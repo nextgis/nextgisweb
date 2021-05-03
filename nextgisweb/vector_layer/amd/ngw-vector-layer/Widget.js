@@ -14,7 +14,10 @@ define([
     // template
     "dojox/layout/TableContainer",
     "ngw-file-upload/Uploader",
-    "dijit/form/ComboBox"
+    "dijit/layout/ContentPane",
+    "dijit/form/ComboBox",
+    "dijit/form/CheckBox",
+    "dijit/TitlePane"
 ], function (
     declare,
     lang,
@@ -47,6 +50,16 @@ define([
             } else {
                 this.mode_section.domNode.style.display = 'none';
             }
+
+            this.wFIDSource.watch('value', function(attr, oldval, newval) {
+                var hideFIDField = newval === 'SEQUENCE';
+                this.wFIDField.set('disabled', hideFIDField);
+            }.bind(this));
+
+            this.wCastGeometryType.watch('value', function(attr, oldval, newval) {
+                var hideSkipOtherGeometryType = newval === 'AUTO';
+                this.wSkipOtherGeometryTypes.set('disabled', hideSkipOtherGeometryType);
+            }.bind(this));
         },
 
         serializeInMixin: function (data) {
@@ -57,7 +70,32 @@ define([
 
             if (this.modeSwitcher.get("value") === 'file') {
                 setObject("source", this.wSourceFile.get("value"));
-                setObject("source.encoding", this.wSourceEncoding.get("value"));
+                setObject("encoding", this.wEncoding.get("value"));
+                setObject("fix_errors", this.wFixErrors.get("value"));
+                setObject("skip_errors", this.wSkipErrors.get("value"));
+                var cast_geometry_type = this.wCastGeometryType.get("value");
+                if (cast_geometry_type === "AUTO") {
+                    cast_geometry_type = null;
+                } else {
+                    setObject("skip_other_geometry_types", this.wSkipOtherGeometryTypes.get("value"));
+                }
+
+                setObject("cast_geometry_type", cast_geometry_type);
+                function bool_toggle (value) {
+                    switch (value) {
+                        case 'YES': return true;
+                        case 'NO': return false;
+                    }
+                    return null;
+                }
+                setObject("cast_is_multi", bool_toggle(this.wCastIsMulti.get("value")));
+                setObject("cast_has_z", bool_toggle(this.wCastHasZ.get("value")));
+
+                var fid_source = this.wFIDSource.get("value");
+                setObject("fid_source", fid_source);
+                if (fid_source !== 'SEQUENCE') {
+                    setObject("fid_field", this.wFIDField.get("value"));
+                }
             } else {
                 setObject("fields", []);
                 setObject("geometry_type", this.wGeometryType.get("value"));

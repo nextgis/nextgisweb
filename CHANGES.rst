@@ -6,9 +6,10 @@ Changes
 
 - Ability to constraint a webmap to default extent.
 - More length and area units in webmap settings.
+- Automatic correction of errors during creation of vector layer.
+- Support for creation of vector layers from GML and KML files.
 - A user login is case insensitive when logging in.
 - Configuration option for disabling social networks share buttons.
-- Experimental support for creation of vector layers from GML files.
 - Performance improvements in geometry handling and rendering
   especially when converting between WKT and WKB formats.
 - Improved word wrapping in webmap identification popup.

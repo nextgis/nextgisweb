@@ -135,3 +135,36 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
         assert fields['datetime'] == datetime(*field_as(ref, 'datetime', 'DateTime')[0:6])
         assert fields['string'] == field_as(ref, 'string', 'String')
         assert fields['unicode'] == field_as(ref, 'unicode', 'String')
+
+
+@pytest.mark.parametrize('fid_source, fid_field, id_expect', (
+    ('SEQUENCE', None, 1),
+    ('FIELD', 'int', -1),
+    ('AUTO', 'int', -1),
+    ('AUTO', 'not_exists', 1),
+))
+def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
+    src = Path(__file__).parent / 'data' / 'type.geojson'
+
+    dataset = ogr.Open(str(src))
+    assert dataset is not None, gdal.GetLastErrorMsg()
+
+    layer = dataset.GetLayer(0)
+    assert layer is not None, gdal.GetLastErrorMsg()
+
+    res = VectorLayer(
+        parent_id=ngw_resource_group, display_name='test_fid',
+        owner_user=User.by_keyname('administrator'),
+        srs=SRS.filter_by(id=3857).one(),
+        tbl_uuid=six.text_type(uuid4().hex))
+
+    res.persist()
+
+    res.setup_from_ogr(layer, fid_params=dict(fid_source=fid_source, fid_field=fid_field))
+    res.load_from_ogr(layer)
+
+    DBSession.flush()
+
+    query = res.feature_query()
+    query.filter_by(id=id_expect)
+    assert query().total_count == 1
