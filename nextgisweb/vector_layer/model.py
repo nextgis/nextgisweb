@@ -476,7 +476,7 @@ class TableInfo(object):
                             if fix_errors == ERROR_FIX.LOSSY:
                                 break
                         else:
-                            errors.append(_("Feature #%d have multiple geometries satisfying the conditions.") % fid)
+                            errors.append(_("Feature #%d has multiple geometries satisfying the conditions.") % fid)
                             continue
                 if geom_candidate is not None:
                     geom = geom_candidate
@@ -487,7 +487,7 @@ class TableInfo(object):
             if gtype not in GEOM_TYPE_OGR:
                 if not skip_other_geometry_types:
                     errors.append(_(
-                        "Feature #%d have unknown geometry type: %d (%s).") % (
+                        "Feature #%d has unknown geometry type: %d (%s).") % (
                         fid, gtype, ogr.GeometryTypeToName(gtype)))
                 continue
             elif not any((
@@ -500,7 +500,7 @@ class TableInfo(object):
             )):
                 if not skip_other_geometry_types:
                     errors.append(_(
-                        "Feature #%d have unsuitable geometry type: %d (%s).") % (
+                        "Feature #%d has unsuitable geometry type: %d (%s).") % (
                         fid, gtype, ogr.GeometryTypeToName(gtype)))
                 continue
 
@@ -518,7 +518,7 @@ class TableInfo(object):
                 if geom.GetGeometryCount() == 1 or fix_errors == ERROR_FIX.LOSSY:
                     geom = geom.GetGeometryRef(0)
                 else:
-                    errors.append(_("Feature #%d have multiple geometries satisfying the conditions.") % fid)
+                    errors.append(_("Feature #%d has multiple geometries satisfying the conditions.") % fid)
                     continue
 
             geom.Transform(transform)
@@ -579,7 +579,7 @@ class TableInfo(object):
                 #             geom = geom.Buffer(0)
                 #     invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype
                 # if invalid:
-                #     errors.append(_("Feature #%d have invalid geometry.") % fid)
+                #     errors.append(_("Feature #%d has invalid geometry.") % fid)
                 #     continue
 
             fld_values = dict()
