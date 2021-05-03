@@ -17,7 +17,7 @@ from .util import (
     gensecret,
     persistent_secret)
 from .model import Base, Session, SessionStore
-from .command import ServerCommand  # NOQA
+from .command import ServerCommand, AMDPackagesCommand  # NOQA
 
 __all__ = ['viewargs', ]
 

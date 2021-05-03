@@ -23,6 +23,9 @@ System requirements
   Python 3 now, but Python 2.7 installation is more stable. So examples bellow
   use Python 2.7.
 
+- Node.js 14.x or higher and Yarn 1.x package manager. We recommend using
+  NodeSource and Yarn package repositories.
+
 - PostgreSQL database with PostGIS and hstore extensions enabled:
 
   - The minimum required versions are PostgreSQL 9.5 and PostGIS 2.4.
@@ -66,11 +69,16 @@ First you need to install required packages:
 
 .. code-block:: none
 
+  # apt install curl git
+  # curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - 
+  # add-apt-repository --yes --no-update "deb https://deb.nodesource.com/node_14.x $(lsb_release -sc) main"
+  # curl --silent https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+  # add-apt-repository --yes --no-update "deb https://dl.yarnpkg.com/debian/ stable main"
+  # apt update
   # apt install python2 python2-dev python3-virtualenv
-  # apt install git curl
   # apt install build-essential libssl-dev libgdal-dev libgeos-dev \
     gdal-bin libxml2-dev libxslt1-dev zlib1g-dev libjpeg-turbo8-dev \
-    nodejs postgresql-client libmagic-dev
+    postgresql-client libmagic-dev nodejs yarn
 
 
 It's recommended to use separate user (``ngw`` for example) for NextGIS Web
@@ -155,11 +163,27 @@ Create ``config/config.ini`` with following contents:
   # To use Russian translation by default uncomment following line
   # locale.default = ru
 
-Now you should initialize database structure with the following command:
+Then set up ``NEXTGISWEB_CONFIG`` environment variable which points to NextGIS
+Web configuration file (instructions about persistent setting are given at the
+end of this section):
 
-.. code-block::
+.. code-block:: none
 
   $ export NEXTGISWEB_CONFIG=/srv/ngw/config/config.ini
+
+After that, set up Node.js and Yarn project environment with workspaces, and
+build necessary files:
+
+.. code-block:: none
+
+  $ nextgisweb jsrealm.install
+  $ mkdir dist
+  $ yarn run build
+
+Now you should initialize database structure with the following command:
+
+.. code-block:: none
+
   $ nextgisweb initialize_db
 
 After that, you can run builtin HTTP server:

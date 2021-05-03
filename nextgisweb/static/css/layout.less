@@ -20,19 +20,35 @@
 
 /* -- BASE STYLES -- */
 @font-face {
-  .font-face('Roboto', ~'../font/roboto-regular', normal, normal);
+  font-family: Roboto;
+  src: url('@{node_modules}/@fontsource/roboto/files/roboto-all-400-normal.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-  .font-face('Roboto', ~'../font/roboto-bold', bold, normal);
+  font-family: Roboto;
+  src: url('@{node_modules}/@fontsource/roboto/files/roboto-all-700-normal.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
 }
 
 @font-face {
-  .font-face('lato_local', ~'../font/lato/lato-regular', normal, normal);
+  font-family: lato_local;
+  src:
+    url('@{node_modules}/lato-font/fonts/lato-normal/lato-normal.woff2') format('woff2'),
+    url('@{node_modules}/lato-font/fonts/lato-normal/lato-normal.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-  .font-face('lato_local', ~'../font/lato/lato-bold', bold, normal);
+  font-family: lato_local;
+  src:
+    url('@{node_modules}/lato-font/fonts/lato-bold/lato-bold.woff2') format('woff2'),
+    url('@{node_modules}/lato-font/fonts/lato-bold/lato-bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
 }
 
 

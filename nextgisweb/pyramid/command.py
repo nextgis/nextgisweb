@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from logging import getLogger
 
 from ..command import Command
+from ..package import amd_packages
 
 logger = getLogger(__name__)
 
@@ -40,3 +41,17 @@ class ServerCommand(Command):
         serve(
             app, host=args.host, port=args.port, threads=1,
             clear_untrusted_proxy_headers=True)
+
+
+@Command.registry.register
+class AMDPackagesCommand():
+    identity = 'amd_packages'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        pass
+
+    @classmethod
+    def execute(cls, args, env):
+        for pname, path in amd_packages():
+            print(pname)

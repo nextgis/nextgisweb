@@ -14,6 +14,7 @@ def pkginfo():
         'core',
         'sentry',
         'pyramid',
+        'jsrealm',
         'auth',
         'resource',
         'resmeta',
@@ -82,23 +83,29 @@ def main(global_config, **settings):
 
 
 def amd_packages():
-    return (
+    return tuple(
+        (k, 'external/{}'.format(k)) for k in (
+            'dojo',
+            'dijit',
+            'dojox',
+            'xstyle',
+            'put-selector',
+            'dgrid',
+            'cbtree',
+
+            'handlebars',
+            'jed',
+            'proj4',
+            'codemirror',
+            'dom-to-image',
+            'svg4everybody',
+            'ie11-custom-properties',
+
+            'jquery',
+        )
+    ) + (
         # contrib packages
-        ('dojo', 'nextgisweb:amd_packages/contrib/dojo'),
-        ('dijit', 'nextgisweb:amd_packages/contrib/dijit'),
-        ('dojox', 'nextgisweb:amd_packages/contrib/dojox'),
-        ('cbtree', 'nextgisweb:amd_packages/contrib/cbtree'),
-        ('xstyle', 'nextgisweb:amd_packages/contrib/xstyle'),
-        ('put-selector', 'nextgisweb:amd_packages/contrib/put-selector'),
-        ('dgrid', 'nextgisweb:amd_packages/contrib/dgrid'),
-        ('handlebars', 'nextgisweb:amd_packages/contrib/handlebars'),
         ('openlayers', 'nextgisweb:amd_packages/contrib/openlayers'),
-        ('dom-to-image', 'nextgisweb:amd_packages/contrib/dom-to-image'),
-        ('svg4everybody', 'nextgisweb:amd_packages/contrib/svg4everybody'),
-        ('codemirror', 'nextgisweb:amd_packages/contrib/codemirror'),
-        ('jquery', 'nextgisweb:amd_packages/contrib/jquery'),
-        ('tus', 'nextgisweb:amd_packages/contrib/tus'),
-        ('ie11-custom-properties', 'nextgisweb:amd_packages/contrib/ie11-custom-properties'),
 
         # nextgisweb packages
         ('ngw', 'nextgisweb:amd_packages/ngw'),

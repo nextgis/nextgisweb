@@ -269,13 +269,17 @@ msgstr "Рекомендуемая высота 45 px и ширина до 200 p
 msgid "Cancel"
 msgstr "Закрыть"
 
-#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:16
-msgid "Measurement units"
-msgstr "Единицы измерения"
+#: nodepkg/api/error.js:12
+msgid "Unknown API error"
+msgstr "Неизвестная ошибка API"
 
-#: amd/ngw-pyramid/template/MiscellaneousForm.hbs:17
-msgid "Meters/Kilometers"
-msgstr "Метры/Километры"
+#: nodepkg/api/error.js:26
+msgid "Invalid API response"
+msgstr "Некорректный ответ API"
+
+#: nodepkg/example/translation.js:5
+msgid "Translated text"
+msgstr "Переведенный текст"
 
 #: amd/ngw-pyramid/template/MiscellaneousForm.hbs:18
 msgid "Feet/Miles"

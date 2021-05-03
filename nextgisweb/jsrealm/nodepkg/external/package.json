@@ -1,0 +1,29 @@
+{
+    "name": "@nextgisweb/external",
+    "version": "0.0.0",
+    "type": "module",
+    "nextgisweb": {
+        "webpackConfigs": {
+            "stylesheet": "webpack.external.cjs"
+        }
+    },
+    "dependencies": {
+        "cbtree": "pjekel/cbtree#v0.9.4",
+        "codemirror": "5.20.2",
+        "dgrid": "SitePen/dgrid#v0.3.21",
+        "dijit": "^1.16.4",
+        "dojo": "^1.16.4",
+        "dojox": "^1.16.4",
+        "dom-to-image": "^2.6.0",
+        "handlebars": "^3.0.3",
+        "ie11-custom-properties": "^4.1.0",
+        "jed": "^1.1.1",
+        "jquery": "3.2.1",
+        "proj4": "^2.7.2",
+        "put-selector": "^0.3.6",
+        "svg4everybody": "^2.1.9",
+        "uglify-js": "^3.13.4",
+        "uglifycss": "^0.0.29",
+        "xstyle": "^0.3.2"
+    }
+}

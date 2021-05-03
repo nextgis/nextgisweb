@@ -10,11 +10,12 @@ Changes
 - Support for creation of vector layers from GML and KML files.
 - A user login is case insensitive when logging in.
 - Configuration option for disabling social networks share buttons.
-- Performance improvements in geometry handling and rendering
-  especially when converting between WKT and WKB formats.
+- Performance improvements in geometry handling and rendering especially when
+  converting between WKT and WKB formats.
 - Performance improvements in tile cache component.
 - Improved word wrapping in webmap identification popup.
 - Minimum and maximum scale restrictions in WMS server.
+- Experimental integration of modern JavaScript and Webpack.
 - OpenLayers library upgraded to 6.5.0.
 - OAuth server logout support via logout redirect endpoint.
 

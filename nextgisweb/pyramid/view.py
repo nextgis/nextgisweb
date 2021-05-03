@@ -16,6 +16,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
+from ..env import env
 from .. import dynmenu as dm
 from ..core.exception import UserException
 from ..package import amd_packages
@@ -52,8 +53,11 @@ def static_amd_file(request):
 def _amd_package_path(name):
     for p, asset in amd_packages():
         if p == name:
-            py_package, path = asset.split(':', 1)
-            return resource_filename(py_package, path)
+            if asset.find(':') == -1:
+                return os.path.join(env.jsrealm.options['dist_path'], asset)
+            else:
+                py_package, path = asset.split(':', 1)
+                return resource_filename(py_package, path)
 
 
 def home(request):
@@ -413,6 +417,9 @@ def setup_pyramid(comp, config):
         .add_view(test_exception_unhandled)
     config.add_route('pyramid.test_timeout', '/test/timeout') \
         .add_view(test_timeout)
+
+    config.add_route('pyramid.test_example', '/test/pyramid/example') \
+        .add_view(lambda request: {}, renderer="nextgisweb:pyramid/template/example.mako")
 
     comp.control_panel = dm.DynMenu(
         dm.Label('info', _("Info")),
