@@ -1,21 +1,21 @@
 Modern JavaScript
 =================
 
-From the beginning, the client-side part of NextGIS Web had been based on the
-Dojo 1.x framework. It was enough simple and great in terms of modularity in
+Since the beginning, the client-side part of NextGIS Web was based on the
+Dojo 1.x framework. It was simple enough and great in terms of modularity in
 those times. But times had changed and now we have modern JavaScript which Dojo
-1.x doesn't support. And now NextGIS Web is in transition from old-style
+1.x doesn't support. NextGIS Web is now in transition from old-style
 Dojo-based code to modern JavaScript with ES modules, Webpack, and lots of other
 stuff.
 
-The bad news is that the migration is hard and will take a lot of resources, but
+The bad news is that the migration is hard and will take lots of resources, but
 the good news is interoperability between old-style and modern JavaScript
 code. Thus you can use modern code from old-style code and vice versa.
 
-The key points are that:
+The key points:
 
-1. Each NextGIS Web component may own one (or even more) corresponding Node
-   package, which belongs to the ``@nextgisweb`` scope (even true for NextGIS
+1. Each NextGIS Web component may own one (or more) corresponding Node
+   package, which belongs to the ``@nextgisweb`` scope (true for NextGIS
    Web extension packages like ``nextgisweb_qgis``). These packages are located
    under ``nodepkg`` subdirectories of corresponding components.
 
@@ -34,8 +34,8 @@ The key points are that:
    module. These entrypoints are compiled to AMD modules and can be loaded by
    Dojo AMD loader on the client-side.
 
-On the side of NextGIS Web, the ``jsrealm`` component manages this enviroment and
-provides some tools to work with that.
+On the NextGIS Web side, the ``jsrealm`` component manages this enviroment and
+provides some tools to work with it.
 
 Setup and directory layout
 --------------------------
@@ -113,14 +113,14 @@ Let's include this package into Yarn workspace root configuration:
   $ cd ~ngw
   $ nextgisweb jsrealm.install
 
-And now you can add some external dependecy for this package, for example:
+And now you can add some external dependency for this package, for example:
 
 .. code-block:: bash
 
   $ cd ~ngw
   $ yarn workspace "@nextgisweb/bar" add faker
 
-Then you can see that dependecy was added to ``package.json`` and now
+Then you can see that dependency was added to ``package.json`` and now
 ``bar/nodepkg/package.json`` looks like this:
 
 .. code-block:: json
