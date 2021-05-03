@@ -260,7 +260,7 @@ class TableInfo(object):
             err_msg = _("Could not determine a geometry type.")
             if len(geom_filter) == 0:
                 err_msg += " " + _("Source layer contains no features satisfying the conditions.")
-            raise VE(err_msg)  # NOQA: E501
+            raise VE(message=err_msg)
 
         self.fields = []
 
@@ -641,7 +641,7 @@ class TableInfo(object):
 
         if len(errors) > 0 and not skip_errors:
             detail = '<br>'.join(html_escape(translate(error)) for error in errors)
-            raise VE(_("Vector layer cannot be written due to errors."), detail=detail)
+            raise VE(message=_("Vector layer cannot be written due to errors."), detail=detail)
 
         # Set sequence next value
         if max_fid is not None:
