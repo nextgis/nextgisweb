@@ -473,7 +473,8 @@ define([
                     }),
                 ],
                 view: new ol.View({
-                    minZoom: 3
+                    minZoom: 3,
+                    constrainResolution: true
                 })
             });
 

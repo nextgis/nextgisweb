@@ -8,7 +8,7 @@ from time import time
 import os.path
 import sqlite3
 from io import BytesIO
-from six.moves.queue import Queue, Full
+from six.moves.queue import Queue, Empty, Full
 
 import transaction
 from PIL import Image
@@ -40,8 +40,12 @@ Base = declarative_base(dependencies=('resource', ))
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
 
 QUEUE_MAX_SIZE = 256
-QUEUE_STUCK_TIMEOUT = 2.0
+QUEUE_STUCK_TIMEOUT = 5.0
+BATCH_MAX_TILES = 32
+BATCH_DEADLINE = 0.5
+
 SQLITE_CON_CACHE = 32
+SQLITE_TIMEOUT = min(QUEUE_STUCK_TIMEOUT * 2, 30)
 
 
 @lru_cache(SQLITE_CON_CACHE)
@@ -50,13 +54,18 @@ def get_tile_db(db_path):
     if not p.parent.exists():
         p.parent.mkdir(parents=True)
     connection = sqlite3.connect(
-        db_path, isolation_level=None, check_same_thread=False)
+        db_path, isolation_level='DEFERRED',
+        timeout=SQLITE_TIMEOUT,
+        check_same_thread=False)
 
     connection.text_factory = bytes
     cur = connection.cursor()
 
     # Set page size according to https://www.sqlite.org/intern-v-extern-blob.html
     cur.execute("PRAGMA page_size = 8192")
+
+    # For better concurency and avoiding lock timeout errors during reading:
+    cur.execute("PRAGMA journal_mode = WAL")
 
     # CREATE TABLE IF NOT EXISTS causes SQLite database lock. So check the tile
     # table existance before table creation.
@@ -74,6 +83,8 @@ def get_tile_db(db_path):
                 PRIMARY KEY (z, x, y)
             )
         """)
+
+        connection.commit()
 
     return connection
 
@@ -124,58 +135,105 @@ class TilestorWriter:
                     self.queue.maxsize))
 
     def _job(self):
+        data = None
+
         while True:
             self.cstart = None
-            data = self.queue.get()
-            self.cstart = time()
+
+            if data is None:
+                data = self.queue.get()
+            db_path = data['db_path']
+
+            self.cstart = ptime = time()
+
+            tiles_written = 0
+            time_taken = 0.0
+
+            answers = []
 
             # Tile cache writer may fall sometimes in case of database connecti
             # problem for example. So we just skip a tile with error and log an
             # exception.
             try:
 
-                z, x, y = data['tile']
-                tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
-
-                img = data['img']
-
-                colortuple = imgcolor(img)
-                color = pack_color(colortuple) if colortuple is not None else None
-
                 with transaction.manager:
                     conn = DBSession.connection()
-                    conn.execute(db.sql.text(
-                        'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
-                        'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
-                        'VALUES (:z, :x, :y, :color, :tstamp)'.format(data['uuid'])
-                    ), z=z, x=x, y=y, color=color, tstamp=tstamp)
+                    tilestor = get_tile_db(db_path)
+
+                    while data is not None and data['db_path'] == db_path:
+                        z, x, y = data['tile']
+                        tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
+
+                        img = data['img']
+
+                        colortuple = imgcolor(img)
+                        color = pack_color(colortuple) if colortuple is not None else None
+
+                        conn.execute(db.sql.text(
+                            'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
+                            'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
+                            'VALUES (:z, :x, :y, :color, :tstamp)'.format(data['uuid'])
+                        ), z=z, x=x, y=y, color=color, tstamp=tstamp)
+
+                        if color is None:
+                            buf = BytesIO()
+                            img.save(buf, format='PNG', compress_level=3)
+
+                            tilestor.execute(
+                                "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
+                                (z, x, y))
+
+                            try:
+                                tilestor.execute(
+                                    "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
+                                    (z, x, y, tstamp, buf.getvalue()))
+                            except sqlite3.IntegrityError:
+                                # NOTE: Race condition with other proccess may occurs here.
+                                # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
+                                pass
+
+                        if 'answer_queue' in data:
+                            answers.append(data['answer_queue'])
+
+                        tiles_written += 1
+
+                        ctime = time()
+                        time_taken += ctime - ptime
+
+                        if tiles_written >= BATCH_MAX_TILES:
+                            # Break the batch
+                            data = None
+                        else:
+                            # Try to get next tile for the batch. Or break
+                            # the batch if there is no tiles left.
+                            if time_taken < BATCH_DEADLINE:
+                                try:
+                                    data = self.queue.get(timeout=(
+                                        BATCH_DEADLINE - time_taken))
+                                except Empty:
+                                    data = None
+                            else:
+                                data = None
+
+                        # Do not account queue block time
+                        ptime = time()
 
                     # Force zope session management to commit changes
                     mark_changed(DBSession())
+                    tilestor.commit()
 
-                if color is None:
-                    buf = BytesIO()
-                    img.save(buf, format='PNG', compress_level=3)
+                    time_taken += time() - ptime
+                    _logger.debug(
+                        "%d tiles were written in %0.3f seconds (%0.3f per "
+                        "tile)", tiles_written, time_taken,
+                        time_taken / tiles_written)
 
-                    tilestor = get_tile_db(data['db_path'])
-                    tilestor.execute(
-                        "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
-                        (z, x, y))
-
-                    try:
-                        tilestor.execute(
-                            "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                            (z, x, y, tstamp, buf.getvalue()))
-                    except sqlite3.IntegrityError:
-                        # NOTE: Race condition with other proccess may occurs here.
-                        # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
-                        pass
+                # Report about sucess only after transaction commit
+                for a in answers:
+                    a.put_nowait(None)
 
             except Exception as exc:
                 _logger.exception("Uncaught exception in tile writer: %s", exc.message)
-
-            if 'answer_queue' in data:
-                data['answer_queue'].put_nowait(None)
 
 
 class ResourceTileCache(Base):
