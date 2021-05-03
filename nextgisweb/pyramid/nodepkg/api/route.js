@@ -50,6 +50,14 @@ export const compatRoute = {};
 // exist functions should be created in alphabetical order.
 for (const key of Object.keys(routeData).sort()) {
     const defn = routeData[key];
-    const fn = (...args) => routeURL(key, ...args);
+    const fn = (...args) => {
+        if (ngwConfig.debug) {
+            console.warn(new Error(
+                `Module "ngw-pyramid/route" has been deprecated! Use ` +
+                `routeURL() or route() from "@nextgisweb/pyramid/api" instead.`
+            ));
+        }
+        return routeURL(key, ...args);
+    }
     set(compatRoute, key, fn);
 }

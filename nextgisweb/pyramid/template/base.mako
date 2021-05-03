@@ -44,6 +44,7 @@
 
     <script type="text/javascript">
         var ngwConfig = {
+            debug: ${request.env.core.options["debug"] | json.dumps, n},
             applicationUrl: ${request.application_url | json.dumps, n},
             assetUrl: ${request.static_url('nextgisweb:static/') | json.dumps, n },
             amdUrl: ${request.route_url('amd_package', subpath="") | json.dumps, n},
