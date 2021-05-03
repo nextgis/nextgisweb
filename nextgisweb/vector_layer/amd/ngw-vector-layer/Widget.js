@@ -58,7 +58,7 @@ define([
 
             this.wCastGeometryType.watch('value', function(attr, oldval, newval) {
                 var hideSkipOtherGeometryType = newval === 'AUTO';
-                this.wSkipOtherGeometryType.set('disabled', hideSkipOtherGeometryType);
+                this.wSkipOtherGeometryTypes.set('disabled', hideSkipOtherGeometryType);
             }.bind(this));
         },
 
@@ -77,7 +77,7 @@ define([
                 if (cast_geometry_type === "AUTO") {
                     cast_geometry_type = null;
                 } else {
-                    setObject("skip_other_geometry_type", this.wSkipOtherGeometryType.get("value"));
+                    setObject("skip_other_geometry_types", this.wSkipOtherGeometryTypes.get("value"));
                 }
 
                 setObject("cast_geometry_type", cast_geometry_type);

@@ -44,7 +44,7 @@ CREATE_TEST_PARAMS = (
 
     (
         'mixed-feature-geom.geojson',
-        dict(geometry_type='POINT', skip_other_geometry_type=True),
+        dict(geometry_type='POINT', skip_other_geometry_types=True),
         dict(geometry_type='MULTIPOINT', feature_count=2),
     ),
     (
@@ -52,14 +52,14 @@ CREATE_TEST_PARAMS = (
         # The first POINT should be taken in LOSSY mode.
         'mixed-feature-geom.geojson',
         dict(
-            geometry_type='POINT', skip_other_geometry_type=True,
+            geometry_type='POINT', skip_other_geometry_types=True,
             fix_errors='LOSSY', is_multi=False),
         dict(geometry_type='POINT', feature_count=2),
     ),
     (
         # The layer has only one LINESTRING geometry and it's valid.
         'mixed-feature-geom.geojson',
-        dict(geometry_type='LINESTRING', skip_other_geometry_type=True),
+        dict(geometry_type='LINESTRING', skip_other_geometry_types=True),
         dict(geometry_type='LINESTRING', feature_count=1),
     ),
 
@@ -71,7 +71,7 @@ CREATE_TEST_PARAMS = (
 
     (
         'null-geom.geojson',
-        dict(skip_other_geometry_type=True),
+        dict(skip_other_geometry_types=True),
         dict(geometry_type='POINT', feature_count=1),
     ),
 
@@ -93,7 +93,7 @@ CREATE_TEST_PARAMS = (
     ),
     (
         'single-geom-collection.geojson',
-        dict(geometry_type='POINT', skip_other_geometry_type=True),
+        dict(geometry_type='POINT', skip_other_geometry_types=True),
         dict(geometry_type='POINT', feature_count=0),
     ),
     (
@@ -175,9 +175,9 @@ def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
         setup_kwargs = dict()
         load_kwargs = dict()
 
-        if 'skip_other_geometry_type' in options:
-            setup_kwargs['skip_other_geometry_type'] = options['skip_other_geometry_type']
-            load_kwargs['skip_other_geometry_type'] = options['skip_other_geometry_type']
+        if 'skip_other_geometry_types' in options:
+            setup_kwargs['skip_other_geometry_types'] = options['skip_other_geometry_types']
+            load_kwargs['skip_other_geometry_types'] = options['skip_other_geometry_types']
 
         if 'fix_errors' in options:
             load_kwargs['fix_errors'] = options['fix_errors']
