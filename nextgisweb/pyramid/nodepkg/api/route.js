@@ -45,7 +45,11 @@ export function route(name, ...rest) {
 }
 
 export const compatRoute = {};
-for (const [key, def] of Object.entries(routeData)) {
+
+// Because both keys "feature_layer.store.item" and "feature_layer.store"
+// exist functions should be created in alphabetical order.
+for (const key of Object.keys(routeData).sort()) {
+    const defn = routeData[key];
     const fn = (...args) => routeURL(key, ...args);
     set(compatRoute, key, fn);
 }
