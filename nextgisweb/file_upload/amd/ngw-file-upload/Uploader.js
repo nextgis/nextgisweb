@@ -7,7 +7,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw/route",
-    "ngw/settings!file_upload",
+    "@nextgisweb/pyramid/settings!",
     "@nextgisweb/pyramid/i18n!",
     "dojo/text!./template/Uploader.hbs",
     "./FileUploader",

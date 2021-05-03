@@ -1,6 +1,6 @@
 define([
     "ngw/route",
-    "ngw/settings!pyramid",
+    "@nextgisweb/pyramid/settings!",
     "@nextgisweb/pyramid/i18n!",
     // css
     "xstyle/css!./company-logo.css"

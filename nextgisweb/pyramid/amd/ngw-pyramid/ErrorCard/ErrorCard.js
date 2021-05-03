@@ -6,7 +6,7 @@ define([
     "dojo/dom-class",
     "dojo/json",
     "dojo/Evented",
-    "ngw/settings!pyramid",
+    "@nextgisweb/pyramid/settings!",
     "ngw-pyramid/form/CodeMirror",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetBase",

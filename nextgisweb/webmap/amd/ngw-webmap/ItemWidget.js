@@ -35,7 +35,7 @@ define([
     // resource
     "dojo/text!./template/ItemWidget.hbs",
     //"xstyle/css!./template/resource/ItemWidget.css",
-    "ngw/settings!webmap",
+    "@nextgisweb/pyramid/settings!",
     // template
     "dijit/layout/TabContainer",
     "dijit/layout/StackContainer",

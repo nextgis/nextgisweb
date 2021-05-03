@@ -29,8 +29,8 @@ define([
     "ngw-webmap/ui/CoordinateSwitcher/CoordinateSwitcher",
     "ngw-pyramid/CopyButton/CopyButton",
     // settings
-    "ngw/settings!feature_layer",
-    "ngw/settings!webmap",
+    "@nextgisweb/pyramid/settings!feature_layer",
+    "@nextgisweb/pyramid/settings!",
     // css
     "xstyle/css!./resources/Identify.css"
 ], function (

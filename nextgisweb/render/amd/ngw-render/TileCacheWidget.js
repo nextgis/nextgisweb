@@ -5,7 +5,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
     "@nextgisweb/pyramid/i18n!",
-    "ngw/settings!render",
+    "@nextgisweb/pyramid/settings!",
     "dojo/text!./template/TileCacheWidget.hbs",
     "dijit/form/CheckBox",
     "dojox/layout/TableContainer",

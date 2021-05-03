@@ -11,7 +11,7 @@ define([
     "dojo/data/ObjectStore",
     "dojo/request/xhr",
     "dojo/io-query",
-    "ngw/settings!feature_layer",
+    "@nextgisweb/pyramid/settings!",
     "ngw/route",
     "@nextgisweb/pyramid/i18n!",
     "dojo/text!./template/ExportForm.hbs",

@@ -9,7 +9,7 @@ define([
     "ngw-spatial-ref-sys/SRSSelect",
     // resource
     "dojo/text!./template/Widget.hbs",
-    "ngw/settings!vector_layer",
+    "@nextgisweb/pyramid/settings!",
     // template
     "dojox/layout/TableContainer",
     "ngw-file-upload/Uploader",

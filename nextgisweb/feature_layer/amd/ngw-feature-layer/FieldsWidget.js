@@ -20,7 +20,7 @@ define([
     "dgrid/Selection",
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",
-    "ngw/settings!feature_layer",
+    "@nextgisweb/pyramid/settings!",
     "ngw-pyramid/form/KeynameTextBox",
     "ngw-resource/serialize",
     "@nextgisweb/pyramid/i18n!",

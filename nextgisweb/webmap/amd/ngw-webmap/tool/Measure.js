@@ -9,7 +9,7 @@ define([
     "dijit/TooltipDialog",
     "openlayers/ol",
     "ngw/route",
-    "ngw/settings!webmap",
+    "@nextgisweb/pyramid/settings!",
     "@nextgisweb/pyramid/i18n!"
 ], function (
     declare,

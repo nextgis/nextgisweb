@@ -57,7 +57,7 @@ define([
     // utils
     "./utils/URL",
     // settings
-    "ngw/settings!webmap",
+    "@nextgisweb/pyramid/settings!",
     // template
     "dijit/layout/TabContainer",
     "dijit/layout/BorderContainer",

@@ -10,7 +10,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
     // resource
     "dojo/text!./template/ConnectionWidget.hbs",
-    "ngw/settings!tmsclient",
+    "@nextgisweb/pyramid/settings!",
     // template
     "dijit/form/ValidationTextBox",
     "dijit/form/Select",

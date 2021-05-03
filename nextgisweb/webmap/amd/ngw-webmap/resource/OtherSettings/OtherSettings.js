@@ -4,7 +4,7 @@ define([
     'ngw/route', 'dijit/_WidgetBase', 'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin', 'ngw-resource/serialize',
     'dijit/form/CheckBox', '@nextgisweb/pyramid/i18n!',
-    'ngw/settings!webmap',
+    '@nextgisweb/pyramid/settings!',
     // resource
     'dojo/text!./OtherSettings.hbs',
     // template

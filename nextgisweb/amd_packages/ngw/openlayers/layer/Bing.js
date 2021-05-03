@@ -2,7 +2,7 @@
 define([
     "dojo/_base/declare",
     "./_Base",
-    "ngw/settings!webmap"
+    "@nextgisweb/pyramid/settings!webmap"
 ], function (
     declare,
     _Base,

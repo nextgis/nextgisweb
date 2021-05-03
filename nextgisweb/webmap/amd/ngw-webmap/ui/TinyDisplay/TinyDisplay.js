@@ -35,7 +35,7 @@ define([
     "ngw-webmap/MapStatesObserver",
     "ngw-webmap/FeatureHighlighter",
     // settings
-    "ngw/settings!webmap",
+    "@nextgisweb/pyramid/settings!",
     "ngw-webmap/controls/LinkToMainMap",
     "dijit/layout/TabContainer",
     "dijit/layout/BorderContainer",

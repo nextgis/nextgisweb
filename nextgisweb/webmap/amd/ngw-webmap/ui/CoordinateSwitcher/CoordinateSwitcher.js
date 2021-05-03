@@ -8,7 +8,7 @@ define([
     "proj4/proj4",
     "ngw-pyramid/utils/coordinateConverter",
     "ngw/load-json!api/component/spatial_ref_sys/",
-    "ngw/settings!webmap",
+    "@nextgisweb/pyramid/settings!",
     //templates
     "xstyle/css!./CoordinateSwitcher.css"
 ], function (
