@@ -16,7 +16,7 @@ from six import text_type, ensure_str
 from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..layer import IBboxLayer
-from ..lib.geometry import Geometry
+from ..lib.geometry import Geometry, GeometryNotValid
 from ..lib.ows import parse_request, get_work_version
 from ..resource import DataScope
 from ..spatial_ref_sys import SRS
@@ -339,11 +339,14 @@ class WFSHandler():
             if tag == 'Intersects':
                 __value_reference = __el[0]
                 if ns_trim(__value_reference.tag) != 'ValueReference':
-                    raise ValidationError("Intersects parse: ValueReference required")
+                    raise ValidationError("Intersects parse: ValueReference required.")
                 elif __value_reference.text != get_geom_column(layer.resource):
                     raise ValidationError("Geometry column '%s' not found" % __value_reference.text)
                 __gml = __el[1]
-                intersects = geom_from_gml(__gml)
+                try:
+                    intersects = geom_from_gml(__gml)
+                except GeometryNotValid:
+                    raise ValidationError("Intersects parse: geometry is not valid.")
                 continue
 
             if tag == 'ResourceId':  # 2.0.0
@@ -662,7 +665,10 @@ class WFSHandler():
             bbox_param = self.p_bbox.split(',')
             box_coords = map(float, bbox_param[:4])
             box_srid = parse_srs(bbox_param[4]) if len(bbox_param) == 5 else feature_layer.srs_id
-            box_geom = Geometry.from_shape(box(*box_coords), srid=box_srid)
+            try:
+                box_geom = Geometry.from_shape(box(*box_coords), srid=box_srid, validate=True)
+            except GeometryNotValid:
+                raise ValidationError("Paremeter BBOX geometry is not valid.")
             query.intersects(box_geom)
 
         if __query is not None:
@@ -807,7 +813,11 @@ class WFSHandler():
                 for _property in _layer:
                     key = ns_trim(_property.tag)
                     if key == geom_column:
-                        feature.geom = geom_from_gml(_property[0])
+                        try:
+                            geom = geom_from_gml(_property[0])
+                        except GeometryNotValid:
+                            raise ValidationError("Geometry is not valid.")
+                        feature.geom = geom
                     else:
                         feature.fields[key] = _property.text
 
@@ -856,7 +866,11 @@ class WFSHandler():
                         geom_column = get_geom_column(feature_layer)
 
                         if key == geom_column:
-                            feature.geom = geom_from_gml(_value[0])
+                            try:
+                                geom = geom_from_gml(_value[0])
+                            except GeometryNotValid:
+                                raise ValidationError("Geometry is not valid.")
+                            feature.geom = geom
                         else:
                             if _value is None:
                                 value = None

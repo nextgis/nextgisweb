@@ -5,14 +5,13 @@ import six
 
 import pytest
 from osgeo import ogr, gdal
-from shapely.geometry import Point
 from shapely.wkt import loads as wkt_loads
 from shapely.wkb import loads as wkb_loads
 from sqlalchemy import func as sa_func
 
 from nextgisweb.models import DBSession
 
-from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.geometry import Geometry, GeometryNotValid
 
 
 @pytest.mark.parametrize('wkt', (
@@ -46,9 +45,27 @@ def test_wkt_wkb(wkt, ngw_txn):
     assert Geometry.from_wkt(wkt_iso).wkb == wkb_ext, "WKT parsing has failed"
 
 
+@pytest.mark.parametrize('wkt, is_valid', (
+    ('dich', False),
+    ('POINT (0.0 0.0)', True),
+    ('POINT Z (1 2 3)', True),
+    ('GEOMETRYCOLLECTION EMPTY', True),
+    ('LINESTRING (0 1)', False),
+    ('POLYGON ((0 0,0 1,1 1,1 0))', False),
+    ('POLYGON ((0 0,0 1,1 1,1 0,0 0))', True),
+    ('POLYGON ((0 0,0 3,2 1,1 1,3 3,3 0,0 0))', False),
+))
+def test_valid(wkt, is_valid):
+    if not is_valid:
+        with pytest.raises(GeometryNotValid):
+            Geometry.from_wkt(wkt)
+    else:
+        Geometry.from_wkt(wkt)
+
+
 def test_wkt_wkb_ogr_shape():
     wkt = Geometry.from_wkt('POINT Z (1 2 3)')
-    
+
     wkb = Geometry.from_wkb(wkt.wkb)
     assert wkt.wkt == wkb.wkt
 
@@ -80,7 +97,6 @@ def test_convert(fmt_src, fmt_dst):
         assert val_dst.Equal(sample[fmt_dst])
     else:
         assert val_dst == sample[fmt_dst]
-    
 
 
 def _pg_wkt_to_wkb_iso(wkt):

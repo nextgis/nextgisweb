@@ -13,13 +13,17 @@ from shapely.geometry import (
 from shapely.ops import transform as map_coords
 
 
+class GeometryNotValid(ValueError):
+    pass
+
+
 class Geometry(object):
     """ Initialization format is kept "as is".
     Other formats are calculated as needed."""
 
     __slots__ = ('_wkb', '_wkt', '_ogr', '_shape', '_srid')
 
-    def __init__(self, wkb=None, wkt=None, ogr=None, shape=None, srid=None):
+    def __init__(self, wkb=None, wkt=None, ogr=None, shape=None, srid=None, _validate=False):
         self._wkb = wkb
         self._wkt = wkt
         self._ogr = ogr
@@ -30,34 +34,40 @@ class Geometry(object):
 
         self._srid = srid
 
+        if _validate and not self._is_valid():
+            raise GeometryNotValid()
+
     @property
     def srid(self):
         return self._srid
 
+    def _is_valid(self):
+        return self.ogr is not None and self._ogr.IsValid()
+
     # Base constructors
 
     @classmethod
-    def from_wkb(cls, data, srid=None):
-        return cls(wkb=data, srid=srid)
+    def from_wkb(cls, data, srid=None, validate=True):
+        return cls(wkb=data, srid=srid, _validate=validate)
 
     @classmethod
-    def from_wkt(cls, data, srid=None):
-        return cls(wkt=data, srid=srid)
+    def from_wkt(cls, data, srid=None, validate=True):
+        return cls(wkt=data, srid=srid, _validate=validate)
 
     @classmethod
-    def from_ogr(cls, data, srid=None):
-        return cls(ogr=data, srid=srid)
+    def from_ogr(cls, data, srid=None, validate=True):
+        return cls(ogr=data, srid=srid, _validate=validate)
 
     @classmethod
-    def from_shape(cls, data, srid=None):
-        return cls(shape=data, srid=srid)
+    def from_shape(cls, data, srid=None, validate=False):
+        return cls(shape=data, srid=srid, _validate=validate)
 
     # Additional constructors
 
     @classmethod
-    def from_geojson(cls, data, srid=None):
+    def from_geojson(cls, data, srid=None, validate=True):
         shape = geometry_shape(data)
-        return cls.from_shape(shape, srid=srid)
+        return cls.from_shape(shape, srid=srid, validate=validate)
 
     @classmethod
     def from_box(cls, minx, miny, maxx, maxy, srid=None):
@@ -96,7 +106,6 @@ class Geometry(object):
                 # WKB is the fastest, so convert to WKB and then to OGR.
                 self._ogr = CreateGeometryFromWkb(self.wkb)
         return self._ogr
-
 
     @property
     def shape(self):

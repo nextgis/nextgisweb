@@ -727,9 +727,9 @@ class FeatureQueryBase(object):
                             if self._geom_format == 'WKB':
                                 geom_data = row['geom'].tobytes() if six.PY3 \
                                     else six.binary_type(row['geom'])
-                                geom = Geometry.from_wkb(geom_data)
+                                geom = Geometry.from_wkb(geom_data, validate=False)
                             else:
-                                geom = Geometry.from_wkt(row['geom'])
+                                geom = Geometry.from_wkt(row['geom'], validate=False)
                         else:
                             geom = None
 
