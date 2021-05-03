@@ -2,6 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
+from logging import error
 import uuid
 import zipfile
 import ctypes
@@ -528,21 +529,58 @@ class TableInfo(object):
                 geom.Set3D(True)
             elif not has_z and geom.Is3D():
                 geom.Set3D(False)
+          
+            # Points can't have validity errors.
+            is_single = _GEOM_OGR_2_TYPE[gtype] not in GEOM_TYPE.is_multi
+            is_point = _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.points
+            is_polygon = _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.polygons
 
-            # Check geometry valid
-            # if not geom.IsValid():
-            #     invalid = True
-            #     if fix_errors != ERROR_FIX.NONE:
-            #         if _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.polygons:
-            #             geom.CloseRings()
-            #         if fix_errors == ERROR_FIX.LOSSY and not geom.IsValid():
-            #             geom = geom.MakeValid()
-            #             if geom is not None and not geom.IsValid():
-            #                 geom = geom.Buffer(0)
-            #         invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype
-            #     if invalid:
-            #         errors.append(_("Feature #%d have invalid geometry.") % fid)
-            #         continue
+            if not is_point and not geom.IsValid():
+                # Close rings for polygons: GDAL doesn't provide a method for
+                # checking if a geometry has unclosed rings, but we can achieve
+                # this via comparison.
+                if is_polygon:
+                    geom_closed = geom.Clone()
+                    geom_closed.CloseRings()
+                    if not geom_closed.Equals(geom):
+                        if fix_errors == ERROR_FIX.NONE:
+                            errors.append(_("Feature #%d has unclosed rings.") % fid)
+                            continue
+                        else:
+                            geom = geom_closed
+
+                # Check for polygon rings with fewer than 3 points and
+                # linestrings with fewer than 2 points.
+                if not geom.IsValid():
+                    error_found = False
+                    for part in ((geom, ) if is_single else geom):
+                        if is_polygon:
+                            for ring in part:
+                                if ring.GetPointCount() < 4:
+                                    # TODO: Invalid parts can be removed from multipart geometries in LOSSY mode.
+                                    errors.append(_("Feature #%d has less than 3 points in a polygon ring.") % fid)
+                                    error_found = True
+                        elif part.GetPointCount() < 2:
+                            # TODO: Invalid parts can be removed from multipart geometries in LOSSY mode.
+                            errors.append(_("Feature #%d has less than 2 points in a linestring.") % fid)
+                            error_found = True
+                        if error_found:
+                            break
+                    if error_found:
+                        continue
+                
+                # NOTE: Disabled for better times.
+                # Check for topology errors and fix them as possible.
+                # invalid = True
+                # if fix_errors != ERROR_FIX.NONE:
+                #     if fix_errors == ERROR_FIX.LOSSY and not geom.IsValid():
+                #         geom = geom.MakeValid()
+                #         if geom is not None and not geom.IsValid():
+                #             geom = geom.Buffer(0)
+                #     invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype
+                # if invalid:
+                #     errors.append(_("Feature #%d have invalid geometry.") % fid)
+                #     continue
 
             fld_values = dict()
             for i in range(feature.GetFieldCount()):

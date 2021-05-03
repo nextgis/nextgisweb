@@ -30,23 +30,30 @@ CREATE_TEST_PARAMS = (
         dict(feature_count=2),
     ),
 
-    # (
-    #     'incomplete-geom.geojson',
-    #     dict(fix_errors='LOSSY'),
-    #     dict(exception=ValidationError),
-    # ),
+    (
+        'incomplete-linestring.geojson',
+        dict(fix_errors='LOSSY'),
+        dict(exception=ValidationError),
+    ),
 
-    # (
-    #     'incomplete-geom.geojson',
-    #     dict(skip_errors=True),
-    #     dict(feature_count=1)
-    # ),
+    (
+        'incomplete-linestring.geojson',
+        dict(skip_errors=True),
+        dict(feature_count=1)
+    ),
+
+    (
+        'incomplete-polygon.geojson',
+        dict(fix_errors='LOSSY'),
+        dict(exception=ValidationError),
+    ),
 
     (
         'mixed-feature-geom.geojson',
         dict(geometry_type='POINT', skip_other_geometry_types=True),
         dict(geometry_type='MULTIPOINT', feature_count=2),
     ),
+
     (
         # The second MULTIPOINT geometry must be converted to a SINGLE geometry.
         # The first POINT should be taken in LOSSY mode.
@@ -75,11 +82,13 @@ CREATE_TEST_PARAMS = (
         dict(geometry_type='POINT', feature_count=1),
     ),
 
-    # (
-    #     'self-intersection.geojson',
-    #     dict(fix_errors='SAFE'),
-    #     dict(exception=ValidationError),
-    # ),
+    (
+        # Geometries with topology errors are accepted.
+        'self-intersection.geojson',
+        dict(fix_errors=None),
+        dict(feature_count=1),
+    ),
+
     # (
     #     'self-intersection.geojson',
     #     dict(fix_errors='LOSSY'),
@@ -125,12 +134,19 @@ CREATE_TEST_PARAMS = (
         dict(geometry_type='MULTIPOINTZ', feature_count=0),
     ),
 
-    # (
-    #     # The unclosed ring must be closed in SAFE mode, QGIS does it sielently.
-    #     'unclosed-ring.geojson',
-    #     dict(fix_errors='SAFE'),
-    #     dict(feature_count=1),
-    # ),
+    (
+        # The unclosed ring must be reported as an error.
+        'unclosed-ring.geojson',
+        dict(),
+        dict(exception=ValidationError),
+    ),
+
+    (
+        # The unclosed ring must be closed in SAFE mode, QGIS does it sielently.
+        'unclosed-ring.geojson',
+        dict(fix_errors='SAFE'),
+        dict(feature_count=1),
+    ),
 
     (
         # Just check loading of POINTZ layers.
