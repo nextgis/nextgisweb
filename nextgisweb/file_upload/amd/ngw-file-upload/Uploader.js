@@ -1,4 +1,3 @@
-/*global define, dojox */
 define([
     "dojo/_base/declare",
     "dojo/Deferred",

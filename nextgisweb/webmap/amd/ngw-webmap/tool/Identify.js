@@ -1,4 +1,3 @@
-/*global console, OpenLayers*/
 define([
     "dojo/_base/declare",
     "./Base",

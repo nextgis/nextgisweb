@@ -1,4 +1,3 @@
-/* globals define, require, console, alert */
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",

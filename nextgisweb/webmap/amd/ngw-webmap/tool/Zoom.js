@@ -1,4 +1,3 @@
-/*global define, require*/
 define([
     "dojo/_base/declare",
     "./Base",

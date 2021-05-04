@@ -1,4 +1,3 @@
-/* global console */
 define([
     'dojo/_base/declare', './_PluginBase', 'dojo/_base/lang',
     'dojo/_base/array', 'dojo/Deferred', 'dijit/layout/TabContainer',

@@ -1,4 +1,3 @@
-/* globals define */
 define([
     'dojo/_base/declare', 'dojo/_base/lang', 'dojo/request/xhr',
     'ngw/route', 'dijit/_WidgetBase', 'dijit/_TemplatedMixin',

@@ -1,4 +1,3 @@
-/* globals define, ngwConfig */
 define([
     "dojo/_base/declare",
     "dijit/Tree",

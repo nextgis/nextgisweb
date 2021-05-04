@@ -1,4 +1,3 @@
-/*global define*/
 define([
     "dojo/_base/declare"
 ], function (

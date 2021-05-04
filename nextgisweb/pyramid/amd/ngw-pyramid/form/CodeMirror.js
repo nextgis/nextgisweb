@@ -1,4 +1,3 @@
-/*global define, require, ngwConfig*/
 define([
     "dojo/_base/declare",
     "dojo/dom-class",
