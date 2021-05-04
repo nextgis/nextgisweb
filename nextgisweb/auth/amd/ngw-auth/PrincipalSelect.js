@@ -3,7 +3,7 @@ define([
     "dijit/form/FilteringSelect",
     "dojo/store/Memory",
     "dojo/_base/lang",
-    "ngw/load-json!auth/principal/dump"
+    "@nextgisweb/pyramid/api/load!auth/principal/dump"
 ], function (
     declare,
     FilteringSelect,

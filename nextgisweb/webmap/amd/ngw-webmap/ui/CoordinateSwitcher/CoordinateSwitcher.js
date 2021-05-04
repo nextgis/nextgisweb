@@ -7,7 +7,7 @@ define([
     "openlayers/ol",
     "proj4/proj4",
     "ngw-pyramid/utils/coordinateConverter",
-    "ngw/load-json!api/component/spatial_ref_sys/",
+    "@nextgisweb/pyramid/api/load!api/component/spatial_ref_sys/",
     "@nextgisweb/pyramid/settings!",
     //templates
     "xstyle/css!./CoordinateSwitcher.css"

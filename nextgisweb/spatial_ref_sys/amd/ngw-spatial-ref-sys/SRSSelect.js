@@ -2,7 +2,7 @@ define([
     "dojo/_base/declare",
     "dijit/form/Select",
     "dojo/_base/array",
-    "ngw/load-json!api/component/spatial_ref_sys/"
+    "@nextgisweb/pyramid/api/load!api/component/spatial_ref_sys/"
 ], function (declare, Select, array, dataSRS) {
     return declare([Select], {
         constructor: function (params) {

@@ -6,7 +6,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
     // resource
-    "ngw/load-json!resource/schema",
+    "@nextgisweb/pyramid/api/load!resource/schema",
     "dojo/text!./template/Widget.hbs",
     "@nextgisweb/pyramid/i18n!",
     // template
