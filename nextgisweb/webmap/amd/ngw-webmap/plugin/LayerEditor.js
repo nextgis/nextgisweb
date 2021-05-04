@@ -25,11 +25,34 @@ define([
     "ngw-webmap/tool/editing/DeleteFeature",
     "ngw-webmap/MapStatesObserver",
     "@nextgisweb/pyramid/i18n!"
-], function (declare, lang, on, Memory, xhr,
-             json, topic, query, domClass, domStyle, all, fnObject, CheckedMenuItem,
-             ConfirmDialog, Standby, ol, route, Vector, _PluginBase, FinishEditingDialog,
-             EditingToolbar, CreateFeature, ModifyFeature, DeleteFeature,
-             MapStatesObserver, i18n) {
+], function (
+    declare,
+    lang,
+    on,
+    Memory,
+    xhr,
+    json,
+    topic,
+    query,
+    domClass,
+    domStyle,
+    all,
+    fnObject,
+    CheckedMenuItem,
+    ConfirmDialog,
+    Standby,
+    ol,
+    route,
+    Vector,
+    _PluginBase,
+    FinishEditingDialog,
+    EditingToolbar,
+    CreateFeature,
+    ModifyFeature,
+    DeleteFeature,
+    MapStatesObserver,
+    i18n
+) {
 
     var wkt = new ol.format.WKT(),
         finishConfirmDialog = new FinishEditingDialog();

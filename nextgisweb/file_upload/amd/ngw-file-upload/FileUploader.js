@@ -23,8 +23,32 @@ define("ngw-file-upload/FileUploader", [
 	"@nextgisweb/file-upload/tus-client",
 	"ngw/route",
 	"@nextgisweb/pyramid/settings!"
-],function(kernel, declare, lang, array, connect, win, Deferred, domStyle, domClass, domGeometry, domAttr, domConstruct,
-			domForm, all, xhr, dijit, Button, Base, HTML5, res, template, tus, route, settings){
+],function (
+    kernel,
+    declare,
+    lang,
+    array,
+    connect,
+    win,
+    Deferred,
+    domStyle,
+    domClass,
+    domGeometry,
+    domAttr,
+    domConstruct,
+    domForm,
+    all,
+    xhr,
+    dijit,
+    Button,
+    Base,
+    HTML5,
+    res,
+    template,
+    tus,
+    route,
+    settings
+) {
 
 	// TODO:
 	//		i18n

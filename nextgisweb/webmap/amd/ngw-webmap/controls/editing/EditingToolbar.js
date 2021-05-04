@@ -4,7 +4,12 @@ define([
     "dojo/dom-construct",
     "openlayers/ol",
     "xstyle/css!./EditingToolbar.css"
-], function (declare, on, domConstruct, ol) {
+], function (
+    declare,
+    on,
+    domConstruct,
+    ol
+) {
     return declare(ol.control.Control, {
         element: undefined,
         target: undefined,

@@ -10,9 +10,18 @@ define([
     'ngw-webmap/MapStatesObserver',
     'dijit/ToolbarSeparator',
     'dijit/form/DropDownButton'
-], function (declare, lang, domStyle, on,
-             _WidgetBase, ToggleButton, ToggleControl,route, MapStatesObserver,
-             ToolbarSeparator) {
+], function (
+    declare,
+    lang,
+    domStyle,
+    on,
+    _WidgetBase,
+    ToggleButton,
+    ToggleControl,
+    route,
+    MapStatesObserver,
+    ToolbarSeparator
+) {
     return declare([_WidgetBase], {
 
         constructor: function (options) {

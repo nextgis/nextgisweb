@@ -11,9 +11,17 @@ define([
     '@nextgisweb/pyramid/i18n!',
     'dojo/text!./NGWDatePicker.hbs'
 ], function (
-    declare, lang, domClass, domConstruct,
-    on, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    DateTextBox, i18n, template
+    declare,
+    lang,
+    domClass,
+    domConstruct,
+    on,
+    _WidgetBase,
+    _TemplatedMixin,
+    _WidgetsInTemplateMixin,
+    DateTextBox,
+    i18n,
+    template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),

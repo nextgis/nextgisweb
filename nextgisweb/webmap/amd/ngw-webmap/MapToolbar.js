@@ -4,7 +4,12 @@ define([
     'ngw-webmap/MapToolbarItems',
     "openlayers/ol",
     "xstyle/css!./template/resources/MapToolbar.css"
-], function (declare, domConstruct, MapToolbarItems, ol) {
+], function (
+    declare,
+    domConstruct,
+    MapToolbarItems,
+    ol
+) {
     return declare( ol.control.Control, {
         element: undefined,
         target: undefined,

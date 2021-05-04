@@ -11,9 +11,16 @@ define([
     'dojo/text!./NGWPagination.hbs',
     'xstyle/css!./NGWPagination.css'
 ], function (
-    declare, lang, on, ioQuery,
-    _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    NGWButton, i18n, template
+    declare,
+    lang,
+    on,
+    ioQuery,
+    _WidgetBase,
+    _TemplatedMixin,
+    _WidgetsInTemplateMixin,
+    NGWButton,
+    i18n,
+    template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),

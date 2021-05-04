@@ -4,7 +4,13 @@ define([
     "dojo/dom-construct",
     "dojo/number",
     "openlayers/ol"
-], function (declare, on, domConstruct, number, ol) {
+], function (
+    declare,
+    on,
+    domConstruct,
+    number,
+    ol
+) {
     return declare(ol.control.Control, {
         element: undefined,
         target: undefined,

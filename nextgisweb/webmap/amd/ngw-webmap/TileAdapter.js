@@ -3,7 +3,12 @@ define([
     "./Adapter",
     "ngw/route",
     "ngw/openlayers/layer/XYZ"
-], function (declare, Adapter, route, XYZ) {
+], function (
+    declare,
+    Adapter,
+    route,
+    XYZ
+) {
     return declare(Adapter, {
         createLayer: function (item) {
             return new XYZ(item.id, {

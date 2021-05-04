@@ -10,8 +10,19 @@ define([
     'ngw/utils/make-singleton',
     'openlayers/ol',
     '@nextgisweb/pyramid/i18n!'
-], function (declare, array, lang, domConstruct, ioQuery, all, Dialog, TextBox,
-             MakeSingleton, ol, i18n) {
+], function (
+    declare,
+    array,
+    lang,
+    domConstruct,
+    ioQuery,
+    all,
+    Dialog,
+    TextBox,
+    MakeSingleton,
+    ol,
+    i18n
+) {
     return {
         getPermalink: function (display, visibleItems, options) {
             var urlWithoutParams, visibleStyles, center, queryStr,

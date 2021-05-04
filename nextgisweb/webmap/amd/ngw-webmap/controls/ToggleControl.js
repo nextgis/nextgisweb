@@ -3,7 +3,12 @@ define([
     "dojo/on",
     "dojo/dom-construct",
     'dijit/form/ToggleButton'
-], function (declare, on, domConstruct, ToggleButton) {
+], function (
+    declare,
+    on,
+    domConstruct,
+    ToggleButton
+) {
     return declare(ToggleButton, {
         content: "content",
         constructor: function(options){

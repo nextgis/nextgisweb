@@ -3,7 +3,12 @@ define([
     "dojo/on",
     "dojo/dom-construct",
     "openlayers/ol"
-], function (declare, on, domConstruct, ol) {
+], function (
+    declare,
+    on,
+    domConstruct,
+    ol
+) {
     return declare(ol.control.Control, {
         element: undefined,
         target: undefined,

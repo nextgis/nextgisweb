@@ -15,10 +15,19 @@ define([
     'dojo/text!./JournalFilter.hbs',
     'xstyle/css!./JournalFilter.css'
 ], function (
-    declare, array, lang, on, ioQuery,
-    domClass, domConstruct,
-    _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    Select, i18n, NGWDatePicker,
+    declare,
+    array,
+    lang,
+    on,
+    ioQuery,
+    domClass,
+    domConstruct,
+    _WidgetBase,
+    _TemplatedMixin,
+    _WidgetsInTemplateMixin,
+    Select,
+    i18n,
+    NGWDatePicker,
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {

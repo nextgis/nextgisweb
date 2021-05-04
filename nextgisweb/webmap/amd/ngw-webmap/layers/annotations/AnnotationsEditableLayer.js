@@ -6,7 +6,15 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "openlayers/ol",
     "ngw/openlayers/layer/Vector",
-], function (declare, lang, array, topic, i18n, ol, Vector) {
+], function (
+    declare,
+    lang,
+    array,
+    topic,
+    i18n,
+    ol,
+    Vector
+) {
     return declare(null, {
         _map: null,
         _editableLayer: null,

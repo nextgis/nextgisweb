@@ -3,7 +3,12 @@ define([
     "dojo/Deferred",
     "dojo/promise/all",
     "@nextgisweb/pyramid/settings!",
-], function (array, Deferred, all, settings) {
+], function (
+    array,
+    Deferred,
+    all,
+    settings
+) {
     return {
         load: function (name, preq, load) {
             var defs = {};

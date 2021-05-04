@@ -107,15 +107,27 @@ define([
     i18n,
     companyLogo,
     MapToolbar,
-    InitialExtent, InfoScale, ToolBase, ToolZoom, ToolMeasure, Identify, FeatureHighlighter,
+    InitialExtent,
+    InfoScale,
+    ToolBase,
+    ToolZoom,
+    ToolMeasure,
+    Identify,
+    FeatureHighlighter,
     NavigationMenu,
-    LayersPanel, PrintMapPanel, SearchPanel, BookmarkPanel, SharePanel, InfoPanel, AnnotationsPanel,
+    LayersPanel,
+    PrintMapPanel,
+    SearchPanel,
+    BookmarkPanel,
+    SharePanel,
+    InfoPanel,
+    AnnotationsPanel,
     ToolSwipe,
     MapStatesObserver,
     URL,
     settings,
-    //template
-    TabContainer, BorderContainer
+    TabContainer,
+    BorderContainer
 ) {
 
     var CustomItemFileWriteStore = declare([ItemFileWriteStore], {

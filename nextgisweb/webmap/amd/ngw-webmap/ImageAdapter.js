@@ -4,7 +4,13 @@ define([
     "./Adapter",
     "ngw/route",
     "ngw/openlayers/layer/Image"
-], function (declare, ioQuery, Adapter, route, Image) {
+], function (
+    declare,
+    ioQuery,
+    Adapter,
+    route,
+    Image
+) {
     return declare(Adapter, {
         createLayer: function (item) {
             var layer = new Image(item.id, {

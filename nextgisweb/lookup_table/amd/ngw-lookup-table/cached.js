@@ -2,7 +2,11 @@ define([
     "dojo/Deferred",
     "dojo/request/xhr",
     "ngw/route"
-], function (Deferred, xhr, route) {
+], function (
+    Deferred,
+    xhr,
+    route
+) {
 
     var cache = {};
 
