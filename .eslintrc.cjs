@@ -1,9 +1,42 @@
 module.exports = {
     root: true,
-    extends: ["eslint:recommended"],
+    plugins: ["requirejs"],
+    extends: ["eslint:recommended", "plugin:requirejs/recommended"],
     globals: {
         dojoConfig: "readonly",
         ngwConfig: "readonly",
+    },
+    rules: {
+        "no-unused-vars": ["error", { args: "all" }],
+        "requirejs/no-object-define": "error",
+        "requirejs/one-dependency-per-line": ["error"],
+        "requirejs/amd-function-arity": [
+            "error",
+            { allowExtraDependencies: true },
+        ],
+        "requirejs/no-restricted-amd-modules": [
+            "error",
+            {
+                name: "ngw/route",
+                message: "Use '@nextgisweb/pyramid/api' instead!",
+            },
+            {
+                name: "ngw/load-json",
+                message: "Use '@nextgisweb/pyramid/api/load' instead!",
+            },
+            {
+                name: "ngw-pyramid/i18n",
+                message: "Use '@nextgisweb/pyramid/i18n' instead!",
+            },
+            {
+                name: "ngw-pyramid/hbs-i18n",
+                message: "Use '@nextgisweb/pyramid/i18n' instead!",
+            },
+            {
+                name: "ngw/settings",
+                message: "Use '@nextgisweb/pyramid/settings' instead!",
+            },
+        ],
     },
     ignorePatterns: ["*/amd_packages/contrib/", "doc/"],
     overrides: [
