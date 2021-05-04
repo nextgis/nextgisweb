@@ -10,21 +10,21 @@ export class BaseAPIError extends BaseError {
         super(message);
         this.title = i18n.gettext("Unknown API error");
     }
-};
+}
 
 export class NetworksResponseError extends BaseAPIError {
     constructor(message) {
         super(message);
         this.title = i18n.gettext("Network error");
     }
-};
+}
 
 export class InvalidResponseError extends BaseAPIError {
     constructor(message) {
         super(message);
         this.title = i18n.gettext("Invalid API response");
     }
-};
+}
 
 export class ServerResponseError extends BaseAPIError {
     constructor(data) {

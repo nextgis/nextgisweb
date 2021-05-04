@@ -1,2 +1,1 @@
-
-console.log("Module '@nextgisweb/pyramid/example/aux/zoo' has been loaded.")
+console.log("Module '@nextgisweb/pyramid/example/aux/zoo' has been loaded.");

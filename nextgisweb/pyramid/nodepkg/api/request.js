@@ -3,20 +3,20 @@ import "whatwg-fetch";
 import {
     NetworksResponseError,
     InvalidResponseError,
-    ServerResponseError
+    ServerResponseError,
 } from "./error";
 
-
 export async function request(path, options) {
-    options = Object.assign({}, {
+    const defaults = {
         method: "GET",
         credentials: "same-origin",
         headers: {},
-    }, options);
+    };
+    options = Object.assign({}, defaults, options);
 
     let urlParams = "";
     if (options.query !== undefined) {
-        urlParams = "?" + (new URLSearchParams(options.query)).toString();
+        urlParams = "?" + new URLSearchParams(options.query).toString();
         delete options.query;
     }
 
@@ -26,9 +26,11 @@ export async function request(path, options) {
         delete options.json;
     }
 
-    const url = ngwConfig.applicationUrl +
+    const url =
+        ngwConfig.applicationUrl +
         (path.startsWith("/") ? "" : "/") +
-        path + urlParams;
+        path +
+        urlParams;
 
     let response;
     try {
@@ -42,20 +44,18 @@ export async function request(path, options) {
 
     if (!respJSON) {
         throw new InvalidResponseError();
-    };
+    }
 
     let body;
     try {
         body = await response.json();
     } catch (e) {
         throw new InvalidResponseError();
-    };
+    }
 
     if (400 <= response.status && response.status <= 599) {
         throw new ServerResponseError(body);
-    };
+    }
 
     return body;
 }
-
-

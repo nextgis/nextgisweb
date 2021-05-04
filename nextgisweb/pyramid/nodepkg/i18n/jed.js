@@ -32,9 +32,8 @@ export class Jed {
 
     missingCallback(key) {
         if (locale !== "en") {
-            console.info(
-                `Translation to locale "${locale}" is missing ` +
-                `for domain "${this.domain}" and key "${key}"!`);
+            const msg = `Translation to locale "${locale}" is missing for domain "${this.domain}" and key "${key}"!`;
+            console.info(msg);
         }
     }
 }

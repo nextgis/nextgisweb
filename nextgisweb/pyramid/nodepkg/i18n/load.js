@@ -10,27 +10,30 @@ export const normalize = callingComponent;
 
 export function load(component, require, load) {
     if (component == "") {
-        console.error(new Error(
-            "No component identifier was given while importing i18n! " +
-            "Using dummy translation as a fallback."));
+        const msg =
+            `No component identifier was given while importing i18n! Using ` +
+            `dummy translation as a fallback.`;
+        console.error(new Error(msg));
         load(stub);
     }
 
     const loader = () => {
-        return route(
-            "pyramid.locdata", component, locale
-        ).get().catch(error => {
-            console.error(
-                `Failed to load translation to locale "${locale}" ` +
-                `and domain "${component}". Using dummy translation ` +
-                `as a fallback.`, error
-            );
-            throw error;
-        })
-    }
+        return route("pyramid.locdata", component, locale)
+            .get()
+            .catch((error) => {
+                const msg =
+                    `Failed to load translation to locale "${locale}" ` +
+                    `and domain "${component}". Using dummy translation ` +
+                    `as a fallback.`;
+                console.error(msg, error);
+                throw error;
+            });
+    };
 
     cache.promiseFor(component, loader).then(
-        data => load(new Jed(component, data)),
-        error => { load(stub) }
-    )
+        (data) => load(new Jed(component, data)),
+        (error) => {
+            load(stub);
+        }
+    );
 }

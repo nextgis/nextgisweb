@@ -13,18 +13,20 @@ define([], function () {
             // be loaded by AMD require loader.
             var chunks = ((value.assets || {}).js || []).slice(1, -1);
             tmp[entry] = chunks.map(function (c) {
-                return 'dist/main/' + c.slice(0, -3);
+                return "dist/main/" + c.slice(0, -3);
             });
         });
 
         entryChunks = tmp;
-        callbacks.forEach(function (f) { f() });
+        callbacks.forEach(function (f) {
+            f();
+        });
         // console.debug("Assets manifest has been loaded.", entryChunks);
     }
 
     var oReq = new XMLHttpRequest();
     oReq.onload = onload;
-    oReq.open("get", ngwConfig.distUrl + 'main/assets-manifest.json', true);
+    oReq.open("get", ngwConfig.distUrl + "main/assets-manifest.json", true);
     oReq.send();
 
     return {
@@ -37,7 +39,7 @@ define([], function () {
                     // console.debug("Chunks has been loaded for " + entry + ".", epchunks);
                     load(null);
                 });
-            };
+            }
 
             if (entryChunks === undefined) {
                 // console.debug("Assets manifest has't been loaded yet!");
@@ -45,6 +47,6 @@ define([], function () {
             } else {
                 ready();
             }
-        }
-    }
-})
+        },
+    };
+});
