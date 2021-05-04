@@ -1,11 +1,9 @@
-const config = require("@nextgisweb/jsrealm/config.cjs");
-
 const path = require("path");
-const fs = require("fs");
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+
+const config = require("@nextgisweb/jsrealm/config.cjs");
 
 const stylesheetRoot = path.resolve(__dirname, "../../../static");
 

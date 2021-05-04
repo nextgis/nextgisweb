@@ -32,8 +32,6 @@ export function load(component, require, load) {
 
     cache.promiseFor(component, loader).then(
         (data) => load(new Jed(component, data)),
-        (error) => {
-            load(stub);
-        }
+        () => load(stub)
     );
 }

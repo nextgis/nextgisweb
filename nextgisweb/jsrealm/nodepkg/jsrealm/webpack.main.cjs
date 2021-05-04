@@ -150,14 +150,14 @@ module.exports = {
         chunkFilename: "chunk/[id].js",
     },
     externals: [
-        function ({ context, request }, callback) {
+        function ({ request }, callback) {
             // Use AMD loader for with-chunks!some-entrypoint-name imports.
             if (request.startsWith("@nextgisweb/jsrealm/with-chunks!")) {
                 return callback(null, `amd ${request}`);
             }
 
             // Use AMD loader for all entrypoints.
-            const requestModule = request.replace(/\!.*$/, "");
+            const requestModule = request.replace(/!.*$/, "");
             if (entrypointList[requestModule] !== undefined) {
                 return callback(null, `amd ${request}`);
             }

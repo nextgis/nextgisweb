@@ -5,7 +5,6 @@ const env = process.env;
 const configRoot = env.npm_package_config_nextgisweb_jsrealm_root;
 
 function* packages() {
-    const result = [];
     const packageJson = JSON.parse(
         fs.readFileSync(`${configRoot}/package.json`)
     );

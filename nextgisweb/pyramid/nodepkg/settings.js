@@ -9,7 +9,7 @@ export const normalize = callingComponent;
 export function load(component, require, ready) {
     if (component == "") {
         const msg = "No identifier was given while importing settings!";
-        console.error(new Error(m));
+        console.error(new Error(msg));
         ready({});
     }
 
@@ -17,8 +17,8 @@ export function load(component, require, ready) {
         return route("pyramid.settings")
             .get({ query: { component: component } })
             .catch((error) => {
-                const m = `Failed to load settings of "${component}"!`;
-                console.error(m, error);
+                const msg = `Failed to load settings of "${component}"!`;
+                console.error(msg, error);
                 throw error;
             });
     };

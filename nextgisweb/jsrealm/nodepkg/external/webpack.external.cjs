@@ -1,29 +1,28 @@
 const config = require("@nextgisweb/jsrealm/config.cjs");
 
 const path = require("path");
-const fs = require("fs");
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const UglifyJS = require("uglify-js");
 const UglifyCSS = require("uglifycss");
+const { debug } = require("../jsrealm/config.cjs");
 
-const minify = config.debug
-    ? (content, path) => content
-    : (content, path) => {
-          if (/\.min\./.test(path)) {
-              // Do nothing with already minified files!
-          } else if (/\.(js)$/.test(path)) {
-              const result = UglifyJS.minify(content.toString(), {
-                  compress: false,
-              });
-              return result.code;
-          } else if (/\.(css)$/.test(path)) {
-              const result = UglifyCSS.processString(content.toString());
-              return result;
-          }
-          return content;
-      };
+function minify(content, path) {
+    if (debug) return content;
+    if (/\.min\./.test(path)) {
+        // Do nothing with already minified files!
+    } else if (/\.(js)$/.test(path)) {
+        const result = UglifyJS.minify(content.toString(), {
+            compress: false,
+        });
+        return result.code;
+    } else if (/\.(css)$/.test(path)) {
+        const result = UglifyCSS.processString(content.toString());
+        return result;
+    }
+    return content;
+}
 
 const copyPatterns = [];
 
@@ -37,7 +36,7 @@ function addPackage(name, options) {
     options.info = options.info || { minimized: true };
 
     if (options.transform === null) {
-        options.transform = (content, path) => content;
+        options.transform = content => content;
     }
     options.transform =
         options.transform !== undefined ? options.transform : minify;

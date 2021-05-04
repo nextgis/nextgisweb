@@ -23,9 +23,10 @@ export function routeURL(name, ...rest) {
     }
 
     return template.replace(/\{(\w+)\}/g, function (m, a) {
-        const value = sub[parseInt(a)];
+        const idx = parseInt(a)
+        const value = sub[idx];
         if (value === undefined) {
-            const msg = `Undefined parameter ${idx}:${keys[idx]} in ${template}.`;
+            const msg = `Undefined parameter ${idx} in "${template}".`;
             throw new Error(msg);
         }
         return value;
@@ -52,7 +53,6 @@ export const compatRoute = {};
 // Because both keys "feature_layer.store.item" and "feature_layer.store"
 // exist functions should be created in alphabetical order.
 for (const key of Object.keys(routeData).sort()) {
-    const defn = routeData[key];
     const fn = (...args) => {
         if (ngwConfig.debug) {
             const msg =

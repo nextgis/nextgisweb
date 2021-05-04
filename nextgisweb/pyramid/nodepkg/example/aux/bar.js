@@ -1,4 +1,4 @@
-import zoo from "./zoo";
+import "./zoo";
 export default () => {
     return "bar";
 };
