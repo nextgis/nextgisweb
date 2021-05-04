@@ -6,7 +6,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
     "ngw-spatial-ref-sys/SRSSelect",
-    "@nextgisweb/pyramid/i18n",
+    "@nextgisweb/pyramid/i18n!",
     // resource
     "dojo/text!./template/Widget.hbs",
     // template
