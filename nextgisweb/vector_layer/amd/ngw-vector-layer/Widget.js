@@ -27,7 +27,7 @@ define([
     serialize,
     SRSSelect,
     template,
-    settings,
+    settings
 ) {
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),

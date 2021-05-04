@@ -7,7 +7,7 @@ define([
     xhr,
     route,
     ErrorDialog,
-    i18n,
+    i18n
 ) {
     var error_message = document.getElementById("error-message");
     function set_error (message) {

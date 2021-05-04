@@ -1,7 +1,7 @@
 define(function(){
     return {
         DDtoDMS: function(value, options){
-            result = {
+            var result = {
                 dir : value<0?options.lon?'W':'S':options.lon?'E':'N',
                 deg : parseInt(value<0?value=-value:value),
                 min : parseInt(value%1*60),
@@ -14,7 +14,7 @@ define(function(){
             return result;
         },
         DDtoDM: function(value, options){
-            result = {
+            var result = {
                 dir : value<0?options.lon?'W':'S':options.lon?'E':'N',
                 deg : parseInt(value<0?value=-value:value),
                 min : parseInt(value%1*60*100)/100,

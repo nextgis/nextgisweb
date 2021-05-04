@@ -59,12 +59,12 @@ define([
                 if (is_area) {
                     switch (settings.units_area) {
                         case "sq_km":
-                            measure = value * m_to_km**2;
+                            measure = value * m_to_km * m_to_km;
                             suffix = SI_km + "<sup>2</sup>";
                             break;
                         case "metric":
                             if (value > 1E5) {
-                                measure = value * m_to_km**2;
+                                measure = value * m_to_km * m_to_km;
                                 suffix = SI_km + "<sup>2</sup>";
                             } else {
                                 measure = value;
@@ -94,7 +94,7 @@ define([
                             };
                             break;
                         case "sq_ft":
-                            measure = value * m_to_ft**2;
+                            measure = value * m_to_ft * m_to_ft;
                             suffix = SI_ft + "<sup>2</sup>";
                             break;
                         case "sq_m":

@@ -13,7 +13,7 @@ define([
     i18n,
     NGWButton,
     template,
-    Uploader,
+    Uploader
 ) {
     /***
      * Use ImageUploader.get('value') to get image:
@@ -29,7 +29,7 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
-            domClass.add(this.focusNode, `uploader--${this.backgroundSize}`);
+            domClass.add(this.focusNode, "uploader--" + this.backgroundSize);
         },
 
         startup: function () {
@@ -59,7 +59,7 @@ define([
             }
         },
 
-        readImage(file) {
+        readImage: function(file) {
             var reader = new FileReader();
             reader.onloadend = function () {
                 this.current_image = reader.result;

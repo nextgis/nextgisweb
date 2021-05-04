@@ -59,7 +59,7 @@ define([
 
             constructor: function (options) {
                 if (!options.display || !options.panel) {
-                    throw Exception(
+                    throw Error(
                         'AnnotationsManager: "display" and "panel" are required parameter for first call!'
                     );
                 }

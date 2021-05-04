@@ -31,7 +31,7 @@ define([
             this.buttonPane = new ContentPane({style: "padding: 12px 0 4px;"});
             this.submitUrl = params.url;
 
-            widget = this;
+            var widget = this;
 
             if (params.operation == 'create') {
                 this.btn = new Button({label: i18n.gettext("Create"), class: "dijitButton--primary" });

@@ -27,7 +27,7 @@ define([
         addState: function (state, control, activate) {
 
             if (this._states.hasOwnProperty(state)) {
-                throw new Exception('State "' + state + '" already registered.');
+                throw new Error('State "' + state + '" already registered.');
             }
 
             this._states[state] = {
