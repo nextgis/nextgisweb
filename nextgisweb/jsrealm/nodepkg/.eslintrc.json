@@ -1,0 +1,16 @@
+{
+    "ignorePatterns": "external/contrib",
+    "overrides": [
+        {
+            "files": "jsrealm/with-chunks.js",
+            "env": {
+                "amd": true,
+                "es2020": false
+            },
+            "parserOptions": {
+                "sourceType": "script",
+                "ecmaVersion": 5
+            }
+        }
+    ]
+}
