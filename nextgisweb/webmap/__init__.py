@@ -41,7 +41,6 @@ class WebMapComponent(Component):
 
         result = dict(
             basemaps=basemaps,
-            bing_apikey=self.options['bing_apikey'],
             annotation=self.options['annotation'],
             adapters=dict(
                 (i.identity, dict(display_name=i.display_name))
@@ -64,7 +63,6 @@ class WebMapComponent(Component):
         Option(
             'basemaps', default=resource_filename('nextgisweb', 'webmap/basemaps.json'),
             doc="Basemaps description file."),
-        Option('bing_apikey', default=None, doc="Bing Maps API key."),
         Option('annotation', bool, default=True, doc="Turn on / off annotations."),
         Option('enable_social_networks', bool, default=True),
     )

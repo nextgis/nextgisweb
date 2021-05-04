@@ -9,42 +9,6 @@
     "source": {}
 }, {
     "base": {
-        "keyname": "bing-satellite",
-        "mid": "ngw/openlayers/layer/Bing"
-    },
-    "layer": {
-        "title": "Bing - Satellite",
-        "visible": false
-    },
-    "source": {
-        "imagerySet": "Aerial"
-    }
-}, {
-    "base": {
-        "keyname": "bing-hybrid",
-        "mid": "ngw/openlayers/layer/Bing"
-    },
-    "layer": {
-        "title": "Bing - Hybrid",
-        "visible": false
-    },
-    "source": {
-        "imagerySet": "AerialWithLabels"
-    }
-}, {
-    "base": {
-        "keyname": "bing-road",
-        "mid": "ngw/openlayers/layer/Bing"
-    },
-    "layer": {
-        "title": "Bing - Roads",
-        "visible": false
-    },
-    "source": {
-        "imagerySet": "Road"
-    }
-}, {
-    "base": {
         "keyname": "blank",
         "mid": "ngw/openlayers/layer/XYZ"
     },
