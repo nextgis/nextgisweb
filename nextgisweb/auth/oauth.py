@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+
+import hashlib
 import re
 import itertools
 from datetime import datetime, timedelta
@@ -77,8 +79,10 @@ class OAuthHelper(object):
             raise exc
 
     def query_introspection(self, access_token):
+        sha512_hex = hashlib.sha512(six.ensure_binary(access_token)).hexdigest()
+
         with DBSession.no_autoflush:
-            token = OAuthToken.filter_by(id=access_token).first()
+            token = OAuthToken.filter_by(id=sha512_hex).first()
 
         if token is not None:
             _logger.debug("Access token was read from cache (%s)", access_token)
@@ -92,7 +96,7 @@ class OAuthHelper(object):
                     return None
                 raise exc
 
-            token = OAuthToken(id=access_token, data=tdata)
+            token = OAuthToken(id=sha512_hex, data=tdata)
             token.exp = datetime.utcfromtimestamp(tdata['exp'])
             token.sub = six.text_type(tdata[self.options['profile.subject.attr']])
             token.persist()
