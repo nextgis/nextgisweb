@@ -8,15 +8,15 @@
     <script>
         require([
             "dojo/ready",
-            "ngw/sorted-table",
+            "@nextgisweb/pyramid/tablesort",
             "ngw-spatial-ref-sys/catalog_browse",
         ], function(
             ready,
-            sortedTable,
+            tablesort,
             catalogFilter
         ){
             ready(function() {
-                sortedTable(document.getElementById("catalog-table"));
+                tablesort.byId("catalog-table");
             });
         });
     </script>

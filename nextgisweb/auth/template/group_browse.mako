@@ -1,21 +1,14 @@
 <%inherit file='nextgisweb:templates/base.mako' />
 <%! from nextgisweb.auth.util import _ %>
 
-<%def name="head()">
-    <script>
-        require([
-            "dojo/ready",
-            "ngw/sorted-table"
-        ], function(
-            ready,
-            sortedTable
-        ){
-            ready(function() {
-                sortedTable(document.getElementById("group-table"));
-            });
-        });
-    </script>
-</%def>
+<script type="text/javascript">
+    require([
+        "@nextgisweb/pyramid/tablesort",
+        "dojo/domReady!"
+    ], function (tablesort) {
+        tablesort.byId("group-table");
+    })
+</script>
 
 <div class="content-box">
     <div class="table-wrapper">

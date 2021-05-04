@@ -11,15 +11,12 @@ from nextgisweb.webmap.model import WebMapScope
 <script>
     require([
         "dojo/ready",
-        "ngw/sorted-table",
         "svg4everybody/svg4everybody"
     ], function(
         ready,
-        sortedTable,
         svg4everybody
     ){
         ready(function() {
-            sortedTable(document.getElementById("children-table"));
             svg4everybody();
         });
     });
@@ -53,6 +50,15 @@ from nextgisweb.webmap.model import WebMapScope
         %endfor    
     </tbody>
 </%def>
+
+<script type="text/javascript">
+    require([
+        "@nextgisweb/pyramid/tablesort",
+        "dojo/domReady!"
+    ], function (tablesort) {
+        tablesort.byId("children-table");
+    })
+</script>
 
 <div class="table-wrapper">
     <table id="children-table" class="children-table pure-table pure-table-horizontal">

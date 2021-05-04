@@ -1,5 +1,8 @@
 {
     "name": "@nextgisweb/pyramid",
     "version": "0.0.0",
-    "type": "module"
+    "type": "module",
+    "dependencies": {
+        "tablesort": "^4.0.1"
+    }
 }

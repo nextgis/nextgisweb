@@ -5,13 +5,13 @@
     <script>
         require([
             "dojo/ready",
-            "ngw/sorted-table"
+            "@nextgisweb/pyramid/tablesort"
         ], function(
             ready,
-            sortedTable,
+            tablesort,
         ){
             ready(function() {
-                sortedTable(document.getElementById("srs-table"));             
+                tablesort.byId("srs-table");
             });
         });
     </script>
