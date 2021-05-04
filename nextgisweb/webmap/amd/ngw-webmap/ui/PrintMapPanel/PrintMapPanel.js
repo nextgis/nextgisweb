@@ -1,3 +1,4 @@
+/* global domtoimage */
 define([
     "dojo/_base/declare",
     "dojo/topic",

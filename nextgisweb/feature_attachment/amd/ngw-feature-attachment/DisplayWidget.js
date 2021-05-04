@@ -39,7 +39,7 @@ define([
             this.inherited(arguments);
 
             domClass.add(this.domNode, "ngw-feature-attachment-DisplayWidget");
-
+            /* global dojox */ // LightboxDialog doesn't provide correct exports
             this.lbox = new dojox.image.LightboxDialog({});
         },
 
