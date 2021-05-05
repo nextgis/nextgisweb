@@ -8,6 +8,7 @@ from time import time
 import os.path
 import sqlite3
 from io import BytesIO
+import atexit
 from six.moves.queue import Queue, Empty, Full
 
 import transaction
@@ -43,6 +44,7 @@ QUEUE_MAX_SIZE = 256
 QUEUE_STUCK_TIMEOUT = 5.0
 BATCH_MAX_TILES = 32
 BATCH_DEADLINE = 0.5
+SHUTDOWN_TIMEOUT = 10
 
 SQLITE_CON_CACHE = 32
 SQLITE_TIMEOUT = min(QUEUE_STUCK_TIMEOUT * 2, 30)
@@ -135,13 +137,28 @@ class TilestorWriter:
                     self.queue.maxsize))
 
     def _job(self):
-        data = None
+        self._shutdown = False
+        atexit.register(self._wait_for_shutdown)
 
+        data = None
         while True:
             self.cstart = None
 
             if data is None:
-                data = self.queue.get()
+                try:
+                    # When the thread is shutting down use minimal timeout
+                    # otherwise use a big timeout not to block shutdown
+                    # that may happen.
+                    get_timeout = 0.001 if self._shutdown else min(
+                        SHUTDOWN_TIMEOUT / 5, 2)
+                    data = self.queue.get(True, get_timeout)
+                except Empty:
+                    if self._shutdown:
+                        _logger.debug("Tile cache writer queue is empty now. Exiting!")
+                        break
+                    else:
+                        continue
+
             db_path = data['db_path']
 
             self.cstart = ptime = time()
@@ -234,6 +251,19 @@ class TilestorWriter:
 
             except Exception as exc:
                 _logger.exception("Uncaught exception in tile writer: %s", exc.message)
+
+    def _wait_for_shutdown(self):
+        _logger.debug(
+            "Waiting for shutdown of tile cache writer for %d seconds (" + 
+            "qsize = %d)...", SHUTDOWN_TIMEOUT, self.queue.qsize())
+
+        self._shutdown = True
+        self._worker.join(SHUTDOWN_TIMEOUT)
+
+        if self._worker.is_alive():
+            _logger.warn("Tile cache writer is still running. It'll be killed!")
+        else:
+            _logger.debug("Tile cache writer has successfully shut down.")
 
 
 class ResourceTileCache(Base):
