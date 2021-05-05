@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
-import hashlib
 import re
 import itertools
 from datetime import datetime, timedelta
 from collections import namedtuple
 from logging import getLogger
+from hashlib import sha512
 import six
-import sqlalchemy as sa
 from six.moves.urllib.parse import urlencode
 
+import sqlalchemy as sa
 import requests
 import zope.event
 
@@ -82,10 +81,10 @@ class OAuthHelper(object):
 
     def query_introspection(self, access_token):
         if len(access_token) > MAX_TOKEN_LENGTH:
-            sha512_hex = hashlib.sha512(six.ensure_binary(access_token)).hexdigest()
-            token_id = sha512_hex
+            token_id = 'sha512:' + sha512(six.ensure_binary(
+                access_token)).hexdigest()
         else:
-            token_id = access_token
+            token_id = 'raw:' + access_token
 
         with DBSession.no_autoflush:
             token = OAuthToken.filter_by(id=token_id).first()
