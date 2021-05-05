@@ -23,7 +23,7 @@ class Geometry(object):
 
     __slots__ = ('_wkb', '_wkt', '_ogr', '_shape', '_srid')
 
-    def __init__(self, wkb=None, wkt=None, ogr=None, shape=None, srid=None, _validate=False):
+    def __init__(self, wkb=None, wkt=None, ogr=None, shape=None, srid=None, validate=False):
         self._wkb = wkb
         self._wkt = wkt
         self._ogr = ogr
@@ -34,7 +34,7 @@ class Geometry(object):
 
         self._srid = srid
 
-        if _validate and not self._check_syntax():
+        if validate and not self._check_syntax():
             raise GeometryNotValid()
 
     @property
@@ -48,19 +48,19 @@ class Geometry(object):
 
     @classmethod
     def from_wkb(cls, data, srid=None, validate=True):
-        return cls(wkb=data, srid=srid, _validate=validate)
+        return cls(wkb=data, srid=srid, validate=validate)
 
     @classmethod
     def from_wkt(cls, data, srid=None, validate=True):
-        return cls(wkt=data, srid=srid, _validate=validate)
+        return cls(wkt=data, srid=srid, validate=validate)
 
     @classmethod
     def from_ogr(cls, data, srid=None, validate=True):
-        return cls(ogr=data, srid=srid, _validate=validate)
+        return cls(ogr=data, srid=srid, validate=validate)
 
     @classmethod
     def from_shape(cls, data, srid=None, validate=False):
-        return cls(shape=data, srid=srid, _validate=validate)
+        return cls(shape=data, srid=srid, validate=validate)
 
     # Additional constructors
 
