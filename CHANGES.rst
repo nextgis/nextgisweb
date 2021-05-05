@@ -16,6 +16,7 @@ Changes
 - Improved word wrapping in webmap identification popup.
 - Minimum and maximum scale restrictions in WMS server.
 - Experimental integration of modern JavaScript and Webpack.
+- Quota for the maximum number of enabled users.
 - OpenLayers library upgraded to 6.5.0.
 - OAuth server logout support via logout redirect endpoint.
 
