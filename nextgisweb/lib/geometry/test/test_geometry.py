@@ -45,22 +45,24 @@ def test_wkt_wkb(wkt, ngw_txn):
     assert Geometry.from_wkt(wkt_iso).wkb == wkb_ext, "WKT parsing has failed"
 
 
-@pytest.mark.parametrize('wkt, is_valid', (
-    ('dich', False),
-    ('POINT (0.0 0.0)', True),
-    ('POINT Z (1 2 3)', True),
-    ('GEOMETRYCOLLECTION EMPTY', True),
-    # ('LINESTRING (0 1)', False),
-    # ('POLYGON ((0 0,0 1,1 1,1 0))', False),
-    ('POLYGON ((0 0,0 1,1 1,1 0,0 0))', True),
-    # ('POLYGON ((0 0,0 3,2 1,1 1,3 3,3 0,0 0))', False),
+@pytest.mark.parametrize('src, is_valid', (
+    (dict(wkt='DICH'), False),
+    (dict(wkt='POINT (0)'), False),
+    (dict(wkt='POINT (0 0.0)'), True),
+    (dict(wkt='POINT Z (1 2 3)'), True),
+    (dict(wkt='GEOMETRYCOLLECTION EMPTY'), True),
+    (dict(wkt='POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))'), True),
+    (dict(wkb='000000000140000000000000004010000000000000'), True),
+    (dict(wkb='FF0000000140000000000000004010000000000000'), False),
 ))
-def test_valid(wkt, is_valid):
+def test_valid(src, is_valid):
+    if 'wkb' in src:
+        src['wkb'] = src['wkb'].decode('hex')
     if not is_valid:
         with pytest.raises(GeometryNotValid):
-            Geometry.from_wkt(wkt)
+            Geometry(validate=True, **src)
     else:
-        Geometry.from_wkt(wkt)
+        Geometry(validate=True, **src)
 
 
 def test_wkt_wkb_ogr_shape():

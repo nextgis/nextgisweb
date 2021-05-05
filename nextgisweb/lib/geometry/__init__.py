@@ -34,15 +34,13 @@ class Geometry(object):
 
         self._srid = srid
 
-        if validate and not self._check_syntax():
-            raise GeometryNotValid()
+        if validate and (wkb is not None or wkt is not None):
+            # Force WKB/WKT validation through conversion to OGR
+            ogr = self.ogr
 
     @property
     def srid(self):
         return self._srid
-
-    def _check_syntax(self):
-        return self.ogr is not None
 
     # Base constructors
 
@@ -105,6 +103,10 @@ class Geometry(object):
             else:
                 # WKB is the fastest, so convert to WKB and then to OGR.
                 self._ogr = CreateGeometryFromWkb(self.wkb)
+
+        if self._ogr is None:
+            raise GeometryNotValid("Invalid geometry WKB/WKT value!")
+
         return self._ogr
 
     @property
