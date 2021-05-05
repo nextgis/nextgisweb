@@ -14,7 +14,7 @@ define([
     "dojo/_base/array",
     "ngw-feature-layer/FeatureStore",
     // settings
-    "@nextgisweb/pyramid/settings!webmap",
+    "@nextgisweb/pyramid/settings!feature_layer",
     // templates
     "dojo/text!./SearchPanel.hbs",
     // css
