@@ -28,6 +28,8 @@ from .util import _, clean_user_keyname
 
 _logger = getLogger(__name__)
 
+MAX_TOKEN_LENGTH = 250
+
 
 class OAuthHelper(object):
 
@@ -79,10 +81,14 @@ class OAuthHelper(object):
             raise exc
 
     def query_introspection(self, access_token):
-        sha512_hex = hashlib.sha512(six.ensure_binary(access_token)).hexdigest()
+        if len(access_token) > MAX_TOKEN_LENGTH:
+            sha512_hex = hashlib.sha512(six.ensure_binary(access_token)).hexdigest()
+            token_id = sha512_hex
+        else:
+            token_id = access_token
 
         with DBSession.no_autoflush:
-            token = OAuthToken.filter_by(id=sha512_hex).first()
+            token = OAuthToken.filter_by(id=token_id).first()
 
         if token is not None:
             _logger.debug("Access token was read from cache (%s)", access_token)
@@ -96,7 +102,7 @@ class OAuthHelper(object):
                     return None
                 raise exc
 
-            token = OAuthToken(id=sha512_hex, data=tdata)
+            token = OAuthToken(id=token_id, data=tdata)
             token.exp = datetime.utcfromtimestamp(tdata['exp'])
             token.sub = six.text_type(tdata[self.options['profile.subject.attr']])
             token.persist()
