@@ -5,10 +5,11 @@ import itertools
 from datetime import datetime, timedelta
 from collections import namedtuple
 from logging import getLogger
+from hashlib import sha512
 import six
-import sqlalchemy as sa
 from six.moves.urllib.parse import urlencode
 
+import sqlalchemy as sa
 import requests
 import zope.event
 
@@ -25,6 +26,8 @@ from .util import _, clean_user_keyname
 
 
 _logger = getLogger(__name__)
+
+MAX_TOKEN_LENGTH = 250
 
 
 class OAuthHelper(object):
@@ -77,8 +80,14 @@ class OAuthHelper(object):
             raise exc
 
     def query_introspection(self, access_token):
+        if len(access_token) > MAX_TOKEN_LENGTH:
+            token_id = 'sha512:' + sha512(six.ensure_binary(
+                access_token)).hexdigest()
+        else:
+            token_id = 'raw:' + access_token
+
         with DBSession.no_autoflush:
-            token = OAuthToken.filter_by(id=access_token).first()
+            token = OAuthToken.filter_by(id=token_id).first()
 
         if token is not None:
             _logger.debug("Access token was read from cache (%s)", access_token)
@@ -92,7 +101,7 @@ class OAuthHelper(object):
                     return None
                 raise exc
 
-            token = OAuthToken(id=access_token, data=tdata)
+            token = OAuthToken(id=token_id, data=tdata)
             token.exp = datetime.utcfromtimestamp(tdata['exp'])
             token.sub = six.text_type(tdata[self.options['profile.subject.attr']])
             token.persist()
