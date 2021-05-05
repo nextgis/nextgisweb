@@ -24,13 +24,13 @@ class Geometry(object):
     __slots__ = ('_wkb', '_wkt', '_ogr', '_shape', '_srid')
 
     def __init__(self, wkb=None, wkt=None, ogr=None, shape=None, srid=None, validate=False):
+        if wkb is None and wkt is None and ogr is None and shape is None:
+            raise ValueError("None base format is not defined.")
+
         self._wkb = wkb
         self._wkt = wkt
         self._ogr = ogr
         self._shape = shape
-
-        if not any((self._wkb, self._wkt, self._ogr, self._shape)):
-            raise ValueError("None base format is not defined.")
 
         self._srid = srid
 
