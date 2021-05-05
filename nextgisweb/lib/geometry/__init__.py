@@ -34,15 +34,15 @@ class Geometry(object):
 
         self._srid = srid
 
-        if _validate and not self._is_valid():
+        if _validate and not self._check_syntax():
             raise GeometryNotValid()
 
     @property
     def srid(self):
         return self._srid
 
-    def _is_valid(self):
-        return self.ogr is not None and self._ogr.IsValid()
+    def _check_syntax(self):
+        return self.ogr is not None
 
     # Base constructors
 

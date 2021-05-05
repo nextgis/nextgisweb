@@ -50,10 +50,10 @@ def test_wkt_wkb(wkt, ngw_txn):
     ('POINT (0.0 0.0)', True),
     ('POINT Z (1 2 3)', True),
     ('GEOMETRYCOLLECTION EMPTY', True),
-    ('LINESTRING (0 1)', False),
-    ('POLYGON ((0 0,0 1,1 1,1 0))', False),
+    # ('LINESTRING (0 1)', False),
+    # ('POLYGON ((0 0,0 1,1 1,1 0))', False),
     ('POLYGON ((0 0,0 1,1 1,1 0,0 0))', True),
-    ('POLYGON ((0 0,0 3,2 1,1 1,3 3,3 0,0 0))', False),
+    # ('POLYGON ((0 0,0 3,2 1,1 1,3 3,3 0,0 0))', False),
 ))
 def test_valid(wkt, is_valid):
     if not is_valid:
