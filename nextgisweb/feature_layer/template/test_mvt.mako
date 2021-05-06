@@ -17,7 +17,7 @@
         var amdUrl = "${request.route_url('amd_package', subpath="")}";
         require([
           "openlayers/ol",
-          "xstyle/css!" + amdUrl + "openlayers/ol.css"
+          "xstyle/css!dist/external-ol/ol.css",
         ], function (ol) {
           var osm = new ol.layer.Tile({
             source: new ol.source.OSM()

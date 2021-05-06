@@ -4,10 +4,13 @@
     "type": "module",
     "nextgisweb": {
         "webpackConfigs": {
-            "stylesheet": "webpack.external.cjs"
+            "external": "webpack.external.cjs",
+            "external-ol": "webpack.external-ol.cjs"
         }
     },
     "dependencies": {
+        "buble": "^0.20.0",
+        "buble-loader": "^0.5.1",
         "cbtree": "pjekel/cbtree#v0.9.4",
         "codemirror": "5.20.2",
         "dgrid": "SitePen/dgrid#v0.3.21",
@@ -19,8 +22,10 @@
         "ie11-custom-properties": "^4.1.0",
         "jed": "^1.1.1",
         "jquery": "3.2.1",
+        "ol": "^6.5.0",
         "proj4": "^2.7.2",
         "put-selector": "^0.3.6",
+        "string-replace-loader": "^3.0.1",
         "svg4everybody": "^2.1.9",
         "uglify-js": "^3.13.4",
         "uglifycss": "^0.0.29",

@@ -69,7 +69,7 @@ define([
     "dijit/ToolbarSeparator",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css",
-    "xstyle/css!" + ngwConfig.amdUrl + "openlayers/ol.css",
+    "xstyle/css!dist/external-ol/ol.css",
     "xstyle/css!./template/resources/Display.css"
 ], function (
     declare,

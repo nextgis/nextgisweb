@@ -63,7 +63,8 @@
             aliases: [
                 ['ngw/load-json', '@nextgisweb/pyramid/api/load'],
                 ['ngw/settings', '@nextgisweb/pyramid/settings'],
-                ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n']
+                ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n'],
+                ['openlayers/ol', 'dist/external-ol/ol'],
             ]
         };
 
