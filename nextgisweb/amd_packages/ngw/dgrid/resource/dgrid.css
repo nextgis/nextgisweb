@@ -1,4 +1,0 @@
-.dgrid-header-row .dgrid-row-table tr th { color: rgba(0, 0, 0, 0.7); }
-
-.dgrid-border-fix .dgrid-row-table .dgrid-cell:first-child { border-left-width: 0; }
-.dgrid-border-fix .dgrid-row-table .dgrid-cell:last-child  { border-right-width: 0; }

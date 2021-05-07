@@ -16,8 +16,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "ngw-resource/serialize",
     //
-    "xstyle/css!./resource/LayerVendorParamsWidget.css",
-    "ngw/dgrid/css"
+    "xstyle/css!./resource/LayerVendorParamsWidget.css"
 ], function (
     declare,
     lang,

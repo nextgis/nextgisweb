@@ -20,7 +20,6 @@ define([
     "ngw-resource/serialize",
     //
     "xstyle/css!./resource/Widget.css",
-    "ngw/dgrid/css"
 ], function (
     declare,
     lang,

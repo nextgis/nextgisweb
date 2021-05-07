@@ -24,8 +24,6 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "ngw-lookup-table/cached",
     "./FeatureStore",
-    // css
-    "xstyle/css!" + ngwConfig.amdUrl + "dgrid/css/skins/claro.css",
     // template
     "dijit/layout/ContentPane",
     "dijit/Toolbar",

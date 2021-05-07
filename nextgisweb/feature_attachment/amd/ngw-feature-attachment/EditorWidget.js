@@ -20,8 +20,7 @@ define([
     "ngw/route",
     "@nextgisweb/pyramid/i18n!",
     //
-    "xstyle/css!./resource/EditorWidget.css",
-    "ngw/dgrid/css"
+    "xstyle/css!./resource/EditorWidget.css"
 ], function (
     declare,
     lang,

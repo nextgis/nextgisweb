@@ -25,8 +25,7 @@ define([
     "@nextgisweb/pyramid/api/load!resource/schema",
     "@nextgisweb/pyramid/i18n!",
     // css
-    "xstyle/css!./resource/PermissionWidget.css",
-    "ngw/dgrid/css"
+    "xstyle/css!./resource/PermissionWidget.css"
 ], function (
     declare,
     lang,

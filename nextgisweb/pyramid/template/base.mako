@@ -28,17 +28,10 @@
 
     <link href="${request.route_url('pyramid.favicon')}"
         rel="shortcut icon" type="image/x-icon"/>
-    <link href="${request.route_url('jsrealm.dist', subpath='stylesheet/pure.css')}"
-        rel="stylesheet" type="text/css"/>
-    <link href="${request.route_url('jsrealm.dist', subpath='stylesheet/default.css')}"
-        rel="stylesheet" type="text/css" media="screen"/>
     <link href="${request.route_url('jsrealm.dist', subpath='stylesheet/layout.css')}"
         rel="stylesheet" type="text/css"/>
     <link href="${request.static_url('nextgisweb:static/css/icon.css')}"
         rel="stylesheet" type="text/css" media="screen"/>
-
-    <link href="${request.route_url('amd_package', subpath='dijit/themes/claro/claro.css')}"
-        rel="stylesheet" media="screen"/>
 
     <link href="${request.route_url('pyramid.custom_css')}" rel="stylesheet" type="text/css"/>
 
@@ -61,9 +54,12 @@
             baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n},
             locale: ${request.locale_name | json.dumps, n},
             aliases: [
+                ['ngw/route', 'ngw-pyramid/route'],
+                ['ngw/utils/make-singleton', 'ngw-pyramid/make-singleton'],
+                ['ngw/dgrid/css', 'ngw-pyramid/nop'],
                 ['ngw/load-json', '@nextgisweb/pyramid/api/load'],
                 ['ngw/settings', '@nextgisweb/pyramid/settings'],
-                ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n']
+                ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n'],
             ]
         };
 

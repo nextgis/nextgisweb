@@ -6,14 +6,13 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const config = require("@nextgisweb/jsrealm/config.cjs");
 
 const stylesheetRoot = path.resolve(__dirname, "../../../static");
+const filename = stylesheetRoot + "/css/layout.less";
 
 module.exports = {
     mode: config.debug ? "development" : "production",
     devtool: config.debug ? "source-map" : false,
     entry: {
-        layout: stylesheetRoot + "/css/layout.less",
-        default: stylesheetRoot + "/css/default.css",
-        pure: require.resolve("purecss/build/pure.css"),
+        layout: filename,
     },
     output: {
         path: path.resolve(config.distPath + "/stylesheet"),
@@ -22,7 +21,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.less$/,
+                test: filename,
                 use: [
                     {
                         loader: MiniCssExtractPlugin.loader,
@@ -47,7 +46,7 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, "css-loader"],
+                use: ["css-loader"],
             },
             {
                 test: /\.(woff2?|ttf|eot)?$/,
@@ -59,11 +58,11 @@ module.exports = {
                 ],
             },
             {
-                test: (fp) => fp.startsWith(stylesheetRoot + "/svg/"),
+                test: /\.(png|gif|svg)?$/,
                 use: [
                     {
                         loader: "file-loader",
-                        options: { outputPath: "svg", name: "[name].[ext]" },
+                        options: { outputPath: "image", name: "[name].[ext]" },
                     },
                 ],
             },

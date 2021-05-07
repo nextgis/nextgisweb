@@ -20,8 +20,7 @@ define([
     "ngw-spatial-ref-sys/SRSSelect",
     "@nextgisweb/pyramid/i18n!",
     //
-    "xstyle/css!./resource/ItemWidget.css",
-    "ngw/dgrid/css"
+    "xstyle/css!./resource/ItemWidget.css"
 ], function (
     declare,
     lang,
