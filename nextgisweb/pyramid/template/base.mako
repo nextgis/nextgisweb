@@ -30,8 +30,6 @@
         rel="shortcut icon" type="image/x-icon"/>
     <link href="${request.route_url('jsrealm.dist', subpath='stylesheet/layout.css')}"
         rel="stylesheet" type="text/css"/>
-    <link href="${request.static_url('nextgisweb:static/css/icon.css')}"
-        rel="stylesheet" type="text/css" media="screen"/>
 
     <link href="${request.route_url('pyramid.custom_css')}" rel="stylesheet" type="text/css"/>
 
