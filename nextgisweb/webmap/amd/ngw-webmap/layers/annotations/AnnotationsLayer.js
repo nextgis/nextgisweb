@@ -4,7 +4,7 @@ define([
     "dojox/dtl",
     "dojox/dtl/Context",
     "openlayers/ol",
-    "openlayers/ol-popup",
+    "../../ol-ext/ol-popup",
     "ngw-webmap/layers/annotations/AnnotationFeature",
     "ngw/openlayers/layer/Vector",
 ], function (

@@ -14,7 +14,7 @@ define([
     "dojo/dnd/Moveable",
     "dojo/dnd/Mover",
     "openlayers/ol",
-    "xstyle/css!./resource/Swipe.css"
+    "xstyle/css!./Swipe.css"
 ], function (
     declare,
     on,

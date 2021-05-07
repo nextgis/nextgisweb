@@ -1,8 +1,7 @@
 define([
-    'dojo/_base/declare',
     'openlayers/ol',
-    'xstyle/css!' + ngwConfig.amdUrl + 'openlayers/ol-popup.css'
-], function (declare, ol) {
+    'xstyle/css!./ol-popup.css'
+], function (ol) {
     var classCallCheck = function (instance, Constructor) {
         if (!(instance instanceof Constructor)) {
             throw new TypeError('Cannot call a class as a function');

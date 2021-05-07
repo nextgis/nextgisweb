@@ -104,9 +104,6 @@ def amd_packages():
             'jquery',
         )
     ) + (
-        # contrib packages
-        ('openlayers', 'nextgisweb:amd_packages/contrib/openlayers'),
-
         # nextgisweb packages
         ('ngw', 'nextgisweb:amd_packages/ngw'),
 

@@ -1,9 +1,10 @@
 define([
-        'dojo/_base/declare',
         'dojo/topic',
         'openlayers/ol'
-    
-    ], function (declare, topic, ol) {
+    ], function (
+        topic,
+        ol
+    ) {
         
         /**
          * This file is part of ol-mapscale package.

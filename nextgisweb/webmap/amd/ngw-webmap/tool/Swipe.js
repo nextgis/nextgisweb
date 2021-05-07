@@ -1,7 +1,7 @@
 define([
     "dojo/_base/declare",
     "./Base",
-    "ngw/openlayers/control/Swipe",
+    "../controls/Swipe",
     "@nextgisweb/pyramid/i18n!"
 ], function (
     declare,
