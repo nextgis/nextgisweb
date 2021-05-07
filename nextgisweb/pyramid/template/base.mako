@@ -1,7 +1,6 @@
 <!DOCTYPE HTML>
 <%! from nextgisweb.pyramid.util import _ %>
-<!--[if IE 8]>         <html class="lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
+<html>
 <%
     import os
     import re
