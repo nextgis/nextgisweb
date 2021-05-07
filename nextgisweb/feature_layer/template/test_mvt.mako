@@ -15,10 +15,7 @@
       <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
       <script>
         var amdUrl = "${request.route_url('amd_package', subpath="")}";
-        require([
-          "openlayers/ol",
-          "xstyle/css!" + amdUrl + "openlayers/ol.css"
-        ], function (ol) {
+        require(["openlayers/ol"], function (ol) {
           var osm = new ol.layer.Tile({
             source: new ol.source.OSM()
           });

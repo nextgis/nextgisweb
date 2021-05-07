@@ -10,7 +10,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "openlayers/ol",
-    "openlayers/ol-popup",
+    "../../ol-ext/ol-popup",
     "ngw-webmap/layers/annotations/AnnotationFeature",
     "@nextgisweb/pyramid/i18n!",
     "ngw/openlayers/layer/Vector",
