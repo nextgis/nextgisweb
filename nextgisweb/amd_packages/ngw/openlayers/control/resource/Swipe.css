@@ -1,4 +1,4 @@
-.ol-swipe
+.nextgis .ol-swipe
 {   position: absolute;
     top: 50%;
     left: 50%;
@@ -6,7 +6,7 @@
     -webkit-transform: translate(-50%, -50%);
 }
 
-.ol-swipe:before
+.nextgis .ol-swipe:before
 {   content: "";
     position: absolute;
     top: -5000px;
@@ -18,7 +18,7 @@
     transform: translate(-2px, 0);
     -webkit-transform: translate(-2px, 0);
 }
-.ol-swipe.horizontal:before
+.nextgis .ol-swipe.horizontal:before
 {   left: -5000px;
     right: -5000px;
     top: 50%;
@@ -27,26 +27,26 @@
     height: 4px;
 }
 
-.ol-swipe,
-.ol-swipe button
+.nextgis .ol-swipe,
+.nextgis .ol-swipe button
 {   cursor: ew-resize;
 }
 
-.ol-swipe button,
-.ol-swipe button:hover,
-.ol-swipe button:focus,
-.ol-swipe button:active{
+.nextgis .ol-swipe button,
+.nextgis .ol-swipe button:hover,
+.nextgis .ol-swipe button:focus,
+.nextgis .ol-swipe button:active{
     background-color: var(--accent);
 }
 
-.ol-swipe.horizontal,
-.ol-swipe.horizontal button
+.nextgis .ol-swipe.horizontal,
+.nextgis .ol-swipe.horizontal button
 {   cursor: ns-resize;
 }
 
-.ol-swipe:after,
-.ol-swipe button:before,
-.ol-swipe button:after
+.nextgis .ol-swipe:after,
+.nextgis .ol-swipe button:before,
+.nextgis .ol-swipe button:after
 {   content: "";
     position: absolute;
     top: 25%;
@@ -57,11 +57,11 @@
     transform: translate(-1px, 0);
     -webkit-transform: translate(-1px, 0);
 }
-.ol-swipe button:after
+.nextgis .ol-swipe button:after
 {   transform: translateX(5px);
     -webkit-transform: translateX(5px);
 }
-.ol-swipe button:before
+.nextgis .ol-swipe button:before
 {   transform: translateX(-7px);
     -webkit-transform: translateX(-7px);
 }

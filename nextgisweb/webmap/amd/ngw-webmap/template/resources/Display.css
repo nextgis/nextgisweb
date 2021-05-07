@@ -11,22 +11,22 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
     border: 0;
 }
 
-.ol-rotate{
+.nextgis .ol-rotate{
     left: .5em;
     right: auto;
     top: 4.643em;
 }
 
-.ol-touch .ol-control{
+.nextgis .ol-touch .ol-control{
     font-size: 1.5em;
 }
 
-.ol-touch .ol-control button{
+.nextgis .ol-touch .ol-control button{
     font-size: 1.14em;
 }
 
 /* Global ol styles */
-.ol-selectable{
+.nextgis .ol-selectable{
     -ms-user-select: text;
     -moz-user-select: text;
     -webkit-user-select: text;
@@ -99,17 +99,17 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
 
 /* Map buttons */
 
-.ol-control {
+.nextgis .ol-control {
     background: none;
     padding: 0;
 }
 
-    .ol-control button,
-    .ol-control button:active,
-    .ol-control button:focus,
-    .ol-control__btn,
-    .ol-control__btn:active,
-    .ol-control__btn:focus{
+    .nextgis .ol-control button,
+    .nextgis .ol-control button:active,
+    .nextgis .ol-control button:focus,
+    .nextgis .ol-control__btn,
+    .nextgis .ol-control__btn:active,
+    .nextgis .ol-control__btn:focus{
         display: block;
         width: 30px;
         height: 30px;
@@ -122,13 +122,13 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
         padding: 0;
         text-align: center;
     }
-    .ol-control button,
-    .ol-control__btn{
+    .nextgis .ol-control button,
+    .nextgis .ol-control__btn{
         color: var(--primary);
         fill: var(--primary);
     }
 
-    .ol-control:first-child button{
+    .nextgis .ol-control:first-child button{
         margin-top:1px;
     }
 
@@ -136,7 +136,7 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
         text-shadow: none;
     }
 
-    .ol-control__icon{
+    .nextgis .ol-control__icon{
         color: inherit;
         fill: inherit;
         line-height: 30px;
@@ -144,18 +144,18 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
         height: 30px;
     }
 
-    .ol-control:hover{
+    .nextgis .ol-control:hover{
         background-color: transparent;
     }
 
-    .ol-control button:hover,
-    .ol-control .ol-control__button:hover{
+    .nextgis .ol-control button:hover,
+    .nextgis .ol-control .ol-control__button:hover{
         background-color: #f9fafb;
     }
 
 /* Rotate control */
 
-.ol-compass{
+.nextgis .ol-compass{
     font-size: 24px;
     font-weight: normal;
     display: inline-block;
@@ -163,7 +163,7 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
 
 /* Scale line */
 
-.ol-scale-line,
+.nextgis .ol-scale-line,
 .control-pane .ol-scale-line{
     position: relative;
     padding: 0;
@@ -171,7 +171,7 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
     top: 1px;
 }
 
-    .ol-scale-line-inner{
+    .nextgis .ol-scale-line-inner{
         margin: 0;
         border-color: rgba(0,0,0,.46);
         color: rgba(0,0,0,.46);
@@ -180,23 +180,23 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
 
 /* Attribution */
 
-.ol-attribution:not(.ol-collapsed){
+.nextgis .ol-attribution:not(.ol-collapsed){
     background: transparent;
     height: auto;
     line-height: inherit;
 }
-    .ol-attribution ul{
+    .nextgis .ol-attribution ul{
         padding: 0;
         text-shadow: inherit;
         color: inherit;
         line-height:1;
     }
 
-    .ol-attribution a{
+    .nextgis .ol-attribution a{
         text-decoration: none;
     }
 
-    .ol-attribution.ol-uncollapsible img {
+    .nextgis .ol-attribution.ol-uncollapsible img {
         height: 14px;
         margin-top: -3px;
         margin-bottom: -1px;

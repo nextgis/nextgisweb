@@ -42,7 +42,6 @@ define([
     "dojox/layout/TableContainer",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + "cbtree/themes/claro/claro.css",
-    "xstyle/css!dist/external-ol/ol.css",
     "xstyle/css!../../template/resources/Display.css",
     "xstyle/css!./TinyDisplay.css"
 ], function (
