@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="translate(879.29 36.805)" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)">
+		<path d="m0 0"/>
+		<path d="m0 0"/>
+	</g>
+	<path d="m520.94 150.74c-3.286-14.739-17.901-24.022-32.637-20.738l-369.53 82.38c-14.739 3.286-24.023 17.898-20.738 32.637 2.839 12.736 14.134 21.399 26.662 21.399 1.97 0 3.972-0.215 5.975-0.661l369.53-82.38c14.74-3.286 24.026-17.898 20.739-32.637z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-miterlimit="10" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m458.25 264.91c-3.723-2e-3 -7.424 1.53-10.056 4.163-2.633 2.633-4.165 6.333-4.163 10.056v170.53c-2e-3 3.723 1.53 7.424 4.163 10.056 2.632 2.633 6.333 4.165 10.056 4.163h51.844c3.723 2e-3 7.424-1.53 10.056-4.163 2.633-2.632 4.165-6.333 4.163-10.056v-170.53c2e-3 -3.723-1.53-7.423-4.163-10.056-2.632-2.632-6.333-4.164-10.056-4.163h-51.844z" enable-background="new    " fill="param(fill)" fill-opacity="param(fill-opacity)" opacity=".75" stroke="param(outline)" stroke-miterlimit="10" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m81.75 121.91c-4.639 0-9.251 1.907-12.531 5.188s-5.188 7.893-5.188 12.531v306.53c0 4.639 1.907 9.251 5.188 12.531s7.893 5.188 12.531 5.188h44.844c4.639 0 9.251-1.907 12.531-5.188s5.188-7.893 5.188-12.531v-154.47c-22.416 6.883-49.301 0.786-63.781-18.25-21.96-26.269-10.755-72.689 21.625-84.938 14.05-3.254 28.104-6.478 42.156-9.719v-39.156c0-4.639-1.907-9.251-5.188-12.531s-7.893-5.188-12.531-5.188h-44.844z" enable-background="new    " fill="param(fill)" fill-opacity="param(fill-opacity)" opacity=".75" stroke="param(outline)" stroke-miterlimit="10" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="matrix(48.15 0 0 48.15 -536.27 -33.307)" display="none" fill="none" stroke="#757575" stroke-width=".1">
+		<rect x="1" y="1" width="10" height="10" display="inline"/>
+		<rect x="2" y="2" width="8" height="8" display="inline"/>
+	</g>
+	<path d="m228.02 50.13c-14.283 0-24.991 6.243-32.125 18.727l-62.227 107.08c23.635 13.833 52.411 30.341 86.325 49.524 20.068-34.35 41.703-71.825 64.902-112.42l-24.752-44.174c-7.133-12.484-17.841-18.726-32.123-18.727z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m215.3 353.28-62.227-108.42h-125.15l50.872 29.449-31.45 54.201c-2.683 4.915-4.023 10.048-4.023 15.398s1.341 10.483 4.023 15.398l49.503 86.325c2.233-6.249 4.466-11.606 6.699-16.072l61.574-105.73 50.178 29.451z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m137.67 413.51-15.378 26.773c-3.581 5.8-5.371 12.042-5.371 18.728 0 10.266 3.683 18.966 11.049 26.1 7.365 7.134 16.174 10.701 26.426 10.701h123.15v-99.702h-129.82c-0.899 1.784-4.248 7.584-10.048 17.4z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m288.92 193.33h124.47l62.902-108.4-50.852 29.449-31.472-54.221c-5.8-10.251-14.718-15.377-26.753-15.378h-99.048c4.016 4.453 7.365 8.912 10.048 13.377l60.879 105.73-10.028 6.024-40.15 23.424z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m541.87 318.48-61.553-107.08c-2.233 1.334-31.016 17.843-86.347 49.524 27.665 47.734 49.531 85.433 65.597 113.1h50.178c14.731 0 25.664-6.249 32.799-18.748 6.684-12.049 6.46-24.316-0.674-36.8z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m387.97 394.76v-58.203l-62.247 108.4 62.247 107.75v-58.224h62.228c12.048 0 21.19-5.133 27.427-15.398l49.524-86.326c-6.686 1.784-12.261 2.676-16.726 2.676l-122.45-0.674z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

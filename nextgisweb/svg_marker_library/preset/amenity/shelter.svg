@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="37.28" height="37.28" baseProfile="full" version="1.1" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+	<path d="m3.25 2.25-1 1" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m3.6 3.4-1.232 1.232" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m5.132 3.118-1.232 1.232" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m3.1 4.9-0.96685 0.96685" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m6.382 2.868-1.232 1.232" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m8.132 2.118-1.232 1.232" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m8.632 3.618-1.232 1.232" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m10.03 3.5036-0.91161 0.87847" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m10.03 2.0036-0.91161 0.87847" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m10.063 4.7094-0.94476 0.92266" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m8.5435 4.9897-0.42548 0.39233" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m7.2633 4.0088-0.6133 0.5912" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m4.8418 2.1361-0.72379 0.74588" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".3"/>
+	<path d="m2.25 6.5 3.75-2 3.75 2-0.25109 0.25568-1.2537-0.50568-2.2466-0.27038-2.2517 0.26647-1.2471 0.50397-0.24984-0.25006z" fill-rule="evenodd" stroke="#000" stroke-width=".4"/>
+	<rect x="3.75" y="6" width=".5" height="3.5" stroke="#000" stroke-width=".4"/>
+	<rect x="7.75" y="6" width=".5" height="3.5" stroke="#000" stroke-width=".4"/>
+</svg>

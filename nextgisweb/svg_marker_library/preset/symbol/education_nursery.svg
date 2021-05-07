@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<circle cx="283.45" cy="106.24" r="72.563" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m455.63 301.08-98.115-98.268c-8.107-7.974-17.337-12.799-31.02-12.799h-87.094c-13.683 0-22.305 4.977-30.183 12.799l-97.128 97.315c-26.545 26.548 9.375 60.529 35.877 34.027l58.66-59.049v55.385h152.95v-55.689l60.198 60.324c24.239 25.531 61.129-8.773 35.858-34.045z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m359.26 359.22-57.645 57.649 42.322 42.243-43.367 43.366c-25.594 25.597 9.715 62.205 36.184 35.736l68.585-71.313c14.719-15.021 18.789-42.765 3.009-58.544-0.054-0.053-49.088-49.137-49.088-49.137z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m221.96 459.11 42.323-42.243-57.647-57.649s-49.033 49.084-49.086 49.138c-15.78 15.779-11.71 43.523 3.009 58.544l68.585 71.313c26.468 26.469 61.777-10.14 36.183-35.736l-43.367-43.367z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

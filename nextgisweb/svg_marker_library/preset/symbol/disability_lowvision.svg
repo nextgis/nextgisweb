@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="matrix(48.15 0 0 48.15 -536.27 -33.307)" display="none" fill="none" stroke="#757575" stroke-width=".1">
+		<rect x="1" y="1" width="10" height="10" display="inline"/>
+		<rect x="2" y="2" width="8" height="8" display="inline"/>
+	</g>
+	<path d="m176.5 150.54-56.981 98.587 12.536 87.191c5.8213 15.871 34.075 12.013 35.328-4.5585l-10.823-70.096 23.365-39.887v111.69l-51.289 159c-1.0205 27.402 34.871 32.206 45.018 16.521l41.946-111.98 0.039 0.10057 25.26-67.792-0.4974-92.416-31.248-33.729c-0.6899-5.1213 1.9435-7.0834 6.6111-6.5481l24.637 28.025v0.0628l77.431 96.219c22.124 10.706 37.427-14.08 28.491-28.491l-119.1-141.9c-4.5177-5.7597-47.188-5.6083-50.724 2.5e-4zm68.201 190.19-24.952 67.641 36.286 99.38c12.245 20.087 50.083 8.1714 45.132-17.327z" fill="param(fill)" fill-opacity="param(fill-opacity)" fill-rule="evenodd" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m196.1 134.82c9.8724 0 18.401-3.5907 25.583-10.773 7.1823-7.1823 10.773-15.71 10.774-25.584-1e-3 -10.311-3.5917-18.945-10.774-25.902-7.1823-6.9562-15.711-10.434-25.583-10.435-9.8743 1e-3 -18.399 3.4791-25.574 10.435-7.1753 6.9572-10.764 15.591-10.763 25.902-1e-3 9.8743 3.5877 18.402 10.763 25.584 7.1764 7.1823 15.7 10.774 25.574 10.773z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m341.22 331.03c-0.564-3.9856 11.433-12.505 14.981-10.302l108.21 185.82c0.8297 4.8645-10.081 13.411-14.981 10.302z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

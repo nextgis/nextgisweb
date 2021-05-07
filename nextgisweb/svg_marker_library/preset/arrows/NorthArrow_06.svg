@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 19.469 19.469" xmlns="http://www.w3.org/2000/svg">
+	<g fill="param(fill)">
+		<path d="m3.6938 3.6938 2.2812 4 1.3438-0.375 0.34375-1.3125-3.9688-2.3125z" fill-opacity=".5" stroke-linecap="square" stroke-width=".19956"/>
+		<path d="m15.775 3.6938-4 2.2812 0.375 1.3438 1.3438 0.375 2.2812-4z" fill-opacity=".5" stroke-linecap="square" stroke-width=".19956"/>
+		<path d="m6.0062 11.806-2.3125 3.9688 3.9688-2.3125-0.34375-1.3125-1.3125-0.34375z" fill-opacity=".5" stroke-linecap="square" stroke-width=".19956"/>
+		<path d="m13.462 11.806-1.3125 0.34375-0.375 1.3438 4 2.2812-2.3125-3.9688z" fill-opacity=".5" stroke-linecap="square" stroke-width=".19956"/>
+		<path transform="matrix(.90762 0 0 .90807 -17.498 -14.436)" d="m40 26.62-7.8787 2.1213-2.1213 7.8787-2.1213-7.8787-7.8787-2.1213 7.8787-2.1213 2.1213-7.8787 2.1213 7.8787z" fill-opacity="param(fill-opacity)" stroke="param(fill)" stroke-opacity="param(fill-opacity)"/>
+	</g>
+</svg>

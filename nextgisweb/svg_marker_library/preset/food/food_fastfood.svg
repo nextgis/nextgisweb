@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="matrix(48.15 0 0 48.15 -536.27 -33.307)" display="none" fill="none" stroke="#757575" stroke-width=".1">
+		<rect x="1" y="1" width="10" height="10" display="inline"/>
+		<rect x="2" y="2" width="8" height="8" display="inline"/>
+	</g>
+	<path d="m297.23 363.07c3.131-27.416-17.623-42.296-62.261-44.639h-107.51c-44.639 2.343-65.589 17.223-62.853 44.639h232.62z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<polygon points="523.98 81.687 505.77 76.398 474.63 186.26 316.03 186.26 354.22 489.37 484.02 489.37 522.8 186.26 493.44 186.26" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m64.604 445.32c-2.737 27.404 18.214 42.087 62.853 44.047h107.51c44.638-1.96 65.392-16.643 62.261-44.047h-232.62z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m287.24 384.22h-213.24c-5.474 1e-3 -10.171 1.958-14.091 5.871-3.92 3.915-5.88 8.417-5.88 13.509 0 5.88 1.96 10.678 5.88 14.395 3.92 3.718 8.617 5.576 14.091 5.575h213.24c5.485 1e-3 10.186-1.857 14.1-5.575 3.914-3.717 5.871-8.515 5.871-14.395 0-5.092-1.957-9.594-5.871-13.509-3.914-3.913-8.614-5.87-14.1-5.871z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

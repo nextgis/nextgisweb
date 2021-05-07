@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="84.676pt" height="85.03pt" version="1.1" viewBox="0 0 84.676 85.03" xmlns="http://www.w3.org/2000/svg">
+	<g fill="#000400" stroke="#000">
+		<path d="M15.409,15.409h53.858v53.858H15.409V15.409z" fill="none" stroke="param(fill)" stroke-opacity="param(fill-opacity)" stroke-width="1.25"/>
+		<path transform="scale(.8)" d="m96.785 0.88281-44.195 44.195-43.529-43.531-7.9551 7.9551 43.529 43.531-43.752 43.752 8.1777 8.1758 43.752-43.752 44.193 44.195h0.001953l7.9551-7.9551-44.195-44.195 44.193-44.193-8.1758-8.1777z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	</g>
+</svg>

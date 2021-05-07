@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="matrix(48.15 0 0 48.15 -536.27 -33.307)" display="none" fill="none" stroke="#757575" stroke-width=".1">
+		<rect x="1" y="1" width="10" height="10" display="inline"/>
+		<rect x="2" y="2" width="8" height="8" display="inline"/>
+	</g>
+	<path d="m515.88 100.69-34.72-33.092c-1.786-1.703-4.194-2.627-6.641-2.595l-154.87 2.553v-23.535c0-5.163-4.186-9.349-9.349-9.349h-45.572c-2.481 0-4.86 0.986-6.614 2.741-1.753 1.755-2.737 4.135-2.735 6.616l0.063 66.862-159.27-2.625c-2.463-0.019-4.853 0.892-6.64 2.595l-34.719 33.092c-1.947 1.855-3.006 4.456-2.909 7.144s1.341 5.205 3.417 6.915l33.906 27.938c1.686 1.39 3.8 2.146 5.978 2.146 0.127 0 0.255-2e-3 0.383-8e-3l159.92-6.527 0.345 361.56c5e-3 5.159 4.189 9.34 9.349 9.34h45.097c5.163 0 9.349-4.186 9.349-9.349v-404.64l155.45 6.345c0.129 5e-3 0.256 8e-3 0.384 8e-3 2.177 0 4.292-0.756 5.978-2.146l33.905-27.938c2.076-1.71 3.319-4.228 3.416-6.915 0.097-2.688-0.962-5.288-2.909-7.143z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

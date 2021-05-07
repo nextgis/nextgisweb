@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 579.997 579.997" sodipodi:docbase="/usr/share/qgis/svg/custom" sodipodi:docname="parking.svg" sodipodi:version="0.32" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd">
+	<sodipodi:namedview bordercolor="#666666" borderopacity="1.0" pagecolor="#ffffff"></sodipodi:namedview>
+	<path d="m19.55 20.073v539.85h540.9v-539.85h-540.9zm518.65 517.6h-496.4v-495.35h496.4v495.35z" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+	<path d="m224.65 327.95h60.325c39.736 0 69.742-8.945 90.008-26.835 20.426-17.891 30.639-44.331 30.639-79.322 0-34.674-10.213-60.958-30.639-78.849-20.266-18.051-50.271-27.074-90.008-27.074h-108.3v354.58h47.975v-142.5zm0-172.66h60.325c22.321 0 39.58 5.778 51.77 17.336 12.194 11.559 18.289 27.945 18.289 49.163 0 21.375-6.095 37.84-18.289 49.397-12.189 11.559-29.448 17.337-51.77 17.337h-60.325v-133.23z" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+</svg>

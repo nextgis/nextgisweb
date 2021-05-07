@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 579.997 579.997" sodipodi:docbase="/usr/share/qgis/svg/Garmin_Symbols" sodipodi:docname="house.svg" sodipodi:version="0.32" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd">
+	<sodipodi:namedview bordercolor="#666666" borderopacity="1.0" pagecolor="#ffffff"></sodipodi:namedview>
+	<rect x="157.75" y="273.44" width="316.26" height="235" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+	<path d="m75.067 288.4 481.62 2.136-140.56-160.23h-206.7l-134.36 158.09z" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+	<rect x="327.99" y="329.42" width="115.76" height="179.01" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="4.5136"/>
+	<rect x="197.16" y="330.34" width="88.37" height="81.756" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+	<rect x="311.28" y="87.369" width="90.859" height="44.026" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+</svg>

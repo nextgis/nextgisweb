@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<path d="m339.52 108.88-7.194-0.13-1.39-84.656v-1.37l-39.205 0.685-39.205-0.685v1.37l-1.389 84.656-7.194 0.13h-69.462v77.893l77.099 0.518 0.946 110.31v42.447c2.014-0.231 4.058-0.389 6.124-0.497 10.508 1.844 21.766 1.557 33.082 0.948 11.315 0.608 22.573 0.896 33.081-0.948 2.065 0.108 4.109 0.266 6.123 0.497v-42.405l0.946-110.36 77.1-0.518v-77.893h-69.462z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m375.98 362.93h-168.92c-5.561 0-10.068 4.508-10.068 10.068v168.92c0 5.561 4.507 10.068 10.068 10.068h168.92c5.561 0 10.068-4.508 10.068-10.068v-168.92c1e-3 -5.561-4.507-10.068-10.068-10.068z" fill="param(fill)" fill-opacity="param(fill-opacity)" opacity=".5"/>
+	<path d="m375.98 362.93h-168.92c-5.561 0-10.068 4.508-10.068 10.068v168.92c0 5.561 4.507 10.068 10.068 10.068h168.92c5.561 0 10.068-4.508 10.068-10.068v-168.92c1e-3 -5.561-4.507-10.068-10.068-10.068z" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

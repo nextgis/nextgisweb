@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 30.982 88.35" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<text transform="matrix(1.3993 0 0 .71464-16.508 20.498)" x="14.802" y="41.814" fill="param(outline)" fill-opacity="param(outline-opacity)" font-family="OPEN SANS" font-size="34.981" letter-spacing="0" word-spacing="0" line-height="125%"><tspan x="14.802" y="41.814" font-family="Adobe Heiti Std R" font-size="22.738">N</tspan></text>
+	<g transform="translate(-15.07-14.07)">
+		<g transform="matrix(.50522 0 0 .57874 15.12.348)">
+			<path id="h" transform="translate(-1.438 34.573)" d="m32 35v-32" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="g" transform="translate(-1.438 34.573)" d="m32-9.453 28.938 73.826-29-29-29 29z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(fill)" stroke-opacity="param(fill-opacity)" stroke-width="3"/>
+			<path id="f" transform="translate(-1.438 34.573)" d="m32-9.453 29 73.45-29-29-29 29z" fill="none" stroke="param(outline)" stroke-linecap="square" stroke-opacity="param(outline-opacity)"/>
+			<path id="d" d="m4 92.82 6.74-3.891" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="c" d="m4.603 90.7 10.397-6" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="b" d="m3 95.17 4-2.309" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="a" d="m5.442 88.45 13.856-8" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="8" d="m12 72.26 18.686-10.812" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="9" d="m14.593 65.45 16.09-9.291" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="A" d="m15.343 63.24 15.343-8.858" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="B" d="m16.877 60.58 13.809-7.972" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="C" d="m17.511 58.45 13.174-7.606" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="D" d="m18.412 56.15 12.274-7.087" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="E" d="m19 54.04 11.427-6.597" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="F" d="m20 51.757 10.822-6.311" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="G" d="m20.826 49.45 9.86-5.693" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="H" d="m21.48 47.3 9.206-5.315" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="I" d="m23 44.647 7.686-4.437" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="J" d="m23.744 42.45 6.928-4" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="K" d="m24.549 40.21 6.137-3.543" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="L" d="m25 38.18 5.686-3.283" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="M" d="m26.663 35.446 4.02-2.323" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="N" d="m27.617 33.12 3.069-1.772" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="O" d="m28 31.13 2.686-1.551" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="P" d="m29.15 28.694l1.534-.886" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="Q" d="m13 69.909 17.686-10.211" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="R" d="m9.206 79.19 21.48-12.402" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="S" d="m8.36 81.45 22.326-12.89" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="T" d="m7.671 83.62 19.946-11.516" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="U" d="m6.137 86.27 17.02-9.827" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="V" d="m10 76.956 20.686-11.943" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="W" d="m11.279 74.45 19.407-11.205" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="X" d="m14 67.56 16.686-9.634" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+			<path id="e" transform="translate(0 3.829)" d="m30.562 65.744v-43.566" fill="none" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width=".25"/>
+		</g>
+		<g transform="matrix(-.50522 0 0-.57874 45.998 116.15)">
+			<use xlink:href="#h"/>
+			<use xlink:href="#g"/>
+			<use xlink:href="#f"/>
+			<use xlink:href="#d"/>
+			<use xlink:href="#c"/>
+			<use xlink:href="#b"/>
+			<use xlink:href="#a"/>
+			<use xlink:href="#8"/>
+			<use xlink:href="#9"/>
+			<use xlink:href="#A"/>
+			<use xlink:href="#B"/>
+			<use xlink:href="#C"/>
+			<use xlink:href="#D"/>
+			<use xlink:href="#E"/>
+			<use xlink:href="#F"/>
+			<use xlink:href="#G"/>
+			<use xlink:href="#H"/>
+			<use xlink:href="#I"/>
+			<use xlink:href="#J"/>
+			<use xlink:href="#K"/>
+			<use xlink:href="#L"/>
+			<use xlink:href="#M"/>
+			<use xlink:href="#N"/>
+			<use xlink:href="#O"/>
+			<use xlink:href="#P"/>
+			<use xlink:href="#Q"/>
+			<use xlink:href="#R"/>
+			<use xlink:href="#S"/>
+			<use xlink:href="#T"/>
+			<use xlink:href="#U"/>
+			<use xlink:href="#V"/>
+			<use xlink:href="#W"/>
+			<use xlink:href="#X"/>
+			<use xlink:href="#e"/>
+		</g>
+	</g>
+</svg>

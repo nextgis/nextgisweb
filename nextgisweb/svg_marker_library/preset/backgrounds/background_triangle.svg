@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 579.997 579.997" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+	<rdf:RDF>
+		<ns:Work rdf:about="">
+			<dc:title>SVG Road Signs</dc:title>
+			<dc:rights>
+				<ns:Agent>
+					<dc:title>John Cliff</dc:title>
+				</ns:Agent>
+			</dc:rights>
+			<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+			<ns:license rdf:resource="http://web.resource.org/cc/PublicDomain"/>
+		</ns:Work>
+		<ns:License rdf:about="http://web.resource.org/cc/PublicDomain">
+			<ns:permits rdf:resource="http://web.resource.org/cc/Reproduction"/>
+			<ns:permits rdf:resource="http://web.resource.org/cc/Distribution"/>
+			<ns:permits rdf:resource="http://web.resource.org/cc/DerivativeWorks"/>
+		</ns:License>
+	</rdf:RDF>
+	<polygon points="288.65 59.382 29.639 520.62 550.36 519.11" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

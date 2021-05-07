@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="matrix(48.15 0 0 48.15 -536.27 -33.307)" display="none" fill="none" stroke="#757575" stroke-width=".1">
+		<rect x="1" y="1" width="10" height="10" display="inline"/>
+		<rect x="2" y="2" width="8" height="8" display="inline"/>
+	</g>
+	<path d="m472 95.129c-135.44-21.685-148.86 89.987-148.84 89.907 111.05 38.182 148.84-89.907 148.84-89.907z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m360.35 223.14c-29.095 0-55.3 11.452-74.49 30.436-19.396-18.983-45.601-30.436-74.592-30.436-58.911 0-106.68 47.562-106.68 106.37 0 2.271 0 4.127 0.31 6.294h0.516c1.651 22.801 8.976 51.585 26.309 87.076 0 0 30.022 57.054 53.752 83.259l2.167 2.063c11.658 11.762 27.753 18.983 45.602 18.983 21.666 0 40.855-10.523 52.514-26.824h0.31c11.658 16.301 30.848 26.824 52.514 26.824 17.643 0 33.943-7.325 45.498-18.983l2.167-2.063c23.936-26.205 53.752-83.259 53.752-83.259 17.333-35.491 24.658-64.069 26.515-87.076h0.207c0.103-2.27 0.103-4.127 0.103-6.294-4e-3 -58.807-47.771-106.37-106.48-106.37z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m248.14 143.21c0.01 0.069-2.94-96.013-119.88-87.829 0 0 22.455 111.91 119.88 87.829z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m280.34 231.07 4.795 0.421 27.368-146.56-1.482-0.855c-0.966-0.557-23.789-13.646-36.158-13.646-3.725 0-6.395 1.15-7.934 3.418-1.975 2.908-1.779 7.231 0.597 13.214 11.601 29.215 12.804 142.86 12.814 144.01z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

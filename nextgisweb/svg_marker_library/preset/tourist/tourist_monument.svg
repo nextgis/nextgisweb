@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="matrix(48.15 0 0 48.15 -536.27 -33.307)" display="none" fill="none" stroke="#757575" stroke-width=".1">
+		<rect x="1" y="1" width="10" height="10" display="inline"/>
+		<rect x="2" y="2" width="8" height="8" display="inline"/>
+	</g>
+	<rect x="35.845" y="500.61" width="504.9" height="18.023" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<rect x="53.554" y="464.5" width="469.23" height="18.023" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m71.617 446.56 433.11-0.061-2e-3 -18.023-17.801 3e-3 -0.027-198.25 17.973-3e-3 -6e-3 -36.045-433.11 0.061 5e-3 36.045 18.642-2e-3 0.028 198.25-18.815 3e-3 3e-3 18.023zm54.829-216.28 36.045-5e-3 0.028 198.25-36.046 5e-3 -0.027-198.25zm72.091-0.01 36.045-5e-3 0.028 198.25-36.045 5e-3 -0.028-198.25zm72.09-0.01 36.046-5e-3 0.027 198.25-36.046 5e-3 -0.027-198.25zm72.092-0.011 36.045-5e-3 0.027 198.25-36.045 5e-3 -0.027-198.25zm72.09-0.01 36.046-5e-3 0.027 198.25-36.046 5e-3 -0.027-198.25z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<polygon points="196.04 174.7 287.31 144.35 378.84 176.76 440.79 177.04 287.82 112.44 130.55 175.35" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<polygon points="502.57 174.87 502.57 141.91 286.16 53.075 71.974 143.9 71.974 176.87 284.19 90.54" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

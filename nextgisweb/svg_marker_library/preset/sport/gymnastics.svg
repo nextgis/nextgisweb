@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="38" height="38" version="1.0" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+	<rect x="15.29" y="20.639" width="269.52" height="258.25" ry="20.87" fill="none" stroke="#000" stroke-linejoin="round" stroke-width="14.69"/>
+	<path d="m142.11 83.911c0.00304 8.9292-7.2347 16.169-16.164 16.169-8.9292 0-16.167-7.2402-16.164-16.169-0.00304-8.9292 7.2347-16.169 16.164-16.169 8.9292 0 16.167 7.2402 16.164 16.169z" fill-rule="evenodd" stroke="#000" stroke-width="1px"/>
+	<path d="m149.86 118.27c14.151 14.151 15.57 34.869 0.2866 59.775" fill="none" stroke="#000" stroke-linecap="round" stroke-width="31.579"/>
+	<path d="m142.64 184.95-28.855 3.9793-34.541-8.5076" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="19.737"/>
+	<path d="m215.38 95.396-23.833 22.931-36.021-0.11414" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="15.789"/>
+	<path d="m157.36 183.83 28.855-3.9793 34.541 8.5076" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="19.737"/>
+	<path d="m89.302 140.97 23.833-22.932 36.021 0.11414" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="15.789"/>
+</svg>

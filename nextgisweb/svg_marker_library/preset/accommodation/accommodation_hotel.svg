@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="matrix(48.15 0 0 48.15 -536.27 -33.307)" display="none" fill="none" stroke="#757575" stroke-width=".1">
+		<rect x="1" y="1" width="10" height="10" display="inline"/>
+		<rect x="2" y="2" width="8" height="8" display="inline"/>
+	</g>
+	<polygon points="295.24 39.758 294.86 39.364 106.54 232.64 144.68 232.64 144.68 520.61 257.98 520.61 257.98 374.27 334.29 374.27 334.29 520.61 445.03 520.61 445.03 232.64 483.17 232.64" fill="param(fill)" fill-opacity="param(fill-opacity)" opacity=".5" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<g fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-miterlimit="10" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)">
+		<polygon points="505.01 350.97 503.81 412.46 77.661 409.61 79.33 279.46 45.71 279.03 42.709 513.19 76.328 513.62 77.23 443.23 503.15 446.07 502.01 504.07 535.63 504.73 538.63 351.62"/>
+		<path d="m257.65 402.15h195.13c22.248 0 40.348-18.1 40.348-40.347s-18.1-40.347-40.348-40.347h-195.13c-22.247 0-40.346 18.1-40.346 40.347s18.099 40.347 40.346 40.347z"/>
+		<path d="m169.84 328.92h0.013c9.029-3e-3 17.523-3.125 23.917-8.791 6.433-5.7 9.974-13.29 9.97-21.394-7e-3 -16.617-15.216-30.136-33.915-30.136-9.029 3e-3 -17.523 3.125-23.917 8.792-6.433 5.701-9.974 13.29-9.97 21.393 8e-3 16.616 15.216 30.136 33.902 30.136zm0-1.15z"/>
+		<path d="m106.8 398.13h84.055c11.339 0 20.563-9.225 20.563-20.563s-9.224-20.563-20.563-20.563h-84.055c-11.339 0-20.563 9.224-20.563 20.563s9.224 20.563 20.563 20.563z"/>
+	</g>
+</svg>

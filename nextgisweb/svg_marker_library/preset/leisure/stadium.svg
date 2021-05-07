@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="37.28" height="37.28" baseProfile="full" version="1.1" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+	<rect transform="matrix(.80075 .599 -.599 .80075 0 0)" x="22.155" y="-14.026" width="26.276" height="36.754" rx="10.917" fill="none" stroke="#191919" stroke-dasharray="0.50704792, 1.01409583" stroke-linejoin="bevel" stroke-width=".50705"/>
+	<rect transform="matrix(.80075 .599 -.599 .80075 0 0)" x="19.528" y="-17.701" width="31.53" height="44.103" rx="13.1" fill="none" stroke="#191919" stroke-linejoin="bevel" stroke-width="1.6403"/>
+	<rect transform="matrix(.80424 .59431 -.59431 .80424 0 0)" x="12.369" y="-3.9608" width="5.5382" height="15.312" rx=".77409" fill="#8c8c8c" stroke="#191919" stroke-linejoin="bevel" stroke-width=".25958"/>
+</svg>

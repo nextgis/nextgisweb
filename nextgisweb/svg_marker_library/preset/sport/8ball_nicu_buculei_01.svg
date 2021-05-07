@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128px" height="128px" sodipodi:docbase="/home/nicu/Desktop/svg" sodipodi:docname="8ball.svg" sodipodi:version="0.32" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<linearGradient id="d">
+			<stop stop-color="#b2b2b2" offset="0"/>
+			<stop stop-color="#fff" stop-opacity="0" offset="1"/>
+		</linearGradient>
+		<radialGradient id="c" cx="574.02" cy="469.34" r="41.5" gradientTransform="matrix(1.592 -1.2873 1.664 2.0578 -1126.3 260.99)" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#fff" offset="0"/>
+			<stop stop-color="#fff" stop-opacity=".36458" offset="1"/>
+		</radialGradient>
+		<radialGradient id="b" cx="355" cy="546.36" r="88.5" gradientTransform="matrix(.81243 -1.0401 .92656 .72375 -439.65 520.18)" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#fff" stop-opacity=".41667" offset="0"/>
+			<stop stop-color="#fff" stop-opacity="0" offset="1"/>
+		</radialGradient>
+		<radialGradient id="a" cx="384.16" cy="615.63" r="23" gradientTransform="matrix(1.0452 .0064321 -.0030801 .57455 -15.462 259.16)" gradientUnits="userSpaceOnUse" xlink:href="#d"/>
+	</defs>
+	<sodipodi:namedview bordercolor="#666666" borderopacity="1.0" pagecolor="#ffffff" showgrid="false"/>
+	<g transform="matrix(.6633 0 0 .6633 -175.48 -299.76)">
+		<path transform="matrix(.82766 .56122 -.56122 .82766 370.33 -108.29)" d="m450 548.86a88.5 88.5 0 1 1-177 0 88.5 88.5 0 1 1 177 0z" sodipodi:cx="361.50000" sodipodi:cy="548.86218" sodipodi:rx="88.500000" sodipodi:ry="88.500000" sodipodi:type="arc"/>
+		<path transform="matrix(.82766 .56122 -.56122 .82766 178.16 -183.03)" d="m610 487.86a41.5 41.5 0 1 1-83 0 41.5 41.5 0 1 1 83 0z" fill="url(#c)" sodipodi:cx="568.50000" sodipodi:cy="487.86218" sodipodi:rx="41.500000" sodipodi:ry="41.500000" sodipodi:type="arc"/>
+		<path d="m373.61 539.8c-1.8954-1.2852-2.9796-1.4506-4.6996-1.1054-1.72 0.34523-3.9581 1.1785-5.2671 3.109-1.309 1.9305-2.0605 3.5858-1.7447 5.3114 0.32766 1.7081 1.694 3.3776 3.5895 4.6628 1.8778 1.2733 4.1718 2.0858 5.8623 1.7463 1.7024-0.35714 2.6985-1.8466 4.0075-3.7771 1.3209-1.948 1.5531-4.3275 1.243-6.0237-0.29827-1.7138-1.1131-2.65-2.9909-3.9234m-5.1303-8.3592c-1.8989-2.338-3.1597-4.8999-3.3591-7.2128-0.19945-2.3129 1.4122-3.9356 2.9236-6.1645 2.2491-3.3169 6.3059-4.4413 9.9586-4.5008 3.6526-0.05947 6.0246 0.55981 10.816 3.8086 4.756 3.225 6.3578 5.7654 7.6543 9.1807 1.3083 3.3979 1.5327 7.2392-0.72826 10.574-1.5114 2.2289-2.9638 4.1457-5.2037 4.8044-2.2225 0.67063-4.4709 0.38804-7.3455-0.51085 2.1677 2.546 2.916 4.8083 3.1369 7.3918 0.25022 2.5779-0.03547 5.4329-1.7491 7.9601-2.6419 3.8961-5.1526 6.3117-9.1066 6.5511-3.9246 0.23379-9.7146-1.1287-14.804-4.5798-5.107-3.463-8.3939-8.1623-9.6641-11.919-1.2408-3.7619 0.05373-7.0952 2.6956-10.991 1.7136-2.5272 4.5927-3.8097 7.0627-4.543 2.4994-0.739 4.5456-0.92045 7.713 0.15129m7.7065-6.2646c-1.0592 1.562-1.7629 2.8397-1.4742 4.2652 0.30625 1.4374 1.5853 2.9196 3.1999 4.0144 1.5795 1.071 3.3602 1.7566 4.7914 1.4973 1.4311-0.25927 2.4009-1.4496 3.4601-3.0116 1.0591-1.5619 1.2926-3.5178 0.99198-4.9257-0.28879-1.4255-1.0771-2.2029-2.6566-3.2739-1.6146-1.0948-2.5934-1.2366-4.042-0.98925-1.4312 0.2593-3.2233 0.87922-4.2705 2.4236" sodipodi:nodetypes="csscscscccsssscscccscscsscccssscscc"/>
+		<path transform="matrix(.82766 .56122 -.56122 .82766 370.33 -108.29)" d="m450 548.86a88.5 88.5 0 1 1-177 0 88.5 88.5 0 1 1 177 0z" fill="url(#b)" sodipodi:cx="361.50000" sodipodi:cy="548.86218" sodipodi:rx="88.500000" sodipodi:ry="88.500000" sodipodi:type="arc"/>
+		<path transform="matrix(1.4128 .43508 -.40596 1.3182 48.542 -368.71)" d="m408 614.86a23 14.5 0 1 1-46 0 23 14.5 0 1 1 46 0z" fill="url(#a)" sodipodi:cx="385.00000" sodipodi:cy="614.86218" sodipodi:rx="23.000000" sodipodi:ry="14.500000" sodipodi:type="arc"/>
+		<path transform="matrix(.1932 .78773 -.735 .18027 671.9 151.26)" d="m408 614.86a23 14.5 0 1 1-46 0 23 14.5 0 1 1 46 0z" fill="url(#a)" sodipodi:cx="385.00000" sodipodi:cy="614.86218" sodipodi:rx="23.000000" sodipodi:ry="14.500000" sodipodi:type="arc"/>
+	</g>
+</svg>

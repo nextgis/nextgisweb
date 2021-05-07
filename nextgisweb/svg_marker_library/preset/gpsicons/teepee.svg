@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 579.997 579.997" sodipodi:docbase="/usr/share/qgis/svg/Garmin_Symbols" sodipodi:docname="teepee.svg" sodipodi:version="0.32" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd">
+	<polygon points="284.32 317.94 192.1 518.88 388.06 518.88" fill="param(fill) #000" fill-opacity="param(fill-opacity)" opacity=".25"/>
+	<polygon points="307.87 114.84 339.46 56.739 316.02 41.268 292.31 86.109 270.68 41.102 249.61 56.746 274.4 112.55 60.749 515.95 59.199 518.88 192.1 518.88 284.32 317.94 388.06 518.88 520.79 518.88" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+</svg>

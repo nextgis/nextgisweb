@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="109.13" height="109.13" version="1.0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<g transform="translate(1.9073e-5 1.1562)" fill="#ff8000" font-size="12">
+		<rect x="50.983" y="6.1554" width="7.9183" height="86.771" rx="4.6037" ry="4.6037"/>
+		<path d="m54.942 37.829-43.799 27.714h87.598l-43.799-27.714z" fill-rule="evenodd" stroke="#ff8000" stroke-linejoin="round" stroke-width="6.0917"/>
+		<path d="m54.942 79.491-19.24 12.174h38.48l-19.24-12.174z" fill-rule="evenodd" stroke="#ff8000" stroke-linejoin="round" stroke-width="2.6759"/>
+		<rect id="a" x="25.527" y="45.422" width="7.9183" height="18.258" rx="4.6037" ry="4.6037" fill="#ff8000" stroke="#ff8000"/>
+		<use transform="translate(50.64 -4.0174e-7)" width="109.13385" height="109.13385" stroke="#ff8000" xlink:href="#a"/>
+	</g>
+</svg>

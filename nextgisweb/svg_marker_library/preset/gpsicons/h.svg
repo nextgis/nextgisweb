@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 579.997 579.997" sodipodi:docbase="/usr/share/qgis/svg/Garmin_Symbols" sodipodi:docname="h.svg" sodipodi:version="0.32" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd">
+	<path d="m288.5 44.248-274.36 208.83v282.67h548.64l3.075-282.65-277.36-208.85zm239.29 456.12h-478.27v-229.76l239.1-181.99 241.68 181.98-2.5 229.77z" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+	<polygon points="134.1 349.79 98.056 346.91 97.555 311.92 65.66 311.92 65.66 490.75 100.57 490.75 100.57 415.33 451.66 415.33 452.65 490.98 487.53 490.98 487.53 345.04 455.67 345.04 454.67 381.58 140.1 379.88" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+</svg>

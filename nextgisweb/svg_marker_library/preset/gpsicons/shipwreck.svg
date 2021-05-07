@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 579.997 579.997" sodipodi:docbase="/usr/share/qgis/svg/Garmin_Symbols" sodipodi:docname="shipwreck.svg" sodipodi:version="0.32" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd">
+	<sodipodi:namedview bordercolor="#666666" borderopacity="1.0" pagecolor="#ffffff"></sodipodi:namedview>
+	<path d="m200.22 415.27 189.99-179.15s39.525 102.38 11.1 139.92c-1.923 2.542-45.411 40.047-45.411 40.047l-155.68-0.821z" fill="param(fill) #000" fill-opacity="param(fill-opacity)" opacity=".25" sodipodi:nodetypes="ccscc"/>
+	<path d="m484.08 383.82-50.021 0.337c11.641-23.316 12.918-55.805 3.945-98.751-6.787-32.485-17.251-59.759-17.693-60.904l-17.301-44.811-124.72 117.6-111.75-124.89-55.283 49.471 113.04 126.33-39.917 37.638-88.91 0.6 0.436 64.545 388.6-2.619-0.436-64.546zm-109.26-85.213c7.024 33.62 4.365 50.992 1.491 56.732-5.027 4.605-18.508 16.411-32.363 28.416l-62.916-0.332 93.143-87.827c0.219 0.998 0.434 2.001 0.645 3.011z" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+</svg>

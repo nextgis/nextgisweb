@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="matrix(48.15 0 0 48.15 -536.27 -33.307)" display="none" fill="none" stroke="#757575" stroke-width=".1">
+		<rect x="1" y="1" width="10" height="10" display="inline"/>
+		<rect x="2" y="2" width="8" height="8" display="inline"/>
+	</g>
+	<rect x="53.554" y="414.5" width="449.23" height="18.023" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<rect x="35.845" y="450.61" width="504.9" height="18.023" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m90.429 378.54-18.815 3e-3 3e-3 18.023 255.42-0.042 2.923 4.173 5.96-4.175 108.81-0.018-4e-3 -18.023-86.306 0.015-98.965-141.29-2.347 1.644-3.974-44.208 70.32 5.539 2.83-35.934-253.11-19.939-2.831 35.934 20.061 1.581 0.027 196.72zm36.018-193.88 36.046 2.839 0.027 191.03-36.045 6e-3 -0.028-193.88zm72.092 5.679 18.147 1.429 16.789 186.75-34.91 6e-3 -0.026-188.18zm64.535 114.86 51.345 73.306-44.754 8e-3 -6.591-73.314z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

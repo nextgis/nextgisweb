@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<path d="m97.688 138.38c-5.231 0.082-10.388 2.309-14.031 6.063s-5.73 8.988-5.656 14.219v28.844h-9.313c-6.604-0.093-13.203 2.551-17.906 7.188s-7.438 11.208-7.438 17.813 2.734 13.176 7.438 17.813 11.302 7.281 17.906 7.188h9.312v75.563h-9.313c-6.604-0.094-13.203 2.551-17.906 7.188s-7.438 11.208-7.438 17.813 2.734 13.176 7.438 17.813 11.302 7.281 17.906 7.188h9.313v86.281h40v-86.281h94.313v-30.068h175.38v30.063h86.312v86.281h40v-86.281h6.438c6.604 0.094 13.203-2.551 17.906-7.188s7.438-11.208 7.438-17.813-2.734-13.176-7.438-17.813-11.303-7.281-17.906-7.188h-6.438v-75.561h6.438c6.604 0.093 13.203-2.551 17.906-7.188s7.438-11.208 7.438-17.813-2.734-13.176-7.438-17.813-11.303-7.281-17.906-7.188h-6.438v-28.844c0.075-5.335-2.1-10.667-5.875-14.438s-9.103-5.927-14.438-5.844c-5.23 0.082-10.388 2.309-14.031 6.063s-5.729 8.988-5.656 14.219v28.844h-356v-28.844c0.075-5.335-2.099-10.667-5.875-14.438s-9.103-5.924-14.437-5.841zm20.312 99.125h356v75.563h-356v-75.563z" enable-background="new    " fill="param(fill)" fill-opacity="param(fill-opacity)" opacity=".75" stroke="param(outline)" stroke-miterlimit="10" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<g fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-miterlimit="10" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)">
+		<rect x="207" y="443" width="190" height="50"/>
+		<rect x="240.32" y="361" width="119.37" height="50"/>
+	</g>
+</svg>

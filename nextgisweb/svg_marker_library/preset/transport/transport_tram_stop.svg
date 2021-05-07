@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="matrix(48.15 0 0 48.15 -536.27 -33.307)" display="none" fill="none" stroke="#757575" stroke-width=".1">
+		<rect x="1" y="1" width="10" height="10" display="inline"/>
+		<rect x="2" y="2" width="8" height="8" display="inline"/>
+	</g>
+	<path d="m257.63 492.35-97.215-0.607c0.433 67.569 97.215 67.57 97.215 0.607z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m458.14 492.33-97.215-0.607c0.432 67.569 97.215 67.57 97.215 0.607z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m343.76 492.2h-68.506c-0.485 15.811-2.964 23.147-7.139 30.379h81.417c-4.144-7.177-6.035-14.786-5.772-30.379z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m437.68 205.03-9.793-10.272h-78.137l114.12-76.872-130.76-87.977-133.67 88.05 116.81 76.799h-81.105l-8.56 10.272h-94.806l0.259 29.15h-0.309l-65.952 131.27v79.616c0 14.379 16.979 29.327 29.924 29.287h413.34v-269.32h-71.362zm-104.63-162.86 112.55 75.726-112.47 75.759-115.14-75.7 115.05-75.785zm-47.721 207.05-0.088 188.17c-1.735 9.831-8.6 11.653-14.109 16.929h-46.806c-5.538-5.413-12.538-7.162-14.292-17.102l-0.089-188.17c0-4.237 5.925-8.411 12.777-13.22h49.583c6.957 4.882 13.024 9.104 13.024 13.393zm-178.52 74.103 43.055-87.496h40.278l-0.128 132.31h-56.241c-12.95 0-34.804-15.561-26.964-44.818zm388.2-74.424-0.091 102.39c-1.71 9.688-8.393 11.614-13.857 16.716h-160.15c-5.534-5.353-12.691-6.715-14.439-16.617l-0.919 0.011 0.215-102.57c0-3.788 6.245-8.178 13.106-13.002h163.56c6.764 4.745 12.567 8.875 12.567 13.07z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

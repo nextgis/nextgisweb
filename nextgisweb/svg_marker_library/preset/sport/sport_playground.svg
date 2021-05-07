@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new 0 0 580 580" version="1.1" viewBox="0 0 580 580" xmlns="http://www.w3.org/2000/svg">
+	<g transform="matrix(48.15 0 0 48.15 -536.27 -33.307)" display="none" fill="none" stroke="#757575" stroke-width=".1">
+		<rect x="1" y="1" width="10" height="10" display="inline"/>
+		<rect x="2" y="2" width="8" height="8" display="inline"/>
+	</g>
+	<circle cx="98.928" cy="285.78" r="57.534" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m429.7 443.53c-1.956-2.607-5.506-3.115-8.188-1.304l-78.111 56.735c-2.608 1.957-3.116 5.652-1.305 8.188l10.58 14.71c1.956 2.607 5.65 3.115 8.188 1.304l78.111-56.735c2.608-1.957 3.115-5.652 1.305-8.188l-10.58-14.71z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<polygon points="285.94 326.58 316.96 381.21 333.26 369.04 302.25 314.69" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<polygon points="260.95 242.09 140.45 30.508 117.33 30.653 244.5 254.12" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+	<path d="m509.85 345.42-111.95-0.146c-8.913 0-16.666 3.841-23.477 8.768l-86.662 60.939-59.562-58.91 82.966-60.721c12.898-10.797 14.564-29.999 3.841-42.896-10.941-12.753-29.999-14.419-42.896-3.695l-129.56 92.241c-18.839 15.868-22.245 51.663-6.521 70.503l93.618 93.69s25.506 33.259 67.532 2.971l119.27-84.198 93.4 0.146c21.81 0 39.346-17.536 39.346-39.346-1e-3 -21.665-17.537-39.346-39.346-39.346z" fill="param(fill)" fill-opacity="param(fill-opacity)" stroke="param(outline)" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width)"/>
+</svg>

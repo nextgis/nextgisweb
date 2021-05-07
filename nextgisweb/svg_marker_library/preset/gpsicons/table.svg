@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="580px" height="580px" enable-background="new -235.433 -235.433 579.997 579.997" sodipodi:docbase="/usr/share/qgis/svg/custom" sodipodi:docname="table.svg" sodipodi:version="0.32" version="1.1" viewBox="-235.43 -235.43 580 580" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd">
+	<sodipodi:namedview bordercolor="#666666" borderopacity="1.0" pagecolor="#ffffff"></sodipodi:namedview>
+	<path d="m310.2 29.101h-100.15v25.606h-35.652l-33.456-106.71h87.254v-31.235h-346.56v31.235h96.864l-33.881 106.71h-40.428v-25.606h-100.15v29.04h49.486v29.612h80.595l-34.653 109.14 44.12-0.011 35.725-109.12h160.81l35.724 109.12 43.118 0.011-34.218-109.14h84.379v-29.612h41.064v-29.039zm-320.06 25.606 34.934-106.71h69.313l34.933 106.71h-139.18z" fill="param(fill) #000" fill-opacity="param(fill-opacity)" stroke="param(outline) #FFF" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0"/>
+</svg>
