@@ -12,6 +12,7 @@ from osgeo import ogr, osr
 from pyramid.request import Request
 from shapely.geometry import box
 from six import text_type, ensure_str
+from sqlalchemy.orm.exc import NoResultFound
 
 from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
@@ -590,6 +591,8 @@ class WFSHandler():
 
         if typenames is None:
             typenames = [layer.keyname for layer in self.resource.layers]
+        else:
+            typenames = [ns_trim(tn) for tn in typenames]
 
         for typename in typenames:
             substitutionGroup = 'gml:AbstractFeature' if self.p_version >= v200 else 'gml:_Feature'
@@ -597,7 +600,10 @@ class WFSHandler():
                                type='ngw:%s_Type' % typename), parent=root)
 
         for typename in typenames:
-            layer = Layer.filter_by(service_id=self.resource.id, keyname=typename).one()
+            try:
+                layer = Layer.filter_by(service_id=self.resource.id, keyname=typename).one()
+            except NoResultFound:
+                raise ValidationError("Unknown layer: %s." % typename)
             feature_layer = layer.resource
             __ctype = El('complexType', dict(name="%s_Type" % typename), parent=root)
             __ccontent = El('complexContent', parent=__ctype)
@@ -637,7 +643,15 @@ class WFSHandler():
                     self.p_typenames = v
                     break
 
-        layer = Layer.filter_by(service_id=self.resource.id, keyname=self.p_typenames).one()
+        if self.p_typenames is None:
+            raise ValidationError("Parameter TYPENAMES must be specified.")
+        else:
+            self.p_typenames = ns_trim(self.p_typenames)
+
+        try:
+            layer = Layer.filter_by(service_id=self.resource.id, keyname=self.p_typenames).one()
+        except NoResultFound:
+            raise ValidationError("Unknown layer: %s." % self.p_typenames)
         feature_layer = layer.resource
         self.request.resource_permission(DataScope.read, feature_layer)
 
@@ -782,7 +796,10 @@ class WFSHandler():
 
         def find_layer(keyname):
             if keyname not in layers:
-                layer = Layer.filter_by(service_id=self.resource.id, keyname=keyname).one()
+                try:
+                    layer = Layer.filter_by(service_id=self.resource.id, keyname=keyname).one()
+                except NoResultFound:
+                    raise ValidationError("Unknown layer: %s." % keyname)
                 self.request.resource_permission(DataScope.write, layer.resource)
                 layers[keyname] = layer
             return layers[keyname]
