@@ -255,6 +255,10 @@ class TilestorWriter:
             except Exception as exc:
                 _logger.exception("Uncaught exception in tile writer: %s", exc.message)
 
+                data = None
+                self.cstart = None
+                tilestor.rollback()
+
     def wait_for_shutdown(self, timeout=SHUTDOWN_TIMEOUT):
         if not self._worker.is_alive():
             return True
