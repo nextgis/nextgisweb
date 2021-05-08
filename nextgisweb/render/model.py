@@ -178,28 +178,17 @@ class TilestorWriter:
                         colortuple = imgcolor(img)
                         color = pack_color(colortuple) if colortuple is not None else None
 
-                        conn.execute(db.sql.text(
-                            'DELETE FROM tile_cache."{0}" WHERE z = :z AND x = :x AND y = :y; '
-                            'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
-                            'VALUES (:z, :x, :y, :color, :tstamp)'.format(data['uuid'])
-                        ), z=z, x=x, y=y, color=color, tstamp=tstamp)
+                        self._write_tile_meta(conn, data['uuid'], dict(
+                            z=z, x=x, y=y, color=color, tstamp=tstamp))
 
                         if color is None:
                             buf = BytesIO()
                             img.save(buf, format='PNG', compress_level=3)
+                            value = buf.getvalue()
 
-                            tilestor.execute(
-                                "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
-                                (z, x, y))
-
-                            try:
-                                tilestor.execute(
-                                    "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                                    (z, x, y, tstamp, buf.getvalue()))
-                            except sqlite3.IntegrityError:
-                                # NOTE: Race condition with other proccess may occurs here.
-                                # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
-                                pass
+                            self._write_tile_data(
+                                tilestor, z, x, y,
+                                tstamp, value)
 
                         if 'answer_queue' in data:
                             answers.append(data['answer_queue'])
@@ -233,9 +222,9 @@ class TilestorWriter:
 
                     time_taken += time() - ptime
                     _logger.debug(
-                        "%d tiles were written in %0.3f seconds (%0.3f per "
-                        "tile)", tiles_written, time_taken,
-                        time_taken / tiles_written)
+                        "%d tiles were written in %0.3f seconds (%0.1f per "
+                        "second, qsize = %d)", tiles_written, time_taken,
+                        tiles_written / time_taken, self.queue.qsize())
 
                 # Report about sucess only after transaction commit
                 for a in answers:
@@ -247,6 +236,39 @@ class TilestorWriter:
                 data = None
                 self.cstart = None
                 tilestor.rollback()
+
+    def _write_tile_meta(self, conn, table_uuid, row):
+        result = conn.execute(db.sql.text(
+            'SELECT true FROM tile_cache."{}" '
+            'WHERE z = :z AND x = :x AND y = :y '
+            'LIMIT 1 FOR UPDATE'.format(table_uuid)
+        ), **row)
+
+        if result.returns_rows:
+            conn.execute(db.sql.text(
+                'DELETE FROM tile_cache."{0}" '
+                'WHERE z = :z AND x = :x AND y = :y '
+                ''.format(table_uuid)
+            ), **row)
+
+        conn.execute(db.sql.text(
+            'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
+            'VALUES (:z, :x, :y, :color, :tstamp)'.format(table_uuid)
+        ), **row)
+
+    def _write_tile_data(self, tilestor, z, x, y, tstamp, value):
+        tilestor.execute(
+            "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
+            (z, x, y))
+
+        try:
+            tilestor.execute(
+                "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
+                (z, x, y, tstamp, value))
+        except sqlite3.IntegrityError:
+            # NOTE: Race condition with other proccess may occurs here.
+            # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
+            pass
 
     def wait_for_shutdown(self, timeout=SHUTDOWN_TIMEOUT):
         if not self._worker.is_alive():
