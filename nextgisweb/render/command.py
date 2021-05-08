@@ -11,7 +11,7 @@ import transaction
 from ..command import Command
 from ..models import DBSession
 
-from .model import ResourceTileCache
+from .model import ResourceTileCache, TilestorWriter
 from .util import affine_bounds_to_tile
 
 
@@ -22,6 +22,7 @@ SEED_STEP = 16
 SEED_INTERVAL = 30
 
 TILE_QUEUE_TIMEOUT = 60
+SHUTDOWN_TIMEOUT = 10 * TILE_QUEUE_TIMEOUT
 
 
 @Command.registry.register
@@ -126,3 +127,6 @@ class TileCacheSeedCommand():
             _logger.info(
                 "Completed seeding cache for resource %d (%d tiles processed, %d rendered)",
                 rend_res.id, progress, rendered)
+
+        TilestorWriter.getInstance().wait_for_shutdown(
+            timeout=SHUTDOWN_TIMEOUT)

@@ -141,7 +141,7 @@ class TilestorWriter:
 
     def _job(self):
         self._shutdown = False
-        atexit.register(self._wait_for_shutdown)
+        atexit.register(self.wait_for_shutdown)
 
         data = None
         while True:
@@ -255,18 +255,23 @@ class TilestorWriter:
             except Exception as exc:
                 _logger.exception("Uncaught exception in tile writer: %s", exc.message)
 
-    def _wait_for_shutdown(self):
+    def wait_for_shutdown(self, timeout=SHUTDOWN_TIMEOUT):
+        if not self._worker.is_alive():
+            return True
+
         _logger.debug(
             "Waiting for shutdown of tile cache writer for %d seconds (" + 
-            "qsize = %d)...", SHUTDOWN_TIMEOUT, self.queue.qsize())
+            "qsize = %d)...", timeout, self.queue.qsize())
 
         self._shutdown = True
-        self._worker.join(SHUTDOWN_TIMEOUT)
+        self._worker.join(timeout)
 
         if self._worker.is_alive():
             _logger.warn("Tile cache writer is still running. It'll be killed!")
+            return False
         else:
             _logger.debug("Tile cache writer has successfully shut down.")
+            return True
 
 
 class ResourceTileCache(Base):
