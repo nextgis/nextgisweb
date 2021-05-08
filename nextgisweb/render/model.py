@@ -99,10 +99,6 @@ class TileWriterQueueFullException(TileWriterQueueException):
     pass
 
 
-class TileWriterQueueStuckException(TileWriterQueueException):
-    pass
-
-
 class TilestorWriter:
     __instance = None
 
@@ -122,13 +118,6 @@ class TilestorWriter:
         return cls.__instance
 
     def put(self, payload, timeout):
-        cstart = self.cstart
-        if cstart is not None:
-            cdelta = time() - cstart
-            if cdelta > QUEUE_STUCK_TIMEOUT:
-                raise TileWriterQueueStuckException(
-                    "Tile writer queue is stuck for {} seconds.".format(cdelta))
-
         try:
             if timeout is None:
                 self.queue.put_nowait(payload)
