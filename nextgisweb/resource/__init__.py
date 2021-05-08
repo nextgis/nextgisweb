@@ -94,27 +94,6 @@ class ResourceComponent(Component):
                 principal=admingrp,
                 action='allow'))
 
-            everyone_permissions = self.options.get('everyone_permissions', None)
-            if everyone_permissions is not None:
-                everyone = User.filter_by(keyname='everyone').one()
-                perm_list = re.split(r'\,\s*', everyone_permissions)
-                for perm in perm_list:
-                    m = re.match(r'(\w+)\:\s*(\w+)', perm)
-                    if m:
-                        scope_ident = m.group(1)
-                        permission_ident = m.group(2)
-                    else:
-                        m = re.match(r'(\w+)', perm)
-                        if m:
-                            scope_ident = m.group(1)
-                            permission_ident = None
-                        else:
-                            raise ValueError("Invalid permission: %s!" % perm)
-
-                    obj.acl.append(ACLRule(
-                        principal=everyone, action='allow',
-                        scope=scope_ident, permission=permission_ident))
-
             obj.persist()
 
     @require('auth')
@@ -146,5 +125,4 @@ class ResourceComponent(Component):
         Option('quota.limit', int, default=None),
         Option('quota.resource_cls', list, default=None),
         Option('quota.resource_by_cls'),
-        Option('everyone_permissions', doc="Permissions for user Everyone"),
     )
