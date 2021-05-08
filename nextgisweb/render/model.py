@@ -121,7 +121,7 @@ class TilestorWriter:
             cls.__instance = TilestorWriter()
         return cls.__instance
 
-    def put(self, payload):
+    def put(self, payload, timeout):
         cstart = self.cstart
         if cstart is not None:
             cdelta = time() - cstart
@@ -130,7 +130,10 @@ class TilestorWriter:
                     "Tile writer queue is stuck for {} seconds.".format(cdelta))
 
         try:
-            self.queue.put_nowait(payload)
+            if timeout is None:
+                self.queue.put_nowait(payload)
+            else:
+                self.queue.put(payload, timeout=timeout)
         except Full:
             raise TileWriterQueueFullException(
                 "Tile writer queue is full at maxsize {}.".format(
@@ -377,7 +380,7 @@ class ResourceTileCache(Base):
 
             return True, Image.open(BytesIO(srow[0]))
 
-    def put_tile(self, tile, img):
+    def put_tile(self, tile, img, timeout=None):
         params = dict(
             tile=tile,
             img=None if img is None else img.copy(),
@@ -392,7 +395,7 @@ class ResourceTileCache(Base):
             params['answer_queue'] = answer_queue
 
         try:
-            writer.put(params)
+            writer.put(params, timeout)
         except TileWriterQueueException as exc:
             _logger.error(
                 "Failed to put tile {} to tile cache for resource {}. {}"

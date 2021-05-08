@@ -21,6 +21,8 @@ _logger = logging.getLogger(__name__)
 SEED_STEP = 16
 SEED_INTERVAL = 30
 
+TILE_QUEUE_TIMEOUT = 60
+
 
 @Command.registry.register
 class TileCacheSeedCommand():
@@ -97,7 +99,7 @@ class TileCacheSeedCommand():
                     if not cache_exists:
                         req = rend_res.render_request(srs)
                         rimg = req.render_tile((z, x, y), 256)
-                        tc.put_tile((z, x, y), rimg)
+                        tc.put_tile((z, x, y), rimg, timeout=TILE_QUEUE_TIMEOUT)
                         rendered += 1
 
                     progress += 1
