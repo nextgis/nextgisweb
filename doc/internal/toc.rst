@@ -10,4 +10,5 @@ NextGIS Web internals
    error
    i18n
    test
+   versioning
    migration
