@@ -13,7 +13,7 @@ define([
     "dojox/widget/Standby",
     "openlayers/ol",
     "ngw/route",
-    "ngw/utils/make-singleton",
+    "ngw-pyramid/make-singleton",
     "ngw-webmap/layers/annotations/AnnotationFeature",
     "ngw-webmap/layers/annotations/AnnotationsLayer",
     "ngw-webmap/layers/annotations/AnnotationsEditableLayer",

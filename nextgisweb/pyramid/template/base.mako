@@ -52,12 +52,13 @@
             locale: ${request.locale_name | json.dumps, n},
             aliases: [
                 ['ngw/route', 'ngw-pyramid/route'],
-                ['ngw/utils/make-singleton', 'ngw-pyramid/make-singleton'],
+                ['openlayers/ol', 'dist/external-ol/ol'],
+                // Ready for removal
+                ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n'],
                 ['ngw/dgrid/css', 'ngw-pyramid/nop'],
                 ['ngw/load-json', '@nextgisweb/pyramid/api/load'],
                 ['ngw/settings', '@nextgisweb/pyramid/settings'],
-                ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n'],
-                ['openlayers/ol', 'dist/external-ol/ol'],
+                ['ngw/utils/make-singleton', 'ngw-pyramid/make-singleton'],
             ]
         };
 

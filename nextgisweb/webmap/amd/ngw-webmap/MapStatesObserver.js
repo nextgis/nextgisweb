@@ -1,7 +1,7 @@
 define([
     'dojo/_base/declare',
     'dojo/_base/array',
-    'ngw/utils/make-singleton'
+    'ngw-pyramid/make-singleton'
 ], function (
     declare,
     array,

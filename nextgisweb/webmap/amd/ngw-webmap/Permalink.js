@@ -7,7 +7,7 @@ define([
     'dojo/promise/all',
     'dijit/Dialog',
     'dijit/form/TextBox',
-    'ngw/utils/make-singleton',
+    'ngw-pyramid/make-singleton',
     'openlayers/ol',
     '@nextgisweb/pyramid/i18n!'
 ], function (

@@ -4,7 +4,7 @@ define([
     "dojo/Deferred",
     "dijit/Tree",
     "dijit/tree/ObjectStoreModel",
-    "ngw/utils/make-singleton",
+    "ngw-pyramid/make-singleton",
     "./ResourceStore",
     "./TreeNode"
 ], function (
