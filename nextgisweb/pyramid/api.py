@@ -11,9 +11,15 @@ from six.moves.urllib.parse import unquote
 
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
+from sqlalchemy import func, select
 
 from ..env import env
 from ..package import pkginfo
+from ..core import (
+    storage_stat_dimension_total,
+    storage_stat_delta_total,
+    kind_of_data_registry,
+)
 from ..core.exception import ValidationError
 from ..models import DBSession
 from ..resource import Resource, MetadataScope
@@ -288,6 +294,31 @@ def statistics(request):
     return result
 
 
+def storage(request):
+    request.require_administrator()
+
+    t1 = storage_stat_dimension_total
+    t2 = storage_stat_delta_total
+
+    s1 = select([t1.c.kind_of_data, t1.c.value_data_volume])
+    s2 = select([t2.c.kind_of_data, t2.c.value_data_volume])
+
+    s3 = s1.union_all(s2).alias('s')
+
+    s4 = select([s3.c.kind_of_data, func.sum(s3.c.value_data_volume)]) \
+        .group_by(s3.c.kind_of_data).alias('s')
+
+    result = dict()
+
+    for identity, value_data_volume in DBSession.query(s4).all():
+        kind_of_data = kind_of_data_registry[identity]
+        result[identity] = dict(
+            display_name=request.localizer.translate(kind_of_data.display_name),
+            volume=value_data_volume)
+
+    return result
+
+
 def custom_css_get(request):
     try:
         body = request.env.core.settings_get('pyramid', 'custom_css')
@@ -390,6 +421,11 @@ def setup_pyramid(comp, config):
         'pyramid.statistics',
         '/api/component/pyramid/statistics',
     ).add_view(statistics, renderer='json')
+
+    config.add_route(
+        'pyramid.storage',
+        '/api/component/pyramid/storage',
+    ).add_view(storage, renderer='json')
 
     config.add_route(
         'pyramid.custom_css', '/api/component/pyramid/custom_css') \

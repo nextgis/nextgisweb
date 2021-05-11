@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from subprocess import check_output
 from six import ensure_str
 
+import transaction
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm.exc import NoResultFound
@@ -39,7 +40,12 @@ from ..compat import Path
 from ..package import enable_qualifications
 
 from .util import _
-from .model import Base, Setting
+from .kind_of_data import *  # NOQA
+from .model import (
+    Base, Setting,
+    storage_stat_dimension, storage_stat_dimension_total,
+    storage_stat_delta, storage_stat_delta_total,
+)
 from .command import BackupCommand  # NOQA
 from .backup import BackupBase, BackupMetadata  # NOQA
 
@@ -290,6 +296,19 @@ class CoreComponent(Component):
 
     def backup_filename(self, filename):
         return os.path.join(self.options['backup.path'], filename)
+
+    def storage_recount_all(self):
+        timestamp = datetime.utcnow()
+
+        with transaction.manager:
+            storage_stat_dimension.delete().execute()
+            storage_stat_dimension_total.delete().execute()
+            storage_stat_delta.delete().execute()
+            storage_stat_delta_total.delete().execute()
+
+            for comp in self.env._components.values():
+                if hasattr(comp, 'storage_recount'):
+                    comp.storage_recount(timestamp)
 
     option_annotations = (
         Option('system.name', default="NextGIS Web"),
