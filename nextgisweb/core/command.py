@@ -301,6 +301,19 @@ class MaintenanceCommand(Command):
 
 
 @Command.registry.register
+class StorageRecountCommand(Command):
+    identity = 'storage_recount'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        pass
+
+    @classmethod
+    def execute(cls, args, env):
+        env.core.storage_recount_all()
+
+
+@Command.registry.register
 class DumpConfigCommand(Command):
     identity = 'dump_config'
 
