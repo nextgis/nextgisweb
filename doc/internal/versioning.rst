@@ -145,7 +145,7 @@ Then start new minor (or major) version:
 
 .. code-block:: bash
 
-  $ bump2version minor
+  $ bump2version --commit minor
   $ cat VERSION
   3.9.0.dev0
 
@@ -182,4 +182,4 @@ And then create a new release version and push it to the repository:
 .. code-block:: bash
 
   $ bump2version --commit --tag release
-  $ git push --tag origin master
+  $ git push --tag origin 3.8.x
