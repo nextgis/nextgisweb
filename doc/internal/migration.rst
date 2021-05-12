@@ -149,3 +149,43 @@ following command:
 
 Thus ``nextgisweb migration.install`` and ``nextgisweb migration.uninstall``
 commands provide the way to install and uninstall components.
+
+Python migrations
+-----------------
+
+Sometimes it's hard or impossible to write migration logic using SQL only. In
+this case, it's possible to use Python module as a migration. So, a migration
+module can be created this way:
+
+.. code-block:: bash
+
+  $ nextgisweb migration.create foo "Add another column"
+  Migration [foo:2e89a6fc] created:
+  * migration/2e89a6fc-add-another-column.py
+
+It works the same way as SQL migrations, but forward and rewind migrations are
+both in one file.
+
+.. code-block:: python
+
+  # -*- coding: utf-8 -*-
+  """ {
+      "revision": "2e89a6fc", "parents": ["2c12ca17"],
+      "date": "2021-01-09T22:47:12",
+      "message": "Add another column"
+  } """
+
+  from __future__ import division, unicode_literals, print_function, absolute_import
+
+
+  def forward(ctx):
+      pass  # TODO: Write code here and remove this placeholder line!
+
+
+  def rewind(ctx):
+      pass  # TODO: Write code here and remove this placeholder line!
+
+
+The global ``env`` object can be accessed by ``ctx.env`` attribute. But keep in
+mind that migration code is executed on outdated database structure. It means
+that you shouldn't use SQLAlchemy models there.
