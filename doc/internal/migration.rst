@@ -159,7 +159,7 @@ module can be created this way:
 
 .. code-block:: bash
 
-  $ nextgisweb migration.create foo "Add another column"
+  $ nextgisweb migration.create --format python foo "Add another column"
   Migration [foo:2e89a6fc] created:
   * migration/2e89a6fc-add-another-column.py
 
