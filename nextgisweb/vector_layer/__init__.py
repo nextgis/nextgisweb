@@ -6,18 +6,24 @@ from sqlalchemy import func
 from ..component import Component, require
 from ..core import (
     storage_stat_dimension,
-    vector_layer_data,
+    KindOfData,
 )
 from ..lib.config import Option
 from ..models import DBSession
 
 from .model import Base, VectorLayer, SCHEMA
+from .util import _
 from . import command  # NOQA
 
 __all__ = [
     'VectorLayerComponent',
     'VectorLayer',
 ]
+
+
+class VectorLayerData(KindOfData):
+    identity = 'vector_layer_data'
+    display_name = _("Vector layer data")
 
 
 class VectorLayerComponent(Component):
@@ -44,7 +50,7 @@ class VectorLayerComponent(Component):
             storage_stat_dimension.insert(dict(
                 timestamp=timestamp,
                 component=self.identity,
-                kind_of_data=vector_layer_data.identity,
+                kind_of_data=VectorLayerData.identity,
                 resource_id=resource.id,
                 value_data_volume=size
             )).execute()

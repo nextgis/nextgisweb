@@ -6,14 +6,20 @@ import os
 from ..component import Component
 from ..core import (
     storage_stat_dimension,
-    raster_layer_data,
+    KindOfData,
 )
 
 from .model import Base, RasterLayer
 from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
+from .util import _
 from . import command  # NOQA
 
 __all__ = ['RasterLayerComponent', 'RasterLayer']
+
+
+class RasterLayerData(KindOfData):
+    identity = 'raster_layer_data'
+    display_name = _("Raster layer data")
 
 
 class RasterLayerComponent(Component):
@@ -61,7 +67,7 @@ class RasterLayerComponent(Component):
             storage_stat_dimension.insert(dict(
                 timestamp=timestamp,
                 component=self.identity,
-                kind_of_data=raster_layer_data.identity,
+                kind_of_data=RasterLayerData.identity,
                 resource_id=resource.id,
                 value_data_volume=size
             )).execute()
