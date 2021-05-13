@@ -4,7 +4,7 @@ Changes
 3.9.0
 -----
 
-
+- Automatic downsampling of social preview image to 1600x630 pixels.
 
 3.8.0
 -----

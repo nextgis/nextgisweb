@@ -1,5 +1,5 @@
 /* globals process */
-var handlebars = require('handlebars/handlebars'),
+var handlebars = require('handlebars'),
     fs = require('fs');
 
 var srctpl = fs.readFileSync('/dev/stdin', {encoding: 'utf-8'});

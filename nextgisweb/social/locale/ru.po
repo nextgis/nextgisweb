@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.5.0.dev5+61350cf2\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2020-09-16 13:11+0000\n"
+"POT-Creation-Date: 2021-05-13 03:28+0000\n"
 "PO-Revision-Date: 2020-09-07 09:54+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: amd/ngw-social/Widget.js:31
+#: amd/ngw-social/Widget.js:29
 msgid "Social"
 msgstr "Соцсети"
 
@@ -32,8 +32,12 @@ msgid "Select a preview image"
 msgstr "Выберите изображение для предпросмотра"
 
 #: amd/ngw-social/template/Widget.hbs:9
-msgid "The image should be in PNG format"
-msgstr "Изображение должно быть в формате PNG"
+msgid ""
+"The image will be converted to PNG format and downscaled to 1600x630 "
+"pixels if it\\'s bigger."
+msgstr ""
+"Изображение будет сконвертировано в формат PNG и уменьшен размер до 1600x630 "
+" пикселей, если оно больше."
 
 #: amd/ngw-social/template/Widget.hbs:18
 msgid "Preview description"

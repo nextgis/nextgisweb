@@ -3,6 +3,8 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from shutil import copyfile
 
+from PIL import Image
+
 from .. import db
 from ..env import env
 from ..file_storage import FileObj
@@ -18,6 +20,8 @@ from .util import COMP_ID
 
 
 Base = declarative_base(dependencies=('resource', ))
+
+MAX_SIZE = (1600, 630)
 
 
 class ResourceSocial(Base):
@@ -40,12 +44,22 @@ class _preview_file_upload_attr(SP):
 
         social = srlzr.obj.social
         if value is not None:
-            fileobj = env.file_storage.fileobj(component=COMP_ID)
-
             srcfile, _ = env.file_upload.get_filename(value['id'])
+
+            fileobj = env.file_storage.fileobj(component=COMP_ID)
             dstfile = env.file_storage.filename(fileobj, makedirs=True)
 
-            copyfile(srcfile, dstfile)
+            with Image.open(srcfile) as image:
+                width, height = image.size
+                resize = width > MAX_SIZE[0] or height > MAX_SIZE[1]
+
+                if image.format != 'PNG' or resize:
+                    if resize:
+                        image.thumbnail(MAX_SIZE)
+                    image.save(dstfile, 'png', optimize=True)
+                else:
+                    copyfile(srcfile, dstfile)
+
             social.preview_fileobj = fileobj
         elif social.preview_fileobj is not None:
             fileobj = social.preview_fileobj
