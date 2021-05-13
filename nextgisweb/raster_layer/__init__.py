@@ -6,7 +6,6 @@ import os
 from ..component import Component
 from ..core import (
     storage_stat_dimension,
-    storage_stat_dimension_total,
     raster_layer_data,
 )
 
@@ -47,13 +46,11 @@ class RasterLayerComponent(Component):
 
         # TODO: Cleanup raster_layer directory same as file_storage
 
-    def storage_recount(self, timestamp):
+    def estimate_storage(self, timestamp):
 
         def file_size(fn):
             stat = os.stat(fn)
             return stat.st_size
-
-        total = 0
 
         for resource in RasterLayer.query():
             fn = self.workdir_filename(resource.fileobj)
@@ -68,11 +65,3 @@ class RasterLayerComponent(Component):
                 resource_id=resource.id,
                 value_data_volume=size
             )).execute()
-
-            total += size
-
-        storage_stat_dimension_total.insert(dict(
-            timestamp=timestamp,
-            kind_of_data=raster_layer_data.identity,
-            value_data_volume=total
-        )).execute()

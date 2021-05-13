@@ -16,7 +16,7 @@ from subprocess import check_output
 from six import ensure_str
 
 import transaction
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func, select, literal
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.engine.url import (
@@ -297,7 +297,7 @@ class CoreComponent(Component):
     def backup_filename(self, filename):
         return os.path.join(self.options['backup.path'], filename)
 
-    def storage_recount_all(self):
+    def estimate_storage_all(self):
         timestamp = datetime.utcnow()
 
         with transaction.manager:
@@ -307,8 +307,18 @@ class CoreComponent(Component):
             storage_stat_delta_total.delete().execute()
 
             for comp in self.env._components.values():
-                if hasattr(comp, 'storage_recount'):
-                    comp.storage_recount(timestamp)
+                if hasattr(comp, 'estimate_storage'):
+                    comp.estimate_storage(timestamp)
+
+            dt = storage_stat_dimension
+
+            total = select([
+                literal(timestamp), dt.c.kind_of_data,
+                func.sum(dt.c.value_data_volume)
+            ]).group_by(dt.c.kind_of_data)
+
+            storage_stat_dimension_total.insert(). \
+                from_select(['timestamp', 'kind_of_data', 'value_data_volume'], total).execute()
 
     option_annotations = (
         Option('system.name', default="NextGIS Web"),
