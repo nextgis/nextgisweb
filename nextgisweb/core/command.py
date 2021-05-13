@@ -301,8 +301,8 @@ class MaintenanceCommand(Command):
 
 
 @Command.registry.register
-class StorageRecountCommand(Command):
-    identity = 'storage_recount'
+class EstimateStorageCommand(Command):
+    identity = 'estimate_storage'
 
     @classmethod
     def argparser_setup(cls, parser, env):
@@ -310,7 +310,7 @@ class StorageRecountCommand(Command):
 
     @classmethod
     def execute(cls, args, env):
-        env.core.storage_recount_all()
+        env.core.estimate_storage_all()
 
 
 @Command.registry.register
