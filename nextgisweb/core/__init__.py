@@ -5,6 +5,7 @@ import os.path
 import io
 import json
 import re
+import uuid
 import warnings
 from collections import OrderedDict
 from datetime import datetime, timedelta
@@ -109,10 +110,10 @@ class CoreComponent(Component):
         return dict(success=True)
 
     def initialize_db(self):
-        for k, v in (
-            ('system.name', 'NextGIS Web'),
-        ):
-            self.init_settings(self.identity, k, self._settings.get(k, v))
+        self.init_settings(self.identity, 'instance_id',
+                           self.options.get('provision.instance_id', str(uuid.uuid4())))
+        self.init_settings(self.identity, 'system.name',
+                           self.options.get('system.name', 'NextGIS Web'))
 
     def gtsdir(self, comp):
         """ Get component's file storage folder """
@@ -209,6 +210,10 @@ class CoreComponent(Component):
         except KeyError:
             return self.system_full_name_default
 
+    @property
+    def instance_id(self):
+        return self.settings_get(self.identity, 'instance_id')
+
     def _db_connection_args(self, error_on_pwfile=False):
         opt_db = self.options.with_prefix('database')
         con_args = dict()
@@ -289,6 +294,7 @@ class CoreComponent(Component):
 
         # Other deployment settings
         Option('support_url', default="https://nextgis.com/contact/"),
+        Option('provision.instance_id', default=None),
 
         # Debug settings
         Option('debug', bool, default=False, doc=(
