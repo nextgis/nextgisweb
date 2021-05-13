@@ -18,7 +18,7 @@ from ..package import pkginfo
 from ..core import (
     storage_stat_dimension_total,
     storage_stat_delta_total,
-    kind_of_data_registry,
+    KindOfData,
 )
 from ..core.exception import ValidationError
 from ..models import DBSession
@@ -311,9 +311,9 @@ def storage(request):
     result = dict()
 
     for identity, value_data_volume in DBSession.query(s4).all():
-        kind_of_data = kind_of_data_registry[identity]
+        kind_of_data = KindOfData.registry[identity]
         result[identity] = dict(
-            display_name=request.localizer.translate(kind_of_data.display_name),
+            display_name=kind_of_data.display_name,
             volume=value_data_volume)
 
     return result

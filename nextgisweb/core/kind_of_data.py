@@ -1,32 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import six
+
 from ..registry import registry_maker
 
-from .util import _
-
-__all__ = [
-    'kind_of_data_registry',
-    'raster_layer_data',
-    'vector_layer_data',
-]
-
-kind_of_data_registry = registry_maker()
+__all__ = ['KindOfData', ]
 
 
-class KindOfData:
+class KindOfDataMeta(type):
 
-    def __init__(self, identity, display_name):
-        self.identity = identity
-        self.display_name = display_name
+    def __init__(cls, name, bases, nmspc):
+        super(KindOfDataMeta, cls).__init__(name, bases, nmspc)
+        if cls.identity is not None:
+            cls.registry.register(cls)
 
-        kind_of_data_registry.register(self)
 
+class KindOfData(six.with_metaclass(KindOfDataMeta)):
 
-raster_layer_data = KindOfData(
-    'raster_layer_data',
-    _("Raster layer data"))
+    registry = registry_maker()
 
-vector_layer_data = KindOfData(
-    'vector_layer_data',
-    _("Vector layer data"))
+    identity = None
+    display_name = None
