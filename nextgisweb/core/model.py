@@ -64,3 +64,18 @@ storage_stat_delta_total = db.Table(
     db.Column('kind_of_data', db.Unicode),
     db.Column('value_data_volume', db.Integer),
 )
+
+
+db.event.listen(storage_stat_delta, 'after_create', db.DDL('''
+    CREATE FUNCTION core_storage_stat_delta_after_insert() RETURNS trigger
+    LANGUAGE 'plpgsql' AS $BODY$
+    BEGIN
+        INSERT INTO core_storage_stat_delta_total ("timestamp", kind_of_data, value_data_volume)
+        VALUES (NEW."timestamp", NEW.kind_of_data, NEW.value_data_volume);
+        RETURN NEW;
+    END
+    $BODY$;
+
+    CREATE TRIGGER after_insert AFTER INSERT ON core_storage_stat_delta
+    FOR EACH ROW EXECUTE PROCEDURE core_storage_stat_delta_after_insert();
+'''), propagate=True)

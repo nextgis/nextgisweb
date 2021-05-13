@@ -6,12 +6,17 @@ from zope.interface import implements
 
 __all__ = [
     'IResourceBase',
+    'IResourceEstimateStorage',
     'implements',
     'providedBy',
 ]
 
 
 class IResourceBase(zope.interface.Interface):
+    pass
+
+
+class IResourceEstimateStorage(IResourceBase):
     pass
 
 

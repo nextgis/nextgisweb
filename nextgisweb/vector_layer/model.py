@@ -29,6 +29,7 @@ from ..resource import (
     Resource,
     DataScope,
     DataStructureScope,
+    IResourceEstimateStorage,
     Serializer,
     SerializedProperty as SP,
     SerializedRelationship as SR,
@@ -670,7 +671,9 @@ class VectorLayerField(Base, LayerField):
     fld_uuid = db.Column(db.Unicode(32), nullable=False)
 
 
-@implementer(IFeatureLayer, IFieldEditableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
+@implementer(
+    IFeatureLayer, IFieldEditableFeatureLayer, IWritableFeatureLayer,
+    IBboxLayer, IResourceEstimateStorage)
 class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'vector_layer'
     cls_display_name = _("Vector layer")

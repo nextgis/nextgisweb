@@ -17,6 +17,7 @@ from ..models import declarative_base
 from ..resource import (
     Resource,
     DataStructureScope, DataScope,
+    IResourceEstimateStorage,
     Serializer,
     SerializedProperty as SP,
     SerializedRelationship as SR,
@@ -54,7 +55,7 @@ COLOR_INTERPRETATION = OrderedDict((
     (gdal.GCI_YCbCr_CrBand, 'YCbCr_Cr')))
 
 
-@implementer(IBboxLayer)
+@implementer(IBboxLayer, IResourceEstimateStorage)
 class RasterLayer(Base, Resource, SpatialLayerMixin):
     identity = 'raster_layer'
     cls_display_name = _("Raster layer")
