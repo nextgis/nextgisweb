@@ -33,6 +33,11 @@ define([
             this._restoreDefaultImage = false;
         },
 
+        startup: function () {
+            this.inherited(arguments);
+            this.wPreviewFile.setAccept('image/png,image/jpeg');
+        },
+
         deserializeInMixin: function (data) {
             this.inherited(arguments);
             if (data[this.serializePrefix].preview_image_exists) {
