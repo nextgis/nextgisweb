@@ -172,7 +172,7 @@ class Group(Principal):
     register = sa.Column(sa.Boolean, nullable=False, default=False)
 
     members = orm.relationship(
-        User, secondary=tab_group_user,
+        User, secondary=tab_group_user, cascade_backrefs=False,
         backref=orm.backref('member_of'))
 
     __mapper_args__ = dict(polymorphic_identity='G')
