@@ -131,7 +131,8 @@ class CoreComponent(Component):
         fname = os.path.join(dname, fobj.uuid)
         oname = self.env.file_storage.filename(fobj, makedirs=makedirs)
         if not os.path.isfile(fname):
-            os.symlink(oname, fname)
+            src = os.path.relpath(oname, os.path.dirname(fname))
+            os.symlink(src, fname)
 
         return fname
 
