@@ -233,6 +233,7 @@ def image(request):
             empty_image = rimg is None
 
             if cache_enabled:
+                tile_cache_failed = False
                 for tx, ty in product(tx_range, ty_range):
                     t_offset = at_t2i * (tx, ty)
                     t_offset = rtoint((t_offset[0] + ext_offset[0], t_offset[1] + ext_offset[1]))
@@ -240,7 +241,9 @@ def image(request):
                         timg = None
                     else:
                         timg = rimg.crop(t_offset + (t_offset[0] + 256, t_offset[1] + 256))
-                    obj.tile_cache.put_tile((ztile, tx, ty), timg)
+
+                    tile_cache_failed = tile_cache_failed or (
+                        not obj.tile_cache.put_tile((ztile, tx, ty), timg))
 
                     if tdi:
                         if rimg is None:
@@ -252,6 +255,10 @@ def image(request):
                             rimg, offset=t_offset, color='red', zxy=(ztile, tx, ty),
                             extent=at_t2l * (tx, ty) + at_t2l * (tx + 1, ty + 1),
                             msg=msg)
+
+                    elif tile_cache_failed:
+                        # Stop putting to the tile cache in case of its failure.
+                        break
 
             if rimg is None:
                 continue

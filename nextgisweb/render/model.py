@@ -414,9 +414,12 @@ class ResourceTileCache(Base):
             answer_queue = Queue(maxsize=1)
             params['answer_queue'] = answer_queue
 
+        result = None
         try:
             writer.put(params, timeout)
+            result = True
         except TileWriterQueueException as exc:
+            result = False
             _logger.error(
                 "Failed to put tile {} to tile cache for resource {}. {}"
                 .format(params['tile'], self.resource_id, exc.message),
@@ -427,6 +430,8 @@ class ResourceTileCache(Base):
                 answer_queue.get()
             except Exception:
                 pass
+
+        return result
 
     def initialize(self):
         self.sameta.create_all(bind=DBSession.connection())
