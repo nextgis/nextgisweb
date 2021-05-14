@@ -18,11 +18,10 @@ def imgcolor(img):
     if img is None:
         return (0, 0, 0, 0)
 
-    # Min and max values for each channel
+    # Min and max values for each channel.
     extrema = PIL.ImageStat.Stat(img).extrema
 
-    # If image have fully transparent alpha channel other
-    # channel other channels doesn't matter at all
+    # If image has transparent alpha channel, other channels won't matter.
     alpha = extrema[3]
     if alpha[0] == 0 and alpha[1] == 0:
         return (0, 0, 0, 0)

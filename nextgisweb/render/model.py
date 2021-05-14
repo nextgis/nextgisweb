@@ -174,6 +174,8 @@ class TilestorWriter:
                         tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
 
                         img = data['img']
+                        if img is not None and img.mode != 'RGBA':
+                            img = img.convert('RGBA')
 
                         colortuple = imgcolor(img)
                         color = pack_color(colortuple) if colortuple is not None else None
