@@ -17,7 +17,10 @@ class IResourceBase(zope.interface.Interface):
 
 
 class IResourceEstimateStorage(IResourceBase):
-    pass
+
+    def estimate_storage(self):
+        """ Returns a dict of estimated storage size
+        for each kind of data """
 
 
 def providedBy(obj):

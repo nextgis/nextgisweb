@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 import subprocess
-import os.path
+import os
 import six
 
 import sqlalchemy as sa
@@ -27,6 +27,7 @@ from ..env import env
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..file_storage import FileObj
 
+from .kind_of_data import RasterLayerData
 from .util import _, calc_overviews_levels
 
 PYRAMID_TARGET_SIZE = 512
@@ -223,6 +224,22 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         )
 
         return extent
+
+    # IResourceEstimateStorage implementation:
+    def estimate_storage(self):
+        result = dict()
+
+        def file_size(fn):
+            stat = os.stat(fn)
+            return stat.st_size
+
+        fn = env.raster_layer.workdir_filename(self.fileobj)
+
+        # Size of source file with overviews
+        size = file_size(fn) + file_size(fn + '.ovr')
+        result[RasterLayerData.identity] = size
+
+        return result
 
 
 class _source_attr(SP):
