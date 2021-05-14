@@ -10,6 +10,7 @@ from sqlalchemy import event, text
 
 from .. import db
 from ..auth import Principal, User, Group
+from ..core import storage_stat_delta
 from ..env import env
 from ..models import declarative_base, DBSession
 from ..registry import registry_maker
@@ -273,6 +274,20 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
     def check_social_editable(cls):
         """ Can this resource social settings be editable? """
         return False
+
+
+@event.listens_for(Resource, 'after_insert', propagate=True)
+def resource_after_insert(mapper, connection, target):
+    if IResourceEstimateStorage.providedBy(target):
+        timestamp = datetime.utcnow()
+        for kind_of_data, size in target.estimate_storage().items():
+            storage_stat_delta.insert(dict(
+                timestamp=timestamp,
+                # component=...
+                kind_of_data=kind_of_data,
+                resource_id=target.id,
+                value_data_volume=size
+            )).execute()
 
 
 @event.listens_for(Resource, 'after_delete', propagate=True)
