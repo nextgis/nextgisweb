@@ -64,6 +64,7 @@ from ..feature_layer import (
     on_data_change,
     query_feature_or_not_found)
 
+from .kind_of_data import VectorLayerData
 from .util import _
 
 
@@ -921,6 +922,18 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         )
 
         return extent
+
+    # IResourceEstimateStorage implementation:
+    def estimate_storage(self):
+        result = dict()
+
+        # Size of vector layer table without indexes
+        size = DBSession.query(func.pg_relation_size(
+            '"{}"."{}"'.format(SCHEMA, self._tablename)
+        )).scalar()
+        result[VectorLayerData.identity] = size
+
+        return result
 
 
 # Create vector_layer schema on table creation
