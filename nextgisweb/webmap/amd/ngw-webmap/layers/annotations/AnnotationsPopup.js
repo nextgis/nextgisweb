@@ -13,7 +13,7 @@ define([
     "../../ol-ext/ol-popup",
     "ngw-webmap/layers/annotations/AnnotationFeature",
     "@nextgisweb/pyramid/i18n!",
-    "ngw/openlayers/layer/Vector",
+    "ngw-webmap/ol/layer/Vector",
     "dojo/text!./AnnotationsPopup.hbs",
     "xstyle/css!./AnnotationsPopup.css",
 ], function (

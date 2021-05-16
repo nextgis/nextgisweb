@@ -3,7 +3,7 @@ define([
     "dojo/io-query",
     "./Adapter",
     "ngw/route",
-    "ngw/openlayers/layer/Image"
+    "ngw-webmap/ol/layer/Image"
 ], function (
     declare,
     ioQuery,

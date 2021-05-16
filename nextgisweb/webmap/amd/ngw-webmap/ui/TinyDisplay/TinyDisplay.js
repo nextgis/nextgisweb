@@ -13,7 +13,7 @@ define([
     "dojo/io-query",
     "dojo/dom-construct",
     "openlayers/ol",
-    "ngw/openlayers/Map",
+    "ngw-webmap/ol/Map",
     "dijit/registry",
     "dijit/layout/ContentPane",
     "dijit/form/ToggleButton",

@@ -16,7 +16,7 @@ define([
     "dojox/widget/Standby",
     "openlayers/ol",
     "ngw/route",
-    "ngw/openlayers/layer/Vector",
+    "ngw-webmap/ol/layer/Vector",
     "ngw-webmap/plugin/_PluginBase",
     "ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog",
     "ngw-webmap/controls/editing/EditingToolbar",

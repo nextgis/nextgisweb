@@ -29,7 +29,7 @@ define([
     "dijit/MenuItem",
     "dijit/Toolbar",
     "@nextgisweb/pyramid/i18n!",
-    "ngw/openlayers/Map",
+    "ngw-webmap/ol/Map",
     "openlayers/ol",
     "../../ol-ext/ol-mapscale",
     "../../ol-ext/DragZoomUnConstrained",

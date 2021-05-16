@@ -2,7 +2,7 @@ define([
     "dojo/_base/declare",
     "./Adapter",
     "ngw/route",
-    "ngw/openlayers/layer/XYZ"
+    "ngw-webmap/ol/layer/XYZ"
 ], function (
     declare,
     Adapter,

@@ -21,7 +21,7 @@ define([
     "put-selector/put",
     "ngw/route",
     "openlayers/ol",
-    "ngw/openlayers/Popup",
+    "ngw-webmap/ol/Popup",
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/FieldsDisplayWidget",
     "ngw-feature-layer/FeatureEditorWidget",

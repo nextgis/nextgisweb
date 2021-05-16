@@ -5,7 +5,7 @@ define([
     "dojo/topic",
     "@nextgisweb/pyramid/i18n!",
     "openlayers/ol",
-    "ngw/openlayers/layer/Vector",
+    "ngw-webmap/ol/layer/Vector",
 ], function (
     declare,
     lang,

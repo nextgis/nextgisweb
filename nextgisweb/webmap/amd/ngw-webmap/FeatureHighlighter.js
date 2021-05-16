@@ -5,7 +5,7 @@ define([
     'dojo/topic',
     'dojo/Deferred',
     'ngw/route',
-    'ngw/openlayers/layer/Vector',
+    'ngw-webmap/ol/layer/Vector',
     'openlayers/ol'
 ], function (
     declare,

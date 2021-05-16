@@ -6,7 +6,7 @@ define([
     "openlayers/ol",
     "../../ol-ext/ol-popup",
     "ngw-webmap/layers/annotations/AnnotationFeature",
-    "ngw/openlayers/layer/Vector",
+    "ngw-webmap/ol/layer/Vector",
 ], function (
     declare,
     array,

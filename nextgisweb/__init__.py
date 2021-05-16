@@ -104,9 +104,6 @@ def amd_packages():
             'jquery',
         )
     ) + (
-        # nextgisweb packages
-        ('ngw', 'nextgisweb:amd_packages/ngw'),
-
         # components packages
         ('ngw-pyramid', 'nextgisweb:pyramid/amd/ngw-pyramid'),
         ('ngw-resource', 'nextgisweb:resource/amd/ngw-resource'),

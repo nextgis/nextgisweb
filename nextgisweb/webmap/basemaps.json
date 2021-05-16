@@ -1,7 +1,7 @@
 [{
     "base": {
         "keyname": "osm-mapnik",
-        "mid": "ngw/openlayers/layer/OSM"
+        "mid": "ngw-webmap/ol/layer/OSM"
     },
     "layer": {
         "title": "OpenStreetMap"
@@ -10,7 +10,7 @@
 }, {
     "base": {
         "keyname": "blank",
-        "mid": "ngw/openlayers/layer/XYZ"
+        "mid": "ngw-webmap/ol/layer/XYZ"
     },
     "layer": {
         "title": "None",

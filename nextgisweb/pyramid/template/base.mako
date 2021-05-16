@@ -57,6 +57,13 @@
                 ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n'],
                 ['ngw/dgrid/css', 'ngw-pyramid/nop'],
                 ['ngw/load-json', '@nextgisweb/pyramid/api/load'],
+                ['ngw/openlayers/layer/_Base', 'ngw-webmap/ol/layer/_Base'],
+                ['ngw/openlayers/layer/Image', 'ngw-webmap/ol/layer/Image'],
+                ['ngw/openlayers/layer/OSM', 'ngw-webmap/ol/layer/OSM'],
+                ['ngw/openlayers/layer/Vector', 'ngw-webmap/ol/layer/Vector'],
+                ['ngw/openlayers/layer/XYZ', 'ngw-webmap/ol/layer/XYZ'],
+                ['ngw/openlayers/Map', 'ngw-webmap/ol/Map'],
+                ['ngw/openlayers/Popup', 'ngw-webmap/ol/Popup'],
                 ['ngw/settings', '@nextgisweb/pyramid/settings'],
                 ['ngw/utils/make-singleton', 'ngw-pyramid/make-singleton'],
             ]
