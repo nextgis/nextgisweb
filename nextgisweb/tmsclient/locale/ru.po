@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nextgisweb 3.4.0.dev1+d5f5567e\n"
 "Report-Msgid-Bugs-To: info@nextgis.com\n"
-"POT-Creation-Date: 2020-12-12 04:58+0000\n"
+"POT-Creation-Date: 2021-05-16 12:24+0000\n"
 "PO-Revision-Date: 2020-05-29 10:28+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,16 +19,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: amd/ngw-tmsclient/ConnectionWidget.js:35
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:52
+#: amd/ngw-tmsclient/ConnectionWidget.js:34
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:55
 msgid "TMS connection"
 msgstr "Соединение TMS"
 
-#: model.py:151
+#: model.py:168
 msgid "Zoom is out of range."
 msgstr "Масштаб вне диапазона"
 
-#: amd/ngw-tmsclient/LayerWidget.js:40 model.py:159
+#: amd/ngw-tmsclient/LayerWidget.js:37 model.py:176
 msgid "TMS layer"
 msgstr "Слой TMS"
 
@@ -72,11 +72,19 @@ msgstr "Ключ API"
 msgid "API key param"
 msgstr "Параметр ключа API"
 
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:37
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:38
+msgid "Username"
+msgstr "Пользователь"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Пароль"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:49
 msgid "Scheme"
 msgstr "Схема"
 
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:43
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:55
 msgid "Skip SSL/TLS certificate verification"
 msgstr "Не проверять сертификат SSL/TLS"
 
