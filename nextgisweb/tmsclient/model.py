@@ -60,6 +60,8 @@ class Connection(Base, Resource):
     url_template = db.Column(db.Unicode, nullable=False)
     apikey = db.Column(db.Unicode)
     apikey_param = db.Column(db.Unicode)
+    username = db.Column(db.Unicode)
+    password = db.Column(db.Unicode)
     scheme = db.Column(db.Enum(*SCHEME.enum), nullable=False, default=SCHEME.XYZ)
     insecure = db.Column(db.Boolean, nullable=False, default=False)
 
@@ -79,7 +81,8 @@ class Connection(Base, Resource):
         if self.scheme == SCHEME.TMS:
             y = toggle_tms_xyz_y(z, y)
 
-        session = get_session(self.id, urlparse(self.url_template).scheme)
+        session = get_session(self.id, urlparse(self.url_template).scheme,
+                              self.username, self.password)
 
         result = session.get(
             self.url_template.format(
@@ -139,6 +142,8 @@ class ConnectionSerializer(Serializer):
     url_template = _url_template_attr(**_defaults)
     apikey = SP(**_defaults)
     apikey_param = SP(**_defaults)
+    username = SP(**_defaults)
+    password = SP(**_defaults)
     scheme = SP(**_defaults)
     insecure = SP(**_defaults)
 

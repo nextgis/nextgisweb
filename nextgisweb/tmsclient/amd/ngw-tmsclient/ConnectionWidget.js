@@ -52,6 +52,8 @@ define([
                 this.wURLTemplate.set("disabled", hold_params);
                 this.wAPIKeyParam.set("disabled", hold_params);
                 this.wScheme.set("disabled", hold_params);
+                this.wUsername.set("disabled", hold_params);
+                this.wPassword.set("disabled", hold_params);
             }.bind(this));
 
             this.wURLTemplate.validator = function (value) {
@@ -64,7 +66,9 @@ define([
             var url_template = this.wURLTemplate.get("value"),
                 capmode = this.wCapmode.get("value"),
                 apikey = this.wAPIKey.get("value"),
-                apikey_param = this.wAPIKeyParam.get("value");
+                apikey_param = this.wAPIKeyParam.get("value"),
+                username = this.wUsername.get("value"),
+                password = this.wPassword.get("value");
             if (url_template === "") {
                 lang.setObject(this.serializePrefix + ".url_template", null, data);
             }
@@ -76,6 +80,12 @@ define([
             }
             if (apikey_param === "") {
                 lang.setObject(this.serializePrefix + ".apikey_param", null, data);
+            }
+            if (username === "") {
+                lang.setObject(this.serializePrefix + ".username", null, data);
+            }
+            if (password === "") {
+                lang.setObject(this.serializePrefix + ".password", null, data);
             }
         }
     });
