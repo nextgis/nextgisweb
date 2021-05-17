@@ -101,8 +101,8 @@ def tile(request):
             if cache_enabled:
                 tcache.put_tile((z, x, y), rimg)
 
-            if rimg is None:
-                continue
+        if rimg is None:
+            continue
 
         if aimg is None:
             aimg = rimg
