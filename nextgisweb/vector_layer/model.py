@@ -2,7 +2,6 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
-from logging import error
 import uuid
 import zipfile
 import ctypes
@@ -99,14 +98,24 @@ _FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
 _FIELD_TYPE_2_DB = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_DB))
 
 SCHEMA = 'vector_layer'
-DRIVERS_SUPPORTED = ('ESRI Shapefile', 'GeoJSON', 'KML', 'GML')
-OPEN_OPTIONS = ('EXPOSE_FID=NO', )
 
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
 
 def translate(trstring):
     return env.core.localizer().translate(trstring)
+
+
+class DRIVERS:
+    ESRI_SHAPEFILE = 'ESRI Shapefile'
+    GEOJSON = 'GeoJSON'
+    KML = 'KML'
+    GML = 'GML'
+
+    enum = (ESRI_SHAPEFILE, GEOJSON, KML, GML)
+
+
+OPEN_OPTIONS = ('EXPOSE_FID=NO', )
 
 
 class ERROR_FIX(object):
@@ -1012,11 +1021,11 @@ class _source_attr(SP):
     def _ogrds(self, filename, encoding):
         if six.PY2:
             with _set_encoding(encoding) as sdecode:
-                ogrds = gdal.OpenEx(filename, 0, allowed_drivers=DRIVERS_SUPPORTED, open_options=OPEN_OPTIONS)
+                ogrds = gdal.OpenEx(filename, 0, allowed_drivers=DRIVERS.enum, open_options=OPEN_OPTIONS)
                 strdecode = sdecode
         else:
             # Ignore encoding option in Python 3
-            ogrds = gdal.OpenEx(filename, 0, allowed_drivers=DRIVERS_SUPPORTED, open_options=OPEN_OPTIONS)
+            ogrds = gdal.OpenEx(filename, 0, allowed_drivers=DRIVERS.enum, open_options=OPEN_OPTIONS)
 
             def strdecode(x):
                 return x
@@ -1041,6 +1050,10 @@ class _source_attr(SP):
         ogrlayer = ogrds.GetLayer(0)
         if ogrlayer is None:
             raise VE(_("Unable to open layer."))
+
+        # Do not trust geometry type of shapefiles
+        if ogrds.GetDriver().ShortName == DRIVERS.ESRI_SHAPEFILE:
+            ogrlayer.GetGeomType = lambda: ogr.wkbUnknown
 
         return ogrlayer
 
