@@ -300,11 +300,11 @@ def custom_css_get(request):
 def custom_css_put(request):
     request.require_administrator()
 
-    body = request.body
-    if re.match(r'^\s*$', body, re.MULTILINE):
+    data = six.ensure_text(request.body)
+    if re.match(r'^\s*$', data, re.MULTILINE):
         request.env.core.settings_delete('pyramid', 'custom_css')
     else:
-        request.env.core.settings_set('pyramid', 'custom_css', body)
+        request.env.core.settings_set('pyramid', 'custom_css', data)
 
     return Response()
 
