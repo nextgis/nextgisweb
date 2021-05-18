@@ -700,7 +700,7 @@ To create mapserver vector style execute following request:
         <outlinecolor blue=\"64\" green=\"64\" red=\"64\"/></style></class></layer></map>"
       },
       "resource": {
-        "cls": "raster_style",
+        "cls": "mapserver_style",
         "description": null,
         "display_name": "grunt area style",
         "keyname": null,
