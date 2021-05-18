@@ -331,10 +331,11 @@ def logo_put(request):
 
     else:
         fn, fnmeta = request.env.file_upload.get_filename(value['id'])
-        with open(fn, 'r') as fd:
+        with open(fn, 'rb') as fd:
+            data = base64.b64encode(fd.read())
             request.env.core.settings_set(
                 'pyramid', 'logo',
-                base64.b64encode(fd.read()))
+                data.decode('utf-8'))
 
     return Response()
 
