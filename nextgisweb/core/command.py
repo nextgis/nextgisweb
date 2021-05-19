@@ -310,13 +310,17 @@ class DumpConfigCommand(Command):
 
     @classmethod
     def execute(cls, args, env):
-        for comp in env.chain('initialize'):
+        def print_options(identity, options):
             sprint = False
-            for k, v in comp.options._options.items():
+            for k, v in options._options.items():
                 if not sprint:
-                    print('[{}]'.format(comp.identity))
+                    print('[{}]'.format(identity))
                     sprint = True
                 print("{} = {}".format(k, v))
+
+        print_options('environment', env.options)
+        for comp in env.chain('initialize'):
+            print_options(comp.identity, comp.options)
 
 
 @Command.registry.register
