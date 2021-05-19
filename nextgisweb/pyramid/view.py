@@ -103,9 +103,11 @@ def locale(request):
 
 def sysinfo(request):
     request.require_administrator()
+    distinfo = filter(lambda dinfo: dinfo.name.startswith('nextgisweb'),
+                      pip_freeze()[1])
     return dict(
         title=_("System information"),
-        distinfo=pip_freeze()[1],
+        distinfo=distinfo,
         dynmenu=request.env.pyramid.control_panel)
 
 
