@@ -10,10 +10,6 @@
     <table id="package-table" class="pure-table pure-table-horizontal">
     <tbody>
         <tr>
-            <td>${tr(_("Name"))}</td>
-            <td>${distr_opts.get('name')}</td>
-        </tr>
-        <tr>
             <td>${tr(_("Description"))}</td>
             <td>${distr_opts.get('description')}</td>
         </tr>
