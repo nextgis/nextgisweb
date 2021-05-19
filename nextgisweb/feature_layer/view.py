@@ -126,7 +126,7 @@ def store_item(layer, request):
 
 @viewargs(renderer='nextgisweb:feature_layer/template/test_mvt.mako')
 def test_mvt(request):
-    return dict()
+    return dict(resource=request.matchdict['id'])
 
 
 @viewargs(renderer='nextgisweb:feature_layer/template/export.mako')
@@ -174,7 +174,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'feature_layer.test_mvt',
-        '/feature_layer/test_mvt'
+        r'/resource/{id:\d+}/test/mvt'
     ).add_view(test_mvt)
 
     # Layer menu extension
