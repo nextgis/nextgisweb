@@ -7,6 +7,7 @@
 
 from __future__ import division, unicode_literals, print_function, absolute_import
 
+import json
 import uuid
 
 from sqlalchemy import text
@@ -21,7 +22,7 @@ def forward(ctx):
     connection.execute(text("""
         INSERT INTO setting (component, name, value)
         VALUES ('core', 'instance_id', :instance_id)
-    """), instance_id=instance_id)
+    """), instance_id=json.dumps(instance_id))
 
 
 def rewind(ctx):
