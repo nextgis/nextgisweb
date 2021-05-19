@@ -2,6 +2,33 @@
 <%! from nextgisweb.pyramid.util import _ %>
 
 
+<% distr_opts = request.env.options.with_prefix('distribution') %>
+
+%if distr_opts.get('name') is not None:
+    <h2>${tr(_('Distribution'))}</h2>
+
+    <table id="package-table" class="pure-table pure-table-horizontal">
+    <tbody>
+        <tr>
+            <td>${tr(_("Name"))}</td>
+            <td>${distr_opts.get('name')}</td>
+        </tr>
+        <tr>
+            <td>${tr(_("Description"))}</td>
+            <td>${distr_opts.get('description')}</td>
+        </tr>
+        <tr>
+            <td>${tr(_("Version"))}</td>
+            <td>${distr_opts.get('version')}</td>
+        </tr>
+        <tr>
+            <td>${tr(_("Date"))}</td>
+            <td>${distr_opts.get('date')}</td>
+        </tr>
+    </tbody>
+    </table>
+%endif
+
 <h2>${tr(_('Platform'))}</h2>
 
 <table id="package-table" class="pure-table pure-table-horizontal">
