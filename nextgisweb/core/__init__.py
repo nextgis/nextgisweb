@@ -2,6 +2,8 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 import os.path
+import platform
+import sys
 import io
 import json
 import re
@@ -9,6 +11,7 @@ import uuid
 import warnings
 from collections import OrderedDict
 from datetime import datetime, timedelta
+from subprocess import check_output
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
@@ -195,6 +198,20 @@ class CoreComponent(Component):
             self.settings_get(component, name)
         except KeyError:
             self.settings_set(component, name, value)
+
+    def sys_info(self):
+        lsb_release = check_output(['lsb_release', '-ds'], universal_newlines=True).strip()
+        postgres_version = DBSession.execute('SHOW server_version').scalar()
+        postgis_version = DBSession.execute('SELECT PostGIS_Lib_Version()').scalar()
+        gdal_version = check_output(['gdal-config', '--version'], universal_newlines=True).strip()
+        return (
+            (_("Linux kernel"), platform.release()),
+            (_("OS distribution"), lsb_release),
+            ("Python", '.'.join(map(str, sys.version_info[0:3]))),
+            ("PostgreSQL", postgres_version),
+            ("Postgis", postgis_version),
+            ("GDAL", gdal_version),
+        )
 
     def query_stat(self):
         result = dict()

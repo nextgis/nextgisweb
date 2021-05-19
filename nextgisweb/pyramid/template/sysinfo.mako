@@ -1,10 +1,21 @@
 <%inherit file='nextgisweb:templates/base.mako' />
 <%! from nextgisweb.pyramid.util import _ %>
-<%! from platform import platform %>
-<%! import sys %>
+
 
 <h2>${tr(_('Platform'))}</h2>
-<p>${"Python %s on %s" % (sys.version, platform())}</p>
+
+<table id="package-table" class="pure-table pure-table-horizontal">
+<tbody>
+%for comp in request.env._components.values():
+    %for k, v in comp.sys_info():
+        <tr>
+            <td>${k}</td>
+            <td>${v}</td>
+        </tr>
+    %endfor
+%endfor
+</tbody>
+</table>
 
 <h2>${tr(_('Packages'))}</h2>
 <div class="content-box">
