@@ -15,11 +15,16 @@ class JSRealmComponent(Component):
     identity = COMP_ID
 
     def sys_info(self):
-        out = check_output(['node', '--version'], universal_newlines=True).strip()
-        node_version = re.match('v?(.*)', out).group(1)
-        return (
-            ("Node", node_version),
-        )
+        result = []
+
+        try:
+            out = check_output(['node', '--version'], universal_newlines=True).strip()
+            node_version = re.match('v?(.*)', out).group(1)
+            result.append(("Node", node_version))
+        except Exception:
+            self.logger.error("Failed to get node version", exc_info=True)
+
+        return result
 
     def setup_pyramid(self, config):
         from . import view

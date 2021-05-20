@@ -200,18 +200,24 @@ class CoreComponent(Component):
             self.settings_set(component, name, value)
 
     def sys_info(self):
-        lsb_release = check_output(['lsb_release', '-ds'], universal_newlines=True).strip()
-        postgres_version = DBSession.execute('SHOW server_version').scalar()
-        postgis_version = DBSession.execute('SELECT PostGIS_Lib_Version()').scalar()
-        gdal_version = check_output(['gdal-config', '--version'], universal_newlines=True).strip()
-        return (
-            (_("Linux kernel"), platform.release()),
-            (_("OS distribution"), lsb_release),
-            ("Python", '.'.join(map(str, sys.version_info[0:3]))),
-            ("PostgreSQL", postgres_version),
-            ("Postgis", postgis_version),
-            ("GDAL", gdal_version),
-        )
+        result = []
+
+        result.append((_("Linux kernel"), platform.release()))
+        try:
+            lsb_release = check_output(['lsb_release', '-ds'], universal_newlines=True).strip()
+            result.append((_("OS distribution"), lsb_release))
+        except Exception:
+            self.logger.error("Failed to get Linux standard base release", exc_info=True)
+        result.append(("Python", '.'.join(map(str, sys.version_info[0:3]))))
+        result.append(("PostgreSQL", DBSession.execute('SHOW server_version').scalar()))
+        result.append(("Postgis", DBSession.execute('SELECT PostGIS_Lib_Version()').scalar()))
+        try:
+            gdal_version = check_output(['gdal-config', '--version'], universal_newlines=True).strip()
+            result.append(("GDAL", gdal_version))
+        except Exception:
+            self.logger.error("Failed to get GDAL version", exc_info=True)
+
+        return result
 
     def query_stat(self):
         result = dict()
