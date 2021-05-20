@@ -1,9 +1,11 @@
 <%inherit file='nextgisweb:templates/base.mako' />
 <%! from nextgisweb.pyramid.util import _ %>
 
+<div id="info-copy-btn" style="/*display: inline-block*/"></div>
+
+<div id="info" style="margin-top: 5px;">
 
 <% distr_opts = request.env.options.with_prefix('distribution') %>
-
 %if distr_opts.get('name') is not None:
     <h2>${tr(_('Distribution'))}</h2>
 
@@ -72,3 +74,18 @@
         </table>
     </div>
 </div>
+</div>
+
+<script>
+require([
+    "ngw-pyramid/CopyButton/CopyButton",
+], function (CopyButton) {
+    var domCopyButton = document.getElementById("info-copy-btn")
+    var copyButton = new CopyButton({
+        targetAttribute: function (target) {
+            return document.getElementById("info").innerText;
+        }
+    });
+    copyButton.placeAt(domCopyButton);
+});
+</script>
