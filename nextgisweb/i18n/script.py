@@ -9,7 +9,7 @@ import codecs
 import logging
 import json
 from importlib import import_module
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 from pkg_resources import (
     iter_entry_points,
     resource_filename,
@@ -127,11 +127,8 @@ def cmd_update(args):
             continue
 
         pot_path = locale_path / '.pot'
-        if not pot_path.is_file():
-            logger.error(
-                "POT-file for component [%s] not found in [%s]",
-                comp_id, str(pot_path))
-            continue
+        if not pot_path.is_file() or args.force_pot:
+            cmd_extract(Namespace(package=args.package, component=comp_id))
 
         po_paths = [locale_path / ('%s.po' % locale) for locale in args.locale]
         po_paths = po_paths or locale_path.glob('*.po')
@@ -210,6 +207,7 @@ def main(argv=sys.argv):
     pupdate = subparsers.add_parser('update')
     pupdate.add_argument('component', nargs='*')
     pupdate.add_argument('--locale', default=[], action='append')
+    pupdate.add_argument('--force-pot', action='store_true', default=False)
     pupdate.set_defaults(func=cmd_update)
 
     pcompile = subparsers.add_parser('compile')
