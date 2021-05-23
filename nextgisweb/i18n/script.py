@@ -119,39 +119,11 @@ def cmd_extract(args):
             write_po(outfd, catalog, ignore_obsolete=True)
 
 
-def cmd_init(args):
-    for component, compmod in load_components(args):
-        mod = import_module(compmod)
-        locale_path = Path(mod.__path__[0]) / 'locale'
-        pot_file = locale_path / '.pot'
-        po_file = locale_path / ('%s.po' % args.locale)
-        if not pot_file.is_file():
-            logger.error(
-                "POT-file for component [%s] not found in [%s]",
-                component, str(pot_file))
-            continue
-
-        if po_file.is_file() and not args.force:
-            logger.error(
-                "Component [%s] target file exists! Skipping. "
-                "Use --force to overwrite.", component)
-            continue
-
-        with io.open(str(pot_file), 'r') as infd:
-            catalog = read_po(infd, locale=args.locale)
-
-        catalog.locale = Locale.parse(args.locale)
-        catalog.revision_date = datetime.now(LOCALTZ)
-
-        with io.open(str(po_file), 'wb') as outfd:
-            write_po(outfd, catalog)
-
-
 def cmd_update(args):
     components = list(load_components(args))
     for comp_id, comp_mod in components:
         locale_path = Path(import_module(comp_mod).__path__[0]) / 'locale'
-        if not locale_path.is_dir() or len(list(locale_path.glob('*.po'))) == 0:
+        if not locale_path.is_dir():
             continue
 
         pot_path = locale_path / '.pot'
@@ -161,15 +133,34 @@ def cmd_update(args):
                 comp_id, str(pot_path))
             continue
 
-        for po_path in locale_path.glob('*.po'):
+        po_paths = [locale_path / ('%s.po' % locale) for locale in args.locale]
+        po_paths = po_paths or locale_path.glob('*.po')
+
+        for po_path in po_paths:
             locale = po_path.with_suffix('').name
+
+            with io.open(str(pot_path), 'r') as pot_fd:
+                pot = read_po(pot_fd, locale=locale)
+
+            if not po_path.is_file():
+                pot.locale = Locale.parse(locale)
+                pot.revision_date = datetime.now(LOCALTZ)
+
+                logger.info(
+                    "Creating component [%s] locale [%s]...",
+                    comp_id, locale)
+
+                with io.open(str(po_path), 'wb') as fd:
+                    write_po(fd, pot)
+
+                continue
+
             logger.info(
                 "Updating component [%s] locale [%s]...",
                 comp_id, locale)
 
-            with io.open(str(po_path), 'r') as po_fd, io.open(str(pot_path), 'r') as pot_fd:
+            with io.open(str(po_path), 'r') as po_fd:
                 po = read_po(po_fd, locale=locale)
-                pot = read_po(pot_fd)
 
             po.update(pot, True)
 
@@ -216,14 +207,9 @@ def main(argv=sys.argv):
     pextract.add_argument('component', nargs='*')
     pextract.set_defaults(func=cmd_extract)
 
-    pinit = subparsers.add_parser('init')
-    pinit.add_argument('component', nargs='*')
-    pinit.add_argument('locale')
-    pinit.add_argument('--force', action='store_true', default=False)
-    pinit.set_defaults(func=cmd_init)
-
     pupdate = subparsers.add_parser('update')
     pupdate.add_argument('component', nargs='*')
+    pupdate.add_argument('--locale', default=[], action='append')
     pupdate.set_defaults(func=cmd_update)
 
     pcompile = subparsers.add_parser('compile')

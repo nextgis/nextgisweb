@@ -9,7 +9,7 @@ projects based on gettext:
 .. _babel: http://babel.pocoo.org/
 
 1. Extract strings to translate from sources to ``.pot`` file (``extract``)
-2. Create or update ``.po`` files from ``.pot`` files (``init`` and ``update``)
+2. Create or update ``.po`` files from ``.pot`` files (``update``)
 3. Compile ``.po`` files into ``.mo`` files (``compile``)
 
 All lines that are shown to the user must be written in sources in English and
@@ -53,7 +53,7 @@ Create a ``.po`` file for the Russian language based on the ``.pot`` file:
 
 ::
 
-  (env) $ nextgisweb-i18n --package nextgisweb_foo init bar ru
+  (env) $ nextgisweb-i18n --package nextgisweb_foo update bar ru
 
 As a result, the ``.po`` file ``nextgisweb_foo/bar/locale/ru.po`` will be
 created. This file must be filled in accordance with the translation of the
