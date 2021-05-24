@@ -54,6 +54,21 @@ def get_mappings():
     return parse_mapping(fileobj)
 
 
+def compare_catalogs(fileA, fileB):
+    not_found = []
+    not_translated = []
+    for msgA in fileA:
+        if msgA.id == '':
+            continue
+        msgB = fileB.get(msgA.id)
+        if not msgB:
+            not_found.append(msgA.id)
+            continue
+        if not msgB.string:
+            not_translated.append(msgA.id)
+    return not_found, not_translated
+
+
 def write_jed(fileobj, catalog):
     data = OrderedDict()
     data[''] = OrderedDict((
@@ -152,17 +167,20 @@ def cmd_update(args):
 
                 continue
 
-            logger.info(
-                "Updating component [%s] locale [%s]...",
-                comp_id, locale)
-
             with io.open(str(po_path), 'r') as po_fd:
                 po = read_po(po_fd, locale=locale)
 
-            po.update(pot, True)
+            not_found, _ = compare_catalogs(pot, po)
 
-            with io.open(str(po_path), 'wb') as fd:
-                write_po(fd, po)
+            if not_found or args.force_po:
+                logger.info(
+                    "Updating component [%s] locale [%s]...",
+                    comp_id, locale)
+
+                po.update(pot, True)
+
+                with io.open(str(po_path), 'wb') as fd:
+                    write_po(fd, po)
 
 
 def cmd_compile(args):
@@ -207,6 +225,7 @@ def main(argv=sys.argv):
     pupdate = subparsers.add_parser('update')
     pupdate.add_argument('component', nargs='*')
     pupdate.add_argument('--locale', default=[], action='append')
+    pupdate.add_argument('--force-po', action='store_true', default=False)
     pupdate.add_argument('--force-pot', action='store_true', default=False)
     pupdate.set_defaults(func=cmd_update)
 
