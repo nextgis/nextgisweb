@@ -163,7 +163,7 @@ def cmd_update(args):
                     comp_id, locale)
 
                 with io.open(str(po_path), 'wb') as fd:
-                    write_po(fd, pot)
+                    write_po(fd, pot, width=80)
 
                 continue
 
@@ -180,7 +180,7 @@ def cmd_update(args):
                 po.update(pot, True)
 
                 with io.open(str(po_path), 'wb') as fd:
-                    write_po(fd, po)
+                    write_po(fd, po, width=80)
 
 
 def cmd_compile(args):
