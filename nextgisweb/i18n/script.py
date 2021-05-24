@@ -210,6 +210,50 @@ def cmd_compile(args):
         logger.error('PO-file [%s] was ignored during compilation!', str(po))
 
 
+def cmd_stat(args):
+    stat = {}
+    stat_package = {}
+    stat[args.package] = stat_package
+
+    components = list(load_components(args))
+    for comp_id, comp_mod in components:
+        stat_component = {}
+        stat_package[comp_id] = stat_component
+
+        locale_path = Path(import_module(comp_mod).__path__[0]) / 'locale'
+        if not locale_path.is_dir() or len(list(locale_path.glob('*.po'))) == 0:
+            continue
+
+        pot_path = locale_path / '.pot'
+        if not pot_path.is_file():
+            logger.error(
+                "POT-file for component [%s] not found in [%s]",
+                comp_id, str(pot_path))
+            continue
+
+        for po_path in locale_path.glob('*.po'):
+            locale = po_path.with_suffix('').name
+
+            with io.open(str(po_path), 'r') as po_fd, io.open(str(pot_path), 'r') as pot_fd:
+                po = read_po(po_fd, locale=locale)
+                pot = read_po(pot_fd)
+
+                terms_translated = [term for term in po if term.string and term.id != '']
+                terms_not_found, _ = compare_catalogs(pot, po)
+
+                stat_locale = {
+                    'terms': len(po),
+                    'translated': len(terms_translated),
+                }
+
+                if len(terms_not_found) != 0:
+                    stat_locale['not_found'] = len(terms_not_found)
+
+                stat_component[locale] = stat_locale
+
+    print(json.dumps(stat, indent=2))
+
+
 def main(argv=sys.argv):
     logging.basicConfig(level=logging.INFO)
 
@@ -232,6 +276,10 @@ def main(argv=sys.argv):
     pcompile = subparsers.add_parser('compile')
     pcompile.add_argument('component', nargs='*')
     pcompile.set_defaults(func=cmd_compile)
+
+    pstat = subparsers.add_parser('stat')
+    pstat.add_argument('component', nargs='*')
+    pstat.set_defaults(func=cmd_stat)
 
     args = parser.parse_args(argv[1:])
 
