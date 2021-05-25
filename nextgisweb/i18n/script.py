@@ -28,6 +28,7 @@ from babel.messages.mofile import write_mo
 import six
 
 from nextgisweb.compat import Path
+from nextgisweb.package import pkginfo
 
 
 logger = logging.getLogger(__name__)
@@ -211,6 +212,9 @@ def cmd_compile(args):
 
 
 def cmd_stat(args):
+    if args.all_packages:
+        raise RuntimeError("Option --all-packages is not supported for this command.")
+
     stat = {}
     stat_package = {}
     stat[args.package] = stat_package
@@ -259,6 +263,7 @@ def main(argv=sys.argv):
 
     parser = ArgumentParser()
     parser.add_argument('-p', '--package', default='nextgisweb')
+    parser.add_argument('--all-packages', action='store_true', default=False)
 
     subparsers = parser.add_subparsers()
 
@@ -283,4 +288,9 @@ def main(argv=sys.argv):
 
     args = parser.parse_args(argv[1:])
 
-    args.func(args)
+    if args.all_packages:
+        for package in pkginfo.packages:
+            args.package = package
+            args.func(args)
+    else:
+        args.func(args)
