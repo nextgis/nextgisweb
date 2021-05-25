@@ -181,7 +181,7 @@ def cmd_update(args):
                 po.update(pot, True)
 
                 with io.open(str(po_path), 'wb') as fd:
-                    write_po(fd, po, width=80)
+                    write_po(fd, po, width=80, ignore_obsolete=True)
 
 
 def cmd_compile(args):
