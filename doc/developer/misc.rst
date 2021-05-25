@@ -11,8 +11,20 @@ Geodatata can be fetched for vector and raster layers. For vector layers
 For raster layers (Raster, :term:`WMS`) - tiles (:term:`TMS`) or image.
 For QGIS styles - qml file.
 
+Export vector layer as file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**The following request returns GPKG, GeoJSON or CSV file from vector layer**:
+
+.. http:get:: /api/resource/(int:id)/export?format=GPKG&srs=4326&zipped=True&fid=ngw_id&encoding=UTF-8
+
+**Example request**: https://sandbox.nextgis.com/api/resource/4308/export?format=GPKG&srs=4326&zipped=False&fid=ngw_id&encoding=UTF-8
+
+Format string is case-sensitive. For formats and options list see https://docs.nextgis.ru/docs_ngcom/source/data_export.html
+
 GeoJSON
 ^^^^^^^
+
 
 **The following request returns GeoJSON file from vector layer**:
 
