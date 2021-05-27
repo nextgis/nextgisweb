@@ -143,7 +143,7 @@ def cmd_update(args):
             continue
 
         pot_path = locale_path / '.pot'
-        if not pot_path.is_file() or args.force_pot:
+        if not pot_path.is_file() or args.extract:
             cmd_extract(Namespace(package=args.package, component=[comp_id, ]))
 
         po_paths = [locale_path / ('%s.po' % locale) for locale in args.locale]
@@ -173,7 +173,7 @@ def cmd_update(args):
 
             not_found, _ = compare_catalogs(pot, po)
 
-            if not_found or args.force_po:
+            if not_found or args.force:
                 logger.info(
                     "Updating component [%s] locale [%s]...",
                     comp_id, locale)
@@ -274,8 +274,8 @@ def main(argv=sys.argv):
     pupdate = subparsers.add_parser('update')
     pupdate.add_argument('component', nargs='*')
     pupdate.add_argument('--locale', default=[], action='append')
-    pupdate.add_argument('--force-po', action='store_true', default=False)
-    pupdate.add_argument('--force-pot', action='store_true', default=False)
+    pupdate.add_argument('--force', action='store_true', default=False)
+    pupdate.add_argument('--extract', action='store_true', default=False)
     pupdate.set_defaults(func=cmd_update)
 
     pcompile = subparsers.add_parser('compile')
