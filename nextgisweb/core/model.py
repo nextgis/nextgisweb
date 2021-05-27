@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-from ..models import declarative_base
+from datetime import datetime
+
+import sqlalchemy as sa
+import zope.event.classhandler
+from zope.sqlalchemy import mark_changed
+
+from ..models import DBSession, declarative_base
 from .. import db
 
 
@@ -85,3 +91,53 @@ db.event.listen(storage_stat_delta, 'after_create', db.DDL('''
     CREATE TRIGGER after_insert AFTER INSERT ON core_storage_stat_delta
     FOR EACH ROW EXECUTE PROCEDURE core_storage_stat_delta_after_insert();
 '''), propagate=True)
+
+
+class ReserveStorage(object):
+
+    def __init__(self, value_data_volume, component=None, kind_of_data=None, resource=None):
+        self.component = component
+        self.kind_of_data = kind_of_data
+        self.resource = resource
+        self.value_data_volume = value_data_volume
+
+
+_reserved_lst = []
+
+
+@zope.event.classhandler.handler(ReserveStorage)
+def _reserve_storage(event):
+    global _reserved_lst
+
+    _reserved_lst.append(dict(
+        component=event.component,
+        kind_of_data=event.kind_of_data,
+        resource=event.resource,
+        value_data_volume=event.value_data_volume))
+
+
+@sa.event.listens_for(DBSession, 'after_flush')
+def _after_flush(session, flush_context):
+    global _reserved_lst
+
+    if len(_reserved_lst) == 0:
+        return
+
+    timestamp = datetime.utcnow()
+    conn = DBSession.connection()
+    while _reserved_lst:
+        reserved = _reserved_lst.pop()
+
+        params = dict(
+            timestamp=timestamp,
+            component=reserved['component'],
+            kind_of_data=reserved['kind_of_data'].identity,
+            resource_id=None if reserved['resource'] is None else reserved['resource'].id,
+            value_data_volume=reserved['value_data_volume'])
+
+        conn.execute(sa.text('''
+            INSERT INTO core_storage_stat_delta (
+                "timestamp", component, kind_of_data, resource_id, value_data_volume
+            )
+            VALUES (:timestamp, :component, :kind_of_data, :resource_id, :value_data_volume)
+        '''), **params)
