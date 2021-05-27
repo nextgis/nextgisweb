@@ -70,8 +70,14 @@ db.event.listen(storage_stat_delta, 'after_create', db.DDL('''
     CREATE FUNCTION core_storage_stat_delta_after_insert() RETURNS trigger
     LANGUAGE 'plpgsql' AS $BODY$
     BEGIN
+        DELETE FROM core_storage_stat_delta_total
+        WHERE kind_of_data = NEW.kind_of_data;
+
         INSERT INTO core_storage_stat_delta_total ("timestamp", kind_of_data, value_data_volume)
-        VALUES (NEW."timestamp", NEW.kind_of_data, NEW.value_data_volume);
+        SELECT NEW."timestamp", NEW.kind_of_data, sum(value_data_volume)
+        FROM core_storage_stat_delta
+        WHERE kind_of_data = NEW.kind_of_data;
+
         RETURN NEW;
     END
     $BODY$;
