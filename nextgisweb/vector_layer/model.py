@@ -8,6 +8,7 @@ import ctypes
 from datetime import datetime, time, date
 import six
 
+import zope.event
 from zope.interface import implementer
 from osgeo import gdal, ogr, osr
 from shapely.geometry import box
@@ -24,6 +25,7 @@ from sqlalchemy import (
 
 from ..event import SafetyEvent
 from .. import db
+from ..core import ReserveStorage
 from ..core.exception import ValidationError
 from ..resource import (
     Resource,
@@ -65,7 +67,7 @@ from ..feature_layer import (
     query_feature_or_not_found)
 
 from .kind_of_data import VectorLayerData
-from .util import _
+from .util import _, COMP_ID
 
 
 GEOM_TYPE_DB = (
@@ -90,6 +92,15 @@ FIELD_TYPE_DB = (
     db.Date,
     db.Time,
     db.DateTime)
+
+FIELD_TYPE_SIZE = {
+    FIELD_TYPE.INTEGER: 4,
+    FIELD_TYPE.BIGINT: 8,
+    FIELD_TYPE.REAL: 8,
+    FIELD_TYPE.DATE: 4,
+    FIELD_TYPE.TIME: 8,
+    FIELD_TYPE.DATETIME: 8,
+}
 
 FIELD_FORBIDDEN_NAME = ("id", "geom")
 
@@ -448,6 +459,18 @@ class TableInfo(object):
 
         errors = []
 
+        def utf8len(s):
+            return len(s.encode('utf-8'))
+
+        static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]
+        dynamic_size = 0
+        string_fields = []
+        for f in self.fields:
+            if f.datatype == FIELD_TYPE.STRING:
+                string_fields.append(f.keyname)
+            else:
+                static_size += FIELD_TYPE_SIZE[f.datatype]
+
         max_fid = None
         for i, feature in enumerate(ogrlayer, start=1):
             if len(errors) >= error_limit:
@@ -469,8 +492,8 @@ class TableInfo(object):
             if geom.GetGeometryType() in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
                and fix_errors != ERROR_FIX.NONE:
                 geom_candidate = None
-                for i in range(geom.GetGeometryCount()):
-                    col_geom = geom.GetGeometryRef(i)
+                for j in range(geom.GetGeometryCount()):
+                    col_geom = geom.GetGeometryRef(j)
                     col_gtype = col_geom.GetGeometryType()
                     if col_gtype not in GEOM_TYPE_OGR:
                         continue
@@ -595,42 +618,42 @@ class TableInfo(object):
                 #     continue
 
             fld_values = dict()
-            for i in range(feature.GetFieldCount()):
-                if i == self.fid_field_index:
+            for k in range(feature.GetFieldCount()):
+                if k == self.fid_field_index:
                     continue
-                fld_type = feature.GetFieldDefnRef(i).GetType()
+                fld_type = feature.GetFieldDefnRef(k).GetType()
 
-                if (not feature.IsFieldSet(i) or feature.IsFieldNull(i)):
+                if (not feature.IsFieldSet(k) or feature.IsFieldNull(k)):
                     fld_value = None
                 elif fld_type == ogr.OFTInteger:
-                    fld_value = feature.GetFieldAsInteger(i)
+                    fld_value = feature.GetFieldAsInteger(k)
                 elif fld_type == ogr.OFTInteger64:
-                    fld_value = feature.GetFieldAsInteger64(i)
+                    fld_value = feature.GetFieldAsInteger64(k)
                 elif fld_type == ogr.OFTReal:
-                    fld_value = feature.GetFieldAsDouble(i)
+                    fld_value = feature.GetFieldAsDouble(k)
                 elif fld_type == ogr.OFTDate:
-                    year, month, day = feature.GetFieldAsDateTime(i)[0:3]
+                    year, month, day = feature.GetFieldAsDateTime(k)[0:3]
                     fld_value = date(year, month, day)
                 elif fld_type == ogr.OFTTime:
-                    hour, minute, second = feature.GetFieldAsDateTime(i)[3:6]
+                    hour, minute, second = feature.GetFieldAsDateTime(k)[3:6]
                     fld_value = time(hour, minute, int(second))
                 elif fld_type == ogr.OFTDateTime:
                     year, month, day, hour, minute, second, tz = \
-                        feature.GetFieldAsDateTime(i)
+                        feature.GetFieldAsDateTime(k)
                     fld_value = datetime(year, month, day,
                                          hour, minute, int(second))
                 elif fld_type == ogr.OFTIntegerList:
-                    fld_value = json.dumps(feature.GetFieldAsIntegerList(i))
+                    fld_value = json.dumps(feature.GetFieldAsIntegerList(k))
                 elif fld_type == ogr.OFTInteger64List:
-                    fld_value = json.dumps(feature.GetFieldAsInteger64List(i))
+                    fld_value = json.dumps(feature.GetFieldAsInteger64List(k))
                 elif fld_type == ogr.OFTRealList:
-                    fld_value = json.dumps(feature.GetFieldAsDoubleList(i))
+                    fld_value = json.dumps(feature.GetFieldAsDoubleList(k))
                 elif fld_type == ogr.OFTStringList:
                     # TODO: encoding
-                    fld_value = json.dumps(feature.GetFieldAsStringList(i))
+                    fld_value = json.dumps(feature.GetFieldAsStringList(k))
                 elif fld_type == ogr.OFTString:
                     try:
-                        fld_value = strdecode(feature.GetFieldAsString(i))
+                        fld_value = strdecode(feature.GetFieldAsString(k))
                     except UnicodeDecodeError:
                         errors.append(_(
                             "It seems like declared and actual attributes "
@@ -640,14 +663,19 @@ class TableInfo(object):
                             feat=fid, attr=i))
                         continue
 
-                fld_name = strdecode(feature.GetFieldDefnRef(i).GetNameRef())
+                fld_name = strdecode(feature.GetFieldDefnRef(k).GetNameRef())
                 fld_values[self[fld_name].key] = fld_value
+
+                if fld_name in string_fields and fld_value is not None:
+                    dynamic_size += utf8len(fld_value)
 
             if len(errors) > 0 and not skip_errors:
                 continue
 
+            geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
+            dynamic_size += len(geom_bytes)
             obj = self.model(id=fid, geom=ga.elements.WKBElement(
-                bytearray(geom.ExportToWkb(ogr.wkbNDR)), srid=self.srs_id), **fld_values)
+                geom_bytes, srid=self.srs_id), **fld_values)
 
             DBSession.add(obj)
 
@@ -655,11 +683,16 @@ class TableInfo(object):
             detail = '<br>'.join(html_escape(translate(error)) for error in errors)
             raise VE(message=_("Vector layer cannot be written due to errors."), detail=detail)
 
+        num_features = i
+        size = static_size * num_features + dynamic_size
+
         # Set sequence next value
         if max_fid is not None:
             connection = DBSession.connection()
             connection.execute('ALTER SEQUENCE "%s"."%s" RESTART WITH %d' %
                                (self.sequence.schema, self.sequence.name, max_fid + 1))
+
+        return size
 
 
 class VectorLayerField(Base, LayerField):
@@ -734,8 +767,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def load_from_ogr(self, ogrlayer, strdecode=lambda x: x,
                       skip_other_geometry_types=False,
                       fix_errors=ERROR_FIX.default, skip_errors=skip_errors_default):
-        self.tableinfo.load_from_ogr(
+        size = self.tableinfo.load_from_ogr(
             ogrlayer, strdecode, skip_other_geometry_types, fix_errors, skip_errors)
+
+        reserve_event = ReserveStorage(
+            size, component=COMP_ID, kind_of_data=VectorLayerData, resource=self)
+        zope.event.notify(reserve_event)
 
     def get_info(self):
         return super(VectorLayer, self).get_info() + (
@@ -925,13 +962,34 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     # IResourceEstimateStorage implementation:
     def estimate_storage(self):
-        result = dict()
+        result = []
 
-        # Size of vector layer table without indexes
-        size = DBSession.query(func.pg_relation_size(
-            '"{}"."{}"'.format(SCHEMA, self._tablename)
-        )).scalar()
-        result[VectorLayerData.identity] = size
+        tableinfo = TableInfo.from_layer(self)
+        tableinfo.setup_metadata(self._tablename)
+        table = tableinfo.table
+
+        static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]  # ID field size
+        string_columns = []
+        for f in tableinfo.fields:
+            if f.datatype == FIELD_TYPE.STRING:
+                string_columns.append(f.key)
+            else:
+                static_size += FIELD_TYPE_SIZE[f.datatype]
+
+        size_columns = [func.length(func.ST_AsBinary(table.columns.geom)), ]
+        for key in string_columns:
+            size_columns.append(func.coalesce(func.octet_length(table.columns[key]), 0))
+
+        columns = [func.count(1), ] + [func.sum(c) for c in size_columns]
+
+        query = sql.select(columns)
+        row = DBSession.connection().execute(query).fetchone()
+
+        num_features = row[0]
+        dynamic_size = sum(row[1:])
+        size = static_size * num_features + dynamic_size
+
+        result.append((VectorLayerData, size))
 
         return result
 

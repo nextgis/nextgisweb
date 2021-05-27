@@ -42,7 +42,7 @@ from ..package import enable_qualifications
 from .util import _
 from .kind_of_data import *  # NOQA
 from .model import (
-    Base, Setting,
+    Base, Setting, ReserveStorage,
     storage_stat_dimension, storage_stat_dimension_total,
     storage_stat_delta, storage_stat_delta_total,
 )
@@ -308,7 +308,14 @@ class CoreComponent(Component):
 
             for comp in self.env._components.values():
                 if hasattr(comp, 'estimate_storage'):
-                    comp.estimate_storage(timestamp)
+                    for kind_of_data, resource_id, size in comp.estimate_storage():
+                        storage_stat_dimension.insert(dict(
+                            timestamp=timestamp,
+                            component=comp.identity,
+                            kind_of_data=kind_of_data.identity,
+                            resource_id=resource_id,
+                            value_data_volume=size
+                        )).execute()
 
             dt = storage_stat_dimension
 

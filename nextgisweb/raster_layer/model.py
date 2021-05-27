@@ -7,11 +7,13 @@ import six
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
+import zope.event
 from zope.interface import implementer
 
 from collections import OrderedDict
 from osgeo import gdal, gdalconst, osr, ogr
 
+from ..core import ReserveStorage
 from ..lib.osrhelper import traditional_axis_mapping
 from ..models import declarative_base
 from ..resource import (
@@ -28,7 +30,7 @@ from ..layer import SpatialLayerMixin, IBboxLayer
 from ..file_storage import FileObj
 
 from .kind_of_data import RasterLayerData
-from .util import _, calc_overviews_levels
+from .util import _, calc_overviews_levels, COMP_ID
 
 PYRAMID_TARGET_SIZE = 512
 
@@ -227,7 +229,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
     # IResourceEstimateStorage implementation:
     def estimate_storage(self):
-        result = dict()
+        result = []
 
         def file_size(fn):
             stat = os.stat(fn)
@@ -237,7 +239,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         # Size of source file with overviews
         size = file_size(fn) + file_size(fn + '.ovr')
-        result[RasterLayerData.identity] = size
+        result.append((RasterLayerData, size))
 
         return result
 
@@ -248,6 +250,11 @@ class _source_attr(SP):
 
         filedata, filemeta = env.file_upload.get_filename(value['id'])
         srlzr.obj.load_file(filedata, env)
+
+        for kind_of_data, size in srlzr.obj.estimate_storage():
+            event = ReserveStorage(size, component=COMP_ID,
+                                   kind_of_data=kind_of_data, resource=srlzr.obj)
+            zope.event.notify(event)
 
 
 class _color_interpretation(SP):

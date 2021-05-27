@@ -2,7 +2,6 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 from ..component import Component
-from ..core import storage_stat_dimension
 
 from .model import Base, RasterLayer
 from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
@@ -41,13 +40,7 @@ class RasterLayerComponent(Component):
 
         # TODO: Cleanup raster_layer directory same as file_storage
 
-    def estimate_storage(self, timestamp):
+    def estimate_storage(self):
         for resource in RasterLayer.query():
-            for kind_of_data, size in resource.estimate_storage().items():
-                storage_stat_dimension.insert(dict(
-                    timestamp=timestamp,
-                    component=self.identity,
-                    kind_of_data=kind_of_data,
-                    resource_id=resource.id,
-                    value_data_volume=size
-                )).execute()
+            for kind_of_data, size in resource.estimate_storage():
+                yield kind_of_data, resource.id, size
