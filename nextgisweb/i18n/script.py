@@ -58,6 +58,8 @@ def get_mappings():
 def compare_catalogs(fileA, fileB):
     not_found = []
     not_translated = []
+    obsolete = []
+
     for msgA in fileA:
         if msgA.id == '':
             continue
@@ -67,7 +69,15 @@ def compare_catalogs(fileA, fileB):
             continue
         if not msgB.string:
             not_translated.append(msgA.id)
-    return not_found, not_translated
+
+    for msgB in fileB:
+        if msgB.id == '':
+            continue
+        msgA = fileA.get(msgB.id)
+        if msgA is None:
+            obsolete.append(msgB.id)
+
+    return not_found, not_translated, obsolete
 
 
 def write_jed(fileobj, catalog):
@@ -171,17 +181,25 @@ def cmd_update(args):
             with io.open(str(po_path), 'r') as po_fd:
                 po = read_po(po_fd, locale=locale)
 
-            not_found, _ = compare_catalogs(pot, po)
+            not_found, _, obsolete = compare_catalogs(pot, po)
 
-            if not_found or args.force:
+            if not_found or obsolete or args.force:
                 logger.info(
                     "Updating component [%s] locale [%s]...",
                     comp_id, locale)
 
                 po.update(pot, True)
 
+                # Remove obsolete untranslated strings but keep translated ones.
+                # They might be useful during small changes in message ids.
+                for msg_id in [
+                    msg.id for msg in po.obsolete.values()
+                    if msg.string == ''
+                ]:
+                    del po.obsolete[msg_id]
+
                 with io.open(str(po_path), 'wb') as fd:
-                    write_po(fd, po, width=80, ignore_obsolete=True)
+                    write_po(fd, po, width=80)
 
 
 def cmd_compile(args):
@@ -243,7 +261,7 @@ def cmd_stat(args):
                 pot = read_po(pot_fd)
 
                 terms_translated = [term for term in po if term.string and term.id != '']
-                terms_not_found, _ = compare_catalogs(pot, po)
+                terms_not_found, _, obsolete = compare_catalogs(pot, po)
 
                 stat_locale = {
                     'terms': len(po),
@@ -252,6 +270,9 @@ def cmd_stat(args):
 
                 if len(terms_not_found) != 0:
                     stat_locale['not_found'] = len(terms_not_found)
+                
+                if len(obsolete) > 0:
+                    stat_locale['obsolete'] = len(obsolete)
 
                 stat_component[locale] = stat_locale
 
