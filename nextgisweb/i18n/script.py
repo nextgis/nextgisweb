@@ -89,7 +89,7 @@ def write_jed(fileobj, catalog):
 def cmd_extract(args):
     pkginfo = load_pkginfo(args)
     for cident, cdefn in pkginfo['components'].items():
-        if args.component is not None and cident not in args.component:
+        if len(args.component) > 0 and cident not in args.component:
             continue
 
         if isinstance(cdefn, six.string_types):
@@ -144,7 +144,7 @@ def cmd_update(args):
 
         pot_path = locale_path / '.pot'
         if not pot_path.is_file() or args.force_pot:
-            cmd_extract(Namespace(package=args.package, component=comp_id))
+            cmd_extract(Namespace(package=args.package, component=[comp_id, ]))
 
         po_paths = [locale_path / ('%s.po' % locale) for locale in args.locale]
         po_paths = po_paths or locale_path.glob('*.po')
