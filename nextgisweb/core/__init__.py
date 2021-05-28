@@ -210,7 +210,7 @@ class CoreComponent(Component):
             self.logger.error("Failed to get Linux standard base release", exc_info=True)
         result.append(("Python", '.'.join(map(str, sys.version_info[0:3]))))
         result.append(("PostgreSQL", DBSession.execute('SHOW server_version').scalar()))
-        result.append(("Postgis", DBSession.execute('SELECT PostGIS_Lib_Version()').scalar()))
+        result.append(("PostGIS", DBSession.execute('SELECT PostGIS_Lib_Version()').scalar()))
         try:
             gdal_version = check_output(['gdal-config', '--version'], universal_newlines=True).strip()
             result.append(("GDAL", gdal_version))

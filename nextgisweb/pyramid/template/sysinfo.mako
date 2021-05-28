@@ -1,48 +1,17 @@
 <%inherit file='nextgisweb:templates/base.mako' />
 <%! from nextgisweb.pyramid.util import _ %>
 
-<div id="info-copy-btn" style="/*display: inline-block*/"></div>
+<%def name="title_block()">
+    <div id="info-copy-btn" style="float: right"></div>
+    <h1>${tr(title)}</h1>
+</%def>
 
-<div id="info" style="margin-top: 5px;">
 
 <% distr_opts = request.env.options.with_prefix('distribution') %>
 %if distr_opts.get('name') is not None:
-    <h2>${tr(_('Distribution'))}</h2>
-
-    <table id="package-table" class="pure-table pure-table-horizontal">
-    <tbody>
-        <tr>
-            <td>${tr(_("Description"))}</td>
-            <td>${distr_opts.get('description')}</td>
-        </tr>
-        <tr>
-            <td>${tr(_("Version"))}</td>
-            <td>${distr_opts.get('version')}</td>
-        </tr>
-        <tr>
-            <td>${tr(_("Date"))}</td>
-            <td>${distr_opts.get('date')}</td>
-        </tr>
-    </tbody>
-    </table>
+    <h2>${distr_opts.get('description')} ${distr_opts.get('version')} (${distr_opts.get('date')})</h2>
 %endif
 
-<h2>${tr(_('Platform'))}</h2>
-
-<table id="package-table" class="pure-table pure-table-horizontal">
-<tbody>
-%for comp in request.env._components.values():
-    %for k, v in comp.sys_info():
-        <tr>
-            <td>${k}</td>
-            <td>${v}</td>
-        </tr>
-    %endfor
-%endfor
-</tbody>
-</table>
-
-<h2>${tr(_('Packages'))}</h2>
 <div class="content-box">
     <div class="table-wrapper">
         <table id="package-table" class="pure-table pure-table-horizontal">
@@ -74,7 +43,22 @@
         </table>
     </div>
 </div>
-</div>
+
+<h2>${tr(_('Platform'))}</h2>
+
+<div class="content-box"><div class="table-wrapper">
+    <table id="package-table" class="pure-table pure-table-horizontal"><tbody>
+    %for comp in request.env._components.values():
+        %for k, v in comp.sys_info():
+            <tr>
+                <th>${k}</th>
+                <td>${v}</td>
+            </tr>
+        %endfor
+    %endfor
+    </tbody> </table>
+</div></div>
+
 
 <script>
 require([
@@ -83,7 +67,7 @@ require([
     var domCopyButton = document.getElementById("info-copy-btn")
     var copyButton = new CopyButton({
         targetAttribute: function (target) {
-            return document.getElementById("info").innerText;
+            return document.getElementById("content-wrapper").innerText;
         }
     });
     copyButton.placeAt(domCopyButton);
