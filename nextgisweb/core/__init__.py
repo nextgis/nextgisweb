@@ -229,7 +229,7 @@ class CoreComponent(Component):
             get_cpu_model())))
 
         mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
-        result.append((_("RAM"), _("%.2f GB") % (float(mem_bytes) / 2**30)))
+        result.append((_("RAM"), "%d MB" % (float(mem_bytes) / 2**20)))
 
         result.append(("Python", '.'.join(map(str, sys.version_info[0:3]))))
 

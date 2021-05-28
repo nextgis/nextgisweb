@@ -35,15 +35,6 @@ msgstr "Дистрибутив ОС"
 msgid "CPU"
 msgstr "Процессор"
 
-#: __init__.py:228
-msgid "Number of cores"
-msgstr "Количество ядер"
-
 #: __init__.py:231
 msgid "RAM"
 msgstr "ОЗУ"
-
-#: __init__.py:231
-#, python-format
-msgid "%.2f GB"
-msgstr "%.2f ГБ"
