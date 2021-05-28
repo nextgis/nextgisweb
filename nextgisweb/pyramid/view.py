@@ -114,6 +114,13 @@ def pkginfo(request):
         'pyramid.control_panel.sysinfo'))
 
 
+def storage(request):
+    request.require_administrator()
+    return dict(
+        title=_("Storage"),
+        dynmenu=request.env.pyramid.control_panel)
+
+
 def backup_browse(request):
     if not request.env.pyramid.options['backup.download']:
         raise HTTPNotFound()
@@ -377,7 +384,7 @@ def setup_pyramid(comp, config):
         .add_view(control_panel, renderer=ctpl('control_panel'))
 
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
-    
+
     config.add_route(
         'pyramid.control_panel.sysinfo',
         '/control-panel/sysinfo'
@@ -387,6 +394,11 @@ def setup_pyramid(comp, config):
         'pyramid.control_panel.pkginfo',
         '/control-panel/pkginfo'
     ).add_view(pkginfo)
+
+    config.add_route(
+        'pyramid.control_panel.storage',
+        '/control-panel/storage'
+    ).add_view(storage, renderer=ctpl('storage'))
 
     config.add_route(
         'pyramid.control_panel.backup.browse',
@@ -443,6 +455,8 @@ def setup_pyramid(comp, config):
         dm.Label('info', _("Info")),
         dm.Link('info/sysinfo', _("System information"), lambda args: (
             args.request.route_url('pyramid.control_panel.sysinfo'))),
+        dm.Link('info/storage', _("Storage"), lambda args: (
+            args.request.route_url('pyramid.control_panel.storage'))),
 
         dm.Label('settings', _("Settings")),
         dm.Link('settings/core', _("Web GIS name"), lambda args: (
