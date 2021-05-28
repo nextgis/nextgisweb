@@ -14,4 +14,4 @@ class RasterMosaicComponent(Component):
         api.setup_pyramid(self, config)
 
     def workdir_filename(self, fobj, makedirs=False):
-        return self.env.core.workdir_filename(self, fobj, makedirs)
+        return self.env.file_storage.workdir_filename(self, fobj, makedirs)

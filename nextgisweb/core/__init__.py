@@ -124,21 +124,6 @@ class CoreComponent(Component):
         return os.path.join(self.options['sdir'], comp.identity) \
             if 'sdir' in self.options else None
 
-    def workdir_filename(self, comp, fobj, makedirs=False):
-        levels = (fobj.uuid[0:2], fobj.uuid[2:4])
-        dname = os.path.join(self.gtsdir(comp), *levels)
-
-        # Create folders if needed
-        if not os.path.isdir(dname):
-            os.makedirs(dname)
-
-        fname = os.path.join(dname, fobj.uuid)
-        oname = self.env.file_storage.filename(fobj, makedirs=makedirs)
-        if not os.path.isfile(fname):
-            os.symlink(oname, fname)
-
-        return fname
-
     def mksdir(self, comp):
         """ Create file storage folder """
         self.bmakedirs(self.options['sdir'], comp.identity)

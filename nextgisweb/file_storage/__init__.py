@@ -84,6 +84,22 @@ class FileStorageComponent(Component):
 
         return os.path.join(path, str(uuid))
 
+    def workdir_filename(self, comp, fobj, makedirs=False):
+        levels = (fobj.uuid[0:2], fobj.uuid[2:4])
+        dname = os.path.join(self.env.core.gtsdir(comp), *levels)
+
+        # Create folders if needed
+        if not os.path.isdir(dname):
+            os.makedirs(dname)
+
+        fname = os.path.join(dname, fobj.uuid)
+        oname = self.env.file_storage.filename(fobj, makedirs=makedirs)
+        if not os.path.isfile(fname):
+            src = os.path.relpath(oname, os.path.dirname(fname))
+            os.symlink(src, fname)
+
+        return fname
+
     def query_stat(self):
         # Traverse all objects in file storage and calculate total
         # and per component size in filesystem
