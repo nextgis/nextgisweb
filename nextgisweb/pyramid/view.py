@@ -17,7 +17,7 @@ from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from ..env import env
-from .. import dynmenu as dm
+from .. import dynmenu as dm, pkginfo
 from ..core.exception import UserException
 from ..package import amd_packages
 from ..compat import lru_cache
@@ -109,6 +109,11 @@ def sysinfo(request):
         title=_("System information"),
         distinfo=distinfo,
         dynmenu=request.env.pyramid.control_panel)
+
+
+def pkginfo(request):
+    return HTTPFound(location=request.route_url(
+        'pyramid.control_panel.sysinfo'))
 
 
 def backup_browse(request):
@@ -366,11 +371,16 @@ def setup_pyramid(comp, config):
         .add_view(control_panel, renderer=ctpl('control_panel'))
 
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
-
+    
     config.add_route(
         'pyramid.control_panel.sysinfo',
         '/control-panel/sysinfo'
     ).add_view(sysinfo, renderer=ctpl('sysinfo'))
+
+    config.add_route(
+        'pyramid.control_panel.pkginfo',
+        '/control-panel/pkginfo'
+    ).add_view(pkginfo)
 
     config.add_route(
         'pyramid.control_panel.backup.browse',
