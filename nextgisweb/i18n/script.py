@@ -174,7 +174,7 @@ def cmd_update(args):
                     comp_id, locale)
 
                 with io.open(str(po_path), 'wb') as fd:
-                    write_po(fd, pot, width=80)
+                    write_po(fd, pot, width=80, omit_header=True)
 
                 continue
 
@@ -199,7 +199,7 @@ def cmd_update(args):
                     del po.obsolete[msg_id]
 
                 with io.open(str(po_path), 'wb') as fd:
-                    write_po(fd, po, width=80)
+                    write_po(fd, po, width=80, omit_header=True)
 
 
 def cmd_compile(args):
