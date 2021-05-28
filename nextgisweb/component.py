@@ -57,6 +57,9 @@ class Component(six.with_metaclass(ComponentMeta, object)):
     def maintenance(self):
         pass
 
+    def sys_info(self):
+        return []
+
     def setup_pyramid(self, config):
         pass
 

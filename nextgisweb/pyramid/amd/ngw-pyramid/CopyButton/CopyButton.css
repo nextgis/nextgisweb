@@ -16,6 +16,10 @@
     opacity: 0;
 }
 
+.copy-button{
+    display: inline-block;
+}
+
 .copy-button.activated .copy-button__icon{
     animation: copyButton-highlight .4s ease-in-out;
 }

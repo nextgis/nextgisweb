@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import re
+from subprocess import check_output
+
 from ..component import Component
 from ..lib.config import Option
 
@@ -10,6 +13,18 @@ from . import command  # NOQA
 
 class JSRealmComponent(Component):
     identity = COMP_ID
+
+    def sys_info(self):
+        result = []
+
+        try:
+            out = check_output(['node', '--version'], universal_newlines=True).strip()
+            node_version = re.match('v?(.*)', out).group(1)
+            result.append(("Node", node_version))
+        except Exception:
+            self.logger.error("Failed to get node version", exc_info=True)
+
+        return result
 
     def setup_pyramid(self, config):
         from . import view

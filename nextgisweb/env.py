@@ -243,6 +243,11 @@ class Env(object):
         Option('logger.waitress', str, default='waitress:error', doc=(
             "By default waitress (builtin HTTP server) logger level is set to "
             "ERROR. It's possible to override this setting here.")),
+
+        Option('distribution.name', default=None),
+        Option('distribution.description', default=None),
+        Option('distribution.version', default=None),
+        Option('distribution.date', default=None),
     ))
 
 

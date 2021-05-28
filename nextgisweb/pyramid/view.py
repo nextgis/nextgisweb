@@ -101,11 +101,13 @@ def locale(request):
     return HTTPFound(location=request.GET.get('next', request.application_url))
 
 
-def pkginfo(request):
+def sysinfo(request):
     request.require_administrator()
+    distinfo = filter(lambda dinfo: dinfo.name.startswith('nextgisweb'),
+                      pip_freeze()[1])
     return dict(
-        title=_("Package versions"),
-        distinfo=pip_freeze()[1],
+        title=_("System information"),
+        distinfo=distinfo,
         dynmenu=request.env.pyramid.control_panel)
 
 
@@ -366,9 +368,9 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
 
     config.add_route(
-        'pyramid.control_panel.pkginfo',
-        '/control-panel/pkginfo'
-    ).add_view(pkginfo, renderer=ctpl('pkginfo'))
+        'pyramid.control_panel.sysinfo',
+        '/control-panel/sysinfo'
+    ).add_view(sysinfo, renderer=ctpl('sysinfo'))
 
     config.add_route(
         'pyramid.control_panel.backup.browse',
@@ -423,8 +425,8 @@ def setup_pyramid(comp, config):
 
     comp.control_panel = dm.DynMenu(
         dm.Label('info', _("Info")),
-        dm.Link('info/pkginfo', _("Package versions"), lambda args: (
-            args.request.route_url('pyramid.control_panel.pkginfo'))),
+        dm.Link('info/sysinfo', _("System information"), lambda args: (
+            args.request.route_url('pyramid.control_panel.sysinfo'))),
 
         dm.Label('settings', _("Settings")),
         dm.Link('settings/core', _("Web GIS name"), lambda args: (

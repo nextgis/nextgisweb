@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+import multiprocessing
 import os
 import os.path
+import platform
+import sys
 import io
 import json
 import re
@@ -9,6 +12,7 @@ import uuid
 import warnings
 from collections import OrderedDict
 from datetime import datetime, timedelta
+from subprocess import check_output
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
@@ -195,6 +199,50 @@ class CoreComponent(Component):
             self.settings_get(component, name)
         except KeyError:
             self.settings_set(component, name, value)
+
+    def sys_info(self):
+        result = []
+
+        def try_check_output(cmd):
+            try:
+                return check_output(cmd, universal_newlines=True).strip()
+            except Exception:
+                msg = "Failed to get sys info with command: '%s'" % ' '.join(cmd)
+                self.logger.error(msg, exc_info=True)
+
+        result.append((_("Linux kernel"), platform.release()))
+        os_distribution = try_check_output(['lsb_release', '-ds'])
+        if os_distribution is not None:
+            result.append((_("OS distribution"), os_distribution))
+
+        def get_cpu_model():
+            cpuinfo = try_check_output(['cat', '/proc/cpuinfo'])
+            if cpuinfo is not None:
+                for line in cpuinfo.split('\n'):
+                    if line.startswith('model name'):
+                        match = re.match(r'model name\s*:?(.*)', line)
+                        return match.group(1).strip()
+            return platform.processor()
+
+        result.append((_("CPU"), '{} × {}'.format(
+            multiprocessing.cpu_count(),
+            get_cpu_model())))
+
+        mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
+        result.append((_("RAM"), "%d MB" % (float(mem_bytes) / 2**20)))
+
+        result.append(("Python", '.'.join(map(str, sys.version_info[0:3]))))
+
+        pg_version = DBSession.execute('SHOW server_version').scalar()
+        pg_version = re.sub(r'\s\(.*\)$', '', pg_version)
+        result.append(("PostgreSQL", pg_version))
+        result.append(("PostGIS", DBSession.execute('SELECT PostGIS_Lib_Version()').scalar()))
+
+        gdal_version = try_check_output(['gdal-config', '--version'])
+        if gdal_version is not None:
+            result.append(("GDAL", gdal_version))
+
+        return result
 
     def query_stat(self):
         result = dict()
