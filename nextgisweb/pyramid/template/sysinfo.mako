@@ -51,8 +51,8 @@
     %for comp in request.env._components.values():
         %for k, v in comp.sys_info():
             <tr>
-                <th>${k}</th>
-                <td>${v}</td>
+                <th>${tr(k)}</th>
+                <td>${tr(v)}</td>
             </tr>
         %endfor
     %endfor
