@@ -233,7 +233,9 @@ class CoreComponent(Component):
 
         result.append(("Python", '.'.join(map(str, sys.version_info[0:3]))))
 
-        result.append(("PostgreSQL", DBSession.execute('SHOW server_version').scalar()))
+        pg_version = DBSession.execute('SHOW server_version').scalar()
+        pg_version = re.sub(r'\s\(.*\)$', '', pg_version)
+        result.append(("PostgreSQL", pg_version))
         result.append(("PostGIS", DBSession.execute('SELECT PostGIS_Lib_Version()').scalar()))
 
         gdal_version = try_check_output(['gdal-config', '--version'])
