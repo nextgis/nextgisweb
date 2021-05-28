@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+import multiprocessing
 import os
 import os.path
 import platform
@@ -202,20 +203,41 @@ class CoreComponent(Component):
     def sys_info(self):
         result = []
 
+        def try_check_output(cmd):
+            try:
+                return check_output(cmd, universal_newlines=True).strip()
+            except Exception:
+                msg = "Failed to get sys info with command: '%s'" % ' '.join(cmd)
+                self.logger.error(msg, exc_info=True)
+
         result.append((_("Linux kernel"), platform.release()))
-        try:
-            lsb_release = check_output(['lsb_release', '-ds'], universal_newlines=True).strip()
-            result.append((_("OS distribution"), lsb_release))
-        except Exception:
-            self.logger.error("Failed to get Linux standard base release", exc_info=True)
+        os_distribution = try_check_output(['lsb_release', '-ds'])
+        if os_distribution is not None:
+            result.append((_("OS distribution"), os_distribution))
+
+        def get_cpu_model():
+            cpuinfo = try_check_output(['cat', '/proc/cpuinfo'])
+            if cpuinfo is not None:
+                for line in cpuinfo.split('\n'):
+                    if line.startswith('model name'):
+                        match = re.match(r'model name\s*:?(.*)', line)
+                        return match.group(1).strip()
+            return platform.processor()
+
+        result.append((_("CPU"), get_cpu_model()))
+        result.append((_("Number of cores"), '%d' % multiprocessing.cpu_count()))
+
+        mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
+        result.append((_("RAM"), _("%.2f GB") % (float(mem_bytes) / 2**30)))
+
         result.append(("Python", '.'.join(map(str, sys.version_info[0:3]))))
+
         result.append(("PostgreSQL", DBSession.execute('SHOW server_version').scalar()))
         result.append(("PostGIS", DBSession.execute('SELECT PostGIS_Lib_Version()').scalar()))
-        try:
-            gdal_version = check_output(['gdal-config', '--version'], universal_newlines=True).strip()
+
+        gdal_version = try_check_output(['gdal-config', '--version'])
+        if gdal_version is not None:
             result.append(("GDAL", gdal_version))
-        except Exception:
-            self.logger.error("Failed to get GDAL version", exc_info=True)
 
         return result
 
