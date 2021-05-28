@@ -503,6 +503,14 @@ Search for raster layers
    Host: ngw_url
    Accept: */*
 
+Search for QGIS vector styles with metadata
+
+.. sourcecode:: http
+
+   GET /api/resource/search/?cls=qgis_vector_style&serialization=full HTTP/1.1
+   Host: ngw_url
+   Accept: */*
+
 
 Child resource
 ^^^^^^^^^^^^^^^
