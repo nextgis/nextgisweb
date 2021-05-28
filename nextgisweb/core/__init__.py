@@ -13,6 +13,7 @@ import warnings
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from subprocess import check_output
+from six import ensure_str
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
@@ -213,7 +214,7 @@ class CoreComponent(Component):
             multiprocessing.cpu_count(),
             get_cpu_model())))
 
-        mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
+        mem_bytes = os.sysconf(ensure_str('SC_PAGE_SIZE')) * os.sysconf(ensure_str('SC_PHYS_PAGES'))
         result.append((_("RAM"), "%d MB" % (float(mem_bytes) / 2**20)))
 
         result.append(("Python", '.'.join(map(str, sys.version_info[0:3]))))
