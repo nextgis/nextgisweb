@@ -262,6 +262,9 @@ def cmd_stat(args):
         for po_path in locale_path.glob('*.po'):
             locale = po_path.with_suffix('').name
 
+            if not ((len(args.locale) > 0 and locale in args.locale) or len(args.locale) == 0):
+                continue
+
             with io.open(str(po_path), 'r') as po_fd, io.open(str(pot_path), 'r') as pot_fd:
                 po = read_po(po_fd, locale=locale)
                 pot = read_po(pot_fd)
@@ -311,6 +314,7 @@ def main(argv=sys.argv):
 
     pstat = subparsers.add_parser('stat')
     pstat.add_argument('component', nargs='*')
+    pstat.add_argument('--locale', default=[], action='append')
     pstat.set_defaults(func=cmd_stat)
 
     args = parser.parse_args(argv[1:])
