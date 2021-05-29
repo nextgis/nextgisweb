@@ -18,8 +18,6 @@ from email import message_from_string
 from collections import OrderedDict
 from datetime import datetime
 
-from babel import Locale
-from babel.util import LOCALTZ
 from babel.messages.catalog import Catalog
 from babel.messages.frontend import parse_mapping
 from babel.messages.extract import extract_from_dir
@@ -164,10 +162,11 @@ def cmd_update(args):
 
             with io.open(str(pot_path), 'r') as pot_fd:
                 pot = read_po(pot_fd, locale=locale)
+                pot_is_empty = len(pot) == 0 and len(pot.obsolete) == 0
 
             if not po_path.is_file():
-                pot.locale = Locale.parse(locale)
-                pot.revision_date = datetime.now(LOCALTZ)
+                if pot_is_empty:
+                    continue
 
                 logger.info(
                     "Creating component [%s] locale [%s]...",
@@ -176,6 +175,13 @@ def cmd_update(args):
                 with io.open(str(po_path), 'wb') as fd:
                     write_po(fd, pot, width=80, omit_header=True)
 
+                continue
+
+            if pot_is_empty:
+                logger.info(
+                    "Deleting component [%s] locale [%s]...",
+                    comp_id, locale)
+                po_path.unlink()
                 continue
 
             with io.open(str(po_path), 'r') as po_fd:
