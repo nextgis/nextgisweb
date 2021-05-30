@@ -440,12 +440,10 @@ define([
                         socialNetworks: settings.enable_social_networks,
                         display: widget
                     });
-    
-                    if (widget.activeLeftPanel === "sharePanel") widget.activatePanel(widget.sharePanel);
-    
+
                     var setPermalinkUrl = lang.hitch(widget.sharePanel, widget.sharePanel.setPermalinkUrl),
                         setEmbedCode = lang.hitch(widget.sharePanel, widget.sharePanel.setEmbedCode);
-    
+
                     widget.sharePanel.on("shown", function () {
                         widget.map.olMap.getView().on("change", setPermalinkUrl);
                         widget.map.olMap.getView().on("change", setEmbedCode);
@@ -454,7 +452,7 @@ define([
                             widget.sharePanel.setEmbedCode();
                         });
                     });
-    
+
                     widget.sharePanel.on("closed", function () {
                         widget.navigationMenu.reset();
                         widget.map.olMap.getView().un("change", setPermalinkUrl);
@@ -462,6 +460,9 @@ define([
                         if (itemStoreListener) itemStoreListener.remove();
                     });
 
+                    if (widget.activeLeftPanel === "sharePanel") {
+                        widget.activatePanel(widget.sharePanel);
+                    }
                 }
             ).then(undefined, function (err) {
                console.error(err);
