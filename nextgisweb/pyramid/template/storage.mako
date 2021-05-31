@@ -7,27 +7,30 @@
         <table class="pure-table pure-table-horizontal">
 
             <thead><tr> 
-                <th class="sort-default" style="width: 80%; text-align: inherit;">${tr(_('Kind of data'))}</th>
-                <th style="width: 20em; text-align: inherit;">${tr(_('Volume'))}</th>
+                <th class="sort-default" style="width: 80%; text-align: inherit;">${tr(_("Kind of data"))}</th>
+                <th style="width: 20em; text-align: inherit;">${tr(_("Volume"))}</th>
             </tr></thead>
 
             <tbody id="storage-body"></tbody>
             <tfoot id="storage-foot" style="font-size: larger;"></tfoot>
         </table>
+
     </div>
 </div>
+
+<h3>${tr(_("Estimate time and date"))}:</h3>
+<input id="storage-timestamp" style="border: none; background: transparent"></input>
+
 
 <script>
 require([
     "dojo/number",
     "dojo/request/xhr",
     "ngw/route",
-    "@nextgisweb/pyramid/i18n!",
 ], function (
     number,
     xhr,
     route,
-    i18n,
 ) {
     function formatBytes(bytes) {
         var units = ["B", "KB", "MB", "GB"];
@@ -35,6 +38,15 @@ require([
         var value = bytes / 1024**i;
         var places = i < 3 ? 0 : 2;
         return number.format(value, {places: places, locale: dojoConfig.locale}) + " " + units[i];
+    }
+
+    function formatTimestamp(timestamp) {
+        if (timestamp === null) {
+            return "-";
+        } else {
+            var date = new Date(timestamp);
+            return date.toLocaleString();
+        }
     }
 
     xhr.get(route.pyramid.storage(), {
@@ -51,12 +63,15 @@ require([
         }
 
         var total = 0;
-        for (var key in data) {
-            var item = data[key];
-            add_row(body, i18n.gettext(item.display_name), item.volume);
+        for (var key in data.storage) {
+            var item = data.storage[key];
+            add_row(body, item.display_name, item.volume);
             total += item.volume;
         }
-        add_row(foot, i18n.gettext("Total"), total);
+        add_row(foot, "Total", total);
+
+        var timestamp = document.getElementById("storage-timestamp");
+        timestamp.value = formatTimestamp(data.timestamp);
     });
 });
 </script>
