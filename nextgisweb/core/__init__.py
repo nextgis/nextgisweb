@@ -310,7 +310,7 @@ class CoreComponent(Component):
                 if hasattr(comp, 'estimate_storage'):
                     for kind_of_data, resource_id, size in comp.estimate_storage():
                         storage_stat_dimension.insert(dict(
-                            timestamp=timestamp,
+                            tstamp=timestamp,
                             component=comp.identity,
                             kind_of_data=kind_of_data.identity,
                             resource_id=resource_id,

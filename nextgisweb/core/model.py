@@ -38,7 +38,7 @@ class Setting(Base):
 
 storage_stat_dimension = db.Table(
     'core_storage_stat_dimension', Base.metadata,
-    db.Column('timestamp', db.TIMESTAMP, nullable=False),
+    db.Column('tstamp', db.TIMESTAMP, nullable=False),
     db.Column('component', db.Unicode),
     db.Column('kind_of_data', db.Unicode),
     db.Column('resource_id', db.Integer),
@@ -48,7 +48,7 @@ storage_stat_dimension = db.Table(
 
 storage_stat_dimension_total = db.Table(
     'core_storage_stat_dimension_total', Base.metadata,
-    db.Column('timestamp', db.TIMESTAMP, nullable=False),
+    db.Column('tstamp', db.TIMESTAMP, nullable=False),
     db.Column('kind_of_data', db.Unicode),
     db.Column('value_data_volume', db.Integer),
 )
@@ -56,7 +56,7 @@ storage_stat_dimension_total = db.Table(
 
 storage_stat_delta = db.Table(
     'core_storage_stat_delta', Base.metadata,
-    db.Column('timestamp', db.TIMESTAMP, nullable=False),
+    db.Column('tstamp', db.TIMESTAMP, nullable=False),
     db.Column('component', db.Unicode),
     db.Column('kind_of_data', db.Unicode),
     db.Column('resource_id', db.Integer),
@@ -66,7 +66,7 @@ storage_stat_delta = db.Table(
 
 storage_stat_delta_total = db.Table(
     'core_storage_stat_delta_total', Base.metadata,
-    db.Column('timestamp', db.TIMESTAMP, nullable=False),
+    db.Column('tstamp', db.TIMESTAMP, nullable=False),
     db.Column('kind_of_data', db.Unicode),
     db.Column('value_data_volume', db.Integer),
 )
@@ -79,8 +79,8 @@ db.event.listen(storage_stat_delta, 'after_create', db.DDL('''
         DELETE FROM core_storage_stat_delta_total
         WHERE kind_of_data = NEW.kind_of_data;
 
-        INSERT INTO core_storage_stat_delta_total ("timestamp", kind_of_data, value_data_volume)
-        SELECT NEW."timestamp", NEW.kind_of_data, sum(value_data_volume)
+        INSERT INTO core_storage_stat_delta_total (tstamp, kind_of_data, value_data_volume)
+        SELECT NEW.tstamp, NEW.kind_of_data, sum(value_data_volume)
         FROM core_storage_stat_delta
         WHERE kind_of_data = NEW.kind_of_data;
 
@@ -137,7 +137,7 @@ def _after_flush(session, flush_context):
 
         conn.execute(sa.text('''
             INSERT INTO core_storage_stat_delta (
-                "timestamp", component, kind_of_data, resource_id, value_data_volume
+                tstamp, component, kind_of_data, resource_id, value_data_volume
             )
             VALUES (:timestamp, :component, :kind_of_data, :resource_id, :value_data_volume)
         '''), **params)
