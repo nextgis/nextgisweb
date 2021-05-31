@@ -1,9 +1,19 @@
 <%!
+import math
 from bunch import Bunch
 from nextgisweb import dynmenu as dm
 from nextgisweb.resource.util import _
 from nextgisweb.resource.scope import ResourceScope, DataScope
 from nextgisweb.webmap.model import WebMapScope
+
+def volume_pretty(volume):
+    if volume == 0:
+        return "-"
+    else:
+        units = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        i = min(int(math.log(volume, 1024)), len(units) - 1)
+        value = volume / 1024**i
+        return "%.2f %s" % (value, units[i])
 %>
 
 <%namespace file="nextgisweb:pyramid/template/util.mako" import="icon"/>
@@ -37,6 +47,7 @@ from nextgisweb.webmap.model import WebMapScope
                     </a>
                 </td>
                 <td>${tr(item.cls_display_name)}</td>
+                <td>${volume_pretty(request.env.resource.resource_volume(item, request))}</td>
                 <td>${item.owner_user}</td>
                 <td class="children-table__action">
                     <% args = Bunch(obj=item, request=request) %>
@@ -64,8 +75,9 @@ from nextgisweb.webmap.model import WebMapScope
     <table id="children-table" class="children-table pure-table pure-table-horizontal">
         <thead>
             <tr>
-                <th class='sort-default' style="width: 50%; text-align: inherit;">${tr(_("Display name"))}</th>
+                <th class='sort-default' style="width: 40%; text-align: inherit;">${tr(_("Display name"))}</th>
                 <th style="width: 25%; text-align: inherit;">${tr(_("Type"))}</th>
+                <th style="width: 10%; text-align: inherit;">${tr(_("Volume"))}</th>
                 <th style="width: 20%; text-align: inherit;">${tr(_("Owner"))}</th>
                 <th class="no-sort" style="width: 0%">&nbsp;</th>
             </tr>
