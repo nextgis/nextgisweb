@@ -167,15 +167,20 @@ doesn't exist, create it from a tag:
   $ git checkout 3.8.0
   $ git branch 3.8.x
 
+After that start new development version:
+
+.. code-block:: bash
+
+  $ bump2version --commit patch
+  $ cat VERSION
+  3.8.1.dev0
+
 Then use ``git cherry-pick`` to backport required commit and increment ``patch``
 version component:
 
 .. code-block:: bash
 
-  $ git cherry-pick --no-commit commit-hash
-  $ bump2version --allow-dirty patch
-  $ git add VERSION .bumpversion.cfg
-  $ git commit
+  $ git cherry-pick commit-hash
 
 And then create a new release version and push it to the repository:
 
