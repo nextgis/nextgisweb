@@ -313,16 +313,22 @@ def storage(request):
     storage = dict()
 
     for identity, value_data_volume in DBSession.query(s4).all():
-        kind_of_data = KindOfData.registry[identity]
-        storage[identity] = dict(
-            display_name=kind_of_data.display_name,
-            volume=value_data_volume)
+        storage[identity] = value_data_volume
 
     result['storage'] = storage
 
     timestamp = DBSession.query(select([func.min(t1.c.tstamp)]).alias('t')).scalar()
     result['timestamp'] = timestamp
 
+    return result
+
+
+def kind_of_data(request):
+    request.require_administrator()
+
+    result = dict()
+    for item in KindOfData.registry:
+        result[item.identity] = request.localizer.translate(item.display_name)
     return result
 
 
@@ -433,6 +439,11 @@ def setup_pyramid(comp, config):
         'pyramid.storage',
         '/api/component/pyramid/storage',
     ).add_view(storage, renderer='json')
+
+    config.add_route(
+        'pyramid.kind_of_data',
+        '/api/component/pyramid/kind_of_data',
+    ).add_view(kind_of_data, renderer='json')
 
     config.add_route(
         'pyramid.custom_css', '/api/component/pyramid/custom_css') \

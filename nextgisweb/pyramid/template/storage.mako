@@ -25,10 +25,12 @@
 <script>
 require([
     "dojo/number",
+    "dojo/promise/all",
     "dojo/request/xhr",
     "ngw/route",
 ], function (
     number,
+    all,
     xhr,
     route,
 ) {
@@ -49,9 +51,13 @@ require([
         }
     }
 
-    xhr.get(route.pyramid.storage(), {
-        handleAs: "json"
-    }).then(function (data) {
+    all([
+        xhr.get(route.pyramid.storage(), {handleAs: "json"}),
+        xhr.get(route.pyramid.kind_of_data(), {handleAs: "json"})
+    ]).then(function (res) {
+        var data = res[0];
+        var kind_of_data = res[1];
+
         var body = document.getElementById("storage-body");
         var foot = document.getElementById("storage-foot");
 
@@ -64,9 +70,10 @@ require([
 
         var total = 0;
         for (var key in data.storage) {
-            var item = data.storage[key];
-            add_row(body, item.display_name, item.volume);
-            total += item.volume;
+            var volume = data.storage[key];
+            var display_name = key in kind_of_data ? kind_of_data[key] : key;
+            add_row(body, display_name, volume);
+            total += volume;
         }
         add_row(foot, "Total", total);
 
