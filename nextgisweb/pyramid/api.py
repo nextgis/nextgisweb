@@ -6,6 +6,7 @@ import base64
 from datetime import timedelta
 from collections import OrderedDict
 from pkg_resources import resource_filename
+from threading import Thread
 from importlib import import_module
 from six.moves.urllib.parse import unquote
 
@@ -294,6 +295,15 @@ def statistics(request):
     return result
 
 
+def estimate_storage(request):
+    request.require_administrator()
+
+    worker = Thread(target=env.core.estimate_storage_all)
+    worker.start()
+
+    return Response()
+
+
 def storage(request):
     request.require_administrator()
 
@@ -434,6 +444,11 @@ def setup_pyramid(comp, config):
         'pyramid.statistics',
         '/api/component/pyramid/statistics',
     ).add_view(statistics, renderer='json')
+
+    config.add_route(
+        'pyramid.estimate_storage',
+        '/api/component/pyramid/estimate_storage',
+    ).add_view(estimate_storage, request_method='POST')
 
     config.add_route(
         'pyramid.storage',

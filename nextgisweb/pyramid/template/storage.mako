@@ -20,6 +20,7 @@
 
 <h3>${tr(_("Estimate time and date"))}:</h3>
 <input id="storage-timestamp" style="border: none; background: transparent"></input>
+<button id="estimate-btn">${tr(_("Estimate now"))}</button>
 
 
 <script>
@@ -80,5 +81,12 @@ require([
         var timestamp = document.getElementById("storage-timestamp");
         timestamp.value = formatTimestamp(data.timestamp);
     });
+
+    var btn_estimate = document.getElementById("estimate-btn");
+    btn_estimate.onclick = function () {
+        btn_estimate.disabled = true;
+        btn_estimate.style.color = "grey";
+        xhr.post(route.pyramid.estimate_storage());
+    };
 });
 </script>
