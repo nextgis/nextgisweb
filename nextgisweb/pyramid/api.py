@@ -297,6 +297,8 @@ def statistics(request):
 def storage(request):
     request.require_administrator()
 
+    result = dict()
+
     t1 = storage_stat_dimension_total
     t2 = storage_stat_delta_total
 
@@ -308,13 +310,18 @@ def storage(request):
     s4 = select([s3.c.kind_of_data, func.sum(s3.c.value_data_volume)]) \
         .group_by(s3.c.kind_of_data).alias('s')
 
-    result = dict()
+    storage = dict()
 
     for identity, value_data_volume in DBSession.query(s4).all():
         kind_of_data = KindOfData.registry[identity]
-        result[identity] = dict(
+        storage[identity] = dict(
             display_name=kind_of_data.display_name,
             volume=value_data_volume)
+
+    result['storage'] = storage
+
+    timestamp = DBSession.query(select([func.min(t1.c.tstamp)]).alias('t')).scalar()
+    result['timestamp'] = timestamp
 
     return result
 

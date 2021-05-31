@@ -320,12 +320,12 @@ class CoreComponent(Component):
             dt = storage_stat_dimension
 
             total = select([
-                literal(timestamp), dt.c.kind_of_data,
+                literal(timestamp).label('tstamp'), dt.c.kind_of_data,
                 func.sum(dt.c.value_data_volume)
             ]).group_by(dt.c.kind_of_data)
 
             storage_stat_dimension_total.insert(). \
-                from_select(['timestamp', 'kind_of_data', 'value_data_volume'], total).execute()
+                from_select(['tstamp', 'kind_of_data', 'value_data_volume'], total).execute()
 
     option_annotations = (
         Option('system.name', default="NextGIS Web"),
