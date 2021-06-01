@@ -103,7 +103,7 @@ addPackage("proj4", {
 
 addPackage("codemirror");
 
-addPackage("dom-to-image", {
+addPackage("dom-to-image-more", {
     from: "src",
 });
 

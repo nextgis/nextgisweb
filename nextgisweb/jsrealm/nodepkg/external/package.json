@@ -17,7 +17,7 @@
         "dijit": "^1.16.4",
         "dojo": "^1.16.4",
         "dojox": "^1.16.4",
-        "dom-to-image": "^2.6.0",
+        "dom-to-image-more": "^2.8.0",
         "handlebars": "^3.0.3",
         "ie11-custom-properties": "^4.1.0",
         "jed": "^1.1.1",

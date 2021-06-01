@@ -39,7 +39,7 @@ define([
     "dijit/TooltipDialog",
     "ngw-webmap/ui/ScalesSelect/ScalesSelect",
     "xstyle/css!./PrintMapPanel.css",
-    "dom-to-image/dom-to-image",
+    "dom-to-image-more/dom-to-image-more",
 ], function (
     declare,
     topic,
