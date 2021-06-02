@@ -102,7 +102,7 @@ msgstr "Панель управления"
 
 #: view.py:109 view.py:428
 msgid "System information"
-msgstr "Системная информация"
+msgstr "Информация о системе"
 
 #: view.py:120 view.py:446
 msgid "Backups"
