@@ -306,14 +306,6 @@ def setup_pyramid(comp, config):
             env.core.locale_default)
     config.set_locale_negotiator(locale_negotiator)
 
-    # TODO: Need to get rid of translation dirs!
-    # Currently used only to search for jed-files.
-    from ..package import pkginfo as _pkginfo
-    for pkg in _pkginfo.packages:
-        dirname = resource_filename(pkg, 'locale')
-        if os.path.isdir(dirname):
-            config.add_translation_dirs(dirname)
-
     # STATIC FILES
 
     if is_debug:
