@@ -12,7 +12,7 @@
             <div data-dojo-attach-point="wConnection"
                 data-dojo-type="ngw-resource/ResourceBox"
                 data-ngw-serialize="connection"
-                data-dojo-props="cls: 'wmsclient_connection', dialogTitle: '{{gettext 'Select WMS connection'}}'"
+                data-dojo-props="required: true, cls: 'wmsclient_connection', dialogTitle: '{{gettext 'Select WMS connection'}}'"
                 title="{{gettext 'WMS connection'}}" style="width: 100%"></div>
 
             <!-- Do not let users pick SRS. By now only one SRS (EPSG:3857) is supported.
