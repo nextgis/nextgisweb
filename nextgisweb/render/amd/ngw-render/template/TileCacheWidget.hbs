@@ -5,10 +5,13 @@
         data-dojo-attach-point="wTableContainer">
 
         <div data-dojo-type="dijit/form/CheckBox"
+            data-dojo-attach-point="wEnabled"
+            data-dojo-attach-event="onChange: _onEnabledChange"
             data-ngw-serialize="enabled"
             title="{{gettext 'Enabled'}}"></div>
 
         <div data-dojo-type="dijit/form/CheckBox"
+            data-dojo-attach-point="wImageCompose"
             data-ngw-serialize="image_compose"
             title="{{gettext 'Allow using tiles in non-tile requests'}}"></div>
 
