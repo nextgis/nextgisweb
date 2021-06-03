@@ -8,6 +8,7 @@ import logging
 from time import sleep
 from datetime import datetime, timedelta
 from pkg_resources import resource_filename
+from hashlib import md5
 from six import reraise
 
 from psutil import Process
@@ -25,7 +26,7 @@ from ..compat import lru_cache
 from . import exception
 from .session import WebSession
 from .renderer import json_renderer
-from .util import _, pip_freeze, ErrorRendererPredicate
+from .util import _, ErrorRendererPredicate
 
 _logger = logging.getLogger(__name__)
 
@@ -103,11 +104,8 @@ def locale(request):
 
 def sysinfo(request):
     request.require_administrator()
-    distinfo = filter(lambda dinfo: dinfo.name.startswith('nextgisweb'),
-                      pip_freeze()[1])
     return dict(
         title=_("System information"),
-        distinfo=distinfo,
         dynmenu=request.env.pyramid.control_panel)
 
 
@@ -322,9 +320,13 @@ def setup_pyramid(comp, config):
             .replace('0x', '').replace('L', '')
         _logger.debug("Using startup time static key [%s]", comp.static_key[1:])
     else:
-        # In production mode build static_key from pip freeze output
-        comp.static_key = '/' + pip_freeze()[0]
-        _logger.debug("Using pip freeze static key [%s]", comp.static_key[1:])
+        # In production mode build static_key from nextgisweb_* package versions
+        package_hash = md5('\n'.join((
+            '{}=={}+{}'.format(pobj.name, pobj.version, pobj.commit)
+            for pobj in comp.env.packages.values()
+        )).encode('utf-8'))
+        comp.static_key = '/' + package_hash.hexdigest()[:8]
+        _logger.debug("Using package based static key '%s'", comp.static_key[1:])
 
     config.add_static_view(
         '/static{}/asset'.format(comp.static_key),

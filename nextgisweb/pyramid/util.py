@@ -8,11 +8,8 @@ import errno
 import fcntl
 import secrets
 import string
-from hashlib import md5
-from collections import namedtuple
 from calendar import timegm
 from logging import getLogger
-from pkg_resources import get_distribution
 import six
 
 from ..i18n import trstring_factory
@@ -123,56 +120,3 @@ def header_encoding_tween_factory(handler, registry):
 
 def datetime_to_unix(dt):
     return timegm(dt.timetuple())
-
-
-def pip_freeze():
-    result = getattr(pip_freeze, '_result', None)
-    if result is not None:
-        return result
-
-    # Read installed packages from pip freeze
-    from pip._internal.operations.freeze import freeze
-    distinfo = []
-    h = md5()
-
-    for line in freeze():
-        line = line.strip().lower()
-        if line == '':
-            continue
-        h.update(line.encode('utf-8'))
-
-        dinfo = None
-        mpkg = re.match(r'(.+)==(.+)', line)
-        if mpkg:
-            dinfo = DistInfo(
-                name=mpkg.group(1),
-                version=mpkg.group(2),
-                commit=None)
-
-        mgit = re.match(r'-e\sgit\+.+\@(.{8}).{32}\#egg=(\w+).*$', line)
-        if mgit:
-            dinfo = DistInfo(
-                name=mgit.group(2),
-                version=get_distribution(mgit.group(2)).version,
-                commit=mgit.group(1))
-
-        if dinfo is not None:
-            distinfo.append(dinfo)
-        else:
-            _logger.warn("Could not parse pip freeze line: %s", line)
-
-    static_key = h.hexdigest()[:8]
-
-    def _sort_key(di):
-        d = get_distribution(di.name)
-        ep = len(d.get_entry_map('nextgisweb.packages')) != 0
-        return (not ep, di.name)
-
-    distinfo = sorted(distinfo, key=_sort_key)
-
-    result = (static_key, tuple(distinfo))
-    setattr(pip_freeze, '_result', result)
-    return result
-
-
-DistInfo = namedtuple('DistInfo', ['name', 'version', 'commit'])

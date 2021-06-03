@@ -36,6 +36,7 @@ from ..lib.config import Option
 from ..models import DBSession
 from ..i18n import Localizer, Translations
 from ..compat import Path
+from ..package import enable_qualifications
 
 from .util import _
 from .model import Base, Setting
@@ -55,6 +56,10 @@ class CoreComponent(Component):
 
     def initialize(self):
         Component.initialize(self)
+
+        # Enable version and git qulifications only in development mode. In
+        # production mode we trust package metadata.
+        enable_qualifications(self.debug)
 
         sa_url = self._engine_url()
         lock_timeout_ms = self.options['database.lock_timeout'].seconds * 1000

@@ -22,16 +22,19 @@
             </tr></thead>
 
             <tbody>
+
+            <%
+                packages = request.env.packages.items()
+                packages.sort(key=lambda i: '' if i[0] == 'nextgisweb' else i[0])
+            %>
             
-            %for dinfo in distinfo:
+            %for pname, pobj in packages:
             <tr>
-                <td>${dinfo.name}</td>
+                <td>${pobj.name}</td>
+                <td>${pobj.version}</td>
                 <td>
-                    ${dinfo.version}
-                </td>
-                <td>
-                    %if dinfo.commit:
-                        ${dinfo.commit}
+                    %if pobj.commit:
+                        ${pobj.commit + ('+' if pobj.dirty else '')}
                     %else:
                         &nbsp;
                     %endif

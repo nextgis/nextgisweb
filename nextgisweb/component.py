@@ -119,10 +119,14 @@ def require(*deps):
 
 
 def load_all(packages=None, components=None):
+    loaded_packages = list()
+    loaded_components = list()
+
     for pkg in pkginfo.packages:
         if packages is not None and not packages.get(pkg, True):
             continue
-
+        
+        loaded_packages.append(pkg)
         for comp in pkginfo.pkg_comp(pkg):
             if components is not None and not components.get(
                 comp, pkginfo.comp_enabled(comp)
@@ -130,8 +134,11 @@ def load_all(packages=None, components=None):
                 continue
             try:
                 __import__(pkginfo.comp_mod(comp))
+                loaded_components.append(comp)
             except Exception:
                 logger.error(
                     "Failed to load component '%s' from module '%s'!",
                     comp, pkginfo.comp_mod(comp))
                 raise
+    
+    return (loaded_packages, loaded_components)

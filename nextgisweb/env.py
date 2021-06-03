@@ -65,9 +65,14 @@ class Env(object):
                     .format(ci))
                 cfg_components[ci] = False
 
-        load_all(packages=cfg_packages, components=cfg_components)
+        loaded_packages, loaded_components = load_all(
+            packages=cfg_packages, components=cfg_components)
 
-        not_found_packages = set(cfg_packages) - set(pkginfo.packages)
+        self.packages = dict((
+            (name, pkginfo.packages[name])
+            for name in loaded_packages))
+
+        not_found_packages = set(cfg_packages) - set(pkginfo.packages.keys())
         if len(not_found_packages) > 0:
             logger.warning(
                 "Not found packages from configuration: {}"
@@ -83,13 +88,10 @@ class Env(object):
 
         for comp_class in Component.registry:
             identity = comp_class.identity
-            comp_enabled = pkginfo.comp_enabled(identity)
-            package = pkginfo.comp_pkg(identity)
-
-            if not cfg_packages.get(package, True):
-                continue
-
-            if not cfg_components.get(identity, comp_enabled):
+            if identity not in loaded_components:
+                logger.warn(
+                    "Component '%s' was imported unexpectedly and won't "
+                    "be initialized!", identity)
                 continue
 
             cfgcomp = _filter_by_prefix(cfg, identity + '.')

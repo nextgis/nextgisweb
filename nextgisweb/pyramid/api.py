@@ -256,7 +256,7 @@ def locdata(request):
 
 
 def pkg_version(request):
-    return dict([(p, pkginfo.pkg_version(p)) for p in pkginfo.packages])
+    return dict([(p.name, p.version) for p in request.env.packages.values()])
 
 
 def healthcheck(request):
