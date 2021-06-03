@@ -44,7 +44,7 @@ class Package(object):
             self._commit = m.group(2)
             self._dirty = m.group(3) is not None
         else:
-            self._version = None
+            self._version = self._version_raw
             self._commit = None
             self._dirty = None
         
