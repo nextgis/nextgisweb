@@ -32,43 +32,9 @@
 
     <link href="${request.route_url('pyramid.custom_css')}" rel="stylesheet" type="text/css"/>
 
+    <%include file="nextgisweb:pyramid/template/client_config.mako" />
+
     <script type="text/javascript">
-        var ngwConfig = {
-            debug: ${request.env.core.options["debug"] | json.dumps, n},
-            applicationUrl: ${request.application_url | json.dumps, n},
-            assetUrl: ${request.static_url('nextgisweb:static/') | json.dumps, n },
-            amdUrl: ${request.route_url('amd_package', subpath="") | json.dumps, n},
-            distUrl: ${request.route_url('jsrealm.dist', subpath='') | json.dumps, n}
-        };
-
-        var dojoConfig = {
-            async: true,
-            isDebug: true,
-            packages: [
-                {name: "dist", location: ${ request.route_url('jsrealm.dist', subpath='') | json.dumps, n}},
-                {name: "@nextgisweb", location: ${ request.route_url('jsrealm.dist', subpath='main/@nextgisweb') | json.dumps, n}}
-            ],
-            baseUrl: ${request.route_url('amd_package', subpath="dojo") | json.dumps, n},
-            locale: ${request.locale_name | json.dumps, n},
-            aliases: [
-                ['ngw/route', 'ngw-pyramid/route'],
-                ['openlayers/ol', 'dist/external-ol/ol'],
-                // Ready for removal
-                ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n'],
-                ['ngw/dgrid/css', 'ngw-pyramid/nop'],
-                ['ngw/load-json', '@nextgisweb/pyramid/api/load'],
-                ['ngw/openlayers/layer/_Base', 'ngw-webmap/ol/layer/_Base'],
-                ['ngw/openlayers/layer/Image', 'ngw-webmap/ol/layer/Image'],
-                ['ngw/openlayers/layer/OSM', 'ngw-webmap/ol/layer/OSM'],
-                ['ngw/openlayers/layer/Vector', 'ngw-webmap/ol/layer/Vector'],
-                ['ngw/openlayers/layer/XYZ', 'ngw-webmap/ol/layer/XYZ'],
-                ['ngw/openlayers/Map', 'ngw-webmap/ol/Map'],
-                ['ngw/openlayers/Popup', 'ngw-webmap/ol/Popup'],
-                ['ngw/settings', '@nextgisweb/pyramid/settings'],
-                ['ngw/utils/make-singleton', 'ngw-pyramid/make-singleton'],
-            ]
-        };
-
         %if (hasattr(request, 'context') and hasattr(request.context, 'id')):
         var ngwResourceId = ${request.context.id};
         %endif
