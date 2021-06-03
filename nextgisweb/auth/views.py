@@ -380,6 +380,7 @@ def setup_pyramid(comp, config):
                     keyname=self.obj.keyname,
                     superuser=self.obj.superuser,
                     disabled=self.obj.disabled,
+                    language=self.obj.language,
                     oauth_subject=self.obj.oauth_subject,
                     member_of=[m.id for m in self.obj.member_of],
                     description=self.obj.description,

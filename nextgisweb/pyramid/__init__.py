@@ -59,10 +59,10 @@ class PyramidComponent(Component):
         result = dict()
 
         result['support_url'] = self.env.core.support_url_view(request)
-
         result['company_logo'] = dict(
             enabled=self.company_logo_enabled(request),
             link=self.company_url_view(request))
+        result['locale_available'] = self.env.core.locale_available
 
         return result
 
@@ -97,13 +97,13 @@ class PyramidComponent(Component):
 
         Option('session.cookie.name', str, default='ngw-sid',
                doc="Session cookie name"),
-
         Option('session.cookie.max_age', timedelta, default=timedelta(days=7),
                doc="Session cookie max_age"),
-
         Option('session.activity_delta', timedelta, default=timedelta(minutes=10),
                doc="Session last activity update time delta in seconds."),
 
         Option('debugtoolbar.enabled', bool),
         Option('debugtoolbar.hosts'),
+
+        Option('legacy_locale_switcher', bool, default=False),
     )

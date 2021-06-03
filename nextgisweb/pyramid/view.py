@@ -301,9 +301,21 @@ def setup_pyramid(comp, config):
 
     # Replace default locale negotiator with session-based one
     def locale_negotiator(request):
-        return request.session.get(
-            'pyramid.locale',
-            env.core.locale_default)
+        user_lang = request.user.language
+        if user_lang is not None:
+            return user_lang
+
+        session_lang = request.session.get('pyramid.locale')
+        if session_lang is not None:
+            return session_lang
+
+        accept_lang = request.accept_language.best_match(
+            request.env.core.locale_available)
+        if accept_lang is not None:
+            return accept_lang
+
+        return request.env.core.locale_default
+
     config.set_locale_negotiator(locale_negotiator)
 
     # TODO: Need to get rid of translation dirs!
