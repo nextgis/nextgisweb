@@ -77,7 +77,7 @@ if sys.version_info[0:2] < (3, 6):
     requires.append('python2-secrets')
     requires.append('OWSLib==0.17.1')
 else:
-    requires.append('OWSLib==0.23.0')
+    requires.append('OWSLib==0.24.1')
 
 extras_require = {
     'dev': ['pdbpp', 'ipython']
