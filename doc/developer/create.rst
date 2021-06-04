@@ -285,6 +285,14 @@ To create vector layer execute following request:
    :<json jsonobj source: JSON object with file upload response
    :<json jsonobj srs: spatial reference of creating vector layer. Should be the same as web map
    :<json int id: EPSG code
+   :<json string cast_geometry_type: layer geometry type: ``POINT``, ``LINESTRING`` or ``POLYGON``. ``null`` for auto-detect (default)
+   :<json bool cast_is_multi: is layer geometry multi. ``null`` for auto-detect (default)
+   :<json bool cast_has_z: is layer geometry 3D. ``null`` for auto-detect (default)
+   :<json bool skip_other_geometry_types: skip features with other geometry types, used if ``cast_geometry_type`` is specified (default: ``false``)
+   :<json string fix_errors: data errors fix level: ``NONE`` - do not fix (default), ``SAFE`` - without losing data, ``LOSSY`` - whatever possible
+   :<json bool skip_errors: skip features with unfixable errors (default: ``false``)
+   :<json bool fid_source: feature ID source: ``SEQUENCE`` - ID is counted from 1 (default), ``FIELD`` - get ID from field (``fid_field`` required), ``AUTO`` - get ID from field if ``fid_field`` is set, otherwise count from 1
+   :<json string fid_field: field from which feature ID is taken (optional)
    :statuscode 201: no error
 
 **Example request**:
@@ -315,7 +323,15 @@ To create vector layer execute following request:
         },
         "srs": {
           "id": 3857
-        }
+        },
+        "cast_geometry_type": "POLYGON",
+        "cast_is_multi": true,
+        "cast_has_z": false,
+        "skip_other_geometry_types": true,
+        "fix_errors": "LOSSY",
+        "skip_errors": true,
+        "fid_source": "AUTO",
+        "fid_field": "ngw_id"
       }
     }
 
