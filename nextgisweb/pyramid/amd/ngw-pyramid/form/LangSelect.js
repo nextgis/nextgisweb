@@ -23,8 +23,8 @@ define([
                 value: null,
                 label: i18n.gettext("Browser default")
             });
-            settings.locale_available.forEach(function (lang) {
-                this.addOption({ value: lang, label: lang});
+            settings.langages.forEach(function (langage) {
+                this.addOption({ value: langage.value, label: langage.display_name});
             }.bind(this));
         }
     });

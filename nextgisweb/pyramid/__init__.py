@@ -5,6 +5,8 @@ from datetime import datetime as dt, timedelta
 from pkg_resources import resource_filename
 
 import transaction
+from babel import Locale
+from babel.core import UnknownLocaleError
 
 from ..lib.config import Option
 from ..component import Component, require
@@ -62,7 +64,17 @@ class PyramidComponent(Component):
         result['company_logo'] = dict(
             enabled=self.company_logo_enabled(request),
             link=self.company_url_view(request))
-        result['locale_available'] = self.env.core.locale_available
+        result['langages'] = []
+        for locale in self.env.core.locale_available:
+            try:
+                babel_locale = Locale.parse(locale)
+            except UnknownLocaleError:
+                display_name = locale
+            else:
+                display_name = babel_locale.get_display_name().title()
+            result['langages'].append(dict(
+                display_name=display_name,
+                value=locale))
 
         return result
 
