@@ -41,7 +41,7 @@ storage_stat_dimension = db.Table(
     db.Column('tstamp', db.TIMESTAMP, nullable=False),
     db.Column('component', db.Unicode),
     db.Column('kind_of_data', db.Unicode),
-    db.Column('resource_id', db.Integer),
+    db.Column('resource_id', db.Integer, index=True),
     db.Column('value_data_volume', db.Integer),
 )
 
@@ -59,7 +59,7 @@ storage_stat_delta = db.Table(
     db.Column('tstamp', db.TIMESTAMP, nullable=False),
     db.Column('component', db.Unicode),
     db.Column('kind_of_data', db.Unicode),
-    db.Column('resource_id', db.Integer),
+    db.Column('resource_id', db.Integer, index=True),
     db.Column('value_data_volume', db.Integer),
 )
 
