@@ -23,7 +23,7 @@ define([
     return declare([_WidgetBase, _TemplatedMixin],{
         templateString: i18n.renderTemplate(template),
         userName: undefined,
-        logoutLink: "#",
+        links: {},
         constructor: function (options) {
             declare.safeMixin(this,options);
         },

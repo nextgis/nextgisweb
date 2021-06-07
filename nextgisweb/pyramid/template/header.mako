@@ -76,7 +76,10 @@
         %if user_mode != 'guest':
             (new UserAvatar({
                 userName: '${user_display_name}',
-                logoutLink: '${request.route_url(logout_route_name)}'
+                links: {
+                    logout: '${request.route_url(logout_route_name)}',
+                    settings: '${request.route_url("auth.user_settings")}'
+                }
             })).placeAt('userAvatar');
         %endif
 
@@ -90,12 +93,6 @@
                 ,{
                     "text": '${tr(_("Control panel"))}',
                     "link": '${request.route_url("pyramid.control_panel")}'
-                }
-            %endif
-            %if user_mode != 'guest':
-                ,{
-                    "text": '${tr(_("User settings"))}',
-                    "link": '${request.route_url("auth.user_settings")}'
                 }
             %endif
             <% help_page_url = request.env.pyramid.help_page_url_view(request) %>
