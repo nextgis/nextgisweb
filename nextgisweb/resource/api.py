@@ -340,30 +340,31 @@ def resource_volume(resource, request):
 
     def _collect_ids(res):
         request.resource_permission(ResourceScope.read, res)
-
         ids.append(res.id)
-
         for child in res.children:
             _collect_ids(child)
 
     try:
         _collect_ids(resource)
     except InsufficientPermissions:
-        return 0
+        volume = 0
+    else:
+        t1 = storage_stat_dimension
+        t2 = storage_stat_delta
 
-    t1 = storage_stat_dimension
-    t2 = storage_stat_delta
+        s1 = select([t1.c.resource_id, t1.c.value_data_volume])
+        s2 = select([t2.c.resource_id, t2.c.value_data_volume])
 
-    s1 = select([t1.c.resource_id, t1.c.value_data_volume])
-    s2 = select([t2.c.resource_id, t2.c.value_data_volume])
+        s3 = s1.union_all(s2).alias('s')
 
-    s3 = s1.union_all(s2).alias('s')
+        s4 = select([func.sum(s3.c.value_data_volume)]) \
+            .where(s3.c.resource_id.in_(ids)).alias('s')
 
-    s4 = select([func.sum(s3.c.value_data_volume)]) \
-        .where(s3.c.resource_id.in_(ids)).alias('s')
+        result = DBSession.query(s4).scalar()
 
-    result = DBSession.query(s4).scalar()
-    return 0 if result is None else result
+        volume = 0 if result is None else result
+
+    return dict(volume=volume)
 
 
 def setup_pyramid(comp, config):
@@ -391,6 +392,11 @@ def setup_pyramid(comp, config):
         .add_view(permission_explain, request_method='GET', renderer='json')
 
     config.add_route(
+        'resource.volume', '/api/resource/{id}/volume',
+        factory=resource_factory) \
+        .add_view(resource_volume, request_method='GET', renderer='json')
+
+    config.add_route(
         'resource.quota', '/api/resource/quota') \
         .add_view(quota, request_method='GET')
 
@@ -405,5 +411,3 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.file_download', r'/api/resource/{id:\d+}/file/{name:.*}',
         factory=resource_factory)
-
-    comp.resource_volume = resource_volume
