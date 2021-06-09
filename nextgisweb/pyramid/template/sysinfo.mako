@@ -24,7 +24,7 @@
             <tbody>
 
             <%
-                packages = request.env.packages.items()
+                packages = list(request.env.packages.items())
                 packages.sort(key=lambda i: '' if i[0] == 'nextgisweb' else i[0])
             %>
             
