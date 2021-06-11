@@ -377,10 +377,10 @@ def setup_pyramid(comp, config):
         .add_view(control_panel, renderer=ctpl('control_panel'))
 
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
-    
+
     config.add_route(
         'pyramid.control_panel.sysinfo',
-        '/control-panel/sysinfo'
+        '/control-panel/sysinfo', client=(),
     ).add_view(sysinfo, renderer=ctpl('sysinfo'))
 
     config.add_route(

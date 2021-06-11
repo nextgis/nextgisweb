@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from subprocess import check_output
 from six import ensure_str
 
+import requests
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm.exc import NoResultFound
@@ -121,6 +122,9 @@ class CoreComponent(Component):
                            self.options.get('provision.instance_id', str(uuid.uuid4())))
         self.init_settings(self.identity, 'system.name',
                            self.options.get('system.name', 'NextGIS Web'))
+
+        if self.check_update():
+            self.logger.info("New update available.")
 
     def gtsdir(self, comp):
         """ Get component's file storage folder """
@@ -231,6 +235,24 @@ class CoreComponent(Component):
             result.append(("GDAL", gdal_version))
 
         return result
+
+    def check_update(self):
+        has_update = False
+
+        query = dict()
+        distr_opts = self.env.options.with_prefix('distribution')
+        if distr_opts.get('name') is not None:
+            query['distribution'] = distr_opts['name'] + ':' + distr_opts['version']
+
+        try:
+            res = requests.get(self.env.ngupdate_url + '/api/query',
+                               query, timeout=5.0)
+            if res.status_code == 200:
+                has_update = res.json()['distribution']['status'] == 'has_update'
+        except Exception:
+            pass
+
+        return has_update
 
     def query_stat(self):
         result = dict()
