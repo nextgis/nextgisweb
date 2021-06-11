@@ -78,7 +78,7 @@
                 userName: '${user_display_name}',
                 links: {
                     logout: '${request.route_url(logout_route_name)}',
-                    settings: '${request.route_url("auth.user_settings")}'
+                    settings: '${request.route_url("auth.settings")}'
                 }
             })).placeAt('userAvatar');
         %endif

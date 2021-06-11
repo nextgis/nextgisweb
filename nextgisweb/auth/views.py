@@ -191,7 +191,7 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
         return response
 
 
-def user_settings(request):
+def settings(request):
     if request.user.keyname == 'guest':
         return HTTPUnauthorized()
 
@@ -216,8 +216,8 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.oauth', '/oauth').add_view(oauth)
 
-    config.add_route('auth.user_settings', '/user_settings') \
-        .add_view(user_settings, renderer='nextgisweb:auth/template/user_settings.mako')
+    config.add_route('auth.settings', '/settings') \
+        .add_view(settings, renderer='nextgisweb:auth/template/settings.mako')
 
     config.add_request_method(_login_url, name='login_url')
 
