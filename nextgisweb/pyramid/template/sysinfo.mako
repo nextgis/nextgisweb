@@ -10,6 +10,9 @@
 <% distr_opts = request.env.options.with_prefix('distribution') %>
 %if distr_opts.get('name') is not None:
     <h2>${distr_opts.get('description')} ${distr_opts.get('version')} (${distr_opts.get('date')})</h2>
+    <div id="release-notes" style="margin-bottom: 10px;">
+        <button id="show-notes-btn" style="display: none;" class="has-update-only">${tr("Show release notes")}</button>
+    </div>
 %endif
 
 <div class="content-box">
@@ -65,8 +68,12 @@
 
 <script>
 require([
+    "dojo/request/xhr",
     "ngw-pyramid/CopyButton/CopyButton",
-], function (CopyButton) {
+], function (
+    xhr,
+    CopyButton,
+) {
     var domCopyButton = document.getElementById("info-copy-btn")
     var copyButton = new CopyButton({
         targetAttribute: function (target) {
@@ -74,5 +81,26 @@ require([
         }
     });
     copyButton.placeAt(domCopyButton);
+
+    <% ngupdate_url = request.env.ngupdate_url %>
+    %if ngupdate_url != '' and distr_opts.get('name') is not None:
+        var distr_name = "${distr_opts.get('name', '')}";
+        var distr_version = "${distr_opts.get('version', '')}";
+        var ngupdate_url = "${ngupdate_url}";
+
+        var showNotesButton = document.getElementById("show-notes-btn");
+        showNotesButton.onclick = function () {
+            showNotesButton.style.display = "none";
+
+            var iframe = document.createElement("iframe");
+            var query = "distribution=" + distr_name + ":" + distr_version;
+            iframe.src = ngupdate_url + "/api/notes?" + query;
+            iframe.setAttribute("frameborder", 0);
+            iframe.style.width = "100%";
+
+            var releaseNotesBlock = document.getElementById("release-notes");
+            releaseNotesBlock.appendChild(iframe);
+        }
+    %endif
 });
 </script>

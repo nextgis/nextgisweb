@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
+
 import re
 import logging
 import logging.config
-import six
+import os
 from collections import OrderedDict
 
+import six
 import sqlalchemy as sa
 
 from .lib.config import OptionAnnotations, Option, ConfigOptions, load_config
@@ -102,6 +104,8 @@ class Env(object):
                 "Attribute name %s already used" % identity
 
             setattr(self, identity, instance)
+
+        self.ngupdate_url = os.environ.get('NGUPDATE_URL', '')
 
     def chain(self, meth, first='core'):
         """ Building a sequence of method calls with dependencies.
