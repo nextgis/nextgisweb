@@ -4,11 +4,9 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/Tooltip",
-    "dojo/request/xhr",
-    "dojo/json",
-    "ngw/route",
-    "ngw-pyramid/ErrorDialog/ErrorDialog",
+    "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
+    "ngw-pyramid/ErrorDialog/ErrorDialog",
     "dojo/text!./template/SettingsForm.hbs",
     // template
     "dijit/layout/BorderContainer",
@@ -20,14 +18,12 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     Tooltip,
-    xhr,
-    json,
-    route,
-    ErrorDialog,
+    api,
     i18n,
+    ErrorDialog,
     template
 ) {
-    var PROFILE_URL = route.auth.profile();
+    var profileRoute = api.route('auth.profile');
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
@@ -35,11 +31,12 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
-            xhr.get(PROFILE_URL, {
-                handleAs: "json"
-            }).then(function (data) {
-                this.language.set("value", data.language, false);
-            }.bind(this));
+            profileRoute.get().then(
+                function (data) {
+                    this.language.set("value", data.language, false)    
+                }.bind(this),
+                function (err) { new ErrorDialog(err).show() }
+            )
         },
 
         startup: function () {
@@ -52,21 +49,15 @@ define([
         },
 
         save: function (data) {
-            xhr.put(PROFILE_URL, {
-                handleAs: "json",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                data: json.stringify(data)
-            }).then(
+            profileRoute.put({json: data}).then(
                 function () {
                     Tooltip.show(i18n.gettext("Saved"), this.language.domNode);
                     setTimeout(function () {
                         Tooltip.hide(this.language.domNode)
                     }.bind(this), 1000);
                 }.bind(this),
-                ErrorDialog.xhrError
-            );
+                function (err) { new ErrorDialog(err).show() }
+            )
         }
     });
 });
