@@ -3,6 +3,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
+    "dijit/Tooltip",
     "dojo/request/xhr",
     "dojo/json",
     "ngw/route",
@@ -18,6 +19,7 @@ define([
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
+    Tooltip,
     xhr,
     json,
     route,
@@ -57,7 +59,12 @@ define([
                 },
                 data: json.stringify(data)
             }).then(
-                function () {},
+                function () {
+                    Tooltip.show(i18n.gettext("Saved"), this.language.domNode);
+                    setTimeout(function () {
+                        Tooltip.hide(this.language.domNode)
+                    }.bind(this), 1000);
+                }.bind(this),
                 ErrorDialog.xhrError
             );
         }
