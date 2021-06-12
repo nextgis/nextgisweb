@@ -280,9 +280,12 @@ def resource_after_delete(mapper, connection, target):
     if IResourceEstimateStorage.providedBy(target):
         connection.execute(text('''
             INSERT INTO core_storage_stat_delta (
-                "timestamp", component, kind_of_data, resource_id, value_data_volume
+                tstamp, component, kind_of_data,
+                resource_id, value_data_volume
             )
-            SELECT :timestamp, component, kind_of_data, :resource_id, -sum(value_data_volume)
+            SELECT
+                :timestamp, component, kind_of_data,
+                :resource_id, -SUM(value_data_volume)
             FROM (
                 SELECT component, kind_of_data, resource_id, value_data_volume
                 FROM core_storage_stat_dimension
