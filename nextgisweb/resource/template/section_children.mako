@@ -1,10 +1,11 @@
 <%!
-import math
-from bunch import Bunch
-from nextgisweb import dynmenu as dm
-from nextgisweb.resource.util import _
-from nextgisweb.resource.scope import ResourceScope, DataScope
-from nextgisweb.webmap.model import WebMapScope
+    import math
+    import json
+    from bunch import Bunch
+    from nextgisweb import dynmenu as dm
+    from nextgisweb.resource.util import _
+    from nextgisweb.resource.scope import ResourceScope, DataScope
+    from nextgisweb.webmap.model import WebMapScope
 %>
 
 <%namespace file="nextgisweb:pyramid/template/util.mako" import="icon"/>
@@ -30,7 +31,7 @@ from nextgisweb.webmap.model import WebMapScope
             %if ResourceScope.read not in permissions:
                 <% continue %>
             %endif
-            <tr data-resource-id="${item.id}">
+            <tr data-id="${item.id}">
                 <td class="children-table__name">
                     <a class="children-table__name__link text-withIcon" href="${item.permalink(request)}">
                         ${icon('svg:' + item.cls)}
@@ -38,8 +39,8 @@ from nextgisweb.webmap.model import WebMapScope
                     </a>
                 </td>
                 <td>${tr(item.cls_display_name)}</td>
-                <td class="resource-volume" style="display: none;"></td>
                 <td>${item.owner_user}</td>
+                <td class="column-storageUsage" style="display: none; text-align: right"></td>
                 <td class="children-table__action">
                     <% args = Bunch(obj=item, request=request) %>
                     %for menu_item in item.__dynmenu__.build(args):
@@ -56,106 +57,91 @@ from nextgisweb.webmap.model import WebMapScope
 <script type="text/javascript">
     require([
         "@nextgisweb/pyramid/tablesort",
-        "ngw/route",
-        "dojo/promise/all",
-        "dojo/request/xhr",
+        "@nextgisweb/pyramid/api",
+        "dojo/query",
+        "dojo/dom",
+        "dojo/dom-style",
+        "dijit/Menu",
+        "dijit/MenuItem",
         "dojo/domReady!"
     ], function (
         tablesort,
-        route,
-        all,
-        xhr,
+        api,
+        query, 
+        dom,
+        domStyle,
+        Menu,
+        MenuItem
     ) {
         tablesort.byId("children-table");
 
-        var children_table = document.getElementById("children-table");
-        var volume_cell_head = document.getElementById("resource-volume-head");
-        var rows = children_table
-            .getElementsByTagName("tbody")[0]
-            .getElementsByTagName("tr");
-        var volume_cells = [];
-        rows.forEach(function (element) {
-            var resource_id_str = element.getAttribute("data-resource-id");
-            var volume_cell = element.getElementsByClassName("resource-volume")[0];
-            volume_cells[resource_id_str] = volume_cell;
-        });
-        var show_volume_chk = document.getElementById("show-volume-chk");
-
-        var volumes_loaded = false;
-        var in_progress = false;
-
-        function toggle_resource_volume (show) {
-
-            function _toggle_resource_volume_display (show) {
-                var display = show ? "" : "none";
-                volume_cell_head.style.display = display;
-                Object.keys(volume_cells).forEach(function (resource_id_str) {
-                    var volume_cell = volume_cells[resource_id_str];
-                    volume_cell.style.display = display;
-                });
-                in_progress = false;
-            }
-
-            if (show && !volumes_loaded) {
-
-                function volume_pretty(volume) {
-                    if (volume === 0) {
-                        return "-";
-                    } else {
-                        var units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-                        var i = Math.min(Math.floor(Math.log(volume) / Math.log(1024)), units.length - 1)
-                        value = volume / 1024**i;
-                        return value.toFixed(2) + " " + units[i];
-                    }
-                }
-
-                var wait_requests = 0;
-                for (var resource_id_str in volume_cells) {
-                    var volume_cell = volume_cells[resource_id_str];
-
-                    wait_requests++;
-                    xhr.get(route.resource.volume({
-                        id: resource_id_str
-                    }), {
-                        handleAs: "json"
-                    }).then(function (data) {
-                        this.innerHTML = volume_pretty(data.volume);
-                    }.bind(volume_cell))
-                    .finally(function () {
-                        if (--wait_requests === 0) {
-                            volumes_loaded = true;
-                            _toggle_resource_volume_display(show)
-                        }
-                    });
-                }
+        function formatSize(volume) {
+            if (volume === 0) {
+                return "-";
             } else {
-                _toggle_resource_volume_display(show);
+                var units = ["B", "KB", "MB", "GB", "TB"];
+                var i = Math.min(Math.floor(Math.log(volume) / Math.log(1024)), units.length - 1);
+                value = volume / 1024 ** i;
+                return value.toFixed(2) + " " + units[i];
             }
         }
 
-        show_volume_chk.onclick = function (event) {
-            if (in_progress) {
-                event.preventDefault();
-                return;
-            }
+        function showStorageUsage() {
+            var tableNode = dom.byId('children-table');
+            var cells = query('.column-storageUsage', tableNode);
+            var tasks = [];
 
-            in_progress = true;
-            var show = show_volume_chk.checked;
-            toggle_resource_volume(show);
-        };
+            cells.forEach(function (node) {
+                domStyle.set(node, 'display', '');
+                var id = node.parentElement.getAttribute('data-id');
+                if (id !== null) {
+                    node.innerHTML = '...';
+                    tasks.push({id: id, node: node});
+                }
+            });
+
+            function next() {
+                var task = tasks.shift();
+                if (task === undefined) {
+                    return;
+                };
+                api.route('resource.volume', task.id).get().then(
+                    function (data) {
+                        task.node.innerHTML = formatSize(data.volume);
+                        task.node.setAttribute('data-sort', data.volume);
+                        next();
+                    }
+                )
+            };
+
+            next();
+        }
+
+        var menu = new Menu({
+            targetNodeIds: ['resourceChildrenOptions'],
+            leftClickToOpen: true,
+        });
+
+        menu.addChild(new MenuItem({
+            label: ${tr(_("Show storage usage")) | json.dumps, n },
+            onClick: showStorageUsage,
+        }));
+
+        menu.startup();
     });
 </script>
 
-<input id="show-volume-chk" type="checkbox">${tr(_("Show volume"))}</input>
 <div class="table-wrapper">
     <table id="children-table" class="children-table pure-table pure-table-horizontal">
         <thead>
             <tr>
                 <th class='sort-default' style="width: 40%; text-align: inherit;">${tr(_("Display name"))}</th>
                 <th style="width: 25%; text-align: inherit;">${tr(_("Type"))}</th>
-                <th style="width: 10%; text-align: inherit; display: none;" id="resource-volume-head">${tr(_("Volume"))}</th>
                 <th style="width: 20%; text-align: inherit;">${tr(_("Owner"))}</th>
-                <th class="no-sort" style="width: 0%">&nbsp;</th>
+                <th class="column-storageUsage" data-sort-method='number' style="width: 20%; text-align: right; display: none;">${tr(_("Storage usage"))}</th>
+                <th class="no-sort" style="width: 0%; text-align: right;">
+                    <i id="resourceChildrenOptions" class="material-icons icon-moreVert" style="cursor: pointer;"></i>
+                </th>
             </tr>
         </thead>
         <% 
