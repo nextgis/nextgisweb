@@ -30,6 +30,10 @@ msgstr "Отслеживать изменения"
 msgid "Seed zoom level"
 msgstr "Заполнить масштабный уровень"
 
+#: amd/ngw-render/template/TileCacheWidget.hbs:42
+msgid "Flush"
+msgstr "Очистить"
+
 #: template/section_api_renderable.mako:8
 msgid "TMS (Tile Map Service)"
 msgstr "TMS (Tile Map Service)"

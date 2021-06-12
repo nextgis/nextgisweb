@@ -543,9 +543,22 @@ class ResourceTileCacheSeializedProperty(SerializedProperty):
             setattr(srlzr.obj.tile_cache, self.attrname, value)
 
 
+class TileCacheFlushProperty(SerializedProperty):
+
+    def getter(self, srlzr):
+        return None
+    
+    def setter(self, srlzr, value):
+        if srlzr.obj.tile_cache is not None:
+            srlzr.obj.tile_cache.clear()
+
+
 class ResourceTileCacheSerializer(Serializer):
     identity = 'tile_cache'
     resclass = Resource
+
+    # NOTE: Flush property should be deserialized at first!
+    flush = TileCacheFlushProperty(read=None, write=ResourceScope.update)
 
     __permissions = dict(read=ResourceScope.read, write=ResourceScope.update)
 

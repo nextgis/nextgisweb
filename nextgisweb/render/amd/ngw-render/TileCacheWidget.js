@@ -36,6 +36,7 @@ define([
             value.enabled = (value.enabled === "on") ? true : false;
             value.track_changes = (value.track_changes === "on") ? true : false;
             value.image_compose = (value.image_compose === "on") ? true : false;
+            value.flush = (value.image_compose === "on") ? true : false;
         },
 
         _onEnabledChange: function (newValue) {
