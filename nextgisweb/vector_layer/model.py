@@ -8,7 +8,6 @@ import ctypes
 from datetime import datetime, time, date
 import six
 
-import zope.event
 from zope.interface import implementer
 from osgeo import gdal, ogr, osr
 from shapely.geometry import box
@@ -25,7 +24,7 @@ from sqlalchemy import (
 
 from ..event import SafetyEvent
 from .. import db
-from ..core import ReserveStorage
+from ..core import reserve_storage
 from ..core.exception import ValidationError
 from ..resource import (
     Resource,
@@ -770,9 +769,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         size = self.tableinfo.load_from_ogr(
             ogrlayer, strdecode, skip_other_geometry_types, fix_errors, skip_errors)
 
-        reserve_event = ReserveStorage(
-            size, component=COMP_ID, kind_of_data=VectorLayerData, resource=self)
-        zope.event.notify(reserve_event)
+        reserve_storage(size, component=COMP_ID,
+                        kind_of_data=VectorLayerData, resource=self)
 
     def get_info(self):
         return super(VectorLayer, self).get_info() + (

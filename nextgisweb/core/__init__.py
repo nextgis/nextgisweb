@@ -42,7 +42,7 @@ from ..package import enable_qualifications
 from .util import _
 from .kind_of_data import *  # NOQA
 from .model import (
-    Base, Setting, ReserveStorage,
+    Base, Setting, reserve_storage,
     storage_stat_dimension, storage_stat_dimension_total,
     storage_stat_delta, storage_stat_delta_total,
 )
