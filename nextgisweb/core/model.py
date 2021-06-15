@@ -93,27 +93,17 @@ db.event.listen(storage_stat_delta, 'after_create', db.DDL('''
 '''), propagate=True)
 
 
-class ReserveStorage(object):
-
-    def __init__(self, value_data_volume, component=None, kind_of_data=None, resource=None):
-        self.component = component
-        self.kind_of_data = kind_of_data
-        self.resource = resource
-        self.value_data_volume = value_data_volume
-
-
 _reserved_lst = []
 
 
-@zope.event.classhandler.handler(ReserveStorage)
-def _reserve_storage(event):
+def reserve_storage(value_data_volume, component=None, kind_of_data=None, resource=None):
     global _reserved_lst
 
     _reserved_lst.append(dict(
-        component=event.component,
-        kind_of_data=event.kind_of_data,
-        resource=event.resource,
-        value_data_volume=event.value_data_volume))
+        component=component,
+        kind_of_data=kind_of_data,
+        resource=resource,
+        value_data_volume=value_data_volume))
 
 
 @sa.event.listens_for(DBSession, 'after_flush')
