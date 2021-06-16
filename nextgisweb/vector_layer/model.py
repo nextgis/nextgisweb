@@ -769,8 +769,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         size = self.tableinfo.load_from_ogr(
             ogrlayer, strdecode, skip_other_geometry_types, fix_errors, skip_errors)
 
-        reserve_storage(size, component=COMP_ID,
-                        kind_of_data=VectorLayerData, resource=self)
+        reserve_storage(COMP_ID, VectorLayerData, value_data_volume=size, resource=self)
 
     def get_info(self):
         return super(VectorLayer, self).get_info() + (

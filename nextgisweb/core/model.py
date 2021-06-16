@@ -96,14 +96,16 @@ db.event.listen(storage_stat_delta, 'after_create', db.DDL('''
 _reserved_lst = []
 
 
-def reserve_storage(value_data_volume, component=None, kind_of_data=None, resource=None):
+def reserve_storage(component, kind_of_data, value_data_volume=None, resource=None):
     global _reserved_lst
 
-    _reserved_lst.append(dict(
-        component=component,
-        kind_of_data=kind_of_data,
-        resource=resource,
-        value_data_volume=value_data_volume))
+    # For now we reserve data volume only
+    if value_data_volume is not None:
+        _reserved_lst.append(dict(
+            component=component,
+            kind_of_data=kind_of_data,
+            resource=resource,
+            value_data_volume=value_data_volume))
 
 
 @sa.event.listens_for(DBSession, 'after_flush')

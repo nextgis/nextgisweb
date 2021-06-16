@@ -251,8 +251,7 @@ class _source_attr(SP):
         srlzr.obj.load_file(filedata, env)
 
         for kind_of_data, size in srlzr.obj.estimate_storage():
-            reserve_storage(size, component=COMP_ID,
-                            kind_of_data=kind_of_data, resource=srlzr.obj)
+            reserve_storage(COMP_ID, kind_of_data, value_data_volume=size, resource=srlzr.obj)
 
 
 class _color_interpretation(SP):
