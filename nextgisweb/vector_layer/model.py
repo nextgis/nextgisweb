@@ -110,9 +110,10 @@ class DRIVERS:
     ESRI_SHAPEFILE = 'ESRI Shapefile'
     GEOJSON = 'GeoJSON'
     KML = 'KML'
+    LIBKML = 'LIBKML'
     GML = 'GML'
 
-    enum = (ESRI_SHAPEFILE, GEOJSON, KML, GML)
+    enum = (ESRI_SHAPEFILE, GEOJSON, KML, LIBKML, GML)
 
 
 OPEN_OPTIONS = ('EXPOSE_FID=NO', )
