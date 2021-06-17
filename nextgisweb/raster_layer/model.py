@@ -162,7 +162,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         subprocess.check_call(cmd)
 
         cmd = [
-            'gdaladdo', '-q', '-ro', '-r', 'cubic',
+            'gdaladdo', '-q', '-ro', '-r', 'gauss',
             '--config', 'COMPRESS_OVERVIEW', 'DEFLATE',
             '--config', 'INTERLEAVE_OVERVIEW', 'PIXEL',
             '--config', 'BIGTIFF_OVERVIEW', 'YES',
