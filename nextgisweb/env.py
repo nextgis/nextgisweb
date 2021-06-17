@@ -105,8 +105,6 @@ class Env(object):
 
             setattr(self, identity, instance)
 
-        self.ngupdate_url = os.environ.get('NGUPDATE_URL', '')
-
     def chain(self, meth, first='core'):
         """ Building a sequence of method calls with dependencies.
         ``core`` component dependency gets added automatically for all
@@ -231,6 +229,11 @@ class Env(object):
                 "Environment configuration option logging.ini_cofig was "
                 "ignored because other logging configuration options were "
                 "given.")
+
+    @property
+    def ngupdate_url(self):
+        env_update_url = os.environ.get('NGUPDATE_URL', '')
+        return env_update_url if env_update_url != '' else 'https://update.nextgis.com'
 
     option_annotations = OptionAnnotations((
         Option('package.*', bool, None, doc=(
