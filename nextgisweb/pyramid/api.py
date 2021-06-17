@@ -312,8 +312,8 @@ def storage(request):
     t1 = storage_stat_dimension_total
     t2 = storage_stat_delta_total
 
-    s1 = select([t1.c.kind_of_data, t1.c.value_data_volume])
-    s2 = select([t2.c.kind_of_data, t2.c.value_data_volume])
+    s1 = select([t1.c.kind_of_data, t1.c.value_data_volume, t1.c.tstamp])
+    s2 = select([t2.c.kind_of_data, t2.c.value_data_volume, t2.c.tstamp])
 
     s3 = s1.union_all(s2).alias('s')
 
@@ -327,7 +327,7 @@ def storage(request):
 
     result['storage'] = storage
 
-    timestamp = DBSession.query(select([func.min(t1.c.tstamp)]).alias('t')).scalar()
+    timestamp = DBSession.query(select([func.min(s3.c.tstamp)]).alias('t')).scalar()
     result['timestamp'] = timestamp
 
     return result
