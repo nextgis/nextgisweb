@@ -498,14 +498,16 @@ def cget(resource, request):
     # Filtering by attributes
     filter_ = []
     keys = [fld.keyname for fld in resource.fields]
-    for key in filter(lambda k: k.startswith('fld_'), request.GET.keys()):
+    keys.append('id')
+    for fld_key in filter(lambda k: k.startswith('fld_'), request.GET.keys()):
+        fld_expr = re.sub('^fld_', '', fld_key)
         try:
-            fld_key, operator = key.rsplit('__', 1)
+            key, operator = fld_expr.rsplit('__', 1)
         except ValueError:
-            fld_key, operator = (key, 'eq')
+            key, operator = (fld_expr, 'eq')
 
-        if fld_key in ['fld_%s' % k for k in keys]:
-            filter_.append((re.sub('^fld_', '', fld_key), operator, request.GET[key]))
+        if key in keys:
+            filter_.append((key, operator, request.GET[fld_key]))
 
     if filter_:
         query.filter(*filter_)
