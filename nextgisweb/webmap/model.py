@@ -266,7 +266,11 @@ class WebMapSerializer(Serializer):
 
 @event.listens_for(SRS, 'after_delete')
 def check_measurement_srid(mapper, connection, target):
-    measurement_srid = env.core.settings_get('webmap', 'measurement_srid')
+    try:
+        measurement_srid = env.core.settings_get('webmap', 'measurement_srid')
+    except KeyError:
+        return
+
     if measurement_srid == target.id:
         connection.execute("""
             UPDATE setting SET value = 4326
