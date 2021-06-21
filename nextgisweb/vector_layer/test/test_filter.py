@@ -34,6 +34,9 @@ check_list = [
     ['string', 'notin', ['Foo, bar', 'bar', 'foo bar, baz'], ['Foo bar,2,3']],
     ['string', 'like', ['Foo%', '%bar', '%ba%'], ['bar%', 'foo%']],
     ['string', 'ilike', ['foo%', '%BAR', '%bA%'], ['bar%', '%foo']],
+    ['id', 'eq', [1], [0, 2]],
+    ['id', 'le', [1, 2], [0]],
+    ['id', 'gt', [0], [1, 2]],
 ]
 
 tests = []
@@ -73,12 +76,13 @@ def resource(ngw_txn, ngw_resource_group):
 
 @pytest.mark.parametrize('filter_, length', tests)
 def test_filter(filter_, length, resource, ngw_txn):
-    query_fields = resource.feature_query()
-    query_fields.limit(1)
-    fields = query_fields().one().fields
-    filtered_field = fields[filter_[0]]
-
     query = resource.feature_query()
-    query.filter(filter_)
-    msg = "%s for '%s' should be %s" % (filter_, filtered_field, length)
-    assert query().total_count == length, msg
+    query.limit(1)
+    feature = query().one()
+    key = filter_[0]
+    filtered_value = feature.id if key == 'id' else feature.fields[key]
+
+    query_filter = resource.feature_query()
+    query_filter.filter(filter_)
+    msg = "%s for '%s' should be %s" % (filter_, filtered_value, length)
+    assert query_filter().total_count == length, msg
