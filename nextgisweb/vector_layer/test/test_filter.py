@@ -38,14 +38,15 @@ check_list = [
 
 tests = []
 
-for c in check_list:
-    [key, operator, should_be_true, should_be_false] = c
-    should_array = [should_be_false, should_be_true]
-    for i in range(len(should_array)):
-        s = should_array[i]
-        for v in s:
-            filter_ = [[key, operator, v]]
-            tests.append([filter_, i])
+for key, operator, should_be_true, should_be_false in check_list:
+    def add_param(v, length):
+        filter_ = [key, operator, v]
+        tests.append(pytest.param(filter_, length, id='{} {} {{{}}}'.format(key, operator, v)))
+
+    for v in should_be_true:
+        add_param(v, 1)
+    for v in should_be_false:
+        add_param(v, 0)
 
 
 @pytest.fixture
@@ -70,19 +71,14 @@ def resource(ngw_txn, ngw_resource_group):
     return resource
 
 
-@pytest.mark.parametrize('data', tests)
-def test_attribution(data, resource, ngw_txn):
+@pytest.mark.parametrize('filter_, length', tests)
+def test_filter(filter_, length, resource, ngw_txn):
+    query_fields = resource.feature_query()
+    query_fields.limit(1)
+    fields = query_fields().one().fields
+    filtered_field = fields[filter_[0]]
 
     query = resource.feature_query()
-    result = query()
-    fields = list(result)[0].fields
-
-    query = resource.feature_query()
-    filter_ = data[0]
-    filtered_field = fields[filter_[0][0]]
-    query = resource.feature_query()
-    query.filter(*filter_)
-    result = query()
-    features = list(result)
-    msg = "%s for '%s' should be %s" % (filter_, filtered_field, data[1])
-    assert len(features) == data[1], msg
+    query.filter(filter_)
+    msg = "%s for '%s' should be %s" % (filter_, filtered_field, length)
+    assert query().total_count == length, msg
