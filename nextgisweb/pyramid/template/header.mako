@@ -106,11 +106,6 @@
             ],
             class: 'right-menu',
             withOverlay: true,
-            loginLink: '${login_url}',
-            %if user_mode != 'guest':
-              user: '${user_display_name}',
-              logoutLink: '${request.route_url(logout_route_name)}'
-            %endif
         })).placeAt('rightMenu');
     });
 </script>
