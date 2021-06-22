@@ -42,6 +42,7 @@
         box-shadow: 0 3px 5px rgba(0,0,0,.16);
         font-weight: var(--body-font-weight);
         font-family: var(--body-font-family), Roboto, sans-serif;
+        cursor: default;
     }
 
 .user-avatar--active .user-avatar__icon{
