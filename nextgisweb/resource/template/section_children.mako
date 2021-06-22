@@ -135,11 +135,11 @@
     <table id="children-table" class="children-table pure-table pure-table-horizontal">
         <thead>
             <tr>
-                <th class='sort-default' style="width: 40%; text-align: inherit;">${tr(_("Display name"))}</th>
-                <th style="width: 25%; text-align: inherit;">${tr(_("Type"))}</th>
-                <th style="width: 20%; text-align: inherit;">${tr(_("Owner"))}</th>
-                <th class="column-volume" data-sort-method='number' style="width: 20%; text-align: right; display: none;">${tr(_("Volume"))}</th>
-                <th class="no-sort" style="width: 0%; text-align: right;">
+                <th class='sort-default' style="text-align: inherit;">${tr(_("Display name"))}</th>
+                <th style="text-align: inherit;">${tr(_("Type"))}</th>
+                <th style="text-align: inherit;">${tr(_("Owner"))}</th>
+                <th class="column-volume" data-sort-method='number' style="text-align: right; display: none;">${tr(_("Volume"))}</th>
+                <th class="no-sort" style="text-align: right;">
                     <i id="resourceChildrenOptions" class="material-icons icon-moreVert" style="cursor: pointer;"></i>
                 </th>
             </tr>
