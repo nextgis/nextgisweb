@@ -2,29 +2,29 @@
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
-#: api.py:67
+#: api.py:70
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:114
+#: api.py:117
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:117
+#: api.py:120
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:120
+#: api.py:123
 #, python-format
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: api.py:126
+#: api.py:129
 #, python-format
 msgid "Resource class '%s' disabled."
 msgstr "Класс ресурса '%s' отключен."
 
-#: api.py:208
+#: api.py:211
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
@@ -86,11 +86,11 @@ msgstr "Операционная ошибка"
 msgid "Resource"
 msgstr "Ресурс"
 
-#: model.py:252
+#: model.py:253
 msgid "Resource can not be a parent himself."
 msgstr "Ресурс не может быть родителем сам себе."
 
-#: model.py:265
+#: model.py:266
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
@@ -349,9 +349,17 @@ msgstr "Тип"
 msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных во внешние приложения."
 
-#: template/section_children.mako:69 template/section_summary.mako:44
+#: template/section_children.mako:126
+msgid "Show resources volume"
+msgstr "Показать размер ресурсов"
+
+#: template/section_children.mako:140 template/section_summary.mako:44
 msgid "Owner"
 msgstr "Владелец"
+
+#: template/section_children.mako:141
+msgid "Volume"
+msgstr "Размер"
 
 #: template/section_description.mako:4
 msgid "Resource description is empty."

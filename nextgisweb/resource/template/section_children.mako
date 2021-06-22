@@ -40,7 +40,7 @@
                 </td>
                 <td>${tr(item.cls_display_name)}</td>
                 <td>${item.owner_user}</td>
-                <td class="column-storageUsage" style="display: none; text-align: right"></td>
+                <td class="column-volume" style="display: none; text-align: right"></td>
                 <td class="children-table__action">
                     <% args = Bunch(obj=item, request=request) %>
                     %for menu_item in item.__dynmenu__.build(args):
@@ -86,9 +86,9 @@
             }
         }
 
-        function showStorageUsage() {
+        function showVolume() {
             var tableNode = dom.byId('children-table');
-            var cells = query('.column-storageUsage', tableNode);
+            var cells = query('.column-volume', tableNode);
             var tasks = [];
 
             cells.forEach(function (node) {
@@ -123,8 +123,8 @@
         });
 
         menu.addChild(new MenuItem({
-            label: ${tr(_("Show storage usage")) | json.dumps, n },
-            onClick: showStorageUsage,
+            label: ${tr(_("Show resources volume")) | json.dumps, n },
+            onClick: showVolume,
         }));
 
         menu.startup();
@@ -138,7 +138,7 @@
                 <th class='sort-default' style="width: 40%; text-align: inherit;">${tr(_("Display name"))}</th>
                 <th style="width: 25%; text-align: inherit;">${tr(_("Type"))}</th>
                 <th style="width: 20%; text-align: inherit;">${tr(_("Owner"))}</th>
-                <th class="column-storageUsage" data-sort-method='number' style="width: 20%; text-align: right; display: none;">${tr(_("Storage usage"))}</th>
+                <th class="column-volume" data-sort-method='number' style="width: 20%; text-align: right; display: none;">${tr(_("Volume"))}</th>
                 <th class="no-sort" style="width: 0%; text-align: right;">
                     <i id="resourceChildrenOptions" class="material-icons icon-moreVert" style="cursor: pointer;"></i>
                 </th>

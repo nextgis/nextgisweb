@@ -1,4 +1,4 @@
-#: api.py:435
+#: api.py:504
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
@@ -8,8 +8,8 @@ msgstr "Внутренняя ошибка сервера"
 
 #: exception.py:209
 msgid ""
-"The server encountered an internal error or misconfiguration and was "
-"unable to complete your request."
+"The server encountered an internal error or misconfiguration and was unable "
+"to complete your request."
 msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
@@ -20,8 +20,8 @@ msgstr "Некорректный запрос"
 
 #: exception.py:239
 msgid ""
-"The server could not comply with the request since it is either malformed"
-" or otherwise incorrect."
+"The server could not comply with the request since it is either malformed or "
+"otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
 #: exception.py:246
@@ -41,9 +41,9 @@ msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
 msgstr ""
-"Возможно, страница удалена либо в адресе допущена ошибка. Исправьте адрес"
-" или вернитесь на главную страницу и попробуйте найти нужную страницу с "
-"помощью навигации."
+"Возможно, страница удалена либо в адресе допущена ошибка. Исправьте адрес или"
+" вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
+"навигации."
 
 #: exception.py:259
 msgid "Unprocessable entity"
@@ -75,43 +75,47 @@ msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: template/header.mako:89 view.py:85
+#: template/header.mako:89 view.py:86
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:109 view.py:428
+#: view.py:108 view.py:444
 msgid "System information"
 msgstr "Информация о системе"
 
 #: view.py:120 view.py:446
+msgid "Storage"
+msgstr "Хранилище"
+
+#: view.py:130 view.py:464
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:135 view.py:434
+#: view.py:145 view.py:452
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:142 view.py:436
+#: view.py:152 view.py:454
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:149 view.py:438
+#: view.py:159 view.py:456
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:156 view.py:432
+#: view.py:166 view.py:450
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:163 view.py:440
+#: view.py:173 view.py:458
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:427
+#: view.py:443
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:431
+#: view.py:449
 msgid "Settings"
 msgstr "Настройки"
 
@@ -210,27 +214,27 @@ msgstr "Войти"
 
 #: amd/ngw-pyramid/template/CORSForm.hbs:17
 msgid ""
-"Enter allowed origins for cross domain requests to use HTTP API of this "
-"Web GIS on other websites. One origin per line."
+"Enter allowed origins for cross domain requests to use HTTP API of this Web "
+"GIS on other websites. One origin per line."
 msgstr ""
 "Введите перечень допустимых источников для кросс-доменных запросов для "
-"использования HTTP API этой Веб ГИС на других веб-сайтах. По одному "
-"источнику в строке."
+"использования HTTP API этой Веб ГИС на других веб-сайтах. По одному источнику"
+" в строке."
 
 #: amd/ngw-pyramid/template/CORSForm.hbs:18
 msgid ""
 "Please note that different protocols (HTTP and HTTPS) and subdomains "
-"(example.com and www.example.com) are different origins. Wildcards are "
-"not allowed."
+"(example.com and www.example.com) are different origins. Wildcards are not "
+"allowed."
 msgstr ""
-"Имейте в виду, что разные протоколы (HTTP и HTTPS) и субдомены "
-"(example.com и www.example.com) считаются разными источниками. Символ "
-"подстановки (*) недопустим."
+"Имейте в виду, что разные протоколы (HTTP и HTTPS) и субдомены (example.com и"
+" www.example.com) считаются разными источниками. Символ подстановки (*) "
+"недопустим."
 
 #: amd/ngw-pyramid/template/CustomCSSForm.hbs:17
 msgid ""
-"Enter custom CSS rules here. They will be used to redefine styles, design"
-" for all pages of your Web GIS."
+"Enter custom CSS rules here. They will be used to redefine styles, design for"
+" all pages of your Web GIS."
 msgstr ""
 "Здесь можно задать стили CSS. Они будут использованы для оформления всех "
 "страниц вашей Веб ГИС."
@@ -279,6 +283,22 @@ msgstr "Пользовательские параметры"
 msgid "Help"
 msgstr "Справка"
 
+#: template/storage.mako:10
+msgid "Kind of data"
+msgstr ""
+
+#: template/storage.mako:11
+msgid "Volume"
+msgstr "Размер"
+
+#: template/storage.mako:21
+msgid "Estimate time and date"
+msgstr ""
+
+#: template/storage.mako:23
+msgid "Estimate now"
+msgstr ""
+
 #: template/sysinfo.mako:20
 msgid "Package"
 msgstr "Пакет"
@@ -287,6 +307,7 @@ msgstr "Пакет"
 msgid "Version"
 msgstr "Версия"
 
-#: template/sysinfo.mako:47
+#: template/sysinfo.mako:50
 msgid "Platform"
 msgstr "Платформа"
+
