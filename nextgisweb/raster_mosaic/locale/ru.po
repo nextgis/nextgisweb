@@ -4,7 +4,7 @@ msgstr "id элемента растровой мозаики не указан.
 
 #: api.py:23
 msgid "Raster mosaic item not found."
-msgstr "Элемент растровой мозаики не найден"
+msgstr "Элемент растровой мозаики не найден."
 
 #: model.py:38
 msgid "Raster mosaic"

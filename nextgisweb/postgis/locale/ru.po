@@ -1,7 +1,7 @@
 #: api.py:48
 #, python-format
 msgid "Table (%s) not found in schema (%s)."
-msgstr ""
+msgstr "Таблица (%s) не найдена в схеме (%s)."
 
 #: amd/ngw-postgis/template/LayerWidget.hbs:42 model.py:49
 msgid "Point"
