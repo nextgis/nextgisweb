@@ -1,16 +1,24 @@
-#: api.py:107
+#: api.py:103
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:112
+#: api.py:108
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:296 api.py:354
+#: api.py:284 api.py:344
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
+
+#: api.py:286
+msgid "Geometry is not valid."
+msgstr "Невалидная геометрия"
+
+#: api.py:544
+msgid "Parameter 'intersects' geometry is not valid."
+msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
 #: exception.py:15
 msgid "Feature not found"
@@ -30,7 +38,7 @@ msgstr "Объект мог быть удалён, либо допущена о�
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:160 view.py:44
+#: amd/ngw-feature-layer/FieldsWidget.js:159 view.py:44
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -39,25 +47,25 @@ msgstr "Таблица объектов"
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:134 view.py:194
+#: view.py:135 view.py:196
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:184
+#: view.py:185
 msgid "Features"
 msgstr "Объекты"
 
-#: template/section_fields.mako:18 view.py:187
+#: template/section_fields.mako:21 view.py:189
 msgid "Table"
 msgstr "Таблица"
 
-#: view.py:204
+#: view.py:206
 msgid "External access"
 msgstr "Внешний доступ"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:192
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: amd/ngw-feature-layer/FieldsWidget.js:123 view.py:209
+#: amd/ngw-feature-layer/FieldsWidget.js:122 view.py:211
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -82,11 +90,11 @@ msgstr "NULL"
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-feature-layer/FeatureGrid.js:241
+#: amd/ngw-feature-layer/FeatureGrid.js:236
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: amd/ngw-feature-layer/FeatureGrid.js:242
+#: amd/ngw-feature-layer/FeatureGrid.js:237
 msgid "Delete feature?"
 msgstr "Удалить объект?"
 
@@ -94,35 +102,35 @@ msgstr "Удалить объект?"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:73 template/section_fields.mako:12
+#: amd/ngw-feature-layer/FieldsWidget.js:72 template/section_fields.mako:15
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:83 template/section_fields.mako:13
+#: amd/ngw-feature-layer/FieldsWidget.js:82 template/section_fields.mako:16
 msgid "Type"
 msgstr "Тип"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:87 template/section_fields.mako:14
+#: amd/ngw-feature-layer/FieldsWidget.js:86 template/section_fields.mako:17
 msgid "Display name"
 msgstr "Наименование"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:101
+#: amd/ngw-feature-layer/FieldsWidget.js:100
 msgid "FT"
 msgstr "ТО"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:111
+#: amd/ngw-feature-layer/FieldsWidget.js:110
 msgid "LA"
 msgstr "АН"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:155
+#: amd/ngw-feature-layer/FieldsWidget.js:154
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:232
+#: amd/ngw-feature-layer/FieldsWidget.js:231
 msgid "Add"
 msgstr "Добавить"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:238
+#: amd/ngw-feature-layer/FieldsWidget.js:237
 msgid "Remove"
 msgstr "Удалить"
 
@@ -176,24 +184,25 @@ msgstr ""
 
 #: template/section_api_layer.mako:17
 msgid ""
-"https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-"
-"vector-tiles"
+"https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-"
+"tiles"
 msgstr ""
-"https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#mvt-"
-"vector-tiles"
+"https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-"
+"tiles"
 
 #: template/section_api_layer.mako:18
 msgid "Read more"
 msgstr "Подробнее"
 
-#: template/section_fields.mako:16
+#: template/section_fields.mako:19
 msgid "Lookup table"
 msgstr "Справочник"
 
-#: template/section_fields.mako:28 template/section_fields.mako:34
+#: template/section_fields.mako:32 template/section_fields.mako:38
 msgid "Yes"
 msgstr "Да"
 
-#: template/section_fields.mako:30 template/section_fields.mako:34
+#: template/section_fields.mako:34 template/section_fields.mako:38
 msgid "No"
 msgstr "Нет"
+

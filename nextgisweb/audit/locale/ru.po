@@ -1,13 +1,17 @@
-#: view.py:30 view.py:85
+#: view.py:32
+msgid "'date_first' and 'date_last' are mutually exclusive."
+msgstr "'date_first' и 'date_last' взаимоисключающие"
+
+#: view.py:52 view.py:109
 msgid "Journal"
 msgstr "Журнал"
 
-#: view.py:59
+#: view.py:82
 #, python-format
 msgid "Journal record: %s"
 msgstr "Запись журнала: %s"
 
-#: view.py:84
+#: view.py:108
 msgid "Audit"
 msgstr "Аудит"
 
@@ -19,39 +23,39 @@ msgstr "Поиск"
 msgid "Export"
 msgstr "Экспорт"
 
-#: template/browse.mako:49
+#: template/browse.mako:45
 msgid "All users"
 msgstr "Все пользователи"
 
-#: template/browse.mako:50
+#: template/browse.mako:46
 msgid "Non-empty users"
 msgstr "Непустые пользователи"
 
-#: template/browse.mako:92
+#: template/browse.mako:88
 msgid "Timestamp"
 msgstr "Время"
 
-#: template/browse.mako:93
+#: template/browse.mako:89
 msgid "Status"
 msgstr "Статус"
 
-#: template/browse.mako:94
+#: template/browse.mako:90
 msgid "Method"
 msgstr "Метод"
 
-#: template/browse.mako:95
+#: template/browse.mako:91
 msgid "Path"
 msgstr "Путь"
 
-#: template/browse.mako:96
+#: template/browse.mako:92
 msgid "Route name"
 msgstr "Имя маршрута"
 
-#: template/browse.mako:97
+#: template/browse.mako:93
 msgid "Context"
 msgstr "Контекст"
 
-#: template/browse.mako:98
+#: template/browse.mako:94
 msgid "User"
 msgstr "Пользователь"
 

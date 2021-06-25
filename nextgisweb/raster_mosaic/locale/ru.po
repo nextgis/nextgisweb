@@ -1,45 +1,53 @@
-#: model.py:37
+#: api.py:17
+msgid "Raster mosaic item id not provided."
+msgstr "id элемента растровой мозаики не указан."
+
+#: api.py:23
+msgid "Raster mosaic item not found."
+msgstr "Элемент растровой мозаики не найден"
+
+#: model.py:38
 msgid "Raster mosaic"
 msgstr "Мозаика растров"
 
-#: model.py:127
+#: model.py:128
 msgid "GDAL library was unable to open the file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:130
+#: model.py:131
 msgid "Only RGB and RGBA rasters are supported."
 msgstr "Поддерживаются только RGB и RGBA растры."
 
-#: model.py:138
+#: model.py:139
 #, python-format
 msgid ""
-"Raster has format '%(format)s', however only following formats are "
-"supported: %(all_formats)s."
+"Raster has format '%(format)s', however only following formats are supported:"
+" %(all_formats)s."
 msgstr ""
 "Формат загруженного растра '%(format)s', однако поддерживаются только "
 "следующие типы: %(all_formats)s."
 
-#: model.py:143
+#: model.py:144
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:154
+#: model.py:155
 msgid "Complex data types are not supported."
 msgstr "Комплексные типы данных не поддерживаются."
 
-#: amd/ngw-raster-mosaic/ItemWidget.js:53
+#: amd/ngw-raster-mosaic/ItemWidget.js:51
 msgid "File name"
 msgstr "Имя файла"
 
-#: amd/ngw-raster-mosaic/ItemWidget.js:64
+#: amd/ngw-raster-mosaic/ItemWidget.js:62
 msgid "Items"
 msgstr "Растры"
 
-#: amd/ngw-raster-mosaic/ItemWidget.js:92
+#: amd/ngw-raster-mosaic/ItemWidget.js:90
 msgid "Upload"
 msgstr "Загрузить"
 
-#: amd/ngw-raster-mosaic/ItemWidget.js:112
+#: amd/ngw-raster-mosaic/ItemWidget.js:110
 msgid "Delete"
 msgstr "Удалить"
 
