@@ -1,30 +1,4 @@
-#: views.py:198
-msgid "User settings"
-msgstr "Ajustes del usuario"
-
-#: views.py:472 views.py:494
-msgid "Create"
-msgstr "Crear"
-
-#: template/login.mako:53
-msgid "Sign in"
-msgstr "Conectarse"
-
-#: template/backup.mako:14
-msgid "Size"
-msgstr "Tamaño"
-
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:98
-msgid "Delete"
-msgstr "Eliminar"
-
-#: amd/ngw-webmap/ItemWidget.js:151 amd/ngw-webmap/template/SettingsForm.hbs:75
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:45
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
-msgid "Save"
-msgstr "Guardar"
-
-#: api.py:438
+#: api.py:435
 msgid "Your Web GIS at nextgis.com"
 msgstr "Tu Web GIS en nextgis.com"
 
@@ -33,7 +7,9 @@ msgid "Internal server error"
 msgstr "Error interno en el servidor"
 
 #: exception.py:209
-msgid "The server encountered an internal error or misconfiguration and was unable to complete your request."
+msgid ""
+"The server encountered an internal error or misconfiguration and was unable "
+"to complete your request."
 msgstr "El servidor no pudo completar su solicitud por una falla interna."
 
 #: exception.py:238
@@ -41,10 +17,14 @@ msgid "Bad request"
 msgstr "Solicitud incorrecta"
 
 #: exception.py:239
-msgid "The server could not comply with the request since it is either malformed or otherwise incorrect."
-msgstr "El servidor no pudo completar su solicitud porque es incorrecta o posee errores."
+msgid ""
+"The server could not comply with the request since it is either malformed or "
+"otherwise incorrect."
+msgstr ""
+"El servidor no pudo completar su solicitud porque es incorrecta o posee "
+"errores."
 
-#: exception.py:68
+#: exception.py:246
 msgid "Forbidden"
 msgstr "Prohibido"
 
@@ -57,8 +37,12 @@ msgid "Page not found"
 msgstr "Página no encontrada"
 
 #: exception.py:252
-msgid "The page may have been deleted or an error in the address. Correct the address or go to the home page and try to find the desired page."
-msgstr "La página pudo haber sido borrada o hay un error en el enlace. Corríjalo o diríjase a la página principal e intente encontrar la dirección deseada."
+msgid ""
+"The page may have been deleted or an error in the address. Correct the "
+"address or go to the home page and try to find the desired page."
+msgstr ""
+"La página pudo haber sido borrada o hay un error en el enlace. Corríjalo o "
+"diríjase a la página principal e intente encontrar la dirección deseada."
 
 #: exception.py:259
 msgid "Unprocessable entity"
@@ -69,7 +53,9 @@ msgid "Unable to process the contained instructions."
 msgstr "No se pueden procesar las instrucciones."
 
 #: exception.py:265
-msgid "The server has either erred or is incapable of performing the requested operation."
+msgid ""
+"The server has either erred or is incapable of performing the requested "
+"operation."
 msgstr "El servidor no pudo completar la solicitud."
 
 #: exception.py:272 exception.py:273
@@ -84,96 +70,96 @@ msgstr "Servicio no disponible"
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr "El servidor no esta disponible. Por favor, intente más tarde."
 
-#: template/header.mako:89 view.py:81
+#: template/header.mako:89 view.py:86
 msgid "Control panel"
 msgstr "Panel de control"
 
-#: view.py:103 view.py:419
-msgid "Package versions"
-msgstr "Versiones de paquetes"
+#: view.py:108 view.py:432
+msgid "System information"
+msgstr "Información del sistema"
 
-#: view.py:114 view.py:437
+#: view.py:123 view.py:450
 msgid "Backups"
 msgstr "Copias de seguridad"
 
-#: view.py:129 view.py:425
+#: view.py:138 view.py:438
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:136 view.py:427
+#: view.py:145 view.py:440
 msgid "Custom CSS"
 msgstr "CSS personalizado"
 
-#: view.py:143 view.py:429
+#: view.py:152 view.py:442
 msgid "Custom logo"
 msgstr "Logo personalizado"
 
-#: view.py:150 view.py:423
+#: view.py:159 view.py:436
 msgid "Web GIS name"
 msgstr "Nombre del Web GIS"
 
-#: view.py:157 view.py:431
+#: view.py:166 view.py:444
 msgid "Home path"
 msgstr "Ruta a la página principal"
 
-#: view.py:418
+#: view.py:431
 msgid "Info"
 msgstr "Información"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:18
+#: view.py:435
 msgid "Settings"
 msgstr "Configuración"
 
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:28
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:30
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:32
 msgid "Copy to clipboard"
 msgstr "Copiar al portapapeles"
 
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:33
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:31
 msgid "Copied"
 msgstr "Copiado"
 
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:34
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:32
 msgid "Unable to copy"
 msgstr "No se ha podido copiar"
 
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:39
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:37
 msgid "Technical information"
 msgstr "Información técnica"
 
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:41
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:39
 msgid "Contact support"
 msgstr "Contacta a soporte"
 
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:43
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:41
 msgid "Back to home"
 msgstr "Volver a la página principal"
 
-#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:29
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:35 nodepkg/api/error.js:18
 msgid "Network error"
 msgstr "Error de conexión"
 
-#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:30
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:36
 msgid "There is no response from the server or problem connecting to server."
 msgstr "No hay respuesta o hay un problema con el servidor."
 
-#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:31
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:37
 msgid "Check network connectivity and try again later."
 msgstr "Compruebe la conexión e intente de nuevo más tarde."
 
-#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:39
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:45
 msgid "Unexpected server response"
 msgstr "Respuesta del servidor inesperada"
 
-#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:40
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:46
 msgid "Something went wrong."
 msgstr "Algo ocurrió."
 
-#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:22
+#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:28
 msgid "Backward"
 msgstr "Atrás"
 
-#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:23
+#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:29
 msgid "Forward"
 msgstr "Adelante"
 
@@ -189,30 +175,77 @@ msgstr "Editor de texto"
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Ingrese un valor de escala correcto, ej. 1:"
 
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:37
+msgid "Create"
+msgstr "Crear"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:39
+#: amd/ngw-pyramid/template/CORSForm.hbs:26
+#: amd/ngw-pyramid/template/CustomCSSForm.hbs:25
+#: amd/ngw-pyramid/template/HomePathForm.hbs:11
+#: amd/ngw-pyramid/template/LogoForm.hbs:22
+#: amd/ngw-pyramid/template/SystemNameForm.hbs:10
+msgid "Save"
+msgstr "Guardar"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:41
+msgid "Delete"
+msgstr "Eliminar"
+
 #: amd/ngw-pyramid/right-menu/RightMenu.js:60
 #: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:5
 msgid "Sign out"
 msgstr "Desconectarse"
 
+#: amd/ngw-pyramid/right-menu/RightMenu.js:65 template/header.mako:30
+msgid "Sign in"
+msgstr "Conectarse"
+
 #: amd/ngw-pyramid/template/CORSForm.hbs:17
-msgid "Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."
-msgstr "Ingrese los dominios permitidos para utilizar la API HTTP de su Web GIS en otros sitios. Uno por linea."
+msgid ""
+"Enter allowed origins for cross domain requests to use HTTP API of this Web "
+"GIS on other websites. One origin per line."
+msgstr ""
+"Ingrese los dominios permitidos para utilizar la API HTTP de su Web GIS en "
+"otros sitios. Uno por linea."
 
 #: amd/ngw-pyramid/template/CORSForm.hbs:18
-msgid "Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are not allowed."
-msgstr "Los diferentes protocolos (HTTP y HTTPS) y subdominios (example.com y www.example.com) son diferentes origines. Los comodínes (*) no estan permitidos."
+msgid ""
+"Please note that different protocols (HTTP and HTTPS) and subdomains "
+"(example.com and www.example.com) are different origins. Wildcards are not "
+"allowed."
+msgstr ""
+"Los diferentes protocolos (HTTP y HTTPS) y subdominios (example.com y "
+"www.example.com) son diferentes origines. Los comodínes (*) no estan "
+"permitidos."
 
 #: amd/ngw-pyramid/template/CustomCSSForm.hbs:17
-msgid "Enter custom CSS rules here. They will be used to redefine styles, design for all pages of your Web GIS."
-msgstr "Ingrese el CSS personalizado. Será utilizado para redefinir los estilos para todas las páginas de su Web GIS."
+msgid ""
+"Enter custom CSS rules here. They will be used to redefine styles, design for"
+" all pages of your Web GIS."
+msgstr ""
+"Ingrese el CSS personalizado. Será utilizado para redefinir los estilos para "
+"todas las páginas de su Web GIS."
 
 #: amd/ngw-pyramid/template/LogoForm.hbs:12
 msgid "We recommend height of 45 px and width of up to 200 px."
 msgstr "Recomendamos una altura de 45 px y una anchura de hasta 200 px."
 
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+#: amd/ngw-pyramid/template/LogoForm.hbs:25
 msgid "Cancel"
 msgstr "Cancelar"
+
+#: nodepkg/api/error.js:11
+msgid "Unknown API error"
+msgstr "Error de API desconocido"
+
+#: nodepkg/api/error.js:25
+msgid "Invalid API response"
+msgstr "Respuesta de API no válida"
+
+#: nodepkg/example/translation.js:5
+msgid "Translated text"
+msgstr "Texto traducido"
 
 #: template/backup.mako:12
 msgid "Filename"
@@ -222,27 +255,37 @@ msgstr "Nombre del archivo"
 msgid "Timestamp (UTC)"
 msgstr "Marca temporal (UTC)"
 
+#: template/backup.mako:14
+msgid "Size"
+msgstr "Tamaño"
+
 #: template/header.mako:84
 msgid "Resources"
 msgstr "Recursos"
+
+#: template/header.mako:98
+msgid "User settings"
+msgstr "Ajustes del usuario"
 
 #: template/header.mako:108
 msgid "Help"
 msgstr "Ayuda"
 
-#: template/pkginfo.mako:6
-msgid "Platform"
-msgstr "Plataforma"
-
-#: template/pkginfo.mako:9
-msgid "Packages"
-msgstr "Paquetes"
-
-#: template/pkginfo.mako:15
+#: template/sysinfo.mako:20
 msgid "Package"
 msgstr "Paquete"
 
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:27
+#: template/sysinfo.mako:21
 msgid "Version"
 msgstr "Versión"
+
+#: template/sysinfo.mako:50
+msgid "Platform"
+msgstr "Plataforma"
+
+#~ msgid "Package versions"
+#~ msgstr "Versiones de paquetes"
+
+#~ msgid "Packages"
+#~ msgstr "Paquetes"
 

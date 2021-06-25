@@ -1,6 +1,22 @@
-#: __init__.py:65
+#: __init__.py:76
 msgid "NextGIS geoinformation system"
 msgstr "Servicio geoinformativo NextGIS"
+
+#: __init__.py:201
+msgid "Linux kernel"
+msgstr "Núcleo Linux"
+
+#: __init__.py:204
+msgid "OS distribution"
+msgstr "OS distribución"
+
+#: __init__.py:215
+msgid "CPU"
+msgstr "CPU"
+
+#: __init__.py:220
+msgid "RAM"
+msgstr "RAM"
 
 #: exception.py:95
 msgid "Validation error"
@@ -15,6 +31,7 @@ msgid "Operational error"
 msgstr "Error operacional"
 
 #: test/test_exception.py:79
+#, python-format
 msgid "The answer is %d"
 msgstr "La respuesta es %d"
 

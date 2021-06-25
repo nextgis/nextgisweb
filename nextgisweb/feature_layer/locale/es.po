@@ -1,64 +1,73 @@
-#: views.py:478 views.py:500
-msgid "Edit"
-msgstr "Editar"
-
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:98
-msgid "Delete"
-msgstr "Eliminar"
-
-#: api.py:30
+#: api.py:103
 msgid "Output format is not provided."
 msgstr "No se proporciona formato de salida."
 
-#: api.py:33
+#: api.py:108
+#, python-format
 msgid "Format '%s' is not supported."
 msgstr "El formato '%s' no es compatible."
 
-#: api.py:283 api.py:341
+#: api.py:284 api.py:344
+#, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "El formato de geometría '%s' no es compatible."
+
+#: api.py:286
+msgid "Geometry is not valid."
+msgstr "La geometría no es válida."
+
+#: api.py:544
+msgid "Parameter 'intersects' geometry is not valid."
+msgstr "El parámetro 'intersects' de la geometría no es válido."
 
 #: exception.py:15
 msgid "Feature not found"
 msgstr "Objeto geográfico no encontrado"
 
 #: exception.py:16
+#, python-format
 msgid "Feature with id = %d was not found in resource with id = %d."
 msgstr "Objeto geográfico con id = %d no se encontró en el recurso con id = %d."
 
 #: exception.py:17
 msgid "The feature may have been deleted or an error in the address."
-msgstr "Es posible que el objeto geográfico se haya eliminado o que haya un error en la dirección."
+msgstr ""
+"Es posible que el objeto geográfico se haya eliminado o que haya un error en "
+"la dirección."
 
 #: model.py:172
+#, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Campo no encontrado (ID=%d)."
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:74
+#: amd/ngw-feature-layer/FieldsWidget.js:159 view.py:44
 msgid "Feature table"
 msgstr "Tabla de objetos geográficos"
 
 #: view.py:61 view.py:84
+#, python-format
 msgid "Feature #%d"
 msgstr "Objeto geográfico #%d"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:100
+#: view.py:135 view.py:196
 msgid "Save as"
 msgstr "Guardar como"
 
-#: amd/ngw-webmap/tool/Identify.js:432
+#: view.py:185
 msgid "Features"
 msgstr "Objetos geográficos"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:22
+#: template/section_fields.mako:21 view.py:189
 msgid "Table"
 msgstr "Tabla"
 
-#: view.py:353
+#: view.py:206
 msgid "External access"
 msgstr "Acceso externo"
 
-#: amd/ngw-webmap/tool/Identify.js:213
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:192
+#: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
+#: amd/ngw-feature-layer/FieldsWidget.js:122 view.py:211
 msgid "Attributes"
 msgstr "Atributos"
 
@@ -78,17 +87,16 @@ msgstr "Colocar el valor del campo en NULL (sin datos)"
 msgid "NULL"
 msgstr "NULL"
 
-#: amd/ngw-webmap/ItemWidget.js:151 amd/ngw-webmap/template/SettingsForm.hbs:75
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:45
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:258
+#: amd/ngw-feature-layer/template/ExportForm.hbs:42
 msgid "Save"
 msgstr "Guardar"
 
-#: amd/ngw-feature-layer/FeatureGrid.js:241
+#: amd/ngw-feature-layer/FeatureGrid.js:236
 msgid "Confirmation"
 msgstr "Confirmación"
 
-#: amd/ngw-feature-layer/FeatureGrid.js:242
+#: amd/ngw-feature-layer/FeatureGrid.js:237
 msgid "Delete feature?"
 msgstr "Borrar el objeto geográfico?"
 
@@ -96,48 +104,47 @@ msgstr "Borrar el objeto geográfico?"
 msgid "N/A"
 msgstr "N/A"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:62
+#: amd/ngw-feature-layer/FieldsWidget.js:72 template/section_fields.mako:15
 msgid "Keyname"
 msgstr "Nombre clave"
 
-#: amd/ngw-resource/template/Widget.hbs:23 template/section_children.mako:62
-#: template/section_summary.mako:36
+#: amd/ngw-feature-layer/FieldsWidget.js:82 template/section_fields.mako:16
 msgid "Type"
 msgstr "Tipo"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:66
+#: amd/ngw-feature-layer/FieldsWidget.js:86 template/section_fields.mako:17
 msgid "Display name"
 msgstr "Nombre para mostrar"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:101
+#: amd/ngw-feature-layer/FieldsWidget.js:100
 msgid "FT"
 msgstr "TO"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:111
+#: amd/ngw-feature-layer/FieldsWidget.js:110
 msgid "LA"
 msgstr "AE"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:155
+#: amd/ngw-feature-layer/FieldsWidget.js:154
 msgid "Label attribute"
 msgstr "Atributo de etiqueta"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:14
+#: amd/ngw-feature-layer/FieldsWidget.js:231
 msgid "Add"
 msgstr "Agregar"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:27
+#: amd/ngw-feature-layer/FieldsWidget.js:237
 msgid "Remove"
 msgstr "Eliminar"
 
-#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:53
+#: amd/ngw-feature-layer/template/ExportForm.hbs:15
 msgid "Format"
 msgstr "Formato"
 
-#: amd/ngw-raster-layer/template/ExportForm.hbs:17
+#: amd/ngw-feature-layer/template/ExportForm.hbs:19
 msgid "SRS"
 msgstr "SRS"
 
-#: amd/ngw-vector-layer/template/Widget.hbs:50
+#: amd/ngw-feature-layer/template/ExportForm.hbs:23
 msgid "Encoding"
 msgstr "Codificación de caracteres"
 
@@ -153,6 +160,14 @@ msgstr "Archivo zip"
 msgid "Open"
 msgstr "Abrir"
 
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:16
+msgid "Edit"
+msgstr "Editar"
+
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:20
+msgid "Delete"
+msgstr "Eliminar"
+
 #: amd/ngw-feature-layer/template/FeatureGrid.hbs:25
 msgid "Search..."
 msgstr "Buscando..."
@@ -162,26 +177,34 @@ msgid "MVT Vector Tiles"
 msgstr "MVT Teselas Vectoriales"
 
 #: template/section_api_layer.mako:12
-msgid "The Mapbox Vector Tile is an efficient encoding for map data into vector tiles that can be rendered dynamically."
-msgstr "Mapbox Vector Tile es una codificación eficiente para datos de mapas en mosaicos vectoriales que se pueden renderizar dinámicamente."
+msgid ""
+"The Mapbox Vector Tile is an efficient encoding for map data into vector "
+"tiles that can be rendered dynamically."
+msgstr ""
+"Mapbox Vector Tile es una codificación eficiente para datos de mapas en "
+"mosaicos vectoriales que se pueden renderizar dinámicamente."
 
 #: template/section_api_layer.mako:17
-msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles"
-msgstr "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles"
+msgid ""
+"https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-"
+"tiles"
+msgstr ""
+"https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-"
+"tiles"
 
-#: template/section_api_wms.mako:17
+#: template/section_api_layer.mako:18
 msgid "Read more"
 msgstr "Leer mas"
 
-#: amd/ngw-lookup-table/Widget.js:90 model.py:25 view.py:19
+#: template/section_fields.mako:19
 msgid "Lookup table"
 msgstr "Tabla de búsqueda"
 
-#: amd/ngw-resource/PermissionWidget.js:108
+#: template/section_fields.mako:32 template/section_fields.mako:38
 msgid "Yes"
 msgstr "Sí"
 
-#: amd/ngw-resource/PermissionWidget.js:110
+#: template/section_fields.mako:34 template/section_fields.mako:38
 msgid "No"
 msgstr "No"
 

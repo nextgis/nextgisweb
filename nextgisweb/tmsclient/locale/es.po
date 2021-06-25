@@ -1,29 +1,13 @@
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:22
-msgid "Coordinate system"
-msgstr "Sistema de coordenadas"
-
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
-msgid "Cancel"
-msgstr "Cancelar"
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:45
-msgid "Max zoom level"
-msgstr "Nivel de zoom máximo"
-
-#: amd/ngw-tmsclient/LayersDialog.js:63
-msgid "OK"
-msgstr "OK"
-
-#: amd/ngw-tmsclient/ConnectionWidget.js:37
+#: amd/ngw-tmsclient/ConnectionWidget.js:34
 #: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:55
 msgid "TMS connection"
 msgstr "Conexión TMS"
 
-#: model.py:163
+#: model.py:168
 msgid "Zoom is out of range."
 msgstr "El zoom está fuera de rango."
 
-#: amd/ngw-tmsclient/LayerWidget.js:40 model.py:171
+#: amd/ngw-tmsclient/LayerWidget.js:37 model.py:176
 msgid "TMS layer"
 msgstr "Capa TMS"
 
@@ -31,9 +15,17 @@ msgstr "Capa TMS"
 msgid "TMS capabilities"
 msgstr "Capacidades TMS"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:38
+#: amd/ngw-tmsclient/LayersDialog.js:25
 msgid "Select layer"
 msgstr "Seleccionar capa"
+
+#: amd/ngw-tmsclient/LayersDialog.js:63
+msgid "OK"
+msgstr "OK"
+
+#: amd/ngw-tmsclient/LayersDialog.js:72
+msgid "Cancel"
+msgstr "Cancelar"
 
 #: amd/ngw-tmsclient/template/ConnectionWidget.hbs:9
 msgid "Capmode"
@@ -59,11 +51,19 @@ msgstr "Clave de API"
 msgid "API key param"
 msgstr "Parámetro de clave de API"
 
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:37
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:38
+msgid "Username"
+msgstr "Nombre de usuario"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Contraseña"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:49
 msgid "Scheme"
 msgstr "Esquema"
 
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:43
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:55
 msgid "Skip SSL/TLS certificate verification"
 msgstr "Omitir la verificación del certificado SSL/TLS"
 
@@ -71,7 +71,11 @@ msgstr "Omitir la verificación del certificado SSL/TLS"
 msgid "Choose a layer"
 msgstr "Elige una capa"
 
-#: template/section_connection.mako:26
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Sistema de coordenadas"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:30
 msgid "Layer"
 msgstr "Capa"
 
@@ -79,19 +83,23 @@ msgstr "Capa"
 msgid "Min zoom level"
 msgstr "Nivel de zoom mínimo"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:10
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:45
+msgid "Max zoom level"
+msgstr "Nivel de zoom máximo"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:51
 msgid "Left, deg."
 msgstr "Izquierda, deg."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:28
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:57
 msgid "Bottom, deg."
 msgstr "Abajo, deg."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:22
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:63
 msgid "Right, deg."
 msgstr "Derecha, deg."
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:16
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:69
 msgid "Top, deg."
 msgstr "Arriba, deg."
 

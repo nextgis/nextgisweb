@@ -1,93 +1,3 @@
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:98
-msgid "Delete"
-msgstr "Eliminar"
-
-#: amd/ngw-webmap/plugin/FeatureLayer.js:74
-msgid "Feature table"
-msgstr "Tabla de objetos geográficos"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:100
-msgid "Save as"
-msgstr "Guardar como"
-
-#: amd/ngw-webmap/tool/Identify.js:432
-msgid "Features"
-msgstr "Objetos geográficos"
-
-#: view.py:353
-msgid "External access"
-msgstr "Acceso externo"
-
-#: amd/ngw-webmap/tool/Identify.js:213
-msgid "Attributes"
-msgstr "Atributos"
-
-#: amd/ngw-webmap/ItemWidget.js:151 amd/ngw-webmap/template/SettingsForm.hbs:75
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:45
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
-msgid "Save"
-msgstr "Guardar"
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:66
-msgid "Display name"
-msgstr "Nombre para mostrar"
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:27
-msgid "Remove"
-msgstr "Eliminar"
-
-#: template/section_api_wms.mako:17
-msgid "Read more"
-msgstr "Leer mas"
-
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:18
-msgid "Settings"
-msgstr "Configuración"
-
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
-msgid "Cancel"
-msgstr "Cancelar"
-
-#: amd/ngw-webmap/template/ItemWidget.hbs:77
-msgid "Enabled"
-msgstr "Habilitado"
-
-#: template/section_api_webmap.mako:7
-msgid "TMS (Tile Map Service)"
-msgstr "TMS (Tile Map Service)"
-
-#: template/section_api_webmap.mako:11
-msgid "TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map is a map displayed in a browser by seamlessly joining dozens of individually requested image."
-msgstr "TMS (Tile Map Service) es una especificación para mapas web de teselas. El mapa web de teselas es un mapa que se muestra en un navegador al unir sin problemas docenas de imágenes solicitadas individualmente."
-
-#: template/section_api_webmap.mako:16
-msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
-msgstr "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:38
-msgid "Select layer"
-msgstr "Seleccionar capa"
-
-#: template/section_connection.mako:26
-msgid "Layer"
-msgstr "Capa"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:10
-msgid "Left, deg."
-msgstr "Izquierda, deg."
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:28
-msgid "Bottom, deg."
-msgstr "Abajo, deg."
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:22
-msgid "Right, deg."
-msgstr "Derecha, deg."
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:16
-msgid "Top, deg."
-msgstr "Arriba, deg."
-
 #: __init__.py:28
 msgid "Main web map"
 msgstr "Mapa web principal"
@@ -112,7 +22,7 @@ msgstr "Mostrar"
 msgid "View annotations"
 msgstr "Ver anotaciones"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:100 model.py:35
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:173 model.py:35
 msgid "Edit annotations"
 msgstr "Editar anotaciones"
 
@@ -120,81 +30,101 @@ msgstr "Editar anotaciones"
 msgid "Web map settings"
 msgstr "Configuración del mapa web"
 
-#: amd/ngw-webmap/Display.js:207 amd/ngw-webmap/Display.js:1002
-#: amd/ngw-webmap/ItemWidget.js:246
+#: view.py:209
+msgid "External access"
+msgstr "Acceso externo"
+
+#: amd/ngw-webmap/Display.js:214 amd/ngw-webmap/Display.js:1011
+#: amd/ngw-webmap/ItemWidget.js:243
 msgid "Layers"
 msgstr "Capas"
 
-#: amd/ngw-webmap/Display.js:219 amd/ngw-webmap/Display.js:429
+#: amd/ngw-webmap/Display.js:220
+msgid "Search"
+msgstr "Buscar"
+
+#: amd/ngw-webmap/Display.js:226 amd/ngw-webmap/Display.js:436
 msgid "Share"
 msgstr "Compartir"
 
-#: amd/ngw-webmap/Display.js:225 amd/ngw-webmap/Display.js:324
+#: amd/ngw-webmap/Display.js:232 amd/ngw-webmap/Display.js:331
 msgid "Print map"
 msgstr "Imprimir mapa"
 
-#: amd/ngw-webmap/Display.js:363 amd/ngw-webmap/Display.js:370
+#: amd/ngw-webmap/Display.js:370 amd/ngw-webmap/Display.js:377
 msgid "Bookmarks"
 msgstr "Marcadores"
 
-#: amd/ngw-webmap/Display.js:529 amd/ngw-webmap/Display.js:539
+#: amd/ngw-webmap/Display.js:400 amd/ngw-webmap/plugin/LayerInfo.js:36
+msgid "Description"
+msgstr "Descripción"
+
+#: amd/ngw-webmap/Display.js:537 amd/ngw-webmap/Display.js:547
 msgid "Annotations"
 msgstr "Anotaciones"
 
-#: amd/ngw-webmap/Display.js:720 amd/ngw-webmap/tool/Zoom.js:19
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:453
+#: amd/ngw-webmap/Display.js:729 amd/ngw-webmap/tool/Zoom.js:18
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:479
 msgid "Zoom in"
 msgstr "Acercarse"
 
-#: amd/ngw-webmap/Display.js:721 amd/ngw-webmap/tool/Zoom.js:22
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:454
+#: amd/ngw-webmap/Display.js:730 amd/ngw-webmap/tool/Zoom.js:21
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:480
 msgid "Zoom out"
 msgstr "Alejarse"
 
-#: amd/ngw-webmap/Display.js:725
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
+#: amd/ngw-webmap/Display.js:734 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
 msgid "Attributions"
 msgstr "Atribuciones"
 
-#: amd/ngw-webmap/Display.js:741
+#: amd/ngw-webmap/Display.js:750
 msgid "Initial extent"
 msgstr "Extensión inicial"
 
-#: amd/ngw-webmap/Display.js:744
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:467
+#: amd/ngw-webmap/Display.js:753 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
 msgid "Reset rotation"
 msgstr "Reiniciar rotación"
 
-#: amd/ngw-webmap/ExtentWidget.js:34
+#: amd/ngw-webmap/ExtentWidget.js:31
 msgid "Extent and bookmarks"
 msgstr "Extensión y marcadores"
 
-#: amd/ngw-webmap/ItemWidget.js:97 amd/ngw-webmap/template/ItemWidget.hbs:41
+#: amd/ngw-webmap/ItemWidget.js:94 amd/ngw-webmap/template/ItemWidget.hbs:41
 msgid "Layer order"
 msgstr "Orden de capas"
 
-#: amd/ngw-webmap/ItemWidget.js:147
+#: amd/ngw-webmap/ItemWidget.js:144
 msgid "Use on the map"
 msgstr "Usar en el mapa"
 
-#: amd/ngw-webmap/ItemWidget.js:312 amd/ngw-webmap/template/ItemWidget.hbs:26
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:75
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+msgid "Save"
+msgstr "Guardar"
+
+#: amd/ngw-webmap/ItemWidget.js:309 amd/ngw-webmap/template/ItemWidget.hbs:26
 msgid "Add group"
 msgstr "Agregar grupo"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:8
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:23
 msgid "Your annotation text"
 msgstr "Tu anotación"
 
 #: amd/ngw-webmap/layers/annotations/AnnotationsPopup.hbs:7
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:122
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:209
 msgid "Edit annotation"
 msgstr "Editando anotación"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:27
+#: amd/ngw-webmap/plugin/FeatureLayer.js:59
 msgid "Go to"
 msgstr "Ir a"
 
-#: amd/ngw-webmap/plugin/LayerEditor.js:79
+#: amd/ngw-webmap/plugin/FeatureLayer.js:115
+msgid "Feature table"
+msgstr "Tabla de objetos geográficos"
+
+#: amd/ngw-webmap/plugin/LayerEditor.js:102
 msgid "Editing"
 msgstr "Edición"
 
@@ -206,11 +136,15 @@ msgstr "Enfocar la capa"
 msgid "Enable layers editing"
 msgstr "Habilitar edición de capa"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:30
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:40
+msgid "Settings"
+msgstr "Configuración"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:52
 msgid "Enable annotations"
 msgstr "Habilitar anotaciones"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:33
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:55
 msgid "Show annotations by default"
 msgstr "Mostrar anotaciones por defecto"
 
@@ -218,15 +152,35 @@ msgstr "Mostrar anotaciones por defecto"
 msgid "Map"
 msgstr "Mapa"
 
+#: amd/ngw-webmap/template/ExtentWidget.hbs:10
+msgid "Left, deg."
+msgstr "Izquierda, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:16
+msgid "Top, deg."
+msgstr "Arriba, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:22
+msgid "Right, deg."
+msgstr "Derecha, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:28
+msgid "Bottom, deg."
+msgstr "Abajo, deg."
+
 #: amd/ngw-webmap/template/ExtentWidget.hbs:34
 msgid "Set extent from layer"
 msgstr "Usar extensión desde capa"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:38
+msgid "Select layer"
+msgstr "Seleccionar capa"
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:46
 msgid "Constrain to extent"
 msgstr "Restringir a la extensión"
 
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:18
+#: amd/ngw-webmap/template/ExtentWidget.hbs:49
 msgid "Select vector layer"
 msgstr "Seleccionar capa vectorial"
 
@@ -238,19 +192,32 @@ msgstr "Recurso de marcador"
 msgid "Add layer"
 msgstr "Agregar capa"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:18
+#: amd/ngw-webmap/template/ItemWidget.hbs:18
 msgid "Select layer\\'s style"
 msgstr "Seleccione el estilo de la capa"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:33
+msgid "Remove"
+msgstr "Eliminar"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
+msgid "Display name"
+msgstr "Nombre para mostrar"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:77
+msgid "Enabled"
+msgstr "Habilitado"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:84
 msgid "Transparency"
 msgstr "Transparencia"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:70
+#: amd/ngw-webmap/template/ItemWidget.hbs:89
 msgid "Min scale"
 msgstr "Escala mínima"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:74
+#: amd/ngw-webmap/template/ItemWidget.hbs:94
 msgid "Max scale"
 msgstr "Escala máxima"
 
@@ -370,59 +337,67 @@ msgstr "Grados, minutos, segundos"
 msgid "Measurement SRID"
 msgstr "SRID de medición"
 
-#: amd/ngw-webmap/tool/Identify.js:247
+#: amd/ngw-webmap/tool/Identify.js:212
+msgid "Attributes"
+msgstr "Atributos"
+
+#: amd/ngw-webmap/tool/Identify.js:246
 msgid "Feature"
 msgstr "Objeto geográfico"
 
-#: amd/ngw-webmap/tool/Identify.js:305 amd/ngw-webmap/tool/Identify.js:322
+#: amd/ngw-webmap/tool/Identify.js:304 amd/ngw-webmap/tool/Identify.js:321
 msgid "Identify"
 msgstr "Identificar"
 
-#: amd/ngw-webmap/tool/Measure.js:34
+#: amd/ngw-webmap/tool/Identify.js:431
+msgid "Features"
+msgstr "Objetos geográficos"
+
+#: amd/ngw-webmap/tool/Measure.js:33
 msgid "Measure distance"
 msgstr "Medir distancia"
 
-#: amd/ngw-webmap/tool/Measure.js:37
+#: amd/ngw-webmap/tool/Measure.js:36
 msgid "Measure area"
 msgstr "Medir área"
 
-#: amd/ngw-webmap/tool/Measure.js:41
+#: amd/ngw-webmap/tool/Measure.js:40
 msgid "m"
 msgstr "m"
 
-#: amd/ngw-webmap/tool/Measure.js:42
+#: amd/ngw-webmap/tool/Measure.js:41
 msgid "km"
 msgstr "km"
 
-#: amd/ngw-webmap/tool/Measure.js:43
+#: amd/ngw-webmap/tool/Measure.js:42
 msgid "ft"
 msgstr "ft"
 
-#: amd/ngw-webmap/tool/Measure.js:44
+#: amd/ngw-webmap/tool/Measure.js:43
 msgid "mi"
 msgstr "mi"
 
-#: amd/ngw-webmap/tool/Measure.js:45
+#: amd/ngw-webmap/tool/Measure.js:44
 msgid "ha"
 msgstr "ha"
 
-#: amd/ngw-webmap/tool/Measure.js:46
+#: amd/ngw-webmap/tool/Measure.js:45
 msgid "ac"
 msgstr "ac"
 
-#: amd/ngw-webmap/tool/Measure.js:267
+#: amd/ngw-webmap/tool/Measure.js:266
 msgid "Double click to finish."
 msgstr "Doble click para terminar."
 
-#: amd/ngw-webmap/tool/Rotate.js:15
+#: amd/ngw-webmap/tool/Rotate.js:14
 msgid "Rotate"
 msgstr "Rotar"
 
-#: amd/ngw-webmap/tool/Swipe.js:18
+#: amd/ngw-webmap/tool/Swipe.js:17
 msgid "Vertical swipe"
 msgstr "Desplazamiento vertical"
 
-#: amd/ngw-webmap/tool/Swipe.js:22
+#: amd/ngw-webmap/tool/Swipe.js:21
 msgid "Horizontal swipe"
 msgstr "Desplazamiento horizontal"
 
@@ -438,12 +413,16 @@ msgstr "Eliminar objetos geográficos"
 msgid "Modify features"
 msgstr "Modificar objetos geográficos"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:50
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:38
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:110
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:48
 msgid "Don't save"
 msgstr "No guardar"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:125
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Eliminar"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:212
 msgid "Create annotation"
 msgstr "Crear anotación"
 
@@ -482,9 +461,9 @@ msgstr "Tamaño del circulo, px"
 msgid "Invalid width: should be from 1 to 100 px"
 msgstr "Ancho inválido: debe ser entre 1 y 100 px"
 
-#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:185
-#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:201
-#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:216
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:262
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:282
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:301
 msgid "Error on the server:"
 msgstr "Error en el servidor:"
 
@@ -496,13 +475,21 @@ msgstr "Mostrar la capa de anotaciones"
 msgid "Show messages"
 msgstr "Mostrar mensajes"
 
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:17
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:27
 msgid "Stopping editing"
 msgstr "Dejar de editar"
 
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:25
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:35
 msgid "Do you want to save changes?"
 msgstr "¿Querés guardar los cambios?"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:53
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
+msgid "Layer"
+msgstr "Capa"
 
 #: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:9
 #: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:94
@@ -586,6 +573,10 @@ msgstr "Barra de escala"
 msgid "Scale"
 msgstr "Escala"
 
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:100
+msgid "Save as"
+msgstr "Guardar como"
+
 #: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:107
 msgid "JPEG"
 msgstr "JPEG"
@@ -606,12 +597,12 @@ msgstr "Use Shift+Arrastrar para hacer zoom en el cuadro"
 msgid "Search on the map"
 msgstr "Buscar en el mapa"
 
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:160
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:213
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:158
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:211
 msgid "Refine search criterion"
 msgstr "Redefinir criteria de busqueda"
 
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:228
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:226
 msgid "Not found"
 msgstr "No encontrado"
 
@@ -643,7 +634,29 @@ msgstr "Generar eventos"
 msgid "Preview"
 msgstr "Previsualizar"
 
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:511
 msgid "Open full map"
 msgstr "Abrir mapa completo"
+
+#: template/section_api_webmap.mako:7
+msgid "TMS (Tile Map Service)"
+msgstr "TMS (Tile Map Service)"
+
+#: template/section_api_webmap.mako:11
+msgid ""
+"TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map "
+"is a map displayed in a browser by seamlessly joining dozens of individually "
+"requested image."
+msgstr ""
+"TMS (Tile Map Service) es una especificación para mapas web de teselas. El "
+"mapa web de teselas es un mapa que se muestra en un navegador al unir sin "
+"problemas docenas de imágenes solicitadas individualmente."
+
+#: template/section_api_webmap.mako:16
+msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
+msgstr "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr "Leer mas"
 

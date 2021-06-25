@@ -1,4 +1,4 @@
-#: amd/ngw-social/Widget.js:32
+#: amd/ngw-social/Widget.js:29
 msgid "Social"
 msgstr "Social"
 
@@ -11,10 +11,15 @@ msgid "Select a preview image"
 msgstr "Seleccione una imagen de vista previa"
 
 #: amd/ngw-social/template/Widget.hbs:9
-msgid "The image should be in PNG format"
-msgstr "La imagen debe estar en formato PNG"
+msgid ""
+"The image will be converted to PNG format and downscaled to 1600x630 pixels "
+"if it\\'s bigger."
+msgstr "La imagen se convertirá a formato PNG y se reducirá a 1600x630 píxeles si es más grande."
 
 #: amd/ngw-social/template/Widget.hbs:18
 msgid "Preview description"
 msgstr "Descripción de vista previa"
+
+#~ msgid "The image should be in PNG format"
+#~ msgstr "La imagen debe estar en formato PNG"
 
