@@ -127,6 +127,13 @@ class Env(object):
         traverse.seq = seq
         traverse(self._components.values())
 
+        # Kludge for raising method to the top of the chain (for ngwcluster)
+        for c in list(traverse.seq):
+            m = getattr(self._components[c], meth)
+            if hasattr(m, '_iam_the_first'):
+                traverse.seq.remove(c)
+                traverse.seq.insert(0, c)
+
         result = list([self._components[i] for i in traverse.seq])
         logger.debug(
             "Chain for method [%s]: %s", meth,
