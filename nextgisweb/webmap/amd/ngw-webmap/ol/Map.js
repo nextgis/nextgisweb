@@ -11,6 +11,11 @@ define([
         DPI: 1000 / 39.37 / 0.28,
 
         IPM: 39.37,
+        
+        // limit extent to applying smart zoom
+        SMART_ZOOM_EXTENT: 100,
+
+        SMART_ZOOM: 12,
 
         constructor: function (options) {
             this.olMap = new ol.Map(options);
@@ -65,14 +70,24 @@ define([
         },
 
         zoomToFeature: function (feature) {
-            var minPointZoom = 12;
-            var view = this.olMap.getView();
-            var geometry = feature.getGeometry();
-            var extent = geometry.getExtent();
-            if (geometry.getType() == 'Point') {
-                view.setCenter(geometry.getCoordinates());
-                if (view.getZoom() < minPointZoom) {
-                    view.setZoom(minPointZoom);
+            var geometry = feature.getGeometry(),
+                extent = geometry.getExtent();
+
+            this.zoomToExtent(extent)
+        },
+
+        zoomToExtent: function (extent) {
+            var view = this.olMap.getView(),
+                widthExtent = ol.extent.getWidth(extent),
+                heightExtent = ol.extent.getHeight(extent),
+                center;
+
+            // If feature extent smaller than SMART_ZOOM_EXTENT then applying smart zoom to it
+            if (widthExtent < this.SMART_ZOOM_EXTENT && heightExtent < this.SMART_ZOOM_EXTENT) {
+                center = ol.extent.getCenter(extent);
+                view.setCenter(center);
+                if (view.getZoom() < this.SMART_ZOOM) {
+                    view.setZoom(this.SMART_ZOOM);
                 }
             } else {
                 view.fit(extent);
