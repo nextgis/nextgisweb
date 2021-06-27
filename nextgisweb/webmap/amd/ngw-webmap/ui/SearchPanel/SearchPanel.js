@@ -247,7 +247,7 @@ define([
                         domClass.remove(this.activeResult, "active");
                     domClass.add(e.target, "active");
                     this.activeResult = e.target;
-                    this.display.map.olMap.getView().fit(result.box);
+                    this.display.map.zoomToExtent(result.box);
                 })
             });
             domConstruct.place(resultNode, this.searchResultsList);

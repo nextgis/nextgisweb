@@ -50,15 +50,12 @@ define([
         },
 
         zoomToFeature: function (resid, fid) {
-            var display = this.display;
-            var minZoom = 12;
-
-            display
-            .featureHighlighter
-            .highlightFeatureById(fid, resid)
-            .then(function (feature) {
-                display.map.zoomToFeature(feature);
-            });
+            this.display
+                .featureHighlighter
+                .highlightFeatureById(fid, resid)
+                .then(function (feature) {
+                    display.map.zoomToFeature(feature);
+                });
         }
     });
 });
