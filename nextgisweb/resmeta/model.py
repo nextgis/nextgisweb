@@ -78,7 +78,8 @@ class _items_attr(SerializedProperty):
                 rml.append(i)
 
         # Remove records to be removed
-        map(lambda i: odata.remove(i), rml)
+        for i in rml:
+            odata.remove(i)
 
         for k, val in value.items():
             if val is None:
