@@ -4,6 +4,8 @@ Changes
 3.9.0
 -----
 
+- Locale autodetection, per user locale setting.
+- Localization into Spanish is available by default.
 - Automatic downsampling of social preview image to 1600x630 pixels.
 
 3.8.0

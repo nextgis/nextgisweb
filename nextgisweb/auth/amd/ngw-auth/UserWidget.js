@@ -16,7 +16,8 @@ define([
     "dojox/layout/TableContainer",
     "ngw-auth/PrincipalMemberSelect",
     "ngw-pyramid/form/KeynameTextBox",
-    "ngw-pyramid/form/DisplayNameTextBox"
+    "ngw-pyramid/form/DisplayNameTextBox",
+    "ngw-pyramid/form/LangSelect"
 ], function (
     declare,
     lang,
@@ -74,6 +75,7 @@ define([
             this.keyname.set("value", value.keyname);
             this.wOAuthSubject.set("value", value.oauth_subject);
             this.cbDisabled.set("checked", value.disabled);
+            this.language.set("value", value.language),
             this.cbSuperuser.set("checked", value.superuser);
             this.description.set("value", value.description);
 
@@ -93,6 +95,7 @@ define([
                 keyname: this.keyname.get("value"),
                 superuser: this.cbSuperuser.get("checked"),
                 disabled: this.cbDisabled.get("checked"),
+                language: this.language.get("value"),
                 member_of: this.memberOf.get("value"),
                 description: this.description.get("value")
             };

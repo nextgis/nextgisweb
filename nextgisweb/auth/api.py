@@ -6,7 +6,8 @@ import json
 from pyramid.response import Response
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPForbidden, HTTPUnprocessableEntity
+from pyramid.httpexceptions import (
+    HTTPForbidden, HTTPUnauthorized, HTTPUnprocessableEntity)
 
 from ..models import DBSession
 from ..core.exception import ValidationError
@@ -49,6 +50,36 @@ def user_idelete(request):
     obj = User.filter_by(id=request.matchdict['id']).one()
     forbid_system_principal(obj)
     DBSession.delete(obj)
+    return None
+
+
+def profile_get(request):
+    user = request.user
+
+    if user.keyname == 'guest':
+        return HTTPUnauthorized()
+
+    data = user.serialize()
+
+    result = dict()
+    for k in ('language', ):
+        result[k] = data[k]
+
+    return result
+
+
+def profile_set(request):
+    user = request.user
+
+    if user.keyname == 'guest':
+        return HTTPUnauthorized()
+
+    for k in request.json_body:
+        if k not in ('language', ):
+            raise ValidationError("Attribute '%s' is not allowed!" % k)
+
+    user.deserialize(request.json_body)
+
     return None
 
 
@@ -155,6 +186,10 @@ def setup_pyramid(comp, config):
         .add_view(user_iget, request_method='GET', renderer='json') \
         .add_view(user_iput, request_method='PUT', renderer='json') \
         .add_view(user_idelete, request_method='DELETE', renderer='json')
+
+    config.add_route('auth.profile', '/api/component/auth/profile') \
+        .add_view(profile_get, request_method='GET', renderer='json') \
+        .add_view(profile_set, request_method='PUT', renderer='json')
 
     config.add_route('auth.group.collection', '/api/component/auth/group/') \
         .add_view(group_cget, request_method='GET', renderer='json') \

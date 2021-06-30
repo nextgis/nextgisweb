@@ -5,6 +5,8 @@ from datetime import datetime as dt, timedelta
 from pkg_resources import resource_filename
 
 import transaction
+from babel import Locale
+from babel.core import UnknownLocaleError
 
 from ..lib.config import Option
 from ..component import Component, require
@@ -59,10 +61,20 @@ class PyramidComponent(Component):
         result = dict()
 
         result['support_url'] = self.env.core.support_url_view(request)
-
         result['company_logo'] = dict(
             enabled=self.company_logo_enabled(request),
             link=self.company_url_view(request))
+        result['langages'] = []
+        for locale in self.env.core.locale_available:
+            try:
+                babel_locale = Locale.parse(locale)
+            except UnknownLocaleError:
+                display_name = locale
+            else:
+                display_name = babel_locale.get_display_name().title()
+            result['langages'].append(dict(
+                display_name=display_name,
+                value=locale))
 
         return result
 
@@ -97,13 +109,13 @@ class PyramidComponent(Component):
 
         Option('session.cookie.name', str, default='ngw-sid',
                doc="Session cookie name"),
-
         Option('session.cookie.max_age', timedelta, default=timedelta(days=7),
                doc="Session cookie max_age"),
-
         Option('session.activity_delta', timedelta, default=timedelta(minutes=10),
                doc="Session last activity update time delta in seconds."),
 
         Option('debugtoolbar.enabled', bool),
         Option('debugtoolbar.hosts'),
+
+        Option('legacy_locale_switcher', bool, default=False),
     )

@@ -34,7 +34,7 @@
     .user-avatar__menu{
         display: none;
         position: absolute;
-        left:0;
+        right:0;
         top: 100%;
         margin-top: 6px;
         z-index: 1000;
@@ -42,6 +42,7 @@
         box-shadow: 0 3px 5px rgba(0,0,0,.16);
         font-weight: var(--body-font-weight);
         font-family: var(--body-font-family), Roboto, sans-serif;
+        cursor: default;
     }
 
 .user-avatar--active .user-avatar__icon{

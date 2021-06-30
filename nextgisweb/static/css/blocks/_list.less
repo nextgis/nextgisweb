@@ -20,15 +20,27 @@
       text-decoration: none;
     }
 
-    &:hover,
-    &:focus {
-      background-color: rgba(0, 0, 0, .04);
-      color: var(--text-base);
-      text-decoration: none;
-    }
-
     &--link {
       cursor: pointer;
+
+      &:hover,
+      &:focus {
+        background-color: rgba(0, 0, 0, .04);
+        color: var(--text-base);
+        text-decoration: none;
+      }
+    }
+
+    &--title{
+      font-weight: bold;
+      border-bottom: 1px solid var(--divider-color);
+      padding-top: 8px;
+      padding-bottom: 8px;
+      margin-bottom: 8px;;
+
+      &:first-child{
+        margin-top: -8xp;
+      }
     }
   }
 
@@ -38,8 +50,18 @@
     padding-bottom: 4px;
 
     .list__item {
-      height: 32px;
-      line-height: 32px;
+      height: 36px;
+      line-height: 36px;
+
+      &--title{
+        padding-top: 4px;
+        padding-bottom: 4px;
+        margin-bottom: 4px;;
+
+        &:first-child{
+          margin-top: -4px;
+        }
+      }
     }
   }
 

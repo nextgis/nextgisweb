@@ -32,13 +32,15 @@
                 <div class="user-avatar" id="userAvatar"></div>
             %endif
         </li>
-        <li class="header-nav__item">
-            %for locale in request.env.core.locale_available:
-                %if locale != request.locale_name:
-                    <a href="${request.route_url('pyramid.locale', locale=locale, _query=dict(next=request.url))}">${locale.upper()}</a>
-                %endif
-            %endfor
-        </li>
+        %if request.env.pyramid.options['legacy_locale_switcher']:
+            <li class="header-nav__item">
+                %for locale in request.env.core.locale_available:
+                    %if locale != request.locale_name:
+                        <a href="${request.route_url('pyramid.locale', locale=locale, _query=dict(next=request.url))}">${locale.upper()}</a>
+                    %endif
+                %endfor
+            </li>
+        %endif
         <li class="header-nav__item">
             <span id="rightMenuIcon" class="rightMenu-icon icon--link material-icons">menu</span>
         </li>
@@ -74,7 +76,10 @@
         %if user_mode != 'guest':
             (new UserAvatar({
                 userName: '${user_display_name}',
-                logoutLink: '${request.route_url(logout_route_name)}'
+                links: {
+                    logout: '${request.route_url(logout_route_name)}',
+                    settings: '${request.route_url("auth.settings")}'
+                }
             })).placeAt('userAvatar');
         %endif
 
@@ -90,17 +95,6 @@
                     "link": '${request.route_url("pyramid.control_panel")}'
                 }
             %endif
-            %if user_mode != 'guest':
-              ## So far we have only one setting, check it
-              <% oauth = request.env.auth.oauth%>
-              %if oauth is not None and oauth.options['enabled'] and oauth.options['bind']:
-                ,{
-                    "text": '${tr(_("User settings"))}',
-                    "link": '${request.route_url("auth.user_settings")}'
-                }
-              %endif
-            %endif
-
             <% help_page_url = request.env.pyramid.help_page_url_view(request) %>
             %if help_page_url is not None:
                 <% help_page_url = help_page_url.format(lang=request.locale_name) %>
@@ -112,11 +106,6 @@
             ],
             class: 'right-menu',
             withOverlay: true,
-            loginLink: '${login_url}',
-            %if user_mode != 'guest':
-              user: '${user_display_name}',
-              logoutLink: '${request.route_url(logout_route_name)}'
-            %endif
         })).placeAt('rightMenu');
     });
 </script>

@@ -6,14 +6,11 @@ from passlib.hash import sha256_crypt
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
-from .. import db
-from ..core.exception import ValidationError
 from ..env import env
-from ..models import DBSession, declarative_base
+from ..models import declarative_base
 from ..compat import lru_cache
 import six
 
-from .util import _
 
 Base = declarative_base()
 
@@ -60,6 +57,7 @@ class User(Principal):
     oauth_subject = sa.Column(sa.Unicode, unique=True)
     oauth_tstamp = sa.Column(sa.DateTime)
     last_activity = sa.Column(sa.DateTime)
+    language = sa.Column(sa.Unicode)
 
     __mapper_args__ = dict(polymorphic_identity='U')
 
@@ -134,6 +132,7 @@ class User(Principal):
             ('superuser', self.superuser),
             ('disabled', self.disabled),
             ('last_activity', self.last_activity),
+            ('language', self.language),
             ('oauth_subject', self.oauth_subject),
             ('oauth_tstamp', self.oauth_tstamp),
             ('member_of', [g.id for g in self.member_of])
@@ -141,7 +140,7 @@ class User(Principal):
 
     def deserialize(self, data):
         attrs = ('display_name', 'description', 'keyname',
-                 'superuser', 'disabled', 'password')
+                 'superuser', 'disabled', 'language', 'password')
         for a in attrs:
             if a in data:
                 setattr(self, a, data[a])
