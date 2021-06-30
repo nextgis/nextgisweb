@@ -6,6 +6,7 @@ Changes
 
 - Locale autodetection, per user locale setting.
 - Localization into Spanish is available by default.
+- Better support of KML: LIBKML GDAL driver is used when available.
 - Automatic downsampling of social preview image to 1600x630 pixels.
 
 3.8.0
