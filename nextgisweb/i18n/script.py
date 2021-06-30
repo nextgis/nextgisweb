@@ -40,12 +40,15 @@ def load_pkginfo(args):
 
 def load_components(args):
     pkginfo = load_pkginfo(args)
-    for cident, cdefn in pkginfo['components'].items():
-        if not args.component or cident in args.component:
-            if isinstance(cdefn, six.string_types):
-                yield (cident, cdefn)
-            else:
-                yield (cident, cdefn['module'])
+    if pkginfo is not None:
+        for cident, cdefn in pkginfo['components'].items():
+            if not args.component or cident in args.component:
+                if isinstance(cdefn, six.string_types):
+                    yield (cident, cdefn)
+                else:
+                    yield (cident, cdefn['module'])
+    else:
+        logger.warn("No components found for package '%s'", args.package)
 
 
 def get_mappings():
