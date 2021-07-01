@@ -16,7 +16,15 @@ require([
     xhr,
     route,
 ) {
-    var timeout = 3 * 60 * 1000;
+    var isSysInfo =
+    %if request.path == request.route_path('pyramid.control_panel.sysinfo'):
+        true
+    %else:
+        false
+    %endif
+    ;
+
+    var timeout = isSysInfo ? 0 : 3 * 60 * 1000;
 
     function check_update () {
         xhr.get(route.pyramid.check_update(), {
