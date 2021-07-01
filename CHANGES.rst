@@ -7,6 +7,7 @@ Changes
 - Locale autodetection, per user locale setting.
 - Localization into Spanish is available by default.
 - Better support of KML: LIBKML GDAL driver is used when available.
+- Filtering features by ID in feature REST API.
 - Automatic downsampling of social preview image to 1600x630 pixels.
 
 3.8.0
