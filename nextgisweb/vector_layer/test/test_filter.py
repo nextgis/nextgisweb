@@ -34,18 +34,24 @@ check_list = [
     ['string', 'notin', ['Foo, bar', 'bar', 'foo bar, baz'], ['Foo bar,2,3']],
     ['string', 'like', ['Foo%', '%bar', '%ba%'], ['bar%', 'foo%']],
     ['string', 'ilike', ['foo%', '%BAR', '%bA%'], ['bar%', '%foo']],
+    ['id', 'eq', [1], [0, 2]],
+    ['id', 'le', [1, 2], [0]],
+    ['id', 'gt', [0], [1, 2]],
+    ['id', 'in', ['0,1,2'], ['0,2']],
+    ['id', 'notin', ['0,2'], ['1']],
 ]
 
 tests = []
 
-for c in check_list:
-    [key, operator, should_be_true, should_be_false] = c
-    should_array = [should_be_false, should_be_true]
-    for i in range(len(should_array)):
-        s = should_array[i]
-        for v in s:
-            filter_ = [[key, operator, v]]
-            tests.append([filter_, i])
+for key, operator, should_be_true, should_be_false in check_list:
+    def add_param(v, length):
+        filter_ = [key, operator, v]
+        tests.append(pytest.param(filter_, length, id='{} {} {{{}}}'.format(key, operator, v)))
+
+    for v in should_be_true:
+        add_param(v, 1)
+    for v in should_be_false:
+        add_param(v, 0)
 
 
 @pytest.fixture
@@ -70,19 +76,15 @@ def resource(ngw_txn, ngw_resource_group):
     return resource
 
 
-@pytest.mark.parametrize('data', tests)
-def test_attribution(data, resource, ngw_txn):
+@pytest.mark.parametrize('filter_, length', tests)
+def test_filter(filter_, length, resource, ngw_txn):
+    query = resource.feature_query()
+    query.limit(1)
+    feature = query().one()
+    key = filter_[0]
+    filtered_value = feature.id if key == 'id' else feature.fields[key]
 
-    query = resource.feature_query()
-    result = query()
-    fields = list(result)[0].fields
-
-    query = resource.feature_query()
-    filter_ = data[0]
-    filtered_field = fields[filter_[0][0]]
-    query = resource.feature_query()
-    query.filter(*filter_)
-    result = query()
-    features = list(result)
-    msg = "%s for '%s' should be %s" % (filter_, filtered_field, data[1])
-    assert len(features) == data[1], msg
+    query_filter = resource.feature_query()
+    query_filter.filter(filter_)
+    msg = "%s for '%s' should be %s" % (filter_, filtered_value, length)
+    assert query_filter().total_count == length, msg
