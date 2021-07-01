@@ -351,11 +351,6 @@ def company_logo(request):
     return FileResponse(resource_filename('nextgisweb', 'static/img/logo_outline.png'))
 
 
-def check_update(request):
-    has_update = request.env.core.check_update()
-    return dict(has_update=has_update)
-
-
 def setup_pyramid(comp, config):
     config.add_tween('nextgisweb.pyramid.api.cors_tween_factory', under=(
         'nextgisweb.pyramid.exception.handled_exception_tween_factory',
@@ -450,7 +445,3 @@ def setup_pyramid(comp, config):
                      '/api/component/pyramid/home_path') \
         .add_view(home_path_get, request_method='GET', renderer='json') \
         .add_view(home_path_put, request_method='PUT', renderer='json')
-
-    if env.ngupdate_url != '':
-        config.add_route('pyramid.check_update', '/api/component/pyramid/check_update') \
-            .add_view(check_update, request_method='GET', renderer='json')
