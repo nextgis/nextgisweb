@@ -1,7 +1,3 @@
-#: amd/ngw-auth/UserWidget.js:38
-msgid "User"
-msgstr "Usuario"
-
 #: __init__.py:41
 msgid "Guest"
 msgstr "Invitado"
@@ -27,10 +23,13 @@ msgid "Owner"
 msgstr "Propietario"
 
 #: __init__.py:176
+#, python-format
 msgid "Maximum number of users is reached. Your current plan user number limit is %d."
-msgstr "Se alcanza el número máximo de usuarios. El límite de número de usuarios de su plan actual es %d."
+msgstr ""
+"Se alcanza el número máximo de usuarios. El límite de número de usuarios de "
+"su plan actual es %d."
 
-#: api.py:183
+#: api.py:218
 msgid "System principals couldn't be chanded."
 msgstr "Las principales del sistema no se pueden cambiar."
 
@@ -42,23 +41,23 @@ msgstr "Credenciales no válidas"
 msgid "User is disabled"
 msgstr "Usuario deshabilitado"
 
-#: oauth.py:118
+#: oauth.py:127
 msgid "User is already bound"
 msgstr "El usuario ya está vinculado"
 
-#: oauth.py:320
+#: oauth.py:329
 msgid "OAuth authorization error"
 msgstr "Error de autorización de OAuth"
 
-#: oauth.py:325
+#: oauth.py:334
 msgid "Invalid OAuth token"
 msgstr "Token de OAuth no válido"
 
-#: oauth.py:330
+#: oauth.py:339
 msgid "OAuth token refresh failed"
 msgstr "Error al actualizar el token de OAuth"
 
-#: oauth.py:335
+#: oauth.py:344
 msgid "OAuth access token is expired"
 msgstr "El token de acceso de OAuth está caducado"
 
@@ -79,53 +78,63 @@ msgid "Login is not unique."
 msgstr "El usuario no es único."
 
 #: views.py:370
-msgid "You can't disable current administrator. At least one enabled administrator is required."
-msgstr "No puede deshabilitar al administrador actual. Se requiere al menos un administrador habilitado."
+msgid ""
+"You can't disable current administrator. At least one enabled administrator "
+"is required."
+msgstr ""
+"No puede deshabilitar al administrador actual. Se requiere al menos un "
+"administrador habilitado."
 
-#: views.py:413
+#: views.py:414
 msgid "Create new user"
 msgstr "Crear un usuario nuevo"
 
-#: views.py:446 views.py:511
+#: views.py:447 views.py:512
 msgid "Users"
 msgstr "Usuarios"
 
-#: views.py:456 views.py:514
+#: views.py:457 views.py:515
 msgid "Groups"
 msgstr "Grupos"
 
-#: views.py:467 views.py:489
+#: views.py:468 views.py:490
 msgid "List"
 msgstr "Lista"
 
-#: views.py:472 views.py:494
+#: views.py:473 views.py:495
 msgid "Create"
 msgstr "Crear"
 
-#: views.py:478 views.py:500
+#: views.py:479 views.py:501
 msgid "Edit"
 msgstr "Editar"
 
-#: amd/ngw-auth/GroupWidget.js:39
+#: amd/ngw-auth/GroupWidget.js:36
 msgid "Group"
 msgstr "Grupo"
 
-#: amd/ngw-auth/UserWidget.js:47
+#: amd/ngw-auth/SettingsForm.js:54
+msgid "Saved"
+msgstr "Guardado"
+
+#: amd/ngw-auth/UserWidget.js:36
+msgid "User"
+msgstr "Usuario"
+
+#: amd/ngw-auth/UserWidget.js:45
 msgid "Enter new password here"
 msgstr "Ingrese la nueva contraseña"
 
-#: amd/ngw-auth/template/GroupWidget.hbs:7
-#: amd/ngw-auth/template/UserWidget.hbs:8 template/group_browse.mako:25
-#: template/user_browse.mako:25
+#: amd/ngw-auth/template/GroupWidget.hbs:7 amd/ngw-auth/template/UserWidget.hbs:8
+#: template/group_browse.mako:18 template/user_browse.mako:18
 msgid "Full name"
 msgstr "Nombre completo"
 
-#: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:26
+#: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:19
 msgid "Group name"
 msgstr "Nombre del grupo"
 
-#: amd/ngw-feature-description/DisplayWidget.js:11
-#: amd/ngw-feature-description/EditorWidget.js:14
+#: amd/ngw-auth/template/GroupWidget.hbs:19 amd/ngw-auth/template/UserWidget.hbs:52
 msgid "Description"
 msgstr "Descripción"
 
@@ -137,8 +146,13 @@ msgstr "Asignar en el registro"
 msgid "Group members"
 msgstr "Miembros del grupo"
 
+#: amd/ngw-auth/template/SettingsForm.hbs:13
+#: amd/ngw-auth/template/UserWidget.hbs:30
+msgid "Language"
+msgstr "Idioma"
+
 #: amd/ngw-auth/template/UserWidget.hbs:15 template/login.mako:44
-#: template/user_browse.mako:26
+#: template/user_browse.mako:19
 msgid "Login"
 msgstr "Usuario"
 
@@ -146,15 +160,15 @@ msgstr "Usuario"
 msgid "Password"
 msgstr "Contraseña"
 
-#: amd/ngw-auth/template/UserWidget.hbs:30
+#: amd/ngw-auth/template/UserWidget.hbs:37
 msgid "OAuth subject"
 msgstr "Sujeto de OAuth"
 
-#: amd/ngw-auth/template/UserWidget.hbs:36
+#: amd/ngw-auth/template/UserWidget.hbs:43
 msgid "Disabled"
 msgstr "Deshabilitado"
 
-#: amd/ngw-auth/template/UserWidget.hbs:52
+#: amd/ngw-auth/template/UserWidget.hbs:59
 msgid "Groups member"
 msgstr "Miembro del grupos"
 
@@ -166,7 +180,7 @@ msgstr "Autorización Requerida"
 msgid "Sign in to Web GIS"
 msgstr "Conectarse a Web GIS"
 
-#: template/login.mako:27 template/login.mako:37 template/user_settings.mako:13
+#: template/login.mako:27 template/login.mako:37 template/settings.mako:13
 msgid "Sign in with OAuth"
 msgstr "Conectarse con OAuth"
 
@@ -174,7 +188,7 @@ msgstr "Conectarse con OAuth"
 msgid "Sign in"
 msgstr "Conectarse"
 
-#: template/user_settings.mako:15
+#: template/settings.mako:15
 msgid "Your account is bound to NextGIS ID account"
 msgstr "Su cuenta está vinculada a la cuenta de ID de NextGIS"
 

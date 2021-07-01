@@ -8,8 +8,8 @@ msgstr "Внутренняя ошибка сервера"
 
 #: exception.py:209
 msgid ""
-"The server encountered an internal error or misconfiguration and was "
-"unable to complete your request."
+"The server encountered an internal error or misconfiguration and was unable "
+"to complete your request."
 msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
@@ -20,8 +20,8 @@ msgstr "Некорректный запрос"
 
 #: exception.py:239
 msgid ""
-"The server could not comply with the request since it is either malformed"
-" or otherwise incorrect."
+"The server could not comply with the request since it is either malformed or "
+"otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
 #: exception.py:246
@@ -41,9 +41,9 @@ msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
 msgstr ""
-"Возможно, страница удалена либо в адресе допущена ошибка. Исправьте адрес"
-" или вернитесь на главную страницу и попробуйте найти нужную страницу с "
-"помощью навигации."
+"Возможно, страница удалена либо в адресе допущена ошибка. Исправьте адрес или"
+" вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
+"навигации."
 
 #: exception.py:259
 msgid "Unprocessable entity"
@@ -75,43 +75,43 @@ msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: template/header.mako:89 view.py:85
+#: template/header.mako:94 view.py:86
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:109 view.py:428
+#: view.py:108 view.py:444
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:120 view.py:446
+#: view.py:123 view.py:462
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:135 view.py:434
+#: view.py:138 view.py:450
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:142 view.py:436
+#: view.py:145 view.py:452
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:149 view.py:438
+#: view.py:152 view.py:454
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:156 view.py:432
+#: view.py:159 view.py:448
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:163 view.py:440
+#: view.py:166 view.py:456
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:427
+#: view.py:443
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:431
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:6 view.py:447
 msgid "Settings"
 msgstr "Настройки"
 
@@ -174,6 +174,10 @@ msgstr "Вперёд"
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Создайте свою Веб ГИС на nextgis.com"
 
+#: amd/ngw-pyramid/form/LangSelect.js:24
+msgid "Browser default"
+msgstr "По умолчанию в браузере"
+
 #: amd/ngw-pyramid/form/RTETextBox.js:61
 msgid "Rich Text Editor"
 msgstr "Визуальный редактор"
@@ -199,38 +203,29 @@ msgstr "Сохранить"
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-pyramid/right-menu/RightMenu.js:60
-#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:5
-msgid "Sign out"
-msgstr "Выйти"
-
-#: amd/ngw-pyramid/right-menu/RightMenu.js:65 template/header.mako:30
-msgid "Sign in"
-msgstr "Войти"
-
 #: amd/ngw-pyramid/template/CORSForm.hbs:17
 msgid ""
-"Enter allowed origins for cross domain requests to use HTTP API of this "
-"Web GIS on other websites. One origin per line."
+"Enter allowed origins for cross domain requests to use HTTP API of this Web "
+"GIS on other websites. One origin per line."
 msgstr ""
 "Введите перечень допустимых источников для кросс-доменных запросов для "
-"использования HTTP API этой Веб ГИС на других веб-сайтах. По одному "
-"источнику в строке."
+"использования HTTP API этой Веб ГИС на других веб-сайтах. По одному источнику"
+" в строке."
 
 #: amd/ngw-pyramid/template/CORSForm.hbs:18
 msgid ""
 "Please note that different protocols (HTTP and HTTPS) and subdomains "
-"(example.com and www.example.com) are different origins. Wildcards are "
-"not allowed."
+"(example.com and www.example.com) are different origins. Wildcards are not "
+"allowed."
 msgstr ""
-"Имейте в виду, что разные протоколы (HTTP и HTTPS) и субдомены "
-"(example.com и www.example.com) считаются разными источниками. Символ "
-"подстановки (*) недопустим."
+"Имейте в виду, что разные протоколы (HTTP и HTTPS) и субдомены (example.com и"
+" www.example.com) считаются разными источниками. Символ подстановки (*) "
+"недопустим."
 
 #: amd/ngw-pyramid/template/CustomCSSForm.hbs:17
 msgid ""
-"Enter custom CSS rules here. They will be used to redefine styles, design"
-" for all pages of your Web GIS."
+"Enter custom CSS rules here. They will be used to redefine styles, design for"
+" all pages of your Web GIS."
 msgstr ""
 "Здесь можно задать стили CSS. Они будут использованы для оформления всех "
 "страниц вашей Веб ГИС."
@@ -242,6 +237,10 @@ msgstr "Рекомендуемая высота 45 px и ширина до 200 p
 #: amd/ngw-pyramid/template/LogoForm.hbs:25
 msgid "Cancel"
 msgstr "Закрыть"
+
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:7
+msgid "Sign out"
+msgstr "Выйти"
 
 #: nodepkg/api/error.js:11
 msgid "Unknown API error"
@@ -267,15 +266,15 @@ msgstr "Время (UTC)"
 msgid "Size"
 msgstr "Размер"
 
-#: template/header.mako:84
+#: template/header.mako:30
+msgid "Sign in"
+msgstr "Войти"
+
+#: template/header.mako:89
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: template/header.mako:98
-msgid "User settings"
-msgstr "Пользовательские параметры"
-
-#: template/header.mako:108
+#: template/header.mako:102
 msgid "Help"
 msgstr "Справка"
 
@@ -287,6 +286,10 @@ msgstr "Пакет"
 msgid "Version"
 msgstr "Версия"
 
-#: template/sysinfo.mako:47
+#: template/sysinfo.mako:50
 msgid "Platform"
 msgstr "Платформа"
+
+#~ msgid "User settings"
+#~ msgstr "Пользовательские параметры"
+

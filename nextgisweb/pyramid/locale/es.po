@@ -70,43 +70,43 @@ msgstr "Servicio no disponible"
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr "El servidor no esta disponible. Por favor, intente más tarde."
 
-#: template/header.mako:89 view.py:86
+#: template/header.mako:94 view.py:86
 msgid "Control panel"
 msgstr "Panel de control"
 
-#: view.py:108 view.py:432
+#: view.py:108 view.py:444
 msgid "System information"
 msgstr "Información del sistema"
 
-#: view.py:123 view.py:450
+#: view.py:123 view.py:462
 msgid "Backups"
 msgstr "Copias de seguridad"
 
-#: view.py:138 view.py:438
+#: view.py:138 view.py:450
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:145 view.py:440
+#: view.py:145 view.py:452
 msgid "Custom CSS"
 msgstr "CSS personalizado"
 
-#: view.py:152 view.py:442
+#: view.py:152 view.py:454
 msgid "Custom logo"
 msgstr "Logo personalizado"
 
-#: view.py:159 view.py:436
+#: view.py:159 view.py:448
 msgid "Web GIS name"
 msgstr "Nombre del Web GIS"
 
-#: view.py:166 view.py:444
+#: view.py:166 view.py:456
 msgid "Home path"
 msgstr "Ruta a la página principal"
 
-#: view.py:431
+#: view.py:443
 msgid "Info"
 msgstr "Información"
 
-#: view.py:435
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:6 view.py:447
 msgid "Settings"
 msgstr "Configuración"
 
@@ -167,6 +167,10 @@ msgstr "Adelante"
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Obtén tu propio Web GIS en nextgis.com"
 
+#: amd/ngw-pyramid/form/LangSelect.js:24
+msgid "Browser default"
+msgstr "Predeterminado por navegador"
+
 #: amd/ngw-pyramid/form/RTETextBox.js:61
 msgid "Rich Text Editor"
 msgstr "Editor de texto"
@@ -191,15 +195,6 @@ msgstr "Guardar"
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:41
 msgid "Delete"
 msgstr "Eliminar"
-
-#: amd/ngw-pyramid/right-menu/RightMenu.js:60
-#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:5
-msgid "Sign out"
-msgstr "Desconectarse"
-
-#: amd/ngw-pyramid/right-menu/RightMenu.js:65 template/header.mako:30
-msgid "Sign in"
-msgstr "Conectarse"
 
 #: amd/ngw-pyramid/template/CORSForm.hbs:17
 msgid ""
@@ -235,6 +230,10 @@ msgstr "Recomendamos una altura de 45 px y una anchura de hasta 200 px."
 msgid "Cancel"
 msgstr "Cancelar"
 
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:7
+msgid "Sign out"
+msgstr "Desconectarse"
+
 #: nodepkg/api/error.js:11
 msgid "Unknown API error"
 msgstr "Error de API desconocido"
@@ -259,15 +258,15 @@ msgstr "Marca temporal (UTC)"
 msgid "Size"
 msgstr "Tamaño"
 
-#: template/header.mako:84
+#: template/header.mako:30
+msgid "Sign in"
+msgstr "Conectarse"
+
+#: template/header.mako:89
 msgid "Resources"
 msgstr "Recursos"
 
-#: template/header.mako:98
-msgid "User settings"
-msgstr "Ajustes del usuario"
-
-#: template/header.mako:108
+#: template/header.mako:102
 msgid "Help"
 msgstr "Ayuda"
 
@@ -288,4 +287,7 @@ msgstr "Plataforma"
 
 #~ msgid "Packages"
 #~ msgstr "Paquetes"
+
+#~ msgid "User settings"
+#~ msgstr "Ajustes del usuario"
 
