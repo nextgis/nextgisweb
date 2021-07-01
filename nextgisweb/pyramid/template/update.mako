@@ -27,12 +27,21 @@ require([
     var timeout = isSysInfo ? 0 : 3 * 60 * 1000;
 
     function check_update () {
-        xhr.get(route.pyramid.check_update(), {
+        xhr.get("${ngupdate_url}/api/query", {
             handleAs: "json",
+            %if distr_opts.get('name') is not None:
+            query: {distribution: "${distr_opts['name']}" + ':' + "${distr_opts['version']}"},
+            %endif
+            headers: {"X-Requested-With": null}
         })
         %if request.user.is_administrator:
             .then(function (data) {
-                if (data.has_update) {
+                var has_update = false;
+                try {
+                    has_update = data.distribution.status === "has_update";
+                } catch {}
+
+                if (has_update) {
                     var list = query("#rightMenu .list")[0];
                     domConstruct.create("a", {
                         class: "list__item",
