@@ -295,7 +295,13 @@ def statistics(request):
     return result
 
 
+def require_storage_enabled(request):
+    if not request.env.core.options['storage.enabled']:
+        raise HTTPNotFound()
+
+
 def estimate_storage(request):
+    require_storage_enabled(request)
     request.require_administrator()
 
     worker = Thread(target=env.core.estimate_storage_all)
@@ -305,6 +311,7 @@ def estimate_storage(request):
 
 
 def storage(request):
+    require_storage_enabled(request)
     request.require_administrator()
 
     result = dict()
@@ -450,11 +457,10 @@ def setup_pyramid(comp, config):
         '/api/component/pyramid/estimate_storage',
     ).add_view(estimate_storage, request_method='POST')
 
-    if env.core.options['storage.enabled']:
-        config.add_route(
-            'pyramid.storage',
-            '/api/component/pyramid/storage',
-        ).add_view(storage, renderer='json')
+    config.add_route(
+        'pyramid.storage',
+        '/api/component/pyramid/storage',
+    ).add_view(storage, renderer='json')
 
     config.add_route(
         'pyramid.kind_of_data',

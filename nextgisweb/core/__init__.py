@@ -83,13 +83,15 @@ class CoreComponent(Component):
             'system.full_name', self.localizer().translate(_('NextGIS geoinformation system')))
         self.support_url_view = lambda request: self.options['support_url']
 
-        if self.options['storage.enabled']:
-            self.initialize_storage()
+        self.initialize_storage()
 
     def initialize_storage(self):
 
         def commit_storage(session, *args, **kwargs):
             if 'reserved_lst' not in session._extra_data:
+                return
+            
+            if not self.options['storage.enabled']:
                 return
 
             reserved_lst = session._extra_data['reserved_lst']

@@ -28,18 +28,15 @@ class Test2KindOfData(KindOfData):
 
 @pytest.fixture(scope='module', autouse=True)
 def prepare_storage(ngw_env):
-    storage_enabled = ngw_env.core.options['storage.enabled']
-    ngw_env.core.options['storage.enabled'] = True
-
     with transaction.manager:
         storage_stat_dimension.delete().execute()
         storage_stat_dimension_total.delete().execute()
         storage_stat_delta.delete().execute()
         storage_stat_delta_total.delete().execute()
 
-    yield
+    with ngw_env.core.options.override({'storage.enabled': True}):
+        yield
 
-    ngw_env.core.options['storage.enabled'] = storage_enabled
     ngw_env.core.estimate_storage_all()
 
 
@@ -52,7 +49,7 @@ def test_storage(ngw_env, ngw_webtest_app, ngw_auth_administrator):
         ngw_env.core.reserve_storage('test_comp_2', Test2KindOfData, value_data_volume=80)
 
     res = ngw_webtest_app.get('/api/component/pyramid/storage', status=200)
-    assert datetime.fromisoformat(res.json['timestamp']) == dt()
+    assert res.json['timestamp'] == dt().isoformat()
 
     storage = res.json['storage']
     assert storage[Test1KindOfData.identity] == 500
