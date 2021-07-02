@@ -122,10 +122,14 @@
             leftClickToOpen: true,
         });
 
+        %if request.env.core.options['storage.enabled']:
+        
         menu.addChild(new MenuItem({
             label: ${tr(_("Show resources volume")) | json.dumps, n },
             onClick: showVolume,
         }));
+        
+        %endif
 
         menu.startup();
     });
