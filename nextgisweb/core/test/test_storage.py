@@ -6,7 +6,6 @@ from datetime import datetime
 import pytest
 import transaction
 from freezegun import freeze_time
-from zope.sqlalchemy import mark_changed
 
 from nextgisweb.core import (
     KindOfData,
@@ -15,7 +14,6 @@ from nextgisweb.core import (
     storage_stat_delta,
     storage_stat_delta_total,
 )
-from nextgisweb.models import DBSession
 
 
 class Test1KindOfData(KindOfData):
@@ -47,14 +45,11 @@ def prepare_storage(ngw_env):
 
 def test_storage(ngw_env, ngw_webtest_app, ngw_auth_administrator):
     with freeze_time() as dt:
-        with transaction.manager:
-            ngw_env.core.reserve_storage('test_comp_1', Test1KindOfData, value_data_volume=100)
-            ngw_env.core.reserve_storage('test_comp_1', Test2KindOfData, value_data_volume=20)
+        ngw_env.core.reserve_storage('test_comp_1', Test1KindOfData, value_data_volume=100)
+        ngw_env.core.reserve_storage('test_comp_1', Test2KindOfData, value_data_volume=20)
 
-            ngw_env.core.reserve_storage('test_comp_2', Test1KindOfData, value_data_volume=400)
-            ngw_env.core.reserve_storage('test_comp_2', Test2KindOfData, value_data_volume=80)
-
-            mark_changed(DBSession())
+        ngw_env.core.reserve_storage('test_comp_2', Test1KindOfData, value_data_volume=400)
+        ngw_env.core.reserve_storage('test_comp_2', Test2KindOfData, value_data_volume=80)
 
     res = ngw_webtest_app.get('/api/component/pyramid/storage', status=200)
     assert datetime.fromisoformat(res.json['timestamp']) == dt()

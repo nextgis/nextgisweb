@@ -23,6 +23,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
+from zope.sqlalchemy import mark_changed
 
 
 # Prevent warning about missing __init__.py in migration directory. Is's OK
@@ -351,6 +352,9 @@ class CoreComponent(Component):
                 kind_of_data=kind_of_data,
                 resource=resource,
                 value_data_volume=value_data_volume))
+
+        with transaction.manager:
+            mark_changed(session)
 
     def estimate_storage_all(self):
         timestamp = datetime.utcnow()
