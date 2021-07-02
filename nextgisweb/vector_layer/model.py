@@ -24,7 +24,6 @@ from sqlalchemy import (
 
 from ..event import SafetyEvent
 from .. import db
-from ..core import reserve_storage
 from ..core.exception import ValidationError
 from ..resource import (
     Resource,
@@ -769,7 +768,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         size = self.tableinfo.load_from_ogr(
             ogrlayer, strdecode, skip_other_geometry_types, fix_errors, skip_errors)
 
-        reserve_storage(COMP_ID, VectorLayerData, value_data_volume=size, resource=self)
+        env.core.reserve_storage(COMP_ID, VectorLayerData, value_data_volume=size, resource=self)
 
     def get_info(self):
         return super(VectorLayer, self).get_info() + (

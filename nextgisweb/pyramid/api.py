@@ -450,10 +450,11 @@ def setup_pyramid(comp, config):
         '/api/component/pyramid/estimate_storage',
     ).add_view(estimate_storage, request_method='POST')
 
-    config.add_route(
-        'pyramid.storage',
-        '/api/component/pyramid/storage',
-    ).add_view(storage, renderer='json')
+    if env.core.options['storage.enabled']:
+        config.add_route(
+            'pyramid.storage',
+            '/api/component/pyramid/storage',
+        ).add_view(storage, renderer='json')
 
     config.add_route(
         'pyramid.kind_of_data',

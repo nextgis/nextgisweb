@@ -16,6 +16,7 @@ from subprocess import check_output
 from six import ensure_str
 
 import transaction
+import sqlalchemy as sa
 from sqlalchemy import create_engine, func, select, literal
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm.exc import NoResultFound
@@ -30,7 +31,6 @@ warnings.filterwarnings(
     'ignore', r"^Not importing.*/core/migration.*__init__\.py$",
     category=ImportWarning)
 
-
 from .. import db
 from ..component import Component
 from ..lib.config import Option
@@ -42,7 +42,7 @@ from ..package import enable_qualifications
 from .util import _
 from .kind_of_data import *  # NOQA
 from .model import (
-    Base, Setting, reserve_storage,
+    Base, Setting,
     storage_stat_dimension, storage_stat_dimension_total,
     storage_stat_delta, storage_stat_delta_total,
 )
@@ -81,6 +81,42 @@ class CoreComponent(Component):
         self.system_full_name_default = self.options.get(
             'system.full_name', self.localizer().translate(_('NextGIS geoinformation system')))
         self.support_url_view = lambda request: self.options['support_url']
+
+        if self.options['storage.enabled']:
+            self.initialize_storage()
+
+    def initialize_storage(self):
+
+        def commit_storage(session, *args, **kwargs):
+            if 'reserved_lst' not in session._extra_data:
+                return
+
+            reserved_lst = session._extra_data['reserved_lst']
+
+            if len(reserved_lst) == 0:
+                return
+
+            timestamp = datetime.utcnow()
+            conn = DBSession.connection()
+            while reserved_lst:
+                reserved = reserved_lst.pop()
+
+                params = dict(
+                    timestamp=timestamp,
+                    component=reserved['component'],
+                    kind_of_data=reserved['kind_of_data'].identity,
+                    resource_id=None if reserved['resource'] is None else reserved['resource'].id,
+                    value_data_volume=reserved['value_data_volume'])
+
+                conn.execute(sa.text('''
+                    INSERT INTO core_storage_stat_delta (
+                        tstamp, component, kind_of_data, resource_id, value_data_volume
+                    )
+                    VALUES (:timestamp, :component, :kind_of_data, :resource_id, :value_data_volume)
+                '''), **params)
+
+        sa.event.listen(DBSession, 'after_flush', commit_storage)
+        sa.event.listen(DBSession, 'before_commit', commit_storage)
 
     def is_service_ready(self):
         while True:
@@ -297,6 +333,25 @@ class CoreComponent(Component):
     def backup_filename(self, filename):
         return os.path.join(self.options['backup.path'], filename)
 
+    def reserve_storage(self, component, kind_of_data, value_data_volume=None, resource=None):
+        if not self.options['storage.enabled']:
+            return
+
+        session = DBSession()
+
+        if 'reserved_lst' not in session._extra_data:
+            session._extra_data['reserved_lst'] = []
+
+        reserved_lst = session._extra_data['reserved_lst']
+
+        # For now we reserve data volume only
+        if value_data_volume is not None:
+            reserved_lst.append(dict(
+                component=component,
+                kind_of_data=kind_of_data,
+                resource=resource,
+                value_data_volume=value_data_volume))
+
     def estimate_storage_all(self):
         timestamp = datetime.utcnow()
 
@@ -353,6 +408,9 @@ class CoreComponent(Component):
         Option('backup.filename', default='%Y%m%d-%H%M%S.ngwbackup', doc=(
             "File name template (passed to strftime) for filename in "
             "backup.path if backup target destination is not specified.")),
+
+        # Estimate storage
+        Option('storage.enabled', bool, default=False),
 
         # Ignore packages and components
         Option('packages.ignore', doc=(

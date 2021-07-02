@@ -395,10 +395,11 @@ def setup_pyramid(comp, config):
         '/control-panel/pkginfo'
     ).add_view(pkginfo)
 
-    config.add_route(
-        'pyramid.control_panel.storage',
-        '/control-panel/storage'
-    ).add_view(storage, renderer=ctpl('storage'))
+    if env.core.options['storage.enabled']:
+        config.add_route(
+            'pyramid.control_panel.storage',
+            '/control-panel/storage'
+        ).add_view(storage, renderer=ctpl('storage'))
 
     config.add_route(
         'pyramid.control_panel.backup.browse',
@@ -455,8 +456,6 @@ def setup_pyramid(comp, config):
         dm.Label('info', _("Info")),
         dm.Link('info/sysinfo', _("System information"), lambda args: (
             args.request.route_url('pyramid.control_panel.sysinfo'))),
-        dm.Link('info/storage', _("Storage"), lambda args: (
-            args.request.route_url('pyramid.control_panel.storage'))),
 
         dm.Label('settings', _("Settings")),
         dm.Link('settings/core', _("Web GIS name"), lambda args: (
@@ -470,6 +469,10 @@ def setup_pyramid(comp, config):
         dm.Link('settings/home_path', _("Home path"), lambda args: (
             args.request.route_url('pyramid.control_panel.home_path'))),
     )
+
+    if env.core.options['storage.enabled']:
+        comp.control_panel.add(dm.Link('info/storage', _("Storage"), lambda args: (
+            args.request.route_url('pyramid.control_panel.storage'))))
 
     if comp.options['backup.download']:
         comp.control_panel.add(dm.Link(

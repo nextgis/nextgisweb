@@ -12,7 +12,6 @@ from zope.interface import implementer
 from collections import OrderedDict
 from osgeo import gdal, gdalconst, osr, ogr
 
-from ..core import reserve_storage
 from ..lib.osrhelper import traditional_axis_mapping
 from ..models import declarative_base
 from ..resource import (
@@ -251,7 +250,7 @@ class _source_attr(SP):
         srlzr.obj.load_file(filedata, env)
 
         for kind_of_data, size in srlzr.obj.estimate_storage():
-            reserve_storage(COMP_ID, kind_of_data, value_data_volume=size, resource=srlzr.obj)
+            env.core.reserve_storage(COMP_ID, kind_of_data, value_data_volume=size, resource=srlzr.obj)
 
 
 class _color_interpretation(SP):

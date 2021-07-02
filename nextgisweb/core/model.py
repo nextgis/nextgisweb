@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-from datetime import datetime
-
-import sqlalchemy as sa
-import zope.event.classhandler
-from zope.sqlalchemy import mark_changed
-
-from ..models import DBSession, declarative_base
 from .. import db
+from ..models import declarative_base
 
 
 Base = declarative_base()
@@ -91,45 +85,3 @@ db.event.listen(storage_stat_delta, 'after_create', db.DDL('''
     CREATE TRIGGER after_insert AFTER INSERT ON core_storage_stat_delta
     FOR EACH ROW EXECUTE PROCEDURE core_storage_stat_delta_after_insert();
 '''), propagate=True)
-
-
-_reserved_lst = []
-
-
-def reserve_storage(component, kind_of_data, value_data_volume=None, resource=None):
-    global _reserved_lst
-
-    # For now we reserve data volume only
-    if value_data_volume is not None:
-        _reserved_lst.append(dict(
-            component=component,
-            kind_of_data=kind_of_data,
-            resource=resource,
-            value_data_volume=value_data_volume))
-
-
-@sa.event.listens_for(DBSession, 'after_flush')
-def _after_flush(session, flush_context):
-    global _reserved_lst
-
-    if len(_reserved_lst) == 0:
-        return
-
-    timestamp = datetime.utcnow()
-    conn = DBSession.connection()
-    while _reserved_lst:
-        reserved = _reserved_lst.pop()
-
-        params = dict(
-            timestamp=timestamp,
-            component=reserved['component'],
-            kind_of_data=reserved['kind_of_data'].identity,
-            resource_id=None if reserved['resource'] is None else reserved['resource'].id,
-            value_data_volume=reserved['value_data_volume'])
-
-        conn.execute(sa.text('''
-            INSERT INTO core_storage_stat_delta (
-                tstamp, component, kind_of_data, resource_id, value_data_volume
-            )
-            VALUES (:timestamp, :component, :kind_of_data, :resource_id, :value_data_volume)
-        '''), **params)
