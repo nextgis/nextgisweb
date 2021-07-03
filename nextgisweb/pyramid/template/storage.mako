@@ -1,92 +1,122 @@
 <%inherit file='nextgisweb:templates/base.mako' />
-<%!from nextgisweb.pyramid.util import _ %>
+<%! from nextgisweb.pyramid.util import _ %>
+<%! from nextgisweb.core import KindOfData %>
+<%! from markupsafe import Markup %>
 
+<%!
+
+SIZE_UNITS = (
+    ('GiB', 1 << 30, 1),
+    ('MiB', 1 << 20, 1),
+    ('KiB', 1 << 10, 0),
+    ('B', 1, 0),
+)
+
+def format_size(v):
+    for u, l, d in SIZE_UNITS:
+        if v >= l:
+            return "{:.0{}f} {}".format(float(v) / l, d, u)
+    return Markup('&nbsp;')
+
+%>
+
+<%
+    data = request.env.core.query_storage()
+    total = data[""]
+
+    estimation_running = request.env.core.estimation_running()
+%>
 
 <div class="content-box">
     <div class="table-wrapper">
-        <table class="pure-table pure-table-horizontal">
-
+        <table id="storage-summary" class="pure-table pure-table-horizontal">
             <thead><tr> 
-                <th class="sort-default" style="width: 80%; text-align: inherit;">${tr(_("Kind of data"))}</th>
-                <th style="width: 20em; text-align: inherit;">${tr(_("Volume"))}</th>
+                <th style="width: 80%; text-align: inherit;">${tr(_("Kind of data"))}</th>
+                <th style="width: 20em; text-align: right;">${tr(_("Volume"))}</th>
             </tr></thead>
 
-            <tbody id="storage-body"></tbody>
-            <tfoot id="storage-foot" style="font-size: larger;"></tfoot>
-        </table>
+            <tbody id="storage-body">
+                %for k, v in data.items():
+                    <% if k == '': continue %>
+                    <tr>
+                        <td>${tr(KindOfData.registry[k].display_name)}</td>
+                        <td data-sort="${v['data_volume']}" style="text-align: right">${format_size(v['data_volume'])}</td>
+                    </tr>
+                %endfor
+            </tbody>
 
+            <tfoot id="storage-foot">
+                <tr>
+                    <th style="text-align: inherit;">${tr(_("Total"))}</th>
+                    <th style="text-align: right;">${format_size(total["data_volume"])}</th>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 </div>
 
-<h3>${tr(_("Estimate time and date"))}:</h3>
-<input id="storage-timestamp" style="border: none; background: transparent"></input>
-<button id="estimate-btn">${tr(_("Estimate now"))}</button>
+<%
+    estimated = total['estimated']
+    updated = total['updated']
 
+    estimated = estimated.replace(microsecond=0).isoformat(' ') if estimated else None
+    updated = updated.replace(microsecond=0).isoformat(' ') if updated else None
+%>
 
-<script>
-require([
-    "dojo/number",
-    "dojo/promise/all",
-    "dojo/request/xhr",
-    "ngw/route",
-], function (
-    number,
-    all,
-    xhr,
-    route,
-) {
-    function formatBytes(bytes) {
-        var units = ["B", "KB", "MB", "GB"];
-        var i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length-1);
-        var value = bytes / 1024**i;
-        var places = i < 3 ? 0 : 2;
-        return number.format(value, {places: places, locale: dojoConfig.locale}) + " " + units[i];
-    }
+<div style="float:right">
+    <button id="estimateBtn" type="button"></button>
+</div>
 
-    function formatTimestamp(timestamp) {
-        if (timestamp === null) {
-            return "-";
-        } else {
-            var date = new Date(timestamp);
-            return date.toLocaleString();
-        }
-    }
+%if estimated and updated:
+    ${tr(_("Storage usage was fully estimated at %s and updated at %s.") % (
+        estimated, updated))}<br>
+%elif estimated:
+    ${tr(_("Storage usage was fully estimated at %s.") % estimated)}<br>
+%elif updated:
+    ${tr(_("Storage usage hasn't been estimated yet but was updated at %s.") % updated)}<br>
+%else:
+    ${tr(_("Storage usage hasn't been estimated yet."))}<br>
+%endif
 
-    all([
-        xhr.get(route.pyramid.storage(), {handleAs: "json"}),
-        xhr.get(route.pyramid.kind_of_data(), {handleAs: "json"})
-    ]).then(function (res) {
-        var data = res[0];
-        var kind_of_data = res[1];
+${tr(_("Some changes may be reflected only after full estimation."))}
 
-        var body = document.getElementById("storage-body");
-        var foot = document.getElementById("storage-foot");
+<script type="text/javascript">
+    require([
+        "@nextgisweb/pyramid/tablesort",
+        "ngw-pyramid/NGWButton/NGWButton",
+        "ngw-pyramid/ErrorDialog/ErrorDialog",
+        "dojo/on",
+        "@nextgisweb/pyramid/api",
+        "dojo/domReady!"
+    ], function (
+        tablesort, Button, ErrorDialog, on, api
+    ) {
+        tablesort.byId("storage-summary");
 
-        function add_row (parent, kind_of_data, volume) {
-            var row = parent.insertRow();
-            row.insertCell().innerText = kind_of_data;
-            volume_pretty = formatBytes(volume);
-            row.insertCell().innerText = volume_pretty;
-        }
+        %if estimation_running:
+            var estimateBtn = new Button({
+                label: "Estimation is in progress...",
+                color: 'secondary',
+                disabled: true
+            }, "estimateBtn");
+        %else:
+            var estimateBtn = new Button({
+                label: "Estimate storage",
+                color: 'secondary'
+            }, "estimateBtn");
 
-        var total = 0;
-        for (var key in data.storage) {
-            var volume = data.storage[key];
-            var display_name = key in kind_of_data ? kind_of_data[key] : key;
-            add_row(body, display_name, volume);
-            total += volume;
-        }
-        add_row(foot, "Total", total);
+            on(estimateBtn, 'click', function () {
+                api.route('pyramid.estimate_storage').post().then(
+                    function () {
+                        location.reload();
+                    },
+                    function (err) {
+                        new ErrorDialog(err).show()
+                    }
+                );
+            });
+        %endif
 
-        var timestamp = document.getElementById("storage-timestamp");
-        timestamp.value = formatTimestamp(data.timestamp);
     });
-
-    var btn_estimate = document.getElementById("estimate-btn");
-    btn_estimate.onclick = function () {
-        btn_estimate.disabled = true;
-        btn_estimate.style.color = "grey";
-        xhr.post(route.pyramid.estimate_storage());
-    };
-});
 </script>
+

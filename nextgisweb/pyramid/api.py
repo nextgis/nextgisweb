@@ -6,21 +6,15 @@ import base64
 from datetime import timedelta
 from collections import OrderedDict
 from pkg_resources import resource_filename
-from threading import Thread
 from importlib import import_module
 from six.moves.urllib.parse import unquote
 
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
-from sqlalchemy import func, select
 
 from ..env import env
 from ..package import pkginfo
-from ..core import (
-    storage_stat_dimension_total,
-    storage_stat_delta_total,
-    KindOfData,
-)
+from ..core import KindOfData
 from ..core.exception import ValidationError
 from ..models import DBSession
 from ..resource import Resource, MetadataScope
@@ -304,40 +298,13 @@ def estimate_storage(request):
     require_storage_enabled(request)
     request.require_administrator()
 
-    worker = Thread(target=env.core.estimate_storage_all)
-    worker.start()
-
-    return Response()
+    request.env.core.start_estimation()
 
 
 def storage(request):
     require_storage_enabled(request)
     request.require_administrator()
-
-    result = dict()
-
-    t1 = storage_stat_dimension_total
-    t2 = storage_stat_delta_total
-
-    s1 = select([t1.c.kind_of_data, t1.c.value_data_volume, t1.c.tstamp])
-    s2 = select([t2.c.kind_of_data, t2.c.value_data_volume, t2.c.tstamp])
-
-    s3 = s1.union_all(s2).alias('s')
-
-    s4 = select([s3.c.kind_of_data, func.sum(s3.c.value_data_volume)]) \
-        .group_by(s3.c.kind_of_data).alias('s')
-
-    storage = dict()
-
-    for identity, value_data_volume in DBSession.query(s4).all():
-        storage[identity] = value_data_volume
-
-    result['storage'] = storage
-
-    timestamp = DBSession.query(select([func.min(s3.c.tstamp)]).alias('t')).scalar()
-    result['timestamp'] = timestamp
-
-    return result
+    return dict((k, v) for k, v in request.env.core.query_storage().items())
 
 
 def kind_of_data(request):
@@ -455,7 +422,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'pyramid.estimate_storage',
         '/api/component/pyramid/estimate_storage',
-    ).add_view(estimate_storage, request_method='POST')
+    ).add_view(estimate_storage, request_method='POST', renderer='json')
 
     config.add_route(
         'pyramid.storage',

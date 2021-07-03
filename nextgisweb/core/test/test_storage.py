@@ -1,39 +1,30 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-from datetime import datetime
-
 import pytest
 import transaction
 from freezegun import freeze_time
 
-from nextgisweb.core import (
-    KindOfData,
-    storage_stat_dimension,
-    storage_stat_dimension_total,
-    storage_stat_delta,
-    storage_stat_delta_total,
-)
+from nextgisweb.models import DBSession
+from nextgisweb.core.storage import KindOfData
+from nextgisweb.core.model import storage_stat_delta
 
 
-class Test1KindOfData(KindOfData):
-    identity = 'test_1_kind_of_data'
+class TestKOD1(KindOfData):
+    identity = 'test_kod_1'
     display_name = identity
 
 
-class Test2KindOfData(KindOfData):
-    identity = 'test_2_kind_of_data'
+class TestKOD2(KindOfData):
+    identity = 'test_kod_2'
     display_name = identity
 
 
 @pytest.fixture(scope='module', autouse=True)
 def prepare_storage(ngw_env):
     with transaction.manager:
-        storage_stat_dimension.delete().execute()
-        storage_stat_dimension_total.delete().execute()
-        storage_stat_delta.delete().execute()
-        storage_stat_delta_total.delete().execute()
-
+        ngw_env.core._clear_storage_tables()
+    
     with ngw_env.core.options.override({'storage.enabled': True}):
         yield
 
@@ -41,16 +32,25 @@ def prepare_storage(ngw_env):
 
 
 def test_storage(ngw_env, ngw_webtest_app, ngw_auth_administrator):
-    with freeze_time() as dt:
-        ngw_env.core.reserve_storage('test_comp_1', Test1KindOfData, value_data_volume=100)
-        ngw_env.core.reserve_storage('test_comp_1', Test2KindOfData, value_data_volume=20)
+    reserve_storage = ngw_env.core.reserve_storage
+    with freeze_time() as dt, transaction.manager:
+        assert 'storage_reservations' not in DBSession().info
 
-        ngw_env.core.reserve_storage('test_comp_2', Test1KindOfData, value_data_volume=400)
-        ngw_env.core.reserve_storage('test_comp_2', Test2KindOfData, value_data_volume=80)
+        reserve_storage('test_comp_1', TestKOD1, value_data_volume=100)
+        reserve_storage('test_comp_1', TestKOD2, value_data_volume=20)
+        reserve_storage('test_comp_2', TestKOD1, value_data_volume=400)
+        reserve_storage('test_comp_2', TestKOD2, value_data_volume=80)
 
+        assert 'storage_reservations' in DBSession().info
+        assert len(DBSession().info['storage_reservations']) == 4
+
+    assert len(DBSession().info['storage_reservations']) == 0
+
+    cur = ngw_env.core.query_storage()
+    assert cur[TestKOD1.identity] == dict(
+        estimated=None, updated=dt(), data_volume=500)
+    
     res = ngw_webtest_app.get('/api/component/pyramid/storage', status=200)
-    assert res.json['timestamp'] == dt().isoformat()
-
-    storage = res.json['storage']
-    assert storage[Test1KindOfData.identity] == 500
-    assert storage[Test2KindOfData.identity] == 100
+    assert res.json['']['updated'] == dt().isoformat()
+    assert res.json[TestKOD1.identity]['data_volume'] == 500
+    assert res.json[TestKOD2.identity]['data_volume'] == 100

@@ -76,6 +76,8 @@ class PyramidComponent(Component):
                 display_name=display_name,
                 value=locale))
 
+        result['storage_enabled'] = self.env.core.options['storage.enabled']
+
         return result
 
     def maintenance(self):

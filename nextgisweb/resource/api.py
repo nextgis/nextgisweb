@@ -5,11 +5,9 @@ from collections import OrderedDict
 import zope.event
 
 from pyramid.response import Response
-from sqlalchemy import func, select
 
 from .. import db
 from .. import geojson
-from ..core import storage_stat_dimension, storage_stat_delta
 from ..core.exception import InsufficientPermissions
 from ..models import DBSession
 from ..auth import User
@@ -349,20 +347,10 @@ def resource_volume(resource, request):
     except InsufficientPermissions:
         volume = 0
     else:
-        t1 = storage_stat_dimension
-        t2 = storage_stat_delta
-
-        s1 = select([t1.c.resource_id, t1.c.value_data_volume])
-        s2 = select([t2.c.resource_id, t2.c.value_data_volume])
-
-        s3 = s1.union_all(s2).alias('s')
-
-        s4 = select([func.sum(s3.c.value_data_volume)]) \
-            .where(s3.c.resource_id.in_(ids)).alias('s')
-
-        result = DBSession.query(s4).scalar()
-
-        volume = 0 if result is None else result
+        res = request.env.core.query_storage(dict(
+            resource_id=lambda col: col.in_(ids)))
+        volume = res.get('', dict()).get('data_volume', 0)
+        volume = volume if volume is not None else 0
 
     return dict(volume=volume)
 

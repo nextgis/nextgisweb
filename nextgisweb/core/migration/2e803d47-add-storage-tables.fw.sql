@@ -4,7 +4,7 @@
     "message": "Add storage tables"
 } ***/
 
-CREATE TABLE public.core_storage_stat_delta
+CREATE TABLE core_storage_stat_delta
 (
     tstamp timestamp without time zone NOT NULL,
     component character varying,
@@ -13,14 +13,14 @@ CREATE TABLE public.core_storage_stat_delta
     value_data_volume integer
 );
 
-CREATE TABLE public.core_storage_stat_delta_total
+CREATE TABLE core_storage_stat_delta_total
 (
     tstamp timestamp without time zone NOT NULL,
     kind_of_data character varying,
     value_data_volume integer
 );
 
-CREATE TABLE public.core_storage_stat_dimension
+CREATE TABLE core_storage_stat_dimension
 (
     tstamp timestamp without time zone NOT NULL,
     component character varying,
@@ -29,7 +29,7 @@ CREATE TABLE public.core_storage_stat_dimension
     value_data_volume integer
 );
 
-CREATE TABLE public.core_storage_stat_dimension_total
+CREATE TABLE core_storage_stat_dimension_total
 (
     tstamp timestamp without time zone NOT NULL,
     kind_of_data character varying,

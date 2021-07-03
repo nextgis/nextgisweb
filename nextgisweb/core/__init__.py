@@ -15,15 +15,12 @@ from datetime import datetime, timedelta
 from subprocess import check_output
 from six import ensure_str
 
-import transaction
-import sqlalchemy as sa
-from sqlalchemy import create_engine, func, select, literal
+from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
-from zope.sqlalchemy import mark_changed
 
 
 # Prevent warning about missing __init__.py in migration directory. Is's OK
@@ -41,17 +38,16 @@ from ..compat import Path
 from ..package import enable_qualifications
 
 from .util import _
-from .kind_of_data import *  # NOQA
-from .model import (
-    Base, Setting,
-    storage_stat_dimension, storage_stat_dimension_total,
-    storage_stat_delta, storage_stat_delta_total,
-)
+from .model import Base, Setting
 from .command import BackupCommand  # NOQA
 from .backup import BackupBase, BackupMetadata  # NOQA
+from .storage import StorageComponentMixin, KindOfData
 
 
-class CoreComponent(Component):
+class CoreComponent(
+    StorageComponentMixin, 
+    Component
+):
     identity = 'core'
     metadata = Base.metadata
 
@@ -62,7 +58,7 @@ class CoreComponent(Component):
         self.locale_available = self.options['locale.available']
 
     def initialize(self):
-        Component.initialize(self)
+        super(CoreComponent, self).initialize()
 
         # Enable version and git qulifications only in development mode. In
         # production mode we trust package metadata.
@@ -82,44 +78,6 @@ class CoreComponent(Component):
         self.system_full_name_default = self.options.get(
             'system.full_name', self.localizer().translate(_('NextGIS geoinformation system')))
         self.support_url_view = lambda request: self.options['support_url']
-
-        self.initialize_storage()
-
-    def initialize_storage(self):
-
-        def commit_storage(session, *args, **kwargs):
-            if 'reserved_lst' not in session._extra_data:
-                return
-            
-            if not self.options['storage.enabled']:
-                return
-
-            reserved_lst = session._extra_data['reserved_lst']
-
-            if len(reserved_lst) == 0:
-                return
-
-            timestamp = datetime.utcnow()
-            conn = DBSession.connection()
-            while reserved_lst:
-                reserved = reserved_lst.pop()
-
-                params = dict(
-                    timestamp=timestamp,
-                    component=reserved['component'],
-                    kind_of_data=reserved['kind_of_data'].identity,
-                    resource_id=None if reserved['resource'] is None else reserved['resource'].id,
-                    value_data_volume=reserved['value_data_volume'])
-
-                conn.execute(sa.text('''
-                    INSERT INTO core_storage_stat_delta (
-                        tstamp, component, kind_of_data, resource_id, value_data_volume
-                    )
-                    VALUES (:timestamp, :component, :kind_of_data, :resource_id, :value_data_volume)
-                '''), **params)
-
-        sa.event.listen(DBSession, 'after_flush', commit_storage)
-        sa.event.listen(DBSession, 'before_commit', commit_storage)
 
     def is_service_ready(self):
         while True:
@@ -336,57 +294,6 @@ class CoreComponent(Component):
     def backup_filename(self, filename):
         return os.path.join(self.options['backup.path'], filename)
 
-    def reserve_storage(self, component, kind_of_data, value_data_volume=None, resource=None):
-        if not self.options['storage.enabled']:
-            return
-
-        session = DBSession()
-
-        if 'reserved_lst' not in session._extra_data:
-            session._extra_data['reserved_lst'] = []
-
-        reserved_lst = session._extra_data['reserved_lst']
-
-        # For now we reserve data volume only
-        if value_data_volume is not None:
-            reserved_lst.append(dict(
-                component=component,
-                kind_of_data=kind_of_data,
-                resource=resource,
-                value_data_volume=value_data_volume))
-
-        with transaction.manager:
-            mark_changed(session)
-
-    def estimate_storage_all(self):
-        timestamp = datetime.utcnow()
-
-        with transaction.manager:
-            storage_stat_dimension.delete().execute()
-            storage_stat_dimension_total.delete().execute()
-            storage_stat_delta.delete().execute()
-            storage_stat_delta_total.delete().execute()
-
-            for comp in self.env._components.values():
-                if hasattr(comp, 'estimate_storage'):
-                    for kind_of_data, resource_id, size in comp.estimate_storage():
-                        storage_stat_dimension.insert(dict(
-                            tstamp=timestamp,
-                            component=comp.identity,
-                            kind_of_data=kind_of_data.identity,
-                            resource_id=resource_id,
-                            value_data_volume=size
-                        )).execute()
-
-            dt = storage_stat_dimension
-
-            total = select([
-                literal(timestamp).label('tstamp'), dt.c.kind_of_data,
-                func.sum(dt.c.value_data_volume)
-            ]).group_by(dt.c.kind_of_data)
-
-            storage_stat_dimension_total.insert(). \
-                from_select(['tstamp', 'kind_of_data', 'value_data_volume'], total).execute()
 
     option_annotations = (
         Option('system.name', default="NextGIS Web"),
