@@ -73,20 +73,23 @@ def test_resource_storage(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth
     with transaction.manager:
         res1 = VectorLayer(
             parent_id=ngw_resource_group,
-            display_name='test-resource-group1',
+            display_name='test-resource-1',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
             geometry_type='POINT',
             tbl_uuid=six.text_type(uuid4().hex),
         ).persist()
+        res1.setup_from_fields([])
+
         res2 = VectorLayer(
             parent_id=ngw_resource_group,
-            display_name='test-resource-group2',
+            display_name='test-resource-2',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
             geometry_type='POINT',
             tbl_uuid=six.text_type(uuid4().hex),
         ).persist()
+        res2.setup_from_fields([])
 
         reserve_storage('test_comp', TestKOD1, resource=res1, value_data_volume=100)
         reserve_storage('test_comp', TestKOD2, resource=res1, value_data_volume=10)

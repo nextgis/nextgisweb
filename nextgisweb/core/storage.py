@@ -105,20 +105,21 @@ class StorageComponentMixin(object):
         agg = sa.select((source.c.kind_of_data,) + agg_cols).group_by(
             source.c.kind_of_data).cte('agg')
 
-        q = agg.select().union_all(sa.select(
-            (sa.sql.null(),) + agg_cols
-        ).select_from(agg)).alias('q')
+        q = agg.select()
+        if where is not None:
+            q = q.union_all(sa.select(
+                (literal(''),) + agg_cols
+            ).select_from(agg))
 
         with DBSession.no_autoflush:
             return dict((
-                # Null isn't allowed as JSON key, replace with empty string
-                row.kind_of_data if row.kind_of_data else '',
+                row.kind_of_data,
                 dict(
                     estimated=row.estimated,
                     updated=row.updated,
                     data_volume=row.data_volume,
                 )
-            ) for row in DBSession.execute(q))
+            ) for row in DBSession.execute(q.alias('q')))
 
     def estimate_storage_all(self):
         timestamp = datetime.utcnow()
@@ -145,17 +146,21 @@ class StorageComponentMixin(object):
                                 value_data_volume=size
                             )))
 
-                qtotal = select([
+                qtotal = sa.select([
                     literal(timestamp).label('tstamp'),
                     details.c.kind_of_data,
                     func.sum(details.c.value_data_volume)
-                ]).group_by(details.c.kind_of_data)
+                ]).group_by(details.c.kind_of_data).union_all(sa.select([
+                    literal(timestamp),
+                    literal(''),
+                    func.sum(details.c.value_data_volume)
+                ]))
 
                 con.execute(totals.insert().from_select([
                     'tstamp', 'kind_of_data', 'value_data_volume'], qtotal))
 
                 summary = [
-                    (k if k else 'total', v['data_volume'])
+                    (k if k != '' else 'total', v['data_volume'])
                     for k, v in self.query_storage().items()]
                 summary.sort(key=lambda i: i[1], reverse=True)
 
