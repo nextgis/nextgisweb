@@ -68,7 +68,7 @@ def test_storage(ngw_env, ngw_webtest_app, ngw_auth_administrator):
     assert res.json[TestKOD2.identity]['data_volume'] == 100
 
 
-def test_resource_delete(ngw_env, ngw_resource_group):
+def test_resource_storage(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
     reserve_storage = ngw_env.core.reserve_storage
     with transaction.manager:
         res1 = VectorLayer(
@@ -96,8 +96,13 @@ def test_resource_delete(ngw_env, ngw_resource_group):
         DBSession.expunge(res1)
         DBSession.expunge(res2)
 
-    cur = ngw_env.core.query_storage()
+    resp = ngw_webtest_app.get('/api/resource/%d/volume' % res1.id, status=200)
+    assert resp.json['volume'] == 110
 
+    resp = ngw_webtest_app.get('/api/resource/%d/volume' % res2.id, status=200)
+    assert resp.json['volume'] == 200
+
+    cur = ngw_env.core.query_storage()
     assert cur['']['data_volume'] == 310
     assert cur[TestKOD1.identity]['data_volume'] == 300
 
