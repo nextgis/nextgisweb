@@ -976,7 +976,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         for key in string_columns:
             size_columns.append(func.coalesce(func.octet_length(table.columns[key]), 0))
 
-        columns = [func.count(1), ] + [func.sum(c) for c in size_columns]
+        columns = [func.count(1), ] + [func.coalesce(func.sum(c), 0) for c in size_columns]
 
         query = sql.select(columns)
         row = DBSession.connection().execute(query).fetchone()
