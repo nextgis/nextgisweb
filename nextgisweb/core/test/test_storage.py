@@ -56,11 +56,14 @@ def test_storage(ngw_env, ngw_webtest_app, ngw_auth_administrator):
     assert len(DBSession().info['storage_reservations']) == 0
 
     cur = ngw_env.core.query_storage()
+    assert cur[''] == dict(
+        estimated=None, updated=dt(), data_volume=600)
     assert cur[TestKOD1.identity] == dict(
         estimated=None, updated=dt(), data_volume=500)
 
     res = ngw_webtest_app.get('/api/component/pyramid/storage', status=200)
     assert res.json['']['updated'] == dt().isoformat()
+    assert res.json['']['data_volume'] == 600
     assert res.json[TestKOD1.identity]['data_volume'] == 500
     assert res.json[TestKOD2.identity]['data_volume'] == 100
 
