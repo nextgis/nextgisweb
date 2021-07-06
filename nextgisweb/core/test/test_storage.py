@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
-
 from uuid import uuid4
+from time import sleep
 
 import pytest
 import six
@@ -136,6 +136,8 @@ def test_storage_estimate_all(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_
         file_upload=file_upload))
 
     ngw_webtest_app.post('/api/component/pyramid/estimate_storage', status=200)
+    sleep(0.05)  # Give a chance to start a thread and acquire the lock
+
     with transaction.manager:
         # Wait estimation end
         DBSession.execute(SQL_LOCK)
