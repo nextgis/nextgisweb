@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+
 import io
+import os
 
 from collections import OrderedDict
 from shutil import copyfileobj
@@ -56,9 +58,11 @@ class FeatureAttachment(Base):
             with io.open(srcfile, 'rb') as fs, io.open(dstfile, 'wb') as fd:
                 copyfileobj(fs, fd)
 
-            for k in ('name', 'mime_type', 'size'):
+            for k in ('name', 'mime_type'):
                 if k in file_upload:
                     setattr(self, k, file_upload[k])
+
+            self.size = os.stat(dstfile).st_size
 
         for k in ('name', 'mime_type', 'description'):
             if k in data:
