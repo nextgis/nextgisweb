@@ -10,6 +10,8 @@ from freezegun import freeze_time
 
 from nextgisweb.auth import User
 from nextgisweb.core import KindOfData
+from nextgisweb.core.storage import SQL_LOCK
+from nextgisweb.feature_attachment import FeatureAttachmentData
 from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
@@ -68,28 +70,24 @@ def test_storage(ngw_env, ngw_webtest_app, ngw_auth_administrator):
     assert res.json[TestKOD2.identity]['data_volume'] == 100
 
 
+def vector_layer(display_name, parent_id):
+    res = VectorLayer(
+        parent_id=parent_id,
+        display_name=display_name,
+        owner_user=User.by_keyname('administrator'),
+        srs=SRS.filter_by(id=3857).one(),
+        geometry_type='POINT',
+        tbl_uuid=six.text_type(uuid4().hex),
+    ).persist()
+    res.setup_from_fields([])
+    return res
+
+
 def test_resource_storage(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
     reserve_storage = ngw_env.core.reserve_storage
     with transaction.manager:
-        res1 = VectorLayer(
-            parent_id=ngw_resource_group,
-            display_name='test-resource-1',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-            geometry_type='POINT',
-            tbl_uuid=six.text_type(uuid4().hex),
-        ).persist()
-        res1.setup_from_fields([])
-
-        res2 = VectorLayer(
-            parent_id=ngw_resource_group,
-            display_name='test-resource-2',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-            geometry_type='POINT',
-            tbl_uuid=six.text_type(uuid4().hex),
-        ).persist()
-        res2.setup_from_fields([])
+        res1 = vector_layer('test-resource-1', ngw_resource_group)
+        res2 = vector_layer('test-resource-2', ngw_resource_group)
 
         reserve_storage('test_comp', TestKOD1, resource=res1, value_data_volume=100)
         reserve_storage('test_comp', TestKOD2, resource=res1, value_data_volume=10)
@@ -120,3 +118,31 @@ def test_resource_storage(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth
 
     cur = ngw_env.core.query_storage()
     assert cur['']['data_volume'] == 0
+
+
+def test_storage_estimate_all(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
+    with transaction.manager:
+        res = vector_layer('test-vector-layer', ngw_resource_group)
+        DBSession.flush()
+        DBSession.expunge(res)
+
+    feature = dict(geom='POINT (0 0)')
+    ngw_webtest_app.post_json('/api/resource/%d/feature/' % res.id, feature)
+
+    content = 'some-content'
+    resp = ngw_webtest_app.put('/api/component/file_upload/', content)
+    file_upload = resp.json
+    ngw_webtest_app.post_json('/api/resource/%d/feature/%d/attachment/' % (res.id, 1), dict(
+        file_upload=file_upload))
+
+    ngw_webtest_app.post('/api/component/pyramid/estimate_storage', status=200)
+    with transaction.manager:
+        # Wait estimation end
+        DBSession.execute(SQL_LOCK)
+
+    cur = ngw_env.core.query_storage(dict(resource_id=lambda col: col == res.id))
+    assert FeatureAttachmentData.identity in cur
+    assert cur[FeatureAttachmentData.identity]['data_volume'] == len(content)
+
+    with transaction.manager:
+        DBSession.delete(res)
