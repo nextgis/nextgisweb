@@ -138,10 +138,10 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
 
 
 @pytest.mark.parametrize('fid_source, fid_field, id_expect', (
-    ('SEQUENCE', None, 1),
-    ('FIELD', 'int', -1),
-    ('AUTO', 'int', -1),
-    ('AUTO', 'not_exists', 1),
+    ('SEQUENCE', [], 1),
+    ('FIELD', ['int', 'not_exists'], -1),
+    ('AUTO', ['not_exists', 'int'], -1),
+    ('AUTO', ['not_exists'], 1),
 ))
 def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
     src = Path(__file__).parent / 'data' / 'type.geojson'

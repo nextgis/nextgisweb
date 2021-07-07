@@ -155,7 +155,7 @@ class FID_SOURCE(object):
 
 fid_params_default = dict(
     fid_source=FID_SOURCE.SEQUENCE,
-    fid_field=None)
+    fid_field=[])
 
 
 class FieldDef(object):
@@ -277,21 +277,21 @@ class TableInfo(object):
         defn = ogrlayer.GetLayerDefn()
 
         if fid_params['fid_source'] in (FID_SOURCE.AUTO, FID_SOURCE.FIELD):
-            if fid_params['fid_field'] is not None:
-                idx = defn.GetFieldIndex(fid_params['fid_field'])
+            for fid_field in fid_params['fid_field']:
+                idx = defn.GetFieldIndex(fid_field)
                 if idx != -1:
                     fld_defn = defn.GetFieldDefn(idx)
                     if fld_defn.GetType() == ogr.OFTInteger:
                         self.fid_field_index = idx
 
             if self.fid_field_index is None and fid_params['fid_source'] == FID_SOURCE.FIELD:
-                if fid_params['fid_field'] is None:
+                if len(fid_params['fid_field']) == 0:
                     raise VE(_("Parameter 'fid_field' is missing."))
                 else:
                     if idx == -1:
-                        raise VE(_("Field '%s' not found.") % fid_params['fid_field'])
+                        raise VE(_("Fields %s not found.") % fid_params['fid_field'])
                     else:
-                        raise VE(_("Field '%s' type is not integer.") % fid_params['fid_field'])
+                        raise VE(_("None of fields %s are integer.") % fid_params['fid_field'])
 
         for i in range(defn.GetFieldCount()):
             if i == self.fid_field_index:
@@ -1113,9 +1113,13 @@ class _source_attr(SP):
             has_z=has_z)
 
         fid_source = srlzr.data.get('fid_source', fid_params_default['fid_source'])
+        fid_field_param = srlzr.data.get('fid_field')
+        fid_field = fid_params_default['fid_field'] if fid_field_param is None \
+            else fid_field_param.split(',')
+
         fid_params = dict(
             fid_source=fid_source,
-            fid_field=srlzr.data.get('fid_field')
+            fid_field=fid_field
         )
 
         self._setup_layer(srlzr.obj, ogrlayer, skip_other_geometry_types, fix_errors, skip_errors,
