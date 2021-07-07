@@ -17,7 +17,6 @@ from ..models import declarative_base
 from ..resource import (
     Resource,
     DataStructureScope, DataScope,
-    IResourceEstimateStorage,
     Serializer,
     SerializedProperty as SP,
     SerializedRelationship as SR,
@@ -56,7 +55,7 @@ COLOR_INTERPRETATION = OrderedDict((
     (gdal.GCI_YCbCr_CrBand, 'YCbCr_Cr')))
 
 
-@implementer(IBboxLayer, IResourceEstimateStorage)
+@implementer(IBboxLayer)
 class RasterLayer(Base, Resource, SpatialLayerMixin):
     identity = 'raster_layer'
     cls_display_name = _("Raster layer")
@@ -225,21 +224,18 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         return extent
 
-    # IResourceEstimateStorage implementation:
-    def estimate_storage(self):
-        result = []
 
-        def file_size(fn):
-            stat = os.stat(fn)
-            return stat.st_size
+def estimate_raster_layer_data(resource):
 
-        fn = env.raster_layer.workdir_filename(self.fileobj)
+    def file_size(fn):
+        stat = os.stat(fn)
+        return stat.st_size
 
-        # Size of source file with overviews
-        size = file_size(fn) + file_size(fn + '.ovr')
-        result.append((RasterLayerData, size))
+    fn = env.raster_layer.workdir_filename(resource.fileobj)
 
-        return result
+    # Size of source file with overviews
+    size = file_size(fn) + file_size(fn + '.ovr')
+    return size
 
 
 class _source_attr(SP):
@@ -249,8 +245,9 @@ class _source_attr(SP):
         filedata, filemeta = env.file_upload.get_filename(value['id'])
         srlzr.obj.load_file(filedata, env)
 
-        for kind_of_data, size in srlzr.obj.estimate_storage():
-            env.core.reserve_storage(COMP_ID, kind_of_data, value_data_volume=size, resource=srlzr.obj)
+        size = estimate_raster_layer_data(srlzr.obj)
+        env.core.reserve_storage(COMP_ID, RasterLayerData, value_data_volume=size,
+                                 resource=srlzr.obj)
 
 
 class _color_interpretation(SP):

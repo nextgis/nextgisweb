@@ -29,7 +29,6 @@ from ..resource import (
     Resource,
     DataScope,
     DataStructureScope,
-    IResourceEstimateStorage,
     Serializer,
     SerializedProperty as SP,
     SerializedRelationship as SR,
@@ -705,7 +704,7 @@ class VectorLayerField(Base, LayerField):
 
 @implementer(
     IFeatureLayer, IFieldEditableFeatureLayer, IWritableFeatureLayer,
-    IBboxLayer, IResourceEstimateStorage)
+    IBboxLayer)
 class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'vector_layer'
     cls_display_name = _("Vector layer")
@@ -956,38 +955,34 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         return extent
 
-    # IResourceEstimateStorage implementation:
-    def estimate_storage(self):
-        result = []
 
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
-        table = tableinfo.table
+def estimate_vector_layer_data(resource):
+    tableinfo = TableInfo.from_layer(resource)
+    tableinfo.setup_metadata(resource._tablename)
+    table = tableinfo.table
 
-        static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]  # ID field size
-        string_columns = []
-        for f in tableinfo.fields:
-            if f.datatype == FIELD_TYPE.STRING:
-                string_columns.append(f.key)
-            else:
-                static_size += FIELD_TYPE_SIZE[f.datatype]
+    static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]  # ID field size
+    string_columns = []
+    for f in tableinfo.fields:
+        if f.datatype == FIELD_TYPE.STRING:
+            string_columns.append(f.key)
+        else:
+            static_size += FIELD_TYPE_SIZE[f.datatype]
 
-        size_columns = [func.length(func.ST_AsBinary(table.columns.geom)), ]
-        for key in string_columns:
-            size_columns.append(func.coalesce(func.octet_length(table.columns[key]), 0))
+    size_columns = [func.length(func.ST_AsBinary(table.columns.geom)), ]
+    for key in string_columns:
+        size_columns.append(func.coalesce(func.octet_length(table.columns[key]), 0))
 
-        columns = [func.count(1), ] + [func.coalesce(func.sum(c), 0) for c in size_columns]
+    columns = [func.count(1), ] + [func.coalesce(func.sum(c), 0) for c in size_columns]
 
-        query = sql.select(columns)
-        row = DBSession.connection().execute(query).fetchone()
+    query = sql.select(columns)
+    row = DBSession.connection().execute(query).fetchone()
 
-        num_features = row[0]
-        dynamic_size = sum(row[1:])
-        size = static_size * num_features + dynamic_size
+    num_features = row[0]
+    dynamic_size = sum(row[1:])
+    size = static_size * num_features + dynamic_size
 
-        result.append((VectorLayerData, size))
-
-        return result
+    return size
 
 
 # Create vector_layer schema on table creation
