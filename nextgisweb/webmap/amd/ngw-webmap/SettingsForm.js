@@ -12,6 +12,7 @@ define([
     "dojo/text!./template/SettingsForm.hbs",
     // template
     "dijit/form/Button",
+    "dijit/form/CheckBox",
     "dijit/form/NumberTextBox",
     "dijit/layout/ContentPane",
     "dijit/layout/BorderContainer",
@@ -54,6 +55,8 @@ define([
 
                 var data = res[0];
                 this.wIdentifyRadius.set('value', data.identify_radius);
+                this.wIdentifyAttributes.set('value', data.identify_attributes);
+
                 this.wPopupWidth.set('value', data.popup_width);
                 this.wPopupHeight.set('value', data.popup_height);
 
@@ -72,6 +75,8 @@ define([
                 },
                 data: json.stringify({
                     identify_radius: this.wIdentifyRadius.get('value'),
+                    identify_attributes: this.wIdentifyAttributes.get('value'),
+
                     popup_width: this.wPopupWidth.get('value'),
                     popup_height: this.wPopupHeight.get('value'),
 

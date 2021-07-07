@@ -87,11 +87,12 @@ def settings_get(request):
     result = dict()
     for k, default in (
         ('identify_radius', 3),
-        ('popup_width', 300), 
+        ('identify_attributes', True),
+        ('popup_width', 300),
         ('popup_height', 200),
         ('units_length', 'm'),
         ('units_area', 'sq.m'),
-        ('degree_format', 'dd'), 
+        ('degree_format', 'dd'),
         ('measurement_srid', 4326),
     ):
         try:
@@ -109,7 +110,8 @@ def settings_put(request):
 
     body = request.json_body
     for k, v in body.items():
-        if k in ('identify_radius', 'popup_width', 'popup_height',
+        if k in ('identify_radius', 'identify_attributes',
+                 'popup_width', 'popup_height',
                  'units_length', 'units_area', 'degree_format', 'measurement_srid'):
             env.core.settings_set('webmap', k, v)
         else:
