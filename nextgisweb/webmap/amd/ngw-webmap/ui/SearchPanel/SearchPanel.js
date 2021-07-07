@@ -14,7 +14,7 @@ define([
     "dojo/_base/array",
     "ngw-feature-layer/FeatureStore",
     // settings
-    "@nextgisweb/pyramid/settings!feature_layer",
+    "@nextgisweb/pyramid/settings!webmap",
     // templates
     "dojo/text!./SearchPanel.hbs",
     // css
@@ -34,7 +34,7 @@ define([
     lang,
     array,
     FeatureStore,
-    featureLayersettings,
+    webmapSettings,
     template
 ) {
     return declare([DynamicPanel, BorderContainer],{
@@ -168,19 +168,28 @@ define([
                     }
                 }, this);
 
-                if (featureLayersettings.search.nominatim) {
+                if (webmapSettings.nominatim_enabled) {
                     var ndeferred = new Deferred();
 
                     deferred.then(lang.hitch(this, function (limit) {
                         var NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search/";
                         var CALLBACK = "json_callback";
 
+                        var query = {format: "json", limit: "30", q: criteria};
+                        if (webmapSettings.nominatim_extent) {
+                            var extent = this.display.map.getExtent("EPSG:4326");
+                            query.bounded = "1";
+                            query.viewbox = extent.join(",");
+                        }
+
                         jsonpArgs = {
                             jsonp: CALLBACK,
-                            query: {format: "json", limit: "30", q: criteria}
+                            query: query
                         };
 
                         script.get(NOMINATIM_SEARCH_URL, jsonpArgs).then(lang.hitch(this, function (data) {
+                            console.log('hi')
+                            console.log(data)
                             array.forEach(data, function (place) {
                                 if (limit > 0) {
                                     // Coordinates come in WGS84

@@ -60,6 +60,9 @@ define([
                 this.wPopupWidth.set('value', data.popup_width);
                 this.wPopupHeight.set('value', data.popup_height);
 
+                this.wNominatimEnabled.set('value', data.nominatim_enabled);
+                this.wNominatimExtent.set('value', data.nominatim_extent);
+
                 this.wUnitsLength.set('value', data.units_length);
                 this.wUnitsArea.set('value', data.units_area);
                 this.wDegreeFormat.set('value', data.degree_format);
@@ -79,6 +82,9 @@ define([
 
                     popup_width: this.wPopupWidth.get('value'),
                     popup_height: this.wPopupHeight.get('value'),
+
+                    nominatim_enabled: this.wNominatimEnabled.get('value'),
+                    nominatim_extent: this.wNominatimExtent.get('value'),
 
                     units_length: this.wUnitsLength.get('value'),
                     units_area: this.wUnitsArea.get('value'),
