@@ -8,5 +8,5 @@ from .util import _
 
 
 class RasterLayerData(KindOfData):
-    identity = 'raster_layer_data'
-    display_name = _("Raster layer data")
+    identity = 'raster_layer'
+    display_name = _("Rasters and pyramids")

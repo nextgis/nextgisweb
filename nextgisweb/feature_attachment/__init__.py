@@ -11,8 +11,8 @@ __all__ = ['FeatureAttachmentComponent', ]
 
 
 class FeatureAttachmentData(KindOfData):
-    identity = 'feature_attachment_data'
-    display_name = _("Feature attachment data")
+    identity = 'feature_attachment'
+    display_name = _("Feature attachments")
 
 
 class FeatureAttachmentComponent(Component):
