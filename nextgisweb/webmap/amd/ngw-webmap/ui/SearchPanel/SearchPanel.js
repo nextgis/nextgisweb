@@ -176,7 +176,7 @@ define([
 
                         var query = {format: "json", limit: "30", q: criteria};
                         if (webmapSettings.nominatim_extent) {
-                            var extent = this.display.map.getExtent("EPSG:4326");
+                            var extent = this.display.config.extent;
                             query.bounded = "1";
                             query.viewbox = extent.join(",");
                         }
