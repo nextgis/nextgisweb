@@ -5,7 +5,7 @@ define([
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
     "dojo/Deferred",
-    "dojo/request/script",
+    "dojo/request/xhr",
     "openlayers/ol",
     "dojo/on",
     "dojo/dom-class",
@@ -26,7 +26,7 @@ define([
     DynamicPanel,
     BorderContainer,
     Deferred,
-    script,
+    xhr,
     ol,
     on,
     domClass,
@@ -172,8 +172,7 @@ define([
                     var ndeferred = new Deferred();
 
                     deferred.then(lang.hitch(this, function (limit) {
-                        var NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search/";
-                        var CALLBACK = "json_callback";
+                        var NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search";
 
                         var query = {format: "json", limit: "30", q: criteria};
                         if (webmapSettings.nominatim_extent) {
@@ -182,14 +181,11 @@ define([
                             query.viewbox = extent.join(",");
                         }
 
-                        jsonpArgs = {
-                            jsonp: CALLBACK,
-                            query: query
-                        };
-
-                        script.get(NOMINATIM_SEARCH_URL, jsonpArgs).then(lang.hitch(this, function (data) {
-                            console.log('hi')
-                            console.log(data)
+                        xhr.get(NOMINATIM_SEARCH_URL, {
+                            handleAs: "json",
+                            query: query,
+                            headers: { "X-Requested-With": null }
+                        }).then(lang.hitch(this, function (data) {
                             array.forEach(data, function (place) {
                                 if (limit > 0) {
                                     // Coordinates come in WGS84
