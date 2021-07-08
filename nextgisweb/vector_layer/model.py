@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import re
 import json
 import uuid
 import zipfile
@@ -1115,7 +1116,7 @@ class _source_attr(SP):
         fid_source = srlzr.data.get('fid_source', fid_params_default['fid_source'])
         fid_field_param = srlzr.data.get('fid_field')
         fid_field = fid_params_default['fid_field'] if fid_field_param is None \
-            else fid_field_param.split(',')
+            else re.split(r'\s*,\s*', fid_field_param)
 
         fid_params = dict(
             fid_source=fid_source,
