@@ -70,7 +70,6 @@ define([
         },
 
         getExtent: function (crs) {
-            window.OL = ol
             var view = this.olMap.getView();
             var extent = view.calculateExtent();
             var mapCrs = view.getProjection().getCode();
