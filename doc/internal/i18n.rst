@@ -53,7 +53,7 @@ Create a ``.po`` file for the Russian language based on the ``.pot`` file:
 
 ::
 
-  (env) $ nextgisweb-i18n --package nextgisweb_foo update bar ru
+  (env) $ nextgisweb-i18n --package nextgisweb_foo update bar --locale ru
 
 As a result, the ``.po`` file ``nextgisweb_foo/bar/locale/ru.po`` will be
 created. This file must be filled in accordance with the translation of the
