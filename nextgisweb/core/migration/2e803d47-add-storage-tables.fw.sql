@@ -7,8 +7,8 @@
 CREATE TABLE core_storage_stat_delta
 (
     tstamp timestamp without time zone NOT NULL,
-    component character varying,
-    kind_of_data character varying,
+    component character varying NOT NULL,
+    kind_of_data character varying NOT NULL,
     resource_id integer,
     value_data_volume integer
 );
@@ -16,15 +16,16 @@ CREATE TABLE core_storage_stat_delta
 CREATE TABLE core_storage_stat_delta_total
 (
     tstamp timestamp without time zone NOT NULL,
-    kind_of_data character varying,
-    value_data_volume integer
+    kind_of_data character varying NOT NULL,
+    value_data_volume integer,
+    CONSTRAINT core_storage_stat_delta_total_pkey PRIMARY KEY (kind_of_data)
 );
 
 CREATE TABLE core_storage_stat_dimension
 (
     tstamp timestamp without time zone NOT NULL,
-    component character varying,
-    kind_of_data character varying,
+    component character varying NOT NULL,
+    kind_of_data character varying NOT NULL,
     resource_id integer,
     value_data_volume integer
 );
@@ -32,8 +33,9 @@ CREATE TABLE core_storage_stat_dimension
 CREATE TABLE core_storage_stat_dimension_total
 (
     tstamp timestamp without time zone NOT NULL,
-    kind_of_data character varying,
-    value_data_volume integer
+    kind_of_data character varying NOT NULL,
+    value_data_volume integer,
+    CONSTRAINT core_storage_stat_dimension_total_pkey PRIMARY KEY (kind_of_data)
 );
 
 CREATE FUNCTION core_storage_stat_delta_after_insert() RETURNS trigger
