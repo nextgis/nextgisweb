@@ -11,7 +11,7 @@ export function init (ngupdate_url, is_admin) {
 
     async function check_update () {
         const distr_opts = ngwConfig.distribution;
-        const params = { instance: ngwConfig.instance_id };
+        const params = { type: "check", instance: ngwConfig.instance_id };
         if (distr_opts.name !== null) {
             params.distribution = distr_opts.name + ':' + distr_opts.version;
         }
