@@ -37,7 +37,7 @@ from ..lib.config import Option
 from ..models import DBSession
 from ..i18n import Localizer, Translations
 from ..compat import Path
-from ..package import enable_qualifications
+from ..package import pkginfo, enable_qualifications
 
 from .util import _
 from .model import Base, Setting
@@ -243,6 +243,9 @@ class CoreComponent(Component):
         distr_opts = self.env.options.with_prefix('distribution')
         if distr_opts.get('name') is not None:
             query['distribution'] = distr_opts['name'] + ':' + distr_opts['version']
+        query['package'] = [
+            package.name + ':' + package.version
+            for package in pkginfo.packages.values()]
 
         try:
             res = requests.get(self.env.ngupdate_url + '/api/query',
