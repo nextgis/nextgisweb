@@ -84,8 +84,7 @@ require([
 
     <% ngupdate_url = request.env.ngupdate_url %>
     %if ngupdate_url != '' and distr_opts.get('name') is not None:
-        var distr_name = "${distr_opts.get('name', '')}";
-        var distr_version = "${distr_opts.get('version', '')}";
+        var distr_opts = ngwConfig.distribution;
         var ngupdate_url = "${ngupdate_url}";
 
         var showNotesButton = document.getElementById("show-notes-btn");
@@ -93,7 +92,7 @@ require([
             showNotesButton.style.display = "none";
 
             var iframe = document.createElement("iframe");
-            var query = "distribution=" + distr_name + ":" + distr_version;
+            var query = "distribution=" + distr_opts.name + ":" + distr_opts.version;
             iframe.src = ngupdate_url + "/api/notes?" + query;
             iframe.setAttribute("frameborder", 0);
             iframe.style.width = "100%";
