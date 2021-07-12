@@ -239,7 +239,7 @@ class CoreComponent(Component):
     def check_update(self):
         has_update = False
 
-        query = dict()
+        query = dict(instance=self.instance_id)
         distr_opts = self.env.options.with_prefix('distribution')
         if distr_opts.get('name') is not None:
             query['distribution'] = distr_opts['name'] + ':' + distr_opts['version']

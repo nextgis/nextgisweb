@@ -1,6 +1,5 @@
 <%
     ngupdate_url = request.env.ngupdate_url
-    distr_opts = request.env.options.with_prefix('distribution')
 %>
 %if ngupdate_url != '':
 <script type="text/javascript">
@@ -27,11 +26,15 @@ require([
     var timeout = isSysInfo ? 0 : 3 * 60 * 1000;
 
     function check_update () {
+        var distr_opts = ngwConfig.distribution;
+        var query = { instance: ngwConfig.instance_id };
+        if (distr_opts.name !== null) {
+            query.distribution = distr_opts.name + ':' + distr_opts.version;
+        }
+
         xhr.get("${ngupdate_url}/api/query", {
             handleAs: "json",
-            %if distr_opts.get('name') is not None:
-            query: {distribution: "${distr_opts['name']}" + ':' + "${distr_opts['version']}"},
-            %endif
+            query: query,
             headers: {"X-Requested-With": null}
         })
         %if request.user.is_administrator:

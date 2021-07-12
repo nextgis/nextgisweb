@@ -1,11 +1,20 @@
 <%! from json import dumps %>
 <%
+    distr_opts = request.env.options.with_prefix('distribution')
+
     ngwConfig = {
         "debug": request.env.core.debug,
         "applicationUrl": request.application_url,
         "assetUrl": request.static_url('nextgisweb:static/'),
         "amdUrl": request.route_url('amd_package', subpath=""),
         "distUrl": request.route_url('jsrealm.dist', subpath=''),
+        "distribution": {
+            "name": distr_opts.get('name'),
+            "description": distr_opts.get('description'),
+            "version": distr_opts.get('version'),
+            "date": distr_opts.get('date'),
+        },
+        "instance_id": request.env.core.instance_id,
     }
 
     dojoConfig = {
