@@ -40,7 +40,7 @@ export function init (ngupdate_url, is_admin) {
             if (has_update) {
                 const list = query("#rightMenu .list")[0];
                 domConstruct.create("a", {
-                    class: "list__item",
+                    class: "list__item list__item--link",
                     innerHTML: "New update available",
                     href: sysInfoURL,
                 }, list);
