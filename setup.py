@@ -48,7 +48,7 @@ requires = [
     'passlib==1.7.1',
     'requests[security]==2.22.0',
     'babel==2.6.0',
-    'sentry-sdk==0.14.3',
+    'sentry-sdk==1.3.0',
     'python-magic==0.4.15',
     'backports.tempfile==1.0',
     'pyproj<3',

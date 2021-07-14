@@ -28,10 +28,13 @@ class SentryComponent(Component):
                     PyramidIntegration(),
                     SqlalchemyIntegration(),
                 ],
-                ignore_errors = [KeyboardInterrupt],
+                ignore_errors=[KeyboardInterrupt],
                 environment=self.options['environment'],
                 shutdown_timeout=self.options['shutdown_timeout'],
             )
+
+    def setup_pyramid(self, config):
+        sentry_sdk.set_user(dict(id=self.env.core.instance_id))
 
     option_annotations = (
         Option('dsn'),
