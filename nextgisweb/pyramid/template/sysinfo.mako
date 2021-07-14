@@ -10,9 +10,7 @@
 <% distr_opts = request.env.options.with_prefix('distribution') %>
 %if distr_opts.get('name') is not None:
     <h2>${distr_opts.get('description')} ${distr_opts.get('version')} (${distr_opts.get('date')})</h2>
-    <div id="release-notes" style="margin-bottom: 10px;">
-        <button id="show-notes-btn" style="display: none;" class="has-update-only">${tr("Show release notes")}</button>
-    </div>
+    <button id="show-notes-btn" style="display: none; margin-bottom: 10px;" class="has-update-only">${tr("Show release notes")}</button>
 %endif
 
 <div class="content-box">
@@ -68,11 +66,11 @@
 
 <script>
 require([
-    "dojo/request/xhr",
     "ngw-pyramid/CopyButton/CopyButton",
+    "@nextgisweb/pyramid/OverlayDialog",
 ], function (
-    xhr,
     CopyButton,
+    OverlayDialog,
 ) {
     var domCopyButton = document.getElementById("info-copy-btn")
     var copyButton = new CopyButton({
@@ -89,16 +87,18 @@ require([
 
         var showNotesButton = document.getElementById("show-notes-btn");
         showNotesButton.onclick = function () {
-            showNotesButton.style.display = "none";
-
             var iframe = document.createElement("iframe");
             var query = "distribution=" + distr_opts.name + ":" + distr_opts.version;
             iframe.src = ngupdate_url + "/api/notes?" + query;
             iframe.setAttribute("frameborder", 0);
             iframe.style.width = "100%";
+            iframe.style.height = "100%";
 
-            var releaseNotesBlock = document.getElementById("release-notes");
-            releaseNotesBlock.appendChild(iframe);
+            var dlg = new OverlayDialog.OverlayDialog({
+                content: iframe.outerHTML,
+            });
+            window.dlg = dlg;
+            dlg.show();
         }
     %endif
 });
