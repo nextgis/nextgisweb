@@ -1,31 +1,29 @@
 # -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from base64 import b64decode
+from datetime import datetime, timedelta
+from logging import getLogger
+
 import six
 import sqlalchemy as sa
-from logging import getLogger
-from datetime import datetime, timedelta
-from base64 import b64decode
-
-from zope.interface import implementer
-from sqlalchemy.orm.exc import NoResultFound
-from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.httpexceptions import HTTPUnauthorized
+from pyramid.interfaces import IAuthenticationPolicy
+from sqlalchemy.orm.exc import NoResultFound
+from zope.interface import implementer
 
-from ..lib.config import OptionAnnotations, Option
-from ..compat import timestamp_to_datetime, datetime_to_timestamp
+from ..compat import datetime_to_timestamp, timestamp_to_datetime
 from ..core.exception import ValidationError
-
-from .models import User
+from ..lib.config import Option, OptionAnnotations
 from .exception import InvalidCredentialsException, UserDisabledException
+from .models import User
 from .oauth import OAuthTokenRefreshException
-
 
 logger = getLogger(__name__)
 
 
 @implementer(IAuthenticationPolicy)
 class AuthenticationPolicy(object):
-
     def __init__(self, comp, options):
         self.comp = comp
         self.oauth = comp.oauth
@@ -44,7 +42,7 @@ class AuthenticationPolicy(object):
 
         # Session based authentication
 
-        current = session.get('auth.policy.current')
+        current = session.get("auth.policy.current")
         if current is not None:
             atype, user_id, exp = current[0:3]
             exp = timestamp_to_datetime(int(exp))
@@ -52,15 +50,16 @@ class AuthenticationPolicy(object):
             now = datetime.utcnow()
             expired = exp <= now
 
-            if atype == 'OAUTH':
+            if atype == "OAUTH":
                 if len(current) != 3:
                     raise ValueError("Invalid OAuth session data")
 
                 if expired:
                     try:
                         tresp = self.oauth.grant_type_refresh_token(
-                            refresh_token=session['auth.policy.refresh_token'],
-                            access_token=session['auth.policy.access_token'])
+                            refresh_token=session["auth.policy.refresh_token"],
+                            access_token=session["auth.policy.access_token"],
+                        )
                         self.remember(request, (user_id, tresp))
                     except OAuthTokenRefreshException:
                         self.forget(request)
@@ -68,15 +67,17 @@ class AuthenticationPolicy(object):
 
                 return user_id
 
-            elif atype == 'LOCAL':
+            elif atype == "LOCAL":
                 if expired:
                     return None
 
-                refresh, = current[3:]
+                (refresh,) = current[3:]
                 if timestamp_to_datetime(refresh) <= now:
-                    session['auth.policy.current'] = current[0:2] + (
-                        int(datetime_to_timestamp(now + self.options['local.lifetime'])),
-                        int(datetime_to_timestamp(now + self.options['local.refresh'])),
+                    session["auth.policy.current"] = current[0:2] + (
+                        int(
+                            datetime_to_timestamp(now + self.options["local.lifetime"])
+                        ),
+                        int(datetime_to_timestamp(now + self.options["local.refresh"])),
                     )
 
                 return user_id
@@ -86,17 +87,17 @@ class AuthenticationPolicy(object):
 
         # HTTP based authentication
 
-        ahead = request.headers.get('Authorization')
+        ahead = request.headers.get("Authorization")
         if ahead is not None:
             ahead = six.ensure_text(ahead)
-            items = ahead.split(' ')
+            items = ahead.split(" ")
             if len(items) != 2:
                 raise ValidationError("Invalid 'Authorization' header.")
             amode, value = items
             amode = amode.upper()
 
-            if amode == 'BASIC':
-                items = six.ensure_text(b64decode(value)).split(':')
+            if amode == "BASIC":
+                items = six.ensure_text(b64decode(value)).split(":")
                 if len(items) != 2:
                     raise ValidationError("Invalid 'Authorization' header.")
                 username, password = items
@@ -104,16 +105,17 @@ class AuthenticationPolicy(object):
                 # Allow token authorization via basic when
                 # username is empty (for legacy clients).
 
-                if username == '':
-                    amode = 'BEARER'
+                if username == "":
+                    amode = "BEARER"
                     value = password
 
                 else:
                     user, _ = self.authenticate_with_password(
-                        username, password, oauth=False)
+                        username, password, oauth=False
+                    )
                     return user.id
 
-            if amode == 'BEARER' and self.oauth is not None:
+            if amode == "BEARER" and self.oauth is not None:
                 user = self.oauth.access_token_to_user(value)
                 if user is not None:
                     return user.id
@@ -131,16 +133,31 @@ class AuthenticationPolicy(object):
         if user_id is None:
             raise ValueError("Empty user_id in a session")
 
-        atype = 'LOCAL' if tresp is None else 'OAUTH'
-        exp = int(datetime_to_timestamp(datetime.utcnow() + self.options['local.lifetime'])) \
-            if tresp is None else tresp.expires
+        atype = "LOCAL" if tresp is None else "OAUTH"
+        exp = (
+            int(
+                datetime_to_timestamp(
+                    datetime.utcnow() + self.options["local.lifetime"]
+                )
+            )
+            if tresp is None
+            else tresp.expires
+        )
 
-        session['auth.policy.current'] = (atype, user_id, int(exp)) + ((
-            int(datetime_to_timestamp(datetime.utcnow() + self.options['local.refresh'])),
-        ) if atype == 'LOCAL' else ())
+        session["auth.policy.current"] = (atype, user_id, int(exp)) + (
+            (
+                int(
+                    datetime_to_timestamp(
+                        datetime.utcnow() + self.options["local.refresh"]
+                    )
+                ),
+            )
+            if atype == "LOCAL"
+            else ()
+        )
 
-        for k in ('access_token', 'refresh_token'):
-            sk = 'auth.policy.{}'.format(k)
+        for k in ("access_token", "refresh_token"):
+            sk = "auth.policy.{}".format(k)
             if tresp is None:
                 if sk in session:
                     del session[sk]
@@ -152,8 +169,8 @@ class AuthenticationPolicy(object):
     def forget(self, request):
         session = request.session
 
-        for k in ('current', 'access_token', 'refresh_token'):
-            sk = 'auth.policy.{}'.format(k)
+        for k in ("current", "access_token", "refresh_token"):
+            sk = "auth.policy.{}".format(k)
             if sk in session:
                 del session[sk]
 
@@ -189,10 +206,19 @@ class AuthenticationPolicy(object):
 
         return (user, tresp)
 
-    option_annotations = OptionAnnotations((
-        Option('local.lifetime', timedelta, default=timedelta(days=1),
-               doc="Local authentication lifetime."),
-
-        Option('local.refresh', timedelta, default=timedelta(hours=1),
-               doc="Refresh local authentication lifetime interval.")
-    ))
+    option_annotations = OptionAnnotations(
+        (
+            Option(
+                "local.lifetime",
+                timedelta,
+                default=timedelta(days=1),
+                doc="Local authentication lifetime.",
+            ),
+            Option(
+                "local.refresh",
+                timedelta,
+                default=timedelta(hours=1),
+                doc="Refresh local authentication lifetime interval.",
+            ),
+        )
+    )
