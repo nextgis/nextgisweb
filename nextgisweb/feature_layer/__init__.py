@@ -79,21 +79,6 @@ class FeatureLayerComponent(Component):
                 lambda ext: (ext.identity, ext.display_widget),
                 FeatureExtension.registry
             )),
-            identify=dict(
-                attributes=self.options['identify.attributes']
-            ),
-            search=dict(
-                nominatim=self.options['search.nominatim']
-            ),
             export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
             datatypes=FIELD_TYPE.enum,
         )
-
-    option_annotations = (
-        Option(
-            'identify.attributes', bool, default=True,
-            doc="Show attributes in identification."),
-        Option(
-            'search.nominatim', bool, default=True,
-            doc="Use Nominatim while searching")
-    )

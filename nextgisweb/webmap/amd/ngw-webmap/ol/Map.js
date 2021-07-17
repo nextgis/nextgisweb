@@ -69,6 +69,16 @@ define([
             };
         },
 
+        getExtent: function (crs) {
+            var view = this.olMap.getView();
+            var extent = view.calculateExtent();
+            var mapCrs = view.getProjection().getCode();
+            if (crs && (crs !== mapCrs)) {
+                extent = ol.proj.transform(extent, mapCrs, crs);
+            }
+            return extent;
+        },
+
         zoomToFeature: function (feature) {
             var geometry = feature.getGeometry(),
                 extent = geometry.getExtent();

@@ -206,7 +206,7 @@ define([
                     widget.featureContainer.addChild(widget.extController);
 
                     // Show feature attributes widget until it's not disabled by settings.
-                    if (featureLayersettings.identify.attributes) {
+                    if (webmapSettings.identify_attributes) {
                         var fwidget = new FieldsDisplayWidget({
                             resourceId: lid, featureId: fid,
                             compact: true, title: i18n.gettext("Attributes")

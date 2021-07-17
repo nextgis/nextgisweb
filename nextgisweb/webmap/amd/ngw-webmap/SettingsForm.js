@@ -12,6 +12,7 @@ define([
     "dojo/text!./template/SettingsForm.hbs",
     // template
     "dijit/form/Button",
+    "dijit/form/CheckBox",
     "dijit/form/NumberTextBox",
     "dijit/layout/ContentPane",
     "dijit/layout/BorderContainer",
@@ -54,8 +55,13 @@ define([
 
                 var data = res[0];
                 this.wIdentifyRadius.set('value', data.identify_radius);
+                this.wIdentifyAttributes.set('value', data.identify_attributes);
+
                 this.wPopupWidth.set('value', data.popup_width);
                 this.wPopupHeight.set('value', data.popup_height);
+
+                this.wNominatimEnabled.set('value', data.nominatim_enabled);
+                this.wNominatimExtent.set('value', data.nominatim_extent);
 
                 this.wUnitsLength.set('value', data.units_length);
                 this.wUnitsArea.set('value', data.units_area);
@@ -72,8 +78,13 @@ define([
                 },
                 data: json.stringify({
                     identify_radius: this.wIdentifyRadius.get('value'),
+                    identify_attributes: this.wIdentifyAttributes.get('value'),
+
                     popup_width: this.wPopupWidth.get('value'),
                     popup_height: this.wPopupHeight.get('value'),
+
+                    nominatim_enabled: this.wNominatimEnabled.get('value'),
+                    nominatim_extent: this.wNominatimExtent.get('value'),
 
                     units_length: this.wUnitsLength.get('value'),
                     units_area: this.wUnitsArea.get('value'),
