@@ -22,6 +22,7 @@ from .. import dynmenu as dm, pkginfo
 from ..core.exception import UserException
 from ..package import amd_packages
 from ..compat import lru_cache
+from ..auth.exception import InvalidCredentialsException, UserDisabledException
 
 from . import exception
 from .session import WebSession
@@ -299,9 +300,13 @@ def setup_pyramid(comp, config):
 
     # Replace default locale negotiator with session-based one
     def locale_negotiator(request):
-        user_lang = request.user.language
-        if user_lang is not None:
-            return user_lang
+        try:
+            user_lang = request.user.language
+            if user_lang is not None:
+                return user_lang
+        except (InvalidCredentialsException, UserDisabledException) as exc:
+            # Ignore user language in case of authentication failure
+            pass
 
         session_lang = request.session.get('pyramid.locale')
         if session_lang is not None:
