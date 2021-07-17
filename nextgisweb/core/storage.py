@@ -122,6 +122,10 @@ class StorageComponentMixin(object):
             ) for row in DBSession.execute(q.alias('q')))
 
     def estimate_storage_all(self):
+        if not self.options['storage.enabled']:
+            logger.warn("Nothing to do because storage stat isn't enabled!")
+            return
+
         timestamp = datetime.utcnow()
         try:
             logger.debug("Starting estimation...")

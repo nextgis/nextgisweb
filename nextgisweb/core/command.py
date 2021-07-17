@@ -291,18 +291,23 @@ class MaintenanceCommand(Command):
 
     @classmethod
     def argparser_setup(cls, parser, env):
-        pass
+        parser.add_argument(
+            '--estimate-storage', dest='estimate_storage', action='store_true',
+            help='Run storage.estimate after maintenance')
 
     @classmethod
     def execute(cls, args, env):
         for comp in env.chain('maintenance'):
             logger.debug("Maintenance for component: %s...", comp.identity)
             comp.maintenance()
+        
+        if args.estimate_storage:
+            env.core.estimate_storage_all()
 
 
 @Command.registry.register
-class EstimateStorageCommand(Command):
-    identity = 'estimate_storage'
+class StorageEstimateCommand(Command):
+    identity = 'storage.estimate'
 
     @classmethod
     def argparser_setup(cls, parser, env):
