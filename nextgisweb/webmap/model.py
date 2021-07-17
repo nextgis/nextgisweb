@@ -78,8 +78,12 @@ class WebMap(Base, Resource):
             editable=self.editable,
             root_item=self.root_item.to_dict(),
             bookmark_resource_id=self.bookmark_resource_id,
-            extent=(self.extent_left, self.extent_bottom,
-                    self.extent_right, self.extent_top),
+            extent=(
+                self.extent_left if self.extent_left is not None else -180,
+                self.extent_bottom if self.extent_bottom is not None else -90,
+                self.extent_right if self.extent_right is not None else +180,
+                self.extent_top if self.extent_top is not None else +90,
+            ),
             extent_constrained=self.extent_constrained,
         )
 
