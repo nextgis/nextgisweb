@@ -22,7 +22,7 @@ msgstr "Открыть"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:100 model.py:35
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:173 model.py:35
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
@@ -34,99 +34,97 @@ msgstr "Настройки веб-карты"
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-webmap/Display.js:207 amd/ngw-webmap/Display.js:1002
-#: amd/ngw-webmap/ItemWidget.js:246
+#: amd/ngw-webmap/Display.js:214 amd/ngw-webmap/Display.js:1011
+#: amd/ngw-webmap/ItemWidget.js:243
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:213
+#: amd/ngw-webmap/Display.js:220
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:219 amd/ngw-webmap/Display.js:429
+#: amd/ngw-webmap/Display.js:226 amd/ngw-webmap/Display.js:436
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:225 amd/ngw-webmap/Display.js:324
+#: amd/ngw-webmap/Display.js:232 amd/ngw-webmap/Display.js:331
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:363 amd/ngw-webmap/Display.js:370
+#: amd/ngw-webmap/Display.js:370 amd/ngw-webmap/Display.js:377
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:393 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:400 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:529 amd/ngw-webmap/Display.js:539
+#: amd/ngw-webmap/Display.js:537 amd/ngw-webmap/Display.js:547
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:720 amd/ngw-webmap/tool/Zoom.js:19
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:453
+#: amd/ngw-webmap/Display.js:729 amd/ngw-webmap/tool/Zoom.js:18
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:479
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:721 amd/ngw-webmap/tool/Zoom.js:22
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:454
+#: amd/ngw-webmap/Display.js:730 amd/ngw-webmap/tool/Zoom.js:21
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:480
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:725
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
+#: amd/ngw-webmap/Display.js:734 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:741
+#: amd/ngw-webmap/Display.js:750
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:744
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:467
+#: amd/ngw-webmap/Display.js:753 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/ExtentWidget.js:34
+#: amd/ngw-webmap/ExtentWidget.js:31
 msgid "Extent and bookmarks"
 msgstr "Охват и закладки"
 
-#: amd/ngw-webmap/ItemWidget.js:97 amd/ngw-webmap/template/ItemWidget.hbs:41
+#: amd/ngw-webmap/ItemWidget.js:94 amd/ngw-webmap/template/ItemWidget.hbs:41
 msgid "Layer order"
 msgstr "Порядок слоёв"
 
-#: amd/ngw-webmap/ItemWidget.js:147
+#: amd/ngw-webmap/ItemWidget.js:144
 msgid "Use on the map"
 msgstr "Учитывать на карте"
 
-#: amd/ngw-webmap/ItemWidget.js:151 amd/ngw-webmap/template/SettingsForm.hbs:75
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:45
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:33
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:93
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-webmap/ItemWidget.js:312 amd/ngw-webmap/template/ItemWidget.hbs:26
+#: amd/ngw-webmap/ItemWidget.js:309 amd/ngw-webmap/template/ItemWidget.hbs:26
 msgid "Add group"
 msgstr "Добавить группу"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:8
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:23
 msgid "Your annotation text"
 msgstr "Ваш текст аннотации"
 
 #: amd/ngw-webmap/layers/annotations/AnnotationsPopup.hbs:7
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:122
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:209
 msgid "Edit annotation"
 msgstr "Редактировать аннотацию"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:27
+#: amd/ngw-webmap/plugin/FeatureLayer.js:59
 msgid "Go to"
 msgstr "Перейти"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:74
+#: amd/ngw-webmap/plugin/FeatureLayer.js:115
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: amd/ngw-webmap/plugin/LayerEditor.js:79
+#: amd/ngw-webmap/plugin/LayerEditor.js:102
 msgid "Editing"
 msgstr "Редактирование"
 
@@ -138,15 +136,15 @@ msgstr "Увеличить до слоя"
 msgid "Enable layers editing"
 msgstr "Разрешить редактирование слоев"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:18
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:40
 msgid "Settings"
 msgstr "Настройки"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:30
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:52
 msgid "Enable annotations"
 msgstr "Разрешить аннотирование"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:33
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:55
 msgid "Show annotations by default"
 msgstr "Показывать аннотации по умолчанию"
 
@@ -251,163 +249,171 @@ msgstr "Высота, пикс."
 msgid "Radius, px"
 msgstr "Радиус, пикс."
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:29
+#: amd/ngw-webmap/template/SettingsForm.hbs:28
+msgid "Show feature attributes"
+msgstr "Показывать атрибуты объектов"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:33
 msgid "Measurement"
 msgstr "Измерения"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:33
+#: amd/ngw-webmap/template/SettingsForm.hbs:37
 msgid "Length units"
 msgstr "Единицы длины"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:34
+#: amd/ngw-webmap/template/SettingsForm.hbs:38
 msgid "Meters"
 msgstr "Метры"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:35
+#: amd/ngw-webmap/template/SettingsForm.hbs:39
 msgid "Kilometers"
 msgstr "Километры"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:36
+#: amd/ngw-webmap/template/SettingsForm.hbs:40
 msgid "Meters/kilometers (auto)"
 msgstr "Метры/километры (авто)"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:37
+#: amd/ngw-webmap/template/SettingsForm.hbs:41
 msgid "Feet"
 msgstr "Футы"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:38
+#: amd/ngw-webmap/template/SettingsForm.hbs:42
 msgid "Miles"
 msgstr "Мили"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:39
+#: amd/ngw-webmap/template/SettingsForm.hbs:43
 msgid "Feet/miles (auto)"
 msgstr "Футы/мили (авто)"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:44
+#: amd/ngw-webmap/template/SettingsForm.hbs:48
 msgid "Area units"
 msgstr "Единицы площади"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:45
+#: amd/ngw-webmap/template/SettingsForm.hbs:49
 msgid "Sq. meters"
 msgstr "Кв. метры"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:46
+#: amd/ngw-webmap/template/SettingsForm.hbs:50
 msgid "Sq. kilometers"
 msgstr "Кв. километры"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:47
+#: amd/ngw-webmap/template/SettingsForm.hbs:51
 msgid "Sq. meters/kilometers (auto)"
 msgstr "Кв. метры/километры (авто)"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:48
+#: amd/ngw-webmap/template/SettingsForm.hbs:52
 msgid "Hectares"
 msgstr "Гектары"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:49
+#: amd/ngw-webmap/template/SettingsForm.hbs:53
 msgid "Acres"
 msgstr "Акры"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:50
+#: amd/ngw-webmap/template/SettingsForm.hbs:54
 msgid "Sq. miles"
 msgstr "Кв. мили"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:51
+#: amd/ngw-webmap/template/SettingsForm.hbs:55
 msgid "Acres/sq. miles (auto)"
 msgstr "Акры/кв. мили (авто)"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:52
+#: amd/ngw-webmap/template/SettingsForm.hbs:56
 msgid "Sq. feet"
 msgstr "Кв. футы"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:57
+#: amd/ngw-webmap/template/SettingsForm.hbs:61
 msgid "Degree format"
 msgstr "Формат градусов"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:58
+#: amd/ngw-webmap/template/SettingsForm.hbs:62
 msgid "Decimal degrees"
 msgstr "Десятичные градусы"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:59
+#: amd/ngw-webmap/template/SettingsForm.hbs:63
 msgid "Degrees, decimal minutes"
 msgstr "Градусы и десятичные минуты"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:60
+#: amd/ngw-webmap/template/SettingsForm.hbs:64
 msgid "Degrees, minutes, seconds"
 msgstr "Градусы, минуты, секунды"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:65
+#: amd/ngw-webmap/template/SettingsForm.hbs:69
 msgid "Measurement SRID"
 msgstr "Система координат для расчётов"
 
+#: amd/ngw-webmap/template/SettingsForm.hbs:76
+msgid "Address search"
+msgstr "Адресный поиск"
+
 #: amd/ngw-webmap/template/SettingsForm.hbs:80
-msgid "Enable Nominatim search"
-msgstr "Включить поиск Nominatim"
+msgid "Enable"
+msgstr "Включить"
 
 #: amd/ngw-webmap/template/SettingsForm.hbs:84
-msgid "Limit Nominatim search within initial map extent"
-msgstr "Ограничить поиск Nominatim начальным охватом карты"
+msgid "Limit by web map initial extent"
+msgstr "Ограничить начальным охватом карты"
 
 #: amd/ngw-webmap/tool/Identify.js:212
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-webmap/tool/Identify.js:247
+#: amd/ngw-webmap/tool/Identify.js:246
 msgid "Feature"
 msgstr "Объект"
 
-#: amd/ngw-webmap/tool/Identify.js:305 amd/ngw-webmap/tool/Identify.js:322
+#: amd/ngw-webmap/tool/Identify.js:304 amd/ngw-webmap/tool/Identify.js:321
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:432
+#: amd/ngw-webmap/tool/Identify.js:431
 msgid "Features"
 msgstr "Объектов"
 
-#: amd/ngw-webmap/tool/Measure.js:34
+#: amd/ngw-webmap/tool/Measure.js:33
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
-#: amd/ngw-webmap/tool/Measure.js:37
+#: amd/ngw-webmap/tool/Measure.js:36
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: amd/ngw-webmap/tool/Measure.js:41
+#: amd/ngw-webmap/tool/Measure.js:40
 msgid "m"
 msgstr "м"
 
-#: amd/ngw-webmap/tool/Measure.js:42
+#: amd/ngw-webmap/tool/Measure.js:41
 msgid "km"
 msgstr "км"
 
-#: amd/ngw-webmap/tool/Measure.js:43
+#: amd/ngw-webmap/tool/Measure.js:42
 msgid "ft"
 msgstr "фут"
 
-#: amd/ngw-webmap/tool/Measure.js:44
+#: amd/ngw-webmap/tool/Measure.js:43
 msgid "mi"
 msgstr "миля"
 
-#: amd/ngw-webmap/tool/Measure.js:45
+#: amd/ngw-webmap/tool/Measure.js:44
 msgid "ha"
 msgstr "га"
 
-#: amd/ngw-webmap/tool/Measure.js:46
+#: amd/ngw-webmap/tool/Measure.js:45
 msgid "ac"
 msgstr "акр"
 
-#: amd/ngw-webmap/tool/Measure.js:267
+#: amd/ngw-webmap/tool/Measure.js:266
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 
-#: amd/ngw-webmap/tool/Rotate.js:15
+#: amd/ngw-webmap/tool/Rotate.js:14
 msgid "Rotate"
 msgstr "Поворот"
 
-#: amd/ngw-webmap/tool/Swipe.js:18
+#: amd/ngw-webmap/tool/Swipe.js:17
 msgid "Vertical swipe"
 msgstr "Вертикальная шторка"
 
-#: amd/ngw-webmap/tool/Swipe.js:22
+#: amd/ngw-webmap/tool/Swipe.js:21
 msgid "Horizontal swipe"
 msgstr "Горизонтальная шторка"
 
@@ -423,16 +429,16 @@ msgstr "Удалить объекты"
 msgid "Modify features"
 msgstr "Изменить объекты"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:50
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:38
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:110
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:48
 msgid "Don't save"
 msgstr "Не сохранять"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:55
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:125
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:212
 msgid "Create annotation"
 msgstr "Создать аннотацию"
 
@@ -471,9 +477,9 @@ msgstr "Размер пунсона, пикс"
 msgid "Invalid width: should be from 1 to 100 px"
 msgstr "Значение должно быть от 1 до 100 пикс."
 
-#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:185
-#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:201
-#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:216
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:262
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:282
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:301
 msgid "Error on the server:"
 msgstr "Ошибка на сервере:"
 
@@ -485,15 +491,15 @@ msgstr "Показывать слой аннотаций"
 msgid "Show messages"
 msgstr "Показывать сообщения"
 
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:17
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:27
 msgid "Stopping editing"
 msgstr "Закончить редактирование?"
 
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:25
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:35
 msgid "Do you want to save changes?"
 msgstr "Вы хотите сохранить изменения?"
 
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:53
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -607,12 +613,12 @@ msgstr "Используйте Shift+мышь для увеличения рам
 msgid "Search on the map"
 msgstr "Поиск по карте"
 
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:160
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:213
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:158
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:216
 msgid "Refine search criterion"
 msgstr "Уточните критерий поиска"
 
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:228
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:231
 msgid "Not found"
 msgstr "Не найдено"
 
@@ -644,7 +650,7 @@ msgstr "Генерация событий"
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:511
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
@@ -654,13 +660,13 @@ msgstr "TMS (Tile Map Service)"
 
 #: template/section_api_webmap.mako:11
 msgid ""
-"TMS (Tile Map Service) is a specification for tiled web maps. Tiled web "
-"map is a map displayed in a browser by seamlessly joining dozens of "
-"individually requested image."
+"TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map "
+"is a map displayed in a browser by seamlessly joining dozens of individually "
+"requested image."
 msgstr ""
-"TMS (Tile Map Service) - это спецификация тайловых карт.  Тайловая карта "
-"- это карта, отображаемая в браузере путем бесшовного соединения десятков"
-" индивидуально запрашиваемых изображений (тайлов)."
+"TMS (Tile Map Service) - это спецификация тайловых карт.  Тайловая карта - "
+"это карта, отображаемая в браузере путем бесшовного соединения десятков "
+"индивидуально запрашиваемых изображений (тайлов)."
 
 #: template/section_api_webmap.mako:16
 msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
