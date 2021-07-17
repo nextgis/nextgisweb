@@ -22,42 +22,44 @@ def format_size(v):
 
 <%
     data = request.env.core.query_storage()
-    total = data[""]
+    total = data.get("")
 
     estimation_running = request.env.core.estimation_running()
 %>
 
-<div class="content-box">
-    <div class="table-wrapper">
-        <table id="storage-summary" class="pure-table pure-table-horizontal">
-            <thead><tr> 
-                <th style="width: 80%; text-align: inherit;">${tr(_("Kind of data"))}</th>
-                <th style="width: 20em; text-align: right;">${tr(_("Volume"))}</th>
-            </tr></thead>
+%if total:
+    <div class="content-box">
+        <div class="table-wrapper">
+            <table id="storage-summary" class="pure-table pure-table-horizontal">
+                <thead><tr> 
+                    <th style="width: 80%; text-align: inherit;">${tr(_("Kind of data"))}</th>
+                    <th style="width: 20em; text-align: right;">${tr(_("Volume"))}</th>
+                </tr></thead>
 
-            <tbody id="storage-body">
-                %for k, v in data.items():
-                    <% if k == '': continue %>
+                <tbody id="storage-body">
+                    %for k, v in data.items():
+                        <% if k == '': continue %>
+                        <tr>
+                            <td>${tr(KindOfData.registry[k].display_name)}</td>
+                            <td data-sort="${v['data_volume']}" style="text-align: right">${format_size(v['data_volume'])}</td>
+                        </tr>
+                    %endfor
+                </tbody>
+
+                <tfoot id="storage-foot">
                     <tr>
-                        <td>${tr(KindOfData.registry[k].display_name)}</td>
-                        <td data-sort="${v['data_volume']}" style="text-align: right">${format_size(v['data_volume'])}</td>
+                        <th style="text-align: inherit;">${tr(_("Total"))}</th>
+                        <th style="text-align: right;">${format_size(total["data_volume"])}</th>
                     </tr>
-                %endfor
-            </tbody>
-
-            <tfoot id="storage-foot">
-                <tr>
-                    <th style="text-align: inherit;">${tr(_("Total"))}</th>
-                    <th style="text-align: right;">${format_size(total["data_volume"])}</th>
-                </tr>
-            </tfoot>
-        </table>
+                </tfoot>
+            </table>
+        </div>
     </div>
-</div>
+%endif
 
 <%
-    estimated = total['estimated']
-    updated = total['updated']
+    estimated = total['estimated'] if total else None
+    updated = total['updated'] if total else None
 
     estimated = estimated.replace(microsecond=0).isoformat(' ') if estimated else None
     updated = updated.replace(microsecond=0).isoformat(' ') if updated else None
@@ -91,7 +93,9 @@ ${tr(_("Some changes may be reflected only after full estimation."))}
     ], function (
         tablesort, Button, ErrorDialog, on, api
     ) {
-        tablesort.byId("storage-summary");
+        %if total:
+            tablesort.byId("storage-summary");
+        %endif
 
         %if estimation_running:
             var estimateBtn = new Button({
