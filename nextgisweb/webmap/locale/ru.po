@@ -339,7 +339,15 @@ msgstr "Градусы, минуты, секунды"
 msgid "Measurement SRID"
 msgstr "Система координат для расчётов"
 
-#: amd/ngw-webmap/tool/Identify.js:213
+#: amd/ngw-webmap/template/SettingsForm.hbs:80
+msgid "Enable Nominatim search"
+msgstr "Включить поиск Nominatim"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:84
+msgid "Limit Nominatim search within initial map extent"
+msgstr "Ограничить поиск Nominatim начальным охватом карты"
+
+#: amd/ngw-webmap/tool/Identify.js:212
 msgid "Attributes"
 msgstr "Атрибуты"
 
