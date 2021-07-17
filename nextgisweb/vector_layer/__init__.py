@@ -4,8 +4,9 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from ..component import Component, require
 from ..lib.config import Option
 
-from .model import Base, VectorLayer
 from . import command  # NOQA
+from .kind_of_data import VectorLayerData
+from .model import Base, VectorLayer, estimate_vector_layer_data
 
 __all__ = [
     'VectorLayerComponent',
@@ -23,6 +24,11 @@ class VectorLayerComponent(Component):
 
     def client_settings(self, request):
         return dict(show_create_mode=self.options['show_create_mode'])
+
+    def estimate_storage(self):
+        for resource in VectorLayer.query():
+            size = estimate_vector_layer_data(resource)
+            yield VectorLayerData, resource.id, size
 
     option_annotations = (
         Option('show_create_mode', bool, default=False),

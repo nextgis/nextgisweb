@@ -1,20 +1,20 @@
-#: __init__.py:76
+#: __init__.py:79
 msgid "NextGIS geoinformation system"
 msgstr "Геоинформационная система NextGIS"
 
-#: __init__.py:201
+#: __init__.py:204
 msgid "Linux kernel"
 msgstr "Ядро Linux"
 
-#: __init__.py:204
+#: __init__.py:207
 msgid "OS distribution"
 msgstr "Дистрибутив ОС"
 
-#: __init__.py:215
+#: __init__.py:218
 msgid "CPU"
 msgstr "Процессор"
 
-#: __init__.py:220
+#: __init__.py:223
 msgid "RAM"
 msgstr "ОЗУ"
 
@@ -29,6 +29,10 @@ msgstr "Недостаточно прав"
 #: exception.py:105
 msgid "Operational error"
 msgstr "Операционная ошибка"
+
+#: storage.py:225
+msgid "Estimation is already running"
+msgstr "Процесс оценки хранилища уже запущен"
 
 #: test/test_exception.py:79
 #, python-format

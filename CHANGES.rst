@@ -11,6 +11,7 @@ Changes
 - Automatic downsampling of social preview image to 1600x630 pixels.
 - Disable (and enable) Nominatim search via settings in the control panel.
 - Ability to constraint Nominatim search area by web map initial extent.
+- Experimental storage accounting and estimation subsystem.
 
 3.8.0
 -----

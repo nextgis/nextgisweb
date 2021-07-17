@@ -14,6 +14,7 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 
 from ..env import env
 from ..package import pkginfo
+from ..core import KindOfData
 from ..core.exception import ValidationError
 from ..models import DBSession
 from ..resource import Resource, MetadataScope
@@ -288,6 +289,33 @@ def statistics(request):
     return result
 
 
+def require_storage_enabled(request):
+    if not request.env.core.options['storage.enabled']:
+        raise HTTPNotFound()
+
+
+def estimate_storage(request):
+    require_storage_enabled(request)
+    request.require_administrator()
+
+    request.env.core.start_estimation()
+
+
+def storage(request):
+    require_storage_enabled(request)
+    request.require_administrator()
+    return dict((k, v) for k, v in request.env.core.query_storage().items())
+
+
+def kind_of_data(request):
+    request.require_administrator()
+
+    result = dict()
+    for item in KindOfData.registry:
+        result[item.identity] = request.localizer.translate(item.display_name)
+    return result
+
+
 def custom_css_get(request):
     try:
         body = request.env.core.settings_get('pyramid', 'custom_css')
@@ -390,6 +418,21 @@ def setup_pyramid(comp, config):
         'pyramid.statistics',
         '/api/component/pyramid/statistics',
     ).add_view(statistics, renderer='json')
+
+    config.add_route(
+        'pyramid.estimate_storage',
+        '/api/component/pyramid/estimate_storage',
+    ).add_view(estimate_storage, request_method='POST', renderer='json')
+
+    config.add_route(
+        'pyramid.storage',
+        '/api/component/pyramid/storage',
+    ).add_view(storage, renderer='json')
+
+    config.add_route(
+        'pyramid.kind_of_data',
+        '/api/component/pyramid/kind_of_data',
+    ).add_view(kind_of_data, renderer='json')
 
     config.add_route(
         'pyramid.custom_css', '/api/component/pyramid/custom_css') \

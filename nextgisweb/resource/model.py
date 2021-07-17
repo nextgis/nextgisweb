@@ -6,6 +6,7 @@ from datetime import datetime
 import six
 
 from bunch import Bunch
+from sqlalchemy import event, text
 
 from .. import db
 from ..auth import Principal, User, Group
@@ -272,6 +273,28 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
     def check_social_editable(cls):
         """ Can this resource social settings be editable? """
         return False
+
+
+@event.listens_for(Resource, 'after_delete', propagate=True)
+def resource_after_delete(mapper, connection, target):
+    connection.execute(text('''
+        INSERT INTO core_storage_stat_delta (
+            tstamp, component, kind_of_data,
+            resource_id, value_data_volume
+        )
+        SELECT
+            :timestamp, component, kind_of_data,
+            :resource_id, -SUM(value_data_volume)
+        FROM (
+            SELECT component, kind_of_data, resource_id, value_data_volume
+            FROM core_storage_stat_dimension
+            UNION ALL
+            SELECT component, kind_of_data, resource_id, value_data_volume
+            FROM core_storage_stat_delta
+        ) t
+        WHERE resource_id = :resource_id
+        GROUP BY component, kind_of_data
+    '''), timestamp=datetime.utcnow(), resource_id=target.id)
 
 
 ResourceScope.read.require(

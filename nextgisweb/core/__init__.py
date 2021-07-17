@@ -29,7 +29,6 @@ warnings.filterwarnings(
     'ignore', r"^Not importing.*/core/migration.*__init__\.py$",
     category=ImportWarning)
 
-
 from .. import db
 from ..component import Component
 from ..lib.config import Option
@@ -42,9 +41,13 @@ from .util import _
 from .model import Base, Setting
 from .command import BackupCommand  # NOQA
 from .backup import BackupBase, BackupMetadata  # NOQA
+from .storage import StorageComponentMixin, KindOfData
 
 
-class CoreComponent(Component):
+class CoreComponent(
+    StorageComponentMixin, 
+    Component
+):
     identity = 'core'
     metadata = Base.metadata
 
@@ -55,7 +58,7 @@ class CoreComponent(Component):
         self.locale_available = self.options['locale.available']
 
     def initialize(self):
-        Component.initialize(self)
+        super(CoreComponent, self).initialize()
 
         # Enable version and git qulifications only in development mode. In
         # production mode we trust package metadata.
@@ -237,6 +240,8 @@ class CoreComponent(Component):
         result['full_name'] = self.system_full_name()
         result['database_size'] = DBSession.query(db.func.pg_database_size(
             db.func.current_database(),)).scalar()
+        if self.options['storage.enabled']:
+            result['storage'] = self.query_storage()
 
         return result
 
@@ -291,6 +296,7 @@ class CoreComponent(Component):
     def backup_filename(self, filename):
         return os.path.join(self.options['backup.path'], filename)
 
+
     option_annotations = (
         Option('system.name', default="NextGIS Web"),
         Option('system.full_name', default=None),
@@ -317,6 +323,9 @@ class CoreComponent(Component):
         Option('backup.filename', default='%Y%m%d-%H%M%S.ngwbackup', doc=(
             "File name template (passed to strftime) for filename in "
             "backup.path if backup target destination is not specified.")),
+
+        # Estimate storage
+        Option('storage.enabled', bool, default=False),
 
         # Ignore packages and components
         Option('packages.ignore', doc=(

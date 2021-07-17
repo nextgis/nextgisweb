@@ -1,4 +1,4 @@
-#: api.py:435
+#: api.py:478
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
@@ -79,39 +79,43 @@ msgstr ""
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:108 view.py:444
+#: view.py:108 view.py:457
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:123 view.py:462
+#: view.py:120 view.py:474
+msgid "Storage"
+msgstr "Хранилище"
+
+#: view.py:130 view.py:479
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:138 view.py:450
+#: view.py:145 view.py:463
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:145 view.py:452
+#: view.py:152 view.py:465
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:152 view.py:454
+#: view.py:159 view.py:467
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:159 view.py:448
+#: view.py:166 view.py:461
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:166 view.py:456
+#: view.py:173 view.py:469
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:443
+#: view.py:456
 msgid "Info"
 msgstr "Информация"
 
-#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:6 view.py:447
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:6 view.py:460
 msgid "Settings"
 msgstr "Настройки"
 
@@ -278,6 +282,43 @@ msgstr "Ресурсы"
 msgid "Help"
 msgstr "Справка"
 
+#: template/storage.mako:35
+msgid "Kind of data"
+msgstr "Вид данных"
+
+#: template/storage.mako:36
+msgid "Volume"
+msgstr "Размер"
+
+#: template/storage.mako:51
+msgid "Total"
+msgstr "Итого"
+
+#: template/storage.mako:73
+#, python-format
+msgid "Storage usage was fully estimated at %s and updated at %s."
+msgstr "Использование хранилища было полностью оценено в %s и обновлено в %s."
+
+#: template/storage.mako:76
+#, python-format
+msgid "Storage usage was fully estimated at %s."
+msgstr "Использование хранилища было полностью оценено в %s."
+
+#: template/storage.mako:78
+#, python-format
+msgid "Storage usage hasn't been estimated yet but was updated at %s."
+msgstr "Использование хранилища еще не было полностью оценено, но было обновлено в %s."
+
+#: template/storage.mako:80
+msgid "Storage usage hasn't been estimated yet."
+msgstr "Использование хранилища еще не было полностью оценено."
+
+#: template/storage.mako:83
+msgid "Some changes may be reflected only after full estimation."
+msgstr ""
+"Некоторые изменения могут быть отражены только после полной оценки "
+"использования хранилища."
+
 #: template/sysinfo.mako:20
 msgid "Package"
 msgstr "Пакет"
@@ -289,7 +330,4 @@ msgstr "Версия"
 #: template/sysinfo.mako:50
 msgid "Platform"
 msgstr "Платформа"
-
-#~ msgid "User settings"
-#~ msgstr "Пользовательские параметры"
 

@@ -8,6 +8,7 @@ from pyramid.response import Response
 
 from .. import db
 from .. import geojson
+from ..core.exception import InsufficientPermissions
 from ..models import DBSession
 from ..auth import User
 
@@ -331,6 +332,29 @@ def search(request):
         content_type='application/json', charset='utf-8')
 
 
+def resource_volume(resource, request):
+
+    ids = []
+
+    def _collect_ids(res):
+        request.resource_permission(ResourceScope.read, res)
+        ids.append(res.id)
+        for child in res.children:
+            _collect_ids(child)
+
+    try:
+        _collect_ids(resource)
+    except InsufficientPermissions:
+        volume = 0
+    else:
+        res = request.env.core.query_storage(dict(
+            resource_id=lambda col: col.in_(ids)))
+        volume = res.get('', dict()).get('data_volume', 0)
+        volume = volume if volume is not None else 0
+
+    return dict(volume=volume)
+
+
 def setup_pyramid(comp, config):
 
     config.add_route(
@@ -354,6 +378,11 @@ def setup_pyramid(comp, config):
         'resource.permission.explain', '/api/resource/{id}/permission/explain',
         factory=resource_factory) \
         .add_view(permission_explain, request_method='GET', renderer='json')
+
+    config.add_route(
+        'resource.volume', '/api/resource/{id}/volume',
+        factory=resource_factory) \
+        .add_view(resource_volume, request_method='GET', renderer='json')
 
     config.add_route(
         'resource.quota', '/api/resource/quota') \

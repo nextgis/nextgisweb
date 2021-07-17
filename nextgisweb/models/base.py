@@ -14,7 +14,6 @@ from zope.sqlalchemy import ZopeTransactionExtension
 # Ignore SQLAlchemy unicode warnings
 warnings.filterwarnings('ignore', '^Unicode type received non-unicode bind param value', sqlalchemy.exc.SAWarning)  # NOQA
 
-
 DBSession = scoped_session(sessionmaker(
     extension=ZopeTransactionExtension(),
     expire_on_commit=False))
