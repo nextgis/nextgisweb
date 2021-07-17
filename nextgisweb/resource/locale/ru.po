@@ -2,29 +2,29 @@
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
-#: api.py:70
+#: api.py:68
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:117
+#: api.py:115
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:120
+#: api.py:118
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:123
+#: api.py:121
 #, python-format
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: api.py:129
+#: api.py:127
 #, python-format
 msgid "Resource class '%s' disabled."
 msgstr "Класс ресурса '%s' отключен."
 
-#: api.py:211
+#: api.py:209
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
@@ -82,7 +82,7 @@ msgstr "Операционная ошибка"
 
 #: amd/ngw-resource/PermissionWidget.js:94 amd/ngw-resource/PermissionWidget.js:183
 #: amd/ngw-resource/Widget.js:31 amd/ngw-resource/form/ResourceLink.js:35
-#: model.py:109 scope.py:27
+#: model.py:110 scope.py:27
 msgid "Resource"
 msgstr "Ресурс"
 
@@ -94,31 +94,31 @@ msgstr "Ресурс не может быть родителем сам себе
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:295
+#: model.py:318
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:301
+#: model.py:324
 #, python-format
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:306
+#: model.py:329
 #, python-format
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:431
+#: model.py:454
 #, python-format
 msgid "Maximum number of resources exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов. Лимит %s."
 
-#: model.py:448
+#: model.py:471
 #, python-format
 msgid "Maximum number of resources '%s' exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов '%s'. Лимит %s."
 
-#: model.py:504
+#: model.py:527
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -327,7 +327,7 @@ msgstr "Выберите ресурс"
 msgid "Confirm deletion of the resource"
 msgstr "Подтвердить удаление ресурса"
 
-#: amd/ngw-resource/template/Widget.hbs:8 template/section_children.mako:67
+#: amd/ngw-resource/template/Widget.hbs:8 template/section_children.mako:142
 #: template/section_summary.mako:6
 msgid "Display name"
 msgstr "Наименование"
@@ -340,7 +340,7 @@ msgstr "Ключ"
 msgid "Parent"
 msgstr "Родитель"
 
-#: amd/ngw-resource/template/Widget.hbs:23 template/section_children.mako:68
+#: amd/ngw-resource/template/Widget.hbs:23 template/section_children.mako:143
 #: template/section_summary.mako:36
 msgid "Type"
 msgstr "Тип"
@@ -349,15 +349,15 @@ msgstr "Тип"
 msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных во внешние приложения."
 
-#: template/section_children.mako:126
+#: template/section_children.mako:128
 msgid "Show resources volume"
 msgstr "Показать размер ресурсов"
 
-#: template/section_children.mako:140 template/section_summary.mako:44
+#: template/section_children.mako:144 template/section_summary.mako:44
 msgid "Owner"
 msgstr "Владелец"
 
-#: template/section_children.mako:141
+#: template/section_children.mako:145
 msgid "Volume"
 msgstr "Размер"
 
