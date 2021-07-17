@@ -240,6 +240,8 @@ class CoreComponent(
         result['full_name'] = self.system_full_name()
         result['database_size'] = DBSession.query(db.func.pg_database_size(
             db.func.current_database(),)).scalar()
+        if self.options['storage.enabled']:
+            result['storage'] = self.query_storage()
 
         return result
 
