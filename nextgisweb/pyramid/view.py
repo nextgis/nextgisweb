@@ -15,7 +15,7 @@ from psutil import Process
 from pyramid.response import Response, FileResponse
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import BeforeRender
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 
 from ..env import env
 from .. import dynmenu as dm, pkginfo
@@ -311,7 +311,7 @@ def setup_pyramid(comp, config):
             user_lang = request.user.language
             if user_lang is not None:
                 return user_lang
-        except (InvalidCredentialsException, UserDisabledException) as exc:
+        except (HTTPUnauthorized, InvalidCredentialsException, UserDisabledException) as exc:
             # Ignore user language in case of authentication failure
             pass
 
