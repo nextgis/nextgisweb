@@ -36,7 +36,7 @@ storage_stat_dimension = db.Table(
     db.Column('component', db.Unicode, nullable=False),
     db.Column('kind_of_data', db.Unicode, nullable=False),
     db.Column('resource_id', db.Integer, index=True),
-    db.Column('value_data_volume', db.Integer),
+    db.Column('value_data_volume', db.BigInteger),
 )
 
 
@@ -44,7 +44,7 @@ storage_stat_dimension_total = db.Table(
     'core_storage_stat_dimension_total', Base.metadata,
     db.Column('tstamp', db.TIMESTAMP, nullable=False),
     db.Column('kind_of_data', db.Unicode, primary_key=True),
-    db.Column('value_data_volume', db.Integer),
+    db.Column('value_data_volume', db.BigInteger),
 )
 
 
@@ -54,7 +54,7 @@ storage_stat_delta = db.Table(
     db.Column('component', db.Unicode, nullable=False),
     db.Column('kind_of_data', db.Unicode, nullable=False),
     db.Column('resource_id', db.Integer, index=True),
-    db.Column('value_data_volume', db.Integer),
+    db.Column('value_data_volume', db.BigInteger),
 )
 
 
@@ -62,7 +62,7 @@ storage_stat_delta_total = db.Table(
     'core_storage_stat_delta_total', Base.metadata,
     db.Column('tstamp', db.TIMESTAMP, nullable=False),
     db.Column('kind_of_data', db.Unicode, primary_key=True),
-    db.Column('value_data_volume', db.Integer),
+    db.Column('value_data_volume', db.BigInteger),
 )
 
 

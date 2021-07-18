@@ -10,14 +10,14 @@ CREATE TABLE core_storage_stat_delta
     component character varying NOT NULL,
     kind_of_data character varying NOT NULL,
     resource_id integer,
-    value_data_volume integer
+    value_data_volume bigint
 );
 
 CREATE TABLE core_storage_stat_delta_total
 (
     tstamp timestamp without time zone NOT NULL,
     kind_of_data character varying NOT NULL,
-    value_data_volume integer,
+    value_data_volume bigint,
     CONSTRAINT core_storage_stat_delta_total_pkey PRIMARY KEY (kind_of_data)
 );
 
@@ -27,14 +27,14 @@ CREATE TABLE core_storage_stat_dimension
     component character varying NOT NULL,
     kind_of_data character varying NOT NULL,
     resource_id integer,
-    value_data_volume integer
+    value_data_volume bigint
 );
 
 CREATE TABLE core_storage_stat_dimension_total
 (
     tstamp timestamp without time zone NOT NULL,
     kind_of_data character varying NOT NULL,
-    value_data_volume integer,
+    value_data_volume bigint,
     CONSTRAINT core_storage_stat_dimension_total_pkey PRIMARY KEY (kind_of_data)
 );
 
