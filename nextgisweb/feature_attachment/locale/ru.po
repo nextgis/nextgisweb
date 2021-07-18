@@ -1,3 +1,7 @@
+#: __init__.py:15
+msgid "Feature attachments"
+msgstr "Прикрепленные к объектам файлы"
+
 #: exception.py:15
 msgid "Attachment not found"
 msgstr "Вложение не найдено"
@@ -12,35 +16,35 @@ msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:36
-#: amd/ngw-feature-attachment/EditorWidget.js:111
+#: amd/ngw-feature-attachment/EditorWidget.js:109
 msgid "Attachments"
 msgstr "Вложения"
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:89
-#: amd/ngw-feature-attachment/EditorWidget.js:78
+#: amd/ngw-feature-attachment/EditorWidget.js:76
 msgid "File name"
 msgstr "Имя файла"
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:89
-#: amd/ngw-feature-attachment/EditorWidget.js:86
+#: amd/ngw-feature-attachment/EditorWidget.js:84
 msgid "Size"
 msgstr "Размер"
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:89
-#: amd/ngw-feature-attachment/EditorWidget.js:92
+#: amd/ngw-feature-attachment/EditorWidget.js:90
 msgid "MIME type"
 msgstr "Тип MIME"
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:89
-#: amd/ngw-feature-attachment/EditorWidget.js:99
+#: amd/ngw-feature-attachment/EditorWidget.js:97
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-feature-attachment/EditorWidget.js:132
+#: amd/ngw-feature-attachment/EditorWidget.js:130
 msgid "Upload"
 msgstr "Загрузить"
 
-#: amd/ngw-feature-attachment/EditorWidget.js:155
+#: amd/ngw-feature-attachment/EditorWidget.js:153
 msgid "Delete"
 msgstr "Удалить"
 

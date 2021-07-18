@@ -1,38 +1,42 @@
-#: api.py:31
+#: api.py:30
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:34
+#: api.py:33
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: amd/ngw-raster-layer/Widget.js:29 model.py:59 view.py:31
+#: kind_of_data.py:12
+msgid "Rasters and pyramids"
+msgstr "Растры и пирамиды"
+
+#: amd/ngw-raster-layer/Widget.js:26 model.py:61 view.py:31
 msgid "Raster layer"
 msgstr "Растровый слой"
 
-#: model.py:79
+#: model.py:81
 msgid "GDAL library was unable to open the file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:87
+#: model.py:89
 #, python-format
 msgid ""
-"Raster has format '%(format)s', however only following formats are "
-"supported: %(all_formats)s."
+"Raster has format '%(format)s', however only following formats are supported:"
+" %(all_formats)s."
 msgstr ""
 "Формат загруженного растра '%(format)s', однако поддерживаются только "
 "следующие типы: %(all_formats)s."
 
-#: model.py:92
+#: model.py:94
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:103
+#: model.py:105
 msgid "Complex data types are not supported."
 msgstr "Комплексные типы данных не поддерживаются."
 
-#: model.py:176
+#: model.py:179
 msgid "Data type"
 msgstr "Тип данных"
 
@@ -40,7 +44,7 @@ msgstr "Тип данных"
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: amd/ngw-raster-layer/ExportForm.js:104
+#: amd/ngw-raster-layer/ExportForm.js:101
 msgid "Band"
 msgstr "Канал"
 
@@ -71,25 +75,3 @@ msgstr "Файл должен быть в формате GeoTIFF."
 #: amd/ngw-raster-layer/template/Widget.hbs:8
 msgid "Coordinate system"
 msgstr "Система координат"
-
-#~ msgid "Only RGB and RGBA rasters are supported."
-#~ msgstr "Поддерживаются только растры RGB и RGBA."
-
-#~ msgid "Only RGB, RGBA and single-band rasters are supported."
-#~ msgstr "Поддерживаются только RGB, RGBA и одноканальные растры."
-
-#~ msgid "Only paletted single-band rasters are supported."
-#~ msgstr "Одноканальный растр должен иметь палитру."
-
-#~ msgid ""
-#~ "Band #%(band)d has type '%(type)s', "
-#~ "however only following band types are"
-#~ " supported: %(all_types)s."
-#~ msgstr ""
-#~ "Канал #%(band)d имеет тип '%(type)s', "
-#~ "однако поддерживаются только следующие типы"
-#~ " каналов: %(all_types)s."
-
-#~ msgid "File UUID"
-#~ msgstr "UUID файла"
-
