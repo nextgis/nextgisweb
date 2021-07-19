@@ -1,12 +1,27 @@
 <%! from json import dumps %>
 <%
+    distr_opts = request.env.options.with_prefix('distribution')
+    distribution = {
+        k: distr_opts[k] for k in ('name', 'description', 'version', 'date')
+    } if distr_opts.get('name') is not None else None
+
+    packages = {p.name: p.version for p in request.env.packages.values()}
+
     ngwConfig = {
         "debug": request.env.core.debug,
         "applicationUrl": request.application_url,
         "assetUrl": request.static_url('nextgisweb:static/'),
         "amdUrl": request.route_url('amd_package', subpath=""),
         "distUrl": request.route_url('jsrealm.dist', subpath=''),
+        "distribution": distribution,
+        "packages": packages,
+        "instanceId": request.env.core.instance_id,
+        "isAdministrator": request.user.is_administrator,
+        "locale": request.locale_name,
     }
+
+    if request.env.ngupdate_url:
+        ngwConfig['ngupdateUrl'] = request.env.ngupdate_url
 
     dojoConfig = {
         "async": True,

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
+
 import re
 import logging
 import logging.config
-import six
+import os
 from collections import OrderedDict
 
+import six
 import sqlalchemy as sa
 
 from .lib.config import OptionAnnotations, Option, ConfigOptions, load_config
@@ -227,6 +229,11 @@ class Env(object):
                 "Environment configuration option logging.ini_cofig was "
                 "ignored because other logging configuration options were "
                 "given.")
+
+    @property
+    def ngupdate_url(self):
+        env_val = os.environ.get('NGUPDATE_URL', 'https://update.nextgis.com')
+        return env_val if env_val != '' else None
 
     option_annotations = OptionAnnotations((
         Option('package.*', bool, None, doc=(

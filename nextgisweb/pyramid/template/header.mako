@@ -43,6 +43,7 @@
         %endif
         <li class="header-nav__item">
             <span id="rightMenuIcon" class="rightMenu-icon icon--link material-icons">menu</span>
+            <span class="rightMenu-notify has-update-only" style="display: none;"></span>
         </li>
     </ul>
     <div class="header__left">

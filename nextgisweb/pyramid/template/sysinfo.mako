@@ -10,6 +10,15 @@
 <% distr_opts = request.env.options.with_prefix('distribution') %>
 %if distr_opts.get('name') is not None:
     <h2>${distr_opts.get('description')} ${distr_opts.get('version')} (${distr_opts.get('date')})</h2>
+    <div id="updateDistSummary" style="display: none; background-color: #cbecd9; margin: 2em 0; padding: 1em; border-radius: .5em">
+        <a id="updateShowDistNotes" style="float: right">${tr(_("Show details"))}</a>
+        ${tr(_("New version available:"))} <span id="updateDistVersion"></span><br/>
+        <% support_url = request.env.core.support_url_view(request) %>
+        %if support_url is not None:
+            <% support_url +=  '?lang=' + request.locale_name %>
+            <a href="${support_url}" target="_blank">${tr(_("Contact support"))}</a> ${tr(_("for update."))}
+        %endif
+    </div>
 %endif
 
 <div class="content-box">
@@ -64,15 +73,47 @@
 
 
 <script>
-require([
-    "ngw-pyramid/CopyButton/CopyButton",
-], function (CopyButton) {
-    var domCopyButton = document.getElementById("info-copy-btn")
-    var copyButton = new CopyButton({
-        targetAttribute: function (target) {
-            return document.getElementById("content-wrapper").innerText;
-        }
+    require([
+        "ngw-pyramid/CopyButton/CopyButton",
+        "@nextgisweb/pyramid/OverlayDialog",
+        "@nextgisweb/pyramid/update",
+    ], function (
+        CopyButton,
+        OverlayDialog,
+        update,
+    ) {
+        var domCopyButton = document.getElementById("info-copy-btn")
+        var copyButton = new CopyButton({
+            targetAttribute: function (target) {
+                return document.getElementById("content-wrapper").innerText;
+            }
+        });
+        copyButton.placeAt(domCopyButton);
+
+        update.registerCallback(function(data) {
+            const distribution = data.distribution;
+            if (distribution && distribution.status === "has_update") {
+                document.getElementById('updateDistVersion').innerHTML = distribution.latest.version + " (" + distribution.latest.date + ')';
+                document.getElementById('updateDistSummary').style.display = 'inherit';
+            }
+
+            var showDistNotes = document.getElementById("updateShowDistNotes");
+            if (showDistNotes) {
+                showDistNotes.onclick = function () {
+                    var iframe = document.createElement("iframe");
+                    iframe.src = update.notesUrl();
+                    iframe.setAttribute("frameborder", 0);
+                    iframe.style.width = "70em";
+                    iframe.style.height = "40em";
+
+                    var dlg = new OverlayDialog.OverlayDialog({
+                        content: iframe.outerHTML,
+                    });
+                    window.dlg = dlg;
+                    dlg.show();
+                }
+            }
+
+        })
     });
-    copyButton.placeAt(domCopyButton);
-});
 </script>

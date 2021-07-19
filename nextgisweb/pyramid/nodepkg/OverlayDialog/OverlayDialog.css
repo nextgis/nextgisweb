@@ -1,0 +1,12 @@
+.overlay-dlg {
+    border: 0;
+}
+
+.overlay-dlg > .dijitDialogTitleBar {
+    background-color: white;
+}
+
+.overlay-dlg > .dijitDialogPaneContent {
+    height: 100%;
+    border: 0;
+}
