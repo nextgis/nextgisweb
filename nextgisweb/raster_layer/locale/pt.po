@@ -1,72 +1,79 @@
-#: api.py:30
-msgid "Output format is not provided."
+msgid ""
 msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: pt\n"
 
-#: api.py:33
-#, python-format
+#: api.py:103
+msgid "Output format is not provided."
+msgstr "Formato de saída não fornecido."
+
+#: api.py:108
 msgid "Format '%s' is not supported."
-msgstr ""
+msgstr "O formato '%s' não é suportado."
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:100
+msgid "Save as"
+msgstr "Guardar como"
+
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:75
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+msgid "Save"
+msgstr "Guardar"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:15
+msgid "Format"
+msgstr "Formato"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:19
+msgid "SRS"
+msgstr "SRS"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Sistema de Coordenadas"
 
 #: amd/ngw-raster-layer/Widget.js:29 model.py:60 view.py:31
 msgid "Raster layer"
-msgstr ""
+msgstr "Camada raster"
 
-#: model.py:80
+#: model.py:128
 msgid "GDAL library was unable to open the file."
-msgstr ""
+msgstr "A biblioteca GDAL não conseguiu abrir o ficheiro."
 
-#: model.py:88
-#, python-format
-msgid ""
-"Raster has format '%(format)s', however only following formats are "
-"supported: %(all_formats)s."
-msgstr ""
+#: model.py:139
+msgid "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
+msgstr "O raster tem o formato '%(format)s', no entanto, apenas os seguintes formatos são suportados: %(all_formats)s."
 
-#: model.py:93
+#: model.py:144
 msgid "Raster files without projection info are not supported."
-msgstr ""
+msgstr "Ficheiros raster sem informação da projeção não são suportados."
 
-#: model.py:104
+#: model.py:155
 msgid "Complex data types are not supported."
-msgstr ""
+msgstr "Tipos de dados complexos não são suportados."
 
 #: model.py:178
 msgid "Data type"
-msgstr ""
-
-#: view.py:20 view.py:34
-msgid "Save as"
-msgstr ""
+msgstr "Tipo de dados"
 
 #: amd/ngw-raster-layer/ExportForm.js:104
 msgid "Band"
-msgstr ""
-
-#: amd/ngw-raster-layer/template/ExportForm.hbs:13
-msgid "Format"
-msgstr ""
-
-#: amd/ngw-raster-layer/template/ExportForm.hbs:17
-msgid "SRS"
-msgstr ""
+msgstr "Banda"
 
 #: amd/ngw-raster-layer/template/ExportForm.hbs:21
 msgid "Bands"
-msgstr ""
+msgstr "Bandas"
 
-#: amd/ngw-raster-layer/template/ExportForm.hbs:30
-msgid "Save"
-msgstr ""
-
-#: amd/ngw-raster-layer/template/Widget.hbs:3
+#: amd/ngw-vector-layer/template/Widget.hbs:47
 msgid "Select a dataset"
-msgstr ""
+msgstr "Selecione um conjunto de dados"
 
 #: amd/ngw-raster-layer/template/Widget.hbs:4
 msgid "Dataset should be in GeoTIFF format."
-msgstr ""
-
-#: amd/ngw-raster-layer/template/Widget.hbs:8
-msgid "Coordinate system"
-msgstr ""
+msgstr "conjunto de dados deve estar no formato GeoTIFF."
 

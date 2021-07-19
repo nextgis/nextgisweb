@@ -1,146 +1,154 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: pt\n"
+
+#: template/browse.mako:98
+msgid "User"
+msgstr "Utilizador"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Senha"
+
+#: template/section_fields.mako:21 view.py:189
+msgid "Table"
+msgstr "Tabela"
+
 #: api.py:49
-#, python-format
 msgid "Table (%s) not found in schema (%s)."
-msgstr ""
+msgstr "Tabela (%s) não foi encontrada no esquema (%s)."
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:42 model.py:52
+#: amd/ngw-vector-layer/template/Widget.hbs:28
+#: amd/ngw-vector-layer/template/Widget.hbs:79 model.py:77
 msgid "Point"
-msgstr ""
+msgstr "Ponto"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:43 model.py:52
+#: amd/ngw-vector-layer/template/Widget.hbs:29
+#: amd/ngw-vector-layer/template/Widget.hbs:80 model.py:77
 msgid "Line"
-msgstr ""
+msgstr "Linha"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:44 model.py:52
+#: amd/ngw-vector-layer/template/Widget.hbs:30
+#: amd/ngw-vector-layer/template/Widget.hbs:81 model.py:77
 msgid "Polygon"
-msgstr ""
+msgstr "Polígono"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:45 model.py:53
+#: amd/ngw-vector-layer/template/Widget.hbs:31 model.py:78
 msgid "Multipoint"
-msgstr ""
+msgstr "Multiponto"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:46 model.py:53
+#: amd/ngw-vector-layer/template/Widget.hbs:32 model.py:78
 msgid "Multiline"
-msgstr ""
+msgstr "Multilinha"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:47 model.py:53
+#: amd/ngw-vector-layer/template/Widget.hbs:33 model.py:78
 msgid "Multipolygon"
-msgstr ""
+msgstr "Multipolígono"
 
 #: amd/ngw-postgis/ConnectionWidget.js:28 model.py:62
 msgid "PostGIS connection"
-msgstr ""
+msgstr "Ligação PostGIS"
 
 #: model.py:126
 msgid "Cannot connect to the database!"
-msgstr ""
+msgstr "Não é possível ligar-se à base de dados!"
 
 #: amd/ngw-postgis/LayerWidget.js:42 model.py:154
 msgid "PostGIS layer"
-msgstr ""
+msgstr "Camada PostGIS"
 
 #: model.py:212
-#, python-format
 msgid "Table '%(table)s' not found!"
-msgstr ""
+msgstr "Tabela '%(table)s' não foi encontrada!"
 
 #: model.py:227
 msgid "SRID missing in geometry_columns table! You should specify it manually."
-msgstr ""
+msgstr "SRID inexistente na tabela geometry_columns! Deve especificá-lo de forma manual."
 
 #: model.py:230
 msgid "0 is an invalid SRID."
-msgstr ""
+msgstr "0 é um SRID inválido."
 
 #: model.py:237
 msgid "SRID in geometry_columns table does not match specified!"
-msgstr ""
+msgstr "O SRID na tabela geometry_columns não corresponde ao especificado!"
 
 #: model.py:245
-msgid ""
-"Geometry type missing in geometry_columns table! You should specify it "
-"manually."
-msgstr ""
+msgid "Geometry type missing in geometry_columns table! You should specify it manually."
+msgstr "Tipo de geometria ausente na tabela geometry_columns! Você deve especificá-lo manualmente."
 
 #: model.py:252
 msgid "Geometry type in geometry_columns table does not match specified!"
-msgstr ""
+msgstr "O tipo de geometria na tabela geometry_columns não corresponde ao especificado!"
 
 #: model.py:270
 msgid "To use column as ID it should have integer type!"
-msgstr ""
+msgstr "Para usar a coluna como ID, tem de ser do tipo inteiro!"
 
 #: model.py:313 model.py:316
-#, python-format
 msgid "Column '%(column)s' not found!"
-msgstr ""
+msgstr "Coluna '%(column)s' não encontrada!"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:39 model.py:323
+#: amd/ngw-vector-layer/template/Widget.hbs:26
+#: amd/ngw-vector-layer/template/Widget.hbs:75 model.py:738
 msgid "Geometry type"
-msgstr ""
+msgstr "Tipo de geometria"
 
 #: amd/ngw-postgis/template/ConnectionWidget.hbs:9
 msgid "Host"
-msgstr ""
+msgstr "Host"
 
 #: amd/ngw-postgis/template/ConnectionWidget.hbs:14
 msgid "Port"
-msgstr ""
+msgstr "Porta"
 
 #: amd/ngw-postgis/template/ConnectionWidget.hbs:19
 msgid "Database"
-msgstr ""
-
-#: amd/ngw-postgis/template/ConnectionWidget.hbs:24
-msgid "User"
-msgstr ""
-
-#: amd/ngw-postgis/template/ConnectionWidget.hbs:29
-msgid "Password"
-msgstr ""
+msgstr "Base de dados"
 
 #: amd/ngw-postgis/template/LayerWidget.hbs:8
 msgid "Select PostGIS connection"
-msgstr ""
+msgstr "Selecione a ligação PostGIS"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:10
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:10
 msgid "Connection"
-msgstr ""
+msgstr "Ligação PostGIS"
 
 #: amd/ngw-postgis/template/LayerWidget.hbs:16
 msgid "Schema"
-msgstr ""
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:22
-msgid "Table"
-msgstr ""
+msgstr "Esquema"
 
 #: amd/ngw-postgis/template/LayerWidget.hbs:28
 msgid "ID column"
-msgstr ""
+msgstr "Coluna do ID"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:34
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:28
 msgid "Geometry column"
-msgstr ""
+msgstr "Coluna da geometria"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:41
-#: amd/ngw-postgis/template/LayerWidget.hbs:53
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:20
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:36
 msgid "Autodetect"
-msgstr ""
+msgstr "Autodetectar"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:61
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
 msgid "Coordinate system"
-msgstr ""
+msgstr "Sistema de Coordenadas"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:68
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:50
 msgid "Attribute definitions"
-msgstr ""
+msgstr "Definições de atributos"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:71
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:53
 msgid "Keep"
-msgstr ""
+msgstr "Manter"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:72
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:54
 msgid "Reload"
-msgstr ""
+msgstr "Recarregar"
 

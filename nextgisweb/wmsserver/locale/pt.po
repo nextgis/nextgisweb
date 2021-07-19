@@ -1,59 +1,63 @@
-#: amd/ngw-wmsserver/ServiceWidget.js:56 model.py:27
-#: template/section_api_wms.mako:7
-msgid "WMS service"
+msgid ""
 msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: pt\n"
 
-#: view.py:353
+#: view.py:209
 msgid "External access"
-msgstr ""
+msgstr "Acesso Externo"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:14
-msgid "Add"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:18
-msgid "Select layer\\'s style"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:27
-msgid "Remove"
-msgstr ""
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:62
+#: amd/ngw-feature-layer/FieldsWidget.js:72 template/section_fields.mako:15
 msgid "Keyname"
-msgstr ""
+msgstr "chave"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:66
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
 msgid "Display name"
-msgstr ""
+msgstr "Nome de exibição"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:70
-msgid "Min scale"
-msgstr ""
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Adicionar"
 
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:74
-msgid "Max scale"
-msgstr ""
+#: amd/ngw-webmap/template/ItemWidget.hbs:33
+msgid "Remove"
+msgstr "Remover"
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr "Saiba mais"
 
 #: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
 msgid "Resource"
-msgstr ""
+msgstr "Recurso"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:18
+msgid "Select layer\\'s style"
+msgstr "Selecionar estilo da camada"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:89
+msgid "Min scale"
+msgstr "Escala mínima"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:94
+msgid "Max scale"
+msgstr "máxima"
+
+#: amd/ngw-wmsserver/ServiceWidget.js:56 model.py:27
+#: template/section_api_wms.mako:7
+msgid "WMS service"
+msgstr "Serviço WMS"
 
 #: template/section_api_wms.mako:11
-msgid ""
-"Web Map Service (WMS) is a standard protocol developed by the Open "
-"Geospatial Consortium for serving georeferenced map images. These images "
-"are typically produced by a map server from data provided by a GIS "
-"database."
-msgstr ""
+msgid "Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map images. These images are typically produced by a map server from data provided by a GIS database."
+msgstr "Web Map Service (WMS) é um protocolo padrão desenvolvido pelo Open Geospatial Consortium para servir imagens georeferenciadas de mapas. Essas imagens são normalmente produzidas por um servidor de mapas a partir de dados fornecidos por uma base de dados GIS."
 
 #: template/section_api_wms.mako:16
-msgid ""
-"https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-"
-"connection"
-msgstr ""
-
-#: template/section_api_wms.mako:17
-msgid "Read more"
-msgstr ""
+msgid "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
+msgstr "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
 

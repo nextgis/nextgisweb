@@ -1,100 +1,109 @@
-#: amd/ngw-wmsclient/ConnectionWidget.js:37
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:16 model.py:49
-msgid "WMS connection"
+msgid ""
 msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: pt\n"
 
-#: amd/ngw-wmsclient/LayerWidget.js:48 model.py:176
-msgid "WMS layer"
-msgstr ""
+#: template/browse.mako:92
+msgid "Timestamp"
+msgstr "Timestamp"
 
-#: view.py:30
-msgid "WMS capabilities"
-msgstr ""
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Senha"
 
-#: view.py:38
-msgid "WMS vendor parameters"
-msgstr ""
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Apagar"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Adicionar"
 
 #: amd/ngw-wmsclient/LayerVendorParamsWidget.js:46
 #: template/section_vendor_params.mako:6
 msgid "Key"
-msgstr ""
+msgstr "Chave"
 
 #: amd/ngw-wmsclient/LayerVendorParamsWidget.js:55
 #: template/section_vendor_params.mako:7
 msgid "Value"
-msgstr ""
+msgstr "Valor"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Sistema de Coordenadas"
+
+#: template/sysinfo.mako:21
+msgid "Version"
+msgstr "Versão"
+
+#: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
+msgid "Layer"
+msgstr "Camada"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:38
+msgid "Username"
+msgstr "Nome de utilizador"
+
+#: amd/ngw-wmsclient/ConnectionWidget.js:37
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:16 model.py:49
+msgid "WMS connection"
+msgstr "Ligação WMS"
+
+#: amd/ngw-wmsclient/LayerWidget.js:48 model.py:176
+msgid "WMS layer"
+msgstr "Camada WMS"
+
+#: view.py:30
+msgid "WMS capabilities"
+msgstr "Capacidades WMS"
+
+#: view.py:38
+msgid "WMS vendor parameters"
+msgstr "Parâmetros do fornecedor WMS"
 
 #: amd/ngw-wmsclient/LayerVendorParamsWidget.js:66
 msgid "Vendor parameters"
-msgstr ""
-
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:92
-msgid "Add"
-msgstr ""
-
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:98
-msgid "Delete"
-msgstr ""
+msgstr "Parâmetros do fornecedor"
 
 #: amd/ngw-wmsclient/template/ConnectionWidget.hbs:10
 msgid "URL"
-msgstr ""
-
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:16
-msgid "Username"
-msgstr ""
-
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:22
-msgid "Password"
-msgstr ""
-
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:27
-msgid "Version"
-msgstr ""
+msgstr "URL"
 
 #: amd/ngw-wmsclient/template/ConnectionWidget.hbs:31
 msgid "Capabilities"
-msgstr ""
+msgstr "Capacidades"
 
 #: amd/ngw-wmsclient/template/ConnectionWidget.hbs:33
 msgid "Do not query"
-msgstr ""
+msgstr "Não consultar"
 
 #: amd/ngw-wmsclient/template/ConnectionWidget.hbs:34
 msgid "Query"
-msgstr ""
+msgstr "Consulta"
 
 #: amd/ngw-wmsclient/template/ConnectionWidget.hbs:35
 msgid "Clear"
-msgstr ""
+msgstr "Limpar"
 
 #: amd/ngw-wmsclient/template/LayerWidget.hbs:15
 msgid "Select WMS connection"
-msgstr ""
-
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:22
-msgid "Coordinate system"
-msgstr ""
+msgstr "Selecionar ligação WMS"
 
 #: amd/ngw-wmsclient/template/LayerWidget.hbs:29
 #: template/section_connection.mako:15
 msgid "Image format"
-msgstr ""
+msgstr "Formato de imagem"
 
 #: amd/ngw-wmsclient/template/LayerWidget.hbs:35
 msgid "WMS layers"
-msgstr ""
-
-#: template/section_connection.mako:7
-msgid "Timestamp"
-msgstr ""
-
-#: template/section_connection.mako:26
-msgid "Layer"
-msgstr ""
+msgstr "Camadas WMS"
 
 #: template/section_connection.mako:27
 msgid "Title"
-msgstr ""
+msgstr "Título"
 
