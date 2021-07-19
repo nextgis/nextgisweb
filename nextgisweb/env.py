@@ -232,8 +232,8 @@ class Env(object):
 
     @property
     def ngupdate_url(self):
-        env_update_url = os.environ.get('NGUPDATE_URL', '')
-        return env_update_url if env_update_url != '' else 'https://update.nextgis.com'
+        env_val = os.environ.get('NGUPDATE_URL', 'https://update.nextgis.com')
+        return env_val if env_val != '' else None
 
     option_annotations = OptionAnnotations((
         Option('package.*', bool, None, doc=(
