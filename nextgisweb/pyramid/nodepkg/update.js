@@ -1,43 +1,64 @@
 /** @entrypoint */
 import "whatwg-fetch";
 import { routeURL } from "./api";
-import pkg_version from "@nextgisweb/pyramid/api/load!/api/component/pyramid/pkg_version";
 import i18n from "@nextgisweb/pyramid/i18n!";
 
-export function init (ngupdate_url, is_admin) {
+const callbacks = [];
+let data = undefined;
+
+function addDistributionAndPackagesParams(params) {
+    const dist = ngwConfig.distribution;
+    if (dist !== null) {
+        params.append('distribution', `${dist.name}:${dist.version}`);
+    }
+    for (const [name, version] of Object.entries(ngwConfig.packages)) {
+        params.append("package", name + ":" + version);
+    }
+}
+
+export function queryUrl(type) {
+    const params = new URLSearchParams({
+        type: type,
+        instance: ngwConfig.instanceId,
+    });
+    addDistributionAndPackagesParams(params);
+    return `${ngwConfig.ngupdateUrl}/api/query?${params.toString()}`;
+}
+
+export function notesUrl() {
+    const params = new URLSearchParams({lang: ngwConfig.locale});
+    addDistributionAndPackagesParams(params);
+    return `${ngwConfig.ngupdateUrl}/api/notes?${params.toString()}`;
+}
+
+export function registerCallback(fn) {
+    if (data === undefined) {
+        callbacks.push(fn);
+    } else {
+        cb(data);
+    }
+}
+
+export function init() {
     const sysInfoURL = routeURL('pyramid.control_panel.sysinfo');
     const isSysInfo = window.location.pathname === sysInfoURL;
     const timeout = isSysInfo ? 0 : 3 * 60 * 1000;
 
-    async function check_update () {
-        const params = new URLSearchParams({
-            type: "check", instance: ngwConfig.instance_id
-        });
-        const distr_opts = ngwConfig.distribution;
-        if (distr_opts.name !== null) {
-            params.append("distribution", distr_opts.name + ':' + distr_opts.version);
-        }
-        for (const [name, version] of Object.entries(pkg_version)) {
-            params.append("package", name + ":" + version);
-        }
-
-        let response;
+    async function checkForUpdates () {
+        const url = queryUrl('check');
         try {
-            response = await window.fetch(ngupdate_url + "/api/query?" + params.toString(), {
-                method: "GET",
-                headers: {"X-Requested-With": null}
-            });
-        } catch { return; }
+            data = await (await window.fetch(url)).json();
+        } catch {
+            data = null;
+            return;
+        }
+        callbacks.forEach((cb) => cb(data));
+    }
 
-        if (is_admin) {
-            let data, distribution, has_update;
-            try {
-                data = await response.json();
-                distribution = data.distribution;
-                has_update = distribution.status === "has_update";
-            } catch { return; }
-
-            if (has_update) {
+    registerCallback((data) => {
+        if (ngwConfig.isAdministrator) {
+            const distribution = data.distribution;
+            if (distribution && distribution.status === "has_update") {
                 const sidebarItem = document.createElement('a');
                 sidebarItem.className = "list__item list__item--link";
                 sidebarItem.style = "background-color: #cbecd9";
@@ -49,13 +70,9 @@ export function init (ngupdate_url, is_admin) {
                     element.style.display = "inherit";
                 });
 
-                const elAvailableVersion = document.getElementById('updatesAvailableVersion');
-                if (elAvailableVersion) {
-                    elAvailableVersion.innerHTML = `${distribution.latest.version} (${distribution.latest.date})`;
-                }
             }
         }
-    }
+    })
 
-    window.setTimeout(check_update, timeout);
+    window.setTimeout(checkForUpdates, timeout);
 };
