@@ -1,9 +1,8 @@
 /** @entrypoint */
 import "whatwg-fetch";
-import { default as domConstruct } from "dojo/dom-construct";
-import { default as query } from "dojo/query";
 import { routeURL } from "./api";
 import pkg_version from "@nextgisweb/pyramid/api/load!/api/component/pyramid/pkg_version";
+import i18n from "@nextgisweb/pyramid/i18n!";
 
 export function init (ngupdate_url, is_admin) {
     const sysInfoURL = routeURL('pyramid.control_panel.sysinfo');
@@ -31,23 +30,29 @@ export function init (ngupdate_url, is_admin) {
         } catch { return; }
 
         if (is_admin) {
-            let has_update = false;
+            let data, distribution, has_update;
             try {
-                const data = await response.json();
-                has_update = data.distribution.status === "has_update";
+                data = await response.json();
+                distribution = data.distribution;
+                has_update = distribution.status === "has_update";
             } catch { return; }
 
             if (has_update) {
-                const list = query("#rightMenu .list")[0];
-                domConstruct.create("a", {
-                    class: "list__item list__item--link",
-                    innerHTML: "New update available",
-                    href: sysInfoURL,
-                }, list);
+                const sidebarItem = document.createElement('a');
+                sidebarItem.className = "list__item list__item--link";
+                sidebarItem.style = "background-color: #cbecd9";
+                sidebarItem.innerHTML = i18n.gettext("Update available");
+                sidebarItem.href = sysInfoURL;
+                document.querySelector("#rightMenu .list").appendChild(sidebarItem);
 
-                query(".has-update-only").forEach((element) => {
+                document.querySelectorAll(".has-update-only").forEach((element) => {
                     element.style.display = "inherit";
                 });
+
+                const elAvailableVersion = document.getElementById('updatesAvailableVersion');
+                if (elAvailableVersion) {
+                    elAvailableVersion.innerHTML = `${distribution.latest.version} (${distribution.latest.date})`;
+                }
             }
         }
     }

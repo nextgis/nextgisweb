@@ -53,9 +53,9 @@
 }
 
 .rightMenu-notify{
-    background-color: RGB(255, 0, 0);
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
+    background-color: #00b77e;
 }
