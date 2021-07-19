@@ -231,8 +231,11 @@ class Layer(Base, Resource, SpatialLayerMixin):
             + urlencode(query).replace("+", "%20")
         )
 
-        return PIL.Image.open(BytesIO(requests.get(
-            url, auth=auth, headers=env.wmsclient.headers).content))
+        response = requests.get(
+            url, auth=auth, headers=env.wmsclient.headers)
+        data = BytesIO(response.content)
+
+        return PIL.Image.open(data)
 
 
 class LayerVendorParam(Base):
