@@ -7,7 +7,6 @@ from six import with_metaclass
 
 import transaction
 import sqlalchemy as sa
-from sqlalchemy import func, column, select, literal
 from zope.sqlalchemy import mark_changed
 
 from ..models import DBSession
@@ -42,7 +41,7 @@ class KindOfData(with_metaclass(KindOfDataMeta)):
 
 
 class StorageComponentMixin(object):
-    
+
     def initialize(self):
         super(StorageComponentMixin, self).initialize()
 
@@ -96,10 +95,10 @@ class StorageComponentMixin(object):
         ), whereclause=whereclause)).alias('src')
 
         agg_cols = (
-            func.MIN(column('estimated')).label('estimated'),
-            func.MAX(column('updated')).label('updated'),
+            sa.func.MIN(sa.column('estimated')).label('estimated'),
+            sa.func.MAX(sa.column('updated')).label('updated'),
             # Dunno why, but w/o this cast postgres generates the numeric type
-            func.SUM(column('data_volume')).cast(
+            sa.func.SUM(sa.column('data_volume')).cast(
                 sa.BigInteger).label('data_volume'))
 
         agg = sa.select((source.c.kind_of_data,) + agg_cols).group_by(
@@ -108,7 +107,7 @@ class StorageComponentMixin(object):
         q = agg.select()
         if where is not None:
             q = q.union_all(sa.select(
-                (literal(''),) + agg_cols
+                (sa.literal(''),) + agg_cols
             ).select_from(agg))
 
         with DBSession.no_autoflush:
@@ -119,7 +118,8 @@ class StorageComponentMixin(object):
                     updated=row.updated,
                     data_volume=row.data_volume,
                 )
-            ) for row in DBSession.execute(q.alias('q')))
+            ) for row in DBSession.execute(q.alias('q'))
+                if row.kind_of_data == '' or row.data_volume != 0)
 
     def estimate_storage_all(self):
         if not self.options['storage.enabled']:
@@ -151,13 +151,13 @@ class StorageComponentMixin(object):
                             )))
 
                 qtotal = sa.select([
-                    literal(timestamp).label('tstamp'),
+                    sa.literal(timestamp).label('tstamp'),
                     details.c.kind_of_data,
-                    func.sum(details.c.value_data_volume)
+                    sa.func.sum(details.c.value_data_volume)
                 ]).group_by(details.c.kind_of_data).union_all(sa.select([
-                    literal(timestamp),
-                    literal(''),
-                    func.coalesce(func.sum(details.c.value_data_volume), 0)
+                    sa.literal(timestamp),
+                    sa.literal(''),
+                    sa.func.coalesce(sa.func.sum(details.c.value_data_volume), 0)
                 ]))
 
                 con.execute(totals.insert().from_select([
