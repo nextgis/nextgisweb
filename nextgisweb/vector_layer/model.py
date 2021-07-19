@@ -460,6 +460,7 @@ class TableInfo(object):
         def utf8len(s):
             return len(s.encode('utf-8'))
 
+        num_features = 0
         static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]
         dynamic_size = 0
         string_fields = []
@@ -675,13 +676,14 @@ class TableInfo(object):
             obj = self.model(id=fid, geom=ga.elements.WKBElement(
                 geom_bytes, srid=self.srs_id), **fld_values)
 
+            num_features += 1
+
             DBSession.add(obj)
 
         if len(errors) > 0 and not skip_errors:
             detail = '<br>'.join(html_escape(translate(error)) for error in errors)
             raise VE(message=_("Vector layer cannot be written due to errors."), detail=detail)
 
-        num_features = i
         size = static_size * num_features + dynamic_size
 
         # Set sequence next value
