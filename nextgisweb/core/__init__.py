@@ -360,7 +360,7 @@ class CoreComponent(
 
         # Locale settings
         Option('locale.default', default='en'),
-        Option('locale.available', list, default=['en', 'ru', 'es']),
+        Option('locale.available', list, default=['en', 'ru', 'es', 'de', 'pt']),
 
         # Other deployment settings
         Option('support_url', default="https://nextgis.com/contact/"),
