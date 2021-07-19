@@ -157,7 +157,7 @@ class StorageComponentMixin(object):
                 ]).group_by(details.c.kind_of_data).union_all(sa.select([
                     literal(timestamp),
                     literal(''),
-                    func.sum(details.c.value_data_volume)
+                    func.coalesce(func.sum(details.c.value_data_volume), 0)
                 ]))
 
                 con.execute(totals.insert().from_select([
