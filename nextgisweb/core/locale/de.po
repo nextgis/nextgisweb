@@ -1,21 +1,45 @@
-#: __init__.py:65
-msgid "NextGIS geoinformation system"
+msgid ""
 msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: de\n"
+
+#: __init__.py:76
+msgid "NextGIS geoinformation system"
+msgstr "NextGIS Geoinformationssystem"
 
 #: exception.py:95
 msgid "Validation error"
-msgstr ""
+msgstr "Validierungsfehler"
 
 #: exception.py:100
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "Berechtigungen nicht ausreichend"
 
 #: exception.py:105
 msgid "Operational error"
-msgstr ""
+msgstr "Betriebsfehler"
 
 #: test/test_exception.py:79
-#, python-format
 msgid "The answer is %d"
-msgstr ""
+msgstr "Die Antwort ist %d"
+
+#: __init__.py:201
+msgid "Linux kernel"
+msgstr "Linux-Kern"
+
+#: __init__.py:204
+msgid "OS distribution"
+msgstr "Betriebssystemverteilung"
+
+#: __init__.py:215
+msgid "CPU"
+msgstr "Zentralprozessor"
+
+#: __init__.py:220
+msgid "RAM"
+msgstr "RAM"
 

@@ -1,5 +1,13 @@
-#: amd/ngw-feature-description/DisplayWidget.js:11
-#: amd/ngw-feature-description/EditorWidget.js:14
-msgid "Description"
+msgid ""
 msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: de\n"
+
+#: amd/ngw-webmap/Display.js:400 amd/ngw-webmap/plugin/LayerInfo.js:36
+msgid "Description"
+msgstr "Beschreibung"
 

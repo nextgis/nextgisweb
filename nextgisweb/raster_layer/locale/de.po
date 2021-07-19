@@ -1,72 +1,84 @@
-#: api.py:30
-msgid "Output format is not provided."
+msgid ""
 msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: de\n"
 
-#: api.py:33
-#, python-format
+#. Нужно уточнить. Здесь речь идет об экспорте данных в файл какого-то формата, который - формат - не указан, верно?
+#: api.py:103
+msgid "Output format is not provided."
+msgstr "Dateiformat für Export ist nicht gewählt."
+
+#. Идет ли здесь речь о формате файла, или это формат в более широком смысле?
+#: api.py:108
 msgid "Format '%s' is not supported."
-msgstr ""
+msgstr "Nicht unterstütztes Dateiformat '%s'."
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:100
+msgid "Save as"
+msgstr "Speichern unter"
+
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:75
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+msgid "Save"
+msgstr "Speichern"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:15
+msgid "Format"
+msgstr "Format"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:19
+msgid "SRS"
+msgstr "SRS"
+
+#. Ребят, у вас есть три слова "Система координат" на русском, которое три раза по-разному переведено: SRS, SRS identifier и Coordinate system. Так должно быть? Спрашиваю, потому что от этого на немецкий перевод тоже зависит
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Koordinatensystem"
 
 #: amd/ngw-raster-layer/Widget.js:29 model.py:60 view.py:31
 msgid "Raster layer"
-msgstr ""
+msgstr "Raster-Layer"
 
-#: model.py:80
+#: model.py:128
 msgid "GDAL library was unable to open the file."
-msgstr ""
+msgstr "Die GDAL-Bibliothek konnte die Datei nicht öffnen."
 
-#: model.py:88
-#, python-format
-msgid ""
-"Raster has format '%(format)s', however only following formats are "
-"supported: %(all_formats)s."
-msgstr ""
+#: model.py:139
+msgid "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
+msgstr "Das geladene Raster '%(format)s' wird nicht unterstützt. Die unterstützten Rasterformate sind: %(all_formats)s."
 
-#: model.py:93
+#: model.py:144
 msgid "Raster files without projection info are not supported."
-msgstr ""
+msgstr "Rasterdateien ohne Projektionsinformationen werden nicht unterstützt."
 
-#: model.py:104
+#: model.py:155
 msgid "Complex data types are not supported."
-msgstr ""
+msgstr "Komplexe Datentypen werden nicht unterstützt."
 
 #: model.py:178
 msgid "Data type"
-msgstr ""
+msgstr "Datentypen"
 
-#: view.py:20 view.py:34
-msgid "Save as"
-msgstr ""
-
+#. Ребят, о каком канале тут идет речь? Канал связи?
 #: amd/ngw-raster-layer/ExportForm.js:104
 msgid "Band"
-msgstr ""
-
-#: amd/ngw-raster-layer/template/ExportForm.hbs:13
-msgid "Format"
-msgstr ""
-
-#: amd/ngw-raster-layer/template/ExportForm.hbs:17
-msgid "SRS"
-msgstr ""
+msgstr "Band"
 
 #: amd/ngw-raster-layer/template/ExportForm.hbs:21
 msgid "Bands"
-msgstr ""
+msgstr "Bänder"
 
-#: amd/ngw-raster-layer/template/ExportForm.hbs:30
-msgid "Save"
-msgstr ""
-
-#: amd/ngw-raster-layer/template/Widget.hbs:3
+#. Ребят, растровый слой и dataset (Datensatz по-немецки) - это две разные вещи. Типа - растровый слой может считаться подклассом класса dataset :) Так и должно быть?
+#: amd/ngw-vector-layer/template/Widget.hbs:47
 msgid "Select a dataset"
-msgstr ""
+msgstr "Datensatz auswählen"
 
 #: amd/ngw-raster-layer/template/Widget.hbs:4
 msgid "Dataset should be in GeoTIFF format."
-msgstr ""
-
-#: amd/ngw-raster-layer/template/Widget.hbs:8
-msgid "Coordinate system"
-msgstr ""
+msgstr "Dateiformat GeoTIFF ist erwartet."
 

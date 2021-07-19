@@ -1,85 +1,99 @@
-#: amd/ngw-wfsclient/WFSConnectionWidget.js:28 model.py:108
-msgid "WFS connection"
+msgid ""
 msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: de\n"
 
-#: amd/ngw-wfsclient/WFSLayerWidget.js:40 model.py:344
-msgid "WFS layer"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:10
-msgid "WFS path"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:16
-msgid "Username"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:22
+#. Вообще, у ребят есть прекрасное слово Kennwort. Предлагаю поменять
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
 msgid "Password"
-msgstr ""
+msgstr "Passwort"
 
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:27
-msgid "Version"
-msgstr ""
+#: amd/ngw-vector-layer/template/Widget.hbs:28
+#: amd/ngw-vector-layer/template/Widget.hbs:79 model.py:77
+msgid "Point"
+msgstr "Punkt"
 
-#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:8
-msgid "Select WFS connection"
-msgstr ""
+#: amd/ngw-vector-layer/template/Widget.hbs:29
+#: amd/ngw-vector-layer/template/Widget.hbs:80 model.py:77
+msgid "Line"
+msgstr "LineString"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:30
+#: amd/ngw-vector-layer/template/Widget.hbs:81 model.py:77
+msgid "Polygon"
+msgstr "Polygon"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:31 model.py:78
+msgid "Multipoint"
+msgstr "Multipunkt"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:32 model.py:78
+msgid "Multiline"
+msgstr "MultiLineString"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:33 model.py:78
+msgid "Multipolygon"
+msgstr "Multipolygon"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:26
+#: amd/ngw-vector-layer/template/Widget.hbs:75 model.py:738
+msgid "Geometry type"
+msgstr "Geometrietyp"
 
 #: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:10
 msgid "Connection"
-msgstr ""
+msgstr "Verbindung"
 
-#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:16
-msgid "Layer"
-msgstr ""
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:28
+msgid "Geometry column"
+msgstr "Geometriespalte"
 
 #: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:20
 #: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:36
 msgid "Autodetect"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:28
-msgid "Geometry column"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:34
-msgid "Geometry type"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:37
-msgid "Point"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:38
-msgid "Line"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:39
-msgid "Polygon"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:40
-msgid "Multipoint"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:41
-msgid "Multiline"
-msgstr ""
-
-#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:42
-msgid "Multipolygon"
-msgstr ""
+msgstr "Automatische Erkennung"
 
 #: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:50
 msgid "Attribute definitions"
-msgstr ""
+msgstr "Attributdefinitionen"
 
 #: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:53
 msgid "Keep"
-msgstr ""
+msgstr "Behalten"
 
 #: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:54
 msgid "Reload"
-msgstr ""
+msgstr "Neu laden"
+
+#: template/sysinfo.mako:21
+msgid "Version"
+msgstr "Version"
+
+#: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
+msgid "Layer"
+msgstr "Layer"
+
+#: amd/ngw-wfsclient/WFSConnectionWidget.js:28 model.py:108
+msgid "WFS connection"
+msgstr "WFS-Verbindung"
+
+#: amd/ngw-wfsclient/WFSLayerWidget.js:40 model.py:344
+msgid "WFS layer"
+msgstr "WFS-Layer"
+
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:10
+msgid "WFS path"
+msgstr "WFS-Pfad"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:38
+msgid "Username"
+msgstr "Benutzername"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:8
+msgid "Select WFS connection"
+msgstr "WFS-Verbindung wählen"
 

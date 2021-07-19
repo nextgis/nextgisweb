@@ -1,28 +1,39 @@
-#: amd/ngw-lookup-table/Widget.js:90 model.py:25 view.py:19
-msgid "Lookup table"
+msgid ""
 msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: de\n"
 
-#: amd/ngw-lookup-table/Widget.js:52 template/section.mako:7
-msgid "Key"
-msgstr ""
-
-#: amd/ngw-lookup-table/Widget.js:61
-msgid "Type"
-msgstr ""
-
-#: amd/ngw-lookup-table/Widget.js:68 template/section.mako:8
-msgid "Value"
-msgstr ""
-
-#: amd/ngw-lookup-table/Widget.js:124
-msgid "Add"
-msgstr ""
-
-#: amd/ngw-lookup-table/Widget.js:130
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
-#: template/section.mako:2
+#: amd/ngw-feature-layer/FieldsWidget.js:82 template/section_fields.mako:16
+msgid "Type"
+msgstr "Typ"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: template/section_fields.mako:19
+msgid "Lookup table"
+msgstr "Nachschlagetabelle"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:46
+#: template/section_vendor_params.mako:6
+msgid "Key"
+msgstr "Schlüssel"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:55
+#: template/section_vendor_params.mako:7
+msgid "Value"
+msgstr "Wert"
+
+#: amd/ngw-raster-mosaic/ItemWidget.js:64
 msgid "Items"
-msgstr ""
+msgstr "Verzeichniselemente"
 

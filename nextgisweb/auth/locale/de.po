@@ -1,185 +1,194 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: de\n"
+
+#: template/browse.mako:98
+msgid "User"
+msgstr "Benutzer"
+
 #: __init__.py:41
 msgid "Guest"
-msgstr ""
+msgstr "Gast"
 
 #: __init__.py:47
 msgid "Everyone"
-msgstr ""
+msgstr "Jeder"
 
 #: __init__.py:53
 msgid "Authenticated"
-msgstr ""
+msgstr "Authentifiziert"
 
 #: __init__.py:61
 msgid "Administrators"
-msgstr ""
+msgstr "Administratoren"
 
 #: __init__.py:64
 msgid "Administrator"
-msgstr ""
+msgstr "Administrator"
 
 #: __init__.py:73
 msgid "Owner"
-msgstr ""
+msgstr "Eigentümer"
 
 #: __init__.py:176
-#, python-format
-msgid ""
-"Maximum number of users is reached. Your current plan user number limit "
-"is %d."
-msgstr ""
+msgid "Maximum number of users is reached. Your current plan user number limit is %d."
+msgstr "Benutzerlimit wurde erreicht. Der aktive Plan erlaubt maximal %d Benutzer."
 
+#. Что такое "системные субъекты" (system principals)?
 #: api.py:183
 msgid "System principals couldn't be chanded."
-msgstr ""
+msgstr "Keine Änderungen der Systemprinzipale sind möglich"
 
 #: exception.py:10
 msgid "Invalid credentials"
-msgstr ""
+msgstr "Fehlerhafte Anmeldeinformation"
 
 #: exception.py:15
 msgid "User is disabled"
-msgstr ""
+msgstr "Benutzer ist gesperrt"
 
 #: oauth.py:118
 msgid "User is already bound"
-msgstr ""
+msgstr "Benutzer ist schon verknüpft"
 
 #: oauth.py:320
 msgid "OAuth authorization error"
-msgstr ""
+msgstr "OAuth-Authorisierungsfehler"
 
 #: oauth.py:325
 msgid "Invalid OAuth token"
-msgstr ""
+msgstr "Falscher OAuth-Token"
 
 #: oauth.py:330
 msgid "OAuth token refresh failed"
-msgstr ""
+msgstr "OAuth-Token wurde nicht aktualisiert"
 
 #: oauth.py:335
 msgid "OAuth access token is expired"
-msgstr ""
+msgstr "OAuth-Token ist abgelaufen"
 
-#: views.py:198
+#: template/header.mako:98
 msgid "User settings"
-msgstr ""
+msgstr "Benutzereinstellungen"
 
+#. Eindeutig - это "однозначно" (в смысле "недвусмысленно"). Здесь корректнее einzigartig
 #: views.py:266
 msgid "Group name is not unique."
-msgstr ""
+msgstr "Gruppenname ist nicht einzigartig."
 
 #: views.py:304
 msgid "Create new group"
-msgstr ""
+msgstr "Neue Gruppe erstellen"
 
+#. eindeutig - это "недвусмысленно". Корректно - einzigartig
 #: views.py:355
 msgid "Login is not unique."
-msgstr ""
+msgstr "Login ist nicht einzigartig."
 
 #: views.py:370
-msgid ""
-"You can't disable current administrator. At least one enabled "
-"administrator is required."
-msgstr ""
+msgid "You can't disable current administrator. At least one enabled administrator is required."
+msgstr "Das ist der letzte aktive Administrator. Deswegen kann man ihn nicht sperren."
 
 #: views.py:413
 msgid "Create new user"
-msgstr ""
+msgstr "Neuen Benutzer anlegen"
 
 #: views.py:446 views.py:511
 msgid "Users"
-msgstr ""
+msgstr "Benutzer"
 
 #: views.py:456 views.py:514
 msgid "Groups"
-msgstr ""
+msgstr "Gruppen"
 
 #: views.py:467 views.py:489
 msgid "List"
-msgstr ""
+msgstr "Liste"
 
-#: views.py:472 views.py:494
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:37
 msgid "Create"
-msgstr ""
+msgstr "Erstellen"
 
-#: views.py:478 views.py:500
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:16
 msgid "Edit"
-msgstr ""
+msgstr "Bearbeiten"
 
 #: amd/ngw-auth/GroupWidget.js:39
 msgid "Group"
-msgstr ""
-
-#: amd/ngw-auth/UserWidget.js:38
-msgid "User"
-msgstr ""
+msgstr "Gruppe"
 
 #: amd/ngw-auth/UserWidget.js:47
 msgid "Enter new password here"
-msgstr ""
+msgstr "Geben Sie hier ein neues Passwort ein"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:7
 #: amd/ngw-auth/template/UserWidget.hbs:8 template/group_browse.mako:25
 #: template/user_browse.mako:25
 msgid "Full name"
-msgstr ""
+msgstr "Vollständiger Name"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:26
 msgid "Group name"
-msgstr ""
+msgstr "Gruppenname"
 
-#: amd/ngw-auth/template/GroupWidget.hbs:19
-#: amd/ngw-auth/template/UserWidget.hbs:45
+#: amd/ngw-webmap/Display.js:400 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
-msgstr ""
+msgstr "Beschreibung"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:24
 msgid "Assign at registration"
-msgstr ""
+msgstr "Zuweisen bei Registrierung"
 
 #: amd/ngw-auth/template/GroupWidget.hbs:30
 msgid "Group members"
-msgstr ""
+msgstr "Gruppenmitglieder"
 
+#. Ну нет, это вот точно некорректно (если, конечно, то не кнопка действия типа "войти"). Полагаю, это название поля.
 #: amd/ngw-auth/template/UserWidget.hbs:15 template/login.mako:44
 #: template/user_browse.mako:26
 msgid "Login"
-msgstr ""
+msgstr "Login"
 
-#: amd/ngw-auth/template/UserWidget.hbs:23 template/login.mako:47
+#. Вообще, у ребят есть прекрасное слово Kennwort. Предлагаю поменять
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
 msgid "Password"
-msgstr ""
+msgstr "Passwort"
 
 #: amd/ngw-auth/template/UserWidget.hbs:30
 msgid "OAuth subject"
-msgstr ""
+msgstr "OAuth-Subjekt"
 
+#. Это про пользователя, верно?
 #: amd/ngw-auth/template/UserWidget.hbs:36
 msgid "Disabled"
-msgstr ""
+msgstr "Deaktiviert"
 
 #: amd/ngw-auth/template/UserWidget.hbs:52
 msgid "Groups member"
-msgstr ""
+msgstr "Gruppenmitglied"
 
 #: template/login.mako:13
 msgid "Authorization Required"
-msgstr ""
+msgstr "Anmeldung erforderlich"
 
 #: template/login.mako:15
 msgid "Sign in to Web GIS"
-msgstr ""
+msgstr "Bei Web GIS anmelden"
 
 #: template/login.mako:27 template/login.mako:37 template/user_settings.mako:13
 msgid "Sign in with OAuth"
-msgstr ""
+msgstr "Mit OAuth anmelden"
 
-#: template/login.mako:53
+#: amd/ngw-pyramid/right-menu/RightMenu.js:65 template/header.mako:30
 msgid "Sign in"
-msgstr ""
+msgstr "Anmelden"
 
 #: template/user_settings.mako:15
 msgid "Your account is bound to NextGIS ID account"
-msgstr ""
+msgstr "Ihr Konto ist mit dem NextGIS-ID verbunden"
 

@@ -1,54 +1,62 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: de\n"
+
+#: view.py:209
+msgid "External access"
+msgstr "externer Zugriff"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:72 template/section_fields.mako:15
+msgid "Keyname"
+msgstr "Schlüsselname"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
+msgid "Display name"
+msgstr "Anzeigename"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:33
+msgid "Remove"
+msgstr "Entfernen"
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr "Weiterlesen"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
+msgid "Resource"
+msgstr "Ressource"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:49
+msgid "Select vector layer"
+msgstr "Vektorlayer wählen"
+
 #: amd/ngw-wfsserver/ServiceWidget.js:58 model.py:25
 msgid "WFS service"
-msgstr ""
-
-#: view.py:19
-msgid "External access"
-msgstr ""
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:14
-msgid "Add"
-msgstr ""
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:18
-msgid "Select vector layer"
-msgstr ""
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:27
-msgid "Remove"
-msgstr ""
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:62
-msgid "Keyname"
-msgstr ""
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:66
-msgid "Display name"
-msgstr ""
+msgstr "WFS-Dienst"
 
 #: amd/ngw-wfsserver/template/ServiceWidget.hbs:70
 msgid "Default count of returned features"
-msgstr ""
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:74
-msgid "Resource"
-msgstr ""
+msgstr "Standardanzahl der zurückgegebenen Objekte"
 
 #: template/section_api_wfs.mako:7
 msgid "Web Feature Service (WFS)"
-msgstr ""
+msgstr "Web Feature Service (WFS)"
 
 #: template/section_api_wfs.mako:11
-msgid ""
-"Web Feature Service (WFS) provides an interface allowing requests for "
-"geographical features across the web using platform-independent calls."
-msgstr ""
+msgid "Web Feature Service (WFS) provides an interface allowing requests for geographical features across the web using platform-independent calls."
+msgstr "Web Feature Service (WFS) stellt eine Schnittstelle zur Verfügung, die die Plattform-unabhängige Anfragen für geografische Objekte ermöglicht."
 
 #: template/section_api_wfs.mako:16
 msgid "https://docs.nextgis.com/docs_ngweb/source/layers.html#wfs-service"
-msgstr ""
-
-#: template/section_api_wfs.mako:17
-msgid "Read more"
 msgstr ""
 
