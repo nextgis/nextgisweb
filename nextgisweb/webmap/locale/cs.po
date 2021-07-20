@@ -1,0 +1,665 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: cs\n"
+
+#: amd/ngw-webmap/Display.js:220
+msgid "Search"
+msgstr "vyhledávání"
+
+#: amd/ngw-webmap/Display.js:400 amd/ngw-webmap/plugin/LayerInfo.js:36
+msgid "Description"
+msgstr "Popis"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Vymazat"
+
+#: amd/ngw-webmap/plugin/FeatureLayer.js:115
+msgid "Feature table"
+msgstr "Tabulka funkcí"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:100
+msgid "Save as"
+msgstr "Uložit jako"
+
+#: amd/ngw-webmap/tool/Identify.js:431
+msgid "Features"
+msgstr "Funkce"
+
+#: view.py:209
+msgid "External access"
+msgstr "Externí přístup"
+
+#: amd/ngw-webmap/tool/Identify.js:212
+msgid "Attributes"
+msgstr "Atributy"
+
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:75
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+msgid "Save"
+msgstr "Uložit"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
+msgid "Display name"
+msgstr "Zobrazované jméno"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:33
+msgid "Remove"
+msgstr "Odstranit"
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr "Přečíst více"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:40
+msgid "Settings"
+msgstr "Nastavení"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:53
+msgid "Cancel"
+msgstr "Zrušení"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:77
+msgid "Enabled"
+msgstr "Povoleno"
+
+#: template/section_api_webmap.mako:7
+msgid "TMS (Tile Map Service)"
+msgstr "TMS (Tile Map Service)"
+
+#: template/section_api_webmap.mako:11
+msgid "TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map is a map displayed in a browser by seamlessly joining dozens of individually requested image."
+msgstr "TMS (Tile Map Service) je specifikace pro kachlové webové mapy. Kachlová webová mapa je mapa zobrazená v prohlížeči plynulým připojením k desítkám individuálně požadovaných obrázků."
+
+#: template/section_api_webmap.mako:16
+msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
+msgstr "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:38
+msgid "Select layer"
+msgstr "Vyberte vrstvu"
+
+#: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
+msgid "Layer"
+msgstr "Vrstva"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:10
+msgid "Left, deg."
+msgstr "Doleva, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:28
+msgid "Bottom, deg."
+msgstr "Dno, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:22
+msgid "Right, deg."
+msgstr "Doprava, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:16
+msgid "Top, deg."
+msgstr "Vrchol, deg."
+
+#: __init__.py:28
+msgid "Main web map"
+msgstr "Hlavní webová mapa"
+
+#: adapter.py:24
+msgid "Tiles"
+msgstr "Dlaždice"
+
+#: adapter.py:34
+msgid "Image"
+msgstr "Obraz"
+
+#: model.py:31 model.py:40 view.py:181 view.py:202
+msgid "Web map"
+msgstr "Webová mapa"
+
+#: model.py:33 view.py:188
+msgid "Display"
+msgstr "Zobrazit"
+
+#: model.py:34
+msgid "View annotations"
+msgstr "Zobrazit poznámky"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:173 model.py:35
+msgid "Edit annotations"
+msgstr "Upravit poznámky"
+
+#: view.py:36 view.py:203
+msgid "Web map settings"
+msgstr "Nastavení webové mapy"
+
+#: amd/ngw-webmap/Display.js:214 amd/ngw-webmap/Display.js:1011
+#: amd/ngw-webmap/ItemWidget.js:243
+msgid "Layers"
+msgstr "Vrstvy"
+
+#: amd/ngw-webmap/Display.js:226 amd/ngw-webmap/Display.js:436
+msgid "Share"
+msgstr "Podělit se"
+
+#: amd/ngw-webmap/Display.js:232 amd/ngw-webmap/Display.js:331
+msgid "Print map"
+msgstr "Tisk mapy"
+
+#: amd/ngw-webmap/Display.js:370 amd/ngw-webmap/Display.js:377
+msgid "Bookmarks"
+msgstr "Záložky"
+
+#: amd/ngw-webmap/Display.js:537 amd/ngw-webmap/Display.js:547
+msgid "Annotations"
+msgstr "Anotace"
+
+#: amd/ngw-webmap/Display.js:729 amd/ngw-webmap/tool/Zoom.js:18
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:479
+msgid "Zoom in"
+msgstr "Přiblížit"
+
+#: amd/ngw-webmap/Display.js:730 amd/ngw-webmap/tool/Zoom.js:21
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:480
+msgid "Zoom out"
+msgstr "Oddálit"
+
+#: amd/ngw-webmap/Display.js:734 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
+msgid "Attributions"
+msgstr "Atribuce"
+
+#: amd/ngw-webmap/Display.js:750
+msgid "Initial extent"
+msgstr "Počáteční rozsah"
+
+#: amd/ngw-webmap/Display.js:753 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
+msgid "Reset rotation"
+msgstr "Resetovat rotaci"
+
+#: amd/ngw-webmap/ExtentWidget.js:31
+msgid "Extent and bookmarks"
+msgstr "Rozsah a záložky"
+
+#: amd/ngw-webmap/ItemWidget.js:94 amd/ngw-webmap/template/ItemWidget.hbs:41
+msgid "Layer order"
+msgstr "Pořadí vrstev"
+
+#: amd/ngw-webmap/ItemWidget.js:144
+msgid "Use on the map"
+msgstr "Použít na mapě"
+
+#: amd/ngw-webmap/ItemWidget.js:309 amd/ngw-webmap/template/ItemWidget.hbs:26
+msgid "Add group"
+msgstr "Přidat skupinu"
+
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:23
+msgid "Your annotation text"
+msgstr "Váš text poznámky"
+
+#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.hbs:7
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:209
+msgid "Edit annotation"
+msgstr "Upravit anotaci"
+
+#: amd/ngw-webmap/plugin/FeatureLayer.js:59
+msgid "Go to"
+msgstr "Jít do"
+
+#: amd/ngw-webmap/plugin/LayerEditor.js:102
+msgid "Editing"
+msgstr "Úpravy"
+
+#: amd/ngw-webmap/plugin/ZoomToLayer.js:24
+msgid "Zoom to layer"
+msgstr "Přiblížit vrstvu"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.hbs:10
+msgid "Enable layers editing"
+msgstr "Povolit úpravy vrstev"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:52
+msgid "Enable annotations"
+msgstr "Povolit anotace "
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:55
+msgid "Show annotations by default"
+msgstr "Ve výchozím nastavení zobrazit poznámky"
+
+#: amd/ngw-webmap/template/Display.hbs:13
+msgid "Map"
+msgstr "Mapa"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:34
+msgid "Set extent from layer"
+msgstr "Nastavit rozsah z vrstvy"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:46
+msgid "Constrain to extent"
+msgstr "Omezte rozsah"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:49
+msgid "Select vector layer"
+msgstr "Vyberte vektorovou vrstvu"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:51
+msgid "Bookmark resource"
+msgstr "Zdroj záložek"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:14
+msgid "Add layer"
+msgstr "Přidat vrstvu"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:18
+msgid "Select layer\\'s style"
+msgstr "Vyberte styl vrstvy"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:84
+msgid "Transparency"
+msgstr "Průhlednost"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:89
+msgid "Min scale"
+msgstr "Minimální stupnice"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:94
+msgid "Max scale"
+msgstr "Maximální měřítko"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:100
+msgid "Adapter"
+msgstr "Adaptér"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:106
+msgid "Style resource"
+msgstr "Zdroj stylu"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:126
+msgid "Expanded"
+msgstr "Rozšířený"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:9
+msgid "Identify popup"
+msgstr "Identifikovat vyskakovací okno"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:14
+msgid "Width, px"
+msgstr "Šířka, px"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:19
+msgid "Height, px"
+msgstr "Výška, px"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:24
+msgid "Radius, px"
+msgstr "Poloměr, px"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:29
+msgid "Measurement"
+msgstr "Měření"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:33
+msgid "Length units"
+msgstr "Jednotky délky"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:34
+msgid "Meters"
+msgstr "Měřiče"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:35
+msgid "Kilometers"
+msgstr "Kilometry"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:36
+msgid "Meters/kilometers (auto)"
+msgstr "Metry / kilometry (auto)"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:37
+msgid "Feet"
+msgstr "Stopy"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:38
+msgid "Miles"
+msgstr "Míle"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:39
+msgid "Feet/miles (auto)"
+msgstr "Stopy / míle (auto)"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:44
+msgid "Area units"
+msgstr "Plošné jednotky"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:45
+msgid "Sq. meters"
+msgstr "Čt. metrů"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:46
+msgid "Sq. kilometers"
+msgstr "Čt. kilometrů"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:47
+msgid "Sq. meters/kilometers (auto)"
+msgstr "Čt. metry / kilometry (auto)"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:48
+msgid "Hectares"
+msgstr "Hektary"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:49
+msgid "Acres"
+msgstr "Acres"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:50
+msgid "Sq. miles"
+msgstr "Čt. mil"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:51
+msgid "Acres/sq. miles (auto)"
+msgstr "Akrů/čtv. míle (auto)"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:52
+msgid "Sq. feet"
+msgstr "Čt. stopy"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:57
+msgid "Degree format"
+msgstr "Formát titulu"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:58
+msgid "Decimal degrees"
+msgstr "Desetinné stupně"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:59
+msgid "Degrees, decimal minutes"
+msgstr "Stupně, desetinné minuty"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:60
+msgid "Degrees, minutes, seconds"
+msgstr "Stupně, minuty, sekundy"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:65
+msgid "Measurement SRID"
+msgstr "Měření SRID"
+
+#: amd/ngw-webmap/tool/Identify.js:246
+msgid "Feature"
+msgstr "Vlastnost"
+
+#: amd/ngw-webmap/tool/Identify.js:304 amd/ngw-webmap/tool/Identify.js:321
+msgid "Identify"
+msgstr "Identifikovat"
+
+#: amd/ngw-webmap/tool/Measure.js:33
+msgid "Measure distance"
+msgstr "Změřte vzdálenost"
+
+#: amd/ngw-webmap/tool/Measure.js:36
+msgid "Measure area"
+msgstr "Změřte plochu"
+
+#: amd/ngw-webmap/tool/Measure.js:40
+msgid "m"
+msgstr "m"
+
+#: amd/ngw-webmap/tool/Measure.js:41
+msgid "km"
+msgstr "km"
+
+#: amd/ngw-webmap/tool/Measure.js:42
+msgid "ft"
+msgstr "ft"
+
+#: amd/ngw-webmap/tool/Measure.js:43
+msgid "mi"
+msgstr "mi"
+
+#: amd/ngw-webmap/tool/Measure.js:44
+msgid "ha"
+msgstr "ha"
+
+#: amd/ngw-webmap/tool/Measure.js:45
+msgid "ac"
+msgstr "ac"
+
+#: amd/ngw-webmap/tool/Measure.js:266
+msgid "Double click to finish."
+msgstr "Dokončete dvojitým kliknutím."
+
+#: amd/ngw-webmap/tool/Rotate.js:14
+msgid "Rotate"
+msgstr "Točit se"
+
+#: amd/ngw-webmap/tool/Swipe.js:17
+msgid "Vertical swipe"
+msgstr "Vertikální přejetí"
+
+#: amd/ngw-webmap/tool/Swipe.js:21
+msgid "Horizontal swipe"
+msgstr "Horizontální přejetí"
+
+#: amd/ngw-webmap/tool/editing/CreateFeature.js:16
+msgid "Create features"
+msgstr "Vytvářejte funkce"
+
+#: amd/ngw-webmap/tool/editing/DeleteFeature.js:16
+msgid "Delete features"
+msgstr "Smazat funkce"
+
+#: amd/ngw-webmap/tool/editing/ModifyFeature.js:16
+msgid "Modify features"
+msgstr "Upravit funkce"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:110
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:48
+msgid "Don't save"
+msgstr "Neukládat"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:212
+msgid "Create annotation"
+msgstr "Vytvořte anotaci"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:5
+msgid "Stroke: width / color"
+msgstr "Zdvih: šířka / barva"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:10
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:46
+msgid "Please enter a numeric value"
+msgstr "Zadejte číselnou hodnotu"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:11
+msgid "Invalid width: should be from 0 to 20 px"
+msgstr "Neplatná šířka: měla by být od 0 do 20 px"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:13
+msgid "Stroke width, px"
+msgstr "Šířka tahu, px"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:18
+msgid "Stroke color"
+msgstr "Barva tahu"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:25
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:31
+msgid "Fill color"
+msgstr "Vyplň barvu"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:38
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:43
+msgid "Circle size, px"
+msgstr "Velikost kruhu, px"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:47
+msgid "Invalid width: should be from 1 to 100 px"
+msgstr "Neplatná šířka: měla by být od 1 do 100 px"
+
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:262
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:282
+#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:301
+msgid "Error on the server:"
+msgstr "Chyba na serveru:"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:14
+msgid "Show annotations layer"
+msgstr "Zobrazit vrstvu poznámek"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:19
+msgid "Show messages"
+msgstr "Zobrazit zprávy"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:27
+msgid "Stopping editing"
+msgstr "Zastavování úprav"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:35
+msgid "Do you want to save changes?"
+msgstr "Chcete uložit změny?"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:9
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:94
+msgid "Print"
+msgstr "Tisk"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:18
+msgid "Paper format"
+msgstr "Papírový formát"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:22
+msgid "Select format"
+msgstr "Vyberte formát"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:24
+msgid "A4 - Portrait"
+msgstr "A4 - Portrét"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:25
+msgid "A4 - Landscape"
+msgstr "A4 - Krajina"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:26
+msgid "A3 - Portrait"
+msgstr "A3 - Portrét"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:27
+msgid "A3 - Landscape"
+msgstr "A3 - Krajina"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:28
+msgid "A2 - Portrait"
+msgstr "A2 - Portrét"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:29
+msgid "A2 - Landscape"
+msgstr "A2 - Krajina"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:30
+msgid "A1 - Portrait"
+msgstr "A1 - Portrét"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:31
+msgid "A1 - Landscape"
+msgstr "A1 - Krajina"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:32
+msgid "A0 - Portrait"
+msgstr "A0 - Portrét"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:33
+msgid "A0 - Landscape"
+msgstr "A0 - Krajina"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:34
+msgid "Custom size"
+msgstr "Vlastní velikost"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:40
+msgid "Height, mm"
+msgstr "Výška, mm"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:51
+msgid "Width, mm"
+msgstr "Šířka, mm"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:62
+msgid "Margin, mm"
+msgstr "Okraj, mm"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:72
+msgid "Scale value"
+msgstr "Hodnota měřítka"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:77
+msgid "Scale bar"
+msgstr "Měřítko"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:82
+#: amd/ngw-webmap/ui/ScalesSelect/ScalesSelect.hbs:5
+msgid "Scale"
+msgstr "Měřítko"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:107
+msgid "JPEG"
+msgstr "JPEG"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:114
+msgid "PNG"
+msgstr "PNG"
+
+#: amd/ngw-webmap/ui/ScalesSelect/ScalesSelect.hbs:8
+msgid "Select scale"
+msgstr "Vyberte měřítko"
+
+#: amd/ngw-webmap/ui/ScalesSelect/ScalesSelect.hbs:24
+msgid "Use Shift+drag for box zooming"
+msgstr "Použijte Shift + tažení pro zvětšení rámeček"
+
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.hbs:7
+msgid "Search on the map"
+msgstr "Hledat na mapě"
+
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:158
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:211
+msgid "Refine search criterion"
+msgstr "Upřesněte kritérium vyhledávání"
+
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:226
+msgid "Not found"
+msgstr "Nenalezeno"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:2
+msgid "Map link"
+msgstr "Odkaz mapy"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:10
+msgid "Social networks"
+msgstr "Sociální sítě"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:18
+msgid "Embed code for your site"
+msgstr "Vložte kód pro svůj web"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:20
+msgid "Map size:"
+msgstr "Velikost mapy:"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:43
+msgid "Link to main map"
+msgstr "Odkaz na hlavní mapu"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:50
+msgid "Generate events"
+msgstr "Generovat události"
+
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:68
+msgid "Preview"
+msgstr "Náhled"
+
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:511
+msgid "Open full map"
+msgstr "Otevřít celou mapu"
+

@@ -1,0 +1,118 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: cs\n"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Heslo"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Souřadnicový systém"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:53
+msgid "Cancel"
+msgstr "Zrušení"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:45
+msgid "Max zoom level"
+msgstr "Maximální úroveň přiblížení"
+
+#: amd/ngw-tmsclient/LayersDialog.js:63
+msgid "OK"
+msgstr "OK"
+
+#: amd/ngw-tmsclient/ConnectionWidget.js:34
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:55
+msgid "TMS connection"
+msgstr "Připojení TMS"
+
+#: model.py:168
+msgid "Zoom is out of range."
+msgstr "Zvětšení je mimo rozsah."
+
+#: amd/ngw-tmsclient/LayerWidget.js:37 model.py:176
+msgid "TMS layer"
+msgstr "TMS vrstva"
+
+#: view.py:24
+msgid "TMS capabilities"
+msgstr "Funkce TMS"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:38
+msgid "Select layer"
+msgstr "Vyberte vrstvu"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:9
+msgid "Capmode"
+msgstr "Capmode"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:11
+msgid "Custom"
+msgstr "Přizpůsobení"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:12
+msgid "NextGIS geoservices"
+msgstr "Další geoslužby GIS"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:20
+msgid "URL template"
+msgstr "Šablona URL"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:26
+msgid "API key"
+msgstr "Klíč API"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:32
+msgid "API key param"
+msgstr "Parametr klíče API"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:49
+msgid "Scheme"
+msgstr "Systém"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:55
+msgid "Skip SSL/TLS certificate verification"
+msgstr "Přeskočit ověření certifikátu SSL / TLS"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:15
+msgid "Choose a layer"
+msgstr "Vyberte vrstvu"
+
+#: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
+msgid "Layer"
+msgstr "Vrstva"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:39
+msgid "Min zoom level"
+msgstr "Minimální úroveň přiblížení"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:10
+msgid "Left, deg."
+msgstr "Doleva, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:28
+msgid "Bottom, deg."
+msgstr "Dno, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:22
+msgid "Right, deg."
+msgstr "Doprava, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:16
+msgid "Top, deg."
+msgstr "Vrchol, deg."
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:75
+msgid "Tile size, px"
+msgstr "Velikost dlaždice, px"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:38
+msgid "Username"
+msgstr "Uživatelské jméno"
+

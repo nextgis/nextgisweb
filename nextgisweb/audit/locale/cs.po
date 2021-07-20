@@ -1,0 +1,69 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: cs\n"
+
+#: view.py:32
+msgid "'date_first' and 'date_last' are mutually exclusive."
+msgstr "„date_first“ a „date_last“ se vzájemně vylučují."
+
+#: view.py:30 view.py:85
+msgid "Journal"
+msgstr "Protokol"
+
+#: view.py:59
+msgid "Journal record: %s"
+msgstr "Záznam v deníku: %s"
+
+#: view.py:84
+msgid "Audit"
+msgstr "Audit"
+
+#: amd/ngw-webmap/Display.js:220
+msgid "Search"
+msgstr "vyhledávání"
+
+#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:23
+msgid "Export"
+msgstr "Export"
+
+#: template/browse.mako:49
+msgid "All users"
+msgstr "Všichni uživatelé"
+
+#: template/browse.mako:50
+msgid "Non-empty users"
+msgstr "Neprázdní uživatelé"
+
+#: template/browse.mako:92
+msgid "Timestamp"
+msgstr "Časové razítko"
+
+#: template/browse.mako:93
+msgid "Status"
+msgstr "Postavení"
+
+#: template/browse.mako:94
+msgid "Method"
+msgstr "Metoda"
+
+#: template/browse.mako:95
+msgid "Path"
+msgstr "Stezka"
+
+#: template/browse.mako:96
+msgid "Route name"
+msgstr "Název trasy"
+
+#: template/browse.mako:97
+msgid "Context"
+msgstr "Kontext"
+
+#: template/browse.mako:98
+msgid "User"
+msgstr "Uživatel"
+

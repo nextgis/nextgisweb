@@ -1,0 +1,109 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: cs\n"
+
+#: template/browse.mako:92
+msgid "Timestamp"
+msgstr "Časové razítko"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Heslo"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Vymazat"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Přidat"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:46
+#: template/section_vendor_params.mako:6
+msgid "Key"
+msgstr "Klíč"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:55
+#: template/section_vendor_params.mako:7
+msgid "Value"
+msgstr "Hodnota"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Souřadnicový systém"
+
+#: template/sysinfo.mako:21
+msgid "Version"
+msgstr "Verze"
+
+#: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
+msgid "Layer"
+msgstr "Vrstva"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:38
+msgid "Username"
+msgstr "Uživatelské jméno"
+
+#: amd/ngw-wmsclient/ConnectionWidget.js:37
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:16 model.py:49
+msgid "WMS connection"
+msgstr "WMS připojení"
+
+#: amd/ngw-wmsclient/LayerWidget.js:48 model.py:176
+msgid "WMS layer"
+msgstr "WMS vrstva"
+
+#: view.py:30
+msgid "WMS capabilities"
+msgstr "Funkce WMS"
+
+#: view.py:38
+msgid "WMS vendor parameters"
+msgstr "Parametry dodavatele WMS"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:66
+msgid "Vendor parameters"
+msgstr "Parametry dodavatele"
+
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:10
+msgid "URL"
+msgstr "URL"
+
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:31
+msgid "Capabilities"
+msgstr "Schopnosti"
+
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:33
+msgid "Do not query"
+msgstr "Neptejte se"
+
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:34
+msgid "Query"
+msgstr "Dotaz"
+
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:35
+msgid "Clear"
+msgstr "Vymazat"
+
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:15
+msgid "Select WMS connection"
+msgstr "Vyberte připojení WMS"
+
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:29
+#: template/section_connection.mako:15
+msgid "Image format"
+msgstr "Formát obrázku"
+
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:35
+msgid "WMS layers"
+msgstr "Vrstvy WMS"
+
+#: template/section_connection.mako:27
+msgid "Title"
+msgstr "Titul"
+

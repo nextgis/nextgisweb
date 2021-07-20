@@ -1,0 +1,79 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: cs\n"
+
+#: api.py:103
+msgid "Output format is not provided."
+msgstr "Výstupní formát není k dispozici."
+
+#: api.py:108
+msgid "Format '%s' is not supported."
+msgstr "Formát '%s' není podporován."
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:100
+msgid "Save as"
+msgstr "Uložit jako"
+
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:75
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+msgid "Save"
+msgstr "Uložit"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:15
+msgid "Format"
+msgstr "Formát"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:19
+msgid "SRS"
+msgstr "SRS"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Souřadnicový systém"
+
+#: amd/ngw-raster-layer/Widget.js:29 model.py:60 view.py:31
+msgid "Raster layer"
+msgstr "Rastrová vrstva"
+
+#: model.py:128
+msgid "GDAL library was unable to open the file."
+msgstr "Knihovně GDAL se nepodařilo soubor otevřít."
+
+#: model.py:139
+msgid "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
+msgstr "Rastr má formát '%(format)s', podporovány jsou však pouze následující formáty: %(all_formats)s."
+
+#: model.py:144
+msgid "Raster files without projection info are not supported."
+msgstr "Rastrové soubory bez informací o projekci nejsou podporovány."
+
+#: model.py:155
+msgid "Complex data types are not supported."
+msgstr "Složité datové typy nejsou podporovány."
+
+#: model.py:178
+msgid "Data type"
+msgstr "Datový typ"
+
+#: amd/ngw-raster-layer/ExportForm.js:104
+msgid "Band"
+msgstr "Kapela"
+
+#: amd/ngw-raster-layer/template/ExportForm.hbs:21
+msgid "Bands"
+msgstr "Kapely"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:47
+msgid "Select a dataset"
+msgstr "Vyberte datovou sadu"
+
+#: amd/ngw-raster-layer/template/Widget.hbs:4
+msgid "Dataset should be in GeoTIFF format."
+msgstr "Datová sada by měla být ve formátu GeoTIFF."
+

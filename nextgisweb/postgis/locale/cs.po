@@ -1,0 +1,154 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: cs\n"
+
+#: template/browse.mako:98
+msgid "User"
+msgstr "Uživatel"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Heslo"
+
+#: template/section_fields.mako:21 view.py:189
+msgid "Table"
+msgstr "Tabulka"
+
+#: api.py:49
+msgid "Table (%s) not found in schema (%s)."
+msgstr "Tabulka (%s) nebyla ve schématu nalezena (%s)."
+
+#: amd/ngw-vector-layer/template/Widget.hbs:28
+#: amd/ngw-vector-layer/template/Widget.hbs:79 model.py:77
+msgid "Point"
+msgstr "Bod"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:29
+#: amd/ngw-vector-layer/template/Widget.hbs:80 model.py:77
+msgid "Line"
+msgstr "Čára"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:30
+#: amd/ngw-vector-layer/template/Widget.hbs:81 model.py:77
+msgid "Polygon"
+msgstr "Polygon"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:31 model.py:78
+msgid "Multipoint"
+msgstr "Multibod"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:32 model.py:78
+msgid "Multiline"
+msgstr "Multičáry"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:33 model.py:78
+msgid "Multipolygon"
+msgstr "Multipolygony"
+
+#: amd/ngw-postgis/ConnectionWidget.js:28 model.py:62
+msgid "PostGIS connection"
+msgstr "Připojení PostGIS"
+
+#: model.py:126
+msgid "Cannot connect to the database!"
+msgstr "Nelze se připojit k databázi!"
+
+#: amd/ngw-postgis/LayerWidget.js:42 model.py:154
+msgid "PostGIS layer"
+msgstr "Vrstva PostGIS"
+
+#: model.py:212
+msgid "Table '%(table)s' not found!"
+msgstr "Tabulka '%(tabulka)s' nebyla nalezena!"
+
+#: model.py:227
+msgid "SRID missing in geometry_columns table! You should specify it manually."
+msgstr "V tabulce geometry_columns chybí SRID! Měli byste to zadat ručně."
+
+#: model.py:230
+msgid "0 is an invalid SRID."
+msgstr "SR0 je neplatný SRID."
+
+#: model.py:237
+msgid "SRID in geometry_columns table does not match specified!"
+msgstr "SRID v tabulce geometry_columns neodpovídá zadané!"
+
+#: model.py:245
+msgid "Geometry type missing in geometry_columns table! You should specify it manually."
+msgstr "V tabulce geometry_columns chybí typ geometrie! Měli byste to zadat ručně."
+
+#: model.py:252
+msgid "Geometry type in geometry_columns table does not match specified!"
+msgstr "Typ geometrie v tabulce geometry_columns neodpovídá zadanému!"
+
+#: model.py:270
+msgid "To use column as ID it should have integer type!"
+msgstr "Chcete-li použít sloupec jako ID, měl by mít celočíselný typ!"
+
+#: model.py:313 model.py:316
+msgid "Column '%(column)s' not found!"
+msgstr "Sloupec '%(sloupec)s' nebyl nalezen!"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:26
+#: amd/ngw-vector-layer/template/Widget.hbs:75 model.py:738
+msgid "Geometry type"
+msgstr "Typ geometrie"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:9
+msgid "Host"
+msgstr "Hostitel"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:14
+msgid "Port"
+msgstr "Přístav"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:19
+msgid "Database"
+msgstr "Databáze"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:8
+msgid "Select PostGIS connection"
+msgstr "Vyberte připojení PostGIS"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:10
+msgid "Connection"
+msgstr "Spojení"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:16
+msgid "Schema"
+msgstr "Schéma"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:28
+msgid "ID column"
+msgstr "Sloupec ID"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:28
+msgid "Geometry column"
+msgstr "Sloupec geometrie"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:20
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:36
+msgid "Autodetect"
+msgstr "Auto detekc"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Souřadnicový systém"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:50
+msgid "Attribute definitions"
+msgstr "Definice atributů"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:53
+msgid "Keep"
+msgstr "Držet"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:54
+msgid "Reload"
+msgstr "Znovu načíst"
+

@@ -1,0 +1,63 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: cs\n"
+
+#: view.py:209
+msgid "External access"
+msgstr "Externí přístup"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:72 template/section_fields.mako:15
+msgid "Keyname"
+msgstr "Klíčový název"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
+msgid "Display name"
+msgstr "Zobrazované jméno"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Přidat"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:33
+msgid "Remove"
+msgstr "Odstranit"
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr "Přečíst více"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
+msgid "Resource"
+msgstr "Zdroj"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:18
+msgid "Select layer\\'s style"
+msgstr "Vyberte styl vrstvy"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:89
+msgid "Min scale"
+msgstr "Minimální stupnice"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:94
+msgid "Max scale"
+msgstr "Maximální měřítko"
+
+#: amd/ngw-wmsserver/ServiceWidget.js:56 model.py:27
+#: template/section_api_wms.mako:7
+msgid "WMS service"
+msgstr "Služba WMS"
+
+#: template/section_api_wms.mako:11
+msgid "Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map images. These images are typically produced by a map server from data provided by a GIS database."
+msgstr "Služba Web Map Service (WMS) je standardní protokol vyvinutý konsorciem Open Geospatial Consortium pro poskytování georeferencovaných mapových obrazů. Tyto obrázky jsou obvykle vytvářeny mapovým serverem z dat poskytovaných databází GIS."
+
+#: template/section_api_wms.mako:16
+msgid "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
+msgstr "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
+

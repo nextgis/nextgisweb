@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: cs\n"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Vymazat"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:82 template/section_fields.mako:16
+msgid "Type"
+msgstr "Typ"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Přidat"
+
+#: template/section_fields.mako:19
+msgid "Lookup table"
+msgstr "Vyhledávací tabulka"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:46
+#: template/section_vendor_params.mako:6
+msgid "Key"
+msgstr "Klíč"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:55
+#: template/section_vendor_params.mako:7
+msgid "Value"
+msgstr "Hodnota"
+
+#: amd/ngw-raster-mosaic/ItemWidget.js:64
+msgid "Items"
+msgstr "Položky"
+

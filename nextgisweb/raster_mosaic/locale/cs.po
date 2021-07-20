@@ -1,0 +1,57 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: cs\n"
+
+#: amd/ngw-svg-marker-library/Widget.js:55
+msgid "File name"
+msgstr "Název souboru"
+
+#: amd/ngw-raster-mosaic/ItemWidget.js:92
+msgid "Upload"
+msgstr "Nahrát"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Vymazat"
+
+#: amd/ngw-raster-mosaic/ItemWidget.js:64
+msgid "Items"
+msgstr "Položky"
+
+#: model.py:128
+msgid "GDAL library was unable to open the file."
+msgstr "Knihovně GDAL se nepodařilo soubor otevřít."
+
+#: model.py:139
+msgid "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
+msgstr "Rastr má formát '%(format)s', podporovány jsou však pouze následující formáty: %(all_formats)s."
+
+#: model.py:144
+msgid "Raster files without projection info are not supported."
+msgstr "Rastrové soubory bez informací o projekci nejsou podporovány."
+
+#: model.py:155
+msgid "Complex data types are not supported."
+msgstr "Složité datové typy nejsou podporovány."
+
+#: api.py:17
+msgid "Raster mosaic item id not provided."
+msgstr "ID položky rastrové mozaiky není poskytnuto."
+
+#: api.py:23
+msgid "Raster mosaic item not found."
+msgstr "Rastrová mozaika nebyla nalezena."
+
+#: model.py:38
+msgid "Raster mosaic"
+msgstr "Rastrová mozaika"
+
+#: model.py:131
+msgid "Only RGB and RGBA rasters are supported."
+msgstr "Podporovány jsou pouze rastry RGB a RGBA."
+
