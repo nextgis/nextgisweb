@@ -361,7 +361,7 @@ class CoreComponent(
         # Locale settings
         Option('locale.default', default='en'),
         Option('locale.available', list, default=[
-            'de', 'en', 'es', 'fr', 'it', 'pt', 'ru',
+            'cs', 'de', 'en', 'es', 'fr', 'it', 'pt', 'ru',
         ]),
 
         # Other deployment settings
