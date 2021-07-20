@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: fr\n"
+
+#: view.py:209
+msgid "External access"
+msgstr "Accès externe"
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr "Lire la suite"
+
+#: amd/ngw-render/TileCacheWidget.js:25
+msgid "Tile cache"
+msgstr "Cache de tuiles"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:77
+msgid "Enabled"
+msgstr "Activé"
+
+#: amd/ngw-render/template/TileCacheWidget.hbs:16
+msgid "Allow using tiles in non-tile requests"
+msgstr "Autoriser les tuiles pour les demandes d'images"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:45
+msgid "Max zoom level"
+msgstr "Niveau de zoom maximum"
+
+#: amd/ngw-render/template/TileCacheWidget.hbs:26
+msgid "TTL, sec."
+msgstr "TTL, sec."
+
+#: amd/ngw-render/template/TileCacheWidget.hbs:31
+msgid "Track changes"
+msgstr "Suivi des modifications"
+
+#: amd/ngw-render/template/TileCacheWidget.hbs:37
+msgid "Seed zoom level"
+msgstr "Ensemencement au niveau de zoom"
+
+#: template/section_api_webmap.mako:7
+msgid "TMS (Tile Map Service)"
+msgstr "TMS (Tile Map Service)"
+
+#: template/section_api_webmap.mako:11
+msgid "TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map is a map displayed in a browser by seamlessly joining dozens of individually requested image."
+msgstr "TMS (Tile Map Service) est une spécification pour les cartes Web tuilées. La carte Web tuilée est une carte affichée dans un navigateur en joignant de manière transparente des dizaines d'images demandées individuellement."
+
+#: template/section_api_webmap.mako:16
+msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
+msgstr "\n"
+"https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
+
+#: amd/ngw-render/template/TileCacheWidget.hbs:42
+msgid "Flush"
+msgstr "Dégager"
+

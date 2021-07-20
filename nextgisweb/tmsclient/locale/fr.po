@@ -1,0 +1,118 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: fr\n"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Mot de passe"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Système de coordonnées"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:53
+msgid "Cancel"
+msgstr "Annuler"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:45
+msgid "Max zoom level"
+msgstr "Niveau de zoom maximum"
+
+#: amd/ngw-tmsclient/LayersDialog.js:63
+msgid "OK"
+msgstr "OK"
+
+#: amd/ngw-tmsclient/ConnectionWidget.js:34
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:55
+msgid "TMS connection"
+msgstr "Connexion TMS"
+
+#: model.py:168
+msgid "Zoom is out of range."
+msgstr "Le zoom est hors de portée."
+
+#: amd/ngw-tmsclient/LayerWidget.js:37 model.py:176
+msgid "TMS layer"
+msgstr "Couche TMS"
+
+#: view.py:24
+msgid "TMS capabilities"
+msgstr "Capacités de TMS"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:38
+msgid "Select layer"
+msgstr "Sélectionnez une couche"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:9
+msgid "Capmode"
+msgstr "Capmode"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:11
+msgid "Custom"
+msgstr "Personnalisé"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:12
+msgid "NextGIS geoservices"
+msgstr "NextGIS geoservices"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:20
+msgid "URL template"
+msgstr "Modèle d'URL"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:26
+msgid "API key"
+msgstr "Clé API"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:32
+msgid "API key param"
+msgstr "Paramètre de clé API"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:49
+msgid "Scheme"
+msgstr "Schème"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:55
+msgid "Skip SSL/TLS certificate verification"
+msgstr "Ignorer la vérification du certificat SSL/TLS"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:15
+msgid "Choose a layer"
+msgstr "Sélectionnez une couche"
+
+#: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
+msgid "Layer"
+msgstr "Couche"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:39
+msgid "Min zoom level"
+msgstr "Niveau de zoom minimum"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:10
+msgid "Left, deg."
+msgstr "Gauche, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:28
+msgid "Bottom, deg."
+msgstr "En bas, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:22
+msgid "Right, deg."
+msgstr "Droite, deg."
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:16
+msgid "Top, deg."
+msgstr "Haut, deg."
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:75
+msgid "Tile size, px"
+msgstr "Taille de la tuile, px"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:38
+msgid "Username"
+msgstr "Nom d'utilisateur"
+

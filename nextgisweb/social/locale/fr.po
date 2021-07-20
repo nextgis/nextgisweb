@@ -1,0 +1,29 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: fr\n"
+
+#: amd/ngw-social/Widget.js:29
+msgid "Social"
+msgstr "Social"
+
+#: amd/ngw-social/template/Widget.hbs:4
+msgid "Preview for social media and messengers:"
+msgstr "Aperçu pour les médias sociaux et les messagers :"
+
+#: amd/ngw-social/template/Widget.hbs:8
+msgid "Select a preview image"
+msgstr "Sélectionnez une image d'aperçu"
+
+#: amd/ngw-social/template/Widget.hbs:18
+msgid "Preview description"
+msgstr "Aperçu de la description"
+
+#: amd/ngw-social/template/Widget.hbs:9
+msgid "The image will be converted to PNG format and downscaled to 1600x630 pixels if it\\'s bigger."
+msgstr "L'image sera convertie au format PNG et réduite à 1600x630 pixels si elle est plus grande."
+

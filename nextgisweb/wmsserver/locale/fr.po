@@ -1,0 +1,64 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: fr\n"
+
+#: view.py:209
+msgid "External access"
+msgstr "Accès externe"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:72 template/section_fields.mako:15
+msgid "Keyname"
+msgstr "Nom de clé"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
+msgid "Display name"
+msgstr "Afficher un nom"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Ajouter"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:33
+msgid "Remove"
+msgstr "Supprimer"
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr "Lire la suite"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
+msgid "Resource"
+msgstr "Ressource"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:18
+msgid "Select layer\\'s style"
+msgstr "Sélectionnez le(s) style(s) du couche"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:89
+msgid "Min scale"
+msgstr "Échelle min"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:94
+msgid "Max scale"
+msgstr "Échelle max"
+
+#: amd/ngw-wmsserver/ServiceWidget.js:56 model.py:27
+#: template/section_api_wms.mako:7
+msgid "WMS service"
+msgstr "Service WMS"
+
+#: template/section_api_wms.mako:11
+msgid "Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map images. These images are typically produced by a map server from data provided by a GIS database."
+msgstr "Web Map Service (WMS) est un protocole standard développé par l'Open Geospatial Consortium pour servir des images cartographiques géoréférencées. Ces images sont généralement produites par un serveur cartographique à partir de données fournies par une base de données GIS."
+
+#: template/section_api_wms.mako:16
+msgid "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
+msgstr "\n"
+"https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
+

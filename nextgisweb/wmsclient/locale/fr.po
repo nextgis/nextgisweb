@@ -1,0 +1,109 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: fr\n"
+
+#: template/browse.mako:92
+msgid "Timestamp"
+msgstr "Horodatage"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Mot de passe"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Effacer"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Ajouter"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:46
+#: template/section_vendor_params.mako:6
+msgid "Key"
+msgstr "Clé"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:55
+#: template/section_vendor_params.mako:7
+msgid "Value"
+msgstr "Valeur"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Système de coordonnées"
+
+#: template/sysinfo.mako:21
+msgid "Version"
+msgstr "Version"
+
+#: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
+msgid "Layer"
+msgstr "Couche"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:38
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#: amd/ngw-wmsclient/ConnectionWidget.js:37
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:16 model.py:49
+msgid "WMS connection"
+msgstr "Connexion WMS"
+
+#: amd/ngw-wmsclient/LayerWidget.js:48 model.py:176
+msgid "WMS layer"
+msgstr "Couche WMS"
+
+#: view.py:30
+msgid "WMS capabilities"
+msgstr "Capacités WMS"
+
+#: view.py:38
+msgid "WMS vendor parameters"
+msgstr "Paramètres du fournisseur WMS"
+
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:66
+msgid "Vendor parameters"
+msgstr "Paramètres du fournisseur"
+
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:10
+msgid "URL"
+msgstr "URL"
+
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:31
+msgid "Capabilities"
+msgstr "Capacités"
+
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:33
+msgid "Do not query"
+msgstr "Ne demandez pas"
+
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:34
+msgid "Query"
+msgstr "Demande"
+
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:35
+msgid "Clear"
+msgstr "Dégager"
+
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:15
+msgid "Select WMS connection"
+msgstr "Sélectionnez la connexion WMS"
+
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:29
+#: template/section_connection.mako:15
+msgid "Image format"
+msgstr "Format d'image"
+
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:35
+msgid "WMS layers"
+msgstr "Couches WMS"
+
+#: template/section_connection.mako:27
+msgid "Title"
+msgstr "Titre"
+

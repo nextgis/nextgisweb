@@ -1,0 +1,154 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: fr\n"
+
+#: template/browse.mako:98
+msgid "User"
+msgstr "Utilisateur"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Mot de passe"
+
+#: template/section_fields.mako:21 view.py:189
+msgid "Table"
+msgstr "Table"
+
+#: api.py:49
+msgid "Table (%s) not found in schema (%s)."
+msgstr "Table (%s) introuvable dans le schéma (%s)."
+
+#: amd/ngw-vector-layer/template/Widget.hbs:28
+#: amd/ngw-vector-layer/template/Widget.hbs:79 model.py:77
+msgid "Point"
+msgstr "Point"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:29
+#: amd/ngw-vector-layer/template/Widget.hbs:80 model.py:77
+msgid "Line"
+msgstr "Ligne"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:30
+#: amd/ngw-vector-layer/template/Widget.hbs:81 model.py:77
+msgid "Polygon"
+msgstr "Polygone"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:31 model.py:78
+msgid "Multipoint"
+msgstr "Multipoint"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:32 model.py:78
+msgid "Multiline"
+msgstr "Multiligne"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:33 model.py:78
+msgid "Multipolygon"
+msgstr "Multipolygone"
+
+#: amd/ngw-postgis/ConnectionWidget.js:28 model.py:62
+msgid "PostGIS connection"
+msgstr "Connexion PostGIS"
+
+#: model.py:126
+msgid "Cannot connect to the database!"
+msgstr "Impossible de se connecter à la base de données!"
+
+#: amd/ngw-postgis/LayerWidget.js:42 model.py:154
+msgid "PostGIS layer"
+msgstr "Couche PostGIS"
+
+#: model.py:212
+msgid "Table '%(table)s' not found!"
+msgstr "Table '%(table)s' introuvable!"
+
+#: model.py:227
+msgid "SRID missing in geometry_columns table! You should specify it manually."
+msgstr "IRS est manquant dans la table geometry_columns! Vous devez la spécifier manuellement."
+
+#: model.py:230
+msgid "0 is an invalid SRID."
+msgstr "0 est un IRS invalide."
+
+#: model.py:237
+msgid "SRID in geometry_columns table does not match specified!"
+msgstr "L'IRS dans la table geometry_columns ne correspond pas à ce qui est spécifié!"
+
+#: model.py:245
+msgid "Geometry type missing in geometry_columns table! You should specify it manually."
+msgstr "Type de géométrie est manquant dans la table geometry_columns! Vous devez la spécifier manuellement."
+
+#: model.py:252
+msgid "Geometry type in geometry_columns table does not match specified!"
+msgstr "Type de géométrie dans la table geometry_columns ne correspond pas à ce qui est spécifié!"
+
+#: model.py:270
+msgid "To use column as ID it should have integer type!"
+msgstr "Pour utiliser la colonne comme ID, elle doit être de type entier!"
+
+#: model.py:313 model.py:316
+msgid "Column '%(column)s' not found!"
+msgstr "Colonne '%(colonne)s' introuvable!"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:26
+#: amd/ngw-vector-layer/template/Widget.hbs:75 model.py:738
+msgid "Geometry type"
+msgstr "Type de géométrie"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:9
+msgid "Host"
+msgstr "Hôte"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:14
+msgid "Port"
+msgstr "Port"
+
+#: amd/ngw-postgis/template/ConnectionWidget.hbs:19
+msgid "Database"
+msgstr "Base de données"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:8
+msgid "Select PostGIS connection"
+msgstr "Sélectionnez la connexion PostGIS"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:10
+msgid "Connection"
+msgstr "Connexion"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:16
+msgid "Schema"
+msgstr "Schéma"
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:28
+msgid "ID column"
+msgstr "Colonne ID"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:28
+msgid "Geometry column"
+msgstr "Colonne de géométrie"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:20
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:36
+msgid "Autodetect"
+msgstr "Détection automatique"
+
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
+msgid "Coordinate system"
+msgstr "Système de coordonnées"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:50
+msgid "Attribute definitions"
+msgstr "Définitions d'attributs"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:53
+msgid "Keep"
+msgstr "Garder"
+
+#: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:54
+msgid "Reload"
+msgstr "Recharger"
+

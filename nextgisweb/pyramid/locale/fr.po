@@ -1,0 +1,266 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: fr\n"
+
+#: template/header.mako:98
+msgid "User settings"
+msgstr "Paramètres utilisateur"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:37
+msgid "Create"
+msgstr "Créer"
+
+#: amd/ngw-pyramid/right-menu/RightMenu.js:65 template/header.mako:30
+msgid "Sign in"
+msgstr "Se connecter"
+
+#: template/backup.mako:14
+msgid "Size"
+msgstr "Taille"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Effacer"
+
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:75
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+msgid "Save"
+msgstr "Enregistrer"
+
+#: api.py:435
+msgid "Your Web GIS at nextgis.com"
+msgstr "Votre Web GIS sur nextgis.com"
+
+#: exception.py:208 exception.py:264
+msgid "Internal server error"
+msgstr "Erreur Interne du Serveur"
+
+#: exception.py:209
+msgid "The server encountered an internal error or misconfiguration and was unable to complete your request."
+msgstr "Le serveur a rencontré une erreur interne ou une mauvaise configuration et n'a pas pu terminer votre demande."
+
+#: exception.py:238
+msgid "Bad request"
+msgstr "Mauvaise demande"
+
+#: exception.py:239
+msgid "The server could not comply with the request since it is either malformed or otherwise incorrect."
+msgstr "Le serveur n'a pas pu se conformer à la demande car il est soit malformée ou incorrect."
+
+#: exception.py:246
+msgid "Forbidden"
+msgstr "Interdit"
+
+#: exception.py:247
+msgid "Access was denied to this resource."
+msgstr "L'accès a été refusé à cette ressource."
+
+#: exception.py:251
+msgid "Page not found"
+msgstr "Page non trouvée"
+
+#: exception.py:252
+msgid "The page may have been deleted or an error in the address. Correct the address or go to the home page and try to find the desired page."
+msgstr "La page a peut-être été supprimée ou il y a peut-être eu une erreur dans l'adresse. Corrigez l'adresse ou allez sur la page d'accueil et essayez de trouver la page que vous voulez."
+
+#: exception.py:259
+msgid "Unprocessable entity"
+msgstr "Entité non traitable"
+
+#: exception.py:260
+msgid "Unable to process the contained instructions."
+msgstr "Impossible de traiter les instructions contenues."
+
+#: exception.py:265
+msgid "The server has either erred or is incapable of performing the requested operation."
+msgstr "Le serveur était soit en erreur, soit incapable d'effectuer l'opération demandée."
+
+#: exception.py:272 exception.py:273
+msgid "Not implemented"
+msgstr "Pas mis en œuvre"
+
+#: exception.py:277
+msgid "Service unavailable"
+msgstr "Service indisponible"
+
+#: exception.py:278
+msgid "The server is currently unavailable. Please try again at a later time."
+msgstr "Le serveur est actuellement indisponible. Veuillez réessayer ultérieurement."
+
+#: template/header.mako:89 view.py:86
+msgid "Control panel"
+msgstr "Panneau de configuration"
+
+#: view.py:123 view.py:450
+msgid "Backups"
+msgstr "Sauvegardes"
+
+#: view.py:138 view.py:438
+msgid "Cross-origin resource sharing (CORS)"
+msgstr "Cross-origin resource sharing (CORS)"
+
+#: view.py:145 view.py:440
+msgid "Custom CSS"
+msgstr "CSS personnalisé"
+
+#: view.py:152 view.py:442
+msgid "Custom logo"
+msgstr "Logo personnalisé"
+
+#: view.py:159 view.py:436
+msgid "Web GIS name"
+msgstr "Nom de Web GIS"
+
+#: view.py:166 view.py:444
+msgid "Home path"
+msgstr "Chemin d'accueil"
+
+#: view.py:431
+msgid "Info"
+msgstr "Info"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:40
+msgid "Settings"
+msgstr "Paramètres"
+
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:28
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:30
+msgid "Copy to clipboard"
+msgstr "Copier dans le presse-papier"
+
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:31
+msgid "Copied"
+msgstr "Copié"
+
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:32
+msgid "Unable to copy"
+msgstr "Impossible de copier"
+
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:37
+msgid "Technical information"
+msgstr "Informations techniques"
+
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:39
+msgid "Contact support"
+msgstr "Contactez le support"
+
+#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:41
+msgid "Back to home"
+msgstr "Retour à l'accueil"
+
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:35 nodepkg/api/error.js:18
+msgid "Network error"
+msgstr "Erreur réseau"
+
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:36
+msgid "There is no response from the server or problem connecting to server."
+msgstr "Il n'y a aucune réponse du serveur ou problème de connexion au serveur."
+
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:37
+msgid "Check network connectivity and try again later."
+msgstr "Vérifiez la connectivité réseau et réessayez plus tard."
+
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:45
+msgid "Unexpected server response"
+msgstr "Réponse inattendue du serveur"
+
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:46
+msgid "Something went wrong."
+msgstr "Quelque chose s'est mal passé."
+
+#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:28
+msgid "Backward"
+msgstr "En arrière"
+
+#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:29
+msgid "Forward"
+msgstr "En avant"
+
+#: amd/ngw-pyramid/company-logo/company-logo.js:24
+msgid "Get your own Web GIS at nextgis.com"
+msgstr "Obtenez votre propre Web GIS sur nextgis.com"
+
+#: amd/ngw-pyramid/form/RTETextBox.js:61
+msgid "Rich Text Editor"
+msgstr "Éditeur de texte enrichi"
+
+#: amd/ngw-pyramid/form/ScaleTextBox.js:18
+msgid "Enter the correct scale value, e.g. 1:"
+msgstr "Entrez la valeur d'échelle correcte, par exemple 1:"
+
+#: amd/ngw-pyramid/right-menu/RightMenu.js:60
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:5
+msgid "Sign out"
+msgstr "Se déconnecter"
+
+#: amd/ngw-pyramid/template/CORSForm.hbs:17
+msgid "Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."
+msgstr "Entrez les origines autorisée pour les demandes de domaine croisées à utiliser l'API HTTP de ce Web GIS sur d'autres sites. Une origine par ligne."
+
+#: amd/ngw-pyramid/template/CORSForm.hbs:18
+msgid "Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are not allowed."
+msgstr "Veuillez noter que différents protocoles (HTTP et HTTPS) et sous-domaines (example.com et www.example.com) ont des origines différentes. Les caractères génériques ne sont pas autorisés."
+
+#: amd/ngw-pyramid/template/CustomCSSForm.hbs:17
+msgid "Enter custom CSS rules here. They will be used to redefine styles, design for all pages of your Web GIS."
+msgstr "Entrez les règles CSS personnalisés ici. Ils seront utilisés pour redéfinir les styles, le design pour toutes les pages de votre Web GIS."
+
+#: amd/ngw-pyramid/template/LogoForm.hbs:12
+msgid "We recommend height of 45 px and width of up to 200 px."
+msgstr "Nous recommandons une hauteur de 45 px et une largeur jusqu'à 200 px."
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:53
+msgid "Cancel"
+msgstr "Annuler"
+
+#: template/backup.mako:12
+msgid "Filename"
+msgstr "Nom de fichier"
+
+#: template/backup.mako:13
+msgid "Timestamp (UTC)"
+msgstr "\n"
+"Horodatage (UTC)"
+
+#: template/header.mako:84
+msgid "Resources"
+msgstr "Ressources"
+
+#: template/header.mako:108
+msgid "Help"
+msgstr "Aide"
+
+#: template/sysinfo.mako:50
+msgid "Platform"
+msgstr "Plate-forme"
+
+#: template/sysinfo.mako:20
+msgid "Package"
+msgstr "Paquet"
+
+#: template/sysinfo.mako:21
+msgid "Version"
+msgstr "Version"
+
+#: view.py:108 view.py:432
+msgid "System information"
+msgstr "Informations système"
+
+#: nodepkg/api/error.js:11
+msgid "Unknown API error"
+msgstr "Erreur d'API inconnue"
+
+#: nodepkg/api/error.js:25
+msgid "Invalid API response"
+msgstr "Réponse API non valide"
+
+#: nodepkg/example/translation.js:5
+msgid "Translated text"
+msgstr "Texte traduit"
+

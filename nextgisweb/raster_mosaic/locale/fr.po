@@ -1,0 +1,57 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: fr\n"
+
+#: amd/ngw-svg-marker-library/Widget.js:55
+msgid "File name"
+msgstr "Nom de fichier"
+
+#: amd/ngw-raster-mosaic/ItemWidget.js:92
+msgid "Upload"
+msgstr "Télécharger"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Effacer"
+
+#: amd/ngw-raster-mosaic/ItemWidget.js:64
+msgid "Items"
+msgstr "éléments"
+
+#: model.py:128
+msgid "GDAL library was unable to open the file."
+msgstr "La bibliothèque GDAL n'a pas pu ouvrir le fichier."
+
+#: model.py:139
+msgid "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
+msgstr "Le raster a le format '%(format)s', mais seuls les formats suivants sont pris en charge : %(all_formats)s."
+
+#: model.py:144
+msgid "Raster files without projection info are not supported."
+msgstr "Les fichiers raster sans informations de projection ne sont pas pris en charge."
+
+#: model.py:155
+msgid "Complex data types are not supported."
+msgstr "Les types de données complexes ne sont pas pris en charge."
+
+#: api.py:17
+msgid "Raster mosaic item id not provided."
+msgstr "L'élément de mosaïque raster non fourni."
+
+#: api.py:23
+msgid "Raster mosaic item not found."
+msgstr "L'élément de mosaïque raster introuvable."
+
+#: model.py:38
+msgid "Raster mosaic"
+msgstr "Mosaïque raster"
+
+#: model.py:131
+msgid "Only RGB and RGBA rasters are supported."
+msgstr "Seuls les rasters RVB et RVBA sont pris en charge."
+
