@@ -1,0 +1,37 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: it\n"
+
+#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:23
+msgid "Export"
+msgstr "Esporta"
+
+#: amd/ngw-svg-marker-library/Widget.js:55
+msgid "File name"
+msgstr "Nome del file"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Elimina"
+
+#: amd/ngw-svg-marker-library/Widget.js:63 model.py:29 view.py:19 view.py:32
+msgid "SVG marker library"
+msgstr "Libreria dei simboli SVG"
+
+#: amd/ngw-svg-marker-library/Widget.js:83
+msgid "Upload files"
+msgstr "Carica files"
+
+#: amd/ngw-svg-marker-library/Widget.js:103
+msgid "Upload archive"
+msgstr "Carica archivio"
+
+#: template/section.mako:6
+msgid "Name"
+msgstr "Nome"
+

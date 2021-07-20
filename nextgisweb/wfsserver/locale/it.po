@@ -1,0 +1,63 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: it\n"
+
+#: view.py:209
+msgid "External access"
+msgstr "Accesso esterno"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:72 template/section_fields.mako:15
+#, fuzzy
+msgid "Keyname"
+msgstr "Nome della chiave"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
+msgid "Display name"
+msgstr "Nome visualizzato"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Aggiungi"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:33
+msgid "Remove"
+msgstr "Rimuovi"
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr "Leggi di più"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
+msgid "Resource"
+msgstr "Risorsa"
+
+#: amd/ngw-webmap/template/ExtentWidget.hbs:49
+msgid "Select vector layer"
+msgstr "Seleziona layer vettoriale"
+
+#: amd/ngw-wfsserver/ServiceWidget.js:58 model.py:25
+msgid "WFS service"
+msgstr "Servizio WFS"
+
+#: amd/ngw-wfsserver/template/ServiceWidget.hbs:70
+msgid "Default count of returned features"
+msgstr "Conteggio predefinito per gli elementi restituiti"
+
+#: template/section_api_wfs.mako:7
+msgid "Web Feature Service (WFS)"
+msgstr "Web Feature Service (WFS)"
+
+#: template/section_api_wfs.mako:11
+msgid "Web Feature Service (WFS) provides an interface allowing requests for geographical features across the web using platform-independent calls."
+msgstr "Web Feature Service (WFS) fonrniscono un'interfaccia a dati geografici come elementi (vettori) usando chiamate indipendenti."
+
+#: template/section_api_wfs.mako:16
+msgid "https://docs.nextgis.com/docs_ngweb/source/layers.html#wfs-service"
+msgstr "https://docs.nextgis.com/docs_ngweb/source/layers.html#wfs-service"
+

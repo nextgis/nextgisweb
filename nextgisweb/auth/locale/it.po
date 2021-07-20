@@ -1,0 +1,192 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: it\n"
+
+#: template/browse.mako:98
+msgid "User"
+msgstr "Utente"
+
+#: __init__.py:41
+msgid "Guest"
+msgstr "Ospite"
+
+#: __init__.py:47
+msgid "Everyone"
+msgstr "Tutti"
+
+#: __init__.py:53
+msgid "Authenticated"
+msgstr "Autenticati"
+
+#: __init__.py:61
+msgid "Administrators"
+msgstr "Amministratori"
+
+#: __init__.py:64
+msgid "Administrator"
+msgstr "Amministratore"
+
+#: __init__.py:73
+msgid "Owner"
+msgstr "Proprietario"
+
+#: __init__.py:176
+msgid "Maximum number of users is reached. Your current plan user number limit is %d."
+msgstr "È stato raggiunto il numero massimo di utenti. Il limite di utenti per il tuo piano è %d."
+
+#: api.py:183
+#, fuzzy
+msgid "System principals couldn't be chanded."
+msgstr "Le impostazioni del sistema non possono essere cambiante."
+
+#: exception.py:10
+msgid "Invalid credentials"
+msgstr "Credenziali invalide"
+
+#: exception.py:15
+msgid "User is disabled"
+msgstr "L'utente è disabilitato"
+
+#: oauth.py:118
+msgid "User is already bound"
+msgstr "L'utente è già collegato"
+
+#: oauth.py:320
+msgid "OAuth authorization error"
+msgstr "Errore di autenticazione OAuth"
+
+#: oauth.py:325
+msgid "Invalid OAuth token"
+msgstr "Token OAuth invalido"
+
+#: oauth.py:330
+msgid "OAuth token refresh failed"
+msgstr "Aggiornamento del token OAuth fallito"
+
+#: oauth.py:335
+msgid "OAuth access token is expired"
+msgstr "Il token di accesso OAuth è scaduto"
+
+#: template/header.mako:98
+msgid "User settings"
+msgstr "Impostazioni utente"
+
+#: views.py:266
+msgid "Group name is not unique."
+msgstr "Il nome del gruppo non è univoco."
+
+#: views.py:304
+msgid "Create new group"
+msgstr "Crea un nuovo gruppo"
+
+#: views.py:355
+msgid "Login is not unique."
+msgstr "Il nome utente non è univoco."
+
+#: views.py:370
+msgid "You can't disable current administrator. At least one enabled administrator is required."
+msgstr "Non è possibile disabilitare l'utente amministratore. Almeno un utente amministratore deve essere attivo."
+
+#: views.py:413
+msgid "Create new user"
+msgstr "Crea un nuovo utente"
+
+#: views.py:446 views.py:511
+msgid "Users"
+msgstr "Utenti"
+
+#: views.py:456 views.py:514
+msgid "Groups"
+msgstr "Gruppi"
+
+#: views.py:467 views.py:489
+msgid "List"
+msgstr "Lista"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:37
+msgid "Create"
+msgstr "Crea"
+
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:16
+msgid "Edit"
+msgstr "Modifica"
+
+#: amd/ngw-auth/GroupWidget.js:39
+msgid "Group"
+msgstr "Gruppo"
+
+#: amd/ngw-auth/UserWidget.js:47
+msgid "Enter new password here"
+msgstr "Inserisci qui la nuova password"
+
+#: amd/ngw-auth/template/GroupWidget.hbs:7
+#: amd/ngw-auth/template/UserWidget.hbs:8 template/group_browse.mako:25
+#: template/user_browse.mako:25
+msgid "Full name"
+msgstr "Nome completo"
+
+#: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:26
+msgid "Group name"
+msgstr "Nome del gruppo"
+
+#: amd/ngw-webmap/Display.js:400 amd/ngw-webmap/plugin/LayerInfo.js:36
+msgid "Description"
+msgstr "Descrizione"
+
+#: amd/ngw-auth/template/GroupWidget.hbs:24
+#, fuzzy
+msgid "Assign at registration"
+msgstr "Assegna al momento della registrazione"
+
+#: amd/ngw-auth/template/GroupWidget.hbs:30
+msgid "Group members"
+msgstr "Membri del gruppo"
+
+#: amd/ngw-auth/template/UserWidget.hbs:15 template/login.mako:44
+#: template/user_browse.mako:26
+msgid "Login"
+msgstr "Nome utente"
+
+#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
+msgid "Password"
+msgstr "Password"
+
+#. Is this meant to be OAuth username?
+#: amd/ngw-auth/template/UserWidget.hbs:30
+#, fuzzy
+msgid "OAuth subject"
+msgstr "Utente OAuth"
+
+#: amd/ngw-auth/template/UserWidget.hbs:36
+msgid "Disabled"
+msgstr "Disabilitato"
+
+#: amd/ngw-auth/template/UserWidget.hbs:52
+msgid "Groups member"
+msgstr "Membro del gruppo"
+
+#: template/login.mako:13
+msgid "Authorization Required"
+msgstr "Autorizzazione richiesta"
+
+#: template/login.mako:15
+msgid "Sign in to Web GIS"
+msgstr "Accedi al Web GIS"
+
+#: template/login.mako:27 template/login.mako:37 template/user_settings.mako:13
+msgid "Sign in with OAuth"
+msgstr "Accedi con OAuth"
+
+#: amd/ngw-pyramid/right-menu/RightMenu.js:65 template/header.mako:30
+msgid "Sign in"
+msgstr "Accedi"
+
+#: template/user_settings.mako:15
+msgid "Your account is bound to NextGIS ID account"
+msgstr "Il tuo account è collegato ad un account NextGIS ID"
+

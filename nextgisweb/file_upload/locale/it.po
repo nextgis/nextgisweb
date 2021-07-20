@@ -1,0 +1,64 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: it\n"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Elimina"
+
+#: api.py:25
+msgid "Uploaded file too large"
+msgstr "File caricato troppo grande"
+
+#: api.py:30
+msgid "Upload is not completed"
+msgstr "Il caricamento non è stato completato"
+
+#: amd/ngw-file-upload/Uploader.js:56
+msgid "Select"
+msgstr "Seleziona"
+
+#: amd/ngw-file-upload/Uploader.js:86
+msgid "max"
+msgstr "max"
+
+#: amd/ngw-file-upload/Uploader.js:114
+msgid "Uploading..."
+msgstr "Upload in corso..."
+
+#: amd/ngw-file-upload/Uploader.js:122
+msgid " uploaded..."
+msgstr " caricato..."
+
+#: amd/ngw-file-upload/Uploader.js:148
+msgid "Could not load file!"
+msgstr "Impossibile caricare il file!"
+
+#: amd/ngw-file-upload/template/ImageUploader.hbs:9
+msgid "Select an image"
+msgstr "Seleziona un'immagine"
+
+#: amd/ngw-file-upload/template/ImageUploader.hbs:10
+#: amd/ngw-file-upload/template/Uploader.hbs:10
+msgid "Overwrite?"
+msgstr "Sovrascrivi?"
+
+#: amd/ngw-file-upload/template/ImageUploader.hbs:11
+#: amd/ngw-file-upload/template/Uploader.hbs:11
+msgid "Try again"
+msgstr "Riprova"
+
+#: amd/ngw-file-upload/template/ImageUploader.hbs:13
+#: amd/ngw-file-upload/template/Uploader.hbs:13
+msgid "or drag and drop here"
+msgstr "oppure trascina e rilascia qui"
+
+#: amd/ngw-file-upload/template/Uploader.hbs:9
+msgid "Select a file"
+msgstr "Seleziona un file"
+

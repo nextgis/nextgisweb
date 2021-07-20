@@ -1,0 +1,72 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: it\n"
+
+#: view.py:32
+msgid "'date_first' and 'date_last' are mutually exclusive."
+msgstr "'date_first' e 'date_last' sono mutuamente esclusivi."
+
+#: view.py:30 view.py:85
+#, fuzzy
+msgid "Journal"
+msgstr "Log"
+
+#: view.py:59
+#, fuzzy
+msgid "Journal record: %s"
+msgstr "Elemento del log: %s"
+
+#: view.py:84
+#, fuzzy
+msgid "Audit"
+msgstr "Verifica"
+
+#: amd/ngw-webmap/Display.js:220
+msgid "Search"
+msgstr "Ricerca"
+
+#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:23
+msgid "Export"
+msgstr "Esporta"
+
+#: template/browse.mako:49
+msgid "All users"
+msgstr "Tutti gli utenti"
+
+#: template/browse.mako:50
+msgid "Non-empty users"
+msgstr "Utenti non vuoti"
+
+#: template/browse.mako:92
+msgid "Timestamp"
+msgstr "Timestamp"
+
+#: template/browse.mako:93
+msgid "Status"
+msgstr "Stato"
+
+#: template/browse.mako:94
+msgid "Method"
+msgstr "Metodo"
+
+#: template/browse.mako:95
+msgid "Path"
+msgstr "Percorso"
+
+#: template/browse.mako:96
+msgid "Route name"
+msgstr "Nome del percorso"
+
+#: template/browse.mako:97
+msgid "Context"
+msgstr "Contesto"
+
+#: template/browse.mako:98
+msgid "User"
+msgstr "Utente"
+

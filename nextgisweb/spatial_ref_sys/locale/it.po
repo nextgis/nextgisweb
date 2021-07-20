@@ -1,0 +1,144 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: it\n"
+
+#: amd/ngw-webmap/Display.js:220
+msgid "Search"
+msgstr "Ricerca"
+
+#: views.py:467 views.py:489
+msgid "List"
+msgstr "Lista"
+
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:37
+msgid "Create"
+msgstr "Crea"
+
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:16
+msgid "Edit"
+msgstr "Modifica"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Elimina"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
+msgid "Display name"
+msgstr "Nome visualizzato"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:15
+msgid "Format"
+msgstr "Formato"
+
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:53
+msgid "Cancel"
+msgstr "Annulla"
+
+#: api.py:41
+msgid "Invalid SRS definition!"
+msgstr "Definizione SRS invalida!"
+
+#: api.py:140
+msgid "Coordinate system (id=%d) already exists."
+msgstr "Il sistema di coordinate (id=%d) è già esistente."
+
+#: util.py:43
+msgid "Invalid MapInfo spatial reference system: %s"
+msgstr "Sistema di riferimento spaziale MapInfo invalido: %s"
+
+#: util.py:72
+msgid "Unknown spatial reference system format: %s!"
+msgstr "Formato di sistema di riferimento spaziale sconosciuto: %s!"
+
+#: util.py:82
+msgid "Invalid OGC WKT definition!"
+msgstr "Definizione OGC WKT invalida!"
+
+#: views.py:23
+msgid "Spatial reference system catalog"
+msgstr "Catalogo dei sistemi di riferimento spaziali"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:6
+msgid "Spatial reference system"
+msgstr "Sistemi di riferimento spaziale"
+
+#: views.py:51 views.py:127
+msgid "Unable to delete standard coordinate system."
+msgstr "Impossibile eliminare il sistema di coordinate standard."
+
+#: views.py:76
+msgid "Coordinate system name is not unique."
+msgstr "Nome del sistema di coordinate non univoco."
+
+#: views.py:83
+msgid "Cannot change wkt definition of standard coordinate system."
+msgstr "Impossibile modificare la definizione WKT del sistema di coordinate standard."
+
+#: views.py:109
+msgid "Create new Spatial reference system"
+msgstr "Crea un nuovo sistema di riferimento spaziale."
+
+#: views.py:156 views.py:202
+msgid "Spatial reference systems"
+msgstr "Sistemi di riferimento spaziale"
+
+#: views.py:178
+msgid "Catalog"
+msgstr "Catalogo"
+
+#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:38
+#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:24
+msgid "Import definition"
+msgstr "Importa definizione"
+
+#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:68
+msgid "Definition"
+msgstr "Definizione"
+
+#: amd/ngw-spatial-ref-sys/catalog_browse.js:54
+msgid "Longitude and latitude must be specified at the same time."
+msgstr "La longitudine e la latitudine devono essere inseriti nello stesso momento."
+
+#: amd/ngw-spatial-ref-sys/catalog_browse.js:83
+msgid "View"
+msgstr "Vista"
+
+#: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:19
+#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:16
+msgid "OGC WKT definition"
+msgstr "Definizione OGC WKT"
+
+#: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:24
+msgid "View details"
+msgstr "Visualizza i dettagli"
+
+#: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:33
+msgid "Import"
+msgstr "Importa"
+
+#: template/catalog_browse.mako:29
+msgid "Latitude"
+msgstr "Latitudine"
+
+#: template/catalog_browse.mako:31
+msgid "Longitude"
+msgstr "Longitudine"
+
+#: template/catalog_browse.mako:42 template/srs_browse.mako:25
+msgid "SRS name"
+msgstr "Nome del sistema di riferimento"
+
+#: template/catalog_browse.mako:43
+msgid "Auth name"
+msgstr "Nome dell'autorità"
+
+#: template/catalog_browse.mako:44
+msgid "Auth SRID"
+msgstr "SRID dell'autorità"
+

@@ -1,0 +1,64 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: it\n"
+
+#: view.py:209
+msgid "External access"
+msgstr "Accesso esterno"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:72 template/section_fields.mako:15
+#, fuzzy
+msgid "Keyname"
+msgstr "Nome della chiave"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
+msgid "Display name"
+msgstr "Nome visualizzato"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Aggiungi"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:33
+msgid "Remove"
+msgstr "Rimuovi"
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr "Leggi di più"
+
+#: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
+msgid "Resource"
+msgstr "Risorsa"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:18
+msgid "Select layer\\'s style"
+msgstr "Seleziona lo stile del layer"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:89
+msgid "Min scale"
+msgstr "Scala min"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:94
+msgid "Max scale"
+msgstr "Scala max"
+
+#: amd/ngw-wmsserver/ServiceWidget.js:56 model.py:27
+#: template/section_api_wms.mako:7
+msgid "WMS service"
+msgstr "Servizio WMS"
+
+#: template/section_api_wms.mako:11
+msgid "Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map images. These images are typically produced by a map server from data provided by a GIS database."
+msgstr "Web Map Service (WMS) è un protocollo standard sviluppato dall'Open Geospatial Consortium per servire mappe come immagini georeferenziate. Le immagini sono tipicamente prodotte da un map server da dati provenienti da un database spaziale."
+
+#: template/section_api_wms.mako:16
+msgid "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
+msgstr "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
+

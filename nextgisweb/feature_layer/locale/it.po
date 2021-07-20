@@ -1,0 +1,207 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: NextGIS Web GUI\n"
+"Language: it\n"
+
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:16
+msgid "Edit"
+msgstr "Modifica"
+
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:115
+msgid "Delete"
+msgstr "Elimina"
+
+#: api.py:103
+msgid "Output format is not provided."
+msgstr "Il formato di output non è stato fornito."
+
+#: api.py:108
+msgid "Format '%s' is not supported."
+msgstr "Il formato '%s' non è supportato."
+
+#: api.py:284 api.py:344
+msgid "Geometry format '%s' is not supported."
+msgstr "La geometria '%s' non è supportata."
+
+#: exception.py:15
+msgid "Feature not found"
+msgstr "Elemento non trovato"
+
+#: exception.py:16
+msgid "Feature with id = %d was not found in resource with id = %d."
+msgstr "L'elemento con id = %d non è stato trovato nella risorsa con id = %d."
+
+#: exception.py:17
+msgid "The feature may have been deleted or an error in the address."
+msgstr "L'elemento potrebbe essere stato eliminato, o è presente un errore nell'indirizzo."
+
+#: model.py:172
+msgid "Field not found (ID=%d)."
+msgstr "Campo non trovato (ID=%d)."
+
+#: amd/ngw-webmap/plugin/FeatureLayer.js:115
+msgid "Feature table"
+msgstr "Tabella attributi"
+
+#: view.py:61 view.py:84
+msgid "Feature #%d"
+msgstr "Elemento #%d"
+
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:100
+msgid "Save as"
+msgstr "Salva come"
+
+#: amd/ngw-webmap/tool/Identify.js:431
+msgid "Features"
+msgstr "Elementi"
+
+#: template/section_fields.mako:21 view.py:189
+msgid "Table"
+msgstr "Tabella"
+
+#: view.py:209
+msgid "External access"
+msgstr "Accesso esterno"
+
+#: amd/ngw-webmap/tool/Identify.js:212
+msgid "Attributes"
+msgstr "Attributi"
+
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:78
+msgid "Attribute: "
+msgstr "Attributo: "
+
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:123
+msgid "Set NULL"
+msgstr "Imposta NULL"
+
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:124
+msgid "Set field value to NULL (No data)"
+msgstr "Imposta il valore del campo come NULL (no data)"
+
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:135
+msgid "NULL"
+msgstr "NULL"
+
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:75
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+msgid "Save"
+msgstr "Salva"
+
+#: amd/ngw-feature-layer/FeatureGrid.js:236
+msgid "Confirmation"
+msgstr "Conferma"
+
+#: amd/ngw-feature-layer/FeatureGrid.js:237
+msgid "Delete feature?"
+msgstr "Elimina elemento?"
+
+#: amd/ngw-feature-layer/FieldsDisplayWidget.js:114
+msgid "N/A"
+msgstr "N/A"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:72 template/section_fields.mako:15
+#, fuzzy
+msgid "Keyname"
+msgstr "Nome della chiave"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:82 template/section_fields.mako:16
+msgid "Type"
+msgstr "Tipo"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:73
+#: amd/ngw-webmap/template/ItemWidget.hbs:122
+msgid "Display name"
+msgstr "Nome visualizzato"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:100
+msgid "FT"
+msgstr "FT"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:110
+msgid "LA"
+msgstr "LA"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:154
+msgid "Label attribute"
+msgstr "Attributo etichetta"
+
+#: amd/ngw-feature-layer/FieldsWidget.js:231
+msgid "Add"
+msgstr "Aggiungi"
+
+#: amd/ngw-webmap/template/ItemWidget.hbs:33
+msgid "Remove"
+msgstr "Rimuovi"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:15
+msgid "Format"
+msgstr "Formato"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:19
+msgid "SRS"
+msgstr "SRS"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:127
+msgid "Encoding"
+msgstr "Codifica"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:122
+msgid "FID field"
+msgstr "Campo FID"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:34
+msgid "Zip archive"
+msgstr "Archivio Zip"
+
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:12
+msgid "Open"
+msgstr "Apri"
+
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:25
+msgid "Search..."
+msgstr "Cerca..."
+
+#: template/section_api_layer.mako:8
+msgid "MVT Vector Tiles"
+msgstr "Tiles vettoriali MVT"
+
+#: template/section_api_layer.mako:12
+msgid "The Mapbox Vector Tile is an efficient encoding for map data into vector tiles that can be rendered dynamically."
+msgstr "Le tiles vettoriali di Mapbox sono un metodo di codifica efficiente e possono essere visualizzate dinamicamente come vettori."
+
+#: template/section_api_layer.mako:17
+msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles"
+msgstr "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles"
+
+#: template/section_api_webmap.mako:17
+msgid "Read more"
+msgstr "Leggi di più"
+
+#: template/section_fields.mako:19
+msgid "Lookup table"
+msgstr "Tabella di lookup"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:98
+#: amd/ngw-vector-layer/template/Widget.hbs:107
+msgid "Yes"
+msgstr "Si"
+
+#: amd/ngw-vector-layer/template/Widget.hbs:99
+#: amd/ngw-vector-layer/template/Widget.hbs:108
+msgid "No"
+msgstr "No"
+
+#: api.py:286
+msgid "Geometry is not valid."
+msgstr "Geometria invalida."
+
+#: api.py:544
+msgid "Parameter 'intersects' geometry is not valid."
+msgstr "Parametro 'intersezione' geometria non è valido."
+
