@@ -242,13 +242,18 @@ class CoreComponent(
     def check_update(self):
         has_update = False
 
-        query = dict(type='init', instance=self.instance_id)
+        query = OrderedDict()
+
         distr_opts = self.env.options.with_prefix('distribution')
         if distr_opts.get('name') is not None:
             query['distribution'] = distr_opts['name'] + ':' + distr_opts['version']
+
         query['package'] = [
             package.name + ':' + package.version
-            for package in pkginfo.packages.values()]
+            for package in sorted(pkginfo.packages.values(), key=lambda p: p.name)]
+
+        query['instance'] = self.instance_id
+        query['event'] = 'initialize'
 
         try:
             res = requests.get(self.env.ngupdate_url + '/api/query',

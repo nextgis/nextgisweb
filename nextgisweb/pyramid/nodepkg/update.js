@@ -11,23 +11,26 @@ function addDistributionAndPackagesParams(params) {
     if (dist !== null) {
         params.append('distribution', `${dist.name}:${dist.version}`);
     }
-    for (const [name, version] of Object.entries(ngwConfig.packages)) {
+    const packageVerion = Object.entries(ngwConfig.packages).sort(
+        (a, b) => (a[0] > b[0]) ? 1 : ((a[0] < b[0]) ? -1 : 0)
+    );
+    for (const [name, version] of packageVerion) {
         params.append("package", name + ":" + version);
     }
 }
 
 export function queryUrl(type) {
-    const params = new URLSearchParams({
-        type: type,
-        instance: ngwConfig.instanceId,
-    });
+    const params = new URLSearchParams();
     addDistributionAndPackagesParams(params);
+    params.append("instance", ngwConfig.instanceId);
+    params.append("event", type)
     return `${ngwConfig.ngupdateUrl}/api/query?${params.toString()}`;
 }
 
 export function notesUrl() {
-    const params = new URLSearchParams({lang: ngwConfig.locale});
+    const params = new URLSearchParams();
     addDistributionAndPackagesParams(params);
+    params.append('lang', ngwConfig.locale);
     return `${ngwConfig.ngupdateUrl}/api/notes?${params.toString()}`;
 }
 
@@ -45,7 +48,7 @@ export function init() {
     const timeout = isSysInfo ? 0 : 3 * 60 * 1000;
 
     async function checkForUpdates () {
-        const url = queryUrl('check');
+        const url = queryUrl('check_for_updates');
         try {
             data = await (await window.fetch(url)).json();
         } catch {
