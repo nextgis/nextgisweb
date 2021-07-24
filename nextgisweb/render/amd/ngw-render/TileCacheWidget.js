@@ -33,10 +33,10 @@ define([
 
         serializeInMixin: function (data) {
             var value = data.tile_cache;
-            value.enabled = (value.enabled === "on") ? true : false;
-            value.track_changes = (value.track_changes === "on") ? true : false;
-            value.image_compose = (value.image_compose === "on") ? true : false;
-            value.flush = (value.image_compose === "on") ? true : false;
+            value.enabled = value.enabled === "on";
+            value.track_changes = value.track_changes === "on";
+            value.image_compose = value.image_compose === "on";
+            value.flush = value.flush === "on";
         },
 
         _onEnabledChange: function (newValue) {
