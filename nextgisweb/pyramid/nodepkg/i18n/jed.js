@@ -25,6 +25,9 @@ export class Jed {
         if (this.handlebars === undefined) {
             this.handlebars = handlebars.create();
             this.handlebars.registerHelper("gettext", this.gettext);
+            this.handlebars.registerHelper("gettextString", (key) => (
+                '"' + this.gettext(key).replace('"', '\\"').replace("'", "\\'") + '"'
+            ));
         }
         const compiled = this.handlebars.compile(template);
         return compiled(context || {});

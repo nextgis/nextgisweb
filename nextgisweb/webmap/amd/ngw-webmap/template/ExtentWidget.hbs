@@ -35,7 +35,7 @@
 
                 <div data-dojo-type="ngw-resource/ResourcePicker"
                     data-dojo-attach-point="layerPicker"
-                    data-dojo-props="interface: 'IBboxLayer', dialogTitle: '{{gettext 'Select layer'}}'">
+                    data-dojo-props="interface: 'IBboxLayer', dialogTitle: {{gettextString 'Select layer'}}">
                 </div>
 
             </div>
@@ -46,7 +46,7 @@
             title="{{gettext 'Constrain to extent'}}" />
 
         <div data-dojo-type="ngw-resource/ResourceBox"
-            data-dojo-props="interface: 'IFeatureLayer', colspan: 2, dialogTitle: '{{gettext 'Select vector layer'}}'"
+            data-dojo-props="interface: 'IFeatureLayer', colspan: 2, dialogTitle: {{gettextString 'Select vector layer'}}"
             data-ngw-serialize="bookmark_resource"
             title="{{gettext 'Bookmark resource'}}"
             style="width: 100%">

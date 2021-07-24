@@ -5,7 +5,7 @@
 
         <div data-dojo-attach-point="wConnection"
             data-dojo-type="ngw-resource/ResourceBox"
-            data-dojo-props="cls: 'postgis_connection', required: true, colspan: 2, dialogTitle: '{{gettext 'Select PostGIS connection'}}'"
+            data-dojo-props="cls: 'postgis_connection', required: true, colspan: 2, dialogTitle: {{gettextString 'Select PostGIS connection'}}"
             data-ngw-serialize="connection"
             title="{{gettext 'Connection'}}" style="width: 100%"></div>
 
@@ -50,7 +50,7 @@
 
         <div data-dojo-attach-point="geometrySRID"
             data-dojo-type="ngw-pyramid/form/IntegerValueTextBox"
-            data-dojo-props="placeholder: '{{gettext 'Autodetect'}}'"
+            data-dojo-props="placeholder: {{gettextString 'Autodetect'}}"
             data-ngw-serialize="geometry_srid"
             title="SRID" style="width: 100%"></div>
 

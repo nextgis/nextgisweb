@@ -10,7 +10,10 @@ var result = [];
 function traverse(node) {
     if (node.type == 'MustacheStatement') {
         var path = node.path;
-        if (path.type == 'PathExpression' && path.original == 'gettext') {
+        if (path.type == 'PathExpression' && (
+            path.original == 'gettext' ||
+            path.original == 'gettextString'
+        )) {
             var params = node.params;
             if (params.length == 1 && params[0].type == 'StringLiteral') {
                 result.push({

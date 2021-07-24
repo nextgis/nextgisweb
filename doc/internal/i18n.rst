@@ -292,16 +292,21 @@ through the template engine `handlebars`_.
 
   <strong>{{gettext "Another message for translation"}}</strong>
 
-.. note::
-    
-  To extract strings from handlebars templates, you need to have nodejs
-  installed. This allows you to use the original handlebars javascript parser to
-  handle templates.
-
 In case of a template-based widget, using handlebars for internationalization
 would look like the original example in the dijit documentation:
 
+.. code-block:: html
+  :caption: File amd/ngw-bar/template/SomeWidget.hbs
+
+  <div data-dojo-type="${baseClass}">
+      <input data-dojo-type="dijit/form/TextBox"
+          data-dojo-props="placeHolder: {{gettextString 'Placeholder'}}"/>
+      <button data-dojo-type="dijit/form/Button">{{gettext 'Button'}}</button>
+  </div>
+
+
 .. code-block:: javascript
+  :caption: File amd/ngw-bar/template/SomeWidget.js
 
   define([
       "dojo/_base/declare",
@@ -314,6 +319,12 @@ would look like the original example in the dijit documentation:
           templateString: i18n.renderTemplate(template)
       });
   });
+
+.. warning::
+  
+  Pay attention to quotes escaping inside attribute values such as
+  ``data-dojo-props`` and use ``gettextString`` there instead of ``gettext``.
+  It'll escape quotes keeping javascript code valid.
 
 .. note::
 

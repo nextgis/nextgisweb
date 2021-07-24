@@ -5,7 +5,7 @@
 
         <div data-dojo-attach-point="wConnection"
             data-dojo-type="ngw-resource/ResourceBox"
-            data-dojo-props="cls: 'wfsclient_connection', required: true, colspan: 2, dialogTitle: '{{gettext 'Select WFS connection'}}'"
+            data-dojo-props="cls: 'wfsclient_connection', required: true, colspan: 2, dialogTitle: {{gettextString 'Select WFS connection'}}"
             data-ngw-serialize="connection"
             title="{{gettext 'Connection'}}" style="width: 100%"></div>
 
@@ -17,7 +17,7 @@
 
         <div data-dojo-attach-point="wGeometrySRID"
             data-dojo-type="ngw-pyramid/form/IntegerValueTextBox"
-            data-dojo-props="required: true, disabled: true, placeholder: '{{gettext 'Autodetect'}}'"
+            data-dojo-props="required: true, disabled: true, placeholder: {{gettextString 'Autodetect'}}"
             data-ngw-serialize="geometry_srid"
             title="SRID" style="width: 100%"></div>
 
