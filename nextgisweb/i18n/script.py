@@ -4,19 +4,13 @@ import sys
 import io
 import os
 import os.path
-import fnmatch
-import codecs
 import logging
 import json
 from importlib import import_module
 from argparse import ArgumentParser, Namespace
-from pkg_resources import (
-    iter_entry_points,
-    resource_filename,
-    get_distribution)
-from email import message_from_string
+from pkg_resources import resource_filename
 from collections import OrderedDict
-from datetime import datetime
+from functools import partial
 
 from babel.messages.catalog import Catalog
 from babel.messages.frontend import parse_mapping
@@ -25,30 +19,13 @@ from babel.messages.pofile import write_po, read_po
 from babel.messages.mofile import write_mo
 import six
 
-from nextgisweb.compat import Path
-from nextgisweb.package import pkginfo
+from ..compat import Path
+from ..package import pkginfo
+from ..lib.config import load_config
+from ..env import Env, setenv, env
 
 
 logger = logging.getLogger(__name__)
-
-
-def load_pkginfo(args):
-    for ep in iter_entry_points(group='nextgisweb.packages'):
-        if ep.name == args.package:
-            return ep.resolve()()
-
-
-def load_components(args):
-    pkginfo = load_pkginfo(args)
-    if pkginfo is not None:
-        for cident, cdefn in pkginfo['components'].items():
-            if not args.component or cident in args.component:
-                if isinstance(cdefn, six.string_types):
-                    yield (cident, cdefn)
-                else:
-                    yield (cident, cdefn['module'])
-    else:
-        logger.warn("No components found for package '%s'", args.package)
 
 
 def get_mappings():
@@ -97,28 +74,66 @@ def write_jed(fileobj, catalog):
     fileobj.write(json.dumps(data, ensure_ascii=False, indent=2))
 
 
-def cmd_extract(args):
-    pkginfo = load_pkginfo(args)
-    for cident, cdefn in pkginfo['components'].items():
-        if len(args.component) > 0 and cident not in args.component:
+def catalog_filename(component, locale, ext='po', internal=False, mkdir=False):
+    if locale is None:
+        locale = ''
+
+    external_path = env.core.options['locale.external_path']
+    if internal or locale == '' or locale == 'ru':
+        cpath = Path(import_module(pkginfo.comp_mod(component)).__path__[0])
+        base = cpath / 'locale'
+    elif external_path is not None:
+        epath = Path(external_path)
+        ppath = epath / pkginfo.comp_pkg(component)
+        if mkdir and not ppath.exists():
+            ppath.mkdir(exist_ok=True)
+        base = ppath / component
+    else:
+        raise RuntimeError("External translations path isn't set!")
+
+    if mkdir and not base.exists():
+        base.mkdir(exist_ok=True)
+
+    return base / "{}.{}".format(locale, ext)
+
+
+def components_and_locales(args, work_in_progress=False):
+    ext_path = env.core.options['locale.external_path']
+    ext_meta = json.loads((Path(ext_path) / 'metadata.json').read_text()) \
+        if ext_path is not None else {}
+    ext_packages = ext_meta.get('packages', [])
+    ext_locales = ext_meta.get('locales', [])
+
+    for comp_id in env._components.keys():
+        if len(args.component) > 0 and comp_id not in args.component:
+            continue
+        if not args.all_packages and pkginfo.comp_pkg(comp_id) != args.package:
             continue
 
-        if isinstance(cdefn, six.string_types):
-            cmod = cdefn
+        if len(getattr(args, 'locale', [])) > 0:
+            locales = list(args.locale)
         else:
-            cmod = cdefn['module']
-        module = import_module(cmod)
+            locales = ['ru']
+            if pkginfo.comp_pkg(comp_id) in ext_packages:
+                locales.extend(ext_locales)
+            if work_in_progress and ext_path is not None:
+                comp_path = Path(ext_path) / pkginfo.comp_pkg(comp_id) / comp_id
+                for fn in comp_path.glob('*.po'):
+                    candidate = fn.with_suffix('').name
+                    if candidate not in locales:
+                        locales.append(candidate)
+        
+        locales.sort()
+        logger.debug("Locale list for [%s] = %s", comp_id, ' '.join(locales))
+        yield comp_id, locales
+
+
+def cmd_extract(args):
+    for cident, _ in components_and_locales(args):
+        module = import_module(pkginfo.comp_mod(cident))
         modpath = module.__path__[0]
 
-        dist = get_distribution(args.package)
-        meta = dict(message_from_string(dist.get_metadata('PKG-INFO')))
-        catalog = Catalog(
-            project=args.package,
-            version=dist.version,
-            copyright_holder=meta.get('Author'),
-            msgid_bugs_address=meta.get('Author-email'),
-            fuzzy=False, charset='utf-8')
-
+        catalog = Catalog()
         method_map, options_map = get_mappings()
 
         def log_callback(filename, method, options):
@@ -137,31 +152,22 @@ def cmd_extract(args):
 
         logger.info("%d messages extracted from component [%s]", len(catalog), cident)
 
-        locale_path = Path(module.__path__[0]) / 'locale'
-        if not locale_path.exists() and locale_path.parent.exists():
-            locale_path.mkdir(exist_ok=True)
+        outfn = catalog_filename(cident, None, ext='pot', mkdir=True)
+        logger.debug("Writing POT-file to %s", outfn)
 
-        outfn = locale_path / '.pot'
         with io.open(str(outfn), 'wb') as outfd:
-            write_po(outfd, catalog, ignore_obsolete=True)
+            write_po(outfd, catalog, ignore_obsolete=True, omit_header=True)
 
 
 def cmd_update(args):
-    components = list(load_components(args))
-    for comp_id, comp_mod in components:
-        locale_path = Path(import_module(comp_mod).__path__[0]) / 'locale'
-        if not locale_path.is_dir():
-            continue
+    for comp_id, locales in components_and_locales(args, work_in_progress=True):
+        pot_path = catalog_filename(comp_id, '', ext='pot', mkdir=True)
 
-        pot_path = locale_path / '.pot'
         if not pot_path.is_file() or args.extract:
-            cmd_extract(Namespace(package=args.package, component=[comp_id, ]))
+            cmd_extract(Namespace(package=pkginfo.comp_pkg(comp_id), component=[comp_id, ]))
 
-        po_paths = [locale_path / ('%s.po' % locale) for locale in args.locale]
-        po_paths = po_paths or locale_path.glob('*.po')
-
-        for po_path in po_paths:
-            locale = po_path.with_suffix('').name
+        for locale in locales:
+            po_path = catalog_filename(comp_id, locale, mkdir=True)
 
             with io.open(str(pot_path), 'r') as pot_fd:
                 pot = read_po(pot_fd, locale=locale)
@@ -212,81 +218,76 @@ def cmd_update(args):
 
 
 def cmd_compile(args):
-    components = list(load_components(args))
-    for comp_id, comd_mod in components:
-        locale_path = Path(import_module(comd_mod).__path__[0]) / 'locale'
-        if not locale_path.is_dir() or len(list(locale_path.glob('*.po'))) == 0:
-            continue
+    for comp_id, locales in components_and_locales(args, work_in_progress=False):
+        for locale in locales:
+            catfn = partial(catalog_filename, comp_id, locale)
+            po_path = catfn()
+            if not po_path.exists():
+                mo_path = catfn(ext='mo', internal=True)
+                if mo_path.exists():
+                    mo_path.unlink()
+                
+                jed_path = catfn(ext='jed', internal=True)
+                if jed_path.exists():
+                    jed_path.unlink()
 
-        for po_path in locale_path.glob('*.po'):
-            locale = po_path.with_suffix('').name
-            with io.open(str(po_path), 'r') as po:
+                continue
+
+            with po_path.open('r') as po:
                 catalog = read_po(po, locale=locale, domain=comp_id)
 
             logger.info(
                 "Compiling component [%s] locale [%s] (%d messages)...",
                 comp_id, locale, len(catalog))
 
-            with io.open(str(po_path.with_suffix('.mo')), 'wb') as mo:
+            with catfn(ext='mo', internal=True, mkdir=True).open('wb') as mo:
                 write_mo(mo, catalog)
 
-            with io.open(str(po_path.with_suffix('.jed')), 'w') as jed:
+            with catfn(ext='jed', internal=True, mkdir=True).open('w') as jed:
                 write_jed(jed, catalog)
-
-    oldstyle_path = Path(resource_filename(args.package, 'locale'))
-    for po in oldstyle_path.glob('*/LC_MESSAGES/*.po'):
-        logger.error('PO-file [%s] was ignored during compilation!', str(po))
 
 
 def cmd_stat(args):
-    if args.all_packages:
-        raise RuntimeError("Option --all-packages is not supported for this command.")
-
     stat = {}
-    stat_package = {}
-    stat[args.package] = stat_package
+    for comp_id, locales in components_and_locales(args, work_in_progress=True):
+        stat_package = stat.setdefault(pkginfo.comp_pkg(comp_id), {})
+        stat_component = stat_package[comp_id] = {}
 
-    components = list(load_components(args))
-    for comp_id, comp_mod in components:
-        stat_component = {}
-        stat_package[comp_id] = stat_component
-
-        locale_path = Path(import_module(comp_mod).__path__[0]) / 'locale'
-        if not locale_path.is_dir() or len(list(locale_path.glob('*.po'))) == 0:
-            continue
-
-        pot_path = locale_path / '.pot'
+        pot_path = catalog_filename(comp_id, None, ext='pot', mkdir=False)
         if not pot_path.is_file():
             logger.error(
                 "POT-file for component [%s] not found in [%s]",
                 comp_id, str(pot_path))
             continue
 
-        for po_path in locale_path.glob('*.po'):
-            locale = po_path.with_suffix('').name
+        with pot_path.open('r') as fd:
+            pot = read_po(fd)
 
-            if not ((len(args.locale) > 0 and locale in args.locale) or len(args.locale) == 0):
-                continue
+        stat_component = stat_package[comp_id] = dict(count=len(pot))
+        stat_locales = stat_component['locales'] = dict()
 
-            with io.open(str(po_path), 'r') as po_fd, io.open(str(pot_path), 'r') as pot_fd:
-                po = read_po(po_fd, locale=locale)
-                pot = read_po(pot_fd)
+        for locale in locales:
+            po_path = catalog_filename(comp_id, locale, ext='po', mkdir=False)
+            if po_path.exists():
+                with po_path.open('r') as po_fd:
+                    po = read_po(po_fd, locale=locale)
+            else:
+                po = Catalog(locale=locale)
 
-                terms_translated = [term for term in po if term.string and term.id != '']
-                terms_not_found, _, obsolete = compare_catalogs(pot, po)
+            not_found, not_translated, obsolete = compare_catalogs(pot, po)
 
-                stat_locale = {
-                    'terms': len(po),
-                    'translated': len(terms_translated),
-                }
+            translated = len(pot) - len(not_found) - len(not_translated)
+            stat_locale = stat_locales[locale] = OrderedDict()
 
-                if len(terms_not_found) != 0:
-                    stat_locale['not_found'] = len(terms_not_found)
-                
-                if len(obsolete) > 0:
-                    stat_locale['obsolete'] = len(obsolete)
+            stat_locale['completeness'] = round(translated / len(pot), 3) \
+                if len(pot) > 0 else 1
 
-                stat_component[locale] = stat_locale
+            if not_found:
+                stat_locale['not_found'] = len(not_found)
+            if not_translated:
+                stat_locale['not_translated'] = len(not_translated)
+            if obsolete:
+                stat_locale['obsolete'] = len(obsolete)
 
     print(json.dumps(stat, indent=2))
 
@@ -297,6 +298,7 @@ def main(argv=sys.argv):
     parser = ArgumentParser()
     parser.add_argument('-p', '--package', default='nextgisweb')
     parser.add_argument('--all-packages', action='store_true', default=False)
+    parser.add_argument('-c', '--config')
 
     subparsers = parser.add_subparsers()
 
@@ -322,9 +324,7 @@ def main(argv=sys.argv):
 
     args = parser.parse_args(argv[1:])
 
-    if args.all_packages:
-        for package in pkginfo.packages:
-            args.package = package
-            args.func(args)
-    else:
-        args.func(args)
+    env = Env(cfg=load_config(args.config, None))
+    setenv(env)
+
+    args.func(args)

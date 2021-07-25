@@ -57,6 +57,18 @@ class CoreComponent(
         self.debug = self.options['debug']
         self.locale_default = self.options['locale.default']
         self.locale_available = self.options['locale.available']
+        if self.locale_available is None:
+            # Locales available by default
+            self.locale_available = ['en', 'ru']
+
+            # Locales from external translations
+            ext_path = self.options['locale.external_path']
+            if ext_path:
+                ext_meta = Path(ext_path) / 'metadata.json'
+                ext_meta = json.loads(ext_meta.read_text())
+                self.locale_available.extend(ext_meta.get('locales', []))
+            
+            self.locale_available.sort()
 
     def initialize(self):
         super(CoreComponent, self).initialize()
@@ -365,9 +377,8 @@ class CoreComponent(
 
         # Locale settings
         Option('locale.default', default='en'),
-        Option('locale.available', list, default=[
-            'cs', 'de', 'en', 'es', 'fr', 'it', 'pt', 'ru',
-        ]),
+        Option('locale.available', list, default=None),
+        Option('locale.external_path', default=None),
 
         # Other deployment settings
         Option('support_url', default="https://nextgis.com/contact/"),
