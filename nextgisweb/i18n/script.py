@@ -6,6 +6,7 @@ import os
 import os.path
 import logging
 import json
+import six
 from importlib import import_module
 from argparse import ArgumentParser, Namespace
 from pkg_resources import resource_filename
@@ -17,7 +18,7 @@ from babel.messages.frontend import parse_mapping
 from babel.messages.extract import extract_from_dir
 from babel.messages.pofile import write_po, read_po
 from babel.messages.mofile import write_mo
-import six
+from attr import attrs, attrib, asdict
 
 from ..compat import Path
 from ..package import pkginfo
@@ -107,7 +108,10 @@ def components_and_locales(args, work_in_progress=False):
     for comp_id in env._components.keys():
         if len(args.component) > 0 and comp_id not in args.component:
             continue
-        if not args.all_packages and pkginfo.comp_pkg(comp_id) != args.package:
+        if (
+            not getattr(args, 'all_packages', False)
+            and pkginfo.comp_pkg(comp_id) != args.package
+        ):
             continue
 
         if len(getattr(args, 'locale', [])) > 0:
@@ -247,26 +251,71 @@ def cmd_compile(args):
                 write_jed(jed, catalog)
 
 
+@attrs
+class StatRecord(object):
+    package = attrib(default=None)
+    component = attrib(default=None)
+    locale = attrib(default=None)
+
+    count = attrib(default=0)
+    translated = attrib(default=0)
+    not_found = attrib(default=0)
+    not_translated = attrib(default=0)
+    obsolete = attrib(default=0)
+
+    @property
+    def completeness(self):
+        return self.translated / self.count if self.count != 0 else 1
+
+
+def group_stat_records(records, keys, with_details=False):
+    temp = dict()
+    for r in records:
+        key = tuple(getattr(r, k) for k in keys)
+        agg, details = temp.get(key, (None, None))
+        if agg is None:
+            agg = StatRecord(**{k: getattr(r, k) for k in keys})
+            details = list()
+            temp[key] = (agg, details)
+
+        for a in (
+            'count', 'translated',
+            'not_found', 'not_translated', 'obsolete',
+        ):
+            setattr(agg, a, getattr(agg, a) + getattr(r, a))
+
+        if with_details:
+            details.append(r)
+
+    result = list(temp.values())
+    result.sort(key=lambda r: tuple(getattr(r[0], k) for k in keys))
+    return (result if with_details else [i[0] for i in result])
+
+
 def cmd_stat(args):
-    stat = {}
-    for comp_id, locales in components_and_locales(args, work_in_progress=True):
-        stat_package = stat.setdefault(pkginfo.comp_pkg(comp_id), {})
-        stat_component = stat_package[comp_id] = {}
+    data = list()
+    all_packages = set()
+    all_components = set()
+    all_locales = set()
+
+    for comp_id, locales in components_and_locales(
+        args, work_in_progress=args.work_in_progress
+    ):
+        all_packages.add(pkginfo.comp_pkg(comp_id))
+        all_components.add(comp_id)
 
         pot_path = catalog_filename(comp_id, None, ext='pot', mkdir=False)
-        if not pot_path.is_file():
-            logger.error(
-                "POT-file for component [%s] not found in [%s]",
-                comp_id, str(pot_path))
-            continue
+        if not pot_path.is_file() or args.extract:
+            cmd_extract(Namespace(package=pkginfo.comp_pkg(comp_id), component=[comp_id, ]))
 
-        with pot_path.open('r') as fd:
-            pot = read_po(fd)
-
-        stat_component = stat_package[comp_id] = dict(count=len(pot))
-        stat_locales = stat_component['locales'] = dict()
+        if pot_path.exists():
+            with pot_path.open('r') as fd:
+                pot = read_po(fd)
+        else:
+            pot = Catalog()
 
         for locale in locales:
+            all_locales.add(locale)
             po_path = catalog_filename(comp_id, locale, ext='po', mkdir=False)
             if po_path.exists():
                 with po_path.open('r') as po_fd:
@@ -275,30 +324,74 @@ def cmd_stat(args):
                 po = Catalog(locale=locale)
 
             not_found, not_translated, obsolete = compare_catalogs(pot, po)
+            data.append(StatRecord(
+                package=pkginfo.comp_pkg(comp_id),
+                component=comp_id,
+                locale=locale,
+                count=len(pot),
+                translated=len(pot) - len(not_found) - len(not_translated),
+                not_found=len(not_found),
+                not_translated=len(not_translated),
+                obsolete=len(obsolete)))
 
-            translated = len(pot) - len(not_found) - len(not_translated)
-            stat_locale = stat_locales[locale] = OrderedDict()
+    if args.json:
+        print(json.dumps([asdict(i) for i in data], indent=2))
+        return
 
-            stat_locale['completeness'] = round(translated / len(pot), 3) \
-                if len(pot) > 0 else 1
+    locales = sorted(list(all_locales))
 
-            if not_found:
-                stat_locale['not_found'] = len(not_found)
-            if not_translated:
-                stat_locale['not_translated'] = len(not_translated)
-            if obsolete:
-                stat_locale['obsolete'] = len(obsolete)
+    len_pkg = max(len('package'), max(len(p) for p in all_packages))
+    len_comp = max(len('component'), max(len(c) for c in all_components))
+    len_loc = 6
 
-    print(json.dumps(stat, indent=2))
+    header_cols = ["{:{}}".format(c, l) for c, l in (
+        ('PACKAGE', len_pkg),
+        ('COMPONENT', len_comp),
+    )] + ["{:>{}}".format(l, len_loc) for l in locales]
+
+    header = ' '.join(header_cols)
+    print(header)
+    print('=' * len(header))
+
+    def print_records(records, grouping, title=None):
+        if title:
+            print("{:-^{}}".format(' ' + title + ' ', len(header)))
+
+        grouped = group_stat_records(records, grouping, with_details=True)
+        for r, detail in grouped:
+            cols = [
+                "{:{}}".format(r.package if r.package else ' ', len_pkg),
+                "{:{}}".format(r.component if r.component else ' ', len_comp),
+            ]
+
+            by_locale = {r.locale: r for r in group_stat_records(
+                detail, ('locale', ))}
+
+            for locale in locales:
+                locale_record = by_locale.get(locale)
+                if locale_record is not None:
+                    c = locale_record.completeness
+                    if c == 1:
+                        cols.append("{:>{}}".format('OK', len_loc))
+                    else:
+                        cols.append("{:>{}.1f}".format(c * 100, len_loc))
+                else:
+                    cols.append("{:>{}}".format('-', len_loc))
+
+            print(' '.join(cols))
+
+    print_records(data, ('package', 'component', ))
+    if len(args.component) == 0:
+        print_records(data, ('package', ), title='PACKAGE SUMMARY')
 
 
 def main(argv=sys.argv):
     logging.basicConfig(level=logging.INFO)
 
     parser = ArgumentParser()
-    parser.add_argument('-p', '--package', default='nextgisweb')
+    parser.add_argument('--package', default='nextgisweb')
     parser.add_argument('--all-packages', action='store_true', default=False)
-    parser.add_argument('-c', '--config')
+    parser.add_argument('--config')
 
     subparsers = parser.add_subparsers()
 
@@ -319,7 +412,10 @@ def main(argv=sys.argv):
 
     pstat = subparsers.add_parser('stat')
     pstat.add_argument('component', nargs='*')
+    pstat.add_argument('--extract', action='store_true', default=False)
     pstat.add_argument('--locale', default=[], action='append')
+    pstat.add_argument('--work-in-progress', action='store_true', default=False)
+    pstat.add_argument('--json', action='store_true', default=False)
     pstat.set_defaults(func=cmd_stat)
 
     args = parser.parse_args(argv[1:])
