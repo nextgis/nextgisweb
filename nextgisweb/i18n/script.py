@@ -342,11 +342,13 @@ def cmd_stat(args):
 
     len_pkg = max(len('package'), max(len(p) for p in all_packages))
     len_comp = max(len('component'), max(len(c) for c in all_components))
+    len_count = 5
     len_loc = 6
 
     header_cols = ["{:{}}".format(c, l) for c, l in (
         ('PACKAGE', len_pkg),
         ('COMPONENT', len_comp),
+        ('COUNT', len_count),
     )] + ["{:>{}}".format(l, len_loc) for l in locales]
 
     header = ' '.join(header_cols)
@@ -367,9 +369,14 @@ def cmd_stat(args):
             by_locale = {r.locale: r for r in group_stat_records(
                 detail, ('locale', ))}
 
+            first = True
             for locale in locales:
                 locale_record = by_locale.get(locale)
                 if locale_record is not None:
+                    if first:
+                        cols.append("{:{}}".format(
+                            locale_record.count, len_count))
+                        first = False
                     c = locale_record.completeness
                     if c == 1:
                         cols.append("{:>{}}".format('OK', len_loc))
