@@ -389,7 +389,7 @@ def main(argv=sys.argv):
     logging.basicConfig(level=logging.INFO)
 
     parser = ArgumentParser()
-    parser.add_argument('--package', default='nextgisweb')
+    parser.add_argument('-p', '--package', default='nextgisweb')
     parser.add_argument('--all-packages', action='store_true', default=False)
     parser.add_argument('--config')
 
