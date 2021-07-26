@@ -118,20 +118,22 @@ def require(*deps):
     return subdecorator
 
 
-def load_all(packages=None, components=None):
+def load_all(packages=None, components=None, enable_disabled=False):
     loaded_packages = list()
     loaded_components = list()
 
     for pkg in pkginfo.packages:
         if packages is not None and not packages.get(pkg, True):
-            continue
+            if not enable_disabled:
+                continue
         
         loaded_packages.append(pkg)
         for comp in pkginfo.pkg_comp(pkg):
             if components is not None and not components.get(
                 comp, pkginfo.comp_enabled(comp)
             ):
-                continue
+                if not enable_disabled:
+                    continue
             try:
                 __import__(pkginfo.comp_mod(comp))
                 loaded_components.append(comp)

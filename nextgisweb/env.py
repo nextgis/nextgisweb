@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 class Env(object):
 
-    def __init__(self, cfg=None, setup_logging=True):
+    def __init__(self, cfg=None, setup_logging=True, enable_disabled=False):
         if cfg is None:
             cfg = load_config(None, None)
 
@@ -68,7 +68,8 @@ class Env(object):
                 cfg_components[ci] = False
 
         loaded_packages, loaded_components = load_all(
-            packages=cfg_packages, components=cfg_components)
+            packages=cfg_packages, components=cfg_components,
+            enable_disabled=enable_disabled)
 
         self.packages = dict((
             (name, pkginfo.packages[name])

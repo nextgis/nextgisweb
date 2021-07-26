@@ -427,7 +427,7 @@ def main(argv=sys.argv):
 
     args = parser.parse_args(argv[1:])
 
-    env = Env(cfg=load_config(args.config, None))
+    env = Env(cfg=load_config(args.config, None), enable_disabled=True)
     setenv(env)
 
     args.func(args)
