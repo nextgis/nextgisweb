@@ -369,14 +369,13 @@ def cmd_stat(args):
             by_locale = {r.locale: r for r in group_stat_records(
                 detail, ('locale', ))}
 
-            first = True
+            for _, locale_record in by_locale.iteritems():
+                cols.append("{:{}}".format(locale_record.count, len_count))
+                break
+            
             for locale in locales:
                 locale_record = by_locale.get(locale)
                 if locale_record is not None:
-                    if first:
-                        cols.append("{:{}}".format(
-                            locale_record.count, len_count))
-                        first = False
                     c = locale_record.completeness
                     if c == 1:
                         cols.append("{:>{}}".format('OK', len_loc))
