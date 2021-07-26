@@ -81,9 +81,10 @@ def collection_get(request):
     parent = request.params.get('parent')
     parent = int(parent) if parent else None
 
-    query = Resource.query().with_polymorphic('*') \
+    query = Resource.query() \
         .filter_by(parent_id=parent) \
-        .order_by(Resource.display_name)
+        .order_by(Resource.display_name) \
+        .options(db.subqueryload(Resource.acl))
 
     result = list()
     for resource in query:
@@ -312,6 +313,7 @@ def search(request):
         data = serializer.data
         return {Resource.identity: data} if smode == 'resource' else data
 
+    # TODO: Chech speed of with_polymorphic('*')
     query = Resource.query().with_polymorphic('*') \
         .filter_by(**dict(map(
             lambda k: (k, request.GET.get(k)),
