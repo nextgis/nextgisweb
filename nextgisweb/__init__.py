@@ -21,6 +21,7 @@ def pkginfo():
         'social',
         'spatial_ref_sys',
         'layer',
+        'layer_preview',
         'feature_layer',
         'feature_description',
         'feature_attachment',
