@@ -1,4 +1,0 @@
-#: models.py:43
-msgid "Raster style"
-msgstr ""
-

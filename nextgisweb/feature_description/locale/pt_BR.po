@@ -1,5 +1,0 @@
-#: amd/ngw-feature-description/DisplayWidget.js:11
-#: amd/ngw-feature-description/EditorWidget.js:14
-msgid "Description"
-msgstr ""
-
