@@ -3,15 +3,15 @@ define([
     "dojo/on", "dojo/dom-class", "dojo/html", "dojo/query",
     "dojo/debounce", "dojo/request/xhr", "dojo/DeferredList",
     "dojox/dtl", "dojox/dtl/Context", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin",
-    "ngw/route", "ngw-pyramid/hbs-i18n", "ngw-pyramid/i18n!resource",
-    "dojo/text!./ResourcesFilter.hbs",
-    "dojo/text!./ResourcesFilterResult.dtl.hbs",
+    "ngw/route", '@nextgisweb/pyramid/i18n!resource',
+    "dojo/text!./ResourcesFilter.hbs", "dojo/text!./ResourcesFilterResult.dtl.hbs",
+    "dojox/dtl/tag/logic",
     "xstyle/css!./ResourcesFilter.css",
     "dijit/form/TextBox"
 ], function (
     declare, lang, array, Deferred, on, domClass, html, query, debounce, xhr,
     DeferredList, dtl, dtlContext, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    route, hbsI18n, i18n, template, templateResult
+    route, i18n, template, templateResult
 ) {
     var TEMPLATE_RESULT_DTL = new dtl.Template(templateResult),
         SVG_URL = ngwConfig.assetUrl + "/svg/svg-symbols.svg",
@@ -22,7 +22,7 @@ define([
         resourceShowRoute = route.resource.show;
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: hbsI18n(template, i18n),
+        templateString: i18n.renderTemplate(template),
         baseClass: "resources-filter",
         title: i18n.gettext("Search resources"),
 
