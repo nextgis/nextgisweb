@@ -11,10 +11,12 @@ import VectorTileSource from "ol/source/VectorTile";
 import MVT from "ol/format/MVT";
 import { fromLonLat } from "ol/proj";
 import { createXYZ } from "ol/tilegrid";
+import {transformExtent} from "ol/proj";
+import {fromExtent} from "ol/geom/Polygon";
 
 import { routeURL } from "@nextgisweb/pyramid/api";
 
-export default ({ target, resource, source_type }) => {
+export default ({ target, resource, source_type, extent }) => {
     const map = new Map({
         target: target,
         layers: [new Tile({ source: new OSMSource() })],
@@ -22,6 +24,14 @@ export default ({ target, resource, source_type }) => {
     });
 
     map.addLayer(source_type == "mvt" ? createMVTLayer(resource) : createXYZLayer(resource));
+
+    if (extent) {
+        const view = map.getView();
+        const dst_srs = view.getProjection();
+        const src_srs = "EPSG:4326";
+        const bbox = [extent.minLon, extent.minLat, extent.maxLon, extent.maxLat];
+        view.fitInternal(fromExtent(transformExtent(bbox, src_srs, dst_srs)));
+    }
 };
 
 const createMVTLayer = (resource) => {

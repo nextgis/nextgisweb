@@ -4,24 +4,34 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from ..pyramid import viewargs
 from ..dynmenu import Link, DynItem
 from ..feature_layer import IFeatureLayer
+from ..layer.interface import IBboxLayer
 from ..render import IRenderableStyle
-from ..resource import Resource, resource_factory
+from ..resource import Resource, ResourceScope, resource_factory
 
 from .util import _
 
 
-@viewargs(renderer='nextgisweb:layer_preview/template/preview.mako')
+@viewargs(renderer="nextgisweb:layer_preview/template/preview.mako")
 def preview_map(request):
+    extent = None
+
     if IFeatureLayer.providedBy(request.context):
         source_type = "mvt"
+        if IBboxLayer.providedBy(request.context):
+            extent = request.context.extent
     elif IRenderableStyle.providedBy(request.context):
         source_type = "xyz"
+        parent = request.context.parent
+        parent_permissions = parent.permissions(request.user)
+        if IBboxLayer.providedBy(parent) and ResourceScope.read in parent_permissions:
+            extent = parent.extent
 
     return dict(
         obj=request.context,
+        extent=extent,
         source_type=source_type,
         subtitle=_("Preview"),
-        maxheight=True)
+    )
 
 
 def setup_pyramid(comp, config):
