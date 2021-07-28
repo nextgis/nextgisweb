@@ -34,6 +34,7 @@ def preview_map(request):
         extent=extent,
         source_type=source_type,
         subtitle=_("Preview"),
+        maxheight=True,
     )
 
 
