@@ -41,7 +41,7 @@ def preview_map(request):
 def setup_pyramid(comp, config):
     config.add_route(
         "layer_preview.map",
-        r"/resource/{id:\d+}/layer_preview",
+        r"/resource/{id:\d+}/preview",
         factory=resource_factory) \
     .add_view(preview_map, context=IFeatureLayer) \
     .add_view(preview_map, context=IRenderableStyle)
@@ -58,6 +58,6 @@ def setup_pyramid(comp, config):
                     lambda args: args.request.route_url(
                         "layer_preview.map", id=args.obj.id
                     ),
-                    'material:preview', True, '_blank')
+                    'material:preview', True)
 
     Resource.__dynmenu__.add(LayerMenuExt())
