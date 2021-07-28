@@ -14,7 +14,7 @@ from .. import db
 from ..lib.osrhelper import traditional_axis_mapping
 from ..core.exception import OperationalError, ValidationError
 from ..env import env
-from ..layer import SpatialLayerMixin
+from ..layer import SpatialLayerMixin, IBboxLayer
 from ..models import declarative_base
 from ..render import IExtentRenderRequest, IRenderableStyle, ITileRenderRequest
 from ..resource import (
@@ -170,7 +170,7 @@ class RenderRequest(object):
         return self.style.render_image(extent, (size, size), self.srs, zoom)
 
 
-@implementer(IRenderableStyle)
+@implementer(IRenderableStyle, IBboxLayer)
 class Layer(Base, Resource, SpatialLayerMixin):
     identity = 'tmsclient_layer'
     cls_display_name = _('TMS layer')
@@ -191,15 +191,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
         Connection, foreign_keys=connection_id,
         cascade=False, cascade_backrefs=False,
     )
-
-    @property
-    def extent(self):
-        return dict(
-            minLon=self.extent_left,
-            maxLon=self.extent_right,
-            minLat=self.extent_bottom,
-            maxLat=self.extent_top,
-        )
 
     @classmethod
     def check_parent(cls, parent):
@@ -296,6 +287,16 @@ class Layer(Base, Resource, SpatialLayerMixin):
             image = image.resize(size)
 
         return image
+
+    # IBboxLayer implementation:
+    @property
+    def extent(self):
+        return dict(
+            minLon=self.extent_left,
+            maxLon=self.extent_right,
+            minLat=self.extent_bottom,
+            maxLat=self.extent_top,
+        )
 
 
 DataScope.read.require(
