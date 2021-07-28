@@ -57,6 +57,6 @@ def setup_pyramid(comp, config):
                     lambda args: args.request.route_url(
                         "layer_preview.map", id=args.obj.id
                     ),
-                    'material:viewMap', True, '_blank')
+                    'material:preview', True, '_blank')
 
     Resource.__dynmenu__.add(LayerMenuExt())
