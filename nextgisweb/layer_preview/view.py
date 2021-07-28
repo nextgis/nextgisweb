@@ -17,14 +17,17 @@ def preview_map(request):
 
     if IFeatureLayer.providedBy(request.context):
         source_type = "mvt"
-        if IBboxLayer.providedBy(request.context):
-            extent = request.context.extent
     elif IRenderableStyle.providedBy(request.context):
         source_type = "xyz"
+
+    if IBboxLayer.providedBy(request.context):
+        extent = request.context.extent
+    else:
         parent = request.context.parent
-        parent_permissions = parent.permissions(request.user)
-        if IBboxLayer.providedBy(parent) and ResourceScope.read in parent_permissions:
-            extent = parent.extent
+        if IBboxLayer.providedBy(parent):
+            parent_permissions = parent.permissions(request.user)
+            if ResourceScope.read in parent_permissions:
+                extent = parent.extent
 
     return dict(
         obj=request.context,
