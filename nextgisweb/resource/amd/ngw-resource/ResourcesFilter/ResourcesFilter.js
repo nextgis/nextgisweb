@@ -23,7 +23,6 @@ define([
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
-        baseClass: "resources-filter",
         title: i18n.gettext("Search resources"),
 
         postCreate: function () {
