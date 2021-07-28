@@ -16,7 +16,7 @@ def preview_map(request):
     extent = None
 
     if IFeatureLayer.providedBy(request.context):
-        source_type = "mvt"
+        source_type = "geojson"
     elif IRenderableStyle.providedBy(request.context):
         source_type = "xyz"
 
