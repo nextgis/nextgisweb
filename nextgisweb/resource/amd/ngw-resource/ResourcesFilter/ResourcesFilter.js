@@ -3,7 +3,7 @@ define([
     "dojo/on", "dojo/dom-class", "dojo/html", "dojo/query",
     "dojo/debounce", "dojo/request/xhr", "dojo/DeferredList",
     "dojox/dtl", "dojox/dtl/Context", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin",
-    "ngw/route", '@nextgisweb/pyramid/i18n!resource',
+    "@nextgisweb/pyramid/api", '@nextgisweb/pyramid/i18n!resource',
     "dojo/text!./ResourcesFilter.hbs", "dojo/text!./ResourcesFilterResult.dtl.hbs",
     "dojox/dtl/tag/logic",
     "xstyle/css!./ResourcesFilter.css",
@@ -11,15 +11,14 @@ define([
 ], function (
     declare, lang, array, Deferred, on, domClass, html, query, debounce, xhr,
     DeferredList, dtl, dtlContext, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-    route, i18n, template, templateResult
+    api, i18n, template, templateResult
 ) {
     var TEMPLATE_RESULT_DTL = new dtl.Template(templateResult),
         SVG_URL = ngwConfig.assetUrl + "/svg/svg-symbols.svg",
         translateDtl = {
             notFound: i18n.gettext("Resource not found")
         },
-        resourceSearchRoute = route.resource.search,
-        resourceShowRoute = route.resource.show;
+        resourceSearchRoute = api.routeURL('resource.search');
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
@@ -62,7 +61,7 @@ define([
 
             var deferredList = new DeferredList([
                 this.getMinTimePromise(1000),
-                xhr.get(resourceSearchRoute(), {
+                xhr.get(resourceSearchRoute, {
                     handleAs: "json",
                     query: {display_name: value}
                 })
@@ -84,7 +83,7 @@ define([
             var templateContext, resultHtml;
 
             result = array.map(result, function (item) {
-                item.url = resourceShowRoute({id: item.resource.id});
+                item.url = api.routeURL('resource.show', {id: item.resource.id});
                 return item;
             }, this);
 
