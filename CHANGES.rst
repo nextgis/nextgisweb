@@ -4,6 +4,7 @@ Changes
 3.9.0
 -----
 
+- Simple tool for previewing resources on the map.
 - Language autodetection, per-user language setting, and support of external
   translation files.
 - Better support of KML: LIBKML GDAL driver is used when available.
