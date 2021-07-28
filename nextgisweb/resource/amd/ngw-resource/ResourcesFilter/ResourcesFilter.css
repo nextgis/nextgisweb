@@ -1,6 +1,6 @@
 .resources-filter {
   width: 290px;
-  z-index: 999;
+  z-index: 100;
 }
 
 .nextgis.claro .resources-filter .dijitTextBox .dijitInputField {
@@ -10,7 +10,8 @@
 .resources-filter .dijitTextBox .dijitInputInner {
   font-weight: normal;
   margin: 0 22px !important;
-  width: 84% !important;
+  /*width: 84% !important;*/
+  width: 90% !important;
 }
 
 .resources-filter .dijitTextBox .dijitPlaceHolder {
@@ -30,6 +31,7 @@
 }
 
 .resources-filter .filter {
+  display: none;
   position: relative;
   right: 0;
   top: -29px;
@@ -47,7 +49,9 @@
 .resources-filter .result,
 .resources-filter.loading .result {
   display: none;
-  top: 35px;
+  position: relative;
+  top: 0;
+  z-index: 100;
   width: 100%;
   background: #FFFFFF;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
