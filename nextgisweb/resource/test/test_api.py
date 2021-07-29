@@ -38,7 +38,7 @@ def resource(ngw_resource_group):
         DBSession.flush()
         DBSession.expunge(obj)
 
-    yield obj.id
+    yield obj
 
     with transaction.manager:
         DBSession.delete(ResourceGroup.filter_by(id=obj.id).one())
@@ -54,3 +54,8 @@ def test_resource_search(resource, ngw_webtest_app, ngw_auth_administrator):
     resp = ngw_webtest_app.get(api_url, dict(
         display_name='Test Symbols ~%', keyname='other'), status=200)
     assert len(resp.json) == 0
+
+    resp = ngw_webtest_app.get(api_url, dict(
+        keyname__ilike='test-key%'), status=200)
+    assert len(resp.json) == 1
+    assert resp.json[0]['resource']['display_name'] == resource.display_name

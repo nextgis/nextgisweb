@@ -313,11 +313,27 @@ def search(request):
         data = serializer.data
         return {Resource.identity: data} if smode == 'resource' else data
 
+    filter_ = []
+    for k, v in request.GET.items():
+        split = k.rsplit('__', 1)
+        if len(split) == 2:
+            k, op = split
+        else:
+            op = 'eq'
+
+        if not hasattr(Resource, k):
+            continue
+        attr = getattr(Resource, k)
+        if op == 'eq':
+            filter_.append(attr == v)
+        elif op == 'ilike':
+            filter_.append(db.sql.operators.ilike_op(attr, v))
+        else:
+            raise ValidationError("Operator '%s' is not supported" % op)
+
     # TODO: Chech speed of with_polymorphic('*')
     query = Resource.query().with_polymorphic('*') \
-        .filter_by(**dict(map(
-            lambda k: (k, request.GET.get(k)),
-            (attr for attr in request.GET if hasattr(Resource, attr))))) \
+        .filter(db.and_(*filter_)) \
         .order_by(Resource.display_name)
 
     if principal_id is not None:
