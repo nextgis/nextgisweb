@@ -139,6 +139,8 @@ class User(Principal):
         ))
 
     def deserialize(self, data):
+        was_disabled = self.disabled is not False
+
         attrs = ('display_name', 'description', 'keyname',
                  'superuser', 'disabled', 'language', 'password')
         for a in attrs:
@@ -149,7 +151,9 @@ class User(Principal):
             self.member_of = [Group.filter_by(id=gid).one()
                               for gid in data['member_of']]
 
-        if not self.system and not self.disabled:
+        enabled = not self.disabled and was_disabled
+
+        if not self.system and enabled:
             env.auth.check_user_limit(self.id)
 
     @classmethod
