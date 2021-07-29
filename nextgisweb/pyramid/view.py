@@ -305,6 +305,11 @@ def setup_pyramid(comp, config):
         return request.env.core.localizer(request.locale_name)
     config.add_request_method(localizer, 'localizer', property=True)
 
+    locale_default = comp.env.core.locale_default
+    locale_sorted = [locale_default] + [
+        l for l in comp.env.core.locale_available
+        if l != locale_default]
+    
     # Replace default locale negotiator with session-based one
     def locale_negotiator(request):
         try:
@@ -319,12 +324,11 @@ def setup_pyramid(comp, config):
         if session_lang is not None:
             return session_lang
 
-        accept_lang = request.accept_language.best_match(
-            request.env.core.locale_available)
+        accept_lang = request.accept_language.best_match(locale_sorted)
         if accept_lang is not None:
             return accept_lang
 
-        return request.env.core.locale_default
+        return locale_default
 
     config.set_locale_negotiator(locale_negotiator)
 
