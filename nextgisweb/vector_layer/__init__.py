@@ -20,7 +20,8 @@ class VectorLayerComponent(Component):
 
     @require('feature_layer')
     def setup_pyramid(self, config):
-        from . import view  # NOQA: F401
+        from . import api, view  # NOQA: F401
+        api.setup_pyramid(self, config)
 
     def client_settings(self, request):
         return dict(show_create_mode=self.options['show_create_mode'])

@@ -1,10 +1,13 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
+    "dojo/request/xhr",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/ContentPane",
     "@nextgisweb/pyramid/i18n!",
+    "ngw/route",
+    "ngw-pyramid/ErrorDialog/ErrorDialog",
     "ngw-resource/serialize",
     "ngw-spatial-ref-sys/SRSSelect",
     // resource
@@ -20,10 +23,13 @@ define([
 ], function (
     declare,
     lang,
+    xhr,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     ContentPane,
     i18n,
+    route,
+    ErrorDialog,
     serialize,
     SRSSelect,
     template,
@@ -38,6 +44,12 @@ define([
             this.wSrs = SRSSelect({allSrs: null});
         },
 
+        _layersVision: function (enable) {
+            // this.wLayerName.domNode.parentNode.parentNode
+            //     .style.display = show ? "" : "none";
+            this.wLayerName.set("disabled", !enable);
+        },
+
         postCreate: function () {
             if (settings.show_create_mode) {
                 this.modeSwitcher.watch('value', function(attr, oldval, newval) {
@@ -48,6 +60,45 @@ define([
             } else {
                 this.mode_section.domNode.style.display = 'none';
             }
+
+            this._layersVision(false);
+            this.wLayerName.watch("options", function (attr, oldval, newval) {
+                var showLayers = newval.length > 1;
+                this._layersVision(showLayers);
+            }.bind(this));
+
+            this.wSourceFile.on("complete", function () {
+                var upload_meta = this.wSourceFile.get("value");
+                xhr.post(route.vector_layer.dataset(), {
+                    handleAs: "json",
+                    headers: { "Content-Type": "application/json" },
+                    data: JSON.stringify({
+                        source: upload_meta
+                    })
+                }).then(function (data) {
+                    var layers = data.layers;
+
+                    var options = [];
+                    layers.forEach(function (layer) {
+                        options.push({label: layer, value: layer});
+                    });
+                    this.wLayerName.set("options", options);
+
+                    if (layers.length === 0) {
+                        this.wSourceFile.uploadReset();
+                        new ErrorDialog({
+                            title: i18n.gettext("Validation error"),
+                            message: i18n.gettext("Dataset doesn't contain layers.")
+                        }).show();
+                    } else {
+                        this.wLayerName.set("value", layers[0]);
+                    }
+                }.bind(this), function (error) {
+                    this.wLayerName.set("options", []);
+                    ErrorDialog.xhrError(error);
+                    this.wSourceFile.uploadReset();
+                }.bind(this));
+            }.bind(this));
 
             this.wFIDSource.watch('value', function(attr, oldval, newval) {
                 var hideFIDField = newval === 'SEQUENCE';
@@ -69,6 +120,10 @@ define([
             if (this.modeSwitcher.get("value") === 'file') {
                 setObject("source", this.wSourceFile.get("value"));
                 setObject("encoding", this.wEncoding.get("value"));
+                if (this.wLayerName.get("options").length > 1) {
+                    setObject("layer_name", this.wLayerName.get("value"));
+                }
+
                 setObject("fix_errors", this.wFixErrors.get("value"));
                 setObject("skip_errors", this.wSkipErrors.get("value"));
                 var cast_geometry_type = this.wCastGeometryType.get("value");
@@ -102,8 +157,7 @@ define([
 
         validateDataInMixin: function (errback) {
             if (this.modeSwitcher.get("value") === 'file') {
-                return this.wSourceFile.upload_promise !== undefined &&
-                    this.wSourceFile.upload_promise.isResolved();
+                return !!this.wSourceFile.get("value");
             }
             return true;
         }
