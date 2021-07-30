@@ -54,8 +54,15 @@
 
 .rightMenu-notify{
     position: absolute;
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background-color: #00b77e;
+    background-color: var(--success);
+    border: 2px solid var(--header-bg);
+    right: -4px;
+    top: 4px;
+}
+
+.rightMenu-notify--danger{
+    background-color: var(--danger);   
 }

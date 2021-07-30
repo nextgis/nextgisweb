@@ -75,47 +75,47 @@ msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: template/header.mako:94 view.py:86
+#: template/header.mako:95 view.py:87
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:108 view.py:457
+#: view.py:109 view.py:462
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:120 view.py:474
+#: view.py:121 view.py:479
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:130 view.py:479
+#: view.py:131 view.py:484
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:145 view.py:463
+#: view.py:146 view.py:468
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:152 view.py:465
+#: view.py:153 view.py:470
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:159 view.py:467
+#: view.py:160 view.py:472
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:166 view.py:461
+#: view.py:167 view.py:466
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:173 view.py:469
+#: view.py:174 view.py:474
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:456
+#: view.py:461
 msgid "Info"
 msgstr "Информация"
 
-#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:6 view.py:460
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:6 view.py:465
 msgid "Settings"
 msgstr "Настройки"
 
@@ -131,6 +131,31 @@ msgstr "Скопировано"
 #: amd/ngw-pyramid/CopyButton/CopyButton.js:32
 msgid "Unable to copy"
 msgstr "Не удалось скопировать"
+
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:69
+msgid "Checking for updates..."
+msgstr "Проверяем наличие обновлений..."
+
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:75
+msgid "New version of NextGIS Web is available"
+msgstr "Доступна новая версия NextGIS Web"
+
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:83 amd/ngw-pyramid/DistInfo/DistInfo.js:94
+msgid "Contact support</a> for update."
+msgstr "Обратитесь в&nbsp;поддержку</a> для установки обновлений."
+
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:88
+#: amd/ngw-pyramid/right-menu/RightMenu.js:90
+msgid "Critical updates are available"
+msgstr "Доступны критические обновления"
+
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:90
+msgid "Please consider updating as&nbsp;soon as&nbsp;possible."
+msgstr "Рекомендуем установить их&nbsp;как можно быстрее"
+
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:121
+msgid "Show details"
+msgstr "Подробнее"
 
 #: amd/ngw-pyramid/ErrorCard/ErrorCard.js:37
 msgid "Technical information"
@@ -207,6 +232,14 @@ msgstr "Сохранить"
 msgid "Delete"
 msgstr "Удалить"
 
+#: amd/ngw-pyramid/right-menu/RightMenu.js:91
+msgid "Updates are available"
+msgstr "Доступны обновления"
+
+#: amd/ngw-pyramid/right-menu/RightMenu.js:98
+msgid "Click to see what's new"
+msgstr "Нажмите и узнайте, что нового"
+
 #: amd/ngw-pyramid/template/CORSForm.hbs:17
 msgid ""
 "Enter allowed origins for cross domain requests to use HTTP API of this Web "
@@ -274,11 +307,11 @@ msgstr "Размер"
 msgid "Sign in"
 msgstr "Войти"
 
-#: template/header.mako:89
+#: template/header.mako:90
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: template/header.mako:102
+#: template/header.mako:103
 msgid "Help"
 msgstr "Справка"
 
@@ -319,15 +352,21 @@ msgstr ""
 "Некоторые изменения могут быть отражены только после полной оценки "
 "использования хранилища."
 
-#: template/sysinfo.mako:20
+#: template/sysinfo.mako:28
 msgid "Package"
 msgstr "Пакет"
 
-#: template/sysinfo.mako:21
+#: template/sysinfo.mako:29
 msgid "Version"
 msgstr "Версия"
 
-#: template/sysinfo.mako:50
+#: template/sysinfo.mako:58
 msgid "Platform"
 msgstr "Платформа"
+
+#~ msgid "for update."
+#~ msgstr "для установки обновлений"
+
+#~ msgid "Please consider updating as soon as possible."
+#~ msgstr "Рекомендуем установить их как можно быстрее."
 

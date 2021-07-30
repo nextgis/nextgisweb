@@ -5,15 +5,17 @@
   font-size: 16px;
 
   .list__item {
-    display: block;
-    padding: 0 16px;
-    height: 48px;
-    line-height: 48px;
+    display: flex;
+    padding: 8px 16px;
+    min-height: 48px;
+    align-items: center;
     white-space: nowrap;
     color: var(--text-base);
     text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
+    box-sizing: border-box;
+    line-height: 1.4;
 
     a {
       color: var(--text-base);
@@ -22,12 +24,22 @@
 
     &--link {
       cursor: pointer;
+      position: relative;
 
       &:hover,
       &:focus {
-        background-color: rgba(0, 0, 0, .04);
         color: var(--text-base);
         text-decoration: none;
+        
+        &::before{
+          content: '';
+          position: absolute;
+          background-color: rgba(0, 0, 0, .04);
+          left: 0;
+          top: 0;
+          right: 0;
+          bottom: 0;
+        }
       }
     }
 
@@ -42,6 +54,12 @@
         margin-top: -8xp;
       }
     }
+    &--success{
+      background-color: var(--surface-bg-success);
+    }
+    &--danger{
+      background-color: var(--surface-bg-danger);
+    }
   }
 
   &--s {
@@ -50,8 +68,7 @@
     padding-bottom: 4px;
 
     .list__item {
-      height: 36px;
-      line-height: 36px;
+      min-height: 36px;
 
       &--title{
         padding-top: 4px;
