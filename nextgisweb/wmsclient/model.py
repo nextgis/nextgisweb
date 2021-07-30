@@ -250,7 +250,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
         for layer in self.connection.capcache_dict['layers']:
             if layer['id'] not in layers:
                 continue
-            if layer['bbox'] is None:
+            if layer.get('bbox') is None:
                 bbox = [-180.0, -90.0, 180.0, 90.0]
                 break
             bbox[0] = min(layer['bbox'][0], bbox[0])
