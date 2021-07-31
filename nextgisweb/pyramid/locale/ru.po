@@ -140,17 +140,23 @@ msgstr "<a>Обратитесь в поддержку</a> для установ�
 msgid "Checking for updates..."
 msgstr "Проверяем наличие обновлений..."
 
-#: amd/ngw-pyramid/DistInfo/DistInfo.js:77
-msgid "New version of NextGIS Web is available: {version}."
-msgstr "Доступна новая версия NextGIS Web: {version}."
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:74
+msgid "Your {distribution} is up-to-date: {version}."
+msgstr "У вас последняя версия {distribution}: {version}."
 
-#: amd/ngw-pyramid/DistInfo/DistInfo.js:81
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:79
+msgid "New version of {distribution} is available: {version}."
+msgstr "Доступна новая версия {distribution}: {version}."
+
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:84
 msgid ""
 "Critical updates are available: {version}. Please consider updating an soon "
 "as possible."
-msgstr "Доступны критические обновления: {version}. Рекомендуем установить их как можно быстрее"
+msgstr ""
+"Доступны критические обновления: {version}. Рекомендуем установить их как "
+"можно быстрее."
 
-#: amd/ngw-pyramid/DistInfo/DistInfo.js:111
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:114
 msgid "Show details"
 msgstr "Подробнее"
 

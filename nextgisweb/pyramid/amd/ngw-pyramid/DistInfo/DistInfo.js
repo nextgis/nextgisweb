@@ -71,10 +71,13 @@ define([
             var messages = {
                 inProgress: function () { return i18n.gettext('Checking for updates...') },
                 upToDate: lang.hitch(this, function () {
-                    return 'Your NextGIS Web is up-to-date: ' + this.currentVersion;
+                    return i18n.gettext("Your {distribution} is up-to-date: {version}.")
+                        .replace("{distribution}", ngwConfig.distribution.description)
+                        .replace("{version}", version)
                 }),
                 hasUpdate: lang.hitch(this, function (version) {
-                    return i18n.gettext("New version of NextGIS Web is available: {version}.")
+                    return i18n.gettext("New version of {distribution} is available: {version}.")
+                        .replace("{distribution}", ngwConfig.distribution.description)
                         .replace("{version}", version) + "<br/>" + contactSupport;
                 }),
                 hasUrgentUpdate: lang.hitch(this, function (version) {
