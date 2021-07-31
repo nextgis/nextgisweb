@@ -379,6 +379,8 @@ class CoreComponent(
         Option('locale.default', default='en'),
         Option('locale.available', list, default=None),
         Option('locale.external_path', default=None),
+        Option('locale.poeditor_project_id', default=435991),
+        Option('locale.poeditor_api_token', default=None),
 
         # Other deployment settings
         Option('support_url', default="https://nextgis.com/contact/"),

@@ -19,6 +19,7 @@ from babel.messages.extract import extract_from_dir
 from babel.messages.pofile import write_po, read_po
 from babel.messages.mofile import write_mo
 from attr import attrs, attrib, asdict
+from poeditor import POEditorAPI
 
 from ..compat import Path
 from ..package import pkginfo
@@ -391,6 +392,53 @@ def cmd_stat(args):
         print_records(data, ('package', ), title='PACKAGE SUMMARY')
 
 
+def cmd_poeditor_pull(args):
+    poeditor_api_token = env.core.options['locale.poeditor_api_token']
+    poeditor_project_id = env.core.options['locale.poeditor_project_id']
+
+    if poeditor_api_token is None:
+        raise RuntimeError("POEditor API token isn't set!")
+
+    client = POEditorAPI(api_token=poeditor_api_token)
+
+    for comp_id, locales in components_and_locales(args, work_in_progress=True):
+        for locale in locales:
+            translated = 0
+            po_path = catalog_filename(comp_id, locale, ext="po", mkdir=False)
+            if po_path.exists():
+                with po_path.open("r") as po_fd:
+                    po = read_po(po_fd, locale=locale)
+
+                logger.info(
+                    "Fetching translations from POEditor for component [%s] locale [%s]...",
+                    comp_id, locale)
+
+                terms = client.view_project_terms(
+                    poeditor_project_id, language_code=locale
+                )
+                terms = [term for term in terms if comp_id in term['tags']]
+                for msg in po:
+                    for term in terms:
+                        if msg.id == term['term']:
+                            cur_tr = msg.string
+                            new_tr = term['translation']['content']
+
+                            if (not cur_tr and new_tr) or (
+                                cur_tr and new_tr and cur_tr != new_tr and args.force
+                            ):
+                                msg.string = new_tr
+                                translated += 1
+                            break
+
+                if translated != 0:
+                    with io.open(str(po_path), 'wb') as fd:
+                        write_po(fd, po, width=80, omit_header=True)
+
+                logger.info(
+                    "%d messages translated for component [%s] locale [%s]",
+                    translated, comp_id, locale)
+
+
 def main(argv=sys.argv):
     logging.basicConfig(level=logging.INFO)
 
@@ -423,6 +471,12 @@ def main(argv=sys.argv):
     pstat.add_argument('--work-in-progress', action='store_true', default=False)
     pstat.add_argument('--json', action='store_true', default=False)
     pstat.set_defaults(func=cmd_stat)
+
+    ppoeditor_pull = subparsers.add_parser('poeditor_pull')
+    ppoeditor_pull.add_argument('component', nargs='*')
+    ppoeditor_pull.add_argument('--locale', default=[], action='append')
+    ppoeditor_pull.add_argument('--force', action='store_true', default=False)
+    ppoeditor_pull.set_defaults(func=cmd_poeditor_pull)
 
     args = parser.parse_args(argv[1:])
 
