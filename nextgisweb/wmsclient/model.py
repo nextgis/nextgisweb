@@ -29,7 +29,7 @@ from ..resource import (
     SerializedResourceRelationship as SRR,
     ValidationError,
     ResourceGroup)
-from ..layer import SpatialLayerMixin
+from ..layer import SpatialLayerMixin, IBboxLayer
 from ..render import (
     IRenderableStyle,
     IExtentRenderRequest,
@@ -87,6 +87,7 @@ class Connection(Base, Resource):
             layers.append(OrderedDict((
                 ('id', lid), ('title', layer.title),
                 ('index', [int(i) for i in layer.index.split('.')]),
+                ('bbox', layer.boundingBoxWGS84),  # may be None
             )))
 
         layers.sort(key=lambda i: i['index'])
@@ -170,7 +171,7 @@ class RenderRequest(object):
         return self.style.render_image(extent, (size, size))
 
 
-@implementer(IRenderableStyle)
+@implementer(IRenderableStyle, IBboxLayer)
 class Layer(Base, Resource, SpatialLayerMixin):
     identity = 'wmsclient_layer'
     cls_display_name = _("WMS layer")
@@ -236,6 +237,33 @@ class Layer(Base, Resource, SpatialLayerMixin):
         data = BytesIO(response.content)
 
         return PIL.Image.open(data)
+
+    # IBboxLayer implementation:
+    @property
+    def extent(self):
+        if not self.connection.capcache():
+            self.connection.capcache_query()
+
+        layers = self.wmslayers.split(',')
+
+        bbox = [180.0, 90.0, -180.0, -90.0]
+        for layer in self.connection.capcache_dict['layers']:
+            if layer['id'] not in layers:
+                continue
+            if layer.get('bbox') is None:
+                bbox = [-180.0, -90.0, 180.0, 90.0]
+                break
+            bbox[0] = min(layer['bbox'][0], bbox[0])
+            bbox[1] = min(layer['bbox'][1], bbox[1])
+            bbox[2] = max(layer['bbox'][2], bbox[2])
+            bbox[3] = max(layer['bbox'][3], bbox[3])
+
+        return dict(
+            minLon=bbox[0],
+            maxLon=bbox[2],
+            minLat=bbox[1],
+            maxLat=bbox[3],
+        )
 
 
 class LayerVendorParam(Base):
