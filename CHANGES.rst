@@ -19,16 +19,16 @@ Changes
 3.8.0
 -----
 
-- Ability to constraint a webmap to default extent.
-- More length and area units in webmap settings.
-- Automatic correction of errors during creation of vector layer.
+- Ability to constraint a web map to default extent.
+- More length and area units in web map settings.
+- Automatic correction of errors during the creation of vector layer.
 - Support for creation of vector layers from GML and KML files.
 - A user login is case insensitive when logging in.
 - Configuration option for disabling social networks share buttons.
-- Performance improvements in geometry handling and rendering especially when
+- Performance improvements in geometry handling and rendering, especially when
   converting between WKT and WKB formats.
 - Performance improvements in tile cache component.
-- Improved word wrapping in webmap identification popup.
+- Improved word wrapping in web map identification popup.
 - Minimum and maximum scale restrictions in WMS server.
 - Experimental integration of modern JavaScript and Webpack.
 - Quota for the maximum number of enabled users.
@@ -39,16 +39,16 @@ Changes
 -----
 
 - Add database migrations framework and automatic migrations applying.
-- External access links for styles, webmaps (TMS) and feature layers (MVT).
-- Experimental WFS client and raster mosaic which is disabled by default.
+- External access links for styles, web maps (TMS), and feature layers (MVT).
+- Experimental WFS client and raster mosaic, which is disabled by default.
 - Add support of 1.1.0 version in WFS server implementation.
 - Improved handling of NODATA values in raster layer and raster style.
-- Compression level of PNG images is set to 3 which is much faster.
-- Performance improvements and better concurency for tile cache.
+- Compression level of PNG images is set to 3, which is much faster.
+- Performance improvements and better concurrency for tile cache.
 - New "CSV for Microsoft Excel" export format for better Excel compatibility.
 - Fix infinite wait of database lock, including during vector layer deletion.
-- Improved handling of invalid JSON bodies in RESP API, now correct error
-  message returns.
+- Improved handling of invalid JSON bodies in RESP API, now the correct error
+  message is returned.
 - Vector layer export to MapInfo MIF/MID format.
 - Vector layer export to Panorama SXF format.
 
@@ -82,14 +82,14 @@ Changes
 - New implementation of WFS server which fixes many bugs.
 - Quad-key support in TMS connection and layer.
 - Support for ``geom_format`` and ``srs`` in feature layer REST API (POST / PUT requests).
-- Session based OAuth authentication with token refresh support.
+- Session-based OAuth authentication with token refresh support.
 - Delete users and groups via REST API.
 - Track timestamps of user's last activity.
-- Customization of webmap's identify popup via control panel.
+- Customization of web map identify popup via control panel.
 - Speedup cleanup of file storage maintenance and cleanup.
 - Fix bulk feature deletion API when passing an empty list.
 - Fix bug in CORS implementation for requests returning errors.
-- Fix coordinates display format in webmap's identification pop-up.
+- Fix coordinates display format in web map identification popup.
 - Fix tile distortion issue for raster styles
 
 3.4.2
