@@ -1,4 +1,4 @@
-const distInfoMessages = define([
+define([
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/dom-class',
@@ -22,7 +22,7 @@ const distInfoMessages = define([
     OverlayDialog,
     _WidgetBase,
     _TemplatedMixin,
-    template,
+    template
 ) {
     return declare([Stateful, _WidgetBase, _TemplatedMixin], {
         templateString: i18n.renderTemplate(template),
@@ -52,7 +52,7 @@ const distInfoMessages = define([
                     if (newVal !== oldVal) {
                         this.updateStatus(newVal, oldVal);
                     }
-                }),
+                })
             );
             this.watch(
                 'message',
@@ -60,50 +60,39 @@ const distInfoMessages = define([
                     if (newVal !== oldVal) {
                         this._renderMessage(newVal);
                     }
-                }),
+                })
             );
         },
 
-        _getMessage(status, version) {
-            const messages = {
-                inProgress: () => i18n.gettext('Checking for updates...'),
-                upToDate: () => {
-                    return `Your NextGIS Web is up-to-date: ${this.currentVersion}`;
-                },
-                hasUpdate: (version) => {
-                    return (
-                        i18n.gettext(
-                            'New version of NextGIS Web is available',
-                        ) +
-                        ': ' +
-                        version +
-                        '<br/> <a href="' +
-                        this.supportUrl +
-                        '" target="_blank">' +
-                        i18n.gettext('Contact support</a> for update.')
-                    );
-                },
-                hasUrgentUpdate: (version) => {
-                    const message =
-                        i18n.gettext('Critical updates are available') +
-                        `: ${version}. ` +
-                        i18n.gettext(
-                            'Please consider updating as&nbsp;soon as&nbsp;possible.',
-                        ) +
-                        `<br/> <a href="${this.supportUrl}" target="_blank">` +
-                        i18n.gettext('Contact support</a> for update.');
-                    return message;
-                },
+        _getMessage: function (status, version) {
+            var contactSupport = i18n.gettext("<a>Contact support</a> for update.")
+                .replace("<a>", '<a href="' + this.supportUrl + '" target="_blank">')
+
+            var messages = {
+                inProgress: function () { return i18n.gettext('Checking for updates...') },
+                upToDate: lang.hitch(this, function () {
+                    return 'Your NextGIS Web is up-to-date: ' + this.currentVersion;
+                }),
+                hasUpdate: lang.hitch(this, function (version) {
+                    return i18n.gettext("New version of NextGIS Web is available: {version}.")
+                        .replace("{version}", version) + "<br/>" + contactSupport;
+                }),
+                hasUrgentUpdate: lang.hitch(this, function (version) {
+                    return i18n.gettext("Critical updates are available: {version}. Please consider updating an soon as possible.")
+                        .replace("{version}", version) + "<br/>" + contactSupport;
+                }),
             };
             return Object.keys(messages).indexOf(status) !== -1
                 ? messages[status](version)
                 : '';
         },
-        _renderMessage(message) {
+
+        _renderMessage: function(message) {
             this.contentNode.innerHTML = message;
         },
-        _renderDialog() {
-            let iframe = document.createElement('iframe');
+
+        _renderDialog: function () {
+            var iframe = document.createElement('iframe');
             iframe.src = this.detailsUrl;
             iframe.setAttribute('frameborder', 0);
             iframe.style.width = '100%';
@@ -114,7 +103,8 @@ const distInfoMessages = define([
                 style: 'width: 95%; max-width: 680px; min-width: 320px;',
             });
         },
-        _addUpdateDetails() {
+
+        _addUpdateDetails: function () {
             if (!this.detailsButton) {
                 this.detailsButton = new NGWButton({
                     size: 'small',
@@ -127,20 +117,22 @@ const distInfoMessages = define([
             if (!this.detailsDialog && this.detailsUrl) {
                 this._renderDialog();
             }
-            on(this.detailsButton, 'click', () => {
+            on(this.detailsButton, 'click', lang.hitch(this, function () {
                 this.detailsDialog.show();
-            });
+            }));
         },
-        _removeUpdateDetails() {
+
+        _removeUpdateDetails: function () {
             this.actionNode.innerHTML = '';
             this.detailsDialog.destroy();
             this.detailsDialog = null;
         },
-        updateStatus(status, oldStatus) {
+
+        updateStatus: function (status, oldStatus) {
             this.set('message', this._getMessage(status, this.nextVersion));
             if (oldStatus)
-                domClass.remove(this.domNode, `${this.baseCls}--${oldStatus}`);
-            domClass.add(this.domNode, `${this.baseCls}--${status}`);
+                domClass.remove(this.domNode, this.baseCls + '--' + oldStatus);
+            domClass.add(this.domNode, this.baseCls + '--' + status);
             if (status === 'hasUpdate' || status === 'hasUrgentUpdate') {
                 this._addUpdateDetails();
             } else if (

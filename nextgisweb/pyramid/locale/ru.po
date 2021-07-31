@@ -79,43 +79,43 @@ msgstr ""
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:109 view.py:462
+#: view.py:109 view.py:466
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:121 view.py:479
+#: view.py:121 view.py:483
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:131 view.py:484
+#: view.py:131 view.py:488
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:146 view.py:468
+#: view.py:146 view.py:472
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:153 view.py:470
+#: view.py:153 view.py:474
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:160 view.py:472
+#: view.py:160 view.py:476
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:167 view.py:466
+#: view.py:167 view.py:470
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:174 view.py:474
+#: view.py:174 view.py:478
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:461
+#: view.py:465
 msgid "Info"
 msgstr "Информация"
 
-#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:6 view.py:465
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:6 view.py:469
 msgid "Settings"
 msgstr "Настройки"
 
@@ -132,28 +132,25 @@ msgstr "Скопировано"
 msgid "Unable to copy"
 msgstr "Не удалось скопировать"
 
-#: amd/ngw-pyramid/DistInfo/DistInfo.js:69
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:68
+msgid "<a>Contact support</a> for update."
+msgstr "<a>Обратитесь в поддержку</a> для установки обновлений."
+
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:72
 msgid "Checking for updates..."
 msgstr "Проверяем наличие обновлений..."
 
-#: amd/ngw-pyramid/DistInfo/DistInfo.js:75
-msgid "New version of NextGIS Web is available"
-msgstr "Доступна новая версия NextGIS Web"
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:77
+msgid "New version of NextGIS Web is available: {version}."
+msgstr "Доступна новая версия NextGIS Web: {version}."
 
-#: amd/ngw-pyramid/DistInfo/DistInfo.js:83 amd/ngw-pyramid/DistInfo/DistInfo.js:94
-msgid "Contact support</a> for update."
-msgstr "Обратитесь в&nbsp;поддержку</a> для установки обновлений."
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:81
+msgid ""
+"Critical updates are available: {version}. Please consider updating an soon "
+"as possible."
+msgstr "Доступны критические обновления: {version}. Рекомендуем установить их как можно быстрее"
 
-#: amd/ngw-pyramid/DistInfo/DistInfo.js:88
-#: amd/ngw-pyramid/right-menu/RightMenu.js:90
-msgid "Critical updates are available"
-msgstr "Доступны критические обновления"
-
-#: amd/ngw-pyramid/DistInfo/DistInfo.js:90
-msgid "Please consider updating as&nbsp;soon as&nbsp;possible."
-msgstr "Рекомендуем установить их&nbsp;как можно быстрее"
-
-#: amd/ngw-pyramid/DistInfo/DistInfo.js:121
+#: amd/ngw-pyramid/DistInfo/DistInfo.js:111
 msgid "Show details"
 msgstr "Подробнее"
 
@@ -231,6 +228,10 @@ msgstr "Сохранить"
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:41
 msgid "Delete"
 msgstr "Удалить"
+
+#: amd/ngw-pyramid/right-menu/RightMenu.js:90
+msgid "Critical updates are available"
+msgstr "Доступны критические обновления"
 
 #: amd/ngw-pyramid/right-menu/RightMenu.js:91
 msgid "Updates are available"
@@ -363,10 +364,3 @@ msgstr "Версия"
 #: template/sysinfo.mako:58
 msgid "Platform"
 msgstr "Платформа"
-
-#~ msgid "for update."
-#~ msgstr "для установки обновлений"
-
-#~ msgid "Please consider updating as soon as possible."
-#~ msgstr "Рекомендуем установить их как можно быстрее."
-

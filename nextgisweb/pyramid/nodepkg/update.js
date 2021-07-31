@@ -37,7 +37,7 @@ export function registerCallback(fn) {
     if (data === undefined) {
         callbacks.push(fn);
     } else {
-        cb(data);
+        fn(data);
     }
 }
 
