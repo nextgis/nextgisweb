@@ -5,13 +5,13 @@ Changes
 -----
 
 - Simple tool for previewing resources on the map.
-- Disable (and enable) address search via settings in the control panel.
+- Disable/enable address search via settings in the control panel.
 - Ability to constraint address search area by web map initial extent.
 - Zoom to a better extent from address search and bookmark panel.
 - Language autodetection, per-user language setting, and support of external
   translation files.
 - Automatic downsampling of a social preview image to 1600x630 pixels.
-- Better support of KML: LIBKML GDAL driver is used when available.
+- Better support for KML: LIBKML GDAL driver is used when available.
 - Filtering features by ID in feature REST API.
 - Layers with an "id" field can be loaded if the field has an integer type.
 - Information about available distribution versions in the control panel.
@@ -20,12 +20,12 @@ Changes
 3.8.0
 -----
 
-- Ability to constraint a web map to default extent.
+- Ability to constraint a web map to the default extent.
 - More length and area units in web map settings.
-- Automatic correction of errors during the creation of vector layer.
+- Automatic correction of errors during the creation of a vector layer.
 - Support for creation of vector layers from GML and KML files.
-- A user login is case insensitive when logging in.
-- Configuration option for disabling social networks share buttons.
+- User login is case insensitive when logging in.
+- Configuration option for disabling social networks sharing buttons.
 - Performance improvements in geometry handling and rendering, especially when
   converting between WKT and WKB formats.
 - Performance improvements in tile cache component.
