@@ -395,6 +395,7 @@ def cmd_stat(args):
 def cmd_poeditor_pull(args):
     poeditor_api_token = env.core.options['locale.poeditor_api_token']
     poeditor_project_id = env.core.options['locale.poeditor_project_id']
+    poeditor_terms = dict()
 
     if poeditor_api_token is None:
         raise RuntimeError("POEditor API token isn't set!")
@@ -403,20 +404,25 @@ def cmd_poeditor_pull(args):
 
     for comp_id, locales in components_and_locales(args, work_in_progress=True):
         for locale in locales:
+            terms = poeditor_terms.get(locale)
+            if terms is None:
+                logger.info(
+                    "Fetching translations from POEditor for locale [%s]...", locale
+                )
+                terms = client.view_project_terms(
+                    poeditor_project_id, language_code=locale
+                )
+                poeditor_terms[locale] = terms
+
             translated = 0
-            po_path = catalog_filename(comp_id, locale, ext="po", mkdir=False)
+
+            po_path = catalog_filename(comp_id, locale, ext='po', mkdir=False)
             if po_path.exists():
                 with po_path.open("r") as po_fd:
                     po = read_po(po_fd, locale=locale)
 
-                logger.info(
-                    "Fetching translations from POEditor for component [%s] locale [%s]...",
-                    comp_id, locale)
-
-                terms = client.view_project_terms(
-                    poeditor_project_id, language_code=locale
-                )
                 terms = [term for term in terms if comp_id in term['tags']]
+
                 for msg in po:
                     for term in terms:
                         if msg.id == term['term']:
@@ -434,9 +440,9 @@ def cmd_poeditor_pull(args):
                     with io.open(str(po_path), 'wb') as fd:
                         write_po(fd, po, width=80, omit_header=True)
 
-                logger.info(
-                    "%d messages translated for component [%s] locale [%s]",
-                    translated, comp_id, locale)
+            logger.info(
+                "%d messages translated for component [%s] locale [%s]",
+                translated, comp_id, locale)
 
 
 def main(argv=sys.argv):
