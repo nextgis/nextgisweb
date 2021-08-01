@@ -12,6 +12,7 @@
   margin: 0 22px !important;
   /*width: 84% !important;*/
   width: 90% !important;
+  padding: 0;
 }
 
 .resources-filter .dijitTextBox .dijitPlaceHolder {
@@ -42,7 +43,7 @@
   content: "\e429";
 }
 
-.resources-filter.active .result {
+.resources-filter.active .result:not(:empty) {
   display: block;
 }
 
@@ -50,8 +51,10 @@
 .resources-filter.loading .result {
   display: none;
   position: relative;
-  top: 0;
+  top: -24px;
+  overflow-y: auto;
   z-index: 100;
+  max-height: 300px;
   width: 100%;
   background: #FFFFFF;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
@@ -60,7 +63,7 @@
 }
 
 .resources-filter .result li {
-  padding: 5px 7px;
+  padding: 6px 7px 5px 7px;
   color: #212121;
   text-decoration: none;
   font-weight: normal;
@@ -88,7 +91,7 @@
   width: 288px;
   height: 3px;
   position: absolute;
-  top: 29px;
+  top: 27px;
   left: 14px;
   border-radius: 4px;
   background-color: #e5eef7;
