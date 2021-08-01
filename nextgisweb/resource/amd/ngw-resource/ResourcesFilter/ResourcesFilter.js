@@ -66,7 +66,7 @@ define([
                 this.getMinTimePromise(1000),
                 xhr.get(resourceSearchRoute, {
                     handleAs: "json",
-                    query: {display_name: value}
+                    query: {display_name__ilike: "%" + value + "%"}
                 })
             ]);
 
