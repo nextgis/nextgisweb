@@ -49,8 +49,11 @@ define([
         },
 
         onChangeSearchInput: function () {
-            var value = this.tbSearch.get("value");
-            if (!value) return false;
+            var value = this.tbSearch.get("value").trim();
+            if (!value) {
+                html.set(this.result, "");
+                return false;
+            }
 
             this.search(value);
         },
