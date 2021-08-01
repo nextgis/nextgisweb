@@ -8,8 +8,8 @@ Changes
 - Disable/enable address search via settings in the control panel.
 - Ability to constraint address search area by web map initial extent.
 - Zoom to a better extent from address search and bookmark panel.
-- Language autodetection, per-user language setting, and support of external
-  translation files.
+- Language autodetection, per-user language setting, and support for the
+  external translation files.
 - Automatic downsampling of a social preview image to 1600x630 pixels.
 - Better support for KML: LIBKML GDAL driver is used when available.
 - Filtering features by ID in feature REST API.
