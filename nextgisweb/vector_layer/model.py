@@ -1073,7 +1073,7 @@ class _source_attr(SP):
 
         ogrds, strdecode = self._ogrds(datafile, encoding)
 
-        layer_name = srlzr.data.get('layer_name')
+        layer_name = srlzr.data.get('source_layer')
         ogrlayer = self._ogrlayer(ogrds, layer_name=layer_name)
 
         skip_other_geometry_types = srlzr.data.get('skip_other_geometry_types')

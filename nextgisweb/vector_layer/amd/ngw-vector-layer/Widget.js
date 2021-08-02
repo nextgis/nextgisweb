@@ -47,7 +47,7 @@ define([
         _layersVision: function (enable) {
             // this.wLayerName.domNode.parentNode.parentNode
             //     .style.display = show ? "" : "none";
-            this.wLayerName.set("disabled", !enable);
+            this.wSourceLayer.set("disabled", !enable);
         },
 
         postCreate: function () {
@@ -62,7 +62,7 @@ define([
             }
 
             this._layersVision(false);
-            this.wLayerName.watch("options", function (attr, oldval, newval) {
+            this.wSourceLayer.watch("options", function (attr, oldval, newval) {
                 var showLayers = newval.length > 1;
                 this._layersVision(showLayers);
             }.bind(this));
@@ -82,7 +82,7 @@ define([
                     layers.forEach(function (layer) {
                         options.push({label: layer, value: layer});
                     });
-                    this.wLayerName.set("options", options);
+                    this.wSourceLayer.set("options", options);
 
                     if (layers.length === 0) {
                         this.wSourceFile.uploadReset();
@@ -91,10 +91,10 @@ define([
                             message: i18n.gettext("Dataset doesn't contain layers.")
                         }).show();
                     } else {
-                        this.wLayerName.set("value", layers[0]);
+                        this.wSourceLayer.set("value", layers[0]);
                     }
                 }.bind(this), function (error) {
-                    this.wLayerName.set("options", []);
+                    this.wSourceLayer.set("options", []);
                     ErrorDialog.xhrError(error);
                     this.wSourceFile.uploadReset();
                 }.bind(this));
@@ -120,8 +120,8 @@ define([
             if (this.modeSwitcher.get("value") === 'file') {
                 setObject("source", this.wSourceFile.get("value"));
                 setObject("encoding", this.wEncoding.get("value"));
-                if (this.wLayerName.get("options").length > 1) {
-                    setObject("layer_name", this.wLayerName.get("value"));
+                if (this.wSourceLayer.get("options").length > 1) {
+                    setObject("source_layer", this.wSourceLayer.get("value"));
                 }
 
                 setObject("fix_errors", this.wFixErrors.get("value"));
