@@ -1030,7 +1030,7 @@ class _source_attr(SP):
 
     def _ogrlayer(self, ogrds, layer_name=None):
         if layer_name is not None:
-            ogrlayer = ogrds.GetLayerByName(layer_name)
+            ogrlayer = ogrds.GetLayerByName(six.ensure_str(layer_name))
         else:
             if ogrds.GetLayerCount() < 1:
                 raise VE(_("Dataset doesn't contain layers."))
