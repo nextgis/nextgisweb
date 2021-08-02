@@ -45,7 +45,9 @@ define([
         },
 
         onBlurInput: function () {
-            domClass.remove(this.domNode, "active");
+            setTimeout(lang.hitch(this, function () {
+                domClass.remove(this.domNode, "active")
+            }), 100);
         },
 
         onChangeSearchInput: function () {
