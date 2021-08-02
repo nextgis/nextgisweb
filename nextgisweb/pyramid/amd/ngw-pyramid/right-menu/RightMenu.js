@@ -22,15 +22,15 @@ define([
     array,
     on,
     update,
-    api,
+    api
 ) {
     return declare([DynamicPanel], {
         items: [],
+
         constructor: function (options) {
             declare.safeMixin(this, options);
 
             var widget = this;
-
             this.contentWidget = new (declare([_WidgetBase], {
                 buildRendering: function () {
                     if (widget.items.length) {
@@ -47,35 +47,35 @@ define([
                                         innerHTML: item.text,
                                         href: item.link,
                                     },
-                                    this.domNode,
+                                    this.domNode
                                 );
                             },
-                            this,
+                            this
                         );
                     }
                 },
             }))();
         },
+
         postCreate: function () {
             this.inherited(arguments);
 
             var widget = this;
-
             on(document.getElementById('rightMenuIcon'), 'click', function () {
                 widget.show();
             });
 
             // subscribe to update checker
-            update.registerCallback((data) => {
+            update.registerCallback(function (data) {
                 if (ngwConfig.isAdministrator) {
                     const distStatus =
                         data.distribution && data.distribution.status;
                     const rightMenuNotifyEl = document.querySelector(
-                        '.rightMenu-notify',
+                        '.rightMenu-notify'
                     );
                     const sysInfoURL = api.routeURL(
-                        'pyramid.control_panel.sysinfo',
-                    );
+                        'pyramid.control_panel.sysinfo'
+                    );                    
 
                     if (
                         distStatus === 'has_update' ||
@@ -92,23 +92,23 @@ define([
                         const sidebarItem = domConstruct.create(
                             'a',
                             {
-                                class: `list__item list__item--link list__item--${itemColor}`,
+                                class: 'list__item list__item--link list__item--' + itemColor,
                                 innerHTML:
-                                    `<div>${sidebarItemText}<br/> <span class="text-muted small-text">` +
+                                    '<div>' + sidebarItemText + '<br/> <span class="text-muted small-text">' +
                                     i18n.gettext("Click to see what's new") +
                                     '</span></div>',
-                                href: sysInfoURL,
+                                href: sysInfoURL
                             },
-                            this.domNode,
+                            widget.domNode
                         );
-                        this.contentWidget.domNode.prepend(sidebarItem);
+                        widget.contentWidget.domNode.prepend(sidebarItem);
                         if (distStatus === 'has_urgent_update') {
                             rightMenuNotifyEl.classList.add(
-                                'rightMenu-notify--danger',
+                                'rightMenu-notify--danger'
                             );
                         } else {
                             rightMenuNotifyEl.classList.remove(
-                                'rightMenu-notify--danger',
+                                'rightMenu-notify--danger'
                             );
                         }
                         rightMenuNotifyEl.style.display = 'block';

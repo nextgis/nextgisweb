@@ -1,7 +1,7 @@
 define([
-    'dojo/_base/declare',
+    "dojo/_base/declare",
     "dojo/dom-construct",
-    'ngw-webmap/MapToolbarItems',
+    "ngw-webmap/MapToolbarItems",
     "openlayers/ol",
     "xstyle/css!./template/resources/MapToolbar.css"
 ], function (
