@@ -50,6 +50,13 @@ define([
             this.wSourceLayer.set("disabled", !enable);
         },
 
+        _resetSouce: function () {
+            this.wSourceFile.uploadReset();
+            this.wSourceLayer.set("options", []);
+            this.wSourceLayer.value = "";
+            this.wSourceLayer._setDisplay("");
+        },
+
         postCreate: function () {
             if (settings.show_create_mode) {
                 this.modeSwitcher.watch('value', function(attr, oldval, newval) {
@@ -78,25 +85,23 @@ define([
                 }).then(function (data) {
                     var layers = data.layers;
 
-                    var options = [];
-                    layers.forEach(function (layer) {
-                        options.push({label: layer, value: layer});
-                    });
-                    this.wSourceLayer.set("options", options);
-
                     if (layers.length === 0) {
-                        this.wSourceFile.uploadReset();
+                        this._resetSouce();
                         new ErrorDialog({
                             title: i18n.gettext("Validation error"),
                             message: i18n.gettext("Dataset doesn't contain layers.")
                         }).show();
                     } else {
+                        var options = [];
+                        layers.forEach(function (layer) {
+                            options.push({label: layer, value: layer});
+                        });
+                        this.wSourceLayer.set("options", options);
                         this.wSourceLayer.set("value", layers[0]);
                     }
                 }.bind(this), function (error) {
-                    this.wSourceLayer.set("options", []);
+                    this._resetSouce();
                     ErrorDialog.xhrError(error);
-                    this.wSourceFile.uploadReset();
                 }.bind(this));
             }.bind(this));
 
