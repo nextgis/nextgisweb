@@ -2,10 +2,8 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import re
-from datetime import datetime
 from lxml import etree
 
-from dateutil.parser import isoparse
 from owslib.crs import Crs
 import requests
 from osgeo import ogr, osr
@@ -15,6 +13,7 @@ from six import BytesIO, ensure_str
 from zope.interface import implementer
 
 from .. import db
+from ..compat import date_fromisoformat, time_fromisoformat, datetime_fromisoformat
 from ..core.exception import ValidationError, OperationalError
 from ..env import env
 from ..feature_layer import (
@@ -284,11 +283,11 @@ class WFSConnection(Base, Resource):
                         else:
                             value = _property.text
                     elif datatype == FIELD_TYPE.DATE:
-                        value = isoparse(_property.text)
+                        value = date_fromisoformat(_property.text)
                     elif datatype == FIELD_TYPE.TIME:
-                        value = datetime.strptime(_property.text, r'%H:%M:%S')
+                        value = time_fromisoformat(_property.text)
                     elif datatype == FIELD_TYPE.DATETIME:
-                        value = isoparse(_property.text)
+                        value = datetime_fromisoformat(_property.text)
                     else:
                         raise ValidationError("Unknown data type: %s" % datatype)
                     fields[key] = value

@@ -17,10 +17,9 @@ from zipfile import ZipFile, is_zipfile
 import transaction
 from zope.sqlalchemy import mark_changed
 import unicodecsv as csv
-from dateutil.parser import isoparse
 
 from .. import geojson
-from ..compat import Path
+from ..compat import Path, datetime_fromisoformat
 from ..command import Command
 from ..models import DBSession
 from ..lib.migration import (
@@ -414,7 +413,7 @@ class MigrationCreateCommand(Command):
         else:
             parents = args.parents
 
-        date = isoparse(args.date) if args.date is not None else datetime.now()
+        date = datetime_fromisoformat(args.date) if args.date is not None else datetime.now()
         revision = revid(date)
         mcls = {'python': PythonModuleMigration, 'sql': SQLScriptMigration}[args.format]
 
