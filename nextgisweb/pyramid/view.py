@@ -175,6 +175,13 @@ def home_path(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def export_vision(request):
+    request.require_administrator()
+    return dict(
+        title=_("\"Save as\" button vision"),
+        dynmenu=request.env.pyramid.control_panel)
+
+
 def test_request(request):
     comp = request.env.pyramid
     handler = comp.test_request_handler
@@ -445,6 +452,11 @@ def setup_pyramid(comp, config):
         '/control-panel/home_path'
     ).add_view(home_path, renderer=ctpl('home_path'))
 
+    config.add_route(
+        'pyramid.control_panel.export_vision',
+        '/control-panel/export_vision'
+    ).add_view(export_vision, renderer=ctpl('export_vision'))
+
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
     comp.test_request_handler = None
@@ -477,6 +489,8 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.logo'))),
         dm.Link('settings/home_path', _("Home path"), lambda args: (
             args.request.route_url('pyramid.control_panel.home_path'))),
+        dm.Link('settings/export_vision', _("\"Save as\" button vision"), lambda args: (
+            args.request.route_url('pyramid.control_panel.export_vision'))),
     )
 
     if env.core.options['storage.enabled']:

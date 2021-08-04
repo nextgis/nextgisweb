@@ -198,6 +198,29 @@ def home_path_put(request):
             raise HTTPBadRequest("Invalid key '%s'" % k)
 
 
+def export_vision_get(request):
+    request.require_administrator()
+    try:
+        export_vision = env.core.settings_get('pyramid', 'export_vision')
+    except KeyError:
+        export_vision = 'data_read'
+    return dict(export_vision=export_vision)
+
+
+def export_vision_put(request):
+    request.require_administrator()
+
+    body = request.json_body
+    for k, v in body.items():
+        if k == 'export_vision':
+            if v in ('data_read', 'data_write', 'admin'):
+                env.core.settings_set('pyramid', 'export_vision', v)
+            else:
+                raise HTTPBadRequest("Invalid value '%s'" % v)
+        else:
+            raise HTTPBadRequest("Invalid key '%s'" % k)
+
+
 def settings(request):
     comp = request.env._components[request.GET['component']]
     return comp.client_settings(request)
@@ -488,3 +511,8 @@ def setup_pyramid(comp, config):
                      '/api/component/pyramid/home_path') \
         .add_view(home_path_get, request_method='GET', renderer='json') \
         .add_view(home_path_put, request_method='PUT', renderer='json')
+
+    config.add_route('pyramid.export_vision',
+                     '/api/component/pyramid/export_vision') \
+        .add_view(export_vision_get, request_method='GET', renderer='json') \
+        .add_view(export_vision_put, request_method='PUT', renderer='json')

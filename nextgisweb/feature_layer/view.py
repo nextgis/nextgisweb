@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import json
 from collections import OrderedDict
 
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import Response
 
 from .. import geojson
@@ -131,7 +132,8 @@ def test_mvt(request):
 
 @viewargs(renderer='nextgisweb:feature_layer/template/export.mako')
 def export(request):
-    request.resource_permission(PD_READ)
+    if not request.has_export_permission():
+        raise HTTPNotFound()
     return dict(obj=request.context, subtitle=_("Save as"), maxheight=True)
 
 
@@ -192,6 +194,7 @@ def setup_pyramid(comp, config):
                             id=args.obj.id),
                         'material:table', True)
 
+                if args.request.has_export_permission():
                     yield dm.Link(
                         'feature_layer/export', _("Save as"),
                         lambda args: args.request.route_url(

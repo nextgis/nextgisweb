@@ -20,7 +20,7 @@ from ..core.exception import InsufficientPermissions
 from .exception import ResourceNotFound
 from .model import Resource
 from .permission import Permission, Scope
-from .scope import ResourceScope
+from .scope import DataScope, ResourceScope
 from .serialize import CompositeSerializer
 from .widget import CompositeWidget
 from .util import _
@@ -208,6 +208,33 @@ def setup_pyramid(comp, config):
                     scope=permission.scope.identity))
 
     config.add_request_method(resource_permission, 'resource_permission')
+
+    def has_export_permission(request):
+
+        user_id = request.authenticated_userid
+        if user_id is None:
+            return False
+
+        user = request.user
+
+        try:
+            export_vision = request.env.core.settings_get('pyramid', 'export_vision')
+        except KeyError:
+            export_vision = 'data_read'
+
+        if export_vision == 'admin':
+            return user.is_administrator
+
+        if export_vision == 'data_write':
+            permission = DataScope.write
+        else:
+            permission = DataScope.read
+
+        resource = request.context
+
+        return resource.has_permission(permission, user)
+
+    config.add_request_method(has_export_permission, 'has_export_permission')
 
     def _route(route_name, route_path, **kwargs):
         return config.add_route(
