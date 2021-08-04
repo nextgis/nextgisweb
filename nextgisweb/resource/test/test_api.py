@@ -30,7 +30,7 @@ def test_disable_resources(
 def resource(ngw_resource_group):
     with transaction.manager:
         obj = ResourceGroup(
-            parent_id=ngw_resource_group, display_name='Test Symbols ~%',
+            parent_id=ngw_resource_group, display_name='Test Юникод Symbols ~%',
             keyname='Test-Keyname',
             owner_user=User.by_keyname('administrator'),
         ).persist()
@@ -48,14 +48,14 @@ def test_resource_search(resource, ngw_webtest_app, ngw_auth_administrator):
     api_url = '/api/resource/search/'
 
     resp = ngw_webtest_app.get(api_url, dict(
-        display_name='Test Symbols ~%'), status=200)
+        display_name='Test Юникод Symbols ~%'), status=200)
     assert len(resp.json) == 1
 
     resp = ngw_webtest_app.get(api_url, dict(
-        display_name='Test Symbols ~%', keyname='other'), status=200)
+        display_name='Test Юникод Symbols ~%', keyname='other'), status=200)
     assert len(resp.json) == 0
 
     resp = ngw_webtest_app.get(api_url, dict(
-        keyname__ilike='test-key%'), status=200)
+        display_name__ilike='test юни%'), status=200)
     assert len(resp.json) == 1
     assert resp.json[0]['resource']['display_name'] == resource.display_name
