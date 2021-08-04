@@ -8,6 +8,6 @@ export default async () => {
         console.log(`Iteration = ${i}`);
     });
 
-    const modMixed = await entrypoint("@nextgisweb/pyramid/example/aux/mixed");
+    const modMixed = await entrypoint("@nextgisweb/pyramid/example/auxiliary/mixed");
     return `${modMixed.default()}, ${modMixed.foo()}, ${modMixed.bar()}`;
 };
