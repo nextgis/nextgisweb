@@ -5,6 +5,8 @@ from collections import OrderedDict
 import zope.event
 
 from pyramid.response import Response
+from sqlalchemy.sql.operators import ilike_op
+from sqlalchemy.sql.expression import collate
 
 from .. import db
 from .. import geojson
@@ -327,7 +329,8 @@ def search(request):
         if op == 'eq':
             filter_.append(attr == v)
         elif op == 'ilike':
-            filter_.append(db.sql.operators.ilike_op(attr, v))
+            expr = collate(attr, 'C.UTF-8')
+            filter_.append(ilike_op(expr, v))
         else:
             raise ValidationError("Operator '%s' is not supported" % op)
 
