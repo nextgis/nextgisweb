@@ -52,7 +52,8 @@ define([
 
         onChangeSearchInput: function () {
             var value = this.tbSearch.get("value").trim();
-            if (!value) {
+
+            if (!value || value.length < 3) {
                 html.set(this.result, "");
                 return false;
             }
