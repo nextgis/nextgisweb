@@ -101,6 +101,8 @@ define([
             resultHtml = TEMPLATE_RESULT_DTL.render(templateContext);
             html.set(this.result, resultHtml);
 
+            this.result.scrollTop = 0;
+
             domClass.remove(this.domNode, "loading");
         },
 
