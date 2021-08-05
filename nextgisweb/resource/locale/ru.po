@@ -2,29 +2,29 @@
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
-#: api.py:68
+#: api.py:70
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:115
+#: api.py:118
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:118
+#: api.py:121
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:121
+#: api.py:124
 #, python-format
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: api.py:127
+#: api.py:130
 #, python-format
 msgid "Resource class '%s' disabled."
 msgstr "Класс ресурса '%s' отключен."
 
-#: api.py:209
+#: api.py:212
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
@@ -188,7 +188,7 @@ msgstr "Недостаточно прав, атрибут '%s'."
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:122
+#: view.py:123
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
@@ -196,7 +196,7 @@ msgstr "Дерево ресурсов"
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:136
+#: view.py:137
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
@@ -204,20 +204,20 @@ msgstr "Обновить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:202
+#: view.py:203
 #, python-format
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:260
+#: view.py:261
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: amd/ngw-resource/DescriptionWidget.js:19 view.py:267
+#: amd/ngw-resource/DescriptionWidget.js:19 view.py:268
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:274
+#: view.py:275
 msgid "User permissions"
 msgstr "Права пользователя"
 
@@ -323,9 +323,13 @@ msgstr "Изменить"
 msgid "Select resource"
 msgstr "Выберите ресурс"
 
-#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.hbs:4
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.hbs:5
 msgid "Search"
 msgstr "Поиск"
+
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:19
+msgid "Resources not found"
+msgstr "Ресурсы не найдены"
 
 #: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:25
 msgid "Search resources"

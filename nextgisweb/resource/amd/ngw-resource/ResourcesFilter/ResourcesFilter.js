@@ -16,7 +16,7 @@ define([
     var TEMPLATE_RESULT_DTL = new dtl.Template(templateResult),
         SVG_URL = ngwConfig.assetUrl + "/svg/svg-symbols.svg",
         translateDtl = {
-            notFound: i18n.gettext("Resource not found")
+            notFound: i18n.gettext("Resources not found")
         },
         resourceSearchRoute = api.routeURL('resource.search');
 
