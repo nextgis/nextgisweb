@@ -1,6 +1,7 @@
 <%inherit file='nextgisweb:templates/obj.mako' />
 
 <% import json %>
+<% from nextgisweb.resource import DataScope %>
 
 <script type="text/javascript">
     require([
@@ -10,7 +11,11 @@
         "dijit/form/TextBox",
         "dojo/domReady!"
     ], function (dom, FeatureGrid, Button, TextBox) {
-        var grid = new FeatureGrid({layerId: ${obj.id}, style: "width: 100%; height: 100%; padding: 0"});
+        var grid = new FeatureGrid({
+            layerId: ${obj.id},
+            readonly: ${json.dumps(not obj.has_permission(DataScope.write, request.user)) | n},
+            style: "width: 100%; height: 100%; padding: 0"
+        });
         grid.placeAt(dom.byId("grid"));
         grid.startup();
     });

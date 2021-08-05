@@ -111,13 +111,17 @@ define([
 
             this.watch("selectedRow", lang.hitch(this, function (attr, oldVal, newVal) {
                 this.btnOpenFeature.set("disabled", newVal === null);
-                this.btnUpdateFeature.set("disabled", newVal === null);
-                this.btnDeleteFeature.set("disabled", newVal === null);
+                if (!this.readonly) {
+                    this.btnUpdateFeature.set("disabled", newVal === null);
+                    this.btnDeleteFeature.set("disabled", newVal === null);
+                }
             }));
 
             this.btnOpenFeature.on("click", lang.hitch(this, this.openFeature));
-            this.btnUpdateFeature.on("click", lang.hitch(this, this.updateFeature));
-            this.btnDeleteFeature.on("click", lang.hitch(this, this.deleteFeature));
+            if (!this.readonly) {
+                this.btnUpdateFeature.on("click", lang.hitch(this, this.updateFeature));
+                this.btnDeleteFeature.on("click", lang.hitch(this, this.deleteFeature));
+            }
 
             if (this.likeSearch) {
                 // Search is needed, set search string processors

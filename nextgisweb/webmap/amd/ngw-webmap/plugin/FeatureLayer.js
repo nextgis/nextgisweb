@@ -194,6 +194,7 @@ define([
             return new Pane({
                 title: item.label,
                 layerId: layerId,
+                readonly: data.readonly,
                 likeSearch: data.likeSearch,
                 plugin: this,
                 onClose: lang.hitch(this, function () {

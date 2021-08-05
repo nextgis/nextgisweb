@@ -48,6 +48,7 @@ def feature_browse(request):
 @viewargs(renderer='nextgisweb:feature_layer/template/feature_show.mako')
 def feature_show(request):
     request.resource_permission(PD_READ)
+    request.resource_permission(PDS_R)
 
     feature_id = int(request.matchdict['feature_id'])
 
@@ -185,12 +186,13 @@ def setup_pyramid(comp, config):
                 yield dm.Label('feature_layer', _("Features"))
 
                 if args.obj.has_permission(PD_READ, args.request.user):
-                    yield dm.Link(
-                        'feature_layer/feature-browse', _("Table"),
-                        lambda args: args.request.route_url(
-                            "feature_layer.feature.browse",
-                            id=args.obj.id),
-                        'material:table', True)
+                    if args.obj.has_permission(PDS_R, args.request.user):
+                        yield dm.Link(
+                            'feature_layer/feature-browse', _("Table"),
+                            lambda args: args.request.route_url(
+                                "feature_layer.feature.browse",
+                                id=args.obj.id),
+                            'material:table', True)
 
                     yield dm.Link(
                         'feature_layer/export', _("Save as"),
