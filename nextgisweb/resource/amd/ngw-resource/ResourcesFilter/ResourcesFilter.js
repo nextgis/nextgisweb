@@ -50,8 +50,14 @@ define([
             }), 100);
         },
 
+        _lastSearchValue: null,
         onChangeSearchInput: function () {
             var value = this.tbSearch.get("value").trim();
+            if (this._lastSearchValue === value) {
+                return false;
+            }
+
+            this._lastSearchValue = value;
 
             if (!value || value.length < 3) {
                 html.set(this.result, "");
