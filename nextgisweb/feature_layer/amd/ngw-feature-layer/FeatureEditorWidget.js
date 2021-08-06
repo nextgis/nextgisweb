@@ -17,6 +17,7 @@ define([
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
     "ngw/route",
+    "ngw-pyramid/ErrorDialog/ErrorDialog",
     "ngw-pyramid/form/RTETextBox",
     "@nextgisweb/pyramid/i18n!",   
     "./loader!",
@@ -40,6 +41,7 @@ define([
     TabContainer,
     TableContainer,
     route,
+    ErrorDialog,
     RTETextBox,
     i18n,
     loader
@@ -234,6 +236,12 @@ define([
             this._tabContainer = new TabContainer({region: "center"});
             this._tabContainer.placeAt(this);
 
+            this._lockContainer = new ContentPane({
+                region: "center",
+                style: "display: none; border: 1px solid silver; background-color: #fff",
+                content: i18n.gettext("Please wait. Processing request...")
+            }).placeAt(this);
+
             this._fwidget = new FieldsWidget({fields: this.fields}).placeAt(this._tabContainer);
 
             this._ext = {};
@@ -254,12 +262,24 @@ define([
             this._btnPane.placeAt(this);
             domClass.add(this._btnPane.domNode, "ngwButtonStrip");
 
-            var btn = new Button({
+            this.btn = new Button({
                 label: i18n.gettext("Save"),
                 onClick: lang.hitch(this, this.save)
             }).placeAt(this._btnPane);
 
-            domClass.add(btn.domNode, "dijitButton--primary");
+            domClass.add(this.btn.domNode, "dijitButton--primary");
+        },
+
+        lock: function () {
+            this._tabContainer.domNode.style.display = "none";
+            this._lockContainer.domNode.style.display = "block";
+            this.btn.set("disabled", true);
+        },
+
+        unlock: function () {
+            this._lockContainer.domNode.style.display = "none";
+            this._tabContainer.domNode.style.display = "block";
+            this.btn.set("disabled", false);
         },
 
         iurl: function () {
@@ -287,14 +307,15 @@ define([
         },
 
         save: function () {
-            var widget = this;
+            this.lock();
+
             var data = {
                 fields: this._fwidget.get("value"),
                 extensions: {}
             };
 
             for (var k in loader) {
-                data.extensions[k] = widget._ext[k].get("value");
+                data.extensions[k] = this._ext[k].get("value");
             }
 
             xhr(this.iurl(), {
@@ -304,9 +325,9 @@ define([
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then(function () {
-                widget.load();
-            });
+            }).then(
+                this.load.bind(this), ErrorDialog.xhrError
+            ).finally(this.unlock.bind(this));
         }
     });
 });
