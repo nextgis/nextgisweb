@@ -1,7 +1,7 @@
 define([
     "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",
     "dojo/on", "dojo/dom-class", "dojo/html", "dojo/query",
-    "dojo/debounce", "dojo/request/xhr", "dojo/DeferredList",
+    "dojo/debounce", "dojo/request/xhr", "dojo/DeferredList", "dojo/mouse",
     "dojox/dtl", "dojox/dtl/Context", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin",
     "@nextgisweb/pyramid/api", '@nextgisweb/pyramid/i18n!resource',
     "dojo/text!./ResourcesFilter.hbs", "dojo/text!./ResourcesFilterResult.dtl.hbs",
@@ -10,7 +10,7 @@ define([
     "dijit/form/TextBox"
 ], function (
     declare, lang, array, Deferred, on, domClass, html, query, debounce, xhr,
-    DeferredList, dtl, dtlContext, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
+    DeferredList, mouse, dtl, dtlContext, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
     api, i18n, template, templateResult
 ) {
     var TEMPLATE_RESULT_DTL = new dtl.Template(templateResult),
@@ -25,9 +25,8 @@ define([
         title: i18n.gettext("Search resources"),
 
         postCreate: function () {
-            var input = query('input', this.tbSearch.domNode)[0];
-            on(input, "focus", lang.hitch(this, this.onFocusInput));
-            on(input, "blur", lang.hitch(this, this.onBlurInput));
+            on(this.elWrapper, mouse.enter, lang.hitch(this, this.onFilterMouseEnter));
+            on(this.elWrapper, mouse.leave, lang.hitch(this, this.onFilterMouseLeave));
 
             on(this.tbSearch, "keyUp", debounce(lang.hitch(this, this.onChangeSearchInput), 1000));
         },
@@ -40,14 +39,12 @@ define([
             return deferred;
         },
 
-        onFocusInput: function () {
+        onFilterMouseEnter: function () {
             domClass.add(this.domNode, "active");
         },
 
-        onBlurInput: function () {
-            setTimeout(lang.hitch(this, function () {
-                domClass.remove(this.domNode, "active")
-            }), 100);
+        onFilterMouseLeave: function () {
+            domClass.remove(this.domNode, "active");
         },
 
         _lastSearchValue: null,
