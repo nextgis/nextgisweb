@@ -10,7 +10,6 @@ define([
     "dijit/tree/TreeStoreModel",
     "dijit/Tree",
     "dijit/tree/dndSource",
-    "dijit/registry",
     "@nextgisweb/pyramid/i18n!",
     "ngw-resource/serialize",
     // resource
@@ -46,11 +45,12 @@ define([
     TreeStoreModel,
     Tree,
     dndSource,
-    registry,
     i18n,
     serialize,
     template
 ) {
+    var keyname_pattern = '^[A-Za-z][\\w]*$';
+
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: i18n.gettext("WFS service"),
         templateString: i18n.renderTemplate(template),
@@ -64,8 +64,6 @@ define([
                 store: this.itemStore,
                 query: {}
             });
-
-            var widget = this;
 
             this.widgetTree = new Tree({
                 model: this.itemModel,
@@ -86,8 +84,24 @@ define([
             this.widgetTreeRootNodeId = this.widgetTree.rootNode.getIdentity();
         },
 
+        _layerKeyname: function (item) {
+            var re = new RegExp(keyname_pattern);
+            var value = item.keyname || item.display_name;
+            if (re.test(value)) {
+                return value;
+            }
+            value = value.replace(/[^\w]/g, '_');
+            value = value.replace(/^_+|_+$/g, '');
+            if (re.test(value)) {
+                return value;
+            }
+            return 'layer_' + item.id;
+        },
+
         postCreate: function () {
             this.inherited(arguments);
+
+            this.widgetItemKeyname.pattern = keyname_pattern;
 
             // It is impossible to create a tree without a model, so creating it manually
             this.widgetTree.placeAt(this.containerTree).startup();
@@ -98,7 +112,7 @@ define([
             this.btnAddLayer.on("click", lang.hitch(this, function () {
                 this.layerPicker.pick().then(lang.hitch(this, function (itm) {
                     this.itemStore.newItem({
-                            "keyname": null,
+                            "keyname": this._layerKeyname(itm),
                             "display_name": itm.display_name,
                             "maxfeatures": 1000,
                             "resource_id": itm.id
@@ -172,10 +186,6 @@ define([
             this.widgetItemMaxFeatures.watch("value", function (attr, oldValue, newValue) {
                 widget.setItemValue("maxfeatures", parseInt(newValue));
             });
-        },
-
-        startup: function () {
-            this.inherited(arguments);
         },
 
         // set current element attribute value
