@@ -22,6 +22,13 @@ from nextgisweb.wfsserver.model import Layer as WFS_Service_Layer, Service as WF
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', )
 
 
+@pytest.fixture(scope='module', autouse=True)
+def skip(ngw_env):
+    if not ngw_env.options.get('component.wfsclient'):
+        pytest.skip("wmsclient is not available")
+    yield
+
+
 def type_geojson_dataset(filename):
     import nextgisweb.vector_layer.test
     path = Path(nextgisweb.vector_layer.test.__file__).parent / 'data' / filename
