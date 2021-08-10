@@ -20,7 +20,7 @@ def test_layer(ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
             parent=dict(id=ngw_resource_group),
         ),
         tmsclient_connection=dict(
-            url_template='https://tile.openstreetmap.fr/{layer}/{z}/{x}/{y}.png',
+            url_template='https://tile-c.openstreetmap.fr/{layer}/{z}/{x}/{y}.png',
             scheme='xyz',
         ),
     )

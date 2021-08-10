@@ -57,7 +57,10 @@ def test_wkt_wkb(wkt, ngw_txn):
 ))
 def test_valid(src, is_valid):
     if 'wkb' in src:
-        src['wkb'] = src['wkb'].decode('hex')
+        if six.PY3:
+            src['wkb'] = bytes.fromhex(src['wkb'])
+        else:
+            src['wkb'] = src['wkb'].decode('hex')
     if not is_valid:
         with pytest.raises(GeometryNotValid):
             Geometry(validate=True, **src)
