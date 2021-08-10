@@ -369,7 +369,7 @@ def cmd_stat(args):
             by_locale = {r.locale: r for r in group_stat_records(
                 detail, ('locale', ))}
 
-            for _, locale_record in by_locale.iteritems():
+            for _, locale_record in by_locale.items():
                 cols.append("{:{}}".format(locale_record.count, len_count))
                 break
             
