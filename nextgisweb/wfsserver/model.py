@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
 
-import re
-
 from .. import db
 from ..core.exception import ValidationError
 from ..models import declarative_base
@@ -13,11 +11,9 @@ from ..resource import (
     SerializedProperty as SP,
     ResourceGroup)
 
-from .util import _
+from .util import _, tag_pattern
 
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
-
-keyname_pattern = re.compile(r'^[A-Za-z][\w]*$')
 
 
 class Service(Base, Resource):
@@ -70,7 +66,7 @@ class _layers_attr(SP):
         m = dict((layer.resource_id, layer) for layer in srlzr.obj.layers)
         keep = set()
         for lv in value:
-            if not keyname_pattern.match(lv['keyname']):
+            if not tag_pattern.match(lv['keyname']):
                 raise ValidationError("Invalid keyname: %s" % lv['keyname'])
             if lv['resource_id'] in m:
                 lo = m[lv['resource_id']]
