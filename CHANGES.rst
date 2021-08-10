@@ -4,6 +4,7 @@ Changes
 3.9.0
 -----
 
+- Add a resource search panel.
 - Simple tool for previewing resources on the map.
 - Disable/enable address search via settings in the control panel.
 - Ability to constraint address search area by web map initial extent.
