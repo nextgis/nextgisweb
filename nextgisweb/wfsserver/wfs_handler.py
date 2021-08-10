@@ -764,7 +764,7 @@ class WFSHandler():
                 count += 1
 
             if None in (minX, minY, maxX, maxY):
-                El('null', parent=__boundedBy, namespace=gml['ns'], text='unknown')
+                El('Null' if self.gml_format == 'GML32' else 'null', parent=__boundedBy, namespace=gml['ns'], text='unknown')
             elif self.p_version >= v110:
                 _envelope = El('Envelope', dict(srsName='urn:ogc:def:crs:EPSG::%d' % srs_out.id), parent=__boundedBy, namespace=gml['ns'])
                 El('lowerCorner', parent=_envelope, namespace=gml['ns'], text='%f %f' % (minX, minY))
