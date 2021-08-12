@@ -19,9 +19,7 @@ System requirements
     distributions. So if you any installation-related issue, please try to
     reproduce a problem on Ubuntu Linux 20.04 before you report them.
 
-- Python 2.7 or Python >= 3.6. NextGIS Web is in transition from Python 2 to
-  Python 3 now, but Python 2.7 installation is more stable. So examples bellow
-  use Python 2.7.
+- Python >= 3.6.
 
 - Node.js 14.x or higher and Yarn 1.x package manager. We recommend using
   NodeSource and Yarn package repositories.
@@ -75,7 +73,7 @@ First you need to install required packages:
   # curl --silent https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
   # add-apt-repository --yes --no-update "deb https://dl.yarnpkg.com/debian/ stable main"
   # apt update
-  # apt install python2 python2-dev python3-virtualenv
+  # apt install python3 python3-dev python3-virtualenv
   # apt install build-essential libssl-dev libgdal-dev libgeos-dev \
     gdal-bin libxml2-dev libxslt1-dev zlib1g-dev libjpeg-turbo8-dev \
     postgresql-client libmagic-dev nodejs yarn
@@ -102,7 +100,7 @@ Now create a virtualenv directory and activate virtualenv:
 
 .. code-block:: none
 
-  $ virtualenv -p /usr/bin/python2 env
+  $ virtualenv -p /usr/bin/python3 env
   $ . env/bin/activate
 
 Create a ``package`` directory and clone NextGIS Web repository here:
