@@ -197,7 +197,7 @@ class AuthComponent(Component):
                doc="Name of route for logout page."),
 
         Option('activity_delta', timedelta, default=timedelta(minutes=10),
-               doc="User last activity update time delta in seconds."),
+               doc="User last activity update time delta."),
 
         Option('user_limit', int, default=None, doc="Limit of enabled users"),
 
