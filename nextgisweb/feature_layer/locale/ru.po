@@ -1,22 +1,27 @@
-#: api.py:103
+#: api.py:104
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:108
+#: api.py:109
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:284 api.py:344
+#: api.py:285 api.py:357
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
 
-#: api.py:286
+#: api.py:287
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:544
+#: api.py:293 api.py:362
+#, python-format
+msgid "Date format '%s' is not supported."
+msgstr "Формат даты '%s' не поддерживается."
+
+#: api.py:583
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -42,59 +47,63 @@ msgstr "Поле не найдено (ID=%d)."
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: view.py:61 view.py:84
+#: view.py:62 view.py:85
 #, python-format
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:135 view.py:196
+#: view.py:136 view.py:198
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:185
+#: view.py:186
 msgid "Features"
 msgstr "Объекты"
 
-#: template/section_fields.mako:21 view.py:189
+#: template/section_fields.mako:21 view.py:191
 msgid "Table"
 msgstr "Таблица"
 
-#: view.py:206
+#: view.py:208
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:192
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:194
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: amd/ngw-feature-layer/FieldsWidget.js:122 view.py:211
+#: amd/ngw-feature-layer/FieldsWidget.js:122 view.py:213
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:78
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:80
 msgid "Attribute: "
 msgstr "Поле: "
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:123
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:125
 msgid "Set NULL"
 msgstr "Установить NULL"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:124
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:126
 msgid "Set field value to NULL (No data)"
 msgstr "Установить для атрибута значение NULL (Нет данных)"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:135
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:137
 msgid "NULL"
 msgstr "NULL"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:258
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:242
+msgid "Please wait. Processing request..."
+msgstr "Пожалуйста подождите, идет обработка запроса..."
+
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:266
 #: amd/ngw-feature-layer/template/ExportForm.hbs:42
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-feature-layer/FeatureGrid.js:236
+#: amd/ngw-feature-layer/FeatureGrid.js:240
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: amd/ngw-feature-layer/FeatureGrid.js:237
+#: amd/ngw-feature-layer/FeatureGrid.js:241
 msgid "Delete feature?"
 msgstr "Удалить объект?"
 
@@ -154,19 +163,19 @@ msgstr "Поле FID"
 msgid "Zip archive"
 msgstr "Zip архив"
 
-#: amd/ngw-feature-layer/template/FeatureGrid.hbs:12
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:13
 msgid "Open"
 msgstr "Открыть"
 
-#: amd/ngw-feature-layer/template/FeatureGrid.hbs:16
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:18
 msgid "Edit"
 msgstr "Редактировать"
 
-#: amd/ngw-feature-layer/template/FeatureGrid.hbs:20
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:23
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-feature-layer/template/FeatureGrid.hbs:25
+#: amd/ngw-feature-layer/template/FeatureGrid.hbs:28
 msgid "Search..."
 msgstr "Поиск..."
 

@@ -1,11 +1,21 @@
 Changes
 =======
 
+4.0.0
+-----
+
+- Source layer selection while creating vector layers from multi-layer sources, 
+  such as ZIP-archives with ESRI Shape-files.
+- Automatic generation of keynames for WMS and WFS services.
+- ISO-8601 date and time formatting in feature layer REST API via
+  ``dt_format=iso`` option.
+
+
 3.9.0
 -----
 
-- Add a resource search panel.
 - Simple tool for previewing resources on the map.
+- Resource quick search tool in the page header.
 - Disable/enable address search via settings in the control panel.
 - Ability to constraint address search area by web map initial extent.
 - Zoom to a better extent from address search and bookmark panel.
