@@ -2,7 +2,7 @@
 from __future__ import division, unicode_literals, print_function, absolute_import
 from datetime import datetime, timedelta
 from uuid import uuid4
-from threading import Thread
+from threading import Lock, Thread
 import logging
 from time import time
 import os.path
@@ -88,7 +88,7 @@ def get_tile_db(db_path):
 
         connection.commit()
 
-    return connection
+    return connection, Lock()
 
 
 class TileWriterQueueException(Exception):
@@ -167,7 +167,7 @@ class TilestorWriter:
 
                 with transaction.manager:
                     conn = DBSession.connection()
-                    tilestor = get_tile_db(db_path)
+                    tilestor, lock = get_tile_db(db_path)
 
                     while data is not None and data['db_path'] == db_path:
                         z, x, y = data['tile']
@@ -188,9 +188,10 @@ class TilestorWriter:
                             img.save(buf, format='PNG', compress_level=3)
                             value = buf.getvalue()
 
-                            self._write_tile_data(
-                                tilestor, z, x, y,
-                                tstamp, value)
+                            with lock:
+                                self._write_tile_data(
+                                    tilestor, z, x, y,
+                                    tstamp, value)
 
                         if 'answer_queue' in data:
                             answers.append(data['answer_queue'])
@@ -351,12 +352,11 @@ class ResourceTileCache(Base):
             self.init_metadata()
         return self._tiletab
 
-    @property
-    def tilestor(self):
+    def get_tilestor(self):
         if self._tilestor is None:
-            self._tilestor = get_tile_db(self.tilestor_path)
+            self._tilestor, self._lock = get_tile_db(self.tilestor_path)
 
-        return self._tilestor
+        return self._tilestor, self._lock
 
     @property
     def tilestor_path(self):
@@ -392,10 +392,11 @@ class ResourceTileCache(Base):
             return True, Image.new('RGBA', (256, 256), colors)
 
         else:
-            cur = self.tilestor.cursor()
-            srow = cur.execute(
-                'SELECT data FROM tile WHERE z = ? AND x = ? AND y = ?',
-                (z, x, y)).fetchone()
+            tilestor, lock = self.get_tilestor()
+            with lock:
+                srow = tilestor.execute(
+                    'SELECT data FROM tile WHERE z = ? AND x = ? AND y = ?',
+                    (z, x, y)).fetchone()
 
             if srow is None:
                 return False, None
