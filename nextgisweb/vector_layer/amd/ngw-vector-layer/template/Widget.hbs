@@ -49,6 +49,16 @@
                     uploaderHelpText: {{gettextString 'Dataset should be in ESRI Shapefile (zip), GeoJSON, GML or KML format.'}}
         "></div>
 
+        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150"
+            style="margin-bottom: 1em;">
+            <select data-dojo-attach-point="wSourceLayer"
+                data-dojo-type="dijit/form/Select"
+                data-dojo-props="required: true"
+                title="{{gettext 'Source layer'}}"
+                style="width: 100%;">
+            </select>
+        </div>
+
         <div data-dojo-type="dijit/TitlePane" data-dojo-props="title: {{gettextString 'Advanced options'}}, open: false">
             <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, labelWidth: 150">
 

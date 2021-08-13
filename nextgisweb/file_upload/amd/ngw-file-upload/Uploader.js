@@ -136,6 +136,8 @@ define([
             // Change text for choosing file
             domClass.remove(this.focusNode, this.stateClasses);
             domClass.add(this.focusNode, "uploader--complete");
+
+            this.emit("complete");
         },
 
         uploadError: function (error) {

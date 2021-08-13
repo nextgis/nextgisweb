@@ -1,12 +1,110 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
+
+import ctypes
+import zipfile
 from datetime import date, time, datetime
 
 import six
-from osgeo import ogr
+from osgeo import gdal, ogr
 
 
 FIELD_GETTER = {}
+
+
+def _set_encoding(encoding):
+
+    class encoding_section(object):
+
+        def __init__(self, encoding):
+            self.encoding = encoding
+
+            if self.encoding:
+                # For GDAL 1.9 and higher try to set SHAPE_ENCODING
+                # through ctypes and libgdal
+
+                # Load library only if we need
+                # to recode
+                self.lib = ctypes.CDLL('libgdal.so')
+
+                # cpl_conv.h functions wrappers
+                # see http://www.gdal.org/cpl__conv_8h.html
+
+                # CPLGetConfigOption
+                self.get_option = self.lib.CPLGetConfigOption
+                self.get_option.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+                self.get_option.restype = ctypes.c_char_p
+
+                # CPLStrdup
+                self.strdup = self.lib.CPLStrdup
+                self.strdup.argtypes = [ctypes.c_char_p, ]
+                self.strdup.restype = ctypes.c_char_p
+
+                # CPLSetThreadLocalConfigOption
+                # Use thread local function
+                # to minimize side effects.
+                self.set_option = self.lib.CPLSetThreadLocalConfigOption
+                self.set_option.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+                self.set_option.restype = None
+
+        def __enter__(self):
+            def strdecode(x):
+                if len(x) >= 254:
+                    # Cludge to fix 254 - 255 byte unicode string cut off
+                    # Until we can decode
+                    # cut a byte on the right
+
+                    while True:
+                        try:
+                            x.decode(self.encoding)
+                            break
+                        except UnicodeDecodeError:
+                            x = x[:-1]
+
+                return x.decode(self.encoding)
+
+            if self.encoding:
+                # Set SHAPE_ENCODING value
+
+                # Keep copy of the current value
+                tmp = self.get_option('SHAPE_ENCODING'.encode(), None)
+                self.old_value = self.strdup(tmp)
+
+                # Set new value
+                self.set_option('SHAPE_ENCODING'.encode(), ''.encode())
+
+                return strdecode
+
+            return lambda x: x
+
+        def __exit__(self, type, value, traceback):
+            if self.encoding:
+                # Return old value
+                self.set_option('SHAPE_ENCODING'.encode(), self.old_value)
+
+    return encoding_section(encoding)
+
+
+def read_dataset(filename, encoding=None, **kw):
+
+    iszip = zipfile.is_zipfile(filename)
+    ogrfn = '/vsizip/{%s}' % filename if iszip else filename
+
+    def _open():
+        return gdal.OpenEx(ogrfn, 0, **kw)
+
+    if six.PY2:
+        with _set_encoding(encoding) as sdecode:
+            ogrds = _open()
+            strdecode = sdecode
+    else:
+        # Ignore encoding option in Python 3
+        ogrds = _open()
+
+        def strdecode(x):
+            return x
+
+    return ogrds, strdecode
 
 
 def read_layer_features(layer, geometry_format=None):

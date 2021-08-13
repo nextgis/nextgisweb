@@ -6,6 +6,7 @@ from datetime import date, time, datetime
 from uuid import uuid4
 
 import pytest
+import webtest
 from osgeo import gdal
 from osgeo import ogr
 
@@ -168,3 +169,33 @@ def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
     query = res.feature_query()
     query.filter_by(id=id_expect)
     assert query().total_count == 1
+
+
+def test_multi_layers(ngw_webtest_app, ngw_auth_administrator):
+    data = 'two-layers.zip'
+    src = os.path.join(DATA_PATH, data)
+    resp = ngw_webtest_app.post('/api/component/file_upload/', dict(
+        file=webtest.Upload(src)))
+    upload_meta = resp.json['upload_meta'][0]
+
+    resp = ngw_webtest_app.post_json('/api/component/vector_layer/dataset',
+                                     dict(source=upload_meta), status=200)
+
+    layers = resp.json['layers']
+    assert len(layers) == 2
+    assert 'layer1' in layers
+    assert 'layer2' in layers
+
+    resp = ngw_webtest_app.post_json('/api/resource/', dict(
+        resource=dict(cls='vector_layer', display_name='test two layers', parent=dict(id=0)),
+        vector_layer=dict(source=upload_meta, source_layer='layer1',
+                          srs=dict(id=3857), fid_source='AUTO', fid_field='id')
+    ), status=201)
+
+    layer_id = resp.json['id']
+
+    resp = ngw_webtest_app.get('/api/resource/%d/feature/2' % layer_id, status=200)
+    feature = resp.json
+    assert feature['fields'] == dict(name_point='Point two')
+
+    ngw_webtest_app.delete('/api/resource/%d' % layer_id)
