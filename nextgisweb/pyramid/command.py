@@ -106,11 +106,15 @@ class AuthenticateCommand():
         refresh = min(lifetime / 2, options['refresh'])
         session_refresh = int(datetime_to_timestamp(utcnow + refresh))
 
-        value = json.dumps(['LOCAL', user.id, session_expires, session_refresh])
+        current = ['LOCAL', user.id, session_expires, session_refresh]
 
         with transaction.manager:
             Session(id=sid, created=utcnow, last_activity=utcnow).persist()
-            SessionStore(session_id=sid, key='auth.policy.current', value=value).persist()
+            for k, v in (
+                ('auth.policy.current', current),
+                ('invite', True),
+            ):
+                SessionStore(session_id=sid, key=k, value=json.dumps(v)).persist()
 
         query = dict(sid=sid, expires=expires.isoformat(), next=result.path)
 
