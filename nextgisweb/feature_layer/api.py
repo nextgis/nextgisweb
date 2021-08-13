@@ -20,6 +20,7 @@ from pyramid.httpexceptions import HTTPNoContent, HTTPNotFound
 from shapely.geometry import box
 from sqlalchemy.orm.exc import NoResultFound
 
+from ..compat import date_fromisoformat, time_fromisoformat, datetime_fromisoformat
 from ..lib.geometry import Geometry, GeometryNotValid, Transformer
 from ..resource import DataScope, ValidationError, Resource, resource_factory
 from ..resource.exception import ResourceNotFound
@@ -273,7 +274,7 @@ def mvt(request):
         gdal.Unlink(ensure_str(vsibuf))
 
 
-def deserialize(feat, data, geom_format='wkt', transformer=None):
+def deserialize(feat, data, geom_format='wkt', dt_format='obj', transformer=None):
     if 'geom' in data:
         try:
             if geom_format == 'wkt':
@@ -288,6 +289,9 @@ def deserialize(feat, data, geom_format='wkt', transformer=None):
         if transformer is not None:
             feat.geom = transformer.transform(feat.geom)
 
+    if dt_format not in ('obj', 'iso'):
+        raise ValidationError(_("Date format '%s' is not supported.") % dt_format)
+
     if 'fields' in data:
         fdata = data['fields']
 
@@ -300,25 +304,34 @@ def deserialize(feat, data, geom_format='wkt', transformer=None):
                     fval = None
 
                 elif fld.datatype == FIELD_TYPE.DATE:
-                    fval = date(
-                        int(val['year']),
-                        int(val['month']),
-                        int(val['day']))
+                    if dt_format == 'iso':
+                        fval = date_fromisoformat(val)
+                    else:
+                        fval = date(
+                            int(val['year']),
+                            int(val['month']),
+                            int(val['day']))
 
                 elif fld.datatype == FIELD_TYPE.TIME:
-                    fval = time(
-                        int(val['hour']),
-                        int(val['minute']),
-                        int(val['second']))
+                    if dt_format == 'iso':
+                        fval = time_fromisoformat(val)
+                    else:
+                        fval = time(
+                            int(val['hour']),
+                            int(val['minute']),
+                            int(val['second']))
 
                 elif fld.datatype == FIELD_TYPE.DATETIME:
-                    fval = datetime(
-                        int(val['year']),
-                        int(val['month']),
-                        int(val['day']),
-                        int(val['hour']),
-                        int(val['minute']),
-                        int(val['second']))
+                    if dt_format == 'iso':
+                        fval = datetime_fromisoformat(val)
+                    else:
+                        fval = datetime(
+                            int(val['year']),
+                            int(val['month']),
+                            int(val['day']),
+                            int(val['hour']),
+                            int(val['minute']),
+                            int(val['second']))
 
                 else:
                     fval = val
@@ -332,7 +345,7 @@ def deserialize(feat, data, geom_format='wkt', transformer=None):
                 ext.deserialize(feat, data['extensions'][cls.identity])
 
 
-def serialize(feat, keys=None, geom_format='wkt', extensions=[]):
+def serialize(feat, keys=None, geom_format='wkt', dt_format='obj', extensions=[]):
     result = OrderedDict(id=feat.id)
 
     if feat.geom is not None:
@@ -345,6 +358,9 @@ def serialize(feat, keys=None, geom_format='wkt', extensions=[]):
 
         result['geom'] = geom
 
+    if dt_format not in ('obj', 'iso'):
+        raise ValidationError(_("Date format '%s' is not supported.") % dt_format)
+
     result['fields'] = OrderedDict()
     for fld in feat.layer.fields:
         if keys is not None and fld.keyname not in keys:
@@ -355,26 +371,30 @@ def serialize(feat, keys=None, geom_format='wkt', extensions=[]):
         if val is None:
             fval = None
 
-        elif fld.datatype == FIELD_TYPE.DATE:
-            fval = OrderedDict((
-                ('year', val.year),
-                ('month', val.month),
-                ('day', val.day)))
+        elif fld.datatype in (FIELD_TYPE.DATE, FIELD_TYPE.TIME, FIELD_TYPE.DATETIME):
+            if dt_format == 'iso':
+                fval = val.isoformat()
+            else:
+                if fld.datatype == FIELD_TYPE.DATE:
+                    fval = OrderedDict((
+                        ('year', val.year),
+                        ('month', val.month),
+                        ('day', val.day)))
 
-        elif fld.datatype == FIELD_TYPE.TIME:
-            fval = OrderedDict((
-                ('hour', val.hour),
-                ('minute', val.minute),
-                ('second', val.second)))
+                elif fld.datatype == FIELD_TYPE.TIME:
+                    fval = OrderedDict((
+                        ('hour', val.hour),
+                        ('minute', val.minute),
+                        ('second', val.second)))
 
-        elif fld.datatype == FIELD_TYPE.DATETIME:
-            fval = OrderedDict((
-                ('year', val.year),
-                ('month', val.month),
-                ('day', val.day),
-                ('hour', val.hour),
-                ('minute', val.minute),
-                ('second', val.second)))
+                elif fld.datatype == FIELD_TYPE.DATETIME:
+                    fval = OrderedDict((
+                        ('year', val.year),
+                        ('month', val.month),
+                        ('day', val.day),
+                        ('hour', val.hour),
+                        ('minute', val.minute),
+                        ('second', val.second)))
 
         else:
             fval = val
@@ -404,9 +424,13 @@ def iget(resource, request):
     request.resource_permission(PERM_READ)
 
     geom_skip = request.GET.get("geom", 'yes').lower() == 'no'
-    geom_format = request.GET.get("geom_format", 'wkt').lower()
     srs = request.GET.get("srs")
-    extensions = _extensions(request.GET.get("extensions"), resource)
+
+    srlz_params = dict(
+        geom_format=request.GET.get('geom_format', 'wkt').lower(),
+        dt_format=request.GET.get('dt_format', 'obj'),
+        extensions=_extensions(request.GET.get('extensions'), resource)
+    )
 
     query = resource.feature_query()
     if not geom_skip:
@@ -416,7 +440,7 @@ def iget(resource, request):
 
     feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
-    result = serialize(feature, geom_format=geom_format, extensions=extensions)
+    result = serialize(feature, **srlz_params)
 
     return Response(
         json.dumps(result, cls=geojson.Encoder),
@@ -452,16 +476,18 @@ def iput(resource, request):
 
     feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
-    geom_format = request.GET.get('geom_format', 'wkt').lower()
+    dsrlz_params = dict(
+        geom_format=request.GET.get('geom_format', 'wkt').lower(),
+        dt_format=request.GET.get('dt_format', 'obj')
+    )
+
     srs = request.GET.get('srs')
 
     if srs is not None:
         srs_from = SRS.filter_by(id=int(srs)).one()
-        transformer = Transformer(srs_from.wkt, resource.srs.wkt)
-    else:
-        transformer = None
+        dsrlz_params['transformer'] = Transformer(srs_from.wkt, resource.srs.wkt)
 
-    deserialize(feature, request.json_body, geom_format=geom_format, transformer=transformer)
+    deserialize(feature, request.json_body, **dsrlz_params)
     if IWritableFeatureLayer.providedBy(resource):
         resource.feature_put(feature)
 
@@ -483,9 +509,13 @@ def cget(resource, request):
     request.resource_permission(PERM_READ)
 
     geom_skip = request.GET.get("geom", 'yes') == 'no'
-    geom_format = request.GET.get("geom_format", 'wkt').lower()
     srs = request.GET.get("srs")
-    extensions = _extensions(request.GET.get("extensions"), resource)
+
+    srlz_params = dict(
+        geom_format=request.GET.get('geom_format', 'wkt').lower(),
+        dt_format=request.GET.get('dt_format', 'obj'),
+        extensions=_extensions(request.GET.get('extensions'), resource)
+    )
 
     query = resource.feature_query()
 
@@ -560,6 +590,7 @@ def cget(resource, request):
         fields = [key for key in keys if key in field_list]
 
     if fields:
+        srlz_params['keys'] = fields
         query.fields(*fields)
 
     if not geom_skip:
@@ -568,7 +599,7 @@ def cget(resource, request):
         query.geom()
 
     result = [
-        serialize(feature, fields, geom_format=geom_format, extensions=extensions)
+        serialize(feature, **srlz_params)
         for feature in query()
     ]
 
@@ -580,17 +611,19 @@ def cget(resource, request):
 def cpost(resource, request):
     request.resource_permission(PERM_WRITE)
 
-    geom_format = request.GET.get('geom_format', 'wkt').lower()
+    dsrlz_params = dict(
+        geom_format=request.GET.get('geom_format', 'wkt').lower(),
+        dt_format=request.GET.get('dt_format', 'obj')
+    )
+
     srs = request.GET.get('srs')
 
     if srs is not None:
         srs_from = SRS.filter_by(id=int(srs)).one()
-        transformer = Transformer(srs_from.wkt, resource.srs.wkt)
-    else:
-        transformer = None
+        dsrlz_params['transformer'] = Transformer(srs_from.wkt, resource.srs.wkt)
 
     feature = Feature(layer=resource)
-    deserialize(feature, request.json_body, geom_format=geom_format, transformer=transformer)
+    deserialize(feature, request.json_body, **dsrlz_params)
     fid = resource.feature_create(feature)
 
     return Response(
@@ -602,20 +635,22 @@ def cpatch(resource, request):
     request.resource_permission(PERM_WRITE)
     result = list()
 
-    geom_format = request.GET.get('geom_format', 'wkt').lower()
+    dsrlz_params = dict(
+        geom_format=request.GET.get('geom_format', 'wkt').lower(),
+        dt_format=request.GET.get('dt_format', 'obj')
+    )
+
     srs = request.GET.get('srs')
 
     if srs is not None:
         srs_from = SRS.filter_by(id=int(srs)).one()
-        transformer = Transformer(srs_from.wkt, resource.srs.wkt)
-    else:
-        transformer = None
+        dsrlz_params['transformer'] = Transformer(srs_from.wkt, resource.srs.wkt)
 
     for fdata in request.json_body:
         if 'id' not in fdata:
             # Create new feature
             feature = Feature(layer=resource)
-            deserialize(feature, fdata, geom_format=geom_format, transformer=transformer)
+            deserialize(feature, fdata, **dsrlz_params)
             fid = resource.feature_create(feature)
         else:
             # Update existing feature
@@ -629,7 +664,7 @@ def cpatch(resource, request):
             for f in query():
                 feature = f
 
-            deserialize(feature, fdata, geom_format=geom_format, transformer=transformer)
+            deserialize(feature, fdata, **dsrlz_params)
             resource.feature_put(feature)
 
         result.append(dict(id=fid))
