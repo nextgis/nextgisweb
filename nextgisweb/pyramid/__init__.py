@@ -19,9 +19,10 @@ from .util import (
     gensecret,
     persistent_secret)
 from .model import Base, Session, SessionStore
+from .session import WebSession
 from .command import ServerCommand, AMDPackagesCommand  # NOQA
 
-__all__ = ['viewargs', ]
+__all__ = ['viewargs', 'WebSession']
 
 
 class PyramidComponent(Component):

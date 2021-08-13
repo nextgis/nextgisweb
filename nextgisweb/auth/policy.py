@@ -14,6 +14,7 @@ from pyramid.httpexceptions import HTTPUnauthorized
 from ..lib.config import OptionAnnotations, Option
 from ..compat import timestamp_to_datetime, datetime_to_timestamp
 from ..core.exception import ValidationError
+from ..pyramid import WebSession
 
 from .models import User
 from .exception import InvalidCredentialsException, UserDisabledException
@@ -156,6 +157,15 @@ class AuthenticationPolicy(object):
             sk = 'auth.policy.{}'.format(k)
             if sk in session:
                 del session[sk]
+
+        if session.get('invite'):
+
+            def forget_session(request, response):
+                cookie_name = request.env.pyramid.options['session.cookie.name']
+                cs = WebSession.cookie_settings(request)
+                response.delete_cookie(cookie_name, path=cs['path'], domain=cs['domain'])
+
+            request.add_response_callback(forget_session)
 
         return ()
 
