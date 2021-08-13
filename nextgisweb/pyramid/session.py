@@ -17,13 +17,6 @@ from .util import gensecret, datetime_to_unix
 
 __all__ = ['WebSession']
 
-cookie_settings = dict(
-    path='/',
-    domain=None,
-    httponly=True,
-    samesite='Lax'
-)
-
 allowed_types = (
     type(None),
     bool,
@@ -113,11 +106,21 @@ class WebSession(dict):
                             kv.value = self._get_for_db(key)
 
             if self._session_id:
-                cookie_settings['secure'] = request.scheme == 'https'
+                cookie_settings = WebSession.cookie_settings(request)
                 cookie_settings['max_age'] = self._cookie_max_age.total_seconds()
                 response.set_cookie(self._cookie_name, value=self._session_id, **cookie_settings)
 
         request.add_response_callback(check_save)
+
+    @staticmethod
+    def cookie_settings(request):
+        return dict(
+            path='/',
+            domain=None,
+            httponly=True,
+            samesite='Lax',
+            secure=request.scheme == 'https'
+        )
 
     def _get_for_db(self, key):
         value = super(WebSession, self).__getitem__(key)
