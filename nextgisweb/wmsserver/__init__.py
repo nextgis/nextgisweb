@@ -3,9 +3,9 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from ..component import Component
 
-from .model import Base, Service
+from .model import Base, Service, Layer
 
-__all__ = ['Service', ]
+__all__ = ['Service', 'Layer', ]
 
 
 class WMSServerComponent(Component):
