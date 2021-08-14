@@ -23,12 +23,19 @@ define([
     return declare([_WidgetBase, _TemplatedMixin],{
         templateString: i18n.renderTemplate(template),
         userName: undefined,
+        invitationSession: false,
         links: {},
         constructor: function (options) {
             declare.safeMixin(this,options);
         },
         postCreate: function(){
             if (this.userName) this._setLetters();
+
+            if (this.invitationSession) {
+                domClass.add(this.domNode, 'user-avatar--danger');
+                this.nodeInvitationSession.innerHTML = i18n.gettext("Invitation session");
+                this.nodeInvitationSession.style.display = '';
+            }
 
             this.on("click", lang.hitch(this, function(e){
                 e.stopPropagation();

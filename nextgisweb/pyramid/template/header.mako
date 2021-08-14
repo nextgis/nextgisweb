@@ -3,6 +3,7 @@
 <%!
     import os
     import re
+    from json import dumps
     from six import text_type
     from nextgisweb.pyramid.util import _
 %>
@@ -17,9 +18,11 @@
         user_mode = 'guest' if user.keyname == 'guest' else (
             'administrator' if user.is_administrator else 'authorized')
         user_display_name = text_type(user)
+        invitation_session = bool(request.session.get('invite'))
     except Exception:
         user_mode = 'guest'
         user_display_name = None
+        invitation_session = False
 
 %>
 
@@ -83,10 +86,11 @@
 
         %if user_mode != 'guest':
             (new UserAvatar({
-                userName: '${user_display_name}',
+                userName: ${user_display_name | dumps, n},
+                invitationSession: ${invitation_session |  dumps, n},
                 links: {
-                    logout: '${request.route_url(logout_route_name)}',
-                    settings: '${request.route_url("auth.settings")}'
+                    logout: ${request.route_url(logout_route_name) | dumps, n},
+                    settings: ${request.route_url("auth.settings") | dumps, n}
                 }
             })).placeAt('userAvatar');
         %endif

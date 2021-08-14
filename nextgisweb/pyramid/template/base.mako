@@ -67,13 +67,6 @@
 </head>
 
 <body class="claro nextgis <%block name='body_class'/>">
-    %if request.session.get('invite'):
-        <div style="z-index: 1000; position: absolute; left: 50%; pointer-events: none;">
-            <div style="position: relative; left: -50%; background: #c27b76; opacity: 80%; padding: 0 1em 0 1em;">
-                ${tr(_("You are working under an invitation session"))}
-            </div>
-        </div>
-    %endif
 
     %if not custom_layout:
         <div class="layout ${'maxwidth' if maxwidth else ''}">
