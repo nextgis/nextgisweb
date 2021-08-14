@@ -178,7 +178,7 @@ def home_path(request):
 def export_vision(request):
     request.require_administrator()
     return dict(
-        title=_("\"Save as\" button vision"),
+        title=_("Resource export"),
         dynmenu=request.env.pyramid.control_panel)
 
 
@@ -489,7 +489,7 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.logo'))),
         dm.Link('settings/home_path', _("Home path"), lambda args: (
             args.request.route_url('pyramid.control_panel.home_path'))),
-        dm.Link('settings/export_vision', _("\"Save as\" button vision"), lambda args: (
+        dm.Link('settings/export_vision', _("Resource export"), lambda args: (
             args.request.route_url('pyramid.control_panel.export_vision'))),
     )
 
