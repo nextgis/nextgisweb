@@ -123,7 +123,7 @@ def group_idelete(request):
 def current_user(request):
     return dict(
         id=request.user.id, keyname=request.user.keyname,
-        display_name=request.user.display_name)
+        display_name=request.user.display_name, language=request.locale_name)
 
 
 def register(request):
