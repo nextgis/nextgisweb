@@ -1,20 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-import json
-from datetime import datetime, timedelta
 from logging import getLogger
 
-import transaction
-from six.moves.urllib.parse import urlencode, urlparse
-
-from ..auth import User, Group
 from ..command import Command
-from ..compat import datetime_to_timestamp
 from ..package import amd_packages
-
-from .model import Session, SessionStore
-from .util import gensecret
 
 logger = getLogger(__name__)
 
@@ -66,58 +56,3 @@ class AMDPackagesCommand():
     def execute(cls, args, env):
         for pname, path in amd_packages():
             print(pname)
-
-
-@Command.registry.register
-class AuthenticateCommand():
-    identity = 'authenticate'
-
-    @classmethod
-    def argparser_setup(cls, parser, env):
-        parser.add_argument(
-            'keyname', type=str, metavar='user|group',
-            help="User or group whose user will be authenticated")
-        parser.add_argument(
-            'url', type=str, metavar='url',
-            help="Web GIS page")
-
-    @classmethod
-    def execute(cls, args, env):
-        user = User.filter_by(keyname=args.keyname).one_or_none()
-        if user is None:
-            group = Group.filter_by(keyname=args.keyname).one_or_none()
-            if group is None:
-                raise ValueError("User or group (keyname='%s') not found." % args.keyname)
-            if len(group.members) == 0:
-                raise ValueError("Group (keyname='%s') has no members." % args.keyname)
-            else:
-                user = group.members[0]
-
-        result = urlparse(args.url)
-
-        sid = gensecret(32)
-        utcnow = datetime.utcnow()
-        lifetime = timedelta(minutes=30)
-        expires = (utcnow + lifetime).replace(microsecond=0)
-
-        session_expires = int(datetime_to_timestamp(expires))
-
-        options = env.auth.options.with_prefix('policy.local')
-        refresh = min(lifetime / 2, options['refresh'])
-        session_refresh = int(datetime_to_timestamp(utcnow + refresh))
-
-        current = ['LOCAL', user.id, session_expires, session_refresh]
-
-        with transaction.manager:
-            Session(id=sid, created=utcnow, last_activity=utcnow).persist()
-            for k, v in (
-                ('auth.policy.current', current),
-                ('invite', True),
-            ):
-                SessionStore(session_id=sid, key=k, value=json.dumps(v)).persist()
-
-        query = dict(sid=sid, expires=expires.isoformat(), next=result.path)
-
-        url = result.scheme + '://' + result.netloc + '/session/invite?' + urlencode(query)
-
-        print(url)
