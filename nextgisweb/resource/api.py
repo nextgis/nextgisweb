@@ -373,7 +373,7 @@ def export_vision_put(request):
     body = request.json_body
     for k, v in body.items():
         if k == 'export_vision':
-            if v in ('data_read', 'data_write', 'admin'):
+            if v in ('data_read', 'data_write', 'administrators'):
                 request.env.core.settings_set('resource', 'export_vision', v)
             else:
                 raise HTTPBadRequest("Invalid value '%s'" % v)

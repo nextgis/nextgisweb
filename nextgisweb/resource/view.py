@@ -361,7 +361,7 @@ def setup_pyramid(comp, config):
         except KeyError:
             export_vision = 'data_read'
 
-        if export_vision == 'admin':
+        if export_vision == 'administrators':
             return user.is_administrator
 
         if export_vision == 'data_write':
