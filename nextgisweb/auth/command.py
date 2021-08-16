@@ -99,7 +99,9 @@ class AuthenticateCommand():
             ):
                 SessionStore(session_id=sid, key=k, value=json.dumps(v)).persist()
 
-        query = dict(sid=sid, expires=expires.isoformat(), next=result.path)
+        query = dict(sid=sid, expires=expires.isoformat())
+        if (len(result.path) > 0 and result.path != '/'):
+            query['next'] = result.path
 
         url = result.scheme + '://' + result.netloc + '/session/invite?' + urlencode(query)
 
