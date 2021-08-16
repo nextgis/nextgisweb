@@ -569,13 +569,16 @@ class WFSHandler():
         k = field.keyname
         if tag_pattern.match(k) and not wfsfld_pattern.match(k):
             return k
-        return 'wfsfld_%d' % field.idx
+        return 'wfsfld_%d' % field.id
 
     def _field_key_decode(self, value, fields):
         match = wfsfld_pattern.match(value)
         if match is not None:
-            fld_idx = int(match[1])
-            return fields[fld_idx].keyname
+            fld_id = int(match[1])
+            for field in fields:
+                if field.id == fld_id:
+                    return field.keyname
+            raise ValidationError("Field (id=%d) not found." % fld_id)
         return value
 
     def _describe_feature_type(self):
