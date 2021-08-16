@@ -175,13 +175,6 @@ def home_path(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
-def export_vision(request):
-    request.require_administrator()
-    return dict(
-        title=_("Resource export"),
-        dynmenu=request.env.pyramid.control_panel)
-
-
 def test_request(request):
     comp = request.env.pyramid
     handler = comp.test_request_handler
@@ -451,11 +444,6 @@ def setup_pyramid(comp, config):
         'pyramid.control_panel.home_path',
         '/control-panel/home_path'
     ).add_view(home_path, renderer=ctpl('home_path'))
-
-    config.add_route(
-        'pyramid.control_panel.export_vision',
-        '/control-panel/export_vision'
-    ).add_view(export_vision, renderer=ctpl('export_vision'))
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 

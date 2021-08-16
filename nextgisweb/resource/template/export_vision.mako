@@ -3,7 +3,7 @@
 <%def name="head()">
     <script type="text/javascript">
         require([
-            "ngw-pyramid/ExportVisionForm",
+            "ngw-resource/ExportVisionForm",
             "dojo/domReady!"
         ], function (
             ExportVisionForm

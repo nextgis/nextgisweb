@@ -22,7 +22,7 @@ define([
     i18n,
     template
 ) {
-    var API_URL = route.pyramid.export_vision();
+    var API_URL = route.resource.export_vision();
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),

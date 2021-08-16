@@ -183,6 +183,14 @@ def widget(request):
         cls=clsid, parent=parent.id if parent else None)
 
 
+@viewargs(renderer='nextgisweb:resource/template/export_vision.mako')
+def export_vision(request):
+    request.require_administrator()
+    return dict(
+        title=_("Resource export"),
+        dynmenu=request.env.pyramid.control_panel)
+
+
 def setup_pyramid(comp, config):
 
     def resource_permission(request, permission, resource=None):
@@ -208,33 +216,6 @@ def setup_pyramid(comp, config):
                     scope=permission.scope.identity))
 
     config.add_request_method(resource_permission, 'resource_permission')
-
-    def has_export_permission(request):
-
-        user_id = request.authenticated_userid
-        if user_id is None:
-            return False
-
-        user = request.user
-
-        try:
-            export_vision = request.env.core.settings_get('pyramid', 'export_vision')
-        except KeyError:
-            export_vision = 'data_read'
-
-        if export_vision == 'admin':
-            return user.is_administrator
-
-        if export_vision == 'data_write':
-            permission = DataScope.write
-        else:
-            permission = DataScope.read
-
-        resource = request.context
-
-        return resource.has_permission(permission, user)
-
-    config.add_request_method(has_export_permission, 'has_export_permission')
 
     def _route(route_name, route_path, **kwargs):
         return config.add_route(
@@ -366,3 +347,35 @@ def setup_pyramid(comp, config):
 
         ResourceMenu(),
     )
+
+    def has_export_permission(request):
+
+        user_id = request.authenticated_userid
+        if user_id is None:
+            return False
+
+        user = request.user
+
+        try:
+            export_vision = request.env.core.settings_get('resouce', 'export_vision')
+        except KeyError:
+            export_vision = 'data_read'
+
+        if export_vision == 'admin':
+            return user.is_administrator
+
+        if export_vision == 'data_write':
+            permission = DataScope.write
+        else:
+            permission = DataScope.read
+
+        resource = request.context
+
+        return resource.has_permission(permission, user)
+
+    config.add_request_method(has_export_permission, 'has_export_permission')
+
+    config.add_route(
+        'pyramid.control_panel.export_vision',
+        '/control-panel/export-vision'
+    ).add_view(export_vision)
