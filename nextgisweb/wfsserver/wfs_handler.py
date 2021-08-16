@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import re
 from collections import OrderedDict
 from datetime import datetime
 from os import path
@@ -23,6 +24,10 @@ from ..resource import DataScope
 from ..spatial_ref_sys import SRS
 
 from .model import Layer
+from .util import tag_pattern
+
+
+wfsfld_pattern = re.compile(r'^wfsfld_(\d+)$')
 
 # Spec: http://docs.opengeospatial.org/is/09-025r2/09-025r2.html
 v100 = '1.0.0'
@@ -560,6 +565,22 @@ class WFSHandler():
 
         return etree.tostring(root)
 
+    def _field_key_encode(self, field):
+        k = field.keyname
+        if tag_pattern.match(k) and not wfsfld_pattern.match(k):
+            return k
+        return 'wfsfld_%d' % field.id
+
+    def _field_key_decode(self, value, fields):
+        match = wfsfld_pattern.match(value)
+        if match is not None:
+            fld_id = int(match[1])
+            for field in fields:
+                if field.id == fld_id:
+                    return field.keyname
+            raise ValidationError("Field (id=%d) not found." % fld_id)
+        return value
+
     def _describe_feature_type(self):
         gml = nsmap('gml', self.p_version)
         wfs = nsmap('wfs', self.p_version)
@@ -623,7 +644,8 @@ class WFSHandler():
                     datatype = 'dateTime'
                 else:
                     datatype = field.datatype.lower()
-                El('element', dict(minOccurs='0', name=field.keyname, type=datatype, nillable='true'), parent=__seq)
+                El('element', dict(minOccurs='0', name=self._field_key_encode(field),
+                                   type=datatype, nillable='true'), parent=__seq)
 
         return etree.tostring(root)
 
@@ -750,7 +772,7 @@ class WFSHandler():
                 __geom.append(__gml)
 
                 for field in feature_layer.fields:
-                    _field = El(field.keyname, parent=__feature)
+                    _field = El(self._field_key_encode(field), parent=__feature)
                     value = feature.fields[field.keyname]
                     if value is not None:
                         if isinstance(value, datetime):
@@ -829,14 +851,15 @@ class WFSHandler():
 
                 for _property in _layer:
                     key = ns_trim(_property.tag)
-                    if key == geom_column:
+                    fld_keyname = self._field_key_decode(key, feature_layer.fields)
+                    if fld_keyname == geom_column:
                         try:
                             geom = geom_from_gml(_property[0])
                         except GeometryNotValid:
                             raise ValidationError("Geometry is not valid.")
                         feature.geom = geom
                     else:
-                        feature.fields[key] = _property.text
+                        feature.fields[fld_keyname] = _property.text
 
                 fid = feature_layer.feature_create(feature)
                 fid_str = fid_encode(fid, keyname)
@@ -875,14 +898,16 @@ class WFSHandler():
                     query.filter_by(id=fids[0])
 
                     feature = query().one()
+
+                    geom_column = get_geom_column(feature_layer)
+
                     for _property in find_tags(_operation, 'Property'):
                         key = find_tags(_property, 'Name')[0].text
+                        fld_keyname = self._field_key_decode(key, feature_layer.fields)
                         _values = find_tags(_property, 'Value')
                         _value = None if len(_values) == 0 else _values[0]
 
-                        geom_column = get_geom_column(feature_layer)
-
-                        if key == geom_column:
+                        if fld_keyname == geom_column:
                             try:
                                 geom = geom_from_gml(_value[0])
                             except GeometryNotValid:
@@ -895,7 +920,7 @@ class WFSHandler():
                                 value = ''
                             else:
                                 value = _value.text
-                            feature.fields[key] = value
+                            feature.fields[fld_keyname] = value
 
                     feature_layer.feature_put(feature)
 

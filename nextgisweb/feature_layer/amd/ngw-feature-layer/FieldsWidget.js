@@ -21,7 +21,6 @@ define([
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",
     "@nextgisweb/pyramid/settings!",
-    "ngw-pyramid/form/KeynameTextBox",
     "ngw-resource/serialize",
     "@nextgisweb/pyramid/i18n!",
     //
@@ -49,7 +48,6 @@ define([
     editor,
     DijitRegistry,
     settings,
-    KeynameTextBox,
     serialize,
     i18n
 ) {
@@ -72,7 +70,7 @@ define([
                 label: i18n.gettext("Keyname"),
                 sortable: false,
                 autoSave: true,
-                editor: KeynameTextBox,
+                editor: ValidationTextBox,
                 editorArgs: {
                     required: true,
                     style: "width: 100%; border: none"

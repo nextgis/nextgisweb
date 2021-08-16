@@ -7,6 +7,7 @@ Changes
 - Source layer selection while creating vector layers from multi-layer sources, 
   such as ZIP-archives with ESRI Shape-files.
 - Automatic generation of keynames for WMS and WFS services.
+- Improved support for Unicode field names for WFS services.
 - ISO-8601 date and time formatting in feature layer REST API via
   ``dt_format=iso`` option.
 
