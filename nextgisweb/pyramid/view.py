@@ -205,16 +205,6 @@ def session_login(request):
     return response
 
 
-def session_invite(request):
-    if any(k not in request.GET for k in ('sid', 'expires')):
-        raise HTTPNotFound()
-
-    return dict(
-        session_id=request.GET['sid'],
-        expires=request.GET['expires'],
-        next_url=request.GET.get('next'))
-
-
 def test_request(request):
     comp = request.env.pyramid
     handler = comp.test_request_handler
@@ -488,11 +478,6 @@ def setup_pyramid(comp, config):
     config.add_route('pyramid.session.login',
                      '/session/login', client=()) \
         .add_view(session_login, request_method='POST')
-
-    config.add_route(
-        'pyramid.session.invite',
-        '/session/invite'
-    ).add_view(session_invite, renderer=ctpl('session_invite'))
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 

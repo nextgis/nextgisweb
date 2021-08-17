@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import transaction
 from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPForbidden
+from pyramid.interfaces import IAuthenticationPolicy
 
 from ..lib.config import OptionAnnotations, Option
 from ..component import Component
@@ -162,6 +163,17 @@ class AuthComponent(Component):
                 **kwargs).persist()
 
         return obj
+
+    def authenticate(self, request, login, password):
+        auth_policy = request.registry.getUtility(IAuthenticationPolicy)
+        user, tresp = auth_policy.authenticate_with_password(
+            username=request.POST['login'].strip(),
+            password=request.POST['password'])
+
+        DBSession.flush()  # Force user.id sequence value
+        headers = auth_policy.remember(request, (user.id, tresp))
+
+        return user, headers
 
     def check_user_limit(self, exclude_id=None):
         user_limit = self.options['user_limit']

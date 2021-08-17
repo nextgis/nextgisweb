@@ -8,11 +8,10 @@ import secrets
 import zope.event
 import sqlalchemy as sa
 
-from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.events import BeforeRender
 from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
-from pyramid.httpexceptions import HTTPFound, HTTPUnauthorized
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 from six.moves.urllib.parse import urlencode
 
 from ..models import DBSession
@@ -54,24 +53,28 @@ def login(request):
     next_url = request.params.get('next', request.application_url)
 
     if request.method == 'POST':
-        auth_policy = request.registry.getUtility(IAuthenticationPolicy)
         try:
-            user, tresp = auth_policy.authenticate_with_password(
-                username=request.POST['login'].strip(),
-                password=request.POST['password'])
-
-            DBSession.flush()  # Force user.id sequence value
-            headers = auth_policy.remember(request, (user.id, tresp))
-
-            event = OnUserLogin(user, request, next_url)
-            zope.event.notify(event)
-
-            return HTTPFound(location=event.next_url, headers=headers)
-
+            user, headers = request.env.auth.authenticate(
+                request, request.POST['login'].strip(), request.POST['password'])
         except (InvalidCredentialsException, UserDisabledException) as exc:
             return dict(error=exc.title, next_url=next_url)
 
+        event = OnUserLogin(user, request, next_url)
+        zope.event.notify(event)
+
+        return HTTPFound(location=event.next_url, headers=headers)
+
     return dict(next_url=next_url)
+
+
+def session_invite(request):
+    if any(k not in request.GET for k in ('sid', 'expires')):
+        raise HTTPNotFound()
+
+    return dict(
+        session_id=request.GET['sid'],
+        expires=request.GET['expires'],
+        next_url=request.GET.get('next'))
 
 
 def oauth(request):
@@ -211,6 +214,11 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.login', '/login') \
         .add_view(login, renderer='nextgisweb:auth/template/login.mako')
+
+    config.add_route(
+        'pyramid.session.invite',
+        '/session/invite'
+    ).add_view(session_invite, renderer='nextgisweb:auth/template/session_invite.mako')
 
     config.add_route('auth.logout', '/logout').add_view(logout)
 
