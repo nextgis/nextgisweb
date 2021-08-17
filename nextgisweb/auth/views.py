@@ -2,6 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
+from datetime import datetime
 
 import string
 import secrets
@@ -19,7 +20,6 @@ from ..compat import datetime_fromisoformat, timestamp_to_datetime
 from ..models import DBSession
 from ..object_widget import ObjectWidget
 from ..pyramid import SessionStore, WebSession
-from ..core.exception import ValidationError
 from ..views import ModelController, permalinker
 from .. import dynmenu as dm
 
@@ -64,12 +64,14 @@ def login(request):
             try:
                 store = SessionStore.filter_by(session_id=sid, key='auth.policy.current').one()
             except NoResultFound:
-                raise ValidationError(_("Session not found."))
+                raise InvalidCredentialsException(_("Session not found."))
             value = json.loads(store.value)
 
-            exp = value[2]
-            if datetime_fromisoformat(expires) != timestamp_to_datetime(exp):
-                raise ValidationError(_("Invalid 'expires' parameter."))
+            exp = timestamp_to_datetime(value[2])
+            if datetime_fromisoformat(expires) != exp:
+                raise InvalidCredentialsException(_("Invalid 'expires' parameter."))
+            if exp <= datetime.utcnow():
+                raise InvalidCredentialsException(_("Session expired."))
 
             cookie_settings = WebSession.cookie_settings(request)
             cookie_settings['expires'] = expires
