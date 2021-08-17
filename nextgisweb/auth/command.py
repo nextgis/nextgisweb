@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-import json
 import logging
-from datetime import datetime, timedelta
 
 import transaction
-from six.moves.urllib.parse import urlencode, urlparse
 
 from ..command import Command
-from ..compat import datetime_to_timestamp
-from ..pyramid import Session, SessionStore
-from ..pyramid.util import gensecret
 
-from . import User, Group
+from . import User
 
 
 logger = logging.getLogger(__name__)
@@ -58,51 +52,10 @@ class AuthenticateCommand():
 
     @classmethod
     def execute(cls, args, env):
-
-        def critical_error(msg):
-            logger.critical(msg)
+        try:
+            url = env.auth.session_invite(args.keyname, args.url)
+        except ValueError as exc:
+            logger.critical(exc)
             exit(1)
-
-        user = User.filter_by(keyname=args.keyname).one_or_none()
-        if user is None:
-            group = Group.filter_by(keyname=args.keyname).one_or_none()
-            if group is None:
-                critical_error("User or group (keyname='%s') not found." % args.keyname)
-            if len(group.members) == 0:
-                critical_error("Group (keyname='%s') has no members." % args.keyname)
-            else:
-                user = group.members[0]
-
-        if user.disabled:
-            critical_error("User (keyname='%s') is disabled." % args.keyname)
-
-        result = urlparse(args.url)
-
-        sid = gensecret(32)
-        utcnow = datetime.utcnow()
-        lifetime = timedelta(minutes=30)
-        expires = (utcnow + lifetime).replace(microsecond=0)
-
-        session_expires = int(datetime_to_timestamp(expires))
-
-        options = env.auth.options.with_prefix('policy.local')
-        refresh = min(lifetime / 2, options['refresh'])
-        session_refresh = int(datetime_to_timestamp(utcnow + refresh))
-
-        current = ['LOCAL', user.id, session_expires, session_refresh]
-
-        with transaction.manager:
-            Session(id=sid, created=utcnow, last_activity=utcnow).persist()
-            for k, v in (
-                ('auth.policy.current', current),
-                ('invite', True),
-            ):
-                SessionStore(session_id=sid, key=k, value=json.dumps(v)).persist()
-
-        query = dict(sid=sid, expires=expires.isoformat())
-        if (len(result.path) > 0 and result.path != '/'):
-            query['next'] = result.path
-
-        url = result.scheme + '://' + result.netloc + '/session/invite?' + urlencode(query)
 
         print(url)

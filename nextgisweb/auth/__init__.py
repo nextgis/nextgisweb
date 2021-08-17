@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import json
 from datetime import datetime, timedelta
 
 import transaction
 from sqlalchemy.orm.exc import NoResultFound
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.interfaces import IAuthenticationPolicy
+from six.moves.urllib.parse import urlencode, urlparse
 
 from ..lib.config import OptionAnnotations, Option
+from ..compat import datetime_to_timestamp
 from ..component import Component
 from ..core.exception import ValidationError
 from ..models import DBSession
+from ..pyramid import Session, SessionStore
+from ..pyramid.util import gensecret
 from .. import db
 
 from .models import Base, Principal, User, Group
@@ -174,6 +179,51 @@ class AuthComponent(Component):
         headers = auth_policy.remember(request, (user.id, tresp))
 
         return user, headers
+
+    def session_invite(self, keyname, url):
+        user = User.filter_by(keyname=keyname).one_or_none()
+        if user is None:
+            group = Group.filter_by(keyname=keyname).one_or_none()
+            if group is None:
+                ValueError("User or group (keyname='%s') not found." % keyname)
+            if len(group.members) == 0:
+                ValueError("Group (keyname='%s') has no members." % keyname)
+            else:
+                user = group.members[0]
+
+        if user.disabled:
+            ValueError("User (keyname='%s') is disabled." % keyname)
+
+        result = urlparse(url)
+
+        sid = gensecret(32)
+        utcnow = datetime.utcnow()
+        lifetime = timedelta(minutes=30)
+        expires = (utcnow + lifetime).replace(microsecond=0)
+
+        session_expires = int(datetime_to_timestamp(expires))
+
+        options = self.env.auth.options.with_prefix('policy.local')
+        half_life = timedelta(seconds=int(lifetime.total_seconds()) / 2)
+        refresh = min(half_life, options['refresh'])
+        session_refresh = int(datetime_to_timestamp(utcnow + refresh))
+
+        current = ['LOCAL', user.id, session_expires, session_refresh]
+
+        with transaction.manager:
+            Session(id=sid, created=utcnow, last_activity=utcnow).persist()
+            for k, v in (
+                ('auth.policy.current', current),
+                ('invite', True),
+            ):
+                SessionStore(session_id=sid, key=k, value=json.dumps(v)).persist()
+
+        query = dict(sid=sid, expires=expires.isoformat())
+        if (len(result.path) > 0 and result.path != '/'):
+            query['next'] = result.path
+
+        url = result.scheme + '://' + result.netloc + '/session/invite?' + urlencode(query)
+        return url
 
     def check_user_limit(self, exclude_id=None):
         user_limit = self.options['user_limit']
