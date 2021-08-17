@@ -13,9 +13,13 @@ from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 from six.moves.urllib.parse import urlencode
+from sqlalchemy.orm.exc import NoResultFound
 
+from ..compat import datetime_fromisoformat, timestamp_to_datetime
 from ..models import DBSession
 from ..object_widget import ObjectWidget
+from ..pyramid import SessionStore, WebSession
+from ..core.exception import ValidationError
 from ..views import ModelController, permalinker
 from .. import dynmenu as dm
 
@@ -53,16 +57,40 @@ def login(request):
     next_url = request.params.get('next', request.application_url)
 
     if request.method == 'POST':
-        try:
-            user, headers = request.env.auth.authenticate(
-                request, request.POST['login'].strip(), request.POST['password'])
-        except (InvalidCredentialsException, UserDisabledException) as exc:
-            return dict(error=exc.title, next_url=next_url)
+        if 'sid' in request.POST:
+            sid = request.POST['sid']
+            expires = request.POST['expires']
 
-        event = OnUserLogin(user, request, next_url)
-        zope.event.notify(event)
+            try:
+                store = SessionStore.filter_by(session_id=sid, key='auth.policy.current').one()
+            except NoResultFound:
+                raise ValidationError(_("Session not found."))
+            value = json.loads(store.value)
 
-        return HTTPFound(location=event.next_url, headers=headers)
+            exp = value[2]
+            if datetime_fromisoformat(expires) != timestamp_to_datetime(exp):
+                raise ValidationError(_("Invalid 'expires' parameter."))
+
+            cookie_settings = WebSession.cookie_settings(request)
+            cookie_settings['expires'] = expires
+
+            cookie_name = request.env.pyramid.options['session.cookie.name']
+
+            response = HTTPFound(location=next_url)
+            response.set_cookie(cookie_name, value=sid, **cookie_settings)
+
+            return response
+        else:
+            try:
+                user, headers = request.env.auth.authenticate(
+                    request, request.POST['login'].strip(), request.POST['password'])
+            except (InvalidCredentialsException, UserDisabledException) as exc:
+                return dict(error=exc.title, next_url=next_url)
+
+            event = OnUserLogin(user, request, next_url)
+            zope.event.notify(event)
+
+            return HTTPFound(location=event.next_url, headers=headers)
 
     return dict(next_url=next_url)
 

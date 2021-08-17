@@ -2,7 +2,6 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 import sys
 import errno
-import json
 import os
 import os.path
 import logging
@@ -17,17 +16,15 @@ from pyramid.response import Response, FileResponse
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
-from sqlalchemy.orm.exc import NoResultFound
 
 from ..env import env
 from .. import dynmenu as dm, pkginfo
-from ..core.exception import UserException, ValidationError
+from ..core.exception import UserException
 from ..package import amd_packages
-from ..compat import datetime_fromisoformat, lru_cache, timestamp_to_datetime
+from ..compat import lru_cache
 from ..auth.exception import InvalidCredentialsException, UserDisabledException
 
 from . import exception
-from .model import SessionStore
 from .session import WebSession
 from .renderer import json_renderer
 from .util import _, ErrorRendererPredicate
@@ -176,33 +173,6 @@ def home_path(request):
     return dict(
         title=_("Home path"),
         dynmenu=request.env.pyramid.control_panel)
-
-
-def session_login(request):
-    sid = request.POST['sid']
-    expires = request.POST['expires']
-    next_url = request.POST.get('next_url', request.application_url)
-
-    try:
-        store = SessionStore.filter_by(session_id=sid, key='auth.policy.current').one()
-    except NoResultFound:
-        raise ValidationError(_("Session not found."))
-
-    value = json.loads(store.value)
-    atype, user_id, exp = value[0:3]
-
-    if datetime_fromisoformat(expires) != timestamp_to_datetime(exp):
-        raise ValidationError(_("Invalid 'expires' parameter."))
-
-    cookie_settings = WebSession.cookie_settings(request)
-    cookie_settings['expires'] = expires
-
-    cookie_name = request.env.pyramid.options['session.cookie.name']
-
-    response = HTTPFound(location=next_url)
-    response.set_cookie(cookie_name, value=sid, **cookie_settings)
-
-    return response
 
 
 def test_request(request):
@@ -474,10 +444,6 @@ def setup_pyramid(comp, config):
         'pyramid.control_panel.home_path',
         '/control-panel/home_path'
     ).add_view(home_path, renderer=ctpl('home_path'))
-
-    config.add_route('pyramid.session.login',
-                     '/session/login', client=()) \
-        .add_view(session_login, request_method='POST')
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 

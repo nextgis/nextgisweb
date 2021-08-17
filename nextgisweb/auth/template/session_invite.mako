@@ -1,7 +1,7 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 <%! from nextgisweb.pyramid.util import _ %>
 
-<form action="${request.route_url('pyramid.session.login')}"
+<form action="${request.route_url('auth.login')}"
     method="POST" style="text-align: center;" >
 
     <input name="sid" type="hidden" required value="${session_id}">
