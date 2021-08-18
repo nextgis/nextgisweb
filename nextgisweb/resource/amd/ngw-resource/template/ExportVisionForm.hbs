@@ -1,0 +1,16 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" style="max-width: 50em;">
+
+    <p>{{gettext 'Select the category of users who can use the "Save as" link to download resource data. This will not affect REST API use which will continue to be governed by permissions.'}}</p>
+
+    <div data-dojo-type="dijit/form/Select"
+        data-dojo-attach-point="wExportVision"
+        style="width: 100%; margin-bottom: 1em;">
+        <option value="data_read">{{gettext 'Users with "Data: Read" permission'}}</option>
+        <option value="data_write">{{gettext 'Users with "Data: Write" permission'}}</option>
+        <option value="administrators">{{gettext 'Administrators'}}</option>
+    </div>
+
+    <button data-dojo-type="dijit/form/Button" 
+        data-dojo-attach-point="buttonSave"
+        class="dijitButton--primary">{{gettext 'Save'}}</button>
+</div>

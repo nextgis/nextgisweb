@@ -4,6 +4,7 @@ Changes
 4.0.0
 -----
 
+- Add setting for a visibility of a resource data download link.
 - Source layer selection while creating vector layers from multi-layer sources, 
   such as ZIP-archives with ESRI Shape-files.
 - Automatic generation of keynames for WMS and WFS services.

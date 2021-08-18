@@ -4,6 +4,7 @@ import json
 from collections import OrderedDict
 import zope.event
 
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
 from sqlalchemy.sql.operators import ilike_op
 from sqlalchemy.sql.expression import collate
@@ -376,6 +377,29 @@ def resource_volume(resource, request):
     return dict(volume=volume)
 
 
+def export_vision_get(request):
+    request.require_administrator()
+    try:
+        export_vision = request.env.core.settings_get('resource', 'export_vision')
+    except KeyError:
+        export_vision = 'data_read'
+    return dict(export_vision=export_vision)
+
+
+def export_vision_put(request):
+    request.require_administrator()
+
+    body = request.json_body
+    for k, v in body.items():
+        if k == 'export_vision':
+            if v in ('data_read', 'data_write', 'administrators'):
+                request.env.core.settings_set('resource', 'export_vision', v)
+            else:
+                raise HTTPBadRequest("Invalid value '%s'" % v)
+        else:
+            raise HTTPBadRequest("Invalid key '%s'" % k)
+
+
 def setup_pyramid(comp, config):
 
     config.add_route(
@@ -412,6 +436,11 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.search', '/api/resource/search/') \
         .add_view(search, request_method='GET')
+
+    config.add_route('resource.export_vision',
+                     '/api/component/resource/export_vision') \
+        .add_view(export_vision_get, request_method='GET', renderer='json') \
+        .add_view(export_vision_put, request_method='PUT', renderer='json')
 
     config.add_route(
         'resource.export', '/api/resource/{id}/export',
