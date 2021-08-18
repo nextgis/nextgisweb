@@ -477,8 +477,6 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.logo'))),
         dm.Link('settings/home_path', _("Home path"), lambda args: (
             args.request.route_url('pyramid.control_panel.home_path'))),
-        dm.Link('settings/export_vision', _("Resource export"), lambda args: (
-            args.request.route_url('pyramid.control_panel.export_vision'))),
     )
 
     if env.core.options['storage.enabled']:

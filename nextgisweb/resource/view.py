@@ -373,9 +373,13 @@ def setup_pyramid(comp, config):
 
         return resource.has_permission(permission, user)
 
+    comp.env.pyramid.control_panel.add(
+        Link('settings/export_vision', _("Resource export"), lambda args: (
+            args.request.route_url('resource.control_panel.export_vision'))))
+
     config.add_request_method(has_export_permission, 'has_export_permission')
 
     config.add_route(
-        'pyramid.control_panel.export_vision',
+        'resource.control_panel.export_vision',
         '/control-panel/export-vision'
     ).add_view(export_vision)
