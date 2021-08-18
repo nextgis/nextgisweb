@@ -2,29 +2,29 @@
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
-#: api.py:68
+#: api.py:69
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:115
+#: api.py:117
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:118
+#: api.py:120
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:121
+#: api.py:123
 #, python-format
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: api.py:127
+#: api.py:129
 #, python-format
 msgid "Resource class '%s' disabled."
 msgstr "Класс ресурса '%s' отключен."
 
-#: api.py:209
+#: api.py:211
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
@@ -130,12 +130,12 @@ msgstr "Чтение"
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:42 view.py:311
+#: scope.py:42 view.py:319
 msgid "Update"
 msgstr "Изменить"
 
 #: amd/ngw-resource/CompositeWidget.js:96 amd/ngw-resource/PermissionWidget.js:321
-#: scope.py:46 view.py:319
+#: scope.py:46 view.py:327
 msgid "Delete"
 msgstr "Удалить"
 
@@ -184,7 +184,7 @@ msgstr "Конфигурация"
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:88 view.py:326
+#: view.py:88 view.py:334
 msgid "JSON view"
 msgstr "Представление JSON"
 
@@ -192,7 +192,7 @@ msgstr "Представление JSON"
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
-#: view.py:129 view.py:336
+#: view.py:129 view.py:344
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -204,29 +204,33 @@ msgstr "Обновить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:203
+#: view.py:190 view.py:377
+msgid "Resource export"
+msgstr "Экспорт ресурсов"
+
+#: view.py:211
 #, python-format
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:261
+#: view.py:269
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: amd/ngw-resource/DescriptionWidget.js:19 view.py:268
+#: amd/ngw-resource/DescriptionWidget.js:19 view.py:276
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:275
+#: view.py:283
 msgid "User permissions"
 msgstr "Права пользователя"
 
 #: amd/ngw-resource/PermissionWidget.js:66 amd/ngw-resource/PermissionWidget.js:133
-#: view.py:337
+#: view.py:345
 msgid "Action"
 msgstr "Действие"
 
-#: view.py:338
+#: view.py:346
 msgid "Extra"
 msgstr "Дополнительно"
 
@@ -239,6 +243,7 @@ msgid "Create and edit"
 msgstr "Создать и изменить"
 
 #: amd/ngw-resource/CompositeWidget.js:89
+#: amd/ngw-resource/template/ExportVisionForm.hbs:15
 msgid "Save"
 msgstr "Сохранить"
 
@@ -327,6 +332,28 @@ msgstr "Выберите ресурс"
 msgid "Confirm deletion of the resource"
 msgstr "Подтвердить удаление ресурса"
 
+#: amd/ngw-resource/template/ExportVisionForm.hbs:3
+msgid ""
+"Select the category of users who can use the \"Save as\" link to download "
+"resource data. This will not affect REST API use which will continue to be "
+"governed by permissions."
+msgstr ""
+"Выберите категорию пользователей, которые могут видеть ссылку \"Сохранить "
+"как\" для скачивания данных ресурса. Это не повлияет на REST API, который "
+"продолжит регулироваться правами доступа."
+
+#: amd/ngw-resource/template/ExportVisionForm.hbs:8
+msgid "Users with \"Data: Read\" permission"
+msgstr "Пользователи с правом доступа \"Данные: Чтение\""
+
+#: amd/ngw-resource/template/ExportVisionForm.hbs:9
+msgid "Users with \"Data: Write\" permission"
+msgstr "Пользователи с правом доступа \"Данные: Запись\""
+
+#: amd/ngw-resource/template/ExportVisionForm.hbs:10
+msgid "Administrators"
+msgstr "Администраторы"
+
 #: amd/ngw-resource/template/Widget.hbs:8 template/section_children.mako:142
 #: template/section_summary.mako:6
 msgid "Display name"
@@ -364,24 +391,4 @@ msgstr "Размер"
 #: template/section_description.mako:4
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
-
-#~ msgid ""
-#~ "The resource may have been deleted or"
-#~ " an error in the URL. Correct the"
-#~ " URL or go to the home page "
-#~ "and try to find the desired resource."
-#~ msgstr ""
-#~ "Возможно ресурс удален, либо в адресе "
-#~ "допущена ошибка. Исправьте адрес или "
-#~ "вернитесь на главную страницу и попробуйте"
-#~ " найти нужный ресурс с помощью навигации."
-
-#~ msgid "Display map"
-#~ msgstr "Открыть карту"
-
-#~ msgid "Display scene"
-#~ msgstr "Открыть сцену"
-
-#~ msgid "Feature table"
-#~ msgstr "Таблица объектов"
 
