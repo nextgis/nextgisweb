@@ -3,12 +3,12 @@
 <%def name="head()">
     <script type="text/javascript">
         require([
-            "ngw-resource/ExportVisionForm",
+            "ngw-resource/ResourceExportForm",
             "dojo/domReady!"
         ], function (
-            ExportVisionForm
+            ResourceExportForm
         ) {
-            (new ExportVisionForm()).placeAt('form').startup();
+            (new ResourceExportForm()).placeAt('form').startup();
         });
     </script>
 </%def>

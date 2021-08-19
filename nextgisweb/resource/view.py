@@ -183,8 +183,8 @@ def widget(request):
         cls=clsid, parent=parent.id if parent else None)
 
 
-@viewargs(renderer='nextgisweb:resource/template/export_vision.mako')
-def export_vision(request):
+@viewargs(renderer='nextgisweb:resource/template/resource_export.mako')
+def resource_export(request):
     request.require_administrator()
     return dict(
         title=_("Resource export"),
@@ -357,14 +357,14 @@ def setup_pyramid(comp, config):
         user = request.user
 
         try:
-            export_vision = request.env.core.settings_get('resouce', 'export_vision')
+            value = request.env.core.settings_get('resouce', 'resource_export')
         except KeyError:
-            export_vision = 'data_read'
+            value = 'data_read'
 
-        if export_vision == 'administrators':
+        if value == 'administrators':
             return user.is_administrator
 
-        if export_vision == 'data_write':
+        if value == 'data_write':
             permission = DataScope.write
         else:
             permission = DataScope.read
@@ -374,12 +374,12 @@ def setup_pyramid(comp, config):
         return resource.has_permission(permission, user)
 
     comp.env.pyramid.control_panel.add(
-        Link('settings/export_vision', _("Resource export"), lambda args: (
-            args.request.route_url('resource.control_panel.export_vision'))))
+        Link('settings/resource_export', _("Resource export"), lambda args: (
+            args.request.route_url('resource.control_panel.resource_export'))))
 
     config.add_request_method(has_export_permission, 'has_export_permission')
 
     config.add_route(
-        'resource.control_panel.export_vision',
-        '/control-panel/export-vision'
-    ).add_view(export_vision)
+        'resource.control_panel.resource_export',
+        '/control-panel/resource-export'
+    ).add_view(resource_export)

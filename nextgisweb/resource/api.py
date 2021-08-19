@@ -377,23 +377,23 @@ def resource_volume(resource, request):
     return dict(volume=volume)
 
 
-def export_vision_get(request):
+def resource_export_get(request):
     request.require_administrator()
     try:
-        export_vision = request.env.core.settings_get('resource', 'export_vision')
+        value = request.env.core.settings_get('resource', 'resource_export')
     except KeyError:
-        export_vision = 'data_read'
-    return dict(export_vision=export_vision)
+        value = 'data_read'
+    return dict(resource_export=value)
 
 
-def export_vision_put(request):
+def resource_export_put(request):
     request.require_administrator()
 
     body = request.json_body
     for k, v in body.items():
-        if k == 'export_vision':
+        if k == 'resource_export':
             if v in ('data_read', 'data_write', 'administrators'):
-                request.env.core.settings_set('resource', 'export_vision', v)
+                request.env.core.settings_set('resource', 'resource_export', v)
             else:
                 raise HTTPBadRequest("Invalid value '%s'" % v)
         else:
@@ -437,10 +437,10 @@ def setup_pyramid(comp, config):
         'resource.search', '/api/resource/search/') \
         .add_view(search, request_method='GET')
 
-    config.add_route('resource.export_vision',
-                     '/api/component/resource/export_vision') \
-        .add_view(export_vision_get, request_method='GET', renderer='json') \
-        .add_view(export_vision_put, request_method='PUT', renderer='json')
+    config.add_route('resource.resource_export',
+                     '/api/component/resource/resource_export') \
+        .add_view(resource_export_get, request_method='GET', renderer='json') \
+        .add_view(resource_export_put, request_method='PUT', renderer='json')
 
     config.add_route(
         'resource.export', '/api/resource/{id}/export',

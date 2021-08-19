@@ -7,7 +7,7 @@ define([
     "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
     "@nextgisweb/pyramid/i18n!",
-    "dojo/text!./template/ExportVisionForm.hbs",
+    "dojo/text!./template/ResourceExportForm.hbs",
     // template
     "dijit/form/Button",
     "dijit/form/Select"
@@ -22,7 +22,7 @@ define([
     i18n,
     template
 ) {
-    var API_URL = route.resource.export_vision();
+    var API_URL = route.resource.resource_export();
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
@@ -37,7 +37,7 @@ define([
             xhr.get(API_URL, {
                 handleAs: "json"
             }).then(function (data) {
-                this.wExportVision.set("value", data.export_vision);
+                this.wResourceExport.set("value", data.resource_export);
             }.bind(this));
         },
 
@@ -48,7 +48,7 @@ define([
                     "Content-Type": "application/json"
                 },
                 data: JSON.stringify({
-                    export_vision: this.wExportVision.get("value")
+                    resource_export: this.wResourceExport.get("value")
                 })
             }).then(
                 function () {
