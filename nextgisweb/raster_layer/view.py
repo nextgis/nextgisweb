@@ -19,7 +19,7 @@ class RasterLayerWidget(Widget):
 
 @viewargs(renderer='nextgisweb:raster_layer/template/export.mako')
 def export(request):
-    if not request.has_export_permission():
+    if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
     return dict(obj=request.context, subtitle=_("Save as"), maxheight=True)
 
@@ -34,7 +34,7 @@ def setup_pyramid(comp, config):
             if isinstance(args.obj, RasterLayer):
                 yield dm.Label('raster_layer', _("Raster layer"))
 
-                if args.request.has_export_permission():
+                if args.obj.has_export_permission(args.request.user):
                     yield dm.Link(
                         'raster_layer/export', _("Save as"),
                         lambda args: args.request.route_url(

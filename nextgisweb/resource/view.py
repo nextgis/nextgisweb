@@ -348,36 +348,9 @@ def setup_pyramid(comp, config):
         ResourceMenu(),
     )
 
-    def has_export_permission(request):
-
-        user_id = request.authenticated_userid
-        if user_id is None:
-            return False
-
-        user = request.user
-
-        try:
-            value = request.env.core.settings_get('resouce', 'resource_export')
-        except KeyError:
-            value = 'data_read'
-
-        if value == 'administrators':
-            return user.is_administrator
-
-        if value == 'data_write':
-            permission = DataScope.write
-        else:
-            permission = DataScope.read
-
-        resource = request.context
-
-        return resource.has_permission(permission, user)
-
     comp.env.pyramid.control_panel.add(
         Link('settings/resource_export', _("Resource export"), lambda args: (
             args.request.route_url('resource.control_panel.resource_export'))))
-
-    config.add_request_method(has_export_permission, 'has_export_permission')
 
     config.add_route(
         'resource.control_panel.resource_export',

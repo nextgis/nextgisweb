@@ -21,7 +21,7 @@ from .serialize import (
     SerializedProperty as SP,
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR)
-from .scope import ResourceScope, MetadataScope
+from .scope import DataScope, ResourceScope, MetadataScope
 from .permission import RequirementList
 from .exception import ValidationError, HierarchyError, ForbiddenError, DisplayNameNotUnique
 
@@ -240,6 +240,22 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
 
     def has_permission(self, permission, user):
         return permission in self.permissions(user)
+
+    def has_export_permission(self, user):
+        try:
+            value = env.core.settings_get('resource', 'resource_export')
+        except KeyError:
+            value = 'data_read'
+
+        if value == 'administrators':
+            return user.is_administrator
+
+        if value == 'data_write':
+            permission = DataScope.write
+        else:
+            permission = DataScope.read
+
+        return self.has_permission(permission, user)
 
     # Data validation
 
