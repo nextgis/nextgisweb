@@ -38,6 +38,10 @@ define([
                 " (" + this.composite.cls + ")");
 
             this.wParent.set("disabled", this.composite.operation === "create");
+            if (this.params.composite.operation == "create") {
+                this.wDisplayName._hasBeenBlurred = true;
+                this.wDisplayName.validate();
+            }
         },
 
         serializeInMixin: function (data) {

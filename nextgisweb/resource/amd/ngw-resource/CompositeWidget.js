@@ -126,8 +126,6 @@ define([
             if (this.operation === "read" || this.operation === "update") {
                 this.refreshObj();
             }
-
-            this.validateData();
         },
 
         // Serialization and validation
