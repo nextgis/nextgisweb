@@ -65,6 +65,8 @@ class WebSession(dict):
             self.created = datetime_to_unix(datetime.utcnow())
 
         def check_save(request, response):
+            update_cookie = False
+
             with transaction.manager:
                 utcnow = datetime.utcnow()
 
@@ -85,6 +87,7 @@ class WebSession(dict):
                         DBSession.query(Session).filter_by(
                             id=self._session_id, last_activity=self._last_activity
                         ).update(dict(last_activity=utcnow))
+                        update_cookie = True
 
                 if len(self._updated) > 0:
                     if self._session_id is None:
@@ -94,6 +97,7 @@ class WebSession(dict):
                             created=utcnow,
                             last_activity=utcnow
                         ).persist()
+                        update_cookie = True
 
                     with DBSession.no_autoflush:
                         for key in self._updated:
@@ -105,10 +109,15 @@ class WebSession(dict):
                                 kv = SessionStore(session_id=self._session_id, key=key).persist()
                             kv.value = self._get_for_db(key)
 
-            if self._session_id:
+            if update_cookie:
+                # Check if another session is set
+                for h, v in response.headerlist:
+                    if h == 'Set-Cookie' and v.startswith(self._cookie_name + '='):
+                        return
                 cookie_settings = WebSession.cookie_settings(request)
                 cookie_settings['max_age'] = self._cookie_max_age.total_seconds()
-                response.set_cookie(self._cookie_name, value=self._session_id, **cookie_settings)
+                response.set_cookie(self._cookie_name, value=self._session_id,
+                                    **cookie_settings)
 
         request.add_response_callback(check_save)
 
