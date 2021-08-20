@@ -36,6 +36,8 @@ def _test_current_user(ngw_webtest_app, keyname):
 
 
 def test_session_invite(user, ngw_env, ngw_webtest_app):
+    sid_key = ngw_env.pyramid.options['session.cookie.name']
+
     url = ngw_env.auth.session_invite(user.keyname, 'https://no-matter/some/path')
     result = urlparse(url)
 
@@ -45,6 +47,12 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
     expires_dt = datetime_fromisoformat(expires)
     next_url = query['next'][0]
     assert next_url == '/some/path'
+
+    ngw_webtest_app.post('/login', dict(
+        login='test-user', password='password123', status=302))
+    sid_key in ngw_webtest_app.cookies
+    assert ngw_webtest_app.cookies[sid_key] != sid
+    _test_current_user(ngw_webtest_app, 'test-user')
 
     ngw_webtest_app.post('/login', dict(
         sid=sid + 'invalid', expires=expires), status=401)
@@ -61,12 +69,12 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
         ngw_webtest_app.post('/login', dict(
             sid=sid, expires=expires), status=302)
 
-    sid_key = ngw_env.pyramid.options['session.cookie.name']
     assert sid_key in ngw_webtest_app.cookies
     assert ngw_webtest_app.cookies[sid_key] == sid
     _test_current_user(ngw_webtest_app, 'test-user')
 
     ngw_webtest_app.post('/logout', status=302)
+    sid_key not in ngw_webtest_app.cookies
     _test_current_user(ngw_webtest_app, 'guest')
 
     ngw_webtest_app.post('/login', dict(
