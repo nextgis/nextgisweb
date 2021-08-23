@@ -3,6 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import os.path
 import geoalchemy2 as ga
+from six import ensure_str
 from sqlalchemy import func
 from sqlalchemy.ext.orderinglist import ordering_list
 from osgeo import gdal, gdalconst, osr, ogr
@@ -210,19 +211,20 @@ class RasterMosaicItem(Base):
 
         # building overviews
         options = {
-            b'COMPRESS_OVERVIEW': b'DEFLATE',
-            b'INTERLEAVE_OVERVIEW': b'PIXEL',
-            b'BIGTIFF_OVERVIEW': b'YES',
+            'COMPRESS_OVERVIEW': 'DEFLATE',
+            'INTERLEAVE_OVERVIEW': 'PIXEL',
+            'BIGTIFF_OVERVIEW': 'YES',
         }
         for key, val in options.items():
-            gdal.SetConfigOption(key, val)
+            gdal.SetConfigOption(ensure_str(key), ensure_str(val))
         try:
             ds = gdal.Open(fn, gdal.GA_ReadOnly)
-            ds.BuildOverviews(b'GAUSS', overviewlist=calc_overviews_levels(ds))
+            ds.BuildOverviews(ensure_str('GAUSS'), overviewlist=calc_overviews_levels(ds))
+
             ds = None
         finally:
             for key, val in options.items():
-                gdal.SetConfigOption(key, None)
+                gdal.SetConfigOption(ensure_str(key), None)
 
     def to_dict(self):
         return dict(id=self.id, display_name=self.display_name)
