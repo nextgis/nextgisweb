@@ -196,8 +196,8 @@ def _get_map(obj, request):
 
         request.resource_permission(DataScope.read, lobj.resource)
 
-        if (lobj.min_scale_denom is None or lobj.min_scale_denom < w_scale) and \
-                (lobj.max_scale_denom is None or w_scale < lobj.max_scale_denom):
+        if (lobj.min_scale_denom is None or lobj.min_scale_denom >= w_scale) and \
+                (lobj.max_scale_denom is None or w_scale >= lobj.max_scale_denom):
             req = lobj.resource.render_request(srs)
             limg = req.render_extent(p_bbox, p_size)
             if limg is not None:
