@@ -46,11 +46,11 @@ def vector_layer_id(ngw_resource_group):
             'crs': {'type': 'name', 'properties': {'name': 'urn:ogc:def:crs:EPSG::3857'}},
             'features': [{
                 'type': 'Feature',
-                'properties': {'name': 'feature1'},
+                'properties': {'price': -1, 'name': 'feature1'},
                 'geometry': {'type': 'Point', 'coordinates': [0, 0]}
             }, {
                 'type': 'Feature',
-                'properties': {'price': -1},
+                'properties': {'price': -2, 'name': 'feature2'},
                 'geometry': {'type': 'Point', 'coordinates': [0, 0]}
             }]
         }
@@ -74,6 +74,8 @@ def test_fields_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     fields = resp.json['feature_layer']['fields']
 
     assert len(fields) == 2
+    assert fields[0]['keyname'] == 'price'
+    assert fields[1]['keyname'] == 'name'
 
     resp = ngw_webtest_app.get('/api/resource/%d/feature/1' % vector_layer_id)
     feature_fields = resp.json['fields']
@@ -109,11 +111,11 @@ def test_fields_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     fields = resp.json['feature_layer']['fields']
 
     assert len(fields) == 3
-    assert fields[0]['keyname'] == 'new_field'
-    assert fields[1]['keyname'] == 'name'
+    assert fields[0]['keyname'] == 'name'
+    assert fields[1]['keyname'] == 'new_field'
     assert fields[2]['keyname'] == 'price'
 
-    fields[2]['delete'] = True
+    fields[1]['delete'] = True
     ngw_webtest_app.put_json('/api/resource/%d' % vector_layer_id, {
         'feature_layer': {'fields': fields}
     }, status=200)
@@ -121,6 +123,21 @@ def test_fields_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     fields = resp.json['feature_layer']['fields']
 
     assert len(fields) == 2
+
+    ngw_webtest_app.put_json('/api/resource/%d' % vector_layer_id, dict(
+        feature_layer=dict(fields=[dict(
+            keyname='new_field2',
+            datatype='STRING',
+            display_name='new_field2',
+        )])
+    ), status=200)
+    resp = ngw_webtest_app.get('/api/resource/%d' % vector_layer_id)
+    fields = resp.json['feature_layer']['fields']
+
+    assert len(fields) == 3
+    assert fields[0]['keyname'] == 'name'
+    assert fields[1]['keyname'] == 'price'
+    assert fields[2]['keyname'] == 'new_field2'
 
 
 def test_geom_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
