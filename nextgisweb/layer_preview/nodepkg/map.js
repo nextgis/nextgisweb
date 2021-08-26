@@ -67,7 +67,7 @@ const createGeoJsonLayer = (resource) => {
 const createXYZLayer = (resource) => {
     const url =
         routeURL("render.tile") +
-        `?resource=${resource}&x={x}&y={y}&z={z}`;
+        `?resource=${resource}&x={x}&y={y}&z={z}&nd=204`;
     const layer = new TileLayer({
         source: new XYZ({
             wrapX: false,
