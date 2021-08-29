@@ -26,7 +26,7 @@
             <span class="dijitReset dijitInline dijitButtonNode">
                 ${tr(_('Sign in with OAuth'))}
             </span>
-        </a
+        </a>
     %else:
         %if (request.env.auth.oauth is not None) and (not request.env.auth.oauth.password):
             <% oauth_url = request.route_url('auth.oauth', _query=dict(next=next_url) if next_url else None) %>
