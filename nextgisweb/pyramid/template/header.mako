@@ -73,13 +73,18 @@
 
 <script>
     require([
+        "dojo/query",
         "ngw-pyramid/right-menu/RightMenu",
         "ngw-pyramid/user-avatar/UserAvatar",
         "ngw-resource/ResourcesFilter/ResourcesFilter"
     ], function (
-        RightMenu, UserAvatar, ResourcesFilter
+        query, RightMenu, UserAvatar, ResourcesFilter
     ) {
-        (new ResourcesFilter({})).placeAt('resourcesFilter');
+        %if not (request.matched_route is not None and request.matched_route.name == 'webmap.display'):
+            if (query("form.auth-form").length === 0) {
+                (new ResourcesFilter({})).placeAt('resourcesFilter');
+            }
+        %endif
 
         %if user_mode != 'guest':
             (new UserAvatar({
