@@ -2,21 +2,24 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
+from datetime import datetime
 
 import string
 import secrets
 import zope.event
 import sqlalchemy as sa
 
-from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.events import BeforeRender
 from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
-from pyramid.httpexceptions import HTTPFound, HTTPUnauthorized
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 from six.moves.urllib.parse import urlencode
+from sqlalchemy.orm.exc import NoResultFound
 
+from ..compat import datetime_fromisoformat, timestamp_to_datetime
 from ..models import DBSession
 from ..object_widget import ObjectWidget
+from ..pyramid import SessionStore, WebSession
 from ..views import ModelController, permalinker
 from .. import dynmenu as dm
 
@@ -54,24 +57,54 @@ def login(request):
     next_url = request.params.get('next', request.application_url)
 
     if request.method == 'POST':
-        auth_policy = request.registry.getUtility(IAuthenticationPolicy)
-        try:
-            user, tresp = auth_policy.authenticate_with_password(
-                username=request.POST['login'].strip(),
-                password=request.POST['password'])
+        if 'sid' in request.POST:
+            sid = request.POST['sid']
+            expires = request.POST['expires']
 
-            DBSession.flush()  # Force user.id sequence value
-            headers = auth_policy.remember(request, (user.id, tresp))
+            try:
+                store = SessionStore.filter_by(session_id=sid, key='auth.policy.current').one()
+            except NoResultFound:
+                raise InvalidCredentialsException(_("Session not found."))
+            value = json.loads(store.value)
+
+            exp = timestamp_to_datetime(value[2])
+            if datetime_fromisoformat(expires) != exp:
+                raise InvalidCredentialsException(_("Invalid 'expires' parameter."))
+            if exp <= datetime.utcnow():
+                raise InvalidCredentialsException(_("Session expired."))
+
+            cookie_settings = WebSession.cookie_settings(request)
+            cookie_settings['expires'] = expires
+
+            cookie_name = request.env.pyramid.options['session.cookie.name']
+
+            response = HTTPFound(location=next_url)
+            response.set_cookie(cookie_name, value=sid, **cookie_settings)
+
+            return response
+        else:
+            try:
+                user, headers = request.env.auth.authenticate(
+                    request, request.POST['login'].strip(), request.POST['password'])
+            except (InvalidCredentialsException, UserDisabledException) as exc:
+                return dict(error=exc.title, next_url=next_url)
 
             event = OnUserLogin(user, request, next_url)
             zope.event.notify(event)
 
             return HTTPFound(location=event.next_url, headers=headers)
 
-        except (InvalidCredentialsException, UserDisabledException) as exc:
-            return dict(error=exc.title, next_url=next_url)
-
     return dict(next_url=next_url)
+
+
+def session_invite(request):
+    if any(k not in request.GET for k in ('sid', 'expires')):
+        raise HTTPNotFound()
+
+    return dict(
+        session_id=request.GET['sid'],
+        expires=request.GET['expires'],
+        next_url=request.GET.get('next'))
 
 
 def oauth(request):
@@ -211,6 +244,11 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.login', '/login') \
         .add_view(login, renderer='nextgisweb:auth/template/login.mako')
+
+    config.add_route(
+        'pyramid.session.invite',
+        '/session/invite'
+    ).add_view(session_invite, renderer='nextgisweb:auth/template/session_invite.mako')
 
     config.add_route('auth.logout', '/logout').add_view(logout)
 

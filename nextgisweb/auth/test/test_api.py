@@ -1,12 +1,84 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+from datetime import timedelta
+
 import pytest
 import transaction
+from freezegun import freeze_time
+from six.moves.urllib.parse import urlparse, parse_qs
 
 from nextgisweb import db
 from nextgisweb.auth import User, Group
+from nextgisweb.compat import datetime_fromisoformat
 from nextgisweb.models import DBSession
+
+
+@pytest.fixture()
+def user():
+    with transaction.manager:
+        user = User(
+            keyname='test-user',
+            display_name='test-user',
+            password='password123'
+        ).persist()
+        DBSession.flush()
+
+    yield user
+
+    with transaction.manager:
+        DBSession.delete(User.filter_by(id=user.id).one())
+
+
+def _test_current_user(ngw_webtest_app, keyname):
+    res = ngw_webtest_app.get('/api/component/auth/current_user')
+    assert res.json['keyname'] == keyname
+
+
+def test_session_invite(user, ngw_env, ngw_webtest_app):
+    sid_key = ngw_env.pyramid.options['session.cookie.name']
+
+    url = ngw_env.auth.session_invite(user.keyname, 'https://no-matter/some/path')
+    result = urlparse(url)
+
+    query = parse_qs(result.query)
+    sid = query['sid'][0]
+    expires = query['expires'][0]
+    expires_dt = datetime_fromisoformat(expires)
+    next_url = query['next'][0]
+    assert next_url == '/some/path'
+
+    ngw_webtest_app.post('/login', dict(
+        login='test-user', password='password123', status=302))
+    sid_key in ngw_webtest_app.cookies
+    assert ngw_webtest_app.cookies[sid_key] != sid
+    _test_current_user(ngw_webtest_app, 'test-user')
+
+    ngw_webtest_app.post('/login', dict(
+        sid=sid + 'invalid', expires=expires), status=401)
+
+    ngw_webtest_app.post('/login', dict(
+        sid=sid, expires=expires_dt + timedelta(seconds=1)
+    ), status=401)
+
+    with freeze_time(expires_dt + timedelta(seconds=1)):
+        ngw_webtest_app.post('/login', dict(
+            sid=sid, expires=expires), status=401)
+
+    with freeze_time(expires_dt - timedelta(minutes=5)):
+        ngw_webtest_app.post('/login', dict(
+            sid=sid, expires=expires), status=302)
+
+    assert sid_key in ngw_webtest_app.cookies
+    assert ngw_webtest_app.cookies[sid_key] == sid
+    _test_current_user(ngw_webtest_app, 'test-user')
+
+    ngw_webtest_app.post('/logout', status=302)
+    sid_key not in ngw_webtest_app.cookies
+    _test_current_user(ngw_webtest_app, 'guest')
+
+    ngw_webtest_app.post('/login', dict(
+        sid=sid, expires=expires), status=401)
 
 
 @pytest.fixture()

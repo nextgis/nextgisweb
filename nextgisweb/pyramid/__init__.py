@@ -19,9 +19,10 @@ from .util import (
     gensecret,
     persistent_secret)
 from .model import Base, Session, SessionStore
+from .session import WebSession
 from .command import ServerCommand, AMDPackagesCommand  # NOQA
 
-__all__ = ['viewargs', ]
+__all__ = ['viewargs', 'WebSession']
 
 
 class PyramidComponent(Component):
@@ -114,7 +115,7 @@ class PyramidComponent(Component):
         Option('session.cookie.max_age', timedelta, default=timedelta(days=7),
                doc="Session cookie max_age"),
         Option('session.activity_delta', timedelta, default=timedelta(minutes=10),
-               doc="Session last activity update time delta in seconds."),
+               doc="Session last activity update time delta."),
 
         Option('debugtoolbar.enabled', bool),
         Option('debugtoolbar.hosts'),

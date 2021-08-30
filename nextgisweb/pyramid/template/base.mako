@@ -6,6 +6,8 @@
     import re
     import json
     from bunch import Bunch
+
+    from nextgisweb.pyramid.util import _
 %>
 <head>
     <% system_name = request.env.core.system_full_name() %>
@@ -65,6 +67,7 @@
 </head>
 
 <body class="claro nextgis <%block name='body_class'/>">
+
     %if not custom_layout:
         <div class="layout ${'maxwidth' if maxwidth else ''}">
 

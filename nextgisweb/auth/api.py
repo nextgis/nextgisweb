@@ -4,8 +4,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import json
 
 from pyramid.response import Response
-from pyramid.interfaces import IAuthenticationPolicy
-from pyramid.security import remember, forget
+from pyramid.security import forget
 from pyramid.httpexceptions import (
     HTTPForbidden, HTTPUnauthorized, HTTPUnprocessableEntity)
 
@@ -155,12 +154,9 @@ def login(request):
     if ('login' not in request.POST) or ('password' not in request.POST):
         return HTTPUnprocessableEntity()
 
-    auth_policy = request.registry.getUtility(IAuthenticationPolicy)
-    user, tresp = auth_policy.authenticate_with_password(
-        username=request.POST['login'].strip(),
-        password=request.POST['password'])
+    user, headers = request.env.auth.authenticate(
+        request, request.POST['login'].strip(), request.POST['password'])
 
-    headers = remember(request, (user.id, tresp))
     return Response(
         json.dumps({
             "keyname": user.keyname,

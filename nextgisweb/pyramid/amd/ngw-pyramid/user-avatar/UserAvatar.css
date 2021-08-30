@@ -17,6 +17,11 @@
         text-align: center;
     }
 
+    .user-avatar--danger .user-avatar__label{
+        color: var(--on-primary);
+        background-color: var(--surface-bg-danger);
+    }
+
     .user-avatar:hover .user-avatar__label{
         opacity: .8;
     }

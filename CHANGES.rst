@@ -4,11 +4,12 @@ Changes
 4.0.0
 -----
 
-- Add setting for a visibility of a resource data download link.
 - Source layer selection while creating vector layers from multi-layer sources, 
   such as ZIP-archives with ESRI Shape-files.
 - Automatic generation of keynames for WMS and WFS services.
 - Improved support for Unicode field names for WFS services.
+- Setting for more granular control of resource export availability.
+- Ability to log in as an arbitrary user with a session invitation.
 - ISO-8601 date and time formatting in feature layer REST API via
   ``dt_format=iso`` option.
 
