@@ -2,9 +2,9 @@
 from __future__ import division, unicode_literals, print_function, absolute_import
 import os
 import os.path
+from datetime import datetime
 
 from ..lib.config import Option
-from ..compat import Path
 from ..component import Component, require
 from ..core import KindOfData
 from ..models import DBSession
@@ -16,7 +16,7 @@ from .interface import (
     ITileRenderRequest,
     ILegendableStyle,
 )
-from .model import Base, ResourceTileCache
+from .model import Base, ResourceTileCache, TIMESTAMP_EPOCH
 from .event import (
     on_style_change,
     on_data_change,
@@ -73,14 +73,25 @@ class RenderComponent(Component):
 
     def estimate_storage(self):
         for tc in ResourceTileCache.filter_by(enabled=True).all():
-            path = Path(tc.tilestor_path)
-            if path.exists():
-                size_img = os.stat(str(path)).st_size
-                count = DBSession.execute(
-                    'SELECT count(1) FROM tile_cache."{}"'.format(tc.uuid.hex)
-                ).scalar()
-                size_color = count * 20  # 5x int columns
-                yield TileCacheData, tc.resource_id, size_img + size_color
+            if tc.ttl is not None:
+                now_unix = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
+                where_sql = ' WHERE tstamp > %d' % (now_unix - tc.ttl)
+            else:
+                where_sql = None
+
+            tilestor, lock = tc.get_tilestor()
+            query_tile = 'SELECT coalesce(sum(length(data) + 16), 0) FROM tile'  # with 4x int columns
+            if where_sql is not None:
+                query_tile += where_sql
+            size_img = tilestor.execute(query_tile).fetchone()[0]
+
+            query = 'SELECT count(1) FROM tile_cache."{}"'.format(tc.uuid.hex)
+            if where_sql is not None:
+                query += where_sql
+            count = DBSession.execute(query).scalar()
+            size_color = count * 20  # 5x int columns
+
+            yield TileCacheData, tc.resource_id, size_img + size_color
 
     option_annotations = (
         Option('tile_cache.enabled', bool, default=True),
