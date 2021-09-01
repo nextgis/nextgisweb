@@ -469,6 +469,11 @@ class TableInfo(object):
             else:
                 static_size += FIELD_TYPE_SIZE[f.datatype]
 
+        if self.fid_field_index is not None:
+            defn = ogrlayer.GetLayerDefn()
+            fld_defn = defn.GetFieldDefn(self.fid_field_index)
+            fid_field_name = fld_defn.GetName()
+
         max_fid = None
         for i, feature in enumerate(ogrlayer, start=1):
             if len(errors) >= error_limit:
@@ -477,6 +482,12 @@ class TableInfo(object):
             if self.fid_field_index is None:
                 fid = i
             else:
+                if not feature.IsFieldSet(self.fid_field_index):
+                    errors.append(_("Feature (seq. #%d) doesn't have a FID field '%s'.") % (i, fid_field_name))
+                    continue
+                if feature.IsFieldNull(self.fid_field_index):
+                    errors.append(_("Feature (seq. #%d) FID field '%s' is null.") % (i, fid_field_name))
+                    continue
                 fid = feature.GetFieldAsInteger(self.fid_field_index)
             max_fid = max(max_fid, fid) if max_fid is not None else fid
 
