@@ -6,11 +6,13 @@ import os
 import os.path
 import logging
 import json
+import re
 import six
 from importlib import import_module
+from packaging import version as pkg_version
 from argparse import ArgumentParser, Namespace
 from pkg_resources import resource_filename
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from functools import partial
 
 from babel.messages.catalog import Catalog
@@ -392,57 +394,153 @@ def cmd_stat(args):
         print_records(data, ('package', ), title='PACKAGE SUMMARY')
 
 
-def cmd_poeditor_pull(args):
+def cmd_poeditor_sync(args):
     poeditor_api_token = env.core.options['locale.poeditor_api_token']
     poeditor_project_id = env.core.options['locale.poeditor_project_id']
-    poeditor_terms = dict()
 
     if poeditor_api_token is None:
         raise RuntimeError("POEditor API token isn't set!")
 
     client = POEditorAPI(api_token=poeditor_api_token)
 
+    # Package versions are stored as part of the project's description in the POEditor
+    description =  POEDitorDescription(client, poeditor_project_id)
+    local_ver = pkginfo.packages[args.package].version
+    if args.package in description.packages:
+        remote_ver = description.packages[args.package]
+
+        if pkg_version.parse(local_ver) < pkg_version.parse(remote_ver):
+            raise RuntimeError(
+                "Version of the '%s' package must be not lower than %s in order to use translations from the POEditor "
+                "(current version: %s)."
+                % (args.package, remote_ver, local_ver)
+            )
+
+    # Update local po-files
+    poeditor_terms = {}
     for comp_id, locales in components_and_locales(args, work_in_progress=True):
         for locale in locales:
+            if locale in ("en", "ru"):
+                continue
+
+            cmd_update(Namespace(
+                package=pkginfo.comp_pkg(comp_id),
+                component=[comp_id, ],
+                locale=[locale, ],
+                extract=args.extract,
+                force=False
+            ))
+
             terms = poeditor_terms.get(locale)
-            if terms is None:
-                logger.info(
-                    "Fetching translations from POEditor for locale [%s]...", locale
-                )
-                terms = client.view_project_terms(
-                    poeditor_project_id, language_code=locale
-                )
+            if not terms:
+                logger.debug("Fetching translations from POEditor for locale [%s]...", locale)
+                terms = client.view_project_terms(poeditor_project_id, language_code=locale)
                 poeditor_terms[locale] = terms
 
-            translated = 0
+            # Filter terms by context
+            terms = [term for term in terms if comp_id == term['context']]
 
-            po_path = catalog_filename(comp_id, locale, ext='po', mkdir=False)
-            if po_path.exists():
-                with po_path.open("r") as po_fd:
-                    po = read_po(po_fd, locale=locale)
+            po_path = catalog_filename(comp_id, locale)
 
-                terms = [term for term in terms if comp_id in term['tags']]
+            if not po_path.exists():
+                continue
 
-                for msg in po:
-                    for term in terms:
-                        if msg.id == term['term']:
-                            cur_tr = msg.string
-                            new_tr = term['translation']['content']
+            with po_path.open('r') as po_fd:
+                po = read_po(po_fd, locale=locale)
 
-                            if (not cur_tr and new_tr) or (
-                                cur_tr and new_tr and cur_tr != new_tr and args.force
-                            ):
-                                msg.string = new_tr
-                                translated += 1
-                            break
+            updated = 0
 
-                if translated != 0:
-                    with io.open(str(po_path), 'wb') as fd:
-                        write_po(fd, po, width=80, omit_header=True)
+            for msg in po:
+                for term in terms:
+                    if msg.id == term['term']:
+                        cur_tr = msg.string
+                        new_tr = term['translation']['content']
 
-            logger.info(
-                "%d messages translated for component [%s] locale [%s]",
-                translated, comp_id, locale)
+                        if cur_tr != new_tr:
+                            msg.string = new_tr
+                            updated += 1
+
+                        break
+
+            if updated != 0:
+                with io.open(str(po_path), 'wb') as fd:
+                    write_po(fd, po, width=80, omit_header=True)
+
+                logger.info(
+                    "%d messages translated for component [%s] locale [%s]",
+                    updated, comp_id, locale)
+
+    # Synchronize terms
+    remote_terms = defaultdict(set)
+    target_state = defaultdict(dict)
+
+    for item in client.view_project_terms(poeditor_project_id):
+        remote_terms[item['term']].add(item['context'])
+
+    comps = []
+    for comp_id, _ in components_and_locales(args, work_in_progress=True):
+        pot_path = catalog_filename(comp_id, '', ext='pot')
+        with pot_path.open('r') as fd:
+            pot = read_po(fd)
+        for msg in pot:
+            if msg.id == '':
+                continue
+            target_state[msg.id][comp_id] = True
+        comps.append(comp_id)
+
+    for comp_id in comps:
+        for msg_id in target_state:
+            if comp_id not in target_state[msg_id]:
+                target_state[msg_id][comp_id] = False
+
+    terms_to_add = []
+    terms_to_del = []
+    for msg_id in target_state:
+        if not msg_id in remote_terms:
+            for comp_id in target_state[msg_id]:
+                if target_state[msg_id][comp_id]:
+                    terms_to_add.append(dict(term=msg_id, context=comp_id))
+            continue
+
+        for comp_id in target_state[msg_id]:
+            if target_state[msg_id][comp_id] and comp_id not in remote_terms[msg_id]:
+                terms_to_add.append(dict(term=msg_id, context=comp_id))
+            if not target_state[msg_id][comp_id] and comp_id in remote_terms[msg_id]:
+                terms_to_del.append(dict(term=msg_id, context=comp_id))
+
+    if len(terms_to_add) > 0 and args.no_dry_run:
+        client.add_terms(poeditor_project_id, terms_to_add)
+    logger.info("Added messages to POEDitor: %d", len(terms_to_add))
+
+    if len(terms_to_del) > 0 and args.no_dry_run:
+        client.delete_terms(poeditor_project_id, terms_to_del)
+    logger.info("Deleted messages from POEDitor: %d", len(terms_to_del))
+
+    if len(terms_to_add) > 0 or len(terms_to_del) > 0:
+        if args.no_dry_run:
+            description.update(args.package, local_ver)
+        logger.info(
+            "Set '%s' package version to '%s' in POEditor.", args.package, local_ver
+        )
+
+    # TODO: Russian language as a reference
+
+
+class POEDitorDescription:
+    def __init__(self, client, project_id):
+        self.client = client
+        self.project_id = project_id
+        self.packages = []
+        self.populate()
+
+    def populate(self):
+        details =  self.client.view_project_details(self.project_id)
+        self.packages = json.loads(re.search('\((.+?)\)', details['description']).group(1))
+
+    def update(self, package, version):
+        self.packages[package] = version
+        description = '[//]: # (%s)' % (json.dumps(self.packages))
+        self.client.update_project(project_id=self.project_id, description=description)
 
 
 def main(argv=sys.argv):
@@ -478,11 +576,12 @@ def main(argv=sys.argv):
     pstat.add_argument('--json', action='store_true', default=False)
     pstat.set_defaults(func=cmd_stat)
 
-    ppoeditor_pull = subparsers.add_parser('poeditor_pull')
+    ppoeditor_pull = subparsers.add_parser('poeditor-sync')
     ppoeditor_pull.add_argument('component', nargs='*')
+    ppoeditor_pull.add_argument('--extract', action='store_true', default=False)
     ppoeditor_pull.add_argument('--locale', default=[], action='append')
-    ppoeditor_pull.add_argument('--force', action='store_true', default=False)
-    ppoeditor_pull.set_defaults(func=cmd_poeditor_pull)
+    ppoeditor_pull.add_argument('--no-dry-run', action='store_true', default=False)
+    ppoeditor_pull.set_defaults(func=cmd_poeditor_sync)
 
     args = parser.parse_args(argv[1:])
 
