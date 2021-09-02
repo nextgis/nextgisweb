@@ -355,6 +355,9 @@ class _owner_user_attr(SR):
         if not srlzr.user.is_administrator:
             raise ForbiddenError(
                 "Membership in group 'administrators' required!")
+        user = User.filter_by(id=value['id']).one()
+        if user.system:
+            raise ValidationError("System user cannot be a resource owner.")
         return super(_owner_user_attr, self).setter(srlzr, value)
 
 
