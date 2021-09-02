@@ -404,7 +404,7 @@ def cmd_poeditor_sync(args):
     client = POEditorAPI(api_token=poeditor_api_token)
 
     # Package versions are stored as part of the project's description in the POEditor
-    description =  POEDitorDescription(client, poeditor_project_id)
+    description =  POEditorDescription(client, poeditor_project_id)
     local_ver = pkginfo.packages[args.package].version
     if args.package in description.packages:
         remote_ver = description.packages[args.package]
@@ -510,23 +510,23 @@ def cmd_poeditor_sync(args):
 
     if len(terms_to_add) > 0 and args.no_dry_run:
         client.add_terms(poeditor_project_id, terms_to_add)
-    logger.info("Added messages to POEDitor: %d", len(terms_to_add))
+    logger.info("%d messages added to the POEditor", len(terms_to_add))
 
     if len(terms_to_del) > 0 and args.no_dry_run:
         client.delete_terms(poeditor_project_id, terms_to_del)
-    logger.info("Deleted messages from POEDitor: %d", len(terms_to_del))
+    logger.info("%d messages deleted from the POEditor", len(terms_to_del))
 
     if len(terms_to_add) > 0 or len(terms_to_del) > 0:
         if args.no_dry_run:
             description.update(args.package, local_ver)
         logger.info(
-            "Set '%s' package version to '%s' in POEditor.", args.package, local_ver
+            "Set '%s' package version to %s in the POEditor.", args.package, local_ver
         )
 
     # TODO: Russian language as a reference
 
 
-class POEDitorDescription:
+class POEditorDescription:
     def __init__(self, client, project_id):
         self.client = client
         self.project_id = project_id
