@@ -13,8 +13,13 @@ define([
 ) {
     return declare([FilteringSelect], {
         preamble: function (params) {
-            var data = params.cls ? principalDump.filter(function (p) {
-                return p.cls === params.cls
+            var data = params.filter_ ? principalDump.filter(function (p) {
+                for (k in params.filter_) {
+                    if (p[k] !== params.filter_[k]) {
+                        return false;
+                    }
+                }
+                return true;
             }) : principalDump;
 
             this.store = new Memory({
