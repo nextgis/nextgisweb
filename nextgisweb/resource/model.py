@@ -346,6 +346,18 @@ class _parent_attr(SRR):
                 % srlzr.obj.parent.id)
 
 
+class _owner_user_attr(SR):
+
+    def writeperm(self, srlzr):
+        return True
+
+    def setter(self, srlzr, value):
+        if not srlzr.user.is_administrator:
+            raise ForbiddenError(
+                "Membership in group 'administrators' required!")
+        return super(_owner_user_attr, self).setter(srlzr, value)
+
+
 class _perms_attr(SP):
 
     def setter(self, srlzr, value):
@@ -416,7 +428,7 @@ class ResourceSerializer(Serializer):
     creation_date = _ro(SP)
 
     parent = _rw(_parent_attr)
-    owner_user = _ro(SR)
+    owner_user = _owner_user_attr(read=_scp.read, depth=2)
 
     permissions = _perms_attr(read=_scp.read, write=_scp.change_permissions)
 

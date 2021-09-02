@@ -161,6 +161,7 @@ def widget(request):
 
         parent = Resource.query().with_polymorphic('*') \
             .filter_by(id=parent_id).one()
+        owner_user = request.user
 
         obj = Resource.registry[clsid](parent=parent, owner_user=request.user)
 
@@ -173,6 +174,7 @@ def widget(request):
 
         clsid = obj.cls
         parent = obj.parent
+        owner_user = obj.owner_user
 
     else:
         raise httpexceptions.HTTPBadRequest()
@@ -180,7 +182,8 @@ def widget(request):
     widget = CompositeWidget(operation=operation, obj=obj, request=request)
     return dict(
         operation=operation, config=widget.config(), id=resid,
-        cls=clsid, parent=parent.id if parent else None)
+        cls=clsid, parent=parent.id if parent else None,
+        owner_user=owner_user.id)
 
 
 @viewargs(renderer='nextgisweb:resource/template/resource_export.mako')
