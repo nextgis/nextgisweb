@@ -452,7 +452,8 @@ class TableInfo(object):
         target_osr = osr.SpatialReference()
         target_osr.ImportFromEPSG(self.srs_id)
 
-        transform = osr.CoordinateTransformation(source_osr, target_osr)
+        transform = osr.CoordinateTransformation(source_osr, target_osr) \
+            if not source_osr.IsSame(target_osr) else None
 
         errors = []
 
@@ -565,7 +566,8 @@ class TableInfo(object):
                     errors.append(_("Feature #%d has multiple geometries satisfying the conditions.") % fid)
                     continue
 
-            geom.Transform(transform)
+            if transform is not None:
+                geom.Transform(transform)
 
             # Force Z
             has_z = self.geometry_type in GEOM_TYPE.has_z
