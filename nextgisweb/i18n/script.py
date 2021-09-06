@@ -434,7 +434,8 @@ def cmd_poeditor_sync(args):
             terms = poeditor_terms.get(locale)
             if not terms:
                 logger.debug("Fetching translations from POEditor for locale [%s]...", locale)
-                terms = client.view_project_terms(poeditor_project_id, language_code=locale)
+                language_code = locale.replace('_', '-').lower()
+                terms = client.view_project_terms(poeditor_project_id, language_code=language_code)
                 poeditor_terms[locale] = terms
 
             # Filter terms by context
