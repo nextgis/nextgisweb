@@ -301,6 +301,7 @@ class CoreComponent(
         opt_db = self.options.with_prefix('database')
         con_args = dict()
         con_args['host'] = opt_db['host']
+        con_args['port'] = opt_db['port']
         con_args['database'] = opt_db['name']
         con_args['username'] = opt_db['user']
 
@@ -338,13 +339,13 @@ class CoreComponent(
     def backup_filename(self, filename):
         return os.path.join(self.options['backup.path'], filename)
 
-
     option_annotations = (
         Option('system.name', default="NextGIS Web"),
         Option('system.full_name', default=None),
 
         # Database options
         Option('database.host', default="localhost"),
+        Option('database.port', default="5432"),
         Option('database.name', default="nextgisweb"),
         Option('database.user', default="nextgisweb"),
         Option('database.password', secure=True, default=None),
