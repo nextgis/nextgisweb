@@ -248,6 +248,10 @@ class AuthComponent(Component):
             rows = OAuthToken.filter(OAuthToken.exp < exp).delete()
             self.logger.info("Expired cached OAuth tokens deleted: %d", rows)
 
+    def backup_configure(self, config):
+        super(AuthComponent, self).backup_configure(config)
+        config.exclude_table_data('public', OAuthToken.__tablename__)
+
     option_annotations = OptionAnnotations((
         Option('register', bool, default=False,
                doc="Allow user registration."),
