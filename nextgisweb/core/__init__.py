@@ -345,7 +345,7 @@ class CoreComponent(
 
         # Database options
         Option('database.host', default="localhost"),
-        Option('database.port', default="5432"),
+        Option('database.port', int, default=5432),
         Option('database.name', default="nextgisweb"),
         Option('database.user', default="nextgisweb"),
         Option('database.password', secure=True, default=None),
