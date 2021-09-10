@@ -138,9 +138,6 @@ class CoreComponent(
         self.init_settings(self.identity, 'system.name',
                            self.options.get('system.name', 'NextGIS Web'))
 
-        if self.check_update():
-            self.logger.info("New update available.")
-
     def gtsdir(self, comp):
         """ Get component's file storage folder """
         return os.path.join(self.options['sdir'], comp.identity) \

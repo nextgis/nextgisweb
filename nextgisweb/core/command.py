@@ -69,6 +69,9 @@ class InitializeDBCmd():
             # DDL commands don't change session status!
             mark_changed(DBSession())
 
+        if env.core.check_update():
+            logger.info("New update available.")
+
 
 @Command.registry.register
 class WaitForServiceCommand(Command):
