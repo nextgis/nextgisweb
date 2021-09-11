@@ -13,6 +13,7 @@ from shutil import rmtree
 from contextlib import contextmanager
 from backports.tempfile import TemporaryDirectory
 from zipfile import ZipFile, is_zipfile
+from six import ensure_text
 
 import transaction
 from zope.sqlalchemy import mark_changed
@@ -355,7 +356,7 @@ class StatisticsCommand(Command):
             if hasattr(comp, 'query_stat'):
                 result[comp.identity] = comp.query_stat()
 
-        print(geojson.dumps(result, ensure_ascii=False, indent=2).encode('utf-8'))
+        print(ensure_text(geojson.dumps(result, ensure_ascii=False, indent=2)))
 
 
 @Command.registry.register
