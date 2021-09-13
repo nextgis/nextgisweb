@@ -283,6 +283,14 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
 
         return value
 
+    @db.validates('owner_user')
+    def _validate_owner_user(self, key, value):
+        with DBSession.no_autoflush:
+            if value.system:
+                raise ValidationError("System user cannot be a resource owner.")
+
+        return value
+
     # Preview
 
     @classmethod
@@ -344,6 +352,18 @@ class _parent_attr(SRR):
             raise HierarchyError(
                 _("Resource can not be a child of resource id = %d.")
                 % srlzr.obj.parent.id)
+
+
+class _owner_user_attr(SR):
+
+    def writeperm(self, srlzr):
+        return True
+
+    def setter(self, srlzr, value):
+        if not srlzr.user.is_administrator:
+            raise ForbiddenError(
+                "Membership in group 'administrators' required!")
+        return super(_owner_user_attr, self).setter(srlzr, value)
 
 
 class _perms_attr(SP):
@@ -416,7 +436,7 @@ class ResourceSerializer(Serializer):
     creation_date = _ro(SP)
 
     parent = _rw(_parent_attr)
-    owner_user = _ro(SR)
+    owner_user = _owner_user_attr(read=_scp.read, depth=2)
 
     permissions = _perms_attr(read=_scp.read, write=_scp.change_permissions)
 

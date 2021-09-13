@@ -17,6 +17,11 @@
             data-dojo-props="required: true"
             title="{{gettext 'Parent'}}" style="width: 100%"></div>
 
+        <div data-dojo-type="ngw-auth/PrincipalSelect"
+            data-dojo-attach-point="wOwnerUser"
+            data-dojo-props="required: false, filter_: { cls: 'U', system: false }"
+            title="{{gettext 'Owner'}}" style="width: 100%"></div>
+
         <div data-dojo-type="dijit/form/TextBox"
             data-dojo-attach-point="wCls"
             data-dojo-props="readonly: true"

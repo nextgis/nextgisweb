@@ -12,9 +12,18 @@ define([
     principalDump
 ) {
     return declare([FilteringSelect], {
-        preamble: function () {
+        preamble: function (params) {
+            var data = params.filter_ ? principalDump.filter(function (p) {
+                for (k in params.filter_) {
+                    if (p[k] !== params.filter_[k]) {
+                        return false;
+                    }
+                }
+                return true;
+            }) : principalDump;
+
             this.store = new Memory({
-                data: principalDump
+                data: data
             });
 
             this.searchAttr = "display_name";
