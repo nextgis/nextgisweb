@@ -67,7 +67,7 @@ class RasterMosaic(Base, Resource, SpatialLayerMixin):
                 fname = env.raster_mosaic.workdir_filename(item.fileobj)
                 fnames.append(fname)
 
-            if fnames > 0:
+            if len(fnames) > 0:
                 ds = gdal.BuildVRT(
                     "",
                     fnames,
@@ -76,8 +76,7 @@ class RasterMosaic(Base, Resource, SpatialLayerMixin):
                         yRes = (ymax - ymin) / height,
                     )
                 )
-
-            return ds
+                return ds
 
     @property
     def extent(self):
