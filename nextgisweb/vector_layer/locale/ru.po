@@ -1,4 +1,4 @@
-#: api.py:15 model.py:1024
+#: api.py:15 model.py:1037
 msgid "GDAL library failed to open file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
@@ -89,42 +89,52 @@ msgstr "Недопустимое имя поля: '%s'. Удалите или п
 msgid "Unsupported field type: %r."
 msgstr "Тип поля %r не поддерживается."
 
-#: model.py:486
+#: model.py:487
+#, python-format
+msgid "Feature (seq. #%d) doesn't have a FID field '%s'."
+msgstr ""
+
+#: model.py:490
+#, python-format
+msgid "Feature (seq. #%d) FID field '%s' is null."
+msgstr ""
+
+#: model.py:498
 #, python-format
 msgid "Feature #%d doesn't have geometry."
 msgstr "Объект #%d не содержит геометрии."
 
-#: model.py:512 model.py:554
+#: model.py:524 model.py:566
 #, python-format
 msgid "Feature #%d has multiple geometries satisfying the conditions."
 msgstr "Объект #%d содержит несколько геометрий, удовлетворяющих условиям."
 
-#: model.py:522
+#: model.py:534
 #, python-format
 msgid "Feature #%d has unknown geometry type: %d (%s)."
 msgstr "Объект #%d содержит неизвестный тип геометрии: %d (%s)."
 
-#: model.py:535
+#: model.py:547
 #, python-format
 msgid "Feature #%d has unsuitable geometry type: %d (%s)."
 msgstr "Объект #%d содержит неподходящий тип геометрии: %d (%s)."
 
-#: model.py:580
+#: model.py:593
 #, python-format
 msgid "Feature #%d has unclosed rings."
 msgstr "Объект #%d содержит незамкнутые кольца."
 
-#: model.py:594
+#: model.py:607
 #, python-format
 msgid "Feature #%d has less than 3 points in a polygon ring."
 msgstr "Объект #%d содержит меньше 3-х точек в кольце полигона."
 
-#: model.py:598
+#: model.py:611
 #, python-format
 msgid "Feature #%d has less than 2 points in a linestring."
 msgstr "Объект #%d содержит меньше 2-х точек в линии."
 
-#: model.py:656
+#: model.py:669
 #, python-format
 msgid ""
 "It seems like declared and actual attributes encodings do not match. Unable "
@@ -134,70 +144,70 @@ msgstr ""
 "Похоже, заданная кодировка отличается от фактической. Невозможно декодировать"
 " атрибут #%(attr)d записи #%(feat)d. Попробуйте выбрать другую кодировку."
 
-#: model.py:684
+#: model.py:697
 msgid "Vector layer cannot be written due to errors."
 msgstr "Векторный слой не может быть записан из-за ошибок."
 
-#: amd/ngw-vector-layer/Widget.js:40 model.py:712
+#: amd/ngw-vector-layer/Widget.js:40 model.py:725
 msgid "Vector layer"
 msgstr "Векторный слой"
 
 #: amd/ngw-vector-layer/template/Widget.hbs:26
-#: amd/ngw-vector-layer/template/Widget.hbs:86 model.py:776
+#: amd/ngw-vector-layer/template/Widget.hbs:86 model.py:789
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: model.py:778
+#: model.py:791
 msgid "Feature count"
 msgstr "Количество объектов"
 
-#: model.py:870
+#: model.py:883
 #, python-format
 msgid "Geometry type (%s) does not match geometry column type (%s)."
 msgstr "Тип геометрии (%s) не соответствует типу поля геометрии (%s)."
 
-#: model.py:1027
+#: model.py:1040
 #, python-format
 msgid "Unsupport OGR driver: %s."
 msgstr "Драйвер OGR '%s' не поддерживается."
 
-#: amd/ngw-vector-layer/Widget.js:92 model.py:1036
+#: amd/ngw-vector-layer/Widget.js:92 model.py:1049
 msgid "Dataset doesn't contain layers."
 msgstr "Набор данных не содержит ни одного слоя."
 
-#: model.py:1039
+#: model.py:1052
 msgid "Dataset contains more than one layer."
 msgstr "Набор данных содержит более одного слоя."
 
-#: model.py:1044
+#: model.py:1057
 msgid "Unable to open layer."
 msgstr "Не удалось открыть слой."
 
-#: model.py:1055
+#: model.py:1068
 msgid "Layer doesn't contain coordinate system information."
 msgstr "Слой не содержит информации о системе координат."
 
-#: model.py:1083
+#: model.py:1096
 msgid "Unknown 'fix_errors' value."
 msgstr "Неизвестное значение параметра 'fix_errors'."
 
-#: model.py:1090
+#: model.py:1103
 msgid "Unknown 'cast_geometry_type' value."
 msgstr "Неизвестное значение параметра 'cast_geometry_type'."
 
-#: model.py:1094
+#: model.py:1107
 msgid "Unknown 'cast_is_multi' value."
 msgstr "Неизвестное значение параметра 'cast_is_multi'."
 
-#: model.py:1098
+#: model.py:1111
 msgid "Unknown 'cast_has_z' value."
 msgstr "Неизвестное значение параметра 'cast_has_z'."
 
-#: model.py:1132
+#: model.py:1145
 msgid "Unsupported geometry type."
 msgstr "Тип геометрии не поддерживается."
 
-#: model.py:1138
+#: model.py:1151
 msgid "Geometry type for existing resource can't be changed."
 msgstr "Тип геометрии существующего ресурса не может быть изменен."
 

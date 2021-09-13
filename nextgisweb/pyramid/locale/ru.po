@@ -75,7 +75,7 @@ msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: template/header.mako:95 view.py:87
+#: template/header.mako:111 view.py:87
 msgid "Control panel"
 msgstr "Панель управления"
 
@@ -115,7 +115,7 @@ msgstr "Стартовая страница"
 msgid "Info"
 msgstr "Информация"
 
-#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:6 view.py:469
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:7 view.py:469
 msgid "Settings"
 msgstr "Настройки"
 
@@ -218,7 +218,7 @@ msgstr "Визуальный редактор"
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
 
-#: amd/ngw-pyramid/modelWidget/FormMixin.js:37
+#: amd/ngw-pyramid/modelWidget/FormMixin.js:37 nodepkg/example/typescript.ts:10
 msgid "Create"
 msgstr "Создать"
 
@@ -282,9 +282,13 @@ msgstr "Рекомендуемая высота 45 px и ширина до 200 p
 msgid "Cancel"
 msgstr "Закрыть"
 
-#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:7
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:8
 msgid "Sign out"
 msgstr "Выйти"
+
+#: amd/ngw-pyramid/user-avatar/UserAvatar.js:36
+msgid "Invitation session"
+msgstr ""
 
 #: nodepkg/api/error.js:11
 msgid "Unknown API error"
@@ -310,15 +314,15 @@ msgstr "Время (UTC)"
 msgid "Size"
 msgstr "Размер"
 
-#: template/header.mako:30
+#: template/header.mako:36
 msgid "Sign in"
 msgstr "Войти"
 
-#: template/header.mako:90
+#: template/header.mako:106
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: template/header.mako:103
+#: template/header.mako:119
 msgid "Help"
 msgstr "Справка"
 
@@ -370,3 +374,4 @@ msgstr "Версия"
 #: template/sysinfo.mako:58
 msgid "Platform"
 msgstr "Платформа"
+
