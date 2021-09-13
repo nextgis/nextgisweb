@@ -5,6 +5,7 @@ import os
 import os.path
 import logging
 import fileinput
+import json
 from os.path import join as pthjoin
 from datetime import datetime, timedelta
 from time import sleep
@@ -316,6 +317,7 @@ class StorageEstimateCommand(Command):
     @classmethod
     def execute(cls, args, env):
         env.core.estimate_storage_all()
+        print(geojson.dumps(env.core.query_storage()))
 
 
 @Command.registry.register
