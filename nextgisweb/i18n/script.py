@@ -397,11 +397,15 @@ def cmd_stat(args):
 
 
 def cmd_poeditor_sync(args):
-    poeditor_api_token = env.core.options['locale.poeditor_api_token']
-    poeditor_project_id = env.core.options['locale.poeditor_project_id']
+    opts = env.core.options.with_prefix('locale.poeditor')
 
-    if poeditor_api_token is None:
+    if 'project_id' not in opts:
+        raise RuntimeError("POEditor project ID isn't set!")
+    poeditor_project_id = opts['project_id']
+
+    if 'api_token' not in opts:
         raise RuntimeError("POEditor API token isn't set!")
+    poeditor_api_token = opts['api_token']
 
     client = POEditorAPI(api_token=poeditor_api_token)
 
