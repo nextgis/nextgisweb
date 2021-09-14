@@ -24,7 +24,7 @@ from ..resource import DataScope
 from ..spatial_ref_sys import SRS
 
 from .model import Layer
-from .util import tag_pattern
+from .util import validate_tag
 
 
 wfsfld_pattern = re.compile(r'^wfsfld_(\d+)$')
@@ -206,7 +206,7 @@ class WFSHandler():
                 xmlns=nsmap('ogc', version)['ns']))
             El('ServiceException', parent=root, text=message)
 
-        return etree.tostring(root)
+        return etree.tostring(root, encoding='utf-8')
 
     @property
     def title(self):
@@ -224,19 +224,21 @@ class WFSHandler():
     def response(self):
         if self.p_request == GET_CAPABILITIES:
             if self.p_version >= v200:
-                xml = self._get_capabilities200()
+                root = self._get_capabilities200()
             elif self.p_version == v110:
-                xml = self._get_capabilities110()
+                root = self._get_capabilities110()
             else:
-                xml = self._get_capabilities100()
+                root = self._get_capabilities100()
         elif self.p_request == DESCRIBE_FEATURE_TYPE:
-            xml = self._describe_feature_type()
+            root = self._describe_feature_type()
         elif self.p_request == GET_FEATURE:
-            xml = self._get_feature()
+            root = self._get_feature()
         elif self.p_request == TRANSACTION:
-            xml = self._transaction()
+            root = self._transaction()
         else:
             raise ValidationError("Unsupported request: '%s'." % self.p_request)
+
+        xml = etree.tostring(root, encoding='utf-8')
 
         if self.p_validate_schema:
             if self.p_request in (GET_CAPABILITIES, TRANSACTION):
@@ -421,7 +423,7 @@ class WFSHandler():
         __sc = El('Scalar_Capabilities', namespace=_ns_ogc, parent=__filter)
         El('Logical_Operators', namespace=_ns_ogc, parent=__sc)
 
-        return etree.tostring(root)
+        return root
 
     def _get_capabilities110(self):
         _ns_ows = nsmap('ows', self.p_version)['ns']
@@ -492,7 +494,7 @@ class WFSHandler():
         __id = El('Id_Capabilities', namespace=_ns_ogc, parent=__filter)
         El('FID', namespace=_ns_ogc, parent=__id)
 
-        return etree.tostring(root)
+        return root
 
     def _get_capabilities200(self):
         _ns_ows = nsmap('ows', self.p_version)['ns']
@@ -563,11 +565,11 @@ class WFSHandler():
         constraint('ImplementsSorting', 'FALSE')
         constraint('ImplementsExtendedOperators', 'FALSE')
 
-        return etree.tostring(root)
+        return root
 
     def _field_key_encode(self, field):
         k = field.keyname
-        if tag_pattern.match(k) and not wfsfld_pattern.match(k):
+        if validate_tag(k) and not wfsfld_pattern.match(k):
             return k
         return 'wfsfld_%d' % field.id
 
@@ -647,7 +649,7 @@ class WFSHandler():
                 El('element', dict(minOccurs='0', name=self._field_key_encode(field),
                                    type=datatype, nillable='true'), parent=__seq)
 
-        return etree.tostring(root)
+        return root
 
     def _get_feature(self):
         wfs = nsmap('wfs', self.p_version)
@@ -806,7 +808,7 @@ class WFSHandler():
         if self.p_version >= v110:
             root.set('timeStamp', datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f"))
 
-        return etree.tostring(root)
+        return root
 
     def _transaction(self):
         _ns_wfs = nsmap('wfs', self.p_version)['ns']
@@ -944,4 +946,4 @@ class WFSHandler():
             _status = El('Status', namespace=_ns_wfs, parent=_result)
             El('SUCCESS', namespace=_ns_wfs, parent=_status)
 
-        return etree.tostring(_response)
+        return _response

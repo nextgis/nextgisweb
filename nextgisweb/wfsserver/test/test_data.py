@@ -34,11 +34,11 @@ def vlayer_id(ngw_resource_group):
             'crs': {'type': 'name', 'properties': {'name': 'urn:ogc:def:crs:EPSG::3857'}},
             'features': [{
                 'type': 'Feature',
-                'properties': {'field1': 1, 'поле2': 'значение1'},
+                'properties': {'field1': 1, 'поле2': 'значение1', '!field3': '!@#$%^&*()значение1'},
                 'geometry': {'type': 'Point', 'coordinates': [0, 0]}
             }, {
                 'type': 'Feature',
-                'properties': {'field1': 2, 'поле2': 'значение2'},
+                'properties': {'field1': 2, 'поле2': 'значение2', '!field3': '!@#$%^&*()значение2'},
                 'geometry': {'type': 'Point', 'coordinates': [10, 10]}
             }]
         }
@@ -91,11 +91,12 @@ def test_cyrillic(service_id, vlayer_id, ngw_httptest_app, ngw_auth_administrato
     layer = wfs_ds.GetLayer(0)
 
     defn = layer.GetLayerDefn()
-    assert defn.GetFieldCount() == 3
+    assert defn.GetFieldCount() == 4
 
-    field_idxs = list(range(3))
+    field_idxs = list(range(defn.GetFieldCount()))
     field_idxs.remove(defn.GetGeomFieldIndex('geom'))
     field_idxs.remove(defn.GetFieldIndex('field1'))
+    field_idxs.remove(defn.GetFieldIndex('поле2'))
     assert len(field_idxs) == 1
 
     field = defn.GetFieldDefn(field_idxs[0])
@@ -110,4 +111,4 @@ def test_cyrillic(service_id, vlayer_id, ngw_httptest_app, ngw_auth_administrato
     assert err == 0, gdal.GetLastErrorMsg()
 
     feature_cmp = ngw_httptest_app.get('/api/resource/%s/feature/1' % vlayer_id).json()
-    assert feature_cmp['fields']['поле2'] == value
+    assert feature_cmp['fields']['!field3'] == value

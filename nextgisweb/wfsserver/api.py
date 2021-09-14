@@ -34,7 +34,7 @@ def wfs(resource, request):
         resource, request,
         force_schema_validation=fsv,
     ).response()
-    return Response(xml, content_type='text/xml')
+    return Response(xml, content_type='text/xml', charset='utf-8')
 
 
 def error_renderer(request, err_info, exc, exc_info, debug=True):
