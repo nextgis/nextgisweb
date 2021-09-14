@@ -92,12 +92,12 @@ msgstr "Тип поля %r не поддерживается."
 #: model.py:487
 #, python-format
 msgid "Feature (seq. #%d) doesn't have a FID field '%s'."
-msgstr ""
+msgstr "Объект (ном. #%d) не содержит поле FID '%s'."
 
 #: model.py:490
 #, python-format
 msgid "Feature (seq. #%d) FID field '%s' is null."
-msgstr ""
+msgstr "Объект (ном. #%d) содержит пустое поле FID '%s'."
 
 #: model.py:498
 #, python-format

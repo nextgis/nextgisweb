@@ -61,15 +61,15 @@ msgstr "Срок действия токена OAuth истек"
 
 #: views.py:67
 msgid "Session not found."
-msgstr ""
+msgstr "Сессия не найдена."
 
 #: views.py:72
 msgid "Invalid 'expires' parameter."
-msgstr ""
+msgstr "Некорректный параметр 'expires'."
 
 #: views.py:74
 msgid "Session expired."
-msgstr ""
+msgstr "Сессия устарела."
 
 #: views.py:231
 msgid "User settings"

@@ -288,7 +288,7 @@ msgstr "Выйти"
 
 #: amd/ngw-pyramid/user-avatar/UserAvatar.js:36
 msgid "Invitation session"
-msgstr ""
+msgstr "Пригласительная сессия"
 
 #: nodepkg/api/error.js:11
 msgid "Unknown API error"
