@@ -14,6 +14,8 @@ from argparse import ArgumentParser, Namespace
 from pkg_resources import resource_filename
 from collections import OrderedDict, defaultdict
 from functools import partial
+from tempfile import NamedTemporaryFile
+from time import sleep
 
 from babel.messages.catalog import Catalog
 from babel.messages.frontend import parse_mapping
@@ -418,6 +420,7 @@ def cmd_poeditor_sync(args):
 
     # Update local po-files
     poeditor_terms = {}
+    reference_catalogs = {}
     for comp_id, locales in components_and_locales(args, work_in_progress=True):
         cmd_update(Namespace(
             package=pkginfo.comp_pkg(comp_id),
@@ -427,7 +430,17 @@ def cmd_poeditor_sync(args):
             force=False))
 
         for locale in locales:
-            if locale in ("en", "ru"):
+            if locale == 'ru':
+                po_path = catalog_filename(comp_id, locale)
+                if po_path.exists():
+                    ref_catalog = reference_catalogs.get(locale)
+                    if ref_catalog is None:
+                        ref_catalog = Catalog(locale=locale)
+                        reference_catalogs[locale] = ref_catalog
+                    with po_path.open('r') as po_fd:
+                        for m in read_po(po_fd, locale=locale):
+                            m.context = comp_id
+                            ref_catalog[m.id] = m
                 continue
 
             terms = poeditor_terms.get(locale)
@@ -515,6 +528,30 @@ def cmd_poeditor_sync(args):
     if len(terms_to_del) > 0 and args.no_dry_run:
         client.delete_terms(poeditor_project_id, terms_to_del)
     logger.info("%d messages deleted from the POEditor", len(terms_to_del))
+
+    if len(reference_catalogs) > 0:
+        logger.info(
+            "Upload the following reference translations to POEditor: " +
+            ", ".join(reference_catalogs.keys()))
+        if args.no_dry_run:
+            wait_for_rate_limit = False
+            for locale, catalog in reference_catalogs.items():
+                with NamedTemporaryFile(suffix='.po') as fd:
+                    write_po(fd, catalog, width=80, omit_header=True)
+                    fd.flush()
+                    logger.debug(
+                        "Uploading %s reference translation...",
+                        locale)
+
+                    # Free account allows doing 1 upload per 20 seconds
+                    sleep(20 if wait_for_rate_limit else 0)
+                    wait_for_rate_limit = True
+
+                    client.update_terms_translations(
+                        project_id=poeditor_project_id,
+                        language_code=locale.replace('-', '_'),
+                        overwrite=True, sync_terms=False,
+                        file_path=fd.name)
 
     if len(terms_to_add) > 0 or len(terms_to_del) > 0:
         if args.no_dry_run:
