@@ -67,6 +67,13 @@ class Layer(Base):
             min_scale_denom=self.min_scale_denom,
             max_scale_denom=self.max_scale_denom)
 
+    @db.validates('keyname')
+    def _validate_keyname(self, key, value):
+        if not keyname_pattern.match(value):
+            raise ValidationError("Invalid keyname: %s" % value)
+
+        return value
+
 
 class _layers_attr(SP):
 
@@ -76,8 +83,6 @@ class _layers_attr(SP):
     def setter(self, srlzr, value):
         srlzr.obj.layers = []
         for lv in value:
-            if not keyname_pattern.match(lv['keyname']):
-                raise ValidationError("Invalid keyname: %s" % lv['keyname'])
             lo = Layer(resource_id=lv['resource_id'])
             srlzr.obj.layers.append(lo)
 
