@@ -129,7 +129,7 @@ def components_and_locales(args, work_in_progress=False):
                     candidate = fn.with_suffix('').name
                     if candidate not in locales:
                         locales.append(candidate)
-        
+      
         locales.sort()
         logger.debug("Locale list for [%s] = %s", comp_id, ' '.join(locales))
         yield comp_id, locales
@@ -419,17 +419,16 @@ def cmd_poeditor_sync(args):
     # Update local po-files
     poeditor_terms = {}
     for comp_id, locales in components_and_locales(args, work_in_progress=True):
+        cmd_update(Namespace(
+            package=pkginfo.comp_pkg(comp_id),
+            component=[comp_id, ],
+            locale=[l for l in locales if l != 'ru'],
+            extract=args.extract,
+            force=False))
+
         for locale in locales:
             if locale in ("en", "ru"):
                 continue
-
-            cmd_update(Namespace(
-                package=pkginfo.comp_pkg(comp_id),
-                component=[comp_id, ],
-                locale=[locale, ],
-                extract=args.extract,
-                force=False
-            ))
 
             terms = poeditor_terms.get(locale)
             if not terms:
