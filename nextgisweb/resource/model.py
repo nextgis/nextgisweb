@@ -286,7 +286,7 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
     @db.validates('owner_user')
     def _validate_owner_user(self, key, value):
         with DBSession.no_autoflush:
-            if value.system:
+            if value.system and value.keyname != 'guest':
                 raise ValidationError("System user cannot be a resource owner.")
 
         return value
