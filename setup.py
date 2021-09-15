@@ -60,6 +60,7 @@ requires = [
     'zipstream-new==1.1.7',
     'cachetools==3.1.1',
     'networkx',
+    'poeditor',
 
 
     # TODO: Move to dev or test dependencies

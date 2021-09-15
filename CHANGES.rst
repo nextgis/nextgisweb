@@ -12,6 +12,7 @@ Changes
 - Ability to log in as an arbitrary user with a session invitation.
 - ISO-8601 date and time formatting in feature layer REST API via
   ``dt_format=iso`` option.
+- Synchronization of translations with POEditor.
 
 
 3.9.0
