@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import numpy
+
 import pytest
 import transaction
-from osgeo import gdal, gdalconst
+from PIL import Image
+from osgeo import gdal, gdalconst, gdal_array
 
 from nextgisweb.auth import User
 from nextgisweb.compat import Path
@@ -68,7 +71,7 @@ def service_id(ngw_resource_group, rstyle_id):
         DBSession.flush()
 
         obj.layers.append(Layer(
-            resource_id=rstyle_id, keyname='test-rounds', display_name='test-rounds'))
+            resource_id=rstyle_id, keyname='test_rounds', display_name='test-rounds'))
 
         DBSession.flush()
         DBSession.expunge(obj)
@@ -85,3 +88,13 @@ def test_read(service_id, ngw_httptest_app, ngw_auth_administrator):
 
     ds = gdal.Open(wms_path, gdalconst.GA_ReadOnly)
     assert ds is not None, gdal.GetLastErrorMsg()
+
+    layers = ds.GetSubDatasets()
+    assert len(layers) == 1
+
+    url, name = layers[0]
+    assert name == 'test-rounds'
+
+    ds = gdal.Open(url, gdalconst.GA_ReadOnly)
+    band_count = ds.RasterCount
+    assert band_count == 3
