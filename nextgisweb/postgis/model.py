@@ -485,20 +485,20 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             st_ymin(sq.c.bbox),
         )
 
+        conn = self.connection.get_connection()
         try:
-            conn = self.connection.get_connection()
             maxLon, minLon, maxLat, minLat = conn.execute(db.select(fields)).first()
-
-            extent = dict(
-                minLon=minLon,
-                maxLon=maxLon,
-                minLat=minLat,
-                maxLat=maxLat
-            )
-
-            return extent
         finally:
             conn.close()
+
+        extent = dict(
+            minLon=minLon,
+            maxLon=maxLon,
+            minLat=minLat,
+            maxLat=maxLat
+        )
+
+        return extent
 
 
 DataScope.read.require(
