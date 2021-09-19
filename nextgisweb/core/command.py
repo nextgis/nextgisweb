@@ -352,10 +352,15 @@ class StatisticsCommand(Command):
 
     @classmethod
     def argparser_setup(cls, parser, env):
-        pass
+        parser.add_argument(
+            '--estimate-storage', dest='estimate_storage', action='store_true',
+            help="Estimate storage before calculating statistics")
 
     @classmethod
     def execute(cls, args, env):
+        if args.estimate_storage:
+            env.core.estimate_storage_all()
+
         result = dict()
         for comp in env._components.values():
             if hasattr(comp, 'query_stat'):
