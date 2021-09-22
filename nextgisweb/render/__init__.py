@@ -4,7 +4,11 @@ import os
 import os.path
 from datetime import datetime
 
+import transaction
+from zope.sqlalchemy import mark_changed
+
 from ..lib.config import Option
+from ..compat import Path
 from ..component import Component, require
 from ..core import KindOfData
 from ..models import DBSession
@@ -66,6 +70,35 @@ class RenderComponent(Component):
             track_changes=self.tile_cache_track_changes,
             seed=self.tile_cache_seed
         ))
+
+    def maintenance(self):
+        self.cleanup()
+
+    def cleanup(self):
+        self.logger.info("Cleaning up tile cache tables...")
+
+        root = Path(self.tile_cache_path)
+        deleted_files = deleted_tables = 0
+
+        with transaction.manager:
+            for row in DBSession.execute('''
+                SELECT t.tablename
+                FROM pg_catalog.pg_tables t
+                LEFT JOIN public.resource_tile_cache r ON replace(r.uuid::character varying, '-', '') = t.tablename::character varying
+                WHERE t.schemaname = 'tile_cache' AND r.resource_id IS NULL
+            '''):
+                tablename = row[0]
+                db_path = root / tablename[0:2] / tablename[2:4] / tablename
+                if db_path.exists():
+                    db_path.unlink()
+                    deleted_files += 1
+                DBSession.execute('DROP TABLE "tile_cache"."%s"' % tablename)
+                deleted_tables += 1
+
+            mark_changed(DBSession())
+
+        self.logger.info("Deleted: %d files, %d tables.",
+                         deleted_files, deleted_tables)
 
     def backup_configure(self, config):
         super(RenderComponent, self).backup_configure(config)
