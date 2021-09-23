@@ -145,9 +145,6 @@ class IFeatureQuery(Interface):
     def geom_format(self):
         """ Initially loaded geometry format """
 
-    def axis_xy(self):
-        """ Initially loaded geometry axis order """
-
     def srs(self, srs):
         """ Include CRS if
         it was included in request """
@@ -183,8 +180,6 @@ class IFeatureQueryLike(IFeatureQuery):
 class IFeatureQueryIntersects(IFeatureQuery):
 
     srs_supported = Attribute(""" List of supported SRS id """)
-    axis_xy = Attribute(""" Axis order """)
-    axis_flip_supported = Attribute(""" Is axis flipping supported """)
 
     def intersects(self, geom):
         """ Set query by spatial intersection """

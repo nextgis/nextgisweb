@@ -406,8 +406,6 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         class BoundFeatureQuery(FeatureQueryBase):
             layer = self
             srs_supported = (self.geometry_srid, )
-            axis_xy = False
-            axis_flip_supported = False
 
         return BoundFeatureQuery
 

@@ -802,8 +802,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         class BoundFeatureQuery(FeatureQueryBase):
             layer = self
             srs_supported = srs_supported_
-            axis_xy = True
-            axis_flip_supported = True
 
         return BoundFeatureQuery
 
@@ -1203,7 +1201,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._geom = None
         self._single_part = None
         self._geom_format = 'WKB'
-        self._axis_xy = False
         self._clip_by_box = None
         self._simplify = None
         self._box = None
@@ -1230,9 +1227,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def geom_format(self, geom_format):
         self._geom_format = geom_format
-
-    def axis_xy(self, axis_xy):
-        self._axis_xy = axis_xy
 
     def clip_by_box(self, box):
         self._clip_by_box = box
@@ -1318,9 +1312,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             ))
 
         if self._geom:
-
-            if not self.axis_xy and srs.is_geographic:
-                geomexpr = func.st_flipcoordinates(geomexpr)
 
             if self._single_part:
 
@@ -1430,8 +1421,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             int_geom = func.st_geomfromtext(self._intersects.wkt)
             if int_srs.is_geographic:
-                if not self._intersects.axis_xy:
-                    int_geom = func.st_flipcoordinates(int_geom)
                 bound_geom = func.st_makeenvelope(-180, -89.9, 180, 89.9)
                 int_geom = func.st_intersection(bound_geom, int_geom)
             int_geom = func.st_setsrid(int_geom, int_srs.id)
