@@ -39,7 +39,7 @@ define([
     "dijit/TooltipDialog",
     "ngw-webmap/ui/ScalesSelect/ScalesSelect",
     "xstyle/css!./PrintMapPanel.css",
-    "dom-to-image-more/dom-to-image-more",
+    "./dom-to-image",
 ], function (
     declare,
     topic,
@@ -273,7 +273,7 @@ define([
             _buildPrintCanvas: function (imageType) {
                 var deferred = new Deferred(),
                     domToImagePromise;
-
+                
                 switch (imageType) {
                     case "png":
                         domToImagePromise = domtoimage.toPng(
@@ -519,12 +519,13 @@ define([
                     return this._pageStyle;
                 }
 
-                var style = document.createElement("style");
-                style.type = "text/css";
-                style.appendChild(document.createTextNode(""));
-                document.head.appendChild(style);
-                this._pageStyle = style;
-                return style;
+                const elStyle = document.createElement("style");
+                elStyle.type = "text/css";
+                elStyle.rel = "stylesheet";
+                elStyle.appendChild(document.createTextNode(""));
+                document.head.appendChild(elStyle);
+                this._pageStyle = elStyle;
+                return elStyle;
             },
 
             _removePageStyle: function () {

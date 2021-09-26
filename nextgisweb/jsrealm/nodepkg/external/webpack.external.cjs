@@ -103,10 +103,6 @@ addPackage("proj4", {
 
 addPackage("codemirror");
 
-addPackage("dom-to-image-more", {
-    from: "src",
-});
-
 addPackage("svg4everybody", {
     from: "dist/svg4everybody.js",
     to: "svg4everybody.js",
