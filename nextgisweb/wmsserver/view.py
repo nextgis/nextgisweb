@@ -4,7 +4,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import json
 import math
 import numpy
-from six import BytesIO
+from six import BytesIO, ensure_str
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
@@ -15,10 +15,12 @@ from osgeo import gdal, gdal_array
 from pyramid.response import Response
 from pyramid.renderers import render as render_template
 from pyramid.httpexceptions import HTTPBadRequest
+from rasterio.crs import CRS
+from rasterio.warp import calculate_default_transform
 
 from ..core.exception import ValidationError
 from ..pyramid.exception import json_error
-from ..lib.geometry import Geometry, Transformer
+from ..lib.geometry import Geometry
 from ..lib.ows import parse_request
 from ..render import ILegendableStyle
 from ..resource import (
@@ -208,10 +210,8 @@ def _get_map(obj, request):
         distance = xmax - xmin
     w_scale = scale(distance, p_width)
 
-    bbox_cache = dict()
-
-    mem = gdal.GetDriverByName('MEM')
-    geo_transform = (xmin, (xmax - xmin) / p_width, 0, ymax, 0, (ymax - ymin) / p_height)
+    mem = gdal.GetDriverByName(ensure_str('MEM'))
+    dst_geo = (xmin, (xmax - xmin) / p_width, 0, ymax, 0, (ymin - ymax) / p_height)
 
     for lname in p_layers:
         try:
@@ -224,47 +224,52 @@ def _get_map(obj, request):
 
         if (lobj.min_scale_denom is None or lobj.min_scale_denom >= w_scale) and \
                 (lobj.max_scale_denom is None or w_scale >= lobj.max_scale_denom):
-            # Do not use foreign SRS as it does not work correctly yet
-            reproject = srs.id != res.srs.id
-            if reproject:
-                if srs.id not in bbox_cache:
-                    geom = Geometry.from_box(*p_bbox)
-                    transformer = Transformer(srs.wkt, res.srs.wkt)
-                    bbox_cache[srs.id] = transformer.transform(geom).bounds
-                src_bbox = bbox_cache[srs.id]
-            else:
-                src_bbox = p_bbox
             req = res.render_request(res.srs)
-            limg = req.render_extent(src_bbox, p_size)
-            if limg is not None:
-                if reproject:
-                    lbuf = BytesIO()
-                    limg.save(lbuf, 'PNG')
+
+            # Do not use foreign SRS as it does not work correctly yet
+            if srs.id == res.srs.id:
+                limg = req.render_extent(p_bbox, p_size)
+            else:
+                affine, src_width, src_height = calculate_default_transform(
+                    CRS.from_wkt(srs.wkt),
+                    CRS.from_wkt(res.srs.wkt),
+                    p_width,
+                    p_height,
+                    left=xmin,
+                    bottom=ymin,
+                    top=ymax,
+                    right=xmax,
+                )
+                src_geo = affine.to_gdal()
+
+                src_bbox = (src_geo[0], src_geo[3] + src_geo[5] * src_height,
+                            src_geo[0] + src_geo[1] * src_width, src_geo[3])
+
+                limg = req.render_extent(src_bbox, (src_width, src_height))
+
+                if limg is not None:
                     data = numpy.asarray(limg)
                     img_h, img_w, band_count = data.shape
 
-                    src_ds = mem.Create('', img_w, img_h, band_count, gdal.GDT_Byte)
-                    s_xmin, s_ymin, s_xmax, s_ymax = src_bbox
-                    src_ds.SetGeoTransform((s_xmin, (s_xmax - s_xmin) / img_w, 0,
-                                            s_ymax, 0, (s_ymax - s_ymin) / img_h))
-                    src_ds.SetProjection(res.srs.wkt)
+                    src_ds = mem.Create(ensure_str(''), img_w, img_h, band_count, gdal.GDT_Byte)
+                    src_ds.SetGeoTransform(src_geo)
                     for i in range(band_count):
                         bandArray = data[:, :, i]
                         src_ds.GetRasterBand(i + 1).WriteArray(bandArray)
 
-                    dst_ds = mem.Create('', img_w, img_h, band_count, gdal.GDT_Byte)
-                    dst_ds.SetGeoTransform(geo_transform)
-                    dst_ds.SetProjection(srs.wkt)
+                    dst_ds = mem.Create(ensure_str(''), p_width, p_height, band_count, gdal.GDT_Byte)
+                    dst_ds.SetGeoTransform(dst_geo)
 
                     gdal.ReprojectImage(src_ds, dst_ds, res.srs.wkt, srs.wkt)
 
-                    array = numpy.zeros((img_h, img_w, band_count), numpy.uint8)
+                    array = numpy.zeros((p_height, p_width, band_count), numpy.uint8)
                     for i in range(band_count):
                         array[:, :, i] = gdal_array.BandReadAsArray(dst_ds.GetRasterBand(i + 1))
                     limg = Image.fromarray(array)
 
                     src_ds = dst_ds = None
 
+            if limg is not None:
                 img.paste(limg, (0, 0), limg)
 
     buf = BytesIO()

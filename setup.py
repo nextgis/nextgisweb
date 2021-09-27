@@ -26,6 +26,7 @@ requires = [
     # Other dependencies
     'alembic==1.4.2',
     'pyramid==1.10.1',
+    'rasterio==1.2.8',
     'SQLAlchemy==1.2.16',
     'transaction==2.4.0',
     'pyramid_tm==2.2.1',
