@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
-from zope.interface import Interface
+
+from zope.interface import Interface, Attribute
 
 from ..resource import IResourceBase
 
 
 class IRenderableStyle(IResourceBase):
+
+    srs = Attribute(""" Source SRS """)
 
     def render_request(self, srs, cond=None):
         pass
