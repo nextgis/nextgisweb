@@ -15,8 +15,6 @@ from osgeo import gdal, gdal_array
 from pyramid.response import Response
 from pyramid.renderers import render as render_template
 from pyramid.httpexceptions import HTTPBadRequest
-from rasterio.crs import CRS
-from rasterio.warp import calculate_default_transform
 
 from ..core.exception import ValidationError
 from ..pyramid.exception import json_error
@@ -230,18 +228,13 @@ def _get_map(obj, request):
             if srs.id == res.srs.id:
                 limg = req.render_extent(p_bbox, p_size)
             else:
-                affine, src_width, src_height = calculate_default_transform(
-                    CRS.from_wkt(srs.wkt),
-                    CRS.from_wkt(res.srs.wkt),
-                    p_width,
-                    p_height,
-                    left=xmin,
-                    bottom=ymin,
-                    top=ymax,
-                    right=xmax,
-                )
-                src_geo = affine.to_gdal()
+                dst_ds = mem.Create(ensure_str(''), p_width, p_height, 4, gdal.GDT_Byte)
+                dst_ds.SetGeoTransform(dst_geo)
 
+                src_ds = gdal.AutoCreateWarpedVRT(dst_ds, srs.wkt, res.srs.wkt)
+                src_width = src_ds.RasterXSize
+                src_height = src_ds.RasterYSize
+                src_geo = src_ds.GetGeoTransform()
                 src_bbox = (src_geo[0], src_geo[3] + src_geo[5] * src_height,
                             src_geo[0] + src_geo[1] * src_width, src_geo[3])
 
@@ -251,14 +244,9 @@ def _get_map(obj, request):
                     data = numpy.asarray(limg)
                     img_h, img_w, band_count = data.shape
 
-                    src_ds = mem.Create(ensure_str(''), img_w, img_h, band_count, gdal.GDT_Byte)
-                    src_ds.SetGeoTransform(src_geo)
                     for i in range(band_count):
                         bandArray = data[:, :, i]
                         src_ds.GetRasterBand(i + 1).WriteArray(bandArray)
-
-                    dst_ds = mem.Create(ensure_str(''), p_width, p_height, band_count, gdal.GDT_Byte)
-                    dst_ds.SetGeoTransform(dst_geo)
 
                     gdal.ReprojectImage(src_ds, dst_ds, res.srs.wkt, srs.wkt)
 
