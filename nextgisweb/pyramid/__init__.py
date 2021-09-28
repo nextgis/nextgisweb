@@ -117,6 +117,8 @@ class PyramidComponent(Component):
         Option('session.activity_delta', timedelta, default=timedelta(minutes=10),
                doc="Session last activity update time delta."),
 
+        Option('static_key', default=None),
+
         Option('debugtoolbar.enabled', bool),
         Option('debugtoolbar.hosts'),
 

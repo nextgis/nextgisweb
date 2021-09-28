@@ -334,7 +334,10 @@ def setup_pyramid(comp, config):
 
     # STATIC FILES
 
-    if is_debug:
+    if 'static_key' in comp.options:
+        comp.static_key = '/' + comp.options['static_key']
+        _logger.debug("Using static key from options '%s'", comp.static_key[1:])
+    elif is_debug:
         # In debug build static_key from proccess startup time
         rproc = Process(os.getpid())
 
