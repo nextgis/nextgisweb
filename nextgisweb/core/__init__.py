@@ -78,7 +78,7 @@ class CoreComponent(
         enable_qualifications(self.debug)
 
         sa_url = self._engine_url()
-        lock_timeout_ms = self.options['database.lock_timeout'].seconds * 1000
+        lock_timeout_ms = int(self.options['database.lock_timeout'].total_seconds() * 1000)
         self.engine = create_engine(sa_url, connect_args=dict(
             options='-c lock_timeout=%d' % lock_timeout_ms))
         self._sa_engine = self.engine
@@ -348,6 +348,7 @@ class CoreComponent(
         Option('database.password', secure=True, default=None),
         Option('database.pwfile', default=None),
         Option('database.lock_timeout', timedelta, default=timedelta(seconds=30)),
+        Option('database.pool.pre_ping', bool, default=False),
 
         # Data storage
         Option('sdir', required=True, doc=(
