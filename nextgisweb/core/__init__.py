@@ -78,9 +78,16 @@ class CoreComponent(
         enable_qualifications(self.debug)
 
         sa_url = self._engine_url()
-        lock_timeout_ms = int(self.options['database.lock_timeout'].total_seconds() * 1000)
-        self.engine = create_engine(sa_url, connect_args=dict(
-            options='-c lock_timeout=%d' % lock_timeout_ms))
+
+        opt_db = self.options.with_prefix('database')
+        lock_timeout_ms = int(opt_db['lock_timeout'].total_seconds() * 1000)
+        args = dict(
+            connect_args=dict(options='-c lock_timeout=%d' % lock_timeout_ms),
+            pool_pre_ping=opt_db['pool.pre_ping']
+        )
+        if 'pool.recycle' in opt_db:
+            args['pool_recycle'] = int(opt_db['pool.recycle'].total_seconds())
+        self.engine = create_engine(sa_url, **args)
         self._sa_engine = self.engine
 
         DBSession.configure(bind=self._sa_engine)
@@ -348,7 +355,10 @@ class CoreComponent(
         Option('database.password', secure=True, default=None),
         Option('database.pwfile', default=None),
         Option('database.lock_timeout', timedelta, default=timedelta(seconds=30)),
-        Option('database.pool.pre_ping', bool, default=False),
+        Option('database.pool.pre_ping', bool, default=False, doc=(
+            "Test connections for liveness upon each checkout.")),
+        Option('database.pool.recycle', timedelta, default=None, doc=(
+            "Recycle connections after the given time delta.")),
 
         # Data storage
         Option('sdir', required=True, doc=(
