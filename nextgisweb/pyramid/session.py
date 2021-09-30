@@ -123,12 +123,13 @@ class WebSession(dict):
 
     @staticmethod
     def cookie_settings(request):
+        is_https = request.scheme == 'https'
         return dict(
             path='/',
             domain=None,
             httponly=True,
-            samesite='Lax',
-            secure=request.scheme == 'https'
+            samesite='None' if is_https else 'Lax',
+            secure=is_https
         )
 
     def _get_for_db(self, key):
