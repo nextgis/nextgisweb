@@ -424,7 +424,7 @@ class ResourceTileCache(Base):
             result = False
             _logger.error(
                 "Failed to put tile {} to tile cache for resource {}. {}"
-                .format(params['tile'], self.resource_id, exc.message),
+                .format(params['tile'], self.resource_id, exc),
                 exc_info=True)
 
         if self.async_writing:
