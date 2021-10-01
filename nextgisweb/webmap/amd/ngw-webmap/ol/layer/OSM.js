@@ -10,8 +10,6 @@ define([
         olSourceClassName: "source.OSM",
 
         constructor: function(name, loptions, soptions) {
-            if (soptions.wrapX === undefined) { soptions.wrapX = false; }
-
             this.inherited(arguments);
         }
     });
