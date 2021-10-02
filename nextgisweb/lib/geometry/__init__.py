@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals, print_function, absolute_import
 
+import math
+
 from warnings import warn
 
 from osgeo.ogr import CreateGeometryFromWkb, CreateGeometryFromWkt, wkbNDR
@@ -188,3 +190,46 @@ def geom_calc(geom, crs, prop, srid):
         return None
 
     return calcs[prop]()
+
+
+def get_worlds_away(coordinate, srs):
+    worlds_away = 0
+
+    if coordinate[0] < srs.minx or coordinate[0] > srs.maxx:
+        worlds_away = math.floor((coordinate[0] - srs.minx) / (srs.maxx - srs.minx))
+
+    return worlds_away
+
+
+def wrapx(coordinate, srs):
+    coordinate = coordinate[:]
+    world_width = srs.maxx - srs.minx
+    worlds_away = get_worlds_away(coordinate, srs)
+
+    if worlds_away:
+        coordinate[0] -= worlds_away * world_width
+
+    return coordinate
+
+
+def wrapx_extent(extent, srs):
+    extents = []
+    lwa = get_worlds_away(extent[:2], srs)
+    rwa = get_worlds_away(extent[2:], srs)
+
+    if lwa != 0 or rwa != 0:
+        bl = wrapx([extent[0], extent[1]], srs)
+        tr = wrapx([extent[2], extent[3]], srs)
+
+        for world in range(rwa - lwa + 1):
+            if world == 0:
+                extents.append([bl[0], extent[1], srs.maxx, extent[3]])
+            elif world == rwa - lwa:
+                extents.append([srs.minx, extent[1], tr[0], extent[3]])
+            else:
+                extents.append([srs.minx, extent[1], srs.maxx, extent[3]])
+
+    else:
+        extents.append(extent)
+
+    return extents
