@@ -2,12 +2,14 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from six import BytesIO
 
+
 import numpy
 import PIL
 from osgeo import gdal, gdalconst, gdal_array
 from pkg_resources import resource_filename
 from zope.interface import implementer
 
+from ..lib.geometry import wrapx_extent
 from ..models import declarative_base
 from ..resource import Resource, DataScope
 from ..render import (
@@ -71,24 +73,38 @@ class RasterStyle(Base, Resource):
         if parent_ds is None:
             return result
 
-        ds = gdal.Warp(
-            "", parent_ds,
-            options=gdal.WarpOptions(
-                width=size[0], height=size[1], outputBounds=extent, format="MEM",
-                warpOptions=['UNIFIED_SRC_NODATA=ON'], dstAlpha=True,
-            ),
-        )
+        extents = wrapx_extent(extent, self.srs)
 
-        band_count = ds.RasterCount
-        array = numpy.zeros((size[1], size[0], band_count), numpy.uint8)
+        x_offset = 0
+        full_extent_width = extent[2] - extent[0]
 
-        for i in range(band_count):
-            array[:, :, i] = gdal_array.BandReadAsArray(ds.GetRasterBand(i + 1),)
+        for extent in extents:
+            width = int(round(size[0] * ((extent[2] - extent[0]) / full_extent_width)))
+            height = size[1]
 
-        ds = None
+            if width == 0 or height == 0:
+                continue
+
+            ds = gdal.Warp(
+                "", parent_ds,
+                options=gdal.WarpOptions(
+                    width=width, height=height, outputBounds=extent, format="MEM",
+                    warpOptions=['UNIFIED_SRC_NODATA=ON'], dstAlpha=True,
+                ),
+            )
+
+            band_count = ds.RasterCount
+            array = numpy.zeros((height, width, band_count), numpy.uint8)
+
+            for i in range(band_count):
+                array[:, :, i] = gdal_array.BandReadAsArray(ds.GetRasterBand(i + 1),)
+
+            wnd = PIL.Image.fromarray(array)
+            result.paste(wnd, (x_offset, 0))
+            x_offset += wnd.size[0]
+            ds = None
+
         parent_ds = None
-        wnd = PIL.Image.fromarray(array)
-        result.paste(wnd)
 
         return result
 
