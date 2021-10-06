@@ -44,7 +44,7 @@ def check_annotation_enabled(request):
 def annotation_cget(resource, request):
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
-    return map(annotation_to_dict, resource.annotations)
+    return [annotation_to_dict(a) for a in resource.annotations]
 
 
 def annotation_cpost(resource, request):
