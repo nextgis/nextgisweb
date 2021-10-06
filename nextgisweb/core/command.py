@@ -219,7 +219,8 @@ class RestoreCommand(Command):
         if is_zipfile(args.source):
             @contextmanager
             def src_context():
-                with TemporaryDirectory() as tmpdir:
+                tmp_root = os.path.split(args.source)[0]
+                with TemporaryDirectory(dir=tmp_root) as tmpdir:
                     cls.decompress(args.source, tmpdir)
                     yield tmpdir
         else:
