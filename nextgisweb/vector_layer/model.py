@@ -477,7 +477,7 @@ class TableInfo(object):
 
         max_fid = None
         for i, feature in enumerate(ogrlayer, start=1):
-            if len(errors) >= error_limit:
+            if len(errors) >= error_limit and not skip_errors:
                 break
 
             if self.fid_field_index is None:
