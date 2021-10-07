@@ -9,8 +9,10 @@
 
 <% distr_opts = request.env.options.with_prefix('distribution') %>
 <% support_url = request.env.core.support_url_view(request) %>
-%if distr_opts.get('name') is not None and request.env.ngupdate_url:
+%if distr_opts.get('name') is not None:
     <h2>${distr_opts.get('description')} ${distr_opts.get('version')} (${distr_opts.get('date')})</h2>
+%endif
+%if request.env.ngupdate_url:
     <div id="distInfo"><div data-dojo-id="distInfo"
         data-dojo-type="ngw-pyramid/DistInfo/DistInfo"
         data-dojo-props='
