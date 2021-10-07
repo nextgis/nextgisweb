@@ -71,7 +71,7 @@ define([
             var messages = {
                 inProgress: function () { return i18n.gettext('Checking for updates...') },
                 upToDate: lang.hitch(this, function () {
-                    return i18n.gettext("Your {distribution} is up-to-date: {version}.")
+                    return i18n.gettext("Your {distribution} is up-to-date.")
                         .replace("{distribution}", ngwConfig.distribution.description)
                         .replace("{version}", version)
                 }),

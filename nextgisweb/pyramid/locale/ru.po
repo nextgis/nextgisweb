@@ -141,8 +141,8 @@ msgid "Checking for updates..."
 msgstr "Проверяем наличие обновлений..."
 
 #: amd/ngw-pyramid/DistInfo/DistInfo.js:74
-msgid "Your {distribution} is up-to-date: {version}."
-msgstr "У вас последняя версия {distribution}: {version}."
+msgid "Your {distribution} is up-to-date."
+msgstr "У вас последняя версия {distribution}."
 
 #: amd/ngw-pyramid/DistInfo/DistInfo.js:79
 msgid "New version of {distribution} is available: {version}."
