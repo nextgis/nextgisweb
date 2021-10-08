@@ -186,6 +186,7 @@ define([
                 columns: columns,
                 queryOptions: this.queryOptions
             });
+            this._grid.on('dgrid-refresh-complete', this.resize.bind(this));
 
             if (this.data) {
                 this._grid.renderArray(this.data);
