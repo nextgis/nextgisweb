@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-from six import ensure_str
-
 import pytest
 from osgeo import gdal
 
 
 @pytest.fixture(scope='module')
 def drv():
-    result = gdal.GetDriverByName(ensure_str('NGW'))
+    result = gdal.GetDriverByName('NGW')
     if result is None:
         pytest.skip("GDAL NGW driver is missing!")
 
@@ -23,8 +19,8 @@ def test_resource_group(drv, ngw_httptest_app, ngw_auth_administrator, ngw_resou
         'DESCRIPTION=test resource group'])
     assert ds is not None, gdal.GetLastErrorMsg()
 
-    assert ds.GetMetadataItem(ensure_str('description'), ensure_str('')) == 'test resource group'
+    assert ds.GetMetadataItem('description', '') == 'test resource group'
 
     url_delete = 'NGW:' + ngw_httptest_app.base_url + '/resource/{}'.format(
-        ds.GetMetadataItem(ensure_str('id'), ensure_str('')))
+        ds.GetMetadataItem('id', ''))
     assert drv.Delete(url_delete) == gdal.CE_None, gdal.GetLastErrorMsg()

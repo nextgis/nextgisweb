@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import json
 from datetime import datetime
-from six import text_type
 
 import transaction
 from pyramid.interfaces import ISession
@@ -22,7 +18,7 @@ allowed_types = (
     bool,
     int,
     float,
-    text_type,
+    str,
     tuple,
 )
 
@@ -133,7 +129,7 @@ class WebSession(dict):
         )
 
     def _get_for_db(self, key):
-        value = super(WebSession, self).__getitem__(key)
+        value = super().__getitem__(key)
         return json.dumps(value)
 
     def _set_from_db(self, key, value):
@@ -145,11 +141,11 @@ class WebSession(dict):
             return v
 
         value = array_to_tuple(value)
-        super(WebSession, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     @property
     def _keys(self):
-        return super(WebSession, self).keys()
+        return super().keys()
 
     def _refresh_all(self):
         if self._refreshed:
@@ -184,35 +180,35 @@ class WebSession(dict):
 
     def __contains__(self, key, *args, **kwargs):
         self._refresh(key)
-        return super(WebSession, self).__contains__(key, *args, **kwargs)
+        return super().__contains__(key, *args, **kwargs)
 
     def keys(self, *args, **kwargs):
         self._refresh_all()
-        return super(WebSession, self).keys(*args, **kwargs)
+        return super().keys(*args, **kwargs)
 
     def values(self, *args, **kwargs):
         self._refresh_all()
-        return super(WebSession, self).values(*args, **kwargs)
+        return super().values(*args, **kwargs)
 
     def items(self, *args, **kwargs):
         self._refresh_all()
-        return super(WebSession, self).items(*args, **kwargs)
+        return super().items(*args, **kwargs)
 
     def __len__(self, *args, **kwargs):
         self._refresh_all()
-        return super(WebSession, self).__len__(*args, **kwargs)
+        return super().__len__(*args, **kwargs)
 
     def __getitem__(self, key, *args, **kwargs):
         self._refresh(key)
-        return super(WebSession, self).__getitem__(key, *args, **kwargs)
+        return super().__getitem__(key, *args, **kwargs)
 
     def get(self, key, *args, **kwargs):
         self._refresh(key)
-        return super(WebSession, self).get(key, *args, **kwargs)
+        return super().get(key, *args, **kwargs)
 
     def __iter__(self, *args, **kwargs):
         self._refresh_all()
-        return super(WebSession, self).__iter__(*args, **kwargs)
+        return super().__iter__(*args, **kwargs)
 
     def __setitem__(self, key, value, *args, **kwargs):
         validate_value(value)
@@ -220,7 +216,7 @@ class WebSession(dict):
             self._updated.append(key)
         if key in self._deleted:
             self._deleted.remove(key)
-        return super(WebSession, self).__setitem__(key, value, *args, **kwargs)
+        return super().__setitem__(key, value, *args, **kwargs)
 
     def setdefault(self, *args, **kwargs):
         raise NotImplementedError()
@@ -234,7 +230,7 @@ class WebSession(dict):
             self._deleted.append(key)
         if key in self._updated:
             self._updated.remove(key)
-        return super(WebSession, self).__delitem__(key, *args, **kwargs)
+        return super().__delitem__(key, *args, **kwargs)
 
     def pop(self, *args, **kwargs):
         raise NotImplementedError()
@@ -247,4 +243,4 @@ class WebSession(dict):
         del self._deleted[:]
         self._cleared = True
         self._refreshed = True
-        return super(WebSession, self).clear(*args, **kwargs)
+        return super().clear(*args, **kwargs)

@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import re
 import json
 import base64
 from datetime import timedelta
 from collections import OrderedDict
+from pathlib import Path
 from pkg_resources import resource_filename
 from importlib import import_module
-from six.moves.urllib.parse import unquote
+from urllib.parse import unquote
 
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
@@ -18,10 +17,8 @@ from ..core import KindOfData
 from ..core.exception import ValidationError
 from ..models import DBSession
 from ..resource import Resource, MetadataScope
-from ..compat import Path
 
 from .util import _, ClientRoutePredicate
-import six
 
 
 def _get_cors_olist():
@@ -135,7 +132,7 @@ def cors_put(request):
 
             for origin in v:
                 if (
-                    not isinstance(origin, six.string_types)
+                    not isinstance(origin, str)
                     or not re.match(r'^https?://[\w\_\-\.]{3,}(:\d{2,5})?/?$', origin)
                 ):
                     raise ValidationError("Invalid origin '%s'" % origin)
@@ -328,7 +325,7 @@ def custom_css_get(request):
 def custom_css_put(request):
     request.require_administrator()
 
-    data = six.ensure_text(request.body)
+    data = str(request.body)
     if re.match(r'^\s*$', data, re.MULTILINE):
         request.env.core.settings_delete('pyramid', 'custom_css')
     else:

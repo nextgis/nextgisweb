@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import logging
 from collections import defaultdict
 from importlib import import_module
+from pathlib import Path
 
 import transaction
 from zope.sqlalchemy import mark_changed
 
-from ..compat import Path
 from ..models import DBSession
 from ..lib.migration import (
     MigrationKey, InitialMigration,
@@ -24,7 +22,7 @@ _logger = logging.getLogger(__name__)
 class MigrationRegistry(Registry):
 
     def __init__(self, env):
-        super(MigrationRegistry, self).__init__()
+        super().__init__()
         self._env = env
 
         for cid, cobj in env._components.items():

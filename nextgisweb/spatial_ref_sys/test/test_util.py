@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import pytest
 
 from nextgisweb.spatial_ref_sys.util import convert_to_wkt, normalize_mapinfo_cs

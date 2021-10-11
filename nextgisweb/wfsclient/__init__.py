@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 from ..component import Component, require
 from ..lib.config import Option
 
@@ -14,7 +11,7 @@ class WFSClientComponent(Component):
     metadata = Base.metadata
 
     def initialize(self):
-        super(WFSClientComponent, self).initialize()
+        super().initialize()
 
         self.headers = {
             'User-Agent': self.options['user_agent']

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import warnings
 
 from alembic.migration import MigrationContext
@@ -34,7 +32,7 @@ class BaseClass(object):
         self.postinit(**kwargs)
 
     def postinit(self, **kwargs):
-        sup = super(BaseClass, self)
+        sup = super()
         if hasattr(sup, 'postinit'):
             sup.postinit(**kwargs)
 

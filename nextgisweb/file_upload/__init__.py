@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 import os.path
 import uuid
@@ -56,7 +54,7 @@ class FileUploadComponent(Component):
         return (base_filename + '.data', base_filename + '.meta')
 
     def maintenance(self):
-        super(FileUploadComponent, self).maintenance()
+        super().maintenance()
         self.cleanup()
 
     def cleanup(self):

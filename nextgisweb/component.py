@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import logging
 import warnings
 import six
@@ -14,7 +12,7 @@ logger = logging.getLogger(__name__)
 class ComponentMeta(type):
 
     def __init__(cls, name, bases, nmspc):
-        super(ComponentMeta, cls).__init__(name, bases, nmspc)
+        super().__init__(name, bases, nmspc)
         abstract = getattr(cls, '__abstract__', False)
         if cls.identity and not abstract:
             cls.registry.register(cls)

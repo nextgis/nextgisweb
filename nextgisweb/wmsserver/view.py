@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import json
 import math
-from six import BytesIO
+from io import BytesIO
 
 from lxml import etree, html
 from lxml.builder import ElementMaker

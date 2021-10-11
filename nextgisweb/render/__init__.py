@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import os
 import os.path
 from datetime import datetime
@@ -68,7 +66,7 @@ class RenderComponent(Component):
         ))
 
     def backup_configure(self, config):
-        super(RenderComponent, self).backup_configure(config)
+        super().backup_configure(config)
         config.exclude_table_data('tile_cache', '*')
 
     def estimate_storage(self):

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import os
 import os.path
 import logging
@@ -122,7 +119,7 @@ class FileStorageComponent(Component):
         return result
 
     def maintenance(self):
-        super(FileStorageComponent, self).maintenance()
+        super().maintenance()
         self.cleanup()
 
     def cleanup(self):

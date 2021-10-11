@@ -4,7 +4,6 @@
     import os
     import re
     from json import dumps
-    from six import text_type
     from nextgisweb.pyramid.util import _
 %>
 
@@ -17,7 +16,7 @@
         user = request.user
         user_mode = 'guest' if user.keyname == 'guest' else (
             'administrator' if user.is_administrator else 'authorized')
-        user_display_name = text_type(user)
+        user_display_name = user.display_name
         invitation_session = bool(request.session.get('invite'))
     except Exception:
         user_mode = 'guest'

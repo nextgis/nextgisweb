@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 from ..lib.config import Option
 from ..component import Component
 from .model import Base, Connection, Layer, WMS_VERSIONS
@@ -12,7 +10,7 @@ class WMSClientComponent(Component):
     metadata = Base.metadata
 
     def initialize(self):
-        super(WMSClientComponent, self).initialize()
+        super().initialize()
 
         self.headers = {
             'User-Agent': self.options['user_agent']

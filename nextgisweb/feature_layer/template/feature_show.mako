@@ -2,7 +2,6 @@
 
 <%
     import json
-    import six
 %>
 
 <script type="text/javascript">
@@ -11,8 +10,8 @@
         "ngw-feature-layer/FeatureDisplayWidget",
         "dojo/domReady!"
     ], function (dom, FeatureDisplayWidget) {
-        var ext = ${ list(ext_mid.keys()) if six.PY3 else ext_mid.keys() | json.dumps, n },
-            mid = ${ list(ext_mid.values()) if six.PY3 else ext_mid.values() | json.dumps, n };
+        var ext = ${ list(ext_mid.keys()) | json.dumps, n },
+            mid = ${ list(ext_mid.values()) | json.dumps, n };
 
         require(mid, function () {
             var extmid = {};

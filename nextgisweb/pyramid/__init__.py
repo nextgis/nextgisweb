@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import os.path
 from datetime import datetime as dt, timedelta
 from pkg_resources import resource_filename
@@ -82,7 +80,7 @@ class PyramidComponent(Component):
         return result
 
     def maintenance(self):
-        super(PyramidComponent, self).maintenance()
+        super().maintenance()
         self.cleanup()
 
     def cleanup(self):
@@ -95,7 +93,7 @@ class PyramidComponent(Component):
         self.logger.info("Deleted: %d sessions", deleted_sessions)
 
     def backup_configure(self, config):
-        super(PyramidComponent, self).backup_configure(config)
+        super().backup_configure(config)
         config.exclude_table_data('public', Session.__tablename__)
         config.exclude_table_data('public', SessionStore.__tablename__)
 

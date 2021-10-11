@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import os.path
-import six
 from datetime import date, time, datetime
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -10,7 +8,6 @@ import webtest
 from osgeo import gdal
 from osgeo import ogr
 
-from nextgisweb.compat import Path
 from nextgisweb.models import DBSession
 from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
@@ -28,7 +25,7 @@ def test_from_fields(ngw_resource_group, ngw_txn):
         owner_user=User.by_keyname('administrator'),
         geometry_type='POINT',
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=six.text_type(uuid4().hex),
+        tbl_uuid=uuid4().hex,
     )
 
     res.setup_from_fields([
@@ -61,7 +58,7 @@ def test_from_ogr(data, ngw_resource_group, ngw_txn):
         parent_id=ngw_resource_group, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=six.text_type(uuid4().hex),
+        tbl_uuid=uuid4().hex,
     )
 
     res.persist()
@@ -100,7 +97,7 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
         parent_id=ngw_resource_group, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=six.text_type(uuid4().hex))
+        tbl_uuid=uuid4().hex)
 
     res.persist()
 
@@ -120,9 +117,6 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
 
         if t in ('Date', 'Time', 'DateTime'):
             result = [int(v) for v in result]
-
-        if t == 'String' and six.PY2:
-            result = result.decode('utf-8')
 
         return result
 
@@ -157,7 +151,7 @@ def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
         parent_id=ngw_resource_group, display_name='test_fid',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=six.text_type(uuid4().hex))
+        tbl_uuid=uuid4().hex)
 
     res.persist()
 

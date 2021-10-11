@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ {
     "revision": "2bfa0320", "parents": ["00000000"],
     "message": "Drop foo table foreign key",
@@ -8,7 +7,6 @@
     ]
 } """
 
-from __future__ import division, unicode_literals, print_function, absolute_import
 from textwrap import dedent
 
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import re
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -50,7 +48,7 @@ class ResourceComponent(Component):
     metadata = Base.metadata
 
     def initialize(self):
-        super(ResourceComponent, self).initialize()
+        super().initialize()
         for item in self.options['disabled_cls']:
             try:
                 Resource.registry[item]

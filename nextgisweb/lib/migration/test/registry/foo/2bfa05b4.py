@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 """ {
     "revision": "2bfa05b4", "parents": ["00000000"],
     "message": "Create table foo_b"
 } """
 
-from __future__ import division, unicode_literals, print_function, absolute_import
 from textwrap import dedent
 
 

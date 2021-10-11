@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
+import importlib
 import json
 from itertools import product
 
 import pytest
-import six
 import transaction
 
 from uuid import uuid4
@@ -17,8 +14,6 @@ from nextgisweb.lib.geometry import Geometry
 from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys.models import SRS
 from nextgisweb.vector_layer import VectorLayer
-
-from nextgisweb.test.reload import reload_module
 
 
 def test_identify(ngw_webtest_app):
@@ -38,7 +33,7 @@ def vector_layer_id(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='vector_layer',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=six.text_type(uuid4().hex),
+            tbl_uuid=uuid4().hex,
         ).persist()
 
         geojson = {
@@ -256,8 +251,8 @@ def test_mvt(extent, simplification, padding, ngw_webtest_app, vector_layer_id, 
 
 
 @pytest.mark.parametrize('mvt_driver_exist, status_expected', (
-        (True, 200),
-        (False, 404),
+    (True, 200),
+    (False, 404),
 ))
 def test_mvt_should_return_not_found_if_mvt_driver_not_available(mvt_driver_exist, status_expected, ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     import nextgisweb.feature_layer.ogrdriver as ogrdriver
@@ -265,14 +260,14 @@ def test_mvt_should_return_not_found_if_mvt_driver_not_available(mvt_driver_exis
     ogrdriver.MVT_DRIVER_EXIST = mvt_driver_exist
 
     import nextgisweb.feature_layer.api as api
-    reload_module(api)
+    importlib.reload(api)
 
     params = dict(z=0, x=0, y=0, resource=vector_layer_id,
                   extent=2048, simplification=4.1, padding=0.1)
     ngw_webtest_app.get('/api/component/feature_layer/mvt', params, status=status_expected)
 
     ogrdriver.MVT_DRIVER_EXIST = old_MVT_DRIVER_EXIST
-    reload_module(api)
+    importlib.reload(api)
 
 
 def test_cdelete(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):

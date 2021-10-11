@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
+from pathlib import Path
 
 import pytest
 
-from nextgisweb.compat import Path
 from nextgisweb.lib.migration.registry import Registry
 from nextgisweb.lib.migration.graph import MigrationGraph
 

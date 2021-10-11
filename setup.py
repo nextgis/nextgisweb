@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import sys
 import io
 import os
@@ -24,61 +23,51 @@ requires = [
     'six',
 
     # Other dependencies
-    'alembic==1.4.2',
-    'pyramid==1.10.1',
-    'SQLAlchemy==1.2.16',
-    'transaction==2.4.0',
-    'pyramid_tm==2.2.1',
-    'pyramid_debugtoolbar==4.5.1',
-    'pyramid_mako==1.0.2',
-    'zope.sqlalchemy==1.1',
-    'zope.interface<5',
-    'zope.event<5',
-    'bunch==1.0.1',
-    'flufl.enum==4.1.1',
-    'waitress==1.2.0',
-    'pygdal' + (('==%s.*' % gv) if gv else ''),  # TODO: Add >=2.3.0
-    'psycopg2==2.8.5',
-    'geoalchemy2==0.5.0',
-    'shapely==1.7.1',
     'affine==2.2.2',
-    'geojson==2.4.1',
-    'pillow==5.4.1',
-    'lxml==4.3.0',
-    'passlib==1.7.1',
-    'requests[security]==2.22.0',
+    'alembic==1.4.2',
     'babel==2.6.0',
-    'sentry-sdk==1.3.0',
-    'python-magic==0.4.15',
-    'backports.tempfile==1.0',
-    'pyproj<3',
+    'bunch==1.0.1',
+    'cachetools==3.1.1',
     'elasticsearch>=7.0.0,<8.0.0',
     'elasticsearch-dsl>=7.1.0,<8.0.0',
-    'unicodecsv==0.14.1',
     'flatdict==4.0.1',
-    'psutil==5.7.3',
-    'zipstream-new==1.1.7',
-    'cachetools==3.1.1',
+    'geoalchemy2==0.5.0',
+    'geojson==2.4.1',
+    'lxml==4.3.0',
+    'numpy',
     'networkx',
+    'OWSLib==0.24.1',
+    'passlib==1.7.1',
+    'pillow==5.4.1',
     'poeditor',
-
+    'psutil==5.7.3',
+    'psycopg2==2.8.5',
+    'pygdal' + (('==%s.*' % gv) if gv else ''),  # TODO: Add >=2.3.0
+    'pyproj==2.6.1',
+    'pyramid==1.10.1',
+    'pyramid_debugtoolbar==4.5.1',
+    'pyramid_mako==1.0.2',
+    'pyramid_tm==2.2.1',
+    'python-magic==0.4.15',
+    'requests[security]==2.22.0',
+    'sentry-sdk==1.3.0',
+    'shapely==1.7.1',
+    'SQLAlchemy==1.2.16',
+    'transaction==2.4.0',
+    'waitress==1.2.0',
+    'zipstream-new==1.1.7',
+    'zope.sqlalchemy==1.1',
+    'zope.interface==4.7.2',
+    'zope.event==4.5.0',
 
     # TODO: Move to dev or test dependencies
+    'flake8',
     'freezegun',
     'pytest',
-    'pytest-watch',
     'pytest-flake8',
+    'pytest-watch',
     'webtest',
-    'flake8',
-    'flake8-future-import',
-    'modernize',
 ]
-
-if sys.version_info[0:2] < (3, 6):
-    requires.append('python2-secrets')
-    requires.append('OWSLib==0.17.1')
-else:
-    requires.append('OWSLib==0.24.1')
 
 extras_require = {
     'dev': ['pdbpp', 'ipython']
@@ -146,11 +135,11 @@ setup(
     description='nextgisweb',
     author='NextGIS',
     author_email='info@nextgis.com',
-    url='http://nextgis.com/nextgis-web',
+    url='https://nextgis.com/nextgis-web',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    python_requires=">=2.7.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, <4",
+    python_requires=">=3.8.*, <4",
     install_requires=requires,
     extras_require=extras_require,
     entry_points=entry_points,

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 from pyproj import CRS
 import sqlalchemy as sa
 import sqlalchemy.orm as orm

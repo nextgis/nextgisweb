@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-import six
+from pathlib import Path
 from itertools import product
 from uuid import uuid4
 
@@ -10,7 +8,6 @@ from osgeo import gdal
 from osgeo import ogr
 from packaging import version as pkg_version
 
-from nextgisweb.compat import Path
 from nextgisweb.models import DBSession
 from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
@@ -36,7 +33,7 @@ def service(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='type',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=six.text_type(uuid4().hex),
+            tbl_uuid=uuid4().hex,
         ).persist()
 
         dsource = type_geojson_dataset('type.geojson')
@@ -55,7 +52,7 @@ def service(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='pointz',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=six.text_type(uuid4().hex),
+            tbl_uuid=uuid4().hex,
         ).persist()
 
         dsource = type_geojson_dataset('pointz.geojson')
@@ -122,7 +119,7 @@ def features(service, ngw_httptest_app, ngw_auth_administrator):
 
 @pytest.mark.parametrize('version', TEST_WFS_VERSIONS)
 def test_layer_name(version, service, ngw_httptest_app, ngw_auth_administrator):
-    driver = ogr.GetDriverByName(six.ensure_str('WFS'))
+    driver = ogr.GetDriverByName('WFS')
     wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
         ngw_httptest_app.base_url, service, version), True)
     assert wfs_ds is not None, gdal.GetLastErrorMsg()
@@ -212,12 +209,12 @@ for version in TEST_WFS_VERSIONS:
 
 @pytest.mark.parametrize('version, layer, fields, wkt', test_edit_params)
 def test_edit(version, layer, fields, wkt, service, ngw_httptest_app, ngw_auth_administrator):
-    driver = ogr.GetDriverByName(six.ensure_str('WFS'))
+    driver = ogr.GetDriverByName('WFS')
     wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
         ngw_httptest_app.base_url, service, version), True)
     assert wfs_ds is not None, gdal.GetLastErrorMsg()
 
-    wfs_layer = wfs_ds.GetLayerByName(six.ensure_str(layer))
+    wfs_layer = wfs_ds.GetLayerByName(layer)
     assert wfs_layer is not None, gdal.GetLastErrorMsg()
 
     feature = wfs_layer.GetNextFeature()
@@ -256,13 +253,13 @@ def test_edit(version, layer, fields, wkt, service, ngw_httptest_app, ngw_auth_a
 
 @pytest.mark.parametrize('version, layer, wkt', test_create_delete_params)
 def test_create_delete(version, layer, wkt, service, ngw_httptest_app, ngw_auth_administrator):
-    driver = ogr.GetDriverByName(six.ensure_str('WFS'))
+    driver = ogr.GetDriverByName('WFS')
     wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
         ngw_httptest_app.base_url, service, version), True)
 
     assert wfs_ds is not None, gdal.GetLastErrorMsg()
 
-    wfslayer_type = wfs_ds.GetLayerByName(six.ensure_str(layer))
+    wfslayer_type = wfs_ds.GetLayerByName(layer)
     assert wfslayer_type is not None, gdal.GetLastErrorMsg()
 
     feature = ogr.Feature(wfslayer_type.GetLayerDefn())

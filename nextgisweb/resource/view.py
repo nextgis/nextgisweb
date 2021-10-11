@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import warnings
-import six
 
 from pyramid import httpexceptions
 from sqlalchemy import bindparam
@@ -20,7 +17,7 @@ from ..core.exception import InsufficientPermissions
 from .exception import ResourceNotFound
 from .model import Resource
 from .permission import Permission, Scope
-from .scope import DataScope, ResourceScope
+from .scope import ResourceScope
 from .serialize import CompositeSerializer
 from .widget import CompositeWidget
 from .util import _
@@ -101,7 +98,7 @@ def schema(request):
             label=request.localizer.translate(cls.cls_display_name),
             scopes=list(cls.scope.keys()))
 
-    for k, scp in six.iteritems(Scope.registry):
+    for k, scp in Scope.registry.items():
         spermissions = dict()
         for p in scp.values():
             spermissions[p.name] = dict(
@@ -291,7 +288,7 @@ def setup_pyramid(comp, config):
     class ResourceMenu(DynItem):
         def build(self, args):
             permissions = args.obj.permissions(args.request.user)
-            for ident, cls in six.iteritems(Resource.registry._dict):
+            for ident, cls in Resource.registry._dict.items():
                 if ident in comp.options['disabled_cls'] or comp.options['disable.' + ident]:
                     continue
 

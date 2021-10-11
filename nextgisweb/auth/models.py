@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 from collections import OrderedDict
+from functools import lru_cache
 
 from passlib.hash import sha256_crypt
 import sqlalchemy as sa
@@ -8,8 +7,6 @@ import sqlalchemy.orm as orm
 
 from ..env import env
 from ..models import declarative_base
-from ..compat import lru_cache
-import six
 
 
 Base = declarative_base()
@@ -62,7 +59,7 @@ class User(Principal):
     __mapper_args__ = dict(polymorphic_identity='U')
 
     def __init__(self, password=None, **kwargs):
-        super(Principal, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if password:
             self.password = password
 
@@ -236,7 +233,7 @@ class PasswordHashValue(object):
     def __eq__(self, other):
         if self.value is None:
             return False
-        elif isinstance(other, six.string_types):
+        elif isinstance(other, str):
             try:
                 return _password_hash_cache(other, self.value)
             except ValueError:

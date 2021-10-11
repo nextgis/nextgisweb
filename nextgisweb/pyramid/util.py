@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 import io
-import re
 import os.path
 import errno
 import fcntl
@@ -10,7 +7,6 @@ import secrets
 import string
 from calendar import timegm
 from logging import getLogger
-import six
 
 from ..i18n import trstring_factory
 
@@ -27,7 +23,7 @@ def viewargs(**kw):
         def wrapped(request, *args, **kwargs):
             return f(request, *args, **kwargs)
 
-        wrapped.__name__ = ('args(%s)' % f.__name__) if six.PY3 else (b'args(%s)' % f.__name__)
+        wrapped.__name__ = 'args(%s)' % f.__name__
         wrapped.__viewargs__ = kw
 
         return wrapped
@@ -92,30 +88,6 @@ def persistent_secret(fn, secretgen):
         secret = secretgen()
         fd.write(secret)
         return secret
-
-
-def header_encoding_tween_factory(handler, registry):
-    """ Force unicode headers to latin-1 encoding in Python 2 environment """
-
-    if six.PY3:
-        return handler
-
-    def header_encoding_tween(request):
-        response = handler(request)
-
-        headers = response.headers
-        for h in (
-            'Content-Type',
-            'Content-Disposition',
-        ):
-            if h in headers:
-                v = headers[h]
-                if type(h) == unicode or type(v) == unicode:  # NOQA: F821
-                    headers[h.encode('latin-1')] = v.encode('latin-1')
-
-        return response
-
-    return header_encoding_tween
 
 
 def datetime_to_unix(dt):

@@ -1,15 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
-import six
 import transaction
 from osgeo import ogr
 
 from nextgisweb.auth import User
-from nextgisweb.compat import Path
 from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
@@ -22,7 +18,7 @@ def type_layer(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='type',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=six.text_type(uuid4().hex),
+            tbl_uuid=uuid4().hex,
         ).persist()
 
         import nextgisweb.vector_layer.test

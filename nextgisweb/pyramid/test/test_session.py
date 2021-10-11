@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import json
 from datetime import datetime, timedelta
+from http.cookies import SimpleCookie
 
 from freezegun import freeze_time
 import pytest
 from webtest import TestApp as BaseTestApp
 import transaction
 from pyramid.response import Response
-from six.moves.http_cookies import SimpleCookie
 
 from nextgisweb.pyramid import Session, SessionStore
 

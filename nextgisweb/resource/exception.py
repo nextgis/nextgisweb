@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import warnings
 
 from zope.interface import implementer
@@ -32,7 +30,7 @@ class ResourceNotFound(UserException):
     http_status_code = 404
 
     def __init__(self, resource_id):
-        super(ResourceNotFound, self).__init__(
+        super().__init__(
             message=self.__class__.message % resource_id,
             data=dict(resource_id=resource_id))
 
@@ -45,7 +43,7 @@ class DisplayNameNotUnique(ValidationError):
         "name. Give the resource a different display name or rename existing.")
 
     def __init__(self, resource_id):
-        super(DisplayNameNotUnique, self).__init__(
+        super().__init__(
             message=self.__class__.message % resource_id,
             data=dict(resource_id=resource_id))
 

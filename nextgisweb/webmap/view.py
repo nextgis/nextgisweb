@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 from collections import namedtuple
-from six.moves.urllib.parse import unquote
+from urllib.parse import unquote
 
 from ..resource import Resource, Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link

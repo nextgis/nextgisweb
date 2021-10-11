@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import sys
 import os.path
 import warnings
@@ -8,7 +6,6 @@ import json
 import logging
 from collections import OrderedDict
 from hashlib import md5
-import six
 
 from pyramid.renderers import render_to_response
 from pyramid.response import Response
@@ -134,9 +131,9 @@ def guru_meditation(tb):
                     # Only file name (without path) taken, so hash
                     # should not depend on package location.
                     os.path.split(fn)[-1],
-                    six.text_type(line),
+                    str(line),
                     func,
-                    six.ensure_text(text) if text is not None else "",
+                    text if text is not None else "",
                 )
             ).encode('utf-8')
         )

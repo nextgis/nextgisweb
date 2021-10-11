@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import sys
 import io
 import os
@@ -7,9 +5,9 @@ import os.path
 import logging
 import json
 import re
-import six
 from importlib import import_module
 from packaging import version as pkg_version
+from pathlib import Path
 from argparse import ArgumentParser, Namespace
 from pkg_resources import resource_filename
 from collections import OrderedDict, defaultdict
@@ -25,7 +23,6 @@ from babel.messages.mofile import write_mo
 from attr import attrs, attrib, asdict
 from poeditor import POEditorAPI
 
-from ..compat import Path
 from ..package import pkginfo
 from ..lib.config import load_config
 from ..env import Env, setenv, env
@@ -74,7 +71,7 @@ def write_jed(fileobj, catalog):
     for msg in catalog:
         if msg.id == '':
             continue
-        data[msg.id] = (msg.string, ) if isinstance(msg.string, six.string_types) \
+        data[msg.id] = (msg.string, ) if isinstance(msg.string, str) \
             else msg.string
 
     fileobj.write(json.dumps(data, ensure_ascii=False, indent=2))

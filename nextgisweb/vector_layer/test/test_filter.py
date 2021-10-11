@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-import six
 import os.path
 import pytest
 from uuid import uuid4
@@ -64,7 +61,7 @@ def resource(ngw_txn, ngw_resource_group):
         parent_id=ngw_resource_group, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=six.text_type(uuid4().hex),
+        tbl_uuid=uuid4().hex,
     )
 
     resource.persist()

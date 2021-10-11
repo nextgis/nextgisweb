@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import random
 import json
-import six
 from uuid import uuid4
 
 import pytest
@@ -36,7 +33,7 @@ def vector_layer_id(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='vector_layer',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=six.text_type(uuid4().hex),
+            tbl_uuid=uuid4().hex,
         ).persist()
 
         geojson = {

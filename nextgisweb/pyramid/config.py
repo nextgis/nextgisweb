@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 from pyramid.config import Configurator as PyramidConfigurator
 
 
@@ -39,7 +36,7 @@ class Configurator(PyramidConfigurator):
 
         """
 
-        super(Configurator, self).add_route(
+        super().add_route(
             name, pattern=pattern, **kwargs)
 
         return RouteHelper(name, self)
@@ -49,4 +46,4 @@ class Configurator(PyramidConfigurator):
         if vargs:
             kwargs = dict(vargs, **kwargs)
 
-        super(Configurator, self).add_view(view=view, **kwargs)
+        super().add_view(view=view, **kwargs)

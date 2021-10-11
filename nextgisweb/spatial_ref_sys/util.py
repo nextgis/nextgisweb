@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-import six
-
 from osgeo import osr
 
 from ..core.exception import ValidationError
@@ -46,38 +42,30 @@ def normalize_mapinfo_cs(source):
     return "Earth Projection " + ", ".join(items)
 
 
-def _gdalenc(v):
-    return v.encode('utf-8') if six.PY2 else v
-
-
-def _gdaldec(v):
-    return six.text_type(v)
-
-
 def convert_to_wkt(source, format=None, pretty=False):
     sr = osr.SpatialReference()
 
     if format == 'proj4':
-        sr.ImportFromProj4(_gdalenc(source))
+        sr.ImportFromProj4(source)
     elif format == 'epsg':
         sr.ImportFromEPSG(int(source))
     elif format == 'esri':
-        sr.ImportFromESRI([_gdalenc(source)])
+        sr.ImportFromESRI([source])
     elif format == 'mapinfo':
-        sr.ImportFromMICoordSys(_gdalenc(normalize_mapinfo_cs(source)))
+        sr.ImportFromMICoordSys(normalize_mapinfo_cs(source))
     elif format == 'wkt':
-        sr.ImportFromWkt(_gdalenc(source))
+        sr.ImportFromWkt(source)
     else:
         raise ValidationError(
             message=_("Unknown spatial reference system format: %s!") % format)
 
-    wkt = _gdaldec(sr.ExportToPrettyWkt() if pretty else sr.ExportToWkt())
+    wkt = sr.ExportToPrettyWkt() if pretty else sr.ExportToWkt()
     return wkt
 
 
 def convert_to_proj(source):
     sr = osr.SpatialReference()
-    if sr.ImportFromWkt(_gdalenc(source)) != 0:
+    if sr.ImportFromWkt(source) != 0:
         raise ValidationError(
             message=_("Invalid OGC WKT definition!"))
-    return _gdaldec(sr.ExportToProj4())
+    return sr.ExportToProj4()

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import re
 from collections import namedtuple
 
@@ -58,7 +56,7 @@ class Migration(object):
 class InitialMigration(Migration):
 
     def __init__(self, component):
-        super(InitialMigration, self).__init__(component, REVID_ZERO)
+        super().__init__(component, REVID_ZERO)
         self._parents = ()
         self._message = 'Initial migration'
         self._dependencies = ()

@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import re
 import itertools
 from datetime import datetime, timedelta
 from collections import namedtuple
 from logging import getLogger
 from hashlib import sha512
-import six
-from six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 
 import sqlalchemy as sa
 import requests
@@ -15,7 +12,6 @@ import zope.event
 
 from ..env import env
 from ..lib.config import OptionAnnotations, Option
-from ..compat import datetime_to_timestamp
 from .. import db
 from ..models import DBSession
 from ..core.exception import UserException
@@ -81,8 +77,7 @@ class OAuthHelper(object):
 
     def query_introspection(self, access_token):
         if len(access_token) > MAX_TOKEN_LENGTH:
-            token_id = 'sha512:' + sha512(six.ensure_binary(
-                access_token)).hexdigest()
+            token_id = 'sha512:' + sha512(access_token.encode('utf-8')).hexdigest()
         else:
             token_id = 'raw:' + access_token
 
@@ -103,7 +98,7 @@ class OAuthHelper(object):
 
             token = OAuthToken(id=token_id, data=tdata)
             token.exp = datetime.utcfromtimestamp(tdata['exp'])
-            token.sub = six.text_type(tdata[self.options['profile.subject.attr']])
+            token.sub = str(tdata[self.options['profile.subject.attr']])
             token.persist()
 
             _logger.debug("Adding access token to cache (%s)", access_token)
@@ -170,7 +165,7 @@ class OAuthHelper(object):
         _logger.debug(
             "%s request to %s endpoint: %s",
             method.upper(), endpoint.upper(),
-            six.text_type(params))
+            str(params))
 
         response = getattr(requests, method.lower())(url, params, headers=self.server_headers)
         response.raise_for_status()
@@ -183,7 +178,7 @@ class OAuthHelper(object):
         return OAuthGrantResponse(
             access_token=data['access_token'],
             refresh_token=data['refresh_token'],
-            expires=datetime_to_timestamp(exp))
+            expires=exp.timestamp())
 
     def _update_user(self, user, token):
         opts = self.options.with_prefix('profile')
@@ -207,7 +202,7 @@ class OAuthHelper(object):
         profile_display_name = opts.get('display_name.attr', None)
         if profile_display_name is not None:
             user.display_name = ' '.join([
-                six.text_type(token[key])
+                token[key]
                 for key in re.split(r',\s*', profile_display_name)
                 if key in token])
 
@@ -348,7 +343,7 @@ class OAuthAccessTokenExpiredException(UserException):
 def _fallback_value(*args):
     for a in args:
         if not(a is None or (
-            isinstance(a, six.string_types) and a.strip() == ''
+            isinstance(a, str) and a.strip() == ''
         )):
             return a
     raise ValueError("No suitable value found")

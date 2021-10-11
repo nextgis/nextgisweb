@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import geoalchemy2 as ga
 import re
-import six
 from shapely.geometry import box
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.engine.url import (
@@ -176,7 +173,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     @property
     def source(self):
-        source_meta = super(PostgisLayer, self).source
+        source_meta = super().source
         source_meta.update(dict(
             schema=self.schema,
             table=self.table,
@@ -319,7 +316,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             conn.close()
 
     def get_info(self):
-        return super(PostgisLayer, self).get_info() + (
+        return super().get_info() + (
             (_("Geometry type"), dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[
                 self.geometry_type]),
         )
@@ -725,8 +722,7 @@ class FeatureQueryBase(object):
 
                         if self._geom:
                             if self._geom_format == 'WKB':
-                                geom_data = row['geom'].tobytes() if six.PY3 \
-                                    else six.binary_type(row['geom'])
+                                geom_data = row['geom'].tobytes()
                                 geom = Geometry.from_wkb(geom_data, validate=False)
                             else:
                                 geom = Geometry.from_wkt(row['geom'], validate=False)

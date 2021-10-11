@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 from uuid import uuid4
 from time import sleep
 
 import pytest
-import six
 import transaction
 from freezegun import freeze_time
 
@@ -77,7 +74,7 @@ def vector_layer(display_name, parent_id):
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
         geometry_type='POINT',
-        tbl_uuid=six.text_type(uuid4().hex),
+        tbl_uuid=uuid4().hex,
     ).persist()
     res.setup_from_fields([])
     return res

@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """ {
     "revision": "2ea54a77", "parents": ["22100521"],
     "date": "2021-05-18T08:49:56",
     "message": "relative-symlinks"
 } """
 
-from __future__ import division, unicode_literals, print_function, absolute_import
 
 import os
 

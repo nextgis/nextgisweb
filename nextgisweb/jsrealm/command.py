@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import json
 import logging
 from collections import OrderedDict
 from importlib import import_module
+from pathlib import Path
 from subprocess import check_call
 
-from ..compat import Path
 from ..command import Command
 from ..package import amd_packages
 

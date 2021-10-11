@@ -1,7 +1,8 @@
 <%inherit file='nextgisweb:templates/base.mako' />
 
 <%
-    from nextgisweb.compat import Path
+    from pathlib import Path
+
     import nextgisweb
     import nextgisweb.pyramid
 

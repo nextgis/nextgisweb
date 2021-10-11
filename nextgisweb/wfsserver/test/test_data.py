@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 
 import json
 from uuid import uuid4
 
 import pytest
-import six
 import transaction
 from osgeo import gdal, ogr
 
@@ -26,7 +23,7 @@ def vlayer_id(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='test_cyrillic',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=six.text_type(uuid4().hex),
+            tbl_uuid=uuid4().hex,
         ).persist()
 
         geojson = {
@@ -82,7 +79,7 @@ def service_id(vlayer_id, ngw_resource_group):
 
 
 def test_cyrillic(service_id, vlayer_id, ngw_httptest_app, ngw_auth_administrator):
-    driver = ogr.GetDriverByName(six.ensure_str('WFS'))
+    driver = ogr.GetDriverByName('WFS')
     wfs_ds = driver.Open('WFS:{}/api/resource/{}/wfs'.format(
         ngw_httptest_app.base_url, service_id), True)
 

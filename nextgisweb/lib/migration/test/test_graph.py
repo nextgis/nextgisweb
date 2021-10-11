@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 from nextgisweb.lib.migration.revision import REVID_ZERO
 from nextgisweb.lib.migration.registry import MigrationKey
 from nextgisweb.lib.migration.graph import resolve

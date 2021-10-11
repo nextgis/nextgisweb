@@ -1,13 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-import six
-
-
-class TrString(six.text_type):
+class TrString(str):
 
     def __new__(cls, msgid, domain=None, context=None,
                 modarg=None, fmtarg=None):
-        self = six.text_type.__new__(cls, msgid)
+        self = str.__new__(cls, msgid)
 
         if isinstance(msgid, self.__class__):
             domain = domain or msgid.domain and msgid.domain[:]

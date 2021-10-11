@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 from collections import OrderedDict
 
 from .model import Resource
@@ -12,7 +10,7 @@ _registry = []
 
 class WidgetMeta(type):
     def __init__(cls, name, bases, nmspc):
-        super(WidgetMeta, cls).__init__(name, bases, nmspc)
+        super().__init__(name, bases, nmspc)
         if not nmspc.get('__abstract__', False):
             _registry.append(cls)
 
@@ -43,7 +41,7 @@ class Widget(six.with_metaclass(WidgetMeta, WidgetBase)):
 class CompositeWidget(WidgetBase):
 
     def __init__(self, *args, **kwargs):
-        super(CompositeWidget, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.members = []
         for mcls in _registry:
             member = mcls(*args, **kwargs)

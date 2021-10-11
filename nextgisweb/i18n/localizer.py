@@ -1,18 +1,15 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import io
 import os
 import os.path
 import fnmatch
 import logging
 from importlib import import_module
+from pathlib import Path
 from pkg_resources import resource_filename
 
-import six
 from babel.support import Translations as BabelTranslations
 
 from ..package import pkginfo
-from ..compat import Path
 
 from .trstring import TrString
 
@@ -73,7 +70,7 @@ def translator(translations):
         if translations is not None:
             translated = dugettext_policy(translations, trstr, domain, context)
         if translated == trstr:
-            translated = six.text_type(trstr)
+            translated = str(trstr)
 
         if trstr.modarg is not None:
             translated = translated % trstr.modarg

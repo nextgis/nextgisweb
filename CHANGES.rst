@@ -3,7 +3,7 @@ Changes
 
 4.0.0
 -----
-
+- Drop python 2.7 support.
 - Source layer selection while creating vector layers from multi-layer sources, 
   such as ZIP-archives with ESRI Shape-files.
 - Automatic generation of keynames for WMS and WFS services.

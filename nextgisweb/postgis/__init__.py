@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 from ..component import Component, require
 from .model import Base, PostgisConnection, PostgisLayer
 
@@ -11,7 +9,7 @@ class PostgisComponent(Component):
     metadata = Base.metadata
 
     def initialize(self):
-        super(PostgisComponent, self).initialize()
+        super().initialize()
         self._engine = dict()
 
     @require('feature_layer')

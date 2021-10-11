@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 from distutils.version import LooseVersion
-import six
 
 import pytest
 
@@ -14,7 +11,7 @@ from nextgisweb.core.backup import (
 
 
 def test_index_file_read_write(tmp_path):
-    ifile = IndexFile(six.text_type(tmp_path / 'index'))
+    ifile = IndexFile(str(tmp_path / 'index'))
 
     data = [
         IndexRecord(1, 'none-value', None),
@@ -39,4 +36,4 @@ def test_parse_pg_dump_version(output, expected):
 
 
 def test_dummy_backup(ngw_env, tmp_path):
-    backup(ngw_env, six.text_type(tmp_path))
+    backup(ngw_env, str(tmp_path))

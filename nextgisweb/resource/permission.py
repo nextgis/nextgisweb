@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
+from collections import UserList
 from functools import reduce
 import six
-from six.moves import UserList
 
 from bunch import Bunch
 
@@ -113,13 +111,13 @@ class ScopeMeta(type):
         if Scope is not None:
             setattr(cls, 'requirements', RequirementList())
 
-        for name, perm in six.iteritems(cls.__dict__):
+        for name, perm in cls.__dict__.items():
             if not isinstance(perm, Permission):
                 continue
 
             perm.bind(name, cls)
 
-        super(ScopeMeta, cls).__init__(classname, bases, nmspc)
+        super().__init__(classname, bases, nmspc)
 
         if Scope is not None:
             cls.registry[cls.__dict__['identity']] = cls

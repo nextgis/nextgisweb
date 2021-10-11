@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import sys
 from collections import OrderedDict
 import six
@@ -103,15 +101,15 @@ class SerializedProperty(object):
 class SerializedRelationship(SerializedProperty):
 
     def __init__(self, depth=1, **kwargs):
-        super(SerializedRelationship, self).__init__(depth=depth + 1, **kwargs)
+        super().__init__(depth=depth + 1, **kwargs)
 
     def bind(self, srlzrcls, prop):
-        super(SerializedRelationship, self).bind(srlzrcls, prop)
+        super().bind(srlzrcls, prop)
         self.relationship = srlzrcls.resclass.__mapper__ \
             .relationships[self.attrname]
 
     def getter(self, srlzr):
-        value = super(SerializedRelationship, self).getter(srlzr)
+        value = super().getter(srlzr)
         return dict(map(
             lambda k: (k.name, serval(getattr(value, k.name))),
             value.__mapper__.primary_key)) if value else None
@@ -143,10 +141,10 @@ class SerializedResourceRelationship(SerializedRelationship):
 class SerializerMeta(type):
 
     def __init__(cls, name, bases, nmspc):
-        super(SerializerMeta, cls).__init__(name, bases, nmspc)
+        super().__init__(name, bases, nmspc)
 
         proptab = []
-        for prop, sp in six.iteritems(nmspc):
+        for prop, sp in nmspc.items():
             if ISerializedAttribute.providedBy(sp):
                 sp.bind(cls, prop)
                 proptab.append((prop, sp))
@@ -193,10 +191,10 @@ class CompositeSerializer(SerializerBase):
     registry = _registry
 
     def __init__(self, obj, user, data=None):
-        super(CompositeSerializer, self).__init__(obj, user, data)
+        super().__init__(obj, user, data)
 
         self.members = OrderedDict()
-        for ident, mcls in six.iteritems(self.registry._dict):
+        for ident, mcls in self.registry._dict.items():
             if data is None or ident in data:
                 mdata = data[ident] if data else None
                 mobj = mcls(obj, user, mdata)
@@ -204,7 +202,7 @@ class CompositeSerializer(SerializerBase):
                     self.members[ident] = mobj
 
     def serialize(self):
-        for ident, mobj in six.iteritems(self.members):
+        for ident, mobj in self.members.items():
             try:
                 mobj.serialize()
                 self.data[ident] = mobj.data
@@ -214,7 +212,7 @@ class CompositeSerializer(SerializerBase):
                 six.reraise(exc_info[0], exc_info[1], exc_info[2])
 
     def deserialize(self):
-        for ident, mobj in six.iteritems(self.members):
+        for ident, mobj in self.members.items():
             try:
                 if ident in self.data:
                     mobj.deserialize()
@@ -240,14 +238,14 @@ def serval(value):
         value is None
         or isinstance(value, int)  # NOQA: W503
         or isinstance(value, float)  # NOQA: W503
-        or isinstance(value, six.string_types)  # NOQA: W503
+        or isinstance(value, str)  # NOQA: W503
     ):
         return value
 
     elif isinstance(value, dict):
         return dict(map(
             lambda k, v: (serval(k), serval(v)),
-            six.iteritems(value)))
+            value.items()))
 
     elif isinstance(value, BaseClass):
         return dict(map(

@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-import six
-
-
 class DynMenu(object):
 
     def __init__(self, *args):
@@ -36,7 +31,7 @@ class Item(object):
 
     def __init__(self, key):
 
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             key = tuple(key.split('/'))
         elif key is None:
             key = ()
@@ -55,13 +50,13 @@ class Item(object):
 class DynItem(Item):
 
     def __init__(self, key=None):
-        super(DynItem, self).__init__(key)
+        super().__init__(key)
 
     def sub(self, value):
         if not self.key:
             return value
         else:
-            if isinstance(value, six.string_types):
+            if isinstance(value, str):
                 value = tuple(value.split('/'))
             return self.key + value
 
@@ -72,7 +67,7 @@ class DynItem(Item):
 class Label(Item):
 
     def __init__(self, key, label):
-        super(Label, self).__init__(key)
+        super().__init__(key)
         self._label = label
 
     @property
@@ -83,7 +78,7 @@ class Label(Item):
 class Link(Item):
 
     def __init__(self, key, label, url, icon=None, important=False, target='_self'):
-        super(Link, self).__init__(key)
+        super().__init__(key)
         self._label = label
         self._url = url
         self._icon = icon

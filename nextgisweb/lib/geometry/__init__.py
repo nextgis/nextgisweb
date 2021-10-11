@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 from warnings import warn
 
 from osgeo.ogr import CreateGeometryFromWkb, CreateGeometryFromWkt, wkbNDR
@@ -159,32 +156,13 @@ class Transformer(object):
 
 
 def geom_calc(geom, crs, prop, srid):
-    # pyproj < 2.3
-    def geodesic_calc_with_postgis():
-        # TODO: Remove these cludges after pyproj upgarade
-        from sqlalchemy import func
-        from ...models import DBSession
 
-        fun = dict(length=func.ST_Length, area=func.ST_Area)[prop]
-        query = fun(func.geography(func.ST_GeomFromText(geom.wkt, srid)))
+    def factor():
+        return crs.axis_info[0].unit_conversion_factor if len(crs.axis_info) > 0 else 1.0
 
-        return DBSession.query(query).scalar()
-
-    factor = crs.axis_info[0].unit_conversion_factor if len(crs.axis_info) > 0 else 1.0
-    calcs = dict(
-        length=lambda: geodesic_calc_with_postgis() if crs.is_geographic else geom.length * factor,
-        area=lambda: geodesic_calc_with_postgis() if crs.is_geographic else geom.area * factor**2
-    )
-
-    # pyproj >= 2.3
-    # calcs = dict(
-    #     length=lambda: crs.get_geod().geometry_length(geom)
-    #         if crs.is_geographic else geom.length * factor,
-    #     area=lambda: crs.get_geod().geometry_area_perimeter(geom)[0]
-    #         if crs.is_geographic else geom.area * factor**2
-    # )
-
-    if prop not in calcs:
-        return None
-
-    return calcs[prop]()
+    if prop == 'length':
+        return crs.get_geod().geometry_length(geom) \
+            if crs.is_geographic else geom.length * factor()
+    elif prop == 'area':
+        return crs.get_geod().geometry_area_perimeter(geom)[0] \
+            if crs.is_geographic else geom.area * factor()**2

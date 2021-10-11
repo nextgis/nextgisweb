@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 from ..resource import (Widget, Resource)
 from ..env import env
 
@@ -15,7 +12,7 @@ class TileCacheWidget(Widget):
 
     def is_applicable(self):
         return env.render.tile_cache_enabled \
-            and super(TileCacheWidget, self).is_applicable()
+            and super().is_applicable()
 
 
 def setup_pyramid(comp, config):

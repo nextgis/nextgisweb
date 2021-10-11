@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 from sqlalchemy import *                    # NOQA
 from sqlalchemy.orm import *                # NOQA
 from sqlalchemy.ext.declarative import *    # NOQA
@@ -24,7 +21,7 @@ class Enum(_Enum):
             assert kwargs['native_enum'] is False
         else:
             kwargs['native_enum'] = False
-        super(Enum, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class UUID(_UUID):
@@ -33,7 +30,7 @@ class UUID(_UUID):
     def __init__(self, *args, **kwargs):
         if 'as_uuid' not in kwargs:
             kwargs['as_uuid'] = True
-        super(UUID, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class JSONText(types.TypeDecorator):

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import numpy as np
 
 from nextgisweb.spatial_ref_sys.models import SRS, BOUNDS_EPSG_3857

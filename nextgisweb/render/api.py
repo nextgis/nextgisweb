@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
+from io import BytesIO
 from math import log, ceil, floor
 from itertools import product
-import six
-from six import BytesIO
+from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
 
-from ..compat import Path
 from ..resource import Resource, ResourceNotFound, DataScope, resource_factory, ValidationError
 
 from .interface import ILegendableStyle, IRenderableStyle
@@ -34,10 +31,10 @@ def tile_debug_info(img, offset=(0, 0), color='black',
     ImageFont.load_default()
     text = []
     if zxy:
-        text.append(six.text_type(zxy))
+        text.append(str(zxy))
     if extent:
-        text.append(six.text_type(extent[0:2]))
-        text.append(six.text_type(extent[2:4]))
+        text.append(str(extent[0:2]))
+        text.append(str(extent[2:4]))
     if msg:
         text.append(msg)
     drw.text((8 + offset[0], 8 + offset[1]), '\n'.join(text), fill=color)

@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
+from pathlib import Path
 from uuid import uuid4
-import six
 
 import pytest
 from osgeo import ogr
 
 from nextgisweb.models import DBSession
 from nextgisweb.auth import User
-from nextgisweb.compat import Path
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.spatial_ref_sys import SRS
@@ -175,7 +172,7 @@ def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
         parent_id=ngw_resource_group, display_name='vector_layer',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=six.text_type(uuid4().hex)
+        tbl_uuid=uuid4().hex
     ).persist()
 
     src = str(path / filename)

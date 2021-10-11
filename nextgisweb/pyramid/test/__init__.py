@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import pytest
 from webtest import TestApp as BaseTestApp
 from webtest.http import StopableWSGIServer
@@ -80,7 +77,7 @@ class WebTestApp(BaseTestApp):
 class HTTPTestApp(RequestsSession):
 
     def __init__(self, http_server):
-        super(HTTPTestApp, self).__init__()
+        super().__init__()
         self.http_server = http_server
         self.application_url = http_server.application_url
 
@@ -92,5 +89,5 @@ class HTTPTestApp(RequestsSession):
         if url.startswith('/'):
             url = self.application_url.strip('/') + url
 
-        return super(HTTPTestApp, self).request(
+        return super().request(
             method, url, *args, **kwargs)

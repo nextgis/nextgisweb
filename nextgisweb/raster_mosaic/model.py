@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import os.path
 import geoalchemy2 as ga
-from six import ensure_str
 from sqlalchemy import func
 from sqlalchemy.ext.orderinglist import ordering_list
-from osgeo import gdal, gdalconst, osr, ogr
+from osgeo import gdal, osr
 from zope.interface import implementer
 
 from .. import db
@@ -215,15 +211,15 @@ class RasterMosaicItem(Base):
             'BIGTIFF_OVERVIEW': 'YES',
         }
         for key, val in options.items():
-            gdal.SetConfigOption(ensure_str(key), ensure_str(val))
+            gdal.SetConfigOption(key, val)
         try:
             ds = gdal.Open(fn, gdal.GA_ReadOnly)
-            ds.BuildOverviews(ensure_str('GAUSS'), overviewlist=calc_overviews_levels(ds))
+            ds.BuildOverviews('GAUSS', overviewlist=calc_overviews_levels(ds))
 
             ds = None
         finally:
             for key, val in options.items():
-                gdal.SetConfigOption(ensure_str(key), None)
+                gdal.SetConfigOption(key, None)
 
     def to_dict(self):
         return dict(id=self.id, display_name=self.display_name)

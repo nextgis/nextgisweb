@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """ {
     "revision": "2e8a9c51", "parents": ["2d9056c4"],
     "date": "2021-05-13T03:55:30",
     "message": "Add instance ID"
 } """
 
-from __future__ import division, unicode_literals, print_function, absolute_import
 
 import json
 import uuid

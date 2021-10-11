@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import uuid
-import six
 
 import sqlalchemy as sa
 
@@ -23,4 +20,4 @@ class FileObj(Base):
 
     def __init__(self, *args, **kwargs):
         Base.__init__(self, *args, **kwargs)
-        self.uuid = six.text_type(uuid.uuid4().hex)
+        self.uuid = uuid.uuid4().hex
