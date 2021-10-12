@@ -744,12 +744,12 @@ def store_collection(layer, request):
         result.append(fdata)
 
     headers = dict()
-    headers[str('Content-Type')] = str('application/json')
+    headers['Content-Type'] = 'application/json'
 
     if http_range:
         total = features.total_count
         last = min(total - 1, last)
-        headers[str('Content-Range')] = str('items %d-%s/%d' % (first, last, total))
+        headers['Content-Range'] = 'items %d-%s/%d' % (first, last, total)
 
     return Response(json.dumps(result, cls=geojson.Encoder), headers=headers)
 

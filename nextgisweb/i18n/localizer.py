@@ -45,7 +45,7 @@ class Translations(BabelTranslations):
                 _logging.debug(
                     "Loading component [%s] translations for locale [%s] from [%s]",
                     comp_id, locale, str(mo_path.relative_to(package_path)))
-                with io.open(str(mo_path), 'rb') as fp:
+                with io.open(mo_path, 'rb') as fp:
                     self.add(Translations(fp=fp, domain=comp_id))
 
 

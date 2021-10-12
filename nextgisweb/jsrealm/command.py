@@ -32,7 +32,7 @@ class JSRealmInstallCommand(object):
                 for package_json in jspkg.glob('**/package.json'):
                     jspkg_rel = str(package_json.parent.relative_to(cwd))
                     _logger.debug("Node package is found in [{}]".format(jspkg_rel))
-                    client_packages.append(str(jspkg_rel))
+                    client_packages.append(jspkg_rel)
 
         package_json = OrderedDict(private=True)
         package_json['config'] = config = OrderedDict()

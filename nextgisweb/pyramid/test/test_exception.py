@@ -83,7 +83,7 @@ def test_exception(app):
 
 
 def test_json(app):
-    headers = {'Content-Type': str('application/json')}
+    headers = {'Content-Type': 'application/json'}
 
     data = r'{"almost": "json" . }'
     app.post('/json', data, headers, status=400)

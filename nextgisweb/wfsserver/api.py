@@ -23,7 +23,7 @@ def wfs(resource, request):
             # TODO: Maybe it should be implemented in the error handler with an additional
             # option to enable this behavior.
 
-            return Response(status_code=401, headers={str('WWW-Authenticate'): str("Basic")})
+            return Response(status_code=401, headers={'WWW-Authenticate': "Basic"})
         else:
             six.reraise(*sys.exc_info())
 

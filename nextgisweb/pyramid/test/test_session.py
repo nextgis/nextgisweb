@@ -64,8 +64,8 @@ def get_session_id(ngw_env):
 @pytest.fixture()
 def session_headers(ngw_env):
     def _wrap(session_id):
-        return dict(cookie=str('%s=%s' % (
-            ngw_env.pyramid.options['session.cookie.name'], session_id)))
+        return dict(cookie='%s=%s' % (
+            ngw_env.pyramid.options['session.cookie.name'], session_id))
     yield _wrap
 
 

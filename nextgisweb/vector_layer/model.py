@@ -325,7 +325,7 @@ class TableInfo(object):
                     raise VE(_("Unsupported field type: %r.") %
                              fld_defn.GetTypeName())
 
-            uid = str(uuid.uuid4().hex)
+            uid = uuid.uuid4().hex
             self.fields.append(FieldDef(
                 'fld_%s' % uid,
                 fld_name,
@@ -342,7 +342,7 @@ class TableInfo(object):
         self.fields = []
 
         for fld in fields:
-            uid = str(uuid.uuid4().hex)
+            uid = uuid.uuid4().hex
             self.fields.append(FieldDef(
                 'fld_%s' % uid,
                 fld.get('keyname'),
@@ -807,7 +807,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IFieldEditableFeatureLayer
 
     def field_create(self, datatype):
-        uid = str(uuid.uuid4().hex)
+        uid = uuid.uuid4().hex
         column = db.Column('fld_' + uid, _FIELD_TYPE_2_DB[datatype])
         op = migrate_operation()
         op.add_column(self._tablename, column, schema=SCHEMA)

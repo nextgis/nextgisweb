@@ -33,7 +33,7 @@ def cors_tween_factory(handler, registry):
     CORS requests """
 
     def hadd(response, n, v):
-        response.headerlist.append((str(n), str(v)))
+        response.headerlist.append((n, v))
 
     def cors_tween(request):
         # Only request under /api/ are handled
@@ -235,7 +235,7 @@ def locdata(request):
     jed_path = locale_path / '{}.jed'.format(locale)
 
     if jed_path.is_file():
-        return FileResponse(str(jed_path), content_type='application/json')
+        return FileResponse(jed_path, content_type='application/json')
 
     # For english locale by default return empty translation, if
     # real translation file was not found. This might be needed if

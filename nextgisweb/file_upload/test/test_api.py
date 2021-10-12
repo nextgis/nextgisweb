@@ -37,9 +37,9 @@ def test_options(ngw_env, ngw_webtest_app):
 
 def test_tus_method(ngw_webtest_app):
     create = ngw_webtest_app.post('/api/component/file_upload/', headers={
-        str('Tus-Resumable'): str('1.0.0'),
-        str('Upload-Length'): str(len(TEST_CONTENT)),
-        str('Upload-Metadata'): str('name dGVzdA=='),
+        'Tus-Resumable': '1.0.0',
+        'Upload-Length': str(len(TEST_CONTENT)),
+        'Upload-Metadata': 'name dGVzdA==',
     }, status=201)
 
     assert create.headers.get('Location').startswith('http://localhost/')
@@ -50,28 +50,28 @@ def test_tus_method(ngw_webtest_app):
 
     # Content type missing
     ngw_webtest_app.patch(location, TEST_CONTENT, headers={
-        str('Tus-Resumable'): str('1.0.0'),
-        str('Upload-Offset'): str(0)
+        'Tus-Resumable': '1.0.0',
+        'Upload-Offset': str(0)
     }, status=415)
 
     # Conflict
     ngw_webtest_app.patch(location, TEST_CONTENT[1:], headers={
-        str('Tus-Resumable'): str('1.0.0'),
-        str('Content-Type'): str('application/offset+octet-stream'),
-        str('Upload-Offset'): str(1)
+        'Tus-Resumable': '1.0.0',
+        'Content-Type': 'application/offset+octet-stream',
+        'Upload-Offset': str(1)
     }, status=409)
 
     patch = ngw_webtest_app.patch(location, TEST_CONTENT, headers={
-        str('Tus-Resumable'): str('1.0.0'),
-        str('Content-Type'): str('application/offset+octet-stream'),
-        str('Upload-Offset'): str(0)
+        'Tus-Resumable': '1.0.0',
+        'Content-Type': 'application/offset+octet-stream',
+        'Upload-Offset': str(0)
     }, status=204)
 
     assert patch.headers.get('Tus-Resumable') == '1.0.0'
     assert patch.headers.get('Upload-Offset') == str(len(TEST_CONTENT))
 
     head = ngw_webtest_app.head(location, headers={
-        str('Tus-Resumable'): str('1.0.0'),
+        'Tus-Resumable': '1.0.0',
     })
 
     assert head.status_code == 200

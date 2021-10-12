@@ -79,7 +79,7 @@ class FileStorageComponent(Component):
         if makedirs and not os.path.isdir(path):
             os.makedirs(path)
 
-        return os.path.join(path, str(uuid))
+        return os.path.join(path, uuid)
 
     def workdir_filename(self, comp, fobj, makedirs=False):
         levels = (fobj.uuid[0:2], fobj.uuid[2:4])

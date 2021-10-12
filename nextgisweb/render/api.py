@@ -15,7 +15,7 @@ from .util import af_transform
 
 PD_READ = DataScope.read
 
-with open(str(Path(__file__).parent / 'empty_256x256.png'), 'rb') as f:
+with open(Path(__file__).parent / 'empty_256x256.png', 'rb') as f:
     EMPTY_TILE_256x256 = f.read()
 
 
