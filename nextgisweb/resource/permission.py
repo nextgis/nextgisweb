@@ -1,6 +1,5 @@
 from collections import UserList
 from functools import reduce
-import six
 
 from bunch import Bunch
 
@@ -143,5 +142,5 @@ class ScopeMeta(type):
     itervalues = values
 
 
-class Scope(six.with_metaclass(ScopeMeta, object)):
+class Scope(metaclass=ScopeMeta):
     pass

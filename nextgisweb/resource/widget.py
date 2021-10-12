@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from .model import Resource
-import six
+
 
 __all__ = ['Widget', ]
 
@@ -23,7 +23,7 @@ class WidgetBase(object):
         self.request = request
 
 
-class Widget(six.with_metaclass(WidgetMeta, WidgetBase)):
+class Widget(WidgetBase, metaclass=WidgetMeta):
     __abstract__ = True
 
     def is_applicable(self):

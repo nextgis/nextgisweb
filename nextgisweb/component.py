@@ -1,6 +1,5 @@
 import logging
 import warnings
-import six
 
 from .lib.config import ConfigOptions
 from .registry import registry_maker
@@ -18,7 +17,7 @@ class ComponentMeta(type):
             cls.registry.register(cls)
 
 
-class Component(six.with_metaclass(ComponentMeta, object)):
+class Component(metaclass=ComponentMeta):
 
     identity = None
     """ Component identifier that should be redefined in a

@@ -1,7 +1,6 @@
 import logging
 from collections import namedtuple, OrderedDict
 from datetime import datetime
-import six
 
 from bunch import Bunch
 from sqlalchemy import event, text
@@ -101,7 +100,7 @@ class ResourceMeta(db.DeclarativeMeta):
         resource_registry.register(cls)
 
 
-class Resource(six.with_metaclass(ResourceMeta, Base)):
+class Resource(Base, metaclass=ResourceMeta):
     registry = resource_registry
 
     identity = 'resource'

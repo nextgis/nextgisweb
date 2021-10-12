@@ -1,6 +1,5 @@
 import sys
 from collections import OrderedDict
-import six
 
 from zope.interface import Interface, implementer
 
@@ -155,7 +154,7 @@ class SerializerMeta(type):
             _registry.register(cls)
 
 
-class Serializer(six.with_metaclass(SerializerMeta, SerializerBase)):
+class Serializer(SerializerBase, metaclass=SerializerMeta):
     registry = _registry
 
     resclass = None
