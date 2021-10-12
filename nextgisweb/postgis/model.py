@@ -343,7 +343,22 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     # IWritableFeatureLayer
 
-    def makevals(self, feature):
+    def _sa_table(self, init_columns=False):
+        cols = []
+        if init_columns:
+            cols.extend([db.sql.column(f.keyname)
+                         for f in self.fields])
+            cols.append(db.sql.column(self.column_id))
+            cols.append(db.sql.column(self.column_geom))
+
+        tab = db.sql.table(self.table, *cols)
+        tab.schema = self.schema
+        tab.quote = True
+        tab.quote_schema = True
+
+        return tab
+
+    def _makevals(self, feature):
         values = dict()
 
         for f in self.fields:
@@ -364,22 +379,10 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         :type feature:  Feature
         """
         conn = self.connection.get_connection()
-
         idcol = db.sql.column(self.column_id)
-        geomcol = db.sql.column(self.column_geom)
-
-        cols = map(db.sql.column, (f.keyname for f in self.fields))
-        cols.append(idcol)
-        cols.append(geomcol)
-
-        tab = db.sql.table(self.table, *cols)
-        tab.schema = self.schema
-
-        tab.quote = True
-        tab.quote_schema = True
-
+        tab = self._sa_table(True)
         stmt = db.update(tab).values(
-            self.makevals(feature)).where(idcol == feature.id)
+            self._makevals(feature)).where(idcol == feature.id)
 
         try:
             conn.execute(stmt)
@@ -395,22 +398,11 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         :return:    inserted object ID
         """
         conn = self.connection.get_connection()
-
         idcol = db.sql.column(self.column_id)
-        geomcol = db.sql.column(self.column_geom)
-
-        cols = map(db.sql.column, (f.keyname for f in self.fields))
-        cols.append(idcol)
-        cols.append(geomcol)
-
-        tab = db.sql.table(self.table, *cols)
-        tab.schema = self.schema
-
-        tab.quote = True
-        tab.quote_schema = True
+        tab = self._sa_table(True)
 
         stmt = db.insert(tab).values(
-            self.makevals(feature)).returning(idcol)
+            self._makevals(feature)).returning(idcol)
 
         try:
             return conn.execute(stmt).scalar()
@@ -424,15 +416,11 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         :type feature_id:  int or bigint
         """
         conn = self.connection.get_connection()
-
-        tab = db.sql.table(self.table)
-        tab.schema = self.schema
-
-        tab.quote = True
-        tab.quote_schema = True
+        idcol = db.sql.column(self.column_id)
+        tab = self._sa_table()
 
         stmt = db.delete(tab).where(
-            db.sql.column(self.column_id) == feature_id)
+            idcol == feature_id)
 
         try:
             conn.execute(stmt)
@@ -442,12 +430,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def feature_delete_all(self):
         """Remove all records from a layer"""
         conn = self.connection.get_connection()
-
-        tab = db.sql.table(self.table)
-        tab.schema = self.schema
-
-        tab.quote = True
-        tab.quote_schema = True
+        tab = self._sa_table()
 
         stmt = db.delete(tab)
 
