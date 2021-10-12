@@ -2,29 +2,29 @@
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
-#: api.py:70
+#: api.py:71
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:118
+#: api.py:119
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:121
+#: api.py:122
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:124
+#: api.py:125
 #, python-format
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: api.py:130
+#: api.py:131
 #, python-format
 msgid "Resource class '%s' disabled."
 msgstr "Класс ресурса '%s' отключен."
 
-#: api.py:212
+#: api.py:213
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
@@ -81,44 +81,44 @@ msgid "Operational error"
 msgstr "Операционная ошибка"
 
 #: amd/ngw-resource/PermissionWidget.js:94 amd/ngw-resource/PermissionWidget.js:183
-#: amd/ngw-resource/Widget.js:31 amd/ngw-resource/form/ResourceLink.js:35
+#: amd/ngw-resource/Widget.js:32 amd/ngw-resource/form/ResourceLink.js:35
 #: model.py:110 scope.py:27
 msgid "Resource"
 msgstr "Ресурс"
 
-#: model.py:253
+#: model.py:269
 msgid "Resource can not be a parent himself."
 msgstr "Ресурс не может быть родителем сам себе."
 
-#: model.py:266
+#: model.py:282
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:318
+#: model.py:342
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:324
+#: model.py:348
 #, python-format
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:329
+#: model.py:353
 #, python-format
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:454
+#: model.py:487
 #, python-format
 msgid "Maximum number of resources exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов. Лимит %s."
 
-#: model.py:471
+#: model.py:504
 #, python-format
 msgid "Maximum number of resources '%s' exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов '%s'. Лимит %s."
 
-#: model.py:527
+#: model.py:560
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -130,12 +130,12 @@ msgstr "Чтение"
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:42 view.py:319
+#: scope.py:42 view.py:322
 msgid "Update"
 msgstr "Изменить"
 
 #: amd/ngw-resource/CompositeWidget.js:96 amd/ngw-resource/PermissionWidget.js:321
-#: scope.py:46 view.py:327
+#: scope.py:46 view.py:330
 msgid "Delete"
 msgstr "Удалить"
 
@@ -184,7 +184,7 @@ msgstr "Конфигурация"
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:88 view.py:334
+#: view.py:88 view.py:337
 msgid "JSON view"
 msgstr "Представление JSON"
 
@@ -192,7 +192,7 @@ msgstr "Представление JSON"
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
-#: view.py:129 view.py:344
+#: view.py:129 view.py:347
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -204,33 +204,33 @@ msgstr "Обновить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:190 view.py:377
+#: view.py:193 view.py:355
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:211
+#: view.py:214
 #, python-format
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:269
+#: view.py:272
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: amd/ngw-resource/DescriptionWidget.js:19 view.py:276
+#: amd/ngw-resource/DescriptionWidget.js:19 view.py:279
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:283
+#: view.py:286
 msgid "User permissions"
 msgstr "Права пользователя"
 
 #: amd/ngw-resource/PermissionWidget.js:66 amd/ngw-resource/PermissionWidget.js:133
-#: view.py:345
+#: view.py:348
 msgid "Action"
 msgstr "Действие"
 
-#: view.py:346
+#: view.py:349
 msgid "Extra"
 msgstr "Дополнительно"
 
@@ -243,7 +243,7 @@ msgid "Create and edit"
 msgstr "Создать и изменить"
 
 #: amd/ngw-resource/CompositeWidget.js:89
-#: amd/ngw-resource/template/ExportVisionForm.hbs:15
+#: amd/ngw-resource/template/ResourceExportForm.hbs:15
 msgid "Save"
 msgstr "Сохранить"
 
@@ -344,27 +344,33 @@ msgstr "Поиск ресурсов"
 msgid "Confirm deletion of the resource"
 msgstr "Подтвердить удаление ресурса"
 
-#: amd/ngw-resource/template/ExportVisionForm.hbs:3
+#: amd/ngw-resource/template/ResourceExportForm.hbs:3
 msgid ""
 "Select the category of users who can use the \"Save as\" link to download "
-"resource data. This will not affect REST API use which will continue to be "
-"governed by permissions."
+"resource data."
 msgstr ""
-"Выберите категорию пользователей, которые могут видеть ссылку \"Сохранить "
-"как\" для скачивания данных ресурса. Это не повлияет на REST API, который "
-"продолжит регулироваться правами доступа."
+"Выберите категорию пользователей, которые могут видеть ссылку "
+"\"Сохранить как\" для скачивания данных ресурса."
 
-#: amd/ngw-resource/template/ExportVisionForm.hbs:8
+#: amd/ngw-resource/template/ResourceExportForm.hbs:8
 msgid "Users with \"Data: Read\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Чтение\""
 
-#: amd/ngw-resource/template/ExportVisionForm.hbs:9
+#: amd/ngw-resource/template/ResourceExportForm.hbs:9
 msgid "Users with \"Data: Write\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Запись\""
 
-#: amd/ngw-resource/template/ExportVisionForm.hbs:10
+#: amd/ngw-resource/template/ResourceExportForm.hbs:10
 msgid "Administrators"
 msgstr "Администраторы"
+
+#: amd/ngw-resource/template/ResourceExportForm.hbs:17
+msgid ""
+"* This will not affect REST API use which will continue to be governed by "
+"permissions."
+msgstr ""
+"* Это не повлияет на REST API, который продолжит "
+"регулироваться правами доступа."
 
 #: amd/ngw-resource/template/Widget.hbs:8 template/section_children.mako:142
 #: template/section_summary.mako:6
@@ -379,7 +385,12 @@ msgstr "Ключ"
 msgid "Parent"
 msgstr "Родитель"
 
-#: amd/ngw-resource/template/Widget.hbs:23 template/section_children.mako:143
+#: amd/ngw-resource/template/Widget.hbs:23 template/section_children.mako:144
+#: template/section_summary.mako:44
+msgid "Owner"
+msgstr "Владелец"
+
+#: amd/ngw-resource/template/Widget.hbs:28 template/section_children.mako:143
 #: template/section_summary.mako:36
 msgid "Type"
 msgstr "Тип"
@@ -391,10 +402,6 @@ msgstr "Используйте эти ссылки для подключения
 #: template/section_children.mako:128
 msgid "Show resources volume"
 msgstr "Показать размер ресурсов"
-
-#: template/section_children.mako:144 template/section_summary.mako:44
-msgid "Owner"
-msgstr "Владелец"
 
 #: template/section_children.mako:145
 msgid "Volume"

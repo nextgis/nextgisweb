@@ -1,6 +1,6 @@
 <div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" style="max-width: 50em;">
 
-    <p>{{gettext 'Select the category of users who can use the "Save as" link to download resource data. This will not affect REST API use which will continue to be governed by permissions.'}}</p>
+    <p>{{gettext 'Select the category of users who can use the "Save as" link to download resource data.'}}</p>
 
     <div data-dojo-type="dijit/form/Select"
         data-dojo-attach-point="wResourceExport"
@@ -13,4 +13,6 @@
     <button data-dojo-type="dijit/form/Button" 
         data-dojo-attach-point="buttonSave"
         class="dijitButton--primary">{{gettext 'Save'}}</button>
+
+    <p style="font-size: 8pt">{{gettext '* This will not affect REST API use which will continue to be governed by permissions.'}}</p>
 </div>
