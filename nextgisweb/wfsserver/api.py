@@ -1,12 +1,8 @@
-import sys
-import six
-
 from pyramid.response import Response
 
 from ..pyramid.exception import json_error
 from ..resource import resource_factory, ServiceScope
-from ..core.exception import InsufficientPermissions, UserException
-from ..lib.ows import parse_request, get_work_version
+from ..core.exception import InsufficientPermissions
 
 from .wfs_handler import WFSHandler
 from .model import Service
@@ -25,7 +21,7 @@ def wfs(resource, request):
 
             return Response(status_code=401, headers={'WWW-Authenticate': "Basic"})
         else:
-            six.reraise(*sys.exc_info())
+            raise
 
     fsv = request.env.wfsserver.force_schema_validation
     xml = WFSHandler(

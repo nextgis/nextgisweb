@@ -20,7 +20,7 @@ except CalledProcessError:
 requires = [
     # Do not use a specific version of system-like packages because their presence is expected
     'pip',
-    'six',
+    'six',  # TODO: Remove after packages update
 
     # Other dependencies
     'affine==2.2.2',

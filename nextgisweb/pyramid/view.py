@@ -1,4 +1,3 @@
-import sys
 import errno
 import os
 import os.path
@@ -8,7 +7,6 @@ from time import sleep
 from datetime import datetime, timedelta
 from pkg_resources import resource_filename
 from hashlib import md5
-from six import reraise
 
 from psutil import Process
 from pyramid.response import Response, FileResponse
@@ -46,7 +44,7 @@ def static_amd_file(request):
     except (OSError, IOError) as exc:
         if exc.errno in (errno.ENOENT, errno.EISDIR):
             raise HTTPNotFound()
-        reraise(*sys.exc_info())
+        raise
 
 
 @lru_cache(maxsize=64)

@@ -2,7 +2,6 @@ import ctypes
 import zipfile
 from datetime import date, time, datetime
 
-import six
 from osgeo import gdal, ogr
 
 
@@ -90,16 +89,15 @@ def read_dataset(filename, encoding=None, **kw):
     def _open():
         return gdal.OpenEx(ogrfn, 0, **kw)
 
-    if six.PY2:
-        with _set_encoding(encoding) as sdecode:
-            ogrds = _open()
-            strdecode = sdecode
-    else:
-        # Ignore encoding option in Python 3
-        ogrds = _open()
+    # with _set_encoding(encoding) as sdecode:
+    #     ogrds = _open()
+    #     strdecode = sdecode
 
-        def strdecode(x):
-            return x
+    # Ignore encoding option in Python 3
+    ogrds = _open()
+
+    def strdecode(x):
+        return x
 
     return ogrds, strdecode
 

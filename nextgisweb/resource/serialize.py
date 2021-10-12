@@ -172,9 +172,8 @@ class Serializer(SerializerBase, metaclass=SerializerMeta):
                 try:
                     sp.deserialize(self)
                 except Exception as exc:
-                    exc_info = sys.exc_info()
                     self.annotate_exception(exc, sp)
-                    six.reraise(exc_info[0], exc_info[1], exc_info[2])
+                    raise
 
     def annotate_exception(self, exc, sp):
         exc.__srlzr_prprt__ = sp.attrname
@@ -206,9 +205,8 @@ class CompositeSerializer(SerializerBase):
                 mobj.serialize()
                 self.data[ident] = mobj.data
             except Exception as exc:
-                exc_info = sys.exc_info()
                 self.annotate_exception(exc, mobj)
-                six.reraise(exc_info[0], exc_info[1], exc_info[2])
+                raise
 
     def deserialize(self):
         for ident, mobj in self.members.items():
@@ -216,9 +214,8 @@ class CompositeSerializer(SerializerBase):
                 if ident in self.data:
                     mobj.deserialize()
             except Exception as exc:
-                exc_info = sys.exc_info()
                 self.annotate_exception(exc, mobj)
-                six.reraise(exc_info[0], exc_info[1], exc_info[2])
+                raise
 
     def annotate_exception(self, exc, mobj):
         """ Adds information about serializer that called the exception to the exception """
