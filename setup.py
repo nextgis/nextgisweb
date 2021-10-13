@@ -62,6 +62,8 @@ requires = [
 
     # TODO: Move to dev or test dependencies
     'flake8',
+    'flake8-future-import',
+    'flake8-coding',
     'freezegun',
     'pytest',
     'pytest-flake8',
