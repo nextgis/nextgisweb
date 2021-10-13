@@ -72,7 +72,6 @@ class PythonModuleMigration(Migration):
         assert not fwpath.exists()
         with fwpath.open('w') as fd:
             fd.write("\"\"\" {\n" + _metadata_to_jskeys(meta, '    ') + "\n} \"\"\"\n")
-            fd.write('\nfrom __future__ import division, unicode_literals, print_function, absolute_import\n')  # NOQA: E501
             if forward:
                 fd.write('\n' + dedent("""
                     def forward(ctx):
