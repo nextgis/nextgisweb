@@ -139,9 +139,6 @@ class Resource(Base, metaclass=ResourceMeta):
     def __str__(self):
         return self.display_name
 
-    def __unicode__(self):
-        return self.__str__()
-
     @classmethod
     def check_parent(cls, parent):
         """ Can this resource be child for parent? """

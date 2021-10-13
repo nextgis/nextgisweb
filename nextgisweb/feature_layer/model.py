@@ -60,9 +60,6 @@ class LayerField(Base):
     def __str__(self):
         return self.display_name
 
-    def __unicode__(self):
-        return self.__str__()
-
     def to_dict(self):
         result = dict(
             (c, getattr(self, c))

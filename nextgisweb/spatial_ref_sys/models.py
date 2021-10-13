@@ -123,9 +123,6 @@ class SRS(Base):
     def __str__(self):
         return self.display_name
 
-    def __unicode__(self):
-        return self.__str__()
-
     @property
     def disabled(self):
         return bool(self.auth_srid or self.auth_name)

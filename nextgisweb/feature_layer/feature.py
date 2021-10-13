@@ -44,9 +44,6 @@ class Feature(object):
     def __str__(self):
         return self.label
 
-    def __unicode__(self):
-        return self.__str__()
-
     @property
     def fields(self):
         return self._fields

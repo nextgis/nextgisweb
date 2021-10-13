@@ -153,7 +153,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     __scope__ = DataScope
 
     connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
-    schema = db.Column(db.Unicode, default=u'public', nullable=False)
+    schema = db.Column(db.Unicode, default='public', nullable=False)
     table = db.Column(db.Unicode, nullable=False)
     column_id = db.Column(db.Unicode, nullable=False)
     column_geom = db.Column(db.Unicode, nullable=False)

@@ -347,6 +347,6 @@ def setup_pyramid(comp, config):
 
     Resource.__psection__.register(
         key='description',
-        title=_(u"External access"),
+        title=_("External access"),
         is_applicable=lambda obj: obj.cls == 'wmsserver_service',
         template='nextgisweb:wmsserver/template/section_api_wms.mako')

@@ -85,9 +85,6 @@ class UserException(Exception):
             if isinstance(self.message, TrString)
             else self.message)
 
-    def __unicode__(self):
-        return self.__str__()
-
 
 class ValidationError(UserException):
     title = _("Validation error")

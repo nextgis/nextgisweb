@@ -204,6 +204,6 @@ def setup_pyramid(comp, config):
 
     Resource.__psection__.register(
         key='description',
-        title=_(u"External access"),
+        title=_("External access"),
         template='nextgisweb:webmap/template/section_api_webmap.mako',
         is_applicable=lambda obj: obj.cls == 'webmap' and get_recursive_values(obj))

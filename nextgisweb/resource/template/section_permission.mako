@@ -15,16 +15,16 @@
                 <td>
                     <%
                     if (perm in permsets.deny):
-                        pd = u"D";
+                        pd = "D";
                         cls="deny";
                     elif (perm in permsets.mask):
-                        pd = u"M";
+                        pd = "M";
                         cls="mask";
                     elif (perm in permsets.allow):
-                        pd = u"A";
+                        pd = "A";
                         cls="allow";
                     else:
-                        pd = u"E";
+                        pd = "E";
                         cls="";
                     %>
                     

@@ -66,9 +66,6 @@ class User(Principal):
     def __str__(self):
         return self.display_name
 
-    def __unicode__(self):
-        return self.__str__()
-
     def compare(self, other):
         """ Compare two users regarding special users """
 
@@ -179,9 +176,6 @@ class Group(Principal):
 
     def __str__(self):
         return self.display_name
-
-    def __unicode__(self):
-        return self.__str__()
 
     def is_member(self, user):
         if self.keyname == 'authorized':

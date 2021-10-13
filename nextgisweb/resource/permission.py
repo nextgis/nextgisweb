@@ -72,9 +72,6 @@ class Permission(object):
     def __str__(self):
         return str(self.label)
 
-    def __unicode__(self):
-        return self.__str__()
-
     def is_bound(self):
         return self.name is not None and self.scope is not None
 
