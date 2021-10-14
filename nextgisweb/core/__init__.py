@@ -155,14 +155,11 @@ class CoreComponent(
         self.bmakedirs(self.options['sdir'], comp.identity)
 
     def bmakedirs(self, base, path):
-        fpath = os.path.join(base, path)
-        if os.path.isdir(fpath):
-            return
-
         if not os.path.isdir(base):
             raise IOError("Invalid base directory path")
 
-        os.makedirs(fpath)
+        fpath = os.path.join(base, path)
+        os.makedirs(fpath, exist_ok=True)
 
     def localizer(self, locale=None):
         if locale is None:
