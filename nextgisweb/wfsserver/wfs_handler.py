@@ -19,7 +19,7 @@ from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..layer import IBboxLayer
 from ..lib.geometry import Geometry, GeometryNotValid
-from ..lib.ows import parse_request, get_work_version
+from ..lib.ows import parse_request, parse_epsg_code, get_work_version
 from ..resource import DataScope
 from ..spatial_ref_sys import SRS
 
@@ -140,16 +140,10 @@ def get_geom_column(feature_layer):
 
 
 def geom_from_gml(el):
-    srid = parse_srs(el.attrib['srsName']) if 'srsName' in el.attrib else None
+    srid = parse_epsg_code(el.attrib['srsName']) if 'srsName' in el.attrib else None
     value = etree.tostring(el)
     ogr_geom = ogr.CreateGeometryFromGML(ensure_str(value))
     return Geometry.from_ogr(ogr_geom, srid=srid)
-
-
-def parse_srs(value):
-    # 'urn:ogc:def:crs:EPSG::3857' -> 3857
-    # http://www.opengis.net/def/crs/epsg/0/4326 -> 4326
-    return int(value.split(':')[-1].split('/')[-1])
 
 
 class WFSHandler():
@@ -702,7 +696,7 @@ class WFSHandler():
         if self.p_bbox is not None:
             bbox_param = self.p_bbox.split(',')
             box_coords = map(float, bbox_param[:4])
-            box_srid = parse_srs(bbox_param[4]) if len(bbox_param) == 5 else feature_layer.srs_id
+            box_srid = parse_epsg_code(bbox_param[4]) if len(bbox_param) == 5 else feature_layer.srs_id
             try:
                 box_geom = Geometry.from_shape(box(*box_coords), srid=box_srid, validate=True)
             except GeometryNotValid:
@@ -735,7 +729,7 @@ class WFSHandler():
             query.geom()
 
             if self.p_srsname is not None:
-                srs_id = parse_srs(self.p_srsname)
+                srs_id = parse_epsg_code(self.p_srsname)
                 srs_out = feature_layer.srs \
                     if srs_id == feature_layer.srs_id \
                     else SRS.filter_by(id=srs_id).one()

@@ -5,7 +5,7 @@ from lxml import etree
 
 from six import BytesIO
 
-__all__ = ['parse_request', 'get_exception_template']
+__all__ = ['parse_request', 'parse_epsg_code', 'get_exception_template']
 
 
 class FIELD_TYPE_WFS(object):
@@ -40,6 +40,12 @@ def parse_request(request):
     params = dict((k.upper(), v) for k, v in params.items())
 
     return params, root_body
+
+
+def parse_epsg_code(value):
+    # 'urn:ogc:def:crs:EPSG::3857' -> 3857
+    # http://www.opengis.net/def/crs/epsg/0/4326 -> 4326
+    return int(value.split(':')[-1].split('/')[-1])
 
 
 def get_work_version(p_version, p_acceptversions, version_supported, version_default):
