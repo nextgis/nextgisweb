@@ -34,15 +34,6 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
-            var principal_store = this.wOwnerUser.store;
-            var principal_filter = [];
-            principal_store.query(function (p) {
-                if (p.cls !== 'U' || (p.system && p.keyname !== 'guest')) {
-                    principal_filter.push(p.id)
-                }
-            });
-            principal_filter.forEach(principal_store.remove.bind(principal_store));
-
             this.wParent.set("value", this.composite.parent !== null ? {id: this.composite.parent} : null);
             this.wOwnerUser.set("value", this.composite.owner_user);
             this.wCls.set("value", resourceSchema.resources[this.composite.cls].label +
