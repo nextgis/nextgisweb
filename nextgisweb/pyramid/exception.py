@@ -242,6 +242,11 @@ for exc, title, explanation in (
         ),
     ),
     (
+        httpexceptions.HTTPPaymentRequired,
+        _("Payment required"),
+        _("Access was denied for financial reasons."),
+    ),
+    (
         httpexceptions.HTTPForbidden,
         _("Forbidden"),
         _("Access was denied to this resource."),

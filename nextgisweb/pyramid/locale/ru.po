@@ -2,7 +2,7 @@
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: exception.py:208 exception.py:264
+#: exception.py:208 exception.py:269
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
@@ -25,18 +25,26 @@ msgid ""
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
 #: exception.py:246
+msgid "Payment required"
+msgstr "Необходима оплата"
+
+#: exception.py:247
+msgid "Access was denied for financial reasons."
+msgstr "Доступ закрыт по финансовым причинам."
+
+#: exception.py:251
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:247
+#: exception.py:252
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:251
+#: exception.py:256
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:252
+#: exception.py:257
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -45,15 +53,15 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:259
+#: exception.py:264
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:260
+#: exception.py:265
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:265
+#: exception.py:270
 msgid ""
 "The server has either erred or is incapable of performing the requested "
 "operation."
@@ -61,15 +69,15 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:272 exception.py:273
+#: exception.py:277 exception.py:278
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:277
+#: exception.py:282
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:278
+#: exception.py:283
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
@@ -79,43 +87,43 @@ msgstr ""
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:109 view.py:466
+#: view.py:109 view.py:469
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:121 view.py:483
+#: view.py:121 view.py:486
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:131 view.py:488
+#: view.py:131 view.py:491
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:146 view.py:472
+#: view.py:146 view.py:475
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:153 view.py:474
+#: view.py:153 view.py:477
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:160 view.py:476
+#: view.py:160 view.py:479
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:167 view.py:470
+#: view.py:167 view.py:473
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:174 view.py:478
+#: view.py:174 view.py:481
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:465
+#: view.py:468
 msgid "Info"
 msgstr "Информация"
 
-#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:7 view.py:469
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:7 view.py:472
 msgid "Settings"
 msgstr "Настройки"
 
@@ -363,15 +371,15 @@ msgstr ""
 "Некоторые изменения могут быть отражены только после полной оценки "
 "использования хранилища."
 
-#: template/sysinfo.mako:28
+#: template/sysinfo.mako:30
 msgid "Package"
 msgstr "Пакет"
 
-#: template/sysinfo.mako:29
+#: template/sysinfo.mako:31
 msgid "Version"
 msgstr "Версия"
 
-#: template/sysinfo.mako:58
+#: template/sysinfo.mako:60
 msgid "Platform"
 msgstr "Платформа"
 
