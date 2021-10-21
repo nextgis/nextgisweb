@@ -40,7 +40,7 @@ class FileObjBackup(BackupBase):
         if os.path.isfile(fn):
             logger.debug(
                 "Skipping restoration of fileobj %s: file already exists!",
-                self.payload[1])
+                self.payload['uuid'])
         else:
             with open(fn, 'wb') as fd:
                 copyfileobj(src, fd, length=BUF_SIZE)
