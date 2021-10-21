@@ -762,6 +762,7 @@ class WFSHandler():
                 geom_gml = geom.ExportToGML([
                     'FORMAT=%s' % self.gml_format,
                     'NAMESPACE_DECL=YES',
+                    'SRSNAME_FORMAT=SHORT',
                     'GMLID=geom-%s' % feature_id])
                 __geom = El('geom', parent=__feature)
                 __gml = etree.fromstring(geom_gml)
