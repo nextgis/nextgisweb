@@ -12,16 +12,11 @@ define([
     principalDump
 ) {
     return declare([FilteringSelect], {
-        preamble: function (params) {
-            var data = params.filter_ ? principalDump.filter(function (p) {
-                for (k in params.filter_) {
-                    if (p[k] !== params.filter_[k]) {
-                        return false;
-                    }
-                }
-                return true;
-            }) : principalDump;
-
+        preamble: function () {
+            var data = [];
+            principalDump.forEach(function (item) {
+                data.push(Object.assign({}, item));
+            });
             this.store = new Memory({
                 data: data
             });
@@ -36,7 +31,7 @@ define([
             });
         },
 
-        constructor: function (params) {
+        constructor: function () {
             this.required = false;
 
             this.labelType = "html";
