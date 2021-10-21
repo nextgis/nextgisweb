@@ -9,6 +9,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
 
 from .. import db
+from ..lib.geometry import Transformer
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -16,6 +17,7 @@ from ..resource import (
     Serializer,
     SerializedProperty as SP)
 from ..resource.exception import ValidationError
+from ..spatial_ref_sys import SRS
 from ..lookup_table import LookupTable
 
 from .interface import (
@@ -223,3 +225,20 @@ class FeatureLayerSerializer(Serializer):
     resclass = LayerFieldsMixin
 
     fields = _fields_attr(read=P_DSS_READ, write=P_DSS_WRITE)
+
+
+class FeatureQueryIntersectsMixin(object):
+
+    def __init__(self):
+        self._intersects = None
+
+    def intersects(self, geom):
+        reproject = geom.srid is not None and geom.srid not in self.srs_supported
+        flip_axis = geom.axis_xy ^ self.axis_xy and not self.axis_flip_supported
+
+        if reproject or flip_axis:
+            srs_from = SRS.filter_by(id=geom.srid).one()
+            transformer = Transformer(srs_from.wkt, self.layer.srs.wkt, self.axis_xy)
+            geom = transformer.transform(geom)
+
+        self._intersects = geom

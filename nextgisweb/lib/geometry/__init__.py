@@ -21,9 +21,10 @@ class Geometry(object):
     """ Initialization format is kept "as is".
     Other formats are calculated as needed."""
 
-    __slots__ = ('_wkb', '_wkt', '_ogr', '_shape', '_srid')
+    __slots__ = ('_wkb', '_wkt', '_ogr', '_shape', '_srid', '_axis_xy')
 
-    def __init__(self, wkb=None, wkt=None, ogr=None, shape=None, srid=None, validate=False):
+    def __init__(self, wkb=None, wkt=None, ogr=None, shape=None,
+                 srid=None, axis_xy=False, validate=False):
         if wkb is None and wkt is None and ogr is None and shape is None:
             raise ValueError("None base format is not defined.")
 
@@ -33,6 +34,7 @@ class Geometry(object):
         self._shape = shape
 
         self._srid = srid
+        self._axis_xy = axis_xy
 
         if validate and (wkb is not None or wkt is not None):
             # Force WKB/WKT validation through conversion to OGR
@@ -42,36 +44,44 @@ class Geometry(object):
     def srid(self):
         return self._srid
 
+    @property
+    def axis_xy(self):
+        return self._axis_xy
+
+    @axis_xy.setter
+    def axis_xy(self, axis_xy):
+        self._axis_xy = axis_xy
+
     # Base constructors
 
     @classmethod
-    def from_wkb(cls, data, srid=None, validate=True):
-        return cls(wkb=data, srid=srid, validate=validate)
+    def from_wkb(cls, data, srid=None, axis_xy=False, validate=True):
+        return cls(wkb=data, srid=srid, axis_xy=axis_xy, validate=validate)
 
     @classmethod
-    def from_wkt(cls, data, srid=None, validate=True):
-        return cls(wkt=data, srid=srid, validate=validate)
+    def from_wkt(cls, data, srid=None, axis_xy=False, validate=True):
+        return cls(wkt=data, srid=srid, axis_xy=axis_xy, validate=validate)
 
     @classmethod
-    def from_ogr(cls, data, srid=None, validate=True):
-        return cls(ogr=data, srid=srid, validate=validate)
+    def from_ogr(cls, data, srid=None, axis_xy=False, validate=True):
+        return cls(ogr=data, srid=srid, axis_xy=axis_xy, validate=validate)
 
     @classmethod
-    def from_shape(cls, data, srid=None, validate=False):
-        return cls(shape=data, srid=srid, validate=validate)
+    def from_shape(cls, data, srid=None, axis_xy=False, validate=False):
+        return cls(shape=data, srid=srid, axis_xy=axis_xy, validate=validate)
 
     # Additional constructors
 
     @classmethod
     def from_geojson(cls, data, srid=None, validate=True):
         shape = geometry_shape(data)
-        return cls.from_shape(shape, srid=srid, validate=validate)
+        return cls.from_shape(shape, srid=srid, axis_xy=True, validate=validate)
 
     @classmethod
-    def from_box(cls, minx, miny, maxx, maxy, srid=None):
+    def from_box(cls, minx, miny, maxx, maxy, axis_xy=False, srid=None):
         return cls.from_shape(
             geometry_box(minx, miny, maxx, maxy),
-            srid=srid)
+            srid=srid, axis_xy=axis_xy)
 
     # Base output formats
 
@@ -122,6 +132,7 @@ class Geometry(object):
     # Additional output formats
 
     def to_geojson(self):
+        # NB: srid and axis order is not considered
         return geometry_mapping(self.shape)
 
     # Shapely providers
@@ -138,23 +149,39 @@ class Geometry(object):
 
 class Transformer(object):
 
-    def __init__(self, wkt_from, wkt_to):
-        crs_from = CRS.from_wkt(wkt_from)
-        crs_to = CRS.from_wkt(wkt_to)
+    def __init__(self, wkt_from, wkt_to, axis_xy):
+        self.crs_from = CRS.from_wkt(wkt_from)
+        self.crs_to = CRS.from_wkt(wkt_to)
+
+        self._axis_xy = axis_xy
 
         # pyproj >= 2.5
         # if crs_from.equals(crs_to):
         if wkt_from == wkt_to:
             self._transformer = None
         else:
-            self._transformer = pyTr.from_crs(crs_from, crs_to, always_xy=True)
+            self._transformer = pyTr.from_crs(self.crs_from, self.crs_to, always_xy=self._axis_xy)
 
     def transform(self, geom):
         # NB: geom.srid is not considered
-        if self._transformer is None:
+        actions = []
+        flip = self._axis_xy ^ geom.axis_xy
+        if flip:
+            if self.crs_from.is_geographic:
+                actions.append(lambda x, y: (y, x))
+            else:
+                geom.axis_xy(self._axis_xy)
+        if self._transformer is not None:
+            actions.append(self._transformer.transform)
+
+        if len(actions) == 0:
             return geom
         else:
-            shape = map_coords(self._transformer.transform, geom.shape)
+            def operations(x, y):
+                for action in actions:
+                    x, y = action(x, y)
+                return x, y
+            shape = map_coords(operations, geom.shape)
             return Geometry.from_shape(shape)
 
 

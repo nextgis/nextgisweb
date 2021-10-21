@@ -18,6 +18,7 @@ from ..core.exception import ValidationError, OperationalError
 from ..env import env
 from ..feature_layer import (
     Feature,
+    FeatureQueryIntersectsMixin,
     FeatureSet,
     FIELD_TYPE,
     GEOM_TYPE,
@@ -223,6 +224,7 @@ class WFSConnection(Base, Resource):
             geom_gml = geom.ExportToGML([
                 'FORMAT=GML32',
                 'NAMESPACE_DECL=YES',
+                'SRSNAME_FORMAT=SHORT',
                 'GMLID=filter-geom-1'])
             __gml = etree.fromstring(geom_gml)
             __intersects.append(__gml)
@@ -403,6 +405,9 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         class BoundFeatureQuery(FeatureQueryBase):
             layer = self
+            srs_supported = (self.geometry_srid, )
+            axis_xy = False
+            axis_flip_supported = False
 
         return BoundFeatureQuery
 
@@ -454,7 +459,7 @@ class WFSLayerSerializer(Serializer):
     IFeatureQueryFilterBy,
     IFeatureQueryIntersects,
 )
-class FeatureQueryBase(object):
+class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def __init__(self):
         self._srs = None
