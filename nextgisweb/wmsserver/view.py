@@ -19,7 +19,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 from ..core.exception import ValidationError
 from ..pyramid.exception import json_error
 from ..lib.geometry import Geometry
-from ..lib.ows import parse_request
+from ..lib.ows import parse_request, parse_epsg_code
 from ..render import ILegendableStyle
 from ..resource import (
     Resource, Widget, resource_factory,
