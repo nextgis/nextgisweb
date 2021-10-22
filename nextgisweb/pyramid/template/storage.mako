@@ -99,13 +99,13 @@ ${tr(_("Some changes may be reflected only after full estimation."))}
 
         %if estimation_running:
             var estimateBtn = new Button({
-                label: "Estimation is in progress...",
+                label: '${tr(_("Estimation is in progress..."))}',
                 color: 'secondary',
                 disabled: true
             }, "estimateBtn");
         %else:
             var estimateBtn = new Button({
-                label: "Estimate storage",
+                label: '${tr(_("Estimate storage"))}',
                 color: 'secondary'
             }, "estimateBtn");
 

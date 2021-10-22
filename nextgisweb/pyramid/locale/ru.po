@@ -1,12 +1,12 @@
-#: api.py:478
+#: api.py:475
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: exception.py:208 exception.py:269
+#: exception.py:205 exception.py:266
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:209
+#: exception.py:206
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -14,37 +14,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:238
+#: exception.py:235
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:239
+#: exception.py:236
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:246
+#: exception.py:243
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:247
+#: exception.py:244
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:251
+#: exception.py:248
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:252
+#: exception.py:249
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:256
+#: exception.py:253
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:257
+#: exception.py:254
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -53,15 +53,15 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:264
+#: exception.py:261
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:265
+#: exception.py:262
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:270
+#: exception.py:267
 msgid ""
 "The server has either erred or is incapable of performing the requested "
 "operation."
@@ -69,61 +69,61 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:277 exception.py:278
+#: exception.py:274 exception.py:275
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:282
+#: exception.py:279
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:283
+#: exception.py:280
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: template/header.mako:111 view.py:87
+#: template/header.mako:110 view.py:83
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:109 view.py:469
+#: view.py:105 view.py:461
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:121 view.py:486
+#: view.py:117 view.py:478
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:131 view.py:491
+#: view.py:127 view.py:483
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:146 view.py:475
+#: view.py:142 view.py:467
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:153 view.py:477
+#: view.py:149 view.py:469
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:160 view.py:479
+#: view.py:156 view.py:471
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:167 view.py:473
+#: view.py:163 view.py:465
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:174 view.py:481
+#: view.py:170 view.py:473
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:468
+#: view.py:460
 msgid "Info"
 msgstr "Информация"
 
-#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:7 view.py:472
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:7 view.py:464
 msgid "Settings"
 msgstr "Настройки"
 
@@ -300,7 +300,7 @@ msgstr "Пригласительная сессия"
 
 #: nodepkg/api/error.js:11
 msgid "Unknown API error"
-msgstr "Неизвестная ошибка API"
+msgstr "Неизвестная ошибка API" 
 
 #: nodepkg/api/error.js:25
 msgid "Invalid API response"
@@ -322,15 +322,15 @@ msgstr "Время (UTC)"
 msgid "Size"
 msgstr "Размер"
 
-#: template/header.mako:36
+#: template/header.mako:35
 msgid "Sign in"
 msgstr "Войти"
 
-#: template/header.mako:106
+#: template/header.mako:105
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: template/header.mako:119
+#: template/header.mako:118
 msgid "Help"
 msgstr "Справка"
 
@@ -370,6 +370,14 @@ msgid "Some changes may be reflected only after full estimation."
 msgstr ""
 "Некоторые изменения могут быть отражены только после полной оценки "
 "использования хранилища."
+
+#: template/storage.mako:103
+msgid "Estimation is in progress..."
+msgstr "Оценка в процессе..."
+
+#: template/storage.mako:109
+msgid "Estimate storage"
+msgstr "Оценка хранилища"
 
 #: template/sysinfo.mako:30
 msgid "Package"
