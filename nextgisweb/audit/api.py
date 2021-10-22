@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-import unicodecsv
-
+import csv
+from io import StringIO
 from math import ceil
+
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound
 from elasticsearch_dsl import Search, Q
 from flatdict import FlatDict
-from six import StringIO
 
 
 def audit_cget(
@@ -73,7 +71,7 @@ def export(request):
         raise HTTPNotFound()
 
     buf = StringIO()
-    writer = unicodecsv.writer(buf, dialect='excel')
+    writer = csv.writer(buf, dialect='excel')
 
     headrow = (
         '@timestamp',

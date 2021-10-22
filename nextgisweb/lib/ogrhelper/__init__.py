@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 import ctypes
 import zipfile
 from datetime import date, time, datetime
 
-import six
 from osgeo import gdal, ogr
 
 
@@ -93,16 +89,15 @@ def read_dataset(filename, encoding=None, **kw):
     def _open():
         return gdal.OpenEx(ogrfn, 0, **kw)
 
-    if six.PY2:
-        with _set_encoding(encoding) as sdecode:
-            ogrds = _open()
-            strdecode = sdecode
-    else:
-        # Ignore encoding option in Python 3
-        ogrds = _open()
+    # with _set_encoding(encoding) as sdecode:
+    #     ogrds = _open()
+    #     strdecode = sdecode
 
-        def strdecode(x):
-            return x
+    # Ignore encoding option in Python 3
+    ogrds = _open()
+
+    def strdecode(x):
+        return x
 
     return ogrds, strdecode
 
@@ -153,7 +148,7 @@ def _geometry_copy(ogr_geom):
 
 
 def _geometry_wkt(ogr_geom):
-    return six.ensure_text(ogr_geom.ExportToWkt())
+    return ogr_geom.ExportToWkt()
 
 
 def _geometry_wkb(ogr_geom):
@@ -169,7 +164,7 @@ def _get_real(feat, fidx):
 
 
 def _get_string(feat, fidx):
-    return six.ensure_text(feat.GetFieldAsString(fidx))
+    return feat.GetFieldAsString(fidx)
 
 
 def _get_date(feat, fidx):

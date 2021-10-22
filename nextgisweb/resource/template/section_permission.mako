@@ -1,7 +1,7 @@
 <% permsets = obj.permission_sets(request.user) %>
 <div class="table-wrapper">
     <table class="pure-table pure-table-horizontal">
-        %for k, scope in six.iteritems(obj.scope):
+        %for k, scope in obj.scope.items():
             <thead><tr>
                 <th style="width: 70%; text-align: inherit;">${tr(scope.label)}</th>
                 <th style="width: 30%; text-align: inherit;"><tt>${k}</tt></th>
@@ -15,16 +15,16 @@
                 <td>
                     <%
                     if (perm in permsets.deny):
-                        pd = u"D";
+                        pd = "D";
                         cls="deny";
                     elif (perm in permsets.mask):
-                        pd = u"M";
+                        pd = "M";
                         cls="mask";
                     elif (perm in permsets.allow):
-                        pd = u"A";
+                        pd = "A";
                         cls="allow";
                     else:
-                        pd = u"E";
+                        pd = "E";
                         cls="";
                     %>
                     

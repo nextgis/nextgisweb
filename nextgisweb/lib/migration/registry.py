@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import re
 import json
 import logging
 from collections import OrderedDict
 from datetime import datetime
+from pathlib import Path
 from textwrap import dedent
 from imp import load_source
-from six import string_types
 
-from ...compat import Path
 from .revision import REVID_ZERO
 from .migration import Dependency, MigrationKey, Migration, InitialMigration
 
@@ -38,7 +35,7 @@ class PythonModuleMigration(Migration):
     _regexp_rewind = re.compile(r'def\s+rewind\s*\(')
 
     def __init__(self, component, revision, mpath):
-        super(PythonModuleMigration, self).__init__(component, revision)
+        super().__init__(component, revision)
         self._mod_path = str(mpath)
 
         with mpath.open('r') as fd:
@@ -74,9 +71,7 @@ class PythonModuleMigration(Migration):
         fwpath = path / '{}.py'.format(basename)
         assert not fwpath.exists()
         with fwpath.open('w') as fd:
-            fd.write('# -*- coding: utf-8 -*-\n')
             fd.write("\"\"\" {\n" + _metadata_to_jskeys(meta, '    ') + "\n} \"\"\"\n")
-            fd.write('\nfrom __future__ import division, unicode_literals, print_function, absolute_import\n')  # NOQA: E501
             if forward:
                 fd.write('\n' + dedent("""
                     def forward(ctx):
@@ -146,7 +141,7 @@ class SQLScriptMigration(Migration):
     _regexp_meta = re.compile(r'^\/\*{3}\s*(\{.+\})\s*\*{3}\/\s*(.*)$', re.I + re.S)
 
     def __init__(self, component, revision, fwpath):
-        super(SQLScriptMigration, self).__init__(component, revision)
+        super().__init__(component, revision)
         self.fwpath = fwpath
 
         def _readfile(fpath, reverse=False):
@@ -240,23 +235,23 @@ def _normalize_metadata(value, component, revision):
         if k == 'revision':
             _validate_revision(v)
         elif k == 'parents':
-            if isinstance(v, string_types):
+            if isinstance(v, str):
                 v = (v, )
             elif isinstance(v, list):
                 v = tuple(v)
             for pr in v:
                 _validate_revision(pr)
         elif k == 'message':
-            assert isinstance(v, string_types)
+            assert isinstance(v, str)
         elif k == 'date':
-            assert isinstance(v, string_types)
+            assert isinstance(v, str)
         elif k == 'dependencies':
             if isinstance(v, list):
                 v = tuple(v)
             assert isinstance(v, tuple)
             deps = list()
             for d in v:
-                if isinstance(d, string_types):
+                if isinstance(d, str):
                     d = ('this', d)
                 if isinstance(d, list):
                     d = tuple(d)
@@ -279,12 +274,12 @@ def _normalize_metadata(value, component, revision):
 
 
 def _validate_revision(value):
-    assert isinstance(value, string_types)
+    assert isinstance(value, str)
     assert re.match(r'^[0-9a-f]{8}$', value) is not None
 
 
 def _validate_revspec(value):
-    assert isinstance(value, string_types)
+    assert isinstance(value, str)
     assert re.match(r'^\w+==[0-9a-f]{8}$', value) is not None
 
 

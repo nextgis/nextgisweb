@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 from ..component import Component
 
 from . import command  # NOQA
@@ -33,7 +30,7 @@ class RasterLayerComponent(Component):
         return self.env.file_storage.workdir_filename(self, fobj, makedirs)
 
     def maintenance(self):
-        super(RasterLayerComponent, self).maintenance()
+        super().maintenance()
 
         self.logger.info("Building missing raster overviews")
         for resource in RasterLayer.query():

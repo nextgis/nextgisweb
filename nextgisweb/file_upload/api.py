@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import pickle
 import json
 import re
@@ -38,10 +36,10 @@ def collection(request):
     if method == 'OPTIONS':
         headers = {}
         if comp.tus_enabled:
-            headers[str('Tus-Resumable')] = str('1.0.0')
-            headers[str('Tus-Version')] = str('1.0.0')
-            headers[str('Tus-Extension')] = str('creation,termination')
-            headers[str('Tus-Max-Size')] = str(comp.max_size)
+            headers['Tus-Resumable'] = '1.0.0'
+            headers['Tus-Version'] = '1.0.0'
+            headers['Tus-Extension'] = 'creation,termination'
+            headers['Tus-Max-Size'] = str(comp.max_size)
         return Response(status=200, headers=headers)
 
     tus = _tus_resumable_header(request)
@@ -331,14 +329,14 @@ def _tus_resumable_header(request):
 
 
 def _tus_response(status, location=None, upload_offset=None, upload_length=None):
-    headers = {str("Tus-Resumable"): str("1.0.0")}
+    headers = {"Tus-Resumable": "1.0.0"}
 
     if location is not None:
-        headers[str('Location')] = str(location)
+        headers['Location'] = location
     if upload_offset is not None:
-        headers[str('Upload-Offset')] = str(upload_offset)
+        headers['Upload-Offset'] = str(upload_offset)
     if upload_length is not None:
-        headers[str('Upload-Length')] = str(upload_length)
+        headers['Upload-Length'] = str(upload_length)
 
     return Response(status=status, headers=headers)
 

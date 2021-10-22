@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime, timedelta
 
 from pyramid.httpexceptions import HTTPNotFound
@@ -91,7 +89,7 @@ def setup_pyramid(comp, config):
     if comp.audit_enabled:
         config.add_tween(
             'nextgisweb.audit.util.audit_tween_factory',
-            under=('nextgisweb.pyramid.util.header_encoding_tween_factory',))
+            over=('nextgisweb.pyramid.exception.unhandled_exception_tween_factory', ))
 
         if comp.audit_es_enabled:
             config.add_route(

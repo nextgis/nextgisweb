@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import sentry_sdk
 from sentry_sdk.integrations.pyramid import PyramidIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
@@ -15,7 +12,7 @@ class SentryComponent(Component):
     identity = 'sentry'
 
     def __init__(self, env, settings):
-        super(SentryComponent, self).__init__(env, settings)
+        super().__init__(env, settings)
 
         if 'dsn' in self.options:
             # Patch MAX_STRING_LENGTH to prevent clipping of big error messages,

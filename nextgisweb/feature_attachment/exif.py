@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 # Borrowed from https://github.com/kylefox/python-image-orientation-patch
 
 from collections import namedtuple

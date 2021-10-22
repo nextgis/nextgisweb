@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
-
 class BaseOperation(object):
     opname = 'base'
     oprank = 0
@@ -27,7 +23,7 @@ class ForwardOperation(BaseOperation):
     gvcolor = '"#92c5de"'
 
     def __init__(self, condition, action, migration):
-        super(ForwardOperation, self).__init__(condition, action, migration=migration)
+        super().__init__(condition, action, migration=migration)
 
     def __str__(self):
         return "Forward [{}:{}]".format(self.component, self.revision)
@@ -40,7 +36,7 @@ class RewindOperation(BaseOperation):
     gvcolor = '"#f4a582"'
 
     def __init__(self, condition, action, migration):
-        super(RewindOperation, self).__init__(condition, action, migration=migration)
+        super().__init__(condition, action, migration=migration)
 
     def __str__(self):
         return "Rewind [{}:{}]".format(self.component, self.revision)
@@ -53,7 +49,7 @@ class InstallOperation(BaseOperation):
     gvcolor = '"#0571b0"'
 
     def __init__(self, condition, action, component):
-        super(InstallOperation, self).__init__(condition, action, component=component)
+        super().__init__(condition, action, component=component)
 
     def __str__(self):
         return "Install [{}]".format(self.component)
@@ -66,7 +62,7 @@ class UninstallOperation(BaseOperation):
     gvcolor = '"#ca0020"'
 
     def __init__(self, condition, action, component):
-        super(UninstallOperation, self).__init__(condition, action, component=component)
+        super().__init__(condition, action, component=component)
 
     def __str__(self):
         return "Uninstall [{}]".format(self.component)

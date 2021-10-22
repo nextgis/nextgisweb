@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
-
 class AfterResourcePut(object):
     def __init__(self, resource, request):
         self.resource = resource

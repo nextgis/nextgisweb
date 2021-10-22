@@ -1,13 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 import re
 import logging
 import logging.config
 import os
 from collections import OrderedDict
 
-import six
 import sqlalchemy as sa
 
 from .lib.config import OptionAnnotations, Option, ConfigOptions, load_config
@@ -284,7 +280,7 @@ class EnvMetaClass(type):
         return _env
 
 
-class env(six.with_metaclass(EnvMetaClass, object)):
+class env(metaclass=EnvMetaClass):
     """ Proxy-class for global environment access. Use it only
     where it is impossible to get access to current environment
     by other means. However in any case, simultaneous work with

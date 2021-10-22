@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 from pyramid.renderers import render_to_response
 
 from ..models import DBSession

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import sys
 import io
 import os
@@ -7,9 +5,9 @@ import os.path
 import logging
 import json
 import re
-import six
 from importlib import import_module
 from packaging import version as pkg_version
+from pathlib import Path
 from argparse import ArgumentParser, Namespace
 from pkg_resources import resource_filename
 from collections import OrderedDict, defaultdict
@@ -25,7 +23,6 @@ from babel.messages.mofile import write_mo
 from attr import attrs, attrib, asdict
 from poeditor import POEditorAPI
 
-from ..compat import Path
 from ..package import pkginfo
 from ..lib.config import load_config
 from ..env import Env, setenv, env
@@ -74,7 +71,7 @@ def write_jed(fileobj, catalog):
     for msg in catalog:
         if msg.id == '':
             continue
-        data[msg.id] = (msg.string, ) if isinstance(msg.string, six.string_types) \
+        data[msg.id] = (msg.string, ) if isinstance(msg.string, str) \
             else msg.string
 
     fileobj.write(json.dumps(data, ensure_ascii=False, indent=2))
@@ -164,7 +161,7 @@ def cmd_extract(args):
         outfn = catalog_filename(cident, None, ext='pot', mkdir=True)
         logger.debug("Writing POT-file to %s", outfn)
 
-        with io.open(str(outfn), 'wb') as outfd:
+        with io.open(outfn, 'wb') as outfd:
             write_po(outfd, catalog, ignore_obsolete=True, omit_header=True)
 
 
@@ -178,7 +175,7 @@ def cmd_update(args):
         for locale in locales:
             po_path = catalog_filename(comp_id, locale, mkdir=True)
 
-            with io.open(str(pot_path), 'r') as pot_fd:
+            with io.open(pot_path, 'r') as pot_fd:
                 pot = read_po(pot_fd, locale=locale)
                 pot_is_empty = len(pot) == 0 and len(pot.obsolete) == 0
 
@@ -190,7 +187,7 @@ def cmd_update(args):
                     "Creating component [%s] locale [%s]...",
                     comp_id, locale)
 
-                with io.open(str(po_path), 'wb') as fd:
+                with io.open(po_path, 'wb') as fd:
                     write_po(fd, pot, width=80, omit_header=True)
 
                 continue
@@ -202,7 +199,7 @@ def cmd_update(args):
                 po_path.unlink()
                 continue
 
-            with io.open(str(po_path), 'r') as po_fd:
+            with io.open(po_path, 'r') as po_fd:
                 po = read_po(po_fd, locale=locale)
 
             not_found, _, obsolete = compare_catalogs(pot, po)
@@ -222,7 +219,7 @@ def cmd_update(args):
                 ]:
                     del po.obsolete[msg_id]
 
-                with io.open(str(po_path), 'wb') as fd:
+                with io.open(po_path, 'wb') as fd:
                     write_po(fd, po, width=80, omit_header=True)
 
 
@@ -480,7 +477,7 @@ def cmd_poeditor_sync(args):
                         break
 
             if updated != 0:
-                with io.open(str(po_path), 'wb') as fd:
+                with io.open(po_path, 'wb') as fd:
                     write_po(fd, po, width=80, omit_header=True)
 
                 logger.info(

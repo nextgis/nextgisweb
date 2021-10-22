@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 from .revision import revid, REVID_ZERO
 from .migration import MigrationKey, Migration, InitialMigration
 from .graph import MigrationGraph, OperationGraph, resolve

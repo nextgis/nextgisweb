@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import os
 import io
 import re
-import warnings
-import six
 from collections import OrderedDict
-from six.moves.configparser import RawConfigParser
+from configparser import RawConfigParser
 
 
 class _NO_DEFAULT(object):
@@ -84,7 +80,7 @@ def environ_substitution(items, environ):
 
     def unescape(v):
         return unescape_re.sub(r'\1', v)
-    
+
     def subfn(m):
         variable = m.group(1)
 
@@ -108,11 +104,12 @@ def environ_substitution(items, environ):
     for k, v in list(items.items()):
         items[k] = substitute(v)
 
+
 def load_config(filenames, include, environ=os.environ, environ_prefix='NEXTGISWEB', hupper=False):
     if filenames is None:
         filenames = environ.get(environ_prefix + '_CONFIG')
 
-    if isinstance(filenames, six.string_types):
+    if isinstance(filenames, str):
         filenames = filenames.split(':')
 
     if include is None:
@@ -129,7 +126,7 @@ def load_config(filenames, include, environ=os.environ, environ_prefix='NEXTGISW
 
     def load_fp(fp):
         cfg = RawConfigParser()
-        (cfg.readfp if six.PY2 else cfg.read_file)(fp)
+        cfg.read_file(fp)
         for section in cfg.sections():
             for k, v in cfg.items(section):
                 rkey = '.'.join((section, k))
@@ -146,7 +143,7 @@ def load_config(filenames, include, environ=os.environ, environ_prefix='NEXTGISW
                 load_fp(fp)
 
     if include is not None:
-        fp = io.StringIO(six.ensure_text(include))
+        fp = io.StringIO(include)
         load_fp(fp)
 
     for k, v in environ.items():

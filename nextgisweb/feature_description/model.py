@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 from .. import db
 from ..models import declarative_base
 from ..resource import Resource

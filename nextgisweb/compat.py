@@ -1,21 +1,16 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
+import warnings
 
 from datetime import datetime, date, time
 
-import six
-if six.PY2:
-    from dateutil.parser import isoparser
-    _isoparser8601 = isoparser()
+from functools import lru_cache
+from pathlib import Path
+from html import escape as html_escape
 
-if six.PY3:
-    from functools import lru_cache
-    from pathlib import Path
-    from html import escape as html_escape
-else:
-    from backports.functools_lru_cache import lru_cache
-    from pathlib2 import Path
-    from cgi import escape as html_escape
+warnings.warn(
+    "The 'nextgisweb.compat' module deprecated now and it's going to be "
+    "removed in 4.1.0. Use native python 3 modules instead.",
+    DeprecationWarning, stacklevel=2)
+
 
 __all__ = [
     'lru_cache',
@@ -25,36 +20,20 @@ __all__ = [
 
 
 def datetime_to_timestamp(value):
-    if six.PY3:
-        return value.timestamp()
-    else:
-        from time import mktime
-        return mktime(value.timetuple())
+    return value.timestamp()
 
 
 def timestamp_to_datetime(value):
-    if six.PY3:
-        return datetime.fromtimestamp(value)
-    else:
-        return datetime.utcfromtimestamp(value)
+    return datetime.fromtimestamp(value)
 
 
 def date_fromisoformat(iso_string):
-    if six.PY3:
-        return date.fromisoformat(iso_string)
-    else:
-        return _isoparser8601.parse_isodate(iso_string)
+    return date.fromisoformat(iso_string)
 
 
 def time_fromisoformat(iso_string):
-    if six.PY3:
-        return time.fromisoformat(iso_string)
-    else:
-        return _isoparser8601.parse_isotime(iso_string)
+    return time.fromisoformat(iso_string)
 
 
 def datetime_fromisoformat(iso_string):
-    if six.PY3:
-        return datetime.fromisoformat(iso_string)
-    else:
-        return _isoparser8601.isoparse(iso_string)
+    return datetime.fromisoformat(iso_string)

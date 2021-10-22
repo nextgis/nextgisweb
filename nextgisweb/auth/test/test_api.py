@@ -1,16 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
-from datetime import timedelta
+from datetime import datetime, timedelta
+from urllib.parse import urlparse, parse_qs
 
 import pytest
 import transaction
 from freezegun import freeze_time
-from six.moves.urllib.parse import urlparse, parse_qs
 
 from nextgisweb import db
 from nextgisweb.auth import User, Group
-from nextgisweb.compat import datetime_fromisoformat
 from nextgisweb.models import DBSession
 
 
@@ -44,7 +40,7 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
     query = parse_qs(result.query)
     sid = query['sid'][0]
     expires = query['expires'][0]
-    expires_dt = datetime_fromisoformat(expires)
+    expires_dt = datetime.fromisoformat(expires)
     next_url = query['next'][0]
     assert next_url == '/some/path'
 

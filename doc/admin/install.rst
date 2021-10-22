@@ -19,14 +19,16 @@ System requirements
     distributions. So if you any installation-related issue, please try to
     reproduce a problem on Ubuntu Linux 20.04 before you report them.
 
-- Python >= 3.6.
+- Python >= 3.8.
+
+- GDAL >= 3.
 
 - Node.js 14.x or higher and Yarn 1.x package manager. We recommend using
   NodeSource and Yarn package repositories.
 
 - PostgreSQL database with PostGIS and hstore extensions enabled:
 
-  - The minimum required versions are PostgreSQL 9.5 and PostGIS 2.4.
+  - The minimum required versions are PostgreSQL 10 and PostGIS 2.5.
 
   - PostgreSQL user must be owner of database and PostGIS system tables
     ``spatial_ref_sys``, ``geography_columns``, ``geometry_columns``,

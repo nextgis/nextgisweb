@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 from time import sleep
 from uuid import uuid4
 import logging
-import six
 
 import pytest
 import transaction
@@ -28,7 +25,7 @@ def frtc(ngw_resource_group):
             owner_user=User.by_keyname('administrator'),
             geometry_type='POINT',
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=six.text_type(uuid4().hex)
+            tbl_uuid=uuid4().hex
         ).persist()
         vector_layer.setup_from_fields([])
 

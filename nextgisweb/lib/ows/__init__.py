@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
+from io import BytesIO
 
 from lxml import etree
-
-from six import BytesIO
 
 __all__ = ['parse_request', 'parse_epsg_code', 'get_exception_template']
 

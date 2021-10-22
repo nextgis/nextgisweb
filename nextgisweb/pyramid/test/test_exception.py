@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import pytest
 from pyramid.config import Configurator
 from pyramid.response import Response
@@ -33,10 +30,6 @@ def app():
 
     config = Configurator(settings=settings)
     config.include(exception)
-
-    config.add_tween(
-        'nextgisweb.pyramid.util.header_encoding_tween_factory',
-        over=('nextgisweb.pyramid.exception.unhandled_exception_tween_factory', ))
 
     def view_error(request):
         raise ErrorTest()
@@ -90,7 +83,7 @@ def test_exception(app):
 
 
 def test_json(app):
-    headers = {'Content-Type': str('application/json')}
+    headers = {'Content-Type': 'application/json'}
 
     data = r'{"almost": "json" . }'
     app.post('/json', data, headers, status=400)

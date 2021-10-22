@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
-
 class ValidationError(Exception):
     def __init__(self, message):
         self.message = message

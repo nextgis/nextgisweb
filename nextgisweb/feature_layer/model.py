@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 
 from collections import OrderedDict
 
 from osgeo import ogr, osr
-from six import ensure_str
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
 
@@ -63,9 +60,6 @@ class LayerField(Base):
     def __str__(self):
         return self.display_name
 
-    def __unicode__(self):
-        return self.__str__()
-
     def to_dict(self):
         result = dict(
             (c, getattr(self, c))
@@ -119,21 +113,16 @@ class LayerFieldsMixin(object):
     def to_ogr(self, ogr_ds, name=r'', fid=None):
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(self.srs.id)
-        ogr_layer = ogr_ds.CreateLayer(ensure_str(name), srs=srs)
+        ogr_layer = ogr_ds.CreateLayer(name, srs=srs)
         for field in self.fields:
             ogr_layer.CreateField(
                 ogr.FieldDefn(
-                    ensure_str(field.keyname),
+                    field.keyname,
                     _FIELD_TYPE_2_ENUM_REVERSED[field.datatype],
                 )
             )
         if fid is not None:
-            ogr_layer.CreateField(
-                ogr.FieldDefn(
-                    ensure_str(fid),
-                    ogr.OFTInteger
-                )
-            )
+            ogr_layer.CreateField(ogr.FieldDefn(fid, ogr.OFTInteger))
         return ogr_layer
 
 

@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import warnings
-import six
 from collections import defaultdict
 from contextlib import contextmanager
 
@@ -12,7 +9,7 @@ from .util import NO_DEFAULT
 class Option(object):
 
     def __init__(
-        self, key, otype=six.text_type, default=NO_DEFAULT,
+        self, key, otype=str, default=NO_DEFAULT,
         required=False, secure=False, doc=None
     ):
         self._key = key
@@ -231,5 +228,5 @@ class MissingAnnotationWarning(Warning):
 class MissingDefaultError(Exception):
 
     def __init__(self, key):
-        super(MissingDefaultError, self).__init__(
+        super().__init__(
             "Missing default for key: {}".format(key))

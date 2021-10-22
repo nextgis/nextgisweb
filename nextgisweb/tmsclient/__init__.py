@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 from ..component import Component, require
 from ..lib.config import Option
 from .model import Base, Connection, Layer, SCHEME
@@ -13,7 +10,7 @@ class TMSClientComponent(Component):
     metadata = Base.metadata
 
     def initialize(self):
-        super(TMSClientComponent, self).initialize()
+        super().initialize()
 
         self.headers = {
             'User-Agent': self.options['user_agent']

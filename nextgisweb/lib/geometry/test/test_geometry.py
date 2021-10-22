@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 from itertools import combinations
-import six
 
 import pytest
 from osgeo import ogr, gdal
@@ -14,6 +11,12 @@ from nextgisweb.models import DBSession
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid
 
 
+# def test_test():
+#     from nextgisweb.geojson import dumps
+#     v = [dict(a='b')]
+#     assert False, type(dumps(v))
+
+
 @pytest.mark.parametrize('wkt', (
     pytest.param('POINT (1 2)', id='point-2d'),
     pytest.param('POINT Z (1 2 3)', id='point-3d'),
@@ -22,7 +25,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid
     # of support in the Shapely library.
 ))
 def test_wkt_wkb(wkt, ngw_txn):
-    ogr_geom = ogr.CreateGeometryFromWkt(six.ensure_str(wkt))
+    ogr_geom = ogr.CreateGeometryFromWkt(wkt)
     assert ogr_geom is not None, gdal.GetLastErrorMsg()
     wkt_iso = ogr_geom.ExportToIsoWkt()
 
@@ -57,10 +60,7 @@ def test_wkt_wkb(wkt, ngw_txn):
 ))
 def test_valid(src, is_valid):
     if 'wkb' in src:
-        if six.PY3:
-            src['wkb'] = bytes.fromhex(src['wkb'])
-        else:
-            src['wkb'] = src['wkb'].decode('hex')
+        src['wkb'] = bytes.fromhex(src['wkb'])
     if not is_valid:
         with pytest.raises(GeometryNotValid):
             Geometry(validate=True, **src)
@@ -97,7 +97,7 @@ def test_convert(fmt_src, fmt_dst):
 
     val_src = getattr(Geometry, 'from_' + fmt_src)(sample[fmt_src])
     val_dst = getattr(val_src, fmt_dst)
-    
+
     if fmt_dst == 'ogr':
         assert val_dst.Equal(sample[fmt_dst])
     else:
@@ -115,14 +115,11 @@ def _pg_wkt_to_wkb_ext(wkt):
 
 
 def _pg_wkb(wkb):
-    _wkb = wkb.hex() if six.PY3 else wkb.encode('hex')
+    _wkb = wkb.hex()
     return _query_scalar_bytes(sa_func.st_asewkb(
         sa_func.st_geomfromwkb(sa_func.decode(_wkb, 'hex')), 'NDR'))
 
 
 def _query_scalar_bytes(query):
     v = DBSession.query(query).scalar()
-    if six.PY3:
-        return v.tobytes()
-    else:
-        return six.binary_type(v)
+    return v.tobytes()

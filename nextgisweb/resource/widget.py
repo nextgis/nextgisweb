@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 from collections import OrderedDict
 
 from .model import Resource
-import six
+
 
 __all__ = ['Widget', ]
 
@@ -12,7 +10,7 @@ _registry = []
 
 class WidgetMeta(type):
     def __init__(cls, name, bases, nmspc):
-        super(WidgetMeta, cls).__init__(name, bases, nmspc)
+        super().__init__(name, bases, nmspc)
         if not nmspc.get('__abstract__', False):
             _registry.append(cls)
 
@@ -25,7 +23,7 @@ class WidgetBase(object):
         self.request = request
 
 
-class Widget(six.with_metaclass(WidgetMeta, WidgetBase)):
+class Widget(WidgetBase, metaclass=WidgetMeta):
     __abstract__ = True
 
     def is_applicable(self):
@@ -43,7 +41,7 @@ class Widget(six.with_metaclass(WidgetMeta, WidgetBase)):
 class CompositeWidget(WidgetBase):
 
     def __init__(self, *args, **kwargs):
-        super(CompositeWidget, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.members = []
         for mcls in _registry:
             member = mcls(*args, **kwargs)

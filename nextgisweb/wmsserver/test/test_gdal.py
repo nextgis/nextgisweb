@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import numpy
+from pathlib import Path
 
 import pytest
 import transaction
@@ -9,7 +7,6 @@ from PIL import Image
 from osgeo import gdal, gdalconst, gdal_array
 
 from nextgisweb.auth import User
-from nextgisweb.compat import Path
 from nextgisweb.models import DBSession
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.raster_style import RasterStyle

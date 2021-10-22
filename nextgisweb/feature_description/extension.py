@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 from ..feature_layer import FeatureExtension
 from ..models import DBSession
 

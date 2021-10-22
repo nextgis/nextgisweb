@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import os.path
 from shutil import copyfile, copyfileobj
 
-import six
 import zipfile
 
 from .. import db
@@ -75,9 +71,6 @@ def validate_filename(filename):
 class _archive_attr(SP):
 
     def setter(self, srlzr, value):
-        def is_dir(file_info):
-            return file_info.is_dir() if six.PY3 else file_info.filename[-1] == '/'
-
         archive_name, metafile = env.file_upload.get_filename(value['id'])
 
         old_files = list(srlzr.obj.files)
@@ -90,7 +83,7 @@ class _archive_attr(SP):
 
         with zipfile.ZipFile(archive_name, mode='r', allowZip64=True) as archive:
             for file_info in archive.infolist():
-                if is_dir(file_info):
+                if file_info.is_dir():
                     continue
 
                 filename = file_info.filename
@@ -162,4 +155,4 @@ class SVGMarkerLibrarySerializer(Serializer):
     def deserialize(self):
         if 'files' in self.data and 'archive' in self.data:
             raise ValidationError('"files" and "archive" attributes should not pass together.')
-        super(self.__class__, self).deserialize()
+        super().deserialize()

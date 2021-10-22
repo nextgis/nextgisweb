@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import subprocess
 import os
-import six
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -137,7 +134,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
-        self.dtype = six.text_type(gdal.GetDataTypeName(data_type))
+        self.dtype = gdal.GetDataTypeName(data_type)
         self.xsize = ds.RasterXSize
         self.ysize = ds.RasterYSize
         self.band_count = ds.RasterCount
@@ -174,7 +171,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         subprocess.check_call(cmd)
 
     def get_info(self):
-        s = super(RasterLayer, self)
+        s = super()
         return (s.get_info() if hasattr(s, 'get_info') else ()) + (
             (_("Data type"), self.dtype),
         )

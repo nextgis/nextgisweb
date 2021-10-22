@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 from ..core.exception import ValidationError
 from ..lib.ogrhelper import read_dataset
 

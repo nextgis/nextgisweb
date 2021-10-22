@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 from datetime import datetime, timedelta
+from functools import lru_cache
 from uuid import uuid4
+from pathlib import Path
 from threading import Lock, Thread
 import logging
 from time import time
@@ -9,14 +9,13 @@ import os.path
 import sqlite3
 from io import BytesIO
 import atexit
-from six.moves.queue import Queue, Empty, Full
+from queue import Queue, Empty, Full
 
 import transaction
 from PIL import Image
 from sqlalchemy import MetaData, Table
 from zope.sqlalchemy import mark_changed
 
-from ..compat import Path, lru_cache
 from ..env import env
 from .. import db
 from ..models import declarative_base, DBSession
@@ -319,7 +318,7 @@ class ResourceTileCache(Base):
         if 'uuid' not in kwagrs:
             kwagrs['uuid'] = uuid4()
         self.reconstructor()
-        super(ResourceTileCache, self).__init__(*args, **kwagrs)
+        super().__init__(*args, **kwagrs)
 
     @db.reconstructor
     def reconstructor(self):
@@ -574,7 +573,7 @@ class ResourceTileCacheSerializer(Serializer):
         return IRenderableStyle.providedBy(self.obj)
 
     def deserialize(self):
-        super(ResourceTileCacheSerializer, self).deserialize()
+        super().deserialize()
 
         if self.obj.tile_cache is not None:
             self.obj.tile_cache.initialize()

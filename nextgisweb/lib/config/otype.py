@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import re
 from datetime import timedelta
-import six
 
 
 class OptionType(object):
@@ -128,12 +125,7 @@ class Timedelta(OptionType):
                 return '{}{}'.format(seconds // m, a)
 
 
-if six.PY2:
-    OptionType.OTYPE_MAPPING[str] = \
-        OptionType.OTYPE_MAPPING[unicode] = Text()  # NOQA: F821
-else:
-    OptionType.OTYPE_MAPPING[str] = Text()
-
+OptionType.OTYPE_MAPPING[str] = Text()
 OptionType.OTYPE_MAPPING[bool] = Boolean()
 OptionType.OTYPE_MAPPING[int] = Integer()
 OptionType.OTYPE_MAPPING[float] = Float()

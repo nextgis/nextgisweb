@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 """ {
     "revision": "2bfa0406", "parents": ["2bfa0320"],
     "dependencies": ["foo==2bfa06fe"]
 } """
 
-from __future__ import division, unicode_literals, print_function, absolute_import
 from textwrap import dedent
 
 

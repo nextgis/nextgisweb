@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import json
 from datetime import datetime
+from urllib.parse import urlencode
 
 import string
 import secrets
@@ -13,10 +11,8 @@ from pyramid.events import BeforeRender
 from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
-from six.moves.urllib.parse import urlencode
 from sqlalchemy.orm.exc import NoResultFound
 
-from ..compat import datetime_fromisoformat, timestamp_to_datetime
 from ..models import DBSession
 from ..object_widget import ObjectWidget
 from ..pyramid import SessionStore, WebSession
@@ -67,8 +63,8 @@ def login(request):
                 raise InvalidCredentialsException(_("Session not found."))
             value = json.loads(store.value)
 
-            exp = timestamp_to_datetime(value[2])
-            if datetime_fromisoformat(expires) != exp:
+            exp = datetime.fromtimestamp(value[2])
+            if datetime.fromisoformat(expires) != exp:
                 raise InvalidCredentialsException(_("Invalid 'expires' parameter."))
             if exp <= datetime.utcnow():
                 raise InvalidCredentialsException(_("Session expired."))
@@ -283,12 +279,12 @@ def setup_pyramid(comp, config):
             return self.operation in ('create', 'edit')
 
         def populate_obj(self):
-            super(AuthGroupWidget, self).populate_obj()
+            super().populate_obj()
 
             self.obj.deserialize(self.data)
 
         def validate(self):
-            result = super(AuthGroupWidget, self).validate()
+            result = super().validate()
             self.error = []
 
             if self.operation in ('create', 'edit'):
@@ -306,7 +302,7 @@ def setup_pyramid(comp, config):
             return result
 
         def widget_params(self):
-            result = super(AuthGroupWidget, self).widget_params()
+            result = super().widget_params()
 
             if self.obj:
                 result['value'] = dict(
@@ -372,12 +368,12 @@ def setup_pyramid(comp, config):
             return self.operation in ('create', 'edit')
 
         def populate_obj(self):
-            super(AuthUserWidget, self).populate_obj()
+            super().populate_obj()
 
             self.obj.deserialize(self.data)
 
         def validate(self):
-            result = super(AuthUserWidget, self).validate()
+            result = super().validate()
             self.error = []
 
             if self.operation in ('create', 'edit'):
@@ -410,7 +406,7 @@ def setup_pyramid(comp, config):
             return result
 
         def widget_params(self):
-            result = super(AuthUserWidget, self).widget_params()
+            result = super().widget_params()
 
             if self.obj:
                 result['value'] = dict(

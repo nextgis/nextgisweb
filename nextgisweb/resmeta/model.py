@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
-
 from .. import db
 from ..models import declarative_base
 from ..resource import (
@@ -11,7 +7,6 @@ from ..resource import (
     SerializedProperty)
 
 from .util import COMP_ID
-import six
 
 
 Base = declarative_base(dependencies=('resource', ))
@@ -52,7 +47,7 @@ class ResourceMetadataItem(Base):
     def value(self, value):
         self.vinteger = value if isinstance(value, int) else None
         self.vfloat = value if isinstance(value, float) else None
-        self.vtext = value if isinstance(value, six.string_types) else None
+        self.vtext = value if isinstance(value, str) else None
 
 
 class _items_attr(SerializedProperty):

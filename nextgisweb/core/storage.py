@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime
 from threading import Thread
 from logging import getLogger
-from six import with_metaclass
 
 import transaction
 import sqlalchemy as sa
@@ -27,12 +24,12 @@ logger = getLogger(__name__)
 class KindOfDataMeta(type):
 
     def __init__(cls, name, bases, nmspc):
-        super(KindOfDataMeta, cls).__init__(name, bases, nmspc)
+        super().__init__(name, bases, nmspc)
         if cls.identity is not None:
             cls.registry.register(cls)
 
 
-class KindOfData(with_metaclass(KindOfDataMeta)):
+class KindOfData(metaclass=KindOfDataMeta):
 
     registry = registry_maker()
 
@@ -43,7 +40,7 @@ class KindOfData(with_metaclass(KindOfDataMeta)):
 class StorageComponentMixin(object):
 
     def initialize(self):
-        super(StorageComponentMixin, self).initialize()
+        super().initialize()
 
         # Do flush reservations to the database as soon as possible. But
         # sometimes there's no flush event (for clean sessions).

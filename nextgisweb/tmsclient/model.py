@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import re
 from io import BytesIO
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 import PIL
 from osgeo import osr, ogr
@@ -114,7 +111,7 @@ class _url_template_attr(SP):
         if value is not None and not url_template_pattern.match(value):
             raise ValidationError("Invalid url template.")
 
-        super(_url_template_attr, self).setter(srlzr, value)
+        super().setter(srlzr, value)
 
 
 class _capmode_attr(SP):
@@ -129,7 +126,7 @@ class _capmode_attr(SP):
         else:
             raise ValidationError(message='Invalid capmode value!')
 
-        super(_capmode_attr, self).setter(srlzr, value)
+        super().setter(srlzr, value)
 
 
 class ConnectionSerializer(Serializer):

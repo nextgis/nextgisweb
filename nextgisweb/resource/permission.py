@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
+from collections import UserList
 from functools import reduce
-import six
-from six.moves import UserList
 
 from bunch import Bunch
 
@@ -75,9 +72,6 @@ class Permission(object):
     def __str__(self):
         return str(self.label)
 
-    def __unicode__(self):
-        return self.__str__()
-
     def is_bound(self):
         return self.name is not None and self.scope is not None
 
@@ -113,13 +107,13 @@ class ScopeMeta(type):
         if Scope is not None:
             setattr(cls, 'requirements', RequirementList())
 
-        for name, perm in six.iteritems(cls.__dict__):
+        for name, perm in cls.__dict__.items():
             if not isinstance(perm, Permission):
                 continue
 
             perm.bind(name, cls)
 
-        super(ScopeMeta, cls).__init__(classname, bases, nmspc)
+        super().__init__(classname, bases, nmspc)
 
         if Scope is not None:
             cls.registry[cls.__dict__['identity']] = cls
@@ -145,5 +139,5 @@ class ScopeMeta(type):
     itervalues = values
 
 
-class Scope(six.with_metaclass(ScopeMeta, object)):
+class Scope(metaclass=ScopeMeta):
     pass

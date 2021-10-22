@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import json
 import math
-from six import BytesIO
+from io import BytesIO
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
@@ -355,6 +352,6 @@ def setup_pyramid(comp, config):
 
     Resource.__psection__.register(
         key='description',
-        title=_(u"External access"),
+        title=_("External access"),
         is_applicable=lambda obj: obj.cls == 'wmsserver_service',
         template='nextgisweb:wmsserver/template/section_api_wms.mako')

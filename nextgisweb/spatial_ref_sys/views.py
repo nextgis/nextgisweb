@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 from ..object_widget import ObjectWidget
 from ..views import ModelController, DeleteWidget, permalinker
 from .. import dynmenu as dm
@@ -40,7 +37,7 @@ def setup_pyramid(comp, config):
 
     class SRSDeleteWidget(DeleteWidget):
         def validate(self):
-            result = super(SRSDeleteWidget, self).validate()
+            result = super().validate()
             self.error = []
             if self.operation == 'delete':
                 disabled = self.obj.disabled
@@ -57,13 +54,13 @@ def setup_pyramid(comp, config):
             return self.operation in ('create', 'edit', 'delete',)
 
         def populate_obj(self):
-            super(SRSWidget, self).populate_obj()
+            super().populate_obj()
 
             self.obj.display_name = self.data.get('display_name')
             self.obj.wkt = self.data.get('wkt', False)
 
         def validate(self):
-            result = super(SRSWidget, self).validate()
+            result = super().validate()
             self.error = []
 
             if self.operation == 'create':
@@ -85,7 +82,7 @@ def setup_pyramid(comp, config):
             return result
 
         def widget_params(self):
-            result = super(SRSWidget, self).widget_params()
+            result = super().widget_params()
 
             if self.obj:
                 result['value'] = dict(

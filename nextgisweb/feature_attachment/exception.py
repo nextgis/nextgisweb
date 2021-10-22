@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 from ..core.exception import UserException
 
 from .util import _
@@ -18,6 +15,6 @@ class AttachmentNotFound(UserException):
     http_status_code = 404
 
     def __init__(self, resource_id, feature_id, attachment_id):
-        super(AttachmentNotFound, self).__init__(
+        super().__init__(
             message=self.__class__.message % (attachment_id, feature_id),
             data=dict(resource_id=resource_id, feature_id=feature_id, attachment_id=attachment_id))

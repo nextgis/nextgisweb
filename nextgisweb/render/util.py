@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import struct
-import six
 
 import PIL.ImageStat
 from affine import Affine
@@ -66,4 +63,4 @@ def pack_color(color):
 
 def unpack_color(value):
     """ Unpack color integer value to color tuple. """
-    return tuple(six.iterbytes(struct.pack('!i', value)))
+    return tuple(iter(struct.pack('!i', value)))

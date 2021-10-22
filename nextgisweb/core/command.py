@@ -1,27 +1,23 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
+import csv
 import sys
 import os
 import os.path
 import logging
 import fileinput
-import json
 from os.path import join as pthjoin
 from datetime import datetime, timedelta
+from pathlib import Path
 from time import sleep
 from tempfile import NamedTemporaryFile, mkdtemp, mkstemp
 from shutil import rmtree
 from contextlib import contextmanager
-from backports.tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory
 from zipfile import ZipFile, is_zipfile
-from six import ensure_text
 
 import transaction
 from zope.sqlalchemy import mark_changed
-import unicodecsv as csv
 
 from .. import geojson
-from ..compat import Path, datetime_fromisoformat
 from ..command import Command
 from ..models import DBSession
 from ..lib.migration import (
@@ -367,7 +363,7 @@ class StatisticsCommand(Command):
             if hasattr(comp, 'query_stat'):
                 result[comp.identity] = comp.query_stat()
 
-        print(ensure_text(geojson.dumps(result, ensure_ascii=False, indent=2)))
+        print(geojson.dumps(result, ensure_ascii=False, indent=2))
 
 
 @Command.registry.register
@@ -425,7 +421,7 @@ class MigrationCreateCommand(Command):
         else:
             parents = args.parents
 
-        date = datetime_fromisoformat(args.date) if args.date is not None else datetime.now()
+        date = datetime.fromisoformat(args.date) if args.date is not None else datetime.now()
         revision = revid(date)
         mcls = {'python': PythonModuleMigration, 'sql': SQLScriptMigration}[args.format]
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import sqlite3
 from textwrap import dedent
 from contextlib import contextmanager

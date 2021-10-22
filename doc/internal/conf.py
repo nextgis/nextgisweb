@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 templates_path = ['_template']
 exclude_patterns = ['_build']

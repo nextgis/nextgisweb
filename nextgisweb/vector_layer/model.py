@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import re
 import json
 import uuid
 from datetime import datetime, time, date
-import six
+from functools import lru_cache
+from html import escape as html_escape
 
 from zope.interface import implementer
 from osgeo import ogr, osr
@@ -38,8 +36,6 @@ from ..models import declarative_base, DBSession, migrate_operation
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..lib.geometry import Geometry
 from ..lib.ogrhelper import read_dataset
-from ..compat import lru_cache, html_escape
-
 from ..feature_layer import (
     Feature,
     FeatureSet,
@@ -329,7 +325,7 @@ class TableInfo(object):
                     raise VE(_("Unsupported field type: %r.") %
                              fld_defn.GetTypeName())
 
-            uid = str(uuid.uuid4().hex)
+            uid = uuid.uuid4().hex
             self.fields.append(FieldDef(
                 'fld_%s' % uid,
                 fld_name,
@@ -346,7 +342,7 @@ class TableInfo(object):
         self.fields = []
 
         for fld in fields:
-            uid = str(uuid.uuid4().hex)
+            uid = uuid.uuid4().hex
             self.fields.append(FieldDef(
                 'fld_%s' % uid,
                 fld.get('keyname'),
@@ -420,7 +416,7 @@ class TableInfo(object):
 
         class model(object):
             def __init__(self, **kwargs):
-                for k, v in six.iteritems(kwargs):
+                for k, v in kwargs.items():
                     setattr(self, k, v)
 
         sequence = db.Sequence(tablename + '_id_seq', start=1,
@@ -785,7 +781,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         env.core.reserve_storage(COMP_ID, VectorLayerData, value_data_volume=size, resource=self)
 
     def get_info(self):
-        return super(VectorLayer, self).get_info() + (
+        return super().get_info() + (
             (_("Geometry type"), dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[
                 self.geometry_type]),
             (_("Feature count"), self.feature_query()().total_count),
@@ -811,7 +807,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IFieldEditableFeatureLayer
 
     def field_create(self, datatype):
-        uid = str(uuid.uuid4().hex)
+        uid = uuid.uuid4().hex
         column = db.Column('fld_' + uid, _FIELD_TYPE_2_DB[datatype])
         op = migrate_operation()
         op.add_column(self._tablename, column, schema=SCHEMA)
@@ -1043,7 +1039,7 @@ class _source_attr(SP):
 
     def _ogrlayer(self, ogrds, layer_name=None):
         if layer_name is not None:
-            ogrlayer = ogrds.GetLayerByName(six.ensure_str(layer_name))
+            ogrlayer = ogrds.GetLayerByName(layer_name)
         else:
             if ogrds.GetLayerCount() < 1:
                 raise VE(_("Dataset doesn't contain layers."))
@@ -1333,7 +1329,7 @@ class FeatureQueryBase(object):
                 selected_fields.append(f)
 
         if self._filter_by:
-            for k, v in six.iteritems(self._filter_by):
+            for k, v in self._filter_by.items():
                 if k == 'id':
                     where.append(table.columns.id == v)
                 else:
@@ -1446,8 +1442,7 @@ class FeatureQueryBase(object):
                                  for f in selected_fields)
                     if self._geom:
                         if self._geom_format == 'WKB':
-                            geom_data = row['geom'].tobytes() if six.PY3 \
-                                else six.binary_type(row['geom'])
+                            geom_data = row['geom'].tobytes()
                             geom = Geometry.from_wkb(geom_data, validate=False)
                         else:
                             geom = Geometry.from_wkt(row['geom'], validate=False)

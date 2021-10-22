@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import collections
 
 from osgeo import ogr
-from six import ensure_str
 
 
 def get_driver_by_name(name):
-    return ogr.GetDriverByName(ensure_str(name))
+    return ogr.GetDriverByName(name)
 
 
 def test_driver_capability(name, capability):

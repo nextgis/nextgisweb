@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import re
 from collections import OrderedDict
 from datetime import datetime
@@ -12,7 +9,6 @@ from lxml.builder import ElementMaker
 from osgeo import ogr, osr
 from pyramid.request import Request
 from shapely.geometry import box
-from six import text_type, ensure_str
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..core.exception import ValidationError
@@ -141,8 +137,9 @@ def get_geom_column(feature_layer):
 
 def geom_from_gml(el):
     srid = parse_epsg_code(el.attrib['srsName']) if 'srsName' in el.attrib else None
-    value = etree.tostring(el)
-    ogr_geom = ogr.CreateGeometryFromGML(ensure_str(value))
+    value = etree.tostring(el, encoding='utf-8')
+    ogr_geom = ogr.CreateGeometryFromGML(value.decode('utf-8'))
+
     return Geometry.from_ogr(ogr_geom, srid=srid)
 
 
@@ -232,7 +229,7 @@ class WFSHandler():
         else:
             raise ValidationError("Unsupported request: '%s'." % self.p_request)
 
-        xml = etree.tostring(root, encoding='utf-8')
+        xml = etree.tostring(root, encoding='unicode')
 
         if self.p_validate_schema:
             if self.p_request in (GET_CAPABILITIES, TRANSACTION):
@@ -773,7 +770,7 @@ class WFSHandler():
                     if value is not None:
                         if isinstance(value, datetime):
                             value = value.isoformat()
-                        elif not isinstance(value, text_type):
+                        elif not isinstance(value, str):
                             value = str(value)
                         _field.text = value
                     else:

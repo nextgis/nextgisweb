@@ -1,21 +1,18 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 import re
 import logging
 from contextlib import contextmanager
 from collections import namedtuple, OrderedDict
+from functools import lru_cache
 from subprocess import check_call, check_output
 import io
 import json
 from distutils.version import LooseVersion
-import six
 
 import sqlalchemy as sa
 
 from ..registry import registry_maker
 from ..models import DBSession
-from ..compat import lru_cache
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +144,7 @@ def backup(env, dst):
         snp_opt = []
         logger.warn(
             "Data inconsistency possible: ---snapshot option is not supported in pg_dump %s!",
-            six.text_type(pgd_version))
+            str(pgd_version))
     else:
         snp_opt = ['--snapshot={}'.format(snapshot), ]
 

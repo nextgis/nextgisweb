@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import os
 import os.path
 import logging
@@ -82,7 +79,7 @@ class FileStorageComponent(Component):
         if makedirs and not os.path.isdir(path):
             os.makedirs(path)
 
-        return os.path.join(path, str(uuid))
+        return os.path.join(path, uuid)
 
     def workdir_filename(self, comp, fobj, makedirs=False):
         levels = (fobj.uuid[0:2], fobj.uuid[2:4])
@@ -122,7 +119,7 @@ class FileStorageComponent(Component):
         return result
 
     def maintenance(self):
-        super(FileStorageComponent, self).maintenance()
+        super().maintenance()
         self.cleanup()
 
     def cleanup(self):

@@ -1,19 +1,16 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import re
-from lxml import etree
+from datetime import date, datetime, time
+from io import BytesIO
 
+from lxml import etree
 from owslib.crs import Crs
 import requests
 from osgeo import ogr, osr
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
 from shapely.geometry import box
-from six import BytesIO, ensure_str
 from zope.interface import implementer
 
 from .. import db
-from ..compat import date_fromisoformat, time_fromisoformat, datetime_fromisoformat
 from ..core.exception import ValidationError, OperationalError
 from ..env import env
 from ..feature_layer import (
@@ -78,8 +75,8 @@ def ns_trim(value):
 
 
 def geom_from_gml(el):
-    value = etree.tostring(el)
-    ogr_geom = ogr.CreateGeometryFromGML(ensure_str(value))
+    value = etree.tostring(el, encoding='utf-8')
+    ogr_geom = ogr.CreateGeometryFromGML(value.decode('utf-8'))
     return Geometry.from_ogr(ogr_geom)
 
 
@@ -283,11 +280,11 @@ class WFSConnection(Base, Resource):
                         else:
                             value = _property.text
                     elif datatype == FIELD_TYPE.DATE:
-                        value = date_fromisoformat(_property.text)
+                        value = date.fromisoformat(_property.text)
                     elif datatype == FIELD_TYPE.TIME:
-                        value = time_fromisoformat(_property.text)
+                        value = time.fromisoformat(_property.text)
                     elif datatype == FIELD_TYPE.DATETIME:
-                        value = datetime_fromisoformat(_property.text)
+                        value = datetime.fromisoformat(_property.text)
                     else:
                         raise ValidationError("Unknown data type: %s" % datatype)
                     fields[key] = value
@@ -311,7 +308,7 @@ class _path_attr(SP):
         if not url_pattern.match(value):
             raise ValidationError("Path is not a valid url.")
 
-        super(_path_attr, self).setter(srlzr, value)
+        super().setter(srlzr, value)
 
 
 class WFSConnectionSerializer(Serializer):
@@ -446,7 +443,7 @@ class WFSLayerSerializer(Serializer):
 
     def deserialize(self):
         self.data['srs'] = dict(id=3857)
-        super(self.__class__, self).deserialize()
+        super().deserialize()
 
 
 @implementer(

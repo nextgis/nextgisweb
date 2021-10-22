@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 from ..resource import Widget, Resource
 from .model import Connection, Layer
 from .util import _

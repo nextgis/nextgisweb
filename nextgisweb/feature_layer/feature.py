@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 from osgeo import ogr
-from six import ensure_str, ensure_text
 
 from .interface import FIELD_TYPE
 
@@ -38,7 +34,7 @@ class Feature(object):
             value = self._fields[label_field.keyname]
             if value is not None:
                 if label_field.datatype == FIELD_TYPE.STRING:
-                    return ensure_text(value)
+                    return value
                 else:
                     return '{}'.format(value)
 
@@ -47,9 +43,6 @@ class Feature(object):
 
     def __str__(self):
         return self.label
-
-    def __unicode__(self):
-        return self.__str__()
 
     @property
     def fields(self):
@@ -88,12 +81,10 @@ class Feature(object):
         )
 
         for field in self.fields:
-            ogr_feature[ensure_str(field)] = self.fields[
-                field
-            ]
+            ogr_feature[field] = self.fields[field]
 
         if fid is not None:
-            ogr_feature[ensure_str(fid)] = self.id
+            ogr_feature[fid] = self.id
 
         return ogr_feature
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 from collections import namedtuple
 import warnings
 
@@ -86,9 +84,6 @@ class UserException(Exception):
             translator(None)(self.message)
             if isinstance(self.message, TrString)
             else self.message)
-
-    def __unicode__(self):
-        return self.__str__()
 
 
 class ValidationError(UserException):

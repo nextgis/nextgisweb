@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import logging
 from collections import namedtuple, OrderedDict
 from datetime import datetime
-import six
 
 from bunch import Bunch
 from sqlalchemy import event, text
@@ -98,12 +95,12 @@ class ResourceMeta(db.DeclarativeMeta):
 
         setattr(cls, 'scope', scope)
 
-        super(ResourceMeta, cls).__init__(classname, bases, nmspc)
+        super().__init__(classname, bases, nmspc)
 
         resource_registry.register(cls)
 
 
-class Resource(six.with_metaclass(ResourceMeta, Base)):
+class Resource(Base, metaclass=ResourceMeta):
     registry = resource_registry
 
     identity = 'resource'
@@ -141,9 +138,6 @@ class Resource(six.with_metaclass(ResourceMeta, Base)):
 
     def __str__(self):
         return self.display_name
-
-    def __unicode__(self):
-        return self.__str__()
 
     @classmethod
     def check_parent(cls, parent):
@@ -333,7 +327,7 @@ class _parent_attr(SRR):
 
     def setter(self, srlzr, value):
         old_parent = srlzr.obj.parent
-        super(_parent_attr, self).setter(srlzr, value)
+        super().setter(srlzr, value)
 
         if old_parent == srlzr.obj.parent:
             return
@@ -360,7 +354,7 @@ class _owner_user_attr(SR):
         if not srlzr.user.is_administrator:
             raise ForbiddenError(
                 "Membership in group 'administrators' required!")
-        return super(_owner_user_attr, self).setter(srlzr, value)
+        return super().setter(srlzr, value)
 
 
 class _perms_attr(SP):
@@ -454,7 +448,7 @@ class ResourceSerializer(Serializer):
         # Save old values to track changes
         parent, display_name = self.obj.parent, self.obj.display_name
 
-        super(ResourceSerializer, self).deserialize(*args, **kwargs)
+        super().deserialize(*args, **kwargs)
 
         if parent != self.parent or display_name != self.display_name:
             with DBSession.no_autoflush:

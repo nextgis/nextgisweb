@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
 import multiprocessing
 import os
 import os.path
@@ -12,8 +10,8 @@ import uuid
 import warnings
 from collections import OrderedDict
 from datetime import datetime, timedelta
+from pathlib import Path
 from subprocess import check_output
-from six import ensure_str
 
 import requests
 from sqlalchemy import create_engine
@@ -35,7 +33,6 @@ from ..component import Component
 from ..lib.config import Option
 from ..models import DBSession
 from ..i18n import Localizer, Translations
-from ..compat import Path
 from ..package import pkginfo, enable_qualifications
 
 from .util import _
@@ -53,7 +50,7 @@ class CoreComponent(
     metadata = Base.metadata
 
     def __init__(self, env, settings):
-        super(CoreComponent, self).__init__(env, settings)
+        super().__init__(env, settings)
         self.debug = self.options['debug']
         self.locale_default = self.options['locale.default']
         self.locale_available = self.options['locale.available']
@@ -71,7 +68,7 @@ class CoreComponent(
             self.locale_available.sort()
 
     def initialize(self):
-        super(CoreComponent, self).initialize()
+        super().initialize()
 
         # Enable version and git qulifications only in development mode. In
         # production mode we trust package metadata.
@@ -236,7 +233,7 @@ class CoreComponent(
             multiprocessing.cpu_count(),
             get_cpu_model())))
 
-        mem_bytes = os.sysconf(ensure_str('SC_PAGE_SIZE')) * os.sysconf(ensure_str('SC_PHYS_PAGES'))
+        mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
         result.append((_("RAM"), "%d MB" % (float(mem_bytes) / 2**20)))
 
         result.append(("Python", '.'.join(map(str, sys.version_info[0:3]))))

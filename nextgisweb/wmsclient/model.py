@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
-
 import re
 import requests
 import json
@@ -120,7 +117,7 @@ class _url_attr(SP):
         if not url_pattern.match(value):
             raise ValidationError("Service url is not valid.")
 
-        super(_url_attr, self).setter(srlzr, value)
+        super().setter(srlzr, value)
 
 
 class _capcache_attr(SP):

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-from six import ensure_str
 import tempfile
 
 from osgeo import gdal
@@ -53,9 +50,8 @@ def export(request):
             finally:
                 gdal.DontUseExceptions()
 
-            response = FileResponse(tmp_file.name, content_type=(
-                ensure_str(driver.mime) if driver.mime else None))
-            response.content_disposition = ensure_str(content_disposition)
+            response = FileResponse(tmp_file.name, content_type=driver.mime)
+            response.content_disposition = content_disposition
             return response
 
     source_filename = env.raster_layer.workdir_filename(request.context.fileobj)

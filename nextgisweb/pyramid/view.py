@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-import sys
 import errno
 import os
 import os.path
 import logging
+from functools import lru_cache
 from time import sleep
 from datetime import datetime, timedelta
 from pkg_resources import resource_filename
 from hashlib import md5
-from six import reraise
 
 from psutil import Process
 from pyramid.response import Response, FileResponse
@@ -21,7 +18,6 @@ from ..env import env
 from .. import dynmenu as dm, pkginfo
 from ..core.exception import UserException
 from ..package import amd_packages
-from ..compat import lru_cache
 from ..auth.exception import InvalidCredentialsException, UserDisabledException
 
 from . import exception
@@ -48,7 +44,7 @@ def static_amd_file(request):
     except (OSError, IOError) as exc:
         if exc.errno in (errno.ENOENT, errno.EISDIR):
             raise HTTPNotFound()
-        reraise(*sys.exc_info())
+        raise
 
 
 @lru_cache(maxsize=64)
@@ -292,10 +288,6 @@ def setup_pyramid(comp, config):
     config.registry.settings['error.exc_response'] = error_handler
     config.include(exception)
 
-    config.add_tween(
-        'nextgisweb.pyramid.util.header_encoding_tween_factory',
-        over=('nextgisweb.pyramid.exception.unhandled_exception_tween_factory', ))
-
     # INTERNATIONALIZATION
 
     # Substitute localizer from pyramid with our own, original is
@@ -532,7 +524,7 @@ def _setup_pyramid_mako(comp, config):
 
     settings['pyramid.reload_templates'] = comp.env.core.debug
     settings['mako.directories'] = 'nextgisweb:templates/'
-    settings['mako.imports'] = ['import six', 'from nextgisweb.i18n import tcheck']
+    settings['mako.imports'] = ['from nextgisweb.i18n import tcheck']
     settings['mako.default_filters'] = ['tcheck', 'h'] if comp.env.core.debug else ['h', ]
 
     import pyramid_mako

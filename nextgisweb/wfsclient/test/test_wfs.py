@@ -1,17 +1,13 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
-import six
 import transaction
 from osgeo import gdal, ogr
 from shapely import affinity
 from shapely.geometry import Polygon
 
 from nextgisweb.auth import User
-from nextgisweb.compat import Path
 from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
@@ -44,7 +40,7 @@ def wfs_service_path(ngw_resource_group, ngw_httptest_app):
             parent_id=ngw_resource_group, display_name='type',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=six.text_type(uuid4().hex),
+            tbl_uuid=uuid4().hex,
         ).persist()
 
         dsource = type_geojson_dataset('type.geojson')

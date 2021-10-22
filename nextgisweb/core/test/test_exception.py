@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-import six
-
 import pytest
 from zope.interface import implementer
 
@@ -68,7 +64,7 @@ def test_user_exception():
             detail="Detail", data=dict(key="value"),
             http_status_code=418)
     except UserException as exc:
-        assert six.text_type(exc) == "UserException: Message"
+        assert str(exc) == "UserException: Message"
         assert exc.title == "Title"
         assert exc.message == "Message"
         assert exc.detail == "Detail"
@@ -77,7 +73,7 @@ def test_user_exception():
 
 def test_localizer():
     exc = UserException(message=_('The answer is %d') % 42)
-    assert six.text_type(exc) == "UserException: The answer is 42"
+    assert str(exc) == "UserException: The answer is 42"
 
 
 def test_positional_message():

@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 import os
 import pkg_resources
 import subprocess
 import re
 from imp import find_module
 from logging import getLogger
-from six import string_types
 
-from .compat import Path
+from pathlib import Path
 
 _logger = getLogger(__name__)
 _version_re = re.compile(r'(.+)\+([0-9a-f]{6,})(\.dirty)?$', re.IGNORECASE)
@@ -119,7 +116,7 @@ class PkgInfo(object):
             self._packages[package_name] = package
             components = package.pkginfo.get('components', dict())
             for (comp, cdefn) in components.items():
-                if isinstance(cdefn, string_types):
+                if isinstance(cdefn, str):
                     cdefn = dict(module=cdefn, enabled=True)
                 if 'enabled' not in cdefn:
                     cdefn['enabled'] = True

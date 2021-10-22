@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, unicode_literals, print_function, absolute_import
 from collections import namedtuple
-from six.moves.urllib.parse import unquote
+from urllib.parse import unquote
 
 from ..resource import Resource, Widget, resource_factory
 from ..dynmenu import DynItem, Label, Link
@@ -167,7 +165,7 @@ def setup_pyramid(comp, config):
 
     def shared_map_test(request):
         iframe = request.POST['iframe']
-        request.response.headerlist.append((str("X-XSS-Protection"), str("0")))
+        request.response.headerlist.append(("X-XSS-Protection", "0"))
         return dict(
             iframe=unquote(unquote(iframe))
         )
@@ -206,6 +204,6 @@ def setup_pyramid(comp, config):
 
     Resource.__psection__.register(
         key='description',
-        title=_(u"External access"),
+        title=_("External access"),
         template='nextgisweb:webmap/template/section_api_webmap.mako',
         is_applicable=lambda obj: obj.cls == 'webmap' and get_recursive_values(obj))
