@@ -11,12 +11,6 @@ from nextgisweb.models import DBSession
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid
 
 
-# def test_test():
-#     from nextgisweb.geojson import dumps
-#     v = [dict(a='b')]
-#     assert False, type(dumps(v))
-
-
 @pytest.mark.parametrize('wkt', (
     pytest.param('POINT (1 2)', id='point-2d'),
     pytest.param('POINT Z (1 2 3)', id='point-3d'),
