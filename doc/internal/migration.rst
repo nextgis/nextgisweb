@@ -168,16 +168,13 @@ both in one file.
 
 .. code-block:: python
 
-  # -*- coding: utf-8 -*-
   """ {
       "revision": "2e89a6fc", "parents": ["2c12ca17"],
       "date": "2021-01-09T22:47:12",
       "message": "Add another column"
   } """
 
-  from __future__ import division, unicode_literals, print_function, absolute_import
-
-
+  
   def forward(ctx):
       pass  # TODO: Write code here and remove this placeholder line!
 
