@@ -513,14 +513,24 @@ def cmd_poeditor_sync(args):
         if not msg_id in remote_terms:
             for comp_id in target_state[msg_id]:
                 if target_state[msg_id][comp_id]:
+                    logger.debug("ADD (%s, %s)", comp_id, msg_id)
                     terms_to_add.append(dict(term=msg_id, context=comp_id))
             continue
 
         for comp_id in target_state[msg_id]:
             if target_state[msg_id][comp_id] and comp_id not in remote_terms[msg_id]:
+                logger.debug("ADD (%s, %s)", comp_id, msg_id)
                 terms_to_add.append(dict(term=msg_id, context=comp_id))
             if not target_state[msg_id][comp_id] and comp_id in remote_terms[msg_id]:
+                logger.debug("DEL (%s, %s)", comp_id, msg_id)
                 terms_to_del.append(dict(term=msg_id, context=comp_id))
+
+    for msg_id, contexts in remote_terms.items():
+        if msg_id not in target_state:
+            for comp_id in contexts:
+                if comp_id in comps:
+                    logger.debug("DEL (%s, %s)", comp_id, msg_id)
+                    terms_to_del.append(dict(term=msg_id, context=comp_id))
 
     if len(terms_to_add) > 0 and args.no_dry_run:
         client.add_terms(poeditor_project_id, terms_to_add)
