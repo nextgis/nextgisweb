@@ -431,7 +431,7 @@ def cmd_poeditor_sync(args):
             force=False))
 
         for locale in locales:
-            if locale == 'ru':
+            if locale == 'ru' and locales != ['ru']:
                 po_path = catalog_filename(comp_id, locale)
                 if po_path.exists():
                     ref_catalog = reference_catalogs.get(locale)
