@@ -1,4 +1,5 @@
 <%inherit file='nextgisweb:templates/base.mako' />
+<%! import json %>
 <%! from nextgisweb.pyramid.util import _ %>
 <%! from nextgisweb.core import KindOfData %>
 <%! from markupsafe import Markup %>
@@ -99,13 +100,13 @@ ${tr(_("Some changes may be reflected only after full estimation."))}
 
         %if estimation_running:
             var estimateBtn = new Button({
-                label: '${tr(_("Estimation is in progress..."))}',
+                label: ${json.dumps(tr(_("Estimation is in progress...")), ensure_ascii=False) | n},
                 color: 'secondary',
                 disabled: true
             }, "estimateBtn");
         %else:
             var estimateBtn = new Button({
-                label: '${tr(_("Estimate storage"))}',
+                label: ${json.dumps(tr(_("Estimate storage")), ensure_ascii=False) | n},
                 color: 'secondary'
             }, "estimateBtn");
 
