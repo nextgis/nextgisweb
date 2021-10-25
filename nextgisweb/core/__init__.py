@@ -229,9 +229,9 @@ class CoreComponent(
                         return match.group(1).strip()
             return platform.processor()
 
+        cpu_model = re.sub(r'\(?(TM|R)\)', '', get_cpu_model())
         result.append((_("CPU"), '{} × {}'.format(
-            multiprocessing.cpu_count(),
-            get_cpu_model())))
+            multiprocessing.cpu_count(), cpu_model)))
 
         mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
         result.append((_("RAM"), "%d MB" % (float(mem_bytes) / 2**20)))
