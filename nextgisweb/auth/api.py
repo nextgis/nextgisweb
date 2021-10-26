@@ -8,7 +8,7 @@ from pyramid.httpexceptions import (
 from ..models import DBSession
 from ..core.exception import ValidationError
 
-from .models import User, Group
+from .models import User, Group, Principal
 from .util import _
 
 
@@ -45,6 +45,7 @@ def user_idelete(request):
     request.require_administrator()
     obj = User.filter_by(id=request.matchdict['id']).one()
     forbid_system_principal(obj)
+    check_principal_references(obj)
     DBSession.delete(obj)
     return None
 
@@ -112,6 +113,7 @@ def group_idelete(request):
     request.require_administrator()
     obj = Group.filter_by(id=request.matchdict['id']).one()
     forbid_system_principal(obj)
+    check_principal_references(obj)
     DBSession.delete(obj)
     return None
 
@@ -209,3 +211,19 @@ def setup_pyramid(comp, config):
 def forbid_system_principal(obj):
     if obj.system:
         raise ValidationError(_("System principals couldn't be chanded."))
+
+
+def check_principal_references(obj):
+    event = Principal.on_find_references(obj)
+    event.notify()
+
+    references_data = []
+    for cls, _id, autoremove in event.data:
+        if not autoremove:
+            references_data.append((cls, _id))
+
+    if len(references_data) > 0:
+        raise ValidationError(
+            message=_("User is referenced with resources")
+            if isinstance(obj, User) else _("Group is referenced with resources"),
+            data=dict(references_data=references_data))

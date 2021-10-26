@@ -6,7 +6,7 @@ from bunch import Bunch
 from sqlalchemy import event, text
 
 from .. import db
-from ..auth import Principal, User, Group
+from ..auth import Principal, User, Group, OnFindReferencesData
 from ..env import env
 from ..models import declarative_base, DBSession
 from ..registry import registry_maker
@@ -547,6 +547,22 @@ class ResourceACLRule(Base):
         return ((self.scope == '' and self.permission == '')
                 or (self.scope == pscope and self.permission == '')  # NOQA: W503
                 or (self.scope == pscope and self.permission == pname))  # NOQA: W503
+
+
+@Principal.on_find_references.handler
+def _on_find_references(event):
+    principal = event.principal
+    data = event.data
+
+    for acl in ResourceACLRule.filter_by(principal_id=principal.id).all():
+        resource = acl.resource
+        data.append(OnFindReferencesData(
+            cls=resource.cls, id=resource.id, autoremove=False))
+
+    if isinstance(principal, User):
+        for resource in Resource.filter_by(owner_user_id=principal.id).all():
+            data.append(OnFindReferencesData(
+                cls=resource.cls, id=resource.id, autoremove=False))
 
 
 class ResourceGroup(Resource):

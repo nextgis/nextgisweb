@@ -1,9 +1,11 @@
-from collections import OrderedDict
+from collections import namedtuple, OrderedDict
 from functools import lru_cache
 
 from passlib.hash import sha256_crypt
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from zope.event import notify
+from zope.event.classhandler import handler
 
 from ..env import env
 from ..models import declarative_base
@@ -26,6 +28,10 @@ tab_group_user = sa.Table(
 )
 
 
+OnFindReferencesData = namedtuple('OnFindReferencesData', [
+    'cls', 'id', 'autoremove'])
+
+
 class Principal(Base):
     __tablename__ = 'auth_principal'
 
@@ -34,6 +40,20 @@ class Principal(Base):
     system = sa.Column(sa.Boolean, nullable=False, default=False)
     display_name = sa.Column(sa.Unicode, nullable=False)
     description = sa.Column(sa.Unicode)
+
+    class on_find_references:
+        def __init__(self, principal):
+            self.principal = principal
+            self.data = []
+
+        def notify(self):
+            notify(self)
+
+        @classmethod
+        def handler(cls, fun):
+            @handler(cls)
+            def _handler(event):
+                fun(event)
 
     __mapper_args__ = dict(
         polymorphic_on=cls,

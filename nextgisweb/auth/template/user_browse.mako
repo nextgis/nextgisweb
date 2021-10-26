@@ -4,6 +4,7 @@
 <script type="text/javascript">
     require([
         "@nextgisweb/pyramid/tablesort",
+        "@nextgisweb/auth/browse",
         "dojo/domReady!"
     ], function (tablesort) {
         tablesort.byId("user-table");
@@ -25,8 +26,9 @@
                     <tr class="${'text-muted' if obj.disabled else ''}">
                         <td>${obj.display_name}</td>
                         <td>${obj.keyname}</td>
-                        <td>
-                            <a class="material-icons icon-edit" href="${request.route_url('auth.user.edit', id=obj.id)}"></a>
+                        <td class="fit-content">
+                            <a class="material-icons icon-edit" href="${request.route_url('auth.user.edit', id=obj.id)}" title="${tr(_('Edit'))}"></a>
+                            <a class="material-icons icon-close" onclick="principal_delete('U', ${obj.id})" title="${tr(_('Delete'))}"></a>
                         </td>
                     </tr>
                 %endfor
