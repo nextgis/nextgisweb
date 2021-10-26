@@ -1,6 +1,7 @@
 import os.path
-from shutil import copyfile, copyfileobj
+from shutil import copyfileobj
 
+import magic
 import zipfile
 
 from .. import db
@@ -18,6 +19,8 @@ from ..resource import (
 from .util import _, COMP_ID
 
 Base = declarative_base(dependencies=('resource', ))
+
+mime_valid = 'image/svg+xml'
 
 
 class SVGMarkerLibrary(Base, Resource):
@@ -65,7 +68,18 @@ class SVGMarker(Base):
 
 def validate_filename(filename):
     if os.path.isabs(filename) or filename != os.path.normpath(filename):
-        raise ValidationError("Insecure filename.")
+        raise ValidationError(_("Insecure filename \"%s\".") % filename)
+
+
+def validate_ext(filename, ext):
+    if ext.lower() != '.svg':
+        raise ValidationError(_("File \"%s\" has an invalid extension.") % filename)
+
+
+def validate_mime(filename, buf):
+    mime = magic.from_buffer(buf, mime=True)
+    if mime != mime_valid:
+        raise ValidationError(_("File type \"%s\" is not SVG.") % filename)
 
 
 class _archive_attr(SP):
@@ -90,14 +104,16 @@ class _archive_attr(SP):
                 validate_filename(filename)
 
                 name, ext = os.path.splitext(filename)
-                if ext.lower() != '.svg':
-                    raise ValidationError("File \"%s\" has an invalid extension" % filename)
+                validate_ext(filename, ext)
 
                 fileobj = env.file_storage.fileobj(component=COMP_ID)
 
                 dstfile = env.file_storage.filename(fileobj, makedirs=True)
-                with archive.open(filename, 'r') as sf, open(dstfile, 'w+b') as df:
-                    copyfileobj(sf, df)
+                with archive.open(filename, 'r') as sf:
+                    validate_mime(filename, sf.read(1024))
+                    sf.seek(0)
+                    with open(dstfile, 'wb') as df:
+                        copyfileobj(sf, df)
 
                 srlzr.obj.files.append(SVGMarker(name=name, fileobj=fileobj))
 
@@ -110,12 +126,19 @@ class _files_attr(SP):
     def setter(self, srlzr, value):
         files_info = dict()
         for f in value:
-            filename = f.pop('name')
+            filename = f['name']
             validate_filename(filename)
             name, ext = os.path.splitext(filename)
-            if 'id' in f and ext.lower() != '.svg':
-                raise ValidationError("File \"%s\" has an invalid extension" % filename)
+            if 'id' in f:
+                validate_ext(filename, ext)
             files_info[name] = f
+
+        def copy_file_validate(srcfile, dstfile, filename):
+            with open(srcfile, 'rb') as sf:
+                validate_mime(filename, sf.read(1024))
+                sf.seek(0)
+                with open(dstfile, 'wb') as df:
+                    copyfileobj(sf, df)
 
         removed_files = list()
         for svg_marker in srlzr.obj.files:
@@ -126,7 +149,7 @@ class _files_attr(SP):
                 if 'id' in file_info:  # Updated file
                     srcfile, metafile = env.file_upload.get_filename(file_info['id'])
                     dstfile = env.file_storage.filename(svg_marker.fileobj, makedirs=False)
-                    copyfile(srcfile, dstfile)
+                    copy_file_validate(srcfile, dstfile, file_info['name'])
                 else:  # Untouched file
                     pass
 
@@ -138,7 +161,7 @@ class _files_attr(SP):
 
             srcfile, metafile = env.file_upload.get_filename(file_info['id'])
             dstfile = env.file_storage.filename(fileobj, makedirs=True)
-            copyfile(srcfile, dstfile)
+            copy_file_validate(srcfile, dstfile, file_info['name'])
 
             svg_marker = SVGMarker(name=name, fileobj=fileobj)
 
