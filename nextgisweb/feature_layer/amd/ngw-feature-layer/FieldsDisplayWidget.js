@@ -39,6 +39,7 @@ define([
         grid_visibility: false,
 
         urlRE: new RegExp("^" + regexp.url({scheme: true}) + "$"),
+        emailRE: new RegExp("^" + regexp.emailAddress() + "$"),
 
         buildRendering: function () {
             this.inherited(arguments);
@@ -102,12 +103,16 @@ define([
 
                 if (val !== null) {
                     if (this.urlRE.test(val)) {
-                        put(tbody, "tr th.display_name $ < td.value a[href=$][target='_blank'] $", fieldmap[k].display_name, val, val);
+                        put(tbody, "tr th.display_name $ < td.value a[href=$][target='_blank'] $", 
+                            fieldmap[k].display_name, val, val);
+                    } else if (this.emailRE.test(val)) {
+                        put(tbody, "tr th.display_name $ < td.value a[href=$] $", 
+                            fieldmap[k].display_name, 'mailto:' + val, val);
                     } else {
                         if (field.lookup_table !== null) {
                             var lval = lookupTableCached.lookup(field.lookup_table.id, val);
                             if (lval !== null) { val = "[" + val + "] " + lval }
-                        };
+                        }
                         put(tbody, "tr th.display_name $ < td.value $", fieldmap[k].display_name, val);
                     }
                 } else {
