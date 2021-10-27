@@ -104,21 +104,11 @@ class RenderComponent(Component):
 
     def estimate_storage(self):
         for tc in ResourceTileCache.filter_by(enabled=True).all():
-            if tc.ttl is not None:
-                now_unix = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
-                where_sql = ' WHERE tstamp > %d' % (now_unix - tc.ttl)
-            else:
-                where_sql = None
-
             tilestor, lock = tc.get_tilestor()
             query_tile = 'SELECT coalesce(sum(length(data) + 16), 0) FROM tile'  # with 4x int columns
-            if where_sql is not None:
-                query_tile += where_sql
             size_img = tilestor.execute(query_tile).fetchone()[0]
 
             query = 'SELECT count(1) FROM tile_cache."{}"'.format(tc.uuid.hex)
-            if where_sql is not None:
-                query += where_sql
             count = DBSession.execute(query).scalar()
             size_color = count * 20  # 5x int columns
 
