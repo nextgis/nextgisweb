@@ -1,12 +1,14 @@
 import os
 import os.path
 from datetime import datetime
+from pathlib import Path
 
+import sqlalchemy as sa
 import transaction
+from sqlalchemy.dialects import postgresql, sqlite
 from zope.sqlalchemy import mark_changed
 
 from ..lib.config import Option
-from ..compat import Path
 from ..component import Component, require
 from ..core import KindOfData
 from ..models import DBSession
@@ -18,7 +20,7 @@ from .interface import (
     ITileRenderRequest,
     ILegendableStyle,
 )
-from .model import Base, ResourceTileCache, TIMESTAMP_EPOCH
+from .model import Base, ResourceTileCache as RTC, TIMESTAMP_EPOCH
 from .event import (
     on_style_change,
     on_data_change,
@@ -76,13 +78,14 @@ class RenderComponent(Component):
         self.logger.info("Cleaning up tile cache tables...")
 
         root = Path(self.tile_cache_path)
-        deleted_files = deleted_tables = 0
+        deleted_tiles = deleted_files = deleted_tables = 0
 
         with transaction.manager:
             for row in DBSession.execute('''
                 SELECT t.tablename
                 FROM pg_catalog.pg_tables t
-                LEFT JOIN public.resource_tile_cache r ON replace(r.uuid::character varying, '-', '') = t.tablename::character varying
+                LEFT JOIN resource_tile_cache r
+                    ON replace(r.uuid::character varying, '-', '') = t.tablename::character varying
                 WHERE t.schemaname = 'tile_cache' AND r.resource_id IS NULL
             '''):
                 tablename = row[0]
@@ -95,15 +98,53 @@ class RenderComponent(Component):
 
             mark_changed(DBSession())
 
-        self.logger.info("Deleted: %d files, %d tables.",
-                         deleted_files, deleted_tables)
+        now_unix = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
+
+        with transaction.manager:
+            conn_pg = DBSession.connection()
+
+            for tc in RTC.filter(
+                sa.or_(RTC.ttl.isnot(None), RTC.max_z.isnot(None))
+            ).all():
+                cond = []
+                if tc.max_z is not None:
+                    cond.append(sa.column('z') > tc.max_z)
+                if tc.ttl is not None:
+                    cond.append(sa.column('tstamp') < now_unix - tc.ttl)
+
+                where = sa.or_(*cond)
+
+                def statement(dialect, table, schema=None):
+                    table = sa.sql.table(table)
+                    table.quote = True
+                    if schema is not None:
+                        table.schema = schema
+                        table.quote_schema = True
+                    stmt = table.delete().where(where)
+                    return stmt.compile(dialect=dialect, compile_kwargs=dict(literal_binds=True))
+
+                stmt = statement(postgresql.dialect(), tc.uuid.hex, 'tile_cache')
+                result = conn_pg.execute(stmt)
+                deleted_tiles += result.rowcount
+
+                stmt2 = statement(sqlite.dialect(), 'tile')
+                conn_sqlite, lock = tc.get_tilestor()
+                with lock:
+                    result = conn_sqlite.execute(str(stmt2))
+                    conn_sqlite.commit()
+                    deleted_tiles += result.rowcount
+
+            mark_changed(DBSession())
+
+        self.logger.info("Deleted: %d tile records, %d files, %d tables.",
+                         deleted_tiles, deleted_files, deleted_tables)
 
     def backup_configure(self, config):
         super().backup_configure(config)
         config.exclude_table_data('tile_cache', '*')
 
     def estimate_storage(self):
-        for tc in ResourceTileCache.filter_by(enabled=True).all():
+        for tc in RTC.filter_by(enabled=True).all():
             tilestor, lock = tc.get_tilestor()
             query_tile = 'SELECT coalesce(sum(length(data) + 16), 0) FROM tile'  # with 4x int columns
             size_img = tilestor.execute(query_tile).fetchone()[0]
