@@ -38,6 +38,8 @@ __all__ = [
     'on_data_change',
 ]
 
+vacuum_freepage_coeff = 0.5
+
 
 class TileCacheData(KindOfData):
     identity = 'tile_cache'
@@ -129,10 +131,20 @@ class RenderComponent(Component):
 
                 stmt2 = statement(sqlite.dialect(), 'tile')
                 conn_sqlite, lock = tc.get_tilestor()
+
                 with lock:
                     result = conn_sqlite.execute(str(stmt2))
                     conn_sqlite.commit()
                     deleted_tiles += result.rowcount
+
+                    freelist_count, page_count = conn_sqlite.execute(
+                        'SELECT fc.freelist_count, pc.page_count '
+                        'FROM pragma_freelist_count fc, pragma_page_count pc;').fetchone()
+
+                    if page_count > 0 and (freelist_count / page_count > vacuum_freepage_coeff):
+                        self.logger.info('VACUUM database %s...' % tc.tilestor_path)
+                        conn_sqlite.execute('VACUUM;')
+                        conn_sqlite.commit()
 
             mark_changed(DBSession())
 
