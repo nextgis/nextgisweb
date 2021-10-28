@@ -124,7 +124,6 @@ define([
 
             if (this.modeSwitcher.get("value") === 'file') {
                 setObject("source", this.wSourceFile.get("value"));
-                setObject("encoding", this.wEncoding.get("value"));
                 if (this.wSourceLayer.get("options").length > 1) {
                     setObject("source_layer", this.wSourceLayer.get("value"));
                 }

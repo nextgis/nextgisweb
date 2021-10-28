@@ -7,7 +7,7 @@ from .util import _
 def dataset(request):
     source = request.json_body['source']
     datafile, metafile = request.env.file_upload.get_filename(source['id'])
-    ogrds, strdecode = read_dataset(datafile)
+    ogrds = read_dataset(datafile)
     if ogrds is None:
         raise ValidationError(_("GDAL library failed to open file."))
 

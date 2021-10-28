@@ -60,7 +60,7 @@ from ..feature_layer import (
     query_feature_or_not_found)
 
 from .kind_of_data import VectorLayerData
-from .util import _, COMP_ID
+from .util import _, COMP_ID, fix_encoding, utf8len
 
 
 GEOM_TYPE_DB = (
@@ -168,7 +168,7 @@ class FieldDef(object):
 
     def __init__(
         self, key, keyname, datatype, uuid, display_name=None,
-        label_field=None, grid_visibility=None
+        label_field=None, grid_visibility=None, ogrindex=None
     ):
         self.key = key
         self.keyname = keyname
@@ -177,6 +177,7 @@ class FieldDef(object):
         self.display_name = display_name
         self.label_field = label_field
         self.grid_visibility = grid_visibility
+        self.ogrindex = ogrindex
 
 
 class TableInfo(object):
@@ -191,8 +192,8 @@ class TableInfo(object):
         self.geometry_type = None
 
     @classmethod
-    def from_ogrlayer(cls, ogrlayer, srs_id, strdecode, skip_other_geometry_types,
-                      fid_params, geom_cast_params):
+    def from_ogrlayer(cls, ogrlayer, srs_id, skip_other_geometry_types,
+                      fid_params, geom_cast_params, fix_errors):
         self = cls(srs_id)
 
         if geom_cast_params['geometry_type'] == GEOM_TYPE.POINT:
@@ -278,8 +279,6 @@ class TableInfo(object):
                 err_msg += " " + _("Source layer contains no features satisfying the conditions.")
             raise VE(message=err_msg)
 
-        self.fields = []
-
         defn = ogrlayer.GetLayerDefn()
 
         if fid_params['fid_source'] in (FID_SOURCE.AUTO, FID_SOURCE.FIELD):
@@ -299,13 +298,38 @@ class TableInfo(object):
                     else:
                         raise VE(_("None of fields %s are integer.") % fid_params['fid_field'])
 
+        self.fields = []
+        field_suffix_pattern = re.compile(r'(.*)_(\d+)')
+
         for i in range(defn.GetFieldCount()):
             if i == self.fid_field_index:
                 continue
             fld_defn = defn.GetFieldDefn(i)
 
-            # TODO: Fix invalid field names as done for attributes.
-            fld_name = strdecode(fld_defn.GetNameRef())
+            fld_name = fld_defn.GetNameRef()
+            fixed_fld_name = fix_encoding(fld_name)
+            if fld_name != fixed_fld_name:
+                if fix_errors == ERROR_FIX.LOSSY:
+                    if fixed_fld_name == '':
+                        fixed_fld_name = 'fld_1'
+                    while True:
+                        unique_check = True
+                        for field in self.fields:
+                            if field.keyname == fixed_fld_name:
+                                unique_check = False
+
+                                match = field_suffix_pattern.match(fixed_fld_name)
+                                if match is None:
+                                    fixed_fld_name = fixed_fld_name + '_1'
+                                else:
+                                    n = int(match[2]) + 1
+                                    fixed_fld_name = '%s_%d' % (match[1], n)
+                                break
+                        if unique_check:
+                            break
+                    fld_name = fixed_fld_name
+                else:
+                    raise VE(_("Field '%s(?)' encoding is broken.") % fixed_fld_name)
             if fld_name.lower() in FIELD_FORBIDDEN_NAME:
                 raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)  # NOQA: E501
 
@@ -330,7 +354,8 @@ class TableInfo(object):
                 'fld_%s' % uid,
                 fld_name,
                 fld_type,
-                uid
+                uid,
+                ogrindex=i
             ))
 
         return self
@@ -372,9 +397,9 @@ class TableInfo(object):
 
         return self
 
-    def __getitem__(self, keyname):
+    def find_field(self, ogrindex):
         for f in self.fields:
-            if f.keyname == keyname:
+            if f.ogrindex == ogrindex:
                 return f
 
     def setup_layer(self, layer):
@@ -442,7 +467,7 @@ class TableInfo(object):
         self.model = model
         self.fmap = {fld.keyname: fld.key for fld in self.fields}
 
-    def load_from_ogr(self, ogrlayer, strdecode, skip_other_geometry_types,
+    def load_from_ogr(self, ogrlayer, skip_other_geometry_types,
                       fix_errors, skip_errors):
         source_osr = ogrlayer.GetSpatialRef()
         target_osr = osr.SpatialReference()
@@ -452,9 +477,6 @@ class TableInfo(object):
             if not source_osr.IsSame(target_osr) else None
 
         errors = []
-
-        def utf8len(s):
-            return len(s.encode('utf-8'))
 
         num_features = 0
         static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]
@@ -571,7 +593,7 @@ class TableInfo(object):
                 geom.Set3D(True)
             elif not has_z and geom.Is3D():
                 geom.Set3D(False)
-          
+
             # Points can't have validity errors.
             is_single = _GEOM_OGR_2_TYPE[gtype] not in GEOM_TYPE.is_multi
             is_point = _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.points
@@ -610,7 +632,7 @@ class TableInfo(object):
                             break
                     if error_found:
                         continue
-                
+
                 # NOTE: Disabled for better times.
                 # Check for topology errors and fix them as possible.
                 # invalid = True
@@ -628,6 +650,8 @@ class TableInfo(object):
             for k in range(feature.GetFieldCount()):
                 if k == self.fid_field_index:
                     continue
+                field = self.find_field(k)
+
                 fld_type = feature.GetFieldDefnRef(k).GetType()
 
                 if (not feature.IsFieldSet(k) or feature.IsFieldNull(k)):
@@ -659,21 +683,19 @@ class TableInfo(object):
                     # TODO: encoding
                     fld_value = json.dumps(feature.GetFieldAsStringList(k))
                 elif fld_type == ogr.OFTString:
-                    try:
-                        fld_value = strdecode(feature.GetFieldAsString(k))
-                    except UnicodeDecodeError:
-                        errors.append(_(
-                            "It seems like declared and actual attributes "
-                            "encodings do not match. Unable to decode "
-                            "attribute #%(attr)d of feature #%(feat)d. "
-                            "Try declaring different encoding.") % dict(
-                            feat=fid, attr=i))
-                        continue
+                    fld_value = feature.GetFieldAsString(k)
+                    fixed_fld_value = fix_encoding(fld_value)
+                    if fld_value != fixed_fld_value:
+                        if fix_errors == ERROR_FIX.LOSSY:
+                            fld_value = fixed_fld_value
+                        else:
+                            errors.append(_("Feature #%d contains a broken encoding of field '%s'.")
+                                          % (fid, field.keyname))
+                            continue
 
-                fld_name = strdecode(feature.GetFieldDefnRef(k).GetNameRef())
-                fld_values[self[fld_name].key] = fld_value
+                fld_values[field.key] = fld_value
 
-                if fld_name in string_fields and fld_value is not None:
+                if field.keyname in string_fields and fld_value is not None:
                     dynamic_size += utf8len(fld_value)
 
             if len(errors) > 0 and not skip_errors:
@@ -748,13 +770,14 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def _tablename(self):
         return 'layer_%s' % self.tbl_uuid
 
-    def setup_from_ogr(self, ogrlayer, strdecode=lambda x: x,
+    def setup_from_ogr(self, ogrlayer,
                        skip_other_geometry_types=False,
                        fid_params=fid_params_default,
-                       geom_cast_params=geom_cast_params_default):
+                       geom_cast_params=geom_cast_params_default,
+                       fix_errors=ERROR_FIX.default):
         tableinfo = TableInfo.from_ogrlayer(
-            ogrlayer, self.srs.id, strdecode, skip_other_geometry_types,
-            fid_params, geom_cast_params)
+            ogrlayer, self.srs.id, skip_other_geometry_types,
+            fid_params, geom_cast_params, fix_errors)
         tableinfo.setup_layer(self)
 
         tableinfo.setup_metadata(self._tablename)
@@ -772,11 +795,10 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         self.tableinfo = tableinfo
 
-    def load_from_ogr(self, ogrlayer, strdecode=lambda x: x,
-                      skip_other_geometry_types=False,
+    def load_from_ogr(self, ogrlayer, skip_other_geometry_types=False,
                       fix_errors=ERROR_FIX.default, skip_errors=skip_errors_default):
         size = self.tableinfo.load_from_ogr(
-            ogrlayer, strdecode, skip_other_geometry_types, fix_errors, skip_errors)
+            ogrlayer, skip_other_geometry_types, fix_errors, skip_errors)
 
         env.core.reserve_storage(COMP_ID, VectorLayerData, value_data_volume=size, resource=self)
 
@@ -1022,10 +1044,9 @@ VE = ValidationError
 
 class _source_attr(SP):
 
-    def _ogrds(self, filename, encoding):
-        ogrds, strdecode = read_dataset(
-            filename, encoding=encoding,
-            allowed_drivers=DRIVERS.enum, open_options=OPEN_OPTIONS)
+    def _ogrds(self, filename):
+        ogrds = read_dataset(
+            filename, allowed_drivers=DRIVERS.enum, open_options=OPEN_OPTIONS)
 
         if ogrds is None:
             ogrds = ogr.Open(filename, 0)
@@ -1035,7 +1056,7 @@ class _source_attr(SP):
                 drivername = ogrds.GetDriver().GetName()
                 raise VE(_("Unsupport OGR driver: %s.") % drivername)
 
-        return ogrds, strdecode
+        return ogrds
 
     def _ogrlayer(self, ogrds, layer_name=None):
         if layer_name is not None:
@@ -1059,15 +1080,16 @@ class _source_attr(SP):
         return ogrlayer
 
     def _setup_layer(self, obj, ogrlayer, skip_other_geometry_types, fix_errors, skip_errors,
-                     geom_cast_params, fid_params, strdecode):
+                     geom_cast_params, fid_params):
         if ogrlayer.GetSpatialRef() is None:
             raise VE(_("Layer doesn't contain coordinate system information."))
 
         obj.tbl_uuid = uuid.uuid4().hex
 
         with DBSession.no_autoflush:
-            obj.setup_from_ogr(ogrlayer, strdecode, skip_other_geometry_types, fid_params, geom_cast_params)
-            obj.load_from_ogr(ogrlayer, strdecode, skip_other_geometry_types, fix_errors, skip_errors)
+            obj.setup_from_ogr(ogrlayer, skip_other_geometry_types, fid_params,
+                               geom_cast_params, fix_errors)
+            obj.load_from_ogr(ogrlayer, skip_other_geometry_types, fix_errors, skip_errors)
 
     def setter(self, srlzr, value):
         if srlzr.obj.id is not None:
@@ -1075,12 +1097,7 @@ class _source_attr(SP):
 
         datafile, metafile = env.file_upload.get_filename(value['id'])
 
-        encoding = srlzr.data.get('encoding')
-        if encoding is None:
-            # backward compatibility
-            encoding = value.get('encoding', 'utf-8')
-
-        ogrds, strdecode = self._ogrds(datafile, encoding)
+        ogrds = self._ogrds(datafile)
 
         layer_name = srlzr.data.get('source_layer')
         ogrlayer = self._ogrlayer(ogrds, layer_name=layer_name)
@@ -1122,7 +1139,7 @@ class _source_attr(SP):
         )
 
         self._setup_layer(srlzr.obj, ogrlayer, skip_other_geometry_types, fix_errors, skip_errors,
-                          geom_cast_params, fid_params, strdecode)
+                          geom_cast_params, fid_params)
 
 
 class _fields_attr(SP):
