@@ -98,7 +98,8 @@ class RenderComponent(Component):
                 DBSession.execute('DROP TABLE "tile_cache"."%s"' % tablename)
                 deleted_tables += 1
 
-            mark_changed(DBSession())
+            if deleted_tables > 0:
+                mark_changed(DBSession())
 
         now_unix = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
 
@@ -144,7 +145,6 @@ class RenderComponent(Component):
                     if page_count > 0 and (freelist_count / page_count > vacuum_freepage_coeff):
                         self.logger.info('VACUUM database %s...' % tc.tilestor_path)
                         conn_sqlite.execute('VACUUM;')
-                        conn_sqlite.commit()
 
             mark_changed(DBSession())
 
