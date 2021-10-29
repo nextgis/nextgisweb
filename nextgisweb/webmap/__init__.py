@@ -1,6 +1,6 @@
-import codecs
 import json
 from pkg_resources import resource_filename
+from pathlib import Path
 
 from ..lib.config import Option
 from ..component import Component, require
@@ -16,6 +16,11 @@ from .util import _
 class WebMapComponent(Component):
     identity = 'webmap'
     metadata = Base.metadata
+
+    def initialize(self):
+        super().initialize()
+        basemaps_path = Path(self.options['basemaps'])
+        self.basemaps = json.loads(basemaps_path.read_text())
 
     @require('resource', 'auth')
     def initialize_db(self):
@@ -33,11 +38,8 @@ class WebMapComponent(Component):
         view.setup_pyramid(self, config)
 
     def client_settings(self, request):
-        with codecs.open(self.options['basemaps'], 'rb', 'utf-8') as fp:
-            basemaps = json.load(fp)
-
         result = dict(
-            basemaps=basemaps,
+            basemaps=self.basemaps,
             annotation=self.options['annotation'],
             adapters=dict(
                 (i.identity, dict(display_name=i.display_name))
