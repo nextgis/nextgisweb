@@ -397,9 +397,11 @@ class TableInfo(object):
 
         return self
 
-    def find_field(self, ogrindex):
+    def find_field(self, keyname=None, ogrindex=None):
         for f in self.fields:
-            if f.ogrindex == ogrindex:
+            if keyname is not None and f.keyname == keyname:
+                return f
+            if ogrindex is not None and f.ogrindex == ogrindex:
                 return f
 
     def setup_layer(self, layer):
@@ -650,7 +652,7 @@ class TableInfo(object):
             for k in range(feature.GetFieldCount()):
                 if k == self.fid_field_index:
                     continue
-                field = self.find_field(k)
+                field = self.find_field(ogrindex=k)
 
                 fld_type = feature.GetFieldDefnRef(k).GetType()
 
@@ -1350,7 +1352,8 @@ class FeatureQueryBase(object):
                 if k == 'id':
                     where.append(table.columns.id == v)
                 else:
-                    where.append(table.columns[tableinfo[k].key] == v)
+                    field = tableinfo.find_field(keyname=k)
+                    where.append(table.columns[field.key] == v)
 
         if self._filter:
             token = []
@@ -1390,7 +1393,8 @@ class FeatureQueryBase(object):
                 if k == "id":
                     token.append(op(table.columns.id, v))
                 else:
-                    token.append(op(table.columns[tableinfo[k].key], v))
+                    field = tableinfo.find_field(keyname=k)
+                    token.append(op(table.columns[field.key], v))
 
             where.append(db.and_(*token))
 
@@ -1402,10 +1406,12 @@ class FeatureQueryBase(object):
                     if table_column == 'id':
                         token.append(op(table.columns.id, val))
                     else:
-                        token.append(op(table.columns[tableinfo[table_column].key], val))
+                        field = tableinfo.find_field(keyname=table_column)
+                        token.append(op(table.columns[field.key], val))
                 elif len(_filter_sql_item) == 4:
                     table_column, op, val1, val2 = _filter_sql_item
-                    token.append(op(table.columns[tableinfo[table_column].key], val1, val2))
+                    field = tableinfo.find_field(keyname=table_column)
+                    token.append(op(table.columns[field.key], val1, val2))
 
             where.append(db.and_(*token))
 
@@ -1430,8 +1436,9 @@ class FeatureQueryBase(object):
         order_criterion = []
         if self._order_by:
             for order, colname in self._order_by:
+                field = tableinfo.find_field(keyname=colname)
                 order_criterion.append(dict(asc=db.asc, desc=db.desc)[order](
-                    table.columns[tableinfo[colname].key]))
+                    table.columns[field.key]))
         order_criterion.append(table.columns.id)
 
         class QueryFeatureSet(FeatureSet):
