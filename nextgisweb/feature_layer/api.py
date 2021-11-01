@@ -340,8 +340,11 @@ def deserialize(feat, data, geom_format='wkt', dt_format='obj', transformer=None
                 ext.deserialize(feat, data['extensions'][cls.identity])
 
 
-def serialize(feat, keys=None, geom_format='wkt', dt_format='obj', extensions=[]):
+def serialize(feat, keys=None, geom_format='wkt', dt_format='obj', label=False, extensions=[]):
     result = OrderedDict(id=feat.id)
+
+    if label:
+        result['label'] = feat.label
 
     if feat.geom is not None:
         if geom_format == 'wkt':
@@ -509,7 +512,8 @@ def cget(resource, request):
     srlz_params = dict(
         geom_format=request.GET.get('geom_format', 'wkt').lower(),
         dt_format=request.GET.get('dt_format', 'obj'),
-        extensions=_extensions(request.GET.get('extensions'), resource)
+        label=request.GET.get('label', False),
+        extensions=_extensions(request.GET.get('extensions'), resource),
     )
 
     query = resource.feature_query()

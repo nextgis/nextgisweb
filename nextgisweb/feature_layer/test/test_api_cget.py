@@ -85,7 +85,8 @@ def get_features_for_orderby_test():
             "properties": {
                 "int": num,
                 "string": text
-            }
+            },
+            "label": "label"
         }
         features.append(feature)
 
@@ -101,3 +102,13 @@ def test_cget_extensions(ngw_webtest_app, vector_layer_id, ngw_auth_administrato
 
     resp = ngw_webtest_app.get('/api/resource/%d/feature/?extensions=description,attachment' % vector_layer_id)
     assert resp.json[0]['extensions'] == dict(description=None, attachment=None)
+
+
+def test_there_is_no_label_by_default(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+    resp = ngw_webtest_app.get('/api/resource/%d/feature/' % vector_layer_id)
+    assert 'label' not in resp.json[0]
+
+
+def test_return_label_by_parameter(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+    resp = ngw_webtest_app.get('/api/resource/%d/feature/?label=true' % vector_layer_id)
+    assert 'label' in resp.json[0]
