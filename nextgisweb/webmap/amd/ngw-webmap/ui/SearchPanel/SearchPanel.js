@@ -4,6 +4,7 @@ define([
     "dijit/_WidgetBase",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
+    "dojo/topic",
     "dojo/Deferred",
     "dojo/request/xhr",
     "openlayers/ol",
@@ -12,7 +13,7 @@ define([
     "dojo/dom-construct",
     "dojo/_base/lang",
     "dojo/_base/array",
-    "ngw-feature-layer/FeatureStore",
+    "@nextgisweb/pyramid/api",
     // settings
     "@nextgisweb/pyramid/settings!webmap",
     // templates
@@ -25,6 +26,7 @@ define([
     _WidgetBase,
     DynamicPanel,
     BorderContainer,
+    topic,
     Deferred,
     xhr,
     ol,
@@ -33,88 +35,96 @@ define([
     domConstruct,
     lang,
     array,
-    FeatureStore,
+    api,
     webmapSettings,
     template
 ) {
-    return declare([DynamicPanel, BorderContainer],{
+    const GEO_JSON_FORMAT = new ol.format.GeoJSON();
+    
+    return declare([DynamicPanel, BorderContainer], {
         inputTimer: undefined,
         statusPane: undefined,
         MAX_SEARCH_RESULTS: 100,
         templateString: i18n.renderTemplate(template),
         activeResult: undefined,
         constructor: function (options) {
-            declare.safeMixin(this,options);
+            declare.safeMixin(this, options);
         },
-        postCreate: function(){
+        postCreate: function () {
             this.inherited(arguments);
 
             var widget = this;
 
-             on(this.searchField, "focus", function(){
-                 domClass.add(widget.titleNode, "focus");
-             });
+            on(this.searchField, "focus", function () {
+                domClass.add(widget.titleNode, "focus");
+            });
 
-             on(this.searchField, "blur", function(){
-                 domClass.remove(widget.titleNode, "focus");
-             });
+            on(this.searchField, "blur", function () {
+                domClass.remove(widget.titleNode, "focus");
+            });
 
-             on(this.searchField, "input", function(e){
-                if (widget.inputTimer) { clearInterval(widget.inputTimer); }
-                widget.inputTimer = setInterval(function() {
+            on(this.searchField, "input", function (e) {
+                if (widget.inputTimer) {
+                    clearInterval(widget.inputTimer);
+                }
+                widget.inputTimer = setInterval(function () {
                     clearInterval(widget.inputTimer);
                     widget.search();
                     widget.inputTimer = undefined;
                 }, 750);
-             });
+            });
 
-             on(this.searchIcon, "click", function(e){
-                 if (widget.inputTimer) { clearInterval(widget.inputTimer); }
-                 widget.search();
-                 widget.inputTimer = undefined;
-             });
+            on(this.searchIcon, "click", function (e) {
+                if (widget.inputTimer) {
+                    clearInterval(widget.inputTimer);
+                }
+                widget.search();
+                widget.inputTimer = undefined;
+            });
         },
-        show: function(){
+        show: function () {
             this.inherited(arguments);
             var widget = this;
 
-            setTimeout(function(){
+            setTimeout(function () {
                 widget.searchField.focus();
             }, 300);
         },
-        hide: function(){
+        hide: function () {
             this.inherited(arguments);
             this.clearAll();
         },
-        setStatus: function(text, statusClass){
+        setStatus: function (text, statusClass) {
             var statusClass = statusClass ? "search-panel__status " + statusClass : "search-panel__status";
 
             if (this.statusPane) this.removeStatus();
 
-            this.statusPane = domConstruct.create("div",{
+            this.statusPane = domConstruct.create("div", {
                 id: "search-panel-status",
                 class: statusClass,
                 innerHTML: text
             });
             domConstruct.place(this.statusPane, this.contentNode, "last");
         },
-        removeStatus: function(){
-            if (this.statusPane){
+        removeStatus: function () {
+            if (this.statusPane) {
                 domConstruct.destroy(this.statusPane);
             }
         },
-        search: function(){
+        search: function () {
             var widget = this,
                 criteria = this.searchField.value;
-            if (this._lastCriteria == criteria) { return; }
+            if (this._lastCriteria === criteria) {
+                return;
+            }
 
-            if (criteria === "" ) {
+            if (criteria === "") {
                 this.clearSearchResults();
                 return;
             }
 
             widget.removeStatus();
-            if (this.searchResultsList ) {
+            if (this.searchResultsList) {
                 this.clearSearchResults();
             }
 
@@ -133,32 +143,41 @@ define([
                         pluginConfig = itmConfig.plugin["ngw-webmap/plugin/FeatureLayer"];
 
                     if (pluginConfig !== undefined && pluginConfig.likeSearch) {
-                        var store = new FeatureStore({
-                            layer: layerId,
-                            featureBox: true
-                        });
-
                         var cdeferred = deferred,
                             ndeferred = new Deferred();
 
                         deferred.then(function (limit) {
-                            console.log("Searching layer=" + layerId + " with limit=" + limit);
-                            store.query({ like: criteria }, {
-                                start: 0,
-                                count: limit + 1
-                            }).forEach(lang.hitch(this, function(itm) {
-                                if (limit > 0) {
-                                    widget.addSearchResult(itm);
+                            const url = api.routeURL('feature_layer.feature.collection', {
+                                id: layerId
+                            });
+
+                            xhr.get(url, {
+                                handleAs: 'json',
+                                query: {
+                                    like: criteria,
+                                    limit: limit,
+                                    geom_format: 'geojson',
+                                    label: true
                                 }
-                                limit = limit - 1;
-                            })).then(function () {
+                            }).then(lang.hitch(this, function (features) {
+                                features.forEach(feature => {
+                                    if (limit > 0) {
+                                        const searchResult = {
+                                            label: feature.label,
+                                            geometry: GEO_JSON_FORMAT.readGeometry(feature.geom)
+                                        };
+                                        widget.addSearchResult(searchResult);
+                                    }
+                                    limit = limit - 1;
+                                });
+
                                 if (limit > 0) {
                                     ndeferred.resolve(limit);
                                 } else {
                                     widget.setStatus(i18n.gettext("Refine search criterion"), "search-panel__status--bg");
                                     ndeferred.reject();
                                 }
-                            }, function (err) {
+                            }), function (err) {
                                 // Continue with other layer if some layer is failed
                                 ndeferred.resolve();
                             }).otherwise(lang.hitch(widget, widget._breakOrError));
@@ -174,7 +193,13 @@ define([
                     deferred.then(lang.hitch(this, function (limit) {
                         var NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search";
 
-                        var query = {format: "json", limit: "30", q: criteria};
+                        var query = {
+                            format: "geojson",
+                            limit: "30",
+                            q: criteria,
+                            polygon_geojson: 1
+                        };
+
                         if (webmapSettings.nominatim_extent) {
                             var extent = this.display.config.extent;
                             query.bounded = "1";
@@ -184,29 +209,19 @@ define([
                         xhr.get(NOMINATIM_SEARCH_URL, {
                             handleAs: "json",
                             query: query,
-                            headers: { "X-Requested-With": null }
-                        }).then(lang.hitch(this, function (data) {
-                            array.forEach(data, function (place) {
+                            headers: {"X-Requested-With": null}
+                        }).then(lang.hitch(this, function (geojson) {
+                            const features = geojson.features;
+
+                            array.forEach(features, function (feature) {
                                 if (limit > 0) {
-                                    // Coordinates come in WGS84
-                                    var extent = [
-                                        parseFloat(place.boundingbox[2]),
-                                        parseFloat(place.boundingbox[0]),
-                                        parseFloat(place.boundingbox[3]),
-                                        parseFloat(place.boundingbox[1])
-                                    ];
-
-                                    extent = ol.proj.transformExtent(
-                                        extent,
-                                        this.display.lonlatProjection,
-                                        this.display.displayProjection
-                                    );
-
-                                    var feature = {
-                                        label: place.display_name,
-                                        box: extent
+                                    const searchResult = {
+                                        label: feature.properties.display_name,
+                                        geometry: GEO_JSON_FORMAT.readGeometry(feature.geometry, {
+                                            featureProjection: this.display.displayProjection
+                                        })
                                     };
-                                    widget.addSearchResult(feature);
+                                    widget.addSearchResult(searchResult);
                                 }
                                 limit = limit - 1;
                             }, this);
@@ -216,7 +231,7 @@ define([
                                 widget.setStatus(i18n.gettext("Refine search criterion"));
                                 ndeferred.reject();
                             }
-                         }));
+                        }));
                     }), function (err) {
                         // Continue with other layer if some layer is failed
                         ndeferred.resolve();
@@ -227,7 +242,7 @@ define([
 
                 deferred.then(function (limit) {
                     widget.loader.style.display = "none";
-                    if (limit == widget.MAX_SEARCH_RESULTS) {
+                    if (limit === widget.MAX_SEARCH_RESULTS) {
                         widget.setStatus(i18n.gettext("Not found"));
                     }
                 }).otherwise(lang.hitch(widget, widget._breakOrError));
@@ -235,7 +250,7 @@ define([
                 fdeferred.resolve(widget.MAX_SEARCH_RESULTS);
             }));
         },
-        addSearchResult: function(result){
+        addSearchResult: function (result) {
             if (!this.searchResultsList) {
                 this.searchResultsList = domConstruct.create("ul", {
                     id: "search-results-list",
@@ -243,26 +258,33 @@ define([
                 });
                 domConstruct.place(this.searchResultsList, this.contentNode, "first");
             }
+
             var resultNode = domConstruct.create("li", {
                 class: "list__item list__item--link",
                 innerHTML: result.label,
                 tabindex: -1,
-                onclick: lang.hitch(this, function (e){
+                onclick: lang.hitch(this, function (e) {
                     if (this.activeResult)
                         domClass.remove(this.activeResult, "active");
                     domClass.add(e.target, "active");
                     this.activeResult = e.target;
-                    this.display.map.zoomToExtent(result.box);
+
+                    this.display.map.zoomToFeature(
+                        new ol.Feature({geometry: result.geometry})
+                    );
+                    topic.publish("feature.highlight", {
+                        olGeometry: result.geometry
+                    });
                 })
             });
             domConstruct.place(resultNode, this.searchResultsList);
         },
-        clearAll: function(){
+        clearAll: function () {
             this.searchField.value = "";
             this._lastCriteria = "";
             this.clearSearchResults();
         },
-        clearSearchResults: function(){
+        clearSearchResults: function () {
             domConstruct.empty(this.contentNode);
             this.searchResultsList = undefined;
             this.statusPane = undefined;
