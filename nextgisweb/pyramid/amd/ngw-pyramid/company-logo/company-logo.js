@@ -1,11 +1,11 @@
 define([
-    "ngw/route",
+    "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/settings!",
     "@nextgisweb/pyramid/i18n!",
     // css
     "xstyle/css!./company-logo.css"
 ], function (
-    route,
+    api,
     settings,
     i18n
 ) {
@@ -15,7 +15,7 @@ define([
             anchor.className = 'map-logo';
 
             var image = document.createElement('img');
-            image.src = route.pyramid.company_logo();
+            image.src = api.routeURL('pyramid.company_logo');
 
             if (settings.company_logo.link !== null && settings.company_logo.link.trim() !== '') {
                 anchor.href = settings.company_logo.link;

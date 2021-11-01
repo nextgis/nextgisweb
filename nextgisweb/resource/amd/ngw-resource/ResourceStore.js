@@ -2,15 +2,15 @@ define([
     "dojo/_base/declare",
     "dojo/store/JsonRest",
     "dojo/_base/array",
-    "ngw/route"
+    "@nextgisweb/pyramid/api"
 ], function (
     declare,
     JsonRest,
     array,
-    route
+    api
 ) {
     return declare("ngw.resource.ResourceStore", [JsonRest], {
-        target: route.resource.collection(),
+        target: api.routeURL('resource.collection'),
         headers: { "Accept": "application/json" },
         getChildren: function(object){
             return this.query({parent: object.id}).then(function(response) {

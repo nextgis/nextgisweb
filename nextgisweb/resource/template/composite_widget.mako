@@ -5,11 +5,11 @@
     <script type="text/javascript">
         require([
             "dojo/request/xhr",
-            "ngw/route",
+            "@nextgisweb/pyramid/api",
             "ngw-resource/CompositeWidget",
             "dojo/domReady!"
-        ], function (xhr, route, CompositeWidget) {
-            xhr(route.resource.widget(), {
+        ], function (xhr, api, CompositeWidget) {
+            xhr(api.routeURL('resource.widget'), {
                 query: ${query | json.dumps, n},
                 handleAs: 'json'
             }).then(function (data) {

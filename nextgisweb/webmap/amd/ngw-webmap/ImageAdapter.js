@@ -2,13 +2,13 @@ define([
     "dojo/_base/declare",
     "dojo/io-query",
     "./Adapter",
-    "ngw/route",
+    "@nextgisweb/pyramid/api",
     "ngw-webmap/ol/layer/Image"
 ], function (
     declare,
     ioQuery,
     Adapter,
-    route,
+    api,
     Image
 ) {
     return declare(Adapter, {
@@ -19,7 +19,7 @@ define([
                 visible: item.visibility,
                 opacity: item.transparency ? (1 - item.transparency / 100) : 1.0
             }, {
-                url: route.render.image(),
+                url: api.routeURL('render.image'),
                 params: {
                     resource: item.styleId
                 },

@@ -1,12 +1,12 @@
 define([
     "dojo/_base/declare",
     "./Adapter",
-    "ngw/route",
+    "@nextgisweb/pyramid/api",
     "ngw-webmap/ol/layer/XYZ"
 ], function (
     declare,
     Adapter,
-    route,
+    api,
     XYZ
 ) {
     return declare(Adapter, {
@@ -17,7 +17,7 @@ define([
                 minResolution: item.minResolution ? item.minResolution : undefined,
                 opacity: item.transparency ? (1 - item.transparency / 100) : 1.0
             }, {
-                url: route.render.tile() + "?z={z}&x={x}&y={y}" + "&resource=" + item.styleId + "&nd=204",
+                url: api.routeURL('render.tile') + "?z={z}&x={x}&y={y}" + "&resource=" + item.styleId + "&nd=204",
                 crossOrigin: 'anonymous'
             });
         }

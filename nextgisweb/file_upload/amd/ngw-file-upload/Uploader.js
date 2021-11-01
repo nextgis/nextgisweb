@@ -5,7 +5,7 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "ngw/route",
+    "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/settings!",
     "@nextgisweb/pyramid/i18n!",
     "dojo/text!./template/Uploader.hbs",
@@ -19,7 +19,7 @@ define([
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    route,
+    api,
     settings,
     i18n,
     template,
@@ -53,7 +53,7 @@ define([
                 label: i18n.gettext("Select"),
                 multiple: false,
                 uploadOnSelect: true,
-                url: route.file_upload.collection(),
+                url: api.routeURL('file_upload.collection'),
                 name: "file"
             }).placeAt(this.fileUploader);
 

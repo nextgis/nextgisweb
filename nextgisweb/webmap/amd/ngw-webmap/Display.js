@@ -30,7 +30,6 @@ define([
     "dojo/topic",
     "cbtree/models/TreeStoreModel",
     "cbtree/Tree",
-    "ngw/route",
     "@nextgisweb/pyramid/i18n!",
     "ngw-pyramid/company-logo/company-logo",
     // tools
@@ -101,7 +100,6 @@ define([
     topic,
     TreeStoreModel,
     Tree,
-    route,
     i18n,
     companyLogo,
     MapToolbar,
