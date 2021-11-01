@@ -8,7 +8,7 @@ define([
     'ngw-pyramid/dynamic-panel/DynamicPanel',
     'dijit/layout/BorderContainer',
     'dojo/dom-construct',
-    'ngw/route',
+    'dojo/_base/lang',
 
     //templates
     "xstyle/css!./InfoPanel.css"
@@ -22,7 +22,7 @@ define([
     DynamicPanel,
     BorderContainer,
     domConstruct,
-    route
+    lang
 ) {
     return declare([DynamicPanel, BorderContainer,_TemplatedMixin], {
         postCreate: function(){
@@ -53,9 +53,9 @@ define([
             this.display
                 .featureHighlighter
                 .highlightFeatureById(fid, resid)
-                .then(function (feature) {
-                    display.map.zoomToFeature(feature);
-                });
+                .then(lang.hitch(this, function (feature) {
+                    this.display.map.zoomToFeature(feature);
+                }));
         }
     });
 });

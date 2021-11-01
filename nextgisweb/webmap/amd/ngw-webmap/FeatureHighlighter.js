@@ -4,7 +4,7 @@ define([
     'dojo/request/xhr',
     'dojo/topic',
     'dojo/Deferred',
-    'ngw/route',
+    '@nextgisweb/pyramid/api',
     'ngw-webmap/ol/layer/Vector',
     'openlayers/ol'
 ], function (
@@ -13,7 +13,7 @@ define([
     xhr,
     topic,
     Deferred,
-    route,
+    api,
     Vector,
     ol
 ) {
@@ -82,7 +82,7 @@ define([
         },
 
         highlightFeatureById: function (featureId, layerId) {
-            var get_feature_item_url = route.feature_layer.feature.item({id: layerId, fid: featureId}),
+            var get_feature_item_url = api.routeURL('feature_layer.feature.item', {id: layerId, fid: featureId}),
                 highlightedDeferred = new Deferred(),
                 feature;
 
