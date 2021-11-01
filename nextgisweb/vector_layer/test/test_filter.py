@@ -66,8 +66,8 @@ def resource(ngw_txn, ngw_resource_group):
 
     resource.persist()
 
-    resource.setup_from_ogr(layer, lambda x: x)
-    resource.load_from_ogr(layer, lambda x: x)
+    resource.setup_from_ogr(layer)
+    resource.load_from_ogr(layer)
 
     DBSession.flush()
     return resource

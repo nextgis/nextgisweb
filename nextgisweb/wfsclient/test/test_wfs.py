@@ -46,8 +46,8 @@ def wfs_service_path(ngw_resource_group, ngw_httptest_app):
         dsource = type_geojson_dataset('type.geojson')
         layer = dsource.GetLayer(0)
 
-        vl_type.setup_from_ogr(layer, lambda x: x)
-        vl_type.load_from_ogr(layer, lambda x: x)
+        vl_type.setup_from_ogr(layer)
+        vl_type.load_from_ogr(layer)
 
         DBSession.flush()
 

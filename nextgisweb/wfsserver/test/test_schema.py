@@ -42,8 +42,8 @@ def service_id(ngw_resource_group):
         dsource = ogr.Open(json.dumps(geojson))
         layer = dsource.GetLayer(0)
 
-        res_vl.setup_from_ogr(layer, lambda x: x)
-        res_vl.load_from_ogr(layer, lambda x: x)
+        res_vl.setup_from_ogr(layer)
+        res_vl.load_from_ogr(layer)
 
         DBSession.flush()
 

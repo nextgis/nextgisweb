@@ -60,8 +60,8 @@ def vector_layer_id(ngw_resource_group):
         dsource = ogr.Open(json.dumps(geojson))
         layer = dsource.GetLayer(0)
 
-        obj.setup_from_ogr(layer, lambda x: x)
-        obj.load_from_ogr(layer, lambda x: x)
+        obj.setup_from_ogr(layer)
+        obj.load_from_ogr(layer)
 
         DBSession.flush()
         DBSession.expunge(obj)

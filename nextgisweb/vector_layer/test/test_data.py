@@ -63,8 +63,8 @@ def test_from_ogr(data, ngw_resource_group, ngw_txn):
 
     res.persist()
 
-    res.setup_from_ogr(layer, lambda x: x)
-    res.load_from_ogr(layer, lambda x: x)
+    res.setup_from_ogr(layer)
+    res.load_from_ogr(layer)
 
     DBSession.flush()
 
@@ -101,8 +101,8 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
 
     res.persist()
 
-    res.setup_from_ogr(layer, lambda x: x)
-    res.load_from_ogr(layer, lambda x: x)
+    res.setup_from_ogr(layer)
+    res.load_from_ogr(layer)
     layer.ResetReading()
 
     DBSession.flush()

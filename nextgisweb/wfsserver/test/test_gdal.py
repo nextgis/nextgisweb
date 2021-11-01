@@ -39,8 +39,8 @@ def service(ngw_resource_group):
         dsource = type_geojson_dataset('type.geojson')
         layer = dsource.GetLayer(0)
 
-        vl_type.setup_from_ogr(layer, lambda x: x)
-        vl_type.load_from_ogr(layer, lambda x: x)
+        vl_type.setup_from_ogr(layer)
+        vl_type.load_from_ogr(layer)
 
         DBSession.flush()
 
@@ -58,8 +58,8 @@ def service(ngw_resource_group):
         dsource = type_geojson_dataset('pointz.geojson')
         layer = dsource.GetLayer(0)
 
-        vl_pointz.setup_from_ogr(layer, lambda x: x)
-        vl_pointz.load_from_ogr(layer, lambda x: x)
+        vl_pointz.setup_from_ogr(layer)
+        vl_pointz.load_from_ogr(layer)
 
         DBSession.flush()
 
