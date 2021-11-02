@@ -75,13 +75,25 @@
 
             <h3>{{gettext 'Address search'}}</h3>
 
-            <div data-dojo-attach-point="wNominatimEnabled"
-                data-dojo-type="dijit/form/CheckBox"
-                title="{{gettext 'Enable'}}"></div>
+            <div data-dojo-attach-point="wAddressEnabled"
+                 data-dojo-type="dijit/form/CheckBox"
+                 title="{{gettext 'Enable'}}"></div>
 
-            <div data-dojo-attach-point="wNominatimExtent"
-                data-dojo-type="dijit/form/CheckBox"
-                title="{{gettext 'Limit by web map initial extent'}}"></div>
+            <div data-dojo-attach-point="wAddressExtent"
+                 data-dojo-type="dijit/form/CheckBox"
+                 title="{{gettext 'Limit by web map initial extent'}}"></div>
+
+            <select data-dojo-type="dijit/form/Select"
+                    data-dojo-attach-point="wAddressGeocoder"
+                    title="{{gettext 'Provider'}}" style="width: 100%">
+                <option value="nominatim" selected="selected">{{gettext 'Nominatim (OSM)'}}</option>
+                <option value="yandex">{{gettext 'Yandex.Maps API Geocoder'}}</option>
+            </select>
+
+            <div data-dojo-attach-point="wYandexApiGeocoderKey"
+                data-dojo-type="dijit/form/TextBox"
+                data-dojo-props="trim: true"
+                title="{{gettext 'Yandex.Maps API Geocoder Key'}}" style="width: 100%"></div>
 
         </div>
 
