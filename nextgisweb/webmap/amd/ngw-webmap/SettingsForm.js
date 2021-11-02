@@ -5,6 +5,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "dojo/promise/all",
     "dojo/request/xhr",
+    "dojo/dom-style",
     "dojo/json",
     "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
@@ -25,6 +26,7 @@ define([
     _WidgetsInTemplateMixin,
     all,
     xhr,
+    domStyle,
     json,
     route,
     ErrorDialog,
@@ -39,7 +41,7 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
-            this.buttonSave.on("click", this.save.bind(this));
+            this._bindEvents();
         },
 
         startup: function () {
@@ -48,29 +50,59 @@ define([
                 xhr.get(API_URL, {handleAs: 'json'}),
                 xhr.get(SRS_URL, {handleAs: 'json'})
             ]).then(function (res) {
-                var srs_list = res[1];
-                srs_list.forEach(function(srs) {
-                    this.wMeasurementSRID.addOption({value: srs.id, label: srs.display_name});
-                }.bind(this));
-
-                var data = res[0];
-                this.wIdentifyRadius.set('value', data.identify_radius);
-                this.wIdentifyAttributes.set('value', data.identify_attributes);
-
-                this.wPopupWidth.set('value', data.popup_width);
-                this.wPopupHeight.set('value', data.popup_height);
-
-                this.wNominatimEnabled.set('value', data.nominatim_enabled);
-                this.wNominatimExtent.set('value', data.nominatim_extent);
-
-                this.wUnitsLength.set('value', data.units_length);
-                this.wUnitsArea.set('value', data.units_area);
-                this.wDegreeFormat.set('value', data.degree_format);
-                this.wMeasurementSRID.set('value', data.measurement_srid);
+                const [webMapSettings, srsList] = res;
+                this._setValues(webMapSettings, srsList);
+                this._handleControls();
             }.bind(this));
         },
+        
+        _bindEvents: function () {
+            this.buttonSave.on("click", this._save.bind(this));
+            this.wAddressGeocoder.on("change", this._handleControls.bind(this))
+        },
 
-        save: function () {
+        _setValues: function (webMapSettings, srsList) {
+            srsList.forEach(function (srs) {
+                this.wMeasurementSRID.addOption({value: srs.id, label: srs.display_name});
+            }.bind(this));
+
+            this.wIdentifyRadius.set('value', webMapSettings.identify_radius);
+            this.wIdentifyAttributes.set('value', webMapSettings.identify_attributes);
+
+            this.wPopupWidth.set('value', webMapSettings.popup_width);
+            this.wPopupHeight.set('value', webMapSettings.popup_height);
+
+            this.wAddressEnabled.set('value', webMapSettings.address_search_enabled);
+            this.wAddressExtent.set('value', webMapSettings.address_search_extent);
+            this.wAddressGeocoder.set('value', webMapSettings.address_geocoder);
+            this.wYandexApiGeocoderKey.set('value', webMapSettings.yandex_api_geocoder_key);
+
+            this.wUnitsLength.set('value', webMapSettings.units_length);
+            this.wUnitsArea.set('value', webMapSettings.units_area);
+            this.wDegreeFormat.set('value', webMapSettings.degree_format);
+            this.wMeasurementSRID.set('value', webMapSettings.measurement_srid);
+        },
+        
+        _handleControls: function () {
+            const addressGeocoder = this.wAddressGeocoder.get('value');
+            this._displayYandexApiKeyWidget(addressGeocoder === 'yandex');
+        },
+        
+        _displayYandexApiKeyWidget: function (shouldDisplay) {
+            const domNode = this.wYandexApiGeocoderKey.domNode;
+
+            if (!domNode.parentNode || !domNode.parentNode.parentNode) {
+                return false;
+            }
+            
+            if (shouldDisplay) {
+                domStyle.set(domNode.parentNode.parentNode, 'display', 'table-row');
+            } else {
+                domStyle.set(domNode.parentNode.parentNode, 'display', 'none');
+            }
+        },
+
+        _save: function () {
             xhr.put(API_URL, {
                 handleAs: 'json',
                 headers: {
@@ -83,8 +115,10 @@ define([
                     popup_width: this.wPopupWidth.get('value'),
                     popup_height: this.wPopupHeight.get('value'),
 
-                    nominatim_enabled: this.wNominatimEnabled.get('value'),
-                    nominatim_extent: this.wNominatimExtent.get('value'),
+                    address_search_enabled: this.wAddressEnabled.get('value'),
+                    address_search_extent: this.wAddressExtent.get('value'),
+                    address_geocoder: this.wAddressGeocoder.get('value'),
+                    yandex_api_geocoder_key: this.wYandexApiGeocoderKey.get('value'),
 
                     units_length: this.wUnitsLength.get('value'),
                     units_area: this.wUnitsArea.get('value'),

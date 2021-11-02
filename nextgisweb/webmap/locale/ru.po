@@ -1,87 +1,87 @@
-#: __init__.py:28
+#: __init__.py:30
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: adapter.py:24
+#: adapter.py:22
 msgid "Tiles"
 msgstr "Тайлы"
 
-#: adapter.py:34
+#: adapter.py:32
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:31 model.py:40 view.py:181 view.py:202
+#: model.py:29 model.py:38 view.py:179 view.py:200
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:33 view.py:188
+#: model.py:31 view.py:186
 msgid "Display"
 msgstr "Открыть"
 
-#: model.py:34
+#: model.py:32
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:173 model.py:35
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:173 model.py:33
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: view.py:36 view.py:203
+#: view.py:34 view.py:201
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:209
+#: view.py:207
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-webmap/Display.js:214 amd/ngw-webmap/Display.js:1011
+#: amd/ngw-webmap/Display.js:212 amd/ngw-webmap/Display.js:1009
 #: amd/ngw-webmap/ItemWidget.js:243
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:220
+#: amd/ngw-webmap/Display.js:218
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:226 amd/ngw-webmap/Display.js:436
+#: amd/ngw-webmap/Display.js:224 amd/ngw-webmap/Display.js:434
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:232 amd/ngw-webmap/Display.js:331
+#: amd/ngw-webmap/Display.js:230 amd/ngw-webmap/Display.js:329
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:370 amd/ngw-webmap/Display.js:377
+#: amd/ngw-webmap/Display.js:368 amd/ngw-webmap/Display.js:375
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:400 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:398 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:537 amd/ngw-webmap/Display.js:547
+#: amd/ngw-webmap/Display.js:535 amd/ngw-webmap/Display.js:545
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:729 amd/ngw-webmap/tool/Zoom.js:18
+#: amd/ngw-webmap/Display.js:727 amd/ngw-webmap/tool/Zoom.js:18
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:479
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:730 amd/ngw-webmap/tool/Zoom.js:21
+#: amd/ngw-webmap/Display.js:728 amd/ngw-webmap/tool/Zoom.js:21
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:480
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:734 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
+#: amd/ngw-webmap/Display.js:732 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:750
+#: amd/ngw-webmap/Display.js:748
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:753 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
+#: amd/ngw-webmap/Display.js:751 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
@@ -97,7 +97,7 @@ msgstr "Порядок слоёв"
 msgid "Use on the map"
 msgstr "Учитывать на карте"
 
-#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:93
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:105
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
 msgid "Save"
@@ -352,6 +352,22 @@ msgstr "Включить"
 #: amd/ngw-webmap/template/SettingsForm.hbs:84
 msgid "Limit by web map initial extent"
 msgstr "Ограничить начальным охватом карты"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:88
+msgid "Provider"
+msgstr "Провайдер"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:89
+msgid "Nominatim (OSM)"
+msgstr "Nominatim (OSM)"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:90
+msgid "Yandex.Maps API Geocoder"
+msgstr "Геокодер API Яндекс.Карт"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:96
+msgid "Yandex.Maps API Geocoder Key"
+msgstr "Ключ геокодера API Яндекс.Карт"
 
 #: amd/ngw-webmap/tool/Identify.js:212
 msgid "Attributes"
@@ -613,12 +629,13 @@ msgstr "Используйте Shift+мышь для увеличения рам
 msgid "Search on the map"
 msgstr "Поиск по карте"
 
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:158
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:216
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:184
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:239
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:306
 msgid "Refine search criterion"
 msgstr "Уточните критерий поиска"
 
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:231
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:320
 msgid "Not found"
 msgstr "Не найдено"
 
@@ -675,3 +692,4 @@ msgstr "https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#render"
 #: template/section_api_webmap.mako:17
 msgid "Read more"
 msgstr "Подробнее"
+
