@@ -115,8 +115,8 @@ define([
                     popup_width: this.wPopupWidth.get('value'),
                     popup_height: this.wPopupHeight.get('value'),
 
-                    address_search_enabled: this.wAddressEnabled.get('value'),
-                    address_search_extent: this.wAddressExtent.get('value'),
+                    address_search_enabled: this.wAddressEnabled.get('value') === 'on',
+                    address_search_extent: this.wAddressExtent.get('value') === 'on',
                     address_geocoder: this.wAddressGeocoder.get('value'),
                     yandex_api_geocoder_key: this.wYandexApiGeocoderKey.get('value'),
 
