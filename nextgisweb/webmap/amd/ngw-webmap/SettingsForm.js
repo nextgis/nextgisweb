@@ -55,7 +55,7 @@ define([
                 this._handleControls();
             }.bind(this));
         },
-        
+
         _bindEvents: function () {
             this.buttonSave.on("click", this._save.bind(this));
             this.wAddressGeocoder.on("change", this._handleControls.bind(this))
@@ -82,19 +82,19 @@ define([
             this.wDegreeFormat.set('value', webMapSettings.degree_format);
             this.wMeasurementSRID.set('value', webMapSettings.measurement_srid);
         },
-        
+
         _handleControls: function () {
             const addressGeocoder = this.wAddressGeocoder.get('value');
             this._displayYandexApiKeyWidget(addressGeocoder === 'yandex');
         },
-        
+
         _displayYandexApiKeyWidget: function (shouldDisplay) {
             const domNode = this.wYandexApiGeocoderKey.domNode;
 
             if (!domNode.parentNode || !domNode.parentNode.parentNode) {
                 return false;
             }
-            
+
             if (shouldDisplay) {
                 domStyle.set(domNode.parentNode.parentNode, 'display', 'table-row');
             } else {
@@ -127,7 +127,7 @@ define([
                 })
             }).then(
                 function () {
-                    window.location.reload(true);
+                    window.location.reload();
                 },
                 ErrorDialog.xhrError
             );
