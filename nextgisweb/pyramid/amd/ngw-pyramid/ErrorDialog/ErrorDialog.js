@@ -23,7 +23,7 @@ define([
             this.errorInfo = {};
 
             // Temporary solution to detect instance of @nextgisweb/pyramid/api/BaseAPIError
-            if (error.data !== undefined && error.name !== undefined && error.name !== undefined) {
+            if (error.data !== undefined && error.name !== undefined) {
                 this.message = error.message;
                 this.detail = error.detail;
                 this.errorTitle = error.data.title;
@@ -44,7 +44,7 @@ define([
                 } else {
                     this.errorTitle = i18n.gettext("Unexpected server response");
                     this.message = i18n.gettext("Something went wrong.");
-                };
+                }
             } else {
                 this.errorTitle = error.title;
                 this.message = error.message;
