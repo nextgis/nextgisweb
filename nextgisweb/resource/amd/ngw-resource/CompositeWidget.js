@@ -2,8 +2,6 @@ define([
     "dojo/_base/declare",
     "dojo/_base/lang",
     "dojo/_base/array",
-    "dojo/json",
-    "dojo/request/xhr",
     "dojo/Deferred",
     "dojo/promise/all",
     "dojo/when",
@@ -14,15 +12,13 @@ define([
     "dijit/layout/ContentPane",
     "dijit/layout/TabContainer",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
+    "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
-    "ngw/route",
     "xstyle/css!./resource/CompositeWidget.css"
 ], function (
     declare,
     lang,
     array,
-    json,
-    xhr,
     Deferred,
     all,
     when,
@@ -33,8 +29,8 @@ define([
     ContentPane,
     TabContainer,
     ErrorDialog,
-    i18n,
-    route
+    api,
+    i18n
 ) {
     var CompositeWidget = declare("ngw.resource.CompositeWidget", BorderContainer, {
         style: "width: 100%; height: 100%; padding: 1px;",
@@ -212,18 +208,6 @@ define([
         // REST API
         // ========
 
-        request: function (args) {
-            return xhr(args.url, {
-                method: args.method,
-                handleAs: "json",
-                data: json.stringify(args.data),
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                }
-            });
-        },
-
         storeRequest: function (args) {
             var widget = this,
                 deferred = new Deferred();
@@ -235,10 +219,9 @@ define([
                         widget.serialize().then(
                             function /* callback */ (data) {
                                 console.debug("Serialization completed");
-                                widget.request({
-                                    url: args.url,
+                                api.request(args.url, {
                                     method: args.method,
-                                    data: data
+                                    json: data,
                                 }).then(
                                     function /* callback */ (response) {
                                         console.debug("REST API request completed");
@@ -304,14 +287,14 @@ define([
             this.lock();
 
             this.storeRequest({
-                url: route.resource.collection(),
-                method: "POST"
+                url: api.routeURL('resource.collection'),
+                method: "POST",
             }).then(
                 /* callback */ lang.hitch(this, function (data) {
                     if (edit) {
-                        window.location = route.resource.update({id: data.id});
+                        window.location = api.routeURL('resource.update', {id: data.id});
                     } else {
-                        window.location = route.resource.show({id: data.id});
+                        window.location = api.routeURL('resource.show', {id: data.id});
                     }
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
@@ -322,11 +305,11 @@ define([
             this.lock();
 
             this.storeRequest({
-                url: route.resource.item(this.id),
+                url: api.routeURL('resource.item', {id: this.id}),
                 method: "PUT"
             }).then(
                 /* callback */ lang.hitch(this, function () {
-                    window.location = route.resource.show({id: this.id});
+                    window.location = api.routeURL('resource.show', {id: this.id});
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
             );
@@ -336,11 +319,11 @@ define([
             this.lock();
 
             this.storeRequest({
-                url: route.resource.item(this.id),
+                url: api.routeURL('resource.item', {id: this.id}),
                 method: "DELETE"
             }).then(
                 /* callback */ lang.hitch(this, function () {
-                    window.location = route.resource.show({id: this.parent});
+                    window.location = api.routeURL('resource.show', {id: this.parent});
                     this.unlock();
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
@@ -348,9 +331,9 @@ define([
         },
 
         refreshObj: function () {
-            xhr(route.resource.item(this.id), {
-                handleAs: "json"
-            }).then(
+            api.route('resource.item', {
+                id: this.id
+            }).get().then(
                 lang.hitch(this, this.deserialize)
             );
         },
