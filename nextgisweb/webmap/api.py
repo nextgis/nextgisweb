@@ -90,6 +90,7 @@ wm_settings = dict(
     address_search_extent=False,
     address_geocoder='nominatim',
     yandex_api_geocoder_key='',
+    nominatim_countrycodes='',
     units_length='m',
     units_area='sq.m',
     degree_format='dd',

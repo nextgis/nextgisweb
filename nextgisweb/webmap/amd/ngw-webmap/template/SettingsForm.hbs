@@ -71,7 +71,9 @@
 
         </div>
 
-        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="region: 'top', cols:1, labelWidth: 300">
+        <div data-dojo-type="dojox/layout/TableContainer"
+             data-dojo-props="region: 'top', cols:1, labelWidth: 300"
+        >
 
             <h3>{{gettext 'Address search'}}</h3>
 
@@ -89,6 +91,14 @@
                 <option value="nominatim" selected="selected">{{gettext 'Nominatim (OSM)'}}</option>
                 <option value="yandex">{{gettext 'Yandex.Maps API Geocoder'}}</option>
             </select>
+
+            <div data-dojo-attach-point="wNominatimCountryCodes"
+                 data-dojo-type="dijit/form/ValidationTextBox"
+                 data-dojo-props="
+                    promptMessage: {{gettextString 'For example: ru or gb,de'}},
+                    regExp:'^(?:(?:[A-Za-z]+)(?:-[A-Za-z]+)?(?:,|$))+(?<!,)$',
+                    invalidMessage:{{gettextString 'Invalid countries. For example ru or gb,de'}}"
+                 title="{{gettext 'Limit search results to countries'}}" style="width: 100%"></div>
 
             <div data-dojo-attach-point="wYandexApiGeocoderKey"
                 data-dojo-type="dijit/form/TextBox"

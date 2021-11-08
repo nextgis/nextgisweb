@@ -213,6 +213,10 @@ define([
                             query.bounded = "1";
                             query.viewbox = extent.join(",");
                         }
+                        
+                        if (webmapSettings.nominatim_countrycodes) {
+                            query.countrycodes = webmapSettings.nominatim_countrycodes;
+                        }
 
                         xhr.get(NOMINATIM_SEARCH_URL, {
                             handleAs: "json",
