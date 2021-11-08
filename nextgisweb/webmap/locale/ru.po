@@ -97,7 +97,7 @@ msgstr "Порядок слоёв"
 msgid "Use on the map"
 msgstr "Учитывать на карте"
 
-#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:105
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:115
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
 msgid "Save"
@@ -106,6 +106,18 @@ msgstr "Сохранить"
 #: amd/ngw-webmap/ItemWidget.js:309 amd/ngw-webmap/template/ItemWidget.hbs:26
 msgid "Add group"
 msgstr "Добавить группу"
+
+#: amd/ngw-webmap/SettingsForm.js:93
+msgid "Validation error"
+msgstr "Ошибка валидации"
+
+#: amd/ngw-webmap/SettingsForm.js:94
+msgid ""
+"Errors found during data validation. Controls with errors marked in red. Fix "
+"it, please."
+msgstr ""
+"При проверке введенных данных обнаружены ошибки. Элементы с ошибками выделены красным цветом. "
+"Исправьте, пожалуйста и сохраните еще раз."
 
 #: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:23
 msgid "Your annotation text"
@@ -341,31 +353,43 @@ msgstr "Градусы, минуты, секунды"
 msgid "Measurement SRID"
 msgstr "Система координат для расчётов"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:76
+#: amd/ngw-webmap/template/SettingsForm.hbs:78
 msgid "Address search"
 msgstr "Адресный поиск"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:80
+#: amd/ngw-webmap/template/SettingsForm.hbs:82
 msgid "Enable"
 msgstr "Включить"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:84
+#: amd/ngw-webmap/template/SettingsForm.hbs:86
 msgid "Limit by web map initial extent"
 msgstr "Ограничить начальным охватом карты"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:88
+#: amd/ngw-webmap/template/SettingsForm.hbs:90
 msgid "Provider"
 msgstr "Провайдер"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:89
+#: amd/ngw-webmap/template/SettingsForm.hbs:91
 msgid "Nominatim (OSM)"
 msgstr "Nominatim (OSM)"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:90
+#: amd/ngw-webmap/template/SettingsForm.hbs:92
 msgid "Yandex.Maps API Geocoder"
 msgstr "Геокодер API Яндекс.Карт"
 
-#: amd/ngw-webmap/template/SettingsForm.hbs:96
+#: amd/ngw-webmap/template/SettingsForm.hbs:98
+msgid "For example: ru or gb,de"
+msgstr "Например, ru или gb,de"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:100
+msgid "Invalid countries. For example ru or gb,de"
+msgstr "Неверные значения. Например, ru или gb,de"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:101
+msgid "Limit search results to countries"
+msgstr "Ограничить поиск странами"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:106
 msgid "Yandex.Maps API Geocoder Key"
 msgstr "Ключ геокодера API Яндекс.Карт"
 
@@ -630,12 +654,12 @@ msgid "Search on the map"
 msgstr "Поиск по карте"
 
 #: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:184
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:239
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:306
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:243
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:310
 msgid "Refine search criterion"
 msgstr "Уточните критерий поиска"
 
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:320
+#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:324
 msgid "Not found"
 msgstr "Не найдено"
 
