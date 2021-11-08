@@ -229,7 +229,7 @@ define([
                                     },
                                     function /* errback */ (err) {
                                         console.error("REST API request failed");
-                                        deferred.reject({ response: err.response });
+                                        deferred.reject(err);
                                     }
                                 );
                             },
