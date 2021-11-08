@@ -30,13 +30,15 @@ define([
             ]).then(function (res) {
                 const [webMapSettings, srsList] = res;
                 this._setValues(webMapSettings, srsList);
-                this._handleControls();
+                this._handleGeocoderControls();
+                this._handleAddressEnabled();
             }.bind(this));
         },
 
         _bindEvents: function () {
             this.buttonSave.on("click", this._save.bind(this));
-            this.wAddressGeocoder.on("change", this._handleControls.bind(this))
+            this.wAddressGeocoder.on("change", this._handleGeocoderControls.bind(this))
+            this.wAddressEnabled.on("change", this._handleAddressEnabled.bind(this))
         },
 
         _setValues: function (webMapSettings, srsList) {
@@ -62,10 +64,19 @@ define([
             this.wMeasurementSRID.set('value', webMapSettings.measurement_srid);
         },
 
-        _handleControls: function () {
+        _handleGeocoderControls: function () {
             const addressGeocoder = this.wAddressGeocoder.get('value');
             this._displayWidget(this.wYandexApiGeocoderKey,addressGeocoder === 'yandex');
             this._displayWidget(this.wNominatimCountryCodes,addressGeocoder === 'nominatim');
+        },
+        
+        _handleAddressEnabled: function () {
+            const addressDisabled = this.wAddressEnabled.get("value") !== "on";
+
+            this.wAddressExtent.set("disabled", addressDisabled);
+            this.wAddressGeocoder.set("disabled", addressDisabled);
+            this.wYandexApiGeocoderKey.set("disabled", addressDisabled);
+            this.wNominatimCountryCodes.set("disabled", addressDisabled);
         },
         
         _displayWidget: function (widget, shouldDisplay) {
