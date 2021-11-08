@@ -85,6 +85,15 @@ define([
         dialog.show();
         return dialog;
     }
+    
+    ErrorDialog.showMessage = function (title, message) {
+        var dialog = new ErrorDialog({
+            title, 
+            message
+        });
+        dialog.show();
+        return dialog;
+    }
 
     return ErrorDialog;
 })
