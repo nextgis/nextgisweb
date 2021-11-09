@@ -484,6 +484,10 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def geom(self):
         self._geom = True
 
+    def geom_format(self, geom_format):
+        # Initialized with OGR only
+        pass
+
     def srs(self, srs):
         self._srs = srs
 
