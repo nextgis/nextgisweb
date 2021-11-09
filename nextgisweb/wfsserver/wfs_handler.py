@@ -808,7 +808,8 @@ class WFSHandler():
                 __feature = El(layer.keyname, {id_attr: feature_id}, parent=__member)
 
                 if feature.geom is not None:
-                    geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
+                    geom = feature.geom.ogr
+                    geom.AssignSpatialReference(osr_out)
 
                     _minX, _maxX, _minY, _maxY = geom.GetEnvelope()
                     minX = _minX if minX is None else min(minX, _minX)

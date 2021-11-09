@@ -76,9 +76,7 @@ class Feature(object):
     def to_ogr(self, layer_defn, fid=None):
         ogr_feature = ogr.Feature(layer_defn)
         ogr_feature.SetFID(self.id)
-        ogr_feature.SetGeometry(
-            ogr.CreateGeometryFromWkb(self.geom.wkb)
-        )
+        ogr_feature.SetGeometry(self.geom.ogr)
 
         for field in self.fields:
             ogr_feature[field] = self.fields[field]
