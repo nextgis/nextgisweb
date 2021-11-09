@@ -4,6 +4,7 @@ import transaction
 
 from nextgisweb.auth import User
 from nextgisweb.models import DBSession
+from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
 from nextgisweb.wfsclient import WFSConnection, WFSLayer
 from nextgisweb.wfsserver import Layer as WFS_Service_Layer, Service as WFSService
@@ -35,7 +36,7 @@ def create_feature_layer(data, parent_id, ngw_httptest_app):
 
             layer = WFSLayer(
                 **res_common, display_name='Feature layer (WFS)',
-                connection=connection, srs_id=3857,
+                connection=connection, srs=SRS.filter_by(id=3857).one(),
                 layer_name=service_layer.keyname, column_geom='geom',
                 geometry_srid=vlayer.srs_id, geometry_type='POINT',
             ).persist()
