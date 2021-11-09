@@ -1349,7 +1349,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         selected_fields = []
         for f in tableinfo.fields:
-            if not self._fields or f.keyname in self._fields:
+            if self._fields is None or f.keyname in self._fields:
                 columns.append(table.columns[f.key].label(f.keyname))
                 selected_fields.append(f)
 

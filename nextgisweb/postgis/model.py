@@ -619,7 +619,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         fieldmap = []
         for idx, fld in enumerate(self.layer.fields, start=1):
-            if not self._fields or fld.keyname in self._fields:
+            if self._fields is None or fld.keyname in self._fields:
                 clabel = 'f%d' % idx
                 addcol(db.sql.column(fld.column_name).label(clabel))
                 fieldmap.append((fld.keyname, clabel))
