@@ -11,8 +11,8 @@ from nextgisweb.wfsserver import Layer as WFS_Service_Layer, Service as WFSServi
 
 
 @contextmanager
-def create_feature_layer(data, parent_id, ngw_httptest_app):
-    with create_vector_layer(data, parent_id) as vlayer:
+def create_feature_layer(ogrlayer, parent_id, ngw_httptest_app):
+    with create_vector_layer(ogrlayer, parent_id) as vlayer:
         with transaction.manager:
             res_common = dict(
                 parent_id=parent_id,

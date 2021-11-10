@@ -11,7 +11,7 @@ from nextgisweb.vector_layer import VectorLayer
 
 
 @contextmanager
-def create_feature_layer(data, parent_id, **kwargs):
+def create_feature_layer(ogrlayer, parent_id, **kwargs):
     with transaction.manager:
         layer = VectorLayer(
             parent_id=parent_id, display_name='Feature layer (vector)',
@@ -19,9 +19,6 @@ def create_feature_layer(data, parent_id, **kwargs):
             srs=SRS.filter_by(id=3857).one(),
             tbl_uuid=uuid4().hex,
         ).persist()
-
-        ds = ogr.Open(str(data))
-        ogrlayer = ds.GetLayer(0)
 
         layer.setup_from_ogr(ogrlayer)
         layer.load_from_ogr(ogrlayer)

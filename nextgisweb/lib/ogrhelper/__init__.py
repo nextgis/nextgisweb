@@ -71,6 +71,10 @@ def _get_integer(feat, fidx):
     return feat.GetFieldAsInteger(fidx)
 
 
+def _get_integer64(feat, fidx):
+    return feat.GetFieldAsInteger64(fidx)
+
+
 def _get_real(feat, fidx):
     return feat.GetFieldAsDouble(fidx)
 
@@ -98,6 +102,7 @@ def _get_datetime(feat, fidx):
 
 
 FIELD_GETTER[ogr.OFTInteger] = _get_integer
+FIELD_GETTER[ogr.OFTInteger64] = _get_integer64
 FIELD_GETTER[ogr.OFTReal] = _get_real
 FIELD_GETTER[ogr.OFTString] = _get_string
 FIELD_GETTER[ogr.OFTDate] = _get_date

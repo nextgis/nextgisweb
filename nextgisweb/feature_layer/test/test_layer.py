@@ -3,9 +3,11 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
+from osgeo import ogr
 
 import nextgisweb.feature_layer.test
 from nextgisweb.lib.geometry import Geometry, Transformer
+from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.spatial_ref_sys.models import WKT_EPSG_4326
 from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
@@ -50,12 +52,16 @@ def cmp_geom(gj_geom, geom2, srs):
 @pytest.mark.parametrize('create_resource', (
     pytest.param(create_vector_layer, id='Vector layer'),
     pytest.param(create_wfs_layer, id='WFS layer'),
+    pytest.param(create_postgis_layer, id='PostGIS layer'),
 ))
 def test_layer(create_resource, ngw_resource_group, ngw_auth_administrator, ngw_httptest_app):
     geojson = json.loads(data_points.read_text())
     gj_fs = geojson['features']
 
-    with create_resource(data_points, ngw_resource_group, ngw_httptest_app=ngw_httptest_app) as layer:
+    ds = ogr.Open(str(data_points))
+    ogrlayer = ds.GetLayer(0)
+
+    with create_resource(ogrlayer, ngw_resource_group, ngw_httptest_app=ngw_httptest_app) as layer:
 
         # IFeatureQuery
 
