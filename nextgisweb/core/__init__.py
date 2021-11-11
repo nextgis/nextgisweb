@@ -354,6 +354,12 @@ class CoreComponent(
         Option('database.pool.recycle', timedelta, default=None, doc=(
             "Recycle connections after the given time delta.")),
 
+        Option('database_test.host'),
+        Option('database_test.port', int),
+        Option('database_test.name'),
+        Option('database_test.user'),
+        Option('database_test.password', secure=True),
+
         # Data storage
         Option('sdir', required=True, doc=(
             "Path to filesytem data storage where data stored along with "
