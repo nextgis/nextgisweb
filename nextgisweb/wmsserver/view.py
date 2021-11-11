@@ -164,9 +164,7 @@ def geographic_distance(lon_x, lat_x, lon_y, lat_y):
     return meters
 
 
-def _get_map(obj, request):
-    params = dict((k.upper(), v) for k, v in request.params.items())
-
+def _get_map(obj, params, request):
     p_layers = params['LAYERS'].split(',')
     p_bbox = [float(v) for v in params['BBOX'].split(',', 3)]
     if len(p_bbox) != 4:
