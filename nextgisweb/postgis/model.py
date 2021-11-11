@@ -328,6 +328,8 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         class BoundFeatureQuery(FeatureQueryBase):
             layer = self
+            # TODO: support from spatial_ref_sys table
+            srs_supported = (self.srs_id, )
 
         return BoundFeatureQuery
 
@@ -533,6 +535,8 @@ class PostgisLayerSerializer(Serializer):
 class FeatureQueryBase(object):
 
     def __init__(self):
+        super(FeatureQueryBase, self).__init__()
+
         self._srs = None
         self._geom = None
         self._geom_format = 'WKB'
@@ -579,9 +583,6 @@ class FeatureQueryBase(object):
 
     def like(self, value):
         self._like = value
-
-    def intersects(self, geom):
-        self._intersects = geom
 
     def __call__(self):
         tab = db.sql.table(self.layer.table)

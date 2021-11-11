@@ -9,13 +9,14 @@ from lxml.builder import ElementMaker
 from osgeo import ogr, osr
 from pyramid.request import Request
 from shapely.geometry import box
+from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..layer import IBboxLayer
 from ..lib.geometry import Geometry, GeometryNotValid
-from ..lib.ows import parse_request, parse_epsg_code, get_work_version
+from ..lib.ows import parse_request, get_work_version
 from ..resource import DataScope
 from ..spatial_ref_sys import SRS
 
@@ -135,12 +136,41 @@ def get_geom_column(feature_layer):
     return feature_layer.column_geom if hasattr(feature_layer, 'column_geom') else 'geom'
 
 
-def geom_from_gml(el):
-    srid = parse_epsg_code(el.attrib['srsName']) if 'srsName' in el.attrib else None
-    value = etree.tostring(el, encoding='utf-8')
-    ogr_geom = ogr.CreateGeometryFromGML(value.decode('utf-8'))
+srs_formats = dict(
+    short=dict(pattern=re.compile(r'EPSG:(\d+)'), axis_xy=True),
+    ogc_urn=dict(pattern=re.compile(r'urn:ogc:def:crs:EPSG::(\d+)'), axis_xy=False),
+    ogc_url=dict(pattern=re.compile(r'http://www.opengis.net/def/crs/EPSG/0/(\d+)'),
+                 axis_xy=False),
+)
 
-    return Geometry.from_ogr(ogr_geom, srid=srid)
+
+def srs_short_format(srs_id):
+    return 'EPSG:%d' % srs_id
+
+
+def srs_ogc_urn_format(srs_id):
+    return 'urn:ogc:def:crs:EPSG::%d' % srs_id
+
+
+def parse_srs(value):
+    for srs_format in srs_formats.values():
+        match = srs_format['pattern'].match(value)
+        if match is not None:
+            return int(match[1]), srs_format['axis_xy']
+    raise ValidationError("Could not recognize SRS format '%s'." % value)
+
+
+def geom_from_gml(el):
+    srid, axis_xy = parse_srs(el.attrib['srsName']) \
+        if 'srsName' in el.attrib else (None, True)
+    value = etree.tostring(el).decode()
+    ogr_geom = ogr.CreateGeometryFromGML(value)
+    geom = Geometry.from_ogr(ogr_geom, srid=srid)
+    if not axis_xy:
+        srs = SRS.filter_by(id=srid).one()
+        if srs.is_geographic:
+            return geom.flip_coordinates()
+    return geom
 
 
 class WFSHandler():
@@ -300,13 +330,22 @@ class WFSHandler():
             __type.append(__name)
             El('Title', parent=__type, text=layer.display_name)
             El('Abstract', parent=__type)
+
             if self.p_version >= v200:
                 srs_tag = 'DefaultCRS'
             elif self.p_version == v110:
                 srs_tag = 'DefaultSRS'
             else:
                 srs_tag = 'SRS'
-            El(srs_tag, parent=__type, text="EPSG:%s" % layer.resource.srs_id)
+            El(srs_tag, parent=__type, text=srs_short_format(layer.resource.srs_id))
+
+            if self.p_version >= v110:
+                for srs in SRS.filter(and_(
+                    SRS.auth_name == 'EPSG',
+                    SRS.id != layer.resource.srs_id
+                )).all():
+                    other_srs_tag = 'OtherCRS' if self.p_version >= v200 else 'OtherSRS'
+                    El(other_srs_tag, parent=__type, text=srs_short_format(srs.id))
 
             if self.p_version == v100:
                 __ops = El('Operations', parent=__type)
@@ -693,9 +732,15 @@ class WFSHandler():
         if self.p_bbox is not None:
             bbox_param = self.p_bbox.split(',')
             box_coords = map(float, bbox_param[:4])
-            box_srid = parse_epsg_code(bbox_param[4]) if len(bbox_param) == 5 else feature_layer.srs_id
+            box_srid, box_axis_xy = parse_srs(bbox_param[4]) \
+                if len(bbox_param) == 5 else (feature_layer.srs_id, True)
             try:
                 box_geom = Geometry.from_shape(box(*box_coords), srid=box_srid, validate=True)
+                # if not box_axis_xy and SRS.filter_by(id=box_srid).one().is_geographic:
+                #   It seems that QGIS is always passes lat/lon BBOX for geographical SRS
+                #   TODO: handle QGIS fix versions
+                if SRS.filter_by(id=box_srid).one().is_geographic:
+                    box_geom = box_geom.flip_coordinates()
             except GeometryNotValid:
                 raise ValidationError("Paremeter BBOX geometry is not valid.")
             query.intersects(box_geom)
@@ -726,7 +771,8 @@ class WFSHandler():
             query.geom()
 
             if self.p_srsname is not None:
-                srs_id = parse_epsg_code(self.p_srsname)
+                # Ignore axis_xy, return X/Y always
+                srs_id, axis_xy = parse_srs(self.p_srsname)
                 srs_out = feature_layer.srs \
                     if srs_id == feature_layer.srs_id \
                     else SRS.filter_by(id=srs_id).one()
@@ -759,6 +805,7 @@ class WFSHandler():
                 geom_gml = geom.ExportToGML([
                     'FORMAT=%s' % self.gml_format,
                     'NAMESPACE_DECL=YES',
+                    'SRSNAME_FORMAT=SHORT',
                     'GMLID=geom-%s' % feature_id])
                 __geom = El('geom', parent=__feature)
                 __gml = etree.fromstring(geom_gml)
@@ -781,11 +828,11 @@ class WFSHandler():
             if None in (minX, minY, maxX, maxY):
                 El('Null' if self.gml_format == 'GML32' else 'null', parent=__boundedBy, namespace=gml['ns'], text='unknown')
             elif self.p_version >= v110:
-                _envelope = El('Envelope', dict(srsName='urn:ogc:def:crs:EPSG::%d' % srs_out.id), parent=__boundedBy, namespace=gml['ns'])
+                _envelope = El('Envelope', dict(srsName=srs_short_format(srs_out.id)), parent=__boundedBy, namespace=gml['ns'])
                 El('lowerCorner', parent=_envelope, namespace=gml['ns'], text='%f %f' % (minX, minY))
                 El('upperCorner', parent=_envelope, namespace=gml['ns'], text='%f %f' % (maxX, maxY))
             else:
-                _box = El('Box', dict(srsName='EPSG:%d' % srs_out.id), parent=__boundedBy, namespace=gml['ns'])
+                _box = El('Box', dict(srsName=srs_short_format(srs_out.id)), parent=__boundedBy, namespace=gml['ns'])
                 El('coordinates', parent=_box, namespace=gml['ns'], text='%f %f %f %f' % (minX, minY, maxX, maxY))
 
             matched = count
@@ -850,6 +897,8 @@ class WFSHandler():
                             geom = geom_from_gml(_property[0])
                         except GeometryNotValid:
                             raise ValidationError("Geometry is not valid.")
+                        if geom.srid is not None and geom.srid != feature_layer.srs_id:
+                            raise ValidationError("Input geometry projection is not supported.")
                         feature.geom = geom
                     else:
                         feature.fields[fld_keyname] = _property.text
@@ -905,6 +954,8 @@ class WFSHandler():
                                 geom = geom_from_gml(_value[0])
                             except GeometryNotValid:
                                 raise ValidationError("Geometry is not valid.")
+                            if geom.srid is not None and geom.srid != feature_layer.srs_id:
+                                raise ValidationError("Input geometry projection is not supported.")
                             feature.geom = geom
                         else:
                             if _value is None:

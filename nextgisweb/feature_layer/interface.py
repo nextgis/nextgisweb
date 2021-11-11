@@ -127,6 +127,8 @@ class IWritableFeatureLayer(IFeatureLayer):
 
 class IFeatureQuery(Interface):
 
+    layer = Attribute(""" IFeatureLayer """)
+
     def fields(self, *args):
         """ Set a list of request fields. If list of fields not set
         return all fields. """
@@ -174,6 +176,8 @@ class IFeatureQueryLike(IFeatureQuery):
 
 
 class IFeatureQueryIntersects(IFeatureQuery):
+
+    srs_supported = Attribute(""" List of supported SRS id """)
 
     def intersects(self, geom):
         """ Set query by spatial intersection """

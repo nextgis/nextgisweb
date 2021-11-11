@@ -1,10 +1,9 @@
 from collections import OrderedDict
 
-from ..lib.config import Option
 from ..component import Component, require
 
 from .feature import Feature, FeatureSet
-from .model import Base, LayerField, LayerFieldsMixin
+from .model import Base, LayerField, LayerFieldsMixin, FeatureQueryIntersectsMixin
 from .interface import (
     GEOM_TYPE,
     GEOM_TYPE_OGR,
@@ -29,6 +28,7 @@ from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 
 __all__ = [
     'Feature',
+    'FeatureQueryIntersectsMixin',
     'FeatureSet',
     'LayerField',
     'LayerFieldsMixin',

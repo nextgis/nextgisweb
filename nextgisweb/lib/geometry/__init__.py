@@ -119,7 +119,14 @@ class Geometry(object):
     # Additional output formats
 
     def to_geojson(self):
+        # NB: srid is not considered
         return geometry_mapping(self.shape)
+
+    # Editors
+
+    def flip_coordinates(self):
+        shape = map_coords(lambda x, y: (y, x), self.shape)
+        return Geometry.from_shape(shape, srid=self.srid)
 
     # Shapely providers
 

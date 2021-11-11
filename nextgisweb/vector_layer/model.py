@@ -31,6 +31,7 @@ from ..resource import (
     SerializedRelationship as SR,
     ResourceGroup)
 from ..resource.exception import ResourceError
+from ..spatial_ref_sys import SRS
 from ..env import env
 from ..models import declarative_base, DBSession, migrate_operation
 from ..layer import SpatialLayerMixin, IBboxLayer
@@ -38,6 +39,7 @@ from ..lib.geometry import Geometry
 from ..lib.ogrhelper import read_dataset
 from ..feature_layer import (
     Feature,
+    FeatureQueryIntersectsMixin,
     FeatureSet,
     LayerField,
     LayerFieldsMixin,
@@ -815,9 +817,11 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     @property
     def feature_query(self):
+        srs_supported_ = [row[0] for row in DBSession.query(SRS.id).all()]
 
         class BoundFeatureQuery(FeatureQueryBase):
             layer = self
+            srs_supported = srs_supported_
 
         return BoundFeatureQuery
 
@@ -1203,9 +1207,11 @@ def _clipbybox2d_exists():
     IFeatureQueryClipByBox,
     IFeatureQuerySimplify,
 )
-class FeatureQueryBase(object):
+class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def __init__(self):
+        super(FeatureQueryBase, self).__init__()
+
         self._srs = None
         self._geom = None
         self._single_part = None
@@ -1224,7 +1230,6 @@ class FeatureQueryBase(object):
         self._filter_by = None
         self._filter_sql = None
         self._like = None
-        self._intersects = None
 
         self._order_by = None
 
@@ -1275,9 +1280,6 @@ class FeatureQueryBase(object):
     def like(self, value):
         self._like = value
 
-    def intersects(self, geom):
-        self._intersects = geom
-
     def __call__(self):
         tableinfo = TableInfo.from_layer(self.layer)
         tableinfo.setup_metadata(self.layer._tablename)
@@ -1286,10 +1288,14 @@ class FeatureQueryBase(object):
         columns = [table.columns.id, ]
         where = []
 
-        srsid = self.layer.srs_id if self._srs is None else self._srs.id
-
         geomcol = table.columns.geom
-        geomexpr = func.st_transform(geomcol, srsid)
+
+        srs = self.layer.srs if self._srs is None else self._srs
+
+        if srs.id != self.layer.srs_id:
+            geomexpr = func.st_transform(geomcol, srs.id)
+        else:
+            geomexpr = geomcol
 
         if self._clip_by_box is not None:
             if _clipbybox2d_exists():
@@ -1307,6 +1313,18 @@ class FeatureQueryBase(object):
             geomexpr = func.st_simplifypreservetopology(
                 geomexpr, self._simplify
             )
+
+        if self._geom_len:
+            columns.append(func.st_length(func.geography(
+                func.st_transform(geomexpr, 4326))).label('geom_len'))
+
+        if self._box:
+            columns.extend((
+                func.st_xmin(geomexpr).label('box_left'),
+                func.st_ymin(geomexpr).label('box_bottom'),
+                func.st_xmax(geomexpr).label('box_right'),
+                func.st_ymax(geomexpr).label('box_top'),
+            ))
 
         if self._geom:
 
@@ -1328,18 +1346,6 @@ class FeatureQueryBase(object):
                 geomexpr = func.st_astext(geomexpr)
 
             columns.append(geomexpr.label('geom'))
-
-        if self._geom_len:
-            columns.append(func.st_length(func.geography(
-                func.st_transform(geomexpr, 4326))).label('geom_len'))
-
-        if self._box:
-            columns.extend((
-                func.st_xmin(geomexpr).label('box_left'),
-                func.st_ymin(geomexpr).label('box_bottom'),
-                func.st_xmax(geomexpr).label('box_right'),
-                func.st_ymax(geomexpr).label('box_top'),
-            ))
 
         selected_fields = []
         for f in tableinfo.fields:
@@ -1427,11 +1433,20 @@ class FeatureQueryBase(object):
             where.append(db.or_(*token))
 
         if self._intersects:
-            intgeom = func.st_setsrid(func.st_geomfromtext(
-                self._intersects.wkt), self._intersects.srid)
-            where.append(func.st_intersects(
-                geomcol, func.st_transform(
-                    intgeom, self.layer.srs_id)))
+            reproject = self._intersects.srid is not None \
+                and self._intersects.srid != self.layer.srs_id
+            int_srs = SRS.filter_by(id=self._intersects.srid).one() \
+                if reproject else self.layer.srs
+
+            int_geom = func.st_geomfromtext(self._intersects.wkt)
+            if int_srs.is_geographic:
+                bound_geom = func.st_makeenvelope(-180, -89.9, 180, 89.9)
+                int_geom = func.st_intersection(bound_geom, int_geom)
+            int_geom = func.st_setsrid(int_geom, int_srs.id)
+            if reproject:
+                int_geom = func.st_transform(int_geom, self.layer.srs_id)
+
+            where.append(func.st_intersects(geomcol, int_geom))
 
         order_criterion = []
         if self._order_by:

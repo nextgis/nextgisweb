@@ -1,12 +1,14 @@
 import json
 import math
-from io import BytesIO
+import numpy
+from six import BytesIO
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
 from PIL import Image
 from bunch import Bunch
 
+from osgeo import gdal, gdal_array
 from pyramid.response import Response
 from pyramid.renderers import render as render_template
 from pyramid.httpexceptions import HTTPBadRequest
@@ -31,6 +33,13 @@ NS_XLINK = 'http://www.w3.org/1999/xlink'
 
 GFI_RADIUS = 5
 GFI_FEATURE_COUNT = 10
+
+
+class IMAGE_FORMAT(object):
+    PNG = 'image/png'
+    JPEG = 'image/jpeg'
+
+    enum = (PNG, JPEG)
 
 
 class ServiceWidget(Widget):
@@ -90,14 +99,14 @@ def _get_capabilities(obj, params, request):
                 E.Format('text/xml'),
                 DCPType()),
             E.GetMap(
-                E.Format('image/png'),
-                E.Format('image/jpeg'),
+                E.Format(IMAGE_FORMAT.PNG),
+                E.Format(IMAGE_FORMAT.JPEG),
                 DCPType()),
             E.GetFeatureInfo(
                 E.Format('text/html'),
                 DCPType()),
             E.GetLegendGraphic(
-                E.Format('image/png'),
+                E.Format(IMAGE_FORMAT.PNG),
                 DCPType())
         ),
         E.Exception(E.Format('text/xml'))
@@ -155,13 +164,19 @@ def geographic_distance(lon_x, lat_x, lon_y, lat_y):
     return meters
 
 
-def _get_map(obj, params, request):
-    p_layers = params.get('LAYERS').split(',')
-    p_bbox = [float(v) for v in params.get('BBOX').split(',')]
-    p_width = int(params.get('WIDTH'))
-    p_height = int(params.get('HEIGHT'))
-    p_format = params.get('FORMAT')
-    p_srs = params.get('SRS', params.get('CRS'))
+def _get_map(obj, request):
+    params = dict((k.upper(), v) for k, v in request.params.items())
+
+    p_layers = params['LAYERS'].split(',')
+    p_bbox = [float(v) for v in params['BBOX'].split(',', 3)]
+    if len(p_bbox) != 4:
+        raise ValidationError("Invalid BBOX parameter.")
+    p_width = int(params['WIDTH'])
+    p_height = int(params['HEIGHT'])
+    p_format = params.get('FORMAT', IMAGE_FORMAT.PNG)
+    if p_format not in IMAGE_FORMAT.enum:
+        raise ValidationError("Invalid FORMAT parameter.")
+    p_srs = params['SRS']
 
     p_size = (p_width, p_height)
 
@@ -182,10 +197,12 @@ def _get_map(obj, params, request):
 
         return delta / img_m
 
+    xmin, ymin, xmax, ymax = p_bbox
+
     if srs.is_geographic:
-        distance = geographic_distance(*p_bbox)
+        distance = geographic_distance(xmin, ymin, xmax, ymax)
     else:
-        distance = p_bbox[2] - p_bbox[0]
+        distance = xmax - xmin
     w_scale = scale(distance, p_width)
 
     for lname in p_layers:
@@ -194,20 +211,60 @@ def _get_map(obj, params, request):
         except KeyError:
             raise ValidationError("Unknown layer: %s" % lname, data=dict(code="LayerNotDefined"))
 
-        request.resource_permission(DataScope.read, lobj.resource)
+        res = lobj.resource
+        request.resource_permission(DataScope.read, res)
 
         if (lobj.min_scale_denom is None or lobj.min_scale_denom >= w_scale) and \
                 (lobj.max_scale_denom is None or w_scale >= lobj.max_scale_denom):
-            req = lobj.resource.render_request(srs)
-            limg = req.render_extent(p_bbox, p_size)
+            req = res.render_request(res.srs)
+
+            # Do not use foreign SRS as it does not work correctly yet
+            if srs.id == res.srs.id:
+                limg = req.render_extent(p_bbox, p_size)
+            else:
+                mem = gdal.GetDriverByName('MEM')
+
+                dst_geo = (xmin, (xmax - xmin) / p_width, 0, ymax, 0, (ymin - ymax) / p_height)
+                dst_ds = mem.Create('', p_width, p_height, 4, gdal.GDT_Byte)
+                dst_ds.SetGeoTransform(dst_geo)
+
+                vrt = gdal.AutoCreateWarpedVRT(dst_ds, srs.wkt, res.srs.wkt)
+                src_width = vrt.RasterXSize
+                src_height = vrt.RasterYSize
+                src_geo = vrt.GetGeoTransform()
+                vrt = None
+
+                src_bbox = (src_geo[0], src_geo[3] + src_geo[5] * src_height,
+                            src_geo[0] + src_geo[1] * src_width, src_geo[3])
+                limg = req.render_extent(src_bbox, (src_width, src_height))
+
+                if limg is not None:
+                    data = numpy.asarray(limg)
+                    img_h, img_w, band_count = data.shape
+
+                    src_ds = mem.Create('', src_width, src_height, band_count, gdal.GDT_Byte)
+                    src_ds.SetGeoTransform(src_geo)
+                    for i in range(band_count):
+                        bandArray = data[:, :, i]
+                        src_ds.GetRasterBand(i + 1).WriteArray(bandArray)
+
+                    gdal.ReprojectImage(src_ds, dst_ds, res.srs.wkt, srs.wkt)
+
+                    array = numpy.zeros((p_height, p_width, band_count), numpy.uint8)
+                    for i in range(band_count):
+                        array[:, :, i] = gdal_array.BandReadAsArray(dst_ds.GetRasterBand(i + 1))
+                    limg = Image.fromarray(array)
+
+                    src_ds = dst_ds = None
+
             if limg is not None:
                 img.paste(limg, (0, 0), limg)
 
     buf = BytesIO()
 
-    if p_format == 'image/jpeg':
+    if p_format == IMAGE_FORMAT.JPEG:
         img.convert('RGB').save(buf, 'jpeg')
-    elif p_format == 'image/png':
+    elif p_format == IMAGE_FORMAT.PNG:
         img.save(buf, 'png', compress_level=3)
 
     buf.seek(0)

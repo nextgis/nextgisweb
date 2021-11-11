@@ -1,9 +1,11 @@
-from zope.interface import Interface
+from zope.interface import Interface, Attribute
 
 from ..resource import IResourceBase
 
 
 class IRenderableStyle(IResourceBase):
+
+    srs = Attribute(""" Source SRS """)
 
     def render_request(self, srs, cond=None):
         pass
