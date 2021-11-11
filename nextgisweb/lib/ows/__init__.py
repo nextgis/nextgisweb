@@ -2,11 +2,12 @@ from io import BytesIO
 
 from lxml import etree
 
-__all__ = ['parse_request', 'parse_epsg_code', 'get_exception_template']
+__all__ = ['parse_request', 'parse_epsg_code', 'get_exception_template', 'FIELD_TYPE_WFS']
 
 
 class FIELD_TYPE_WFS(object):
     INTEGER = 'integer'
+    LONG = 'long'
     DOUBLE = 'double'
     STRING = 'string'
     DATE = 'date'

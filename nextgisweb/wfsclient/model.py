@@ -49,6 +49,7 @@ from .util import _, COMP_ID
 
 WFS_2_FIELD_TYPE = {
     FIELD_TYPE_WFS.INTEGER: FIELD_TYPE.INTEGER,
+    FIELD_TYPE_WFS.LONG: FIELD_TYPE.BIGINT,
     FIELD_TYPE_WFS.DOUBLE: FIELD_TYPE.REAL,
     FIELD_TYPE_WFS.STRING: FIELD_TYPE.STRING,
     FIELD_TYPE_WFS.DATE: FIELD_TYPE.DATE,
@@ -278,7 +279,7 @@ class WFSConnection(Base, Resource):
                     nil_attr = r'{http://www.w3.org/2001/XMLSchema-instance}nil'
                     if _property.attrib.get(nil_attr, 'false') == 'true':
                         value = None
-                    elif datatype == FIELD_TYPE.INTEGER:
+                    elif datatype in (FIELD_TYPE.INTEGER, FIELD_TYPE.BIGINT):
                         value = int(_property.text)
                     elif datatype == FIELD_TYPE.REAL:
                         value = float(_property.text)

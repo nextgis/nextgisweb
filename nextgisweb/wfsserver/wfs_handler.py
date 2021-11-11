@@ -16,7 +16,7 @@ from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..layer import IBboxLayer
 from ..lib.geometry import Geometry, GeometryNotValid
-from ..lib.ows import parse_request, get_work_version
+from ..lib.ows import parse_request, parse_epsg_code, get_work_version, FIELD_TYPE_WFS
 from ..resource import DataScope
 from ..spatial_ref_sys import SRS
 
@@ -25,6 +25,16 @@ from .util import validate_tag
 
 
 wfsfld_pattern = re.compile(r'^wfsfld_(\d+)$')
+
+FIELD_TYPE_2_WFS = {
+    FIELD_TYPE.INTEGER: FIELD_TYPE_WFS.INTEGER,
+    FIELD_TYPE.BIGINT: FIELD_TYPE_WFS.LONG,
+    FIELD_TYPE.REAL: FIELD_TYPE_WFS.DOUBLE,
+    FIELD_TYPE.STRING: FIELD_TYPE_WFS.STRING,
+    FIELD_TYPE.DATE: FIELD_TYPE_WFS.DATE,
+    FIELD_TYPE.TIME: FIELD_TYPE_WFS.TIME,
+    FIELD_TYPE.DATETIME: FIELD_TYPE_WFS.DATETIME,
+}
 
 # Spec: http://docs.opengeospatial.org/is/09-025r2/09-025r2.html
 v100 = '1.0.0'
@@ -671,12 +681,9 @@ class WFSHandler():
                 feature_layer.geometry_type]), parent=__seq)
 
             for field in feature_layer.fields:
-                if field.datatype == FIELD_TYPE.REAL:
-                    datatype = 'double'
-                elif field.datatype == FIELD_TYPE.DATETIME:
-                    datatype = 'dateTime'
-                else:
-                    datatype = field.datatype.lower()
+                datatype = FIELD_TYPE_2_WFS.get(field.datatype)
+                if datatype is None:
+                    raise ValidationError("Unknown data type: %s" % field.datatype)
                 El('element', dict(minOccurs='0', name=self._field_key_encode(field),
                                    type=datatype, nillable='true'), parent=__seq)
 
