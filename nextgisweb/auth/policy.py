@@ -9,11 +9,10 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.httpexceptions import HTTPUnauthorized
 
 from ..lib.config import OptionAnnotations, Option
-from ..core.exception import ValidationError
 from ..pyramid import WebSession
 
 from .models import User
-from .exception import InvalidCredentialsException, UserDisabledException
+from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, UserDisabledException
 from .oauth import OAuthTokenRefreshException
 
 
@@ -85,17 +84,18 @@ class AuthenticationPolicy(object):
 
         ahead = request.headers.get('Authorization')
         if ahead is not None:
-            items = ahead.split(' ')
-            if len(items) != 2:
-                raise ValidationError("Invalid 'Authorization' header.")
-            amode, value = items
+            try:
+                amode, value = ahead.split(' ', maxsplit=1)
+            except ValueError:
+                raise InvalidAuthorizationHeader()
             amode = amode.upper()
 
             if amode == 'BASIC':
-                items = b64decode(value).decode('utf-8').split(':')
-                if len(items) != 2:
-                    raise ValidationError("Invalid 'Authorization' header.")
-                username, password = items
+                try:
+                    decoded = b64decode(value).decode('utf-8')
+                    username, password = decoded.split(':', maxsplit=1)
+                except ValueError:
+                    raise InvalidAuthorizationHeader()
 
                 # Allow token authorization via basic when
                 # username is empty (for legacy clients).
