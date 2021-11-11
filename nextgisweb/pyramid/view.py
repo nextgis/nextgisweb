@@ -12,13 +12,13 @@ from psutil import Process
 from pyramid.response import Response, FileResponse
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import BeforeRender
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from ..env import env
 from .. import dynmenu as dm, pkginfo
 from ..core.exception import UserException
 from ..package import amd_packages
-from ..auth.exception import InvalidCredentialsException, UserDisabledException
+from ..models import DBSession
 
 from . import exception
 from .session import WebSession
@@ -197,6 +197,17 @@ def test_exception_unhandled(request):
     raise UnhandledTestException()
 
 
+def test_exception_transaction(request):
+    request.user
+
+    try:
+        DBSession.execute("DO $$ BEGIN RAISE division_by_zero; END $$")
+    except Exception:
+        pass
+
+    DBSession.execute("SELECT 1")
+
+
 def test_timeout(reqest):
     logger = reqest.env.pyramid.logger
 
@@ -304,21 +315,32 @@ def setup_pyramid(comp, config):
     
     # Replace default locale negotiator with session-based one
     def locale_negotiator(request):
-        try:
-            user_lang = request.user.language
-            if user_lang is not None:
-                return user_lang
-        except (HTTPUnauthorized, InvalidCredentialsException, UserDisabledException) as exc:
-            # Ignore user language in case of authentication failure
-            pass
+        environ = request.environ
 
-        session_lang = request.session.get('pyramid.locale')
-        if session_lang is not None:
-            return session_lang
+        if 'auth.user' in environ:
+            user_loaded = True
+        else:
+            # Force to load user's profile. But it might fail because of
+            # authentication or transaction failueres.
+            try:
+                request.user
+            except Exception:
+                user_loaded = False
+            else:
+                user_loaded = True
 
-        accept_lang = request.accept_language.best_match(locale_sorted)
-        if accept_lang is not None:
-            return accept_lang
+        if user_loaded:
+            environ_language = environ['auth.user']['language']
+            if environ_language is not None:
+                return environ_language
+
+        session_language = request.session.get('pyramid.locale')
+        if session_language is not None:
+            return session_language
+
+        accept_language = request.accept_language.best_match(locale_sorted)
+        if accept_language is not None:
+            return accept_language
 
         return locale_default
 
@@ -450,6 +472,8 @@ def setup_pyramid(comp, config):
         .add_view(test_exception_handled)
     config.add_route('pyramid.test_exception_unhandled', '/test/exception/unhandled') \
         .add_view(test_exception_unhandled)
+    config.add_route('pyramid.test_exception_transaction', '/test/exception/transaction') \
+        .add_view(test_exception_transaction)
     config.add_route('pyramid.test_timeout', '/test/timeout') \
         .add_view(test_timeout)
 

@@ -12,6 +12,7 @@
     login_url = request.login_url()
 
     # Fetching user details may fail sometimes, especially in error handlers!
+    # TODO: But now it's fixed and this block needs major refactoring.
     try:
         user = request.user
         user_mode = 'guest' if user.keyname == 'guest' else (

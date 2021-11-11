@@ -75,8 +75,8 @@ def audit_tween_factory(handler, registry):
             user = request.environ.get("auth.user")
             if user is not None:
                 body['user'] = OrderedDict(
-                    id=user.id, keyname=user.keyname,
-                    display_name=user.display_name)
+                    id=user['id'], keyname=user['keyname'],
+                    display_name=user['display_name'])
 
             body['response'] = body_response = OrderedDict(
                 status_code=response.status_code)

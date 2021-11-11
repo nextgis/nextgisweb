@@ -4,6 +4,8 @@ from urllib.parse import urlencode, urlparse
 
 import transaction
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm import defer
+from sqlalchemy import select
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.interfaces import IAuthenticationPolicy
 
@@ -80,33 +82,55 @@ class AuthComponent(Component):
     def setup_pyramid(self, config):
 
         def user(request):
+            environ = request.environ
+            cached = environ.get('auth.user_obj')
+
+            # Check that the cached value is in the current DBSession (and
+            # therefore can load fields from DB).
+            if cached is not None and cached in DBSession:
+                return cached
+
+            # Username, password and token are validated here.
             user_id = request.authenticated_userid
-            user = User.filter(
+
+            user = DBSession.query(User).filter(
                 (User.id == user_id) if user_id is not None
-                else (User.keyname == 'guest')).one()
+                else (User.keyname == 'guest'),
+            ).options(
+                defer(User.description),
+                defer(User.password_hash),
+                defer(User.oauth_subject),
+                defer(User.oauth_tstamp),
+            ).one()
 
             if user.disabled:
                 raise UserDisabledException()
+            
+            # Update last_activity if more than activity_delta time passed, but
+            # only once per request.
+            if cached is None:
+                # Make locals in order to avoid SA session expiration issues
+                user_id, user_la = user.id, user.last_activity
 
-            # Make locals in order to avoid SA session expiration
-            user_id, user_la = user.id, user.last_activity
+                delta = self.options['activity_delta']
+                if user_la is None or (datetime.utcnow() - user_la) > delta:
 
-            # Update user's last_activity if more than activity_delta
-            delta = self.options['activity_delta']
-            if user_la is None or (datetime.utcnow() - user_la) > delta:
+                    def update_last_activity(request):
+                        with transaction.manager:
+                            DBSession.query(User).filter_by(
+                                principal_id=user_id,
+                                last_activity=user_la,
+                            ).update(dict(last_activity=datetime.utcnow()))
 
-                def update_last_activity(request):
-                    with transaction.manager:
-                        DBSession.query(User).filter_by(
-                            principal_id=user_id,
-                            last_activity=user_la,
-                        ).update(dict(last_activity=datetime.utcnow()))
+                    request.add_finished_callback(update_last_activity)
 
-                request.add_finished_callback(update_last_activity)
+            # Store essential user details request's environ
+            environ['auth.user'] = dict(
+                id=user.id, keyname=user.keyname,
+                display_name=user.display_name,
+                language=user.language)
 
-            # Keep user in request environ for audit component
-            request.environ['auth.user'] = user
-
+            environ['auth.user_obj'] = cached
             return user
 
         def require_administrator(request):
@@ -114,7 +138,7 @@ class AuthComponent(Component):
                 raise HTTPForbidden(
                     "Membership in group 'administrators' required!")
 
-        config.add_request_method(user, reify=True)
+        config.add_request_method(user, property=True)
         config.add_request_method(require_administrator)
 
         config.set_authentication_policy(AuthenticationPolicy(
