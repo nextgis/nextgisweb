@@ -88,14 +88,20 @@ class AuthComponent(Component):
             if user.disabled:
                 raise UserDisabledException()
 
-            # Set user last activity
+            # Make locals in order to avoid SA session expiration
+            user_id, user_la = user.id, user.last_activity
+
+            # Update user's last_activity if more than activity_delta
             delta = self.options['activity_delta']
-            if user.last_activity is None or (datetime.utcnow() - user.last_activity) > delta:
+            if user_la is None or (datetime.utcnow() - user_la) > delta:
+
                 def update_last_activity(request):
                     with transaction.manager:
                         DBSession.query(User).filter_by(
-                            principal_id=user.id, last_activity=user.last_activity
+                            principal_id=user_id,
+                            last_activity=user_la,
                         ).update(dict(last_activity=datetime.utcnow()))
+
                 request.add_finished_callback(update_last_activity)
 
             # Keep user in request environ for audit component
