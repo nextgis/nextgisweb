@@ -94,12 +94,25 @@ define([
             }
         },
         
-        _validate: function () {
-            return this.wNominatimCountryCodes.validate();
+        _validateAddressSearch: function () {
+            const addressDisabled = this.wAddressEnabled.get("value") !== "on";
+            if (addressDisabled) {
+                return true;
+            }                
+            
+            const addressGeocoder = this.wAddressGeocoder.get('value');
+            if (addressGeocoder === 'yandex' && !this.wYandexApiGeocoderKey.validate()) {
+                return false;
+            }            
+            if (addressGeocoder === 'nominatim' && !this.wNominatimCountryCodes.validate()) {
+                return false;
+            }
+
+            return true;
         },
 
         _save: function () {
-            if (!this._validate()) {
+            if (!this._validateAddressSearch()) {
                 ErrorDialog.showMessage(
                     i18n.gettext("Validation error"),
                     i18n.gettext("Errors found during data validation. Controls with errors marked in red. Fix it, please.")

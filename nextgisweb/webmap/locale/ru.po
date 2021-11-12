@@ -97,7 +97,7 @@ msgstr "Порядок слоёв"
 msgid "Use on the map"
 msgstr "Учитывать на карте"
 
-#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:115
+#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:117
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:105
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
 msgid "Save"
@@ -107,17 +107,17 @@ msgstr "Сохранить"
 msgid "Add group"
 msgstr "Добавить группу"
 
-#: amd/ngw-webmap/SettingsForm.js:93
+#: amd/ngw-webmap/SettingsForm.js:117
 msgid "Validation error"
 msgstr "Ошибка валидации"
 
-#: amd/ngw-webmap/SettingsForm.js:94
+#: amd/ngw-webmap/SettingsForm.js:118
 msgid ""
 "Errors found during data validation. Controls with errors marked in red. Fix "
 "it, please."
 msgstr ""
-"При проверке введенных данных обнаружены ошибки. Элементы с ошибками выделены красным цветом. "
-"Исправьте, пожалуйста и сохраните еще раз."
+"При проверке введенных данных обнаружены ошибки. Элементы с ошибками выделены"
+" красным цветом. Исправьте, пожалуйста и сохраните еще раз."
 
 #: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:23
 msgid "Your annotation text"
@@ -390,6 +390,10 @@ msgid "Limit search results to countries"
 msgstr "Ограничить поиск странами"
 
 #: amd/ngw-webmap/template/SettingsForm.hbs:106
+msgid "Yandex.Maps Key is required"
+msgstr "Ключ Yandex.Maps обязателен"
+
+#: amd/ngw-webmap/template/SettingsForm.hbs:108
 msgid "Yandex.Maps API Geocoder Key"
 msgstr "Ключ геокодера API Яндекс.Карт"
 

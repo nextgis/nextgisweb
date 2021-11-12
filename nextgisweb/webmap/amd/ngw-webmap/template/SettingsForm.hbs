@@ -101,8 +101,10 @@
                  title="{{gettext 'Limit search results to countries'}}" style="width: 100%"></div>
 
             <div data-dojo-attach-point="wYandexApiGeocoderKey"
-                data-dojo-type="dijit/form/TextBox"
-                data-dojo-props="trim: true"
+                data-dojo-type="dijit/form/ValidationTextBox"
+                data-dojo-props="
+                    promptMessage: {{gettextString 'Yandex.Maps Key is required'}},
+                    required: true"
                 title="{{gettext 'Yandex.Maps API Geocoder Key'}}" style="width: 100%"></div>
 
         </div>
