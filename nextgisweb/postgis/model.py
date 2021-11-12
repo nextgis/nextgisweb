@@ -22,11 +22,13 @@ from ..resource import (
     ValidationError,
     ForbiddenError,
     ResourceGroup)
+from ..spatial_ref_sys import SRS
 from ..env import env
 from ..layer import IBboxLayer, SpatialLayerMixin
 from ..lib.geometry import Geometry
 from ..feature_layer import (
     Feature,
+    FeatureQueryIntersectsMixin,
     FeatureSet,
     LayerField,
     LayerFieldsMixin,
@@ -532,7 +534,7 @@ class PostgisLayerSerializer(Serializer):
     IFeatureQueryIntersects,
     IFeatureQueryOrderBy,
 )
-class FeatureQueryBase(object):
+class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def __init__(self):
         super(FeatureQueryBase, self).__init__()
@@ -549,7 +551,6 @@ class FeatureQueryBase(object):
         self._filter = None
         self._filter_by = None
         self._like = None
-        self._intersects = None
 
         self._order_by = None
 
@@ -599,10 +600,14 @@ class FeatureQueryBase(object):
         idcol = db.sql.column(self.layer.column_id)
         addcol(idcol.label('id'))
 
-        srsid = self.layer.srs_id if self._srs is None else self._srs.id
-
         geomcol = db.sql.column(self.layer.column_geom)
-        geomexpr = db.func.st_transform(geomcol, srsid)
+
+        srs = self.layer.srs if self._srs is None else self._srs
+
+        if srs.id != self.layer.geometry_srid:
+            geomexpr = db.func.st_transform(geomcol, srs.id)
+        else:
+            geomexpr = geomcol
 
         if self._geom:
             if self._geom_format == 'WKB':
@@ -660,11 +665,20 @@ class FeatureQueryBase(object):
             select.append_whereclause(db.or_(*clauses))
 
         if self._intersects:
-            intgeom = db.func.st_setsrid(db.func.st_geomfromtext(
-                self._intersects.wkt), self._intersects.srid)
-            select.append_whereclause(db.func.st_intersects(
-                geomcol, db.func.st_transform(
-                    intgeom, self.layer.geometry_srid)))
+            reproject = self._intersects.srid is not None \
+                and self._intersects.srid != self.layer.srs_id
+            int_srs = SRS.filter_by(id=self._intersects.srid).one() \
+                if reproject else self.layer.srs
+
+            int_geom = db.func.st_geomfromtext(self._intersects.wkt)
+            if int_srs.is_geographic:
+                bound_geom = db.func.st_makeenvelope(-180, -89.9, 180, 89.9)
+                int_geom = db.func.st_intersection(bound_geom, int_geom)
+            int_geom = db.func.st_setsrid(int_geom, int_srs.id)
+            if reproject:
+                int_geom = db.func.st_transform(int_geom, self.layer.srs_id)
+
+            select.append_whereclause(db.func.st_intersects(geomcol, int_geom))
 
         if self._box:
             addcol(db.func.st_xmin(geomexpr).label('box_left'))
