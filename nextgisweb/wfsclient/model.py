@@ -247,7 +247,7 @@ class WFSConnection(Base, Resource):
                 req_root.attrib['startindex'] = str(offset)
 
         if srs is not None:
-            req_root.attrib['srsName'] = str(srs)
+            req_root.attrib['srsName'] = 'EPSG:%d' % srs
 
         body = self.request_wfs('POST', xml_root=req_root)
 
