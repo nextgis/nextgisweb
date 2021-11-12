@@ -338,11 +338,7 @@ def setup_pyramid(comp, config):
         if session_language is not None:
             return session_language
 
-        accept_language = request.accept_language.best_match(locale_sorted)
-        if accept_language is not None:
-            return accept_language
-
-        return locale_default
+        return request.accept_language.lookup(locale_sorted, default=locale_default)
 
     config.set_locale_negotiator(locale_negotiator)
 

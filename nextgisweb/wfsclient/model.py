@@ -11,7 +11,7 @@ from shapely.geometry import box
 from zope.interface import implementer
 
 from .. import db
-from ..core.exception import ValidationError, OperationalError
+from ..core.exception import ForbiddenError, ValidationError, OperationalError
 from ..env import env
 from ..feature_layer import (
     Feature,
@@ -34,9 +34,7 @@ from ..resource import (
     ConnectionScope,
     DataScope,
     DataStructureScope,
-    ForbiddenError,
     Resource,
-    ResourceError,
     ResourceGroup,
     SerializedProperty as SP,
     SerializedRelationship as SR,
@@ -90,7 +88,7 @@ def get_srid(value):
 
 
 def fid_int(fid, layer_name):
-    m = re.search('^%s\.(\d+)$' % layer_name, fid)
+    m = re.search(r'^%s\.(\d+)$' % layer_name, fid)
     if m is None:
         raise ValidationError("Feature ID encoding is not supported")
     return int(m.group(1))
@@ -425,7 +423,7 @@ class _fields_action(SP):
             else:
                 raise ForbiddenError()
         elif value != 'keep':
-            raise ResourceError()
+            raise ValidationError("Invalid 'fields' parameter.")
 
 
 class WFSLayerSerializer(Serializer):

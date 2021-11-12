@@ -5,9 +5,8 @@ from zope.interface import Interface, implementer
 
 from ..registry import registry_maker
 from ..models import BaseClass
-from ..core.exception import IUserException
+from ..core.exception import IUserException, ForbiddenError
 
-from .exception import ForbiddenError
 from .util import _
 
 _registry = registry_maker()

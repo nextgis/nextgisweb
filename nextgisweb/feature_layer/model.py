@@ -6,6 +6,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
 
 from .. import db
+from ..core.exception import ValidationError
 from ..lib.geometry import Transformer
 from ..models import declarative_base
 from ..resource import (
@@ -13,7 +14,6 @@ from ..resource import (
     DataStructureScope,
     Serializer,
     SerializedProperty as SP)
-from ..resource.exception import ValidationError
 from ..spatial_ref_sys import SRS
 from ..lookup_table import LookupTable
 

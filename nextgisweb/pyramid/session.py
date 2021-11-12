@@ -111,7 +111,7 @@ class WebSession(dict):
                     if h == 'Set-Cookie' and v.startswith(self._cookie_name + '='):
                         return
                 cookie_settings = WebSession.cookie_settings(request)
-                cookie_settings['max_age'] = self._cookie_max_age.total_seconds()
+                cookie_settings['max_age'] = int(self._cookie_max_age.total_seconds())
                 response.set_cookie(self._cookie_name, value=self._session_id,
                                     **cookie_settings)
 

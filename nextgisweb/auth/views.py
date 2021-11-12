@@ -66,11 +66,12 @@ def login(request):
             exp = datetime.fromtimestamp(value[2])
             if datetime.fromisoformat(expires) != exp:
                 raise InvalidCredentialsException(_("Invalid 'expires' parameter."))
-            if exp <= datetime.utcnow():
+            now = datetime.utcnow()
+            if exp <= now:
                 raise InvalidCredentialsException(_("Session expired."))
 
             cookie_settings = WebSession.cookie_settings(request)
-            cookie_settings['expires'] = expires
+            cookie_settings['max_age'] = int((exp - now).total_seconds())
 
             cookie_name = request.env.pyramid.options['session.cookie.name']
 

@@ -11,12 +11,14 @@ from .util import _
 
 
 __all__ = [
-    'ResourceError',
     'ResourceNotFound',
     'DisplayNameNotUnique',
+    'HierarchyError',
+
+    # deprecate
+    'ResourceError',
     'ForbiddenError',
     'ValidationError',
-    'HierarchyError',
     'OperationalError',
 ]
 
@@ -48,6 +50,10 @@ class DisplayNameNotUnique(ValidationError):
             data=dict(resource_id=resource_id))
 
 
+class HierarchyError(ValidationError):
+    title = _("Hierarchy error")
+
+
 # TODO: Rewrite old-style resource exception classes
 
 @implementer(IUserException)
@@ -65,18 +71,6 @@ class ResourceError(Exception):
 class ForbiddenError(ResourceError):
     title = _("Forbidden")
     http_status_code = 403
-
-
-class ValidationError(ResourceError):
-    """ Exception raised by incorrect data
-    from user or external service """
-
-    title = _("Validation error")
-    http_status_code = 422
-
-
-class HierarchyError(ValidationError):
-    title = _("Hierarchy error")
 
 
 class OperationalError(ResourceError):

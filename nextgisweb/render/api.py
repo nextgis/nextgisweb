@@ -7,7 +7,8 @@ from PIL import Image, ImageDraw, ImageFont
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
 
-from ..resource import Resource, ResourceNotFound, DataScope, resource_factory, ValidationError
+from ..core.exception import ValidationError
+from ..resource import Resource, ResourceNotFound, DataScope, resource_factory
 
 from .interface import ILegendableStyle, IRenderableStyle
 from .util import af_transform

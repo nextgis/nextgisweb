@@ -91,6 +91,11 @@ class ValidationError(UserException):
     http_status_code = 422
 
 
+class ForbiddenError(UserException):
+    title = _("Forbidden")
+    http_status_code = 403
+
+
 class InsufficientPermissions(UserException):
     title = _("Insufficient permissions")
     http_status_code = 403

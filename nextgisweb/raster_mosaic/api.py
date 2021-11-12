@@ -1,9 +1,11 @@
 from pyramid.response import FileResponse
 from sqlalchemy.orm.exc import NoResultFound
 
-from .model import RasterMosaic, RasterMosaicItem
+from ..core.exception import ValidationError
 from ..env import env
-from ..resource import ValidationError, DataScope
+from ..resource import DataScope
+
+from .model import RasterMosaic, RasterMosaicItem
 from .util import _
 
 

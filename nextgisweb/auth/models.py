@@ -134,7 +134,7 @@ class User(Principal):
 
     @password.setter # NOQA
     def password(self, value):
-        self.password_hash = sha256_crypt.encrypt(value)
+        self.password_hash = sha256_crypt.hash(value)
 
     def serialize(self):
         return OrderedDict((

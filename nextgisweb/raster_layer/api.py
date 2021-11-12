@@ -3,9 +3,10 @@ import tempfile
 from osgeo import gdal
 from pyramid.response import FileResponse
 
+from ..core.exception import ValidationError
 from ..env import env
 from ..spatial_ref_sys import SRS
-from ..resource import ValidationError, DataScope
+from ..resource import DataScope
 from .gdaldriver import EXPORT_FORMAT_GDAL
 from .model import RasterLayer
 from .util import _

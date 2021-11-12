@@ -120,7 +120,7 @@ class StorageComponentMixin(object):
 
     def estimate_storage_all(self):
         if not self.options['storage.enabled']:
-            logger.warn("Nothing to do because storage stat isn't enabled!")
+            logger.warning("Nothing to do because storage stat isn't enabled!")
             return
 
         timestamp = datetime.utcnow()

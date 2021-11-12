@@ -6,10 +6,10 @@ from osgeo import gdal, osr
 from zope.interface import implementer
 
 from .. import db
+from ..core.exception import ValidationError
 from ..env import env
 from ..lib.geometry import Geometry
 from ..models import declarative_base, DBSession
-from ..resource.exception import ValidationError
 from ..resource import (
     DataScope,
     DataStructureScope,

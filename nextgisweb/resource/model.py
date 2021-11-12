@@ -7,6 +7,7 @@ from sqlalchemy import event, text
 
 from .. import db
 from ..auth import Principal, User, Group, OnFindReferencesData
+from ..core.exception import ValidationError, ForbiddenError
 from ..env import env
 from ..models import declarative_base, DBSession
 from ..registry import registry_maker
@@ -20,7 +21,7 @@ from .serialize import (
     SerializedResourceRelationship as SRR)
 from .scope import DataScope, ResourceScope, MetadataScope
 from .permission import RequirementList
-from .exception import ValidationError, HierarchyError, ForbiddenError, DisplayNameNotUnique
+from .exception import HierarchyError, DisplayNameNotUnique
 
 
 __all__ = ['Resource', ]

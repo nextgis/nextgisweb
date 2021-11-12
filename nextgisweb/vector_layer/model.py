@@ -30,7 +30,6 @@ from ..resource import (
     SerializedProperty as SP,
     SerializedRelationship as SR,
     ResourceGroup)
-from ..resource.exception import ResourceError
 from ..spatial_ref_sys import SRS
 from ..env import env
 from ..models import declarative_base, DBSession, migrate_operation
@@ -1167,7 +1166,7 @@ class _geometry_type_attr(SP):
             srlzr.obj.geometry_type = value
 
         elif srlzr.obj.geometry_type != value:
-            raise ResourceError(_("Geometry type for existing resource can't be changed."))
+            raise ValidationError(_("Geometry type for existing resource can't be changed."))
 
 
 P_DSS_READ = DataStructureScope.read

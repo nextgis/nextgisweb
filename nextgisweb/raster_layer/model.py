@@ -9,6 +9,7 @@ from zope.interface import implementer
 from collections import OrderedDict
 from osgeo import gdal, gdalconst, osr, ogr
 
+from ..core.exception import ValidationError
 from ..lib.osrhelper import traditional_axis_mapping
 from ..models import declarative_base
 from ..resource import (
@@ -18,7 +19,6 @@ from ..resource import (
     SerializedProperty as SP,
     SerializedRelationship as SR,
     ResourceGroup)
-from ..resource.exception import ValidationError
 from ..env import env
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..file_storage import FileObj

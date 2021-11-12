@@ -5,6 +5,7 @@ import magic
 import zipfile
 
 from .. import db
+from ..core.exception import ValidationError
 from ..env import env
 from ..file_storage import FileObj
 from ..models import DBSession, declarative_base
@@ -13,7 +14,6 @@ from ..resource import (
     Serializer,
     SerializedProperty as SP,
     ResourceScope,
-    ValidationError,
     ResourceGroup)
 
 from .util import _, COMP_ID

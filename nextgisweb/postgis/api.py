@@ -4,10 +4,10 @@ from sqlalchemy import inspect
 from sqlalchemy.exc import NoSuchTableError
 from pyramid.response import Response
 
-from .model import PostgisConnection
+from ..core.exception import ValidationError
 from ..resource import resource_factory, ConnectionScope
-from ..resource.exception import ValidationError
 
+from .model import PostgisConnection
 from .util import _
 
 

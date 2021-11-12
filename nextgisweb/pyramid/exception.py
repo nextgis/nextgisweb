@@ -34,7 +34,7 @@ def includeme(config):
     # PYRAMID REDEFINED METHODS FOR ERROR HANDLING
     def json_body(req):
         try:
-            return json.loads(req.body, encoding=req.charset)
+            return json.loads(req.body.decode(req.charset))
         except ValueError as exc:
             user_exception(exc, title="JSON parse error", http_status_code=400)
             reraise(*sys.exc_info())

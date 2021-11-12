@@ -8,6 +8,7 @@ from sqlalchemy.engine.url import (
 from zope.interface import implementer
 
 from .. import db
+from ..core.exception import ValidationError, ForbiddenError
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -18,9 +19,6 @@ from ..resource import (
     SerializedProperty as SP,
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
-    ResourceError,
-    ValidationError,
-    ForbiddenError,
     ResourceGroup)
 from ..spatial_ref_sys import SRS
 from ..env import env
@@ -501,7 +499,7 @@ class _fields_action(SP):
             else:
                 raise ForbiddenError()
         elif value != 'keep':
-            raise ResourceError()
+            raise ValidationError("Invalid 'fields' parameter.")
 
 
 class PostgisLayerSerializer(Serializer):

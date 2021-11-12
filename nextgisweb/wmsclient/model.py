@@ -13,6 +13,7 @@ from owslib.map.common import WMSCapabilitiesReader
 from pyramid.url import urlencode
 
 from .. import db
+from ..core.exception import ValidationError
 from ..env import env
 from ..models import declarative_base
 from ..resource import (
@@ -24,7 +25,6 @@ from ..resource import (
     SerializedProperty as SP,
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
-    ValidationError,
     ResourceGroup)
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..render import (

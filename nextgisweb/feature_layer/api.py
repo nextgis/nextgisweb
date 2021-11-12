@@ -16,8 +16,9 @@ from pyramid.httpexceptions import HTTPNoContent, HTTPNotFound
 from shapely.geometry import box
 from sqlalchemy.orm.exc import NoResultFound
 
+from ..core.exception import ValidationError
 from ..lib.geometry import Geometry, GeometryNotValid, Transformer
-from ..resource import DataScope, ValidationError, Resource, resource_factory
+from ..resource import DataScope, Resource, resource_factory
 from ..resource.exception import ResourceNotFound
 from ..spatial_ref_sys import SRS
 from .. import geojson
