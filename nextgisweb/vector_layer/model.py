@@ -1440,6 +1440,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             int_geom = func.st_geomfromtext(self._intersects.wkt)
             if int_srs.is_geographic:
+                # Prevent tolerance condition error
                 bound_geom = func.st_makeenvelope(-180, -89.9, 180, 89.9)
                 int_geom = func.st_intersection(bound_geom, int_geom)
             int_geom = func.st_setsrid(int_geom, int_srs.id)
