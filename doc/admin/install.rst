@@ -47,7 +47,8 @@ System requirements
       # apt install postgresql postgresql-contrib postgis
       # su postgres -c psql
       postgres=# CREATE ROLE nextgisweb LOGIN PASSWORD 'changeme';
-      postgres=# CREATE DATABASE nextgisweb OWNER nextgisweb;
+      postgres=# CREATE DATABASE nextgisweb OWNER nextgisweb
+      postgres-# ENCODING 'UTF-8' LC_COLLATE 'C.UTF-8' LC_CTYPE 'C.UTF-8';
       postgres=# \connect nextgisweb
       nextgisweb=# CREATE EXTENSION postgis;
       nextgisweb=# ALTER TABLE spatial_ref_sys OWNER TO nextgisweb;
