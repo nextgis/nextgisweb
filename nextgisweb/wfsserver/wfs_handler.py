@@ -212,8 +212,10 @@ class WFSHandler():
             message = "Unknown error"
 
         params, root_body = parse_request(request)
-        version = get_work_version(params.get('VERSION'), params.get('ACCEPTVERSIONS'), \
-            VERSION_SUPPORTED, VERSION_DEFAULT)
+        version = get_work_version(params.get('VERSION'), params.get('ACCEPTVERSIONS'),
+                                   VERSION_SUPPORTED, VERSION_DEFAULT)
+        if version is None:
+            version = VERSION_DEFAULT
 
         if version >= v200:
             root = El('ExceptionReport', dict(
