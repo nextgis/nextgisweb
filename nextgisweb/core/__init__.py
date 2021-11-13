@@ -238,10 +238,15 @@ class CoreComponent(
 
         result.append(("Python", '.'.join(map(str, sys.version_info[0:3]))))
 
-        pg_version = DBSession.execute('SHOW server_version').scalar()
-        pg_version = re.sub(r'\s\(.*\)$', '', pg_version)
-        result.append(("PostgreSQL", pg_version))
-        result.append(("PostGIS", DBSession.execute('SELECT PostGIS_Lib_Version()').scalar()))
+        postgres_info = DBSession.scalar('SHOW server_version')
+        postgres_info = re.sub(r'\s\(.*\)$', '', postgres_info)
+        postgres_info += " ({}, {})".format(*DBSession.execute("""
+            SELECT datcollate, datctype FROM pg_database
+            WHERE datname = current_database()""").first())
+        result.append(("PostgreSQL", postgres_info))
+
+        postgis_version = DBSession.scalar('SELECT PostGIS_Lib_Version()')
+        result.append(("PostGIS", postgis_version))
 
         gdal_version = try_check_output(['gdal-config', '--version'])
         if gdal_version is not None:
