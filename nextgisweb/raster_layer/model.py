@@ -65,6 +65,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     ysize = sa.Column(sa.Integer, nullable=False)
     dtype = sa.Column(sa.Unicode, nullable=False)
     band_count = sa.Column(sa.Integer, nullable=False)
+    cloud_optimized = sa.Column(sa.Boolean, nullable=False, default=False)
 
     fileobj = orm.relationship(FileObj, cascade='all')
 
@@ -72,7 +73,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    def load_file(self, filename, env):
+    def load_file(self, filename, env, cloud_optimized=False):
         ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
         if not ds:
             raise ValidationError(_("GDAL library was unable to open the file."))
@@ -120,16 +121,29 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         dst_file = env.raster_layer.workdir_filename(fobj, makedirs=True)
         self.fileobj = fobj
 
+        if cloud_optimized:
+            cmd_opts = (
+                '-of', 'COG',
+                '-co', 'BLOCKSIZE=256',
+            )
+        else:
+            cmd_opts = (
+                '-of', 'GTiff',
+                '-co', 'TILED=YES',
+                '-co', 'BLOCKXSIZE=256',
+                '-co', 'BLOCKYSIZE=256',
+            )
+
         if reproject:
-            cmd = ['gdalwarp', '-of', 'GTiff', '-t_srs', 'EPSG:%d' % self.srs.id]
+            cmd = ['gdalwarp', '-t_srs', 'EPSG:%d' % self.srs.id]
             if not has_nodata and alpha_band is None:
                 cmd.append('-dstalpha')
         else:
             cmd = ['gdal_translate', '-of', 'GTiff']
 
         cmd.extend(('-co', 'COMPRESS=DEFLATE',
-                    '-co', 'TILED=YES',
                     '-co', 'BIGTIFF=YES', filename, dst_file))
+        cmd.extend(cmd_opts)
         subprocess.check_call(cmd)
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
@@ -138,6 +152,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         self.xsize = ds.RasterXSize
         self.ysize = ds.RasterYSize
         self.band_count = ds.RasterCount
+        self.cloud_optimized = cloud_optimized
 
         self.build_overview()
 
@@ -146,6 +161,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         return gdal.Open(fn, gdalconst.GA_ReadOnly)
 
     def build_overview(self, missing_only=False):
+        if self.cloud_optimized:
+            return
+
         fn = env.raster_layer.workdir_filename(self.fileobj)
         if missing_only and os.path.isfile(fn + '.ovr'):
             return
@@ -174,6 +192,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         s = super()
         return (s.get_info() if hasattr(s, 'get_info') else ()) + (
             (_("Data type"), self.dtype),
+            (_("COG"), self.cloud_optimized),
         )
 
     # IBboxLayer implementation:
@@ -222,7 +241,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         return extent
 
 
-def estimate_raster_layer_data(resource):
+def estimate_raster_layer_data(resource, cloud_optimized=False):
 
     def file_size(fn):
         stat = os.stat(fn)
@@ -231,18 +250,21 @@ def estimate_raster_layer_data(resource):
     fn = env.raster_layer.workdir_filename(resource.fileobj)
 
     # Size of source file with overviews
-    size = file_size(fn) + file_size(fn + '.ovr')
+    size = file_size(fn)
+    if not cloud_optimized:
+        size += file_size(fn + '.ovr')
     return size
 
 
 class _source_attr(SP):
 
     def setter(self, srlzr, value):
+        cloud_optimized = srlzr.data.get("cog", False)
 
         filedata, filemeta = env.file_upload.get_filename(value['id'])
-        srlzr.obj.load_file(filedata, env)
+        srlzr.obj.load_file(filedata, env, cloud_optimized)
 
-        size = estimate_raster_layer_data(srlzr.obj)
+        size = estimate_raster_layer_data(srlzr.obj, cloud_optimized)
         env.core.reserve_storage(COMP_ID, RasterLayerData, value_data_volume=size,
                                  resource=srlzr.obj)
 
@@ -275,3 +297,4 @@ class RasterLayerSerializer(Serializer):
 
     source = _source_attr(write=P_DS_WRITE)
     color_interpretation = _color_interpretation(read=P_DSS_READ)
+    cloud_optimized = SP(read=P_DSS_READ)

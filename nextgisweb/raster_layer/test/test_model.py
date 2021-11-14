@@ -16,14 +16,21 @@ from nextgisweb.raster_layer.model import RasterLayer
     ('sochi-aster-dem.tif', 2, 3857),
     ('sochi-aster-dem.tif', 1, 4326),
 ])
-def test_load_file(source, band_count, srs_id, ngw_env, ngw_txn, ngw_resource_group):
+@pytest.mark.parametrize('cloud_optimized', [False, True])
+def test_load_file(
+    source, band_count, srs_id, ngw_env, ngw_txn, ngw_resource_group, cloud_optimized
+):
     res = RasterLayer(
         parent_id=ngw_resource_group, display_name='test:{}'.format(source),
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=srs_id).one(),
     ).persist()
 
-    res.load_file(os.path.join(os.path.split(__file__)[0], 'data', source), ngw_env)
+    res.load_file(
+        os.path.join(os.path.split(__file__)[0], "data", source),
+        ngw_env,
+        cloud_optimized,
+    )
     assert res.band_count == band_count
 
     fn_data = ngw_env.file_storage.filename(res.fileobj)
@@ -33,4 +40,7 @@ def test_load_file(source, band_count, srs_id, ngw_env, ngw_txn, ngw_resource_gr
     assert os.path.islink(fn_work) and os.path.realpath(fn_work) == fn_data
 
     # Check for raster overviews
-    assert os.path.isfile(fn_work + '.ovr')
+    if not cloud_optimized:
+        assert os.path.isfile(fn_work + '.ovr')
+    else:
+        assert not os.path.isfile(fn_work + '.ovr')

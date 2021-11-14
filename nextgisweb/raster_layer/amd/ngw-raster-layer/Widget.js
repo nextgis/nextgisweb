@@ -10,6 +10,7 @@ define([
     "dojo/text!./template/Widget.hbs",
     // template
     "dojox/layout/TableContainer",
+    "dijit/form/CheckBox",
     "ngw-file-upload/Uploader"
 ], function (
     declare,
@@ -35,6 +36,7 @@ define([
             
             value.srs = { id: this.wSrs.get("value") };
             value.source = this.wFile.data;
+            value.cog = this.wCOG.checked;
         },
 
         validateDataInMixin: function (errback) {

@@ -1,25 +1,25 @@
-#: api.py:30
+#: api.py:28
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:33
+#: api.py:31
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: kind_of_data.py:12
+#: kind_of_data.py:8
 msgid "Rasters and pyramids"
 msgstr "Растры и пирамиды"
 
-#: amd/ngw-raster-layer/Widget.js:26 model.py:61 view.py:31
+#: amd/ngw-raster-layer/Widget.js:27 model.py:58 view.py:32
 msgid "Raster layer"
 msgstr "Растровый слой"
 
-#: model.py:81
+#: model.py:79
 msgid "GDAL library was unable to open the file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:89
+#: model.py:87
 #, python-format
 msgid ""
 "Raster has format '%(format)s', however only following formats are supported:"
@@ -28,19 +28,23 @@ msgstr ""
 "Формат загруженного растра '%(format)s', однако поддерживаются только "
 "следующие типы: %(all_formats)s."
 
-#: model.py:94
+#: model.py:92
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:105
+#: model.py:103
 msgid "Complex data types are not supported."
 msgstr "Комплексные типы данных не поддерживаются."
 
-#: model.py:179
+#: model.py:194
 msgid "Data type"
 msgstr "Тип данных"
 
-#: view.py:20 view.py:34
+#: model.py:195
+msgid "COG"
+msgstr "COG"
+
+#: view.py:21 view.py:36
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -75,3 +79,7 @@ msgstr "Файл должен быть в формате GeoTIFF."
 #: amd/ngw-raster-layer/template/Widget.hbs:8
 msgid "Coordinate system"
 msgstr "Система координат"
+
+#: amd/ngw-raster-layer/template/Widget.hbs:12
+msgid "Upload as Cloud Optimized GeoTIFF (COG)"
+msgstr "Загрузить как Cloud Optimized GeoTIFF (COG)"

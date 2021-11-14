@@ -3,9 +3,13 @@
         data-dojo-props="uploaderLinkText: {{gettextString 'Select a dataset'}},
                          uploaderHelpText: {{gettextString 'Dataset should be in GeoTIFF format.'}}
         "></div>
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 200">
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 300">
         <!-- Do not let users pick SRS. By now only one SRS (EPSG:3857) is supported.
         <div data-dojo-type="ngw-spatial-ref-sys/SRSSelect" data-dojo-attach-point="wSrs" title="{{gettext 'Coordinate system'}}" style="width: 100%"></div>
         -->
+        <div data-dojo-type="dijit/form/CheckBox"
+            data-dojo-attach-point="wCOG"
+            title="{{gettext 'Upload as Cloud Optimized GeoTIFF (COG)'}}" checked>
+        </div>
     </div>
 </div>
