@@ -65,6 +65,9 @@ def setup_pyramid(comp, config):
                 style = item.style
                 layer = style.parent
 
+                if not style.has_permission(DataScope.read, request.user):
+                    return None
+
                 # If there are no necessary permissions skip web-map element
                 # so it won't be shown in the tree
 
@@ -76,9 +79,6 @@ def setup_pyramid(comp, config):
                 #     'data-read',
                 # ):
                 #     return None
-
-                if not layer.has_permission(DataScope.read, request.user):
-                    return None
 
                 # Main element parameters
                 data.update(
