@@ -39,3 +39,9 @@ def setup_pyramid(comp, config):
                             id=args.obj.id))
 
     Resource.__dynmenu__.add(LayerMenuExt())
+
+    Resource.__psection__.register(
+        key='description',
+        title=_("External access"),
+        is_applicable=lambda obj: obj.cls == 'raster_layer' and obj.cloud_optimized,
+        template='nextgisweb:raster_layer/template/section_api_cog.mako')
