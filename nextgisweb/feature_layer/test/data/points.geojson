@@ -26,6 +26,27 @@
         {
             "type": "Feature",
             "properties": {
+                "null": null,
+                "int": 0,
+                "int64": 500,
+                "real": 500.3,
+                "date": "2001-01-01",
+                "time": "23:59:59",
+                "datetime": "2001-01-01 23:59:00.000",
+                "string": "Boo far",
+                "unicode": "Юникод"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    0.0,
+                    0.0
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
                 "null": "not-null",
                 "int": 1,
                 "int64": -9223372036854775808,

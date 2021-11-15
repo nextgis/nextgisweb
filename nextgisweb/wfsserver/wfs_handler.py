@@ -141,6 +141,16 @@ GEOM_TYPE_TO_GML_TYPE = {
     GEOM_TYPE.MULTIPOLYGONZ: 'gml:MultiPolygonPropertyType',
 }
 
+# Values are feature query operators
+LOGICAL_OPERATORS = {
+    'PropertyIsEqualTo': 'eq',
+    'PropertyIsNotEqualTo': 'ne',
+    'PropertyIsGreaterThan': 'gt',
+    'PropertyIsGreaterThanOrEqualTo': 'ge',
+    'PropertyIsLessThan': 'lt',
+    'PropertyIsLessThanOrEqualTo': 'le',
+}
+
 
 def get_geom_column(feature_layer):
     return feature_layer.column_geom if hasattr(feature_layer, 'column_geom') else 'geom'
@@ -206,6 +216,7 @@ class WFSHandler():
         self.p_srsname = params.get('SRSNAME')
         self.p_count = params.get('COUNT', params.get('MAXFEATURES'))
         self.p_startindex = params.get('STARTINDEX')
+        self.p_filter = params.get('FILTER')
 
         self.p_validate_schema = force_schema_validation or (
             params.get('VALIDATESCHEMA', 'FALSE').upper() in ('1', 'YES', 'TRUE'))
@@ -383,34 +394,65 @@ class WFSHandler():
                         El('LatLongBoundingBox', bbox, parent=__type)
 
     def _parse_filter(self, __filter, layer):
-        fids = list()
-        intersects = None
-        for __el in __filter:
-            tag = ns_trim(__el.tag)
-            if tag == 'Intersects':
-                __value_reference = __el[0]
-                if ns_trim(__value_reference.tag) != 'ValueReference':
-                    raise ValidationError("Intersects parse: ValueReference required.")
-                elif __value_reference.text != get_geom_column(layer.resource):
-                    raise ValidationError("Geometry column '%s' not found" % __value_reference.text)
-                __gml = __el[1]
-                try:
-                    intersects = geom_from_gml(__gml)
-                except GeometryNotValid:
-                    raise ValidationError("Intersects parse: geometry is not valid.")
-                continue
+        filter_result = dict(
+            fids=list(),
+            intersects=None,
+            filter=list()
+        )
+        next_target = [(__filter, 0)]
+        while len(next_target) > 0:
+            __parent, start_index = next_target.pop()
+            for i in range(start_index, len(__parent)):
+                __el = __parent[i]
+                tag = ns_trim(__el.tag)
+                if tag == 'And':
+                    next_target.append((__parent, i + 1))
+                    next_target.append((__el, 0))
+                    break
 
-            if tag == 'ResourceId':  # 2.0.0
-                resid_attr = 'rid'
-            elif tag == 'GmlObjectId':  # 1.1.0
-                resid_attr = ns_attr('gml', 'id', self.p_version)
-            elif tag == 'FeatureId':  # 1.0.0 and 1.1.0
-                resid_attr = 'fid'
-            else:
-                raise ValidationError("Filter element '%s' not supported." % __el.tag)
-            fid = __el.get(resid_attr)
-            fids.append(fid_decode(fid, layer.keyname))
-        return fids, intersects
+                if tag == 'ResourceId':  # 2.0.0
+                    resid_attr = 'rid'
+                elif tag == 'GmlObjectId':  # 1.1.0
+                    resid_attr = ns_attr('gml', 'id', self.p_version)
+                elif tag == 'FeatureId':  # 1.0.0 and 1.1.0
+                    resid_attr = 'fid'
+                else:
+                    resid_attr = None
+                if resid_attr is not None:
+                    fid = __el.get(resid_attr)
+                    filter_result['fids'].append(fid_decode(fid, layer.keyname))
+                    continue
+
+                if tag in ('BBOX', 'Intersects'):
+                    if filter_result['intersects'] is not None:
+                        raise ValidationError("%d parameter conflict." % tag)
+                    __value_reference = __el[0]
+                    if ns_trim(__value_reference.tag) != 'ValueReference':
+                        raise ValidationError("%d parse: ValueReference required." % tag)
+                    elif __value_reference.text != get_geom_column(layer.resource):
+                        raise ValidationError("Geometry column '%s' not found." % __value_reference.text)
+                    __gml = __el[1]
+                    try:
+                        filter_result['intersects'] = geom_from_gml(__gml)
+                    except GeometryNotValid:
+                        raise ValidationError("%d parse: geometry is not valid." % tag)
+                    continue
+
+                if tag in LOGICAL_OPERATORS.keys():
+                    __value_reference = __el[0]
+                    if ns_trim(__value_reference.tag) != 'ValueReference':
+                        raise ValidationError("%d parse: ValueReference required." % tag)
+                    k = __value_reference.text
+                    __literal = __el[1]
+                    if ns_trim(__literal.tag) != 'Literal':
+                        raise ValidationError("%d parse: Literal required." % tag)
+                    v = __literal.text
+                    op = LOGICAL_OPERATORS[tag]
+                    filter_result['filter'].append((k, op, v))
+                    continue
+
+                raise ValidationError("Filter element '%s' is not supported." % __el.tag)
+        return filter_result
 
     def _get_capabilities100(self):
         EM = ElementMaker(nsmap=dict(ogc=nsmap('ogc', self.p_version)['ns']))
@@ -757,18 +799,24 @@ class WFSHandler():
                 raise ValidationError("Paremeter BBOX geometry is not valid.")
             query.intersects(box_geom)
 
+        __filters = []
         if __query is not None:
-            __filters = find_tags(__query, 'Filter')
-            if len(__filters) == 1:
-                fids, intersects = self._parse_filter(__filters[0], layer)
-                if len(fids) > 0:
-                    query.filter(('id', 'in', ','.join((str(fid) for fid in fids))))
-                if intersects is not None:
-                    if self.p_bbox is not None:
-                        raise ValidationError("Parameters conflict: BBOX, Intersects")
-                    query.intersects(intersects)
-            elif len(__filters) > 1:
-                raise ValidationError("Multiple filters not supported.")
+            __filters.extend(find_tags(__query, 'Filter'))
+        if self.p_filter is not None:
+            __filters.append(etree.fromstring(self.p_filter))
+
+        if len(__filters) == 1:
+            result = self._parse_filter(__filters[0], layer)
+            if len(result['fids']) > 0:
+                query.filter(('id', 'in', ','.join((str(fid) for fid in result['fids']))))
+            if result['intersects'] is not None:
+                if self.p_bbox is not None:
+                    raise ValidationError("Parameters conflict: BBOX, Intersects")
+                query.intersects(result['intersects'])
+            if len(result['filter']) > 0:
+                query.filter(*result['filter'])
+        elif len(__filters) > 1:
+            raise ValidationError("Multiple filters not supported.")
 
         if self.p_propertyname is not None:
             self.p_propertyname = [ns_trim(v) for v in self.p_propertyname.split(',')]
@@ -951,9 +999,10 @@ class WFSHandler():
                 feature_layer = layer.resource
 
                 _filter = find_tags(_operation, 'Filter')[0]
-                fids, intersects = self._parse_filter(_filter, layer)
-                if intersects is not None:
-                    raise ValidationError("Intersects filter not supported in transaction")
+                result = self._parse_filter(_filter, layer)
+                if result['intersects'] is not None or len(result['filter']) != 0:
+                    raise ValidationError("Only feature ID filter is supported in transaction.")
+                fids = result['fids']
                 if len(fids) == 0:
                     raise ValidationError("Feature ID filter must be specified.")
 

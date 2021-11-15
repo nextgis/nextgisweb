@@ -5,6 +5,7 @@ Changes
 -----
 
 - Support for CORS domain wildcards (like ``https://*.csb.app``).
+- WFS client and server simple filters support.
 
 
 4.0.0

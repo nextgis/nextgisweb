@@ -21,6 +21,7 @@ from ..feature_layer import (
     GEOM_TYPE,
     IFeatureLayer,
     IFeatureQuery,
+    IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryIntersects,
     LayerField,
@@ -53,6 +54,15 @@ WFS_2_FIELD_TYPE = {
     FIELD_TYPE_WFS.DATE: FIELD_TYPE.DATE,
     FIELD_TYPE_WFS.TIME: FIELD_TYPE.TIME,
     FIELD_TYPE_WFS.DATETIME: FIELD_TYPE.DATETIME,
+}
+
+LOGICAL_OPERATORS = {
+    'eq': 'PropertyIsEqualTo',
+    'ne': 'PropertyIsNotEqualTo',
+    'gt': 'PropertyIsGreaterThan',
+    'ge': 'PropertyIsGreaterThanOrEqualTo',
+    'lt': 'PropertyIsLessThan',
+    'le': 'PropertyIsLessThanOrEqualTo',
 }
 
 Base = declarative_base()
@@ -191,8 +201,8 @@ class WFSConnection(Base, Resource):
 
         return fields
 
-    def get_feature(self, layer, fid=None, intersects=None, propertyname=None, get_count=False,
-                    limit=None, offset=None, srs=None, add_box=False):
+    def get_feature(self, layer, fid=None, filter_=None, intersects=None, propertyname=None,
+                    get_count=False, limit=None, offset=None, srs=None, add_box=False):
         req_root = etree.Element('GetFeature')
 
         __query = etree.Element('Query', dict(typeNames=layer.layer_name))
@@ -204,6 +214,21 @@ class WFSConnection(Base, Resource):
         if fid is not None:
             __rid = etree.Element('ResourceId', dict(rid=fid_str(fid, layer.layer_name)))
             __filter.append(__rid)
+
+        if filter_ is not None:
+            __and = etree.Element('And')
+            for k, o, v in filter_:
+                if o not in LOGICAL_OPERATORS.keys():
+                    raise ValidationError("Operator '%s' is not supported." % o)
+                __op = etree.Element(LOGICAL_OPERATORS[o])
+                __value_reference = etree.Element('ValueReference')
+                __value_reference.text = k
+                __op.append(__value_reference)
+                __literal = etree.Element('Literal')
+                __literal.text = str(v)
+                __op.append(__literal)
+                __and.append(__op)
+            __filter.append(__and)
 
         if intersects is not None:
             __intersects = etree.Element('Intersects')
@@ -456,6 +481,7 @@ class WFSLayerSerializer(Serializer):
 
 @implementer(
     IFeatureQuery,
+    IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryIntersects,
 )
@@ -465,12 +491,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._srs = None
         self._geom = False
         self._box = False
-
         self._fields = None
         self._limit = None
         self._offset = None
 
+        self._filter = None
+
         self._filter_by = None
+
         self._intersects = None
 
     def fields(self, *args):
@@ -493,6 +521,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def box(self):
         self._box = True
 
+    def filter(self, *args):
+        self._filter = args
+
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
 
@@ -502,7 +533,15 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def __call__(self):
         params = dict()
         if self._filter_by is not None:
-            params['fid'] = self._filter_by.get('id')
+            if 'id' in self._filter_by:
+                params['fid'] = self._filter_by.pop('id')
+            if len(self._filter_by) > 0:
+                if self._filter is None:
+                    self._filter = list()
+                for k, v in self._filter_by.items():
+                    self._filter.append((k, 'eq', v))
+        if self._filter is not None and len(self._filter) > 0:
+            params['filter_'] = self._filter
         if self._limit is not None:
             params['limit'] = self._limit
             params['offset'] = self._offset

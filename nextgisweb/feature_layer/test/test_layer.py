@@ -1,5 +1,6 @@
 import json
 from datetime import date, datetime, time
+from itertools import product
 from pathlib import Path
 
 import pytest
@@ -15,6 +16,16 @@ from nextgisweb.wfsclient.test import create_feature_layer as create_wfs_layer
 
 
 data_points = Path(nextgisweb.feature_layer.test.__file__).parent / 'data' / 'points.geojson'
+filter_cases = (
+    ((('string', 'eq', 'Foo bar'), ), [1, 3]),
+    ((('string', 'ne', 'Foo bar'), ), [2]),
+    ((('int', 'eq', 0), ), [2]),
+    ((('int', 'eq', 0), ('unicode', 'eq', 'Юникод')), [2]),
+    ((('int64', 'ge', 500), ), [1, 2]),
+    ((('int64', 'gt', 500), ), [1]),
+    ((('int64', 'le', 500), ), [2, 3]),
+    ((('int64', 'lt', 500), ), [3]),
+)
 
 
 def cmp_fields(gj_fields, fields):
@@ -108,3 +119,28 @@ def test_layer(create_resource, ngw_resource_group, ngw_auth_administrator, ngw_
         query.srs(srs)
         for i, f in enumerate(query()):
             cmp_geom(gj_fs[i]['geometry'], f.geom, srs)
+
+        # IFeatureQueryFilter
+
+        for filter_, ids_expected in filter_cases:
+            query = layer.feature_query()
+            query.filter(*filter_)
+            ids = [f.id for f in query()]
+            assert sorted(ids) == ids_expected
+
+        # IFeatureQueryFilterBy
+
+        for filter_, ids_expected in filter_cases:
+            filter_by = dict()
+            skip = False
+            for k, o, v in filter_:
+                if o != 'eq':
+                    skip = True
+                    break
+                filter_by[k] = v
+            if skip:
+                continue
+            query = layer.feature_query()
+            query.filter_by(**filter_by)
+            ids = [f.id for f in query()]
+            assert sorted(ids) == ids_expected
