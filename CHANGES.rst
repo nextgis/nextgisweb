@@ -4,16 +4,22 @@ Changes
 4.0.0
 -----
 
-- Drop python 2.7 support.
 - Source layer selection while creating vector layers from multi-layer sources, 
   such as ZIP-archives with ESRI Shape-files.
 - WMS and WFS services on-the-fly reprojection.
+- Yandex Maps-based address search on the webmap.
+- Ability to restrict address search by a country if using Nominatim.
+- Display emails as active ``mailto:`` links in the webmap popup.
+- Ability to delete users and groups in the control panel.
+- Ability to change resource owner in UI and REST API.
 - Automatic generation of keynames for WMS and WFS services.
 - Improved support for Unicode field names for WFS services.
 - Setting for more granular control of resource export availability.
 - Ability to log in as an arbitrary user with a session invitation.
 - ISO-8601 date and time formatting in feature layer REST API via
   ``dt_format=iso`` option.
+- Drop Python 2.7 support, now NextGIS Web requires Python 3.8+.
+- PostgreSQL 10+, PostGIS 2.5+ and GDAL 3.0+ are required now.
 - Synchronization of translations with POEditor.
 
 
