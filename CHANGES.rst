@@ -9,6 +9,8 @@ Changes
 - WMS and WFS services on-the-fly reprojection.
 - Yandex Maps-based address search on the webmap.
 - Ability to restrict address search by a country if using Nominatim.
+- Hiding of inaccessible layers while displaying webmaps.
+- Feature highlight when selecting from search results.
 - Display emails as active ``mailto:`` links in the webmap popup.
 - Ability to delete users and groups in the control panel.
 - Ability to change resource owner in UI and REST API.
