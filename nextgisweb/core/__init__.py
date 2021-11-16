@@ -283,6 +283,11 @@ class CoreComponent(
     def query_stat(self):
         result = dict()
         result['full_name'] = self.system_full_name()
+        fs_size = 0
+        for root, dirs, files in os.walk(self.options['sdir']):
+            for f in files:
+                fs_size += os.stat(os.path.join(root, f), follow_symlinks=False).st_size
+        result['filesystem_size'] = fs_size
         result['database_size'] = DBSession.query(db.func.pg_database_size(
             db.func.current_database(),)).scalar()
         if self.options['storage.enabled']:
