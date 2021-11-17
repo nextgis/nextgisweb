@@ -664,7 +664,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         if self._intersects:
             reproject = self._intersects.srid is not None \
-                and self._intersects.srid != self.layer.srs_id
+                and self._intersects.srid != self.layer.geometry_srid
             int_srs = SRS.filter_by(id=self._intersects.srid).one() \
                 if reproject else self.layer.srs
 
@@ -675,7 +675,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 int_geom = db.func.st_intersection(bound_geom, int_geom)
             int_geom = db.func.st_setsrid(int_geom, int_srs.id)
             if reproject:
-                int_geom = db.func.st_transform(int_geom, self.layer.srs_id)
+                int_geom = db.func.st_transform(int_geom, self.layer.geometry_srid)
 
             select.append_whereclause(db.func.st_intersects(geomcol, int_geom))
 
