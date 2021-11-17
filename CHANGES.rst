@@ -11,8 +11,8 @@ Changes
 - Hide inaccessible layers while displaying webmaps.
 - Highlight feature when selecting from search results.
 - Display emails as active ``mailto:`` links in the webmap popup.
-- Delete users and groups from the control panel.
-- Change resource owner in UI and REST API.
+- Ability to delete users and groups from the control panel.
+- Ability to change resource owner in UI and REST API.
 - Automatic generation of keynames for WMS and WFS services.
 - Improved support for Unicode field names for WFS services.
 - Granular control setting for resource export availability.
