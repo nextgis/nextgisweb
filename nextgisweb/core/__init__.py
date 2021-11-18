@@ -9,11 +9,13 @@ import re
 import uuid
 import warnings
 from collections import OrderedDict
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 from pathlib import Path
 from subprocess import check_output
 
 import requests
+import transaction
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm.exc import NoResultFound
@@ -204,6 +206,31 @@ class CoreComponent(
             self.settings_get(component, name)
         except KeyError:
             self.settings_set(component, name, value)
+
+    @contextmanager
+    def settings_override(self, settings):
+        def set_or_delete(comp, name, value):
+            if value is None:
+                self.settings_delete(comp, name)
+            else:
+                self.settings_set(comp, name, value)
+
+        restore = list()
+        with transaction.manager:
+            for comp, name, value in settings:
+                try:
+                    rvalue = self.settings_get(comp, name)
+                except KeyError:
+                    rvalue = None
+                restore.append((comp, name, rvalue))
+                set_or_delete(comp, name, value)
+
+        try:
+            yield
+        finally:
+            with transaction.manager:
+                for comp, name, rvalue in restore:
+                    set_or_delete(comp, name, rvalue)
 
     def sys_info(self):
         result = []

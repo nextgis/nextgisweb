@@ -18,7 +18,7 @@ from ..core.exception import ValidationError
 from ..models import DBSession
 from ..resource import Resource, MetadataScope
 
-from .util import _, ClientRoutePredicate
+from .util import _, ClientRoutePredicate, parse_origin
 
 
 def _get_cors_olist():
@@ -62,7 +62,24 @@ def cors_tween_factory(handler, registry):
             # headers and terminate this set of steps.
             # http://www.w3.org/TR/cors/#resource-preflight-requests
 
-            if olist is not None and origin in olist:
+            def check_domain():
+                for url in olist:
+                    if origin == url:
+                        return True
+                    if '*' in url:
+                        o_scheme, o_domain, o_port = parse_origin(origin)[1:]
+                        scheme, domain, port = parse_origin(url)[1:]
+                        if o_scheme != scheme or o_port != port:
+                            continue
+                        wildcard_level = domain.count('.') + 1
+                        level_cmp = wildcard_level - 1
+                        upper = domain.rsplit('.', level_cmp)[-level_cmp:]
+                        o_upper = o_domain.rsplit('.', level_cmp)[-level_cmp:]
+                        if upper == o_upper:
+                            return True
+                return False
+
+            if olist is not None and check_domain():
 
                 # Access-Control-Request-Method header of preflight request
                 method = request.headers.get('Access-Control-Request-Method')
@@ -131,11 +148,15 @@ def cors_put(request):
             v = [o.lower() for o in v]
 
             for origin in v:
-                if (
-                    not isinstance(origin, str)
-                    or not re.match(r'^https?://[\w\_\-\.]{3,}(:\d{2,5})?/?$', origin)
-                ):
-                    raise ValidationError("Invalid origin '%s'" % origin)
+                if not isinstance(origin, str):
+                    raise ValidationError("Invalid origin: '%s'." % origin)
+                try:
+                    is_wildcard, schema, domain, port = parse_origin(origin)
+                except ValueError:
+                    raise ValidationError("Invalid origin: '%s'." % origin)
+                if is_wildcard and domain.count('.') < 2:
+                    raise ValidationError("Second-level and above wildcard domain "
+                                          "is not supported: '%s'." % origin)
 
             # Strip trailing slashes
             v = [(o[:-1] if o.endswith('/') else o) for o in v]

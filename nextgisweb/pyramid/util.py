@@ -3,6 +3,7 @@ import io
 import os.path
 import errno
 import fcntl
+import re
 import secrets
 import string
 from calendar import timegm
@@ -92,3 +93,18 @@ def persistent_secret(fn, secretgen):
 
 def datetime_to_unix(dt):
     return timegm(dt.timetuple())
+
+
+origin_pattern = re.compile(r'^(https?)://(\*\.)?([\w\-\.]{3,})(:\d{2,5})?/?$')
+
+
+def parse_origin(url):
+    m = origin_pattern.match(url)
+    if m is None:
+        raise ValueError("Invalid origin.")
+    scheme, wildcard, domain, port = m[1], m[2], m[3], m[4]
+    domain = domain.rstrip('.')
+    is_wildcard = wildcard is not None
+    if is_wildcard:
+        domain = wildcard + domain
+    return is_wildcard, scheme, domain, port
