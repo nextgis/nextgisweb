@@ -35,6 +35,29 @@ def cors_tween_factory(handler, registry):
     def hadd(response, n, v):
         response.headerlist.append((n, v))
 
+    def is_cors_origin(origin):
+        olist = _get_cors_olist()
+
+        if not olist:
+            return False
+
+        for url in olist:
+            if origin == url:
+                return True
+            if '*' in url:
+                o_scheme, o_domain, o_port = parse_origin(origin)[1:]
+                scheme, domain, port = parse_origin(url)[1:]
+                if o_scheme != scheme or o_port != port:
+                    continue
+                wildcard_level = domain.count('.') + 1
+                level_cmp = wildcard_level - 1
+                upper = domain.rsplit('.', level_cmp)[-level_cmp:]
+                o_upper = o_domain.rsplit('.', level_cmp)[-level_cmp:]
+                if upper == o_upper:
+                    return True
+        return False
+
+
     def cors_tween(request):
         # Only request under /api/ are handled
         is_api = request.path_info.startswith('/api/')
@@ -53,34 +76,13 @@ def cors_tween_factory(handler, registry):
         # http://www.w3.org/TR/cors/#resource-preflight-requests
 
         if is_api and origin is not None:
-
-            olist = _get_cors_olist()
-
             # If the value of the Origin header is not a
             # case-sensitive match for any of the values
             # in list of origins do not set any additional
             # headers and terminate this set of steps.
             # http://www.w3.org/TR/cors/#resource-preflight-requests
 
-            def check_domain():
-                for url in olist:
-                    if origin == url:
-                        return True
-                    if '*' in url:
-                        o_scheme, o_domain, o_port = parse_origin(origin)[1:]
-                        scheme, domain, port = parse_origin(url)[1:]
-                        if o_scheme != scheme or o_port != port:
-                            continue
-                        wildcard_level = domain.count('.') + 1
-                        level_cmp = wildcard_level - 1
-                        upper = domain.rsplit('.', level_cmp)[-level_cmp:]
-                        o_upper = o_domain.rsplit('.', level_cmp)[-level_cmp:]
-                        if upper == o_upper:
-                            return True
-                return False
-
-            if olist is not None and check_domain():
-
+            if is_cors_origin(origin):
                 # Access-Control-Request-Method header of preflight request
                 method = request.headers.get('Access-Control-Request-Method')
 
