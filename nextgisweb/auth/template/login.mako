@@ -1,6 +1,8 @@
 <%inherit file="nextgisweb:pyramid/template/base.mako" />
 <%! from nextgisweb.auth.util import _ %>
 
+<%def name="hide_resource_filter()"/>
+
 <form class="auth-form pure-form pure-form-stacked" 
     action="${request.route_url('auth.login')}" method="POST">
 

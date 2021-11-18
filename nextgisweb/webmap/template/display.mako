@@ -20,7 +20,8 @@
     </script>
 </%def>
 
-<%include file="nextgisweb:pyramid/template/header.mako" args="title=display_config['webmapTitle']"/>
+<%include file="nextgisweb:pyramid/template/header.mako" args="title=display_config['webmapTitle'],
+    hide_resource_filter=True"/>
 
 <div id="webmap-wrapper" class="webmap-wrapper">
 

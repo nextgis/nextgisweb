@@ -71,7 +71,8 @@
     %if not custom_layout:
         <div class="layout ${'maxwidth' if maxwidth else ''}">
 
-            <%include file="nextgisweb:pyramid/template/header.mako" args="title=system_name"/>
+            <%include file="nextgisweb:pyramid/template/header.mako" args="title=system_name,
+                hide_resource_filter=hasattr(self, 'hide_resource_filter')"/>
 
             %if obj and hasattr(obj,'__dynmenu__'):
                 <%
