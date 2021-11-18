@@ -1,26 +1,30 @@
-#: __init__.py:79
+#: __init__.py:96
 msgid "NextGIS geoinformation system"
 msgstr "Геоинформационная система NextGIS"
 
-#: __init__.py:204
+#: __init__.py:218
 msgid "Linux kernel"
 msgstr "Ядро Linux"
 
-#: __init__.py:207
+#: __init__.py:221
 msgid "OS distribution"
 msgstr "Дистрибутив ОС"
 
-#: __init__.py:218
+#: __init__.py:233
 msgid "CPU"
 msgstr "Процессор"
 
-#: __init__.py:223
+#: __init__.py:237
 msgid "RAM"
 msgstr "ОЗУ"
 
-#: exception.py:95
+#: exception.py:90
 msgid "Validation error"
 msgstr "Ошибка валидации"
+
+#: exception.py:95
+msgid "Forbidden"
+msgstr "Запрещено"
 
 #: exception.py:100
 msgid "Insufficient permissions"
@@ -30,11 +34,11 @@ msgstr "Недостаточно прав"
 msgid "Operational error"
 msgstr "Операционная ошибка"
 
-#: storage.py:225
+#: storage.py:222
 msgid "Estimation is already running"
 msgstr "Процесс оценки хранилища уже запущен"
 
-#: test/test_exception.py:79
+#: test/test_exception.py:75
 #, python-format
 msgid "The answer is %d"
 msgstr "Ответ %d"
