@@ -13,7 +13,7 @@ from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.auth import User
 
-from nextgisweb.render.model import ResourceTileCache
+from nextgisweb.render.model import ResourceTileCache, TilestorWriter
 from nextgisweb.render.util import pack_color, unpack_color
 
 
@@ -72,6 +72,12 @@ def img_fill():
 def img_empty():
     result = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
     return result
+
+
+@pytest.fixture(scope='session', autouse=True)
+def wait_for_shutdown():
+    yield
+    TilestorWriter.getInstance().wait_for_shutdown()
 
 
 def test_pack_unpack():
