@@ -1,0 +1,48 @@
+{
+    "type": "FeatureCollection",
+    "name": "layer",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "null": null,
+                "int": -1,
+                "int64": 9223372036854775807,
+                "real": 0.33333333333333298,
+                "date": "2001-01-01",
+                "time": "23:59:59",
+                "datetime": "2001-01-01 23:59:00.000",
+                "string": "Foo bar",
+                "unicode": "Юникод"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    0.0,
+                    0.0
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "null": "not-null",
+                "int": 1,
+                "int64": -9223372036854775808,
+                "real": 4.0,
+                "date": "2001-01-01",
+                "time": "23:59:59",
+                "datetime": "2001-01-01 23:59:00.000",
+                "string": "Foo bar",
+                "unicode": "مرحبا بالعالم"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    131.89371,
+                    43.11047
+                ]
+            }
+        }
+    ]
+}

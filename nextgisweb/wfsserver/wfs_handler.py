@@ -16,7 +16,7 @@ from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..layer import IBboxLayer
 from ..lib.geometry import Geometry, GeometryNotValid
-from ..lib.ows import parse_request, get_work_version
+from ..lib.ows import parse_request, parse_epsg_code, get_work_version, FIELD_TYPE_WFS
 from ..resource import DataScope
 from ..spatial_ref_sys import SRS
 
@@ -25,6 +25,16 @@ from .util import validate_tag
 
 
 wfsfld_pattern = re.compile(r'^wfsfld_(\d+)$')
+
+FIELD_TYPE_2_WFS = {
+    FIELD_TYPE.INTEGER: FIELD_TYPE_WFS.INTEGER,
+    FIELD_TYPE.BIGINT: FIELD_TYPE_WFS.LONG,
+    FIELD_TYPE.REAL: FIELD_TYPE_WFS.DOUBLE,
+    FIELD_TYPE.STRING: FIELD_TYPE_WFS.STRING,
+    FIELD_TYPE.DATE: FIELD_TYPE_WFS.DATE,
+    FIELD_TYPE.TIME: FIELD_TYPE_WFS.TIME,
+    FIELD_TYPE.DATETIME: FIELD_TYPE_WFS.DATETIME,
+}
 
 # Spec: http://docs.opengeospatial.org/is/09-025r2/09-025r2.html
 v100 = '1.0.0'
@@ -190,6 +200,7 @@ class WFSHandler():
             raise ValidationError("Unsupported version")
 
         self.p_typenames = params.get('TYPENAMES', params.get('TYPENAME'))
+        self.p_propertyname = params.get('PROPERTYNAME')
         self.p_resulttype = params.get('RESULTTYPE')
         self.p_bbox = params.get('BBOX')
         self.p_srsname = params.get('SRSNAME')
@@ -672,12 +683,9 @@ class WFSHandler():
                 feature_layer.geometry_type]), parent=__seq)
 
             for field in feature_layer.fields:
-                if field.datatype == FIELD_TYPE.REAL:
-                    datatype = 'double'
-                elif field.datatype == FIELD_TYPE.DATETIME:
-                    datatype = 'dateTime'
-                else:
-                    datatype = field.datatype.lower()
+                datatype = FIELD_TYPE_2_WFS.get(field.datatype)
+                if datatype is None:
+                    raise ValidationError("Unknown data type: %s" % field.datatype)
                 El('element', dict(minOccurs='0', name=self._field_key_encode(field),
                                    type=datatype, nillable='true'), parent=__seq)
 
@@ -710,6 +718,8 @@ class WFSHandler():
             raise ValidationError("Unknown layer: %s." % self.p_typenames)
         feature_layer = layer.resource
         self.request.resource_permission(DataScope.read, feature_layer)
+
+        geom_column = get_geom_column(feature_layer)
 
         EM = ElementMaker(namespace=wfs['ns'], nsmap=dict(
             gml=gml['ns'], wfs=wfs['ns'], ngw=self.service_namespace,
@@ -760,6 +770,15 @@ class WFSHandler():
             elif len(__filters) > 1:
                 raise ValidationError("Multiple filters not supported.")
 
+        if self.p_propertyname is not None:
+            self.p_propertyname = [ns_trim(v) for v in self.p_propertyname.split(',')]
+            query.fields(*self.p_propertyname)
+        elif __query is not None:
+            __propertynames = find_tags(__query, 'PropertyName')
+            if len(__propertynames) > 0:
+                self.p_propertyname = [ns_trim(el.text) for el in __propertynames]
+                query.fields(*self.p_propertyname)
+
         limit = int(self.p_count) if self.p_count is not None else layer.maxfeatures
         if limit is not None:
             offset = 0 if self.p_startindex is None else int(self.p_startindex)
@@ -770,7 +789,8 @@ class WFSHandler():
         if self.p_resulttype == 'hits':
             matched = query().total_count
         else:
-            query.geom()
+            if self.p_propertyname is None or geom_column in self.p_propertyname:
+                query.geom()
 
             if self.p_srsname is not None:
                 # Ignore axis_xy, return X/Y always
@@ -796,24 +816,28 @@ class WFSHandler():
                 id_attr = ns_attr('gml', 'id', self.p_version) if self.p_version >= v110 else 'fid'
                 __feature = El(layer.keyname, {id_attr: feature_id}, parent=__member)
 
-                geom = ogr.CreateGeometryFromWkb(feature.geom.wkb, osr_out)
+                if feature.geom is not None:
+                    geom = feature.geom.ogr
+                    geom.AssignSpatialReference(osr_out)
 
-                _minX, _maxX, _minY, _maxY = geom.GetEnvelope()
-                minX = _minX if minX is None else min(minX, _minX)
-                minY = _minY if minY is None else min(minY, _minY)
-                maxX = _maxX if maxX is None else max(maxX, _maxX)
-                maxY = _maxY if maxY is None else max(maxY, _maxY)
+                    _minX, _maxX, _minY, _maxY = geom.GetEnvelope()
+                    minX = _minX if minX is None else min(minX, _minX)
+                    minY = _minY if minY is None else min(minY, _minY)
+                    maxX = _maxX if maxX is None else max(maxX, _maxX)
+                    maxY = _maxY if maxY is None else max(maxY, _maxY)
 
-                geom_gml = geom.ExportToGML([
-                    'FORMAT=%s' % self.gml_format,
-                    'NAMESPACE_DECL=YES',
-                    'SRSNAME_FORMAT=SHORT',
-                    'GMLID=geom-%s' % feature_id])
-                __geom = El('geom', parent=__feature)
-                __gml = etree.fromstring(geom_gml)
-                __geom.append(__gml)
+                    geom_gml = geom.ExportToGML([
+                        'FORMAT=%s' % self.gml_format,
+                        'NAMESPACE_DECL=YES',
+                        'SRSNAME_FORMAT=SHORT',
+                        'GMLID=geom-%s' % feature_id])
+                    __geom = El('geom', parent=__feature)
+                    __gml = etree.fromstring(geom_gml)
+                    __geom.append(__gml)
 
                 for field in feature_layer.fields:
+                    if field.keyname not in feature.fields:
+                        continue
                     _field = El(self._field_key_encode(field), parent=__feature)
                     value = feature.fields[field.keyname]
                     if value is not None:

@@ -1,9 +1,9 @@
 from ..component import Component
 
-from .model import Base, Service
+from .model import Base, Service, Layer
 from .wfs_handler import VERSION_DEFAULT, VERSION_SUPPORTED
 
-__all__ = ['Service', 'VERSION_DEFAULT', 'VERSION_SUPPORTED']
+__all__ = ['Service', 'Layer', 'VERSION_DEFAULT', 'VERSION_SUPPORTED']
 
 
 class WFSServerComponent(Component):

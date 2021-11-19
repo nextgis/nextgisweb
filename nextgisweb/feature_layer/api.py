@@ -436,6 +436,8 @@ def iget(resource, request):
         if srs is not None:
             query.srs(SRS.filter_by(id=int(srs)).one())
         query.geom()
+        if srlz_params['geom_format'] == 'wkt':
+            query.geom_format('WKT')
 
     feature = query_feature_or_not_found(query, resource.id, int(request.matchdict['fid']))
 
@@ -597,6 +599,8 @@ def cget(resource, request):
         if srs is not None:
             query.srs(SRS.filter_by(id=int(srs)).one())
         query.geom()
+        if srlz_params['geom_format'] == 'wkt':
+            query.geom_format('WKT')
 
     result = [
         serialize(feature, **srlz_params)

@@ -47,6 +47,7 @@ from .util import _, COMP_ID
 
 WFS_2_FIELD_TYPE = {
     FIELD_TYPE_WFS.INTEGER: FIELD_TYPE.INTEGER,
+    FIELD_TYPE_WFS.LONG: FIELD_TYPE.BIGINT,
     FIELD_TYPE_WFS.DOUBLE: FIELD_TYPE.REAL,
     FIELD_TYPE_WFS.STRING: FIELD_TYPE.STRING,
     FIELD_TYPE_WFS.DATE: FIELD_TYPE.DATE,
@@ -190,7 +191,7 @@ class WFSConnection(Base, Resource):
 
         return fields
 
-    def get_feature(self, layer, fid=None, intersects=None, get_count=False,
+    def get_feature(self, layer, fid=None, intersects=None, propertyname=None, get_count=False,
                     limit=None, offset=None, srs=None, add_box=False):
         req_root = etree.Element('GetFeature')
 
@@ -229,6 +230,12 @@ class WFSConnection(Base, Resource):
             __query.append(__filter)
         # } Filter
 
+        if propertyname is not None:
+            for p in propertyname:
+                __p = etree.Element('PropertyName')
+                __p.text = p
+                __query.append(__p)
+
         if get_count:
             req_root.attrib['resultType'] = 'hits'
 
@@ -238,7 +245,7 @@ class WFSConnection(Base, Resource):
                 req_root.attrib['startindex'] = str(offset)
 
         if srs is not None:
-            req_root.attrib['srsName'] = str(srs)
+            req_root.attrib['srsName'] = 'EPSG:%d' % srs
 
         body = self.request_wfs('POST', xml_root=req_root)
 
@@ -270,7 +277,7 @@ class WFSConnection(Base, Resource):
                     nil_attr = r'{http://www.w3.org/2001/XMLSchema-instance}nil'
                     if _property.attrib.get(nil_attr, 'false') == 'true':
                         value = None
-                    elif datatype == FIELD_TYPE.INTEGER:
+                    elif datatype in (FIELD_TYPE.INTEGER, FIELD_TYPE.BIGINT):
                         value = int(_property.text)
                     elif datatype == FIELD_TYPE.REAL:
                         value = float(_property.text)
@@ -476,6 +483,10 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def geom(self):
         self._geom = True
 
+    def geom_format(self, geom_format):
+        # Initialized with OGR only
+        pass
+
     def srs(self, srs):
         self._srs = srs
 
@@ -501,6 +512,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             params['add_box'] = True
         if self._intersects:
             params['intersects'] = self._intersects
+
+        if not self._geom and self._fields is not None:
+            params['propertyname'] = self._fields
+        elif not self._geom:
+            params['propertyname'] = [f.keyname for f in self.layer.fields]
+        elif self._fields is not None:
+            params['propertyname'] = self._fields
+            params['propertyname'].append(self.layer.column_geom)
 
         features, count = self.layer.connection.get_feature(
             self.layer, **params)
