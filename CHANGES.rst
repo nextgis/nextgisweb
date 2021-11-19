@@ -1,6 +1,12 @@
 Changes
 =======
 
+4.1.0
+-----
+
+- Support for CORS domain wildcards (like ``https://*.csb.app``).
+
+
 4.0.0
 -----
 
