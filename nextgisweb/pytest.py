@@ -53,3 +53,4 @@ def webapp_handler(ngw_env):
 
     yield _decorator
     pyramid.test_request_handler = None
+
