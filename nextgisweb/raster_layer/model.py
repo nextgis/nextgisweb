@@ -259,7 +259,7 @@ def estimate_raster_layer_data(resource, cog=False):
 class _source_attr(SP):
 
     def setter(self, srlzr, value):
-        cog = srlzr.data.get("cog", False)
+        cog = srlzr.data.get("cog", env.raster_layer.cog_enabled)
 
         filedata, filemeta = env.file_upload.get_filename(value['id'])
         srlzr.obj.load_file(filedata, env, cog)

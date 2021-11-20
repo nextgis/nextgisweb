@@ -8,6 +8,8 @@ define([
     "@nextgisweb/pyramid/i18n!",
     // resource
     "dojo/text!./template/Widget.hbs",
+    // settings
+    "@nextgisweb/pyramid/settings!",
     // template
     "dojox/layout/TableContainer",
     "dijit/form/CheckBox",
@@ -20,7 +22,8 @@ define([
     serialize,
     SRSSelect,
     i18n,
-    template
+    template,
+    settings
 ) {
     return declare("ngw.raster.layer.Widget", [_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
@@ -28,6 +31,11 @@ define([
 
         constructor: function () {
             this.wSrs = SRSSelect({allSrs: null});
+        },
+
+        postCreate: function () {
+            this.inherited(arguments);
+            this.wCOG.set("checked", settings.cog_enabled);
         },
 
         serializeInMixin: function (data) {
