@@ -16,9 +16,9 @@ from nextgisweb.raster_layer.model import RasterLayer
     ('sochi-aster-dem.tif', 2, 3857),
     ('sochi-aster-dem.tif', 1, 4326),
 ])
-@pytest.mark.parametrize('cloud_optimized', [False, True])
+@pytest.mark.parametrize('cog', [False, True])
 def test_load_file(
-    source, band_count, srs_id, ngw_env, ngw_txn, ngw_resource_group, cloud_optimized
+    source, band_count, srs_id, ngw_env, ngw_txn, ngw_resource_group, cog
 ):
     res = RasterLayer(
         parent_id=ngw_resource_group, display_name='test:{}'.format(source),
@@ -29,7 +29,7 @@ def test_load_file(
     res.load_file(
         os.path.join(os.path.split(__file__)[0], "data", source),
         ngw_env,
-        cloud_optimized,
+        cog,
     )
     assert res.band_count == band_count
 
@@ -40,7 +40,7 @@ def test_load_file(
     assert os.path.islink(fn_work) and os.path.realpath(fn_work) == fn_data
 
     # Check for raster overviews
-    if not cloud_optimized:
+    if not cog:
         assert os.path.isfile(fn_work + '.ovr')
     else:
         assert not os.path.isfile(fn_work + '.ovr')

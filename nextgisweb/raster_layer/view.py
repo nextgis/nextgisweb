@@ -43,5 +43,5 @@ def setup_pyramid(comp, config):
     Resource.__psection__.register(
         key='description',
         title=_("External access"),
-        is_applicable=lambda obj: obj.cls == 'raster_layer' and obj.cloud_optimized,
+        is_applicable=lambda obj: obj.cls == 'raster_layer' and obj.cog,
         template='nextgisweb:raster_layer/template/section_api_cog.mako')

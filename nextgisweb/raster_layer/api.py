@@ -80,7 +80,7 @@ def cog(resource, request):
         )
 
     if request.method == "GET":
-        if not resource.cloud_optimized:
+        if not resource.cog:
             raise ValidationError(_("Requested raster is not COG."))
 
         range = request.range
