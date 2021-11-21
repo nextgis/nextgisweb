@@ -30,6 +30,9 @@ _logger = logging.getLogger(__name__)
 
 def static_amd_file(request):
     subpath = request.matchdict['subpath']
+    if len(subpath) == 0:
+        raise HTTPNotFound()
+
     amd_package_name = subpath[0]
     amd_package_path = '/'.join(subpath[1:])
 
