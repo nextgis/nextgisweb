@@ -6,6 +6,7 @@ from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
 
 from nextgisweb.raster_layer.model import RasterLayer
+from .validate_cloud_optimized_geotiff import validate
 
 
 @pytest.mark.parametrize('source, band_count, srs_id', [
@@ -16,14 +17,21 @@ from nextgisweb.raster_layer.model import RasterLayer
     ('sochi-aster-dem.tif', 2, 3857),
     ('sochi-aster-dem.tif', 1, 4326),
 ])
-def test_load_file(source, band_count, srs_id, ngw_env, ngw_txn, ngw_resource_group):
+@pytest.mark.parametrize('cog', [False, True])
+def test_load_file(
+    source, band_count, srs_id, ngw_env, ngw_txn, ngw_resource_group, cog
+):
     res = RasterLayer(
         parent_id=ngw_resource_group, display_name='test:{}'.format(source),
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=srs_id).one(),
     ).persist()
 
-    res.load_file(os.path.join(os.path.split(__file__)[0], 'data', source), ngw_env)
+    res.load_file(
+        os.path.join(os.path.split(__file__)[0], "data", source),
+        ngw_env,
+        cog,
+    )
     assert res.band_count == band_count
 
     fn_data = ngw_env.file_storage.filename(res.fileobj)
@@ -32,5 +40,9 @@ def test_load_file(source, band_count, srs_id, ngw_env, ngw_txn, ngw_resource_gr
     fn_work = ngw_env.raster_layer.workdir_filename(res.fileobj)
     assert os.path.islink(fn_work) and os.path.realpath(fn_work) == fn_data
 
-    # Check for raster overviews
-    assert os.path.isfile(fn_work + '.ovr')
+    warnings, errors, _ = validate(fn_work, full_check=True)
+    if cog:
+        assert len(errors) == 0
+
+    if not cog:
+        assert len(errors) == 1

@@ -109,7 +109,7 @@ def cors_tween_factory(handler, registry):
                     # Add allowed Authorization header for HTTP authentication
                     # from JavaScript. It is a good idea?
 
-                    hadd(response, 'Access-Control-Allow-Headers', 'Authorization')
+                    hadd(response, 'Access-Control-Allow-Headers', 'Authorization, Range')
 
                     return response
 

@@ -6,6 +6,7 @@ Changes
 
 - Support for CORS domain wildcards (like ``https://*.csb.app``).
 - WFS client and server simple filters support.
+- Cloud-optimized GeoTIFF (COG) support for raster layers.
 
 
 4.0.0

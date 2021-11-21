@@ -7,6 +7,7 @@ import sqlalchemy.orm as orm
 from zope.interface import implementer
 
 from collections import OrderedDict
+from tempfile import NamedTemporaryFile
 from osgeo import gdal, gdalconst, osr, ogr
 
 from ..core.exception import ValidationError
@@ -65,6 +66,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     ysize = sa.Column(sa.Integer, nullable=False)
     dtype = sa.Column(sa.Unicode, nullable=False)
     band_count = sa.Column(sa.Integer, nullable=False)
+    cog = sa.Column(sa.Boolean, nullable=False, default=False)
 
     fileobj = orm.relationship(FileObj, cascade='all')
 
@@ -72,7 +74,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    def load_file(self, filename, env):
+    def load_file(self, filename, env, cog=False):
         ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
         if not ds:
             raise ValidationError(_("GDAL library was unable to open the file."))
@@ -129,8 +131,25 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         cmd.extend(('-co', 'COMPRESS=DEFLATE',
                     '-co', 'TILED=YES',
-                    '-co', 'BIGTIFF=YES', filename, dst_file))
-        subprocess.check_call(cmd)
+                    '-co', 'BIGTIFF=YES', filename))
+
+        if not cog:
+            subprocess.check_call(cmd + [dst_file,])
+            self.build_overview()
+        else:
+            # TODO: COG driver
+            with NamedTemporaryFile() as tf:
+                tmp_file = tf.name
+                subprocess.check_call(cmd + [tmp_file,])
+                self.build_overview(fn=tmp_file)
+
+                cmd = ['gdal_translate', '-of', 'Gtiff']
+                cmd.extend(('-co', 'COMPRESS=DEFLATE',
+                            '-co', 'TILED=YES',
+                            '-co', 'BIGTIFF=YES',
+                            '-co', 'COPY_SRC_OVERVIEWS=YES', tmp_file, dst_file))
+                subprocess.check_call(cmd)
+                os.unlink(tmp_file + '.ovr')
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
@@ -138,15 +157,19 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         self.xsize = ds.RasterXSize
         self.ysize = ds.RasterYSize
         self.band_count = ds.RasterCount
-
-        self.build_overview()
+        self.cog = cog
 
     def gdal_dataset(self):
         fn = env.raster_layer.workdir_filename(self.fileobj)
         return gdal.Open(fn, gdalconst.GA_ReadOnly)
 
-    def build_overview(self, missing_only=False):
-        fn = env.raster_layer.workdir_filename(self.fileobj)
+    def build_overview(self, missing_only=False, fn=None):
+        if self.cog:
+            return
+
+        if fn is None:
+            fn = env.raster_layer.workdir_filename(self.fileobj)
+
         if missing_only and os.path.isfile(fn + '.ovr'):
             return
 
@@ -174,6 +197,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         s = super()
         return (s.get_info() if hasattr(s, 'get_info') else ()) + (
             (_("Data type"), self.dtype),
+            (_("COG"), self.cog),
         )
 
     # IBboxLayer implementation:
@@ -222,7 +246,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         return extent
 
 
-def estimate_raster_layer_data(resource):
+def estimate_raster_layer_data(resource, cog=False):
 
     def file_size(fn):
         stat = os.stat(fn)
@@ -231,20 +255,33 @@ def estimate_raster_layer_data(resource):
     fn = env.raster_layer.workdir_filename(resource.fileobj)
 
     # Size of source file with overviews
-    size = file_size(fn) + file_size(fn + '.ovr')
+    size = file_size(fn)
+    if not cog:
+        size += file_size(fn + '.ovr')
     return size
 
 
 class _source_attr(SP):
 
     def setter(self, srlzr, value):
+        cog = srlzr.data.get("cog", env.raster_layer.cog_enabled)
 
         filedata, filemeta = env.file_upload.get_filename(value['id'])
-        srlzr.obj.load_file(filedata, env)
+        srlzr.obj.load_file(filedata, env, cog)
 
-        size = estimate_raster_layer_data(srlzr.obj)
+        size = estimate_raster_layer_data(srlzr.obj, cog)
         env.core.reserve_storage(COMP_ID, RasterLayerData, value_data_volume=size,
                                  resource=srlzr.obj)
+
+
+class _cog_attr(SP):
+    
+    def setter(self, srlzr, value):
+        if srlzr.data.get("source") is None:
+            raise ValidationError(_("COG attribute can be set only at creation time."))
+        else:
+            # Just do nothing, _source_attr serializer will handle the value.
+            pass
 
 
 class _color_interpretation(SP):
@@ -272,6 +309,7 @@ class RasterLayerSerializer(Serializer):
     xsize = SP(read=P_DSS_READ)
     ysize = SP(read=P_DSS_READ)
     band_count = SP(read=P_DSS_READ)
+    color_interpretation = _color_interpretation(read=P_DSS_READ)
 
     source = _source_attr(write=P_DS_WRITE)
-    color_interpretation = _color_interpretation(read=P_DSS_READ)
+    cog = _cog_attr(read=P_DSS_READ, write=P_DS_WRITE)

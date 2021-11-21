@@ -93,7 +93,7 @@ class SerializedProperty(object):
         if self.writeperm(srlzr):
             self.setter(srlzr, srlzr.data[self.attrname])
         else:
-            raise ForbiddenError(_("Attribute '%s' forbidden.") % self.attrname)
+            raise ForbiddenError(message=_("Attribute '%s' forbidden.") % self.attrname)
 
 
 class SerializedRelationship(SerializedProperty):

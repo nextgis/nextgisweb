@@ -1,7 +1,9 @@
+import os
 import tempfile
+from nextgisweb.resource.view import resource_factory
 
 from osgeo import gdal
-from pyramid.response import FileResponse
+from pyramid.response import FileResponse, Response
 
 from ..core.exception import ValidationError
 from ..env import env
@@ -64,7 +66,51 @@ def export(request):
         return _warp(source_filename)
 
 
+def cog(resource, request):
+    request.resource_permission(PERM_READ)
+
+    fn = env.raster_layer.workdir_filename(resource.fileobj)
+    filesize = os.path.getsize(fn)
+
+    if request.method == "HEAD":
+        return Response(
+            accept_ranges="bytes",
+            content_length=filesize,
+            content_type="image/geo+tiff"
+        )
+
+    if request.method == "GET":
+        if not resource.cog:
+            raise ValidationError(_("Requested raster is not COG."))
+
+        range = request.range
+        if range is None:
+            raise ValidationError(_("Range header is missed or invalid."))
+
+        content_range = range.content_range(filesize)
+        if content_range is None:
+            raise ValidationError(_("Range %s can not be read." % range))
+
+        content_length = content_range.stop - content_range.start
+        response = Response(
+            status_code=206,
+            content_length=content_length,
+            content_range=content_range,
+            content_type="image/geo+tiff"
+        )
+
+        with open(fn, "rb") as f:
+            f.seek(content_range.start)
+            response.body = f.read(content_length)
+
+        return response
+
+
 def setup_pyramid(comp, config):
     config.add_view(
         export, route_name="resource.export", context=RasterLayer, request_method="GET"
     )
+    config.add_route(
+        "raster_layer.cog", "/api/resource/{id}/cog",
+        factory=resource_factory) \
+        .add_view(cog, context=RasterLayer, request_method="GET")
