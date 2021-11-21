@@ -7,6 +7,7 @@ import sqlalchemy.orm as orm
 from zope.interface import implementer
 
 from collections import OrderedDict
+from tempfile import NamedTemporaryFile
 from osgeo import gdal, gdalconst, osr, ogr
 
 from ..core.exception import ValidationError
@@ -121,30 +122,34 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         dst_file = env.raster_layer.workdir_filename(fobj, makedirs=True)
         self.fileobj = fobj
 
-        if cog:
-            cmd_opts = (
-                '-of', 'COG',
-                '-co', 'BLOCKSIZE=256',
-            )
-        else:
-            cmd_opts = (
-                '-of', 'GTiff',
-                '-co', 'TILED=YES',
-                '-co', 'BLOCKXSIZE=256',
-                '-co', 'BLOCKYSIZE=256',
-            )
-
         if reproject:
-            cmd = ['gdalwarp', '-t_srs', 'EPSG:%d' % self.srs.id]
+            cmd = ['gdalwarp', '-of', 'GTiff', '-t_srs', 'EPSG:%d' % self.srs.id]
             if not has_nodata and alpha_band is None:
                 cmd.append('-dstalpha')
         else:
             cmd = ['gdal_translate', '-of', 'GTiff']
 
         cmd.extend(('-co', 'COMPRESS=DEFLATE',
-                    '-co', 'BIGTIFF=YES', filename, dst_file))
-        cmd.extend(cmd_opts)
-        subprocess.check_call(cmd)
+                    '-co', 'TILED=YES',
+                    '-co', 'BIGTIFF=YES', filename))
+
+        if not cog:
+            subprocess.check_call(cmd + [dst_file,])
+            self.build_overview()
+        else:
+            # TODO: COG driver
+            with NamedTemporaryFile() as tf:
+                tmp_file = tf.name
+                subprocess.check_call(cmd + [tmp_file,])
+                self.build_overview(fn=tmp_file)
+
+                cmd = ['gdal_translate', '-of', 'Gtiff']
+                cmd.extend(('-co', 'COMPRESS=DEFLATE',
+                            '-co', 'TILED=YES',
+                            '-co', 'BIGTIFF=YES',
+                            '-co', 'COPY_SRC_OVERVIEWS=YES', tmp_file, dst_file))
+                subprocess.check_call(cmd)
+                os.unlink(tmp_file + '.ovr')
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
@@ -154,17 +159,17 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         self.band_count = ds.RasterCount
         self.cog = cog
 
-        self.build_overview()
-
     def gdal_dataset(self):
         fn = env.raster_layer.workdir_filename(self.fileobj)
         return gdal.Open(fn, gdalconst.GA_ReadOnly)
 
-    def build_overview(self, missing_only=False):
+    def build_overview(self, missing_only=False, fn=None):
         if self.cog:
             return
 
-        fn = env.raster_layer.workdir_filename(self.fileobj)
+        if fn is None:
+            fn = env.raster_layer.workdir_filename(self.fileobj)
+
         if missing_only and os.path.isfile(fn + '.ovr'):
             return
 
@@ -259,9 +264,6 @@ def estimate_raster_layer_data(resource, cog=False):
 class _source_attr(SP):
 
     def setter(self, srlzr, value):
-        if srlzr.obj.id is not None:
-            raise ValidationError(_("Source attribute is applicable at resource creation only."))
-
         cog = srlzr.data.get("cog", env.raster_layer.cog_enabled)
 
         filedata, filemeta = env.file_upload.get_filename(value['id'])
@@ -275,8 +277,8 @@ class _source_attr(SP):
 class _cog_attr(SP):
     
     def setter(self, srlzr, value):
-        if srlzr.obj.id is not None and value != srlzr.obj.cog:
-            raise ValidationError(_("COG attribute cann't be changed."))
+        if srlzr.data.get("source") is None:
+            raise ValidationError(_("COG attribute can be set only at creation time."))
         else:
             # Just do nothing, _source_attr serializer will handle the value.
             pass
