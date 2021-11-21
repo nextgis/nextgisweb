@@ -133,6 +133,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                     '-co', 'TILED=YES',
                     '-co', 'BIGTIFF=YES', filename))
 
+        self.cog = cog
         if not cog:
             subprocess.check_call(cmd + [dst_file,])
             self.build_overview()
@@ -157,14 +158,13 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         self.xsize = ds.RasterXSize
         self.ysize = ds.RasterYSize
         self.band_count = ds.RasterCount
-        self.cog = cog
 
     def gdal_dataset(self):
         fn = env.raster_layer.workdir_filename(self.fileobj)
         return gdal.Open(fn, gdalconst.GA_ReadOnly)
 
     def build_overview(self, missing_only=False, fn=None):
-        if self.cog:
+        if fn is None and self.cog:
             return
 
         if fn is None:
@@ -277,7 +277,11 @@ class _source_attr(SP):
 class _cog_attr(SP):
     
     def setter(self, srlzr, value):
-        if srlzr.data.get("source") is None:
+        if (
+            srlzr.data.get("source") is None
+            and srlzr.obj.id is not None
+            and value != srlzr.obj.cog
+        ):
             raise ValidationError(_("COG attribute can be set only at creation time."))
         else:
             # Just do nothing, _source_attr serializer will handle the value.

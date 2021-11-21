@@ -44,7 +44,13 @@ define([
             
             value.srs = { id: this.wSrs.get("value") };
             value.source = this.wFile.data;
-            value.cog = this.wCOG.checked;
+
+            if (
+                this.composite.operation == "create" ||
+                this.composite.operation == "update" && value.source
+            ) {
+                value.cog = this.wCOG.checked;
+            }
         },
 
         validateDataInMixin: function (errback) {
