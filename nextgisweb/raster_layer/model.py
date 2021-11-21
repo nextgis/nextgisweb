@@ -269,6 +269,16 @@ class _source_attr(SP):
                                  resource=srlzr.obj)
 
 
+class _cog_attr(SP):
+    
+    def setter(self, srlzr, value):
+        if srlzr.obj.id is not None and value != srlzr.obj.cog:
+            raise ValidationError(_("COG attribute cann't be changed."))
+        else:
+            # Just do nothing, _source_attr serializer will handle the value.
+            pass
+
+
 class _color_interpretation(SP):
 
     def getter(self, srlzr):
@@ -294,7 +304,7 @@ class RasterLayerSerializer(Serializer):
     xsize = SP(read=P_DSS_READ)
     ysize = SP(read=P_DSS_READ)
     band_count = SP(read=P_DSS_READ)
+    color_interpretation = _color_interpretation(read=P_DSS_READ)
 
     source = _source_attr(write=P_DS_WRITE)
-    color_interpretation = _color_interpretation(read=P_DSS_READ)
-    cog = SP(read=P_DSS_READ)
+    cog = _cog_attr(read=P_DSS_READ, write=P_DS_WRITE)
