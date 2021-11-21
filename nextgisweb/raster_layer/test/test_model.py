@@ -6,6 +6,7 @@ from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
 
 from nextgisweb.raster_layer.model import RasterLayer
+from .validate_cloud_optimized_geotiff import validate
 
 
 @pytest.mark.parametrize('source, band_count, srs_id', [
@@ -39,8 +40,9 @@ def test_load_file(
     fn_work = ngw_env.raster_layer.workdir_filename(res.fileobj)
     assert os.path.islink(fn_work) and os.path.realpath(fn_work) == fn_data
 
-    # Check for raster overviews
+    warnings, errors, _ = validate(fn_work, full_check=True)
+    if cog:
+        assert len(errors) == 0
+
     if not cog:
-        assert os.path.isfile(fn_work + '.ovr')
-    else:
-        assert not os.path.isfile(fn_work + '.ovr')
+        assert len(errors) == 1
