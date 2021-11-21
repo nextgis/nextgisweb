@@ -94,6 +94,8 @@ def export(request):
     encoding = request.GET.get("encoding")
     zipped = request.GET.get("zipped", "true")
     zipped = zipped.lower() == "true"
+    aliases = request.GET.get("aliases", "true")
+    aliases = aliases.lower() == "true"
 
     if format is None:
         raise ValidationError(
@@ -142,6 +144,15 @@ def export(request):
             + list(itertools.chain(*[("-lco", o) for o in lco]))
             + list(itertools.chain(*[("-dsco", o) for o in dsco]))
         )
+
+        if aliases:
+            flds = [
+                '{} as "{}"'.format(fld.keyname, fld.display_name)
+                for fld in request.context.fields
+            ]
+            if fid is not None:
+                flds += ['FID as "{}"'.format(fid)]
+            vtopts += ["-sql", 'select {} from ""'.format(", ".join(flds))]
 
         if driver.fid_support and fid is None:
             vtopts.append('-preserve_fid')
