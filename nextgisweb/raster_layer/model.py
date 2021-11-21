@@ -259,6 +259,9 @@ def estimate_raster_layer_data(resource, cog=False):
 class _source_attr(SP):
 
     def setter(self, srlzr, value):
+        if srlzr.obj.id is not None:
+            raise ValidationError(_("Source attribute is applicable at resource creation only."))
+
         cog = srlzr.data.get("cog", env.raster_layer.cog_enabled)
 
         filedata, filemeta = env.file_upload.get_filename(value['id'])
