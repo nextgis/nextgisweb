@@ -3,7 +3,8 @@ import tempfile
 from nextgisweb.resource.view import resource_factory
 
 from osgeo import gdal
-from pyramid.response import FileResponse, Response
+from io import DEFAULT_BUFFER_SIZE
+from pyramid.response import FileIter, FileResponse, Response
 
 from ..core.exception import ValidationError
 from ..env import env
@@ -16,6 +17,22 @@ from .util import _
 
 PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write
+
+
+class RangeFileWrapper(FileIter):
+    def __init__(self, file, block_size=DEFAULT_BUFFER_SIZE, offset=0, length=0):
+        super().__init__(file=file, block_size=block_size)
+        self.file.seek(offset, os.SEEK_SET)
+        self.remaining = length
+
+    def __next__(self):
+        if self.remaining <= 0:
+            raise StopIteration()
+        data = self.file.read(min(self.remaining, self.block_size))
+        if not data:
+            raise StopIteration()
+        self.remaining -= len(data)
+        return data
 
 
 def export(request):
@@ -99,9 +116,11 @@ def cog(resource, request):
             content_type="image/geo+tiff"
         )
 
-        with open(fn, "rb") as f:
-            f.seek(content_range.start)
-            response.body = f.read(content_length)
+        response.app_iter = RangeFileWrapper(
+            open(fn, "rb"),
+            offset=content_range.start,
+            length=content_length
+        )
 
         return response
 
