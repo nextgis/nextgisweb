@@ -56,9 +56,10 @@ WFS_2_FIELD_TYPE = {
     FIELD_TYPE_WFS.DATETIME: FIELD_TYPE.DATETIME,
 }
 
-LOGICAL_OPERATORS = {
+COMPARISON_OPERATORS = {
     'eq': 'PropertyIsEqualTo',
     'ne': 'PropertyIsNotEqualTo',
+    'isnull': 'PropertyIsNil',
     'gt': 'PropertyIsGreaterThan',
     'ge': 'PropertyIsGreaterThanOrEqualTo',
     'lt': 'PropertyIsLessThan',
@@ -218,15 +219,24 @@ class WFSConnection(Base, Resource):
         if filter_ is not None:
             __and = etree.Element('And')
             for k, o, v in filter_:
-                if o not in LOGICAL_OPERATORS.keys():
+                if o not in COMPARISON_OPERATORS.keys():
                     raise ValidationError("Operator '%s' is not supported." % o)
-                __op = etree.Element(LOGICAL_OPERATORS[o])
+                __op = etree.Element(COMPARISON_OPERATORS[o])
                 __value_reference = etree.Element('ValueReference')
                 __value_reference.text = k
                 __op.append(__value_reference)
-                __literal = etree.Element('Literal')
-                __literal.text = str(v)
-                __op.append(__literal)
+                if o == 'isnull':
+                    if v == 'yes':
+                        pass
+                    elif v == 'no':
+                        raise ValidationError("Value '%s' for operator '%s' is not supported."
+                                              % (v, o))
+                    else:
+                        raise ValueError("Invalid value '%s' for operator '%s'." % (v, o))
+                else:
+                    __literal = etree.Element('Literal')
+                    __literal.text = str(v)
+                    __op.append(__literal)
                 __and.append(__op)
             __filter.append(__and)
 

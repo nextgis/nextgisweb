@@ -632,7 +632,17 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         if self._filter:
             clauses = []
             for k, o, v in self._filter:
-                supported_operators = ('gt', 'lt', 'ge', 'le', 'eq', 'ne', 'like', 'ilike')
+                supported_operators = (
+                    'eq',
+                    'ne',
+                    'isnull',
+                    'ge',
+                    'gt',
+                    'le',
+                    'lt',
+                    'like',
+                    'ilike',
+                )
                 if o not in supported_operators:
                     raise ValueError(
                         "Invalid operator '%s'. Only %r are supported." % (
@@ -640,15 +650,27 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
                 if o == 'like':
                     o = 'like_op'
-
-                if o == 'ilike':
+                elif o == 'ilike':
                     o = 'ilike_op'
+                elif o == "isnull":
+                    if v == 'yes':
+                        o = 'is_'
+                    elif v == 'no':
+                        o = 'isnot'
+                    else:
+                        raise ValueError(
+                            "Invalid value '%s' for operator '%s'."
+                            % (v, o)
+                        )
+                    v = db.sql.null()
 
                 op = getattr(db.sql.operators, o)
                 if k == 'id':
-                    clauses.append(op(idcol, v))
+                    column = idcol
                 else:
-                    clauses.append(op(db.sql.column(k), v))
+                    column = db.sql.column(k)
+
+                clauses.append(op(column, v))
 
             select.append_whereclause(db.and_(*clauses))
 

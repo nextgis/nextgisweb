@@ -142,9 +142,10 @@ GEOM_TYPE_TO_GML_TYPE = {
 }
 
 # Values are feature query operators
-LOGICAL_OPERATORS = {
+COMPARISON_OPERATORS = {
     'PropertyIsEqualTo': 'eq',
     'PropertyIsNotEqualTo': 'ne',
+    'PropertyIsNil': 'isnull',
     'PropertyIsGreaterThan': 'gt',
     'PropertyIsGreaterThanOrEqualTo': 'ge',
     'PropertyIsLessThan': 'lt',
@@ -442,16 +443,22 @@ class WFSHandler():
                         raise ValidationError("%d parse: geometry is not valid." % tag)
                     continue
 
-                if tag in LOGICAL_OPERATORS.keys():
+                if tag in COMPARISON_OPERATORS.keys():
+                    op = COMPARISON_OPERATORS[tag]
+
                     __value_reference = __el[0]
                     if ns_trim(__value_reference.tag) != 'ValueReference':
                         raise ValidationError("%d parse: ValueReference required." % tag)
                     k = __value_reference.text
-                    __literal = __el[1]
-                    if ns_trim(__literal.tag) != 'Literal':
-                        raise ValidationError("%d parse: Literal required." % tag)
-                    v = __literal.text
-                    op = LOGICAL_OPERATORS[tag]
+
+                    if tag == 'PropertyIsNil':
+                        v = 'yes'
+                    else:
+                        __literal = __el[1]
+                        if ns_trim(__literal.tag) != 'Literal':
+                            raise ValidationError("%d parse: Literal required." % tag)
+                        v = __literal.text
+
                     filter_result['filter'].append((k, op, v))
                     continue
 

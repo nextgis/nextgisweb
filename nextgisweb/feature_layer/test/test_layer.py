@@ -12,11 +12,14 @@ from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.spatial_ref_sys.models import WKT_EPSG_4326
 from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
+from nextgisweb.wfsclient import WFSLayer
 from nextgisweb.wfsclient.test import create_feature_layer as create_wfs_layer
 
 
 data_points = Path(nextgisweb.feature_layer.test.__file__).parent / 'data' / 'points.geojson'
 filter_cases = (
+    ((('null', 'isnull', 'yes'), ), [1, 2]),
+    ((('null', 'isnull', 'no'), ), [3]),
     ((('string', 'eq', 'Foo bar'), ), [1, 3]),
     ((('string', 'ne', 'Foo bar'), ), [2]),
     ((('int', 'eq', 0), ), [2]),
@@ -123,6 +126,16 @@ def test_layer(create_resource, ngw_resource_group, ngw_auth_administrator, ngw_
         # IFeatureQueryFilter
 
         for filter_, ids_expected in filter_cases:
+            # Skip unsupported operations
+            skip = False
+            if isinstance(layer, WFSLayer):
+                for k, op, v in filter_:
+                    if op == 'isnull' and v == 'no':
+                        skip = True
+                        break
+            if skip:
+                continue
+
             query = layer.feature_query()
             query.filter(*filter_)
             ids = [f.id for f in query()]

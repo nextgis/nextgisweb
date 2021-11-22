@@ -8,7 +8,7 @@ from html import escape as html_escape
 from zope.interface import implementer
 from osgeo import ogr, osr
 from shapely.geometry import box
-from sqlalchemy.sql import ColumnElement
+from sqlalchemy.sql import ColumnElement, null
 from sqlalchemy.ext.compiler import compiles
 
 import geoalchemy2 as ga
@@ -1365,14 +1365,15 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             for k, o, v in self._filter:
                 supported_operators = (
                     "eq",
+                    "ne",
+                    "isnull",
                     "ge",
                     "gt",
+                    "le",
+                    "lt",
+                    "like",
                     "ilike",
                     "in",
-                    "le",
-                    "like",
-                    "lt",
-                    "ne",
                     "notin",
                     "startswith",
                 )
@@ -1393,13 +1394,26 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     "startswith",
                 ]:
                     o += "_op"
+                elif o == "isnull":
+                    if v == 'yes':
+                        o = 'is_'
+                    elif v == 'no':
+                        o = 'isnot'
+                    else:
+                        raise ValueError(
+                            "Invalid value '%s' for operator '%s'."
+                            % (v, o)
+                        )
+                    v = null()
 
                 op = getattr(db.sql.operators, o)
                 if k == "id":
-                    token.append(op(table.columns.id, v))
+                    column = table.columns.id
                 else:
                     field = tableinfo.find_field(keyname=k)
-                    token.append(op(table.columns[field.key], v))
+                    column = table.columns[field.key]
+
+                token.append(op(column, v))
 
             where.append(db.and_(*token))
 
