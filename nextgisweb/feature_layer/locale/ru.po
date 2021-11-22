@@ -1,27 +1,27 @@
-#: api.py:102
+#: api.py:103
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:107
+#: api.py:108
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:295 api.py:370
+#: api.py:294 api.py:369
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
 
-#: api.py:297
+#: api.py:296
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:303 api.py:375
+#: api.py:302 api.py:374
 #, python-format
 msgid "Date format '%s' is not supported."
 msgstr "Формат даты '%s' не поддерживается."
 
-#: api.py:599
+#: api.py:598
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -160,8 +160,8 @@ msgid "FID field"
 msgstr "Поле FID"
 
 #: amd/ngw-feature-layer/template/ExportForm.hbs:34
-msgid "Use field aliases"
-msgstr "Использовать псевдонимы полей"
+msgid "Use field display names"
+msgstr "Использовать наименования полей"
 
 #: amd/ngw-feature-layer/template/ExportForm.hbs:37
 msgid "Zip archive"

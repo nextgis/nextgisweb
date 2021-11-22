@@ -94,8 +94,8 @@ def export(request):
     encoding = request.GET.get("encoding")
     zipped = request.GET.get("zipped", "true")
     zipped = zipped.lower() == "true"
-    aliases = request.GET.get("aliases", "true")
-    aliases = aliases.lower() == "true"
+    display_name = request.GET.get("display_name", "true")
+    display_name = display_name.lower() == "true"
 
     if format is None:
         raise ValidationError(
@@ -145,9 +145,13 @@ def export(request):
             + list(itertools.chain(*[("-dsco", o) for o in dsco]))
         )
 
-        if aliases:
+        if display_name:
+            # CPLES_SQLI == 7
             flds = [
-                '{} as "{}"'.format(fld.keyname, fld.display_name)
+                '{} as "{}"'.format(
+                    gdal.EscapeString(fld.keyname, 7),
+                    gdal.EscapeString(fld.display_name, 7)
+                )
                 for fld in request.context.fields
             ]
             if fid is not None:
