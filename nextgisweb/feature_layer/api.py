@@ -150,12 +150,12 @@ def export(request):
             flds = [
                 '{} as "{}"'.format(
                     gdal.EscapeString(fld.keyname, 7),
-                    gdal.EscapeString(fld.display_name, 7)
+                    gdal.EscapeString(fld.display_name, 7),
                 )
                 for fld in request.context.fields
             ]
             if fid is not None:
-                flds += ['FID as "{}"'.format(fid)]
+                flds += ['FID as "{}"'.format(gdal.EscapeString(fid, 7))]
             vtopts += ["-sql", 'select {} from ""'.format(", ".join(flds))]
 
         if driver.fid_support and fid is None:
