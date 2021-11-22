@@ -588,9 +588,10 @@ class WFSHandler():
     def _get_capabilities200(self):
         _ns_ows = nsmap('ows', self.p_version)['ns']
         _ns_fes = nsmap('fes', self.p_version)['ns']
+        _ns_gml = nsmap('gml', self.p_version)['ns']
 
         EM = ElementMaker(nsmap=dict(
-            fes=_ns_fes, ows=_ns_ows, xlink=nsmap('xlink', self.p_version)['ns']
+            fes=_ns_fes, ows=_ns_ows, gml=_ns_gml, xlink=nsmap('xlink', self.p_version)['ns']
         ))
         root = EM('WFS_Capabilities', dict(
             version=self.p_version,
@@ -632,6 +633,7 @@ class WFSHandler():
 
         # Filter_Capabilities
         __filter = El('Filter_Capabilities', namespace=_ns_fes, parent=root)
+
         __conf = El('Conformance', namespace=_ns_fes, parent=__filter)
 
         def constraint(name, default):
@@ -653,6 +655,20 @@ class WFSHandler():
         constraint('ImplementsVersionNav', 'FALSE')
         constraint('ImplementsSorting', 'FALSE')
         constraint('ImplementsExtendedOperators', 'FALSE')
+
+        __sc = El('Spatial_Capabilities', namespace=_ns_fes, parent=__filter)
+
+        __go = El('GeometryOperands', namespace=_ns_fes, parent=__sc)
+        for operand in (
+            'gml:Envelope',
+            'gml:Point',
+            'gml:LineString',
+            'gml:Polygon'
+        ):
+            El('GeometryOperand', dict(name=operand), namespace=_ns_fes, parent=__go)
+
+        __so = El('SpatialOperators', namespace=_ns_fes, parent=__sc)
+        El('SpatialOperator', dict(name='BBOX'), namespace=_ns_fes, parent=__so)
 
         return root
 
