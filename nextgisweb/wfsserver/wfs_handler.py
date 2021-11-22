@@ -335,7 +335,7 @@ class WFSHandler():
         return xml
 
     def _feature_type_list(self, parent):
-        __list = El('FeatureTypeList', parent=parent)
+        __list = El('FeatureTypeList')
         if self.p_version < v200:
             __ops = El('Operations', parent=__list)
             if self.p_version == v110:
@@ -344,6 +344,7 @@ class WFSHandler():
                 El('Query', parent=__ops)
 
         EM_name = ElementMaker(nsmap=dict(ngw=self.service_namespace))
+        layer_count = 0
         for layer in self.resource.layers:
             feature_layer = layer.resource
             if not feature_layer.has_permission(DataScope.read, self.request.user):
@@ -392,6 +393,9 @@ class WFSHandler():
                         bbox = dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
                                     minx=str(extent['minLon']), miny=str(extent['minLat']))
                         El('LatLongBoundingBox', bbox, parent=__type)
+            layer_count += 1
+        if layer_count > 0:
+            parent.append(__list)
 
     def _parse_filter(self, __filter, layer):
         filter_result = dict(
