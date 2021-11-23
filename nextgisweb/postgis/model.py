@@ -8,7 +8,7 @@ from sqlalchemy.engine.url import (
 from zope.interface import implementer
 
 from .. import db
-from ..core.exception import ExternalDatabaseError, ValidationError, ForbiddenError
+from ..core.exception import ValidationError, ForbiddenError
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -41,6 +41,7 @@ from ..feature_layer import (
     IFeatureQueryIntersects,
     IFeatureQueryOrderBy)
 
+from .exception import ExternalDatabaseError
 from .util import _
 
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
