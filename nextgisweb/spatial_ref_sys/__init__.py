@@ -49,4 +49,5 @@ class SpatialRefSysComponent(Component):
     option_annotations = (
         Option('catalog.enabled', bool, default=False),
         Option('catalog.url'),
+        Option('catalog.timeout', float, default=15, doc="Catalog request timeout in seconds."),
     )

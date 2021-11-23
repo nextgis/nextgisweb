@@ -1,19 +1,21 @@
 import re
-import requests
 import json
 from io import BytesIO
 from datetime import datetime
 from collections import OrderedDict
 
+import PIL
+import requests
 from zope.interface import implementer
 from lxml import etree
-import PIL
 from owslib.wms import WebMapService
 from owslib.map.common import WMSCapabilitiesReader
+from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
 from pyramid.url import urlencode
+from requests.exceptions import RequestException
 
 from .. import db
-from ..core.exception import ValidationError
+from ..core.exception import ExternalServerError, ValidationError
 from ..env import env
 from ..models import declarative_base
 from ..resource import (
@@ -229,11 +231,21 @@ class Layer(Base, Resource, SpatialLayerMixin):
             + urlencode(query).replace("+", "%20")
         )
 
-        response = requests.get(
-            url, auth=auth, headers=env.wmsclient.headers)
-        data = BytesIO(response.content)
+        try:
+            response = requests.get(
+                url, auth=auth, headers=env.wmsclient.headers,
+                timeout=env.wmsclient.options['timeout'])
+        except RequestException:
+            raise ExternalServerError()
 
-        return PIL.Image.open(data)
+        if response.status_code == 200:
+            return PIL.Image.open(BytesIO(response.content))
+        elif response.status_code == 401:
+            raise HTTPUnauthorized()
+        elif response.status_code == 403:
+            raise HTTPForbidden()
+        else:
+            raise ExternalServerError()
 
     # IBboxLayer implementation:
     @property

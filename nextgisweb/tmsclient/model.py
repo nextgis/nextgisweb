@@ -1,5 +1,6 @@
 import re
 from io import BytesIO
+from requests.exceptions import RequestException
 from urllib.parse import urlparse
 
 import PIL
@@ -9,7 +10,7 @@ from zope.interface import implementer
 
 from .. import db
 from ..lib.osrhelper import traditional_axis_mapping
-from ..core.exception import OperationalError, ValidationError
+from ..core.exception import ExternalServerError, ValidationError
 from ..env import env
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..models import declarative_base
@@ -81,17 +82,20 @@ class Connection(Base, Resource):
         session = get_session(self.id, urlparse(self.url_template).scheme,
                               self.username, self.password)
 
-        result = session.get(
-            self.url_template.format(
-                x=x, y=y, z=z,
-                q=quad_key(x, y, z),
-                layer=layer_name
-            ),
-            params=self.query_params,
-            headers=env.tmsclient.headers,
-            timeout=env.tmsclient.options['timeout'],
-            verify=not self.insecure
-        )
+        try:
+            result = session.get(
+                self.url_template.format(
+                    x=x, y=y, z=z,
+                    q=quad_key(x, y, z),
+                    layer=layer_name
+                ),
+                params=self.query_params,
+                headers=env.tmsclient.headers,
+                timeout=env.tmsclient.options['timeout'],
+                verify=not self.insecure
+            )
+        except RequestException:
+            raise ExternalServerError()
 
         if result.status_code == 200:
             return PIL.Image.open(BytesIO(result.content))
@@ -100,7 +104,7 @@ class Connection(Base, Resource):
         elif result.status_code == 403:
             raise HTTPForbidden()
         elif result.status_code // 100 == 5:
-            raise OperationalError("Third-party service unavailable.")
+            raise ExternalServerError()
         else:
             return None
 

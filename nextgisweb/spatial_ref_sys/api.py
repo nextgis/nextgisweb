@@ -2,8 +2,9 @@ import json
 
 import requests
 from pyproj import CRS
+from requests.exceptions import RequestException
 
-from ..core.exception import ValidationError
+from ..core.exception import ValidationError, ExternalServerError
 from ..env import env
 from ..lib.geometry import Geometry, Transformer, geom_calc as shp_geom_calc
 from ..models import DBSession
@@ -86,8 +87,11 @@ def catalog_collection(request):
 
     catalog_url = env.spatial_ref_sys.options['catalog.url']
     url = catalog_url + '/api/v1/spatial_ref_sys/'
-    res = requests.get(url, query)
-    res.raise_for_status()
+    try:
+        res = requests.get(url, query, timeout=env.spatial_ref_sys.options['catalog.timeout'])
+        res.raise_for_status()
+    except RequestException:
+        raise ExternalServerError()
 
     items = list()
     for srs in res.json():
@@ -104,8 +108,11 @@ def catalog_collection(request):
 def get_srs_from_catalog(catalog_id):
     catalog_url = env.spatial_ref_sys.options['catalog.url']
     url = catalog_url + '/api/v1/spatial_ref_sys/' + str(catalog_id)
-    res = requests.get(url)
-    res.raise_for_status()
+    try:
+        res = requests.get(url, timeout=env.spatial_ref_sys.options['catalog.timeout'])
+        res.raise_for_status()
+    except RequestException:
+        raise ExternalServerError()
 
     return res.json()
 
