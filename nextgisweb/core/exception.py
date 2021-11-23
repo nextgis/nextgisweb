@@ -107,11 +107,11 @@ class OperationalError(UserException):
     http_status_code = 503
 
 
-class ExternalServerError(OperationalError):
-    title = _("External server error")
+class ExternalServiceError(OperationalError):
+    title = _("External service error")
 
 
-class ExternalDatabaseError(ExternalServerError):
+class ExternalDatabaseError(ExternalServiceError):
     title = _("External database error")
 
     def __init__(self, *args, **kwargs):

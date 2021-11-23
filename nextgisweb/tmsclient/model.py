@@ -10,7 +10,7 @@ from zope.interface import implementer
 
 from .. import db
 from ..lib.osrhelper import traditional_axis_mapping
-from ..core.exception import ExternalServerError, ValidationError
+from ..core.exception import ExternalServiceError, ValidationError
 from ..env import env
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..models import declarative_base
@@ -95,7 +95,7 @@ class Connection(Base, Resource):
                 verify=not self.insecure
             )
         except RequestException:
-            raise ExternalServerError()
+            raise ExternalServiceError()
 
         if result.status_code == 200:
             return PIL.Image.open(BytesIO(result.content))
@@ -104,7 +104,7 @@ class Connection(Base, Resource):
         elif result.status_code == 403:
             raise HTTPForbidden()
         elif result.status_code // 100 == 5:
-            raise ExternalServerError()
+            raise ExternalServiceError()
         else:
             return None
 

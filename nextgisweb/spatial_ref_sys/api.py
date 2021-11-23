@@ -4,7 +4,7 @@ import requests
 from pyproj import CRS
 from requests.exceptions import RequestException
 
-from ..core.exception import ValidationError, ExternalServerError
+from ..core.exception import ValidationError, ExternalServiceError
 from ..env import env
 from ..lib.geometry import Geometry, Transformer, geom_calc as shp_geom_calc
 from ..models import DBSession
@@ -91,7 +91,7 @@ def catalog_collection(request):
         res = requests.get(url, query, timeout=env.spatial_ref_sys.options['catalog.timeout'])
         res.raise_for_status()
     except RequestException:
-        raise ExternalServerError()
+        raise ExternalServiceError()
 
     items = list()
     for srs in res.json():
@@ -112,7 +112,7 @@ def get_srs_from_catalog(catalog_id):
         res = requests.get(url, timeout=env.spatial_ref_sys.options['catalog.timeout'])
         res.raise_for_status()
     except RequestException:
-        raise ExternalServerError()
+        raise ExternalServiceError()
 
     return res.json()
 

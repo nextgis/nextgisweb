@@ -15,7 +15,7 @@ from pyramid.url import urlencode
 from requests.exceptions import RequestException
 
 from .. import db
-from ..core.exception import ExternalServerError, ValidationError
+from ..core.exception import ExternalServiceError, ValidationError
 from ..env import env
 from ..models import declarative_base
 from ..resource import (
@@ -236,7 +236,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
                 url, auth=auth, headers=env.wmsclient.headers,
                 timeout=env.wmsclient.options['timeout'])
         except RequestException:
-            raise ExternalServerError()
+            raise ExternalServiceError()
 
         if response.status_code == 200:
             return PIL.Image.open(BytesIO(response.content))
@@ -245,7 +245,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
         elif response.status_code == 403:
             raise HTTPForbidden()
         else:
-            raise ExternalServerError()
+            raise ExternalServiceError()
 
     # IBboxLayer implementation:
     @property

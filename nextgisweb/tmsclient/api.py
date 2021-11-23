@@ -1,7 +1,7 @@
 import requests
 from requests.exceptions import RequestException
 
-from ..core.exception import ExternalServerError
+from ..core.exception import ExternalServiceError
 from ..resource import ConnectionScope, resource_factory
 
 from .model import Connection, NEXTGIS_GEOSERVICES
@@ -22,7 +22,7 @@ def inspect_connection(request):
                 timeout=request.env.tmsclient.options['timeout'])
             result.raise_for_status()
         except RequestException:
-            raise ExternalServerError()
+            raise ExternalServiceError()
 
         for layer in result.json():
             layers.append(dict(

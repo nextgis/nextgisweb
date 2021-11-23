@@ -12,7 +12,7 @@ from shapely.geometry import box
 from zope.interface import implementer
 
 from .. import db
-from ..core.exception import ForbiddenError, ValidationError, ExternalServerError
+from ..core.exception import ForbiddenError, ValidationError, ExternalServiceError
 from ..env import env
 from ..feature_layer import (
     Feature,
@@ -150,7 +150,7 @@ class WFSConnection(Base, Resource):
                 **kwargs
             )
         except RequestException:
-            raise ExternalServerError()
+            raise ExternalServiceError()
 
         if response.status_code // 100 == 2:
             return response.content
@@ -159,7 +159,7 @@ class WFSConnection(Base, Resource):
         elif response.status_code == 403:
             raise HTTPForbidden()
         elif response.status_code // 100 == 5:
-            raise ExternalServerError()
+            raise ExternalServiceError()
         else:
             return None
 
