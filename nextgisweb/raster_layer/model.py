@@ -246,7 +246,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         return extent
 
 
-def estimate_raster_layer_data(resource, cog=False):
+def estimate_raster_layer_data(resource):
 
     def file_size(fn):
         stat = os.stat(fn)
@@ -256,7 +256,7 @@ def estimate_raster_layer_data(resource, cog=False):
 
     # Size of source file with overviews
     size = file_size(fn)
-    if not cog:
+    if not resource.cog:
         size += file_size(fn + '.ovr')
     return size
 
@@ -269,13 +269,13 @@ class _source_attr(SP):
         filedata, filemeta = env.file_upload.get_filename(value['id'])
         srlzr.obj.load_file(filedata, env, cog)
 
-        size = estimate_raster_layer_data(srlzr.obj, cog)
+        size = estimate_raster_layer_data(srlzr.obj)
         env.core.reserve_storage(COMP_ID, RasterLayerData, value_data_volume=size,
                                  resource=srlzr.obj)
 
 
 class _cog_attr(SP):
-    
+
     def setter(self, srlzr, value):
         if (
             srlzr.data.get("source") is None
