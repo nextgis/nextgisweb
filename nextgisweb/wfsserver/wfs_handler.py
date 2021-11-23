@@ -142,9 +142,10 @@ GEOM_TYPE_TO_GML_TYPE = {
 }
 
 # Values are feature query operators
-LOGICAL_OPERATORS = {
+COMPARISON_OPERATORS = {
     'PropertyIsEqualTo': 'eq',
     'PropertyIsNotEqualTo': 'ne',
+    'PropertyIsNil': 'isnull',
     'PropertyIsGreaterThan': 'gt',
     'PropertyIsGreaterThanOrEqualTo': 'ge',
     'PropertyIsLessThan': 'lt',
@@ -335,7 +336,7 @@ class WFSHandler():
         return xml
 
     def _feature_type_list(self, parent):
-        __list = El('FeatureTypeList', parent=parent)
+        __list = El('FeatureTypeList')
         if self.p_version < v200:
             __ops = El('Operations', parent=__list)
             if self.p_version == v110:
@@ -344,6 +345,7 @@ class WFSHandler():
                 El('Query', parent=__ops)
 
         EM_name = ElementMaker(nsmap=dict(ngw=self.service_namespace))
+        layer_count = 0
         for layer in self.resource.layers:
             feature_layer = layer.resource
             if not feature_layer.has_permission(DataScope.read, self.request.user):
@@ -392,6 +394,9 @@ class WFSHandler():
                         bbox = dict(maxx=str(extent['maxLon']), maxy=str(extent['maxLat']),
                                     minx=str(extent['minLon']), miny=str(extent['minLat']))
                         El('LatLongBoundingBox', bbox, parent=__type)
+            layer_count += 1
+        if layer_count > 0:
+            parent.append(__list)
 
     def _parse_filter(self, __filter, layer):
         filter_result = dict(
@@ -438,16 +443,22 @@ class WFSHandler():
                         raise ValidationError("%d parse: geometry is not valid." % tag)
                     continue
 
-                if tag in LOGICAL_OPERATORS.keys():
+                if tag in COMPARISON_OPERATORS.keys():
+                    op = COMPARISON_OPERATORS[tag]
+
                     __value_reference = __el[0]
                     if ns_trim(__value_reference.tag) != 'ValueReference':
                         raise ValidationError("%d parse: ValueReference required." % tag)
                     k = __value_reference.text
-                    __literal = __el[1]
-                    if ns_trim(__literal.tag) != 'Literal':
-                        raise ValidationError("%d parse: Literal required." % tag)
-                    v = __literal.text
-                    op = LOGICAL_OPERATORS[tag]
+
+                    if tag == 'PropertyIsNil':
+                        v = 'yes'
+                    else:
+                        __literal = __el[1]
+                        if ns_trim(__literal.tag) != 'Literal':
+                            raise ValidationError("%d parse: Literal required." % tag)
+                        v = __literal.text
+
                     filter_result['filter'].append((k, op, v))
                     continue
 
@@ -584,9 +595,10 @@ class WFSHandler():
     def _get_capabilities200(self):
         _ns_ows = nsmap('ows', self.p_version)['ns']
         _ns_fes = nsmap('fes', self.p_version)['ns']
+        _ns_gml = nsmap('gml', self.p_version)['ns']
 
         EM = ElementMaker(nsmap=dict(
-            fes=_ns_fes, ows=_ns_ows, xlink=nsmap('xlink', self.p_version)['ns']
+            fes=_ns_fes, ows=_ns_ows, gml=_ns_gml, xlink=nsmap('xlink', self.p_version)['ns']
         ))
         root = EM('WFS_Capabilities', dict(
             version=self.p_version,
@@ -628,6 +640,7 @@ class WFSHandler():
 
         # Filter_Capabilities
         __filter = El('Filter_Capabilities', namespace=_ns_fes, parent=root)
+
         __conf = El('Conformance', namespace=_ns_fes, parent=__filter)
 
         def constraint(name, default):
@@ -649,6 +662,20 @@ class WFSHandler():
         constraint('ImplementsVersionNav', 'FALSE')
         constraint('ImplementsSorting', 'FALSE')
         constraint('ImplementsExtendedOperators', 'FALSE')
+
+        __sc = El('Spatial_Capabilities', namespace=_ns_fes, parent=__filter)
+
+        __go = El('GeometryOperands', namespace=_ns_fes, parent=__sc)
+        for operand in (
+            'gml:Envelope',
+            'gml:Point',
+            'gml:LineString',
+            'gml:Polygon'
+        ):
+            El('GeometryOperand', dict(name=operand), namespace=_ns_fes, parent=__go)
+
+        __so = El('SpatialOperators', namespace=_ns_fes, parent=__sc)
+        El('SpatialOperator', dict(name='BBOX'), namespace=_ns_fes, parent=__so)
 
         return root
 

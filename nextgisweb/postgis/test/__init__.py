@@ -27,7 +27,8 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
     opts_db = env.core.options.with_prefix('database_test')
 
     for o in ('host', 'name', 'user'):
-        pytest.skip(f"Option database_test.{o} isn't set")
+        if o not in opts_db:
+            pytest.skip(f"Option database_test.{o} isn't set")
 
     con_args = dict(
         host=opts_db['host'],
