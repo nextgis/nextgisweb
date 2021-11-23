@@ -519,6 +519,7 @@ def cget(resource, request):
         extensions=_extensions(request.GET.get('extensions'), resource),
     )
 
+    keys = [fld.keyname for fld in resource.fields]
     query = resource.feature_query()
 
     # Paging
@@ -529,14 +530,11 @@ def cget(resource, request):
 
     # Filtering by attributes
     filter_ = []
-    keys = [fld.keyname for fld in resource.fields]
     for param in request.GET.keys():
         if param.startswith('fld_'):
             fld_expr = re.sub('^fld_', '', param)
-            check_key = True
         elif param == 'id' or param.startswith('id__'):
             fld_expr = param
-            check_key = False
         else:
             continue
 
@@ -545,8 +543,10 @@ def cget(resource, request):
         except ValueError:
             key, operator = (fld_expr, 'eq')
 
-        if not check_key or key in keys:
-            filter_.append((key, operator, request.GET[param]))
+        if key != 'id' and key not in keys:
+            raise ValidationError("Inknown field '%s'." % key)
+
+        filter_.append((key, operator, request.GET[param]))
 
     if filter_:
         query.filter(*filter_)
