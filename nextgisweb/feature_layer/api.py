@@ -148,9 +148,9 @@ def export(request):
         if display_name:
             # CPLES_SQLI == 7
             flds = [
-                '{} as "{}"'.format(
-                    gdal.EscapeString(fld.keyname, 7),
-                    gdal.EscapeString(fld.display_name, 7),
+                '"{}" as "{}"'.format(
+                    fld.keyname.replace('"', r'\"'),
+                    fld.display_name.replace('"', r'\"'),
                 )
                 for fld in request.context.fields
             ]

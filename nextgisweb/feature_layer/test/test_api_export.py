@@ -99,11 +99,16 @@ def export_geojson(layer_id, ngw_webtest_app, ngw_auth_administrator):
 ])
 def test_field_escape(value, update_field, export_geojson):
     update_field(keyname=value)
-    geojson = export_geojson(display_name=False)       
+    geojson = export_geojson(display_name=False)
     fprop = geojson['features'][0]['properties']
     assert fprop[value] == 'value'
 
     update_field(display_name=value)
+    geojson = export_geojson(display_name=True)
+    fprop = geojson['features'][0]['properties']
+
+    # to deal with SQL column names that look like SQL keywords
+    update_field(keyname=value, display_name=value)
     geojson = export_geojson(display_name=True)
     fprop = geojson['features'][0]['properties']
     assert fprop[value] == 'value'
