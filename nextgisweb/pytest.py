@@ -20,24 +20,6 @@ def ngw_env():
     return _env_initialize()
 
 
-@pytest.fixture(scope='session')
-def env(ngw_env):
-    warn("Fixture env is deprecated! Use ngw_env instead.", DeprecationWarning)
-    return ngw_env
-
-
-@pytest.fixture
-def txn(ngw_txn):
-    warn("Fixture txn is deprecated! Use ngw_txn instead.", DeprecationWarning)
-    return ngw_txn
-
-
-@pytest.fixture(scope='session')
-def webapp(ngw_webtest_factory):
-    warn("Fixture webapp is deprecated! Use ngw_webtest_app instead.", DeprecationWarning)
-    return ngw_webtest_factory()
-
-
 @pytest.fixture()
 def webapp_handler(ngw_env):
     pyramid = ngw_env.pyramid

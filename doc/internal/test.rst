@@ -52,35 +52,35 @@ Server-side
 ^^^^^^^^^^^
 
 Server-side tests are executed in the same context as other NextGIS Web console
-scripts. The environment can be loaded with ``env`` fixture, which initializes
-components.
+scripts. The environment can be loaded with ``ngw_env`` fixture, which
+initializes components and the environment.
 
 .. code-block:: python
 
   # package/component/test/test_env.py
 
-  def test_component(env):
-      env.component.some_component_method()
+  def test_component(ngw_env):
+      ngw_env.component.some_component_method()
 
-
-If the test must be performed inside a database transaction that needs to be
-aborted, use transaction ``txn`` fixture.
+Tests inside a transaction can be performed using ``ngw_txn`` fixture. It begins
+a new transaction and rollbacks it at exit, flushing changes to the database
+before that.
 
 .. code-block:: python
 
   # package/component/test/test_txn.py
   from ..model import SomeModel
 
-  def test_transaction(txn):
+  def test_transaction(ngw_txn):
       SomeModel(field='value').persist()  # Dummy record insert
-      DBSession.flush()
 
 
 Web application
 ^^^^^^^^^^^^^^^
 
-For testing via HTTP requests fixture ``webapp`` can be used. It's represents
-`WebTest's <https://docs.pylonsproject.org/projects/webtest/en/latest/index.html>`_
+For testing via HTTP requests fixture ``ngw_webtest_app`` can be used. It's
+represents `WebTest
+<https://docs.pylonsproject.org/projects/webtest/en/latest/index.html>`_
 `TestApp <https://docs.pylonsproject.org/projects/webtest/en/latest/api.html>`_
 instance which can be used for doing requests.
 
@@ -88,8 +88,8 @@ instance which can be used for doing requests.
 
   # package/component/test/test_webapp.py
 
-  def test_api_method(webapp):
-      webapp.get('/api/component/component/method')
+  def test_api_method(ngw_webtest_app):
+      ngw_webtest_app.get('/api/component/component/method')
 
 
 Writing tests
