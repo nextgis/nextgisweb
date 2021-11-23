@@ -8,9 +8,9 @@ unit and functional tests.
 File layout
 -----------
 
-Each NextGIS Web component have own set of tests located inside ``test``
-directory.  Consider directory structure on example fom  package ``package`` and
-component ``component``.
+Each NextGIS Web component have its own set of tests located inside ``test``
+directory.  Consider the directory structure on the example for package
+``package`` and component ``component``.
 
 ::
 
@@ -28,34 +28,31 @@ component ``component``.
 Unit tests
 ----------
 
-Unit tests designed to test functionality of a specific module and usually do
-not need additional configuration. Just refer `pytest documentation
+Unit tests are designed for testing modules and usually don't require additional
+configuration. Refer `pytest documentation
 <https://docs.pytest.org/en/latest/contents.html>`_ and `Writing tests`_
 section.
-
 
 .. code-block:: python
 
   # package/component/test/test_unit.py
-  from package.component import some_function
+  from .. import some_function
 
   def test_some_function():
       assert some_function(1) == 0
 
-
 Functional tests
 ----------------
 
-Functional tests operate on data and NextGIS Web must be configured and
-initialized database (``nextgisweb initialize_db``). Some tests can modify data
-so don't run functional tests on production instances.
+Functional tests operate on data, and NextGIS Web must be configured and have
+the database initialized via ``nextgisweb initialize_db``. Some tests modify
+data, so don't run these tests in a production environment.
 
-
-Server side
+Server-side
 ^^^^^^^^^^^
 
-Server side tests executed in same context as others NextGIS Web console
-scripts. Enviroment can be loaded with ``env`` fixture wich initializes
+Server-side tests are executed in the same context as other NextGIS Web console
+scripts. The environment can be loaded with ``env`` fixture, which initializes
 components.
 
 .. code-block:: python
@@ -66,13 +63,13 @@ components.
       env.component.some_component_method()
 
 
-If the test needs to be performed as part of transaction that needs to be
-aborted, you can use transaction fixture ``txn``.
+If the test must be performed inside a database transaction that needs to be
+aborted, use transaction ``txn`` fixture.
 
 .. code-block:: python
 
   # package/component/test/test_txn.py
-  from package.component.model import SomeModel
+  from ..model import SomeModel
 
   def test_transaction(txn):
       SomeModel(field='value').persist()  # Dummy record insert
@@ -85,7 +82,7 @@ Web application
 For testing via HTTP requests fixture ``webapp`` can be used. It's represents
 `WebTest's <https://docs.pylonsproject.org/projects/webtest/en/latest/index.html>`_
 `TestApp <https://docs.pylonsproject.org/projects/webtest/en/latest/api.html>`_
-instance wich can be used for doing requests.
+instance which can be used for doing requests.
 
 .. code-block:: python
 
@@ -101,27 +98,12 @@ Writing tests
 Naming conventions
 ^^^^^^^^^^^^^^^^^^
 
-Follow pytest default naming conventions - test modules and function should be
-prefixed with ``test_``.
+Follow pytest default naming conventions - test modules and functions must have
+``test_`` prefix.
 
 .. note::
 
-  Do not forget to add an dummy ``__init__.py`` file to test directory.
-  Otherwise pytest will not be able to handle names of the modules.
-
-Relative imports
-^^^^^^^^^^^^^^^^
-
-Pytest doesn't support well relative imports in test modules. So don't use
-relative imports and use absolute imports instead. For example:
-
-.. code-block:: python
-
-  # package/component/test/test_import.py
-
-  from ..model import SomeModel                   # Wrong way!
-  from package.component.model import SomeModel   # It's OK!
-
+  Do not forget to add a dummy ``__init__.py`` file to the ``test`` directory.
 
 Running tests
 -------------
