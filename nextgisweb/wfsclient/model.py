@@ -152,16 +152,10 @@ class WFSConnection(Base, Resource):
         except RequestException:
             raise ExternalServiceError()
 
-        if response.status_code // 100 == 2:
+        if response.status_code == 200:
             return response.content
-        elif response.status_code == 401:
-            raise HTTPUnauthorized()
-        elif response.status_code == 403:
-            raise HTTPForbidden()
-        elif response.status_code // 100 == 5:
-            raise ExternalServiceError()
         else:
-            return None
+            raise ExternalServiceError()
 
     def get_capabilities(self):
         body = self.request_wfs('GET', params=dict(REQUEST='GetCapabilities'))

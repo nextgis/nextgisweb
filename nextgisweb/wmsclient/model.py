@@ -240,10 +240,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         if response.status_code == 200:
             return PIL.Image.open(BytesIO(response.content))
-        elif response.status_code == 401:
-            raise HTTPUnauthorized()
-        elif response.status_code == 403:
-            raise HTTPForbidden()
+        elif response.status_code in (204, 404):
+            return None
         else:
             raise ExternalServiceError()
 

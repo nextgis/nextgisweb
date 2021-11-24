@@ -99,14 +99,10 @@ class Connection(Base, Resource):
 
         if result.status_code == 200:
             return PIL.Image.open(BytesIO(result.content))
-        elif result.status_code == 401:
-            raise HTTPUnauthorized()
-        elif result.status_code == 403:
-            raise HTTPForbidden()
-        elif result.status_code // 100 == 5:
-            raise ExternalServiceError()
-        else:
+        elif result.status_code in (204, 404):
             return None
+        else:
+            raise ExternalServiceError()
 
 
 class _url_template_attr(SP):
