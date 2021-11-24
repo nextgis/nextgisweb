@@ -91,7 +91,7 @@ class Connection(Base, Resource):
                 ),
                 params=self.query_params,
                 headers=env.tmsclient.headers,
-                timeout=env.tmsclient.options['timeout'],
+                timeout=env.tmsclient.options['timeout'].total_seconds(),
                 verify=not self.insecure
             )
         except RequestException:

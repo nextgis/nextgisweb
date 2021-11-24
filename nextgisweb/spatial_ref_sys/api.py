@@ -87,8 +87,9 @@ def catalog_collection(request):
 
     catalog_url = env.spatial_ref_sys.options['catalog.url']
     url = catalog_url + '/api/v1/spatial_ref_sys/'
+    timeout = env.spatial_ref_sys.options['catalog.timeout'].total_seconds()
     try:
-        res = requests.get(url, query, timeout=env.spatial_ref_sys.options['catalog.timeout'])
+        res = requests.get(url, query, timeout=timeout)
         res.raise_for_status()
     except RequestException:
         raise ExternalServiceError()
@@ -108,8 +109,9 @@ def catalog_collection(request):
 def get_srs_from_catalog(catalog_id):
     catalog_url = env.spatial_ref_sys.options['catalog.url']
     url = catalog_url + '/api/v1/spatial_ref_sys/' + str(catalog_id)
+    timeout = env.spatial_ref_sys.options['catalog.timeout'].total_seconds()
     try:
-        res = requests.get(url, timeout=env.spatial_ref_sys.options['catalog.timeout'])
+        res = requests.get(url, timeout=timeout)
         res.raise_for_status()
     except RequestException:
         raise ExternalServiceError()

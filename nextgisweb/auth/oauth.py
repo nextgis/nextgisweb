@@ -167,8 +167,9 @@ class OAuthHelper(object):
             method.upper(), endpoint.upper(),
             str(params))
 
+        timeout = self.options['timeout'].total_seconds()
         response = getattr(requests, method.lower())(
-            url, params, headers=self.server_headers, timeout=self.options['timeout'])
+            url, params, headers=self.server_headers, timeout=timeout)
         response.raise_for_status()
 
         return response.json()
@@ -287,7 +288,7 @@ class OAuthHelper(object):
         Option('profile.sync_timedelta', timedelta, default=None,
                doc="Minimum time delta between profile synchronization with OAuth server."),
 
-        Option('timeout', float, default=15, doc="OAuth server request timeout in seconds."),
+        Option('timeout', timedelta, default=timedelta(seconds=15), doc="OAuth server request timeout."),
     ))
 
 

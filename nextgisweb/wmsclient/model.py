@@ -234,7 +234,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
         try:
             response = requests.get(
                 url, auth=auth, headers=env.wmsclient.headers,
-                timeout=env.wmsclient.options['timeout'])
+                timeout=env.wmsclient.options['timeout'].total_seconds())
         except RequestException:
             raise ExternalServiceError()
 
