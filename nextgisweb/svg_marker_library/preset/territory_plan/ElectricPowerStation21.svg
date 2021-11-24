@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="76.49pt" height="76pt" version="1.0" viewBox="0 0 76.49 76" xmlns="http://www.w3.org/2000/svg">
+	<g transform="translate(0 76) scale(.1 -.1)" fill="#00a700">
+		<path d="m0 663v-98l288-282 287-282 95-1h95l-380 380c-209 209-381 380-382 380-2 0-3-44-3-97z"/>
+		<path d="m0 386v-95l145-145 145-146h99 99l-240 240c-132 132-242 240-244 240s-4-42-4-94z"/>
+		<path d="m0 128c0-76 2-87 24-107 21-19 32-22 103-19l80 3-207 207v-84z"/>
+	</g>
+</svg>

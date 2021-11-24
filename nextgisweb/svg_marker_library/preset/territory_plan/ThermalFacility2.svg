@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 20010904//EN'  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="84pt" height="84pt" version="1.0" viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg">
+	<g transform="translate(0 84) scale(.1 -.1)">
+		<path d="m20 435v-265h110 110v-25c0-22 4-25 35-25h35v55c0 30-4 55-10 55s-10 85-10 235v235h-45-45v-230-230h-45-45v230 230h-45-45v-265z"/>
+		<path d="m310 665c0-34 1-35 40-35h40v-260-260h45 45v260 260h40c39 0 40 1 40 35v35h-125-125v-35z"/>
+		<path d="m580 405v-295h40 40v260 260h45 45v-255-255h40 40v290 290h-125-125v-295z"/>
+	</g>
+</svg>
