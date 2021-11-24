@@ -23,5 +23,6 @@ class PostgisComponent(Component):
         api.setup_pyramid(self, config)
 
     option_annotations = (
+        Option('connect_timeout', timedelta, default=timedelta(seconds=15)),
         Option('statement_timeout', timedelta, default=timedelta(seconds=15)),
     )
