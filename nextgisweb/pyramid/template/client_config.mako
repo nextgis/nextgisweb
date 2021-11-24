@@ -7,6 +7,12 @@
 
     packages = {p.name: p.version for p in request.env.packages.values()}
 
+    try:
+        is_administrator = request.user.is_administrator
+    except Exception:
+        # Something like InvalidCredentials
+        is_administrator = False
+
     ngwConfig = {
         "debug": request.env.core.debug,
         "applicationUrl": request.application_url,
@@ -16,7 +22,7 @@
         "distribution": distribution,
         "packages": packages,
         "instanceId": request.env.core.instance_id,
-        "isAdministrator": request.user.is_administrator,
+        "isAdministrator": is_administrator,
         "locale": request.locale_name,
     }
 

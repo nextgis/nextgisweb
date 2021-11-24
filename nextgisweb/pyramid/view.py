@@ -7,6 +7,7 @@ from time import sleep
 from datetime import datetime, timedelta
 from pkg_resources import resource_filename
 from hashlib import md5
+from pathlib import Path
 
 from psutil import Process
 from pyramid.response import Response, FileResponse
@@ -552,3 +553,10 @@ def _setup_pyramid_mako(comp, config):
 
     import pyramid_mako
     config.include(pyramid_mako)
+
+    # Work around the template lookup bug (test_not_found_unauthorized)
+    tsp = 'template/error.mako'
+    base = Path(__file__).parent
+    config.override_asset(
+        to_override=f'nextgisweb:pyramid/{tsp}',
+        override_with=str(base / tsp))

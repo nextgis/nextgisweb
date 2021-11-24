@@ -90,3 +90,9 @@ def test_json(app):
 
     data = r'{"correct": "json"}'
     app.post('/json', data, headers, status=200)
+
+
+def test_not_found_unauthorized(ngw_webtest_app):
+    ngw_webtest_app.authorization = ('Basic', ('administrator', 'invalid'))
+    ngw_webtest_app.get('/invalid', status=404)
+    ngw_webtest_app.get('/api/invalid', status=404)
