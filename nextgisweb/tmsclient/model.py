@@ -83,7 +83,7 @@ class Connection(Base, Resource):
                               self.username, self.password)
 
         try:
-            result = session.get(
+            response = session.get(
                 self.url_template.format(
                     x=x, y=y, z=z,
                     q=quad_key(x, y, z),
@@ -97,9 +97,13 @@ class Connection(Base, Resource):
         except RequestException:
             raise ExternalServiceError()
 
-        if result.status_code == 200:
-            return PIL.Image.open(BytesIO(result.content))
-        elif result.status_code in (204, 404):
+        if response.status_code == 200:
+            data = BytesIO(response.content)
+            try:
+                return PIL.Image.open(data)
+            except IOError:
+                raise ExternalServiceError("Image processing error.")
+        elif response.status_code in (204, 404):
             return None
         else:
             raise ExternalServiceError()

@@ -239,7 +239,11 @@ class Layer(Base, Resource, SpatialLayerMixin):
             raise ExternalServiceError()
 
         if response.status_code == 200:
-            return PIL.Image.open(BytesIO(response.content))
+            data = BytesIO(response.content)
+            try:
+                return PIL.Image.open(data)
+            except IOError:
+                raise ExternalServiceError("Image processing error.")
         elif response.status_code in (204, 404):
             return None
         else:
