@@ -46,7 +46,7 @@ requires = [
     'pyproj==2.6.1',
     'pyramid==1.10.1',
     'pyramid_debugtoolbar==4.9',
-    'pyramid_mako==1.0.2',
+    'pyramid_mako==1.1.0',
     'pyramid_tm==2.2.1',
     'python-magic==0.4.15',
     'requests[security]==2.22.0',
