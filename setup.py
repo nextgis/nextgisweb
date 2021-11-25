@@ -45,7 +45,7 @@ requires = [
     'pygdal' + (('==%s.*' % gv) if gv else ''),  # TODO: Add >=2.3.0
     'pyproj==2.6.1',
     'pyramid==1.10.1',
-    'pyramid_debugtoolbar==4.5.1',
+    'pyramid_debugtoolbar==4.9',
     'pyramid_mako==1.0.2',
     'pyramid_tm==2.2.1',
     'python-magic==0.4.15',
