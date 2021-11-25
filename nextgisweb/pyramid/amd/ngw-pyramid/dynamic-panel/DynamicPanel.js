@@ -45,7 +45,7 @@ define([
             if (this.isOpen) this.show();
 
             if (this.withCloser)
-                this._createCLoser();
+                this._createCloser();
 
             if (this.withOverlay)
                 this._createOverlay();
@@ -68,7 +68,7 @@ define([
             if (this.overlay) this.overlay.style.display = "none";
             this.emit("closed");
         },
-        _createCLoser: function(){
+        _createCloser: function(){
             this.closer = domConstruct.create("span", {
                 class: "dynamic-panel__closer material-icons material-icons--link icon--link",
                 innerHTML: "close"
