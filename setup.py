@@ -23,7 +23,7 @@ requires = [
     'six',  # TODO: Remove after packages update
 
     # Other dependencies
-    'affine==2.2.2',
+    'affine==2.3.0',
     'alembic==1.4.2',
     'babel==2.6.0',
     'bunch==1.0.1',
