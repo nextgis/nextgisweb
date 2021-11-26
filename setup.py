@@ -38,7 +38,7 @@ requires = [
     'networkx',
     'OWSLib==0.24.1',
     'passlib==1.7.1',
-    'pillow==5.4.1',
+    'pillow==8.4.0',
     'poeditor',
     'psutil==5.7.3',
     'psycopg2==2.8.5',
