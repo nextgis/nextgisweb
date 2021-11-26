@@ -23,7 +23,7 @@ requires = [
     'six',  # TODO: Remove after packages update
 
     # Other dependencies
-    'affine==2.2.2',
+    'affine==2.3.0',
     'alembic==1.4.2',
     'babel==2.6.0',
     'bunch==1.0.1',
@@ -45,9 +45,9 @@ requires = [
     'pygdal' + (('==%s.*' % gv) if gv else ''),  # TODO: Add >=2.3.0
     'pyproj==2.6.1',
     'pyramid==1.10.1',
-    'pyramid_debugtoolbar==4.5.1',
-    'pyramid_mako==1.0.2',
-    'pyramid_tm==2.2.1',
+    'pyramid_debugtoolbar==4.9',
+    'pyramid_mako==1.1.0',
+    'pyramid_tm==2.4',
     'python-magic==0.4.15',
     'requests[security]==2.22.0',
     'sentry-sdk==1.3.0',

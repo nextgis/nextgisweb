@@ -233,44 +233,28 @@ class TilestorWriter:
                     a.put_nowait(None)
 
             except Exception as exc:
-                _logger.exception("Uncaught exception in tile writer: %s", exc.message)
+                _logger.exception("Uncaught exception in tile cache writer")
 
                 data = None
                 self.cstart = None
                 tilestor.rollback()
 
     def _write_tile_meta(self, conn, table_uuid, row):
-        result = conn.execute(db.sql.text(
-            'SELECT true FROM tile_cache."{}" '
-            'WHERE z = :z AND x = :x AND y = :y '
-            'LIMIT 1 FOR UPDATE'.format(table_uuid)
-        ), **row)
-
-        if result.returns_rows:
-            conn.execute(db.sql.text(
-                'DELETE FROM tile_cache."{0}" '
-                'WHERE z = :z AND x = :x AND y = :y '
-                ''.format(table_uuid)
-            ), **row)
-
-        conn.execute(db.sql.text(
-            'INSERT INTO tile_cache."{0}" (z, x, y, color, tstamp) '
-            'VALUES (:z, :x, :y, :color, :tstamp)'.format(table_uuid)
-        ), **row)
+        conn.execute(db.sql.text("""
+            INSERT INTO tile_cache."{0}" AS tc (z, x, y, color, tstamp)
+            VALUES (:z, :x, :y, :color, :tstamp)
+            ON CONFLICT (z, x, y) DO UPDATE
+            SET color = :color, tstamp = :tstamp
+            WHERE tc.tstamp < :tstamp
+        """.format(table_uuid)), **row)
 
     def _write_tile_data(self, tilestor, z, x, y, tstamp, value):
-        tilestor.execute(
-            "DELETE FROM tile WHERE z = ? AND x = ? AND y = ?",
-            (z, x, y))
-
-        try:
-            tilestor.execute(
-                "INSERT INTO tile VALUES (?, ?, ?, ?, ?)",
-                (z, x, y, tstamp, value))
-        except sqlite3.IntegrityError:
-            # NOTE: Race condition with other proccess may occurs here.
-            # TODO: ON CONFLICT DO ... in SQLite >= 3.24.0 (python 3)
-            pass
+        tilestor.execute("""
+            INSERT INTO tile VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT (z, x, y) DO UPDATE
+            SET tstamp = ?, data = ?
+            WHERE tstamp < ?
+        """, (z, x, y, tstamp, value, tstamp, value, tstamp))
 
     def wait_for_shutdown(self, timeout=SHUTDOWN_TIMEOUT):
         if not self._worker.is_alive():
