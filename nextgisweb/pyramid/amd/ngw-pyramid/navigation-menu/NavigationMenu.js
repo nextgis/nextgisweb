@@ -69,10 +69,12 @@ define([
                 className: 'navigation-menu__item ' + itemActiveClass,
                 title: item.title,
                 onclick: function (e) {
-                    if (widget.value === item.value)
+                    if (widget.value === item.value) {
                         widget.reset();
-                    else
+                    }
+                    else {
                         widget.activateItem(item.value, this);
+                    }
                 }
             }, this.domNode);
 

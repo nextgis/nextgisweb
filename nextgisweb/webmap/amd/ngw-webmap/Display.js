@@ -326,14 +326,13 @@ define([
                     widget.printMapPanel = new PrintMapPanel({
                         region: 'left',
                         splitter: false,
-                        title: i18n.gettext("Print map"),
-                        isOpen: widget.activeLeftPanel == "printMapPanel",
+                        isOpen: widget.activeLeftPanel === "printMapPanel",
                         class: "dynamic-panel--fullwidth",
                         gutters: false,
                         map: widget.map.olMap
                     });
 
-                    if (widget.activeLeftPanel == "printMapPanel")
+                    if (widget.activeLeftPanel === "printMapPanel")
                         widget.activatePanel(widget.printMapPanel);
 
                     widget.printMapPanel.on("closed", function(){
@@ -348,14 +347,15 @@ define([
                     widget.searchPanel = new SearchPanel({
                         region: 'left',
                         class: "dynamic-panel--fullwidth",
-                        isOpen: widget.activeLeftPanel == "searchPanel",
+                        isOpen: widget.activeLeftPanel === "searchPanel",
                         gutters: false,
                         withCloser: false,
                         display: widget
                     });
 
-                    if (widget.activeLeftPanel == "searchPanel")
+                    if (widget.activeLeftPanel === "searchPanel") {
                         widget.activatePanel(widget.searchPanel);
+                    }
 
                     widget.searchPanel.on("closed", function(){
                         widget.navigationMenu.reset();
@@ -373,14 +373,14 @@ define([
                             region: 'left',
                             class: "dynamic-panel--fullwidth",
                             title: i18n.gettext("Bookmarks"),
-                            isOpen: widget.activeLeftPanel == "bookmarkPanel",
+                            isOpen: widget.activeLeftPanel === "bookmarkPanel",
                             gutters: false,
-                            withCloser: false,
+                            withCloser: true,
                             display: widget,
                             bookmarkLayerId: widget.config.bookmarkLayerId
                         });
 
-                        if (widget.activeLeftPanel == "bookmarkPanel")
+                        if (widget.activeLeftPanel === "bookmarkPanel")
                             widget.activatePanel(widget.bookmarkPanel);
 
                         widget.bookmarkPanel.on("closed", function () {
@@ -406,14 +406,14 @@ define([
                         region: 'left',
                         class: "info-panel dynamic-panel--fullwidth",
                         withTitle: false,
-                        isOpen: widget.activeLeftPanel == "infoPanel",
+                        isOpen: widget.activeLeftPanel === "infoPanel",
                         gutters: false,
-                        withCloser: false,
+                        withCloser: true,
                         description: widget.config.webmapDescription,
                         display: widget
                     });
 
-                    if (widget.activeLeftPanel == "infoPanel")
+                    if (widget.activeLeftPanel === "infoPanel")
                         widget.activatePanel(widget.infoPanel);
 
                     widget.infoPanel.on("closed", function () {
@@ -434,7 +434,7 @@ define([
                         title: i18n.gettext("Share"),
                         isOpen: widget.activeLeftPanel === "sharePanel",
                         gutters: false,
-                        withCloser: false,
+                        withCloser: true,
                         socialNetworks: settings.enable_social_networks,
                         display: widget
                     });
@@ -543,13 +543,13 @@ define([
                     region: 'left',
                     class: 'dynamic-panel--fullwidth',
                     title: i18n.gettext('Annotations'),
-                    isOpen: widget.activeLeftPanel == 'annotationPanel',
+                    isOpen: widget.activeLeftPanel === 'annotationPanel',
                     gutters: false,
-                    withCloser: false,
+                    withCloser: true,
                     display: widget
                 });
             
-                if (widget.activeLeftPanel == 'annotationPanel')
+                if (widget.activeLeftPanel === 'annotationPanel')
                     widget.activatePanel(widget.annotationPanel);
             
                 widget.annotationPanel.on('closed', function () {
@@ -970,12 +970,14 @@ define([
                 region: 'left'
             }).placeAt(this.navigationMenuPane);
 
-            this.navigationMenu.watch("value", function(name, oldValue, value){
-                if (oldValue && widget[oldValue])
+            this.navigationMenu.watch("value", function(name, oldValue, value) {
+                if (oldValue && widget[oldValue]) {
                     widget.deactivatePanel(widget[oldValue]);
+                }                    
 
-                if (widget[value])
+                if (widget[value]) {
                     widget.activatePanel(widget[value]);
+                }
 
                 widget.activeLeftPanel = value;
                 widget._setActivePanelURL();
@@ -1007,14 +1009,14 @@ define([
                         region: 'left',
                         class: "dynamic-panel--fullwidth",
                         title: i18n.gettext("Layers"),
-                        isOpen: widget.activeLeftPanel == "layersPanel",
+                        isOpen: widget.activeLeftPanel === "layersPanel",
                         gutters: false,
-                        withCloser: false
+                        withCloser: true
                     });
 
                     widget.itemTree.placeAt(widget.layersPanel.contentWidget.layerTreePane);
 
-                    if (widget.activeLeftPanel == "layersPanel")
+                    if (widget.activeLeftPanel === "layersPanel")
                         widget.activatePanel(widget.layersPanel);
 
                     widget.layersPanel.on("closed", function(){
@@ -1106,23 +1108,34 @@ define([
                 this.map.olMap.getView().fit(this._extent);
             }
         },
-        activatePanel: function(panel){
-            if (panel.isFullWidth){
-                domClass.add(this.leftPanelPane.domNode,  "leftPanelPane--fullwidth");
+
+        activatePanel: function (panel) {
+            if (panel.isFullWidth) {
+                domClass.add(
+                    this.leftPanelPane.domNode,
+                    "leftPanelPane--fullwidth"
+                );
                 this.leftPanelPane.set("splitter", false);
             }
 
             this.leftPanelPane.addChild(panel);
             this.mainContainer.addChild(this.leftPanelPane);
+            
             panel.show();
         },
-        deactivatePanel: function(panel){
+
+        deactivatePanel: function (panel) {
             this.mainContainer.removeChild(this.leftPanelPane);
             this.leftPanelPane.removeChild(panel);
-            if (panel.isFullWidth){
-                domClass.remove(this.leftPanelPane.domNode,  "leftPanelPane--fullwidth");
+
+            if (panel.isFullWidth) {
+                domClass.remove(
+                    this.leftPanelPane.domNode,
+                    "leftPanelPane--fullwidth"
+                );
                 this.leftPanelPane.set("splitter", true);
             }
+
             if (panel.isOpen) {
                 panel.hide();
             }

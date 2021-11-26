@@ -213,6 +213,14 @@ define([
                         this._resizeMapContainer(null, null, newMargin);
                     })
                 );
+
+                on(
+                    this.contentWidget.closePanel, 
+                    "click", 
+                    () => {
+                        this.hide();
+                    }
+                );
             },
 
             _processExportButtons: function () {
