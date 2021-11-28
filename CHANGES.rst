@@ -7,6 +7,11 @@ Changes
 - Support for CORS domain wildcards (like ``https://*.csb.app``).
 - WFS client and server simple filters support.
 - Cloud-optimized GeoTIFF (COG) support for raster layers.
+- Export feature layer using field display names instead of keynames.
+- Unknown fields in REST API filters return an error.
+- Improved handling of external services errors.
+- Timeout for external services is set to 15 seconds.
+- OpenLayers library upgraded to 6.9.0.
 
 
 4.0.0
