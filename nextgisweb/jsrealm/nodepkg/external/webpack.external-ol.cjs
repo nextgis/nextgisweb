@@ -9,43 +9,6 @@ const config = require("@nextgisweb/jsrealm/config.cjs");
 const entry = path.resolve(path.join(__dirname, "contrib/ol/entry.js"));
 const index = path.resolve(path.join(__dirname, "contrib/ol/index.js"));
 
-// Imports of these modules cause webpack warnings because of missing default.
-// Let's filter them out. It's not required for openlayers higher than 6.5.0.
-const INVALID = [
-    "ol/color",
-    "ol/css",
-    "ol/events",
-    "ol/extent",
-    "ol/has",
-    "ol/math",
-    "ol/net",
-    "ol/obj",
-    "ol/reproj",
-    "ol/resolutionconstraint",
-    "ol/sphere",
-    "ol/tilegrid",
-    "ol/transform",
-    "ol/util",
-    "ol/webgl",
-    "ol/xml",
-    "ol/worker/version",
-    "ol/worker/webgl",
-    "ol/webgl/ShaderBuilder",
-    "ol/tilegrid/common",
-    "ol/style/LiteralStyle",
-    "ol/style/expressions",
-    "ol/source/common",
-    "ol/reproj/common",
-    "ol/renderer/vector",
-    "ol/render/canvas",
-    "ol/proj/epsg3857",
-    "ol/proj/epsg4326",
-    "ol/geom/flat/closest",
-    "ol/geom/flat/geodesic",
-    "ol/format/XLink",
-    "ol/events/condition",
-];
-
 // Exclude large modules from explicit including into the bundle. But they still can 
 // be implicit included by other modules.
 const EXCLUDE = [
@@ -73,6 +36,7 @@ const EXCLUDE = [
     "ol/source/BingMaps",
     "ol/source/CartoDB",
     "ol/source/Cluster",
+    "ol/source/GeoTIFF",
     "ol/source/IIIF",
     "ol/source/ImageArcGISRest",
     "ol/source/ImageMapGuide",
@@ -96,9 +60,6 @@ function importReplace(match) {
     if (md) {
         varname = md[1];
         modname = md[2];
-        if (INVALID.indexOf(modname) >= 0) {
-            return `const ${varname} = undefined;`;
-        }
     } else {
         const md = reNamed.exec(match);
         if (md) {
@@ -133,20 +94,37 @@ module.exports = {
                         {
                             // Replace relative imports with absolute
                             search: /^(import .*)['"]\.\/(.*)['"];$/gim,
-                            replace: '$1"$2.js";',
+                            replace: '$1"$2";',
                         },
                         {
                             // Fix missing imports and remove unused
                             search: /^import .*$/gim,
                             replace: importReplace,
-                        },
+                        }
                     ],
                 },
             },
             {
                 test: /\.js$/,
-                loader: "buble-loader",
-            },
+                loader: "babel-loader",
+                options: {
+                    sourceType: "unambiguous",
+                    presets: [
+                        [
+                            "@babel/preset-env",
+                            {
+                                targets: {
+                                    firefox: "78",
+                                    chrome: "87",
+                                    edge: "88",
+                                    safari: "13",
+                                    ie: "11",
+                                },
+                            },
+                        ],
+                    ],
+                },
+        },
             {
                 test: /\.css$/i,
                 use: ["style-loader", "css-loader"],
@@ -167,6 +145,7 @@ module.exports = {
     ],
     output: {
         path: path.resolve(config.distPath + "/external-ol"),
+        publicPath: "",
         filename: "ol.js",
         library: "ol",
         libraryTarget: "umd",

@@ -4,6 +4,7 @@ from ..feature_layer import IFeatureLayer
 from ..layer.interface import IBboxLayer
 from ..render import IRenderableStyle
 from ..resource import Resource, ResourceScope, resource_factory
+from ..raster_layer import RasterLayer
 
 from .util import _
 
@@ -16,6 +17,8 @@ def preview_map(request):
         source_type = "geojson"
     elif IRenderableStyle.providedBy(request.context):
         source_type = "xyz"
+    elif isinstance(request.context, RasterLayer) and request.context.cog:
+        source_type = "geotiff"
 
     if IBboxLayer.providedBy(request.context):
         extent = request.context.extent
@@ -41,13 +44,14 @@ def setup_pyramid(comp, config):
         r"/resource/{id:\d+}/preview",
         factory=resource_factory) \
     .add_view(preview_map, context=IFeatureLayer) \
-    .add_view(preview_map, context=IRenderableStyle)
-
+    .add_view(preview_map, context=IRenderableStyle) \
+    .add_view(preview_map, context=RasterLayer)
     class LayerMenuExt(DynItem):
         def build(self, args):
             if (
-                IFeatureLayer.providedBy(args.obj) or
-                IRenderableStyle.providedBy(args.obj)
+                IFeatureLayer.providedBy(args.obj)
+                or IRenderableStyle.providedBy(args.obj)
+                or (isinstance(args.obj, RasterLayer) and args.obj.cog)
             ):
                 yield Link(
                     "extra/preview",

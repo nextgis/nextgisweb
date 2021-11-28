@@ -4,12 +4,13 @@ import Map from "ol/Map";
 import View from "ol/View";
 import Tile from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
-import TileLayer from 'ol/layer/Tile';
+import WebGLTileLayer from "ol/layer/WebGLTile";
 import VectorTileLayer from "ol/layer/VectorTile";
 import OSMSource from "ol/source/OSM";
 import XYZ from "ol/source/XYZ";
 import VectorTileSource from "ol/source/VectorTile";
 import VectorSource from "ol/source/Vector";
+import GeoTIFF from "ol/source/GeoTIFF";
 import MVT from "ol/format/MVT";
 import GeoJSON from "ol/format/GeoJSON";
 import { fromLonLat } from "ol/proj";
@@ -26,7 +27,11 @@ export default ({ target, resource, source_type, extent }) => {
         view: new View({ center: fromLonLat([0, 0]), zoom: 3, constrainResolution: true }),
     });
 
-    map.addLayer(source_type == "geojson" ? createGeoJsonLayer(resource) : createXYZLayer(resource));
+    map.addLayer(
+        source_type == "geojson" ? createGeoJsonLayer(resource) :
+        source_type == "geotiff" ? createGeoTIFFLayer(resource) :
+        createXYZLayer(resource)
+    );
 
     if (extent) {
         const view = map.getView();
@@ -64,11 +69,25 @@ const createGeoJsonLayer = (resource) => {
     return layer;
 };
 
+const createGeoTIFFLayer = (resource) => {
+    const url = routeURL("raster_layer.cog", `${resource}`);
+    const layer = new WebGLTileLayer({
+        source: new GeoTIFF({
+            sources: [
+                {
+                    url: url
+                }
+            ]
+        })
+    });
+    return layer;
+};
+
 const createXYZLayer = (resource) => {
     const url =
         routeURL("render.tile") +
         `?resource=${resource}&x={x}&y={y}&z={z}&nd=204`;
-    const layer = new TileLayer({
+    const layer = new Tile({
         source: new XYZ({
             wrapX: false,
             url: url,

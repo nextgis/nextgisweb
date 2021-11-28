@@ -9,8 +9,6 @@
         }
     },
     "dependencies": {
-        "buble": "^0.20.0",
-        "buble-loader": "^0.5.1",
         "cbtree": "pjekel/cbtree#v0.9.4",
         "codemirror": "5.20.2",
         "dgrid": "SitePen/dgrid#v0.3.21",
@@ -21,7 +19,7 @@
         "ie11-custom-properties": "^4.1.0",
         "jed": "^1.1.1",
         "jquery": "3.2.1",
-        "ol": "6.5.x",
+        "ol": "6.9.x",
         "proj4": "^2.7.2",
         "put-selector": "^0.3.6",
         "string-replace-loader": "^3.0.1",
