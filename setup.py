@@ -18,11 +18,6 @@ except CalledProcessError:
     gv = None
 
 requires = [
-    # Do not use a specific version of system-like packages because their presence is expected
-    'pip',
-    'six',  # TODO: Remove after packages update
-
-    # Other dependencies
     'affine==2.3.0',
     'alembic==1.4.2',
     'babel==2.6.0',
