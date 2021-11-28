@@ -14,6 +14,7 @@ from pathlib import Path
 from subprocess import check_output
 
 import requests
+from requests.exceptions import RequestException
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm.exc import NoResultFound
@@ -273,10 +274,11 @@ class CoreComponent(
         try:
             res = requests.get(self.env.ngupdate_url + '/api/query',
                                query, timeout=5.0)
-            if res.status_code == 200:
-                has_update = res.json()['distribution']['status'] == 'has_update'
-        except Exception:
+            res.raise_for_status()
+        except RequestException:
             pass
+        else:
+            has_update = res.json()['distribution']['status'] == 'has_update'
 
         return has_update
 

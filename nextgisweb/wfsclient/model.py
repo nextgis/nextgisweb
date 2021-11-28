@@ -7,11 +7,12 @@ from owslib.crs import Crs
 import requests
 from osgeo import ogr, osr
 from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
+from requests.exceptions import RequestException
 from shapely.geometry import box
 from zope.interface import implementer
 
 from .. import db
-from ..core.exception import ForbiddenError, ValidationError, OperationalError
+from ..core.exception import ForbiddenError, ValidationError, ExternalServiceError
 from ..env import env
 from ..feature_layer import (
     Feature,
@@ -142,23 +143,20 @@ class WFSConnection(Base, Resource):
         if self.username is not None:
             kwargs['auth'] = requests.auth.HTTPBasicAuth(self.username, self.password)
 
-        response = requests.request(
-            method, self.path,
-            headers=env.wfsclient.headers,
-            timeout=env.wfsclient.options['timeout'],
-            **kwargs
-        )
+        try:
+            response = requests.request(
+                method, self.path,
+                headers=env.wfsclient.headers,
+                timeout=env.wfsclient.options['timeout'],
+                **kwargs
+            )
+        except RequestException:
+            raise ExternalServiceError()
 
-        if response.status_code // 100 == 2:
+        if response.status_code == 200:
             return response.content
-        elif response.status_code == 401:
-            raise HTTPUnauthorized()
-        elif response.status_code == 403:
-            raise HTTPForbidden()
-        elif response.status_code // 100 == 5:
-            raise OperationalError("Third-party service unavailable.")
         else:
-            return None
+            raise ExternalServiceError()
 
     def get_capabilities(self):
         body = self.request_wfs('GET', params=dict(REQUEST='GetCapabilities'))

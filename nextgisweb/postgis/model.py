@@ -1,7 +1,7 @@
 import geoalchemy2 as ga
 import re
 from shapely.geometry import box
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
@@ -41,6 +41,7 @@ from ..feature_layer import (
     IFeatureQueryIntersects,
     IFeatureQueryOrderBy)
 
+from .exception import ExternalDatabaseError
 from .util import _
 
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
@@ -86,10 +87,16 @@ class PostgisConnection(Base, Resource):
             else:
                 del comp._engine[self.id]
 
-        engine = db.create_engine(make_engine_url(EngineURL(
+        connect_timeout = int(comp.options['connect_timeout'].total_seconds())
+        statement_timeout_ms = int(comp.options['statement_timeout'].total_seconds()) * 1000
+        args = dict(connect_args=dict(
+            connect_timeout=connect_timeout,
+            options='-c statement_timeout=%d' % statement_timeout_ms))
+        engine_url = make_engine_url(EngineURL(
             'postgresql+psycopg2',
             host=self.hostname, port=self.port, database=self.database,
-            username=self.username, password=self.password)))
+            username=self.username, password=self.password))
+        engine = db.create_engine(engine_url, **args)
 
         resid = self.id
 
@@ -312,6 +319,8 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if not colfound_geom:
                 raise ValidationError(_("Column '%(column)s' not found!") % dict(column=self.column_geom)) # NOQA
 
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(sa_error=exc)
         finally:
             conn.close()
 
@@ -382,9 +391,10 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         tab = self._sa_table(True)
         stmt = db.update(tab).values(
             self._makevals(feature)).where(idcol == feature.id)
-
         try:
             conn.execute(stmt)
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(sa_error=exc)
         finally:
             conn.close()
 
@@ -405,6 +415,8 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         try:
             return conn.execute(stmt).scalar()
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(sa_error=exc)
         finally:
             conn.close()
 
@@ -423,6 +435,8 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         try:
             conn.execute(stmt)
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(sa_error=exc)
         finally:
             conn.close()
 
@@ -470,6 +484,8 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         conn = self.connection.get_connection()
         try:
             maxLon, minLon, maxLat, minLat = conn.execute(db.select(fields)).first()
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(sa_error=exc)
         finally:
             conn.close()
 
@@ -757,6 +773,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                             ) if self._box else None
                         )
 
+                except SQLAlchemyError as exc:
+                    raise ExternalDatabaseError(sa_error=exc)
                 finally:
                     conn.close()
 
@@ -770,6 +788,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         from_obj=select.alias('all')))
                     for row in result:
                         return row[0]
+                except SQLAlchemyError as exc:
+                    raise ExternalDatabaseError(sa_error=exc)
                 finally:
                     conn.close()
 

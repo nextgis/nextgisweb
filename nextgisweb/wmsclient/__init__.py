@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from ..lib.config import Option
 from ..component import Component
 from .model import Base, Connection, Layer, WMS_VERSIONS
@@ -25,4 +27,5 @@ class WMSClientComponent(Component):
 
     option_annotations = (
         Option('user_agent', default="NextGIS Web"),
+        Option('timeout', timedelta, default=timedelta(seconds=15), doc="WMS request timeout."),
     )

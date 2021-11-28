@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from ..component import Component, require
 from ..lib.config import Option
 from .model import Base, Connection, Layer, SCHEME
@@ -29,5 +31,5 @@ class TMSClientComponent(Component):
         Option('nextgis_geoservices.layers', default='https://geoservices.nextgis.com/config/maps'),  # NOQA: E501
         Option('nextgis_geoservices.url_template', default='https://geoservices.nextgis.com/raster/{layer}/{z}/{x}/{y}.png'),  # NOQA: E501
         Option('user_agent', default="NextGIS Web"),
-        Option('timeout', float, default=15),  # seconds
+        Option('timeout', timedelta, default=timedelta(seconds=15)),
     )

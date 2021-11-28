@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..component import Component
@@ -49,4 +51,5 @@ class SpatialRefSysComponent(Component):
     option_annotations = (
         Option('catalog.enabled', bool, default=False),
         Option('catalog.url'),
+        Option('catalog.timeout', timedelta, default=timedelta(seconds=15), doc="Catalog request timeout."),
     )

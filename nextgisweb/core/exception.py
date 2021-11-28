@@ -104,3 +104,7 @@ class InsufficientPermissions(UserException):
 class OperationalError(UserException):
     title = _("Operational error")
     http_status_code = 503
+
+
+class ExternalServiceError(OperationalError):
+    title = _("External service error")
