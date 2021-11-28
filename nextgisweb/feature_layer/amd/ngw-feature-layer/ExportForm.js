@@ -84,6 +84,7 @@ define([
                     format: this.wFormat.get('value'),
                     srs: this.wSRS.get('value'),
                     zipped: this.wZipped.checked ? 'true' : 'false',
+                    display_name: this.wDisplayName.checked ? 'true' : 'false',
                     fid: this.wFID.get('value'),
                     encoding: this.wEncoding.get('value')
                 };

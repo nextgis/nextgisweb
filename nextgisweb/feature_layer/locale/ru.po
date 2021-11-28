@@ -1,58 +1,58 @@
-#: api.py:104
+#: api.py:103
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:109
+#: api.py:108
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:285 api.py:357
+#: api.py:294 api.py:369
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
 
-#: api.py:287
+#: api.py:296
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:293 api.py:362
+#: api.py:302 api.py:374
 #, python-format
 msgid "Date format '%s' is not supported."
 msgstr "Формат даты '%s' не поддерживается."
 
-#: api.py:583
+#: api.py:598
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: exception.py:15
+#: exception.py:13
 msgid "Feature not found"
 msgstr "Объект не найден"
 
-#: exception.py:16
+#: exception.py:14
 #, python-format
 msgid "Feature with id = %d was not found in resource with id = %d."
 msgstr "Объект с id = %d не найден в ресурсе с id = %d."
 
-#: exception.py:17
+#: exception.py:15
 msgid "The feature may have been deleted or an error in the address."
 msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
 
-#: model.py:172
+#: model.py:163
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:159 view.py:44
+#: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:43
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: view.py:62 view.py:85
+#: view.py:61 view.py:84
 #, python-format
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:136 view.py:198
+#: view.py:136 view.py:199
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -64,13 +64,13 @@ msgstr "Объекты"
 msgid "Table"
 msgstr "Таблица"
 
-#: view.py:208
+#: view.py:209
 msgid "External access"
 msgstr "Внешний доступ"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:194
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: amd/ngw-feature-layer/FieldsWidget.js:122 view.py:213
+#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:214
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -95,51 +95,51 @@ msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:266
-#: amd/ngw-feature-layer/template/ExportForm.hbs:42
+#: amd/ngw-feature-layer/template/ExportForm.hbs:45
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-feature-layer/FeatureGrid.js:240
+#: amd/ngw-feature-layer/FeatureGrid.js:241
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: amd/ngw-feature-layer/FeatureGrid.js:241
+#: amd/ngw-feature-layer/FeatureGrid.js:242
 msgid "Delete feature?"
 msgstr "Удалить объект?"
 
-#: amd/ngw-feature-layer/FieldsDisplayWidget.js:114
+#: amd/ngw-feature-layer/FieldsDisplayWidget.js:119
 msgid "N/A"
 msgstr "Н/Д"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:72 template/section_fields.mako:15
+#: amd/ngw-feature-layer/FieldsWidget.js:70 template/section_fields.mako:15
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:82 template/section_fields.mako:16
+#: amd/ngw-feature-layer/FieldsWidget.js:80 template/section_fields.mako:16
 msgid "Type"
 msgstr "Тип"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:86 template/section_fields.mako:17
+#: amd/ngw-feature-layer/FieldsWidget.js:84 template/section_fields.mako:17
 msgid "Display name"
 msgstr "Наименование"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:100
+#: amd/ngw-feature-layer/FieldsWidget.js:98
 msgid "FT"
 msgstr "ТО"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:110
+#: amd/ngw-feature-layer/FieldsWidget.js:108
 msgid "LA"
 msgstr "АН"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:154
+#: amd/ngw-feature-layer/FieldsWidget.js:152
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:231
+#: amd/ngw-feature-layer/FieldsWidget.js:229
 msgid "Add"
 msgstr "Добавить"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:237
+#: amd/ngw-feature-layer/FieldsWidget.js:235
 msgid "Remove"
 msgstr "Удалить"
 
@@ -160,6 +160,10 @@ msgid "FID field"
 msgstr "Поле FID"
 
 #: amd/ngw-feature-layer/template/ExportForm.hbs:34
+msgid "Use field display names"
+msgstr "Использовать наименования полей"
+
+#: amd/ngw-feature-layer/template/ExportForm.hbs:37
 msgid "Zip archive"
 msgstr "Zip архив"
 
