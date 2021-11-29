@@ -157,7 +157,8 @@ def export(request):
             ]
             if fid is not None:
                 flds += ['FID as "{}"'.format(fid.replace('"', r'\"'))]
-            vtopts += ["-sql", 'select {} from ""'.format(", ".join(flds))]
+            vtopts += ["-sql", 'select {} from ""'.format(", ".join(
+                flds if len(flds) > 0 else '*'))]
 
         if driver.fid_support and fid is None:
             vtopts.append('-preserve_fid')
