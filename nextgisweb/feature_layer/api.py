@@ -89,7 +89,10 @@ def export(request):
         request.GET.get("srs", request.context.srs.id)
     )
     srs = SRS.filter_by(id=srs).one()
+
     fid = request.GET.get("fid")
+    fid = fid if fid != "" else None
+
     format = request.GET.get("format")
     encoding = request.GET.get("encoding")
     zipped = request.GET.get("zipped", "true")
