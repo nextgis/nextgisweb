@@ -180,15 +180,17 @@ def export(request):
                         for file in files:
                             path = os.path.join(root, file)
                             zipf.write(path, os.path.basename(path))
-                response = FileResponse(tmp_file.name, content_type=content_type)
+                response = FileResponse(
+                    tmp_file.name, content_type=content_type,
+                    request=request)
                 response.content_disposition = content_disposition
                 return response
         else:
             content_type = driver.mime or "application/octet-stream"
             content_disposition = "attachment; filename=%s" % filename
             response = FileResponse(
-                os.path.join(tmp_dir, filename), content_type=content_type
-            )
+                os.path.join(tmp_dir, filename), content_type=content_type,
+                request=request)
             response.content_disposition = content_disposition
             return response
 
