@@ -256,6 +256,10 @@ class CoreComponent(
         return result
 
     def check_update(self):
+        ngupdate_url = self.env.ngupdate_url
+        if ngupdate_url is None:
+            return False
+
         has_update = False
 
         query = OrderedDict()
@@ -272,7 +276,7 @@ class CoreComponent(
         query['event'] = 'initialize'
 
         try:
-            res = requests.get(self.env.ngupdate_url + '/api/query',
+            res = requests.get(ngupdate_url + '/api/query',
                                query, timeout=5.0)
             res.raise_for_status()
         except RequestException:
