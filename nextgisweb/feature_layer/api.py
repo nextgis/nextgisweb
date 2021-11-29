@@ -94,7 +94,8 @@ def export(request):
     encoding = request.GET.get("encoding")
     zipped = request.GET.get("zipped", "true")
     zipped = zipped.lower() == "true"
-    display_name = request.GET.get("display_name", "true")
+
+    display_name = request.GET.get("display_name", "false")
     display_name = display_name.lower() == "true"
 
     if format is None:
