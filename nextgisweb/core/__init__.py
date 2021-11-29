@@ -260,8 +260,6 @@ class CoreComponent(
         if ngupdate_url is None:
             return False
 
-        has_update = False
-
         query = OrderedDict()
 
         distr_opts = self.env.options.with_prefix('distribution')
@@ -280,11 +278,17 @@ class CoreComponent(
                                query, timeout=5.0)
             res.raise_for_status()
         except RequestException:
-            pass
-        else:
-            has_update = res.json()['distribution']['status'] == 'has_update'
+            return False
 
-        return has_update
+        try:
+            data = res.json()
+        except json.decoder.JSONDecodeError:
+            return False
+
+        if 'distribution' in data:
+            return data['distribution'].get('status') == 'has_update'
+
+        return False
 
     def query_stat(self):
         result = dict()
