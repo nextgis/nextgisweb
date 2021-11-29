@@ -174,7 +174,7 @@ def _get_map(obj, params, request):
     p_format = params.get('FORMAT', IMAGE_FORMAT.PNG)
     if p_format not in IMAGE_FORMAT.enum:
         raise ValidationError("Invalid FORMAT parameter.")
-    p_srs = params['SRS']
+    p_srs = params.get('SRS', params.get('CRS'))
 
     p_size = (p_width, p_height)
 
