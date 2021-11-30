@@ -51,8 +51,8 @@ requires = [
     'transaction==2.4.0',
     'waitress==1.2.0',
     'zipstream-new==1.1.7',
-    'zope.sqlalchemy==1.1',
-    'zope.interface==4.7.2',
+    'zope.sqlalchemy==1.6',
+    'zope.interface==5.4.0',
     'zope.event==4.5.0',
 
     # TODO: Move to dev or test dependencies
