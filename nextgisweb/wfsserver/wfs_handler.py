@@ -982,9 +982,16 @@ class WFSHandler():
         transformer_cache = dict()
 
         def transform(geom, srs_to):
-            if transformer is None:
-                transformer = Transformer(wkt_from, wkt_to)
-            return geom
+            if geom.srid not in transformer_cache:
+                transformer_cache[geom.srid] = dict()
+            if srs_to.id not in transformer_cache[geom.srid]:
+                try:
+                    srs_from = SRS.filter_by(id=geom.srid).one()
+                except NoResultFound:
+                    raise ValidationError("SRID (id=%d) not found." % geom.srid)
+                transformer_cache[geom.srid][srs_to.id] = Transformer(srs_from.wkt, srs_to.wkt)
+            transformer = transformer_cache[geom.srid][srs_to.id]
+            return transformer.transform(geom)
 
         for _operation in self.root_body:
             operation_tag = ns_trim(_operation.tag)
@@ -1007,7 +1014,7 @@ class WFSHandler():
                         except GeometryNotValid:
                             raise ValidationError("Geometry is not valid.")
                         if geom.srid is not None and geom.srid != feature_layer.srs_id:
-                            raise ValidationError("Input geometry projection is not supported.")
+                            geom = transform(geom, feature_layer.srs)
                         feature.geom = geom
                     else:
                         feature.fields[fld_keyname] = _property.text
@@ -1065,7 +1072,7 @@ class WFSHandler():
                             except GeometryNotValid:
                                 raise ValidationError("Geometry is not valid.")
                             if geom.srid is not None and geom.srid != feature_layer.srs_id:
-                                raise ValidationError("Input geometry projection is not supported.")
+                                geom = transform(geom, feature_layer.srs)
                             feature.geom = geom
                         else:
                             if _value is None:
