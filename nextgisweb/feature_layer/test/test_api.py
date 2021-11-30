@@ -293,13 +293,3 @@ def test_cdelete(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     assert resp.json
 
     assert ngw_webtest_app.get(url).json == []
-
-
-def test_filter(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
-    url = '/api/resource/%d/feature/' % vector_layer_id
-
-    resp = ngw_webtest_app.get(url, dict(fld_price__ge=-1), status=200)
-    assert len(resp.json) == 1
-    assert resp.json[0]['fields']['price'] == -1
-
-    ngw_webtest_app.get(url, dict(fld_not_exists='no matter'), status=422)
