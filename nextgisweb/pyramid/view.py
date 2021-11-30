@@ -539,6 +539,7 @@ def _setup_pyramid_tm(comp, config):
             skip_tm_path_info)
 
     settings['tm.activate_hook'] = activate_hook
+    settings['tm.annotate_user'] = False
 
     config.include(pyramid_tm)
 
