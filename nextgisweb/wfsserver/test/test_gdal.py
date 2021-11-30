@@ -160,6 +160,8 @@ def test_compare(version, key, features):
 
             if dref.GetType() == ogr.OFTReal:
                 gname = 'GetFieldAsDouble'
+            elif dref.GetType() == ogr.OFTDate:
+                gname = 'GetFieldAsDateTime'
             else:
                 gname = 'GetFieldAs' + ogr.GetFieldTypeName(dref.GetType())
 
