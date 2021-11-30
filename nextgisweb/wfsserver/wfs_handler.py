@@ -15,8 +15,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from ..core.exception import ValidationError
 from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
 from ..layer import IBboxLayer
-from ..lib.geometry import Geometry, GeometryNotValid
-from ..lib.ows import parse_request, parse_epsg_code, get_work_version, FIELD_TYPE_WFS
+from ..lib.geometry import Geometry, GeometryNotValid, Transformer
+from ..lib.ows import parse_request, parse_srs, SRSParseError, get_work_version, FIELD_TYPE_WFS
 from ..resource import DataScope
 from ..spatial_ref_sys import SRS
 
@@ -157,14 +157,6 @@ def get_geom_column(feature_layer):
     return feature_layer.column_geom if hasattr(feature_layer, 'column_geom') else 'geom'
 
 
-srs_formats = dict(
-    short=dict(pattern=re.compile(r'EPSG:(\d+)'), axis_xy=True),
-    ogc_urn=dict(pattern=re.compile(r'urn:ogc:def:crs:EPSG::(\d+)'), axis_xy=False),
-    ogc_url=dict(pattern=re.compile(r'http://www.opengis.net/def/crs/EPSG/0/(\d+)'),
-                 axis_xy=False),
-)
-
-
 def srs_short_format(srs_id):
     return 'EPSG:%d' % srs_id
 
@@ -173,17 +165,15 @@ def srs_ogc_urn_format(srs_id):
     return 'urn:ogc:def:crs:EPSG::%d' % srs_id
 
 
-def parse_srs(value):
-    for srs_format in srs_formats.values():
-        match = srs_format['pattern'].match(value)
-        if match is not None:
-            return int(match[1]), srs_format['axis_xy']
-    raise ValidationError("Could not recognize SRS format '%s'." % value)
-
-
 def geom_from_gml(el):
-    srid, axis_xy = parse_srs(el.attrib['srsName']) \
-        if 'srsName' in el.attrib else (None, True)
+    if 'srsName' in el.attrib:
+        try:
+            srid, axis_xy = parse_srs(el.attrib['srsName'])
+        except SRSParseError as e:
+            raise ValidationError(str(e))
+    else:
+        srid, axis_xy = None, True
+
     value = etree.tostring(el).decode()
     ogr_geom = ogr.CreateGeometryFromGML(value)
     geom = Geometry.from_ogr(ogr_geom, srid=srid)
@@ -813,8 +803,15 @@ class WFSHandler():
         if self.p_bbox is not None:
             bbox_param = self.p_bbox.split(',')
             box_coords = map(float, bbox_param[:4])
-            box_srid, box_axis_xy = parse_srs(bbox_param[4]) \
-                if len(bbox_param) == 5 else (feature_layer.srs_id, True)
+
+            if len(bbox_param) == 5:
+                try:
+                    box_srid, box_axis_xy = parse_srs(bbox_param[4])
+                except SRSParseError as e:
+                    raise ValidationError(str(e))
+            else:
+                box_srid, box_axis_xy = feature_layer.srs_id, True
+
             try:
                 box_geom = Geometry.from_shape(box(*box_coords), srid=box_srid, validate=True)
                 # if not box_axis_xy and SRS.filter_by(id=box_srid).one().is_geographic:
@@ -868,8 +865,12 @@ class WFSHandler():
                 query.geom()
 
             if self.p_srsname is not None:
-                # Ignore axis_xy, return X/Y always
-                srs_id, axis_xy = parse_srs(self.p_srsname)
+                try:
+                    # Ignore axis_xy, return X/Y always
+                    srs_id, axis_xy = parse_srs(self.p_srsname)
+                except SRSParseError as e:
+                    raise ValidationError(str(e))
+
                 srs_out = feature_layer.srs \
                     if srs_id == feature_layer.srs_id \
                     else SRS.filter_by(id=srs_id).one()
@@ -977,6 +978,13 @@ class WFSHandler():
         if show_summary:
             _summary = El('TransactionSummary', namespace=_ns_wfs, parent=_response)
             summary = dict(totalInserted=0, totalUpdated=0, totalDeleted=0)
+
+        transformer_cache = dict()
+
+        def transform(geom, srs_to):
+            if transformer is None:
+                transformer = Transformer(wkt_from, wkt_to)
+            return geom
 
         for _operation in self.root_body:
             operation_tag = ns_trim(_operation.tag)

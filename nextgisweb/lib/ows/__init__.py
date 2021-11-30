@@ -1,8 +1,15 @@
+import re
 from io import BytesIO
 
 from lxml import etree
 
-__all__ = ['parse_request', 'parse_epsg_code', 'get_exception_template', 'FIELD_TYPE_WFS']
+__all__ = [
+    'parse_request',
+    'SRSParseError',
+    'parse_srs',
+    'get_exception_template',
+    'FIELD_TYPE_WFS',
+]
 
 
 class FIELD_TYPE_WFS(object):
@@ -40,10 +47,24 @@ def parse_request(request):
     return params, root_body
 
 
-def parse_epsg_code(value):
-    # 'urn:ogc:def:crs:EPSG::3857' -> 3857
-    # http://www.opengis.net/def/crs/epsg/0/4326 -> 4326
-    return int(value.split(':')[-1].split('/')[-1])
+class SRSParseError(ValueError):
+    pass
+
+
+srs_formats = dict(
+    short=dict(pattern=re.compile(r'EPSG:(\d+)'), axis_xy=True),
+    ogc_urn=dict(pattern=re.compile(r'urn:ogc:def:crs:EPSG::(\d+)'), axis_xy=False),
+    ogc_url=dict(pattern=re.compile(r'http://www.opengis.net/def/crs/EPSG/0/(\d+)'),
+                 axis_xy=False),
+)
+
+
+def parse_srs(value):
+    for srs_format in srs_formats.values():
+        match = srs_format['pattern'].match(value)
+        if match is not None:
+            return int(match[1]), srs_format['axis_xy']
+    raise SRSParseError("Could not recognize SRS format '%s'." % value)
 
 
 def get_work_version(p_version, p_acceptversions, version_supported, version_default):
