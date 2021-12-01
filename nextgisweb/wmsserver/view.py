@@ -16,7 +16,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 from ..core.exception import ValidationError
 from ..pyramid.exception import json_error
 from ..lib.geometry import Geometry
-from ..lib.ows import parse_request, parse_epsg_code
+from ..lib.ows import parse_request, parse_srs, SRSParseError
 from ..render import ILegendableStyle
 from ..resource import (
     Resource, Widget, resource_factory,
@@ -183,9 +183,9 @@ def _get_map(obj, params, request):
     img = Image.new('RGBA', p_size, (255, 255, 255, 0))
 
     try:
-        epsg = parse_epsg_code(p_srs)
-    except ValueError:
-        raise ValidationError("Invalid SRS/CRS parameter.")
+        epsg, axis_sy = parse_srs(p_srs)
+    except SRSParseError as e:
+        raise ValidationError(str(e))
     srs = SRS.filter_by(id=epsg).one()
 
     def scale(delta, img_px):
@@ -292,9 +292,9 @@ def _get_feature_info(obj, params, request):
         t=p_bbox[3] - bh * (p_y - GFI_RADIUS) / p_height)
 
     try:
-        epsg = parse_epsg_code(p_srs)
-    except ValueError:
-        raise ValidationError("Invalid SRS/CRS parameter.")
+        epsg, axis_xy = parse_srs(p_srs)
+    except SRSParseError as e:
+        raise ValidationError(str(e))
     srs = SRS.filter_by(id=epsg).one()
 
     qgeom = Geometry.from_wkt((
