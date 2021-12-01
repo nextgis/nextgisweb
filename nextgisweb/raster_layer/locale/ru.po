@@ -9,7 +9,7 @@ msgstr "Формат '%s' не поддерживается."
 
 #: api.py:101
 msgid "Requested raster is not COG."
-msgstr ""
+msgstr "Запрошенный растр не является COG"
 
 #: api.py:105
 msgid "Range header is missed or invalid."
@@ -59,7 +59,7 @@ msgstr "COG"
 
 #: model.py:285
 msgid "COG attribute can be set only at creation time."
-msgstr ""
+msgstr "Атрибут COG может быть установлен только в момент создания ресурса"
 
 #: view.py:21 view.py:36
 msgid "Save as"
@@ -67,7 +67,7 @@ msgstr "Сохранить как"
 
 #: view.py:45
 msgid "External access"
-msgstr ""
+msgstr "Внешний доступ"
 
 #: amd/ngw-raster-layer/ExportForm.js:101
 msgid "Band"
@@ -107,7 +107,7 @@ msgstr "Загрузить как Cloud Optimized GeoTIFF (COG)"
 
 #: template/section_api_cog.mako:7
 msgid "Cloud Optimized GeoTIFF"
-msgstr ""
+msgstr "Cloud Optimized GeoTIFF"
 
 #: template/section_api_cog.mako:11
 msgid ""
@@ -117,4 +117,7 @@ msgid ""
 "clients issuing ​HTTP GET range requests to ask for just the parts of a file "
 "they need."
 msgstr ""
-
+"Cloud Optimized GeoTIFF (COG) это специально подготовленный к хранению на "
+"веб-сервере и эффективной работе в облаке файл GeoTIFF, позволяющий обращаться"
+" в HTTP запросах только к нужным части растра, без необходимости загружать его"
+"в клиентское приложение целиком"
