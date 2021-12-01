@@ -1,8 +1,10 @@
 from contextlib import contextmanager
 
+import pytest
 import transaction
 
 from nextgisweb.auth import User
+from nextgisweb.env import env
 from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
@@ -12,6 +14,9 @@ from nextgisweb.wfsserver import Layer as WFS_Service_Layer, Service as WFSServi
 
 @contextmanager
 def create_feature_layer(ogrlayer, parent_id, ngw_httptest_app):
+    if not env.options.get('component.wfsclient'):
+        pytest.skip("wmsclient is not available")
+
     with create_vector_layer(ogrlayer, parent_id) as vlayer:
         with transaction.manager:
             res_common = dict(
