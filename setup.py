@@ -38,7 +38,7 @@ requires = [
     'psutil==5.8.0',
     'psycopg2==2.9.2',
     'pygdal' + (('==%s.*' % gv) if gv else ''),  # TODO: Add >=2.3.0
-    'pyproj==2.6.1',
+    'pyproj==3.3.0',
     'pyramid==1.10.8',
     'pyramid_debugtoolbar==4.9',
     'pyramid_mako==1.1.0',
