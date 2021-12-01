@@ -46,14 +46,17 @@ define([
             }
 
             this.wCapmode.on('change', function(value) {
-                var hold_params = value === "nextgis_geoservices";
+                var is_geoservices = value === "nextgis_geoservices";
 
-                this.wURLTemplate.required = hold_params;
-                this.wURLTemplate.set("disabled", hold_params);
-                this.wAPIKeyParam.set("disabled", hold_params);
-                this.wScheme.set("disabled", hold_params);
-                this.wUsername.set("disabled", hold_params);
-                this.wPassword.set("disabled", hold_params);
+                this.wURLTemplate.required = is_geoservices;
+                this.wURLTemplate.set("disabled", is_geoservices);
+                if (this.composite.operation === "create") {
+                    this.wAPIKey.required = is_geoservices;
+                }
+                this.wAPIKeyParam.set("disabled", is_geoservices);
+                this.wScheme.set("disabled", is_geoservices);
+                this.wUsername.set("disabled", is_geoservices);
+                this.wPassword.set("disabled", is_geoservices);
             }.bind(this));
 
             this.wURLTemplate.validator = function (value) {

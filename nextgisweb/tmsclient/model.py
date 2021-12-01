@@ -124,6 +124,10 @@ class _capmode_attr(SP):
         if value is None:
             pass
         elif value == NEXTGIS_GEOSERVICES:
+            if srlzr.obj.capmode != NEXTGIS_GEOSERVICES:
+                apikey = srlzr.data.get('apikey')
+                if apikey is None or len(apikey) == 0:
+                    raise ValidationError(message=_("API key required."))
             srlzr.obj.url_template = env.tmsclient.options['nextgis_geoservices.url_template']
             srlzr.obj.apikey_param = 'apikey'
             srlzr.obj.scheme = SCHEME.XYZ
