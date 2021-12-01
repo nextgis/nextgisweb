@@ -60,7 +60,7 @@ def cmp_geom(gj_geom, geom2, srs):
         geom1 = t.transform(geom1)
     g1 = geom1.shape
     g2 = geom2.shape
-    assert g1.almost_equals(g2)
+    assert g1.equals_exact(g2, 5e-07)
 
 
 @pytest.mark.parametrize('create_resource', (

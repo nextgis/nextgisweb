@@ -117,7 +117,7 @@ def collection_post(request):
         raise ValidationError(_("Resource parent required."))
 
     if 'cls' not in data['resource']:
-        raise ValidationError(_("Resource class required."))
+        raise ValidationError(message=_("Resource class required."))
 
     if data['resource']['cls'] not in Resource.registry:
         raise ValidationError(_("Unknown resource class '%s'.") % data['resource']['cls'])
@@ -126,7 +126,7 @@ def collection_post(request):
         data['resource']['cls'] in request.env.resource.options['disabled_cls']
         or request.env.resource.options['disable.' + data['resource']['cls']]
     ):
-        raise ValidationError(_("Resource class '%s' disabled.") % data['resource']['cls'])
+        raise ValidationError(message=_("Resource class '%s' disabled.") % data['resource']['cls'])
 
     cls = Resource.registry[data['resource']['cls']]
     resource = cls(owner_user=request.user)

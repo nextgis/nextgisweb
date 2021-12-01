@@ -566,7 +566,7 @@ def cget(resource, request):
             key, operator = (fld_expr, 'eq')
 
         if key != 'id' and key not in keys:
-            raise ValidationError("Inknown field '%s'." % key)
+            raise ValidationError(message="Unknown field '%s'." % key)
 
         filter_.append((key, operator, request.GET[param]))
 

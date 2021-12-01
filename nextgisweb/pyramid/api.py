@@ -151,14 +151,16 @@ def cors_put(request):
 
             for origin in v:
                 if not isinstance(origin, str):
-                    raise ValidationError("Invalid origin: '%s'." % origin)
+                    raise ValidationError(message="Invalid origin: '%s'." % origin)
                 try:
                     is_wildcard, schema, domain, port = parse_origin(origin)
                 except ValueError:
-                    raise ValidationError("Invalid origin: '%s'." % origin)
+                    raise ValidationError(message="Invalid origin: '%s'." % origin)
                 if is_wildcard and domain.count('.') < 2:
-                    raise ValidationError("Second-level and above wildcard domain "
-                                          "is not supported: '%s'." % origin)
+                    raise ValidationError(
+                        message="Second-level and above wildcard domain "
+                        "is not supported: '%s'." % origin
+                    )
 
             # Strip trailing slashes
             v = [(o[:-1] if o.endswith('/') else o) for o in v]

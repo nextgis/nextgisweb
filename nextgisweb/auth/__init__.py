@@ -263,7 +263,7 @@ class AuthComponent(Component):
 
             active_user_count = query.scalar()
             if active_user_count >= user_limit:
-                raise ValidationError(_(
+                raise ValidationError(message=_(
                     "Maximum number of users is reached. Your current plan user number limit is %d."
                 ) % user_limit)
 

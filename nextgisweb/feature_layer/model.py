@@ -199,7 +199,7 @@ class _fields_attr(SP):
                 if keyname == fields[j].keyname:
                     raise ValidationError("Field keyname (%s) is not unique." % keyname)
                 if display_name == fields[j].display_name:
-                    raise ValidationError("Field display_name (%s) is not unique." % display_name)
+                    raise ValidationError(message="Field display_name (%s) is not unique." % display_name)
 
         obj.fields = fields
         obj.fields.reorder()

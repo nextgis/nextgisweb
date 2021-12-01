@@ -417,9 +417,9 @@ class TableInfo(object):
 
             # Check unique names
             if f.keyname in _keynames:
-                raise ValidationError("Field keyname (%s) is not unique." % f.keyname)
+                raise ValidationError(message="Field keyname (%s) is not unique." % f.keyname)
             if f.display_name in _display_names:
-                raise ValidationError("Field display_name (%s) is not unique." % f.display_name)
+                raise ValidationError(message="Field display_name (%s) is not unique." % f.display_name)
             _keynames.append(f.keyname)
             _display_names.append(f.display_name)
 
