@@ -124,7 +124,7 @@ class _capmode_attr(SP):
         if value is None:
             pass
         elif value == NEXTGIS_GEOSERVICES:
-            if srlzr.obj.capmode != NEXTGIS_GEOSERVICES:
+            if srlzr.obj.id is None or srlzr.obj.capmode != NEXTGIS_GEOSERVICES:
                 apikey = srlzr.data.get('apikey')
                 if apikey is None or len(apikey) == 0:
                     raise ValidationError(message=_("API key required."))
@@ -310,6 +310,19 @@ DataScope.read.require(
 )
 
 
+class _layer_name_attr(SP):
+
+    def setter(self, srlzr, value):
+        if srlzr.obj.id is None or srlzr.obj.layer_name != value:
+            if (
+                (value is None or len(value) == 0)
+                and r'{layer}' in srlzr.obj.connection.url_template
+            ):
+                raise ValidationError(message=_("Layer name required."))
+
+        super().setter(srlzr, value)
+
+
 class LayerSerializer(Serializer):
     identity = Layer.identity
     resclass = Layer
@@ -319,7 +332,7 @@ class LayerSerializer(Serializer):
 
     connection = SRR(**_defaults)
     srs = SR(**_defaults)
-    layer_name = SP(**_defaults)
+    layer_name = _layer_name_attr(**_defaults)
     tilesize = SP(**_defaults)
     minzoom = SP(**_defaults)
     maxzoom = SP(**_defaults)
