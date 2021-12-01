@@ -19,7 +19,7 @@ def inspect_connection(request):
             result = requests.get(
                 request.env.tmsclient.options['nextgis_geoservices.layers'],
                 headers=request.env.tmsclient.headers,
-                timeout=request.env.tmsclient.options['timeout'])
+                timeout=request.env.tmsclient.options['timeout'].total_seconds())
             result.raise_for_status()
         except RequestException:
             raise ExternalServiceError()
