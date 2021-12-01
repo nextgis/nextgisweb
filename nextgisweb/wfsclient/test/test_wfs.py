@@ -21,7 +21,7 @@ TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', )
 @pytest.fixture(scope='module', autouse=True)
 def skip(ngw_env):
     if not ngw_env.options.get('component.wfsclient'):
-        pytest.skip("wmsclient is not available")
+        pytest.skip("wfsclient is not available")
     yield
 
 

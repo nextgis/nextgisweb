@@ -15,7 +15,7 @@ from nextgisweb.wfsserver import Layer as WFS_Service_Layer, Service as WFSServi
 @contextmanager
 def create_feature_layer(ogrlayer, parent_id, ngw_httptest_app):
     if not env.options.get('component.wfsclient'):
-        pytest.skip("wmsclient is not available")
+        pytest.skip("wfsclient is not available")
 
     with create_vector_layer(ogrlayer, parent_id) as vlayer:
         with transaction.manager:
