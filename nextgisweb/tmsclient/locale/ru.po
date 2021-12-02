@@ -1,17 +1,25 @@
 #: amd/ngw-tmsclient/ConnectionWidget.js:34
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:55
+#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:53
 msgid "TMS connection"
 msgstr "Соединение TMS"
 
-#: model.py:168
+#: model.py:130
+msgid "API key required."
+msgstr "API ключ является обязательным"
+
+#: model.py:173
 msgid "Zoom is out of range."
 msgstr "Масштаб вне диапазона"
 
-#: amd/ngw-tmsclient/LayerWidget.js:37 model.py:176
+#: amd/ngw-tmsclient/LayerWidget.js:37 model.py:181
 msgid "TMS layer"
 msgstr "Слой TMS"
 
-#: view.py:24
+#: model.py:321
+msgid "Layer name required."
+msgstr "Имя слоя является обязательным"
+
+#: view.py:21
 msgid "TMS capabilities"
 msgstr "Возможности TMS"
 
