@@ -328,8 +328,7 @@ def search(request):
         if op == 'eq':
             filter_.append(attr == v)
         elif op == 'ilike':
-            expr = collate(attr, 'C.UTF-8')
-            filter_.append(ilike_op(expr, v))
+            filter_.append(ilike_op(attr, v))
         else:
             raise ValidationError("Operator '%s' is not supported" % op)
 
