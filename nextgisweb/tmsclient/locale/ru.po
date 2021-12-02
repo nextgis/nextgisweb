@@ -5,7 +5,7 @@ msgstr "Соединение TMS"
 
 #: model.py:130
 msgid "API key required."
-msgstr "API ключ является обязательным"
+msgstr "API ключ является обязательным."
 
 #: model.py:173
 msgid "Zoom is out of range."
@@ -17,7 +17,7 @@ msgstr "Слой TMS"
 
 #: model.py:321
 msgid "Layer name required."
-msgstr "Имя слоя является обязательным"
+msgstr "Имя слоя является обязательным."
 
 #: view.py:21
 msgid "TMS capabilities"

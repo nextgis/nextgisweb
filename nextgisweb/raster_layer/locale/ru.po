@@ -13,12 +13,12 @@ msgstr "Запрошенный растр не является COG"
 
 #: api.py:105
 msgid "Range header is missed or invalid."
-msgstr ""
+msgstr "Заголовок 'Range' пропущен или некорректен."
 
 #: api.py:109
 #, python-format
 msgid "Range %s can not be read."
-msgstr ""
+msgstr "Диапазон %s не может быть прочитан."
 
 #: kind_of_data.py:8
 msgid "Rasters and pyramids"
