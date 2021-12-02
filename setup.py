@@ -26,7 +26,7 @@ requires = [
     'elasticsearch>=7.0.0,<8.0.0',
     'elasticsearch-dsl>=7.1.0,<8.0.0',
     'flatdict==4.0.1',
-    'geoalchemy2==0.5.0',
+    'geoalchemy2==0.9.4',
     'geojson==2.5.0',
     'lxml==4.6.4',
     'numpy',
