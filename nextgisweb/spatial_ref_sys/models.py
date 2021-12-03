@@ -25,7 +25,7 @@ class SRS(Base):
 
     id_seq = db.Sequence(
         'srs_id_seq', metadata=Base.metadata,
-        minvalue=SRID_LOCAL, maxvalue=SRID_MAX)
+        start=SRID_LOCAL, minvalue=SRID_LOCAL, maxvalue=SRID_MAX)
 
     id = sa.Column(
         sa.Integer, id_seq, primary_key=True, autoincrement=False,
