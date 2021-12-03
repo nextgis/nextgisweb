@@ -15,7 +15,7 @@ class VectorLayerComponent(Component):
     identity = 'vector_layer'
     metadata = Base.metadata
 
-    @require('feature_layer')
+    @require('feature_layer', 'layer')
     def setup_pyramid(self, config):
         from . import api, view  # NOQA: F401
         api.setup_pyramid(self, config)

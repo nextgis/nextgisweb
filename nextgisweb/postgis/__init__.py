@@ -16,7 +16,7 @@ class PostgisComponent(Component):
         super().initialize()
         self._engine = dict()
 
-    @require('feature_layer')
+    @require('feature_layer', 'layer')
     def setup_pyramid(self, config):
         from . import view # NOQA
         from . import api

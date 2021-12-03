@@ -21,7 +21,7 @@ class TMSClientComponent(Component):
     def client_settings(self, request):
         return dict(schemes=SCHEME.enum)
 
-    @require('resource')
+    @require('render', 'layer')
     def setup_pyramid(self, config):
         from . import api, view
         api.setup_pyramid(self, config)

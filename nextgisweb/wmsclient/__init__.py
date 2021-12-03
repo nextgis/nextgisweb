@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from ..lib.config import Option
-from ..component import Component
+from ..component import Component, require
 from .model import Base, Connection, Layer, WMS_VERSIONS
 
 __all__ = ['Connection', 'Layer']
@@ -18,6 +18,7 @@ class WMSClientComponent(Component):
             'User-Agent': self.options['user_agent']
         }
 
+    @require('render', 'layer')
     def setup_pyramid(self, config):
         from . import view
         view.setup_pyramid(self, config)

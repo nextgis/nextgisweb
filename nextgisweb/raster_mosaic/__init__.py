@@ -1,11 +1,12 @@
 from .model import Base
-from ..component import Component
+from ..component import Component, require
 
 
 class RasterMosaicComponent(Component):
     identity = 'raster_mosaic'
     metadata = Base.metadata
 
+    @require('layer')
     def setup_pyramid(self, config):
         from . import api
         from . import view  # NOQA: F401

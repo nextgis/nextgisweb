@@ -17,7 +17,7 @@ class WFSClientComponent(Component):
             'User-Agent': self.options['user_agent']
         }
 
-    @require('feature_layer')
+    @require('feature_layer', 'layer')
     def setup_pyramid(self, config):
         from . import api
         from . import view  # NOQA

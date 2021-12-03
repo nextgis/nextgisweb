@@ -1,4 +1,4 @@
-from ..component import Component
+from ..component import Component, require
 from ..lib.config import Option
 from ..lib.logging import logger
 
@@ -19,6 +19,7 @@ class RasterLayerComponent(Component):
         self.wdir = self.env.core.gtsdir(self)
         self.cog_enabled = self.options["cog_enabled"]
 
+    @require('layer')
     def setup_pyramid(self, config):
         from . import view, api # NOQA
         view.setup_pyramid(self, config)

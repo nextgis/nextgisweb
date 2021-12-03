@@ -14,6 +14,7 @@ class WFSServerComponent(Component):
         super().__init__(*args, **kwargs)
         self.force_schema_validation = False
 
+    @require('feature_layer', 'layer')
     def setup_pyramid(self, config):
         from . import api, view
         api.setup_pyramid(self, config)
