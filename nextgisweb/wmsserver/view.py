@@ -17,7 +17,7 @@ from ..core.exception import ValidationError
 from ..pyramid.exception import json_error
 from ..lib.geometry import Geometry
 from ..lib.ows import parse_request, parse_srs, SRSParseError
-from ..render import ILegendableStyle
+from ..render import ILegendableStyle, IRenderableStyle
 from ..resource import (
     Resource, Widget, resource_factory,
     ServiceScope, DataScope)
@@ -210,6 +210,10 @@ def _get_map(obj, params, request):
             raise ValidationError("Unknown layer: %s" % lname, data=dict(code="LayerNotDefined"))
 
         res = lobj.resource
+
+        if not IRenderableStyle.providedBy(res):
+            raise ValidationError("Resource (ID=%d) cannot be rendered." % res.id)
+
         request.resource_permission(DataScope.read, res)
 
         if (lobj.min_scale_denom is None or lobj.min_scale_denom >= w_scale) and \

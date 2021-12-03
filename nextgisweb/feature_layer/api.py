@@ -245,6 +245,9 @@ def mvt(request):
         except NoResultFound:
             raise ResourceNotFound(resid)
 
+        if not IFeatureLayer.providedBy(obj):
+            raise ValidationError("Resource (ID=%d) is not a feature layer." % (resid,))
+
         request.resource_permission(PERM_READ, obj)
 
         query = obj.feature_query()
