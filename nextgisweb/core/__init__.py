@@ -17,6 +17,7 @@ import requests
 from requests.exceptions import RequestException
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.engine.url import (
     URL as EngineURL,
@@ -88,8 +89,10 @@ class CoreComponent(
         self.engine = create_engine(sa_url, **args)
         self._sa_engine = self.engine
 
-        DBSession.configure(bind=self._sa_engine)
+        # Without configure_mappers() some backrefs won't work
+        configure_mappers()
 
+        DBSession.configure(bind=self._sa_engine)
         self.DBSession = DBSession
 
         # Methods for customization in components
