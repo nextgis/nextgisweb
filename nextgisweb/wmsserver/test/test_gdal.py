@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 import transaction
-from PIL import Image
+from PIL import Image, ImageStat
 from osgeo import gdal, gdalconst, gdal_array
 
 from nextgisweb.auth import User
@@ -95,3 +95,34 @@ def test_read(service_id, ngw_httptest_app, ngw_auth_administrator):
     ds = gdal.Open(url, gdalconst.GA_ReadOnly)
     band_count = ds.RasterCount
     assert band_count == 3
+
+    # TODO channel values change for some reason
+    tolerance = 2
+
+    def read_image(*extent):
+        width = height = 500
+        ds_img = gdal.Warp('', ds, options=gdal.WarpOptions(
+            width=width, height=height, outputBounds=extent, dstSRS='EPSG:3857',
+            format='MEM'))
+        array = numpy.zeros((height, width, band_count), numpy.uint8)
+        for i in range(band_count):
+            band = ds_img.GetRasterBand(i + 1)
+            array[:, :, i] = gdal_array.BandReadAsArray(band)
+        img = Image.fromarray(array)
+        return img
+
+    def color(img):
+        extrema = ImageStat.Stat(img).extrema
+        for b in extrema:
+            if abs(b[0] - b[1]) > tolerance:
+                return None
+        return [b[0] for b in extrema]
+
+    img_red = read_image(558728, 5789851, 1242296, 7544030)
+    assert color(img_red) == pytest.approx((255, 0, 0), abs=tolerance)
+
+    img_green = read_image(4580543, 6704397, 5033914, 6932643)
+    assert color(img_green) == pytest.approx((0, 255, 0), abs=tolerance)
+
+    img_blue = read_image(454962, 2593621, 2239863, 3771499)
+    assert color(img_blue) == pytest.approx((0, 0, 255), abs=tolerance)
