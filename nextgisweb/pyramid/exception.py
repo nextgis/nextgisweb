@@ -9,7 +9,6 @@ from hashlib import md5
 
 from pyramid.renderers import render_to_response
 from pyramid.response import Response
-from pyramid.compat import reraise
 from pyramid import httpexceptions
 from zope.interface import implementer
 from zope.interface.interface import adapter_hooks
@@ -37,7 +36,8 @@ def includeme(config):
             return json.loads(req.body.decode(req.charset))
         except ValueError as exc:
             user_exception(exc, title="JSON parse error", http_status_code=400)
-            reraise(*sys.exc_info())
+            raise
+
     config.add_request_method(json_body, 'json_body', property=True)
     config.add_request_method(json_body, 'json', property=True)
 
@@ -58,10 +58,8 @@ def handled_exception_tween_factory(handler, registry):
             return response
 
         except Exception as exc:
-            exc_info = sys.exc_info()
-
             if request.path_info.startswith('/test/request/'):
-                reraise(*exc_info)
+                raise
 
             try:
                 err_info = IUserException(exc)
@@ -69,11 +67,11 @@ def handled_exception_tween_factory(handler, registry):
                 err_info = None
 
             if err_info is not None:
-                eresp = err_response(request, err_info, exc, exc_info)
+                eresp = err_response(request, err_info, exc, sys.exc_info())
                 if eresp is not None:
                     return eresp
 
-            reraise(*exc_info)
+            raise
 
     return handled_exception_tween
 
@@ -86,7 +84,7 @@ def unhandled_exception_tween_factory(handler, registry):
             return handler(request)
         except Exception as exc:
             if request.path_info.startswith('/test/request/'):
-                reraise(*sys.exc_info())
+                raise
 
             try:
                 _logger.exception("Uncaught exception %s at %s" % (exc_name(exc), request.url))
