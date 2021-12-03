@@ -23,12 +23,10 @@ from babel.messages.mofile import write_mo
 from attr import attrs, attrib, asdict
 from poeditor import POEditorAPI
 
-from ..package import pkginfo
 from ..lib.config import load_config
+from ..lib.logging import logger
+from ..package import pkginfo
 from ..env import Env, setenv, env
-
-
-logger = logging.getLogger(__name__)
 
 
 def get_mappings():

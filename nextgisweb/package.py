@@ -3,11 +3,11 @@ import pkg_resources
 import subprocess
 import re
 from imp import find_module
-from logging import getLogger
 
 from pathlib import Path
 
-_logger = getLogger(__name__)
+from .lib.logging import logger
+
 _version_re = re.compile(r'(.+)\+([0-9a-f]{6,})(\.dirty)?$', re.IGNORECASE)
 _qualifications = False
 
@@ -71,7 +71,7 @@ class Package(object):
         if hasattr(self, '_pkginfo'):
             return self._pkginfo
 
-        _logger.debug(
+        logger.debug(
             "Loading entrypoint '%s:%s'...",
             self._entrypoint.module_name,
             ','.join(self._entrypoint.attrs))
@@ -180,7 +180,7 @@ def git_commit(path):
         if isinstance(exc, subprocess.CalledProcessError) and exc.returncode == 128:
             pass  # Not a git repository
         else:
-            _logger.error("Failed to get git commit hash in '%s'", path)
+            logger.error("Failed to get git commit hash in '%s'", path)
         return None
     return commit.rstrip()
 
@@ -196,5 +196,5 @@ def git_dirty(path):
         if isinstance(exc, subprocess.CalledProcessError) and exc.returncode == 128:
             pass  # Not a git repository
         else:
-            _logger.error("Failed to get git dirty flag in '%s'", path)
+            logger.error("Failed to get git dirty flag in '%s'", path)
         return None

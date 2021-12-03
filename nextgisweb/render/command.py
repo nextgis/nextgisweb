@@ -1,4 +1,3 @@
-import logging
 from math import ceil, floor
 from itertools import product
 from datetime import datetime
@@ -6,14 +5,12 @@ from datetime import datetime
 from pyproj import Transformer
 import transaction
 
+from ..lib.logging import logger
 from ..command import Command
 from ..models import DBSession
 
 from .model import ResourceTileCache, TilestorWriter
 from .util import affine_bounds_to_tile
-
-
-_logger = logging.getLogger(__name__)
 
 
 SEED_STEP = 16
@@ -84,7 +81,7 @@ class TileCacheSeedCommand():
             rend_res = tc.resource
             srs = rend_res.srs
 
-            _logger.info("Seeding tile cache for resource %d with %d tiles", rend_res.id, rcount)
+            logger.info("Seeding tile cache for resource %d with %d tiles", rend_res.id, rcount)
 
             progress = 0
             rendered = 0
@@ -115,14 +112,14 @@ class TileCacheSeedCommand():
                         rend_res = tc.resource
                         srs = rend_res.srs
 
-                        _logger.debug(
+                        logger.debug(
                             "%d tiles processed and %d rendered for resource %d (%.2f)",
                             progress, rendered, rend_res.id, 100.0 * progress / rcount)
 
             tc.update_seed_status('completed', total=rcount)
             transaction.commit()
 
-            _logger.info(
+            logger.info(
                 "Completed seeding cache for resource %d (%d tiles processed, %d rendered)",
                 rend_res.id, progress, rendered)
 

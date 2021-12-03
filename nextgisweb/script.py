@@ -5,16 +5,10 @@ from argparse import ArgumentParser
 from textwrap import wrap
 from contextlib import contextmanager
 
-from .lib.config import (
-    Option,
-    NO_DEFAULT,
-    load_config,
-    key_to_environ)
+from .lib.config import Option, NO_DEFAULT, load_config, key_to_environ
+from .lib.logging import logger
 from .env import Env, setenv
 from .command import Command
-
-
-_logger = logging.getLogger(__name__)
 
 
 def main(argv=sys.argv):
@@ -42,12 +36,12 @@ def main(argv=sys.argv):
     setenv(env)
 
     if logging is not None:
-        _logger.warning(
+        logger.warning(
             "Deprecated command line option --logging was ignored! "
             "Use environment logging.* and logger.* options instead.")
 
     elif 'NEXTGISWEB_LOGGING' in os.environ:
-        _logger.warning(
+        logger.warning(
             "Deprecated environment variable NEXTGISWEB_LOGGING was ignored! "
             "Use environment logging.* and logger.* options instead.")
 

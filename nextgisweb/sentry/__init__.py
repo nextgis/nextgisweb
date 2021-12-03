@@ -1,15 +1,13 @@
 import json
-from logging import getLogger
 
 import sqlalchemy
 
+from ..lib.config import Option
+from ..lib.logging import logger
 from ..component import Component
 from ..core.model import Setting
-from ..lib.config import Option
 
 __all__ = ['SentryComponent', ]
-
-logger = getLogger(__name__)
 
 
 class SentryComponent(Component):

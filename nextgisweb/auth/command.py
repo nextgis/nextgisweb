@@ -1,13 +1,10 @@
-import logging
 
 import transaction
 
+from ..lib.logging import logger
 from ..command import Command
 
 from . import User
-
-
-logger = logging.getLogger(__name__)
 
 
 @Command.registry.register

@@ -7,10 +7,9 @@ from collections import OrderedDict
 import sqlalchemy as sa
 
 from .lib.config import OptionAnnotations, Option, ConfigOptions, load_config
+from .lib.logging import logger
 from .component import Component, load_all
 from .package import pkginfo
-
-logger = logging.getLogger(__name__)
 
 
 class Env(object):

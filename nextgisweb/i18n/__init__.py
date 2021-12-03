@@ -1,10 +1,9 @@
-import logging
 import inspect
+
+from ..lib.logging import logger
 
 from .trstring import TrString, trstring_factory # API # NOQA
 from .localizer import Translations, Localizer, translator # API # NOQA
-
-logger = logging.getLogger(__name__)
 
 
 def tcheck(arg):

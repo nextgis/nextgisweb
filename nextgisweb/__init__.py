@@ -1,10 +1,8 @@
 import os
-import logging
 
 from .lib.config import load_config
+from .lib.logging import logger
 from .env import Env, setenv
-
-logger = logging.getLogger(__name__)
 
 
 def pkginfo():

@@ -2,7 +2,6 @@ import csv
 import sys
 import os
 import os.path
-import logging
 import fileinput
 from os.path import join as pthjoin
 from datetime import datetime, timedelta
@@ -17,6 +16,7 @@ from zipfile import ZipFile, is_zipfile
 import transaction
 from zope.sqlalchemy import mark_changed
 
+from ..lib.logging import logger
 from .. import geojson
 from ..command import Command
 from ..models import DBSession
@@ -27,9 +27,6 @@ from ..lib.migration import (
 
 from .backup import backup, restore
 from .migration import MigrationRegistry, MigrationContext
-
-
-logger = logging.getLogger(__name__)
 
 
 @Command.registry.register

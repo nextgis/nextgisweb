@@ -2,19 +2,16 @@ import io
 import os
 import os.path
 import fnmatch
-import logging
 from importlib import import_module
 from pathlib import Path
 from pkg_resources import resource_filename
 
 from babel.support import Translations as BabelTranslations
 
+from ..lib.logging import logger
 from ..package import pkginfo
 
 from .trstring import TrString
-
-
-_logging = logging.getLogger(__name__)
 
 
 class Translations(BabelTranslations):
@@ -42,7 +39,7 @@ class Translations(BabelTranslations):
             mo_path = locale_path / '{}.mo'.format(locale)
 
             if mo_path.is_file():
-                _logging.debug(
+                logger.debug(
                     "Loading component [%s] translations for locale [%s] from [%s]",
                     comp_id, locale, str(mo_path.relative_to(package_path)))
                 with io.open(mo_path, 'rb') as fp:

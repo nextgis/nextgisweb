@@ -1,9 +1,6 @@
-from logging import getLogger
-
+from ..lib.logging import logger
 from ..command import Command
 from ..package import amd_packages
-
-logger = getLogger(__name__)
 
 
 @Command.registry.register

@@ -1,17 +1,15 @@
 import re
 import json
-import logging
 from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
 from imp import load_source
 
+from ..logging import logger
 from .revision import REVID_ZERO
 from .migration import Dependency, MigrationKey, Migration, InitialMigration
 
-
-_logger = logging.getLogger(__name__)
 
 PLACEHOLDER = 'TODO: Write code here and remove this placeholder line!'
 
@@ -28,7 +26,7 @@ class PythonModuleMigration(Migration):
                 revision = m.group(1).lower()
                 yield PythonModuleMigration(component, revision, fn)
             else:
-                _logger.warn('Failed to identify python migration: {}'.format(fn))
+                logger.warn('Failed to identify python migration: {}'.format(fn))
 
     _regexp_meta = re.compile(r'^(?:\s*\#[^\n]*\n|\s*\n)*\"{3}\s*(\{.+\})\s*\"{3}\s*(.*)$', re.S)
     _regexp_forward = re.compile(r'def\s+forward\s*\(')
@@ -108,7 +106,7 @@ class SQLScriptMigration(Migration):
                 migration = SQLScriptMigration(component, revision, fn)
                 yield migration
             else:
-                _logger.warn('Failed to identify SQL script migration: {}'.format(fn))
+                logger.warn('Failed to identify SQL script migration: {}'.format(fn))
 
     @classmethod
     def template(cls, path, revision, forward=True, rewind=True, **meta):

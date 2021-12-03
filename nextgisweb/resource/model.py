@@ -27,7 +27,6 @@ from .exception import HierarchyError, DisplayNameNotUnique
 
 __all__ = ['Resource', ]
 
-_logger = logging.getLogger(__name__)
 
 Base = declarative_base(dependencies=('auth', ))
 

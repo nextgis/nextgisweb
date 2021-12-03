@@ -1,14 +1,12 @@
 import json
-import logging
 from collections import OrderedDict
 from importlib import import_module
 from pathlib import Path
 from subprocess import check_call
 
+from ..lib.logging import logger
 from ..command import Command
 from ..package import amd_packages
-
-_logger = logging.getLogger(__name__)
 
 
 @Command.registry.register
@@ -31,7 +29,7 @@ class JSRealmInstallCommand(object):
             if jspkg.exists():
                 for package_json in jspkg.glob('**/package.json'):
                     jspkg_rel = str(package_json.parent.relative_to(cwd))
-                    _logger.debug("Node package is found in [{}]".format(jspkg_rel))
+                    logger.debug("Node package is found in [{}]".format(jspkg_rel))
                     client_packages.append(jspkg_rel)
 
         package_json = OrderedDict(private=True)

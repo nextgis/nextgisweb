@@ -1,4 +1,3 @@
-import logging
 from collections import defaultdict
 from importlib import import_module
 from pathlib import Path
@@ -7,6 +6,7 @@ import transaction
 from zope.sqlalchemy import mark_changed
 
 from ..models import DBSession
+from ..lib.logging import logger
 from ..lib.migration import (
     MigrationKey, InitialMigration,
     Registry, MigrationGraph,
@@ -15,8 +15,6 @@ from ..lib.migration import (
     PythonModuleMigration, SQLScriptMigration)
 
 from .model import Migration as MigrationModel
-
-_logger = logging.getLogger(__name__)
 
 
 class MigrationRegistry(Registry):
@@ -63,13 +61,13 @@ class MigrationRegistry(Registry):
             if mk in known:
                 result[mk] = True
             else:
-                _logger.warn("Unknown migration found: {}".format(mk))
+                logger.warn("Unknown migration found: {}".format(mk))
 
         # Set all ancestor migrations to applied state
         if ancestors:
             for anc in self.graph.ancestors(tuple(result.keys()), True):
                 if anc not in result:
-                    _logger.warn("Setting [{}] to applied state".format(anc))
+                    logger.warn("Setting [{}] to applied state".format(anc))
                     result[anc] = True
 
         return result
@@ -89,10 +87,10 @@ class MigrationRegistry(Registry):
                 delete.append(k)
 
         if len(insert) > 0:
-            _logger.debug('Insert migrations: ' + ', '.join(
+            logger.debug('Insert migrations: ' + ', '.join(
                 map(str, sorted(insert))))
         if len(delete) > 0:
-            _logger.debug('Delete migrations: ' + ', '.join(
+            logger.debug('Delete migrations: ' + ', '.join(
                 map(str, sorted(delete))))
 
         # Write changes
@@ -165,7 +163,7 @@ class MigrationContext(object):
 
     def execute_install(self, operations, state):
         components = [op.component for op in operations]
-        _logger.info("Installation for components: {}".format(', '.join(components)))
+        logger.info("Installation for components: {}".format(', '.join(components)))
 
         metadata, tables = self._metadata_for_components(components)
         metadata.create_all(DBSession.connection(), tables)
@@ -176,7 +174,7 @@ class MigrationContext(object):
         # Run initialize_db after component installation
         for comp in self.env.chain('initialize_db'):
             if comp.identity in components:
-                _logger.debug("Executing initialize_db for [{}] component".format(comp.identity))
+                logger.debug("Executing initialize_db for [{}] component".format(comp.identity))
                 comp.initialize_db()
 
         return state
@@ -193,7 +191,7 @@ class MigrationContext(object):
             raise RuntimeError('Components {} is not uninstallable!'.format(
                 ', '.join(danger)))
 
-        _logger.info("Uninstallation for components: {}".format(', '.join(components)))
+        logger.info("Uninstallation for components: {}".format(', '.join(components)))
 
         metadata, tables = self._metadata_for_components(components)
         metadata.drop_all(DBSession.connection(), tables)
@@ -217,5 +215,5 @@ class MigrationContext(object):
     def _metadata_for_components(self, components):
         metadata = self.env.metadata()
         tables = [t for t in metadata.tables.values() if t._component_identity in components]
-        _logger.debug("Tables selected: {}".format(', '.join(map(str, tables))))
+        logger.debug("Tables selected: {}".format(', '.join(map(str, tables))))
         return metadata, tables

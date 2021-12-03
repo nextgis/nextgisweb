@@ -1,12 +1,12 @@
 import os
 import os.path
-import logging
 from collections import OrderedDict, defaultdict
 from datetime import datetime as dt, timedelta
 from shutil import copyfileobj
 from operator import itemgetter
 
 from ..lib.config import Option
+from ..lib.logging import logger
 from ..component import Component
 from ..core import BackupBase
 
@@ -16,8 +16,6 @@ from . import command  # NOQA
 __all__ = ['FileStorageComponent', 'FileObj']
 
 BUF_SIZE = 1024 * 1024
-
-logger = logging.getLogger(__name__)
 
 
 @BackupBase.registry.register

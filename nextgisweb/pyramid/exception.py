@@ -3,7 +3,6 @@ import os.path
 import warnings
 import traceback
 import json
-import logging
 from collections import OrderedDict
 from hashlib import md5
 
@@ -13,11 +12,9 @@ from pyramid import httpexceptions
 from zope.interface import implementer
 from zope.interface.interface import adapter_hooks
 
+from ..lib.logging import logger
 from ..core.exception import IUserException, user_exception
 from .util import _
-
-
-_logger = logging.getLogger(__name__)
 
 
 def includeme(config):
@@ -87,11 +84,11 @@ def unhandled_exception_tween_factory(handler, registry):
                 raise
 
             try:
-                _logger.exception("Uncaught exception %s at %s" % (exc_name(exc), request.url))
+                logger.exception("Uncaught exception %s at %s" % (exc_name(exc), request.url))
                 iexc = InternalServerError(sys.exc_info())
                 return exc_response(request, iexc, iexc, iexc.exc_info)
             except Exception:
-                _logger.exception("Exception while rendering error response at %s", request.url)
+                logger.exception("Exception while rendering error response at %s", request.url)
                 return httpexceptions.HTTPInternalServerError()
 
     return unhandled_exception_tween

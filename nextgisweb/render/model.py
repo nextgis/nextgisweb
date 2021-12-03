@@ -16,6 +16,7 @@ from PIL import Image
 from sqlalchemy import MetaData, Table
 from zope.sqlalchemy import mark_changed
 
+from ..lib.logging import logger
 from ..env import env
 from .. import db
 from ..models import declarative_base, DBSession
@@ -29,8 +30,6 @@ from ..resource import (
 from .interface import IRenderableStyle
 from .event import on_style_change, on_data_change
 from .util import imgcolor, affine_bounds_to_tile, pack_color, unpack_color
-
-_logger = logging.getLogger(__name__)
 
 
 TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
@@ -145,7 +144,7 @@ class TilestorWriter:
                     data = self.queue.get(True, get_timeout)
                 except Empty:
                     if self._shutdown:
-                        _logger.debug("Tile cache writer queue is empty now. Exiting!")
+                        logger.debug("Tile cache writer queue is empty now. Exiting!")
                         break
                     else:
                         continue
@@ -223,7 +222,7 @@ class TilestorWriter:
                     tilestor.commit()
 
                     time_taken += time() - ptime
-                    _logger.debug(
+                    logger.debug(
                         "%d tiles were written in %0.3f seconds (%0.1f per "
                         "second, qsize = %d)", tiles_written, time_taken,
                         tiles_written / time_taken, self.queue.qsize())
@@ -233,7 +232,7 @@ class TilestorWriter:
                     a.put_nowait(None)
 
             except Exception as exc:
-                _logger.exception("Uncaught exception in tile cache writer")
+                logger.exception("Uncaught exception in tile cache writer")
 
                 data = None
                 self.cstart = None
@@ -260,7 +259,7 @@ class TilestorWriter:
         if not self._worker.is_alive():
             return True
 
-        _logger.debug(
+        logger.debug(
             "Waiting for shutdown of tile cache writer for %d seconds (" + 
             "qsize = %d)...", timeout, self.queue.qsize())
 
@@ -268,10 +267,10 @@ class TilestorWriter:
         self._worker.join(timeout)
 
         if self._worker.is_alive():
-            _logger.warn("Tile cache writer is still running. It'll be killed!")
+            logger.warn("Tile cache writer is still running. It'll be killed!")
             return False
         else:
-            _logger.debug("Tile cache writer has successfully shut down.")
+            logger.debug("Tile cache writer has successfully shut down.")
             return True
 
 
@@ -406,7 +405,7 @@ class ResourceTileCache(Base):
             result = True
         except TileWriterQueueException as exc:
             result = False
-            _logger.error(
+            logger.error(
                 "Failed to put tile {} to tile cache for resource {}. {}"
                 .format(params['tile'], self.resource_id, exc),
                 exc_info=True)

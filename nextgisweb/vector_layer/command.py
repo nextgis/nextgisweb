@@ -1,14 +1,10 @@
-import logging
-
 from sqlalchemy.sql import text as literal_sql
 
+from ..lib.logging import logger
 from ..command import Command
 from ..models import DBSession
 
 from .model import SCHEMA
-
-
-_logger = logging.getLogger(__name__)
 
 
 @Command.registry.register
@@ -43,7 +39,7 @@ class CleanupOrhpanedTablesCommand():
             FROM ( %s ) base
         ''' % base_query), schema=SCHEMA, regexp=regexp).fetchone()
 
-        _logger.info("%d tables found, %d orphan (schema = '%s', regexp = '%s')",
+        logger.info("%d tables found, %d orphan (schema = '%s', regexp = '%s')",
                      total, orphan, SCHEMA, regexp)
 
         result = con.execute(literal_sql('''
@@ -68,7 +64,7 @@ class CleanupOrhpanedTablesCommand():
                     raise ValueError("Resource id should be empty!")
 
                 drop_query = 'DROP TABLE "%s"."%s"' % (SCHEMA, row['table_name'])
-                _logger.debug(drop_query)
+                logger.debug(drop_query)
                 con.execute(drop_query)
 
                 if args.table_per_txn:
@@ -82,4 +78,4 @@ class CleanupOrhpanedTablesCommand():
             if not args.table_per_txn:
                 con.execute('COMMIT')
         finally:
-            _logger.info('%d orphaned tables deleted', count)
+            logger.info('%d orphaned tables deleted', count)

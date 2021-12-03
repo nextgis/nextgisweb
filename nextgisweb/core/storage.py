@@ -1,11 +1,11 @@
 from datetime import datetime
 from threading import Thread
-from logging import getLogger
 
 import transaction
 import sqlalchemy as sa
 from zope.sqlalchemy import mark_changed
 
+from ..lib.logging import logger
 from ..models import DBSession
 from ..registry import registry_maker
 
@@ -16,9 +16,6 @@ from .model import (
     storage_stat_dimension_total,
     storage_stat_delta,
     storage_stat_delta_total)
-
-
-logger = getLogger(__name__)
 
 
 class KindOfDataMeta(type):

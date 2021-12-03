@@ -1,7 +1,6 @@
 import errno
 import os
 import os.path
-import logging
 from functools import lru_cache
 from time import sleep
 from datetime import datetime, timedelta
@@ -15,6 +14,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
+from ..lib.logging import logger
 from ..env import env
 from .. import dynmenu as dm, pkginfo
 from ..core.exception import UserException
@@ -25,8 +25,6 @@ from . import exception
 from .session import WebSession
 from .renderer import json_renderer
 from .util import _, ErrorRendererPredicate
-
-_logger = logging.getLogger(__name__)
 
 
 def static_amd_file(request):
@@ -350,7 +348,7 @@ def setup_pyramid(comp, config):
 
     if 'static_key' in comp.options:
         comp.static_key = '/' + comp.options['static_key']
-        _logger.debug("Using static key from options '%s'", comp.static_key[1:])
+        logger.debug("Using static key from options '%s'", comp.static_key[1:])
     elif is_debug:
         # In debug build static_key from proccess startup time
         rproc = Process(os.getpid())
@@ -358,12 +356,12 @@ def setup_pyramid(comp, config):
         # When running under control of uWSGI master process use master's startup time
         if rproc.name() == 'uwsgi' and rproc.parent().name() == 'uwsgi':
             rproc = rproc.parent()
-            _logger.debug("Found uWSGI master process PID=%d", rproc.pid)
+            logger.debug("Found uWSGI master process PID=%d", rproc.pid)
 
         # Use 4-byte hex representation of 1/5 second intervals
         comp.static_key = '/' + hex(int(rproc.create_time() * 5) % (2 ** 64)) \
             .replace('0x', '').replace('L', '')
-        _logger.debug("Using startup time static key [%s]", comp.static_key[1:])
+        logger.debug("Using startup time static key [%s]", comp.static_key[1:])
     else:
         # In production mode build static_key from nextgisweb_* package versions
         package_hash = md5('\n'.join((
@@ -371,7 +369,7 @@ def setup_pyramid(comp, config):
             for pobj in comp.env.packages.values()
         )).encode('utf-8'))
         comp.static_key = '/' + package_hash.hexdigest()[:8]
-        _logger.debug("Using package based static key '%s'", comp.static_key[1:])
+        logger.debug("Using package based static key '%s'", comp.static_key[1:])
 
     config.add_static_view(
         '/static{}/asset'.format(comp.static_key),

@@ -2,7 +2,6 @@ import re
 import itertools
 from datetime import datetime, timedelta
 from collections import namedtuple
-from logging import getLogger
 from hashlib import sha512
 from urllib.parse import urlencode
 
@@ -12,6 +11,7 @@ import zope.event
 
 from ..env import env
 from ..lib.config import OptionAnnotations, Option
+from ..lib.logging import logger
 from .. import db
 from ..models import DBSession
 from ..core.exception import UserException
@@ -20,8 +20,6 @@ from .models import User, Group, Base
 from .exception import UserDisabledException
 from .util import _, clean_user_keyname
 
-
-_logger = getLogger(__name__)
 
 MAX_TOKEN_LENGTH = 250
 
@@ -71,7 +69,7 @@ class OAuthHelper(object):
                 access_token=access_token))
         except requests.HTTPError as exc:
             if 400 <= exc.response.status_code <= 403:
-                _logger.debug("Token refresh failed: %s", exc.response.text)
+                logger.debug("Token refresh failed: %s", exc.response.text)
                 raise OAuthTokenRefreshException()
             raise exc
 
@@ -85,14 +83,14 @@ class OAuthHelper(object):
             token = OAuthToken.filter_by(id=token_id).first()
 
         if token is not None:
-            _logger.debug("Access token was read from cache (%s)", access_token)
+            logger.debug("Access token was read from cache (%s)", access_token)
         else:
             try:
                 tdata = self._server_request('introspection', dict(
                     token=access_token))
             except requests.HTTPError as exc:
                 if 400 <= exc.response.status_code <= 403:
-                    _logger.debug("Token verification failed: %s", exc.response.text)
+                    logger.debug("Token verification failed: %s", exc.response.text)
                     return None
                 raise exc
 
@@ -101,7 +99,7 @@ class OAuthHelper(object):
             token.sub = str(tdata[self.options['profile.subject.attr']])
             token.persist()
 
-            _logger.debug("Adding access token to cache (%s)", access_token)
+            logger.debug("Adding access token to cache (%s)", access_token)
 
         return token
 
@@ -162,7 +160,7 @@ class OAuthHelper(object):
         if 'client.secret' in self.options:
             params['client_secret'] = self.options['client.secret']
 
-        _logger.debug(
+        logger.debug(
             "%s request to %s endpoint: %s",
             method.upper(), endpoint.upper(),
             str(params))

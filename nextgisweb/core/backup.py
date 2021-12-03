@@ -1,6 +1,5 @@
 import os
 import re
-import logging
 from contextlib import contextmanager
 from collections import namedtuple, OrderedDict
 from functools import lru_cache
@@ -11,10 +10,9 @@ from distutils.version import LooseVersion
 
 import sqlalchemy as sa
 
+from ..lib.logging import logger
 from ..registry import registry_maker
 from ..models import DBSession
-
-logger = logging.getLogger(__name__)
 
 
 IR_FIELDS = ('id', 'identity', 'payload')

@@ -7,14 +7,11 @@ import re
 import secrets
 import string
 from calendar import timegm
-from logging import getLogger
 
 from ..i18n import trstring_factory
 
 COMP_ID = 'pyramid'
 _ = trstring_factory(COMP_ID)
-
-_logger = getLogger(__name__)
 
 
 def viewargs(**kw):

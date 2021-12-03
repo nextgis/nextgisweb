@@ -1,5 +1,4 @@
 import sqlalchemy as sa
-from logging import getLogger
 from datetime import datetime, timedelta
 from base64 import b64decode
 
@@ -14,9 +13,6 @@ from ..pyramid import WebSession
 from .models import User
 from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, UserDisabledException
 from .oauth import OAuthTokenRefreshException
-
-
-logger = getLogger(__name__)
 
 
 @implementer(IAuthenticationPolicy)

@@ -10,8 +10,6 @@ from tempfile import NamedTemporaryFile
 from pyramid.response import FileResponse
 from pyramid.httpexceptions import HTTPNotFound
 
-_logger = logging.getLogger(__name__)
-
 
 def setup_pyramid(comp, config):
     comp.dist_path = comp.options['dist_path']
