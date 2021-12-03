@@ -130,7 +130,7 @@ class AuthComponent(Component):
                 display_name=user.display_name,
                 language=user.language)
 
-            environ['auth.user_obj'] = cached
+            environ['auth.user_obj'] = user
             return user
 
         def require_administrator(request):
