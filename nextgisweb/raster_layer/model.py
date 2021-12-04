@@ -12,6 +12,7 @@ from osgeo import gdal, gdalconst, osr, ogr
 
 from ..core.exception import ValidationError
 from ..lib.osrhelper import traditional_axis_mapping
+from ..lib.logging import logger
 from ..models import declarative_base
 from ..resource import (
     Resource,
@@ -179,7 +180,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         cmd = ['gdaladdo', '-q', '-clean', fn]
 
-        env.raster_layer.logger.debug('Removing existing overviews with command: ' + ' '.join(cmd))
+        logger.debug('Removing existing overviews with command: ' + ' '.join(cmd))
         subprocess.check_call(cmd)
 
         cmd = [
@@ -190,7 +191,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             fn
         ] + levels
 
-        env.raster_layer.logger.debug('Building raster overview with command: ' + ' '.join(cmd))
+        logger.debug('Building raster overview with command: ' + ' '.join(cmd))
         subprocess.check_call(cmd)
 
     def get_info(self):

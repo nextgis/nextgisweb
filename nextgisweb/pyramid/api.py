@@ -11,6 +11,7 @@ from urllib.parse import unquote
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 
+from ..lib.logging import logger
 from ..env import env
 from ..package import pkginfo
 from ..core import KindOfData
@@ -238,7 +239,7 @@ def route(request):
         api_pattern = route.pattern.startswith('/api/')
         if api_pattern or client_predicate:
             if api_pattern and client_predicate:
-                request.env.pyramid.logger.warn(
+                logger.warn(
                     "API route '%s' has useless 'client' predicate!",
                     route.name)
             kys = route_re.findall(route.path)

@@ -121,7 +121,7 @@ class FileStorageComponent(Component):
         self.cleanup()
 
     def cleanup(self):
-        self.logger.info('Cleaning up file storage...')
+        logger.info('Cleaning up file storage...')
 
         deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
         kept_files, kept_dirs, kept_bytes = 0, 0, 0
@@ -154,11 +154,11 @@ class FileStorageComponent(Component):
             else:
                 kept_dirs += 1
 
-        self.logger.info(
+        logger.info(
             "Deleted: %d files, %d directories, %d bytes",
             deleted_files, deleted_dirs, deleted_bytes)
 
-        self.logger.info(
+        logger.info(
             "Preserved: %d files, %d directories, %d bytes",
             kept_files, kept_dirs, kept_bytes)
 

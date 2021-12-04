@@ -7,6 +7,7 @@ from babel import Locale
 from babel.core import UnknownLocaleError
 
 from ..lib.config import Option
+from ..lib.logging import logger
 from ..component import Component, require
 
 from .config import Configurator
@@ -35,7 +36,7 @@ class PyramidComponent(Component):
         config.add_route_predicate('error_renderer', ErrorRendererPredicate)
 
         def _gensecret():
-            self.logger.info("Generating pyramid cookie secret...")
+            logger.info("Generating pyramid cookie secret...")
             return gensecret(32)
 
         self.env.core.mksdir(self)
@@ -84,13 +85,13 @@ class PyramidComponent(Component):
         self.cleanup()
 
     def cleanup(self):
-        self.logger.info("Cleaning up sessions...")
+        logger.info("Cleaning up sessions...")
 
         with transaction.manager:
             actual_date = dt.utcnow() - self.options['session.cookie.max_age']
             deleted_sessions = Session.filter(Session.last_activity < actual_date).delete()
 
-        self.logger.info("Deleted: %d sessions", deleted_sessions)
+        logger.info("Deleted: %d sessions", deleted_sessions)
 
     def backup_configure(self, config):
         super().backup_configure(config)

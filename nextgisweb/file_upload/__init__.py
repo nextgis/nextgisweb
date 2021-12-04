@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime, timedelta
 
 from ..lib.config import Option
+from ..lib.logging import logger
 from ..component import Component
 from . import command  # NOQA
 
@@ -58,7 +59,7 @@ class FileUploadComponent(Component):
         self.cleanup()
 
     def cleanup(self):
-        self.logger.info("Cleaning up file uploads...")
+        logger.info("Cleaning up file uploads...")
         path = self.path
 
         deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
@@ -99,11 +100,11 @@ class FileUploadComponent(Component):
             else:
                 kept_dirs += 1
 
-        self.logger.info(
+        logger.info(
             "Deleted: %d files, %d directories, %d bytes",
             deleted_files, deleted_dirs, deleted_bytes)
 
-        self.logger.info(
+        logger.info(
             "Preserved: %d files, %d directories, %d bytes",
             kept_files, kept_dirs, kept_bytes)
 

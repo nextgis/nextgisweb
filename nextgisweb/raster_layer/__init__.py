@@ -1,5 +1,6 @@
 from ..component import Component
 from ..lib.config import Option
+from ..lib.logging import logger
 
 from . import command  # NOQA
 from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
@@ -35,7 +36,7 @@ class RasterLayerComponent(Component):
     def maintenance(self):
         super().maintenance()
 
-        self.logger.info("Building missing raster overviews")
+        logger.info("Building missing raster overviews")
         for resource in RasterLayer.query():
             resource.build_overview(missing_only=True)
 

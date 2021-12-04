@@ -10,6 +10,7 @@ from pyramid.httpexceptions import HTTPForbidden
 from pyramid.interfaces import IAuthenticationPolicy
 
 from ..lib.config import OptionAnnotations, Option
+from ..lib.logging import logger
 from ..component import Component
 from ..core.exception import ValidationError
 from ..models import DBSession
@@ -271,10 +272,10 @@ class AuthComponent(Component):
         with transaction.manager:
             # Add additional minute for clock skew
             exp = datetime.utcnow() + timedelta(seconds=60)
-            self.logger.debug("Cleaning up expired OAuth tokens (exp < %s)", exp)
+            logger.debug("Cleaning up expired OAuth tokens (exp < %s)", exp)
 
             rows = OAuthToken.filter(OAuthToken.exp < exp).delete()
-            self.logger.info("Expired cached OAuth tokens deleted: %d", rows)
+            logger.info("Expired cached OAuth tokens deleted: %d", rows)
 
     def backup_configure(self, config):
         super().backup_configure(config)

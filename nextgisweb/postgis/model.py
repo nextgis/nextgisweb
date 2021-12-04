@@ -7,6 +7,7 @@ from sqlalchemy.engine.url import (
     make_url as make_engine_url)
 from zope.interface import implementer
 
+from ..lib.logging import logger
 from .. import db
 from ..core.exception import ValidationError, ForbiddenError
 from ..models import declarative_base
@@ -102,19 +103,19 @@ class PostgisConnection(Base, Resource):
 
         @db.event.listens_for(engine, 'connect')
         def _connect(dbapi, record):
-            comp.logger.debug(
+            logger.debug(
                 "Resource #%d, pool 0x%x, connection 0x%x created",
                 resid, id(dbapi), id(engine))
 
         @db.event.listens_for(engine, 'checkout')
         def _checkout(dbapi, record, proxy):
-            comp.logger.debug(
+            logger.debug(
                 "Resource #%d, pool 0x%x, connection 0x%x retrieved",
                 resid, id(dbapi), id(engine))
 
         @db.event.listens_for(engine, 'checkin')
         def _checkin(dbapi, record):
-            comp.logger.debug(
+            logger.debug(
                 "Resource #%d, pool 0x%x, connection 0x%x returned",
                 resid, id(dbapi), id(engine))
 

@@ -211,8 +211,6 @@ def test_exception_transaction(request):
 
 
 def test_timeout(reqest):
-    logger = reqest.env.pyramid.logger
-
     duration = float(reqest.GET.get('t', '60'))
     interval = float(reqest.GET['i']) if 'i' in reqest.GET else None
 

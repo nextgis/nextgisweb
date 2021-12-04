@@ -4,6 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from .. import db
 from ..lib.config import Option
+from ..lib.logging import logger
 from ..component import Component, require
 from ..auth import User, Group
 from ..models import DBSession
@@ -53,7 +54,7 @@ class ResourceComponent(Component):
             try:
                 Resource.registry[item]
             except KeyError:
-                self.logger.error("Resource class '%s' from disabled_cls option not found!", item)
+                logger.error("Resource class '%s' from disabled_cls option not found!", item)
 
         self.quota_limit = self.options['quota.limit']
         self.quota_resource_cls = self.options['quota.resource_cls']

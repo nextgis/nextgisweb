@@ -3,6 +3,7 @@ from subprocess import check_output
 
 from ..component import Component
 from ..lib.config import Option
+from ..lib.logging import logger
 
 from .util import COMP_ID
 from . import command  # NOQA
@@ -19,7 +20,7 @@ class JSRealmComponent(Component):
             node_version = re.match('v?(.*)', out).group(1)
             result.append(("Node", node_version))
         except Exception:
-            self.logger.error("Failed to get node version", exc_info=True)
+            logger.error("Failed to get node version", exc_info=True)
 
         return result
 

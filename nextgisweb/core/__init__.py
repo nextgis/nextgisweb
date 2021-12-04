@@ -33,6 +33,7 @@ warnings.filterwarnings(
 from .. import db
 from ..component import Component
 from ..lib.config import Option
+from ..lib.logging import logger
 from ..models import DBSession
 from ..i18n import Localizer, Translations
 from ..package import pkginfo, enable_qualifications
@@ -217,7 +218,7 @@ class CoreComponent(
                 return check_output(cmd, universal_newlines=True).strip()
             except Exception:
                 msg = "Failed to get sys info with command: '%s'" % ' '.join(cmd)
-                self.logger.error(msg, exc_info=True)
+                logger.error(msg, exc_info=True)
 
         result.append((_("Linux kernel"), platform.release()))
         os_distribution = try_check_output(['lsb_release', '-ds'])

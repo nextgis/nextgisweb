@@ -3,7 +3,6 @@ from functools import lru_cache
 from uuid import uuid4
 from pathlib import Path
 from threading import Lock, Thread
-import logging
 from time import time
 import os.path
 import sqlite3
@@ -458,7 +457,7 @@ class ResourceTileCache(Base):
                 xmax += 1
                 ymax += 1
 
-                env.render.logger.debug(
+                logger.debug(
                     'Removing tiles for z=%d x=%d..%d y=%d..%d',
                     z, xmin, xmax, ymin, ymax)
 

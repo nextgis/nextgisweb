@@ -81,6 +81,10 @@ class Component(metaclass=ComponentMeta):
 
     @property
     def logger(self):
+        warnings.warn(
+            "Component logger has been deprecated, use logger from "
+            "nextgisweb.lib.logging instead available from 4.1.0.dev4.",
+            DeprecationWarning, stacklevel=2)
         return self._logger
 
     @property
