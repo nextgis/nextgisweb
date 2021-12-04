@@ -126,7 +126,7 @@ def components_and_locales(args, work_in_progress=False):
                     candidate = fn.with_suffix('').name
                     if candidate not in locales:
                         locales.append(candidate)
-      
+
         locales.sort()
         logger.debug("Locale list for [%s] = %s", comp_id, ' '.join(locales))
         yield comp_id, locales
@@ -230,7 +230,7 @@ def cmd_compile(args):
                 mo_path = catfn(ext='mo', internal=True)
                 if mo_path.exists():
                     mo_path.unlink()
-                
+
                 jed_path = catfn(ext='jed', internal=True)
                 if jed_path.exists():
                     jed_path.unlink()
@@ -345,11 +345,11 @@ def cmd_stat(args):
     len_count = 5
     len_loc = 6
 
-    header_cols = ["{:{}}".format(c, l) for c, l in (
+    header_cols = ["{:{}}".format(c, lc) for c, lc in (
         ('PACKAGE', len_pkg),
         ('COMPONENT', len_comp),
         ('COUNT', len_count),
-    )] + ["{:>{}}".format(l, len_loc) for l in locales]
+    )] + ["{:>{}}".format(lc, len_loc) for lc in locales]
 
     header = ' '.join(header_cols)
     print(header)
@@ -372,7 +372,7 @@ def cmd_stat(args):
             for _, locale_record in by_locale.items():
                 cols.append("{:{}}".format(locale_record.count, len_count))
                 break
-            
+
             for locale in locales:
                 locale_record = by_locale.get(locale)
                 if locale_record is not None:
@@ -405,7 +405,7 @@ def cmd_poeditor_sync(args):
     client = POEditorAPI(api_token=poeditor_api_token)
 
     # Package versions are stored as part of the project's description in the POEditor
-    description =  POEditorDescription(client, poeditor_project_id)
+    description = POEditorDescription(client, poeditor_project_id)
     local_ver = pkginfo.packages[args.package].version
     if args.package in description.packages:
         remote_ver = description.packages[args.package]
@@ -424,7 +424,7 @@ def cmd_poeditor_sync(args):
         cmd_update(Namespace(
             package=pkginfo.comp_pkg(comp_id),
             component=[comp_id, ],
-            locale=[l for l in locales if l != 'ru'],
+            locale=[lc for lc in locales if lc != 'ru'],
             extract=args.extract,
             force=False))
 
@@ -508,7 +508,7 @@ def cmd_poeditor_sync(args):
     terms_to_add = []
     terms_to_del = []
     for msg_id in target_state:
-        if not msg_id in remote_terms:
+        if msg_id not in remote_terms:
             for comp_id in target_state[msg_id]:
                 if target_state[msg_id][comp_id]:
                     logger.debug("ADD (%s, %s)", comp_id, msg_id)
@@ -540,8 +540,8 @@ def cmd_poeditor_sync(args):
 
     if len(reference_catalogs) > 0:
         logger.info(
-            "Upload the following reference translations to POEditor: " +
-            ", ".join(reference_catalogs.keys()))
+            "Upload the following reference translations to POEditor: "
+            + ", ".join(reference_catalogs.keys()))
         if args.no_dry_run:
             wait_for_rate_limit = False
             for locale, catalog in reference_catalogs.items():
@@ -580,8 +580,8 @@ class POEditorDescription:
         self.populate()
 
     def populate(self):
-        details =  self.client.view_project_details(self.project_id)
-        self.packages = json.loads(re.search('\((.+?)\)', details['description']).group(1))
+        details = self.client.view_project_details(self.project_id)
+        self.packages = json.loads(re.search(r'\((.+?)\)', details['description']).group(1))
 
     def update(self, package, version):
         self.packages[package] = version

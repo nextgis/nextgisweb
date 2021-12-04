@@ -38,7 +38,7 @@ def ngw_core_settings_override(ngw_env):
                     rvalue = None
                 restore.append((comp, name, rvalue))
                 set_or_delete(comp, name, value)
-        
+
         yield
 
         with manager:
@@ -46,4 +46,3 @@ def ngw_core_settings_override(ngw_env):
                 set_or_delete(comp, name, rvalue)
 
     return wrapped
-

@@ -25,7 +25,7 @@ def amd_packages():
 
 
 class Package(object):
-    
+
     def __init__(self, entrypoint):
         self._name = entrypoint.dist.key.replace('-', '_')
         self._entrypoint = entrypoint
@@ -44,7 +44,7 @@ class Package(object):
             self._version = self._version_raw
             self._commit = None
             self._dirty = None
-        
+
         self._qualified = False
 
     @property
@@ -55,7 +55,7 @@ class Package(object):
     def version(self):
         self._qualify()
         return self._version
-    
+
     @property
     def commit(self):
         self._qualify()
@@ -78,7 +78,7 @@ class Package(object):
 
         self._pkginfo = self._entrypoint.resolve()()
         return self._pkginfo
-    
+
     def _qualify(self):
         if self._qualified or not _qualifications:
             return

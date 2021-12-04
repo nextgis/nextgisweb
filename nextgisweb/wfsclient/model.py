@@ -6,7 +6,6 @@ from lxml import etree
 from owslib.crs import Crs
 import requests
 from osgeo import ogr, osr
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
 from requests.exceptions import RequestException
 from shapely.geometry import box
 from zope.interface import implementer
@@ -96,7 +95,7 @@ def get_srid(value):
     try:
         crs = Crs(value)
         return crs.code
-    except:
+    except Exception:
         return None
 
 

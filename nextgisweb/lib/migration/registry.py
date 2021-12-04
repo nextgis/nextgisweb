@@ -303,7 +303,7 @@ def _metadata_to_jskeys(value, indent='    '):
             rk.difference_update(pk)
             lines.append(_jskeys(*[(k, value[k]) for k in pk]))
 
-    return ',\n'.join(((indent + l) for l in lines))
+    return ',\n'.join(((indent + line) for line in lines))
 
 
 def _slugify(message):

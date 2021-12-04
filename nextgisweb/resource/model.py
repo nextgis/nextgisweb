@@ -1,10 +1,8 @@
-import logging
 from collections import namedtuple, OrderedDict
 from datetime import datetime
 
 from bunch import Bunch
 from sqlalchemy import event, text
-from sqlalchemy.ext.declarative import declared_attr
 
 from .. import db
 from ..auth import Principal, User, Group, OnFindReferencesData

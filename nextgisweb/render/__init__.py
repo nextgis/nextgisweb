@@ -149,8 +149,9 @@ class RenderComponent(Component):
 
             mark_changed(DBSession())
 
-        logger.info("Deleted: %d tile records, %d files, %d tables.",
-                         deleted_tiles, deleted_files, deleted_tables)
+        logger.info(
+            "Deleted: %d tile records, %d files, %d tables.",
+            deleted_tiles, deleted_files, deleted_tables)
 
     def backup_configure(self, config):
         super().backup_configure(config)

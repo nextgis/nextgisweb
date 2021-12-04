@@ -230,7 +230,7 @@ class TilestorWriter:
                 for a in answers:
                     a.put_nowait(None)
 
-            except Exception as exc:
+            except Exception:
                 logger.exception("Uncaught exception in tile cache writer")
 
                 data = None
@@ -259,8 +259,8 @@ class TilestorWriter:
             return True
 
         logger.debug(
-            "Waiting for shutdown of tile cache writer for %d seconds (" + 
-            "qsize = %d)...", timeout, self.queue.qsize())
+            "Waiting for shutdown of tile cache writer for %d seconds "
+            "(qsize = %d)...", timeout, self.queue.qsize())
 
         self._shutdown = True
         self._worker.join(timeout)
@@ -529,7 +529,7 @@ class TileCacheFlushProperty(SerializedProperty):
 
     def getter(self, srlzr):
         return None
-    
+
     def setter(self, srlzr, value):
         if srlzr.obj.tile_cache is not None:
             srlzr.obj.tile_cache.clear()

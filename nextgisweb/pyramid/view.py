@@ -16,7 +16,7 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from ..lib.logging import logger
 from ..env import env
-from .. import dynmenu as dm, pkginfo
+from .. import dynmenu as dm
 from ..core.exception import UserException
 from ..package import amd_packages
 from ..models import DBSession
@@ -264,6 +264,7 @@ def setup_pyramid(comp, config):
     # ERROR HANGLING
 
     comp.error_handlers = list()
+
     @comp.error_handlers.append
     def error_renderer_handler(request, err_info, exc, exc_info):
         error_renderer = None
@@ -310,9 +311,9 @@ def setup_pyramid(comp, config):
 
     locale_default = comp.env.core.locale_default
     locale_sorted = [locale_default] + [
-        l for l in comp.env.core.locale_available
-        if l != locale_default]
-    
+        lc for lc in comp.env.core.locale_available
+        if lc != locale_default]
+
     # Replace default locale negotiator with session-based one
     def locale_negotiator(request):
         environ = request.environ

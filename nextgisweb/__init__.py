@@ -50,7 +50,7 @@ def pkginfo():
     )
 
 
-def main(global_config = None, **settings):
+def main(global_config=None, **settings):
     """ This function returns a Pyramid WSGI application. """
 
     env = Env(cfg=load_config(None, None))

@@ -298,7 +298,7 @@ class MaintenanceCommand(Command):
         for comp in env.chain('maintenance'):
             logger.debug("Maintenance for component: %s...", comp.identity)
             comp.maintenance()
-        
+
         if args.estimate_storage:
             env.core.estimate_storage_all()
 

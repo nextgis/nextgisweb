@@ -24,6 +24,6 @@ autodoc_member_order = 'bysource'
 autoclass_content = 'both'
 
 http_index_shortname = 'api'
-html_theme_options = { 'nosidebar': True }
+html_theme_options = {'nosidebar': True}
 
 # -- Options for HTML output ----------------------------------------------

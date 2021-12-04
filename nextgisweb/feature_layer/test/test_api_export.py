@@ -67,7 +67,7 @@ def update_field(layer_id, ngw_webtest_app, ngw_auth_administrator):
         fields[0].update(field)
         ngw_webtest_app.put_json(f'/api/resource/{layer_id}', dict(
             feature_layer=dict(fields=fields)))
-    
+
     return wrapped
 
 
@@ -82,7 +82,7 @@ def export_geojson(layer_id, ngw_webtest_app, ngw_auth_administrator):
             qs['fid'] = fid
         resp = ngw_webtest_app.get(f'/api/resource/{layer_id}/export', qs)
         return resp.json
-    
+
     return wrapped
 
 

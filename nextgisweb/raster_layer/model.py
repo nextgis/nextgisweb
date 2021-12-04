@@ -136,13 +136,13 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         self.cog = cog
         if not cog:
-            subprocess.check_call(cmd + [dst_file,])
+            subprocess.check_call(cmd + [dst_file])
             self.build_overview()
         else:
             # TODO: COG driver
             with NamedTemporaryFile() as tf:
                 tmp_file = tf.name
-                subprocess.check_call(cmd + [tmp_file,])
+                subprocess.check_call(cmd + [tmp_file])
                 self.build_overview(fn=tmp_file)
 
                 cmd = ['gdal_translate', '-of', 'Gtiff']

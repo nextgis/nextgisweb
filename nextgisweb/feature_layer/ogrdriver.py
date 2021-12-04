@@ -30,6 +30,7 @@ OGRDriverT = collections.namedtuple(
     ],
 )
 
+
 def OGRDriver(
     name,
     display_name,
@@ -52,6 +53,7 @@ def OGRDriver(
         lco_configurable,
         dsco_configurable,
     )
+
 
 EXPORT_FORMAT_OGR["ESRI Shapefile"] = OGRDriver(
     "ESRI Shapefile",
@@ -153,6 +155,5 @@ OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
 ]
 
 MVT_DRIVER_NAME = "MVT"
-MVT_DRIVER_EXIST = (get_driver_by_name(MVT_DRIVER_NAME) is not None) and \
-                   test_driver_capability(MVT_DRIVER_NAME,
-                                          ogr.ODrCCreateDataSource)
+MVT_DRIVER_EXIST = (get_driver_by_name(MVT_DRIVER_NAME) is not None) \
+    and test_driver_capability(MVT_DRIVER_NAME, ogr.ODrCCreateDataSource)

@@ -58,7 +58,6 @@ def cors_tween_factory(handler, registry):
                     return True
         return False
 
-
     def cors_tween(request):
         # Only request under /api/ are handled
         is_api = request.path_info.startswith('/api/')
@@ -477,8 +476,11 @@ def setup_pyramid(comp, config):
     def preview_link_view(request):
         defaults = comp.preview_link_default_view(request)
 
-        if hasattr(request, 'context') and isinstance(request.context, Resource) \
-            and request.context in DBSession:
+        if (
+            hasattr(request, 'context')
+            and isinstance(request.context, Resource)
+            and request.context in DBSession
+        ):
             if not request.context.has_permission(MetadataScope.read, request.user):
                 return dict(image=None, description=None)
 

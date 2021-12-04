@@ -23,7 +23,6 @@ from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
 
-
 # Prevent warning about missing __init__.py in migration directory. Is's OK
 # and migration directory is intended for migration scripts.
 warnings.filterwarnings(
@@ -42,11 +41,11 @@ from .util import _
 from .model import Base, Setting
 from .command import BackupCommand  # NOQA
 from .backup import BackupBase, BackupMetadata  # NOQA
-from .storage import StorageComponentMixin, KindOfData
+from .storage import StorageComponentMixin, KindOfData  # NOQA
 
 
 class CoreComponent(
-    StorageComponentMixin, 
+    StorageComponentMixin,
     Component
 ):
     identity = 'core'
@@ -67,7 +66,7 @@ class CoreComponent(
                 ext_meta = Path(ext_path) / 'metadata.json'
                 ext_meta = json.loads(ext_meta.read_text())
                 self.locale_available.extend(ext_meta.get('locales', []))
-            
+
             self.locale_available.sort()
 
     def initialize(self):

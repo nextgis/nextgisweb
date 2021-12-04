@@ -234,8 +234,8 @@ class OperationGraph(object):
 
         out = StringIO()
 
-        def w(l):
-            out.write(l)
+        def w(line):
+            out.write(line)
             out.write('\n')
 
         def sc(a, b):

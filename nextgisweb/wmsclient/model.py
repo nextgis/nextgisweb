@@ -10,7 +10,6 @@ from zope.interface import implementer
 from lxml import etree
 from owslib.wms import WebMapService
 from owslib.map.common import WMSCapabilitiesReader
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
 from pyramid.url import urlencode
 from requests.exceptions import RequestException
 

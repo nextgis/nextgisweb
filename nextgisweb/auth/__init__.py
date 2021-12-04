@@ -5,7 +5,6 @@ from urllib.parse import urlencode, urlparse
 import transaction
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import defer
-from sqlalchemy import select
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.interfaces import IAuthenticationPolicy
 
@@ -106,7 +105,7 @@ class AuthComponent(Component):
 
             if user.disabled:
                 raise UserDisabledException()
-            
+
             # Update last_activity if more than activity_delta time passed, but
             # only once per request.
             if cached is None:

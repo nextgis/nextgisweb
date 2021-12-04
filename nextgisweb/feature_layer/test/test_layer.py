@@ -1,6 +1,5 @@
 import json
 from datetime import date, datetime, time
-from itertools import product
 from pathlib import Path
 
 import pytest

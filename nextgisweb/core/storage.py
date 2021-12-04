@@ -162,11 +162,10 @@ class StorageComponentMixin(object):
                     for k, v in self.query_storage().items()]
                 summary.sort(key=lambda i: i[1], reverse=True)
 
-
             logger.info("Estimation completed: %s", ', '.join(
                 '{}={}'.format(*i) for i in summary))
 
-        except Exception as exc:
+        except Exception:
             logger.exception("Unexpected exception during estimation proccess")
             raise
 
@@ -207,7 +206,7 @@ class StorageComponentMixin(object):
 
 STORAGE_TABLES = (
     storage_stat_dimension, storage_stat_dimension_total,
-    storage_stat_delta, storage_stat_delta_total,            
+    storage_stat_delta, storage_stat_delta_total,
 )
 
 LOCK_TABLE = "'core_storage_stat_dimension'::regclass::int"

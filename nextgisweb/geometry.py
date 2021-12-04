@@ -1,6 +1,6 @@
 import warnings
 
-from .lib.geometry import Geometry, Transformer
+from .lib.geometry import Geometry
 
 warnings.warn(
     "The 'nextgisweb.geometry' module deprecated now and it's going to be "

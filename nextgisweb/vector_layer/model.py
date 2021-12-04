@@ -234,8 +234,10 @@ class TableInfo(object):
                 if geom is None:
                     continue
                 gtype = geom.GetGeometryType()
-                if gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D) \
-                    and geom.GetGeometryCount() == 1:
+                if (
+                    gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D)
+                    and geom.GetGeometryCount() == 1
+                ):
                     geom = geom.GetGeometryRef(0)
                     gtype = geom.GetGeometryType()
 
@@ -253,13 +255,17 @@ class TableInfo(object):
                 elif skip_other_geometry_types and geometry_type not in geom_filter:
                     continue
 
-                if geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi \
-                    and geometry_type in GEOM_TYPE.is_multi:
+                if (
+                    geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi
+                    and geometry_type in GEOM_TYPE.is_multi
+                ):
                     geom_filter = geom_filter.intersection(set(GEOM_TYPE.is_multi))
                     is_multi = True
 
-                if geom_cast_params['has_z'] == TOGGLE.AUTO and not has_z \
-                    and geometry_type in GEOM_TYPE.has_z:
+                if (
+                    geom_cast_params['has_z'] == TOGGLE.AUTO and not has_z
+                    and geometry_type in GEOM_TYPE.has_z
+                ):
                     geom_filter = geom_filter.intersection(set(GEOM_TYPE.has_z))
                     has_z = True
 
@@ -528,15 +534,17 @@ class TableInfo(object):
                     col_gtype = col_geom.GetGeometryType()
                     if col_gtype not in GEOM_TYPE_OGR:
                         continue
-                    if (self.geometry_type in GEOM_TYPE.points and col_gtype in (
-                           ogr.wkbPoint, ogr.wkbPoint25D,
-                           ogr.wkbMultiPoint, ogr.wkbMultiPoint25D)) \
-                       or (self.geometry_type in GEOM_TYPE.linestrings and col_gtype in (
-                           ogr.wkbLineString, ogr.wkbLineString25D,
-                           ogr.wkbMultiLineString, ogr.wkbMultiLineString25D)) \
-                       or (self.geometry_type in GEOM_TYPE.polygons and col_gtype in (
-                           ogr.wkbPolygon, ogr.wkbPolygon25D,
-                           ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D)):
+                    if (
+                        (self.geometry_type in GEOM_TYPE.points and col_gtype in (
+                            ogr.wkbPoint, ogr.wkbPoint25D,
+                            ogr.wkbMultiPoint, ogr.wkbMultiPoint25D))
+                        or (self.geometry_type in GEOM_TYPE.linestrings and col_gtype in (
+                            ogr.wkbLineString, ogr.wkbLineString25D,
+                            ogr.wkbMultiLineString, ogr.wkbMultiLineString25D))
+                        or (self.geometry_type in GEOM_TYPE.polygons and col_gtype in (
+                            ogr.wkbPolygon, ogr.wkbPolygon25D,
+                            ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D))
+                    ):
                         if geom_candidate is None:
                             geom_candidate = col_geom
                             if fix_errors == ERROR_FIX.LOSSY:

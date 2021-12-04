@@ -68,8 +68,8 @@ class RasterMosaic(Base, Resource, SpatialLayerMixin):
                     "",
                     fnames,
                     options=gdal.BuildVRTOptions(
-                        xRes = (xmax - xmin) / width,
-                        yRes = (ymax - ymin) / height,
+                        xRes=(xmax - xmin) / width,
+                        yRes=(ymax - ymin) / height,
                     )
                 )
                 return ds
@@ -251,6 +251,7 @@ P_DS_READ = DataScope.read
 P_DS_WRITE = DataScope.write
 P_RS_READ = ResourceScope.read
 P_RS_UPDATE = ResourceScope.update
+
 
 class RasterMosaicSerializer(Serializer):
     identity = RasterMosaic.identity

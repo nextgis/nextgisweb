@@ -881,7 +881,8 @@ class WFSHandler():
             osr_out = osr.SpatialReference()
             osr_out.ImportFromWkt(srs_out.wkt)
 
-            __boundedBy = El('boundedBy', parent=root,
+            __boundedBy = El(
+                'boundedBy', parent=root,
                 namespace=wfs['ns'] if self.p_version >= v200 else gml['ns'])
             minX = maxX = minY = maxY = None
 

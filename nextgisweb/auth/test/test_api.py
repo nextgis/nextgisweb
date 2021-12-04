@@ -123,7 +123,7 @@ def test_user_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_us
 
         masha = dict(keyname='test-masha', display_name='Test Masha',
                      password='password', disabled=False)
-        ngw_webtest_app.post_json(API_URL, masha, status=422)   
+        ngw_webtest_app.post_json(API_URL, masha, status=422)
 
         ngw_webtest_app.delete(API_URL + str(vasya_id), status=200)
         ngw_webtest_app.delete(API_URL + str(petya_id), status=200)

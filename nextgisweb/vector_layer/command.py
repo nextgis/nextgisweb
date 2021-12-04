@@ -39,8 +39,9 @@ class CleanupOrhpanedTablesCommand():
             FROM ( %s ) base
         ''' % base_query), schema=SCHEMA, regexp=regexp).fetchone()
 
-        logger.info("%d tables found, %d orphan (schema = '%s', regexp = '%s')",
-                     total, orphan, SCHEMA, regexp)
+        logger.info(
+            "%d tables found, %d orphan (schema = '%s', regexp = '%s')",
+            total, orphan, SCHEMA, regexp)
 
         result = con.execute(literal_sql('''
             SELECT base.table_name, base.id

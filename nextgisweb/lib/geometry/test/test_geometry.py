@@ -76,7 +76,7 @@ def test_wkt_wkb_ogr_shape():
 
 
 @pytest.mark.parametrize('fmt_src, fmt_dst', combinations(
-    ('wkb', 'wkt', 'ogr', 'shape'), 2  
+    ('wkb', 'wkt', 'ogr', 'shape'), 2
 ))
 def test_convert(fmt_src, fmt_dst):
     geom_wkt = 'POINT Z (1 2 3)'

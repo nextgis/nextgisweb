@@ -209,6 +209,7 @@ for version in TEST_WFS_VERSIONS:
             ),
         ))
 
+
 @pytest.mark.parametrize('version, layer, fields, wkt', test_edit_params)
 def test_edit(version, layer, fields, wkt, service, ngw_httptest_app, ngw_auth_administrator):
     driver = ogr.GetDriverByName('WFS')

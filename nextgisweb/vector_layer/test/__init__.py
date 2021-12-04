@@ -2,7 +2,6 @@ from contextlib import contextmanager
 from uuid import uuid4
 
 import transaction
-from osgeo import ogr
 
 from nextgisweb.auth import User
 from nextgisweb.models import DBSession

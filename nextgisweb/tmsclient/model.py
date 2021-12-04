@@ -5,7 +5,6 @@ from urllib.parse import urlparse
 
 import PIL
 from osgeo import osr, ogr
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPForbidden
 from zope.interface import implementer
 
 from .. import db

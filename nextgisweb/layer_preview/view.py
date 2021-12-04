@@ -42,10 +42,12 @@ def setup_pyramid(comp, config):
     config.add_route(
         "layer_preview.map",
         r"/resource/{id:\d+}/preview",
-        factory=resource_factory) \
-    .add_view(preview_map, context=IFeatureLayer) \
-    .add_view(preview_map, context=IRenderableStyle) \
-    .add_view(preview_map, context=RasterLayer)
+        factory=resource_factory
+    ) \
+        .add_view(preview_map, context=IFeatureLayer) \
+        .add_view(preview_map, context=IRenderableStyle) \
+        .add_view(preview_map, context=RasterLayer)
+
     class LayerMenuExt(DynItem):
         def build(self, args):
             if (

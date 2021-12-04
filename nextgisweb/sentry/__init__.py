@@ -18,7 +18,7 @@ class SentryComponent(Component):
         self.enabled = 'dsn' in self.options
         if self.enabled:
             self.initialize_sentry_sdk()
-    
+
     def initialize_sentry_sdk(self):
         import sentry_sdk
         from sentry_sdk.integrations.pyramid import PyramidIntegration
@@ -38,7 +38,7 @@ class SentryComponent(Component):
             environment=self.options['environment'],
             shutdown_timeout=self.options['shutdown_timeout'],
         )
-        
+
         ts = Setting.__table__
         qs = ts.select().where(sqlalchemy.and_(
             ts.c.component == 'core',
@@ -56,7 +56,7 @@ class SentryComponent(Component):
                     logger.debug(
                         "Failed to get instance_id, the database may not "
                         "have been initialized yet")
-                except Exception as exc:
+                except Exception:
                     logger.error("Got an exception while getting instance_id")
                 else:
                     if row is not None:

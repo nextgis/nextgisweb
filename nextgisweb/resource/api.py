@@ -5,7 +5,6 @@ import zope.event
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
 from sqlalchemy.sql.operators import ilike_op
-from sqlalchemy.sql.expression import collate
 
 from .. import db
 from .. import geojson

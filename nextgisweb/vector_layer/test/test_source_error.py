@@ -16,13 +16,13 @@ path = Path(__file__).parent / 'data' / 'errors'
 # List of creation test cases: file name, creation options, and final checks.
 CREATE_TEST_PARAMS = (
     (
-        'geom-collection.geojson', 
+        'geom-collection.geojson',
         dict(),
         dict(exception=ValidationError),
     ),
 
     (
-        'geom-collection.geojson', 
+        'geom-collection.geojson',
         dict(fix_errors='SAFE'),
         dict(feature_count=2),
     ),

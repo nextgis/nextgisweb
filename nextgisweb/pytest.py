@@ -1,4 +1,3 @@
-from warnings import warn
 from contextlib import contextmanager
 
 import pytest
@@ -35,4 +34,3 @@ def webapp_handler(ngw_env):
 
     yield _decorator
     pyramid.test_request_handler = None
-
