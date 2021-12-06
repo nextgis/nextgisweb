@@ -72,7 +72,11 @@ class Connection(Base, Resource):
                                        un=self.username,
                                        pw=self.password,
                                        headers=env.wmsclient.headers)
-        self.capcache_xml = etree.tostring(reader.read(self.url))
+        try:
+            xml = reader.read(self.url)
+        except RequestException:
+            raise ExternalServiceError("Could not read WMS capabilities.")
+        self.capcache_xml = etree.tostring(xml)
 
         service = WebMapService(
             url=self.url, version=self.version,
