@@ -333,13 +333,39 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     # IFeatureLayer
 
+    def is_srs_supported(self, srs):
+        if srs.auth_name is None or srs.auth_srid is None:
+            return False
+
+        if srs.auth_srid == self.geometry_srid:
+            return True
+
+        auth_name = db.sql.column('auth_name')
+        auth_srid = db.sql.column('auth_srid')
+        tab = db.sql.table('spatial_ref_sys',
+                           auth_name,
+                           auth_srid)
+        tab.quote = True
+
+        conn = self.connection.get_connection()
+        stmt = db.select((db.exists(db.select([]).where(
+            db.and_(auth_name == srs.auth_name, auth_srid == srs.auth_srid)
+        )), ))
+
+        try:
+            result = conn.execute(stmt)
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(sa_error=exc)
+        finally:
+            conn.close()
+
+        return result.scalar()
+
     @property
     def feature_query(self):
 
         class BoundFeatureQuery(FeatureQueryBase):
             layer = self
-            # TODO: support from spatial_ref_sys table
-            srs_supported = (self.srs_id, )
 
         return BoundFeatureQuery
 

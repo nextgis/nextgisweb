@@ -59,7 +59,7 @@ class FeatureLayerComponent(Component):
     def initialize(self):
         self.FeatureExtension = FeatureExtension
 
-    @require('resource', 'spatial_ref_sys')
+    @require('layer')
     def setup_pyramid(self, config):
         from . import view, api
         view.setup_pyramid(self, config)

@@ -179,3 +179,6 @@ class SRSMixin(object):
     @declared_attr
     def srs(cls):
         return orm.relationship('SRS', lazy='joined')
+
+    def is_srs_supported(self, srs):
+        return self.srs_id == srs.id

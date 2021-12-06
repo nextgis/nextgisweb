@@ -52,8 +52,15 @@ class RasterStyle(Base, Resource):
         ) or parent.cls == "raster_mosaic"
 
     @property
+    def srs_id(self):
+        return self.parent.srs_id
+
+    @property
     def srs(self):
         return self.parent.srs
+
+    def is_srs_supported(self, srs):
+        return self.parent.is_srs_supported(srs)
 
     def render_request(self, srs, cond=None):
         return RenderRequest(self, srs, cond)

@@ -1,12 +1,13 @@
 from ..component import Component, require
 
 from .models import SpatialLayerMixin
-from .interface import IBboxLayer
+from .interface import IBboxLayer, ISRS
 
 __all__ = [
     'LayerComponent',
     'SpatialLayerMixin',
     'IBboxLayer',
+    'ISRS',
 ]
 
 

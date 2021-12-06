@@ -222,11 +222,10 @@ class FeatureQueryIntersectsMixin(object):
         self._intersects = None
 
     def intersects(self, geom):
-        reproject = geom.srid is not None and geom.srid not in self.srs_supported
-
-        if reproject:
+        if geom.srid is not None:
             srs_from = SRS.filter_by(id=geom.srid).one()
-            transformer = Transformer(srs_from.wkt, self.layer.srs.wkt)
-            geom = transformer.transform(geom)
+            if not self.layer.is_srs_supported(srs_from):
+                transformer = Transformer(srs_from.wkt, self.layer.srs.wkt)
+                geom = transformer.transform(geom)
 
         self._intersects = geom

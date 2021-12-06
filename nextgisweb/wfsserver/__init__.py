@@ -1,4 +1,4 @@
-from ..component import Component
+from ..component import Component, require
 
 from .model import Base, Service, Layer
 from .wfs_handler import VERSION_DEFAULT, VERSION_SUPPORTED

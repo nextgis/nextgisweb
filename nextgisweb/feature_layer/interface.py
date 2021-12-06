@@ -2,7 +2,7 @@
 from osgeo import ogr
 from zope.interface import Interface, Attribute
 
-from ..resource import IResourceBase
+from ..layer import ISRS
 
 
 GEOM_TYPE_OGR = (
@@ -77,7 +77,7 @@ class FIELD_TYPE(object):
     enum = (INTEGER, BIGINT, REAL, STRING, DATE, TIME, DATETIME)
 
 
-class IFeatureLayer(IResourceBase):
+class IFeatureLayer(ISRS):
 
     geometry_type = Attribute(""" Layer geometry type GEOM_TYPE """)
     fields = Attribute(""" List of fields """)
@@ -176,8 +176,6 @@ class IFeatureQueryLike(IFeatureQuery):
 
 
 class IFeatureQueryIntersects(IFeatureQuery):
-
-    srs_supported = Attribute(""" List of supported SRS id """)
 
     def intersects(self, geom):
         """ Set query by spatial intersection """

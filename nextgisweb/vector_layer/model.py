@@ -822,6 +822,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     # IFeatureLayer
 
+    def is_srs_supported(self, srs):
+        return True
+
     @property
     def feature_query(self):
         srs_supported_ = [row[0] for row in DBSession.query(SRS.id).all()]

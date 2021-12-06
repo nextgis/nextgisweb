@@ -117,7 +117,11 @@ def layer_id(ngw_resource_group, connection_id):
 
 def test_connection(connection_id, ngw_webtest_app, ngw_auth_administrator):
     res = ngw_webtest_app.get('/api/resource/%d/wfs_connection/inspect/' % connection_id)
-    assert res.json == [dict(name='type', srid=3857)]
+    assert len(res.json) == 1
+
+    info = res.json[0]
+    assert info['name'] == 'type'
+    assert info['srid'] == 3857
 
     ngw_webtest_app.get('/api/resource/%d/wfs_connection/inspect/%s/' % (
         connection_id, 'type'), status=200)

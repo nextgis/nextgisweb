@@ -61,7 +61,7 @@ class RenderComponent(Component):
         if not os.path.isdir(self.tile_cache_path):
             os.makedirs(self.tile_cache_path)
 
-    @require('resource', 'spatial_ref_sys')
+    @require('layer')
     def setup_pyramid(self, config):
         from . import api, view # NOQA
         api.setup_pyramid(self, config)

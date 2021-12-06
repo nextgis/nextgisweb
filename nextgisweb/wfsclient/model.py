@@ -3,7 +3,6 @@ from datetime import date, datetime, time
 from io import BytesIO
 
 from lxml import etree
-from owslib.crs import Crs
 import requests
 from osgeo import ogr, osr
 from requests.exceptions import RequestException
@@ -29,7 +28,7 @@ from ..feature_layer import (
 )
 from ..layer import SpatialLayerMixin
 from ..lib.geometry import Geometry
-from ..lib.ows import FIELD_TYPE_WFS
+from ..lib.ows import FIELD_TYPE_WFS, parse_srs, SRSParseError
 from ..models import declarative_base
 from ..resource import (
     ConnectionScope,
@@ -89,14 +88,6 @@ def geom_from_gml(el):
     value = etree.tostring(el, encoding='utf-8')
     ogr_geom = ogr.CreateGeometryFromGML(value.decode('utf-8'))
     return Geometry.from_ogr(ogr_geom)
-
-
-def get_srid(value):
-    try:
-        crs = Crs(value)
-        return crs.code
-    except Exception:
-        return None
 
 
 def fid_int(fid, layer_name):
@@ -163,16 +154,26 @@ class WFSConnection(Base, Resource):
         root = etree.parse(BytesIO(body)).getroot()
 
         layers = []
-        for el in find_tags(root, 'FeatureType'):
-            srid = get_srid(find_tags(el, 'DefaultCRS')[0].text)
+        for layer_el in find_tags(root, 'FeatureType'):
+            srid_supported = []
 
-            is_supported = type(srid) == int
-            if not is_supported:
+            try:
+                srid, axis_xy = parse_srs(find_tags(layer_el, 'DefaultCRS')[0].text)
+                srid_supported.append(srid)
+            except SRSParseError:
                 continue
 
+            for srs_el in find_tags(layer_el, 'OtherCRS'):
+                try:
+                    other_srid, axis_xy = parse_srs(srs_el.text)
+                except SRSParseError:
+                    continue
+                srid_supported.append(other_srid)
+
             layers.append(dict(
-                name=find_tags(el, 'Name')[0].text,
+                name=find_tags(layer_el, 'Name')[0].text,
                 srid=srid,
+                srid_supported=srid_supported,
             ))
 
         return dict(layers=layers)
@@ -434,12 +435,24 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     # IFeatureLayer
 
+    def is_srs_supported(self, srs):
+        if srs.auth_name != 'EPSG' or srs.auth_srid is None:
+            return False
+
+        if srs.auth_srid in (self.srs_id, self.geometry_srid):
+            return True
+
+        for layer in self.connection.get_capabilities()['layers']:
+            if layer['name'] == self.layer_name:
+                return srs.auth_srid in layer['srid_supported']
+
+        return False
+
     @property
     def feature_query(self):
 
         class BoundFeatureQuery(FeatureQueryBase):
             layer = self
-            srs_supported = (self.geometry_srid, )
 
         return BoundFeatureQuery
 
