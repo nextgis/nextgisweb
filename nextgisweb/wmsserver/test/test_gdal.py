@@ -99,10 +99,10 @@ def test_read(service_id, ngw_httptest_app, ngw_auth_administrator):
     # TODO channel values change for some reason
     tolerance = 2
 
-    def read_image(*extent):
+    def read_image(x1, y1, x2, y2, srs):
         width = height = 500
         ds_img = gdal.Warp('', ds, options=gdal.WarpOptions(
-            width=width, height=height, outputBounds=extent, dstSRS='EPSG:3857',
+            width=width, height=height, outputBounds=(x1, y1, x2, y2), dstSRS=srs,
             format='MEM'))
         array = numpy.zeros((height, width, band_count), numpy.uint8)
         for i in range(band_count):
@@ -118,11 +118,17 @@ def test_read(service_id, ngw_httptest_app, ngw_auth_administrator):
                 return None
         return [b[0] for b in extrema]
 
-    img_red = read_image(558728, 5789851, 1242296, 7544030)
+    img_red = read_image(558728, 5789851, 1242296, 7544030, 'EPSG:3857')
+    assert color(img_red) == pytest.approx((255, 0, 0), abs=tolerance)
+    img_red = read_image(5.02, 46.06, 11.16, 55.93, 'EPSG:4326')
     assert color(img_red) == pytest.approx((255, 0, 0), abs=tolerance)
 
-    img_green = read_image(4580543, 6704397, 5033914, 6932643)
+    img_green = read_image(4580543, 6704397, 5033914, 6932643, 'EPSG:3857')
+    assert color(img_green) == pytest.approx((0, 255, 0), abs=tolerance)
+    img_green = read_image(41.15, 51.47, 45.22, 52.73, 'EPSG:4326')
     assert color(img_green) == pytest.approx((0, 255, 0), abs=tolerance)
 
-    img_blue = read_image(454962, 2593621, 2239863, 3771499)
+    img_blue = read_image(454962, 2593621, 2239863, 3771499, 'EPSG:3857')
+    assert color(img_blue) == pytest.approx((0, 0, 255), abs=tolerance)
+    img_blue = read_image(4.09, 22.68, 20.12, 32.06, 'EPSG:4326')
     assert color(img_blue) == pytest.approx((0, 0, 255), abs=tolerance)
