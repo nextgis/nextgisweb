@@ -10,5 +10,6 @@ class WMSServerComponent(Component):
     metadata = Base.metadata
 
     def setup_pyramid(self, config):
-        from . import view
+        from . import api, view
+        api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
