@@ -1,13 +1,13 @@
-from os.path import abspath, split, splitext
 from sys import _getframe
-from inspect import getmodule
 from logging import getLogger, Logger
 
 __all__ = ['DO_NOT_USE_WILDCARD_IMPORT']
 
 logger: Logger  # Annotation for type hints
 
-_dirmod_cache = dict()
+logger_bootstrap = getLogger('nextgisweb.bootstrap')
+logger_unknown = getLogger('nextgisweb.unknown')
+logger_this = getLogger(__name__)
 
 
 def __getattr__(attr):
@@ -15,24 +15,17 @@ def __getattr__(attr):
     if attr == 'logger':
         frame = _getframe(1)
 
-        # Call of inspect.getmodule(object) is expensive, thus we use
-        # directory-based cache: files located in the same directory have
-        # the same module name prefix.
+        if frame.f_code.co_filename == '<frozen importlib._bootstrap>':
+            return logger_bootstrap
 
-        fullname = abspath(frame.f_code.co_filename)
-        dirname, filename = split(fullname)
-
-        dirpkg = _dirmod_cache.get(dirname)
-        if dirpkg is not None:
-            name = dirpkg + '.' + splitext(filename)[0]
-
+        name = frame.f_locals.get('__name__')
+        if name is not None:
+            return getLogger(name)
         else:
-            mod = getmodule(frame)
-            name = mod.__name__
-            _dirmod_cache[dirname] = name if filename.startswith('__init__.') \
-                else '.'.join(name.split('.')[:-1])
-
-        return getLogger(name)
+            logger_this.warning(
+                "Logger 'nextgisweb.unknown' will be used for "
+                "frame: %s", str(frame))
+            return logger_unknown
 
     elif attr == 'DO_NOT_USE_WILDCARD_IMPORT':
         raise ImportError(
