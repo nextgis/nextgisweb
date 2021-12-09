@@ -6,6 +6,11 @@ import pytest
 from osgeo import ogr
 
 import nextgisweb.feature_layer.test
+from nextgisweb.feature_layer import (
+    IFeatureQueryFilter,
+    IFeatureQueryFilterBy,
+    IFeatureQueryOrderBy,
+)
 from nextgisweb.lib.geometry import Geometry, Transformer
 from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
 from nextgisweb.spatial_ref_sys import SRS
@@ -27,6 +32,10 @@ filter_cases = (
     ((('int64', 'gt', 500), ), [1]),
     ((('int64', 'le', 500), ), [2, 3]),
     ((('int64', 'lt', 500), ), [3]),
+)
+order_by_cases = (
+    ((('asc', 'real'), ), [1, 3, 2]),
+    ((('asc', 'date'), ('desc', 'int')), [2, 1, 3]),
 )
 
 
@@ -122,37 +131,53 @@ def test_layer(create_resource, ngw_resource_group, ngw_auth_administrator, ngw_
         for i, f in enumerate(query()):
             cmp_geom(gj_fs[i]['geometry'], f.geom, srs)
 
+        q = layer.feature_query()
+
         # IFeatureQueryFilter
 
-        for filter_, ids_expected in filter_cases:
-            # Skip unsupported operations
-            skip = False
-            if isinstance(layer, WFSLayer):
-                for k, op, v in filter_:
-                    if op == 'isnull' and v == 'no':
-                        skip = True
-                        break
-            if skip:
-                continue
+        if IFeatureQueryFilter.providedBy(q):
 
-            query = layer.feature_query()
-            query.filter(*filter_)
-            ids = [f.id for f in query()]
-            assert sorted(ids) == ids_expected
+            for filter_, ids_expected in filter_cases:
+                # Skip unsupported operations
+                skip = False
+                if isinstance(layer, WFSLayer):
+                    for k, op, v in filter_:
+                        if op == 'isnull' and v == 'no':
+                            skip = True
+                            break
+                if skip:
+                    continue
+
+                query = layer.feature_query()
+                query.filter(*filter_)
+                ids = [f.id for f in query()]
+                assert sorted(ids) == ids_expected
 
         # IFeatureQueryFilterBy
 
-        for filter_, ids_expected in filter_cases:
-            filter_by = dict()
-            skip = False
-            for k, o, v in filter_:
-                if o != 'eq':
-                    skip = True
-                    break
-                filter_by[k] = v
-            if skip:
-                continue
-            query = layer.feature_query()
-            query.filter_by(**filter_by)
-            ids = [f.id for f in query()]
-            assert sorted(ids) == ids_expected
+        if IFeatureQueryFilterBy.providedBy(q):
+
+            for filter_, ids_expected in filter_cases:
+                filter_by = dict()
+                skip = False
+                for k, o, v in filter_:
+                    if o != 'eq':
+                        skip = True
+                        break
+                    filter_by[k] = v
+                if skip:
+                    continue
+                query = layer.feature_query()
+                query.filter_by(**filter_by)
+                ids = [f.id for f in query()]
+                assert sorted(ids) == ids_expected
+
+        # IFeatureQueryOrderBy
+
+        if IFeatureQueryOrderBy.providedBy(q):
+
+            for order_by, ids_expected in order_by_cases:
+                query = layer.feature_query()
+                query.order_by(*order_by)
+                ids = [f.id for f in query()]
+                assert ids == ids_expected
