@@ -4,7 +4,7 @@ from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from imp import load_source
+from importlib.machinery import SourceFileLoader
 
 from ..logging import logger
 from .revision import REVID_ZERO
@@ -86,11 +86,11 @@ class PythonModuleMigration(Migration):
 
     @property
     def forward_callable(self):
-        return getattr(load_source('', self._mod_path), 'forward')
+        return getattr(SourceFileLoader('', self._mod_path).load_module(), 'forward')
 
     @property
     def rewind_callable(self):
-        return getattr(load_source('', self._mod_path), 'rewind')
+        return getattr(SourceFileLoader('', self._mod_path).load_module(), 'rewind')
 
 
 class SQLScriptMigration(Migration):

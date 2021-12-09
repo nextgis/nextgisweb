@@ -2,7 +2,7 @@ import os
 import pkg_resources
 import subprocess
 import re
-from imp import find_module
+import importlib
 
 from pathlib import Path
 
@@ -30,7 +30,8 @@ class Package(object):
         self._name = entrypoint.dist.key.replace('-', '_')
         self._entrypoint = entrypoint
 
-        pathname = find_module(self.name)[1]
+        spec = importlib.util.find_spec(self.name)
+        pathname = spec.submodule_search_locations[0]
         self._path = Path(pathname)
 
         # Assume a version local part consists of commit id and dirtiness flag.
