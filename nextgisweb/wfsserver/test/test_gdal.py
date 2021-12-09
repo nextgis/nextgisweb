@@ -124,11 +124,11 @@ def test_layer_name(version, service, ngw_httptest_app, ngw_auth_administrator):
         ngw_httptest_app.base_url, service, version), True)
     assert wfs_ds is not None, gdal.GetLastErrorMsg()
 
-    wfs_layer = wfs_ds.GetLayer(0)
+    wfs_layer = wfs_ds.GetLayerByName('type')
     assert wfs_layer is not None, gdal.GetLastErrorMsg()
     assert wfs_layer.GetName() == 'type'
 
-    wfs_layer = wfs_ds.GetLayer(1)
+    wfs_layer = wfs_ds.GetLayerByName('pointz')
     assert wfs_layer is not None, gdal.GetLastErrorMsg()
     assert wfs_layer.GetName() == 'pointz'
 
