@@ -182,6 +182,8 @@ def git_commit(path):
         else:
             logger.error("Failed to get git commit hash in '%s'", path)
         return None
+    finally:
+        devnull.close()
     return commit.rstrip()
 
 
@@ -198,3 +200,5 @@ def git_dirty(path):
         else:
             logger.error("Failed to get git dirty flag in '%s'", path)
         return None
+    finally:
+        devnull.close()
