@@ -607,7 +607,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         tab.quote = True
         tab.quote_schema = True
 
-        select = db.select([], tab)
+        select = tab.select()
 
         def addcol(col):
             select.append_column(col)

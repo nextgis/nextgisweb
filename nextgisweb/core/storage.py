@@ -112,7 +112,7 @@ class StorageComponentMixin(object):
                     updated=row.updated,
                     data_volume=row.data_volume,
                 )
-            ) for row in DBSession.execute(q.alias('q'))
+            ) for row in DBSession.query(q.alias('q'))
                 if row.kind_of_data == '' or row.data_volume != 0)
 
     def estimate_storage_all(self):
