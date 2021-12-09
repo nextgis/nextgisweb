@@ -101,7 +101,7 @@ def features(service, ngw_httptest_app, ngw_auth_administrator):
                 ngw_httptest_app.base_url, service, version), True)
             assert wfs_ds is not None, gdal.GetLastErrorMsg()
 
-            wfs_layer = wfs_ds.GetLayer(0)
+            wfs_layer = wfs_ds.GetLayerByName('type')
             assert wfs_layer is not None, gdal.GetLastErrorMsg()
 
             ref_ds = type_geojson_dataset('type.geojson')
