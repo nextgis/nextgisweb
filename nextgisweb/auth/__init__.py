@@ -256,16 +256,17 @@ class AuthComponent(Component):
     def check_user_limit(self, exclude_id=None):
         user_limit = self.options['user_limit']
         if user_limit is not None:
-            query = DBSession.query(db.func.count(User.id)).filter(
-                db.and_(db.not_(User.system), db.not_(User.disabled)))
-            if exclude_id is not None:
-                query = query.filter(User.id != exclude_id)
+            with transaction.manager:
+                query = DBSession.query(db.func.count(User.id)).filter(
+                    db.and_(db.not_(User.system), db.not_(User.disabled)))
+                if exclude_id is not None:
+                    query = query.filter(User.id != exclude_id)
 
-            active_user_count = query.scalar()
-            if active_user_count >= user_limit:
-                raise ValidationError(message=_(
-                    "Maximum number of users is reached. Your current plan user number limit is %d."
-                ) % user_limit)
+                active_user_count = query.scalar()
+                if active_user_count >= user_limit:
+                    raise ValidationError(message=_(
+                        "Maximum number of users is reached. Your current plan user number limit is %d."
+                    ) % user_limit)
 
     def maintenance(self):
         with transaction.manager:
