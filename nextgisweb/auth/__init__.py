@@ -213,14 +213,12 @@ class AuthComponent(Component):
         if user is None:
             group = Group.filter_by(keyname=keyname).one_or_none()
             if group is None:
-                ValueError("User or group (keyname='%s') not found." % keyname)
-            if len(group.members) == 0:
-                ValueError("Group (keyname='%s') has no members." % keyname)
+                raise RuntimeError(f"No user or group found for keyname '{keyname}'")
+            for user in group.members:
+                if not user.disabled:
+                    break
             else:
-                user = group.members[0]
-
-        if user.disabled:
-            ValueError("User (keyname='%s') is disabled." % keyname)
+                raise RuntimeError(f"Unable to find an enabled member of '{keyname}' group")
 
         result = urlparse(url)
 
