@@ -1,4 +1,4 @@
-<%page args="title, hide_resource_filter"/>
+<%page args="title, hide_resource_filter=False"/>
 
 <%!
     import os
