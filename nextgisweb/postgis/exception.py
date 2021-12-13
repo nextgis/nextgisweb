@@ -12,7 +12,11 @@ class ExternalDatabaseError(ExternalServiceError):
 
         if not hasattr(self, 'detail') and 'sa_error' in kwargs:
             sa_error = kwargs['sa_error']
-            if isinstance(sa_error, StatementError) and sa_error.orig is not None:
+            if (
+                isinstance(sa_error, StatementError)
+                and sa_error.orig is not None
+                and sa_error.orig.pgcode is not None
+            ):
                 detail = 'PostgreSQL error code: %s.' % sa_error.orig.pgcode
             else:
                 detail = 'SQLAlchemy error code: %s.' % sa_error.code
