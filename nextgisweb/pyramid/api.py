@@ -29,6 +29,34 @@ def _get_cors_olist():
         return None
 
 
+def is_cors_origin(request):
+    # Origin header required in CORS requests
+    origin = request.headers.get('Origin')
+    if origin is None:
+        return False
+
+    olist = _get_cors_olist()
+
+    if not olist:
+        return False
+
+    for url in olist:
+        if origin == url:
+            return True
+        if '*' in url:
+            o_scheme, o_domain, o_port = parse_origin(origin)[1:]
+            scheme, domain, port = parse_origin(url)[1:]
+            if o_scheme != scheme or o_port != port:
+                continue
+            wildcard_level = domain.count('.') + 1
+            level_cmp = wildcard_level - 1
+            upper = domain.rsplit('.', level_cmp)[-level_cmp:]
+            o_upper = o_domain.rsplit('.', level_cmp)[-level_cmp:]
+            if upper == o_upper:
+                return True
+    return False
+
+
 def cors_tween_factory(handler, registry):
     """ Tween adds Access-Control-* headers for simple and preflighted
     CORS requests """
@@ -36,34 +64,9 @@ def cors_tween_factory(handler, registry):
     def hadd(response, n, v):
         response.headerlist.append((n, v))
 
-    def is_cors_origin(origin):
-        olist = _get_cors_olist()
-
-        if not olist:
-            return False
-
-        for url in olist:
-            if origin == url:
-                return True
-            if '*' in url:
-                o_scheme, o_domain, o_port = parse_origin(origin)[1:]
-                scheme, domain, port = parse_origin(url)[1:]
-                if o_scheme != scheme or o_port != port:
-                    continue
-                wildcard_level = domain.count('.') + 1
-                level_cmp = wildcard_level - 1
-                upper = domain.rsplit('.', level_cmp)[-level_cmp:]
-                o_upper = o_domain.rsplit('.', level_cmp)[-level_cmp:]
-                if upper == o_upper:
-                    return True
-        return False
-
     def cors_tween(request):
         # Only request under /api/ are handled
         is_api = request.path_info.startswith('/api/')
-
-        # Origin header required in CORS requests
-        origin = request.headers.get('Origin')
 
         # If the Origin header is not present terminate this set of
         # steps. The request is outside the scope of this specification.
@@ -75,51 +78,52 @@ def cors_tween_factory(handler, registry):
         # the scope of this specification.
         # http://www.w3.org/TR/cors/#resource-preflight-requests
 
-        if is_api and origin is not None:
+        if is_api and request.is_cors_origin:
             # If the value of the Origin header is not a
             # case-sensitive match for any of the values
             # in list of origins do not set any additional
             # headers and terminate this set of steps.
             # http://www.w3.org/TR/cors/#resource-preflight-requests
 
-            if is_cors_origin(origin):
-                # Access-Control-Request-Method header of preflight request
-                method = request.headers.get('Access-Control-Request-Method')
+            origin = request.headers['Origin']
 
-                if method is not None and request.method == 'OPTIONS':
+            # Access-Control-Request-Method header of preflight request
+            method = request.headers.get('Access-Control-Request-Method')
 
-                    response = Response(content_type='text/plain')
+            if method is not None and request.method == 'OPTIONS':
 
-                    # The Origin header can only contain a single origin as
-                    # the user agent will not follow redirects.
-                    # http://www.w3.org/TR/cors/#resource-preflight-requests
+                response = Response(content_type='text/plain')
 
+                # The Origin header can only contain a single origin as
+                # the user agent will not follow redirects.
+                # http://www.w3.org/TR/cors/#resource-preflight-requests
+
+                hadd(response, 'Access-Control-Allow-Origin', origin)
+
+                # Add one or more Access-Control-Allow-Methods headers
+                # consisting of (a subset of) the list of methods.
+                # Since the list of methods can be unbounded,
+                # simply returning the method indicated by
+                # Access-Control-Request-Method (if supported) can be enough.
+                # http://www.w3.org/TR/cors/#resource-preflight-requests
+
+                hadd(response, 'Access-Control-Allow-Methods', method)
+                hadd(response, 'Access-Control-Allow-Credentials', 'true')
+
+                # Add allowed Authorization header for HTTP authentication
+                # from JavaScript. It is a good idea?
+
+                hadd(response, 'Access-Control-Allow-Headers', 'Authorization, Range')
+
+                return response
+
+            else:
+
+                def set_cors_headers(request, response):
                     hadd(response, 'Access-Control-Allow-Origin', origin)
-
-                    # Add one or more Access-Control-Allow-Methods headers
-                    # consisting of (a subset of) the list of methods.
-                    # Since the list of methods can be unbounded,
-                    # simply returning the method indicated by
-                    # Access-Control-Request-Method (if supported) can be enough.
-                    # http://www.w3.org/TR/cors/#resource-preflight-requests
-
-                    hadd(response, 'Access-Control-Allow-Methods', method)
                     hadd(response, 'Access-Control-Allow-Credentials', 'true')
 
-                    # Add allowed Authorization header for HTTP authentication
-                    # from JavaScript. It is a good idea?
-
-                    hadd(response, 'Access-Control-Allow-Headers', 'Authorization, Range')
-
-                    return response
-
-                else:
-
-                    def set_cors_headers(request, response):
-                        hadd(response, 'Access-Control-Allow-Origin', origin)
-                        hadd(response, 'Access-Control-Allow-Credentials', 'true')
-
-                    request.add_response_callback(set_cors_headers)
+                request.add_response_callback(set_cors_headers)
 
         # Run default request handler
         return handler(request)
@@ -402,6 +406,8 @@ def company_logo(request):
 
 
 def setup_pyramid(comp, config):
+    config.add_request_method(is_cors_origin, property=True)
+
     config.add_tween('nextgisweb.pyramid.api.cors_tween_factory', under=(
         'nextgisweb.pyramid.exception.handled_exception_tween_factory',
         'INGRESS'))
