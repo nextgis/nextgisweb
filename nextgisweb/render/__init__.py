@@ -170,6 +170,7 @@ class RenderComponent(Component):
             yield TileCacheData, tc.resource_id, size_img + size_color
 
     option_annotations = (
+        Option('cors_origin', bool, default=False, doc="Check request Origin header."),
         Option('tile_cache.enabled', bool, default=True),
         Option('tile_cache.track_changes', bool, default=False),
         Option('tile_cache.seed', bool, default=False),
