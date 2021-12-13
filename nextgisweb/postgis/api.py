@@ -1,12 +1,13 @@
 import json
 
 from sqlalchemy import inspect
-from sqlalchemy.exc import NoSuchTableError
+from sqlalchemy.exc import NoSuchTableError, SQLAlchemyError
 from pyramid.response import Response
 
 from ..core.exception import ValidationError
 from ..resource import resource_factory, ConnectionScope
 
+from .exception import ExternalDatabaseError
 from .model import PostgisConnection
 from .util import _
 
@@ -15,7 +16,11 @@ def inspect_connection(request):
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
-    inspector = inspect(connection.get_engine())
+    engine = connection.get_engine()
+    try:
+        inspector = inspect(engine)
+    except SQLAlchemyError as exc:
+        raise ExternalDatabaseError(message="Failed to inspect database.", sa_error=exc)
 
     result = []
     for schema_name in inspector.get_schema_names():
@@ -32,7 +37,11 @@ def inspect_table(request):
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
-    inspector = inspect(connection.get_engine())
+    engine = connection.get_engine()
+    try:
+        inspector = inspect(engine)
+    except SQLAlchemyError as exc:
+        raise ExternalDatabaseError(message="Failed to inspect database.", sa_error=exc)
 
     table_name = request.matchdict['table_name']
     schema = request.GET.get('schema', 'public')
