@@ -217,7 +217,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 raise ValidationError(_("Table '%(table)s' not found!") % dict(table=tableref)) # NOQA
 
             result = conn.execute(
-                """SELECT type, srid FROM geometry_columns
+                """SELECT type, coord_dimension, srid FROM geometry_columns
                 WHERE f_table_schema = %s
                     AND f_table_name = %s
                     AND f_geometry_column = %s""",
@@ -248,6 +248,9 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
                 if tab_geom_type == 'GEOMETRY' and self.geometry_type is None:
                     raise ValidationError(_("Geometry type missing in geometry_columns table! You should specify it manually.")) # NOQA
+
+                if row['coord_dimension'] == 3:
+                    tab_geom_type += 'Z'
 
                 if (
                     self.geometry_type is not None
