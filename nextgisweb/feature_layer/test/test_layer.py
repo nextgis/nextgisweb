@@ -1,5 +1,6 @@
 import json
 from datetime import date, datetime, time
+from itertools import product
 from pathlib import Path
 
 import pytest
@@ -76,7 +77,7 @@ def cmp_geom(gj_geom, geom2, srs):
     pytest.param(create_wfs_layer, id='WFS layer'),
     pytest.param(create_postgis_layer, id='PostGIS layer'),
 ))
-def test_layer(create_resource, ngw_resource_group, ngw_auth_administrator, ngw_httptest_app):
+def test_attributes(create_resource, ngw_resource_group, ngw_auth_administrator, ngw_httptest_app):
     geojson = json.loads(data_points.read_text())
     gj_fs = geojson['features']
 
@@ -116,20 +117,6 @@ def test_layer(create_resource, ngw_resource_group, ngw_auth_administrator, ngw_
         fs = list(query())
         assert len(fs) == limit
         cmp_fields(gj_fs[offset + limit - 1]['properties'], fs[limit - 1].fields)
-
-        # - geom
-        query = layer.feature_query()
-        query.geom()
-        for i, f in enumerate(query()):
-            cmp_geom(gj_fs[i]['geometry'], f.geom, layer.srs)
-
-        # - srs
-        srs = SRS.filter_by(id=4326).one()
-        query = layer.feature_query()
-        query.geom()
-        query.srs(srs)
-        for i, f in enumerate(query()):
-            cmp_geom(gj_fs[i]['geometry'], f.geom, srs)
 
         q = layer.feature_query()
 
@@ -181,3 +168,37 @@ def test_layer(create_resource, ngw_resource_group, ngw_auth_administrator, ngw_
                 query.order_by(*order_by)
                 ids = [f.id for f in query()]
                 assert ids == ids_expected
+
+
+@pytest.mark.parametrize('create_resource, geom_type', product(
+    (create_vector_layer, create_postgis_layer, create_wfs_layer),
+    ('point', 'linestring', 'polygon', 'multipoint', 'multilinestring', 'multipolygon',
+     'pointz', 'linestringz', 'polygonz', 'multipointz', 'multilinestringz', 'multipolygonz')
+))
+def test_geometry(create_resource, geom_type, ngw_resource_group, ngw_httptest_app):
+    data = Path(nextgisweb.feature_layer.test.__file__).parent \
+        / 'data' / 'geometry' / f'{geom_type}.geojson'
+
+    geojson = json.loads(data.read_text())
+    gj_fs = geojson['features']
+
+    ds = ogr.Open(str(data))
+    ogrlayer = ds.GetLayer(0)
+
+    with create_resource(ogrlayer, ngw_resource_group, ngw_httptest_app=ngw_httptest_app) as layer:
+
+        # IFeatureQuery
+
+        # - geom
+        query = layer.feature_query()
+        query.geom()
+        for i, f in enumerate(query()):
+            cmp_geom(gj_fs[i]['geometry'], f.geom, layer.srs)
+
+        # - srs
+        srs = SRS.filter_by(id=4326).one()
+        query = layer.feature_query()
+        query.geom()
+        query.srs(srs)
+        for i, f in enumerate(query()):
+            cmp_geom(gj_fs[i]['geometry'], f.geom, srs)

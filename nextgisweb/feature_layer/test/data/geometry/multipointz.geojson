@@ -1,0 +1,28 @@
+{
+    "type": "FeatureCollection",
+    "name": "layer",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [37.6178, 55.7512, 1],
+                    [30.3114, 59.9379, 2]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [131.9088, 43.1147, -3],
+                    [158.6833, 53.0217, -4]
+                ]
+            }
+        }
+    ]
+}

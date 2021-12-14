@@ -1,0 +1,28 @@
+{
+    "type": "FeatureCollection",
+    "name": "layer",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [37.6178, 55.7512, 0],
+                    [131.9088, 43.1147, 1]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [30.3114, 59.9379, 4.4],
+                    [37.6178, 55.7512, 4.4]
+                ]
+            }
+        }
+    ]
+}

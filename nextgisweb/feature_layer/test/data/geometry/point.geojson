@@ -1,0 +1,22 @@
+{
+    "type": "FeatureCollection",
+    "name": "layer",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "Point",
+                "coordinates": [37.6178, 55.7512]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "Point",
+                "coordinates": [131.9088, 43.1147]
+            }
+        }
+    ]
+}

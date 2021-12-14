@@ -6,6 +6,7 @@ import pytest
 
 from nextgisweb.auth import User
 from nextgisweb.env import env
+from nextgisweb.feature_layer import GEOM_TYPE
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
 from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys import SRS
@@ -48,12 +49,14 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
 
     column_geom = 'the_geom'
     geom_type = _GEOM_OGR_2_TYPE[ogrlayer.GetGeomType()]
+    dimension = 3 if geom_type in GEOM_TYPE.has_z else 2
+    geometry_type_db = _GEOM_TYPE_2_DB[geom_type]
     osr_ = ogrlayer.GetSpatialRef()
     assert osr_.GetAuthorityName(None) == 'EPSG'
     srid = int(osr_.GetAuthorityCode(None))
     columns.append(sa.Column(column_geom, ga.Geometry(
-        dimension=2, srid=srid,
-        geometry_type=_GEOM_TYPE_2_DB[geom_type])))
+        dimension=dimension, srid=srid,
+        geometry_type=geometry_type_db)))
 
     defn = ogrlayer.GetLayerDefn()
     for i in range(defn.GetFieldCount()):
