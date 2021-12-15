@@ -248,7 +248,8 @@ class WFSConnection(Base, Resource):
                 srs_intersects = layer.srs
             osr_intersects = osr.SpatialReference()
             osr_intersects.ImportFromWkt(srs_intersects.wkt)
-            geom = ogr.CreateGeometryFromWkb(intersects.wkb, osr_intersects)
+            geom = intersects.ogr
+            geom.AssignSpatialReference(osr_intersects)
             geom_gml = geom.ExportToGML([
                 'FORMAT=GML32',
                 'NAMESPACE_DECL=YES',
