@@ -885,6 +885,7 @@ class WFSHandler():
                 'boundedBy', parent=root,
                 namespace=wfs['ns'] if self.p_version >= v200 else gml['ns'])
             minX = maxX = minY = maxY = None
+            gml_parser = etree.XMLParser(huge_tree=True)
 
             for feature in query():
                 feature_id = fid_encode(feature.id, layer.keyname)
@@ -908,8 +909,8 @@ class WFSHandler():
                         'NAMESPACE_DECL=YES',
                         'SRSNAME_FORMAT=SHORT',
                         'GMLID=geom-%s' % feature_id])
+                    __gml = etree.fromstring(geom_gml, parser=gml_parser)
                     __geom = El('geom', parent=__feature)
-                    __gml = etree.fromstring(geom_gml)
                     __geom.append(__gml)
 
                 for field in feature_layer.fields:
