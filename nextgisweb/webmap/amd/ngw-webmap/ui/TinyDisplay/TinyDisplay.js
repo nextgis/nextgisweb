@@ -154,6 +154,8 @@ define([
 
         // Current basemap
         _baseLayer: undefined,
+        
+        tiny: true,
 
         // For image loading
         assetUrl: ngwConfig.assetUrl,
@@ -681,11 +683,8 @@ define([
                     attribute: "position"
                 }] : null,
                 onItem: function (item) {
-                    console.log(item.label);
-                    console.log(item.id);
                     layer = widget._layerSetup(item);
                     widget._layer_order.unshift(store.getValue(item, "id"));
-                    console.log(widget._layer_order);
                     // Turn on layers from permalink
                     var cond,
                         visibleStyles = widget._urlParams.styles;

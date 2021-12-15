@@ -70,6 +70,8 @@ define([
         _disabled: true,
 
         constructor: function () {
+            if (this.display.tiny) return;
+
             var webmapEditable = this.display.config.webmapEditable;
             
             if (webmapEditable) {
@@ -175,7 +177,9 @@ define([
         },
 
         postCreate: function () {
-            if (this._disabled) return;
+            if (this._disabled || this.display.tiny) {
+                return;
+            }
 
             finishConfirmDialog.on("save", lang.hitch(this, this._saveChanges));
             finishConfirmDialog.on("undo", lang.hitch(this, this._undoChanges));
@@ -198,6 +202,7 @@ define([
         },
 
         _selectInteraction: null,
+
         _buildSelectInteraction: function () {
             var selectInteraction = new ol.interaction.Select({
                 layers: [this.editorVectorLayer.olLayer],
