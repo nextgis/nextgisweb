@@ -130,6 +130,7 @@ class TilestorWriter:
         atexit.register(self.wait_for_shutdown)
 
         data = None
+        tilestor = None
         while True:
             self.cstart = None
 
@@ -219,6 +220,7 @@ class TilestorWriter:
                     # Force zope session management to commit changes
                     mark_changed(DBSession())
                     tilestor.commit()
+                    tilestor = None
 
                     time_taken += time() - ptime
                     logger.debug(
@@ -235,7 +237,8 @@ class TilestorWriter:
 
                 data = None
                 self.cstart = None
-                tilestor.rollback()
+                if tilestor is not None:
+                    tilestor.rollback()
 
     def _write_tile_meta(self, conn, table_uuid, row):
         conn.execute(db.sql.text("""
