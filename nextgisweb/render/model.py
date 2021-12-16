@@ -51,7 +51,7 @@ SQLITE_TIMEOUT = min(QUEUE_STUCK_TIMEOUT * 2, 30)
 def get_tile_db(db_path):
     p = Path(db_path)
     if not p.parent.exists():
-        p.parent.mkdir(parents=True)
+        p.parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(
         db_path, isolation_level='DEFERRED',
         timeout=SQLITE_TIMEOUT,
