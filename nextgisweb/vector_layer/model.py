@@ -59,6 +59,7 @@ from ..feature_layer import (
     IFeatureQuerySimplify,
     on_data_change,
     query_feature_or_not_found)
+from ..registry import registry_maker
 
 from .kind_of_data import VectorLayerData
 from .util import _, COMP_ID, fix_encoding, utf8len
@@ -165,6 +166,10 @@ fid_params_default = dict(
     fid_field=[])
 
 
+MIN_INT32 = - 2**31
+MAX_INT32 = 2**31 - 1
+
+
 class FieldDef(object):
 
     def __init__(
@@ -197,6 +202,27 @@ class TableInfo(object):
                       fid_params, geom_cast_params, fix_errors):
         self = cls(srs_id)
 
+        defn = ogrlayer.GetLayerDefn()
+
+        explorer_registry = registry_maker()
+
+        class Explorer:
+            identity = None
+
+            def __init__(self):
+                self.done = False
+                explorer_registry.register(self)
+
+            def _explore(self, feature):
+                pass
+
+            def work(self, feature):
+                if self.done:
+                    return
+                self.done = self._explore(feature)
+
+        # Geom type
+
         if geom_cast_params['geometry_type'] == GEOM_TYPE.POINT:
             geom_filter = set(GEOM_TYPE.points)
         elif geom_cast_params['geometry_type'] == GEOM_TYPE.LINESTRING:
@@ -218,21 +244,22 @@ class TableInfo(object):
 
         ltype = ogrlayer.GetGeomType()
 
-        if len(geom_filter) == 1:
-            self.geometry_type = geom_filter.pop()
-        elif ltype in GEOM_TYPE_OGR and _GEOM_OGR_2_TYPE[ltype] in geom_filter:
-            self.geometry_type = _GEOM_OGR_2_TYPE[ltype]
-        elif len(geom_filter) > 1:
-            is_multi = False
-            has_z = False
+        class GeomTypeExplorer(Explorer):
+            identity = 'geom_type'
 
-            for feature in ogrlayer:
-                if len(geom_filter) <= 1:
-                    break
+            def __init__(self, geom_filter):
+                super().__init__()
+                self.geom_filter = geom_filter
+                self.is_multi = False
+                self.has_z = False
+
+            def _explore(self, feature):
+                if len(self.geom_filter) <= 1:
+                    return True
 
                 geom = feature.GetGeometryRef()
                 if geom is None:
-                    continue
+                    return False
                 gtype = geom.GetGeometryType()
                 if (
                     gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D)
@@ -242,40 +269,106 @@ class TableInfo(object):
                     gtype = geom.GetGeometryType()
 
                 if gtype not in GEOM_TYPE_OGR:
-                    continue
+                    return False
                 geometry_type = _GEOM_OGR_2_TYPE[gtype]
 
                 if geom_cast_params['geometry_type'] == TOGGLE.AUTO:
                     if geometry_type in GEOM_TYPE.points:
-                        geom_filter = geom_filter.intersection(set(GEOM_TYPE.points))
+                        self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.points))
                     elif geometry_type in GEOM_TYPE.linestrings:
-                        geom_filter = geom_filter.intersection(set(GEOM_TYPE.linestrings))
+                        self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.linestrings))
                     elif geometry_type in GEOM_TYPE.polygons:
-                        geom_filter = geom_filter.intersection(set(GEOM_TYPE.polygons))
-                elif skip_other_geometry_types and geometry_type not in geom_filter:
-                    continue
+                        self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.polygons))
+                elif skip_other_geometry_types and geometry_type not in self.geom_filter:
+                    return False
 
                 if (
-                    geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi
+                    geom_cast_params['is_multi'] == TOGGLE.AUTO and not self.is_multi
                     and geometry_type in GEOM_TYPE.is_multi
                 ):
-                    geom_filter = geom_filter.intersection(set(GEOM_TYPE.is_multi))
-                    is_multi = True
+                    self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.is_multi))
+                    self.is_multi = True
 
                 if (
-                    geom_cast_params['has_z'] == TOGGLE.AUTO and not has_z
+                    geom_cast_params['has_z'] == TOGGLE.AUTO and not self.has_z
                     and geometry_type in GEOM_TYPE.has_z
                 ):
-                    geom_filter = geom_filter.intersection(set(GEOM_TYPE.has_z))
-                    has_z = True
+                    self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.has_z))
+                    self.has_z = True
 
-            if geom_cast_params['is_multi'] == TOGGLE.AUTO and not is_multi:
-                geom_filter = geom_filter - set(GEOM_TYPE.is_multi)
+                return False
 
-            if geom_cast_params['has_z'] == TOGGLE.AUTO and not has_z:
-                geom_filter = geom_filter - set(GEOM_TYPE.has_z)
+        if len(geom_filter) == 1:
+            self.geometry_type = geom_filter.pop()
+        elif ltype in GEOM_TYPE_OGR and _GEOM_OGR_2_TYPE[ltype] in geom_filter:
+            self.geometry_type = _GEOM_OGR_2_TYPE[ltype]
+        elif len(geom_filter) > 1:
+
+            # Can't determine single geometry type, need exploration
+            GeomTypeExplorer(geom_filter)
+
+        # FID field
+
+        class Int32RangeExplorer(Explorer):
+            identity = 'int32_range'
+
+            def __init__(self, field_index):
+                super().__init__()
+                self.result_ok = True
+                self.field_index = field_index
+
+            def _explore(self, feature):
+                fid = feature.GetFieldAsInteger64(self.field_index)
+                if not (MIN_INT32 < fid < MAX_INT32):
+                    self.result_ok = False
+                    return True
+
+        fid_field_index = None
+        fid_field_found = False
+        if fid_params['fid_source'] in (FID_SOURCE.AUTO, FID_SOURCE.FIELD):
+            for fid_field in fid_params['fid_field']:
+                idx = defn.GetFieldIndex(fid_field)
+                if idx != -1:
+                    fid_field_found = True
+                    fld_defn = defn.GetFieldDefn(idx)
+                    fld_type = fld_defn.GetType()
+                    if fld_type in (ogr.OFTInteger, ogr.OFTInteger64):
+                        fid_field_index = idx
+                        # Found FID field, should check for uniqueness
+                        # TODO
+
+                        if fld_type == ogr.OFTInteger64:
+                            # FID is int64, should check values for int32 range
+                            Int32RangeExplorer(fid_field_index)
+                        break
+
+        # Explore layer
+
+        if len(explorer_registry) > 0:
+
+            for feature in ogrlayer:
+                all_done = True
+                for explorer in explorer_registry:
+                    if not explorer.done:
+                        explorer.work(feature)
+                    all_done = all_done and explorer.done
+                if all_done:
+                    break
 
             ogrlayer.ResetReading()
+
+        # Geom type
+
+        if GeomTypeExplorer.identity in explorer_registry:
+            gt_explorer = explorer_registry[GeomTypeExplorer.identity]
+
+            geom_filter = gt_explorer.geom_filter
+
+            if geom_cast_params['is_multi'] == TOGGLE.AUTO and not gt_explorer.is_multi:
+                geom_filter = geom_filter - set(GEOM_TYPE.is_multi)
+
+            if geom_cast_params['has_z'] == TOGGLE.AUTO and not gt_explorer.has_z:
+                geom_filter = geom_filter - set(GEOM_TYPE.has_z)
 
             if len(geom_filter) == 1:
                 self.geometry_type = geom_filter.pop()
@@ -286,24 +379,37 @@ class TableInfo(object):
                 err_msg += " " + _("Source layer contains no features satisfying the conditions.")
             raise VE(message=err_msg)
 
-        defn = ogrlayer.GetLayerDefn()
+        # FID field
 
-        if fid_params['fid_source'] in (FID_SOURCE.AUTO, FID_SOURCE.FIELD):
-            for fid_field in fid_params['fid_field']:
-                idx = defn.GetFieldIndex(fid_field)
-                if idx != -1:
-                    fld_defn = defn.GetFieldDefn(idx)
-                    if fld_defn.GetType() == ogr.OFTInteger:
-                        self.fid_field_index = idx
+        if fid_field_index is not None:
+            fid_field_ok = True
 
-            if self.fid_field_index is None and fid_params['fid_source'] == FID_SOURCE.FIELD:
-                if len(fid_params['fid_field']) == 0:
-                    raise VE(_("Parameter 'fid_field' is missing."))
+            fid_field_name = defn.GetFieldDefn(fid_field_index).GetName()
+
+            if Int32RangeExplorer.identity in explorer_registry:
+                range_explorer = explorer_registry[Int32RangeExplorer.identity]
+                if not range_explorer.result_ok:
+                    fid_field_ok = False
+                    if fix_errors == ERROR_FIX.NONE:
+                        raise VE(message=_("Field '%s' is out of int32 range.") % fid_field_name)
+
+            if fid_field_ok:
+                self.fid_field_index = fid_field_index
+
+        if (
+            self.fid_field_index is None
+            and fid_params['fid_source'] == FID_SOURCE.FIELD
+            and fix_errors == ERROR_FIX.NONE
+        ):
+            if len(fid_params['fid_field']) == 0:
+                raise VE(_("Parameter 'fid_field' is missing."))
+            else:
+                if not fid_field_found:
+                    raise VE(_("Fields %s not found.") % fid_params['fid_field'])
                 else:
-                    if idx == -1:
-                        raise VE(_("Fields %s not found.") % fid_params['fid_field'])
-                    else:
-                        raise VE(_("None of fields %s are integer.") % fid_params['fid_field'])
+                    raise VE(_("None of fields %s are integer.") % fid_params['fid_field'])
+
+        # Fields
 
         self.fields = []
         field_suffix_pattern = re.compile(r'(.*)_(\d+)')
@@ -501,6 +607,7 @@ class TableInfo(object):
             defn = ogrlayer.GetLayerDefn()
             fld_defn = defn.GetFieldDefn(self.fid_field_index)
             fid_field_name = fld_defn.GetName()
+            fid_field_type = fld_defn.GetType()
 
         max_fid = None
         for i, feature in enumerate(ogrlayer, start=1):
@@ -516,7 +623,11 @@ class TableInfo(object):
                 if feature.IsFieldNull(self.fid_field_index):
                     errors.append(_("Feature (seq. #%d) FID field '%s' is null.") % (i, fid_field_name))
                     continue
-                fid = feature.GetFieldAsInteger(self.fid_field_index)
+                if fid_field_type == ogr.OFTInteger:
+                    fid = feature.GetFieldAsInteger(self.fid_field_index)
+                elif fid_field_type == ogr.OFTInteger64:
+                    fid = feature.GetFieldAsInteger64(self.fid_field_index)
+
             max_fid = max(max_fid, fid) if max_fid is not None else fid
 
             geom = feature.GetGeometryRef()

@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 
 def registry_maker():
-    class ClassRegistry(object):
+    class ClassRegistry:
 
         def __init__(self):
             self._items = []
@@ -29,6 +29,9 @@ def registry_maker():
 
         def __contains__(self, identity):
             return self._dict.__contains__(identity)
+
+        def __len__(self):
+            return len(self._items)
 
         def get(self, identity, default=None):
             return self._dict.get(identity, default)
