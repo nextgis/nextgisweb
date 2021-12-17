@@ -13,7 +13,7 @@ from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.feature_layer import FIELD_TYPE
 from nextgisweb.vector_layer import VectorLayer
-from nextgisweb.vector_layer.model import error_limit, ERROR_FIX
+from nextgisweb.vector_layer.model import error_limit, ERROR_FIX, FID_SOURCE
 
 
 DATA_PATH = os.path.join(os.path.dirname(
@@ -233,3 +233,58 @@ def test_error_limit(ngw_resource_group):
 
     DBSession.flush()
     assert res.feature_query()().total_count == some
+
+
+def test_geom_field(ngw_resource_group):
+    res = VectorLayer(
+        parent_id=ngw_resource_group, display_name='test-geom-fld',
+        owner_user=User.by_keyname('administrator'),
+        srs=SRS.filter_by(id=3857).one(),
+        tbl_uuid=uuid4().hex
+    ).persist()
+
+    src = os.path.join(DATA_PATH, 'geom-fld.geojson')
+    ds = ogr.Open(src)
+    layer = ds.GetLayer(0)
+
+    with pytest.raises(ValidationError):
+        res.setup_from_ogr(layer)
+    res.setup_from_ogr(layer, fix_errors=ERROR_FIX.SAFE)
+    res.load_from_ogr(layer)
+
+    DBSession.flush()
+
+    query = res.feature_query()
+    feature = query().one()
+    assert feature.id == 1
+    assert list(feature.fields.keys()) == ['geom_1']
+
+
+
+def test_id_int64(ngw_resource_group):
+    res = VectorLayer(
+        parent_id=ngw_resource_group, display_name='test-int64',
+        owner_user=User.by_keyname('administrator'),
+        srs=SRS.filter_by(id=3857).one(),
+        tbl_uuid=uuid4().hex
+    ).persist()
+
+    src = os.path.join(DATA_PATH, 'int64.geojson')
+    ds = ogr.Open(src)
+    layer = ds.GetLayer(0)
+
+    with pytest.raises(ValidationError):
+        res.setup_from_ogr(layer)
+
+    fid_params = dict(fid_source=FID_SOURCE.FIELD, fid_field=['id'])
+    with pytest.raises(ValidationError):
+        res.setup_from_ogr(layer, fid_params=fid_params)
+    res.setup_from_ogr(layer, fix_errors=ERROR_FIX.SAFE, fid_params=fid_params)
+    res.load_from_ogr(layer)
+
+    DBSession.flush()
+
+    query = res.feature_query()
+    feature = query().one()
+    assert feature.id == 1
+    assert list(feature.fields.keys()) == ['id_1']

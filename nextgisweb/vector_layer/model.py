@@ -421,30 +421,35 @@ class TableInfo(object):
 
             fld_name = fld_defn.GetNameRef()
             fixed_fld_name = fix_encoding(fld_name)
-            if fld_name != fixed_fld_name:
-                if fix_errors == ERROR_FIX.LOSSY:
-                    if fixed_fld_name == '':
-                        fixed_fld_name = 'fld_1'
-                    while True:
-                        unique_check = True
-                        for field in self.fields:
-                            if field.keyname == fixed_fld_name:
-                                unique_check = False
 
-                                match = field_suffix_pattern.match(fixed_fld_name)
-                                if match is None:
-                                    fixed_fld_name = fixed_fld_name + '_1'
-                                else:
-                                    n = int(match[2]) + 1
-                                    fixed_fld_name = '%s_%d' % (match[1], n)
-                                break
-                        if unique_check:
-                            break
-                    fld_name = fixed_fld_name
+            if fld_name != fixed_fld_name and fix_errors == ERROR_FIX.LOSSY:
+                raise VE(_("Field '%s(?)' encoding is broken.") % fixed_fld_name)
+
+            if fixed_fld_name.lower() in FIELD_FORBIDDEN_NAME:
+                if fix_errors == ERROR_FIX.NONE:
+                    raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)  # NOQA: E501
                 else:
-                    raise VE(_("Field '%s(?)' encoding is broken.") % fixed_fld_name)
-            if fld_name.lower() in FIELD_FORBIDDEN_NAME:
-                raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)  # NOQA: E501
+                    fixed_fld_name += '_1'
+
+            if fld_name != fixed_fld_name:
+                if fixed_fld_name == '':
+                    fixed_fld_name = 'fld_1'
+                while True:
+                    unique_check = True
+                    for field in self.fields:
+                        if field.keyname == fixed_fld_name:
+                            unique_check = False
+
+                            match = field_suffix_pattern.match(fixed_fld_name)
+                            if match is None:
+                                fixed_fld_name += '_1'
+                            else:
+                                n = int(match[2]) + 1
+                                fixed_fld_name = '%s_%d' % (match[1], n)
+                            break
+                    if unique_check:
+                        break
+                fld_name = fixed_fld_name
 
             fld_type = None
             fld_type_ogr = fld_defn.GetType()
