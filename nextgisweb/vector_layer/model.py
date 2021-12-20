@@ -318,10 +318,42 @@ class TableInfo(object):
                 self.field_index = field_index
 
             def _explore(self, feature):
-                fid = feature.GetFieldAsInteger64(self.field_index)
+                i = self.field_index
+                if not feature.IsFieldSet(i) or feature.IsFieldNull(i):
+                    return False
+
+                fid = feature.GetFieldAsInteger64(i)
                 if not (MIN_INT32 < fid < MAX_INT32):
                     self.result_ok = False
                     return True
+
+        class UniquenessExplorer(Explorer):
+            identity = 'unique'
+
+            def __init__(self, field_index, field_type):
+                super().__init__()
+                self.result_ok = True
+                self.field_index = field_index
+                self.field_type = field_type
+                self.values = set()
+
+            def _explore(self, feature):
+                i = self.field_index
+                if not feature.IsFieldSet(i) or feature.IsFieldNull(i):
+                    self.result_ok = False
+                    return True
+
+                if self.field_type == ogr.OFTInteger:
+                    value = feature.GetFieldAsInteger(i)
+                elif self.field_type == ogr.OFTInteger64:
+                    value = feature.GetFieldAsInteger64(i)
+                else:
+                    raise NotImplementedError()
+
+                if value in self.values:
+                    self.result_ok = False
+                    return True
+                self.values.add(value)
 
         fid_field_index = None
         fid_field_found = False
@@ -335,7 +367,7 @@ class TableInfo(object):
                     if fld_type in (ogr.OFTInteger, ogr.OFTInteger64):
                         fid_field_index = idx
                         # Found FID field, should check for uniqueness
-                        # TODO
+                        UniquenessExplorer(fid_field_index, fld_type)
 
                         if fld_type == ogr.OFTInteger64:
                             # FID is int64, should check values for int32 range
@@ -392,6 +424,13 @@ class TableInfo(object):
                     fid_field_ok = False
                     if fix_errors == ERROR_FIX.NONE:
                         raise VE(message=_("Field '%s' is out of int32 range.") % fid_field_name)
+
+            if UniquenessExplorer.identity in explorer_registry:
+                uniqueness_explorer = explorer_registry[UniquenessExplorer.identity]
+                if not uniqueness_explorer.result_ok:
+                    fid_field_ok = False
+                    if fix_errors == ERROR_FIX.NONE:
+                        raise VE(message=_("Field '%s' contains non-unique or empty values.") % fid_field_name)
 
             if fid_field_ok:
                 self.fid_field_index = fid_field_index

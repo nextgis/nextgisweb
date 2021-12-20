@@ -260,16 +260,18 @@ def test_geom_field(ngw_resource_group):
     assert list(feature.fields.keys()) == ['geom_1']
 
 
-
-def test_id_int64(ngw_resource_group):
+@pytest.mark.parametrize('data', (
+    'int64', 'id-non-uniq', 'id-empty',
+))
+def test_id_field(data, ngw_resource_group):
     res = VectorLayer(
-        parent_id=ngw_resource_group, display_name='test-int64',
+        parent_id=ngw_resource_group, display_name=f'test-{data}',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
         tbl_uuid=uuid4().hex
     ).persist()
 
-    src = os.path.join(DATA_PATH, 'int64.geojson')
+    src = os.path.join(DATA_PATH, f'{data}.geojson')
     ds = ogr.Open(src)
     layer = ds.GetLayer(0)
 
