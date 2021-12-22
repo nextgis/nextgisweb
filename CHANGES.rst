@@ -8,6 +8,7 @@ Changes
 - WFS client and server simple filters support.
 - Cloud-optimized GeoTIFF (COG) support for raster layers.
 - Export feature layer using field display names instead of keynames.
+- Improved handling of vector layer sources with ``id`` and ``geom`` fields.
 - Unknown fields in REST API filters return an error.
 - Improved handling of external services errors.
 - Timeout for external services is set to 15 seconds.
