@@ -29,7 +29,7 @@ def _get_cors_olist():
         return None
 
 
-def is_cors_origin(request):
+def check_origin(request):
     # Origin header required in CORS requests
     origin = request.headers.get('Origin')
     if origin is None:
@@ -78,7 +78,7 @@ def cors_tween_factory(handler, registry):
         # the scope of this specification.
         # http://www.w3.org/TR/cors/#resource-preflight-requests
 
-        if is_api and request.is_cors_origin:
+        if is_api and request.check_origin():
             # If the value of the Origin header is not a
             # case-sensitive match for any of the values
             # in list of origins do not set any additional
@@ -406,7 +406,7 @@ def company_logo(request):
 
 
 def setup_pyramid(comp, config):
-    config.add_request_method(is_cors_origin, property=True)
+    config.add_request_method(check_origin)
 
     config.add_tween('nextgisweb.pyramid.api.cors_tween_factory', under=(
         'nextgisweb.pyramid.exception.handled_exception_tween_factory',

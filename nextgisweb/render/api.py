@@ -58,13 +58,13 @@ def image_response(img, empty_code, size):
     return Response(body_file=buf, content_type='image/png')
 
 
-def require_cors(request):
-    if request.env.render.options['cors_origin'] and not request.is_cors_origin:
+def check_origin(request):
+    if request.env.render.options['check_origin'] and not request.check_origin():
         raise HTTPForbidden("Origin not allowed.")
 
 
 def tile(request):
-    require_cors(request)
+    check_origin(request)
 
     z = int(request.GET['z'])
     x = int(request.GET['x'])
@@ -123,7 +123,7 @@ def tile(request):
 
 
 def image(request):
-    require_cors(request)
+    check_origin(request)
 
     p_extent = tuple(map(float, request.GET['extent'].split(',')))
     p_size = tuple(map(int, request.GET['size'].split(',')))
