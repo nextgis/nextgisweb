@@ -69,7 +69,11 @@ def image_response(img, empty_code, size):
 def check_origin(request):
     if request.env.render.options['check_origin']:
         origin = request.headers.get('Origin')
-        if origin is not None and not request.check_origin(origin):
+        if (
+            origin is not None
+            and not origin.startswith(request.application_url)
+            and not request.check_origin(origin)
+        ):
             raise InvalidOriginError()
 
 
