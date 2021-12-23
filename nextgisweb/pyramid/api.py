@@ -29,11 +29,9 @@ def _get_cors_olist():
         return None
 
 
-def check_origin(request):
-    # Origin header required in CORS requests
-    origin = request.headers.get('Origin')
+def check_origin(request, origin):
     if origin is None:
-        return False
+        raise ValueError("Agument origin must have a value")
 
     olist = _get_cors_olist()
 
@@ -65,6 +63,8 @@ def cors_tween_factory(handler, registry):
         response.headerlist.append((n, v))
 
     def cors_tween(request):
+        origin = request.headers.get('Origin')
+
         # Only request under /api/ are handled
         is_api = request.path_info.startswith('/api/')
 
@@ -78,14 +78,12 @@ def cors_tween_factory(handler, registry):
         # the scope of this specification.
         # http://www.w3.org/TR/cors/#resource-preflight-requests
 
-        if is_api and request.check_origin():
+        if is_api and origin is not None and request.check_origin(origin):
             # If the value of the Origin header is not a
             # case-sensitive match for any of the values
             # in list of origins do not set any additional
             # headers and terminate this set of steps.
             # http://www.w3.org/TR/cors/#resource-preflight-requests
-
-            origin = request.headers['Origin']
 
             # Access-Control-Request-Method header of preflight request
             method = request.headers.get('Access-Control-Request-Method')

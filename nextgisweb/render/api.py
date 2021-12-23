@@ -67,8 +67,10 @@ def image_response(img, empty_code, size):
 
 
 def check_origin(request):
-    if request.env.render.options['check_origin'] and not request.check_origin():
-        raise InvalidOriginError()
+    if request.env.render.options['check_origin']:
+        origin = request.headers.get('Origin')
+        if origin is not None and not request.check_origin(origin):
+            raise InvalidOriginError()
 
 
 def tile(request):
