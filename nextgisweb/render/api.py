@@ -7,11 +7,19 @@ from PIL import Image, ImageDraw, ImageFont
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden
 
-from ..core.exception import ValidationError
+from ..core.exception import ValidationError, UserException
 from ..resource import Resource, ResourceNotFound, DataScope, resource_factory
 
 from .interface import ILegendableStyle, IRenderableStyle
-from .util import af_transform
+from .util import af_transform, _
+
+
+class InvalidOriginError(UserException):
+    title = _("Invalid origin")
+    message = _(
+        "Origin validation is enabled for rendering requests, but the given "
+        "origin doesn't match with the CORS origins list.")
+    http_status_code = 403
 
 
 PD_READ = DataScope.read
@@ -60,7 +68,7 @@ def image_response(img, empty_code, size):
 
 def check_origin(request):
     if request.env.render.options['check_origin'] and not request.check_origin():
-        raise HTTPForbidden("Origin not allowed.")
+        raise InvalidOriginError()
 
 
 def tile(request):

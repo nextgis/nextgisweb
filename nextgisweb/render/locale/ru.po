@@ -1,32 +1,44 @@
-#: view.py:24
-msgid "External access"
-msgstr "Внешний доступ"
-
-#: amd/ngw-render/TileCacheWidget.js:27
+#: __init__.py:47 amd/ngw-render/TileCacheWidget.js:25
 msgid "Tile cache"
 msgstr "Тайловый кэш"
 
-#: amd/ngw-render/template/TileCacheWidget.hbs:9
+#: api.py:18
+msgid "Invalid origin"
+msgstr "Недопустимый источник"
+
+#: api.py:19
+msgid ""
+"Origin validation is enabled for rendering requests, but the given origin "
+"doesn't match with the CORS origins list."
+msgstr ""
+"Для запросов рендеринга включена проверка источника, однако указанный "
+"источник не совпадает со списком допустимых источников CORS."
+
+#: view.py:21
+msgid "External access"
+msgstr "Внешний доступ"
+
+#: amd/ngw-render/template/TileCacheWidget.hbs:11
 msgid "Enabled"
 msgstr "Включен"
 
-#: amd/ngw-render/template/TileCacheWidget.hbs:13
+#: amd/ngw-render/template/TileCacheWidget.hbs:16
 msgid "Allow using tiles in non-tile requests"
 msgstr "Разрешить тайлы для запросов изображений"
 
-#: amd/ngw-render/template/TileCacheWidget.hbs:18
+#: amd/ngw-render/template/TileCacheWidget.hbs:21
 msgid "Max zoom level"
 msgstr "Максимальный масштабный уровень"
 
-#: amd/ngw-render/template/TileCacheWidget.hbs:23
+#: amd/ngw-render/template/TileCacheWidget.hbs:26
 msgid "TTL, sec."
 msgstr "TTL, сек."
 
-#: amd/ngw-render/template/TileCacheWidget.hbs:28
+#: amd/ngw-render/template/TileCacheWidget.hbs:31
 msgid "Track changes"
 msgstr "Отслеживать изменения"
 
-#: amd/ngw-render/template/TileCacheWidget.hbs:34
+#: amd/ngw-render/template/TileCacheWidget.hbs:37
 msgid "Seed zoom level"
 msgstr "Заполнить масштабный уровень"
 
@@ -40,13 +52,13 @@ msgstr "TMS (Tile Map Service)"
 
 #: template/section_api_renderable.mako:12
 msgid ""
-"TMS (Tile Map Service) is a specification for tiled web maps. Tiled web "
-"map is a map displayed in a browser by seamlessly joining dozens of "
-"individually requested image."
+"TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map "
+"is a map displayed in a browser by seamlessly joining dozens of individually "
+"requested image."
 msgstr ""
-"TMS (Tile Map Service) - это спецификация тайловых карт.  Тайловая карта "
-"- это карта, отображаемая в браузере путем бесшовного соединения десятков"
-" индивидуально запрашиваемых изображений (тайлов)."
+"TMS (Tile Map Service) - это спецификация тайловых карт.  Тайловая карта - "
+"это карта, отображаемая в браузере путем бесшовного соединения десятков "
+"индивидуально запрашиваемых изображений (тайлов)."
 
 #: template/section_api_renderable.mako:17
 msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
@@ -55,3 +67,4 @@ msgstr "https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#render"
 #: template/section_api_renderable.mako:18
 msgid "Read more"
 msgstr "Подробнее"
+
