@@ -236,8 +236,8 @@ msgid "Select a dataset"
 msgstr "Выберите набор данных"
 
 #: amd/ngw-vector-layer/template/Widget.hbs:49
-msgid "Dataset should be in ESRI Shapefile (zip), GeoJSON, GML or KML format."
-msgstr "Данные должны быть в формате ESRI Shapefile (zip-архив), GeoJSON, GML или KML."
+msgid "Dataset should be in ESRI Shapefile (zip), GeoPackage, GeoJSON, GML or KML format."
+msgstr "Данные должны быть в формате ESRI Shapefile (zip-архив), GeoPackage, GeoJSON, GML или KML."
 
 #: amd/ngw-vector-layer/template/Widget.hbs:57
 msgid "Source layer"

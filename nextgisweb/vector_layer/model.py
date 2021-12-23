@@ -116,12 +116,13 @@ def translate(trstring):
 
 class DRIVERS:
     ESRI_SHAPEFILE = 'ESRI Shapefile'
+    GPKG = 'GPKG'
     GEOJSON = 'GeoJSON'
     KML = 'KML'
     LIBKML = 'LIBKML'
     GML = 'GML'
 
-    enum = (ESRI_SHAPEFILE, GEOJSON, KML, LIBKML, GML)
+    enum = (ESRI_SHAPEFILE, GPKG, GEOJSON, KML, LIBKML, GML)
 
 
 OPEN_OPTIONS = ('EXPOSE_FID=NO', )
