@@ -96,8 +96,7 @@ class CoreComponent(
         self.DBSession = DBSession
 
         # Methods for customization in components
-        self.system_full_name_default = self.options.get(
-            'system.full_name', self.localizer().translate(_('NextGIS geoinformation system')))
+        self.system_full_name_default = self.localizer().translate(_('NextGIS geoinformation system'))
         self.support_url_view = lambda request: self.options['support_url']
 
     def is_service_ready(self):
@@ -141,10 +140,13 @@ class CoreComponent(
         return dict(success=True)
 
     def initialize_db(self):
-        self.init_settings(self.identity, 'instance_id',
-                           self.options.get('provision.instance_id', str(uuid.uuid4())))
-        self.init_settings(self.identity, 'system.name',
-                           self.options.get('system.name', 'NextGIS Web'))
+        self.init_settings(self.identity, 'instance_id', self.options.get(
+            'provision.instance_id', str(uuid.uuid4())))
+
+        system_title = self.options['provision.system.title']
+        if system_title is not None:
+            # TODO: Rename system.full_name to system.title
+            self.init_settings(self.identity, 'system.full_name', system_title)
 
     def gtsdir(self, comp):
         """ Get component's file storage folder """
@@ -361,9 +363,6 @@ class CoreComponent(
         return os.path.join(self.options['backup.path'], filename)
 
     option_annotations = (
-        Option('system.name', default="NextGIS Web"),
-        Option('system.full_name', default=None),
-
         # Database options
         Option('database.host', default="localhost"),
         Option('database.port', int, default=5432),
@@ -417,6 +416,7 @@ class CoreComponent(
         # Other deployment settings
         Option('support_url', default="https://nextgis.com/contact/"),
         Option('provision.instance_id', default=None),
+        Option('provision.system.title', default=None),
 
         # Debug settings
         Option('debug', bool, default=False, doc=(
