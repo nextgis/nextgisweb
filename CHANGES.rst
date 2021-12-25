@@ -6,9 +6,14 @@ Changes
 
 - Support for CORS domain wildcards (like ``https://*.csb.app``).
 - WFS client and server simple filters support.
+- Reprojection into different coordinate systems in WMS and WFS services.
 - Cloud-optimized GeoTIFF (COG) support for raster layers.
 - Export feature layer using field display names instead of keynames.
 - Improved handling of vector layer sources with ``id`` and ``geom`` fields.
+- Ability to use field display names (aliases) while exporting vector layer.
+- Ability to filter NULL values in feature REST API.
+- Support for 25D geometries in PostGIS layers.
+- Wrapping around the dateline for tile-based layers on webmaps.
 - Unknown fields in REST API filters return an error.
 - Improved handling of external services errors.
 - Timeout for external services is set to 15 seconds.
