@@ -1,5 +1,5 @@
 import ngwdocker
-ngwdocker.require_version('>=2.0.0.dev14')
+ngwdocker.require_version('>=2.0.0.dev16')
 
 from pathlib import Path
 
@@ -9,22 +9,7 @@ from ngwdocker.util import copyfiles
 
 
 class Package(PackageBase):
-
-    # TODO: Remove legacy method
-    def debpackages(self):
-        return (
-            'libgdal-dev',
-            'libgeos-dev',
-            'gdal-bin',
-            'g++',
-            'libxml2-dev',
-            'libxslt1-dev',
-            'zlib1g-dev',
-            'libjpeg-turbo8-dev',
-            'nodejs',
-            'postgresql-client',
-            'libmagic-dev',
-        )
+    pass
 
 
 @AppImage.on_user_dir.handler
