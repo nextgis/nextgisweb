@@ -376,11 +376,11 @@ class CoreComponent(
         Option('database.pool.recycle', timedelta, default=None, doc=(
             "Recycle connections after the given time delta.")),
 
-        Option('database_test.host'),
-        Option('database_test.port', int),
-        Option('database_test.name'),
-        Option('database_test.user'),
-        Option('database_test.password', secure=True),
+        Option('test.database.host'),
+        Option('test.database.port', int),
+        Option('test.database.name'),
+        Option('test.database.user'),
+        Option('test.database.password', secure=True),
 
         # Data storage
         Option('sdir', required=True, doc=(
