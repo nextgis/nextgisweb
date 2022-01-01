@@ -10,7 +10,6 @@ from pathlib import Path
 
 from psutil import Process
 from pyramid.response import Response, FileResponse
-from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
@@ -244,11 +243,6 @@ def setup_pyramid(comp, config):
 
     # Session factory
     config.set_session_factory(WebSession)
-
-    # Empty authorization policy. Why do we need this?
-    # NOTE: Authentication policy is set up in then authentication component!
-    authz_policy = ACLAuthorizationPolicy()
-    config.set_authorization_policy(authz_policy)
 
     _setup_pyramid_debugtoolbar(comp, config)
     _setup_pyramid_tm(comp, config)

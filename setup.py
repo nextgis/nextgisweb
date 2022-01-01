@@ -39,7 +39,7 @@ requires = [
     'psycopg2==2.9.2',
     'pygdal' + (('==%s.*' % gv) if gv else ''),  # TODO: Add >=2.3.0
     'pyproj==3.3.0',
-    'pyramid==1.10.8',
+    'pyramid==2.0',
     'pyramid_debugtoolbar==4.9',
     'pyramid_mako==1.1.0',
     'pyramid_tm==2.4',

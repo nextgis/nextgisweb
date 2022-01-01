@@ -4,7 +4,8 @@ from base64 import b64decode
 
 from zope.interface import implementer
 from sqlalchemy.orm.exc import NoResultFound
-from pyramid.interfaces import IAuthenticationPolicy
+from pyramid.interfaces import ISecurityPolicy
+from pyramid.authorization import ACLHelper
 from pyramid.httpexceptions import HTTPUnauthorized
 
 from ..lib.config import OptionAnnotations, Option
@@ -15,19 +16,17 @@ from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, 
 from .oauth import OAuthTokenRefreshException
 
 
-@implementer(IAuthenticationPolicy)
-class AuthenticationPolicy(object):
+@implementer(ISecurityPolicy)
+class SecurityPolicy(object):
 
     def __init__(self, comp, options):
         self.comp = comp
         self.oauth = comp.oauth
         self.options = options
         self.test_user = None
+        self.acl_helper = ACLHelper()
 
-    def unauthenticated_userid(self, request):
-        return None
-
-    def authenticated_userid(self, request):
+    def identity(self, request):
         # Override current user in tests via ngw_auth_administrator fixture
         if self.test_user is not None:
             return User.by_keyname(self.test_user).id
@@ -114,10 +113,13 @@ class AuthenticationPolicy(object):
 
         return None
 
-    def effective_principals(self, request):
-        return []
+    def authenticated_userid(self, request):
+        return self.identity(request)
 
-    def remember(self, request, what):
+    def permits(self, request, context, permission):
+        return self.acl_helper.permits(context, [], permission)
+
+    def remember(self, request, what, **kw):
         session = request.session
         user_id, tresp = what
         if user_id is None:
@@ -141,7 +143,7 @@ class AuthenticationPolicy(object):
 
         return ()
 
-    def forget(self, request):
+    def forget(self, request, **kw):
         session = request.session
 
         for k in ('current', 'access_token', 'refresh_token'):

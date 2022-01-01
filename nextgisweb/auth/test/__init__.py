@@ -1,12 +1,12 @@
 import pytest
-from pyramid.interfaces import IAuthenticationPolicy
+from pyramid.interfaces import ISecurityPolicy
 
 
 @pytest.fixture()
 def ngw_auth_administrator(ngw_pyramid_config):
-    policy = ngw_pyramid_config.registry.getUtility(IAuthenticationPolicy)
+    policy = ngw_pyramid_config.registry.getUtility(ISecurityPolicy)
 
-    assert policy.test_user is None, "Authentication policy test_used is already defined!"
+    assert policy.test_user is None, "Security policy test_used is already defined!"
 
     policy.test_user = 'administrator'
     yield
