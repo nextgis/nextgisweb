@@ -32,3 +32,25 @@ export class ServerResponseError extends BaseAPIError {
         this.data = data;
     }
 }
+
+export class LunkwillError extends BaseError {
+    constructor(message, data = {}) {
+        super(message !== undefined ? message : i18n.gettext(
+            "Unexpected error while processing long-running request."
+        ));
+        this.title = i18n.gettext("Long-running request error");
+        this.data = data;
+    }
+}
+
+export class LunkwillRequestCancelled extends LunkwillError {
+    constructor(data) {
+        super(i18n.gettext("Long-running request was cancelled."), data);
+    }
+}
+
+export class LunkwillRequestFailed extends LunkwillError {
+    constructor(data) {
+        super(undefined, data);
+    }
+}
