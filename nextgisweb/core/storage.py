@@ -44,6 +44,26 @@ class StorageComponentMixin(object):
         sa.event.listen(DBSession, 'after_flush', self._flush_reservations)
         sa.event.listen(DBSession, 'before_commit', self._flush_reservations)
 
+    def check_limit(self, volume_reserve=0):
+        volume_limit = self.options['storage.limit']
+        if volume_limit is None:
+            return
+
+        session = DBSession()
+        reservations = session.info.get('storage_reservations')
+        if reservations is None:
+            current_reserve = 0
+        else:
+            current_reserve = sum(res['value_data_volume'] for res in reservations)
+
+        if session.info.get('current_total') is None:
+            with DBSession.no_autoflush:
+                result = self.query_storage(where=dict(kind_of_data=lambda col: col == ''))
+            session.info['current_total'] = result['']['data_volume']
+
+        if session.info['current_total'] + current_reserve + volume_reserve > volume_limit:
+            raise StorageLimitExceeded()
+
     def reserve_storage(self, component, kind_of_data, value_data_volume=None, resource=None):
         if not self.options['storage.enabled']:
             return
@@ -55,6 +75,8 @@ class StorageComponentMixin(object):
 
         # For now we reserve data volume only
         if value_data_volume is not None:
+            self.check_limit(volume_reserve=value_data_volume)
+
             reservations.append(dict(
                 component=component,
                 kind_of_data=kind_of_data,
@@ -92,7 +114,7 @@ class StorageComponentMixin(object):
             sa.func.MIN(sa.column('estimated')).label('estimated'),
             sa.func.MAX(sa.column('updated')).label('updated'),
             # Dunno why, but w/o this cast postgres generates the numeric type
-            sa.func.SUM(sa.column('data_volume')).cast(
+            sa.func.coalesce(sa.func.SUM(sa.column('data_volume')), 0).cast(
                 sa.BigInteger).label('data_volume'))
 
         agg = sa.select((source.c.kind_of_data,) + agg_cols).group_by(
@@ -187,6 +209,9 @@ class StorageComponentMixin(object):
         if reservations is None or len(reservations) == 0:
             return
 
+        self.check_limit()
+        session.info['current_total'] = None
+
         tstamp = datetime.utcnow()
         session.connection().execute(storage_stat_delta.insert(), [dict(
             tstamp=tstamp,
@@ -212,6 +237,11 @@ STORAGE_TABLES = (
 LOCK_TABLE = "'core_storage_stat_dimension'::regclass::int"
 SQL_LOCK = "SELECT pg_advisory_xact_lock({}, 0)".format(LOCK_TABLE)
 SQL_TRY_LOCK = "SELECT pg_try_advisory_xact_lock({}, 0)".format(LOCK_TABLE)
+
+
+class StorageLimitExceeded(UserException):
+    title = _("Storage limit exceeded")
+    http_status_code = 402
 
 
 class EstimationAlreadyRunning(UserException):

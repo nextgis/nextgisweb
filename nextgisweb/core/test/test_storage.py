@@ -7,7 +7,7 @@ from freezegun import freeze_time
 
 from nextgisweb.auth import User
 from nextgisweb.core import KindOfData
-from nextgisweb.core.storage import SQL_LOCK
+from nextgisweb.core.storage import SQL_LOCK, StorageLimitExceeded
 from nextgisweb.feature_attachment import FeatureAttachmentData
 from nextgisweb.models import DBSession
 from nextgisweb.spatial_ref_sys import SRS
@@ -145,3 +145,12 @@ def test_storage_estimate_all(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_
 
     with transaction.manager:
         DBSession.delete(res)
+
+
+def test_storage_limit(ngw_env):
+    core = ngw_env.core
+    with core.options.override({'storage.limit': 100}):
+        core.reserve_storage('test_comp', TestKOD1, value_data_volume=50)
+        with pytest.raises(StorageLimitExceeded):
+            core.reserve_storage('test_comp', TestKOD1, value_data_volume=60)
+        core.reserve_storage('test_comp', TestKOD1, value_data_volume=40)

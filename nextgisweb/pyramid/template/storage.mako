@@ -24,6 +24,7 @@ def format_size(v):
 <%
     data = request.env.core.query_storage()
     total = data.get("")
+    limit = request.env.core.options['storage.limit']
 
     estimation_running = request.env.core.estimation_running()
 %>
@@ -52,6 +53,12 @@ def format_size(v):
                         <th style="text-align: inherit;">${tr(_("Total"))}</th>
                         <th style="text-align: right;">${format_size(total["data_volume"])}</th>
                     </tr>
+                    %if limit is not None:
+                        <tr>
+                            <th style="text-align: inherit;">${tr(_("Limit"))}</th>
+                            <th style="text-align: right;">${format_size(limit)}</th>
+                        </tr>
+                    %endif
                 </tfoot>
             </table>
         </div>
