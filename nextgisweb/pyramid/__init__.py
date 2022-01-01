@@ -23,6 +23,7 @@ from .util import (
 from .model import Base, Session, SessionStore
 from .session import WebSession
 from .command import ServerCommand, AMDPackagesCommand  # NOQA
+from .util import _
 
 __all__ = ['viewargs', 'WebSession']
 
@@ -130,6 +131,16 @@ class PyramidComponent(Component):
             deleted_sessions = Session.filter(Session.last_activity < actual_date).delete()
 
         logger.info("Deleted: %d sessions", deleted_sessions)
+
+    def sys_info(self):
+        try:
+            import uwsgi
+            yield ("uWSGI", uwsgi.version.decode())
+        except ImportError:
+            pass
+
+        lunkwill = self.options['lunkwill.enabled']
+        yield ("Lunkwill", _("Enabled") if lunkwill else _("Disabled"))
 
     def backup_configure(self, config):
         super().backup_configure(config)
