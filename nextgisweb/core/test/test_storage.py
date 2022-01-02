@@ -5,13 +5,13 @@ import pytest
 import transaction
 from freezegun import freeze_time
 
-from nextgisweb.auth import User
-from nextgisweb.core import KindOfData
-from nextgisweb.core.storage import SQL_LOCK, StorageLimitExceeded
-from nextgisweb.feature_attachment import FeatureAttachmentData
-from nextgisweb.models import DBSession
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.vector_layer import VectorLayer
+from ...auth import User
+from ...feature_attachment import FeatureAttachmentData
+from ...models import DBSession
+from ...spatial_ref_sys import SRS
+from ...vector_layer import VectorLayer
+from .. import KindOfData
+from ..storage import SQL_LOCK, StorageLimitExceeded
 
 
 class TestKOD1(KindOfData):
@@ -36,23 +36,27 @@ def prepare_storage(ngw_env):
 @pytest.fixture(scope='module', autouse=True)
 def reset_storage(ngw_env):
     yield
-    ngw_env.core.estimate_storage_all()
+
+    if ngw_env.core.options['storage.enabled']:
+        ngw_env.core.estimate_storage_all()
 
 
 def test_storage(ngw_env, ngw_webtest_app, ngw_auth_administrator):
     reserve_storage = ngw_env.core.reserve_storage
     with freeze_time() as dt, transaction.manager:
-        assert 'storage_reservations' not in DBSession().info
+        assert 'storage.res' not in DBSession().info
 
         reserve_storage('test_comp_1', TestKOD1, value_data_volume=100)
         reserve_storage('test_comp_1', TestKOD2, value_data_volume=20)
         reserve_storage('test_comp_2', TestKOD1, value_data_volume=400)
         reserve_storage('test_comp_2', TestKOD2, value_data_volume=80)
 
-        assert 'storage_reservations' in DBSession().info
-        assert len(DBSession().info['storage_reservations']) == 4
+        assert 'storage.txn' in DBSession().info
+        assert 'storage.res' in DBSession().info
+        assert len(DBSession().info['storage.res']) == 4
 
-    assert len(DBSession().info['storage_reservations']) == 0
+    assert 'storage.txn' not in DBSession().info
+    assert 'storage.res' not in DBSession().info
 
     cur = ngw_env.core.query_storage()
     assert cur[''] == dict(
@@ -147,10 +151,17 @@ def test_storage_estimate_all(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_
         DBSession.delete(res)
 
 
-def test_storage_limit(ngw_env):
+def test_storage_limit_exceeded(ngw_env):
     core = ngw_env.core
-    with core.options.override({'storage.limit': 100}):
-        core.reserve_storage('test_comp', TestKOD1, value_data_volume=50)
-        with pytest.raises(StorageLimitExceeded):
-            core.reserve_storage('test_comp', TestKOD1, value_data_volume=60)
-        core.reserve_storage('test_comp', TestKOD1, value_data_volume=40)
+    with transaction.manager:
+        with core.options.override({'storage.limit': 100}):
+            core.reserve_storage('test_comp', TestKOD1, value_data_volume=50)
+            with pytest.raises(StorageLimitExceeded):
+                core.reserve_storage('test_comp', TestKOD1, value_data_volume=60)
+            core.reserve_storage('test_comp', TestKOD1, value_data_volume=40)
+        assert DBSession().info['storage.txn'] == 90
+
+    with transaction.manager:
+        with core.options.override({'storage.limit': 50}):
+            with pytest.raises(StorageLimitExceeded):
+                core.check_storage_limit()
