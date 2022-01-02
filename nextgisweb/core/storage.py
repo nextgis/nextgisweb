@@ -9,7 +9,7 @@ from ..lib.logging import logger
 from ..models import DBSession
 from ..registry import registry_maker
 
-from .util import _
+from .util import _, format_size
 from .exception import UserException
 from .model import (
     storage_stat_dimension,
@@ -258,7 +258,7 @@ class StorageLimitExceeded(UserException):
                 message=_(
                     "The operation cann't be performed because the storage "
                     "limit (%s) has been already exceeded by %s."
-                ) % (str(limit), str(total - limit)),
+                ) % (format_size(limit), format_size(total - limit)),
                 data=data)
         else:
             # TODO: Humanize output of sizes
@@ -267,7 +267,7 @@ class StorageLimitExceeded(UserException):
                 message=_(
                     "The operation requires %s of storage and cann't be "
                     "performed because only %s available."
-                ) % (str(requested), str(limit - total)),
+                ) % (format_size(requested), format_size(limit - total)),
                 data=data)
 
 

@@ -3,21 +3,12 @@
 <%! from nextgisweb.pyramid.util import _ %>
 <%! from nextgisweb.core import KindOfData %>
 <%! from markupsafe import Markup %>
+<%! from humanize import naturalsize %>
 
 <%!
 
-SIZE_UNITS = (
-    ('GiB', 1 << 30, 1),
-    ('MiB', 1 << 20, 1),
-    ('KiB', 1 << 10, 0),
-    ('B', 1, 0),
-)
-
 def format_size(v):
-    for u, l, d in SIZE_UNITS:
-        if v >= l:
-            return "{:.0{}f} {}".format(float(v) / l, d, u)
-    return Markup('&nbsp;')
+    return Markup(naturalsize(v, binary=True, format='%.0f').replace(' ', '&nbsp;'))
 
 %>
 
@@ -55,8 +46,12 @@ def format_size(v):
                     </tr>
                     %if limit is not None:
                         <tr>
-                            <th style="text-align: inherit;">${tr(_("Limit"))}</th>
-                            <th style="text-align: right;">${format_size(limit)}</th>
+                            <th style="text-align: inherit;">${tr(_("Usage"))}</th>
+                            <th style="text-align: right;">
+                                ${'%.0f%%' % (100 * total["data_volume"] / limit)}
+                                ${tr(_("of"))}
+                                ${format_size(limit)}
+                            </th>
                         </tr>
                     %endif
                 </tfoot>
