@@ -103,16 +103,6 @@ addPackage("proj4", {
 
 addPackage("codemirror");
 
-addPackage("svg4everybody", {
-    from: "dist/svg4everybody.js",
-    to: "svg4everybody.js",
-});
-
-addPackage("ie11-custom-properties", {
-    from: "ie11CustomProperties.js",
-    to: "ie11CustomProperties.js",
-});
-
 addPackage("jquery", {
     from: "dist/jquery.min.js",
     to: "jquery/jquery-3.2.1.min.js",

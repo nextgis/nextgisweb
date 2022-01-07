@@ -23,7 +23,6 @@
     </title>
 
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <%include file="nextgisweb:social/template/meta.mako" args="title=page_title"/>
 
@@ -44,12 +43,6 @@
 
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
     <script src="${request.route_url('jsrealm.dist', subpath='main/chunk/runtime.js')}"></script>
-
-    <script>
-        window.MSInputMethodContext && 
-        document.documentMode && 
-        require(["ie11-custom-properties/ie11CustomProperties"]);
-    </script>
     
     %if hasattr(self, 'assets'):
         ${self.assets()}

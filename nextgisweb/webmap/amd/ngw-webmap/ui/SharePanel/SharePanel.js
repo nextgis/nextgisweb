@@ -16,7 +16,6 @@ define([
     "dojox/dtl/_base",
     "dojox/dtl/Context",
     "dojo/text!./SharePanel.hbs",
-    "svg4everybody/svg4everybody",
 
     //templates
     "xstyle/css!./SharePanel.css",
@@ -37,8 +36,7 @@ define([
     Permalink,
     dtl,
     dtlContext,
-    template,
-    svg4everybody
+    template
 ) {
     return declare(
         [
@@ -76,7 +74,6 @@ define([
                     this.contentWidget.socialNetworks.style.display = "none";
                 }
 
-                svg4everybody();
                 this.contentWidget.mapWidthControl.on(
                     "change",
                     lang.hitch(this, function () {

@@ -94,8 +94,6 @@ def amd_packages():
             'jed',
             'proj4',
             'codemirror',
-            'svg4everybody',
-            'ie11-custom-properties',
 
             'jquery',
         )

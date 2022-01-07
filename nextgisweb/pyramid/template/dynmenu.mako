@@ -4,20 +4,6 @@
 
 <% from nextgisweb import dynmenu as dm %>
 
-<script>
-    require([
-        "dojo/ready",
-        "svg4everybody/svg4everybody"
-    ], function(
-        ready,
-        svg4everybody
-    ){
-        ready(function() {
-            svg4everybody();
-        });
-    });
-</script>
-
 <ul class="sidebar-menu list-unstyled">
 <% label = None %>
 %for item in dynmenu.build(args):

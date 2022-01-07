@@ -10,20 +10,6 @@
 
 <%namespace file="nextgisweb:pyramid/template/util.mako" import="icon"/>
 
-<script>
-    require([
-        "dojo/ready",
-        "svg4everybody/svg4everybody"
-    ], function(
-        ready,
-        svg4everybody
-    ){
-        ready(function() {
-            svg4everybody();
-        });
-    });
-</script>
-
 <%def name="child_group(children)">
     <tbody>
         %for item in children:
