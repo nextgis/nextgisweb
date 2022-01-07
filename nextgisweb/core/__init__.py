@@ -399,6 +399,8 @@ class CoreComponent(
 
         # Estimate storage
         Option('storage.enabled', bool, default=False),
+        Option('storage.limit', int, default=None, doc=(
+            "Storage limit in bytes.")),
 
         # Ignore packages and components
         Option('packages.ignore', doc=(

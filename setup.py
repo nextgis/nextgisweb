@@ -28,6 +28,7 @@ requires = [
     'flatdict==4.0.1',
     'geoalchemy2==0.9.4',
     'geojson==2.5.0',
+    'humanize==3.13.1',
     'lxml==4.6.4',
     'numpy',
     'networkx',
