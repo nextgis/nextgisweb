@@ -22,5 +22,6 @@ module.exports = {
     rootPath: path.resolve(configRoot),
     distPath: path.resolve(configRoot + "/dist"),
     externals: env.npm_package_config_nextgisweb_jsrealm_externals.split(","),
+    targets: JSON.parse(env.npm_package_config_nextgisweb_jsrealm_targets),
     packages: packages,
 };

@@ -83,7 +83,6 @@ module.exports = {
     entry: entry,
     devtool: "source-map",
     mode: config.debug ? "development" : "production",
-    target: ["web", "es5"],
     module: {
         rules: [
             {
@@ -113,13 +112,7 @@ module.exports = {
                         [
                             "@babel/preset-env",
                             {
-                                targets: {
-                                    firefox: "78",
-                                    chrome: "87",
-                                    edge: "88",
-                                    safari: "13",
-                                    ie: "11",
-                                },
+                                targets: config.targets,
                             },
                         ],
                     ],

@@ -88,7 +88,6 @@ module.exports = {
     mode: config.debug ? "development" : "production",
     devtool: config.debug ? "source-map" : false,
     entry: entrypointList,
-    target: ["web", "es5"],
     module: {
         rules: entrypointRules.concat([
             {
@@ -107,13 +106,7 @@ module.exports = {
                                     // debug: config.debug,
                                     corejs: { version: 3 },
                                     useBuiltIns: "usage",
-                                    targets: {
-                                        firefox: "78",
-                                        chrome: "87",
-                                        edge: "88",
-                                        safari: "13",
-                                        ie: "11",
-                                    },
+                                    targets: config.targets,
                                 },
                             ],
                         ],
