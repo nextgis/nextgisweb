@@ -5,6 +5,7 @@ Changes
 -----
 
 - Support for CORS domain wildcards (like ``https://*.csb.app``).
+- Browser compatibility test and dropping support for Internet Explorer.
 - WFS client and server simple filters support.
 - Reprojection into different coordinate systems in WMS and WFS services.
 - Cloud-optimized GeoTIFF (COG) support for raster layers.

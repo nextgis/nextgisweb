@@ -6,10 +6,11 @@ import transaction
 from babel import Locale
 from babel.core import UnknownLocaleError
 
-from ..lib.config import Option
+from ..lib.config import Option, OptionAnnotations
 from ..lib.logging import logger
 from ..component import Component, require
 
+from . import uacompat
 from .config import Configurator
 from .util import (
     viewargs,
@@ -53,9 +54,10 @@ class PyramidComponent(Component):
 
     @require('resource')
     def setup_pyramid(self, config):
-        from . import view, api
+        from . import view, api, uacompat as uac
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
+        uac.setup_pyramid(self, config)
 
     def client_settings(self, request):
         result = dict()
@@ -98,7 +100,7 @@ class PyramidComponent(Component):
         config.exclude_table_data('public', Session.__tablename__)
         config.exclude_table_data('public', SessionStore.__tablename__)
 
-    option_annotations = (
+    option_annotations = OptionAnnotations((
         Option('help_page.enabled', bool, default=True),
         Option('help_page.url', default="https://nextgis.com/redirect/{lang}/help/"),
 
@@ -122,4 +124,4 @@ class PyramidComponent(Component):
         Option('debugtoolbar.hosts'),
 
         Option('legacy_locale_switcher', bool, default=False),
-    )
+    )) + uacompat.option_annotations

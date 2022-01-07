@@ -390,3 +390,78 @@ msgstr "Версия"
 #: template/sysinfo.mako:60
 msgid "Platform"
 msgstr "Платформа"
+
+#: template/uacompat.mako:8
+msgid "Browser compatibility test"
+msgstr "Проверка совместимости браузера"
+
+#: template/uacompat.mako:60
+#, python-format
+msgid "%(name)s %(current)s supported"
+msgstr "%(name)s %(current)s поддерживается"
+
+#: template/uacompat.mako:61
+msgid ""
+"Web GIS browser compatibility test has been passed! The Web GIS should work "
+"fine."
+msgstr "Проверка совместимости браузера пройдена! Веб ГИС должна работать корректно."
+
+#: template/uacompat.mako:64
+#, python-format
+msgid "%(name)s not supported"
+msgstr "%(name)s не поддерживается"
+
+#: template/uacompat.mako:65
+#, python-format
+msgid ""
+"You're using %(name)s although it's not supported by the Web GIS. It's an "
+"outdated browser lacking required features. Try a different browser or "
+"contact your system administrator if another browser isn't available."
+msgstr ""
+"Вы используете %(name)s, хотя он не поддерживается Веб ГИС. Это устаревший "
+"браузер не обладащий рядом необходимых функций. Попробуйте использовать "
+"другой браузер или свяжитесь с вашим системным администратором если другой "
+"браузер недоступен."
+
+#: template/uacompat.mako:67
+#, python-format
+msgid "%(name)s %(current)s not supported"
+msgstr "%(name)s %(current)s не поддерживается"
+
+#: template/uacompat.mako:68
+#, python-format
+msgid ""
+"You're using %(name)s %(current)s although it's not supported by the Web GIS."
+" It's an outdated version lacking required features. Contact your system "
+"administrator for upgrading to %(name)s %(required)s+ or try a different "
+"browser."
+msgstr ""
+"Вы используете %(name)s %(current)s, хотя он не поддерживается Веб ГИС. Это "
+"устаревшая версия браузера, не обладащая рядом необходимых функций. Свяжитесь"
+" с вашим системным администратором для обновления или попробуйте использовать"
+" другой браузер."
+
+#: template/uacompat.mako:72
+msgid ""
+"If you still want to continue using the current browser, click the link below"
+" to bypass the compatibility test. The Web GIS or some features may degrade "
+"or fail  in this case."
+msgstr ""
+"Если вы все же хотите продолжить использование Веб ГИС с текущий браузером, "
+"нажмите на ссылку ниже, чтобы пропустить проверку совместимости. Веб ГИС или "
+"часть ее функций могут работать некорректно в этом случае."
+
+#: template/uacompat.mako:73
+msgid "I understood but want to proceed at my own risk. Skip the test!"
+msgstr "Понятно, но я хочу продолжить на свой страх и риск. Пропустить тест!"
+
+#: template/uacompat.mako:75
+msgid "Unknown browser"
+msgstr "Неизвестный браузер"
+
+#: template/uacompat.mako:76
+msgid "If you are using an up-to-date browser the Web GIS should be fine."
+msgstr ""
+"Если вы используете актуальную версию браузера, Веб ГИС будет работать "
+"нормально."
+

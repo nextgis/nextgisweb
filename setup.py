@@ -49,6 +49,7 @@ requires = [
     'shapely==1.8.0',
     'SQLAlchemy==1.3.24',
     'transaction==3.0.1',
+    'ua-parser==0.10.0',
     'waitress==2.0.0',
     'zipstream-new==1.1.8',
     'zope.sqlalchemy==1.6',
