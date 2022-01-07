@@ -38,7 +38,33 @@ msgstr "Операционная ошибка"
 msgid "External service error"
 msgstr "Ошибка внешнего сервиса"
 
-#: storage.py:222
+#: storage.py:257
+msgid "Storage full"
+msgstr "Хранилище переполнено"
+
+#: storage.py:258
+#, python-format
+msgid ""
+"The operation cann't be performed because the storage limit (%s) has been "
+"already exceeded by %s."
+msgstr ""
+"Операция не может быть выполнена, так как лимит использования хранилища (%s) "
+"уже превышен на %s."
+
+#: storage.py:266
+msgid "Not enough storage"
+msgstr "Недостаточно места в хранилище"
+
+#: storage.py:267
+#, python-format
+msgid ""
+"The operation requires %s of storage and cann't be performed because only %s "
+"available."
+msgstr ""
+"Операция не может быть выполнена, так как для ее выполнения требуется %s в "
+"хранилище, однако доступно только %s."
+
+#: storage.py:275
 msgid "Estimation is already running"
 msgstr "Процесс оценки хранилища уже запущен"
 

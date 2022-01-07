@@ -346,7 +346,15 @@ msgstr "Размер"
 msgid "Total"
 msgstr "Итого"
 
-#: template/storage.mako:74
+#: template/storage.mako:49
+msgid "Usage"
+msgstr "Использовано"
+
+#: template/storage.mako:52
+msgid "of"
+msgstr "из"
+
+#: template/storage.mako:76
 #, python-format
 msgid "Storage usage was fully estimated at %s and updated at %s."
 msgstr "Использование хранилища было полностью оценено в %s и обновлено в %s."
