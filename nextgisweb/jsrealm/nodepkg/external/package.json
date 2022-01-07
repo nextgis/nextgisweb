@@ -18,7 +18,7 @@
         "handlebars": "^3.0.3",
         "jed": "^1.1.1",
         "jquery": "3.2.1",
-        "ol": "6.9.x",
+        "ol": "6.10.x",
         "proj4": "^2.7.2",
         "put-selector": "^0.3.6",
         "string-replace-loader": "^3.0.1",

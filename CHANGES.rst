@@ -19,7 +19,7 @@ Changes
 - Improved handling of external services errors.
 - Timeout for external services is set to 15 seconds.
 - Pyramid library upgraded to 2.0.0.
-- OpenLayers library upgraded to 6.9.0.
+- OpenLayers library upgraded to 6.10.0.
 
 
 4.0.0
