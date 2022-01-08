@@ -6,9 +6,9 @@ from functools import lru_cache
 from subprocess import check_call, check_output
 import io
 import json
-from distutils.version import LooseVersion
 
 import sqlalchemy as sa
+from packaging.version import Version
 
 from ..lib.logging import logger
 from ..registry import registry_maker
@@ -93,13 +93,13 @@ BackupMetadata = namedtuple('BackupMetadata', ['filename', 'timestamp', 'size'])
 
 
 def parse_pg_dump_version(output):
-    """ Parse output of pg_dump --version to LooseVersion """
+    """ Parse output of pg_dump --version to Version """
     output = output.strip()
     output = re.sub(r'\(.*?\)', ' ', output)
     m = re.search(r'\d+(?:\.\d+){1,}', output)
     if m is None:
         raise ValueError("Unrecognized pg_dump output!")
-    return LooseVersion(m.group(0))
+    return Version(m.group(0))
 
 
 def pg_connection_options(env):
