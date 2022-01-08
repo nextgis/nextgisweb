@@ -49,11 +49,5 @@ def create_feature_layer(ogrlayer, parent_id, ngw_httptest_app):
             DBSession.flush()
 
             layer.setup()
-
-        try:
-            yield layer
-        finally:
-            with transaction.manager:
-                DBSession.delete(WFSLayer.filter_by(id=layer.id).one())
-                DBSession.delete(WFSConnection.filter_by(id=connection.id).one())
-                DBSession.delete(WFSService.filter_by(id=service.id).one())
+        
+        yield layer

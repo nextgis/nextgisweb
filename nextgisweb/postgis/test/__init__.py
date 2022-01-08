@@ -115,8 +115,5 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
     try:
         yield layer
     finally:
-        with transaction.manager:
-            DBSession.delete(PostgisLayer.filter_by(id=layer.id).one())
-            DBSession.delete(PostgisConnection.filter_by(id=connection.id).one())
         meta.drop_all(engine)
         engine.dispose()

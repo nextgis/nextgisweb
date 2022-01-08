@@ -24,8 +24,4 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
 
         DBSession.flush()
 
-    try:
-        yield layer
-    finally:
-        with transaction.manager:
-            DBSession.delete(VectorLayer.filter_by(id=layer.id).one())
+    yield layer
