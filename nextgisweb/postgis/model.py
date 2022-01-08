@@ -1,6 +1,8 @@
 import geoalchemy2 as ga
 import re
+import sqlalchemy.sql as sql
 from shapely.geometry import box
+from sqlalchemy import text, func
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.engine.url import (
     URL as EngineURL,
@@ -93,7 +95,7 @@ class PostgisConnection(Base, Resource):
         args = dict(connect_args=dict(
             connect_timeout=connect_timeout,
             options='-c statement_timeout=%d' % statement_timeout_ms))
-        engine_url = make_engine_url(EngineURL(
+        engine_url = make_engine_url(EngineURL.create(
             'postgresql+psycopg2',
             host=self.hostname, port=self.port, database=self.database,
             username=self.username, password=self.password))
@@ -206,24 +208,24 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         conn = self.connection.get_connection()
 
         try:
-            result = conn.execute(
+            result = conn.execute(text(
                 """SELECT * FROM information_schema.tables
-                WHERE table_schema = %s AND table_name = %s""",
-                self.schema, self.table)
+                WHERE table_schema = :s AND table_name = :t"""),
+                dict(s=self.schema, t=self.table))
 
             tableref = '%s.%s' % (self.schema, self.table)
 
             if result.first() is None:
                 raise ValidationError(_("Table '%(table)s' not found!") % dict(table=tableref)) # NOQA
 
-            result = conn.execute(
+            result = conn.execute(text(
                 """SELECT type, coord_dimension, srid FROM geometry_columns
-                WHERE f_table_schema = %s
-                    AND f_table_name = %s
-                    AND f_geometry_column = %s""",
-                self.schema, self.table, self.column_geom)
+                WHERE f_table_schema = :s
+                    AND f_table_name = :t
+                    AND f_geometry_column = :column"""),
+                dict(s=self.schema, t=self.table, column=self.column_geom))
 
-            row = result.first()
+            row = result.mappings().first()
 
             if row:
                 geometry_srid = row['srid']
@@ -262,17 +264,17 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 if self.geometry_type is None:
                     self.geometry_type = tab_geom_type
 
-            result = conn.execute(
+            result = conn.execute(text(
                 """SELECT column_name, data_type
                 FROM information_schema.columns
-                WHERE table_schema = %s AND table_name = %s
-                ORDER BY ordinal_position""",
-                self.schema, self.table)
+                WHERE table_schema = :s AND table_name = :t
+                ORDER BY ordinal_position"""),
+                dict(s=self.schema, t=self.table))
 
             colfound_id = False
             colfound_geom = False
 
-            for row in result:
+            for row in result.mappings():
                 if row['column_name'] == self.column_id:
                     if row['data_type'] not in ['integer', 'bigint']:
                         raise ValidationError(_("To use column as ID it should have integer type!"))  # NOQA
@@ -378,7 +380,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 values[f.keyname] = feature.fields[f.keyname]
 
         if feature.geom is not None:
-            values[self.column_geom] = db.func.st_transform(
+            values[self.column_geom] = func.st_transform(
                 ga.elements.WKBElement(bytearray(feature.geom.wkb), srid=self.srs_id),
                 self.geometry_srid)
 
@@ -459,14 +461,14 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IBboxLayer
     @property
     def extent(self):
-        st_force2d = db.func.st_force2d
-        st_transform = db.func.st_transform
-        st_extent = db.func.st_extent
-        st_setsrid = db.func.st_setsrid
-        st_xmax = db.func.st_xmax
-        st_xmin = db.func.st_xmin
-        st_ymax = db.func.st_ymax
-        st_ymin = db.func.st_ymin
+        st_force2d = func.st_force2d
+        st_transform = func.st_transform
+        st_extent = func.st_extent
+        st_setsrid = func.st_setsrid
+        st_xmax = func.st_xmax
+        st_xmin = func.st_xmin
+        st_ymax = func.st_ymax
+        st_ymin = func.st_ymin
 
         tab = db.sql.table(self.table)
         tab.schema = self.schema
@@ -604,53 +606,45 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._like = value
 
     def __call__(self):
-        tab = db.sql.table(self.layer.table)
-        tab.schema = self.layer.schema
+        tab = self.layer._sa_table(True)
 
-        tab.quote = True
-        tab.quote_schema = True
+        idcol = getattr(tab.columns, self.layer.column_id)
+        columns = [idcol]
+        where = []
 
-        select = tab.select()
-
-        def addcol(col):
-            select.append_column(col)
-
-        idcol = db.sql.column(self.layer.column_id)
-        addcol(idcol.label('id'))
-
-        geomcol = db.sql.column(self.layer.column_geom)
+        geomcol = getattr(tab.columns, self.layer.column_geom)
 
         srs = self.layer.srs if self._srs is None else self._srs
 
         if srs.id != self.layer.geometry_srid:
-            geomexpr = db.func.st_transform(geomcol, srs.id)
+            geomexpr = func.st_transform(geomcol, srs.id)
         else:
             geomexpr = geomcol
 
         if self._geom:
             if self._geom_format == 'WKB':
-                geomexpr = db.func.st_asbinary(geomexpr, 'NDR')
+                geomexpr = func.st_asbinary(geomexpr, 'NDR')
             else:
-                geomexpr = db.func.st_astext(geomexpr)
+                geomexpr = func.st_astext(geomexpr)
 
-            addcol(geomexpr.label('geom'))
+            columns.append(geomexpr.label('geom'))
 
         fieldmap = []
         for idx, fld in enumerate(self.layer.fields, start=1):
             if self._fields is None or fld.keyname in self._fields:
                 clabel = 'f%d' % idx
-                addcol(db.sql.column(fld.column_name).label(clabel))
+                columns.append(getattr(tab.columns, fld.column_name).label(clabel))
                 fieldmap.append((fld.keyname, clabel))
 
         if self._filter_by:
             for k, v in self._filter_by.items():
                 if k == 'id':
-                    select.append_whereclause(idcol == v)
+                    where.append(idcol == v)
                 else:
-                    select.append_whereclause(db.sql.column(k) == v)
+                    where.append(db.sql.column(k) == v)
 
         if self._filter:
-            clauses = []
+            token = []
             for k, o, v in self._filter:
                 supported_operators = (
                     'eq',
@@ -690,19 +684,19 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 else:
                     column = db.sql.column(k)
 
-                clauses.append(op(column, v))
+                token.append(op(column, v))
 
-            select.append_whereclause(db.and_(*clauses))
+            where.append(db.and_(True, *token))
 
         if self._like:
-            clauses = []
+            token = []
             for fld in self.layer.fields:
-                clauses.append(db.sql.cast(
+                token.append(db.sql.cast(
                     db.sql.column(fld.column_name),
                     db.Unicode).ilike(
                     '%' + self._like + '%'))
 
-            select.append_whereclause(db.or_(*clauses))
+            where.append(db.or_(*token))
 
         if self._intersects:
             reproject = self._intersects.srid is not None \
@@ -710,32 +704,34 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             int_srs = SRS.filter_by(id=self._intersects.srid).one() \
                 if reproject else self.layer.srs
 
-            int_geom = db.func.st_geomfromtext(self._intersects.wkt)
+            int_geom = func.st_geomfromtext(self._intersects.wkt)
             if int_srs.is_geographic:
                 # Prevent tolerance condition error
-                bound_geom = db.func.st_makeenvelope(-180, -89.9, 180, 89.9)
-                int_geom = db.func.st_intersection(bound_geom, int_geom)
-            int_geom = db.func.st_setsrid(int_geom, int_srs.id)
+                bound_geom = func.st_makeenvelope(-180, -89.9, 180, 89.9)
+                int_geom = func.st_intersection(bound_geom, int_geom)
+            int_geom = func.st_setsrid(int_geom, int_srs.id)
             if reproject:
-                int_geom = db.func.st_transform(int_geom, self.layer.geometry_srid)
+                int_geom = func.st_transform(int_geom, self.layer.geometry_srid)
 
-            select.append_whereclause(db.func.st_intersects(geomcol, int_geom))
+            where.append(func.st_intersects(geomcol, int_geom))
 
         if self._box:
-            addcol(db.func.st_xmin(geomexpr).label('box_left'))
-            addcol(db.func.st_ymin(geomexpr).label('box_bottom'))
-            addcol(db.func.st_xmax(geomexpr).label('box_right'))
-            addcol(db.func.st_ymax(geomexpr).label('box_top'))
+            columns.extend((
+                func.st_xmin(geomexpr).label('box_left'),
+                func.st_ymin(geomexpr).label('box_bottom'),
+                func.st_xmax(geomexpr).label('box_right'),
+                func.st_ymax(geomexpr).label('box_top'),
+            ))
 
         gt = self.layer.geometry_type
-        select.append_whereclause(db.func.geometrytype(db.sql.column(
-            self.layer.column_geom)).in_((gt, )))
+        where.append(func.geometrytype(geomcol) == gt)
 
+        order_criterion = []
         if self._order_by:
             for order, colname in self._order_by:
-                select.append_order_by(dict(asc=db.asc, desc=db.desc)[order](
+                order_criterion.append(dict(asc=db.asc, desc=db.desc)[order](
                     db.sql.column(colname)))
-        select.append_order_by(idcol)
+        order_criterion.append(idcol)
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer
@@ -748,15 +744,17 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             _offset = self._offset
 
             def __iter__(self):
-                if self._limit:
-                    query = select.limit(self._limit).offset(self._offset)
-                else:
-                    query = select
+                query = sql.select(*columns) \
+                    .where(db.and_(True, *where)) \
+                    .limit(self._limit) \
+                    .offset(self._offset) \
+                    .order_by(*order_criterion)
 
                 conn = self.layer.connection.get_connection()
 
                 try:
-                    for row in conn.execute(query):
+                    result = conn.execute(query)
+                    for row in result.mappings():
                         fdict = dict((k, row[l]) for k, l in fieldmap)
 
                         if self._geom:
@@ -776,7 +774,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                                 row['box_right'], row['box_top']
                             ) if self._box else None
                         )
-
                 except SQLAlchemyError as exc:
                     raise ExternalDatabaseError(sa_error=exc)
                 finally:
@@ -787,11 +784,10 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 conn = self.layer.connection.get_connection()
 
                 try:
-                    result = conn.execute(db.select(
-                        [db.sql.text('COUNT(id)'), ],
-                        from_obj=select.alias('all')))
-                    for row in result:
-                        return row[0]
+                    query = sql.select(func.count(idcol)) \
+                        .where(db.and_(True, *where))
+                    result = conn.execute(query)
+                    return result.scalar()
                 except SQLAlchemyError as exc:
                     raise ExternalDatabaseError(sa_error=exc)
                 finally:

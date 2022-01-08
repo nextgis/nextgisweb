@@ -12,6 +12,7 @@ from psutil import Process
 from pyramid.response import Response, FileResponse
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from sqlalchemy import text
 
 from ..lib.logging import logger
 from ..env import env
@@ -202,11 +203,11 @@ def test_exception_transaction(request):
     request.user
 
     try:
-        DBSession.execute("DO $$ BEGIN RAISE division_by_zero; END $$")
+        DBSession.execute(text("DO $$ BEGIN RAISE division_by_zero; END $$"))
     except Exception:
         pass
 
-    DBSession.execute("SELECT 1")
+    DBSession.execute(text("SELECT 1"))
 
 
 def test_timeout(reqest):

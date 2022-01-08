@@ -8,7 +8,7 @@ from html import escape as html_escape
 from zope.interface import implementer
 from osgeo import ogr, osr
 from shapely.geometry import box
-from sqlalchemy.sql import ColumnElement, null
+from sqlalchemy.sql import ColumnElement, null, text
 from sqlalchemy.ext.compiler import compiles
 
 import geoalchemy2 as ga
@@ -18,6 +18,7 @@ from sqlalchemy import (
     func,
     cast
 )
+from sqlalchemy.orm import registry
 
 from ..event import SafetyEvent
 from .. import db
@@ -599,7 +600,7 @@ class TableInfo(object):
         metadata.bind = env.core.engine
         geom_fldtype = _GEOM_TYPE_2_DB[self.geometry_type]
 
-        class model(object):
+        class model:
             def __init__(self, **kwargs):
                 for k, v in kwargs.items():
                     setattr(self, k, v)
@@ -619,7 +620,8 @@ class TableInfo(object):
                 fld.datatype]), self.fields)
         )
 
-        db.mapper(model, table)
+        mapper_registry = registry()
+        mapper_registry.map_imperatively(model, table)
 
         self.metadata = metadata
         self.sequence = sequence
@@ -886,8 +888,8 @@ class TableInfo(object):
         # Set sequence next value
         if max_fid is not None:
             connection = DBSession.connection()
-            connection.execute('ALTER SEQUENCE "%s"."%s" RESTART WITH %d' %
-                               (self.sequence.schema, self.sequence.name, max_fid + 1))
+            connection.execute(text('ALTER SEQUENCE "%s"."%s" RESTART WITH %d' %
+                               (self.sequence.schema, self.sequence.name, max_fid + 1)))
 
         return size
 
@@ -1177,7 +1179,7 @@ def estimate_vector_layer_data(resource):
 
     columns = [func.count(1), ] + [func.coalesce(func.sum(c), 0) for c in size_columns]
 
-    query = sql.select(columns)
+    query = sql.select(*columns)
     row = DBSession.connection().execute(query).fetchone()
 
     num_features = row[0]
@@ -1355,7 +1357,7 @@ class VectorLayerSerializer(Serializer):
 def _clipbybox2d_exists():
     return (
         DBSession.connection()
-        .execute("SELECT 1 FROM pg_proc WHERE proname='st_clipbybox2d'")
+        .execute(text("SELECT 1 FROM pg_proc WHERE proname='st_clipbybox2d'"))
         .fetchone()
     )
 
@@ -1448,7 +1450,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         tableinfo.setup_metadata(self.layer._tablename)
         table = tableinfo.table
 
-        columns = [table.columns.id, ]
+        idcol = table.columns.id
+        columns = [idcol]
         where = []
 
         geomcol = table.columns.geom
@@ -1519,7 +1522,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         if self._filter_by:
             for k, v in self._filter_by.items():
                 if k == 'id':
-                    where.append(table.columns.id == v)
+                    where.append(idcol == v)
                 else:
                     field = tableinfo.find_field(keyname=k)
                     where.append(table.columns[field.key] == v)
@@ -1572,14 +1575,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
                 op = getattr(db.sql.operators, o)
                 if k == "id":
-                    column = table.columns.id
+                    column = idcol
                 else:
                     field = tableinfo.find_field(keyname=k)
                     column = table.columns[field.key]
 
                 token.append(op(column, v))
 
-            where.append(db.and_(*token))
+            where.append(db.and_(True, *token))
 
         if self._filter_sql:
             token = []
@@ -1587,7 +1590,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 if len(_filter_sql_item) == 3:
                     table_column, op, val = _filter_sql_item
                     if table_column == 'id':
-                        token.append(op(table.columns.id, val))
+                        token.append(op(idcol, val))
                     else:
                         field = tableinfo.find_field(keyname=table_column)
                         token.append(op(table.columns[field.key], val))
@@ -1596,7 +1599,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     field = tableinfo.find_field(keyname=table_column)
                     token.append(op(table.columns[field.key], val1, val2))
 
-            where.append(db.and_(*token))
+            where.append(db.and_(True, *token))
 
         if self._like:
             token = []
@@ -1632,7 +1635,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 field = tableinfo.find_field(keyname=colname)
                 order_criterion.append(dict(asc=db.asc, desc=db.desc)[order](
                     table.columns[field.key]))
-        order_criterion.append(table.columns.id)
+        order_criterion.append(db.asc(idcol))
 
         class QueryFeatureSet(FeatureSet):
             fields = selected_fields
@@ -1646,15 +1649,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             _offset = self._offset
 
             def __iter__(self):
-                query = sql.select(
-                    columns,
-                    whereclause=db.and_(*where),
-                    limit=self._limit,
-                    offset=self._offset,
-                    order_by=order_criterion,
-                )
-                rows = DBSession.connection().execute(query)
-                for row in rows:
+                query = sql.select(*columns) \
+                    .where(db.and_(True, *where)) \
+                    .limit(self._limit) \
+                    .offset(self._offset) \
+                    .order_by(*order_criterion)
+
+                result = DBSession.connection().execute(query)
+                for row in result.mappings():
                     fdict = dict((f.keyname, row[f.keyname])
                                  for f in selected_fields)
                     if self._geom:
@@ -1682,12 +1684,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             @property
             def total_count(self):
-                query = sql.select(
-                    [func.count(table.columns.id), ],
-                    whereclause=db.and_(*where)
-                )
-                res = DBSession.connection().execute(query)
-                for row in res:
-                    return row[0]
+                query = sql.select(func.count(idcol)) \
+                    .where(db.and_(True, *where))
+                result = DBSession.connection().execute(query)
+                return result.scalar()
 
         return QueryFeatureSet()

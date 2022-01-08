@@ -20,11 +20,11 @@ def forward(ctx):
     connection.execute(text("""
         INSERT INTO setting (component, name, value)
         VALUES ('core', 'instance_id', :instance_id)
-    """), instance_id=json.dumps(instance_id))
+    """), dict(instance_id=json.dumps(instance_id)))
 
 
 def rewind(ctx):
-    DBSession.execute("""
+    DBSession.execute(text("""
         DELETE FROM setting
         WHERE component = 'core' AND name = 'instance_id';
-    """)
+    """))

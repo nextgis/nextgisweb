@@ -20,19 +20,19 @@ def test_postgis_sync(ngw_txn):
 
     qpg = db.text('SELECT srtext FROM spatial_ref_sys WHERE srid = :id')
 
-    srtext, = DBSession.connection().execute(qpg, id=obj.id).fetchone()
+    srtext, = DBSession.connection().execute(qpg, dict(id=obj.id)).fetchone()
     assert obj.wkt == srtext
 
     obj.wkt = WKT_EPSG_3857
     DBSession.flush()
 
-    srtext, = DBSession.connection().execute(qpg, id=obj.id).fetchone()
+    srtext, = DBSession.connection().execute(qpg, dict(id=obj.id)).fetchone()
     assert obj.wkt == srtext
 
     DBSession.delete(obj)
     DBSession.flush()
 
-    assert DBSession.connection().execute(qpg, id=obj.id).fetchone() is None
+    assert DBSession.connection().execute(qpg, dict(id=obj.id)).fetchone() is None
 
 
 @pytest.mark.parametrize('x, y, src, dst', (
@@ -44,7 +44,7 @@ def test_postgis_transform(ngw_txn, x, y, src, dst):
         'SELECT ST_X(pt), ST_Y(pt) '
         'FROM ST_Transform(ST_Transform('
         '   ST_SetSRID(ST_MakePoint(:x, :y), :src) ,:dst), :src) AS pt'
-    ), x=x, y=y, src=src, dst=dst).fetchone()
+    ), dict(x=x, y=y, src=src, dst=dst)).fetchone()
     assert abs(px - x) < 1e-6
     assert abs(py - y) < 1e-6
 

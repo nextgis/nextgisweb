@@ -84,19 +84,19 @@ class RenderComponent(Component):
         deleted_tiles = deleted_files = deleted_tables = 0
 
         with transaction.manager:
-            for row in DBSession.execute('''
+            for row in DBSession.execute(sa.text('''
                 SELECT t.tablename
                 FROM pg_catalog.pg_tables t
                 LEFT JOIN resource_tile_cache r
                     ON replace(r.uuid::character varying, '-', '') = t.tablename::character varying
                 WHERE t.schemaname = 'tile_cache' AND r.resource_id IS NULL
-            '''):
+            ''')):
                 tablename = row[0]
                 db_path = root / tablename[0:2] / tablename[2:4] / tablename
                 if db_path.exists():
                     db_path.unlink()
                     deleted_files += 1
-                DBSession.execute('DROP TABLE "tile_cache"."%s"' % tablename)
+                DBSession.execute(sa.text('DROP TABLE "tile_cache"."%s"' % tablename))
                 deleted_tables += 1
 
             if deleted_tables > 0:
@@ -163,7 +163,7 @@ class RenderComponent(Component):
             query_tile = 'SELECT coalesce(sum(length(data) + 16), 0) FROM tile'  # with 4x int columns
             size_img = tilestor.execute(query_tile).fetchone()[0]
 
-            query = 'SELECT count(1) FROM tile_cache."{}"'.format(tc.uuid.hex)
+            query = sa.text('SELECT count(1) FROM tile_cache."{}"'.format(tc.uuid.hex))
             count = DBSession.execute(query).scalar()
             size_color = count * 20  # 5x int columns
 

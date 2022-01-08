@@ -37,7 +37,7 @@ class CleanupOrhpanedTablesCommand():
         total, orphan = con.execute(literal_sql('''
             SELECT COUNT(*), COUNT(*) - COUNT(base.id)
             FROM ( %s ) base
-        ''' % base_query), schema=SCHEMA, regexp=regexp).fetchone()
+        ''' % base_query), dict(schema=SCHEMA, regexp=regexp)).fetchone()
 
         logger.info(
             "%d tables found, %d orphan (schema = '%s', regexp = '%s')",
@@ -47,36 +47,36 @@ class CleanupOrhpanedTablesCommand():
             SELECT base.table_name, base.id
             FROM ( %s ) base
             WHERE base.orphan
-        ''' % base_query), schema=SCHEMA, regexp=regexp)
+        ''' % base_query), dict(schema=SCHEMA, regexp=regexp))
 
         if not args.confirm:
             return
 
         if not args.table_per_txn:
-            con.execute('BEGIN')
+            con.execute(literal_sql('BEGIN'))
 
         count = 0
         try:
             for row in result:
                 if args.table_per_txn:
-                    con.execute('BEGIN')
+                    con.execute(literal_sql('BEGIN'))
 
                 if row['id'] is not None:
                     raise ValueError("Resource id should be empty!")
 
-                drop_query = 'DROP TABLE "%s"."%s"' % (SCHEMA, row['table_name'])
+                drop_query = literal_sql('DROP TABLE "%s"."%s"' % (SCHEMA, row['table_name']))
                 logger.debug(drop_query)
                 con.execute(drop_query)
 
                 if args.table_per_txn:
-                    con.execute('COMMIT')
+                    con.execute(literal_sql('COMMIT'))
 
                 count += 1
         except Exception:
-            con.execute('ROLLBACK')
+            con.execute(literal_sql('ROLLBACK'))
             raise
         else:
             if not args.table_per_txn:
-                con.execute('COMMIT')
+                con.execute(literal_sql('COMMIT'))
         finally:
             logger.info('%d orphaned tables deleted', count)

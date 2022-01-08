@@ -39,7 +39,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
         username=opts_db['user'],
         password=opts_db['password'])
 
-    engine_url = make_engine_url(EngineURL(
+    engine_url = make_engine_url(EngineURL.create(
         'postgresql+psycopg2', **con_args))
 
     engine = sa.create_engine(engine_url)
@@ -71,22 +71,23 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
     meta.create_all(engine)
 
     with engine.connect() as conn:
-        for i, feature in enumerate(ogrlayer, start=1):
-            values = dict(id=i)
+        with conn.begin():
+            for i, feature in enumerate(ogrlayer, start=1):
+                values = dict(id=i)
 
-            geom = feature.GetGeometryRef()
-            geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
-            values[column_geom] = ga.elements.WKBElement(geom_bytes, srid=srid)
+                geom = feature.GetGeometryRef()
+                geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
+                values[column_geom] = ga.elements.WKBElement(geom_bytes, srid=srid)
 
-            for k in range(feature.GetFieldCount()):
-                if not feature.IsFieldSet(k) or feature.IsFieldNull(k):
-                    continue
-                fld_defn = defn.GetFieldDefn(k)
-                fld_name = fld_defn.GetNameRef()
-                fld_get = FIELD_GETTER[fld_defn.GetType()]
-                values[fld_name] = fld_get(feature, k)
+                for k in range(feature.GetFieldCount()):
+                    if not feature.IsFieldSet(k) or feature.IsFieldNull(k):
+                        continue
+                    fld_defn = defn.GetFieldDefn(k)
+                    fld_name = fld_defn.GetNameRef()
+                    fld_get = FIELD_GETTER[fld_defn.GetType()]
+                    values[fld_name] = fld_get(feature, k)
 
-            conn.execute(table.insert().values(**values))
+                conn.execute(table.insert().values(**values))
 
     with transaction.manager:
         res_common = dict(

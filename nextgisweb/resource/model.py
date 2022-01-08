@@ -3,6 +3,7 @@ from datetime import datetime
 
 from bunch import Bunch
 from sqlalchemy import event, text
+from sqlalchemy.ext.declarative import declared_attr
 
 from .. import db
 from ..auth import Principal, User, Group, OnFindReferencesData
@@ -313,7 +314,7 @@ def resource_after_delete(mapper, connection, target):
         ) t
         WHERE resource_id = :resource_id
         GROUP BY component, kind_of_data
-    '''), timestamp=datetime.utcnow(), resource_id=target.id)
+    '''), dict(timestamp=datetime.utcnow(), resource_id=target.id))
 
 
 ResourceScope.read.require(

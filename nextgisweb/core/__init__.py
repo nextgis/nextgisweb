@@ -15,7 +15,7 @@ from subprocess import check_output
 
 import requests
 from requests.exceptions import RequestException
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm.exc import NoResultFound
@@ -128,7 +128,7 @@ class CoreComponent(
         sa_engine = create_engine(sa_url)
         try:
             with sa_engine.connect() as conn:
-                conn.execute("SELECT 1")
+                conn.execute(text("SELECT 1"))
         except OperationalError as exc:
             msg = str(exc.orig).rstrip()
             return OrderedDict((
@@ -246,9 +246,9 @@ class CoreComponent(
 
         postgres_info = DBSession.scalar('SHOW server_version')
         postgres_info = re.sub(r'\s\(.*\)$', '', postgres_info)
-        postgres_info += " ({}, {})".format(*DBSession.execute("""
+        postgres_info += " ({}, {})".format(*DBSession.execute(text("""
             SELECT datcollate, datctype FROM pg_database
-            WHERE datname = current_database()""").first())
+            WHERE datname = current_database()""")).first())
         result.append(("PostgreSQL", postgres_info))
 
         postgis_version = DBSession.scalar('SELECT PostGIS_Lib_Version()')
@@ -341,7 +341,7 @@ class CoreComponent(
 
     def _engine_url(self, error_on_pwfile=False):
         con_args = self._db_connection_args(error_on_pwfile=error_on_pwfile)
-        return make_engine_url(EngineURL(
+        return make_engine_url(EngineURL.create(
             'postgresql+psycopg2', **con_args))
 
     def get_backups(self):

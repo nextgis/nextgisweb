@@ -1,6 +1,6 @@
 import json
 
-from sqlalchemy import event
+from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.types import TypeDecorator
 import geoalchemy2 as ga
@@ -266,6 +266,23 @@ class WebMapSerializer(Serializer):
     root_item = _root_item_attr(**_mdargs)
 
 
+WM_SETTINGS = dict(
+    identify_radius=3,
+    identify_attributes=True,
+    popup_width=300,
+    popup_height=200,
+    address_search_enabled=True,
+    address_search_extent=False,
+    address_geocoder='nominatim',
+    yandex_api_geocoder_key='',
+    nominatim_countrycodes='',
+    units_length='m',
+    units_area='sq.m',
+    degree_format='dd',
+    measurement_srid=4326,
+)
+
+
 @event.listens_for(SRS, 'after_delete')
 def check_measurement_srid(mapper, connection, target):
     try:
@@ -274,7 +291,8 @@ def check_measurement_srid(mapper, connection, target):
         return
 
     if measurement_srid == target.id:
-        connection.execute("""
-            UPDATE setting SET value = 4326
+        srid_default = WM_SETTINGS['measurement_srid']
+        connection.execute(text("""
+            UPDATE setting SET value = :srid
             WHERE component = 'webmap' AND name = 'measurement_srid'
-        """)
+        """), dict(srid=srid_default))

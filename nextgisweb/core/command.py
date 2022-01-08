@@ -14,6 +14,7 @@ from tempfile import TemporaryDirectory
 from zipfile import ZipFile, is_zipfile
 
 import transaction
+from sqlalchemy import text
 from zope.sqlalchemy import mark_changed
 
 from ..lib.logging import logger
@@ -252,35 +253,33 @@ class SQLCommand(Command):
     @classmethod
     def execute(cls, args, env):
         con = DBSession.connection()
-        con.begin()
+        with con.begin():
 
-        def _execute(sql):
-            return con.execute(sql)
+            def _execute(sql):
+                return con.execute(text(sql))
 
-        sql = args.query
+            sql = args.query
 
-        if sql == '':
-            finput = fileinput.input(args.file if args.file is not None else ['-', ])
+            if sql == '':
+                finput = fileinput.input(args.file if args.file is not None else ['-', ])
 
-            for line in finput:
-                if finput.isfirstline() and sql != '':
-                    res = _execute(sql)
-                    sql = ''
-                sql = sql + '\n' + line
+                for line in finput:
+                    if finput.isfirstline() and sql != '':
+                        res = _execute(sql)
+                        sql = ''
+                    sql = sql + '\n' + line
 
-        elif args.file is not None:
-            raise RuntimeError("Option -f or --file shouldn't be used with query argument")
+            elif args.file is not None:
+                raise RuntimeError("Option -f or --file shouldn't be used with query argument")
 
-        if sql != '':
-            res = _execute(sql)
+            if sql != '':
+                res = _execute(sql)
 
-        if args.result:
-            w = csv.writer(sys.stdout, encoding='utf-8')
-            w.writerow(res.keys())
-            for row in res.fetchall():
-                w.writerow(row)
-
-        con.execute('COMMIT')
+            if args.result:
+                w = csv.writer(sys.stdout, encoding='utf-8')
+                w.writerow(res.keys())
+                for row in res.fetchall():
+                    w.writerow(row)
 
 
 @Command.registry.register

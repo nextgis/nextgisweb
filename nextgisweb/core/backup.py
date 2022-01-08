@@ -115,11 +115,11 @@ def backup(env, dst):
     # TRANSACTION AND CONNECTION
 
     con = DBSession.connection()
-    con.execute(
+    con.execute(sa.text(
         "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE "
-        "   READ ONLY DEFERRABLE")
+        "   READ ONLY DEFERRABLE"))
 
-    snapshot, = con.execute("SELECT pg_export_snapshot()").fetchone()
+    snapshot, = con.execute(sa.text("SELECT pg_export_snapshot()")).fetchone()
     logger.debug("Using postgres snapshot: %s", snapshot)
 
     # CONFIGURATION
@@ -172,13 +172,13 @@ def backup(env, dst):
     def get_cls_relname(oid):
         relname, = con.execute(
             sa.text("SELECT relname FROM pg_catalog.pg_class WHERE oid = :oid"),
-            oid=oid).fetchone()
+            dict(oid=oid)).fetchone()
         return relname
 
     def get_namespace(oid):
-        nspname, = con.execute(sa.text(
-            "SELECT nspname FROM pg_catalog.pg_namespace WHERE oid = :oid"
-        ), oid=oid).fetchone()
+        nspname, = con.execute(
+            sa.text("SELECT nspname FROM pg_catalog.pg_namespace WHERE oid = :oid"),
+            dict(oid=oid)).fetchone()
         return nspname
 
     pg_toc_regexp = re.compile(r'(\d+)\;\s+(\d+)\s+(\d+)\s+(.*)')
@@ -246,14 +246,9 @@ def backup(env, dst):
 def restore(env, src):
     con = DBSession.connection()
 
-    con.execute('BEGIN')
-    try:
+    with con.begin():
         metadata = env.metadata()
         metadata.drop_all(con)
-        con.execute('COMMIT')
-    except Exception:
-        con.execute('ROLLBACK')
-        raise
 
     # POSTGRES RESTORE
     logger.info("Restoring PostgreSQL dump...")
@@ -274,8 +269,7 @@ def restore(env, src):
     logger.info("Restoring component data...")
 
     comp_root = os.path.join(src, 'component')
-    con.execute('BEGIN')
-    try:
+    with con.begin():
         for comp_identity in os.listdir(comp_root):
             comp = env._components[comp_identity]
             comp_dir = os.path.join(comp_root, comp_identity)
@@ -290,7 +284,3 @@ def restore(env, src):
                             binfn = os.path.join(comp_dir, '{:08d}'.format(record.id))
                             with io.open(binfn, 'rb') as fd:
                                 itm.restore(fd)
-        con.execute('COMMIT')
-    except Exception:
-        con.execute('ROLLBACK')
-        raise

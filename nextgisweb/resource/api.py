@@ -333,7 +333,7 @@ def search(request):
 
     # TODO: Chech speed of with_polymorphic('*')
     query = Resource.query().with_polymorphic('*') \
-        .filter(db.and_(*filter_)) \
+        .filter(db.and_(True, *filter_)) \
         .order_by(Resource.display_name)
 
     if principal_id is not None:

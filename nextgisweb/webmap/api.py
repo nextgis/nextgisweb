@@ -11,6 +11,7 @@ from .model import (
     WebMap,
     WebMapScope,
     WebMapAnnotation,
+    WM_SETTINGS,
 )
 
 
@@ -81,26 +82,9 @@ def annotation_idelete(resource, request):
     return None
 
 
-wm_settings = dict(
-    identify_radius=3,
-    identify_attributes=True,
-    popup_width=300,
-    popup_height=200,
-    address_search_enabled=True,
-    address_search_extent=False,
-    address_geocoder='nominatim',
-    yandex_api_geocoder_key='',
-    nominatim_countrycodes='',
-    units_length='m',
-    units_area='sq.m',
-    degree_format='dd',
-    measurement_srid=4326,
-)
-
-
 def settings_get(request):
     result = dict()
-    for k, default in wm_settings.items():
+    for k, default in WM_SETTINGS.items():
         try:
             v = env.core.settings_get('webmap', k)
             if v is not None:
@@ -116,7 +100,7 @@ def settings_put(request):
 
     body = request.json_body
     for k, v in body.items():
-        if k in wm_settings.keys():
+        if k in WM_SETTINGS.keys():
             env.core.settings_set('webmap', k, v)
         else:
             raise HTTPBadRequest("Invalid key '%s'" % k)

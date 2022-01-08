@@ -247,7 +247,7 @@ class TilestorWriter:
             ON CONFLICT (z, x, y) DO UPDATE
             SET color = :color, tstamp = :tstamp
             WHERE tc.tstamp < :tstamp
-        """.format(table_uuid)), **row)
+        """.format(table_uuid)), row)
 
     def _write_tile_data(self, tilestor, z, x, y, tstamp, value):
         tilestor.execute("""
@@ -357,7 +357,7 @@ class ResourceTileCache(Base):
             'SELECT color, tstamp '
             'FROM tile_cache."{}" '
             'WHERE z = :z AND x = :x AND y = :y'.format(self.uuid.hex)
-        ), z=z, x=x, y=y).fetchone()
+        ), dict(z=z, x=x, y=y)).fetchone()
 
         if trow is None:
             return False, None
@@ -464,10 +464,8 @@ class ResourceTileCache(Base):
                     'Removing tiles for z=%d x=%d..%d y=%d..%d',
                     z, xmin, xmax, ymin, ymax)
 
-                conn.execute(
-                    query_delete, z=z,
-                    xmin=xmin, ymin=ymin,
-                    xmax=xmax, ymax=ymax)
+                conn.execute(query_delete, dict(
+                    z=z, xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax))
 
             mark_changed(DBSession())
 

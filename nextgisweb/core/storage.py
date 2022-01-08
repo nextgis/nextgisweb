@@ -97,19 +97,19 @@ class StorageComponentMixin(object):
             delta = storage_stat_delta.alias('de')
 
         whereclause = sa.and_(v(sa.column(k)) for k, v in where.items()) \
-            if where else None
+            if where and len(where) > 0 else True
 
-        source = sa.select((
+        source = sa.select(
             dimen.c.kind_of_data,
             dimen.c.tstamp.label('estimated'),
             sa.sql.null().label('updated'),
             dimen.c.value_data_volume.label('data_volume'),
-        ), whereclause=whereclause).union_all(sa.select((
+        ).where(whereclause).union_all(sa.select(
             delta.c.kind_of_data,
             sa.sql.null(),
             delta.c.tstamp,
             delta.c.value_data_volume,
-        ), whereclause=whereclause)).alias('src')
+        ).where(whereclause)).alias('src')
 
         agg_cols = (
             sa.func.MIN(sa.column('estimated')).label('estimated'),
@@ -118,13 +118,13 @@ class StorageComponentMixin(object):
             sa.func.coalesce(sa.func.SUM(sa.column('data_volume')), 0).cast(
                 sa.BigInteger).label('data_volume'))
 
-        agg = sa.select((source.c.kind_of_data,) + agg_cols).group_by(
+        agg = sa.select(source.c.kind_of_data, *agg_cols).group_by(
             source.c.kind_of_data).cte('agg')
 
         q = agg.select()
         if where is not None:
             q = q.union_all(sa.select(
-                (sa.literal(''),) + agg_cols
+                sa.literal(''), *agg_cols
             ).select_from(agg))
 
         with DBSession.no_autoflush:
@@ -159,7 +159,7 @@ class StorageComponentMixin(object):
                     if hasattr(comp, 'estimate_storage'):
                         logger.debug("Estimating storage of component '%s'...", comp.identity)
                         for kind_of_data, resource_id, size in comp.estimate_storage():
-                            con.execute(details.insert(dict(
+                            con.execute(details.insert().values(dict(
                                 tstamp=timestamp,
                                 component=comp.identity,
                                 kind_of_data=kind_of_data.identity,
@@ -167,15 +167,15 @@ class StorageComponentMixin(object):
                                 value_data_volume=size
                             )))
 
-                qtotal = sa.select([
+                qtotal = sa.select(
                     sa.literal(timestamp).label('tstamp'),
                     details.c.kind_of_data,
                     sa.func.sum(details.c.value_data_volume)
-                ]).group_by(details.c.kind_of_data).union_all(sa.select([
+                ).group_by(details.c.kind_of_data).union_all(sa.select(
                     sa.literal(timestamp),
                     sa.literal(''),
                     sa.func.coalesce(sa.func.sum(details.c.value_data_volume), 0)
-                ]))
+                ))
 
                 con.execute(totals.insert().from_select([
                     'tstamp', 'kind_of_data', 'value_data_volume'], qtotal))
@@ -185,10 +185,11 @@ class StorageComponentMixin(object):
                     for k, v in self.query_storage().items()]
                 summary.sort(key=lambda i: i[1], reverse=True)
 
+
             logger.info("Estimation completed: %s", ', '.join(
                 '{}={}'.format(*i) for i in summary))
 
-        except Exception:
+        except Exception as exc:
             logger.exception("Unexpected exception during estimation proccess")
             raise
 
@@ -234,12 +235,12 @@ class StorageComponentMixin(object):
 
 STORAGE_TABLES = (
     storage_stat_dimension, storage_stat_dimension_total,
-    storage_stat_delta, storage_stat_delta_total,
+    storage_stat_delta, storage_stat_delta_total,            
 )
 
-LOCK_TABLE = "'core_storage_stat_dimension'::regclass::int"
-SQL_LOCK = "SELECT pg_advisory_xact_lock({}, 0)".format(LOCK_TABLE)
-SQL_TRY_LOCK = "SELECT pg_try_advisory_xact_lock({}, 0)".format(LOCK_TABLE)
+LOCK_TABLE = sa.text("'core_storage_stat_dimension'::regclass::int")
+SQL_LOCK = sa.text("SELECT pg_advisory_xact_lock({}, 0)".format(LOCK_TABLE))
+SQL_TRY_LOCK = sa.text("SELECT pg_try_advisory_xact_lock({}, 0)".format(LOCK_TABLE))
 
 
 class StorageLimitExceeded(UserException):
