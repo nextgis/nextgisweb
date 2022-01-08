@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from uuid import uuid4
 
 import transaction
 from osgeo import ogr
@@ -65,7 +66,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
         fld_type = _FIELD_TYPE_2_ENUM[fld_defn.GetType()]
         columns.append(sa.Column(fld_name, _FIELD_TYPE_2_DB[fld_type]))
 
-    table = sa.Table('postgis_test', meta, *columns)
+    table = sa.Table('test_' + uuid4().hex, meta, *columns)
 
     meta.create_all(engine)
 
