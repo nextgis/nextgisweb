@@ -20,4 +20,10 @@ def ngw_resource_group(ngw_env):
     yield res.id
 
     with transaction.manager:
-        DBSession.delete(ResourceGroup.filter_by(id=res.id).one())
+        def recurse_children(res):
+            for child in res.children:
+                DBSession.delete(child)
+            DBSession.delete(res)
+        
+        with DBSession.no_autoflush:
+            recurse_children(ResourceGroup.filter_by(id=res.id).one())
