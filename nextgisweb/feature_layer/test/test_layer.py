@@ -1,6 +1,5 @@
 import json
 from datetime import date, datetime, time
-from itertools import product
 from pathlib import Path
 
 import pytest
@@ -73,9 +72,9 @@ def cmp_geom(gj_geom, geom2, srs):
 
 
 @pytest.mark.parametrize('create_resource', (
-    pytest.param(create_vector_layer, id='Vector layer'),
-    pytest.param(create_wfs_layer, id='WFS layer'),
-    pytest.param(create_postgis_layer, id='PostGIS layer'),
+    pytest.param(create_vector_layer, id='vector_layer'),
+    pytest.param(create_wfs_layer, id='wfsclient_layer'),
+    pytest.param(create_postgis_layer, id='postgis_layer'),
 ))
 def test_attributes(create_resource, ngw_resource_group, ngw_auth_administrator, ngw_httptest_app):
     geojson = json.loads(data_points.read_text())
@@ -170,11 +169,21 @@ def test_attributes(create_resource, ngw_resource_group, ngw_auth_administrator,
                 assert ids == ids_expected
 
 
-@pytest.mark.parametrize('create_resource, geom_type', product(
-    (create_vector_layer, create_postgis_layer, create_wfs_layer),
-    ('point', 'linestring', 'polygon', 'multipoint', 'multilinestring', 'multipolygon',
-     'pointz', 'linestringz', 'polygonz', 'multipointz', 'multilinestringz', 'multipolygonz')
-))
+def geom_type_product():
+    for cfunc, alias in (
+        (create_vector_layer, 'vector_layer'),
+        (create_postgis_layer, 'postgis_layer'),
+        (create_wfs_layer, 'wfsclient_layer'),
+    ):
+        for geom_type in (
+            'point', 'pointz', 'multipoint', 'multipointz',
+            'linestring', 'linestringz', 'multilinestring', 'multilinestringz',
+            'polygon', 'polygonz', 'multipolygon', 'multipolygonz',
+        ):
+            yield pytest.param(cfunc, geom_type, id=f'{alias}-{geom_type}')
+
+
+@pytest.mark.parametrize('create_resource, geom_type', geom_type_product())
 def test_geometry(create_resource, geom_type, ngw_resource_group, ngw_httptest_app):
     data = Path(nextgisweb.feature_layer.test.__file__).parent \
         / 'data' / 'geometry' / f'{geom_type}.geojson'
