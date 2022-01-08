@@ -6,7 +6,8 @@ from requests import Session as RequestsSession
 
 @pytest.fixture(scope='session')
 def ngw_pyramid_config(ngw_env):
-    return ngw_env.pyramid.make_app({})
+    with ngw_env.pyramid.options.override({'debugtoolbar.enabled': False}):
+        yield ngw_env.pyramid.make_app({})
 
 
 @pytest.fixture(scope='session')
