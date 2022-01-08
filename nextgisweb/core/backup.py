@@ -137,14 +137,8 @@ def backup(env, dst):
 
     pgd_version = parse_pg_dump_version(check_output(
         ['/usr/bin/pg_dump', '--version']).decode('utf-8'))
-
-    if pgd_version < LooseVersion('9.5'):
-        snp_opt = []
-        logger.warn(
-            "Data inconsistency possible: ---snapshot option is not supported in pg_dump %s!",
-            str(pgd_version))
-    else:
-        snp_opt = ['--snapshot={}'.format(snapshot), ]
+    if pgd_version < Version('10.0'):
+        raise RuntimeError("pg_dump 10.0+ required")
 
     exc_opt = list()
     if len(config._exclude_table) > 0:
@@ -161,7 +155,8 @@ def backup(env, dst):
         '--format=directory',
         '--compress=0',
         '--file={}'.format(pg_dir),
-    ] + snp_opt + exc_opt + pg_copt, env=dict(PGPASSWORD=pg_pass))
+        '--snapshot={}'.format(snapshot),
+    ] + exc_opt + pg_copt, env=dict(PGPASSWORD=pg_pass))
 
     pg_listing = check_output([
         '/usr/bin/pg_restore',
