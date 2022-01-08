@@ -12,6 +12,12 @@ class Package(PackageBase):
     pass
 
 
+@AppImage.on_apt.handler
+def on_apt(event):
+    if event.image.context.is_development():
+        event.image.environment['SQLALCHEMY_WARN_20'] = '1'
+
+
 @AppImage.on_user_dir.handler
 def on_user_dir(event):
     nextgisweb_package = event.image.context.packages['nextgisweb']
