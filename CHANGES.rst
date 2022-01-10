@@ -18,6 +18,7 @@ Changes
 - Unknown fields in REST API filters return an error.
 - Improved handling of external services errors.
 - Timeout for external services is set to 15 seconds.
+- Experimental support for long-runnning requests via ``lunkwill`` extension.
 - Pyramid library upgraded to 2.0.0.
 - SQLAlchemy library upgraded to 1.4.27.
 - OpenLayers library upgraded to 6.10.0.

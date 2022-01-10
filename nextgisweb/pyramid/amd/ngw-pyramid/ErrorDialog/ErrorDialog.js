@@ -23,10 +23,10 @@ define([
             this.errorInfo = {};
 
             // Temporary solution to detect instance of @nextgisweb/pyramid/api/BaseAPIError
-            if (error.data !== undefined && error.name !== undefined) {
+            if (error.data !== undefined && error.name !== undefined && error.title !== undefined) {
                 this.message = error.message;
                 this.detail = error.detail;
-                this.errorTitle = error.data.title;
+                this.errorTitle = error.title;
                 this.errorInfo = error.data;
             } else if (error.response) {
                 var response = error.response;

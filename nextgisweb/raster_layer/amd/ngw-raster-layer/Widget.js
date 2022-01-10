@@ -38,6 +38,11 @@ define([
             this.wCOG.set("checked", settings.cog_enabled);
         },
 
+        serialize: function(data, lunkwill) {
+            this.inherited(arguments);
+            lunkwill.suggest(this.composite.operation == "create");
+        },
+
         serializeInMixin: function (data) {
             if (data.raster_layer === undefined) { data.raster_layer = {}; }
             var value = data.raster_layer;
