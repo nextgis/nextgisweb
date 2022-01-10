@@ -468,7 +468,9 @@ class TableInfo(object):
 
             if fixed_fld_name.lower() in FIELD_FORBIDDEN_NAME:
                 if fix_errors == ERROR_FIX.NONE:
-                    raise VE(_("Field name is forbidden: '%s'. Please remove or rename it.") % fld_name)  # NOQA: E501
+                    raise VE(message=_(
+                        "Field name is forbidden: '%s'. Please remove or "
+                        "rename it.") % fld_name)
                 else:
                     fixed_fld_name += '_1'
 
