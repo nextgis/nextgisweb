@@ -10,7 +10,7 @@ from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 from osgeo import gdal, gdalconst, osr, ogr
 
-from ..core.exception import ValidationError
+from ..core.exception import ValidationError, OperationalError
 from ..lib.osrhelper import traditional_axis_mapping
 from ..lib.logging import logger
 from ..models import declarative_base
@@ -26,7 +26,7 @@ from ..layer import SpatialLayerMixin, IBboxLayer
 from ..file_storage import FileObj
 
 from .kind_of_data import RasterLayerData
-from .util import _, calc_overviews_levels, COMP_ID
+from .util import _, calc_overviews_levels, COMP_ID, raster_size
 
 PYRAMID_TARGET_SIZE = 512
 
@@ -102,7 +102,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             if data_type is None:
                 data_type = band.DataType
             elif data_type != band.DataType:
-                raise ValidationError(_("Complex data types are not supported."))
+                raise ValidationError(_("Mixed band data types are not supported."))
 
             if band.GetRasterColorInterpretation() == gdal.GCI_AlphaBand:
                 assert alpha_band is None, "Multiple alpha bands found!"
@@ -117,22 +117,34 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         dst_osr.ImportFromEPSG(int(self.srs.id))
 
         reproject = not src_osr.IsSame(dst_osr)
-
-        fobj = FileObj(component='raster_layer')
-
-        dst_file = env.raster_layer.workdir_filename(fobj, makedirs=True)
-        self.fileobj = fobj
+        add_alpha = reproject and not has_nodata and alpha_band is None
 
         if reproject:
             cmd = ['gdalwarp', '-of', 'GTiff', '-t_srs', 'EPSG:%d' % self.srs.id]
-            if not has_nodata and alpha_band is None:
+            if add_alpha:
                 cmd.append('-dstalpha')
+            ds_measure = gdal.AutoCreateWarpedVRT(ds, src_osr.ExportToWkt(), dst_osr.ExportToWkt())
         else:
             cmd = ['gdal_translate', '-of', 'GTiff']
+            ds_measure = ds
+
+        size_presume = raster_size(ds_measure)
+        if add_alpha:
+            size_presume = size_presume // ds_measure.RasterCount * (ds_measure.RasterCount + 1)
+        ds_measure = None
+
+        size_limit = env.raster_layer.options['size_limit']
+        if size_limit is not None:
+            if size_presume > size_limit:
+                raise ValidationError(_("Raster data limit exceeded."))
 
         cmd.extend(('-co', 'COMPRESS=DEFLATE',
                     '-co', 'TILED=YES',
                     '-co', 'BIGTIFF=YES', filename))
+
+        fobj = FileObj(component='raster_layer')
+        dst_file = env.raster_layer.workdir_filename(fobj, makedirs=True)
+        self.fileobj = fobj
 
         self.cog = cog
         if not cog:
@@ -154,6 +166,10 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 os.unlink(tmp_file + '.ovr')
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
+
+        size = raster_size(ds)
+        if size != size_presume:
+            raise OperationalError("Data was corrupted during processing.")
 
         self.dtype = gdal.GetDataTypeName(data_type)
         self.xsize = ds.RasterXSize

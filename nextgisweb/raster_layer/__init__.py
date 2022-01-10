@@ -49,4 +49,5 @@ class RasterLayerComponent(Component):
 
     option_annotations = (
         Option('cog_enabled', bool, default=False),
+        Option('size_limit', int, default=None),
     )
