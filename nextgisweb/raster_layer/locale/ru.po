@@ -45,9 +45,18 @@ msgstr ""
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:104
-msgid "Complex data types are not supported."
-msgstr "Комплексные типы данных не поддерживаются."
+#: model.py:106
+msgid "Mixed band data types are not supported."
+msgstr "Смешанные типы каналов не поддерживаются."
+
+#: model.py:137
+#, python-format
+msgid ""
+"The uncompressed raster size (%(size)s) exceeds the limit (%(limit)s) by "
+"%(delta)s. Reduce raster size to fit the limit."
+msgstr ""
+"Размер несжатого растра (%(size)s) превышает лимит (%(limit)s) на %(delta)s. "
+"Уменьшите растр, чтобы он вписывался в лимит."
 
 #: model.py:199
 msgid "Data type"
