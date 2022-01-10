@@ -59,7 +59,9 @@ class WebMap(Base, Resource):
         Resource, foreign_keys=bookmark_resource_id,
         backref=db.backref('bookmarked_webmaps'))
 
-    annotations = db.relationship('WebMapAnnotation', cascade='all,delete-orphan')
+    annotations = db.relationship(
+        'WebMapAnnotation', back_populates='webmap',
+        cascade='all,delete-orphan')
 
     @classmethod
     def check_parent(cls, parent):
@@ -224,7 +226,7 @@ class WebMapAnnotation(Base):
     style = db.Column(JSONTextType)
     geom = db.Column(ga.Geometry(dimension=2, srid=3857), nullable=False)
 
-    webmap = db.relationship(WebMap)
+    webmap = db.relationship(WebMap, back_populates='annotations')
 
 
 PR_READ = ResourceScope.read
