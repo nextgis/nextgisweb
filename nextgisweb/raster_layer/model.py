@@ -10,7 +10,8 @@ from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 from osgeo import gdal, gdalconst, osr, ogr
 
-from ..core.exception import ValidationError, OperationalError
+from ..core.exception import ValidationError
+from ..core.util import format_size
 from ..lib.osrhelper import traditional_axis_mapping
 from ..lib.logging import logger
 from ..models import declarative_base
@@ -128,15 +129,19 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             cmd = ['gdal_translate', '-of', 'GTiff']
             ds_measure = ds
 
-        size_presume = raster_size(ds_measure)
-        if add_alpha:
-            size_presume = size_presume // ds_measure.RasterCount * (ds_measure.RasterCount + 1)
+        size_expected = raster_size(ds_measure, 1 if add_alpha else 0)
         ds_measure = None
 
         size_limit = env.raster_layer.options['size_limit']
-        if size_limit is not None:
-            if size_presume > size_limit:
-                raise ValidationError(_("Raster data limit exceeded."))
+        if size_limit is not None and size_expected > size_limit:
+            raise ValidationError(message=_(
+                "The uncompressed raster size (%(size)s) exceeds the limit "
+                "(%(limit)s) by %(delta)s. Reduce raster size to fit the limit."
+            ) % dict(
+                size=format_size(size_expected),
+                limit=format_size(size_limit),
+                delta=format_size(size_expected - size_limit),
+            ))
 
         cmd.extend(('-co', 'COMPRESS=DEFLATE',
                     '-co', 'TILED=YES',
@@ -167,9 +172,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
-        size = raster_size(ds)
-        if size != size_presume:
-            raise OperationalError("Data was corrupted during processing.")
+        assert raster_size(ds) == size_expected, "Expected size mismatch"
 
         self.dtype = gdal.GetDataTypeName(data_type)
         self.xsize = ds.RasterXSize
