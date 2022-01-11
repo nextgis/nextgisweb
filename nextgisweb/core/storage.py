@@ -257,7 +257,7 @@ class StorageLimitExceeded(UserException):
             super().__init__(
                 title=_("Storage full"),
                 message=_(
-                    "The operation cann't be performed because the storage "
+                    "The operation can't be performed because the storage "
                     "limit (%s) has been already exceeded by %s."
                 ) % (format_size(limit), format_size(total - limit)),
                 data=data)
@@ -266,7 +266,7 @@ class StorageLimitExceeded(UserException):
             super().__init__(
                 title=_("Not enough storage"),
                 message=_(
-                    "The operation requires %s of storage and cann't be "
+                    "The operation requires %s of storage and can't be "
                     "performed because only %s available."
                 ) % (format_size(requested), format_size(limit - total)),
                 data=data)
