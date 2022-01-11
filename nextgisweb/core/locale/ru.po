@@ -45,7 +45,7 @@ msgstr "Хранилище переполнено"
 #: storage.py:258
 #, python-format
 msgid ""
-"The operation can't be performed because the storage limit (%s) has been "
+"This operation can't be performed because the storage limit (%s) has been "
 "already exceeded by %s."
 msgstr ""
 "Операция не может быть выполнена, так как лимит использования хранилища (%s) "
@@ -58,7 +58,7 @@ msgstr "Недостаточно места в хранилище"
 #: storage.py:267
 #, python-format
 msgid ""
-"The operation requires %s of storage and can't be performed because only %s "
+"This operation requires %s of storage and can't be performed because only %s "
 "available."
 msgstr ""
 "Операция не может быть выполнена, так как для ее выполнения требуется %s в "
