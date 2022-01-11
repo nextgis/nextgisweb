@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from ..component import Component, require
 from ..lib.config import Option
 
@@ -25,5 +27,5 @@ class WFSClientComponent(Component):
 
     option_annotations = (
         Option('user_agent', default="NextGIS Web"),
-        Option('timeout', float, default=60),  # seconds
+        Option('timeout', timedelta, default=timedelta(seconds=60)),
     )

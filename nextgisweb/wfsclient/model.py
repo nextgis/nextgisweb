@@ -146,7 +146,7 @@ class WFSConnection(Base, Resource):
             response = requests.request(
                 method, self.path,
                 headers=env.wfsclient.headers,
-                timeout=env.wfsclient.options['timeout'],
+                timeout=env.wfsclient.options['timeout'].total_seconds(),
                 **kwargs
             )
         except RequestException:
