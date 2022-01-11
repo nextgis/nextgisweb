@@ -609,7 +609,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         tab = self.layer._sa_table(True)
 
         idcol = getattr(tab.columns, self.layer.column_id)
-        columns = [idcol]
+        columns = [idcol.label('id')]
         where = []
 
         geomcol = getattr(tab.columns, self.layer.column_geom)
