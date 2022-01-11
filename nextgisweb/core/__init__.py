@@ -32,6 +32,7 @@ warnings.filterwarnings(
 from .. import db
 from ..component import Component
 from ..lib.config import Option
+from ..lib.config.otype import InformationUnit
 from ..lib.logging import logger
 from ..models import DBSession
 from ..i18n import Localizer, Translations
@@ -399,8 +400,8 @@ class CoreComponent(
 
         # Estimate storage
         Option('storage.enabled', bool, default=False),
-        Option('storage.limit', int, default=None, doc=(
-            "Storage limit in bytes.")),
+        Option('storage.limit', InformationUnit, default=None, doc=(
+            "Storage limit.")),
 
         # Ignore packages and components
         Option('packages.ignore', doc=(

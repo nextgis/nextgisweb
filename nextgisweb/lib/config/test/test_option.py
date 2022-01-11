@@ -3,7 +3,7 @@ from datetime import timedelta
 import pytest
 
 from nextgisweb.lib.config.otype import (
-    OptionType, Text, Boolean, Integer, List)
+    OptionType, Text, Boolean, Integer, List, InformationUnit)
 
 
 @pytest.mark.parametrize('otype, input, expected', (
@@ -20,7 +20,10 @@ from nextgisweb.lib.config.otype import (
     (List, 'a,b,c', ['a', 'b', 'c']),
     (List, 'ab, bc, cd', ['ab', 'bc', 'cd']),
     (List(Integer), '1, 2, 3', [1, 2, 3]),
-    (List(separator=r'\s+'), 'en ru', ['en', 'ru'])
+    (List(separator=r'\s+'), 'en ru', ['en', 'ru']),
+    (InformationUnit, '3', 3),
+    (InformationUnit, '5B', 5),
+    (InformationUnit, '500 MB', 500 * 1024**2),
 ))
 def test_parse(otype, input, expected):
     assert OptionType.normalize(otype).loads(input) == expected

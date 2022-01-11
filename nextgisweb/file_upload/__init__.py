@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime, timedelta
 
 from ..lib.config import Option
+from ..lib.config.otype import InformationUnit
 from ..lib.logging import logger
 from ..component import Component
 from . import command  # NOQA
@@ -122,8 +123,8 @@ class FileUploadComponent(Component):
 
     option_annotations = (
         Option('path', default=None),
-        Option('max_size', int, default=8 * 2**30),
+        Option('max_size', InformationUnit, default=8 * 2**30),
         Option('tus.enabled', bool, default=True),
-        Option('tus.chunk_size.default', int, default=16 * 2**20),
-        Option('tus.chunk_size.minimum', int, default=1 * 2**20),
+        Option('tus.chunk_size.default', InformationUnit, default=16 * 2**20),
+        Option('tus.chunk_size.minimum', InformationUnit, default=1 * 2**20),
     )

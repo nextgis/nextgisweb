@@ -125,6 +125,31 @@ class Timedelta(OptionType):
                 return '{}{}'.format(seconds // m, a)
 
 
+class InformationUnit(OptionType):
+    _parts = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
+    _pattern = re.compile(r'(\d+) ?(\w+)?')
+
+    def __str__(self):
+        return 'information_unit'
+
+    def loads(self, value):
+        match = self._pattern.match(value)
+        if match is not None:
+            units = int(match[1])
+            suffix = match[2] if match[2] is not None else 'B'
+            if suffix in self._parts:
+                pow_ = self._parts.index(suffix)
+                return units * 1024**pow_
+        raise ValueError("Invalid information unit value: " + value)
+
+    def dumps(self, value):
+        if value is None:
+            return ''
+        for a, m in self._parts:
+            if value % m == 0:
+                return '{} {}'
+
+
 OptionType.OTYPE_MAPPING[str] = Text()
 OptionType.OTYPE_MAPPING[bool] = Boolean()
 OptionType.OTYPE_MAPPING[int] = Integer()
