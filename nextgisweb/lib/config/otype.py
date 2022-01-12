@@ -126,21 +126,20 @@ class Timedelta(OptionType):
 
 
 class SizeInBytes(OptionType):
-    _parts = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
-    _pattern = re.compile(r'(\d+) ?(\w+)?')
+    _parts = ('', 'K', 'M', 'G', 'T')
+    _pattern = re.compile(r'^(\d+) ?([KMGT]?)B?$', re.IGNORECASE)
 
     def __str__(self):
         return 'size_in_bytes'
 
     def loads(self, value):
-        match = self._pattern.match(value)
-        if match is not None:
+        if match := self._pattern.match(value):
             units = int(match[1])
-            suffix = match[2] if match[2] is not None else 'B'
+            suffix = match[2].upper()
             if suffix in self._parts:
                 pow_ = self._parts.index(suffix)
                 return units * 1024**pow_
-        raise ValueError("Invalid information unit value: " + value)
+        raise ValueError("Invalid SizeInBytes value: " + value)
 
     def dumps(self, value):
         if value is None:
