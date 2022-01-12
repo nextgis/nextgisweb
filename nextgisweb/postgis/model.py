@@ -2,7 +2,7 @@ import geoalchemy2 as ga
 import re
 import sqlalchemy.sql as sql
 from shapely.geometry import box
-from sqlalchemy import text, func
+from sqlalchemy import select, text, func
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.engine.url import (
     URL as EngineURL,
@@ -470,15 +470,14 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         st_ymax = func.st_ymax
         st_ymin = func.st_ymin
 
-        tab = db.sql.table(self.table)
-        tab.schema = self.schema
+        tab = self._sa_table(True)
 
-        geomcol = db.sql.column(self.column_geom)
+        geomcol = getattr(tab.columns, self.column_geom)
 
         bbox = st_extent(st_transform(st_setsrid(db.cast(
             st_force2d(geomcol), ga.Geometry), self.geometry_srid), 4326)
         ).label('bbox')
-        sq = db.select([bbox], tab).alias('t')
+        sq = select(bbox).alias('t')
 
         fields = (
             st_xmax(sq.c.bbox),
@@ -489,7 +488,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         conn = self.connection.get_connection()
         try:
-            maxLon, minLon, maxLat, minLat = conn.execute(db.select(fields)).first()
+            maxLon, minLon, maxLat, minLat = conn.execute(select(*fields)).first()
         except SQLAlchemyError as exc:
             raise ExternalDatabaseError(sa_error=exc)
         finally:
