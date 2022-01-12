@@ -125,12 +125,12 @@ class Timedelta(OptionType):
                 return '{}{}'.format(seconds // m, a)
 
 
-class InformationUnit(OptionType):
+class SizeInBytes(OptionType):
     _parts = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
     _pattern = re.compile(r'(\d+) ?(\w+)?')
 
     def __str__(self):
-        return 'information_unit'
+        return 'size_in_bytes'
 
     def loads(self, value):
         match = self._pattern.match(value)

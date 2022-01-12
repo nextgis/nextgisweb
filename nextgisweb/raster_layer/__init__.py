@@ -1,6 +1,6 @@
 from ..component import Component
 from ..lib.config import Option
-from ..lib.config.otype import InformationUnit
+from ..lib.config.otype import SizeInBytes
 from ..lib.logging import logger
 
 from . import command  # NOQA
@@ -50,5 +50,5 @@ class RasterLayerComponent(Component):
 
     option_annotations = (
         Option('cog_enabled', bool, default=False),
-        Option('size_limit', InformationUnit, default=None),
+        Option('size_limit', SizeInBytes, default=None),
     )
