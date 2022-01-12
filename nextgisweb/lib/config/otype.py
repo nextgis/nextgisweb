@@ -94,7 +94,8 @@ class List(OptionType):
         return [self._otype.loads(v) for v in re.split(self._separator, value)]
 
     def dumps(self, value):
-        return ', '.join(value) if value is not None else ''
+        return ', '.join(self._otype.dumps(v) for v in value) \
+            if value is not None else ''
 
 
 class Timedelta(OptionType):
