@@ -29,10 +29,11 @@ from nextgisweb.lib.config.otype import (
     (SizeInBytes, '42T', 42 * 1024 ** 4),
     (SizeInBytes, '1YB', ValueError),
 ))
-def test_loads(otype, input, expected):
+def test_loads_dumps(otype, input, expected):
     norm = OptionType.normalize(otype)
     if isclass(expected) and issubclass(expected, Exception):
         with pytest.raises(expected):
            norm.loads(input)
     else: 
         assert norm.loads(input) == expected
+        assert norm.loads(norm.dumps(expected)) == expected
