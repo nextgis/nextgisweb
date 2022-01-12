@@ -137,16 +137,17 @@ class SizeInBytes(OptionType):
             units = int(match[1])
             suffix = match[2].upper()
             if suffix in self._parts:
-                pow_ = self._parts.index(suffix)
-                return units * 1024**pow_
+                power = self._parts.index(suffix)
+                return units * 1024 ** power
         raise ValueError("Invalid SizeInBytes value: " + value)
 
     def dumps(self, value):
         if value is None:
             return ''
-        for a, m in self._parts:
+        for power, suf in reversed(list(enumerate(self._parts))):
+            m = 1024 ** power
             if value % m == 0:
-                return '{} {}'
+                return '{:d}{:s}'.format(value // m, suf)
 
 
 OptionType.OTYPE_MAPPING[str] = Text()
