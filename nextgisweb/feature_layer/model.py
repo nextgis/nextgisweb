@@ -90,7 +90,8 @@ class LayerFieldsMixin(object):
             order_by=cls.__field_class__.idx,
             collection_class=ordering_list('idx'),
             cascade='all, delete-orphan',
-            single_parent=True
+            back_populates="layer",
+            single_parent=True,
         )
 
     @declared_attr
