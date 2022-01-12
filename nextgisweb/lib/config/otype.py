@@ -94,7 +94,8 @@ class List(OptionType):
         return [self._otype.loads(v) for v in re.split(self._separator, value)]
 
     def dumps(self, value):
-        return ', '.join(value) if value is not None else ''
+        return ', '.join(self._otype.dumps(v) for v in value) \
+            if value is not None else ''
 
 
 class Timedelta(OptionType):
@@ -123,6 +124,31 @@ class Timedelta(OptionType):
         for a, m in self._parts:
             if seconds % m == 0:
                 return '{}{}'.format(seconds // m, a)
+
+
+class SizeInBytes(OptionType):
+    _parts = ('', 'K', 'M', 'G', 'T')
+    _pattern = re.compile(r'^(\d+) ?([KMGT]?)B?$', re.IGNORECASE)
+
+    def __str__(self):
+        return 'size_in_bytes'
+
+    def loads(self, value):
+        if match := self._pattern.match(value):
+            units = int(match[1])
+            suffix = match[2].upper()
+            if suffix in self._parts:
+                power = self._parts.index(suffix)
+                return units * 1024 ** power
+        raise ValueError("Invalid SizeInBytes value: " + value)
+
+    def dumps(self, value):
+        if value is None:
+            return ''
+        for power, suf in reversed(list(enumerate(self._parts))):
+            m = 1024 ** power
+            if value % m == 0:
+                return '{:d}{:s}'.format(value // m, suf)
 
 
 OptionType.OTYPE_MAPPING[str] = Text()
