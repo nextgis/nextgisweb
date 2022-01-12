@@ -8,6 +8,7 @@ NextGIS Web internals
    resource
    jsrealm
    error
+   lunkwill
    i18n
    test
    versioning
