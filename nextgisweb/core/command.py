@@ -149,7 +149,9 @@ class BackupCommand(Command):
                 os.unlink(target)
                 logger.warn("Backup path not set. Writing backup to temporary file %s!", target)
 
-        if os.path.exists(target):
+        to_stdout = target == '-'
+
+        if not to_stdout and os.path.exists(target):
             raise RuntimeError("Target already exists!")
 
         if args.nozip:
@@ -164,6 +166,12 @@ class BackupCommand(Command):
                     rmtree(tmpdir)
                     raise
 
+        elif to_stdout:
+            @contextmanager
+            def tgt_context():
+                with TemporaryDirectory() as tmp_dir:
+                    yield tmp_dir
+                    cls.compress(tmp_dir, sys.stdout.buffer)
         else:
             @contextmanager
             def tgt_context():
@@ -183,11 +191,13 @@ class BackupCommand(Command):
         with tgt_context() as tgt:
             backup(env, tgt)
 
-        print(target)
+        if not to_stdout:
+            print(target)
 
     @classmethod
     def compress(cls, src, dst):
-        logger.debug("Compressing '%s' to '%s'...", src, dst)
+        logger.debug("Compressing '%s' to '%s'...", src,
+                     dst if isinstance(dst, str) else dst.name)
         with ZipFile(dst, 'w', allowZip64=True) as zipf:
             for root, dirs, files in os.walk(src):
                 zipf.write(root, os.path.relpath(root, src))
@@ -210,24 +220,33 @@ class RestoreCommand(Command):
 
     @classmethod
     def execute(cls, args, env):
-        if is_zipfile(args.source):
+        source = args.source
+        from_stdin = source == '-'
+        if from_stdin:
             @contextmanager
             def src_context():
-                tmp_root = os.path.split(args.source)[0]
+                with TemporaryDirectory() as tmpdir:
+                    cls.decompress(sys.stdin.buffer, tmpdir)
+                    yield tmpdir
+        elif is_zipfile(source):
+            @contextmanager
+            def src_context():
+                tmp_root = os.path.split(source)[0]
                 with TemporaryDirectory(dir=tmp_root) as tmpdir:
-                    cls.decompress(args.source, tmpdir)
+                    cls.decompress(source, tmpdir)
                     yield tmpdir
         else:
             @contextmanager
             def src_context():
-                yield args.source
+                yield source
 
         with src_context() as src:
             restore(env, src)
 
     @classmethod
     def decompress(cls, src, dst):
-        logger.debug("Decompressing '%s' to '%s'...", src, dst)
+        logger.debug("Decompressing '%s' to '%s'...",
+                     src if isinstance(src, str) else src.name, dst)
         with ZipFile(src, 'r') as zipf:
             zipf.extractall(dst)
 
