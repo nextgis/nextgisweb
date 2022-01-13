@@ -42,6 +42,14 @@ class IMAGE_FORMAT(object):
     enum = (PNG, JPEG)
 
 
+def layer_by_keyname(service, keyname):
+    for layer in service.layers:
+        if layer.keyname == keyname:
+            return layer
+    raise ValidationError(message="Unknown layer: '%s'." % keyname,
+                          data=dict(code="LayerNotDefined"))
+
+
 def handler(obj, request):
     request.resource_permission(ServiceScope.connect)
 
@@ -174,8 +182,6 @@ def _get_map(obj, params, request):
 
     p_size = (p_width, p_height)
 
-    lmap = dict((lyr.keyname, lyr) for lyr in obj.layers)
-
     img = Image.new('RGBA', p_size, (255, 255, 255, 0))
 
     try:
@@ -203,10 +209,7 @@ def _get_map(obj, params, request):
     w_scale = scale(distance, p_width)
 
     for lname in p_layers:
-        try:
-            lobj = lmap[lname]
-        except KeyError:
-            raise ValidationError("Unknown layer: %s" % lname, data=dict(code="LayerNotDefined"))
+        lobj = layer_by_keyname(obj, lname)
 
         res = lobj.resource
         request.resource_permission(DataScope.read, res)
@@ -306,13 +309,11 @@ def _get_feature_info(obj, params, request):
         + "%(r)f %(t)f, %(r)f %(b)f, %(l)f %(b)f))"
     ) % qbox, srs.id)
 
-    lmap = dict((lyr.keyname, lyr) for lyr in obj.layers)
-
     results = list()
     fcount = 0
 
     for lname in p_query_layers:
-        layer = lmap[lname]
+        layer = layer_by_keyname(obj, lname)
         flayer = layer.resource.feature_layer
 
         request.resource_permission(DataScope.read, layer.resource)
@@ -364,9 +365,7 @@ def _get_feature_info(obj, params, request):
 def _get_legend_graphic(obj, params, request):
     p_layer = params.get('LAYER')
 
-    lmap = dict((lyr.keyname, lyr) for lyr in obj.layers)
-    layer = lmap[p_layer]
-
+    layer = layer_by_keyname(obj, p_layer)
     request.resource_permission(DataScope.read, layer.resource)
 
     if not ILegendableStyle.providedBy(layer.resource):
