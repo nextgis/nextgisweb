@@ -393,10 +393,12 @@ class CoreComponent(
         Option('backup.path', doc=(
             "Path to directory in filesystem where backup created if target "
             "destination is not specified.")),
-
         Option('backup.filename', default='%Y%m%d-%H%M%S.ngwbackup', doc=(
             "File name template (passed to strftime) for filename in "
             "backup.path if backup target destination is not specified.")),
+        Option('backup.tmpdir', default=None, doc=(
+            "Temporary directory used for backup integrity and archive "
+            "packing/unpacking.")),
 
         # Estimate storage
         Option('storage.enabled', bool, default=False),
