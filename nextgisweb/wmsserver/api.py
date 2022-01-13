@@ -12,6 +12,7 @@ from osgeo import gdal, gdal_array
 from pyramid.response import Response
 from pyramid.renderers import render as render_template
 from pyramid.httpexceptions import HTTPBadRequest
+from sqlalchemy.orm.exc import NoResultFound
 
 from ..core.exception import ValidationError
 from ..pyramid.exception import json_error
@@ -181,7 +182,10 @@ def _get_map(obj, params, request):
         epsg, axis_sy = parse_srs(p_srs)
     except SRSParseError as e:
         raise ValidationError(str(e))
-    srs = SRS.filter_by(id=epsg).one()
+    try:
+        srs = SRS.filter_by(id=epsg).one()
+    except NoResultFound:
+        raise ValidationError(message="SRS (id=%d) not found." % epsg)
 
     def scale(delta, img_px):
         dpi = 96
@@ -292,7 +296,10 @@ def _get_feature_info(obj, params, request):
         epsg, axis_xy = parse_srs(p_srs)
     except SRSParseError as e:
         raise ValidationError(str(e))
-    srs = SRS.filter_by(id=epsg).one()
+    try:
+        srs = SRS.filter_by(id=epsg).one()
+    except NoResultFound:
+        raise ValidationError(message="SRS (id=%d) not found." % epsg)
 
     qgeom = Geometry.from_wkt((
         "POLYGON((%(l)f %(b)f, %(l)f %(t)f, "
