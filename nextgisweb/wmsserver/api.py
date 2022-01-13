@@ -168,6 +168,8 @@ def _get_map(obj, params, request):
     if p_format not in IMAGE_FORMAT.enum:
         raise ValidationError("Invalid FORMAT parameter.")
     p_srs = params.get('SRS', params.get('CRS'))
+    if p_srs is None:
+        raise ValidationError(message="CRS/SRS parameter required.")
 
     p_size = (p_width, p_height)
 
@@ -268,7 +270,9 @@ def _get_feature_info(obj, params, request):
     p_width = int(params.get('WIDTH'))
     p_height = int(params.get('HEIGHT'))
     p_srs = params.get('SRS', params.get('CRS'))
-    p_info_format = params.get('INFO_FORMAT', b'text/html')
+    if p_srs is None:
+        raise ValidationError(message="CRS/SRS parameter required.")
+    p_info_format = params.get('INFO_FORMAT', 'text/html')
 
     p_x = float(params.get('X'))
     p_y = float(params.get('Y'))
