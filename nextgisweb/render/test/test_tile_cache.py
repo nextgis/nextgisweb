@@ -9,7 +9,8 @@ from shapely.geometry import Point
 
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.models import DBSession
-from nextgisweb.vector_layer import VectorLayer
+from nextgisweb.raster_layer import RasterLayer
+from nextgisweb.raster_style import RasterStyle
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.auth import User
 
@@ -20,17 +21,19 @@ from nextgisweb.render.util import pack_color, unpack_color
 @pytest.fixture
 def frtc(ngw_resource_group):
     with transaction.manager:
-        vector_layer = VectorLayer(
-            parent_id=ngw_resource_group, display_name='from_fields',
+        layer = RasterLayer(
+            parent_id=ngw_resource_group, display_name='test-render-layer',
             owner_user=User.by_keyname('administrator'),
-            geometry_type='POINT',
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=uuid4().hex
+            xsize=100, ysize=100, dtype='Byte', band_count=3,
         ).persist()
-        vector_layer.setup_from_fields([])
+        style = RasterStyle(
+            parent=layer, display_name='test-render-style',
+            owner_user=User.by_keyname('administrator'),
+        ).persist()
 
         result = ResourceTileCache(
-            resource=vector_layer,
+            resource=style,
         ).persist()
         result.async_writing = True
 
@@ -41,7 +44,8 @@ def frtc(ngw_resource_group):
 
     with transaction.manager:
         DBSession.delete(ResourceTileCache.filter_by(resource_id=result.resource_id).one())
-        DBSession.delete(VectorLayer.filter_by(id=vector_layer.id).one())
+        DBSession.delete(RasterStyle.filter_by(id=style.id).one())
+        DBSession.delete(RasterLayer.filter_by(id=layer.id).one())
 
 
 @pytest.fixture
