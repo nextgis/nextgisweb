@@ -325,6 +325,13 @@ def estimate_storage(request):
     request.env.core.start_estimation()
 
 
+def storage_status(request):
+    require_storage_enabled(request)
+    request.require_administrator()
+
+    return dict(estimation_running=request.env.core.estimation_running())
+
+
 def storage(request):
     require_storage_enabled(request)
     request.require_administrator()
@@ -449,6 +456,11 @@ def setup_pyramid(comp, config):
         'pyramid.estimate_storage',
         '/api/component/pyramid/estimate_storage',
     ).add_view(estimate_storage, request_method='POST', renderer='json')
+
+    config.add_route(
+        'pyramid.storage_status',
+        '/api/component/pyramid/storage_status',
+    ).add_view(storage_status, request_method='GET', renderer='json')
 
     config.add_route(
         'pyramid.storage',

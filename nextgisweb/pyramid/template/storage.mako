@@ -106,6 +106,13 @@ ${tr(_("Some changes may be reflected only after full estimation."))}
                 color: 'secondary',
                 disabled: true
             }, "estimateBtn");
+            setInterval(function () {
+                api.route('pyramid.storage_status').get().then(function(result) {
+                    if (!result.estimation_running) {
+                        location.reload();
+                    }
+                });
+            }, 10000);
         %else:
             var estimateBtn = new Button({
                 label: ${json.dumps(tr(_("Estimate storage")), ensure_ascii=False) | n},
