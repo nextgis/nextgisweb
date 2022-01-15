@@ -45,7 +45,8 @@ class WebMapComponent(Component):
                 (i.identity, dict(display_name=i.display_name))
                 for i in WebMapAdapter.registry
             ),
-            enable_social_networks=self.options['enable_social_networks']
+            enable_social_networks=self.options['enable_social_networks'],
+            check_origin=self.options['check_origin'],
         )
 
         result.update(self.settings_view(request))

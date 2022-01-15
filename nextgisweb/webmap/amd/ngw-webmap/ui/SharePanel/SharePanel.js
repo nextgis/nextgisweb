@@ -15,6 +15,8 @@ define([
     "ngw-webmap/Permalink",
     "dojox/dtl/_base",
     "dojox/dtl/Context",
+    "@nextgisweb/pyramid/api",
+    "@nextgisweb/pyramid/settings!",
     "dojo/text!./SharePanel.hbs",
 
     //templates
@@ -36,6 +38,8 @@ define([
     Permalink,
     dtl,
     dtlContext,
+    api,
+    settings,
     template
 ) {
     return declare(
@@ -104,6 +108,12 @@ define([
                         this.contentWidget.previewMapForm.submit();
                     })
                 );
+                
+                if (settings["check_origin"]) {
+                    this.contentWidget.checkOriginNote.innerHTML =  i18n.gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain.")
+                        .replace("<a>", '<a href="' + api.routeURL('pyramid.control_panel.cors') + '" target="_blank">')
+                }
+
             },
             show: function () {
                 this.inherited(arguments);

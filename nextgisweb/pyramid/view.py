@@ -431,7 +431,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'pyramid.control_panel.cors',
-        '/control-panel/cors'
+        '/control-panel/cors', client=(),
     ).add_view(cors, renderer=ctpl('cors'))
 
     config.add_route(
