@@ -1,6 +1,8 @@
 from collections import namedtuple
 from urllib.parse import unquote
 
+from pyramid.renderers import render_to_response
+
 from ..resource import Resource, Widget, resource_factory, DataScope
 from ..dynmenu import DynItem, Label, Link
 
@@ -35,127 +37,155 @@ def settings(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+def check_origin(request):
+    if (
+        not request.env.webmap.options['check_origin']
+        or request.headers.get('Sec-Fetch-Dest') != 'iframe'
+        or request.headers.get('Sec-Fetch-Site') == 'same-origin'
+    ):
+        return True
+
+    referer = request.headers.get('Referer')
+    if referer is not None:
+        if referer.endswith('/'):
+            referer = referer[:-1]
+        if (
+            not referer.startswith(request.application_url)
+            and not request.check_origin(referer)
+        ):
+            return False
+
+    return True
+
+
+def display(obj, request):
+    if not check_origin(request):
+        response = render_to_response('nextgisweb:webmap/template/cors_error.mako',
+                                      dict(), request)
+        response.status = 403
+        return response
+
+    request.resource_permission(WebMap.scope.webmap.display)
+
+    MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])
+
+    display.mid = MID(
+        set(),
+        set(),
+        set(),
+    )
+
+    # Map level plugins
+    plugin = dict()
+    for pcls in WebmapPlugin.registry:
+        p_mid_data = pcls.is_supported(obj)
+        if p_mid_data:
+            plugin.update((p_mid_data,))
+
+    def traverse(item):
+        data = dict(
+            id=item.id,
+            type=item.item_type,
+            label=item.display_name
+        )
+
+        if item.item_type == 'layer':
+            style = item.style
+            layer = style.parent
+
+            if not style.has_permission(DataScope.read, request.user):
+                return None
+
+            # If there are no necessary permissions skip web-map element
+            # so it won't be shown in the tree
+
+            # TODO: Security
+
+            # if not layer.has_permission(
+            #     request.user,
+            #     'style-read',
+            #     'data-read',
+            # ):
+            #     return None
+
+            # Main element parameters
+            data.update(
+                layerId=style.parent_id,
+                styleId=style.id,
+                visibility=bool(item.layer_enabled),
+                transparency=item.layer_transparency,
+                minScaleDenom=item.layer_min_scale_denom,
+                maxScaleDenom=item.layer_max_scale_denom,
+                drawOrderPosition=item.draw_order_position,
+            )
+
+            data['adapter'] = WebMapAdapter.registry.get(
+                item.layer_adapter, 'image').mid
+            display.mid.adapter.add(data['adapter'])
+
+            # Layer level plugins
+            plugin = dict()
+            for pcls in WebmapLayerPlugin.registry:
+                p_mid_data = pcls.is_layer_supported(layer, obj)
+                if p_mid_data:
+                    plugin.update((p_mid_data,))
+
+            data.update(plugin=plugin)
+            display.mid.plugin.update(plugin.keys())
+
+        elif item.item_type in ('root', 'group'):
+            # Recursively run all elements excluding those
+            # with no permissions
+            data.update(
+                expanded=item.group_expanded,
+                children=list(filter(
+                    None,
+                    map(traverse, item.children)
+                ))
+            )
+
+        return data
+
+    tmp = obj.to_dict()
+
+    config = dict(
+        extent=tmp["extent"],
+        extent_constrained=tmp["extent_constrained"],
+        rootItem=traverse(obj.root_item),
+        mid=dict(
+            adapter=tuple(display.mid.adapter),
+            basemap=tuple(display.mid.basemap),
+            plugin=tuple(display.mid.plugin)
+        ),
+        webmapPlugin=plugin,
+        bookmarkLayerId=obj.bookmark_resource_id,
+        tinyDisplayUrl=request.route_url('webmap.display.tiny', id=obj.id),
+        testEmbeddedMapUrl=request.route_url('webmap.display.shared.test', id=obj.id),
+        webmapId=obj.id,
+        webmapDescription=obj.description,
+        webmapTitle=obj.display_name,
+        webmapEditable=obj.editable,
+        drawOrderEnabled=obj.draw_order_enabled,
+    )
+
+    if request.env.webmap.options['annotation']:
+        config['annotations'] = dict(
+            enabled=obj.annotation_enabled,
+            default=obj.annotation_default,
+            scope=dict(
+                read=obj.has_permission(WebMapScope.annotation_read, request.user),
+                write=obj.has_permission(WebMapScope.annotation_write, request.user),
+            )
+        )
+
+    return dict(
+        obj=obj,
+        display_config=config,
+        custom_layout=True
+    )
+
+
 def setup_pyramid(comp, config):
-    def display(obj, request):
-        request.resource_permission(WebMap.scope.webmap.display)
-
-        MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])
-
-        display.mid = MID(
-            set(),
-            set(),
-            set(),
-        )
-
-        # Map level plugins
-        plugin = dict()
-        for pcls in WebmapPlugin.registry:
-            p_mid_data = pcls.is_supported(obj)
-            if p_mid_data:
-                plugin.update((p_mid_data,))
-
-        def traverse(item):
-            data = dict(
-                id=item.id,
-                type=item.item_type,
-                label=item.display_name
-            )
-
-            if item.item_type == 'layer':
-                style = item.style
-                layer = style.parent
-
-                if not style.has_permission(DataScope.read, request.user):
-                    return None
-
-                # If there are no necessary permissions skip web-map element
-                # so it won't be shown in the tree
-
-                # TODO: Security
-
-                # if not layer.has_permission(
-                #     request.user,
-                #     'style-read',
-                #     'data-read',
-                # ):
-                #     return None
-
-                # Main element parameters
-                data.update(
-                    layerId=style.parent_id,
-                    styleId=style.id,
-                    visibility=bool(item.layer_enabled),
-                    transparency=item.layer_transparency,
-                    minScaleDenom=item.layer_min_scale_denom,
-                    maxScaleDenom=item.layer_max_scale_denom,
-                    drawOrderPosition=item.draw_order_position,
-                )
-
-                data['adapter'] = WebMapAdapter.registry.get(
-                    item.layer_adapter, 'image').mid
-                display.mid.adapter.add(data['adapter'])
-
-                # Layer level plugins
-                plugin = dict()
-                for pcls in WebmapLayerPlugin.registry:
-                    p_mid_data = pcls.is_layer_supported(layer, obj)
-                    if p_mid_data:
-                        plugin.update((p_mid_data,))
-
-                data.update(plugin=plugin)
-                display.mid.plugin.update(plugin.keys())
-
-            elif item.item_type in ('root', 'group'):
-                # Recursively run all elements excluding those
-                # with no permissions
-                data.update(
-                    expanded=item.group_expanded,
-                    children=list(filter(
-                        None,
-                        map(traverse, item.children)
-                    ))
-                )
-
-            return data
-
-        tmp = obj.to_dict()
-
-        config = dict(
-            extent=tmp["extent"],
-            extent_constrained=tmp["extent_constrained"],
-            rootItem=traverse(obj.root_item),
-            mid=dict(
-                adapter=tuple(display.mid.adapter),
-                basemap=tuple(display.mid.basemap),
-                plugin=tuple(display.mid.plugin)
-            ),
-            webmapPlugin=plugin,
-            bookmarkLayerId=obj.bookmark_resource_id,
-            tinyDisplayUrl=request.route_url('webmap.display.tiny', id=obj.id),
-            testEmbeddedMapUrl=request.route_url('webmap.display.shared.test', id=obj.id),
-            webmapId=obj.id,
-            webmapDescription=obj.description,
-            webmapTitle=obj.display_name,
-            webmapEditable=obj.editable,
-            drawOrderEnabled=obj.draw_order_enabled,
-        )
-
-        if comp.options['annotation']:
-            config['annotations'] = dict(
-                enabled=obj.annotation_enabled,
-                default=obj.annotation_default,
-                scope=dict(
-                    read=obj.has_permission(WebMapScope.annotation_read, request.user),
-                    write=obj.has_permission(WebMapScope.annotation_write, request.user),
-                )
-            )
-
-        return dict(
-            obj=obj,
-            display_config=config,
-            custom_layout=True
-        )
-
     config.add_route(
         'webmap.display', r'/resource/{id:\d+}/display',
         factory=resource_factory, client=('id',)

@@ -64,4 +64,5 @@ class WebMapComponent(Component):
             doc="Basemaps description file."),
         Option('annotation', bool, default=True, doc="Turn on / off annotations."),
         Option('enable_social_networks', bool, default=True),
+        Option('check_origin', bool, default=False, doc="Check iframe Referer header."),
     )
