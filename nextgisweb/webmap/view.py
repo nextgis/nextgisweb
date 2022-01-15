@@ -1,5 +1,5 @@
 from collections import namedtuple
-from urllib.parse import unquote
+from urllib.parse import unquote, urljoin, urlparse
 
 from pyramid.renderers import render_to_response
 
@@ -53,17 +53,27 @@ def check_origin(request):
             not referer.startswith(request.application_url)
             and not request.check_origin(referer)
         ):
-            return False
+            webmap_url = request.route_url(
+                'webmap.display',
+                id=request.context.id
+            ) + '?' + request.query_string
+
+            response = render_to_response(
+                'nextgisweb:webmap/template/invalid_origin.mako', dict(
+                    origin=urljoin(request.headers.get('Referer'), '/'),
+                    domain=urlparse(request.application_url).hostname,
+                    webmap_url=webmap_url,
+                ), request)
+            response.status = 403
+            return response
 
     return True
 
 
 def display(obj, request):
-    if not check_origin(request):
-        response = render_to_response('nextgisweb:webmap/template/cors_error.mako',
-                                      dict(), request)
-        response.status = 403
-        return response
+    is_valid_or_error = check_origin(request)
+    if is_valid_or_error is not True:
+        return is_valid_or_error
 
     request.resource_permission(WebMap.scope.webmap.display)
 
