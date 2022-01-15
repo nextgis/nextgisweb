@@ -10,11 +10,11 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:29 model.py:38 view.py:182 view.py:203
+#: model.py:29 model.py:38 view.py:224 view.py:245
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:31 view.py:189
+#: model.py:31 view.py:231
 msgid "Display"
 msgstr "Открыть"
 
@@ -26,11 +26,15 @@ msgstr "Просмотр аннотаций"
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: view.py:34 view.py:204
+#: view.py:36 view.py:246
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:210
+#: view.py:202
+msgid "Embedded webmap preview"
+msgstr "Просмотр встроенной веб-карты"
+
+#: view.py:252
 msgid "External access"
 msgstr "Внешний доступ"
 
@@ -64,16 +68,16 @@ msgid "Annotations"
 msgstr "Аннотации"
 
 #: amd/ngw-webmap/Display.js:727 amd/ngw-webmap/tool/Zoom.js:18
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:479
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:481
 msgid "Zoom in"
 msgstr "Приблизить"
 
 #: amd/ngw-webmap/Display.js:728 amd/ngw-webmap/tool/Zoom.js:21
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:480
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:482
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:732 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
+#: amd/ngw-webmap/Display.js:732 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:486
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
@@ -81,7 +85,7 @@ msgstr "Информация о правообладателях"
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:751 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
+#: amd/ngw-webmap/Display.js:751 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:495
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
@@ -136,7 +140,7 @@ msgstr "Перейти"
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: amd/ngw-webmap/plugin/LayerEditor.js:102
+#: amd/ngw-webmap/plugin/LayerEditor.js:104
 msgid "Editing"
 msgstr "Редактирование"
 
@@ -695,13 +699,30 @@ msgstr "Ссылка на основную карту"
 msgid "Generate events"
 msgstr "Генерация событий"
 
-#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:68
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.hbs:71
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:511
+#: amd/ngw-webmap/ui/SharePanel/SharePanel.js:113
+msgid ""
+"<a>CORS</a> must be enabled for the target origin when embedding a web map on"
+" a different domain."
+msgstr ""
+"<a>CORS</a> должен быть включен при встраивании веб-карты на домене."
+
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:513
 msgid "Open full map"
 msgstr "Открыть карту целиком"
+
+#: template/invalid_origin.mako:4
+#, python-format
+msgid "Web map embedding is not allowed for %s in the Web GIS settings."
+msgstr "Встраивание веб-карты не разрешено для %s в настройках Веб ГИС."
+
+#: template/invalid_origin.mako:6
+#, python-format
+msgid "View the map on %s"
+msgstr "Посмотреть карту на %s"
 
 #: template/section_api_webmap.mako:7
 msgid "TMS (Tile Map Service)"
