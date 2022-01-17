@@ -30,6 +30,9 @@ export class ServerResponseError extends BaseAPIError {
     constructor(data) {
         super(data.message);
         this.data = data;
+        if (data.title) {
+            this.title = data.title;
+        }
     }
 }
 
