@@ -8,10 +8,6 @@
          class="print-controls-pane">
       <div class="dynamic-panel__title">
           {{gettext 'Print'}}
-          <a class="close material-icons icon-close"
-             title="{{gettext 'Close'}}"
-             data-dojo-attach-point="closePanel"
-          ></a>
       </div>
       <div class="print-panel-content">
         <div data-dojo-type="dojox/layout/TableContainer"
@@ -123,6 +119,11 @@
           </div>
         </div>
       </div>
+      <span class="close material-icons material-icons--link icon--link"
+          title="{{gettext 'Close'}}"
+          data-dojo-attach-point="closePanel">
+          close
+      </span>
     </div>
 
     <div data-dojo-type="dijit/layout/ContentPane"
