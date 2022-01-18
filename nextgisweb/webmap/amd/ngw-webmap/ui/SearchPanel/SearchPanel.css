@@ -3,7 +3,7 @@
     height: 100%;
 }
 
-.search-panel__header{
+.search-panel__controls{
     position: relative;
 }
 
@@ -15,12 +15,12 @@
 .search-panel__field-icon{
     position: absolute;
     right: 4px;
-    top: -5px;
+    top: -3px;
     user-select: none;
     cursor: pointer;
 }
 
-.search-panel__header.focus .search-panel__field-icon,
+.search-panel__controls.focus .search-panel__field-icon,
 .search-panel__field-icon:hover{
     color:var(--primary);
 }
@@ -35,12 +35,8 @@
     background: url("resources/geometry-bg.png") 0 0 repeat;
 }
 
-.dynamic-panel--fullwidth .search-panel__header {
-    height: 40px;
-}
-
 .dynamic-panel--fullwidth .search-panel__content {
-    top: 46px;
+    top: 38px;
 }
 
 .search-panel__status{
@@ -50,12 +46,11 @@
 
 .search-panel__controls {
   position: absolute;
-  top: 23px;
+  top: 14px;
   right: 0;
   left: 0;
   border-bottom: 1px solid rgba(0, 0, 0, .12);
-  
-  padding: 0 16px;
+  padding: 0 16px 1px 16px;
 }
 
 .search-panel__close {
