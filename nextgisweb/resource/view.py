@@ -2,7 +2,7 @@ import warnings
 
 from pyramid import httpexceptions
 from sqlalchemy import bindparam
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
 import sqlalchemy.ext.baked
 
@@ -56,13 +56,14 @@ def resource_factory(request):
         raise ResourceNotFound(res_id)
 
     # Second, load resource of it's class
-    bq_obj = _rf_bakery(
-        lambda session: session.query(Resource).with_polymorphic(
-            Resource.registry[res_cls]
-        ).options(
-            joinedload(Resource.owner_user),
-            joinedload(Resource.parent),
-        ).filter_by(id=bindparam('id')), res_cls)
+    def res_query(session):
+        res = with_polymorphic(Resource, [Resource.registry[res_cls]])
+        return session.query(res).options(
+            joinedload(res.owner_user),
+            joinedload(res.parent),
+        ).filter_by(id=bindparam('id'))
+
+    bq_obj = _rf_bakery(res_query, res_cls)
 
     obj = bq_obj(DBSession()).params(id=res_id).one()
     request.audit_context(res_cls, res_id)
@@ -156,7 +157,7 @@ def widget(request):
         if clsid not in Resource.registry._dict:
             raise httpexceptions.HTTPBadRequest()
 
-        parent = Resource.query().with_polymorphic('*') \
+        parent = with_polymorphic(Resource, '*') \
             .filter_by(id=parent_id).one()
         owner_user = request.user
 
@@ -166,7 +167,7 @@ def widget(request):
         if resid is None or clsid is not None or parent_id is not None:
             raise httpexceptions.HTTPBadRequest()
 
-        obj = Resource.query().with_polymorphic('*') \
+        obj = with_polymorphic(Resource, '*') \
             .filter_by(id=resid).one()
 
         clsid = obj.cls

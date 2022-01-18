@@ -257,7 +257,7 @@ def setup_pyramid(comp, config):
     config.add_request_method(_login_url, name='login_url')
 
     def principal_dump(request):
-        query = Principal.query().with_polymorphic('*')
+        query = sa.orm.with_polymorphic(Principal, '*').query()
         result = []
 
         for p in query:

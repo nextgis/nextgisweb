@@ -4,6 +4,7 @@ import zope.event
 
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
+from sqlalchemy.orm import with_polymorphic
 from sqlalchemy.sql.operators import ilike_op
 
 from .. import db
@@ -332,7 +333,7 @@ def search(request):
             raise ValidationError("Operator '%s' is not supported" % op)
 
     # TODO: Chech speed of with_polymorphic('*')
-    query = Resource.query().with_polymorphic('*') \
+    query = with_polymorphic(Resource, '*') \
         .filter(db.and_(True, *filter_)) \
         .order_by(Resource.display_name)
 
