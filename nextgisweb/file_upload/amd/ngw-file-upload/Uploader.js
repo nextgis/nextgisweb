@@ -8,6 +8,7 @@ define([
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/settings!",
     "@nextgisweb/pyramid/i18n!",
+    "ngw-pyramid/ErrorDialog/ErrorDialog",
     "dojo/text!./template/Uploader.hbs",
     "./FileUploader",
     //
@@ -22,6 +23,7 @@ define([
     api,
     settings,
     i18n,
+    ErrorDialog,
     template,
     Uploader
 ) {
@@ -64,7 +66,7 @@ define([
             this.uploaderWidget.on("begin", function () { widget.uploadBegin(); });
             this.uploaderWidget.on("progress", function (evt) { widget.uploadProgress(evt); });
             this.uploaderWidget.on("complete", function (data) { widget.uploadComplete(data); });
-            this.uploaderWidget.on("error", function () { widget.uploadError(); });
+            this.uploaderWidget.on("error", this.uploadError.bind(this));
 
             widget.dndInit();
         },
@@ -148,6 +150,12 @@ define([
 
             domClass.remove(this.focusNode, this.stateClasses);
             domClass.add(this.focusNode, "uploader--error");
+
+            // ErrorDialog have wrong behaviour with Error instances
+            if (error instanceof Error) {
+                error = Object.assign({}, error);
+            }
+            new ErrorDialog(error).show()
         },
 
         uploadReset: function() {

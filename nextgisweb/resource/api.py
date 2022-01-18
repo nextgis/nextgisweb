@@ -100,6 +100,8 @@ def collection_get(request):
 
 
 def collection_post(request):
+    request.env.core.check_storage_limit()
+
     data = dict(request.json_body)
 
     if 'resource' not in data:

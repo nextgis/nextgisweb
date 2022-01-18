@@ -76,6 +76,8 @@ def item(request):
 
 
 def _collection_post(request):
+    request.env.core.check_storage_limit()
+
     comp = env.file_upload
 
     metas = []
@@ -126,6 +128,8 @@ def _collection_post(request):
 
 
 def _collection_put(request):
+    request.env.core.check_storage_limit()
+
     comp = env.file_upload
     if request.content_length > comp.max_size:
         raise UploadedFileTooLarge()
@@ -167,6 +171,8 @@ def _collection_put(request):
 
 
 def _collection_post_tus(request):
+    request.env.core.check_storage_limit()
+
     comp = request.env.file_upload
 
     try:
