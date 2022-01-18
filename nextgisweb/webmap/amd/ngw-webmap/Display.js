@@ -347,9 +347,10 @@ define([
                     widget.searchPanel = new SearchPanel({
                         region: 'left',
                         class: "dynamic-panel--fullwidth",
+                        title: i18n.gettext("Search"),
                         isOpen: widget.activeLeftPanel === "searchPanel",
                         gutters: false,
-                        withCloser: false,
+                        withCloser: true,
                         display: widget
                     });
 

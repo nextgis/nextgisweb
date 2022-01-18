@@ -2,6 +2,8 @@ define([
     "dojo/_base/declare",
     "@nextgisweb/pyramid/i18n!",
     "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "dijit/_WidgetsInTemplateMixin",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
     "dojo/topic",
@@ -24,6 +26,8 @@ define([
     declare,
     i18n,
     _WidgetBase,
+    _TemplatedMixin,
+    _WidgetsInTemplateMixin,
     DynamicPanel,
     BorderContainer,
     topic,
@@ -45,11 +49,20 @@ define([
         inputTimer: undefined,
         statusPane: undefined,
         MAX_SEARCH_RESULTS: 100,
-        templateString: i18n.renderTemplate(template),
+        // templateString: i18n.renderTemplate(template),
         activeResult: undefined,
 
         constructor: function (options) {
             declare.safeMixin(this, options);
+
+            this.contentWidget = new (declare(
+                [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
+                {
+                    templateString: i18n.renderTemplate(template),
+                    region: "top",
+                    gutters: false
+                }
+            ))();
         },
 
         postCreate: function () {
@@ -57,15 +70,15 @@ define([
 
             var widget = this;
 
-            on(this.searchField, "focus", function () {
-                domClass.add(widget.titleNode, "focus");
+            on(this.contentWidget.searchField, "focus", function () {
+                domClass.add(widget.contentWidget.controlsNode, "focus");
             });
 
-            on(this.searchField, "blur", function () {
-                domClass.remove(widget.titleNode, "focus");
+            on(this.contentWidget.searchField, "blur", function () {
+                domClass.remove(widget.contentWidget.controlsNode, "focus");
             });
 
-            on(this.searchField, "input", function (e) {
+            on(this.contentWidget.searchField, "input", function (e) {
                 if (widget.inputTimer) {
                     clearInterval(widget.inputTimer);
                 }
@@ -76,7 +89,7 @@ define([
                 }, 750);
             });
 
-            on(this.searchIcon, "click", function (e) {
+            on(this.contentWidget.searchIcon, "click", function (e) {
                 if (widget.inputTimer) {
                     clearInterval(widget.inputTimer);
                 }
@@ -90,7 +103,7 @@ define([
             var widget = this;
 
             setTimeout(function () {
-                widget.searchField.focus();
+                widget.contentWidget.searchField.focus();
             }, 300);
         },
 
@@ -109,7 +122,7 @@ define([
                 class: statusClass,
                 innerHTML: text
             });
-            domConstruct.place(this.statusPane, this.contentNode, "last");
+            domConstruct.place(this.statusPane, this.contentWidget.contentNode, "last");
         },
 
         removeStatus: function () {
@@ -120,7 +133,7 @@ define([
 
         search: function () {
             var widget = this,
-                criteria = this.searchField.value;
+                criteria = this.contentWidget.searchField.value;
             if (this._lastCriteria === criteria) {
                 return;
             }
@@ -137,7 +150,7 @@ define([
 
             this._lastCriteria = criteria;
 
-            this.loader.style.display = "block";
+            this.contentWidget.loader.style.display = "block";
 
             this.display.getVisibleItems().then(lang.hitch(this, function (items) {
                 var deferred = new Deferred(),
@@ -319,7 +332,7 @@ define([
                 }
 
                 deferred.then(function (limit) {
-                    widget.loader.style.display = "none";
+                    widget.contentWidget.loader.style.display = "none";
                     if (limit === widget.MAX_SEARCH_RESULTS) {
                         widget.setStatus(i18n.gettext("Not found"));
                     }
@@ -335,7 +348,7 @@ define([
                     id: "search-results-list",
                     class: "list list--s list--multirow search-results"
                 });
-                domConstruct.place(this.searchResultsList, this.contentNode, "first");
+                domConstruct.place(this.searchResultsList, this.contentWidget.contentNode, "first");
             }
 
             var resultNode = domConstruct.create("li", {
@@ -360,21 +373,21 @@ define([
         },
 
         clearAll: function () {
-            this.searchField.value = "";
+            this.contentWidget.searchField.value = "";
             this._lastCriteria = "";
             this.clearSearchResults();
         },
 
         clearSearchResults: function () {
-            domConstruct.empty(this.contentNode);
+            domConstruct.empty(this.contentWidget.contentNode);
             this.searchResultsList = undefined;
             this.statusPane = undefined;
-            this.loader.style.display = "none";
+            this.contentWidget.loader.style.display = "none";
         },
 
         _breakOrError: function (value) {
-            if (this.loader)
-                this.loader.style.display = "none";
+            if (this.contentWidget.loader)
+                this.contentWidget.loader.style.display = "none";
 
             if (value !== undefined) {
                 console.error(value);
