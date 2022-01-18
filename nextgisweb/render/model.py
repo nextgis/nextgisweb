@@ -297,7 +297,8 @@ class ResourceTileCache(Base):
     async_writing = False
 
     resource = db.relationship(Resource, backref=db.backref(
-        'tile_cache', cascade='all, delete-orphan', uselist=False))
+        'tile_cache', cascade='all, delete-orphan', uselist=False,
+        cascade_backrefs=False))
 
     def __init__(self, *args, **kwagrs):
         if 'uuid' not in kwagrs:

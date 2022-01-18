@@ -48,7 +48,8 @@ class Layer(Base):
 
     resource = db.relationship(
         Resource, foreign_keys=resource_id,
-        backref=db.backref('_wfsserver_layers', cascade='all'))
+        backref=db.backref('_wfsserver_layers', cascade='all',
+        cascade_backrefs=False))
 
     def to_dict(self):
         return dict(
