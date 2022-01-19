@@ -4,7 +4,7 @@
 }
 
 .nextgis.claro .resources-filter .dijitTextBox .dijitInputField {
-  padding: 5px 4px;
+  padding: 8px 4px 5px 7px;
 }
 
 .resources-filter .dijitTextBox .dijitInputInner {
@@ -22,9 +22,8 @@
 
 .resources-filter .search {
   position: relative;
-  left: 2px;
-  top: -29px;
-  float: left;
+  left: 4px;
+  top: -28px;
 }
 
 .resources-filter .search:before {
@@ -51,7 +50,7 @@
 .resources-filter.loading .result {
   display: none;
   position: relative;
-  top: -24px;
+  top: -29px;
   overflow-y: auto;
   z-index: 100;
   max-height: 300px;
@@ -74,11 +73,15 @@
 }
 
 .resources-filter .result li a {
-  padding-left: 20px;
+  padding-left: 22px;
 }
 
 .resources-filter .result li.not-found {
   color: gray;
+}
+
+.resources-filter .result .text-withIcon__icon {
+  top: 1px;
 }
 
 .resources-filter.loading .linear-activity {
@@ -91,7 +94,7 @@
   width: 288px;
   height: 3px;
   position: absolute;
-  top: 27px;
+  top: 30px;
   left: 14px;
   border-radius: 4px;
   background-color: #e5eef7;
