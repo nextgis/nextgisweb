@@ -151,7 +151,7 @@ class BackupCommand(Command):
 
         to_stdout = target == '-'
 
-        tmp_root = env.core.options.get('backup.tempdir', None if to_stdout
+        tmp_root = env.core.options.get('backup.tmpdir', None if to_stdout
                                         else os.path.split(target)[0])
 
         if not to_stdout and os.path.exists(target):
