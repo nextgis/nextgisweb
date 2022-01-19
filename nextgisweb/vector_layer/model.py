@@ -36,7 +36,7 @@ from ..env import env
 from ..models import declarative_base, DBSession, migrate_operation
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..lib.geometry import Geometry
-from ..lib.ogrhelper import read_dataset
+from ..lib.ogrhelper import read_dataset, FIELD_GETTER
 from ..feature_layer import (
     Feature,
     FeatureQueryIntersectsMixin,
@@ -99,6 +99,13 @@ FIELD_TYPE_SIZE = {
 }
 
 FIELD_FORBIDDEN_NAME = ("id", "geom")
+
+STRING_CAST_TYPES = (
+    ogr.OFTIntegerList,
+    ogr.OFTInteger64List,
+    ogr.OFTRealList,
+    ogr.OFTStringList,
+)
 
 _GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum))
 _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
@@ -497,10 +504,7 @@ class TableInfo(object):
             fld_type = None
             fld_type_ogr = fld_defn.GetType()
 
-            if fld_type_ogr in (ogr.OFTRealList,
-                                ogr.OFTStringList,
-                                ogr.OFTIntegerList,
-                                ogr.OFTInteger64List):
+            if fld_type_ogr in STRING_CAST_TYPES:
                 fld_type = FIELD_TYPE.STRING
 
             if fld_type is None:
@@ -827,42 +831,21 @@ class TableInfo(object):
 
                 if (not feature.IsFieldSet(k) or feature.IsFieldNull(k)):
                     fld_value = None
-                elif fld_type == ogr.OFTInteger:
-                    fld_value = feature.GetFieldAsInteger(k)
-                elif fld_type == ogr.OFTInteger64:
-                    fld_value = feature.GetFieldAsInteger64(k)
-                elif fld_type == ogr.OFTReal:
-                    fld_value = feature.GetFieldAsDouble(k)
-                elif fld_type == ogr.OFTDate:
-                    year, month, day = feature.GetFieldAsDateTime(k)[0:3]
-                    fld_value = date(year, month, day)
-                elif fld_type == ogr.OFTTime:
-                    hour, minute, second = feature.GetFieldAsDateTime(k)[3:6]
-                    fld_value = time(hour, minute, int(second))
-                elif fld_type == ogr.OFTDateTime:
-                    year, month, day, hour, minute, second, tz = \
-                        feature.GetFieldAsDateTime(k)
-                    fld_value = datetime(year, month, day,
-                                         hour, minute, int(second))
-                elif fld_type == ogr.OFTIntegerList:
-                    fld_value = json.dumps(feature.GetFieldAsIntegerList(k))
-                elif fld_type == ogr.OFTInteger64List:
-                    fld_value = json.dumps(feature.GetFieldAsInteger64List(k))
-                elif fld_type == ogr.OFTRealList:
-                    fld_value = json.dumps(feature.GetFieldAsDoubleList(k))
-                elif fld_type == ogr.OFTStringList:
-                    # TODO: encoding
-                    fld_value = json.dumps(feature.GetFieldAsStringList(k))
-                elif fld_type == ogr.OFTString:
-                    fld_value = feature.GetFieldAsString(k)
-                    fixed_fld_value = fix_encoding(fld_value)
-                    if fld_value != fixed_fld_value:
-                        if fix_errors == ERROR_FIX.LOSSY:
-                            fld_value = fixed_fld_value
-                        else:
-                            errors.append(_("Feature #%d contains a broken encoding of field '%s'.")
-                                          % (fid, field.keyname))
-                            continue
+                else:
+                    fld_value = FIELD_GETTER[fld_type](feature, k)
+
+                    if fld_type in STRING_CAST_TYPES:
+                        fld_value = json.dumps(fld_value)
+                    elif fld_type == ogr.OFTString:
+                        fixed_fld_value = fix_encoding(fld_value)
+                        if fld_value != fixed_fld_value:
+                            if fix_errors == ERROR_FIX.LOSSY:
+                                fld_value = fixed_fld_value
+                            else:
+                                errors.append(_(
+                                    "Feature #%d contains a broken encoding of field '%s'.")
+                                    % (fid, field.keyname))
+                                continue
 
                 fld_values[field.key] = fld_value
 
