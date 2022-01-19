@@ -178,9 +178,9 @@ def _collection_post_tus(request):
     try:
         upload_length = int(request.headers['Upload-Length'])
     except (KeyError, ValueError):
-        return _tus_response(400)
+        raise exc.HTTPBadRequest()
     if upload_length > comp.max_size:
-        return _tus_response(413)
+        raise UploadedFileTooLarge()
 
     upload_metadata = _tus_decode_upload_metadata(request.headers.get('Upload-Metadata'))
 
@@ -211,7 +211,7 @@ def _item_head_tus(request):
     fnd, fnm = comp.get_filename(request.matchdict['id'])
 
     if not isfile(fnd):
-        _tus_response(404)
+        raise exc.HTTPNotFound()
 
     with open(fnm, 'rb') as fd:
         meta = pickle.loads(fd.read())
@@ -246,17 +246,17 @@ def _item_patch_tus(request):
     comp = request.env.file_upload
 
     if request.content_type != 'application/offset+octet-stream':
-        return _tus_response(415)
+        raise exc.HTTPUnsupportedMediaType()
 
     try:
         upload_offset = int(request.headers['Upload-Offset'])
     except (KeyError, ValueError):
-        return _tus_response(400)
+        raise exc.HTTPBadRequest()
 
     fnd, fnm = comp.get_filename(request.matchdict['id'])
 
     if not isfile(fnm):
-        return _tus_response(404)
+        raise exc.HTTPNotFound()
 
     with open(fnm, 'rb') as fd:
         meta = pickle.loads(fd.read())
@@ -264,17 +264,17 @@ def _item_patch_tus(request):
 
     # Don't upload more than declared file size.
     if upload_offset + request.content_length > size:
-        return _tus_response(413)
+        raise UploadedFileTooLarge()
 
     # Check minimum chunk size to prevent misconfiguration
     remain = size - upload_offset
     if request.content_length < min(remain, comp.tus_chunk_size_minimum):
-        return _tus_response(400)
+        raise exc.HTTPBadRequest()
 
     with open(fnd, 'ab') as fd:
         # Check for upload conflict
         if upload_offset != fd.tell():
-            return _tus_response(409)
+            raise exc.HTTPConflict()
 
         # Copy request body to data file. Input streaming is also supported
         # here is some conditions: uwsgi - does, pserve - doesn't.
@@ -287,7 +287,7 @@ def _item_patch_tus(request):
             if len(buf) == 0:
                 break
             if upload_offset + read > size:
-                return _tus_response(413)
+                raise UploadedFileTooLarge()
             fd.write(buf)
             upload_offset += read
 
