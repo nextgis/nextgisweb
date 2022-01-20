@@ -25,10 +25,18 @@ define([
         title: i18n.gettext("Search resources"),
 
         postCreate: function () {
-            on(this.elWrapper, mouse.enter, lang.hitch(this, this.onFilterMouseEnter));
-            on(this.elWrapper, mouse.leave, lang.hitch(this, this.onFilterMouseLeave));
+            on(this.tbSearch, 'focus', lang.hitch(this, this.onFocus));
+            on(this.tbSearch, 'blur', lang.hitch(this, this.onBlur));
 
             on(this.tbSearch, "keyUp", debounce(lang.hitch(this, this.onChangeSearchInput), 1000));
+        },
+        
+        onFocus: function () {
+            domClass.add(this.domNode, "active");
+        },
+        
+        onBlur: function()  {
+            domClass.remove(this.domNode, "active");
         },
 
         getMinTimePromise: function (timeMs) {
@@ -37,14 +45,6 @@ define([
                 deferred.resolve();
             }, timeMs);
             return deferred;
-        },
-
-        onFilterMouseEnter: function () {
-            domClass.add(this.domNode, "active");
-        },
-
-        onFilterMouseLeave: function () {
-            domClass.remove(this.domNode, "active");
         },
 
         _lastSearchValue: null,
