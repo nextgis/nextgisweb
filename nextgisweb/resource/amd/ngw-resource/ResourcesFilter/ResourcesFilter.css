@@ -16,8 +16,9 @@
 }
 
 .resources-filter .dijitTextBox .dijitPlaceHolder {
-  font-weight: normal;
   left: 22px;
+  font-style: normal;
+  font-weight: normal;
 }
 
 .resources-filter .search {
