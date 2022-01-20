@@ -59,12 +59,20 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
         dimension=dimension, srid=srid,
         geometry_type=geometry_type_db)))
 
+    # Make columns different from keynames
+
+    def column_keyname(name):
+        return name[4:]
+
+    def keyname_column(keyname):
+        return 'fld_%s' % keyname
+
     defn = ogrlayer.GetLayerDefn()
     for i in range(defn.GetFieldCount()):
         fld_defn = defn.GetFieldDefn(i)
         fld_name = fld_defn.GetNameRef()
         fld_type = _FIELD_TYPE_2_ENUM[fld_defn.GetType()]
-        columns.append(sa.Column(fld_name, _FIELD_TYPE_2_DB[fld_type]))
+        columns.append(sa.Column(keyname_column(fld_name), _FIELD_TYPE_2_DB[fld_type]))
 
     table = sa.Table('test_' + uuid4().hex, meta, *columns)
 
@@ -85,7 +93,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
                     fld_defn = defn.GetFieldDefn(k)
                     fld_name = fld_defn.GetNameRef()
                     fld_get = FIELD_GETTER[fld_defn.GetType()]
-                    values[fld_name] = fld_get(feature, k)
+                    values[keyname_column(fld_name)] = fld_get(feature, k)
 
                 conn.execute(table.insert().values(**values))
 
@@ -112,6 +120,9 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
         DBSession.flush()
 
         layer.setup()
+
+        for field in layer.fields:
+            field.keyname = field.display_name = column_keyname(field.column_name)
 
     try:
         yield layer

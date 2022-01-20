@@ -360,7 +360,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def _sa_table(self, init_columns=False):
         cols = []
         if init_columns:
-            cols.extend([db.sql.column(f.keyname)
+            cols.extend([db.sql.column(f.column_name)
                          for f in self.fields])
             cols.append(db.sql.column(self.column_id))
             cols.append(db.sql.column(self.column_geom))
@@ -377,7 +377,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         for f in self.fields:
             if f.keyname in feature.fields.keys():
-                values[f.keyname] = feature.fields[f.keyname]
+                values[f.column_name] = feature.fields[f.keyname]
 
         if feature.geom is not None:
             values[self.column_geom] = func.st_transform(
@@ -607,11 +607,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def __call__(self):
         tab = self.layer._sa_table(True)
 
-        idcol = getattr(tab.columns, self.layer.column_id)
+        idcol = tab.columns[self.layer.column_id]
         columns = [idcol.label('id')]
         where = []
 
-        geomcol = getattr(tab.columns, self.layer.column_geom)
+        geomcol = tab.columns[self.layer.column_geom]
 
         srs = self.layer.srs if self._srs is None else self._srs
 
@@ -640,7 +640,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 if k == 'id':
                     where.append(idcol == v)
                 else:
-                    where.append(db.sql.column(k) == v)
+                    field = self.layer.field_by_keyname(k)
+                    where.append(tab.columns[field.column_name] == v)
 
         if self._filter:
             token = []
@@ -681,7 +682,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 if k == 'id':
                     column = idcol
                 else:
-                    column = db.sql.column(k)
+                    field = self.layer.field_by_keyname(k)
+                    column = tab.columns[field.column_name]
 
                 token.append(op(column, v))
 
@@ -691,7 +693,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             token = []
             for fld in self.layer.fields:
                 token.append(db.sql.cast(
-                    db.sql.column(fld.column_name),
+                    tab.columns[fld.column_name],
                     db.Unicode).ilike(
                     '%' + self._like + '%'))
 
@@ -727,9 +729,10 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         order_criterion = []
         if self._order_by:
-            for order, colname in self._order_by:
+            for order, k in self._order_by:
+                field = self.layer.field_by_keyname(k)
                 order_criterion.append(dict(asc=db.asc, desc=db.desc)[order](
-                    db.sql.column(colname)))
+                    tab.columns[field.column_name]))
         order_criterion.append(idcol)
 
         class QueryFeatureSet(FeatureSet):
