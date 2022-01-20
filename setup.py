@@ -58,13 +58,14 @@ requires = [
     'zope.event==4.5.0',
 
     # TODO: Move to dev or test dependencies
-    'flake8',
-    'flake8-future-import',
+    'coverage',
     'flake8-coding',
+    'flake8-future-import',
+    'flake8',
     'freezegun',
-    'pytest',
     'pytest-flake8',
     'pytest-watch',
+    'pytest',
     'webtest',
 ]
 
