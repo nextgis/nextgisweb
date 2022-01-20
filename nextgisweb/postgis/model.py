@@ -129,8 +129,9 @@ class PostgisConnection(Base, Resource):
     def get_connection(self):
         try:
             conn = self.get_engine().connect()
-        except OperationalError:
-            raise ValidationError(_("Cannot connect to the database!"))
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(message=_("Cannot connect to the database!"),
+                                        sa_error=exc)
         return conn
 
 

@@ -1,14 +1,16 @@
 
 from pyramid.response import Response
 
-from .interface import IFeatureLayer
 from .. import geojson
+from ..core.exception import ExternalServiceError
 from ..lib.geometry import Geometry
 from ..models import DBSession
 from ..resource import (
     Resource,
     ResourceScope,
     DataScope)
+
+from .interface import IFeatureLayer
 
 PR_R = ResourceScope.read
 
@@ -75,11 +77,15 @@ def identify(request):
             # otherwise the response might be too big.
             query.limit(10)
 
-            features = [
-                dict(id=f.id, layerId=layer.id,
-                     label=f.label, fields=f.fields)
-                for f in query()
-            ]
+            try:
+                features = [
+                    dict(id=f.id, layerId=layer.id,
+                         label=f.label, fields=f.fields)
+                    for f in query()
+                ]
+            except ExternalServiceError as exc:
+                result[layer.id] = dict(error=exc.title)
+                continue
 
             # Add name of parent resource to identification results,
             # if there is no way to get layer name by id on the client
