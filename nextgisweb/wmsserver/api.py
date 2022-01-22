@@ -89,7 +89,7 @@ def _get_capabilities(obj, params, request):
         if obj.description is not None else ''
 
     service = E.Service(
-        E.Name(obj.keyname or 'WMS'),
+        E.Name('OGC:WMS'),
         E.Title(obj.display_name),
         E.Abstract(abstract),
         OnlineResource()
@@ -98,7 +98,7 @@ def _get_capabilities(obj, params, request):
     capability = E.Capability(
         E.Request(
             E.GetCapabilities(
-                E.Format('text/xml'),
+                E.Format('application/vnd.ogc.wms_xml'),
                 DCPType()),
             E.GetMap(
                 E.Format(IMAGE_FORMAT.PNG),
@@ -111,7 +111,7 @@ def _get_capabilities(obj, params, request):
                 E.Format(IMAGE_FORMAT.PNG),
                 DCPType())
         ),
-        E.Exception(E.Format('text/xml'))
+        E.Exception(E.Format('application/vnd.ogc.se_xml'))
     )
 
     layer = E.Layer(
@@ -144,9 +144,12 @@ def _get_capabilities(obj, params, request):
         dict(version='1.1.1'),
         service, capability)
 
+    doctype = '<!DOCTYPE WMT_MS_Capabilities SYSTEM "http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd">'
+
     return Response(
-        etree.tostring(xml, encoding='utf-8'),
-        content_type='text/xml')
+        etree.tostring(xml, xml_declaration=True, doctype=doctype, encoding='utf-8'),
+        content_type='application/vnd.ogc.wms_xml'
+    )
 
 
 def geographic_distance(lon_x, lat_x, lon_y, lat_y):
@@ -397,7 +400,7 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
     xml = etree.tostring(root)
 
     return Response(
-        xml, content_type='application/xml', charset='utf-8',
+        xml, content_type='application/vnd.ogc.se_xml', charset='utf-8',
         status_code=_json_error['status_code'])
 
 
