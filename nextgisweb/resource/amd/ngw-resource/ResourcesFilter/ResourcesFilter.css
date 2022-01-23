@@ -69,7 +69,7 @@
   font-weight: normal;
 }
 
-.resources-filter .result li:hover {
+.resources-filter .result li.active {
   background: #f0f6fc;
 }
 

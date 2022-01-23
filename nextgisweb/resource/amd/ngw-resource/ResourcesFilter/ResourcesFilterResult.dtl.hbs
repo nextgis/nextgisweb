@@ -1,7 +1,7 @@
 <div>
     <ul class="list-unstyled">
         {% for item in items %}
-        <li class="">
+        <li data-resid="{{ item.resource.id }}">
             <a class="children-table__name__link text-withIcon" href="{{item.url}}">
                 <span class="text-withIcon__icon text-withIcon__icon_size_s">
                     <svg class="text-withIcon__pic svgIcon-{{item.resource.cls}}">
