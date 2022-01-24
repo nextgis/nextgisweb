@@ -10,7 +10,12 @@
         <input name="next" type="hidden" value="${next_url}">
     %endif
 
-    <button type="submit" class="pure-button pure-button-primary" >
-        ${tr(_('Sign in'))}
+    <button class="auth-form__btn dijit dijitReset dijitInline dijitButton--primary dijitButton"
+            type="submit" value="">
+        <span class="dijitReset dijitInline dijitButtonNode" >
+            <span>
+                ${tr(_('Sign in'))}
+            </span>
+        </span>
     </button>
 </form>
