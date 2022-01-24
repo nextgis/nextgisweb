@@ -147,8 +147,14 @@ def _get_capabilities(obj, params, request):
     doctype = '<!DOCTYPE WMT_MS_Capabilities SYSTEM "http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd">'
 
     return Response(
-        etree.tostring(xml, xml_declaration=True, doctype=doctype, encoding='utf-8'),
-        content_type='application/vnd.ogc.wms_xml'
+        etree.tostring(
+            xml,
+            xml_declaration=True,
+            doctype=doctype,
+            encoding='utf-8',
+            pretty_print=True,
+        ),
+        content_type='application/vnd.ogc.wms_xml',
     )
 
 
