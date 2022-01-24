@@ -79,11 +79,13 @@ def _maker():
 def _get_capabilities(obj, params, request):
     E = _maker()                                                    # NOQA
 
-    OnlineResource = lambda: E.OnlineResource({                     # NOQA
+    OnlineResource = lambda url: E.OnlineResource({                     # NOQA
         '{%s}type' % NS_XLINK: 'simple',
-        '{%s}href' % NS_XLINK: request.path_url})
+        '{%s}href' % NS_XLINK: url})
 
-    DCPType = lambda: E.DCPType(E.HTTP(E.Get(OnlineResource())))    # NOQA
+    DCPType = lambda: E.DCPType(
+        E.HTTP(E.Get(OnlineResource('{}?'.format(request.path_url))))
+    )
 
     abstract = html.document_fromstring(obj.description).text_content() \
         if obj.description is not None else ''
@@ -92,7 +94,7 @@ def _get_capabilities(obj, params, request):
         E.Name('OGC:WMS'),
         E.Title(obj.display_name),
         E.Abstract(abstract),
-        OnlineResource()
+        OnlineResource(request.path_url)
     )
 
     capability = E.Capability(
