@@ -1,6 +1,7 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/array",
+    "dojo/dom-class",
     "dojox/dtl",
     "dojox/dtl/Context",
     "openlayers/ol",
@@ -10,6 +11,7 @@ define([
 ], function (
     declare,
     array,
+    domClass,
     dtl,
     dtlContext,
     ol,
@@ -72,23 +74,23 @@ define([
         },
 
         showPopups: function () {
-            var olFeatures = this._source.getFeatures(),
-                map = this._map,
-                popup;
-
+            const olFeatures = this._source.getFeatures();
             array.forEach(
                 olFeatures,
                 function (olFeature) {
-                    popup = olFeature.get("popup");
-                    popup.addToMap(map).show();
+                    this.showPopup(olFeature);
                 },
                 this
             );
         },
 
         showPopup: function (annotationFeature) {
-            var popup = annotationFeature.getPopup();
+            const popup =
+                typeof annotationFeature.getPopup === "function"
+                    ? annotationFeature.getPopup()
+                    : annotationFeature.get("popup");
             popup.addToMap(this._map).show();
+            domClass.add(popup._popup.element, "annotation-layer");
         },
 
         hidePopups: function () {
