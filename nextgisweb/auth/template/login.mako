@@ -49,7 +49,7 @@
             <input name="password" type="password" required placeholder="${tr(_('Password'))}">
         </div>
         <button class="auth-form__btn dijit dijitReset dijitInline dijitButton--primary dijitButton"
-                type="submit" value="" class="pure-button pure-button-primary">
+                type="submit" value="">
             <span class="dijitReset dijitInline dijitButtonNode" >
                 <span>
                     ${tr(_('Sign in'))}
