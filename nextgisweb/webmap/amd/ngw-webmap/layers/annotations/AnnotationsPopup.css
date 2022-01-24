@@ -46,3 +46,7 @@ body.annotations-edit .ol-popup.annotation:hover .edit-controls {
 .ol-popup.annotation .edit-controls span:hover {
   color: var(--primary);
 }
+
+.annotation-layer {
+  z-index: -1;
+}
