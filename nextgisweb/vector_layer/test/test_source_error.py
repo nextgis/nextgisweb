@@ -165,14 +165,24 @@ CREATE_TEST_PARAMS = (
     ),
 
     (
-        'out-of-bounds.geojson',
+        'out-of-bounds-point.geojson',
         dict(),
         dict(exception=ValidationError),
     ),
     (
-        'out-of-bounds.geojson',
+        'out-of-bounds-point.geojson',
         dict(skip_errors=True),
         dict(geometry_type='POINT', feature_count=0),
+    ),
+    (
+        'out-of-bounds-linestring.geojson',
+        dict(),
+        dict(exception=ValidationError),
+    ),
+    (
+        'out-of-bounds-linestring.geojson',
+        dict(skip_errors=True),
+        dict(geometry_type='LINESTRING', feature_count=0),
     ),
 )
 
