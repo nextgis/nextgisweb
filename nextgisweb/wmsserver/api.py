@@ -73,7 +73,7 @@ def handler(obj, request):
 
 
 def _maker():
-    return ElementMaker(nsmap=dict(xlink=NS_XLINK))
+    return ElementMaker()
 
 
 def _get_capabilities(obj, params, request):
