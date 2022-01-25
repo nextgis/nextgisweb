@@ -163,6 +163,17 @@ CREATE_TEST_PARAMS = (
         dict(geometry_type='POINT', has_z=False, fix_errors='LOSSY'),
         dict(geometry_type='POINT', feature_count=1),
     ),
+
+    (
+        'out-of-bounds.geojson',
+        dict(),
+        dict(exception=ValidationError),
+    ),
+    (
+        'out-of-bounds.geojson',
+        dict(skip_errors=True),
+        dict(geometry_type='POINT', feature_count=0),
+    ),
 )
 
 
