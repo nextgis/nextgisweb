@@ -1,11 +1,13 @@
 import json
 
+import geoalchemy2 as ga
 from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.types import TypeDecorator
-import geoalchemy2 as ga
 
+from .util import _
 from .. import db
+from ..auth import User
 from ..env import env
 from ..models import declarative_base
 from ..resource import (
@@ -18,8 +20,6 @@ from ..resource import (
     SerializedResourceRelationship as SRR,
     ResourceGroup)
 from ..spatial_ref_sys import SRS
-
-from .util import _
 
 Base = declarative_base(dependencies=('resource', ))
 
@@ -225,8 +225,14 @@ class WebMapAnnotation(Base):
     description = db.Column(db.Unicode)
     style = db.Column(JSONTextType)
     geom = db.Column(ga.Geometry(dimension=2, srid=3857), nullable=False)
+    public = db.Column(db.Boolean, nullable=False, default=True)
+    user_id = db.Column(db.ForeignKey(User.id), nullable=True)
 
     webmap = db.relationship(WebMap, back_populates='annotations')
+    user = db.relationship(User, backref=db.backref(
+        'webmap_annotations',
+        cascade='all, delete-orphan',
+    ))
 
 
 PR_READ = ResourceScope.read
