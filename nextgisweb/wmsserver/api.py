@@ -123,16 +123,18 @@ def _get_capabilities(obj, params, request):
             maxx="180.000000", maxy="85.051129"))
     )
 
+    for srs in SRS.filter_by(auth_name='EPSG'):
+        layer.append(E.SRS('EPSG:%d' % srs.auth_srid))
+
     for lyr in obj.layers:
         queryable = '1' if hasattr(lyr.resource, 'feature_layer') else '0'
 
         lnode = E.Layer(
             dict(queryable=queryable),
             E.Name(lyr.keyname),
-            E.Title(lyr.display_name))
-
-        for srs in SRS.filter_by(auth_name='EPSG'):
-            lnode.append(E.SRS('EPSG:%d' % srs.auth_srid))
+            E.Title(lyr.display_name),
+            E.SRS('EPSG:3857')
+        )
 
         layer.append(lnode)
 
