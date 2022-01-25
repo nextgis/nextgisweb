@@ -131,12 +131,8 @@ def _get_capabilities(obj, params, request):
             E.Name(lyr.keyname),
             E.Title(lyr.display_name))
 
-        if IFeatureLayer.providedBy(lyr.resource.parent):
-            for srs in SRS.filter_by(auth_name='EPSG'):
-                lnode.append(E.SRS('EPSG:%d' % srs.auth_srid))
-        else:
-            # Only Web Mercator is enabled for raster layers
-            lnode.append(E.SRS('EPSG:3857'))
+        for srs in SRS.filter_by(auth_name='EPSG'):
+            lnode.append(E.SRS('EPSG:%d' % srs.auth_srid))
 
         layer.append(lnode)
 
