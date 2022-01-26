@@ -94,6 +94,13 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         if not dsproj or not dsgtran:
             raise ValidationError(_("Raster files without projection info are not supported."))
 
+        # Workaround for broken encoding in WKT. Otherwise, it'll cause SWIG
+        # TypeError (not a string) while passing to GDAL.
+        try:
+            dsproj.encode('utf-8', 'strict')
+        except UnicodeEncodeError:
+            dsproj = dsproj.encode('utf-8', 'replace').decode('utf-8')
+
         data_type = None
         alpha_band = None
         has_nodata = None
