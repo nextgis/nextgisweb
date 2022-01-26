@@ -116,15 +116,21 @@ def _get_capabilities(obj, params, request):
         E.Exception(E.Format('application/vnd.ogc.se_xml'))
     )
 
-    layer = E.Layer(
-        E.Title(obj.display_name),
-        E.LatLonBoundingBox(dict(
-            minx="-180.000000", miny="-85.051129",
-            maxx="180.000000", maxy="85.051129"))
-    )
+    layer = E.Layer(E.Title(obj.display_name))
 
     for srs in SRS.filter_by(auth_name='EPSG'):
         layer.append(E.SRS('EPSG:%d' % srs.auth_srid))
+
+    layer.append(
+        E.LatLonBoundingBox(
+            dict(
+                minx="-180.000000",
+                miny="-85.051129",
+                maxx="180.000000",
+                maxy="85.051129"
+            )
+        )
+    )
 
     for lyr in obj.layers:
         queryable = '1' if hasattr(lyr.resource, 'feature_layer') else '0'
