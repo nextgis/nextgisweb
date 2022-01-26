@@ -120,7 +120,15 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                     band.GetNoDataValue() is not None)
 
         src_osr = osr.SpatialReference()
-        src_osr.ImportFromWkt(dsproj)
+        if src_osr.ImportFromWkt(dsproj) != 0:
+            raise ValidationError(_(
+                "GDAL was uanble to parse the raster coordinate system."))
+
+        if src_osr.IsLocal():
+            raise ValidationError(_(
+                "The source raster has a local coordinate system and can't be "
+                "reprojected to the target coordinate system."))
+
         dst_osr = osr.SpatialReference()
         dst_osr.ImportFromEPSG(int(self.srs.id))
 
@@ -131,7 +139,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             cmd = ['gdalwarp', '-of', 'GTiff', '-t_srs', 'EPSG:%d' % self.srs.id]
             if add_alpha:
                 cmd.append('-dstalpha')
-            ds_measure = gdal.AutoCreateWarpedVRT(ds, src_osr.ExportToWkt(), dst_osr.ExportToWkt())
+            ds_measure = gdal.AutoCreateWarpedVRT(
+                ds, src_osr.ExportToWkt(), dst_osr.ExportToWkt())
+            assert ds_measure is not None, gdal.GetLastErrorMsg()
         else:
             cmd = ['gdal_translate', '-of', 'GTiff']
             ds_measure = ds

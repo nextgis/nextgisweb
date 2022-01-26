@@ -24,15 +24,15 @@ msgstr "Диапазон %s не может быть прочитан."
 msgid "Rasters and pyramids"
 msgstr "Растры и пирамиды"
 
-#: amd/ngw-raster-layer/Widget.js:30 model.py:59 view.py:32
+#: amd/ngw-raster-layer/Widget.js:30 model.py:61 view.py:32
 msgid "Raster layer"
 msgstr "Растровый слой"
 
-#: model.py:80
+#: model.py:82
 msgid "GDAL library was unable to open the file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:88
+#: model.py:90
 #, python-format
 msgid ""
 "Raster has format '%(format)s', however only following formats are supported:"
@@ -41,15 +41,27 @@ msgstr ""
 "Формат загруженного растра '%(format)s', однако поддерживаются только "
 "следующие типы: %(all_formats)s."
 
-#: model.py:93
+#: model.py:95
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:106
+#: model.py:113
 msgid "Mixed band data types are not supported."
 msgstr "Смешанные типы каналов не поддерживаются."
 
-#: model.py:137
+#: model.py:124
+msgid "GDAL was uanble to parse the raster coordinate system."
+msgstr "GDAL не смог обработать определение системы координат растра."
+
+#: model.py:128
+msgid ""
+"The source raster has a local coordinate system and can't be reprojected to "
+"the target coordinate system."
+msgstr ""
+"Исходный растр имеет локальную систему координат и не может быть "
+"перепроецирован в целевую."
+
+#: model.py:154
 #, python-format
 msgid ""
 "The uncompressed raster size (%(size)s) exceeds the limit (%(limit)s) by "
@@ -58,15 +70,15 @@ msgstr ""
 "Размер несжатого растра (%(size)s) превышает лимит (%(limit)s) на %(delta)s. "
 "Уменьшите растр, чтобы он вписывался в лимит."
 
-#: model.py:199
+#: model.py:236
 msgid "Data type"
 msgstr "Тип данных"
 
-#: model.py:200
+#: model.py:237
 msgid "COG"
 msgstr "COG"
 
-#: model.py:285
+#: model.py:322
 msgid "COG attribute can be set only at creation time."
 msgstr "Атрибут COG может быть установлен только в момент создания ресурса"
 
@@ -127,6 +139,7 @@ msgid ""
 "they need."
 msgstr ""
 "Cloud Optimized GeoTIFF (COG) это специально подготовленный к хранению на "
-"веб-сервере и эффективной работе в облаке файл GeoTIFF, позволяющий обращаться"
-" в HTTP запросах только к нужным частям растра, без необходимости загружать"
-" его в клиентское приложение целиком."
+"веб-сервере и эффективной работе в облаке файл GeoTIFF, позволяющий "
+"обращаться в HTTP запросах только к нужным частям растра, без необходимости "
+"загружать его в клиентское приложение целиком."
+
