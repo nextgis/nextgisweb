@@ -66,6 +66,8 @@ def parse_header(value):
     fid = parsed['family'].lower()
     if fid not in FAMILIES:
         return None
+    if parsed.get('major', None) is None:
+        return None
     return fid, int(parsed['major'])
 
 
