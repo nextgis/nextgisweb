@@ -1281,6 +1281,14 @@ end or both. Works only for ``like`` and ``ilike`` operations.
    GET api/resource/442/feature/?extensions= HTTP/1.1
    Host: ngw_url
    Accept: */*
+   
+For large geometries use GET body to send such geometry.
+
+**Example request to get features with large geometry**:
+
+.. sourcecode:: bash
+
+   curl --request GET "http://sandbox.nextgis.com/api/resource/1234/feature/" --header "Content-Type: application/json" --data-raw "{\"intersects\": \"MULTIPOLYGON (((3821804.05999104725196958 5744803.73564852681010962, 3756055.8574127024039626 5562813.06612514425069094, 3927526.96338468883186579 5635924.2469089291989803, 3821804.05999104725196958 5744803.73564852681010962)))\"}"
 
 Attachment
 ^^^^^^^^^^^
