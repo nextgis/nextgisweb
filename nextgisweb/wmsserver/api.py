@@ -32,7 +32,7 @@ from .model import Service
 NS_XLINK = 'http://www.w3.org/1999/xlink'
 
 GFI_RADIUS = 5
-GFI_FEATURE_COUNT = 10
+GFI_FEATURE_COUNT = 1
 
 
 class IMAGE_FORMAT(object):
