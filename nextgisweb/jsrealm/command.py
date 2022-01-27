@@ -41,6 +41,10 @@ class JSRealmInstallCommand(object):
         config['nextgisweb_jsrealm_externals'] = ','.join([
             pname for pname, _ in amd_packages()])
 
+        ca = env.pyramid.options[f'compression.algorithms']
+        config[f'nextgisweb_pyramid_compression_algorithms'] = \
+            json.dumps(ca if ca else [])
+
         targets = dict()
         for k in FAMILIES.keys():
             r = env.pyramid.options[f'uacompat.{k}']

@@ -7,6 +7,10 @@ import re
 import secrets
 import string
 from calendar import timegm
+from mimetypes import guess_type
+
+from pyramid.response import FileResponse
+from pyramid.httpexceptions import HTTPNotFound
 
 from ..i18n import trstring_factory
 
@@ -59,6 +63,37 @@ class ErrorRendererPredicate(object):
 
     def __repr__(self):
         return "<error_renderer>"
+
+
+class StaticFileResponse(FileResponse):
+
+    def __init__(self, filename, *, request) -> None:
+        content_type, _ = guess_type(filename)
+
+        found_encoding = None
+        if (
+            (pref := request.env.pyramid.options['compression.algorithms']) and
+            (aenc := request.accept_encoding) and
+            (match := aenc.best_match(pref))
+        ):
+            try_filename = filename + '.' + match
+            if os.path.isfile(try_filename):
+                filename = try_filename
+                found_encoding = match
+        
+        if found_encoding is None and not os.path.isfile(filename):
+            raise HTTPNotFound()
+        
+        super().__init__(
+            filename,
+            content_type=content_type,
+            cache_max_age=3600,
+            request=request)
+
+        if found_encoding:
+            self.headers['Content-Encoding'] = found_encoding
+
+        self.headers['Vary'] = 'Accept-Encoding'
 
 
 def gensecret(length):

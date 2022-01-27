@@ -135,6 +135,7 @@ module.exports = {
             ],
         }),
         new BundleAnalyzerPlugin({ analyzerMode: "static" }),
+        ...config.compressionPlugins,
     ],
     output: {
         path: path.resolve(config.distPath + "/external-ol"),

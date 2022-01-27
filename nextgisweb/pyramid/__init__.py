@@ -19,7 +19,8 @@ from .util import (
     ClientRoutePredicate,
     ErrorRendererPredicate,
     gensecret,
-    persistent_secret)
+    persistent_secret,
+    StaticFileResponse)
 from .model import Base, Session, SessionStore
 from .session import WebSession
 from .command import ServerCommand, AMDPackagesCommand  # NOQA
@@ -175,4 +176,6 @@ class PyramidComponent(Component):
         Option('lunkwill.enabled', bool, default=None),
         Option('lunkwill.host', str, default=None),
         Option('lunkwill.port', int, default=None),
+
+        Option('compression.algorithms', list, default=['br', 'gzip']),
     )) + uacompat.option_annotations

@@ -1,8 +1,7 @@
 import os
 import os.path
 
-from pyramid.response import FileResponse
-from pyramid.httpexceptions import HTTPNotFound
+from ..pyramid import StaticFileResponse
 
 
 def setup_pyramid(comp, config):
@@ -14,7 +13,4 @@ def setup_pyramid(comp, config):
 def dist(request):
     dist_path = request.env.jsrealm.options['dist_path']
     filename = os.path.join(dist_path, *request.matchdict['subpath'])
-    if os.path.isfile(filename):
-        return FileResponse(filename, cache_max_age=3600, request=request)
-    else:
-        raise HTTPNotFound()
+    return StaticFileResponse(filename, request=request)    

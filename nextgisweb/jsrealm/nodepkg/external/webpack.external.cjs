@@ -123,5 +123,6 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(),
         new CopyPlugin({ patterns: copyPatterns }),
+        ...config.compressionPlugins,
     ],
 };

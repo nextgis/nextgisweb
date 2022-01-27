@@ -18,7 +18,11 @@ module.exports = {
     output: {
         path: path.resolve(config.distPath + "/stylesheet"),
     },
-    plugins: [new CleanWebpackPlugin(), new MiniCssExtractPlugin()],
+    plugins: [
+        new CleanWebpackPlugin(),
+        new MiniCssExtractPlugin(),
+        ...config.compressionPlugins,
+    ],
     module: {
         rules: [
             {

@@ -135,6 +135,7 @@ module.exports = {
         }),
         new CleanWebpackPlugin(),
         new BundleAnalyzerPlugin({ analyzerMode: "static" }),
+        ...config.compressionPlugins,
     ],
     output: {
         path: path.resolve(config.rootPath, "dist/main"),

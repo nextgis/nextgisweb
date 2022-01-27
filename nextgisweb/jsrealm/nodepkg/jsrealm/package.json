@@ -15,6 +15,7 @@
         "babel-loader": "^8.2.2",
         "babel-plugin-import": "^1.13.3",
         "clean-webpack-plugin": "^4.0.0-alpha.0",
+        "compression-webpack-plugin": "^9.2.0",
         "copy-webpack-plugin": "^8.1.1",
         "core-js": "3",
         "css-loader": "^5.2.4",

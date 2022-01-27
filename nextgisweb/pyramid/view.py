@@ -24,7 +24,7 @@ from ..models import DBSession
 from . import exception
 from .session import WebSession
 from .renderer import json_renderer
-from .util import _, ErrorRendererPredicate
+from .util import _, ErrorRendererPredicate, StaticFileResponse
 
 
 def static_amd_file(request):
@@ -39,14 +39,8 @@ def static_amd_file(request):
     if ap_base_path is None:
         raise HTTPNotFound()
 
-    try:
-        return FileResponse(
-            os.path.join(ap_base_path, amd_package_path),
-            cache_max_age=3600, request=request)
-    except (OSError, IOError) as exc:
-        if exc.errno in (errno.ENOENT, errno.EISDIR):
-            raise HTTPNotFound()
-        raise
+    filename = os.path.join(ap_base_path, amd_package_path)
+    return StaticFileResponse(filename, request=request)
 
 
 @lru_cache(maxsize=64)
