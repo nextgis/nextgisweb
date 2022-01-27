@@ -206,27 +206,21 @@ class Resource(Base, metaclass=ResourceMeta):
                         elif rule.action == 'deny':
                             deny.add(perm)
 
-        for scp in self.scope.values():
-            for req in scp.requirements:
-                for a in class_permissions:
-                    if req.dst == a and (
-                        req.cls is None
-                        or isinstance(self, req.cls)  # NOQA: W503
-                    ):
-                        if req.attr is None:
-                            p = req.src in allow \
-                                and req.src not in deny \
-                                and req.src not in mask
-                        else:
-                            attrval = getattr(self, req.attr)
+        for req in self.class_requirements():
+            if req.attr is None:
+                has_req = req.src in allow \
+                    and req.src not in deny \
+                    and req.src not in mask
+            else:
+                attrval = getattr(self, req.attr)
 
-                            if attrval is None:
-                                p = req.attr_empty is True
-                            else:
-                                p = attrval.has_permission(req.src, user)
+                if attrval is None:
+                    has_req = req.attr_empty is True
+                else:
+                    has_req = attrval.has_permission(req.src, user)
 
-                        if not p:
-                            mask.add(a)
+            if not has_req:
+                mask.add(req.dst)
 
         return PermissionSets(allow=allow, deny=deny, mask=mask)
 
