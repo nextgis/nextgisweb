@@ -181,11 +181,24 @@ def geographic_distance(lon_x, lat_x, lon_y, lat_y):
     return meters
 
 
+def _validate_bbox(bbox):
+    if len(bbox) != 4:
+        raise ValidationError("Invalid BBOX parameter.")
+
+    xmin, ymin, xmax, ymax = bbox
+
+    if xmin >= xmax:
+        raise ValidationError("BBOX parameter's minimum X must be lower than the maximum X.")
+
+    if ymin >= ymax:
+        raise ValidationError("BBOX parameter's minimum Y must be lower than the maximum Y.")
+
+    return bbox
+
+
 def _get_map(obj, params, request):
     p_layers = params['LAYERS'].split(',')
-    p_bbox = [float(v) for v in params['BBOX'].split(',', 3)]
-    if len(p_bbox) != 4:
-        raise ValidationError("Invalid BBOX parameter.")
+    p_bbox = _validate_bbox([float(v) for v in params['BBOX'].split(',', 3)])
     p_width = int(params['WIDTH'])
     p_height = int(params['HEIGHT'])
     p_format = params.get('FORMAT', IMAGE_FORMAT.PNG)
@@ -288,7 +301,7 @@ def _get_map(obj, params, request):
 
 
 def _get_feature_info(obj, params, request):
-    p_bbox = [float(v) for v in params.get('BBOX').split(',')]
+    p_bbox = _validate_bbox([float(v) for v in params.get('BBOX').split(',')])
     p_width = int(params.get('WIDTH'))
     p_height = int(params.get('HEIGHT'))
     p_srs = params.get('SRS', params.get('CRS'))
