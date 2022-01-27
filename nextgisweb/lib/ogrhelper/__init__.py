@@ -1,10 +1,24 @@
 import zipfile
+from contextlib import contextmanager
 from datetime import date, time, datetime
 
 from osgeo import gdal, ogr
 
 
 FIELD_GETTER = {}
+
+
+@contextmanager
+def ogr_use_exceptions():
+    if ogr.GetUseExceptions():
+        yield
+        return
+
+    ogr.UseExceptions()
+    try:
+        yield
+    finally:
+        ogr.DontUseExceptions()
 
 
 def read_dataset(filename, **kw):

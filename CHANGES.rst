@@ -15,6 +15,7 @@ Changes
 - Ability to filter NULL values in feature REST API.
 - Support for 25D geometries in PostGIS layers.
 - Wrapping around the dateline for tile-based layers on webmaps.
+- Improved handling of coordinates outside boundaries of coordinate systems.
 - Unknown fields in REST API filters return an error.
 - Improved handling of external services errors.
 - Timeout for external services is set to 15 seconds.

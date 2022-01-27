@@ -1,7 +1,6 @@
 import re
 import json
 import uuid
-from datetime import datetime, time, date
 from functools import lru_cache
 from html import escape as html_escape
 
@@ -36,7 +35,7 @@ from ..env import env
 from ..models import declarative_base, DBSession, migrate_operation
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..lib.geometry import Geometry
-from ..lib.ogrhelper import read_dataset, FIELD_GETTER
+from ..lib.ogrhelper import ogr_use_exceptions, read_dataset, FIELD_GETTER
 from ..feature_layer import (
     Feature,
     FeatureQueryIntersectsMixin,
@@ -760,7 +759,13 @@ class TableInfo(object):
                     continue
 
             if transform is not None:
-                geom.Transform(transform)
+                with ogr_use_exceptions():
+                    try:
+                        geom.Transform(transform)
+                    except RuntimeError:
+                        errors.append(_("Feature #%d has a geometry that can't be reprojected to "
+                                        "target coordinate system"))
+                        continue
 
             # Force Z
             has_z = self.geometry_type in GEOM_TYPE.has_z
