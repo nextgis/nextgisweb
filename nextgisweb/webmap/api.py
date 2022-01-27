@@ -17,7 +17,7 @@ from .model import (
 
 def annotation_to_dict(obj):
     result = OrderedDict()
-    for k in ('id', 'description', 'style', 'geom'):
+    for k in ('id', 'description', 'style', 'geom', 'public'):
         v = getattr(obj, k)
         if k == 'geom':
             v = to_shape(v).wkt
@@ -27,7 +27,7 @@ def annotation_to_dict(obj):
 
 
 def annotation_from_dict(obj, data):
-    for k in ('description', 'style', 'geom'):
+    for k in ('description', 'style', 'geom', 'public'):
         if k in data:
             v = data[k]
             if k == 'geom':
