@@ -1,5 +1,4 @@
 @import (css) "@{node_modules}/purecss/build/base.css";
-@import (css) "@{node_modules}/purecss/build/grids.css";
 
 @import (css) "./icon.css";
 @import (css) "fontello.css";
@@ -57,10 +56,6 @@
   font-style: normal;
 }
 
-
-.pure-g [class *="pure-u"] {
-  font-family: var(--body-font-family), Roboto, sans-serif;
-}
 
 body, html {
   height: 100%;
@@ -377,11 +372,23 @@ a[class*=" icon-"]:hover:before {
 
 /* -- CONTENT STYLES -- */
 .content {
+  display: flex;
+  flex-flow: row wrap;
+  align-content: flex-start;
   padding-bottom: 30px;
-}
 
-.content__inner {
-  min-height: 100%;
+  & > .content__inner {
+    display: inline-block;
+    width: 100%;
+    min-height: 100%;
+  }
+
+  &.content_with-sidebar {
+    & > .content__inner,
+    & > .content__inner.expand > .content-wrapper.content-maxheight > div.expand {
+      width: 75%;
+    }
+  }
 }
 
 .content-maxheight {
@@ -544,6 +551,8 @@ a[class*=" icon-"]:hover:before {
 /* Sidebar */
 
 .sidebar {
+  display: inline-block;
+  width: 25%;
   position: relative;
   box-sizing: border-box;
   background-color: var(--sidebar-bg);
@@ -614,6 +623,7 @@ a[class*=" icon-"]:hover:before {
 }
 
 .sidebar-helper {
+  display: inline-block;
   width: 25%;
   position: absolute;
   right: 0;
