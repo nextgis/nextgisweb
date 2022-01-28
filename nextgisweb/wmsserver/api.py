@@ -241,7 +241,7 @@ def _get_map(obj, params, request):
     try:
         epsg, axis_sy = parse_srs(p_srs)
     except SRSParseError as e:
-        raise ValidationError(str(e))
+        raise ValidationError(message=str(e), data=dict(code="InvalidSRS"))
     try:
         srs = SRS.filter_by(id=epsg).one()
     except NoResultFound:
