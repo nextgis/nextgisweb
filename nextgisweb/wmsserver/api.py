@@ -204,7 +204,7 @@ def _get_map(obj, params, request):
     p_format = params.get('FORMAT', IMAGE_FORMAT.PNG)
     p_style = params.get('STYLES')
     if p_format not in IMAGE_FORMAT.enum:
-        raise ValidationError("Invalid FORMAT parameter.")
+        raise ValidationError("Invalid FORMAT parameter.", data=dict(code="InvalidFormat"))
     if p_style:
         raise ValidationError("Style not found.", data=dict(code="StyleNotDefined"))
     p_srs = params.get('SRS', params.get('CRS'))
@@ -222,7 +222,9 @@ def _get_map(obj, params, request):
     try:
         srs = SRS.filter_by(id=epsg).one()
     except NoResultFound:
-        raise ValidationError(message="SRS (id=%d) not found." % epsg)
+        raise ValidationError(
+            message="SRS (id=%d) not found." % epsg, data=dict(code="InvalidSRS")
+        )
 
     def scale(delta, img_px):
         dpi = 96
