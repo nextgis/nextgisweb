@@ -205,7 +205,7 @@ def _get_map(obj, params, request):
     p_style = params.get('STYLES')
     if p_format not in IMAGE_FORMAT.enum:
         raise ValidationError("Invalid FORMAT parameter.")
-    if p_style is not None:
+    if p_style:
         raise ValidationError("Style not found.", data=dict(code="StyleNotDefined"))
     p_srs = params.get('SRS', params.get('CRS'))
     if p_srs is None:
