@@ -5,7 +5,7 @@ from six import BytesIO
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
-from PIL import Image
+from PIL import Image, ImageColor
 from bunch import Bunch
 
 from osgeo import gdal, gdal_array
@@ -196,6 +196,19 @@ def _validate_bbox(bbox):
     return bbox
 
 
+def _validate_bgcolor(bgcolor):
+    if not bgcolor.startswith("0x"):
+        raise ValidationError("BGCOLOR parameter should start with '0x'.")
+
+    bgcolor = bgcolor.replace("0x", "#")
+    try:
+        color = ImageColor(bgcolor)
+    except ValueError:
+        raise ValidationError("BGCOLOR parameter has unknown color specifier.")
+
+    return color
+
+
 def _get_map(obj, params, request):
     p_layers = params['LAYERS'].split(',')
     p_bbox = _validate_bbox([float(v) for v in params['BBOX'].split(',', 3)])
@@ -203,17 +216,27 @@ def _get_map(obj, params, request):
     p_height = int(params['HEIGHT'])
     p_format = params.get('FORMAT', IMAGE_FORMAT.PNG)
     p_style = params.get('STYLES')
+    p_bgcolor = params.get('BGCOLOR')
+    p_transparent = params.get('TRANSPARENT', 'FALSE')
+    p_srs = params.get('SRS', params.get('CRS'))
+
     if p_format not in IMAGE_FORMAT.enum:
         raise ValidationError("Invalid FORMAT parameter.", data=dict(code="InvalidFormat"))
-    if p_style:
+    if p_style and not (p_style == "," * (len(p_layers) - 1)):
         raise ValidationError("Style not found.", data=dict(code="StyleNotDefined"))
-    p_srs = params.get('SRS', params.get('CRS'))
     if p_srs is None:
         raise ValidationError(message="CRS/SRS parameter required.")
+    if p_bgcolor:
+        r, g, b = _validate_bgcolor(p_bgcolor)
+        bgcolor = (r, g, b, 255)
+    else:
+        bgcolor = (255, 255, 255, 255)
+    if p_transparent == 'TRUE':
+        bgcolor[-1] = 0
 
     p_size = (p_width, p_height)
 
-    img = Image.new('RGBA', p_size, (255, 255, 255, 0))
+    img = Image.new('RGBA', p_size, bgcolor)
 
     try:
         epsg, axis_sy = parse_srs(p_srs)
