@@ -202,7 +202,7 @@ def _validate_bgcolor(bgcolor):
 
     bgcolor = bgcolor.replace("0x", "#")
     try:
-        color = ImageColor(bgcolor)
+        color = ImageColor.getrgb(bgcolor)
     except ValueError:
         raise ValidationError("BGCOLOR parameter has unknown color specifier.")
 
