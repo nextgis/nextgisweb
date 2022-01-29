@@ -5,7 +5,7 @@ from six import BytesIO
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
-from PIL import Image, ImageColor
+from PIL import Image, ImageColor, ImageDraw, ImageFont
 from bunch import Bunch
 
 from osgeo import gdal, gdal_array
@@ -113,7 +113,8 @@ def _get_capabilities(obj, params, request):
                 E.Format(IMAGE_FORMAT.PNG),
                 DCPType())
         ),
-        E.Exception(E.Format('application/vnd.ogc.se_xml'))
+        E.Exception(E.Format('application/vnd.ogc.se_xml')),
+        E.Exception(E.Format('application/vnd.ogc.se_inimage'))
     )
 
     layer = E.Layer(E.Title(obj.display_name))
@@ -437,6 +438,8 @@ def _get_legend_graphic(obj, params, request):
 
 
 def error_renderer(request, err_info, exc, exc_info, debug=True):
+    params, _ = parse_request(request)
+
     _json_error = json_error(request, err_info, exc, exc_info, debug=debug)
     err_title = _json_error.get('title')
     err_message = _json_error.get('message')
@@ -447,6 +450,32 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
         message = err_message
     else:
         message = "Unknown error"
+
+    exc_type = params.get('EXCEPTIONS')
+
+    if exc_type == 'application/vnd.ogc.se_inimage':
+        # when an exception is raised and EXCEPTIONS=application/vnd.ogc.se_inimage,
+        # then the error messages are graphically returned as part of the content
+        p_width = int(params['WIDTH'])
+        p_height = int(params['HEIGHT'])
+        p_format = params.get('FORMAT', IMAGE_FORMAT.PNG)
+        p_size = (p_width, p_height)
+
+        img = Image.new('RGBA', p_size, (255, 255, 255, 0))
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.load_default()
+        draw.text((10, 10), message, font=font, fill='grey')
+
+        buf = BytesIO()
+
+        if p_format == IMAGE_FORMAT.JPEG:
+            img.convert('RGB').save(buf, 'jpeg')
+        elif p_format == IMAGE_FORMAT.PNG:
+            img.save(buf, 'png', compress_level=3)
+
+        buf.seek(0)
+
+        return Response(body_file=buf, content_type=p_format)
 
     code = _json_error.get('data', dict()).get('code')
 
