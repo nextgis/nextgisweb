@@ -228,15 +228,19 @@ def _get_map(obj, params, request):
         raise ValidationError(message="CRS/SRS parameter required.")
     if p_bgcolor:
         r, g, b = _validate_bgcolor(p_bgcolor)
-        bgcolor = (r, g, b, 255)
+        bgcolor = (r, g, b)
     else:
-        bgcolor = (255, 255, 255, 255)
+        bgcolor = (255, 255, 255)
+
     if p_transparent == 'TRUE':
-        bgcolor = bgcolor[:-1] + (0,)
+        img_mode = 'RGBA'
+        bgcolor = bgcolor + (0,)
+    else:
+        img_mode = 'RGB'
 
     p_size = (p_width, p_height)
 
-    img = Image.new('RGBA', p_size, bgcolor)
+    img = Image.new(img_mode, p_size, bgcolor)
 
     try:
         epsg, axis_sy = parse_srs(p_srs)
