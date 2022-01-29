@@ -232,7 +232,7 @@ def _get_map(obj, params, request):
     else:
         bgcolor = (255, 255, 255, 255)
     if p_transparent == 'TRUE':
-        bgcolor[-1] = 0
+        bgcolor = bgcolor[:-1] + (0,)
 
     p_size = (p_width, p_height)
 
