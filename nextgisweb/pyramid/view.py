@@ -156,6 +156,7 @@ def cp_logo(request):
 def system_name(request):
     request.require_administrator()
     return dict(
+        entrypoint='@nextgisweb/pyramid/system-name-form',
         title=_("Web GIS name"),
         dynmenu=request.env.pyramid.control_panel)
 
@@ -441,7 +442,9 @@ def setup_pyramid(comp, config):
     config.add_route(
         'pyramid.control_panel.system_name',
         '/control-panel/system-name'
-    ).add_view(system_name, renderer=ctpl('system_name'))
+    ).add_view(
+        system_name,
+        renderer='nextgisweb:gui/template/react_app.mako')
 
     config.add_route(
         'pyramid.control_panel.home_path',
