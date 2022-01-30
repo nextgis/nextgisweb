@@ -12,7 +12,6 @@
         "@fontsource/roboto": "^4.2.3",
         "css-minimizer-webpack-plugin": "^2.0.0",
         "lato-font": "^3.0.0",
-        "mini-css-extract-plugin": "^1.6.0",
-        "purecss": "^0.6.2"
+        "mini-css-extract-plugin": "^1.6.0"
     }
 }
