@@ -1,7 +1,12 @@
 module.exports = {
     root: true,
-    plugins: ["requirejs"],
-    extends: ["eslint:recommended", "plugin:requirejs/recommended"],
+    plugins: ["requirejs", "react"],
+    extends: [
+        "eslint:recommended",
+        "plugin:requirejs/recommended",
+        "plugin:react/recommended",
+        "plugin:react/jsx-runtime",
+    ],
     globals: {
         dojoConfig: "readonly",
         ngwConfig: "readonly",
@@ -61,6 +66,7 @@ module.exports = {
             },
             parserOptions: {
                 sourceType: "module",
+                jsx: true,
             },
         },
         {
