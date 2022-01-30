@@ -98,6 +98,8 @@ module.exports = {
                 // packages for better browser compatibility.
                 exclude: config.debug ? /node_modules/ : [
                     /node_modules\/core-js/,
+                    /node_modules\/react/,
+                    /node_modules\/react-dom/,
                 ],
                 resolve: { fullySpecified: false },
                 use: {

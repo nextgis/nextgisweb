@@ -1,0 +1,4 @@
+#: nodepkg/gui/example.js:13
+msgid "Internationalization test"
+msgstr "Тест интернационализации"
+
