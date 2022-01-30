@@ -63,7 +63,7 @@ def handler(obj, request):
         if service != 'WMS':
             raise HTTPBadRequest("Invalid SERVICE parameter value.")
         return _get_capabilities(obj, params, request)
-    elif req == 'GETMAP':
+    elif req == 'GETMAP' or req == 'MAP':
         return _get_map(obj, params, request)
     elif req == 'GETFEATUREINFO':
         return _get_feature_info(obj, params, request)
