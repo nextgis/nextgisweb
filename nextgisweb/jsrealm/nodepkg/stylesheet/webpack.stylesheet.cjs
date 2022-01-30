@@ -1,4 +1,5 @@
 const path = require("path");
+const os = require("os");
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
@@ -87,5 +88,9 @@ module.exports = {
                 },
             }),
         ],
+    },
+    watchOptions: {
+        poll: os.release().match(/-WSL.?$/) ? 1000 : false,
+        ignored: "**/node_modules",
     },
 };

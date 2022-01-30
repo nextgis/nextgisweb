@@ -2,6 +2,7 @@ const config = require("@nextgisweb/jsrealm/config.cjs");
 
 const path = require("path");
 const fs = require("fs");
+const os = require("os");
 const glob = require("glob");
 const doctrine = require("doctrine");
 
@@ -177,5 +178,9 @@ module.exports = {
             chunks: "all",
             minSize: 0,
         },
+    },
+    watchOptions: {
+        poll: os.release().match(/-WSL.?$/) ? 1000 : false,
+        ignored: "**/node_modules",
     },
 };
