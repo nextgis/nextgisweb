@@ -25,6 +25,23 @@
 @import "ngw-ui/_ngw-error";
 @import "ngw-ui/_ngw-toolbar";
 
+
+/* -- BOX-SIZING -- */
+
+/* Dijit widgets assume box-sizing: content-box, but antd sets
+box-sizing: border-box for all elements. Override box-sizing where it matters. */
+
+div.dijitContentPane,
+div.dijitTabPaneWrapper,
+div.dijitTabInner,
+div.dijitTabInnerDiv,
+div.dijitToolbar,
+td.tableContainer-labelCell,
+div.content__container
+{
+  box-sizing: content-box;
+}
+
 /* -- BASE STYLES -- */
 @font-face {
   font-family: Roboto;
