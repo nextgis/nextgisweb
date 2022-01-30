@@ -92,7 +92,12 @@ module.exports = {
         rules: entrypointRules.concat([
             {
                 test: /\.(m?js|ts?)$/,
-                exclude: [/node_modules\/core-js/],
+                // In development mode exclude everything in node_modules for
+                // better performance. In production mode exclude only specific
+                // packages for better browser compatibility.
+                exclude: config.debug ? /node_modules/ : [
+                    /node_modules\/core-js/,
+                ],
                 resolve: { fullySpecified: false },
                 use: {
                     loader: "babel-loader",
