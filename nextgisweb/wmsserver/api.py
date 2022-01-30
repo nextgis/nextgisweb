@@ -5,6 +5,7 @@ from six import BytesIO
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
+from pkg_resources import resource_filename
 from PIL import Image, ImageColor, ImageDraw, ImageFont
 from bunch import Bunch
 
@@ -113,8 +114,10 @@ def _get_capabilities(obj, params, request):
                 E.Format(IMAGE_FORMAT.PNG),
                 DCPType())
         ),
-        E.Exception(E.Format('application/vnd.ogc.se_xml')),
-        E.Exception(E.Format('application/vnd.ogc.se_inimage'))
+        E.Exception(
+            E.Format('application/vnd.ogc.se_xml'),
+            E.Format('application/vnd.ogc.se_inimage')
+        )
     )
 
     layer = E.Layer(E.Title(obj.display_name))
@@ -463,7 +466,9 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
 
         img = Image.new('RGBA', p_size, (255, 255, 255, 0))
         draw = ImageDraw.Draw(img)
-        font = ImageFont.load_default()
+        font = ImageFont.truetype(
+            resource_filename('nextgisweb', 'wmsserver/fonts/DejaVuSansMono.ttf'), 10
+        )
         draw.text((10, 10), message, font=font, fill='grey')
 
         buf = BytesIO()
