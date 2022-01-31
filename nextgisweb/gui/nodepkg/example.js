@@ -1,9 +1,20 @@
 /** @entrypoint */
+import {
+    Button,
+    Calendar,
+    ConfigProvider,
+    DatePicker,
+    Form,
+    Input,
+    Select,
+    Space,
+} from "./antd";
+
 import i18n from "@nextgisweb/pyramid/i18n!";
 
 export default function ExampleApplication() {
     return (
-        <>
+        <ConfigProvider>
             <h2>Regular buttons</h2>
 
             <Space>
@@ -60,6 +71,6 @@ export default function ExampleApplication() {
                 <Calendar fullscreen={false} />
             </div>
 
-        </>
+        </ConfigProvider>
     );
 }

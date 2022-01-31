@@ -23,6 +23,7 @@ function* packages() {
 const rootPath = path.resolve(configRoot);
 const distPath = path.resolve(configRoot + "/dist");
 const debug = env.npm_package_config_nextgisweb_core_debug == "true";
+const locales = env.npm_package_config_nextgisweb_core_locale_available.split(/\s*,\s*/)
 
 const compressRegExp = /\.(js|css|html|json|svg)$/i;
 const compressionPlugins = [];
@@ -64,6 +65,7 @@ module.exports = {
     debug,
     rootPath,
     distPath,
+    locales,
     externals: env.npm_package_config_nextgisweb_jsrealm_externals.split(","),
     targets: JSON.parse(env.npm_package_config_nextgisweb_jsrealm_targets),
     packages: packages,
