@@ -3,6 +3,7 @@ import json
 import geoalchemy2 as ga
 from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.orm import validates
 from sqlalchemy.types import TypeDecorator
 
 from .util import _
@@ -31,6 +32,7 @@ class WebMapScope(Scope):
     display = Permission(_("Display")).require(ResourceScope.read)
     annotation_read = Permission(_("View annotations")).require(ResourceScope.read)
     annotation_write = Permission(_("Edit annotations")).require(ResourceScope.read)
+    annotation_manage = Permission(_("Manage annotations")).require(annotation_write)
 
 
 class WebMap(Base, Resource):
@@ -61,7 +63,7 @@ class WebMap(Base, Resource):
 
     annotations = db.relationship(
         'WebMapAnnotation', back_populates='webmap',
-        cascade='all,delete-orphan')
+        cascade='all,delete-orphan', cascade_backrefs=False)
 
     @classmethod
     def check_parent(cls, parent):
@@ -233,6 +235,13 @@ class WebMapAnnotation(Base):
         'webmap_annotations',
         cascade='all, delete-orphan',
     ))
+
+    @validates('public', 'user_id')
+    def validates_read_only_fields(self, key, value):
+        val = getattr(self, key)
+        if val or val is False:
+            raise ValueError('WebMapAnnotation.%s cannot be modified.' % key)
+        return value
 
 
 PR_READ = ResourceScope.read

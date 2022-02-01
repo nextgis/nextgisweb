@@ -10,21 +10,25 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:29 model.py:38 view.py:224 view.py:245
+#: model.py:30 model.py:40 view.py:224 view.py:245
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:31 view.py:231
+#: model.py:32 view.py:231
 msgid "Display"
 msgstr "Открыть"
 
-#: model.py:32
+#: model.py:33
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:173 model.py:33
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:173 model.py:34
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
+
+#: model.py:35
+msgid "Manage annotations"
+msgstr "Администрировать аннотации"
 
 #: view.py:36 view.py:246
 msgid "Web map settings"
