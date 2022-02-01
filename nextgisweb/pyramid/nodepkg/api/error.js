@@ -7,40 +7,38 @@ const i18n = new LazyJed("pyramid");
 
 export class BaseAPIError extends BaseError {
     constructor(message) {
-        super(message);
+        super(message || i18n.gettext("Something went wrong."));
         this.title = i18n.gettext("Unknown API error");
     }
 }
 
 export class NetworksResponseError extends BaseAPIError {
     constructor(message) {
-        super(message);
+        super(message || i18n.gettext("There is no response from the server or problem connecting to server."));
         this.title = i18n.gettext("Network error");
+        this.detail = i18n.gettext("Check network connectivity and try again later.");
     }
 }
 
 export class InvalidResponseError extends BaseAPIError {
     constructor(message) {
-        super(message);
-        this.title = i18n.gettext("Invalid API response");
+        super(message || i18n.gettext("Something went wrong."));
+        this.title = i18n.gettext("Unexpected server response");
     }
 }
 
 export class ServerResponseError extends BaseAPIError {
     constructor(data) {
         super(data.message);
+        this.title = data.title || this.title;
+        this.detail = data.detail || null;
         this.data = data;
-        if (data.title) {
-            this.title = data.title;
-        }
     }
 }
 
 export class LunkwillError extends BaseError {
     constructor(message, data = {}) {
-        super(message !== undefined ? message : i18n.gettext(
-            "Unexpected error while processing long-running request."
-        ));
+        super(message || i18n.gettext("Unexpected error while processing long-running request."));
         this.title = i18n.gettext("Long-running request error");
         this.data = data;
     }
