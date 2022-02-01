@@ -236,7 +236,7 @@ def _get_map(obj, params, request):
     else:
         bgcolor = (255, 255, 255)
 
-    if p_transparent == 'TRUE':
+    if p_transparent.upper() == 'TRUE':
         img_mode = 'RGBA'
         bgcolor = bgcolor + (0,)
     else:
