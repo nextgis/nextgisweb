@@ -12,6 +12,7 @@ module.exports = {
         ngwConfig: "readonly",
     },
     rules: {
+        "indent": ["error", 4],
         "no-unused-vars": ["error", { args: "all" }],
         "requirejs/no-object-define": "error",
         "requirejs/one-dependency-per-line": ["error"],
