@@ -870,7 +870,7 @@ class TableInfo(object):
             DBSession.add(obj)
 
         if len(errors) > 0 and not skip_errors:
-            detail = '<br>'.join(html_escape(translate(error)) for error in errors)
+            detail = '<br>'.join(html_escape(translate(error), quote=False) for error in errors)
             raise VE(message=_("Vector layer cannot be written due to errors."), detail=detail)
 
         size = static_size * num_features + dynamic_size
