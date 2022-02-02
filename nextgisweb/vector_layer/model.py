@@ -764,7 +764,7 @@ class TableInfo(object):
                         geom.Transform(transform)
                     except RuntimeError:
                         errors.append(_("Feature #%d has a geometry that can't be reprojected to "
-                                        "target coordinate system"))
+                                        "target coordinate system") % fid)
                         continue
 
             # Force Z
