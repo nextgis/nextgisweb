@@ -121,7 +121,7 @@ export function StorageSummary() {
 
     function infoTextFirst() {
         if (total.esimated != null && total.updated != null) {
-            return i18n.gettext("Storage usage was fully estimated at %s and total.updated at %s.")
+            return i18n.gettext("Storage usage was fully estimated at %s and updated at %s.")
                 .replace("%s", utc(total.esimated).local().format("L LTS"))
                 .replace("%s", utc(total.updated).local().format("L LTS"));
         } else if (total.updated == null) {
