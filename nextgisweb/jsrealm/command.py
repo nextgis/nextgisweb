@@ -44,6 +44,9 @@ class JSRealmInstallCommand(object):
         ca = env.pyramid.options[f'compression.algorithms']
         config[f'nextgisweb_pyramid_compression_algorithms'] = \
             json.dumps(ca if ca else [])
+        
+        config['nextgisweb_core_locale_available'] = \
+            ','.join(env.core.locale_available)
 
         targets = dict()
         for k in FAMILIES.keys():

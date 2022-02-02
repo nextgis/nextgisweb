@@ -1,0 +1,11 @@
+{
+    "name": "@nextgisweb/gui",
+    "version": "0.0.0",
+    "type": "module",
+    "dependencies": {
+        "antd": "^4.18.4",
+        "dayjs": "^1.10.7",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2"
+    }
+}

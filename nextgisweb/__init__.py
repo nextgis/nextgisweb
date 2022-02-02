@@ -10,6 +10,7 @@ def pkginfo():
         'core',
         'sentry',
         'pyramid',
+        'gui',
         'jsrealm',
         'auth',
         'resource',

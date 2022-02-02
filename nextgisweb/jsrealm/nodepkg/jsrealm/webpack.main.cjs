@@ -85,6 +85,81 @@ for (const pkg of config.packages()) {
     }
 }
 
+function scanLocales(moduleName) {
+    const result = {};
+    const pat = path.join(require.resolve(moduleName), "..", "locale", "*.js");
+    for (const filename of glob.sync(pat)) {
+        const m = filename.match(/\/([a-z]{2}(?:[\-_][a-z]{2})?)\.js$/i);
+        if (m) {
+            const original = m[1];
+            const key = original.replace('_', '-').toLowerCase();
+            result[key] = {key, original, filename};
+        };
+    };
+    return result;
+}
+
+const DEFAULT_COUNTRY_FOR_LANGUAGE = { en: "us", cs: "cz" };
+
+function lookupLocale(key, map) {
+    const m = key.match(/^(\w+)-(\w+)$/);
+    const [lang, cnt] = m ? [m[1], m[2]] : [key, undefined];
+
+    const test = [];
+
+    if (cnt) {
+        test.push(`${lang}-${cnt}`);
+    } else {
+        const cfl = DEFAULT_COUNTRY_FOR_LANGUAGE[lang];
+        test.push(cfl ? `${lang}-${cfl}` : `${lang}-${lang}`);
+    };
+
+    test.push(lang);
+    
+    for (const c of test) {
+        const m = map[c];
+        if (m) { return m; }
+    }
+
+    if (key != 'en') {
+        return lookupLocale('en', map);
+    };
+
+    throw "Locale 'en' not found!";
+}
+
+const antdLocales = scanLocales("antd");
+const dayjsLocales = scanLocales("dayjs");
+
+const localeOutDir = path.resolve(
+    require.resolve("@nextgisweb/jsrealm/locale-loader"),
+    "..", "locale");
+
+for (const lang of config.locales) {
+    const entrypoint = `@nextgisweb/jsrealm/locale/${lang}`;
+    const antd = lookupLocale(lang, antdLocales);
+    const dayjs = lookupLocale(lang, dayjsLocales);
+
+    const code = (
+        `import '@nextgisweb/jsrealm/with-chunks!${entrypoint}';\n` +
+        `\n` +
+        `import antdLocale from '${antd.filename}';\n` +
+        `export const antd = antdLocale.default;\n` +
+        `\n`+
+        `import dayjs from '@nextgisweb/gui/dayjs';\n` +
+        `\n` +
+        `import '${dayjs.filename}';\n` +
+        `dayjs.locale('${dayjs.original}');\n`
+    );
+
+    const jsFile = path.join(localeOutDir, lang + '.js');
+    fs.writeFileSync(jsFile, code);
+    entrypointList[entrypoint] = {
+        import: jsFile,
+        library: { type: "amd", name: entrypoint },
+    };
+}
+
 module.exports = {
     mode: config.debug ? "development" : "production",
     devtool: config.debug ? "source-map" : false,
@@ -98,6 +173,8 @@ module.exports = {
                 // packages for better browser compatibility.
                 exclude: config.debug ? /node_modules/ : [
                     /node_modules\/core-js/,
+                    /node_modules\/react/,
+                    /node_modules\/react-dom/,
                 ],
                 resolve: { fullySpecified: false },
                 use: {
@@ -106,6 +183,12 @@ module.exports = {
                         sourceType: "unambiguous",
                         presets: [
                             ["@babel/preset-typescript", {}],
+                            [
+                                "@babel/preset-react",
+                                {
+                                    "runtime": "automatic",
+                                },
+                            ],
                             [
                                 "@babel/preset-env",
                                 {

@@ -1,0 +1,28 @@
+.pyramid-storage-summary .ant-table-cell.data-volume {
+    text-align: right;
+}
+
+.pyramid-storage-summary tbody td.ant-table-cell.data-volume {
+    position: relative;
+    z-index: 0;
+}
+
+.pyramid-storage-summary tbody td.ant-table-cell.data-volume > .wrapper {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    margin: 8px;
+}
+
+.pyramid-storage-summary tbody td.ant-table-cell.data-volume > .wrapper > .bar {
+    height: 100%;
+    border-radius: 4px;
+    background-color: var(--secondary);
+}
+
+.pyramid-storage-summary tbody td.ant-table-cell.data-volume > span {
+    position: relative;
+    z-index: 10;
+}

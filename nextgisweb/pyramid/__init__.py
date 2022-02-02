@@ -117,6 +117,7 @@ class PyramidComponent(Component):
                 value=locale))
 
         result['storage_enabled'] = self.env.core.options['storage.enabled']
+        result['storage_limit'] = self.env.core.options['storage.limit']
 
         return result
 

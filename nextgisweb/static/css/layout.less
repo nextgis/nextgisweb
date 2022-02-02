@@ -1,4 +1,4 @@
-@import (css) "@{node_modules}/purecss/build/base.css";
+@import (css) "@{node_modules}/antd/dist/antd.variable.css";
 
 @import (css) "./icon.css";
 @import (css) "fontello.css";
@@ -6,6 +6,8 @@
 /* Import */
 
 @import "settings/_variables";
+@import "settings/_antd";
+
 @import "helpers/_mixin";
 @import "helpers/_utilities";
 @import "blocks/_decorations";
@@ -22,6 +24,23 @@
 @import "ngw-ui/_ngw-date-picker";
 @import "ngw-ui/_ngw-error";
 @import "ngw-ui/_ngw-toolbar";
+
+
+/* -- BOX-SIZING -- */
+
+/* Dijit widgets assume box-sizing: content-box, but antd sets
+box-sizing: border-box for all elements. Override box-sizing where it matters. */
+
+div.dijitContentPane,
+div.dijitTabPaneWrapper,
+div.dijitTabInner,
+div.dijitTabInnerDiv,
+div.dijitToolbar,
+td.tableContainer-labelCell,
+div.content__container
+{
+  box-sizing: content-box;
+}
 
 /* -- BASE STYLES -- */
 @font-face {
