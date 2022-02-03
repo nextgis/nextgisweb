@@ -6,7 +6,7 @@ import { utc } from "@nextgisweb/gui/dayjs";
 import i18n from "@nextgisweb/pyramid/i18n!";
 import settings from "@nextgisweb/pyramid/settings!";
 import kindOfData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/kind_of_data";
-import "./StorageSummary.css";
+import "./StorageSummary.less";
 
 function formatSize(value) {
     return (value / 1024 ** 2).toFixed(0).toString();

@@ -1,0 +1,30 @@
+.pyramid-storage-summary {
+    .ant-table-cell.data-volume {
+        text-align: right;
+    }
+
+    tbody td.ant-table-cell.data-volume {
+        position: relative;
+        z-index: 0;
+
+        > .wrapper {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+            margin: 8px;
+
+            > .bar {
+                height: 100%;
+                border-radius: 4px;
+                background-color: var(--secondary);
+            }
+        }
+
+        > span {
+            position: relative;
+            z-index: 10;
+        }
+    }
+}
