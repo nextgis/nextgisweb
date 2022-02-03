@@ -184,10 +184,10 @@ def widget(request):
         owner_user=owner_user.id)
 
 
-@viewargs(renderer='nextgisweb:resource/template/resource_export.mako')
 def resource_export(request):
     request.require_administrator()
     return dict(
+        entrypoint='@nextgisweb/resource/export-settings',
         title=_("Resource export"),
         dynmenu=request.env.pyramid.control_panel)
 
@@ -356,4 +356,4 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.control_panel.resource_export',
         '/control-panel/resource-export'
-    ).add_view(resource_export)
+    ).add_view(resource_export, renderer='nextgisweb:gui/template/react_app.mako')
