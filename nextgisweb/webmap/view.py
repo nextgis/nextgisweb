@@ -238,7 +238,7 @@ def setup_pyramid(comp, config):
 
     WebMap.__dynmenu__.add(DisplayMenu())
 
-    config.add_route('webmap.control_panel.settings', '/control_panel/webmap-settings') \
+    config.add_route('webmap.control_panel.settings', '/control-panel/webmap-settings') \
         .add_view(settings, renderer='nextgisweb:webmap/template/settings.mako')
 
     comp.env.pyramid.control_panel.add(
