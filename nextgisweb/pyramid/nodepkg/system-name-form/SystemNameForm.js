@@ -45,7 +45,6 @@ export function SystemNameForm() {
                 <Button
                     type="primary"
                     loading={loading}
-                    disabled={!fullName}
                     icon={<SaveOutlined />}
                     onClick={saveSystemName}
                 >
