@@ -166,6 +166,7 @@ def system_name(request):
 def home_path(request):
     request.require_administrator()
     return dict(
+        entrypoint='@nextgisweb/pyramid/home-path',
         title=_("Home path"),
         dynmenu=request.env.pyramid.control_panel)
 
@@ -451,7 +452,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'pyramid.control_panel.home_path',
         '/control-panel/home_path'
-    ).add_view(home_path, renderer=ctpl('home_path'))
+    ).add_view(home_path, renderer='nextgisweb:gui/template/react_app.mako')
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
