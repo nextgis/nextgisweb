@@ -113,7 +113,7 @@ define([
             }).placeAt(this.actionBar);
 
             this.btnUndo = new Button({
-                label: i18n.gettext("Don't save"),
+                label: i18n.gettext("Cancel"),
                 onClick: lang.hitch(this, this.onUndo),
             }).placeAt(this.actionBar);
 
