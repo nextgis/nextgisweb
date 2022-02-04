@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Radio, Button, Space, Row, Typography, Col, Skeleton } from "antd";
+import { Radio, Button, Space, Row, Typography, Col, Skeleton } from "@nextgisweb/gui/antd";
 import { SaveOutlined } from "@ant-design/icons";
 import { route } from "@nextgisweb/pyramid/api";
 import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";

@@ -136,6 +136,7 @@ def backup_download(request):
 def cors(request):
     request.require_administrator()
     return dict(
+        entrypoint='@nextgisweb/pyramid/cors-settings',
         title=_("Cross-origin resource sharing (CORS)"),
         dynmenu=request.env.pyramid.control_panel)
 
@@ -428,7 +429,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'pyramid.control_panel.cors',
         '/control-panel/cors', client=(),
-    ).add_view(cors, renderer=ctpl('cors'))
+    ).add_view(cors, renderer='nextgisweb:gui/template/react_app.mako')
 
     config.add_route(
         'pyramid.control_panel.custom_css',
