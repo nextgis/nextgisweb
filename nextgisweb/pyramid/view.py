@@ -451,7 +451,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'pyramid.control_panel.home_path',
-        '/control-panel/home_path'
+        '/control-panel/home-path'
     ).add_view(home_path, renderer='nextgisweb:gui/template/react_app.mako')
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
