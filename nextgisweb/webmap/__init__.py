@@ -8,7 +8,7 @@ from ..auth import User
 from ..models import DBSession
 from .. import db
 
-from .model import Base, WebMap, WebMapItem
+from .model import Base, WebMap, WebMapItem, WebMapScope
 from .adapter import WebMapAdapter
 from .util import _
 
