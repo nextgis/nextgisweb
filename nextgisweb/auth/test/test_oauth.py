@@ -168,7 +168,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
         )
     ):
-        ngw_webtest_app.get('/api/component/auth/current_user')
+        user = ngw_webtest_app.get('/api/component/auth/current_user').json
 
     access_token = access_token_next
     refresh_token = refresh_token_next
@@ -182,3 +182,25 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
             status_code=401, text="EXPIRED"))
     ):
         ngw_webtest_app.get('/api/component/auth/current_user')
+
+    # Local authentication of the created user
+
+    with transaction.manager:
+        User.filter_by(id=user['id']).one().password = 'test-password'
+
+    ngw_webtest_app.post('/api/component/auth/logout')
+
+    ngw_webtest_app.post('/api/component/auth/login', dict(
+        login=user['keyname'], password='test-password'))
+    assert ngw_webtest_app.get('/api/component/auth/current_user').json == user
+    ngw_webtest_app.post('/api/component/auth/logout')
+
+    # Disable local authentication for OAuth users
+
+    local_auth_keep = ngw_env.auth.oauth.local_auth
+    try:
+        ngw_env.auth.oauth.local_auth = False
+        ngw_webtest_app.post('/api/component/auth/login', dict(
+            login=user['keyname'], password='test-password'), status=401)
+    finally:
+        ngw_env.auth.oauth.local_auth = local_auth_keep
