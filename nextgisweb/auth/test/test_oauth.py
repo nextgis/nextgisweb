@@ -33,6 +33,8 @@ def setup_oauth(ngw_env):
         'oauth.server.token_endpoint': 'http://oauth/token',
         'oauth.server.auth_endpoint': 'http://oauth/auth',
         'oauth.server.introspection_endpoint': 'http://oauth/introspect',
+        'oauth.profile.subject.attr': 'sub',
+        'oauth.profile.keyname.attr': 'preferred_username',
     }
 
     prev_helper = auth.oauth
@@ -190,17 +192,14 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
 
     ngw_webtest_app.post('/api/component/auth/logout')
 
-    ngw_webtest_app.post('/api/component/auth/login', dict(
-        login=user['keyname'], password='test-password'))
-    assert ngw_webtest_app.get('/api/component/auth/current_user').json == user
-    ngw_webtest_app.post('/api/component/auth/logout')
+    with patch.object(ngw_env.auth.oauth, 'local_auth', new=True):
+        ngw_webtest_app.post('/api/component/auth/login', dict(
+            login=user['keyname'], password='test-password'))
+        assert ngw_webtest_app.get('/api/component/auth/current_user').json == user
+        ngw_webtest_app.post('/api/component/auth/logout')
 
     # Disable local authentication for OAuth users
 
-    local_auth_keep = ngw_env.auth.oauth.local_auth
-    try:
-        ngw_env.auth.oauth.local_auth = False
+    with patch.object(ngw_env.auth.oauth, 'local_auth', new=False):
         ngw_webtest_app.post('/api/component/auth/login', dict(
             login=user['keyname'], password='test-password'), status=401)
-    finally:
-        ngw_env.auth.oauth.local_auth = local_auth_keep
