@@ -111,7 +111,6 @@ def cog(resource, request):
         content_length = content_range.stop - content_range.start
         response = Response(
             status_code=206,
-            content_length=content_length,
             content_range=content_range,
             content_type="image/geo+tiff"
         )
@@ -121,6 +120,7 @@ def cog(resource, request):
             offset=content_range.start,
             length=content_length
         )
+        response.content_length = content_length
 
         return response
 
