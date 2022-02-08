@@ -145,6 +145,8 @@ class OAuthHelper(object):
 
             user.oauth_tstamp = datetime.utcnow()
 
+        DBSession.flush()  # Force user.id sequence value
+
         event = OnAccessTokenToUser(user, token.data)
         zope.event.notify(event)
 
