@@ -10,7 +10,6 @@ const WebpackAssetsManifest = require("webpack-assets-manifest");
 const CopyPlugin = require("copy-webpack-plugin");
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 function scanForEntrypoints(pkg) {
     const result = [];
@@ -115,7 +114,7 @@ function lookupLocale(key, map) {
     };
 
     test.push(lang);
-    
+
     for (const c of test) {
         const m = map[c];
         if (m) { return m; }
@@ -227,8 +226,8 @@ module.exports = {
             ],
         }),
         new CleanWebpackPlugin(),
-        new BundleAnalyzerPlugin({ analyzerMode: "static" }),
         ...config.compressionPlugins,
+        ...config.bundleAnalyzerPlugins,
     ],
     output: {
         path: path.resolve(config.rootPath, "dist/main"),

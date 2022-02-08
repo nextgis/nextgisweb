@@ -9,7 +9,7 @@ const config = require("@nextgisweb/jsrealm/config.cjs");
 const entry = path.resolve(path.join(__dirname, "contrib/ol/entry.js"));
 const index = path.resolve(path.join(__dirname, "contrib/ol/index.js"));
 
-// Exclude large modules from explicit including into the bundle. But they still can 
+// Exclude large modules from explicit including into the bundle. But they still can
 // be implicit included by other modules.
 const EXCLUDE = [
     "ol/format/EsriJSON",
@@ -134,8 +134,8 @@ module.exports = {
                 },
             ],
         }),
-        new BundleAnalyzerPlugin({ analyzerMode: "static" }),
         ...config.compressionPlugins,
+        ...config.bundleAnalyzerPlugins,
     ],
     output: {
         path: path.resolve(config.distPath + "/external-ol"),
