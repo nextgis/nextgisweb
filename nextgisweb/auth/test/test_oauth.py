@@ -30,6 +30,7 @@ def setup_oauth(ngw_env):
         'oauth.register': True,
         'oauth.client.id': CLIENT_ID,
         'oauth.client.secret': CLIENT_SECRET,
+        'oauth.server.password': False,
         'oauth.server.token_endpoint': 'http://oauth/token',
         'oauth.server.auth_endpoint': 'http://oauth/auth',
         'oauth.server.introspection_endpoint': 'http://oauth/introspect',
@@ -123,12 +124,25 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     state = dict(parse_qsl(ngw_webtest_app.cookies[f'ngw-oastate-{state_key}']))
     assert state['next_url'] == next_url
 
+    oauth_user = "oauth-test"
+    oauth_pwd = "oauth-pwd"
     oauth_subject = str(uuid4())
     code = token_urlsafe(16)
     access_token = token_urlsafe(32)
     refresh_token = token_urlsafe(32)
 
-    start_tstamp = int(datetime.utcnow().timestamp())
+    def introspection_response():
+        start_tstamp = int(datetime.utcnow().timestamp())
+        return dict(
+            exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
+            iat=start_tstamp,
+            sub=oauth_subject,
+            name="OAuth",
+            first_name="OAuth",
+            family_name="Test",
+            preferred_username=oauth_user,
+            active=True,
+        )
 
     with server_response_mock(
         'token', dict(grant_type='authorization_code'),
@@ -140,16 +154,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
         )
     ), server_response_mock(
         'introspection', dict(token=access_token),
-        response=dict(
-            exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
-            iat=start_tstamp,
-            sub=oauth_subject,
-            name="OAuth",
-            first_name="OAuth",
-            family_name="Test",
-            preferred_username="oauth-test",
-            active=True,
-        )
+        response=introspection_response()
     ):
         cb_url = f"/oauth?state={state_key}&code={code}"
         resp = ngw_webtest_app.get(cb_url, status=302)
@@ -203,3 +208,21 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     with patch.object(ngw_env.auth.oauth, 'local_auth', new=False):
         ngw_webtest_app.post('/api/component/auth/login', dict(
             login=user['keyname'], password='test-password'), status=401)
+
+    # Oauth password authentication
+    access_token_next = token_urlsafe(32)
+    refresh_token_next = token_urlsafe(32)
+
+    with server_response_mock(
+        'token', dict(grant_type='password', username=oauth_user, password=oauth_pwd),
+        dict(
+            access_token=access_token_next,
+            refresh_token=refresh_token_next,
+            expires_in=ACCESS_TOKEN_LIFETIME,
+        )
+    ), server_response_mock(
+        'introspection', dict(token=access_token_next), introspection_response()
+    ), patch.object(ngw_env.auth.oauth, 'password', new=True):
+        ngw_webtest_app.post('/api/component/auth/login', dict(
+            login=oauth_user, password=oauth_pwd))
+        assert ngw_webtest_app.get('/api/component/auth/current_user').json == user
