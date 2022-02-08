@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from urllib.parse import urlencode
+from urllib.parse import urlencode, parse_qsl
 
 import string
 import secrets
@@ -120,7 +120,7 @@ def oauth(request):
         # Extract data from state named cookie
         state = request.params['state']
         try:
-            data = json.loads(request.cookies[cookie_name(state)])
+            data = dict(parse_qsl(request.cookies[cookie_name(state)]))
         except ValueError:
             raise AuthorizationException("State cookie parse error")
 
@@ -159,7 +159,7 @@ def oauth(request):
 
         # Store data in state named cookie
         response.set_cookie(
-            cookie_name(state), value=json.dumps(data),
+            cookie_name(state), value=urlencode(data),
             path=oauth_path, max_age=600, httponly=True)
 
         return response

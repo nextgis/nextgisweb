@@ -21,10 +21,13 @@ class SecurityPolicy(object):
 
     def __init__(self, comp, options):
         self.comp = comp
-        self.oauth = comp.oauth
         self.options = options
         self.test_user = None
         self.acl_helper = ACLHelper()
+
+    @property
+    def oauth(self):
+        return self.comp.oauth
 
     def identity(self, request):
         # Override current user in tests via ngw_auth_administrator fixture

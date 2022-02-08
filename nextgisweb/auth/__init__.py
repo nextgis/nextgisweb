@@ -203,7 +203,6 @@ class AuthComponent(Component):
             username=request.POST['login'].strip(),
             password=request.POST['password'])
 
-        DBSession.flush()  # Force user.id sequence value
         headers = auth_policy.remember(request, (user.id, tresp))
 
         return user, headers
