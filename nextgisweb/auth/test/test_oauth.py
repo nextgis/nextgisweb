@@ -124,24 +124,40 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     state = dict(parse_qsl(ngw_webtest_app.cookies[f'ngw-oastate-{state_key}']))
     assert state['next_url'] == next_url
 
-    oauth_user = "oauth-test"
-    oauth_pwd = "oauth-pwd"
-    oauth_subject = str(uuid4())
+    ouser1 = dict(
+        sub=str(uuid4()),
+        name="Oauth",
+        keyname="oauth-test",
+        pwd="oauth-pwd",
+        first_name="OAuth",
+        family_name="Test",
+        active=True,
+    )
+    ouser2 = dict(
+        sub=str(uuid4()),
+        name="Oauth2",
+        keyname="oauth-test2",
+        pwd="oauth-secret",
+        first_name="OAuthOauth",
+        family_name="TestTest",
+        active=True,
+    )
+
     code = token_urlsafe(16)
     access_token = token_urlsafe(32)
     refresh_token = token_urlsafe(32)
 
-    def introspection_response():
+    def introspection_response(user):
         start_tstamp = int(datetime.utcnow().timestamp())
         return dict(
             exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
             iat=start_tstamp,
-            sub=oauth_subject,
-            name="OAuth",
-            first_name="OAuth",
-            family_name="Test",
-            preferred_username=oauth_user,
-            active=True,
+            sub=user['sub'],
+            name=user['name'],
+            first_name=user['first_name'],
+            family_name=user['family_name'],
+            preferred_username=user['keyname'],
+            active=user['active'],
         )
 
     with server_response_mock(
@@ -154,7 +170,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
         )
     ), server_response_mock(
         'introspection', dict(token=access_token),
-        response=introspection_response()
+        response=introspection_response(ouser1)
     ):
         cb_url = f"/oauth?state={state_key}&code={code}"
         resp = ngw_webtest_app.get(cb_url, status=302)
@@ -210,19 +226,39 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
             login=user['keyname'], password='test-password'), status=401)
 
     # Oauth password authentication
-    access_token_next = token_urlsafe(32)
-    refresh_token_next = token_urlsafe(32)
+    access_token = token_urlsafe(32)
+    refresh_token = token_urlsafe(32)
 
     with server_response_mock(
-        'token', dict(grant_type='password', username=oauth_user, password=oauth_pwd),
+        'token', dict(grant_type='password', username=ouser1['keyname'], password=ouser1['pwd']),
         dict(
-            access_token=access_token_next,
-            refresh_token=refresh_token_next,
+            access_token=access_token,
+            refresh_token=refresh_token,
             expires_in=ACCESS_TOKEN_LIFETIME,
         )
     ), server_response_mock(
-        'introspection', dict(token=access_token_next), introspection_response()
+        'introspection', dict(token=access_token), introspection_response(ouser1)
     ), patch.object(ngw_env.auth.oauth, 'password', new=True):
         ngw_webtest_app.post('/api/component/auth/login', dict(
-            login=oauth_user, password=oauth_pwd))
+            login=ouser1['keyname'], password=ouser1['pwd']))
         assert ngw_webtest_app.get('/api/component/auth/current_user').json == user
+    ngw_webtest_app.post('/api/component/auth/logout')
+
+    # Bearer authentication
+    ngw_webtest_app.authorization = ('Bearer', access_token)
+
+    assert ngw_webtest_app.get('/api/component/auth/current_user').json == user
+
+    freezegun.tick(ACCESS_TOKEN_LIFETIME + 5)
+    assert ngw_webtest_app.get('/api/component/auth/current_user', status=401)
+
+    # Register user with bearer authentication
+    access_token = token_urlsafe(32)
+
+    ngw_webtest_app.authorization = ('Bearer', access_token)
+    with server_response_mock(
+        'introspection', dict(token=access_token), introspection_response(ouser2)
+    ):
+        keyname = ngw_webtest_app.get('/api/component/auth/current_user').json['keyname']
+        user2 = User.filter_by(keyname=keyname).one()
+        assert user2.oauth_subject == ouser2['sub']
