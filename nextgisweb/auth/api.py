@@ -1,5 +1,8 @@
 import json
+import re
 
+import sqlalchemy as sa
+from sqlalchemy.orm import aliased
 from pyramid.response import Response
 from pyramid.security import forget
 from pyramid.httpexceptions import (
@@ -11,6 +14,9 @@ from ..core.exception import ValidationError
 from .models import User, Group, Principal
 from .util import _
 
+keyname_pattern = re.compile(r'^[A-Za-z][A-Za-z0-9_\-]*$')
+brief_keys = ('keyname', 'display_name', 'system')
+
 
 def user_cget(request):
     request.require_administrator()
@@ -19,7 +25,10 @@ def user_cget(request):
 
 def user_cpost(request):
     request.require_administrator()
+
     obj = User(system=False)
+    check_keyname(obj, request.json_body)
+    check_display_name(obj, request.json_body)
     obj.deserialize(request.json_body)
     obj.persist()
 
@@ -29,24 +38,29 @@ def user_cpost(request):
 
 def user_iget(request):
     request.require_administrator()
-    obj = User.filter_by(id=request.matchdict['id']).one()
+    obj = User.filter_by(id=int(request.matchdict['id'])).one()
     return obj.serialize()
 
 
 def user_iput(request):
     request.require_administrator()
-    obj = User.filter_by(id=request.matchdict['id']).one()
-    forbid_system_principal(obj)
+
+    obj = User.filter_by(id=int(request.matchdict['id'])).one()
+    check_keyname(obj, request.json_body)
+    check_display_name(obj, request.json_body)
+    check_system_user(obj, request.json_body)
     obj.deserialize(request.json_body)
+    check_last_administrator()
     return dict(id=obj.id)
 
 
 def user_idelete(request):
     request.require_administrator()
-    obj = User.filter_by(id=request.matchdict['id']).one()
-    forbid_system_principal(obj)
-    check_principal_references(obj)
+
+    obj = User.filter_by(id=int(request.matchdict['id'])).one()
+    check_principal_delete(obj)
     DBSession.delete(obj)
+    check_last_administrator()
     return None
 
 
@@ -87,7 +101,11 @@ def group_cget(request):
 
 def group_cpost(request):
     request.require_administrator()
+
     obj = Group(system=False)
+    check_keyname(obj, request.json_body)
+    check_display_name(obj, request.json_body)
+    check_group_members(obj, request.json_body)
     obj.deserialize(request.json_body)
     obj.persist()
 
@@ -97,23 +115,28 @@ def group_cpost(request):
 
 def group_iget(request):
     request.require_administrator()
-    obj = Group.filter_by(id=request.matchdict['id']).one()
+    obj = Group.filter_by(id=int(request.matchdict['id'])).one()
     return obj.serialize()
 
 
 def group_iput(request):
     request.require_administrator()
-    obj = Group.filter_by(id=request.matchdict['id']).one()
-    forbid_system_principal(obj)
+
+    obj = Group.filter_by(id=int(request.matchdict['id'])).one()
+    check_keyname(obj, request.json_body)
+    check_display_name(obj, request.json_body)
+    check_system_group(obj, request.json_body)
+    check_group_members(obj, request.json_body)
     obj.deserialize(request.json_body)
+    check_last_administrator()
     return dict(id=obj.id)
 
 
 def group_idelete(request):
     request.require_administrator()
-    obj = Group.filter_by(id=request.matchdict['id']).one()
-    forbid_system_principal(obj)
-    check_principal_references(obj)
+
+    obj = Group.filter_by(id=int(request.matchdict['id'])).one()
+    check_principal_delete(obj)
     DBSession.delete(obj)
     return None
 
@@ -208,9 +231,65 @@ def setup_pyramid(comp, config):
         .add_view(logout, request_method='POST', renderer='json')
 
 
-def forbid_system_principal(obj):
+class SystemPrincipalAttributeReadOnly(ValidationError):
+
+    def __init__(self, attr):
+        super().__init__(message=_(
+            "The '%s' attribute of the system principal can't be changed."
+        ) % attr)
+
+
+class PrincipalNotUnique(ValidationError):
+
+    def __init__(self, attr, value):
+        if attr == 'keyname':
+            message = _("Principal '%s' already exists.") % value
+        elif attr == 'display_name':
+            message = _("Principal with full name '%s' already exists.") % value
+        else:
+            raise ValueError(f"Invalid attribute: {attr}")
+        super().__init__(message=message)
+
+
+def check_system_user(obj, data):
+    if not obj.system:
+        return
+
+    for k, v in data.items():
+        if not (getattr(obj, k) == data[k] or (
+            obj.keyname == 'guest' and k == 'member_of'
+        )):
+            raise SystemPrincipalAttributeReadOnly(k)
+
+
+def check_system_group(obj, data):
+    if not obj.system:
+        return
+
+    allowed_attrs = ('register', 'members')
+    for k in data:
+        if not (getattr(obj, k) == data[k] or k in allowed_attrs):
+            raise SystemPrincipalAttributeReadOnly(k)
+
+
+def check_group_members(obj, data):
+    if 'members' not in data:
+        return
+
+    user = User.filter(
+        User.system,
+        User.keyname != 'guest',
+        User.id.in_(data['members'])).first()
+    if user is not None:
+        raise ValidationError(message=_(
+            "User '%s' can't be a member of a group.") % user.display_name)
+
+
+def check_principal_delete(obj):
     if obj.system:
-        raise ValidationError(_("System principals couldn't be chanded."))
+        raise ValidationError(message=_(
+            "System principals can't be deleted."))
+    check_principal_references(obj)
 
 
 def check_principal_references(obj):
@@ -227,3 +306,51 @@ def check_principal_references(obj):
             message=_("User is referenced with resources")
             if isinstance(obj, User) else _("Group is referenced with resources"),
             data=dict(references_data=references_data))
+
+
+def check_keyname(obj, data):
+    if 'keyname' not in data or obj.keyname == data['keyname']:
+        return
+
+    principal_cls = type(obj)
+    keyname = data['keyname']
+
+    if not keyname_pattern.match(keyname):
+        raise ValidationError(message=_(
+            "Invalid principal name: '%s'.") % keyname)
+
+    query = principal_cls.filter(
+        sa.func.lower(principal_cls.keyname) == keyname.lower())
+    if obj.id is not None:
+        query = query.filter(principal_cls.id != obj.id)
+
+    is_unique = not DBSession.query(query.exists()).scalar()
+    if not is_unique:
+        raise PrincipalNotUnique('keyname', keyname)
+
+
+def check_display_name(obj, data):
+    if 'display_name' not in data or obj.display_name == data['display_name']:
+        return
+
+    display_name = data['display_name']
+
+    query = Principal.filter(
+        Principal.cls == obj.cls,
+        sa.func.lower(Principal.display_name) == display_name.lower())
+    if obj.id is not None:
+        query = query.filter(Principal.id != obj.id)
+
+    is_unique = not DBSession.query(query.exists()).scalar()
+    if not is_unique:
+        raise PrincipalNotUnique('display_name', display_name)
+
+
+def check_last_administrator():
+    member = aliased(User, flat=True)
+    query = DBSession.query(Group).filter_by(keyname='administrators') \
+        .join(Group.members.of_type(member)).filter_by(disabled=False).limit(1)
+    if query.count() == 0:
+        raise ValidationError(message=_(
+            "The 'administrators' group must have at least one enabled member."
+        ))
