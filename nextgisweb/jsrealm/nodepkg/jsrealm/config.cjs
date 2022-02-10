@@ -3,6 +3,7 @@ const fs = require("fs");
 const zlib = require("zlib");
 
 const CompressionPlugin = require("compression-webpack-plugin");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 const env = process.env;
 const configRoot = env.npm_package_config_nextgisweb_jsrealm_root;
@@ -63,7 +64,7 @@ if (!debug || env.npm_package_config_nextgisweb_pyramid_compression === 'true') 
 }
 
 const bundleAnalyzerPlugins = (!debug || env.npm_package_config_nextgisweb_jsrealm_bundle_analyzer === 'true') ?
-    [new require("webpack-bundle-analyzer").BundleAnalyzerPlugin({ analyzerMode: "static" })] : [];
+    [new BundleAnalyzerPlugin({ analyzerMode: "static" })] : [];
 
 module.exports = {
     debug,
