@@ -8,7 +8,7 @@ from zope.event import notify
 from zope.event.classhandler import handler
 
 from ..env import env
-from ..models import declarative_base
+from ..models import DBSession, declarative_base
 
 
 Base = declarative_base()
@@ -157,9 +157,10 @@ class User(Principal):
 
         attrs = ('display_name', 'description', 'keyname',
                  'superuser', 'disabled', 'language', 'password')
-        for a in attrs:
-            if a in data:
-                setattr(self, a, data[a])
+        with DBSession.no_autoflush:
+            for a in attrs:
+                if a in data:
+                    setattr(self, a, data[a])
 
         if 'member_of' in data:
             self.member_of = [Group.filter_by(id=gid).one()
@@ -220,13 +221,14 @@ class Group(Principal):
 
     def deserialize(self, data):
         attrs = ('display_name', 'description', 'keyname', 'register')
-        for a in attrs:
-            if a in data:
-                setattr(self, a, data[a])
+        with DBSession.no_autoflush:
+            for a in attrs:
+                if a in data:
+                    setattr(self, a, data[a])
 
-        if 'members' in data:
-            self.members = [User.filter_by(id=uid).one()
-                            for uid in data['members']]
+            if 'members' in data:
+                self.members = [User.filter_by(id=uid).one()
+                                for uid in data['members']]
 
 
 @lru_cache(maxsize=256)
