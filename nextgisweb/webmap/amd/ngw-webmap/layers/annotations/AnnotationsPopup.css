@@ -18,6 +18,21 @@ body.annotations-edit .ol-popup.annotation:hover .edit-controls {
   border: none;
 }
 
+body.ann-types-display .ol-popup.annotation.public {
+  border-left: #97e07e 5px solid;
+  left: -55px;
+}
+
+body.ann-types-display .ol-popup.annotation.own {
+  border-left: #e8b3f8 5px solid;
+  left: -55px;
+}
+
+body.ann-types-display .ol-popup.annotation.private {
+  border-left: #f88f8f 5px solid;
+  left: -55px;
+}
+
 .ol-popup.annotation:before {
   border: none;
 }

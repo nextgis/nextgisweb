@@ -12,13 +12,13 @@ define([
     "dojox/html/entities",
     "dojox/widget/Standby",
     "openlayers/ol",
-    "ngw/route",
+    "@nextgisweb/pyramid/api",
+    "ngw-pyramid/ErrorDialog/ErrorDialog",
     "ngw-pyramid/make-singleton",
     "ngw-webmap/layers/annotations/AnnotationFeature",
     "ngw-webmap/layers/annotations/AnnotationsLayer",
     "ngw-webmap/layers/annotations/AnnotationsEditableLayer",
     "ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog",
-    "@nextgisweb/pyramid/i18n!",
 ], function (
     declare,
     lang,
@@ -33,15 +33,16 @@ define([
     htmlEntities,
     Standby,
     ol,
-    route,
+    api,
+    ErrorDialog,
     MakeSingleton,
     AnnotationFeature,
     AnnotationsLayer,
     AnnotationsEditableLayer,
     AnnotationsDialog,
-    i18n
 ) {
     var wkt = new ol.format.WKT();
+    const { route } = api;
 
     return MakeSingleton(
         declare("ngw-webmap.AnnotationsManager", [], {
@@ -53,7 +54,7 @@ define([
             _annotationPanel: null,
 
             _annotationsVisible: null,
-            _popupsVisible: null,
+            _messagesVisible: null,
 
             _editable: null,
 
@@ -66,8 +67,9 @@ define([
                 this._display = options.display;
                 this._annotationPanel = options.panel;
 
-                this._annotationsVisible = this._display.config.annotations.default;
-                this._popupsVisible = this._annotationsVisible;
+                this._annotationsVisible =
+                    this._display.config.annotations.default;
+                this._messagesVisible = this._annotationsVisible;
 
                 this._annotationsDialog = new AnnotationsDialog({
                     annotationsManager: this,
@@ -104,16 +106,15 @@ define([
                 );
             },
 
-            _loadAnnotations: function () {
-                this._getAnnotationsCollection().then(
-                    lang.hitch(this, function (annotations) {
-                        this._annotationsLayer.fillAnnotations(annotations);
-                        this._onAnnotationsVisibleChange(
-                            this._annotationsVisible
-                        );
-                        this._onMessagesVisibleChange(this._popupsVisible);
-                    })
-                );
+            _loadAnnotations: async function () {
+                try {
+                    const annotations = await this._getAnnotationsCollection();
+                    this._annotationsLayer.fillAnnotations(annotations);
+                    this._onAnnotationsVisibleChange(this._annotationsVisible);
+                    this._onMessagesVisibleChange(this._messagesVisible);
+                } catch (err) {
+                    new ErrorDialog(err).show();
+                }
             },
 
             _bindEvents: function () {
@@ -147,6 +148,15 @@ define([
                     "/annotations/messages/visible",
                     lang.hitch(this, this._onMessagesVisibleChange)
                 );
+
+                topic.subscribe(
+                    "webmap/annotations/filter/changed",
+                    lang.hitch(this, this._onFilterChanged)
+                );
+            },
+
+            _onFilterChanged: function (filter) {
+                this._annotationsLayer.applyFilter(filter);
             },
 
             _onAnnotationsVisibleChange: function (toShow) {
@@ -154,17 +164,17 @@ define([
 
                 this._annotationsLayer.getLayer().set("visibility", toShow);
 
-                if (toShow && this._popupsVisible) {
+                if (toShow && this._messagesVisible) {
                     this._annotationsLayer.showPopups();
                 }
 
-                if (!toShow && this._popupsVisible) {
+                if (!toShow && this._messagesVisible) {
                     this._annotationsLayer.hidePopups();
                 }
             },
 
             _onMessagesVisibleChange: function (toShow) {
-                this._popupsVisible = toShow;
+                this._messagesVisible = toShow;
 
                 if (toShow) {
                     this._annotationsLayer.showPopups();
@@ -188,9 +198,10 @@ define([
             },
 
             _onCreateOlFeature: function (olFeature) {
-                var annFeature = new AnnotationFeature({
+                const annFeature = new AnnotationFeature({
                     feature: olFeature,
                 });
+
                 this._annotationsDialog
                     .showForEdit(annFeature)
                     .then(lang.hitch(this, this._dialogResultHandle));
@@ -216,7 +227,7 @@ define([
             },
 
             _dialogResultHandle: function (result, dialog) {
-                var annFeature = result.annFeature;
+                const annFeature = result.annFeature;
 
                 if (result.action === "save") {
                     if (annFeature.isNew()) {
@@ -245,134 +256,110 @@ define([
                 }
             },
 
-            createAnnotation: function (annFeature, newAnnotationInfo, dialog) {
+            createAnnotation: async function (
+                annFeature,
+                newAnnotationInfo,
+                dialog
+            ) {
                 this._standby.show();
-                this._createAnnotation(annFeature, newAnnotationInfo).then(
-                    lang.hitch(this, function (resultSaved) {
-                        var annId = resultSaved.id;
-                        annFeature.setId(annId);
-                        annFeature.updateAnnotationInfo(newAnnotationInfo);
-                        if (this._popupsVisible)
-                            this._annotationsLayer.showPopup(annFeature);
-                        this._standby.hide();
-                    }),
-                    lang.hitch(this, function (err) {
-                        this._standby.hide();
-                        alert(
-                            i18n.gettext("Error on the server:") +
-                                " " +
-                                err.response.text
-                        );
-                        dialog.showLastData();
-                    })
-                );
+                try {
+                    const annotationInfo = await this._createAnnotation(
+                        annFeature,
+                        newAnnotationInfo
+                    );
+                    annFeature.updateAnnotationInfo(annotationInfo);
+                    if (this._messagesVisible) 
+                        this._annotationsLayer.showPopup(annFeature);
+                } catch (err) {
+                    new ErrorDialog(err).show();
+                    dialog.showLastData();
+                } finally {
+                    this._standby.hide();
+                }
             },
 
-            updateAnnotation: function (annFeature, newAnnotationInfo, dialog) {
+            updateAnnotation: async function (
+                annFeature,
+                newAnnotationInfo,
+                dialog
+            ) {
                 this._standby.show();
-                this._updateAnnotation(annFeature, newAnnotationInfo).then(
-                    lang.hitch(this, function () {
-                        annFeature.updateAnnotationInfo(newAnnotationInfo);
-                        annFeature.updatePopup();
-                        this._standby.hide();
-                    }),
-                    lang.hitch(this, function (err) {
-                        this._standby.hide();
-                        alert(
-                            i18n.gettext("Error on the server:") +
-                                " " +
-                                err.response.text
-                        );
-                        dialog.showLastData();
-                    })
-                );
+                try {
+                    await this._updateAnnotation(annFeature, newAnnotationInfo);
+                    annFeature.updateAnnotationInfo(newAnnotationInfo);
+                } catch (err) {
+                    new ErrorDialog(err).show();
+                    dialog.showLastData();
+                } finally {
+                    this._standby.hide();
+                }
             },
 
-            deleteAnnotation: function (annFeature, dialog) {
+            deleteAnnotation: async function (annFeature, dialog) {
                 this._standby.show();
-                this._deleteAnnotation(annFeature).then(
-                    lang.hitch(this, function () {
-                        this._annotationsLayer.removeAnnFeature(annFeature);
-                        this._standby.hide();
-                    }),
-                    lang.hitch(this, function (err) {
-                        this._standby.hide();
-                        alert(
-                            i18n.gettext("Error on the server:") +
-                                " " +
-                                err.response.text
-                        );
-                        dialog.showLastData();
-                    })
-                );
+                try {
+                    await this._deleteAnnotation(annFeature);
+                    this._annotationsLayer.removeAnnFeature(annFeature);
+                } catch (err) {
+                    new ErrorDialog(err).show();
+                    dialog.showLastData();
+                } finally {
+                    this._standby.hide();
+                }
             },
 
-            _createAnnotation: function (annFeature, newAnnotationInfo) {
+            _createAnnotation: async function (annFeature, newAnnotationInfo) {
                 newAnnotationInfo.geom = wkt.writeGeometry(
                     annFeature.getFeature().getGeometry()
                 );
 
-                return xhr(
-                    route.webmap.annotation.collection({
-                        id: this._display.config.webmapId,
-                    }),
-                    {
-                        method: "POST",
-                        handleAs: "json",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        data: json.stringify(newAnnotationInfo),
-                    }
-                );
+                const createInfo = await route(
+                    "webmap.annotation.collection",
+                    this._display.config.webmapId
+                )
+                    .post({
+                        json: newAnnotationInfo,
+                    })
+                    .then((d) => d);
+
+                return await route(
+                    "webmap.annotation.item",
+                    this._display.config.webmapId,
+                    createInfo.id
+                )
+                    .get()
+                    .then((d) => d);
             },
 
-            _getAnnotationsCollection: function () {
-                return xhr(
-                    route.webmap.annotation.collection({
-                        id: this._display.config.webmapId,
-                    }),
-                    {
-                        method: "GET",
-                        handleAs: "json",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
+            _getAnnotationsCollection: async function () {
+                return route(
+                    "webmap.annotation.collection",
+                    this._display.config.webmapId
+                )
+                    .get()
+                    .then((d) => d);
             },
 
-            _deleteAnnotation: function (annFeature) {
-                return xhr(
-                    route.webmap.annotation.item({
-                        id: this._display.config.webmapId,
-                        annotation_id: annFeature.getId(),
-                    }),
-                    {
-                        method: "DELETE",
-                        handleAs: "json",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
+            _deleteAnnotation: async function (annFeature) {
+                return route(
+                    "webmap.annotation.item",
+                    this._display.config.webmapId,
+                    annFeature.getId()
+                )
+                    .delete()
+                    .then((d) => d);
             },
 
             _updateAnnotation: function (annFeature, newAnnotationInfo) {
-                return xhr(
-                    route.webmap.annotation.item({
-                        id: this._display.config.webmapId,
-                        annotation_id: annFeature.getId(),
-                    }),
-                    {
-                        method: "PUT",
-                        handleAs: "json",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        data: json.stringify(newAnnotationInfo),
-                    }
-                );
+                return route(
+                    "webmap.annotation.item",
+                    this._display.config.webmapId,
+                    annFeature.getId()
+                )
+                    .put({
+                        json: newAnnotationInfo,
+                    })
+                    .then((d) => d);
             },
         })
     );

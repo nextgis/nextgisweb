@@ -5,6 +5,7 @@ define([
     "dojo/on",
     "dojo/topic",
     "dojo/html",
+    "dojo/dom-class",
     "dojo/dom-construct",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
@@ -23,6 +24,7 @@ define([
     on,
     topic,
     html,
+    domClass,
     domConstruct,
     _WidgetBase,
     _TemplatedMixin,
@@ -34,7 +36,7 @@ define([
     Vector,
     template
 ) {
-    var contentTemplate = i18n.renderTemplate(template);
+    const contentTemplate = i18n.renderTemplate(template);
 
     return declare(null, {
         _popup: null,
@@ -42,16 +44,53 @@ define([
         _contentWidget: null,
         _editable: null,
 
-        constructor: function (annotationFeature, editable) {
+        constructor: function (annotationFeature, editable, annotationInfo) {
             this._editable = editable;
             this._annFeature = annotationFeature;
+
+            const customCssClass = annotationInfo
+                ? `annotation ${this._getAccessCssClass(annotationInfo)}`
+                : "annotation";
+
             this._popup = new olPopup({
                 insertFirst: false,
                 autoPan: false,
-                customCssClass: "annotation",
+                customCssClass,
             });
+
+            if (annotationInfo) this._setTitle(annotationInfo);
+
             this._popup.annFeature = annotationFeature;
             this._popup.cloneOlPopup = this.cloneOlPopup;
+        },
+
+        _getAccessCssClass: function (annotationInfo) {
+            if (!annotationInfo) return "";
+            if (annotationInfo.public) return "public";
+            if (annotationInfo.own) return "own";
+            return "private";
+        },
+        
+        _setAccessCssClass: function (annotationInfo) {
+            if (!this._popup) return;
+
+            const elPopup = this._popup.element.childNodes[0];
+            const cssClass = this._getAccessCssClass(annotationInfo);
+            domClass.add(elPopup, cssClass);
+        },
+
+        _setTitle: function (annotationInfo) {
+            let title;
+            if (annotationInfo.public) {
+                title = i18n.gettext("Public annotation");
+            } else if (annotationInfo.own) {
+                title = i18n.gettext("My private annotation");
+            } else {
+                title = i18n.gettext(
+                    `Private annotation (${annotationInfo.user})`
+                );
+            }
+            this._popup.element.setAttribute("title", title);
         },
 
         addToMap: function (map) {
@@ -59,6 +98,7 @@ define([
 
             this._map = map;
             this._map.olMap.addOverlay(this._popup);
+            domClass.add(this._popup.element, "annotation-layer");
             return this;
         },
 
@@ -134,6 +174,15 @@ define([
         },
 
         update: function () {
+            const feature = this._annFeature.getFeature();
+            const accessType = this._annFeature.getAccessType();
+
+            if (feature && accessType) {
+                const annotationInfo = this._annFeature.getAnnotationInfo();
+                this._setTitle(annotationInfo);
+                this._setAccessCssClass(annotationInfo);
+            }
+
             if (!this._contentWidget) return false;
             html.set(
                 this._contentWidget.descriptionDiv,

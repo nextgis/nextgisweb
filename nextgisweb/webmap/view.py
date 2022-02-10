@@ -185,6 +185,7 @@ def display(obj, request):
             scope=dict(
                 read=obj.has_permission(WebMapScope.annotation_read, request.user),
                 write=obj.has_permission(WebMapScope.annotation_write, request.user),
+                manage=obj.has_permission(WebMapScope.annotation_manage, request.user),
             )
         )
 
