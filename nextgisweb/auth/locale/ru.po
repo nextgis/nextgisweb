@@ -37,29 +37,29 @@ msgstr "Атрибут '%s' системного субъекта не може�
 msgid "Principal '%s' already exists."
 msgstr "Субъект '%s' уже существует."
 
-#: api.py:271
+#: api.py:275
 #, python-format
 msgid "Principal with full name '%s' already exists."
 msgstr "Субъект с наименованием '%s' уже существует."
 
-#: api.py:295
+#: api.py:311
 #, python-format
 msgid "User '%s' can't be a member of a group."
 msgstr "Пользователь '%s' не может быть членом группы."
 
-#: api.py:313
+#: api.py:317
 msgid "System principals can't be deleted."
 msgstr "Системные субъекты не могут быть удалены."
 
-#: api.py:329
+#: api.py:333
 msgid "User is referenced with resources"
 msgstr "Пользователь связан с ресурсами"
 
-#: api.py:330
+#: api.py:334
 msgid "Group is referenced with resources"
 msgstr "Группа связана с ресурсами"
 
-#: api.py:342
+#: api.py:346
 #, python-format
 msgid "Invalid principal name: '%s'."
 msgstr "Недопустимое имя субъекта: '%s'."
@@ -100,111 +100,105 @@ msgstr "Не удалось выполнить обновление токена
 msgid "OAuth access token is expired"
 msgstr "Срок действия токена OAuth истек"
 
-#: views.py:63
+#: views.py:62
 msgid "Session not found."
 msgstr "Сессия не найдена."
 
-#: views.py:68
+#: views.py:67
 msgid "Invalid 'expires' parameter."
 msgstr "Некорректный параметр 'expires'."
 
-#: views.py:71
+#: views.py:70
 msgid "Session expired."
 msgstr "Сессия устарела."
 
-#: views.py:228
+#: views.py:227
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: views.py:301
-msgid "Group name is not unique."
-msgstr "Имя группы не уникально."
-
-#: views.py:339
-msgid "Create new group"
-msgstr "Создать новую группу"
-
-#: views.py:390
-msgid "Login is not unique."
-msgstr "Логин не уникален."
-
-#: views.py:449
-msgid "Create new user"
-msgstr "Создать нового пользователя"
-
-#: views.py:482 views.py:547
+#: views.py:233 views.py:347
 msgid "Users"
 msgstr "Пользователи"
 
-#: views.py:492 views.py:550
+#: views.py:246
+msgid "Create new user"
+msgstr "Создать нового пользователя"
+
+#: views.py:261 views.py:351
 msgid "Groups"
 msgstr "Группы"
 
-#: views.py:503 views.py:525
-msgid "List"
-msgstr "Список"
+#: views.py:274
+msgid "Create new group"
+msgstr "Создать новую группу"
 
-#: views.py:508 views.py:530
-msgid "Create"
-msgstr "Создать"
-
-#: template/group_browse.mako:30 template/user_browse.mako:30 views.py:514
-#: views.py:536
-msgid "Edit"
-msgstr "Изменить"
-
-#: amd/ngw-auth/GroupWidget.js:36
-msgid "Group"
-msgstr "Группа"
+#: views.py:355
+msgid "Groups and users"
+msgstr "Группы и пользователи"
 
 #: amd/ngw-auth/SettingsForm.js:54
 msgid "Saved"
 msgstr "Сохранено"
 
-#: amd/ngw-auth/UserWidget.js:36
-msgid "User"
-msgstr "Пользователь"
-
-#: amd/ngw-auth/UserWidget.js:45
-msgid "Enter new password here"
-msgstr "Для изменения пароля заполните это поле"
-
-#: amd/ngw-auth/template/GroupWidget.hbs:7 amd/ngw-auth/template/UserWidget.hbs:8
-#: template/group_browse.mako:19 template/user_browse.mako:19
-msgid "Full name"
-msgstr "Полное имя"
-
-#: amd/ngw-auth/template/GroupWidget.hbs:13 template/group_browse.mako:20
-msgid "Group name"
-msgstr "Имя группы"
-
-#: amd/ngw-auth/template/GroupWidget.hbs:19 amd/ngw-auth/template/UserWidget.hbs:52
-msgid "Description"
-msgstr "Описание"
-
-#: amd/ngw-auth/template/GroupWidget.hbs:24
-msgid "Assign at registration"
-msgstr "Назначать при регистрации"
-
-#: amd/ngw-auth/template/GroupWidget.hbs:30
-msgid "Group members"
-msgstr "Члены группы"
-
-#: amd/ngw-auth/template/SettingsForm.hbs:13
-#: amd/ngw-auth/template/UserWidget.hbs:30
+#: amd/ngw-auth/template/SettingsForm.hbs:13 nodepkg/user-widget/UserWidget.js:34
 msgid "Language"
 msgstr "Язык"
 
-#: amd/ngw-auth/template/UserWidget.hbs:15 template/login.mako:46
-#: template/user_browse.mako:20
+#: nodepkg/browse.js:9 nodepkg/user-browse/UserBrowse.js:20
+msgid "Delete user?"
+msgstr "Удалить пользователя?"
+
+#: nodepkg/browse.js:9 nodepkg/group-browse/GroupBrowse.js:21
+msgid "Delete group?"
+msgstr "Удалить группу?"
+
+#: nodepkg/browse.js:11
+msgid "Confirmation"
+msgstr "Подтверждение"
+
+#: nodepkg/group-browse/GroupBrowse.js:7 nodepkg/group-widget/GroupWidget.js:14
+#: nodepkg/user-browse/UserBrowse.js:7 nodepkg/user-widget/UserWidget.js:14
+msgid "Full name"
+msgstr "Полное имя"
+
+#: nodepkg/group-browse/GroupBrowse.js:13 nodepkg/group-widget/GroupWidget.js:19
+msgid "Group name"
+msgstr "Имя группы"
+
+#: nodepkg/group-browse/GroupBrowse.js:22
+msgid "Group deleted"
+msgstr "Группа удалена"
+
+#: nodepkg/group-widget/GroupWidget.js:25 nodepkg/user-widget/UserWidget.js:50
+msgid "Description"
+msgstr "Описание"
+
+#: nodepkg/group-widget/GroupWidget.js:30
+msgid "Assign at registration"
+msgstr "Назначать при регистрации"
+
+#: nodepkg/group-widget/GroupWidget.js:35
+msgid "Group members"
+msgstr "Члены группы"
+
+#: nodepkg/user-browse/UserBrowse.js:13 nodepkg/user-widget/UserWidget.js:19
+#: template/login.mako:46
 msgid "Login"
 msgstr "Логин"
 
-#: amd/ngw-auth/template/UserWidget.hbs:23 template/login.mako:49
+#: nodepkg/user-browse/UserBrowse.js:21
+msgid "User deleted"
+msgstr "Пользователь удален"
+
+#: nodepkg/user-widget/UserWidget.js:25 template/login.mako:49
 msgid "Password"
 msgstr "Пароль"
 
-#: amd/ngw-auth/template/UserWidget.hbs:37
+#: nodepkg/user-widget/UserWidget.js:30
+msgid "Enter new password here"
+msgstr "Для изменения пароля заполните это поле"
+
+#: nodepkg/user-widget/UserWidget.js:40
 msgid "OAuth subject"
 msgstr "Субъект OAuth"
 
@@ -215,22 +209,6 @@ msgstr "Отключен"
 #: amd/ngw-auth/template/UserWidget.hbs:59
 msgid "Groups member"
 msgstr "Член групп"
-
-#: nodepkg/browse.js:9
-msgid "Delete user?"
-msgstr "Удалить пользователя?"
-
-#: nodepkg/browse.js:9
-msgid "Delete group?"
-msgstr "Удалить группу?"
-
-#: nodepkg/browse.js:11
-msgid "Confirmation"
-msgstr "Подтверждение"
-
-#: template/group_browse.mako:31 template/user_browse.mako:31
-msgid "Delete"
-msgstr "Удалить"
 
 #: template/login.mako:15
 msgid "Authorization Required"

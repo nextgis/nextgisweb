@@ -14,9 +14,8 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..models import DBSession
-from ..object_widget import ObjectWidget
 from ..pyramid import SessionStore, WebSession
-from ..views import ModelController, permalinker
+from ..views import  permalinker
 from .. import dynmenu as dm
 
 from .models import Principal, User, Group
@@ -228,16 +227,65 @@ def settings(request):
     return dict(title=_("User settings"))
 
 
+def user_browse(request):
+    request.require_administrator()
+    return dict(
+        title=_("Users"),
+        entrypoint='@nextgisweb/auth/user-browse',
+        dynmenu=request.env.pyramid.control_panel)
+
+
+def user_create_or_edit(request):
+    request.require_administrator()
+
+    result = dict(
+        entrypoint='@nextgisweb/auth/user-widget',
+        dynmenu=request.env.pyramid.control_panel)
+
+    if 'id' not in request.matchdict:
+        result['title'] = _("Create new user")
+    else:
+        try:
+            obj = User.filter_by(**request.matchdict).one()
+        except NoResultFound:
+            raise HTTPNotFound()
+        result['props'] = dict(id=obj.id)
+        result['title'] = obj.display_name
+
+    return result
+
+
+def group_browse(request):
+    request.require_administrator()
+    return dict(
+        title=_("Groups"),
+        entrypoint='@nextgisweb/auth/group-browse',
+        dynmenu=request.env.pyramid.control_panel)
+
+
+def group_create_or_edit(request):
+    request.require_administrator()
+
+    result = dict(
+        entrypoint='@nextgisweb/auth/group-widget',
+        dynmenu=request.env.pyramid.control_panel)
+
+    if 'id' not in request.matchdict:
+        result['title'] = _("Create new group")
+    else:
+        try:
+            obj = Group.filter_by(**request.matchdict).one()
+        except NoResultFound:
+            raise HTTPNotFound()
+        result['props'] = dict(id=obj.id)
+        result['title'] = obj.display_name
+
+    return result
+
+
 def setup_pyramid(comp, config):
     # Add it before default pyramid handlers
     comp.env.pyramid.error_handlers.insert(0, forbidden_error_handler)
-
-    def check_permission(request):
-        """ To avoid interdependency of two components:
-        auth and security, permissions to edit users
-        are limited by administrators group membership criterion"""
-
-        request.require_administrator()
 
     config.add_route('auth.login', '/login') \
         .add_view(login, renderer='nextgisweb:auth/template/login.mako')
@@ -274,282 +322,38 @@ def setup_pyramid(comp, config):
     config.add_route('auth.principal_dump', '/auth/principal/dump') \
         .add_view(principal_dump, renderer='json')
 
-    class AuthGroupWidget(ObjectWidget):
+    react_renderer = 'nextgisweb:gui/template/react_app.mako'
+    config.add_route('auth.user.browse', '/auth/user/', client=True) \
+        .add_view(user_browse, renderer=react_renderer)
+    config.add_route('auth.user.create', '/auth/user/create', client=True) \
+        .add_view(user_create_or_edit, renderer=react_renderer)
+    config.add_route('auth.user.edit', '/auth/user/{id:\\d+}', client=True) \
+        .add_view(user_create_or_edit, renderer=react_renderer)
 
-        def is_applicable(self):
-            return self.operation in ('create', 'edit')
+    config.add_route('auth.group.browse', '/auth/group/', client=True) \
+        .add_view(group_browse, renderer=react_renderer)
+    config.add_route('auth.group.create', '/auth/group/create', client=True) \
+        .add_view(group_create_or_edit, renderer=react_renderer)
+    config.add_route('auth.group.edit', '/auth/group/{id:\\d+}', client=True) \
+        .add_view(group_create_or_edit, renderer=react_renderer)
 
-        def populate_obj(self):
-            super().populate_obj()
-
-            self.obj.deserialize(self.data)
-
-        def validate(self):
-            result = super().validate()
-            self.error = []
-
-            if self.operation in ('create', 'edit'):
-                query = Group.filter_by(
-                    keyname=self.data.get("keyname"))
-                if self.operation == 'edit':
-                    query = query.filter(Group.id != self.obj.id)
-                conflict = query.first()
-                if conflict:
-                    result = False
-                    self.error.append(dict(
-                        message=self.request.localizer.translate(
-                            _("Group name is not unique."))))
-
-            return result
-
-        def widget_params(self):
-            result = super().widget_params()
-
-            if self.obj:
-                result['value'] = dict(
-                    display_name=self.obj.display_name,
-                    keyname=self.obj.keyname,
-                    description=self.obj.description,
-                    register=self.obj.register)
-
-                result['users'] = [
-                    dict(
-                        value=u.id,
-                        label=u.display_name,
-                        selected=u in self.obj.members
-                    ) for u in User.filter_by(system=False)]
-
-            else:
-                # List of all users for selector
-                result['users'] = [
-                    dict(value=u.id, label=u.display_name)
-                    for u in User.filter_by(system=False)
-                ]
-
-            return result
-
-        def widget_module(self):
-            return 'ngw-auth/GroupWidget'
-
-    class GroupController(ModelController):
-
-        def create_context(self, request):
-            check_permission(request)
-            return dict(template=dict(
-                subtitle=_("Create new group"),
-                dynmenu=Group.__dynmenu__))
-
-        def edit_context(self, request):
-            check_permission(request)
-            obj = Group.filter_by(**request.matchdict) \
-                .filter_by(system=False).one()
-
-            return dict(
-                obj=obj,
-                template=dict(obj=obj)
-            )
-
-        def create_object(self, context):
-            return Group()
-
-        def query_object(self, context):
-            return context['obj']
-
-        def widget_class(self, context, operation):
-            return AuthGroupWidget
-
-        def template_context(self, context):
-            return context['template']
-
-    GroupController('auth.group', '/auth/group').includeme(config)
-
-    class AuthUserWidget(ObjectWidget):
-
-        def is_applicable(self):
-            return self.operation in ('create', 'edit')
-
-        def populate_obj(self):
-            super().populate_obj()
-
-            self.obj.deserialize(self.data)
-
-        def validate(self):
-            result = super().validate()
-            self.error = []
-
-            if self.operation in ('create', 'edit'):
-                query = User.filter(
-                    sa.func.lower(User.keyname) == self.data.get("keyname").lower())
-                if self.operation == 'edit':
-                    query = query.filter(User.id != self.obj.id)
-                conflict = query.first()
-                if conflict:
-                    result = False
-                    self.error.append(dict(
-                        message=self.request.localizer.translate(
-                            _("Login is not unique."))))
-
-            if self.operation == 'edit':
-                disabled = self.data.get('disabled', False)
-                if disabled or 'member_of' in self.data:
-                    admins = Group.filter_by(keyname='administrators').one()
-                    if not disabled and admins.id in self.data['member_of']:
-                        pass
-                    elif not any([
-                        user for user in admins.members
-                        if not user.disabled and user.principal_id != self.obj.principal_id
-                    ]):
-                        result = False
-                        self.error.append(dict(
-                            message=self.request.localizer.translate(
-                                _("You can't disable current administrator. At least one enabled administrator is required."))))  # NOQA
-
-            return result
-
-        def widget_params(self):
-            result = super().widget_params()
-
-            if self.obj:
-                result['value'] = dict(
-                    display_name=self.obj.display_name,
-                    keyname=self.obj.keyname,
-                    superuser=self.obj.superuser,
-                    disabled=self.obj.disabled,
-                    language=self.obj.language,
-                    oauth_subject=self.obj.oauth_subject,
-                    member_of=[m.id for m in self.obj.member_of],
-                    description=self.obj.description,
-                )
-                result['groups'] = [
-                    dict(
-                        value=g.id,
-                        label=g.display_name,
-                        selected=g in self.obj.member_of
-                    )
-                    for g in Group.query()
-                ]
-
-            else:
-                # List of all groups to selection field
-                result['groups'] = [
-                    dict(value=g.id, label=g.display_name)
-                    for g in Group.query()
-                ]
-
-            return result
-
-        def widget_module(self):
-            return 'ngw-auth/UserWidget'
-
-    class AuthUserModelController(ModelController):
-
-        def create_context(self, request):
-            check_permission(request)
-            return dict(template=dict(
-                subtitle=_("Create new user"),
-                dynmenu=User.__dynmenu__))
-
-        def edit_context(self, request):
-            check_permission(request)
-            obj = User.filter_by(**request.matchdict) \
-                .filter_by(system=False).one()
-
-            return dict(
-                obj=obj,
-                template=dict(obj=obj)
-            )
-
-        def create_object(self, context):
-            return User()
-
-        def query_object(self, context):
-            return context['obj']
-
-        def widget_class(self, context, operation):
-            return AuthUserWidget
-
-        def template_context(self, context):
-            return context['template']
-
-    AuthUserModelController('auth.user', '/auth/user').includeme(config)
-
-    permalinker(Group, "auth.group.edit")
     permalinker(User, "auth.user.edit")
+    permalinker(Group, "auth.group.edit")
 
-    def user_browse(request):
-        check_permission(request)
-        return dict(
-            title=_("Users"),
-            obj_list=User.filter_by(system=False).order_by(User.display_name),
-            dynmenu=request.env.pyramid.control_panel)
-
-    config.add_route('auth.user.browse', '/auth/user/') \
-        .add_view(user_browse, renderer='nextgisweb:auth/template/user_browse.mako')
-
-    def group_browse(request):
-        check_permission(request)
-        return dict(
-            title=_("Groups"),
-            obj_list=Group.filter_by(system=False).order_by(Group.display_name),
-            dynmenu=request.env.pyramid.control_panel)
-
-    config.add_route('auth.group.browse', '/auth/group/') \
-        .add_view(group_browse, renderer='nextgisweb:auth/template/group_browse.mako')
-
-    class UserMenu(dm.DynItem):
+    class AuthComponentMenu(dm.DynItem):
 
         def build(self, kwargs):
             yield dm.Link(
-                self.sub('browse'), _("List"),
-                lambda kwargs: kwargs.request.route_url('auth.user.browse')
-            )
+                self.sub('user'), _("Users"),
+                lambda kwargs: kwargs.request.route_url('auth.user.browse'))
 
             yield dm.Link(
-                self.sub('create'), _("Create"),
-                lambda kwargs: kwargs.request.route_url('auth.user.create')
-            )
-
-            if 'obj' in kwargs and isinstance(kwargs.obj, User):
-                yield dm.Link(
-                    self.sub('edit'), _("Edit"),
-                    lambda kwargs: kwargs.request.route_url(
-                        'auth.user.edit',
-                        id=kwargs.obj.id
-                    )
-                )
-
-    class GroupMenu(dm.DynItem):
-
-        def build(self, kwargs):
-            yield dm.Link(
-                self.sub('browse'), _("List"),
-                lambda kwargs: kwargs.request.route_url('auth.group.browse')
-            )
-
-            yield dm.Link(
-                self.sub('create'), _("Create"),
-                lambda kwargs: kwargs.request.route_url('auth.group.create')
-            )
-
-            if 'obj' in kwargs and isinstance(kwargs.obj, Group):
-                yield dm.Link(
-                    self.sub('edit'), _("Edit"),
-                    lambda kwargs: kwargs.request.route_url(
-                        'auth.group.edit',
-                        id=kwargs.obj.id
-                    )
-                )
-
-    User.__dynmenu__ = comp.env.pyramid.control_panel
-    Group.__dynmenu__ = comp.env.pyramid.control_panel
+                self.sub('group'), _("Groups"),
+                lambda kwargs: kwargs.request.route_url('auth.group.browse'))
 
     comp.env.pyramid.control_panel.add(
-        dm.Label('auth-user', _("Users")),
-        UserMenu('auth-user'),
-
-        dm.Label('auth-group', _("Groups")),
-        GroupMenu('auth-group'),
-    )
+        dm.Label('auth', _("Groups and users")),
+        AuthComponentMenu('auth'))
 
     # Login and logout routes names
     def add_globals(event):
