@@ -82,26 +82,29 @@ export function ModelForm(props) {
     }, []);
 
     return (
-        <LoadingWrapper loading={status === "loading"}>
-            <Space direction="vertical" style={{ width: "100%" }}>
-                <FieldsForm
-                    initialValues={value}
-                    fields={fields}
-                    form={form}
-                    onChange={onFieldsChange}
-                >
-                    <Form.Item>
-                        <SaveButton
-                            disabled={!valid}
-                            onClick={submit}
-                            loading={status === "saving"}
-                        >
-                            {btnTitleAliases[operation]}
-                        </SaveButton>
-                    </Form.Item>
-                </FieldsForm>
-            </Space>
-        </LoadingWrapper>
+        <LoadingWrapper
+            loading={status === "loading"}
+            content={() => (
+                <Space direction="vertical" style={{ width: "100%" }}>
+                    <FieldsForm
+                        initialValues={value}
+                        fields={fields}
+                        form={form}
+                        onChange={onFieldsChange}
+                    >
+                        <Form.Item>
+                            <SaveButton
+                                disabled={!valid}
+                                onClick={submit}
+                                loading={status === "saving"}
+                            >
+                                {btnTitleAliases[operation]}
+                            </SaveButton>
+                        </Form.Item>
+                    </FieldsForm>
+                </Space>
+            )}
+        ></LoadingWrapper>
     );
 }
 

@@ -54,7 +54,9 @@ export function ModelBrowse({
         ...columns,
         {
             title: () => (
-                <Tooltip title={i18n.gettext("Create")}>
+                <Tooltip
+                    title={i18n.gettext("Create")}
+                >
                     <Button
                         icon={<PlusOutlined />}
                         type="primary"
@@ -65,7 +67,7 @@ export function ModelBrowse({
             ),
             key: "action",
             width: "0px",
-            align: "right",
+            align: "center",
             render: (text, record) => (
                 <div style={{ whiteSpace: "nowrap" }}>
                     <Tooltip title={i18n.gettext("Edit")}>
