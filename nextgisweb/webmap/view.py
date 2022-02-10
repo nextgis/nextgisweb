@@ -3,13 +3,12 @@ from urllib.parse import unquote, urljoin, urlparse
 
 from pyramid.renderers import render_to_response
 
-from ..resource import Resource, Widget, resource_factory, DataScope
-from ..dynmenu import DynItem, Label, Link
-
+from .adapter import WebMapAdapter
 from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
-from .adapter import WebMapAdapter
 from .util import get_recursive_values, _
+from ..dynmenu import DynItem, Label, Link
+from ..resource import Resource, Widget, resource_factory, DataScope
 
 
 class ExtentWidget(Widget):
@@ -33,6 +32,7 @@ class SettingsWidget(Widget):
 def settings(request):
     request.require_administrator()
     return dict(
+        entrypoint='@nextgisweb/webmap/settings',
         title=_("Web map settings"),
         dynmenu=request.env.pyramid.control_panel)
 
@@ -238,8 +238,10 @@ def setup_pyramid(comp, config):
 
     WebMap.__dynmenu__.add(DisplayMenu())
 
-    config.add_route('webmap.control_panel.settings', '/control-panel/webmap-settings') \
-        .add_view(settings, renderer='nextgisweb:webmap/template/settings.mako')
+    config.add_route(
+        'webmap.control_panel.settings',
+        '/control-panel/webmap-settings'
+    ).add_view(settings, renderer='nextgisweb:gui/template/react_app.mako')
 
     comp.env.pyramid.control_panel.add(
         Label('webmap', _("Web map")),

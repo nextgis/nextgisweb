@@ -714,6 +714,10 @@ msgstr ""
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
+#: nodepkg/settings/Settings.js:56
+msgid "Settings saved"
+msgstr "Настройки сохранены"
+
 #: template/invalid_origin.mako:4
 #, python-format
 msgid "Web map embedding is not allowed for %s in the Web GIS settings."
