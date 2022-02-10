@@ -1,5 +1,6 @@
 import json
 import re
+from collections import OrderedDict
 
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased
@@ -15,12 +16,25 @@ from .models import User, Group, Principal
 from .util import _
 
 keyname_pattern = re.compile(r'^[A-Za-z][A-Za-z0-9_\-]*$')
-brief_keys = ('keyname', 'display_name', 'system')
+brief_keys = ('id', 'system', 'keyname', 'display_name')
 
 
 def user_cget(request):
     request.require_administrator()
-    return list(map(lambda o: o.serialize(), User.query()))
+
+    brief = request.GET.get('brief') in ('true', 'yes', '1')
+
+    result = []
+    for o in User.query():
+        data = o.serialize()
+        if brief:
+            data = OrderedDict([
+                (k, v) for k, v in data.items()
+                if k in brief_keys
+            ])
+        result.append(data)
+
+    return result
 
 
 def user_cpost(request):
@@ -96,7 +110,20 @@ def profile_set(request):
 
 def group_cget(request):
     request.require_administrator()
-    return list(map(lambda o: o.serialize(), Group.query()))
+
+    brief = request.GET.get('brief') in ('true', 'yes', '1')
+
+    result = []
+    for o in Group.query():
+        data = o.serialize()
+        if brief:
+            data = OrderedDict([
+                (k, v) for k, v in data.items()
+                if k in brief_keys
+            ])
+        result.append(data)
+
+    return result
 
 
 def group_cpost(request):
