@@ -9,6 +9,10 @@
         "@nextgisweb/gui/react-app",
     ], function (comp, reactApp) {
         var props = ${ (props if props else {}) | json.dumps, n };
-        reactApp.default(comp.default, props, document.getElementById('root'));
+
+        reactApp.default(
+            comp.default, props,
+            document.getElementById('root')
+        );
     });
 </script>

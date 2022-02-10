@@ -1,4 +1,40 @@
-#: nodepkg/gui/example.js:13
+#: nodepkg/example.js:66
 msgid "Internationalization test"
 msgstr "Тест интернационализации"
+
+#: nodepkg/component/SaveButton.js:9 nodepkg/model-form/ModelForm.js:12
+msgid "Save"
+msgstr "Сохранить"
+
+#: nodepkg/fields-form/FieldsForm.js:50
+msgid "This value is required"
+msgstr "Необходимо указать значение"
+
+#: nodepkg/fields-form/field/KeynameTextBox.js:9
+msgid "The value entered is not valid"
+msgstr "Введенное значение некорректно"
+
+#: nodepkg/fields-form/field/LanguageSelect.js:9
+msgid "Browser default"
+msgstr "По умолчанию в браузере"
+
+#: nodepkg/model-browse/ModelBrowse.js:28
+msgid "Confirmation"
+msgstr "Подтверждение"
+
+#: nodepkg/model-browse/ModelBrowse.js:30
+msgid "Item deleted"
+msgstr "Элемент удален"
+
+#: nodepkg/model-browse/ModelBrowse.js:57 nodepkg/model-form/ModelForm.js:11
+msgid "Create"
+msgstr "Создать"
+
+#: nodepkg/model-browse/ModelBrowse.js:71
+msgid "Edit"
+msgstr "Изменить"
+
+#: nodepkg/model-browse/ModelBrowse.js:79 nodepkg/model-form/ModelForm.js:13
+msgid "Delete"
+msgstr "Удалить"
 
