@@ -10,11 +10,11 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:30 model.py:40 view.py:224 view.py:245
+#: model.py:30 model.py:40 view.py:225 view.py:246
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:32 view.py:231
+#: model.py:32 view.py:232
 msgid "Display"
 msgstr "Открыть"
 
@@ -22,7 +22,7 @@ msgstr "Открыть"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:173 model.py:34
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:220 model.py:34
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
@@ -30,15 +30,15 @@ msgstr "Редактировать аннотации"
 msgid "Manage annotations"
 msgstr "Администрировать аннотации"
 
-#: view.py:36 view.py:246
+#: view.py:36 view.py:247
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:202
+#: view.py:203
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:252
+#: view.py:253
 msgid "External access"
 msgstr "Внешний доступ"
 
@@ -127,7 +127,7 @@ msgstr ""
 "При проверке введенных данных обнаружены ошибки. Элементы с ошибками выделены"
 " красным цветом. Исправьте, пожалуйста и сохраните еще раз."
 
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:23
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:25
 msgid "Your annotation text"
 msgstr "Ваш текст аннотации"
 
@@ -135,6 +135,18 @@ msgstr "Ваш текст аннотации"
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:252
 msgid "Edit annotation"
 msgstr "Редактировать аннотацию"
+
+#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.js:85
+msgid "Public annotation"
+msgstr "Публичная аннотация"
+
+#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.js:87
+msgid "My private annotation"
+msgstr "Моя приватная аннотация"
+
+#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.js:90
+msgid "Private annotation"
+msgstr "Приватная аннотация"
 
 #: amd/ngw-webmap/plugin/FeatureLayer.js:59
 msgid "Go to"
@@ -482,9 +494,9 @@ msgid "Modify features"
 msgstr "Изменить объекты"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:116
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:48
-msgid "Don't save"
-msgstr "Не сохранять"
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:53
+msgid "Cancel"
+msgstr "Отменить"
 
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:121
 msgid "Delete"
@@ -541,19 +553,37 @@ msgstr "Размер пунсона, пикс"
 msgid "Invalid width: should be from 1 to 100 px"
 msgstr "Значение должно быть от 1 до 100 пикс."
 
-#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:262
-#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:282
-#: amd/ngw-webmap/ui/AnnotationsManager/AnnotationsManager.js:301
-msgid "Error on the server:"
-msgstr "Ошибка на сервере:"
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:7
+msgid "Annotations layer"
+msgstr "Слой аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:14
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:16
 msgid "Show annotations layer"
 msgstr "Показывать слой аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:19
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:21
 msgid "Show messages"
 msgstr "Показывать сообщения"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:27
+msgid "Private annotations"
+msgstr "Приватные аннотации"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:37
+msgid "Show annotation types"
+msgstr "Показать типы аннотаций"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:43
+msgid "Public annotations"
+msgstr "Публичные аннотации"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:49
+msgid "My private annotations"
+msgstr "Мои приватные аннотации"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:256
+msgid "Other private annotations"
+msgstr "Другие приватные аннотации"
 
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:27
 msgid "Stopping editing"
@@ -563,9 +593,9 @@ msgstr "Закончить редактирование?"
 msgid "Do you want to save changes?"
 msgstr "Вы хотите сохранить изменения?"
 
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:53
-msgid "Cancel"
-msgstr "Отменить"
+#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:48
+msgid "Don't save"
+msgstr "Не сохранять"
 
 #: amd/ngw-webmap/ui/LayersPanel/LayersPanel.hbs:8
 msgid "Layer"

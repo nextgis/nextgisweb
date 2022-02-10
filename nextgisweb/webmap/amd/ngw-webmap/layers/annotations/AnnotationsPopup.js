@@ -70,7 +70,7 @@ define([
             if (annotationInfo.own) return "own";
             return "private";
         },
-        
+
         _setAccessCssClass: function (annotationInfo) {
             if (!this._popup) return;
 
@@ -86,9 +86,9 @@ define([
             } else if (annotationInfo.own) {
                 title = i18n.gettext("My private annotation");
             } else {
-                title = i18n.gettext(
-                    `Private annotation (${annotationInfo.user})`
-                );
+                title =
+                    i18n.gettext(`Private annotation`) +
+                    ` (${annotationInfo.user})`;
             }
             this._popup.element.setAttribute("title", title);
         },
