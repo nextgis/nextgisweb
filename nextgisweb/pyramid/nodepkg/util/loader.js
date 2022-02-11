@@ -19,8 +19,8 @@ export function callingComponent(arg, toAbsMid) {
     const parts = abs.split("/");
     const component = (parts[0] == "@nextgisweb"
         ? parts[1]
-        : parts[0].replace(/^ngw-/, "").replace(/\-/g, "_")
-    ).replace(".", "");
+        : parts[0].replace(/^ngw-/, "")
+    ).replace(/\-/g, "_").replace(".", "");
 
     // if (component == req) {
     //     console.debug(
