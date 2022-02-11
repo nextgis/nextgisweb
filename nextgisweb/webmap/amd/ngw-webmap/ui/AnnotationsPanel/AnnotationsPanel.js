@@ -103,7 +103,7 @@ define([
                     this.contentWidget.chbAnnShowMessages.set("disabled", true);
                 }
 
-                this.contentWidget.chbShowAnnTypes.set("value", false);
+                this.contentWidget.chbShowAnnTypes.set("value", true);
                 this.contentWidget.chbShowPublicAnn.set("value", true);
                 this.contentWidget.chbShowOwnPrivateAnn.set("value", true);
             },
@@ -255,7 +255,7 @@ define([
                     name: "chbShowOtherPrivateAnnotations",
                     title: i18n.gettext("Other private annotations"),
 
-                    checked: true,
+                    checked: false,
                 });
                 this.contentWidget.tcAccessAnnotations.addChild(
                     this._chbShowOtherPrivateAnn
