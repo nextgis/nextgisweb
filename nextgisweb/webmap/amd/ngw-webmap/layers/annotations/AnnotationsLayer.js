@@ -19,12 +19,11 @@ define([
     AnnotationFeature,
     Vector
 ) {
-    var wkt = new ol.format.WKT();
-
     return declare(null, {
         _layer: null,
         _source: null,
         _map: null,
+        _popupsVisible: null,
 
         constructor: function (editable) {
             this._editable = editable;
@@ -67,6 +66,8 @@ define([
                 },
                 this
             );
+
+            this.applyFilter();
         },
 
         getLayer: function () {
@@ -74,43 +75,49 @@ define([
         },
 
         showPopups: function () {
-            const olFeatures = this._source.getFeatures();
-            array.forEach(
-                olFeatures,
-                function (olFeature) {
-                    this.showPopup(olFeature);
-                },
-                this
-            );
+            this._popupsVisible = true;
+            this.applyFilter(this._filter);
         },
 
         showPopup: function (annotationFeature) {
-            const popup =
-                typeof annotationFeature.getPopup === "function"
-                    ? annotationFeature.getPopup()
-                    : annotationFeature.get("popup");
-            popup.addToMap(this._map).show();
-            domClass.add(popup._popup.element, "annotation-layer");
+            annotationFeature.togglePopup(true, this._map);
         },
 
         hidePopups: function () {
-            var olFeatures = this._source.getFeatures(),
-                popup;
-
             array.forEach(
-                olFeatures,
-                function (olFeature) {
-                    popup = olFeature.get("popup").remove();
-                },
+                this._source.getFeatures(),
+                (f) => f.get("annFeature").togglePopup(false),
                 this
             );
+            this._popupsVisible = false;
         },
 
         removeAnnFeature: function (annFeature) {
-            var olFeature = annFeature.getFeature();
+            const olFeature = annFeature.getFeature();
             olFeature.get("popup").remove();
             this._source.removeFeature(olFeature);
             annFeature.clearOlFeature();
+        },
+
+        _filter: null,
+        
+        getFilter: function () {
+            return this._filter;
+        },
+        
+        applyFilter: function (filter) {
+            if (filter) this._filter = filter;
+
+            this._source.getFeatures().forEach((f) => {
+                const { annFeature } = f.getProperties();
+                const accessType = annFeature.getAccessType();
+                const visible = this._filter[accessType];
+                annFeature.toggleVisible(visible);
+                annFeature.togglePopup(
+                    this._popupsVisible ? visible : false,
+                    this._map
+                );
+            });
         },
     });
 });

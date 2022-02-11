@@ -1,11 +1,7 @@
 from collections import OrderedDict
 
-from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from geoalchemy2.shape import to_shape
-
-from ..env import env
-from ..models import DBSession
-from ..resource import resource_factory
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 
 from .model import (
     WebMap,
@@ -13,21 +9,34 @@ from .model import (
     WebMapAnnotation,
     WM_SETTINGS,
 )
+from ..env import env
+from ..models import DBSession
+from ..resource import resource_factory
 
 
-def annotation_to_dict(obj):
+def annotation_to_dict(obj, request, with_user_info=False):
     result = OrderedDict()
-    for k in ('id', 'description', 'style', 'geom'):
+
+    keys = ('id', 'description', 'style', 'geom', 'public')
+    if with_user_info and (obj.public is False):
+        keys = keys + ('user_id', 'user',)
+
+    user_id = request.user.id
+    result['own'] = user_id == obj.user_id
+
+    for k in keys:
         v = getattr(obj, k)
         if k == 'geom':
             v = to_shape(v).wkt
+        if k == 'user' and (v is not None):
+            v = v.display_name
         if v is not None:
             result[k] = v
     return result
 
 
 def annotation_from_dict(obj, data):
-    for k in ('description', 'style', 'geom'):
+    for k in ('description', 'style', 'geom', 'public'):
         if k in data:
             v = data[k]
             if k == 'geom':
@@ -43,7 +52,12 @@ def check_annotation_enabled(request):
 def annotation_cget(resource, request):
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
-    return [annotation_to_dict(a) for a in resource.annotations]
+
+    if resource.has_permission(WebMapScope.annotation_manage, request.user):
+        return [annotation_to_dict(a, request, with_user_info=True) for a in resource.annotations]
+
+    return [annotation_to_dict(a, request) for a in resource.annotations
+            if a.public or (not a.public and a.user_id == request.user.id)]
 
 
 def annotation_cpost(resource, request):
@@ -51,6 +65,8 @@ def annotation_cpost(resource, request):
     request.resource_permission(WebMapScope.annotation_write)
     obj = WebMapAnnotation()
     annotation_from_dict(obj, request.json_body)
+    if not obj.public:
+        obj.user_id = request.user.id
     resource.annotations.append(obj)
     DBSession.flush()
     return dict(id=obj.id)
@@ -61,7 +77,8 @@ def annotation_iget(resource, request):
     request.resource_permission(WebMapScope.annotation_read)
     obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(
         request.matchdict['annotation_id'])).one()
-    return annotation_to_dict(obj)
+    with_user_info = resource.has_permission(WebMapScope.annotation_manage, request.user)
+    return annotation_to_dict(obj, request, with_user_info)
 
 
 def annotation_iput(resource, request):

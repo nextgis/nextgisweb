@@ -9,6 +9,7 @@ Changes
 - WFS client and server simple filters support.
 - Reprojection into different coordinate systems in WMS and WFS services.
 - Cloud-optimized GeoTIFF (COG) support for raster layers.
+- Private annotations on web maps, visible only for authors.
 - Export feature layer using field display names instead of keynames.
 - Improved handling of vector layer sources with ``id`` and ``geom`` fields.
 - Ability to use field display names (aliases) while exporting vector layer.

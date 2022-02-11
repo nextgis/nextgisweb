@@ -3,8 +3,12 @@
   height: 100%;
 }
 
+.annotation-pane {
+  padding: 0 16px 24px !important
+}
+
 .annotations-panel .annotations-table-container {
-  padding: 2px;
+  padding: 0;
 }
 
 .annotations-panel .annotations-table-container .ol-control {
@@ -48,4 +52,16 @@
   width: 20px;
   height: 20px;
   font-size: 20px;
+}
+
+.annotations-panel .annotations-access-container .ann-public {
+  filter: hue-rotate(274deg);
+}
+
+.annotations-panel .annotations-access-container .ann-own {
+  filter: hue-rotate(67deg);
+}
+
+.annotations-panel .annotations-access-container .ann-private {
+  filter: hue-rotate(160deg);
 }

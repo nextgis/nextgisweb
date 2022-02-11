@@ -1,23 +1,53 @@
 <div class="annotations-panel">
-  <div data-dojo-attach-point="annotationPane"
-       data-dojo-type="dijit/layout/ContentPane"
-       data-dojo-props="region: 'center'"
-       style="padding: 0">
+    <div data-dojo-attach-point="annotationPane"
+         data-dojo-type="dijit/layout/ContentPane"
+         data-dojo-props="region: 'center'"
+         class="annotation-pane">
 
-    <div class="annotations-table-container"
-         data-dojo-attach-point="tcAnnotations"
-         data-dojo-type="dojox/layout/TableContainer"
-         data-dojo-props="cols: 1, labelWidth: 200">
+        <h5 class="heading">{{gettext 'Annotations layer'}}</h5>
 
-      <div data-dojo-attach-point="chbAnnotationsShow"
-           data-dojo-type="dijit/form/CheckBox"
-           title="{{gettext 'Show annotations layer'}}">
-      </div>
+        <div class="annotations-table-container"
+             data-dojo-attach-point="tcAnnotations"
+             data-dojo-type="dojox/layout/TableContainer"
+             data-dojo-props="cols: 1, labelWidth: 200">
 
-      <div data-dojo-attach-point="chbAnnotationsShowMessages"
-           data-dojo-type="dijit/form/CheckBox"
-           title="{{gettext 'Show messages'}}">
-      </div>
+            <div data-dojo-attach-point="chbAnnotationsShow"
+                 data-dojo-type="dijit/form/CheckBox"
+                 title="{{gettext 'Show annotations layer'}}">
+            </div>
+
+            <div data-dojo-attach-point="chbAnnShowMessages"
+                 data-dojo-type="dijit/form/CheckBox"
+                 title="{{gettext 'Show messages'}}">
+            </div>
+        </div>
+
+        <h5 data-dojo-attach-point="headerAccessAnnotations"
+            class="heading">
+            {{gettext 'Private annotations'}}
+        </h5>
+
+        <div class="annotations-access-container"
+             data-dojo-attach-point="tcAccessAnnotations"
+             data-dojo-type="dojox/layout/TableContainer"
+             data-dojo-props="cols: 1, labelWidth: 200">
+
+            <div data-dojo-attach-point="chbShowAnnTypes"
+                 data-dojo-type="dijit/form/CheckBox"
+                 title="{{gettext 'Show annotation types'}}">
+            </div>
+
+            <div data-dojo-attach-point="chbShowPublicAnn"
+                 data-dojo-type="dijit/form/CheckBox"
+                 class="ann-public"
+                 title="{{gettext 'Public annotations'}}">
+            </div>
+
+            <div data-dojo-attach-point="chbShowOwnPrivateAnn"
+                 data-dojo-type="dijit/form/CheckBox"
+                 class="ann-own"
+                 title="{{gettext 'My private annotations'}}">
+            </div>
+        </div>
     </div>
-  </div>
 </div>

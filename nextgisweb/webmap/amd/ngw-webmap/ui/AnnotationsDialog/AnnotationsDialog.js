@@ -21,6 +21,8 @@ define([
     "dijit/form/NumberTextBox",
     "dijit/form/Select",
     "dijit/form/DropDownButton",
+    "dijit/DropDownMenu",
+    "dijit/MenuItem",
     "@nextgisweb/pyramid/i18n!",
     "ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings",
     "xstyle/css!./AnnotationsDialog.css",
@@ -47,6 +49,8 @@ define([
     NumberTextBox,
     Select,
     DropDownButton,
+    DropDownMenu,
+    MenuItem,
     i18n,
     AnnotationsSettings
 ) {
@@ -100,14 +104,16 @@ define([
                 },
                 this.containerNode
             );
+            
+            this._buildCreateAnnotationBtn();
 
-            this.btnOk = new Button({
+            this.btnSave = new Button({
                 label: i18n.gettext("Save"),
                 onClick: lang.hitch(this, this.onSave),
             }).placeAt(this.actionBar);
 
             this.btnUndo = new Button({
-                label: i18n.gettext("Don't save"),
+                label: i18n.gettext("Cancel"),
                 onClick: lang.hitch(this, this.onUndo),
             }).placeAt(this.actionBar);
 
@@ -120,10 +126,47 @@ define([
 
             this.onCancel = lang.hitch(this, this.onUndo);
         },
+        
+        _buildCreateAnnotationBtn: function () {
+            const menu = new DropDownMenu({ style: "display: none;" });
+            const menuItemPublic = new MenuItem({
+                label: i18n.gettext("Create as public"),
+                iconClass: "dijitIconApplication",
+                onClick: lang.hitch(this, function () {
+                    this.onCreate(true);
+                }),
+            });
+            menu.addChild(menuItemPublic);
 
+            const menuItemPrivate = new MenuItem({
+                label: i18n.gettext("Create as private"),
+                iconClass: "dijitIconKey",
+                onClick: lang.hitch(this, function () {
+                    this.onCreate(false);
+                }),
+            });
+            menu.addChild(menuItemPrivate);
+
+            this.btnCreate = new DropDownButton({
+                label: i18n.gettext("Create"),
+                dropDown: menu
+            }).placeAt(this.actionBar);
+        },
+        
+        onCreate: function (isPublic) {
+            const newData = this._updateFeatureFromDialog();
+            newData.public = isPublic;
+            this.save(newData);
+        },
+        
         onSave: function () {
+            const newData = this._updateFeatureFromDialog();
+            this.save(newData);
+        },
+
+        save: function (newData) {
             this.emit("save");
-            var newData = this._updateFeatureFromDialog();
+
             if (this._deferred)
                 this._deferred.resolve(
                     {
@@ -208,9 +251,13 @@ define([
             if (id) {
                 this.titleNode.innerHTML = i18n.gettext("Edit annotation");
                 domStyle.set(this.btnDelete.domNode, "display", "block");
+                domStyle.set(this.btnCreate.domNode, "display", "none");
+                domStyle.set(this.btnSave.domNode, "display", "inline-block");
             } else {
                 this.titleNode.innerHTML = i18n.gettext("Create annotation");
                 domStyle.set(this.btnDelete.domNode, "display", "none");
+                domStyle.set(this.btnCreate.domNode, "display", "inline-block");
+                domStyle.set(this.btnSave.domNode, "display", "none");
             }
 
             this.show();
