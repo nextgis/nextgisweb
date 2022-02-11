@@ -135,10 +135,6 @@ define([
                     "webmap/annotations/change/",
                     lang.hitch(this, this._onChangeAnnotation)
                 );
-                topic.subscribe(
-                    "webmap/annotations/geometry/changed",
-                    lang.hitch(this, this._onChangeGeometry)
-                );
 
                 topic.subscribe(
                     "/annotations/visible",
@@ -211,19 +207,6 @@ define([
                 this._annotationsDialog
                     .showForEdit(annFeature)
                     .then(lang.hitch(this, this._dialogResultHandle));
-            },
-
-            _onChangeGeometry: function (annFeature, previousGeometry) {
-                this._standby.show();
-                this._updateAnnotation(annFeature).then(
-                    lang.hitch(this, function () {
-                        this._standby.hide();
-                    }),
-                    lang.hitch(this, function () {
-                        annFeature.updateGeometry(previousGeometry);
-                        this._standby.hide();
-                    })
-                );
             },
 
             _dialogResultHandle: function (result, dialog) {
