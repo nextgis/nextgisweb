@@ -133,6 +133,7 @@ define([
         },
 
         updateAnnotationInfo: function (annotationInfo) {
+            this.setId(annotationInfo.id);
             this._style = this._buildStyle(annotationInfo);
             this._feature.setStyle(this._style);
 

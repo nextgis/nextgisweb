@@ -39,7 +39,7 @@ define([
     AnnotationFeature,
     AnnotationsLayer,
     AnnotationsEditableLayer,
-    AnnotationsDialog,
+    AnnotationsDialog
 ) {
     var wkt = new ol.format.WKT();
     const { route } = api;
@@ -268,7 +268,7 @@ define([
                         newAnnotationInfo
                     );
                     annFeature.updateAnnotationInfo(annotationInfo);
-                    if (this._messagesVisible) 
+                    if (this._messagesVisible)
                         this._annotationsLayer.showPopup(annFeature);
                 } catch (err) {
                     new ErrorDialog(err).show();
@@ -285,8 +285,8 @@ define([
             ) {
                 this._standby.show();
                 try {
-                    await this._updateAnnotation(annFeature, newAnnotationInfo);
-                    annFeature.updateAnnotationInfo(newAnnotationInfo);
+                    const annotationInfo = await this._updateAnnotation(annFeature, newAnnotationInfo);
+                    annFeature.updateAnnotationInfo(annotationInfo);
                 } catch (err) {
                     new ErrorDialog(err).show();
                     dialog.showLastData();
@@ -322,10 +322,17 @@ define([
                     })
                     .then((d) => d);
 
-                return await route(
-                    "webmap.annotation.item",
+                return this._getAnnotation(
                     this._display.config.webmapId,
                     createInfo.id
+                );
+            },
+
+            _getAnnotation: async function (webmapId, annotationId) {
+                return await route(
+                    "webmap.annotation.item",
+                    webmapId,
+                    annotationId
                 )
                     .get()
                     .then((d) => d);
@@ -350,8 +357,8 @@ define([
                     .then((d) => d);
             },
 
-            _updateAnnotation: function (annFeature, newAnnotationInfo) {
-                return route(
+            _updateAnnotation: async function (annFeature, newAnnotationInfo) {
+                const updateInfo = await route(
                     "webmap.annotation.item",
                     this._display.config.webmapId,
                     annFeature.getId()
@@ -360,6 +367,11 @@ define([
                         json: newAnnotationInfo,
                     })
                     .then((d) => d);
+
+                return this._getAnnotation(
+                    this._display.config.webmapId,
+                    updateInfo.id
+                );
             },
         })
     );
