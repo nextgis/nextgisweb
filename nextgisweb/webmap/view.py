@@ -244,10 +244,8 @@ def setup_pyramid(comp, config):
     ).add_view(settings, renderer='nextgisweb:gui/template/react_app.mako')
 
     comp.env.pyramid.control_panel.add(
-        Label('webmap', _("Web map")),
-        Link('webmap/settings', _("Web map settings"), lambda args: (
-            args.request.route_url('webmap.control_panel.settings')))
-    )
+        Link('settings.webmap', _("Web map"), lambda args: (
+            args.request.route_url('webmap.control_panel.settings'))))
 
     Resource.__psection__.register(
         key='description',
