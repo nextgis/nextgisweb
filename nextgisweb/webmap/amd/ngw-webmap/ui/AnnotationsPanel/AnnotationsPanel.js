@@ -187,11 +187,6 @@ define([
                 this.contentWidget.chbShowOwnPrivateAnn
                     .set("checked", true)
                     .set("disabled", true);
-                if (this._chbShowOtherPrivateAnn) {
-                    this._chbShowOtherPrivateAnn
-                        .set("checked", true)
-                        .set("disabled", true);
-                }
                 this._updateAccessTypeFilters();
             },
 
