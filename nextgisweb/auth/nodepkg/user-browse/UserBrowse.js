@@ -1,10 +1,15 @@
-import { StopOutlined } from "@ant-design/icons";
 import { Badge, Button } from "@nextgisweb/gui/antd";
+import { utc } from "@nextgisweb/gui/dayjs";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
+import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!";
 import { useState } from "react";
-import { route } from "@nextgisweb/pyramid/api";
 import getMessages from "../userMessages";
+
+const messages = {
+    disabled: i18n.gettext("Disabled"),
+    enabled: i18n.gettext("Enabled"),
+};
 
 export function UserBrowse() {
     const columns = [
@@ -21,11 +26,23 @@ export function UserBrowse() {
             sorter: (a, b) => (a.keyname > b.keyname ? 1 : -1),
         },
         {
-            title: i18n.gettext("Disabled"),
+            title: i18n.gettext("Last activity"),
+            dataIndex: "last_activity",
+            key: "last_activity",
+            sorter: (a, b) => {
+                const [al, bl] = [a.last_activity, b.last_activity].map((l) =>
+                    l ? new Date(l).getTime() : 0
+                );
+                return al - bl;
+            },
+            render: (text) => (text ? utc(text).local().format("L LTS") : ""),
+        },
+        {
+            title: i18n.gettext("Status"),
             dataIndex: "disabled",
             key: "disabled",
             render: (text) => {
-                return text ? <StopOutlined /> : null;
+                return text ? messages.disabled : messages.enabled;
             },
             sorter: (a, b) => (a.disabled > b.disabled ? 1 : -1),
         },
@@ -106,7 +123,7 @@ export function UserBrowse() {
             messages={getMessages()}
             collectionOptions={{ query: { brief: true } }}
             collectionFilter={(itm) => !itm.system || itm.keyname == "guest"}
-            selectedControl={[DisableSelectedUsers, EnableSelectedUsers]}
+            selectedControls={[EnableSelectedUsers, DisableSelectedUsers]}
         />
     );
 }

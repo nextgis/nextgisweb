@@ -177,6 +177,10 @@ msgstr "Описание"
 msgid "Assign at registration"
 msgstr "Назначать при регистрации"
 
+#: nodepkg/user-browse/UserBrowse.js:11
+msgid "Enabled"
+msgstr "Включен"
+
 #: nodepkg/group-widget/GroupWidget.js:35
 msgid "Group members"
 msgstr "Члены группы"
@@ -189,6 +193,14 @@ msgstr "Логин"
 #: nodepkg/user-browse/UserBrowse.js:21
 msgid "User deleted"
 msgstr "Пользователь удален"
+
+#: nodepkg/user-browse/UserBrowse.js:29
+msgid "Last activity"
+msgstr "Последняя активность"
+
+#: nodepkg/user-browse/UserBrowse.js:41
+msgid "Status"
+msgstr "Статус"
 
 #: nodepkg/user-browse/UserBrowse.js:96
 msgid "Disable"

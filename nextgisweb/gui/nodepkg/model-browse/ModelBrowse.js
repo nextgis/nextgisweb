@@ -3,6 +3,7 @@ import {
     DeleteOutlined,
     EditOutlined,
     PlusOutlined,
+    SearchOutlined,
 } from "@ant-design/icons";
 import {
     Badge,
@@ -29,7 +30,7 @@ export function ModelBrowse({
     model: m,
     messages,
     itemProps = {},
-    selectedControl = [],
+    selectedControls = [],
     collectionOptions,
     collectionFilter,
     ...tableProps
@@ -207,12 +208,13 @@ export function ModelBrowse({
     const TableControl = () => (
         <Row type="flex" justify="space-between">
             <Col>
-                <Input.Search
+                <Input
                     placeholder={i18n.gettext("Search")}
                     value={search}
                     onChange={(e) => {
                         setSearch(e.target.value);
                     }}
+                    prefix={<SearchOutlined />}
                     allowClear
                 />
             </Col>
@@ -230,18 +232,19 @@ export function ModelBrowse({
 
     const SelectedControl = () => (
         <Space direction="horizontal">
+            {selectedControls.map((control) =>
+                control({ selected, rows, setRows })
+            )}
             <Badge count={selected.length} size="small">
                 <Button
                     icon={<DeleteOutlined />}
                     onClick={onDeleteSelectedBtnClick}
                     loading={status === "deleting"}
+                    danger
                 >
                     {i18n.gettext("Delete")}
                 </Button>
             </Badge>
-            {selectedControl.map((control) =>
-                control({ selected, rows, setRows })
-            )}
         </Space>
     );
 
