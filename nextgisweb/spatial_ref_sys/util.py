@@ -44,7 +44,7 @@ def normalize_mapinfo_cs(source):
 
 def convert_to_wkt(source, format=None, pretty=False):
     sr = osr.SpatialReference()
-
+    
     if format == 'proj4':
         sr.ImportFromProj4(source)
     elif format == 'epsg':

@@ -1,11 +1,11 @@
+import { Button, Form, message, Popconfirm, Space } from "@nextgisweb/gui/antd";
+import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
+import { FieldsForm } from "@nextgisweb/gui/fields-form";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
+import i18n from "@nextgisweb/pyramid/i18n!gui";
+import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
 import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
-import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
-import { Alert, Form, Space } from "@nextgisweb/gui/antd";
-import { SaveButton, LoadingWrapper } from "@nextgisweb/gui/component";
-import { FieldsForm } from "@nextgisweb/gui/fields-form";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
 
 const btnTitleAliases = {
     create: i18n.gettext("Create"),
@@ -14,18 +14,34 @@ const btnTitleAliases = {
 };
 
 export function ModelForm(props) {
-    const { fields, model, id } = props;
+    const {
+        messages: msg,
+        fields,
+        model: m,
+        id,
+        children,
+        ...formProps
+    } = props;
     const operation = id !== undefined ? "edit" : "create";
 
-    const [form] = Form.useForm();
+    const messages = msg ?? {};
+    const deleteConfirm =
+        messages.deleteConfirm || i18n.gettext("Confirmation");
+
+    const model =
+        typeof m === "string"
+            ? {
+                  item: m + ".item",
+                  collection: m + ".collection",
+                  edit: m + ".edit",
+                  browse: m + ".browse",
+              }
+            : m;
+
+    const form = props.form || Form.useForm()[0];
 
     const [status, setStatus] = useState("loading");
-    const [valid, setValid] = useState();
     const [value, setValue] = useState({});
-
-    const onFieldsChange = ({ isValid }) => {
-        setValid(isValid());
-    };
 
     const submit = async () => {
         setStatus("saving");
@@ -33,10 +49,28 @@ export function ModelForm(props) {
             const json = await form.validateFields();
             const req =
                 id !== undefined
-                    ? route(model + ".item", id).put
-                    : route(model + ".collection").post;
-            const resp = await req({ json });
-            const url = routeURL(model + ".edit", resp.id);
+                    ? route(model.item, id).put
+                    : route(model.collection).post;
+            try {
+                const resp = await req({ json });
+                const url = routeURL(model.edit, resp.id);
+                window.open(url, "_self");
+            } catch (err) {
+                new ErrorDialog(err).show();
+            }
+        } catch (err) {
+            message.error(i18n.gettext("Fix the form errors first"));
+        } finally {
+            setStatus(null);
+        }
+    };
+
+    const deleteModelItem = async () => {
+        setStatus("deleting");
+
+        try {
+            await route(model.item, id).delete();
+            const url = routeURL(model.browse);
             window.open(url, "_self");
         } catch (err) {
             new ErrorDialog(err).show();
@@ -55,7 +89,7 @@ export function ModelForm(props) {
         setStatus("loading");
         if (id) {
             try {
-                const resp = await route(model + ".item", id).get();
+                const resp = await route(model.item, id).get();
                 setValue(resp);
             } catch (er) {
                 // model item is not exist handler
@@ -74,43 +108,57 @@ export function ModelForm(props) {
 
     useEffect(async () => {
         setInitialValues();
-
         window.addEventListener("keydown", onKeyDown, false);
         return () => {
             window.removeEventListener("keydown", onKeyDown, false);
         };
     }, []);
 
+    if (status === "loading") {
+        return <LoadingWrapper />;
+    }
+
     return (
-        <LoadingWrapper
-            loading={status === "loading"}
-            content={() => (
-                <Space direction="vertical" style={{ width: "100%" }}>
-                    <FieldsForm
-                        initialValues={value}
-                        fields={fields}
-                        form={form}
-                        onChange={onFieldsChange}
-                    >
-                        <Form.Item>
-                            <SaveButton
-                                disabled={!valid}
-                                onClick={submit}
-                                loading={status === "saving"}
+        <Space direction="vertical" style={{ width: "100%" }}>
+            <FieldsForm
+                initialValues={value}
+                fields={fields}
+                form={form}
+                {...formProps}
+            >
+                {children}
+                <Form.Item>
+                    <Space>
+                        <SaveButton
+                            onClick={submit}
+                            loading={status === "saving"}
+                        >
+                            {btnTitleAliases[operation]}
+                        </SaveButton>
+                        {operation === "edit" ? (
+                            <Popconfirm
+                                title={deleteConfirm}
+                                onConfirm={deleteModelItem}
                             >
-                                {btnTitleAliases[operation]}
-                            </SaveButton>
-                        </Form.Item>
-                    </FieldsForm>
-                </Space>
-            )}
-        ></LoadingWrapper>
+                                <Button danger>
+                                    {btnTitleAliases["delete"]}
+                                </Button>
+                            </Popconfirm>
+                        ) : (
+                            ""
+                        )}
+                    </Space>
+                </Form.Item>
+            </FieldsForm>
+        </Space>
     );
 }
 
 ModelForm.propTypes = {
     id: PropTypes.number,
-    model: PropTypes.string.isRequired,
+    children: PropTypes.node,
+    model: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
     value: PropTypes.object,
     fields: PropTypes.array.isRequired,
+    form: PropTypes.any,
 };

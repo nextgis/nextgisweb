@@ -6,6 +6,7 @@ import i18n from "@nextgisweb/pyramid/i18n!auth";
 import { PropTypes } from "prop-types";
 import { useState } from "react";
 import { PrincipalMemberSelect } from "../field";
+import getMessages from "../groupMessages";
 
 export function GroupWidget({ id }) {
     const [fields] = useState(() => [
@@ -43,7 +44,7 @@ export function GroupWidget({ id }) {
         },
     ]);
 
-    const p = { fields, model: "auth.group", id };
+    const p = { fields, model: "auth.group", id, messages: getMessages() };
 
     return (
         <ContentBox>

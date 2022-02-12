@@ -1,13 +1,13 @@
 import { PropTypes } from "prop-types";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Checkbox, Form, Input } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
+import i18n from "@nextgisweb/pyramid/i18n!gui";
 
 export function FieldsForm(props) {
     const { fields, initialValues, onChange, form, ...formProps } = props;
     const form_ = form || Form.useForm()[0];
 
-    const isValid = () => {
+    const isValid = async () => {
         return form_.getFieldsError().every((e) => {
             return e.errors.length === 0;
         });
@@ -26,15 +26,19 @@ export function FieldsForm(props) {
         autoComplete: "off",
         labelCol: { span: 5 },
         labelAlign: "left",
-        onFieldsChange,
         ...formProps,
     };
 
+    if (onChange) {
+        formProps_.onFieldsChange = onFieldsChange;
+    }
+
     return (
         <Form {...formProps_}>
-            {fields.map((f) => (
-                <Fragment key={f.name}>{FormItem(f)}</Fragment>
-            ))}
+            {fields &&
+                fields.map((f) => (
+                    <Fragment key={f.name}>{FormItem(f)}</Fragment>
+                ))}
             {props.children}
         </Form>
     );
@@ -81,7 +85,7 @@ function getInputType(widget, props) {
 }
 
 FieldsForm.propTypes = {
-    fields: PropTypes.array.isRequired,
+    fields: PropTypes.array,
     initialValues: PropTypes.object,
     children: PropTypes.node,
     onChange: PropTypes.func,

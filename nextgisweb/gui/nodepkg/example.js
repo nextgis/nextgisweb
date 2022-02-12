@@ -10,7 +10,7 @@ import {
     Space,
 } from "./antd";
 
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n!gui";
 
 export default function ExampleApplication() {
     return (

@@ -13,16 +13,36 @@ from .models import SRS
 from .util import convert_to_wkt, _
 
 
-def collection(request):
+def check_srs_unique(data, existing_id=None):
+    query = SRS.filter_by(display_name=data.get("display_name"))
+    if existing_id is not None:
+        query = query.filter(SRS.id != existing_id)
+    if query.first() is not None:
+        raise ValidationError(message=_(
+            "Coordinate system name is not unique."))
+
+
+def cget(request):
     srs_collection = list(map(lambda o: dict(
         id=o.id, display_name=o.display_name,
-        auth_name=o.auth_name, auth_srid=o.auth_srid,
-        wkt=o.wkt
+        auth_name=o.auth_name, auth_srid=o.auth_srid, 
+        wkt=o.wkt, disabled=o.disabled,
     ), SRS.query()))
     return sorted(srs_collection, key=lambda srs: srs["id"] != 4326)
 
 
-def get(request):
+def cpost(request):
+    request.require_administrator()
+
+    check_srs_unique(request.json_body)
+    obj = SRS(**request.json_body)
+    obj.persist()
+
+    DBSession.flush()
+    return dict(id=obj.id)
+
+
+def iget(request):
     obj = SRS.filter_by(id=request.matchdict["id"]).one()
     return dict(
         id=obj.id, display_name=obj.display_name,
@@ -31,9 +51,40 @@ def get(request):
     )
 
 
+def iput(request):
+    request.require_administrator()
+
+    obj = SRS.filter_by(id=int(request.matchdict['id'])).one()
+    data = request.json_body
+    check_srs_unique(data, obj.id)
+
+    disallowed_wkt_change = obj.disabled and obj.wkt != data.get("wkt")
+    if disallowed_wkt_change:
+        raise ValidationError(message=_(
+            "Cannot change wkt definition of standard coordinate system."))
+
+    obj.display_name = data.get('display_name')
+    obj.wkt = data.get('wkt', False)
+    DBSession.flush()
+
+    return dict(id=obj.id)
+
+
+def idelete(request):
+    request.require_administrator()
+
+    obj = SRS.filter_by(id=int(request.matchdict['id'])).one()
+    disabled = obj.disabled
+    if disabled:
+        raise ValidationError(message=_(
+            "Unable to delete standard coordinate system."))
+    DBSession.delete(obj)
+    return None
+
+
 def srs_convert(request):
-    proj_str = request.POST.get("projStr")
-    format = request.POST.get("format")
+    proj_str = request.json_body["projStr"]
+    format = request.json_body["format"]
     wkt = convert_to_wkt(proj_str, format, pretty=True)
     if not wkt:
         raise ValidationError(_("Invalid SRS definition!"))
@@ -156,9 +207,9 @@ def catalog_import(request):
 
 
 def setup_pyramid(comp, config):
-    config.add_route(
-        "spatial_ref_sys.collection", "/api/component/spatial_ref_sys/",
-    ).add_view(collection, request_method="GET", renderer="json")
+    config.add_route("spatial_ref_sys.collection", "/api/component/spatial_ref_sys/") \
+        .add_view(cget, request_method="GET", renderer="json") \
+        .add_view(cpost, request_method='POST', renderer='json')
 
     config.add_route("spatial_ref_sys.convert", "/api/component/spatial_ref_sys/convert") \
         .add_view(srs_convert, request_method="POST", renderer="json")
@@ -179,9 +230,10 @@ def setup_pyramid(comp, config):
         r"/api/component/spatial_ref_sys/{id:\d+}/geom_area"
     ).add_view(lambda r: geom_calc(r, "area"), request_method="POST", renderer="json")
 
-    config.add_route(
-        "spatial_ref_sys.get", r"/api/component/spatial_ref_sys/{id:\d+}",
-    ).add_view(get, request_method="GET", renderer="json")
+    config.add_route("spatial_ref_sys.item", r"/api/component/spatial_ref_sys/{id:\d+}")\
+        .add_view(iget, request_method="GET", renderer="json")\
+        .add_view(iput, request_method='PUT', renderer='json') \
+        .add_view(idelete, request_method='DELETE', renderer='json')
 
     if comp.options['catalog.enabled']:
         config.add_route(

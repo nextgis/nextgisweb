@@ -1,5 +1,6 @@
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import i18n from "@nextgisweb/pyramid/i18n!";
+import getMessages from "../groupMessages";
 
 export function GroupBrowse() {
     const columns = [
@@ -17,12 +18,7 @@ export function GroupBrowse() {
         },
     ];
 
-    const messages = {
-        deleteConfirm: i18n.gettext("Delete group?"),
-        deleteSuccess: i18n.gettext("Group deleted"),
-    };
-
     return (
-        <ModelBrowse model="auth.group" columns={columns} messages={messages} />
+        <ModelBrowse model="auth.group" columns={columns} messages={getMessages()} />
     );
 }
