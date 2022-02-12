@@ -116,6 +116,11 @@ define([
             }.bind(this));
         },
 
+        serialize: function(data, lunkwill) {
+            this.inherited(arguments);
+            lunkwill.suggest(this.composite.operation == "create");
+        },
+
         serializeInMixin: function (data) {
             var prefix = this.prefix,
                 setObject = function (key, value) { lang.setObject(prefix + "." + key, value, data); };
