@@ -1,6 +1,6 @@
 import { Form, Select } from "@nextgisweb/gui/antd";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
+import i18n from "@nextgisweb/pyramid/i18n!gui";
 
 export function LanguageSelect(props) {
     const langages = [

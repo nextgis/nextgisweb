@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types";
 import { Form, Input } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n!gui";
 
 export function KeynameTextBox(props) {
     const rules = [...props.rules] || [];

@@ -1,5 +1,5 @@
 import { SaveOutlined } from "@ant-design/icons";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
+import i18n from "@nextgisweb/pyramid/i18n!gui";
 import { Button } from "@nextgisweb/gui/antd";
 import { PropTypes } from "prop-types";
 

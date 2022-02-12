@@ -19,7 +19,7 @@ import {
     Tooltip,
 } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n!gui";
 import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
 import { PropTypes } from "prop-types";
 import { useEffect, useMemo, useState } from "react";

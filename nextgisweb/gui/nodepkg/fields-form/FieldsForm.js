@@ -1,7 +1,7 @@
 import { PropTypes } from "prop-types";
 import { Fragment, useEffect } from "react";
 import { Checkbox, Form, Input } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
+import i18n from "@nextgisweb/pyramid/i18n!gui";
 
 export function FieldsForm(props) {
     const { fields, initialValues, onChange, form, ...formProps } = props;
