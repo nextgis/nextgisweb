@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
     Col,
     Form,
@@ -8,16 +7,15 @@ import {
     Typography,
 } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
-import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!";
-
+import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
+import { useEffect, useState } from "react";
 
 export function CORSSettings() {
     const [form] = Form.useForm();
     const [status, setStatus] = useState("loading");
     const [initial, setInitial] = useState("");
-    const [valid, setValid] = useState(true);
 
     async function load() {
         const resp = await route("pyramid.cors").get();
@@ -34,27 +32,18 @@ export function CORSSettings() {
                 await route("pyramid.cors").put({
                     json: { allow_origin: list || null },
                 });
-                message.success("CORS settings updated");
+                message.success(i18n.gettext("CORS settings updated"));
             } catch (err) {
                 new ErrorDialog(err).show();
             } finally {
                 setStatus(null);
             }
         } catch {
-            // ignore form validation error
+            message.error(i18n.gettext("Fix the form errors first"));
         }
     }
 
     useEffect(() => load(), []);
-
-    const onChange = async () => {
-        try {
-            await form.validateFields();
-            setValid(true);
-        } catch {
-            setValid(false);
-        }
-    };
 
     const validCORSRule = (val) => {
         const expression =
@@ -90,7 +79,6 @@ export function CORSSettings() {
                     <Form initialValues={{ cors: initial }} form={form}>
                         <Form.Item rules={rules} name="cors">
                             <Input.TextArea
-                                onChange={onChange}
                                 autoSize={{ minRows: 12, maxRows: 12 }}
                                 style={{ width: "100%" }}
                             />
@@ -114,7 +102,6 @@ export function CORSSettings() {
                 <SaveButton
                     onClick={save}
                     loading={status === "saving"}
-                    disabled={!valid}
                 ></SaveButton>
             </Row>
         </>

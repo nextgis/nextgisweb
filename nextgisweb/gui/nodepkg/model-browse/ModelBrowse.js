@@ -14,12 +14,23 @@ import i18n from "@nextgisweb/pyramid/i18n!";
 
 export function ModelBrowse({
     columns,
-    model,
+    model: m,
     messages,
     collectionOptions,
     collectionFilter,
     ...tableProps
 }) {
+    const model =
+        typeof m === "string"
+            ? {
+                  item: m + ".item",
+                  collection: m + ".collection",
+                  edit: m + ".edit",
+                  browse: m + ".browse",
+                  create: m + ".create",
+              }
+            : m;
+
     messages = messages || {};
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -30,13 +41,13 @@ export function ModelBrowse({
         messages.deleteSuccess || i18n.gettext("Item deleted");
 
     const onEditClick = (id) => {
-        const url = routeURL(model + ".edit", id);
+        const url = routeURL(model.edit, id);
         window.open(url, "_self");
     };
 
     const deleteModelItem = async (id) => {
         try {
-            await route(model + ".item", id).delete();
+            await route(model.item, id).delete();
             const newRows = rows.filter((row) => row.id !== id);
             setRows(newRows);
             message.success(deleteSuccess);
@@ -46,7 +57,7 @@ export function ModelBrowse({
     };
 
     const goToCreatePage = () => {
-        const url = routeURL(model + ".create");
+        const url = routeURL(model.create);
         window.open(url, "_self");
     };
 
@@ -54,9 +65,7 @@ export function ModelBrowse({
         ...columns,
         {
             title: () => (
-                <Tooltip
-                    title={i18n.gettext("Create")}
-                >
+                <Tooltip title={i18n.gettext("Create")}>
                     <Button
                         icon={<PlusOutlined />}
                         type="primary"
@@ -97,7 +106,7 @@ export function ModelBrowse({
     ];
 
     useEffect(async () => {
-        const resp = await route(model + ".collection").get(collectionOptions);
+        const resp = await route(model.collection).get(collectionOptions);
         const data = resp.filter(collectionFilter || (() => true));
         setRows(data.map((x) => ({ ...x, key: x.keyname })));
         setLoading(false);

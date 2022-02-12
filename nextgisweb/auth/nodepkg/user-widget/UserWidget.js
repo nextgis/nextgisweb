@@ -1,11 +1,12 @@
 import { ContentBox } from "@nextgisweb/gui/component";
-import { ModelForm } from "@nextgisweb/gui/model-form";
 import { KeynameTextBox, LanguageSelect } from "@nextgisweb/gui/fields-form";
+import { ModelForm } from "@nextgisweb/gui/model-form";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
 import { PropTypes } from "prop-types";
 import { useState } from "react";
 import { PrincipalMemberSelect } from "../field";
+import getMessages from "../userMessages";
 
 export function UserWidget({ id }) {
     const [fields] = useState(() => [
@@ -59,7 +60,7 @@ export function UserWidget({ id }) {
         },
     ]);
 
-    const p = { fields, model: "auth.user", id };
+    const p = { fields, model: "auth.user", id, messages: getMessages() };
 
     return (
         <ContentBox>

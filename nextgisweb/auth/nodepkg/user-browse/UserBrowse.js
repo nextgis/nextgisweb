@@ -1,5 +1,7 @@
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
-import i18n from "@nextgisweb/pyramid/i18n!auth";
+import i18n from "@nextgisweb/pyramid/i18n!";
+import getMessages from "../userMessages";
+
 
 export function UserBrowse() {
     const columns = [
@@ -16,18 +18,14 @@ export function UserBrowse() {
             sorter: (a, b) => (a.keyname > b.keyname ? 1 : -1),
         },
     ];
-    const messages = {
-        deleteConfirm: i18n.gettext("Delete user?"),
-        deleteSuccess: i18n.gettext("User deleted"),
-    };
 
     return (
         <ModelBrowse
             model="auth.user"
             columns={columns}
-            messages={messages}
+            messages={getMessages()}
             collectionOptions={{ query: { brief: true } }}
-            collectionFilter={(itm) => !itm.system || itm.keyname == 'guest'}
+            collectionFilter={(itm) => !itm.system || itm.keyname == "guest"}
         />
     );
 }

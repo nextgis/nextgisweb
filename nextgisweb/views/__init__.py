@@ -1,7 +1,6 @@
-from .model_controller import ModelController, DeleteWidget
+from .model_controller import DeleteWidget
 
 __all__ = [
-    'ModelController',
     'DeleteWidget',
 ]
 

@@ -38,3 +38,7 @@ msgstr "Изменить"
 msgid "Delete"
 msgstr "Удалить"
 
+#: nodepkg/model-form/ModelForm.js:62
+msgid "Fix the form errors first"
+msgstr "Необходимо исправить ошибки в форме"
+

@@ -112,6 +112,14 @@ msgstr "Подробнее"
 msgid "Import"
 msgstr "Импорт"
 
+#: nodepkg/srsMessages.js:5
+msgid "Delete SRS?"
+msgstr "Удалить СК?"
+
+#: nodepkg/srsMessages.js:6
+msgid "SRS deleted"
+msgstr "СК удалена"
+
 #: template/catalog_browse.mako:27
 msgid "Search"
 msgstr "Поиск"

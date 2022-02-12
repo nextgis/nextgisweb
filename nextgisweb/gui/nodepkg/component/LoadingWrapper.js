@@ -2,7 +2,7 @@ import { Skeleton } from "@nextgisweb/gui/antd";
 import { PropTypes } from "prop-types";
 
 export function LoadingWrapper({
-    loading,
+    loading=true,
     children,
     rows = 4,
     content,
@@ -16,7 +16,7 @@ export function LoadingWrapper({
 }
 
 LoadingWrapper.propTypes = {
-    loading: PropTypes.bool.isRequired,
+    loading: PropTypes.bool,
     children: PropTypes.any,
     content: PropTypes.func,
 };
