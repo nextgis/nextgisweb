@@ -32,9 +32,10 @@ export function FieldsForm(props) {
 
     return (
         <Form {...formProps_}>
-            {fields.map((f) => (
-                <Fragment key={f.name}>{FormItem(f)}</Fragment>
-            ))}
+            {fields &&
+                fields.map((f) => (
+                    <Fragment key={f.name}>{FormItem(f)}</Fragment>
+                ))}
             {props.children}
         </Form>
     );
@@ -81,7 +82,7 @@ function getInputType(widget, props) {
 }
 
 FieldsForm.propTypes = {
-    fields: PropTypes.array.isRequired,
+    fields: PropTypes.array,
     initialValues: PropTypes.object,
     children: PropTypes.node,
     onChange: PropTypes.func,
