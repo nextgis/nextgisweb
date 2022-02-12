@@ -18,6 +18,7 @@ export function SrsBrowse() {
             model={modelObj}
             columns={columns}
             messages={getMessages()}
+            itemProps={{ canDelete: ({ item }) => item.disabled }}
         />
     );
 }
