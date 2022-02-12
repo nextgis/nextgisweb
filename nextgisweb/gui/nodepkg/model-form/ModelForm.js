@@ -38,7 +38,7 @@ export function ModelForm(props) {
               }
             : m;
 
-    const [form] = [props.form] || Form.useForm();
+    const form = props.form || Form.useForm()[0];
 
     const [status, setStatus] = useState("loading");
     const [value, setValue] = useState({});

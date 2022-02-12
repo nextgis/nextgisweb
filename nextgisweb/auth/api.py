@@ -16,7 +16,7 @@ from .models import User, Group, Principal
 from .util import _
 
 keyname_pattern = re.compile(r'^[A-Za-z][A-Za-z0-9_\-]*$')
-brief_keys = ('id', 'system', 'keyname', 'display_name')
+brief_keys = ('id', 'system', 'keyname', 'display_name', 'disabled')
 
 
 def user_cget(request):

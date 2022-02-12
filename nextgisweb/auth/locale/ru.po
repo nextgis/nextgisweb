@@ -190,6 +190,14 @@ msgstr "Логин"
 msgid "User deleted"
 msgstr "Пользователь удален"
 
+#: nodepkg/user-browse/UserBrowse.js:96
+msgid "Disable"
+msgstr "Отключить"
+
+#: nodepkg/user-browse/UserBrowse.js:96
+msgid "Enable"
+msgstr "Включить"
+
 #: nodepkg/user-widget/UserWidget.js:25 template/login.mako:49
 msgid "Password"
 msgstr "Пароль"

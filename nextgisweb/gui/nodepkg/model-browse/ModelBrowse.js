@@ -29,6 +29,7 @@ export function ModelBrowse({
     model: m,
     messages,
     itemProps = {},
+    selectedControl = [],
     collectionOptions,
     collectionFilter,
     ...tableProps
@@ -212,7 +213,6 @@ export function ModelBrowse({
                     onChange={(e) => {
                         setSearch(e.target.value);
                     }}
-                    // onSearch={(value) => setSearch(value)}
                     allowClear
                 />
             </Col>
@@ -229,15 +229,20 @@ export function ModelBrowse({
     );
 
     const SelectedControl = () => (
-        <Badge count={selected.length}>
-            <Button
-                icon={<DeleteOutlined />}
-                onClick={onDeleteSelectedBtnClick}
-                loading={status === "deleting"}
-            >
-                {i18n.gettext("Delete")}
-            </Button>
-        </Badge>
+        <Space direction="horizontal">
+            <Badge count={selected.length} size="small">
+                <Button
+                    icon={<DeleteOutlined />}
+                    onClick={onDeleteSelectedBtnClick}
+                    loading={status === "deleting"}
+                >
+                    {i18n.gettext("Delete")}
+                </Button>
+            </Badge>
+            {selectedControl.map((control) =>
+                control({ selected, rows, setRows })
+            )}
+        </Space>
     );
 
     return (
@@ -269,4 +274,5 @@ ModelBrowse.propTypes = {
     columns: PropTypes.array.isRequired,
     messages: PropTypes.object,
     itemProps: PropTypes.object,
+    selectedControl: PropTypes.array,
 };
