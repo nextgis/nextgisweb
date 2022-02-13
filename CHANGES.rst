@@ -4,26 +4,25 @@ Changes
 4.1.0
 -----
 
-- Support for CORS domain wildcards (like ``https://*.csb.app``).
-- Browser compatibility test and dropping support for Internet Explorer.
-- WFS client and server simple filters support.
-- Reprojection into different coordinate systems in WMS and WFS services.
 - Cloud-optimized GeoTIFF (COG) support for raster layers.
+- Browser compatibility test and Internet Explorer deprecation.
+- Experimental support for long-runnning requests for raster and vector layers
+  creation using ``lunkwill`` extension.
 - Private annotations on web maps, visible only for authors.
-- Export feature layer using field display names instead of keynames.
+- Wrapping around the dateline for tile-based layers on web maps.
+- A lot of improvements for the control panel: filters, batch operations, etc.
 - Improved handling of vector layer sources with ``id`` and ``geom`` fields.
+- Reprojection into different coordinate systems in WMS and WFS services.
 - Ability to use field display names (aliases) while exporting vector layer.
-- Ability to filter NULL values in feature REST API.
-- Support for 25D geometries in PostGIS layers.
-- Wrapping around the dateline for tile-based layers on webmaps.
+- Support for CORS domain wildcards (like ``https://*.csb.app``).
+- WFS client and server simple filters support.
 - Improved handling of coordinates outside boundaries of coordinate systems.
+- Support for 25D geometries in PostGIS layers.
+- Export feature layer using field display names instead of keynames.
+- Ability to filter NULL values in feature REST API.
 - Unknown fields in REST API filters return an error.
-- Improved handling of external services errors.
-- Timeout for external services is set to 15 seconds.
-- Experimental support for long-runnning requests via ``lunkwill`` extension.
-- Pyramid library upgraded to 2.0.0.
-- SQLAlchemy library upgraded to 1.4.27.
-- OpenLayers library upgraded to 6.10.0.
+- Improved handling of external services errors and timeouts.
+- Upgraded dependencies: Pyramid 2.0, SQLAlchemy 1.4, and OpenLayers 6.10
 
 
 4.0.0
