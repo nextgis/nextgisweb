@@ -1,12 +1,20 @@
-#: api.py:498
+#: __init__.py:145
+msgid "Enabled"
+msgstr "Включено"
+
+#: __init__.py:145
+msgid "Disabled"
+msgstr "Отключено"
+
+#: api.py:519
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: exception.py:205 exception.py:266
+#: exception.py:200 exception.py:261
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:206
+#: exception.py:201
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -14,37 +22,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:235
+#: exception.py:230
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:236
+#: exception.py:231
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:243
+#: exception.py:238
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:244
+#: exception.py:239
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:248
+#: exception.py:243
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:249
+#: exception.py:244
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:253
+#: exception.py:248
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:254
+#: exception.py:249
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -53,15 +61,15 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:261
+#: exception.py:256
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:262
+#: exception.py:257
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:267
+#: exception.py:262
 msgid ""
 "The server has either erred or is incapable of performing the requested "
 "operation."
@@ -69,61 +77,61 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:274 exception.py:275
+#: exception.py:269 exception.py:270
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:279
+#: exception.py:274
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:280
+#: exception.py:275
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: template/header.mako:111 view.py:83
+#: template/header.mako:111 view.py:79
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:105 view.py:481
+#: view.py:101 view.py:477
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:117 view.py:498
+#: view.py:114 view.py:494
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:127 view.py:503
+#: view.py:124 view.py:499
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:142 view.py:487
+#: view.py:140 view.py:483
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:149 view.py:489
+#: view.py:147 view.py:485
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:156 view.py:491
+#: view.py:154 view.py:487
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:163 view.py:485
+#: view.py:162 view.py:481
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:170 view.py:493
+#: view.py:170 view.py:489
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:480
+#: view.py:476
 msgid "Info"
 msgstr "Информация"
 
-#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:7 view.py:484
+#: amd/ngw-pyramid/user-avatar/UserAvatar.hbs:7 view.py:480
 msgid "Settings"
 msgstr "Настройки"
 
@@ -184,21 +192,22 @@ msgstr "На главную"
 msgid "Network error"
 msgstr "Сетевая ошибка"
 
-#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:36
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:36 nodepkg/api/error.js:17
 msgid "There is no response from the server or problem connecting to server."
 msgstr ""
 "Не удалось получить ответ от сервера либо в процессе соединения возникла "
 "ошибка."
 
-#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:37
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:37 nodepkg/api/error.js:19
 msgid "Check network connectivity and try again later."
 msgstr "Проверьте сетевое соединение и попробуйте повторить позже."
 
-#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:45
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:45 nodepkg/api/error.js:26
 msgid "Unexpected server response"
 msgstr "Неожидаемый ответ сервера"
 
-#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:46
+#: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:46 nodepkg/api/error.js:10
+#: nodepkg/api/error.js:25
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
 
@@ -231,11 +240,9 @@ msgid "Create"
 msgstr "Создать"
 
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:39
-#: amd/ngw-pyramid/template/CORSForm.hbs:26
 #: amd/ngw-pyramid/template/CustomCSSForm.hbs:25
-#: amd/ngw-pyramid/template/HomePathForm.hbs:11
-#: amd/ngw-pyramid/template/LogoForm.hbs:22
-#: amd/ngw-pyramid/template/SystemNameForm.hbs:10
+#: amd/ngw-pyramid/template/LogoForm.hbs:22 nodepkg/home-path/HomePath.js:47
+#: nodepkg/system-name-form/SystemNameForm.js:52
 msgid "Save"
 msgstr "Сохранить"
 
@@ -254,25 +261,6 @@ msgstr "Доступны обновления"
 #: amd/ngw-pyramid/right-menu/RightMenu.js:98
 msgid "Click to see what's new"
 msgstr "Нажмите и узнайте, что нового"
-
-#: amd/ngw-pyramid/template/CORSForm.hbs:17
-msgid ""
-"Enter allowed origins for cross domain requests to use HTTP API of this Web "
-"GIS on other websites. One origin per line."
-msgstr ""
-"Введите перечень допустимых источников для кросс-доменных запросов для "
-"использования HTTP API этой Веб ГИС на других веб-сайтах. По одному источнику"
-" в строке."
-
-#: amd/ngw-pyramid/template/CORSForm.hbs:18
-msgid ""
-"Please note that different protocols (HTTP and HTTPS) and subdomains "
-"(example.com and www.example.com) are different origins. Wildcards are "
-"allowed for third-level domains and higher."
-msgstr ""
-"Имейте в виду, что разные протоколы (HTTP и HTTPS) и субдомены (example.com "
-"и www.example.com) считаются разными источниками. Символ подстановки (*) "
-"допустим для доменов третьего уровней и выше."
 
 #: amd/ngw-pyramid/template/CustomCSSForm.hbs:17
 msgid ""
@@ -302,13 +290,97 @@ msgstr "Пригласительная сессия"
 msgid "Unknown API error"
 msgstr "Неизвестная ошибка API"
 
-#: nodepkg/api/error.js:25
-msgid "Invalid API response"
-msgstr "Некорректный ответ API"
+#: nodepkg/api/error.js:41
+msgid "Unexpected error while processing long-running request."
+msgstr "Неожиданная ошибка во время выполнения длительного запроса."
+
+#: nodepkg/api/error.js:42
+msgid "Long-running request error"
+msgstr "Ошибка длительного запроса"
+
+#: nodepkg/api/error.js:49
+msgid "Long-running request was cancelled."
+msgstr "Длительный запрос был отменен."
+
+#: nodepkg/cors-settings/CORSSettings.js:35
+msgid "CORS settings updated"
+msgstr "Настройки CORS обновлены"
+
+#: nodepkg/cors-settings/CORSSettings.js:42
+msgid "Fix the form errors first"
+msgstr "Вначале исправьте ошибку в форме"
+
+#: nodepkg/cors-settings/CORSSettings.js:62
+msgid "The value entered is not valid"
+msgstr "Введенное значение некорректно"
+
+#: nodepkg/cors-settings/CORSSettings.js:90
+msgid ""
+"Enter allowed origins for cross domain requests to use HTTP API of this Web "
+"GIS on other websites. One origin per line."
+msgstr ""
+"Введите перечень допустимых источников для кросс-доменных запросов для "
+"использования HTTP API этой Веб ГИС на других веб-сайтах. По одному источнику"
+" в строке."
+
+#: nodepkg/cors-settings/CORSSettings.js:95
+msgid ""
+"Please note that different protocols (HTTP and HTTPS) and subdomains "
+"(example.com and www.example.com) are different origins. Wildcards are "
+"allowed for third-level domains and higher."
+msgstr ""
+"Имейте в виду, что разные протоколы (HTTP и HTTPS) и субдомены (example.com и"
+" www.example.com) считаются разными источниками. Символ подстановки (*) "
+"допустим для доменов третьего уровней и выше."
 
 #: nodepkg/example/translation.js:5
 msgid "Translated text"
 msgstr "Переведенный текст"
+
+#: nodepkg/storage-summary/StorageSummary.js:82
+msgid "Kind of data"
+msgstr "Вид данных"
+
+#: nodepkg/storage-summary/StorageSummary.js:88
+msgid "Volume"
+msgstr "Размер"
+
+#: nodepkg/storage-summary/StorageSummary.js:104
+msgid "Total"
+msgstr "Итого"
+
+#: nodepkg/storage-summary/StorageSummary.js:109
+msgid "of"
+msgstr "из"
+
+#: nodepkg/storage-summary/StorageSummary.js:124
+#, python-format
+msgid "Storage usage was fully estimated at %s and updated at %s."
+msgstr "Использование хранилища было полностью оценено в %s и обновлено в %s."
+
+#: nodepkg/storage-summary/StorageSummary.js:128
+#, python-format
+msgid "Storage usage was fully estimated at %s."
+msgstr "Использование хранилища было полностью оценено в %s."
+
+#: nodepkg/storage-summary/StorageSummary.js:131
+#, python-format
+msgid "Storage usage hasn't been estimated yet but was updated at %s."
+msgstr "Использование хранилища еще не было полностью оценено, но было обновлено в %s."
+
+#: nodepkg/storage-summary/StorageSummary.js:134
+msgid "Storage usage hasn't been estimated yet."
+msgstr "Использование хранилища еще не было полностью оценено."
+
+#: nodepkg/storage-summary/StorageSummary.js:139
+msgid "Some changes may be reflected only after full estimation."
+msgstr ""
+"Некоторые изменения могут быть отражены только после полной оценки "
+"использования хранилища."
+
+#: nodepkg/storage-summary/StorageSummary.js:162
+msgid "Estimate storage"
+msgstr "Оценка хранилища"
 
 #: template/backup.mako:12
 msgid "Filename"
@@ -334,59 +406,6 @@ msgstr "Ресурсы"
 msgid "Help"
 msgstr "Справка"
 
-#: template/storage.mako:36
-msgid "Kind of data"
-msgstr "Вид данных"
-
-#: template/storage.mako:37
-msgid "Volume"
-msgstr "Размер"
-
-#: template/storage.mako:52
-msgid "Total"
-msgstr "Итого"
-
-#: template/storage.mako:49
-msgid "Usage"
-msgstr "Использовано"
-
-#: template/storage.mako:52
-msgid "of"
-msgstr "из"
-
-#: template/storage.mako:76
-#, python-format
-msgid "Storage usage was fully estimated at %s and updated at %s."
-msgstr "Использование хранилища было полностью оценено в %s и обновлено в %s."
-
-#: template/storage.mako:77
-#, python-format
-msgid "Storage usage was fully estimated at %s."
-msgstr "Использование хранилища было полностью оценено в %s."
-
-#: template/storage.mako:79
-#, python-format
-msgid "Storage usage hasn't been estimated yet but was updated at %s."
-msgstr "Использование хранилища еще не было полностью оценено, но было обновлено в %s."
-
-#: template/storage.mako:81
-msgid "Storage usage hasn't been estimated yet."
-msgstr "Использование хранилища еще не было полностью оценено."
-
-#: template/storage.mako:84
-msgid "Some changes may be reflected only after full estimation."
-msgstr ""
-"Некоторые изменения могут быть отражены только после полной оценки "
-"использования хранилища."
-
-#: template/storage.mako:103
-msgid "Estimation is in progress..."
-msgstr "Оценка в процессе..."
-
-#: template/storage.mako:109
-msgid "Estimate storage"
-msgstr "Оценка хранилища"
-
 #: template/sysinfo.mako:30
 msgid "Package"
 msgstr "Пакет"
@@ -399,27 +418,27 @@ msgstr "Версия"
 msgid "Platform"
 msgstr "Платформа"
 
-#: template/uacompat.mako:8
+#: template/uacompat.mako:4
 msgid "Browser compatibility test"
 msgstr "Проверка совместимости браузера"
 
-#: template/uacompat.mako:60
+#: template/uacompat.mako:23
 #, python-format
 msgid "%(name)s %(current)s supported"
 msgstr "%(name)s %(current)s поддерживается"
 
-#: template/uacompat.mako:61
+#: template/uacompat.mako:24
 msgid ""
 "Web GIS browser compatibility test has been passed! The Web GIS should work "
 "fine."
 msgstr "Проверка совместимости браузера пройдена! Веб ГИС должна работать корректно."
 
-#: template/uacompat.mako:64
+#: template/uacompat.mako:27
 #, python-format
 msgid "%(name)s not supported"
 msgstr "%(name)s не поддерживается"
 
-#: template/uacompat.mako:65
+#: template/uacompat.mako:28
 #, python-format
 msgid ""
 "You're using %(name)s although it's not supported by the Web GIS. It's an "
@@ -431,12 +450,12 @@ msgstr ""
 "другой браузер или свяжитесь с вашим системным администратором если другой "
 "браузер недоступен."
 
-#: template/uacompat.mako:67
+#: template/uacompat.mako:30
 #, python-format
 msgid "%(name)s %(current)s not supported"
 msgstr "%(name)s %(current)s не поддерживается"
 
-#: template/uacompat.mako:68
+#: template/uacompat.mako:31
 #, python-format
 msgid ""
 "You're using %(name)s %(current)s although it's not supported by the Web GIS."
@@ -449,7 +468,7 @@ msgstr ""
 " с вашим системным администратором для обновления или попробуйте использовать"
 " другой браузер."
 
-#: template/uacompat.mako:72
+#: template/uacompat.mako:35
 msgid ""
 "If you still want to continue using the current browser, click the link below"
 " to bypass the compatibility test. The Web GIS or some features may degrade "
@@ -459,15 +478,15 @@ msgstr ""
 "нажмите на ссылку ниже, чтобы пропустить проверку совместимости. Веб ГИС или "
 "часть ее функций могут работать некорректно в этом случае."
 
-#: template/uacompat.mako:73
+#: template/uacompat.mako:36
 msgid "I understood but want to proceed at my own risk. Skip the test!"
 msgstr "Понятно, но я хочу продолжить на свой страх и риск. Пропустить тест!"
 
-#: template/uacompat.mako:75
+#: template/uacompat.mako:38
 msgid "Unknown browser"
 msgstr "Неизвестный браузер"
 
-#: template/uacompat.mako:76
+#: template/uacompat.mako:39
 msgid "If you are using an up-to-date browser the Web GIS should be fine."
 msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "

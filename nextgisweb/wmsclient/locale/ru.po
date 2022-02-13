@@ -1,71 +1,71 @@
-#: amd/ngw-wmsclient/ConnectionWidget.js:35
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:16 model.py:45
+#: amd/ngw-wmsclient/ConnectionWidget.js:34
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:16 model.py:47
 msgid "WMS connection"
 msgstr "Соединение WMS"
 
-#: amd/ngw-wmsclient/LayerWidget.js:48 model.py:163
+#: amd/ngw-wmsclient/LayerWidget.js:45 model.py:179
 msgid "WMS layer"
 msgstr "Слой WMS"
 
-#: view.py:30
+#: view.py:27
 msgid "WMS capabilities"
 msgstr "Возможности WMS"
 
-#: view.py:38
+#: view.py:35
 msgid "WMS vendor parameters"
 msgstr "WMS вендор параметры"
 
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:46
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:44
 #: template/section_vendor_params.mako:6
 msgid "Key"
 msgstr "Ключ"
 
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:55
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:53
 #: template/section_vendor_params.mako:7
 msgid "Value"
 msgstr "Значение"
 
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:66
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:64
 msgid "Vendor parameters"
 msgstr "Вендор параметры"
 
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:92
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:90
 msgid "Add"
 msgstr "Добавить"
 
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:98
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:96
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:9
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:10
 msgid "URL"
 msgstr "URL"
 
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:15
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:16
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:21
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:22
 msgid "Password"
 msgstr "Пароль"
 
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:26
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:27
 msgid "Version"
 msgstr "Версия"
 
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:30
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:31
 msgid "Capabilities"
 msgstr "Возможности"
 
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:32
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:33
 msgid "Do not query"
 msgstr "Не запрашивать"
 
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:33
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:34
 msgid "Query"
 msgstr "Запросить"
 
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:34
+#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:35
 msgid "Clear"
 msgstr "Очистить"
 

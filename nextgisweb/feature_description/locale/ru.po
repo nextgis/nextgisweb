@@ -1,4 +1,5 @@
-#: amd/DisplayWidget.js:11 amd/EditorWidget.js:14
+#: amd/ngw-feature-description/DisplayWidget.js:11
+#: amd/ngw-feature-description/EditorWidget.js:14
 msgid "Description"
 msgstr "Описание"
 

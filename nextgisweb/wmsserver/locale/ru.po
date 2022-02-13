@@ -1,9 +1,9 @@
-#: amd/ngw-wmsserver/ServiceWidget.js:56 model.py:27
+#: amd/ngw-wmsserver/ServiceWidget.js:55 model.py:24
 #: template/section_api_wms.mako:7
 msgid "WMS service"
 msgstr "Сервис WMS"
 
-#: view.py:320
+#: view.py:16
 msgid "External access"
 msgstr "Внешний доступ"
 
@@ -41,23 +41,22 @@ msgstr "Ресурс"
 
 #: template/section_api_wms.mako:11
 msgid ""
-"Web Map Service (WMS) is a standard protocol developed by the Open "
-"Geospatial Consortium for serving georeferenced map images. These images "
-"are typically produced by a map server from data provided by a GIS "
-"database."
+"Web Map Service (WMS) is a standard protocol developed by the Open Geospatial"
+" Consortium for serving georeferenced map images. These images are typically "
+"produced by a map server from data provided by a GIS database."
 msgstr ""
 "Web Map Service (WMS) - это стандартный протокол, разработанный Open "
 "Geospatial Consortium для предоставления географически привязанных "
-"изображений. Эти изображения обычно генерируются картографическим "
-"сервером из данных базы данных ГИС."
+"изображений. Эти изображения обычно генерируются картографическим сервером из"
+" данных базы данных ГИС."
 
-#: template/section_api_wms.mako:14
+#: template/section_api_wms.mako:16
 msgid ""
 "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-"
 "connection"
 msgstr "https://docs.nextgis.ru/docs_ngweb/source/layers.html#id9"
 
-#: template/section_api_wms.mako:15
+#: template/section_api_wms.mako:17
 msgid "Read more"
 msgstr "Подробнее"
 

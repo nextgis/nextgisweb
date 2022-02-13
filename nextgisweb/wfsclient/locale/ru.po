@@ -1,24 +1,24 @@
-#: amd/ngw-wfsclient/WFSConnectionWidget.js:26 model.py:106
+#: amd/ngw-wfsclient/WFSConnectionWidget.js:25 model.py:115
 msgid "WFS connection"
 msgstr "Соединение WFS"
 
-#: amd/ngw-wfsclient/WFSLayerWidget.js:40 model.py:333
+#: amd/ngw-wfsclient/WFSLayerWidget.js:37 model.py:380
 msgid "WFS layer"
 msgstr "Слой WFS"
 
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:9
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:10
 msgid "WFS path"
 msgstr "Адрес WFS"
 
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:15
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:16
 msgid "Username"
 msgstr "Пользователь"
 
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:21
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:22
 msgid "Password"
 msgstr "Пароль"
 
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:26
+#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:27
 msgid "Version"
 msgstr "Версия"
 

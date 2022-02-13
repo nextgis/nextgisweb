@@ -1,8 +1,8 @@
-#: api.py:25
+#: api.py:23
 msgid "Uploaded file too large"
 msgstr "Загруженный файл слишком большой"
 
-#: api.py:30
+#: api.py:28
 msgid "Upload is not completed"
 msgstr "Загрузка не завершена"
 
@@ -10,19 +10,19 @@ msgstr "Загрузка не завершена"
 msgid "Select"
 msgstr "Выбрать"
 
-#: amd/ngw-file-upload/Uploader.js:82
+#: amd/ngw-file-upload/Uploader.js:85
 msgid "max"
 msgstr "максимум"
 
-#: amd/ngw-file-upload/Uploader.js:105
+#: amd/ngw-file-upload/Uploader.js:113
 msgid "Uploading..."
 msgstr "Идёт загрузка..."
 
-#: amd/ngw-file-upload/Uploader.js:113
+#: amd/ngw-file-upload/Uploader.js:121
 msgid " uploaded..."
 msgstr " загружено..."
 
-#: amd/ngw-file-upload/Uploader.js:139
+#: amd/ngw-file-upload/Uploader.js:149
 msgid "Could not load file!"
 msgstr "Не удалось загрузить файл!"
 
@@ -52,7 +52,4 @@ msgstr "Удалить"
 #: amd/ngw-file-upload/template/Uploader.hbs:9
 msgid "Select a file"
 msgstr "Выберите файл"
-
-#~ msgid "or use drag and drop"
-#~ msgstr "или перетащите в эту область"
 

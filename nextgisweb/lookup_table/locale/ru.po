@@ -1,24 +1,24 @@
-#: amd/ngw-lookup-table/Widget.js:90 model.py:25 view.py:18
+#: amd/ngw-lookup-table/Widget.js:88 model.py:22 view.py:16
 msgid "Lookup table"
 msgstr "Справочник"
 
-#: amd/ngw-lookup-table/Widget.js:52 template/section.mako:7
+#: amd/ngw-lookup-table/Widget.js:50 template/section.mako:7
 msgid "Key"
 msgstr "Ключ"
 
-#: amd/ngw-lookup-table/Widget.js:61
+#: amd/ngw-lookup-table/Widget.js:59
 msgid "Type"
 msgstr "Тип"
 
-#: amd/ngw-lookup-table/Widget.js:68 template/section.mako:8
+#: amd/ngw-lookup-table/Widget.js:66 template/section.mako:8
 msgid "Value"
 msgstr "Значение"
 
-#: amd/ngw-lookup-table/Widget.js:138
+#: amd/ngw-lookup-table/Widget.js:122
 msgid "Add"
 msgstr "Добавить"
 
-#: amd/ngw-lookup-table/Widget.js:144
+#: amd/ngw-lookup-table/Widget.js:128
 msgid "Delete"
 msgstr "Удалить"
 

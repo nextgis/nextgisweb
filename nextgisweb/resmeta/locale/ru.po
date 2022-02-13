@@ -1,36 +1,36 @@
-#: view.py:18 amd/ngw-resmeta/Widget.js:96
+#: amd/ngw-resmeta/Widget.js:88 view.py:15
 msgid "Metadata"
 msgstr "Метаданные"
 
-#: amd/ngw-resmeta/Widget.js:58 template/section.mako:5
+#: amd/ngw-resmeta/Widget.js:50 template/section.mako:9
 msgid "Key"
 msgstr "Ключ"
 
-#: amd/ngw-resmeta/Widget.js:67 template/section.mako:6
+#: amd/ngw-resmeta/Widget.js:59 template/section.mako:10
 msgid "Type"
 msgstr "Тип"
 
-#: amd/ngw-resmeta/Widget.js:74 template/section.mako:7
+#: amd/ngw-resmeta/Widget.js:66 template/section.mako:11
 msgid "Value"
 msgstr "Значение"
 
-#: amd/ngw-resmeta/Widget.js:123
+#: amd/ngw-resmeta/Widget.js:115
 msgid "Text"
 msgstr "Текст"
 
-#: amd/ngw-resmeta/Widget.js:130
+#: amd/ngw-resmeta/Widget.js:122
 msgid "Integer"
 msgstr "Целое число"
 
-#: amd/ngw-resmeta/Widget.js:137
+#: amd/ngw-resmeta/Widget.js:129
 msgid "Float"
 msgstr "Вещественное число"
 
-#: amd/ngw-resmeta/Widget.js:144
+#: amd/ngw-resmeta/Widget.js:136
 msgid "Add"
 msgstr "Добавить"
 
-#: amd/ngw-resmeta/Widget.js:150
+#: amd/ngw-resmeta/Widget.js:142
 msgid "Remove"
 msgstr "Удалить"
 

@@ -1,24 +1,24 @@
-#: api.py:17
+#: api.py:18
 msgid "Raster mosaic item id not provided."
 msgstr "id элемента растровой мозаики не указан."
 
-#: api.py:23
+#: api.py:24
 msgid "Raster mosaic item not found."
 msgstr "Элемент растровой мозаики не найден."
 
-#: model.py:38
+#: model.py:35
 msgid "Raster mosaic"
 msgstr "Мозаика растров"
 
-#: model.py:128
+#: model.py:124
 msgid "GDAL library was unable to open the file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:131
+#: model.py:127
 msgid "Only RGB and RGBA rasters are supported."
 msgstr "Поддерживаются только RGB и RGBA растры."
 
-#: model.py:139
+#: model.py:135
 #, python-format
 msgid ""
 "Raster has format '%(format)s', however only following formats are supported:"
@@ -27,11 +27,11 @@ msgstr ""
 "Формат загруженного растра '%(format)s', однако поддерживаются только "
 "следующие типы: %(all_formats)s."
 
-#: model.py:144
+#: model.py:140
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:155
+#: model.py:151
 msgid "Complex data types are not supported."
 msgstr "Комплексные типы данных не поддерживаются."
 

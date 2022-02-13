@@ -1,8 +1,8 @@
-#: __init__.py:91
+#: __init__.py:90
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
-#: api.py:71
+#: api.py:69
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
@@ -64,202 +64,203 @@ msgstr ""
 "наименование. Присвойте ресурсу другое наименование или переименуйте "
 "существующий."
 
-#: exception.py:68
-msgid "Forbidden"
-msgstr "Доступ запрещен"
-
-#: amd/ngw-resource/CompositeWidget.js:264 exception.py:76
-msgid "Validation error"
-msgstr "Ошибка валидации"
-
-#: exception.py:81
+#: exception.py:54
 msgid "Hierarchy error"
 msgstr "Ошибка иерархии"
 
-#: exception.py:88
+#: exception.py:72
+msgid "Forbidden"
+msgstr "Доступ запрещен"
+
+#: exception.py:80
 msgid "Operational error"
 msgstr "Операционная ошибка"
 
 #: amd/ngw-resource/PermissionWidget.js:94 amd/ngw-resource/PermissionWidget.js:183
 #: amd/ngw-resource/Widget.js:32 amd/ngw-resource/form/ResourceLink.js:35
-#: model.py:110 scope.py:27
+#: model.py:103 scope.py:25
 msgid "Resource"
 msgstr "Ресурс"
 
-#: model.py:269
+#: model.py:259
 msgid "Resource can not be a parent himself."
 msgstr "Ресурс не может быть родителем сам себе."
 
-#: model.py:282
+#: model.py:272
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:342
+#: model.py:332
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:348
+#: model.py:338
 #, python-format
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:353
+#: model.py:343
 #, python-format
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:487
+#: model.py:477
 #, python-format
 msgid "Maximum number of resources exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов. Лимит %s."
 
-#: model.py:504
+#: model.py:494
 #, python-format
 msgid "Maximum number of resources '%s' exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов '%s'. Лимит %s."
 
-#: model.py:560
+#: model.py:566
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: scope.py:29 scope.py:68 scope.py:80 scope.py:90 scope.py:103
+#: scope.py:27 scope.py:66 scope.py:78 scope.py:88 scope.py:101
 msgid "Read"
 msgstr "Чтение"
 
-#: amd/ngw-resource/CompositeWidget.js:77 scope.py:35
+#: amd/ngw-resource/CompositeWidget.js:73 scope.py:33
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:42 view.py:322
+#: scope.py:40 view.py:320
 msgid "Update"
 msgstr "Изменить"
 
-#: amd/ngw-resource/CompositeWidget.js:96 amd/ngw-resource/PermissionWidget.js:321
-#: scope.py:46 view.py:330
+#: amd/ngw-resource/CompositeWidget.js:92 amd/ngw-resource/PermissionWidget.js:321
+#: scope.py:44 view.py:328
 msgid "Delete"
 msgstr "Удалить"
 
-#: scope.py:51
+#: scope.py:49
 msgid "Manage children"
 msgstr "Управление дочерними ресурсами"
 
-#: scope.py:54
+#: scope.py:52
 msgid "Change permissions"
 msgstr "Изменение прав доступа"
 
-#: scope.py:66
+#: scope.py:64
 msgid "Metadata"
 msgstr "Метаданные"
 
-#: scope.py:69 scope.py:81 scope.py:91 scope.py:104
+#: scope.py:67 scope.py:79 scope.py:89 scope.py:102
 msgid "Write"
 msgstr "Запись"
 
-#: scope.py:78
+#: scope.py:76
 msgid "Data structure"
 msgstr "Структура данных"
 
-#: scope.py:88
+#: scope.py:86
 msgid "Data"
 msgstr "Данные"
 
-#: scope.py:101
+#: scope.py:99
 msgid "Connection"
 msgstr "Соединение"
 
-#: scope.py:105 scope.py:117
+#: scope.py:103 scope.py:115
 msgid "Connect"
 msgstr "Соединение"
 
-#: scope.py:115
+#: scope.py:113
 msgid "Service"
 msgstr "Сервис"
 
-#: scope.py:118
+#: scope.py:116
 msgid "Configure"
 msgstr "Конфигурация"
 
-#: serialize.py:100
+#: serialize.py:96
 #, python-format
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:88 view.py:337
+#: view.py:86 view.py:335
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:123
+#: view.py:121
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
-#: view.py:129 view.py:347
+#: view.py:127 view.py:345
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:137
+#: view.py:135
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
-#: amd/ngw-resource/DeleteWidget.js:20 view.py:144
+#: amd/ngw-resource/DeleteWidget.js:20 view.py:142
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:193 view.py:355
+#: view.py:191 view.py:353
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:214
+#: view.py:212
 #, python-format
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:272
+#: view.py:270
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: amd/ngw-resource/DescriptionWidget.js:19 view.py:279
+#: amd/ngw-resource/DescriptionWidget.js:19 view.py:277
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:286
+#: view.py:284
 msgid "User permissions"
 msgstr "Права пользователя"
 
 #: amd/ngw-resource/PermissionWidget.js:66 amd/ngw-resource/PermissionWidget.js:133
-#: view.py:348
+#: view.py:346
 msgid "Action"
 msgstr "Действие"
 
-#: view.py:349
+#: view.py:347
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: amd/ngw-resource/CompositeWidget.js:53
+#: amd/ngw-resource/CompositeWidget.js:49
 msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
 
-#: amd/ngw-resource/CompositeWidget.js:82
+#: amd/ngw-resource/CompositeWidget.js:78
 msgid "Create and edit"
 msgstr "Создать и изменить"
 
-#: amd/ngw-resource/CompositeWidget.js:89
+#: amd/ngw-resource/CompositeWidget.js:85
 #: amd/ngw-resource/template/ResourceExportForm.hbs:15
+#: nodepkg/export-settings/ExportSettings.js:60
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-resource/CompositeWidget.js:256 amd/ngw-resource/CompositeWidget.js:272
+#: amd/ngw-resource/CompositeWidget.js:241 amd/ngw-resource/CompositeWidget.js:257
 msgid "Unexpected error"
 msgstr "Внезапная ошибка"
 
-#: amd/ngw-resource/CompositeWidget.js:257
+#: amd/ngw-resource/CompositeWidget.js:242
 msgid "Serialization failed"
 msgstr "Сериализация не удалась"
 
-#: amd/ngw-resource/CompositeWidget.js:265
+#: amd/ngw-resource/CompositeWidget.js:249
+msgid "Validation error"
+msgstr "Ошибка валидации"
+
+#: amd/ngw-resource/CompositeWidget.js:250
 msgid "Errors found during data validation. Tabs with errors marked in red."
 msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
 
-#: amd/ngw-resource/CompositeWidget.js:273
+#: amd/ngw-resource/CompositeWidget.js:258
 msgid "Validation failed"
 msgstr "Валидация провалилась"
 
@@ -345,34 +346,39 @@ msgid "Confirm deletion of the resource"
 msgstr "Подтвердить удаление ресурса"
 
 #: amd/ngw-resource/template/ResourceExportForm.hbs:3
+#: nodepkg/export-settings/ExportSettings.js:40
 msgid ""
 "Select the category of users who can use the \"Save as\" link to download "
 "resource data."
 msgstr ""
-"Выберите категорию пользователей, которые могут видеть ссылку "
-"\"Сохранить как\" для скачивания данных ресурса."
+"Выберите категорию пользователей, которые могут видеть ссылку \"Сохранить "
+"как\" для скачивания данных ресурса."
 
 #: amd/ngw-resource/template/ResourceExportForm.hbs:8
+#: nodepkg/export-settings/ExportSettings.js:47
 msgid "Users with \"Data: Read\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Чтение\""
 
 #: amd/ngw-resource/template/ResourceExportForm.hbs:9
+#: nodepkg/export-settings/ExportSettings.js:48
 msgid "Users with \"Data: Write\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Запись\""
 
 #: amd/ngw-resource/template/ResourceExportForm.hbs:10
+#: nodepkg/export-settings/ExportSettings.js:49
 msgid "Administrators"
 msgstr "Администраторы"
 
 #: amd/ngw-resource/template/ResourceExportForm.hbs:17
+#: nodepkg/export-settings/ExportSettings.js:68
 msgid ""
 "* This will not affect REST API use which will continue to be governed by "
 "permissions."
 msgstr ""
-"* Это не повлияет на REST API, который продолжит "
-"регулироваться правами доступа."
+"* Это не повлияет на REST API, который продолжит регулироваться правами "
+"доступа."
 
-#: amd/ngw-resource/template/Widget.hbs:8 template/section_children.mako:142
+#: amd/ngw-resource/template/Widget.hbs:8 template/section_children.mako:128
 #: template/section_summary.mako:6
 msgid "Display name"
 msgstr "Наименование"
@@ -385,12 +391,12 @@ msgstr "Ключ"
 msgid "Parent"
 msgstr "Родитель"
 
-#: amd/ngw-resource/template/Widget.hbs:23 template/section_children.mako:144
+#: amd/ngw-resource/template/Widget.hbs:23 template/section_children.mako:130
 #: template/section_summary.mako:44
 msgid "Owner"
 msgstr "Владелец"
 
-#: amd/ngw-resource/template/Widget.hbs:28 template/section_children.mako:143
+#: amd/ngw-resource/template/Widget.hbs:28 template/section_children.mako:129
 #: template/section_summary.mako:36
 msgid "Type"
 msgstr "Тип"
@@ -399,11 +405,11 @@ msgstr "Тип"
 msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных во внешние приложения."
 
-#: template/section_children.mako:128
+#: template/section_children.mako:114
 msgid "Show resources volume"
 msgstr "Показать размер ресурсов"
 
-#: template/section_children.mako:145
+#: template/section_children.mako:131
 msgid "Volume"
 msgstr "Размер"
 

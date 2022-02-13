@@ -1,17 +1,17 @@
-#: __init__.py:15
+#: __init__.py:12
 msgid "Feature attachments"
 msgstr "Прикрепленные к объектам файлы"
 
-#: exception.py:15
+#: exception.py:12
 msgid "Attachment not found"
 msgstr "Вложение не найдено"
 
-#: exception.py:16
+#: exception.py:13
 #, python-format
 msgid "Attachment with id = %d was not found in feature with id = %d."
 msgstr "Вложение с id = %d не найдено в объекте с id = %d."
 
-#: exception.py:17
+#: exception.py:14
 msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 

@@ -1,8 +1,8 @@
-#: amd/ngw-wfsserver/ServiceWidget.js:58 model.py:25
+#: amd/ngw-wfsserver/ServiceWidget.js:55 model.py:22
 msgid "WFS service"
 msgstr "Сервис WFS"
 
-#: view.py:19
+#: view.py:16
 msgid "External access"
 msgstr "Внешний доступ"
 
@@ -43,9 +43,9 @@ msgid ""
 "Web Feature Service (WFS) provides an interface allowing requests for "
 "geographical features across the web using platform-independent calls."
 msgstr ""
-"Web Feature Service (WFS) предоставляет интерфейс, позволяющий "
-"запрашивать географические сущности, используя независимые от "
-"используемой платформы вызовы."
+"Web Feature Service (WFS) предоставляет интерфейс, позволяющий запрашивать "
+"географические сущности, используя независимые от используемой платформы "
+"вызовы."
 
 #: template/section_api_wfs.mako:16
 msgid "https://docs.nextgis.com/docs_ngweb/source/layers.html#wfs-service"
@@ -54,7 +54,4 @@ msgstr "https://docs.nextgis.ru/docs_ngweb/source/layers.html#c-wfs"
 #: template/section_api_wfs.mako:17
 msgid "Read more"
 msgstr "Подробнее"
-
-#~ msgid "WFS URL"
-#~ msgstr "WFS URL"
 

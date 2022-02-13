@@ -1,90 +1,73 @@
-#: api.py:41
+#: api.py:21
+msgid "Coordinate system name is not unique."
+msgstr "Название системы координат не уникально."
+
+#: api.py:63
+msgid "Cannot change wkt definition of standard coordinate system."
+msgstr "Невозможно изменить определение wkt стандартной системы координат."
+
+#: api.py:79
+msgid "Unable to delete standard coordinate system."
+msgstr "Невозможно удалить стандартную систему координат."
+
+#: api.py:90
 msgid "Invalid SRS definition!"
 msgstr "Неверное определение SRS!"
 
-#: api.py:140
+#: api.py:197
 #, python-format
 msgid "Coordinate system (id=%d) already exists."
 msgstr "Система координат (id=%d) уже существует."
 
-#: util.py:43
+#: util.py:39
 #, python-format
 msgid "Invalid MapInfo spatial reference system: %s"
 msgstr "Неверная система координат MapInfo: %s"
 
-#: util.py:72
+#: util.py:60
 #, python-format
 msgid "Unknown spatial reference system format: %s!"
 msgstr "Неверный формат системы координат: %s!"
 
-#: util.py:82
+#: util.py:70
 msgid "Invalid OGC WKT definition!"
 msgstr "Неверное определение OGC WKT!"
 
-#: views.py:23
+#: views.py:22
 msgid "Spatial reference system catalog"
 msgstr "Каталог систем координат"
 
-#: amd/ngw-spatial-ref-sys/SRSWidget.js:46 views.py:33
+#: views.py:32
 msgid "Spatial reference system"
 msgstr "Система координат"
 
-#: views.py:51 views.py:127
-msgid "Unable to delete standard coordinate system."
-msgstr "Невозможно удалить стандартную систему координат."
-
-#: views.py:76
-msgid "Coordinate system name is not unique."
-msgstr "Название системы координат не уникально."
-
-#: views.py:83
-msgid "Cannot change wkt definition of standard coordinate system."
-msgstr "Невозможно изменить определение wkt стандартной системы координат."
-
-#: views.py:109
-msgid "Create new Spatial reference system"
-msgstr "Создать новую Систему координат"
-
-#: views.py:156 views.py:202
+#: views.py:42 views.py:117
 msgid "Spatial reference systems"
 msgstr "Системы координат"
 
-#: views.py:167
+#: views.py:55
+msgid "Create new Spatial reference system"
+msgstr "Создать новую Систему координат"
+
+#: views.py:82
 msgid "List"
 msgstr "Список"
 
-#: views.py:172
+#: views.py:87
 msgid "Create"
 msgstr "Создать"
 
-#: views.py:178
+#: views.py:93
 msgid "Catalog"
 msgstr "Каталог"
 
-#: template/srs_browse.mako:35 views.py:184
+#: views.py:99
 msgid "Edit"
 msgstr "Редактировать"
 
-#: template/srs_browse.mako:37 views.py:192
+#: views.py:107
 msgid "Delete"
 msgstr "Удалить"
-
-#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:38
-#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:24
-msgid "Import definition"
-msgstr "Импортировать определение"
-
-#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:53
-msgid "Format"
-msgstr "Формат"
-
-#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:68
-msgid "Definition"
-msgstr "Определение"
-
-#: amd/ngw-spatial-ref-sys/SRSImportDialog.js:86
-msgid "Cancel"
-msgstr "Отменить"
 
 #: amd/ngw-spatial-ref-sys/catalog_browse.js:54
 msgid "Longitude and latitude must be specified at the same time."
@@ -95,12 +78,12 @@ msgid "View"
 msgstr "Просмотр"
 
 #: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:13
-#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:9
+#: nodepkg/srs-widget/SRSWidget.js:22
 msgid "Display name"
 msgstr "Наименование"
 
 #: amd/ngw-spatial-ref-sys/template/CatalogImportForm.hbs:19
-#: amd/ngw-spatial-ref-sys/template/SRSWidget.hbs:16
+#: nodepkg/srs-widget/SRSWidget.js:27
 msgid "OGC WKT definition"
 msgstr "OGC WKT определение"
 
@@ -120,6 +103,22 @@ msgstr "Удалить СК?"
 msgid "SRS deleted"
 msgstr "СК удалена"
 
+#: nodepkg/srs-browse/SrsBrowse.js:9 template/catalog_browse.mako:42
+msgid "SRS name"
+msgstr "Наименование СК"
+
+#: nodepkg/srs-widget/SRSImportForm.js:19
+msgid "Format"
+msgstr "Формат"
+
+#: nodepkg/srs-widget/SRSImportForm.js:30
+msgid "Definition"
+msgstr "Определение"
+
+#: nodepkg/srs-widget/SRSWidget.js:69 nodepkg/srs-widget/SRSWidget.js:89
+msgid "Import definition"
+msgstr "Импортировать определение"
+
 #: template/catalog_browse.mako:27
 msgid "Search"
 msgstr "Поиск"
@@ -131,10 +130,6 @@ msgstr "Широта"
 #: template/catalog_browse.mako:31
 msgid "Longitude"
 msgstr "Долгота"
-
-#: template/catalog_browse.mako:42 template/srs_browse.mako:25
-msgid "SRS name"
-msgstr "Наименование СК"
 
 #: template/catalog_browse.mako:43
 msgid "Auth name"

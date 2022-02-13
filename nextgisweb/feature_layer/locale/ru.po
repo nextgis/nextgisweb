@@ -38,7 +38,7 @@ msgstr "Объект с id = %d не найден в ресурсе с id = %d."
 msgid "The feature may have been deleted or an error in the address."
 msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
 
-#: model.py:163
+#: model.py:164
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
@@ -218,3 +218,4 @@ msgstr "Да"
 #: template/section_fields.mako:34 template/section_fields.mako:38
 msgid "No"
 msgstr "Нет"
+

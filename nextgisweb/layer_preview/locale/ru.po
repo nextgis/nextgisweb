@@ -1,4 +1,4 @@
-#: view.py:36 view.py:57
+#: view.py:36 view.py:60
 msgid "Preview"
 msgstr "Просмотр"
 

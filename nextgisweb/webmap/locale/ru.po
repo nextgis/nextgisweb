@@ -10,7 +10,7 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:30 model.py:40 view.py:225 view.py:246
+#: model.py:30 model.py:40 view.py:225 view.py:248
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -22,7 +22,7 @@ msgstr "Открыть"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:220 model.py:34
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:215 model.py:34
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
@@ -30,7 +30,7 @@ msgstr "Редактировать аннотации"
 msgid "Manage annotations"
 msgstr "Администрировать аннотации"
 
-#: view.py:36 view.py:247
+#: view.py:36
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
@@ -105,27 +105,16 @@ msgstr "Порядок слоёв"
 msgid "Use on the map"
 msgstr "Учитывать на карте"
 
-#: amd/ngw-webmap/ItemWidget.js:148 amd/ngw-webmap/template/SettingsForm.hbs:117
+#: amd/ngw-webmap/ItemWidget.js:148
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:111
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
+#: nodepkg/settings/SettingsForm.js:260
 msgid "Save"
 msgstr "Сохранить"
 
 #: amd/ngw-webmap/ItemWidget.js:309 amd/ngw-webmap/template/ItemWidget.hbs:26
 msgid "Add group"
 msgstr "Добавить группу"
-
-#: amd/ngw-webmap/SettingsForm.js:117
-msgid "Validation error"
-msgstr "Ошибка валидации"
-
-#: amd/ngw-webmap/SettingsForm.js:118
-msgid ""
-"Errors found during data validation. Controls with errors marked in red. Fix "
-"it, please."
-msgstr ""
-"При проверке введенных данных обнаружены ошибки. Элементы с ошибками выделены"
-" красным цветом. Исправьте, пожалуйста и сохраните еще раз."
 
 #: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:25
 msgid "Your annotation text"
@@ -264,158 +253,6 @@ msgstr "Ресурс стиля"
 #: amd/ngw-webmap/template/ItemWidget.hbs:126
 msgid "Expanded"
 msgstr "Развернута"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:9
-msgid "Identify popup"
-msgstr "Окно идентификации"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:14
-msgid "Width, px"
-msgstr "Ширина, пикс."
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:19
-msgid "Height, px"
-msgstr "Высота, пикс."
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:24
-msgid "Radius, px"
-msgstr "Радиус, пикс."
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:28
-msgid "Show feature attributes"
-msgstr "Показывать атрибуты объектов"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:33
-msgid "Measurement"
-msgstr "Измерения"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:37
-msgid "Length units"
-msgstr "Единицы длины"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:38
-msgid "Meters"
-msgstr "Метры"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:39
-msgid "Kilometers"
-msgstr "Километры"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:40
-msgid "Meters/kilometers (auto)"
-msgstr "Метры/километры (авто)"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:41
-msgid "Feet"
-msgstr "Футы"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:42
-msgid "Miles"
-msgstr "Мили"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:43
-msgid "Feet/miles (auto)"
-msgstr "Футы/мили (авто)"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:48
-msgid "Area units"
-msgstr "Единицы площади"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:49
-msgid "Sq. meters"
-msgstr "Кв. метры"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:50
-msgid "Sq. kilometers"
-msgstr "Кв. километры"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:51
-msgid "Sq. meters/kilometers (auto)"
-msgstr "Кв. метры/километры (авто)"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:52
-msgid "Hectares"
-msgstr "Гектары"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:53
-msgid "Acres"
-msgstr "Акры"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:54
-msgid "Sq. miles"
-msgstr "Кв. мили"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:55
-msgid "Acres/sq. miles (auto)"
-msgstr "Акры/кв. мили (авто)"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:56
-msgid "Sq. feet"
-msgstr "Кв. футы"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:61
-msgid "Degree format"
-msgstr "Формат градусов"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:62
-msgid "Decimal degrees"
-msgstr "Десятичные градусы"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:63
-msgid "Degrees, decimal minutes"
-msgstr "Градусы и десятичные минуты"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:64
-msgid "Degrees, minutes, seconds"
-msgstr "Градусы, минуты, секунды"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:69
-msgid "Measurement SRID"
-msgstr "Система координат для расчётов"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:78
-msgid "Address search"
-msgstr "Адресный поиск"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:82
-msgid "Enable"
-msgstr "Включить"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:86
-msgid "Limit by web map initial extent"
-msgstr "Ограничить начальным охватом карты"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:90
-msgid "Provider"
-msgstr "Провайдер"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:91
-msgid "Nominatim (OSM)"
-msgstr "Nominatim (OSM)"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:92
-msgid "Yandex.Maps API Geocoder"
-msgstr "Геокодер API Яндекс.Карт"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:98
-msgid "For example: ru or gb,de"
-msgstr "Например, ru или gb,de"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:100
-msgid "Invalid countries. For example ru or gb,de"
-msgstr "Неверные значения. Например, ru или gb,de"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:101
-msgid "Limit search results to countries"
-msgstr "Ограничить поиск странами"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:106
-msgid "Yandex.Maps Key is required"
-msgstr "Ключ Yandex.Maps обязателен"
-
-#: amd/ngw-webmap/template/SettingsForm.hbs:108
-msgid "Yandex.Maps API Geocoder Key"
-msgstr "Ключ геокодера API Яндекс.Карт"
 
 #: amd/ngw-webmap/tool/Identify.js:212
 msgid "Attributes"
@@ -581,7 +418,7 @@ msgstr "Публичные аннотации"
 msgid "My private annotations"
 msgstr "Мои приватные аннотации"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:256
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:251
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
@@ -762,6 +599,150 @@ msgstr "Открыть карту целиком"
 #: nodepkg/settings/Settings.js:56
 msgid "Settings saved"
 msgstr "Настройки сохранены"
+
+#: nodepkg/settings/SettingsForm.js:52
+msgid "Identify popup"
+msgstr "Окно идентификации"
+
+#: nodepkg/settings/SettingsForm.js:58
+msgid "Width, px"
+msgstr "Ширина, пикс."
+
+#: nodepkg/settings/SettingsForm.js:71
+msgid "Height, px"
+msgstr "Высота, пикс."
+
+#: nodepkg/settings/SettingsForm.js:84
+msgid "Radius, px"
+msgstr "Радиус, пикс."
+
+#: nodepkg/settings/SettingsForm.js:107
+msgid "Show feature attributes"
+msgstr "Показывать атрибуты объектов"
+
+#: nodepkg/settings/SettingsForm.js:113
+msgid "Measurement"
+msgstr "Измерения"
+
+#: nodepkg/settings/SettingsForm.js:119
+msgid "Length units"
+msgstr "Единицы длины"
+
+#: nodepkg/settings/SettingsForm.js:130
+msgid "Area units"
+msgstr "Единицы площади"
+
+#: nodepkg/settings/SettingsForm.js:141
+msgid "Degree format"
+msgstr "Формат градусов"
+
+#: nodepkg/settings/SettingsForm.js:155
+msgid "Measurement SRID"
+msgstr "Система координат для расчётов"
+
+#: nodepkg/settings/SettingsForm.js:165
+msgid "Address search"
+msgstr "Адресный поиск"
+
+#: nodepkg/settings/SettingsForm.js:178
+msgid "Enable"
+msgstr "Включить"
+
+#: nodepkg/settings/SettingsForm.js:192
+msgid "Limit by web map initial extent"
+msgstr "Ограничить начальным охватом карты"
+
+#: nodepkg/settings/SettingsForm.js:202
+msgid "Provider"
+msgstr "Провайдер"
+
+#: nodepkg/settings/SettingsForm.js:214
+msgid "Limit search results to countries"
+msgstr "Ограничить поиск странами"
+
+#: nodepkg/settings/SettingsForm.js:224
+msgid "Invalid countries. For example ru or gb,de"
+msgstr "Неверные значения. Например, ru или gb,de"
+
+#: nodepkg/settings/SettingsForm.js:237
+msgid "Yandex.Maps API Geocoder Key"
+msgstr "Ключ геокодера API Яндекс.Карт"
+
+#: nodepkg/settings/select-options.js:5
+msgid "Meters"
+msgstr "Метры"
+
+#: nodepkg/settings/select-options.js:9
+msgid "Kilometers"
+msgstr "Километры"
+
+#: nodepkg/settings/select-options.js:13
+msgid "Meters/kilometers (auto)"
+msgstr "Метры/километры (авто)"
+
+#: nodepkg/settings/select-options.js:17
+msgid "Feet"
+msgstr "Футы"
+
+#: nodepkg/settings/select-options.js:21
+msgid "Miles"
+msgstr "Мили"
+
+#: nodepkg/settings/select-options.js:25
+msgid "Feet/miles (auto)"
+msgstr "Футы/мили (авто)"
+
+#: nodepkg/settings/select-options.js:32
+msgid "Sq. meters"
+msgstr "Кв. метры"
+
+#: nodepkg/settings/select-options.js:36
+msgid "Sq. kilometers"
+msgstr "Кв. километры"
+
+#: nodepkg/settings/select-options.js:40
+msgid "Sq. meters/kilometers (auto)"
+msgstr "Кв. метры/километры (авто)"
+
+#: nodepkg/settings/select-options.js:44
+msgid "Hectares"
+msgstr "Гектары"
+
+#: nodepkg/settings/select-options.js:48
+msgid "Acres"
+msgstr "Акры"
+
+#: nodepkg/settings/select-options.js:52
+msgid "Sq. miles"
+msgstr "Кв. мили"
+
+#: nodepkg/settings/select-options.js:56
+msgid "Acres/sq. miles (auto)"
+msgstr "Акры/кв. мили (авто)"
+
+#: nodepkg/settings/select-options.js:60
+msgid "Sq. feet"
+msgstr "Кв. футы"
+
+#: nodepkg/settings/select-options.js:67
+msgid "Decimal degrees"
+msgstr "Десятичные градусы"
+
+#: nodepkg/settings/select-options.js:71
+msgid "Degrees, decimal minutes"
+msgstr "Градусы и десятичные минуты"
+
+#: nodepkg/settings/select-options.js:75
+msgid "Degrees, minutes, seconds"
+msgstr "Градусы, минуты, секунды"
+
+#: nodepkg/settings/select-options.js:82
+msgid "Nominatim (OSM)"
+msgstr "Nominatim (OSM)"
+
+#: nodepkg/settings/select-options.js:86
+msgid "Yandex.Maps API Geocoder"
+msgstr "Геокодер API Яндекс.Карт"
 
 #: template/invalid_origin.mako:4
 #, python-format
