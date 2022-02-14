@@ -60,7 +60,7 @@ export function ModelBrowse({
     useEffect(async () => {
         const resp = await route(model.collection).get(collectionOptions);
         const data = resp.filter(collectionFilter || (() => true));
-        setRows(data.map((x) => ({ ...x, key: x.id })));
+        setRows(data);
         setStatus(null);
     }, []);
 
@@ -256,6 +256,8 @@ export function ModelBrowse({
         >
             {selected.length ? SelectedControl() : TableControl()}
             <Table
+                rowKey="id"
+                showSorterTooltip={false}
                 rowSelection={{
                     type: "checkbox",
                     selectedRowKeys: selected,

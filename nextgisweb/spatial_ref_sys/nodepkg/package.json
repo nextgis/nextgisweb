@@ -1,5 +1,8 @@
 {
     "name": "@nextgisweb/spatial-ref-sys",
     "version": "0.0.0",
-    "type": "module"
+    "type": "module",
+    "dependencies": {
+        "lodash-es": "^4.17.21"
+    }
 }

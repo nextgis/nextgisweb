@@ -7,6 +7,7 @@ from .. import dynmenu as dm
 from .models import SRS
 from .util import _
 
+react_renderer = 'nextgisweb:gui/template/react_app.mako'
 
 def check_permission(request):
     """ To avoid interdependency of two components:
@@ -20,6 +21,7 @@ def catalog_browse(request):
     check_permission(request)
     return dict(
         title=_("Spatial reference system catalog"),
+        entrypoint="@nextgisweb/spatial-ref-sys/catalog-browse",
         dynmenu=request.env.pyramid.control_panel)
 
 
@@ -30,8 +32,8 @@ def catalog_import(request):
     item_url = catalog_url + '/srs/' + str(catalog_id)
     return dict(
         title=_("Spatial reference system") + ' #%d' % catalog_id,
-        item_url=item_url,
-        catalog_id=catalog_id,
+        entrypoint="@nextgisweb/spatial-ref-sys/catalog-import",
+        props=dict(url=item_url, id=catalog_id),
         dynmenu=request.env.pyramid.control_panel)
 
 
@@ -65,7 +67,7 @@ def srs_create_or_edit(request):
 
 
 def setup_pyramid(comp, config):
-    react_renderer = 'nextgisweb:gui/template/react_app.mako'
+    
     config.add_route('srs.browse', '/srs/', client=True) \
         .add_view(srs_browse, renderer=react_renderer)
     config.add_route('srs.create', '/srs/create', client=True) \
@@ -122,9 +124,9 @@ def setup_pyramid(comp, config):
         config.add_route(
             'srs.catalog',
             '/srs/catalog'
-        ).add_view(catalog_browse, renderer='nextgisweb:spatial_ref_sys/template/catalog_browse.mako')
+        ).add_view(catalog_browse, renderer=react_renderer)
 
         config.add_route(
             'srs.catalog.import',
             r'/srs/catalog/{id:\d+}', client=('id',)
-        ).add_view(catalog_import, renderer='nextgisweb:spatial_ref_sys/template/catalog_import.mako')
+        ).add_view(catalog_import, renderer=react_renderer)

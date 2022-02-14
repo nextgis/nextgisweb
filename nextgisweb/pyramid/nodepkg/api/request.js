@@ -46,6 +46,9 @@ export async function request(path, options) {
     try {
         response = await window.fetch(url, options);
     } catch (e) {
+        if (e.name === 'AbortError') {
+            throw e;
+        }
         throw new NetworksResponseError();
     }
 
