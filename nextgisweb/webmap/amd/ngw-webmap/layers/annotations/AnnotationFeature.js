@@ -48,12 +48,6 @@ define([
         },
 
         _buildFromAnnotationInfo: function (annotationInfo) {
-            const popup = new AnnotationsPopup(
-                this,
-                this._editable,
-                annotationInfo
-            );
-
             const geom = wkt.readGeometry(annotationInfo.geom);
             const feature = new ol.Feature({
                 geometry: geom,
@@ -66,12 +60,20 @@ define([
 
             feature.setProperties({
                 info: annotationInfo,
-                popup: popup,
                 annFeature: this,
             });
 
             this._feature = feature;
             this.calculateAccessType();
+
+            const popup = new AnnotationsPopup(
+                this,
+                this._editable,
+                annotationInfo
+            );
+            feature.setProperties({
+                popup: popup,
+            });
         },
 
         _buildFromFeature: function (feature) {
@@ -105,7 +107,9 @@ define([
         },
 
         getAnnotationInfo: function () {
-            return this._feature.get("info");
+            const feature = this.getFeature();
+            if (!feature) return null;
+            return feature.get("info");
         },
 
         getPopup: function () {
@@ -124,6 +128,26 @@ define([
 
         getAccessType: function () {
             return this._accessType;
+        },
+
+        getAccessTypeTitle: function () {
+            const annotationInfo = this.getAnnotationInfo();
+            if (!annotationInfo) return null;
+
+            const accessType = this.getAccessType();
+            if (!accessType) return null;
+
+            let title;
+            if (accessType === "public") {
+                title = i18n.gettext("Public annotation");
+            } else if (accessType === "own") {
+                title = i18n.gettext("My private annotation");
+            } else {
+                title =
+                    i18n.gettext(`Private annotation`) +
+                    ` (${annotationInfo.user})`;
+            }
+            return title;
         },
 
         updateGeometry: function (geometry) {
@@ -198,9 +222,12 @@ define([
             this.getFeature().setStyle(visible ? this._style : hideStyle);
             this._visible = visible;
         },
-        
+
         togglePopup: function (visible, map) {
-            if ((visible && this._popupVisible) || (!visible && !this._popupVisible))
+            if (
+                (visible && this._popupVisible) ||
+                (!visible && !this._popupVisible)
+            )
                 return false;
 
             const popup = this.getPopup();
@@ -210,6 +237,6 @@ define([
                 popup.remove();
             }
             this._popupVisible = visible;
-        }
+        },
     });
 });

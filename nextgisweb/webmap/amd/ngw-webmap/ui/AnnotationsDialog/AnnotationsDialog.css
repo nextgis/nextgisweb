@@ -1,34 +1,34 @@
-.adt-table-horiz .dijitButtonNode.dijitArrowButton {
-  width: 10px;
+.annotation-dialog .annotation-access-type {
+  padding: 1px 2px 1px 5px;
+  margin: 0 0 9px 0;
+  color: #818181;
+  text-align: left;
+  font-size: 12px;
 }
 
-i.select-color {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin-right: 5px;
+.annotation-dialog[data-access-type="empty"] .annotation-access-type {
+  display: none;
 }
 
-i.select-color.red {
-  background-color: #FF0000;
+.annotation-dialog[data-access-type="public"] .annotation-access-type {
+  border-left: #97e07e 8px solid;
+  border-bottom: #97e07e 1px solid;
+  border-top: #97e07e 1px solid;
+  border-right: #97e07e 1px solid;  
 }
 
-i.select-color.green {
-  background-color: #008000;
+.annotation-dialog[data-access-type="own"] .annotation-access-type {
+  border-left: #e8b3f8 8px solid;
+  border-bottom: #e8b3f8 1px solid;
+  border-top: #e8b3f8 1px solid;
+  border-right: #e8b3f8 1px solid;  
 }
 
-i.select-color.blue {
-  background-color: #0000FF;
+.annotation-dialog[data-access-type="private"] .annotation-access-type {
+  border-left: #f88f8f 8px solid;
+  border-bottom: #f88f8f 1px solid;
+  border-top: #f88f8f 1px solid;
+  border-right: #f88f8f 1px solid;  
 }
 
-i.select-color.yellow {
-  background-color: #FFFF00;
-}
 
-i.select-color.orange {
-  background-color: #FFA500;
-}
-
-i.select-color.black {
-  background-color: #000000;
-}

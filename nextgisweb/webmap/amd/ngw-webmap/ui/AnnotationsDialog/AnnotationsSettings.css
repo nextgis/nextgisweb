@@ -29,7 +29,7 @@
   float: right;
 }
 
-.annotations-settings table .row .controls.circle-size .dijitTextBox  {
+.annotations-settings table .row .controls.circle-size .dijitTextBox {
   width: 100%;
 }
 
@@ -38,4 +38,3 @@ div.dijitPopup.Popup {
   margin-top: 1px;
   background-color: #ededed;
 }
-

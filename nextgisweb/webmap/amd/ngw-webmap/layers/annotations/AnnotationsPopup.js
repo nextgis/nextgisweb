@@ -49,7 +49,7 @@ define([
             this._annFeature = annotationFeature;
 
             const customCssClass = annotationInfo
-                ? `annotation ${this._getAccessCssClass(annotationInfo)}`
+                ? `annotation ${this._getAccessCssClass(annotationFeature)}`
                 : "annotation";
 
             this._popup = new olPopup({
@@ -58,39 +58,27 @@ define([
                 customCssClass,
             });
 
-            if (annotationInfo) this._setTitle(annotationInfo);
+            if (annotationInfo) this._setTitle(annotationFeature);
 
             this._popup.annFeature = annotationFeature;
             this._popup.cloneOlPopup = this.cloneOlPopup;
         },
 
-        _getAccessCssClass: function (annotationInfo) {
-            if (!annotationInfo) return "";
-            if (annotationInfo.public) return "public";
-            if (annotationInfo.own) return "own";
-            return "private";
+        _getAccessCssClass: function (annFeature) {
+            return annFeature.getAccessType();
         },
 
-        _setAccessCssClass: function (annotationInfo) {
+        _setAccessCssClass: function (annFeature) {
             if (!this._popup) return;
 
             const elPopup = this._popup.element.childNodes[0];
-            const cssClass = this._getAccessCssClass(annotationInfo);
+            const cssClass = this._getAccessCssClass(annFeature);
             domClass.add(elPopup, cssClass);
         },
 
-        _setTitle: function (annotationInfo) {
-            let title;
-            if (annotationInfo.public) {
-                title = i18n.gettext("Public annotation");
-            } else if (annotationInfo.own) {
-                title = i18n.gettext("My private annotation");
-            } else {
-                title =
-                    i18n.gettext(`Private annotation`) +
-                    ` (${annotationInfo.user})`;
-            }
-            this._popup.element.setAttribute("title", title);
+        _setTitle: function (annotationFeature) {
+            const accessTypeTitle = annotationFeature.getAccessTypeTitle();
+            this._popup.element.setAttribute("title", accessTypeTitle);
         },
 
         addToMap: function (map) {
@@ -178,9 +166,8 @@ define([
             const accessType = this._annFeature.getAccessType();
 
             if (feature && accessType) {
-                const annotationInfo = this._annFeature.getAnnotationInfo();
-                this._setTitle(annotationInfo);
-                this._setAccessCssClass(annotationInfo);
+                this._setTitle(this._annFeature);
+                this._setAccessCssClass(this._annFeature);
             }
 
             if (!this._contentWidget) return false;
