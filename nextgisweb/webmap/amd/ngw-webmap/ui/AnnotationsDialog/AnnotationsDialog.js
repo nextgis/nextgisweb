@@ -3,10 +3,13 @@ define([
     "dojo/_base/lang",
     "dojo/dom-construct",
     "dojo/dom-style",
+    "dojo/dom-attr",
     "dojo/Deferred",
     "dojo/on",
     "dojo/Evented",
     "dojo/store/Memory",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
     "dijit/Dialog",
     "dijit/form/Button",
     "dijit/layout/ContentPane",
@@ -31,10 +34,13 @@ define([
     lang,
     domConstruct,
     domStyle,
+    domAttr,
     Deferred,
     on,
     Evented,
     Memory,
+    _WidgetBase,
+    _TemplatedMixin,
     Dialog,
     Button,
     ContentPane,
@@ -54,6 +60,11 @@ define([
     i18n,
     AnnotationsSettings
 ) {
+    const AccessTypeSection = declare([_WidgetBase, _TemplatedMixin], {
+        templateString:
+            '<div class="annotation-access-type" data-dojo-attach-point="accessContainer"></div>',
+    });
+
     return declare([Dialog, Evented], {
         _deferred: null,
         _annFeature: null,
@@ -61,10 +72,15 @@ define([
         constructor: function (options) {
             declare.safeMixin(this, options);
             this.style = "width: 400px";
+            this.class = "annotation-dialog";
         },
 
         postCreate: function () {
             this.inherited(arguments);
+
+            this.accessTypeSection = new AccessTypeSection().placeAt(
+                this.containerNode
+            );
 
             this.editor = new Editor({
                 extraPlugins: [
@@ -89,8 +105,7 @@ define([
                     "|",
                     "createLink",
                 ],
-                style:
-                    'font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 14px;',
+                style: 'font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 14px;',
             }).placeAt(this.containerNode);
 
             this.annotationsSettings = new AnnotationsSettings().placeAt(
@@ -104,7 +119,7 @@ define([
                 },
                 this.containerNode
             );
-            
+
             this._buildCreateAnnotationBtn();
 
             this.btnSave = new Button({
@@ -126,7 +141,7 @@ define([
 
             this.onCancel = lang.hitch(this, this.onUndo);
         },
-        
+
         _buildCreateAnnotationBtn: function () {
             const menu = new DropDownMenu({ style: "display: none;" });
             const menuItemPublic = new MenuItem({
@@ -149,16 +164,16 @@ define([
 
             this.btnCreate = new DropDownButton({
                 label: i18n.gettext("Create"),
-                dropDown: menu
+                dropDown: menu,
             }).placeAt(this.actionBar);
         },
-        
+
         onCreate: function (isPublic) {
             const newData = this._updateFeatureFromDialog();
             newData.public = isPublic;
             this.save(newData);
         },
-        
+
         onSave: function () {
             const newData = this._updateFeatureFromDialog();
             this.save(newData);
@@ -260,6 +275,8 @@ define([
                 domStyle.set(this.btnSave.domNode, "display", "none");
             }
 
+            this._updateAccessSection(annFeature);
+
             this.show();
 
             this._annFeature = annFeature;
@@ -269,6 +286,14 @@ define([
 
         showLastData: function () {
             this.show();
+        },
+
+        _updateAccessSection: function (annFeature) {
+            const accessType = annFeature.getAccessType();
+
+            this.accessTypeSection.accessContainer.innerHTML =
+                annFeature.getAccessTypeTitle();
+            domAttr.set(this.domNode, "data-access-type", accessType || "empty");
         },
     });
 });
