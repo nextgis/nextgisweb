@@ -13,12 +13,11 @@ Changes
 - A lot of improvements for the control panel: filters, batch operations, etc.
 - Improved handling of vector layer sources with ``id`` and ``geom`` fields.
 - Reprojection into different coordinate systems in WMS and WFS services.
-- Ability to use field display names (aliases) while exporting vector layer.
+- Export feature layer using field display names (aliases) instead of keynames.
 - Support for CORS domain wildcards (like ``https://*.csb.app``).
 - WFS client and server simple filters support.
 - Improved handling of coordinates outside boundaries of coordinate systems.
 - Support for 25D geometries in PostGIS layers.
-- Export feature layer using field display names instead of keynames.
 - Ability to filter NULL values in feature REST API.
 - Unknown fields in REST API filters return an error.
 - Improved handling of external services errors and timeouts.
