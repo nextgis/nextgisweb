@@ -253,6 +253,7 @@ define([
                     annFeature.updateAnnotationInfo(annotationInfo);
                     if (this._messagesVisible)
                         this._annotationsLayer.showPopup(annFeature);
+                    this._annotationsLayer.redrawFilter();
                 } catch (err) {
                     new ErrorDialog(err).show();
                     dialog.showLastData();
@@ -270,6 +271,7 @@ define([
                 try {
                     const annotationInfo = await this._updateAnnotation(annFeature, newAnnotationInfo);
                     annFeature.updateAnnotationInfo(annotationInfo);
+                    this._annotationsLayer.redrawFilter();
                 } catch (err) {
                     new ErrorDialog(err).show();
                     dialog.showLastData();

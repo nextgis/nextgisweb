@@ -54,7 +54,7 @@ define([
             _display: null,
             _mapStates: null,
             _enableEdit: false,
-            _chbAddAnnotations: null,
+            _chbEditAnnotations: null,
 
             constructor: function (options) {
                 declare.safeMixin(this, options);
@@ -99,7 +99,6 @@ define([
                 );
 
                 if (!showAnnLayer) {
-                    this.toggleAccessTypesChb(false);
                     this.contentWidget.chbAnnShowMessages.set("disabled", true);
                 }
 
@@ -126,8 +125,8 @@ define([
                             this._mapStates.getActiveState() ===
                                 ADD_ANNOTATION_STATE_KEY
                         ) {
-                            if (this._chbAddAnnotations.get("checked"))
-                                this._chbAddAnnotations.set("checked", false);
+                            if (this._chbEditAnnotations.get("checked"))
+                                this._chbEditAnnotations.set("checked", false);
                         }
                     }
                 );
@@ -142,7 +141,6 @@ define([
                             !value
                         );
                         deactivateAnnotationState(value);
-                        this.toggleAccessTypesChb(value);
                     })
                 );
 
@@ -154,8 +152,8 @@ define([
                     }
                 );
 
-                if (this._chbAddAnnotations && this._enableEdit) {
-                    this._chbAddAnnotations.on(
+                if (this._chbEditAnnotations && this._enableEdit) {
+                    this._chbEditAnnotations.on(
                         "change",
                         lang.hitch(this, function (value) {
                             if (value) {
@@ -165,7 +163,6 @@ define([
                                 topic.publish(
                                     "webmap/annotations/add/activate"
                                 );
-                                this.setAccessTypesForEdit();
                             } else {
                                 this._mapStates.deactivateState(
                                     ADD_ANNOTATION_STATE_KEY
@@ -173,50 +170,22 @@ define([
                                 topic.publish(
                                     "webmap/annotations/add/deactivate"
                                 );
-                                this.enableAccessTypesAfterEdit();
                             }
                         })
                     );
                 }
             },
 
-            setAccessTypesForEdit: function () {
-                this.contentWidget.chbShowPublicAnn
-                    .set("checked", true)
-                    .set("disabled", true);
-                this.contentWidget.chbShowOwnPrivateAnn
-                    .set("checked", true)
-                    .set("disabled", true);
-                this._updateAccessTypeFilters();
-            },
-
-            enableAccessTypesAfterEdit: function () {
-                this.toggleAccessTypesChb(true);
-                this._updateAccessTypeFilters();
-            },
-
-            toggleAccessTypesChb: function (enabled) {
-                const disabled = !enabled;
-                this.contentWidget.chbShowPublicAnn.set("disabled", disabled);
-                this.contentWidget.chbShowOwnPrivateAnn.set(
-                    "disabled",
-                    disabled
-                );
-                if (this._chbShowOtherPrivateAnn) {
-                    this._chbShowOtherPrivateAnn.set("disabled", disabled);
-                }
-            },
-
             _buildAnnotationEditTool: function () {
                 if (!this._display.config.annotations.scope.write) return false;
 
-                this._chbAddAnnotations = new CheckBox({
+                this._chbEditAnnotations = new CheckBox({
                     name: "chbAddAnnotations",
                     title: i18n.gettext("Edit annotations"),
                     checked: false,
                 });
                 this.contentWidget.tcAnnotations.addChild(
-                    this._chbAddAnnotations
+                    this._chbEditAnnotations
                 );
 
                 this._mapStates.addState(ADD_ANNOTATION_STATE_KEY);

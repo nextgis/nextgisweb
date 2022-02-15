@@ -67,7 +67,7 @@ define([
                 this
             );
 
-            this.applyFilter();
+            this.redrawFilter();
         },
 
         getLayer: function () {
@@ -76,7 +76,7 @@ define([
 
         showPopups: function () {
             this._popupsVisible = true;
-            this.applyFilter(this._filter);
+            this.redrawFilter();
         },
 
         showPopup: function (annotationFeature) {
@@ -100,18 +100,23 @@ define([
         },
 
         _filter: null,
-        
+
         getFilter: function () {
             return this._filter;
         },
-        
+
         applyFilter: function (filter) {
-            if (filter) this._filter = filter;
+            this._filter = filter;
+            this.redrawFilter();
+        },
+
+        redrawFilter: function () {
+            const filter = this._filter;
 
             this._source.getFeatures().forEach((f) => {
                 const { annFeature } = f.getProperties();
                 const accessType = annFeature.getAccessType();
-                const visible = this._filter[accessType];
+                const visible = filter ? filter[accessType] : true;
                 annFeature.toggleVisible(visible);
                 annFeature.togglePopup(
                     this._popupsVisible ? visible : false,
