@@ -21,6 +21,6 @@ def get_recursive_values(webmap, item_type='layer', attr_value='layer_style_id',
                 iterate(item.children)
 
     iterate(root.children)
-    values.sort(key=lambda v: v[1])
+    values.sort(key=lambda v: v[1], reverse=True)
 
     return [v[0] for v in values]
