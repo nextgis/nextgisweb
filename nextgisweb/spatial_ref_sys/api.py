@@ -1,12 +1,11 @@
 import json
 
 import requests
-from pyproj import CRS
 from requests.exceptions import RequestException
 
 from ..core.exception import ValidationError, ExternalServiceError
 from ..env import env
-from ..lib.geometry import Geometry, Transformer, geom_calc as shp_geom_calc
+from ..lib.geometry import Geometry, Transformer, geom_area, geom_length
 from ..models import DBSession
 
 from .models import SRS
@@ -103,19 +102,20 @@ def geom_transform(request):
     return dict(geom=geom.wkt)
 
 
-def geom_calc(request, prop):
-    srs_from_id = request.json_body["srs"] if "srs" in request.json_body else None
-    srs_to = SRS.filter_by(id=int(request.matchdict["id"])).one()
-    geom = Geometry.from_wkt(request.json_body["geom"])
+def geom_calc(request, measure_fun):
+    srs_to = SRS.filter_by(id=int(request.matchdict['id'])).one()
+    srs_from_id = request.json_body.get('srs', srs_to.id)
 
-    crs_to = CRS.from_wkt(srs_to.wkt)
+    geom = Geometry.from_geojson(request.json_body['geom']) \
+        if request.json_body.get('geom_format') == 'geojson' \
+        else Geometry.from_wkt(request.json_body['geom'])
 
-    if srs_from_id and srs_from_id != srs_to.id:
-        srs_from = SRS.filter_by(id=int(srs_from_id)).one()
+    if srs_from_id != srs_to.id:
+        srs_from = SRS.filter_by(id=srs_from_id).one()
         transformer = Transformer(srs_from.wkt, srs_to.wkt)
         geom = transformer.transform(geom)
 
-    value = shp_geom_calc(geom.shape, crs_to, prop, srs_to.id)
+    value = measure_fun(geom, srs_to.wkt)
     return dict(value=value)
 
 
@@ -223,12 +223,12 @@ def setup_pyramid(comp, config):
     config.add_route(
         "spatial_ref_sys.geom_length",
         r"/api/component/spatial_ref_sys/{id:\d+}/geom_length"
-    ).add_view(lambda r: geom_calc(r, "length"), request_method="POST", renderer="json")
+    ).add_view(lambda r: geom_calc(r, geom_length), request_method="POST", renderer="json")
 
     config.add_route(
         "spatial_ref_sys.geom_area",
         r"/api/component/spatial_ref_sys/{id:\d+}/geom_area"
-    ).add_view(lambda r: geom_calc(r, "area"), request_method="POST", renderer="json")
+    ).add_view(lambda r: geom_calc(r, geom_area), request_method="POST", renderer="json")
 
     config.add_route("spatial_ref_sys.item", r"/api/component/spatial_ref_sys/{id:\d+}")\
         .add_view(iget, request_method="GET", renderer="json")\

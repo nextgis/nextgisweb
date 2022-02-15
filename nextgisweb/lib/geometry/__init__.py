@@ -162,14 +162,25 @@ class Transformer(object):
             return Geometry.from_shape(shape)
 
 
-def geom_calc(geom, crs, prop, srid):
+def crs_unit_factor(crs):
+    return crs.axis_info[0].unit_conversion_factor if len(crs.axis_info) > 0 else 1.0
 
-    def factor():
-        return crs.axis_info[0].unit_conversion_factor if len(crs.axis_info) > 0 else 1.0
 
-    if prop == 'length':
-        return crs.get_geod().geometry_length(geom) \
-            if crs.is_geographic else geom.length * factor()
-    elif prop == 'area':
-        return crs.get_geod().geometry_area_perimeter(geom)[0] \
-            if crs.is_geographic else geom.area * factor()**2
+def geom_length(geom, crs_wkt):
+    shape = geom.shape
+    crs = CRS.from_wkt(crs_wkt)
+
+    if crs.is_geographic:
+        return crs.get_geod().geometry_length(shape)
+    else:
+        return shape.length * crs_unit_factor(crs)
+
+
+def geom_area(geom, crs_wkt):
+    shape = geom.shape
+    crs = CRS.from_wkt(crs_wkt)
+
+    if crs.is_geographic:
+        return crs.get_geod().geometry_area_perimeter(shape)[0]
+    else:
+        return shape.area * crs_unit_factor(crs)**2

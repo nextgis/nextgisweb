@@ -190,9 +190,8 @@ define([
                 return true;
             }
 
-            var units = settings.units;
             var mapProj = tool.display.map.olMap.getView().getProjection();
-            var mapSRID = mapProj.getCode().match(/EPSG\:(\d+)/)[1];
+            var mapSRID = parseInt(mapProj.getCode().match(/EPSG\:(\d+)/)[1], 10);
 
             var listener;
             var DELAY = 200; // milliseconds
@@ -217,7 +216,10 @@ define([
                         xhr(measure_url({id: settings.measurement_srid}), {
                             method: "POST",
                             data: JSON.stringify({
-                                geom: new ol.format.WKT().writeGeometry(geom),
+                                geom: new ol.format.GeoJSON().writeGeometryObject(geom, {
+                                    rightHanded: true,
+                                }),
+                                geom_format: 'geojson',
                                 srs: mapSRID
                             }),
                             headers: {'Content-Type': 'application/json'},
