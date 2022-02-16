@@ -6,7 +6,7 @@ from pyramid.renderers import render_to_response
 from .adapter import WebMapAdapter
 from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
-from .util import get_recursive_values, _
+from .util import webmap_items_to_tms_ids_list, _
 from ..dynmenu import DynItem, Label, Link
 from ..resource import Resource, Widget, resource_factory, DataScope
 
@@ -252,4 +252,4 @@ def setup_pyramid(comp, config):
         key='description',
         title=_("External access"),
         template='nextgisweb:webmap/template/section_api_webmap.mako',
-        is_applicable=lambda obj: obj.cls == 'webmap' and get_recursive_values(obj))
+        is_applicable=lambda obj: obj.cls == 'webmap' and webmap_items_to_tms_ids_list(obj))

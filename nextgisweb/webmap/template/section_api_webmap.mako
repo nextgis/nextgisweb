@@ -1,4 +1,4 @@
-<%! from nextgisweb.webmap.util import get_recursive_values, _ %>
+<%! from nextgisweb.webmap.util import webmap_items_to_tms_ids_list, _ %>
 
 <%inherit file="nextgisweb:resource/template/section_api.mako"/>
 
@@ -23,7 +23,7 @@
         </div>
     </div>
     <div class="row-input-info">
-        <% layers_ids = get_recursive_values(obj) %>
+        <% layers_ids = webmap_items_to_tms_ids_list(obj) %>
         <% layers_ids_str = ','.join(str(id) for id in layers_ids) %>
         <% url_webmap_tms = request.route_url('render.tile') + '?resource=' + layers_ids_str + '&x={x}&y={y}&z={z}' %>
         <div class="text" data-value="${url_webmap_tms}">

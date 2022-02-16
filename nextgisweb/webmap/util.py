@@ -4,23 +4,25 @@ COMP_ID = 'webmap'
 _ = trstring_factory(COMP_ID)
 
 
-def get_recursive_values(webmap, item_type='layer', attr_value='layer_style_id', attr_sort='position'):
+def webmap_items_to_tms_ids_list(webmap):
     if not webmap:
         raise TypeError
 
     root = webmap.root_item
-    values = []
+    webmap_items = []
 
     def iterate(children):
         for item in children:
-            if item.item_type == item_type:
-                if hasattr(item, attr_value) and hasattr(item, attr_sort):
-                    values.append([getattr(item, attr_value), getattr(item, attr_sort)])
-
-            if hasattr(item, 'children'):
+            if item.item_type == 'layer' and item.layer_style_id:
+                webmap_items.append(item)
+            if item.children:
                 iterate(item.children)
 
     iterate(root.children)
-    values.sort(key=lambda v: v[1], reverse=True)
 
-    return [v[0] for v in values]
+    if webmap.draw_order_enabled:
+        webmap_items.sort(key=lambda i: i.draw_order_position)
+
+    webmap_items.reverse()
+
+    return [i.layer_style_id for i in webmap_items]

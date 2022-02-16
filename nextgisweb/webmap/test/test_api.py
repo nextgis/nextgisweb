@@ -6,7 +6,7 @@ from nextgisweb.models import DBSession
 from nextgisweb.webmap.model import WebMap, WebMapItem
 
 ANNOTATION_SAMPLE = dict(
-    description='1', geom='POINT (0 0)', public=True,
+    description='1', geom='POINT (0 0)', public=True, own=False,
     style=dict(string='string', int=0, bool=True, none=None)
 )
 
@@ -44,6 +44,5 @@ def test_annotation_post_get(webmap, ngw_webtest_app, ngw_auth_administrator):
 
     adata = ngw_webtest_app.get('/api/resource/%d/annotation/%d' % (webmap.id, aid)).json
     del adata['id']
-    del adata['own']
 
     assert adata == ANNOTATION_SAMPLE

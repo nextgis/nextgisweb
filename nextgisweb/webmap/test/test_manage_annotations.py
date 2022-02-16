@@ -9,7 +9,7 @@ from nextgisweb.resource import ACLRule, ResourceGroup
 from nextgisweb.resource.model import ResourceACLRule
 from nextgisweb.webmap.model import WebMap, WebMapItem, WebMapAnnotation
 
-TEST_USER_KEYNAME = 'test_user'  # % round(time.time() * 1000)
+TEST_USER_KEYNAME = 'test_user'
 
 
 def make_annotation_json(public: bool):
