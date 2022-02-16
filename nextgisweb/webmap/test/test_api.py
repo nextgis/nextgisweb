@@ -44,5 +44,6 @@ def test_annotation_post_get(webmap, ngw_webtest_app, ngw_auth_administrator):
 
     adata = ngw_webtest_app.get('/api/resource/%d/annotation/%d' % (webmap.id, aid)).json
     del adata['id']
+    del adata['own']
 
     assert adata == ANNOTATION_SAMPLE
