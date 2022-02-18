@@ -36,6 +36,7 @@ define([
     "ngw-webmap/MapToolbar",
     "ngw-webmap/controls/InitialExtent",
     "ngw-webmap/controls/InfoScale",
+    "ngw-webmap/controls/MyLocation",
     "./tool/Base",
     "./tool/Zoom",
     "./tool/Measure",
@@ -105,6 +106,7 @@ define([
     MapToolbar,
     InitialExtent,
     InfoScale,
+    MyLocation,
     ToolBase,
     ToolZoom,
     ToolMeasure,
@@ -747,6 +749,11 @@ define([
                     display: widget,
                     target: widget.leftTopControlPane,
                     tipLabel: i18n.gettext("Initial extent")
+                }),
+                new MyLocation({
+                    display: widget,
+                    target: widget.leftTopControlPane,
+                    tipLabel: i18n.gettext("Locate me")
                 }),
                 new ol.control.Rotate({
                     tipLabel: i18n.gettext("Reset rotation"),

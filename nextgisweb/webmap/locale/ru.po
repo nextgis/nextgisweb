@@ -22,7 +22,7 @@ msgstr "Открыть"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:215 model.py:34
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:184 model.py:34
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
@@ -42,54 +42,58 @@ msgstr "Просмотр встроенной веб-карты"
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-webmap/Display.js:212 amd/ngw-webmap/Display.js:1012
+#: amd/ngw-webmap/Display.js:214 amd/ngw-webmap/Display.js:1019
 #: amd/ngw-webmap/ItemWidget.js:243
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:218 amd/ngw-webmap/Display.js:350
+#: amd/ngw-webmap/Display.js:220 amd/ngw-webmap/Display.js:352
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:224 amd/ngw-webmap/Display.js:435
+#: amd/ngw-webmap/Display.js:226 amd/ngw-webmap/Display.js:437
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:230
+#: amd/ngw-webmap/Display.js:232
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:369 amd/ngw-webmap/Display.js:376
+#: amd/ngw-webmap/Display.js:371 amd/ngw-webmap/Display.js:378
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:399 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:401 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:536 amd/ngw-webmap/Display.js:546
+#: amd/ngw-webmap/Display.js:538 amd/ngw-webmap/Display.js:548
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:728 amd/ngw-webmap/tool/Zoom.js:18
+#: amd/ngw-webmap/Display.js:730 amd/ngw-webmap/tool/Zoom.js:18
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:481
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:729 amd/ngw-webmap/tool/Zoom.js:21
+#: amd/ngw-webmap/Display.js:731 amd/ngw-webmap/tool/Zoom.js:21
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:482
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:733 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:486
+#: amd/ngw-webmap/Display.js:735 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:486
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:749
+#: amd/ngw-webmap/Display.js:751
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:752 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:495
+#: amd/ngw-webmap/Display.js:756
+msgid "Locate me"
+msgstr "Определить мое местоположение"
+
+#: amd/ngw-webmap/Display.js:759 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:495
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
@@ -106,7 +110,7 @@ msgid "Use on the map"
 msgstr "Учитывать на карте"
 
 #: amd/ngw-webmap/ItemWidget.js:148
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:111
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:126
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
 #: nodepkg/settings/SettingsForm.js:260
 msgid "Save"
@@ -116,26 +120,30 @@ msgstr "Сохранить"
 msgid "Add group"
 msgstr "Добавить группу"
 
+#: amd/ngw-webmap/controls/MyLocation.js:113
+msgid "Your location could not be determined"
+msgstr "Определить местоположение не удалось"
+
 #: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:25
 msgid "Your annotation text"
 msgstr "Ваш текст аннотации"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.hbs:7
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:252
-msgid "Edit annotation"
-msgstr "Редактировать аннотацию"
-
-#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.js:85
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:142
 msgid "Public annotation"
 msgstr "Публичная аннотация"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.js:87
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:144
 msgid "My private annotation"
 msgstr "Моя приватная аннотация"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.js:90
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:147
 msgid "Private annotation"
 msgstr "Приватная аннотация"
+
+#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.hbs:7
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:267
+msgid "Edit annotation"
+msgstr "Редактировать аннотацию"
 
 #: amd/ngw-webmap/plugin/FeatureLayer.js:59
 msgid "Go to"
@@ -302,7 +310,7 @@ msgstr "га"
 msgid "ac"
 msgstr "акр"
 
-#: amd/ngw-webmap/tool/Measure.js:266
+#: amd/ngw-webmap/tool/Measure.js:268
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 
@@ -330,28 +338,28 @@ msgstr "Удалить объекты"
 msgid "Modify features"
 msgstr "Изменить объекты"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:116
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:131
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:53
 msgid "Cancel"
 msgstr "Отменить"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:121
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:136
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:133
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:148
 msgid "Create as public"
 msgstr "Создать как публичную"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:142
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:157
 msgid "Create as private"
 msgstr "Создать как приватную"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:151
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:166
 msgid "Create"
 msgstr "Создать"
 
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:257
+#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:272
 msgid "Create annotation"
 msgstr "Создать аннотацию"
 
@@ -418,7 +426,7 @@ msgstr "Публичные аннотации"
 msgid "My private annotations"
 msgstr "Мои приватные аннотации"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:251
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:220
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
