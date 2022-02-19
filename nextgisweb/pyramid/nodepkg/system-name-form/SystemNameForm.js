@@ -1,7 +1,6 @@
-import { SaveOutlined } from "@ant-design/icons";
-import { Button, Input, Row, Col } from "@nextgisweb/gui/antd";
+import { Input, Row, Col } from "@nextgisweb/gui/antd";
+import { SaveButton } from "@nextgisweb/gui/component";
 import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!";
 import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
 import { useEffect, useState } from "react";
 
@@ -43,14 +42,7 @@ export function SystemNameForm() {
                 />
             </Col>
             <Col flex="none">
-                <Button
-                    type="primary"
-                    loading={loading}
-                    icon={<SaveOutlined />}
-                    onClick={saveSystemName}
-                >
-                    {i18n.gettext("Save")}
-                </Button>
+                <SaveButton loading={loading} onClick={saveSystemName} />
             </Col>
         </Row>
     );
