@@ -4,6 +4,7 @@ import {
     Divider,
     Form,
     Input,
+    InputNumber,
     Space,
     Table,
     Tooltip,
@@ -139,28 +140,28 @@ export function CatalogBrowse() {
                 <Divider type="vertical" />
             </Form.Item>
             <Form.Item>
-                <Input
+                <InputNumber
                     style={{ maxWidth: "10em" }}
                     placeholder={i18n.gettext("Latitude")}
                     value={lat}
                     type="number"
                     onChange={(e) => {
-                        setLat(e.target.value);
+                        setLat(e);
                     }}
-                    suffix="°"
+                    addonAfter="°"
                     allowClear
                 />
             </Form.Item>
             <Form.Item>
-                <Input
+                <InputNumber
                     style={{ maxWidth: "10em" }}
                     placeholder={i18n.gettext("Longitude")}
                     value={lon}
                     type="number"
                     onChange={(e) => {
-                        setLon(e.target.value);
+                        setLon(e);
                     }}
-                    suffix="°"
+                    addonAfter="°"
                     allowClear
                 />
             </Form.Item>

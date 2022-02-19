@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types";
-import { Fragment, useEffect } from "react";
-import { Checkbox, Form, Input } from "@nextgisweb/gui/antd";
+import { Fragment } from "react";
+import { Checkbox, Form, Input, InputNumber } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
 
 export function FieldsForm(props) {
@@ -79,6 +79,8 @@ function getInputType(widget, props) {
             return <Input.Password {...props} />;
         } else if (widget === "textarea") {
             return <Input.TextArea {...props} />;
+        } else if (widget === "number") {
+            return <InputNumber type="number" {...props} />;
         }
     }
     return <Input {...props} />;
