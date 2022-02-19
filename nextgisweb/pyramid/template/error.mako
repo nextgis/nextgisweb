@@ -6,27 +6,32 @@ from nextgisweb.pyramid.util import _
 from nextgisweb.pyramid.exception import json_error
 %>
 
-<div id="error-card"></div>
+<%def name="title()">
+    ${tr(error_title)}
+</%def>
+
+<% system_name = request.env.core.system_full_name() %>
+
+<%include
+    file="nextgisweb:pyramid/template/header.mako"
+    args="title=system_name, hide_resource_filter=True"
+/>
+
+<div style="position: absolute; top: 100px; bottom: 100px; right: 0px;  width: 100%">
+    <div style="display: flex; justify-content: center; align-items: center; height: 100%">
+        <div id="root"></div>
+    <div>
+</div>
 
 <script type="text/javascript">
     require([
-        "ngw-pyramid/ErrorCard/ErrorCard",
-        "@nextgisweb/pyramid/i18n!pyramid",
-        "dojo/domReady!"
-    ], function (
-        ErrorCard,
-        i18n
-    ) {
-        var error = ${json.dumps(json_error(request, err_info, exc, exc_info, debug=debug)) | n};
-        var errorCard = new ErrorCard({
-            error: error,
-            errorTitle: error.title,
-            message: error.message,
-            detail: error.detail,
-            mainActionText: i18n.gettext('Back to home'),
-            mainActionUrl: '/'
-        }).placeAt('error-card');
-
-        errorCard.startup();
+        '@nextgisweb/gui/error',
+        "@nextgisweb/gui/react-app",
+    ], function (errorModule, reactApp) {
+        var props = ${ dict(error=error_json) | json.dumps, n };
+        reactApp.default(
+            errorModule.ErrorPage, props,
+            document.getElementById('root')
+        );
     });
 </script>

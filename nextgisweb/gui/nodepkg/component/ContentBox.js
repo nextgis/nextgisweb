@@ -1,3 +1,7 @@
-export function ContentBox({ children }) {
-    return <div className="content-box">{children}</div>;
+export function ContentBox({ children, ...restProps }) {
+    return (
+        <div className="content-box" {...restProps}>
+            {children}
+        </div>
+    );
 }

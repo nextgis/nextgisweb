@@ -176,18 +176,6 @@ msgstr ""
 msgid "Show details"
 msgstr "Подробнее"
 
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:37
-msgid "Technical information"
-msgstr "Техническая информация"
-
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:39
-msgid "Contact support"
-msgstr "Написать в поддержку"
-
-#: amd/ngw-pyramid/ErrorCard/ErrorCard.js:41
-msgid "Back to home"
-msgstr "На главную"
-
 #: amd/ngw-pyramid/ErrorDialog/ErrorDialog.js:35 nodepkg/api/error.js:18
 msgid "Network error"
 msgstr "Сетевая ошибка"

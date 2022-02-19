@@ -137,6 +137,8 @@ def cors_get(request):
 def cors_put(request):
     request.require_administrator()
 
+    raise HTTPBadRequest("Invalid key '%s' value!")
+
     body = request.json_body
     for k, v in body.items():
         if k == 'allow_origin':

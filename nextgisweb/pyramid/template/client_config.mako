@@ -41,6 +41,7 @@
         "aliases": [
             ['ngw/route', 'ngw-pyramid/route'],
             ['openlayers/ol', 'dist/external-ol/ol'],
+            ['ngw-pyramid/ErrorDialog/ErrorDialog', 'ngw-pyramid/ErrorDialog'],
             # Ready for removal
             ['ngw-pyramid/i18n', '@nextgisweb/pyramid/i18n'],
             ['ngw/dgrid/css', 'ngw-pyramid/nop'],

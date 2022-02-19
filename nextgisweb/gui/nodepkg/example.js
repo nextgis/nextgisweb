@@ -9,8 +9,9 @@ import {
     Select,
     Space,
 } from "./antd";
-
+import { errorModal } from "@nextgisweb/gui/error";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
+import { request } from "@nextgisweb/pyramid/api";
 
 export default function ExampleApplication() {
     return (
@@ -21,16 +22,26 @@ export default function ExampleApplication() {
                 <Button type="primary">Primary</Button>
                 <Button type="secondary">Default</Button>
                 <Button type="dashed">Dashed</Button>
-                <Button type="secondary" disabled>Disabled</Button>
+                <Button type="secondary" disabled>
+                    Disabled
+                </Button>
             </Space>
 
             <h2>Danger buttons</h2>
 
             <Space>
-                <Button type="primary" danger>Primary</Button>
-                <Button type="secondary" danger>Default</Button>
-                <Button type="dashed" danger>Dashed</Button>
-                <Button type="secondary" danger disabled>Disabled</Button>
+                <Button type="primary" danger>
+                    Primary
+                </Button>
+                <Button type="secondary" danger>
+                    Default
+                </Button>
+                <Button type="dashed" danger>
+                    Dashed
+                </Button>
+                <Button type="secondary" danger disabled>
+                    Disabled
+                </Button>
             </Space>
 
             <h2>Form</h2>
@@ -71,6 +82,14 @@ export default function ExampleApplication() {
                 <Calendar fullscreen={false} />
             </div>
 
+            <h2>Errors</h2>
+
+            <Button
+                type="primary"
+                onClick={() => request("/api/not-found").catch(errorModal)}
+            >
+                Not found
+            </Button>
         </ConfigProvider>
     );
 }

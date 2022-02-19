@@ -1,10 +1,34 @@
-#: nodepkg/example.js:66
+#: nodepkg/example.js:77
 msgid "Internationalization test"
 msgstr "Тест интернационализации"
 
 #: nodepkg/component/SaveButton.js:9 nodepkg/model-form/ModelForm.js:12
 msgid "Save"
 msgstr "Сохранить"
+
+#: nodepkg/error/index.js:37
+msgid "Unexpected error"
+msgstr ""
+
+#: nodepkg/error/index.js:41
+msgid "Something went wrong."
+msgstr ""
+
+#: nodepkg/error/shared.js:33
+msgid "Technical information"
+msgstr "Техническая информация"
+
+#: nodepkg/error/shared.js:42
+msgid "Contact support"
+msgstr "Написать в поддержку"
+
+#: nodepkg/error/shared.js:46
+msgid "OK"
+msgstr ""
+
+#: nodepkg/error/shared.js:50
+msgid "Back to home"
+msgstr "На главную"
 
 #: nodepkg/fields-form/FieldsForm.js:54
 msgid "This value is required"
