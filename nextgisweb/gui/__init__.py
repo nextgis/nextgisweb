@@ -1,9 +1,9 @@
 from ..component import Component
 
-from .util import COMP_ID
+from .util import COMP_ID, REACT_RENDERER
 
 
-__all__ = ['GUIComponent', ]
+__all__ = ['GUIComponent', 'REACT_RENDERER']
 
 
 class GUIComponent(Component):

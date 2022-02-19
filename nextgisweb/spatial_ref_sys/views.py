@@ -3,11 +3,11 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from ..views import permalinker
 from .. import dynmenu as dm
+from ..gui import REACT_RENDERER
 
 from .models import SRS
 from .util import _
 
-react_renderer = 'nextgisweb:gui/template/react_app.mako'
 
 def check_permission(request):
     """ To avoid interdependency of two components:
@@ -69,11 +69,11 @@ def srs_create_or_edit(request):
 def setup_pyramid(comp, config):
     
     config.add_route('srs.browse', '/srs/', client=True) \
-        .add_view(srs_browse, renderer=react_renderer)
+        .add_view(srs_browse, renderer=REACT_RENDERER)
     config.add_route('srs.create', '/srs/create', client=True) \
-        .add_view(srs_create_or_edit, renderer=react_renderer)
+        .add_view(srs_create_or_edit, renderer=REACT_RENDERER)
     config.add_route('srs.edit', '/srs/{id:\\d+}', client=True) \
-        .add_view(srs_create_or_edit, renderer=react_renderer)
+        .add_view(srs_create_or_edit, renderer=REACT_RENDERER)
 
     permalinker(SRS, 'srs.edit')
 
@@ -124,9 +124,9 @@ def setup_pyramid(comp, config):
         config.add_route(
             'srs.catalog',
             '/srs/catalog'
-        ).add_view(catalog_browse, renderer=react_renderer)
+        ).add_view(catalog_browse, renderer=REACT_RENDERER)
 
         config.add_route(
             'srs.catalog.import',
             r'/srs/catalog/{id:\d+}', client=('id',)
-        ).add_view(catalog_import, renderer=react_renderer)
+        ).add_view(catalog_import, renderer=REACT_RENDERER)

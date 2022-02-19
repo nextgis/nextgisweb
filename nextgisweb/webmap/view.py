@@ -9,6 +9,7 @@ from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .util import webmap_items_to_tms_ids_list, _
 from ..dynmenu import DynItem, Label, Link
 from ..resource import Resource, Widget, resource_factory, DataScope
+from ..gui import REACT_RENDERER
 
 
 class ExtentWidget(Widget):
@@ -242,7 +243,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'webmap.control_panel.settings',
         '/control-panel/webmap-settings'
-    ).add_view(settings, renderer='nextgisweb:gui/template/react_app.mako')
+    ).add_view(settings, renderer=REACT_RENDERER)
 
     comp.env.pyramid.control_panel.add(
         Link('settings.webmap', _("Web map"), lambda args: (

@@ -12,6 +12,7 @@ from ..psection import PageSections
 from ..pyramid import viewargs
 from ..models import DBSession
 
+from ..gui import REACT_RENDERER
 from ..core.exception import InsufficientPermissions
 
 from .exception import ResourceNotFound
@@ -356,4 +357,4 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.control_panel.resource_export',
         '/control-panel/resource-export'
-    ).add_view(resource_export, renderer='nextgisweb:gui/template/react_app.mako')
+    ).add_view(resource_export, renderer=REACT_RENDERER)

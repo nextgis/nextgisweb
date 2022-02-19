@@ -13,6 +13,7 @@ from pyramid.renderers import render_to_response
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 from sqlalchemy.orm.exc import NoResultFound
 
+from ..gui import REACT_RENDERER
 from ..models import DBSession
 from ..pyramid import SessionStore, WebSession
 from ..views import  permalinker
@@ -322,20 +323,19 @@ def setup_pyramid(comp, config):
     config.add_route('auth.principal_dump', '/auth/principal/dump') \
         .add_view(principal_dump, renderer='json')
 
-    react_renderer = 'nextgisweb:gui/template/react_app.mako'
     config.add_route('auth.user.browse', '/auth/user/', client=True) \
-        .add_view(user_browse, renderer=react_renderer)
+        .add_view(user_browse, renderer=REACT_RENDERER)
     config.add_route('auth.user.create', '/auth/user/create', client=True) \
-        .add_view(user_create_or_edit, renderer=react_renderer)
+        .add_view(user_create_or_edit, renderer=REACT_RENDERER)
     config.add_route('auth.user.edit', '/auth/user/{id:\\d+}', client=True) \
-        .add_view(user_create_or_edit, renderer=react_renderer)
+        .add_view(user_create_or_edit, renderer=REACT_RENDERER)
 
     config.add_route('auth.group.browse', '/auth/group/', client=True) \
-        .add_view(group_browse, renderer=react_renderer)
+        .add_view(group_browse, renderer=REACT_RENDERER)
     config.add_route('auth.group.create', '/auth/group/create', client=True) \
-        .add_view(group_create_or_edit, renderer=react_renderer)
+        .add_view(group_create_or_edit, renderer=REACT_RENDERER)
     config.add_route('auth.group.edit', '/auth/group/{id:\\d+}', client=True) \
-        .add_view(group_create_or_edit, renderer=react_renderer)
+        .add_view(group_create_or_edit, renderer=REACT_RENDERER)
 
     permalinker(User, "auth.user.edit")
     permalinker(Group, "auth.group.edit")

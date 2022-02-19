@@ -14,6 +14,7 @@ from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from sqlalchemy import text
 
+from ..gui import REACT_RENDERER
 from ..lib.logging import logger
 from ..env import env
 from .. import dynmenu as dm
@@ -415,7 +416,7 @@ def setup_pyramid(comp, config):
         config.add_route(
             'pyramid.control_panel.storage',
             '/control-panel/storage'
-        ).add_view(storage, renderer='nextgisweb:gui/template/react_app.mako')
+        ).add_view(storage, renderer=REACT_RENDERER)
 
     config.add_route(
         'pyramid.control_panel.backup.browse',
@@ -430,7 +431,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'pyramid.control_panel.cors',
         '/control-panel/cors', client=(),
-    ).add_view(cors, renderer='nextgisweb:gui/template/react_app.mako')
+    ).add_view(cors, renderer=REACT_RENDERER)
 
     config.add_route(
         'pyramid.control_panel.custom_css',
@@ -447,12 +448,12 @@ def setup_pyramid(comp, config):
         '/control-panel/system-name'
     ).add_view(
         system_name,
-        renderer='nextgisweb:gui/template/react_app.mako')
+        renderer=REACT_RENDERER)
 
     config.add_route(
         'pyramid.control_panel.home_path',
         '/control-panel/home-path'
-    ).add_view(home_path, renderer='nextgisweb:gui/template/react_app.mako')
+    ).add_view(home_path, renderer=REACT_RENDERER)
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 

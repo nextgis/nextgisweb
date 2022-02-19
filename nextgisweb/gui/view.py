@@ -1,3 +1,6 @@
+from .util import REACT_RENDERER
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         'gui.example',
@@ -6,4 +9,4 @@ def setup_pyramid(comp, config):
         lambda request: dict(
             entrypoint='@nextgisweb/gui/example'
         ),
-        renderer='nextgisweb:gui/template/react_app.mako')
+        renderer=REACT_RENDERER)
