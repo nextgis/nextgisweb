@@ -353,19 +353,28 @@ def custom_css_get(request):
     except KeyError:
         body = ""
 
-    return Response(body, content_type='text/css', charset='utf-8', expires=timedelta(days=1))
+    is_json = request.GET.get('format', 'css').lower() == 'json'
+    if is_json:
+        return Response(json.dumps(body), content_type='application/json', charset='utf-8')
+    else:
+        return Response(body, content_type='text/css', charset='utf-8', expires=timedelta(days=1))
 
 
 def custom_css_put(request):
     request.require_administrator()
 
-    data = request.body.decode(request.charset)
-    if re.match(r'^\s*$', data, re.MULTILINE):
+    is_json = request.GET.get('format', 'css').lower() == 'json'
+    data = request.json_body if is_json else request.body.decode(request.charset)
+
+    if data is None or re.match(r'^\s*$', data, re.MULTILINE):
         request.env.core.settings_delete('pyramid', 'custom_css')
     else:
         request.env.core.settings_set('pyramid', 'custom_css', data)
 
-    return Response()
+    if is_json:
+        return Response(json.dumps(None), content_type="application/json", charset='utf-8')
+    else:
+        return Response()
 
 
 def logo_get(request):

@@ -333,6 +333,10 @@ msgstr ""
 " www.example.com) считаются разными источниками. Символ подстановки (*) "
 "допустим для доменов третьего уровней и выше."
 
+#: nodepkg/custom-css-form/CustomCSSForm.js:32
+msgid "Custom styles saved. Reload the page to get them applied."
+msgstr "Изменения в стилях сохранены. Обновите страницу, чтобы увидеть изменения."
+
 #: nodepkg/example/translation.js:5
 msgid "Translated text"
 msgstr "Переведенный текст"

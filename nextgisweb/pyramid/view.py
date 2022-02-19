@@ -145,6 +145,7 @@ def cors(request):
 def custom_css(request):
     request.require_administrator()
     return dict(
+        entrypoint='@nextgisweb/pyramid/custom-css-form',
         title=_("Custom CSS"),
         dynmenu=request.env.pyramid.control_panel)
 
@@ -436,7 +437,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'pyramid.control_panel.custom_css',
         '/control-panel/custom-css'
-    ).add_view(custom_css, renderer=ctpl('custom_css'))
+    ).add_view(custom_css, renderer=REACT_RENDERER)
 
     config.add_route(
         'pyramid.control_panel.logo',
