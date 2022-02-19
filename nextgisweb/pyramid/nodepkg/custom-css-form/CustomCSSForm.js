@@ -50,7 +50,7 @@ export function CustomCSSForm() {
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
             <Row gutter={[16, 16]}>
-                <Col flex="auto" style={{ height: "300px" }}>
+                <Col span={14} style={{ height: "300px" }}>
                     <Code
                         lang="css"
                         lineNumbers
@@ -58,7 +58,7 @@ export function CustomCSSForm() {
                         value={value}
                     />
                 </Col>
-                <Col flex="none" span={10}>
+                <Col  span={10}>
                     <Typography.Paragraph>
                         {i18n.gettext(
                             "Enter custom CSS rules here. They will be used to redefine styles, design for all pages of your Web GIS."
