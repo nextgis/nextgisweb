@@ -6,6 +6,16 @@
         "antd": "^4.18.4",
         "dayjs": "^1.10.7",
         "react": "^17.0.2",
-        "react-dom": "^17.0.2"
+        "react-dom": "^17.0.2",
+        "@codemirror/basic-setup": "^0.19.1",
+        "@codemirror/commands": "^0.19.8",
+        "@codemirror/view": "^0.19.42",
+        "@codemirror/lang-css": "^0.19.3",
+        "@codemirror/lang-xml": "^0.19.2",
+        "@codemirror/lang-json": "^0.19.2",
+        "@codemirror/lang-html": "^0.19.4",
+        "@codemirror/lang-python": "^0.19.4",
+        "@codemirror/lang-javascript": "^0.19.7",
+        "@codemirror/lang-markdown": "^0.19.6"
     }
 }
