@@ -8,10 +8,17 @@
     packages = {p.name: p.version for p in request.env.packages.values()}
 
     try:
-        is_administrator = request.user.is_administrator
+        user = request.user
+        is_administrator = user.is_administrator
+        is_guest = user.keyname == 'guest'
+        user_display_name = user.display_name
+        invitation_session = bool(request.session.get('invite'))
     except Exception:
         # Something like InvalidCredentials
         is_administrator = False
+        is_guest = True
+        user_display_name = None
+        invitation_session = False
 
     ngwConfig = {
         "debug": request.env.core.debug,
@@ -23,8 +30,16 @@
         "packages": packages,
         "instanceId": request.env.core.instance_id,
         "isAdministrator": is_administrator,
+        "isGuest": is_guest,
+        "userDisplayName": user_display_name,
+        "invitationSession": invitation_session,
         "locale": request.locale_name,
     }
+
+    if is_guest:
+        ngwConfig['loginUrl'] = request.login_url()
+    else:
+        ngwConfig['logoutUrl'] = request.route_url(request.env.auth.options['logout_route_name'])
 
     if request.env.ngupdate_url:
         ngwConfig['ngupdateUrl'] = request.env.ngupdate_url

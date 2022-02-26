@@ -12,14 +12,20 @@
 %if distr_opts.get('name') is not None:
     <h2>${distr_opts.get('description')} ${distr_opts.get('version')} (${distr_opts.get('date')})</h2>
     %if request.env.ngupdate_url:
-        <div id="distInfo"><div data-dojo-id="distInfo"
-            data-dojo-type="ngw-pyramid/DistInfo/DistInfo"
-            data-dojo-props='
-                status: "inProgress",
-                currentVersion: `${distr_opts.get("version")} (${distr_opts.get("date")})`,
-                supportUrl: "${support_url}"
-            '
-            style="margin-bottom: 16px;"></div></div>
+        <div id="updateSysInfo"></div>
+        <script type="text/javascript">
+            require([
+                "@nextgisweb/pyramid/update/sysinfo",
+                "@nextgisweb/gui/react-app"
+            ], function (
+                updateSysInfo, reactApp
+            ) {
+                reactApp.default(
+                    updateSysInfo.default, {},
+                    document.getElementById("updateSysInfo"),
+                );
+            });
+        </script>
     %endif
 %endif
 <div class="content-box">
@@ -76,39 +82,11 @@
 <script>
     require([
         "dojo/ready",
-        "dojo/parser",
         "ngw-pyramid/CopyButton/CopyButton",
-        "ngw-pyramid/DistInfo/DistInfo",
-        "@nextgisweb/pyramid/update",
     ], function (
         ready, 
-        parser,
         CopyButton,
-        DistInfo,
-        update,
     ) {
-        ready(function() {
-            var nodeDistInfo = document.getElementById('distInfo');
-            if (nodeDistInfo) {
-                parser.parse(nodeDistInfo);
-                distInfo.set('detailsUrl', update.notesUrl());
-            }
-
-            update.registerCallback(function(data) {
-                const distribution = data.distribution;
-                if (distribution && distribution.status === "has_update") {
-                    distInfo.set('nextVersion', distribution.latest.version + ' (' + distribution.latest.date + ')');
-                    distInfo.set('status', 'hasUpdate');
-                }
-                if (distribution && distribution.status === "has_urgent_update") {
-                    distInfo.set('nextVersion', distribution.latest.version + ' (' + distribution.latest.date + ')');
-                    distInfo.set('status', 'hasUrgentUpdate');
-                }
-                if (distribution && distribution.status === "up_to_date") {
-                    distInfo.set('status', 'upToDate');
-                }
-            });
-        });
         var domCopyButton = document.getElementById("info-copy-btn")
         var copyButton = new CopyButton({
             targetAttribute: function (target) {

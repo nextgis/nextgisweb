@@ -96,6 +96,10 @@ class Component(metaclass=ComponentMeta):
         """
         return ()
 
+    @property
+    def template_include(self):
+        return ()
+
 
 def require(*deps):
     """ Decorator for dependencies between components methods.

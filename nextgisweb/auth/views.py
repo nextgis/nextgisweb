@@ -300,7 +300,7 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.oauth', '/oauth').add_view(oauth)
 
-    config.add_route('auth.settings', '/settings') \
+    config.add_route('auth.settings', '/settings', client=True) \
         .add_view(settings, renderer='nextgisweb:auth/template/settings.mako')
 
     config.add_request_method(_login_url, name='login_url')

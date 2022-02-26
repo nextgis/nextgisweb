@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from pkg_resources import resource_filename
 from hashlib import md5
 from pathlib import Path
+from itertools import chain
 
 from psutil import Process
 from pyramid.response import Response, FileResponse
@@ -380,6 +381,11 @@ def setup_pyramid(comp, config):
     config.add_request_method(
         lambda r: amd_base, 'amd_base',
         property=True, reify=True)
+
+    # Base template includes
+
+    comp._template_include = list(chain(*[
+        c.template_include for c in comp.env.chain('template_include')]))
 
     # RENDERERS
 

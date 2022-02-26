@@ -1,0 +1,69 @@
+.ngw-pyramid-menu-icon {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    width: 34px;
+    height: 34px;
+    line-height: 34px;
+    border-radius: 2px;
+    color: var(--primary);
+    text-align: center;
+    cursor: pointer;
+
+    > span.main {
+        line-height: 34px;
+        color: inherit;
+    }
+
+    > span.more {
+        position: absolute;
+        right: 0px;
+        top: 2px;
+        font-size: 8px;
+        line-height: 8px;
+        display: block;
+
+        &-success {
+            color: var(--success);
+        }
+
+        &-danger {
+            color: var(--danger);
+        }
+    }
+}
+
+.ngw-pyramid-menu-drawer {
+    .ant-drawer-header {
+        padding: 16px 12px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+
+        .ant-drawer-header-title .ant-drawer-close {
+            margin-left: auto;
+        }
+    }
+
+    .ant-drawer-body {
+        padding: 0px;
+
+        a {
+            display: block;
+            padding: 12px 24px;
+            text-decoration: none;
+            line-height: 1.25;
+            color: var(--text-base);
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.04);
+            }
+
+            &.notification-success {
+                background-color: var(--surface-bg-success);
+            }
+
+            &.notification-danger {
+                background-color: var(--surface-bg-danger);
+            }
+        }
+    }
+}

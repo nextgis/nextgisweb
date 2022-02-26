@@ -56,7 +56,9 @@
         <script src="${request.route_url('amd_package', subpath='%s.js' % a)}"></script>
     %endfor
 
-    <%include file="nextgisweb:pyramid/template/update.mako"/>
+    %for template in request.env.pyramid._template_include:
+        <%include file="${template}"/>
+    %endfor
 </head>
 
 <body class="claro nextgis <%block name='body_class'/>">

@@ -1,0 +1,32 @@
+.ngw-pyramid-update-sysinfo {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 1em;
+    background-color: rgba(128, 138, 147, 0.25);
+    border-radius: var(--border-radius-root);
+
+    &.critical {
+        background-color: var(--surface-bg-danger);
+    }
+
+    &.non-critical {
+        background-color: var(--surface-bg-success);
+    }
+
+    > .btn {
+        margin-left: auto;
+    }
+}
+
+.ngw-pyramid-update-sysinfo-modal {
+    .ant-modal-body {
+        padding: 8px;
+    }
+
+    iframe {
+        width: 100%;
+        height: 75vh;
+        border: none;
+    }
+}

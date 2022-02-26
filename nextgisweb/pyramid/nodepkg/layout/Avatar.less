@@ -1,0 +1,61 @@
+.ngw-pyramid-avatar {
+    cursor: pointer;
+    user-select: none;
+
+    &-label {
+        display: inline-block;
+        vertical-align: middle;
+        width: 34px;
+        height: 34px;
+        line-height: 34px;
+        border-radius: 2px;
+        color: var(--user-avatar-text, var(--on-primary-text));
+        background: var(--user-avatar-bg, var(--primary));
+        text-align: center;
+    }
+}
+
+.ngw-pyramid-avatar-authenticated {
+    line-height: 1;
+}
+
+.ngw-pyramid-avatar-danger {
+    .ngw-pyramid-avatar-label {
+        color: var(--on-primary);
+        background-color: var(--surface-bg-danger);
+    }
+}
+
+.ngw-pyramid-avatar-active {
+    .ngw-pyramid-avatar-icon {
+        transform: rotate(180deg);
+    }
+}
+
+.ngw-pyramid-avatar-popover {
+    .ant-popover-title {
+        padding: 6px 12px;
+        font-weight: bold;
+    }
+
+    .ant-popover-inner-content {
+        padding: 0px;
+
+        div.warning {
+            display: block;
+            padding: 6px 12px;
+            background-color: var(--surface-bg-danger);
+        }
+
+        a {
+            display: block;
+            padding: 6px 12px;
+            text-decoration: none;
+            color: var(--text-base);
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.04);
+            }
+        }
+    }
+}

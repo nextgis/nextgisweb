@@ -101,6 +101,7 @@ class PyramidComponent(Component):
         result = dict()
 
         result['support_url'] = self.env.core.support_url_view(request)
+        result['help_page_url'] = self.env.pyramid.help_page_url_view(request)
         result['company_logo'] = dict(
             enabled=self.company_logo_enabled(request),
             link=self.company_url_view(request))
@@ -120,6 +121,10 @@ class PyramidComponent(Component):
         result['storage_limit'] = self.env.core.options['storage.limit']
 
         return result
+
+    @property
+    def template_include(self):
+        return ('nextgisweb:pyramid/template/update.mako', )
 
     def maintenance(self):
         super().maintenance()
