@@ -21,7 +21,7 @@ def webmap_items_to_tms_ids_list(webmap):
     iterate(root.children)
 
     if webmap.draw_order_enabled:
-        webmap_items.sort(key=lambda i: i.draw_order_position)
+        webmap_items.sort(key=lambda i: ((0, i.draw_order_position) if i.draw_order_position is not None else (1, 0)))
 
     webmap_items.reverse()
 
