@@ -1,14 +1,13 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
-    "dojo/request/xhr",
     "dojo/store/Memory",
     "dijit/layout/ContentPane",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
+    "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
-    "ngw/route",
     "./LayersDialog",
     // resource
     "dojo/text!./template/LayerWidget.hbs",
@@ -21,14 +20,13 @@ define([
 ], function (
     declare,
     lang,
-    xhr,
     Memory,
     ContentPane,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     serialize,
+    api,
     i18n,
-    route,
     LayersDialog,
     template
 ) {
@@ -54,14 +52,28 @@ define([
             this.btnChooseLayer.set("disabled", data.length === 0);
         },
 
+        _setLayerNameVision: function (visible) {
+            this.wLayerName.domNode.parentElement.parentElement
+                .style.display = visible ? '' : 'none';
+        },
+
         postCreate: function () {
             this.inherited(arguments);
 
             this.wConnection.on("update", function (event) {
-                var connection = event.value;
-                xhr.get(route.tmsclient.connection.layers(connection), {
-                    handleAs: "json"
-                }).then(this._updateStore.bind(this));
+                var value = event.value;
+                api.route('resource.item', value).get().then(function (resource) {
+                    var connection = resource.tmsclient_connection;
+                    if (connection.capmode === 'nextgis_geoservices') {
+                        api.route('tmsclient.connection.layers', value)
+                            .get()
+                            .then(this._updateStore.bind(this));
+                        this._setLayerNameVision(false);
+                    } else {
+                        this._updateStore([]);
+                        this._setLayerNameVision(connection.url_template.includes('{layer}'));
+                    }
+                }.bind(this));
             }.bind(this));
 
             this.btnChooseLayer.on("click", function () {
