@@ -225,7 +225,9 @@ def settings(request):
     if request.user.keyname == 'guest':
         return HTTPUnauthorized()
 
-    return dict(title=_("User settings"))
+    return dict(
+        title=_("User settings"),
+        entrypoint='@nextgisweb/auth/settings-form')
 
 
 def user_browse(request):
@@ -301,7 +303,7 @@ def setup_pyramid(comp, config):
     config.add_route('auth.oauth', '/oauth').add_view(oauth)
 
     config.add_route('auth.settings', '/settings', client=True) \
-        .add_view(settings, renderer='nextgisweb:auth/template/settings.mako')
+        .add_view(settings, renderer=REACT_RENDERER)
 
     config.add_request_method(_login_url, name='login_url')
 
