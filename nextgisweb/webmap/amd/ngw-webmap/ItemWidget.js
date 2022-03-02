@@ -440,8 +440,15 @@ define([
         },
 
         serializeInMixin: function (data) {
-            if (data.webmap === undefined) { data.webmap = {}; }
-            var store = this.itemStore;
+            if (data.webmap === undefined) {
+                data.webmap = {};
+            }
+            const store = this.itemStore;
+            
+            data.webmap.draw_order_enabled = this.layerOrder.get("enabled");
+            if (data.webmap.draw_order_enabled) {
+                this.layerOrder.save();
+            }
 
             // There is no simple way to make data dump from itemStore for some rease
             // so walk through recursively.
@@ -462,7 +469,6 @@ define([
             }
 
             data.webmap.root_item = traverse(this.itemModel.root);
-            data.webmap.draw_order_enabled = this.layerOrder.get("enabled");
         },
 
         deserializeInMixin: function (data) {
