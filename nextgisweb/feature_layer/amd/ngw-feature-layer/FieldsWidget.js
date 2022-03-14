@@ -276,6 +276,8 @@ define([
                 function(itm) {
                     // Skip fields created and deleted in one session
                     return  !(itm.delete && itm.id == undefined)
+                }, {
+                    sort: [{attribute:"idx", descending: false}]
                 }
             ).map(function (src) {
                 var obj = lang.clone(src);
