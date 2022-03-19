@@ -238,6 +238,10 @@ msgstr "Наименование"
 msgid "Enabled"
 msgstr "Включен"
 
+#: amd/ngw-webmap/template/ItemWidget.hbs:82
+msgid "Identifiable"
+msgstr "Идентифицируемый"
+
 #: amd/ngw-webmap/template/ItemWidget.hbs:84
 msgid "Transparency"
 msgstr "Прозрачность"

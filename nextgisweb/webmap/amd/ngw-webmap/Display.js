@@ -639,6 +639,7 @@ define([
 
                     copy.visibility = null;
                     copy.checked = item.visibility;
+                    copy.identifiable = item.identifiable,
                     copy.position = item.drawOrderPosition;
 
                 } else if (copy.type === "group" || copy.type === "root") {

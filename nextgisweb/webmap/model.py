@@ -121,7 +121,16 @@ class WebMapItem(Base):
     display_name = db.Column(db.Unicode, nullable=True)
     group_expanded = db.Column(db.Boolean, nullable=True)
     layer_style_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
-    layer_enabled = db.Column(db.Boolean, nullable=True)
+
+    def layer_enabled_default(context):
+        if context.get_current_parameters()['item_type'] == 'layer':
+            return False
+    layer_enabled = db.Column(db.Boolean, nullable=True, default=layer_enabled_default)
+
+    def layer_identifiable_default(context):
+        if context.get_current_parameters()['item_type'] == 'layer':
+            return True
+    layer_identifiable = db.Column(db.Boolean, nullable=True, default=layer_identifiable_default)
     layer_transparency = db.Column(db.Float, nullable=True)
     layer_min_scale_denom = db.Column(db.Float, nullable=True)
     layer_max_scale_denom = db.Column(db.Float, nullable=True)
@@ -175,6 +184,7 @@ class WebMapItem(Base):
                 item_type=self.item_type,
                 display_name=self.display_name,
                 layer_enabled=self.layer_enabled,
+                layer_identifiable=self.layer_identifiable,
                 layer_transparency=self.layer_transparency,
                 layer_style_id=self.layer_style_id,
                 style_parent_id=style_parent_id,
@@ -194,7 +204,7 @@ class WebMapItem(Base):
                 child.from_dict(i)
                 self.children.append(child)
 
-        for a in ('display_name', 'group_expanded', 'layer_enabled',
+        for a in ('display_name', 'group_expanded', 'layer_enabled', 'layer_identifiable',
                   'layer_adapter', 'layer_style_id', 'layer_transparency',
                   'layer_min_scale_denom', 'layer_max_scale_denom',
                   'draw_order_position'):
