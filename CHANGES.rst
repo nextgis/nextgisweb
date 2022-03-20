@@ -1,6 +1,12 @@
 Changes
 =======
 
+4.2.0
+-----
+
+- "Locate me" tool on web maps.
+- Identifiable setting for web map layers.
+
 4.1.0
 -----
 
