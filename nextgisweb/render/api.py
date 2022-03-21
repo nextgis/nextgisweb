@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden
+from pyramid.httpexceptions import HTTPBadRequest
 
 from ..core.exception import ValidationError, UserException
 from ..resource import Resource, ResourceNotFound, DataScope, resource_factory
@@ -130,7 +130,7 @@ def tile(request):
                 aimg = Image.alpha_composite(aimg, rimg)
             except ValueError:
                 raise HTTPBadRequest(
-                    "Image (ID=%d) must have mode %s, but it is %s mode." %
+                    explanation="Image (ID=%d) must have mode %s, but it is %s mode." %
                     (obj.id, aimg.mode, rimg.mode))
 
     return image_response(aimg, p_empty_code, (256, 256))
@@ -297,7 +297,7 @@ def image(request):
                 aimg = Image.alpha_composite(aimg, rimg)
             except ValueError:
                 raise HTTPBadRequest(
-                    "Image (ID=%d) must have mode %s, but it is %s mode." %
+                    explanation="Image (ID=%d) must have mode %s, but it is %s mode." %
                     (obj.id, aimg.mode, rimg.mode))
 
     return image_response(aimg, p_empty_code, p_size)

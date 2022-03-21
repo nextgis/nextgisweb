@@ -176,7 +176,7 @@ def current_user(request):
 
 def register(request):
     if not request.env.auth.options['register']:
-        raise HTTPForbidden("Anonymous registration is not allowed!")
+        raise HTTPForbidden(explanation="Anonymous registration is not allowed!")
 
     # For self-registration only certain attributes of the user are required
     rkeys = ('display_name', 'description', 'keyname', 'password')

@@ -136,7 +136,7 @@ class AuthComponent(Component):
         def require_administrator(request):
             if not request.user.is_administrator:
                 raise HTTPForbidden(
-                    "Membership in group 'administrators' required!")
+                    explanation="Membership in group 'administrators' required!")
 
         config.add_request_method(user, property=True)
         config.add_request_method(require_administrator)

@@ -144,7 +144,7 @@ def cors_put(request):
                 v = []
 
             if not isinstance(v, list):
-                raise HTTPBadRequest("Invalid key '%s' value!" % k)
+                raise HTTPBadRequest(explanation="Invalid key '%s' value!" % k)
 
             # The scheme and host are case-insensitive
             # and normally provided in lowercase.
@@ -173,7 +173,7 @@ def cors_put(request):
 
             env.core.settings_set('pyramid', 'cors_allow_origin', v)
         else:
-            raise HTTPBadRequest("Invalid key '%s'" % k)
+            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
 def system_name_get(request):
@@ -196,7 +196,7 @@ def system_name_put(request):
             else:
                 env.core.settings_delete('core', 'system.full_name')
         else:
-            raise HTTPBadRequest("Invalid key '%s'" % k)
+            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
 def home_path_get(request):
@@ -219,7 +219,7 @@ def home_path_put(request):
             else:
                 env.core.settings_delete('pyramid', 'home_path')
         else:
-            raise HTTPBadRequest("Invalid key '%s'" % k)
+            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
 def settings(request):

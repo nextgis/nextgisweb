@@ -120,7 +120,7 @@ def settings_put(request):
         if k in WM_SETTINGS.keys():
             env.core.settings_set('webmap', k, v)
         else:
-            raise HTTPBadRequest("Invalid key '%s'" % k)
+            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
 def setup_pyramid(comp, config):

@@ -394,9 +394,9 @@ def resource_export_put(request):
             if v in ('data_read', 'data_write', 'administrators'):
                 request.env.core.settings_set('resource', 'resource_export', v)
             else:
-                raise HTTPBadRequest("Invalid value '%s'" % v)
+                raise HTTPBadRequest(explanation="Invalid value '%s'" % v)
         else:
-            raise HTTPBadRequest("Invalid key '%s'" % k)
+            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
 def setup_pyramid(comp, config):

@@ -61,7 +61,7 @@ def handler(obj, request):
 
     if req == 'GETCAPABILITIES':
         if service != 'WMS':
-            raise HTTPBadRequest("Invalid SERVICE parameter value.")
+            raise HTTPBadRequest(explanation="Invalid SERVICE parameter value.")
         return _get_capabilities(obj, params, request)
     elif req == 'GETMAP' or req == 'MAP':
         return _get_map(obj, params, request)
@@ -70,7 +70,7 @@ def handler(obj, request):
     elif req == 'GETLEGENDGRAPHIC':
         return _get_legend_graphic(obj, params, request)
     else:
-        raise HTTPBadRequest("Invalid REQUEST parameter value.")
+        raise HTTPBadRequest(explanation="Invalid REQUEST parameter value.")
 
 
 def _maker():
