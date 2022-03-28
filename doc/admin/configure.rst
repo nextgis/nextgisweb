@@ -137,3 +137,9 @@ format using option ``--env-vars``. For example, command ``nextgisweb-config
   ## Option: tus.chunk_size.minimum (integer) (default: 1048576)
   # NEXTGISWEB__FILE_UPLOAD__TUS__CHUNK_SIZE__MINIMUM=1048576
 
+
+Fonts
+-----
+
+If NGW is built without ngwdocker, the fonts can be added to different folders. One of them is ``/usr/share/fonts/``.
+To check that a font has been added, you can clear the font cache with ``fc-cache -f -v`` and see it in the ``fc-list``.
