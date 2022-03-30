@@ -259,22 +259,94 @@ define([
         _buildEditingItemInteractions: function (editingItem) {
             var itemConfig = this.display.get("itemConfig"),
                 pluginConfig = itemConfig.plugin[this.identity],
-                draw, modify, snap;
+                draw, modify, snap, mode, getStride, geometryFunction;
+
+            mode = {
+                POINT: "Point",
+                LINESTRING: "LineString",
+                POLYGON: "Polygon",
+                MULTIPOINT: "MultiPoint",
+                MULTILINESTRING: "MultiLineString",
+                MULTIPOLYGON: "MultiPolygon",
+                POINTZ: "Point",
+                LINESTRINGZ: "LineString",
+                POLYGONZ: "Polygon",
+                MULTIPOINTZ: "MultiPoint",
+                MULTILINESTRINGZ: "MultiLineString",
+                MULTIPOLYGONZ: "MultiPolygon"
+            }[pluginConfig.geometry_type];
+
+            getStride = function() {
+                switch(pluginConfig.geometry_type) {
+                    case "POINTZ":
+                    case "LINESTRINGZ":
+                    case "POLYGONZ":
+                    case "MULTIPOINTZ":
+                    case "MULTILINESTRINGZ":
+                    case "MULTIPOLYGONZ":
+                        return 3;
+                    default:
+                        return 2;
+                }
+            };
+
+            // Draw interaction doesn't accept geometry layout
+            // https://github.com/openlayers/openlayers/issues/2700
+
+            geometryFunction = function (coordinates, geometry, projection) {
+                var vertex, Constructor;
+
+                if (mode === "Point" || mode === "MultiPoint") {
+                    Constructor = ol.geom.Point;
+                    vertex = coordinates;
+                    while (vertex.length < getStride()) {
+                        vertex.push(0);
+                    }
+                } else if (mode === "LineString" || mode == "MultiLineString") {
+                    Constructor = ol.geom.LineString;
+                    for (var i = 0, ii = coordinates.length; i < ii; ++i) {
+                        vertex = coordinates[i];
+                        while (vertex.length < getStride()) {
+                            vertex.push(0);
+                        }
+                    }
+                } else if (mode === "Polygon" || mode === "MultiPolygon") {
+                    Constructor = ol.geom.Polygon;
+                    for (var i = 0, ii = coordinates[0].length; i < ii; ++i) {
+                        vertex = coordinates[0][i];
+                        while (vertex.length < getStride()) {
+                            vertex.push(0);
+                        }
+                    }
+                }
+
+                if (geometry) {
+                    if (mode === "Polygon" || mode == "MultiPolygon") {
+                        if (coordinates[0].length) {
+                            // Add a closing coordinate to match the first
+                            geometry.setCoordinates([
+                                coordinates[0].concat([coordinates[0][0]]),
+                            ]);
+                        } else {
+                            geometry.setCoordinates([]);
+                        }
+                    } else {
+                        geometry.setCoordinates(coordinates);
+                    }
+                } else {
+                    geometry = new Constructor(coordinates);
+                }
+                return geometry;
+            };
 
             draw = new ol.interaction.Draw({
                 source: this.source,
                 features: editingItem.features,
-                type: {
-                    POINT: "Point",
-                    LINESTRING: "LineString",
-                    POLYGON: "Polygon",
-                    MULTIPOINT: "MultiPoint",
-                    MULTILINESTRING: "MultiLineString",
-                    MULTIPOLYGON: "MultiPolygon"
-                }[pluginConfig.geometry_type],
+                type: mode,
                 freehandCondition: function (event) {
                     return ol.events.condition.never(event);
-                }
+                },
+                geometryFunction: geometryFunction
             });
 
             draw.on("drawend", lang.hitch(this, function (e) {
