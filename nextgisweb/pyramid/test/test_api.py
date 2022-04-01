@@ -65,7 +65,7 @@ def test_misc_settings(api_key, comp, setting_key, key, value, override, webtest
 def test_custom_css(override, webtest, ngw_auth_administrator):
     api_url = '/api/component/pyramid/custom_css'
     value = 'any text'
-    with override('custom_css'):
+    with override('pyramid', 'custom_css'):
         webtest.put(api_url, value, status=200)
 
         resp = webtest.get(api_url, status=200)
