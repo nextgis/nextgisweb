@@ -57,11 +57,12 @@ def identify(request):
     feature_count = 0
 
     for layer in layer_list:
+        layer_id_str = str(layer.id)
         if not layer.has_permission(DataScope.read, request.user):
-            result[layer.id] = dict(error="Forbidden")
+            result[layer_id_str] = dict(error="Forbidden")
 
         elif not IFeatureLayer.providedBy(layer):
-            result[layer.id] = dict(error="Not implemented")
+            result[layer_id_str] = dict(error="Not implemented")
 
         else:
             query = layer.feature_query()
@@ -85,7 +86,7 @@ def identify(request):
                 for feature in features:
                     feature['parent'] = layer.parent.display_name
 
-            result[layer.id] = dict(
+            result[layer_id_str] = dict(
                 features=features,
                 featureCount=len(features)
             )
