@@ -65,7 +65,7 @@ requires = [
     'freezegun',
     'pytest-flake8',
     'pytest-watch',
-    'pytest',
+    'pytest==7.0.*',
     'webtest',
 ]
 
