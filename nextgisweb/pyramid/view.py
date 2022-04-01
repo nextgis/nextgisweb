@@ -13,9 +13,11 @@ from pyramid.response import Response, FileResponse
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from sqlalchemy import text
+from markupsafe import Markup
 
 from ..gui import REACT_RENDERER
 from ..lib.logging import logger
+from ..lib.json import dumps
 from ..env import env
 from .. import dynmenu as dm
 from ..core.exception import UserException
@@ -542,12 +544,24 @@ def _setup_pyramid_tm(comp, config):
     config.include(pyramid_tm)
 
 
+def json_js(value, pretty=False):
+    """ Mako template function for easy JSON generation
+
+    It can be used as a function ``${json_js(value)}`` or as a filter but in
+    conjunction with n-filter ``${value | n, json_js}``."""
+
+    return Markup(dumps(value, pretty=pretty))
+
+
 def _setup_pyramid_mako(comp, config):
     settings = config.registry.settings
 
     settings['pyramid.reload_templates'] = comp.env.core.debug
     settings['mako.directories'] = 'nextgisweb:templates/'
-    settings['mako.imports'] = ['from nextgisweb.i18n import tcheck']
+    settings['mako.imports'] = [
+        'from nextgisweb.i18n import tcheck',
+        'from nextgisweb.pyramid.view import json_js',
+    ]
     settings['mako.default_filters'] = ['tcheck', 'h'] if comp.env.core.debug else ['h', ]
 
     import pyramid_mako

@@ -1,4 +1,3 @@
-<%! from json import dumps %>
 <%
     distr_opts = request.env.options.with_prefix('distribution')
     distribution = {
@@ -75,6 +74,6 @@
 %>
 
 <script type="text/javascript">
-    var ngwConfig = ${ ngwConfig | dumps, n };
-    var dojoConfig = ${ dojoConfig | dumps, n };
+    var ngwConfig = ${json_js(ngwConfig)};
+    var dojoConfig = ${json_js(dojoConfig)};
 </script>

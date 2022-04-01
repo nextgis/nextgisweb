@@ -1,6 +1,5 @@
 <%!
     import math
-    import json
     from bunch import Bunch
     from nextgisweb import dynmenu as dm
     from nextgisweb.resource.util import _
@@ -111,7 +110,7 @@
         %if request.env.core.options['storage.enabled']:
         
         menu.addChild(new MenuItem({
-            label: ${tr(_("Show resources volume")) | json.dumps, n },
+            label: ${json_js(tr(_("Show resources volume")))},
             onClick: showVolume,
         }));
         

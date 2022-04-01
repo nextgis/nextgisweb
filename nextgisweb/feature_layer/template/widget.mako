@@ -1,7 +1,5 @@
 <%inherit file='nextgisweb:templates/obj.mako' />
 
-<% import json %>
-
 <script type="text/javascript">
     require([
         "dojo/dom",
@@ -9,9 +7,9 @@
         "dojo/domReady!"
     ], function (dom, FeatureEditorWidget) {
         var widget = new FeatureEditorWidget({
-            resource: ${ obj.id | json.dumps, n },
-            feature: ${ feature_id | json.dumps, n },
-            fields: ${ fields | json.dumps, n },
+            resource: ${json_js(obj.id)},
+            feature: ${json_js(feature_id)},
+            fields: ${json_js(fields)},
             style: "width: 100%; height: 100%; padding: 1px;"});
 
         widget.placeAt(dom.byId("widget"));

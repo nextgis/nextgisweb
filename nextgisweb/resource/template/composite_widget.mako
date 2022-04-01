@@ -1,7 +1,6 @@
 <%inherit file='nextgisweb:templates/obj.mako' />
 
 <%def name="head()">
-    <% import json %>
     <script type="text/javascript">
         require([
             "dojo/request/xhr",
@@ -10,7 +9,7 @@
             "dojo/domReady!"
         ], function (xhr, api, CompositeWidget) {
             xhr(api.routeURL('resource.widget'), {
-                query: ${query | json.dumps, n},
+                query: ${json_js(query)},
                 handleAs: 'json'
             }).then(function (data) {
                 CompositeWidget.bootstrap(data).then(function (widget) {

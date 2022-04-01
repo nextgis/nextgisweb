@@ -1,6 +1,5 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 <%!
-import json
 from pyramid.httpexceptions import HTTPNotFound
 from nextgisweb.pyramid.util import _
 from nextgisweb.pyramid.exception import json_error
@@ -28,7 +27,7 @@ from nextgisweb.pyramid.exception import json_error
         '@nextgisweb/gui/error',
         "@nextgisweb/gui/react-app",
     ], function (errorModule, reactApp) {
-        var props = ${ dict(error=error_json) | json.dumps, n };
+        var props = ${json_js(dict(error=error_json))};
         reactApp.default(
             errorModule.ErrorPage, props,
             document.getElementById('root')

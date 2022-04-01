@@ -1,14 +1,13 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
-<%! import json %>
 
 <div id='root'></div>
 
 <script type="text/javascript">
     require([
-        ${entrypoint | json.dumps},
+        ${json_js(entrypoint)},
         "@nextgisweb/gui/react-app",
     ], function (comp, reactApp) {
-        var props = ${ (props if props else {}) | json.dumps, n };
+        var props = ${json_js(props if props else {})};
 
         reactApp.default(
             comp.default, props,
