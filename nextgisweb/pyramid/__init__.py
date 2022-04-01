@@ -74,7 +74,7 @@ class PyramidComponent(Component):
 
         if self.options['lunkwill.enabled'] is None:
             self.options['lunkwill.enabled'] = lunkwill_rpc
-       
+
         if self.options['lunkwill.enabled']:
             if self.options['lunkwill.host'] is None:
                 self.options['lunkwill.host'] = environ.get(
@@ -153,6 +153,21 @@ class PyramidComponent(Component):
         super().backup_configure(config)
         config.exclude_table_data('public', Session.__tablename__)
         config.exclude_table_data('public', SessionStore.__tablename__)
+
+    def query_stat(self):
+        result = dict()
+
+        try:
+            result['cors'] = len(self.env.core.settings_get('pyramid', 'cors_allow_origin')) > 0
+        except KeyError:
+            result['cors'] = False
+
+        try:
+            result['custom_css'] = self.env.core.settings_get('pyramid', 'custom_css').strip() != ''
+        except KeyError:
+            result['custom_css'] = False
+
+        return result
 
     option_annotations = OptionAnnotations((
         Option('help_page.enabled', bool, default=True),
