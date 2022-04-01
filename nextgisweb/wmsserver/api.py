@@ -17,6 +17,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from ..core.exception import ValidationError
 from ..pyramid.exception import json_error
+from ..lib.json import dumps
 from ..lib.geometry import Geometry
 from ..lib.ows import parse_request, parse_srs, SRSParseError
 from ..render import ILegendableStyle
@@ -24,8 +25,6 @@ from ..resource import (
     resource_factory,
     ServiceScope, DataScope)
 from ..spatial_ref_sys import SRS
-from ..feature_layer import IFeatureLayer
-from .. import geojson
 
 from .model import Service
 
@@ -416,9 +415,7 @@ def _get_feature_info(obj, params, request):
             )
             for result in results
         ]
-        return Response(
-            json.dumps(result, cls=geojson.Encoder),
-            content_type='application/json', charset='utf-8')
+        return Response(dumps(result), content_type='application/json', charset='utf-8')
 
     return Response(render_template(
         'nextgisweb:wmsserver/template/get_feature_info_html.mako',

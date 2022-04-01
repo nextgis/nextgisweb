@@ -1,4 +1,3 @@
-import json
 from io import BytesIO
 
 from PIL import Image
@@ -83,10 +82,7 @@ def iget(resource, request):
         attachment_id=int(request.matchdict['aid'])
     )
 
-    return Response(
-        json.dumps(obj.serialize()),
-        content_type='application/json',
-        charset='utf-8')
+    return obj.serialize()
 
 
 def idelete(resource, request):
@@ -98,11 +94,6 @@ def idelete(resource, request):
     )
 
     DBSession.delete(obj)
-
-    return Response(
-        json.dumps(None),
-        content_type='application/json',
-        charset='utf-8')
 
 
 def iput(resource, request):
@@ -117,10 +108,7 @@ def iput(resource, request):
 
     DBSession.flush()
 
-    return Response(
-        json.dumps(dict(id=obj.id)),
-        content_type='application/json',
-        charset='utf-8')
+    return dict(id=obj.id)
 
 
 def cget(resource, request):
@@ -132,10 +120,7 @@ def cget(resource, request):
 
     result = [itm.serialize() for itm in query]
 
-    return Response(
-        json.dumps(result),
-        content_type='application/json',
-        charset='utf-8')
+    return result
 
 
 def cpost(resource, request):
@@ -159,10 +144,7 @@ def cpost(resource, request):
     DBSession.add(obj)
     DBSession.flush()
 
-    return Response(
-        json.dumps(dict(id=obj.id)),
-        content_type='application/json',
-        charset='utf-8')
+    return dict(id=obj.id)
 
 
 def setup_pyramid(comp, config):
@@ -184,12 +166,12 @@ def setup_pyramid(comp, config):
     config.add_route(
         'feature_attachment.item', itmurl,
         factory=resource_factory) \
-        .add_view(iget, request_method='GET') \
-        .add_view(iput, request_method='PUT') \
-        .add_view(idelete, request_method='DELETE')
+        .add_view(iget, request_method='GET', renderer='json') \
+        .add_view(iput, request_method='PUT', renderer='json') \
+        .add_view(idelete, request_method='DELETE', renderer='json')
 
     config.add_route(
         'feature_attachment.collection', colurl,
         factory=resource_factory) \
-        .add_view(cget, request_method='GET') \
-        .add_view(cpost, request_method='POST')
+        .add_view(cget, request_method='GET', renderer='json') \
+        .add_view(cpost, request_method='POST', renderer='json')

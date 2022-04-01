@@ -1,8 +1,4 @@
-
-from pyramid.response import Response
-
 from .interface import IFeatureLayer
-from .. import geojson
 from ..lib.geometry import Geometry
 from ..models import DBSession
 from ..resource import (
@@ -98,7 +94,4 @@ def identify(request):
 
     result['featureCount'] = feature_count
 
-    return Response(
-        geojson.dumps(result),
-        content_type='application/json',
-        charset='utf-8')
+    return result

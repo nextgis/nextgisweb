@@ -1,10 +1,7 @@
-import json
 from collections import OrderedDict
 
 from pyramid.httpexceptions import HTTPNotFound
-from pyramid.response import Response
 
-from .. import geojson
 from ..resource import (
     Resource,
     ResourceScope,
@@ -119,9 +116,7 @@ def store_item(layer, request):
             extension = extcls(layer=layer)
             result['ext'][extcls.identity] = extension.feature_data(feature)
 
-    return Response(
-        json.dumps(result, cls=geojson.Encoder),
-        content_type='application/json', charset='utf-8')
+    return result
 
 
 @viewargs(renderer='nextgisweb:feature_layer/template/test_mvt.mako')
@@ -169,7 +164,7 @@ def setup_pyramid(comp, config):
         r'/resource/{id:\d+}/store/{feature_id:\d+}',
         factory=resource_factory,
         client=('id', 'feature_id')
-    ).add_view(store_item, context=IFeatureLayer)
+    ).add_view(store_item, context=IFeatureLayer, renderer='json')
 
     config.add_view(export, route_name='resource.export.page', context=IFeatureLayer)
 

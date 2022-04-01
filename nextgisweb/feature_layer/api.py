@@ -21,7 +21,6 @@ from ..lib.geometry import Geometry, GeometryNotValid, Transformer
 from ..resource import DataScope, Resource, resource_factory
 from ..resource.exception import ResourceNotFound
 from ..spatial_ref_sys import SRS
-from .. import geojson
 
 from .interface import (
     IFeatureLayer,
@@ -465,9 +464,7 @@ def iget(resource, request):
 
     result = serialize(feature, **srlz_params)
 
-    return Response(
-        json.dumps(result, cls=geojson.Encoder),
-        content_type='application/json', charset='utf-8')
+    return result
 
 
 def item_extent(resource, request):
@@ -486,9 +483,7 @@ def item_extent(resource, request):
         maxLon=maxLon,
         maxLat=maxLat
     )
-    return Response(
-        json.dumps(dict(extent=extent)),
-        content_type='application/json', charset='utf-8')
+    return dict(extent=extent)
 
 
 def iput(resource, request):
@@ -514,9 +509,7 @@ def iput(resource, request):
     if IWritableFeatureLayer.providedBy(resource):
         resource.feature_put(feature)
 
-    return Response(
-        json.dumps(dict(id=feature.id)),
-        content_type='application/json', charset='utf-8')
+    return dict(id=feature.id)
 
 
 def idelete(resource, request):
@@ -524,8 +517,6 @@ def idelete(resource, request):
 
     fid = int(request.matchdict['fid'])
     resource.feature_delete(fid)
-
-    return Response(json.dumps(None), content_type='application/json', charset='utf-8')
 
 
 def cget(resource, request):
@@ -629,9 +620,7 @@ def cget(resource, request):
         for feature in query()
     ]
 
-    return Response(
-        json.dumps(result, cls=geojson.Encoder),
-        content_type='application/json', charset='utf-8')
+    return result
 
 
 def cpost(resource, request):
@@ -652,9 +641,7 @@ def cpost(resource, request):
     deserialize(feature, request.json_body, **dsrlz_params)
     fid = resource.feature_create(feature)
 
-    return Response(
-        json.dumps(dict(id=fid)),
-        content_type='application/json', charset='utf-8')
+    return dict(id=fid)
 
 
 def cpatch(resource, request):
@@ -695,7 +682,7 @@ def cpatch(resource, request):
 
         result.append(dict(id=fid))
 
-    return Response(json.dumps(result), content_type='application/json', charset='utf-8')
+    return result
 
 
 def cdelete(resource, request):
@@ -712,7 +699,7 @@ def cdelete(resource, request):
         resource.feature_delete_all()
         result = True
 
-    return Response(json.dumps(result), content_type='application/json', charset='utf-8')
+    return result
 
 
 def count(resource, request):
@@ -721,9 +708,7 @@ def count(resource, request):
     query = resource.feature_query()
     total_count = query().total_count
 
-    return Response(
-        json.dumps(dict(total_count=total_count)),
-        content_type='application/json', charset='utf-8')
+    return dict(total_count=total_count)
 
 
 def store_collection(layer, request):
@@ -774,15 +759,13 @@ def store_collection(layer, request):
 
         result.append(fdata)
 
-    headers = dict()
-    headers['Content-Type'] = 'application/json'
-
     if http_range:
         total = features.total_count
         last = min(total - 1, last)
-        headers['Content-Range'] = 'items %d-%s/%d' % (first, last, total)
+        content_range = 'items %d-%d/%d' % (first, last, total)
+        request.response.headers['Content-Range'] = content_range
 
-    return Response(json.dumps(result, cls=geojson.Encoder), headers=headers)
+    return result
 
 
 def setup_pyramid(comp, config):
@@ -805,35 +788,35 @@ def setup_pyramid(comp, config):
     config.add_route(
         'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',
         factory=resource_factory) \
-        .add_view(iget, context=IFeatureLayer, request_method='GET') \
-        .add_view(iput, context=IFeatureLayer, request_method='PUT') \
+        .add_view(iget, context=IFeatureLayer, request_method='GET', renderer='json') \
+        .add_view(iput, context=IFeatureLayer, request_method='PUT', renderer='json') \
         .add_view(idelete, context=IWritableFeatureLayer,
-                  request_method='DELETE')
+                  request_method='DELETE', renderer='json')
 
     config.add_route(
         'feature_layer.feature.item_extent', '/api/resource/{id}/feature/{fid}/extent',
         factory=resource_factory) \
-        .add_view(item_extent, context=IFeatureLayer, request_method='GET')
+        .add_view(item_extent, context=IFeatureLayer, request_method='GET', renderer='json')
 
     config.add_route(
         'feature_layer.feature.collection', '/api/resource/{id}/feature/',
         factory=resource_factory) \
-        .add_view(cget, context=IFeatureLayer, request_method='GET') \
-        .add_view(cpost, context=IWritableFeatureLayer, request_method='POST') \
-        .add_view(cpatch, context=IWritableFeatureLayer, request_method='PATCH') \
-        .add_view(cdelete, context=IWritableFeatureLayer, request_method='DELETE')
+        .add_view(cget, context=IFeatureLayer, request_method='GET', renderer='json') \
+        .add_view(cpost, context=IWritableFeatureLayer, request_method='POST', renderer='json') \
+        .add_view(cpatch, context=IWritableFeatureLayer, request_method='PATCH', renderer='json') \
+        .add_view(cdelete, context=IWritableFeatureLayer, request_method='DELETE', renderer='json')
 
     config.add_route(
         'feature_layer.feature.count', '/api/resource/{id}/feature_count',
         factory=resource_factory) \
-        .add_view(count, context=IFeatureLayer, request_method='GET')
+        .add_view(count, context=IFeatureLayer, request_method='GET', renderer='json')
 
     config.add_route(
         'feature_layer.store', r'/api/resource/{id:\d+}/store/',
         factory=resource_factory) \
-        .add_view(store_collection, context=IFeatureLayer, request_method='GET')
+        .add_view(store_collection, context=IFeatureLayer, request_method='GET', renderer='json')
 
     from .identify import identify
     config.add_route(
         'feature_layer.identify', '/api/feature_layer/identify') \
-        .add_view(identify, request_method='POST')
+        .add_view(identify, request_method='POST', renderer='json')

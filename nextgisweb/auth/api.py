@@ -1,10 +1,8 @@
-import json
 import re
 from collections import OrderedDict
 
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased
-from pyramid.response import Response
 from pyramid.security import forget
 from pyramid.httpexceptions import (
     HTTPForbidden, HTTPUnauthorized, HTTPUnprocessableEntity)
@@ -205,21 +203,18 @@ def login(request):
 
     user, headers = request.env.auth.authenticate(
         request, request.POST['login'].strip(), request.POST['password'])
+    request.response.headerlist.extend(headers)
 
-    return Response(
-        json.dumps({
-            "keyname": user.keyname,
-            "display_name": user.display_name,
-            "description": user.description
-        }), status_code=200, headers=headers,
-        content_type='application/json', charset='utf-8')
+    return dict(
+        keyname=user.keyname,
+        display_name=user.display_name,
+        description=user.description)
 
 
 def logout(request):
     headers = forget(request)
-    return Response(
-        json.dumps({}), headers=headers,
-        content_type='application/json', charset='utf-8')
+    request.response.headerlist.extend(headers)
+    return dict()
 
 
 def setup_pyramid(comp, config):

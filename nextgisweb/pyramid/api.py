@@ -269,15 +269,14 @@ def locdata(request):
     # instead of English strings we'll use msgid.
 
     if locale == 'en':
-        return Response(json.dumps({"": {
+        return {"": {
             "domain": component,
             "lang": "en",
             "plural_forms": "nplurals=2; plural=(n != 1);"
-        }}), content_type='application/json', charset='utf-8')
+        }}
 
-    return Response(json.dumps(dict(
-        error="Locale data not found!"
-    )), status_code=404, content_type='application/json', charset='utf-8')
+    request.response.status_code = 404
+    return dict(error="Locale data not found!")
 
 
 def pkg_version(request):
@@ -297,10 +296,9 @@ def healthcheck(request):
         result['success'] = result['success'] and cresult['success']
         result['component'][comp.identity] = cresult
 
-    return Response(
-        json.dumps(result), content_type="application/json",
-        status_code=200 if result['success'] else 503, charset='utf-8'
-    )
+    if not result['success']:
+        request.response.status_code = 503
+    return result
 
 
 def statistics(request):
@@ -454,7 +452,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'pyramid.healthcheck',
         '/api/component/pyramid/healthcheck',
-    ).add_view(healthcheck)
+    ).add_view(healthcheck, renderer='json')
 
     config.add_route(
         'pyramid.statistics',

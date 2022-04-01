@@ -17,14 +17,14 @@ import transaction
 from sqlalchemy import text
 from zope.sqlalchemy import mark_changed
 
-from ..lib.logging import logger
-from .. import geojson
 from ..command import Command
-from ..models import DBSession
+from ..lib.json import dumps
+from ..lib.logging import logger
 from ..lib.migration import (
     revid, REVID_ZERO, MigrationKey, resolve,
     UninstallOperation, RewindOperation,
     PythonModuleMigration, SQLScriptMigration)
+from ..models import DBSession
 
 from .backup import backup, restore
 from .migration import MigrationRegistry, MigrationContext
@@ -335,7 +335,7 @@ class StorageEstimateCommand(Command):
     @classmethod
     def execute(cls, args, env):
         env.core.estimate_storage_all()
-        print(geojson.dumps(env.core.query_storage()))
+        print(dumps(env.core.query_storage()))
 
 
 @Command.registry.register
@@ -381,7 +381,7 @@ class StatisticsCommand(Command):
             if hasattr(comp, 'query_stat'):
                 result[comp.identity] = comp.query_stat()
 
-        print(geojson.dumps(result, ensure_ascii=False, indent=2))
+        print(dumps(result, pretty=True))
 
 
 @Command.registry.register

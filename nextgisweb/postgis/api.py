@@ -1,8 +1,5 @@
-import json
-
 from sqlalchemy import inspect
 from sqlalchemy.exc import NoSuchTableError, SQLAlchemyError
-from pyramid.response import Response
 
 from ..core.exception import ValidationError
 from ..resource import resource_factory, ConnectionScope
@@ -30,7 +27,7 @@ def inspect_connection(request):
                 views=inspector.get_view_names(schema=schema_name),
                 tables=inspector.get_table_names(schema=schema_name)))
 
-    return Response(json.dumps(result), content_type='application/json', charset='utf-8')
+    return result
 
 
 def inspect_table(request):
@@ -55,16 +52,18 @@ def inspect_table(request):
     except NoSuchTableError:
         raise ValidationError(_("Table (%s) not found in schema (%s)." % (table_name, schema)))
 
-    return Response(json.dumps(result), content_type='application/json', charset='utf-8')
+    return result
 
 
 def setup_pyramid(comp, config):
     config.add_route(
         'postgis.connection.inspect', '/api/resource/{id}/inspect/',
-        factory=resource_factory) \
-        .add_view(inspect_connection, context=PostgisConnection, request_method='GET')
+        factory=resource_factory
+    ).add_view(inspect_connection, context=PostgisConnection,
+               request_method='GET', renderer='json')
 
     config.add_route(
         'postgis.connection.inspect.table', '/api/resource/{id}/inspect/{table_name}/',
-        factory=resource_factory) \
-        .add_view(inspect_table, context=PostgisConnection, request_method='GET')
+        factory=resource_factory
+    ).add_view(inspect_table, context=PostgisConnection,
+               request_method='GET', renderer='json')

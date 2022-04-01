@@ -1,25 +1,9 @@
-import datetime
-import decimal
-import functools
+import warnings
 
-from geojson import dumps as _dumps, loads as _loads
-from geojson.codec import GeoJSONEncoder
+from .lib.json import dumps, loads  # NOQA
 
 
-class Encoder(GeoJSONEncoder):
-    # SQLAlchemy's Reflecting Tables mechanism uses decimal.Decimal
-    # for numeric columns and datetime.date for dates. Python json
-    # doesn't deal with these types. This class provides a simple
-    # encoder to deal with objects of these types.
-
-    def default(self, obj):
-        if isinstance(obj, (datetime.date, datetime.datetime, datetime.time)):
-            return obj.isoformat()
-        if isinstance(obj, decimal.Decimal):
-            # The decimal is converted to a lossy float
-            return float(obj)
-        return GeoJSONEncoder.default(self, obj)
-
-
-dumps = functools.partial(_dumps, cls=Encoder)
-loads = functools.partial(_loads, cls=Encoder)
+warnings.warn(
+    "The 'nextgisweb.geojson' module deprecated now and it's going to be "
+    "removed in 4.2.0. Use the 'nextgisweb.lib.json' module instead.",
+    DeprecationWarning, stacklevel=2)

@@ -27,10 +27,12 @@ def test_api_login_logout(ngw_webtest_app):
     resp = ngw_webtest_app.post('/api/component/auth/login', dict(
         login='administrator', password='admin'))
     assert resp.status_code == 200
+    assert resp.json['keyname'] == 'administrator'
 
     _dummy_auth_request(ngw_webtest_app)
 
     resp = ngw_webtest_app.post('/api/component/auth/logout')
+    assert resp.json == dict()
     resp = ngw_webtest_app.get('/api/component/auth/user/', expect_errors=True)
     assert resp.status_code == 403
 

@@ -1,4 +1,3 @@
-import errno
 import os
 import os.path
 from functools import lru_cache
@@ -23,9 +22,8 @@ from ..core.exception import UserException
 from ..package import amd_packages
 from ..models import DBSession
 
-from . import exception
+from . import exception, renderer
 from .session import WebSession
-from .renderer import json_renderer
 from .util import _, ErrorRendererPredicate, StaticFileResponse
 
 
@@ -389,7 +387,7 @@ def setup_pyramid(comp, config):
 
     # RENDERERS
 
-    config.add_renderer('json', json_renderer)
+    config.add_renderer('json', renderer.JSON())
 
     # Filter for quick translation. Defines function tr, which we can use
     # instead of request.localizer.translate in mako templates.

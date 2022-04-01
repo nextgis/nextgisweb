@@ -1,13 +1,14 @@
-import datetime
-
-from pyramid.renderers import JSON
+from ..lib import json
 
 
-def datetime_adapter(obj, request):
-    return obj.isoformat()
+class JSON:
 
+    def __call__(self, info):
+        def _render(value, system):
+            request = system.get('request')
+            if request is not None:
+                response = request.response
+                response.content_type = 'application/json'
+            return json.dumpb(value)
 
-json_renderer = JSON()
-json_renderer.add_adapter(datetime.date, datetime_adapter)
-json_renderer.add_adapter(datetime.datetime, datetime_adapter)
-json_renderer.add_adapter(datetime.time, datetime_adapter)
+        return _render

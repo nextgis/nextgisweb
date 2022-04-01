@@ -2,8 +2,8 @@ import pytest
 import json
 from sqlalchemy.exc import IntegrityError
 
+from nextgisweb.lib.json import dumps
 from nextgisweb.models import DBSession
-from nextgisweb import geojson
 from nextgisweb.resource import Resource, ResourceGroup
 from nextgisweb.resource.serialize import CompositeSerializer
 from nextgisweb.auth import User
@@ -14,7 +14,7 @@ def test_root_serialize(ngw_txn):
     srlzr = CompositeSerializer(resource, resource.owner_user)
     srlzr.serialize()
 
-    data = json.loads(json.dumps(srlzr.data, cls=geojson.Encoder))
+    data = json.loads(dumps(srlzr.data))
 
     assert 'resource' in data
     assert data['resource']['cls'] == 'resource_group'

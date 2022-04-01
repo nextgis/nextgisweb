@@ -6,9 +6,9 @@ from datetime import datetime
 
 import zope.event
 
-from .. import geojson
 from ..env import env
 from ..i18n import trstring_factory
+from ..lib.json import dumps
 
 COMP_ID = 'audit'
 _ = trstring_factory(COMP_ID)
@@ -21,7 +21,7 @@ def es_index(timestamp):
 
 
 def to_nsjdon(data):
-    return geojson.dumps(data)
+    return dumps(data)
 
 
 class OnResponse(object):
