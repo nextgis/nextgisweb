@@ -16,6 +16,12 @@ from nextgisweb.wfsserver.model import Service as WFSService, Layer as WFSLayer
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
 
 
+@pytest.fixture(scope='module', autouse=True)
+def force_schema_validation(ngw_env):
+    with ngw_env.wfsserver.force_schema_validation():
+        yield
+
+
 @pytest.fixture(scope='module')
 def vlayer_id(ngw_resource_group):
     with transaction.manager:

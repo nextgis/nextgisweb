@@ -26,6 +26,12 @@ def type_geojson_dataset(filename):
     return result
 
 
+@pytest.fixture(scope='module', autouse=True)
+def force_schema_validation(ngw_env):
+    with ngw_env.wfsserver.force_schema_validation():
+        yield
+
+
 @pytest.fixture(scope='module')
 def service(ngw_resource_group):
     with transaction.manager:

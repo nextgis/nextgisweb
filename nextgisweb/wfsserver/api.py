@@ -23,7 +23,7 @@ def wfs(resource, request):
         else:
             raise
 
-    fsv = request.env.wfsserver.force_schema_validation
+    fsv = request.env.wfsserver._force_schema_validation
     xml = WFSHandler(
         resource, request,
         force_schema_validation=fsv,
