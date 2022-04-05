@@ -2,7 +2,6 @@ import sys
 import os.path
 import warnings
 import traceback
-import json
 from collections import OrderedDict
 from hashlib import md5
 
@@ -12,6 +11,7 @@ from pyramid import httpexceptions
 from zope.interface import implementer
 from zope.interface.interface import adapter_hooks
 
+from ..lib import json
 from ..lib.logging import logger
 from ..core.exception import IUserException, user_exception
 from .util import _
@@ -30,7 +30,7 @@ def includeme(config):
     # PYRAMID REDEFINED METHODS FOR ERROR HANDLING
     def json_body(req):
         try:
-            return json.loads(req.body.decode(req.charset))
+            return json.loadb(req.body)
         except ValueError as exc:
             user_exception(exc, title="JSON parse error", http_status_code=400)
             raise
@@ -176,8 +176,8 @@ def json_error(request, err_info, exc, exc_info, debug=True):
 
 def json_error_response(request, err_info, exc, exc_info, debug=True):
     return Response(
-        json.dumps(json_error(request, err_info, exc, exc_info, debug=debug)),
-        content_type='application/json', charset='utf-8',
+        json.dumpb(json_error(request, err_info, exc, exc_info, debug=debug)),
+        content_type='application/json',
         status_code=err_info_attr(err_info, exc, 'http_status_code', 500))
 
 

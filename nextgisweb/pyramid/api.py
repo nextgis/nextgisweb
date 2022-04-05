@@ -1,5 +1,4 @@
 import re
-import json
 import base64
 from datetime import timedelta
 from collections import OrderedDict
@@ -11,6 +10,7 @@ from urllib.parse import unquote
 from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 
+from ..lib import json
 from ..lib.logging import logger
 from ..env import env
 from ..package import pkginfo
@@ -353,7 +353,7 @@ def custom_css_get(request):
 
     is_json = request.GET.get('format', 'css').lower() == 'json'
     if is_json:
-        return Response(json.dumps(body), content_type='application/json', charset='utf-8')
+        return Response(json.dumpb(body), content_type='application/json')
     else:
         return Response(body, content_type='text/css', charset='utf-8', expires=timedelta(days=1))
 
@@ -370,7 +370,7 @@ def custom_css_put(request):
         request.env.core.settings_set('pyramid', 'custom_css', data)
 
     if is_json:
-        return Response(json.dumps(None), content_type="application/json", charset='utf-8')
+        return Response(json.dumpb(None), content_type="application/json")
     else:
         return Response()
 
