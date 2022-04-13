@@ -141,7 +141,12 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 cmd.append('-dstalpha')
             ds_measure = gdal.AutoCreateWarpedVRT(
                 ds, src_osr.ExportToWkt(), dst_osr.ExportToWkt())
-            assert ds_measure is not None, gdal.GetLastErrorMsg()
+            if ds_measure is None:
+                message = _("Failed to reproject the raster to the target coordinate system.")
+                gdal_err = gdal.GetLastErrorMsg().strip()
+                if gdal_err != '':
+                    message += ' ' + _("GDAL error message: %s") % gdal_err
+                raise ValidationError(message=message)
         else:
             cmd = ['gdal_translate', '-of', 'GTiff']
             ds_measure = ds
