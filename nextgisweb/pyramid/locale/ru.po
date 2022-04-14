@@ -329,6 +329,10 @@ msgstr "Изменения в стилях сохранены. Обновите 
 msgid "Translated text"
 msgstr "Переведенный текст"
 
+#: nodepkg/logo-form/LogoForm.js:43
+msgid "Logo saved. Reload the page to get them applied."
+msgstr "Логотип сохранен. Обновите страницу, чтобы увидеть изменения."
+
 #: nodepkg/storage-summary/StorageSummary.js:82
 msgid "Kind of data"
 msgstr "Вид данных"

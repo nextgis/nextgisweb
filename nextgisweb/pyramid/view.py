@@ -154,6 +154,7 @@ def custom_css(request):
 def cp_logo(request):
     request.require_administrator()
     return dict(
+        entrypoint='@nextgisweb/pyramid/logo-form',
         title=_("Custom logo"),
         dynmenu=request.env.pyramid.control_panel)
 
@@ -448,7 +449,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'pyramid.control_panel.logo',
         '/control-panel/logo'
-    ).add_view(cp_logo, renderer=ctpl('logo'))
+    ).add_view(cp_logo, renderer=REACT_RENDERER)
 
     config.add_route(
         'pyramid.control_panel.system_name',
