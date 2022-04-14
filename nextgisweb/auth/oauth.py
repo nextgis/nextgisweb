@@ -18,7 +18,7 @@ from ..core.exception import UserException
 
 from .models import User, Group, Base
 from .exception import UserDisabledException
-from .util import _, clean_user_keyname
+from .util import _, clean_user_keyname, enum_name
 
 
 MAX_TOKEN_LENGTH = 250
@@ -189,10 +189,11 @@ class OAuthHelper(object):
         if profile_keyname is not None:
             user.keyname = token[profile_keyname]
 
-        # Check keyname uniqueness and add numbered suffix
+        # Check keyname/display_name uniqueness and add numbered suffix
         keyname_base = _fallback_value(user.keyname, user.oauth_subject)
         for idx in itertools.count():
-            candidate = clean_user_keyname(keyname_base, idx)
+            candidate = clean_user_keyname(keyname_base)
+            candidate = enum_name(candidate, idx)
             if User.filter(
                 sa.func.lower(User.keyname) == candidate.lower(),
                 User.id != user.id
@@ -200,7 +201,6 @@ class OAuthHelper(object):
                 user.keyname = candidate
                 break
 
-        # Full name (display_name)
         profile_display_name = opts.get('display_name.attr', None)
         if profile_display_name is not None:
             user.display_name = ' '.join([
@@ -208,7 +208,15 @@ class OAuthHelper(object):
                 for key in re.split(r',\s*', profile_display_name)
                 if key in token])
 
-        user.display_name = _fallback_value(user.display_name, user.keyname)
+        display_name_base = _fallback_value(user.display_name, user.keyname)
+        for idx in itertools.count():
+            candidate = enum_name(display_name_base, idx)
+            if User.filter(
+                sa.func.lower(User.display_name) == candidate.lower(),
+                User.id != user.id
+            ).first() is None:
+                user.display_name = candidate
+                break
 
         # Group membership (member_of)
         mof_attr = opts.get('member_of.attr', None)

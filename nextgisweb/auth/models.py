@@ -41,6 +41,11 @@ class Principal(Base):
     display_name = sa.Column(sa.Unicode, nullable=False)
     description = sa.Column(sa.Unicode)
 
+    __table_args__ = (
+        sa.Index('auth_principal_cls_lower_display_name_idx',
+                 cls, sa.func.lower(display_name), unique=True),
+    )
+
     class on_find_references:
         def __init__(self, principal):
             self.principal = principal
@@ -162,9 +167,9 @@ class User(Principal):
                 if a in data:
                     setattr(self, a, data[a])
 
-        if 'member_of' in data:
-            self.member_of = [Group.filter_by(id=gid).one()
-                              for gid in data['member_of']]
+            if 'member_of' in data:
+                self.member_of = [Group.filter_by(id=gid).one()
+                                  for gid in data['member_of']]
 
         enabled = not self.disabled and was_disabled
 

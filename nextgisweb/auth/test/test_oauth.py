@@ -36,6 +36,7 @@ def setup_oauth(ngw_env):
         'oauth.server.introspection_endpoint': 'http://oauth/introspect',
         'oauth.profile.subject.attr': 'sub',
         'oauth.profile.keyname.attr': 'preferred_username',
+        'oauth.profile.display_name.attr': 'family_name',
     }
 
     prev_helper = auth.oauth
@@ -139,7 +140,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
         keyname="oauth-test2",
         pwd="oauth-secret",
         first_name="OAuthOauth",
-        family_name="TestTest",
+        family_name="Test",
         active=True,
     )
 
@@ -261,4 +262,5 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     ):
         keyname = ngw_webtest_app.get('/api/component/auth/current_user').json['keyname']
         user2 = User.filter_by(keyname=keyname).one()
+        assert user2.display_name == ouser2['family_name'] + '_1'
         assert user2.oauth_subject == ouser2['sub']
