@@ -1,10 +1,10 @@
 import "./ImageUploader.less";
 
 import { InboxOutlined, StopOutlined } from "@ant-design/icons";
-import { useFileUploader } from "@nextgisweb/file-upload";
+import { useFileUploader } from "../hook/useFileUploader";
 import { message, Upload, Button } from "@nextgisweb/gui/antd";
 import { DeleteOutlined } from "@ant-design/icons";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n!file_upload";
 import { PropTypes } from "prop-types";
 import { useState, useEffect } from "react";
 

@@ -1,9 +1,6 @@
 import { message, Space } from "@nextgisweb/gui/antd";
-import {
-    ImageUploader,
-    LoadingWrapper,
-    SaveButton
-} from "@nextgisweb/gui/component";
+import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
+import { ImageUploader } from "@nextgisweb/file-upload";
 import ErrorDialog from "@nextgisweb/gui/error";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!pyramid";
