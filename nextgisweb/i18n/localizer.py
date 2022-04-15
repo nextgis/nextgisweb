@@ -69,8 +69,13 @@ def translator(translations):
         if translated == trstr:
             translated = str(trstr)
 
-        if trstr.modarg is not None:
-            translated = translated % trstr.modarg
+        modarg = trstr.modarg
+        if modarg is not None:
+            if isinstance(modarg, tuple):
+                modarg = tuple(_translator(i) for i in modarg)
+            else:
+                modarg = _translator(modarg)
+            translated = translated % modarg
 
         return translated
 
