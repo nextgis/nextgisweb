@@ -78,14 +78,15 @@ def show(request):
     return dict(obj=request.context, sections=request.context.__psection__)
 
 
-@viewargs(renderer='nextgisweb:resource/template/json.mako')
-def objjson(request):
+def json_view(request):
     request.resource_permission(PERM_READ)
-    serializer = CompositeSerializer(obj=request.context, user=request.user)
-    serializer.serialize()
-    return dict(obj=request.context,
-                subtitle=_("JSON view"),
-                objjson=serializer.data)
+    return dict(
+        entrypoint='@nextgisweb/resource/json-view',
+        props=dict(id=request.context.id),
+        title=_("JSON view"),
+        obj=request.context,
+        maxheight=True,
+    )
 
 
 # TODO: Move to API
@@ -240,7 +241,7 @@ def setup_pyramid(comp, config):
     _resource_route('show', r'{id:\d+}', client=('id', )).add_view(show)
 
     _resource_route('json', r'{id:\d+}/json', client=('id', )) \
-        .add_view(objjson)
+        .add_view(json_view, renderer=REACT_RENDERER)
 
     _resource_route('tree', r'{id:\d+}/tree', client=('id', )).add_view(tree)
 

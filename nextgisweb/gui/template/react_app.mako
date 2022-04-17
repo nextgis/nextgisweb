@@ -1,6 +1,6 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<div id='root'></div>
+<div id='root' style="${'height: 100%' if maxheight else ''}"></div>
 
 <script type="text/javascript">
     require([
