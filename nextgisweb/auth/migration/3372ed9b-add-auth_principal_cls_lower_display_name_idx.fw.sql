@@ -32,7 +32,7 @@ BEGIN
 
             SELECT COUNT(*) INTO conflict_count
             FROM auth_principal
-            WHERE cls = row.cls AND lower(display_name) = candidate;
+            WHERE cls = row.cls AND lower(display_name) = lower(candidate);
 
             IF conflict_count = 0 THEN
                 UPDATE auth_principal
