@@ -11,8 +11,6 @@ from babel.support import Translations as BabelTranslations
 from ..lib.logging import logger
 from ..package import pkginfo
 
-from .trstring import TrString
-
 
 class Translations(BabelTranslations):
     def scandir(self, directory, locale):
@@ -45,41 +43,8 @@ class Translations(BabelTranslations):
                 with io.open(mo_path, 'rb') as fp:
                     self.add(Translations(fp=fp, domain=comp_id))
 
-
-def dugettext_policy(translations, trstr, domain, context):
-    if domain is None:
-        domain = getattr(trstr, 'domain', None) or 'messages'
-    context = context or getattr(trstr, 'context', None)
-    msgid = trstr
-    translated = translations.dugettext(domain, msgid)
-    return trstr if translated == msgid else translated
-
-
-def translator(translations):
-    def _translator(trstr, domain=None, context=None):
-        if not isinstance(trstr, TrString):
-            return trstr
-
-        translated = trstr
-        domain = domain or trstr.domain
-        context = context or trstr.context
-
-        if translations is not None:
-            translated = dugettext_policy(translations, trstr, domain, context)
-        if translated == trstr:
-            translated = str(trstr)
-
-        modarg = trstr.modarg
-        if modarg is not None:
-            if isinstance(modarg, tuple):
-                modarg = tuple(_translator(i) for i in modarg)
-            else:
-                modarg = _translator(modarg)
-            translated = translated % modarg
-
-        return translated
-
-    return _translator
+    def translate(self, msg, *, domain, context):
+        return self.dugettext(domain, msg)
 
 
 class Localizer(object):
@@ -89,7 +54,7 @@ class Localizer(object):
         self.pluralizer = None
         self.translator = None
 
-    def translate(self, tstring, domain=None):
-        if self.translator is None:
-            self.translator = translator(self.translations)
-        return self.translator(tstring, domain=domain)
+    def translate(self, value):
+        if trmeth := getattr(value, '__translate__', None):
+            return trmeth(self.translations)
+        return value

@@ -4,7 +4,6 @@ import warnings
 from zope.interface import Interface, Attribute, implementer, classImplements
 from zope.interface.interface import adapter_hooks
 
-from ..i18n import TrString, translator
 from .util import _
 
 
@@ -79,11 +78,7 @@ class UserException(Exception):
         _self_attr('http_status_code', http_status_code)
 
     def __str__(self):
-        return "{}: {}".format(
-            self.__class__.__name__,
-            translator(None)(self.message)
-            if isinstance(self.message, TrString)
-            else self.message)
+        return "{}: {}".format(self.__class__.__name__, self.message)
 
 
 class ValidationError(UserException):

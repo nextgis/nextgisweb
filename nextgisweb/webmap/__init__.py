@@ -42,7 +42,8 @@ class WebMapComponent(Component):
             basemaps=self.basemaps,
             annotation=self.options['annotation'],
             adapters=dict(
-                (i.identity, dict(display_name=i.display_name))
+                (i.identity, dict(
+                    display_name=request.localizer.translate(i.display_name)))
                 for i in WebMapAdapter.registry
             ),
             enable_social_networks=self.options['enable_social_networks'],
