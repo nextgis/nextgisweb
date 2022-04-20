@@ -59,6 +59,15 @@
     %for template in request.env.pyramid._template_include:
         <%include file="${template}"/>
     %endfor
+
+    <%
+        try:
+            include_head = request.env.core.settings_get('pyramid', 'include_head')
+        except KeyError:
+            include_head = ""
+    %>
+    ${include_head | n}
+
 </head>
 
 <body class="claro nextgis <%block name='body_class'/>">
