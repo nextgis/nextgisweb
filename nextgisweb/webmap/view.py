@@ -156,6 +156,9 @@ def display(obj, request):
                 ))
             )
 
+            if not data['children']:
+                return None
+
         return data
 
     tmp = obj.to_dict()
@@ -196,6 +199,7 @@ def display(obj, request):
         display_config=config,
         custom_layout=True
     )
+
 
 def preview_embedded(request):
     iframe = request.POST['iframe']
