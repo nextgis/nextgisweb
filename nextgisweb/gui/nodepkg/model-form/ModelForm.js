@@ -52,8 +52,8 @@ export function ModelForm(props) {
                     ? route(model.item, id).put
                     : route(model.collection).post;
             try {
-                const resp = await req({ json });
-                const url = routeURL(model.edit, resp.id);
+                await req({ json });
+                const url = routeURL(model.browse);
                 window.open(url, "_self");
             } catch (err) {
                 new ErrorDialog(err).show();
