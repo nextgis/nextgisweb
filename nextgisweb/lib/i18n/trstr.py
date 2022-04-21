@@ -17,6 +17,9 @@ class TrStr:
     def __add__(self, other):
         return TrStrConcat(self, other)
 
+    def __radd__(self, other):
+        return TrStrConcat(other, self)
+
     def format(self, *args, **kwargs):
         return TrStrFormat(self, args, kwargs)
 
@@ -27,14 +30,18 @@ class TrStr:
 
 class TrStrConcat:
 
-    def __init__(self, *items):
-        self._items = list(items)
+    def __init__(self, a, b):
+        self._items = (a._items if isinstance(a, TrStrConcat) else [a]) \
+            + (b._items if isinstance(b, TrStrConcat) else [b])
 
     def __str__(self):
         return "".join(map(str, deep_cast_to_str(self._items)))
 
     def __add__(self, other):
         return TrStrConcat(self, other)
+
+    def __radd__(self, other):
+        return TrStrConcat(other, self)
 
     def __translate__(self, translator):
         return "".join(map(str, deep_translate(self._items, translator)))
@@ -51,6 +58,9 @@ class TrStrModFormat:
 
     def __add__(self, other):
         return TrStrConcat(self, other)
+
+    def __radd__(self, other):
+        return TrStrConcat(other, self)
 
     def __translate__(self, translator):
         arg = deep_translate(self.arg, translator)
@@ -70,6 +80,9 @@ class TrStrFormat:
 
     def __add__(self, other):
         return TrStrConcat(self, other)
+
+    def __radd__(self, other):
+        return TrStrConcat(other, self)
 
     def __translate__(self, translator):
         return self.trstr.__translate__(translator).format(
