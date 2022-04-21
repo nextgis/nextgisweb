@@ -30,6 +30,8 @@ export function ModelBrowse({
     model: m,
     messages,
     itemProps = {},
+    createProps = {},
+    callbacks = {},
     selectedControls = [],
     collectionOptions,
     collectionFilter,
@@ -91,6 +93,9 @@ export function ModelBrowse({
             const newRows = rows.filter((row) => row.id !== id);
             setRows(newRows);
             message.success(deleteSuccess);
+            if (callbacks && callbacks.deleteModelItem) {
+                callbacks.deleteModelItem();
+            }
         } catch (err) {
             new ErrorDialog(err).show();
         }
@@ -129,6 +134,9 @@ export function ModelBrowse({
             setSelected([]);
             setRows(newRows);
             message.success(deleteBatchSuccess);
+            if (callbacks && callbacks.deleteSelected) {
+                callbacks.deleteSelected();
+            }
         } catch (err) {
             new ErrorDialog(err).show();
         } finally {
@@ -223,6 +231,7 @@ export function ModelBrowse({
                     icon={<PlusOutlined />}
                     type="primary"
                     onClick={goToCreatePage}
+                    {...createProps}
                 >
                     {i18n.gettext("Create")}
                 </Button>
@@ -279,5 +288,12 @@ ModelBrowse.propTypes = {
     columns: PropTypes.array.isRequired,
     messages: PropTypes.object,
     itemProps: PropTypes.object,
-    selectedControl: PropTypes.array,
+    createProps: PropTypes.object,
+    selectedControls: PropTypes.array,
+    collectionOptions: PropTypes.object,
+    collectionFilter: PropTypes.func,
+    callbacks: PropTypes.shape({
+        deleteSelected: PropTypes.func,
+        deleteModelItem: PropTypes.func,
+    })
 };
