@@ -155,8 +155,8 @@ def display(obj, request):
                     map(traverse, item.children)
                 ))
             )
-
-            if not data['children']:
+            # Hide empty groups
+            if (item.item_type in 'group') and not data['children']:
                 return None
 
         return data
