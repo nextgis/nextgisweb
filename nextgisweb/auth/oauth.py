@@ -185,38 +185,40 @@ class OAuthHelper(object):
     def _update_user(self, user, token):
         opts = self.options.with_prefix('profile')
 
-        profile_keyname = opts.get('keyname.attr', None)
-        if profile_keyname is not None:
-            user.keyname = token[profile_keyname]
+        if user.keyname is None or not opts['keyname.no_update']:
+            profile_keyname = opts.get('keyname.attr', None)
+            if profile_keyname is not None:
+                user.keyname = token[profile_keyname]
 
-        # Check keyname/display_name uniqueness and add numbered suffix
-        keyname_base = _fallback_value(user.keyname, user.oauth_subject)
-        for idx in itertools.count():
-            candidate = clean_user_keyname(keyname_base)
-            candidate = enum_name(candidate, idx)
-            if User.filter(
-                sa.func.lower(User.keyname) == candidate.lower(),
-                User.id != user.id
-            ).first() is None:
-                user.keyname = candidate
-                break
+            # Check keyname/display_name uniqueness and add numbered suffix
+            keyname_base = _fallback_value(user.keyname, user.oauth_subject)
+            for idx in itertools.count():
+                candidate = clean_user_keyname(keyname_base)
+                candidate = enum_name(candidate, idx)
+                if User.filter(
+                    sa.func.lower(User.keyname) == candidate.lower(),
+                    User.id != user.id
+                ).first() is None:
+                    user.keyname = candidate
+                    break
 
-        profile_display_name = opts.get('display_name.attr', None)
-        if profile_display_name is not None:
-            user.display_name = ' '.join([
-                token[key]
-                for key in re.split(r',\s*', profile_display_name)
-                if key in token])
+        if user.display_name is None or not opts['display_name.no_update']:
+            profile_display_name = opts.get('display_name.attr', None)
+            if profile_display_name is not None:
+                user.display_name = ' '.join([
+                    token[key]
+                    for key in re.split(r',\s*', profile_display_name)
+                    if key in token])
 
-        display_name_base = _fallback_value(user.display_name, user.keyname)
-        for idx in itertools.count():
-            candidate = enum_name(display_name_base, idx)
-            if User.filter(
-                sa.func.lower(User.display_name) == candidate.lower(),
-                User.id != user.id
-            ).first() is None:
-                user.display_name = candidate
-                break
+            display_name_base = _fallback_value(user.display_name, user.keyname)
+            for idx in itertools.count():
+                candidate = enum_name(display_name_base, idx)
+                if User.filter(
+                    sa.func.lower(User.display_name) == candidate.lower(),
+                    User.id != user.id
+                ).first() is None:
+                    user.display_name = candidate
+                    break
 
         # Group membership (member_of)
         mof_attr = opts.get('member_of.attr', None)
@@ -286,9 +288,13 @@ class OAuthHelper(object):
 
         Option('profile.keyname.attr', default='preferred_username',
                doc="OAuth profile keyname (user name)"),
+        Option('profile.keyname.no_update', bool, default=False,
+               doc="Turn off keyname secondary synchronization"),
 
         Option('profile.display_name.attr', default='name',
                doc="OAuth profile display name"),
+        Option('profile.display_name.no_update', bool, default=False,
+               doc="Turn off display_name secondary synchronization"),
 
         Option('profile.member_of.attr', default=None),
         Option('profile.member_of.map', list, default=None),
