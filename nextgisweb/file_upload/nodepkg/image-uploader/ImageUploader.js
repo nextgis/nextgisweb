@@ -10,15 +10,18 @@ import { useState, useEffect } from "react";
 
 const { Dragger } = Upload;
 
-const uploadText = `${i18n.gettext("Select an image")} ${i18n.gettext(
-    "or drag and drop here"
-)}`;
+const UPLOAD_TEXT = `${i18n.gettext("Select an image")}`;
+const DND_TEXT = i18n.gettext("or drag and drop here");
 
 export function ImageUploader({
     helpText,
+    uploadText = UPLOAD_TEXT,
+    dragAndDropText = DND_TEXT,
     onChange,
     showProgressInDocTitle = true,
+    accept,
     image,
+    inputProps = {},
 }) {
     const [fileUploader, abortFileUpload] = useFileUploader();
     const [progressText, setProgressText] = useState(null);
@@ -101,7 +104,9 @@ export function ImageUploader({
     const DragInput = () => {
         const InputText = () => (
             <>
-                <p className="ant-upload-text">{uploadText}</p>
+                <p className="ant-upload-text">
+                    {[uploadText, dragAndDropText].filter(Boolean).join(" ")}
+                </p>
                 {helpText ? <p className="ant-upload-hint">{helpText}</p> : ""}
             </>
         );
@@ -127,6 +132,8 @@ export function ImageUploader({
                 {...props}
                 height={height}
                 disabled={progressText !== null}
+                accept={accept}
+                {...inputProps}
             >
                 <p className="ant-upload-drag-icon">
                     <InboxOutlined />
@@ -172,7 +179,11 @@ export function ImageUploader({
 
 ImageUploader.propTypes = {
     helpText: PropTypes.string,
+    uploadText: PropTypes.string,
+    dragAndDropText: PropTypes.string,
     showProgressInDocTitle: PropTypes.bool,
     onChange: PropTypes.func,
     image: PropTypes.object,
+    inputProps: PropTypes.object,
+    accept: PropTypes.string,
 };
