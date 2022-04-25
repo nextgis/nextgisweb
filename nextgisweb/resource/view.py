@@ -268,14 +268,14 @@ def setup_pyramid(comp, config):
         template='nextgisweb:resource/template/section_summary.mako')
 
     Resource.__psection__.register(
-        key='children', priority=20,
+        key='children', priority=40,
         title=_("Child resources"),
         is_applicable=lambda obj: len(obj.children) > 0,
         template='nextgisweb:resource/template/section_children.mako')
 
     Resource.__psection__.register(
         key='description',
-        priority=50,
+        priority=20,
         title=_("Description"),
         is_applicable=lambda obj: obj.description is not None,
         template='nextgisweb:resource/template/section_description.mako')
