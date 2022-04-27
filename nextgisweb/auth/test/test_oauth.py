@@ -22,8 +22,8 @@ ACCESS_TOKEN_LIFETIME = 60
 REFRESH_TOKEN_LIFETIME = 1800
 
 
-@pytest.fixture(scope='module', autouse=True)
-def setup_oauth(ngw_env):
+@pytest.fixture(scope='function', autouse=True)
+def setup_oauth(ngw_env, request):
     auth = ngw_env.auth
     options = {
         'oauth.enabled': True,
@@ -36,9 +36,11 @@ def setup_oauth(ngw_env):
         'oauth.server.auth_endpoint': 'http://oauth/auth',
         'oauth.server.introspection_endpoint': 'http://oauth/introspect',
         'oauth.profile.subject.attr': 'sub',
-        'oauth.profile.keyname.attr': 'preferred_username',
-        'oauth.profile.display_name.attr': 'family_name',
+        'oauth.profile.keyname.attr': None,
+        'oauth.profile.display_name.attr': None,
     }
+    if hasattr(request, 'param'):
+        options.update(request.param)
 
     prev_helper = auth.oauth
     with auth.options.override(options):
@@ -111,6 +113,10 @@ def freezegun():
         yield v
 
 
+@pytest.mark.parametrize('setup_oauth', [{
+    'oauth.profile.keyname.attr': 'preferred_username',
+    'oauth.profile.display_name.attr': 'family_name',
+}], indirect=['setup_oauth'])
 def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ngw_env):
     options = ngw_env.auth.options.with_prefix('oauth')
 
@@ -265,3 +271,43 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
         user2 = User.filter_by(keyname=keyname).one()
         assert user2.display_name == ouser2['family_name'] + '_1'
         assert user2.oauth_subject == ouser2['sub']
+
+
+@pytest.mark.parametrize('setup_oauth', [{
+    'oauth.scope': ['user.read', 'user.write'],
+}], indirect=['setup_oauth'])
+@pytest.mark.parametrize('scope, ok', (
+    (['user.read'], False),
+    (['user.read', 'user.write'], True),
+    (['user.write', 'user.read', 'other'], True),
+))
+def test_scope(scope, ok, server_response_mock, ngw_webtest_app):
+    resp = ngw_webtest_app.get('/oauth', status=302)
+    redirect = resp.headers['Location']
+    redirect_qs = dict(parse_qsl(urlsplit(redirect).query))
+    state_key = redirect_qs['state']
+
+    code = token_urlsafe(16)
+    access_token = token_urlsafe(32)
+    refresh_token = token_urlsafe(32)
+
+    start_tstamp = int(datetime.utcnow().timestamp())
+    with server_response_mock(
+        'token', dict(grant_type='authorization_code'),
+        response=dict(
+            access_token=access_token,
+            expires_in=ACCESS_TOKEN_LIFETIME,
+            refresh_token=refresh_token,
+            refresh_expires_in=REFRESH_TOKEN_LIFETIME,
+        )
+    ), server_response_mock(
+        'introspection', dict(token=access_token),
+        response=dict(
+            exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
+            iat=start_tstamp,
+            sub='sub',
+            scope=' '.join(scope),
+        )
+    ):
+        cb_url = f"/oauth?state={state_key}&code={code}"
+        ngw_webtest_app.get(cb_url, status=302 if ok else 401)
