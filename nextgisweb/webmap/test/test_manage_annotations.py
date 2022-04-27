@@ -39,7 +39,7 @@ def append_acl(resource, action, principal, scope, permission, identity):
 
 
 @pytest.fixture(scope='module')
-def user_with_webmap(ngw_env, ngw_resource_group):
+def webmap_id(ngw_resource_group):
     with transaction.manager:
         user = User(
             keyname=TEST_USER_KEYNAME,
@@ -55,14 +55,13 @@ def user_with_webmap(ngw_env, ngw_resource_group):
         webmap = WebMap(
             parent_id=ngw_resource_group,
             display_name=__name__,
-            owner_user=User.by_keyname(TEST_USER_KEYNAME),
+            owner_user=user,
             root_item=WebMapItem(item_type='root')
         ).persist()
 
         append_acl(webmap, 'allow', user, 'resource', 'read', WebMap.identity)
         append_acl(webmap, 'allow', user, 'webmap', 'annotation_read', WebMap.identity)
         append_acl(webmap, 'allow', user, 'webmap', 'annotation_write', WebMap.identity)
-        webmap.persist()
 
         user_admin_id = User.by_keyname('administrator').id
         make_annotation(webmap, public=True, user_id=user_admin_id)
@@ -73,15 +72,12 @@ def user_with_webmap(ngw_env, ngw_resource_group):
 
     DBSession.flush()
 
-    yield user, webmap
+    yield webmap.id
 
     with transaction.manager:
-        user = User.filter_by(keyname=TEST_USER_KEYNAME).one()
-        webmap = WebMap.filter_by(owner_user_id=user.id).one()
         DBSession.query(ResourceACLRule).filter(ResourceACLRule.principal_id == user.id).delete()
-        DBSession.query(User).filter(User.keyname == TEST_USER_KEYNAME).delete()
-        DBSession.query(WebMapAnnotation).filter(WebMapAnnotation.webmap_id == webmap.id).delete()
-        DBSession.delete(WebMap.filter_by(owner_user_id=user.id).one())
+        DBSession.delete(WebMap.filter_by(id=webmap.id).one())
+        DBSession.delete(User.filter_by(id=user.id).one())
 
 
 @pytest.fixture()
@@ -96,10 +92,8 @@ def ngw_auth_test_user(ngw_pyramid_config):
 
 
 def test_no_admin_annotations_should_view_only_public_annotations_and_own_private(ngw_webtest_app, ngw_auth_test_user,
-                                                                  ngw_resource_group, user_with_webmap):
-    (user, webmap) = user_with_webmap
-
-    annotations = ngw_webtest_app.get('/api/resource/%d/annotation/' % webmap.id).json
+                                                                                  webmap_id):
+    annotations = ngw_webtest_app.get('/api/resource/%d/annotation/' % webmap_id).json
     assert len(annotations) == 3
 
     public_annotations = list(filter(lambda a: a['public'] is True, annotations))
@@ -110,10 +104,8 @@ def test_no_admin_annotations_should_view_only_public_annotations_and_own_privat
 
 
 def test_admin_annotations_should_view_all_annotations(ngw_webtest_app, ngw_auth_administrator,
-                                                       ngw_resource_group, user_with_webmap):
-    (user, webmap) = user_with_webmap
-
-    annotations = ngw_webtest_app.get('/api/resource/%d/annotation/' % webmap.id).json
+                                                       webmap_id):
+    annotations = ngw_webtest_app.get('/api/resource/%d/annotation/' % webmap_id).json
     assert len(annotations) == 4
 
     public_annotations = list(filter(lambda a: a['public'] is True, annotations))
