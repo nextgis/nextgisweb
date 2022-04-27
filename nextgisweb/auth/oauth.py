@@ -37,8 +37,6 @@ class OAuthHelper(object):
             self.server_headers['Authorization'] = options['server.authorization_header']
 
     def authorization_code_url(self, redirect_uri, **kwargs):
-        # TODO: Implement scope support
-
         qs = dict(
             response_type='code',
             redirect_uri=redirect_uri,
@@ -46,19 +44,22 @@ class OAuthHelper(object):
 
         if 'client.id' in self.options:
             qs['client_id'] = self.options['client.id']
+        if self.options.get('scope') is not None:
+            qs['scope'] = ' '.join(self.options['scope'])
 
         return self.options['server.auth_endpoint'] + '?' + urlencode(qs)
 
     def grant_type_password(self, username, password):
-        # TODO: Implement scope support
-
-        return self._token_request('password', dict(
+        params = dict(
             username=username,
-            password=password))
+            password=password)
+
+        if self.options.get('scope') is not None:
+            params['scope'] = ' '.join(self.options['scope'])
+
+        return self._token_request('password', params)
 
     def grant_type_authorization_code(self, code, redirect_uri):
-        # TODO: Implement scope support
-
         return self._token_request('authorization_code', dict(
             redirect_uri=redirect_uri, code=code))
 
@@ -94,6 +95,11 @@ class OAuthHelper(object):
                     return None
                 raise exc
 
+            if self.options.get('scope') is not None:
+                token_scope = set(tdata['scope'].split(' ')) if 'scope' in tdata else set()
+                if (not set(self.options['scope']).issubset(token_scope)):
+                    raise InvalidScopeException()
+
             token = OAuthToken(id=token_id, data=tdata)
             token.exp = datetime.utcfromtimestamp(tdata['exp'])
             token.sub = str(tdata[self.options['profile.subject.attr']])
@@ -104,8 +110,6 @@ class OAuthHelper(object):
         return token
 
     def access_token_to_user(self, access_token, merge_user=None):
-        # TODO: Implement scope support
-
         token = self.query_introspection(access_token)
         if token is None:
             return None
@@ -253,6 +257,9 @@ class OAuthHelper(object):
         Option('bind', bool, default=True,
                doc="Allow binding local user to OAuth user."),
 
+        Option('scope', list, default=None,
+               doc="OAuth scopes"),
+
         Option('client.id', default=None,
                doc="OAuth client ID"),
 
@@ -345,6 +352,11 @@ class AuthorizationException(UserException):
 
 class InvalidTokenException(UserException):
     title = _("Invalid OAuth token")
+    http_status_code = 401
+
+
+class InvalidScopeException(UserException):
+    title = _("Invalid OAuth scope")
     http_status_code = 401
 
 

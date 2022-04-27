@@ -28,6 +28,7 @@ def setup_oauth(ngw_env):
     options = {
         'oauth.enabled': True,
         'oauth.register': True,
+        'oauth.scope': None,
         'oauth.client.id': CLIENT_ID,
         'oauth.client.secret': CLIENT_SECRET,
         'oauth.server.password': False,
