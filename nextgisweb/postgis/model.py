@@ -1,5 +1,7 @@
-import geoalchemy2 as ga
 import re
+from contextlib import contextmanager
+
+import geoalchemy2 as ga
 import sqlalchemy.sql as sql
 from shapely.geometry import box
 from sqlalchemy import select, text, func
@@ -126,12 +128,19 @@ class PostgisConnection(Base, Resource):
         comp._engine[self.id] = engine
         return engine
 
+    @contextmanager
     def get_connection(self):
         try:
             conn = self.get_engine().connect()
         except OperationalError:
             raise ValidationError(_("Cannot connect to the database!"))
-        return conn
+
+        try:
+            yield conn
+        except SQLAlchemyError as exc:
+            raise ExternalDatabaseError(sa_error=exc)
+        finally:
+            conn.close()
 
 
 class PostgisConnectionSerializer(Serializer):
@@ -205,9 +214,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         self.feature_label_field = None
 
-        conn = self.connection.get_connection()
-
-        try:
+        with self.connection.get_connection() as conn:
             result = conn.execute(text(
                 """SELECT * FROM information_schema.tables
                 WHERE table_schema = :s AND table_name = :t"""),
@@ -325,11 +332,6 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if not colfound_geom:
                 raise ValidationError(_("Column '%(column)s' not found!") % dict(column=self.column_geom)) # NOQA
 
-        except SQLAlchemyError as exc:
-            raise ExternalDatabaseError(sa_error=exc)
-        finally:
-            conn.close()
-
     def get_info(self):
         return super().get_info() + (
             (_("Geometry type"), dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[
@@ -392,17 +394,13 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         :param feature: object description
         :type feature:  Feature
         """
-        conn = self.connection.get_connection()
         idcol = db.sql.column(self.column_id)
         tab = self._sa_table(True)
         stmt = db.update(tab).values(
             self._makevals(feature)).where(idcol == feature.id)
-        try:
+
+        with self.connection.get_connection() as conn:
             conn.execute(stmt)
-        except SQLAlchemyError as exc:
-            raise ExternalDatabaseError(sa_error=exc)
-        finally:
-            conn.close()
 
     def feature_create(self, feature):
         """Insert new object to DB which is described in feature
@@ -412,19 +410,13 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         :return:    inserted object ID
         """
-        conn = self.connection.get_connection()
         idcol = db.sql.column(self.column_id)
         tab = self._sa_table(True)
-
         stmt = db.insert(tab).values(
             self._makevals(feature)).returning(idcol)
 
-        try:
+        with self.connection.get_connection() as conn:
             return conn.execute(stmt).scalar()
-        except SQLAlchemyError as exc:
-            raise ExternalDatabaseError(sa_error=exc)
-        finally:
-            conn.close()
 
     def feature_delete(self, feature_id):
         """Remove record with id
@@ -432,31 +424,21 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         :param feature_id: record id
         :type feature_id:  int or bigint
         """
-        conn = self.connection.get_connection()
         idcol = db.sql.column(self.column_id)
         tab = self._sa_table()
-
         stmt = db.delete(tab).where(
             idcol == feature_id)
 
-        try:
+        with self.connection.get_connection() as conn:
             conn.execute(stmt)
-        except SQLAlchemyError as exc:
-            raise ExternalDatabaseError(sa_error=exc)
-        finally:
-            conn.close()
 
     def feature_delete_all(self):
         """Remove all records from a layer"""
-        conn = self.connection.get_connection()
         tab = self._sa_table()
-
         stmt = db.delete(tab)
 
-        try:
+        with self.connection.get_connection() as conn:
             conn.execute(stmt)
-        finally:
-            conn.close()
 
     # IBboxLayer
     @property
@@ -486,13 +468,8 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             st_ymin(sq.c.bbox),
         )
 
-        conn = self.connection.get_connection()
-        try:
+        with self.connection.get_connection() as conn:
             maxLon, minLon, maxLat, minLat = conn.execute(select(*fields)).first()
-        except SQLAlchemyError as exc:
-            raise ExternalDatabaseError(sa_error=exc)
-        finally:
-            conn.close()
 
         extent = dict(
             minLon=minLon,
@@ -752,9 +729,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     .offset(self._offset) \
                     .order_by(*order_criterion)
 
-                conn = self.layer.connection.get_connection()
-
-                try:
+                with self.layer.connection.get_connection() as conn:
                     result = conn.execute(query)
                     for row in result.mappings():
                         fdict = dict((k, row[l]) for k, l in fieldmap)
@@ -776,23 +751,13 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                                 row['box_right'], row['box_top']
                             ) if self._box else None
                         )
-                except SQLAlchemyError as exc:
-                    raise ExternalDatabaseError(sa_error=exc)
-                finally:
-                    conn.close()
 
             @property
             def total_count(self):
-                conn = self.layer.connection.get_connection()
-
-                try:
+                with self.layer.connection.get_connection() as conn:
                     query = sql.select(func.count(idcol)) \
                         .where(db.and_(True, *where))
                     result = conn.execute(query)
                     return result.scalar()
-                except SQLAlchemyError as exc:
-                    raise ExternalDatabaseError(sa_error=exc)
-                finally:
-                    conn.close()
 
         return QueryFeatureSet()
