@@ -35,12 +35,6 @@
 
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
 
-    <script type="text/javascript">
-        %if (hasattr(request, 'context') and hasattr(request.context, 'id')):
-        var ngwResourceId = ${request.context.id};
-        %endif
-    </script>
-
     <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
     <script src="${request.route_url('jsrealm.dist', subpath='main/chunk/runtime.js')}"></script>
     
