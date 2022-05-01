@@ -374,15 +374,6 @@ def setup_pyramid(comp, config):
     config.add_route('amd_package', '/static{}/amd/*subpath'.format(comp.static_key)) \
         .add_view(static_amd_file)
 
-    # Collect external AMD-packages from other components
-    amd_base = []
-    for c in comp._env.chain('amd_base'):
-        amd_base.extend(c.amd_base)
-
-    config.add_request_method(
-        lambda r: amd_base, 'amd_base',
-        property=True, reify=True)
-
     # Base template includes
 
     comp._template_include = list(chain(*[

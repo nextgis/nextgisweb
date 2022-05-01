@@ -52,10 +52,6 @@
         ${self.head()}
     %endif
 
-    %for a in request.amd_base:
-        <script src="${request.route_url('amd_package', subpath='%s.js' % a)}"></script>
-    %endfor
-
     %for template in request.env.pyramid._template_include:
         <%include file="${template}"/>
     %endfor

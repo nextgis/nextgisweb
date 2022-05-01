@@ -88,15 +88,6 @@ class Component(metaclass=ComponentMeta):
         return self._logger
 
     @property
-    def amd_base(self):
-        """
-        Список вспомогательных AMD модулей, предоставляемых компонентом,
-        которые будут использованы в базовом шаблоне страницы. Могут
-        быть использованы для изменения её внешнего вида.
-        """
-        return ()
-
-    @property
     def template_include(self):
         return ()
 
