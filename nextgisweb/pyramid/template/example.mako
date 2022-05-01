@@ -1,4 +1,4 @@
-<%inherit file='nextgisweb:templates/base.mako' />
+<%inherit file='nextgisweb:pyramid/template/base.mako' />
 
 <%
     from pathlib import Path

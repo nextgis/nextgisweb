@@ -1,4 +1,4 @@
-<%inherit file='nextgisweb:templates/obj.mako' />
+<%inherit file='nextgisweb:pyramid/template/obj.mako' />
 
 <%def name="head()">
     <script type="text/javascript">

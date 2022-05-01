@@ -1,4 +1,4 @@
-<%inherit file='nextgisweb:templates/obj.mako' />
+<%inherit file='nextgisweb:pyramid/template/obj.mako' />
 
 <div id="map" style="width: 100%; height: 100%; border: 2px solid #ddd;"></div>
 <script>

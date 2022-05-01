@@ -74,7 +74,7 @@ def resource_factory(request):
     return obj
 
 
-@viewargs(renderer='psection.mako')
+@viewargs(renderer='nextgisweb:pyramid/template/psection.mako')
 def show(request):
     request.resource_permission(PERM_READ)
     return dict(obj=request.context, sections=request.context.__psection__)
