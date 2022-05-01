@@ -84,20 +84,22 @@ class Label(Item):
 
 class Link(Item):
 
-    def __init__(self, key, label, url, icon=None, important=False, target='_self'):
+    def __init__(self, key, label, url, icon=None, important=False, target='_self', icon_suffix=None):
         super().__init__(key)
         self._label = label
         self._url = url
         self._icon = icon
         self._important = important
         self._target = target
+        self._icon_suffix = icon_suffix
 
     def copy(self):
         return Link(
             self.key, self.label, self.url,
             icon=self.icon,
             important=self.important,
-            target=self.target)
+            target=self.target,
+            icon_suffix=self.icon_suffix)
 
     @property
     def label(self):
@@ -118,3 +120,7 @@ class Link(Item):
     @property
     def target(self):
         return self._target
+
+    @property
+    def icon_suffix(self):
+        return self._icon_suffix

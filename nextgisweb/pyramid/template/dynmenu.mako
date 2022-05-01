@@ -20,9 +20,16 @@
             %if show_icon:
                 <a href="${url}" class="sidebar-menu__link withIcon withIcon-s">
                     ${icon_svg(item.icon)}${tr(item.label)}
+                    %if item.icon_suffix:
+                        ${icon_svg(item.icon_suffix, 'icon-s')}
+                    %endif
                 </a>
             %else:
-                <a href="${url}" target="${item.target}" class="sidebar-menu__link">${tr(item.label)}</a>
+                <a href="${url}" target="${item.target}" class="sidebar-menu__link">${tr(item.label)}
+                    %if item.icon_suffix:
+                        ${icon_svg(item.icon_suffix, 'icon-s')}
+                    %endif
+                </a>
             %endif
         </li>
     %endif
