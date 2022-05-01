@@ -16,21 +16,15 @@
         %endif
         <% url = item.url(args) %>
         <li class="sidebar-menu__item${' sidebar-menu__item--selected' if url == request.url else ''}">
-            <% show_icon = item.icon %>
-            %if show_icon:
-                <a href="${url}" class="sidebar-menu__link withIcon withIcon-s">
-                    ${icon_svg(item.icon)}${tr(item.label)}
-                    %if item.icon_suffix:
-                        ${icon_svg(item.icon_suffix, 'icon-s')}
-                    %endif
-                </a>
-            %else:
-                <a href="${url}" target="${item.target}" class="sidebar-menu__link">${tr(item.label)}
-                    %if item.icon_suffix:
-                        ${icon_svg(item.icon_suffix, 'icon-s')}
-                    %endif
-                </a>
-            %endif
+            <a href="${url}" target="${item.target}" class="sidebar-menu__link withIcon withIcon-s">
+                %if item.icon:
+                    ${icon_svg(item.icon)}
+                %endif
+                ${tr(item.label)}
+                %if item.icon_suffix:
+                    ${icon_svg(item.icon_suffix, 'icon-s')}
+                %endif
+            </a>
         </li>
     %endif
 %endfor
