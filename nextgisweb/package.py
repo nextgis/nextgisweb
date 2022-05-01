@@ -8,7 +8,7 @@ from pathlib import Path
 
 from .lib.logging import logger
 
-_version_re = re.compile(r'(.+)\+([0-9a-f]{6,})(\.dirty)?$', re.IGNORECASE)
+_version_re = re.compile(r'(.+)\+(?:git)?([0-9a-f]{4,})(\.dirty)?$', re.IGNORECASE)
 _qualifications = False
 
 
