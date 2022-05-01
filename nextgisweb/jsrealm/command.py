@@ -22,6 +22,7 @@ class JSRealmInstallCommand(object):
     @classmethod
     def execute(cls, args, env):
         client_packages = list()
+        icon_sources = list()
         cwd = Path().resolve()
         for cid, cobj in env._components.items():
             cmod = import_module(cobj.__class__.__module__)
@@ -33,6 +34,10 @@ class JSRealmInstallCommand(object):
                     logger.debug("Node package is found in [{}]".format(jspkg_rel))
                     client_packages.append(jspkg_rel)
 
+            icondir = cpath / 'icon'
+            if icondir.exists():
+                icon_sources.append([cid, str(icondir)])
+
         package_json = OrderedDict(private=True)
         package_json['config'] = config = OrderedDict()
         config['nextgisweb_core_debug'] = str(env.core.options['debug']).lower()
@@ -40,6 +45,7 @@ class JSRealmInstallCommand(object):
         config['nextgisweb_jsrealm_packages'] = ','.join(client_packages)
         config['nextgisweb_jsrealm_externals'] = ','.join([
             pname for pname, _ in amd_packages()])
+        config['nextgisweb_jsrealm_icon_sources'] = json.dumps(icon_sources)
 
         ca = env.pyramid.options[f'compression.algorithms']
         config[f'nextgisweb_pyramid_compression_algorithms'] = \

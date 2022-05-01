@@ -1,11 +1,13 @@
 define([
     "dojo/_base/declare",
     "../Base",
-    "@nextgisweb/pyramid/i18n!"
+    "@nextgisweb/pyramid/i18n!",
+    "@nextgisweb/pyramid/icon"
 ], function (
     declare,
     Base,
-    i18n
+    i18n,
+    icon
 ) {
     return declare(Base, {
         layerEditor: null,
@@ -14,7 +16,7 @@ define([
             declare.safeMixin(this, options);
 
             this.label = i18n.gettext("Modify features");
-            this.customIcon = "<span class='ol-control__icon material-icons'>edit</span>";
+            this.customIcon = '<span class="ol-control__icon">' + icon.html({glyph: "edit"}) + '</span>';
         },
 
         activate: function () {

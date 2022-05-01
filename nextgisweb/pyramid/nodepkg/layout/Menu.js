@@ -2,6 +2,8 @@ import { useState, Fragment } from "react";
 import { observer } from "mobx-react";
 import { Drawer } from "@nextgisweb/gui/antd";
 import { layoutStore } from "./store";
+import CircleIcon from "@material-icons/svg/circle";
+import MenuIcon from "@material-icons/svg/menu";
 import "./Menu.less";
 
 export const Menu = observer(({ state }) => {
@@ -13,15 +15,12 @@ export const Menu = observer(({ state }) => {
                 className="ngw-pyramid-menu-icon"
                 onClick={() => setVisible(true)}
             >
-                <span className="material-icons main">menu</span>
+                <MenuIcon />
                 {layoutStore.menuNotification && (
                     <span
-                        className={
-                            "material-icons more more-" +
-                            layoutStore.menuNotification
-                        }
+                        className={"more more-" + layoutStore.menuNotification}
                     >
-                        circle
+                        <CircleIcon />
                     </span>
                 )}
             </div>

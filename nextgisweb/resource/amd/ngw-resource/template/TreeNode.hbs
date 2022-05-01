@@ -1,19 +1,13 @@
-<div class="dijitTreeNode" role="presentation"
-	><div data-dojo-attach-point="rowNode" class="dijitTreeRow" role="presentation"
-		><span data-dojo-attach-point="expandoNode" class="dijitInline dijitTreeExpando" role="presentation"></span
-		><span data-dojo-attach-point="expandoNodeText" class="dijitExpandoText" role="presentation"></span
-		><span data-dojo-attach-point="contentNode"
-			class="dijitTreeContent text-withIcon text-withIcon_size_s" role="presentation">
-			<span role="presentation" class="text-withIcon__icon text-withIcon__icon_size_s" data-dojo-attach-point="iconNode">
-				<svg class="text-withIcon__pic svgIcon-${item.cls}"
-				    ><use xmlns:xlink="http://www.w3.org/1999/xlink"
-				          xlink:href="${assetUrl}/svg/svg-symbols.svg#${item.cls}"></use>
-				<svg
-			></span
-			><span data-dojo-attach-point="labelNode,focusNode" role="treeitem"
+<div class="dijitTreeNode" role="presentation">
+	<div data-dojo-attach-point="rowNode" class="dijitTreeRow" role="presentation" style="display: flex; align-items: center; gap: 6px;">
+		<div style="flex-grow: 0" data-dojo-attach-point="expandoNode" class="dijitInline dijitTreeExpando" role="presentation"></div>
+		<div style="flex-grow: 0" data-dojo-attach-point="expandoNodeText" class="dijitExpandoText" role="presentation"></div>
+		<div data-dojo-attach-point="contentNode" class="dijitTreeContent withIcon withIcon-s" role="presentation">
+			<svg data-dojo-attach-point="iconNode" class="icon"><use xlink:href="#icon-rescls-${item.cls}"/></svg>
+			<span data-dojo-attach-point="labelNode,focusNode" role="treeitem"
 				   tabindex="-1" aria-selected="false" id="${id}_label"></span>
-		</span
-	></div>
+		</div>
+	</div>
 	<div data-dojo-attach-point="containerNode" class="dijitTreeNodeContainer" role="presentation"
 		 style="display: none;" aria-labelledby="${id}_label"></div>
 </div>

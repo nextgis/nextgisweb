@@ -36,7 +36,8 @@ def setup_pyramid(comp, config):
                         'raster_layer/export', _("Save as"),
                         lambda args: args.request.route_url(
                             "resource.export.page",
-                            id=args.obj.id))
+                            id=args.obj.id),
+                        'material-save_alt')
 
     Resource.__dynmenu__.add(LayerMenuExt())
 

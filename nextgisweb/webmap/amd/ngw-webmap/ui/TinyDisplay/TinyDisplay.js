@@ -25,6 +25,7 @@ define([
     "dojo/topic",
     "ngw/route",
     "@nextgisweb/pyramid/i18n!",
+    "@nextgisweb/pyramid/icon",
     "ngw-pyramid/company-logo/company-logo",
     // tools
     "../../tool/Base",
@@ -70,6 +71,7 @@ define([
     topic,
     route,
     i18n,
+    icon,
     companyLogo,
     ToolBase,
     ToolZoom,
@@ -471,12 +473,12 @@ define([
                 controls: [
                     new ol.control.Zoom({
                         zoomInLabel: domConstruct.create("span", {
-                            class: "ol-control__icon material-icons",
-                            innerHTML: "add"
+                            class: "ol-control__icon",
+                            innerHTML: icon.html({glyph: "add"})
                         }),
                         zoomOutLabel: domConstruct.create("span", {
-                            class: "ol-control__icon material-icons",
-                            innerHTML: "remove"
+                            class: "ol-control__icon",
+                            innerHTML: icon.html({glyph: "remove"})
                         }),
                         zoomInTipLabel: i18n.gettext("Zoom in"),
                         zoomOutTipLabel: i18n.gettext("Zoom out"),
@@ -495,8 +497,8 @@ define([
                         tipLabel: i18n.gettext("Reset rotation"),
                         target: widget.leftTopControlPane,
                         label: domConstruct.create("span", {
-                            class: "ol-control__icon material-icons",
-                            innerHTML: "arrow_upward"
+                            class: "ol-control__icon",
+                            innerHTML: icon.html({glyph: "arrow_upward"})
                         })
                     }),
                 ],

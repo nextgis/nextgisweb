@@ -4,21 +4,20 @@
     background-color: var(--icon-menu-bg, var(--primary));
     color: var(--icon-menu-text, var(--on-primary-text));
 }
+
     .navigation-menu__item{
-        text-align:center;
+        text-align: center;
         cursor: pointer;
         height: 40px;
         user-select: none;
     }
 
-    .navigation-menu__icon{
-        line-height: 40px;
-        color: inherit;
-        opacity: .48;
-        color: inherit;
+    .navigation-menu__item > svg.icon {
+      opacity: 0.5;
+      line-height: 40px;
     }
 
-        .navigation-menu__item:hover .navigation-menu__icon,
-        .active .navigation-menu__icon{
-            opacity: 1;
-        }
+    .navigation-menu__item.active > svg.icon,
+    .navigation-menu__item:hover > svg.icon {
+      opacity: 1;
+    }

@@ -3,12 +3,14 @@ define([
     "./Base",
     "openlayers/ol",
     "@nextgisweb/pyramid/i18n!",
+    "@nextgisweb/pyramid/icon",
     "xstyle/css!./resources/Zoom.css"
 ], function (
     declare,
     Base,
     ol,
-    i18n
+    i18n,
+    icon
 ) {
     return declare(Base, {
         out: false, 
@@ -16,10 +18,10 @@ define([
         constructor: function (options) {
             if (!this.out) {
                 this.label = i18n.gettext("Zoom in");
-                this.customIcon = "<span class='ol-control__icon material-icons'>zoom_in</span>";
+                this.customIcon = '<span class="ol-control__icon">' + icon.html({glyph: 'zoom_in'}) + '</svg></span>';
             } else {
                 this.label = i18n.gettext("Zoom out");
-                this.customIcon = "<span class='ol-control__icon material-icons'>zoom_out</span>";
+                this.customIcon = '<span class="ol-control__icon">' + icon.html({glyph: 'zoom_out'}) + '</span>';
             };
 
             this.interaction = new ol.interaction.DragZoom({

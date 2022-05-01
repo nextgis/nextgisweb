@@ -30,6 +30,7 @@ define([
     "dojo/topic",
     "cbtree/models/TreeStoreModel",
     "cbtree/Tree",
+    "@nextgisweb/pyramid/icon",
     "@nextgisweb/pyramid/i18n!",
     "ngw-pyramid/company-logo/company-logo",
     // tools
@@ -101,6 +102,7 @@ define([
     topic,
     TreeStoreModel,
     Tree,
+    icon,
     i18n,
     companyLogo,
     MapToolbar,
@@ -212,25 +214,25 @@ define([
         navigationMenuItems: [
             {
                 title: i18n.gettext('Layers'),
-                icon: 'layers',
+                icon: 'material-layers',
                 name: 'layers',
                 value: 'layersPanel'
             },
             {
                 title: i18n.gettext('Search'),
-                icon: 'search',
+                icon: 'material-search',
                 name: 'search',
                 value: 'searchPanel'
             },
             {
                 title: i18n.gettext('Share'),
-                icon: 'share',
+                icon: 'material-share',
                 name: 'share',
                 value: 'sharePanel'
             },
             {
                 title: i18n.gettext('Print map'),
-                icon: 'print',
+                icon: 'material-print',
                 name: 'print',
                 value: 'printMapPanel'
             }
@@ -400,7 +402,7 @@ define([
                 this.navigationMenuItems.splice(2,0, {
                     title: i18n.gettext('Description'),
                     name: 'info',
-                    icon: 'info_outline',
+                    icon: 'material-info',
                     value: 'infoPanel'
                 });
                 // Do it asynchronious way to get URL params work
@@ -537,7 +539,7 @@ define([
             this.navigationMenuItems.splice(2, 0, {
                 title: i18n.gettext('Annotations'),
                 name: 'annotation',
-                icon: 'message',
+                icon: 'material-message',
                 value: 'annotationPanel'
             });
         
@@ -721,12 +723,12 @@ define([
             this._mapAddControls([
                 new ol.control.Zoom({
                     zoomInLabel: domConstruct.create("span", {
-                        class: "ol-control__icon material-icons",
-                        innerHTML: "add"
+                        class: "ol-control__icon",
+                        innerHTML: icon.html({glyph: "add"})
                     }),
                     zoomOutLabel: domConstruct.create("span", {
-                        class: "ol-control__icon material-icons",
-                        innerHTML: "remove"
+                        class: "ol-control__icon",
+                        innerHTML: icon.html({glyph: "remove"})
                     }),
                     zoomInTipLabel: i18n.gettext("Zoom in"),
                     zoomOutTipLabel: i18n.gettext("Zoom out"),
@@ -760,8 +762,8 @@ define([
                     tipLabel: i18n.gettext("Reset rotation"),
                     target: widget.leftTopControlPane,
                     label: domConstruct.create("span", {
-                        class: "ol-control__icon material-icons",
-                        innerHTML: "arrow_upward"
+                        class: "ol-control__icon",
+                        innerHTML: icon.html({glyph: "arrow_upward"})
                     })
                 }),
                 widget.mapToolbar

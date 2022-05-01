@@ -60,6 +60,10 @@
         <%include file="${template}"/>
     %endfor
 
+    <script type="text/javascript">
+        require(["@nextgisweb/pyramid/icon"]);
+    </script>
+
     <%
         try:
             include_head = request.env.core.settings_get('pyramid', 'include_head')

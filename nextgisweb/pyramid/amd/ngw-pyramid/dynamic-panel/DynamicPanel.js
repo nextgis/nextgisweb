@@ -10,6 +10,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/_WidgetBase",
+    "@nextgisweb/pyramid/icon",
     "dojo/text!./DynamicPanel.hbs",
     "dijit/form/Select",
     "xstyle/css!./DynamicPanel.css"
@@ -25,6 +26,7 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     _WidgetBase,
+    icon,
     template
 ) {
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],{
@@ -70,8 +72,8 @@ define([
         },
         _createCloser: function(){
             this.closer = domConstruct.create("span", {
-                class: "dynamic-panel__closer material-icons material-icons--link icon--link",
-                innerHTML: "close"
+                class: "dynamic-panel__closer",
+                innerHTML: '<span class="ol-control__icon">' + icon.html({glyph: "close"}) + '</span>',
             });
             domConstruct.place(this.closer, this.domNode);
 

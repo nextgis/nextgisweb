@@ -4,12 +4,15 @@ const path = require("path");
 const fs = require("fs");
 const os = require("os");
 const glob = require("glob");
+const tmp = require("tmp");
 const doctrine = require("doctrine");
 
 const WebpackAssetsManifest = require("webpack-assets-manifest");
 const CopyPlugin = require("copy-webpack-plugin");
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+
+const { IconResolverPlugin, iconSymbolId } = require('./icon-util.cjs');
 
 function scanForEntrypoints(pkg) {
     const result = [];
@@ -159,6 +162,61 @@ for (const lang of config.locales) {
     };
 }
 
+let spriteCode = "";
+const sharedIconIds = {};
+
+for (const [comp, dir] of config.iconSources) {
+    for (let fn of glob.sync(`${dir}/**/*.svg`)) {
+        const id = ("icon-" + comp + "-" +
+            path.relative(dir, fn).replace(/\.svg$/, "")
+        ).replace(/\w+\-resource\/(\w+)/, (m, p) => `rescls-${p}`);
+        spriteCode = spriteCode + `import "${fn}";\n`;
+        sharedIconIds[fn] = id;
+    }
+}
+
+const spriteModuleFile = tmp.fileSync({ postfix: ".js" }).name;
+fs.writeFileSync(spriteModuleFile, spriteCode);
+
+
+const babelLoader = {
+    loader: "babel-loader",
+    options: {
+        sourceType: "unambiguous",
+        presets: [
+            ["@babel/preset-typescript", {}],
+            [
+                "@babel/preset-react",
+                {
+                    "runtime": "automatic",
+                },
+            ],
+            [
+                "@babel/preset-env",
+                {
+                    // debug: config.debug,
+                    corejs: { version: 3 },
+                    useBuiltIns: "usage",
+                    targets: config.targets,
+                },
+            ],
+        ],
+        plugins: ["@babel/plugin-transform-runtime"],
+    }
+};
+
+const svgSpriteLoader = {
+    loader: "svg-sprite-loader",
+    options: {
+        runtimeGenerator: require.resolve('./icon-runtime.cjs'),
+        symbolId: (fn) => {
+            const shared = sharedIconIds[fn];
+            if (shared) { return shared };
+            return iconSymbolId(fn);
+        }
+    }
+};
+
 module.exports = {
     mode: config.debug ? "development" : "production",
     devtool: config.debug ? "source-map" : false,
@@ -176,31 +234,7 @@ module.exports = {
                     /node_modules\/react-dom/,
                 ],
                 resolve: { fullySpecified: false },
-                use: {
-                    loader: "babel-loader",
-                    options: {
-                        sourceType: "unambiguous",
-                        presets: [
-                            ["@babel/preset-typescript", {}],
-                            [
-                                "@babel/preset-react",
-                                {
-                                    "runtime": "automatic",
-                                },
-                            ],
-                            [
-                                "@babel/preset-env",
-                                {
-                                    // debug: config.debug,
-                                    corejs: { version: 3 },
-                                    useBuiltIns: "usage",
-                                    targets: config.targets,
-                                },
-                            ],
-                        ],
-                        plugins: ["@babel/plugin-transform-runtime"],
-                    },
-                },
+                use: babelLoader,
             },
             {
                 test: /\.css$/i,
@@ -209,8 +243,17 @@ module.exports = {
             {
                 test: /\.less$/i,
                 use: ["style-loader", "css-loader", "less-loader"],
+            },
+            {
+                test: /\.svg$/i,
+                use: [babelLoader, svgSpriteLoader, "svgo-loader"]
             }
         ]),
+    },
+    resolve: {
+        plugins: [
+            new IconResolverPlugin({ shared: spriteModuleFile }),
+        ],
     },
     plugins: [
         new WebpackAssetsManifest({ entrypoints: true }),

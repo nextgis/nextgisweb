@@ -43,6 +43,10 @@
         cursor: pointer;
     }
 
+    .dynamic-panel__closer svg.icon {
+      color: var(--icon-color);
+    }
+
     .dynamic-panel__loader{
         display: none;
         position: absolute;

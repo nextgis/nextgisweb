@@ -187,14 +187,15 @@ def setup_pyramid(comp, config):
                             lambda args: args.request.route_url(
                                 "feature_layer.feature.browse",
                                 id=args.obj.id),
-                            'material:table', True)
+                            'material-table_view', True)
 
                 if args.obj.has_export_permission(args.request.user):
                     yield dm.Link(
                         'feature_layer/export', _("Save as"),
                         lambda args: args.request.route_url(
                             "resource.export.page",
-                            id=args.obj.id))
+                            id=args.obj.id),
+                        'material-save_alt')
 
     Resource.__dynmenu__.add(LayerMenuExt())
 

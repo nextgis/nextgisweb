@@ -22,28 +22,6 @@
 }
 
 
-.coordinate-switcher .dijitArrowButtonInner,
-.claro .coordinate-switcher .dijitArrowButtonInner{
-    display: none;
-}
-
-.claro .coordinate-switcher .dijitArrowButton::after{
-    content: "arrow_drop_down";
-    font-family: "Material Icons";
-    font-size: 17px;
-    font-feature-settings: 'liga';
-    vertical-align: middle;
-    color: var(--icon-color);
-    margin-left: -5px;
-    margin-right: -5px;
-}
-
-.claro .coordinate-switcher.dijitSelectOpenedFocused .dijitArrowButton{
-    position: relative;
-    top: -1px;
-    transform: rotate(180deg);
-}
-
 .claro .coordinate-switcher .dijitButtonContents,
 .coordinate-switcher .dijitButtonContents{
     border-right: 0

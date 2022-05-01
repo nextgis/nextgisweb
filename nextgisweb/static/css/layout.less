@@ -1,7 +1,6 @@
 @import (css) "@{node_modules}/antd/dist/antd.variable.css";
 
 @import (css) "./icon.css";
-@import (css) "fontello.css";
 
 /* Import */
 
@@ -11,14 +10,12 @@
 @import "helpers/_mixin";
 @import "helpers/_utilities";
 @import "blocks/_decorations";
+@import "blocks/_icons";
 @import "blocks/_links";
 @import "blocks/_list";
 @import "blocks/_loaders";
 @import "blocks/_tables";
-@import "blocks/_text-withIcon";
 @import "blocks/_typography";
-@import "icons/_material-icons";
-@import "icons/_svg-symbols";
 
 @import "ngw-ui/_ngw-buttons";
 @import "ngw-ui/_ngw-date-picker";
@@ -142,18 +139,6 @@ a[class*=" icon-"]:hover:before {
   color: var(--primary);
 }
 
-.icon-viewMap:before {
-  font-family: "fontello";
-}
-
-.icon-table:before {
-  font-family: "fontello";
-}
-
-.icon-users:before {
-  margin-left: -.3%;
-}
-
 .middle-text {
   font-size: @font-size-md;
   font-weight: bold;
@@ -275,16 +260,6 @@ a[class*=" icon-"]:hover:before {
       }
     }
 
-    & > .material-icons {
-      display: inline;
-      color: inherit;
-      line-height: inherit;
-
-      &:hover {
-        color: inherit;
-        opacity: .76;
-      }
-    }
   }
 }
 
@@ -495,8 +470,6 @@ a[class*=" icon-"]:hover:before {
     }
 
     .help {
-      font-size: 1.35em;
-      vertical-align: top;
       cursor: pointer;
 
       .tooltip-content {
@@ -527,10 +500,6 @@ a[class*=" icon-"]:hover:before {
       float: right;
       padding-top: 5px;
       padding-right: 3px;
-
-      span.material-icons {
-        font-size: 22px;
-      }
     }
   }
 }
@@ -627,7 +596,6 @@ a[class*=" icon-"]:hover:before {
 }
 
 .sidebar-menu__link {
-  display: inline-block;
   color: var(--on-sidebar-text);
   text-decoration: none;
 

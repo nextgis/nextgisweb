@@ -2,13 +2,10 @@
     <ul class="list-unstyled">
         {% for item in items %}
         <li data-resid="{{ item.resource.id }}">
-            <a class="children-table__name__link text-withIcon" href="{{item.url}}">
-                <span class="text-withIcon__icon text-withIcon__icon_size_s">
-                    <svg class="text-withIcon__pic svgIcon-{{item.resource.cls}}">
-                        <use xmlns:xlink="http://www.w3.org/1999/xlink"
-                             xlink:href="{{svgUrl}}#{{item.resource.cls}}"></use>
-                    </svg>
-                </span>
+            <a class="children-table__name__link withIcon withIcon-s" href="{{item.url}}">
+                <svg class="icon">
+                    <use xlink:href="#icon-rescls-{{item.resource.cls}}" />
+                </svg>
                 {{ item.resource.display_name }}
             </a>
         </li>
@@ -16,8 +13,7 @@
 
         {% ifequal items.length 0 %}
         <li class="not-found">
-            <a class="children-table__name__link text-withIcon" href="javascript:;">
-                <span class="text-withIcon__icon text-withIcon__icon_size_s"></span>
+            <a class="children-table__name__link" href="javascript:;">
                 {{ tr.notFound }}
             </a>
         </li>

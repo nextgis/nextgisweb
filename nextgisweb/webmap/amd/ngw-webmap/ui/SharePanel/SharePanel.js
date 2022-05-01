@@ -17,6 +17,7 @@ define([
     "dojox/dtl/Context",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/settings!",
+    "@nextgisweb/webmap/icon",
     "dojo/text!./SharePanel.hbs",
 
     //templates
@@ -40,6 +41,7 @@ define([
     dtlContext,
     api,
     settings,
+    icon,
     template
 ) {
     return declare(

@@ -73,6 +73,7 @@ module.exports = {
     locales,
     externals: env.npm_package_config_nextgisweb_jsrealm_externals.split(","),
     targets: JSON.parse(env.npm_package_config_nextgisweb_jsrealm_targets),
+    iconSources: JSON.parse(env.npm_package_config_nextgisweb_jsrealm_icon_sources),
     packages: packages,
     compressionPlugins,
     bundleAnalyzerPlugins,

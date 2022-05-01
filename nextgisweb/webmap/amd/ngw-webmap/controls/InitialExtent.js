@@ -2,12 +2,14 @@ define([
     'dojo/_base/declare',
     "dojo/on",
     "dojo/dom-construct",
-    "openlayers/ol"
+    "openlayers/ol",
+    "@nextgisweb/pyramid/icon"
 ], function (
     declare,
     on,
     domConstruct,
-    ol
+    ol,
+    icon
 ) {
     return declare(ol.control.Control, {
         element: undefined,
@@ -22,7 +24,7 @@ define([
 
             this.element = domConstruct.create("div", {
                 class: "ol-control ol-unselectable",
-                innerHTML: "<button><span class='ol-control__icon material-icons'>home</span></button>",
+                innerHTML: '<button><span class="ol-control__icon">' + icon.html({glyph: "home"}) + '</span></button>',
                 title: this.tipLabel
             });
 

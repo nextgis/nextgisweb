@@ -119,7 +119,7 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
         text-decoration: none;
         line-height:30px;
         border-radius: 2px;
-        padding: 0;
+        padding-top: 2px;
         text-align: center;
     }
     .nextgis .ol-control button,

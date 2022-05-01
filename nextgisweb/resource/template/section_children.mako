@@ -7,7 +7,7 @@
     from nextgisweb.webmap.model import WebMapScope
 %>
 
-<%namespace file="nextgisweb:pyramid/template/util.mako" import="icon"/>
+<%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>
 
 <%def name="child_group(children)">
     <tbody>
@@ -18,8 +18,8 @@
             %endif
             <tr data-id="${item.id}">
                 <td class="children-table__name">
-                    <a class="children-table__name__link text-withIcon" href="${item.permalink(request)}">
-                        ${icon('svg:' + item.cls)}
+                    <a class="children-table__name__link withIcon-m" href="${item.permalink(request)}">
+                        ${icon_svg(f"resource/cls/{item.cls}")}
                         ${item.display_name}
                     </a>
                 </td>
@@ -30,7 +30,7 @@
                     <% args = Bunch(obj=item, request=request) %>
                     %for menu_item in item.__dynmenu__.build(args):
                         %if isinstance(menu_item, dm.Link) and menu_item.important and menu_item.icon is not None:
-                            <a href="${menu_item.url(args)}" target="${menu_item.target}" title="${tr(menu_item.label)}">${icon(menu_item.icon)}</a>
+                            <a href="${menu_item.url(args)}" target="${menu_item.target}" title="${tr(menu_item.label)}">${icon_svg(menu_item.icon)}</a>
                         %endif
                     %endfor
                 </td>
@@ -129,7 +129,7 @@
                 <th style="text-align: inherit;">${tr(_("Owner"))}</th>
                 <th class="column-volume" data-sort-method='number' style="text-align: right; display: none;">${tr(_("Volume"))}</th>
                 <th class="no-sort" style="text-align: right;">
-                    <i id="resourceChildrenOptions" class="material-icons icon-moreVert" style="cursor: pointer;"></i>
+                    <span id="resourceChildrenOptions" style="cursor: pointer;">${icon_svg('resource/vmore')}</span>
                 </th>
             </tr>
         </thead>

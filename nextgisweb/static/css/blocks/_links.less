@@ -11,10 +11,19 @@ a, .link {
   text-decoration: underline;
   cursor: pointer;
 
+  svg.icon {
+    color: var(--icon-color);
+  }
+
   &:hover {
     color: var(--link-hover-color);
     border-color: var(--link-hover-color);
+
+    svg.icon {
+      color: inherit;
+    }
   }
+
 }
 
 .link {

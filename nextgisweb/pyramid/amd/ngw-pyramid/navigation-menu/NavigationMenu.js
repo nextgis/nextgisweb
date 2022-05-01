@@ -65,7 +65,7 @@ define([
                 itemActiveClass = (this.value === item.value) ? 'active' : '';
 
             item.el = domConstruct.create('div', {
-                innerHTML: '<span class="navigation-menu__icon material-icons">' + item.icon + '</span>',
+                innerHTML: '<svg class="icon" fill="currentColor"><use xlink:href="#icon-' + item.icon + '"/></svg>',
                 className: 'navigation-menu__item ' + itemActiveClass,
                 title: item.title,
                 onclick: function (e) {

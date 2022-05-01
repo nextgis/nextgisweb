@@ -2,12 +2,14 @@ define([
     'dojo/_base/declare',
     "dojo/on",
     "dojo/dom-construct",
-    "openlayers/ol"
+    "openlayers/ol",
+    "@nextgisweb/pyramid/icon"
 ], function (
     declare,
     on,
     domConstruct,
-    ol
+    ol,
+    icon
 ) {
     return declare(ol.control.Control, {
         element: undefined,
@@ -29,7 +31,7 @@ define([
                 href: this.url,
                 target: "_blank",
                 class: "ol-control__btn",
-                innerHTML: "<span class='ol-control__icon material-icons'>open_in_new</span>",
+                innerHTML: icon.html({glyph: "open_in_new"}),
             }, this.element);
 
 

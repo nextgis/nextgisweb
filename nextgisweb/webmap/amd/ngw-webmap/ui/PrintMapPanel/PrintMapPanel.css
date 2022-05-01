@@ -23,6 +23,10 @@
   top: 8px;
 }
 
+.close svg.icon {
+  color: var(--icon-color);
+}
+
 .printMap-panel .print-panel-content {
   position: absolute;
   top: 40px;

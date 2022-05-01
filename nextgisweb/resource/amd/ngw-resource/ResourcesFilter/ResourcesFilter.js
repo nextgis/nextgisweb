@@ -14,7 +14,6 @@ define([
     api, i18n, template, templateResult
 ) {
     const TEMPLATE_RESULT_DTL = new dtl.Template(templateResult);
-    const SVG_URL = ngwConfig.assetUrl + "/svg/svg-symbols.svg";
     const translateDtl = {
         notFound: i18n.gettext("Resources not found"),
     };
@@ -123,7 +122,6 @@ define([
             );
 
             const templateContext = new dtlContext({
-                svgUrl: SVG_URL,
                 items: result,
                 tr: translateDtl,
             });

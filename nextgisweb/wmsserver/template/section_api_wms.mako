@@ -5,7 +5,8 @@
 <%block name="content">
     <div class="row-title">
         <div class="text">${tr(_("WMS service"))}</div>
-        <div class="material-icons icon-helpOutline help">
+        <span class="help">
+            <svg class="icon icon-s" fill="currentColor"><use xlink:href="#icon-material-help_outline"/></svg>
             <div class="tooltip-content">
                 <div class="tooltip-help">
                     ${tr(_('Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map images. These images are typically produced by a map server from data provided by a GIS database.'))}
@@ -20,7 +21,7 @@
                     %endif
                 </div>
             </div>
-        </div>
+        </span>
     </div>
     <div class="row-input-info">
         <% url_wms = request.route_url('wmsserver.wms', id=obj.id) %>

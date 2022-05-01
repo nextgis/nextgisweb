@@ -10,6 +10,11 @@
     text-align: center;
     cursor: pointer;
 
+    > svg.icon {
+        font-size: 32px;
+        color: inherit;
+    }
+
     > span.main {
         line-height: 34px;
         color: inherit;
@@ -17,11 +22,15 @@
 
     > span.more {
         position: absolute;
-        right: 0px;
-        top: 2px;
-        font-size: 8px;
-        line-height: 8px;
+        right: -2px;
+        top: -6px;
+        height: 16px;
         display: block;
+
+        > svg.icon {
+            font-size: 16px;
+            line-height: 1;
+        }
 
         &-success {
             color: var(--success);

@@ -6,7 +6,8 @@
 <%block name="content">
     <div class="row-title">
         <div class="text">${tr(_("MVT Vector Tiles"))}</div>
-        <div class="material-icons icon-helpOutline help">
+        <span class="help">
+            <svg class="icon icon-s" fill="currentColor"><use xlink:href="#icon-material-help_outline"/></svg>
             <div class="tooltip-content">
                 <div class="tooltip-help">
                     ${tr(_('The Mapbox Vector Tile is an efficient encoding for map data into vector tiles that can be rendered dynamically.'))}
@@ -21,7 +22,7 @@
                     %endif
                 </div>
             </div>
-        </div>
+        </span>
     </div>
     <div class="row-input-info">
         <% url_mvt = request.route_url('feature_layer.mvt', _query={'resource': obj.id }) + '&x={x}&y={y}&z={z}' %>

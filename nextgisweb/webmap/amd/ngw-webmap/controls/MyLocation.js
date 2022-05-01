@@ -3,8 +3,9 @@ define([
     "dojo/on",
     "dojo/dom-construct",
     "@nextgisweb/pyramid/i18n!",
+    "@nextgisweb/pyramid/icon",
     "openlayers/ol",
-], function (declare, on, domConstruct, i18n, ol) {
+], function (declare, on, domConstruct, i18n, icon, ol) {
     const zIndexLocationLayer = 6000;
     const positionFeatureStyle = new ol.style.Style({
         image: new ol.style.Circle({
@@ -37,9 +38,7 @@ define([
 
             this.element = domConstruct.create("div", {
                 class: "ol-control ol-unselectable",
-                innerHTML:
-                    "<button><span class='ol-control__icon material-icons'>my_location</span></button>",
-                title: this.tipLabel,
+                innerHTML: '<button><span class="ol-control__icon">' + icon.html({glyph: "my_location"}) + '</span></button>', title: this.tipLabel,
             });
 
             if (

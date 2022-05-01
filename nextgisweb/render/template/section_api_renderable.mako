@@ -6,7 +6,8 @@
 <%block name="content">
     <div class="row-title">
         <div class="text">${tr(_("TMS (Tile Map Service)"))}</div>
-        <div class="material-icons icon-helpOutline help">
+        <span class="help">
+            <svg class="icon icon-s" fill="currentColor"><use xlink:href="#icon-material-help_outline"/></svg>
             <div class="tooltip-content">
                 <div class="tooltip-help">
                     ${tr(_('TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map is a map displayed in a browser by seamlessly joining dozens of individually requested image.'))}
@@ -21,7 +22,7 @@
                     %endif
                 </div>
             </div>
-        </div>
+        </span>
     </div>
     <div class="row-input-info">
         <% url_tms = request.route_url('render.tile', _query={'resource': obj.id }) + '&x={x}&y={y}&z={z}' %>

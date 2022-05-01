@@ -21,14 +21,11 @@
   font-weight: normal;
 }
 
-.resources-filter .search {
+.resources-filter .icon-search {
   position: relative;
+  width: 24px;
   left: 4px;
   top: -28px;
-}
-
-.resources-filter .search:before {
-  content: "\e8b6";
 }
 
 .resources-filter .filter {
@@ -73,16 +70,8 @@
   background: #f0f6fc;
 }
 
-.resources-filter .result li a {
-  padding-left: 22px;
-}
-
 .resources-filter .result li.not-found {
   color: gray;
-}
-
-.resources-filter .result .text-withIcon__icon {
-  top: 1px;
 }
 
 .resources-filter.loading .linear-activity {
