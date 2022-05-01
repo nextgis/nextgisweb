@@ -1,10 +1,12 @@
 import warnings
+from dataclasses import dataclass
 
 from pyramid import httpexceptions
 from sqlalchemy import bindparam
 from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
 import sqlalchemy.ext.baked
+import zope.event
 
 from ..views import permalinker
 from ..dynmenu import DynMenu, Label, Link, DynItem
@@ -123,12 +125,19 @@ def tree(request):
         subtitle=_("Resource tree"))
 
 
+@dataclass
+class OnResourceCreateView:
+    cls: str
+    parent: Resource
+
+
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def create(request):
     request.resource_permission(PERM_MCHILDREN)
+    cls = request.GET.get('cls')
+    zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
     return dict(obj=request.context, subtitle=_("Create resource"), maxheight=True,
-                query=dict(operation='create', cls=request.GET.get('cls'),
-                           parent=request.context.id))
+                query=dict(operation='create', cls=cls, parent=request.context.id))
 
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
