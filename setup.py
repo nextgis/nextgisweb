@@ -132,7 +132,7 @@ class InstallCommand(install):
 setup(
     name='nextgisweb',
     version=VERSION,
-    description='nextgisweb',
+    description='NextGIS Web main package',
     author='NextGIS',
     author_email='info@nextgis.com',
     url='https://nextgis.com/nextgis-web',

@@ -46,7 +46,13 @@
             
             %for pname, pobj in packages:
             <tr>
-                <td>${pobj.name}</td>
+                <td><%
+                    value = pobj.metadata['Summary']
+                    if value == 'UNKNOWN':
+                        value = None
+                    if not value:
+                        value = pobj.name
+                %>${value}</td>
                 <td>${pobj.version}</td>
                 <td>
                     %if pobj.commit:

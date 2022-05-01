@@ -3,6 +3,7 @@ import pkg_resources
 import subprocess
 import re
 import importlib
+from importlib.metadata import metadata
 
 from pathlib import Path
 
@@ -79,6 +80,14 @@ class Package(object):
 
         self._pkginfo = self._entrypoint.resolve()()
         return self._pkginfo
+
+    @property
+    def metadata(self):
+        if cached := getattr(self, '_metadata', None):
+            return cached
+        value = metadata(self.name)
+        self._metadata = value
+        return value
 
     def _qualify(self):
         if self._qualified or not _qualifications:
