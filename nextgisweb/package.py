@@ -175,7 +175,7 @@ def git_commit(path):
     try:
         devnull = open(os.devnull, 'w')
         commit = subprocess.check_output(
-            ['git', 'rev-parse', '--short', 'HEAD'],
+            ['git', 'rev-parse', '--short=8', 'HEAD'],
             cwd=path, universal_newlines=True, stderr=devnull)
     except Exception as exc:
         if isinstance(exc, subprocess.CalledProcessError) and exc.returncode == 128:
