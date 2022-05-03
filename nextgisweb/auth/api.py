@@ -198,17 +198,24 @@ def register(request):
 
 
 def login(request):
-    if ('login' not in request.POST) or ('password' not in request.POST):
+
+    data = request.POST
+
+    if ('login' not in data) or ('password' not in data):
         return HTTPUnprocessableEntity()
 
+    login = data['login'].strip()
+    password = data['password']
+
     user, headers = request.env.auth.authenticate(
-        request, request.POST['login'].strip(), request.POST['password'])
+        request, login=login, password=password)
     request.response.headerlist.extend(headers)
 
     return dict(
         keyname=user.keyname,
         display_name=user.display_name,
         description=user.description)
+
 
 
 def logout(request):
