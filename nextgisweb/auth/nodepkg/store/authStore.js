@@ -1,6 +1,5 @@
 import { makeAutoObservable } from "mobx";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 
 class AuthStore {
