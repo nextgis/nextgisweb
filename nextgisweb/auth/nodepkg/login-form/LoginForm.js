@@ -39,7 +39,12 @@ export const LoginForm = observer((props = {}) => {
         setCreds((oldVal) => ({ ...oldVal, ...e.value }));
     };
 
-    const oauthUrl = routeURL('auth.oauth')
+    const oauthUrl =
+        routeURL("auth.oauth") +
+        "?" +
+        new URLSearchParams({
+            next: location.href,
+        });
 
     return (
         <>
@@ -49,7 +54,11 @@ export const LoginForm = observer((props = {}) => {
                 ""
             )}
             {settings.oauth.enabled ? (
-                <Button type="primary" style={{ marginBottom: "20px" }} href={oauthUrl}>
+                <Button
+                    type="primary"
+                    style={{ marginBottom: "20px" }}
+                    href={oauthUrl}
+                >
                     {oauthText}
                 </Button>
             ) : (
