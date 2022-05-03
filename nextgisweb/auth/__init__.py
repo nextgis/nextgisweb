@@ -23,7 +23,7 @@ from .policy import SecurityPolicy
 from .oauth import OAuthHelper, OAuthToken, OnAccessTokenToUser
 from .util import _
 from .views import OnUserLogin
-from . import command # NOQA
+from . import command  # NOQA
 
 __all__ = [
     'Principal', 'User', 'Group', 'OnAccessTokenToUser',
@@ -147,6 +147,12 @@ class AuthComponent(Component):
         from . import views, api
         views.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
+
+    def client_settings(self, request):
+        enabled = (self.oauth is not None) and (not self.oauth.password)
+        return dict(
+            oauth=dict(enabled=enabled)
+        )
 
     def query_stat(self):
         user_count = DBSession.query(db.func.count(User.id)).filter(

@@ -1,9 +1,14 @@
+import { Button } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
+import settings from "@nextgisweb/pyramid/settings!auth";
 import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import { authStore } from "../store";
+
+const oauthText = i18n.gettext("Sign in with OAuth");
 
 export const LoginForm = observer((props = {}) => {
     const [creds, setCreds] = useState();
@@ -34,10 +39,19 @@ export const LoginForm = observer((props = {}) => {
         setCreds((oldVal) => ({ ...oldVal, ...e.value }));
     };
 
+    const oauthUrl = routeURL('auth.oauth')
+
     return (
         <>
             {authStore.loginError ? (
                 <div className="auth-form__error">{authStore.loginError}</div>
+            ) : (
+                ""
+            )}
+            {settings.oauth.enabled ? (
+                <Button type="primary" style={{ marginBottom: "20px" }} href={oauthUrl}>
+                    {oauthText}
+                </Button>
             ) : (
                 ""
             )}

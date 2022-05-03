@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import settings from "@nextgisweb/pyramid/settings!pyramid";
+
 
 class AuthStore {
     loginError = "";
@@ -9,6 +9,7 @@ class AuthStore {
     authenticated = !window.ngwConfig.isGuest;
     invitationSession = window.ngwConfig.invitationSession;
     userDisplayName = window.ngwConfig.userDisplayName;
+    isAdministrator = window.ngwConfig.isAdministrator;
 
     constructor() {
         makeAutoObservable(this);
@@ -45,9 +46,3 @@ class AuthStore {
 }
 
 export const authStore = new AuthStore();
-
-if (ngwConfig.isAdministrator) {
-}
-
-if (settings["help_page_url"]) {
-}

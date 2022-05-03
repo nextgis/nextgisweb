@@ -300,7 +300,7 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.logout', '/logout').add_view(logout)
 
-    config.add_route('auth.oauth', '/oauth').add_view(oauth)
+    config.add_route('auth.oauth', '/oauth', client=True).add_view(oauth)
 
     config.add_route('auth.settings', '/settings', client=True) \
         .add_view(settings, renderer=REACT_RENDERER)

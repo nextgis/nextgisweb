@@ -1,10 +1,9 @@
-import { Modal } from "@nextgisweb/gui/antd";
 import { LoginOutlined } from "@ant-design/icons";
+import { Form, Modal } from "@nextgisweb/gui/antd";
+import { useKeydownListener } from "@nextgisweb/gui/hook";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
-import { Form } from "@nextgisweb/gui/antd";
 import LoginForm from "./login-form";
 import { authStore } from "./store/authStore";
-import { useKeydownListener } from "@nextgisweb/gui/hook";
 
 const { confirm } = Modal;
 
