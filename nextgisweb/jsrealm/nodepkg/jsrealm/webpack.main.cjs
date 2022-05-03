@@ -173,6 +173,15 @@ for (const [comp, dir] of config.iconSources) {
         spriteCode = spriteCode + `import "${fn}";\n`;
         sharedIconIds[fn] = id;
     }
+
+    const materialBase = path.resolve('./node_modules/@material-icons/svg/svg');
+    for (const fn of glob.sync(`${dir}/material.json`)) {
+        const body = JSON.parse(fs.readFileSync(fn));
+        for (let ref of body) {
+            if (ref.match(/\w+/)) { ref = ref + '/baseline' };
+            spriteCode = spriteCode + `import "${materialBase}/${ref}.svg";\n`;
+        }
+    }
 }
 
 const spriteModuleFile = tmp.fileSync({ postfix: ".js" }).name;
