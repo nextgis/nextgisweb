@@ -145,9 +145,7 @@ body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; 
     .nextgis .ol-control__icon{
         color: inherit;
         fill: inherit;
-        line-height: 30px;
-        width: 30px;
-        height: 30px;
+        font-size: 24px;
     }
 
     .nextgis .ol-control:hover{

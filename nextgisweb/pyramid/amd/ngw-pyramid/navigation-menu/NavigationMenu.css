@@ -14,7 +14,7 @@
 
     .navigation-menu__item > svg.icon {
       opacity: 0.5;
-      line-height: 40px;
+      font-size: 24px;
     }
 
     .navigation-menu__item.active > svg.icon,

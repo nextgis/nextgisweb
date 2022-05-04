@@ -37,8 +37,7 @@
 
     .dynamic-panel__closer{
         position: absolute;
-        top: 8px;
-        right: 4px;
+        right: 8px;
         z-index: 10;
         cursor: pointer;
     }
