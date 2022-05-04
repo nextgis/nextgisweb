@@ -206,8 +206,7 @@ class AuthComponent(Component):
     def authenticate(self, request, login, password):
         auth_policy = request.registry.getUtility(ISecurityPolicy)
         user, tresp = auth_policy.authenticate_with_password(
-            username=request.POST['login'].strip(),
-            password=request.POST['password'])
+            username=login, password=password)
 
         headers = auth_policy.remember(request, (user.id, tresp))
 
@@ -253,7 +252,7 @@ class AuthComponent(Component):
         if (len(result.path) > 0 and result.path != '/'):
             query['next'] = result.path
 
-        url = result.scheme + '://' + result.netloc + '/session/invite?' + urlencode(query)
+        url = result.scheme + '://' + result.netloc + '/session-invite?' + urlencode(query)
         return url
 
     def check_user_limit(self, exclude_id=None):

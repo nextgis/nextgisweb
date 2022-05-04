@@ -52,56 +52,61 @@ class OnUserLogin(object):
 def login(request):
     next_url = request.params.get('next', request.application_url)
 
+    # TODO: Remove in 4.3+ release! We might need it for GDAL driver or
+    # something else. But /api/compoment/auth/login must be used there.
     if request.method == 'POST':
-        if 'sid' in request.POST:
-            sid = request.POST['sid']
-            expires = request.POST['expires']
+        try:
+            user, headers = request.env.auth.authenticate(
+                request, request.POST['login'].strip(), request.POST['password'])
+        except (InvalidCredentialsException, UserDisabledException) as exc:
+            return dict(error=exc.title, next_url=next_url)
 
-            try:
-                store = SessionStore.filter_by(session_id=sid, key='auth.policy.current').one()
-            except NoResultFound:
-                raise InvalidCredentialsException(message=_("Session not found."))
-            value = json.loads(store.value)
+        event = OnUserLogin(user, request, next_url)
+        zope.event.notify(event)
 
-            exp = datetime.fromtimestamp(value[2])
-            if datetime.fromisoformat(expires) != exp:
-                raise InvalidCredentialsException(message=_("Invalid 'expires' parameter."))
-            now = datetime.utcnow()
-            if exp <= now:
-                raise InvalidCredentialsException(message=_("Session expired."))
+        return HTTPFound(location=event.next_url, headers=headers)
 
-            cookie_settings = WebSession.cookie_settings(request)
-            cookie_settings['max_age'] = int((exp - now).total_seconds())
-
-            cookie_name = request.env.pyramid.options['session.cookie.name']
-
-            response = HTTPFound(location=next_url)
-            response.set_cookie(cookie_name, value=sid, **cookie_settings)
-
-            return response
-        else:
-            try:
-                user, headers = request.env.auth.authenticate(
-                    request, request.POST['login'].strip(), request.POST['password'])
-            except (InvalidCredentialsException, UserDisabledException) as exc:
-                return dict(error=exc.title, next_url=next_url)
-
-            event = OnUserLogin(user, request, next_url)
-            zope.event.notify(event)
-
-            return HTTPFound(location=event.next_url, headers=headers)
-
-    return dict(next_url=next_url)
+    return dict(custom_layout=True, next_url=next_url)
 
 
 def session_invite(request):
-    if any(k not in request.GET for k in ('sid', 'expires')):
-        raise HTTPNotFound()
+    next_url = request.params.get('next', request.application_url)
 
-    return dict(
-        session_id=request.GET['sid'],
-        expires=request.GET['expires'],
-        next_url=request.GET.get('next'))
+    if request.method == 'GET':
+        if any(k not in request.GET for k in ('sid', 'expires')):
+            raise HTTPNotFound()
+
+        return dict(
+            session_id=request.GET['sid'],
+            expires=request.GET['expires'],
+            next_url=next_url)
+
+    elif request.method == 'POST':
+        sid = request.POST['sid']
+        expires = request.POST['expires']
+
+        try:
+            store = SessionStore.filter_by(session_id=sid, key='auth.policy.current').one()
+        except NoResultFound:
+            raise InvalidCredentialsException(message=_("Session not found."))
+        value = json.loads(store.value)
+
+        exp = datetime.fromtimestamp(value[2])
+        if datetime.fromisoformat(expires) != exp:
+            raise InvalidCredentialsException(message=_("Invalid 'expires' parameter."))
+        now = datetime.utcnow()
+        if exp <= now:
+            raise InvalidCredentialsException(message=_("Session expired."))
+
+        cookie_settings = WebSession.cookie_settings(request)
+        cookie_settings['max_age'] = int((exp - now).total_seconds())
+
+        cookie_name = request.env.pyramid.options['session.cookie.name']
+
+        response = HTTPFound(location=next_url)
+        response.set_cookie(cookie_name, value=sid, **cookie_settings)
+
+        return response
 
 
 def oauth(request):
@@ -212,10 +217,7 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
         and request.authenticated_userid is None
     ):
         response = render_to_response('nextgisweb:auth/template/login.mako', dict(
-            auth_required=(
-                request.env.auth.options['oauth.enabled']
-                and request.env.auth.options['oauth.default']
-            ), next_url=request.url,
+            custom_layout=True,
         ), request=request)
         response.status = 403
         return response
@@ -294,8 +296,8 @@ def setup_pyramid(comp, config):
         .add_view(login, renderer='nextgisweb:auth/template/login.mako')
 
     config.add_route(
-        'pyramid.session.invite',
-        '/session/invite'
+        'auth.session_invite',
+        '/session-invite'
     ).add_view(session_invite, renderer='nextgisweb:auth/template/session_invite.mako')
 
     config.add_route('auth.logout', '/logout').add_view(logout)

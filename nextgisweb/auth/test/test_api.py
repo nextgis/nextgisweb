@@ -10,12 +10,12 @@ from ...auth import User, Group
 from ...models import DBSession
 
 
-def user_url(user_id = None):
+def user_url(user_id=None):
     return ('/api/component/auth/user/' + (
         str(user_id) if user_id else ''))
 
 
-def group_url(group_id = None):
+def group_url(group_id=None):
     return ('/api/component/auth/group/' + (
         str(group_id) if group_id else ''))
 
@@ -56,6 +56,32 @@ def _test_current_user(ngw_webtest_app, keyname):
     assert res.json['keyname'] == keyname
 
 
+def test_login_logout(user, ngw_webtest_app):
+    _test_current_user(ngw_webtest_app, 'guest')
+
+    ngw_webtest_app.post('/api/component/auth/login', dict(
+        login='test-user', missing="password"), status=422)
+    ngw_webtest_app.post('/api/component/auth/login', dict(
+        login='test-user', password='invalid'), status=401)
+
+    ngw_webtest_app.post('/api/component/auth/login', dict(
+        login='test-user', password='password123'), status=200)
+    _test_current_user(ngw_webtest_app, 'test-user')
+
+    ngw_webtest_app.post('/api/component/auth/logout', status=200)
+    _test_current_user(ngw_webtest_app, 'guest')
+
+    ngw_webtest_app.post_json('/api/component/auth/login', dict(
+        login=42, password='password123'), status=422)
+
+    ngw_webtest_app.post_json('/api/component/auth/login', dict(
+        login='test-user', password='password123'), status=200)
+    _test_current_user(ngw_webtest_app, 'test-user')
+
+    ngw_webtest_app.post('/api/component/auth/logout', status=200)
+    _test_current_user(ngw_webtest_app, 'guest')
+
+
 def test_session_invite(user, ngw_env, ngw_webtest_app):
     sid_key = ngw_env.pyramid.options['session.cookie.name']
 
@@ -75,19 +101,19 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
     assert ngw_webtest_app.cookies[sid_key] != sid
     _test_current_user(ngw_webtest_app, 'test-user')
 
-    ngw_webtest_app.post('/login', dict(
+    ngw_webtest_app.post('/session-invite', dict(
         sid=sid + 'invalid', expires=expires), status=401)
 
-    ngw_webtest_app.post('/login', dict(
+    ngw_webtest_app.post('/session-invite', dict(
         sid=sid, expires=expires_dt + timedelta(seconds=1)
     ), status=401)
 
     with freeze_time(expires_dt + timedelta(seconds=1)):
-        ngw_webtest_app.post('/login', dict(
+        ngw_webtest_app.post('/session-invite', dict(
             sid=sid, expires=expires), status=401)
 
     with freeze_time(expires_dt - timedelta(minutes=5)):
-        ngw_webtest_app.post('/login', dict(
+        ngw_webtest_app.post('/session-invite', dict(
             sid=sid, expires=expires), status=302)
 
     assert sid_key in ngw_webtest_app.cookies
@@ -98,7 +124,7 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
     sid_key not in ngw_webtest_app.cookies
     _test_current_user(ngw_webtest_app, 'guest')
 
-    ngw_webtest_app.post('/login', dict(
+    ngw_webtest_app.post('/session-invite', dict(
         sid=sid, expires=expires), status=401)
 
 
