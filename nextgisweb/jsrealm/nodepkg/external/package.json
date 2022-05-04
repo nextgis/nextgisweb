@@ -21,6 +21,7 @@
         "ol": "6.10.x",
         "proj4": "^2.7.2",
         "put-selector": "^0.3.6",
+        "react-copy-to-clipboard": "5.1.0",
         "string-replace-loader": "^3.0.1",
         "uglify-js": "^3.13.4",
         "uglifycss": "^0.0.29",
