@@ -1,6 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import { routeURL } from "@nextgisweb/pyramid/api";
-
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 
 class AuthStore {
     loginError = "";
@@ -16,28 +15,32 @@ class AuthStore {
     }
 
     async login(creds) {
+        this._logout();
         this._cleanErrors();
-        const { login, password } = creds;
         try {
-            const url = routeURL("auth.login_cookies");
-            let formData = new FormData();
-            formData.append("login", login);
-            formData.append("password", password);
-            const resp = await fetch(url, { method: "POST", body: formData });
-            if (resp.ok) {
-                const user = await resp.json();
-                this.authenticated = true;
-                this.userDisplayName = user.display_name;
-            } else {
-                const error = await resp.json();
-                this.loginError = error.title;
-                throw new Error(error);
-            }
+            this.isLogining = true;
+            const resp = await route("auth.login_cookies").post({
+                json: creds,
+            });
+            this.authenticated = true;
+            this.userDisplayName = resp.display_name;
+            return resp;
         } catch (er) {
-            throw new Error();
+            this.loginError = er.title;
+            throw new Error(er);
         } finally {
             this.isLogining = false;
         }
+    }
+
+    logout() {
+        this._logout();
+        window.open(window.ngwConfig.logoutUrl);
+    }
+
+    _logout() {
+        this.authenticated = false;
+        this.userDisplayName = "";
     }
 
     _cleanErrors() {

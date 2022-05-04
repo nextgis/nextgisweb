@@ -17,7 +17,9 @@ export const Avatar = observer(({}) => {
                 </div>
             )}
             <a href={routeURL("auth.settings")}>{i18n.gettext("Settings")}</a>
-            <a href={ngwConfig.logoutUrl}>{i18n.gettext("Sign out")}</a>
+            <a href="#" onClick={() => authStore.logout()}>
+                {i18n.gettext("Sign out")}
+            </a>
         </>
     );
 

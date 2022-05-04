@@ -49,11 +49,13 @@ export const LoginForm = observer((props = {}) => {
     return (
         <>
             {settings.oauth.enabled && (
-                <div style={{ marginBottom: "1em" }}>
-                    <Button type="primary" href={oauthUrl}>
-                        {oauthText}
-                    </Button>
-                </div>
+                <Button
+                    type="primary"
+                    href={oauthUrl}
+                    style={{ marginBottom: "1em" }}
+                >
+                    {oauthText}
+                </Button>
             )}
             {authStore.loginError && (
                 <div style={{ marginBottom: "1em" }}>

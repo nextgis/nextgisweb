@@ -5,7 +5,7 @@ import i18n from "@nextgisweb/pyramid/i18n!auth";
 import LoginForm from "./login-form";
 import { authStore } from "./store/authStore";
 
-const { confirm } = Modal;
+const { confirm, info } = Modal;
 
 const titleMsg = i18n.gettext("Sign in to Web GIS");
 const okText = i18n.gettext("Sign in");
@@ -52,9 +52,10 @@ export default function loginModal() {
         style: { textAlign: "center" },
         title: <h1>{titleMsg}</h1>,
         content: <Content />,
+        closable: true,
         okButtonProps,
         cancelButtonProps: { size: "large" },
-        okText: okText,
+        okText,
         onOk,
     });
 

@@ -20,7 +20,7 @@
 
 <script type="text/javascript">
     require([
-        '@nextgisweb/auth/login-form',
+        '@nextgisweb/auth/login-box',
         "@nextgisweb/gui/react-app",
     ], function (loginFormModule, reactApp) {
         reactApp.default(
