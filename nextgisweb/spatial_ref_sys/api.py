@@ -33,8 +33,9 @@ def cget(request):
 def cpost(request):
     request.require_administrator()
 
-    check_srs_unique(request.json_body)
-    obj = SRS(**request.json_body)
+    data = request.json_body
+    check_srs_unique(data)
+    obj = SRS(**data)
     obj.persist()
 
     DBSession.flush()
@@ -82,8 +83,9 @@ def idelete(request):
 
 
 def srs_convert(request):
-    proj_str = request.json_body["projStr"]
-    format = request.json_body["format"]
+    data = request.json_body
+    proj_str = data["projStr"]
+    format = data["format"]
     wkt = convert_to_wkt(proj_str, format, pretty=True)
     if not wkt:
         raise ValidationError(_("Invalid SRS definition!"))
@@ -92,9 +94,10 @@ def srs_convert(request):
 
 
 def geom_transform(request):
-    srs_from = SRS.filter_by(id=int(request.json_body["srs"])).one()
+    data = request.json_body
+    srs_from = SRS.filter_by(id=int(data["srs"])).one()
     srs_to = SRS.filter_by(id=int(request.matchdict["id"])).one()
-    geom = Geometry.from_wkt(request.json_body["geom"])
+    geom = Geometry.from_wkt(data["geom"])
 
     transformer = Transformer(srs_from.wkt, srs_to.wkt)
     geom = transformer.transform(geom)
@@ -103,12 +106,13 @@ def geom_transform(request):
 
 
 def geom_calc(request, measure_fun):
+    data = request.json_body
     srs_to = SRS.filter_by(id=int(request.matchdict['id'])).one()
-    srs_from_id = request.json_body.get('srs', srs_to.id)
+    srs_from_id = data.get('srs', srs_to.id)
 
-    geom = Geometry.from_geojson(request.json_body['geom']) \
-        if request.json_body.get('geom_format') == 'geojson' \
-        else Geometry.from_wkt(request.json_body['geom'])
+    geom = Geometry.from_geojson(data['geom']) \
+        if data.get('geom_format') == 'geojson' \
+        else Geometry.from_wkt(data['geom'])
 
     if srs_from_id != srs_to.id:
         srs_from = SRS.filter_by(id=srs_from_id).one()

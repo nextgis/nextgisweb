@@ -5,9 +5,10 @@ import traceback
 from collections import OrderedDict
 from hashlib import md5
 
-from pyramid.renderers import render_to_response
-from pyramid.response import Response
 from pyramid import httpexceptions
+from pyramid.renderers import render_to_response
+from pyramid.request import RequestLocalCache
+from pyramid.response import Response
 from zope.interface import implementer
 from zope.interface.interface import adapter_hooks
 
@@ -27,7 +28,8 @@ def includeme(config):
     config.add_tween(ERR_TFACTORY, over=(TM_TFACTORY, 'MAIN'), under=(DT_TFACTORY, 'INGRESS'))
     config.add_tween(EXC_TFACTORY, over=(DT_TFACTORY, ERR_TFACTORY))
 
-    # PYRAMID REDEFINED METHODS FOR ERROR HANDLING
+    # PYRAMID REDEFINED METHODS FOR ERROR HANDLING / CACHING
+    @RequestLocalCache()
     def json_body(req):
         try:
             return json.loadb(req.body)

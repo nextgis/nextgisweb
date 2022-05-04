@@ -38,10 +38,11 @@ def user_cget(request):
 def user_cpost(request):
     request.require_administrator()
 
+    data = request.json_body
     obj = User(system=False)
-    check_keyname(obj, request.json_body)
-    check_display_name(obj, request.json_body)
-    obj.deserialize(request.json_body)
+    check_keyname(obj, data)
+    check_display_name(obj, data)
+    obj.deserialize(data)
     obj.persist()
 
     DBSession.flush()
@@ -57,11 +58,12 @@ def user_iget(request):
 def user_iput(request):
     request.require_administrator()
 
+    data = request.json_body
     obj = User.filter_by(id=int(request.matchdict['id'])).one()
-    check_keyname(obj, request.json_body)
-    check_display_name(obj, request.json_body)
-    check_system_user(obj, request.json_body)
-    obj.deserialize(request.json_body)
+    check_keyname(obj, data)
+    check_display_name(obj, data)
+    check_system_user(obj, data)
+    obj.deserialize(data)
     check_last_administrator()
     return dict(id=obj.id)
 
@@ -97,11 +99,12 @@ def profile_set(request):
     if user.keyname == 'guest':
         return HTTPUnauthorized()
 
-    for k in request.json_body:
+    data = request.json_body
+    for k in data:
         if k not in ('language', ):
             raise ValidationError("Attribute '%s' is not allowed!" % k)
 
-    user.deserialize(request.json_body)
+    user.deserialize(data)
 
     return None
 
@@ -127,11 +130,12 @@ def group_cget(request):
 def group_cpost(request):
     request.require_administrator()
 
+    data = request.json_body
     obj = Group(system=False)
-    check_keyname(obj, request.json_body)
-    check_display_name(obj, request.json_body)
-    check_group_members(obj, request.json_body)
-    obj.deserialize(request.json_body)
+    check_keyname(obj, data)
+    check_display_name(obj, data)
+    check_group_members(obj, data)
+    obj.deserialize(data)
     obj.persist()
 
     DBSession.flush()
@@ -147,12 +151,13 @@ def group_iget(request):
 def group_iput(request):
     request.require_administrator()
 
+    data = request.json_body
     obj = Group.filter_by(id=int(request.matchdict['id'])).one()
-    check_keyname(obj, request.json_body)
-    check_display_name(obj, request.json_body)
-    check_system_group(obj, request.json_body)
-    check_group_members(obj, request.json_body)
-    obj.deserialize(request.json_body)
+    check_keyname(obj, data)
+    check_display_name(obj, data)
+    check_system_group(obj, data)
+    check_group_members(obj, data)
+    obj.deserialize(data)
     check_last_administrator()
     return dict(id=obj.id)
 

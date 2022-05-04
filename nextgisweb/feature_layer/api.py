@@ -586,8 +586,11 @@ def cget(resource, request):
     if 'intersects' in request.GET:
         wkt_intersects = request.GET['intersects']
     # Workaround to pass really big geometry for intersection filter
-    elif request.content_type == 'application/json' and 'intersects' in request.json_body:
-        wkt_intersects = request.json_body['intersects']
+    elif (
+        request.content_type == 'application/json'
+        and 'intersects' in (json_body := request.json_body)
+    ):
+        wkt_intersects = json_body['intersects']
     else:
         wkt_intersects = None
 

@@ -45,9 +45,10 @@ def identify(request):
             and array of features
     """
 
-    srs = int(request.json_body['srs'])
-    geom = Geometry.from_wkt(request.json_body['geom'], srid=srs)
-    layers = map(int, request.json_body['layers'])
+    data = request.json_body
+    srs = int(data['srs'])
+    geom = Geometry.from_wkt(data['geom'], srid=srs)
+    layers = map(int, data['layers'])
 
     layer_list = DBSession.query(Resource).filter(Resource.id.in_(layers))
 
