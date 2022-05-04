@@ -126,12 +126,12 @@ msgstr "Чтение"
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:40 view.py:322
+#: scope.py:40 view.py:331
 msgid "Update"
 msgstr "Изменить"
 
 #: amd/ngw-resource/CompositeWidget.js:92 amd/ngw-resource/PermissionWidget.js:321
-#: scope.py:44 view.py:330
+#: scope.py:44 view.py:339
 msgid "Delete"
 msgstr "Удалить"
 
@@ -180,53 +180,53 @@ msgstr "Конфигурация"
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:86 view.py:337
+#: view.py:88 view.py:346
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:123
+#: view.py:125
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
-#: view.py:129 view.py:348
+#: view.py:139 view.py:357
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:137
+#: view.py:146
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
-#: amd/ngw-resource/DeleteWidget.js:20 view.py:144
+#: amd/ngw-resource/DeleteWidget.js:20 view.py:153
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:193 view.py:356
+#: view.py:202 view.py:365
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:214
+#: view.py:223
 #, python-format
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:272
+#: view.py:281
 msgid "Child resources"
 msgstr "Дочерние ресурсы"
 
-#: amd/ngw-resource/DescriptionWidget.js:19 view.py:279
+#: amd/ngw-resource/DescriptionWidget.js:19 view.py:288
 msgid "Description"
 msgstr "Описание"
 
-#: view.py:286
+#: view.py:295
 msgid "User permissions"
 msgstr "Права пользователя"
 
 #: amd/ngw-resource/PermissionWidget.js:66 amd/ngw-resource/PermissionWidget.js:133
-#: view.py:349
+#: view.py:358
 msgid "Action"
 msgstr "Действие"
 
-#: view.py:350
+#: view.py:359
 msgid "Extra"
 msgstr "Дополнительно"
 
@@ -333,11 +333,11 @@ msgstr "Выберите ресурс"
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:19
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:18
 msgid "Resources not found"
 msgstr "Ресурсы не найдены"
 
-#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:25
+#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:24
 msgid "Search resources"
 msgstr "Поиск ресурсов"
 
@@ -379,7 +379,7 @@ msgstr ""
 "доступа."
 
 #: amd/ngw-resource/template/Widget.hbs:8
-#: nodepkg/children-section/ChildrenSection.js:68 template/section_summary.mako:6
+#: nodepkg/children-section/ChildrenSection.js:69 template/section_summary.mako:6
 msgid "Display name"
 msgstr "Наименование"
 
@@ -392,26 +392,30 @@ msgid "Parent"
 msgstr "Родитель"
 
 #: amd/ngw-resource/template/Widget.hbs:23
-#: nodepkg/children-section/ChildrenSection.js:90 template/section_summary.mako:44
+#: nodepkg/children-section/ChildrenSection.js:89 template/section_summary.mako:44
 msgid "Owner"
 msgstr "Владелец"
 
 #: amd/ngw-resource/template/Widget.hbs:28
-#: nodepkg/children-section/ChildrenSection.js:84 template/section_summary.mako:36
+#: nodepkg/children-section/ChildrenSection.js:83 template/section_summary.mako:36
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/children-section/ChildrenSection.js:97
+#: nodepkg/children-section/ChildrenSection.js:96
 msgid "Volume"
 msgstr "Размер"
 
-#: nodepkg/children-section/ChildrenSection.js:120
+#: nodepkg/children-section/ChildrenSection.js:119
 msgid "Show resources volume"
 msgstr "Показать размер ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:121
+#: nodepkg/children-section/ChildrenSection.js:122
 msgid "Hide resources volume"
 msgstr "Скрыть размер ресурсов"
+
+#: template/section_api.mako:4
+msgid "Use these links to plug data into external applications."
+msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
 
 #: template/section_description.mako:4
 msgid "Resource description is empty."
