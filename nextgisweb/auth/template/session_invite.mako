@@ -10,7 +10,7 @@
         <input name="next" type="hidden" value="${next_url}">
     %endif
 
-    <button class="auth-form__btn dijit dijitReset dijitInline dijitButton--primary dijitButton"
+    <button class="dijit dijitReset dijitInline dijitButton--primary dijitButton"
             type="submit" value="">
         <span class="dijitReset dijitInline dijitButtonNode" >
             <span>

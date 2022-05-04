@@ -1,4 +1,4 @@
-import { Button } from "@nextgisweb/gui/antd";
+import { Button, Alert } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
@@ -48,21 +48,17 @@ export const LoginForm = observer((props = {}) => {
 
     return (
         <>
-            {authStore.loginError ? (
-                <div className="auth-form__error">{authStore.loginError}</div>
-            ) : (
-                ""
+            {settings.oauth.enabled && (
+                <div style={{ marginBottom: "1em" }}>
+                    <Button type="primary" href={oauthUrl}>
+                        {oauthText}
+                    </Button>
+                </div>
             )}
-            {settings.oauth.enabled ? (
-                <Button
-                    type="primary"
-                    style={{ marginBottom: "20px" }}
-                    href={oauthUrl}
-                >
-                    {oauthText}
-                </Button>
-            ) : (
-                ""
+            {authStore.loginError && (
+                <div style={{ marginBottom: "1em" }}>
+                    <Alert type="error" message={authStore.loginError} />
+                </div>
             )}
             <FieldsForm {...p} onChange={onChange}></FieldsForm>
         </>

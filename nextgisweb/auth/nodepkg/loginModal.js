@@ -50,7 +50,7 @@ export default function loginModal() {
     loginConfirm = confirm({
         icon: false,
         style: { textAlign: "center" },
-        title: <h1 className="auth-form__title">{titleMsg}</h1>,
+        title: <h1>{titleMsg}</h1>,
         content: <Content />,
         okButtonProps,
         cancelButtonProps: { size: "large" },
