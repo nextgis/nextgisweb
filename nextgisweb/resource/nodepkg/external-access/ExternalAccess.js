@@ -1,6 +1,6 @@
 import {PropTypes} from "prop-types";
 import {useState, useEffect} from "react";
-import {Radio, Button, Space, Row, Typography, Col, Skeleton, Tooltip} from "@nextgisweb/gui/antd";
+import {Radio, Button, Space, Row, Typography, Col, Skeleton, Popover} from "@nextgisweb/gui/antd";
 import {InfoCircleOutlined, CopyOutlined} from "@ant-design/icons";
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import {SaveOutlined} from "@ant-design/icons";
@@ -17,7 +17,7 @@ export function ExternalAccess({htmlDataset}) {
     let externalDoc;
     if (externalDocEnabled && externalDocUrl && externalDocText) {
         externalDoc = <>
-            <br/>
+            {" "}
             <a target="_blank"
                href={externalDocUrl}>
                 {externalDocText}
@@ -31,14 +31,17 @@ export function ExternalAccess({htmlDataset}) {
         {externalDoc}
     </>;
 
-    return (<div className="external-access">
+    return (<div className="ngw-resource-external-access">
         <div className="row-title">
             <div className="text">{title}</div>
-            <Tooltip className="info"
-                     title={titleTooltip}
+            {" "}
+            <Popover
+                overlayClassName="ngw-resource-external-access-popover"
+                placement="right"
+                content={titleTooltip}
             >
                 <InfoCircleOutlined/>
-            </Tooltip>
+            </Popover>
         </div>
         <div className="row-input-info">
             <div className="url-text">
