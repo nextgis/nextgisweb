@@ -1,4 +1,4 @@
-import { LoginOutlined } from "@ant-design/icons";
+import LoginIcon from "@material-icons/svg/login";
 import { Alert, Button, Form } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
@@ -97,7 +97,7 @@ export const LoginForm = observer((props = {}) => {
                 size="large"
                 loading={authStore.isLogining}
                 onClick={login}
-                icon={<LoginOutlined />}
+                icon={<LoginIcon />}
             >
                 {loginText}
             </Button>

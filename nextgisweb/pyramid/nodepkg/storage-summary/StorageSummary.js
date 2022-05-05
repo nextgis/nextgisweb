@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ReloadOutlined } from "@ant-design/icons";
+import CachedIcon from "@material-icons/svg/cached";
 import { route } from "@nextgisweb/pyramid/api";
 import { Button, Col, Row, Skeleton, Table, Typography } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
@@ -156,7 +156,7 @@ export function StorageSummary() {
                     <Button
                         onClick={isEstimating || doEstimate}
                         loading={isEstimating}
-                        icon={<ReloadOutlined />}
+                        icon={<CachedIcon />}
                         size="large"
                     >
                         {i18n.gettext("Estimate storage")}

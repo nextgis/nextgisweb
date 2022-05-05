@@ -1,7 +1,5 @@
-import {useRef, forwardRef, createRef} from "react";
 import {PropTypes} from "prop-types";
 import {Popover} from "@nextgisweb/gui/antd";
-import {InfoCircleOutlined, CopyOutlined} from "@ant-design/icons";
 import HelpOutlineIcon from "@material-icons/svg/help_outline";
 import ContentCopyIcon from "@material-icons/svg/content_copy";
 import {CopyToClipboard} from 'react-copy-to-clipboard';

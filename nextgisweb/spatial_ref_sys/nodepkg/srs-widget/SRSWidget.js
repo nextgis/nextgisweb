@@ -1,4 +1,3 @@
-import { ImportOutlined } from "@ant-design/icons";
 import { Button, Form, Modal } from "@nextgisweb/gui/antd";
 import { ContentBox } from "@nextgisweb/gui/component";
 import { ModelForm } from "@nextgisweb/gui/model-form";
@@ -81,11 +80,7 @@ export function SRSWidget({ id }) {
         <ContentBox>
             <ModelForm {...p}>
                 <Form.Item wrapperCol={{ offset: 5 }}>
-                    <Button
-                        size="small"
-                        icon={<ImportOutlined />}
-                        onClick={showModal}
-                    >
+                    <Button size="small" onClick={showModal}>
                         {i18n.gettext("Import definition")}
                     </Button>
                 </Form.Item>

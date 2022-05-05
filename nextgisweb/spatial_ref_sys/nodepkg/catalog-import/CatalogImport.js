@@ -1,5 +1,4 @@
 import { Button, Form, message } from "@nextgisweb/gui/antd";
-import { ImportOutlined } from "@ant-design/icons";
 
 import { route } from "@nextgisweb/pyramid/api";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
@@ -81,8 +80,8 @@ export function CatalogImport({ url, id }) {
             <Form.Item>
                 <SaveButton
                     onClick={importSrs}
+                    icon={null}
                     loading={status === "importing"}
-                    icon={<ImportOutlined />}
                 >
                     {i18n.gettext("Import")}
                 </SaveButton>

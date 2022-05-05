@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Radio, Button, Space, Row, Typography, Col, Skeleton } from "@nextgisweb/gui/antd";
-import { SaveOutlined } from "@ant-design/icons";
+import SaveOutlineIcon from "@material-icons/svg/save/outline";
 import { route } from "@nextgisweb/pyramid/api";
 import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
 import i18n from "@nextgisweb/pyramid/i18n!";
@@ -55,7 +55,7 @@ export function ExportSettings() {
                         onClick={save}
                         type="primary"
                         loading={status === "saving"}
-                        icon={<SaveOutlined />}
+                        icon={<SaveOutlineIcon />}
                     >
                         {i18n.gettext("Save")}
                     </Button>

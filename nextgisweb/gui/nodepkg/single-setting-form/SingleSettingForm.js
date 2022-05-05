@@ -46,7 +46,12 @@ export function SingleSettingForm({ model, settingName, inputProps = {} }) {
                 />
             </Col>
             <Col flex="none">
-                <SaveButton loading={status === "saving"} onClick={save} />
+                <br/>
+                <SaveButton loading={status === "saving"} onClick={save} /><br/>
+                <SaveButton loading={true} onClick={save} />
+                <br/>
+                <SaveButton size="large" loading={status === "saving"} onClick={save} /><br/>
+                <SaveButton size="large" loading={true} onClick={save} />
             </Col>
         </Row>
     );

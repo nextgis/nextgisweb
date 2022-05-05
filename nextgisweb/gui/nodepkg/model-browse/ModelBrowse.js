@@ -1,10 +1,7 @@
-import {
-    CloseOutlined,
-    DeleteOutlined,
-    EditOutlined,
-    PlusOutlined,
-    SearchOutlined,
-} from "@ant-design/icons";
+import AddCircleIcon from "@material-icons/svg/add_circle";
+import DeleteForeverIcon from "@material-icons/svg/delete_forever";
+import EditIcon from "@material-icons/svg/edit";
+import SearchIcon from "@material-icons/svg/search";
 import {
     Badge,
     Button,
@@ -187,7 +184,7 @@ export function ModelBrowse({
                         <Button
                             type="text"
                             shape="circle"
-                            icon={<EditOutlined />}
+                            icon={<EditIcon />}
                             onClick={() => onEditClick(record.id)}
                         />
                     </Tooltip>
@@ -201,7 +198,7 @@ export function ModelBrowse({
                                 <Button
                                     type="text"
                                     shape="circle"
-                                    icon={<CloseOutlined />}
+                                    icon={<DeleteForeverIcon />}
                                 />
                             </Popconfirm>
                         </Tooltip>
@@ -222,13 +219,13 @@ export function ModelBrowse({
                     onChange={(e) => {
                         setSearch(e.target.value);
                     }}
-                    prefix={<SearchOutlined />}
+                    prefix={<SearchIcon />}
                     allowClear
                 />
             </Col>
             <Col>
                 <Button
-                    icon={<PlusOutlined />}
+                    icon={<AddCircleIcon />}
                     type="primary"
                     onClick={goToCreatePage}
                     {...createProps}
@@ -246,7 +243,7 @@ export function ModelBrowse({
             )}
             <Badge count={selected.length} size="small">
                 <Button
-                    icon={<DeleteOutlined />}
+                    icon={<DeleteForeverIcon />}
                     onClick={onDeleteSelectedBtnClick}
                     loading={status === "deleting"}
                     danger

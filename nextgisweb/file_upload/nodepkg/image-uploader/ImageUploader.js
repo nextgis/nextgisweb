@@ -1,9 +1,9 @@
 import "./ImageUploader.less";
-
-import { InboxOutlined, StopOutlined } from "@ant-design/icons";
+import CancelIcon from "@material-icons/svg/cancel";
+import DeleteIcon from "@material-icons/svg/delete";
+import { InboxOutlined } from "@ant-design/icons";
 import { useFileUploader } from "../hook/useFileUploader";
 import { message, Upload, Button } from "@nextgisweb/gui/antd";
-import { DeleteOutlined } from "@ant-design/icons";
 import i18n from "@nextgisweb/pyramid/i18n!file_upload";
 import { PropTypes } from "prop-types";
 import { useState, useEffect } from "react";
@@ -119,7 +119,7 @@ export function ImageUploader({
                 <span>
                     <Button
                         shape="round"
-                        icon={<StopOutlined />}
+                        icon={<CancelIcon />}
                         onClick={abort}
                     >
                         {i18n.gettext("Stop")}
@@ -159,7 +159,7 @@ export function ImageUploader({
                         shape="round"
                         ghost
                         danger
-                        icon={<DeleteOutlined />}
+                        icon={<DeleteIcon />}
                         style={{
                             position: "absolute",
                             top: "10px",

@@ -1,4 +1,5 @@
-import { InfoCircleOutlined, SearchOutlined } from "@ant-design/icons";
+import SearchIcon from "@material-icons/svg/search";
+import InfoOutlineIcon from "@material-icons/svg/info/outline";
 import {
     Button,
     Divider,
@@ -114,7 +115,7 @@ export function CatalogBrowse() {
                         <Button
                             type="text"
                             shape="circle"
-                            icon={<InfoCircleOutlined />}
+                            icon={<InfoOutlineIcon />}
                             onClick={() => onImportClick(record.id)}
                         />
                     </Tooltip>
@@ -132,7 +133,7 @@ export function CatalogBrowse() {
                     onChange={(e) => {
                         setSearch(e.target.value);
                     }}
-                    prefix={<SearchOutlined />}
+                    prefix={<SearchIcon />}
                     allowClear
                 />
             </Form.Item>
