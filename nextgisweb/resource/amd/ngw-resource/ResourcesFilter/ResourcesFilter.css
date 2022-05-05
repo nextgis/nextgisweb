@@ -27,6 +27,7 @@
   color: var(--icon-color);
   left: 4px;
   top: -30px;
+  width: 30px;
 }
 
 .resources-filter .filter {
