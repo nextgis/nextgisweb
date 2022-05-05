@@ -1,26 +1,20 @@
 .ngw-resource-external-access {
     .row-input-info {
-        display: inline-block;
+        display: flex;
         border: 1px solid rgba(0, 0, 0, 0.08);
-        box-sizing: border-box;
         border-radius: 4px;
-        width: 100%;
+        padding: 4px;
 
         .url-text {
-            display: inline-block;
-            margin: 6px 0 0 5px;
-            width: 93%;
+            flex-grow: 1;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
             user-select: all;
         }
 
-        .copy-icon {
-            display: inline-block;
-            float: right;
-            padding-top: 10px;
-            padding-right: 9px;
+        svg.icon {
+            flex-shrink: 0;
         }
     }
 }

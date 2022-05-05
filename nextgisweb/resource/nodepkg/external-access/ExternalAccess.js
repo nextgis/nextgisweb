@@ -1,6 +1,9 @@
+import {useRef, forwardRef, createRef} from "react";
 import {PropTypes} from "prop-types";
 import {Popover} from "@nextgisweb/gui/antd";
 import {InfoCircleOutlined, CopyOutlined} from "@ant-design/icons";
+import HelpOutlineIcon from "@material-icons/svg/help_outline";
+import ContentCopyIcon from "@material-icons/svg/content_copy";
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 import "./ExternalAccess.less";
@@ -34,7 +37,7 @@ export function ExternalAccess({htmlDataset}) {
                 placement="right"
                 content={titleTooltip}
             >
-                <InfoCircleOutlined/>
+                <HelpOutlineIcon/>
             </Popover>
         </div>
         <div className="row-input-info">
@@ -42,7 +45,7 @@ export function ExternalAccess({htmlDataset}) {
                 {url}
             </div>
             <CopyToClipboard text={url}>
-                <CopyOutlined className="copy-icon"/>
+                <span className="copy-icon"><ContentCopyIcon/></span>
             </CopyToClipboard>
         </div>
     </div>)
