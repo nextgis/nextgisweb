@@ -10,7 +10,6 @@ import { PropTypes } from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import { authStore } from "../store";
 
-
 const oauthText = i18n.gettext("Sign in with OAuth");
 const titleText = i18n.gettext("Sign in to Web GIS");
 const loginText = i18n.gettext("Sign in");
@@ -57,9 +56,9 @@ export const LoginForm = observer((props = {}) => {
             if (props.reloadAfterLogin) {
                 location.reload();
             } else {
-                let nextUrl =
-                    resp.next_url || nextQueryParam || location.origin;
-                window.open(nextUrl, "_self");
+                // Query next param takes precedence over user's home URL.
+                const next = nextQueryParam || resp.home_url || location.origin;
+                window.open(next, "_self");
             }
         } catch {
             // ignore

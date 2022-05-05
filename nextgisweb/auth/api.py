@@ -224,7 +224,7 @@ def login(request):
         display_name=user.display_name)
 
     if event.next_url:
-        result['next_url'] = event.next_url
+        result['home_url'] = event.next_url
 
     return result
 
