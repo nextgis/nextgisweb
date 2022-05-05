@@ -14,9 +14,9 @@ module.exports = function ({ symbol, config, context }) {
         const symbol = new Symbol(${stringifySymbol(symbol)});
         sprite.add(symbol);
 
-        function Icon() {
+        function Icon({...props}) {
             return (
-                <svg className="icon" fill="currentColor">
+                <svg {...props} className="icon" fill="currentColor">
                     <use xlinkHref="#${symbol.id}"/>
                 </svg>
             );
