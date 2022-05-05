@@ -8,6 +8,7 @@ define([
     // resource
     "dojo/text!./template/WFSConnectionWidget.hbs",
     // template
+    "dijit/form/Select",
     "dijit/form/ValidationTextBox",
     "dojox/layout/TableContainer"
 ], function (
