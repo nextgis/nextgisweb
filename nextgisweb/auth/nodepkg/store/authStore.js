@@ -38,7 +38,7 @@ class AuthStore {
 
     logout() {
         this._logout();
-        window.open(window.ngwConfig.logoutUrl);
+        window.open(window.ngwConfig.logoutUrl, "_self");
     }
 
     setShowLoginModal(val) {
