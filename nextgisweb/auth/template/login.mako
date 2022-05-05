@@ -1,60 +1,33 @@
-<%inherit file="nextgisweb:pyramid/template/base.mako" />
+<%inherit file='nextgisweb:pyramid/template/base.mako' />
 <%! from nextgisweb.auth.util import _ %>
 
-<%def name="hide_resource_filter()"/>
+<%def name="title()">
+    ${tr(_('Sign in to Web GIS'))}
+</%def>
 
-<form class="auth-form" 
-    action="${request.route_url('auth.login')}" method="POST">
+<% system_name = request.env.core.system_full_name() %>
 
-    %if not next_url is UNDEFINED:
-        <input type="hidden" name="next" value="${next_url}">
-    %endif
+<%include
+    file="nextgisweb:pyramid/template/header.mako"
+    args="title=system_name, hide_resource_filter=True"
+/>
 
-    <h1 class="auth-form__title">
-        %if auth_required:
-            ${tr(_('Authorization Required'))}
-        %else:
-            ${tr(_('Sign in to Web GIS'))}
-        %endif
-    </h1>
+<div style="position: absolute; top: 100px; bottom: 100px; right: 0px;  width: 100%">
+    <div style="display: flex; justify-content: center; align-items: center; height: 100%">
+        <div id="root"></div>
+    <div>
+</div>
 
-    %if error:
-        <div class="auth-form__error">${error}</div>
-    %endif
-
-    %if auth_required:
-        <a class="dijit dijitReset dijitInline dijitButton--primary dijitButton"
-            href="${request.login_url()}">
-            <span class="dijitReset dijitInline dijitButtonNode">
-                ${tr(_('Sign in with OAuth'))}
-            </span>
-        </a>
-    %else:
-        %if (request.env.auth.oauth is not None) and (not request.env.auth.oauth.password):
-            <% oauth_url = request.route_url('auth.oauth', _query=dict(next=next_url) if next_url else None) %>
-            <div class="auth-form__control-group">
-                <a class="dijit dijitReset dijitInline dijitButton--primary dijitButton"
-                    href="${oauth_url}">
-                    <span class="dijitReset dijitInline dijitButtonNode">
-                        ${tr(_('Sign in with OAuth'))}
-                    </span>
-                </a>
-            </div>
-        %endif
-
-        <div class="auth-form__control-group">
-            <input autofocus name="login" type="text" required placeholder="${tr(_('Login'))}">
-        </div>
-        <div class="auth-form__control-group">
-            <input name="password" type="password" required placeholder="${tr(_('Password'))}">
-        </div>
-        <button class="auth-form__btn dijit dijitReset dijitInline dijitButton--primary dijitButton"
-                type="submit" value="">
-            <span class="dijitReset dijitInline dijitButtonNode" >
-                <span>
-                    ${tr(_('Sign in'))}
-                </span>
-            </span>
-        </button>
-    %endif
-</form>
+<script type="text/javascript">
+    require([
+        '@nextgisweb/auth/login-box',
+        "@nextgisweb/gui/react-app",
+        "@nextgisweb/auth/store"
+    ], function (loginFormModule, reactApp, store) {
+        store.authStore.setShowLoginModal(false);
+        reactApp.default(
+            loginFormModule.default, {},
+            document.getElementById('root')
+        );
+    });
+</script>

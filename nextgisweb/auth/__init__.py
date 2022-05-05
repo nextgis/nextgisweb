@@ -23,7 +23,7 @@ from .policy import SecurityPolicy
 from .oauth import OAuthHelper, OAuthToken, OnAccessTokenToUser
 from .util import _
 from .views import OnUserLogin
-from . import command # NOQA
+from . import command  # NOQA
 
 __all__ = [
     'Principal', 'User', 'Group', 'OnAccessTokenToUser',
@@ -148,6 +148,12 @@ class AuthComponent(Component):
         views.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
+    def client_settings(self, request):
+        enabled = (self.oauth is not None) and (not self.oauth.password)
+        return dict(
+            oauth=dict(enabled=enabled)
+        )
+
     def query_stat(self):
         user_count = DBSession.query(db.func.count(User.id)).filter(
             db.and_(db.not_(User.system), db.not_(User.disabled))).scalar()
@@ -200,8 +206,7 @@ class AuthComponent(Component):
     def authenticate(self, request, login, password):
         auth_policy = request.registry.getUtility(ISecurityPolicy)
         user, tresp = auth_policy.authenticate_with_password(
-            username=request.POST['login'].strip(),
-            password=request.POST['password'])
+            username=login, password=password)
 
         headers = auth_policy.remember(request, (user.id, tresp))
 
@@ -247,7 +252,7 @@ class AuthComponent(Component):
         if (len(result.path) > 0 and result.path != '/'):
             query['next'] = result.path
 
-        url = result.scheme + '://' + result.netloc + '/session/invite?' + urlencode(query)
+        url = result.scheme + '://' + result.netloc + '/session-invite?' + urlencode(query)
         return url
 
     def check_user_limit(self, exclude_id=None):

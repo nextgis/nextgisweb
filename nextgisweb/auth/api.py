@@ -3,14 +3,15 @@ from collections import OrderedDict
 
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased
+from zope.event import notify
 from pyramid.security import forget
-from pyramid.httpexceptions import (
-    HTTPForbidden, HTTPUnauthorized, HTTPUnprocessableEntity)
+from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
 
 from ..models import DBSession
 from ..core.exception import ValidationError
 
 from .models import User, Group, Principal
+from .views import OnUserLogin
 from .util import _
 
 keyname_pattern = re.compile(r'^[A-Za-z][A-Za-z0-9_\-]*$')
@@ -203,17 +204,34 @@ def register(request):
 
 
 def login(request):
-    if ('login' not in request.POST) or ('password' not in request.POST):
-        return HTTPUnprocessableEntity()
+    if len(request.POST) > 0:
+        login = request.POST.get('login')
+        password = request.POST.get('password')
+    else:
+        json_body = request.json_body
+        if not isinstance(json_body, dict):
+            raise ValidationError()
+        login = json_body.get('login')
+        password = json_body.get('password')
+
+    if not isinstance(login, str) or not isinstance(password, str):
+        raise ValidationError()
 
     user, headers = request.env.auth.authenticate(
-        request, request.POST['login'].strip(), request.POST['password'])
+        request, login=login, password=password)
     request.response.headerlist.extend(headers)
 
-    return dict(
-        keyname=user.keyname,
-        display_name=user.display_name,
-        description=user.description)
+    event = OnUserLogin(user, request, None)
+    notify(event)
+
+    result = dict(
+        id=user.id, keyname=user.keyname,
+        display_name=user.display_name)
+
+    if event.next_url:
+        result['home_url'] = event.next_url
+
+    return result
 
 
 def logout(request):

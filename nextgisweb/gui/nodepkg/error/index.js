@@ -1,11 +1,11 @@
 /** @entrypoint */
-import ReactDOM from "react-dom";
-import i18n from "@nextgisweb/pyramid/i18n!gui";
 import { NetworksResponseError } from "@nextgisweb/pyramid/api";
+import i18n from "@nextgisweb/pyramid/i18n!gui";
+import showModal from "../showModal";
 import { ErrorModal } from "./ErrorModal";
 import { ErrorPage } from "./ErrorPage";
 
-function extract(error) {
+function extractError(error) {
     // Temporary solution to detect instance of @nextgisweb/pyramid/api/BaseAPIError
     if (error.name && error.message && error.title) {
         return {
@@ -43,14 +43,7 @@ function extract(error) {
 }
 
 function errorModal(error) {
-    const fragmentNode = document.createDocumentFragment();
-
-    setTimeout(() => {
-        ReactDOM.render(
-            <ErrorModal error={extract(error)}></ErrorModal>,
-            fragmentNode
-        );
-    });
+    return showModal(ErrorModal, { error: extractError(error) });
 }
 
-export { errorModal, ErrorPage };
+export { errorModal, ErrorPage, extractError };
