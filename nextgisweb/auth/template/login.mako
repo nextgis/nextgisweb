@@ -22,7 +22,9 @@
     require([
         '@nextgisweb/auth/login-box',
         "@nextgisweb/gui/react-app",
-    ], function (loginFormModule, reactApp) {
+        "@nextgisweb/auth/store"
+    ], function (loginFormModule, reactApp, store) {
+        store.authStore.setShowLoginModal(false);
         reactApp.default(
             loginFormModule.default, {},
             document.getElementById('root')

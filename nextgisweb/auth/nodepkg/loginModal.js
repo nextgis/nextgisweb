@@ -1,63 +1,19 @@
-import { LoginOutlined } from "@ant-design/icons";
-import { Form, Modal } from "@nextgisweb/gui/antd";
-import { useKeydownListener } from "@nextgisweb/gui/hook";
-import i18n from "@nextgisweb/pyramid/i18n!auth";
+import { Modal } from "@nextgisweb/gui/antd";
+import showModal from "@nextgisweb/gui/showModal";
 import LoginForm from "./login-form";
-import { authStore } from "./store/authStore";
 
-const { confirm, info } = Modal;
-
-const titleMsg = i18n.gettext("Sign in to Web GIS");
-const okText = i18n.gettext("Sign in");
+const LoginModal = (props) => {
+    return (
+        <Modal footer={null} width="350px" {...props}>
+            <LoginForm reloadAfterLogin />
+        </Modal>
+    );
+};
 
 export default function loginModal() {
-    let creds = null;
-    let loginConfirm = false;
-    let form = null;
-    const setCreds = (val) => {
-        creds = val;
+    const onCancel = () => {
+        modal.destroy();
     };
-
-    const okButtonProps = {
-        size: "large",
-        key: "submit",
-        htmlType: "submit",
-        icon: <LoginOutlined />,
-    };
-
-    const onOk = async () => {
-        try {
-            loginConfirm.update({
-                okButtonProps: { ...okButtonProps, loading: true },
-            });
-            await form.validateFields();
-            await authStore.login(creds);
-            Modal.destroyAll();
-            location.reload();
-        } finally {
-            loginConfirm.update({
-                okButtonProps: { ...okButtonProps, loading: false },
-            });
-        }
-    };
-
-    const Content = () => {
-        form = Form.useForm()[0];
-        useKeydownListener("enter", () => onOk());
-        return <LoginForm onChange={setCreds} form={form} />;
-    };
-
-    loginConfirm = confirm({
-        icon: false,
-        style: { textAlign: "center" },
-        title: <h1>{titleMsg}</h1>,
-        content: <Content />,
-        closable: true,
-        okButtonProps,
-        cancelButtonProps: { size: "large" },
-        okText,
-        onOk,
-    });
-
-    return loginConfirm;
+    const modal = showModal(LoginModal, { onCancel });
+    return modal;
 }

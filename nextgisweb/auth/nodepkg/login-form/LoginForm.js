@@ -1,5 +1,7 @@
-import { Button, Alert } from "@nextgisweb/gui/antd";
+import { LoginOutlined } from "@ant-design/icons";
+import { Alert, Button, Form } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
+import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
 import settings from "@nextgisweb/pyramid/settings!auth";
@@ -8,10 +10,17 @@ import { PropTypes } from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import { authStore } from "../store";
 
+
 const oauthText = i18n.gettext("Sign in with OAuth");
+const titleText = i18n.gettext("Sign in to Web GIS");
+const loginText = i18n.gettext("Sign in");
 
 export const LoginForm = observer((props = {}) => {
     const [creds, setCreds] = useState();
+
+    const form = Form.useForm()[0];
+    const queryParams = new URLSearchParams(location.search);
+    const nextQueryParam = queryParams.get("next");
 
     const fields = useMemo(() => [
         {
@@ -27,7 +36,7 @@ export const LoginForm = observer((props = {}) => {
         },
     ]);
 
-    const p = { fields, size: "large", form: props.form };
+    const p = { fields, size: "large", form };
 
     useEffect(() => {
         if (props && props.onChange) {
@@ -39,6 +48,24 @@ export const LoginForm = observer((props = {}) => {
         setCreds((oldVal) => ({ ...oldVal, ...e.value }));
     };
 
+    useKeydownListener("enter", () => login());
+
+    const login = async () => {
+        try {
+            await form.validateFields();
+            const resp = await authStore.login(creds);
+            if (props.reloadAfterLogin) {
+                location.reload();
+            } else {
+                let nextUrl =
+                    resp.next_url || nextQueryParam || location.origin;
+                window.open(nextUrl, "_self");
+            }
+        } catch {
+            // ignore
+        }
+    };
+
     const oauthUrl =
         routeURL("auth.oauth") +
         "?" +
@@ -47,7 +74,9 @@ export const LoginForm = observer((props = {}) => {
         });
 
     return (
-        <>
+        <div style={{ textAlign: "center" }}>
+            <h1>{titleText}</h1>
+
             {settings.oauth.enabled && (
                 <Button
                     type="primary"
@@ -63,11 +92,22 @@ export const LoginForm = observer((props = {}) => {
                 </div>
             )}
             <FieldsForm {...p} onChange={onChange}></FieldsForm>
-        </>
+
+            <Button
+                type="primary"
+                size="large"
+                loading={authStore.isLogining}
+                onClick={login}
+                icon={<LoginOutlined />}
+            >
+                {loginText}
+            </Button>
+        </div>
     );
 });
 
 LoginForm.propTypes = {
     onChange: PropTypes.func,
+    reloadAfterLogin: PropTypes.bool,
     form: PropTypes.object,
 };

@@ -1,5 +1,6 @@
+import { extractError } from "@nextgisweb/gui/error";
+import { route } from "@nextgisweb/pyramid/api";
 import { makeAutoObservable } from "mobx";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
 
 class AuthStore {
     loginError = "";
@@ -9,6 +10,7 @@ class AuthStore {
     invitationSession = window.ngwConfig.invitationSession;
     userDisplayName = window.ngwConfig.userDisplayName;
     isAdministrator = window.ngwConfig.isAdministrator;
+    showLoginModal = true;
 
     constructor() {
         makeAutoObservable(this);
@@ -26,7 +28,8 @@ class AuthStore {
             this.userDisplayName = resp.display_name;
             return resp;
         } catch (er) {
-            this.loginError = er.title;
+            const { title } = extractError(er);
+            this.loginError = title;
             throw new Error(er);
         } finally {
             this.isLogining = false;
@@ -36,6 +39,10 @@ class AuthStore {
     logout() {
         this._logout();
         window.open(window.ngwConfig.logoutUrl);
+    }
+
+    setShowLoginModal(val) {
+        this.showLoginModal = val;
     }
 
     _logout() {
