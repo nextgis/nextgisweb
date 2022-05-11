@@ -370,7 +370,7 @@ define([
 
             // Bookmark panel
             if (this.config.bookmarkLayerId) {
-                this.navigationMenuItems.splice(2, 0, { title: i18n.gettext('Bookmarks'), name: 'bookmark', icon: 'bookmark', value: 'bookmarkPanel'});
+                this.navigationMenuItems.splice(2, 0, { title: i18n.gettext('Bookmarks'), name: 'bookmark', icon: 'material-bookmark', value: 'bookmarkPanel'});
 
                 all([widget._layersDeferred, widget._postCreateDeferred]).then(
                     function () {
