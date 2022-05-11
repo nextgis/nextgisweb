@@ -66,7 +66,9 @@ def login(request):
 
         return HTTPFound(location=event.next_url, headers=headers)
 
-    return dict(custom_layout=True, next_url=next_url)
+    return dict(
+        custom_layout=True, next_url=next_url,
+        props=dict(reloadAfterLogin=False))
 
 
 def session_invite(request):
@@ -217,7 +219,7 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
         and request.authenticated_userid is None
     ):
         response = render_to_response('nextgisweb:auth/template/login.mako', dict(
-            custom_layout=True,
+            custom_layout=True, props=dict(reloadAfterLogin=True),
         ), request=request)
         response.status = 403
         return response

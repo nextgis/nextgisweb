@@ -26,7 +26,7 @@
     ], function (loginFormModule, reactApp, store) {
         store.authStore.setShowLoginModal(false);
         reactApp.default(
-            loginFormModule.default, {},
+            loginFormModule.default, ${json_js(props)},
             document.getElementById('root')
         );
     });
