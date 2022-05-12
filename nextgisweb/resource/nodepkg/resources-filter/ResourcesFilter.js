@@ -95,11 +95,9 @@ export function ResourcesFilter(props) {
     }
 
     return <AutoComplete
-        dropdownClassName="res-filter"
-        dropdownMatchSelectWidth={250}
-        style={{
-            width: 250,
-        }}
+        dropdownClassName="ngw-resource-resource-filter-dropdown"
+        dropdownMatchSelectWidth={290}
+        style={{ width: 290 }}
         onSelect={onSelect}
         options={options}
         status={acStatus}
