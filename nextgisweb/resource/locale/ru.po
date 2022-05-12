@@ -329,18 +329,6 @@ msgstr "Изменить"
 msgid "Select resource"
 msgstr "Выберите ресурс"
 
-#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.hbs:5
-msgid "Search"
-msgstr "Поиск"
-
-#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:18
-msgid "Resources not found"
-msgstr "Ресурсы не найдены"
-
-#: amd/ngw-resource/ResourcesFilter/ResourcesFilter.js:24
-msgid "Search resources"
-msgstr "Поиск ресурсов"
-
 #: amd/ngw-resource/template/DeleteWidget.hbs:7
 msgid "Confirm deletion of the resource"
 msgstr "Подтвердить удаление ресурса"
@@ -412,6 +400,14 @@ msgstr "Показать размер ресурсов"
 #: nodepkg/children-section/ChildrenSection.js:122
 msgid "Hide resources volume"
 msgstr "Скрыть размер ресурсов"
+
+#: nodepkg/resources-filter/ResourcesFilter.js:106
+msgid "Resources not found"
+msgstr "Ресурсы не найдены"
+
+#: nodepkg/resources-filter/ResourcesFilter.js:110
+msgid "Search resources"
+msgstr "Поиск ресурсов"
 
 #: template/section_api.mako:4
 msgid "Use these links to plug data into external applications."

@@ -45,20 +45,15 @@
 
 <script>
     require([
+        "@nextgisweb/gui/react-app",
         "@nextgisweb/pyramid/layout",
-        "@nextgisweb/gui/react-app"
-    ], function (
-        layout, reactApp
-    ) {
+        "@nextgisweb/resource/resources-filter",
+    ], function (reactApp, layout, resourcesFilter) {
         reactApp.default(layout.Avatar, {}, document.getElementById("avatar"));
         reactApp.default(layout.Menu, {}, document.getElementById("menu"));
 
         %if not hide_resource_filter:
-            require([
-                "ngw-resource/ResourcesFilter/ResourcesFilter"
-            ], function(ResourcesFilter) {
-                (new ResourcesFilter({})).placeAt('resourcesFilter');
-            });
+        reactApp.default(resourcesFilter.default, {}, document.getElementById("resourcesFilter"));
         %endif
     });
 </script>
