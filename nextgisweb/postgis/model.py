@@ -52,8 +52,12 @@ from .util import _
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
 
-GEOM_TYPE_DISPLAY = (_("Point"), _("Line"), _("Polygon"),
-                     _("Multipoint"), _("Multiline"), _("Multipolygon"))
+GEOM_TYPE_DISPLAY = (
+    _("Point"), _("Line"), _("Polygon"),
+    _("Multipoint"), _("Multiline"), _("Multipolygon"),
+    _("Point Z"), _("Line Z"), _("Polygon Z"),
+    _("Multipoint Z"), _("Multiline Z"), _("Multipolygon Z"),
+)
 
 PC_READ = ConnectionScope.read
 PC_WRITE = ConnectionScope.write
@@ -702,7 +706,13 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             ))
 
         gt = self.layer.geometry_type
+        if gt in GEOM_TYPE.has_z:
+            gt = re.sub(r'Z$', '', gt)
+            ndims = 3
+        else:
+            ndims = 2
         where.append(func.geometrytype(geomcol) == gt)
+        where.append(func.st_ndims(geomcol) == ndims)
 
         order_criterion = []
         if self._order_by:

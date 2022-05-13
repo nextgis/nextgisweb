@@ -192,7 +192,9 @@ def test_geometry(create_resource, geom_type, ngw_resource_group_sub, ngw_httpte
         # - geom
         query = layer.feature_query()
         query.geom()
-        for i, f in enumerate(query()):
+        result = query()
+        assert result.total_count == len(gj_fs)
+        for i, f in enumerate(result):
             cmp_geom(gj_fs[i]['geometry'], f.geom, layer.srs)
 
         # - srs
@@ -200,5 +202,7 @@ def test_geometry(create_resource, geom_type, ngw_resource_group_sub, ngw_httpte
         query = layer.feature_query()
         query.geom()
         query.srs(srs)
-        for i, f in enumerate(query()):
+        result = query()
+        assert result.total_count == len(gj_fs)
+        for i, f in enumerate(result):
             cmp_geom(gj_fs[i]['geometry'], f.geom, srs)

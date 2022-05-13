@@ -1,4 +1,4 @@
-#: api.py:56
+#: api.py:53
 #, python-format
 msgid "Table (%s) not found in schema (%s)."
 msgstr "Таблица (%s) не найдена в схеме (%s)."
@@ -7,60 +7,84 @@ msgstr "Таблица (%s) не найдена в схеме (%s)."
 msgid "External database error"
 msgstr "Ошибка внешней базы данных"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:42 model.py:53
+#: amd/ngw-postgis/template/LayerWidget.hbs:42 model.py:56
 msgid "Point"
 msgstr "Точка"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:43 model.py:53
+#: amd/ngw-postgis/template/LayerWidget.hbs:43 model.py:56
 msgid "Line"
 msgstr "Линия"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:44 model.py:53
+#: amd/ngw-postgis/template/LayerWidget.hbs:44 model.py:56
 msgid "Polygon"
 msgstr "Полигон"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:45 model.py:54
+#: amd/ngw-postgis/template/LayerWidget.hbs:45 model.py:57
 msgid "Multipoint"
 msgstr "Мультиточка"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:46 model.py:54
+#: amd/ngw-postgis/template/LayerWidget.hbs:46 model.py:57
 msgid "Multiline"
 msgstr "Мультилиния"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:47 model.py:54
+#: amd/ngw-postgis/template/LayerWidget.hbs:47 model.py:57
 msgid "Multipolygon"
 msgstr "Мультиполигон"
 
-#: amd/ngw-postgis/ConnectionWidget.js:25 model.py:63
+#: model.py:58
+msgid "Point Z"
+msgstr "Точка Z"
+
+#: model.py:58
+msgid "Line Z"
+msgstr "Линия Z"
+
+#: model.py:58
+msgid "Polygon Z"
+msgstr "Полигон Z"
+
+#: model.py:59
+msgid "Multipoint Z"
+msgstr "Мультиточка Z"
+
+#: model.py:59
+msgid "Multiline Z"
+msgstr "Мультилиния Z"
+
+#: model.py:59
+msgid "Multipolygon Z"
+msgstr "Мультиполигон Z"
+
+#: amd/ngw-postgis/ConnectionWidget.js:25 model.py:69
 msgid "PostGIS connection"
 msgstr "Соединение PostGIS"
 
-#: model.py:133
+#: model.py:140
 msgid "Cannot connect to the database!"
 msgstr "Невозможно подключиться к базе данных!"
 
-#: amd/ngw-postgis/LayerWidget.js:39 model.py:161
+#: amd/ngw-postgis/LayerWidget.js:39 model.py:174
 msgid "PostGIS layer"
 msgstr "Слой PostGIS"
 
-#: model.py:219
+#: model.py:230
 #, python-format
 msgid "Table '%(table)s' not found!"
 msgstr "Таблица '%(table)s' не найдена!"
 
-#: model.py:234
+#: model.py:245
 msgid "SRID missing in geometry_columns table! You should specify it manually."
 msgstr "SRID отсутствует в таблице geometry_columns! Необходимо указать SRID вручную."
 
-#: model.py:237
+#: model.py:248
 msgid "0 is an invalid SRID."
 msgstr "SRID не может быть равен 0."
 
-#: model.py:244
+#: model.py:255
 msgid "SRID in geometry_columns table does not match specified!"
 msgstr "SRID в таблице geometry_columns не соответствует указанному!"
 
-#: model.py:252
+#: model.py:263
 msgid ""
 "Geometry type missing in geometry_columns table! You should specify it "
 "manually."
@@ -68,22 +92,22 @@ msgstr ""
 "Тип геометрии отсутствует в таблице geometry_columns! Необходимо указать тип "
 "геометрии вручную."
 
-#: model.py:262
+#: model.py:273
 msgid "Geometry type in geometry_columns table does not match specified!"
 msgstr "Тип геометрии в таблице geometry_columns не соответствует указанному!"
 
-#: model.py:280
+#: model.py:291
 msgid "To use column as ID it should have integer type!"
 msgstr ""
 "Для использования поля в качестве идентификатора оно должно иметь "
 "целочисленный тип!"
 
-#: model.py:323 model.py:326
+#: model.py:334 model.py:337
 #, python-format
 msgid "Column '%(column)s' not found!"
 msgstr "Поле '%(column)s' не найдено!"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:39 model.py:335
+#: amd/ngw-postgis/template/LayerWidget.hbs:39 model.py:341
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
@@ -151,10 +175,3 @@ msgstr "Оставить"
 #: amd/ngw-postgis/template/LayerWidget.hbs:72
 msgid "Reload"
 msgstr "Загрузить"
-
-#~ msgid "N/A"
-#~ msgstr "Н/Д"
-
-#~ msgid "Feature count"
-#~ msgstr "Количество объектов"
-
