@@ -11,7 +11,7 @@ from ..core.exception import ValidationError, UserException
 from ..resource import Resource, ResourceNotFound, DataScope, resource_factory
 
 from .interface import ILegendableStyle, IRenderableStyle
-from .util import af_transform, _
+from .util import _, af_transform, zxy_from_request
 
 
 class InvalidOriginError(UserException):
@@ -80,9 +80,7 @@ def check_origin(request):
 def tile(request):
     check_origin(request)
 
-    z = int(request.GET['z'])
-    x = int(request.GET['x'])
-    y = int(request.GET['y'])
+    z, x, y = zxy_from_request(request)
 
     p_resource = map(int, filter(None, request.GET['resource'].split(',')))
     p_cache = request.GET.get('cache', 'true').lower() in ('true', 'yes', '1') \

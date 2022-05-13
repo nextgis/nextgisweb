@@ -21,6 +21,7 @@ from ..lib.geometry import Geometry, GeometryNotValid, Transformer
 from ..resource import DataScope, Resource, resource_factory
 from ..resource.exception import ResourceNotFound
 from ..spatial_ref_sys import SRS
+from ..render.util import zxy_from_request
 
 from .interface import (
     IFeatureLayer,
@@ -198,9 +199,7 @@ def mvt(request):
     if not MVT_DRIVER_EXIST:
         return HTTPNotFound(explanation='MVT GDAL driver not found')
 
-    z = int(request.GET["z"])
-    x = int(request.GET["x"])
-    y = int(request.GET["y"])
+    z, x, y = zxy_from_request(request)
 
     extent = int(request.GET.get('extent', 4096))
     simplification = float(request.GET.get("simplification", extent / 512))

@@ -223,7 +223,15 @@ def home_path_put(request):
 
 
 def settings(request):
-    comp = request.env._components[request.GET['component']]
+    identity = request.GET.get('component')
+    if identity is None:
+        raise ValidationError(message=_(
+            "Required parameter 'component' is missing."))
+
+    comp = request.env._components.get(identity)
+    if comp is None:
+        raise ValidationError(message=_("Invalid component identity."))
+
     return comp.client_settings(request)
 
 

@@ -14,6 +14,26 @@ msgstr ""
 "Для запросов рендеринга включена проверка источника, однако указанный "
 "источник не совпадает со списком допустимых источников CORS."
 
+#: util.py:81
+msgid "Required parameter '{}' is missing."
+msgstr "Отсутствует необходимый параметр '{}'."
+
+#: util.py:86
+msgid "Placeholders {x}, {y} and {z} must be filled with values."
+msgstr "Вместо {x}, {y} и {z} должны быть указаны значения."
+
+#: util.py:88
+msgid ""
+"It seems you are trying to open an URL template directly in a browser. To "
+"test it try adding some values for 'x', 'y' and 'z' parameters."
+msgstr ""
+"Похоже вы пытаетесь открыть ссылку шаблон в браузере напрямую. Для проверки "
+"попробуйте указать значения параметров 'x', 'y' и 'z'."
+
+#: util.py:93
+msgid "The value of '{}' parameter must be a non-negative integer."
+msgstr "Значение параметра '{}' должно быть не отрицательным числом."
+
 #: view.py:21
 msgid "External access"
 msgstr "Внешний доступ"

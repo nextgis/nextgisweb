@@ -6,7 +6,15 @@ msgstr "Включено"
 msgid "Disabled"
 msgstr "Отключено"
 
-#: api.py:519
+#: api.py:228
+msgid "Required parameter 'component' is missing."
+msgstr "Отсутствует необходимый параметр 'component'."
+
+#: api.py:233
+msgid "Invalid component identity."
+msgstr "Некорректный идентификатор компонента."
+
+#: api.py:534
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
