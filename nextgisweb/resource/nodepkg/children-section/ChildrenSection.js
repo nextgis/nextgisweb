@@ -81,12 +81,14 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
                 />
                 <Column
                     title={i18n.gettext("Type")}
+                    responsive={["md"]}
                     className="cls"
                     dataIndex="clsDisplayName"
                     sorter={sorterFactory("clsDisplayName")}
                 />
                 <Column
                     title={i18n.gettext("Owner")}
+                    responsive={["xl"]}
                     className="ownerUser"
                     dataIndex="ownerUserDisplayName"
                     sorter={sorterFactory("ownerUserDisplayName")}

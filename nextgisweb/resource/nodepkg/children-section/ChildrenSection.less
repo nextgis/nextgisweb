@@ -22,6 +22,7 @@
                 gap: 8px;
                 text-decoration: none;
                 color: black;
+                overflow-wrap: anywhere;
 
                 &:hover {
                     color: var(--primary);
@@ -48,6 +49,12 @@
         .volume,
         .actions {
             white-space: nowrap;
+        }
+
+        .ownerUser {
+            max-width: 15em;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
     }
