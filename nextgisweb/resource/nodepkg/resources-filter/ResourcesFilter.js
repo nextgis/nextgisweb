@@ -59,7 +59,7 @@ export function ResourcesFilter(props) {
         debounce(async ({query: q, signal}) => {
             setLoading(true);
             try {
-                const resources = await route("resource.search").get(q);
+                const resources = await route("resource.search").get(q, signal);
                 const options = resourcesToOptions(resources)
                 setOptions(options);
                 setAcSatus("");
