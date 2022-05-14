@@ -3,7 +3,7 @@ import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { Code } from "@nextgisweb/gui/component/code";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!pyramid";
-import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useEffect, useState } from "react";
 
 export function CustomCSSForm() {
@@ -32,7 +32,7 @@ export function CustomCSSForm() {
                 // prettier-ignore
                 message.success(i18n.gettext("Custom styles saved. Reload the page to get them applied."));
             } catch (err) {
-                new ErrorDialog(err).show();
+                errorModal(err);
             } finally {
                 setStatus(null);
             }

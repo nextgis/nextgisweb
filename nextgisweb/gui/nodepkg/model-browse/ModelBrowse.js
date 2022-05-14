@@ -17,7 +17,7 @@ import {
 } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
-import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
+import { errorModal } from "@nextgisweb/gui/error";
 import { PropTypes } from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import "./ModelBrowse.less";
@@ -94,7 +94,7 @@ export function ModelBrowse({
                 callbacks.deleteModelItem();
             }
         } catch (err) {
-            new ErrorDialog(err).show();
+            errorModal(err);
         }
     };
 
@@ -135,7 +135,7 @@ export function ModelBrowse({
                 callbacks.deleteSelected();
             }
         } catch (err) {
-            new ErrorDialog(err).show();
+            errorModal(err);
         } finally {
             setStatus(null);
         }

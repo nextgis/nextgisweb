@@ -1,13 +1,13 @@
 /** @entrypoint */
 import { request } from "@nextgisweb/pyramid/api";
-import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
+import { errorModal } from "@nextgisweb/gui/error";
 
 export default async () => {
     let data;
     try {
         data = await request("/api/some");
     } catch (e) {
-        new ErrorDialog(e).show();
+        errorModal(e);
     }
     return JSON.stringify(data);
 };

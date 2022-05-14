@@ -4,7 +4,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import i18n from "@nextgisweb/pyramid/i18n!";
-import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useEffect, useState } from "react";
 
 export function CatalogImport({ url, id }) {
@@ -34,7 +34,7 @@ export function CatalogImport({ url, id }) {
             setData(srs);
             setStatus(null);
         } catch (err) {
-            new ErrorDialog(err).show();
+            errorModal(err);
             setStatus("error");
         }
     }, []);
@@ -59,7 +59,7 @@ export function CatalogImport({ url, id }) {
                 i18n.gettext("The spatial reference system is imported")
             );
         } catch (err) {
-            new ErrorDialog(err).show();
+            errorModal(err);
         } finally {
             setStatus(null);
         }

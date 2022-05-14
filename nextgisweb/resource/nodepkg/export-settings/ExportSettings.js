@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Radio, Button, Space, Row, Typography, Col, Skeleton } from "@nextgisweb/gui/antd";
 import SaveOutlineIcon from "@material-icons/svg/save/outline";
 import { route } from "@nextgisweb/pyramid/api";
-import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
+import { errorModal } from "@nextgisweb/gui/error";
 import i18n from "@nextgisweb/pyramid/i18n!";
 
 export function ExportSettings() {
@@ -22,7 +22,7 @@ export function ExportSettings() {
                 json: { resource_export: value },
             });
         } catch (err) {
-            new ErrorDialog(err).show();
+            errorModal(err);
         } finally {
             setStatus(null);
         }

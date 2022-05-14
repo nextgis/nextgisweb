@@ -1,6 +1,6 @@
 import { Col, Input, message, Row } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
-import ErrorDialog from "@nextgisweb/gui/error";
+import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
 import { PropTypes } from "prop-types";
@@ -41,7 +41,7 @@ export function SingleSettingForm({
                 message.success([saveSuccesText, saveSuccesReloadText].filter(Boolean).join(' '));
             }
         } catch (err) {
-            new ErrorDialog(err).show();
+            errorModal(err);
         } finally {
             setStatus(null);
         }
@@ -57,6 +57,7 @@ export function SingleSettingForm({
                 <Input
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
+                    allowClear 
                     {...inputProps}
                 />
             </Col>

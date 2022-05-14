@@ -9,7 +9,7 @@ import {
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!";
-import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useEffect, useState } from "react";
 
 export function CORSSettings() {
@@ -34,7 +34,7 @@ export function CORSSettings() {
                 });
                 message.success(i18n.gettext("CORS settings updated"));
             } catch (err) {
-                new ErrorDialog(err).show();
+                errorModal(err);
             } finally {
                 setStatus(null);
             }

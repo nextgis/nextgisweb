@@ -3,7 +3,7 @@ import { ContentBox, LoadingWrapper } from "@nextgisweb/gui/component";
 import { FieldsForm, LanguageSelect } from "@nextgisweb/gui/fields-form";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
-import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useEffect, useState, useMemo } from "react";
 
 export function SettingsForm({ id }) {
@@ -40,7 +40,7 @@ export function SettingsForm({ id }) {
       await route("auth.profile").put({ json });
       message.success(i18n.gettext("Saved"));
     } catch (err) {
-      new ErrorDialog(err).show();
+      errorModal(err);
     } finally {
       setStatus(null);
     }

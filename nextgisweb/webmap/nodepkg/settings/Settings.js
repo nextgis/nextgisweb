@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { route } from "@nextgisweb/pyramid/api";
-import ErrorDialog from "ngw-pyramid/ErrorDialog/ErrorDialog";
+import { errorModal } from "@nextgisweb/gui/error";
 import { message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import i18n from "@nextgisweb/pyramid/i18n!";
@@ -42,7 +42,7 @@ export function Settings() {
             setSrsOptions(srsListToOptions(srsInfo));
             setStatus("loaded");
         } catch (err) {
-            new ErrorDialog(err).show();
+            errorModal(err);
         }
     }
 
@@ -55,7 +55,7 @@ export function Settings() {
             setStatus("loaded");
             message.success(i18n.gettext("Settings saved"))
         } catch (err) {
-            new ErrorDialog(err).show();
+            errorModal(err);
         }
     };
 

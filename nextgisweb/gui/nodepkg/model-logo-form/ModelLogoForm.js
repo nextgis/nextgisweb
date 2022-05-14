@@ -1,16 +1,14 @@
 import { ImageUploader } from "@nextgisweb/file-upload";
 import { message, Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
-import ErrorDialog from "@nextgisweb/gui/error";
+import { errorModal } from "@nextgisweb/gui/error";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!";
 import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
 
 const defaultMessages = {
-    saveSuccess: i18n.gettext(
-        "Logo saved. Reload the page to get them applied."
-    ),
+    saveSuccess: i18n.gettext("Logo saved. Reload the page to get them applied."),
 };
 
 export function ModelLogoForm({ model, messages = {}, accept }) {
@@ -43,7 +41,7 @@ export function ModelLogoForm({ model, messages = {}, accept }) {
             });
             message.success(msg.saveSuccess);
         } catch (err) {
-            new ErrorDialog(err).show();
+            errorModal(err);
         } finally {
             setStatus(null);
         }
