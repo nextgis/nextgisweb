@@ -122,7 +122,7 @@ export function UserBrowse() {
             columns={columns}
             messages={getMessages()}
             collectionOptions={{ query: { brief: true } }}
-            collectionFilter={(itm) => !itm.system || itm.keyname == "guest"}
+            collectionFilter={(itm) => !itm.system}
             selectedControls={[EnableSelectedUsers, DisableSelectedUsers]}
         />
     );
