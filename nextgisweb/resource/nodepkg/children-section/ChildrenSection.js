@@ -1,16 +1,18 @@
 import MoreVertIcon from "@material-icons/svg/more_vert";
 import {
     Dropdown,
+    Divider,
     Menu,
+    Modal,
+    message,
     Popconfirm,
     Table,
     Tooltip,
-    message,
 } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
-import { errorModal } from "@nextgisweb/gui/error";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import "./ChildrenSection.less";
 
 const { Column } = Table;
@@ -31,6 +33,7 @@ function formatSize(volume) {
 
 const deleteConfirm = i18n.gettext("Confirmation");
 const deleteSuccess = i18n.gettext("Resource deleted");
+const deleteBatchSuccess = i18n.gettext("Items deleted");
 
 function renderActions(actions, id, setTableItems) {
     const deleteModelItem = () => {
@@ -95,8 +98,131 @@ async function loadVolumes(data, setState) {
 
 export function ChildrenSection({ data, storageEnabled, ...props }) {
     const [volumeVisible, setVolumeVisible] = useState(false);
+    const [batchDeletingInProgress, setBatchDeletingInProgress] =
+        useState(false);
+    const [allowBatch, setAllowBatch] = useState(false);
     const [volumeValues, setVolumeValues] = useState({});
     const [items, setItems] = useState([...data]);
+    const [selected, setSelected] = useState([]);
+
+    const menuItems = [];
+
+    const rowSelection_ = {
+        onChange: (selectedRowKeys, selectedRows) => {
+            setSelected(selectedRowKeys);
+        },
+    };
+
+    // TODO: make universal function with ModelBrowser.js
+    const deleteSelected = async () => {
+        setBatchDeletingInProgress(true);
+        try {
+            const deleted = [];
+            const deleteError = [];
+            for (const s of selected) {
+                try {
+                    await route("resource.item", s).delete();
+                    deleted.push(s);
+                } catch {
+                    deleteError.push(s);
+                }
+            }
+            if (deleteError.length) {
+                errorModal({
+                    tittle: i18n.gettext(
+                        "The errors occurred during execution"
+                    ),
+                    detail: `${i18n.gettext(
+                        "Failed to delete items:"
+                    )} ${deleteError.join(", ")}`,
+                });
+            }
+            setSelected([]);
+            setItems((old) => old.filter((row) => !deleted.includes(row.id)));
+            message.success(deleteBatchSuccess);
+        } catch (err) {
+            errorModal(err);
+        } finally {
+            setBatchDeletingInProgress(false);
+        }
+    };
+
+    const onDeleteSelectedClick = () => {
+        Modal.confirm({
+            title: i18n.gettext("Do you want to delete these resources?"),
+            onOk() {
+                deleteSelected();
+            },
+        });
+    };
+
+    const rowSelection = useMemo(() => {
+        return (
+            allowBatch && {
+                type: "checkbox",
+                selectedRowKeys: selected,
+                ...rowSelection_,
+            }
+        );
+    }, [allowBatch, selected]);
+
+    menuItems.push({
+        label: allowBatch
+            ? i18n.gettext("Disallow batch operations")
+            : i18n.gettext("Allow batch operations"),
+        onClick: () => {
+            setAllowBatch(!allowBatch);
+        },
+    });
+
+    if (storageEnabled) {
+        menuItems.push({
+            label: volumeVisible
+                ? i18n.gettext("Hide resources volume")
+                : i18n.gettext("Show resources volume"),
+            onClick: () => {
+                setVolumeVisible(!volumeVisible);
+                !volumeVisible && loadVolumes(data, setVolumeValues);
+            },
+        });
+    }
+    if (allowBatch && selected.length) {
+        menuItems.push(
+            ...[
+                { type: "divider", label: i18n.gettext("Batch operations") },
+                {
+                    label: i18n.gettext("Delete"),
+                    onClick: onDeleteSelectedClick,
+                    loding: batchDeletingInProgress,
+                },
+            ]
+        );
+    }
+
+    const MenuDropdown = () => {
+        const menu = (
+            <Menu>
+                {menuItems.map(({ type, label, ...menuItemProps }) => {
+                    return type === "divider" ? (
+                        <Divider key={label} plain style={{ margin: "0" }}>
+                            {label}
+                        </Divider>
+                    ) : (
+                        <Menu.Item key={label} {...menuItemProps}>
+                            {label}
+                        </Menu.Item>
+                    );
+                })}
+            </Menu>
+        );
+        return (
+            <Dropdown overlay={menu} trigger={["click"]}>
+                <a>
+                    <MoreVertIcon />
+                </a>
+            </Dropdown>
+        );
+    };
 
     return (
         <div className="ngw-resource-children-section">
@@ -105,6 +231,7 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
                 rowKey="id"
                 pagination={false}
                 size="middle"
+                rowSelection={rowSelection}
             >
                 <Column
                     title={i18n.gettext("Display name")}
@@ -151,42 +278,7 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
                     />
                 )}
                 <Column
-                    title={
-                        storageEnabled && (
-                            <Dropdown
-                                overlay={
-                                    <Menu
-                                        items={[
-                                            {
-                                                label: !volumeVisible
-                                                    ? i18n.gettext(
-                                                          "Show resources volume"
-                                                      )
-                                                    : i18n.gettext(
-                                                          "Hide resources volume"
-                                                      ),
-                                                onClick: () => {
-                                                    setVolumeVisible(
-                                                        !volumeVisible
-                                                    );
-                                                    !volumeVisible &&
-                                                        loadVolumes(
-                                                            data,
-                                                            setVolumeValues
-                                                        );
-                                                },
-                                            },
-                                        ]}
-                                    />
-                                }
-                                trigger={["click"]}
-                            >
-                                <a>
-                                    <MoreVertIcon />
-                                </a>
-                            </Dropdown>
-                        )
-                    }
+                    title={menuItems.length && <MenuDropdown />}
                     className="actions"
                     dataIndex="actions"
                     render={(actions, record) =>
