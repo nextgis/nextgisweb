@@ -8,25 +8,25 @@ msgstr "Сохранить"
 
 #: nodepkg/error/index.js:37
 msgid "Unexpected error"
-msgstr ""
+msgstr "Неожиданная ошибка"
 
 #: nodepkg/error/index.js:41
 msgid "Something went wrong."
-msgstr ""
+msgstr "Что-то пошло не так."
 
-#: nodepkg/error/shared.js:33
+#: nodepkg/error/shared.js:58
 msgid "Technical information"
 msgstr "Техническая информация"
 
-#: nodepkg/error/shared.js:42
+#: nodepkg/error/shared.js:67
 msgid "Contact support"
 msgstr "Написать в поддержку"
 
-#: nodepkg/error/shared.js:46
+#: nodepkg/error/shared.js:71
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
-#: nodepkg/error/shared.js:50
+#: nodepkg/error/shared.js:75
 msgid "Back to home"
 msgstr "На главную"
 
@@ -42,48 +42,52 @@ msgstr "Введенное значение некорректно"
 msgid "Browser default"
 msgstr "По умолчанию в браузере"
 
-#: nodepkg/model-browse/ModelBrowse.js:50 nodepkg/model-form/ModelForm.js:29
+#: nodepkg/model-browse/ModelBrowse.js:49 nodepkg/model-form/ModelForm.js:29
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: nodepkg/model-browse/ModelBrowse.js:51
+#: nodepkg/model-browse/ModelBrowse.js:50
 msgid "Item deleted"
 msgstr "Элемент удален"
 
-#: nodepkg/model-browse/ModelBrowse.js:53
+#: nodepkg/model-browse/ModelBrowse.js:52
 msgid "Items deleted"
 msgstr "Элементы удалены"
 
-#: nodepkg/model-browse/ModelBrowse.js:117
+#: nodepkg/model-browse/ModelBrowse.js:119
 msgid "The errors occurred during execution"
 msgstr "Во время выполнения возникли ошибки"
 
-#: nodepkg/model-browse/ModelBrowse.js:121
+#: nodepkg/model-browse/ModelBrowse.js:123
 msgid "Failed to delete items:"
 msgstr "Не удалось удалить элементы:"
 
-#: nodepkg/model-browse/ModelBrowse.js:141
+#: nodepkg/model-browse/ModelBrowse.js:146
 msgid "Do you want to delete these items?"
 msgstr "Вы хотите удалить эти элементы?"
 
-#: nodepkg/model-browse/ModelBrowse.js:178
+#: nodepkg/model-browse/ModelBrowse.js:183
 msgid "Edit"
 msgstr "Изменить"
 
-#: nodepkg/model-browse/ModelBrowse.js:187 nodepkg/model-browse/ModelBrowse.js:245
+#: nodepkg/model-browse/ModelBrowse.js:192 nodepkg/model-browse/ModelBrowse.js:251
 #: nodepkg/model-form/ModelForm.js:13
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/model-browse/ModelBrowse.js:212
+#: nodepkg/model-browse/ModelBrowse.js:217
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.js:227 nodepkg/model-form/ModelForm.js:11
+#: nodepkg/model-browse/ModelBrowse.js:233 nodepkg/model-form/ModelForm.js:11
 msgid "Create"
 msgstr "Создать"
 
 #: nodepkg/model-form/ModelForm.js:62
 msgid "Fix the form errors first"
 msgstr "Необходимо исправить ошибки в форме"
+
+#: nodepkg/model-logo-form/ModelLogoForm.js:11
+msgid "Logo saved. Reload the page to get them applied."
+msgstr "Логотип сохранен. Для просмотра изменений обновите страницу."
 
