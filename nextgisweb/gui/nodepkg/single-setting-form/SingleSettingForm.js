@@ -1,11 +1,23 @@
-import { Col, Input, Row } from "@nextgisweb/gui/antd";
+import { Col, Input, message, Row } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import ErrorDialog from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
+import i18n from "@nextgisweb/pyramid/i18n!gui";
 import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
 
-export function SingleSettingForm({ model, settingName, inputProps = {} }) {
+const saveSuccesText_ = i18n.gettext("The setting is saved.");
+const saveSuccesReloadText_ = i18n.gettext(
+    "Reload the page to get them applied."
+);
+
+export function SingleSettingForm({
+    model,
+    settingName,
+    saveSuccesText = saveSuccesText_,
+    saveSuccesReloadText = saveSuccesReloadText_,
+    inputProps = {},
+}) {
     const [status, setStatus] = useState("loading");
     const [value, setValue] = useState();
 
@@ -25,6 +37,9 @@ export function SingleSettingForm({ model, settingName, inputProps = {} }) {
             await route(model).put({
                 json,
             });
+            if (saveSuccesText) {
+                message.success([saveSuccesText, saveSuccesReloadText].filter(Boolean).join(' '));
+            }
         } catch (err) {
             new ErrorDialog(err).show();
         } finally {
@@ -56,4 +71,5 @@ SingleSettingForm.propTypes = {
     model: PropTypes.string.isRequired,
     settingName: PropTypes.string,
     inputProps: PropTypes.object,
+    saveSuccesText: PropTypes.string,
 };
