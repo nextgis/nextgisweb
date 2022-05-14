@@ -1,9 +1,17 @@
-import { Table, Menu, Dropdown } from "@nextgisweb/gui/antd";
-import { useState } from "react";
+import MoreVertIcon from "@material-icons/svg/more_vert";
+import {
+    Dropdown,
+    Menu,
+    Popconfirm,
+    Table,
+    Tooltip,
+    message,
+} from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
+import { errorModal } from "@nextgisweb/gui/error";
+import { useState } from "react";
 import "./ChildrenSection.less";
-import MoreVertIcon from "@material-icons/svg/more_vert";
 
 const { Column } = Table;
 
@@ -21,15 +29,47 @@ function formatSize(volume) {
     }
 }
 
-function renderActions(actions) {
+const deleteConfirm = i18n.gettext("Confirmation");
+const deleteSuccess = i18n.gettext("Resource deleted");
+
+function renderActions(actions, id, setTableItems) {
+    const deleteModelItem = () => {
+        return route("resource.item", id)
+            .delete()
+            .then(() => {
+                setTableItems((old) => old.filter((x) => x.id !== id));
+                message.success(deleteSuccess);
+            })
+            .catch((err) => {
+                errorModal(err);
+            });
+    };
+
     return actions.map((action, idx) => {
-        return (
-            <a key={idx} href={action.href} target={action.target}>
-                <svg className="icon" fill="currentColor">
-                    <use xlinkHref={`#icon-${action.icon}`} />
-                </svg>
-            </a>
+        const { key, target, href, icon, title } = action;
+
+        const createActionBtn = (props_) => (
+            <Tooltip key={title} title={title}>
+                <a {...props_}>
+                    <svg className="icon" fill="currentColor">
+                        <use xlinkHref={`#icon-${icon}`} />
+                    </svg>
+                </a>
+            </Tooltip>
         );
+        if (Array.isArray(key) && key[1] === "20-delete") {
+            return (
+                <Popconfirm
+                    key={title}
+                    placement="bottom"
+                    title={deleteConfirm}
+                    onConfirm={() => deleteModelItem()}
+                >
+                    {createActionBtn()}
+                </Popconfirm>
+            );
+        }
+        return createActionBtn({ href, target });
     });
 }
 
@@ -56,11 +96,12 @@ async function loadVolumes(data, setState) {
 export function ChildrenSection({ data, storageEnabled, ...props }) {
     const [volumeVisible, setVolumeVisible] = useState(false);
     const [volumeValues, setVolumeValues] = useState({});
+    const [items, setItems] = useState([...data]);
 
     return (
         <div className="ngw-resource-children-section">
             <Table
-                dataSource={data}
+                dataSource={items}
                 rowKey="id"
                 pagination={false}
                 size="middle"
@@ -148,7 +189,9 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
                     }
                     className="actions"
                     dataIndex="actions"
-                    render={(actions) => renderActions(actions)}
+                    render={(actions, record) =>
+                        renderActions(actions, record.id, setItems)
+                    }
                 />
             </Table>
         </div>
