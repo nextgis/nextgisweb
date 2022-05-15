@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
 import transaction
-
 from freezegun import freeze_time
-from nextgisweb.models import DBSession
-from nextgisweb.auth import User
+
+from ...models import DBSession
+from ..model import User
 
 
 def test_last_activity(ngw_env, ngw_webtest_app):

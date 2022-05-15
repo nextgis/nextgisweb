@@ -1,10 +1,10 @@
 import pytest
 import transaction
 
-from nextgisweb.models import DBSession
+from ...lib.geometry import Geometry
+from ...models import DBSession
 
-from nextgisweb.spatial_ref_sys.models import SRS
-from nextgisweb.lib.geometry import Geometry
+from ..model import SRS
 
 MOSCOW_VLADIVOSTOK = 'LINESTRING(37.62 55.75,131.9 43.12)'
 LENGTH_SPHERE = 6434561.600305

@@ -17,12 +17,12 @@ from ..pyramid import Session, SessionStore
 from ..pyramid.util import gensecret
 from .. import db
 
-from .models import Base, Principal, User, Group, OnFindReferencesData
+from .model import Base, Principal, User, Group, OnFindReferencesData
 from .exception import UserDisabledException
 from .policy import SecurityPolicy
 from .oauth import OAuthHelper, OAuthToken, OnAccessTokenToUser
 from .util import _
-from .views import OnUserLogin
+from .api import OnUserLogin
 from . import command  # NOQA
 
 __all__ = [
@@ -144,8 +144,8 @@ class AuthComponent(Component):
         config.set_security_policy(SecurityPolicy(
             self, self.options.with_prefix('policy')))
 
-        from . import views, api
-        views.setup_pyramid(self, config)
+        from . import view, api
+        view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
     def client_settings(self, request):

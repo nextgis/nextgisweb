@@ -16,7 +16,7 @@ from .. import db
 from ..models import DBSession
 from ..core.exception import UserException
 
-from .models import User, Group, Base
+from .model import User, Group, Base
 from .exception import UserDisabledException
 from .util import _, clean_user_keyname, enum_name
 

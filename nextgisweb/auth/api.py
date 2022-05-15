@@ -10,8 +10,7 @@ from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
 from ..models import DBSession
 from ..core.exception import ValidationError
 
-from .models import User, Group, Principal
-from .views import OnUserLogin
+from .model import User, Group, Principal
 from .util import _
 
 keyname_pattern = re.compile(r'^[A-Za-z][A-Za-z0-9_\-]*$')
@@ -201,6 +200,29 @@ def register(request):
 
     DBSession.flush()
     return dict(id=obj.id)
+
+
+class OnUserLogin(object):
+
+    def __init__(self, user, request, next_url):
+        self._user = user
+        self._request = request
+        self._next_url = next_url
+
+    @property
+    def user(self):
+        return self._user
+
+    @property
+    def request(self):
+        return self._request
+
+    @property
+    def next_url(self):
+        return self._next_url
+
+    def set_next_url(self, url):
+        self._next_url = url
 
 
 def login(request):

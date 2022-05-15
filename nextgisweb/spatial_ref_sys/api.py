@@ -8,7 +8,7 @@ from ..env import env
 from ..lib.geometry import Geometry, Transformer, geom_area, geom_length
 from ..models import DBSession
 
-from .models import SRS
+from .model import SRS
 from .util import convert_to_wkt, _
 
 

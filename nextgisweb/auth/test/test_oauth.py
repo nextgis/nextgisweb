@@ -13,7 +13,7 @@ import transaction
 
 from ...models import DBSession
 from ..oauth import OAuthHelper
-from ..models import User
+from ..model import User
 
 CLIENT_ID = token_hex(16)
 CLIENT_SECRET = token_urlsafe(16)

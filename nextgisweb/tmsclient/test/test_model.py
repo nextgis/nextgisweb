@@ -1,7 +1,7 @@
 import numpy as np
 
-from nextgisweb.spatial_ref_sys.models import SRS, BOUNDS_EPSG_3857
-from nextgisweb.tmsclient import Layer
+from ...spatial_ref_sys.model import SRS, BOUNDS_EPSG_3857
+from ..model import Layer
 
 
 def image_compare(im1, im2):

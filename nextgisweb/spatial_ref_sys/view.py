@@ -5,7 +5,7 @@ from ..views import permalinker
 from .. import dynmenu as dm
 from ..gui import REACT_RENDERER
 
-from .models import SRS
+from .model import SRS
 from .util import _
 
 

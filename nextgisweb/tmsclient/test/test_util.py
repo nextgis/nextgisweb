@@ -1,9 +1,8 @@
 import pytest
 
-from nextgisweb.spatial_ref_sys.models import (
-    SRS, BOUNDS_EPSG_3857, BOUNDS_EPSG_4326,
-)
-from nextgisweb.tmsclient.util import crop_box, render_zoom
+from ...spatial_ref_sys.model import SRS, BOUNDS_EPSG_3857, BOUNDS_EPSG_4326
+
+from ..util import crop_box, render_zoom
 
 
 @pytest.mark.parametrize('src_extent, dst_extent, width, height, expected', (

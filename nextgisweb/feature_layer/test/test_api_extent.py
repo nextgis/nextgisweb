@@ -5,10 +5,10 @@ import transaction
 from uuid import uuid4
 from osgeo import ogr
 
-from nextgisweb.models import DBSession
-from nextgisweb.vector_layer import VectorLayer
-from nextgisweb.spatial_ref_sys.models import SRS
-from nextgisweb.auth import User
+from ...models import DBSession
+from ...vector_layer import VectorLayer
+from ...spatial_ref_sys.model import SRS
+from ...auth import User
 
 
 @pytest.fixture(scope='module')

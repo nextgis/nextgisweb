@@ -16,37 +16,15 @@ from sqlalchemy.orm.exc import NoResultFound
 from ..gui import REACT_RENDERER
 from ..models import DBSession
 from ..pyramid import SessionStore, WebSession
-from ..views import  permalinker
+from ..views import permalinker
 from .. import dynmenu as dm
 
-from .models import Principal, User, Group
+from .model import Principal, User, Group
 
 from .exception import InvalidCredentialsException, UserDisabledException
 from .oauth import InvalidTokenException, AuthorizationException
+from .api import OnUserLogin
 from .util import _
-
-
-class OnUserLogin(object):
-
-    def __init__(self, user, request, next_url):
-        self._user = user
-        self._request = request
-        self._next_url = next_url
-
-    @property
-    def user(self):
-        return self._user
-
-    @property
-    def request(self):
-        return self._request
-
-    @property
-    def next_url(self):
-        return self._next_url
-
-    def set_next_url(self, url):
-        self._next_url = url
 
 
 def login(request):

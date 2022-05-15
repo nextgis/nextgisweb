@@ -1,9 +1,9 @@
 import pytest
 
-from nextgisweb import db
-from nextgisweb.models import DBSession
-from nextgisweb.core.exception import ValidationError
-from nextgisweb.spatial_ref_sys.models import (
+from ... import db
+from ...models import DBSession
+from ...core.exception import ValidationError
+from ..model import (
     SRS, SRID_LOCAL,
     WKT_EPSG_4326, WKT_EPSG_3857,
     BOUNDS_EPSG_3857, BOUNDS_EPSG_4326)

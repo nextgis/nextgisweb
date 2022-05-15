@@ -11,7 +11,7 @@ from pyramid.httpexceptions import HTTPUnauthorized
 from ..lib.config import OptionAnnotations, Option
 from ..pyramid import WebSession
 
-from .models import User
+from .model import User
 from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, UserDisabledException
 from .oauth import OAuthTokenRefreshException
 

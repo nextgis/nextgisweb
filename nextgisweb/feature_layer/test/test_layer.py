@@ -5,22 +5,22 @@ from pathlib import Path
 import pytest
 from osgeo import ogr
 
-import nextgisweb.feature_layer.test
-from nextgisweb.feature_layer import (
+from ...lib.geometry import Geometry, Transformer
+from ...postgis.test import create_feature_layer as create_postgis_layer
+from ...spatial_ref_sys import SRS
+from ...spatial_ref_sys.model import WKT_EPSG_4326
+from ...vector_layer.test import create_feature_layer as create_vector_layer
+from ...wfsclient import WFSLayer
+from ...wfsclient.test import create_feature_layer as create_wfs_layer
+
+from ..interface import (
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryOrderBy,
 )
-from nextgisweb.lib.geometry import Geometry, Transformer
-from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.spatial_ref_sys.models import WKT_EPSG_4326
-from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
-from nextgisweb.wfsclient import WFSLayer
-from nextgisweb.wfsclient.test import create_feature_layer as create_wfs_layer
 
 
-data_points = Path(nextgisweb.feature_layer.test.__file__).parent / 'data' / 'points.geojson'
+data_points = Path(__file__).parent / 'data' / 'points.geojson'
 filter_cases = (
     ((('null', 'isnull', 'yes'), ), [1, 2]),
     ((('null', 'isnull', 'no'), ), [3]),
@@ -176,7 +176,7 @@ def geom_type_product():
 
 @pytest.mark.parametrize('create_resource, geom_type', geom_type_product())
 def test_geometry(create_resource, geom_type, ngw_resource_group_sub, ngw_httptest_app):
-    data = Path(nextgisweb.feature_layer.test.__file__).parent \
+    data = Path(__file__).parent \
         / 'data' / 'geometry' / f'{geom_type}.geojson'
 
     geojson = json.loads(data.read_text())

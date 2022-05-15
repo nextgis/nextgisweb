@@ -5,7 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from ..component import Component
 from ..lib.config import Option
 from .util import COMP_ID
-from .models import Base, SRS, SRSMixin, WKT_EPSG_4326, WKT_EPSG_3857
+from .model import Base, SRS, SRSMixin, WKT_EPSG_4326, WKT_EPSG_3857
 
 __all__ = ['SpatialRefSysComponent', 'SRS', 'SRSMixin']
 
@@ -41,8 +41,8 @@ class SpatialRefSysComponent(Component):
                 srs.persist()
 
     def setup_pyramid(self, config):
-        from . import views, api
-        views.setup_pyramid(self, config)
+        from . import view, api
+        view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
     def query_stat(self):

@@ -8,12 +8,12 @@ import transaction
 from uuid import uuid4
 from osgeo import ogr
 
-from nextgisweb.auth import User
-from nextgisweb.feature_layer.ogrdriver import EXPORT_FORMAT_OGR
-from nextgisweb.lib.geometry import Geometry
-from nextgisweb.models import DBSession
-from nextgisweb.spatial_ref_sys.models import SRS
-from nextgisweb.vector_layer import VectorLayer
+from ...lib.geometry import Geometry
+from ...auth import User
+from ...feature_layer.ogrdriver import EXPORT_FORMAT_OGR
+from ...models import DBSession
+from ...spatial_ref_sys.model import SRS
+from ...vector_layer import VectorLayer
 
 
 def test_identify(ngw_webtest_app):
