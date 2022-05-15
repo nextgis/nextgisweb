@@ -21,7 +21,6 @@ from .exception import ResourceNotFound
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
-from .serialize import CompositeSerializer
 from .widget import CompositeWidget
 from .util import _
 

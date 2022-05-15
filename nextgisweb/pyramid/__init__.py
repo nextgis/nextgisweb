@@ -22,7 +22,11 @@ from .session import WebSession
 from .command import ServerCommand, AMDPackagesCommand  # NOQA
 from .util import _
 
-__all__ = ['viewargs', 'WebSession']
+__all__ = [
+    'StaticFileResponse',
+    'viewargs',
+    'WebSession',
+]
 
 
 class PyramidComponent(Component):

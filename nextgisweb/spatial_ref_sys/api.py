@@ -24,7 +24,7 @@ def check_srs_unique(data, existing_id=None):
 def cget(request):
     srs_collection = list(map(lambda o: dict(
         id=o.id, display_name=o.display_name,
-        auth_name=o.auth_name, auth_srid=o.auth_srid, 
+        auth_name=o.auth_name, auth_srid=o.auth_srid,
         wkt=o.wkt, disabled=o.disabled,
     ), SRS.query()))
     return sorted(srs_collection, key=lambda srs: srs["id"] != 4326)

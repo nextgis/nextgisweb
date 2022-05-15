@@ -1,8 +1,5 @@
 import os
-import io
 import os.path
-import errno
-import fcntl
 import re
 import secrets
 import string
@@ -72,18 +69,18 @@ class StaticFileResponse(FileResponse):
 
         found_encoding = None
         if (
-            (pref := request.env.pyramid.options['compression.algorithms']) and
-            (aenc := request.accept_encoding) and
-            (match := aenc.best_match(pref))
+            (pref := request.env.pyramid.options['compression.algorithms'])
+            and (aenc := request.accept_encoding)
+            and (match := aenc.best_match(pref))
         ):
             try_filename = filename + '.' + match
             if os.path.isfile(try_filename):
                 filename = try_filename
                 found_encoding = match
-        
+
         if found_encoding is None and not os.path.isfile(filename):
             raise HTTPNotFound()
-        
+
         super().__init__(
             filename,
             content_type=content_type,

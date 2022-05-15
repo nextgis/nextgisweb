@@ -1,9 +1,7 @@
-import json
 from collections import OrderedDict
 import zope.event
 
 from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.response import Response
 from sqlalchemy.orm import with_polymorphic
 from sqlalchemy.sql.operators import ilike_op
 

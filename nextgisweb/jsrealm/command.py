@@ -47,10 +47,10 @@ class JSRealmInstallCommand(object):
             pname for pname, _ in amd_packages()])
         config['nextgisweb_jsrealm_icon_sources'] = json.dumps(icon_sources)
 
-        ca = env.pyramid.options[f'compression.algorithms']
-        config[f'nextgisweb_pyramid_compression_algorithms'] = \
+        ca = env.pyramid.options['compression.algorithms']
+        config['nextgisweb_pyramid_compression_algorithms'] = \
             json.dumps(ca if ca else [])
-        
+
         config['nextgisweb_core_locale_available'] = \
             ','.join(env.core.locale_available)
 

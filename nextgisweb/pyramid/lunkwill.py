@@ -67,7 +67,7 @@ def tween_factory(handler, registry):
                 headerlist=resp.headers.items())
 
         return handler(request)
-    
+
     return tween
 
 

@@ -1,5 +1,4 @@
 from time import sleep
-from uuid import uuid4
 import logging
 
 import pytest

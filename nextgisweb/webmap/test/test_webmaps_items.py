@@ -105,8 +105,8 @@ def test_count_tms_ids_should_equals_webmap_items_count(webmap_with_items):
         webmap = WebMap.filter_by(id=webmap.id).one()
         ids = webmap_items_to_tms_ids_list(webmap)
     assert len(ids) == count_layers_created
-    
-    
+
+
 def test_default_order_tms_ids_should_match_the_reversed_order_webmap_items(webmap_with_items):
     webmap, fixt_layers_styles = webmap_with_items
     with transaction.manager:

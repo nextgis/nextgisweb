@@ -33,7 +33,7 @@ def test_loads_dumps(otype, input, expected):
     norm = OptionType.normalize(otype)
     if isclass(expected) and issubclass(expected, Exception):
         with pytest.raises(expected):
-           norm.loads(input)
-    else: 
+            norm.loads(input)
+    else:
         assert norm.loads(input) == expected
         assert norm.loads(norm.dumps(expected)) == expected

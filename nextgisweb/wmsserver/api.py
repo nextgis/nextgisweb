@@ -1,4 +1,3 @@
-import json
 import math
 import numpy
 from six import BytesIO
@@ -77,13 +76,13 @@ def _maker():
 
 
 def _get_capabilities(obj, params, request):
-    E = _maker()                                                    # NOQA
+    E = _maker()
 
-    OnlineResource = lambda url: E.OnlineResource({                     # NOQA
+    OnlineResource = lambda url: E.OnlineResource({  # NOQA: E731
         '{%s}type' % NS_XLINK: 'simple',
         '{%s}href' % NS_XLINK: url})
 
-    DCPType = lambda: E.DCPType(
+    DCPType = lambda: E.DCPType(  # NOQA: E731
         E.HTTP(E.Get(OnlineResource('{}?'.format(request.path_url))))
     )
 

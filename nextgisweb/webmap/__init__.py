@@ -12,6 +12,12 @@ from .model import Base, WebMap, WebMapItem, WebMapScope
 from .adapter import WebMapAdapter
 from .util import _
 
+__all__ = [
+    "WebMap",
+    "WebMapItem",
+    "WebMapScope",
+]
+
 
 class WebMapComponent(Component):
     identity = 'webmap'

@@ -13,4 +13,4 @@ def setup_pyramid(comp, config):
 def dist(request):
     dist_path = request.env.jsrealm.options['dist_path']
     filename = os.path.join(dist_path, *request.matchdict['subpath'])
-    return StaticFileResponse(filename, request=request)    
+    return StaticFileResponse(filename, request=request)

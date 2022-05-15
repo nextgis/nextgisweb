@@ -67,7 +67,7 @@ def srs_create_or_edit(request):
 
 
 def setup_pyramid(comp, config):
-    
+
     config.add_route('srs.browse', '/srs/', client=True) \
         .add_view(srs_browse, renderer=REACT_RENDERER)
     config.add_route('srs.create', '/srs/create', client=True) \

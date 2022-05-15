@@ -49,5 +49,5 @@ def create_feature_layer(ogrlayer, parent_id, ngw_httptest_app):
             DBSession.flush()
 
             layer.setup()
-        
+
         yield layer
