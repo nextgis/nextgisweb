@@ -103,26 +103,6 @@ def gensecret(length):
         for i in range(length)])
 
 
-def persistent_secret(fn, secretgen):
-    try:
-        fh = os.open(fn, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-    except OSError as e:
-        if e.errno == errno.EEXIST:
-            # Failed as the file already exists
-            with io.open(fn, 'r') as fd:
-                fcntl.flock(fd, fcntl.LOCK_EX)
-                return fd.read()
-        else:
-            raise
-
-    # No exception, so the file must have been created successfully
-    with os.fdopen(fh, 'w') as fd:
-        fcntl.flock(fd, fcntl.LOCK_EX)
-        secret = secretgen()
-        fd.write(secret)
-        return secret
-
-
 def datetime_to_unix(dt):
     return timegm(dt.timetuple())
 

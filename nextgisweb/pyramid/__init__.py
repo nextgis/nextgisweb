@@ -1,4 +1,3 @@
-import os.path
 from os import environ
 from datetime import datetime as dt, timedelta
 from pkg_resources import resource_filename
@@ -17,8 +16,6 @@ from .util import (
     viewargs,
     ClientRoutePredicate,
     ErrorRendererPredicate,
-    gensecret,
-    persistent_secret,
     StaticFileResponse)
 from .model import Base, Session, SessionStore
 from .session import WebSession
@@ -38,15 +35,6 @@ class PyramidComponent(Component):
 
         config.add_route_predicate('client', ClientRoutePredicate)
         config.add_route_predicate('error_renderer', ErrorRendererPredicate)
-
-        def _gensecret():
-            logger.info("Generating pyramid cookie secret...")
-            return gensecret(32)
-
-        self.env.core.mksdir(self)
-        sdir = self.env.core.gtsdir(self)
-
-        self.secret = persistent_secret(os.path.join(sdir, 'secret'), _gensecret)
 
         # Setup pyramid app for other components
         chain = self._env.chain('setup_pyramid', first='pyramid')
