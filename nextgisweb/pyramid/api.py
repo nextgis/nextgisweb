@@ -265,6 +265,10 @@ def locdata(request):
     locale = request.matchdict['locale']
     component = request.matchdict['component']
 
+    skey = request.GET.get('skey')
+    if skey and skey == request.env.pyramid.static_key[1:]:
+        request.response.cache_control = 'public, max-age=31536000'
+
     mod = import_module(pkginfo.comp_mod(component))
     locale_path = Path(mod.__path__[0]) / 'locale'
     jed_path = locale_path / '{}.jed'.format(locale)

@@ -19,7 +19,7 @@ export function load(component, require, load) {
 
     const loader = () => {
         return route("pyramid.locdata", component, locale)
-            .get()
+            .get({ query: { skey: ngwConfig.staticKey } })
             .catch((error) => {
                 const msg =
                     `Failed to load translation to locale "${locale}" ` +

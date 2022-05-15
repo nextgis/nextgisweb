@@ -25,6 +25,7 @@
         "assetUrl": request.static_url('nextgisweb:static/'),
         "amdUrl": request.route_url('amd_package', subpath=""),
         "distUrl": request.route_url('jsrealm.dist', subpath=''),
+        "staticKey": request.env.pyramid.static_key[1:],
         "distribution": distribution,
         "packages": packages,
         "instanceId": request.env.core.instance_id,
