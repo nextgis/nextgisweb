@@ -42,10 +42,10 @@ class OAuthHelper(object):
             redirect_uri=redirect_uri,
             **kwargs)
 
-        if 'client.id' in self.options:
-            qs['client_id'] = self.options['client.id']
-        if self.options.get('scope') is not None:
-            qs['scope'] = ' '.join(self.options['scope'])
+        if client_id := self.options.get('client.id'):
+            qs['client_id'] = client_id
+        if scope := self.options.get('scope'):
+            qs['scope'] = ' '.join(scope)
 
         return self.options['server.auth_endpoint'] + '?' + urlencode(qs)
 
@@ -54,8 +54,8 @@ class OAuthHelper(object):
             username=username,
             password=password)
 
-        if self.options.get('scope') is not None:
-            params['scope'] = ' '.join(self.options['scope'])
+        if scope := self.options.get('scope'):
+            qs['scope'] = ' '.join(scope)
 
         return self._token_request('password', params)
 
@@ -161,10 +161,10 @@ class OAuthHelper(object):
         method = self.options.get('server.{}_method'.format(endpoint), 'POST').lower()
         params = dict(params)
 
-        if 'client.id' in self.options:
-            params['client_id'] = self.options['client.id']
-        if 'client.secret' in self.options:
-            params['client_secret'] = self.options['client.secret']
+        if client_id := self.options.get('client.id'):
+            params['client_id'] = client_id
+        if client_secret := self.options.get('client.secret'):
+            params['client_secret'] = client_secret
 
         logger.debug(
             "%s request to %s endpoint: %s",
