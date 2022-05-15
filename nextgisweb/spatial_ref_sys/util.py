@@ -2,10 +2,10 @@ from osgeo import osr
 
 from ..core.exception import ValidationError
 
-from ..i18n import trstring_factory
+from ..lib.i18n import trstr_factory
 
 COMP_ID = "spatial_ref_sys"
-_ = trstring_factory(COMP_ID)
+_ = trstr_factory(COMP_ID)
 
 MI_UNIT_ALIASES = {
     0: "mi",

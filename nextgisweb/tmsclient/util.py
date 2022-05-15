@@ -1,10 +1,10 @@
 from math import log
 
-from ..i18n import trstring_factory
+from ..lib.i18n import trstr_factory
 
 
 COMP_ID = 'tmsclient'
-_ = trstring_factory(COMP_ID)
+_ = trstr_factory(COMP_ID)
 
 
 def crop_box(src_extent, dst_extent, width, height):

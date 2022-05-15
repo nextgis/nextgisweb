@@ -12,10 +12,10 @@ from mimetypes import guess_type
 from pyramid.response import FileResponse
 from pyramid.httpexceptions import HTTPNotFound
 
-from ..i18n import trstring_factory
+from ..lib.i18n import trstr_factory
 
 COMP_ID = 'pyramid'
-_ = trstring_factory(COMP_ID)
+_ = trstr_factory(COMP_ID)
 
 
 def viewargs(**kw):

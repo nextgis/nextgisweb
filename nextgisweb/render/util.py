@@ -3,12 +3,12 @@ import struct
 import PIL.ImageStat
 from affine import Affine
 
-from ..i18n import trstring_factory
+from ..lib.i18n import trstr_factory
 from ..core.exception import ValidationError
 
 
 COMP_ID = 'render'
-_ = trstring_factory(COMP_ID)
+_ = trstr_factory(COMP_ID)
 
 
 def imgcolor(img):

@@ -7,11 +7,11 @@ from datetime import datetime
 import zope.event
 
 from ..env import env
-from ..i18n import trstring_factory
+from ..lib.i18n import trstr_factory
 from ..lib.json import dumps
 
 COMP_ID = 'audit'
-_ = trstring_factory(COMP_ID)
+_ = trstr_factory(COMP_ID)
 
 
 def es_index(timestamp):

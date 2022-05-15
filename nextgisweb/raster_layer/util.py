@@ -1,9 +1,9 @@
 from osgeo import gdal
 
-from ..i18n import trstring_factory
+from ..lib.i18n import trstr_factory
 
 COMP_ID = 'raster_layer'
-_ = trstring_factory(COMP_ID)
+_ = trstr_factory(COMP_ID)
 
 PYRAMID_TARGET_SIZE = 512
 

@@ -1,9 +1,9 @@
 from humanize import naturalsize
 
-from ..i18n import trstring_factory
+from ..lib.i18n import trstr_factory
 
 COMP_ID = 'core'
-_ = trstring_factory(COMP_ID)
+_ = trstr_factory(COMP_ID)
 
 
 def format_size(value):

@@ -1,9 +1,9 @@
 import re
 
-from ..i18n import trstring_factory
+from ..lib.i18n import trstr_factory
 
 COMP_ID = 'auth'
-_ = trstring_factory(COMP_ID)
+_ = trstr_factory(COMP_ID)
 
 
 def clean_user_keyname(value):

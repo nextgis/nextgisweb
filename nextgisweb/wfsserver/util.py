@@ -1,9 +1,9 @@
 from lxml.etree import Element
 
-from ..i18n import trstring_factory
+from ..lib.i18n import trstr_factory
 
 COMP_ID = 'wfsserver'
-_ = trstring_factory(COMP_ID)
+_ = trstr_factory(COMP_ID)
 
 
 def validate_tag(tag):
