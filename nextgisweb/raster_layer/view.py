@@ -37,7 +37,7 @@ def setup_pyramid(comp, config):
                         lambda args: args.request.route_url(
                             "resource.export.page",
                             id=args.obj.id),
-                        'material-save_alt')
+                        icon='material-save_alt')
 
     Resource.__dynmenu__.add(LayerMenuExt())
 

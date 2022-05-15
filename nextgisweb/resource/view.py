@@ -323,14 +323,14 @@ def setup_pyramid(comp, config):
                     'create/%s' % ident,
                     cls.cls_display_name,
                     self._url(ident),
-                    f"rescls-{cls.identity}")
+                    icon=f"rescls-{cls.identity}")
 
             if PERM_UPDATE in permissions:
                 yield Link(
                     'operation/10-update', _("Update"),
                     lambda args: args.request.route_url(
                         'resource.update', id=args.obj.id),
-                    'material-edit', True)
+                    important=True, icon='material-edit')
 
             if PERM_DELETE in permissions and args.obj.id != 0 and \
                     args.obj.parent.has_permission(PERM_MCHILDREN, args.request.user):
@@ -338,14 +338,14 @@ def setup_pyramid(comp, config):
                     'operation/20-delete', _("Delete"),
                     lambda args: args.request.route_url(
                         'resource.delete', id=args.obj.id),
-                    'material-delete_forever', True)
+                    important=True, icon='material-delete_forever')
 
             if PERM_READ in permissions:
                 yield Link(
                     'extra/json', _("JSON view"),
                     lambda args: args.request.route_url(
                         'resource.json', id=args.obj.id),
-                    'material-data_object')
+                    icon='material-data_object')
 
         def _url(self, cls):
             return lambda args: args.request.route_url(

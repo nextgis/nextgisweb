@@ -235,9 +235,9 @@ def setup_pyramid(comp, config):
                 and args.obj.has_permission(WebMapScope.display, args.request.user)
             ):
                 yield Link(
-                    'webmap/display', _("Display"),
-                    self._url(),
-                    'webmap-display', True, '_blank')
+                    'webmap/display', _("Display"), self._url(),
+                    important=True, target='_blank',
+                    icon='webmap-display')
 
         def _url(self):
             return lambda args: args.request.route_url(
