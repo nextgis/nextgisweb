@@ -1,4 +1,3 @@
-import logging
 import warnings
 
 from .lib.config import ConfigOptions
@@ -32,8 +31,6 @@ class Component(metaclass=ComponentMeta):
         self._options = ConfigOptions(
             settings, self.option_annotations
             if hasattr(self, 'option_annotations') else ())
-
-        self._logger = logging.getLogger(self.__class__.__module__)
 
     def initialize(self):
         """ First initialization stage. """
@@ -78,14 +75,6 @@ class Component(metaclass=ComponentMeta):
     @property
     def options(self):
         return self._options
-
-    @property
-    def logger(self):
-        warnings.warn(
-            "Component logger has been deprecated, use logger from "
-            "nextgisweb.lib.logging instead available from 4.1.0.dev4.",
-            DeprecationWarning, stacklevel=2)
-        return self._logger
 
     @property
     def template_include(self):

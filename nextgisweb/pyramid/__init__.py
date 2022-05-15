@@ -1,4 +1,3 @@
-import logging
 import os.path
 from os import environ
 from datetime import datetime as dt, timedelta
@@ -27,8 +26,6 @@ from .command import ServerCommand, AMDPackagesCommand  # NOQA
 from .util import _
 
 __all__ = ['viewargs', 'WebSession']
-
-logger = logging.getLogger(__name__)
 
 
 class PyramidComponent(Component):

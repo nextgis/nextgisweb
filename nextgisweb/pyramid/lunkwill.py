@@ -1,13 +1,9 @@
-import logging
 from uuid import UUID
 from urllib.parse import urlsplit, urlunsplit
 
 import urllib3
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
-
-
-logger = logging.getLogger(__name__)
 
 
 def setup_pyramid(comp, config):
