@@ -55,7 +55,7 @@ class OAuthHelper(object):
             password=password)
 
         if scope := self.options.get('scope'):
-            qs['scope'] = ' '.join(scope)
+            params['scope'] = ' '.join(scope)
 
         return self._token_request('password', params)
 
