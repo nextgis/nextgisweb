@@ -196,8 +196,8 @@ class FieldDef(object):
 
 class TableInfo(object):
 
-    def __init__(self, srs_id):
-        self.srs_id = srs_id
+    def __init__(self, srs):
+        self.srs = srs
         self.metadata = None
         self.table = None
         self.model = None
@@ -206,9 +206,9 @@ class TableInfo(object):
         self.geometry_type = None
 
     @classmethod
-    def from_ogrlayer(cls, ogrlayer, srs_id, skip_other_geometry_types,
+    def from_ogrlayer(cls, ogrlayer, srs, skip_other_geometry_types,
                       fid_params, geom_cast_params, fix_errors):
-        self = cls(srs_id)
+        self = cls(srs)
 
         defn = ogrlayer.GetLayerDefn()
 
@@ -525,8 +525,8 @@ class TableInfo(object):
         return self
 
     @classmethod
-    def from_fields(cls, fields, srs_id, geometry_type):
-        self = cls(srs_id)
+    def from_fields(cls, fields, srs, geometry_type):
+        self = cls(srs)
         self.geometry_type = geometry_type
         self.fields = []
 
@@ -546,7 +546,7 @@ class TableInfo(object):
 
     @classmethod
     def from_layer(cls, layer):
-        self = cls(layer.srs_id)
+        self = cls(layer.srs)
 
         self.geometry_type = layer.geometry_type
 
@@ -619,7 +619,7 @@ class TableInfo(object):
                 sequence,
                 primary_key=True),
             db.Column('geom', ga.Geometry(
-                dimension=2, srid=self.srs_id,
+                dimension=2, srid=self.srs.id,
                 geometry_type=geom_fldtype)),
             *map(lambda fld: db.Column(fld.key, _FIELD_TYPE_2_DB[
                 fld.datatype]), self.fields)
@@ -637,8 +637,7 @@ class TableInfo(object):
     def load_from_ogr(self, ogrlayer, skip_other_geometry_types,
                       fix_errors, skip_errors):
         source_osr = ogrlayer.GetSpatialRef()
-        target_osr = osr.SpatialReference()
-        target_osr.ImportFromEPSG(self.srs_id)
+        target_osr = self.srs.to_osr()
 
         transform = osr.CoordinateTransformation(source_osr, target_osr) \
             if not source_osr.IsSame(target_osr) else None
@@ -863,7 +862,7 @@ class TableInfo(object):
             geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
             dynamic_size += len(geom_bytes)
             obj = self.model(id=fid, geom=ga.elements.WKBElement(
-                geom_bytes, srid=self.srs_id), **fld_values)
+                geom_bytes, srid=self.srs.id), **fld_values)
 
             num_features += 1
 
@@ -935,7 +934,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                        geom_cast_params=geom_cast_params_default,
                        fix_errors=ERROR_FIX.default):
         tableinfo = TableInfo.from_ogrlayer(
-            ogrlayer, self.srs.id, skip_other_geometry_types,
+            ogrlayer, self.srs, skip_other_geometry_types,
             fid_params, geom_cast_params, fix_errors)
         tableinfo.setup_layer(self)
 
@@ -946,7 +945,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     def setup_from_fields(self, fields):
         tableinfo = TableInfo.from_fields(
-            fields, self.srs.id, self.geometry_type)
+            fields, self.srs, self.geometry_type)
         tableinfo.setup_layer(self)
 
         tableinfo.setup_metadata(self._tablename)

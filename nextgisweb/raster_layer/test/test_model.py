@@ -1,5 +1,5 @@
 import os.path
-from osgeo import gdal, osr
+from osgeo import gdal
 from tempfile import NamedTemporaryFile
 
 import pytest
@@ -67,8 +67,7 @@ def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env
     ).persist()
 
     driver = gdal.GetDriverByName('GTiff')
-    proj = osr.SpatialReference()
-    proj.ImportFromEPSG(3857)
+    proj = res.srs.to_osr()
     proj_wkt = proj.ExportToWkt()
 
     with ngw_env.raster_layer.options.override(dict(size_limit=size_limit)):

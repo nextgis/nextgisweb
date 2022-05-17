@@ -1,4 +1,5 @@
 import pytest
+from osgeo import osr
 
 from ... import db
 from ...models import DBSession
@@ -105,3 +106,13 @@ def test_point_tilexy(ngw_txn):
 
     vdk_x, vdk_y = 14681475, 5300249
     assert list(map(int, srs_3395._point_tilexy(vdk_x, vdk_y, zoom))) == [3548, 1506]
+
+
+@pytest.mark.parametrize('EPSG', (3857, 4326))
+def test_osr(EPSG, ngw_txn):
+    sr1 = SRS.filter_by(auth_name='EPSG', auth_srid=EPSG).one().to_osr()
+
+    sr2 = osr.SpatialReference()
+    sr2.ImportFromEPSG(EPSG)
+
+    assert sr1.IsSame(sr2)

@@ -129,8 +129,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 "The source raster has a local coordinate system and can't be "
                 "reprojected to the target coordinate system."))
 
-        dst_osr = osr.SpatialReference()
-        dst_osr.ImportFromEPSG(int(self.srs.id))
+        dst_osr = self.srs.to_osr()
 
         reproject = not src_osr.IsSame(dst_osr)
         add_alpha = reproject and not has_nodata and alpha_band is None
@@ -248,10 +247,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         """Возвращает охват слоя
         """
 
-        src_osr = osr.SpatialReference()
-        dst_osr = osr.SpatialReference()
+        src_osr = self.srs.to_osr()
 
-        src_osr.ImportFromEPSG(int(self.srs.id))
+        dst_osr = osr.SpatialReference()
         dst_osr.ImportFromEPSG(4326)
 
         traditional_axis_mapping(src_osr)

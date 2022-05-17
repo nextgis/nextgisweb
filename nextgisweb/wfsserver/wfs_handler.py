@@ -6,7 +6,7 @@ from tempfile import NamedTemporaryFile
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
-from osgeo import ogr, osr
+from osgeo import ogr
 from pyramid.request import Request
 from shapely.geometry import box
 from sqlalchemy import and_
@@ -878,8 +878,7 @@ class WFSHandler():
                 srs_out = feature_layer.srs
             query.srs(srs_out)
 
-            osr_out = osr.SpatialReference()
-            osr_out.ImportFromWkt(srs_out.wkt)
+            osr_out = srs_out.to_osr()
 
             __boundedBy = El(
                 'boundedBy', parent=root,

@@ -235,8 +235,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
                 extent[2], min(extent[3], 85.0511),
             )
 
-        dst_osr = traditional_axis_mapping(osr.SpatialReference())
-        dst_osr.ImportFromWkt(self.srs.wkt)
+        dst_osr = self.srs.to_osr()
+        traditional_axis_mapping(dst_osr)
 
         extent_max = prepare_geog_extent((self.extent_left, self.extent_bottom, self.extent_right, self.extent_top))
         if self.srs.id != 4326:
@@ -248,8 +248,8 @@ class Layer(Base, Resource, SpatialLayerMixin):
             extent = prepare_geog_extent(extent)
 
         if srs.id != self.srs.id:
-            req_osr = traditional_axis_mapping(osr.SpatialReference())
-            req_osr.ImportFromWkt(srs.wkt)
+            req_osr = srs.to_osr()
+            traditional_axis_mapping(req_osr)
             extent = transform_extent(extent, req_osr, dst_osr)
 
         xtile_from, ytile_from, xtile_to, ytile_to = self.srs.extent_tile_range(extent, zoom)

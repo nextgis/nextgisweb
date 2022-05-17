@@ -1,4 +1,4 @@
-from pyproj import CRS
+from osgeo import gdal, osr
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
@@ -65,7 +65,7 @@ class SRS(Base):
 
     @property
     def is_geographic(self):
-        return CRS.from_wkt(self.wkt).is_geographic
+        return bool(self.to_osr().IsGeographic())
 
     @property
     def _zero_level_numtiles_x(self):
@@ -119,6 +119,12 @@ class SRS(Base):
             ytile_max -= 1
 
         return [int(xtile_min), int(ytile_min), int(xtile_max), int(ytile_max)]
+
+    def to_osr(self):
+        sr = osr.SpatialReference()
+        if sr.ImportFromWkt(self.wkt) != 0:
+            raise ValueError(gdal.GetLastErrorMsg())
+        return sr
 
     def __str__(self):
         return self.display_name

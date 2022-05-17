@@ -159,8 +159,7 @@ class RasterMosaicItem(Base):
 
         src_osr = osr.SpatialReference()
         src_osr.ImportFromWkt(dsproj)
-        dst_osr = osr.SpatialReference()
-        dst_osr.ImportFromEPSG(int(self.resource.srs.id))
+        dst_osr = self.resource.srs.to_osr()
 
         reproject = not src_osr.IsSame(dst_osr)
 

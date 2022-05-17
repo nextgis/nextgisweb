@@ -5,7 +5,7 @@ from io import BytesIO
 from lxml import etree
 from owslib.crs import Crs
 import requests
-from osgeo import ogr, osr
+from osgeo import ogr
 from requests.exceptions import RequestException
 from shapely.geometry import box
 from zope.interface import implementer
@@ -246,8 +246,7 @@ class WFSConnection(Base, Resource):
                 srs_intersects = SRS.filter_by(id=intersects.srid).one()
             else:
                 srs_intersects = layer.srs
-            osr_intersects = osr.SpatialReference()
-            osr_intersects.ImportFromWkt(srs_intersects.wkt)
+            osr_intersects = srs_intersects.to_osr()
             geom = intersects.ogr
             geom.AssignSpatialReference(osr_intersects)
             geom_gml = geom.ExportToGML([
