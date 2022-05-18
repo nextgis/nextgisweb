@@ -1,10 +1,10 @@
 import MoreVertIcon from "@material-icons/svg/more_vert";
 import {
+    Badge,
     Dropdown,
-    Divider,
     Menu,
-    Modal,
     message,
+    Modal,
     Popconfirm,
     Table,
     Tooltip,
@@ -31,9 +31,8 @@ function formatSize(volume) {
     }
 }
 
-const deleteConfirm = i18n.gettext("Confirmation");
 const deleteSuccess = i18n.gettext("Resource deleted");
-const deleteBatchSuccess = i18n.gettext("Items deleted");
+const deleteBatchSuccess = i18n.gettext("Resources deleted");
 
 function renderActions(actions, id, setTableItems) {
     const deleteModelItem = () => {
@@ -48,7 +47,18 @@ function renderActions(actions, id, setTableItems) {
             });
     };
 
-    return actions.map((action, idx) => {
+    const onDeleteClick = () => {
+        Modal.confirm({
+            title: i18n.gettext("Delete resource"),
+            content: i18n.gettext("Confirm deletion of the resource"),
+            onOk() {
+                return deleteModelItem();
+            },
+            autoFocusButton: "cancel",
+        });
+    };
+
+    return actions.map((action) => {
         const { key, target, href, icon, title } = action;
 
         const createActionBtn = (props_) => (
@@ -61,16 +71,7 @@ function renderActions(actions, id, setTableItems) {
             </Tooltip>
         );
         if (Array.isArray(key) && key[1] === "20-delete") {
-            return (
-                <Popconfirm
-                    key={title}
-                    placement="bottom"
-                    title={deleteConfirm}
-                    onConfirm={() => deleteModelItem()}
-                >
-                    {createActionBtn()}
-                </Popconfirm>
-            );
+            return createActionBtn({ onClick: onDeleteClick });
         }
         return createActionBtn({ href, target });
     });
@@ -108,7 +109,7 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
     const menuItems = [];
 
     const rowSelection_ = {
-        onChange: (selectedRowKeys, selectedRows) => {
+        onChange: (selectedRowKeys) => {
             setSelected(selectedRowKeys);
         },
     };
@@ -149,10 +150,12 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
 
     const onDeleteSelectedClick = () => {
         Modal.confirm({
-            title: i18n.gettext("Do you want to delete these resources?"),
+            content: i18n.gettext("Confirm deletion of the resource."),
+            title: i18n.gettext("Delete resources"),
             onOk() {
-                deleteSelected();
+                return deleteSelected();
             },
+            autoFocusButton: "cancel",
         });
     };
 
@@ -160,16 +163,19 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
         return (
             allowBatch && {
                 type: "checkbox",
+                getCheckboxProps: () => ({
+                    disabled: batchDeletingInProgress,
+                }),
                 selectedRowKeys: selected,
                 ...rowSelection_,
             }
         );
-    }, [allowBatch, selected]);
+    }, [allowBatch, selected, batchDeletingInProgress]);
 
     menuItems.push({
         label: allowBatch
-            ? i18n.gettext("Disallow batch operations")
-            : i18n.gettext("Allow batch operations"),
+            ? i18n.gettext("Turn off multiple selection")
+            : i18n.gettext("Select multiple resources"),
         onClick: () => {
             setAllowBatch(!allowBatch);
         },
@@ -189,11 +195,22 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
     if (allowBatch && selected.length) {
         menuItems.push(
             ...[
-                { type: "divider", label: i18n.gettext("Batch operations") },
                 {
-                    label: i18n.gettext("Delete"),
+                    type: "divider",
+                },
+                {
+                    label: (
+                        <>
+                            <Badge
+                                count={selected.length}
+                                size="small"
+                                offset={[10, 0]}
+                            >
+                                {i18n.gettext("Delete")}
+                            </Badge>
+                        </>
+                    ),
                     onClick: onDeleteSelectedClick,
-                    loding: batchDeletingInProgress,
                 },
             ]
         );
@@ -202,11 +219,9 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
     const MenuDropdown = () => {
         const menu = (
             <Menu>
-                {menuItems.map(({ type, label, ...menuItemProps }) => {
+                {menuItems.map(({ type, label, ...menuItemProps }, idx) => {
                     return type === "divider" ? (
-                        <Divider key={label} plain style={{ margin: "0" }}>
-                            {label}
-                        </Divider>
+                        <Menu.Divider key={idx}></Menu.Divider>
                     ) : (
                         <Menu.Item key={label} {...menuItemProps}>
                             {label}
