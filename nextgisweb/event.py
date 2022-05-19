@@ -27,13 +27,3 @@ class Event:
     __isub__ = unhandle
     __call__ = fire
     __len__ = get_handlers_count
-
-
-class SafetyEvent(Event):
-
-    def fire(self, *args, **kargs):
-        for handler in self._handlers:
-            try:
-                handler(*args, **kargs)
-            except Exception:
-                pass

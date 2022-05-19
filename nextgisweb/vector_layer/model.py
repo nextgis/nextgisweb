@@ -19,7 +19,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import registry
 
-from ..event import SafetyEvent
 from .. import db
 from ..core.exception import ValidationError
 from ..resource import (
@@ -907,19 +906,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     __field_class__ = VectorLayerField
 
-    # events
-    before_feature_create = SafetyEvent()  # args: resource, feature
-    after_feature_create = SafetyEvent()   # args: resource, feature_id
-
-    before_feature_update = SafetyEvent()  # args: resource, feature
-    after_feature_update = SafetyEvent()   # args: resource, feature
-
-    before_feature_delete = SafetyEvent()  # args: resource, feature_id
-    after_feature_delete = SafetyEvent()   # args: resource, feature_id
-
-    before_all_feature_delete = SafetyEvent()  # args: resource
-    after_all_feature_delete = SafetyEvent()
-
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
@@ -1007,8 +993,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IWritableFeatureLayer
 
     def feature_put(self, feature):
-        self.before_feature_update.fire(resource=self, feature=feature)
-
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(self._tablename)
 
@@ -1026,8 +1010,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         DBSession.merge(obj)
 
-        self.after_feature_update.fire(resource=self, feature=feature)
-
         on_data_change.fire(self, feature.geom)
         # TODO: Old geom version
 
@@ -1039,7 +1021,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         :return:    inserted object ID
         """
-        self.before_feature_create.fire(resource=self, feature=feature)
 
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(self._tablename)
@@ -1066,8 +1047,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         DBSession.flush()
         DBSession.refresh(obj)
 
-        self.after_feature_create.fire(resource=self, feature_id=obj.id)
-
         on_data_change.fire(self, feature.geom)
 
         return obj.id
@@ -1078,7 +1057,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         :param feature_id: record id
         :type feature_id:  int or bigint
         """
-        self.before_feature_delete.fire(resource=self, feature_id=feature_id)
 
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(self._tablename)
@@ -1089,20 +1067,15 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         obj = DBSession.query(tableinfo.model).filter_by(id=feature.id).one()
         DBSession.delete(obj)
 
-        self.after_feature_delete.fire(resource=self, feature_id=feature_id)
-
         on_data_change.fire(self, feature.geom)
 
     def feature_delete_all(self):
         """Remove all records from a layer"""
-        self.before_all_feature_delete.fire(resource=self)
 
         tableinfo = TableInfo.from_layer(self)
         tableinfo.setup_metadata(self._tablename)
 
         DBSession.query(tableinfo.model).delete()
-
-        self.after_all_feature_delete.fire(resource=self)
 
         geom = box(self.srs.minx, self.srs.miny, self.srs.maxx, self.srs.maxy)
         on_data_change.fire(self, geom)
