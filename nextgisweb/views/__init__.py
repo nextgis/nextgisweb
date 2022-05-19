@@ -1,10 +1,3 @@
-from .model_controller import DeleteWidget
-
-__all__ = [
-    'DeleteWidget',
-]
-
-
 def permalinker(model, route_name, keys=('id', )):
     def _permalink(model, request):
         return request.route_url(route_name, **dict(
