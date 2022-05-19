@@ -22,7 +22,7 @@
             if isinstance(menu_item, dm.Link) and menu_item.important and menu_item.icon is not None:
                 iacts.append(dict(
                     href=menu_item.url(args), target=menu_item.target,
-                    title=tr(menu_item.label), icon=menu_item.icon))
+                    title=tr(menu_item.label), icon=menu_item.icon, key=menu_item.key))
 
         data.append(idata)
 

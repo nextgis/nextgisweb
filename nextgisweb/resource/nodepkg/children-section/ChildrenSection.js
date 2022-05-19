@@ -1,9 +1,18 @@
-import { Table, Menu, Dropdown } from "@nextgisweb/gui/antd";
-import { useState } from "react";
+import MoreVertIcon from "@material-icons/svg/more_vert";
+import {
+    Badge,
+    Dropdown,
+    Menu,
+    message,
+    Modal,
+    Table,
+    Tooltip,
+} from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
+import { useMemo, useState } from "react";
 import "./ChildrenSection.less";
-import MoreVertIcon from "@material-icons/svg/more_vert";
 
 const { Column } = Table;
 
@@ -21,15 +30,58 @@ function formatSize(volume) {
     }
 }
 
-function renderActions(actions) {
-    return actions.map((action, idx) => {
-        return (
-            <a key={idx} href={action.href} target={action.target}>
-                <svg className="icon" fill="currentColor">
-                    <use xlinkHref={`#icon-${action.icon}`} />
-                </svg>
-            </a>
+function confirmThenDelete(callback) {
+    Modal.confirm({
+        onOk: callback,
+        title: i18n.gettext("Confirmation required"),
+        content: i18n.gettext(
+            "Please confirm resource deletion. This action cannot be undone."
+        ),
+        okButtonProps: { danger: true, type: "primary" },
+        okText: i18n.gettext("Delete"),
+        autoFocusButton: "cancel",
+    });
+}
+
+function notifySuccessfulDeletion(count) {
+    message.success(
+        count == 1
+            ? i18n.gettext("Resource deleted")
+            : i18n.gettext("Resources deleted")
+    );
+}
+
+function renderActions(actions, id, setTableItems) {
+    const deleteModelItem = () => {
+        return route("resource.item", id)
+            .delete()
+            .then(() => {
+                setTableItems((old) => old.filter((x) => x.id !== id));
+                notifySuccessfulDeletion(1);
+            })
+            .catch((err) => {
+                errorModal(err);
+            });
+    };
+
+    return actions.map((action) => {
+        const { key, target, href, icon, title } = action;
+
+        const createActionBtn = (props_) => (
+            <Tooltip key={title} title={title}>
+                <a {...props_}>
+                    <svg className="icon" fill="currentColor">
+                        <use xlinkHref={`#icon-${icon}`} />
+                    </svg>
+                </a>
+            </Tooltip>
         );
+        if (Array.isArray(key) && key[1] === "20-delete") {
+            return createActionBtn({
+                onClick: () => confirmThenDelete(deleteModelItem),
+            });
+        }
+        return createActionBtn({ href, target });
     });
 }
 
@@ -55,15 +107,139 @@ async function loadVolumes(data, setState) {
 
 export function ChildrenSection({ data, storageEnabled, ...props }) {
     const [volumeVisible, setVolumeVisible] = useState(false);
+    const [batchDeletingInProgress, setBatchDeletingInProgress] =
+        useState(false);
+    const [allowBatch, setAllowBatch] = useState(false);
     const [volumeValues, setVolumeValues] = useState({});
+    const [items, setItems] = useState([...data]);
+    const [selected, setSelected] = useState([]);
+
+    const menuItems = [];
+
+    const rowSelection_ = {
+        onChange: (selectedRowKeys) => {
+            setSelected(selectedRowKeys);
+        },
+    };
+
+    // TODO: make universal function with ModelBrowser.js
+    const deleteSelected = async () => {
+        setBatchDeletingInProgress(true);
+        try {
+            const deleted = [];
+            const deleteError = [];
+            for (const s of selected) {
+                try {
+                    await route("resource.item", s).delete();
+                    deleted.push(s);
+                } catch {
+                    deleteError.push(s);
+                }
+            }
+            if (deleteError.length) {
+                errorModal({
+                    tittle: i18n.gettext(
+                        "The errors occurred during execution"
+                    ),
+                    detail: `${i18n.gettext(
+                        "Failed to delete items:"
+                    )} ${deleteError.join(", ")}`,
+                });
+            } else {
+                notifySuccessfulDeletion(deleted.length);
+            }
+            setSelected([]);
+            setItems((old) => old.filter((row) => !deleted.includes(row.id)));
+        } catch (err) {
+            errorModal(err);
+        } finally {
+            setBatchDeletingInProgress(false);
+        }
+    };
+
+    const rowSelection = useMemo(() => {
+        return (
+            allowBatch && {
+                type: "checkbox",
+                getCheckboxProps: () => ({
+                    disabled: batchDeletingInProgress,
+                }),
+                selectedRowKeys: selected,
+                ...rowSelection_,
+            }
+        );
+    }, [allowBatch, selected, batchDeletingInProgress]);
+
+    menuItems.push({
+        label: allowBatch
+            ? i18n.gettext("Turn off multiple selection")
+            : i18n.gettext("Select multiple resources"),
+        onClick: () => {
+            setAllowBatch(!allowBatch);
+        },
+    });
+
+    if (storageEnabled) {
+        menuItems.push({
+            label: volumeVisible
+                ? i18n.gettext("Hide resources volume")
+                : i18n.gettext("Show resources volume"),
+            onClick: () => {
+                setVolumeVisible(!volumeVisible);
+                !volumeVisible && loadVolumes(data, setVolumeValues);
+            },
+        });
+    }
+    if (allowBatch && selected.length) {
+        menuItems.push(
+            ...[
+                {
+                    type: "divider",
+                },
+                {
+                    label: (
+                        <>
+                            {i18n.gettext("Delete")}{" "}
+                            <Badge size="small" count={selected.length} />
+                        </>
+                    ),
+                    onClick: () => confirmThenDelete(deleteSelected),
+                },
+            ]
+        );
+    }
+
+    const MenuDropdown = () => {
+        const menu = (
+            <Menu>
+                {menuItems.map(({ type, label, ...menuItemProps }, idx) => {
+                    return type === "divider" ? (
+                        <Menu.Divider key={idx}></Menu.Divider>
+                    ) : (
+                        <Menu.Item key={label} {...menuItemProps}>
+                            {label}
+                        </Menu.Item>
+                    );
+                })}
+            </Menu>
+        );
+        return (
+            <Dropdown overlay={menu} trigger={["click"]}>
+                <a>
+                    <MoreVertIcon />
+                </a>
+            </Dropdown>
+        );
+    };
 
     return (
         <div className="ngw-resource-children-section">
             <Table
-                dataSource={data}
+                dataSource={items}
                 rowKey="id"
                 pagination={false}
                 size="middle"
+                rowSelection={rowSelection}
             >
                 <Column
                     title={i18n.gettext("Display name")}
@@ -110,45 +286,12 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
                     />
                 )}
                 <Column
-                    title={
-                        storageEnabled && (
-                            <Dropdown
-                                overlay={
-                                    <Menu
-                                        items={[
-                                            {
-                                                label: !volumeVisible
-                                                    ? i18n.gettext(
-                                                          "Show resources volume"
-                                                      )
-                                                    : i18n.gettext(
-                                                          "Hide resources volume"
-                                                      ),
-                                                onClick: () => {
-                                                    setVolumeVisible(
-                                                        !volumeVisible
-                                                    );
-                                                    !volumeVisible &&
-                                                        loadVolumes(
-                                                            data,
-                                                            setVolumeValues
-                                                        );
-                                                },
-                                            },
-                                        ]}
-                                    />
-                                }
-                                trigger={["click"]}
-                            >
-                                <a>
-                                    <MoreVertIcon />
-                                </a>
-                            </Dropdown>
-                        )
-                    }
+                    title={menuItems.length && <MenuDropdown />}
                     className="actions"
                     dataIndex="actions"
-                    render={(actions) => renderActions(actions)}
+                    render={(actions, record) =>
+                        renderActions(actions, record.id, setItems)
+                    }
                 />
             </Table>
         </div>
