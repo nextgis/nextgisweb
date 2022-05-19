@@ -146,11 +146,15 @@ def update(request):
                 query=dict(operation='update', id=request.context.id))
 
 
-@viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def delete(request):
-    request.resource_permission(PERM_DELETE)
-    return dict(obj=request.context, subtitle=_("Delete resource"), maxheight=True,
-                query=dict(operation='delete', id=request.context.id))
+    request.resource_permission(PERM_READ)
+    return dict(
+        entrypoint='@nextgisweb/resource/delete-page',
+        props=dict(id=request.context.id),
+        title=_("Delete resource"),
+        obj=request.context,
+        maxheight=True,
+    )
 
 
 @viewargs(renderer='json')
@@ -263,7 +267,7 @@ def setup_pyramid(comp, config):
     _resource_route('update', r'{id:\d+}/update', client=('id', )) \
         .add_view(update)
     _resource_route('delete', r'{id:\d+}/delete', client=('id', )) \
-        .add_view(delete)
+        .add_view(delete, renderer=REACT_RENDERER)
 
     permalinker(Resource, 'resource.show')
 

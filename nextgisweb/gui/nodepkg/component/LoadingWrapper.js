@@ -18,5 +18,6 @@ export function LoadingWrapper({
 LoadingWrapper.propTypes = {
     loading: PropTypes.bool,
     children: PropTypes.any,
+    rows: PropTypes.number,
     content: PropTypes.func,
 };
