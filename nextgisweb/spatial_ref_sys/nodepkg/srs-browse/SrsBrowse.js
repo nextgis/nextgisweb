@@ -1,3 +1,4 @@
+import { Button } from "@nextgisweb/gui/antd";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import i18n from "@nextgisweb/pyramid/i18n!";
 import getMessages from "../srsMessages";
@@ -13,12 +14,26 @@ export function SrsBrowse() {
         },
     ];
 
+    const headerControls = [
+        ({ selected, rows, setRows }) => {
+            const onAddFromCatalogClick = () => {
+                console.log("click", selected, rows);
+            };
+            return (
+                <Button onClick={onAddFromCatalogClick}>
+                    {i18n.gettext("Add from catalog")}
+                </Button>
+            );
+        },
+    ];
+
     return (
         <ModelBrowse
             model={modelObj}
             columns={columns}
             messages={getMessages()}
             itemProps={{ canDelete: ({ item }) => item.disabled }}
+            headerControls={headerControls}
         />
     );
 }
