@@ -389,9 +389,37 @@ msgstr "Владелец"
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/children-section/ChildrenSection.js:96
-msgid "Volume"
-msgstr "Размер"
+#: nodepkg/children-section/ChildrenSection.js:36
+msgid "Confirmation required"
+msgstr "Требуется подтверждение"
+
+#: nodepkg/children-section/ChildrenSection.js:37
+msgid "Please confirm resource deletion. This action cannot be undone."
+msgstr "Пожалуйста подтвердите удалеине. Это действие не может быть отменено."
+
+#: nodepkg/children-section/ChildrenSection.js:49
+msgid "Resource deleted"
+msgstr "Ресурс удален"
+
+#: nodepkg/children-section/ChildrenSection.js:50
+msgid "Resources deleted"
+msgstr "Ресурсы удалены"
+
+#: nodepkg/children-section/ChildrenSection.js:141
+msgid "The errors occurred during execution"
+msgstr "В ходе выполнения операции возникли ошибки"
+
+#: nodepkg/children-section/ChildrenSection.js:175
+msgid "Turn off multiple selection"
+msgstr "Отключить множественный выбор"
+
+#: nodepkg/children-section/ChildrenSection.js:176
+msgid "Select multiple resources"
+msgstr "Выбрать несколько ресурсов"
+
+#: nodepkg/children-section/ChildrenSection.js:185
+msgid "Hide resources volume"
+msgstr "Скрыть размер ресурсов"
 
 #: nodepkg/children-section/ChildrenSection.js:119
 msgid "Show resources volume"

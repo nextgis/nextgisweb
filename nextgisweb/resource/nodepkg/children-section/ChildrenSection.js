@@ -5,7 +5,6 @@ import {
     Menu,
     message,
     Modal,
-    Popconfirm,
     Table,
     Tooltip,
 } from "@nextgisweb/gui/antd";
@@ -31,8 +30,26 @@ function formatSize(volume) {
     }
 }
 
-const deleteSuccess = i18n.gettext("Resource deleted");
-const deleteBatchSuccess = i18n.gettext("Resources deleted");
+function confirmThenDelete(callback) {
+    Modal.confirm({
+        onOk: callback,
+        title: i18n.gettext("Confirmation required"),
+        content: i18n.gettext(
+            "Please confirm resource deletion. This action cannot be undone."
+        ),
+        okButtonProps: { danger: true, type: "primary" },
+        okText: i18n.gettext("Delete"),
+        autoFocusButton: "cancel",
+    });
+}
+
+function notifySuccessfulDeletion(count) {
+    message.success(
+        count == 1
+            ? i18n.gettext("Resource deleted")
+            : i18n.gettext("Resources deleted")
+    );
+}
 
 function renderActions(actions, id, setTableItems) {
     const deleteModelItem = () => {
@@ -40,22 +57,11 @@ function renderActions(actions, id, setTableItems) {
             .delete()
             .then(() => {
                 setTableItems((old) => old.filter((x) => x.id !== id));
-                message.success(deleteSuccess);
+                notifySuccessfulDeletion(1);
             })
             .catch((err) => {
                 errorModal(err);
             });
-    };
-
-    const onDeleteClick = () => {
-        Modal.confirm({
-            title: i18n.gettext("Delete resource"),
-            content: i18n.gettext("Confirm deletion of the resource"),
-            onOk() {
-                return deleteModelItem();
-            },
-            autoFocusButton: "cancel",
-        });
     };
 
     return actions.map((action) => {
@@ -71,7 +77,9 @@ function renderActions(actions, id, setTableItems) {
             </Tooltip>
         );
         if (Array.isArray(key) && key[1] === "20-delete") {
-            return createActionBtn({ onClick: onDeleteClick });
+            return createActionBtn({
+                onClick: () => confirmThenDelete(deleteModelItem),
+            });
         }
         return createActionBtn({ href, target });
     });
@@ -137,26 +145,16 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
                         "Failed to delete items:"
                     )} ${deleteError.join(", ")}`,
                 });
+            } else {
+                notifySuccessfulDeletion(deleted.length);
             }
             setSelected([]);
             setItems((old) => old.filter((row) => !deleted.includes(row.id)));
-            message.success(deleteBatchSuccess);
         } catch (err) {
             errorModal(err);
         } finally {
             setBatchDeletingInProgress(false);
         }
-    };
-
-    const onDeleteSelectedClick = () => {
-        Modal.confirm({
-            content: i18n.gettext("Confirm deletion of the resource."),
-            title: i18n.gettext("Delete resources"),
-            onOk() {
-                return deleteSelected();
-            },
-            autoFocusButton: "cancel",
-        });
     };
 
     const rowSelection = useMemo(() => {
@@ -201,16 +199,11 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
                 {
                     label: (
                         <>
-                            <Badge
-                                count={selected.length}
-                                size="small"
-                                offset={[10, 0]}
-                            >
-                                {i18n.gettext("Delete")}
-                            </Badge>
+                            {i18n.gettext("Delete")}{" "}
+                            <Badge size="small" count={selected.length} />
                         </>
                     ),
-                    onClick: onDeleteSelectedClick,
+                    onClick: () => confirmThenDelete(deleteSelected),
                 },
             ]
         );
