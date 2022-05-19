@@ -52,4 +52,5 @@ class SpatialRefSysComponent(Component):
         Option('catalog.enabled', bool, default=False),
         Option('catalog.url'),
         Option('catalog.timeout', timedelta, default=timedelta(seconds=15), doc="Catalog request timeout."),
+        Option('catalog.coordinates_search', bool, default=False),
     )

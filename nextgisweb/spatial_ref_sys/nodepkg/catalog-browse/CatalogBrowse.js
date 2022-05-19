@@ -1,5 +1,5 @@
 import SearchIcon from "@material-icons/svg/search";
-import InfoOutlineIcon from "@material-icons/svg/info/outline";
+import InputOutlineIcon from "@material-icons/svg/input/outline";
 import {
     Button,
     Divider,
@@ -17,7 +17,7 @@ import i18n from "@nextgisweb/pyramid/i18n!";
 import debounce from "lodash/debounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-export function CatalogBrowse() {
+export function CatalogBrowse({ coordinates_search }) {
     const [status, setStatus] = useState(null);
     const [search, setSearch] = useState("");
     const [lon, setLon] = useState(null);
@@ -25,7 +25,7 @@ export function CatalogBrowse() {
 
     const [rows, setRows] = useState([]);
 
-    const latLon = useMemo(() => (lon && lat ? [lat, lon] : null), [lat, lon]);
+    const latLon = useMemo(() => (lon !== null && lat !== null ? [lat, lon] : null), [lat, lon]);
 
     const query = useMemo(() => {
         if ((search && search.length > 1) || latLon) {
@@ -82,7 +82,7 @@ export function CatalogBrowse() {
 
     const onImportClick = (id) => {
         const url = routeURL("srs.catalog.import", id);
-        window.open(url, "_self");
+        window.open(url, "_blank");
     };
 
     const columns = [
@@ -115,7 +115,7 @@ export function CatalogBrowse() {
                         <Button
                             type="text"
                             shape="circle"
-                            icon={<InfoOutlineIcon />}
+                            icon={<InputOutlineIcon />}
                             onClick={() => onImportClick(record.id)}
                         />
                     </Tooltip>
@@ -137,6 +137,7 @@ export function CatalogBrowse() {
                     allowClear
                 />
             </Form.Item>
+            { coordinates_search ? <>
             <Form.Item style={{ height: "100%" }}>
                 <Divider type="vertical" />
             </Form.Item>
@@ -166,6 +167,7 @@ export function CatalogBrowse() {
                     allowClear
                 />
             </Form.Item>
+            </> : null }
         </Form>
     );
 
