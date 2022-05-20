@@ -395,7 +395,7 @@ msgstr "Требуется подтверждение"
 
 #: nodepkg/children-section/ChildrenSection.js:37
 msgid "Please confirm resource deletion. This action cannot be undone."
-msgstr "Пожалуйста подтвердите удалеине. Это действие не может быть отменено."
+msgstr "Пожалуйста подтвердите удаление. Это действие не может быть отменено."
 
 #: nodepkg/children-section/ChildrenSection.js:49
 msgid "Resource deleted"
