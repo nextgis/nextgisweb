@@ -1,4 +1,5 @@
 import MoreVertIcon from "@material-icons/svg/more_vert";
+import PriorityHighIcon from "@material-icons/svg/priority_high";
 import {
     Badge,
     Dropdown,
@@ -11,7 +12,7 @@ import {
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import "./ChildrenSection.less";
 
 const { Column } = Table;
@@ -51,6 +52,11 @@ function notifySuccessfulDeletion(count) {
     );
 }
 
+function isDeleteAction(action) {
+    const { key } = action;
+    return Array.isArray(key) && key[1] === "20-delete";
+}
+
 function renderActions(actions, id, setTableItems) {
     const deleteModelItem = () => {
         return route("resource.item", id)
@@ -65,7 +71,7 @@ function renderActions(actions, id, setTableItems) {
     };
 
     return actions.map((action) => {
-        const { key, target, href, icon, title } = action;
+        const { target, href, icon, title } = action;
 
         const createActionBtn = (props_) => (
             <Tooltip key={title} title={title}>
@@ -76,7 +82,7 @@ function renderActions(actions, id, setTableItems) {
                 </a>
             </Tooltip>
         );
-        if (Array.isArray(key) && key[1] === "20-delete") {
+        if (isDeleteAction(action)) {
             return createActionBtn({
                 onClick: () => confirmThenDelete(deleteModelItem),
             });
@@ -114,7 +120,19 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
     const [items, setItems] = useState([...data]);
     const [selected, setSelected] = useState([]);
 
-    const menuItems = [];
+    const deleteAllowedSelected = useMemo(() => {
+        const allowedToDelete = [];
+        for (const item of items) {
+            if (selected.includes(item.id)) {
+                const includeDelAction =
+                    item.actions && item.actions.some(isDeleteAction);
+                if (includeDelAction) {
+                    allowedToDelete.push(item.id);
+                }
+            }
+        }
+        return allowedToDelete;
+    }, [selected]);
 
     const rowSelection_ = {
         onChange: (selectedRowKeys) => {
@@ -122,13 +140,23 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
         },
     };
 
+    useEffect(() => {
+        setSelected((oldSelection) => {
+            const itemsIds = items.map((item) => item.id);
+            const updatedSelection = oldSelection.filter((selectedItem) =>
+                itemsIds.includes(selectedItem)
+            );
+            return updatedSelection;
+        });
+    }, [items]);
+
     // TODO: make universal function with ModelBrowser.js
     const deleteSelected = async () => {
         setBatchDeletingInProgress(true);
         try {
             const deleted = [];
             const deleteError = [];
-            for (const s of selected) {
+            for (const s of deleteAllowedSelected) {
                 try {
                     await route("resource.item", s).delete();
                     deleted.push(s);
@@ -148,8 +176,11 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
             } else {
                 notifySuccessfulDeletion(deleted.length);
             }
-            setSelected([]);
-            setItems((old) => old.filter((row) => !deleted.includes(row.id)));
+            const removeDeleted = (old) =>
+                old.filter((row) => !deleted.includes(row.id));
+
+            setSelected(removeDeleted);
+            setItems(removeDeleted);
         } catch (err) {
             errorModal(err);
         } finally {
@@ -170,44 +201,68 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
         );
     }, [allowBatch, selected, batchDeletingInProgress]);
 
-    menuItems.push({
-        label: allowBatch
-            ? i18n.gettext("Turn off multiple selection")
-            : i18n.gettext("Select multiple resources"),
-        onClick: () => {
-            setAllowBatch(!allowBatch);
-        },
-    });
-
-    if (storageEnabled) {
-        menuItems.push({
-            label: volumeVisible
-                ? i18n.gettext("Hide resources volume")
-                : i18n.gettext("Show resources volume"),
+    const menuItems = useMemo(() => {
+        const menuItems_ = [];
+        menuItems_.push({
+            label: allowBatch
+                ? i18n.gettext("Turn off multiple selection")
+                : i18n.gettext("Select multiple resources"),
             onClick: () => {
-                setVolumeVisible(!volumeVisible);
-                !volumeVisible && loadVolumes(data, setVolumeValues);
+                setAllowBatch(!allowBatch);
             },
         });
-    }
-    if (allowBatch && selected.length) {
-        menuItems.push(
-            ...[
-                {
+
+        if (storageEnabled) {
+            menuItems_.push({
+                label: volumeVisible
+                    ? i18n.gettext("Hide resources volume")
+                    : i18n.gettext("Show resources volume"),
+                onClick: () => {
+                    setVolumeVisible(!volumeVisible);
+                    !volumeVisible && loadVolumes(data, setVolumeValues);
+                },
+            });
+        }
+        if (allowBatch) {
+            const batchOperations = [];
+            if (selected.length) {
+                batchOperations.push(
+                    ...[
+                        {
+                            label: (
+                                <>
+                                    {i18n.gettext("Delete")}{" "}
+                                    {deleteAllowedSelected.length > 0 && <Badge
+                                        size="small"
+                                        count={deleteAllowedSelected.length}
+                                    />}{" "}
+                                    {deleteAllowedSelected.length <
+                                        selected.length && deleteAllowedSelected.length > 0 && (
+                                        <Tooltip
+                                            title={i18n.gettext(
+                                                "Not all of the selected can be deleted."
+                                            )}
+                                        >
+                                            <PriorityHighIcon />
+                                        </Tooltip>
+                                    )}
+                                </>
+                            ),
+                            disabled: !deleteAllowedSelected.length,
+                            onClick: () => confirmThenDelete(deleteSelected),
+                        },
+                    ]
+                );
+            }
+            if (batchOperations.length) {
+                batchOperations.unshift({
                     type: "divider",
-                },
-                {
-                    label: (
-                        <>
-                            {i18n.gettext("Delete")}{" "}
-                            <Badge size="small" count={selected.length} />
-                        </>
-                    ),
-                    onClick: () => confirmThenDelete(deleteSelected),
-                },
-            ]
-        );
-    }
+                });
+            }
+            menuItems_.push(...batchOperations);
+        }
+        return menuItems_;
+    }, [allowBatch, deleteAllowedSelected]);
 
     const MenuDropdown = () => {
         const menu = (

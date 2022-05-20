@@ -425,9 +425,13 @@ msgstr "Скрыть размер ресурсов"
 msgid "Show resources volume"
 msgstr "Показать размер ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:122
-msgid "Hide resources volume"
-msgstr "Скрыть размер ресурсов"
+#: nodepkg/children-section/ChildrenSection.js:242
+msgid "Not all of the selected can be deleted."
+msgstr "Не все выделенные ресурсы могут быть удалены."
+
+#: nodepkg/children-section/ChildrenSection.js:329
+msgid "Volume"
+msgstr "Размер"
 
 #: nodepkg/resources-filter/ResourcesFilter.js:106
 msgid "Resources not found"
