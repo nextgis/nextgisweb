@@ -1,4 +1,5 @@
 import os.path
+from datetime import datetime
 from shutil import copyfileobj
 
 import magic
@@ -85,6 +86,8 @@ def validate_mime(filename, buf):
 class _archive_attr(SP):
 
     def setter(self, srlzr, value):
+        srlzr.obj.tstamp = datetime.utcnow()
+
         archive_name, metafile = env.file_upload.get_filename(value['id'])
 
         old_files = list(srlzr.obj.files)
@@ -124,6 +127,8 @@ class _files_attr(SP):
         return [dict(name=f.name) for f in srlzr.obj.files]
 
     def setter(self, srlzr, value):
+        srlzr.obj.tstamp = datetime.utcnow()
+
         files_info = dict()
         for f in value:
             filename = f['name']
