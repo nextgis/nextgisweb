@@ -13,11 +13,12 @@ import {
 // TODO: make global custom antd table style
 import "@nextgisweb/gui/model-browse/ModelBrowse.less";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import i18n from "@nextgisweb/pyramid/i18n!";
 import debounce from "lodash/debounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-export function CatalogBrowse({ coordinates_search }) {
+export function CatalogBrowse() {
     const [status, setStatus] = useState(null);
     const [search, setSearch] = useState("");
     const [lon, setLon] = useState(null);
@@ -25,7 +26,10 @@ export function CatalogBrowse({ coordinates_search }) {
 
     const [rows, setRows] = useState([]);
 
-    const latLon = useMemo(() => (lon !== null && lat !== null ? [lat, lon] : null), [lat, lon]);
+    const latLon = useMemo(
+        () => (lon !== null && lat !== null ? [lat, lon] : null),
+        [lat, lon]
+    );
 
     const query = useMemo(() => {
         if ((search && search.length > 1) || latLon) {
@@ -82,7 +86,7 @@ export function CatalogBrowse({ coordinates_search }) {
 
     const onImportClick = (id) => {
         const url = routeURL("srs.catalog.import", id);
-        window.open(url, "_blank");
+        window.open(url, "_self");
     };
 
     const columns = [
@@ -91,6 +95,15 @@ export function CatalogBrowse({ coordinates_search }) {
             dataIndex: "display_name",
             key: "display_name",
             sorter: (a, b) => (a.display_name > b.display_name ? 1 : -1),
+            render: (text, record) => (
+                <Button
+                    type="link"
+                    href={settings.catalog.url + "/srs/" + record.id}
+                    target="_blank"
+                >
+                    {text}
+                </Button>
+            ),
         },
         {
             title: i18n.gettext("Auth name"),
@@ -111,7 +124,7 @@ export function CatalogBrowse({ coordinates_search }) {
             align: "center",
             render: (text, record) => (
                 <div style={{ whiteSpace: "nowrap" }}>
-                    <Tooltip title={i18n.gettext("View")}>
+                    <Tooltip title={i18n.gettext("Import")}>
                         <Button
                             type="text"
                             shape="circle"
@@ -137,37 +150,39 @@ export function CatalogBrowse({ coordinates_search }) {
                     allowClear
                 />
             </Form.Item>
-            { coordinates_search ? <>
-            <Form.Item style={{ height: "100%" }}>
-                <Divider type="vertical" />
-            </Form.Item>
-            <Form.Item>
-                <InputNumber
-                    style={{ maxWidth: "10em" }}
-                    placeholder={i18n.gettext("Latitude")}
-                    value={lat}
-                    type="number"
-                    onChange={(e) => {
-                        setLat(e);
-                    }}
-                    addonAfter="°"
-                    allowClear
-                />
-            </Form.Item>
-            <Form.Item>
-                <InputNumber
-                    style={{ maxWidth: "10em" }}
-                    placeholder={i18n.gettext("Longitude")}
-                    value={lon}
-                    type="number"
-                    onChange={(e) => {
-                        setLon(e);
-                    }}
-                    addonAfter="°"
-                    allowClear
-                />
-            </Form.Item>
-            </> : null }
+            {settings.catalog.coordinates_search ? (
+                <>
+                    <Form.Item style={{ height: "100%" }}>
+                        <Divider type="vertical" />
+                    </Form.Item>
+                    <Form.Item>
+                        <InputNumber
+                            style={{ maxWidth: "10em" }}
+                            placeholder={i18n.gettext("Latitude")}
+                            value={lat}
+                            type="number"
+                            onChange={(e) => {
+                                setLat(e);
+                            }}
+                            addonAfter="°"
+                            allowClear
+                        />
+                    </Form.Item>
+                    <Form.Item>
+                        <InputNumber
+                            style={{ maxWidth: "10em" }}
+                            placeholder={i18n.gettext("Longitude")}
+                            value={lon}
+                            type="number"
+                            onChange={(e) => {
+                                setLon(e);
+                            }}
+                            addonAfter="°"
+                            allowClear
+                        />
+                    </Form.Item>
+                </>
+            ) : null}
         </Form>
     );
 

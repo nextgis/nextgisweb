@@ -19,11 +19,10 @@ def check_permission(request):
 
 def catalog_browse(request):
     check_permission(request)
-    options = request.env.spatial_ref_sys.options
+
     return dict(
         title=_("Spatial reference system catalog"),
         entrypoint="@nextgisweb/spatial-ref-sys/catalog-browse",
-        props=dict(coordinates_search=options['catalog.coordinates_search']),
         dynmenu=request.env.pyramid.control_panel)
 
 
@@ -125,7 +124,7 @@ def setup_pyramid(comp, config):
     if comp.options['catalog.enabled']:
         config.add_route(
             'srs.catalog',
-            '/srs/catalog'
+            '/srs/catalog', client=True
         ).add_view(catalog_browse, renderer=REACT_RENDERER)
 
         config.add_route(

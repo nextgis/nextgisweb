@@ -1,5 +1,7 @@
 import { Button } from "@nextgisweb/gui/antd";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
+import { routeURL } from "@nextgisweb/pyramid/api";
+import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import i18n from "@nextgisweb/pyramid/i18n!";
 import getMessages from "../srsMessages";
 import { modelObj } from "../srsModel";
@@ -14,18 +16,21 @@ export function SrsBrowse() {
         },
     ];
 
-    const headerControls = [
-        ({ selected, rows, setRows }) => {
+    const headerControls = [];
+
+    if (settings.catalog.enabled) {
+        headerControls.push(({ selected, rows, setRows }) => {
             const onAddFromCatalogClick = () => {
-                console.log("click", selected, rows);
+                const url = routeURL("srs.catalog");
+                window.open(url, "_self");
             };
             return (
                 <Button onClick={onAddFromCatalogClick}>
-                    {i18n.gettext("Add from catalog")}
+                    {i18n.gettext("Import from catalog")}
                 </Button>
             );
-        },
-    ];
+        });
+    }
 
     return (
         <ModelBrowse
