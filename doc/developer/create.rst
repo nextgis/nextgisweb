@@ -242,6 +242,13 @@ To create empty vector layer execute following request:
         ]
     }
   }
+  
+  Same steps with curl:
+
+.. sourcecode:: bash
+
+curl -d '{ "resource":{"cls":"vector_layer", "parent":{"id":0}, "display_name":"new"}, "vector_layer":{"geometry_type":"LINESTRING","srs":{"id":3857}, "fields":[{"keyname":"fieldname1","datatype":"STRING","display_name":"fld1"}]}   }' -u administrator:demodemo -X POST https://sandbox.nextgis.com/api/resource/
+
 
 Vector layer with data
 -----------------------
