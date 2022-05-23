@@ -223,10 +223,6 @@ msgstr "Создайте свою Веб ГИС на nextgis.com"
 msgid "Browser default"
 msgstr "По умолчанию в браузере"
 
-#: amd/ngw-pyramid/form/RTETextBox.js:61
-msgid "Rich Text Editor"
-msgstr "Визуальный редактор"
-
 #: amd/ngw-pyramid/form/ScaleTextBox.js:18
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"

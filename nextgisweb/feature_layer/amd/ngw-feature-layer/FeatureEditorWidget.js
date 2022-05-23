@@ -9,6 +9,7 @@ define([
     "dojo/number",
     "dijit/_WidgetBase",
     "dijit/form/Button",
+    "dijit/form/TextBox",
     "dijit/form/NumberTextBox",
     "dijit/form/DateTextBox",
     "dijit/form/TimeTextBox",
@@ -18,7 +19,6 @@ define([
     "dojox/layout/TableContainer",
     "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
-    "ngw-pyramid/form/RTETextBox",
     "@nextgisweb/pyramid/i18n!",   
     "./loader!",
     "xstyle/css!./resource/FeatureEditorWidget.css"
@@ -33,6 +33,7 @@ define([
     number,
     _WidgetBase,
     Button,
+    TextBox,
     NumberTextBox,
     DateTextBox,
     TimeTextBox,
@@ -42,7 +43,6 @@ define([
     TableContainer,
     route,
     ErrorDialog,
-    RTETextBox,
     i18n,
     loader
 ) {
@@ -76,9 +76,8 @@ define([
                 ];
             } else if (this.datatype == "STRING") {
                 this.children = [
-                    (new RTETextBox({
-                        label: i18n.gettext("Attribute: ") + this.label,
-                        style: "flex-grow: 1"
+                    (new TextBox({
+                        style: "width: calc(100% - 20px - 1ex)"
                     })).placeAt(this)
                 ];
             } else if (this.datatype == "DATE") {
