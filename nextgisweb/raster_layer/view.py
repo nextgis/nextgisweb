@@ -18,7 +18,7 @@ class RasterLayerWidget(Widget):
 def export(request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
-    return dict(obj=request.context, subtitle=_("Save as"), maxheight=True)
+    return dict(obj=request.context, title=_("Save as"), maxheight=True)
 
 
 def setup_pyramid(comp, config):

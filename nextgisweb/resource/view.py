@@ -12,6 +12,7 @@ from ..views import permalinker
 from ..dynmenu import DynMenu, Label, Link, DynItem
 from ..psection import PageSections
 from ..pyramid import viewargs
+from ..pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
 from ..models import DBSession
 
 from ..gui import REACT_RENDERER
@@ -73,6 +74,16 @@ def resource_factory(request):
     return obj
 
 
+@breadcrumb_adapter
+def resource_breadcrumb(obj, request):
+    if isinstance(obj, Resource):
+        return Breadcrumb(
+            label=obj.display_name,
+            link=request.route_url('resource.show', id=obj.id),
+            icon=f'rescls-{obj.cls}',
+            parent=obj.parent)
+
+
 @viewargs(renderer='nextgisweb:pyramid/template/psection.mako')
 def show(request):
     request.resource_permission(PERM_READ)
@@ -121,7 +132,7 @@ def tree(request):
     obj = request.context
     return dict(
         obj=obj, maxwidth=True, maxheight=True,
-        subtitle=_("Resource tree"))
+        title=_("Resource tree"))
 
 
 @dataclass
@@ -135,14 +146,14 @@ def create(request):
     request.resource_permission(PERM_MCHILDREN)
     cls = request.GET.get('cls')
     zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
-    return dict(obj=request.context, subtitle=_("Create resource"), maxheight=True,
+    return dict(obj=request.context, title=_("Create resource"), maxheight=True,
                 query=dict(operation='create', cls=cls, parent=request.context.id))
 
 
 @viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
 def update(request):
     request.resource_permission(PERM_UPDATE)
-    return dict(obj=request.context, subtitle=_("Update resource"), maxheight=True,
+    return dict(obj=request.context, title=_("Update resource"), maxheight=True,
                 query=dict(operation='update', id=request.context.id))
 
 

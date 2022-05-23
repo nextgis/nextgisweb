@@ -172,6 +172,20 @@ a[class*=" icon-"]:hover:before {
     margin: 0;
     vertical-align: middle;
   }
+
+  .title-header {
+    display: flex;
+
+    > .txt {
+      flex-grow: 1;
+    }
+
+    > .ext {
+      flex-grow: 0;
+    }
+  }
+
+
 }
 
 .container {
@@ -624,11 +638,17 @@ a[class*=" icon-"]:hover:before {
 .path__link {
   color: var(--text-secondary);
   text-decoration: none;
-  border-bottom: 1px solid transparent;
+
+  svg.icon {
+    opacity: 0.5;
+  }
 
   &:hover {
     color: var(--link-hover-color);
-    border-bottom-color: var(--link-hover-color);
+
+    svg.icon {
+      opacity: 1;
+    }
   }
 }
 

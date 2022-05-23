@@ -1,30 +1,35 @@
 <!DOCTYPE HTML>
-<%! from nextgisweb.pyramid.util import _ %>
-<html>
-<%
-    import os
-    import re
-    import json
-    from bunch import Bunch
 
+<%!
+    from bunch import Bunch
+    from nextgisweb.pyramid.breadcrumb import breadcrumb_path
     from nextgisweb.pyramid.util import _
 %>
+
+<%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>
+
+<%
+    effective_title = None if title is UNDEFINED else title
+    if hasattr(next, 'title'):
+        new_title = next.title()
+        effective_title = new_title if (new_title is not None) else effective_title
+
+    bcpath = list()
+    if obj is not UNDEFINED:
+        bcpath = breadcrumb_path(obj, request)
+        if len(bcpath) > 0 and effective_title is None:
+            effective_title = bcpath[-1].label
+            bcpath = bcpath[:-1]
+
+    system_name = request.env.core.system_full_name()
+    head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else (system_name)
+%>
+<html>
 <head>
-    <% system_name = request.env.core.system_full_name() %>
-
-    <title>
-        <% page_title = '' %>
-        %if hasattr(self, 'title'):
-            <% page_title += self.title() + ' | ' %>
-        %endif
-
-        <% page_title += system_name %>
-        ${page_title}
-    </title>
-
+    <title>${head_title}</title>
     <meta charset="utf-8">
 
-    <%include file="nextgisweb:social/template/meta.mako" args="title=page_title"/>
+    <%include file="nextgisweb:social/template/meta.mako" args="title=head_title"/>
 
     <link href="${request.route_url('pyramid.favicon')}"
         rel="shortcut icon" type="image/x-icon"/>
@@ -92,13 +97,28 @@
                 <div class="content__inner expand">
                     <div id="title" class="title">
                         <div class="content__container container">
-                            %if hasattr(next, 'title_block'):
-                                ${next.title_block()}
-                            %elif hasattr(next, 'title'):
-                                <h1>${next.title()}</h1>
-                            %elif title:
-                                <h1>${tr(title)}</h1>
+                            %if len(bcpath) > 0:
+                                <div class="path">
+                                    %for idx, bc in enumerate(bcpath):
+                                        <span class="path__item">
+                                            <a class="path__link" href="${bc.link}">
+                                                %if bc.icon:
+                                                    ${icon_svg(bc.icon)}
+                                                %endif
+                                                %if bc.label:
+                                                    ${tr(bc.label)}
+                                                %endif
+                                            </a>
+                                        </span>
+                                    %endfor
+                                </div>
                             %endif
+                            <div class="title-header">
+                                <h1 class="txt">${tr(effective_title)}</h1>
+                                %if hasattr(next, 'title_ext'):
+                                    <div class="ext">${next.title_ext()}</div>
+                                %endif
+                            </div>
                         </div>
                     </div>
                     <div id="content-wrapper" class="content-wrapper ${'content-maxheight' if maxheight else ''}">

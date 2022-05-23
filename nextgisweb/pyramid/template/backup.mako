@@ -1,8 +1,5 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 <%! from nextgisweb.pyramid.util import _ %>
-<%! from platform import platform %>
-<%! import sys %>
-
 
 <div class="content-box">
     <div class="table-wrapper">

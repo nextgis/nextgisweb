@@ -1,9 +1,8 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 <%! from nextgisweb.pyramid.util import _ %>
 
-<%def name="title_block()">
+<%def name="title_ext()">
     <div id="info-copy-btn" style="float: right"></div>
-    <h1>${tr(title)}</h1>
 </%def>
 
 

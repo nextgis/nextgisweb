@@ -33,7 +33,7 @@ def preview_map(request):
         obj=request.context,
         extent=extent,
         source_type=source_type,
-        subtitle=_("Preview"),
+        title=_("Preview"),
         maxheight=True,
     )
 

@@ -1,4 +1,4 @@
-<%inherit file='obj.mako' />
+<%inherit file='base.mako' />
 
 %for section in sections:
     %if section.is_applicable(obj):

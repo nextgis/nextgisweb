@@ -1,8 +1,8 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
+
 <%!
-from pyramid.httpexceptions import HTTPNotFound
-from nextgisweb.pyramid.util import _
-from nextgisweb.pyramid.exception import json_error
+    from nextgisweb.pyramid.util import _
+    from nextgisweb.pyramid.exception import json_error
 %>
 
 <%def name="title()">

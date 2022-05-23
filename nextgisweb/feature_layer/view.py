@@ -37,7 +37,7 @@ PR_R = ResourceScope.read
 def feature_browse(request):
     request.resource_permission(PD_READ)
     request.resource_permission(PDS_R)
-    return dict(obj=request.context, subtitle=_("Feature table"),
+    return dict(obj=request.context, title=_("Feature table"),
                 maxwidth=True, maxheight=True)
 
 
@@ -55,7 +55,7 @@ def feature_show(request):
 
     return dict(
         obj=request.context,
-        subtitle=_("Feature #%d") % feature_id,
+        title=_("Feature #%d") % feature_id,
         feature_id=feature_id,
         ext_mid=ext_mid)
 
@@ -78,7 +78,7 @@ def feature_update(request):
         obj=request.context,
         feature_id=feature_id,
         fields=fields,
-        subtitle=_("Feature #%d") % feature_id,
+        title=_("Feature #%d") % feature_id,
         maxheight=True)
 
 
@@ -128,7 +128,7 @@ def test_mvt(request):
 def export(request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
-    return dict(obj=request.context, subtitle=_("Save as"), maxheight=True)
+    return dict(obj=request.context, title=_("Save as"), maxheight=True)
 
 
 def setup_pyramid(comp, config):
