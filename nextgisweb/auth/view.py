@@ -46,7 +46,8 @@ def login(request):
 
     return dict(
         custom_layout=True, next_url=next_url,
-        props=dict(reloadAfterLogin=False))
+        props=dict(reloadAfterLogin=False),
+        title=_('Sign in to Web GIS'))
 
 
 def session_invite(request):

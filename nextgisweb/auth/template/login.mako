@@ -1,10 +1,6 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 <%! from nextgisweb.auth.util import _ %>
 
-<%def name="title()">
-    ${tr(_('Sign in to Web GIS'))}
-</%def>
-
 <% system_name = request.env.core.system_full_name() %>
 
 <%include
