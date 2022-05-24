@@ -1,5 +1,6 @@
 import SearchIcon from "@material-icons/svg/search";
-import InputOutlineIcon from "@material-icons/svg/input/outline";
+import InputOutlineIcon from "@material-icons/svg/input";
+import OpenInNewIcon from "@material-icons/svg/open_in_new";
 import {
     Button,
     Divider,
@@ -56,7 +57,17 @@ export function CatalogBrowse() {
                     query: q,
                     signal,
                 });
-                setRows(srs);
+                setRows(
+                    // Add auth_name_srid column
+                    srs.map((row) => ({
+                        auth_name_srid:
+                            (row.auth_name &&
+                                row.auth_srid &&
+                                `${row.auth_name}:${row.auth_srid}`) ||
+                            null,
+                        ...row,
+                    }))
+                );
             } catch (er) {
                 // ignore error
             } finally {
@@ -96,26 +107,24 @@ export function CatalogBrowse() {
             key: "display_name",
             sorter: (a, b) => (a.display_name > b.display_name ? 1 : -1),
             render: (text, record) => (
-                <Button
-                    type="link"
-                    href={settings.catalog.url + "/srs/" + record.id}
-                    target="_blank"
-                >
-                    {text}
-                </Button>
+                <>
+                    {text}{" "}
+                    <Tooltip title={i18n.gettext("Show in catalog")}>
+                        <a
+                            href={settings.catalog.url + "/srs/" + record.id}
+                            target="_blank"
+                        >
+                            <OpenInNewIcon />
+                        </a>
+                    </Tooltip>
+                </>
             ),
         },
         {
-            title: i18n.gettext("Auth name"),
-            dataIndex: "auth_name",
-            key: "auth_name",
-            sorter: (a, b) => (a.auth_name > b.auth_name ? 1 : -1),
-        },
-        {
-            title: i18n.gettext("Auth SRID"),
-            dataIndex: "auth_srid",
-            key: "auth_srid",
-            sorter: (a, b) => (a.auth_srid > b.auth_srid ? 1 : -1),
+            title: i18n.gettext("Authority and code"),
+            dataIndex: "auth_name_srid",
+            key: "auth_name_srid",
+            sorter: (a, b) => (a.auth_name_srid > b.auth_name_srid ? 1 : -1),
         },
         {
             title: "",
