@@ -12,6 +12,7 @@ define([
 
         renderValue: function (value) {
             this.domNode.innerHTML = value;
+            return !!value;
         }
     });
 });

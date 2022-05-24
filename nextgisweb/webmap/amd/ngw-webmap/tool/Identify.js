@@ -223,8 +223,9 @@ define([
                                 compact: true
                             });
 
-                        ewidget.renderValue(feature.extensions[key]);
-                        ewidget.placeAt(widget.extContainer);
+                        if (ewidget.renderValue(feature.extensions[key]) !== false) {
+                            ewidget.placeAt(widget.extContainer);
+                        }
                     });
 
                     widget.editButton = new Button({
