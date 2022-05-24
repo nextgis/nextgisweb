@@ -20,12 +20,12 @@ export function SrsBrowse() {
 
     if (settings.catalog.enabled) {
         headerControls.push(({ selected, rows, setRows }) => {
-            const onAddFromCatalogClick = () => {
+            const importFromCatalog = () => {
                 const url = routeURL("srs.catalog");
                 window.open(url, "_self");
             };
             return (
-                <Button onClick={onAddFromCatalogClick}>
+                <Button onClick={importFromCatalog}>
                     {i18n.gettext("Import from catalog")}
                 </Button>
             );

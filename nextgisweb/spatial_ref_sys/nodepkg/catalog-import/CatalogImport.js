@@ -1,6 +1,5 @@
-import { Button, Form, message } from "@nextgisweb/gui/antd";
-
-import { route } from "@nextgisweb/pyramid/api";
+import { Button, Form } from "@nextgisweb/gui/antd";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import i18n from "@nextgisweb/pyramid/i18n!";
@@ -28,7 +27,6 @@ export function CatalogImport({ url, id }) {
     ]);
 
     useEffect(async () => {
-        // route('spatial_ref_sys.catalog.import')
         try {
             const srs = await route("spatial_ref_sys.catalog.item", id).get();
             setData(srs);
@@ -52,12 +50,10 @@ export function CatalogImport({ url, id }) {
     const importSrs = async () => {
         setStatus("importing");
         try {
-            await route("spatial_ref_sys.catalog.import").post({
+            const resp = await route("spatial_ref_sys.catalog.import").post({
                 json: { catalog_id: id },
             });
-            message.success(
-                i18n.gettext("The spatial reference system is imported")
-            );
+            window.open(routeURL("srs.edit", resp.id), "_self");
         } catch (err) {
             errorModal(err);
         } finally {
