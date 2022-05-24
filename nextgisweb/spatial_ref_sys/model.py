@@ -131,7 +131,8 @@ class SRS(Base):
 
     @property
     def disabled(self):
-        return bool(self.auth_srid or self.auth_name)
+        # EPSG:3857 and EPSG:4326 are special and cannot be changed or deleted.
+        return self.id in (3857, 4326)
 
 
 db.event.listen(SRS.__table__, 'after_create', db.DDL("""
