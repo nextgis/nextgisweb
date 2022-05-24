@@ -132,13 +132,14 @@ def catalog_collection(request):
     if q is not None:
         query['q'] = q
 
-    lat = request.GET.get('lat')
-    lon = request.GET.get('lon')
-    if lat is not None and lon is not None:
-        query['intersects'] = json.dumps(dict(
-            type='Point',
-            coordinates=(float(lon), float(lat))
-        ))
+    if request.env.spatial_ref_sys.options['catalog.coordinates_search']:
+        lat = request.GET.get('lat')
+        lon = request.GET.get('lon')
+        if lat is not None and lon is not None:
+            query['intersects'] = json.dumps(dict(
+                type='Point',
+                coordinates=(float(lon), float(lat))
+            ))
 
     catalog_url = env.spatial_ref_sys.options['catalog.url']
     url = catalog_url + '/api/v1/spatial_ref_sys/'

@@ -89,9 +89,10 @@ msgstr "Организация (код)"
 msgid "Auth SRID"
 msgstr "Организация (идентификатор СК)"
 
-#: nodepkg/catalog-browse/CatalogBrowse.js:112
-msgid "View"
-msgstr "Просмотр"
+#: nodepkg/catalog-browse/CatalogBrowse.js:127
+#: nodepkg/catalog-import/CatalogImport.js:86
+msgid "Import"
+msgstr "Импорт"
 
 #: nodepkg/catalog-browse/CatalogBrowse.js:129
 msgid "Search"
@@ -121,9 +122,9 @@ msgstr "Система координат импортирована"
 msgid "View details"
 msgstr "Подробнее"
 
-#: nodepkg/catalog-import/CatalogImport.js:87
-msgid "Import"
-msgstr "Импорт"
+#: nodepkg/srs-browse/SrsBrowse.js:29
+msgid "Import from catalog"
+msgstr "Импортировать из каталога"
 
 #: nodepkg/srs-widget/SRSImportForm.js:19
 msgid "Format"

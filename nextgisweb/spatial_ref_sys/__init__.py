@@ -45,6 +45,14 @@ class SpatialRefSysComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
+    def client_settings(self, request):
+        cat_opts = self.options.with_prefix('catalog')
+        return dict(catalog=dict(
+            enabled=cat_opts['enabled'],
+            url=cat_opts['url'] if cat_opts['enabled'] else None,
+            coordinates_search=cat_opts['coordinates_search'],
+        ))
+
     def query_stat(self):
         return dict(count=SRS.query().count())
 
@@ -52,4 +60,5 @@ class SpatialRefSysComponent(Component):
         Option('catalog.enabled', bool, default=False),
         Option('catalog.url'),
         Option('catalog.timeout', timedelta, default=timedelta(seconds=15), doc="Catalog request timeout."),
+        Option('catalog.coordinates_search', bool, default=False),
     )
