@@ -12,31 +12,56 @@ from .model import SRS
 from .util import convert_to_wkt, _
 
 
-def check_srs_unique(data, existing_id=None):
-    query = SRS.filter_by(display_name=data.get("display_name"))
-    if existing_id is not None:
-        query = query.filter(SRS.id != existing_id)
-    if query.first() is not None:
-        raise ValidationError(message=_(
-            "Coordinate system name is not unique."))
+def serialize(obj):
+    return dict(
+        id=obj.id, display_name=obj.display_name,
+        auth_name=obj.auth_name, auth_srid=obj.auth_srid,
+        wkt=obj.wkt, catalog_id=obj.catalog_id,
+        system=obj.system, protected=obj.protected,
+    )
+
+
+def deserialize(obj, data, *, create):
+    for k, v in data.items():
+        if (
+            (k in ('id', 'auth_name', 'auth_srid', 'catalog_id'))
+            and (create or v != getattr(obj, k))
+        ):
+            raise ValidationError(message=_(
+                "SRS attribute '{}' cannot be changed or set during creation."
+            ).format(k))
+        elif k in ('display_name', 'wkt'):
+            if not isinstance(v, str):
+                raise ValidationError(message=_(
+                    "SRS attribute '{}' must have a string value."
+                ).format(k))
+            if k == 'display_name':
+                with DBSession.no_autoflush:
+                    existing = SRS.filter_by(display_name=v) \
+                        .filter(SRS.id != obj.id).first()
+                    if existing:
+                        raise ValidationError(message=_(
+                            "SRS display name is not unique."))
+            if (
+                k == 'wkt' and not create and obj.protected
+                and v != getattr(obj, k)
+            ):
+                raise ValidationError(message=_(
+                    "OGC WKT definition cannot be changed for this SRS."))
+            setattr(obj, k, v)
+        elif k in ('system', 'protected'):
+            pass
 
 
 def cget(request):
-    srs_collection = list(map(lambda o: dict(
-        id=o.id, display_name=o.display_name,
-        auth_name=o.auth_name, auth_srid=o.auth_srid,
-        wkt=o.wkt, disabled=o.disabled,
-    ), SRS.query()))
-    return sorted(srs_collection, key=lambda srs: srs["id"] != 4326)
+    return [serialize(obj) for obj in SRS.query()]
 
 
 def cpost(request):
     request.require_administrator()
 
-    data = request.json_body
-    check_srs_unique(data)
-    obj = SRS(**data)
-    obj.persist()
+    obj = SRS().persist()
+    deserialize(obj, request.json_body, create=True)
 
     DBSession.flush()
     return dict(id=obj.id)
@@ -44,29 +69,14 @@ def cpost(request):
 
 def iget(request):
     obj = SRS.filter_by(id=request.matchdict["id"]).one()
-    return dict(
-        id=obj.id, display_name=obj.display_name,
-        auth_name=obj.auth_name, auth_srid=obj.auth_srid,
-        wkt=obj.wkt
-    )
+    return serialize(obj)
 
 
 def iput(request):
     request.require_administrator()
 
     obj = SRS.filter_by(id=int(request.matchdict['id'])).one()
-    data = request.json_body
-    check_srs_unique(data, obj.id)
-
-    disallowed_wkt_change = obj.disabled and obj.wkt != data.get("wkt")
-    if disallowed_wkt_change:
-        raise ValidationError(message=_(
-            "Cannot change wkt definition of standard coordinate system."))
-
-    obj.display_name = data.get('display_name')
-    obj.wkt = data.get('wkt', False)
-    DBSession.flush()
-
+    deserialize(obj, request.json_body, create=False)
     return dict(id=obj.id)
 
 
@@ -74,10 +84,10 @@ def idelete(request):
     request.require_administrator()
 
     obj = SRS.filter_by(id=int(request.matchdict['id'])).one()
-    disabled = obj.disabled
-    if disabled:
+    if obj.system:
         raise ValidationError(message=_(
-            "Unable to delete standard coordinate system."))
+            "System SRS cannot be deleted."))
+
     DBSession.delete(obj)
     return None
 
@@ -199,8 +209,8 @@ def catalog_import(request):
     if None not in (srs['auth_name'], srs['auth_srid'], srs['postgis_srid']):
         conflict = SRS.filter_by(id=srs['postgis_srid']).first()
         if conflict:
-            raise ValidationError(_("Coordinate system (id=%d) already exists.")
-                                  % srs['postgis_srid'])
+            raise ValidationError(message=_(
+                "SRS #{} already exists.").format(srs['postgis_srid']))
         obj.id = srs['postgis_srid']
         obj.auth_name = srs['auth_name']
         obj.auth_srid = srs['auth_srid']

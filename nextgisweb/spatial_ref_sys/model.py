@@ -55,9 +55,6 @@ class SRS(Base):
             name='srs_id_auth_check'),
     )
 
-    def delete(selef):
-        raise Exception()
-
     @db.validates('wkt')
     def _validate_wkt(self, key, value):
         self.proj4 = convert_to_proj(value)
@@ -130,9 +127,13 @@ class SRS(Base):
         return self.display_name
 
     @property
-    def disabled(self):
-        # EPSG:3857 and EPSG:4326 are special and cannot be changed or deleted.
+    def system(self):
+        # EPSG:3857 and EPSG:4326 are special and cannot be deleted.
         return self.id in (3857, 4326)
+
+    @property
+    def protected(self):
+        return bool(self.auth_name or self.auth_srid or self.catalog_id)
 
 
 db.event.listen(SRS.__table__, 'after_create', db.DDL("""

@@ -156,7 +156,7 @@ export function ModelBrowse({
 
     const canDelete = (item) => {
         if (itemProps.canDelete) {
-            return !itemProps.canDelete({ item });
+            return itemProps.canDelete({ item });
         }
         return true;
     };

@@ -9,7 +9,7 @@ import { modelObj } from "../srsModel";
 export function SrsBrowse() {
     const columns = [
         {
-            title: i18n.gettext("SRS name"),
+            title: i18n.gettext("Display name"),
             dataIndex: "display_name",
             key: "display_name",
             sorter: (a, b) => (a.display_name > b.display_name ? 1 : -1),
@@ -37,7 +37,7 @@ export function SrsBrowse() {
             model={modelObj}
             columns={columns}
             messages={getMessages()}
-            itemProps={{ canDelete: ({ item }) => item.disabled }}
+            itemProps={{ canDelete: ({ item }) => !item.system }}
             headerControls={headerControls}
         />
     );
