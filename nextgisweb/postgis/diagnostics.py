@@ -1,14 +1,38 @@
 from enum import Enum
 from socket import gethostbyname, gaierror
 
+import geoalchemy2 as ga
+from sqlalchemy import inspect
 from sqlalchemy.engine import Connection, URL as EngineURL, create_engine
 from sqlalchemy.pool import NullPool
+from sqlalchemy.types import (
+    BigInteger,
+    Date,
+    DateTime,
+    Integer,
+    Numeric,
+    String,
+    Time,
+)
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql import text as sql, quoted_name
 
+from ..feature_layer import FIELD_TYPE
 from ..lib.logging import logger
 
-from .util import _
+from .util import _, coltype_as_str
+
+
+# Field type - generic DB type
+_FIELD_TYPE_2_DB = {
+    FIELD_TYPE.INTEGER: Integer,
+    FIELD_TYPE.BIGINT: BigInteger,
+    FIELD_TYPE.REAL: Numeric,
+    FIELD_TYPE.STRING: String,
+    FIELD_TYPE.DATE: Date,
+    FIELD_TYPE.TIME: Time,
+    FIELD_TYPE.DATETIME: DateTime,
+}
 
 
 class StatusEnum(Enum):
@@ -99,8 +123,8 @@ class LayerCheck(Check):
 
     def __init__(
         self, *,
-        schema, table, column_id, column_geom,
-        geometry_type, geometry_srid,
+        schema, table, column_id=None, column_geom=None,
+        geometry_type=None, geometry_srid=None, fields=None
     ):
         super().__init__()
         self.schema = schema
@@ -109,6 +133,11 @@ class LayerCheck(Check):
         self.column_geom = column_geom
         self.geometry_type = geometry_type
         self.geometry_srid = geometry_srid
+        self.fields = fields
+
+    @property
+    def qname(self):
+        return quoted_name(self.schema, True) + '.' + quoted_name(self.table, True)
 
 
 class PostgresCheck(ConnectionCheck):
@@ -170,13 +199,14 @@ class PostgisCheck(ConnectionCheck):
         self.say(_("Number of spatial reference systems: {}.").format(srs_count))
 
 
+class ColumnInfo(dict):
+    pass
+
+
 class TableCheck(LayerCheck):
     title = _("Layer table")
 
     def handler(self, conn: Connection):
-        self.qname = quoted_name(self.schema, True) + \
-            '.' + quoted_name(self.table, True)
-
         table_type = conn.execute(sql("""
             SELECT table_type FROM information_schema.tables
             WHERE table_schema = :schema AND table_name = :table
@@ -206,74 +236,131 @@ class TableCheck(LayerCheck):
         count = conn.execute(sql("SELECT COUNT(*) FROM " + self.qname)).scalar()
         self.say(_("Number of records: {}.").format(count))
 
+        inspector = inspect(conn)
+
+        column_info = ColumnInfo()
+        for column in inspector.get_columns(self.table, self.schema):
+            column_info[column['name']] = column
+        self.inject(column_info)
+
+        pk_info = inspector.get_pk_constraint(self.table, self.schema)
+        self.inject(pk_info, 'PKInfo')
+
+        index_info = inspector.get_indexes(self.table, self.schema)
+        self.inject(index_info, 'IndexInfo')
+
 
 class IdColumnCheck(LayerCheck):
     title = _("ID column")
 
-    def handler(self, conn: Connection, tab: TableCheck):
-        cinfo = conn.execute(
-            sql("""
-                SELECT * FROM information_schema.columns
-                WHERE table_schema=:schema
-                    AND table_name=:table
-                    AND column_name=:column
-            """),
-            schema=self.schema, table=self.table,
-            column=self.column_id,
-        ).one_or_none()
+    def handler(
+        self, conn: Connection, tab: TableCheck, column_info: ColumnInfo,
+        pk_info: 'PKInfo', index_info: 'IndexInfo'
+    ):
+        if self.column_id is not None:
+            if not (cinfo := column_info.get(self.column_id)):
+                self.error(_("Column not found."))
+                return
+            self.success(_("Column found."))
 
-        if not cinfo:
-            self.error(_("Column not found."))
-            return
+            type_msg = _("Type is {}.").format(coltype_as_str(cinfo['type']))
+            if not isinstance(cinfo['type'], Integer):
+                self.error(type_msg)
+                return
+            self.success(type_msg)
 
-        self.success(_("Column found, type is {}.").format(
-            cinfo['data_type'].upper()))
+            if (
+                len(pk_info['constrained_columns']) == 1
+                and pk_info['constrained_columns'][0] == self.column_id
+            ):
+                self.success(_("Is primary key."))
+            else:
+                self.say(_("Not a primary key."))
 
-        # * Integer type
-        # * Uniqueness
-        # * Nullability
-        # * Autoincrement or default
+                if cinfo['nullable']:
+                    self.warning(_("Can be NULL."))
+                else:
+                    self.success(_("Can't be NULL."))
+
+                def has_unique_index(cname):
+                    for i in index_info:
+                        if (
+                            i['unique'] and len(i['column_names']) == 1
+                            and i['column_names'][0] == cname
+                        ):
+                            return True
+                    return False
+
+                if not cinfo['nullable'] and has_unique_index(self.column_id):
+                    is_unique = True
+                else:
+                    qname_cid = quoted_name(self.column_id, True)
+                    is_unique = conn.execute(sql(f"""
+                        SELECT EXISTS (
+                            SELECT {qname_cid}, count(*) FROM {self.qname}
+                            GROUP BY {qname_cid} HAVING count(*) > 1 LIMIT 1
+                        )
+                    """))
+
+                if is_unique:
+                    self.success(_("Is unique."))
+                else:
+                    self.error(_("Is not unique."))
+                    return
+
+            ai = cinfo['autoincrement']
+            if (isinstance(ai, bool) and ai) or (ai == 'auto'):
+                self.success(_("Has autoincrement."))
+            else:
+                self.warning(_("Has no autoincrement."))
 
 
 class GeomColumnCheck(LayerCheck):
     title = _("Geometry column")
 
-    def handler(self, conn: Connection, postgis: PostgisCheck, tab: TableCheck):
-        cinfo = conn.execute(
-            sql("""
-                SELECT * FROM information_schema.columns
-                WHERE table_schema=:schema
-                    AND table_name=:table
-                    AND column_name=:column
-            """),
-            schema=self.schema, table=self.table,
-            column=self.column_geom,
-        ).one_or_none()
+    def handler(
+        self, conn: Connection, postgis: PostgisCheck, tab: TableCheck,
+        column_info: ColumnInfo
+    ):
+        if self.column_geom is not None:
+            if not (cinfo := column_info.get(self.column_geom)):
+                self.error(_("Column not found."))
+                return
+            self.success(_("Column found."))
 
-        if not cinfo:
-            self.error(_("Column not found."))
-            return
-
-        data_type = cinfo['data_type'].upper()
-        udt_name = cinfo['udt_name'].upper()
-
-        if data_type != 'USER-DEFINED' or udt_name != 'GEOMETRY':
-            self.error(_("Column found with invalid type: ({}, {}).").format(
-                data_type, udt_name), ERROR)
-            return
-
-        self.success(_("Column found, type is {}.").format(udt_name))
-
-        # * More type checks
+            type_msg = _("Type is {}.").format(coltype_as_str(cinfo['type']))
+            ctype = cinfo['type']
+            if not isinstance(ctype, ga.Geometry):
+                self.error(type_msg)
+                return
+            elif ctype.geometry_type not in ('GEOMETRY', self.geometry_type):
+                self.error(type_msg + " " + _("Geometry type mismatch."))
+                return
+            elif ctype.srid != self.geometry_srid:
+                self.error(type_msg + " " + _("Geometry SRID mismatch."))
+                return
+            self.success(type_msg)
 
 
-# TODO: Add fields parameter to LayerChechBase and do field checks here
-#
-# class ColumnsCheck(LayerCheckBase):
-#     title = "Field columns"
-#
-#     def handler(self, conn: Connection, tab: LayerTableCheck):
-#         pass
+class ColumnsCheck(LayerCheck):
+    title = _("Field columns")
+
+    def handler(self, conn: Connection, tab: TableCheck, column_info: ColumnInfo):
+        for field in self.fields:
+            if not (cinfo := column_info.get(field.column_name)):
+                self.error(_("Column {} not found.").format(field.column_name))
+                return
+            col_msg = _("Column {} found.").format(field.column_name)
+            type_expected = _FIELD_TYPE_2_DB[field.datatype]
+            if not isinstance(cinfo['type'], type_expected):
+                self.success(col_msg)
+                self.error("Column {} type {} does not match {} base type.".format(
+                    field.column_name, coltype_as_str(cinfo['type']),
+                    coltype_as_str(type_expected())))
+                return
+            else:
+                col_msg += " " + _("Type is {}.").format(coltype_as_str(cinfo['type']))
+                self.success(col_msg)
 
 
 class Checker:
@@ -289,6 +376,8 @@ class Checker:
                 ck = cls(**connection)
             elif issubclass(cls, LayerCheck):
                 if layer is None:
+                    continue
+                if issubclass(cls, ColumnsCheck) and 'fields' not in layer:
                     continue
                 ck = cls(**layer)
             else:

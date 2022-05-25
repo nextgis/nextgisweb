@@ -7,7 +7,7 @@ from ..resource import resource_factory, ConnectionScope, DataStructureScope
 from .diagnostics import Checker
 from .exception import ExternalDatabaseError
 from .model import PostgisConnection, PostgisLayer
-from .util import _
+from .util import _, coltype_as_str
 
 
 def inspect_connection(request):
@@ -48,8 +48,8 @@ def inspect_table(request):
     try:
         for column in inspector.get_columns(table_name, schema):
             result.append(dict(
-                name=column.get('name'),
-                type='%r' % column.get('type')))
+                name=column['name'],
+                type=coltype_as_str(column['type'])))
     except NoSuchTableError:
         raise ValidationError(_("Table (%s) not found in schema (%s)." % (table_name, schema)))
 
@@ -77,7 +77,7 @@ def diagnostics(request):
             request.resource_permission(DataStructureScope.read, res)
             layer = {k: getattr(res, k) for k in (
                 'schema', 'table', 'column_id', 'column_geom',
-                'geometry_type', 'geometry_srid')}
+                'geometry_type', 'geometry_srid', 'fields')}
 
             if connection is None:
                 connection = dict(id=res.id)

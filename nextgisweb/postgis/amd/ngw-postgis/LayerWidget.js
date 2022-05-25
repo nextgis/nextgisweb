@@ -108,7 +108,7 @@ define([
             }).then(lang.hitch(this, function (response) {
                 var idcols = [], geomcols = [];
                 array.forEach(response, function (item) {
-                    if (!item.type.startsWith("Geometry")) {
+                    if (!item.type.toLowerCase().startsWith("geometry")) {
                         idcols.push({id: item.name});
                     } else {
                         geomcols.push({id: item.name});
