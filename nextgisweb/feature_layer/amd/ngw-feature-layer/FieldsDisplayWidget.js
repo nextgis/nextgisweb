@@ -38,7 +38,7 @@ define([
 
         grid_visibility: false,
 
-        urlRE: new RegExp("^" + regexp.url({scheme: true}) + "$"),
+        urlRE: new RegExp("^(?:" + regexp.url({scheme: true}) + "|(?:mailto:|tel:|e1c://)[^\\s]+)$"),
         emailRE: new RegExp("^" + regexp.emailAddress() + "$"),
 
         buildRendering: function () {
