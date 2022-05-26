@@ -187,8 +187,8 @@ def html_error_response(request, err_info, exc, exc_info, debug=True):
     response = render_to_response(
         'nextgisweb:pyramid/template/error.mako',
         dict(
-            error_title=err_info_attr(err_info, exc, 'title'),
             error_json=json_error(request, err_info, exc, exc_info, debug=debug),
+            title=err_info_attr(err_info, exc, 'title'),
             custom_layout=True,
         ),
         request=request)

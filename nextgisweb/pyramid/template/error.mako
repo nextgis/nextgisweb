@@ -1,14 +1,5 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<%!
-    from nextgisweb.pyramid.util import _
-    from nextgisweb.pyramid.exception import json_error
-%>
-
-<%def name="title()">
-    ${tr(error_title)}
-</%def>
-
 <% system_name = request.env.core.system_full_name() %>
 
 <%include
