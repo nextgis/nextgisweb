@@ -2,22 +2,25 @@ define([
     "dojo/_base/declare",
     "dojo/_base/lang",
     "dijit/Editor",
-    "dijit/_editor/plugins/LinkDialog",
-    "dijit/_editor/plugins/ViewSource",
     "ngw-resource/serialize",
-    "@nextgisweb/pyramid/i18n!"
+    "@nextgisweb/pyramid/i18n!",
+    "dijit/_editor/plugins/LinkDialog",
+    "dijit/_editor/plugins/ViewSource"
 ], function (
     declare,
     lang,
     Editor,
-    LinkDialog,
-    ViewSource,
     serialize,
     i18n
 ) {
     return declare("ngw.resource.DescriptionWidget", [Editor, serialize.Mixin], {
         title: i18n.gettext("Description"),
-        extraPlugins: ["|", "createLink", "unlink", "insertImage", "viewsource"],
+        extraPlugins: ["|", {
+            name: "dijit/_editor/plugins/LinkDialog",
+            command: "createLink",
+            // Allow everything except malicious javascript
+            urlRegExp: '(?!\\s*javascript\\s*:).*',
+        }, "unlink", "insertImage", "viewsource"],
         serattr: "resource.description",
 
         constructor: function () {
