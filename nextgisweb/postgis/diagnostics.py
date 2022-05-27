@@ -199,8 +199,26 @@ class PostgisCheck(ConnectionCheck):
         self.say(_("Number of spatial reference systems: {}.").format(srs_count))
 
 
-class ColumnInfo(dict):
-    pass
+class TableInspector:
+
+    def __init__(self, conn, schema, table):
+        i = inspect(conn)
+        self.columns = {c['name']: c for c in i.get_columns(table, schema)}
+        self.pk_constraint = i.get_pk_constraint(table, schema)
+        self.indexes = i.get_indexes(table, schema)
+
+    def is_column_primary_key(self, column):
+        ccols = self.pk_constraint['constrained_columns']
+        return len(ccols) == 1 and ccols[0] == column
+
+    def has_unique_index_on(self, column):
+        for idx in self.indexes:
+            if (
+                idx['unique'] and len(idx['column_names']) == 1
+                and idx['column_names'][0] == column
+            ):
+                return True
+        return False
 
 
 class TableCheck(LayerCheck):
@@ -236,131 +254,113 @@ class TableCheck(LayerCheck):
         count = conn.execute(sql("SELECT COUNT(*) FROM " + self.qname)).scalar()
         self.say(_("Number of records: {}.").format(count))
 
-        inspector = inspect(conn)
+        if self.column_id is None or self.column_geom is None:
+            self.error(_("ID or geometry column isn't set."))
+            return
 
-        column_info = ColumnInfo()
-        for column in inspector.get_columns(self.table, self.schema):
-            column_info[column['name']] = column
-        self.inject(column_info)
-
-        pk_info = inspector.get_pk_constraint(self.table, self.schema)
-        self.inject(pk_info, 'PKInfo')
-
-        index_info = inspector.get_indexes(self.table, self.schema)
-        self.inject(index_info, 'IndexInfo')
+        self.inject(TableInspector(conn, self.schema, self.table))
 
 
 class IdColumnCheck(LayerCheck):
     title = _("ID column")
 
-    def handler(
-        self, conn: Connection, tab: TableCheck, column_info: ColumnInfo,
-        pk_info: 'PKInfo', index_info: 'IndexInfo'
-    ):
-        if self.column_id is not None:
-            if not (cinfo := column_info.get(self.column_id)):
-                self.error(_("Column not found."))
-                return
-            self.success(_("Column found."))
+    def handler(self, conn: Connection, tins: TableInspector):
+        cinfo = tins.columns.get(self.column_id)
+        if cinfo is None:
+            self.error(_("Column not found."))
+            return
 
-            type_msg = _("Type is {}.").format(coltype_as_str(cinfo['type']))
-            if not isinstance(cinfo['type'], Integer):
-                self.error(type_msg)
-                return
-            self.success(type_msg)
+        ctype_repr = coltype_as_str(cinfo['type'])
+        if not isinstance(cinfo['type'], Integer):
+            self.error(_("Column found, but has non-integer type - {}.").format(ctype_repr))
 
-            if (
-                len(pk_info['constrained_columns']) == 1
-                and pk_info['constrained_columns'][0] == self.column_id
-            ):
-                self.success(_("Is primary key."))
+        self.success(_("Column found, type is {}.").format(ctype_repr))
+
+        if tins.is_column_primary_key(self.column_id):
+            self.success(_("Column is the primary key."))
+        else:
+            self.say(_("Column is not the primary key."))
+
+            nullable = cinfo['nullable']
+            has_unique_index = tins.has_unique_index_on(self.column_id)
+
+            if nullable:
+                self.warning(_("Column can be NULL."))
             else:
-                self.say(_("Not a primary key."))
+                self.success(_("Column cannot be NULL."))
 
-                if cinfo['nullable']:
-                    self.warning(_("Can be NULL."))
-                else:
-                    self.success(_("Can't be NULL."))
-
-                def has_unique_index(cname):
-                    for i in index_info:
-                        if (
-                            i['unique'] and len(i['column_names']) == 1
-                            and i['column_names'][0] == cname
-                        ):
-                            return True
-                    return False
-
-                if not cinfo['nullable'] and has_unique_index(self.column_id):
-                    is_unique = True
-                else:
-                    qname_cid = quoted_name(self.column_id, True)
-                    is_unique = conn.execute(sql(f"""
-                        SELECT EXISTS (
-                            SELECT {qname_cid}, count(*) FROM {self.qname}
-                            GROUP BY {qname_cid} HAVING count(*) > 1 LIMIT 1
-                        )
-                    """))
-
-                if is_unique:
-                    self.success(_("Is unique."))
-                else:
-                    self.error(_("Is not unique."))
-                    return
-
-            ai = cinfo['autoincrement']
-            if (isinstance(ai, bool) and ai) or (ai == 'auto'):
-                self.success(_("Has autoincrement."))
+            if not has_unique_index:
+                self.warning(_("Unique index not found."))
             else:
-                self.warning(_("Has no autoincrement."))
+                self.success(_("Unique index found."))
+
+            if nullable or not has_unique_index:
+                qname_col = quoted_name(self.column_id, True)
+                not_unique = conn.execute(sql(f"""SELECT EXISTS (
+                    SELECT {qname_col}, COUNT(*) FROM {self.qname}
+                    GROUP BY {qname_col} HAVING COUNT(*) > 1 LIMIT 1
+                )""")).scalar()
+
+                if not_unique:
+                    self.error(_("Non-unique values in the column."))
+                else:
+                    self.success(_("All values seem to be unique."))
+
+        ai = cinfo['autoincrement']
+        if (isinstance(ai, bool) and ai) or (ai == 'auto'):
+            self.success(_("Column is auto-incrementable."))
+        else:
+            self.warning(_("Column isn't auto-incrementable."))
 
 
 class GeomColumnCheck(LayerCheck):
     title = _("Geometry column")
 
-    def handler(
-        self, conn: Connection, postgis: PostgisCheck, tab: TableCheck,
-        column_info: ColumnInfo
-    ):
-        if self.column_geom is not None:
-            if not (cinfo := column_info.get(self.column_geom)):
-                self.error(_("Column not found."))
-                return
-            self.success(_("Column found."))
+    def handler(self, conn: Connection, postgis: PostgisCheck, tins: TableInspector):
+        cinfo = tins.columns.get(self.column_geom)
+        if cinfo is None:
+            self.error(_("Column not found."))
+            return
 
-            type_msg = _("Type is {}.").format(coltype_as_str(cinfo['type']))
-            ctype = cinfo['type']
-            if not isinstance(ctype, ga.Geometry):
-                self.error(type_msg)
-                return
-            elif ctype.geometry_type not in ('GEOMETRY', self.geometry_type):
-                self.error(type_msg + " " + _("Geometry type mismatch."))
-                return
-            elif ctype.srid != self.geometry_srid:
-                self.error(type_msg + " " + _("Geometry SRID mismatch."))
-                return
-            self.success(type_msg)
+        ctype = cinfo['type']
+        ctype_repr = coltype_as_str(ctype).upper().replace(',', ', ')
+
+        if (
+            not isinstance(ctype, ga.Geometry)
+            or ctype.geometry_type not in ('GEOMETRY', self.geometry_type)
+        ):
+            self.error(_(
+                "Column found, but has an incompatible type - {}."
+            ).format(ctype_repr))
+        else:
+            self.success(_("Column found, type is {}.").format(ctype_repr))
+
+        if ctype.srid != self.geometry_srid:
+            self.error(_("Geometry SRID mismatch."))
 
 
 class ColumnsCheck(LayerCheck):
     title = _("Field columns")
 
-    def handler(self, conn: Connection, tab: TableCheck, column_info: ColumnInfo):
+    def handler(self, conn: Connection, tins: TableInspector):
         for field in self.fields:
-            if not (cinfo := column_info.get(field.column_name)):
-                self.error(_("Column {} not found.").format(field.column_name))
+            cinfo = tins.columns.get(field.column_name)
+            if cinfo is None:
+                self.error(_("Column of field '{}' not found.").format(field.keyname))
                 return
-            col_msg = _("Column {} found.").format(field.column_name)
+
+            ctype = cinfo['type']
+            ctype_repr = coltype_as_str(ctype).upper().replace(',', ', ')
+
             type_expected = _FIELD_TYPE_2_DB[field.datatype]
-            if not isinstance(cinfo['type'], type_expected):
-                self.success(col_msg)
-                self.error("Column {} type {} does not match {} base type.".format(
-                    field.column_name, coltype_as_str(cinfo['type']),
-                    coltype_as_str(type_expected())))
-                return
+            if not isinstance(ctype, type_expected):
+                self.error(_(
+                    "Column of field '{}' found, but has an incompatible type - {}."
+                ).format(field.keyname, ctype_repr))
             else:
-                col_msg += " " + _("Type is {}.").format(coltype_as_str(cinfo['type']))
-                self.success(col_msg)
+                self.success(_(
+                    "Column of field '{}' found, type is {}."
+                ).format(field.keyname, ctype_repr))
 
 
 class Checker:
