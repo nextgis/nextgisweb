@@ -169,7 +169,7 @@ msgstr "Колонка поля '{}' найдена, но имеет несов�
 
 #: diagnostics.py:361
 msgid "Column of field '{}' found, type is {}."
-msgstr "Колонка поля '{}' не найдена, тип {}."
+msgstr "Колонка поля '{}' найдена, тип {}."
 
 #: exception.py:8
 msgid "External database error"
