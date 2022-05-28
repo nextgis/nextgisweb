@@ -286,7 +286,7 @@ class AuthComponent(Component):
             rows = OAuthToken.filter(OAuthToken.exp < exp).delete()
             logger.info("Expired cached OAuth tokens data deleted: %d", rows)
 
-            rows = OAuthToken.filter(OAuthPasswordToken.refresh_exp < exp).delete()
+            rows = OAuthPasswordToken.filter(OAuthPasswordToken.refresh_exp < exp).delete()
             logger.info("Expired cached OAuth password tokens deleted: %d", rows)
 
     def backup_configure(self, config):
