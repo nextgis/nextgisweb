@@ -6,6 +6,16 @@ Changes
 
 - "Locate me" tool on web maps.
 - Identifiable setting for web map layers.
+- Batch deletion in the list of child resources.
+- Completed control panel migration to Antd and React.
+- Improved login dialog, resource search, etc.
+- Fast JSON serialiazation and deserialization base on orjson library.
+- Hide empty groups and groups with no accessible layers on web maps.
+- Support for 25D geometries in PostGIS layers.
+- PostGIS connection and layer diagnostic tool.
+- Improved handling of URLs for descriptions and feature layer fields.
+- Improved management of spatial reference systems and catalog integration.
+- Support for simultaneous OAuth authorization code and password grant types.
 
 4.1.0
 -----
