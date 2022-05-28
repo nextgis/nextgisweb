@@ -181,7 +181,7 @@ def _login_url(request):
         login_qs['next'] = request.url
 
     oauth_opts = auth.options.with_prefix('oauth')
-    if oauth_opts['enabled'] and oauth_opts['default'] and not oauth_opts['server.password']:
+    if oauth_opts['enabled'] and oauth_opts['default'] and oauth_opts['server.authorization_code']:
         login_url = request.route_url('auth.oauth', _query=login_qs)
     else:
         login_url = request.route_url(auth.options['login_route_name'], _query=login_qs)
