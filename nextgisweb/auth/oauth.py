@@ -2,12 +2,15 @@ import re
 import itertools
 from datetime import datetime, timedelta
 from collections import namedtuple
+from functools import lru_cache
 from hashlib import sha512
 from urllib.parse import urlencode
 
 import sqlalchemy as sa
+from sqlalchemy.orm.exc import NoResultFound
 import requests
 import zope.event
+from passlib.hash import sha256_crypt
 
 from ..env import env
 from ..lib.config import OptionAnnotations, Option
@@ -51,14 +54,40 @@ class OAuthHelper(object):
         return self.options['server.auth_endpoint'] + '?' + urlencode(qs)
 
     def grant_type_password(self, username, password):
-        params = dict(
-            username=username,
-            password=password)
+        client_id = self.options.get('client.id')
+
+        pwd_token_id = _password_token_hash_cache(username, password, client_id)
+
+        try:
+            pwd_token = OAuthPasswordToken.filter_by(id=pwd_token_id).one()
+        except NoResultFound:
+            # If no token found, create new one not adding it into DBSession.
+            # otherwise an error could happen when an incomplete token record is
+            # flushed to DB.
+            pwd_token = OAuthPasswordToken(id=pwd_token_id)
+        else:
+            now = datetime.utcnow()
+            if pwd_token.exp > now:
+                return pwd_token.to_grant_response()
+
+            if pwd_token.refresh_exp > now:
+                try:
+                    tresp = self.grant_type_refresh_token(
+                        pwd_token.refresh_token, pwd_token.access_token)
+                except OAuthTokenRefreshException:
+                    pass
+                else:
+                    pwd_token.update_from_grant_response(tresp)
+                    return tresp
 
         if scope := self.options.get('scope'):
             params['scope'] = ' '.join(scope)
 
-        return self._token_request('password', params)
+        tresp = self._token_request('password', dict(
+            username=username, password=password))
+        pwd_token.update_from_grant_response(tresp)
+        DBSession.merge(pwd_token)
+        return tresp
 
     def grant_type_authorization_code(self, code, redirect_uri):
         return self._token_request('authorization_code', dict(
@@ -182,10 +211,12 @@ class OAuthHelper(object):
     def _token_request(self, grant_type, params):
         data = self._server_request('token', dict(params, grant_type=grant_type))
         exp = datetime.utcnow() + timedelta(seconds=data['expires_in'])
+        refresh_exp = datetime.utcnow() + timedelta(seconds=data['refresh_expires_in'])
         return OAuthGrantResponse(
             access_token=data['access_token'],
             refresh_token=data['refresh_token'],
-            expires=exp.timestamp())
+            expires=exp.timestamp(),
+            refresh_expires=refresh_exp.timestamp())
 
     def _update_user(self, user, token):
         opts = self.options.with_prefix('profile')
@@ -333,7 +364,35 @@ class OnAccessTokenToUser(object):
 
 
 OAuthGrantResponse = namedtuple('OAuthGrantResponse', [
-    'access_token', 'refresh_token', 'expires'])
+    'access_token', 'refresh_token', 'expires', 'refresh_expires'])
+
+
+class OAuthPasswordToken(Base):
+    __tablename__ = 'auth_oauth_password_token'
+
+    id = db.Column(db.Unicode, primary_key=True)
+    access_token = db.Column(db.Unicode, nullable=False)
+    exp = db.Column(db.DateTime, nullable=False)
+    refresh_token = db.Column(db.Unicode, nullable=False)
+    refresh_exp = db.Column(db.DateTime, nullable=False)
+
+    def update_from_grant_response(self, tresp):
+        self.access_token = tresp.access_token
+        self.refresh_token = tresp.refresh_token
+        self.exp = datetime.utcfromtimestamp(tresp.expires)
+        self.refresh_exp = datetime.utcfromtimestamp(tresp.refresh_expires)
+
+    def to_grant_response(self):
+        return OAuthGrantResponse(
+            access_token=self.access_token,
+            refresh_token=self.refresh_token,
+            expires=self.exp.timestamp(),
+            refresh_expires=self.refresh_exp.timestamp())
+
+
+@lru_cache(maxsize=256)
+def _password_token_hash_cache(username, password, salt):
+    return sha256_crypt.hash(f"{username}:{password}:{salt if salt else 'ngw'}")
 
 
 class OAuthToken(Base):

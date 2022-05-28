@@ -10,6 +10,17 @@ from ...auth import User, Group
 from ...models import DBSession
 
 
+@pytest.fixture(scope='module', autouse=True)
+def disable_oauth(ngw_env):
+    auth = ngw_env.auth
+
+    prev_helper = auth.oauth
+    with auth.options.override({'oauth.enabled': False}):
+        auth.oauth = None
+        yield
+    auth.oauth = prev_helper
+
+
 def user_url(user_id=None):
     return ('/api/component/auth/user/' + (
         str(user_id) if user_id else ''))
