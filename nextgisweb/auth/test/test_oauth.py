@@ -31,6 +31,7 @@ def setup_oauth(ngw_env, request):
         'oauth.scope': None,
         'oauth.client.id': CLIENT_ID,
         'oauth.client.secret': CLIENT_SECRET,
+        'oauth.server.authorization_code': True,
         'oauth.server.password': False,
         'oauth.server.token_endpoint': 'http://oauth/token',
         'oauth.server.auth_endpoint': 'http://oauth/auth',

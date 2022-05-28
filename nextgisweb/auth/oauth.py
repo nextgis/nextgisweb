@@ -29,6 +29,7 @@ class OAuthHelper(object):
     def __init__(self, options):
         self.options = options
 
+        self.authorization_code = options['server.authorization_code']
         self.password = options['server.password']
         self.local_auth = options['local_auth']
 
@@ -266,8 +267,11 @@ class OAuthHelper(object):
         Option('client.secret', default=None, secure=True,
                doc="OAuth client secret"),
 
+        Option('server.authorization_code', bool, default=True,
+               doc="Use authorization code grant type."),
+
         Option('server.password', bool, default=False,
-               doc="Use password grant type instead of authorization code grant type."),
+               doc="Use password grant type."),
 
         Option('server.token_endpoint',
                doc="OAuth token endpoint URL."),

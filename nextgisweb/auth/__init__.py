@@ -149,7 +149,7 @@ class AuthComponent(Component):
         api.setup_pyramid(self, config)
 
     def client_settings(self, request):
-        enabled = (self.oauth is not None) and (not self.oauth.password)
+        enabled = (self.oauth is not None) and self.oauth.authorization_code
         return dict(
             oauth=dict(enabled=enabled)
         )
