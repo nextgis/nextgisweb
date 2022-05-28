@@ -104,7 +104,7 @@ class SecurityPolicy(object):
 
                 else:
                     user, _ = self.authenticate_with_password(
-                        username, password, oauth=False)
+                        username, password)
                     return user.id
 
             if amode == 'BEARER' and self.oauth is not None:
@@ -165,7 +165,7 @@ class SecurityPolicy(object):
 
         return ()
 
-    def authenticate_with_password(self, username, password, oauth=True):
+    def authenticate_with_password(self, username, password):
         user = None
         tresp = None
 
@@ -186,7 +186,7 @@ class SecurityPolicy(object):
 
         # Step 2: Authentication with OAuth password if enabled
 
-        if user is None and oauth and self.oauth is not None and self.oauth.password:
+        if user is None and self.oauth is not None and self.oauth.password:
             tresp = self.oauth.grant_type_password(username, password)
             user = self.oauth.access_token_to_user(tresp.access_token)
 
