@@ -304,7 +304,7 @@ class IdColumnCheck(LayerCheck):
                 if not_unique:
                     self.error(_("Non-unique values in the column."))
                 else:
-                    self.success(_("All values seem to be unique."))
+                    self.success(_("All values are unique."))
 
         ai = cinfo['autoincrement']
         if (isinstance(ai, bool) and ai) or (ai == 'auto'):
