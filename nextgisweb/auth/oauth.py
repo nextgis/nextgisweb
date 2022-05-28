@@ -80,11 +80,11 @@ class OAuthHelper(object):
                     pwd_token.update_from_grant_response(tresp)
                     return tresp
 
+        params = dict(username=username, password=password)
         if scope := self.options.get('scope'):
             params['scope'] = ' '.join(scope)
 
-        tresp = self._token_request('password', dict(
-            username=username, password=password))
+        tresp = self._token_request('password', params)
         pwd_token.update_from_grant_response(tresp)
         DBSession.merge(pwd_token)
         return tresp
