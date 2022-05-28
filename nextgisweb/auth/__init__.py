@@ -5,7 +5,7 @@ from urllib.parse import urlencode, urlparse
 import transaction
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import defer
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
 from pyramid.interfaces import ISecurityPolicy
 
 from ..lib.config import OptionAnnotations, Option
@@ -138,8 +138,14 @@ class AuthComponent(Component):
                 raise HTTPForbidden(
                     explanation="Membership in group 'administrators' required!")
 
+        def require_authenticated(request):
+            if request.authenticated_userid is None:
+                raise HTTPForbidden(
+                    explanation="Authentication required!")
+
         config.add_request_method(user, property=True)
         config.add_request_method(require_administrator)
+        config.add_request_method(require_authenticated)
 
         config.set_security_policy(SecurityPolicy(
             self, self.options.with_prefix('policy')))

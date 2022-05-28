@@ -1,7 +1,175 @@
-#: api.py:53
+#: api.py:54
 #, python-format
 msgid "Table (%s) not found in schema (%s)."
 msgstr "Таблица (%s) не найдена в схеме (%s)."
+
+#: api.py:72
+msgid "PostGIS layer {} not found!"
+msgstr "Слой PostGIS {} не найден!"
+
+#: api.py:89
+msgid "PostGIS connection {} not found!"
+msgstr "Соединение PostGIS {} не найдено!"
+
+#: diagnostics.py:98
+msgid "Got an unexpected error."
+msgstr "Возникла неожиданная ошибка."
+
+#: diagnostics.py:144
+msgid "PostgreSQL connection"
+msgstr "Подключение к PostgreSQL"
+
+#: diagnostics.py:150
+msgid "Host name resolution failed: {}."
+msgstr "Не удалось выполнить разрешение имени: {}."
+
+#: diagnostics.py:164
+msgid "Failed to connect to the database."
+msgstr "Не удалось подключиться к базе данных."
+
+#: diagnostics.py:168
+msgid "Connected to the database."
+msgstr "Подключение к базе данных выполнено."
+
+#: diagnostics.py:171
+msgid "Executed {} query."
+msgstr "Выполнен запрос {}."
+
+#: diagnostics.py:174
+msgid "PostgreSQL version {}."
+msgstr "Версия PostgreSQL {}."
+
+#: diagnostics.py:183
+msgid "PostGIS extension"
+msgstr "Расширение PostGIS"
+
+#: diagnostics.py:191
+msgid "PostGIS extension not found."
+msgstr "Расширение PostGIS не найдено."
+
+#: diagnostics.py:193
+msgid "PostGIS extension version {}."
+msgstr "Версия расширения PostGIS {}."
+
+#: diagnostics.py:196
+msgid "Number of geometry columns: {}."
+msgstr "Количество колонок геометрий: {}."
+
+#: diagnostics.py:199
+msgid "Number of spatial reference systems: {}."
+msgstr "Количество систем координат: {}."
+
+#: diagnostics.py:225
+msgid "Layer table"
+msgstr "Таблица слоя"
+
+#: diagnostics.py:233
+msgid "Table not found."
+msgstr "Таблица не найдена."
+
+#: diagnostics.py:235
+msgid "Table found, table type is {}."
+msgstr "Таблица найдена, тип таблицы {}."
+
+#: diagnostics.py:248
+msgid "{} privilege is present."
+msgstr "Привелегия {} присутствует."
+
+#: diagnostics.py:250 diagnostics.py:252
+msgid "{} privilege is absent."
+msgstr "Привелегия {} отсутствует."
+
+#: diagnostics.py:255
+msgid "Number of records: {}."
+msgstr "Количество записей: {}."
+
+#: diagnostics.py:258
+msgid "ID or geometry column isn't set."
+msgstr "Не установлена колонка ID или геометрии."
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:28 diagnostics.py:265
+msgid "ID column"
+msgstr "Поле ID"
+
+#: diagnostics.py:270 diagnostics.py:322
+msgid "Column not found."
+msgstr "Колонка не найдена."
+
+#: diagnostics.py:275
+msgid "Column found, but has non-integer type - {}."
+msgstr "Колонка найдена, но имеет не целочисленный тип - {}."
+
+#: diagnostics.py:277 diagnostics.py:336
+msgid "Column found, type is {}."
+msgstr "Кололка найдена, тип {}."
+
+#: diagnostics.py:280
+msgid "Column is the primary key."
+msgstr "Колонка является первичным ключем."
+
+#: diagnostics.py:282
+msgid "Column is not the primary key."
+msgstr "Колонка не является первичным ключем."
+
+#: diagnostics.py:288
+msgid "Column can be NULL."
+msgstr "Колонка может быть NULL."
+
+#: diagnostics.py:290
+msgid "Column cannot be NULL."
+msgstr "Колонка не может быть NULL."
+
+#: diagnostics.py:293
+msgid "Unique index not found."
+msgstr "Уникальный индекс не найден."
+
+#: diagnostics.py:295
+msgid "Unique index found."
+msgstr "Уникальный индекс найден."
+
+#: diagnostics.py:305
+msgid "Non-unique values in the column."
+msgstr "В колонке есть не уникальные значения."
+
+#: diagnostics.py:307
+msgid "All values are unique."
+msgstr "Все значения уникальны."
+
+#: diagnostics.py:311
+msgid "Column is auto-incrementable."
+msgstr "Колонка авто-инкрементируемая."
+
+#: diagnostics.py:313
+msgid "Column isn't auto-incrementable."
+msgstr "Колонка не авто-инкрементируемая."
+
+#: amd/ngw-postgis/template/LayerWidget.hbs:34 diagnostics.py:317
+msgid "Geometry column"
+msgstr "Поле геометрии"
+
+#: diagnostics.py:332
+msgid "Column found, but has an incompatible type - {}."
+msgstr "Колонка найдена, но имеет несовместимый тип - {}."
+
+#: diagnostics.py:339
+msgid "Geometry SRID mismatch."
+msgstr "SRID геометрий не соответствуют."
+
+#: diagnostics.py:343
+msgid "Field columns"
+msgstr "Колонки полей"
+
+#: diagnostics.py:349
+msgid "Column of field '{}' not found."
+msgstr "Колонка поля '{}' не найдена."
+
+#: diagnostics.py:357
+msgid "Column of field '{}' found, but has an incompatible type - {}."
+msgstr "Колонка поля '{}' найдена, но имеет несовместимый тип - {}."
+
+#: diagnostics.py:361
+msgid "Column of field '{}' found, type is {}."
+msgstr "Колонка поля '{}' не найдена, тип {}."
 
 #: exception.py:8
 msgid "External database error"
@@ -111,6 +279,14 @@ msgstr "Поле '%(column)s' не найдено!"
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
+#: view.py:34
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+#: view.py:56
+msgid "PostGIS diagnostics"
+msgstr "Диагностика PostGIS"
+
 #: amd/ngw-postgis/template/ConnectionWidget.hbs:9
 msgid "Host"
 msgstr "Сервер"
@@ -147,14 +323,6 @@ msgstr "Схема"
 msgid "Table"
 msgstr "Таблица"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:28
-msgid "ID column"
-msgstr "Поле ID"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:34
-msgid "Geometry column"
-msgstr "Поле геометрии"
-
 #: amd/ngw-postgis/template/LayerWidget.hbs:41
 #: amd/ngw-postgis/template/LayerWidget.hbs:53
 msgid "Autodetect"
@@ -175,3 +343,20 @@ msgstr "Оставить"
 #: amd/ngw-postgis/template/LayerWidget.hbs:72
 msgid "Reload"
 msgstr "Загрузить"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:13
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:14
+msgid "Success"
+msgstr "Успех"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:15
+msgid "Warning"
+msgstr "Предупреждение"
+
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:16
+msgid "Error"
+msgstr "Ошибка"
+

@@ -1,0 +1,63 @@
+.ngw-postgis-diagnostics-widget {
+    .check {
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(57, 70, 78, 0.3);
+        margin-bottom: 1rem;
+
+        div.check-header {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+
+            .check-title {
+                flex-grow: 1;
+                font-size: larger;
+            }
+
+            .check-status {
+                flex-grow: 0;
+                width: var(--status-length);
+                text-align: center;
+                padding: 0.1rem 0.5rem;
+                border-radius: 4px;
+                text-transform: uppercase;
+                background-color: var(--status-color);
+                color: white;
+                font-weight: bolder;
+            }
+        }
+
+        ul.check-messages {
+            padding: 0.5rem;
+            list-style: none;
+            margin: 0;
+            border-top: 1px solid rgba(57, 70, 78, 0.15);
+
+            li > svg.icon {
+                margin-right: 0.5rem;
+                color: var(--status-color);
+            }
+        }
+
+        &.success,
+        li.success {
+            --status-color: var(--success);
+        }
+
+        &.warning,
+        li.warning {
+            --status-color: var(--warning);
+        }
+
+        &.error,
+        li.error {
+            --status-color: var(--error);
+        }
+
+        &.unknown,
+        li.unknown {
+            --status-color: gray;
+        }
+    }
+}

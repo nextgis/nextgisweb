@@ -21,6 +21,7 @@ class PostgisComponent(Component):
         from . import view # NOQA
         from . import api
         api.setup_pyramid(self, config)
+        view.setup_pyramid(self, config)
 
     option_annotations = (
         Option('connect_timeout', timedelta, default=timedelta(seconds=15)),
