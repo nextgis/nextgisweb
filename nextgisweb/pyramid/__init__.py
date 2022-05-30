@@ -178,6 +178,15 @@ class PyramidComponent(Component):
 
         Option('static_key', default=None),
 
+        Option('response_buffering', bool, default=None, doc=(
+            "Does the reverse proxy server in front of NextGIS Web use "
+            "output buffering or not? It's enabled by default in Nginx, "
+            "but it's better let NextGIS Web know about it.")),
+        Option('x_accel_buffering', bool, default=False, doc=(
+            "Allow usage of X-Accel-Buffering header to control output "
+            "buffering as it's done in Nginx. See docs on proxy_buffering "
+            "directive for ngx_http_proxy module for details.")),
+
         Option('debugtoolbar.enabled', bool),
         Option('debugtoolbar.hosts'),
 

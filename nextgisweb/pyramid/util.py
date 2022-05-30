@@ -117,3 +117,19 @@ def parse_origin(url):
     if is_wildcard:
         domain = wildcard + domain
     return is_wildcard, scheme, domain, port
+
+
+def set_output_buffering(request, response, value, *, strict=False):
+    if value is None:
+        return
+
+    opts = request.env.pyramid.options
+    default = opts['response_buffering']
+    if value == default:
+        return
+
+    x_accel_buffering = opts['x_accel_buffering']
+    if x_accel_buffering:
+        response.headers['X-Accel-Buffering'] = 'yes' if value else 'no'
+    elif strict:
+        raise RuntimeError("Failed to set output buffering")

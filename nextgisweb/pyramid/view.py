@@ -26,7 +26,7 @@ from ..models import DBSession
 
 from . import exception, renderer
 from .session import WebSession
-from .util import _, ErrorRendererPredicate, StaticFileResponse
+from .util import _, ErrorRendererPredicate, StaticFileResponse, set_output_buffering
 
 
 def static_amd_file(request):
@@ -215,6 +215,8 @@ def test_exception_transaction(request):
 def test_timeout(reqest):
     duration = float(reqest.GET.get('t', '60'))
     interval = float(reqest.GET['i']) if 'i' in reqest.GET else None
+    buffering = (reqest.GET['b'].lower() in ('true', '1', 'yes')) \
+        if 'b' in reqest.GET else None
 
     start = datetime.utcnow()
     finish = start + timedelta(seconds=duration)
@@ -237,7 +239,9 @@ def test_timeout(reqest):
             logger.warn("Timeout test: " + line)
             yield (line + "\n").encode('utf-8')
 
-    return Response(app_iter=generator(), content_type='text/plain')
+    resp = Response(app_iter=generator(), content_type='text/plain')
+    set_output_buffering(reqest, resp, buffering, strict=True)
+    return resp
 
 
 def setup_pyramid(comp, config):
