@@ -13,8 +13,8 @@ const DEFAULT_DATA = { projStr: "", format: "proj4" };
 
 export function SRSWidget({ id }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isProtected, setIsProtected] = useState(true);
-    const [isSystem, setIsSystem] = useState(true);
+    const [isProtected, setIsProtected] = useState(false);
+    const [isSystem, setIsSystem] = useState(false);
     const [form] = Form.useForm();
     const [modalForm] = Form.useForm();
     const fields = useMemo(() => {
@@ -38,9 +38,10 @@ export function SRSWidget({ id }) {
                 widget: "textarea",
                 rows: 4,
                 required: true,
+                disabled: isProtected,
             },
         ];
-    }, [form.values]);
+    }, [form.values, isProtected]);
 
     const showModal = () => {
         setIsModalVisible(true);
