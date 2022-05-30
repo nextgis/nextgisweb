@@ -33,10 +33,21 @@ export function FieldsForm(props) {
         formProps_.onFieldsChange = onFieldsChange;
     }
 
+    const includedFormItems = fields.filter((f) => {
+        const included = f.included;
+        if (included !== undefined) {
+            if (typeof included === "function") {
+                return included(f, initialValues);
+            }
+            return !!included;
+        }
+        return true;
+    });
+
     return (
         <Form {...formProps_}>
             {fields &&
-                fields.map((f) => (
+                includedFormItems.map((f) => (
                     <Fragment key={f.name}>{FormItem(f)}</Fragment>
                 ))}
             {props.children}
@@ -45,7 +56,8 @@ export function FieldsForm(props) {
 }
 
 function FormItem(props) {
-    const { required, requiredMessage, widget, ...formProps } = props;
+    const { required, requiredMessage, widget, included, value, ...formProps } =
+        props;
     formProps.rules = formProps.rules || [];
 
     if (required) {
@@ -97,8 +109,9 @@ FormItem.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
     widget: PropTypes.string,
-    disabled: PropTypes.boolean,
-    required: PropTypes.boolean,
+    disabled: PropTypes.bool,
+    required: PropTypes.bool,
     choices: PropTypes.array,
     requiredMessage: PropTypes.string,
+    included: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]),
 };

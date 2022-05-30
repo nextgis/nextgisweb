@@ -12,6 +12,7 @@ const PLACEHOLDERS = {
 
 export function SRSImportFrom({ format: f, projStr, onChange, form }) {
     const [format, setFormat] = useState(f);
+
     const fields = useMemo(
         () => [
             {

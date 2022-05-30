@@ -15,13 +15,16 @@ const btnTitleAliases = {
 
 export function ModelForm(props) {
     const {
-        messages: msg,
-        fields,
-        model: m,
         id,
+        model: m,
+        fields,
         children,
+        messages: msg,
+        allowDelete: allowDelete_,
         ...formProps
     } = props;
+
+    const allowDelete = allowDelete_ ?? true;
     const operation = id !== undefined ? "edit" : "create";
 
     const messages = msg ?? {};
@@ -87,22 +90,29 @@ export function ModelForm(props) {
 
     async function setInitialValues() {
         setStatus("loading");
+        const initialValues = {};
         if (id) {
             try {
                 const resp = await route(model.item, id).get();
-                setValue(resp);
+                Object.assign(initialValues, resp);
+                if (formProps.onChange) {
+                    formProps.onChange({ value: initialValues });
+                }
             } catch (er) {
                 // model item is not exist handler
             }
-        } else {
-            const initialValues = {};
-            for (const f of fields) {
-                if (f.value !== undefined) {
+        }
+        for (const f of fields) {
+            if (f.value !== undefined && initialValues[f.name] === undefined) {
+                if (typeof f.value === "function") {
+                    initialValues[f.name] = f.value(initialValues);
+                } else {
                     initialValues[f.name] = f.value;
                 }
             }
-            setValue(initialValues);
         }
+        setValue(initialValues);
+
         setStatus(null);
     }
 
@@ -135,7 +145,7 @@ export function ModelForm(props) {
                         >
                             {btnTitleAliases[operation]}
                         </SaveButton>
-                        {operation === "edit" ? (
+                        {operation === "edit" && allowDelete ? (
                             <Popconfirm
                                 title={deleteConfirm}
                                 onConfirm={deleteModelItem}
@@ -161,4 +171,6 @@ ModelForm.propTypes = {
     value: PropTypes.object,
     fields: PropTypes.array.isRequired,
     form: PropTypes.any,
+    onChange: PropTypes.func,
+    allowDelete: PropTypes.bool,
 };

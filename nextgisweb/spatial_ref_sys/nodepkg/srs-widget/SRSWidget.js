@@ -4,7 +4,7 @@ import { ModelForm } from "@nextgisweb/gui/model-form";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!";
 import { PropTypes } from "prop-types";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import getMessages from "../srsMessages";
 import { modelObj } from "../srsModel";
 import { SRSImportFrom } from "./SRSImportForm";
@@ -13,22 +13,34 @@ const DEFAULT_DATA = { projStr: "", format: "proj4" };
 
 export function SRSWidget({ id }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isProtected, setIsProtected] = useState(true);
+    const [isSystem, setIsSystem] = useState(true);
     const [form] = Form.useForm();
     const [modalForm] = Form.useForm();
-    const [fields] = useState(() => [
-        {
-            name: "display_name",
-            label: i18n.gettext("Display name"),
-            required: true,
-        },
-        {
-            name: "wkt",
-            label: i18n.gettext("OGC WKT definition"),
-            widget: "textarea",
-            rows: 4,
-            required: true,
-        },
-    ]);
+    const fields = useMemo(() => {
+        return [
+            {
+                name: "display_name",
+                label: i18n.gettext("Display name"),
+                required: true,
+            },
+            {
+                name: "auth_name_srid",
+                label: i18n.gettext("Authority and code"),
+                value: (record) => `${record.auth_name}:${record.auth_srid}`,
+                disabled: true,
+                included: (field, values) =>
+                    id !== undefined && values.protected,
+            },
+            {
+                name: "wkt",
+                label: i18n.gettext("OGC WKT definition"),
+                widget: "textarea",
+                rows: 4,
+                required: true,
+            },
+        ];
+    }, [form.values]);
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -74,16 +86,29 @@ export function SRSWidget({ id }) {
         model: modelObj,
         labelCol: { span: 5 },
         messages: getMessages(),
+        onChange: (obj) => {
+            const v = obj.value;
+            if (v) {
+                if (v.system !== undefined) {
+                    setIsSystem(v.system);
+                }
+                if (v.protected !== undefined) {
+                    setIsProtected(v.protected);
+                }
+            }
+        },
     };
 
     return (
         <ContentBox>
-            <ModelForm {...p}>
-                <Form.Item wrapperCol={{ offset: 5 }}>
-                    <Button size="small" onClick={showModal}>
-                        {i18n.gettext("Import definition")}
-                    </Button>
-                </Form.Item>
+            <ModelForm allowDelete={!isSystem} {...p}>
+                {!isProtected && (
+                    <Form.Item wrapperCol={{ offset: 5 }}>
+                        <Button size="small" onClick={showModal}>
+                            {i18n.gettext("Import definition")}
+                        </Button>
+                    </Form.Item>
+                )}
             </ModelForm>
             <Modal
                 title={<Title />}
