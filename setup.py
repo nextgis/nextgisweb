@@ -48,7 +48,7 @@ requires = [
     'requests[security]==2.26.0',
     'sentry-sdk==1.3.0',
     'shapely==1.8.0',
-    'SQLAlchemy==1.4.29',
+    'SQLAlchemy==1.4.36',
     'transaction==3.0.1',
     'ua-parser==0.10.0',
     'waitress==2.0.0',
