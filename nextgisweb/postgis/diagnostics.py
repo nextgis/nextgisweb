@@ -2,7 +2,7 @@ from enum import Enum
 from socket import gethostbyname, gaierror
 
 import geoalchemy2 as ga
-from sqlalchemy import inspect
+from sqlalchemy import func, inspect, select, sql
 from sqlalchemy.engine import Connection, URL as EngineURL, create_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy.types import (
@@ -15,7 +15,6 @@ from sqlalchemy.types import (
     Time,
 )
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.sql import text as sql, quoted_name
 
 from ..feature_layer import FIELD_TYPE
 from ..lib.logging import logger
@@ -137,7 +136,16 @@ class LayerCheck(Check):
 
     @property
     def qname(self):
-        return quoted_name(self.schema, True) + '.' + quoted_name(self.table, True)
+        return sql.quoted_name(self.schema, True) + '.' + sql.quoted_name(self.table, True)
+
+    @property
+    def sa_table(self):
+        table = sql.table(self.table)
+        table.schema = self.schema
+        table.quote = True
+        table.quote_schema = True
+
+        return table
 
 
 class PostgresCheck(ConnectionCheck):
@@ -167,10 +175,10 @@ class PostgresCheck(ConnectionCheck):
         self.inject(conn)
         self.success(_("Connected to the database."))
 
-        conn.execute(sql("SELECT 1"))
+        conn.execute(sql.text("SELECT 1"))
         self.success(_("Executed {} query.").format('SELECT 1'))
 
-        ver = conn.execute(sql("SHOW server_version")).scalar().split(' ')[0]
+        ver = conn.execute(sql.text("SHOW server_version")).scalar().split(' ')[0]
         self.success(_("PostgreSQL version {}.").format(ver))
 
     def cleanup(self):
@@ -183,7 +191,7 @@ class PostgisCheck(ConnectionCheck):
     title = _("PostGIS extension")
 
     def handler(self, conn: Connection):
-        ver = conn.execute(sql("""
+        ver = conn.execute(sql.text("""
             SELECT extversion FROM pg_extension
             WHERE extname = 'postgis'
         """)).scalar()
@@ -225,7 +233,7 @@ class TableCheck(LayerCheck):
     title = _("Layer table")
 
     def handler(self, conn: Connection):
-        table_type = conn.execute(sql("""
+        table_type = conn.execute(sql.text("""
             SELECT table_type FROM information_schema.tables
             WHERE table_schema = :schema AND table_name = :table
         """), schema=self.schema, table=self.table).scalar()
@@ -241,7 +249,7 @@ class TableCheck(LayerCheck):
             ('DELETE', False),
         ):
             has_privilege = conn.execute(
-                sql("SELECT has_table_privilege(:qname, :privilege)"),
+                sql.text("SELECT has_table_privilege(:qname, :privilege)"),
                 qname=self.qname, privilege=priv,
             ).scalar()
             if has_privilege:
@@ -251,7 +259,7 @@ class TableCheck(LayerCheck):
             else:
                 self.error(_("{} privilege is absent.").format(priv))
 
-        count = conn.execute(sql("SELECT COUNT(*) FROM " + self.qname)).scalar()
+        count = conn.execute(select(func.count('*')).select_from(self.sa_table)).scalar()
         self.say(_("Number of records: {}.").format(count))
 
         if self.column_id is None or self.column_geom is None:
@@ -284,8 +292,17 @@ class IdColumnCheck(LayerCheck):
             nullable = cinfo['nullable']
             has_unique_index = tins.has_unique_index_on(self.column_id)
 
+            column_id = sql.column(self.column_id)
+
             if nullable:
                 self.warning(_("Column can be NULL."))
+
+                expr = self.sa_table.select().where(column_id.is_(None)).exists().select()
+                has_null_values = conn.execute(expr).scalar()
+                if has_null_values:
+                    self.error(_("NULL values in the column."))
+                else:
+                    self.success(_("No NULL values in the column."))
             else:
                 self.success(_("Column cannot be NULL."))
 
@@ -294,12 +311,15 @@ class IdColumnCheck(LayerCheck):
             else:
                 self.success(_("Unique index found."))
 
-            if nullable or not has_unique_index:
-                qname_col = quoted_name(self.column_id, True)
-                not_unique = conn.execute(sql(f"""SELECT EXISTS (
-                    SELECT {qname_col}, COUNT(*) FROM {self.qname}
-                    GROUP BY {qname_col} HAVING COUNT(*) > 1 LIMIT 1
-                )""")).scalar()
+            if not has_unique_index:
+                fcount = func.count('*')
+                expr = select(column_id, fcount) \
+                    .select_from(self.sa_table) \
+                    .group_by(column_id) \
+                    .having(fcount > 1) \
+                    .limit(1) \
+                    .exists().select()
+                not_unique = conn.execute(expr).scalar()
 
                 if not_unique:
                     self.error(_("Non-unique values in the column."))
