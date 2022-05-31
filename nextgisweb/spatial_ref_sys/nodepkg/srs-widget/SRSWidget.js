@@ -41,7 +41,7 @@ export function SRSWidget({ id }) {
                 disabled: isProtected,
             },
         ];
-    }, [form.values, isProtected]);
+    }, [isProtected]);
 
     const showModal = () => {
         setIsModalVisible(true);
