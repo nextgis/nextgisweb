@@ -98,9 +98,11 @@ class PostgisConnection(Base, Resource):
 
         connect_timeout = int(comp.options['connect_timeout'].total_seconds())
         statement_timeout_ms = int(comp.options['statement_timeout'].total_seconds()) * 1000
-        args = dict(connect_args=dict(
-            connect_timeout=connect_timeout,
-            options='-c statement_timeout=%d' % statement_timeout_ms))
+        args = dict(
+            client_encoding='utf-8',
+            connect_args=dict(
+                connect_timeout=connect_timeout,
+                options='-c statement_timeout=%d' % statement_timeout_ms))
         engine_url = make_engine_url(EngineURL.create(
             'postgresql+psycopg2',
             host=self.hostname, port=self.port, database=self.database,

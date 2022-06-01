@@ -164,7 +164,7 @@ class PostgresCheck(ConnectionCheck):
             host=self.hostname, port=self.port, database=self.database,
             username=self.username, password=self.password)
 
-        engine = create_engine(url, poolclass=NullPool, connect_args=dict(
+        engine = create_engine(url, client_encoding='utf-8', poolclass=NullPool, connect_args=dict(
             connect_timeout=5))
         try:
             conn = self._conn = engine.connect()
