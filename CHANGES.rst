@@ -16,6 +16,8 @@ Changes
 - Improved handling of URLs for descriptions and feature layer fields.
 - Improved management of spatial reference systems and catalog integration.
 - Support for simultaneous OAuth authorization code and password grant types.
+- Ability to inject some HTML into the base template for metrics and counters.
+- Fixed editing 25D geometries on web maps.
 
 4.1.0
 -----
@@ -47,7 +49,7 @@ Changes
   such as ZIP-archives or Mapinfo TABs.
 - On-the-fly reprojection for WMS and WFS services.
 - Ability to restrict address search by a country if using Nominatim.
-- Hide inaccessible layers while displaying webmaps.
+- Hide inaccessible layers while displaying web maps.
 - Highlight feature when selecting from search results.
 - Display emails as active ``mailto:`` links in the webmap popup.
 - Ability to delete users and groups from the control panel.
