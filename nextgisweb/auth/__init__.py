@@ -113,7 +113,10 @@ class AuthComponent(Component):
                 user_id, user_la = user.id, user.last_activity
 
                 delta = self.options['activity_delta']
-                if user_la is None or (datetime.utcnow() - user_la) > delta:
+                if (
+                    (user_la is None or (datetime.utcnow() - user_la) > delta)
+                    and not request.session.get('invite', False)
+                ):
 
                     def update_last_activity(request):
                         with transaction.manager:
