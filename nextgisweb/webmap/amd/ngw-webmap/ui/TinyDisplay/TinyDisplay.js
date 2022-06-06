@@ -196,9 +196,11 @@ define([
             this.clientSettings = clientSettings;
 
             // Add basemap's AMD modules
-            array.forEach(clientSettings.basemaps, function (bm) {
-                mids.basemap.push(bm.base.mid);
-            });
+            mids.basemap.push(
+                "ngw-webmap/ol/layer/OSM",
+                "ngw-webmap/ol/layer/XYZ",
+                "ngw-webmap/ol/layer/QuadKey"
+            );
 
             array.forEach(Object.keys(mids), function (k) {
                 var deferred = new LoggedDeferred("_midDeferred." + k);
