@@ -184,6 +184,12 @@ CREATE_TEST_PARAMS = (
         dict(skip_errors=True),
         dict(geometry_type='LINESTRING', feature_count=0),
     ),
+    (
+        # M dimension should be stripped here.
+        'layer_m.gpkg',
+        dict(fix_errors='LOSSY'),
+        dict(geometry_type='POINT', feature_count=2),
+    ),
 )
 
 
