@@ -77,8 +77,8 @@ def test_from_ogr(data, ngw_resource_group, ngw_txn):
 
     fields = feature.fields
     assert fields['int'] == -1
-    # TODO: Date, time and datetime tests fails on shapefile
-    # assert fields['date'] == date(2001, 1, 1)
+    assert fields['date'] == date(2001, 1, 1)
+    # TODO: Time and datetime tests fails on shapefile
     # assert fields['time'] == time(23, 59, 59)
     # assert fields['datetime'] == datetime(2001, 1, 1, 23, 59, 0)
     assert fields['string'] == "Foo bar"
