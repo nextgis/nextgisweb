@@ -1,5 +1,5 @@
 #: amd/ngw-wmsserver/ServiceWidget.js:55 model.py:24
-#: template/section_api_wms.mako:7
+#: template/section_api_wms.mako:10
 msgid "WMS service"
 msgstr "Сервис WMS"
 
@@ -12,7 +12,7 @@ msgid "Add"
 msgstr "Добавить"
 
 #: amd/ngw-wmsserver/template/ServiceWidget.hbs:18
-msgid "Select layer\\'s style"
+msgid "Select layer's style"
 msgstr "Выберите стиль слоя"
 
 #: amd/ngw-wmsserver/template/ServiceWidget.hbs:27
@@ -50,13 +50,13 @@ msgstr ""
 "изображений. Эти изображения обычно генерируются картографическим сервером из"
 " данных базы данных ГИС."
 
-#: template/section_api_wms.mako:16
+#: template/section_api_wms.mako:14
 msgid ""
 "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-"
 "connection"
 msgstr "https://docs.nextgis.ru/docs_ngweb/source/layers.html#id9"
 
-#: template/section_api_wms.mako:17
+#: template/section_api_wms.mako:15
 msgid "Read more"
 msgstr "Подробнее"
 

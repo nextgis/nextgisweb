@@ -13,7 +13,7 @@ msgstr "Выберите изображение для предпросмотр�
 #: amd/ngw-social/template/Widget.hbs:9
 msgid ""
 "The image will be converted to PNG format and downscaled to 1600x630 pixels "
-"if it\\'s bigger."
+"if it's bigger."
 msgstr ""
 "Изображение будет сконвертировано в формат PNG и уменьшен размер до 1600x630"
 "  пикселей, если оно больше."

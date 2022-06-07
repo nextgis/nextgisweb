@@ -42,16 +42,16 @@ msgstr "Просмотр встроенной веб-карты"
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-webmap/Display.js:218 amd/ngw-webmap/Display.js:1025
+#: amd/ngw-webmap/Display.js:218 amd/ngw-webmap/Display.js:1027
 #: amd/ngw-webmap/ItemWidget.js:243
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:224 amd/ngw-webmap/Display.js:356
+#: amd/ngw-webmap/Display.js:224 amd/ngw-webmap/Display.js:358
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:230 amd/ngw-webmap/Display.js:441
+#: amd/ngw-webmap/Display.js:230 amd/ngw-webmap/Display.js:443
 msgid "Share"
 msgstr "Поделиться"
 
@@ -59,49 +59,49 @@ msgstr "Поделиться"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:375 amd/ngw-webmap/Display.js:382
+#: amd/ngw-webmap/Display.js:377 amd/ngw-webmap/Display.js:384
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:405 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:407 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:543 amd/ngw-webmap/Display.js:553
+#: amd/ngw-webmap/Display.js:545 amd/ngw-webmap/Display.js:555
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:736 amd/ngw-webmap/tool/Zoom.js:20
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:483
+#: amd/ngw-webmap/Display.js:738 amd/ngw-webmap/tool/Zoom.js:20
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:485
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:737 amd/ngw-webmap/tool/Zoom.js:23
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:484
+#: amd/ngw-webmap/Display.js:739 amd/ngw-webmap/tool/Zoom.js:23
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:486
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:741 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:488
+#: amd/ngw-webmap/Display.js:743 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:490
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:757
+#: amd/ngw-webmap/Display.js:759
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:762
+#: amd/ngw-webmap/Display.js:764
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:765 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:497
+#: amd/ngw-webmap/Display.js:767 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:499
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:1137
+#: amd/ngw-webmap/Display.js:1139
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:1138
+#: amd/ngw-webmap/Display.js:1140
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -230,7 +230,7 @@ msgid "Add layer"
 msgstr "Добавить слой"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:18
-msgid "Select layer\\'s style"
+msgid "Select layer's style"
 msgstr "Выберите стиль слоя"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:33
@@ -612,7 +612,7 @@ msgid ""
 " a different domain."
 msgstr "<a>CORS</a> должен быть включен при встраивании веб-карты на домене."
 
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:515
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:517
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
