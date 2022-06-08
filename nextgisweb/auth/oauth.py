@@ -211,7 +211,9 @@ class OAuthHelper(object):
     def _token_request(self, grant_type, params):
         data = self._server_request('token', dict(params, grant_type=grant_type))
         exp = datetime.utcnow() + timedelta(seconds=data['expires_in'])
-        refresh_exp = datetime.utcnow() + timedelta(seconds=data['refresh_expires_in'])
+        refresh_exp = datetime.utcnow() + (
+            timedelta(seconds=data['refresh_expires_in']) if 'refresh_expires_in' in data
+            else self.options['refresh_token.lifetime.default'])
         return OAuthGrantResponse(
             access_token=data['access_token'],
             refresh_token=data['refresh_token'],
@@ -345,6 +347,8 @@ class OAuthHelper(object):
                doc="Minimum time delta between profile synchronization with OAuth server."),
 
         Option('timeout', timedelta, default=timedelta(seconds=15), doc="OAuth server request timeout."),
+        Option('refresh_token.lifetime.default', timedelta, default=timedelta(days=7),
+               doc="Refresh token lifetime interval, if not set from server."),
     ))
 
 
