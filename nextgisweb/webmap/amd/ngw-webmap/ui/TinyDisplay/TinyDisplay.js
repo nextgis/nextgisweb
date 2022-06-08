@@ -25,6 +25,7 @@ define([
     "dojo/topic",
     "ngw/route",
     "@nextgisweb/pyramid/i18n!",
+    "@nextgisweb/gui/error",
     "@nextgisweb/pyramid/icon",
     "ngw-pyramid/company-logo/company-logo",
     // tools
@@ -71,6 +72,7 @@ define([
     topic,
     route,
     i18n,
+    errorModule,
     icon,
     companyLogo,
     ToolBase,
@@ -340,6 +342,7 @@ define([
                 function () {
                     widget._toolsSetup();
                     widget._pluginsSetup();
+                    widget._identifyFeatureByAttrValue();
                 }
             ).then(undefined, function (err) { console.error(err); });
             this.tools = [];
@@ -649,6 +652,24 @@ define([
 
         _zoomToInitialExtent: function () {
             this.map.olMap.getView().fit(this._extent);
+        },
+
+        _identifyFeatureByAttrValue: function () {
+            const urlParams = this._urlParams;
+
+            if (!("hl_lid" in urlParams && "hl_attr" in urlParams && "hl_val" in urlParams)) {
+                return;
+            }
+            
+            this.identify
+                .identifyFeatureByAttrValue(urlParams.hl_lid, urlParams.hl_attr, urlParams.hl_val)
+                .then(result => {
+                    if (result) return;
+                    errorModule.errorModal({
+                        title: i18n.gettext("Object not found"),
+                        message: i18n.gettext("Object from URL parameters not found")
+                    });
+                });
         },
 
         _setBasemap: function () {
