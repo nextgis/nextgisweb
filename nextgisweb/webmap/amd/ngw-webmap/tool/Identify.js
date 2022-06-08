@@ -188,7 +188,6 @@ define([
 
             domConstruct.empty(widget.featureContainer.domNode);
 
-
             xhr.get(iurl, {
                 method: "GET",
                 handleAs: "json"
@@ -417,7 +416,7 @@ define([
                 ol.geom.Polygon.fromExtent(bounds));
         },
 
-        _responsePopup: function (response, point, layerLabels) {
+        _responsePopup: function (response, point, layerLabels, afterPopupInit) {
 
             if (response.featureCount === 0) {
                 topic.publish("feature.unhighlight");
@@ -443,6 +442,7 @@ define([
 
             this._popup.setTitle(i18n.gettext("Features") + ": " + response.featureCount);
             this._popup.setPosition(point);
+            if (afterPopupInit && afterPopupInit instanceof Function) afterPopupInit();
 
             on(this._popup._closeSpan, "click", lang.hitch(this, function () {
                 this._popup.setPosition(undefined);
@@ -475,10 +475,6 @@ define([
                     return false;
                 }
                 const foundFeature = features[0];
-                
-                const geometry = wkt.readGeometry(foundFeature.geom);
-                const extent = geometry.getExtent();
-                this.map.zoomToExtent(extent);
 
                 const layerId = layerInfo.resource.id;
                 
@@ -495,12 +491,16 @@ define([
                     }]
                 };
                 
+                const geometry = wkt.readGeometry(foundFeature.geom);
+                const extent = geometry.getExtent();
                 const center = ol.extent.getCenter(extent);
                 
                 const layerLabel = {};
                 layerLabel[layerId] = layerInfo.resource.display_name;
 
-                this._responsePopup(identifyResponse, center, layerLabel);
+                this._responsePopup(identifyResponse, center, layerLabel, () => {
+                    this.map.zoomToExtent(extent);
+                });
                 identifyDeferred.resolve(true);
             });
             
