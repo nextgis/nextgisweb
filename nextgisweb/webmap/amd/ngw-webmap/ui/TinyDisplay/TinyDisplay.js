@@ -552,7 +552,7 @@ define([
 
             companyLogo(this.mapNode);
 
-            this._zoomToInitialExtent();
+            this._setMapExtent();
             this._setBasemap();
 
             this._handlePostMessage();
@@ -616,26 +616,39 @@ define([
             }
         },
 
-        _zoomToInitialExtent: function () {
-            if (this._urlParams.zoom && this._urlParams.lon && this._urlParams.lat) {
-                this.map.olMap.getView().setCenter(
-                    ol.proj.fromLonLat([
-                        parseFloat(this._urlParams.lon),
-                        parseFloat(this._urlParams.lat)
-                    ])
-                );
-                this.map.olMap.getView().setZoom(
-                    parseInt(this._urlParams.zoom)
-                );
+        _setMapExtent: function () {
+            if (this._zoomByUrlParams()) return;
+            this._zoomToInitialExtent();
+        },
+        
+        _zoomByUrlParams: function () {
+            const urlParams = this._urlParams;
 
-                if (this._urlParams.angle) {
-                    this.map.olMap.getView().setRotation(
-                        parseFloat(this._urlParams.angle)
-                    );
-                }
-            } else {
-                this.map.olMap.getView().fit(this._extent);
+            if (!("zoom" in urlParams && "lon" in urlParams && "lat" in urlParams)) {
+                return false;
             }
+
+            this.map.olMap.getView().setCenter(
+                ol.proj.fromLonLat([
+                    parseFloat(urlParams.lon),
+                    parseFloat(urlParams.lat)
+                ])
+            );
+            this.map.olMap.getView().setZoom(
+                parseInt(urlParams.zoom)
+            );
+
+            if ("angle" in urlParams) {
+                this.map.olMap.getView().setRotation(
+                    parseFloat(urlParams.angle)
+                );
+            }
+            
+            return true;
+        },
+
+        _zoomToInitialExtent: function () {
+            this.map.olMap.getView().fit(this._extent);
         },
 
         _setBasemap: function () {
