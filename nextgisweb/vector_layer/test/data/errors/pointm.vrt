@@ -1,0 +1,9 @@
+<OGRVRTDataSource>
+    <OGRVRTLayer name="pointm">
+        <SrcDataSource relativeToVRT="1">pointm.csv</SrcDataSource>
+        <FID/>
+        <GeometryType>wkbPointM</GeometryType>
+        <LayerSRS>WGS84</LayerSRS>
+        <GeometryField encoding="WKT" field="WKT" />
+    </OGRVRTLayer>
+</OGRVRTDataSource>

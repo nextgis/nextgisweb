@@ -165,6 +165,19 @@ CREATE_TEST_PARAMS = (
     ),
 
     (
+        # M dimension should cause an error.
+        'pointm.vrt',
+        dict(),
+        dict(exception=ValidationError),
+    ),
+    (
+        # M dimension should be stripped here.
+        'pointm.vrt',
+        dict(fix_errors='LOSSY'),
+        dict(geometry_type='POINT', feature_count=2),
+    ),
+
+    (
         'out-of-bounds-point.geojson',
         dict(),
         dict(exception=ValidationError),
