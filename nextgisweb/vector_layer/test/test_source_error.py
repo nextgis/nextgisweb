@@ -165,6 +165,12 @@ CREATE_TEST_PARAMS = (
     ),
 
     (
+        # M dimension should cause an error.
+        'pointm.vrt',
+        dict(),
+        dict(exception=ValidationError),
+    ),
+    (
         # M dimension should be stripped here.
         'pointm.vrt',
         dict(fix_errors='LOSSY'),
