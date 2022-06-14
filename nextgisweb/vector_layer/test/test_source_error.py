@@ -165,6 +165,13 @@ CREATE_TEST_PARAMS = (
     ),
 
     (
+        # M dimension should be stripped here.
+        'pointm.vrt',
+        dict(fix_errors='LOSSY'),
+        dict(geometry_type='POINT', feature_count=2),
+    ),
+
+    (
         'out-of-bounds-point.geojson',
         dict(),
         dict(exception=ValidationError),
@@ -183,12 +190,6 @@ CREATE_TEST_PARAMS = (
         'out-of-bounds-linestring.geojson',
         dict(skip_errors=True),
         dict(geometry_type='LINESTRING', feature_count=0),
-    ),
-    (
-        # M dimension should be stripped here.
-        'layer_m.gpkg',
-        dict(fix_errors='LOSSY'),
-        dict(geometry_type='POINT', feature_count=2),
     ),
 )
 
