@@ -213,7 +213,7 @@ class OAuthHelper(object):
         exp = datetime.utcnow() + timedelta(seconds=data['expires_in'])
         refresh_exp = datetime.utcnow() + (
             timedelta(seconds=data['refresh_expires_in']) if 'refresh_expires_in' in data
-            else self.options['refresh_token.lifetime.default'])
+            else self.options['server.refresh_expires_in'])
         return OAuthGrantResponse(
             access_token=data['access_token'],
             refresh_token=data['refresh_token'],
@@ -321,6 +321,9 @@ class OAuthHelper(object):
         Option('server.authorization_header', default=None,
                doc="Add Authorization HTTP header to requests to OAuth server."),
 
+        Option('server.refresh_expires_in', timedelta, default=timedelta(days=7),
+               doc="Default refresh token expiration (if not set by OAuth server)."),
+
         Option('server.logout_endpoint', default=None,
                doc="OAuth logout endpoint URL."),
 
@@ -347,8 +350,6 @@ class OAuthHelper(object):
                doc="Minimum time delta between profile synchronization with OAuth server."),
 
         Option('timeout', timedelta, default=timedelta(seconds=15), doc="OAuth server request timeout."),
-        Option('refresh_token.lifetime.default', timedelta, default=timedelta(days=7),
-               doc="Refresh token lifetime interval, if not set from server."),
     ))
 
 
