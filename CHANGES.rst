@@ -20,6 +20,7 @@ Changes
 - Fixed editing 25D geometries on web maps.
 - M dimenision stripping while creating a vector layer in LOSSY mode.
 - Support for quad-key basemaps on web maps.
+- Cloud-optimized GeoTIFF (COG) enabled by default.
 
 4.1.0
 -----

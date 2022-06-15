@@ -49,6 +49,6 @@ class RasterLayerComponent(Component):
             yield RasterLayerData, resource.id, size
 
     option_annotations = (
-        Option('cog_enabled', bool, default=False),
+        Option('cog_enabled', bool, default=True),
         Option('size_limit', SizeInBytes, default=None),
     )
