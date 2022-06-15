@@ -21,6 +21,7 @@ Changes
 - M dimenision stripping while creating a vector layer in LOSSY mode.
 - Support for quad-key basemaps on web maps.
 - Cloud-optimized GeoTIFF (COG) enabled by default.
+- Selecting features on web maps via ``hl_*`` URL parameters.
 
 4.1.0
 -----
