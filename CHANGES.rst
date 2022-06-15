@@ -18,6 +18,8 @@ Changes
 - Support for simultaneous OAuth authorization code and password grant types.
 - Ability to inject some HTML into the base template for metrics and counters.
 - Fixed editing 25D geometries on web maps.
+- M dimenision stripping while creating a vector layer in LOSSY mode.
+- Support for quad-key basemaps on web maps.
 
 4.1.0
 -----
