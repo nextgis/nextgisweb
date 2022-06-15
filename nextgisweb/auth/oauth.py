@@ -84,7 +84,14 @@ class OAuthHelper(object):
         if scope := self.options.get('scope'):
             params['scope'] = ' '.join(scope)
 
-        tresp = self._token_request('password', params)
+        try:
+            tresp = self._token_request('password', params)
+        except requests.HTTPError as exc:
+            if 400 <= exc.response.status_code <= 403:
+                logger.debug("Password grant type failed: %s", exc.response.text)
+                raise OAuthPasswordGrantTypeException()
+            raise
+
         pwd_token.update_from_grant_response(tresp)
         DBSession.merge(pwd_token)
         return tresp
@@ -425,6 +432,11 @@ class InvalidTokenException(UserException):
 
 class InvalidScopeException(UserException):
     title = _("Invalid OAuth scope")
+    http_status_code = 401
+
+
+class OAuthPasswordGrantTypeException(UserException):
+    title = _("OAuth password grant type failed")
     http_status_code = 401
 
 

@@ -13,7 +13,7 @@ from ..pyramid import WebSession
 
 from .model import User
 from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, UserDisabledException
-from .oauth import OAuthTokenRefreshException
+from .oauth import OAuthTokenRefreshException, OAuthPasswordGrantTypeException
 
 
 @implementer(ISecurityPolicy)
@@ -187,8 +187,12 @@ class SecurityPolicy(object):
         # Step 2: Authentication with OAuth password if enabled
 
         if user is None and self.oauth is not None and self.oauth.password:
-            tresp = self.oauth.grant_type_password(username, password)
-            user = self.oauth.access_token_to_user(tresp.access_token)
+            try:
+                tresp = self.oauth.grant_type_password(username, password)
+            except OAuthPasswordGrantTypeException:
+                pass
+            else:
+                user = self.oauth.access_token_to_user(tresp.access_token)
 
         if user is None:
             raise InvalidCredentialsException()
