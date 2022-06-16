@@ -164,23 +164,21 @@ class AuthComponent(Component):
         )
 
     def query_stat(self):
-        user_count = DBSession.query(db.func.count(User.id)).filter(
-            db.and_(db.not_(User.system), db.not_(User.disabled))).scalar()
+        def ucnt(*fc, agg=db.func.count):
+            return DBSession.query(agg(User.id)).filter(
+                ~User.system, ~User.disabled, *fc).scalar()
 
-        la_everyone = DBSession.query(db.func.max(User.last_activity)).scalar()
-
-        la_authenticated = DBSession.query(db.func.max(User.last_activity)).filter(
-            User.keyname != 'guest').scalar()
-
-        la_administrator = DBSession.query(db.func.max(User.last_activity)).filter(
-            User.member_of.any(keyname='administrators')).scalar()
+        def ula(*fc, agg=db.func.max):
+            return DBSession.query(agg(User.last_activity)).filter(
+                *fc).scalar()
 
         return dict(
-            user_count=user_count,
+            user_count=ucnt(),
+            oauth_count=ucnt(~User.oauth_subject.is_not(None)),
             last_activity=dict(
-                everyone=la_everyone,
-                authenticated=la_authenticated,
-                administrator=la_administrator,
+                everyone=ula(),
+                authenticated=ula(User.keyname != 'guest'),
+                administrator=ula(User.member_of.any(keyname='administrators')),
             )
         )
 
