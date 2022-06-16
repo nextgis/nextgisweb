@@ -103,8 +103,8 @@ define([
 
                 if (val !== null) {
                     if (this.urlRE.test(val)) {
-                        put(tbody, "tr th.display_name $ < td.value a[href=$][target='_blank'] $", 
-                            fieldmap[k].display_name, val, val);
+                        put(tbody, "tr th.display_name $ < td.value a[href=$][target='$'] $", 
+                            fieldmap[k].display_name, val, val.match(/https?:/) ? '_blank' : '_self', val);
                     } else if (this.emailRE.test(val)) {
                         put(tbody, "tr th.display_name $ < td.value a[href=$] $", 
                             fieldmap[k].display_name, 'mailto:' + val, val);
