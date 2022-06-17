@@ -322,7 +322,13 @@ class _cog_attr(SP):
             and srlzr.obj.id is not None
             and value != srlzr.obj.cog
         ):
-            raise ValidationError(_("COG attribute can be set only at creation time."))
+            fn = env.raster_layer.workdir_filename(srlzr.obj.fileobj)
+            srlzr.obj.load_file(fn, env, value)
+
+            size = estimate_raster_layer_data(srlzr.obj)
+            env.core.reserve_storage(
+                COMP_ID, RasterLayerData, value_data_volume=size, resource=srlzr.obj
+            )
         else:
             # Just do nothing, _source_attr serializer will handle the value.
             pass
