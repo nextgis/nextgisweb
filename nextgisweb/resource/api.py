@@ -316,8 +316,7 @@ def search(request):
         else:
             raise ValidationError("Operator '%s' is not supported" % op)
 
-    # TODO: Chech speed of with_polymorphic('*')
-    query = with_polymorphic(Resource, '*') \
+    query = Resource \
         .filter(db.and_(True, *filter_)) \
         .order_by(Resource.display_name)
 
