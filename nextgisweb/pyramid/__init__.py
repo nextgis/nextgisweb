@@ -20,7 +20,7 @@ from .util import (
 from .model import Base, Session, SessionStore
 from .session import WebSession
 from .command import ServerCommand, AMDPackagesCommand  # NOQA
-from .util import _
+from .util import _, gensecret
 
 __all__ = [
     'StaticFileResponse',
@@ -46,6 +46,10 @@ class PyramidComponent(Component):
             comp.setup_pyramid(config)
 
         return config
+
+    def initialize_db(self):
+        self.env.core.init_settings(self.identity, 'custom_css.ckey', gensecret(8))
+        self.env.core.init_settings(self.identity, 'company_logo.ckey', gensecret(8))
 
     @require('resource')
     def setup_pyramid(self, config):
@@ -93,6 +97,7 @@ class PyramidComponent(Component):
         result['help_page_url'] = self.env.pyramid.help_page_url_view(request)
         result['company_logo'] = dict(
             enabled=self.company_logo_enabled(request),
+            ckey=self.env.core.settings_get('pyramid', 'company_logo.ckey'),
             link=self.company_url_view(request))
         result['langages'] = []
         for locale in self.env.core.locale_available:

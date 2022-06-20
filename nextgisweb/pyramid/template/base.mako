@@ -36,7 +36,11 @@
     <link href="${request.route_url('jsrealm.dist', subpath='stylesheet/layout.css')}"
         rel="stylesheet" type="text/css"/>
 
-    <link href="${request.route_url('pyramid.custom_css')}" rel="stylesheet" type="text/css"/>
+    <%
+        custom_css_url = request.route_url('pyramid.custom_css', _query=dict(
+            ckey=request.env.core.settings_get('pyramid', 'custom_css.ckey')))
+    %>
+    <link href="${custom_css_url}" rel="stylesheet" type="text/css"/>
 
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
 

@@ -19,7 +19,7 @@ from ..core.exception import ValidationError
 from ..models import DBSession
 from ..resource import Resource, MetadataScope
 
-from .util import _, ClientRoutePredicate, parse_origin
+from .util import _, ClientRoutePredicate, gensecret, parse_origin
 
 
 def _get_cors_olist():
@@ -365,9 +365,18 @@ def custom_css_get(request):
 
     is_json = request.GET.get('format', 'css').lower() == 'json'
     if is_json:
-        return Response(json.dumpb(body), content_type='application/json')
+        response = Response(json.dumpb(body), content_type='application/json')
     else:
-        return Response(body, content_type='text/css', charset='utf-8', expires=timedelta(days=1))
+        response = Response(body, content_type='text/css', charset='utf-8')
+
+    if (
+        'ckey' in request.GET
+        and request.GET['ckey'] == request.env.core.settings_get('pyramid', 'custom_css.ckey')
+    ):
+        response.cache_control.public = True
+        response.cache_control.max_age = int(timedelta(days=1).total_seconds())
+
+    return response
 
 
 def custom_css_put(request):
@@ -381,6 +390,8 @@ def custom_css_put(request):
     else:
         request.env.core.settings_set('pyramid', 'custom_css', data)
 
+    request.env.core.settings_set('pyramid', 'custom_css.ckey', gensecret(8))
+
     if is_json:
         return Response(json.dumpb(None), content_type="application/json")
     else:
@@ -390,13 +401,21 @@ def custom_css_put(request):
 def logo_get(request):
     try:
         logodata = request.env.core.settings_get('pyramid', 'logo')
-        bindata = base64.b64decode(logodata)
-        return Response(
-            bindata, content_type='image/png',
-            expires=timedelta(days=1))
-
     except KeyError:
         raise HTTPNotFound()
+
+    bindata = base64.b64decode(logodata)
+    response = Response(
+        bindata, content_type='image/png')
+
+    if (
+        'ckey' in request.GET
+        and request.GET['ckey'] == request.env.core.settings_get('pyramid', 'logo.ckey')
+    ):
+        response.cache_control.public = True
+        response.cache_control.max_age = int(timedelta(days=1).total_seconds())
+
+    return response
 
 
 def logo_put(request):
@@ -415,18 +434,31 @@ def logo_put(request):
                 'pyramid', 'logo',
                 data.decode('utf-8'))
 
+    request.env.core.settings_set('pyramid', 'logo.ckey', gensecret(8))
+
     return Response()
 
 
 def company_logo(request):
+    response = None
     company_logo_view = request.env.pyramid.company_logo_view
     if company_logo_view is not None:
         try:
-            return company_logo_view(request)
+            response = company_logo_view(request)
         except HTTPNotFound:
             pass
 
-    return FileResponse(resource_filename('nextgisweb', 'static/img/logo_outline.png'))
+    if response is None:
+        response = FileResponse(resource_filename('nextgisweb', 'static/img/logo_outline.png'))
+
+    if (
+        'ckey' in request.GET
+        and request.GET['ckey'] == request.env.core.settings_get('pyramid', 'company_logo.ckey')
+    ):
+        response.cache_control.public = True
+        response.cache_control.max_age = int(timedelta(days=1).total_seconds())
+
+    return response
 
 
 def setup_pyramid(comp, config):

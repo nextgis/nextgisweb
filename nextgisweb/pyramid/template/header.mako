@@ -29,8 +29,11 @@
                     <img class="logo__pic" src="${request.static_url('nextgisweb:static/img/return-button.svg')}"/>
                 %else:
                     <%
-                        logo_url = request.route_url('pyramid.logo') if request.env.core.settings_exists('pyramid', 'logo') \
-                            else request.static_url('nextgisweb:static/img/nextgis_logo_s.svg')
+                        if request.env.core.settings_exists('pyramid', 'logo'):
+                            logo_url = request.route_url('pyramid.logo', _query=dict(
+                                ckey=request.env.core.settings_get('pyramid', 'logo.ckey')))
+                        else:
+                            logo_url = request.static_url('nextgisweb:static/img/nextgis_logo_s.svg')
                     %>
                     <img class="logo__pic" src="${logo_url}"/>
                 %endif

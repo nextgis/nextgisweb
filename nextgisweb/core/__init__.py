@@ -45,6 +45,13 @@ from .backup import BackupBase, BackupMetadata  # NOQA
 from .storage import StorageComponentMixin, KindOfData  # NOQA
 
 
+class _NO_DEFAULT:
+    pass
+
+
+NO_DEFAULT = _NO_DEFAULT()
+
+
 class CoreComponent(
     StorageComponentMixin,
     Component
@@ -185,12 +192,15 @@ class CoreComponent(
             Setting.component == component, Setting.name == name
         ))).scalar()
 
-    def settings_get(self, component, name):
+    def settings_get(self, component, name, default=NO_DEFAULT):
         try:
             obj = Setting.filter_by(component=component, name=name).one()
             return json.loads(obj.value)
         except NoResultFound:
-            raise KeyError("Setting %s.%s not found!" % (component, name))
+            if default is NO_DEFAULT:
+                raise KeyError("Setting %s.%s not found!" % (component, name))
+            else:
+                return default
 
     def settings_set(self, component, name, value):
         try:

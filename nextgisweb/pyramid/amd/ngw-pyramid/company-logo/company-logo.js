@@ -6,21 +6,22 @@ define([
     "xstyle/css!./company-logo.css"
 ], function (
     api,
-    settings,
+    settingsPyramid,
     i18n
 ) {
     return function (mapNode) {
-        if (settings.company_logo.enabled) {
+        var settings = settingsPyramid.company_logo;
+        if (settings.enabled) {
             var anchor = document.createElement('a');
             anchor.className = 'map-logo';
 
             var image = document.createElement('img');
-            image.src = api.routeURL('pyramid.company_logo');
+            image.src = api.routeURL('pyramid.company_logo') + '?ckey=' + settings.ckey;
 
-            if (settings.company_logo.link !== null && settings.company_logo.link.trim() !== '') {
-                anchor.href = settings.company_logo.link;
+            if (settings.link !== null && settings.link.trim() !== '') {
+                anchor.href = settings.link;
                 anchor.target = '_blank';
-                if (settings.company_logo.link.search(/:\/\/nextgis/) !== -1) {
+                if (settings.link.search(/:\/\/nextgis/) !== -1) {
                     image.alt = i18n.gettext('Get your own Web GIS at nextgis.com');
                 }
             }
