@@ -28,6 +28,7 @@ define([
     return declare("ngw.raster.layer.Widget", [_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
         title: i18n.gettext("Raster layer"),
+        prefix: "raster_layer",
 
         constructor: function () {
             this.wSrs = SRSSelect({allSrs: null});
@@ -40,7 +41,17 @@ define([
 
         serialize: function(data, lunkwill) {
             this.inherited(arguments);
-            lunkwill.suggest(this.composite.operation == "create");
+
+            var initial_cog_value = this.initial_cog_value;
+            lunkwill.suggest(
+                this.composite.operation == "create" ||
+                  data.raster_layer.source !== undefined ||
+                  data.raster_layer.cog !== initial_cog_value
+              );
+        },
+
+        deserializeInMixin: function (data) {
+            this.initial_cog_value = data.raster_layer.cog;
         },
 
         serializeInMixin: function (data) {
@@ -49,13 +60,7 @@ define([
             
             value.srs = { id: this.wSrs.get("value") };
             value.source = this.wFile.data;
-
-            if (
-                this.composite.operation == "create" ||
-                this.composite.operation == "update" && value.source
-            ) {
-                value.cog = this.wCOG.checked;
-            }
+            value.cog = this.wCOG.checked;
         },
 
         validateDataInMixin: function (errback) {
