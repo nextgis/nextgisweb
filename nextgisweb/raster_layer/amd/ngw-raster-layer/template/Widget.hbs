@@ -1,4 +1,5 @@
-<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" class="padding-block">
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${prefix}" class="padding-block">
     <div data-dojo-type="ngw-file-upload/Uploader" data-dojo-attach-point="wFile" 
         data-dojo-props="uploaderLinkText: {{gettextString 'Select a dataset'}},
                          uploaderHelpText: {{gettextString 'Dataset should be in GeoTIFF format.'}}
@@ -9,6 +10,7 @@
         -->
         <div data-dojo-type="dijit/form/CheckBox"
             data-dojo-attach-point="wCOG"
+            data-ngw-serialize="cog"
             title="{{gettext 'Upload as Cloud Optimized GeoTIFF (COG)'}}" checked>
         </div>
     </div>
