@@ -14,7 +14,7 @@ from pyramid.renderers import render as render_template
 from pyramid.httpexceptions import HTTPBadRequest
 from sqlalchemy.orm.exc import NoResultFound
 
-from ..core.exception import ValidationError
+from ..core.exception import InsufficientPermissions, ValidationError
 from ..pyramid.exception import json_error
 from ..lib.json import dumps
 from ..lib.geometry import Geometry
@@ -50,7 +50,19 @@ def layer_by_keyname(service, keyname):
 
 
 def handler(obj, request):
-    request.resource_permission(ServiceScope.connect)
+    try:
+        request.resource_permission(ServiceScope.connect)
+    except InsufficientPermissions:
+        if request.authenticated_userid is None:
+            # Force 401 Unauthorized for unauthenticated users. It's useful for MapInfo
+            # because there is no way to give user credentials directly there.
+
+            # TODO: Maybe it should be implemented in the error handler with an additional
+            # option to enable this behavior.
+
+            return Response(status_code=401, headers={'WWW-Authenticate': "Basic"})
+        else:
+            raise
 
     params, root_body = parse_request(request)
 
