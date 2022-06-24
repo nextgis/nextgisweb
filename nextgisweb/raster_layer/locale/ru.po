@@ -123,8 +123,8 @@ msgid "Coordinate system"
 msgstr "Система координат"
 
 #: amd/ngw-raster-layer/template/Widget.hbs:12
-msgid "Upload as Cloud Optimized GeoTIFF (COG)"
-msgstr "Загрузить как Cloud Optimized GeoTIFF (COG)"
+msgid "Cloud Optimized GeoTIFF (COG)"
+msgstr "Cloud Optimized GeoTIFF (COG)"
 
 #: template/section_api_cog.mako:7
 msgid "Cloud Optimized GeoTIFF"
