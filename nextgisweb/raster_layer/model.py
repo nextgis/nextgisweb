@@ -150,7 +150,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             cmd = ['gdal_translate', '-of', 'GTiff']
             ds_measure = ds
 
-        size_expected = raster_size(ds_measure, 1 if add_alpha else 0)
+        size_expected = raster_size(
+            ds_measure, 1 if add_alpha else 0,
+            data_type=data_type if gdal.VersionInfo() < '3030300' else None)  # https://github.com/OSGeo/gdal/issues/4469
         ds_measure = None
 
         size_limit = env.raster_layer.options['size_limit']
