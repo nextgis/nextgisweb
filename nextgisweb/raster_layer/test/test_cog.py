@@ -11,7 +11,7 @@ from nextgisweb.spatial_ref_sys import SRS
 from .validate_cloud_optimized_geotiff import validate
 
 
-def test_cog(ngw_webtest_app, ngw_resource_group, ngw_env):
+def test_cog(ngw_webtest_app, ngw_auth_administrator, ngw_resource_group, ngw_env):
     source = "sochi-aster-dem.tif"
     source_srs_id = 4326
     src = os.path.join(os.path.split(__file__)[0], "data", source)
