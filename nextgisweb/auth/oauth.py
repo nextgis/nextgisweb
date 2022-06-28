@@ -307,6 +307,8 @@ class OAuthHelper(object):
         Option('client.secret', default=None, secure=True,
                doc="OAuth client secret"),
 
+        Option('server.display_name', default='OAuth'),
+
         Option('server.authorization_code', bool, default=True,
                doc="Use authorization code grant type."),
 

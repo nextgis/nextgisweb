@@ -10,7 +10,7 @@ import { PropTypes } from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import { authStore } from "../store";
 
-const oauthText = i18n.gettext("Sign in with OAuth");
+const oauthText = i18n.gettext("Sign in with {}");
 const titleText = i18n.gettext("Sign in to Web GIS");
 const loginText = i18n.gettext("Sign in");
 
@@ -82,7 +82,7 @@ export const LoginForm = observer((props = {}) => {
                     href={oauthUrl}
                     style={{ marginBottom: "1em" }}
                 >
-                    {oauthText}
+                    {oauthText.replace("{}", settings.oauth.display_name)}
                 </Button>
             )}
             {authStore.loginError && (

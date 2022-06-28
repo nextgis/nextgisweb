@@ -22,49 +22,49 @@ msgstr "Администратор"
 msgid "Owner"
 msgstr "Владелец"
 
-#: __init__.py:265
+#: __init__.py:280
 #, python-format
 msgid "Maximum number of users is reached. Your current plan user number limit is %d."
 msgstr "Превышено максимальное количество пользователей. Лимит текущего плана - %d."
 
-#: api.py:264
+#: api.py:304
 #, python-format
 msgid "The '%s' attribute of the system principal can't be changed."
 msgstr "Атрибут '%s' системного субъекта не может быть изменен."
 
-#: api.py:273
+#: api.py:313
 #, python-format
 msgid "Principal '%s' already exists."
 msgstr "Субъект '%s' уже существует."
 
-#: api.py:275
+#: api.py:315
 #, python-format
 msgid "Principal with full name '%s' already exists."
 msgstr "Субъект с наименованием '%s' уже существует."
 
-#: api.py:311
+#: api.py:351
 #, python-format
 msgid "User '%s' can't be a member of a group."
 msgstr "Пользователь '%s' не может быть членом группы."
 
-#: api.py:317
+#: api.py:357
 msgid "System principals can't be deleted."
 msgstr "Системные субъекты не могут быть удалены."
 
-#: api.py:333
+#: api.py:373
 msgid "User is referenced with resources"
 msgstr "Пользователь связан с ресурсами"
 
-#: api.py:334
+#: api.py:374
 msgid "Group is referenced with resources"
 msgstr "Группа связана с ресурсами"
 
-#: api.py:346
+#: api.py:386
 #, python-format
 msgid "Invalid principal name: '%s'."
 msgstr "Недопустимое имя субъекта: '%s'."
 
-#: api.py:381
+#: api.py:421
 msgid "The 'administrators' group must have at least one enabled member."
 msgstr "Группа 'administrators' должна иметь хотя бы одного включенного участника."
 
@@ -80,69 +80,73 @@ msgstr "Неверные данные учетной записи"
 msgid "User is disabled"
 msgstr "Пользователь заблокирован"
 
-#: oauth.py:120
+#: oauth.py:161
 msgid "User is already bound"
 msgstr "Пользователь уже привязан"
 
-#: oauth.py:328
+#: oauth.py:426
 msgid "OAuth authorization error"
 msgstr "Ошибка авторизации OAuth"
 
-#: oauth.py:333
+#: oauth.py:431
 msgid "Invalid OAuth token"
 msgstr "Некорректный токен OAuth"
 
-#: oauth.py:338
+#: oauth.py:436
+msgid "Invalid OAuth scope"
+msgstr "Некорректный скоуп OAuth"
+
+#: oauth.py:441
+msgid "OAuth password grant type failed"
+msgstr "Не удалось получить доступ по паролю OAuth"
+
+#: oauth.py:446
 msgid "OAuth token refresh failed"
 msgstr "Не удалось выполнить обновление токена OAuth"
 
-#: oauth.py:343
+#: oauth.py:451
 msgid "OAuth access token is expired"
 msgstr "Срок действия токена OAuth истек"
 
-#: views.py:62
+#: nodepkg/login-form/LoginForm.js:14 view.py:50
+msgid "Sign in to Web GIS"
+msgstr "Войти в Веб ГИС"
+
+#: view.py:72
 msgid "Session not found."
 msgstr "Сессия не найдена."
 
-#: views.py:67
+#: view.py:77
 msgid "Invalid 'expires' parameter."
 msgstr "Некорректный параметр 'expires'."
 
-#: views.py:70
+#: view.py:80
 msgid "Session expired."
 msgstr "Сессия устарела."
 
-#: views.py:227
+#: view.py:212
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: views.py:233 views.py:347
+#: view.py:219 view.py:332
 msgid "Users"
 msgstr "Пользователи"
 
-#: views.py:246
+#: view.py:232
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: views.py:261 views.py:351
+#: view.py:247 view.py:336
 msgid "Groups"
 msgstr "Группы"
 
-#: views.py:274
+#: view.py:260
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: views.py:355
+#: view.py:340
 msgid "Groups and users"
 msgstr "Группы и пользователи"
-
-#: amd/ngw-auth/SettingsForm.js:54
-msgid "Saved"
-msgstr "Сохранено"
-
-#: amd/ngw-auth/template/SettingsForm.hbs:13 nodepkg/user-widget/UserWidget.js:47
-msgid "Language"
-msgstr "Язык"
 
 #: nodepkg/browse.js:9 nodepkg/userMessages.js:5
 msgid "Delete user?"
@@ -185,6 +189,31 @@ msgstr "Назначать при регистрации"
 msgid "Description"
 msgstr "Описание"
 
+#: nodepkg/login-form/LoginForm.js:13
+msgid "Sign in with {}"
+msgstr "Войти через {}"
+
+#: nodepkg/login-form/LoginForm.js:15 template/session_invite.mako:17
+msgid "Sign in"
+msgstr "Войти"
+
+#: nodepkg/login-form/LoginForm.js:27 nodepkg/user-browse/UserBrowse.js:23
+#: nodepkg/user-widget/UserWidget.js:20
+msgid "Login"
+msgstr "Логин"
+
+#: nodepkg/login-form/LoginForm.js:32 nodepkg/user-widget/UserWidget.js:26
+msgid "Password"
+msgstr "Пароль"
+
+#: nodepkg/settings-form/SettingsForm.js:16 nodepkg/user-widget/UserWidget.js:47
+msgid "Language"
+msgstr "Язык"
+
+#: nodepkg/settings-form/SettingsForm.js:41
+msgid "Saved"
+msgstr "Сохранено"
+
 #: nodepkg/user-browse/UserBrowse.js:10 nodepkg/user-widget/UserWidget.js:35
 msgid "Disabled"
 msgstr "Отключен"
@@ -192,11 +221,6 @@ msgstr "Отключен"
 #: nodepkg/user-browse/UserBrowse.js:11
 msgid "Enabled"
 msgstr "Включен"
-
-#: nodepkg/user-browse/UserBrowse.js:23 nodepkg/user-widget/UserWidget.js:20
-#: template/login.mako:46
-msgid "Login"
-msgstr "Логин"
 
 #: nodepkg/user-browse/UserBrowse.js:29
 msgid "Last activity"
@@ -214,10 +238,6 @@ msgstr "Отключить"
 msgid "Enable"
 msgstr "Включить"
 
-#: nodepkg/user-widget/UserWidget.js:26 template/login.mako:49
-msgid "Password"
-msgstr "Пароль"
-
 #: nodepkg/user-widget/UserWidget.js:31
 msgid "Enter new password here"
 msgstr "Для изменения пароля заполните это поле"
@@ -229,24 +249,3 @@ msgstr "Член групп"
 #: nodepkg/user-widget/UserWidget.js:53
 msgid "OAuth subject"
 msgstr "Субъект OAuth"
-
-#: template/login.mako:15
-msgid "Authorization Required"
-msgstr "Требуется авторизация"
-
-#: template/login.mako:17
-msgid "Sign in to Web GIS"
-msgstr "Войти в Веб ГИС"
-
-#: template/login.mako:29 template/login.mako:39 template/settings.mako:13
-msgid "Sign in with OAuth"
-msgstr "Войти через OAuth"
-
-#: template/login.mako:55 template/session_invite.mako:17
-msgid "Sign in"
-msgstr "Войти"
-
-#: template/settings.mako:15
-msgid "Your account is bound to NextGIS ID account"
-msgstr "Ваш аккаунт связан с аккаунтом NextGIS ID"
-

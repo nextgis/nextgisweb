@@ -160,7 +160,10 @@ class AuthComponent(Component):
     def client_settings(self, request):
         enabled = (self.oauth is not None) and self.oauth.authorization_code
         return dict(
-            oauth=dict(enabled=enabled)
+            oauth=dict(
+                enabled=enabled,
+                display_name=self.oauth.options['server.display_name'] if enabled else None,
+            )
         )
 
     def query_stat(self):
