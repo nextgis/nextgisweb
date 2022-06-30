@@ -236,14 +236,9 @@ class FileStorageComponent(Component):
             else:
                 kept_dirs += 1
 
-        if dry_run:
-            logger.info(
-                "%d orphaned files, %d directories found (%d bytes)",
-                deleted_files, deleted_dirs, deleted_bytes)
-        else:
-            logger.info(
-                "%d files, %d directories deleted (%d bytes)",
-                deleted_files, deleted_dirs, deleted_bytes)
+        logger.info(
+            "%d orphaned files, %d directories found (%d bytes)",
+            deleted_files, deleted_dirs, deleted_bytes)
 
         logger.info(
             "%d files, %d directories remain (%d bytes)",
