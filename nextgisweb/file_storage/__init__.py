@@ -185,33 +185,19 @@ class FileStorageComponent(Component):
             logger.info("fileobj references not found.")
             return
 
-        columns = list()
-        q = DBSession.query(FileObj.id)
+        q = DBSession.query(FileObj)
         for schema, table, column in db_set:
-            с = sql.column(column)
-            t = sql.table(table, с, schema=schema)
-            q = q.join(t, FileObj.id == с, isouter=True)
-            columns.append(с)
-        q = q.where(sql.func.coalesce(*columns).is_(None))
+            c = sql.column(column)
+            sql.table(table, c, schema=schema)  # Bind column to table
+            q = q.filter(~exists().where(FileObj.id == c))
 
         if dry_run:
             records = q.count()
-            logger.info("%d unreferenced file records found", records)
-            return
-
-        q = FileObj.filter(FileObj.id.in_(q))
-
-        batch_size = 5000
-        records = 0
-
-        for i in range(id_min, id_max + 1, batch_size):
-            q2 = q.filter(
-                i <= FileObj.id,
-                FileObj.id < i + batch_size)
+        else:
             with transaction.manager:
-                records += q2.delete(synchronize_session=False)
+                records = q.delete(synchronize_session=False)
 
-        logger.info("%d unreferenced file records deleted", records)
+        logger.info("%d unreferenced file records found", records)
 
     def cleanup_orphaned(self, dry_run):
         deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
