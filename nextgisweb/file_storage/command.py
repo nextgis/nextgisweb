@@ -34,8 +34,9 @@ class CleanUpCommand():
     @classmethod
     def execute(cls, args, env):
         env.file_storage.cleanup(
-            unreferenced=not args.dry_run and args.unreferenced,
-            orphaned=not args.dry_run and args.orphaned)
+            dry_run=args.dry_run,
+            unreferenced=args.unreferenced,
+            orphaned=args.orphaned)
 
         if args.dry_run:
             print("Use --no-dry-run option to make the changes!")

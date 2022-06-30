@@ -6,7 +6,7 @@ from shutil import copyfileobj
 from operator import itemgetter
 
 import transaction
-from sqlalchemy import sql, text
+from sqlalchemy import sql, text, exists
 
 from ..lib.config import Option
 from ..lib.logging import logger
@@ -122,15 +122,17 @@ class FileStorageComponent(Component):
 
     def maintenance(self):
         super().maintenance()
-        self.cleanup()
+        self.cleanup(dry_run=False)
 
-    def cleanup(self, unreferenced=False, orphaned=True):
+    def cleanup(self, *, dry_run, unreferenced=False, orphaned=True):
         logger.info('Cleaning up file storage...')
 
-        self.cleanup_unreferenced(not unreferenced)
-        self.cleanup_orphaned(not orphaned)
+        if unreferenced:
+            self.cleanup_unreferenced(dry_run=dry_run)
+        if orphaned:
+            self.cleanup_orphaned(dry_run=dry_run)
 
-    def cleanup_unreferenced(self, dry_run):
+    def cleanup_unreferenced(self, *, dry_run):
         id_min, id_max = DBSession.query(
             sql.func.min(FileObj.id), sql.func.max(FileObj.id)).first()
         if id_min is None:
@@ -199,7 +201,7 @@ class FileStorageComponent(Component):
 
         logger.info("%d unreferenced file records found", records)
 
-    def cleanup_orphaned(self, dry_run):
+    def cleanup_orphaned(self, *, dry_run):
         deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
         kept_files, kept_dirs, kept_bytes = 0, 0, 0
 
