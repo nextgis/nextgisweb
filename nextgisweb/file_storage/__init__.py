@@ -230,10 +230,10 @@ class FileStorageComponent(Component):
 
                 if obj is None and (dt.utcnow() - dt.utcfromtimestamp(stat.st_ctime) > delta):
                     if dry_run:
+                        deleted_files_suppose += 1
+                    else:
                         os.remove(fullfn)
                         relist = True
-                    else:
-                        deleted_files_suppose += 1
                     deleted_files += 1
                     deleted_bytes += stat.st_size
                 else:
@@ -244,7 +244,7 @@ class FileStorageComponent(Component):
                 (not relist and len(filenames) == 0 and len(dirnames) == 0)
                 or len(os.listdir(dirpath)) == deleted_files_suppose  # NOQA: W503
             ):
-                if dry_run:
+                if not dry_run:
                     os.rmdir(dirpath)
                 deleted_dirs += 1
             else:
