@@ -242,5 +242,5 @@ class FileStorageComponent(Component):
 
     option_annotations = (
         Option('path', default=None),
-        Option('cleanup_keep_interval', timedelta, default=timedelta(hours=4)),
+        Option('cleanup_keep_interval', timedelta, default=timedelta(days=2)),
     )
