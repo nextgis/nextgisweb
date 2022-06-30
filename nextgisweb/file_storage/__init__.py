@@ -174,18 +174,12 @@ class FileStorageComponent(Component):
                 ):
                     sa_set.add((
                         table.schema if table.schema is not None else 'public',
-                        table.name,
-                        fk.parent.name))
+                        table.name, fk.parent.name))
 
         if sa_set != db_set:
-            logger.error("Database and SQLAlchemy references mismatch!")
-            logger.debug(f"DB set: {db_set}")
-            logger.debug(f"SQLAlchemy set: {sa_set}")
-            return
-
-        if len(db_set) == 0:
-            logger.info("fileobj references not found.")
-            return
+            raise RuntimeError(
+                "FileObj DB and SQLAlchemy references mismatch: "
+                "{} != {}".format(db_set, sa_set))
 
         q = DBSession.query(FileObj)
         for schema, table, column in db_set:
