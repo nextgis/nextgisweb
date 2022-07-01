@@ -239,7 +239,7 @@ class OAuthHelper(object):
             keyname_base = _fallback_value(user.keyname, user.oauth_subject)
             for idx in itertools.count():
                 candidate = clean_user_keyname(keyname_base)
-                candidate = enum_name(candidate, idx)
+                candidate = enum_name(candidate, idx, sep="_")
                 if User.filter(
                     sa.func.lower(User.keyname) == candidate.lower(),
                     User.id != user.id
@@ -257,7 +257,7 @@ class OAuthHelper(object):
 
             display_name_base = _fallback_value(user.display_name, user.keyname)
             for idx in itertools.count():
-                candidate = enum_name(display_name_base, idx)
+                candidate = enum_name(display_name_base, idx, sep=" ")
                 if User.filter(
                     sa.func.lower(User.display_name) == candidate.lower(),
                     User.id != user.id

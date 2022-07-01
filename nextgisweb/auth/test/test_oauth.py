@@ -116,6 +116,45 @@ def freezegun():
 
 @pytest.mark.parametrize('setup_oauth', [{
     'oauth.profile.keyname.attr': 'preferred_username',
+    'oauth.profile.display_name.attr': 'first_name, last_name',
+}], indirect=['setup_oauth'])
+def test_update_profile(ngw_env, ngw_txn):
+    u1 = User(oauth_subject=str(uuid4())).persist()
+
+    with DBSession.no_autoflush:
+        ngw_env.auth.oauth._update_user(u1, {
+            "preferred_username": "john_doe",
+            "first_name": "John",
+            "last_name": "Doe"
+        })
+        DBSession.flush()
+
+    assert u1.keyname == "john_doe"
+    assert u1.display_name == "John Doe"
+
+    u2 = User(oauth_subject=str(uuid4())).persist()
+    with DBSession.no_autoflush:
+        ngw_env.auth.oauth._update_user(u2, {
+            "preferred_username": "JOHN_DOE",
+            "first_name": "JOHN",
+            "last_name": "DOE"
+        })
+        DBSession.flush()
+
+    assert u2.keyname == "JOHN_DOE_2"
+    assert u2.display_name == "JOHN DOE 2"
+
+    u3 = User(oauth_subject=str(uuid4())).persist()
+    with DBSession.no_autoflush:
+        ngw_env.auth.oauth._update_user(u3, {"preferred_username": "_3"})
+        DBSession.flush()
+
+    assert u3.keyname == "u3"
+    assert u3.display_name == "u3"
+
+
+@pytest.mark.parametrize('setup_oauth', [{
+    'oauth.profile.keyname.attr': 'preferred_username',
     'oauth.profile.display_name.attr': 'family_name',
 }], indirect=['setup_oauth'])
 def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ngw_env):

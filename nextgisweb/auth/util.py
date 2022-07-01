@@ -7,16 +7,20 @@ _ = trstr_factory(COMP_ID)
 
 
 def clean_user_keyname(value):
-    """Remove invalid chars from user keyname"""
-
+    # Replace all invalid chars with underscores
     value = re.sub(r'(_*[^A-Za-z0-9_]+)+_*', '_', value)
-    value = re.sub(r'^([^A-Za-z\_])', r'_\1', value)
+
+    # Add "u" prefix if it doesn't start with letter
+    value = re.sub(r'^_*([^A-Za-z])', r'u\1', value)
+
+    # Strip underscores
+    value = value.strip('_')
+
     return value
 
 
-def enum_name(value, idx):
-    """Add index to avoid conflicts"""
-
+def enum_name(value, idx, sep='_'):
     if idx > 0:
-        value += ('_{}' if not value.endswith('_') else '{}').format(idx)
+        value = value.rstrip(sep)
+        value += sep + str(idx + 1)
     return value
