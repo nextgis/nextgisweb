@@ -196,14 +196,13 @@ class FileStorageComponent(Component):
         logger.info("%d unreferenced file records found", records)
 
     def cleanup_orphaned(self, *, dry_run):
-        deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
-        kept_files, kept_dirs, kept_bytes = 0, 0, 0
+        deleted_files = deleted_bytes = 0
+        kept_files = kept_bytes = 0
 
         delta = self.options['cleanup_keep_interval']
 
         for (dirpath, dirnames, filenames) in os.walk(self.path, topdown=False):
             relist = False
-            deleted_files_suppose = 0
 
             for fn in filenames:
                 obj = FileObj.filter_by(uuid=fn).first()
@@ -211,9 +210,7 @@ class FileStorageComponent(Component):
                 stat = os.stat(fullfn)
 
                 if obj is None and (dt.utcnow() - dt.utcfromtimestamp(stat.st_ctime) > delta):
-                    if dry_run:
-                        deleted_files_suppose += 1
-                    else:
+                    if not dry_run:
                         os.remove(fullfn)
                         relist = True
                     deleted_files += 1
@@ -223,22 +220,21 @@ class FileStorageComponent(Component):
                     kept_bytes += stat.st_size
 
             if (
-                (not relist and len(filenames) == 0 and len(dirnames) == 0)
-                or len(os.listdir(dirpath)) == deleted_files_suppose  # NOQA: W503
+                not dry_run
+                and (
+                    (not relist and len(filenames) == 0 and len(dirnames) == 0)
+                    or len(os.listdir(dirpath)) == 0
+                )
             ):
-                if not dry_run:
-                    os.rmdir(dirpath)
-                deleted_dirs += 1
-            else:
-                kept_dirs += 1
+                os.rmdir(dirpath)
 
         logger.info(
-            "%d orphaned files, %d directories found (%d bytes)",
-            deleted_files, deleted_dirs, deleted_bytes)
+            "%d orphaned files found (%d bytes)",
+            deleted_files, deleted_bytes)
 
         logger.info(
-            "%d files, %d directories remain (%d bytes)",
-            kept_files, kept_dirs, kept_bytes)
+            "%d files remain (%d bytes)",
+            kept_files, kept_bytes)
 
     option_annotations = (
         Option('path', default=None),
