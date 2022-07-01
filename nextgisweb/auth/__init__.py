@@ -177,7 +177,7 @@ class AuthComponent(Component):
 
         return dict(
             user_count=ucnt(),
-            oauth_count=ucnt(~User.oauth_subject.is_not(None)),
+            oauth_count=ucnt(User.oauth_subject.is_not(None)),
             last_activity=dict(
                 everyone=ula(),
                 authenticated=ula(User.keyname != 'guest'),
