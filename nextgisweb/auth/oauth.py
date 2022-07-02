@@ -286,8 +286,10 @@ class OAuthHelper(object):
         Option('enabled', bool, default=False,
                doc="Enable OAuth authentication."),
 
-        Option('default', bool, default=False,
-               doc="Preffer OAuth authentication over local."),
+        Option('default', bool, default=False, doc=(
+            "Use OAuth authentication by default. Unauthenticated user viewing "
+            "forbidden page will be redirected to OAuth server without showing "
+            "login dialog. Login dialog will be available at /login URL.")),
 
         Option('register', bool, default=True,
                doc="Allow registering new users via OAuth."),

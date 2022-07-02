@@ -1,9 +1,10 @@
+import { observer } from "mobx-react-lite";
 import loginModal from "@nextgisweb/auth/loginModal";
 import { authStore } from "@nextgisweb/auth/store";
 import { Popover } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!pyramid";
-import { observer } from "mobx-react-lite";
+import settings from "@nextgisweb/pyramid/settings!auth";
 import "./Avatar.less";
 
 const signInText = i18n.gettext("Sign in");
@@ -26,7 +27,12 @@ export const Avatar = observer(({}) => {
     );
 
     const showLoginModal = () => {
-        loginModal();
+        if (settings.oauth.enabled && settings.oauth.default) {
+            const qs = new URLSearchParams([["next", window.location]]);
+            window.open(routeURL("auth.oauth") + "?" + qs.toString(), "_self");
+        } else {
+            loginModal();
+        }
     };
 
     return (

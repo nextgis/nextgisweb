@@ -166,7 +166,13 @@ def logout(request):
 
     headers = forget(request)
 
-    return HTTPFound(location=location, headers=headers)
+    response = HTTPFound(location=location, headers=headers)
+
+    # Cookie for loop prevention with default OAuth
+    if oaserver and oaserver.options['default']:
+        response.set_cookie('ngw-oauth-logout', max_age=600, httponly=True)
+
+    return response
 
 
 def _login_url(request):
@@ -190,6 +196,8 @@ def _login_url(request):
 
 
 def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
+    oaserver = request.env.auth.oauth
+
     # If user is not authentificated, we can offer him to sign in
     if (
         request.method == 'GET'
@@ -197,11 +205,20 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
         and err_info.http_status_code == 403
         and request.authenticated_userid is None
     ):
-        response = render_to_response('nextgisweb:auth/template/login.mako', dict(
-            custom_layout=True, props=dict(reloadAfterLogin=True),
-        ), request=request)
-        response.status = 403
-        return response
+        if oaserver and oaserver.options['default']:
+            if 'ngw-oauth-logout' in request.cookies:
+                # Loop prevention, bypass the handler
+                return
+            else:
+                return HTTPFound(
+                    location=request.route_path('auth.oauth', _query=dict(
+                        next=request.path_qs)))
+        else:
+            response = render_to_response('nextgisweb:auth/template/login.mako', dict(
+                custom_layout=True, props=dict(reloadAfterLogin=True),
+            ), request=request)
+            response.status = 403
+            return response
 
 
 def settings(request):
