@@ -87,7 +87,7 @@ def profile_get(request):
     data = user.serialize()
 
     result = dict()
-    for k in ('language', ):
+    for k in ('language', 'oauth_subject'):
         result[k] = data[k]
 
     return result

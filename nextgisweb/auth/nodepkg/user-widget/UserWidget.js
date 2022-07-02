@@ -3,6 +3,7 @@ import { KeynameTextBox, LanguageSelect } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
+import settings from "@nextgisweb/pyramid/settings!auth";
 import { PropTypes } from "prop-types";
 import { useState } from "react";
 import { PrincipalMemberSelect } from "../field";
@@ -50,7 +51,7 @@ export function UserWidget({ id }) {
         },
         {
             name: "oauth_subject",
-            label: i18n.gettext("OAuth subject"),
+            label: settings.oauth.display_name,
             disabled: true,
         },
         {

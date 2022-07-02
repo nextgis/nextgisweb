@@ -163,6 +163,7 @@ class AuthComponent(Component):
             oauth=dict(
                 enabled=enabled,
                 default=self.oauth.options['default'] if enabled else None,
+                bind=self.oauth.options['bind'] if enabled else None,
                 display_name=self.oauth.options['server.display_name'] if enabled else None,
             )
         )

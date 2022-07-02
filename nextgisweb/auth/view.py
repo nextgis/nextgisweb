@@ -113,8 +113,9 @@ def oauth(request):
         tresp = oaserver.grant_type_authorization_code(
             request.params['code'], oauth_url)
 
-        if data['merge'] == '1' and request.user.keyname != 'guest':
-            user = oaserver.access_token_to_user(tresp.access_token, merge_user=request.user)
+        if data['bind'] == '1' and request.user.keyname != 'guest':
+            user = oaserver.access_token_to_user(
+                tresp.access_token, bind_user=request.user)
         else:
             user = oaserver.access_token_to_user(tresp.access_token)
 
@@ -134,7 +135,7 @@ def oauth(request):
     else:
         data = dict(
             next_url=request.params.get('next', request.application_url),
-            merge=request.params.get('merge', '0')
+            bind=request.params.get('bind', '0')
         )
 
         alphabet = string.ascii_letters + string.digits

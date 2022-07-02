@@ -22,7 +22,7 @@ msgstr "Администратор"
 msgid "Owner"
 msgstr "Владелец"
 
-#: __init__.py:280
+#: __init__.py:282
 #, python-format
 msgid "Maximum number of users is reached. Your current plan user number limit is %d."
 msgstr "Превышено максимальное количество пользователей. Лимит текущего плана - %d."
@@ -80,31 +80,39 @@ msgstr "Неверные данные учетной записи"
 msgid "User is disabled"
 msgstr "Пользователь заблокирован"
 
-#: oauth.py:161
-msgid "User is already bound"
-msgstr "Пользователь уже привязан"
+#: oauth.py:163
+msgid "{} binding error"
+msgstr "Ошибка привязки {}"
 
-#: oauth.py:426
+#: oauth.py:164
+msgid ""
+"This {dn} account ({sub}) is already bound to the different user ({id}). Log "
+"in using this account instead of binding it."
+msgstr ""
+"Этот аккаунт {dn} ({sub}) уже привязан к другому пользователю ({id}). Войдите"
+" с использованием этого аккаунта вместо привязки."
+
+#: oauth.py:435
 msgid "OAuth authorization error"
 msgstr "Ошибка авторизации OAuth"
 
-#: oauth.py:431
+#: oauth.py:440
 msgid "Invalid OAuth token"
 msgstr "Некорректный токен OAuth"
 
-#: oauth.py:436
+#: oauth.py:445
 msgid "Invalid OAuth scope"
 msgstr "Некорректный скоуп OAuth"
 
-#: oauth.py:441
+#: oauth.py:450
 msgid "OAuth password grant type failed"
 msgstr "Не удалось получить доступ по паролю OAuth"
 
-#: oauth.py:446
+#: oauth.py:455
 msgid "OAuth token refresh failed"
 msgstr "Не удалось выполнить обновление токена OAuth"
 
-#: oauth.py:451
+#: oauth.py:460
 msgid "OAuth access token is expired"
 msgstr "Срок действия токена OAuth истек"
 
@@ -124,27 +132,27 @@ msgstr "Некорректный параметр 'expires'."
 msgid "Session expired."
 msgstr "Сессия устарела."
 
-#: view.py:212
+#: view.py:230
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: view.py:219 view.py:332
+#: view.py:237 view.py:350
 msgid "Users"
 msgstr "Пользователи"
 
-#: view.py:232
+#: view.py:250
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: view.py:247 view.py:336
+#: view.py:265 view.py:354
 msgid "Groups"
 msgstr "Группы"
 
-#: view.py:260
+#: view.py:278
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: view.py:340
+#: view.py:358
 msgid "Groups and users"
 msgstr "Группы и пользователи"
 
@@ -169,7 +177,7 @@ msgid "User deleted"
 msgstr "Пользователь удален"
 
 #: nodepkg/group-browse/GroupBrowse.js:8 nodepkg/group-widget/GroupWidget.js:15
-#: nodepkg/user-browse/UserBrowse.js:17 nodepkg/user-widget/UserWidget.js:15
+#: nodepkg/user-browse/UserBrowse.js:17 nodepkg/user-widget/UserWidget.js:16
 msgid "Full name"
 msgstr "Полное имя"
 
@@ -185,7 +193,7 @@ msgstr "Члены группы"
 msgid "Assign at registration"
 msgstr "Назначать при регистрации"
 
-#: nodepkg/group-widget/GroupWidget.js:42 nodepkg/user-widget/UserWidget.js:58
+#: nodepkg/group-widget/GroupWidget.js:42 nodepkg/user-widget/UserWidget.js:59
 msgid "Description"
 msgstr "Описание"
 
@@ -198,23 +206,35 @@ msgid "Sign in"
 msgstr "Войти"
 
 #: nodepkg/login-form/LoginForm.js:27 nodepkg/user-browse/UserBrowse.js:23
-#: nodepkg/user-widget/UserWidget.js:20
+#: nodepkg/user-widget/UserWidget.js:21
 msgid "Login"
 msgstr "Логин"
 
-#: nodepkg/login-form/LoginForm.js:32 nodepkg/user-widget/UserWidget.js:26
+#: nodepkg/login-form/LoginForm.js:32 nodepkg/user-widget/UserWidget.js:27
 msgid "Password"
 msgstr "Пароль"
 
-#: nodepkg/settings-form/SettingsForm.js:16 nodepkg/user-widget/UserWidget.js:47
+#: nodepkg/settings-form/SettingsForm.js:18
+msgid "Account bound"
+msgstr "Аккаунт привязан"
+
+#: nodepkg/settings-form/SettingsForm.js:29
+msgid "Bind account"
+msgstr "Привязать аккаунт"
+
+#: nodepkg/settings-form/SettingsForm.js:31
+msgid "Account not bound"
+msgstr "Аккаунт не привязан"
+
+#: nodepkg/settings-form/SettingsForm.js:43 nodepkg/user-widget/UserWidget.js:48
 msgid "Language"
 msgstr "Язык"
 
-#: nodepkg/settings-form/SettingsForm.js:41
+#: nodepkg/settings-form/SettingsForm.js:80
 msgid "Saved"
 msgstr "Сохранено"
 
-#: nodepkg/user-browse/UserBrowse.js:10 nodepkg/user-widget/UserWidget.js:35
+#: nodepkg/user-browse/UserBrowse.js:10 nodepkg/user-widget/UserWidget.js:36
 msgid "Disabled"
 msgstr "Отключен"
 
@@ -238,14 +258,11 @@ msgstr "Отключить"
 msgid "Enable"
 msgstr "Включить"
 
-#: nodepkg/user-widget/UserWidget.js:31
+#: nodepkg/user-widget/UserWidget.js:32
 msgid "Enter new password here"
 msgstr "Для изменения пароля заполните это поле"
 
-#: nodepkg/user-widget/UserWidget.js:40
+#: nodepkg/user-widget/UserWidget.js:41
 msgid "Groups member"
 msgstr "Член групп"
 
-#: nodepkg/user-widget/UserWidget.js:53
-msgid "OAuth subject"
-msgstr "Субъект OAuth"

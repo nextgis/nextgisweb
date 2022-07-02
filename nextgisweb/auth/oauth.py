@@ -146,7 +146,7 @@ class OAuthHelper(object):
 
         return token
 
-    def access_token_to_user(self, access_token, merge_user=None):
+    def access_token_to_user(self, access_token, bind_user=None):
         token = self.query_introspection(access_token)
         if token is None:
             return None
@@ -156,10 +156,17 @@ class OAuthHelper(object):
         with DBSession.no_autoflush:
             user = User.filter_by(oauth_subject=token.sub).first()
 
-            if merge_user is not None:
-                if user is not None and user.id != merge_user.id:
-                    raise AuthorizationException(message=_("User is already bound"))
-                user = merge_user
+            if bind_user is not None:
+                if user is not None and user.id != bind_user.id:
+                    dn = self.options['server.display_name']
+                    raise AuthorizationException(
+                        title=_("{} binding error").format(dn),
+                        message=_(
+                            "This {dn} account ({sub}) is already bound to "
+                            "the different user ({id}). Log in using this "
+                            "account instead of binding it."
+                        ).format(dn=dn, sub=token.sub, id=user.id))
+                user = bind_user
 
             if user is None:
                 # Register new user with default groups
@@ -181,7 +188,7 @@ class OAuthHelper(object):
             ):
                 # Skip profile synchronization
                 return user
-            elif merge_user is None:
+            elif bind_user is None:
                 self._update_user(user, token.data)
 
             user.oauth_tstamp = datetime.utcnow()
