@@ -1,0 +1,31 @@
+.ngw-auth-login-form {
+    text-align: center;
+
+    .oauth {
+        .ant-btn {
+            width: 100%;
+        }
+    }
+
+    .separator {
+        margin: 1em 0;
+        background: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0) calc(50% - 1px),
+            var(--icon-color) calc(50%),
+            rgba(0, 0, 0, 0) calc(50% + 1px)
+        );
+
+        > span {
+            color: var(--text-secondary);
+            background-color: white;
+            padding: 0 1ex;
+        }
+    }
+
+    .login-password {
+        .ant-alert {
+            margin-bottom: 1em;
+        }
+    }
+}

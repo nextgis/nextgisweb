@@ -116,7 +116,7 @@ msgstr "Не удалось выполнить обновление токена
 msgid "OAuth access token is expired"
 msgstr "Срок действия токена OAuth истек"
 
-#: nodepkg/login-form/LoginForm.js:14 view.py:50
+#: nodepkg/login-form/LoginForm.js:18 view.py:50
 msgid "Sign in to Web GIS"
 msgstr "Войти в Веб ГИС"
 
@@ -197,22 +197,26 @@ msgstr "Назначать при регистрации"
 msgid "Description"
 msgstr "Описание"
 
-#: nodepkg/login-form/LoginForm.js:13
+#: nodepkg/login-form/LoginForm.js:15
 msgid "Sign in with {}"
 msgstr "Войти через {}"
 
-#: nodepkg/login-form/LoginForm.js:15 template/session_invite.mako:17
+#: nodepkg/login-form/LoginForm.js:19 template/session_invite.mako:17
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/login-form/LoginForm.js:27 nodepkg/user-browse/UserBrowse.js:23
+#: nodepkg/login-form/LoginForm.js:31 nodepkg/user-browse/UserBrowse.js:23
 #: nodepkg/user-widget/UserWidget.js:21
 msgid "Login"
 msgstr "Логин"
 
-#: nodepkg/login-form/LoginForm.js:32 nodepkg/user-widget/UserWidget.js:27
+#: nodepkg/login-form/LoginForm.js:36 nodepkg/user-widget/UserWidget.js:27
 msgid "Password"
 msgstr "Пароль"
+
+#: nodepkg/login-form/LoginForm.js:92
+msgid "or using login and password"
+msgstr "или используя логин и пароль"
 
 #: nodepkg/settings-form/SettingsForm.js:18
 msgid "Account bound"
