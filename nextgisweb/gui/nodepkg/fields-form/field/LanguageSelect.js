@@ -13,7 +13,11 @@ export function LanguageSelect({ loading, ...props }) {
     const selectProps = { loading };
     return (
         <Form.Item {...props}>
-            <Select {...selectProps}>
+            <Select
+                // See https://ant.design/components/select/#FAQ
+                listHeight={32 * (settings.langages.length + 1)}
+                {...selectProps}
+            >
                 {langages.map(({ value, display_name }) => (
                     <Select.Option key={value} value={value}>
                         {display_name}
