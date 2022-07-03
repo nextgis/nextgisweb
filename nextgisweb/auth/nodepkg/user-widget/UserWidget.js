@@ -32,6 +32,11 @@ export function UserWidget({ id }) {
                 id !== undefined ? i18n.gettext("Enter new password here") : "",
         },
         {
+            name: "oauth_subject",
+            label: settings.oauth.display_name,
+            disabled: true,
+        },
+        {
             name: "disabled",
             label: i18n.gettext("Disabled"),
             widget: "checkbox",
@@ -48,11 +53,6 @@ export function UserWidget({ id }) {
             label: i18n.gettext("Language"),
             widget: LanguageSelect,
             value: null,
-        },
-        {
-            name: "oauth_subject",
-            label: settings.oauth.display_name,
-            disabled: true,
         },
         {
             name: "description",

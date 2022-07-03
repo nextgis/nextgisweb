@@ -1,5 +1,5 @@
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n!auth";
 import getMessages from "../groupMessages";
 
 export function GroupBrowse() {
@@ -16,9 +16,20 @@ export function GroupBrowse() {
             key: "keyname",
             sorter: (a, b) => (a.keyname > b.keyname ? 1 : -1),
         },
+        {
+            title: i18n.gettext("New users"),
+            dataIndex: "register",
+            key: "register",
+            render: (value) =>
+                value ? i18n.gettext("Yes") : i18n.gettext("No"),
+        },
     ];
 
     return (
-        <ModelBrowse model="auth.group" columns={columns} messages={getMessages()} />
+        <ModelBrowse
+            model="auth.group"
+            columns={columns}
+            messages={getMessages()}
+        />
     );
 }

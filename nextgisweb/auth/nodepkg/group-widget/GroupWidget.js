@@ -34,7 +34,7 @@ export function GroupWidget({ id }) {
         },
         {
             name: "register",
-            label: i18n.gettext("Assign at registration"),
+            label: i18n.gettext("New users"),
             widget: "checkbox",
         },
         {

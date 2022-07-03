@@ -27,44 +27,44 @@ msgstr "Владелец"
 msgid "Maximum number of users is reached. Your current plan user number limit is %d."
 msgstr "Превышено максимальное количество пользователей. Лимит текущего плана - %d."
 
-#: api.py:304
+#: api.py:306
 #, python-format
 msgid "The '%s' attribute of the system principal can't be changed."
 msgstr "Атрибут '%s' системного субъекта не может быть изменен."
 
-#: api.py:313
+#: api.py:315
 #, python-format
 msgid "Principal '%s' already exists."
 msgstr "Субъект '%s' уже существует."
 
-#: api.py:315
+#: api.py:317
 #, python-format
 msgid "Principal with full name '%s' already exists."
 msgstr "Субъект с наименованием '%s' уже существует."
 
-#: api.py:351
+#: api.py:353
 #, python-format
 msgid "User '%s' can't be a member of a group."
 msgstr "Пользователь '%s' не может быть членом группы."
 
-#: api.py:357
+#: api.py:359
 msgid "System principals can't be deleted."
 msgstr "Системные субъекты не могут быть удалены."
 
-#: api.py:373
+#: api.py:375
 msgid "User is referenced with resources"
 msgstr "Пользователь связан с ресурсами"
 
-#: api.py:374
+#: api.py:376
 msgid "Group is referenced with resources"
 msgstr "Группа связана с ресурсами"
 
-#: api.py:386
+#: api.py:388
 #, python-format
 msgid "Invalid principal name: '%s'."
 msgstr "Недопустимое имя субъекта: '%s'."
 
-#: api.py:421
+#: api.py:423
 msgid "The 'administrators' group must have at least one enabled member."
 msgstr "Группа 'administrators' должна иметь хотя бы одного включенного участника."
 
@@ -177,7 +177,7 @@ msgid "User deleted"
 msgstr "Пользователь удален"
 
 #: nodepkg/group-browse/GroupBrowse.js:8 nodepkg/group-widget/GroupWidget.js:15
-#: nodepkg/user-browse/UserBrowse.js:17 nodepkg/user-widget/UserWidget.js:16
+#: nodepkg/user-browse/UserBrowse.js:20 nodepkg/user-widget/UserWidget.js:16
 msgid "Full name"
 msgstr "Полное имя"
 
@@ -185,13 +185,23 @@ msgstr "Полное имя"
 msgid "Group name"
 msgstr "Имя группы"
 
+#: nodepkg/group-browse/GroupBrowse.js:20 nodepkg/group-widget/GroupWidget.js:37
+msgid "New users"
+msgstr "Новые пользователи"
+
+#: nodepkg/group-browse/GroupBrowse.js:24 nodepkg/user-browse/UserBrowse.js:51
+#: nodepkg/user-browse/UserBrowse.js:62
+msgid "Yes"
+msgstr "Да"
+
+#: nodepkg/group-browse/GroupBrowse.js:24 nodepkg/user-browse/UserBrowse.js:51
+#: nodepkg/user-browse/UserBrowse.js:62
+msgid "No"
+msgstr "Нет"
+
 #: nodepkg/group-widget/GroupWidget.js:26
 msgid "Group members"
 msgstr "Члены группы"
-
-#: nodepkg/group-widget/GroupWidget.js:37
-msgid "Assign at registration"
-msgstr "Назначать при регистрации"
 
 #: nodepkg/group-widget/GroupWidget.js:42 nodepkg/user-widget/UserWidget.js:59
 msgid "Description"
@@ -205,12 +215,13 @@ msgstr "Войти через {}"
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/login-form/LoginForm.js:31 nodepkg/user-browse/UserBrowse.js:23
+#: nodepkg/login-form/LoginForm.js:31 nodepkg/user-browse/UserBrowse.js:37
 #: nodepkg/user-widget/UserWidget.js:21
 msgid "Login"
 msgstr "Логин"
 
-#: nodepkg/login-form/LoginForm.js:36 nodepkg/user-widget/UserWidget.js:27
+#: nodepkg/login-form/LoginForm.js:36 nodepkg/user-browse/UserBrowse.js:47
+#: nodepkg/user-widget/UserWidget.js:27
 msgid "Password"
 msgstr "Пароль"
 
@@ -230,7 +241,7 @@ msgstr "Привязать аккаунт"
 msgid "Account not bound"
 msgstr "Аккаунт не привязан"
 
-#: nodepkg/settings-form/SettingsForm.js:43 nodepkg/user-widget/UserWidget.js:48
+#: nodepkg/settings-form/SettingsForm.js:43 nodepkg/user-widget/UserWidget.js:53
 msgid "Language"
 msgstr "Язык"
 
@@ -238,27 +249,35 @@ msgstr "Язык"
 msgid "Saved"
 msgstr "Сохранено"
 
-#: nodepkg/user-browse/UserBrowse.js:10 nodepkg/user-widget/UserWidget.js:36
+#: nodepkg/user-browse/UserBrowse.js:13 nodepkg/user-widget/UserWidget.js:41
 msgid "Disabled"
 msgstr "Отключен"
 
-#: nodepkg/user-browse/UserBrowse.js:11
+#: nodepkg/user-browse/UserBrowse.js:14
 msgid "Enabled"
 msgstr "Включен"
 
-#: nodepkg/user-browse/UserBrowse.js:29
+#: nodepkg/user-browse/UserBrowse.js:46
+msgid "Users with a password can sign in with login and password."
+msgstr "Пользователи с паролем могут войти используя логин и пароль."
+
+#: nodepkg/user-browse/UserBrowse.js:57
+msgid "Users bound to {dn} can sign in with {dn}."
+msgstr "Пользователи связанные с {dn} могут войти через {dn}."
+
+#: nodepkg/user-browse/UserBrowse.js:68
 msgid "Last activity"
 msgstr "Последняя активность"
 
-#: nodepkg/user-browse/UserBrowse.js:41
+#: nodepkg/user-browse/UserBrowse.js:81
 msgid "Status"
 msgstr "Статус"
 
-#: nodepkg/user-browse/UserBrowse.js:113
+#: nodepkg/user-browse/UserBrowse.js:153
 msgid "Disable"
 msgstr "Отключить"
 
-#: nodepkg/user-browse/UserBrowse.js:113
+#: nodepkg/user-browse/UserBrowse.js:153
 msgid "Enable"
 msgstr "Включить"
 
@@ -266,7 +285,7 @@ msgstr "Включить"
 msgid "Enter new password here"
 msgstr "Для изменения пароля заполните это поле"
 
-#: nodepkg/user-widget/UserWidget.js:41
+#: nodepkg/user-widget/UserWidget.js:46
 msgid "Groups member"
 msgstr "Член групп"
 

@@ -154,7 +154,10 @@ class User(Principal):
             ('language', self.language),
             ('oauth_subject', self.oauth_subject),
             ('oauth_tstamp', self.oauth_tstamp),
-            ('member_of', [g.id for g in self.member_of])
+            ('member_of', [g.id for g in self.member_of]),
+            ('is_administrator', self.is_administrator),
+            ('has_password', self.password_hash is not None),
+            ('has_oauth', self.oauth_subject is not None),
         ))
 
     def deserialize(self, data):
