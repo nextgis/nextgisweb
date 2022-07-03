@@ -5,10 +5,14 @@ from datetime import datetime as dt, timedelta
 from shutil import copyfileobj
 from operator import itemgetter
 
+import transaction
+from sqlalchemy import sql, text, exists
+
 from ..lib.config import Option
 from ..lib.logging import logger
 from ..component import Component
 from ..core import BackupBase
+from ..models import DBSession
 
 from .models import Base, FileObj
 from . import command  # NOQA
@@ -118,13 +122,82 @@ class FileStorageComponent(Component):
 
     def maintenance(self):
         super().maintenance()
-        self.cleanup()
+        self.cleanup(dry_run=False)
 
-    def cleanup(self):
+    def cleanup(self, *, dry_run, unreferenced=False, orphaned=True):
         logger.info('Cleaning up file storage...')
 
-        deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
-        kept_files, kept_dirs, kept_bytes = 0, 0, 0
+        if unreferenced:
+            self.cleanup_unreferenced(dry_run=dry_run)
+        if orphaned:
+            self.cleanup_orphaned(dry_run=dry_run)
+
+    def cleanup_unreferenced(self, *, dry_run):
+        id_min, id_max = DBSession.query(
+            sql.func.min(FileObj.id), sql.func.max(FileObj.id)).first()
+        if id_min is None:
+            logger.info("fileobj is empty!")
+            return
+
+        schema = FileObj.metadata.schema
+
+        db_set = set()
+        for row in DBSession.execute(text("""
+            SELECT kcu.table_schema, kcu.table_name, kcu.column_name
+            FROM information_schema.constraint_column_usage ccu
+            INNER JOIN information_schema.table_constraints tc ON
+                tc.constraint_name = ccu.constraint_name
+                AND tc.constraint_type = 'FOREIGN KEY'
+            INNER JOIN information_schema.key_column_usage kcu ON
+                kcu.constraint_name = ccu.constraint_name
+                AND kcu.table_schema = tc.table_schema
+                AND kcu.table_name = tc.table_name
+            WHERE
+                ccu.table_schema = :schema
+                AND ccu.table_name = :table
+                AND ccu.column_name = :column
+        """), dict(
+            schema=schema if schema is not None else 'public',
+            table=FileObj.__tablename__,
+            column=FileObj.id.name
+        )):
+            db_set.add(row)
+
+        sa_set = set()
+        metadata = self.env.metadata()
+        for table in metadata.tables.values():
+            for fk in table.foreign_keys:
+                if (
+                    fk.column.table.name == FileObj.__tablename__
+                    and fk.column.table.schema == schema
+                    and fk.column.name == FileObj.id.name
+                ):
+                    sa_set.add((
+                        table.schema if table.schema is not None else 'public',
+                        table.name, fk.parent.name))
+
+        if sa_set != db_set:
+            raise RuntimeError(
+                "FileObj DB and SQLAlchemy references mismatch: "
+                "{} != {}".format(db_set, sa_set))
+
+        q = DBSession.query(FileObj)
+        for schema, table, column in db_set:
+            c = sql.column(column)
+            sql.table(table, c, schema=schema)  # Bind column to table
+            q = q.filter(~exists().where(FileObj.id == c))
+
+        if dry_run:
+            records = q.count()
+        else:
+            with transaction.manager:
+                records = q.delete(synchronize_session=False)
+
+        logger.info("%d unreferenced file records found", records)
+
+    def cleanup_orphaned(self, *, dry_run):
+        deleted_files = deleted_bytes = 0
+        kept_files = kept_bytes = 0
 
         delta = self.options['cleanup_keep_interval']
 
@@ -137,8 +210,9 @@ class FileStorageComponent(Component):
                 stat = os.stat(fullfn)
 
                 if obj is None and (dt.utcnow() - dt.utcfromtimestamp(stat.st_ctime) > delta):
-                    os.remove(fullfn)
-                    relist = True
+                    if not dry_run:
+                        os.remove(fullfn)
+                        relist = True
                     deleted_files += 1
                     deleted_bytes += stat.st_size
                 else:
@@ -146,23 +220,23 @@ class FileStorageComponent(Component):
                     kept_bytes += stat.st_size
 
             if (
-                (not relist and len(filenames) == 0 and len(dirnames) == 0)
-                or len(os.listdir(dirpath)) == 0  # NOQA: W503
+                not dry_run
+                and (
+                    (not relist and len(filenames) == 0 and len(dirnames) == 0)
+                    or len(os.listdir(dirpath)) == 0
+                )
             ):
                 os.rmdir(dirpath)
-                deleted_dirs += 1
-            else:
-                kept_dirs += 1
 
         logger.info(
-            "Deleted: %d files, %d directories, %d bytes",
-            deleted_files, deleted_dirs, deleted_bytes)
+            "%d orphaned files found (%d bytes)",
+            deleted_files, deleted_bytes)
 
         logger.info(
-            "Preserved: %d files, %d directories, %d bytes",
-            kept_files, kept_dirs, kept_bytes)
+            "%d files remain (%d bytes)",
+            kept_files, kept_bytes)
 
     option_annotations = (
         Option('path', default=None),
-        Option('cleanup_keep_interval', default=timedelta(hours=4))
+        Option('cleanup_keep_interval', timedelta, default=timedelta(days=2)),
     )
