@@ -102,7 +102,7 @@ class PyramidComponent(Component):
         result['langages'] = []
         for locale in self.env.core.locale_available:
             try:
-                babel_locale = Locale.parse(locale)
+                babel_locale = Locale.parse(locale, sep='-')
             except UnknownLocaleError:
                 display_name = locale
             else:

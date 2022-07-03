@@ -28,6 +28,8 @@ from ..lib.logging import logger
 from ..package import pkginfo
 from ..env import Env, setenv, env
 
+from .util import to_gettext_locale, to_http_locale
+
 
 def get_mappings():
     fileobj = open(resource_filename('nextgisweb', 'babel.cfg'), 'r')
@@ -174,7 +176,7 @@ def cmd_update(args):
             po_path = catalog_filename(comp_id, locale, mkdir=True)
 
             with io.open(pot_path, 'r') as pot_fd:
-                pot = read_po(pot_fd, locale=locale)
+                pot = read_po(pot_fd, locale=to_gettext_locale(locale))
                 pot_is_empty = len(pot) == 0 and len(pot.obsolete) == 0
 
             if not po_path.is_file():
@@ -198,7 +200,7 @@ def cmd_update(args):
                 continue
 
             with io.open(po_path, 'r') as po_fd:
-                po = read_po(po_fd, locale=locale)
+                po = read_po(po_fd, locale=to_gettext_locale(locale))
 
             not_found, _, obsolete = compare_catalogs(pot, po)
 
@@ -238,7 +240,7 @@ def cmd_compile(args):
                 continue
 
             with po_path.open('r') as po:
-                catalog = read_po(po, locale=locale, domain=comp_id)
+                catalog = read_po(po, locale=to_gettext_locale(locale), domain=comp_id)
 
             logger.info(
                 "Compiling component [%s] locale [%s] (%d messages)...",
@@ -319,9 +321,9 @@ def cmd_stat(args):
             po_path = catalog_filename(comp_id, locale, ext='po', mkdir=False)
             if po_path.exists():
                 with po_path.open('r') as po_fd:
-                    po = read_po(po_fd, locale=locale)
+                    po = read_po(po_fd, locale=to_gettext_locale(locale))
             else:
-                po = Catalog(locale=locale)
+                po = Catalog(locale=to_gettext_locale(locale))
 
             not_found, not_translated, obsolete = compare_catalogs(pot, po)
             data.append(StatRecord(
@@ -434,10 +436,10 @@ def cmd_poeditor_sync(args):
                 if po_path.exists():
                     ref_catalog = reference_catalogs.get(locale)
                     if ref_catalog is None:
-                        ref_catalog = Catalog(locale=locale)
+                        ref_catalog = Catalog(locale=to_gettext_locale(locale))
                         reference_catalogs[locale] = ref_catalog
                     with po_path.open('r') as po_fd:
-                        for m in read_po(po_fd, locale=locale):
+                        for m in read_po(po_fd, locale=to_gettext_locale(locale)):
                             m.context = comp_id
                             ref_catalog[m.id] = m
                 continue
@@ -445,8 +447,7 @@ def cmd_poeditor_sync(args):
             terms = poeditor_terms.get(locale)
             if not terms:
                 logger.debug("Fetching translations from POEditor for locale [%s]...", locale)
-                language_code = locale.replace('_', '-').lower()
-                terms = client.view_project_terms(poeditor_project_id, language_code=language_code)
+                terms = client.view_project_terms(poeditor_project_id, language_code=to_http_locale(locale))
                 poeditor_terms[locale] = terms
 
             # Filter terms by context
@@ -458,7 +459,7 @@ def cmd_poeditor_sync(args):
                 continue
 
             with po_path.open('r') as po_fd:
-                po = read_po(po_fd, locale=locale)
+                po = read_po(po_fd, locale=to_gettext_locale(locale))
 
             updated = 0
 
