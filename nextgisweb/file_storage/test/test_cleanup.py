@@ -29,7 +29,7 @@ def test_keep_delete(ngw_env, ngw_txn):
         with io.open(fn, 'w') as fd:
             fd.write(fn)
 
-    ngw_env.file_storage.cleanup()
+    ngw_env.file_storage.cleanup(dry_run=False)
 
     assert os.path.isfile(fn_keep)
     assert not os.path.isfile(fn_delete)
