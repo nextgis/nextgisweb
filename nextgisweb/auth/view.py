@@ -99,8 +99,21 @@ def oauth(request):
     def cookie_name(state):
         return 'ngw-oastate-' + state
 
-    if 'error' in request.params:
-        raise AuthorizationException()
+    if error := request.params.get('error'):
+        title = None
+        message = None
+
+        if (
+            oaserver.options['server.type'] == 'nextgisid'
+            and error == 'invalid_scope'
+        ):
+            title = _("Team membership required")
+            message = _(
+                "You are not a member of this Web GIS team. Contact Web GIS "
+                "administrator and ask to be added to the team or try "
+                "a different account.")
+
+        raise AuthorizationException(title=title, message=message)
 
     elif 'code' in request.params and 'state' in request.params:
         # Extract data from state named cookie

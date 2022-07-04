@@ -80,11 +80,11 @@ msgstr "Неверные данные учетной записи"
 msgid "User is disabled"
 msgstr "Пользователь заблокирован"
 
-#: oauth.py:163
+#: oauth.py:194
 msgid "{} binding error"
 msgstr "Ошибка привязки {}"
 
-#: oauth.py:164
+#: oauth.py:195
 msgid ""
 "This {dn} account ({sub}) is already bound to the different user ({id}). Log "
 "in using this account instead of binding it."
@@ -92,27 +92,27 @@ msgstr ""
 "Этот аккаунт {dn} ({sub}) уже привязан к другому пользователю ({id}). Войдите"
 " с использованием этого аккаунта вместо привязки."
 
-#: oauth.py:435
+#: oauth.py:493
 msgid "OAuth authorization error"
 msgstr "Ошибка авторизации OAuth"
 
-#: oauth.py:440
+#: oauth.py:498
 msgid "Invalid OAuth token"
 msgstr "Некорректный токен OAuth"
 
-#: oauth.py:445
+#: oauth.py:503
 msgid "Invalid OAuth scope"
 msgstr "Некорректный скоуп OAuth"
 
-#: oauth.py:450
+#: oauth.py:508
 msgid "OAuth password grant type failed"
 msgstr "Не удалось получить доступ по паролю OAuth"
 
-#: oauth.py:455
+#: oauth.py:513
 msgid "OAuth token refresh failed"
 msgstr "Не удалось выполнить обновление токена OAuth"
 
-#: oauth.py:460
+#: oauth.py:518
 msgid "OAuth access token is expired"
 msgstr "Срок действия токена OAuth истек"
 
@@ -132,27 +132,39 @@ msgstr "Некорректный параметр 'expires'."
 msgid "Session expired."
 msgstr "Сессия устарела."
 
-#: view.py:230
+#: view.py:110
+msgid "Team membership required"
+msgstr "Необходимо участие в команде"
+
+#: view.py:111
+msgid ""
+"You are not a member of this Web GIS team. Contact Web GIS administrator and "
+"ask to be added to the team or try a different account."
+msgstr ""
+"Вы не являетесь членом команды этой Веб ГИС. Свяжитесь с администратором Веб "
+"ГИС и для добавления в команду или используйте другой аккаунт."
+
+#: view.py:243
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: view.py:237 view.py:350
+#: view.py:250 view.py:363
 msgid "Users"
 msgstr "Пользователи"
 
-#: view.py:250
+#: view.py:263
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: view.py:265 view.py:354
+#: view.py:278 view.py:367
 msgid "Groups"
 msgstr "Группы"
 
-#: view.py:278
+#: view.py:291
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: view.py:358
+#: view.py:371
 msgid "Groups and users"
 msgstr "Группы и пользователи"
 
