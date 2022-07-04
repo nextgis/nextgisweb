@@ -32,6 +32,7 @@ class OAuthHelper(object):
 
     def __init__(self, options):
         self.options = options
+        self._apply_server_type()
 
         self.authorization_code = options['server.authorization_code']
         self.password = options['server.password']
@@ -40,6 +41,41 @@ class OAuthHelper(object):
         self.server_headers = {}
         if 'server.authorization_header' in options:
             self.server_headers['Authorization'] = options['server.authorization_header']
+
+    def _apply_server_type(self):
+        options = self.options
+
+        stype = options['server.type']
+        if stype is None:
+            return
+
+        def _set(k, value):
+            if k not in options:
+                options[k] = value
+
+        base_url = options['server.base_url'].rstrip('/')
+
+        if stype == 'nextgisid':
+            oauth_url = f"{base_url}/oauth2"
+            _set('server.display_name', "NextGIS ID")
+            _set('server.token_endpoint', f"{oauth_url}/token/")
+            _set('server.auth_endpoint', f"{oauth_url}/authorize/")
+            _set('server.introspection_endpoint', f"{oauth_url}/introspect/")
+            _set('profile.subject.attr', 'sub')
+            _set('profile.keyname.attr', 'username')
+            _set('profile.display_name.attr', 'first_name, last_name')
+
+        elif stype == 'keycloak':
+            oidc_url = f"{base_url}/protocol/openid-connect"
+            _set('server.token_endpoint', f"{oidc_url}/token")
+            _set('server.auth_endpoint', f"{oidc_url}/auth")
+            _set('server.introspection_endpoint', f"{oidc_url}/token/introspect")
+            _set('profile.subject.attr', 'sub')
+            _set('profile.keyname.attr', 'preferred_username')
+            _set('profile.display_name.attr', 'first_name, last_name')
+
+        else:
+            raise ValueError(f"Invalid value: {stype}")
 
     def authorization_code_url(self, redirect_uri, **kwargs):
         qs = dict(
@@ -320,6 +356,13 @@ class OAuthHelper(object):
 
         Option('client.secret', default=None, secure=True,
                doc="OAuth client secret"),
+
+        Option('server.type', default=None, doc=(
+            "OAuth server: nextgisid or keycloak (requires base URL).")),
+
+        Option('server.base_url', doc=(
+            "OAuth server base URL. For NextGIS ID - https://nextgisid, "
+            "for Keycloak - https://keycloak/auth/realms/master.")),
 
         Option('server.display_name', default='OAuth'),
 
