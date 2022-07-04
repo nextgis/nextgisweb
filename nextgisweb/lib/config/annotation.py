@@ -195,7 +195,7 @@ class ConfigOptionsPrefixProxy(object):
         return self._parent[self._pkey(key)]
 
     def __setitem__(self, key, value):
-        self._parent[self._pkey[key]] = value
+        self._parent[self._pkey(key)] = value
 
     def __contains__(self, key):
         return self._pkey(key) in self._parent
