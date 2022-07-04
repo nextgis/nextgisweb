@@ -139,32 +139,32 @@ msgstr "Необходимо участие в команде"
 #: view.py:111
 msgid ""
 "You are not a member of this Web GIS team. Contact Web GIS administrator and "
-"ask to be added to the team or try a different account."
+"ask to be added to the team."
 msgstr ""
 "Вы не являетесь членом команды этой Веб ГИС. Свяжитесь с администратором Веб "
-"ГИС и для добавления в команду или используйте другой аккаунт."
+"ГИС для добавления в команду."
 
-#: view.py:243
+#: view.py:242
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: view.py:250 view.py:363
+#: view.py:249 view.py:362
 msgid "Users"
 msgstr "Пользователи"
 
-#: view.py:263
+#: view.py:262
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: view.py:278 view.py:367
+#: view.py:277 view.py:366
 msgid "Groups"
 msgstr "Группы"
 
-#: view.py:291
+#: view.py:290
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: view.py:371
+#: view.py:370
 msgid "Groups and users"
 msgstr "Группы и пользователи"
 
@@ -300,4 +300,3 @@ msgstr "Для изменения пароля заполните это пол�
 #: nodepkg/user-widget/UserWidget.js:46
 msgid "Groups member"
 msgstr "Член групп"
-

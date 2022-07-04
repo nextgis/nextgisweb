@@ -30,7 +30,7 @@ msgstr "OK"
 msgid "Back to home"
 msgstr "На главную"
 
-#: nodepkg/fields-form/FieldsForm.js:54
+#: nodepkg/fields-form/FieldsForm.js:66
 msgid "This value is required"
 msgstr "Необходимо указать значение"
 
@@ -42,52 +42,60 @@ msgstr "Введенное значение некорректно"
 msgid "Browser default"
 msgstr "По умолчанию в браузере"
 
-#: nodepkg/model-browse/ModelBrowse.js:49 nodepkg/model-form/ModelForm.js:29
+#: nodepkg/model-browse/ModelBrowse.js:50 nodepkg/model-form/ModelForm.js:32
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: nodepkg/model-browse/ModelBrowse.js:50
+#: nodepkg/model-browse/ModelBrowse.js:51
 msgid "Item deleted"
 msgstr "Элемент удален"
 
-#: nodepkg/model-browse/ModelBrowse.js:52
+#: nodepkg/model-browse/ModelBrowse.js:53
 msgid "Items deleted"
 msgstr "Элементы удалены"
 
-#: nodepkg/model-browse/ModelBrowse.js:119
+#: nodepkg/model-browse/ModelBrowse.js:118
 msgid "The errors occurred during execution"
 msgstr "Во время выполнения возникли ошибки"
 
-#: nodepkg/model-browse/ModelBrowse.js:123
+#: nodepkg/model-browse/ModelBrowse.js:122
 msgid "Failed to delete items:"
 msgstr "Не удалось удалить элементы:"
 
-#: nodepkg/model-browse/ModelBrowse.js:146
+#: nodepkg/model-browse/ModelBrowse.js:145
 msgid "Do you want to delete these items?"
 msgstr "Вы хотите удалить эти элементы?"
 
-#: nodepkg/model-browse/ModelBrowse.js:183
+#: nodepkg/model-browse/ModelBrowse.js:182
 msgid "Edit"
 msgstr "Изменить"
 
-#: nodepkg/model-browse/ModelBrowse.js:192 nodepkg/model-browse/ModelBrowse.js:251
+#: nodepkg/model-browse/ModelBrowse.js:191 nodepkg/model-browse/ModelBrowse.js:260
 #: nodepkg/model-form/ModelForm.js:13
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/model-browse/ModelBrowse.js:217
+#: nodepkg/model-browse/ModelBrowse.js:216
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.js:233 nodepkg/model-form/ModelForm.js:11
+#: nodepkg/model-browse/ModelBrowse.js:238 nodepkg/model-form/ModelForm.js:11
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/model-form/ModelForm.js:62
+#: nodepkg/model-form/ModelForm.js:65
 msgid "Fix the form errors first"
 msgstr "Необходимо исправить ошибки в форме"
 
 #: nodepkg/model-logo-form/ModelLogoForm.js:11
 msgid "Logo saved. Reload the page to get them applied."
 msgstr "Логотип сохранен. Для просмотра изменений обновите страницу."
+
+#: nodepkg/single-setting-form/SingleSettingForm.js:9
+msgid "The setting is saved."
+msgstr "Настройка сохранена."
+
+#: nodepkg/single-setting-form/SingleSettingForm.js:10
+msgid "Reload the page to get them applied."
+msgstr "Обновите страницу, чтобы настройки вступили в силу."
 

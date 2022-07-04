@@ -110,8 +110,7 @@ def oauth(request):
             title = _("Team membership required")
             message = _(
                 "You are not a member of this Web GIS team. Contact Web GIS "
-                "administrator and ask to be added to the team or try "
-                "a different account.")
+                "administrator and ask to be added to the team.")
 
         raise AuthorizationException(title=title, message=message)
 
