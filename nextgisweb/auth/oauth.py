@@ -9,6 +9,7 @@ from urllib.parse import urlencode
 import sqlalchemy as sa
 from sqlalchemy.orm.exc import NoResultFound
 import requests
+from requests.exceptions import InvalidJSONError
 import zope.event
 from passlib.hash import sha256_crypt
 
@@ -86,11 +87,9 @@ class OAuthHelper(object):
 
         try:
             tresp = self._token_request('password', params)
-        except requests.HTTPError as exc:
-            if 400 <= exc.response.status_code <= 403:
-                logger.debug("Password grant type failed: %s", exc.response.text)
-                raise OAuthPasswordGrantTypeException()
-            raise
+        except OAuthErrorResponse as exc:
+            logger.warning("Password grant type failed: %s", exc.code)
+            raise OAuthPasswordGrantTypeException()
 
         pwd_token.update_from_grant_response(tresp)
         DBSession.merge(pwd_token)
@@ -105,11 +104,9 @@ class OAuthHelper(object):
             return self._token_request('refresh_token', dict(
                 refresh_token=refresh_token,
                 access_token=access_token))
-        except requests.HTTPError as exc:
-            if 400 <= exc.response.status_code <= 403:
-                logger.debug("Token refresh failed: %s", exc.response.text)
-                raise OAuthTokenRefreshException()
-            raise exc
+        except OAuthErrorResponse as exc:
+            logger.warning("Token refresh failed: %s", exc.code)
+            raise OAuthTokenRefreshException()
 
     def query_introspection(self, access_token):
         if len(access_token) > MAX_TOKEN_LENGTH:
@@ -126,11 +123,9 @@ class OAuthHelper(object):
             try:
                 tdata = self._server_request('introspection', dict(
                     token=access_token))
-            except requests.HTTPError as exc:
-                if 400 <= exc.response.status_code <= 403:
-                    logger.debug("Token verification failed: %s", exc.response.text)
-                    return None
-                raise exc
+            except OAuthErrorResponse as exc:
+                logger.warning("Token verification failed: %s", exc.code)
+                return None  # TODO: Use custom exception here instead of None
 
             if self.options.get('scope') is not None:
                 token_scope = set(tdata['scope'].split(' ')) if 'scope' in tdata else set()
@@ -218,9 +213,19 @@ class OAuthHelper(object):
         timeout = self.options['timeout'].total_seconds()
         response = getattr(requests, method.lower())(
             url, params, headers=self.server_headers, timeout=timeout)
-        response.raise_for_status()
 
-        return response.json()
+        try:
+            result = response.json()
+        except InvalidJSONError:
+            raise OAuthInvalidResponse("JSON decode error")
+
+        if not (200 <= response.status_code <= 299):
+            error = result.get('error')
+            if error is None or not isinstance(error, str):
+                raise OAuthInvalidResponse("Error key missing")
+            raise OAuthErrorResponse(error)
+
+        return result
 
     def _token_request(self, grant_type, params):
         data = self._server_request('token', dict(params, grant_type=grant_type))
@@ -429,6 +434,16 @@ class OAuthToken(Base):
     def check_expiration(self):
         if self.exp < datetime.utcnow():
             raise OAuthAccessTokenExpiredException()
+
+
+class OAuthInvalidResponse(Exception):
+    pass
+
+
+class OAuthErrorResponse(Exception):
+    def __init__(self, code):
+        super().__init__(f"Error code: {code}")
+        self.code = code
 
 
 class AuthorizationException(UserException):

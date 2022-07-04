@@ -1,18 +1,16 @@
 from contextlib import contextmanager
 from datetime import datetime
 from secrets import token_hex, token_urlsafe
-from types import SimpleNamespace
 from unittest.mock import patch
 from urllib.parse import parse_qsl, urlsplit
 from uuid import uuid4
 
 import pytest
 from freezegun import freeze_time
-from requests.exceptions import HTTPError
 import transaction
 
 from ...models import DBSession
-from ..oauth import OAuthHelper
+from ..oauth import OAuthHelper, OAuthErrorResponse
 from ..model import User
 
 CLIENT_ID = token_hex(16)
@@ -31,6 +29,7 @@ def setup_oauth(ngw_env, request):
         'oauth.scope': None,
         'oauth.client.id': CLIENT_ID,
         'oauth.client.secret': CLIENT_SECRET,
+        'oauth.server.type': None,
         'oauth.server.authorization_code': True,
         'oauth.server.password': False,
         'oauth.server.token_endpoint': 'http://oauth/token',
@@ -248,8 +247,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
 
     with server_response_mock(
         'token', dict(grant_type='refresh_token', refresh_token=refresh_token),
-        response=HTTPError(response=SimpleNamespace(
-            status_code=401, text="EXPIRED"))
+        response=OAuthErrorResponse("expired"),
     ):
         ngw_webtest_app.get('/api/component/auth/current_user')
 
@@ -485,8 +483,7 @@ def test_password_token_session(server_response_mock, freezegun, ngw_webtest_app
 
     with server_response_mock(
         'token', dict(grant_type='refresh_token', refresh_token=refresh_token_next),
-        response=HTTPError(response=SimpleNamespace(
-            status_code=401, text="EXPIRED"))
+        response=OAuthErrorResponse('expired'),
     ):
         resp = ngw_webtest_app.get('/api/component/auth/current_user').json
         assert resp['keyname'] == 'guest'
