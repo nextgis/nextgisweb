@@ -93,6 +93,19 @@ def session_invite(request):
 def oauth(request):
     oaserver = request.env.auth.oauth
 
+    if oaserver is None:
+        no_oauth = request.params.get('na')
+        if no_oauth == 'next':
+            return HTTPFound(request.params.get(
+                'next', request.application_url))
+        elif no_oauth == 'login':
+            return HTTPFound(request.route_url('auth.login', _query=(
+                dict(next=request.params['next'])
+                if 'next' in request.params else dict())
+            ))
+        else:
+            raise HTTPNotFound()
+
     oauth_url = request.route_url('auth.oauth')
     oauth_path = request.route_path('auth.oauth')
 
