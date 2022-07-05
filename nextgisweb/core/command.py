@@ -274,7 +274,7 @@ class SQLCommand(Command):
 
     @classmethod
     def execute(cls, args, env):
-        con = DBSession.connection()
+        con = DBSession.connection(execution_options=dict(isolation_level='AUTOCOMMIT'))
         with con.begin():
 
             def _execute(sql):
@@ -298,7 +298,7 @@ class SQLCommand(Command):
                 res = _execute(sql)
 
             if args.result:
-                w = csv.writer(sys.stdout, encoding='utf-8')
+                w = csv.writer(sys.stdout)
                 w.writerow(res.keys())
                 for row in res.fetchall():
                     w.writerow(row)
