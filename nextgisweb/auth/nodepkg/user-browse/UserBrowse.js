@@ -1,13 +1,13 @@
 import AdministratorIcon from "@material-icons/svg/local_police";
 import RegularUserIcon from "@material-icons/svg/person";
-import { Badge, Button, Tooltip } from "@nextgisweb/gui/antd";
+import { Badge, Button, Tooltip, Alert } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
-import settings from "@nextgisweb/pyramid/settings!auth";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import getMessages from "../userMessages";
+import { default as oauth, makeTeamManageButton } from "../oauth";
 
 const messages = {
     disabled: i18n.gettext("Disabled"),
@@ -40,7 +40,7 @@ columns.push({
     sorter: (a, b) => (a.keyname > b.keyname ? 1 : -1),
 });
 
-if (settings.oauth.enabled) {
+if (oauth.enabled) {
     columns.push({
         title: // prettier-ignore
             <Tooltip title={i18n.gettext("Users with a password can sign in with login and password.")}>
@@ -54,8 +54,8 @@ if (settings.oauth.enabled) {
 
     columns.push({
         title: // prettier-ignore
-            <Tooltip title={i18n.gettext("Users bound to {dn} can sign in with {dn}.").replaceAll('{dn}', settings.oauth.display_name)}>
-                {settings.oauth.display_name}
+            <Tooltip title={i18n.gettext("Users bound to {dn} can sign in with {dn}.").replaceAll('{dn}', oauth.name)}>
+                {oauth.name}
             </Tooltip>,
         dataIndex: "has_oauth",
         key: "has_oauth",
@@ -156,14 +156,26 @@ export function UserBrowse() {
         );
     };
 
+    // prettier-ignore
+    const infoNGID = useMemo(() => oauth.isNGID && <Alert
+        type="info" style={{marginTop: "1ex"}}
+        message={i18n.gettext("Your team members won't be shown here until their first logon. Set \"New users\" flag for a group to automatically assign new user to this group. You may also modify permission for authenticated users to manage access for your team members.").replace("{name}", oauth.name)}
+    />, []);
+
+    const tmBtn = makeTeamManageButton({ target: "_blank" });
+
     return (
-        <ModelBrowse
-            model="auth.user"
-            columns={columns}
-            messages={getMessages()}
-            collectionOptions={{ query: { brief: true } }}
-            collectionFilter={(itm) => !itm.system}
-            selectedControls={[EnableSelectedUsers, DisableSelectedUsers]}
-        />
+        <div className="ngw-auth-user-browse">
+            <ModelBrowse
+                model="auth.user"
+                columns={columns}
+                messages={getMessages()}
+                collectionOptions={{ query: { brief: true } }}
+                collectionFilter={(itm) => !itm.system}
+                headerControls={(tmBtn && [() => tmBtn]) || []}
+                selectedControls={[EnableSelectedUsers, DisableSelectedUsers]}
+            />
+            {infoNGID}
+        </div>
     );
 }

@@ -4,16 +4,14 @@ import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
-import settings from "@nextgisweb/pyramid/settings!auth";
 import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import { authStore } from "../store";
+import oauth from "../oauth";
 import "./LoginForm.less";
 
-const oauthText = i18n
-    .gettext("Sign in with {}")
-    .replace("{}", settings.oauth.display_name);
+const oauthText = i18n.gettext("Sign in with {}").replace("{}", oauth.name);
 
 const titleText = i18n.gettext("Sign in to Web GIS");
 const loginText = i18n.gettext("Sign in");
@@ -80,7 +78,7 @@ export const LoginForm = observer((props = {}) => {
         <div className="ngw-auth-login-form">
             <h1>{titleText}</h1>
 
-            {settings.oauth.enabled && (
+            {oauth.enabled && (
                 <>
                     <div className="oauth">
                         <Button type="primary" size="large" href={oauthUrl}>

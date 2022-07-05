@@ -3,13 +3,9 @@ import { message, Form, Button } from "@nextgisweb/gui/antd";
 import { ContentBox, LoadingWrapper } from "@nextgisweb/gui/component";
 import { FieldsForm, LanguageSelect } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import settings from "@nextgisweb/pyramid/settings!auth";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
 import { errorModal } from "@nextgisweb/gui/error";
-
-const oauthEnabled = settings.oauth.enabled;
-const oauthDN = settings.oauth.display_name;
-const oauthBind = settings.oauth.bind;
+import oauth from "../oauth";
 
 function OAuthStatus({ oauthSubject }) {
     if (oauthSubject) {
@@ -18,7 +14,7 @@ function OAuthStatus({ oauthSubject }) {
                 {i18n.gettext("Account bound")} <span>({oauthSubject})</span>
             </>
         );
-    } else if (oauthBind) {
+    } else if (oauth.bind) {
         const bindUrl =
             routeURL("auth.oauth") +
             "?" +
@@ -45,10 +41,10 @@ export function SettingsForm({ id }) {
             loading: status === "saved",
         });
 
-        if (oauthEnabled) {
+        if (oauth.enabled) {
             result.push({
                 name: "oauth_subject",
-                label: oauthDN,
+                label: oauth.name,
                 widget: ({ name, ...props }) => (
                     <Form.Item {...props}>
                         <OAuthStatus oauthSubject={profile.oauth_subject} />

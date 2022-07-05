@@ -164,7 +164,12 @@ class AuthComponent(Component):
                 enabled=enabled,
                 default=self.oauth.options['default'] if enabled else None,
                 bind=self.oauth.options['bind'] if enabled else None,
+                server_type=self.oauth.options['server.type'] if enabled else None,
                 display_name=self.oauth.options['server.display_name'] if enabled else None,
+                base_url=(
+                    self.oauth.options['server.base_url']
+                    if (enabled and 'server.base_url' in self.oauth.options)
+                    else None),
             )
         )
 

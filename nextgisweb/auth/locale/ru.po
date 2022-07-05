@@ -22,7 +22,7 @@ msgstr "Администратор"
 msgid "Owner"
 msgstr "Владелец"
 
-#: __init__.py:282
+#: __init__.py:287
 #, python-format
 msgid "Maximum number of users is reached. Your current plan user number limit is %d."
 msgstr "Превышено максимальное количество пользователей. Лимит текущего плана - %d."
@@ -132,11 +132,11 @@ msgstr "Некорректный параметр 'expires'."
 msgid "Session expired."
 msgstr "Сессия устарела."
 
-#: view.py:110
+#: view.py:123
 msgid "Team membership required"
 msgstr "Необходимо участие в команде"
 
-#: view.py:111
+#: view.py:124
 msgid ""
 "You are not a member of this Web GIS team. Contact Web GIS administrator and "
 "ask to be added to the team."
@@ -144,27 +144,27 @@ msgstr ""
 "Вы не являетесь членом команды этой Веб ГИС. Свяжитесь с администратором Веб "
 "ГИС для добавления в команду."
 
-#: view.py:242
+#: view.py:255
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: view.py:249 view.py:362
+#: view.py:262 view.py:375
 msgid "Users"
 msgstr "Пользователи"
 
-#: view.py:262
+#: view.py:275
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: view.py:277 view.py:366
+#: view.py:290 view.py:379
 msgid "Groups"
 msgstr "Группы"
 
-#: view.py:290
+#: view.py:303
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: view.py:370
+#: view.py:383
 msgid "Groups and users"
 msgstr "Группы и пользователи"
 
@@ -189,7 +189,7 @@ msgid "User deleted"
 msgstr "Пользователь удален"
 
 #: nodepkg/group-browse/GroupBrowse.js:8 nodepkg/group-widget/GroupWidget.js:15
-#: nodepkg/user-browse/UserBrowse.js:20 nodepkg/user-widget/UserWidget.js:16
+#: nodepkg/user-browse/UserBrowse.js:20 nodepkg/user-widget/UserWidget.js:20
 msgid "Full name"
 msgstr "Полное имя"
 
@@ -215,7 +215,7 @@ msgstr "Нет"
 msgid "Group members"
 msgstr "Члены группы"
 
-#: nodepkg/group-widget/GroupWidget.js:42 nodepkg/user-widget/UserWidget.js:59
+#: nodepkg/group-widget/GroupWidget.js:42 nodepkg/user-widget/UserWidget.js:72
 msgid "Description"
 msgstr "Описание"
 
@@ -228,12 +228,12 @@ msgid "Sign in"
 msgstr "Войти"
 
 #: nodepkg/login-form/LoginForm.js:31 nodepkg/user-browse/UserBrowse.js:37
-#: nodepkg/user-widget/UserWidget.js:21
+#: nodepkg/user-widget/UserWidget.js:26
 msgid "Login"
 msgstr "Логин"
 
 #: nodepkg/login-form/LoginForm.js:36 nodepkg/user-browse/UserBrowse.js:47
-#: nodepkg/user-widget/UserWidget.js:27
+#: nodepkg/user-widget/UserWidget.js:33
 msgid "Password"
 msgstr "Пароль"
 
@@ -253,7 +253,7 @@ msgstr "Привязать аккаунт"
 msgid "Account not bound"
 msgstr "Аккаунт не привязан"
 
-#: nodepkg/settings-form/SettingsForm.js:43 nodepkg/user-widget/UserWidget.js:53
+#: nodepkg/settings-form/SettingsForm.js:43 nodepkg/user-widget/UserWidget.js:65
 msgid "Language"
 msgstr "Язык"
 
@@ -261,7 +261,7 @@ msgstr "Язык"
 msgid "Saved"
 msgstr "Сохранено"
 
-#: nodepkg/user-browse/UserBrowse.js:13 nodepkg/user-widget/UserWidget.js:41
+#: nodepkg/user-browse/UserBrowse.js:13 nodepkg/user-widget/UserWidget.js:51
 msgid "Disabled"
 msgstr "Отключен"
 
@@ -293,10 +293,36 @@ msgstr "Отключить"
 msgid "Enable"
 msgstr "Включить"
 
-#: nodepkg/user-widget/UserWidget.js:32
+#: nodepkg/user-browse/UserBrowse.js:162
+msgid ""
+"Your team members won't be shown here until their first logon. Set \"New "
+"users\" flag for a group to automatically assign new user to this group. You "
+"may also modify permission for authenticated users to manage access for your "
+"team members."
+msgstr ""
+"Участники вашей команды не будут показаны в списке до их первого входа. "
+"Установите флаг \"Новые пользователи\" для группы для её автоматического "
+"назначения пользователю. Вы также можете редактировать права для "
+"пользователей прошедших аутентификацию для управления правами участников "
+"команды."
+
+#: nodepkg/user-browse/UserBrowse.js:181 nodepkg/user-widget/UserWidget.js:85
+msgid "Manage team"
+msgstr "Управлять командой"
+
+#: nodepkg/user-widget/UserWidget.js:38
 msgid "Enter new password here"
 msgstr "Для изменения пароля заполните это поле"
 
-#: nodepkg/user-widget/UserWidget.js:46
+#: nodepkg/user-widget/UserWidget.js:57
 msgid "Groups member"
 msgstr "Член групп"
+
+#: nodepkg/user-widget/UserWidget.js:84
+msgid ""
+"Consider adding {name} user to your team instead of creating a new user with "
+"a password."
+msgstr ""
+"Можно добавить пользователя {name} в вашу команду вместо создания нового "
+"пользователя с паролем."
+

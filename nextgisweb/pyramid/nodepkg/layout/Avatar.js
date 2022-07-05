@@ -4,7 +4,6 @@ import { authStore } from "@nextgisweb/auth/store";
 import { Popover } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!pyramid";
-import settings from "@nextgisweb/pyramid/settings!auth";
 import "./Avatar.less";
 
 const signInText = i18n.gettext("Sign in");
@@ -27,7 +26,7 @@ export const Avatar = observer(({}) => {
     );
 
     const showLoginModal = () => {
-        if (settings.oauth.enabled && settings.oauth.default) {
+        if (oauth.enabled && oauth.default) {
             const qs = new URLSearchParams([["next", window.location]]);
             window.open(routeURL("auth.oauth") + "?" + qs.toString(), "_self");
         } else {
