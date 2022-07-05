@@ -200,10 +200,10 @@ class PostgisCheck(ConnectionCheck):
         else:
             self.success(_("PostGIS extension version {}.").format(ver))
 
-        gcol_count = conn.execute("SELECT COUNT(*) FROM geometry_columns").scalar()
+        gcol_count = conn.execute(sql.text("SELECT COUNT(*) FROM geometry_columns")).scalar()
         self.say(_("Number of geometry columns: {}.").format(gcol_count))
 
-        srs_count = conn.execute("SELECT COUNT(*) FROM spatial_ref_sys").scalar()
+        srs_count = conn.execute(sql.text("SELECT COUNT(*) FROM spatial_ref_sys")).scalar()
         self.say(_("Number of spatial reference systems: {}.").format(srs_count))
 
 
