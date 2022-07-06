@@ -23,7 +23,7 @@ export function GroupWidget({ id }) {
         },
         {
             name: "members",
-            label: i18n.gettext("Group members"),
+            label: i18n.gettext("Users"),
             widget: PrincipalMemberSelect,
             choices: async () =>
                 (

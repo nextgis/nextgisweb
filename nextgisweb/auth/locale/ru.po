@@ -45,7 +45,7 @@ msgstr "Субъект с наименованием '%s' уже существ�
 #: api.py:353
 #, python-format
 msgid "User '%s' can't be a member of a group."
-msgstr "Пользователь '%s' не может быть членом группы."
+msgstr "Пользователь '%s' не может быть участником группы."
 
 #: api.py:359
 msgid "System principals can't be deleted."
@@ -116,7 +116,7 @@ msgstr "Не удалось выполнить обновление токена
 msgid "OAuth access token is expired"
 msgstr "Срок действия токена OAuth истек"
 
-#: nodepkg/login-form/LoginForm.js:18 view.py:50
+#: nodepkg/login-form/LoginForm.js:16 view.py:50
 msgid "Sign in to Web GIS"
 msgstr "Войти в Веб ГИС"
 
@@ -141,14 +141,14 @@ msgid ""
 "You are not a member of this Web GIS team. Contact Web GIS administrator and "
 "ask to be added to the team."
 msgstr ""
-"Вы не являетесь членом команды этой Веб ГИС. Свяжитесь с администратором Веб "
-"ГИС для добавления в команду."
+"Вы не являетесь участником команды этой Веб ГИС. Свяжитесь с администратором "
+"Веб ГИС для добавления в команду."
 
 #: view.py:255
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: view.py:262 view.py:375
+#: nodepkg/group-widget/GroupWidget.js:26 view.py:262 view.py:375
 msgid "Users"
 msgstr "Пользователи"
 
@@ -156,7 +156,7 @@ msgstr "Пользователи"
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: view.py:290 view.py:379
+#: nodepkg/user-widget/UserWidget.js:56 view.py:290 view.py:379
 msgid "Groups"
 msgstr "Группы"
 
@@ -184,12 +184,16 @@ msgstr "Подтверждение"
 msgid "Group deleted"
 msgstr "Группа удалена"
 
+#: nodepkg/oauth.js:24
+msgid "Manage team"
+msgstr "Управлять командой"
+
 #: nodepkg/userMessages.js:6
 msgid "User deleted"
 msgstr "Пользователь удален"
 
 #: nodepkg/group-browse/GroupBrowse.js:8 nodepkg/group-widget/GroupWidget.js:15
-#: nodepkg/user-browse/UserBrowse.js:20 nodepkg/user-widget/UserWidget.js:20
+#: nodepkg/user-browse/UserBrowse.js:20 nodepkg/user-widget/UserWidget.js:19
 msgid "Full name"
 msgstr "Полное имя"
 
@@ -211,57 +215,53 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/group-widget/GroupWidget.js:26
-msgid "Group members"
-msgstr "Члены группы"
-
-#: nodepkg/group-widget/GroupWidget.js:42 nodepkg/user-widget/UserWidget.js:72
+#: nodepkg/group-widget/GroupWidget.js:42 nodepkg/user-widget/UserWidget.js:71
 msgid "Description"
 msgstr "Описание"
 
-#: nodepkg/login-form/LoginForm.js:15
+#: nodepkg/login-form/LoginForm.js:14
 msgid "Sign in with {}"
 msgstr "Войти через {}"
 
-#: nodepkg/login-form/LoginForm.js:19 template/session_invite.mako:17
+#: nodepkg/login-form/LoginForm.js:17 template/session_invite.mako:17
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/login-form/LoginForm.js:31 nodepkg/user-browse/UserBrowse.js:37
-#: nodepkg/user-widget/UserWidget.js:26
+#: nodepkg/login-form/LoginForm.js:29 nodepkg/user-browse/UserBrowse.js:37
+#: nodepkg/user-widget/UserWidget.js:25
 msgid "Login"
 msgstr "Логин"
 
-#: nodepkg/login-form/LoginForm.js:36 nodepkg/user-browse/UserBrowse.js:47
-#: nodepkg/user-widget/UserWidget.js:33
+#: nodepkg/login-form/LoginForm.js:34 nodepkg/user-browse/UserBrowse.js:47
+#: nodepkg/user-widget/UserWidget.js:32
 msgid "Password"
 msgstr "Пароль"
 
-#: nodepkg/login-form/LoginForm.js:92
+#: nodepkg/login-form/LoginForm.js:90
 msgid "or using login and password"
 msgstr "или используя логин и пароль"
 
-#: nodepkg/settings-form/SettingsForm.js:18
+#: nodepkg/settings-form/SettingsForm.js:14
 msgid "Account bound"
 msgstr "Аккаунт привязан"
 
-#: nodepkg/settings-form/SettingsForm.js:29
+#: nodepkg/settings-form/SettingsForm.js:25
 msgid "Bind account"
 msgstr "Привязать аккаунт"
 
-#: nodepkg/settings-form/SettingsForm.js:31
+#: nodepkg/settings-form/SettingsForm.js:27
 msgid "Account not bound"
 msgstr "Аккаунт не привязан"
 
-#: nodepkg/settings-form/SettingsForm.js:43 nodepkg/user-widget/UserWidget.js:65
+#: nodepkg/settings-form/SettingsForm.js:39 nodepkg/user-widget/UserWidget.js:64
 msgid "Language"
 msgstr "Язык"
 
-#: nodepkg/settings-form/SettingsForm.js:80
+#: nodepkg/settings-form/SettingsForm.js:76
 msgid "Saved"
 msgstr "Сохранено"
 
-#: nodepkg/user-browse/UserBrowse.js:13 nodepkg/user-widget/UserWidget.js:51
+#: nodepkg/user-browse/UserBrowse.js:13 nodepkg/user-widget/UserWidget.js:50
 msgid "Disabled"
 msgstr "Отключен"
 
@@ -306,19 +306,11 @@ msgstr ""
 "пользователей прошедших аутентификацию для управления правами участников "
 "команды."
 
-#: nodepkg/user-browse/UserBrowse.js:181 nodepkg/user-widget/UserWidget.js:85
-msgid "Manage team"
-msgstr "Управлять командой"
-
-#: nodepkg/user-widget/UserWidget.js:38
+#: nodepkg/user-widget/UserWidget.js:37
 msgid "Enter new password here"
 msgstr "Для изменения пароля заполните это поле"
 
-#: nodepkg/user-widget/UserWidget.js:57
-msgid "Groups member"
-msgstr "Член групп"
-
-#: nodepkg/user-widget/UserWidget.js:84
+#: nodepkg/user-widget/UserWidget.js:83
 msgid ""
 "Consider adding {name} user to your team instead of creating a new user with "
 "a password."

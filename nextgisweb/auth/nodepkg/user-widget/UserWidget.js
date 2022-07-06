@@ -53,7 +53,7 @@ export function UserWidget({ id }) {
 
         result.push({
             name: "member_of",
-            label: i18n.gettext("Groups member"),
+            label: i18n.gettext("Groups"),
             widget: PrincipalMemberSelect,
             choices: () =>
                 route("auth.group.collection").get({ query: { brief: true } }),
