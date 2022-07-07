@@ -427,6 +427,7 @@ class CoreComponent(
         Option('locale.external_path', default=None),
         Option('locale.poeditor.project_id', str, default=None),
         Option('locale.poeditor.api_token', str, default=None),
+        Option('locale.contribute_url', default=None),
 
         # Other deployment settings
         Option('support_url', default="https://nextgis.com/contact/"),

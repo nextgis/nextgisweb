@@ -99,6 +99,7 @@ class PyramidComponent(Component):
             enabled=self.company_logo_enabled(request),
             ckey=self.env.core.settings_get('pyramid', 'company_logo.ckey'),
             link=self.company_url_view(request))
+
         result['langages'] = []
         for locale in self.env.core.locale_available:
             try:
@@ -110,6 +111,7 @@ class PyramidComponent(Component):
             result['langages'].append(dict(
                 display_name=display_name,
                 value=locale))
+        result['language_contribute_url'] = self.env.core.options['locale.contribute_url']
 
         result['storage_enabled'] = self.env.core.options['storage.enabled']
         result['storage_limit'] = self.env.core.options['storage.limit']
