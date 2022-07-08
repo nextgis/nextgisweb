@@ -1,0 +1,9 @@
+.resource-picker-modal .ant-modal-footer {
+    height: 60px;
+}
+.resource-picker-modal .ant-table-row {
+    height: 57px;
+}
+.resource-picker-modal .ant-modal-footer .ant-input {
+    text-align: left;
+}

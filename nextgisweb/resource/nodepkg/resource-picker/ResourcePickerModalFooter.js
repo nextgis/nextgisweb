@@ -14,123 +14,116 @@ const moveToThisFolderTitle = i18n.gettext("Move to this folder");
 const moveToSelectedFolderTitle = i18n.gettext("Move");
 const cleanSelectionTitle = i18n.gettext("Clean selection");
 
-export const ResourcePickerModalFooter = observer(
-    ({
-        resourceStore,
-        onOk,
-    }) => {
-        const {
-            selected,
-            parentId,
-            initialParentId,
-            createNewFolderLoading,
-            allowCreateResource,
-            childrenLoading,
-        } = resourceStore;
+export const ResourcePickerModalFooter = observer(({ resourceStore, onOk }) => {
+    const {
+        selected,
+        parentId,
+        initialParentId,
+        createNewFolderLoading,
+        allowCreateResource,
+        childrenLoading,
+    } = resourceStore;
 
-        const [createMode, setCreateMode] = useState(false);
-        const [newFolderName, setNewFolderName] = useState();
+    const [createMode, setCreateMode] = useState(false);
+    const [newFolderName, setNewFolderName] = useState();
 
-        const onCreateClick = () => {
-            resourceStore.cleanSelection();
-            setCreateMode(true);
-        };
+    const onCreateClick = () => {
+        resourceStore.cleanSelection();
+        setCreateMode(true);
+    };
 
-        const onSave = async () => {
-            try {
-                await resourceStore.createNewFolder(newFolderName);
-                setCreateMode(false);
-            } catch (er) {
-                errorModal(er);
-            }
-        };
+    const onSave = async () => {
+        try {
+            await resourceStore.createNewFolder(newFolderName);
+            setCreateMode(false);
+        } catch (er) {
+            errorModal(er);
+        }
+    };
 
-        useEffect(() => {
-            resourceStore.setAllowSelection(!createMode);
-            resourceStore.setAllowMoveInside(!createMode);
-        }, [createMode]);
+    useEffect(() => {
+        resourceStore.setAllowSelection(!createMode);
+        resourceStore.setAllowMoveInside(!createMode);
+    }, [createMode]);
 
-        return (
-            <>
-                {createMode ? (
+    return (
+        <>
+            {createMode ? (
+                <Input.Group>
                     <Row>
                         <Col>
-                            <a
-                                style={{ fontSize: "1.5rem" }}
+                            <Button
+                                icon={<ArrowBack />}
                                 onClick={() => setCreateMode(false)}
-                            >
-                                <ArrowBack />
-                            </a>
+                            ></Button>
                         </Col>
                         <Col flex="auto">
-                            <Input.Group>
-                                <Input
-                                    style={{ width: "calc(100% - 40px)" }}
-                                    onChange={(e) => {
-                                        setNewFolderName(e.target.value);
-                                    }}
-                                />
-                                <Button
-                                    type="primary"
-                                    icon={<DoneIcon />}
-                                    loading={childrenLoading}
-                                    disabled={!newFolderName}
-                                    onClick={onSave}
-                                ></Button>
-                            </Input.Group>
+                            <Input
+                                style={{ width: "calc(100% - 40px)" }}
+                                onChange={(e) => {
+                                    setNewFolderName(e.target.value);
+                                }}
+                            />
+                            <Button
+                                type="primary"
+                                icon={<DoneIcon />}
+                                loading={childrenLoading}
+                                disabled={!newFolderName}
+                                onClick={onSave}
+                            ></Button>
                         </Col>
                     </Row>
-                ) : (
-                    <Row justify="space-between">
-                        <Col>
-                            {allowCreateResource && !createNewFolderLoading && (
-                                <Tooltip title={createNewFolderTitle}>
-                                    <a
-                                        style={{ fontSize: "1.5rem" }}
-                                        onClick={onCreateClick}
-                                    >
-                                        <CreateNewFolder />
-                                    </a>
-                                </Tooltip>
-                            )}
-                        </Col>
-                        <Col>
-                            {selected.length ? (
-                                <Space>
-                                    <Tooltip title={cleanSelectionTitle}>
-                                        <a
-                                            style={{ fontSize: "1.5rem" }}
-                                            onClick={() => {
-                                                resourceStore.cleanSelection();
-                                            }}
-                                        >
-                                            <HighlightOff />
-                                        </a>
-                                    </Tooltip>
-                                    <Button
-                                        color="primary"
-                                        disabled={!selected.length}
-                                        onClick={() => onOk(selected[0])}
-                                    >
-                                        {moveToSelectedFolderTitle}
-                                    </Button>
-                                </Space>
-                            ) : (
-                                <Button
-                                    color="primary"
-                                    onClick={() => onOk(parentId)}
-                                    disabled={parentId === initialParentId}
+                </Input.Group>
+            ) : (
+                <Row justify="space-between">
+                    <Col>
+                        {allowCreateResource && !createNewFolderLoading && (
+                            <Tooltip title={createNewFolderTitle}>
+                                <a
+                                    style={{ fontSize: "1.5rem" }}
+                                    onClick={onCreateClick}
                                 >
-                                    {moveToThisFolderTitle}
+                                    <CreateNewFolder />
+                                </a>
+                            </Tooltip>
+                        )}
+                    </Col>
+                    <Col>
+                        {selected.length ? (
+                            <Space>
+                                <Tooltip title={cleanSelectionTitle}>
+                                    <Button
+                                        icon={<HighlightOff />}
+                                        onClick={() => {
+                                            resourceStore.cleanSelection();
+                                        }}
+                                    ></Button>
+                                </Tooltip>
+                                <Button
+                                    style={{ width: "200px" }}
+                                    color="primary"
+                                    disabled={!selected.length}
+                                    onClick={() => onOk(selected[0])}
+                                >
+                                    {moveToSelectedFolderTitle}
                                 </Button>
-                            )}
-                        </Col>
-                    </Row>
-                )}
-            </>
-        );
-    }
-);
+                            </Space>
+                        ) : (
+                            <Button
+                                style={{ width: "200px" }}
+                                color="primary"
+                                onClick={() => onOk(parentId)}
+                                disabled={parentId === initialParentId}
+                            >
+                                {moveToThisFolderTitle}
+                            </Button>
+                        )}
+                    </Col>
+                </Row>
+            )}
+        </>
+    );
+});
 
 ResourcePickerModalFooter.propTypes = {
     allowCreateResourceBtn: PropTypes.bool,

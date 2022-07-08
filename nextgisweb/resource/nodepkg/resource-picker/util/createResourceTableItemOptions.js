@@ -15,7 +15,7 @@ export function createResourceTableItemOptions(resource) {
             },
         ],
         cls: "resource_group",
-        displayName: newFolder.displayName,
-        id: newFolder.id,
+        displayName: resource.displayName,
+        id: resource.id,
     };
 }

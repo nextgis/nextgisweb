@@ -8,18 +8,18 @@ import {
     Modal,
     Table,
     Tooltip,
-    Progress,
 } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
-import showModal from "@nextgisweb/gui/showModal";
+
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
 import { useEffect, useMemo, useState } from "react";
 import { showResourcePicker } from "../resource-picker";
-import { createResourceTableItemOptions } from "../util/createResourceTableItemOptions";
+import { createResourceTableItemOptions } from "../resource-picker/util/createResourceTableItemOptions";
 import "./ChildrenSection.less";
+import { forEachSelected } from "./util/forEachSelected";
 
 const { Column } = Table;
 
@@ -139,44 +139,6 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         }
     };
 
-    // WIP for batch reource moving
-    // useEffect(() => {
-    //     const modalOptions = {
-    //         status: "active",
-    //         type: "line",
-    //         percent: 0,
-    //         visible: true,
-    //         closable: false,
-    //         footer: null,
-    //         title: "Resource moving in progress",
-    //     };
-    //     const ProgressModal = ({ visible, closable,footer, title,...progressProps }) => {
-    //         return (
-    //             <Modal {...{ visible, closable, footer, title }}>
-    //                 <Progress {...progressProps} />
-    //             </Modal>
-    //         );
-    //     };
-    //     const movingProgressModal = showModal(ProgressModal, {
-    //         ...modalOptions,
-    //         progress: 0,
-    //     });
-
-    //     const updateProgress = async () => {
-    //         for (const a of Array.from(Array(100), (_, i) => i + 1)) {
-    //             await new Promise((res) => {
-    //                 setTimeout(res, 500);
-    //             });
-    //             movingProgressModal.update({ ...modalOptions, percent: a });
-    //         }
-    //     };
-    //     updateProgress();
-
-    //     return () => {
-    //         // abort all requests
-    //     };
-    // }, []);
-
     useEffect(() => {
         setSelected((oldSelection) => {
             const itemsIds = items.map((item) => item.id);
@@ -187,85 +149,41 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         });
     }, [items]);
 
-    const moveSelectedTo = async (parentId) => {
-        setBatchMoveInProgress(true);
-
-        try {
-            const moved = [];
-            const moveError = [];
-            for (const s of selected) {
-                try {
-                    await route("resource.item", s).put({
-                        json: {
-                            resource: {
-                                parent: { id: parentId },
-                            },
+    const moveSelectedTo = (parentId) => {
+        forEachSelected({
+            title: i18n.gettext("Resource moving progress"),
+            setItems,
+            setSelected,
+            setInProgress: setBatchMoveInProgress,
+            selected,
+            executer: ({ selectedItem, signal }) =>
+                route("resource.item", selectedItem).put({
+                    signal,
+                    json: {
+                        resource: {
+                            parent: { id: parentId },
                         },
-                    });
-                    moved.push(s);
-                } catch {
-                    moveError.push(s);
-                }
-            }
-            if (moveError.length) {
-                errorModal({
-                    tittle: i18n.gettext(
-                        "The errors occurred during execution"
-                    ),
-                    detail: `${i18n.gettext(
-                        "Failed to move items:"
-                    )} ${moveError.join(", ")}`,
-                });
-            } else {
-                notifySuccessfulMove(moved.length);
-            }
-            const removeMoved = (old) =>
-                old.filter((row) => !moved.includes(row.id));
-
-            setSelected(removeMoved);
-            setItems(removeMoved);
-        } catch (err) {
-            errorModal(err);
-        } finally {
-            setBatchMoveInProgress(false);
-        }
+                    },
+                }),
+            onSuccess: (successItems) => {
+                notifySuccessfulMove(successItems.length);
+            },
+        });
     };
 
-    const deleteSelected = async () => {
-        setBatchDeletingInProgress(true);
-        try {
-            const deleted = [];
-            const deleteError = [];
-            for (const s of deleteAllowedSelected) {
-                try {
-                    await route("resource.item", s).delete();
-                    deleted.push(s);
-                } catch {
-                    deleteError.push(s);
-                }
-            }
-            if (deleteError.length) {
-                errorModal({
-                    tittle: i18n.gettext(
-                        "The errors occurred during execution"
-                    ),
-                    detail: `${i18n.gettext(
-                        "Failed to delete items:"
-                    )} ${deleteError.join(", ")}`,
-                });
-            } else {
-                notifySuccessfulDeletion(deleted.length);
-            }
-            const removeDeleted = (old) =>
-                old.filter((row) => !deleted.includes(row.id));
-
-            setSelected(removeDeleted);
-            setItems(removeDeleted);
-        } catch (err) {
-            errorModal(err);
-        } finally {
-            setBatchDeletingInProgress(false);
-        }
+    const deleteSelected = () => {
+        forEachSelected({
+            title: i18n.gettext("Resource deleting progress"),
+            setItems,
+            setSelected,
+            setInProgress: setBatchDeletingInProgress,
+            selected: deleteAllowedSelected,
+            executer: ({ selectedItem, signal }) =>
+                route("resource.item", selectedItem).delete({ signal }),
+            onSuccess: (successItems) => {
+                notifySuccessfulDeletion(successItems.length);
+            },
+        });
     };
 
     const rowSelection = useMemo(() => {
@@ -336,13 +254,17 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
             // Batch change parent
             const changeParentOperationConfig = {
                 label: <>{i18n.gettext("Change parent")}</>,
-                onClick: () =>
-                    showResourcePicker({
+                onClick: () => {
+                    const resourcePicker = showResourcePicker({
                         resourceId,
-                        disabledIds: selected,
+                        disabledIds: [...selected, resourceId],
                         onNewFolder,
-                        onSelect: moveSelectedTo,
-                    }),
+                        onSelect: (newParentId) => {
+                            moveSelectedTo(newParentId);
+                            resourcePicker.close();
+                        },
+                    });
+                },
             };
 
             const batchOperations = [];

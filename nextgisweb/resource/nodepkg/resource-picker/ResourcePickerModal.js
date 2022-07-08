@@ -1,3 +1,5 @@
+import './ResourcePickerModal.css'
+
 import { Modal } from "@nextgisweb/gui/antd";
 import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
@@ -55,6 +57,7 @@ export function ResourcePickerModal({
             {...props}
             visible={visible}
             destroyOnClose
+            className="resource-picker-modal"
             bodyStyle={{
                 overflowY: "auto",
                 minHeight: "400px",
