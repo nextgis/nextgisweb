@@ -7,3 +7,13 @@
 .resource-picker-modal .ant-modal-footer .ant-input {
     text-align: left;
 }
+
+.resource-breadcrumb .ant-breadcrumb-link {
+    display: inline-flex;
+}
+.resource-breadcrumb .ant-breadcrumb-link .resource-breadcrumb-item {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

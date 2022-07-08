@@ -50,6 +50,23 @@ function notifySuccessfulMove(count) {
             : i18n.gettext("Resources have been moved")
     );
 }
+function notifyMoveWithError(successItems, errorItems) {
+    message.warning(
+        `${i18n.gettext("Not all resources moved")} (${successItems.length}/${
+            errorItems.length
+        })`
+    );
+}
+function notifyMoveAbsolutError(errorItems) {
+    const count = errorItems.length;
+    message.error(
+        i18n.gettext(
+            count == 1
+                ? i18n.gettext("Failed to move resource")
+                : i18n.gettext("Failed to move resources")
+        )
+    );
+}
 
 function isDeleteAction(action) {
     const { key } = action;
@@ -110,8 +127,9 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
     const [items, setItems] = useState([...data]);
     const [selected, setSelected] = useState([]);
 
-    const deleteAllowedSelected = useMemo(() => {
+    const selectedAllowefForDelete = useMemo(() => {
         const allowedToDelete = [];
+
         for (const item of items) {
             if (selected.includes(item.id)) {
                 const includeDelAction =
@@ -121,8 +139,9 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 }
             }
         }
+
         return allowedToDelete;
-    }, [selected]);
+    }, [selected, items]);
 
     const rowSelection_ = {
         onChange: (selectedRowKeys) => {
@@ -130,11 +149,12 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         },
     };
 
-    const onNewFolder = (newFolder) => {
-        if (newFolder) {
-            if (newFolder.parent.id === resourceId)
+    const onNewGroup = (newGroup) => {
+        if (newGroup) {
+            if (newGroup.parent.id === resourceId)
                 setItems((old) => {
-                    return [...old, createResourceTableItemOptions(newFolder)];
+                    const newItem = createResourceTableItemOptions(newGroup);
+                    return [...old, newItem];
                 });
         }
     };
@@ -165,8 +185,16 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                         },
                     },
                 }),
-            onSuccess: (successItems) => {
-                notifySuccessfulMove(successItems.length);
+            onComplate: (successItems, errorItems) => {
+                if (successItems.length) {
+                    if (errorItems.length) {
+                        notifyMoveWithError(successItems, errorItems);
+                    } else {
+                        notifySuccessfulMove(successItems.length);
+                    }
+                } else if (errorItems) {
+                    notifyMoveAbsolutError(errorItems);
+                }
             },
         });
     };
@@ -177,11 +205,13 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
             setItems,
             setSelected,
             setInProgress: setBatchDeletingInProgress,
-            selected: deleteAllowedSelected,
+            selected: selectedAllowefForDelete,
             executer: ({ selectedItem, signal }) =>
                 route("resource.item", selectedItem).delete({ signal }),
-            onSuccess: (successItems) => {
-                notifySuccessfulDeletion(successItems.length);
+            onComplate: (successItems, errorItems) => {
+                if (successItems.length) {
+                    notifySuccessfulDeletion(successItems.length);
+                }
             },
         });
     };
@@ -224,16 +254,16 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         if (allowBatch) {
             // Batch delete
             const checkNotAllForDelete =
-                deleteAllowedSelected.length < selected.length &&
-                deleteAllowedSelected.length > 0;
+                selectedAllowefForDelete.length < selected.length &&
+                selectedAllowefForDelete.length > 0;
             const deleteOperationConfig = {
                 label: (
                     <>
                         {i18n.gettext("Delete")}{" "}
-                        {deleteAllowedSelected.length > 0 && (
+                        {selectedAllowefForDelete.length > 0 && (
                             <Badge
                                 size="small"
-                                count={deleteAllowedSelected.length}
+                                count={selectedAllowefForDelete.length}
                             />
                         )}{" "}
                         {checkNotAllForDelete && (
@@ -247,18 +277,18 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                         )}
                     </>
                 ),
-                disabled: !deleteAllowedSelected.length,
+                disabled: !selectedAllowefForDelete.length,
                 onClick: () => confirmThenDelete(deleteSelected),
             };
 
             // Batch change parent
-            const changeParentOperationConfig = {
-                label: <>{i18n.gettext("Change parent")}</>,
+            const moveOperationConfig = {
+                label: <>{i18n.gettext("Move")}</>,
                 onClick: () => {
                     const resourcePicker = showResourcePicker({
                         resourceId,
                         disabledIds: [...selected, resourceId],
-                        onNewFolder,
+                        onNewGroup,
                         onSelect: (newParentId) => {
                             moveSelectedTo(newParentId);
                             resourcePicker.close();
@@ -270,7 +300,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
             const batchOperations = [];
             if (selected.length) {
                 batchOperations.push(
-                    ...[deleteOperationConfig, changeParentOperationConfig]
+                    ...[deleteOperationConfig, moveOperationConfig]
                 );
             }
             if (batchOperations.length) {
@@ -281,22 +311,10 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
             menuItems_.push(...batchOperations);
         }
         return menuItems_;
-    }, [allowBatch, deleteAllowedSelected]);
+    }, [allowBatch, selectedAllowefForDelete]);
 
     const MenuDropdown = () => {
-        const menu = (
-            <Menu>
-                {menuItems.map(({ type, label, ...menuItemProps }, idx) => {
-                    return type === "divider" ? (
-                        <Menu.Divider key={idx}></Menu.Divider>
-                    ) : (
-                        <Menu.Item key={idx} {...menuItemProps}>
-                            {label}
-                        </Menu.Item>
-                    );
-                })}
-            </Menu>
-        );
+        const menu = <Menu items={menuItems} />;
         return (
             <Dropdown overlay={menu} trigger={["click"]}>
                 <a>

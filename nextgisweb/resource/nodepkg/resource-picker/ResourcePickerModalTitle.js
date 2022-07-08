@@ -11,8 +11,10 @@ import { useEffect, useState } from "react";
 import { ResourceBreadcrumb } from "../resource-breadcrumb";
 import ResourcesFilter from "../resources-filter";
 
-const returnToInitialFolderTitle = i18n.gettext("Return to initial folder");
-const refreshFolderTitle = i18n.gettext("Refresh this folder");
+const returnToInitialGroupTitle = i18n.gettext(
+    "Return to initial group resource"
+);
+const refreshGroupTitle = i18n.gettext("Refresh this group resource");
 
 export const ResourcePickerModalTitle = observer(
     ({ resourceStore, onClose }) => {
@@ -21,8 +23,6 @@ export const ResourcePickerModalTitle = observer(
         const [searchMode, setSearchMode] = useState(false);
 
         useEffect(() => {
-            resourceStore.setAllowSelection(!searchMode);
-            resourceStore.setAllowMoveInside(!searchMode);
             resourceStore.setAllowCreateResource(!searchMode);
         }, [searchMode]);
 
@@ -60,13 +60,13 @@ export const ResourcePickerModalTitle = observer(
                             <SearchIcon />
                         </a>
                     </Col>
-                    <Col flex="auto">
+                    <Col flex="auto" className="resource-breadcrumb">
                         <ResourceBreadcrumb resourceStore={resourceStore} />
                     </Col>
 
                     {parentId !== initialParentId && allowMoveInside && (
                         <Col style={{ width: "30px" }}>
-                            <Tooltip title={returnToInitialFolderTitle}>
+                            <Tooltip title={returnToInitialGroupTitle}>
                                 <a
                                     onClick={() =>
                                         resourceStore.returnToInitial()
@@ -79,7 +79,7 @@ export const ResourcePickerModalTitle = observer(
                     )}
 
                     <Col style={{ width: "30px" }}>
-                        <Tooltip title={refreshFolderTitle}>
+                        <Tooltip title={refreshGroupTitle}>
                             <a onClick={() => resourceStore.refresh()}>
                                 <SyncIcon />
                             </a>

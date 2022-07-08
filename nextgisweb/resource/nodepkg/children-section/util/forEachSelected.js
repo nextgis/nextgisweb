@@ -3,7 +3,6 @@ import { showProgressModal } from "@nextgisweb/gui/progress-modal";
 import { errorModal } from "@nextgisweb/gui/error";
 
 const titleMsg = i18n.gettext("Operation progress");
-const errorTitleMsg = i18n.gettext("The errors occurred during execution");
 
 const errorDetailMsg = (errorItems) => {
     return `${i18n.gettext("Failed to execute items:")} ${errorItems.join(
@@ -15,11 +14,10 @@ export async function forEachSelected({
     executer,
     setItems,
     selected,
-    onSuccess,
+    onComplate,
     setSelected,
     setInProgress,
     title = titleMsg,
-    errorTitle = errorTitleMsg,
 }) {
     setInProgress(true);
     const abortControl = new AbortController();
@@ -34,8 +32,10 @@ export async function forEachSelected({
     try {
         const sucessItems = [];
         const errorItems = [];
-        const removeSuccessItems = (old) =>
-            old.filter((row) => !sucessItems.includes(row.id));
+        const removeSuccessItems = (old) => {
+            return old.filter((row) => !sucessItems.includes(row.id));
+        };
+
         let counter = 0;
         for (const selectedItem of selected) {
             try {
@@ -43,8 +43,11 @@ export async function forEachSelected({
                 sucessItems.push(selectedItem);
                 setSelected(removeSuccessItems);
                 setItems(removeSuccessItems);
-            } catch {
+            } catch (er) {
                 errorItems.push(selectedItem);
+                await new Promise((resolve) => {
+                    errorModal(er, { afterClose: resolve });
+                });
             } finally {
                 const progressPercent = Math.ceil(
                     (++counter / selected.length) * 100
@@ -53,14 +56,7 @@ export async function forEachSelected({
             }
         }
         progressModal.close();
-        if (errorItems.length) {
-            errorModal({
-                title: errorTitle,
-                detail: errorDetailMsg(errorItems),
-            });
-        } else if (onSuccess) {
-            onSuccess(sucessItems);
-        }
+        onComplate(sucessItems, errorItems);
     } catch (err) {
         errorModal(err);
     } finally {

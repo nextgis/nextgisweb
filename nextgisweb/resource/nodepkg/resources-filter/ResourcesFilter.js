@@ -38,7 +38,7 @@ const resourcesToOptions = (resourcesInfo) => {
     });
 };
 
-export function ResourcesFilter({ onChange, cls }) {
+export function ResourcesFilter({ onChange, cls, ...rest }) {
     const [options, setOptions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
@@ -112,6 +112,7 @@ export function ResourcesFilter({ onChange, cls }) {
             options={options}
             status={acStatus}
             notFoundContent={i18n.gettext("Resources not found")}
+            {...rest}
         >
             <Input.Search
                 size="middle"

@@ -15,8 +15,8 @@ export class ResourcePickerStore {
     brearcrumbItemsLoading = false;
     brearcrumbItems = [];
 
-    createNewFolderLoading = false;
-    createNewFolderError = false;
+    createNewGroupLoading = false;
+    createNewGroupError = false;
 
     disabledIds = [];
     enabledCls = [];
@@ -28,16 +28,16 @@ export class ResourcePickerStore {
 
     selected = [];
 
-    onNewFolder = null;
+    onNewGroup = null;
 
     setChildrenAbortController = null;
     setBrearcrumbItemsAbortController = null;
-    createNewFolderAbortController = null;
+    createNewGroupAbortController = null;
 
-    constructor({ parentId, disabledIds, enabledCls, onNewFolder }) {
+    constructor({ parentId, disabledIds, enabledCls, onNewGroup }) {
         this.parentId = parentId;
         this.initialParentId = this.parentId;
-        this.onNewFolder = onNewFolder;
+        this.onNewGroup = onNewGroup;
         if (disabledIds) {
             this.disabledIds = disabledIds;
         }
@@ -47,7 +47,7 @@ export class ResourcePickerStore {
         makeAutoObservable(this, {
             setChildrenAbortController: false,
             setBrearcrumbItemsAbortController: false,
-            createNewFolderAbortController: false,
+            createNewGroupAbortController: false,
         });
         this.changeParentTo(this.parentId);
     }
@@ -102,7 +102,7 @@ export class ResourcePickerStore {
     abort() {
         this.abortChildLoading();
         this.abortBreadcrumbsLoading();
-        this.aboretNewFolderCreation();
+        this.aboretNewGroupCreation();
     }
 
     abortChildLoading() {
@@ -119,11 +119,11 @@ export class ResourcePickerStore {
         this.setBrearcrumbItemsAbortController = null;
     }
 
-    aboretNewFolderCreation() {
-        if (this.createNewFolderAbortController) {
-            this.createNewFolderAbortController.abort();
+    aboretNewGroupCreation() {
+        if (this.createNewGroupAbortController) {
+            this.createNewGroupAbortController.abort();
         }
-        this.createNewFolderAbortController = null;
+        this.createNewGroupAbortController = null;
     }
 
     async setBrearcrumbItems(parent) {
@@ -188,12 +188,12 @@ export class ResourcePickerStore {
         }
     }
 
-    async createNewFolder(name) {
-        this.aboretNewFolderCreation();
+    async createNewGroup(name) {
+        this.aboretNewGroupCreation();
         try {
-            this.createNewFolderAbortController = new AbortController();
+            this.createNewGroupAbortController = new AbortController();
             runInAction(() => {
-                this.createNewFolderLoading = true;
+                this.createNewGroupLoading = true;
             });
 
             const payload = {
@@ -206,30 +206,31 @@ export class ResourcePickerStore {
                     cls: "resource_group",
                 },
             };
-            const newGroup = await route("resource.collection").post({
+            const createdItem = await route("resource.collection").post({
                 json: payload,
             });
+            // const newResource = await route("resource.item", createdItem.id).get();
 
             await this.refresh();
             const newItem = [...this.children].find(
-                (c) => c.id === newGroup.id
+                (c) => c.id === createdItem.id
             );
 
             if (newItem) {
-                if (this.onNewFolder) {
-                    this.onNewFolder(newItem);
+                if (this.onNewGroup) {
+                    this.onNewGroup(newItem);
                 }
                 return newItem;
             }
         } catch (er) {
             const { title } = extractError(er);
             runInAction(() => {
-                this.createNewFolderError = title;
+                this.createNewGroupError = title;
             });
-            throw new Error(er);
+            throw er;
         } finally {
             runInAction(() => {
-                this.createNewFolderLoading = false;
+                this.createNewGroupLoading = false;
             });
         }
     }

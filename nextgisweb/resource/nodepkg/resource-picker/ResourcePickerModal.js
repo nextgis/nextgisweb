@@ -17,11 +17,11 @@ const DEFAULTS = {
 };
 
 export function ResourcePickerModal({
+    onSelect,
+    enabledCls = ["resource_group"],
     resourceId,
     disabledIds,
-    enabledCls = ["resource_group"],
-    onNewFolder,
-    onSelect,
+    onNewGroup,
     allowCreateResourceBtn = true,
     ...props
 }) {
@@ -32,7 +32,7 @@ export function ResourcePickerModal({
             parentId: resourceId,
             disabledIds,
             enabledCls,
-            onNewFolder,
+            onNewGroup,
         })
     );
     const close = () => setVisible(false);

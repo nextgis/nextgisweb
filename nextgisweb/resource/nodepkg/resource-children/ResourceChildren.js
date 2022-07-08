@@ -11,13 +11,13 @@ const { Column } = Table;
 
 export const ResourceChildren = observer(({ resourceStore }) => {
     const {
-        children,
-        childrenLoading,
-        disabledIds,
-        enabledCls,
         selected,
-        allowMoveInside,
+        children,
+        enabledCls,
+        disabledIds,
         allowSelection,
+        allowMoveInside,
+        childrenLoading,
     } = resourceStore;
 
     const [selectionType] = useState("radio");
@@ -60,7 +60,9 @@ export const ResourceChildren = observer(({ resourceStore }) => {
         if (disabled || !allowMoveInside) {
             return <></>;
         }
-        const onClick = () => {
+        const onClick = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
             resourceStore.changeParentTo(record.id);
         };
         return (
@@ -83,6 +85,23 @@ export const ResourceChildren = observer(({ resourceStore }) => {
                     ...rowSelection,
                 }
             }
+            onRow={(record, rowIndex) => {
+                return {
+                    onClick: (event) => {
+                        const props = getCheckboxProps(record);
+                        if (props.disabled) {
+                            return;
+                        }
+                        const existIndex = selected.indexOf(record.id);
+                        let newSelected = [record.id];
+                        if (existIndex !== -1) {
+                            newSelected = [...selected];
+                            newSelected.splice(existIndex, 1);
+                        }
+                        resourceStore.setSelected(newSelected);
+                    },
+                };
+            }}
         >
             <Column
                 title={i18n.gettext("Display name")}

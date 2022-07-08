@@ -1,8 +1,10 @@
+import { routeURL } from "@nextgisweb/pyramid/api";
+
 export function createResourceTableItemOptions(resource) {
     return {
         actions: [
             {
-                href: "",
+                href: routeURL("resource.update", resource.id),
                 title: "Изменить",
                 icon: "material-edit",
                 key: ["operation", "10-update"],
@@ -17,5 +19,6 @@ export function createResourceTableItemOptions(resource) {
         cls: "resource_group",
         displayName: resource.displayName,
         id: resource.id,
+        link: routeURL("resource.show", resource.id)
     };
 }

@@ -1,11 +1,5 @@
 import HomeFilled from "@material-icons/svg/home-filled";
-import {
-    Breadcrumb,
-    Menu,
-    Skeleton,
-    Space,
-    Tooltip,
-} from "@nextgisweb/gui/antd";
+import { Breadcrumb, Menu, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
 import { useMemo } from "react";
@@ -27,10 +21,16 @@ export const ResourceBreadcrumb = observer(
 
             const createLabel = (resItem, name, link = true) => {
                 const name_ = name || resItem.resource.display_name;
-                return allowMoveInside && link ? (
-                    <a onClick={() => onClick(resItem.resource.id)}>{name_}</a>
-                ) : (
-                    name_
+                return (
+                    <span className="resource-breadcrumb-item">
+                        {allowMoveInside && link ? (
+                            <a onClick={() => onClick(resItem.resource.id)}>
+                                {name_}
+                            </a>
+                        ) : (
+                            name_
+                        )}
+                    </span>
                 );
             };
 
@@ -41,23 +41,20 @@ export const ResourceBreadcrumb = observer(
                 brearcrumbItems.length > maxBreadcrumbItems;
             if (packFirstItemsToMenu) {
                 // Skip the first item because it's a Home
-                const moveToMenuItems = brearcrumbItems.splice(
+                const breadcrumbsForMenu = brearcrumbItems.splice(
                     1,
                     brearcrumbItems.length - 1 - maxBreadcrumbItems
                 );
+                const moveToMenuItems = breadcrumbsForMenu.map((item) => {
+                    return {
+                        label: createLabel(item),
+                    };
+                });
                 menuItems.push(...moveToMenuItems);
             }
 
             const moveToResourceMenu = menuItems.length && (
-                <Menu>
-                    {menuItems.map((item) => {
-                        return (
-                            <Menu.Item key={item.resource.id}>
-                                {createLabel(item)}
-                            </Menu.Item>
-                        );
-                    })}
-                </Menu>
+                <Menu items={menuItems} />
             );
 
             const HomeIcon = () => (

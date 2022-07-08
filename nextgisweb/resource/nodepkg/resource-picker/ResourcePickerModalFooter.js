@@ -4,128 +4,154 @@ import DoneIcon from "@material-icons/svg/done";
 import HighlightOff from "@material-icons/svg/highlight_off";
 import { Button, Col, Input, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
+import { useKeydownListener } from "@nextgisweb/gui/hook";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
 import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
-import { useEffect, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
-const createNewFolderTitle = i18n.gettext("New folder");
-const moveToThisFolderTitle = i18n.gettext("Move to this folder");
-const moveToSelectedFolderTitle = i18n.gettext("Move");
+const createNewGroupTitle = i18n.gettext("New resource group");
+const moveToThisGroupTitle = i18n.gettext("Move to this resource group");
+const moveToSelectedGroupTitle = i18n.gettext("Move");
 const cleanSelectionTitle = i18n.gettext("Clean selection");
 
-export const ResourcePickerModalFooter = observer(({ resourceStore, onOk }) => {
+const CreateControl = observer(({ setCreateMode, resourceStore }) => {
+    const { childrenLoading } = resourceStore;
+    const resourceNameInput = useRef(null);
+
+    const [resourceName, setResourceName] = useState();
+
+    useKeydownListener("enter", () => {
+        onSave();
+    });
+
+    useEffect(() => {
+        const input = resourceNameInput.current;
+        if (input) {
+            input.focus();
+        }
+    }, []);
+
+    const onSave = async () => {
+        try {
+            if (resourceName) {
+                await resourceStore.createNewGroup(resourceName);
+                setCreateMode(false);
+            }
+        } catch (er) {
+            errorModal(er);
+        }
+    };
+
+    return (
+        <Input.Group>
+            <Row>
+                <Col>
+                    <Button
+                        icon={<ArrowBack />}
+                        onClick={() => setCreateMode(false)}
+                    ></Button>
+                </Col>
+                <Col flex="auto">
+                    <Input
+                        style={{ width: "calc(100% - 40px)" }}
+                        value={resourceName}
+                        onChange={(e) => {
+                            setResourceName(e.target.value);
+                        }}
+                        ref={resourceNameInput}
+                    />
+                    <Button
+                        type="primary"
+                        icon={<DoneIcon />}
+                        loading={childrenLoading}
+                        disabled={!resourceName}
+                        onClick={onSave}
+                    ></Button>
+                </Col>
+            </Row>
+        </Input.Group>
+    );
+});
+
+const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
     const {
         selected,
         parentId,
-        initialParentId,
-        createNewFolderLoading,
+        disabledIds,
         allowCreateResource,
-        childrenLoading,
+        createNewGroupLoading,
     } = resourceStore;
-
-    const [createMode, setCreateMode] = useState(false);
-    const [newFolderName, setNewFolderName] = useState();
 
     const onCreateClick = () => {
         resourceStore.cleanSelection();
         setCreateMode(true);
     };
 
-    const onSave = async () => {
-        try {
-            await resourceStore.createNewFolder(newFolderName);
-            setCreateMode(false);
-        } catch (er) {
-            errorModal(er);
-        }
-    };
+    return (
+        <Row justify="space-between">
+            <Col>
+                {allowCreateResource && !createNewGroupLoading && (
+                    <Tooltip title={createNewGroupTitle}>
+                        <a
+                            style={{ fontSize: "1.5rem" }}
+                            onClick={onCreateClick}
+                        >
+                            <CreateNewFolder />
+                        </a>
+                    </Tooltip>
+                )}
+            </Col>
+            <Col>
+                {selected.length ? (
+                    <Space>
+                        <Tooltip title={cleanSelectionTitle}>
+                            <Button
+                                icon={<HighlightOff />}
+                                onClick={() => {
+                                    resourceStore.cleanSelection();
+                                }}
+                            ></Button>
+                        </Tooltip>
+                        <Button
+                            style={{ width: "200px" }}
+                            color="primary"
+                            disabled={!selected.length}
+                            onClick={() => onOk(selected[0])}
+                        >
+                            {moveToSelectedGroupTitle}
+                        </Button>
+                    </Space>
+                ) : (
+                    <Button
+                        style={{ width: "200px" }}
+                        color="primary"
+                        onClick={() => onOk(parentId)}
+                        disabled={disabledIds.includes(parentId)}
+                    >
+                        {moveToThisGroupTitle}
+                    </Button>
+                )}
+            </Col>
+        </Row>
+    );
+});
 
-    useEffect(() => {
-        resourceStore.setAllowSelection(!createMode);
-        resourceStore.setAllowMoveInside(!createMode);
-    }, [createMode]);
+export const ResourcePickerModalFooter = observer(({ resourceStore, onOk }) => {
+    const [createMode, setCreateMode] = useState(false);
 
     return (
         <>
             {createMode ? (
-                <Input.Group>
-                    <Row>
-                        <Col>
-                            <Button
-                                icon={<ArrowBack />}
-                                onClick={() => setCreateMode(false)}
-                            ></Button>
-                        </Col>
-                        <Col flex="auto">
-                            <Input
-                                style={{ width: "calc(100% - 40px)" }}
-                                onChange={(e) => {
-                                    setNewFolderName(e.target.value);
-                                }}
-                            />
-                            <Button
-                                type="primary"
-                                icon={<DoneIcon />}
-                                loading={childrenLoading}
-                                disabled={!newFolderName}
-                                onClick={onSave}
-                            ></Button>
-                        </Col>
-                    </Row>
-                </Input.Group>
+                <CreateControl {...{ resourceStore, setCreateMode }} />
             ) : (
-                <Row justify="space-between">
-                    <Col>
-                        {allowCreateResource && !createNewFolderLoading && (
-                            <Tooltip title={createNewFolderTitle}>
-                                <a
-                                    style={{ fontSize: "1.5rem" }}
-                                    onClick={onCreateClick}
-                                >
-                                    <CreateNewFolder />
-                                </a>
-                            </Tooltip>
-                        )}
-                    </Col>
-                    <Col>
-                        {selected.length ? (
-                            <Space>
-                                <Tooltip title={cleanSelectionTitle}>
-                                    <Button
-                                        icon={<HighlightOff />}
-                                        onClick={() => {
-                                            resourceStore.cleanSelection();
-                                        }}
-                                    ></Button>
-                                </Tooltip>
-                                <Button
-                                    style={{ width: "200px" }}
-                                    color="primary"
-                                    disabled={!selected.length}
-                                    onClick={() => onOk(selected[0])}
-                                >
-                                    {moveToSelectedFolderTitle}
-                                </Button>
-                            </Space>
-                        ) : (
-                            <Button
-                                style={{ width: "200px" }}
-                                color="primary"
-                                onClick={() => onOk(parentId)}
-                                disabled={parentId === initialParentId}
-                            >
-                                {moveToThisFolderTitle}
-                            </Button>
-                        )}
-                    </Col>
-                </Row>
+                <MoveControl {...{ resourceStore, setCreateMode, onOk }} />
             )}
         </>
     );
 });
 
 ResourcePickerModalFooter.propTypes = {
-    allowCreateResourceBtn: PropTypes.bool,
+    resourceStore: PropTypes.object,
     onOk: PropTypes.func,
 };
