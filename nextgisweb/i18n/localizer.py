@@ -29,6 +29,7 @@ class Translations(BabelTranslations):
             self.add(dtrans)
 
     def load_envcomp(self, env, locale):
+        self.locale = locale
         for comp_id, comp in env._components.items():
             package_path = Path(resource_filename(pkginfo.comp_pkg(comp_id), '')).parent
 

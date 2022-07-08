@@ -1,4 +1,7 @@
 from functools import partial
+from inspect import signature
+
+from ..logging import logger
 
 
 class TrStr:
@@ -47,6 +50,35 @@ class TrStrConcat:
         return "".join(map(str, deep_translate(self._items, translator)))
 
 
+def translate_guard(errors):
+
+    def actual_decorator(func):
+        translate_args = 'translate_args' in signature(func).parameters
+
+        def wrapper(trstr, original_translator):
+            kwargs = dict() if not translate_args else dict(
+                translate_args=trstr.__translate_args__(original_translator))
+
+            try:
+                return func(trstr, original_translator, **kwargs)
+            except errors as exc:
+                try:
+                    result = func(trstr, dummy_translator, **kwargs)
+                except errors:
+                    raise exc from None
+                else:
+                    logger.exception(
+                        'Got an exception during translation into "%s". '
+                        'Falling back to untranslated message "%s".',
+                        getattr(original_translator, 'locale', 'unknown'),
+                        str(trstr), exc_info=exc)
+                    return result
+
+        return wrapper
+
+    return actual_decorator
+
+
 class TrStrModFormat:
 
     def __init__(self, trstr, arg):
@@ -62,9 +94,12 @@ class TrStrModFormat:
     def __radd__(self, other):
         return TrStrConcat(other, self)
 
-    def __translate__(self, translator):
-        arg = deep_translate(self.arg, translator)
-        return self.trstr.__translate__(translator) % arg
+    def __translate_args__(self, translator):
+        return deep_translate(self.arg, translator)
+
+    @translate_guard(TypeError)
+    def __translate__(self, translator, translate_args):
+        return self.trstr.__translate__(translator) % translate_args
 
 
 class TrStrFormat:
@@ -76,7 +111,7 @@ class TrStrFormat:
 
     def __str__(self):
         return str(self.trstr).format(
-            *deep_cast_to_str(self.arg), **deep_cast_to_str(self.kwargs))
+            *deep_cast_to_str(self.args), **deep_cast_to_str(self.kwargs))
 
     def __add__(self, other):
         return TrStrConcat(self, other)
@@ -84,10 +119,19 @@ class TrStrFormat:
     def __radd__(self, other):
         return TrStrConcat(other, self)
 
-    def __translate__(self, translator):
-        return self.trstr.__translate__(translator).format(
-            *deep_translate(self.args, translator),
-            **deep_translate(self.kwargs, translator))
+    def __translate_args__(self, translator):
+        return (
+            deep_translate(self.args, translator),
+            deep_translate(self.kwargs, translator)
+        )
+
+    def __translate_message__(self, translator):
+        return self.trstr.__translate__(translator)
+
+    @translate_guard((KeyError, IndexError))
+    def __translate__(self, translator, translate_args):
+        args, kwargs = translate_args
+        return self.trstr.__translate__(translator).format(*args, **kwargs)
 
 
 def deep_translate(value, translator):
@@ -120,3 +164,11 @@ def deep_cast_to_str(value):
 
 def trstr_factory(domain):
     return partial(TrStr, domain=domain)
+
+
+class DummyTranslator:
+    def translate(self, msg, *, context=None, domain=None):
+        return msg
+
+
+dummy_translator = DummyTranslator()
