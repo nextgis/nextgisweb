@@ -8,28 +8,20 @@ import {
     Modal,
     Table,
     Tooltip,
+    Progress,
 } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
+import showModal from "@nextgisweb/gui/showModal";
+import { formatSize } from "@nextgisweb/gui/util/formatSize";
+import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { showResourcePicker } from "../resource-picker";
+import { createResourceTableItemOptions } from "../util/createResourceTableItemOptions";
 import "./ChildrenSection.less";
 
 const { Column } = Table;
-
-function formatSize(volume) {
-    if (volume === 0) {
-        return "-";
-    } else {
-        var units = ["B", "KB", "MB", "GB", "TB"];
-        var i = Math.min(
-            Math.floor(Math.log(volume) / Math.log(1024)),
-            units.length - 1
-        );
-        const value = volume / Math.pow(1024, i);
-        return value.toFixed(0) + " " + units[i];
-    }
-}
 
 function confirmThenDelete(callback) {
     Modal.confirm({
@@ -49,6 +41,13 @@ function notifySuccessfulDeletion(count) {
         count == 1
             ? i18n.gettext("Resource deleted")
             : i18n.gettext("Resources deleted")
+    );
+}
+function notifySuccessfulMove(count) {
+    message.success(
+        count == 1
+            ? i18n.gettext("Resource has been moved")
+            : i18n.gettext("Resources have been moved")
     );
 }
 
@@ -91,16 +90,6 @@ function renderActions(actions, id, setTableItems) {
     });
 }
 
-function sorterFactory(attr) {
-    return (a, b) => {
-        const va = a[attr];
-        const vb = b[attr];
-        if (va == vb) return 0;
-        if (va > vb) return 1;
-        if (vb > va) return -1;
-    };
-}
-
 async function loadVolumes(data, setState) {
     setState({});
     for (const { id } of data) {
@@ -111,10 +100,11 @@ async function loadVolumes(data, setState) {
     }
 }
 
-export function ChildrenSection({ data, storageEnabled, ...props }) {
+export function ChildrenSection({ data, storageEnabled, resourceId }) {
     const [volumeVisible, setVolumeVisible] = useState(false);
     const [batchDeletingInProgress, setBatchDeletingInProgress] =
         useState(false);
+    const [batchMoveInProgress, setBatchMoveInProgress] = useState(false);
     const [allowBatch, setAllowBatch] = useState(false);
     const [volumeValues, setVolumeValues] = useState({});
     const [items, setItems] = useState([...data]);
@@ -140,6 +130,53 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
         },
     };
 
+    const onNewFolder = (newFolder) => {
+        if (newFolder) {
+            if (newFolder.parent.id === resourceId)
+                setItems((old) => {
+                    return [...old, createResourceTableItemOptions(newFolder)];
+                });
+        }
+    };
+
+    // WIP for batch reource moving
+    // useEffect(() => {
+    //     const modalOptions = {
+    //         status: "active",
+    //         type: "line",
+    //         percent: 0,
+    //         visible: true,
+    //         closable: false,
+    //         footer: null,
+    //         title: "Resource moving in progress",
+    //     };
+    //     const ProgressModal = ({ visible, closable,footer, title,...progressProps }) => {
+    //         return (
+    //             <Modal {...{ visible, closable, footer, title }}>
+    //                 <Progress {...progressProps} />
+    //             </Modal>
+    //         );
+    //     };
+    //     const movingProgressModal = showModal(ProgressModal, {
+    //         ...modalOptions,
+    //         progress: 0,
+    //     });
+
+    //     const updateProgress = async () => {
+    //         for (const a of Array.from(Array(100), (_, i) => i + 1)) {
+    //             await new Promise((res) => {
+    //                 setTimeout(res, 500);
+    //             });
+    //             movingProgressModal.update({ ...modalOptions, percent: a });
+    //         }
+    //     };
+    //     updateProgress();
+
+    //     return () => {
+    //         // abort all requests
+    //     };
+    // }, []);
+
     useEffect(() => {
         setSelected((oldSelection) => {
             const itemsIds = items.map((item) => item.id);
@@ -150,7 +187,50 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
         });
     }, [items]);
 
-    // TODO: make universal function with ModelBrowser.js
+    const moveSelectedTo = async (parentId) => {
+        setBatchMoveInProgress(true);
+
+        try {
+            const moved = [];
+            const moveError = [];
+            for (const s of selected) {
+                try {
+                    await route("resource.item", s).put({
+                        json: {
+                            resource: {
+                                parent: { id: parentId },
+                            },
+                        },
+                    });
+                    moved.push(s);
+                } catch {
+                    moveError.push(s);
+                }
+            }
+            if (moveError.length) {
+                errorModal({
+                    tittle: i18n.gettext(
+                        "The errors occurred during execution"
+                    ),
+                    detail: `${i18n.gettext(
+                        "Failed to move items:"
+                    )} ${moveError.join(", ")}`,
+                });
+            } else {
+                notifySuccessfulMove(moved.length);
+            }
+            const removeMoved = (old) =>
+                old.filter((row) => !moved.includes(row.id));
+
+            setSelected(removeMoved);
+            setItems(removeMoved);
+        } catch (err) {
+            errorModal(err);
+        } finally {
+            setBatchMoveInProgress(false);
+        }
+    };
+
     const deleteSelected = async () => {
         setBatchDeletingInProgress(true);
         try {
@@ -224,34 +304,51 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
             });
         }
         if (allowBatch) {
+            // Batch delete
+            const checkNotAllForDelete =
+                deleteAllowedSelected.length < selected.length &&
+                deleteAllowedSelected.length > 0;
+            const deleteOperationConfig = {
+                label: (
+                    <>
+                        {i18n.gettext("Delete")}{" "}
+                        {deleteAllowedSelected.length > 0 && (
+                            <Badge
+                                size="small"
+                                count={deleteAllowedSelected.length}
+                            />
+                        )}{" "}
+                        {checkNotAllForDelete && (
+                            <Tooltip
+                                title={i18n.gettext(
+                                    "Not all of the selected can be deleted."
+                                )}
+                            >
+                                <PriorityHighIcon />
+                            </Tooltip>
+                        )}
+                    </>
+                ),
+                disabled: !deleteAllowedSelected.length,
+                onClick: () => confirmThenDelete(deleteSelected),
+            };
+
+            // Batch change parent
+            const changeParentOperationConfig = {
+                label: <>{i18n.gettext("Change parent")}</>,
+                onClick: () =>
+                    showResourcePicker({
+                        resourceId,
+                        disabledIds: selected,
+                        onNewFolder,
+                        onSelect: moveSelectedTo,
+                    }),
+            };
+
             const batchOperations = [];
             if (selected.length) {
                 batchOperations.push(
-                    ...[
-                        {
-                            label: (
-                                <>
-                                    {i18n.gettext("Delete")}{" "}
-                                    {deleteAllowedSelected.length > 0 && <Badge
-                                        size="small"
-                                        count={deleteAllowedSelected.length}
-                                    />}{" "}
-                                    {deleteAllowedSelected.length <
-                                        selected.length && deleteAllowedSelected.length > 0 && (
-                                        <Tooltip
-                                            title={i18n.gettext(
-                                                "Not all of the selected can be deleted."
-                                            )}
-                                        >
-                                            <PriorityHighIcon />
-                                        </Tooltip>
-                                    )}
-                                </>
-                            ),
-                            disabled: !deleteAllowedSelected.length,
-                            onClick: () => confirmThenDelete(deleteSelected),
-                        },
-                    ]
+                    ...[deleteOperationConfig, changeParentOperationConfig]
                 );
             }
             if (batchOperations.length) {
@@ -271,7 +368,7 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
                     return type === "divider" ? (
                         <Menu.Divider key={idx}></Menu.Divider>
                     ) : (
-                        <Menu.Item key={label} {...menuItemProps}>
+                        <Menu.Item key={idx} {...menuItemProps}>
                             {label}
                         </Menu.Item>
                     );

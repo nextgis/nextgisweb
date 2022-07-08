@@ -38,6 +38,7 @@
             comp.default, {
                 storageEnabled: ${json_js(request.env.core.options['storage.enabled'])},
                 data: ${json_js(data)},
+                resourceId: ${obj.id},
             }, document.getElementById('childrenSection')
         );
     });
