@@ -53,7 +53,7 @@ export class ResourcePickerStore {
     }
 
     async changeParentTo(parent) {
-        this.cleanSelection();
+        this.clearSelection();
         runInAction(() => {
             this.parentId = parent;
             this.setChildrenFor(parent);
@@ -79,7 +79,7 @@ export class ResourcePickerStore {
         });
     }
 
-    cleanSelection() {
+    clearSelection() {
         this.setSelected([]);
     }
 

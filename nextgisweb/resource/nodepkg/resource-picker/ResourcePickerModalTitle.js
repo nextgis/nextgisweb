@@ -12,9 +12,9 @@ import { ResourceBreadcrumb } from "../resource-breadcrumb";
 import ResourcesFilter from "../resources-filter";
 
 const returnToInitialGroupTitle = i18n.gettext(
-    "Return to initial group resource"
+    "Go to initial group"
 );
-const refreshGroupTitle = i18n.gettext("Refresh this group resource");
+const refreshGroupTitle = i18n.gettext("Refresh");
 
 export const ResourcePickerModalTitle = observer(
     ({ resourceStore, onClose }) => {

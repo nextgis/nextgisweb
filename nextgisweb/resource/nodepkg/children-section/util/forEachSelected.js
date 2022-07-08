@@ -2,13 +2,7 @@ import i18n from "@nextgisweb/pyramid/i18n!resource";
 import { showProgressModal } from "@nextgisweb/gui/progress-modal";
 import { errorModal } from "@nextgisweb/gui/error";
 
-const titleMsg = i18n.gettext("Operation progress");
-
-const errorDetailMsg = (errorItems) => {
-    return `${i18n.gettext("Failed to execute items:")} ${errorItems.join(
-        ", "
-    )}`;
-};
+const titleMsg = i18n.gettext("Operation in progress");
 
 export async function forEachSelected({
     executer,

@@ -10,10 +10,10 @@ import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
 import { useState, useRef, useEffect } from "react";
 
-const createNewGroupTitle = i18n.gettext("New resource group");
-const moveToThisGroupTitle = i18n.gettext("Move to this resource group");
-const moveToSelectedGroupTitle = i18n.gettext("Move");
-const cleanSelectionTitle = i18n.gettext("Clean selection");
+const createNewGroupTitle = i18n.gettext("Create group");
+const moveToThisGroupTitle = i18n.gettext("Move to this group");
+const moveToSelectedGroupTitle = i18n.gettext("Move to selected group");
+const clearSelectionTitle = i18n.gettext("Clear selection");
 
 const CreateControl = observer(({ setCreateMode, resourceStore }) => {
     const { childrenLoading } = resourceStore;
@@ -84,12 +84,12 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
     } = resourceStore;
 
     const onCreateClick = () => {
-        resourceStore.cleanSelection();
+        resourceStore.clearSelection();
         setCreateMode(true);
     };
 
     return (
-        <Row justify="space-between">
+        <Row justify="space-between" >
             <Col>
                 {allowCreateResource && !createNewGroupLoading && (
                     <Tooltip title={createNewGroupTitle}>
@@ -105,17 +105,16 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
             <Col>
                 {selected.length ? (
                     <Space>
-                        <Tooltip title={cleanSelectionTitle}>
+                        <Tooltip title={clearSelectionTitle}>
                             <Button
                                 icon={<HighlightOff />}
                                 onClick={() => {
-                                    resourceStore.cleanSelection();
+                                    resourceStore.clearSelection();
                                 }}
                             ></Button>
                         </Tooltip>
                         <Button
-                            style={{ width: "200px" }}
-                            color="primary"
+                            type="primary"
                             disabled={!selected.length}
                             onClick={() => onOk(selected[0])}
                         >
@@ -124,8 +123,7 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
                     </Space>
                 ) : (
                     <Button
-                        style={{ width: "200px" }}
-                        color="primary"
+                        type="primary"
                         onClick={() => onOk(parentId)}
                         disabled={disabledIds.includes(parentId)}
                     >

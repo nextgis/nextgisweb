@@ -171,7 +171,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
 
     const moveSelectedTo = (parentId) => {
         forEachSelected({
-            title: i18n.gettext("Resource moving progress"),
+            title: i18n.gettext("Moving resources"),
             setItems,
             setSelected,
             setInProgress: setBatchMoveInProgress,
@@ -201,7 +201,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
 
     const deleteSelected = () => {
         forEachSelected({
-            title: i18n.gettext("Resource deleting progress"),
+            title: i18n.gettext("Deleting resources"),
             setItems,
             setSelected,
             setInProgress: setBatchDeletingInProgress,
