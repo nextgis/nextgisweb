@@ -42,8 +42,8 @@ function extractError(error) {
     };
 }
 
-function errorModal(error) {
-    return showModal(ErrorModal, { error: extractError(error) });
+function errorModal(error, props) {
+    return showModal(ErrorModal, { error: extractError(error), ...props });
 }
 
 export { errorModal, ErrorPage, extractError };

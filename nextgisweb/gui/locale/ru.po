@@ -91,11 +91,19 @@ msgstr "Необходимо исправить ошибки в форме"
 msgid "Logo saved. Reload the page to get them applied."
 msgstr "Логотип сохранен. Для просмотра изменений обновите страницу."
 
-#: nodepkg/single-setting-form/SingleSettingForm.js:9
+#: nodepkg/progress-modal/ProgressModal.js:4
+msgid "Operation in progress"
+msgstr "Выполняется операция"
+
+#: nodepkg/progress-modal/ProgressModal.js:5
+msgid "Cancel"
+msgstr "Отмена"
+
+#: nodepkg/single-setting-form/SingleSettingForm.js:10
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/single-setting-form/SingleSettingForm.js:10
+#: nodepkg/single-setting-form/SingleSettingForm.js:11
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
 

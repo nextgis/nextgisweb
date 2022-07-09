@@ -33,9 +33,23 @@ export default function showModal(ModalComponent, config) {
         render(currentConfig);
     }
 
+    function update(configUpdate) {
+        if (typeof configUpdate === "function") {
+            currentConfig = configUpdate(currentConfig);
+        } else {
+            currentConfig = {
+                ...currentConfig,
+                ...configUpdate,
+            };
+        }
+        render(currentConfig);
+    }
+
     render(currentConfig);
 
     return {
         destroy: close,
+        close,
+        update,
     };
 }

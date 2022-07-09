@@ -56,7 +56,11 @@
         reactApp.default(layout.Menu, {}, document.getElementById("menu"));
 
         %if not hide_resource_filter:
-        reactApp.default(resourcesFilter.default, {}, document.getElementById("resourcesFilter"));
+        reactApp.default(resourcesFilter.default, {
+            onChange: function(v, opt) {
+                window.location.href = opt.url
+            }
+        }, document.getElementById("resourcesFilter"));
         %endif
     });
 </script>

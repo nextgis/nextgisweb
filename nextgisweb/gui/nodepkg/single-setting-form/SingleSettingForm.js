@@ -2,6 +2,7 @@ import { Col, Input, message, Row } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
 import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
@@ -21,12 +22,15 @@ export function SingleSettingForm({
     const [status, setStatus] = useState("loading");
     const [value, setValue] = useState();
 
-    useEffect(async () => {
-        const resp = await route(model).get();
-        const val = settingName ? resp[settingName] : resp;
-        setValue(val);
-        setStatus(null);
-    }, []);
+    const { data } = useRouteGet({ name: model });
+
+    useEffect(() => {
+        if (data) {
+            const val = settingName ? data[settingName] : data;
+            setValue(val);
+            setStatus(null);
+        }
+    }, [data]);
 
     const save = async () => {
         setStatus("saving");
@@ -38,7 +42,11 @@ export function SingleSettingForm({
                 json,
             });
             if (saveSuccesText) {
-                message.success([saveSuccesText, saveSuccesReloadText].filter(Boolean).join(' '));
+                message.success(
+                    [saveSuccesText, saveSuccesReloadText]
+                        .filter(Boolean)
+                        .join(" ")
+                );
             }
         } catch (err) {
             errorModal(err);
@@ -48,7 +56,7 @@ export function SingleSettingForm({
     };
 
     if (status == "loading") {
-        return <LoadingWrapper />;
+        return <LoadingWrapper rows={1} />;
     }
 
     return (
@@ -57,7 +65,7 @@ export function SingleSettingForm({
                 <Input
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
-                    allowClear 
+                    allowClear
                     {...inputProps}
                 />
             </Col>

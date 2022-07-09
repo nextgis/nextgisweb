@@ -10,26 +10,18 @@ import {
     Tooltip,
 } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
+
+import { formatSize } from "@nextgisweb/gui/util/formatSize";
+import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { showResourcePicker } from "../resource-picker";
+import { createResourceTableItemOptions } from "../resource-picker/util/createResourceTableItemOptions";
 import "./ChildrenSection.less";
+import { forEachSelected } from "./util/forEachSelected";
 
 const { Column } = Table;
-
-function formatSize(volume) {
-    if (volume === 0) {
-        return "-";
-    } else {
-        var units = ["B", "KB", "MB", "GB", "TB"];
-        var i = Math.min(
-            Math.floor(Math.log(volume) / Math.log(1024)),
-            units.length - 1
-        );
-        const value = volume / Math.pow(1024, i);
-        return value.toFixed(0) + " " + units[i];
-    }
-}
 
 function confirmThenDelete(callback) {
     Modal.confirm({
@@ -49,6 +41,30 @@ function notifySuccessfulDeletion(count) {
         count == 1
             ? i18n.gettext("Resource deleted")
             : i18n.gettext("Resources deleted")
+    );
+}
+function notifySuccessfulMove(count) {
+    message.success(
+        count == 1
+            ? i18n.gettext("Resource has been moved")
+            : i18n.gettext("Resources have been moved")
+    );
+}
+function notifyMoveWithError(successItems, errorItems) {
+    message.warning(
+        `${i18n.gettext("Not all resources moved")} (${successItems.length}/${
+            errorItems.length
+        })`
+    );
+}
+function notifyMoveAbsolutError(errorItems) {
+    const count = errorItems.length;
+    message.error(
+        i18n.gettext(
+            count == 1
+                ? i18n.gettext("Failed to move resource")
+                : i18n.gettext("Failed to move resources")
+        )
     );
 }
 
@@ -91,16 +107,6 @@ function renderActions(actions, id, setTableItems) {
     });
 }
 
-function sorterFactory(attr) {
-    return (a, b) => {
-        const va = a[attr];
-        const vb = b[attr];
-        if (va == vb) return 0;
-        if (va > vb) return 1;
-        if (vb > va) return -1;
-    };
-}
-
 async function loadVolumes(data, setState) {
     setState({});
     for (const { id } of data) {
@@ -111,17 +117,19 @@ async function loadVolumes(data, setState) {
     }
 }
 
-export function ChildrenSection({ data, storageEnabled, ...props }) {
+export function ChildrenSection({ data, storageEnabled, resourceId }) {
     const [volumeVisible, setVolumeVisible] = useState(false);
     const [batchDeletingInProgress, setBatchDeletingInProgress] =
         useState(false);
+    const [batchMoveInProgress, setBatchMoveInProgress] = useState(false);
     const [allowBatch, setAllowBatch] = useState(false);
     const [volumeValues, setVolumeValues] = useState({});
     const [items, setItems] = useState([...data]);
     const [selected, setSelected] = useState([]);
 
-    const deleteAllowedSelected = useMemo(() => {
+    const selectedAllowefForDelete = useMemo(() => {
         const allowedToDelete = [];
+
         for (const item of items) {
             if (selected.includes(item.id)) {
                 const includeDelAction =
@@ -131,13 +139,24 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
                 }
             }
         }
+
         return allowedToDelete;
-    }, [selected]);
+    }, [selected, items]);
 
     const rowSelection_ = {
         onChange: (selectedRowKeys) => {
             setSelected(selectedRowKeys);
         },
+    };
+
+    const onNewGroup = (newGroup) => {
+        if (newGroup) {
+            if (newGroup.parent.id === resourceId)
+                setItems((old) => {
+                    const newItem = createResourceTableItemOptions(newGroup);
+                    return [...old, newItem];
+                });
+        }
     };
 
     useEffect(() => {
@@ -150,42 +169,51 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
         });
     }, [items]);
 
-    // TODO: make universal function with ModelBrowser.js
-    const deleteSelected = async () => {
-        setBatchDeletingInProgress(true);
-        try {
-            const deleted = [];
-            const deleteError = [];
-            for (const s of deleteAllowedSelected) {
-                try {
-                    await route("resource.item", s).delete();
-                    deleted.push(s);
-                } catch {
-                    deleteError.push(s);
+    const moveSelectedTo = (parentId) => {
+        forEachSelected({
+            title: i18n.gettext("Moving resources"),
+            setItems,
+            setSelected,
+            setInProgress: setBatchMoveInProgress,
+            selected,
+            executer: ({ selectedItem, signal }) =>
+                route("resource.item", selectedItem).put({
+                    signal,
+                    json: {
+                        resource: {
+                            parent: { id: parentId },
+                        },
+                    },
+                }),
+            onComplate: (successItems, errorItems) => {
+                if (successItems.length) {
+                    if (errorItems.length) {
+                        notifyMoveWithError(successItems, errorItems);
+                    } else {
+                        notifySuccessfulMove(successItems.length);
+                    }
+                } else if (errorItems) {
+                    notifyMoveAbsolutError(errorItems);
                 }
-            }
-            if (deleteError.length) {
-                errorModal({
-                    tittle: i18n.gettext(
-                        "The errors occurred during execution"
-                    ),
-                    detail: `${i18n.gettext(
-                        "Failed to delete items:"
-                    )} ${deleteError.join(", ")}`,
-                });
-            } else {
-                notifySuccessfulDeletion(deleted.length);
-            }
-            const removeDeleted = (old) =>
-                old.filter((row) => !deleted.includes(row.id));
+            },
+        });
+    };
 
-            setSelected(removeDeleted);
-            setItems(removeDeleted);
-        } catch (err) {
-            errorModal(err);
-        } finally {
-            setBatchDeletingInProgress(false);
-        }
+    const deleteSelected = () => {
+        forEachSelected({
+            title: i18n.gettext("Deleting resources"),
+            setItems,
+            setSelected,
+            setInProgress: setBatchDeletingInProgress,
+            selected: selectedAllowefForDelete,
+            executer: ({ selectedItem, signal }) =>
+                route("resource.item", selectedItem).delete({ signal }),
+            onComplate: (successItems, errorItems) => {
+                if (successItems.length) {
+                    notifySuccessfulDeletion(successItems.length);
+                }
+            },
+        });
     };
 
     const rowSelection = useMemo(() => {
@@ -224,34 +252,55 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
             });
         }
         if (allowBatch) {
+            // Batch delete
+            const checkNotAllForDelete =
+                selectedAllowefForDelete.length < selected.length &&
+                selectedAllowefForDelete.length > 0;
+            const deleteOperationConfig = {
+                label: (
+                    <>
+                        {i18n.gettext("Delete")}{" "}
+                        {selectedAllowefForDelete.length > 0 && (
+                            <Badge
+                                size="small"
+                                count={selectedAllowefForDelete.length}
+                            />
+                        )}{" "}
+                        {checkNotAllForDelete && (
+                            <Tooltip
+                                title={i18n.gettext(
+                                    "Not all of the selected can be deleted."
+                                )}
+                            >
+                                <PriorityHighIcon />
+                            </Tooltip>
+                        )}
+                    </>
+                ),
+                disabled: !selectedAllowefForDelete.length,
+                onClick: () => confirmThenDelete(deleteSelected),
+            };
+
+            // Batch change parent
+            const moveOperationConfig = {
+                label: <>{i18n.gettext("Move")}</>,
+                onClick: () => {
+                    const resourcePicker = showResourcePicker({
+                        resourceId,
+                        disabledIds: [...selected, resourceId],
+                        onNewGroup,
+                        onSelect: (newParentId) => {
+                            moveSelectedTo(newParentId);
+                            resourcePicker.close();
+                        },
+                    });
+                },
+            };
+
             const batchOperations = [];
             if (selected.length) {
                 batchOperations.push(
-                    ...[
-                        {
-                            label: (
-                                <>
-                                    {i18n.gettext("Delete")}{" "}
-                                    {deleteAllowedSelected.length > 0 && <Badge
-                                        size="small"
-                                        count={deleteAllowedSelected.length}
-                                    />}{" "}
-                                    {deleteAllowedSelected.length <
-                                        selected.length && deleteAllowedSelected.length > 0 && (
-                                        <Tooltip
-                                            title={i18n.gettext(
-                                                "Not all of the selected can be deleted."
-                                            )}
-                                        >
-                                            <PriorityHighIcon />
-                                        </Tooltip>
-                                    )}
-                                </>
-                            ),
-                            disabled: !deleteAllowedSelected.length,
-                            onClick: () => confirmThenDelete(deleteSelected),
-                        },
-                    ]
+                    ...[deleteOperationConfig, moveOperationConfig]
                 );
             }
             if (batchOperations.length) {
@@ -262,22 +311,10 @@ export function ChildrenSection({ data, storageEnabled, ...props }) {
             menuItems_.push(...batchOperations);
         }
         return menuItems_;
-    }, [allowBatch, deleteAllowedSelected]);
+    }, [allowBatch, selectedAllowefForDelete]);
 
     const MenuDropdown = () => {
-        const menu = (
-            <Menu>
-                {menuItems.map(({ type, label, ...menuItemProps }, idx) => {
-                    return type === "divider" ? (
-                        <Menu.Divider key={idx}></Menu.Divider>
-                    ) : (
-                        <Menu.Item key={label} {...menuItemProps}>
-                            {label}
-                        </Menu.Item>
-                    );
-                })}
-            </Menu>
-        );
+        const menu = <Menu items={menuItems} />;
         return (
             <Dropdown overlay={menu} trigger={["click"]}>
                 <a>
