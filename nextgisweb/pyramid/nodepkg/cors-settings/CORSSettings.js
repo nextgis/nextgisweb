@@ -7,43 +7,53 @@ import {
     Typography,
 } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
+import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!";
-import { errorModal } from "@nextgisweb/gui/error";
-import { useEffect, useState } from "react";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+
+import { useMemo, useState } from "react";
+
+const helpMsg = i18n.gettext(
+    "Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."
+);
+const infoMsg = i18n.gettext(
+    "Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are allowed for third-level domains and higher."
+);
 
 export function CORSSettings() {
     const [form] = Form.useForm();
-    const [status, setStatus] = useState("loading");
-    const [initial, setInitial] = useState("");
+    const [status, setStatus] = useState(null);
 
-    async function load() {
-        const resp = await route("pyramid.cors").get();
-        setInitial(resp.allow_origin ? resp.allow_origin.join("\n") : "");
-        setStatus(null);
-    }
+    const corsRoute = useRouteGet({ name: "pyramid.cors" });
+
+    const allowOriginInitial = useMemo(() => {
+        const allowOrigin = corsRoute.data && corsRoute.data.allow_origin;
+        return allowOrigin ? allowOrigin.join("\n") : "";
+    }, [corsRoute.data]);
 
     async function save() {
         try {
-            const { cors } = await form.validateFields();
             setStatus("saving");
-            const list = cors.split(/\n/).filter((s) => !s.match(/^\s*$/));
+            const { cors } = await form.validateFields();
             try {
+                const list = cors
+                    .split(/\n/)
+                    .filter((s) => !s.match(/^\s*$/))
+                    .map((c) => c.trim());
                 await route("pyramid.cors").put({
                     json: { allow_origin: list || null },
                 });
                 message.success(i18n.gettext("CORS settings updated"));
             } catch (err) {
                 errorModal(err);
-            } finally {
-                setStatus(null);
             }
         } catch {
             message.error(i18n.gettext("Fix the form errors first"));
+        } finally {
+            setStatus(null);
         }
     }
-
-    useEffect(() => load(), []);
 
     const validCORSRule = (val) => {
         const expression =
@@ -68,7 +78,7 @@ export function CORSSettings() {
         }),
     ];
 
-    if (status == "loading") {
+    if (corsRoute.isLoading) {
         return <LoadingWrapper loading={true} />;
     }
 
@@ -76,7 +86,10 @@ export function CORSSettings() {
         <>
             <Row gutter={[16, 16]}>
                 <Col flex="auto">
-                    <Form initialValues={{ cors: initial }} form={form}>
+                    <Form
+                        initialValues={{ cors: allowOriginInitial }}
+                        form={form}
+                    >
                         <Form.Item rules={rules} name="cors">
                             <Input.TextArea
                                 autoSize={{ minRows: 12, maxRows: 12 }}
@@ -86,16 +99,8 @@ export function CORSSettings() {
                     </Form>
                 </Col>
                 <Col flex="none" span={10}>
-                    <Typography.Paragraph>
-                        {i18n.gettext(
-                            "Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."
-                        )}
-                    </Typography.Paragraph>
-                    <Typography.Paragraph>
-                        {i18n.gettext(
-                            "Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are allowed for third-level domains and higher."
-                        )}
-                    </Typography.Paragraph>
+                    <Typography.Paragraph>{helpMsg}</Typography.Paragraph>
+                    <Typography.Paragraph>{infoMsg}</Typography.Paragraph>
                 </Col>
             </Row>
             <Row>

@@ -209,7 +209,6 @@ export class ResourcePickerStore {
             const createdItem = await route("resource.collection").post({
                 json: payload,
             });
-            // const newResource = await route("resource.item", createdItem.id).get();
 
             await this.refresh();
             const newItem = [...this.children].find(

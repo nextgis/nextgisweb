@@ -3,18 +3,18 @@ import { route as apiRoute } from "../api";
 
 const loadingCounterReducer = (state, action) => {
     switch (action) {
-        case "increment":
-            return {count:state.count + 1};
-        case "decrement":
-            return {count: state.count - 1};
-        case "reset":
-            return {count: 0};
-        default:
-            throw new Error();
+    case "increment":
+        return { count: state.count + 1 };
+    case "decrement":
+        return { count: state.count - 1 };
+    case "reset":
+        return { count: 0 };
+    default:
+        throw new Error();
     }
 };
 
-export function useRoute(name, params = {}) {
+export function useRoute(name, { loadOnInit = false, ...params } = {}) {
     const [abortController, dispatchAbortController] = useReducer(
         (state, action) => {
             if (action === "abort" && state) {
@@ -28,7 +28,7 @@ export function useRoute(name, params = {}) {
     );
     const [loadingCounter, dispatchLoadingCounter] = useReducer(
         loadingCounterReducer,
-        {count: 0}
+        { count: Number(!!loadOnInit) }
     );
 
     const route = useMemo(() => {
@@ -37,9 +37,16 @@ export function useRoute(name, params = {}) {
         for (const method of ["get", "post", "put", "delete"]) {
             const requestForMethodCb = route_[method];
             route_[method] = async (options) => {
+                if (loadOnInit) {
+                    dispatchLoadingCounter("decrement");
+                    loadOnInit = false;
+                }
                 dispatchLoadingCounter("increment");
                 try {
-                    return requestForMethodCb({ signal: abortController, ...options });
+                    return await requestForMethodCb({
+                        signal: abortController,
+                        ...options,
+                    });
                 } finally {
                     dispatchLoadingCounter("decrement");
                 }
