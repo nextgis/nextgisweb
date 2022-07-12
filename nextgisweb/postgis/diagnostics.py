@@ -135,10 +135,6 @@ class LayerCheck(Check):
         self.fields = fields
 
     @property
-    def qname(self):
-        return sql.quoted_name(self.schema, True) + '.' + sql.quoted_name(self.table, True)
-
-    @property
     def sa_table(self):
         table = sql.table(self.table)
         table.schema = self.schema
@@ -248,10 +244,10 @@ class TableCheck(LayerCheck):
             ('UPDATE', False),
             ('DELETE', False),
         ):
-            has_privilege = conn.execute(
-                sql.text("SELECT has_table_privilege(:qname, :privilege)"),
-                qname=self.qname, privilege=priv,
-            ).scalar()
+            has_privilege = conn.execute(sql.text("""
+                SELECT has_table_privilege(
+                    quote_ident(:schema) || '.' || quote_ident(:table), :privilege)
+            """), schema=self.schema, table=self.table, privilege=priv).scalar()
             if has_privilege:
                 self.success(_("{} privilege is present.").format(priv))
             elif not req:
