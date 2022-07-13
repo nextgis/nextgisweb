@@ -15,8 +15,8 @@ from .util import _
 
 keyname_pattern = re.compile(r'^[A-Za-z][A-Za-z0-9_\-]*$')
 brief_keys = (
-    'id', 'system', 'keyname', 'display_name', 'disabled', 'last_activity',
-    'is_administrator', 'has_password', 'has_oauth')
+    'id', 'system', 'keyname', 'display_name', 'disabled',
+    'password', 'oauth_subject', 'last_activity', 'is_administrator')
 
 
 def user_cget(request):
