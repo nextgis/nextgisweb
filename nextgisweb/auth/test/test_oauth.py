@@ -350,10 +350,27 @@ def test_scope(scope, ok, server_response_mock, ngw_webtest_app):
         ngw_webtest_app.get(cb_url, status=302 if ok else 401)
 
 
+@pytest.fixture(scope='function')
+def disabled_local_user():
+    with transaction.manager:
+        user = User(
+            keyname='chapaev',
+            display_name='Chapaev V. I.',
+            password='pustota',
+            disabled=True,
+        ).persist()
+        DBSession.flush()
+
+    yield user
+
+    with transaction.manager:
+        DBSession.delete(User.filter_by(id=user.id).one())
+
+
 @pytest.mark.parametrize('setup_oauth', [{
     'oauth.server.password': True,
 }], indirect=['setup_oauth'])
-def test_password_token_basic(server_response_mock, freezegun, ngw_webtest_app):
+def test_password_token_basic(disabled_local_user, server_response_mock, freezegun, ngw_webtest_app):
     access_token = token_urlsafe(32)
     refresh_token = token_urlsafe(32)
 
@@ -381,7 +398,7 @@ def test_password_token_basic(server_response_mock, freezegun, ngw_webtest_app):
     ):
         ngw_webtest_app.authorization = ('Basic', tuple(creds.values()))
         resp = ngw_webtest_app.get('/api/component/auth/current_user', creds).json
-        assert resp['keyname'] == 'chapaev'
+        assert resp['keyname'] == 'chapaev_2'
 
     # Check caching: it'll fail if server request occurs
     ngw_webtest_app.get('/api/component/auth/current_user', creds)
@@ -405,7 +422,7 @@ def test_password_token_basic(server_response_mock, freezegun, ngw_webtest_app):
         response=introspection_response()
     ):
         resp = ngw_webtest_app.get('/api/component/auth/current_user', creds).json
-        assert resp['keyname'] == 'chapaev'
+        assert resp['keyname'] == 'chapaev_2'
 
     # Expire refresh token, new token will be requested
     freezegun.tick(REFRESH_TOKEN_LIFETIME + 5)
@@ -426,7 +443,7 @@ def test_password_token_basic(server_response_mock, freezegun, ngw_webtest_app):
         response=introspection_response()
     ):
         resp = ngw_webtest_app.get('/api/component/auth/current_user', creds).json
-        assert resp['keyname'] == 'chapaev'
+        assert resp['keyname'] == 'chapaev_2'
 
 
 @pytest.mark.parametrize('setup_oauth', [{

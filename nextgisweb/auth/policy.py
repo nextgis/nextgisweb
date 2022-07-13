@@ -14,6 +14,7 @@ from ..pyramid import WebSession
 from .model import User
 from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, UserDisabledException
 from .oauth import OAuthTokenRefreshException, OAuthPasswordGrantTypeException
+from .util import _
 
 
 @implementer(ISecurityPolicy)
@@ -177,12 +178,13 @@ class SecurityPolicy(object):
 
         try:
             test_user = q.one()
-            if test_user.disabled:
-                raise UserDisabledException()
-            elif test_user.password == password:
-                user = test_user
         except NoResultFound:
             pass
+        else:
+            if test_user.password is not None and test_user.password == password:
+                if test_user.disabled:
+                    raise UserDisabledException()
+                user = test_user
 
         # Step 2: Authentication with OAuth password if enabled
 
