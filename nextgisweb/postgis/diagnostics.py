@@ -203,10 +203,21 @@ class PostgisCheck(ConnectionCheck):
         self.say(_("Number of spatial reference systems: {}.").format(srs_count))
 
 
+class TableNotExists(Exception):
+    pass
+
+
 class TableInspector:
 
     def __init__(self, conn, schema, table):
         i = inspect(conn)
+        if not i.has_table(table, schema):
+            raise TableNotExists()
+
+        self.table_type = conn.execute(sql.text("""
+            SELECT table_type FROM information_schema.tables
+            WHERE table_schema = :schema AND table_name = :table
+        """), schema=schema, table=table).scalar()
         self.columns = {c['name']: c for c in i.get_columns(table, schema)}
         self.pk_constraint = i.get_pk_constraint(table, schema)
         self.indexes = i.get_indexes(table, schema)
@@ -229,14 +240,12 @@ class TableCheck(LayerCheck):
     title = _("Layer table")
 
     def handler(self, conn: Connection):
-        table_type = conn.execute(sql.text("""
-            SELECT table_type FROM information_schema.tables
-            WHERE table_schema = :schema AND table_name = :table
-        """), schema=self.schema, table=self.table).scalar()
-        if table_type is None:
+        try:
+            tins = TableInspector(conn, self.schema, self.table)
+        except TableNotExists:
             self.error(_("Table not found."))
-        else:
-            self.success(_("Table found, table type is {}.").format(table_type))
+            return
+        self.success(_("Table found, table type is {}.").format(tins.table_type))
 
         for (priv, req) in (
             ('SELECT', True),
@@ -262,7 +271,7 @@ class TableCheck(LayerCheck):
             self.error(_("ID or geometry column isn't set."))
             return
 
-        self.inject(TableInspector(conn, self.schema, self.table))
+        self.inject(tins)
 
 
 class IdColumnCheck(LayerCheck):
@@ -280,18 +289,22 @@ class IdColumnCheck(LayerCheck):
 
         self.success(_("Column found, type is {}.").format(ctype_repr))
 
-        if tins.is_column_primary_key(self.column_id):
+        is_table = tins.table_type == 'BASE TABLE'
+
+        if is_table and tins.is_column_primary_key(self.column_id):
             self.success(_("Column is the primary key."))
         else:
-            self.say(_("Column is not the primary key."))
+            if is_table:
+                self.say(_("Column is not the primary key."))
 
             nullable = cinfo['nullable']
-            has_unique_index = tins.has_unique_index_on(self.column_id)
+            has_unique_index = is_table and tins.has_unique_index_on(self.column_id)
 
             column_id = sql.column(self.column_id)
 
             if nullable:
-                self.warning(_("Column can be NULL."))
+                if is_table:
+                    self.warning(_("Column can be NULL."))
 
                 expr = self.sa_table.select().where(column_id.is_(None)).exists().select()
                 has_null_values = conn.execute(expr).scalar()
@@ -302,10 +315,11 @@ class IdColumnCheck(LayerCheck):
             else:
                 self.success(_("Column cannot be NULL."))
 
-            if not has_unique_index:
-                self.warning(_("Unique index not found."))
-            else:
-                self.success(_("Unique index found."))
+            if is_table:
+                if not has_unique_index:
+                    self.warning(_("Unique index not found."))
+                else:
+                    self.success(_("Unique index found."))
 
             if not has_unique_index:
                 fcount = func.count('*')
@@ -322,11 +336,12 @@ class IdColumnCheck(LayerCheck):
                 else:
                     self.success(_("All values are unique."))
 
-        ai = cinfo['autoincrement']
-        if (isinstance(ai, bool) and ai) or (ai == 'auto'):
-            self.success(_("Column is auto-incrementable."))
-        else:
-            self.warning(_("Column isn't auto-incrementable."))
+        if is_table:
+            ai = cinfo['autoincrement']
+            if (isinstance(ai, bool) and ai) or (ai == 'auto'):
+                self.success(_("Column is auto-incrementable."))
+            else:
+                self.warning(_("Column isn't auto-incrementable."))
 
 
 class GeomColumnCheck(LayerCheck):
