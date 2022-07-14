@@ -61,7 +61,16 @@ msgstr ""
 "Исходный растр имеет локальную систему координат и не может быть "
 "перепроецирован в целевую."
 
-#: model.py:154
+#: model.py:144
+msgid "Failed to reproject the raster to the target coordinate system."
+msgstr "Не удалось перепроецировать растр в целевую систему координат."
+
+#: model.py:147
+#, python-format
+msgid "GDAL error message: %s"
+msgstr "Сообщение об ошибке GDAL: %s"
+
+#: model.py:160
 #, python-format
 msgid ""
 "The uncompressed raster size (%(size)s) exceeds the limit (%(limit)s) by "
@@ -70,23 +79,19 @@ msgstr ""
 "Размер несжатого растра (%(size)s) превышает лимит (%(limit)s) на %(delta)s. "
 "Уменьшите растр, чтобы он вписывался в лимит."
 
-#: model.py:236
+#: model.py:242
 msgid "Data type"
 msgstr "Тип данных"
 
-#: model.py:237
+#: model.py:243
 msgid "COG"
 msgstr "COG"
-
-#: model.py:322
-msgid "COG attribute can be set only at creation time."
-msgstr "Атрибут COG может быть установлен только в момент создания ресурса"
 
 #: view.py:21 view.py:36
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:45
+#: view.py:46
 msgid "External access"
 msgstr "Внешний доступ"
 
@@ -110,23 +115,23 @@ msgstr "Каналы"
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-raster-layer/template/Widget.hbs:3
+#: amd/ngw-raster-layer/template/Widget.hbs:4
 msgid "Select a dataset"
 msgstr "Выберите растровый слой"
 
-#: amd/ngw-raster-layer/template/Widget.hbs:4
+#: amd/ngw-raster-layer/template/Widget.hbs:5
 msgid "Dataset should be in GeoTIFF format."
 msgstr "Файл должен быть в формате GeoTIFF."
 
-#: amd/ngw-raster-layer/template/Widget.hbs:8
+#: amd/ngw-raster-layer/template/Widget.hbs:9
 msgid "Coordinate system"
 msgstr "Система координат"
 
-#: amd/ngw-raster-layer/template/Widget.hbs:12
+#: amd/ngw-raster-layer/template/Widget.hbs:14
 msgid "Cloud Optimized GeoTIFF (COG)"
 msgstr "Cloud Optimized GeoTIFF (COG)"
 
-#: template/section_api_cog.mako:7
+#: template/section_api_cog.mako:10
 msgid "Cloud Optimized GeoTIFF"
 msgstr "Cloud Optimized GeoTIFF"
 
@@ -142,4 +147,3 @@ msgstr ""
 "веб-сервере и эффективной работе в облаке файл GeoTIFF, позволяющий "
 "обращаться в HTTP запросах только к нужным частям растра, без необходимости "
 "загружать его в клиентское приложение целиком."
-

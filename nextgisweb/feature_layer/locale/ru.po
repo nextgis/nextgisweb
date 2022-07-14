@@ -7,21 +7,21 @@ msgstr "Выходной формат не указан."
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:303 api.py:378
+#: api.py:301 api.py:376
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
 
-#: api.py:305
+#: api.py:303
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:311 api.py:383
+#: api.py:309 api.py:381
 #, python-format
 msgid "Date format '%s' is not supported."
 msgstr "Формат даты '%s' не поддерживается."
 
-#: api.py:607
+#: api.py:600
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -38,63 +38,59 @@ msgstr "Объект с id = %d не найден в ресурсе с id = %d."
 msgid "The feature may have been deleted or an error in the address."
 msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
 
-#: model.py:164
+#: model.py:163
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:43
+#: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:40
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: view.py:61 view.py:84
+#: view.py:58 view.py:81
 #, python-format
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:136 view.py:199
+#: view.py:131 view.py:194
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:186
+#: view.py:181
 msgid "Features"
 msgstr "Объекты"
 
-#: template/section_fields.mako:21 view.py:191
+#: template/section_fields.mako:21 view.py:186
 msgid "Table"
 msgstr "Таблица"
 
-#: view.py:209
+#: view.py:205
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:194
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:193
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:214
+#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:210
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:80
-msgid "Attribute: "
-msgstr "Поле: "
-
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:125
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:124
 msgid "Set NULL"
 msgstr "Установить NULL"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:126
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:125
 msgid "Set field value to NULL (No data)"
 msgstr "Установить для атрибута значение NULL (Нет данных)"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:137
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:136
 msgid "NULL"
 msgstr "NULL"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:242
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:241
 msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:266
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:265
 #: amd/ngw-feature-layer/template/ExportForm.hbs:45
 msgid "Save"
 msgstr "Сохранить"
@@ -183,7 +179,7 @@ msgstr "Удалить"
 msgid "Search..."
 msgstr "Поиск..."
 
-#: template/section_api_layer.mako:8
+#: template/section_api_layer.mako:11
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
@@ -195,7 +191,7 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: template/section_api_layer.mako:17
+#: template/section_api_layer.mako:15
 msgid ""
 "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-"
 "tiles"
@@ -203,7 +199,7 @@ msgstr ""
 "https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-"
 "tiles"
 
-#: template/section_api_layer.mako:18
+#: template/section_api_layer.mako:16
 msgid "Read more"
 msgstr "Подробнее"
 
