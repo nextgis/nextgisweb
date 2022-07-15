@@ -1,28 +1,32 @@
-#: api.py:30
+#: api.py:31
 msgid "SRS attribute '{}' cannot be changed or set during creation."
 msgstr "Атрибут СК '{}' не может быть изменен или установлен в процессе создания."
 
-#: api.py:35
+#: api.py:36
 msgid "SRS attribute '{}' must have a string value."
 msgstr "Атрибут СК '{}' должен иметь строковое значение."
 
-#: api.py:43
+#: api.py:44
 msgid "SRS display name is not unique."
 msgstr "Наименование СК не уникально."
 
-#: api.py:49
+#: api.py:50
 msgid "OGC WKT definition cannot be changed for this SRS."
 msgstr "Определение OGC WKT не может быть изменено для этой СК."
 
-#: api.py:88
+#: api.py:89
 msgid "System SRS cannot be deleted."
 msgstr "Системная СК не может быть удалена."
 
-#: api.py:101
+#: api.py:102
 msgid "Invalid SRS definition!"
 msgstr "Неверное определение SRS!"
 
-#: api.py:212
+#: api.py:207
+msgid "SRS authority attributes must be defined while importing from the catalog."
+msgstr "Аттрибуты организации СК должны быть указаны при импорте из каталога."
+
+#: api.py:232
 msgid "SRS #{} already exists."
 msgstr "СК #{} уже существует."
 
@@ -86,7 +90,7 @@ msgstr "СК удалена"
 
 #: nodepkg/catalog-browse/CatalogBrowse.js:105
 #: nodepkg/catalog-import/CatalogImport.js:16 nodepkg/srs-browse/SrsBrowse.js:12
-#: nodepkg/srs-widget/SRSWidget.js:21
+#: nodepkg/srs-widget/SRSWidget.js:24
 msgid "Display name"
 msgstr "Наименование"
 
@@ -94,7 +98,7 @@ msgstr "Наименование"
 msgid "Show in catalog"
 msgstr "Показать в каталоге"
 
-#: nodepkg/catalog-browse/CatalogBrowse.js:124
+#: nodepkg/catalog-browse/CatalogBrowse.js:124 nodepkg/srs-widget/SRSWidget.js:29
 msgid "Authority and code"
 msgstr "Источник и код"
 
@@ -115,7 +119,7 @@ msgstr "Широта"
 msgid "Longitude"
 msgstr "Долгота"
 
-#: nodepkg/catalog-import/CatalogImport.js:21 nodepkg/srs-widget/SRSWidget.js:26
+#: nodepkg/catalog-import/CatalogImport.js:21 nodepkg/srs-widget/SRSWidget.js:37
 msgid "OGC WKT definition"
 msgstr "OGC WKT определение"
 
@@ -127,15 +131,15 @@ msgstr "Подробнее"
 msgid "Import from catalog"
 msgstr "Импортировать из каталога"
 
-#: nodepkg/srs-widget/SRSImportForm.js:19
+#: nodepkg/srs-widget/SRSImportForm.js:20
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/srs-widget/SRSImportForm.js:30
+#: nodepkg/srs-widget/SRSImportForm.js:31
 msgid "Definition"
 msgstr "Определение"
 
-#: nodepkg/srs-widget/SRSWidget.js:68 nodepkg/srs-widget/SRSWidget.js:84
+#: nodepkg/srs-widget/SRSWidget.js:81 nodepkg/srs-widget/SRSWidget.js:109
 msgid "Import definition"
 msgstr "Импортировать определение"
 

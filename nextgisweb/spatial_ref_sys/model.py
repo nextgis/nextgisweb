@@ -49,6 +49,9 @@ class SRS(Base):
             '(auth_name IS NULL AND auth_srid IS NULL) '
             'OR (auth_name IS NOT NULL AND auth_srid IS NOT NULL)',
             name='srs_auth_check'),
+        db.UniqueConstraint(
+            'auth_name', 'auth_srid',
+            name="srs_auth_unique"),
     )
 
     @db.validates('wkt')
