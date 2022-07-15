@@ -2,6 +2,7 @@ import json
 
 import requests
 from requests.exceptions import RequestException
+from sqlalchemy import sql
 
 from ..core.exception import ValidationError, ExternalServiceError
 from ..env import env
@@ -206,12 +207,18 @@ def catalog_import(request):
         catalog_id=srs['id']
     )
 
-    if None not in (srs['auth_name'], srs['auth_srid'], srs['postgis_srid']):
-        conflict = SRS.filter_by(id=srs['postgis_srid']).first()
-        if conflict:
-            raise ValidationError(message=_(
-                "SRS #{} already exists.").format(srs['postgis_srid']))
+    conflict_filter = SRS.catalog_id == srs['id']
+
+    if srs['postgis_srid'] is not None:
         obj.id = srs['postgis_srid']
+        conflict_filter = sql.or_(conflict_filter, SRS.id == srs['postgis_srid'])
+
+    conflict = SRS.filter(conflict_filter).first()
+    if conflict:
+        raise ValidationError(message=_(
+            "SRS '{}' already exists (id={}).").format(srs['display_name'], conflict.id))
+
+    if srs['auth_name'] is not None and srs['auth_srid'] is not None:
         obj.auth_name = srs['auth_name']
         obj.auth_srid = srs['auth_srid']
 
