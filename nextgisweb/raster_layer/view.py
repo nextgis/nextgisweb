@@ -38,6 +38,12 @@ def setup_pyramid(comp, config):
                             "resource.export.page",
                             id=args.obj.id),
                         icon='material-save_alt')
+                    yield dm.Link(
+                        'raster_layer/download', _("Download"),
+                        lambda args: args.request.route_url(
+                            "raster_layer.download",
+                            id=args.obj.id),
+                        icon='material-download')
 
     Resource.__dynmenu__.add(LayerMenuExt())
 

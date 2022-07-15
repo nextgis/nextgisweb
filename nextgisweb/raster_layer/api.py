@@ -8,6 +8,7 @@ from pyramid.response import FileIter, FileResponse, Response
 
 from ..core.exception import ValidationError
 from ..env import env
+from ..pyramid.util import set_output_buffering
 from ..spatial_ref_sys import SRS
 from ..resource import DataScope
 from .gdaldriver import EXPORT_FORMAT_GDAL
@@ -125,6 +126,18 @@ def cog(resource, request):
         return response
 
 
+def download(request):
+    request.resource_permission(PERM_READ)
+
+    filename = env.raster_layer.workdir_filename(request.context.fileobj)
+    response = FileResponse(
+        filename, content_type="image/tiff; application=geotiff",
+        request=request)
+    response.content_disposition = "attachment; filename=%s.tif" % request.context.id
+    set_output_buffering(request, response, False)
+    return response
+
+
 def setup_pyramid(comp, config):
     config.add_view(
         export, route_name="resource.export", context=RasterLayer, request_method="GET"
@@ -133,3 +146,7 @@ def setup_pyramid(comp, config):
         "raster_layer.cog", "/api/resource/{id}/cog",
         factory=resource_factory) \
         .add_view(cog, context=RasterLayer, request_method="GET")
+    config.add_route(
+        "raster_layer.download", "/api/resource/{id}/download",
+        factory=resource_factory) \
+        .add_view(download, context=RasterLayer, request_method="GET")
