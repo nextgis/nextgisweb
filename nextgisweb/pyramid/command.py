@@ -21,6 +21,10 @@ class ServerCommand(Command):
 
         reload = args.reload if (args.reload is not None) else env.core.debug
         if reload:
+            # Workaround for https://bugs.python.org/issue47082,
+            # https://github.com/numpy/numpy/issues/21223
+            import numpy
+
             from hupper import start_reloader
             start_reloader(
                 'nextgisweb.script.main',
