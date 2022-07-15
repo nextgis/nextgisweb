@@ -184,6 +184,7 @@ class Env(object):
                 'level': self.options['logging.level'],
                 'handlers': ['default'],
             },
+            'disable_existing_loggers': False,
         }
 
         config['formatters']['default'] = {
@@ -206,9 +207,7 @@ class Env(object):
                 has_options = True
                 qaulname, level = v.split(':', 2)
                 level = level.upper()
-                loggers[qaulname] = dict(
-                    level=level, propagate=False,
-                    handlers=['default'])
+                loggers[qaulname] = dict(level=level)
             elif k.startswith('logging.'):
                 if k != 'logging.ini_config':
                     has_options = True

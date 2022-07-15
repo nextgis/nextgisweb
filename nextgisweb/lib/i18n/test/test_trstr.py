@@ -66,7 +66,6 @@ def test_guard(caplog):
         caplog.clear()
         with caplog.at_level(ERROR):
             yield
-            # TODO: May fail in some logging configuration
             assert "exception during translation" in caplog.text
 
     dt.add("A", "B")
