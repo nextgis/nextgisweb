@@ -5,6 +5,9 @@ from argparse import ArgumentParser
 from textwrap import wrap
 from contextlib import contextmanager
 
+# Workaround for https://bugs.python.org/issue47082
+import numpy  # NOQA
+
 from .lib.config import Option, NO_DEFAULT, load_config, key_to_environ
 from .lib.logging import logger
 from .env import Env, setenv
