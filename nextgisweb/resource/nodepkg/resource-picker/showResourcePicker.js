@@ -1,5 +1,5 @@
 import showModal from "@nextgisweb/gui/showModal";
-import { ResourcePickerModal } from "./ResourcePickerModal";
+import { ResourcePickerModal } from "./resource-picker-modal";
 
 export function showResourcePicker(params) {
     return showModal(ResourcePickerModal, {

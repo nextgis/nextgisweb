@@ -8,12 +8,10 @@ import i18n from "@nextgisweb/pyramid/i18n!resource";
 import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
-import { ResourceBreadcrumb } from "../resource-breadcrumb";
-import ResourcesFilter from "../resources-filter";
+import { ResourcePickerBreadcrumb } from "../resource-picker-breadcrumb";
+import ResourcesFilter from "../../resources-filter";
 
-const returnToInitialGroupTitle = i18n.gettext(
-    "Go to initial group"
-);
+const returnToInitialGroupTitle = i18n.gettext("Go to initial group");
 const refreshGroupTitle = i18n.gettext("Refresh");
 
 export const ResourcePickerModalTitle = observer(
@@ -61,7 +59,9 @@ export const ResourcePickerModalTitle = observer(
                         </a>
                     </Col>
                     <Col flex="auto" className="resource-breadcrumb">
-                        <ResourceBreadcrumb resourceStore={resourceStore} />
+                        <ResourcePickerBreadcrumb
+                            resourceStore={resourceStore}
+                        />
                     </Col>
 
                     {parentId !== initialParentId && allowMoveInside && (

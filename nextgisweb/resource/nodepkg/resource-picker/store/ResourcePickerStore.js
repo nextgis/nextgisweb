@@ -1,6 +1,6 @@
 import { extractError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
-import { loadParents } from "../util/loadParents";
+import { loadParents } from "../../util/loadParents";
 import { makeAutoObservable, runInAction } from "mobx";
 
 export class ResourcePickerStore {
@@ -18,6 +18,8 @@ export class ResourcePickerStore {
     createNewGroupLoading = false;
     createNewGroupError = false;
 
+    showCls = [];
+
     disabledIds = [];
     enabledCls = [];
 
@@ -34,7 +36,7 @@ export class ResourcePickerStore {
     setBrearcrumbItemsAbortController = null;
     createNewGroupAbortController = null;
 
-    constructor({ parentId, disabledIds, enabledCls, onNewGroup }) {
+    constructor({ parentId, disabledIds, enabledCls, onNewGroup, showCls }) {
         this.parentId = parentId;
         this.initialParentId = this.parentId;
         this.onNewGroup = onNewGroup;
@@ -43,6 +45,9 @@ export class ResourcePickerStore {
         }
         if (enabledCls) {
             this.enabledCls = enabledCls;
+        }
+        if (showCls) {
+            this.showCls = showCls;
         }
         makeAutoObservable(this, {
             setChildrenAbortController: false,
@@ -163,15 +168,22 @@ export class ResourcePickerStore {
                 query: { parent },
                 signal: this.setChildrenAbortController.signal,
             });
-            const resources = resp.map((x) => {
+            const resources = [];
+            for (const x of resp) {
                 const res = x.resource;
-                return {
-                    id: res.id,
-                    displayName: res.display_name,
-                    cls: res.cls,
-                    parent: { id: res.parent.id },
-                };
-            });
+                const cls = res.cls;
+                const s = this.showCls;
+                const showClsAllowed =
+                    s && s.length ? this.showCls.includes(cls) : true;
+                if (showClsAllowed) {
+                    resources.push({
+                        id: res.id,
+                        displayName: res.display_name,
+                        cls,
+                        parent: { id: res.parent.id },
+                    });
+                }
+            }
             runInAction(() => {
                 this.children = resources;
             });

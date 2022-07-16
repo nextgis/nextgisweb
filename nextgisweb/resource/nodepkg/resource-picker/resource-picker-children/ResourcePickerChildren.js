@@ -9,7 +9,7 @@ import { observer } from "mobx-react-lite";
 
 const { Column } = Table;
 
-export const ResourceChildren = observer(({ resourceStore }) => {
+export const ResourcePickerChildren = observer(({ resourceStore }) => {
     const {
         selected,
         children,
@@ -127,6 +127,6 @@ export const ResourceChildren = observer(({ resourceStore }) => {
     );
 });
 
-ResourceChildren.propTypes = {
+ResourcePickerChildren.propTypes = {
     resourceStore: PropTypes.object,
 };

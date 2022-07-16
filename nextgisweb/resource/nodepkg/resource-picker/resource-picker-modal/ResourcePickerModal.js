@@ -4,7 +4,7 @@ import { Modal } from "@nextgisweb/gui/antd";
 import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
 
-import { ResourceChildren } from "../resource-children";
+import { ResourcePickerChildren } from "../resource-picker-children";
 import { ResourcePickerStore } from "../store/ResourcePickerStore";
 import { ResourcePickerModalFooter } from "./ResourcePickerModalFooter";
 import { ResourcePickerModalTitle } from "./ResourcePickerModalTitle";
@@ -19,6 +19,7 @@ const DEFAULTS = {
 export function ResourcePickerModal({
     onSelect,
     enabledCls = ["resource_group"],
+    showCls = ["resource_group"],
     resourceId,
     disabledIds,
     onNewGroup,
@@ -33,6 +34,7 @@ export function ResourcePickerModal({
             disabledIds,
             enabledCls,
             onNewGroup,
+            showCls,
         })
     );
     const close = () => setVisible(false);
@@ -80,7 +82,7 @@ export function ResourcePickerModal({
                 />
             }
         >
-            <ResourceChildren
+            <ResourcePickerChildren
                 resourceStore={resourceStore}
                 enabledCls={["resource_group"]}
             />

@@ -1,5 +1,5 @@
 /** @entrypoint */
-import { ResourcePickerModal } from "./ResourcePickerModal";
+import { ResourcePickerModal } from "./resource-picker-modal/ResourcePickerModal";
 import { showResourcePicker } from './showResourcePicker';
 
 export { ResourcePickerModal, showResourcePicker };

@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
 import { useMemo } from "react";
 
-export const ResourceBreadcrumb = observer(
+export const ResourcePickerBreadcrumb = observer(
     ({
         resourceStore,
         // TODO: make it dependent on the block length
@@ -102,7 +102,7 @@ export const ResourceBreadcrumb = observer(
     }
 );
 
-ResourceBreadcrumb.propTypes = {
+ResourcePickerBreadcrumb.propTypes = {
     resourceStore: PropTypes.object,
     maxBreadcrumbItems: PropTypes.number,
 };

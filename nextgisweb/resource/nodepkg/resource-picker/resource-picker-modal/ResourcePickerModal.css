@@ -12,7 +12,7 @@
     display: inline-flex;
 }
 .resource-breadcrumb .ant-breadcrumb-link .resource-breadcrumb-item {
-    max-width: 150px;
+    max-width: 160px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
