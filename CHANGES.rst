@@ -9,7 +9,7 @@ Changes
 - Batch deletion in the list of child resources.
 - Completed control panel migration to Antd and React.
 - Improved login dialog, resource search, etc.
-- Fast JSON serialiazation and deserialization base on orjson library.
+- Fast JSON serialiazation and deserialization based on orjson library.
 - Hide empty groups and groups with no accessible layers on web maps.
 - Support for 25D geometries in PostGIS layers.
 - PostGIS connection and layer diagnostic tool.
@@ -21,7 +21,11 @@ Changes
 - M dimenision stripping while creating a vector layer in LOSSY mode.
 - Support for quad-key basemaps on web maps.
 - Cloud-optimized GeoTIFF (COG) enabled by default.
+- Enabling (and disabling) Cloud-optimized GeoTIFF (COG) for existing rasters.
 - Selecting features on web maps via ``hl_*`` URL parameters.
+- OAuth improvements, including password-based authentication and team
+  management for NextGIS ID.
+- Ability to download raster layers in an internal representation.
 
 4.1.0
 -----
