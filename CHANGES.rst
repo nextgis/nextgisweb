@@ -6,26 +6,24 @@ Changes
 
 - "Locate me" tool on web maps.
 - Identifiable setting for web map layers.
-- Batch deletion in the list of child resources.
-- Completed control panel migration to Antd and React.
-- Improved login dialog, resource search, etc.
-- Fast JSON serialiazation and deserialization based on orjson library.
-- Hide empty groups and groups with no accessible layers on web maps.
-- Support for 25D geometries in PostGIS layers.
+- Batch deletion and moving of resources.
+- Ability to download raster layers as an internal representation.
 - PostGIS connection and layer diagnostic tool.
-- Improved handling of URLs for descriptions and feature layer fields.
-- Improved management of spatial reference systems and catalog integration.
-- Support for simultaneous OAuth authorization code and password grant types.
-- Ability to inject some HTML into the base template for metrics and counters.
-- Fixed editing 25D geometries on web maps.
-- M dimenision stripping while creating a vector layer in LOSSY mode.
 - Support for quad-key basemaps on web maps.
+- OAuth improvements: NextGIS ID integration, simultaneous authorization code
+  and password grant types.
+- Improved management of spatial reference systems and catalog integration.
+- Better support for 25D geometries on web maps and PostGIS layers.
+- Improved handling of URLs in descriptions and feature layer fields.
 - Cloud-optimized GeoTIFF (COG) enabled by default.
-- Enabling (and disabling) Cloud-optimized GeoTIFF (COG) for existing rasters.
+- In-place conversion between COG and non-COG rasters.
+- Hide empty groups and groups with no accessible layers on web maps.
+- M dimension stripping while creating vector layers in LOSSY mode.
 - Selecting features on web maps via ``hl_*`` URL parameters.
-- OAuth improvements, including password-based authentication and team
-  management for NextGIS ID.
-- Ability to download raster layers in an internal representation.
+- Ability to inject some HTML into the base template for metrics and counters.
+- Fast JSON serialization and deserialization based on orjson library.
+- Completed control panel migration to Antd and React.
+
 
 4.1.0
 -----
