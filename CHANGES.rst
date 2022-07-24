@@ -1,6 +1,12 @@
 Changes
 =======
 
+Unreleased
+----------
+
+- OpenLayers library upgraded to 6.15.1.
+
+
 4.2.0
 -----
 
