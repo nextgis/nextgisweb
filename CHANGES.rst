@@ -1,10 +1,11 @@
 Changes
 =======
 
-Unreleased
+4.3.0
 ----------
 
 - OpenLayers library upgraded to 6.15.1.
+- Use resource SRS by default while exporting raster and vector layers.
 
 
 4.2.0
