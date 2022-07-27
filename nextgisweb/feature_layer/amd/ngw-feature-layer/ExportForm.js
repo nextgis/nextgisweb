@@ -126,6 +126,14 @@ define([
                         }
                     })
                 })));
+            })).then(lang.hitch(this, function() {
+                xhr.get(route.resource.item({id: this.resid}), {
+                    handleAs: 'json'
+                }).then(
+                    function(data) {
+                        this.wSRS.set('value', data[data.resource.cls].srs.id);
+                    }.bind(this)
+                );
             }));
         }
     });

@@ -88,7 +88,17 @@ define([
                         }
                     })
                 })));
-            }));
+            })).then(
+                lang.hitch(this, function() {
+                    xhr.get(route.resource.item({id: this.resid}), {
+                        handleAs: 'json'
+                    }).then(
+                        function(data) {
+                            this.wSRS.set('value', data.raster_layer.srs.id);
+                        }.bind(this)
+                    );
+                })
+            );
 
             // Multiselect Dojo widget is not associated with a data store/object.
             // As per the documentation it is just a wrapper over the SELECT HTML element.
