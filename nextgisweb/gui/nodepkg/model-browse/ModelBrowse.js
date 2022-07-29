@@ -13,24 +13,23 @@ import {
     Row,
     Space,
     Table,
-    Tooltip,
+    Tooltip
 } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
-import { errorModal } from "@nextgisweb/gui/error";
 import { PropTypes } from "prop-types";
 import React, { useEffect, useMemo, useState } from "react";
 import "./ModelBrowse.less";
-
 export function ModelBrowse({
-    columns,
     model: m,
+    columns,
     messages,
+    callbacks = {},
     itemProps = {},
     createProps = {},
-    callbacks = {},
-    selectedControls = [],
     headerControls = [],
+    selectedControls = [],
     collectionOptions,
     collectionFilter,
     ...tableProps
@@ -38,12 +37,12 @@ export function ModelBrowse({
     const model =
         typeof m === "string"
             ? {
-                  item: m + ".item",
-                  collection: m + ".collection",
-                  edit: m + ".edit",
-                  browse: m + ".browse",
-                  create: m + ".create",
-              }
+                item: m + ".item",
+                collection: m + ".collection",
+                edit: m + ".edit",
+                browse: m + ".browse",
+                create: m + ".create",
+            }
             : m;
 
     const msg = messages || {};
@@ -187,7 +186,7 @@ export function ModelBrowse({
                             onClick={() => onEditClick(record.id)}
                         />
                     </Tooltip>
-                    {canDelete(record) ? (
+                    {canDelete(record) && (
                         <Tooltip title={i18n.gettext("Delete")}>
                             <Popconfirm
                                 placement="bottom"
@@ -201,8 +200,6 @@ export function ModelBrowse({
                                 />
                             </Popconfirm>
                         </Tooltip>
-                    ) : (
-                        ""
                     )}
                 </div>
             ),
@@ -246,7 +243,7 @@ export function ModelBrowse({
         <Space direction="horizontal">
             {selectedControls.map((control, idx) => (
                 <React.Fragment key={idx}>
-                    {control({selected, rows, setRows})}
+                    {control({ selected, rows, setRows })}
                 </React.Fragment>
             ))}
 

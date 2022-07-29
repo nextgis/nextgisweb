@@ -7,10 +7,11 @@ import {
     message,
     Modal,
     Table,
-    Tooltip,
+    Tooltip
 } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 
+import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
 import { route } from "@nextgisweb/pyramid/api";
@@ -91,11 +92,11 @@ function renderActions(actions, id, setTableItems) {
 
         const createActionBtn = (props_) => (
             <Tooltip key={title} title={title}>
-                <a {...props_}>
-                    <svg className="icon" fill="currentColor">
-                        <use xlinkHref={`#icon-${icon}`} />
-                    </svg>
-                </a>
+                <SvgIconLink
+                    {...props_}
+                    icon={icon}
+                    fill="currentColor"
+                ></SvgIconLink>
             </Tooltip>
         );
         if (isDeleteAction(action)) {
@@ -339,12 +340,12 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                     dataIndex="displayName"
                     sorter={sorterFactory("displayName")}
                     render={(value, record) => (
-                        <a href={record.link}>
-                            <svg className="icon">
-                                <use xlinkHref={`#icon-rescls-${record.cls}`} />
-                            </svg>
+                        <SvgIconLink
+                            href={record.link}
+                            icon={`rescls-${record.cls}`}
+                        >
                             {value}
-                        </a>
+                        </SvgIconLink>
                     )}
                 />
                 <Column

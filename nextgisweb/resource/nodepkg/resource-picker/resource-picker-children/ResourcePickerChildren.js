@@ -1,11 +1,12 @@
 import ArrowForward from "@material-icons/svg/arrow_forward";
 
-import { Space, Table, Button } from "@nextgisweb/gui/antd";
+import { Button, Space, Table } from "@nextgisweb/gui/antd";
+import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
+import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
 import { useMemo, useState } from "react";
-import { observer } from "mobx-react-lite";
 
 const { Column } = Table;
 
@@ -110,9 +111,7 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
                 sorter={sorterFactory("displayName")}
                 render={(value, record) => (
                     <Space>
-                        <svg className="icon">
-                            <use xlinkHref={`#icon-rescls-${record.cls}`} />
-                        </svg>
+                        <SvgIcon icon={`rescls-${record.cls}`}/>
                         {value}
                     </Space>
                 )}
