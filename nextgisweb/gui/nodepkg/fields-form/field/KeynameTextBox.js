@@ -2,7 +2,7 @@ import { PropTypes } from "prop-types";
 import { Form, Input } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
 
-export function KeynameTextBox(props) {
+export function KeynameTextBox({form, ...props}) {
     const rules = [...props.rules] || [];
     rules.push({
         pattern: new RegExp(/^[A-Za-z][\w-]*$/g),

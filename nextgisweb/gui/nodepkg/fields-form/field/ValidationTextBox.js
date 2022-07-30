@@ -2,7 +2,7 @@ import { PropTypes } from "prop-types";
 import { Form, Input } from "@nextgisweb/gui/antd";
 
 export function ValidationTextBox(props) {
-    const { disabled, ...formProps } = props;
+    const { disabled, form, ...formProps } = props;
     const inputProps = { disabled };
     return (
         <Form.Item {...formProps}>

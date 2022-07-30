@@ -1,7 +1,11 @@
 import { extractError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
-import { loadParents } from "../../util/loadParents";
+import i18n from "@nextgisweb/pyramid/i18n!resource";
 import { makeAutoObservable, runInAction } from "mobx";
+import { loadParents } from "../../util/loadParents";
+
+const getThisMsg = i18n.gettext("Move to this group");
+const getSelectedMsg = i18n.gettext("Move to selected group");
 
 export class ResourcePickerStore {
     childrenLoadError = false;
@@ -36,10 +40,22 @@ export class ResourcePickerStore {
     setBrearcrumbItemsAbortController = null;
     createNewGroupAbortController = null;
 
-    constructor({ parentId, disabledIds, enabledCls, onNewGroup, showCls }) {
+    getThisMsg = getThisMsg;
+    getSelectedMsg = getSelectedMsg;
+
+    constructor({
+        parentId,
+        onNewGroup,
+        disabledIds,
+        enabledCls,
+        showCls,
+        getSelectedMsg,
+        getThisMsg,
+    }) {
         this.parentId = parentId;
         this.initialParentId = this.parentId;
         this.onNewGroup = onNewGroup;
+
         if (disabledIds) {
             this.disabledIds = disabledIds;
         }
@@ -48,6 +64,12 @@ export class ResourcePickerStore {
         }
         if (showCls) {
             this.showCls = showCls;
+        }
+        if (getSelectedMsg) {
+            this.getSelectedMsg = getSelectedMsg;
+        }
+        if (getThisMsg) {
+            this.getThisMsg = getThisMsg;
         }
         makeAutoObservable(this, {
             setChildrenAbortController: false,

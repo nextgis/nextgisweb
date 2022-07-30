@@ -1,4 +1,4 @@
-import './ResourcePickerModal.css'
+import "./ResourcePickerModal.css";
 
 import { Modal } from "@nextgisweb/gui/antd";
 import { PropTypes } from "prop-types";
@@ -17,12 +17,15 @@ const DEFAULTS = {
 };
 
 export function ResourcePickerModal({
+    showCls = ["resource_group"],
     onSelect,
     enabledCls = ["resource_group"],
-    showCls = ["resource_group"],
-    resourceId,
-    disabledIds,
     onNewGroup,
+    resourceId,
+    getThisMsg,
+    disabledIds,
+    closeOnSelect = true,
+    getSelectedMsg,
     allowCreateResourceBtn = true,
     ...props
 }) {
@@ -31,6 +34,8 @@ export function ResourcePickerModal({
     const [resourceStore] = useState(
         new ResourcePickerStore({
             parentId: resourceId,
+            getSelectedMsg,
+            getThisMsg,
             disabledIds,
             enabledCls,
             onNewGroup,
@@ -42,6 +47,9 @@ export function ResourcePickerModal({
     const onOk = (resource) => {
         if (onSelect) {
             onSelect(resource);
+        }
+        if (closeOnSelect) {
+            close();
         }
     };
 
@@ -91,8 +99,11 @@ export function ResourcePickerModal({
 }
 
 ResourcePickerModal.propTypes = {
-    resourceId: PropTypes.number,
     onSelect: PropTypes.func,
-    allowCreateResourceBtn: PropTypes.bool,
+    getThisMsg: PropTypes.string,
+    resourceId: PropTypes.number,
     disabledIds: PropTypes.arrayOf(PropTypes.number),
+    closeOnSelect: PropTypes.bool,
+    getSelectedMsg: PropTypes.string,
+    allowCreateResourceBtn: PropTypes.bool,
 };

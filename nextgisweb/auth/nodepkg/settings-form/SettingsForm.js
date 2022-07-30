@@ -45,7 +45,7 @@ export function SettingsForm({ id }) {
             result.push({
                 name: "oauth_subject",
                 label: oauth.name,
-                widget: ({ name, ...props }) => (
+                widget: ({ name, form, ...props }) => (
                     <Form.Item {...props}>
                         <OAuthStatus oauthSubject={profile.oauth_subject} />
                     </Form.Item>

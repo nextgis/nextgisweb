@@ -48,7 +48,7 @@ export function FieldsForm(props) {
         <Form {...formProps_}>
             {fields &&
                 includedFormItems.map((f) => (
-                    <Fragment key={f.name}>{FormItem(f)}</Fragment>
+                    <Fragment key={f.name}>{FormItem({form: form_, ...f})}</Fragment>
                 ))}
             {props.children}
         </Form>

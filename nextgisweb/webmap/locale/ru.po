@@ -10,11 +10,11 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:30 model.py:40 view.py:231 view.py:254
+#: model.py:30 model.py:40 view.py:245 view.py:276
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:32 view.py:238
+#: model.py:32 view.py:250
 msgid "Display"
 msgstr "Открыть"
 
@@ -34,11 +34,19 @@ msgstr "Администрировать аннотации"
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:209
+#: view.py:210
+msgid "Clone webmap"
+msgstr "Клонировать веб-карту"
+
+#: view.py:218
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:259
+#: nodepkg/clone-webmap/CloneWebmap.js:162 view.py:256
+msgid "Clone"
+msgstr "Клонировать"
+
+#: view.py:281
 msgid "External access"
 msgstr "Внешний доступ"
 
@@ -72,16 +80,16 @@ msgid "Annotations"
 msgstr "Аннотации"
 
 #: amd/ngw-webmap/Display.js:738 amd/ngw-webmap/tool/Zoom.js:20
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:485
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:488
 msgid "Zoom in"
 msgstr "Приблизить"
 
 #: amd/ngw-webmap/Display.js:739 amd/ngw-webmap/tool/Zoom.js:23
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:486
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:489
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:743 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:490
+#: amd/ngw-webmap/Display.js:743 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
@@ -93,15 +101,15 @@ msgstr "Начальный охват"
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:767 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:499
+#: amd/ngw-webmap/Display.js:767 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:502
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:1139
+#: amd/ngw-webmap/Display.js:1153 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:669
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:1140
+#: amd/ngw-webmap/Display.js:1154 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:670
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -239,6 +247,7 @@ msgstr "Удалить"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:73
 #: amd/ngw-webmap/template/ItemWidget.hbs:127
+#: nodepkg/clone-webmap/CloneWebmap.js:45
 msgid "Display name"
 msgstr "Наименование"
 
@@ -274,19 +283,19 @@ msgstr "Ресурс стиля"
 msgid "Expanded"
 msgstr "Развернута"
 
-#: amd/ngw-webmap/tool/Identify.js:216
+#: amd/ngw-webmap/tool/Identify.js:215
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-webmap/tool/Identify.js:251
+#: amd/ngw-webmap/tool/Identify.js:250
 msgid "Feature"
 msgstr "Объект"
 
-#: amd/ngw-webmap/tool/Identify.js:309 amd/ngw-webmap/tool/Identify.js:326
+#: amd/ngw-webmap/tool/Identify.js:308 amd/ngw-webmap/tool/Identify.js:325
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:444
+#: amd/ngw-webmap/tool/Identify.js:443
 msgid "Features"
 msgstr "Объектов"
 
@@ -612,9 +621,21 @@ msgid ""
 " a different domain."
 msgstr "<a>CORS</a> должен быть включен при встраивании веб-карты на домене."
 
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:517
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:520
 msgid "Open full map"
 msgstr "Открыть карту целиком"
+
+#: nodepkg/clone-webmap/CloneWebmap.js:34
+msgid "Resource group"
+msgstr "Группа ресурсов"
+
+#: nodepkg/clone-webmap/CloneWebmap.js:37
+msgid "Clone to selected group"
+msgstr "Клонировать в выбранную группу"
+
+#: nodepkg/clone-webmap/CloneWebmap.js:38
+msgid "Clone to this group"
+msgstr "Клонировать в эту группу"
 
 #: nodepkg/settings/Settings.js:56
 msgid "Settings saved"

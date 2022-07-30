@@ -2,7 +2,7 @@ import { Form, Select } from "@nextgisweb/gui/antd";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
 
-export function LanguageSelect({ loading, ...props }) {
+export function LanguageSelect({ loading, form, ...props }) {
     const langages = [
         {
             value: null,

@@ -8,7 +8,7 @@ from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .util import webmap_items_to_tms_ids_list, _
 from ..dynmenu import DynItem, Label, Link
-from ..resource import Resource, Widget, resource_factory, DataScope
+from ..resource import Resource, Widget, resource_factory, DataScope, ResourceScope
 from ..gui import REACT_RENDERER
 
 
@@ -201,6 +201,15 @@ def display(obj, request):
     )
 
 
+def clone(request):
+    request.resource_permission(ResourceScope.read)
+    return dict(
+        entrypoint='@nextgisweb/webmap/clone-webmap',
+        props=dict(id=request.context.id),
+        obj=request.context,
+        title=_("Clone webmap"))
+
+
 def preview_embedded(request):
     iframe = request.POST['iframe']
     request.response.headerlist.append(("X-XSS-Protection", "0"))
@@ -226,22 +235,35 @@ def setup_pyramid(comp, config):
         'webmap.preview_embedded', '/webmap/embedded-preview'
     ).add_view(preview_embedded, renderer='nextgisweb:webmap/template/preview_embedded.mako')
 
+    config.add_route(
+        'webmap.clone', r'/resource/{id:\d+}/clone',
+        factory=resource_factory, client=('id',)
+    ).add_view(clone, context=WebMap, renderer=REACT_RENDERER)
+
     class DisplayMenu(DynItem):
         def build(self, args):
             yield Label('webmap', _("Web map"))
 
-            if (
-                isinstance(args.obj, WebMap)
-                and args.obj.has_permission(WebMapScope.display, args.request.user)
-            ):
-                yield Link(
-                    'webmap/display', _("Display"), self._url(),
-                    important=True, target='_blank',
-                    icon='webmap-display')
+            if isinstance(args.obj, WebMap):
+                if args.obj.has_permission(WebMapScope.display, args.request.user):
+                    yield Link(
+                        'webmap/display', _("Display"), self._display_url(),
+                        important=True, target='_blank',
+                        icon='webmap-display')
 
-        def _url(self):
+                if args.obj.has_permission(ResourceScope.read, args.request.user):
+                    yield Link(
+                        'webmap/clone', _("Clone"), self._clone_url(),
+                        important=False, target='_self',
+                        icon='material-content_copy')
+
+        def _display_url(self):
             return lambda args: args.request.route_url(
                 'webmap.display', id=args.obj.id)
+
+        def _clone_url(self):
+            return lambda args: args.request.route_url(
+                'webmap.clone', id=args.obj.id)
 
     WebMap.__dynmenu__.add(DisplayMenu())
 

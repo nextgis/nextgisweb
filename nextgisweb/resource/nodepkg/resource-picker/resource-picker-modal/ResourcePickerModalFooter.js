@@ -10,10 +10,8 @@ import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
 import { useState, useRef, useEffect } from "react";
 
-const createNewGroupTitle = i18n.gettext("Create group");
-const moveToThisGroupTitle = i18n.gettext("Move to this group");
-const moveToSelectedGroupTitle = i18n.gettext("Move to selected group");
-const clearSelectionTitle = i18n.gettext("Clear selection");
+const createNewGroupMsg = i18n.gettext("Create group");
+const clearSelectionMsg = i18n.gettext("Clear selection");
 
 const CreateControl = observer(({ setCreateMode, resourceStore }) => {
     const { childrenLoading } = resourceStore;
@@ -78,7 +76,9 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
     const {
         selected,
         parentId,
+        getThisMsg,
         disabledIds,
+        getSelectedMsg,
         allowCreateResource,
         createNewGroupLoading,
     } = resourceStore;
@@ -89,10 +89,10 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
     };
 
     return (
-        <Row justify="space-between" >
+        <Row justify="space-between">
             <Col>
                 {allowCreateResource && !createNewGroupLoading && (
-                    <Tooltip title={createNewGroupTitle}>
+                    <Tooltip title={createNewGroupMsg}>
                         <a
                             style={{ fontSize: "1.5rem" }}
                             onClick={onCreateClick}
@@ -105,7 +105,7 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
             <Col>
                 {selected.length ? (
                     <Space>
-                        <Tooltip title={clearSelectionTitle}>
+                        <Tooltip title={clearSelectionMsg}>
                             <Button
                                 icon={<HighlightOff />}
                                 onClick={() => {
@@ -118,7 +118,7 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
                             disabled={!selected.length}
                             onClick={() => onOk(selected[0])}
                         >
-                            {moveToSelectedGroupTitle}
+                            {getSelectedMsg}
                         </Button>
                     </Space>
                 ) : (
@@ -127,7 +127,7 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
                         onClick={() => onOk(parentId)}
                         disabled={disabledIds.includes(parentId)}
                     >
-                        {moveToThisGroupTitle}
+                        {getThisMsg}
                     </Button>
                 )}
             </Col>
@@ -135,21 +135,25 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
     );
 });
 
-export const ResourcePickerModalFooter = observer(({ resourceStore, onOk }) => {
-    const [createMode, setCreateMode] = useState(false);
+export const ResourcePickerModalFooter = observer(
+    ({ resourceStore, onOk, ...props }) => {
+        const [createMode, setCreateMode] = useState(false);
 
-    return (
-        <>
-            {createMode ? (
-                <CreateControl {...{ resourceStore, setCreateMode }} />
-            ) : (
-                <MoveControl {...{ resourceStore, setCreateMode, onOk }} />
-            )}
-        </>
-    );
-});
+        return (
+            <>
+                {createMode ? (
+                    <CreateControl {...{ resourceStore, setCreateMode }} />
+                ) : (
+                    <MoveControl
+                        {...{ resourceStore, setCreateMode, onOk, ...props }}
+                    />
+                )}
+            </>
+        );
+    }
+);
 
 ResourcePickerModalFooter.propTypes = {
-    resourceStore: PropTypes.object,
     onOk: PropTypes.func,
+    resourceStore: PropTypes.object,
 };

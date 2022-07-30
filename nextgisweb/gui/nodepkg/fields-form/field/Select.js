@@ -1,7 +1,7 @@
 import { Form, Select as AntdSelect } from "@nextgisweb/gui/antd";
 
 
-export function Select({ choices, ...props }) {
+export function Select({ choices, form, ...props }) {
     return (
         <Form.Item {...props}>
             <AntdSelect {...props}>
