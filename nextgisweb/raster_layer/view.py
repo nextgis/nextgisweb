@@ -1,7 +1,7 @@
 from pyramid.httpexceptions import HTTPNotFound
 
 from .. import dynmenu as dm
-from ..pyramid import viewargs
+from ..gui import REACT_RENDERER
 from ..resource import Widget, Resource
 
 from .model import RasterLayer
@@ -14,15 +14,25 @@ class RasterLayerWidget(Widget):
     amdmod = 'ngw-raster-layer/Widget'
 
 
-@viewargs(renderer='nextgisweb:raster_layer/template/export.mako')
 def export(request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
-    return dict(obj=request.context, title=_("Save as"), maxheight=True)
+    return dict(
+        obj=request.context,
+        title=_("Save as"),
+        props=dict(id=request.context.id),
+        entrypoint="@nextgisweb/raster_layer/export-form",
+        maxheight=True,
+    )
 
 
 def setup_pyramid(comp, config):
-    config.add_view(export, route_name='resource.export.page', context=RasterLayer)
+    config.add_view(
+        export,
+        route_name='resource.export.page',
+        context=RasterLayer,
+        renderer=REACT_RENDERER,
+    )
 
     # Layer menu extension
     class LayerMenuExt(dm.DynItem):
