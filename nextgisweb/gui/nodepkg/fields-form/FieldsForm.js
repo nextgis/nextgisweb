@@ -1,10 +1,19 @@
 import { PropTypes } from "prop-types";
-import { Fragment } from "react";
-import { Checkbox, Form, Input, InputNumber } from "@nextgisweb/gui/antd";
+import { Fragment, useMemo, useEffect } from "react";
+import { Form, Input, InputNumber } from "@nextgisweb/gui/antd";
+import { Checkbox } from "./field/Checkbox";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
 
 export function FieldsForm(props) {
-    const { fields, initialValues, onChange, form, ...formProps } = props;
+    const {
+        fields,
+        initialValues,
+        onChange,
+        whenReady,
+        form,
+        ref,
+        ...formProps
+    } = props;
     const form_ = form || Form.useForm()[0];
 
     const isValid = async () => {
@@ -33,23 +42,36 @@ export function FieldsForm(props) {
         formProps_.onFieldsChange = onFieldsChange;
     }
 
-    const includedFormItems = fields.filter((f) => {
-        const included = f.included;
-        if (included !== undefined) {
-            if (typeof included === "function") {
-                return included(f, initialValues);
-            }
-            return !!included;
+    const includedFormItems = useMemo(
+        () =>
+            fields
+                ? fields.filter((f) => {
+                    const included = f.included;
+                    if (included !== undefined) {
+                        if (typeof included === "function") {
+                            return included(f, initialValues);
+                        }
+                        return !!included;
+                    }
+                    return true;
+                })
+                : [],
+        [fields]
+    );
+
+    useEffect(() => {
+        if (whenReady) {
+            whenReady();
         }
-        return true;
-    });
+    }, []);
 
     return (
-        <Form {...formProps_}>
-            {fields &&
-                includedFormItems.map((f) => (
-                    <Fragment key={f.name}>{FormItem({form: form_, ...f})}</Fragment>
-                ))}
+        <Form labelWrap colon={false} {...formProps_} className="fields-form">
+            {includedFormItems.map((f) => (
+                <Fragment key={f.name}>
+                    {FormItem({ form: form_, ...f })}
+                </Fragment>
+            ))}
             {props.children}
         </Form>
     );
@@ -72,11 +94,7 @@ function FormItem(props) {
         return <FormWidget {...formProps}></FormWidget>;
     }
     if (widget === "checkbox") {
-        return (
-            <Form.Item {...formProps} valuePropName="checked">
-                <Checkbox></Checkbox>
-            </Form.Item>
-        );
+        return <Checkbox {...formProps}></Checkbox>;
     }
 
     return (
@@ -99,10 +117,11 @@ function getInputType(widget, props) {
 }
 
 FieldsForm.propTypes = {
-    fields: PropTypes.array,
     initialValues: PropTypes.object,
-    children: PropTypes.node,
+    whenReady: PropTypes.func,
     onChange: PropTypes.func,
+    children: PropTypes.node,
+    fields: PropTypes.array,
     form: PropTypes.any,
 };
 FormItem.propTypes = {

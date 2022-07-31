@@ -1,5 +1,6 @@
 import settings from "@nextgisweb/pyramid/settings!raster_layer";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { Form } from "@nextgisweb/gui/antd";
 import { FieldsForm, Select, useForm } from "@nextgisweb/gui/fields-form";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
@@ -31,6 +32,7 @@ const bandListToOptions = (bandList) => {
 
 export function ExportForm({ id }) {
     const [status, setStatus] = useState("loading");
+    const { makeSignal } = useAbortController();
     const [srsOptions, setSrsOptions] = useState([]);
     const [bandOptions, setBandOptions] = useState([]);
     const [defaultSrs, setDefaultSrs] = useState();
@@ -38,8 +40,13 @@ export function ExportForm({ id }) {
 
     async function load() {
         try {
-            const srsInfo = await route("spatial_ref_sys.collection").get();
-            const itemInfo = await route("resource.item", id).get();
+            const signal = makeSignal();
+            const [srsInfo, itemInfo] = await Promise.all(
+                [
+                    route("spatial_ref_sys.collection"),
+                    route("resource.item", id),
+                ].map((r) => r.get({ signal }))
+            );
             setSrsOptions(srsListToOptions(srsInfo));
             setBandOptions(bandListToOptions(itemInfo.raster_layer.color_interpretation));
             setDefaultSrs(itemInfo.raster_layer.srs.id);

@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from pyramid.httpexceptions import HTTPNotFound
 
+from ..gui import REACT_RENDERER
 from ..resource import (
     Resource,
     ResourceScope,
@@ -124,11 +125,16 @@ def test_mvt(request):
     return dict()
 
 
-@viewargs(renderer='nextgisweb:feature_layer/template/export.mako')
 def export(request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
-    return dict(obj=request.context, title=_("Save as"), maxheight=True)
+    return dict(
+        obj=request.context,
+        title=_("Save as"),
+        props=dict(id=request.context.id),
+        entrypoint="@nextgisweb/feature_layer/export-form",
+        maxheight=True
+    )
 
 
 def setup_pyramid(comp, config):
@@ -166,7 +172,12 @@ def setup_pyramid(comp, config):
         client=('id', 'feature_id')
     ).add_view(store_item, context=IFeatureLayer, renderer='json')
 
-    config.add_view(export, route_name='resource.export.page', context=IFeatureLayer)
+    config.add_view(
+        export,
+        route_name='resource.export.page',
+        context=IFeatureLayer,
+        renderer=REACT_RENDERER,
+    )
 
     config.add_route(
         'feature_layer.test_mvt',
