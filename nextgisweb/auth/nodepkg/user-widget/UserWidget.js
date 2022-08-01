@@ -3,18 +3,18 @@ import { ContentBox, LoadingWrapper } from "@nextgisweb/gui/component";
 import { KeynameTextBox, LanguageSelect } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
 import { PropTypes } from "prop-types";
 import { useMemo } from "react";
 import { PrincipalMemberSelect } from "../field";
 import { default as oauth, makeTeamManageButton } from "../oauth";
 import getMessages from "../userMessages";
+import { UserWidgetPassword } from "./UserWidgetPassword";
 
 export function UserWidget({ id }) {
-    const { data: group, isLoading } = useRouteGet({
-        name: "auth.group.collection",
-    });
+    const { data: group, isLoading } = useRouteGet("auth.group.collection");
+
+    const isNewUser = id === undefined;
 
     const fields = useMemo(() => {
         const fields_ = [];
@@ -35,10 +35,9 @@ export function UserWidget({ id }) {
                 {
                     name: "password",
                     label: i18n.gettext("Password"),
-                    widget: "password",
-                    autoComplete: 'new-password',
+                    widget: UserWidgetPassword,
                     // required only when creating a new user
-                    required: id === undefined,
+                    required: isNewUser,
                     placeholder:
                         id !== undefined
                             ? i18n.gettext("Enter new password here")
@@ -47,7 +46,7 @@ export function UserWidget({ id }) {
             ]
         );
 
-        if (oauth.enabled && id) {
+        if (oauth.enabled && !isNewUser) {
             fields_.push({
                 name: "oauth_subject",
                 label: oauth.name,
@@ -69,16 +68,14 @@ export function UserWidget({ id }) {
                     choices: group || [],
                     value:
                         group && id === undefined
-                            ? group
-                                .filter((g) => g.register)
-                                .map((g) => g.id)
+                            ? group.filter((g) => g.register).map((g) => g.id)
                             : [],
                 },
                 {
                     name: "language",
                     label: i18n.gettext("Language"),
                     widget: LanguageSelect,
-                    value: 'default',
+                    value: "default",
                 },
                 {
                     name: "description",
@@ -91,10 +88,10 @@ export function UserWidget({ id }) {
         return fields_;
     }, [group]);
 
-    const p = { fields, model: "auth.user", id, messages: getMessages() };
+    const props = { fields, model: "auth.user", id, messages: getMessages() };
 
     // prettier-ignore
-    const infoNGID = useMemo(() => oauth.isNGID && !id && <Alert
+    const infoNGID = useMemo(() => oauth.isNGID && isNewUser && <Alert
         type="info" style={{marginBottom: "1ex"}}
         message={i18n.gettext("Consider adding {name} user to your team instead of creating a new user with a password.").replace("{name}", oauth.name)}
         action={makeTeamManageButton()}
@@ -108,7 +105,7 @@ export function UserWidget({ id }) {
         <div className="ngw-auth-user-widget">
             {infoNGID}
             <ContentBox>
-                <ModelForm {...p}></ModelForm>
+                <ModelForm {...props}></ModelForm>
             </ContentBox>
         </div>
     );
