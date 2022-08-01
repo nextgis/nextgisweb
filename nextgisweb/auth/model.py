@@ -178,7 +178,7 @@ class User(Principal):
             if (pwd := data.get('password')) is not None:
                 if pwd is True:
                     if self.password_hash is None:
-                        raise ValidationError(message=_("Local password is not set."))
+                        raise ValidationError(message=_("Password is not set."))
                 elif pwd is False:
                     self.password = None
                 else:

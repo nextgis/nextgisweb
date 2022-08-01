@@ -1,51 +1,63 @@
 import { Form, Input, Select } from "@nextgisweb/gui/antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
+import oauth from "../oauth";
 
 const modes = [
     {
-        label: i18n.gettext("Use"),
-        value: "use",
+        label: i18n.gettext("Keep existing"),
+        value: "keep",
     },
     {
-        label: i18n.gettext("Not use"),
-        value: "notuse",
+        label: i18n.gettext("Assign new"),
+        value: "assign",
     },
     {
-        label: i18n.gettext("Set new"),
-        value: "set",
+        label: oauth.enabled
+            ? i18n.gettext("{name} only").replace("{name}", oauth.name)
+            : i18n.gettext("Turn off"),
+        value: "turn_off",
     },
 ];
 
 const PasswordInput = ({ value, onChange, ...inputProps }) => {
-    const [mode, setMode] = useState("use");
-    const [password, setPassword] = useState(mode === "set" ? value : "");
+    const [mode, setMode] = useState(value === false ? "turn_off" : "keep");
+    const [password, setPassword] = useState(mode === "assign" ? value : "");
 
     useEffect(() => {
-        if (mode === "set") {
+        if (mode === "assign") {
             onChange(password);
-        } else if (mode === "use") {
+        } else if (mode === "keep") {
             onChange(true);
-        } else if (mode === "notuse") {
+        } else if (mode === "turn_off") {
             onChange(false);
         }
     }, [mode, password]);
 
+    // Hide "keep" item if password wasn't assigned.
+    const availableModes = useMemo(() => {
+        return modes.filter((m) => value !== false || m.value !== "keep");
+    }, []);
+
     return (
-        <Input.Group compact>
-            <Select onChange={setMode} style={{ width: "200px" }} value={mode}>
-                {modes.map((m) => (
+        <Input.Group compact style={{ display: "flex" }}>
+            <Select
+                onChange={setMode}
+                dropdownMatchSelectWidth={false}
+                value={mode}
+            >
+                {availableModes.map((m) => (
                     <Select.Option key={m.value} value={m.value}>
                         {m.label}
                     </Select.Option>
                 ))}
             </Select>
-            {mode === "set" && (
+            {mode === "assign" && (
                 <Input.Password
-                    style={{ width: "calc(100% - 200px)" }}
-                    value={mode === "set" ? password : ""}
+                    style={{ flexGrow: "1" }}
+                    value={mode === "assign" ? password : ""}
                     onChange={(e) => setPassword(e.target.value)}
-                    disabled={mode !== "set"}
+                    disabled={mode !== "assign"}
                     {...inputProps}
                 ></Input.Password>
             )}

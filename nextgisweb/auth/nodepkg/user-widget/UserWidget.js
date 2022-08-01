@@ -40,11 +40,9 @@ export function UserWidget({ id }) {
                     name: "password",
                     label: i18n.gettext("Password"),
                     widget: isNewUser ? Password : UserWidgetPassword,
-                    required: isNewUser,
+                    required: true,
                     autoComplete: "new-password",
-                    placeholder: !isNewUser
-                        ? i18n.gettext("Enter new password here")
-                        : "",
+                    placeholder: i18n.gettext("Enter new password here"),
                 },
             ]
         );
