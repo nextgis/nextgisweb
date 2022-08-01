@@ -1,8 +1,5 @@
-import ManageSearchIcon from "@material-icons/svg/manage_search";
-import { Button, Form, Input, Select, Skeleton } from "@nextgisweb/gui/antd";
-import { showResourcePicker } from "@nextgisweb/resource/resource-picker";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { Form, Input, Select } from "@nextgisweb/gui/antd";
+import { useEffect, useState } from "react";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
 
 const modes = [
@@ -20,7 +17,7 @@ const modes = [
     },
 ];
 
-const PasswordInput = ({ value, onChange }) => {
+const PasswordInput = ({ value, onChange, ...inputProps }) => {
     const [mode, setMode] = useState("use");
     const [password, setPassword] = useState(mode === "set" ? value : "");
 
@@ -36,7 +33,7 @@ const PasswordInput = ({ value, onChange }) => {
 
     return (
         <Input.Group compact>
-            <Select onChange={setMode} style={{ width: "100px" }} value={mode}>
+            <Select onChange={setMode} style={{ width: "200px" }} value={mode}>
                 {modes.map((m) => (
                     <Select.Option key={m.value} value={m.value}>
                         {m.label}
@@ -45,20 +42,28 @@ const PasswordInput = ({ value, onChange }) => {
             </Select>
             {mode === "set" && (
                 <Input.Password
-                    style={{ width: "calc(100% - 100px)" }}
+                    style={{ width: "calc(100% - 200px)" }}
                     value={mode === "set" ? password : ""}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={mode !== "set"}
+                    {...inputProps}
                 ></Input.Password>
             )}
         </Input.Group>
     );
 };
 
-export function UserWidgetPassword({ form, ...props }) {
+export function UserWidgetPassword({
+    form,
+    autoComplete,
+    placeholder,
+    ...props
+}) {
+    const inputProps = { autoComplete, placeholder };
+
     return (
         <Form.Item {...props}>
-            <PasswordInput></PasswordInput>
+            <PasswordInput {...inputProps}></PasswordInput>
         </Form.Item>
     );
 }

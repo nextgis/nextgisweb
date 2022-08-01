@@ -1,6 +1,10 @@
 import { Alert } from "@nextgisweb/gui/antd";
 import { ContentBox, LoadingWrapper } from "@nextgisweb/gui/component";
-import { KeynameTextBox, LanguageSelect } from "@nextgisweb/gui/fields-form";
+import {
+    KeynameTextBox,
+    LanguageSelect,
+    Password,
+} from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
@@ -14,7 +18,7 @@ import { UserWidgetPassword } from "./UserWidgetPassword";
 export function UserWidget({ id }) {
     const { data: group, isLoading } = useRouteGet("auth.group.collection");
 
-    const isNewUser = id === undefined;
+    const isNewUser = useMemo(() => id === undefined, [id]);
 
     const fields = useMemo(() => {
         const fields_ = [];
@@ -35,13 +39,12 @@ export function UserWidget({ id }) {
                 {
                     name: "password",
                     label: i18n.gettext("Password"),
-                    widget: UserWidgetPassword,
-                    // required only when creating a new user
+                    widget: isNewUser ? Password : UserWidgetPassword,
                     required: isNewUser,
-                    placeholder:
-                        id !== undefined
-                            ? i18n.gettext("Enter new password here")
-                            : "",
+                    autoComplete: "new-password",
+                    placeholder: !isNewUser
+                        ? i18n.gettext("Enter new password here")
+                        : "",
                 },
             ]
         );
@@ -67,7 +70,7 @@ export function UserWidget({ id }) {
                     widget: PrincipalMemberSelect,
                     choices: group || [],
                     value:
-                        group && id === undefined
+                        group && isNewUser
                             ? group.filter((g) => g.register).map((g) => g.id)
                             : [],
                 },
@@ -86,7 +89,7 @@ export function UserWidget({ id }) {
         );
 
         return fields_;
-    }, [group]);
+    }, [group, isNewUser]);
 
     const props = { fields, model: "auth.user", id, messages: getMessages() };
 
