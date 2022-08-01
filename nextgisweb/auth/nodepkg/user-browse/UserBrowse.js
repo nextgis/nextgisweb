@@ -46,10 +46,9 @@ if (oauth.enabled) {
             <Tooltip title={i18n.gettext("Users with a password can sign in with login and password.")}>
                 {i18n.gettext("Password")}
             </Tooltip>,
-        dataIndex: "has_password",
-        key: "has_password",
+        dataIndex: "password",
         render: (value) => (value ? i18n.gettext("Yes") : i18n.gettext("No")),
-        sorter: (a, b) => (a.has_password > b.has_password ? 1 : -1),
+        sorter: (a, b) => (a.password > b.password ? 1 : -1),
     });
 
     columns.push({
@@ -57,10 +56,9 @@ if (oauth.enabled) {
             <Tooltip title={i18n.gettext("Users bound to {dn} can sign in with {dn}.").replaceAll('{dn}', oauth.name)}>
                 {oauth.name}
             </Tooltip>,
-        dataIndex: "has_oauth",
-        key: "has_oauth",
+        dataIndex: "oauth_subject",
         render: (value) => (value ? i18n.gettext("Yes") : i18n.gettext("No")),
-        sorter: (a, b) => (a.has_oauth > b.has_oauth ? 1 : -1),
+        sorter: (a, b) => (!!a.oauth_subject > !!b.oauth_subject ? 1 : -1),
     });
 }
 

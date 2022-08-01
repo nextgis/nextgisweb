@@ -80,6 +80,10 @@ msgstr "Неверные данные учетной записи"
 msgid "User is disabled"
 msgstr "Пользователь заблокирован"
 
+#: model.py:181
+msgid "Password is not set."
+msgstr "Пароль не установлен."
+
 #: oauth.py:194
 msgid "{} binding error"
 msgstr "Ошибка привязки {}"
@@ -156,7 +160,7 @@ msgstr "Пользователи"
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: nodepkg/user-widget/UserWidget.js:56 view.py:290 view.py:379
+#: nodepkg/user-widget/UserWidget.js:67 view.py:290 view.py:379
 msgid "Groups"
 msgstr "Группы"
 
@@ -193,7 +197,7 @@ msgid "User deleted"
 msgstr "Пользователь удален"
 
 #: nodepkg/group-browse/GroupBrowse.js:8 nodepkg/group-widget/GroupWidget.js:15
-#: nodepkg/user-browse/UserBrowse.js:20 nodepkg/user-widget/UserWidget.js:19
+#: nodepkg/user-browse/UserBrowse.js:20 nodepkg/user-widget/UserWidget.js:30
 msgid "Full name"
 msgstr "Полное имя"
 
@@ -205,17 +209,17 @@ msgstr "Имя группы"
 msgid "New users"
 msgstr "Новые пользователи"
 
-#: nodepkg/group-browse/GroupBrowse.js:24 nodepkg/user-browse/UserBrowse.js:51
-#: nodepkg/user-browse/UserBrowse.js:62
+#: nodepkg/group-browse/GroupBrowse.js:24 nodepkg/user-browse/UserBrowse.js:50
+#: nodepkg/user-browse/UserBrowse.js:60
 msgid "Yes"
 msgstr "Да"
 
-#: nodepkg/group-browse/GroupBrowse.js:24 nodepkg/user-browse/UserBrowse.js:51
-#: nodepkg/user-browse/UserBrowse.js:62
+#: nodepkg/group-browse/GroupBrowse.js:24 nodepkg/user-browse/UserBrowse.js:50
+#: nodepkg/user-browse/UserBrowse.js:60
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/group-widget/GroupWidget.js:42 nodepkg/user-widget/UserWidget.js:71
+#: nodepkg/group-widget/GroupWidget.js:42 nodepkg/user-widget/UserWidget.js:83
 msgid "Description"
 msgstr "Описание"
 
@@ -228,12 +232,12 @@ msgid "Sign in"
 msgstr "Войти"
 
 #: nodepkg/login-form/LoginForm.js:29 nodepkg/user-browse/UserBrowse.js:37
-#: nodepkg/user-widget/UserWidget.js:25
+#: nodepkg/user-widget/UserWidget.js:35
 msgid "Login"
 msgstr "Логин"
 
 #: nodepkg/login-form/LoginForm.js:34 nodepkg/user-browse/UserBrowse.js:47
-#: nodepkg/user-widget/UserWidget.js:32
+#: nodepkg/user-widget/UserWidget.js:41
 msgid "Password"
 msgstr "Пароль"
 
@@ -253,7 +257,7 @@ msgstr "Привязать аккаунт"
 msgid "Account not bound"
 msgstr "Аккаунт не привязан"
 
-#: nodepkg/settings-form/SettingsForm.js:39 nodepkg/user-widget/UserWidget.js:64
+#: nodepkg/settings-form/SettingsForm.js:39 nodepkg/user-widget/UserWidget.js:77
 msgid "Language"
 msgstr "Язык"
 
@@ -261,7 +265,7 @@ msgstr "Язык"
 msgid "Saved"
 msgstr "Сохранено"
 
-#: nodepkg/user-browse/UserBrowse.js:13 nodepkg/user-widget/UserWidget.js:50
+#: nodepkg/user-browse/UserBrowse.js:13 nodepkg/user-widget/UserWidget.js:62
 msgid "Disabled"
 msgstr "Отключен"
 
@@ -273,27 +277,27 @@ msgstr "Включен"
 msgid "Users with a password can sign in with login and password."
 msgstr "Пользователи с паролем могут войти используя логин и пароль."
 
-#: nodepkg/user-browse/UserBrowse.js:57
+#: nodepkg/user-browse/UserBrowse.js:56
 msgid "Users bound to {dn} can sign in with {dn}."
 msgstr "Пользователи связанные с {dn} могут войти через {dn}."
 
-#: nodepkg/user-browse/UserBrowse.js:68
+#: nodepkg/user-browse/UserBrowse.js:66
 msgid "Last activity"
 msgstr "Последняя активность"
 
-#: nodepkg/user-browse/UserBrowse.js:81
+#: nodepkg/user-browse/UserBrowse.js:79
 msgid "Status"
 msgstr "Статус"
 
-#: nodepkg/user-browse/UserBrowse.js:153
+#: nodepkg/user-browse/UserBrowse.js:151
 msgid "Disable"
 msgstr "Отключить"
 
-#: nodepkg/user-browse/UserBrowse.js:153
+#: nodepkg/user-browse/UserBrowse.js:151
 msgid "Enable"
 msgstr "Включить"
 
-#: nodepkg/user-browse/UserBrowse.js:162
+#: nodepkg/user-browse/UserBrowse.js:160
 msgid ""
 "Your team members won't be shown here until their first logon. Set \"New "
 "users\" flag for a group to automatically assign new user to this group. You "
@@ -306,15 +310,31 @@ msgstr ""
 "пользователей прошедших аутентификацию для управления правами участников "
 "команды."
 
-#: nodepkg/user-widget/UserWidget.js:37
+#: nodepkg/user-widget/UserWidget.js:45
 msgid "Enter new password here"
 msgstr "Для изменения пароля заполните это поле"
 
-#: nodepkg/user-widget/UserWidget.js:83
+#: nodepkg/user-widget/UserWidget.js:97
 msgid ""
 "Consider adding {name} user to your team instead of creating a new user with "
 "a password."
 msgstr ""
 "Можно добавить пользователя {name} в вашу команду вместо создания нового "
 "пользователя с паролем."
+
+#: nodepkg/user-widget/UserWidgetPassword.js:8
+msgid "Keep existing"
+msgstr "Оставить существующий"
+
+#: nodepkg/user-widget/UserWidgetPassword.js:12
+msgid "Assign new"
+msgstr "Назначить новый"
+
+#: nodepkg/user-widget/UserWidgetPassword.js:17
+msgid "{name} only"
+msgstr "Только {name}"
+
+#: nodepkg/user-widget/UserWidgetPassword.js:18
+msgid "Turn off"
+msgstr "Выключить"
 

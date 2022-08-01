@@ -8,6 +8,7 @@ Changes
 - Use resource SRS by default while exporting raster and vector layers.
 - Support for webmap cloning via UI.
 - Assign default groups while creating users via UI.
+- Ability to turn off user password and keep only OAuth authentication.
 
 
 4.2.0

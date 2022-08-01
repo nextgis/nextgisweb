@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from itertools import product
 from urllib.parse import urlparse, parse_qs
 
 import pytest
@@ -91,6 +92,14 @@ def test_login_logout(user, ngw_webtest_app):
 
     ngw_webtest_app.post('/api/component/auth/logout', status=200)
     _test_current_user(ngw_webtest_app, 'guest')
+
+
+def test_login_no_password(user, ngw_webtest_app):
+    with transaction.manager:
+        User.filter_by(id=user.id).one().password = None
+
+    ngw_webtest_app.post('/api/component/auth/login', dict(
+        login=user.keyname, password=None), status=401)
 
 
 def test_session_invite(user, ngw_env, ngw_webtest_app):
@@ -329,3 +338,32 @@ class TestSystemPrincipal:
         ngw_webtest_app.put_json(
             group_url(group.id), data,
             status=200 if ok else 422)
+
+
+@pytest.mark.parametrize('password_before, password', product(
+    ('old-T3ST', None),
+    ('new-secret-test-password', None, True, False, None),
+))
+def test_password(password_before, password, user, ngw_webtest_app, ngw_auth_administrator):
+    with transaction.manager:
+        User.filter_by(id=user.id).one().password = password_before
+
+    ok = not (password is True and password_before is None)
+
+    ngw_webtest_app.put_json(user_url(user.id), dict(password=password), status=200 if ok else 422)
+    if not ok:
+        return
+
+    password_after = User.filter_by(id=user.id).one().password
+
+    if password is None or password is True:
+        assert password_after == password_before
+    elif password is False:
+        assert password_after is None
+    elif isinstance(password, str):
+        assert password_after == password
+    else:
+        raise NotImplementedError()
+
+    resp = ngw_webtest_app.get(user_url(user.id), status=200)
+    assert resp.json['password'] is (password_after is not None)

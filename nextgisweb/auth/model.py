@@ -7,8 +7,11 @@ import sqlalchemy.orm as orm
 from zope.event import notify
 from zope.event.classhandler import handler
 
+from ..core.exception import ValidationError
 from ..env import env
 from ..models import DBSession, declarative_base
+
+from .util import _
 
 
 Base = declarative_base()
@@ -135,11 +138,11 @@ class User(Principal):
 
     @property
     def password(self):
-        return PasswordHashValue(self.password_hash)
+        return PasswordHashValue(self.password_hash) if self.password_hash is not None else None
 
     @password.setter # NOQA
     def password(self, value):
-        self.password_hash = sha256_crypt.hash(value)
+        self.password_hash = sha256_crypt.hash(value) if value is not None else None
 
     def serialize(self):
         return OrderedDict((
@@ -150,21 +153,20 @@ class User(Principal):
             ('keyname', self.keyname),
             ('superuser', self.superuser),
             ('disabled', self.disabled),
+            ('password', self.password_hash is not None),
             ('last_activity', self.last_activity),
             ('language', self.language),
             ('oauth_subject', self.oauth_subject),
             ('oauth_tstamp', self.oauth_tstamp),
             ('member_of', [g.id for g in self.member_of]),
             ('is_administrator', self.is_administrator),
-            ('has_password', self.password_hash is not None),
-            ('has_oauth', self.oauth_subject is not None),
         ))
 
     def deserialize(self, data):
         was_disabled = self.disabled is not False
 
         attrs = ('display_name', 'description', 'keyname',
-                 'superuser', 'disabled', 'language', 'password')
+                 'superuser', 'disabled', 'language')
         with DBSession.no_autoflush:
             for a in attrs:
                 if a in data:
@@ -173,6 +175,14 @@ class User(Principal):
             if 'member_of' in data:
                 self.member_of = [Group.filter_by(id=gid).one()
                                   for gid in data['member_of']]
+            if (pwd := data.get('password')) is not None:
+                if pwd is True:
+                    if self.password_hash is None:
+                        raise ValidationError(message=_("Password is not set."))
+                elif pwd is False:
+                    self.password = None
+                else:
+                    self.password = pwd
 
         enabled = not self.disabled and was_disabled
 
