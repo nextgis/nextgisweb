@@ -36,16 +36,13 @@ class RangeFileWrapper(FileIter):
         return data
 
 
-def export(request):
+def export(resource, request):
     request.resource_permission(PERM_READ)
 
-    srs = int(request.GET.get("srs", request.context.srs.id))
-    srs = SRS.filter_by(id=srs).one()
-    format = request.GET.get("format", "GTiff")
-    bands = request.GET.get("bands", [])
-
-    if bands:
-        bands = bands.split(",")
+    srs = SRS.filter_by(id=int(request.GET['srs'])).one() \
+        if 'srs' in request.GET else resource.srs
+    format = request.GET.get('format', 'GTiff')
+    bands = request.GET['bands'].split(',') if 'bands' in request.GET else None
 
     if format is None:
         raise ValidationError(_("Output format is not provided."))
@@ -55,7 +52,7 @@ def export(request):
 
     driver = EXPORT_FORMAT_GDAL[format]
 
-    filename = "%d.%s" % (request.context.id, driver.extension,)
+    filename = "%d.%s" % (resource.id, driver.extension,)
     content_disposition = "attachment; filename=%s" % filename
 
     def _warp(source_filename):
@@ -78,8 +75,8 @@ def export(request):
             response.content_disposition = content_disposition
             return response
 
-    source_filename = env.raster_layer.workdir_filename(request.context.fileobj)
-    if len(bands) != request.context.band_count:
+    source_filename = env.raster_layer.workdir_filename(resource.fileobj)
+    if bands is not None and len(bands) != resource.band_count:
         with tempfile.NamedTemporaryFile(suffix=".tif") as tmp_file:
             gdal.Translate(tmp_file.name, source_filename, bandList=bands)
             return _warp(tmp_file.name)
