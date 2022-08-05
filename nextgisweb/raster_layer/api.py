@@ -42,7 +42,10 @@ def export(request):
     srs = int(request.GET.get("srs", request.context.srs.id))
     srs = SRS.filter_by(id=srs).one()
     format = request.GET.get("format", "GTiff")
-    bands = request.GET.get("bands").split(",")
+    bands = request.GET.get("bands", [])
+
+    if bands:
+        bands = bands.split(",")
 
     if format is None:
         raise ValidationError(_("Output format is not provided."))

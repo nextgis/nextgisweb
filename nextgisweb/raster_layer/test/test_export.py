@@ -65,7 +65,7 @@ def test_export_srs(epsg, ngw_webtest_app, raster_layer_id):
 def test_export_format(format, ngw_webtest_app, raster_layer_id):
     resp = ngw_webtest_app.get(
         "/api/resource/%d/export" % raster_layer_id,
-        params={"format": format, "bands": [1, 2, 3]},
+        params={"format": format, "bands": "1,2,3"},
     )
     with NamedTemporaryFile() as f:
         f.write(resp.body)
