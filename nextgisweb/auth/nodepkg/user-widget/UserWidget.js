@@ -76,7 +76,7 @@ export function UserWidget({ id }) {
                     name: "language",
                     label: i18n.gettext("Language"),
                     widget: LanguageSelect,
-                    value: "default",
+                    value: null,
                 },
                 {
                     name: "description",

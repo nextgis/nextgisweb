@@ -5,7 +5,7 @@ import i18n from "@nextgisweb/pyramid/i18n!gui";
 export function LanguageSelect({ loading, form, ...props }) {
     const langages = [
         {
-            value: 'default',
+            value: null,
             display_name: i18n.gettext("Browser default"),
         },
         ...settings.langages,
