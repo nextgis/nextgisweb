@@ -333,11 +333,11 @@ def setup_pyramid(comp, config):
 
         if user_loaded:
             environ_language = environ['auth.user']['language']
-            if environ_language is not None:
+            if environ_language in locale_sorted:
                 return environ_language
 
         session_language = request.session.get('pyramid.locale')
-        if session_language is not None:
+        if session_language in locale_sorted:
             return session_language
 
         return request.accept_language.lookup(locale_sorted, default=locale_default)
