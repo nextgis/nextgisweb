@@ -101,6 +101,10 @@ def export(request):
     display_name = request.GET.get("display_name", "false")
     display_name = display_name.lower() == "true"
 
+    fields = request.GET["fields"].split(",") if "fields" in request.GET else None
+    if fields is None:
+        fields = [fld.keyname for fld in request.context.fields]
+
     if format is None:
         raise ValidationError(
             _("Output format is not provided.")
@@ -149,19 +153,21 @@ def export(request):
             + list(itertools.chain(*[("-dsco", o) for o in dsco]))
         )
 
-        if display_name:
-            # CPLES_SQLI == 7
-            flds = [
-                '"{}" as "{}"'.format(
-                    fld.keyname.replace('"', r'\"'),
-                    fld.display_name.replace('"', r'\"'),
-                )
-                for fld in request.context.fields
-            ]
-            if fid is not None:
-                flds += ['FID as "{}"'.format(fid.replace('"', r'\"'))]
-            vtopts += ["-sql", 'select {} from ""'.format(", ".join(
-                flds if len(flds) > 0 else '*'))]
+        # CPLES_SQLI == 7
+        flds = [
+            '"{}" as "{}"'.format(
+                fld.keyname.replace('"', r"\""),
+                getattr(fld, "display_name" if display_name else "keyname").replace(
+                    '"', r"\""
+                ),
+            )
+            for fld in request.context.fields
+            if fld.keyname in fields
+        ]
+        if fid is not None:
+            flds += ['FID as "{}"'.format(fid.replace('"', r'\"'))]
+        vtopts += ["-sql", 'select {} from ""'.format(", ".join(
+            flds if len(flds) > 0 else '*'))]
 
         if driver.fid_support and fid is None:
             vtopts.append('-preserve_fid')

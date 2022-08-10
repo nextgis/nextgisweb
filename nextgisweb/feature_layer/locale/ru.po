@@ -1,27 +1,27 @@
-#: api.py:106
+#: api.py:110
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:111
+#: api.py:115
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:301 api.py:376
+#: api.py:307 api.py:382
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
 
-#: api.py:303
+#: api.py:309
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:309 api.py:381
+#: api.py:315 api.py:387
 #, python-format
 msgid "Date format '%s' is not supported."
 msgstr "Формат даты '%s' не поддерживается."
 
-#: api.py:600
+#: api.py:606
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -43,34 +43,34 @@ msgstr "Объект мог быть удалён, либо допущена о�
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:40
+#: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:41
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: view.py:58 view.py:81
+#: view.py:59 view.py:82
 #, python-format
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:131 view.py:194
+#: view.py:133 view.py:205
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:181
+#: view.py:192
 msgid "Features"
 msgstr "Объекты"
 
-#: template/section_fields.mako:21 view.py:186
+#: template/section_fields.mako:21 view.py:197
 msgid "Table"
 msgstr "Таблица"
 
-#: view.py:205
+#: view.py:216
 msgid "External access"
 msgstr "Внешний доступ"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:193
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:210
+#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:221
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -91,7 +91,7 @@ msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:265
-#: amd/ngw-feature-layer/template/ExportForm.hbs:45
+#: nodepkg/export-form/ExportForm.js:180
 msgid "Save"
 msgstr "Сохранить"
 
@@ -139,30 +139,6 @@ msgstr "Добавить"
 msgid "Remove"
 msgstr "Удалить"
 
-#: amd/ngw-feature-layer/template/ExportForm.hbs:15
-msgid "Format"
-msgstr "Формат"
-
-#: amd/ngw-feature-layer/template/ExportForm.hbs:19
-msgid "SRS"
-msgstr "Система координат"
-
-#: amd/ngw-feature-layer/template/ExportForm.hbs:23
-msgid "Encoding"
-msgstr "Кодировка"
-
-#: amd/ngw-feature-layer/template/ExportForm.hbs:30
-msgid "FID field"
-msgstr "Поле FID"
-
-#: amd/ngw-feature-layer/template/ExportForm.hbs:34
-msgid "Use field display names instead of keynames"
-msgstr "Использовать наименования полей вместо ключей"
-
-#: amd/ngw-feature-layer/template/ExportForm.hbs:37
-msgid "Zip archive"
-msgstr "Zip архив"
-
 #: amd/ngw-feature-layer/template/FeatureGrid.hbs:13
 msgid "Open"
 msgstr "Открыть"
@@ -178,6 +154,34 @@ msgstr "Удалить"
 #: amd/ngw-feature-layer/template/FeatureGrid.hbs:28
 msgid "Search..."
 msgstr "Поиск..."
+
+#: nodepkg/export-form/ExportForm.js:89
+msgid "Format"
+msgstr "Формат"
+
+#: nodepkg/export-form/ExportForm.js:99
+msgid "SRS"
+msgstr "Система координат"
+
+#: nodepkg/export-form/ExportForm.js:105
+msgid "Encoding"
+msgstr "Кодировка"
+
+#: nodepkg/export-form/ExportForm.js:115
+msgid "FID field"
+msgstr "Поле FID"
+
+#: nodepkg/export-form/ExportForm.js:119
+msgid "Use field display names instead of keynames"
+msgstr "Использовать наименования полей вместо ключей"
+
+#: nodepkg/export-form/ExportForm.js:126
+msgid "Fields"
+msgstr "Поля"
+
+#: nodepkg/export-form/ExportForm.js:133
+msgid "Zip archive"
+msgstr "Zip архив"
 
 #: template/section_api_layer.mako:11
 msgid "MVT Vector Tiles"

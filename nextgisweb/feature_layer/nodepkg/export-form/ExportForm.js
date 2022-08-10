@@ -24,10 +24,20 @@ const srsListToOptions = (srsList) => {
     });
 };
 
+const fieldListToOptions = (fieldList) => {
+    return fieldList.map((field) => {
+        return {
+            label: field.display_name,
+            value: field.keyname,
+        };
+    });
+};
+
 export function ExportForm({ id }) {
     const [status, setStatus] = useState("loading");
     const { makeSignal } = useAbortController();
     const [srsOptions, setSrsOptions] = useState([]);
+    const [fieldOptions, setFieldOptions] = useState([]);
     const [defaultSrs, setDefaultSrs] = useState();
     const [format, setFormat] = useState(exportFormats[0].name);
     const [fields, setFields] = useState([]);
@@ -45,6 +55,7 @@ export function ExportForm({ id }) {
             );
             setSrsOptions(srsListToOptions(srsInfo));
             setDefaultSrs(itemInfo[itemInfo.resource.cls].srs.id);
+            setFieldOptions(fieldListToOptions(itemInfo.feature_layer.fields));
         } catch (err) {
             errorModal(err);
         } finally {
@@ -111,13 +122,20 @@ export function ExportForm({ id }) {
                 widget: Checkbox,
             },
             {
+                name: "fields",
+                label: i18n.gettext("Fields"),
+                widget: Select,
+                mode: "multiple",
+                choices: fieldOptions,
+            },
+            {
                 name: "zipped",
                 label: i18n.gettext("Zip archive"),
                 widget: Checkbox,
                 disabled: !exportFormat.single_file,
             },
         ]);
-    }, [srsOptions, format, isReady]);
+    }, [srsOptions, fieldOptions, format, isReady]);
 
     const onChange = (e) => {
         if ("format" in e.value) {
@@ -148,6 +166,7 @@ export function ExportForm({ id }) {
             onChange={onChange}
             initialValues={{
                 format,
+                fields: fieldOptions.map((field) => field.value),
                 srs: defaultSrs,
                 fid: "ngw_id",
                 encoding: "UTF-8",
