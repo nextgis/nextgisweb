@@ -13,6 +13,7 @@ define(function(){
 
             return result;
         },
+
         DDtoDM: function(value, options){
             var result = {
                 dir : value<0?options.lon?'W':'S':options.lon?'E':'N',
@@ -24,6 +25,13 @@ define(function(){
                 result = result.deg+"°" + result.min + "'" + result.dir
 
             return result;
+        },
+        
+        lonLatToDM: function (lonLat) {
+            const [lon, lat] = lonLat;
+            const strLon = `${lon.toFixed(3)} ${lon > 0 ? 'E' : (lon < 0 ? 'W' : '')}`;
+            const strLat = `${lat.toFixed(3)} ${lat > 0 ? 'N' : (lat < 0 ? 'S' : '')}`;
+            return `${strLon}, ${strLat}`;
         }
     };
 });

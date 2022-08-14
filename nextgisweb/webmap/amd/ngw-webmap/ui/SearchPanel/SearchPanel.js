@@ -6,6 +6,7 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
+    "dojo/debounce",
     "dojo/topic",
     "dojo/Deferred",
     "dojo/request/xhr",
@@ -16,6 +17,8 @@ define([
     "dojo/_base/lang",
     "dojo/_base/array",
     "@nextgisweb/pyramid/api",
+    "@nextgisweb/webmap/coordinates/parser",
+    "ngw-pyramid/utils/coordinateConverter",
     // settings
     "@nextgisweb/pyramid/settings!webmap",
     // templates
@@ -30,6 +33,7 @@ define([
     _WidgetsInTemplateMixin,
     DynamicPanel,
     BorderContainer,
+    debounce,
     topic,
     Deferred,
     xhr,
@@ -40,6 +44,8 @@ define([
     lang,
     array,
     api,
+    coordinatesParser,
+    coordinateConverter,
     webmapSettings,
     template
 ) {
@@ -78,32 +84,20 @@ define([
                 domClass.remove(widget.contentWidget.controlsNode, "focus");
             });
 
-            on(this.contentWidget.searchField, "input", function (e) {
-                if (widget.inputTimer) {
-                    clearInterval(widget.inputTimer);
-                }
-                widget.inputTimer = setInterval(function () {
-                    clearInterval(widget.inputTimer);
-                    widget.search();
-                    widget.inputTimer = undefined;
-                }, 750);
-            });
-
-            on(this.contentWidget.searchIcon, "click", function (e) {
-                if (widget.inputTimer) {
-                    clearInterval(widget.inputTimer);
-                }
+            on(this.contentWidget.searchField, 'input', debounce(() => {
                 widget.search();
-                widget.inputTimer = undefined;
+            }, 750));
+
+            on(this.contentWidget.searchIcon, 'click', () => {
+                widget.search();
             });
         },
 
         show: function () {
             this.inherited(arguments);
-            var widget = this;
 
-            setTimeout(function () {
-                widget.contentWidget.searchField.focus();
+            setTimeout(() => {
+                this.contentWidget.searchField.focus();
             }, 300);
         },
 
@@ -113,16 +107,17 @@ define([
         },
 
         setStatus: function (text, statusClass) {
-            var statusClass = statusClass ? "search-panel__status " + statusClass : "search-panel__status";
+            const statusPaneCssClass = statusClass ? 'search-panel__status ' + statusClass :
+                'search-panel__status';
 
-            if (this.statusPane) this.removeStatus();
+            this.removeStatus();
 
-            this.statusPane = domConstruct.create("div", {
-                id: "search-panel-status",
-                class: statusClass,
+            this.statusPane = domConstruct.create('div', {
+                id: 'search-panel-status',
+                class: statusPaneCssClass,
                 innerHTML: text
             });
-            domConstruct.place(this.statusPane, this.contentWidget.contentNode, "last");
+            domConstruct.place(this.statusPane, this.contentWidget.contentNode, 'last');
         },
 
         removeStatus: function () {
@@ -134,6 +129,7 @@ define([
         search: function () {
             var widget = this,
                 criteria = this.contentWidget.searchField.value;
+
             if (this._lastCriteria === criteria) {
                 return;
             }
@@ -155,6 +151,22 @@ define([
             this.display.getVisibleItems().then(lang.hitch(this, function (items) {
                 var deferred = new Deferred(),
                     fdeferred = deferred;
+
+                const coordinatesDeferred = new Deferred();
+                deferred.then(limit => {
+                    try {
+                        const newLimit = this.parseCoordinatesInput(criteria, limit);
+                        if (newLimit > 0) {
+                            coordinatesDeferred.resolve(newLimit);
+                        } else {
+                            widget.setStatus(i18n.gettext('Refine search criterion'), 'search-panel__status--bg');
+                            coordinatesDeferred.reject();
+                        }
+                    } catch (error) {
+                        coordinatesDeferred.resolve(limit);
+                    }
+                });
+                deferred = coordinatesDeferred;
 
                 array.forEach(items, function (itm) {
                     var id = this.display.itemStore.getValue(itm, "id"),
@@ -184,7 +196,8 @@ define([
                                     if (limit > 0) {
                                         const searchResult = {
                                             label: feature.label,
-                                            geometry: GEO_JSON_FORMAT.readGeometry(feature.geom)
+                                            geometry: GEO_JSON_FORMAT.readGeometry(feature.geom),
+                                            type: "layers"
                                         };
                                         widget.addSearchResult(searchResult);
                                     }
@@ -244,7 +257,8 @@ define([
                                         label: feature.properties.display_name,
                                         geometry: GEO_JSON_FORMAT.readGeometry(feature.geometry, {
                                             featureProjection: this.display.displayProjection
-                                        })
+                                        }),
+                                        type: "public"
                                     };
                                     widget.addSearchResult(searchResult);
                                 }
@@ -310,7 +324,8 @@ define([
                                             "coordinates": [lon, lat]
                                         }, {
                                             featureProjection: this.display.displayProjection
-                                        })
+                                        }),
+                                        type: "public"
                                     };
                                     widget.addSearchResult(searchResult);
                                 }
@@ -342,6 +357,27 @@ define([
             }));
         },
 
+        parseCoordinatesInput: function (criteria, limit) {
+            const coordinates = coordinatesParser.parse(criteria);
+
+            coordinates.forEach(c => {
+                const {lat, lon} = c;
+                const searchResult = {
+                    label: coordinateConverter.lonLatToDM([lon, lat]),
+                    geometry: GEO_JSON_FORMAT.readGeometry({
+                        'type': 'Point',
+                        'coordinates': [lon, lat]
+                    }, {
+                        featureProjection: this.display.displayProjection
+                    }),
+                    type: 'place'
+                };
+                this.addSearchResult(searchResult);
+                limit = limit - 1;
+            });
+            return limit;
+        },
+
         addSearchResult: function (result) {
             if (!this.searchResultsList) {
                 this.searchResultsList = domConstruct.create("ul", {
@@ -351,9 +387,10 @@ define([
                 domConstruct.place(this.searchResultsList, this.contentWidget.contentNode, "first");
             }
 
-            var resultNode = domConstruct.create("li", {
-                class: "list__item list__item--link",
-                innerHTML: result.label,
+            const svg = `<svg class="icon" fill="#919191"><use xlink:href="#icon-material-${result.type}"/></svg>`;
+            const resultNode = domConstruct.create("li", {
+                class: `list__item list__item--link ${result.type}`,
+                innerHTML: `<span>${result.label} ${svg}</span>`,
                 tabindex: -1,
                 onclick: lang.hitch(this, function (e) {
                     if (this.activeResult)
