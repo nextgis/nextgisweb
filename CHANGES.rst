@@ -10,6 +10,7 @@ Changes
 - Assign default groups while creating users via UI.
 - Ability to turn off user password and keep only OAuth authentication.
 - Fields selection while exporting featrue layer.
+- Search by coordinates on web maps.
 
 
 4.2.0
