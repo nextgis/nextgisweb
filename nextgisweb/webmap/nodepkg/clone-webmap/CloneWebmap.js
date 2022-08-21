@@ -119,14 +119,14 @@ export function CloneWebmap({ id }) {
         initialValues: { parent: parentId },
     };
 
-    const save = async () => {
+    const clone = async () => {
         setSaving(true);
         try {
             const val = form.getFieldValue();
-            const { resource, resmeta, webmap } = JSON.parse(
+            const { resource, resmeta, webmap, ...rest } = JSON.parse(
                 JSON.stringify(data)
             );
-
+            delete rest.social;
             delete resource.id;
             delete resource.creation_date;
             delete resource.children;
@@ -136,7 +136,7 @@ export function CloneWebmap({ id }) {
             resource.display_name = val.name;
             resource.parent = { id: val.parent };
 
-            const newResPayload = { resource, resmeta, webmap };
+            const newResPayload = { resource, resmeta, webmap, ...rest };
             const cloneItem = await route("resource.collection").post({
                 json: newResPayload,
                 signal: makeSignal(),
@@ -158,7 +158,7 @@ export function CloneWebmap({ id }) {
         <>
             <Space direction="vertical" style={{ width: "100%" }}>
                 <FieldsForm {...props}></FieldsForm>
-                <SaveButton loading={saving} onClick={save}>
+                <SaveButton loading={saving} onClick={clone}>
                     {i18n.gettext("Clone")}
                 </SaveButton>
             </Space>
