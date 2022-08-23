@@ -35,7 +35,7 @@ msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
 #: view.py:210
-msgid "Clone webmap"
+msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
 #: view.py:218

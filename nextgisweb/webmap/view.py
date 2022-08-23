@@ -207,7 +207,7 @@ def clone(request):
         entrypoint='@nextgisweb/webmap/clone-webmap',
         props=dict(id=request.context.id),
         obj=request.context,
-        title=_("Clone webmap"))
+        title=_("Clone web map"))
 
 
 def preview_embedded(request):
