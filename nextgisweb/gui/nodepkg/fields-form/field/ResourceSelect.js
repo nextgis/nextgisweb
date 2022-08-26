@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import ManageSearchIcon from "@material-icons/svg/manage_search";
 import { Button, Form, Input, Skeleton } from "@nextgisweb/gui/antd";
 import { showResourcePicker } from "@nextgisweb/resource/resource-picker";
@@ -81,10 +82,19 @@ const SelectInput = ({ value, onChange, ...pickerOptions }) => {
     );
 };
 
-export function ResourceSelect({ form, pickerOptions, ...props }) {
+SelectInput.propTypes = {
+    onChange: PropTypes.func,
+    value: PropTypes.any,
+};
+
+export function ResourceSelect({ pickerOptions, ...props }) {
     return (
         <Form.Item {...props}>
             <SelectInput {...pickerOptions}></SelectInput>
         </Form.Item>
     );
 }
+
+ResourceSelect.propTypes = {
+    pickerOptions: PropTypes.objext,
+};

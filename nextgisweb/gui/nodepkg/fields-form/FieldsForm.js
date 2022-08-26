@@ -11,7 +11,6 @@ export function FieldsForm(props) {
         onChange,
         whenReady,
         form,
-        ref,
         ...formProps
     } = props;
     const form_ = form || Form.useForm()[0];
@@ -69,7 +68,7 @@ export function FieldsForm(props) {
         <Form labelWrap colon={false} {...formProps_} className="fields-form">
             {includedFormItems.map((f) => (
                 <Fragment key={f.name}>
-                    {FormItem({ form: form_, ...f })}
+                    {FormItem({ ...f })}
                 </Fragment>
             ))}
             {props.children}

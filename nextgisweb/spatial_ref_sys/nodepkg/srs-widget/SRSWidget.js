@@ -80,7 +80,7 @@ export function SRSWidget({ id }) {
     // to not exec gettext on closed modal
     const Title = () => <>{i18n.gettext("Import definition")}</>;
 
-    const p = {
+    const props = {
         id,
         form,
         fields,
@@ -102,7 +102,7 @@ export function SRSWidget({ id }) {
 
     return (
         <ContentBox>
-            <ModelForm allowDelete={!isSystem} {...p}>
+            <ModelForm allowDelete={!isSystem} {...props}>
                 {!isProtected && (
                     <Form.Item wrapperCol={{ offset: 5 }}>
                         <Button size="small" onClick={showModal}>
