@@ -208,6 +208,7 @@ class BackupCommand(Command):
                     if os.path.isfile(filename):
                         arcname = pthjoin(os.path.relpath(root, src), fn)
                         zipf.write(filename, arcname)
+                        os.unlink(filename)  # Free space as soon as possible
 
 
 @Command.registry.register
