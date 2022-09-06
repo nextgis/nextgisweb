@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from ..component import Component, require
+from ..lib.config import Option
 
 from .feature import Feature, FeatureSet
 from .model import Base, LayerField, LayerFieldsMixin, FeatureQueryIntersectsMixin
@@ -58,6 +59,7 @@ class FeatureLayerComponent(Component):
 
     def initialize(self):
         self.FeatureExtension = FeatureExtension
+        self.export_limit = self.options['export.limit']
 
     @require('resource')
     def setup_pyramid(self, config):
@@ -80,3 +82,7 @@ class FeatureLayerComponent(Component):
             export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
             datatypes=FIELD_TYPE.enum,
         )
+
+    option_annotations = (
+        Option('export.limit', int, default=None, doc='The export limit'),
+    )

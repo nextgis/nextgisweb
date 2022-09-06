@@ -85,6 +85,19 @@ def view_geojson(request):
 def export(request):
     request.resource_permission(PERM_READ)
 
+    query = request.context.feature_query()
+    export_limit = request.env.feature_layer.export_limit
+
+    if export_limit is not None:
+        total_count = query().total_count
+
+        if total_count > export_limit:
+            raise ValidationError(
+                message=_(
+                    "The export limit is set to {limit:d} features, but the layer contains {count:d}."
+                ).format(limit=export_limit, count=total_count)
+            )
+
     srs = int(
         request.GET.get("srs", request.context.srs.id)
     )
@@ -131,7 +144,6 @@ def export(request):
     if encoding is not None:
         lco.append("ENCODING=%s" % encoding)
 
-    query = request.context.feature_query()
     query.geom()
 
     ogr_ds = _ogr_memory_ds()
