@@ -17,10 +17,19 @@ class Enum(_Enum):
     """ sqlalchemy.Enum wrapped with native_enum=False pre-installed"""
 
     def __init__(self, *args, **kwargs):
-        if 'native_enum' in kwargs:
-            assert kwargs['native_enum'] is False
-        else:
-            kwargs['native_enum'] = False
+        for k, v in (
+            ('native_enum', False),
+            ('create_constraint', False),
+            ('validate_strings', True),
+        ):
+            if k in kwargs:
+                assert kwargs[k] == v
+            else:
+                kwargs[k] = v
+
+        if 'length' not in kwargs:
+            kwargs['length'] = 50
+
         super().__init__(*args, **kwargs)
 
 
