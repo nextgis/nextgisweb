@@ -3,6 +3,7 @@ import os
 import os.path
 import platform
 import sys
+import tempfile
 import io
 import json
 import re
@@ -125,6 +126,28 @@ class CoreComponent(
         sa_engine.dispose()
 
     def healthcheck(self):
+        stat = os.statvfs(self.env.file_storage.path)
+        if (free_space := self.options['core.healthcheck.free_space']) > 0:
+            if (free_space_current := stat.f_bavail / stat.f_blocks * 100) < free_space:
+                return OrderedDict((
+                    ('success', False),
+                    ('message', "%.2f%% free space left on file storage." % free_space_current),
+                ))
+        if (free_inodes := self.options['core.healthcheck.free_inodes']) > 0:
+            if (free_inodes_current := stat.f_ffree / stat.f_files * 100) < free_inodes:
+                return OrderedDict((
+                    ('success', False),
+                    ('message', "%.2f%% free inodes left on file storage." % free_inodes_current),
+                ))
+        try:
+            with tempfile.TemporaryFile(dir=self.env.file_storage.path):
+                pass
+        except IOError:
+            return OrderedDict((
+                ('success', False),
+                ('message', "Could not create a file on file storage."),
+            ))
+
         try:
             sa_url = self._engine_url(error_on_pwfile=True)
         except IOError:
@@ -420,6 +443,12 @@ class CoreComponent(
             "Deprecated, use environment package.* option instead.")),
         Option('components.ignore', doc=(
             "Deperected, use environment component.* option instead.")),
+
+        # Healthckeck
+        Option('core.healthcheck.free_space', int, default=10, doc=(
+            "Free space check during healthcheck in percent (0 for don't check).")),
+        Option('core.healthcheck.free_inodes', int, default=10, doc=(
+            "Free inodes check during healthcheck in percent (0 for don't check).")),
 
         # Locale settings
         Option('locale.default', default='en'),
