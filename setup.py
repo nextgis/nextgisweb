@@ -45,6 +45,7 @@ requires = [
     'pyramid_mako==1.1.0',
     'pyramid_tm==2.4',
     'python-magic==0.4.24',
+    'python-ulid==1.1.0',
     'requests[security]==2.26.0',
     'sentry-sdk==1.3.0',
     'shapely==1.8.0',
