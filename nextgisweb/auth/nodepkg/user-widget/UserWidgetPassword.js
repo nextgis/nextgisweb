@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Form, Input, Select } from "@nextgisweb/gui/antd";
 import { useEffect, useState, useMemo } from "react";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
@@ -65,12 +66,12 @@ const PasswordInput = ({ value, onChange, ...inputProps }) => {
     );
 };
 
-export function UserWidgetPassword({
-    form,
-    autoComplete,
-    placeholder,
-    ...props
-}) {
+PasswordInput.propTypes = {
+    onChange: PropTypes.func,
+    value: PropTypes.any,
+};
+
+export function UserWidgetPassword({ autoComplete, placeholder, ...props }) {
     const inputProps = { autoComplete, placeholder };
 
     return (
@@ -79,3 +80,8 @@ export function UserWidgetPassword({
         </Form.Item>
     );
 }
+
+UserWidgetPassword.propTypes = {
+    autoComplete: PropTypes.string,
+    placeholder: PropTypes.string,
+};

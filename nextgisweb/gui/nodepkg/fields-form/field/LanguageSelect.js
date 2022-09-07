@@ -1,29 +1,87 @@
-import { Form, Select } from "@nextgisweb/gui/antd";
-import settings from "@nextgisweb/pyramid/settings!pyramid";
+import { Button, Form, Input, Select } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
+import settings from "@nextgisweb/pyramid/settings!pyramid";
+import { PropTypes } from "prop-types";
 
-export function LanguageSelect({ loading, form, ...props }) {
+const languageContributeUrl = settings.language_contribute_url;
+const translateProposalMsg = i18n.gettext("Improve or add new translation");
+
+const LanguageSelectInput = ({
+    value,
+    onChange,
+    contribute = true,
+    ...selectProps
+}) => {
+    const defValue = "null";
+    if (value === null) {
+        value = defValue;
+    }
+
     const langages = [
         {
-            value: null,
+            value: defValue,
             display_name: i18n.gettext("Browser default"),
         },
         ...settings.langages,
     ];
-    const selectProps = { loading };
+
+    const onChangeMW = (val) => {
+        if (val === defValue) {
+            val = null;
+        }
+        onChange(val);
+    };
+
+    const SelectInput = () => (
+        <Select
+            value={value}
+            onChange={onChangeMW}
+            // See https://ant.design/components/select/#FAQ
+            listHeight={32 * (settings.langages.length + 1)}
+            style={{ flexGrow: 1 }}
+            {...selectProps}
+        >
+            {langages.map((opt) => (
+                <Select.Option key={opt.value} value={opt.value}>
+                    {opt.display_name}
+                </Select.Option>
+            ))}
+        </Select>
+    );
+
+    return (
+        <Input.Group compact style={{ display: "flex" }}>
+            <SelectInput {...selectProps} />
+            {contribute && languageContributeUrl && (
+                <Button
+                    type="link"
+                    href={languageContributeUrl}
+                    target="_blank"
+                >
+                    {translateProposalMsg}
+                </Button>
+            )}
+        </Input.Group>
+    );
+};
+
+LanguageSelectInput.propTypes = {
+    contribute: PropTypes.bool,
+    onChange: PropTypes.func,
+    value: PropTypes.any,
+};
+
+export function LanguageSelect({ loading, contribute, ...props }) {
+    const selectProps = { loading, contribute };
+
     return (
         <Form.Item {...props}>
-            <Select
-                // See https://ant.design/components/select/#FAQ
-                listHeight={32 * (settings.langages.length + 1)}
-                {...selectProps}
-            >
-                {langages.map(({ value, display_name }) => (
-                    <Select.Option key={value} value={value}>
-                        {display_name}
-                    </Select.Option>
-                ))}
-            </Select>
+            <LanguageSelectInput {...selectProps} />
         </Form.Item>
     );
 }
+
+LanguageSelect.propTypes = {
+    loading: PropTypes.bool,
+    contribute: PropTypes.bool,
+};

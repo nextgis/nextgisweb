@@ -38,7 +38,11 @@ msgstr "Необходимо указать значение"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/fields-form/field/LanguageSelect.js:9
+#: nodepkg/fields-form/field/LanguageSelect.js:7
+msgid "Improve or add new translation"
+msgstr "Уточнить перевод или добавить новый"
+
+#: nodepkg/fields-form/field/LanguageSelect.js:23
 msgid "Browser default"
 msgstr "По умолчанию в браузере"
 

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useEffect, useState, useMemo } from "react";
 import { message, Form, Button } from "@nextgisweb/gui/antd";
 import { ContentBox, LoadingWrapper } from "@nextgisweb/gui/component";
@@ -28,7 +29,11 @@ function OAuthStatus({ oauthSubject }) {
     }
 }
 
-export function SettingsForm({ id }) {
+OAuthStatus.propTypes = {
+    oauthSubject: PropTypes.string,
+};
+
+export function SettingsForm() {
     const [status, setStatus] = useState("loading");
     const [profile, setProfile] = useState(null);
     const fields = useMemo(() => {
@@ -36,16 +41,16 @@ export function SettingsForm({ id }) {
 
         result.push({
             name: "language",
-            label: i18n.gettext("Language"),
             widget: LanguageSelect,
             loading: status === "saved",
+            label: i18n.gettext("Language"),
         });
 
         if (oauth.enabled) {
             result.push({
                 name: "oauth_subject",
                 label: oauth.name,
-                widget: ({ name, form, ...props }) => (
+                widget: ({ ...props }) => (
                     <Form.Item {...props}>
                         <OAuthStatus oauthSubject={profile.oauth_subject} />
                     </Form.Item>
@@ -83,13 +88,15 @@ export function SettingsForm({ id }) {
     if (status === "loading") {
         return <LoadingWrapper />;
     }
-
+    const initialValues = {
+        language: profile.language,
+    };
     return (
         <ContentBox>
             <FieldsForm
                 {...p}
                 onChange={onChange}
-                initialValues={{ language: profile.language }}
+                initialValues={initialValues}
             ></FieldsForm>
         </ContentBox>
     );

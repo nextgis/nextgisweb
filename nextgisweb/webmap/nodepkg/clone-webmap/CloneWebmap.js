@@ -55,7 +55,7 @@ export function CloneWebmap({ id }) {
             const [, onlyName, multiply] = m;
             return [onlyName, multiply];
         }
-        return [];
+        return [existName];
     };
 
     const setUniqName = async (resname, parentId_) => {
@@ -65,9 +65,9 @@ export function CloneWebmap({ id }) {
                 signal: makeSignal(),
                 query: { parent: parentId_ },
             });
-            let newName = resname;
-            let [onlyname] = parseName(resname);
             let lastMultipy = 0;
+            let newName = resname;
+            const [onlyname] = parseName(resname);
             for (const s of siblings) {
                 const [onlyname_, multiply] = parseName(
                     s.resource.display_name
@@ -128,10 +128,10 @@ export function CloneWebmap({ id }) {
             );
             delete rest.social;
             delete resource.id;
-            delete resource.creation_date;
+            delete resource.scopes;
             delete resource.children;
             delete resource.interfaces;
-            delete resource.scopes;
+            delete resource.creation_date;
             resource.keyname = null;
             resource.display_name = val.name;
             resource.parent = { id: val.parent };
