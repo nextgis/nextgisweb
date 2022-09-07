@@ -3,8 +3,7 @@ import i18n from "@nextgisweb/pyramid/i18n!gui";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 import { PropTypes } from "prop-types";
 
-const languageContributeUrl = "https://nextgis.com";
-// const languageContributeUrl = settings.language_contribute_url;
+const languageContributeUrl = settings.language_contribute_url;
 const translateProposalMsg = i18n.gettext("Improve or add new translation");
 
 const LanguageSelectInput = ({
@@ -39,6 +38,7 @@ const LanguageSelectInput = ({
             onChange={onChangeMW}
             // See https://ant.design/components/select/#FAQ
             listHeight={32 * (settings.langages.length + 1)}
+            style={{ flexGrow: 1 }}
             {...selectProps}
         >
             {langages.map((opt) => (
@@ -49,19 +49,20 @@ const LanguageSelectInput = ({
         </Select>
     );
 
-    if (contribute && languageContributeUrl) {
-        return (
-            <Input.Group compact>
-                <SelectInput />
+    return (
+        <Input.Group compact style={{ display: "flex" }}>
+            <SelectInput {...selectProps} />
+            {contribute && languageContributeUrl && (
                 <Button
-                    onClick={() => window.open(languageContributeUrl, "_blank")}
+                    type="link"
+                    href={languageContributeUrl}
+                    target="_blank"
                 >
                     {translateProposalMsg}
                 </Button>
-            </Input.Group>
-        );
-    }
-    return <SelectInput {...selectProps} />;
+            )}
+        </Input.Group>
+    );
 };
 
 LanguageSelectInput.propTypes = {
