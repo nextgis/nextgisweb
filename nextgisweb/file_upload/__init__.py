@@ -1,15 +1,22 @@
 import os
 import os.path
-import uuid
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from shutil import rmtree
+
+from ulid import ULID
 
 from ..lib.config import Option
 from ..lib.config.otype import SizeInBytes
 from ..lib.logging import logger
 from ..component import Component
+
 from . import command  # NOQA
+from .util import stat_dir
 
 __all__ = ["FileUploadComponent", ]
+
+
+date_format = r'%Y-%m-%d'
 
 
 class FileUploadComponent(Component):
@@ -35,7 +42,7 @@ class FileUploadComponent(Component):
 
     def fileid(self):
         """ Returns new file identifier """
-        return str(uuid.uuid4())
+        return ULID().hex
 
     def get_filename(self, fileid, makedirs=False):
         """ Returns filename (data and metadata), where
@@ -44,8 +51,8 @@ class FileUploadComponent(Component):
         With makedirs == True also create folders.
         Useful when filename are needed for writing. """
 
-        # Separate in two folder levels by first id characters
-        levels = (fileid[0:2], fileid[2:4])
+        ulid = ULID.from_hex(fileid)
+        levels = (ulid.datetime.strftime(date_format), fileid[-2:], fileid[-4:-2])
         level_path = os.path.join(self.path, *levels)
 
         # Create folders if needed
@@ -63,51 +70,35 @@ class FileUploadComponent(Component):
         logger.info("Cleaning up file uploads...")
         path = self.path
 
-        deleted_files, deleted_dirs, deleted_bytes = 0, 0, 0
-        kept_files, kept_dirs, kept_bytes = 0, 0, 0
+        deleted_files = deleted_bytes = 0
+        kept_files = kept_bytes = 0
 
-        cutstamp = datetime.now() - timedelta(days=1)
+        date_keep = datetime.utcnow().date() - timedelta(days=1)
 
-        for (dirpath, dirnames, filenames) in os.walk(path, topdown=False):
-            relist = False
+        for dirpath in os.listdir(path):
+            try:
+                date_dir = datetime.strptime(dirpath, date_format).date()
+            except ValueError:
+                logger.warning(f"Unknown folder {dirpath}, skipping...")
+                continue
+            abspath = os.path.join(path, dirpath)
+            files, bytes_ = stat_dir(abspath)
 
-            for fn in filenames:
-                if not fn.endswith('.meta'):
-                    continue
-
-                metaname = os.path.join(dirpath, fn)
-                dataname = metaname[:-5] + '.data'
-                metastat = os.stat(metaname)
-                datastat = os.stat(dataname)
-                metatime = datetime.fromtimestamp(metastat.st_mtime)
-                datatime = datetime.fromtimestamp(datastat.st_mtime)
-
-                if (metatime < cutstamp) and (datatime < cutstamp):
-                    os.remove(metaname)
-                    os.remove(dataname)
-                    relist = True
-                    deleted_files += 2
-                    deleted_bytes += metastat.st_size + datastat.st_size
-                else:
-                    kept_files += 2
-                    kept_bytes += metastat.st_size + datastat.st_size
-
-            if (
-                (not relist and len(filenames) == 0 and len(dirnames) == 0)
-                or len(os.listdir(dirpath)) == 0  # NOQA: W503
-            ):
-                os.rmdir(dirpath)
-                deleted_dirs += 1
+            if date_dir < date_keep:
+                rmtree(abspath)
+                deleted_files += files
+                deleted_bytes += bytes_
             else:
-                kept_dirs += 1
+                kept_files += files
+                kept_bytes += bytes_
 
         logger.info(
-            "Deleted: %d files, %d directories, %d bytes",
-            deleted_files, deleted_dirs, deleted_bytes)
+            "Deleted: %d files (%d bytes)",
+            deleted_files, deleted_bytes)
 
         logger.info(
-            "Preserved: %d files, %d directories, %d bytes",
-            kept_files, kept_dirs, kept_bytes)
+            "Preserved: %d files (%d bytes)",
+            kept_files, kept_bytes)
 
     def client_settings(self, request):
         return dict(
