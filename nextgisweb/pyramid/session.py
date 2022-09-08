@@ -148,7 +148,7 @@ class WebSession(dict):
         return super().keys()
 
     def _refresh_all(self):
-        if self._refreshed:
+        if self._session_id is None or self._refreshed:
             return
         for kv in SessionStore.filter(SessionStore.session_id == self._session_id,
                                       ~SessionStore.key.in_(self._keys)).all():
@@ -156,7 +156,7 @@ class WebSession(dict):
         self._refreshed = True
 
     def _refresh(self, key):
-        if self._refreshed or key in self._keys:
+        if self._session_id is None or self._refreshed or key in self._keys:
             return
         if key not in self._deleted:
             try:
