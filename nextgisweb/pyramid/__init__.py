@@ -176,7 +176,7 @@ class PyramidComponent(Component):
 
         Option('backup.download', bool, default=False),
 
-        Option('session.cookie.name', str, default='ngw-sid',
+        Option('session.cookie.name', str, default='ngw_sid',
                doc="Session cookie name"),
         Option('session.cookie.max_age', timedelta, default=timedelta(days=7),
                doc="Session cookie max_age"),
