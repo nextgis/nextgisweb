@@ -90,7 +90,10 @@ class CoreComponent(
         opt_db = self.options.with_prefix('database')
         lock_timeout_ms = int(opt_db['lock_timeout'].total_seconds() * 1000)
         args = dict(
-            connect_args=dict(options='-c lock_timeout=%d' % lock_timeout_ms),
+            connect_args=dict(
+                connect_timeout=int(opt_db['connect_timeout'].total_seconds()),
+                options='-c lock_timeout=%d' % lock_timeout_ms,
+            ),
             pool_pre_ping=opt_db['pool.pre_ping']
         )
         if 'pool.recycle' in opt_db:
@@ -116,13 +119,16 @@ class CoreComponent(
             except IOError as exc:
                 yield "File [{}] is missing!".format(exc.filename)
 
-        sa_engine = create_engine(sa_url)
+        sa_engine = create_engine(sa_url, connect_args=dict(connect_timeout=int(
+            self.options['database.connect_timeout'].total_seconds())))
+
         while True:
             try:
                 with sa_engine.connect():
                     break
             except OperationalError as exc:
                 yield str(exc.orig).rstrip()
+
         sa_engine.dispose()
 
     def healthcheck(self):
@@ -158,7 +164,9 @@ class CoreComponent(
                 ('message', "Database password file is missing!")
             ))
 
-        sa_engine = create_engine(sa_url)
+        sa_engine = create_engine(sa_url, connect_args=dict(connect_timeout=int(
+            self.options['database.connect_timeout'].total_seconds())))
+
         try:
             with sa_engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
@@ -406,6 +414,7 @@ class CoreComponent(
         Option('database.user', default="nextgisweb"),
         Option('database.password', secure=True, default=None),
         Option('database.pwfile', default=None),
+        Option('database.connect_timeout', timedelta, default=timedelta(seconds=5)),
         Option('database.lock_timeout', timedelta, default=timedelta(seconds=30)),
         Option('database.pool.pre_ping', bool, default=False, doc=(
             "Test connections for liveness upon each checkout.")),
