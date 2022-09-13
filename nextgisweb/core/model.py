@@ -94,3 +94,8 @@ db.event.listen(storage_stat_delta, 'after_create', db.DDL('''
     CREATE TRIGGER after_insert AFTER INSERT ON core_storage_stat_delta
     FOR EACH ROW EXECUTE PROCEDURE core_storage_stat_delta_after_insert();
 '''), propagate=True)
+
+
+db.event.listen(storage_stat_delta, 'after_drop', db.DDL('''
+    DROP FUNCTION core_storage_stat_delta_after_insert();
+'''), propagate=True)
