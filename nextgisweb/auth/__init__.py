@@ -4,7 +4,7 @@ from urllib.parse import urlencode, urlparse
 
 import transaction
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.orm import defer
+from sqlalchemy.orm import defer, undefer
 from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
 from pyramid.interfaces import ISecurityPolicy
 
@@ -97,9 +97,9 @@ class AuthComponent(Component):
                 (User.id == user_id) if user_id is not None
                 else (User.keyname == 'guest'),
             ).options(
+                undefer(User.is_administrator),
                 defer(User.description),
                 defer(User.password_hash),
-                defer(User.oauth_subject),
                 defer(User.oauth_tstamp),
             ).one()
 

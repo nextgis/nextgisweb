@@ -122,21 +122,6 @@ class User(Principal):
             return a.principal_id == b.principal_id and a.principal_id is not None
 
     @property
-    def is_administrator(self):
-        """ Is user member of 'administrators' """
-        if self.principal_id is None:
-            return False
-
-        # To reduce number of DB requests, cache
-        # 'administrators' group in the instance
-        if not hasattr(self, '_admins'):
-            self._admins = Group.filter_by(keyname='administrators').one()
-
-        return any([
-            user for user in self._admins.members
-            if user.principal_id == self.principal_id])
-
-    @property
     def password(self):
         return PasswordHashValue(self.password_hash) if self.password_hash is not None else None
 
@@ -247,6 +232,16 @@ class Group(Principal):
             if 'members' in data:
                 self.members = [User.filter_by(id=uid).one()
                                 for uid in data['members']]
+
+
+auth_group_administrators = Group.__table__.alias('auth_group_administrators')
+User.is_administrator = orm.column_property(
+    sa.select(1).select_from(tab_group_user.join(auth_group_administrators, sa.and_(
+        auth_group_administrators.c.principal_id == tab_group_user.c.group_id,
+        auth_group_administrators.c.keyname == 'administrators')))
+    .where(tab_group_user.c.user_id == User.principal_id)
+    .exists().label('is_administrator'),
+    deferred=True)
 
 
 @lru_cache(maxsize=256)

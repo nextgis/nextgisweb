@@ -2,7 +2,7 @@ import re
 from collections import OrderedDict
 
 import sqlalchemy as sa
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, undefer
 from zope.event import notify
 from pyramid.security import forget
 from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
@@ -25,7 +25,7 @@ def user_cget(request):
     brief = request.GET.get('brief') in ('true', 'yes', '1')
 
     result = []
-    for o in User.query():
+    for o in User.query().options(undefer(User.is_administrator)):
         data = o.serialize()
         if brief:
             data = OrderedDict([
@@ -53,7 +53,9 @@ def user_cpost(request):
 
 def user_iget(request):
     request.require_administrator()
-    obj = User.filter_by(id=int(request.matchdict['id'])).one()
+    obj = User.filter_by(id=int(request.matchdict['id'])).options(
+        undefer(User.is_administrator),
+    ).one()
     return obj.serialize()
 
 
