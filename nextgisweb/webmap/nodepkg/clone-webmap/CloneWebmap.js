@@ -11,6 +11,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!webmap";
 import { useEffect, useMemo, useState } from "react";
+import PropTypes from "prop-types";
 
 export function CloneWebmap({ id }) {
     const form = useForm()[0];
@@ -120,34 +121,52 @@ export function CloneWebmap({ id }) {
     };
 
     const clone = async () => {
-        setSaving(true);
-        try {
-            const val = form.getFieldValue();
-            const { resource, resmeta, webmap, ...rest } = JSON.parse(
-                JSON.stringify(data)
-            );
-            delete rest.social;
-            delete resource.id;
-            delete resource.scopes;
-            delete resource.children;
-            delete resource.interfaces;
-            delete resource.creation_date;
-            resource.keyname = null;
-            resource.display_name = val.name;
-            resource.parent = { id: val.parent };
+        const val = form.getFieldValue();
+        const { resource, resmeta, webmap, ...rest } = JSON.parse(
+            JSON.stringify(data)
+        );
+        delete rest.social;
+        delete resource.id;
+        delete resource.scopes;
+        delete resource.children;
+        delete resource.interfaces;
+        delete resource.creation_date;
+        resource.keyname = null;
+        resource.display_name = val.name;
+        resource.parent = { id: val.parent };
 
-            const newResPayload = { resource, resmeta, webmap, ...rest };
-            const cloneItem = await route("resource.collection").post({
-                json: newResPayload,
-                signal: makeSignal(),
-            });
-            const newItemDetailUrl = routeURL("resource.update", cloneItem.id);
-            window.open(newItemDetailUrl, "_self");
-        } catch (er) {
-            errorModal(er);
-        } finally {
-            setSaving(false);
-        }
+        const clone_ = async () => {
+            setSaving(true);
+            try {
+                const newResPayload = { resource, resmeta, webmap, ...rest };
+                const cloneItem = await route("resource.collection").post({
+                    json: newResPayload,
+                    signal: makeSignal(),
+                });
+                const newItemDetailUrl = routeURL(
+                    "resource.update",
+                    cloneItem.id
+                );
+                window.open(newItemDetailUrl, "_self");
+            } catch (er) {
+                const cantChangePermissions =
+                    er.data &&
+                    er.data.exception &&
+                    er.data.exception ===
+                        "nextgisweb.core.exception.ForbiddenError";
+                if (cantChangePermissions && resource.permissions) {
+                    // Workaround to make a copy without permission to change permissions
+                    delete resource.permissions;
+                    delete resource.owner_user;
+                    await clone_();
+                } else {
+                    errorModal(er);
+                }
+            } finally {
+                setSaving(false);
+            }
+        };
+        clone_();
     };
 
     if (isLoading) {
@@ -165,3 +184,7 @@ export function CloneWebmap({ id }) {
         </>
     );
 }
+
+CloneWebmap.propTypes = {
+    id: PropTypes.number,
+};
