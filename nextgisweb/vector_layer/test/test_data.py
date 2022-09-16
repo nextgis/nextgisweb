@@ -14,6 +14,7 @@ from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.feature_layer import FIELD_TYPE
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer.model import error_limit, ERROR_FIX, FID_SOURCE
+from nextgisweb.lib.ogrhelper import read_dataset
 
 
 DATA_PATH = os.path.join(os.path.dirname(
@@ -81,6 +82,47 @@ def test_from_ogr(data, ngw_resource_group, ngw_txn):
     # TODO: Time and datetime tests fails on shapefile
     # assert fields['time'] == time(23, 59, 59)
     # assert fields['datetime'] == datetime(2001, 1, 1, 23, 59, 0)
+    assert fields['string'] == "Foo bar"
+    assert fields['unicode'] == 'Значимость этих проблем настолько очевидна, что реализация намеченных плановых заданий требуют определения и уточнения.'  # NOQA: E501
+
+
+@pytest.mark.parametrize(
+    'data',
+    (
+        'layer-lon-lat.csv',
+        'layer-lon-lat.xlsx',
+    ),
+)
+def test_from_csv_xlsx(data, ngw_resource_group, ngw_txn):
+    src = os.path.join(DATA_PATH, data)
+    dsource = read_dataset(src, source_filename=data)
+    layer = dsource.GetLayer(0)
+
+    res = VectorLayer(
+        parent_id=ngw_resource_group, display_name='from_ogr',
+        owner_user=User.by_keyname('administrator'),
+        srs=SRS.filter_by(id=3857).one(),
+        tbl_uuid=uuid4().hex,
+    )
+
+    res.persist()
+
+    res.setup_from_ogr(layer)
+    res.load_from_ogr(layer)
+
+    DBSession.flush()
+
+    features = list(res.feature_query()())
+    assert len(features) == 1
+
+    feature = features[0]
+    assert feature.id == 1
+
+    fields = feature.fields
+    assert int(fields['int']) == -1
+    assert fields['date'] == "2001/01/01"
+    assert fields['time'] == "23:59:59"
+    assert fields['datetime'] == "2001/01/01 23:59:00"
     assert fields['string'] == "Foo bar"
     assert fields['unicode'] == 'Значимость этих проблем настолько очевидна, что реализация намеченных плановых заданий требуют определения и уточнения.'  # NOQA: E501
 

@@ -1,3 +1,5 @@
+import os
+import pathlib
 import zipfile
 from contextlib import contextmanager
 from datetime import date, time, datetime
@@ -22,6 +24,21 @@ def ogr_use_exceptions():
 
 
 def read_dataset(filename, **kw):
+    source_filename = kw.pop("source_filename", None)
+    if source_filename is not None:
+        suffix = pathlib.Path(source_filename).suffix.lower()
+        if suffix in (".csv", ".xlsx"):
+            dst_path = pathlib.Path(filename).with_suffix(suffix)
+            if not (dst_path.is_symlink() or dst_path.is_file()):
+                dst_path.symlink_to(filename)
+            filename = """
+<OGRVRTDataSource>
+    <OGRVRTLayer name="{}">
+        <SrcDataSource relativeToVRT="0">{}</SrcDataSource>
+        <LayerSRS>WGS84</LayerSRS>
+        <GeometryField encoding="PointFromColumns" x="lon" y="lat" reportSrcColumn="false"/>
+    </OGRVRTLayer>
+</OGRVRTDataSource>""".format(dst_path.stem, dst_path)
 
     iszip = zipfile.is_zipfile(filename)
     ogrfn = '/vsizip/{%s}' % filename if iszip else filename

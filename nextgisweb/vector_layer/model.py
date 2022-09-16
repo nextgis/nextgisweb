@@ -127,8 +127,9 @@ class DRIVERS:
     KML = 'KML'
     LIBKML = 'LIBKML'
     GML = 'GML'
+    OGR_VRT = 'OGR_VRT'
 
-    enum = (ESRI_SHAPEFILE, GPKG, GEOJSON, KML, LIBKML, GML)
+    enum = (ESRI_SHAPEFILE, GPKG, GEOJSON, KML, LIBKML, GML, OGR_VRT)
 
 
 OPEN_OPTIONS = ('EXPOSE_FID=NO', )
@@ -1184,9 +1185,13 @@ VE = ValidationError
 
 class _source_attr(SP):
 
-    def _ogrds(self, filename):
+    def _ogrds(self, filename, source_filename=None):
         ogrds = read_dataset(
-            filename, allowed_drivers=DRIVERS.enum, open_options=OPEN_OPTIONS)
+            filename,
+            allowed_drivers=DRIVERS.enum,
+            open_options=OPEN_OPTIONS,
+            source_filename=source_filename,
+        )
 
         if ogrds is None:
             ogrds = ogr.Open(filename, 0)
@@ -1237,7 +1242,7 @@ class _source_attr(SP):
 
         datafile, metafile = env.file_upload.get_filename(value['id'])
 
-        ogrds = self._ogrds(datafile)
+        ogrds = self._ogrds(datafile, source_filename=value['name'])
 
         layer_name = srlzr.data.get('source_layer')
         ogrlayer = self._ogrlayer(ogrds, layer_name=layer_name)
