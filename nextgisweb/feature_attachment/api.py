@@ -1,4 +1,6 @@
 from io import BytesIO
+from zipfile import ZipFile, ZIP_DEFLATED
+from tempfile import NamedTemporaryFile
 
 from PIL import Image
 from pyramid.response import Response, FileResponse
@@ -147,6 +149,24 @@ def cpost(resource, request):
     return dict(id=obj.id)
 
 
+def export(resource, request):
+    request.resource_permission(DataScope.read)
+
+    query = FeatureAttachment.filter_by(resource_id=resource.id) \
+        .order_by(FeatureAttachment.feature_id, FeatureAttachment.id)
+
+    with NamedTemporaryFile(suffix=".zip") as tmp_file:
+        with ZipFile(tmp_file, "w", ZIP_DEFLATED, allowZip64=True) as zipf:
+            for obj in query:
+                fn = env.file_storage.filename(obj.fileobj)
+                arcname = f'{obj.feature_id:010d}/{obj.id:010d}-{obj.name}'
+                zipf.write(fn, arcname=arcname)
+
+        response = FileResponse(tmp_file.name, content_type='application/zip')
+        response.content_disposition = 'attachment; filename="%d.attachments.zip"' % resource.id
+        return response
+
+
 def setup_pyramid(comp, config):
     colurl = '/api/resource/{id}/feature/{fid}/attachment/'
     itmurl = '/api/resource/{id}/feature/{fid}/attachment/{aid}'
@@ -175,3 +195,9 @@ def setup_pyramid(comp, config):
         factory=resource_factory) \
         .add_view(cget, request_method='GET', renderer='json') \
         .add_view(cpost, request_method='POST', renderer='json')
+
+    config.add_route(
+        'feature_attachment.export',
+        '/api/resource/{id}/feature_attachment/export',
+        factory=resource_factory
+    ).add_view(export)

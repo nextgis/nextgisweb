@@ -15,27 +15,31 @@ msgstr "Вложение с id = %d не найдено в объекте с id 
 msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 
+#: view.py:19 view.py:40
+msgid "Export attachments"
+msgstr "Экспорт вложений"
+
 #: amd/ngw-feature-attachment/DisplayWidget.js:36
 #: amd/ngw-feature-attachment/EditorWidget.js:109
 msgid "Attachments"
 msgstr "Вложения"
 
-#: amd/ngw-feature-attachment/DisplayWidget.js:89
+#: amd/ngw-feature-attachment/DisplayWidget.js:91
 #: amd/ngw-feature-attachment/EditorWidget.js:76
 msgid "File name"
 msgstr "Имя файла"
 
-#: amd/ngw-feature-attachment/DisplayWidget.js:89
+#: amd/ngw-feature-attachment/DisplayWidget.js:91
 #: amd/ngw-feature-attachment/EditorWidget.js:84
 msgid "Size"
 msgstr "Размер"
 
-#: amd/ngw-feature-attachment/DisplayWidget.js:89
+#: amd/ngw-feature-attachment/DisplayWidget.js:91
 #: amd/ngw-feature-attachment/EditorWidget.js:90
 msgid "MIME type"
 msgstr "Тип MIME"
 
-#: amd/ngw-feature-attachment/DisplayWidget.js:89
+#: amd/ngw-feature-attachment/DisplayWidget.js:91
 #: amd/ngw-feature-attachment/EditorWidget.js:97
 msgid "Description"
 msgstr "Описание"
@@ -47,4 +51,8 @@ msgstr "Загрузить"
 #: amd/ngw-feature-attachment/EditorWidget.js:153
 msgid "Delete"
 msgstr "Удалить"
+
+#: nodepkg/export-form/ExportForm.js:29
+msgid "Download attachments as ZIP-archive"
+msgstr "Скачать вложения как ZIP-архив"
 

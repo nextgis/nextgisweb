@@ -21,8 +21,9 @@ class FeatureAttachmentComponent(Component):
         from . import extension # NOQA
 
     def setup_pyramid(self, config):
-        from . import api
+        from . import view, api
         api.setup_pyramid(self, config)
+        view.setup_pyramid(self, config)
 
     def estimate_storage(self):
         for obj in FeatureAttachment.query():
