@@ -33,6 +33,9 @@ export async function request(path, options) {
         useLunkwill = true;
     }
 
+    const lunkwillReturnUrl = !!opt.lunkwillReturnUrl;
+    delete opt.lunkwillReturnUrl;
+
     if (opt.json !== undefined) {
         opt.body = JSON.stringify(opt.json);
         opt.headers["Content-Type"] = "application/json";
@@ -56,8 +59,12 @@ export async function request(path, options) {
             throw new NetworksResponseError();
         }
 
-        if (useLunkwill) {
-            response = await handleLunkwillResponse(response);
+        if (useLunkwill && lunkwillCheckResponse(response)) {
+            const lwRespUrl = await lunkwillResponseUrl(response);
+            if (lunkwillReturnUrl) {
+                return lwRespUrl;
+            }
+            response = await lunkwillFetch(lwRespUrl);
         }
 
         const respCType = response.headers.get("content-type");
@@ -127,15 +134,15 @@ export class LunkwillParam {
     }
 }
 
-async function handleLunkwillResponse(lwResp) {
+function lunkwillCheckResponse(lwResp) {
     const ct = lwResp.headers.get("content-type");
-    if (
-        ct === undefined ||
-        !ct.includes("application/vnd.lunkwill.request-summary+json")
-    ) {
-        return lwResp;
-    }
+    return (
+        ct !== undefined &&
+        ct.includes("application/vnd.lunkwill.request-summary+json")
+    );
+}
 
+async function lunkwillResponseUrl(lwResp) {
     let lwData = await responseJson(lwResp);
     let delay = lwData.delay_ms;
     const retry = lwData.retry_ms !== undefined ? lwData.retry_ms : 2000;
@@ -179,8 +186,12 @@ async function handleLunkwillResponse(lwResp) {
         }
     }
 
+    return res;
+}
+
+async function lunkwillFetch(lwRespUrl) {
     try {
-        return await window.fetch(res, { credentials: "same-origin" });
+        return await window.fetch(lwRespUrl, { credentials: "same-origin" });
     } catch (e) {
         throw new NetworksResponseError();
     }

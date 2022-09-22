@@ -116,6 +116,8 @@ class PyramidComponent(Component):
         result['storage_enabled'] = self.env.core.options['storage.enabled']
         result['storage_limit'] = self.env.core.options['storage.limit']
 
+        result['lunkwill_enabled'] = self.options['lunkwill.enabled']
+
         return result
 
     @property
