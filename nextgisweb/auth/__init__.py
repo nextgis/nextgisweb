@@ -131,6 +131,8 @@ class AuthComponent(Component):
             environ['auth.user'] = dict(
                 id=user.id, keyname=user.keyname,
                 display_name=user.display_name,
+                is_administrator=user.is_administrator,
+                oauth_subject=user.oauth_subject,
                 language=user.language)
 
             environ['auth.user_obj'] = user
