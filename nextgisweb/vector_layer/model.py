@@ -5,7 +5,7 @@ from functools import lru_cache
 from html import escape as html_escape
 
 from zope.interface import implementer
-from osgeo import ogr, osr
+from osgeo import gdal, ogr, osr
 from shapely.geometry import box
 from sqlalchemy.sql import ColumnElement, null, text
 from sqlalchemy.ext.compiler import compiles
@@ -1225,8 +1225,14 @@ class _source_attr(SP):
 
     def _setup_layer(self, obj, ogrlayer, skip_other_geometry_types, fix_errors, skip_errors,
                      geom_cast_params, fid_params):
-        if ogrlayer.GetSpatialRef() is None:
-            raise VE(_("Layer doesn't contain coordinate system information."))
+
+        try:
+            # Apparently OGR_XLSX_HEADERS is taken into account during the GetSpatialRef call
+            gdal.SetConfigOption("OGR_XLSX_HEADERS", "FORCE")
+            if ogrlayer.GetSpatialRef() is None:
+                raise VE(_("Layer doesn't contain coordinate system information."))
+        finally:
+            gdal.SetConfigOption("OGR_XLSX_HEADERS", None)
 
         obj.tbl_uuid = uuid.uuid4().hex
 
