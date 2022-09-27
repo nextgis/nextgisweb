@@ -107,7 +107,7 @@ export function ResourcesFilter({ onChange, cls, ...rest }) {
         <AutoComplete
             dropdownClassName="ngw-resource-resource-filter-dropdown"
             dropdownMatchSelectWidth={290}
-            style={{ width: 290 }}
+            style={{ width: "100%" }}
             onSelect={onSelect}
             options={options}
             status={acStatus}

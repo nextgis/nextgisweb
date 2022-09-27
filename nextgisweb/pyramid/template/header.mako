@@ -2,26 +2,7 @@
 
 <% return_url = request.GET['return'] if 'return' in request.GET else False %>
 
-<div id="header" class="header clearfix">
-    <ul class="header-nav header__right">
-        %if not hide_resource_filter:
-            <li class="header-nav__item">
-                <div class="header-resources-filter" id="resourcesFilter"></div>
-            </li>
-        %endif
-        <li id="avatar" class="header-nav__item"></li>
-        %if request.env.pyramid.options['legacy_locale_switcher']:
-            <li class="header-nav__item">
-                %for locale in request.env.core.locale_available:
-                    %if locale != request.locale_name:
-                        <a href="${request.route_url('pyramid.locale', locale=locale, _query=dict(next=request.url))}">${locale.upper()}</a>
-                    %endif
-                %endfor
-            </li>
-        %endif
-        <li id="menu" class="header-nav__item"></li>
-    </ul>
-
+<div id="header" class="header">
     <div class="header__left">
         <div class="header__title">
             <a class="header__title-logo" href="${return_url if return_url else request.application_url}">
@@ -43,6 +24,24 @@
             </div>
         </div>
     </div>
+    <ul class="header-nav header__right">
+        %if not hide_resource_filter:
+            <li class="header-nav__item">
+                <div class="header-resources-filter" id="resourcesFilter"></div>
+            </li>
+        %endif
+        <li id="avatar" class="header-nav__item"></li>
+        %if request.env.pyramid.options['legacy_locale_switcher']:
+            <li class="header-nav__item">
+                %for locale in request.env.core.locale_available:
+                    %if locale != request.locale_name:
+                        <a href="${request.route_url('pyramid.locale', locale=locale, _query=dict(next=request.url))}">${locale.upper()}</a>
+                    %endif
+                %endfor
+            </li>
+        %endif
+        <li id="menu" class="header-nav__item"></li>
+    </ul>
 </div>
 
 

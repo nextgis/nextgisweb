@@ -196,9 +196,12 @@ a[class*=" icon-"]:hover:before {
 /* -- Header --*/
 
 .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: relative;
   box-sizing: border-box;
-  padding: 15px 15px 15px 0;
+  padding: 12px 12px 12px 0;
   background-color: var(--header-bg);
   z-index: 10;
   line-height: 1.5;
@@ -223,29 +226,25 @@ a[class*=" icon-"]:hover:before {
   }
 
   .header__title {
+    position: relative;
+    top: -1px;
     display: flex;
     align-items: center;
     color: inherit;
     vertical-align: top;
     font-weight: var(--heading-font-weight);
-    min-height: 34px;
-    margin-top: -7px;
-    margin-bottom: -7px;
+    // min-height: 34px;
+    // margin-top: -7px;
+    // margin-bottom: -7px;
   }
 }
 
 .header-nav {
-  margin: 0;
+  margin: -9px 0;
   list-style-type: none;
   padding: 0;
-  position: absolute;
-  right: 16px;
-  top: 0;
-  bottom: 0;
   font-weight: var(--heading-font-weight);
-  margin-top: auto;
-  margin-bottom: auto;
-  height: 34px;
+  white-space: nowrap;
 
   &__item {
     display: inline-block;
@@ -255,14 +254,19 @@ a[class*=" icon-"]:hover:before {
     height: 34px;
     line-height: 34px;
     margin-bottom: auto;
+    white-space: normal;
 
     & > .header-resources-filter {
       line-height: normal;
     }
 
     .header-resources-filter {
-      width: 290px;
+      width: 180px;
       margin-top: 1px;
+
+      @media (min-width: 992px) {
+        width: 290px;
+      }
     }
 
     & > a {
@@ -278,7 +282,7 @@ a[class*=" icon-"]:hover:before {
 }
 
 .header__left {
-  padding-right: 250px;
+  padding-right: 24px;
 }
 
 .header__title-logo {
@@ -317,6 +321,7 @@ a[class*=" icon-"]:hover:before {
   padding-left: 16px;
   padding-top: 4px;
   padding-bottom: 4px;
+  line-height: 1.2;
 }
 
 
