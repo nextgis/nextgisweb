@@ -9,6 +9,14 @@ from osgeo import gdal, ogr
 
 FIELD_GETTER = {}
 
+OGR_VRT_LAYER = """
+<OGRVRTLayer name="{}">
+    <SrcDataSource relativeToVRT="0">{}</SrcDataSource>
+    <LayerSRS>WGS84</LayerSRS>
+    <GeometryField encoding="PointFromColumns" x="lon" y="lat" reportSrcColumn="false"/>
+</OGRVRTLayer>
+"""
+
 
 @contextmanager
 def ogr_use_exceptions():
@@ -33,14 +41,13 @@ def read_dataset(filename, **kw):
             dst_path = pathlib.Path(filename).with_suffix(suffix)
             if not (dst_path.is_symlink() or dst_path.is_file()):
                 dst_path.symlink_to(filename)
-            filename = """
-<OGRVRTDataSource>
-    <OGRVRTLayer name="{}">
-        <SrcDataSource relativeToVRT="0">{}</SrcDataSource>
-        <LayerSRS>WGS84</LayerSRS>
-        <GeometryField encoding="PointFromColumns" x="lon" y="lat" reportSrcColumn="false"/>
-    </OGRVRTLayer>
-</OGRVRTDataSource>""".format(dst_path.stem, dst_path)
+
+            layers = ""
+            ogrds = gdal.OpenEx(str(dst_path), 0)
+            for i in range(ogrds.GetLayerCount()):
+                layer = ogrds.GetLayer(i)
+                layers += OGR_VRT_LAYER.format(layer.GetName(), dst_path)
+            filename = "<OGRVRTDataSource>{}</OGRVRTDataSource>".format(layers)
 
     kw["allowed_drivers"] = allowed_drivers
     iszip = zipfile.is_zipfile(filename)
