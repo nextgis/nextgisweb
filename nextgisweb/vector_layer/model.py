@@ -1247,7 +1247,7 @@ class _source_attr(SP):
 
         datafile, metafile = env.file_upload.get_filename(value['id'])
 
-        ogrds = self._ogrds(datafile, source_filename=value['name'])
+        ogrds = self._ogrds(datafile, source_filename=value.get('name'))
 
         layer_name = srlzr.data.get('source_layer')
         ogrlayer = self._ogrlayer(ogrds, layer_name=layer_name)
