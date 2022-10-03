@@ -73,11 +73,11 @@ msgstr "Таблица найдена, тип таблицы {}."
 
 #: diagnostics.py:261
 msgid "{} privilege is present."
-msgstr "Привелегия {} присутствует."
+msgstr "Привилегия {} присутствует."
 
 #: diagnostics.py:263 diagnostics.py:265
 msgid "{} privilege is absent."
-msgstr "Привелегия {} отсутствует."
+msgstr "Привилегия {} отсутствует."
 
 #: diagnostics.py:268
 msgid "Number of records: {}."
@@ -101,7 +101,7 @@ msgstr "Колонка найдена, но имеет не целочислен
 
 #: diagnostics.py:290 diagnostics.py:367
 msgid "Column found, type is {}."
-msgstr "Кололка найдена, тип {}."
+msgstr "Колонка найдена, тип {}."
 
 #: diagnostics.py:295
 msgid "Column is the primary key."
