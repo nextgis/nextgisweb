@@ -11,6 +11,7 @@ Changes
 - Ability to turn off user password and keep only OAuth authentication.
 - Fields selection while exporting featrue layer.
 - Search by coordinates on web maps.
+- CSV and XLSX support when creating a vector layer.
 
 
 4.2.0
