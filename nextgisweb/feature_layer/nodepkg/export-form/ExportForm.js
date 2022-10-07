@@ -171,7 +171,7 @@ export function ExportForm({ id }) {
                 fid: "ngw_id",
                 encoding: "UTF-8",
                 display_name: false,
-                zipped: true,
+                zipped: false,
             }}
             labelCol={{ span: 6 }}
         >
