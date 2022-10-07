@@ -141,6 +141,21 @@ EXPORT_FORMAT_OGR["SXF"] = OGRDriver(
     dsco_configurable=("SXF_MAP_SCALE:1000000", "SXF_MAP_NAME", "SXF_SHEET_KEY"),
 )
 
+EXPORT_FORMAT_OGR["KML"] = OGRDriver(
+    "LIBKML",
+    "KML (*.kml)",
+    "kml",
+    single_file=True,
+    mime="application/vnd.google-earth.kml+xml"
+)
+
+EXPORT_FORMAT_OGR["KMZ"] = OGRDriver(
+    "LIBKML",
+    "KMZ (*.kmz)",
+    "kmz",
+    single_file=True,
+    mime="application/vnd.google-earth.kmz"
+)
 
 OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
     {
