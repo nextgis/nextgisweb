@@ -232,11 +232,11 @@ class AuthComponent(Component):
         return user, headers
 
     def session_invite(self, keyname, url):
-        user = User.filter_by(keyname=keyname).one_or_none()
+        user = User.filter_by(keyname=keyname, disabled=False).one_or_none()
         if user is None:
             group = Group.filter_by(keyname=keyname).one_or_none()
             if group is None:
-                raise RuntimeError(f"No user or group found for keyname '{keyname}'")
+                raise RuntimeError(f"No enabled user or group found for keyname '{keyname}'")
             for user in group.members:
                 if not user.disabled:
                     break
