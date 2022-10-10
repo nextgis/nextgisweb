@@ -25,6 +25,8 @@ from .util import _
 
 Base = declarative_base(dependencies=('resource', 'lookup_table'))
 
+FIELD_FORBIDDEN_NAME = ('id', 'geom')
+
 _FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
 
 
@@ -169,6 +171,10 @@ class _fields_attr(SP):
                 mfld = obj.field_create(fld['datatype'])  # create
 
             if 'keyname' in fld:
+                if fld['keyname'] in FIELD_FORBIDDEN_NAME:
+                    raise ValidationError(message=_(
+                        "Field name is forbidden: '%s'. Please remove or "
+                        "rename it.") % fld['keyname'])
                 mfld.keyname = fld['keyname']
             if 'display_name' in fld:
                 mfld.display_name = fld['display_name']

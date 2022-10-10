@@ -43,6 +43,7 @@ from ..feature_layer import (
     LayerFieldsMixin,
     GEOM_TYPE,
     GEOM_TYPE_OGR,
+    FIELD_FORBIDDEN_NAME,
     FIELD_TYPE,
     FIELD_TYPE_OGR,
     IFeatureLayer,
@@ -95,8 +96,6 @@ FIELD_TYPE_SIZE = {
     FIELD_TYPE.TIME: 8,
     FIELD_TYPE.DATETIME: 8,
 }
-
-FIELD_FORBIDDEN_NAME = ("id", "geom")
 
 STRING_CAST_TYPES = (
     ogr.OFTIntegerList,

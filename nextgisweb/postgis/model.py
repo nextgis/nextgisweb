@@ -36,6 +36,7 @@ from ..feature_layer import (
     LayerField,
     LayerFieldsMixin,
     GEOM_TYPE,
+    FIELD_FORBIDDEN_NAME,
     FIELD_TYPE,
     IFeatureLayer,
     IWritableFeatureLayer,
@@ -296,7 +297,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 elif row['column_name'] == self.column_geom:
                     colfound_geom = True
 
-                elif row['column_name'] in ('id', 'geom'):
+                elif row['column_name'] in FIELD_FORBIDDEN_NAME:
                     # TODO: Currently id and geom fields break vector layer. We should fix it!
                     pass
 

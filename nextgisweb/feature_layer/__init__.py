@@ -4,7 +4,8 @@ from ..component import Component, require
 from ..lib.config import Option
 
 from .feature import Feature, FeatureSet
-from .model import Base, LayerField, LayerFieldsMixin, FeatureQueryIntersectsMixin
+from .model import (
+    Base, LayerField, LayerFieldsMixin, FeatureQueryIntersectsMixin, FIELD_FORBIDDEN_NAME)
 from .interface import (
     GEOM_TYPE,
     GEOM_TYPE_OGR,
@@ -35,6 +36,7 @@ __all__ = [
     'LayerFieldsMixin',
     'GEOM_TYPE',
     'GEOM_TYPE_OGR',
+    'FIELD_FORBIDDEN_NAME',
     'FIELD_TYPE',
     'FIELD_TYPE_OGR',
     'IFeatureLayer',
