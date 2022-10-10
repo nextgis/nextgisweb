@@ -6,6 +6,7 @@ from sqlalchemy.orm import aliased, undefer
 from zope.event import notify
 from pyramid.security import forget
 from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
+from pyramid.interfaces import ISecurityPolicy
 
 from ..models import DBSession
 from ..core.exception import ValidationError
@@ -64,6 +65,15 @@ def user_iput(request):
 
     data = request.json_body
     obj = User.filter_by(id=int(request.matchdict['id'])).one()
+
+    if (
+        ('keyname' in data and obj.keyname != data['keyname'])
+        or ('password' in data and data['password'] is not True)
+        or data.get('alink_token') is not None
+    ):
+        auth_policy = request.registry.getUtility(ISecurityPolicy)
+        auth_policy.forget_user(obj.id)
+
     check_keyname(obj, data)
     check_display_name(obj, data)
     check_system_user(obj, data)

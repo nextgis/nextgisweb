@@ -8,11 +8,13 @@ import {
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
+import settings from "@nextgisweb/pyramid/settings!auth";
 import { PropTypes } from "prop-types";
 import { useMemo } from "react";
 import { PrincipalMemberSelect } from "../field";
 import { default as oauth, makeTeamManageButton } from "../oauth";
 import getMessages from "../userMessages";
+import { UserWidgetAlinkToken } from "./UserWidgetAlinkToken";
 import { UserWidgetPassword } from "./UserWidgetPassword";
 
 export function UserWidget({ id }) {
@@ -52,6 +54,14 @@ export function UserWidget({ id }) {
                 name: "oauth_subject",
                 label: oauth.name,
                 disabled: true,
+            });
+        }
+
+        if (settings.alink) {
+            fields_.push({
+                name: "alink_token",
+                label: i18n.gettext("Link authorization"),
+                widget: UserWidgetAlinkToken,
             });
         }
 

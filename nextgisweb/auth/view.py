@@ -90,6 +90,22 @@ def session_invite(request):
         return response
 
 
+def alink(request):
+    if not request.env.auth.options['alink']:
+        raise HTTPNotFound()
+
+    user = User.filter_by(alink_token=request.matchdict['token']).one()
+    if user.disabled:
+        raise UserDisabledException()
+    if user.is_administrator:
+        raise AuthorizationException(message="Administrator can not be authorized via link.")
+
+    remember(request, (user.id, None))
+
+    next_url = request.params.get('next', request.application_url)
+    return HTTPFound(location=next_url)
+
+
 def oauth(request):
     oaserver = request.env.auth.oauth
 
@@ -323,6 +339,8 @@ def setup_pyramid(comp, config):
         'auth.session_invite',
         '/session-invite'
     ).add_view(session_invite, renderer='nextgisweb:auth/template/session_invite.mako')
+
+    config.add_route('auth.alink', '/alink/{token}').add_view(alink)
 
     config.add_route('auth.logout', '/logout').add_view(logout)
 

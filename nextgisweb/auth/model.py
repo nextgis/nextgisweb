@@ -10,6 +10,7 @@ from zope.event.classhandler import handler
 from ..core.exception import ValidationError
 from ..env import env
 from ..models import DBSession, declarative_base
+from ..pyramid.util import gensecret
 
 from .util import _
 
@@ -81,6 +82,7 @@ class User(Principal):
     password_hash = sa.Column(sa.Unicode)
     oauth_subject = sa.Column(sa.Unicode, unique=True)
     oauth_tstamp = sa.Column(sa.DateTime)
+    alink_token = sa.Column(sa.Unicode)
     last_activity = sa.Column(sa.DateTime)
     language = sa.Column(sa.Unicode)
 
@@ -143,6 +145,7 @@ class User(Principal):
             ('language', self.language),
             ('oauth_subject', self.oauth_subject),
             ('oauth_tstamp', self.oauth_tstamp),
+            ('alink_token', self.alink_token),
             ('member_of', [g.id for g in self.member_of]),
             ('is_administrator', self.is_administrator),
         ))
@@ -168,6 +171,9 @@ class User(Principal):
                     self.password = None
                 else:
                     self.password = pwd
+
+            if (alink_token := data.get('alink_token')) is not None:
+                self.alink_token = gensecret(32) if alink_token else None
 
         enabled = not self.disabled and was_disabled
 
