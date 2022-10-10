@@ -249,7 +249,7 @@ def test_exception(ngw_webtest_app, webapp_handler):
     ('del', False),
     ('clear', False),
 ))
-def test_session_start(handler, expect, ngw_webtest_app, webapp_handler):
+def test_session_start(handler, expect, ngw_webtest_app, webapp_handler, ngw_env):
     def _handler(request):
         if handler == 'empty':
             pass
@@ -272,4 +272,5 @@ def test_session_start(handler, expect, ngw_webtest_app, webapp_handler):
 
     with webapp_handler(_handler):
         ngw_webtest_app.get('/test/request/')
-        assert ('ngw-sid' in ngw_webtest_app.cookies) == expect
+        cookie_name = ngw_env.pyramid.options['session.cookie.name']
+        assert (cookie_name in ngw_webtest_app.cookies) == expect
