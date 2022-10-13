@@ -38,7 +38,7 @@ requires = [
     'poeditor',
     'psutil==5.8.0',
     'psycopg2==2.9.2',
-    'pygdal' + (('==%s.*' % gv) if gv else ''),  # TODO: Add >=2.3.0
+    'pygdal' + (f'=={gv}.*,' if gv else '') + '>=3',
     'pyproj==3.3.0',
     'pyramid==2.0',
     'pyramid_debugtoolbar==4.9',
