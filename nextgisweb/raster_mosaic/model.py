@@ -9,6 +9,7 @@ from .. import db
 from ..core.exception import ValidationError
 from ..env import env
 from ..lib.geometry import Geometry
+from ..lib.osrhelper import sr_from_wkt
 from ..models import declarative_base, DBSession
 from ..resource import (
     DataScope,
@@ -157,8 +158,7 @@ class RasterMosaicItem(Base):
                 has_nodata = (has_nodata is None or has_nodata) and (
                     band.GetNoDataValue() is not None)
 
-        src_osr = osr.SpatialReference()
-        src_osr.ImportFromWkt(dsproj)
+        src_osr = sr_from_wkt(dsproj)
         dst_osr = self.resource.srs.to_osr()
 
         reproject = not src_osr.IsSame(dst_osr)

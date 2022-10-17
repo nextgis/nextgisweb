@@ -12,7 +12,7 @@ from osgeo import gdal, gdalconst, osr, ogr
 
 from ..core.exception import ValidationError
 from ..core.util import format_size
-from ..lib.osrhelper import traditional_axis_mapping
+from ..lib.osrhelper import sr_from_epsg, sr_from_wkt, SpatialReferenceError
 from ..lib.logging import logger
 from ..models import declarative_base
 from ..resource import (
@@ -119,8 +119,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 has_nodata = (has_nodata is None or has_nodata) and (
                     band.GetNoDataValue() is not None)
 
-        src_osr = osr.SpatialReference()
-        if src_osr.ImportFromWkt(dsproj) != 0:
+        try:
+            src_osr = sr_from_wkt(dsproj)
+        except SpatialReferenceError:
             raise ValidationError(_(
                 "GDAL was uanble to parse the raster coordinate system."))
 
@@ -250,12 +251,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         """
 
         src_osr = self.srs.to_osr()
-
-        dst_osr = osr.SpatialReference()
-        dst_osr.ImportFromEPSG(4326)
-
-        traditional_axis_mapping(src_osr)
-        traditional_axis_mapping(dst_osr)
+        dst_osr = sr_from_epsg(4326)
 
         coordTrans = osr.CoordinateTransformation(src_osr, dst_osr)
 

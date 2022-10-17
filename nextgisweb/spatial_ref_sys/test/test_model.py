@@ -1,7 +1,7 @@
 import pytest
-from osgeo import osr
 
 from ... import db
+from ...lib.osrhelper import sr_from_epsg
 from ...models import DBSession
 from ...core.exception import ValidationError
 from ..model import (
@@ -112,7 +112,5 @@ def test_point_tilexy(ngw_txn):
 def test_osr(EPSG, ngw_txn):
     sr1 = SRS.filter_by(auth_name='EPSG', auth_srid=EPSG).one().to_osr()
 
-    sr2 = osr.SpatialReference()
-    sr2.ImportFromEPSG(EPSG)
-
+    sr2 = sr_from_epsg(EPSG)
     assert sr1.IsSame(sr2)

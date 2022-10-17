@@ -2,12 +2,13 @@ from math import ceil, floor
 from itertools import product
 from datetime import datetime
 
-from pyproj import Transformer
 import transaction
 
-from ..lib.logging import logger
 from ..command import Command
+from ..lib.geometry import Geometry, Transformer
+from ..lib.logging import logger
 from ..models import DBSession
+from ..spatial_ref_sys import WKT_EPSG_4326
 
 from .model import ResourceTileCache, TilestorWriter
 from .util import affine_bounds_to_tile
@@ -30,25 +31,27 @@ class TileCacheSeedCommand():
 
     @classmethod
     def execute(cls, args, env):
-        tc_ids = DBSession.query(ResourceTileCache.resource_id).filter(
+        transformers = dict()
+
+        for tc in DBSession.query(ResourceTileCache).filter(
             ResourceTileCache.enabled,
             ResourceTileCache.seed_z != None  # NOQA: E711
-        ).all()
-
-        # TODO: Add arbitrary SRS support
-        srs_tr = Transformer.from_crs(4326, 3857, always_xy=True)
-
-        for tc_id in tc_ids:
-            tc = ResourceTileCache.filter_by(resource_id=tc_id).one()
-
+        ):
             rend_res = tc.resource
             data_res = rend_res.parent
             srs = data_res.srs
 
             # TODO: Add arbitrary SRS support
             extent_4326 = data_res.extent
-            extent = srs_tr.transform(extent_4326['minLon'], extent_4326['minLat']) + \
-                srs_tr.transform(extent_4326['maxLon'], extent_4326['maxLat'])
+            extent_4326_geom = Geometry.from_box(
+                extent_4326['minLon'], extent_4326['minLat'],
+                extent_4326['maxLon'], extent_4326['maxLat'])
+
+            if srs.id not in transformers:
+                transformers[srs.id] = Transformer(WKT_EPSG_4326, srs.wkt)
+            transformer = transformers[srs.id]
+
+            extent = transformer.transform(extent_4326_geom).ogr.GetEnvelope()
 
             rlevel = list()
             rcount = 0

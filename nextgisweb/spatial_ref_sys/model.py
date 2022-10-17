@@ -1,9 +1,9 @@
-from osgeo import gdal, osr
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declared_attr
 
 from .. import db
+from ..lib.osrhelper import sr_from_wkt
 from ..models import declarative_base
 
 from .util import convert_to_proj
@@ -117,10 +117,7 @@ class SRS(Base):
         return [int(xtile_min), int(ytile_min), int(xtile_max), int(ytile_max)]
 
     def to_osr(self):
-        sr = osr.SpatialReference()
-        if sr.ImportFromWkt(self.wkt) != 0:
-            raise ValueError(gdal.GetLastErrorMsg())
-        return sr
+        return sr_from_wkt(self.wkt)
 
     def __str__(self):
         return self.display_name

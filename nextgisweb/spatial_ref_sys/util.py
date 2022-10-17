@@ -3,6 +3,7 @@ from osgeo import osr
 from ..core.exception import ValidationError
 
 from ..lib.i18n import trstr_factory
+from ..lib.osrhelper import sr_from_wkt, SpatialReferenceError
 
 COMP_ID = "spatial_ref_sys"
 _ = trstr_factory(COMP_ID)
@@ -64,8 +65,9 @@ def convert_to_wkt(source, format=None, pretty=False):
 
 
 def convert_to_proj(source):
-    sr = osr.SpatialReference()
-    if sr.ImportFromWkt(source) != 0:
+    try:
+        sr = sr_from_wkt(source)
+    except SpatialReferenceError:
         raise ValidationError(
             message=_("Invalid OGC WKT definition!"))
     return sr.ExportToProj4()

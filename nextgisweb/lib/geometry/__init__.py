@@ -1,7 +1,7 @@
 from warnings import warn
 
-from osgeo.ogr import CreateGeometryFromWkb, CreateGeometryFromWkt, wkbNDR
-from pyproj import CRS, Transformer as pyTr
+from osgeo import gdal, ogr, osr
+from pyproj import CRS
 from shapely import wkt, wkb
 from shapely.geometry import (
     mapping as geometry_mapping,
@@ -9,12 +9,14 @@ from shapely.geometry import (
     box as geometry_box)
 from shapely.ops import transform as map_coords
 
+from ..osrhelper import sr_from_wkt
+
 
 class GeometryNotValid(ValueError):
     pass
 
 
-class Geometry(object):
+class Geometry:
     """ Initialization format is kept "as is".
     Other formats are calculated as needed."""
 
@@ -79,7 +81,7 @@ class Geometry(object):
                 self._wkb = self._shape.wkb
             else:
                 # ORG is the fastest, so convert to OGR and then to WKB.
-                self._wkb = self.ogr.ExportToWkb(wkbNDR)
+                self._wkb = self.ogr.ExportToWkb(ogr.wkbNDR)
         return self._wkb
 
     @property
@@ -96,10 +98,10 @@ class Geometry(object):
     def ogr(self):
         if self._ogr is None:
             if self._wkb is None and self._wkt is not None:
-                self._ogr = CreateGeometryFromWkt(self._wkt)
+                self._ogr = ogr.CreateGeometryFromWkt(self._wkt)
             else:
                 # WKB is the fastest, so convert to WKB and then to OGR.
-                self._ogr = CreateGeometryFromWkb(self.wkb)
+                self._ogr = ogr.CreateGeometryFromWkb(self.wkb)
 
         if self._ogr is None:
             raise GeometryNotValid("Invalid geometry WKB/WKT value!")
@@ -140,26 +142,26 @@ class Geometry(object):
         return self.shape.simplify(*args, **kwargs)
 
 
-class Transformer(object):
+class Transformer:
 
     def __init__(self, wkt_from, wkt_to):
-        crs_from = CRS.from_wkt(wkt_from)
-        crs_to = CRS.from_wkt(wkt_to)
+        sr_from = sr_from_wkt(wkt_from)
+        sr_to = sr_from_wkt(wkt_to)
 
-        # pyproj >= 2.5
-        # if crs_from.equals(crs_to):
-        if wkt_from == wkt_to:
-            self._transformer = None
+        if sr_from.IsSame(sr_to):
+            self._transformation = None
         else:
-            self._transformer = pyTr.from_crs(crs_from, crs_to, always_xy=True)
+            self._transformation = osr.CoordinateTransformation(sr_from, sr_to)
 
     def transform(self, geom):
         # NB: geom.srid is not considered
-        if self._transformer is None:
+        if self._transformation is None:
             return geom
         else:
-            shape = map_coords(self._transformer.transform, geom.shape)
-            return Geometry.from_shape(shape)
+            ogr_geom = geom.ogr
+            if ogr_geom.Transform(self._transformation) != 0:
+                raise ValueError(gdal.GetLastErrorMsg())
+            return Geometry.from_ogr(ogr_geom)
 
 
 def crs_unit_factor(crs):

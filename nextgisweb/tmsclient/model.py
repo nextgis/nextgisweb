@@ -8,7 +8,7 @@ from osgeo import osr, ogr
 from zope.interface import implementer
 
 from .. import db
-from ..lib.osrhelper import traditional_axis_mapping
+from ..lib.osrhelper import sr_from_epsg
 from ..core.exception import ExternalServiceError, ValidationError
 from ..env import env
 from ..layer import SpatialLayerMixin, IBboxLayer
@@ -236,12 +236,10 @@ class Layer(Base, Resource, SpatialLayerMixin):
             )
 
         dst_osr = self.srs.to_osr()
-        traditional_axis_mapping(dst_osr)
 
         extent_max = prepare_geog_extent((self.extent_left, self.extent_bottom, self.extent_right, self.extent_top))
         if self.srs.id != 4326:
-            wgs84_osr = traditional_axis_mapping(osr.SpatialReference())
-            wgs84_osr.ImportFromEPSG(4326)
+            wgs84_osr = sr_from_epsg(4326)
             extent_max = transform_extent(extent_max, wgs84_osr, dst_osr)
 
         if srs.is_geographic:
@@ -249,7 +247,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         if srs.id != self.srs.id:
             req_osr = srs.to_osr()
-            traditional_axis_mapping(req_osr)
             extent = transform_extent(extent, req_osr, dst_osr)
 
         xtile_from, ytile_from, xtile_to, ytile_to = self.srs.extent_tile_range(extent, zoom)
