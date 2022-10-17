@@ -15,7 +15,7 @@ from pathlib import Path
 from subprocess import check_output
 
 import requests
-from requests.exceptions import RequestException
+from requests.exceptions import RequestException, JSONDecodeError
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import configure_mappers
@@ -331,7 +331,7 @@ class CoreComponent(
 
         try:
             data = res.json()
-        except json.decoder.JSONDecodeError:
+        except JSONDecodeError:
             return False
 
         if 'distribution' in data:
