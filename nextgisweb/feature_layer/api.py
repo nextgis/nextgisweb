@@ -98,25 +98,7 @@ def export(request):
                 ).format(limit=export_limit, count=total_count)
             )
 
-    srs = int(
-        request.GET.get("srs", request.context.srs.id)
-    )
-    srs = SRS.filter_by(id=srs).one()
-
-    fid = request.GET.get("fid")
-    fid = fid if fid != "" else None
-
     format = request.GET.get("format")
-    encoding = request.GET.get("encoding")
-    zipped = request.GET.get("zipped", "true")
-    zipped = zipped.lower() == "true"
-
-    display_name = request.GET.get("display_name", "false")
-    display_name = display_name.lower() == "true"
-
-    fields = request.GET["fields"].split(",") if "fields" in request.GET else None
-    if fields is None:
-        fields = [fld.keyname for fld in request.context.fields]
 
     if format is None:
         raise ValidationError(
@@ -129,6 +111,27 @@ def export(request):
         )
 
     driver = EXPORT_FORMAT_OGR[format]
+
+    # KML should be created as WGS84
+    if driver.name == "LIBKML":
+        srs = SRS.filter_by(id=4326).one()
+    else:
+        srs = int(request.GET.get("srs", request.context.srs.id))
+        srs = SRS.filter_by(id=srs).one()
+
+    fid = request.GET.get("fid")
+    fid = fid if fid != "" else None
+
+    encoding = request.GET.get("encoding")
+    zipped = request.GET.get("zipped", "true")
+    zipped = zipped.lower() == "true"
+
+    display_name = request.GET.get("display_name", "false")
+    display_name = display_name.lower() == "true"
+
+    fields = request.GET["fields"].split(",") if "fields" in request.GET else None
+    if fields is None:
+        fields = [fld.keyname for fld in request.context.fields]
 
     # dataset creation options (configurable by user)
     dsco = list()
