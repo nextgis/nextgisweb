@@ -302,20 +302,13 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                     pass
 
                 else:
-                    datatype = None
                     if row['data_type'] == 'integer':
                         datatype = FIELD_TYPE.INTEGER
                     elif row['data_type'] == 'bigint':
                         datatype = FIELD_TYPE.BIGINT
-                    elif row['data_type'] == 'double precision':
+                    elif row['data_type'] in ('double precision', 'numeric'):
                         datatype = FIELD_TYPE.REAL
-                    elif row['data_type'] == 'numeric':
-                        datatype = FIELD_TYPE.REAL
-                    elif row['data_type'] == 'character varying':
-                        datatype = FIELD_TYPE.STRING
-                    elif row['data_type'] == 'text':
-                        datatype = FIELD_TYPE.STRING
-                    elif row['data_type'] == 'uuid':
+                    elif row['data_type'] in ('character varying', 'character', 'text', 'uuid'):
                         datatype = FIELD_TYPE.STRING
                     elif row['data_type'] == 'date':
                         datatype = FIELD_TYPE.DATE
@@ -323,15 +316,17 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                         datatype = FIELD_TYPE.TIME
                     elif re.match('^timestamp', row['data_type']):
                         datatype = FIELD_TYPE.DATETIME
+                    else:
+                        logger.warning(f"Column type '{row['data_type']}' is not supported.")
+                        continue
 
-                    if datatype is not None:
-                        fopts = dict(display_name=row['column_name'])
-                        fopts.update(fdata.get(row['column_name'], dict()))
-                        self.fields.append(PostgisLayerField(
-                            keyname=row['column_name'],
-                            datatype=datatype,
-                            column_name=row['column_name'],
-                            **fopts))
+                    fopts = dict(display_name=row['column_name'])
+                    fopts.update(fdata.get(row['column_name'], dict()))
+                    self.fields.append(PostgisLayerField(
+                        keyname=row['column_name'],
+                        datatype=datatype,
+                        column_name=row['column_name'],
+                        **fopts))
 
             if not colfound_id:
                 raise ValidationError(_("Column '%(column)s' not found!") % dict(column=self.column_id)) # NOQA
