@@ -14,6 +14,9 @@ class Package(PackageBase):
 
 @AppImage.on_apt.handler
 def on_apt(event):
+    event.package(
+        'libpcre3', 'libpcre3-dev',  # uWSGI internal routing support
+    )
     if event.image.context.is_development():
         event.image.environment['SQLALCHEMY_WARN_20'] = '1'
 
