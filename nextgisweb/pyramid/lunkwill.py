@@ -78,8 +78,13 @@ def proxy(request):
         if k.lower() not in ('connection',)}
     headers['Connection'] = 'close'
     pool = request.registry.settings['lunkwill.pool']
-    resp = pool.request(request.method, url, headers=headers, retries=False)
-    return Response(status=resp.status, body=resp.data, headerlist=resp.headers.items())
+    resp = pool.request(
+        request.method, url, 
+        headers=headers, retries=False,
+        preload_content=False)
+    return Response(
+        status=resp.status, headerlist=resp.headers.items(),
+        app_iter=resp.stream())
 
 
 def urlrebase(ngw_url, lw_url):
