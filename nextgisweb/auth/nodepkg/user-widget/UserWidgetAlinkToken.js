@@ -60,6 +60,13 @@ const AlinkInput = ({ value, onChange }) => {
                     disabled={true}
                 ></Input>
             )}
+            {mode === "assign" && (
+                <Input
+                    style={{ flexGrow: "1" }}
+                    value={i18n.gettext("The generated link will be available after saving.")}
+                    disabled={true}
+                ></Input>
+            )}
         </Input.Group>
     );
 };

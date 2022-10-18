@@ -21,7 +21,7 @@ from .. import dynmenu as dm
 
 from .model import Principal, User, Group
 
-from .exception import InvalidCredentialsException, UserDisabledException
+from .exception import InvalidCredentialsException, UserDisabledException, ALinkException
 from .oauth import InvalidTokenException, AuthorizationException
 from .api import OnUserLogin
 from .util import _
@@ -94,11 +94,19 @@ def alink(request):
     if not request.env.auth.options['alink']:
         raise HTTPNotFound()
 
-    user = User.filter_by(alink_token=request.matchdict['token']).one()
+    try:
+        user = User.filter_by(alink_token=request.matchdict['token']).one()
+    except NoResultFound:
+        raise ALinkException(message=_(
+            "Failed to authenticate using the given authorization link. "
+            "Please check the link and contact the administrator."))
+
     if user.disabled:
         raise UserDisabledException()
+
     if user.is_administrator:
-        raise AuthorizationException(message="Administrator can not be authorized via link.")
+        raise ALinkException(message=_(
+            "Usage of authorization link is forbidden for administrators."))
 
     remember(request, (user.id, None))
 

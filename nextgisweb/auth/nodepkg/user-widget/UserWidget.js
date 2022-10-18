@@ -60,7 +60,7 @@ export function UserWidget({ id }) {
         if (settings.alink) {
             fields_.push({
                 name: "alink_token",
-                label: i18n.gettext("Link authorization"),
+                label: i18n.gettext("Authorization link"),
                 widget: UserWidgetAlinkToken,
             });
         }

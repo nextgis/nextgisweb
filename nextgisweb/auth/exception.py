@@ -15,4 +15,9 @@ class InvalidCredentialsException(UserException):
 
 class UserDisabledException(UserException):
     title = _("User is disabled")
-    http_status_code = 403
+    http_status_code = 401
+
+
+class ALinkException(UserException):
+    title = _("Invalid authorization link")
+    http_status_code = 401
