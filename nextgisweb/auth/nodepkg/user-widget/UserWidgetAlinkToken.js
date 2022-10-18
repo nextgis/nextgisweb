@@ -9,8 +9,8 @@ const modes = [
         value: "keep",
     },
     {
-        label: i18n.gettext("Generate new token"),
-        value: "generate",
+        label: i18n.gettext("Assign new"),
+        value: "assign",
     },
     {
         label: i18n.gettext("Turn off"),
@@ -27,7 +27,7 @@ const AlinkInput = ({ value, onChange }) => {
     const [mode, setMode] = useState(value === null ? "turn_off" : "keep");
 
     useEffect(() => {
-        if (mode === "generate") {
+        if (mode === "assign") {
             onChange(true);
         } else if (mode === "keep") {
             onChange(null);
