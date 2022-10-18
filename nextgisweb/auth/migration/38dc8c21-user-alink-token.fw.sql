@@ -4,4 +4,4 @@
     "message": "User alink token"
 } ***/
 
-ALTER TABLE auth_user ADD COLUMN alink_token character varying;
+ALTER TABLE auth_user ADD COLUMN alink_token character varying UNIQUE;

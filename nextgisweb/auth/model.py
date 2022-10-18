@@ -82,7 +82,7 @@ class User(Principal):
     password_hash = sa.Column(sa.Unicode)
     oauth_subject = sa.Column(sa.Unicode, unique=True)
     oauth_tstamp = sa.Column(sa.DateTime)
-    alink_token = sa.Column(sa.Unicode)
+    alink_token = sa.Column(sa.Unicode, unique=True)
     last_activity = sa.Column(sa.DateTime)
     language = sa.Column(sa.Unicode)
 
