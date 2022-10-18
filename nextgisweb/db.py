@@ -8,7 +8,7 @@ from sqlalchemy import func                 # NOQA
 from sqlalchemy import types                # NOQA
 
 from sqlalchemy import Enum as _Enum
-from sqlalchemy.dialects.postgresql import UUID as _UUID
+from sqlalchemy.dialects.postgresql import UUID as _UUID, JSONB  # NOQA
 
 import json as _json
 

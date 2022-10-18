@@ -228,7 +228,7 @@ class CoreComponent(
     def settings_get(self, component, name, default=NO_DEFAULT):
         try:
             obj = Setting.filter_by(component=component, name=name).one()
-            return json.loads(obj.value)
+            return obj.value
         except NoResultFound:
             if default is NO_DEFAULT:
                 raise KeyError("Setting %s.%s not found!" % (component, name))
@@ -240,7 +240,7 @@ class CoreComponent(
             obj = Setting.filter_by(component=component, name=name).one()
         except NoResultFound:
             obj = Setting(component=component, name=name).persist()
-        obj.value = json.dumps(value)
+        obj.value = value
 
     def settings_delete(self, component, name):
         try:

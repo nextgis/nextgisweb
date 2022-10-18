@@ -24,7 +24,7 @@ class Setting(Base):
 
     component = db.Column(db.Unicode, primary_key=True)
     name = db.Column(db.Unicode, primary_key=True)
-    value = db.Column(db.Unicode, nullable=False)
+    value = db.Column(db.JSONB, nullable=False)
 
 
 storage_stat_dimension = db.Table(
