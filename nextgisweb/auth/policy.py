@@ -8,8 +8,10 @@ from pyramid.interfaces import ISecurityPolicy
 from pyramid.authorization import ACLHelper
 from pyramid.httpexceptions import HTTPUnauthorized
 
+from ..lib import json
 from ..lib.config import OptionAnnotations, Option
-from ..pyramid import WebSession
+from ..models import DBSession
+from ..pyramid import SessionStore, WebSession
 
 from .model import User
 from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, UserDisabledException
@@ -165,6 +167,11 @@ class SecurityPolicy(object):
             request.add_response_callback(forget_session)
 
         return ()
+
+    def forget_user(self, user_id):
+        for session_kv in SessionStore.filter_by(key='auth.policy.current'):
+            if json.loads(session_kv.value)[1] == user_id:
+                DBSession.delete(session_kv.session)
 
     def authenticate_with_password(self, username, password):
         user = None

@@ -162,6 +162,7 @@ class AuthComponent(Component):
     def client_settings(self, request):
         enabled = (self.oauth is not None) and self.oauth.authorization_code
         return dict(
+            alink=self.options['alink'],
             oauth=dict(
                 enabled=enabled,
                 default=self.oauth.options['default'] if enabled else None,
@@ -310,6 +311,8 @@ class AuthComponent(Component):
     option_annotations = OptionAnnotations((
         Option('register', bool, default=False,
                doc="Allow user registration."),
+        Option('alink', bool, default=False,
+               doc="Allow authentication via link."),
 
         Option('login_route_name', default='auth.login',
                doc="Name of route for login page."),
