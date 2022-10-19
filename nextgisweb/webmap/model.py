@@ -1,10 +1,7 @@
-import json
-
 import geoalchemy2 as ga
 from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
-from sqlalchemy.types import TypeDecorator
 
 from .util import _
 from .. import db
@@ -213,29 +210,13 @@ class WebMapItem(Base):
                 setattr(self, a, data[a])
 
 
-class JSONTextType(TypeDecorator):
-    """ SA type decorator for JSON stored as text """
-
-    impl = db.Unicode
-
-    def process_bind_param(self, value, dialect):
-        if value is None:
-            return None
-        return json.dumps(value)
-
-    def process_result_value(self, value, dialect):
-        if not value:
-            return None
-        return json.loads(value)
-
-
 class WebMapAnnotation(Base):
     __tablename__ = 'webmap_annotation'
 
     id = db.Column(db.Integer, primary_key=True)
     webmap_id = db.Column(db.ForeignKey(WebMap.id), nullable=False)
     description = db.Column(db.Unicode)
-    style = db.Column(JSONTextType)
+    style = db.Column(db.JSONB)
     geom = db.Column(ga.Geometry(dimension=2, srid=3857), nullable=False)
     public = db.Column(db.Boolean, nullable=False, default=True)
     user_id = db.Column(db.ForeignKey(User.id), nullable=True)

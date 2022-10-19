@@ -472,7 +472,7 @@ class OAuthToken(Base):
     id = db.Column(db.Unicode, primary_key=True)
     exp = db.Column(db.DateTime, nullable=False)
     sub = db.Column(db.Unicode, nullable=False)
-    data = db.Column(db.JSONText, nullable=False)
+    data = db.Column(db.JSONB, nullable=False)
 
     def check_expiration(self):
         if self.exp < datetime.utcnow():

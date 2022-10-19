@@ -10,8 +10,6 @@ from sqlalchemy import types                # NOQA
 from sqlalchemy import Enum as _Enum
 from sqlalchemy.dialects.postgresql import UUID as _UUID, JSONB  # NOQA
 
-import json as _json
-
 
 class Enum(_Enum):
     """ sqlalchemy.Enum wrapped with native_enum=False pre-installed"""
@@ -40,13 +38,3 @@ class UUID(_UUID):
         if 'as_uuid' not in kwargs:
             kwargs['as_uuid'] = True
         super().__init__(*args, **kwargs)
-
-
-class JSONText(types.TypeDecorator):
-    impl = types.Unicode
-
-    def process_bind_param(self, value, dialect):
-        return _json.dumps(value)
-
-    def process_result_value(self, value, dialect):
-        return _json.loads(value)
