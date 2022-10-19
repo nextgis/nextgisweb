@@ -5,7 +5,6 @@ import platform
 import sys
 import tempfile
 import io
-import json
 import re
 import uuid
 import warnings
@@ -34,6 +33,7 @@ from .. import db
 from ..component import Component
 from ..lib.config import Option
 from ..lib.config.otype import SizeInBytes
+from ..lib import json
 from ..lib.logging import logger
 from ..models import DBSession
 from ..i18n import Localizer, Translations
@@ -90,6 +90,8 @@ class CoreComponent(
         opt_db = self.options.with_prefix('database')
         lock_timeout_ms = int(opt_db['lock_timeout'].total_seconds() * 1000)
         args = dict(
+            json_serializer=json.dumps,
+            json_deserializer=json.loads,
             connect_args=dict(
                 connect_timeout=int(opt_db['connect_timeout'].total_seconds()),
                 options='-c lock_timeout=%d' % lock_timeout_ms,
