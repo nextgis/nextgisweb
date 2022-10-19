@@ -12,6 +12,7 @@ Changes
 - Fields selection while exporting featrue layer.
 - Search by coordinates on web maps.
 - CSV and XLSX support when creating a vector layer.
+- User sessions clearing when changing login or password.
 
 
 4.2.0
