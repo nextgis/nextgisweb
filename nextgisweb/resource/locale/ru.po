@@ -444,7 +444,7 @@ msgstr "Показать размер ресурсов"
 
 #: nodepkg/children-section/ChildrenSection.js:259
 msgid "Hide resource creation date"
-msgstr "Сурыть дату создания ресурса"
+msgstr "Скрыть дату создания ресурса"
 
 #: nodepkg/children-section/ChildrenSection.js:260
 msgid "Show resource creation date"
