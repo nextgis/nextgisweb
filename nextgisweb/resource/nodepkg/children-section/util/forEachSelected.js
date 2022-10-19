@@ -13,7 +13,9 @@ export async function forEachSelected({
     setInProgress,
     title = titleMsg,
 }) {
-    setInProgress(true);
+    if (setInProgress) {
+        setInProgress(true);
+    }
     const abortControl = new AbortController();
     const signal = abortControl.signal;
     const progressModal = showProgressModal({
@@ -54,6 +56,8 @@ export async function forEachSelected({
     } catch (err) {
         errorModal(err);
     } finally {
-        setInProgress(false);
+        if (setInProgress) {
+            setInProgress(false);
+        }
     }
 }

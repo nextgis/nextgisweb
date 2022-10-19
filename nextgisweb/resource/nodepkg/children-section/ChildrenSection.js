@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import MoreVertIcon from "@material-icons/svg/more_vert";
 import PriorityHighIcon from "@material-icons/svg/priority_high";
 import {
@@ -7,10 +8,11 @@ import {
     message,
     Modal,
     Table,
-    Tooltip
+    Tooltip,
 } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 
+import { utc } from "@nextgisweb/gui/dayjs";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
@@ -120,15 +122,16 @@ async function loadVolumes(data, setState) {
 
 export function ChildrenSection({ data, storageEnabled, resourceId }) {
     const [volumeVisible, setVolumeVisible] = useState(false);
+    const [creationDateVisible, setCreationDateVisible] = useState(false);
     const [batchDeletingInProgress, setBatchDeletingInProgress] =
         useState(false);
-    const [batchMoveInProgress, setBatchMoveInProgress] = useState(false);
+
     const [allowBatch, setAllowBatch] = useState(false);
     const [volumeValues, setVolumeValues] = useState({});
     const [items, setItems] = useState([...data]);
     const [selected, setSelected] = useState([]);
 
-    const selectedAllowefForDelete = useMemo(() => {
+    const selectedAllowedForDelete = useMemo(() => {
         const allowedToDelete = [];
 
         for (const item of items) {
@@ -175,7 +178,6 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
             title: i18n.gettext("Moving resources"),
             setItems,
             setSelected,
-            setInProgress: setBatchMoveInProgress,
             selected,
             executer: ({ selectedItem, signal }) =>
                 route("resource.item", selectedItem).put({
@@ -206,10 +208,10 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
             setItems,
             setSelected,
             setInProgress: setBatchDeletingInProgress,
-            selected: selectedAllowefForDelete,
+            selected: selectedAllowedForDelete,
             executer: ({ selectedItem, signal }) =>
                 route("resource.item", selectedItem).delete({ signal }),
-            onComplate: (successItems, errorItems) => {
+            onComplate: (successItems) => {
                 if (successItems.length) {
                     notifySuccessfulDeletion(successItems.length);
                 }
@@ -252,19 +254,27 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 },
             });
         }
+        menuItems_.push({
+            label: creationDateVisible
+                ? i18n.gettext("Hide resource creation date")
+                : i18n.gettext("Show resource creation date"),
+            onClick: () => {
+                setCreationDateVisible(!creationDateVisible);
+            },
+        });
         if (allowBatch) {
             // Batch delete
             const checkNotAllForDelete =
-                selectedAllowefForDelete.length < selected.length &&
-                selectedAllowefForDelete.length > 0;
+                selectedAllowedForDelete.length < selected.length &&
+                selectedAllowedForDelete.length > 0;
             const deleteOperationConfig = {
                 label: (
                     <>
                         {i18n.gettext("Delete")}{" "}
-                        {selectedAllowefForDelete.length > 0 && (
+                        {selectedAllowedForDelete.length > 0 && (
                             <Badge
                                 size="small"
-                                count={selectedAllowefForDelete.length}
+                                count={selectedAllowedForDelete.length}
                             />
                         )}{" "}
                         {checkNotAllForDelete && (
@@ -278,7 +288,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                         )}
                     </>
                 ),
-                disabled: !selectedAllowefForDelete.length,
+                disabled: !selectedAllowedForDelete.length,
                 onClick: () => confirmThenDelete(deleteSelected),
             };
 
@@ -312,7 +322,12 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
             menuItems_.push(...batchOperations);
         }
         return menuItems_;
-    }, [allowBatch, selectedAllowefForDelete]);
+    }, [
+        allowBatch,
+        selectedAllowedForDelete,
+        creationDateVisible,
+        volumeVisible,
+    ]);
 
     const MenuDropdown = () => {
         const menu = <Menu items={menuItems} />;
@@ -362,6 +377,21 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                     dataIndex="ownerUserDisplayName"
                     sorter={sorterFactory("ownerUserDisplayName")}
                 />
+                {creationDateVisible && (
+                    <Column
+                        title={i18n.gettext("Created")}
+                        responsive={["xl"]}
+                        className="creationDate"
+                        dataIndex="creationDate"
+                        sorter={sorterFactory("creationDate")}
+                        render={(text) => {
+                            if (text) {
+                                return utc(text).local().format("L LTS");
+                            }
+                            return "";
+                        }}
+                    />
+                )}
                 {storageEnabled && volumeVisible && (
                     <Column
                         title={i18n.gettext("Volume")}
@@ -390,3 +420,9 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         </div>
     );
 }
+
+ChildrenSection.propTypes = {
+    data: PropTypes.arrayOf(PropTypes.object),
+    resourceId: PropTypes.number,
+    storageEnabled: PropTypes.bool,
+};

@@ -13,7 +13,7 @@
             continue
         idata = dict(
             id=item.id, displayName=item.display_name, link=item.permalink(request),
-            cls=item.cls, clsDisplayName=tr(item.cls_display_name),
+            cls=item.cls, clsDisplayName=tr(item.cls_display_name), creationDate=item.creation_date,
             ownerUserDisplayName=item.owner_user.display_name)
         
         iacts = idata["actions"] = list()
