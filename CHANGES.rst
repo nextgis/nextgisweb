@@ -12,7 +12,11 @@ Changes
 - Fields selection while exporting featrue layer.
 - Search by coordinates on web maps.
 - CSV and XLSX support when creating a vector layer.
-- User sessions clearing when changing login or password.
+- Ability to download all attachments of a vector layer.
+- Vector layer export to KML and KMZ formats.
+- Support for fixed length ``character`` columns for PostGIS layers.
+- Automatic logout when changing user password or login.
+- Experimental support for authorization links.
 
 
 4.2.0
