@@ -1,6 +1,6 @@
-import i18n from "@nextgisweb/pyramid/i18n!resource";
-import { showProgressModal } from "@nextgisweb/gui/progress-modal";
 import { errorModal } from "@nextgisweb/gui/error";
+import { showProgressModal } from "@nextgisweb/gui/progress-modal";
+import i18n from "@nextgisweb/pyramid/i18n!resource";
 
 const titleMsg = i18n.gettext("Operation in progress");
 

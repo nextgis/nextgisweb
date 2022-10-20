@@ -1,6 +1,8 @@
-import PropTypes from "prop-types";
 import MoreVertIcon from "@material-icons/svg/more_vert";
 import PriorityHighIcon from "@material-icons/svg/priority_high";
+import PropTypes from "prop-types";
+import { useEffect, useMemo, useState } from "react";
+
 import {
     Badge,
     Dropdown,
@@ -10,19 +12,19 @@ import {
     Table,
     Tooltip,
 } from "@nextgisweb/gui/antd";
-import { errorModal } from "@nextgisweb/gui/error";
-
 import { utc } from "@nextgisweb/gui/dayjs";
+import { errorModal } from "@nextgisweb/gui/error";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
-import { useEffect, useMemo, useState } from "react";
+
 import { showResourcePicker } from "../resource-picker";
 import { createResourceTableItemOptions } from "../resource-picker/util/createResourceTableItemOptions";
-import "./ChildrenSection.less";
 import { forEachSelected } from "./util/forEachSelected";
+
+import "./ChildrenSection.less";
 
 const { Column } = Table;
 
@@ -385,8 +387,12 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                         dataIndex="creationDate"
                         sorter={sorterFactory("creationDate")}
                         render={(text) => {
-                            if (text) {
-                                return utc(text).local().format("L LTS");
+                            if (text && !text.startsWith('1970')) {
+                                return (
+                                    <div style={{ whiteSpace: "nowrap" }}>
+                                        {utc(text).local().format("L LTS")}
+                                    </div>
+                                );
                             }
                             return "";
                         }}
