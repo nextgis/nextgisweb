@@ -1085,6 +1085,7 @@ To get features using filters execute the following request:
    :param geom_format: ``geojson`` - output geometry in geojson format instead of WKT
    :param srs: EPSG code - reproject geometry to EPSG
    :param geom: yes - return geometry, no - don't return geometry (defaults yes)
+   :param dt_format: iso - return date, time, timestamp in ISO format, obj - return date, time, timestamp as JSON object (default obj)
    :param extensions: comma separated list of extensions. Available ``description`` and ``attachments``. Defaults to ``description,attachments`` 
    :>jsonarray features: features array
    :statuscode 200: no error
