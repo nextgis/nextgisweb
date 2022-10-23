@@ -26,7 +26,6 @@ export function ResourcePickerModal({
     disabledIds,
     closeOnSelect = true,
     getSelectedMsg,
-    allowCreateResourceBtn = true,
     ...props
 }) {
     const [visible, setVisible] = useState(props.visible ?? true);
@@ -65,7 +64,7 @@ export function ResourcePickerModal({
         <Modal
             {...DEFAULTS}
             {...props}
-            visible={visible}
+            open={visible}
             destroyOnClose
             className="resource-picker-modal"
             bodyStyle={{
@@ -99,11 +98,14 @@ export function ResourcePickerModal({
 }
 
 ResourcePickerModal.propTypes = {
-    onSelect: PropTypes.func,
-    getThisMsg: PropTypes.string,
-    resourceId: PropTypes.number,
-    disabledIds: PropTypes.arrayOf(PropTypes.number),
+    visible: PropTypes.bool,
     closeOnSelect: PropTypes.bool,
+    disabledIds: PropTypes.arrayOf(PropTypes.number),
+    enabledCls: PropTypes.array,
     getSelectedMsg: PropTypes.string,
-    allowCreateResourceBtn: PropTypes.bool,
+    getThisMsg: PropTypes.string,
+    onNewGroup: PropTypes.any,
+    onSelect: PropTypes.func,
+    resourceId: PropTypes.number,
+    showCls: PropTypes.array,
 };

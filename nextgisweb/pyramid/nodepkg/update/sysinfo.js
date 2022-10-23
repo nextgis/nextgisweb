@@ -1,9 +1,9 @@
 /** @entrypoint */
-import { useState, useEffect } from "react";
 import { Button, Modal } from "@nextgisweb/gui/antd";
-import { registerCallback, notesUrl } from ".";
 import i18n from "@nextgisweb/pyramid/i18n!pyramid";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
+import { useEffect, useState } from "react";
+import { notesUrl, registerCallback } from ".";
 import "./sysinfo.less";
 
 export default function UpdateSysInfo() {
@@ -31,19 +31,19 @@ export default function UpdateSysInfo() {
     const res = !loaded
         ? i18n.gettext("Checking for updates...")
         : /* prettier-ignore */ (hasUpdate
-              ? isCritical
-                  ? i18n.gettext("Critical updates are available: {version}. Please consider updating an soon as possible.")
-                  : i18n.gettext("New version of {distribution} is available: {version}.")
-              : i18n.gettext("Your {distribution} is up-to-date.")
-          )
-              .replace("{distribution}", ngwConfig.distribution.description)
-              .replace("{version}", latestVersion);
+            ? isCritical
+                ? i18n.gettext("Critical updates are available: {version}. Please consider updating an soon as possible.")
+                : i18n.gettext("New version of {distribution} is available: {version}.")
+            : i18n.gettext("Your {distribution} is up-to-date.")
+        )
+            .replace("{distribution}", ngwConfig.distribution.description)
+            .replace("{version}", latestVersion);
 
     const [mUpdPre, mUpdLnk, mUpdPost] = hasUpdate
         ? i18n
-              .gettext("<a>Contact support</a> for update.")
-              .match(/(.*)<a>(.*)<\/a>(.*)/)
-              .slice(1)
+            .gettext("<a>Contact support</a> for update.")
+            .match(/(.*)<a>(.*)<\/a>(.*)/)
+            .slice(1)
         : [null, null, null];
 
     const showDetails = () => setDetailsVisible(true);
@@ -61,7 +61,7 @@ export default function UpdateSysInfo() {
                 {hasUpdate && (
                     <div>
                         {mUpdPre}
-                        <a href={settings.support_url} target="_blank">
+                        <a href={settings.support_url} target="_blank" rel="noreferrer">
                             {mUpdLnk}
                         </a>
                         {mUpdPost}
@@ -75,7 +75,7 @@ export default function UpdateSysInfo() {
                     </Button>
                     <Modal
                         wrapClassName="ngw-pyramid-update-sysinfo-modal"
-                        visible={detailsVisible}
+                        open={detailsVisible}
                         title={ngwConfig.distribution.description}
                         footer={false}
                         width="60em"

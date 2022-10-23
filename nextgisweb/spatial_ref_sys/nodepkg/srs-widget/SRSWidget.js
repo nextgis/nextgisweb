@@ -4,7 +4,7 @@ import { ModelForm } from "@nextgisweb/gui/model-form";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!";
 import { PropTypes } from "prop-types";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import getMessages from "../srsMessages";
 import { modelObj } from "../srsModel";
 import { SRSImportFrom } from "./SRSImportForm";
@@ -113,7 +113,7 @@ export function SRSWidget({ id }) {
             </ModelForm>
             <Modal
                 title={<Title />}
-                visible={isModalVisible}
+                open={isModalVisible}
                 onOk={handleOk}
                 onCancel={handleCancel}
             >

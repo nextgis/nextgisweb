@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState } from "react";
 import { observer } from "mobx-react";
 import { Drawer } from "@nextgisweb/gui/antd";
 import { layoutStore } from "./store";
@@ -6,11 +6,13 @@ import CircleIcon from "@material-icons/svg/circle";
 import MenuIcon from "@material-icons/svg/menu";
 import "./Menu.less";
 
-export const Menu = observer(({ state }) => {
+const MenuItem = observer(({ title, ...rest }) => <a {...rest}>{title}</a>);
+
+export const Menu = observer(() => {
     const [visible, setVisible] = useState(false);
 
     return (
-        <Fragment>
+        <>
             <div
                 className="ngw-pyramid-menu-icon"
                 onClick={() => setVisible(true)}
@@ -26,15 +28,14 @@ export const Menu = observer(({ state }) => {
             </div>
             <Drawer
                 placement="right"
-                visible={visible}
+                open={visible}
                 onClose={() => setVisible(false)}
                 className="ngw-pyramid-menu-drawer"
             >
-                {layoutStore.menuItems.map((itm) => {
-                    const { title, ...rest } = itm;
-                    return <a {...rest}>{title}</a>;
-                })}
+                {layoutStore.menuItems.map((item, i) => (
+                    <MenuItem key={i} {...item} />
+                ))}
             </Drawer>
-        </Fragment>
+        </>
     );
 });
