@@ -1,3 +1,5 @@
+const babelConfigPath = require.resolve('@nextgisweb/jsrealm/babelrc.cjs');
+
 module.exports = {
     root: true,
     plugins: ["requirejs", "react"],
@@ -65,9 +67,13 @@ module.exports = {
                 browser: true,
                 es2020: true,
             },
+            parser: "@babel/eslint-parser",
             parserOptions: {
                 sourceType: "module",
                 jsx: true,
+                babelOptions: {
+                    configFile: babelConfigPath,
+                },
             },
         },
         {

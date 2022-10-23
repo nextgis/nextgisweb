@@ -12,7 +12,19 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
-const { IconResolverPlugin, iconSymbolId } = require('./icon-util.cjs');
+const babelOptions = require("./babelrc.cjs");
+const presetEnvOptIndex = babelOptions.presets.findIndex(
+    (item) => typeof item[0] === "string" && item[0] === "@babel/preset-env"
+);
+if (presetEnvOptIndex !== -1) {
+    const presetEnvOpt = babelOptions.presets[presetEnvOptIndex];
+    if (presetEnvOpt && typeof presetEnvOpt[1] === 'object') {
+        presetEnvOpt[1].targets = config.targets;
+        babelOptions.presets[presetEnvOptIndex] = presetEnvOpt
+    }
+}
+
+const { IconResolverPlugin, iconSymbolId } = require("./icon-util.cjs");
 
 function scanForEntrypoints(pkg) {
     const result = [];
@@ -187,31 +199,9 @@ for (const [comp, dir] of config.iconSources) {
 const spriteModuleFile = tmp.fileSync({ postfix: ".js" }).name;
 fs.writeFileSync(spriteModuleFile, spriteCode);
 
-
 const babelLoader = {
     loader: "babel-loader",
-    options: {
-        sourceType: "unambiguous",
-        presets: [
-            ["@babel/preset-typescript", {}],
-            [
-                "@babel/preset-react",
-                {
-                    "runtime": "automatic",
-                },
-            ],
-            [
-                "@babel/preset-env",
-                {
-                    // debug: config.debug,
-                    corejs: { version: 3 },
-                    useBuiltIns: "usage",
-                    targets: config.targets,
-                },
-            ],
-        ],
-        plugins: ["@babel/plugin-transform-runtime"],
-    }
+    options: babelOptions,
 };
 
 const svgSpriteLoader = {
