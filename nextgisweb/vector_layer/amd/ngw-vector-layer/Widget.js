@@ -1,13 +1,12 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
-    "dojo/request/xhr",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/ContentPane",
+    "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
-    "ngw/route",
-    "ngw-pyramid/ErrorDialog/ErrorDialog",
+    "@nextgisweb/gui/error",
     "ngw-resource/serialize",
     "ngw-spatial-ref-sys/SRSSelect",
     // resource
@@ -23,13 +22,12 @@ define([
 ], function (
     declare,
     lang,
-    xhr,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     ContentPane,
+    api,
     i18n,
-    route,
-    ErrorDialog,
+    error,
     serialize,
     SRSSelect,
     template,
@@ -76,21 +74,17 @@ define([
 
             this.wSourceFile.on("complete", function () {
                 var upload_meta = this.wSourceFile.get("value");
-                xhr.post(route.vector_layer.dataset(), {
-                    handleAs: "json",
-                    headers: { "Content-Type": "application/json" },
-                    data: JSON.stringify({
-                        source: upload_meta
-                    })
-                }).then(function (data) {
+                api.route('vector_layer.dataset').post({
+                    json: { source: upload_meta }
+                }).then(lang.hitch(this, function(data) {
                     var layers = data.layers;
 
                     if (layers.length === 0) {
                         this._resetSouce();
-                        new ErrorDialog({
+                        error.errorModal({
                             title: i18n.gettext("Validation error"),
                             message: i18n.gettext("Dataset doesn't contain layers.")
-                        }).show();
+                        });
                     } else {
                         var options = [];
                         layers.forEach(function (layer) {
@@ -99,10 +93,10 @@ define([
                         this.wSourceLayer.set("options", options);
                         this.wSourceLayer.set("value", layers[0]);
                     }
-                }.bind(this), function (error) {
+                }), lang.hitch(this, function(err) {
                     this._resetSouce();
-                    ErrorDialog.xhrError(error);
-                }.bind(this));
+                    error.errorModal(err);
+                }))
             }.bind(this));
 
             this.wFIDSource.watch('value', function(attr, oldval, newval) {
