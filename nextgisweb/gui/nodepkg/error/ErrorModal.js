@@ -10,15 +10,15 @@ const DEFAULTS = {
     maskTransitionName: "",
 };
 
-export function ErrorModal({ error, ...props }) {
-    const [visible, setVisible] = useState(props.visible ?? true);
+export function ErrorModal({ error, visible: visibleInitial, ...props }) {
+    const [visible, setVisible] = useState(visibleInitial ?? true);
     const tinfoState = useState(false);
 
     const close = () => setVisible(false);
 
     useEffect(() => {
-        setVisible(props.visible);
-    }, [props.visible]);
+        setVisible(visibleInitial);
+    }, [visibleInitial]);
 
     return (
         <Modal
