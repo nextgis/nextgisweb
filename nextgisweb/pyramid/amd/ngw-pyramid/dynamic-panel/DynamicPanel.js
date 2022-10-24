@@ -37,12 +37,22 @@ define([
         withCloser: true,
         withOverlay: false,
         withTitle: true,
+        
+        makeComp: undefined,
+        options: undefined,
+
         constructor: function (options) {
-            declare.safeMixin(this,options);
+            this.options = options;
+            declare.safeMixin(this, options);
         },
+
         postCreate: function(){
             if (this.contentWidget)
                 this.contentWidget.placeAt(this.contentNode);
+            
+            if (this.makeComp && this.makeComp instanceof Function) {
+                this.makeComp(this.contentNode, this.options);
+            }
 
             if (this.isOpen) this.show();
 
@@ -56,20 +66,33 @@ define([
                 domClass.add(this.domNode, "dynamic-panel--notitle");
             }
         },
-        show: function(){
+
+        show: function() {
             this.isOpen = true;
             this.domNode.style.display = "block";
             if (this.overlay) this.overlay.style.display = "block";
             if (this.getParent()) this.getParent().resize();
+            
+            if (this.makeComp && this.makeComp instanceof Function) {
+                this.makeComp(this.contentNode, this.options);
+            }
+            
             this.emit("shown");
         },
-        hide: function(){
+
+        hide: function() {
             this.isOpen = false;
             this.domNode.style.display = "none";
             if (this.getParent()) this.getParent().resize();
             if (this.overlay) this.overlay.style.display = "none";
+
+            if (this.makeComp && this.makeComp instanceof Function) {
+                this.makeComp(this.contentNode, this.options);
+            }
+            
             this.emit("closed");
         },
+
         _createCloser: function(){
             this.closer = domConstruct.create("span", {
                 class: "dynamic-panel__closer",
@@ -81,6 +104,7 @@ define([
                this.hide();
             }));
         },
+
         _createOverlay: function(){
             this.overlay = domConstruct.create("div", {
                 class: "overlay"

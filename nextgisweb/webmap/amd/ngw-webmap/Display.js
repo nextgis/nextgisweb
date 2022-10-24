@@ -436,7 +436,6 @@ define([
             // Share panel
             all([widget._layersDeferred, widget._postCreateDeferred]).then(
                 function () {
-                    var itemStoreListener;
                     widget.sharePanel = new SharePanel({
                         region: 'left',
                         class: "dynamic-panel--fullwidth",
@@ -445,28 +444,22 @@ define([
                         gutters: false,
                         withCloser: true,
                         socialNetworks: settings.enable_social_networks,
-                        display: widget
-                    });
-
-                    var setPermalinkUrl = lang.hitch(widget.sharePanel, widget.sharePanel.setPermalinkUrl),
-                        setEmbedCode = lang.hitch(widget.sharePanel, widget.sharePanel.setEmbedCode);
-
-                    widget.sharePanel.on("shown", function () {
-                        widget.map.olMap.getView().on("change", setPermalinkUrl);
-                        widget.map.olMap.getView().on("change", setEmbedCode);
-                        itemStoreListener = widget.itemStore.on("Set", function (item, attr) {
-                            widget.sharePanel.setPermalinkUrl();
-                            widget.sharePanel.setEmbedCode();
-                        });
+                        display: widget,
+                        eventVisibility: undefined
                     });
 
                     widget.sharePanel.on("closed", function () {
                         widget.navigationMenu.reset();
-                        widget.map.olMap.getView().un("change", setPermalinkUrl);
-                        widget.map.olMap.getView().un("change", setEmbedCode);
-                        if (itemStoreListener) itemStoreListener.remove();
                     });
 
+                    widget.sharePanel.on("pre-show", function () {
+                        widget.sharePanel.options.eventVisibility = "pre-show";
+                    });
+
+                    widget.sharePanel.on("pre-hide", function () {
+                        widget.sharePanel.options.eventVisibility = "pre-hide";
+                    });
+                    
                     if (widget.activeLeftPanel === "sharePanel") {
                         widget.activatePanel(widget.sharePanel);
                     }
