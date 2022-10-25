@@ -1,10 +1,13 @@
+import re
 from io import BytesIO
 from zipfile import ZipFile, ZIP_DEFLATED
 from tempfile import NamedTemporaryFile
+from itertools import count
 
 from PIL import Image
 from pyramid.response import Response, FileResponse
 
+from ..lib.json import dumpb
 from ..resource import DataScope, resource_factory
 from ..env import env
 from ..models import DBSession
@@ -155,12 +158,44 @@ def export(resource, request):
     query = FeatureAttachment.filter_by(resource_id=resource.id) \
         .order_by(FeatureAttachment.feature_id, FeatureAttachment.id)
 
+    metadata = dict()
+    metadata_items = metadata['items'] = dict()
+
     with NamedTemporaryFile(suffix=".zip") as tmp_file:
         with ZipFile(tmp_file, "w", ZIP_DEFLATED, allowZip64=True) as zipf:
+            current_feature_id = None
+            feature_anames = set()
+
             for obj in query:
+                if obj.feature_id != current_feature_id:
+                    feature_anames = set()
+                    current_feature_id = obj.feature_id
+
+                name = obj.name
+                if name in feature_anames:
+                    # Make attachment's name unique
+                    (base, suffix) = re.match(
+                        r'(.*?)((?:\.[a-z0-9_]+)+)$',
+                        name, re.IGNORECASE).groups()
+                    for idx in count(1):
+                        candidate = f'{base}.{idx}{suffix}'
+                        if candidate not in feature_anames:
+                            name = candidate
+                            break
+
+                feature_anames.add(name)
+                arcname = f'{obj.feature_id:010d}/{name}'
+
+                metadata_item = metadata_items[arcname] = dict(
+                    id=obj.id, feature_id=obj.feature_id,
+                    name=obj.name, mime_type=obj.mime_type)
+                if obj.description is not None:
+                    metadata_item['description'] = obj.description
+
                 fn = env.file_storage.filename(obj.fileobj)
-                arcname = f'{obj.feature_id:010d}/{obj.id:010d}-{obj.name}'
                 zipf.write(fn, arcname=arcname)
+
+            zipf.writestr('metadata.json', dumpb(metadata))
 
         response = FileResponse(tmp_file.name, content_type='application/zip')
         response.content_disposition = 'attachment; filename="%d.attachments.zip"' % resource.id
