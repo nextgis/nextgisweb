@@ -80,7 +80,7 @@ def diagnostics(request):
                 'geometry_type', 'geometry_srid', 'fields')}
 
             if connection is None:
-                connection = dict(id=res.id)
+                connection = dict(id=res.connection_id)
 
     if cid := connection.get('id'):
         try:
