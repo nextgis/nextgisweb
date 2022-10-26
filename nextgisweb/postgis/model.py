@@ -4,8 +4,9 @@ from contextlib import contextmanager
 import geoalchemy2 as ga
 import sqlalchemy.sql as sql
 from shapely.geometry import box
-from sqlalchemy import select, text, func
-from sqlalchemy.exc import OperationalError, SQLAlchemyError
+from sqlalchemy import func, select, text
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
@@ -222,15 +223,12 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.feature_label_field = None
 
         with self.connection.get_connection() as conn:
-            result = conn.execute(text(
-                """SELECT * FROM information_schema.tables
-                WHERE table_schema = :s AND table_name = :t"""),
-                dict(s=self.schema, t=self.table))
-
-            tableref = '%s.%s' % (self.schema, self.table)
-
-            if result.first() is None:
-                raise ValidationError(_("Table '%(table)s' not found!") % dict(table=tableref)) # NOQA
+            inspector = db.inspect(conn.engine)
+            try:
+                columns = inspector.get_columns(self.table, self.schema)
+            except NoSuchTableError:
+                raise ValidationError(_("Table '%(table)s' not found!") %
+                                      dict(table=f'{self.schema}.{self.table}'))
 
             result = conn.execute(text(
                 """SELECT type, coord_dimension, srid FROM geometry_columns
@@ -239,9 +237,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                     AND f_geometry_column = :column"""),
                 dict(s=self.schema, t=self.table, column=self.column_geom))
 
-            row = result.mappings().first()
-
-            if row:
+            if row := result.mappings().first():
                 geometry_srid = row['srid']
 
                 if geometry_srid == 0 and self.geometry_srid is None:
@@ -278,54 +274,47 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 if self.geometry_type is None:
                     self.geometry_type = tab_geom_type
 
-            result = conn.execute(text(
-                """SELECT column_name, data_type
-                FROM information_schema.columns
-                WHERE table_schema = :s AND table_name = :t
-                ORDER BY ordinal_position"""),
-                dict(s=self.schema, t=self.table))
-
             colfound_id = False
             colfound_geom = False
 
-            for row in result.mappings():
-                if row['column_name'] == self.column_id:
-                    if row['data_type'] not in ['integer', 'bigint']:
+            for column in columns:
+                if column['name'] == self.column_id:
+                    if not isinstance(column['type'], db.Integer):
                         raise ValidationError(_("To use column as ID it should have integer type!"))  # NOQA
                     colfound_id = True
 
-                elif row['column_name'] == self.column_geom:
+                elif column['name'] == self.column_geom:
                     colfound_geom = True
 
-                elif row['column_name'] in FIELD_FORBIDDEN_NAME:
+                elif column['name'] in FIELD_FORBIDDEN_NAME:
                     # TODO: Currently id and geom fields break vector layer. We should fix it!
                     pass
 
                 else:
-                    if row['data_type'] == 'integer':
-                        datatype = FIELD_TYPE.INTEGER
-                    elif row['data_type'] == 'bigint':
+                    if isinstance(column['type'], db.BigInteger):
                         datatype = FIELD_TYPE.BIGINT
-                    elif row['data_type'] in ('double precision', 'numeric'):
+                    elif isinstance(column['type'], db.Integer):
+                        datatype = FIELD_TYPE.INTEGER
+                    elif isinstance(column['type'], db.Numeric):
                         datatype = FIELD_TYPE.REAL
-                    elif row['data_type'] in ('character varying', 'character', 'text', 'uuid'):
+                    elif isinstance(column['type'], (db.String, UUID)):
                         datatype = FIELD_TYPE.STRING
-                    elif row['data_type'] == 'date':
+                    elif isinstance(column['type'], db.Date):
                         datatype = FIELD_TYPE.DATE
-                    elif re.match('^time(?!stamp)', row['data_type']):
+                    elif isinstance(column['type'], db.Time):
                         datatype = FIELD_TYPE.TIME
-                    elif re.match('^timestamp', row['data_type']):
+                    elif isinstance(column['type'], db.DateTime):
                         datatype = FIELD_TYPE.DATETIME
                     else:
-                        logger.warning(f"Column type '{row['data_type']}' is not supported.")
+                        logger.warning(f"Column type '{column['type']}' is not supported.")
                         continue
 
-                    fopts = dict(display_name=row['column_name'])
-                    fopts.update(fdata.get(row['column_name'], dict()))
+                    fopts = dict(display_name=column['name'])
+                    fopts.update(fdata.get(column['name'], dict()))
                     self.fields.append(PostgisLayerField(
-                        keyname=row['column_name'],
+                        keyname=column['name'],
                         datatype=datatype,
-                        column_name=row['column_name'],
+                        column_name=column['name'],
                         **fopts))
 
             if not colfound_id:
