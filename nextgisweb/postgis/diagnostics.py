@@ -3,6 +3,7 @@ from socket import gethostbyname, gaierror
 
 import geoalchemy2 as ga
 from sqlalchemy import func, inspect, select, sql
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.engine import Connection, URL as EngineURL, create_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy.types import (
@@ -27,7 +28,7 @@ _FIELD_TYPE_2_DB = {
     FIELD_TYPE.INTEGER: Integer,
     FIELD_TYPE.BIGINT: BigInteger,
     FIELD_TYPE.REAL: Numeric,
-    FIELD_TYPE.STRING: String,
+    FIELD_TYPE.STRING: (String, UUID),
     FIELD_TYPE.DATE: Date,
     FIELD_TYPE.TIME: Time,
     FIELD_TYPE.DATETIME: DateTime,
