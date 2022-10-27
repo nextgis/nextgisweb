@@ -171,7 +171,7 @@ class PyramidComponent(Component):
         Option('help_page.enabled', bool, default=True),
         Option('help_page.url', default="https://nextgis.com/redirect/{lang}/help/"),
 
-        Option('favicon', default=resource_filename('nextgisweb', 'static/img/favicon.ico')),
+        Option('favicon', default=resource_filename('nextgisweb', 'pyramid/asset/favicon.ico')),
         Option('company_url', default="https://nextgis.com"),
         Option('desktop_gis_example', default='NextGIS QGIS'),
         Option('nextgis_external_docs_links', default=True),

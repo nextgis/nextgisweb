@@ -22,7 +22,6 @@
     ngwConfig = {
         "debug": request.env.core.debug,
         "applicationUrl": request.application_url,
-        "assetUrl": request.static_url('nextgisweb:static/'),
         "amdUrl": request.route_url('amd_package', subpath=""),
         "distUrl": request.route_url('jsrealm.dist', subpath=''),
         "staticKey": request.env.pyramid.static_key[1:],

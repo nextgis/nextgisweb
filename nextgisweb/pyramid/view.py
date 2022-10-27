@@ -29,6 +29,25 @@ from .session import WebSession
 from .util import _, ErrorRendererPredicate, StaticFileResponse, set_output_buffering
 
 
+def asset(request):
+    component = request.matchdict['component']
+    subpath = request.matchdict['subpath']
+
+    try:
+        comp_obj = env._components[component]
+    except KeyError:
+        raise HTTPNotFound()
+
+    package, rest = comp_obj.__class__.__module__.split('.', 1)
+    rest = rest.replace('.', '/')
+
+    fn = resource_filename(package, rest + '/asset/' + '/'.join(subpath))
+    if os.path.isfile(fn):
+        return FileResponse(fn, request=request, cache_max_age=3600)
+    else:
+        raise HTTPNotFound()
+
+
 def static_amd_file(request):
     subpath = request.matchdict['subpath']
     if len(subpath) == 0:
@@ -371,9 +390,14 @@ def setup_pyramid(comp, config):
         comp.static_key = '/' + package_hash.hexdigest()[:8]
         logger.debug("Using package based static key '%s'", comp.static_key[1:])
 
-    config.add_static_view(
-        '/static{}/asset'.format(comp.static_key),
-        'nextgisweb:static', cache_max_age=3600)
+    # Component asset handler
+
+    config.add_route(
+        'pyramid.asset',
+        f'/static{comp.static_key}/asset/{{component}}/*subpath',
+    ).add_view(asset, request_method='GET')
+
+    # AMD package handler
 
     config.add_route('amd_package', '/static{}/amd/*subpath'.format(comp.static_key)) \
         .add_view(static_amd_file)

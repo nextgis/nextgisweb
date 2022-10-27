@@ -449,7 +449,7 @@ def company_logo(request):
             pass
 
     if response is None:
-        response = FileResponse(resource_filename('nextgisweb', 'static/img/logo_outline.png'))
+        response = FileResponse(resource_filename('nextgisweb', 'pyramid/asset/logo_outline.png'))
 
     if (
         'ckey' in request.GET
@@ -565,9 +565,11 @@ def setup_pyramid(comp, config):
                 )
         return defaults
 
-    comp.preview_link_default_view = lambda request: \
-        dict(image=request.static_url('nextgisweb:static/img/webgis-for-social.png'),
-             description=_("Your Web GIS at nextgis.com"))
+    comp.preview_link_default_view = lambda request: dict(
+        image=request.route_url(
+            'pyramid.asset', component='pyramid',
+            subpath='webgis-for-social.png'),
+        description=_("Your Web GIS at nextgis.com"))
 
     comp.preview_link_view = preview_link_view
 
