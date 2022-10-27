@@ -22,7 +22,7 @@
     ngwConfig = {
         "debug": request.env.core.debug,
         "applicationUrl": request.application_url,
-        "amdUrl": request.route_url('amd_package', subpath=""),
+        "amdUrl": request.route_url('pyramid.amd_package', subpath=""),
         "distUrl": request.route_url('jsrealm.dist', subpath=''),
         "staticKey": request.env.pyramid.static_key[1:],
         "distribution": distribution,
@@ -50,7 +50,7 @@
             {"name": "dist", "location": request.route_url('jsrealm.dist', subpath='')},
             {"name": "@nextgisweb", "location": request.route_url('jsrealm.dist', subpath='main/@nextgisweb')}
         ],
-        "baseUrl": request.route_url('amd_package', subpath="dojo"),
+        "baseUrl": request.route_url('pyramid.amd_package', subpath="dojo"),
         "locale": request.locale_name,
         "aliases": [
             ['ngw/route', 'ngw-pyramid/route'],

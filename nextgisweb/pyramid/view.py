@@ -399,7 +399,7 @@ def setup_pyramid(comp, config):
 
     # AMD package handler
 
-    config.add_route('amd_package', '/static{}/amd/*subpath'.format(comp.static_key)) \
+    config.add_route('pyramid.amd_package', '/static{}/amd/*subpath'.format(comp.static_key)) \
         .add_view(static_amd_file)
 
     # Base template includes

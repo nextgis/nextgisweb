@@ -44,7 +44,7 @@
 
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
 
-    <script src="${request.route_url('amd_package', subpath='dojo/dojo.js')}"></script>
+    <script src="${request.route_url('pyramid.amd_package', subpath='dojo/dojo.js')}"></script>
     <script src="${request.route_url('jsrealm.dist', subpath='main/chunk/runtime.js')}"></script>
     
     %if hasattr(self, 'assets'):
