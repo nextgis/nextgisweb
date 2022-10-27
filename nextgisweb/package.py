@@ -25,15 +25,18 @@ def amd_packages():
     return result
 
 
+def _module_path(module_name):
+    spec = importlib.util.find_spec(module_name)
+    pathname = spec.submodule_search_locations[0]
+    return Path(pathname)
+
+
 class Package(object):
 
     def __init__(self, entrypoint):
         self._name = entrypoint.dist.key.replace('-', '_')
         self._entrypoint = entrypoint
-
-        spec = importlib.util.find_spec(self.name)
-        pathname = spec.submodule_search_locations[0]
-        self._path = Path(pathname)
+        self._path = _module_path(self.name)
 
         # Assume a version local part consists of commit id and dirtiness flag.
         self._version_raw = entrypoint.dist.version
@@ -112,6 +115,7 @@ class PkgInfo(object):
         self._comp_mod = dict()
         self._comp_enabled = dict()
         self._comp_pkg = dict()
+        self._comp_path = dict()
         self._packages = dict()
         self._pkg_comp = dict()
 
@@ -136,6 +140,7 @@ class PkgInfo(object):
                 self._comp_mod[comp] = modname
                 self._comp_enabled[comp] = cdefn['enabled']
                 self._comp_pkg[comp] = package_name
+                self._comp_path[comp] = _module_path(modname)
                 if package_name not in self._pkg_comp:
                     self._pkg_comp[package_name] = list()
                 self._pkg_comp[package_name].append(comp)
@@ -166,6 +171,10 @@ class PkgInfo(object):
     def comp_pkg(self, comp):
         self.scan()
         return self._comp_pkg[comp]
+
+    def comp_path(self, comp):
+        self.scan()
+        return self._comp_path[comp]
 
     def pkg_comp(self, pkg):
         self.scan()

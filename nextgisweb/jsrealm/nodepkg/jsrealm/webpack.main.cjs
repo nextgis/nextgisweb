@@ -178,16 +178,17 @@ let spriteCode = "";
 const sharedIconIds = {};
 
 for (const [comp, dir] of config.iconSources) {
-    for (let fn of glob.sync(`${dir}/**/*.svg`)) {
+    const realDir = fs.realpathSync(dir);
+    for (let fn of glob.sync(`${realDir}/**/*.svg`)) {
         const id = ("icon-" + comp + "-" +
-            path.relative(dir, fn).replace(/\.svg$/, "")
+            path.relative(realDir, fn).replace(/\.svg$/, "")
         ).replace(/\w+\-resource\/(\w+)/, (m, p) => `rescls-${p}`);
         spriteCode = spriteCode + `import "${fn}";\n`;
-        sharedIconIds[fn] = id;
+        sharedIconIds[fs.realpathSync(fn)] = id;
     }
 
     const materialBase = path.resolve('./node_modules/@material-icons/svg/svg');
-    for (const fn of glob.sync(`${dir}/material.json`)) {
+    for (const fn of glob.sync(`${realDir}/material.json`)) {
         const body = JSON.parse(fs.readFileSync(fn));
         for (let ref of body) {
             if (ref.match(/\w+/)) { ref = ref + '/baseline' };

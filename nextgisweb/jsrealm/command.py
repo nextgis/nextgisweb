@@ -1,12 +1,10 @@
 import json
-from collections import OrderedDict
-from importlib import import_module
 from pathlib import Path
 from subprocess import check_call
 
 from ..lib.logging import logger
 from ..command import Command
-from ..package import amd_packages
+from ..package import amd_packages, pkginfo
 from ..pyramid.uacompat import FAMILIES
 
 
@@ -23,25 +21,32 @@ class JSRealmInstallCommand(object):
     def execute(cls, args, env):
         client_packages = list()
         icon_sources = list()
+
+        debug = env.core.options['debug']
         cwd = Path().resolve()
-        for cid, cobj in env._components.items():
-            cmod = import_module(cobj.__class__.__module__)
-            cpath = Path(cmod.__file__).parent.resolve()
+
+        for cid, cpath in pkginfo._comp_path.items():
+            cpath = cpath.resolve().relative_to(cwd)
+            if cid not in env._components and debug:
+                logger.debug("Component [%s] excluded from build in debug mode", cid)
+                continue
+
             jspkg = cpath / 'nodepkg'
             if jspkg.exists():
                 for package_json in jspkg.glob('**/package.json'):
-                    jspkg_rel = str(package_json.parent.relative_to(cwd))
-                    logger.debug("Node package is found in [{}]".format(jspkg_rel))
-                    client_packages.append(jspkg_rel)
+                    package_dir = package_json.parent
+                    logger.debug("Node package %s (%s)", package_dir, cid)
+                    client_packages.append(str(package_dir))
 
-            icondir = cpath / 'icon'
-            if icondir.exists():
-                icon_sources.append([cid, str(icondir)])
+            icon_source = cpath / 'icon'
+            if icon_source.exists():
+                logger.debug("Icon source %s (%s)", icon_source, cid)
+                icon_sources.append([cid, str(icon_source)])
 
-        package_json = OrderedDict(private=True)
-        package_json['config'] = config = OrderedDict()
-        config['nextgisweb_core_debug'] = str(env.core.options['debug']).lower()
-        config['nextgisweb_jsrealm_root'] = str(Path().resolve())
+        package_json = dict(private=True)
+        package_json['config'] = config = dict()
+        config['nextgisweb_core_debug'] = str(debug).lower()
+        config['nextgisweb_jsrealm_root'] = str(cwd.resolve())
         config['nextgisweb_jsrealm_packages'] = ','.join(client_packages)
         config['nextgisweb_jsrealm_externals'] = ','.join([
             pname for pname, _ in amd_packages()])
@@ -62,8 +67,11 @@ class JSRealmInstallCommand(object):
             targets[k] = r
         config['nextgisweb_jsrealm_targets'] = json.dumps(targets)
 
-        package_json['scripts'] = scripts = OrderedDict()
-        webpack_config = Path(__file__).parent / 'nodepkg' / 'jsrealm' / 'webpack.root.cjs'
+        webpack_config = (
+            Path(__file__).parent / 'nodepkg' / 'jsrealm' / 'webpack.root.cjs'
+        ).resolve().relative_to(cwd)
+
+        package_json['scripts'] = scripts = dict()
         scripts['build'] = 'webpack --config {}'.format(webpack_config)
         scripts['watch'] = 'webpack --watch --config {}'.format(webpack_config)
 
