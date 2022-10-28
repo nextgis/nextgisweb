@@ -13,3 +13,4 @@ NextGIS Web internals
    test
    versioning
    migration
+   url_route
