@@ -55,11 +55,13 @@ def OGRDriver(
     )
 
 
-EXPORT_FORMAT_OGR["ESRI Shapefile"] = OGRDriver(
-    "ESRI Shapefile",
-    "ESRI Shapefile (*.shp)",
-    "shp",
-    single_file=False,
+EXPORT_FORMAT_OGR["GPKG"] = OGRDriver(
+    "GPKG",
+    "GeoPackage (*.gpkg)",
+    "gpkg",
+    single_file=True,
+    fid_support=True,
+    mime="application/geopackage+vnd.sqlite3",
 )
 
 EXPORT_FORMAT_OGR["GeoJSON"] = OGRDriver(
@@ -69,6 +71,13 @@ EXPORT_FORMAT_OGR["GeoJSON"] = OGRDriver(
     single_file=True,
     fid_support=True,
     mime="application/json",
+)
+
+EXPORT_FORMAT_OGR["ESRI Shapefile"] = OGRDriver(
+    "ESRI Shapefile",
+    "ESRI Shapefile (*.shp)",
+    "shp",
+    single_file=False,
 )
 
 EXPORT_FORMAT_OGR["CSV"] = OGRDriver(
@@ -101,14 +110,6 @@ EXPORT_FORMAT_OGR["CSV_MSEXCEL"] = OGRDriver(
     mime="text/csv",
 )
 
-EXPORT_FORMAT_OGR["DXF"] = OGRDriver(
-    "DXF",
-    "AutoCAD DXF (*.dxf)",
-    "dxf",
-    single_file=True,
-    mime="application/dxf",
-)
-
 EXPORT_FORMAT_OGR["MapInfo File (TAB)"] = OGRDriver(
     "MapInfo File",
     "MapInfo TAB (*.tab)",
@@ -121,24 +122,6 @@ EXPORT_FORMAT_OGR["MapInfo File (MIF/MID)"] = OGRDriver(
     "MapInfo MIF/MID (*.mif/*.mid)",
     "mif",
     single_file=False,
-)
-
-EXPORT_FORMAT_OGR["GPKG"] = OGRDriver(
-    "GPKG",
-    "GeoPackage (*.gpkg)",
-    "gpkg",
-    single_file=True,
-    fid_support=True,
-    mime="application/geopackage+vnd.sqlite3",
-)
-
-EXPORT_FORMAT_OGR["SXF"] = OGRDriver(
-    "SXF",
-    "Storage and eXchange Format (*.sxf)",
-    "sxf",
-    single_file=False,
-    options=("SXF_NEW_BEHAVIOR=YES",),
-    dsco_configurable=("SXF_MAP_SCALE:1000000", "SXF_MAP_NAME", "SXF_SHEET_KEY"),
 )
 
 EXPORT_FORMAT_OGR["KML"] = OGRDriver(
@@ -155,6 +138,23 @@ EXPORT_FORMAT_OGR["KMZ"] = OGRDriver(
     "kmz",
     single_file=True,
     mime="application/vnd.google-earth.kmz"
+)
+
+EXPORT_FORMAT_OGR["DXF"] = OGRDriver(
+    "DXF",
+    "AutoCAD DXF (*.dxf)",
+    "dxf",
+    single_file=True,
+    mime="application/dxf",
+)
+
+EXPORT_FORMAT_OGR["SXF"] = OGRDriver(
+    "SXF",
+    "Storage and eXchange Format (*.sxf)",
+    "sxf",
+    single_file=False,
+    options=("SXF_NEW_BEHAVIOR=YES",),
+    dsco_configurable=("SXF_MAP_SCALE:1000000", "SXF_MAP_NAME", "SXF_SHEET_KEY"),
 )
 
 OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
