@@ -1,11 +1,10 @@
-import json
 from datetime import datetime, timedelta
 from urllib.parse import urlencode, urlparse
 
 import transaction
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import defer, undefer
-from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
+from pyramid.httpexceptions import HTTPForbidden
 from pyramid.interfaces import ISecurityPolicy
 
 from ..lib.config import OptionAnnotations, Option
@@ -266,7 +265,7 @@ class AuthComponent(Component):
                 ('auth.policy.current', current),
                 ('invite', True),
             ):
-                SessionStore(session_id=sid, key=k, value=json.dumps(v)).persist()
+                SessionStore(session_id=sid, key=k, value=v).persist()
 
         query = dict(sid=sid, expires=expires.isoformat())
         if (len(result.path) > 0 and result.path != '/'):

@@ -18,7 +18,7 @@ class SessionStore(Base):
     session_id = db.Column(db.ForeignKey(Session.id, ondelete='cascade'),
                            primary_key=True)
     key = db.Column(db.Unicode, primary_key=True)
-    value = db.Column(db.Unicode, nullable=False)
+    value = db.Column(db.JSONB, nullable=False)
 
     session = db.relationship(
         Session, foreign_keys=session_id,

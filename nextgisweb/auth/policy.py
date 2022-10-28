@@ -8,7 +8,6 @@ from pyramid.interfaces import ISecurityPolicy
 from pyramid.authorization import ACLHelper
 from pyramid.httpexceptions import HTTPUnauthorized
 
-from ..lib import json
 from ..lib.config import OptionAnnotations, Option
 from ..models import DBSession
 from ..pyramid import SessionStore, WebSession
@@ -16,7 +15,6 @@ from ..pyramid import SessionStore, WebSession
 from .model import User
 from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, UserDisabledException
 from .oauth import OAuthTokenRefreshException, OAuthPasswordGrantTypeException
-from .util import _
 
 
 @implementer(ISecurityPolicy)
@@ -71,10 +69,10 @@ class SecurityPolicy(object):
 
                 refresh, = current[3:]
                 if datetime.fromtimestamp(refresh) <= now:
-                    session['auth.policy.current'] = current[0:2] + (
+                    session['auth.policy.current'] = current[0:2] + [
                         int((now + self.options['local.lifetime']).timestamp()),
                         int((now + self.options['local.refresh']).timestamp()),
-                    )
+                    ]
 
                 return user_id
 
@@ -168,10 +166,12 @@ class SecurityPolicy(object):
 
         return ()
 
-    def forget_user(self, user_id):
-        for session_kv in SessionStore.filter_by(key='auth.policy.current'):
-            if json.loads(session_kv.value)[1] == user_id:
-                DBSession.delete(session_kv.session)
+    def forget_user(self, request):
+        SessionStore.filter(
+            SessionStore.session_id != request.session.id,
+            SessionStore.key == 'auth.policy.current',
+            SessionStore.value[1].cast(sa.Integer) == request.authenticated_userid,
+        ).delete(synchronize_session=False)
 
     def authenticate_with_password(self, username, password):
         user = None

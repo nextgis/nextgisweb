@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 import transaction
@@ -12,24 +11,6 @@ from .model import Session, SessionStore
 from .util import gensecret, datetime_to_unix
 
 __all__ = ['WebSession']
-
-allowed_types = (
-    type(None),
-    bool,
-    int,
-    float,
-    str,
-    tuple,
-)
-
-
-def validate_value(v):
-    t = type(v)
-    if t not in allowed_types:
-        raise ValueError('Type `%s` is not allowed!' % t)
-    elif t == tuple:
-        return all(validate_value(_v) for _v in v)
-    return True
 
 
 @implementer(ISession)
@@ -103,7 +84,7 @@ class WebSession(dict):
                                     key=key).one()
                             except NoResultFound:
                                 kv = SessionStore(session_id=self._session_id, key=key).persist()
-                            kv.value = self._get_for_db(key)
+                            kv.value = self[key]
 
             if update_cookie:
                 # Check if another session is set
@@ -128,20 +109,9 @@ class WebSession(dict):
             secure=is_https
         )
 
-    def _get_for_db(self, key):
-        value = super().__getitem__(key)
-        return json.dumps(value)
-
-    def _set_from_db(self, key, value):
-        value = json.loads(value)
-
-        def array_to_tuple(v):
-            if type(v) == list:
-                v = tuple(array_to_tuple(_v) for _v in v)
-            return v
-
-        value = array_to_tuple(value)
-        super().__setitem__(key, value)
+    @property
+    def id(self):
+        return self._session_id
 
     @property
     def _keys(self):
@@ -152,7 +122,7 @@ class WebSession(dict):
             return
         for kv in SessionStore.filter(SessionStore.session_id == self._session_id,
                                       ~SessionStore.key.in_(self._keys)).all():
-            self._set_from_db(kv.key, kv.value)
+            self[kv.key] = kv.value
         self._refreshed = True
 
     def _refresh(self, key):
@@ -161,7 +131,7 @@ class WebSession(dict):
         if key not in self._deleted:
             try:
                 kv = SessionStore.filter_by(session_id=self._session_id, key=key).one()
-                self._set_from_db(key, kv.value)
+                self[key] = kv.value
             except NoResultFound:
                 pass
 
@@ -211,7 +181,6 @@ class WebSession(dict):
         return super().__iter__(*args, **kwargs)
 
     def __setitem__(self, key, value, *args, **kwargs):
-        validate_value(value)
         if key not in self._updated:
             self._updated.append(key)
         if key in self._deleted:

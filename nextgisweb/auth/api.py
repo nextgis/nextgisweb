@@ -72,7 +72,7 @@ def user_iput(request):
         or data.get('alink_token') is not None
     ):
         auth_policy = request.registry.getUtility(ISecurityPolicy)
-        auth_policy.forget_user(obj.id)
+        auth_policy.forget_user(request)
 
     check_keyname(obj, data)
     check_display_name(obj, data)

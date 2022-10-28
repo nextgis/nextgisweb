@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from urllib.parse import urlencode, parse_qsl
 
@@ -70,9 +69,8 @@ def session_invite(request):
             store = SessionStore.filter_by(session_id=sid, key='auth.policy.current').one()
         except NoResultFound:
             raise InvalidCredentialsException(message=_("Session not found."))
-        value = json.loads(store.value)
 
-        exp = datetime.fromtimestamp(value[2])
+        exp = datetime.fromtimestamp(store.value[2])
         if datetime.fromisoformat(expires) != exp:
             raise InvalidCredentialsException(message=_("Invalid 'expires' parameter."))
         now = datetime.utcnow()

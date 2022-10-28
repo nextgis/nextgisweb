@@ -1,4 +1,3 @@
-import json
 from datetime import datetime, timedelta
 from http.cookies import SimpleCookie
 
@@ -72,7 +71,7 @@ def session_headers(ngw_env):
 def read_store(session_id):
     result = dict()
     for kv in SessionStore.filter_by(session_id=session_id).all():
-        result[kv.key] = json.loads(kv.value)
+        result[kv.key] = kv.value
     return result
 
 
@@ -150,26 +149,37 @@ def test_session_lifetime(ngw_env, cwebapp, save_options, get_session_id, sessio
         assert new_session_id != session_id
 
 
-@pytest.mark.parametrize('key, value, error', (
-    ('none', None, None),
-    ('str', 'foo', None),
-    ('int', 42, None),
-    ('float', 3.14159, None),
-    ('bool', True, None),
-    ('list', [], ValueError),
-    pytest.param('tuple', (1, 2, ('nested', 'tuple')), None, id='tuple'),
-    pytest.param('deep', ('we', ('need', ('to', ('go', ('deeper',))))), None, id='deep'),
-    pytest.param('mutable', ('ok', (None, (True, ('bad', dict())))), ValueError, id='mutable'),
-    pytest.param('k' * 1024, 'v' * 1024, None, id='long'),
+@pytest.mark.parametrize('key, value', (
+    ('none', None),
+    ('str', 'foo'),
+    ('int', 42),
+    ('float', 3.14159),
+    ('bool', True),
+    ('list', []),
+    pytest.param('tuple', (1, 2, ('nested', 'tuple')), id='tuple'),
+    pytest.param('deep', ('we', ('need', ('to', ('go', ('deeper',))))), id='deep'),
+    pytest.param('mutable', ('ok', (None, (True, ('bad', dict())))), id='mutable'),
+    pytest.param('k' * 1024, 'v' * 1024, id='long'),
 ))
-def test_serialization(key, value, error, ngw_webtest_app, webapp_handler):
+def test_serialization(key, value, ngw_webtest_app, webapp_handler):
     def _set(request):
         request.session[key] = value
         return Response()
 
     def _get(request):
-        assert type(request.session[key]) == type(value)
-        assert request.session[key] == value
+        def _tuple2list(obj):
+            if type(obj) is tuple:
+                obj = list(obj)
+                for i in range(len(obj)):
+                    obj[i] = _tuple2list(obj[i])
+            elif type(obj) is dict:
+                for k, v in obj.items():
+                    obj[k] = _tuple2list(v)
+            return obj
+
+        cmp = _tuple2list(value)
+        assert type(request.session[key]) == type(cmp)
+        assert request.session[key] == cmp
         return Response()
 
     def _del(request):
@@ -181,12 +191,7 @@ def test_serialization(key, value, error, ngw_webtest_app, webapp_handler):
         return Response()
 
     with webapp_handler(_set):
-        if error is not None:
-            with pytest.raises(error):
-                ngw_webtest_app.get('/test/request/')
-            return
-        else:
-            ngw_webtest_app.get('/test/request/')
+        ngw_webtest_app.get('/test/request/')
 
     with webapp_handler(_get):
         ngw_webtest_app.get('/test/request/')
@@ -229,11 +234,6 @@ def test_exception(ngw_webtest_app, webapp_handler):
 
         with pytest.raises(KeyError):
             del request.session['invalid']
-
-        # Session should validate that value is immutable, and
-        # may raise more specific exception.
-        with pytest.raises(ValueError):
-            request.session['mutable'] = ('foo', [], dict())
 
         return Response()
 
