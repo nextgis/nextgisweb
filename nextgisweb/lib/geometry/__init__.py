@@ -10,6 +10,7 @@ from shapely.geometry import (
 from shapely.ops import transform as map_coords
 
 from ..osrhelper import sr_from_wkt
+from ..ogrhelper import cohere_bytes
 
 
 class GeometryNotValid(ValueError):
@@ -26,7 +27,14 @@ class Geometry:
         if wkb is None and wkt is None and ogr is None and shape is None:
             raise ValueError("None base format is not defined.")
 
-        self._wkb = wkb
+        if wkb is not None:
+            if isinstance(wkb, bytes):
+                self._wkb = wkb
+            else:
+                raise ValueError(f"Bytes expected, got {type(wkb).__name__}")
+        else:
+            self._wkb = None
+
         self._wkt = wkt
         self._ogr = ogr
         self._shape = shape
@@ -81,7 +89,7 @@ class Geometry:
                 self._wkb = self._shape.wkb
             else:
                 # ORG is the fastest, so convert to OGR and then to WKB.
-                self._wkb = self.ogr.ExportToWkb(ogr.wkbNDR)
+                self._wkb = cohere_bytes(self.ogr.ExportToWkb(ogr.wkbNDR))
         return self._wkb
 
     @property

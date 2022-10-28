@@ -96,6 +96,15 @@ def geometry_force_multi(ogr_geom):
     return ogr_geom
 
 
+def cohere_bytes(value):
+    if isinstance(value, bytearray):
+        return bytes(value)
+    elif isinstance(value, bytes):
+        return value
+    else:
+        raise ValueError(f"Bytes or bytearray expected, got {type(value).__name__}")
+
+
 def _geometry_copy(ogr_geom):
     return ogr_geom.Clone()
 

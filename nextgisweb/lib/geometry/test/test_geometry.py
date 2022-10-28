@@ -6,9 +6,10 @@ from shapely.wkt import loads as wkt_loads
 from shapely.wkb import loads as wkb_loads
 from sqlalchemy import func as sa_func
 
-from nextgisweb.models import DBSession
+from ....models import DBSession
 
-from nextgisweb.lib.geometry import Geometry, GeometryNotValid
+from ...geometry import Geometry, GeometryNotValid
+from ...ogrhelper import cohere_bytes
 
 
 @pytest.mark.parametrize('wkt', (
@@ -83,7 +84,7 @@ def test_convert(fmt_src, fmt_dst):
     geom_ogr = ogr.CreateGeometryFromWkt(geom_wkt)
 
     sample = dict(
-        wkb=geom_ogr.ExportToWkb(ogr.wkbNDR),
+        wkb=cohere_bytes(geom_ogr.ExportToWkb(ogr.wkbNDR)),
         wkt=geom_ogr.ExportToIsoWkt(),
         ogr=geom_ogr.Clone(),
         shape=wkt_loads(geom_wkt),

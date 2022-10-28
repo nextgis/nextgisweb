@@ -297,7 +297,7 @@ def mvt(request):
 
             # SEEK_SET = 0
             gdal.VSIFSeekL(f, 0, 0)
-            content = gdal.VSIFReadL(1, size, f)
+            content = bytes(gdal.VSIFReadL(1, size, f))
             gdal.VSIFCloseL(f)
 
             return Response(
