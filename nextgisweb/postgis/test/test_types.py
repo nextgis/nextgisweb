@@ -34,7 +34,7 @@ def creds(ngw_env):
 
     with engine.connect() as conn:
         with conn.begin():
-            conn.execute('''
+            conn.execute(sa.text('''
                 CREATE TABLE test_types
                 (
                     id bigserial PRIMARY KEY,
@@ -59,13 +59,13 @@ def creds(ngw_env):
                     1.1, 1.2,
                     now(), now(), now()
                 );
-            ''')
+            '''))
 
         try:
             yield con_args
         finally:
             with conn.begin():
-                conn.execute('DROP TABLE test_types;')
+                conn.execute(sa.text('DROP TABLE test_types;'))
 
 
 def test_types(creds, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
