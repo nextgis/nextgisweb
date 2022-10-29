@@ -111,4 +111,12 @@ Running tests
 .. code-block:: shell
 
   $ export NEXTGISWEB_CONFIG=path/to/config.ini
-  $ python -m pytest -v path/to/package
+  $ python -m pytest package                     # All tests from package
+  $ python -m pytest package/component           # Only tests from component
+  $ python -m pytest --pyargs package.component  # Same but by Python module name
+
+.. note::
+
+  The last option with ``--pyargs`` might be useful when running tests in Crater
+  / NGWDocker environment. Path-based options won't work because of symlinks
+  inside ``site-packages`` directory.
