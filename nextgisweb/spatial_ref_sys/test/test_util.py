@@ -1,6 +1,6 @@
 import pytest
 
-from nextgisweb.spatial_ref_sys.util import convert_to_wkt, normalize_mapinfo_cs
+from ..util import convert_to_wkt, normalize_mapinfo_cs
 
 WKT_EPSG_4326_MI = 'GEOGCS["unnamed",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]]'  # NOQA: E501
 

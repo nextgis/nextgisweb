@@ -1,12 +1,13 @@
 import os.path
 
 import transaction
-
 from osgeo import gdal
-from nextgisweb.auth import User
-from nextgisweb.models import DBSession
-from nextgisweb.raster_layer.model import RasterLayer
-from nextgisweb.spatial_ref_sys import SRS
+
+from ...auth import User
+from ...models import DBSession
+from ...spatial_ref_sys import SRS
+
+from ..model import RasterLayer
 
 from .validate_cloud_optimized_geotiff import validate
 

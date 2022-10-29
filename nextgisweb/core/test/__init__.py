@@ -3,7 +3,7 @@ from contextlib import contextmanager
 import pytest
 from transaction import manager
 
-from nextgisweb.models import DBSession
+from ...models import DBSession
 
 
 @pytest.fixture()

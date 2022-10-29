@@ -255,11 +255,11 @@ def test_mvt(extent, simplification, padding, ngw_webtest_app, vector_layer_id, 
     (False, 404),
 ))
 def test_mvt_should_return_not_found_if_mvt_driver_not_available(mvt_driver_exist, status_expected, ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
-    import nextgisweb.feature_layer.ogrdriver as ogrdriver
+    from .. import ogrdriver
     old_MVT_DRIVER_EXIST = ogrdriver.MVT_DRIVER_EXIST
     ogrdriver.MVT_DRIVER_EXIST = mvt_driver_exist
 
-    import nextgisweb.feature_layer.api as api
+    from .. import api
     importlib.reload(api)
 
     params = dict(z=0, x=0, y=0, resource=vector_layer_id,

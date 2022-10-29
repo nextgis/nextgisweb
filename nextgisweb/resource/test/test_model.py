@@ -1,12 +1,14 @@
-import pytest
 import json
+
+import pytest
 from sqlalchemy.exc import IntegrityError
 
-from nextgisweb.lib.json import dumps
-from nextgisweb.models import DBSession
-from nextgisweb.resource import Resource, ResourceGroup
-from nextgisweb.resource.serialize import CompositeSerializer
-from nextgisweb.auth import User
+from ...lib.json import dumps
+from ...models import DBSession
+from ...auth import User
+
+from .. import Resource, ResourceGroup
+from ..serialize import CompositeSerializer
 
 
 def test_root_serialize(ngw_txn):

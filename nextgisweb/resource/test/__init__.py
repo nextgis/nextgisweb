@@ -4,10 +4,10 @@ from uuid import uuid4
 import pytest
 import transaction
 
-from nextgisweb.models import DBSession
-from nextgisweb.auth import User
+from ...models import DBSession
+from ...auth import User
 
-from nextgisweb.resource.model import ResourceGroup
+from ..model import ResourceGroup
 
 
 @pytest.fixture(scope='session')

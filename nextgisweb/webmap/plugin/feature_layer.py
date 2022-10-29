@@ -1,8 +1,7 @@
 from pyramid import threadlocal
 
-from nextgisweb.resource import DataScope
-
 from ...feature_layer import IFeatureLayer, IFeatureQueryLike
+from ...resource import DataScope
 from .base import WebmapLayerPlugin
 
 

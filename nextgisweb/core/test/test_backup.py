@@ -1,12 +1,7 @@
 import pytest
 from packaging.version import Version
 
-from nextgisweb.core.backup import (
-    IndexFile,
-    IndexRecord,
-    parse_pg_dump_version,
-    backup,
-)
+from ..backup import IndexFile, IndexRecord, parse_pg_dump_version, backup
 
 
 def test_index_file_read_write(tmp_path):

@@ -8,19 +8,20 @@ from osgeo import gdal
 from osgeo import ogr
 from packaging import version as pkg_version
 
-from nextgisweb.models import DBSession
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.vector_layer import VectorLayer
-from nextgisweb.wfsserver.model import Service as WFSService, Layer as WFSLayer
+from ...models import DBSession
+from ...auth import User
+from ...spatial_ref_sys import SRS
+from ...vector_layer import VectorLayer
+
+from ..model import Service as WFSService, Layer as WFSLayer
 
 
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
 
 
 def type_geojson_dataset(filename):
-    import nextgisweb.vector_layer.test
-    path = Path(nextgisweb.vector_layer.test.__file__).parent / 'data' / filename
+    from ...vector_layer import test as vector_layer_test
+    path = Path(vector_layer_test.__file__).parent / 'data' / filename
     result = ogr.Open(str(path))
     assert result is not None, gdal.GetLastErrorMsg()
     return result

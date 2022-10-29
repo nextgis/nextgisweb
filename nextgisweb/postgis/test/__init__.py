@@ -1,27 +1,24 @@
 from contextlib import contextmanager
 from uuid import uuid4
 
-import transaction
-from osgeo import ogr
 import pytest
+import transaction
+import sqlalchemy as sa
+import geoalchemy2 as ga
+from osgeo import ogr
+from sqlalchemy.engine.url import URL as EngineURL, make_url as make_engine_url
 
-from nextgisweb.auth import User
-from nextgisweb.env import env
-from nextgisweb.feature_layer import GEOM_TYPE
-from nextgisweb.lib.ogrhelper import FIELD_GETTER
-from nextgisweb.models import DBSession
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.postgis import PostgisConnection, PostgisLayer
-from nextgisweb.vector_layer.model import (
+from ...auth import User
+from ...env import env
+from ...feature_layer import GEOM_TYPE
+from ...lib.ogrhelper import FIELD_GETTER
+from ...models import DBSession
+from ...spatial_ref_sys import SRS
+from ...vector_layer.model import (
     _GEOM_OGR_2_TYPE, _GEOM_TYPE_2_DB,
     _FIELD_TYPE_2_ENUM, _FIELD_TYPE_2_DB)
 
-
-import sqlalchemy as sa
-import geoalchemy2 as ga
-from sqlalchemy.engine.url import (
-    URL as EngineURL,
-    make_url as make_engine_url)
+from .. import PostgisConnection, PostgisLayer
 
 
 @contextmanager

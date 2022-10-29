@@ -3,10 +3,11 @@ import pytest
 from uuid import uuid4
 from osgeo import ogr
 
-from nextgisweb.models import DBSession
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.vector_layer import VectorLayer
+from ...models import DBSession
+from ...auth import User
+from ...spatial_ref_sys import SRS
+
+from .. import VectorLayer
 
 
 DATA_PATH = os.path.join(os.path.dirname(

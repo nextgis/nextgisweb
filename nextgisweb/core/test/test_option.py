@@ -1,7 +1,7 @@
 import pytest
 
-from nextgisweb.component import Component, load_all
-from nextgisweb.lib.config import Option
+from ...component import Component, load_all
+from ...lib.config import Option
 
 
 def pytest_generate_tests(metafunc):

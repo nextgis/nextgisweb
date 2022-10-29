@@ -1,9 +1,9 @@
 import pytest
 import transaction
 
-from nextgisweb.auth import User
-from nextgisweb.models import DBSession
-from nextgisweb.resource import ResourceGroup
+from ...auth import User
+from ...models import DBSession
+from ...resource import ResourceGroup
 
 
 @pytest.fixture

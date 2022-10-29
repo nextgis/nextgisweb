@@ -2,8 +2,7 @@ from datetime import timedelta
 
 import pytest
 
-from nextgisweb.lib.migration.revision import (
-    REVID_LENGTH, EPOCH_START, EPOCH_END, revid)
+from ..revision import REVID_LENGTH, EPOCH_START, EPOCH_END, revid
 
 
 def test_start_end():

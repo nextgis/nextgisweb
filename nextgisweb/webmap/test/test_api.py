@@ -1,9 +1,10 @@
 import pytest
 import transaction
 
-from nextgisweb.auth import User
-from nextgisweb.models import DBSession
-from nextgisweb.webmap.model import WebMap, WebMapItem
+from ...auth import User
+from ...models import DBSession
+
+from .. import WebMap, WebMapItem
 
 ANNOTATION_SAMPLE = dict(
     description='1', geom='POINT (0 0)', public=True, own=False,

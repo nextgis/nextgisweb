@@ -3,9 +3,7 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 
-from nextgisweb.lib.config.util import (
-    environ_substitution,
-    load_config)
+from ..util import environ_substitution, load_config
 
 
 @pytest.mark.parametrize('value, environ, expected', (

@@ -3,7 +3,7 @@ from datetime import date, time, datetime
 
 from osgeo import ogr
 
-from nextgisweb.lib.ogrhelper import read_layer_features
+from .. import read_layer_features
 
 
 DATA = {

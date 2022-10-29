@@ -1,9 +1,10 @@
 import pytest
 import transaction
 
-from nextgisweb.auth import User
-from nextgisweb.models import DBSession
-from nextgisweb.resource import ResourceGroup
+from ...auth import User
+from ...models import DBSession
+
+from .. import ResourceGroup
 
 
 def test_disable_resources(

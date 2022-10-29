@@ -1,6 +1,6 @@
-from nextgisweb.lib.migration.revision import REVID_ZERO
-from nextgisweb.lib.migration.registry import MigrationKey
-from nextgisweb.lib.migration.graph import resolve
+from ..revision import REVID_ZERO
+from ..registry import MigrationKey
+from ..graph import resolve
 
 
 def test_ancestors(graph):

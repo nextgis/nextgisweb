@@ -7,7 +7,7 @@ from webtest import TestApp as BaseTestApp
 import transaction
 from pyramid.response import Response
 
-from nextgisweb.pyramid import Session, SessionStore
+from .. import Session, SessionStore
 
 
 prefix = '_test_'

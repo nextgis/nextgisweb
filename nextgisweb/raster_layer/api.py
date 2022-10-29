@@ -1,6 +1,5 @@
 import os
 import tempfile
-from nextgisweb.resource.view import resource_factory
 
 from osgeo import gdal
 from io import DEFAULT_BUFFER_SIZE
@@ -10,7 +9,7 @@ from ..core.exception import ValidationError
 from ..env import env
 from ..pyramid.util import set_output_buffering
 from ..spatial_ref_sys import SRS
-from ..resource import DataScope
+from ..resource import DataScope, resource_factory
 from .gdaldriver import EXPORT_FORMAT_GDAL
 from .model import RasterLayer
 from .util import _

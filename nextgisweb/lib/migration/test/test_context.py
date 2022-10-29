@@ -2,7 +2,7 @@ import sqlite3
 from textwrap import dedent
 from contextlib import contextmanager
 
-from nextgisweb.lib.migration.graph import (
+from ..graph import (
     resolve,
     InstallOperation, UninstallOperation,
     ForwardOperation, RewindOperation)

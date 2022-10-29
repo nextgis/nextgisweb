@@ -4,8 +4,8 @@ from datetime import timedelta
 
 import pytest
 
-from nextgisweb.models import DBSession
-from nextgisweb.file_storage import FileObj
+from ...models import DBSession
+from ...file_storage import FileObj
 
 
 @pytest.fixture(scope='module', autouse=True)

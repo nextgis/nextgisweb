@@ -1,8 +1,8 @@
 import pytest
 
-from nextgisweb.component import Component, load_all
-from nextgisweb.lib.migration.graph import MigrationGraph, resolve
-from nextgisweb.core.migration import MigrationRegistry
+from ...component import Component, load_all
+from ...lib.migration.graph import MigrationGraph, resolve
+from ..migration import MigrationRegistry
 
 
 def pytest_generate_tests(metafunc):

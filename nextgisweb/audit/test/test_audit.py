@@ -1,7 +1,7 @@
 import pytest
 
 from datetime import datetime
-from nextgisweb.audit.util import es_index
+from ..util import es_index
 
 
 def one(es, index):

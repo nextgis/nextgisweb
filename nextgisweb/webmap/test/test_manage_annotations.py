@@ -3,11 +3,12 @@ import pytest
 import transaction
 from pyramid.interfaces import ISecurityPolicy
 
-from nextgisweb.auth import User
-from nextgisweb.models import DBSession
-from nextgisweb.resource import ACLRule, ResourceGroup
-from nextgisweb.resource.model import ResourceACLRule
-from nextgisweb.webmap.model import WebMap, WebMapItem, WebMapAnnotation
+from ...auth import User
+from ...models import DBSession
+from ...resource import ACLRule, ResourceGroup
+from ...resource.model import ResourceACLRule
+
+from ..model import WebMap, WebMapItem, WebMapAnnotation
 
 TEST_USER_KEYNAME = 'test_user'
 

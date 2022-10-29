@@ -2,8 +2,8 @@ from collections import defaultdict
 
 import pytest
 
-from nextgisweb.component import load_all
-from nextgisweb.resource import Resource
+from ...component import load_all
+from .. import Resource
 
 
 def pytest_generate_tests(metafunc):

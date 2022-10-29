@@ -4,11 +4,12 @@ from uuid import uuid4
 import pytest
 from osgeo import ogr
 
-from nextgisweb.models import DBSession
-from nextgisweb.auth import User
-from nextgisweb.core.exception import ValidationError
-from nextgisweb.vector_layer import VectorLayer
-from nextgisweb.spatial_ref_sys import SRS
+from ...models import DBSession
+from ...auth import User
+from ...core.exception import ValidationError
+from ...spatial_ref_sys import SRS
+
+from .. import VectorLayer
 
 path = Path(__file__).parent / 'data' / 'errors'
 

@@ -7,12 +7,13 @@ from osgeo import gdal, ogr
 from shapely import affinity
 from shapely.geometry import Polygon
 
-from nextgisweb.auth import User
-from nextgisweb.models import DBSession
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.vector_layer import VectorLayer
-from nextgisweb.wfsclient.model import WFSConnection, WFSLayer
-from nextgisweb.wfsserver.model import Layer as WFS_Service_Layer, Service as WFSService
+from ...auth import User
+from ...models import DBSession
+from ...spatial_ref_sys import SRS
+from ...vector_layer import VectorLayer
+from ...wfsserver.model import Layer as WFS_Service_Layer, Service as WFSService
+
+from ..model import WFSConnection, WFSLayer
 
 
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', )
@@ -26,8 +27,8 @@ def skip(ngw_env):
 
 
 def type_geojson_dataset(filename):
-    import nextgisweb.vector_layer.test
-    path = Path(nextgisweb.vector_layer.test.__file__).parent / 'data' / filename
+    from ...vector_layer import test as vector_layer_test
+    path = Path(vector_layer_test.__file__).parent / 'data' / filename
     result = ogr.Open(str(path))
     assert result is not None, gdal.GetLastErrorMsg()
     return result

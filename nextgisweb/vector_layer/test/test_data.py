@@ -7,14 +7,15 @@ import pytest
 import webtest
 from osgeo import gdal, ogr, osr
 
-from nextgisweb.core.exception import ValidationError
-from nextgisweb.models import DBSession
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.feature_layer import FIELD_TYPE
-from nextgisweb.vector_layer import VectorLayer
-from nextgisweb.vector_layer.model import error_limit, ERROR_FIX, FID_SOURCE
-from nextgisweb.lib.ogrhelper import read_dataset
+from ...core.exception import ValidationError
+from ...models import DBSession
+from ...auth import User
+from ...spatial_ref_sys import SRS
+from ...feature_layer import FIELD_TYPE
+from ...lib.ogrhelper import read_dataset
+
+from .. import VectorLayer
+from ..model import error_limit, ERROR_FIX, FID_SOURCE
 
 
 DATA_PATH = os.path.join(os.path.dirname(

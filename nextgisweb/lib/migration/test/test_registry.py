@@ -2,9 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from nextgisweb.lib.migration.migration import MigrationKey
-from nextgisweb.lib.migration.registry import (
-    PythonModuleMigration, SQLScriptMigration, Registry)
+from ..migration import MigrationKey
+from ..registry import PythonModuleMigration, SQLScriptMigration, Registry
 
 data_mformat = Path(__file__).parent / 'mformat'
 data_registry = Path(__file__).parent / 'registry'

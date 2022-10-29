@@ -3,8 +3,7 @@ from inspect import isclass
 
 import pytest
 
-from nextgisweb.lib.config.otype import (
-    OptionType, Text, Boolean, Integer, List, SizeInBytes)
+from ..otype import OptionType, Text, Boolean, Integer, List, SizeInBytes
 
 
 @pytest.mark.parametrize('otype, input, expected,', (

@@ -1,13 +1,14 @@
 import pytest
 import transaction
 
-from nextgisweb.auth import User
-from nextgisweb.models import DBSession
-from nextgisweb.raster_layer import RasterLayer
-from nextgisweb.raster_style import RasterStyle
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.webmap import WebMap, WebMapItem
-from nextgisweb.webmap.util import webmap_items_to_tms_ids_list
+from ...auth import User
+from ...models import DBSession
+from ...raster_layer import RasterLayer
+from ...raster_style import RasterStyle
+from ...spatial_ref_sys import SRS
+
+from .. import WebMap, WebMapItem
+from ..util import webmap_items_to_tms_ids_list
 
 
 def make_webmap_item_layer(layer_style):

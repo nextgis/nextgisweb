@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import pytest
 
-from nextgisweb.lib.json import dumpb, loadb, dumps, loads
+from .. import dumpb, loadb, dumps, loads
 
 
 int64min = -9223372036854775808

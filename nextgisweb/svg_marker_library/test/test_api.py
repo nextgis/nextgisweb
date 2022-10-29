@@ -3,10 +3,11 @@ from os import path
 import pytest
 import transaction
 
-from nextgisweb.auth import User
-from nextgisweb.file_storage import FileObj
-from nextgisweb.models import DBSession
-from nextgisweb.svg_marker_library import SVGMarker, SVGMarkerLibrary
+from ...auth import User
+from ...file_storage import FileObj
+from ...models import DBSession
+
+from .. import SVGMarker, SVGMarkerLibrary
 
 
 DATA_DIR = path.join(path.dirname(__file__), 'data/')

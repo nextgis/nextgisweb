@@ -1,6 +1,6 @@
 import pytest
 
-from nextgisweb.lib.config.annotation import (
+from ..annotation import (
     Option,
     ConfigOptions,
     MissingAnnotationWarning,

@@ -4,13 +4,13 @@ import pytest
 
 
 def _env_initialize():
-    import nextgisweb.env
-    result = nextgisweb.env.env()
+    from .env import env, Env, setenv
+    result = env()
     if result:
         return result
-    result = nextgisweb.env.Env()
+    result = Env()
     result.initialize()
-    nextgisweb.env.setenv(result)
+    setenv(result)
     return result
 
 

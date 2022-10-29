@@ -1,14 +1,15 @@
 import os.path
+
 import pytest
 import transaction
-
 from osgeo import gdal, osr
 from tempfile import NamedTemporaryFile
 
-from nextgisweb.raster_layer.model import RasterLayer
-from nextgisweb.models import DBSession
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
+from ...models import DBSession
+from ...auth import User
+from ...spatial_ref_sys import SRS
+
+from ..model import RasterLayer
 
 
 @pytest.fixture(autouse=True)

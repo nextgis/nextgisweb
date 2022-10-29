@@ -6,15 +6,15 @@ import transaction
 from PIL import Image, ImageDraw
 from shapely.geometry import Point
 
-from nextgisweb.lib.geometry import Geometry
-from nextgisweb.models import DBSession
-from nextgisweb.raster_layer import RasterLayer
-from nextgisweb.raster_style import RasterStyle
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.auth import User
+from ...lib.geometry import Geometry
+from ...models import DBSession
+from ...raster_layer import RasterLayer
+from ...raster_style import RasterStyle
+from ...spatial_ref_sys import SRS
+from ...auth import User
 
-from nextgisweb.render.model import ResourceTileCache, TilestorWriter
-from nextgisweb.render.util import pack_color, unpack_color
+from ..model import ResourceTileCache, TilestorWriter
+from ..util import pack_color, unpack_color
 
 
 @pytest.fixture

@@ -6,10 +6,10 @@ from osgeo import ogr
 import transaction
 import xml.etree.ElementTree as ET
 
-from nextgisweb.auth import User
-from nextgisweb.models import DBSession
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.vector_layer import VectorLayer
+from ...auth import User
+from ...models import DBSession
+from ...spatial_ref_sys import SRS
+from ...vector_layer import VectorLayer
 
 
 @pytest.fixture(scope='module')

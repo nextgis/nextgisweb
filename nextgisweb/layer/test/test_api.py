@@ -3,9 +3,9 @@ from pathlib import Path
 import pytest
 from osgeo import ogr, gdalconst
 
-import nextgisweb.feature_layer.test
-from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
-from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
+from ...feature_layer import test as feature_layer_test
+from ...postgis.test import create_feature_layer as create_postgis_layer
+from ...vector_layer.test import create_feature_layer as create_vector_layer
 
 
 def layer_product():
@@ -18,7 +18,7 @@ def layer_product():
             'linestring', 'linestringz', 'multilinestring', 'multilinestringz',
             'polygon', 'polygonz', 'multipolygon', 'multipolygonz',
         ):
-            data = Path(nextgisweb.feature_layer.test.__file__).parent \
+            data = Path(feature_layer_test.__file__).parent \
                 / 'data' / 'geometry' / f'{geom_type}.geojson'
             ds = ogr.Open(str(data), gdalconst.GA_ReadOnly)
             # Should return whole DataSource, otherwise it will be destroyed

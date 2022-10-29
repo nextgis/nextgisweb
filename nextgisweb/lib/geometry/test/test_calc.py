@@ -1,7 +1,7 @@
 import pytest
 
-from nextgisweb.lib.geometry import Geometry, geom_area, geom_length, Transformer
-from nextgisweb.lib.osrhelper import sr_from_epsg
+from .. import Geometry, geom_area, geom_length, Transformer
+from ...osrhelper import sr_from_epsg
 
 
 wkt_gorky_theater_lhr = 'POLYGON((14682273 5329594,14682300 5329697,14682359 5329681,14682331 5329577,14682273 5329594))'

@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from nextgisweb.lib.migration.graph import OperationGraph
+from ..graph import OperationGraph
 
 
 class MO(object):

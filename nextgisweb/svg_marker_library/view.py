@@ -1,5 +1,5 @@
-from nextgisweb.dynmenu import DynItem, Label, Link
-from nextgisweb.resource import Resource, Widget
+from ..dynmenu import DynItem, Label, Link
+from ..resource import Resource, Widget
 
 from .model import SVGMarkerLibrary
 from .util import _, COMP_ID
