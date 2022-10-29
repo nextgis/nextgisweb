@@ -14,16 +14,16 @@ directory.  Consider the directory structure on the example for package
 
 ::
 
-  .                               # Repository root directory
-  ├── package                     # Package source root
-  │   ├── component               # Component root directory
-  │   │   ├── test                # Test root directory
-  │   │   │   ├── data            # Test data directory
-  │   │   │   ├── __init__.py     # Dummy __init__ module
-  │   │   │   └── test_*.py       # Test module files
-  │   │   └── __init__.py         # And other component files
-  │   └── __init__.py             # Package files and other components
-  └── setup.py                    # Setuptools configuration file
+  🗁                               # Repository root directory
+  ├── 🗁 package                   # Package source root
+  │   ├── 🗁 component             # Component root directory
+  │   │   ├── 🗁 test              # Test root directory
+  │   │   │   ├── 🗀 data          # Test data directory
+  │   │   │   ├── 🗎 __init__.py   # Dummy __init__ module
+  │   │   │   └── 🗎 test_*.py     # Test module files
+  │   │   └── 🗎 __init__.py       # And other component files
+  │   └── 🗎 __init__.py           # Package files and other components
+  └── 🗎 setup.py                  # Setuptools configuration file
 
 Unit tests
 ----------
