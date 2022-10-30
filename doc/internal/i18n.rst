@@ -112,11 +112,10 @@ work with strings: first, the string is marked as requiring translation, then
 before displaying it to the user, it's translated according to the user's
 preferences. 
 
-The class :py:class:`nextgisweb.i18n.trstring.TrString` solves this problem,
-which is similar to the class :py:class:`translationstring.TranslationString`,
-but with some additional convenience in terms of string interpolation. Let's
-look at the example of the ``bar`` component from the ``nextgisweb_foo``
-package.
+The class :py:class:`nextgisweb.lib.i18n.trstr.TrStr` solves this problem, which
+is similar to the class :py:class:`translationstring.TranslationString`, but
+with some additional convenience in terms of string interpolation. Let's look at
+the example of the ``bar`` component from the ``nextgisweb_foo`` package.
 
 .. code-block:: text
   :caption: Sample directory structure
@@ -131,12 +130,12 @@ package.
 .. code-block:: python
   :caption: File util.py
 
-  from nextgisweb.i18n import trstring_factory
-  _ = trstring_factory('bar')
+  from nextgisweb.lib.i18n import trstr_factory
+  _ = trstr_factory('bar')
 
-Function :py:func:`nextgisweb.i18n.trstring.trstring_factory` allows you to
-simplify creation of strings :py:class:`~nextgisweb.i18n.trstring.TrString` with
-a predefined domain, which is specified in the function parameters. For
+Function :py:func:`nextgisweb.lib.i18n.trstr.trstr_factory` allows you to
+simplify creation of strings :py:class:`~nextgisweb.lib.i18n.trstr.TrStr` with a
+predefined domain, which is specified in the function parameters. For
 convenience, both the function and the class are also available for import from
 the module :py:mod:`nextgisweb.i18n`, as shown in the examples.
 

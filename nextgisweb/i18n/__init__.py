@@ -13,11 +13,11 @@ __all__ = [
 
 
 def trstring_factory(domain):
-    # from warnings import warn
-    # warn(
-    #     "Function 'nextgisweb.i18n.trstring_factory' has been deprecated. "
-    #     "Replace it with 'nextgisweb.lib.i18n.trstr_factory'.",
-    #     DeprecationWarning, stacklevel=2)
+    from warnings import warn
+    warn(
+        "Function 'nextgisweb.i18n.trstring_factory' has been deprecated. "
+        "Replace it with 'nextgisweb.lib.i18n.trstr_factory'.",
+        DeprecationWarning, stacklevel=2)
     return trstr_factory(domain)
 
 
