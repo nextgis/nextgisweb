@@ -1,6 +1,6 @@
 import math
 import numpy
-from six import BytesIO
+from io import BytesIO
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
