@@ -12,7 +12,7 @@ from .component import Component, load_all
 from .package import pkginfo
 
 
-class Env(object):
+class Env:
 
     def __init__(self, cfg=None, setup_logging=True, enable_disabled=False):
         if cfg is None:

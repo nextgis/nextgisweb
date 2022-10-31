@@ -259,7 +259,7 @@ def _password_hash_cache(a, b):
     return result
 
 
-class PasswordHashValue(object):
+class PasswordHashValue:
     """ Automatic password hashes comparison class """
 
     def __init__(self, value):

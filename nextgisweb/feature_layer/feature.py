@@ -3,7 +3,7 @@ from osgeo import ogr
 from .interface import FIELD_TYPE
 
 
-class Feature(object):
+class Feature:
 
     def __init__(self, layer=None, id=None, fields=None, geom=None, box=None, calculations=None):
         self._layer = layer
@@ -87,7 +87,7 @@ class Feature(object):
         return ogr_feature
 
 
-class FeatureSet(object):
+class FeatureSet:
 
     def one(self):
         data = list(self.__iter__())

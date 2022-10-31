@@ -12,7 +12,7 @@ from .util import _
 _registry = registry_maker()
 
 
-class SerializerBase(object):
+class SerializerBase:
 
     def __init__(self, obj, user, data=None):
         self.obj = obj
@@ -54,7 +54,7 @@ class ISerializedAttribute(Interface):
 
 
 @implementer(ISerializedAttribute)
-class SerializedProperty(object):
+class SerializedProperty:
 
     def __init__(self, read=None, write=None, scope=None, depth=1):
         self.read = read

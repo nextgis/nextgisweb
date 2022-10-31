@@ -24,7 +24,7 @@ def to_nsjdon(data):
     return dumps(data)
 
 
-class OnResponse(object):
+class OnResponse:
 
     def __init__(self, request, response, body):
         self._request = request

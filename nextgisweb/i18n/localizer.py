@@ -48,7 +48,7 @@ class Translations(BabelTranslations):
         return self.dugettext(domain, msg)
 
 
-class Localizer(object):
+class Localizer:
     def __init__(self, locale, translations):
         self.locale_name = locale
         self.translations = translations

@@ -2,7 +2,7 @@ import re
 from datetime import timedelta
 
 
-class OptionType(object):
+class OptionType:
     OTYPE_MAPPING = {}
 
     @classmethod

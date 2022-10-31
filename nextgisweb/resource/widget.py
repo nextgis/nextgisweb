@@ -15,7 +15,7 @@ class WidgetMeta(type):
             _registry.append(cls)
 
 
-class WidgetBase(object):
+class WidgetBase:
 
     def __init__(self, operation, obj, request):
         self.operation = operation

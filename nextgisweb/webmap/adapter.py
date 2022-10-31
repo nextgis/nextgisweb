@@ -2,7 +2,7 @@ from ..registry import registry_maker
 from .util import _
 
 
-class WebMapAdapter(object):
+class WebMapAdapter:
     """ Web map adapter is responsible for how layer style
     will be displayed on web map.
 
@@ -13,7 +13,7 @@ class WebMapAdapter(object):
 
 
 @WebMapAdapter.registry.register
-class TileAdapter(object):
+class TileAdapter:
     """ An adapter that implements visulation of layer style through
     tile service, but the service itself is implemented by other component. """
 
@@ -23,7 +23,7 @@ class TileAdapter(object):
 
 
 @WebMapAdapter.registry.register
-class ImageAdapter(object):
+class ImageAdapter:
     """ An adapter that implements visulation of layer style through
     WMS-like GetImage request, but the service itself is implemented by other component. """
 

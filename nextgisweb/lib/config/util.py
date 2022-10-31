@@ -5,7 +5,7 @@ from collections import OrderedDict
 from configparser import RawConfigParser
 
 
-class _NO_DEFAULT(object):
+class _NO_DEFAULT:
 
     def __repr__(self):
         return "NO_DEFAULT"

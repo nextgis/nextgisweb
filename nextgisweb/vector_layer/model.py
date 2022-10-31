@@ -133,7 +133,7 @@ class DRIVERS:
 OPEN_OPTIONS = ('EXPOSE_FID=NO', )
 
 
-class ERROR_FIX(object):
+class ERROR_FIX:
     NONE = 'NONE'
     SAFE = 'SAFE'
     LOSSY = 'LOSSY'
@@ -147,7 +147,7 @@ skip_errors_default = False
 error_limit = 10
 
 
-class TOGGLE(object):
+class TOGGLE:
     AUTO = None
     YES = True
     NO = False
@@ -161,7 +161,7 @@ geom_cast_params_default = dict(
     has_z=TOGGLE.AUTO)
 
 
-class FID_SOURCE(object):
+class FID_SOURCE:
     AUTO = 'AUTO'
     SEQUENCE = 'SEQUENCE'
     FIELD = 'FIELD'
@@ -176,7 +176,7 @@ MIN_INT32 = - 2**31
 MAX_INT32 = 2**31 - 1
 
 
-class FieldDef(object):
+class FieldDef:
 
     def __init__(
         self, key, keyname, datatype, uuid, display_name=None,
@@ -192,7 +192,7 @@ class FieldDef(object):
         self.ogrindex = ogrindex
 
 
-class TableInfo(object):
+class TableInfo:
 
     def __init__(self, srs):
         self.srs = srs

@@ -1,11 +1,11 @@
 from ...registry import registry_maker
 
 
-class WebmapPlugin(object):
+class WebmapPlugin:
 
     registry = registry_maker()
 
 
-class WebmapLayerPlugin(object):
+class WebmapLayerPlugin:
 
     registry = registry_maker()

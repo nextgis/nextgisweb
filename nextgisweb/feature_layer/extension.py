@@ -2,7 +2,7 @@
 from ..registry import registry_maker
 
 
-class FeatureExtension(object):
+class FeatureExtension:
     registry = registry_maker()
 
     def __init__(self, layer):

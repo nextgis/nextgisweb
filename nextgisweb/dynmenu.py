@@ -1,4 +1,4 @@
-class DynMenu(object):
+class DynMenu:
 
     def __init__(self, *args):
         self._items = list(args)
@@ -30,7 +30,7 @@ class DynMenu(object):
         return result
 
 
-class Item(object):
+class Item:
 
     def __init__(self, key):
         self._key = tuple(key.split('/')) if isinstance(key, str) else (

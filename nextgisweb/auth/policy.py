@@ -9,7 +9,6 @@ from pyramid.authorization import ACLHelper
 from pyramid.httpexceptions import HTTPUnauthorized
 
 from ..lib.config import OptionAnnotations, Option
-from ..models import DBSession
 from ..pyramid import SessionStore, WebSession
 
 from .model import User
@@ -18,7 +17,7 @@ from .oauth import OAuthTokenRefreshException, OAuthPasswordGrantTypeException
 
 
 @implementer(ISecurityPolicy)
-class SecurityPolicy(object):
+class SecurityPolicy:
 
     def __init__(self, comp, options):
         self.comp = comp

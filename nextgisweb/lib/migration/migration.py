@@ -8,7 +8,7 @@ MigrationKey.__repr__ = lambda self: "<{}:{}>".format(*self)
 MigrationKey.__str__ = lambda self: "{}:{}".format(*self)
 
 
-class Migration(object):
+class Migration:
 
     def __init__(self, component, revision):
         self._component = component
@@ -64,7 +64,7 @@ class InitialMigration(Migration):
         self._has_rewind = False
 
 
-class Dependency(object):
+class Dependency:
 
     def __init__(self, value):
         m = re.match(r'^(.+)(==|[\>\<]=?)(.+)$', value)

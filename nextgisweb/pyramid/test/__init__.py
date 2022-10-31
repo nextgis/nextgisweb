@@ -43,7 +43,7 @@ def ngw_httptest_app(ngw_wsgi_test_helper):
     app.close()
 
 
-class WSGITestHelper(object):
+class WSGITestHelper:
 
     def __init__(self, environment, application):
         self.environment = environment

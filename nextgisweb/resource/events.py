@@ -1,4 +1,4 @@
-class AfterResourcePut(object):
+class AfterResourcePut:
     def __init__(self, resource, request):
         self.resource = resource
         self.request = request
@@ -7,7 +7,7 @@ class AfterResourcePut(object):
         return self.__class__.__name__
 
 
-class AfterResourceCollectionPost(object):
+class AfterResourceCollectionPost:
     def __init__(self, resource, request):
         self.resource = resource
         self.request = request

@@ -19,7 +19,7 @@ IR_FIELDS = ('id', 'identity', 'payload')
 IndexRecord = namedtuple('IndexRecord', IR_FIELDS)
 
 
-class IndexFile(object):
+class IndexFile:
 
     def __init__(self, filename):
         self.filename = filename
@@ -55,7 +55,7 @@ class IndexFile(object):
             yield read()
 
 
-class BackupBase(object):
+class BackupBase:
     registry = registry_maker()
 
     def __init__(self, payload):
@@ -76,7 +76,7 @@ class BackupBase(object):
         raise NotImplementedError()
 
 
-class BackupConfiguration(object):
+class BackupConfiguration:
 
     def __init__(self):
         self._exclude_table = list()

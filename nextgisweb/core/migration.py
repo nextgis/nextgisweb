@@ -110,7 +110,7 @@ class MigrationRegistry(Registry):
                 DBSession.delete(m)
 
 
-class MigrationContext(object):
+class MigrationContext:
 
     def __init__(self, registry, env):
         self.registry = registry

@@ -186,7 +186,7 @@ class SQLScriptMigration(Migration):
             return fd.read()
 
 
-class Registry(object):
+class Registry:
 
     def __init__(self):
         self._all_migrations = dict()

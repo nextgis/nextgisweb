@@ -174,7 +174,7 @@ DROP FUNCTION IF EXISTS srs_spatial_ref_sys_sync();
 """), propagate=True)
 
 
-class SRSMixin(object):
+class SRSMixin:
 
     @declared_attr
     def srs_id(cls):

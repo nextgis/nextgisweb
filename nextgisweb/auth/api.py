@@ -216,7 +216,7 @@ def register(request):
     return dict(id=obj.id)
 
 
-class OnUserLogin(object):
+class OnUserLogin:
 
     def __init__(self, user, request, next_url):
         self._user = user

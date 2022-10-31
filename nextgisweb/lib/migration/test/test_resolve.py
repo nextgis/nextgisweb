@@ -3,7 +3,7 @@ from collections import OrderedDict
 from ..graph import OperationGraph
 
 
-class MO(object):
+class MO:
     optype = 'test'
     oprank = 0
 

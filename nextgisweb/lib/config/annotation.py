@@ -6,7 +6,7 @@ from .otype import OptionType
 from .util import NO_DEFAULT
 
 
-class Option(object):
+class Option:
 
     def __init__(
         self, key, otype=str, default=NO_DEFAULT,
@@ -56,7 +56,7 @@ class OptionAnnotations(tuple):
         return OptionAnnotations(map(_copy, self))
 
 
-class ConfigOptions(object):
+class ConfigOptions:
 
     def __init__(self, options, annotations):
         self._options = options
@@ -185,7 +185,7 @@ class ConfigOptions(object):
         return ConfigOptionsPrefixProxy(self, prefix)
 
 
-class ConfigOptionsPrefixProxy(object):
+class ConfigOptionsPrefixProxy:
 
     def __init__(self, parent, prefix):
         self._parent = parent

@@ -35,7 +35,7 @@ class RequirementList(UserList):
         assert not g, "A cyclic dependency exists amongst %r" % g
 
 
-class Requirement(object):
+class Requirement:
 
     def __init__(self, dst, src, attr=None, cls=None, attr_empty=False):
         self.dst = dst
@@ -49,7 +49,7 @@ class Requirement(object):
             repr(self.dst), repr(self.src), self.attr)
 
 
-class Permission(object):
+class Permission:
 
     # Counter to number objects. Needed to get elements in
     # a way they were created inside class.

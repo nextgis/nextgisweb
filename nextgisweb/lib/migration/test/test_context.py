@@ -66,7 +66,7 @@ def initial(ctx):
     return ctx
 
 
-class Context(object):
+class Context:
 
     def __init__(self):
         self._conn = sqlite3.connect(':memory:')

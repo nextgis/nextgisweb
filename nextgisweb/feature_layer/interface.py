@@ -29,7 +29,7 @@ FIELD_TYPE_OGR = (
     ogr.OFTDateTime)
 
 
-class GEOM_TYPE(object):
+class GEOM_TYPE:
     POINT = 'POINT'
     LINESTRING = 'LINESTRING'
     POLYGON = 'POLYGON'
@@ -65,7 +65,7 @@ class GEOM_TYPE(object):
     )
 
 
-class FIELD_TYPE(object):
+class FIELD_TYPE:
     INTEGER = 'INTEGER'
     BIGINT = 'BIGINT'
     REAL = 'REAL'

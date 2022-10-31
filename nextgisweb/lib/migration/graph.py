@@ -8,7 +8,7 @@ from .operation import (
 from .migration import MigrationKey
 
 
-class MigrationGraph(object):
+class MigrationGraph:
 
     def __init__(self, registry, install_dependencies={}):
         self._install_dependecies = install_dependencies
@@ -131,7 +131,7 @@ class MigrationGraph(object):
         return result
 
 
-class OperationGraph(object):
+class OperationGraph:
 
     def __init__(self, opertaions):
         self.operations = opertaions

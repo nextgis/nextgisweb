@@ -34,7 +34,7 @@ class KindOfData(metaclass=KindOfDataMeta):
     display_name = None
 
 
-class StorageComponentMixin(object):
+class StorageComponentMixin:
 
     def initialize(self):
         super().initialize()

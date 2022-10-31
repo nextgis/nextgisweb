@@ -12,7 +12,7 @@ DBSession = scoped_session(sessionmaker(expire_on_commit=False))
 register(DBSession)
 
 
-class BaseClass(object):
+class BaseClass:
 
     def __init__(self, **kwargs):
         cls = type(self)

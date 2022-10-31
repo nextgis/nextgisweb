@@ -1,4 +1,4 @@
-class PageSection(object):
+class PageSection:
 
     def __init__(
         self, key=None, title=None, priority=50,
@@ -14,7 +14,7 @@ class PageSection(object):
         self.is_applicable = is_applicable
 
 
-class PageSections(object):
+class PageSections:
 
     def __init__(self):
         self._items = []

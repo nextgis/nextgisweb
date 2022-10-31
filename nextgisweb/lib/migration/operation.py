@@ -1,4 +1,4 @@
-class BaseOperation(object):
+class BaseOperation:
     opname = 'base'
     oprank = 0
 

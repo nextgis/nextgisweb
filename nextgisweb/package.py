@@ -31,7 +31,7 @@ def _module_path(module_name):
     return Path(pathname)
 
 
-class Package(object):
+class Package:
 
     def __init__(self, entrypoint):
         self._name = entrypoint.dist.key.replace('-', '_')
@@ -107,7 +107,7 @@ class Package(object):
         self._qualified = True
 
 
-class PkgInfo(object):
+class PkgInfo:
 
     def __init__(self):
         self.scanned = False

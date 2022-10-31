@@ -1,7 +1,7 @@
 from pyramid.config import Configurator as PyramidConfigurator
 
 
-class RouteHelper(object):
+class RouteHelper:
 
     def __init__(self, name, config):
         self.config = config

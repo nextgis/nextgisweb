@@ -9,7 +9,7 @@ from ..pyramid.uacompat import FAMILIES
 
 
 @Command.registry.register
-class JSRealmInstallCommand(object):
+class JSRealmInstallCommand:
     identity = 'jsrealm.install'
     no_initialize = True
 

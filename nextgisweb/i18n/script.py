@@ -254,7 +254,7 @@ def cmd_compile(args):
 
 
 @attrs
-class StatRecord(object):
+class StatRecord:
     package = attrib(default=None)
     component = attrib(default=None)
     locale = attrib(default=None)

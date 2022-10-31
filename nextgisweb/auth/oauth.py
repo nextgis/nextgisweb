@@ -28,7 +28,7 @@ from .util import _, clean_user_keyname, enum_name
 MAX_TOKEN_LENGTH = 250
 
 
-class OAuthHelper(object):
+class OAuthHelper:
 
     def __init__(self, options):
         self.options = options
@@ -419,7 +419,7 @@ class OAuthHelper(object):
     ))
 
 
-class OnAccessTokenToUser(object):
+class OnAccessTokenToUser:
 
     def __init__(self, user, profile):
         self._user = user

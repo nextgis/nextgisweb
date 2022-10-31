@@ -80,7 +80,7 @@ class LayerField(Base):
         return result
 
 
-class LayerFieldsMixin(object):
+class LayerFieldsMixin:
     __field_class__ = LayerField
     __scope__ = DataStructureScope
 
@@ -222,7 +222,7 @@ class FeatureLayerSerializer(Serializer):
     fields = _fields_attr(read=P_DSS_READ, write=P_DSS_WRITE)
 
 
-class FeatureQueryIntersectsMixin(object):
+class FeatureQueryIntersectsMixin:
 
     def __init__(self):
         self._intersects = None

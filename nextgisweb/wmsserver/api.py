@@ -34,7 +34,7 @@ GFI_RADIUS = 5
 GFI_FEATURE_COUNT = 1
 
 
-class IMAGE_FORMAT(object):
+class IMAGE_FORMAT:
     PNG = 'image/png'
     JPEG = 'image/jpeg'
 

@@ -36,7 +36,7 @@ NEXTGIS_GEOSERVICES = 'nextgis_geoservices'
 url_template_pattern = re.compile(r'^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\{\}]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/\{\}?]*)?$', re.IGNORECASE | re.UNICODE)  # NOQA
 
 
-class SCHEME(object):
+class SCHEME:
     XYZ = 'xyz'
     TMS = 'tms'
 
@@ -155,7 +155,7 @@ class ConnectionSerializer(Serializer):
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)
-class RenderRequest(object):
+class RenderRequest:
     def __init__(self, style, srs, cond):
         self.style = style
         self.srs = srs

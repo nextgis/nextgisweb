@@ -158,7 +158,7 @@ class ConnectionSerializer(Serializer):
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)
-class RenderRequest(object):
+class RenderRequest:
 
     def __init__(self, style, srs, cond):
         self.style = style

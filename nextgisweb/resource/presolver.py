@@ -7,7 +7,7 @@ ExplainRequirement = namedtuple('ExplainRequirement', [
     'result', 'resource', 'requirement', 'satisfied', 'resolver'])
 
 
-class PermissionResolver(object):
+class PermissionResolver:
 
     def __init__(self, resource, user, permissions=None, explain=False):
         self._resource = resource

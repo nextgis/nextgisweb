@@ -30,7 +30,7 @@ def viewargs(**kw):
     return wrap
 
 
-class ClientRoutePredicate(object):
+class ClientRoutePredicate:
     def __init__(self, val, config):
         self.val = val
 
@@ -46,7 +46,7 @@ class ClientRoutePredicate(object):
         return "<client>"
 
 
-class ErrorRendererPredicate(object):
+class ErrorRendererPredicate:
     def __init__(self, val, config):
         self.val = val
 

@@ -1,5 +1,5 @@
 from .registry import registry_maker
 
 
-class Command(object):
+class Command:
     registry = registry_maker()

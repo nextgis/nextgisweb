@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-class FIELD_TYPE_WFS(object):
+class FIELD_TYPE_WFS:
     INTEGER = 'integer'
     LONG = 'long'
     DOUBLE = 'double'
