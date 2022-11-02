@@ -1,16 +1,19 @@
+import { PropTypes } from "prop-types";
+import { useMemo } from "react";
+
 import { Alert } from "@nextgisweb/gui/antd";
 import { ContentBox, LoadingWrapper } from "@nextgisweb/gui/component";
 import {
     KeynameTextBox,
     LanguageSelect,
-    Password,
+    Password
 } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
 import settings from "@nextgisweb/pyramid/settings!auth";
-import { PropTypes } from "prop-types";
-import { useMemo } from "react";
+
 import { PrincipalMemberSelect } from "../field";
 import { default as oauth, makeTeamManageButton } from "../oauth";
 import getMessages from "../userMessages";
@@ -77,6 +80,7 @@ export function UserWidget({ id }) {
                     label: i18n.gettext("Groups"),
                     widget: PrincipalMemberSelect,
                     choices: group || [],
+                    memberHref: (userId) => routeURL('auth.group.edit', userId),
                     value:
                         group && isNewUser
                             ? group.filter((g) => g.register).map((g) => g.id)

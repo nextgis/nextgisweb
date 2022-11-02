@@ -20,7 +20,9 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
 import { PropTypes } from "prop-types";
 import React, { useEffect, useMemo, useState } from "react";
+
 import "./ModelBrowse.less";
+
 export function ModelBrowse({
     model: m,
     columns,
@@ -161,7 +163,7 @@ export function ModelBrowse({
     };
 
     const rowSelection = {
-        onChange: (selectedRowKeys, selectedRows) => {
+        onChange: (selectedRowKeys) => {
             setSelected(selectedRowKeys);
         },
         getCheckboxProps: (record) => ({

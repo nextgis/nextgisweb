@@ -1,10 +1,12 @@
+import { PropTypes } from "prop-types";
+import { useState } from "react";
+
 import { ContentBox } from "@nextgisweb/gui/component";
 import { KeynameTextBox } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
-import { route } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
-import { PropTypes } from "prop-types";
-import { useState } from "react";
+
 import { PrincipalMemberSelect } from "../field";
 import getMessages from "../groupMessages";
 
@@ -25,6 +27,7 @@ export function GroupWidget({ id }) {
             name: "members",
             label: i18n.gettext("Users"),
             widget: PrincipalMemberSelect,
+            memberHref: (userId) => routeURL('auth.user.edit', userId),
             choices: async () =>
                 (
                     await route("auth.user.collection").get({

@@ -34,11 +34,11 @@ export function ModelForm(props) {
     const model =
         typeof m === "string"
             ? {
-                  item: m + ".item",
-                  collection: m + ".collection",
-                  edit: m + ".edit",
-                  browse: m + ".browse",
-              }
+                item: m + ".item",
+                collection: m + ".collection",
+                edit: m + ".edit",
+                browse: m + ".browse",
+            }
             : m;
 
     const form = props.form || Form.useForm()[0];
@@ -173,4 +173,5 @@ ModelForm.propTypes = {
     form: PropTypes.any,
     onChange: PropTypes.func,
     allowDelete: PropTypes.bool,
+    messages: PropTypes.object,
 };
