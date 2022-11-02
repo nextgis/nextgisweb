@@ -36,7 +36,17 @@ export function PrincipalMemberSelect(props) {
                 onClose={onClose}
                 style={{ marginRight: 3 }}
             >
-                {memberHref ? <a href={memberHref(value)}>{label}</a> : label}
+                {memberHref ? (
+                    <a
+                        href={memberHref(value)}
+                        style={{ textDecoration: "none" }}
+                        target="_blank"
+                    >
+                        {label}
+                    </a>
+                ) : (
+                    label
+                )}
             </Tag>
         );
     };
