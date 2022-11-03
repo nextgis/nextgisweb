@@ -219,15 +219,20 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         ds = gdal.Open(fn, gdalconst.GA_ReadOnly)
         levels = list(map(str, calc_overviews_levels(ds)))
-        ds = None
 
         cmd = ['gdaladdo', '-q', '-clean', fn]
 
         logger.debug('Removing existing overviews with command: ' + ' '.join(cmd))
         subprocess.check_call(cmd)
 
+        data_type = ds.GetRasterBand(1).DataType
+        resampling = (
+            'nearest' if gdal.DataTypeIsComplex(data_type) else 'gauss'
+        )
+        ds = None
+
         cmd = [
-            'gdaladdo', '-q', '-ro', '-r', 'gauss',
+            'gdaladdo', '-q', '-ro', '-r', resampling,
             '--config', 'COMPRESS_OVERVIEW', 'DEFLATE',
             '--config', 'INTERLEAVE_OVERVIEW', 'PIXEL',
             '--config', 'BIGTIFF_OVERVIEW', 'YES',
