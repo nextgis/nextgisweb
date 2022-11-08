@@ -17,6 +17,7 @@ Changes
 - Support for fixed length ``character`` columns for PostGIS layers.
 - Automatic logout when changing user password or login.
 - Experimental support for authorization links.
+- Support for booleans and nulls in resource metadata.
 
 
 4.2.0

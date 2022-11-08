@@ -6,8 +6,7 @@ from ..resource import (
     Serializer,
     SerializedProperty)
 
-from .util import COMP_ID
-
+from .util import COMP_ID, _
 
 Base = declarative_base(dependencies=('resource', ))
 
@@ -28,15 +27,15 @@ class ResourceMetadataItem(Base):
 
     def tval(self):
         if self.vinteger is not None:
-            return ('integer', self.vinteger)
+            return ('number', self.vinteger)
         elif self.vfloat is not None:
-            return ('float', self.vfloat)
+            return ('number', self.vfloat)
         elif self.vtext is not None:
-            return ('text', self.vtext)
+            return ('string', self.vtext)
         elif self.vboolean is not None:
             return ('boolean', self.vboolean)
         else:
-            return (None, None)
+            return ('null', None)
 
     @property
     def vtype(self):
@@ -53,6 +52,14 @@ class ResourceMetadataItem(Base):
         self.vfloat = value if isinstance(value, float) else None
         self.vtext = value if isinstance(value, str) else None
         self.vboolean = value if isinstance(value, bool) else None
+    
+
+VTYPE_DISPLAY_NAME = {
+    'string': _("String"),
+    'number': _("Number"),
+    'boolean': _("Boolean"),
+    'null': _("Empty"),
+}      
 
 
 class _items_attr(SerializedProperty):
