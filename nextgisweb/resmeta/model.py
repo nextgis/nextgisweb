@@ -21,6 +21,7 @@ class ResourceMetadataItem(Base):
     vinteger = db.Column(db.Integer)
     vfloat = db.Column(db.Float)
     vtext = db.Column(db.Unicode)
+    vboolean = db.Column(db.Boolean)
 
     resource = db.relationship(Resource, backref=db.backref(
         COMP_ID, cascade='all, delete-orphan'))
@@ -32,6 +33,8 @@ class ResourceMetadataItem(Base):
             return ('float', self.vfloat)
         elif self.vtext is not None:
             return ('text', self.vtext)
+        elif self.vboolean is not None:
+            return ('boolean', self.vboolean)
         else:
             return (None, None)
 
@@ -45,9 +48,11 @@ class ResourceMetadataItem(Base):
 
     @value.setter
     def value(self, value):
-        self.vinteger = value if isinstance(value, int) else None
+        self.vinteger = value if isinstance(value, int) \
+            and not isinstance(value, bool) else None
         self.vfloat = value if isinstance(value, float) else None
         self.vtext = value if isinstance(value, str) else None
+        self.vboolean = value if isinstance(value, bool) else None
 
 
 class _items_attr(SerializedProperty):
@@ -67,7 +72,7 @@ class _items_attr(SerializedProperty):
         imap = dict()   # Records to be rewritten
 
         for i in odata:
-            if i.key in value and value[i.key] is not None:
+            if i.key in value:
                 imap[i.key] = i
             else:
                 rml.append(i)
@@ -77,9 +82,6 @@ class _items_attr(SerializedProperty):
             odata.remove(i)
 
         for k, val in value.items():
-            if val is None:
-                continue
-
             itm = imap.get(k)
 
             if itm is None:
