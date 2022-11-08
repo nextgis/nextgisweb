@@ -89,6 +89,7 @@ export class EditorStore {
 
     constructor() {
         makeAutoObservable(this);
+        this.addPlaceholder();
     }
 
     load(value) {
