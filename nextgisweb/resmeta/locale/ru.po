@@ -1,36 +1,51 @@
-#: amd/ngw-resmeta/Widget.js:88 view.py:15
+#: amd/ngw-resmeta/Widget.js:12 view.py:15
 msgid "Metadata"
 msgstr "Метаданные"
 
-#: amd/ngw-resmeta/Widget.js:50 template/section.mako:9
+#: nodepkg/editor/EditorStore.js:30
+msgid "Key name is required."
+msgstr "Необходимо указать ключ."
+
+#: nodepkg/editor/EditorStore.js:38
+msgid "Key name is not unique."
+msgstr "Ключ не уникален."
+
+#: nodepkg/editor/EditorWidget.js:47
+msgid "Type here to add a new key..."
+msgstr "Введите новый ключ здесь..."
+
+#: nodepkg/editor/EditorWidget.js:86
+msgid "False"
+msgstr "Ложь"
+
+#: nodepkg/editor/EditorWidget.js:87
+msgid "True"
+msgstr "Истина"
+
+#: nodepkg/editor/EditorWidget.js:109
+msgid "String"
+msgstr "Строка"
+
+#: nodepkg/editor/EditorWidget.js:110
+msgid "Number"
+msgstr "Число"
+
+#: nodepkg/editor/EditorWidget.js:111
+msgid "Boolean"
+msgstr "Логический"
+
+#: nodepkg/editor/EditorWidget.js:112
+msgid "Empty"
+msgstr "Пусто"
+
+#: nodepkg/editor/EditorWidget.js:127 template/section.mako:10
 msgid "Key"
 msgstr "Ключ"
 
-#: amd/ngw-resmeta/Widget.js:59 template/section.mako:10
+#: nodepkg/editor/EditorWidget.js:138 template/section.mako:11
 msgid "Type"
 msgstr "Тип"
 
-#: amd/ngw-resmeta/Widget.js:66 template/section.mako:11
+#: nodepkg/editor/EditorWidget.js:148 template/section.mako:12
 msgid "Value"
 msgstr "Значение"
-
-#: amd/ngw-resmeta/Widget.js:115
-msgid "Text"
-msgstr "Текст"
-
-#: amd/ngw-resmeta/Widget.js:122
-msgid "Integer"
-msgstr "Целое число"
-
-#: amd/ngw-resmeta/Widget.js:129
-msgid "Float"
-msgstr "Вещественное число"
-
-#: amd/ngw-resmeta/Widget.js:136
-msgid "Add"
-msgstr "Добавить"
-
-#: amd/ngw-resmeta/Widget.js:142
-msgid "Remove"
-msgstr "Удалить"
-
