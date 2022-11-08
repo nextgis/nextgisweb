@@ -1,7 +1,12 @@
 from datetime import timedelta
 
 import pytest
+import transaction
 from freezegun import freeze_time
+
+from ...models import DBSession
+
+from .. import User
 
 
 @pytest.fixture(scope='module', autouse=True)
@@ -77,3 +82,35 @@ def _dummy_auth_request(ngw_webtest_app, status_code=200):
         '/api/component/auth/user/',
         expect_errors=status_code < 200 or status_code >= 300)
     assert resp.status_code == status_code
+
+
+@pytest.fixture
+def user():
+    with transaction.manager:
+        user = User(
+            keyname='test-user',
+            display_name='test-user',
+            password='password123'
+        ).persist()
+        DBSession.flush()
+
+    yield user
+
+    with transaction.manager:
+        DBSession.delete(user)
+
+
+def test_forget_user(ngw_webtest_factory, user):
+    app1 = ngw_webtest_factory()
+    app1.authorization = ('Basic', ('administrator', 'admin'))
+
+    app2 = ngw_webtest_factory()
+    app2.post('/api/component/auth/login', dict(
+        login=user.keyname, password='password123'))
+    resp = app2.get('/api/component/auth/current_user')
+    assert resp.json['keyname'] == user.keyname
+
+    app1.put_json(f'/api/component/auth/user/{user.id}', dict(password='other-password'))
+
+    resp = app2.get('/api/component/auth/current_user')
+    assert resp.json['keyname'] == 'guest'

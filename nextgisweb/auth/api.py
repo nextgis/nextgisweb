@@ -67,12 +67,14 @@ def user_iput(request):
     obj = User.filter_by(id=int(request.matchdict['id'])).one()
 
     if (
-        ('keyname' in data and obj.keyname != data['keyname'])
-        or ('password' in data and data['password'] is not True)
-        or data.get('alink_token') is not None
+        obj.id != request.authenticated_userid and (
+            ('keyname' in data and obj.keyname != data['keyname'])
+            or ('password' in data and data['password'] is not True)
+            or data.get('alink_token') is not None
+        )
     ):
         auth_policy = request.registry.getUtility(ISecurityPolicy)
-        auth_policy.forget_user(request)
+        auth_policy.forget_user(obj.id, request)
 
     check_keyname(obj, data)
     check_display_name(obj, data)
