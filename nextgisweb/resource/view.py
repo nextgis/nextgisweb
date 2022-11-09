@@ -292,7 +292,6 @@ def setup_pyramid(comp, config):
 
     Resource.__psection__.register(
         key='children', priority=40,
-        title=_("Child resources"),
         is_applicable=lambda obj: len(obj.children) > 0,
         template='nextgisweb:resource/template/section_children.mako')
 

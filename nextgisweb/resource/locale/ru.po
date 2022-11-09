@@ -509,4 +509,3 @@ msgstr "Используйте эти ссылки для подключения
 #: template/section_description.mako:4
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
-
