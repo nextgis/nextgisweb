@@ -147,46 +147,55 @@ def export(request):
     if encoding is not None:
         lco.append("ENCODING=%s" % encoding)
 
+    intersects = request.GET.get("intersects")
+    intersects_srs = int(request.GET.get("intersects_srs", srs.id))
+    if intersects is not None:
+        try:
+            geom = Geometry.from_wkt(intersects, srid=intersects_srs)
+        except GeometryNotValid:
+            raise ValidationError(_("Parameter 'intersects_srs' contains not valid geometry."))
+        query.intersects(geom)
+
     query.geom()
 
     ogr_ds = _ogr_memory_ds()
     ogr_layer = _ogr_layer_from_features(  # NOQA: 841
         request.context, query(), ds=ogr_ds, fid=fid)
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        filename = "%d.%s" % (
-            request.context.id,
-            driver.extension,
-        )
+    filename = "%d.%s" % (
+        request.context.id,
+        driver.extension,
+    )
 
-        vtopts = (
-            [
-                "-f", driver.name,
-                "-t_srs", srs.wkt,
-            ]
-            + list(itertools.chain(*[("-lco", o) for o in lco]))
-            + list(itertools.chain(*[("-dsco", o) for o in dsco]))
-        )
-
-        # CPLES_SQLI == 7
-        flds = [
-            '"{}" as "{}"'.format(
-                fld.keyname.replace('"', r"\""),
-                getattr(fld, "display_name" if display_name else "keyname").replace(
-                    '"', r"\""
-                ),
-            )
-            for fld in request.context.fields
-            if fld.keyname in fields
+    vtopts = (
+        [
+            "-f", driver.name,
+            "-t_srs", srs.wkt,
         ]
-        if fid is not None:
-            flds += ['FID as "{}"'.format(fid.replace('"', r'\"'))]
-        vtopts += ["-sql", 'select {} from ""'.format(", ".join(
-            flds if len(flds) > 0 else '*'))]
+        + list(itertools.chain(*[("-lco", o) for o in lco]))
+        + list(itertools.chain(*[("-dsco", o) for o in dsco]))
+    )
 
-        if driver.fid_support and fid is None:
-            vtopts.append('-preserve_fid')
+    # CPLES_SQLI == 7
+    flds = [
+        '"{}" as "{}"'.format(
+            fld.keyname.replace('"', r"\""),
+            getattr(fld, "display_name" if display_name else "keyname").replace(
+                '"', r"\""
+            ),
+        )
+        for fld in request.context.fields
+        if fld.keyname in fields
+    ]
+    if fid is not None:
+        flds += ['FID as "{}"'.format(fid.replace('"', r'\"'))]
+    vtopts += ["-sql", 'select {} from ""'.format(", ".join(
+        flds if len(flds) > 0 else '*'))]
 
+    if driver.fid_support and fid is None:
+        vtopts.append('-preserve_fid')
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
         gdal.VectorTranslate(
             os.path.join(tmp_dir, filename), ogr_ds,
             options=gdal.VectorTranslateOptions(options=vtopts)

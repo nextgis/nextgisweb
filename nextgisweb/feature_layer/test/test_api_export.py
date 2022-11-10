@@ -74,10 +74,14 @@ def update_field(layer_id, ngw_webtest_app, ngw_auth_administrator):
 @pytest.fixture()
 def export_geojson(layer_id, ngw_webtest_app, ngw_auth_administrator):
 
-    def wrapped(display_name=False, fid=None):
+    def wrapped(display_name=False, fid=None, intersects=None, intersects_srs=None):
         qs = dict(
             format='GeoJSON', srs='4326', zipped='false',
             display_name=str(display_name).lower())
+        if intersects is not None:
+            qs['intersects'] = intersects
+        if intersects_srs is not None:
+            qs['intersects_srs'] = intersects_srs
         if fid is not None:
             qs['fid'] = fid
         resp = ngw_webtest_app.get(f'/api/resource/{layer_id}/export', qs)
@@ -113,3 +117,12 @@ def test_field_escape(value, update_field, export_geojson):
     geojson = export_geojson(display_name=True)
     fprop = geojson['features'][0]['properties']
     assert fprop['display_name'] == 'value'
+
+
+@pytest.mark.parametrize('intersects, count', [
+    ('POLYGON((-1 -1, -1 1, 1 1, 1 -1, -1 -1))', 1),
+    ('POLYGON((1 1, 1 3, 3 3, 3 1, 1 1))', 0),
+])
+def test_intersects(intersects, count, export_geojson):
+    geojson = export_geojson(intersects=intersects, intersects_srs=3857)
+    assert len(geojson['features']) == count
