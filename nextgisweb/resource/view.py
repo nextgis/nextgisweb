@@ -298,7 +298,6 @@ def setup_pyramid(comp, config):
     Resource.__psection__.register(
         key='description',
         priority=20,
-        title=_("Description"),
         is_applicable=lambda obj: obj.description is not None,
         template='nextgisweb:resource/template/section_description.mako')
 

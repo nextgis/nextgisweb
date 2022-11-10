@@ -438,8 +438,9 @@ a[class*=" icon-"]:hover:before {
   box-shadow: @elevation-base;
   border-radius: @border-radius-base;
 
-  p:first-child {
+  & > p:first-child,  & > p:last-child {
     margin-top: 0;
+    margin-bottom: 0;
   }
 
   & > .table-wrapper {
