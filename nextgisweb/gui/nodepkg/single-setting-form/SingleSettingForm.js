@@ -25,9 +25,11 @@ export function SingleSettingForm({
     const { data } = useRouteGet({ name: model });
 
     useEffect(() => {
-        const val = settingName ? data[settingName] : data;
-        setValue(val);
-        setStatus(null);
+        if (data !== undefined) {
+            const val = settingName ? data[settingName] : data;
+            setValue(val);
+            setStatus(null);
+        }
     }, [data]);
 
     const save = async () => {
