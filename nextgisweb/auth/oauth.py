@@ -72,7 +72,7 @@ class OAuthHelper:
             _set('server.introspection_endpoint', f"{oidc_url}/token/introspect")
             _set('profile.subject.attr', 'sub')
             _set('profile.keyname.attr', 'preferred_username')
-            _set('profile.display_name.attr', 'first_name, last_name')
+            _set('profile.display_name.attr', 'name')
 
         else:
             raise ValueError(f"Invalid value: {stype}")
