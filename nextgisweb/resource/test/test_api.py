@@ -57,3 +57,59 @@ def test_resource_search(resource, ngw_webtest_app, ngw_auth_administrator):
         display_name__ilike='test юни%'), status=200)
     assert len(resp.json) == 1
     assert resp.json[0]['resource']['display_name'] == resource.display_name
+
+
+@pytest.fixture(scope='module')
+def resources(ngw_resource_group):
+    # R - A
+    #   - B - C
+    #       - D
+    with transaction.manager:
+        admin = User.by_keyname('administrator')
+        res_R = ResourceGroup(
+            parent_id=ngw_resource_group, display_name='Test resource ROOT',
+            keyname='test_res_R', owner_user=admin,
+        ).persist()
+        res_A = ResourceGroup(
+            parent=res_R, display_name='Test resource A',
+            keyname='test_res_A', owner_user=admin,
+        ).persist()
+        res_B = ResourceGroup(
+            parent=res_R, display_name='Test resource B',
+            keyname='test_res_B', owner_user=admin,
+        ).persist()
+        res_C = ResourceGroup(
+            parent=res_B, display_name='Test resource C',
+            keyname='test_res_C', owner_user=admin,
+        ).persist()
+        res_D = ResourceGroup(
+            parent=res_B, display_name='Test resource D',
+            keyname='test_res_D', owner_user=admin,
+        ).persist()
+        DBSession.flush()
+
+    yield
+
+    with transaction.manager:
+        DBSession.delete(res_D)
+        DBSession.delete(res_C)
+        DBSession.delete(res_B)
+        DBSession.delete(res_A)
+        DBSession.delete(res_R)
+
+
+@pytest.mark.parametrize('root_keyname, keynames_expected', (
+    ('test_res_R', {'test_res_R', 'test_res_A', 'test_res_B', 'test_res_C', 'test_res_D'}),
+    ('test_res_B', {'test_res_B', 'test_res_C', 'test_res_D'}),
+))
+def test_resource_search_parent_id_recursive(
+    resources, root_keyname, keynames_expected, ngw_webtest_app,
+    ngw_auth_administrator
+):
+    response = ngw_webtest_app.get('/api/resource/search/', dict(keyname=root_keyname))
+    root_id = response.json[0]['resource']['id']
+
+    data = ngw_webtest_app.get('/api/resource/search/', dict(parent_id__recursive=root_id)).json
+    keynames = {item['resource']['keyname'] for item in data}
+
+    assert keynames == keynames_expected

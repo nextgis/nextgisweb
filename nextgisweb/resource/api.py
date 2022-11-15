@@ -2,7 +2,7 @@ from collections import OrderedDict
 import zope.event
 
 from pyramid.httpexceptions import HTTPBadRequest
-from sqlalchemy.orm import with_polymorphic
+from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 
 from .. import db
@@ -292,6 +292,17 @@ def search(request):
 
     scls = smap.get(smode)
 
+    query = DBSession.query(Resource)
+    if 'parent_id__recursive' in request.GET:
+        parent_id_recursive = int(request.GET.pop('parent_id__recursive'))
+        if parent_id_recursive != 0:
+            rquery = DBSession.query(Resource.id).filter(
+                Resource.id == int(parent_id_recursive)
+            ).cte(recursive=True)
+            rquery = rquery.union_all(DBSession.query(Resource.id).filter(
+                Resource.parent_id == rquery.c.id))
+            query = query.filter(exists().where(Resource.id == rquery.c.id))
+
     def serialize(resource, user):
         serializer = scls(resource, user)
         serializer.serialize()
@@ -315,10 +326,10 @@ def search(request):
             filter_.append(ilike_op(attr, v))
         else:
             raise ValidationError("Operator '%s' is not supported" % op)
+    if len(filter_) > 0:
+        query = query.filter(db.and_(*filter_))
 
-    query = Resource \
-        .filter(db.and_(True, *filter_)) \
-        .order_by(Resource.display_name)
+    query = query.order_by(Resource.display_name)
 
     if principal_id is not None:
         owner = User.filter_by(principal_id=int(principal_id)).one()
