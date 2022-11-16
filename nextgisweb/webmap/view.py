@@ -93,11 +93,18 @@ def display(obj, request):
         if p_mid_data:
             plugin.update((p_mid_data,))
 
+    items_states = {
+        'expanded': [],
+        'checked': []
+    }
+
     def traverse(item):
         data = dict(
             id=item.id,
+            key=item.id,
             type=item.item_type,
-            label=item.display_name
+            label=item.display_name,
+            title=item.display_name,
         )
 
         if item.item_type == 'layer':
@@ -119,11 +126,15 @@ def display(obj, request):
             # ):
             #     return None
 
+            layer_enabled = bool(item.layer_enabled)
+            if layer_enabled:
+                items_states.get('checked').append(item.id)
+
             # Main element parameters
             data.update(
                 layerId=style.parent_id,
                 styleId=style.id,
-                visibility=bool(item.layer_enabled),
+                visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
                 transparency=item.layer_transparency,
                 minScaleDenom=item.layer_min_scale_denom,
@@ -146,10 +157,13 @@ def display(obj, request):
             display.mid.plugin.update(plugin.keys())
 
         elif item.item_type in ('root', 'group'):
+            expanded = item.group_expanded
+            if expanded:
+                items_states.get('expanded').append(item.id)
             # Recursively run all elements excluding those
             # with no permissions
             data.update(
-                expanded=item.group_expanded,
+                expanded=expanded,
                 children=list(filter(
                     None,
                     map(traverse, item.children)
@@ -167,6 +181,7 @@ def display(obj, request):
         extent=tmp["extent"],
         extent_constrained=tmp["extent_constrained"],
         rootItem=traverse(obj.root_item),
+        itemsStates=items_states,
         mid=dict(
             adapter=tuple(display.mid.adapter),
             basemap=tuple(display.mid.basemap),
