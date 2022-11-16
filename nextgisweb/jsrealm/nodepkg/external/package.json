@@ -9,7 +9,6 @@
         }
     },
     "dependencies": {
-        "cbtree": "pjekel/cbtree#v0.9.4",
         "codemirror": "5.20.2",
         "dgrid": "SitePen/dgrid#v0.3.21",
         "dijit": "1.16.x",

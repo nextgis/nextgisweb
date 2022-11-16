@@ -89,7 +89,6 @@ def amd_packages():
             'xstyle',
             'put-selector',
             'dgrid',
-            'cbtree',
 
             'handlebars',
             'jed',

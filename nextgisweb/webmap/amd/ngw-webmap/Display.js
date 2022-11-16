@@ -28,8 +28,6 @@ define([
     "dojo/request/xhr",
     "dojo/data/ItemFileWriteStore",
     "dojo/topic",
-    "cbtree/models/TreeStoreModel",
-    "cbtree/Tree",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/webmap/layers-tree",
     "@nextgisweb/pyramid/icon",
@@ -103,8 +101,6 @@ define([
     xhr,
     ItemFileWriteStore,
     topic,
-    TreeStoreModel,
-    Tree,
     reactApp,
     LayersTreeComp,
     icon,
@@ -309,13 +305,6 @@ define([
             this._mapDeferred.then(
                 function () { widget._itemStorePrepare(); }
             );
-
-            // Tree store model
-            this.itemModel = new TreeStoreModel({
-                store: this.itemStore,
-                checkedAttr: "checked",
-                query: { type: "root" }
-            });
 
             this.displayProjection = "EPSG:3857";
             this.lonlatProjection = "EPSG:4326";

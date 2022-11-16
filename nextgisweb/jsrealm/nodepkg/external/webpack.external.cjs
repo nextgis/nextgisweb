@@ -74,17 +74,6 @@ addPackage("dgrid", {
     },
 });
 
-addPackage("cbtree", {
-    globOptions: {
-        ignore: [
-            "**/cbtree/node_modules/**",
-            "**/themes/(nihilo|soria|tundra|iphone)/**",
-            "**/demos/**",
-            "**/store/server/**",
-        ],
-    },
-});
-
 addPackage("handlebars", {
     from: "dist/handlebars.min.js",
     to: "handlebars.js",
