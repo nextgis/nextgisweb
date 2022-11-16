@@ -40,6 +40,7 @@ def setup_pyramid(comp, config):
                         'feature_layer/feature_attachment', _("Attachments"),
                         lambda args: args.request.route_url(
                             "feature_attachment.page",
-                            id=args.obj.id))
+                            id=args.obj.id),
+                        icon='material-attach_file')
 
     Resource.__dynmenu__.add(LayerMenuExt())
