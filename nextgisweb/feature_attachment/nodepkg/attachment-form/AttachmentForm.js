@@ -2,7 +2,7 @@ import { useState } from "react";
 import { fileUploader } from "@nextgisweb/file-upload";
 import { Button, Checkbox, Upload } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
-import { route, routeURL, request, LunkwillParam } from "@nextgisweb/pyramid/api";
+import { routeURL, request, LunkwillParam } from "@nextgisweb/pyramid/api";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 import i18n from "@nextgisweb/pyramid/i18n!feature_attachment";
 
@@ -41,10 +41,15 @@ export function AttachmentForm({ id }) {
                 const uploadedFiles = await fileUploader({
                     files: [info.file.originFileObj]
                 });
-                console.log(uploadedFiles)
+                const lunkwillParam = new LunkwillParam();
+                lunkwillParam.suggest();
+                let url = routeURL("feature_attachment.import", id);
                 try {
-                    await route("feature_attachment.import", { id: id }).put({
-                        json: { source: uploadedFiles[0], clear: clearCurrent }
+                    await request(url, {
+                        method: "PUT",
+                        json: { source: uploadedFiles[0], clear: clearCurrent },
+                        lunkwill: lunkwillParam,
+                        lunkwillReturnUrl: true,
                     });
                 } catch (err) {
                     errorModal(err);
