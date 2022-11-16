@@ -221,15 +221,13 @@ def import_attachment(resource, request):
     data, meta = request.env.file_upload.get_filename(upload_meta['id'])
     with DBSession.no_autoflush, ZipFile(data, mode='r') as z:
         meta_file = 'metadata.json'
-        namelist = z.namelist()
 
-        def create(name, feature_id):
+        def create(info, feature_id):
             fileobj = env.file_storage.fileobj(component=COMP_ID)
             dstfile = env.file_storage.filename(fileobj, makedirs=True)
-            with z.open(name, 'r') as sf, open(dstfile, 'wb') as df:
+            with z.open(info, 'r') as sf, open(dstfile, 'wb') as df:
                 copyfileobj(sf, df)
 
-            info = z.getinfo(name)
             if not clear:
                 for att_cmp in FeatureAttachment.filter_by(
                     resource_id=resource.id,
@@ -249,21 +247,24 @@ def import_attachment(resource, request):
 
             return obj
 
-        if meta_file in namelist:
+        if meta_file in z.namelist():
             meta = loadb(z.read(meta_file))
             for name, item_meta in meta['items'].items():
-                obj = create(name, item_meta['feature_id'])
+                obj = create(z.getinfo(name), item_meta['feature_id'])
                 if obj is None:
                     continue
                 for k in ('name', 'mime_type', 'description'):
                     setattr(obj, k, item_meta[k])
         else:
-            for path in map(Path, namelist):
-                obj = create(str(path), int(path.parts[0]))
+            for info in z.infolist():
+                if info.is_dir():
+                    continue
+                path = Path(info.filename)
+                obj = create(info, int(path.parts[0]))
                 if obj is None:
                     continue
                 obj.name = os.path.join(*path.parts[1:])
-                with z.open(str(path)) as f:
+                with z.open(info) as f:
                     obj.mime_type = magic.from_buffer(f.read(1024), mime=True)
 
 
