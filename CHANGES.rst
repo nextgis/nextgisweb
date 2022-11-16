@@ -11,6 +11,7 @@ Changes
 - Ability to turn off user password and keep only OAuth authentication.
 - Fields selection while exporting featrue layer.
 - Search by coordinates on web maps.
+- Check for disk free space in the healthcheck.
 - CSV and XLSX support when creating a vector layer.
 - Ability to download all attachments of a vector layer.
 - Vector layer export to KML and KMZ formats.
@@ -18,6 +19,8 @@ Changes
 - Automatic logout when changing user password or login.
 - Experimental support for authorization links.
 - Support for booleans and nulls in resource metadata.
+- Support for materialized views and 25D geometries in PostGIS layers.
+- Ability to search through resources recursively in REST API.
 
 
 4.2.0
