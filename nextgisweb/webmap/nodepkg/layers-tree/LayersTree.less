@@ -1,13 +1,26 @@
-.layers-tree {
+.ngw-webmap-layers-tree {
     .ant-tree-treenode {
-        padding: 0 0 2px;
+        width: 100%;
+        padding-bottom: 2px;
 
-        .ant-tree-checkbox {
-            margin: 2px 0 0 0;
+        .ant-tree-switcher {
+            width: 18px;
         }
 
-        .layer-icon {
-            color: #993333;
+        .ant-tree-checkbox {
+            margin-right: 2px;
+        }
+
+        .ant-tree-iconEle {
+            width: 18px;
+        }
+
+        .ant-tree-node-content-wrapper {
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding-left: 2px;
         }
     }
 }

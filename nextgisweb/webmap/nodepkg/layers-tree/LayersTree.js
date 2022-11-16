@@ -1,72 +1,72 @@
-import {useEffect, useMemo, useState} from "react";
-import {Tree} from "@nextgisweb/gui/antd";
-import FolderIcon from "@material-icons/svg/folder";
-import FolderOpenIcon from "@material-icons/svg/folder_open";
-import DescriptionIcon from "@material-icons/svg/description";
+import { useMemo, useState } from "react";
+import { Tree } from "@nextgisweb/gui/antd";
+import FolderClosedIcon from "@material-icons/svg/folder/outline";
+import FolderOpenIcon from "@material-icons/svg/folder_open/outline";
+import DescriptionIcon from "@material-icons/svg/description/outline";
 
 import PropTypes from "prop-types";
 
 import "./LayersTree.less";
 
-const iconGroupStyle = {
-    fontSize: "18px",
-    color: "#c29e68"
-};
-
-const iconLayerStyle = {
-    fontSize: "15px",
-    color: "#759dc0"
-};
-
 const handleWebMapItem = (webMapItem) => {
     if (webMapItem.type === "root" || webMapItem.type === "group") {
-        webMapItem.icon = ({expanded}) => expanded ?
-            <FolderOpenIcon style={iconGroupStyle}/> :
-            <FolderIcon style={iconGroupStyle}/>;
+        webMapItem.icon = ({ expanded }) =>
+            expanded ? <FolderOpenIcon /> : <FolderClosedIcon />;
     } else if (webMapItem.type === "layer") {
-        webMapItem.icon = <DescriptionIcon style={iconLayerStyle}/>;
+        webMapItem.icon = <DescriptionIcon />;
     }
 
     if (webMapItem.children) {
-        webMapItem.children.forEach((childItem) => {
-            handleWebMapItem(childItem);
-        });
+        webMapItem.children.forEach(handleWebMapItem);
     }
 };
 
 const prepareWebMapItems = (webMapItems) => {
-    webMapItems.forEach(i => {
-        handleWebMapItem(i);
-    });
+    webMapItems.forEach(handleWebMapItem);
     return webMapItems;
 };
 
-export function LayersTree({webMapItems, expanded, checked, onCheckChanged, onSelect}) {
+export function LayersTree({
+    webMapItems,
+    expanded,
+    checked,
+    onCheckChanged,
+    onSelect,
+}) {
     const [expandedKeys, setExpandedKeys] = useState(expanded);
     const [checkedKeys, setCheckedKeys] = useState(checked);
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [autoExpandParent, setAutoExpandParent] = useState(true);
 
-    const treeItems = useMemo(() => prepareWebMapItems(webMapItems), [webMapItems]);
+    const treeItems = useMemo(
+        () => prepareWebMapItems(webMapItems),
+        [webMapItems]
+    );
 
     const onExpand = (expandedKeysValue) => {
         setExpandedKeys(expandedKeysValue);
         setAutoExpandParent(false);
     };
+
     const onCheck = (checkedKeysValue) => {
-        const checked = checkedKeysValue.filter(x => !checkedKeys.includes(x));
-        const unchecked = checkedKeys.filter(x => !checkedKeysValue.includes(x));
-        if (onCheckChanged) onCheckChanged({checked, unchecked});
+        const checked = checkedKeysValue.filter(
+            (x) => !checkedKeys.includes(x)
+        );
+        const unchecked = checkedKeys.filter(
+            (x) => !checkedKeysValue.includes(x)
+        );
+        if (onCheckChanged) onCheckChanged({ checked, unchecked });
         setCheckedKeys(checkedKeysValue);
     };
+
     const _onSelect = (selectedKeysValue) => {
         setSelectedKeys(selectedKeysValue);
         if (onSelect) onSelect(selectedKeysValue);
     };
 
-    return (<>
+    return (
         <Tree
-            className="layers-tree"
+            className="ngw-webmap-layers-tree"
             checkable
             showIcon
             onExpand={onExpand}
@@ -78,7 +78,7 @@ export function LayersTree({webMapItems, expanded, checked, onCheckChanged, onSe
             selectedKeys={selectedKeys}
             treeData={treeItems}
         />
-    </>);
+    );
 }
 
 LayersTree.propTypes = {
@@ -86,5 +86,5 @@ LayersTree.propTypes = {
     expanded: PropTypes.array,
     checked: PropTypes.array,
     onCheckChanged: PropTypes.func,
-    onSelect: PropTypes.func
+    onSelect: PropTypes.func,
 };
