@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { fileUploader } from "@nextgisweb/file-upload";
-import { Button, Checkbox, Upload } from "@nextgisweb/gui/antd";
+import { Button, Checkbox, Modal, Upload } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { routeURL, request, LunkwillParam } from "@nextgisweb/pyramid/api";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
@@ -30,6 +30,12 @@ export function AttachmentForm({ id }) {
     // Import
     const [loadingImport, setLoadingImport] = useState(false);
     const [clearCurrent, setClearCurrent] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalText, setModalText] = useState();
+
+    const onOk = () => {
+        window.open(routeURL("resource.show", { id: id }), "_self");
+    }
 
     const props = {
         multiple: false,
@@ -44,8 +50,9 @@ export function AttachmentForm({ id }) {
                 const lunkwillParam = new LunkwillParam();
                 lunkwillParam.suggest();
                 let url = routeURL("feature_attachment.import", id);
+                let data;
                 try {
-                    await request(url, {
+                    data = await request(url, {
                         method: "PUT",
                         json: { source: uploadedFiles[0], clear: clearCurrent },
                         lunkwill: lunkwillParam,
@@ -57,7 +64,12 @@ export function AttachmentForm({ id }) {
                 } finally {
                     setLoadingImport(false);
                 }
-                window.open(routeURL("feature_layer.feature.browse", { id: id }), "_self");
+                let message = i18n.gettext("Files imported - {}.").replace('{}', data.imported);
+                if (data.skipped > 0) {
+                    message += " " + i18n.gettext("Files skipped - {}.").replace('{}', data.skipped);
+                }
+                setModalText(message);
+                setModalOpen(true);
             }
         }
     }
@@ -79,6 +91,13 @@ export function AttachmentForm({ id }) {
             <Button type="primary" loading={loadingDownload} onClick={download}>
                 {i18n.gettext("Download as ZIP-archive")}
             </Button>
+            <Modal
+                open={modalOpen}
+                onOk={onOk}
+                onCancel={() => setModalOpen(false)}
+            >
+                <p>{modalText}</p>
+            </Modal>
         </div>
     );
 }

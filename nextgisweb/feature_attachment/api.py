@@ -285,19 +285,22 @@ def import_attachment(resource, request):
                 msg = tr(
                     _("Following files found in {}, but missing from the archive: ")
                     .format(meta_file))
-                raise ValidationError(msg + file_list_msg(excess_items, str_limit - len(msg)))
+                raise ValidationError(
+                    message=msg + file_list_msg(excess_items, str_limit - len(msg)))
             elif len((excess_files := (cmp_B - cmp_A))) > 0:
                 msg = tr(
                     _("Following files found in archive, but missing in {}: ")
                     .format(meta_file))
-                raise ValidationError(msg + file_list_msg(excess_files, str_limit - len(msg)))
+                raise ValidationError(
+                    message=msg + file_list_msg(excess_files, str_limit - len(msg)))
 
         for info in infolist:
             if meta is None:
                 path = Path(info.filename)
                 if not (len(path.parts) > 1 and path.parts[0].isdigit()):
                     raise ValidationError(
-                        _("Could not determine feature ID from path '{}'.").format(info.filename))
+                        message=_("Could not determine feature ID from path '{}'.")
+                        .format(info.filename))
                 feature_id = int(path.parts[0])
             else:
                 item_meta = meta['items'][info.filename]

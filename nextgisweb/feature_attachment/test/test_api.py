@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 from tempfile import NamedTemporaryFile
 from uuid import uuid4
 from zipfile import ZipFile
