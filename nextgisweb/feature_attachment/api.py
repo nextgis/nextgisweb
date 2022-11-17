@@ -12,6 +12,7 @@ import magic
 from PIL import Image
 from pyramid.response import Response, FileResponse
 
+from ..core.exception import ValidationError
 from ..lib.json import dumpb, loadb
 from ..resource import DataScope, resource_factory
 from ..env import env
@@ -21,7 +22,7 @@ from ..feature_layer.exception import FeatureNotFound
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from .model import FeatureAttachment
-from .util import COMP_ID
+from .util import COMP_ID, _
 
 
 def attachment_or_not_found(resource_id, feature_id, attachment_id):
@@ -210,6 +211,7 @@ def export(resource, request):
 
 def import_attachment(resource, request):
     request.resource_permission(DataScope.write)
+    tr = request.localizer.translate
 
     data = request.json_body
 
@@ -221,6 +223,9 @@ def import_attachment(resource, request):
     data, meta = request.env.file_upload.get_filename(upload_meta['id'])
     with DBSession.no_autoflush, ZipFile(data, mode='r') as z:
         meta_file = 'metadata.json'
+
+        imported = 0
+        skipped = 0
 
         def create(info, feature_id):
             fileobj = env.file_storage.fileobj(component=COMP_ID)
@@ -247,25 +252,72 @@ def import_attachment(resource, request):
 
             return obj
 
-        if meta_file in z.namelist():
-            meta = loadb(z.read(meta_file))
-            for name, item_meta in meta['items'].items():
-                obj = create(z.getinfo(name), item_meta['feature_id'])
-                if obj is None:
-                    continue
-                for k in ('name', 'mime_type', 'description'):
-                    setattr(obj, k, item_meta[k])
-        else:
-            for info in z.infolist():
-                if info.is_dir():
-                    continue
+        meta = None
+        infolist = []
+        for info in z.infolist():
+            if info.is_dir():
+                continue
+            if info.filename == meta_file:
+                meta = loadb(z.read(meta_file))
+            else:
+                infolist.append(info)
+
+        if meta is not None:
+            str_limit = 500
+
+            def file_list_msg(files, limit):
+                join = ", "
+                msg = ""
+                for name in files:
+                    name = f"'{name}'"
+                    if msg != "":
+                        name = join + name
+                    limit -= len(name)
+                    if limit <= 0:
+                        msg += _("... ({} files).".format(len(files)))
+                        return msg
+                    msg += name
+                return msg + "."
+
+            cmp_A = set(meta['items'].keys())
+            cmp_B = set(info.filename for info in infolist)
+            if len((excess_items := (cmp_A - cmp_B))) > 0:
+                msg = tr(
+                    _("Following files found in {}, but missing from the archive: ")
+                    .format(meta_file))
+                raise ValidationError(msg + file_list_msg(excess_items, str_limit - len(msg)))
+            elif len((excess_files := (cmp_B - cmp_A))) > 0:
+                msg = tr(
+                    _("Following files found in archive, but missing in {}: ")
+                    .format(meta_file))
+                raise ValidationError(msg + file_list_msg(excess_files, str_limit - len(msg)))
+
+        for info in infolist:
+            if meta is None:
                 path = Path(info.filename)
-                obj = create(info, int(path.parts[0]))
-                if obj is None:
-                    continue
+                if not (len(path.parts) > 1 and path.parts[0].isdigit()):
+                    raise ValidationError(
+                        _("Could not determine feature ID from path '{}'.").format(info.filename))
+                feature_id = int(path.parts[0])
+            else:
+                item_meta = meta['items'][info.filename]
+                feature_id = item_meta['feature_id']
+
+            obj = create(info, feature_id)
+            if obj is None:
+                skipped += 1
+                continue
+            imported += 1
+
+            if meta is None:
                 obj.name = os.path.join(*path.parts[1:])
                 with z.open(info) as f:
                     obj.mime_type = magic.from_buffer(f.read(1024), mime=True)
+            else:
+                for k in ('name', 'mime_type', 'description'):
+                    setattr(obj, k, item_meta.get(k))
+
+    return dict(imported=imported, skipped=skipped)
 
 
 def setup_pyramid(comp, config):
