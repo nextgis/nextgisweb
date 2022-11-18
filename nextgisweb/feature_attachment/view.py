@@ -16,7 +16,7 @@ def attachment(request):
 
     return dict(
         obj=request.context,
-        title=_("Attachments"),
+        title=_("Manage attachments"),
         props=dict(id=request.context.id),
         entrypoint="@nextgisweb/feature_attachment/attachment-form",
         maxheight=True
@@ -37,7 +37,7 @@ def setup_pyramid(comp, config):
             if IFeatureLayer.providedBy(args.obj):
                 if args.obj.has_export_permission(args.request.user):
                     yield dm.Link(
-                        'feature_layer/feature_attachment', _("Attachments"),
+                        'feature_layer/feature_attachment', _("Manage attachments"),
                         lambda args: args.request.route_url(
                             "feature_attachment.page",
                             id=args.obj.id),

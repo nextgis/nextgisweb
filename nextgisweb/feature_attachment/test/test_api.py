@@ -153,7 +153,7 @@ def test_import_multiple(layer_id, ngw_webtest_app, ngw_auth_administrator):
     assert resp.json == dict(imported=0, skipped=3)
 
     resp = ngw_webtest_app.put_json(f'/api/resource/{layer_id}/feature_attachment/import', dict(
-        source=upload_meta, clear=True), status=200)
+        source=upload_meta, replace=True), status=200)
     assert resp.json == dict(imported=3, skipped=0)
 
     files = (

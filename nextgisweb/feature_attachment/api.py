@@ -215,8 +215,8 @@ def import_attachment(resource, request):
 
     data = request.json_body
 
-    clear = data.get('clear', False)
-    if clear:
+    replace = data.get('replace', False) is True
+    if replace:
         FeatureAttachment.filter_by(resource_id=resource.id).delete()
 
     upload_meta = data['source']
@@ -233,7 +233,7 @@ def import_attachment(resource, request):
             with z.open(info, 'r') as sf, open(dstfile, 'wb') as df:
                 copyfileobj(sf, df)
 
-            if not clear:
+            if not replace:
                 for att_cmp in FeatureAttachment.filter_by(
                     resource_id=resource.id,
                     feature_id=feature_id,
