@@ -1,14 +1,13 @@
 import filecmp
-import os
 import re
 from io import BytesIO
 from itertools import count
-from pathlib import Path
 from shutil import copyfileobj
 from tempfile import NamedTemporaryFile
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import BadZipFile, ZIP_DEFLATED, ZipFile
+from contextlib import contextmanager
 
-import magic
+from magic import from_buffer as magic_from_buffer
 from PIL import Image
 from pyramid.response import Response, FileResponse
 
@@ -211,116 +210,143 @@ def export(resource, request):
 
 def import_attachment(resource, request):
     request.resource_permission(DataScope.write)
-    tr = request.localizer.translate
 
     data = request.json_body
-
     replace = data.get('replace', False) is True
-    if replace:
-        FeatureAttachment.filter_by(resource_id=resource.id).delete()
-
     upload_meta = data['source']
     data, meta = request.env.file_upload.get_filename(upload_meta['id'])
-    with DBSession.no_autoflush, ZipFile(data, mode='r') as z:
-        meta_file = 'metadata.json'
+
+    @contextmanager
+    def open_zip_file():
+        try:
+            with ZipFile(data, mode='r') as zf:
+                yield zf
+        except BadZipFile:
+            raise ValidationError(message=_("Invalid ZIP archive."))
+
+    with open_zip_file() as z:
+        try:
+            metadata_info = z.getinfo('metadata.json')
+        except KeyError:
+            metadata_info = None
+
+        if metadata_info is not None:
+            metadata = loadb(z.read(metadata_info))
+            metadata_items = metadata.get('items')
+        else:
+            metadata = None
+            metadata_items = None
+
+        sources = []
+
+        for info in z.infolist():
+            if info.is_dir() or info == metadata_info:
+                continue
+
+            info_fn = info.filename
+            src = dict(info=info)
+
+            if metadata_items is not None:
+                try:
+                    file_md = metadata_items.pop(info_fn)
+                except KeyError:
+                    raise ValidationError(message=_(
+                        "File '{}' isn't found in metadata.").format(info_fn))
+
+                file_name = file_md.get('name')
+                if not isinstance(file_name, str):
+                    raise ValidationError(message=_(
+                        "Invalid name for file '{}'.").format(info_fn))
+                src['name'] = file_name
+
+                file_fid = file_md.get('feature_id')
+                if not isinstance(file_fid, int):
+                    raise ValidationError(message=_(
+                        "Invalid feature ID for file '{}'.").format(info_fn))
+                src['feature_id'] = file_fid
+
+                file_mime = file_md.get('mime_type')
+                if file_mime is not None and not isinstance(file_mime, str):
+                    raise ValidationError(message=_(
+                        "Invalid MIME type for file '{}'.").format(info_fn))
+                src['mime_type'] = file_mime
+
+                file_desc = file_md.get('description')
+                if file_desc is not None and not isinstance(file_desc, str):
+                    raise ValidationError(message=_(
+                        "Invalid description for file '{}'.").format(info_fn))
+                src['description'] = file_desc
+
+            else:
+                try:
+                    file_fid, file_name = info.filename.split('/', 2)
+                    if file_fid.isdigit():
+                        file_fid = int(file_fid)
+                    else:
+                        raise ValueError
+                except ValueError:
+                    raise ValidationError(message=_(
+                        "Could not determine feature ID for file '{}'."
+                    ).format(info_fn))
+
+                src['feature_id'] = file_fid
+                src['name'] = file_name
+                src['mime_type'] = None
+                src['description'] = None
+
+            if src['mime_type'] is None:
+                with z.open(info) as f:
+                    src['mime_type'] = magic_from_buffer(f.read(1024), mime=True)
+
+            sources.append(src)
+
+        if metadata_items is not None:
+            for missing in metadata_items.keys():
+                raise ValidationError(message=_(
+                    "File '{}' isn't found in the archive.").format(missing))
 
         imported = 0
         skipped = 0
 
-        def create(info, feature_id):
-            fileobj = env.file_storage.fileobj(component=COMP_ID)
-            dstfile = env.file_storage.filename(fileobj, makedirs=True)
-            with z.open(info, 'r') as sf, open(dstfile, 'wb') as df:
-                copyfileobj(sf, df)
+        if replace:
+            FeatureAttachment.filter_by(resource_id=resource.id).delete()
+            DBSession.flush()
 
-            if not replace:
-                for att_cmp in FeatureAttachment.filter_by(
-                    resource_id=resource.id,
-                    feature_id=feature_id,
-                    size=info.file_size
-                ):
-                    cmpfile = env.file_storage.filename(att_cmp.fileobj, makedirs=False)
-                    if filecmp.cmp(dstfile, cmpfile, False):
-                        return None
+        with DBSession.no_autoflush:
+            for src in sources:
+                fileobj = env.file_storage.fileobj(component=COMP_ID)
+                dstfile = env.file_storage.filename(fileobj, makedirs=True)
+                with z.open(src['info'], 'r') as sf, open(dstfile, 'wb') as df:
+                    copyfileobj(sf, df)
 
-            obj = FeatureAttachment(
-                resource=resource,
-                feature_id=feature_id,
-                size=info.file_size,
-            ).persist()
-            obj.fileobj = fileobj.persist()
+                skip = False
+                if not replace:
+                    for att_cmp in FeatureAttachment.filter_by(
+                        resource_id=resource.id,
+                        feature_id=src['feature_id'],
+                        size=src['info'].file_size
+                    ):
+                        cmpfile = env.file_storage.filename(
+                            att_cmp.fileobj, makedirs=False)
+                        if filecmp.cmp(dstfile, cmpfile, False):
+                            skip = True
+                            break
 
-            return obj
+                if not skip:
+                    obj = FeatureAttachment(
+                        resource=resource,
+                        feature_id=src['feature_id'],
+                        name=src['name'],
+                        mime_type=src['mime_type'],
+                        descrition=src['description'],
+                        size=src['info'].file_size,
+                    ).persist()
+                    obj.fileobj = fileobj.persist()
+                    imported += 1
+                else:
+                    skipped += 1
 
-        meta = None
-        infolist = []
-        for info in z.infolist():
-            if info.is_dir():
-                continue
-            if info.filename == meta_file:
-                meta = loadb(z.read(meta_file))
-            else:
-                infolist.append(info)
-
-        if meta is not None:
-            str_limit = 500
-
-            def file_list_msg(files, limit):
-                join = ", "
-                msg = ""
-                for name in files:
-                    name = f"'{name}'"
-                    if msg != "":
-                        name = join + name
-                    limit -= len(name)
-                    if limit <= 0:
-                        msg += _("... ({} files).".format(len(files)))
-                        return msg
-                    msg += name
-                return msg + "."
-
-            cmp_A = set(meta['items'].keys())
-            cmp_B = set(info.filename for info in infolist)
-            if len((excess_items := (cmp_A - cmp_B))) > 0:
-                msg = tr(
-                    _("Following files found in {}, but missing from the archive: ")
-                    .format(meta_file))
-                raise ValidationError(
-                    message=msg + file_list_msg(excess_items, str_limit - len(msg)))
-            elif len((excess_files := (cmp_B - cmp_A))) > 0:
-                msg = tr(
-                    _("Following files found in archive, but missing in {}: ")
-                    .format(meta_file))
-                raise ValidationError(
-                    message=msg + file_list_msg(excess_files, str_limit - len(msg)))
-
-        for info in infolist:
-            if meta is None:
-                path = Path(info.filename)
-                if not (len(path.parts) > 1 and path.parts[0].isdigit()):
-                    raise ValidationError(
-                        message=_("Could not determine feature ID from path '{}'.")
-                        .format(info.filename))
-                feature_id = int(path.parts[0])
-            else:
-                item_meta = meta['items'][info.filename]
-                feature_id = item_meta['feature_id']
-
-            obj = create(info, feature_id)
-            if obj is None:
-                skipped += 1
-                continue
-            imported += 1
-
-            if meta is None:
-                obj.name = os.path.join(*path.parts[1:])
-                with z.open(info) as f:
-                    obj.mime_type = magic.from_buffer(f.read(1024), mime=True)
-            else:
-                for k in ('name', 'mime_type', 'description'):
-                    setattr(obj, k, item_meta.get(k))
-
-    return dict(imported=imported, skipped=skipped)
+        return dict(imported=imported, skipped=skipped)
 
 
 def setup_pyramid(comp, config):
