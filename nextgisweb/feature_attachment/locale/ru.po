@@ -2,6 +2,38 @@
 msgid "Feature attachments"
 msgstr "Прикрепленные к объектам файлы"
 
+#: api.py:225
+msgid "Invalid ZIP archive."
+msgstr "Некорректный ZIP-архив."
+
+#: api.py:253
+msgid "File '{}' isn't found in metadata."
+msgstr "Файл '{}' не найден в метаданных."
+
+#: api.py:258
+msgid "Invalid name for file '{}'."
+msgstr "Некорректное имя для файла '{}'."
+
+#: api.py:264
+msgid "Invalid feature ID for file '{}'."
+msgstr "Некорректный идентификатор объекта для файла '{}'."
+
+#: api.py:270
+msgid "Invalid MIME type for file '{}'."
+msgstr "Некорректный MIME-тип для файла '{}'."
+
+#: api.py:276
+msgid "Invalid description for file '{}'."
+msgstr "Некорректное описание для файла '{}'."
+
+#: api.py:288
+msgid "Could not determine feature ID for file '{}'."
+msgstr "Не удалось определить идентификатор объекта для файла '{}'."
+
+#: api.py:305
+msgid "File '{}' isn't found in the archive."
+msgstr "Файл '{}' не найден в архиве."
+
 #: exception.py:12
 msgid "Attachment not found"
 msgstr "Вложение не найдено"
@@ -16,8 +48,8 @@ msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 
 #: view.py:19 view.py:40
-msgid "Export attachments"
-msgstr "Экспорт вложений"
+msgid "Manage attachments"
+msgstr "Управление вложениями"
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:36
 #: amd/ngw-feature-attachment/EditorWidget.js:109
@@ -52,7 +84,62 @@ msgstr "Загрузить"
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/export-form/ExportForm.js:29
-msgid "Download attachments as ZIP-archive"
-msgstr "Скачать вложения как ZIP-архив"
+#: nodepkg/attachment-form/AttachmentForm.js:48
+msgid ""
+"Use export to copy feature attachments between different layers or to create "
+"a backup. The resulting ZIP archive will contain all of the attachments put "
+"in directories named after feature IDs. Attachment metadata are put into a "
+"separate JSON file."
+msgstr ""
+"Используйте экспорт для копирования вложений между разными слоями или для "
+"создания резервной копии. Полученный ZIP-архив будет содержать все вложения в"
+" директориях с именами объектов. Метаданные вложений сохраняются в отдельном "
+"JSON-файле."
+
+#: nodepkg/attachment-form/AttachmentForm.js:58
+msgid "Export attachments to ZIP archive"
+msgstr "Экспортировать вложения в ZIP-архив"
+
+#: nodepkg/attachment-form/AttachmentForm.js:73
+msgid "Back to resource"
+msgstr "Назад к ресурсу"
+
+#: nodepkg/attachment-form/AttachmentForm.js:75
+msgid "Close"
+msgstr "Закрыть"
+
+#: nodepkg/attachment-form/AttachmentForm.js:78
+msgid "The archive has been successfully imported."
+msgstr "Импорт архива выполнен успешно."
+
+#: nodepkg/attachment-form/AttachmentForm.js:81
+msgid "Attachments imported - {i}, skipped - {s}."
+msgstr "Импортировано вложений - {i}, пропущено - {s}."
+
+#: nodepkg/attachment-form/AttachmentForm.js:115
+msgid ""
+"Upload a ZIP archive to batch append attachments to existing features. An "
+"archive must contain directories named after feature IDs. Each folder can "
+"contain one or many attachments. Duplicates will be ignored."
+msgstr ""
+"Загрузите ZIP-архив для пакетного добавления вложений к существующим "
+"объектам. Архив должен содержать директории названные по идентификаторам "
+"объектов. Каждая директория может содержать одно или несколько вложений. "
+"Дубликаты будут пропущены."
+
+#: nodepkg/attachment-form/AttachmentForm.js:124
+msgid "Delete existing attachments"
+msgstr "Удалить существующие вложения"
+
+#: nodepkg/attachment-form/AttachmentForm.js:145
+msgid "Import attachments from ZIP archive"
+msgstr "Импортировать вложения из ZIP-архива."
+
+#: nodepkg/attachment-form/AttachmentForm.js:157
+msgid "Export"
+msgstr "Экспорт"
+
+#: nodepkg/attachment-form/AttachmentForm.js:162
+msgid "Import"
+msgstr "Импорт"
 
