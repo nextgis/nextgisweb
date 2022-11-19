@@ -8,7 +8,7 @@ from .. import dynmenu as dm
 from .util import _
 
 
-def export(request):
+def attachment(request):
     request.resource_permission(DataScope.read)
 
     if not request.context.has_export_permission(request.user):
@@ -16,19 +16,19 @@ def export(request):
 
     return dict(
         obj=request.context,
-        title=_("Export attachments"),
+        title=_("Manage attachments"),
         props=dict(id=request.context.id),
-        entrypoint="@nextgisweb/feature_attachment/export-form",
+        entrypoint="@nextgisweb/feature_attachment/attachment-form",
         maxheight=True
     )
 
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'feature_attachment.export.page',
-        r'/resource/{id:\d+}/export-attachments',
+        'feature_attachment.page',
+        r'/resource/{id:\d+}/attachments',
         factory=resource_factory,
-    ).add_view(export, context=IFeatureLayer, renderer=REACT_RENDERER)
+    ).add_view(attachment, context=IFeatureLayer, renderer=REACT_RENDERER)
 
     # Layer menu extension
     class LayerMenuExt(dm.DynItem):
@@ -37,10 +37,10 @@ def setup_pyramid(comp, config):
             if IFeatureLayer.providedBy(args.obj):
                 if args.obj.has_export_permission(args.request.user):
                     yield dm.Link(
-                        'feature_layer/feature_attachment-export', _("Export attachments"),
+                        'feature_layer/feature_attachment', _("Manage attachments"),
                         lambda args: args.request.route_url(
-                            "feature_attachment.export.page",
-                            id=args.obj.id))
+                            "feature_attachment.page",
+                            id=args.obj.id),
+                        icon='material-attach_file')
 
     Resource.__dynmenu__.add(LayerMenuExt())
-

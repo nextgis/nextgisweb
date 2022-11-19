@@ -13,7 +13,7 @@ Changes
 - Search by coordinates on web maps.
 - Check for disk free space in the healthcheck.
 - CSV and XLSX support when creating a vector layer.
-- Ability to download all attachments of a vector layer.
+- Export and import feature layer attachments.
 - Vector layer export to KML and KMZ formats.
 - Support for fixed length ``character`` columns for PostGIS layers.
 - Automatic logout when changing user password or login.
