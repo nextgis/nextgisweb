@@ -2,6 +2,14 @@
 msgid "Internationalization test"
 msgstr "Тест интернационализации"
 
+#: nodepkg/buttons/CopyToClipboardButton.js:11
+msgid "Copied to clipboard"
+msgstr "Скопиривано в буфер обмена"
+
+#: nodepkg/buttons/CopyToClipboardButton.js:20
+msgid "Copy to clipboard"
+msgstr "Копировать в буфер обмена"
+
 #: nodepkg/component/SaveButton.js:9 nodepkg/model-form/ModelForm.js:12
 msgid "Save"
 msgstr "Сохранить"
@@ -30,7 +38,7 @@ msgstr "OK"
 msgid "Back to home"
 msgstr "На главную"
 
-#: nodepkg/fields-form/FieldsForm.js:66
+#: nodepkg/fields-form/FieldsForm.js:87
 msgid "This value is required"
 msgstr "Необходимо указать значение"
 
@@ -46,44 +54,44 @@ msgstr "Уточнить перевод или добавить новый"
 msgid "Browser default"
 msgstr "По умолчанию в браузере"
 
-#: nodepkg/model-browse/ModelBrowse.js:50 nodepkg/model-form/ModelForm.js:32
+#: nodepkg/model-browse/ModelBrowse.js:51 nodepkg/model-form/ModelForm.js:32
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: nodepkg/model-browse/ModelBrowse.js:51
+#: nodepkg/model-browse/ModelBrowse.js:52
 msgid "Item deleted"
 msgstr "Элемент удален"
 
-#: nodepkg/model-browse/ModelBrowse.js:53
+#: nodepkg/model-browse/ModelBrowse.js:54
 msgid "Items deleted"
 msgstr "Элементы удалены"
 
-#: nodepkg/model-browse/ModelBrowse.js:118
+#: nodepkg/model-browse/ModelBrowse.js:119
 msgid "The errors occurred during execution"
 msgstr "Во время выполнения возникли ошибки"
 
-#: nodepkg/model-browse/ModelBrowse.js:122
+#: nodepkg/model-browse/ModelBrowse.js:123
 msgid "Failed to delete items:"
 msgstr "Не удалось удалить элементы:"
 
-#: nodepkg/model-browse/ModelBrowse.js:145
+#: nodepkg/model-browse/ModelBrowse.js:146
 msgid "Do you want to delete these items?"
 msgstr "Вы хотите удалить эти элементы?"
 
-#: nodepkg/model-browse/ModelBrowse.js:182
+#: nodepkg/model-browse/ModelBrowse.js:183
 msgid "Edit"
 msgstr "Изменить"
 
-#: nodepkg/model-browse/ModelBrowse.js:191 nodepkg/model-browse/ModelBrowse.js:260
+#: nodepkg/model-browse/ModelBrowse.js:192 nodepkg/model-browse/ModelBrowse.js:259
 #: nodepkg/model-form/ModelForm.js:13
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/model-browse/ModelBrowse.js:216
+#: nodepkg/model-browse/ModelBrowse.js:215
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.js:238 nodepkg/model-form/ModelForm.js:11
+#: nodepkg/model-browse/ModelBrowse.js:237 nodepkg/model-form/ModelForm.js:11
 msgid "Create"
 msgstr "Создать"
 

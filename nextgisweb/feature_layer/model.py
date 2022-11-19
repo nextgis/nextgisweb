@@ -173,8 +173,8 @@ class _fields_attr(SP):
             if 'keyname' in fld:
                 if fld['keyname'] in FIELD_FORBIDDEN_NAME:
                     raise ValidationError(message=_(
-                        "Field name is forbidden: '%s'. Please remove or "
-                        "rename it.") % fld['keyname'])
+                        "Field name is forbidden: '{}'. Please remove or "
+                        "rename it.").format(fld['keyname']))
                 mfld.keyname = fld['keyname']
             if 'display_name' in fld:
                 mfld.display_name = fld['display_name']

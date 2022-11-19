@@ -126,14 +126,14 @@ msgstr "Чтение"
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:40 view.py:345
+#: scope.py:40 view.py:343
 msgid "Update"
 msgstr "Изменить"
 
 #: amd/ngw-resource/CompositeWidget.js:92 amd/ngw-resource/PermissionWidget.js:321
-#: nodepkg/children-section/ChildrenSection.js:37
-#: nodepkg/children-section/ChildrenSection.js:273
-#: nodepkg/delete-page/DeletePage.js:49 scope.py:44 view.py:353
+#: nodepkg/children-section/ChildrenSection.js:39
+#: nodepkg/children-section/ChildrenSection.js:275
+#: nodepkg/delete-page/DeletePage.js:49 scope.py:44 view.py:351
 msgid "Delete"
 msgstr "Удалить"
 
@@ -182,7 +182,7 @@ msgstr "Конфигурация"
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:98 view.py:360
+#: view.py:98 view.py:358
 msgid "JSON view"
 msgstr "Представление JSON"
 
@@ -190,7 +190,7 @@ msgstr "Представление JSON"
 msgid "Resource tree"
 msgstr "Дерево ресурсов"
 
-#: view.py:149 view.py:371
+#: view.py:149 view.py:369
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -202,7 +202,7 @@ msgstr "Обновить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:216 view.py:379
+#: view.py:216 view.py:377
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
@@ -211,24 +211,16 @@ msgstr "Экспорт ресурсов"
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:295
-msgid "Child resources"
-msgstr "Дочерние ресурсы"
-
-#: amd/ngw-resource/DescriptionWidget.js:17 view.py:302
-msgid "Description"
-msgstr "Описание"
-
-#: view.py:309
+#: view.py:307
 msgid "User permissions"
 msgstr "Права пользователя"
 
 #: amd/ngw-resource/PermissionWidget.js:66 amd/ngw-resource/PermissionWidget.js:133
-#: view.py:372
+#: view.py:370
 msgid "Action"
 msgstr "Действие"
 
-#: view.py:373
+#: view.py:371
 msgid "Extra"
 msgstr "Дополнительно"
 
@@ -265,6 +257,10 @@ msgstr "При проверке данных обнаружена ошибка. 
 #: amd/ngw-resource/CompositeWidget.js:258
 msgid "Validation failed"
 msgstr "Валидация провалилась"
+
+#: amd/ngw-resource/DescriptionWidget.js:17
+msgid "Description"
+msgstr "Описание"
 
 #: amd/ngw-resource/PermissionWidget.js:57
 msgid "All resources"
@@ -370,7 +366,7 @@ msgstr ""
 "доступа."
 
 #: amd/ngw-resource/template/Widget.hbs:8
-#: nodepkg/children-section/ChildrenSection.js:353
+#: nodepkg/children-section/ChildrenSection.js:355
 #: nodepkg/resource-picker/resource-picker-children/ResourcePickerChildren.js:108
 #: template/section_summary.mako:6
 msgid "Display name"
@@ -385,84 +381,84 @@ msgid "Parent"
 msgstr "Родитель"
 
 #: amd/ngw-resource/template/Widget.hbs:23
-#: nodepkg/children-section/ChildrenSection.js:374 template/section_summary.mako:44
+#: nodepkg/children-section/ChildrenSection.js:376 template/section_summary.mako:44
 msgid "Owner"
 msgstr "Владелец"
 
 #: amd/ngw-resource/template/Widget.hbs:28
-#: nodepkg/children-section/ChildrenSection.js:367 template/section_summary.mako:36
+#: nodepkg/children-section/ChildrenSection.js:369 template/section_summary.mako:36
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/children-section/ChildrenSection.js:32
+#: nodepkg/children-section/ChildrenSection.js:34
 msgid "Confirmation required"
 msgstr "Требуется подтверждение"
 
-#: nodepkg/children-section/ChildrenSection.js:33
+#: nodepkg/children-section/ChildrenSection.js:35
 msgid "Please confirm resource deletion. This action cannot be undone."
 msgstr "Пожалуйста подтвердите удаление. Это действие не может быть отменено."
 
-#: nodepkg/children-section/ChildrenSection.js:45
+#: nodepkg/children-section/ChildrenSection.js:47
 msgid "Resource deleted"
 msgstr "Ресурс удален"
 
-#: nodepkg/children-section/ChildrenSection.js:46
+#: nodepkg/children-section/ChildrenSection.js:48
 msgid "Resources deleted"
 msgstr "Ресурсы удалены"
 
-#: nodepkg/children-section/ChildrenSection.js:52
+#: nodepkg/children-section/ChildrenSection.js:54
 msgid "Resource has been moved"
 msgstr "Ресурс перемещен"
 
-#: nodepkg/children-section/ChildrenSection.js:53
+#: nodepkg/children-section/ChildrenSection.js:55
 msgid "Resources have been moved"
 msgstr "Ресурсы перемещены"
 
-#: nodepkg/children-section/ChildrenSection.js:178
+#: nodepkg/children-section/ChildrenSection.js:180
 msgid "Moving resources"
 msgstr "Перемещение ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:207
+#: nodepkg/children-section/ChildrenSection.js:209
 msgid "Deleting resources"
 msgstr "Удаление ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:239
+#: nodepkg/children-section/ChildrenSection.js:241
 msgid "Turn off multiple selection"
 msgstr "Отключить множественный выбор"
 
-#: nodepkg/children-section/ChildrenSection.js:240
+#: nodepkg/children-section/ChildrenSection.js:242
 msgid "Select multiple resources"
 msgstr "Выбрать несколько ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:249
+#: nodepkg/children-section/ChildrenSection.js:251
 msgid "Hide resources volume"
 msgstr "Скрыть размер ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:250
+#: nodepkg/children-section/ChildrenSection.js:252
 msgid "Show resources volume"
 msgstr "Показать размер ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:259
+#: nodepkg/children-section/ChildrenSection.js:261
 msgid "Hide resource creation date"
 msgstr "Скрыть дату создания ресурса"
 
-#: nodepkg/children-section/ChildrenSection.js:260
+#: nodepkg/children-section/ChildrenSection.js:262
 msgid "Show resource creation date"
 msgstr "Показать дату создания ресурса"
 
-#: nodepkg/children-section/ChildrenSection.js:282
+#: nodepkg/children-section/ChildrenSection.js:284
 msgid "Not all of the selected can be deleted."
 msgstr "Не все выделенные ресурсы могут быть удалены."
 
-#: nodepkg/children-section/ChildrenSection.js:297
+#: nodepkg/children-section/ChildrenSection.js:299
 msgid "Move"
 msgstr "Переместить"
 
-#: nodepkg/children-section/ChildrenSection.js:382
+#: nodepkg/children-section/ChildrenSection.js:384
 msgid "Created"
 msgstr "Дата создания"
 
-#: nodepkg/children-section/ChildrenSection.js:397
+#: nodepkg/children-section/ChildrenSection.js:403
 msgid "Volume"
 msgstr "Размер"
 
@@ -506,6 +502,6 @@ msgstr "Поиск ресурсов"
 msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
 
-#: template/section_description.mako:4
+#: template/section_description.mako:5
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."

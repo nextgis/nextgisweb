@@ -94,7 +94,7 @@ def export(request):
         if total_count > export_limit:
             raise ValidationError(
                 message=_(
-                    "The export limit is set to {limit:d} features, but the layer contains {count:d}."
+                    "The export limit is set to {limit} features, but the layer contains {count}."
                 ).format(limit=export_limit, count=total_count)
             )
 
@@ -153,7 +153,7 @@ def export(request):
         try:
             geom = Geometry.from_wkt(intersects, srid=intersects_srs)
         except GeometryNotValid:
-            raise ValidationError(_("Parameter 'intersects_srs' contains not valid geometry."))
+            raise ValidationError(message=_("Parameter 'intersects' geometry is not valid."))
         query.intersects(geom)
 
     query.geom()

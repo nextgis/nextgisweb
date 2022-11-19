@@ -1,29 +1,33 @@
-#: api.py:110
+#: api.py:96
+msgid "The export limit is set to {limit} features, but the layer contains {count}."
+msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
+
+#: api.py:105
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:115
+#: api.py:110
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:307 api.py:382
+#: api.py:156 api.py:630
+msgid "Parameter 'intersects' geometry is not valid."
+msgstr "Параметр 'intersects' содержит невалидную геометрию."
+
+#: api.py:331 api.py:406
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
 
-#: api.py:309
+#: api.py:333
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:315 api.py:387
+#: api.py:339 api.py:411
 #, python-format
 msgid "Date format '%s' is not supported."
 msgstr "Формат даты '%s' не поддерживается."
-
-#: api.py:606
-msgid "Parameter 'intersects' geometry is not valid."
-msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
 #: exception.py:13
 msgid "Feature not found"
@@ -38,10 +42,14 @@ msgstr "Объект с id = %d не найден в ресурсе с id = %d."
 msgid "The feature may have been deleted or an error in the address."
 msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
 
-#: model.py:163
+#: model.py:165
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
+
+#: model.py:175
+msgid "Field name is forbidden: '{}'. Please remove or rename it."
+msgstr "Недопустимое имя поля: '{}'. Пожалуйста удалите или переименуйте его."
 
 #: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:41
 msgid "Feature table"
