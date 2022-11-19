@@ -169,7 +169,7 @@ class SecurityPolicy:
         SessionStore.filter(
             SessionStore.session_id != request.session.id,
             SessionStore.key == 'auth.policy.current',
-            SessionStore.value[1].cast(sa.Integer) == user_id,
+            SessionStore.value.op('->>')(1).cast(sa.Integer) == user_id,
         ).delete(synchronize_session=False)
 
     def authenticate_with_password(self, username, password):

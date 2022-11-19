@@ -53,7 +53,7 @@ def creds(ngw_env):
                     fld_date, fld_time_without_tz, fld_ts_without_tz
                 )
                 VALUES (
-                    'POINT (0 0)'::geometry,
+                    ST_SetSRID('POINT (0 0)'::geometry, 3857),
                     'varchar', 'character', 'text', md5(random()::text)::uuid,
                     -1, 9223372036854775807,
                     1.1, 1.2,
