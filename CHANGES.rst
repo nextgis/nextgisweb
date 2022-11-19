@@ -4,23 +4,22 @@ Changes
 4.3.0
 ----------
 
-- OpenLayers library upgraded to 6.15.1.
-- Use resource SRS by default while exporting raster and vector layers.
 - Support for webmap cloning via UI.
-- Assign default groups while creating users via UI.
-- Ability to turn off user password and keep only OAuth authentication.
-- Fields selection while exporting featrue layer.
 - Search by coordinates on web maps.
-- Check for disk free space in the healthcheck.
 - CSV and XLSX support when creating a vector layer.
 - Export and import feature layer attachments.
 - Vector layer export to KML and KMZ formats.
-- Support for fixed length ``character`` columns for PostGIS layers.
-- Automatic logout when changing user password or login.
+- Fields selection while exporting featrue layer.
+- Assign default groups while creating users via UI.
 - Experimental support for authorization links.
+- Use resource SRS by default while exporting raster and vector layers.
 - Support for booleans and nulls in resource metadata.
+- Support for fixed length ``character`` columns in PostGIS layers.
 - Support for materialized views and 25D geometries in PostGIS layers.
+- Ability to turn off user password and keep only OAuth authentication.
+- Check for disk free space in the healthcheck.
 - Ability to search through resources recursively in REST API.
+- OpenLayers library upgraded to 6.15.1.
 
 
 4.2.0
