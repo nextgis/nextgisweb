@@ -20,16 +20,17 @@ export function AttachmentForm({ id }) {
     // Export
 
     const doExport = async () => {
+        const apiUrl = routeURL("feature_attachment.export", id);
         if (pyramidSettings.lunkwill_enabled) {
             const lunkwillParam = new LunkwillParam();
             lunkwillParam.require();
             try {
                 setLoading("export");
-                const url = await request(url, {
+                const respUrl = await request(apiUrl, {
                     lunkwill: lunkwillParam,
                     lunkwillReturnUrl: true,
                 });
-                window.open(url);
+                window.open(respUrl);
             } catch (err) {
                 errorModal(err);
                 return;
@@ -37,8 +38,7 @@ export function AttachmentForm({ id }) {
                 setLoading(false);
             }
         } else {
-            const url = routeURL("feature_attachment.export", id);
-            window.open(url);
+            window.open(apiUrl);
         }
     };
 
