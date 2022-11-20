@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import {
@@ -165,7 +166,7 @@ export function ExportForm({ id }) {
                 widget: Number,
                 min: -90,
                 max: +90,
-            }
+            },
         ]);
     }, [srsOptions, fieldOptions, format, isReady]);
 
@@ -178,28 +179,28 @@ export function ExportForm({ id }) {
     const buildExtent = (fields) => {
         const extent = [];
         const corners = ["minlon", "minlat", "maxlon", "maxlat"];
-        corners.forEach(function(corner) {
+        corners.forEach(function (corner) {
             if (fields[corner] !== undefined) {
-                extent.push(fields[corner])
+                extent.push(fields[corner]);
             }
             delete fields[corner];
         });
         return extent.length === 4 ? extent : undefined;
-    }
+    };
 
     const exportFeatureLayer = () => {
         const fields = form.getFieldsValue();
         const extent = buildExtent(fields);
         const params = new URLSearchParams(fields);
 
-        if ((extent !== undefined) && (!isEmpty(extent))) {
-            params.append("intersects", new WKT().writeGeometryText(fromExtent(extent)));
+        if (extent !== undefined && !isEmpty(extent)) {
+            params.append(
+                "intersects",
+                new WKT().writeGeometryText(fromExtent(extent))
+            );
         }
 
-        window.open(
-            routeURL("resource.export", id) +
-                "?" + params.toString()
-        );
+        window.open(routeURL("resource.export", id) + "?" + params.toString());
     };
 
     if (status === "loading") {
@@ -233,3 +234,7 @@ export function ExportForm({ id }) {
         </FieldsForm>
     );
 }
+
+ExportForm.propTypes = {
+    id: PropTypes.number,
+};
