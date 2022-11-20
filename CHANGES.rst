@@ -9,7 +9,7 @@ Changes
 - CSV and XLSX support when creating a vector layer.
 - Export and import feature layer attachments.
 - Vector layer export to KML and KMZ formats.
-- Fields selection while exporting featrue layer.
+- Fields selection while exporting feature layer.
 - Assign default groups while creating users via UI.
 - Experimental support for authorization links.
 - Use resource SRS by default while exporting raster and vector layers.
