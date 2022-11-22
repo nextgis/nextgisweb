@@ -15,7 +15,11 @@ msgstr "Формат '%s' не поддерживается."
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api.py:331 api.py:406
+#: api.py:163
+msgid "Failed to reproject 'intersects' geometry."
+msgstr "Не удалось перепроецировать геометрию 'intersects'."
+
+#: api.py:340 api.py:415
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
@@ -187,9 +191,33 @@ msgstr "Использовать наименования полей вмест�
 msgid "Fields"
 msgstr "Поля"
 
-#: nodepkg/export-form/ExportForm.js:133
+#: nodepkg/export-form/ExportForm.js:138
+msgid "Limit by extent"
+msgstr "Ограничить охватом"
+
+#: nodepkg/export-form/ExportForm.js:143
 msgid "Zip archive"
 msgstr "Zip архив"
+
+#: nodepkg/export-form/ExtentInput.js:5
+msgid "deg."
+msgstr "град."
+
+#: nodepkg/export-form/ExtentInput.js:7
+msgid "Left"
+msgstr "Лево"
+
+#: nodepkg/export-form/ExtentInput.js:8
+msgid "Top"
+msgstr "Верх"
+
+#: nodepkg/export-form/ExtentInput.js:9
+msgid "Right"
+msgstr "Право"
+
+#: nodepkg/export-form/ExtentInput.js:10
+msgid "Bottom"
+msgstr "Низ"
 
 #: template/section_api_layer.mako:11
 msgid "MVT Vector Tiles"
