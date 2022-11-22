@@ -96,5 +96,5 @@ export function ResourceSelect({ pickerOptions, ...props }) {
 }
 
 ResourceSelect.propTypes = {
-    pickerOptions: PropTypes.objext,
+    pickerOptions: PropTypes.object,
 };

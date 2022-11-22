@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from "react";
 import {
     Badge,
     Dropdown,
-    Menu,
     message,
     Modal,
     Table,
@@ -332,9 +331,8 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
     ]);
 
     const MenuDropdown = () => {
-        const menu = <Menu items={menuItems} />;
         return (
-            <Dropdown overlay={menu} trigger={["click"]}>
+            <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
                 <a>
                     <MoreVertIcon />
                 </a>
@@ -387,7 +385,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                         dataIndex="creationDate"
                         sorter={sorterFactory("creationDate")}
                         render={(text) => {
-                            if (text && !text.startsWith('1970')) {
+                            if (text && !text.startsWith("1970")) {
                                 return (
                                     <div style={{ whiteSpace: "nowrap" }}>
                                         {utc(text).local().format("L LTS")}

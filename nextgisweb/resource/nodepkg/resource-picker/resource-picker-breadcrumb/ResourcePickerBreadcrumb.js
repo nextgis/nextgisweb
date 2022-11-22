@@ -1,8 +1,10 @@
-import HomeFilled from "@material-icons/svg/home-filled";
-import { Breadcrumb, Menu, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
-import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
+
+import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
+
+import HomeFilledIcon from "@material-icons/svg/home-filled";
+import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
 
 export const ResourcePickerBreadcrumb = observer(
     ({
@@ -20,15 +22,15 @@ export const ResourcePickerBreadcrumb = observer(
             };
 
             const createLabel = (resItem, name, link = true) => {
-                const name_ = name || resItem.resource.display_name;
+                const displayName = name || resItem.resource.display_name;
                 return (
                     <span className="resource-breadcrumb-item">
                         {allowMoveInside && link ? (
                             <a onClick={() => onClick(resItem.resource.id)}>
-                                {name_}
+                                {displayName}
                             </a>
                         ) : (
-                            name_
+                            displayName
                         )}
                     </span>
                 );
@@ -38,7 +40,8 @@ export const ResourcePickerBreadcrumb = observer(
             const packFirstItemsToMenu =
                 typeof maxBreadcrumbItems === "number" &&
                 maxBreadcrumbItems !== Infinity &&
-                brearcrumbItems.length > maxBreadcrumbItems;
+                brearcrumbItems.length > maxBreadcrumbItems + 1;
+
             if (packFirstItemsToMenu) {
                 // Skip the first item because it's a Home
                 const breadcrumbsForMenu = brearcrumbItems.splice(
@@ -47,18 +50,15 @@ export const ResourcePickerBreadcrumb = observer(
                 );
                 const moveToMenuItems = breadcrumbsForMenu.map((item) => {
                     return {
+                        key: item.resource.id,
                         label: createLabel(item),
                     };
                 });
                 menuItems.push(...moveToMenuItems);
             }
 
-            const moveToResourceMenu = menuItems.length && (
-                <Menu items={menuItems} />
-            );
-
             const HomeIcon = () => (
-                <HomeFilled style={{ fontSize: "1.1rem" }} />
+                <HomeFilledIcon style={{ fontSize: "1.1rem" }} />
             );
 
             for (let i = 0; i < brearcrumbItems.length; i++) {
@@ -66,27 +66,39 @@ export const ResourcePickerBreadcrumb = observer(
                 let name = null;
                 const isLink = i < brearcrumbItems.length - 1;
                 if (i === 0) {
-                    name =
-                        brearcrumbItems.length > 1 ? (
-                            <Tooltip title={name}>
+                    if (brearcrumbItems.length > 1) {
+                        name = (
+                            <Tooltip title={parent.resource.display_name}>
                                 <HomeIcon />
                             </Tooltip>
-                        ) : (
+                        );
+                    } else {
+                        name = (
                             <Space>
                                 <HomeIcon />
                                 {parent.resource.display_name}
                             </Space>
                         );
+                    }
                 }
                 const item = (
-                    <Breadcrumb.Item
-                        key={parent.resource.id}
-                        overlay={i === 0 && moveToResourceMenu}
-                    >
+                    <Breadcrumb.Item key={parent.resource.id}>
                         {createLabel(parent, name, isLink)}
                     </Breadcrumb.Item>
                 );
                 items.push(item);
+                if (i === 0 && packFirstItemsToMenu) {
+                    if (packFirstItemsToMenu) {
+                        items.push(
+                            <Breadcrumb.Item
+                                key="-1"
+                                menu={{ items: menuItems }}
+                            >
+                                ...
+                            </Breadcrumb.Item>
+                        );
+                    }
+                }
             }
             return items;
         }, [brearcrumbItems, allowMoveInside]);

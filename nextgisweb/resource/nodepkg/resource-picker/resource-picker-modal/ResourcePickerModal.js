@@ -18,6 +18,7 @@ const DEFAULTS = {
 
 export function ResourcePickerModal({
     showCls = ["resource_group"],
+    visible: initVisible,
     onSelect,
     enabledCls = ["resource_group"],
     onNewGroup,
@@ -28,7 +29,7 @@ export function ResourcePickerModal({
     getSelectedMsg,
     ...props
 }) {
-    const [visible, setVisible] = useState(props.visible ?? true);
+    const [visible, setVisible] = useState(initVisible ?? true);
 
     const [resourceStore] = useState(
         new ResourcePickerStore({
@@ -57,8 +58,8 @@ export function ResourcePickerModal({
     });
 
     useEffect(() => {
-        setVisible(props.visible);
-    }, [props.visible]);
+        setVisible(initVisible);
+    }, [initVisible]);
 
     return (
         <Modal
