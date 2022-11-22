@@ -5,7 +5,6 @@ import {
     Checkbox,
     FieldsForm,
     Form,
-    Number,
     Select,
     useForm,
 } from "@nextgisweb/gui/fields-form";
@@ -14,9 +13,10 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import i18n from "@nextgisweb/pyramid/i18n!";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 import { useEffect, useState } from "react";
-import { isEmpty } from "ol/extent";
 import { fromExtent } from "ol/geom/Polygon";
 import WKT from "ol/format/WKT";
+
+import { ExtentInput } from "./ExtentInput";
 
 const exportFormats = settings.export_formats;
 
@@ -134,38 +134,15 @@ export function ExportForm({ id }) {
                 choices: fieldOptions,
             },
             {
+                name: "extent",
+                label: i18n.gettext("Limit by extent"),
+                widget: ExtentInput,
+            },
+            {
                 name: "zipped",
                 label: i18n.gettext("Zip archive"),
                 widget: Checkbox,
                 disabled: !exportFormat.single_file,
-            },
-            {
-                name: "minlon",
-                label: i18n.gettext("Left, deg."),
-                widget: Number,
-                min: -180,
-                max: +180,
-            },
-            {
-                name: "maxlat",
-                label: i18n.gettext("Top, deg."),
-                widget: Number,
-                min: -90,
-                max: +90,
-            },
-            {
-                name: "maxlon",
-                label: i18n.gettext("Right, deg."),
-                widget: Number,
-                min: -180,
-                max: +180,
-            },
-            {
-                name: "minlat",
-                label: i18n.gettext("Bottom, deg."),
-                widget: Number,
-                min: -90,
-                max: +90,
             },
         ]);
     }, [srsOptions, fieldOptions, format, isReady]);
@@ -176,28 +153,14 @@ export function ExportForm({ id }) {
         }
     };
 
-    const buildExtent = (fields) => {
-        const extent = [];
-        const corners = ["minlon", "minlat", "maxlon", "maxlat"];
-        corners.forEach(function (corner) {
-            if (fields[corner] !== undefined) {
-                extent.push(fields[corner]);
-            }
-            delete fields[corner];
-        });
-        return extent.length === 4 ? extent : undefined;
-    };
-
     const exportFeatureLayer = () => {
-        const fields = form.getFieldsValue();
-        const extent = buildExtent(fields);
+        const { extent, ...fields } = form.getFieldsValue();
         const params = new URLSearchParams(fields);
 
-        if (extent !== undefined && !isEmpty(extent)) {
-            params.append(
-                "intersects",
-                new WKT().writeGeometryText(fromExtent(extent))
-            );
+        if (!extent.includes(null)) {
+            const wkt = new WKT().writeGeometryText(fromExtent(extent));
+            params.append("intersects", wkt);
+            params.append("intersects_srs", "4326");
         }
 
         window.open(routeURL("resource.export", id) + "?" + params.toString());
