@@ -1,6 +1,12 @@
 Changes
 =======
 
+4.3.1
+-----
+
+- Fix resource group selection issue while cloning webmaps.
+
+
 4.3.0
 ----------
 
