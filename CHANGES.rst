@@ -1,6 +1,12 @@
 Changes
 =======
 
+4.4.0
+-----
+
+- Limit by extent while exporting feature layer.
+
+
 4.3.1
 -----
 

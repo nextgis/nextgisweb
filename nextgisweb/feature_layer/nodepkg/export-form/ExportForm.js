@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import {
@@ -12,6 +13,10 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import i18n from "@nextgisweb/pyramid/i18n!";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 import { useEffect, useState } from "react";
+import { fromExtent } from "ol/geom/Polygon";
+import WKT from "ol/format/WKT";
+
+import { ExtentInput } from "./ExtentInput";
 
 const exportFormats = settings.export_formats;
 
@@ -129,6 +134,11 @@ export function ExportForm({ id }) {
                 choices: fieldOptions,
             },
             {
+                name: "extent",
+                label: i18n.gettext("Limit by extent"),
+                widget: ExtentInput,
+            },
+            {
                 name: "zipped",
                 label: i18n.gettext("Zip archive"),
                 widget: Checkbox,
@@ -144,12 +154,16 @@ export function ExportForm({ id }) {
     };
 
     const exportFeatureLayer = () => {
-        const fields = form.getFieldsValue();
-        window.open(
-            routeURL("resource.export", id) +
-                "?" +
-                new URLSearchParams(fields).toString()
-        );
+        const { extent, ...fields } = form.getFieldsValue();
+        const params = new URLSearchParams(fields);
+
+        if (!extent.includes(null)) {
+            const wkt = new WKT().writeGeometryText(fromExtent(extent));
+            params.append("intersects", wkt);
+            params.append("intersects_srs", "4326");
+        }
+
+        window.open(routeURL("resource.export", id) + "?" + params.toString());
     };
 
     if (status === "loading") {
@@ -183,3 +197,7 @@ export function ExportForm({ id }) {
         </FieldsForm>
     );
 }
+
+ExportForm.propTypes = {
+    id: PropTypes.number,
+};

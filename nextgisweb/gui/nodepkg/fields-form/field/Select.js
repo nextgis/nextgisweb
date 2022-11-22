@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+
 import { Form, Select as AntdSelect } from "@nextgisweb/gui/antd";
 
 export function Select({ choices, ...props }) {
@@ -23,7 +24,8 @@ Select.propTypes = {
     choices: PropTypes.arrayOf(
         PropTypes.shape({
             label: PropTypes.string.isRequired,
-            value: PropTypes.string.isRequired,
+            value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+                .isRequired,
         })
     ),
 };

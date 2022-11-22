@@ -147,13 +147,22 @@ def export(request):
     if encoding is not None:
         lco.append("ENCODING=%s" % encoding)
 
-    intersects = request.GET.get("intersects")
-    intersects_srs = int(request.GET.get("intersects_srs", srs.id))
-    if intersects is not None:
+    if (intersects := request.GET.get("intersects")) is not None:
         try:
-            geom = Geometry.from_wkt(intersects, srid=intersects_srs)
+            geom = Geometry.from_wkt(intersects)
         except GeometryNotValid:
             raise ValidationError(message=_("Parameter 'intersects' geometry is not valid."))
+
+        intersects_srs_id = int(request.GET.get("intersects_srs", request.context.srs.id))
+        if intersects_srs_id != request.context.srs.id:
+            intersects_transformer = Transformer(SRS.filter_by(
+                id=intersects_srs_id).one().wkt, request.context.srs.wkt)
+            try:
+                geom = intersects_transformer.transform(geom)
+            except ValueError:
+                raise ValidationError(message=_(
+                    "Failed to reproject 'intersects' geometry."))
+
         query.intersects(geom)
 
     query.geom()
