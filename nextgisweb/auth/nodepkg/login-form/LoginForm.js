@@ -35,7 +35,7 @@ export const LoginForm = observer((props = {}) => {
             widget: "password",
             required: true,
         },
-    ]);
+    ], []);
 
     const p = { fields, size: "large", form };
 
