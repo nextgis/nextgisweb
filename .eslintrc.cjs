@@ -8,6 +8,7 @@ module.exports = {
         "plugin:requirejs/recommended",
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
+        "plugin:react-hooks/recommended",
     ],
     globals: {
         dojoConfig: "readonly",
