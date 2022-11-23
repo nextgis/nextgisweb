@@ -15,12 +15,15 @@ import {
     useState,
 } from "react";
 import Draggable from "react-draggable";
+import StraightIcon from "@material-icons/svg/straight";
 
 import TableConfigModal from "./componen./util/renderFeatureFieldValue
 import { fetchFeatures } from "./api/fetchFeatures";
 import { scrollbarWidth } from "./util/scrollbarWidth";
 import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 import "./FeatureTable.less";
+
+const RESIZE_HANDLE_WIDTH = 6;
 
 const queryClient = new QueryClient();
 
@@ -29,6 +32,24 @@ const LoadingRow = () => "...";
 const debouncedFn = debounce((fn) => {
     fn();
 }, 200);
+
+const SortIcon = ({ dir }) => {
+    if (dir === "desc") {
+        return (
+            <span className="desc">
+                <StraightIcon />
+            </span>
+        );
+    } else if (dir === "asc") {
+        return (
+            <span className="asc">
+                <StraightIcon />
+            </span>
+        );
+    } else {
+        return <></>;
+    }
+};
 
 const queryCache = {};
 
@@ -88,7 +109,15 @@ const queryCache = {};
  *                                        ^    ^
  *            the `lack` of these items `indicates` that there are `no more pages`
  */
-const FeatureTableComponent = ({ total, resourceId, fields, query, empty }) => {
+const FeatureTableComponent = ({
+    total,
+    resourceId,
+    fields,
+    query,
+    empty,
+    settingsOpen,
+    setSettingsOpen,
+}) => {
     const parentRef = useRef(null);
 
     const [rowMinHeight] = useState(25);
@@ -101,8 +130,6 @@ const FeatureTableComponent = ({ total, resourceId, fields, query, empty }) => {
 
     const [totalWidth, setTotalWidth] = useState(0);
     const [widths, setWidths] = useState({});
-
-    const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
 
     const [visibleFields, setVisibleFields] = useState([
         "id",
@@ -131,7 +158,7 @@ const FeatureTableComponent = ({ total, resourceId, fields, query, empty }) => {
     const columns = useMemo(() => {
         const cols = [];
         const fields_ = [
-            { keyname: "id", display_name: "#", width: 100, sorted: false },
+            { keyname: "id", display_name: "#", sorted: false },
             ...fields,
         ];
 
@@ -332,7 +359,7 @@ const FeatureTableComponent = ({ total, resourceId, fields, query, empty }) => {
                     }
                 }
                 return (
-                    <div className="tr" style={{ width: "100%" }}>
+                    <>
                         {columns.map((f) => {
                             const val = row && row[f.keyname];
                             const renderValue = row ? (
@@ -344,35 +371,28 @@ const FeatureTableComponent = ({ total, resourceId, fields, query, empty }) => {
                                 <div
                                     key={f.keyname}
                                     className="td"
-                                    style={{
-                                        width: `${f.width}px`,
-                                        overflow: "hidden",
-                                    }}
+                                    style={{ width: `${f.width}px` }}
                                 >
                                     {renderValue}
                                 </div>
                             );
                         })}
-                    </div>
+                    </>
                 );
             };
 
             return (
                 <div
                     key={virtualRow.key}
+                    className="tr"
                     data-index={virtualRow.index}
                     ref={measureElement}
                     style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
+                        minHeight: `${rowMinHeight}px`,
                         transform: `translateY(${virtualRow.start}px)`,
                     }}
                 >
-                    <div style={{ minHeight: `${rowMinHeight}px` }}>
-                        {prepareRow()}
-                    </div>
+                    {prepareRow()}
                 </div>
             );
         });
@@ -386,86 +406,67 @@ const FeatureTableComponent = ({ total, resourceId, fields, query, empty }) => {
     const HeaderCols = useCallback(() => {
         return columns.map((column, i) => {
             const { keyname, display_name, width, sorted } = column;
-            const withResize = i + 1 < columns.length;
             const colSort = orderBy[0] === keyname && orderBy[1];
-            let sortOrder = null;
-            if (colSort && sorted) {
-                sortOrder = {
-                    asc: " 🔼",
-                    desc: " 🔽",
-                }[colSort];
-            }
-            const closable = keyname !== "id";
-            const closeIcon = closable ? (
-                <span
-                    style={{ cursor: "pointer" }}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setVisibleFields((oldFields) =>
-                            oldFields.filter((f) => f !== keyname)
-                        );
-                    }}
-                >
-                    ✖
-                </span>
-            ) : null;
             return (
                 <div
                     key={keyname}
-                    className="td"
+                    className="th"
                     style={{
                         width: `${width}px`,
-                        overflow: "hidden",
+                    }}
+                    onClick={() => {
+                        if (sorted) {
+                            toggleSorting(keyname);
+                        }
                     }}
                 >
-                    <div
-                        className="header-row-label"
-                        onClick={() => {
-                            if (sorted) {
-                                toggleSorting(keyname);
-                            }
-                        }}
-                    >
-                        {display_name}
-                        {closeIcon}
-                        {sortOrder}
-                    </div>
-
-                    {withResize ? (
-                        <Draggable
-                            axis="x"
-                            defaultClassName="drag-handle"
-                            defaultClassNameDragging="drag-handle-active"
-                            onDrag={(event, { deltaX }) =>
-                                resizeRow({
-                                    colKey: keyname,
-                                    deltaX,
-                                })
-                            }
-                            position={{ x: 0 }}
-                            zIndex={999}
-                        >
-                            <div className="drag-handle-icon">⋮</div>
-                        </Draggable>
-                    ) : null}
+                    <div className="label">{display_name}</div>
+                    {colSort && sorted && (
+                        <div className="suffix">
+                            <SortIcon dir={colSort} />
+                        </div>
+                    )}
                 </div>
             );
         });
     }, [columns, orderBy, resizeRow]);
 
+    const HeaderHandles = useCallback(() => {
+        let cumWidth = 0;
+        return columns.map((column, i) => {
+            cumWidth += column.width;
+            return (
+                <Draggable
+                    key={`h${column.keyname}`}
+                    axis="x"
+                    defaultClassName="handle"
+                    defaultClassNameDragging="handle-dragging"
+                    defaultClassNameDragged="handle-dragged"
+                    onStop={(event, { lastX }) => {
+                        // TODO: Set fixed width to the column
+                    }}
+                >
+                    <div
+                        style={{
+                            left: cumWidth - RESIZE_HANDLE_WIDTH / 2,
+                            width: RESIZE_HANDLE_WIDTH,
+                        }}
+                    ></div>
+                </Draggable>
+            );
+        });
+    }, [columns, resizeRow]);
+
     return (
         <div className="ngw-feature-layer-feature-table">
             <div className="thead">
-                <button onClick={() => setIsConfigModalOpen(true)}>
-                    Table config
-                </button>
                 <div
-                    className="tr header-row"
+                    className="tr"
                     style={{ paddingRight: `${scrollBarSize}px` }}
                 >
                     <HeaderCols />
                 </div>
+                <HeaderHandles />
             </div>
             <div ref={parentRef} className="tbody-scroller">
                 {isEmpty && empty ? (
@@ -477,8 +478,8 @@ const FeatureTableComponent = ({ total, resourceId, fields, query, empty }) => {
                 )}
             </div>
             <TableConfigModal
-                isOpen={isConfigModalOpen}
-                setIsOpen={setIsConfigModalOpen}
+                isOpen={settingsOpen}
+                setIsOpen={setSettingsOpen}
                 visibleFields={visibleFields}
                 setVisibleFields={setVisibleFields}
                 fields={fields}

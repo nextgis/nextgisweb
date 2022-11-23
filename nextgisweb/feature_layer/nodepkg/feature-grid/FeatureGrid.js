@@ -1,7 +1,7 @@
 import { PropTypes } from "prop-types";
 import { useMemo, useState } from "react";
-
-import { Input, Empty } from "@nextgisweb/gui/antd";
+import TuneIcon from "@material-icons/svg/tune";
+import { Input, Button, Empty } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
 
@@ -17,6 +17,7 @@ export const FeatureGrid = ({ id }) => {
     const { data: resourceData } = useRouteGet("resource.item", { id });
 
     const [query, setQuery] = useState("");
+    const [settingsOpen, setSettingsOpen] = useState(false);
 
     const fields = useMemo(() => {
         if (resourceData) {
@@ -32,18 +33,28 @@ export const FeatureGrid = ({ id }) => {
     return (
         <div className="ngw-feature-layer-feature-grid">
             <div className="toolbar">
-                <Input
-                    placeholder={searchPlaceholder}
-                    onChange={(e) => setQuery(e.target.value)}
-                />
+                <div className="spacer"/>
+                <div>
+                    <Button
+                        type="text"
+                        icon={<TuneIcon />}
+                        onClick={() => setSettingsOpen(!settingsOpen)}
+                    />
+                </div>
+                <div>
+                    <Input
+                        placeholder={searchPlaceholder}
+                        onChange={(e) => setQuery(e.target.value)}
+                    />
+                </div>
             </div>
 
             <FeatureTable
                 resourceId={id}
                 total={totalData.total_count}
                 fields={fields}
-                query={query}
                 empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+                {...{ fields, query, settingsOpen, setSettingsOpen }}
             />
         </div>
     );

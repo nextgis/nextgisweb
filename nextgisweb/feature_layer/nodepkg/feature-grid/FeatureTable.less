@@ -3,9 +3,51 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    background-color: white;
+    border: 1px solid var(--icon-color);
 
     .thead {
+        position: relative;
+        user-select: none;
+        border-bottom: 1px solid var(--icon-color);
+        background-color: var(--surface-bg);
 
+        .tr {
+            .th {
+                display: flex;
+                border-right-color: var(--divider-color);
+                cursor: pointer;
+
+                .label {
+                    flex-grow: 1;
+                }
+
+                .suffix {
+                    span.asc,
+                    span.desc {
+                        svg.icon {
+                            margin: 0 -2px;
+                        }
+                    }
+                    span.asc {
+                        svg.icon {
+                            transform: rotate(180deg);
+                        }
+                    }
+                }
+            }
+        }
+
+        .handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            cursor: col-resize;
+
+            &-dragging {
+                background-color: rgba(127, 127, 127, 0.75);
+            }
+        }
     }
 
     .tbody-scroller {
@@ -15,59 +57,41 @@
         overflow-y: scroll;
         overflow-x: auto;
         border-spacing: 0;
-        border: 1px solid black;
 
         .tbody {
             position: relative;
             width: 100%;
+
+            .tr {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+            }
         }
     }
 
     .tr {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         :last-child {
             .td {
                 border-bottom: 0;
             }
         }
-        border-bottom: 1px solid black;
+        border-bottom: 1px solid var(--divider-color);
     }
 
-    .td {
+    .td,
+    .th {
         flex: 1;
         width: 200px;
         margin: 0;
-        padding: 0;
-        border-right: 1px solid black;
+        padding: 2px 4px;
+        overflow-x: hidden;
+        border-right: 1px solid var(--divider-color);
         :last-child {
             border-right: 0;
         }
-    }
-
-    .header-row {
-        .td {
-            display: flex;
-        }
-    }
-    .header-row-label {
-        flex: 1;
-    }
-
-    .drag-handle {
-        cursor: col-resize;
-        color: #0085ff;
-    }
-    .drag-handle:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-    }
-
-    .drag-handle-active,
-    .drag-handle-active:hover {
-        color: #0b6fcc;
-        z-index: 3;
-    }
-
-    .drag-handle-icon {
     }
 }
