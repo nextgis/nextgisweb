@@ -14,7 +14,8 @@ module.exports = {
         ngwConfig: "readonly",
     },
     rules: {
-        "indent": ["error", 4],
+        "eqeqeq": "error",
+        "indent": ["error", 4, { "SwitchCase": 1 }],
         "no-unused-vars": ["error", { args: "after-used" }],
         "requirejs/no-object-define": "error",
         "requirejs/one-dependency-per-line": ["error"],
@@ -82,6 +83,9 @@ module.exports = {
                 browser: true,
                 amd: true,
             },
+            rules: {
+                "eqeqeq": "off",
+            }
         },
     ],
 };
