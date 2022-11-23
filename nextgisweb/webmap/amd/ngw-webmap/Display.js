@@ -28,8 +28,8 @@ define([
     "dojo/request/xhr",
     "dojo/data/ItemFileWriteStore",
     "dojo/topic",
-    "cbtree/models/TreeStoreModel",
-    "cbtree/Tree",
+    "@nextgisweb/gui/react-app",
+    "@nextgisweb/webmap/layers-tree",
     "@nextgisweb/pyramid/icon",
     "@nextgisweb/gui/error",
     "@nextgisweb/pyramid/i18n!",
@@ -101,8 +101,8 @@ define([
     xhr,
     ItemFileWriteStore,
     topic,
-    TreeStoreModel,
-    Tree,
+    reactApp,
+    LayersTreeComp,
     icon,
     errorModule,
     i18n,
@@ -305,13 +305,6 @@ define([
             this._mapDeferred.then(
                 function () { widget._itemStorePrepare(); }
             );
-
-            // Tree store model
-            this.itemModel = new TreeStoreModel({
-                store: this.itemStore,
-                checkedAttr: "checked",
-                query: { type: "root" }
-            });
 
             this.displayProjection = "EPSG:3857";
             this.lonlatProjection = "EPSG:4326";
@@ -617,9 +610,6 @@ define([
 
         startup: function () {
             this.inherited(arguments);
-
-            this.itemTree.startup();
-
             this._startupDeferred.resolve();
         },
 
@@ -639,7 +629,7 @@ define([
 
                     copy.visibility = null;
                     copy.checked = item.visibility;
-                    copy.identifiable = item.identifiable,
+                    copy.identifiable = item.identifiable;
                     copy.position = item.drawOrderPosition;
 
                 } else if (copy.type === "group" || copy.type === "root") {
@@ -995,22 +985,8 @@ define([
         },
 
         _layersPanelSetup: function(){
-            var widget = this;
-
-            widget.itemTree = new Tree({
-                style: "height: 100%",
-                model: widget.itemModel,
-                autoExpand: true,
-                showRoot: false
-            });
-
-            widget.itemTree.watch("selectedItem", function (attr, oldVal, newVal) {
-                widget.set(
-                    "itemConfig",
-                    widget._itemConfigById[widget.itemStore.getValue(newVal, "id")]
-                );
-                widget.set("item", newVal);
-            });
+            var widget = this,
+                itemStore = this.itemStore;
 
             all([widget._layersDeferred, widget._postCreateDeferred]).then(
                 function () {
@@ -1023,30 +999,61 @@ define([
                         withCloser: true
                     });
 
-                    widget.itemTree.placeAt(widget.layersPanel.contentWidget.layerTreePane);
+                    const handleCheckChanged = (checkChanged) => {
+                        const {checked, unchecked} = checkChanged;
+                        checked.forEach(i => {
+                            itemStore.fetchItemByIdentity({
+                                identity: i,
+                                onItem: (item) => {
+                                    itemStore.setValue(item, "checked", true);
+                                }
+                            });
+                        });
+                        unchecked.forEach(i => {
+                            itemStore.fetchItemByIdentity({
+                                identity: i,
+                                onItem: (item) => {
+                                    itemStore.setValue(item, "checked", false);
+                                }
+                            });
+                        });
+                    };
+
+                    const handleSelect = (selectedKeys) => {
+                        if (selectedKeys.length === 0 || selectedKeys.length < 1) {
+                            return;
+                        }
+
+                        const itemId = selectedKeys[0];
+                        itemStore.fetchItemByIdentity({
+                            identity: itemId,
+                            onItem: (item) => {
+                                widget.set(
+                                    "itemConfig",
+                                    widget._itemConfigById[itemId]
+                                );
+                                widget.set("item", item);
+                            }
+                        });
+                    };
+
+                    const {expanded, checked} = widget.config.itemsStates;
+                    reactApp.default(
+                        LayersTreeComp.default,
+                        {
+                            webMapItems: widget.config.rootItem.children ?? [],
+                            expanded, checked,
+                            onCheckChanged: handleCheckChanged,
+                            onSelect: handleSelect
+                        },
+                        widget.layersPanel.contentWidget.layerTreePane.domNode
+                    );
 
                     if (widget.activeLeftPanel === "layersPanel")
                         widget.activatePanel(widget.layersPanel);
 
                     widget.layersPanel.on("closed", function(){
                         widget.navigationMenu.reset();
-                    });
-                }
-            ).then(undefined, function (err) { console.error(err); });
-
-            // Collapse tree nodes which isn't marked as expanded. Other nodes will
-            // expand using autoExpand = true
-            all([widget._itemStoreDeferred, widget.itemTree.onLoadDeferred]).then(
-                function () {
-                    widget.itemStore.fetch({
-                        queryOptions: { deep: true },
-                        onItem: function (item) {
-                            var node = widget.itemTree.getNodesByItem(item)[0],
-                                config = widget._itemConfigById[widget.itemStore.getValue(item, "id")];
-                            if (node && config.type === "group" && !config.expanded) {
-                                node.collapse();
-                            }
-                        }
                     });
                 }
             ).then(undefined, function (err) { console.error(err); });
