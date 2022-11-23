@@ -1,7 +1,7 @@
 import MoreVertIcon from "@material-icons/svg/more_vert";
 import PriorityHighIcon from "@material-icons/svg/priority_high";
 import PropTypes from "prop-types";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
     Badge,
@@ -148,21 +148,28 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         return allowedToDelete;
     }, [selected, items]);
 
-    const rowSelection_ = {
-        onChange: (selectedRowKeys) => {
-            setSelected(selectedRowKeys);
-        },
-    };
+    const rowSelection_ = useMemo(
+        () => ({
+            onChange: (selectedRowKeys) => {
+                setSelected(selectedRowKeys);
+            },
+        }),
+        []
+    );
 
-    const onNewGroup = (newGroup) => {
-        if (newGroup) {
-            if (newGroup.parent.id === resourceId)
-                setItems((old) => {
-                    const newItem = createResourceTableItemOptions(newGroup);
-                    return [...old, newItem];
-                });
-        }
-    };
+    const onNewGroup = useCallback(
+        (newGroup) => {
+            if (newGroup) {
+                if (newGroup.parent.id === resourceId)
+                    setItems((old) => {
+                        const newItem =
+                            createResourceTableItemOptions(newGroup);
+                        return [...old, newItem];
+                    });
+            }
+        },
+        [resourceId]
+    );
 
     useEffect(() => {
         setSelected((oldSelection) => {
@@ -174,36 +181,39 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         });
     }, [items]);
 
-    const moveSelectedTo = (parentId) => {
-        forEachSelected({
-            title: i18n.gettext("Moving resources"),
-            setItems,
-            setSelected,
-            selected,
-            executer: ({ selectedItem, signal }) =>
-                route("resource.item", selectedItem).put({
-                    signal,
-                    json: {
-                        resource: {
-                            parent: { id: parentId },
+    const moveSelectedTo = useCallback(
+        (parentId) => {
+            forEachSelected({
+                title: i18n.gettext("Moving resources"),
+                setItems,
+                setSelected,
+                selected,
+                executer: ({ selectedItem, signal }) =>
+                    route("resource.item", selectedItem).put({
+                        signal,
+                        json: {
+                            resource: {
+                                parent: { id: parentId },
+                            },
                         },
-                    },
-                }),
-            onComplate: (successItems, errorItems) => {
-                if (successItems.length) {
-                    if (errorItems.length) {
-                        notifyMoveWithError(successItems, errorItems);
-                    } else {
-                        notifySuccessfulMove(successItems.length);
+                    }),
+                onComplate: (successItems, errorItems) => {
+                    if (successItems.length) {
+                        if (errorItems.length) {
+                            notifyMoveWithError(successItems, errorItems);
+                        } else {
+                            notifySuccessfulMove(successItems.length);
+                        }
+                    } else if (errorItems) {
+                        notifyMoveAbsolutError(errorItems);
                     }
-                } else if (errorItems) {
-                    notifyMoveAbsolutError(errorItems);
-                }
-            },
-        });
-    };
+                },
+            });
+        },
+        [selected]
+    );
 
-    const deleteSelected = () => {
+    const deleteSelected = useCallback(() => {
         forEachSelected({
             title: i18n.gettext("Deleting resources"),
             setItems,
@@ -218,7 +228,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 }
             },
         });
-    };
+    }, [selectedAllowedForDelete]);
 
     const rowSelection = useMemo(() => {
         return (
@@ -231,7 +241,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 ...rowSelection_,
             }
         );
-    }, [allowBatch, selected, batchDeletingInProgress]);
+    }, [allowBatch, selected, batchDeletingInProgress, rowSelection_]);
 
     const menuItems = useMemo(() => {
         const menuItems_ = [];
@@ -324,10 +334,17 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         }
         return menuItems_;
     }, [
+        data,
+        selected,
         allowBatch,
-        selectedAllowedForDelete,
-        creationDateVisible,
+        resourceId,
+        onNewGroup,
         volumeVisible,
+        moveSelectedTo,
+        deleteSelected,
+        storageEnabled,
+        creationDateVisible,
+        selectedAllowedForDelete,
     ]);
 
     const MenuDropdown = () => {

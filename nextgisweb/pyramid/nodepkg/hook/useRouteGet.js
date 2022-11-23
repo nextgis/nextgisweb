@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+
 import { useRoute } from "./useRoute";
 
 export function useRouteGet(nameOrProps, params = {}, options = {}) {
@@ -18,7 +19,7 @@ export function useRouteGet(nameOrProps, params = {}, options = {}) {
     const [data, setData] = useState();
     const [error, setError] = useState();
 
-    const refresh = async () => {
+    const refresh = useCallback(async () => {
         abort();
         setIsLoading(true);
         try {
@@ -29,10 +30,11 @@ export function useRouteGet(nameOrProps, params = {}, options = {}) {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [abort, options, route]);
 
     useEffect(() => {
         refresh();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return { data, error, isLoading, abort, refresh };
