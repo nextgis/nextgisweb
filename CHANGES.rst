@@ -5,6 +5,7 @@ Changes
 -----
 
 - Limit by extent while exporting feature layer.
+- OAuth-based automatic group assignment.
 
 
 4.3.1

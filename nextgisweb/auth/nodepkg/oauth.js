@@ -9,6 +9,7 @@ const {
     server_type: type,
     display_name: name,
     base_url: baseUrl,
+    group_mapping,
 } = settings.oauth;
 
 const isNGID = type == "nextgisid";
@@ -36,4 +37,5 @@ export default {
     name,
     type,
     isNGID,
+    group_mapping,
 };

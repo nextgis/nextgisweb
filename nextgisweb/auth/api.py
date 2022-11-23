@@ -349,7 +349,7 @@ def check_system_group(obj, data):
     if not obj.system:
         return
 
-    allowed_attrs = ('register', 'members')
+    allowed_attrs = ('register', 'members', 'oauth_mapping')
     for k in data:
         if not (getattr(obj, k) == data[k] or k in allowed_attrs):
             raise SystemPrincipalAttributeReadOnly(k)

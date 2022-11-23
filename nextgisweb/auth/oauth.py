@@ -16,6 +16,7 @@ from passlib.hash import sha256_crypt
 from ..env import env
 from ..lib.config import OptionAnnotations, Option
 from ..lib.logging import logger
+from ..lib.json import dumps as json_dumps
 from .. import db
 from ..models import DBSession
 from ..core.exception import UserException
@@ -73,6 +74,7 @@ class OAuthHelper:
             _set('profile.subject.attr', 'sub')
             _set('profile.keyname.attr', 'preferred_username')
             _set('profile.display_name.attr', 'name')
+            _set('profile.member_of.attr', 'resource_access.{client_id}.roles')
 
         else:
             raise ValueError(f"Invalid value: {stype}")
@@ -314,21 +316,31 @@ class OAuthHelper:
                     break
 
         # Group membership (member_of)
-        mof_attr = opts.get('member_of.attr', None)
-        if mof_attr is not None:
-            mof = token[mof_attr]
-            if not isinstance(mof, list):
-                raise ValueError()  # FIXME!
+        if (mof_attr := opts.get('member_of.attr', None)) is not None:
+            mof_attr_sub = mof_attr.format(client_id=self.options['client.id'])
+            try:
+                mof = _member_of_from_token(token, mof_attr_sub)
+            except ValueError:
+                logger.warning("Can't get token groups for user '%s'.", user.keyname)
+                mof = []
+            else:
+                logger.debug(
+                    "Token groups for user '%s': %s",
+                    user.keyname, json_dumps(mof))
 
-            grp_map = dict(map(
-                lambda i: i.split(':'),
-                opts['member_of.map']))
+            new_groups = []
+            for group in user.member_of:
+                if not group.oauth_mapping:
+                    new_groups.append(group)
+                elif (k := group.keyname.lower()) in mof:
+                    mof.remove(k)
 
-            grp_keyname = list(map(
-                lambda i: grp_map.get(i, i),
-                mof))
+            new_groups.extend(
+                Group.filter(
+                    Group.oauth_mapping,
+                    sa.func.lower(Group.keyname).in_(mof)).all())
 
-            user.member_of = Group.filter(Group.keyname.in_(grp_keyname)).all()
+            user.member_of = new_groups
 
     option_annotations = OptionAnnotations((
         Option('enabled', bool, default=False,
@@ -409,8 +421,12 @@ class OAuthHelper:
         Option('profile.display_name.no_update', bool, default=False,
                doc="Turn off display_name secondary synchronization"),
 
-        Option('profile.member_of.attr', default=None),
-        Option('profile.member_of.map', list, default=None),
+        Option('profile.member_of.attr', default=None, doc=(
+            "OAuth group attribute used for automatic group assignment. Users "
+            "get membership in groups with keynames that match the values of "
+            "the attribute and have OAuth mapping flag. Supports dots and "
+            "{client_id} substitution (like 'resource_access.{client_id}.roles' "
+            "for Keycloak integration).")),
 
         Option('profile.sync_timedelta', timedelta, default=None,
                doc="Minimum time delta between profile synchronization with OAuth server."),
@@ -526,3 +542,17 @@ def _fallback_value(*args):
         )):
             return a
     raise ValueError("No suitable value found")
+
+
+def _member_of_from_token(token, key):
+    value = token
+    for k in key.split('.'):
+        if isinstance(value, dict) and k in value:
+            value = value[k]
+        else:
+            raise ValueError
+
+    if not isinstance(value, list):
+        raise ValueError
+
+    return [v.lower() for v in value]

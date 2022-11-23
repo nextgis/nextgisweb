@@ -1,6 +1,7 @@
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import i18n from "@nextgisweb/pyramid/i18n!auth";
 import getMessages from "../groupMessages";
+import { default as oauth } from "../oauth";
 
 export function GroupBrowse() {
     const columns = [
@@ -24,6 +25,16 @@ export function GroupBrowse() {
                 value ? i18n.gettext("Yes") : i18n.gettext("No"),
         },
     ];
+
+    if (oauth.group_mapping) {
+        columns.push({
+            title: oauth.name,
+            dataIndex: "oauth_mapping",
+            key: "oauth_mapping",
+            render: (value) =>
+                value ? i18n.gettext("Yes") : i18n.gettext("No"),
+        });
+    }
 
     return (
         <ModelBrowse

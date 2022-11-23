@@ -11,7 +11,7 @@ import transaction
 
 from ...models import DBSession
 from ..oauth import OAuthHelper, OAuthErrorResponse
-from ..model import User
+from ..model import Group, User
 
 CLIENT_ID = token_hex(16)
 CLIENT_SECRET = token_urlsafe(16)
@@ -38,6 +38,7 @@ def setup_oauth(ngw_env, request):
         'oauth.profile.subject.attr': 'sub',
         'oauth.profile.keyname.attr': None,
         'oauth.profile.display_name.attr': None,
+        'oauth.profile.member_of.attr': None,
     }
     if hasattr(request, 'param'):
         options.update(request.param)
@@ -150,6 +151,52 @@ def test_update_profile(ngw_env, ngw_txn):
 
     assert u3.keyname == "u3"
     assert u3.display_name == "u3"
+
+
+@pytest.fixture(scope='module')
+def principals():
+    groups = (
+        ('test_group1', True),
+        ('Test_group2', False),
+        ('test_group3', True),
+        ('Test_group4', False),
+    )
+    with transaction.manager:
+        user = User(
+            keyname='test_user',
+            display_name='Test member_of user',
+            oauth_subject=str(uuid4())
+        ).persist()
+        for keyname, oauth_mapping in groups:
+            Group(keyname=keyname, display_name=keyname, oauth_mapping=oauth_mapping).persist()
+
+    yield
+
+    with transaction.manager:
+        DBSession.delete(user)
+        for keyname, _ in groups:
+            DBSession.delete(Group.filter_by(keyname=keyname).one())
+
+
+@pytest.mark.parametrize('setup_oauth, roles, result', [
+    ({'oauth.profile.member_of.attr': 'resource_access.{client_id}.roles'}, ) + line for line in [
+        ([], {'Test_group2'}),
+        (['Test_group3', 'test_group4'], {'Test_group2', 'test_group3'}),
+    ]
+], indirect=['setup_oauth'])
+def test_update_member_of(roles, result, ngw_env, ngw_txn, principals):
+    user = User.filter_by(keyname='test_user').one()
+    user.member_of = Group.filter(
+        Group.keyname.in_(('test_group1', 'Test_group2'))).all()
+
+    with DBSession.no_autoflush:
+        ngw_env.auth.oauth._update_user(user, {
+            "resource_access": {
+                CLIENT_ID: {"roles": roles}
+            }
+        })
+
+    assert {g.keyname for g in user.member_of} == result
 
 
 @pytest.mark.parametrize('setup_oauth', [{

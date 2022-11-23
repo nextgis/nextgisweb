@@ -197,6 +197,7 @@ class Group(Principal):
         sa.ForeignKey(Principal.id), primary_key=True)
     keyname = sa.Column(sa.Unicode, unique=True)
     register = sa.Column(sa.Boolean, nullable=False, default=False)
+    oauth_mapping = sa.Column(sa.Boolean, nullable=False, default=False)
 
     members = orm.relationship(
         User, secondary=tab_group_user, cascade_backrefs=False,
@@ -225,11 +226,12 @@ class Group(Principal):
             ('description', self.description),
             ('keyname', self.keyname),
             ('register', self.register),
+            ('oauth_mapping', self.oauth_mapping),
             ('members', [u.id for u in self.members])
         ))
 
     def deserialize(self, data):
-        attrs = ('display_name', 'description', 'keyname', 'register')
+        attrs = ('display_name', 'description', 'keyname', 'register', 'oauth_mapping')
         with DBSession.no_autoflush:
             for a in attrs:
                 if a in data:
