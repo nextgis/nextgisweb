@@ -118,7 +118,9 @@ const FeatureTableComponent = ({
     settingsOpen,
     setSettingsOpen,
 }) => {
-    const parentRef = useRef(null);
+    const tbodyRef = useRef(null);
+    const theadRef = useRef(null);
+    const columnRef = useRef({});
 
     const [rowMinHeight] = useState(25);
     const [pageSize] = useState(100);
@@ -128,8 +130,9 @@ const FeatureTableComponent = ({
     /** For limit the number of API requests */
     const [fetchEnabled, setFetchEnabled] = useState(false);
 
-    const [totalWidth, setTotalWidth] = useState(0);
-    const [widths, setWidths] = useState({});
+    const [tableWidth, setTableWidth] = useState(0);
+    const [effectiveWidths, setEffectiveWidths] = useState(null);
+    const [userDefinedWidths, setUserDefinedWidths] = useState({});
 
     const [visibleFields, setVisibleFields] = useState([
         "id",
@@ -143,6 +146,10 @@ const FeatureTableComponent = ({
     const scrollBarSize = useMemo(() => scrollbarWidth(), []);
 
     const toggleSorting = (keyname, curOrder = null) => {
+        if (keyname == "id") {
+            setOrderBy([]);
+            return;
+        }
         const sortOrderSeq = ["asc", "desc", null];
         setOrderBy(([oldSortKey, oldSortOrder]) => {
             if (oldSortKey === keyname) {
@@ -158,36 +165,30 @@ const FeatureTableComponent = ({
     const columns = useMemo(() => {
         const cols = [];
         const fields_ = [
-            { keyname: "id", display_name: "#", sorted: false },
+            { keyname: "id", display_name: "#", datatype: "INTEGER" },
             ...fields,
         ];
 
-        let freeWidthColLen = fields_.length;
-        let fixedWidth = 0;
-        for (const wKey in widths) {
-            freeWidthColLen -= 1;
-            fixedWidth += widths[wKey].width;
-        }
-        for (const f of fields_) {
-            if (f.width !== undefined && !(f in widths)) {
-                freeWidthColLen -= 1;
-                fixedWidth += f.width;
+        for (const field of fields_) {
+            const { keyname, datatype } = field;
+            let flex = {};
+            if (keyname === "id") {
+                flex = "0 0 5em";
+            } else if (datatype === "INTEGER" || datatype === "REAL") {
+                flex = "1 1 6em";
+            } else {
+                flex = "5 5 8em";
             }
+            field["flex"] = flex;
         }
+
         for (const f of fields_) {
             if (visibleFields.includes(f.keyname)) {
-                const width =
-                    widths[f.keyname] ??
-                    (totalWidth - fixedWidth) / freeWidthColLen;
-                cols.push({
-                    width,
-                    ...f,
-                    sorted: f.sorted ?? true,
-                });
+                cols.push(f);
             }
         }
         return cols;
-    }, [fields, totalWidth, widths, visibleFields]);
+    }, [fields, tableWidth, visibleFields]);
 
     const cacheKey = useMemo(() => {
         return [pageSize, query, visibleFields.sort().join("_")].join("__");
@@ -259,7 +260,7 @@ const FeatureTableComponent = ({
     const { getVirtualItems, measureElement, getTotalSize, scrollToIndex } =
         useVirtualizer({
             count: queryMode ? queryTotal : total,
-            getScrollElement: () => parentRef.current,
+            getScrollElement: () => tbodyRef.current,
             estimateSize: () => rowMinHeight,
         });
 
@@ -267,16 +268,26 @@ const FeatureTableComponent = ({
 
     useLayoutEffect(() => {
         const updateTableWidth = () => {
-            setTotalWidth(parentRef.current.offsetWidth);
+            setTableWidth(tbodyRef.current.offsetWidth);
         };
         const debouncedUpdate = debounce(updateTableWidth, 100);
         const tableResizeObserver = new ResizeObserver(debouncedUpdate).observe(
-            parentRef.current
+            tbodyRef.current
         );
         return () => {
             tableResizeObserver.disconnect();
         };
     }, []);
+
+    useLayoutEffect(() => {
+        const newEffectiveWidths = {};
+        columns.forEach((column, idx) => {
+            newEffectiveWidths[idx] =
+                columnRef.current[idx].getBoundingClientRect().width;
+        });
+        setEffectiveWidths(newEffectiveWidths);
+        return () => {};
+    }, [columns, tableWidth, userDefinedWidths]);
 
     useEffect(() => {
         scrollToIndex(0, { smoothScroll: false });
@@ -311,36 +322,6 @@ const FeatureTableComponent = ({
         }
     }, [virtualItems, pageSize]);
 
-    const resizeRow = useCallback(
-        ({ colKey, deltaX }) => {
-            setWidths((prevWidths) => {
-                const colWidth =
-                    prevWidths[colKey] ?? totalWidth / columns.length;
-                const percentDelta = deltaX;
-
-                const newWidths = {
-                    ...prevWidths,
-                    [colKey]: colWidth + percentDelta,
-                };
-
-                const colIndex = columns.findIndex((c) => c.keyname === colKey);
-
-                if (colIndex !== -1) {
-                    const nextCol = columns[colIndex + 1];
-                    if (nextCol) {
-                        const nextColKey = nextCol.keyname;
-                        const nextColWidth =
-                            prevWidths[nextColKey] ??
-                            totalWidth / columns.length;
-                        newWidths[nextColKey] = nextColWidth - percentDelta;
-                    }
-                }
-                return newWidths;
-            });
-        },
-        [totalWidth, columns]
-    );
-
     const Rows = useCallback(() => {
         const firstVirtual = virtualItems[0];
         if (!firstVirtual) {
@@ -360,7 +341,7 @@ const FeatureTableComponent = ({
                 }
                 return (
                     <>
-                        {columns.map((f) => {
+                        {columns.map((f, i) => {
                             const val = row && row[f.keyname];
                             const renderValue = row ? (
                                 renderFeatureFieldValue(f, val) || val
@@ -369,9 +350,9 @@ const FeatureTableComponent = ({
                             );
                             return (
                                 <div
-                                    key={f.keyname}
+                                    key={i}
                                     className="td"
-                                    style={{ width: `${f.width}px` }}
+                                    style={{ width: `${effectiveWidths[i]}px` }}
                                 >
                                     {renderValue}
                                 </div>
@@ -396,7 +377,15 @@ const FeatureTableComponent = ({
                 </div>
             );
         });
-    }, [data, columns, pageSize, rowMinHeight, virtualItems, measureElement]);
+    }, [
+        data,
+        columns,
+        pageSize,
+        rowMinHeight,
+        virtualItems,
+        measureElement,
+        effectiveWidths,
+    ]);
 
     let isEmpty = total === 0;
     if (queryMode && !isEmpty) {
@@ -404,46 +393,59 @@ const FeatureTableComponent = ({
     }
 
     const HeaderCols = useCallback(() => {
-        return columns.map((column, i) => {
-            const { keyname, display_name, width, sorted } = column;
-            const colSort = orderBy[0] === keyname && orderBy[1];
-            return (
+        return columns
+            .map((column, i) => {
+                const { keyname, display_name: label, flex } = column;
+                const colSort = orderBy[0] === keyname && orderBy[1];
+
+                const style = userDefinedWidths[i]
+                    ? { flex: `0 0 ${userDefinedWidths[i]}px` }
+                    : { flex };
+
+                return (
+                    <div
+                        key={i}
+                        ref={(element) => {
+                            columnRef.current[i] = element;
+                        }}
+                        className="th"
+                        style={style}
+                        onClick={() => toggleSorting(keyname)}
+                    >
+                        <div className="label">{label}</div>
+                        {colSort && (
+                            <div className="suffix">
+                                <SortIcon dir={colSort} />
+                            </div>
+                        )}
+                    </div>
+                );
+            })
+            .concat([
                 <div
-                    key={keyname}
-                    className="th"
-                    style={{
-                        width: `${width}px`,
-                    }}
-                    onClick={() => {
-                        if (sorted) {
-                            toggleSorting(keyname);
-                        }
-                    }}
-                >
-                    <div className="label">{display_name}</div>
-                    {colSort && sorted && (
-                        <div className="suffix">
-                            <SortIcon dir={colSort} />
-                        </div>
-                    )}
-                </div>
-            );
-        });
-    }, [columns, orderBy, resizeRow]);
+                    key="scrollbar"
+                    style={{ flex: `0 0 ${scrollBarSize}px` }}
+                />,
+            ]);
+    }, [userDefinedWidths, columns, orderBy]);
 
     const HeaderHandles = useCallback(() => {
         let cumWidth = 0;
         return columns.map((column, i) => {
-            cumWidth += column.width;
+            const width = effectiveWidths[i];
+            cumWidth += width;
             return (
                 <Draggable
-                    key={`h${column.keyname}`}
+                    key={i}
                     axis="x"
                     defaultClassName="handle"
                     defaultClassNameDragging="handle-dragging"
                     defaultClassNameDragged="handle-dragged"
                     onStop={(event, { lastX }) => {
-                        // TODO: Set fixed width to the column
+                        setUserDefinedWidths((prev) => ({
+                            ...prev,
+                            [i]: width + lastX,
+                        }));
                     }}
                 >
                     <div
@@ -455,25 +457,28 @@ const FeatureTableComponent = ({
                 </Draggable>
             );
         });
-    }, [columns, resizeRow]);
+    }, [columns, effectiveWidths]);
 
     return (
         <div className="ngw-feature-layer-feature-table">
-            <div className="thead">
-                <div
-                    className="tr"
-                    style={{ paddingRight: `${scrollBarSize}px` }}
-                >
+            <div ref={theadRef} className="thead">
+                <div className="tr">
                     <HeaderCols />
                 </div>
-                <HeaderHandles />
+                {effectiveWidths && <HeaderHandles />}
             </div>
-            <div ref={parentRef} className="tbody-scroller">
+            <div
+                ref={tbodyRef}
+                className="tbody-scroller"
+                onScroll={() => {
+                    theadRef.current.scrollLeft = tbodyRef.current.scrollLeft;
+                }}
+            >
                 {isEmpty && empty ? (
                     empty()
                 ) : (
                     <div className="tbody" style={{ height: getTotalSize() }}>
-                        <Rows />
+                        {effectiveWidths && <Rows />}
                     </div>
                 )}
             </div>

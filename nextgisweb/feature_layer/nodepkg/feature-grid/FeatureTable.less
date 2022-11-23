@@ -8,21 +8,28 @@
 
     .thead {
         position: relative;
+        overflow-x: hidden;
         user-select: none;
         border-bottom: 1px solid var(--icon-color);
         background-color: var(--surface-bg);
 
         .tr {
             .th {
+                flex: 1;
+                min-width: 3em;
                 display: flex;
                 border-right-color: var(--divider-color);
                 cursor: pointer;
 
                 .label {
                     flex-grow: 1;
+                    min-width: 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 .suffix {
+                    flex: 0 0 auto;
                     span.asc,
                     span.desc {
                         svg.icon {
@@ -66,7 +73,13 @@
                 position: absolute;
                 top: 0;
                 left: 0;
-                width: 100%;
+                min-width: 100%;
+
+                .td {
+                    flex: 0 0 auto;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
             }
         }
     }
@@ -74,24 +87,12 @@
     .tr {
         display: flex;
         flex-wrap: nowrap;
-        :last-child {
-            .td {
-                border-bottom: 0;
-            }
-        }
         border-bottom: 1px solid var(--divider-color);
     }
 
     .td,
     .th {
-        flex: 1;
-        width: 200px;
-        margin: 0;
         padding: 2px 4px;
-        overflow-x: hidden;
         border-right: 1px solid var(--divider-color);
-        :last-child {
-            border-right: 0;
-        }
     }
 }
