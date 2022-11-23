@@ -1,12 +1,14 @@
-import ArrowForward from "@material-icons/svg/arrow_forward";
+import { PropTypes } from "prop-types";
+
+import { observer } from "mobx-react-lite";
+import { useMemo, useState } from "react";
 
 import { Button, Space, Table } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
-import { observer } from "mobx-react-lite";
-import { PropTypes } from "prop-types";
-import { useMemo, useState } from "react";
+
+import FolderOpenIcon from "@material-icons/svg/arrow_forward";
 
 const { Column } = Table;
 
@@ -67,7 +69,11 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
             resourceStore.changeParentTo(record.id);
         };
         return (
-            <Button shape="circle" icon={<ArrowForward />} onClick={onClick} />
+            <Button
+                shape="circle"
+                icon={<FolderOpenIcon />}
+                onClick={onClick}
+            />
         );
     };
 
@@ -86,9 +92,9 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
                     ...rowSelection,
                 }
             }
-            onRow={(record, rowIndex) => {
+            onRow={(record) => {
                 return {
-                    onClick: (event) => {
+                    onClick: () => {
                         const props = getCheckboxProps(record);
                         if (props.disabled) {
                             return;
@@ -111,7 +117,7 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
                 sorter={sorterFactory("displayName")}
                 render={(value, record) => (
                     <Space>
-                        <SvgIcon icon={`rescls-${record.cls}`}/>
+                        <SvgIcon icon={`rescls-${record.cls}`} />
                         {value}
                     </Space>
                 )}

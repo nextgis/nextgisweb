@@ -12,10 +12,10 @@ export const ResourcePickerBreadcrumb = observer(
         // TODO: make it dependent on the block length
         maxBreadcrumbItems = 2,
     }) => {
-        const { brearcrumbItems, brearcrumbItemsLoading, allowMoveInside } =
+        const { breadcrumbItems, breadcrumbItemsLoading, allowMoveInside } =
             resourceStore;
 
-        const breadcrumbItems = useMemo(() => {
+        const Breadcrumbs = useMemo(() => {
             const items = [];
             const onClick = (newLastResourceId) => {
                 resourceStore.changeParentTo(newLastResourceId);
@@ -40,13 +40,13 @@ export const ResourcePickerBreadcrumb = observer(
             const packFirstItemsToMenu =
                 typeof maxBreadcrumbItems === "number" &&
                 maxBreadcrumbItems !== Infinity &&
-                brearcrumbItems.length > maxBreadcrumbItems + 1;
+                breadcrumbItems.length > maxBreadcrumbItems + 1;
 
             if (packFirstItemsToMenu) {
                 // Skip the first item because it's a Home
-                const breadcrumbsForMenu = brearcrumbItems.splice(
+                const breadcrumbsForMenu = breadcrumbItems.splice(
                     1,
-                    brearcrumbItems.length - 1 - maxBreadcrumbItems
+                    breadcrumbItems.length - 1 - maxBreadcrumbItems
                 );
                 const moveToMenuItems = breadcrumbsForMenu.map((item) => {
                     return {
@@ -61,12 +61,12 @@ export const ResourcePickerBreadcrumb = observer(
                 <HomeFilledIcon style={{ fontSize: "1.1rem" }} />
             );
 
-            for (let i = 0; i < brearcrumbItems.length; i++) {
-                const parent = brearcrumbItems[i];
+            for (let i = 0; i < breadcrumbItems.length; i++) {
+                const parent = breadcrumbItems[i];
                 let name = null;
-                const isLink = i < brearcrumbItems.length - 1;
+                const isLink = i < breadcrumbItems.length - 1;
                 if (i === 0) {
-                    if (brearcrumbItems.length > 1) {
+                    if (breadcrumbItems.length > 1) {
                         name = (
                             <Tooltip title={parent.resource.display_name}>
                                 <HomeIcon />
@@ -101,15 +101,15 @@ export const ResourcePickerBreadcrumb = observer(
                 }
             }
             return items;
-        }, [brearcrumbItems, allowMoveInside]);
+        }, [breadcrumbItems, allowMoveInside]);
 
-        return brearcrumbItemsLoading ? (
+        return breadcrumbItemsLoading ? (
             <Space>
                 <Skeleton.Button active size="small" shape="circle" />
                 <Skeleton.Input active size="small" />
             </Space>
         ) : (
-            <Breadcrumb>{breadcrumbItems}</Breadcrumb>
+            <Breadcrumb>{Breadcrumbs}</Breadcrumb>
         );
     }
 );

@@ -15,9 +15,9 @@ export class ResourcePickerStore {
     parentId = 0;
     initialParentId = 0;
 
-    setBrearcrumbItemsError = false;
-    brearcrumbItemsLoading = false;
-    brearcrumbItems = [];
+    setBreadcrumbItemsError = false;
+    breadcrumbItemsLoading = false;
+    breadcrumbItems = [];
 
     createNewGroupLoading = false;
     createNewGroupError = false;
@@ -37,7 +37,7 @@ export class ResourcePickerStore {
     onNewGroup = null;
 
     setChildrenAbortController = null;
-    setBrearcrumbItemsAbortController = null;
+    setBreadcrumbItemsAbortController = null;
     createNewGroupAbortController = null;
 
     getThisMsg = getThisMsg;
@@ -73,7 +73,7 @@ export class ResourcePickerStore {
         }
         makeAutoObservable(this, {
             setChildrenAbortController: false,
-            setBrearcrumbItemsAbortController: false,
+            setBreadcrumbItemsAbortController: false,
             createNewGroupAbortController: false,
         });
         this.changeParentTo(this.parentId);
@@ -84,7 +84,7 @@ export class ResourcePickerStore {
         runInAction(() => {
             this.parentId = parent;
             this.setChildrenFor(parent);
-            this.setBrearcrumbItems(parent);
+            this.setBreadcrumbItems(parent);
         });
     }
 
@@ -140,10 +140,10 @@ export class ResourcePickerStore {
     }
 
     abortBreadcrumbsLoading() {
-        if (this.setBrearcrumbItemsAbortController) {
-            this.setBrearcrumbItemsAbortController.abort();
+        if (this.setBreadcrumbItemsAbortController) {
+            this.setBreadcrumbItemsAbortController.abort();
         }
-        this.setBrearcrumbItemsAbortController = null;
+        this.setBreadcrumbItemsAbortController = null;
     }
 
     aboretNewGroupCreation() {
@@ -153,28 +153,28 @@ export class ResourcePickerStore {
         this.createNewGroupAbortController = null;
     }
 
-    async setBrearcrumbItems(parent) {
+    async setBreadcrumbItems(parent) {
         this.abortBreadcrumbsLoading();
         try {
             runInAction(() => {
-                this.brearcrumbItemsLoading = true;
+                this.breadcrumbItemsLoading = true;
             });
-            this.setBrearcrumbItemsAbortController = new AbortController();
+            this.setBreadcrumbItemsAbortController = new AbortController();
             const parents = await loadParents(parent, {
-                signal: this.setBrearcrumbItemsAbortController.signal,
+                signal: this.setBreadcrumbItemsAbortController.signal,
             });
             runInAction(() => {
-                this.brearcrumbItems = parents;
+                this.breadcrumbItems = parents;
             });
         } catch (er) {
             const { title } = extractError(er);
             runInAction(() => {
-                this.setBrearcrumbItemsError = title;
+                this.setBreadcrumbItemsError = title;
             });
             throw new Error(er);
         } finally {
             runInAction(() => {
-                this.brearcrumbItemsLoading = false;
+                this.breadcrumbItemsLoading = false;
             });
         }
     }
