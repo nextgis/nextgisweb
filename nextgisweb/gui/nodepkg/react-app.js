@@ -9,4 +9,10 @@ export default function (Component, props, domNode) {
         </ConfigProvider>,
         domNode
     );
+
+    const unmount = () => {
+        ReactDOM.unmountComponentAtNode(domNode);
+    };
+
+    return { ref: domNode, unmount };
 }
