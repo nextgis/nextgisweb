@@ -10,6 +10,7 @@ from ..resource import (
     DataScope,
     resource_factory,
     Widget)
+from ..gui import REACT_RENDERER
 from ..pyramid import viewargs
 from .. import dynmenu as dm
 
@@ -34,12 +35,20 @@ PDS_W = DataStructureScope.write
 PR_R = ResourceScope.read
 
 
-@viewargs(renderer='nextgisweb:feature_layer/template/feature_browse.mako')
 def feature_browse(request):
     request.resource_permission(PD_READ)
     request.resource_permission(PDS_R)
-    return dict(obj=request.context, title=_("Feature table"),
-                maxwidth=True, maxheight=True)
+
+    readonly = not request.context.has_permission(PD_WRITE, request.user)
+
+    return dict(
+        obj=request.context,
+        title=_("Feature table"),
+        entrypoint="@nextgisweb/feature-layer/feature-grid",
+        props=dict(id=request.context.id, readonly=readonly),
+        maxwidth=True,
+        maxheight=True
+    )
 
 
 @viewargs(renderer='nextgisweb:feature_layer/template/feature_show.mako')
@@ -143,7 +152,7 @@ def setup_pyramid(comp, config):
         r'/resource/{id:\d+}/feature/',
         factory=resource_factory,
         client=('id', )
-    ).add_view(feature_browse, context=IFeatureLayer)
+    ).add_view(feature_browse, renderer=REACT_RENDERER)
 
     config.add_route(
         'feature_layer.feature.show',
