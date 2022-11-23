@@ -1,6 +1,3 @@
-// TODO: delete this import because IE is no longer supported
-import "whatwg-fetch";
-
 import {
     NetworksResponseError,
     InvalidResponseError,

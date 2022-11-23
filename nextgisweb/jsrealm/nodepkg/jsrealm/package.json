@@ -41,7 +41,6 @@
         "webpack-assets-manifest": "^5.0.5",
         "webpack-bundle-analyzer": "^4.4.1",
         "webpack-cli": "^4.6.0",
-        "webpack": "5.50.0",
-        "whatwg-fetch": "^3.6.2"
+        "webpack": "5.50.0"
     }
 }
