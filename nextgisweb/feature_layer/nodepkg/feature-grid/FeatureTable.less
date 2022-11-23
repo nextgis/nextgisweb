@@ -30,12 +30,14 @@
 
                 .suffix {
                     flex: 0 0 auto;
+
                     span.asc,
                     span.desc {
                         svg.icon {
                             margin: 0 -2px;
                         }
                     }
+
                     span.asc {
                         svg.icon {
                             transform: rotate(180deg);
@@ -74,11 +76,20 @@
                 top: 0;
                 left: 0;
                 min-width: 100%;
+                cursor: pointer;
 
                 .td {
                     flex: 0 0 auto;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                }
+
+                &:hover {
+                    background-color: rgba(0,0,0,.04);
+                }
+                &.selected {
+                    background-color: #fdf8c3;
+                    // background-color: rgba(0,0,0,.08);
                 }
             }
         }

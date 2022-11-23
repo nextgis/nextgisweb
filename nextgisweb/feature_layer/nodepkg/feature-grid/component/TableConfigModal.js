@@ -14,37 +14,30 @@ export default function TableConfigModal({
     };
 
     return (
-        <>
-            <Modal
-                title="Table config"
-                open={isOpen}
-                nOk={close}
-                onCancel={close}
-                footer={null}
-            >
-                {fields.map((f) => {
-                    const checked = visibleFields.includes(f.keyname);
-                    return (
+        <Modal open={isOpen} nOk={close} onCancel={close} footer={null}>
+            {fields.map((f) => {
+                const checked = visibleFields.includes(f.id);
+                return (
+                    <div key={f.id}>
                         <Checkbox
-                            key={f.keyname}
                             checked={checked}
                             onChange={() =>
                                 setVisibleFields((old) => {
                                     if (checked) {
                                         return old.filter(
-                                            (oldF) => oldF !== f.keyname
+                                            (oldF) => oldF !== f.id
                                         );
                                     }
-                                    return [...old, f.keyname];
+                                    return [...old, f.id];
                                 })
                             }
                         >
                             {f.display_name}
                         </Checkbox>
-                    );
-                })}
-            </Modal>
-        </>
+                    </div>
+                );
+            })}
+        </Modal>
     );
 }
 
@@ -53,5 +46,5 @@ TableConfigModal.propTypes = {
     isOpen: PropTypes.bool,
     setIsOpen: PropTypes.func,
     setVisibleFields: PropTypes.func,
-    visibleFields: PropTypes.arrayOf(PropTypes.string),
+    visibleFields: PropTypes.arrayOf(PropTypes.number),
 };

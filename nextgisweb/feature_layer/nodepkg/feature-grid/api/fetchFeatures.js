@@ -1,5 +1,8 @@
 import { route } from "@nextgisweb/pyramid/api";
 
+import { KEY_FIELD_KEYNAME } from "../constant";
+
+
 export async function fetchFeatures({
     resourceId,
     orderBy,
@@ -30,7 +33,7 @@ export async function fetchFeatures({
     }
     const parts = await Promise.all(promises);
     for (const p of parts.flat()) {
-        items.push({ ...p.fields, id: p.id });
+        items.push({ ...p.fields, [KEY_FIELD_KEYNAME]: p.id });
     }
     return items;
 }
