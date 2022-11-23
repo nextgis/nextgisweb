@@ -1,7 +1,6 @@
 export class LoaderCache {
     constructor() {
         this.promises = {};
-        this.errors = {};
     }
 
     promiseFor(key, loader) {
@@ -9,18 +8,30 @@ export class LoaderCache {
         if (promise === undefined) {
             promise = loader();
             this.promises[key] = promise;
+            promise.catch(() => {
+                delete this.promises[key];
+            });
         }
         return promise;
+    }
+
+    clean(key = null) {
+        if (key) {
+            delete this.promises[key];
+        } else {
+            this.promises = {};
+        }
     }
 }
 
 export function callingComponent(arg, toAbsMid) {
     const abs = toAbsMid(".");
     const parts = abs.split("/");
-    const component = (parts[0] == "@nextgisweb"
-        ? parts[1]
-        : parts[0].replace(/^ngw-/, "")
-    ).replace(/\-/g, "_").replace(".", "");
+    const component = (
+        parts[0] === "@nextgisweb" ? parts[1] : parts[0].replace(/^ngw-/, "")
+    )
+        .replace(/-/g, "_")
+        .replace(".", "");
 
     // if (component == req) {
     //     console.debug(
@@ -29,7 +40,7 @@ export function callingComponent(arg, toAbsMid) {
     //     );
     // }
 
-    if (arg == "") {
+    if (arg === "") {
         return component;
     } else {
         return arg;
