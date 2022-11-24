@@ -1,3 +1,5 @@
+import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
+
 import {
     NetworksResponseError,
     InvalidResponseError,
@@ -90,7 +92,8 @@ export async function request(path, options) {
         return body;
     };
     if (opt.method.toUpperCase() === "GET" && useCache) {
-        return cache.promiseFor(url, makeRequest);
+        const cacheToUse = useCache instanceof LoaderCache ? useCache : cache;
+        return cacheToUse.promiseFor(url, makeRequest);
     }
     return makeRequest();
 }
