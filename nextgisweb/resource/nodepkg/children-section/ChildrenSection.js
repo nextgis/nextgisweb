@@ -3,18 +3,12 @@ import PriorityHighIcon from "@material-icons/svg/priority_high";
 import PropTypes from "prop-types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import {
-    Badge,
-    Dropdown,
-    message,
-    Modal,
-    Table,
-    Tooltip,
-} from "@nextgisweb/gui/antd";
+import { Badge, Dropdown, message, Table, Tooltip } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { errorModal } from "@nextgisweb/gui/error";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
+import { confirmDelete } from "@nextgisweb/gui/confirm";
 import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
 import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
@@ -27,29 +21,25 @@ import "./ChildrenSection.less";
 
 const { Column } = Table;
 
-function confirmThenDelete(callback) {
-    Modal.confirm({
-        onOk: callback,
-        title: i18n.gettext("Confirmation required"),
+function confirmThenDelete(onOk) {
+    confirmDelete({
+        onOk,
         content: i18n.gettext(
             "Please confirm resource deletion. This action cannot be undone."
         ),
-        okButtonProps: { danger: true, type: "primary" },
-        okText: i18n.gettext("Delete"),
-        autoFocusButton: "cancel",
     });
 }
 
 function notifySuccessfulDeletion(count) {
     message.success(
-        count == 1
+        count === 1
             ? i18n.gettext("Resource deleted")
             : i18n.gettext("Resources deleted")
     );
 }
 function notifySuccessfulMove(count) {
     message.success(
-        count == 1
+        count === 1
             ? i18n.gettext("Resource has been moved")
             : i18n.gettext("Resources have been moved")
     );
@@ -65,7 +55,7 @@ function notifyMoveAbsolutError(errorItems) {
     const count = errorItems.length;
     message.error(
         i18n.gettext(
-            count == 1
+            count === 1
                 ? i18n.gettext("Failed to move resource")
                 : i18n.gettext("Failed to move resources")
         )

@@ -1,3 +1,28 @@
+#: nodepkg/confirm.js:8
+msgid "Confirmation required"
+msgstr ""
+
+#: nodepkg/confirm.js:9
+msgid "Please confirm this action."
+msgstr ""
+
+#: nodepkg/confirm.js:11 nodepkg/error/shared.js:71
+msgid "OK"
+msgstr "OK"
+
+#: nodepkg/confirm.js:35
+msgid "Please confirm the deletion."
+msgstr ""
+
+#: nodepkg/confirm.js:36 nodepkg/model-browse/ModelBrowse.js:192
+#: nodepkg/model-browse/ModelBrowse.js:259 nodepkg/model-form/ModelForm.js:13
+msgid "Delete"
+msgstr "Удалить"
+
+#: nodepkg/confirm.js:37
+msgid "Failed to delete."
+msgstr ""
+
 #: nodepkg/example.js:77
 msgid "Internationalization test"
 msgstr "Тест интернационализации"
@@ -29,10 +54,6 @@ msgstr "Техническая информация"
 #: nodepkg/error/shared.js:67
 msgid "Contact support"
 msgstr "Написать в поддержку"
-
-#: nodepkg/error/shared.js:71
-msgid "OK"
-msgstr "OK"
 
 #: nodepkg/error/shared.js:75
 msgid "Back to home"
@@ -81,11 +102,6 @@ msgstr "Вы хотите удалить эти элементы?"
 #: nodepkg/model-browse/ModelBrowse.js:183
 msgid "Edit"
 msgstr "Изменить"
-
-#: nodepkg/model-browse/ModelBrowse.js:192 nodepkg/model-browse/ModelBrowse.js:259
-#: nodepkg/model-form/ModelForm.js:13
-msgid "Delete"
-msgstr "Удалить"
 
 #: nodepkg/model-browse/ModelBrowse.js:215
 msgid "Search"
