@@ -1,0 +1,109 @@
+.ngw-feature-layer-feature-table {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border: 1px solid var(--icon-color);
+
+    .thead {
+        position: relative;
+        overflow-x: hidden;
+        user-select: none;
+        border-bottom: 1px solid var(--icon-color);
+        background-color: var(--surface-bg);
+
+        .tr {
+            .th {
+                flex: 1;
+                min-width: 3em;
+                display: flex;
+                border-right-color: var(--divider-color);
+                cursor: pointer;
+
+                .label {
+                    flex-grow: 1;
+                    min-width: 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .suffix {
+                    flex: 0 0 auto;
+
+                    span.asc,
+                    span.desc {
+                        svg.icon {
+                            margin: 0 -2px;
+                        }
+                    }
+
+                    span.asc {
+                        svg.icon {
+                            transform: rotate(180deg);
+                        }
+                    }
+                }
+            }
+        }
+
+        .handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            cursor: col-resize;
+
+            &-dragging {
+                background-color: rgba(127, 127, 127, 0.75);
+            }
+        }
+    }
+
+    .tbody-scroller {
+        flex-grow: 1;
+        height: 0px;
+        width: 100%;
+        overflow-y: scroll;
+        overflow-x: auto;
+        border-spacing: 0;
+
+        .tbody {
+            position: relative;
+            width: 100%;
+
+            .tr {
+                position: absolute;
+                top: 0;
+                left: 0;
+                min-width: 100%;
+                cursor: pointer;
+
+                .td {
+                    flex: 0 0 auto;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:hover {
+                    background-color: rgba(0,0,0,.04);
+                }
+                &.selected {
+                    background-color: #fdf8c3;
+                    // background-color: rgba(0,0,0,.08);
+                }
+            }
+        }
+    }
+
+    .tr {
+        display: flex;
+        flex-wrap: nowrap;
+        border-bottom: 1px solid var(--divider-color);
+    }
+
+    .td,
+    .th {
+        padding: 2px 4px;
+        border-right: 1px solid var(--divider-color);
+    }
+}

@@ -1,5 +1,11 @@
 {
-    "name": "@nextgisweb/feature_layer",
+    "name": "@nextgisweb/feature-layer",
     "version": "0.0.0",
-    "type": "module"
+    "type": "module",
+    "dependencies": {
+        "@tanstack/react-virtual": "^3.0.0-beta.22",
+        "@tanstack/react-query": "^4.14.5",
+        "lodash-es": "^4.17.21",
+        "react-draggable": "^4.4.5"
+    }
 }
