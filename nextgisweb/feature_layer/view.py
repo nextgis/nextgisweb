@@ -141,7 +141,7 @@ def export(request):
         obj=request.context,
         title=_("Save as"),
         props=dict(id=request.context.id),
-        entrypoint="@nextgisweb/feature_layer/export-form",
+        entrypoint="@nextgisweb/feature-layer/export-form",
         maxheight=True
     )
 
