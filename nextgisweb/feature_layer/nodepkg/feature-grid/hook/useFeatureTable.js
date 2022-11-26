@@ -61,7 +61,7 @@ const debouncedFn = debounce((fn) => {
  *   │
  *   │ Step 3 - > get to the end of the table
  *   │          > decrease the queryTotal size
- *   │          > set `hasQueryNextPage` to `false`
+ *   │          > set `hasNextPage` to `false`
  *   │
  *   └oooooooooo|oooooooooo┼oooooooooo╫oooxxxxxx╫┤ queryTotal - (pageSize - loadedItemsLength)
  *                                        ^    ^
@@ -80,7 +80,7 @@ export function useFeatureTable({
 }) {
     const [pages, setPages] = useState([]);
     // const [fetchEnabled, setFetchEnabled] = useState(false);
-    const [hasQueryNextPage, setHasQueryNextPage] = useState(false);
+    const [hasNextPage, setHasNextPage] = useState(false);
     const [queryTotal, setQueryTotal] = useState(0);
 
     /** For limit the number of API requests */
@@ -95,20 +95,40 @@ export function useFeatureTable({
         }
         abortController.current = null;
     };
+
+    useEffect(() => {
+        loaderCache.current.clean();
+    }, [total]);
+
     const createSignal = useCallback(() => {
         abort();
         abortController.current = new AbortController();
         return abortController.current.signal;
     }, []);
 
-    const [data, setData] = useState();
+    const [data, setData_] = useState([]);
+
+    const setData = (features) => {
+        setData_((old) => {
+            if (!old.length && !features.length) {
+                return old;
+            }
+            return features;
+        });
+    };
 
     const queryMode = useMemo(() => !!query, [query]);
 
     useEffect(() => {
+        return () => {
+            abort();
+        };
+    }, []);
+
+    useEffect(() => {
         setFetchEnabled(false);
         debouncedFn(() => setFetchEnabled(true));
-    }, [pages, pageSize, query]);
+    }, [pages, pageSize, query, orderBy]);
 
     const handleFeatures = useCallback(
         (features) => {
@@ -116,18 +136,48 @@ export function useFeatureTable({
             for (const f of features) {
                 f.__rowIndex = rowIndex++;
             }
+            const hasNewPage = features.length / pages.length >= pageSize;
+            setHasNextPage(hasNewPage);
             if (queryMode) {
-                const hasNewPage = features.length / pages.length >= pageSize;
-                const toSize = pages[pages.length - 1] + pageSize;
+                const toSize = pages[0] + pageSize * pages.length;
                 const newTotal = hasNewPage
                     ? toSize + pageSize
                     : toSize - (pageSize - (features.length % pageSize));
                 setQueryTotal(newTotal);
-                setHasQueryNextPage(hasNewPage);
             }
             setData(features);
         },
         [pageSize, pages, queryMode]
+    );
+
+    const fetchWrapper = useCallback(
+        ({ page, signal, key }) => {
+            return loaderCache.current
+                .promiseFor(key, () => {
+                    return fetchFeatures({
+                        fields: columns
+                            // ids that are less than one are created for
+                            // internal purposes and not used in NGW
+                            .filter((f) => f.id > 0)
+                            .map((f) => f.keyname),
+                        limit: pageSize,
+                        cache: false,
+                        offset: page,
+                        like: query,
+                        resourceId,
+                        orderBy,
+                        signal,
+                    });
+                })
+                .catch((er) => {
+                    if (er && er.name === "AbortError") {
+                        // ignore abort error
+                    } else {
+                        throw er;
+                    }
+                });
+        },
+        [columns, orderBy, pageSize, query, resourceId]
     );
 
     const queryFn = useCallback(async () => {
@@ -161,54 +211,31 @@ export function useFeatureTable({
                 const promises = [];
                 for (const { key, page } of cacheKeys) {
                     if (pages.includes(page)) {
-                        promises.push(
-                            loaderCache.current
-                                .promiseFor(key, () => {
-                                    return fetchFeatures({
-                                        fields: columns
-                                            // ids that are less than one are created for
-                                            // internal purposes and not used in NGW
-                                            .filter((f) => f.id > 0)
-                                            .map((f) => f.keyname),
-                                        limit: pageSize,
-                                        cache: false,
-                                        offset: page,
-                                        like: query,
-                                        resourceId,
-                                        orderBy,
-                                        signal,
-                                    });
-                                })
-                                .catch((er) => {
-                                    if (er && er.name === "AbortError") {
-                                        // ignore abort error
-                                    } else {
-                                        throw er;
-                                    }
-                                })
-                        );
+                        promises.push(fetchWrapper({ page, signal, key }));
                     }
                 }
                 const parts = await Promise.all(promises);
                 const features = [];
-                for (const p of parts.flat()) {
-                    if (p) {
-                        features.push(p);
+                // Fulfilled `parts` from `cache` are not cancelable and always return values
+                // Therefore, if there was aborted,
+                // the number of `features` will not mutch to the number of `pages`
+                if (parts.every(Boolean)) {
+                    for (const p of parts.flat()) {
+                        if (p) {
+                            features.push(p);
+                        }
                     }
+                    handleFeatures(features);
                 }
-                handleFeatures(features);
             }
-        } else {
-            handleFeatures([]);
         }
     }, [
         handleFeatures,
         visibleFields,
         fetchEnabled,
         createSignal,
-        resourceId,
+        fetchWrapper,
         pageSize,
-        columns,
         orderBy,
         pages,
         query,
@@ -223,30 +250,50 @@ export function useFeatureTable({
 
     const virtualItems = getVirtualItems();
 
-    useEffect(() => {
-        loaderCache.current.clean();
-    }, [total]);
+    const prevTotal = useRef(total);
 
     useEffect(() => {
+        if (total === prevTotal.current && pages.length && data.length) {
+            const firstDataIndex = data[0].__rowIndex;
+            const lastDataIndex = data[data.length - 1].__rowIndex;
+            const lastPageIndex = pages[0] + pageSize * pages.length - 1;
+
+            let curentDataInTheRange =
+                firstDataIndex === pages[0] &&
+                (hasNextPage
+                    ? lastDataIndex === lastPageIndex
+                    : lastDataIndex <= lastPageIndex);
+            if (curentDataInTheRange) {
+                return;
+            }
+        }
         queryFn();
     }, [
         visibleFields,
         fetchEnabled,
+        hasNextPage,
         pageSize,
         orderBy,
         queryFn,
         query,
         total,
         pages,
+        data,
     ]);
+
+    // Update prevTotal only after useEffect with queryFn call!
+    useEffect(() => {
+        prevTotal.current = total;
+    }, [total]);
 
     useEffect(() => {
         setData([]);
-        scrollToIndex(0, { smoothScroll: false });
+    }, [orderBy, query]);
 
-        const { total, loadedCount = pageSize } = {};
-        setQueryTotal(loadedCount);
-        setHasQueryNextPage(total !== undefined ? false : true);
+    useEffect(() => {
+        scrollToIndex(0, { smoothScroll: false });
+        // to init first loading
+        setQueryTotal(pageSize);
     }, [query, pageSize, scrollToIndex]);
 
     useEffect(() => {
@@ -273,9 +320,9 @@ export function useFeatureTable({
         data,
         queryMode,
         queryTotal,
+        hasNextPage,
         virtualItems,
         getTotalSize,
         measureElement,
-        hasQueryNextPage,
     };
 }

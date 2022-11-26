@@ -90,10 +90,10 @@ const FeatureTable = ({
         data,
         queryMode,
         queryTotal,
+        hasNextPage,
         virtualItems,
         getTotalSize,
         measureElement,
-        hasQueryNextPage,
     } = useFeatureTable({
         visibleFields,
         rowMinHeight,
@@ -158,8 +158,6 @@ const FeatureTable = ({
         if (!firstVirtual) {
             return null;
         }
-        const startIndex = virtualItems[0].index;
-        const dataDelta = startIndex % pageSize;
 
         const prepareCols = (row) => {
             return (
@@ -191,18 +189,13 @@ const FeatureTable = ({
             let isSelected = false;
             let className = "tr";
 
-            let row = null;
-            if (data) {
-                const dataIndex = virtualRow.index - startIndex + dataDelta;
-                const dataRow = data[dataIndex];
-                if (dataRow && dataRow.__rowIndex === virtualRow.index) {
-                    row = dataRow;
-
-                    isSelected = selected.find(
-                        (s) => s[KEY_FIELD_KEYNAME] === row[KEY_FIELD_KEYNAME]
-                    );
-                }
+            const row = data.find((d) => d.__rowIndex === virtualRow.index);
+            if (row) {
+                isSelected = selected.find(
+                    (s) => s[KEY_FIELD_KEYNAME] === row[KEY_FIELD_KEYNAME]
+                );
             }
+
             if (isSelected) {
                 className += " selected";
             }
@@ -238,7 +231,6 @@ const FeatureTable = ({
         data,
         columns,
         selected,
-        pageSize,
         setSelected,
         rowMinHeight,
         virtualItems,
@@ -248,7 +240,7 @@ const FeatureTable = ({
 
     let isEmpty = total === 0;
     if (queryMode && !isEmpty) {
-        isEmpty = !hasQueryNextPage && queryTotal === 0;
+        isEmpty = !hasNextPage && queryTotal === 0;
     }
 
     const HeaderCols = useCallback(() => {
