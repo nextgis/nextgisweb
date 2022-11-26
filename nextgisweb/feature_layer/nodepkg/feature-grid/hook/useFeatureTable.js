@@ -1,19 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import debounce from "lodash/debounce";
-import { useEffect, useMemo, useState } from "react";
 
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import { fetchFeatures } from "../api/fetchFeatures";
+import { createCacheKey } from "../util/createCacheKey";
 
 const debouncedFn = debounce((fn) => {
     fn();
 }, 200);
-
-let queryCache = {};
-
-const loaderCache = new LoaderCache();
 
 /**
  * This table component works in two modes:
@@ -78,104 +74,145 @@ export function useFeatureTable({
     orderBy,
     pageSize,
     tbodyRef,
-    LoadingCol,
     resourceId,
     rowMinHeight,
     visibleFields,
 }) {
     const [pages, setPages] = useState([]);
+    // const [fetchEnabled, setFetchEnabled] = useState(false);
     const [hasQueryNextPage, setHasQueryNextPage] = useState(false);
     const [queryTotal, setQueryTotal] = useState(0);
+
     /** For limit the number of API requests */
     const [fetchEnabled, setFetchEnabled] = useState(false);
 
+    const abortController = useRef();
+    const loaderCache = useRef(new LoaderCache());
+
+    const abort = () => {
+        if (abortController.current) {
+            return abortController.current.abort();
+        }
+        abortController.current = null;
+    };
+    const createSignal = useCallback(() => {
+        abort();
+        abortController.current = new AbortController();
+        return abortController.current.signal;
+    }, []);
+
+    const [data, setData] = useState();
+
     const queryMode = useMemo(() => !!query, [query]);
 
-    const cacheKey = useMemo(() => {
-        return [pageSize, query, visibleFields.sort().join("_")].join(
-            "__"
-        );
-    }, [pageSize, query, visibleFields]);
-
     useEffect(() => {
-        loaderCache.clean();
-        queryCache = {};
-    }, [total]);
+        setFetchEnabled(false);
+        debouncedFn(() => setFetchEnabled(true));
+    }, [pages, pageSize, query]);
 
-    const { data } = useQuery({
-        queryKey: [
-            "features",
-            pages,
-            pageSize,
-            orderBy,
-            query,
-            visibleFields,
-            total,
-        ],
-        /**
-         * In order to use non-infinite time,
-         * we need to synchronize caching with other requests (total, item fields)
-         * and with local queryCache
-         */
-        cacheTime: Infinity,
-        staleTime: Infinity,
-        enabled: fetchEnabled,
-        keepPreviousData: true,
-        queryFn: async ({ signal }) => {
-            if (pages.length) {
-                /**
-                 * The queryFn use cache based on `page`, `pageSize` asd `orderBy` parameters.
-                 * But the `page` is a array of table visual parts splited by N elements.
-                 * So the `page` param may be as [0,1], [1] and [1,2] (and also [0,1,2,3] for a large screen).
-                 * Thus we need a cache for each page request to avoid duples.
-                 */
-                const features = await fetchFeatures({
-                    fields: columns
-                        .filter((f) => f.id > 0) // ids that are less than one are created for internal purposes and not used in NGW
-                        .map((f) => f.keyname),
-                    like: query,
-                    cache: loaderCache,
-                    limit: pageSize,
-                    pages,
-                    signal,
+    const handleFeatures = useCallback(
+        (features) => {
+            let rowIndex = pages[0];
+            for (const f of features) {
+                f.__rowIndex = rowIndex++;
+            }
+            if (queryMode) {
+                const hasNewPage = features.length / pages.length >= pageSize;
+                const toSize = pages[pages.length - 1] + pageSize;
+                const newTotal = hasNewPage
+                    ? toSize + pageSize
+                    : toSize - (pageSize - (features.length % pageSize));
+                setQueryTotal(newTotal);
+                setHasQueryNextPage(hasNewPage);
+            }
+            setData(features);
+        },
+        [pageSize, pages, queryMode]
+    );
+
+    const queryFn = useCallback(async () => {
+        abort();
+        if (pages.length) {
+            const cache = loaderCache.current;
+
+            const cacheKeys = pages.map((page) => ({
+                page,
+                key: createCacheKey({
+                    visibleFields,
+                    pageSize,
                     orderBy,
-                    resourceId,
-                });
-                let rowIndex = pages[0];
-                for (const f of features) {
-                    f.__rowIndex = rowIndex++;
-                }
-                if (queryMode) {
-                    const hasNewPage =
-                        features.length / pages.length >= pageSize;
-                    const toSize = pages[pages.length - 1] + pageSize;
-                    const newTotal = hasNewPage
-                        ? toSize + pageSize
-                        : toSize - (pageSize - (features.length % pageSize));
-                    setQueryTotal(newTotal);
-                    setHasQueryNextPage(hasNewPage);
-
-                    const toCache = { loadedCount: newTotal };
-                    if (!hasNewPage) {
-                        toCache.total = newTotal;
-                    }
-                    queryCache[cacheKey] = toCache;
-                }
-                return features;
-            }
-            return [];
-        },
-        placeholderData: () => {
-            const placeholderData = {};
-            for (const c of columns) {
-                placeholderData[c.keyname] = <LoadingCol />;
-            }
-            return Array.from(
-                { length: pages.length * pageSize },
-                () => placeholderData
+                    query,
+                    page,
+                }),
+            }));
+            const allPageLoaded = cacheKeys.every((c) =>
+                cache.fulfilled(c.key)
             );
-        },
-    });
+
+            if (allPageLoaded) {
+                const features = (
+                    await Promise.all(
+                        cacheKeys.map((c) => cache.resolve(c.key))
+                    )
+                ).flat();
+                handleFeatures(features);
+            } else if (fetchEnabled) {
+                const signal = createSignal();
+                const promises = [];
+                for (const { key, page } of cacheKeys) {
+                    if (pages.includes(page)) {
+                        promises.push(
+                            loaderCache.current
+                                .promiseFor(key, () => {
+                                    return fetchFeatures({
+                                        fields: columns
+                                            // ids that are less than one are created for
+                                            // internal purposes and not used in NGW
+                                            .filter((f) => f.id > 0)
+                                            .map((f) => f.keyname),
+                                        limit: pageSize,
+                                        cache: false,
+                                        offset: page,
+                                        like: query,
+                                        resourceId,
+                                        orderBy,
+                                        signal,
+                                    });
+                                })
+                                .catch((er) => {
+                                    if (er && er.name === "AbortError") {
+                                        // ignore abort error
+                                    } else {
+                                        throw er;
+                                    }
+                                })
+                        );
+                    }
+                }
+                const parts = await Promise.all(promises);
+                const features = [];
+                for (const p of parts.flat()) {
+                    if (p) {
+                        features.push(p);
+                    }
+                }
+                handleFeatures(features);
+            }
+        } else {
+            handleFeatures([]);
+        }
+    }, [
+        handleFeatures,
+        visibleFields,
+        fetchEnabled,
+        createSignal,
+        resourceId,
+        pageSize,
+        columns,
+        orderBy,
+        pages,
+        query,
+    ]);
 
     const { getVirtualItems, measureElement, getTotalSize, scrollToIndex } =
         useVirtualizer({
@@ -187,17 +224,30 @@ export function useFeatureTable({
     const virtualItems = getVirtualItems();
 
     useEffect(() => {
-        scrollToIndex(0, { smoothScroll: false });
-
-        const { total, loadedCount = pageSize } = queryCache[cacheKey] || {};
-        setQueryTotal(loadedCount);
-        setHasQueryNextPage(total !== undefined ? false : true);
-    }, [query, pageSize, scrollToIndex, cacheKey]);
+        loaderCache.current.clean();
+    }, [total]);
 
     useEffect(() => {
-        setFetchEnabled(false);
-        debouncedFn(() => setFetchEnabled(true));
-    }, [pages, pageSize, query]);
+        queryFn();
+    }, [
+        visibleFields,
+        fetchEnabled,
+        pageSize,
+        orderBy,
+        queryFn,
+        query,
+        total,
+        pages,
+    ]);
+
+    useEffect(() => {
+        setData([]);
+        scrollToIndex(0, { smoothScroll: false });
+
+        const { total, loadedCount = pageSize } = {};
+        setQueryTotal(loadedCount);
+        setHasQueryNextPage(total !== undefined ? false : true);
+    }, [query, pageSize, scrollToIndex]);
 
     useEffect(() => {
         const items = [...virtualItems];

@@ -3,16 +3,35 @@ export class LoaderCache {
         this.promises = {};
     }
 
+    fulfilled(key) {
+        return this.promises[key]?.fulfilled;
+    }
+
+    resolve(key) {
+        return this.promises[key]?.loader;
+    }
+
     promiseFor(key, loader) {
         let promise = this.promises[key];
         if (promise === undefined) {
-            promise = loader();
+            promise = {
+                fulfilled: false,
+                loader: loader(),
+            };
+            promise.loader
+                .then((result) => {
+                    this.promises[key].fulfilled = true;
+                    return result;
+                })
+                .catch(() => {
+                    // The AbortControl signal may be triggered after successful execution
+                    if (!this.fulfilled(key)) {
+                        delete this.promises[key];
+                    }
+                });
             this.promises[key] = promise;
-            promise.catch(() => {
-                delete this.promises[key];
-            });
         }
-        return promise;
+        return promise.loader;
     }
 
     clean(key = null) {

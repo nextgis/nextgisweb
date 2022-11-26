@@ -1,6 +1,5 @@
 import { PropTypes } from "prop-types";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import debounce from "lodash/debounce";
 import {
     useCallback,
@@ -23,9 +22,7 @@ import "./FeatureTable.less";
 
 const RESIZE_HANDLE_WIDTH = 6;
 
-const queryClient = new QueryClient();
-
-const FeatureTableComponent = ({
+const FeatureTable = ({
     empty,
     total,
     query,
@@ -360,7 +357,7 @@ const FeatureTableComponent = ({
     );
 };
 
-FeatureTableComponent.propTypes = {
+FeatureTable.propTypes = {
     LoadingCol: PropTypes.func,
     empty: PropTypes.func,
     fields: PropTypes.arrayOf(PropTypes.object),
@@ -374,10 +371,4 @@ FeatureTableComponent.propTypes = {
     total: PropTypes.number,
 };
 
-export default function FutureTable(props) {
-    return (
-        <QueryClientProvider client={queryClient}>
-            <FeatureTableComponent {...props} />
-        </QueryClientProvider>
-    );
-}
+export default FeatureTable;
