@@ -316,7 +316,7 @@ class OAuthHelper:
                     break
 
         # Group membership (member_of)
-        if (mof_attr := opts.get('member_of.attr', None)) is not None:
+        if (mof_attr := opts['member_of.attr']) is not None:
             mof_attr_sub = mof_attr.format(client_id=self.options['client.id'])
             try:
                 mof = _member_of_from_token(token, mof_attr_sub)

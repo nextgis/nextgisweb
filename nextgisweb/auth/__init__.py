@@ -172,7 +172,9 @@ class AuthComponent(Component):
                     self.oauth.options['server.base_url']
                     if (enabled and 'server.base_url' in self.oauth.options)
                     else None),
-                group_mapping='profile.member_of.attr' in self.oauth.options if enabled else False,
+                group_mapping=(
+                    (self.oauth.options['profile.member_of.attr'] is not None)
+                    if enabled else False),
             )
         )
 
