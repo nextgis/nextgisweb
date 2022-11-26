@@ -72,8 +72,8 @@ class JSRealmInstallCommand:
         ).resolve().relative_to(cwd)
 
         package_json['scripts'] = scripts = dict()
-        scripts['build'] = 'webpack --config {}'.format(webpack_config)
-        scripts['watch'] = 'webpack --watch --config {}'.format(webpack_config)
+        scripts['build'] = 'webpack --progress --config {}'.format(webpack_config)
+        scripts['watch'] = 'webpack --progress --watch --config {}'.format(webpack_config)
 
         package_json['workspaces'] = client_packages
 
