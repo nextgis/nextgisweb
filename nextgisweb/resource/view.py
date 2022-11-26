@@ -126,15 +126,6 @@ def schema(request):
     return dict(resources=resources, scopes=scopes)
 
 
-# TODO: Remove deprecated useless page
-@viewargs(renderer='nextgisweb:resource/template/tree.mako')
-def tree(request):
-    obj = request.context
-    return dict(
-        obj=obj, maxwidth=True, maxheight=True,
-        title=_("Resource tree"))
-
-
 @dataclass
 class OnResourceCreateView:
     cls: str
@@ -265,8 +256,6 @@ def setup_pyramid(comp, config):
 
     _resource_route('json', r'{id:\d+}/json', client=('id', )) \
         .add_view(json_view, renderer=REACT_RENDERER)
-
-    _resource_route('tree', r'{id:\d+}/tree', client=('id', )).add_view(tree)
 
     _resource_route('export.page', r'{id:\d+}/export', request_method='GET')
 
