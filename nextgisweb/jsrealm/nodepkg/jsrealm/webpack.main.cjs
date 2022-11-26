@@ -217,9 +217,10 @@ const svgSpriteLoader = {
     }
 };
 
-module.exports = {
+module.exports = (env, argv) => ({
     mode: config.debug ? "development" : "production",
     devtool: config.debug ? "source-map" : false,
+    bail: !env.WEBPACK_WATCH,
     entry: entrypointList,
     module: {
         rules: entrypointRules.concat([
@@ -312,4 +313,4 @@ module.exports = {
         poll: os.release().match(/-WSL.?$/) ? 1000 : false,
         ignored: "**/node_modules",
     },
-};
+});
