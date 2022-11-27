@@ -322,25 +322,36 @@ class OAuthHelper:
                 mof = _member_of_from_token(token, mof_attr_sub)
             except ValueError:
                 logger.warning("Can't get token groups for user '%s'.", user.keyname)
-                mof = []
+                mof = set()
             else:
                 logger.debug(
-                    "Token groups for user '%s': %s",
-                    user.keyname, json_dumps(mof))
+                    "Token groups for user '%s': %s", user.keyname,
+                    ', '.join(f"'{m}'" for m in mof))
 
-            new_groups = []
-            for group in user.member_of:
+            for group in list(user.member_of):
                 if not group.oauth_mapping:
-                    new_groups.append(group)
-                elif (k := group.keyname.lower()) in mof:
-                    mof.remove(k)
+                    continue
+                keyname = group.keyname.lower()
+                if keyname in mof:
+                    logger.debug("Keeping user '%s' in group '%s'.", user.keyname, keyname)
+                    mof.remove(keyname)
+                else:
+                    logger.info("Removing user '%s' from group '%s'.", user.keyname, keyname)
+                    user.member_of.remove(group)
 
-            new_groups.extend(
-                Group.filter(
-                    Group.oauth_mapping,
-                    sa.func.lower(Group.keyname).in_(mof)).all())
-
-            user.member_of = new_groups
+            if len(mof) > 0:
+                grp_add = Group.filter(Group.oauth_mapping, sa.func.lower(
+                    Group.keyname).in_(mof)).all()
+                if len(grp_add) > 0:
+                    logger.info(
+                        "Adding user '%s' into groups: %s.", user.keyname,
+                        ', '.join(f"'{g.keyname}'" for g in grp_add))
+                    user.member_of.extend(grp_add)
+                if len(grp_add) != len(mof):
+                    miss = mof.difference(set(g.keyname.lower() for g in grp_add))
+                    logger.warn(
+                        "Unmatched groups for user '%s': %s.", user.keyname,
+                        ', '.join(f"'{m}'" for m in miss))
 
     option_annotations = OptionAnnotations((
         Option('enabled', bool, default=False,
@@ -555,4 +566,4 @@ def _member_of_from_token(token, key):
     if not isinstance(value, list):
         raise ValueError
 
-    return [v.lower() for v in value]
+    return set(v.lower() for v in value)
