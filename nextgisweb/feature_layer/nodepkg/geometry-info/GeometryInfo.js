@@ -4,6 +4,8 @@ import {Spin} from "@nextgisweb/gui/antd";
 
 import {route} from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!";
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import {formatMetersLength, formatMetersArea} from "@nextgisweb/webmap/utils/format-units";
 
 import "./GeometryInfo.less";
 
@@ -12,11 +14,24 @@ const loadGeometryInfo = async (layerId, featureId) => {
         id: layerId,
         fid: featureId
     });
-    return await geoInfoRoute.get();
+    const query = {
+        srs: webmapSettings.measurement_srid
+    };
+    return await geoInfoRoute.get({query});
 };
 
-const formatDecimalValues = (num) => {
-    return Math.round(num * 100) / 100;
+const locale = window.dojoConfig.locale;
+const formatConfig = {
+    format: "jsx",
+    locale
+};
+
+const formatLength = (length) => formatMetersLength(length, webmapSettings.units_length, formatConfig);
+const formatArea = (area) => formatMetersArea(area, webmapSettings.units_area, formatConfig);
+
+const formatExtentValue = (number) => {
+    const numberRound = Math.round(number * 100) / 100;
+    return numberRound.toLocaleString(locale);
 };
 
 export function GeometryInfo({layerId, featureId}) {
@@ -26,7 +41,6 @@ export function GeometryInfo({layerId, featureId}) {
     async function load() {
         try {
             const geometryInfo = await loadGeometryInfo(layerId, featureId);
-            console.log(geometryInfo);
             setGeometryInfo(geometryInfo);
             setStatus("loaded");
         } catch (err) {
@@ -66,7 +80,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Length")}
                     </td>
                     <td>
-                        {formatDecimalValues(geometryInfo.length).toLocaleString()}
+                        {formatLength(geometryInfo.length)}
                     </td>
                 </tr>
                 <tr>
@@ -74,7 +88,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Area")}
                     </td>
                     <td>
-                        {formatDecimalValues(geometryInfo.area).toLocaleString()}
+                        {formatArea(geometryInfo.area)}
                     </td>
                 </tr>
                 <tr>
@@ -82,7 +96,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (xMin)")}
                     </td>
                     <td>
-                        {formatDecimalValues(geometryInfo.extent.minLon).toLocaleString()}
+                        {formatExtentValue(geometryInfo.extent.minLon)}
                     </td>
                 </tr>
                 <tr>
@@ -90,7 +104,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (yMin)")}
                     </td>
                     <td>
-                        {formatDecimalValues(geometryInfo.extent.minLat).toLocaleString()}<br/>
+                        {formatExtentValue(geometryInfo.extent.minLat)}
                     </td>
                 </tr>
                 <tr>
@@ -98,7 +112,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (xMax)")}
                     </td>
                     <td>
-                        {formatDecimalValues(geometryInfo.extent.maxLon).toLocaleString()}
+                        {formatExtentValue(geometryInfo.extent.maxLon)}
                     </td>
                 </tr>
                 <tr>
@@ -106,7 +120,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (yMax)")}
                     </td>
                     <td>
-                        {formatDecimalValues(geometryInfo.extent.maxLat).toLocaleString()}
+                        {formatExtentValue(geometryInfo.extent.maxLat)}
                     </td>
                 </tr>
                 </tbody>
