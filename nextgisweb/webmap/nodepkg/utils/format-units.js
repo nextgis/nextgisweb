@@ -22,7 +22,7 @@ const defaultConfig = {
 
 const formatPlacesValue = (value) => {
     let places;
-    if (value < 1) {
+    if (value > 0 && value < 1) {
         places = Math.floor(-Math.log10(value)) + 4;
     } else {
         places = 2;

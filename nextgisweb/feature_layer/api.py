@@ -531,7 +531,6 @@ def get_extent(resource, feature_id, srs):
 def geometry_info(resource, request):
     request.resource_permission(PERM_READ)
 
-    feature_id = int(request.matchdict['fid'])
     query = resource.feature_query()
     query.geom()
     query.geom_format('WKT')
@@ -541,12 +540,18 @@ def geometry_info(resource, request):
     srs = SRS.filter_by(id=srs_id).one()
     query.srs(srs)
 
+    feature_id = int(request.matchdict['fid'])
     feature = query_feature_or_not_found(query, resource.id, feature_id)
 
+    geom = feature.geom
+    shape = geom.shape
+    geom_type = shape.geom_type
+
     srs_wkt = sr_from_epsg(srs_id).ExportToWkt()
+
     return dict(
-        area= geom_area(feature.geom, srs_wkt),
-        length=geom_length(feature.geom, srs_wkt),
+        area=None if (geom_type is 'Point') else geom_area(geom, srs_wkt),
+        length=None if (geom_type is 'Point') else geom_length(geom, srs_wkt),
         extent=get_extent(resource, feature_id, srs_id)
     )
 

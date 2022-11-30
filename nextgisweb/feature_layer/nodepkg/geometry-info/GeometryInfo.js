@@ -71,26 +71,34 @@ export function GeometryInfo({layerId, featureId}) {
         );
     }
 
+    const length = geometryInfo.length == null ? <></> : (
+        <tr>
+            <td>
+                {i18n.gettext("Length")}
+            </td>
+            <td>
+                {formatLength(geometryInfo.length)}
+            </td>
+        </tr>
+    );
+
+    const area = geometryInfo.area == null ? <></> : (
+        <tr>
+            <td>
+                {i18n.gettext("Area")}
+            </td>
+            <td>
+                {formatArea(geometryInfo.area)}
+            </td>
+        </tr>
+    );
+
     return (
         <>
             <table className="geometry-info-table">
                 <tbody>
-                <tr>
-                    <td>
-                        {i18n.gettext("Length")}
-                    </td>
-                    <td>
-                        {formatLength(geometryInfo.length)}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        {i18n.gettext("Area")}
-                    </td>
-                    <td>
-                        {formatArea(geometryInfo.area)}
-                    </td>
-                </tr>
+                {length}
+                {area}
                 <tr>
                     <td>
                         {i18n.gettext("Extent (xMin)")}
