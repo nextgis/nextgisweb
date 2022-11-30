@@ -15,7 +15,8 @@ from subprocess import check_output
 
 import requests
 from requests.exceptions import RequestException, JSONDecodeError
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, inspect, text, types
+from sqlalchemy.dialects.postgresql import dialect as pg_dialect
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm.exc import NoResultFound
@@ -407,6 +408,45 @@ class CoreComponent(
 
     def backup_filename(self, filename):
         return os.path.join(self.options['backup.path'], filename)
+
+    def check_integrity(self):
+        metadata = self.env.metadata()
+        metadata.bind = self.engine
+        inspector = inspect(self.engine)
+
+        def type_repr(ctype):
+            return ctype.compile(pg_dialect()).replace(',', ', ').upper()
+
+        def type_compare(t1: types.TypeEngine, t2: types.TypeEngine):
+            c1, c2 = type(t1), type(t2)
+            if c1 is types.NUMERIC:
+                c1 = types.Numeric
+            elif c1 is types.VARCHAR:
+                c1 = types.String
+            return issubclass(c2, c1) or issubclass(c1, c2)
+
+        for table in metadata.tables.values():
+            table_repr = (table.schema + '.' + table.name) \
+                if (table.schema is not None) else table.name
+
+            if not table.exists():
+                yield f"Table '{table_repr}' not found."
+                continue
+
+            db_columns = {c['name']: c for c in inspector.get_columns(
+                table.name, table.schema)}
+
+            for column in table.columns:
+                if column.name not in db_columns:
+                    yield f"Column '{column.name}' of table '{table_repr}' not found."
+                    continue
+
+                db_column = db_columns[column.name]
+                t1, t2 = db_column['type'], column.type
+                if not type_compare(t1, t2):
+                    yield (
+                        f"Column '{column.name}' type of table '{table_repr}' doesn't match. "
+                        f"{type_repr(t2)} expected, but got {type_repr(t1)}.")
 
     option_annotations = (
         # Database options

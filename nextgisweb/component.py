@@ -50,6 +50,9 @@ class Component(metaclass=ComponentMeta):
     def maintenance(self):
         pass
 
+    def check_integrity(self):
+        pass
+
     def sys_info(self):
         return []
 

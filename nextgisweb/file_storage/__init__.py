@@ -236,6 +236,12 @@ class FileStorageComponent(Component):
             "%d files remain (%d bytes)",
             kept_files, kept_bytes)
 
+    def check_integrity(self):
+        for fileobj in FileObj.query():
+            filepath = self.filename(fileobj, makedirs=False)
+            if not os.path.isfile(filepath):
+                yield f"File '{filepath}' not found."
+
     option_annotations = (
         Option('path', default=None),
         Option('cleanup_keep_interval', timedelta, default=timedelta(days=2)),

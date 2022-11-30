@@ -326,6 +326,37 @@ class MaintenanceCommand(Command):
 
 
 @Command.registry.register
+class CheckIntegrityCommand(Command):
+    identity = 'check_integrity'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        pass
+
+    @classmethod
+    def execute(cls, args, env):
+        fail = False
+        with DBSession.connection(execution_options=dict(
+            isolation_level='SERIALIZABLE',
+            postgresql_readonly=True,
+            postgresql_deferrable=True,
+        )) as con:
+            for comp in env.chain('check_integrity'):
+                with con.begin_nested():
+                    try:
+                        citer = comp.check_integrity()
+                        if citer is not None and hasattr(citer, '__next__'):
+                            for error in citer:
+                                logger.error(f"Fault for [{comp.identity}]: {error}")
+                                fail = True
+                    except Exception as exc:
+                        logger.error(f"Error for [{comp.identity}]: {str(exc)}")
+                        fail = True
+        if fail:
+            exit(1)
+
+
+@Command.registry.register
 class StorageEstimateCommand(Command):
     identity = 'storage.estimate'
 
