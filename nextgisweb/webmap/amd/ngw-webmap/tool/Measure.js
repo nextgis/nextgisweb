@@ -52,7 +52,7 @@ define([
                 
                 const formattedMeasure = is_area ?
                     utils.formatMetersArea(value, settings.units_area, formatConfig) :
-                    utils.formatMetersLength(value, settings.units_area, formatConfig);
+                    utils.formatMetersLength(value, settings.units_length, formatConfig);
                 
                 return `${label} = ${formattedMeasure}`;
             }

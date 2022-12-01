@@ -104,7 +104,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (xMin)")}
                     </td>
                     <td>
-                        {formatExtentValue(geometryInfo.extent.minLon)}
+                        {formatExtentValue(geometryInfo.extent.minX)}
                     </td>
                 </tr>
                 <tr>
@@ -112,7 +112,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (yMin)")}
                     </td>
                     <td>
-                        {formatExtentValue(geometryInfo.extent.minLat)}
+                        {formatExtentValue(geometryInfo.extent.minY)}
                     </td>
                 </tr>
                 <tr>
@@ -120,7 +120,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (xMax)")}
                     </td>
                     <td>
-                        {formatExtentValue(geometryInfo.extent.maxLon)}
+                        {formatExtentValue(geometryInfo.extent.maxX)}
                     </td>
                 </tr>
                 <tr>
@@ -128,7 +128,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (yMax)")}
                     </td>
                     <td>
-                        {formatExtentValue(geometryInfo.extent.maxLat)}
+                        {formatExtentValue(geometryInfo.extent.maxY)}
                     </td>
                 </tr>
                 </tbody>

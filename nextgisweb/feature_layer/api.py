@@ -513,13 +513,17 @@ def item_extent(resource, request):
     return dict(extent=extent)
 
 
-def get_extent(resource, feature_id, srs):
+def get_box_bounds(resource, feature_id, srs):
     query = resource.feature_query()
     query.srs(SRS.filter_by(id=srs).one())
     query.box()
 
     feature = query_feature_or_not_found(query, resource.id, feature_id)
-    minLon, minLat, maxLon, maxLat = feature.box.bounds
+    return feature.box.bounds
+
+
+def get_extent(resource, feature_id, srs):
+    minLon, minLat, maxLon, maxLat = get_box_bounds(resource, feature_id, srs)
     return dict(
         minLon=minLon,
         minLat=minLat,
@@ -549,10 +553,18 @@ def geometry_info(resource, request):
 
     srs_wkt = sr_from_epsg(srs_id).ExportToWkt()
 
+    minX, minY, maxX, maxY = get_box_bounds(resource, feature_id, srs_id)
+    extent = dict(
+        minX=minX,
+        minY=minY,
+        maxX=maxX,
+        maxY=maxY
+    )
+
     return dict(
-        area=None if (geom_type is 'Point') else geom_area(geom, srs_wkt),
-        length=None if (geom_type is 'Point') else geom_length(geom, srs_wkt),
-        extent=get_extent(resource, feature_id, srs_id)
+        area=None if (geom_type == 'Point') else abs(geom_area(geom, srs_wkt)),
+        length=None if (geom_type == 'Point') else abs(geom_length(geom, srs_wkt)),
+        extent=extent
     )
 
 
