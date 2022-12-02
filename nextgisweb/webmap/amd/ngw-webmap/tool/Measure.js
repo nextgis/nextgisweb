@@ -10,7 +10,8 @@ define([
     "ngw/route",
     "@nextgisweb/pyramid/settings!",
     "@nextgisweb/pyramid/i18n!",
-    "@nextgisweb/webmap/icon"
+    "@nextgisweb/webmap/utils",
+    "@nextgisweb/webmap/icon",
 ], function (
     declare,
     Base,
@@ -23,12 +24,12 @@ define([
     route,
     settings,
     i18n,
+    utils,
     icon
 ) {
-    console.log(icon)
-
     var GEOM_LENGTH_URL = route.spatial_ref_sys.geom_length;
     var GEOM_AREA_URL = route.spatial_ref_sys.geom_area;
+
     return declare(Base, {
         constructor: function (options) {
             var tool = this;
@@ -41,121 +42,19 @@ define([
                 this.customIcon = '<span class="ol-control__icon"><svg class="icon" fill="currentColor"><use xlink:href="#' + icon.MeasureArea.id + '"/></svg></span>';
             }
 
-            var SI_m = i18n.gettext('m'),
-                SI_km = i18n.gettext('km'),
-                SI_ft = i18n.gettext('ft'),
-                SI_mi = i18n.gettext('mi'),
-                SI_ha = i18n.gettext('ha'),
-                SI_ac = i18n.gettext('ac');
-
             function formatUnits (value, is_area) {
-                var label, measure, suffix, places;
+                const label = is_area ? "S" : "L";
 
-                label = is_area ? "S" : "L";
-
-                var m_to_km = 1E-3,
-                    m_to_ft = 1 / 0.3048,
-                    ft_to_mi = 1 / 5280,
-                    m2_to_ha = 1E-4,
-                    m2_to_ac = 1 / 4046.86,
-                    ac_to_mi2 = 1 / 640;
-
-                if (is_area) {
-                    switch (settings.units_area) {
-                        case "sq_km":
-                            measure = value * m_to_km * m_to_km;
-                            suffix = SI_km + "<sup>2</sup>";
-                            break;
-                        case "metric":
-                            if (value > 1E5) {
-                                measure = value * m_to_km * m_to_km;
-                                suffix = SI_km + "<sup>2</sup>";
-                            } else {
-                                measure = value;
-                                suffix = SI_m + "<sup>2</sup>";
-                            };
-                            break;
-                        case "ha":
-                            measure = value * m2_to_ha;
-                            suffix = SI_ha;
-                            break;
-                        case "ac":
-                            measure = value * m2_to_ac;
-                            suffix = SI_ac;
-                            break;
-                        case "sq_mi":
-                            measure = value * m2_to_ac * ac_to_mi2;
-                            suffix = SI_mi + "<sup>2</sup>";
-                            break;
-                        case "imperial":
-                            value = value * m2_to_ac;
-                            if (value > (640 * 100)) {
-                                measure = value * ac_to_mi2;
-                                suffix = SI_mi + "<sup>2</sup>";
-                            } else {
-                                measure = value;
-                                suffix = SI_ac;
-                            };
-                            break;
-                        case "sq_ft":
-                            measure = value * m_to_ft * m_to_ft;
-                            suffix = SI_ft + "<sup>2</sup>";
-                            break;
-                        case "sq_m":
-                        default:
-                            measure = value;
-                            suffix = SI_m + "<sup>2</sup>";
-                    }
-                } else {
-                    switch (settings.units_length) {
-                        case "km":
-                            measure = value * m_to_km;
-                            suffix = SI_km;
-                            break;
-                        case "metric":
-                            if (value > 1000) {
-                                measure = value * m_to_km;
-                                suffix = SI_km;
-                            } else {
-                                measure = value;
-                                suffix = SI_m;
-                            };
-                            break;
-                        case "ft":
-                            measure = value * m_to_ft;
-                            suffix = SI_ft;
-                            break;
-                        case "mi":
-                            measure = value * m_to_ft * ft_to_mi;
-                            suffix = SI_mi;
-                            break;
-                        case "imperial":
-                            value = value * m_to_ft;
-                            if (value > 5280) {
-                                measure = value * ft_to_mi;
-                                suffix = SI_mi;
-                            } else {
-                                measure = value;
-                                suffix = SI_ft;
-                            };
-                            break;
-                        case "m":
-                        default:
-                            measure = value;
-                            suffix = SI_m;
-                    }
-                }
-                if (measure < 1) {
-                    places = Math.floor(-Math.log10(measure)) + 4;
-                } else {
-                    places = 2;
-                }
-                return [
-                    label,
-                    "=",
-                    number.format(measure, {places: places,locale: dojoConfig.locale}),
-                    suffix
-                ].join(' ');
+                const formatConfig = {
+                    format: "html-string",
+                    locale: dojoConfig.locale
+                };
+                
+                const formattedMeasure = is_area ?
+                    utils.formatMetersArea(value, settings.units_area, formatConfig) :
+                    utils.formatMetersLength(value, settings.units_length, formatConfig);
+                
+                return `${label} = ${formattedMeasure}`;
             }
 
             var style = new ol.style.Style({

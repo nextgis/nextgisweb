@@ -17,11 +17,12 @@ from shapely.geometry import box
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..core.exception import ValidationError
-from ..lib.geometry import Geometry, GeometryNotValid, Transformer
+from ..lib.geometry import Geometry, GeometryNotValid, Transformer, geom_area, geom_length
 from ..resource import DataScope, Resource, resource_factory
 from ..resource.exception import ResourceNotFound
 from ..spatial_ref_sys import SRS
 from ..render.util import zxy_from_request
+from ..lib.osrhelper import sr_from_epsg
 
 from .interface import (
     IFeatureLayer,
@@ -507,21 +508,64 @@ def iget(resource, request):
 
 def item_extent(resource, request):
     request.resource_permission(PERM_READ)
-
     feature_id = int(request.matchdict['fid'])
+    extent = get_extent(resource, feature_id, 4326)
+    return dict(extent=extent)
+
+
+def get_box_bounds(resource, feature_id, srs):
     query = resource.feature_query()
-    query.srs(SRS.filter_by(id=4326).one())
+    query.srs(SRS.filter_by(id=srs).one())
     query.box()
 
     feature = query_feature_or_not_found(query, resource.id, feature_id)
-    minLon, minLat, maxLon, maxLat = feature.box.bounds
-    extent = dict(
+    return feature.box.bounds
+
+
+def get_extent(resource, feature_id, srs):
+    minLon, minLat, maxLon, maxLat = get_box_bounds(resource, feature_id, srs)
+    return dict(
         minLon=minLon,
         minLat=minLat,
         maxLon=maxLon,
         maxLat=maxLat
     )
-    return dict(extent=extent)
+
+
+def geometry_info(resource, request):
+    request.resource_permission(PERM_READ)
+
+    query = resource.feature_query()
+    query.geom()
+    query.geom_format('WKT')
+
+    srs_param = request.GET.get("srs")
+    srs_id = int(srs_param) if srs_param is not None else 3857
+    srs = SRS.filter_by(id=srs_id).one()
+    query.srs(srs)
+
+    feature_id = int(request.matchdict['fid'])
+    feature = query_feature_or_not_found(query, resource.id, feature_id)
+
+    geom = feature.geom
+    shape = geom.shape
+    geom_type = shape.geom_type
+
+    srs_wkt = sr_from_epsg(srs_id).ExportToWkt()
+
+    minX, minY, maxX, maxY = get_box_bounds(resource, feature_id, srs_id)
+    extent = dict(
+        minX=minX,
+        minY=minY,
+        maxX=maxX,
+        maxY=maxY
+    )
+
+    return dict(
+        area=None if (geom_type == 'Point') else abs(geom_area(geom, srs_wkt)),
+        length=None if (geom_type == 'Point') else abs(geom_length(geom, srs_wkt)),
+        extent=extent
+    )
 
 
 def iput(resource, request):
@@ -838,6 +882,11 @@ def setup_pyramid(comp, config):
         'feature_layer.feature.item_extent', '/api/resource/{id}/feature/{fid}/extent',
         factory=resource_factory) \
         .add_view(item_extent, context=IFeatureLayer, request_method='GET', renderer='json')
+
+    config.add_route(
+        'feature_layer.feature.geometry_info', '/api/resource/{id}/feature/{fid}/geometry_info',
+        factory=resource_factory
+    ).add_view(geometry_info, context=IFeatureLayer, request_method='GET', renderer='json')
 
     config.add_route(
         'feature_layer.feature.collection', '/api/resource/{id}/feature/',

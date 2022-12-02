@@ -26,6 +26,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/FieldsDisplayWidget",
     "ngw-feature-layer/FeatureEditorWidget",
+    "ngw-feature-layer/GeometryInfoWidget",
     "ngw-webmap/ui/CoordinateSwitcher/CoordinateSwitcher",
     "ngw-pyramid/CopyButton/CopyButton",
     // settings
@@ -61,6 +62,7 @@ define([
     i18n,
     FieldsDisplayWidget,
     FeatureEditorWidget,
+    GeometryInfoWidget,
     CoordinateSwitcher,
     CopyButton,
     featureLayersettings,
@@ -80,7 +82,7 @@ define([
     Control.prototype.constructor = Control;
 
     Control.prototype.handleClickEvent = function(evt) {
-        if (evt.type == 'singleclick') {
+        if (evt.type === 'singleclick') {
             this.tool.execute(evt.pixel);
             evt.preventDefault();
         }
@@ -217,6 +219,17 @@ define([
 
                         fwidget.renderValue(feature.fields);
                         fwidget.placeAt(widget.extContainer);
+                    }
+
+                    if (webmapSettings.show_geometry_info) {
+                        var geometryWidget = new GeometryInfoWidget({
+                            resourceId: lid, 
+                            featureId: fid,
+                            compact: true,
+                            title: i18n.gettext("Geometry")
+                        });
+                        geometryWidget.renderValue(lid, fid);
+                        geometryWidget.placeAt(widget.extContainer);
                     }
 
                     array.forEach(Object.keys(widget.extWidgetClasses), function (key) {

@@ -94,7 +94,7 @@ export const SettingsForm = ({
             </Row>
 
             <Row gutter={[16, 16]}>
-                <Col span={24}>
+                <Col span={8}>
                     <Form.Item>
                         <Space direction="horizontal">
                             <Form.Item
@@ -105,6 +105,20 @@ export const SettingsForm = ({
                                 <Switch />
                             </Form.Item>
                             {i18n.gettext("Show feature attributes")}
+                        </Space>
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item>
+                        <Space direction="horizontal">
+                            <Form.Item
+                                noStyle
+                                name="show_geometry_info"
+                                valuePropName="checked"
+                            >
+                                <Switch />
+                            </Form.Item>
+                            {i18n.gettext("Show geometry info")}
                         </Space>
                     </Form.Item>
                 </Col>

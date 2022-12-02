@@ -1,34 +1,34 @@
-#: api.py:96
+#: api.py:97
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api.py:105
+#: api.py:106
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:110
+#: api.py:111
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:156 api.py:630
+#: api.py:155 api.py:666
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api.py:163
+#: api.py:164
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api.py:340 api.py:415
+#: api.py:341 api.py:416
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
 
-#: api.py:333
+#: api.py:343
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:339 api.py:411
+#: api.py:349 api.py:421
 #, python-format
 msgid "Date format '%s' is not supported."
 msgstr "Формат даты '%s' не поддерживается."
@@ -55,34 +55,34 @@ msgstr "Поле не найдено (ID=%d)."
 msgid "Field name is forbidden: '{}'. Please remove or rename it."
 msgstr "Недопустимое имя поля: '{}'. Пожалуйста удалите или переименуйте его."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:41
+#: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:46
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: view.py:59 view.py:82
+#: view.py:68 view.py:91
 #, python-format
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:133 view.py:205
+#: view.py:142 view.py:214
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:192
+#: view.py:201
 msgid "Features"
 msgstr "Объекты"
 
-#: template/section_fields.mako:21 view.py:197
+#: template/section_fields.mako:21 view.py:206
 msgid "Table"
 msgstr "Таблица"
 
-#: view.py:216
+#: view.py:225
 msgid "External access"
 msgstr "Внешний доступ"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:193
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:221
+#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:230
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -103,7 +103,7 @@ msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:265
-#: nodepkg/export-form/ExportForm.js:180
+#: nodepkg/export-form/ExportForm.js:194
 msgid "Save"
 msgstr "Сохранить"
 
@@ -151,43 +151,51 @@ msgstr "Добавить"
 msgid "Remove"
 msgstr "Удалить"
 
+#: amd/ngw-feature-layer/GeometryInfoWidget.js:15
+msgid "Geometry"
+msgstr "Геометрия"
+
 #: amd/ngw-feature-layer/template/FeatureGrid.hbs:13
+#: nodepkg/feature-grid/FeatureGrid.js:23
 msgid "Open"
 msgstr "Открыть"
 
 #: amd/ngw-feature-layer/template/FeatureGrid.hbs:18
+#: nodepkg/feature-grid/FeatureGrid.js:25
 msgid "Edit"
 msgstr "Редактировать"
 
 #: amd/ngw-feature-layer/template/FeatureGrid.hbs:23
+#: nodepkg/feature-grid/FeatureGrid.js:24
 msgid "Delete"
 msgstr "Удалить"
 
 #: amd/ngw-feature-layer/template/FeatureGrid.hbs:28
+#: nodepkg/feature-grid/FeatureGrid.js:22
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/export-form/ExportForm.js:89
+#: nodepkg/export-form/ExportForm.js:94
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.js:99
+#: nodepkg/export-form/ExportForm.js:104
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.js:105
+#: nodepkg/export-form/ExportForm.js:110
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: nodepkg/export-form/ExportForm.js:115
+#: nodepkg/export-form/ExportForm.js:120
 msgid "FID field"
 msgstr "Поле FID"
 
-#: nodepkg/export-form/ExportForm.js:119
+#: nodepkg/export-form/ExportForm.js:124
 msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
-#: nodepkg/export-form/ExportForm.js:126
+#: nodepkg/export-form/ExportForm.js:131
 msgid "Fields"
 msgstr "Поля"
 
@@ -208,16 +216,48 @@ msgid "Left"
 msgstr "Лево"
 
 #: nodepkg/export-form/ExtentInput.js:8
-msgid "Top"
-msgstr "Верх"
+msgid "Bottom"
+msgstr "Низ"
 
 #: nodepkg/export-form/ExtentInput.js:9
 msgid "Right"
 msgstr "Право"
 
 #: nodepkg/export-form/ExtentInput.js:10
-msgid "Bottom"
-msgstr "Низ"
+msgid "Top"
+msgstr "Верх"
+
+#: nodepkg/geometry-info/GeometryInfo.js:44
+msgid "Load geometry info..."
+msgstr "Загрузка информации..."
+
+#: nodepkg/geometry-info/GeometryInfo.js:54
+msgid "Failed to get information about the geometry"
+msgstr "Не удалось получить информацию о геометрии"
+
+#: nodepkg/geometry-info/GeometryInfo.js:66
+msgid "Length"
+msgstr "Периметр"
+
+#: nodepkg/geometry-info/GeometryInfo.js:74
+msgid "Area"
+msgstr "Площадь"
+
+#: nodepkg/geometry-info/GeometryInfo.js:82
+msgid "Extent (xMin)"
+msgstr "Экстент (xMin)"
+
+#: nodepkg/geometry-info/GeometryInfo.js:90
+msgid "Extent (yMin)"
+msgstr "Экстент (yMin)"
+
+#: nodepkg/geometry-info/GeometryInfo.js:98
+msgid "Extent (xMax)"
+msgstr "Экстент (xMax)"
+
+#: nodepkg/geometry-info/GeometryInfo.js:106
+msgid "Extent (yMax)"
+msgstr "Экстент (yMax)"
 
 #: template/section_api_layer.mako:11
 msgid "MVT Vector Tiles"

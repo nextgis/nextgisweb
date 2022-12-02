@@ -277,6 +277,7 @@ class WebMapSerializer(Serializer):
 WM_SETTINGS = dict(
     identify_radius=3,
     identify_attributes=True,
+    show_geometry_info=False,
     popup_width=300,
     popup_height=200,
     address_search_enabled=True,
