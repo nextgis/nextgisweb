@@ -349,6 +349,25 @@ def import_attachment(resource, request):
         return dict(imported=imported, skipped=skipped)
 
 
+def clear_external(resource, request):
+    request.resource_permission(DataScope.write)
+
+    with DBSession.no_autoflush:
+
+        query = resource.feature_query()
+        query.limit(1)
+
+        def feature_exists(fid):
+            query.filter_by(id=fid)
+            for f in query():
+                return True
+            return False
+
+        for feature_attachment in FeatureAttachment.filter_by(resource_id=resource.id):
+            if not feature_exists(feature_attachment.feature_id):
+                DBSession.delete(feature_attachment)
+
+
 def setup_pyramid(comp, config):
     colurl = '/api/resource/{id}/feature/{fid}/attachment/'
     itmurl = '/api/resource/{id}/feature/{fid}/attachment/{aid}'
@@ -389,3 +408,9 @@ def setup_pyramid(comp, config):
         '/api/resource/{id}/feature_attachment/import',
         factory=resource_factory
     ).add_view(import_attachment, request_method='PUT', renderer='json')
+
+    config.add_route(
+        'feature_attachment.clear_external',
+        '/api/resource/{id}/feature_attachment/clear_external',
+        factory=resource_factory
+    ).add_view(clear_external, request_method='DELETE', renderer='json')

@@ -17,6 +17,10 @@ import "./AttachmentForm.less";
 export function AttachmentForm({ id }) {
     const [loading, setLoading] = useState(false);
 
+    const backToResource = () => {
+        window.open(routeURL("resource.show", { id: id }), "_self");
+    };
+
     // Export
 
     const doExport = async () => {
@@ -63,10 +67,6 @@ export function AttachmentForm({ id }) {
     // Import
 
     const [importReplace, setImportReplace] = useState(false);
-
-    const backToResource = () => {
-        window.open(routeURL("resource.show", { id: id }), "_self");
-    };
 
     const ImportSuccessModal = ({ result, ...props }) => (
         <Modal
@@ -147,6 +147,44 @@ export function AttachmentForm({ id }) {
             </Upload>
         </>
     );
+
+    // Clear
+
+    const doClear = async () => {
+        try {
+            setLoading("clear");
+            const lunkwillParam = new LunkwillParam();
+            lunkwillParam.suggest();
+            await route("feature_attachment.clear_external", id).delete({
+                lunkwill: lunkwillParam,
+            });
+        } catch (err) {
+            errorModal(err);
+            return;
+        } finally {
+            setLoading(false);
+        }
+        backToResource();
+    };
+
+    const clearTab = () => (
+        <>
+            <p>
+                {i18n.gettext(
+                    "The features of external layers can be deleted, but the attachments still remain."
+                )}
+            </p>
+            <Button
+                type="primary"
+                disabled={loading && loading !== "clear"}
+                loading={loading == "clear"}
+                onClick={doClear}
+            >
+                {i18n.gettext("Clear attachments of missing features")}
+            </Button>
+        </>
+    );
+
     return (
         <Tabs
             className="ngw-feature-attachment-attachment-form"
@@ -161,6 +199,11 @@ export function AttachmentForm({ id }) {
                     key: "import",
                     label: i18n.gettext("Import"),
                     children: importTab(),
+                },
+                {
+                    key: "clear",
+                    label: i18n.gettext("Clear"),
+                    children: clearTab(),
                 },
             ]}
         />
