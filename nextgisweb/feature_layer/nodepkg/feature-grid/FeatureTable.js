@@ -135,9 +135,8 @@ const FeatureTable = ({
             setTableWidth(tbodyRef.current.offsetWidth);
         };
         const debouncedUpdate = debounce(updateTableWidth, 100);
-        const tableResizeObserver = new ResizeObserver(debouncedUpdate).observe(
-            tbodyRef.current
-        );
+        const tableResizeObserver = new ResizeObserver(debouncedUpdate);
+        tableResizeObserver.observe(tbodyRef.current);
         return () => {
             tableResizeObserver.disconnect();
         };

@@ -279,7 +279,7 @@ define([
 
                 });
 
-                topic.publish("feature.highlight", {geom: feature.geom});
+                topic.publish("feature.highlight", {geom: feature.geom, feature: feature});
             });
         },
         _displayCoordinates: function(){

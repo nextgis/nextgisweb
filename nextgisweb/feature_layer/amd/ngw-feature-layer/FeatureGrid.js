@@ -164,10 +164,10 @@ define([
                         if (f.lookup_table != null) {
                             var repr = lookupTableCached.lookup(f.lookup_table.id, value);
                             if (repr !== null) { value = "[" + value + "] " + repr };
-                        };
+                        }
                         return value;
                     }
-                };
+                }
 
                 columns.push(colDefn);
                 fields.push(f.keyname);

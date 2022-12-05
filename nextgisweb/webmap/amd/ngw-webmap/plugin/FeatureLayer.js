@@ -2,97 +2,154 @@ define([
     "dojo/_base/declare",
     "./_PluginBase",
     "dojo/_base/lang",
-    "dojo/_base/array",
-    "dojo/Deferred",
     "dijit/layout/TabContainer",
-    "dijit/Menu",
     "dijit/MenuItem",
-    "dojo/dom-style",
+    "dijit/_WidgetBase",
     "dojo/request/xhr",
-    "dojo/request/script",
     "dojo/topic",
     "openlayers/ol",
     "@nextgisweb/pyramid/i18n!",
-    "ngw-feature-layer/FeatureStore",
-    "ngw-feature-layer/FeatureGrid",
-    "dijit/form/Button",
-    "dijit/form/TextBox",
-    "dijit/ToolbarSeparator",
-    "dijit/popup",
-    "put-selector/put",
+    "@nextgisweb/gui/react-app",
+    "@nextgisweb/feature-layer/feature-grid",
     "ngw/route",
 ], function (
     declare,
     _PluginBase,
     lang,
-    array,
-    Deferred,
     TabContainer,
-    Menu,
     MenuItem,
-    domStyle,
+    _WidgetBase,
     xhr,
-    script,
     topic,
     ol,
     i18n,
-    FeatureStore,
+    reactApp,
     FeatureGrid,
-    Button,
-    TextBox,
-    ToolbarSeparator,
-    popup,
-    put,
     route
 ) {
-    var Pane = declare([FeatureGrid], {
+    var Pane = declare([_WidgetBase], {
         closable: true,
         gutters: false,
         iconClass: "iconTable",
+        selectedId: undefined,
+        featureHighlightedEvent: null,
+        featureUnhighlightedEvent: null,
 
         postCreate: function () {
-            this.inherited(arguments);
-
             var widget = this;
+            this.inherited(arguments);
+            var plugin = this.plugin;
+            var data = plugin.display.get("itemConfig").plugin[plugin.identity];
 
-            this.btnZoomToFeature = new Button({
-                label: i18n.gettext("Go to"),
-                iconClass: "iconArrowInOut",
-                disabled: true,
-                onClick: function () {
-                    widget.zoomToFeature();
-                },
-            });
-            this.toolbar.addChild(this.btnZoomToFeature);
+            this.domNode.style.height = "100%";
+            this.domNode.style.padding = "8px";
 
-            this.watch("selectedRow", function (attr, oldVal, newVal) {
-                widget.btnZoomToFeature.set("disabled", newVal === null);
-                if (newVal) {
-                    xhr.get(
-                        route.feature_layer.feature.item({
-                            id: widget.layerId,
-                            fid: newVal.id,
-                        }),
-                        {
-                            handleAs: "json",
+            var display = widget.plugin.display;
+
+            var component = reactApp.default(
+                FeatureGrid.default,
+                {
+                    id: this.layerId,
+                    readonly: data.readonly,
+                    size: "small",
+                    onDelete: function () {
+                        if (display) {
+                            var layer = display._layers[widget.layerId];
+                            if (layer) {
+                                layer.reload();
+                            }
                         }
-                    ).then(function (feature) {
-                        topic.publish("feature.highlight", {
-                            geom: feature.geom,
-                        });
-                    });
+                    },
+                    onSelect: function (newVal) {
+                        var fid = Array.isArray(newVal) ? newVal[0] : newVal;
+                        widget.selectedId = fid;
+                        if (fid !== undefined) {
+                            xhr.get(
+                                route.feature_layer.feature.item({
+                                    id: widget.layerId,
+                                    fid: fid,
+                                }),
+                                {
+                                    handleAs: "json",
+                                }
+                            ).then(function (feature) {
+                                topic.publish("feature.highlight", {
+                                    geom: feature.geom,
+                                });
+                            });
+                        } else {
+                            topic.publish("feature.unhighlight");
+                        }
+                    },
+                    actions: [
+                        {
+                            title: i18n.gettext("Go to"),
+                            icon: "material-center_focus_weak",
+                            disabled: function (params) {
+                                return !params.selected.length;
+                            },
+                            action: function () {
+                                widget.zoomToFeature();
+                            },
+                        },
+                    ],
+                },
+                this.domNode
+            );
+
+            this.featureHighlightedEvent = function (e) {
+                if (e.feature) {
+                    component.update({ selectedIds: [e.feature.id] });
                 }
-            });
+            };
+            this.featureUnhighlightedEvent = function () {
+                component.update({ selectedIds: [] });
+            };
+
+            topic.subscribe("feature.highlight", this.featureHighlightedEvent);
+            topic.subscribe(
+                "feature.unhighlight",
+                this.featureUnhighlightedEvent
+            );
+
+            this.component = component;
+        },
+
+        destroy: function () {
+            if (this.component) {
+                this.component.unmount();
+            }
+            this.component = null;
+            if (this.featureHighlightedEvent) {
+                topic.unsubscribe(
+                    "feature.highlight",
+                    this.featureHighlightedEvent
+                );
+            }
+            if (this.featureUnhighlightedEvent) {
+                topic.unsubscribe(
+                    "feature.unhighlight",
+                    this.featureUnhighlightedEvent
+                );
+            }
+        },
+
+        updateSearch: function () {
+            if (this.component) {
+                this.component.update({ query: "" });
+            }
         },
 
         zoomToFeature: function () {
             var display = this.plugin.display;
             var wkt = new ol.format.WKT();
 
+            var selectedId = this.selectedId;
+
             xhr.get(
                 route.feature_layer.feature.item({
                     id: this.layerId,
-                    fid: this.get("selectedRow").id,
+                    fid: selectedId,
                 }),
                 {
                     handleAs: "json",
@@ -178,6 +235,7 @@ define([
             }
 
             pane = this._buildPane(layerId, item);
+
             this._openedLayersById[layerId] = pane;
 
             if (!this.tabContainer.getChildren().length) {

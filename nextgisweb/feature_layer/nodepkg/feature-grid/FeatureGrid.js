@@ -1,15 +1,12 @@
 import { PropTypes } from "prop-types";
 
-import DeleteIcon from "@material-icons/svg/delete";
-import EditIcon from "@material-icons/svg/edit";
-import OpenIcon from "@material-icons/svg/open_in_new";
-import TuneIcon from "@material-icons/svg/tune";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import { Button, Empty, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
 import { routeURL } from "@nextgisweb/pyramid/api";
+import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
 
@@ -17,6 +14,10 @@ import { deleteFeatures } from "./api/deleteFeatures";
 import { KEY_FIELD_KEYNAME } from "./constant";
 import FeatureTable from "./FeatureTable";
 
+import DeleteIcon from "@material-icons/svg/delete";
+import EditIcon from "@material-icons/svg/edit";
+import OpenIcon from "@material-icons/svg/open_in_new";
+import TuneIcon from "@material-icons/svg/tune";
 import "./FeatureGrid.less";
 
 const searchPlaceholderMsg = i18n.gettext("Search...");
@@ -26,7 +27,18 @@ const editTitleMsg = i18n.gettext("Edit");
 
 const LoadingCol = () => "...";
 
-export const FeatureGrid = ({ id, readonly }) => {
+export const FeatureGrid = ({
+    id,
+    query: q,
+    onDelete,
+    onSelect,
+    deleteError,
+    actions = [],
+    selectedIds,
+    beforeDelete,
+    size = "middle",
+    readonly = true,
+}) => {
     const { data: totalData, refresh: refreshTotal } = useRouteGet(
         "feature_layer.feature.count",
         {
@@ -38,6 +50,31 @@ export const FeatureGrid = ({ id, readonly }) => {
     const [query, setQuery] = useState("");
     const [selected, setSelected] = useState([]);
     const [settingsOpen, setSettingsOpen] = useState(false);
+
+    useEffect(() => {
+        if (onSelect) {
+            onSelect(selected.map((s) => s[KEY_FIELD_KEYNAME]));
+        }
+    }, [selected, onSelect]);
+
+    useEffect(() => {
+        if (selectedIds) {
+            setSelected((old) => {
+                if (!old.length && !selectedIds.length) {
+                    return old;
+                }
+                return selectedIds.map((s) => {
+                    return { [KEY_FIELD_KEYNAME]: s };
+                });
+            });
+        }
+    }, [selectedIds]);
+
+    useEffect(() => {
+        if (q !== undefined) {
+            setQuery(q);
+        }
+    }, [q])
 
     const fields = useMemo(() => {
         if (resourceData) {
@@ -59,32 +96,47 @@ export const FeatureGrid = ({ id, readonly }) => {
 
     const handleDelete = async () => {
         const featureIds = selected.map((s) => s[KEY_FIELD_KEYNAME]);
-        await deleteFeatures({
-            resourceId: id,
-            featureIds,
-        });
+        if (beforeDelete) {
+            beforeDelete(featureIds);
+        }
+        try {
+            await deleteFeatures({
+                resourceId: id,
+                featureIds,
+            });
+            if (onDelete) {
+                onDelete(featureIds);
+            }
+        } catch (er) {
+            if (deleteError) {
+                deleteError(featureIds);
+            }
+        }
         await refreshTotal();
         setSelected([]);
     };
 
-    const selectedAction = [
+    const tableActions = [
         {
             onClick: () => {
                 goTo("feature_layer.feature.show");
             },
             icon: <OpenIcon />,
             title: openTitleMsg,
+            size,
         },
     ];
 
     if (!readonly) {
-        selectedAction.push(
+        tableActions.push(
             {
                 onClick: () => {
                     goTo("feature_layer.feature.update");
                 },
                 icon: <EditIcon />,
                 title: editTitleMsg,
+                disabled: !selected.length,
+                size,
             },
             {
                 onClick: () => {
@@ -93,26 +145,45 @@ export const FeatureGrid = ({ id, readonly }) => {
                 icon: <DeleteIcon />,
                 title: deleteTitleMsg,
                 danger: true,
+                disabled: !selected.length,
+                size,
             }
         );
+    }
+
+    for (const { action, icon, ...rest } of actions) {
+        const customAction = { size, ...rest };
+        if (action) {
+            const onClick = () => {
+                action({ selected });
+            };
+            customAction.onClick = onClick;
+        }
+        if (typeof customAction.disabled === "function") {
+            customAction.disabled = customAction.disabled({ selected });
+        }
+        if (typeof icon === "string") {
+            customAction.icon = <SvgIcon icon={icon} fill="currentColor" />;
+        }
+        tableActions.push(customAction);
     }
 
     return (
         <div className="ngw-feature-layer-feature-grid">
             <div className="toolbar">
-                {selected.length
-                    ? selectedAction.map(({ title, ...s }, i) => (
-                        <div key={i}>
-                            <Button {...s}>{title}</Button>
-                        </div>
-                    ))
-                    : null}
+                {tableActions.map(({ title, ...s }, i) => (
+                    <div key={i}>
+                        <Button {...s}>{title}</Button>
+                    </div>
+                ))}
+
                 <div className="spacer" />
                 <div>
                     <Button
                         type="text"
                         icon={<TuneIcon />}
                         onClick={() => setSettingsOpen(!settingsOpen)}
+                        size={size}
                     />
                 </div>
                 <div>
@@ -120,6 +191,7 @@ export const FeatureGrid = ({ id, readonly }) => {
                         placeholder={searchPlaceholderMsg}
                         onChange={(e) => setQuery(e.target.value)}
                         allowClear
+                        size={size}
                     />
                 </div>
             </div>
@@ -144,6 +216,14 @@ export const FeatureGrid = ({ id, readonly }) => {
 };
 
 FeatureGrid.propTypes = {
+    actions: PropTypes.arrayOf(PropTypes.object),
+    selectedIds: PropTypes.arrayOf(PropTypes.number),
+    beforeDelete: PropTypes.func,
+    query: PropTypes.string,
+    deleteError: PropTypes.func,
     id: PropTypes.number,
+    onDelete: PropTypes.func,
+    onSelect: PropTypes.func,
     readonly: PropTypes.bool,
+    size: PropTypes.oneOf(["small", "middle", "large"]),
 };

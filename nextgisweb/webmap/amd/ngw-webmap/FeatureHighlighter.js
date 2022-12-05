@@ -83,8 +83,7 @@ define([
 
         highlightFeatureById: function (featureId, layerId) {
             var get_feature_item_url = api.routeURL('feature_layer.feature.item', {id: layerId, fid: featureId}),
-                highlightedDeferred = new Deferred(),
-                feature;
+                highlightedDeferred = new Deferred();
 
             xhr.get(get_feature_item_url, {
                 method: 'GET',

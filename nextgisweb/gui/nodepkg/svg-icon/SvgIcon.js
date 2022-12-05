@@ -10,5 +10,5 @@ export function SvgIcon({ icon, fill }) {
 
 SvgIcon.propTypes = {
     icon: PropTypes.string.isRequired,
-    fill: PropTypes.string,
+    fill: PropTypes.oneOf(['currentColor']),
 };
