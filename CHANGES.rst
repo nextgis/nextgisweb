@@ -6,6 +6,7 @@ Changes
 
 - Limit by extent while exporting feature layer.
 - OAuth-based automatic group assignment.
+- Geometry properties in the identification popup.
 
 
 4.3.1
