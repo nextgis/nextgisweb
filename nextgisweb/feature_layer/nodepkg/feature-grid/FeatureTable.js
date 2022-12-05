@@ -38,7 +38,7 @@ const FeatureTable = ({
     const theadRef = useRef(null);
     const columnRef = useRef({});
 
-    const [rowMinHeight] = useState(25);
+    const [rowMinHeight] = useState(27);
     const [pageSize] = useState(100);
 
     /** Define sort params as tuple of field keyname and ordering (asc|desc) */

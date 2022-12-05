@@ -301,7 +301,8 @@ export function useFeatureTable({
 
         if (items.length) {
             const from = items[0].index;
-            const to = items[items.length - 1].index;
+            // Trigger for loading at least one page
+            const to = items[items.length - 1].index + 1;
 
             const fromPage = Math.floor(from / pageSize);
             const toPage = Math.ceil(to / pageSize);
