@@ -123,6 +123,7 @@ export const FeatureGrid = ({
             },
             icon: <OpenIcon />,
             title: openTitleMsg,
+            disabled: !selected.length,
             size,
         },
     ];
