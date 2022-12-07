@@ -31,6 +31,11 @@ define([
 
         addTool: function (tool, state, place) {
             place = place || this;
+            
+            const cssClasses = ["ol-control", "ol-unselectable"];
+            if (tool.customCssClass) {
+                cssClasses.push(tool.customCssClass);
+            }
 
             var tglButtonTool = new ToggleControl({
                 label: tool.label,
@@ -40,7 +45,7 @@ define([
                 state: state,
                 intermediateChanges:false,
                 customIcon: tool.customIcon,
-                class: "ol-control ol-unselectable"
+                class: cssClasses.join(" ")
             });
             
             if (typeof place === "function") {

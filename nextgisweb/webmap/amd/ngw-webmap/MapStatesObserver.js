@@ -1,13 +1,13 @@
 define([
-    'dojo/_base/declare',
-    'dojo/_base/array',
-    'ngw-pyramid/make-singleton'
+    "dojo/_base/declare",
+    "dojo/_base/array",
+    "ngw-pyramid/make-singleton"
 ], function (
     declare,
     array,
     MakeSingleton
 ) {
-    return MakeSingleton(declare('ngw-webmap.MapStatesObserver', [], {
+    return MakeSingleton(declare("ngw-webmap.MapStatesObserver", [], {
         _states: {},
         _defaultState: null,
         _currentState: null,
@@ -31,7 +31,7 @@ define([
         addState: function (state, control, activate) {
 
             if (this._states.hasOwnProperty(state)) {
-                throw new Error('State "' + state + '" already registered.');
+                throw new Error("State \"" + state + "\" already registered.");
             }
 
             this._states[state] = {
@@ -52,33 +52,46 @@ define([
                 return false;
             }
 
-            if (this._currentState && this._currentState === state) return true;
+            const affectGlobalState = this.shouldAffectState(state);
+            if (this._currentState &&
+                this._currentState === state &&
+                affectGlobalState
+            ) return true;
 
-            if (this._currentState) {
+            if (this._currentState && affectGlobalState) {
                 var currentControl = this._states[this._currentState].control;
                 if (currentControl) currentControl.deactivate();
             }
-            
+
             var stateControl = this._states[state].control;
-            if (stateControl)  stateControl.activate();
-            this._currentState = state;
+            if (stateControl) stateControl.activate();
+
+            if (affectGlobalState) this._currentState = state;
             return true;
         },
 
         deactivateState: function (state) {
+            const affectGlobalState = this.shouldAffectState(state);
             if (!this._states.hasOwnProperty(state) ||
-                state !== this._currentState) {
+                state !== this._currentState &&
+                affectGlobalState) {
                 return false;
             }
 
             var stateControl = this._states[state].control;
             if (stateControl) stateControl.deactivate();
 
-            this._currentState = null;
-            if (this._defaultState && this._defaultState !== state) {
+            if (this._defaultState &&
+                this._defaultState !== state &&
+                affectGlobalState) {
+                this._currentState = null;
                 this.activateState(this._defaultState);
             }
             return true;
+        },
+
+        shouldAffectState: function (stateName) {
+            return stateName.substring(0, 1) !== "~";
         },
 
         setDefaultState: function (state, activate) {
