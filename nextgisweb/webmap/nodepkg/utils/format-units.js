@@ -20,6 +20,11 @@ const defaultConfig = {
     locale: "en"
 };
 
+export const roundValue = (num, places) => {
+    return Math.round((num + Number.EPSILON) * Math.pow(10, places)) /
+        Math.pow(10, places);
+};
+
 const formatPlacesValue = (value) => {
     let places;
     if (value > 0 && value < 1) {
@@ -27,7 +32,7 @@ const formatPlacesValue = (value) => {
     } else {
         places = 2;
     }
-    return Math.round(value * (10 * places)) / (10 * places);
+    return roundValue(value, places);
 };
 
 /**
@@ -152,6 +157,39 @@ const metersAreaToUnit = (meters, unit) => {
         value: resultValue,
         postfix
     };
+};
+
+/**
+ * Format single value
+ * @param {number} value - Coordinate value, e.g. 38.55555559
+ * @param {string} locale - Locale, e.g. 'en'
+ */
+export const formatCoordinatesValue = (value, locale) => {
+    const numberRound = roundValue(value, 2);
+    return numberRound.toLocaleString(locale);
+};
+
+/**
+ * Calculate decimal places to rounding
+ * @param {Object} proj - ol/proj/Projection
+ * @return {number} Decimal places to rounding
+ */
+export const getDecPlacesRoundCoordByProj = (proj) => {
+    const extent = proj.getExtent();
+    const max = Math.max.apply(null, extent.map(e => Math.abs(e)));
+    return max < 1000 ? 2 : 0;
+};
+
+/**
+ * Round coordinates
+ * @param {(number|number[])} coords - single value, array of coordinates
+ * @param {number} places - decimal places to rounding
+ */
+export const roundCoords = (coords, places) => {
+    if (coords instanceof Array) {
+        return coords.map(c => roundValue(c, places));
+    }
+    return roundValue(coords, places);
 };
 
 /**

@@ -43,6 +43,7 @@ define([
     "./tool/Zoom",
     "./tool/Measure",
     "./tool/Identify",
+    "./tool/ViewerInfo",
     "ngw-webmap/FeatureHighlighter",
     //left panel
     "ngw-pyramid/navigation-menu/NavigationMenu",
@@ -115,6 +116,7 @@ define([
     ToolZoom,
     ToolMeasure,
     Identify,
+    ToolViewerInfo,
     FeatureHighlighter,
     NavigationMenu,
     LayersPanel,
@@ -895,6 +897,8 @@ define([
             this.mapToolbar.items.addTool(new ToolMeasure({display: this, type: "Polygon"}), 'measuringArea');
 
             this.mapToolbar.items.addTool(new ToolSwipe({display: this, orientation: "vertical"}), 'swipeVertical');
+
+            this.mapToolbar.items.addTool(new ToolViewerInfo({display: this}), '~viewerInfo');
 
             this.identify = new Identify({display: this});
             var mapStates = MapStatesObserver.getInstance();

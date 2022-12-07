@@ -5,7 +5,11 @@ import {Spin} from "@nextgisweb/gui/antd";
 import {route} from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
-import {formatMetersLength, formatMetersArea} from "@nextgisweb/webmap/utils/format-units";
+import {
+    formatMetersLength,
+    formatMetersArea,
+    formatCoordinatesValue
+} from "@nextgisweb/webmap/utils/format-units";
 
 import "./GeometryInfo.less";
 
@@ -28,11 +32,6 @@ const formatConfig = {
 
 const formatLength = (length) => formatMetersLength(length, webmapSettings.units_length, formatConfig);
 const formatArea = (area) => formatMetersArea(area, webmapSettings.units_area, formatConfig);
-
-const formatExtentValue = (number) => {
-    const numberRound = Math.round(number * 100) / 100;
-    return numberRound.toLocaleString(locale);
-};
 
 export function GeometryInfo({layerId, featureId}) {
     const [status, setStatus] = useState("loading");
@@ -104,7 +103,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (xMin)")}
                     </td>
                     <td>
-                        {formatExtentValue(geometryInfo.extent.minX)}
+                        {formatCoordinatesValue(geometryInfo.extent.minX)}
                     </td>
                 </tr>
                 <tr>
@@ -112,7 +111,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (yMin)")}
                     </td>
                     <td>
-                        {formatExtentValue(geometryInfo.extent.minY)}
+                        {formatCoordinatesValue(geometryInfo.extent.minY)}
                     </td>
                 </tr>
                 <tr>
@@ -120,7 +119,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (xMax)")}
                     </td>
                     <td>
-                        {formatExtentValue(geometryInfo.extent.maxX)}
+                        {formatCoordinatesValue(geometryInfo.extent.maxX)}
                     </td>
                 </tr>
                 <tr>
@@ -128,7 +127,7 @@ export function GeometryInfo({layerId, featureId}) {
                         {i18n.gettext("Extent (yMax)")}
                     </td>
                     <td>
-                        {formatExtentValue(geometryInfo.extent.maxY)}
+                        {formatCoordinatesValue(geometryInfo.extent.maxY)}
                     </td>
                 </tr>
                 </tbody>

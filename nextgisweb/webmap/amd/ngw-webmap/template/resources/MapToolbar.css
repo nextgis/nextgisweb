@@ -7,9 +7,11 @@
 
 
 .claro .control-pane--bottom .map-toolbar .ol-control{
+    position: relative;
     display: inline-block;
     vertical-align: middle;
     margin-left: 6px;
+    z-index: 10;
 }
     .claro .control-pane--bottom .map-toolbar .ol-control:first-child{
         margin-left: 0;
@@ -19,7 +21,7 @@
     margin-top: 8px;
 }
     .claro .control-pane--top .map-toolbar .ol-control:first-child{
-        margin-top: 0px;
+        margin-top: 0;
     }
 
     .claro .map-toolbar .ol-control .dijitButtonNode{
@@ -27,7 +29,7 @@
         border: 0;
         width: 30px;
         height: 30px;
-        line-height: 29px;
+        line-height: 30px;
         background: #fff;
         color: var(--primary);
         fill: var(--primary);

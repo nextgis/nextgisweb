@@ -50,66 +50,66 @@ msgstr "Клонировать"
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-webmap/Display.js:218 amd/ngw-webmap/Display.js:996
+#: amd/ngw-webmap/Display.js:220 amd/ngw-webmap/Display.js:1000
 #: amd/ngw-webmap/ItemWidget.js:243
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:224 amd/ngw-webmap/Display.js:351
+#: amd/ngw-webmap/Display.js:226 amd/ngw-webmap/Display.js:353
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:230 amd/ngw-webmap/Display.js:435
+#: amd/ngw-webmap/Display.js:232 amd/ngw-webmap/Display.js:437
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:236
+#: amd/ngw-webmap/Display.js:238
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:370 amd/ngw-webmap/Display.js:377
+#: amd/ngw-webmap/Display.js:372 amd/ngw-webmap/Display.js:379
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:400 amd/ngw-webmap/plugin/LayerInfo.js:36
+#: amd/ngw-webmap/Display.js:402 amd/ngw-webmap/plugin/LayerInfo.js:36
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:531 amd/ngw-webmap/Display.js:541
+#: amd/ngw-webmap/Display.js:533 amd/ngw-webmap/Display.js:543
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:721 amd/ngw-webmap/tool/Zoom.js:20
+#: amd/ngw-webmap/Display.js:723 amd/ngw-webmap/tool/Zoom.js:20
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:488
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:722 amd/ngw-webmap/tool/Zoom.js:23
+#: amd/ngw-webmap/Display.js:724 amd/ngw-webmap/tool/Zoom.js:23
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:489
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:726 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
+#: amd/ngw-webmap/Display.js:728 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:742
+#: amd/ngw-webmap/Display.js:744
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:747
+#: amd/ngw-webmap/Display.js:749
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:750 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:502
+#: amd/ngw-webmap/Display.js:752 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:502
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:1153 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:669
+#: amd/ngw-webmap/Display.js:1157 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:669
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:1154 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:670
+#: amd/ngw-webmap/Display.js:1158 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:670
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -161,11 +161,11 @@ msgstr "Приватная аннотация"
 msgid "Edit annotation"
 msgstr "Редактировать аннотацию"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:59
+#: amd/ngw-webmap/plugin/FeatureLayer.js:86
 msgid "Go to"
 msgstr "Перейти"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:115
+#: amd/ngw-webmap/plugin/FeatureLayer.js:172
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -303,39 +303,15 @@ msgstr "Идентификация"
 msgid "Features"
 msgstr "Объектов"
 
-#: amd/ngw-webmap/tool/Measure.js:37
+#: amd/ngw-webmap/tool/Measure.js:38
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
-#: amd/ngw-webmap/tool/Measure.js:40
+#: amd/ngw-webmap/tool/Measure.js:41
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: amd/ngw-webmap/tool/Measure.js:44
-msgid "m"
-msgstr "м"
-
-#: amd/ngw-webmap/tool/Measure.js:45
-msgid "km"
-msgstr "км"
-
-#: amd/ngw-webmap/tool/Measure.js:46
-msgid "ft"
-msgstr "фут"
-
-#: amd/ngw-webmap/tool/Measure.js:47
-msgid "mi"
-msgstr "миля"
-
-#: amd/ngw-webmap/tool/Measure.js:48
-msgid "ha"
-msgstr "га"
-
-#: amd/ngw-webmap/tool/Measure.js:49
-msgid "ac"
-msgstr "акр"
-
-#: amd/ngw-webmap/tool/Measure.js:272
+#: amd/ngw-webmap/tool/Measure.js:171
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 
@@ -350,6 +326,10 @@ msgstr "Вертикальная шторка"
 #: amd/ngw-webmap/tool/Swipe.js:23
 msgid "Horizontal swipe"
 msgstr "Горизонтальная шторка"
+
+#: amd/ngw-webmap/tool/ViewerInfo.js:24
+msgid "Show cursor coordinates / extent"
+msgstr "Показать координаты курсора / охват"
 
 #: amd/ngw-webmap/tool/editing/CreateFeature.js:18
 msgid "Create features"
@@ -608,6 +588,14 @@ msgstr "Клонировать в выбранную группу"
 msgid "Clone to this group"
 msgstr "Клонировать в эту группу"
 
+#: nodepkg/map-viewer-info/MapViewerInfo.js:122
+msgid "Show extent"
+msgstr "Показывать охват"
+
+#: nodepkg/map-viewer-info/MapViewerInfo.js:123
+msgid "Show cursor coordinates"
+msgstr "Показывать координаты курсора"
+
 #: nodepkg/settings/Settings.js:56
 msgid "Settings saved"
 msgstr "Настройки сохранены"
@@ -813,6 +801,30 @@ msgstr "Копировать код"
 #: nodepkg/share-panel/SharePanel.js:218 nodepkg/share-panel/SharePanel.js:229
 msgid "Preview"
 msgstr "Предпросмотр"
+
+#: nodepkg/utils/format-units.js:11
+msgid "m"
+msgstr "м"
+
+#: nodepkg/utils/format-units.js:12
+msgid "km"
+msgstr "км"
+
+#: nodepkg/utils/format-units.js:13
+msgid "ft"
+msgstr "фут"
+
+#: nodepkg/utils/format-units.js:14
+msgid "mi"
+msgstr "миля"
+
+#: nodepkg/utils/format-units.js:15
+msgid "ha"
+msgstr "га"
+
+#: nodepkg/utils/format-units.js:16
+msgid "ac"
+msgstr "акр"
 
 #: template/invalid_origin.mako:4
 #, python-format
