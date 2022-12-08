@@ -11,7 +11,7 @@ msgstr "Выходной формат не указан."
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:155 api.py:666
+#: api.py:155 api.py:693
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -107,14 +107,6 @@ msgstr "Пожалуйста подождите, идет обработка з�
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-feature-layer/FeatureGrid.js:241
-msgid "Confirmation"
-msgstr "Подтверждение"
-
-#: amd/ngw-feature-layer/FeatureGrid.js:242
-msgid "Delete feature?"
-msgstr "Удалить объект?"
-
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:119
 msgid "N/A"
 msgstr "Н/Д"
@@ -154,26 +146,6 @@ msgstr "Удалить"
 #: amd/ngw-feature-layer/GeometryInfoWidget.js:15
 msgid "Geometry"
 msgstr "Геометрия"
-
-#: amd/ngw-feature-layer/template/FeatureGrid.hbs:13
-#: nodepkg/feature-grid/FeatureGrid.js:23
-msgid "Open"
-msgstr "Открыть"
-
-#: amd/ngw-feature-layer/template/FeatureGrid.hbs:18
-#: nodepkg/feature-grid/FeatureGrid.js:25
-msgid "Edit"
-msgstr "Редактировать"
-
-#: amd/ngw-feature-layer/template/FeatureGrid.hbs:23
-#: nodepkg/feature-grid/FeatureGrid.js:24
-msgid "Delete"
-msgstr "Удалить"
-
-#: amd/ngw-feature-layer/template/FeatureGrid.hbs:28
-#: nodepkg/feature-grid/FeatureGrid.js:22
-msgid "Search..."
-msgstr "Поиск..."
 
 #: nodepkg/export-form/ExportForm.js:94
 msgid "Format"
@@ -227,37 +199,57 @@ msgstr "Право"
 msgid "Top"
 msgstr "Верх"
 
-#: nodepkg/geometry-info/GeometryInfo.js:44
+#: nodepkg/feature-grid/FeatureGrid.js:23
+msgid "Search..."
+msgstr "Поиск..."
+
+#: nodepkg/feature-grid/FeatureGrid.js:24
+msgid "Open"
+msgstr "Открыть"
+
+#: nodepkg/feature-grid/FeatureGrid.js:25
+msgid "Delete"
+msgstr "Удалить"
+
+#: nodepkg/feature-grid/FeatureGrid.js:26
+msgid "Edit"
+msgstr "Редактировать"
+
+#: nodepkg/geometry-info/GeometryInfo.js:57
 msgid "Load geometry info..."
 msgstr "Загрузка информации..."
 
-#: nodepkg/geometry-info/GeometryInfo.js:54
+#: nodepkg/geometry-info/GeometryInfo.js:67
 msgid "Failed to get information about the geometry"
 msgstr "Не удалось получить информацию о геометрии"
 
-#: nodepkg/geometry-info/GeometryInfo.js:66
-msgid "Length"
+#: nodepkg/geometry-info/GeometryInfo.js:78
+msgid "Perimeter"
 msgstr "Периметр"
 
-#: nodepkg/geometry-info/GeometryInfo.js:74
+#: nodepkg/geometry-info/GeometryInfo.js:78
+msgid "Length"
+msgstr "Длина"
+
+#: nodepkg/geometry-info/GeometryInfo.js:90
 msgid "Area"
 msgstr "Площадь"
 
-#: nodepkg/geometry-info/GeometryInfo.js:82
-msgid "Extent (xMin)"
-msgstr "Экстент (xMin)"
-
-#: nodepkg/geometry-info/GeometryInfo.js:90
-msgid "Extent (yMin)"
-msgstr "Экстент (yMin)"
-
-#: nodepkg/geometry-info/GeometryInfo.js:98
-msgid "Extent (xMax)"
-msgstr "Экстент (xMax)"
-
 #: nodepkg/geometry-info/GeometryInfo.js:106
+msgid "Extent (xMin)"
+msgstr "Охват (xMin)"
+
+#: nodepkg/geometry-info/GeometryInfo.js:114
+msgid "Extent (yMin)"
+msgstr "Охват (yMin)"
+
+#: nodepkg/geometry-info/GeometryInfo.js:122
+msgid "Extent (xMax)"
+msgstr "Охват (xMax)"
+
+#: nodepkg/geometry-info/GeometryInfo.js:130
 msgid "Extent (yMax)"
-msgstr "Экстент (yMax)"
+msgstr "Охват (yMax)"
 
 #: template/section_api_layer.mako:11
 msgid "MVT Vector Tiles"

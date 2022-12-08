@@ -73,7 +73,10 @@ export function GeometryInfo({layerId, featureId}) {
     const length = geometryInfo.length == null ? <></> : (
         <tr>
             <td>
-                {i18n.gettext("Length")}
+                {
+                    geometryInfo.type.toLowerCase().includes('polygon') ?
+                        i18n.gettext("Perimeter") : i18n.gettext("Length")
+                }
             </td>
             <td>
                 {formatLength(geometryInfo.length)}

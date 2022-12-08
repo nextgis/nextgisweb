@@ -561,9 +561,19 @@ def geometry_info(resource, request):
         maxY=maxY
     )
 
+    area = abs(geom_area(geom, srs_wkt))
+    length = abs(geom_length(geom, srs_wkt))
+
+    if geom_type == 'Point':
+        area = None
+        length = None
+    elif geom_type == 'LineString' or geom_type == 'LinearRing' or geom_type == 'MultiLineString':
+        area = None
+
     return dict(
-        area=None if (geom_type == 'Point') else abs(geom_area(geom, srs_wkt)),
-        length=None if (geom_type == 'Point') else abs(geom_length(geom, srs_wkt)),
+        type=geom_type,
+        area=area,
+        length=length,
         extent=extent
     )
 
