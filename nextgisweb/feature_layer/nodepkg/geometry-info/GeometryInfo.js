@@ -3,13 +3,16 @@ import PropTypes from "prop-types";
 import {Spin} from "@nextgisweb/gui/antd";
 
 import {route} from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import {
     formatMetersLength,
     formatMetersArea,
     formatCoordinatesValue
 } from "@nextgisweb/webmap/utils/format-units";
+import {
+    getGeometryTypeTitle
+} from "@nextgisweb/webmap/utils/geometry-types";
 
 import "./GeometryInfo.less";
 
@@ -74,7 +77,7 @@ export function GeometryInfo({layerId, featureId}) {
         <tr>
             <td>
                 {
-                    geometryInfo.type.toLowerCase().includes('polygon') ?
+                    geometryInfo.type.toLowerCase().includes("polygon") ?
                         i18n.gettext("Perimeter") : i18n.gettext("Length")
                 }
             </td>
@@ -99,6 +102,14 @@ export function GeometryInfo({layerId, featureId}) {
         <>
             <table className="geometry-info-table">
                 <tbody>
+                <tr>
+                    <td>
+                        {i18n.gettext("Geometry type")}
+                    </td>
+                    <td>
+                        {getGeometryTypeTitle(geometryInfo.type.toLowerCase())}
+                    </td>
+                </tr>
                 {length}
                 {area}
                 <tr>

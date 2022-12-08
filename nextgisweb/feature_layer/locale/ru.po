@@ -215,39 +215,43 @@ msgstr "Удалить"
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/geometry-info/GeometryInfo.js:57
+#: nodepkg/geometry-info/GeometryInfo.js:60
 msgid "Load geometry info..."
 msgstr "Загрузка информации..."
 
-#: nodepkg/geometry-info/GeometryInfo.js:67
+#: nodepkg/geometry-info/GeometryInfo.js:70
 msgid "Failed to get information about the geometry"
 msgstr "Не удалось получить информацию о геометрии"
 
-#: nodepkg/geometry-info/GeometryInfo.js:78
+#: nodepkg/geometry-info/GeometryInfo.js:81
 msgid "Perimeter"
 msgstr "Периметр"
 
-#: nodepkg/geometry-info/GeometryInfo.js:78
+#: nodepkg/geometry-info/GeometryInfo.js:81
 msgid "Length"
 msgstr "Длина"
 
-#: nodepkg/geometry-info/GeometryInfo.js:90
+#: nodepkg/geometry-info/GeometryInfo.js:93
 msgid "Area"
 msgstr "Площадь"
 
-#: nodepkg/geometry-info/GeometryInfo.js:106
+#: nodepkg/geometry-info/GeometryInfo.js:107
+msgid "Geometry type"
+msgstr "Тип геометрии"
+
+#: nodepkg/geometry-info/GeometryInfo.js:117
 msgid "Extent (xMin)"
 msgstr "Охват (xMin)"
 
-#: nodepkg/geometry-info/GeometryInfo.js:114
+#: nodepkg/geometry-info/GeometryInfo.js:125
 msgid "Extent (yMin)"
 msgstr "Охват (yMin)"
 
-#: nodepkg/geometry-info/GeometryInfo.js:122
+#: nodepkg/geometry-info/GeometryInfo.js:133
 msgid "Extent (xMax)"
 msgstr "Охват (xMax)"
 
-#: nodepkg/geometry-info/GeometryInfo.js:130
+#: nodepkg/geometry-info/GeometryInfo.js:141
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 

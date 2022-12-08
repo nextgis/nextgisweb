@@ -588,11 +588,11 @@ msgstr "Клонировать в выбранную группу"
 msgid "Clone to this group"
 msgstr "Клонировать в эту группу"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.js:122
+#: nodepkg/map-viewer-info/MapViewerInfo.js:121
 msgid "Show extent"
 msgstr "Показывать охват"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.js:123
+#: nodepkg/map-viewer-info/MapViewerInfo.js:122
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
@@ -825,6 +825,38 @@ msgstr "га"
 #: nodepkg/utils/format-units.js:16
 msgid "ac"
 msgstr "акр"
+
+#: nodepkg/utils/geometry-types.js:6
+msgid "Point"
+msgstr "Точка"
+
+#: nodepkg/utils/geometry-types.js:9
+msgid "LineString"
+msgstr "Линия"
+
+#: nodepkg/utils/geometry-types.js:12
+msgid "LinearRing"
+msgstr "Замкнутый контур"
+
+#: nodepkg/utils/geometry-types.js:15
+msgid "Polygon"
+msgstr "Полигон"
+
+#: nodepkg/utils/geometry-types.js:18
+msgid "MultiPoint"
+msgstr "Мультиточка"
+
+#: nodepkg/utils/geometry-types.js:21
+msgid "MultiLineString"
+msgstr "Мультилиния"
+
+#: nodepkg/utils/geometry-types.js:24
+msgid "MultiPolygon"
+msgstr "Мультиполигон"
+
+#: nodepkg/utils/geometry-types.js:27
+msgid "GeometryCollection"
+msgstr "Коллекция геометрий"
 
 #: template/invalid_origin.mako:4
 #, python-format
