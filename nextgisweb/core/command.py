@@ -1,8 +1,10 @@
+import argparse
 import csv
 import sys
 import os
 import os.path
 import fileinput
+import shutil
 from os.path import join as pthjoin
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -26,7 +28,7 @@ from ..lib.migration import (
     PythonModuleMigration, SQLScriptMigration)
 from ..models import DBSession
 
-from .backup import backup, restore
+from .backup import backup, restore, pg_connection_options
 from .migration import MigrationRegistry, MigrationContext
 
 
@@ -303,6 +305,28 @@ class SQLCommand(Command):
                 w.writerow(res.keys())
                 for row in res.fetchall():
                     w.writerow(row)
+
+
+@Command.registry.register
+class PsqlCommand(Command):
+    identity = 'psql'
+    no_initialize = True
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        # TODO: Add support for bypassing options and arguments to psql
+        pass
+
+    @classmethod
+    def execute(cls, args, env):
+        opts, password = pg_connection_options(env)
+        psql_path = shutil.which('psql')
+        if psql_path is None:
+            raise RuntimeError("Executable 'psql' not found!")
+        environ = os.environ.copy()
+        if password is not None:
+            environ['PGPASSWORD'] = password
+        os.execve(psql_path, ['psql', ] + opts, environ)
 
 
 @Command.registry.register
