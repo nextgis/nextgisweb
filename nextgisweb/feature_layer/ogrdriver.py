@@ -9,7 +9,7 @@ def get_driver_by_name(name):
 
 def test_driver_capability(name, capability):
     driver = get_driver_by_name(name)
-    return driver.TestCapability(capability)
+    return (driver is not None) and driver.TestCapability(capability)
 
 
 EXPORT_FORMAT_OGR = collections.OrderedDict()
