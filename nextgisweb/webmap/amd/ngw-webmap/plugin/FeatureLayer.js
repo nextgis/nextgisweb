@@ -34,6 +34,7 @@ define([
         selectedId: undefined,
         featureHighlightedEvent: null,
         featureUnhighlightedEvent: null,
+        topicHandlers: [],
 
         postCreate: function () {
             var widget = this;
@@ -106,10 +107,14 @@ define([
                 component.update({ selectedIds: [] });
             };
 
-            topic.subscribe("feature.highlight", this.featureHighlightedEvent);
-            topic.subscribe(
-                "feature.unhighlight",
-                this.featureUnhighlightedEvent
+            this.topicHandlers.push(
+                topic.subscribe("feature.highlight", this.featureHighlightedEvent)
+            );
+            this.topicHandlers.push(
+                topic.subscribe(
+                    "feature.unhighlight",
+                    this.featureUnhighlightedEvent
+                )
             );
 
             this.component = component;
@@ -120,18 +125,10 @@ define([
                 this.component.unmount();
             }
             this.component = null;
-            if (this.featureHighlightedEvent) {
-                topic.unsubscribe(
-                    "feature.highlight",
-                    this.featureHighlightedEvent
-                );
+            for (var i = 0; i < this.topicHandlers.length; i++) {
+                this.topicHandlers[i].remove();
             }
-            if (this.featureUnhighlightedEvent) {
-                topic.unsubscribe(
-                    "feature.unhighlight",
-                    this.featureUnhighlightedEvent
-                );
-            }
+            this.topicHandlers = [];
         },
 
         updateSearch: function () {
