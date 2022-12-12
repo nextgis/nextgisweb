@@ -76,6 +76,52 @@ class ResourceComponent(Component):
 
         return quota_resource_by_cls
 
+    def quota_check(self, data):
+        required_total = 0
+
+        for cls, required in data.items():
+            if self.quota_resource_cls is None or cls in self.quota_resource_cls:
+                required_total += required
+
+            # Quota per resource class checking
+            if cls in self.quota_resource_by_cls:
+                query = DBSession \
+                    .query(db.func.count(Resource.id)) \
+                    .filter(Resource.cls == cls)
+
+                with DBSession.no_autoflush:
+                    count = query.scalar()
+
+                cls_quota_limit = self.quota_resource_by_cls[cls]
+                if count + required > cls_quota_limit:
+                    return dict(
+                        success=False,
+                        cls=cls,
+                        limit=cls_quota_limit,
+                        count=count,
+                        required=required,
+                    )
+
+        # Total quota checking
+        if required_total > 0 and self.quota_limit is not None:
+            query = DBSession.query(db.func.count(Resource.id))
+            if self.quota_resource_cls is not None:
+                query = query.filter(Resource.cls.in_(self.quota_resource_cls))
+
+            with DBSession.no_autoflush:
+                count_total = query.scalar()
+
+            if count_total + required_total > self.quota_limit:
+                return dict(
+                    success=False,
+                    cls=None,
+                    limit=self.quota_limit,
+                    count=count_total,
+                    required=required_total,
+                )
+
+        return dict(success=True)
+
     @require('auth')
     def initialize_db(self):
         adminusr = User.filter_by(keyname='administrator').one()

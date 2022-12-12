@@ -457,42 +457,18 @@ class ResourceSerializer(Serializer):
             if conflict is not None:
                 raise DisplayNameNotUnique(conflict.id)
 
-        # Total quota checking
-        quota_resource_cls = env.resource.quota_resource_cls
-        quota_limit = env.resource.quota_limit
-
-        if (
-            quota_limit is not None and self.obj.id is None
-            and (quota_resource_cls is None or self.obj.cls in quota_resource_cls)  # NOQA: W503
-        ):
-            query = DBSession.query(db.func.count(Resource.id))
-            if quota_resource_cls is not None:
-                query = query.filter(Resource.cls.in_(quota_resource_cls))
-
-            with DBSession.no_autoflush:
-                count = query.scalar()
-
-            if count >= quota_limit:
-                raise ValidationError(_(
-                    "Maximum number of resources exceeded. The limit is %s."
-                ) % (quota_limit,))
-
-        # Quota per resource class checking
-        quota_resource_by_cls = env.resource.quota_resource_by_cls
-
-        if self.obj.id is None and self.obj.cls in quota_resource_by_cls:
-            query = DBSession\
-                .query(db.func.count(Resource.id))\
-                .filter(Resource.cls == self.obj.cls)
-
-            with DBSession.no_autoflush:
-                count = query.scalar()
-
-            quota = quota_resource_by_cls[self.obj.cls]
-            if count >= quota:
-                raise ValidationError(_(
-                    "Maximum number of resources '%s' exceeded. The limit is %s."
-                ) % (self.obj.cls_display_name, quota))
+        if self.obj.id is None:
+            result = env.resource.quota_check({self.obj.cls: 1})
+            if not result['success']:
+                if result['cls'] is None:
+                    msg = _(
+                        "Maximum number of resources exceeded. The limit is %s."
+                    ) % result['limit']
+                else:
+                    msg = _(
+                        "Maximum number of resources '%s' exceeded. The limit is %s."
+                    ) % (self.obj.cls_display_name, result['limit'])
+                raise ValidationError(message=msg)
 
 
 class ResourceACLRule(Base):

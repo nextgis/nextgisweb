@@ -366,6 +366,20 @@ def resource_volume(resource, request):
     return dict(volume=volume)
 
 
+def quota_check(request):
+    result = request.env.resource.quota_check(request.json_body)
+    if result['success']:
+        return dict(success=True)
+
+    tr = request.localizer.translate
+    msg = tr(_("Not enough resource quota: {0} required, but only {1} available.")) \
+        .format(result['required'], max(result['limit'] - result['count'], 0))
+    if result['cls'] is not None:
+        cls_display_name = tr(Resource.registry[result['cls']].cls_display_name)
+        msg += " " + tr(_("Resource type - {}.")).format(cls_display_name)
+    return dict(success=False, message=msg)
+
+
 def resource_export_get(request):
     request.require_administrator()
     try:
@@ -425,6 +439,10 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.search', '/api/resource/search/') \
         .add_view(search, request_method='GET', renderer='json')
+
+    config.add_route(
+        'resource.quota_check', '/api/component/resource/check_quota') \
+        .add_view(quota_check, request_method='POST', renderer='json')
 
     config.add_route('resource.resource_export',
                      '/api/component/resource/resource_export') \
