@@ -10,23 +10,23 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:27 model.py:37 view.py:260 view.py:291
+#: model.py:29 model.py:40 view.py:260 view.py:291
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:29 view.py:265
+#: model.py:31 view.py:265
 msgid "Display"
 msgstr "Открыть"
 
-#: model.py:30
+#: model.py:32
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:184 model.py:31
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:196 model.py:33
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: model.py:32
+#: model.py:34
 msgid "Manage annotations"
 msgstr "Администрировать аннотации"
 
@@ -144,15 +144,15 @@ msgstr "Определить местоположение не удалось"
 msgid "Your annotation text"
 msgstr "Ваш текст аннотации"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:142
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:143
 msgid "Public annotation"
 msgstr "Публичная аннотация"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:144
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:145
 msgid "My private annotation"
 msgstr "Моя приватная аннотация"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:147
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:148
 msgid "Private annotation"
 msgstr "Приватная аннотация"
 
@@ -431,7 +431,25 @@ msgstr "Публичные аннотации"
 msgid "My private annotations"
 msgstr "Мои приватные аннотации"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:220
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:205
+#: nodepkg/utils/geometry-types.js:6
+msgid "Point"
+msgstr "Точка"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:206
+msgid "Line"
+msgstr "Линия"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:207
+#: nodepkg/utils/geometry-types.js:15
+msgid "Polygon"
+msgstr "Полигон"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:214
+msgid "Geometry type"
+msgstr "Тип геометрии"
+
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:251
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
@@ -826,10 +844,6 @@ msgstr "га"
 msgid "ac"
 msgstr "акр"
 
-#: nodepkg/utils/geometry-types.js:6
-msgid "Point"
-msgstr "Точка"
-
 #: nodepkg/utils/geometry-types.js:9
 msgid "LineString"
 msgstr "Линия"
@@ -837,10 +851,6 @@ msgstr "Линия"
 #: nodepkg/utils/geometry-types.js:12
 msgid "LinearRing"
 msgstr "Замкнутый контур"
-
-#: nodepkg/utils/geometry-types.js:15
-msgid "Polygon"
-msgstr "Полигон"
 
 #: nodepkg/utils/geometry-types.js:18
 msgid "MultiPoint"
