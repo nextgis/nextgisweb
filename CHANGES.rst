@@ -7,6 +7,7 @@ Changes
 - Limit by extent while exporting feature layer.
 - OAuth-based automatic group assignment.
 - Geometry properties in the identification popup.
+- Display the cursor location and an extent on webmaps.
 
 
 4.3.1
