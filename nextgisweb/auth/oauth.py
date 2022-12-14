@@ -7,6 +7,7 @@ from hashlib import sha512
 from urllib.parse import urlencode
 
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm.exc import NoResultFound
 import requests
 from requests.exceptions import InvalidJSONError
@@ -16,7 +17,6 @@ from passlib.hash import sha256_crypt
 from ..env import env
 from ..lib.config import OptionAnnotations, Option
 from ..lib.logging import logger
-from ..lib.json import dumps as json_dumps
 from .. import db
 from ..models import DBSession
 from ..core.exception import UserException
@@ -170,10 +170,17 @@ class OAuthHelper:
                 if (not set(self.options['scope']).issubset(token_scope)):
                     raise InvalidScopeException()
 
-            token = OAuthToken(id=token_id, data=tdata)
-            token.exp = datetime.utcfromtimestamp(tdata['exp'])
-            token.sub = str(tdata[self.options['profile.subject.attr']])
-            token.persist()
+            stmt = pg_insert(OAuthToken).values([dict(
+                id=token_id,
+                exp=datetime.utcfromtimestamp(tdata['exp']),
+                sub=str(tdata[self.options['profile.subject.attr']]),
+                data=tdata,
+            )]).on_conflict_do_nothing().returning(OAuthToken)
+            stmt = sa.select(OAuthToken).from_statement(stmt). \
+                execution_options(populate_existing=True)
+
+            with DBSession.no_autoflush:
+                token = DBSession.execute(stmt).scalar()
 
             logger.debug("Adding access token to cache (%s)", access_token)
 
