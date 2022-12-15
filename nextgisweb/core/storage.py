@@ -58,6 +58,9 @@ class StorageComponentMixin:
                     kind_of_data=lambda col: col == ''))
             current_total = sinfo['storage.cur'] = result['']['data_volume']
 
+            # FIXME: Work around to clean up 'storage.cur' in DBSession().info
+            mark_changed(DBSession())
+
         if volume_limit < current_total + requested:
             raise StorageLimitExceeded(
                 total=current_total,
@@ -208,18 +211,16 @@ class StorageComponentMixin:
         # there's not pending reservations in the list.
 
         sinfo = session.info
-        reservations = sinfo.get('storage.res')
-        if reservations is None or len(reservations) == 0:
-            return
 
-        tstamp = datetime.utcnow()
-        session.connection().execute(storage_stat_delta.insert(), [dict(
-            tstamp=tstamp,
-            component=res['component'],
-            kind_of_data=res['kind_of_data'].identity,
-            resource_id=None if res['resource'] is None else res['resource'].id,
-            value_data_volume=res['value_data_volume']
-        ) for res in reservations])
+        if reservations := sinfo.get('storage.res'):
+            tstamp = datetime.utcnow()
+            session.connection().execute(storage_stat_delta.insert(), [dict(
+                tstamp=tstamp,
+                component=res['component'],
+                kind_of_data=res['kind_of_data'].identity,
+                resource_id=None if res['resource'] is None else res['resource'].id,
+                value_data_volume=res['value_data_volume']
+            ) for res in reservations])
 
         # Cleanup storage session info
         sinfo.pop('storage.res', None)
