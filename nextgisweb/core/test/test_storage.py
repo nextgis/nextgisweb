@@ -84,7 +84,7 @@ def vector_layer(display_name, parent_id):
     return res
 
 
-def test_resource_storage(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
+def test_resource(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
     reserve_storage = ngw_env.core.reserve_storage
     with transaction.manager:
         res1 = vector_layer('test-resource-1', ngw_resource_group)
@@ -121,27 +121,31 @@ def test_resource_storage(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth
     assert cur['']['data_volume'] == 0
 
 
-def test_storage_estimate_all(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
+def estimage(app):
+    app.post('/api/component/pyramid/estimate_storage', status=200)
+    sleep(0.05)  # Give a chance to start a thread and acquire the lock
+    with transaction.manager:
+        # Wait estimation end
+        DBSession.execute(SQL_LOCK)
+
+
+def test_estimate_all(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
     with transaction.manager:
         res = vector_layer('test-vector-layer', ngw_resource_group)
         DBSession.flush()
         DBSession.expunge(res)
 
     feature = dict(geom='POINT (0 0)')
-    ngw_webtest_app.post_json('/api/resource/%d/feature/' % res.id, feature)
+    resp = ngw_webtest_app.post_json('/api/resource/%d/feature/' % res.id, feature)
+    fid = resp.json['id']
 
     content = 'some-content'
     resp = ngw_webtest_app.put('/api/component/file_upload/', content)
     file_upload = resp.json
-    ngw_webtest_app.post_json('/api/resource/%d/feature/%d/attachment/' % (res.id, 1), dict(
+    ngw_webtest_app.post_json('/api/resource/%d/feature/%d/attachment/' % (res.id, fid), dict(
         file_upload=file_upload))
 
-    ngw_webtest_app.post('/api/component/pyramid/estimate_storage', status=200)
-    sleep(0.05)  # Give a chance to start a thread and acquire the lock
-
-    with transaction.manager:
-        # Wait estimation end
-        DBSession.execute(SQL_LOCK)
+    estimage(ngw_webtest_app)
 
     cur = ngw_env.core.query_storage(dict(resource_id=lambda col: col == res.id))
     assert FeatureAttachmentData.identity in cur
@@ -165,3 +169,33 @@ def test_storage_limit_exceeded(ngw_env):
         with core.options.override({'storage.limit': 50}):
             with pytest.raises(StorageLimitExceeded):
                 core.check_storage_limit()
+
+
+def test_check_limit_after_estimate(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
+    with transaction.manager:
+        res = vector_layer('test-vector-layer', ngw_resource_group)
+        DBSession.flush()
+
+    feature = dict(geom='POINT (0 0)')
+    resp = ngw_webtest_app.post_json('/api/resource/%d/feature/' % res.id, feature)
+    fid = resp.json['id']
+
+    content = 'some-content'
+    resp = ngw_webtest_app.put('/api/component/file_upload/', content)
+    resp = ngw_webtest_app.post_json('/api/resource/%d/feature/%d/attachment/' % (
+        res.id, fid), dict(file_upload=resp.json))
+    aid = resp.json['id']
+
+    estimage(ngw_webtest_app)
+
+    resp = ngw_webtest_app.get('/api/component/pyramid/storage', status=200)
+    current = resp.json['']['data_volume']
+
+    def try_upload(ok):
+        ngw_webtest_app.put('/api/component/file_upload/upload', b'A', status=201 if ok else 402)
+
+    with ngw_env.core.options.override({'storage.limit': current - 1}):
+        try_upload(False)
+        ngw_webtest_app.delete('/api/resource/%d/feature/%d/attachment/%d' % (res.id, fid, aid))
+        estimage(ngw_webtest_app)
+        try_upload(True)
