@@ -17,6 +17,7 @@ from shapely.geometry import box
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..core.exception import ValidationError
+from ..env import env
 from ..lib.geometry import Geometry, GeometryNotValid, Transformer, geom_area, geom_length
 from ..resource import DataScope, Resource, resource_factory
 from ..resource.exception import ResourceNotFound
@@ -76,20 +77,69 @@ def _extensions(extensions, layer):
     return result
 
 
-def view_geojson(request):
-    request.GET["format"] = "GeoJSON"
-    request.GET["zipped"] = "false"
+class ExportOptions:
+    __slots__ = (
+        'driver', 'dsco', 'lco', 'srs', 'intersects_geom', 'intersects_srs',
+        'fields', 'fid_field', 'use_display_name',
+    )
 
-    return export(request)
+    def __init__(
+        self, *, format=None, encoding=None, srs=None,
+        intersects=None, intersects_srs=None,
+        fields=None, fid='', display_name='false', **params,
+    ):
+        if format is None:
+            raise ValidationError(message=_("Output format is not provided."))
+        if format not in EXPORT_FORMAT_OGR:
+            raise ValidationError(message=_("Format '%s' is not supported.") % format)
+        self.driver = EXPORT_FORMAT_OGR[format]
+
+        # dataset creation options (configurable by user)
+        self.dsco = list()
+        if self.driver.dsco_configurable is not None:
+            for option in self.driver.dsco_configurable:
+                option = option.split(':')[0]
+                if option in params:
+                    self.dsco.append(f'{option}={params[option]}')
+
+        # layer creation options
+        self.lco = []
+        if self.driver.options is not None:
+            self.lco.extend(self.driver.options)
+        if encoding is not None:
+            self.lco.append(f'ENCODING={encoding}')
+
+        # KML should be created as WGS84
+        if self.driver.name == 'LIBKML':
+            self.srs = SRS.filter_by(id=4326).one()
+        elif srs is not None:
+            self.srs = SRS.filter_by(id=srs).one()
+        else:
+            self.srs = None
+
+        if intersects is not None:
+            try:
+                self.intersects_geom = Geometry.from_wkt(intersects)
+            except GeometryNotValid:
+                raise ValidationError(message=_("Parameter 'intersects' geometry is not valid."))
+
+            if intersects_srs is not None:
+                self.intersects_srs = SRS.filter_by(id=intersects_srs).one()
+            else:
+                self.intersects_srs = None
+        else:
+            self.intersects_geom = self.intersects_srs = None
+
+        self.fields = fields.split(',') if fields is not None else None
+        self.fid_field = fid if fid != '' else None
+
+        self.use_display_name = display_name.lower() == 'true'
 
 
-def export(request):
-    request.resource_permission(PERM_READ)
+def export(resource, options, filepath):
+    query = resource.feature_query()
 
-    query = request.context.feature_query()
-    export_limit = request.env.feature_layer.export_limit
-
-    if export_limit is not None:
+    if (export_limit := env.feature_layer.export_limit) is not None:
         total_count = query().total_count
 
         if total_count > export_limit:
@@ -99,140 +149,166 @@ def export(request):
                 ).format(limit=export_limit, count=total_count)
             )
 
-    format = request.GET.get("format")
+    query.geom()
 
-    if format is None:
-        raise ValidationError(
-            _("Output format is not provided.")
-        )
-
-    if format not in EXPORT_FORMAT_OGR:
-        raise ValidationError(
-            _("Format '%s' is not supported.") % (format,)
-        )
-
-    driver = EXPORT_FORMAT_OGR[format]
-
-    # KML should be created as WGS84
-    if driver.name == "LIBKML":
-        srs = SRS.filter_by(id=4326).one()
-    else:
-        srs = int(request.GET.get("srs", request.context.srs.id))
-        srs = SRS.filter_by(id=srs).one()
-
-    fid = request.GET.get("fid")
-    fid = fid if fid != "" else None
-
-    encoding = request.GET.get("encoding")
-    zipped = request.GET.get("zipped", "true")
-    zipped = zipped.lower() == "true"
-
-    display_name = request.GET.get("display_name", "false")
-    display_name = display_name.lower() == "true"
-
-    fields = request.GET["fields"].split(",") if "fields" in request.GET else None
-    if fields is None:
-        fields = [fld.keyname for fld in request.context.fields]
-
-    # dataset creation options (configurable by user)
-    dsco = list()
-    if driver.dsco_configurable is not None:
-        for option in driver.dsco_configurable:
-            option = option.split(":")[0]
-            if option in request.GET:
-                dsco.append("%s=%s" % (option, request.GET.get(option)))
-
-    # layer creation options
-    lco = list(driver.options or [])
-
-    if encoding is not None:
-        lco.append("ENCODING=%s" % encoding)
-
-    if (intersects := request.GET.get("intersects")) is not None:
-        try:
-            geom = Geometry.from_wkt(intersects)
-        except GeometryNotValid:
-            raise ValidationError(message=_("Parameter 'intersects' geometry is not valid."))
-
-        intersects_srs_id = int(request.GET.get("intersects_srs", request.context.srs.id))
-        if intersects_srs_id != request.context.srs.id:
-            intersects_transformer = Transformer(SRS.filter_by(
-                id=intersects_srs_id).one().wkt, request.context.srs.wkt)
+    if options.intersects_geom is not None:
+        if options.intersects_srs is not None and options.intersects_srs.id != resource.srs_id:
+            transformer = Transformer(options.intersects_srs.wkt, resource.srs.wkt)
             try:
-                geom = intersects_transformer.transform(geom)
+                intersects_geom = transformer.transform(options.intersects_geom)
             except ValueError:
                 raise ValidationError(message=_(
                     "Failed to reproject 'intersects' geometry."))
-
-        query.intersects(geom)
-
-    query.geom()
+        else:
+            intersects_geom = options.intersects_geom
+        query.intersects(intersects_geom)
 
     ogr_ds = _ogr_memory_ds()
     ogr_layer = _ogr_layer_from_features(  # NOQA: 841
-        request.context, query(), ds=ogr_ds, fid=fid)
+        resource, query(), ds=ogr_ds, fid=options.fid_field)
 
-    filename = "%d.%s" % (
-        request.context.id,
-        driver.extension,
-    )
-
+    driver = options.driver
+    srs = options.srs if options.srs is not None else resource.srs
     vtopts = (
         [
-            "-f", driver.name,
-            "-t_srs", srs.wkt,
+            '-f', driver.name,
+            '-t_srs', srs.wkt,
         ]
-        + list(itertools.chain(*[("-lco", o) for o in lco]))
-        + list(itertools.chain(*[("-dsco", o) for o in dsco]))
+        + list(itertools.chain(*[('-lco', o) for o in options.lco]))
+        + list(itertools.chain(*[('-dsco', o) for o in options.dsco]))
     )
 
     # CPLES_SQLI == 7
     flds = [
         '"{}" as "{}"'.format(
-            fld.keyname.replace('"', r"\""),
-            getattr(fld, "display_name" if display_name else "keyname").replace(
-                '"', r"\""
+            fld.keyname.replace('"', r'\"'),
+            (fld.display_name if options.use_display_name else fld.keyname).replace(
+                '"', r'\"'
             ),
         )
-        for fld in request.context.fields
-        if fld.keyname in fields
+        for fld in resource.fields
+        if options.fields is None or fld.keyname in options.fields
     ]
-    if fid is not None:
-        flds += ['FID as "{}"'.format(fid.replace('"', r'\"'))]
-    vtopts += ["-sql", 'select {} from ""'.format(", ".join(
+    if options.fid_field is not None:
+        flds += ['FID as "{}"'.format(options.fid_field.replace('"', r'\"'))]
+    vtopts += ['-sql', 'select {} from ""'.format(', '.join(
         flds if len(flds) > 0 else '*'))]
 
-    if driver.fid_support and fid is None:
+    if driver.fid_support and options.fid_field is None:
         vtopts.append('-preserve_fid')
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        gdal.VectorTranslate(
-            os.path.join(tmp_dir, filename), ogr_ds,
-            options=gdal.VectorTranslateOptions(options=vtopts)
-        )
+    gdal.VectorTranslate(
+        filepath, ogr_ds,
+        options=gdal.VectorTranslateOptions(options=vtopts)
+    )
 
-        if zipped or not driver.single_file:
-            content_type = "application/zip"
-            content_disposition = "attachment; filename=%s" % ("%s.zip" % (filename,))
-            with tempfile.NamedTemporaryFile(suffix=".zip") as tmp_file:
-                with zipfile.ZipFile(tmp_file, "w", zipfile.ZIP_DEFLATED) as zipf:
-                    for root, dirs, files in os.walk(tmp_dir):
-                        for file in files:
-                            path = os.path.join(root, file)
-                            zipf.write(path, os.path.basename(path))
-                response = FileResponse(
-                    tmp_file.name, content_type=content_type,
-                    request=request)
-                response.content_disposition = content_disposition
-                return response
+
+def _zip_response(request, directory, filename):
+    with tempfile.NamedTemporaryFile(suffix='.zip') as tmp_file:
+        with zipfile.ZipFile(tmp_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, dirs, files in os.walk(directory):
+                for file in files:
+                    path = os.path.join(root, file)
+                    zipf.write(path, os.path.relpath(path, directory))
+        response = FileResponse(
+            tmp_file.name,
+            content_type='application/zip',
+            request=request)
+        response.content_disposition = f'attachment; filename={filename}.zip'
+        return response
+
+
+def export_single(resource, request):
+    request.resource_permission(PERM_READ)
+
+    params = dict(request.GET)
+    for p in ('srs', 'intersects_srs'):
+        if p in params:
+            params[p] = int(params[p])
+    options = ExportOptions(**params)
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        filename = f'{resource.id}.{options.driver.extension}'
+        filepath = os.path.join(tmp_dir, filename)
+
+        export(resource, options, filepath)
+
+        zipped = request.GET.get('zipped', 'true').lower() == 'true'
+        if not options.driver.single_file or zipped:
+            return _zip_response(request, tmp_dir, filename)
         else:
-            content_type = driver.mime or "application/octet-stream"
-            content_disposition = "attachment; filename=%s" % filename
             response = FileResponse(
-                os.path.join(tmp_dir, filename), content_type=content_type,
+                filepath,
+                content_type=options.driver.mime or 'application/octet-stream',
                 request=request)
-            response.content_disposition = content_disposition
+            response.content_disposition = f'attachment; filename={filename}'
             return response
+
+
+def view_geojson(resource, request):
+    options = ExportOptions(format='GeoJSON')
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        filename = f'{resource.id}.{options.driver.extension}'
+        filepath = os.path.join(tmp_dir, filename)
+
+        export(resource, options, filepath)
+
+        response = FileResponse(
+            filepath,
+            content_type=options.driver.mime or 'application/octet-stream',
+            request=request)
+        response.content_disposition = f'attachment; filename={filename}'
+        return response
+
+
+def export_multi(request):
+    if request.method == 'GET':
+        params = dict(request.GET)
+        for p in ('srs', 'intersects_srs'):
+            if p in params:
+                params[p] = int(params[p])
+
+        params_resources = list()
+        for p in params.pop('resources').split(','):
+            splitted = p.split(':')
+            param = dict(id=int(splitted[0]))
+            for i, key in enumerate(('name', ), start=1):
+                if len(splitted) <= i:
+                    break
+                param[key] = splitted[i]
+            params_resources.append(param)
+    else:
+        params = request.json_body
+        params_resources = params.pop('resources')
+    options = ExportOptions(**params)
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        for param in params_resources:
+            try:
+                resource = Resource.filter_by(id=param['id']).one()
+            except NoResultFound:
+                raise ResourceNotFound(param['id'])
+            request.resource_permission(PERM_READ, resource)
+
+            if 'name' in param:
+                name = param['name']
+                if name != os.path.basename(name):
+                    raise ValidationError(
+                        message=_("File name parameter '{}' is not valid.") % name)
+            else:
+                name = str(resource.id)
+
+            if not options.driver.single_file:
+                layer_dir = os.path.join(tmp_dir, name)
+                os.mkdir(layer_dir)
+            else:
+                layer_dir = tmp_dir
+            filepath = os.path.join(layer_dir, f'{name}.{options.driver.extension}')
+
+            export(resource, options, filepath)
+
+        return _zip_response(request, tmp_dir, 'layers')
 
 
 def mvt(request):
@@ -870,11 +946,15 @@ def setup_pyramid(comp, config):
         .add_view(view_geojson, context=IFeatureLayer, request_method='GET')
 
     config.add_view(
-        export,
+        export_single,
         route_name='resource.export',
         context=IFeatureLayer,
         request_method='GET',
     )
+
+    config.add_route(
+        'feature_layer.export', '/api/component/feature_layer/export'
+    ).add_view(export_multi, request_method=('POST', 'GET'))
 
     config.add_route(
         'feature_layer.mvt', '/api/component/feature_layer/mvt') \
