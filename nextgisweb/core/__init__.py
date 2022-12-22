@@ -137,14 +137,14 @@ class CoreComponent(
     def healthcheck(self):
         stat = os.statvfs(self.options['sdir'])
 
-        if (free_space := self.options['core.healthcheck.free_space']) > 0:
+        if (free_space := self.options['healthcheck.free_space']) > 0:
             if (free_space_current := stat.f_bavail / stat.f_blocks * 100) < free_space:
                 return OrderedDict((
                     ('success', False),
                     ('message', "%.2f%% free space left on file storage." % free_space_current),
                 ))
 
-        if (free_inodes := self.options['core.healthcheck.free_inodes']) > 0:
+        if (free_inodes := self.options['healthcheck.free_inodes']) > 0:
             if (free_inodes_current := stat.f_ffree / stat.f_files * 100) < free_inodes:
                 return OrderedDict((
                     ('success', False),
@@ -498,9 +498,9 @@ class CoreComponent(
             "Deperected, use environment component.* option instead.")),
 
         # Healthckeck
-        Option('core.healthcheck.free_space', int, default=10, doc=(
+        Option('healthcheck.free_space', float, default=10, doc=(
             "Free space check during healthcheck in percent (0 for don't check).")),
-        Option('core.healthcheck.free_inodes', int, default=10, doc=(
+        Option('healthcheck.free_inodes', float, default=10, doc=(
             "Free inodes check during healthcheck in percent (0 for don't check).")),
 
         # Locale settings
