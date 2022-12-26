@@ -1,23 +1,23 @@
 import PropTypes from "prop-types";
+
+import { useCallback, useEffect, useState, useMemo } from "react";
 import ManageSearchIcon from "@material-icons/svg/manage_search";
+
 import { Button, Form, Input, Skeleton } from "@nextgisweb/gui/antd";
 import { showResourcePicker } from "@nextgisweb/resource/resource-picker";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { useCallback, useEffect, useState, useMemo } from "react";
-
-let abortController = null;
+import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
 const SelectInput = ({ value, onChange, ...pickerOptions }) => {
+    const { makeSignal, abort } = useAbortController();
     const [resource, setResource] = useState(null);
     const [resourceLoading, setResourceLoading] = useState(null);
     const loadResource = useCallback(async () => {
         abort();
-        abortController = new AbortController();
-        setResourceLoading(true);
         try {
             const res = await route("resource.item", value).get({
                 cache: true,
-                signal: abortController.signal,
+                signal: makeSignal(),
             });
             setResource(res);
         } finally {
@@ -25,19 +25,13 @@ const SelectInput = ({ value, onChange, ...pickerOptions }) => {
         }
     }, [value]);
 
-    const abort = () => {
-        if (abortController) {
-            abortController.abort();
-        }
-        abortController = null;
-    };
-
     useEffect(() => {
         return abort;
     }, []);
+
     useEffect(() => {
         loadResource();
-    }, [value]);
+    }, [value, loadResource]);
 
     const displayName = useMemo(() => {
         return resource && resource.resource.display_name;

@@ -1,6 +1,7 @@
 import { KeynameTextBox } from "./field/KeynameTextBox";
 import { LanguageSelect } from "./field/LanguageSelect";
 import { ResourceSelect } from "./field/ResourceSelect";
+import { ResourceSelectMultiple } from "./field/ResourceSelectMultiple";
 import { TextArea } from "./field/TextArea";
 import { Password } from "./field/Password";
 import { Checkbox } from "./field/Checkbox";
@@ -15,6 +16,7 @@ import { Form } from "@nextgisweb/gui/antd";
 const useForm = Form.useForm;
 
 export {
+    ResourceSelectMultiple,
     ValidationTextBox,
     KeynameTextBox,
     LanguageSelect,

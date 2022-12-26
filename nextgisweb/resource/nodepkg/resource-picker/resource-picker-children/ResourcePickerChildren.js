@@ -16,36 +16,43 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
     const {
         selected,
         children,
-        enabledCls,
+        multiple,
         disabledIds,
+        checkEnabled,
+        moveInsideCls,
         allowSelection,
         allowMoveInside,
         childrenLoading,
     } = resourceStore;
 
-    const [selectionType] = useState("radio");
+    const [selectionType] = useState(multiple ? "" : "radio");
 
-    const getCheckboxProps = (record) => {
+    const getEnabledProps = (record, checks) => {
         const props = { disabled: false };
 
         const disableChecker = [
             {
-                useCheck: () => Array.isArray(disabledIds),
+                check: () => Array.isArray(disabledIds),
                 isDisabled: () => disabledIds.includes(record.id),
             },
-            {
-                useCheck: () => Array.isArray(enabledCls),
-                isDisabled: () => !enabledCls.includes(record.cls),
-            },
+            ...checks,
         ];
         props.disabled = disableChecker.some((check) => {
-            if (check.useCheck()) {
+            const ok = check.check ? check.check() : true;
+            if (ok) {
                 return check.isDisabled();
             }
             return true;
         });
 
         return props;
+    };
+    const getCheckboxProps = (record) => {
+        return getEnabledProps(record, [
+            {
+                isDisabled: () => !checkEnabled.call(resourceStore, record),
+            },
+        ]);
     };
 
     const rowSelection = useMemo(() => {
@@ -59,7 +66,11 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
     }, [selected]);
 
     const renderActions = (actions, record) => {
-        const { disabled } = getCheckboxProps(record);
+        const { disabled } = getEnabledProps(record, [
+            {
+                isDisabled: () => !moveInsideCls.includes(record.cls),
+            },
+        ]);
         if (disabled || !allowMoveInside) {
             return <></>;
         }
@@ -100,11 +111,16 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
                             return;
                         }
                         const existIndex = selected.indexOf(record.id);
-                        let newSelected = [record.id];
+
+                        let newSelected = multiple ? [...selected] : [];
+                        newSelected.push(record.id);
+
+                        // unselect on second click
                         if (existIndex !== -1) {
                             newSelected = [...selected];
                             newSelected.splice(existIndex, 1);
                         }
+
                         resourceStore.setSelected(newSelected);
                     },
                 };

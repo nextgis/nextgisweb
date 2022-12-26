@@ -1,14 +1,16 @@
+import { observer } from "mobx-react-lite";
+import { PropTypes } from "prop-types";
+import { useState, useRef, useEffect, useMemo } from "react";
+
 import ArrowBack from "@material-icons/svg/arrow_back";
 import CreateNewFolder from "@material-icons/svg/create_new_folder";
 import DoneIcon from "@material-icons/svg/done";
 import HighlightOff from "@material-icons/svg/highlight_off";
+
 import { Button, Col, Input, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
-import { observer } from "mobx-react-lite";
-import { PropTypes } from "prop-types";
-import { useState, useRef, useEffect } from "react";
 
 const createNewGroupMsg = i18n.gettext("Create group");
 const clearSelectionMsg = i18n.gettext("Clear selection");
@@ -76,6 +78,8 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
     const {
         selected,
         parentId,
+        multiple,
+        enabledCls,
         getThisMsg,
         disabledIds,
         getSelectedMsg,
@@ -83,9 +87,26 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
         createNewGroupLoading,
     } = resourceStore;
 
+    const pickThisGroupAllowed = useMemo(() => {
+        return enabledCls.includes("resource_group");
+    }, [enabledCls]);
+
     const onCreateClick = () => {
         resourceStore.clearSelection();
         setCreateMode(true);
+    };
+
+    // eslint-disable-next-line react/prop-types
+    const OkBtn = ({ disabled }) => {
+        return (
+            <Button
+                type="primary"
+                disabled={disabled ?? !selected.length}
+                onClick={() => onOk(multiple ? selected : selected[0])}
+            >
+                {getSelectedMsg}
+            </Button>
+        );
     };
 
     return (
@@ -113,15 +134,9 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
                                 }}
                             ></Button>
                         </Tooltip>
-                        <Button
-                            type="primary"
-                            disabled={!selected.length}
-                            onClick={() => onOk(selected[0])}
-                        >
-                            {getSelectedMsg}
-                        </Button>
+                        <OkBtn />
                     </Space>
-                ) : (
+                ) : pickThisGroupAllowed ? (
                     <Button
                         type="primary"
                         onClick={() => onOk(parentId)}
@@ -129,6 +144,8 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
                     >
                         {getThisMsg}
                     </Button>
+                ) : (
+                    <OkBtn disabled={true}></OkBtn>
                 )}
             </Col>
         </Row>

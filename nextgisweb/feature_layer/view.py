@@ -146,7 +146,24 @@ def export(request):
     )
 
 
+def export_multiple(request):
+    return dict(
+        obj=request.context,
+        title=_("Save as"),
+        props=dict(multiple=True, pick=True),
+        entrypoint="@nextgisweb/feature-layer/export-form",
+        maxheight=True
+    )
+
+
 def setup_pyramid(comp, config):
+
+    config.add_route(
+        'feature_layer.export_multiple',
+        r'/resource/export_multiple',
+        client=True
+    ).add_view(export_multiple, renderer=REACT_RENDERER)
+
     config.add_route(
         'feature_layer.feature.browse',
         r'/resource/{id:\d+}/feature/',

@@ -17,8 +17,11 @@ const DEFAULTS = {
 };
 
 export function ResourcePickerModal({
+    store,
     showCls = ["resource_group"],
     visible: initVisible,
+    multiple,
+    selected,
     onSelect,
     enabledCls = ["resource_group"],
     onNewGroup,
@@ -27,18 +30,22 @@ export function ResourcePickerModal({
     disabledIds,
     closeOnSelect = true,
     getSelectedMsg,
+    enabledInterfaces,
     ...props
 }) {
     const [visible, setVisible] = useState(initVisible ?? true);
 
-    const [resourceStore] = useState(
+    const [resourceStore] = useState(() => store ||
         new ResourcePickerStore({
             parentId: resourceId,
+            enabledInterfaces,
             getSelectedMsg,
             getThisMsg,
             disabledIds,
             enabledCls,
             onNewGroup,
+            selected,
+            multiple,
             showCls,
         })
     );
@@ -99,14 +106,18 @@ export function ResourcePickerModal({
 }
 
 ResourcePickerModal.propTypes = {
+    store: PropTypes.object,
     visible: PropTypes.bool,
     closeOnSelect: PropTypes.bool,
     disabledIds: PropTypes.arrayOf(PropTypes.number),
     enabledCls: PropTypes.array,
+    enabledInterfaces: PropTypes.array,
     getSelectedMsg: PropTypes.string,
     getThisMsg: PropTypes.string,
     onNewGroup: PropTypes.any,
     onSelect: PropTypes.func,
     resourceId: PropTypes.number,
+    selected: PropTypes.array,
     showCls: PropTypes.array,
+    multiple: PropTypes.bool,
 };
