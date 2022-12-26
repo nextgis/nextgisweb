@@ -175,7 +175,14 @@ class OAuthHelper:
                 exp=datetime.utcfromtimestamp(tdata['exp']),
                 sub=str(tdata[self.options['profile.subject.attr']]),
                 data=tdata,
-            )]).on_conflict_do_nothing().returning(OAuthToken)
+            )])
+            stmt = stmt.on_conflict_do_update(
+                index_elements=[OAuthToken.id],
+                set_=dict(
+                    exp=stmt.excluded.exp,
+                    sub=stmt.excluded.sub,
+                    data=stmt.excluded.data)
+            ).returning(OAuthToken)
             stmt = sa.select(OAuthToken).from_statement(stmt). \
                 execution_options(populate_existing=True)
 
