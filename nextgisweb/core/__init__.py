@@ -144,7 +144,10 @@ class CoreComponent(
                     ('message', "%.2f%% free space left on file storage." % free_space_current),
                 ))
 
-        if (free_inodes := self.options['healthcheck.free_inodes']) > 0:
+        if (
+            (free_inodes := self.options['healthcheck.free_inodes']) > 0
+            and stat.f_ffree >= 0  # Not available in some FS
+        ):
             if (free_inodes_current := stat.f_ffree / stat.f_files * 100) < free_inodes:
                 return OrderedDict((
                     ('success', False),
