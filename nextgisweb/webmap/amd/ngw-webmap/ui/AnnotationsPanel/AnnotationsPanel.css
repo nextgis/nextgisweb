@@ -65,3 +65,7 @@
 .annotations-panel .annotations-access-container .ann-private {
   filter: hue-rotate(160deg);
 }
+
+.annotations-panel .annotation-pane > .tableContainer-table > tbody > tr > td.tableContainer-valueCell {
+  text-align: right;
+}
