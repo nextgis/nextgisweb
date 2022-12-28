@@ -135,6 +135,11 @@ define([
                     "webmap/annotations/change/",
                     lang.hitch(this, this._onChangeAnnotation)
                 );
+                
+                topic.subscribe(
+                    "webmap/annotations/change/geometryType",
+                    lang.hitch(this, this._onChangeGeometryType)
+                );
 
                 topic.subscribe(
                     "/annotations/visible",
@@ -182,7 +187,8 @@ define([
             _onAddModeActivated: function () {
                 if (this._editable)
                     domClass.add(document.body, "annotations-edit");
-                this._editableLayer.activate(this._annotationsLayer);
+                const geometryType = this._annotationPanel.getGeometryType();
+                this._editableLayer.activate(this._annotationsLayer, geometryType);
                 this._annotationPanel.setAnnotationsShow(true);
                 this._annotationPanel.setMessagesShow(true);
             },
@@ -207,6 +213,10 @@ define([
                 this._annotationsDialog
                     .showForEdit(annFeature)
                     .then(lang.hitch(this, this._dialogResultHandle));
+            },
+            
+            _onChangeGeometryType: function (geometryType) {
+                this._editableLayer.changeGeometryType(geometryType);
             },
 
             _dialogResultHandle: function (result, dialog) {
@@ -294,9 +304,8 @@ define([
             },
 
             _createAnnotation: async function (annFeature, newAnnotationInfo) {
-                newAnnotationInfo.geom = wkt.writeGeometry(
-                    annFeature.getFeature().getGeometry()
-                );
+                const geometry = annFeature.getFeature().getGeometry();
+                newAnnotationInfo.geom = wkt.writeGeometry(geometry);
 
                 const createInfo = await route(
                     "webmap.annotation.collection",

@@ -24,6 +24,7 @@ define([
     const wkt = new ol.format.WKT();
     const defaultDescription = i18n.gettext("Your annotation text");
     const defaultStyle = {
+        
         circle: {
             radius: 5,
             stroke: { color: "#d27a00", width: 1 },
@@ -186,12 +187,15 @@ define([
             if (typeof jsonStyle === "string" || jsonStyle instanceof String) {
                 jsonStyle = json.parse(jsonStyle);
             }
+
             return new ol.style.Style({
                 image: new ol.style.Circle({
                     radius: jsonStyle.circle.radius,
                     fill: new ol.style.Fill(jsonStyle.circle.fill),
-                    stroke: new ol.style.Stroke(jsonStyle.circle.stroke),
+                    stroke: new ol.style.Stroke(jsonStyle.circle.stroke)
                 }),
+                fill: new ol.style.Fill(jsonStyle.circle.fill),
+                stroke: new ol.style.Stroke(jsonStyle.circle.stroke)
             });
         },
 

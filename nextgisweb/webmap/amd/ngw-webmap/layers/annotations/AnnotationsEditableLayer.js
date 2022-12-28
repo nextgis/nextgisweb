@@ -24,13 +24,13 @@ define([
             this._map = map;
         },
 
-        activate: function (annotationsLayer) {
+        activate: function (annotationsLayer, geometryType) {
             this._annotationsLayer = annotationsLayer;
             this._editableLayer = new Vector("", { title: "editor.overlay" });
             this._source = annotationsLayer.getSource();
             this._editableLayer.olLayer.setSource(this._source);
             this._map.addLayer(this._editableLayer);
-            this._setInteractions();
+            this._setInteractions(geometryType);
         },
 
         deactivate: function () {
@@ -39,11 +39,16 @@ define([
             this._editableLayer = null;
             this._source = null;
         },
+        
+        changeGeometryType: function (geometryType) {
+            this._offInteractions();
+            this._setInteractions(geometryType);
+        },
 
-        _setInteractions: function () {
+        _setInteractions: function (geometryType) {
             this._draw = new ol.interaction.Draw({
                 source: this._source,
-                type: "Point",
+                type: geometryType,
                 freehandCondition: function (event) {
                     return ol.events.condition.never(event);
                 },
@@ -66,6 +71,6 @@ define([
         _offInteractions: function () {
             this._map.olMap.removeInteraction(this._draw);
             this._draw = null;
-        },
+        }
     });
 });

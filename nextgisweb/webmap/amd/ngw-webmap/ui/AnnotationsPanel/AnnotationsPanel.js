@@ -11,6 +11,9 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/BorderContainer",
     "dijit/form/CheckBox",
+    "dijit/form/Select",
+    "dojo/data/ObjectStore",
+    "dojo/store/Memory",
     "@nextgisweb/pyramid/i18n!",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "ngw-webmap/ui/AnnotationsManager/AnnotationsManager",
@@ -35,6 +38,9 @@ define([
     _WidgetsInTemplateMixin,
     BorderContainer,
     CheckBox,
+    Select,
+    ObjectStore,
+    Memory,
     i18n,
     DynamicPanel,
     AnnotationsManager,
@@ -114,6 +120,11 @@ define([
             setMessagesShow: function (value) {
                 this.contentWidget.chbAnnShowMessages.set("value", value);
             },
+            
+            getGeometryType: function () {
+                return this._selGeometryType ? 
+                    this._selGeometryType.get("value") : undefined;
+            },
 
             _bindEvents: function () {
                 var deactivateAnnotationState = lang.hitch(
@@ -157,21 +168,22 @@ define([
                         "change",
                         lang.hitch(this, function (value) {
                             if (value) {
-                                this._mapStates.activateState(
-                                    ADD_ANNOTATION_STATE_KEY
-                                );
-                                topic.publish(
-                                    "webmap/annotations/add/activate"
-                                );
+                                this._mapStates.activateState(ADD_ANNOTATION_STATE_KEY);
+                                this._selGeometryType.set("disabled", false);
+                                topic.publish("webmap/annotations/add/activate");
                             } else {
-                                this._mapStates.deactivateState(
-                                    ADD_ANNOTATION_STATE_KEY
-                                );
-                                topic.publish(
-                                    "webmap/annotations/add/deactivate"
-                                );
+                                this._mapStates.deactivateState(ADD_ANNOTATION_STATE_KEY);
+                                this._selGeometryType.set("disabled", true);
+                                topic.publish("webmap/annotations/add/deactivate");
                             }
                         })
+                    );
+
+                    this._selGeometryType.on(
+                        "change",
+                        (value) => {
+                            topic.publish("webmap/annotations/change/geometryType", value);
+                        }
                     );
                 }
             },
@@ -186,6 +198,21 @@ define([
                 });
                 this.contentWidget.tcAnnotations.addChild(
                     this._chbEditAnnotations
+                );
+
+                this._selGeometryType = new Select({
+                    name: "selGeometryType",
+                    title: i18n.gettext("Geometry type"),
+                    disabled: true,
+                    options: [
+                        {value: "Point", label: i18n.gettext("Point")},
+                        {value: "LineString", label: i18n.gettext("Line")},
+                        {value: "Polygon", label: i18n.gettext("Polygon")}
+                    ]
+                });
+                this._selGeometryType.set("value", "Point");
+                this.contentWidget.tcAnnotations.addChild(
+                    this._selGeometryType
                 );
 
                 this._mapStates.addState(ADD_ANNOTATION_STATE_KEY);
