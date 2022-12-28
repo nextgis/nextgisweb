@@ -161,11 +161,11 @@ msgstr "Приватная аннотация"
 msgid "Edit annotation"
 msgstr "Редактировать аннотацию"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:86
+#: amd/ngw-webmap/plugin/FeatureLayer.js:87
 msgid "Go to"
 msgstr "Перейти"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:172
+#: amd/ngw-webmap/plugin/FeatureLayer.js:169
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -176,6 +176,10 @@ msgstr "Редактирование"
 #: amd/ngw-webmap/plugin/ZoomToLayer.js:24
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
+
+#: amd/ngw-webmap/plugin/ZoomToWebmap.js:22
+msgid "Zoom to all layers"
+msgstr "Увеличить до всех слоев"
 
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.hbs:10
 msgid "Enable layers editing"

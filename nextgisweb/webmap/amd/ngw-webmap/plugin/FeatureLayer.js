@@ -172,6 +172,7 @@ define([
                 onClick: function () {
                     plugin.openFeatureGrid();
                 },
+                order: 2
             });
 
             this.tabContainer = new TabContainer({
@@ -200,9 +201,7 @@ define([
                 this.display.layersPanel &&
                 this.display.layersPanel.contentWidget.itemMenu
             ) {
-                this.display.layersPanel.contentWidget.itemMenu.addChild(
-                    this.menuItem
-                );
+                this.addToLayersMenu();
             }
 
             this._bindEvents();

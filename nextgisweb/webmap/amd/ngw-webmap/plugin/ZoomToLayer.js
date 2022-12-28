@@ -16,7 +16,6 @@ define([
     ol
 ) {
     return declare([_PluginBase], {
-
         constructor: function () {
             var plugin = this;
 
@@ -26,7 +25,8 @@ define([
                 disabled: true,
                 onClick: function () {
                     plugin.zoomToLayer();
-                }
+                },
+                order: 4
             });
 
             this.display.watch("item", function (attr, oldVal, newVal) {
@@ -37,9 +37,7 @@ define([
         },
 
         postCreate: function () {
-            if (this.display.layersPanel && this.display.layersPanel.contentWidget.itemMenu) {
-                this.display.layersPanel.contentWidget.itemMenu.addChild(this.menuItem);
-            }
+            this.addToLayersMenu();
         },
 
         zoomToLayer: function () {

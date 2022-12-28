@@ -106,7 +106,8 @@ define([
                 onClick: function () {
                     var menuItem = this;
                     lang.hitch(plugin, plugin._onClickMenuItem(menuItem));
-                }
+                },
+                order: 3
             });
         },
 
@@ -185,9 +186,7 @@ define([
             finishConfirmDialog.on("undo", lang.hitch(this, this._undoChanges));
             finishConfirmDialog.on("continue", lang.hitch(this, this._continueEditing));
 
-            if (this.display.layersPanel.contentWidget.itemMenu) {
-                this.display.layersPanel.contentWidget.itemMenu.addChild(this.menuItem);
-            }
+            this.addToLayersMenu();
 
             this._buildVectorLayer();
             this._buildSelectInteraction();

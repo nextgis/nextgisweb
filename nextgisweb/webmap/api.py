@@ -11,7 +11,7 @@ from .model import (
 )
 from ..env import env
 from ..models import DBSession
-from ..resource import resource_factory
+from ..resource import resource_factory, DataScope
 
 
 def annotation_to_dict(obj, request, with_user_info=False):
@@ -99,6 +99,35 @@ def annotation_idelete(resource, request):
     return None
 
 
+def get_webmap_extent(resource, request):
+    request.resource_permission(WebMap.scope.webmap.display)
+
+    def add_extent(e1, e2):
+        if (not e1) or (not e2):
+            return e1 if not e2 else e2
+        return dict(
+            minLon=min(e1['minLon'], e2['minLon']),
+            maxLon=max(e1['maxLon'], e2['maxLon']),
+            minLat=min(e1['minLat'], e2['minLat']),
+            maxLat=min(e1['maxLat'], e2['maxLat']),
+        )
+
+    def traverse(item, extent):
+        if item.item_type == 'layer':
+            style = item.style
+            layer = style.parent
+            if not style.has_permission(DataScope.read, request.user):
+                return None
+            if layer.extent:
+                extent = add_extent(extent, layer.extent)
+        elif item.item_type in ('root', 'group'):
+            for i in item.children:
+                extent = traverse(i, extent)
+        return extent
+
+    return traverse(resource.root_item, None)
+
+
 def settings_get(request):
     result = dict()
     for k, default in WM_SETTINGS.items():
@@ -132,6 +161,12 @@ def setup_pyramid(comp, config):
                      '/api/component/webmap/settings') \
         .add_view(settings_get, request_method='GET', renderer='json') \
         .add_view(settings_put, request_method='PUT', renderer='json')
+
+    config.add_route(
+        'webmap.extent', r'/api/webmap/{id:\d+}/extent/',
+        factory=resource_factory
+    ) \
+        .add_view(get_webmap_extent, context=WebMap, request_method='GET', renderer='json')
 
 
 def setup_annotations(config):

@@ -38,7 +38,8 @@ define([
                 disabled: true,
                 onClick: function () {
                     plugin.openLayerInfo();
-                }
+                },
+                order: 1
             });
 
             var store = this.itemStore,
@@ -52,9 +53,7 @@ define([
         },
 
         postCreate: function () {
-            if (this.display.layersPanel && this.display.layersPanel.contentWidget.itemMenu) {
-                this.display.layersPanel.contentWidget.itemMenu.addChild(this.menuItem);
-            }
+            this.addToLayersMenu();
         },
 
         openLayerInfo: function () {
