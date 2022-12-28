@@ -8,7 +8,8 @@ Changes
 - OAuth-based automatic group assignment.
 - Geometry properties in the identification popup.
 - Display the cursor location and an extent on webmaps.
-
+- Zoom to all layers on webmaps.
+- Support for linear and polygonal annotations.
 
 4.3.1
 -----
