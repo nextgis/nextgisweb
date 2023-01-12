@@ -97,7 +97,7 @@ define([
                         aid: a.id
                     });
 
-                    put(tbody, "tr td.name a[href=$] $ < < td.size $ < td.mime_type $ < td.description $",
+                    put(tbody, "tr td.name a[href=$][target=_blank] $ < < td.size $ < td.mime_type $ < td.description $",
                         href, a.name, fileSizeToString(a.size), a.mime_type,
                         a.description === null ? "" : a.description);
 
