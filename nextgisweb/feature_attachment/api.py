@@ -1,11 +1,12 @@
 import filecmp
 import re
+from contextlib import contextmanager
 from io import BytesIO
 from itertools import count
 from shutil import copyfileobj
 from tempfile import NamedTemporaryFile
+from urllib.parse import quote_plus
 from zipfile import BadZipFile, ZIP_DEFLATED, ZipFile
-from contextlib import contextmanager
 
 from magic import from_buffer as magic_from_buffer
 from PIL import Image
@@ -47,7 +48,9 @@ def download(resource, request):
     )
 
     fn = env.file_storage.filename(obj.fileobj)
-    return FileResponse(fn, content_type=obj.mime_type, request=request)
+    response = FileResponse(fn, content_type=obj.mime_type, request=request)
+    response.content_disposition = f'filename*=utf-8\'\'{quote_plus(obj.name)}'
+    return response
 
 
 def image(resource, request):
