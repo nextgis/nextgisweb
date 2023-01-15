@@ -27,7 +27,8 @@ define([
     CheckBox,
     i18n,
     settingsWebmap,
-    template
+    template,
+    Select
 ) {
     return declare(
         [
@@ -51,12 +52,17 @@ define([
                 this.chbAnnotationEnabled = new CheckBox({
                     title: i18n.gettext("Enable annotations"),
                 });
-                this.chbAnnotationDefault = new CheckBox({
-                    title: i18n.gettext("Show annotations by default"),
+                this.selAnnotationDefault = new Select({
+                    title: i18n.gettext("Show annotations"),
+                    options: [
+                        {label: i18n.gettext("No"), value: "no"},
+                        {label: i18n.gettext("Yes"), value: "yes"},
+                        {label: i18n.gettext("With messages"), value: "messages"},
+                    ]
                 });
 
                 this.tcControls.addChild(this.chbAnnotationEnabled);
-                this.tcControls.addChild(this.chbAnnotationDefault);
+                this.tcControls.addChild(this.selAnnotationDefault);
             },
 
             serializeInMixin: function (data) {
@@ -67,12 +73,8 @@ define([
                 value.editable = this.chbEditable.get("checked");
 
                 if (settingsWebmap.annotation) {
-                    value.annotation_enabled = this.chbAnnotationEnabled.get(
-                        "checked"
-                    );
-                    value.annotation_default = this.chbAnnotationDefault.get(
-                        "checked"
-                    );
+                    value.annotation_enabled = this.chbAnnotationEnabled.get("checked");
+                    value.annotation_default = this.selAnnotationDefault.get("value");
                 }
             },
 
@@ -85,8 +87,8 @@ define([
                         "checked",
                         value.annotation_enabled
                     );
-                    this.chbAnnotationDefault.set(
-                        "checked",
+                    this.selAnnotationDefault.set(
+                        "value",
                         value.annotation_default
                     );
                 }

@@ -1,5 +1,5 @@
 import geoalchemy2 as ga
-from sqlalchemy import event, text
+from sqlalchemy import event, text, Enum
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
 
@@ -20,6 +20,8 @@ from ..resource import (
 from ..spatial_ref_sys import SRS
 
 Base = declarative_base(dependencies=('resource', ))
+
+ANNOTATIONS_DEFAULT_VALUES = ('no', 'yes', 'messages')
 
 
 class WebMapScope(Scope):
@@ -50,7 +52,7 @@ class WebMap(Base, Resource):
     extent_constrained = db.Column(db.Boolean, default=False)
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
-    annotation_default = db.Column(db.Boolean, nullable=False, default=False)
+    annotation_default = db.Column(Enum(*ANNOTATIONS_DEFAULT_VALUES, create_type=False), nullable=False, default='no')
 
     root_item = db.relationship('WebMapItem', cascade='all')
 

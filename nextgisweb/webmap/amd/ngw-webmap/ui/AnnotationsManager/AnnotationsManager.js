@@ -53,9 +53,7 @@ define([
             _annotationsDialog: null,
             _annotationPanel: null,
 
-            _annotationsVisible: null,
-            _messagesVisible: null,
-
+            _annotationsVisibleState: null,
             _editable: null,
 
             constructor: function (options) {
@@ -67,9 +65,7 @@ define([
                 this._display = options.display;
                 this._annotationPanel = options.panel;
 
-                this._annotationsVisible =
-                    this._display.config.annotations.default;
-                this._messagesVisible = this._annotationsVisible;
+                this._annotationsVisibleState = this._annotationPanel.getAnnotVisibleState();
 
                 this._annotationsDialog = new AnnotationsDialog({
                     annotationsManager: this,
@@ -89,7 +85,7 @@ define([
             },
 
             _buildStandby: function () {
-                var standby = new Standby({
+                const standby = new Standby({
                     target: "webmap-wrapper",
                     color: "#e5eef7",
                 });
@@ -110,8 +106,7 @@ define([
                 try {
                     const annotations = await this._getAnnotationsCollection();
                     this._annotationsLayer.fillAnnotations(annotations);
-                    this._onAnnotationsVisibleChange(this._annotationsVisible);
-                    this._onMessagesVisibleChange(this._messagesVisible);
+                    this._onAnnotationsVisibleChange(this._annotationsVisibleState);
                 } catch (err) {
                     new ErrorDialog(err).show();
                 }
@@ -145,10 +140,6 @@ define([
                     "/annotations/visible",
                     lang.hitch(this, this._onAnnotationsVisibleChange)
                 );
-                topic.subscribe(
-                    "/annotations/messages/visible",
-                    lang.hitch(this, this._onMessagesVisibleChange)
-                );
 
                 topic.subscribe(
                     "webmap/annotations/filter/changed",
@@ -160,24 +151,18 @@ define([
                 this._annotationsLayer.applyFilter(filter);
             },
 
-            _onAnnotationsVisibleChange: function (toShow) {
-                this._annotationsVisible = toShow;
-
-                this._annotationsLayer.getLayer().set("visibility", toShow);
-
-                if (toShow && this._messagesVisible) {
-                    this._annotationsLayer.showPopups();
-                }
-
-                if (!toShow && this._messagesVisible) {
-                    this._annotationsLayer.hidePopups();
-                }
-            },
-
-            _onMessagesVisibleChange: function (toShow) {
-                this._messagesVisible = toShow;
-
-                if (toShow) {
+            /**
+             * Handle visibility of annotations layer and its messages
+             * @param annotVisibleState - 'no', 'yes', 'messages'
+             * @private
+             */
+            _onAnnotationsVisibleChange: function (annotVisibleState) {
+                this._annotationsVisibleState = annotVisibleState;
+                
+                const annotVisible = annotVisibleState === 'yes' || annotVisibleState === 'messages';
+                this._annotationsLayer.getLayer().set("visibility", annotVisible);
+                
+                if (this._isMessagesVisible()) {
                     this._annotationsLayer.showPopups();
                 } else {
                     this._annotationsLayer.hidePopups();
@@ -189,8 +174,7 @@ define([
                     domClass.add(document.body, "annotations-edit");
                 const geometryType = this._annotationPanel.getGeometryType();
                 this._editableLayer.activate(this._annotationsLayer, geometryType);
-                this._annotationPanel.setAnnotationsShow(true);
-                this._annotationPanel.setMessagesShow(true);
+                this._annotationPanel.setAnnotationsShow('messages');
             },
 
             _onAddModeDeactivated: function () {
@@ -217,6 +201,10 @@ define([
             
             _onChangeGeometryType: function (geometryType) {
                 this._editableLayer.changeGeometryType(geometryType);
+            },
+            
+            _isMessagesVisible: function () {
+                return this._annotationsVisibleState === 'messages';
             },
 
             _dialogResultHandle: function (result, dialog) {
@@ -261,8 +249,9 @@ define([
                         newAnnotationInfo
                     );
                     annFeature.updateAnnotationInfo(annotationInfo);
-                    if (this._messagesVisible)
+                    if (this._isMessagesVisible()) {
                         this._annotationsLayer.showPopup(annFeature);
+                    }
                     this._annotationsLayer.redrawFilter();
                 } catch (err) {
                     new ErrorDialog(err).show();
