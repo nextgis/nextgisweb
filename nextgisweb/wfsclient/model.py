@@ -285,7 +285,8 @@ class WFSConnection(Base, Resource):
         root = etree.parse(BytesIO(body)).getroot()
 
         features = []
-        count = int(root.attrib['numberMatched'])
+        n_matched = root.attrib['numberMatched']
+        count = None if n_matched == 'unknown' else int(n_matched)
 
         if not get_count:
             _members = find_tags(root, 'member')
@@ -580,6 +581,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             @property
             def total_count(self):
+                if count is None:
+                    raise ExternalServiceError(
+                        message="Couldn't determine feature count in the current request.")
                 return count
 
         return QueryFeatureSet()
