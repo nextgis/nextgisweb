@@ -13,6 +13,7 @@ __all__ = [
 
 
 class FIELD_TYPE_WFS:
+    INT = 'int'
     INTEGER = 'integer'
     LONG = 'long'
     DOUBLE = 'double'
