@@ -10,12 +10,12 @@ from sqlalchemy.engine.url import URL as EngineURL, make_url as make_engine_url
 
 from ...auth import User
 from ...env import env
-from ...feature_layer import GEOM_TYPE
+from ...feature_layer import GEOM_TYPE, GEOM_TYPE_OGR_2_GEOM_TYPE
 from ...lib.ogrhelper import FIELD_GETTER
 from ...models import DBSession
 from ...spatial_ref_sys import SRS
 from ...vector_layer.model import (
-    _GEOM_OGR_2_TYPE, _GEOM_TYPE_2_DB,
+    _GEOM_TYPE_2_DB,
     _FIELD_TYPE_2_ENUM, _FIELD_TYPE_2_DB)
 
 from .. import PostgisConnection, PostgisLayer
@@ -46,7 +46,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
     columns = [sa.Column(column_id, sa.Integer, primary_key=True)]
 
     column_geom = 'the_geom'
-    geom_type = _GEOM_OGR_2_TYPE[ogrlayer.GetGeomType()]
+    geom_type = GEOM_TYPE_OGR_2_GEOM_TYPE[ogrlayer.GetGeomType()]
     dimension = 3 if geom_type in GEOM_TYPE.has_z else 2
     geometry_type_db = _GEOM_TYPE_2_DB[geom_type]
     osr_ = ogrlayer.GetSpatialRef()

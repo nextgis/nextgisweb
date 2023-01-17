@@ -9,6 +9,7 @@ from .model import (
 from .interface import (
     GEOM_TYPE,
     GEOM_TYPE_OGR,
+    GEOM_TYPE_OGR_2_GEOM_TYPE,
     FIELD_TYPE,
     FIELD_TYPE_OGR,
     IFeatureLayer,
@@ -36,6 +37,7 @@ __all__ = [
     'LayerFieldsMixin',
     'GEOM_TYPE',
     'GEOM_TYPE_OGR',
+    'GEOM_TYPE_OGR_2_GEOM_TYPE',
     'FIELD_FORBIDDEN_NAME',
     'FIELD_TYPE',
     'FIELD_TYPE_OGR',

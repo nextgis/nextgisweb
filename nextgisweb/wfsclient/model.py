@@ -19,6 +19,7 @@ from ..feature_layer import (
     FeatureSet,
     FIELD_TYPE,
     GEOM_TYPE,
+    GEOM_TYPE_OGR_2_GEOM_TYPE,
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
@@ -432,7 +433,8 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         if self.geometry_type is None:
             example_feature = features[0]
-            self.geometry_type = example_feature.geom.geom_type.upper()
+            self.geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[
+                example_feature.geom.ogr.GetGeometryType()]
 
     # IFeatureLayer
 

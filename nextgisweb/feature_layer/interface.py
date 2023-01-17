@@ -65,6 +65,9 @@ class GEOM_TYPE:
     )
 
 
+GEOM_TYPE_OGR_2_GEOM_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum))
+
+
 class FIELD_TYPE:
     INTEGER = 'INTEGER'
     BIGINT = 'BIGINT'

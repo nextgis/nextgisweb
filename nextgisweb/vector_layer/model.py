@@ -43,6 +43,7 @@ from ..feature_layer import (
     LayerFieldsMixin,
     GEOM_TYPE,
     GEOM_TYPE_OGR,
+    GEOM_TYPE_OGR_2_GEOM_TYPE,
     FIELD_FORBIDDEN_NAME,
     FIELD_TYPE,
     FIELD_TYPE_OGR,
@@ -104,7 +105,6 @@ STRING_CAST_TYPES = (
     ogr.OFTStringList,
 )
 
-_GEOM_OGR_2_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum))
 _GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
 
 _FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
@@ -280,7 +280,7 @@ class TableInfo:
 
                 if gtype not in GEOM_TYPE_OGR:
                     return False
-                geometry_type = _GEOM_OGR_2_TYPE[gtype]
+                geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype]
 
                 if geom_cast_params['geometry_type'] == TOGGLE.AUTO:
                     if geometry_type in GEOM_TYPE.points:
@@ -310,8 +310,8 @@ class TableInfo:
 
         if len(geom_filter) == 1:
             self.geometry_type = geom_filter.pop()
-        elif ltype in GEOM_TYPE_OGR and _GEOM_OGR_2_TYPE[ltype] in geom_filter:
-            self.geometry_type = _GEOM_OGR_2_TYPE[ltype]
+        elif ltype in GEOM_TYPE_OGR and GEOM_TYPE_OGR_2_GEOM_TYPE[ltype] in geom_filter:
+            self.geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[ltype]
         elif len(geom_filter) > 1:
 
             # Can't determine single geometry type, need exploration
@@ -733,11 +733,11 @@ class TableInfo:
                 continue
             elif not any((
                 (self.geometry_type in GEOM_TYPE.points
-                    and _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.points),
+                    and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.points),
                 (self.geometry_type in GEOM_TYPE.linestrings
-                    and _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.linestrings),
+                    and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.linestrings),
                 (self.geometry_type in GEOM_TYPE.polygons
-                    and _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.polygons),
+                    and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.polygons),
             )):
                 if not skip_other_geometry_types:
                     errors.append(_(
@@ -779,9 +779,9 @@ class TableInfo:
                 geom.Set3D(False)
 
             # Points can't have validity errors.
-            is_single = _GEOM_OGR_2_TYPE[gtype] not in GEOM_TYPE.is_multi
-            is_point = _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.points
-            is_polygon = _GEOM_OGR_2_TYPE[gtype] in GEOM_TYPE.polygons
+            is_single = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] not in GEOM_TYPE.is_multi
+            is_point = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.points
+            is_polygon = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.polygons
 
             if not is_point and not geom.IsValid():
                 # Close rings for polygons: GDAL doesn't provide a method for
