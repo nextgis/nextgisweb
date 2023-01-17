@@ -102,10 +102,11 @@ def get_srid(value):
 
 
 def fid_int(fid, layer_name):
-    m = re.search(r'^%s\.(\d+)$' % layer_name, fid)
+    # Check pattern 'layer_name_without_namespace.FID' and return FID
+    m = re.search(r'^(.*:)?%s\.(\d+)$' % re.sub('^.*:', '', layer_name), fid)
     if m is None:
         raise ValidationError("Feature ID encoding is not supported")
-    return int(m.group(1))
+    return int(m.group(2))
 
 
 def fid_str(fid, layer_name):
@@ -155,14 +156,12 @@ class WFSConnection(Base, Resource):
             raise ExternalServiceError()
 
         if response.status_code == 200:
-            return response.content
+            return etree.parse(BytesIO(response.content)).getroot()
         else:
             raise ExternalServiceError()
 
     def get_capabilities(self):
-        body = self.request_wfs('GET', params=dict(REQUEST='GetCapabilities'))
-
-        root = etree.parse(BytesIO(body)).getroot()
+        root = self.request_wfs('GET', params=dict(REQUEST='GetCapabilities'))
 
         layers = []
         for el in find_tags(root, 'FeatureType'):
@@ -180,10 +179,8 @@ class WFSConnection(Base, Resource):
         return dict(layers=layers)
 
     def get_fields(self, layer_name):
-        body = self.request_wfs('GET', params=dict(
+        root = self.request_wfs('GET', params=dict(
             request='DescribeFeatureType', typeNames=layer_name))
-
-        root = etree.parse(BytesIO(body)).getroot()
         cplx = find_tags(root, 'complexType')[0]
 
         fields = []
@@ -281,9 +278,7 @@ class WFSConnection(Base, Resource):
         if srs is not None:
             req_root.attrib['srsName'] = 'EPSG:%d' % srs
 
-        body = self.request_wfs('POST', xml_root=req_root)
-
-        root = etree.parse(BytesIO(body)).getroot()
+        root = self.request_wfs('POST', xml_root=req_root)
 
         features = []
         n_matched = root.attrib['numberMatched']
