@@ -200,25 +200,31 @@ class WFSConnection(Base, Resource):
 
     def get_feature(self, layer, fid=None, filter_=None, intersects=None, propertyname=None,
                     get_count=False, limit=None, offset=None, srs=None, add_box=False):
-        req_root = etree.Element('GetFeature')
+        NS_WFS = 'http://www.opengis.net/wfs/2.0'
+        NS_FES = 'http://www.opengis.net/fes/2.0'
 
-        __query = etree.Element('Query', dict(typeNames=layer.layer_name))
+        req_root = etree.Element(etree.QName(NS_WFS, 'GetFeature'), nsmap=dict(
+            wfs=NS_WFS, fes=NS_FES))
+
+        __query = etree.Element(etree.QName(NS_WFS, 'Query'), dict(typeNames=layer.layer_name))
         req_root.append(__query)
 
         # Filter {
-        __filter = etree.Element('Filter')
+        __filter = etree.Element(etree.QName(NS_FES, 'Filter'))
 
         if fid is not None:
-            __rid = etree.Element('ResourceId', dict(rid=fid_str(fid, layer.layer_name)))
+            __rid = etree.Element(
+                etree.QName(NS_FES, 'ResourceId'),
+                dict(rid=fid_str(fid, layer.layer_name)))
             __filter.append(__rid)
 
         if filter_ is not None:
-            __and = etree.Element('And')
+            __and = etree.Element(etree.QName(NS_FES, 'And'))
             for k, o, v in filter_:
                 if o not in COMPARISON_OPERATORS.keys():
                     raise ValidationError("Operator '%s' is not supported." % o)
-                __op = etree.Element(COMPARISON_OPERATORS[o])
-                __value_reference = etree.Element('ValueReference')
+                __op = etree.Element(etree.QName(NS_FES, COMPARISON_OPERATORS[o]))
+                __value_reference = etree.Element(etree.QName(NS_FES, 'ValueReference'))
                 __value_reference.text = k
                 __op.append(__value_reference)
                 if o == 'isnull':
@@ -230,15 +236,15 @@ class WFSConnection(Base, Resource):
                     else:
                         raise ValueError("Invalid value '%s' for operator '%s'." % (v, o))
                 else:
-                    __literal = etree.Element('Literal')
+                    __literal = etree.Element(etree.QName(NS_FES, 'Literal'))
                     __literal.text = str(v)
                     __op.append(__literal)
                 __and.append(__op)
             __filter.append(__and)
 
         if intersects is not None:
-            __intersects = etree.Element('Intersects')
-            __value_reference = etree.Element('ValueReference')
+            __intersects = etree.Element(etree.QName(NS_FES, 'Intersects'))
+            __value_reference = etree.Element(etree.QName(NS_FES, 'ValueReference'))
             __value_reference.text = layer.column_geom
             __intersects.append(__value_reference)
             if intersects.srid is not None:
@@ -263,7 +269,7 @@ class WFSConnection(Base, Resource):
 
         if propertyname is not None:
             for p in propertyname:
-                __p = etree.Element('PropertyName')
+                __p = etree.Element(etree.QName(NS_WFS, 'PropertyName'))
                 __p.text = p
                 __query.append(__p)
 
