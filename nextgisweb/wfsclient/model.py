@@ -279,7 +279,7 @@ class WFSConnection(Base, Resource):
         if limit is not None:
             req_root.attrib['count'] = str(limit)
             if offset is not None:
-                req_root.attrib['startindex'] = str(offset)
+                req_root.attrib['startIndex'] = str(offset)
 
         if srs is not None:
             req_root.attrib['srsName'] = 'EPSG:%d' % srs
