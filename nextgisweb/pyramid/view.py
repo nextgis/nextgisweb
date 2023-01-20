@@ -414,7 +414,9 @@ def setup_pyramid(comp, config):
     # Filter for quick translation. Defines function tr, which we can use
     # instead of request.localizer.translate in mako templates.
     def tr_subscriber(event):
-        event['tr'] = event['request'].localizer.translate
+        def _tr(msg):
+            return event['request'].localizer.translate(msg)
+        event['tr'] = _tr
     config.add_subscriber(tr_subscriber, BeforeRender)
 
     # OTHERS
