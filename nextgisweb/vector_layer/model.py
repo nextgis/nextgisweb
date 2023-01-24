@@ -198,6 +198,9 @@ class TableInfo:
         self.srs = srs
         self.metadata = None
         self.table = None
+        self.id_column = None
+        self.geom_column = None
+        self.field_column = None
         self.model = None
         self.fid_field_index = None
         self.fmap = None
@@ -633,6 +636,12 @@ class TableInfo:
         self.metadata = metadata
         self.sequence = sequence
         self.table = table
+        self.id_column = table.c.id
+        self.geom_column = table.c.geom
+        self.field_column = {
+            fld.keyname: getattr(table.c, fld.key)
+            for fld in self.fields
+        }
         self.model = model
         self.fmap = {fld.keyname: fld.key for fld in self.fields}
 
