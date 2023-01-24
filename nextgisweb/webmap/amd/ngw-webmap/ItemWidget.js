@@ -323,7 +323,7 @@ define([
                             "item_type": "layer",
                             "display_name": itm.display_name,
                             "layer_style_id": itm.id,
-                            "layer_enabled": false,
+                            "layer_enabled": true,
                             "layer_identifiable": true,
                             "layer_transparency": null,
                             "layer_min_scale_denom": null,
