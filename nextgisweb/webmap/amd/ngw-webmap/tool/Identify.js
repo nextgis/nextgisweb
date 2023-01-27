@@ -279,7 +279,11 @@ define([
 
                 });
 
-                topic.publish("feature.highlight", {geom: feature.geom, feature: feature});
+                topic.publish("feature.highlight", {
+                    geom: feature.geom, 
+                    featureId: feature.id, 
+                    layerId: lid
+                });
             });
         },
         _displayCoordinates: function(){

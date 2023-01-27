@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 
 import { Button, Empty, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
@@ -38,6 +38,7 @@ export const FeatureGrid = ({
     beforeDelete,
     size = "middle",
     readonly = true,
+    cleanSelectedOnFilter = true,
 }) => {
     const { data: totalData, refresh: refreshTotal } = useRouteGet(
         "feature_layer.feature.count",
@@ -48,33 +49,42 @@ export const FeatureGrid = ({
     const { data: resourceData } = useRouteGet("resource.item", { id });
 
     const [query, setQuery] = useState("");
-    const [selected, setSelected] = useState([]);
+    const [selected, setSelected_] = useState(() => []);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
-    useEffect(() => {
-        if (onSelect) {
-            onSelect(selected.map((s) => s[KEY_FIELD_KEYNAME]));
-        }
-    }, [selected, onSelect]);
+    const setSelected = useCallback(
+        (val) => {
+            setSelected_((old) => {
+                let newVal = val;
+                if (typeof val === "function") {
+                    newVal = val(old);
+                }
+                if (onSelect) {
+                    onSelect(
+                        newVal.map((s) => s[KEY_FIELD_KEYNAME]),
+                        old
+                    );
+                }
+                if (!old && !newVal) {
+                    return old;
+                }
+                return newVal;
+            });
+        },
+        [onSelect]
+    );
 
     useEffect(() => {
         if (selectedIds) {
-            setSelected((old) => {
-                if (!old.length && !selectedIds.length) {
-                    return old;
-                }
-                return selectedIds.map((s) => {
-                    return { [KEY_FIELD_KEYNAME]: s };
-                });
-            });
+            setSelected(selectedIds.map((s) => ({ [KEY_FIELD_KEYNAME]: s })));
         }
-    }, [selectedIds]);
+    }, [selectedIds, setSelected]);
 
     useEffect(() => {
         if (q !== undefined) {
             setQuery(q);
         }
-    }, [q])
+    }, [q]);
 
     const fields = useMemo(() => {
         if (resourceData) {
@@ -210,6 +220,7 @@ export const FeatureGrid = ({
                     setSelected,
                     settingsOpen,
                     setSettingsOpen,
+                    cleanSelectedOnFilter
                 }}
             />
         </div>
@@ -219,6 +230,7 @@ export const FeatureGrid = ({
 FeatureGrid.propTypes = {
     actions: PropTypes.arrayOf(PropTypes.object),
     selectedIds: PropTypes.arrayOf(PropTypes.number),
+    cleanSelectedOnFilter: PropTypes.bool,
     beforeDelete: PropTypes.func,
     query: PropTypes.string,
     deleteError: PropTypes.func,

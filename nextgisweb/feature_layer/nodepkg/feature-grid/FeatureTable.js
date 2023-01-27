@@ -33,6 +33,7 @@ const FeatureTable = ({
     setSelected,
     settingsOpen,
     setSettingsOpen,
+    cleanSelectedOnFilter = true,
 }) => {
     const tbodyRef = useRef(null);
     const theadRef = useRef(null);
@@ -108,8 +109,10 @@ const FeatureTable = ({
     });
 
     useEffect(() => {
-        setSelected([]);
-    }, [query, setSelected]);
+        if (cleanSelectedOnFilter) {
+            setSelected([]);
+        }
+    }, [query, cleanSelectedOnFilter, setSelected]);
 
     const scrollBarSize = useMemo(() => scrollbarWidth(), []);
 
@@ -357,6 +360,7 @@ FeatureTable.propTypes = {
     resourceId: PropTypes.number,
     selected: PropTypes.arrayOf(PropTypes.object),
     setSelected: PropTypes.func,
+    cleanSelectedOnFilter: PropTypes.bool,
     setSettingsOpen: PropTypes.func,
     settingsOpen: PropTypes.bool,
     total: PropTypes.number,

@@ -3,14 +3,14 @@ import { route as apiRoute } from "../api";
 
 const loadingCounterReducer = (state, action) => {
     switch (action) {
-    case "increment":
-        return { count: state.count + 1 };
-    case "decrement":
-        return { count: state.count - 1 };
-    case "reset":
-        return { count: 0 };
-    default:
-        throw new Error();
+        case "increment":
+            return { count: state.count + 1 };
+        case "decrement":
+            return { count: state.count - 1 };
+        case "reset":
+            return { count: 0 };
+        default:
+            throw new Error();
     }
 };
 

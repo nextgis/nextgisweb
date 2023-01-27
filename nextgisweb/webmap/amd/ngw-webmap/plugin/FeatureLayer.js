@@ -32,8 +32,6 @@ define([
         gutters: false,
         iconClass: "iconTable",
         selectedId: undefined,
-        featureHighlightedEvent: null,
-        featureUnhighlightedEvent: null,
         topicHandlers: [],
 
         postCreate: function () {
@@ -47,12 +45,33 @@ define([
 
             var display = widget.plugin.display;
 
+            var safePublish = function (name, data) {
+                widget.unsubscribe();
+                topic.publish(name, data);
+                widget.subscribe();
+            };
+
+            var highlightedFeatures =
+                display.featureHighlighter.getHighlighted();
+            var selectedIds = [];
+            for (var i = 0; i < highlightedFeatures.length; i++) {
+                var f = highlightedFeatures[i];
+                if (f.getProperties) {
+                    var props = f.getProperties();
+                    if (props.layerId === widget.layerId) {
+                        selectedIds.push(props.featureId);
+                    }
+                }
+            }
+
             var component = reactApp.default(
                 FeatureGrid.default,
                 {
                     id: this.layerId,
                     readonly: data.readonly,
                     size: "small",
+                    cleanSelectedOnFilter: false,
+                    selectedIds: selectedIds,
                     onDelete: function () {
                         if (display) {
                             var layer = display._layers[widget.layerId];
@@ -74,12 +93,20 @@ define([
                                     handleAs: "json",
                                 }
                             ).then(function (feature) {
-                                topic.publish("feature.highlight", {
+                                safePublish("feature.highlight", {
                                     geom: feature.geom,
+                                    featureId: feature.id,
+                                    layerId: widget.layerId,
                                 });
                             });
                         } else {
-                            topic.publish("feature.unhighlight");
+                            safePublish("feature.unhighlight", function (f) {
+                                if (f && f.getProperties) {
+                                    var props = f.getProperties();
+                                    return props.layerId === widget.layerId;
+                                }
+                                return true;
+                            });
                         }
                     },
                     actions: [
@@ -98,26 +125,46 @@ define([
                 this.domNode
             );
 
-            this.featureHighlightedEvent = function (e) {
-                if (e.feature) {
-                    component.update({ selectedIds: [e.feature.id] });
-                }
-            };
-            this.featureUnhighlightedEvent = function () {
-                component.update({ selectedIds: [] });
-            };
+            this.subscribe();
 
+            this.component = component;
+        },
+
+        featureUnhighlightedEvent: function () {
+            this.component.update({ selectedIds: [] });
+        },
+
+        featureHighlightedEvent: function (e) {
+            if (e.featureId !== undefined) {
+                if (e.layerId === this.layerId) {
+                    this.component.update({ selectedIds: [e.featureId] });
+                } else {
+                    this.featureUnhighlightedEvent();
+                }
+            }
+        },
+
+        subscribe: function () {
+            this.unsubscribe();
             this.topicHandlers.push(
-                topic.subscribe("feature.highlight", this.featureHighlightedEvent)
+                topic.subscribe(
+                    "feature.highlight",
+                    this.featureHighlightedEvent.bind(this)
+                )
             );
             this.topicHandlers.push(
                 topic.subscribe(
                     "feature.unhighlight",
-                    this.featureUnhighlightedEvent
+                    this.featureUnhighlightedEvent.bind(this)
                 )
             );
+        },
 
-            this.component = component;
+        unsubscribe: function () {
+            for (var i = 0; i < this.topicHandlers.length; i++) {
+                this.topicHandlers[i].remove();
+            }
+            this.topicHandlers = [];
         },
 
         destroy: function () {
@@ -125,10 +172,7 @@ define([
                 this.component.unmount();
             }
             this.component = null;
-            for (var i = 0; i < this.topicHandlers.length; i++) {
-                this.topicHandlers[i].remove();
-            }
-            this.topicHandlers = [];
+            this.unsubscribe();
         },
 
         updateSearch: function () {

@@ -68,17 +68,31 @@ define([
             } else if (e.olGeometry) {
                 geometry = e.olGeometry;
             }
-
             feature = new ol.Feature({
-                geometry: geometry
+                geometry: geometry,
+                layerId: e.layerId,
+                featureId: e.featureId
             });
             this._source.addFeature(feature);
 
             return feature;
         },
 
-        _unhighlightFeature: function () {
-            this._source.clear();
+        _unhighlightFeature: function (filter) {
+            if (filter) {
+                var features = this._source.getFeatures()
+                for (var i = 0; i < features.length; i++) {
+                    if (filter(features[i])) {
+                        this._source.removeFeature(features[i])
+                    }
+                }
+            } else {
+                this._source.clear();
+            }
+        },
+
+        getHighlighted: function () {
+            return this._source.getFeatures()
         },
 
         highlightFeatureById: function (featureId, layerId) {
@@ -89,7 +103,7 @@ define([
                 method: 'GET',
                 handleAs: 'json'
             }).then(lang.hitch(this, function (feature) {
-                feature = this._highlightFeature({geom: feature.geom});
+                feature = this._highlightFeature({geom: feature.geom, featureId: featureId, layerId: layerId});
                 highlightedDeferred.resolve(feature);
             }));
 
