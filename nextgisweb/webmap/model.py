@@ -52,7 +52,7 @@ class WebMap(Base, Resource):
     extent_constrained = db.Column(db.Boolean, default=False)
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
-    annotation_default = db.Column(Enum(*ANNOTATIONS_DEFAULT_VALUES, create_type=False), nullable=False, default='no')
+    annotation_default = db.Column(db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default='no')
 
     root_item = db.relationship('WebMapItem', cascade='all')
 
