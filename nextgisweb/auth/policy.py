@@ -142,7 +142,9 @@ class SecurityPolicy:
                 if sk in session:
                     del session[sk]
             else:
-                session[sk] = getattr(tresp, k)
+                v = getattr(tresp, k)
+                assert v is not None, f"{k} must be defined"
+                session[sk] = v
 
         return ()
 
