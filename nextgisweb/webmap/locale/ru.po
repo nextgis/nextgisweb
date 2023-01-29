@@ -193,9 +193,25 @@ msgstr "Настройки"
 msgid "Enable annotations"
 msgstr "Разрешить аннотирование"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:55
-msgid "Show annotations by default"
-msgstr "Показывать аннотации по умолчанию"
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:56
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:16
+msgid "Show annotations"
+msgstr "Показывать аннотации"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:58
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:17
+msgid "No"
+msgstr "Да"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:59
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:18
+msgid "Yes"
+msgstr "Нет"
+
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:60
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:19
+msgid "With messages"
+msgstr "С сообщениями"
 
 #: amd/ngw-webmap/template/Display.hbs:13
 msgid "Map"
