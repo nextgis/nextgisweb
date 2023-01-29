@@ -11,15 +11,13 @@
              data-dojo-type="dojox/layout/TableContainer"
              data-dojo-props="cols: 1, labelWidth: 200">
 
-            <div data-dojo-attach-point="chbAnnotationsShow"
-                 data-dojo-type="dijit/form/CheckBox"
-                 title="{{gettext 'Show annotations layer'}}">
-            </div>
-
-            <div data-dojo-attach-point="chbAnnShowMessages"
-                 data-dojo-type="dijit/form/CheckBox"
-                 title="{{gettext 'Show messages'}}">
-            </div>
+            <select data-dojo-attach-point="selAnnotationsShow"
+                 data-dojo-type="dijit/form/Select"
+                 title="{{gettext 'Show annotations'}}">
+                <option value="no">{{gettext 'No'}}</option>
+                <option value="yes">{{gettext 'Yes'}}</option>
+                <option value="messages">{{gettext 'With messages'}}</option>
+            </select>
         </div>
 
         <h5 data-dojo-attach-point="headerAccessAnnotations"

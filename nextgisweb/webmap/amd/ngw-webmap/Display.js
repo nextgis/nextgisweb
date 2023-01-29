@@ -535,6 +535,13 @@ define([
                 icon: 'material-message',
                 value: 'annotationPanel'
             });
+
+            const annotUrlParam = this._urlParams.annot;
+            let annotVisibleState;
+            if (annotUrlParam && (annotUrlParam === "no" || annotUrlParam === "yes"
+                || annotUrlParam === "messages")) {
+                annotVisibleState = annotUrlParam;
+            }
         
             var buildAnnotationsPanel = function (widget) {
                 widget.annotationPanel = new AnnotationsPanel({
@@ -544,7 +551,8 @@ define([
                     isOpen: widget.activeLeftPanel === 'annotationPanel',
                     gutters: false,
                     withCloser: true,
-                    display: widget
+                    display: widget,
+                    annotVisibleState
                 });
             
                 if (widget.activeLeftPanel === 'annotationPanel')

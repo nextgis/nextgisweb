@@ -93,45 +93,32 @@ define([
             },
 
             _setDefaultValues: function () {
-                const showAnnLayer = this._display.config.annotations.default;
-
-                this.contentWidget.chbAnnotationsShow.set(
-                    "value",
-                    showAnnLayer
-                );
-                this.contentWidget.chbAnnShowMessages.set(
-                    "value",
-                    showAnnLayer
-                );
-
-                if (!showAnnLayer) {
-                    this.contentWidget.chbAnnShowMessages.set("disabled", true);
-                }
-
+                const showAnnLayer = this.annotVisibleState || this._display.config.annotations.default;
+                this.contentWidget.selAnnotationsShow.set("value", showAnnLayer);
                 this.contentWidget.chbShowAnnTypes.set("value", true);
                 this.contentWidget.chbShowPublicAnn.set("value", true);
                 this.contentWidget.chbShowOwnPrivateAnn.set("value", true);
             },
 
-            setAnnotationsShow: function (value) {
-                this.contentWidget.chbAnnotationsShow.set("value", value);
-            },
-
-            setMessagesShow: function (value) {
-                this.contentWidget.chbAnnShowMessages.set("value", value);
+            setAnnotationsShow: function (mode) {
+                this.contentWidget.selAnnotationsShow.set("value", mode);
             },
             
             getGeometryType: function () {
                 return this._selGeometryType ? 
                     this._selGeometryType.get("value") : undefined;
             },
+            
+            getAnnotVisibleState: function () {
+                return this.contentWidget.selAnnotationsShow.get("value");
+            },
 
             _bindEvents: function () {
-                var deactivateAnnotationState = lang.hitch(
+                const deactivateAnnotationState = lang.hitch(
                     this,
-                    function (value) {
+                    function (mode) {
                         if (
-                            !value &&
+                            mode === 'no' &&
                             this._enableEdit &&
                             this._mapStates.getActiveState() ===
                                 ADD_ANNOTATION_STATE_KEY
@@ -142,25 +129,12 @@ define([
                     }
                 );
 
-                this.contentWidget.chbAnnotationsShow.on(
+                this.contentWidget.selAnnotationsShow.on(
                     "change",
-                    lang.hitch(this, function (value) {
-                        this._filter
-                        topic.publish("/annotations/visible", value);
-                        this.contentWidget.chbAnnShowMessages.set(
-                            "disabled",
-                            !value
-                        );
-                        deactivateAnnotationState(value);
+                    lang.hitch(this, function (mode) {
+                        topic.publish("/annotations/visible", mode);
+                        deactivateAnnotationState(mode);
                     })
-                );
-
-                this.contentWidget.chbAnnShowMessages.on(
-                    "change",
-                    function (value) {
-                        topic.publish("/annotations/messages/visible", value);
-                        deactivateAnnotationState(value);
-                    }
                 );
 
                 if (this._chbEditAnnotations && this._enableEdit) {

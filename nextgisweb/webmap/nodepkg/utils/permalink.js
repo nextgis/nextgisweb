@@ -8,6 +8,11 @@ export const getPermalink = (display, visibleItems, options) => {
     const center = options.center ? options.center :
         toLonLat(display.map.olMap.getView().getCenter());
 
+    let annot;
+    if (display && display.annotationPanel) {
+        annot = display.annotationPanel.getAnnotVisibleState();
+    }
+
     let params = {
         base: display._baseLayer.name,
         lon: center[0].toFixed(4),
@@ -16,6 +21,10 @@ export const getPermalink = (display, visibleItems, options) => {
         zoom: display.map.olMap.getView().getZoom(),
         styles: visibleStyles.join(",")
     };
+
+    if (annot) {
+        params = {...params, ...{annot}};
+    }
 
     if (options.additionalParams) {
         params = {...params, ...options.additionalParams};
