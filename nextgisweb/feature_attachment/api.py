@@ -341,7 +341,7 @@ def import_attachment(resource, request):
                         feature_id=src['feature_id'],
                         name=src['name'],
                         mime_type=src['mime_type'],
-                        descrition=src['description'],
+                        description=src['description'],
                         size=src['info'].file_size,
                     ).persist()
                     obj.fileobj = fileobj.persist()
