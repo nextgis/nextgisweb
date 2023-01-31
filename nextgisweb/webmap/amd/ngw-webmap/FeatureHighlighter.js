@@ -91,6 +91,32 @@ define([
             }
         },
 
+        /**
+         * Add highlited layer to the map
+         * @param {Polygon} e.geom - polygonal geometry
+         * @param {int} [e.layerId] - resource id by which layer highlited
+         * @param {int} [e.featureId] - feature id by which layer highlited
+         */
+        highlightFeature: function (e) {
+            this._highlightFeature(e)
+        },
+
+        /**
+         * Callback for filtering features.
+         *
+         * @callback filterFeatures
+         * @param {ol.Feature} feature - An integer.
+         * @return {boolean} - is feature satisfy filter
+        */
+ 
+        /**
+         * Remove highligh layer from the map
+         * @param {filterFeatures} [filter] - callback for filtering features to be removed from the map
+         */
+        unhighlightFeature: function (filter) {
+            this._unhighlightFeature(filter)
+        },
+
         getHighlighted: function () {
             return this._source.getFeatures()
         },

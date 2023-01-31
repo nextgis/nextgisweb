@@ -31,7 +31,7 @@ define([
         closable: true,
         gutters: false,
         iconClass: "iconTable",
-        selectedId: undefined,
+        selectedIds: [],
         topicHandlers: [],
 
         postCreate: function () {
@@ -45,21 +45,15 @@ define([
 
             var display = widget.plugin.display;
 
-            var safePublish = function (name, data) {
-                widget.unsubscribe();
-                topic.publish(name, data);
-                widget.subscribe();
-            };
-
             var highlightedFeatures =
                 display.featureHighlighter.getHighlighted();
-            var selectedIds = [];
+            widget.selectedIds = [];
             for (var i = 0; i < highlightedFeatures.length; i++) {
                 var f = highlightedFeatures[i];
                 if (f.getProperties) {
                     var props = f.getProperties();
                     if (props.layerId === widget.layerId) {
-                        selectedIds.push(props.featureId);
+                        widget.selectedIds.push(props.featureId);
                     }
                 }
             }
@@ -71,7 +65,7 @@ define([
                     readonly: data.readonly,
                     size: "small",
                     cleanSelectedOnFilter: false,
-                    selectedIds: selectedIds,
+                    selectedIds: widget.selectedIds,
                     onDelete: function () {
                         if (display) {
                             var layer = display._layers[widget.layerId];
@@ -81,8 +75,8 @@ define([
                         }
                     },
                     onSelect: function (newVal) {
-                        var fid = Array.isArray(newVal) ? newVal[0] : newVal;
-                        widget.selectedId = fid;
+                        widget.selectedIds = newVal;
+                        var fid = newVal[0];
                         if (fid !== undefined) {
                             xhr.get(
                                 route.feature_layer.feature.item({
@@ -93,20 +87,22 @@ define([
                                     handleAs: "json",
                                 }
                             ).then(function (feature) {
-                                safePublish("feature.highlight", {
+                                display.featureHighlighter.highlightFeature({
                                     geom: feature.geom,
                                     featureId: feature.id,
                                     layerId: widget.layerId,
                                 });
                             });
                         } else {
-                            safePublish("feature.unhighlight", function (f) {
-                                if (f && f.getProperties) {
-                                    var props = f.getProperties();
-                                    return props.layerId === widget.layerId;
+                            display.featureHighlighter.unhighlightFeature(
+                                function (f) {
+                                    if (f && f.getProperties) {
+                                        var props = f.getProperties();
+                                        return props.layerId === widget.layerId;
+                                    }
+                                    return true;
                                 }
-                                return true;
-                            });
+                            );
                         }
                     },
                     actions: [
@@ -185,23 +181,24 @@ define([
             var display = this.plugin.display;
             var wkt = new ol.format.WKT();
 
-            var selectedId = this.selectedId;
-
-            xhr.get(
-                route.feature_layer.feature.item({
-                    id: this.layerId,
-                    fid: selectedId,
-                }),
-                {
-                    handleAs: "json",
-                }
-            ).then(function (feature) {
-                var geometry = wkt.readGeometry(feature.geom);
-                display.map.zoomToFeature(
-                    new ol.Feature({ geometry: geometry })
-                );
-                display.tabContainer.selectChild(display.mainPane);
-            });
+            var fid = this.selectedIds[0];
+            if (fid !== undefined) {
+                xhr.get(
+                    route.feature_layer.feature.item({
+                        id: this.layerId,
+                        fid: fid,
+                    }),
+                    {
+                        handleAs: "json",
+                    }
+                ).then(function (feature) {
+                    var geometry = wkt.readGeometry(feature.geom);
+                    display.map.zoomToFeature(
+                        new ol.Feature({ geometry: geometry })
+                    );
+                    display.tabContainer.selectChild(display.mainPane);
+                });
+            }
         },
     });
 
@@ -216,7 +213,7 @@ define([
                 onClick: function () {
                     plugin.openFeatureGrid();
                 },
-                order: 2
+                order: 2,
             });
 
             this.tabContainer = new TabContainer({
