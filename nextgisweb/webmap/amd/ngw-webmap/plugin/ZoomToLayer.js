@@ -2,7 +2,6 @@ define([
     "dojo/_base/declare",
     "./_PluginBase",
     "dojo/request/xhr",
-    "dijit/MenuItem",
     "ngw/route",
     "@nextgisweb/pyramid/i18n!",
     "openlayers/ol"
@@ -10,34 +9,23 @@ define([
     declare,
     _PluginBase,
     xhr,
-    MenuItem,
     route,
     i18n,
     ol
 ) {
     return declare([_PluginBase], {
-        constructor: function () {
-            var plugin = this;
-
-            this.menuItem = new MenuItem({
-                label: i18n.gettext("Zoom to layer"),
-                iconClass: "iconShapeSquare",
-                disabled: true,
-                onClick: function () {
-                    plugin.zoomToLayer();
-                },
-                order: 4
-            });
-
-            this.display.watch("item", function (attr, oldVal, newVal) {
-                var itemConfig = plugin.display.get("itemConfig");
-                plugin.menuItem.set("disabled", !(itemConfig.type == "layer" &&
-                    itemConfig.plugin[plugin.identity]));
-            });
+        
+        getPluginState: function (nodeData) {
+            const {type} = nodeData;
+            return {
+                enabled: type === "layer" &&
+                    nodeData.plugin[this.identity],
+            };
         },
-
-        postCreate: function () {
-            this.addToLayersMenu();
+        
+        run: function () {
+            this.zoomToLayer();
+            return Promise.resolve(undefined);
         },
 
         zoomToLayer: function () {

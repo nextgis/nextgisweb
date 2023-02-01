@@ -502,6 +502,7 @@ define([
                 function () {
                     widget._toolsSetup();
                     widget._pluginsSetup();
+                    widget._buildLayersTree();
                     widget._identifyFeatureByAttrValue();
                 }
             ).then(undefined, function (err) { console.error(err); });
@@ -996,7 +997,7 @@ define([
             this._setActivePanelURL();
         },
 
-        _layersPanelSetup: function(){
+        _layersPanelSetup: function() {
             var widget = this,
                 itemStore = this.itemStore;
 
@@ -1010,56 +1011,6 @@ define([
                         gutters: false,
                         withCloser: true
                     });
-
-                    const handleCheckChanged = (checkChanged) => {
-                        const {checked, unchecked} = checkChanged;
-                        checked.forEach(i => {
-                            itemStore.fetchItemByIdentity({
-                                identity: i,
-                                onItem: (item) => {
-                                    itemStore.setValue(item, "checked", true);
-                                }
-                            });
-                        });
-                        unchecked.forEach(i => {
-                            itemStore.fetchItemByIdentity({
-                                identity: i,
-                                onItem: (item) => {
-                                    itemStore.setValue(item, "checked", false);
-                                }
-                            });
-                        });
-                    };
-
-                    const handleSelect = (selectedKeys) => {
-                        if (selectedKeys.length === 0 || selectedKeys.length < 1) {
-                            return;
-                        }
-
-                        const itemId = selectedKeys[0];
-                        itemStore.fetchItemByIdentity({
-                            identity: itemId,
-                            onItem: (item) => {
-                                widget.set(
-                                    "itemConfig",
-                                    widget._itemConfigById[itemId]
-                                );
-                                widget.set("item", item);
-                            }
-                        });
-                    };
-
-                    const {expanded, checked} = widget.config.itemsStates;
-                    reactApp.default(
-                        LayersTreeComp.default,
-                        {
-                            webMapItems: widget.config.rootItem.children ?? [],
-                            expanded, checked,
-                            onCheckChanged: handleCheckChanged,
-                            onSelect: handleSelect
-                        },
-                        widget.layersPanel.contentWidget.layerTreePane.domNode
-                    );
 
                     if (widget.activeLeftPanel === "layersPanel")
                         widget.activatePanel(widget.layersPanel);
@@ -1090,6 +1041,63 @@ define([
                     if (widget._urlParams.base) { widget.layersPanel.contentWidget.basemapSelect.set("value", widget._urlParams.base); }
                 }
             ).then(undefined, function (err) { console.error(err); });
+        },
+
+        _buildLayersTree: function () {
+            const widget = this;
+            const itemStore = this.itemStore;
+
+            const handleCheckChanged = (checkChanged) => {
+                const {checked, unchecked} = checkChanged;
+                checked.forEach(i => {
+                    itemStore.fetchItemByIdentity({
+                        identity: i,
+                        onItem: (item) => {
+                            itemStore.setValue(item, "checked", true);
+                        }
+                    });
+                });
+                unchecked.forEach(i => {
+                    itemStore.fetchItemByIdentity({
+                        identity: i,
+                        onItem: (item) => {
+                            itemStore.setValue(item, "checked", false);
+                        }
+                    });
+                });
+            };
+
+            const handleSelect = (selectedKeys) => {
+                if (selectedKeys.length === 0 || selectedKeys.length < 1) {
+                    return;
+                }
+
+                const itemId = selectedKeys[0];
+                itemStore.fetchItemByIdentity({
+                    identity: itemId,
+                    onItem: (item) => {
+                        widget.set(
+                            "itemConfig",
+                            widget._itemConfigById[itemId]
+                        );
+                        widget.set("item", item);
+                    }
+                });
+            };
+
+            const {expanded, checked} = widget.config.itemsStates;
+            reactApp.default(
+                LayersTreeComp.default,
+                {
+                    webMapItems: widget.config.rootItem.children ?? [],
+                    expanded, 
+                    checked,
+                    onCheckChanged: handleCheckChanged,
+                    onSelect: handleSelect,
+                    getWebmapPlugins: () => widget._plugins
+                },
+                widget.layersPanel.contentWidget.layerTreePane.domNode
+            );
         },
 
         getVisibleItems: function () {

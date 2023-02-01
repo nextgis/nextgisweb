@@ -1,4 +1,12 @@
 .ngw-webmap-layers-tree {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+
+    .ant-tree-treenode-motion {
+        width: 100%;
+    }
+
     .ant-tree-treenode {
         width: 100%;
         padding-bottom: 2px;
@@ -11,16 +19,49 @@
             margin-right: 2px;
         }
 
-        .ant-tree-iconEle {
-            width: 18px;
-        }
-
         .ant-tree-node-content-wrapper {
-            flex-grow: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            display: flex;
+            flex-flow: row wrap;
+            flex-wrap: nowrap;
+            align-content: flex-start;
+            align-items: center;
+            gap: 2px;
+            width: 100%;
             padding-left: 2px;
+            overflow: hidden;
+
+            .ant-tree-iconEle {
+                width: 16px;
+                height: 16px;
+                display: flex;
+                align-items: center;
+            }
+
+            .ant-tree-title {
+                display: flex;
+                flex-direction: row;
+                min-width: 0;
+                width: 100%;
+
+                .title {
+                    flex: 1;
+                    min-width: 0;
+                    padding: 0;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
         }
+    }
+}
+
+.tree-item-menu {
+    .ant-dropdown-menu-title-content {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 5px;
+        align-items: baseline;
     }
 }

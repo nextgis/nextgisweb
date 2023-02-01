@@ -3,15 +3,11 @@ define([
     "./_PluginBase",
     "dojo/dom-construct",
     "dijit/layout/ContentPane",
-    "dijit/MenuItem",
-    "@nextgisweb/pyramid/i18n!",
 ], function (
     declare,
     _PluginBase,
     domConstruct,
     ContentPane,
-    MenuItem,
-    i18n
 ) {
     var Pane = declare([ContentPane], {
         closable: true,
@@ -28,32 +24,16 @@ define([
     });
 
     return declare([_PluginBase], {
-
-        constructor: function () {
-            var plugin = this;
-
-            this.menuItem = new MenuItem({
-                label: i18n.gettext("Description"),
-                iconClass: "iconDescription",
-                disabled: true,
-                onClick: function () {
-                    plugin.openLayerInfo();
-                },
-                order: 1
-            });
-
-            var store = this.itemStore,
-                menuItem = this.menuItem;
-
-            this.display.watch("item", function (attr, oldVal, newVal) {
-                var type = store.getValue(newVal, "type");
-                menuItem.set("disabled", type !== "layer");
-            });
-
+        getPluginState: function (nodeData) {
+            const {type} = nodeData;
+            return {
+                enabled: type === "layer",
+            };
         },
-
-        postCreate: function () {
-            this.addToLayersMenu();
+        
+        run: function () {
+            this.openLayerInfo();
+            return Promise.resolve(undefined);
         },
 
         openLayerInfo: function () {

@@ -11,7 +11,6 @@ define([
     "dojo/dom-style",
     "dojo/promise/all",
     "dojox/lang/functional/object",
-    "dijit/CheckedMenuItem",
     "dijit/ConfirmDialog",
     "dojox/widget/Standby",
     "openlayers/ol",
@@ -38,7 +37,6 @@ define([
     domStyle,
     all,
     fnObject,
-    CheckedMenuItem,
     ConfirmDialog,
     Standby,
     ol,
@@ -84,7 +82,6 @@ define([
             this.store = new Memory();
             this.source = new ol.source.Vector();
 
-            this.menuItem = this._buildMenuItem();
             this._bindTreeItem();
 
             this.display._mapAddControls([
@@ -96,36 +93,62 @@ define([
             this.elEditToolbar = query('.edit-toolbar')[0];
             this._buildEditingControls();
         },
+        
+        postCreate: function () {
+            if (this._disabled || this.display.tiny) {
+                return;
+            }
 
-        _buildMenuItem: function () {
-            var plugin = this;
+            finishConfirmDialog.on("save", lang.hitch(this, this._saveChanges));
+            finishConfirmDialog.on("undo", lang.hitch(this, this._undoChanges));
+            finishConfirmDialog.on("continue", lang.hitch(this, this._continueEditing));
 
-            return new CheckedMenuItem({
-                label: i18n.gettext("Editing"),
-                disabled: true,
-                onClick: function () {
-                    var menuItem = this;
-                    lang.hitch(plugin, plugin._onClickMenuItem(menuItem));
-                },
-                order: 3
-            });
+            this._buildVectorLayer();
+            this._buildSelectInteraction();
+            this._buildStandby();
         },
 
-        _onClickMenuItem: function (menuItem) {
-            var _selectedResourceId = this._selectedResourceId,
-                editingItem = this._getEditingItem(_selectedResourceId),
-                isBeginEditing = menuItem.checked;
-
-            if (isBeginEditing) {
-                editingItem = this._buildEditingItem(menuItem, _selectedResourceId);
-                this.editingItem = editingItem;
-                this._showEditingControls();
-                this._setDefaultEditMode();
+        getPluginState: function (nodeData) {
+            const {type} = nodeData;
+            return {
+                enabled: type === "layer" &&
+                    nodeData.plugin[this.identity] &&
+                    nodeData.plugin[this.identity].writable,
+                active: nodeData.editable && 
+                    nodeData.editable === true
+            };
+        },
+        
+        resolve: undefined,
+        run: function (nodeData) {
+            if (nodeData.editable) {
+                return new Promise((resolve) => {
+                    this.resolve = resolve;
+                    this._stopEditing();
+                });
             } else {
-                editingItem.checked = menuItem.checked;
-                this.editingItem = editingItem;
-                finishConfirmDialog.show();
+                nodeData.editable = true;
+                this._startEditing(nodeData);
             }
+            return Promise.resolve(undefined);
+        },
+
+        _resolveRun: function () {
+            if (this.resolve) {
+                this.resolve(true);
+                this.resolve = undefined;
+            }
+        },
+        
+        _startEditing: function (nodeData) {
+            this.editingItem = this._buildEditingItem(nodeData);
+            this._showEditingControls();
+            this._setDefaultEditMode();
+        },
+        
+        _stopEditing: function () {
+            this.editingItem = this._getEditingItem(this._selectedResourceId);
+            finishConfirmDialog.show();
         },
 
         _getEditingItem: function (resourceId) {
@@ -142,7 +165,6 @@ define([
                 editingItem;
 
             this._selectedResourceId = itemConfig.layerId;
-
             if (isPreviousEditing) this.mapStates.activateDefaultState();
 
             var isResourceSupportEditing = itemConfig.type === "layer" &&
@@ -150,47 +172,18 @@ define([
                 itemConfig.plugin[this.identity].writable;
 
             if (!isResourceSupportEditing) {
-                this._setMenuItemAsUneditable();
                 this._hideEditingControls();
                 this.editingItem = undefined;
                 return true;
             }
 
             this.editingItem = this._getEditingItem(this._selectedResourceId);
-            this._setMenuItemFromEditingItem(this.editingItem);
-
             if (this.editingItem) {
                 this._showEditingControls();
                 this._setEditingMode(this._lastEditingState);
             } else {
                 this._hideEditingControls();
             }
-        },
-
-        _setMenuItemAsUneditable: function () {
-            this.menuItem.set("disabled", true);
-            this.menuItem.set("checked", false);
-        },
-
-        _setMenuItemFromEditingItem: function (editingItem) {
-            this.menuItem.set("disabled", false);
-            this.menuItem.set("checked", editingItem !== undefined);
-        },
-
-        postCreate: function () {
-            if (this._disabled || this.display.tiny) {
-                return;
-            }
-
-            finishConfirmDialog.on("save", lang.hitch(this, this._saveChanges));
-            finishConfirmDialog.on("undo", lang.hitch(this, this._undoChanges));
-            finishConfirmDialog.on("continue", lang.hitch(this, this._continueEditing));
-
-            this.addToLayersMenu();
-
-            this._buildVectorLayer();
-            this._buildSelectInteraction();
-            this._buildStandby();
         },
 
         _buildVectorLayer: function () {
@@ -239,16 +232,17 @@ define([
             this._standby = standby;
         },
 
-        _buildEditingItem: function (menuItem, _selectedResourceId) {
-            var editingItem = {
-                id: _selectedResourceId,
-                checked: menuItem.checked,
+        _buildEditingItem: function (nodeData) {
+            const selectedResourceId = this._selectedResourceId;
+            const editingItem = {
+                id: selectedResourceId,
+                nodeData: nodeData,
                 interactions: {},
                 features: new ol.Collection(),
                 featuresDeleted: []
             };
 
-            this._fetchVectorData(_selectedResourceId, editingItem);
+            this._fetchVectorData(editingItem);
             this._buildEditingItemInteractions(editingItem);
             this.store.put(editingItem);
 
@@ -344,14 +338,12 @@ define([
             });
         },
 
-        _fetchVectorData: function (resourceId, editingItem) {
-            this._disableEditingMenuItem();
-
+        _fetchVectorData: function (editingItem) {
+            const resourceId = editingItem.id;
             xhr.get(route.feature_layer.feature.collection({id: resourceId}), {
                 handleAs: "json"
             }).then(lang.hitch(this, function (featuresInfo) {
                 this._handleFetchedVectorData(resourceId, featuresInfo, editingItem);
-                this._enableEditingMenuItem();
             }));
         },
 
@@ -368,14 +360,6 @@ define([
 
             editingItem.features.extend(olFeatures);
             this.source.addFeatures(olFeatures);
-        },
-
-        _disableEditingMenuItem: function () {
-            this.menuItem.set("disabled", true);
-        },
-
-        _enableEditingMenuItem: function () {
-            this.menuItem.set("disabled", false);
         },
 
         _buildEditingControls: function () {
@@ -489,6 +473,7 @@ define([
         _undoChanges: function () {
             this._deactivateEditingControls();
             this._removeCurrentEditingItem();
+            this._resolveRun();
         },
 
         _saveChanges: function () {
@@ -505,6 +490,7 @@ define([
                 this.display._layers[this.display.item.id].reload();
                 topic.publish('/webmap/feature-table/refresh', this._selectedResourceId);
                 this._standby.hide();
+                this._resolveRun();
             }));
         },
 
@@ -584,15 +570,13 @@ define([
             });
 
             this.store.remove(this._selectedResourceId);
-
-
-
+            this.editingItem.nodeData.editable = false;
             this.editingItem = undefined;
         },
 
         _continueEditing: function () {
-            this.editingItem.checked = true;
-            this.menuItem.set("checked", true);
+            this.editingItem.nodeData.editable = true;
+            this._resolveRun();
         }
     });
 });
