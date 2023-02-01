@@ -70,8 +70,7 @@ define([
         constructor: function () {
             if (this.display.tiny) return;
 
-            var webmapEditable = this.display.config.webmapEditable;
-            
+            const webmapEditable = this.display.config.webmapEditable;
             if (webmapEditable) {
                 this._disabled = false;
             } else {
@@ -111,7 +110,8 @@ define([
         getPluginState: function (nodeData) {
             const {type} = nodeData;
             return {
-                enabled: type === "layer" &&
+                enabled: !this._disabled && 
+                    type === "layer" &&
                     nodeData.plugin[this.identity] &&
                     nodeData.plugin[this.identity].writable,
                 active: nodeData.editable && 
