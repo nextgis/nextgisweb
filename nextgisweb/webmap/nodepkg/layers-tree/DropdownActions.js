@@ -35,7 +35,7 @@ const makeMenuItemByPlugin = (keyPlugin, pluginInfo) => {
     if (keyPlugin === PLUGINS.LayerEditor) {
         const {active} = pluginInfo;
         const title = active ?
-            i18n.gettext("Stop edit") :
+            i18n.gettext("Stop editing") :
             i18n.gettext("Edit");
         return {
             key: keyPlugin,
