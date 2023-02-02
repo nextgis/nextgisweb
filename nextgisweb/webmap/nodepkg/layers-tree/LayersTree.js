@@ -84,6 +84,8 @@ export function LayersTree({
 
     return <Tree
         className="ngw-webmap-layers-tree"
+        virtual={false}
+        motion={false}
         checkable
         showIcon
         onExpand={onExpand}
