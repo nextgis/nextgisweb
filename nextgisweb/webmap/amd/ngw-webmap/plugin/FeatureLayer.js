@@ -212,7 +212,7 @@ define([
         getPluginState: function (nodeData) {
             const {type, plugin} = nodeData;
             return {
-                enabled: type === "layer" && plugin[plugin.identity],
+                enabled: type === "layer" && plugin[this.identity],
             };
         },
         
