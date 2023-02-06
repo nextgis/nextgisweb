@@ -21,7 +21,8 @@ from .serialize import (
     SerializedResourceRelationship)
 from .util import _
 
-from .events import *    # NOQA
+from .command import *      # NOQA
+from .events import *       # NOQA
 from .exception import *    # NOQA
 from .interface import *    # NOQA
 from .model import *        # NOQA
