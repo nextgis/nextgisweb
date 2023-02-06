@@ -51,6 +51,22 @@
                     overflow: hidden;
                     text-overflow: ellipsis;
                 }
+
+                .more {
+                    text-align: center;
+
+                    @supports (-moz-appearance:none) {
+                        &, & svg {
+                            width: 32px;
+                        }
+                    }
+
+                    @media only screen and (hover: none) and (pointer: coarse) {
+                        &, & svg {
+                            width: 32px;
+                        }
+                    }
+                }
             }
         }
     }
