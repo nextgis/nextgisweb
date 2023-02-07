@@ -69,16 +69,14 @@ export function LayersTree({
         const {title} = nodeData;
         return <>
             <span className="title">{title}</span>
-            <span className="more">
-                <DropdownActions
-                    nodeData={nodeData}
-                    getWebmapPlugins={getWebmapPlugins}
-                    setMoreClickId={setMoreClickId}
-                    moreClickId={moreClickId}
-                    update={update}
-                    setUpdate={setUpdate}
-                />
-            </span>
+            <DropdownActions
+                nodeData={nodeData}
+                getWebmapPlugins={getWebmapPlugins}
+                setMoreClickId={setMoreClickId}
+                moreClickId={moreClickId}
+                update={update}
+                setUpdate={setUpdate}
+            />
         </>;
     };
 

@@ -1,4 +1,4 @@
-import {Dropdown} from "@nextgisweb/gui/antd";
+import {Dropdown, Button} from "@nextgisweb/gui/antd";
 import DescriptionIcon from "@material-icons/svg/description/outline";
 import ListAltIcon from "@material-icons/svg/list_alt/baseline";
 import AspectRationIcon from "@material-icons/svg/aspect_ratio/baseline";
@@ -78,9 +78,12 @@ export function DropdownActions({
         return <></>;
     }
     if (moreClickId === undefined || moreClickId !== id) {
-        return <MoreVertIcon onClick={() => {
-            setMoreClickId(id);
-        }}/>;
+        return <span className="more"
+                    onClick={() => {
+                        setMoreClickId(id);
+                    }}>
+            <MoreVertIcon/>
+        </span>;
     }
 
     const menuItems = [];
@@ -127,7 +130,7 @@ export function DropdownActions({
                      destroyPopupOnHide
                      open
                      placement="bottomRight">
-        <MoreVertIcon/>
+        <span className="more"><MoreVertIcon/></span>
     </Dropdown>;
 }
 
