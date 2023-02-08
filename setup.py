@@ -140,7 +140,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    python_requires=">=3.8.*, <4",
+    python_requires=">=3.8,<4",
     install_requires=requires,
     extras_require=extras_require,
     entry_points=entry_points,
