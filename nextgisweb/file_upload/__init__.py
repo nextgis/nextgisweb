@@ -1,6 +1,5 @@
 import os
-import os.path
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from shutil import rmtree
 
 from ulid import ULID
@@ -76,21 +75,24 @@ class FileUploadComponent(Component):
         self.cleanup()
 
     def cleanup(self):
+        if not os.path.exists(self.path):
+            logger.info("Upload directory not exists.")
+            return
+
         logger.info("Cleaning up file uploads...")
-        path = self.path
 
         deleted_files = deleted_bytes = 0
         kept_files = kept_bytes = 0
 
         date_keep = datetime.utcnow().date() - timedelta(days=1)
 
-        for dirpath in os.listdir(path):
+        for dirpath in os.listdir(self.path):
             try:
                 date_dir = datetime.strptime(dirpath, date_format).date()
             except ValueError:
                 logger.warning(f"Unknown folder {dirpath}, skipping...")
                 continue
-            abspath = os.path.join(path, dirpath)
+            abspath = os.path.join(self.path, dirpath)
             files, bytes_ = stat_dir(abspath)
 
             if date_dir < date_keep:
