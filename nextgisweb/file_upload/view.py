@@ -1,13 +1,16 @@
-from ..pyramid import viewargs
+from ..gui import REACT_RENDERER
+from .util import _
 
 
-@viewargs(renderer='nextgisweb:file_upload/template/test.mako')
 def test(request):
-    return dict(title="Страница тестирования загрузки файлов")
+    return dict(
+        title=_("File Upload testing page"),
+        entrypoint="@nextgisweb/file-upload/test",
+    )
 
 
 def setup_pyramid(comp, config):
     config.add_route(
         'file_upload.test',
         '/test/file_upload'
-    ).add_view(test)
+    ).add_view(test, renderer=REACT_RENDERER)

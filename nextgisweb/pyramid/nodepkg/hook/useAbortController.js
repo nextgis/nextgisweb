@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export function useAbortController() {
-    const [controllers, setControllers] = useState([]);
+    const controllers = useRef([]);
 
     const makeSignal = () => {
         const abortController = new AbortController();
-        setControllers((old) => [...old, abortController]);
+        controllers.current = [...controllers.current, abortController];
         return abortController.signal;
     };
 
     const abort = () => {
-        for (const a of controllers) {
+        for (const a of controllers.current) {
             a.abort();
         }
-        setControllers([]);
+        controllers.current = [];
     };
 
     useEffect(() => {

@@ -13,7 +13,7 @@ export function FieldsForm(props) {
         form,
         ...formProps
     } = props;
-    const form_ = form || Form.useForm()[0];
+    const form_ = Form.useForm(form)[0];
 
     const isValid = async () => {
         return form_.getFieldsError().every((e) => {

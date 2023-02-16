@@ -8,7 +8,9 @@ import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
 
 const defaultMessages = {
-    saveSuccess: i18n.gettext("Logo saved. Reload the page to get them applied."),
+    saveSuccess: i18n.gettext(
+        "Logo saved. Reload the page to get them applied."
+    ),
 };
 
 export function ModelLogoForm({ model, messages = {}, accept }) {
@@ -17,7 +19,7 @@ export function ModelLogoForm({ model, messages = {}, accept }) {
 
     const msg = { ...defaultMessages, ...messages };
 
-    useEffect(async () => {
+    const initLogo = async () => {
         try {
             const resp = await fetch(routeURL(model));
             if (resp.ok) {
@@ -31,6 +33,10 @@ export function ModelLogoForm({ model, messages = {}, accept }) {
         } finally {
             setStatus(null);
         }
+    };
+
+    useEffect(() => {
+        initLogo();
     }, []);
 
     const save = async () => {
@@ -47,7 +53,7 @@ export function ModelLogoForm({ model, messages = {}, accept }) {
         }
     };
 
-    if (status == "loading") {
+    if (status === "loading") {
         return <LoadingWrapper />;
     }
 

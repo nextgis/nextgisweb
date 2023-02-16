@@ -1,147 +1,76 @@
 import "./ImageUploader.less";
-import CancelIcon from "@material-icons/svg/cancel";
-import DeleteIcon from "@material-icons/svg/delete";
-import { InboxOutlined } from "@ant-design/icons";
-import { useFileUploader } from "../hook/useFileUploader";
-import { message, Upload, Button } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!file_upload";
+
 import { PropTypes } from "prop-types";
+
 import { useState, useEffect } from "react";
 
-const { Dragger } = Upload;
+import DeleteIcon from "@material-icons/svg/delete";
+import { Button } from "@nextgisweb/gui/antd";
+import i18n from "@nextgisweb/pyramid/i18n!file_upload";
+
+import { FileUploader } from "../file-uploader";
+import { FileUploaderType } from "../type/FileUploaderType";
 
 const UPLOAD_TEXT = `${i18n.gettext("Select an image")}`;
-const DND_TEXT = i18n.gettext("or drag and drop here");
 
-export function ImageUploader({
-    helpText,
-    uploadText = UPLOAD_TEXT,
-    dragAndDropText = DND_TEXT,
-    onChange,
-    showProgressInDocTitle = true,
-    accept,
-    image,
-    inputProps = {},
-}) {
-    const [fileUploader, abortFileUpload] = useFileUploader();
-    const [progressText, setProgressText] = useState(null);
-    const [imageMeta, setImageMeta] = useState(null);
-    const [docTitle] = useState(document.title);
+export function ImageUploader({ inputProps, file, image, ...rest }) {
     const [backgroundImage, setBackgroundImage] = useState(null);
+    const [chosenFile, setChosenFile] = useState();
+    const [fileMeta, setFileMeta] = useState();
 
-    useEffect(() => {
-        if (image) {
-            readImage(image);
-        }
-    }, []);
+    const inputPropsOnChange = inputProps?.onChange;
 
-    useEffect(() => {
-        if (onChange) {
-            onChange(imageMeta);
-        }
-    }, [imageMeta]);
+    // for backward compatibility
+    file = file ?? image;
+    const props = {
+        file,
+        height: "220px",
+        fileMeta,
+        uploadText: UPLOAD_TEXT,
+        setFileMeta,
+        inputProps: {
+            name: "image",
+            onChange: (info) => {
+                if (info) {
+                    const { status } = info.file;
+                    if (status === "done") {
+                        setChosenFile([info.file.originFileObj]);
+                    }
+                    if (inputPropsOnChange) {
+                        inputPropsOnChange(info);
+                    }
+                }
+            },
+            ...inputProps,
+        },
+        ...rest,
+    };
 
-    const readImage = (file) => {
+    const clean = () => {
+        setFileMeta(null);
+        setBackgroundImage(null);
+    };
+
+    const readImage = (file_) => {
+        const f = Array.isArray(file_) ? file_[0] : file_
         const reader = new FileReader();
         reader.onloadend = () => {
             setBackgroundImage(`url(${reader.result})`);
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(f);
     };
 
-    const abort = () => {
-        abortFileUpload();
-    };
-
-    const clean = () => {
-        setImageMeta(null);
-        setBackgroundImage(null);
-    };
-
-    const onProgress = (evt) => {
-        if (evt.type === "progress") {
-            setProgressText(evt.percent + i18n.gettext(" uploaded..."));
-            if (showProgressInDocTitle) {
-                document.title = evt.percent + " | " + docTitle;
-            }
+    useEffect(() => {
+        if (file) {
+            readImage(file);
         }
-    };
+    }, []);
 
-    const upload = async (files) => {
-        try {
-            const uploadedImages = await fileUploader({
-                files,
-                onProgress,
-            });
-            const uploadedImage = uploadedImages && uploadedImages[0];
-            if (uploadedImage) {
-                setImageMeta(uploadedImage);
-                readImage(files[0]);
-            }
-        } catch (er) {
-            console.log(er);
-        } finally {
-            setProgressText(null);
+    useEffect(() => {
+        if (chosenFile && fileMeta) {
+            readImage(chosenFile);
         }
-    };
-
-    const props = {
-        name: "image",
-        multiple: false,
-        showUploadList: false,
-        onChange(info) {
-            const { status } = info.file;
-            if (status === "done") {
-                upload([info.file.originFileObj]);
-            } else if (status === "error") {
-                message.error(`${info.file.name} file upload failed.`);
-            }
-        },
-    };
-
-    const height = "220px";
-
-    const DragInput = () => {
-        const InputText = () => (
-            <>
-                <p className="ant-upload-text">
-                    {[uploadText, dragAndDropText].filter(Boolean).join(" ")}
-                </p>
-                {helpText ? <p className="ant-upload-hint">{helpText}</p> : ""}
-            </>
-        );
-
-        const ProgressText = () => (
-            <div>
-                <span>
-                    <p className="ant-upload-text">{progressText}</p>
-                </span>
-                <span>
-                    <Button
-                        shape="round"
-                        icon={<CancelIcon />}
-                        onClick={abort}
-                    >
-                        {i18n.gettext("Stop")}
-                    </Button>
-                </span>
-            </div>
-        );
-        return (
-            <Dragger
-                {...props}
-                height={height}
-                disabled={progressText !== null}
-                accept={accept}
-                {...inputProps}
-            >
-                <p className="ant-upload-drag-icon">
-                    <InboxOutlined />
-                </p>
-                {progressText !== null ? <ProgressText /> : <InputText />}
-            </Dragger>
-        );
-    };
+    }, [chosenFile, fileMeta]);
 
     const Preview = () => {
         return (
@@ -149,7 +78,7 @@ export function ImageUploader({
                 <div
                     className="uploader__dropzone"
                     style={{
-                        height: height,
+                        height: props.height,
                         backgroundImage: backgroundImage,
                         width: "100%",
                         position: "relative",
@@ -174,16 +103,15 @@ export function ImageUploader({
         );
     };
 
-    return <>{backgroundImage ? <Preview /> : DragInput()}</>;
+    return <>{backgroundImage ? <Preview /> : <FileUploader {...props} />}</>;
 }
 
 ImageUploader.propTypes = {
-    helpText: PropTypes.string,
-    uploadText: PropTypes.string,
-    dragAndDropText: PropTypes.string,
-    showProgressInDocTitle: PropTypes.bool,
-    onChange: PropTypes.func,
+    /**
+     * @deprecated - use file instead
+     */
     image: PropTypes.object,
-    inputProps: PropTypes.object,
-    accept: PropTypes.string,
+    file: PropTypes.object,
+    height: PropTypes.string,
+    ...FileUploaderType,
 };

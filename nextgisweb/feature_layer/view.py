@@ -10,7 +10,6 @@ from ..resource import (
     DataScope,
     resource_factory,
     Widget)
-from ..gui import REACT_RENDERER
 from ..pyramid import viewargs
 from .. import dynmenu as dm
 

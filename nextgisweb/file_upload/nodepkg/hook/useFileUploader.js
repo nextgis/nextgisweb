@@ -1,28 +1,14 @@
-import { useState, useEffect } from "react";
 import { fileUploader } from "@nextgisweb/file-upload";
+import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
 export function useFileUploader() {
-    const [abortController, setAbortControl] = useState();
+    const { makeSignal, abort } = useAbortController();
 
-    useEffect(() => {
-        return () => {
+    return {
+        upload: (options) => {
             abort();
-        };
-    }, []);
-
-    const abort = () => {
-        if (abortController) {
-            abortController.abort();
-        }
-    };
-
-    return [
-        (options) => {
-            abort();
-            const newAbortControl = new AbortController();
-            setAbortControl(newAbortControl);
-            return fileUploader({ ...options, signal: newAbortControl.signal });
+            return fileUploader({ ...options, signal: makeSignal() });
         },
         abort,
-    ];
+    };
 }
