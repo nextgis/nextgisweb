@@ -13,5 +13,18 @@ class RebuildOverviewCommand():
 
     @classmethod
     def execute(cls, args, env):
-        for resource in RasterLayer.query():
+        for resource in RasterLayer.filter_by(cog=False):
             resource.build_overview()
+
+
+@Command.registry.register
+class CleanupCommand:
+    identity = 'raster_layer.cleanup'
+
+    @classmethod
+    def argparser_setup(cls, parser, env):
+        pass
+
+    @classmethod
+    def execute(cls, args, env):
+        env.raster_layer.cleanup()
