@@ -221,6 +221,7 @@ class FileStorageComponent(Component):
 
             if (
                 not dry_run
+                and dirpath != os.path.normpath(self.path)
                 and (
                     (not relist and len(filenames) == 0 and len(dirnames) == 0)
                     or len(os.listdir(dirpath)) == 0
