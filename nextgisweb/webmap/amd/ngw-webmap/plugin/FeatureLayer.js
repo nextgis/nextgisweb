@@ -3,7 +3,6 @@ define([
     "./_PluginBase",
     "dojo/_base/lang",
     "dijit/layout/TabContainer",
-    "dijit/MenuItem",
     "dijit/_WidgetBase",
     "dojo/request/xhr",
     "dojo/topic",
@@ -17,7 +16,6 @@ define([
     _PluginBase,
     lang,
     TabContainer,
-    MenuItem,
     _WidgetBase,
     xhr,
     topic,
@@ -204,47 +202,26 @@ define([
 
     return declare([_PluginBase], {
         constructor: function (options) {
-            var plugin = this;
-
-            this.menuItem = new MenuItem({
-                label: i18n.gettext("Feature table"),
-                iconClass: "iconTable",
-                disabled: true,
-                onClick: function () {
-                    plugin.openFeatureGrid();
-                },
-                order: 2,
-            });
-
             this.tabContainer = new TabContainer({
                 region: "bottom",
                 style: "height: 45%",
                 splitter: true,
             });
+        },
 
-            this.display.watch(
-                "item",
-                lang.hitch(this, function (attr, oldVal, newVal) {
-                    var itemConfig = plugin.display.get("itemConfig");
-                    this.menuItem.set(
-                        "disabled",
-                        !(
-                            itemConfig.type == "layer" &&
-                            itemConfig.plugin[plugin.identity]
-                        )
-                    );
-                })
-            );
+        getPluginState: function (nodeData) {
+            const {type, plugin} = nodeData;
+            return {
+                enabled: type === "layer" && plugin[this.identity],
+            };
+        },
+        
+        run: function () {
+            this.openFeatureGrid();
+            return Promise.resolve(undefined);
         },
 
         postCreate: function () {
-            if (
-                this.display.layersPanel &&
-                this.display.layersPanel.contentWidget.itemMenu
-            ) {
-                this.addToLayersMenu();
-            }
-
             this._bindEvents();
         },
 
