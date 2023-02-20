@@ -10,7 +10,7 @@ import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
 import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
-import { route } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
 
 import { showResourcePicker } from "../resource-picker";
@@ -134,8 +134,20 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 }
             }
         }
-
         return allowedToDelete;
+    }, [selected, items]);
+
+    const selectedAllowedForFeatureExport = useMemo(() => {
+        const allowedToFeatureExport = [];
+
+        for (const item of items) {
+            if (selected.includes(item.id)) {
+                if (item.cls === "vector_layer") {
+                    allowedToFeatureExport.push(item.id);
+                }
+            }
+        }
+        return allowedToFeatureExport;
     }, [selected, items]);
 
     const rowSelection_ = useMemo(
@@ -308,11 +320,28 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                     });
                 },
             };
+            const exportFeaturesOperationConfig = {
+                label: <>{i18n.gettext("Export vector layers")}</>,
+                disabled: !selectedAllowedForFeatureExport.length,
+                onClick: () => {
+                    window.open(
+                        `${routeURL(
+                            "feature_layer.export_multiple"
+                        )}?resources=${selectedAllowedForFeatureExport.join(
+                            ","
+                        )}`
+                    );
+                },
+            };
 
             const batchOperations = [];
             if (selected.length) {
                 batchOperations.push(
-                    ...[deleteOperationConfig, moveOperationConfig]
+                    ...[
+                        deleteOperationConfig,
+                        moveOperationConfig,
+                        exportFeaturesOperationConfig,
+                    ]
                 );
             }
             if (batchOperations.length) {
@@ -335,6 +364,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         storageEnabled,
         creationDateVisible,
         selectedAllowedForDelete,
+        selectedAllowedForFeatureExport,
     ]);
 
     const MenuDropdown = () => {

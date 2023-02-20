@@ -67,9 +67,7 @@ export function FieldsForm(props) {
     return (
         <Form labelWrap colon={false} {...formProps_} className="fields-form">
             {includedFormItems.map((f) => (
-                <Fragment key={f.name}>
-                    {FormItem({ ...f })}
-                </Fragment>
+                <Fragment key={f.name}>{FormItem({ ...f })}</Fragment>
             ))}
             {props.children}
         </Form>
@@ -77,8 +75,11 @@ export function FieldsForm(props) {
 }
 
 function FormItem(props) {
-    const { required, requiredMessage, widget, included, value, ...formProps } =
-        props;
+    const { required, requiredMessage, widget, ...formProps } = props;
+
+    delete formProps.included;
+    delete formProps.value;
+
     formProps.rules = formProps.rules || [];
 
     if (required) {
@@ -115,18 +116,31 @@ function getInputType(widget, props) {
     return <Input {...props} />;
 }
 
+const FieldPropTypes = PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string,
+    widget: PropTypes.any,
+    mode: PropTypes.string,
+    included: PropTypes.bool,
+    choices: PropTypes.arrayOf(
+        PropTypes.shape({ name: PropTypes.string, value: PropTypes.any })
+    ),
+    disabled: PropTypes.bool,
+});
+
 FieldsForm.propTypes = {
     initialValues: PropTypes.object,
     whenReady: PropTypes.func,
     onChange: PropTypes.func,
     children: PropTypes.node,
-    fields: PropTypes.array,
+    fields: PropTypes.arrayOf(FieldPropTypes),
     form: PropTypes.any,
 };
 FormItem.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
     widget: PropTypes.string,
+    widgetProps: PropTypes.object,
     disabled: PropTypes.bool,
     required: PropTypes.bool,
     choices: PropTypes.array,

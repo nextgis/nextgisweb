@@ -23,7 +23,7 @@ export function routeURL(name, ...rest) {
     }
 
     return template.replace(/\{(\w+)\}/g, function (m, a) {
-        const idx = parseInt(a)
+        const idx = parseInt(a);
         const value = sub[idx];
         if (value === undefined) {
             const msg = `Undefined parameter ${idx} in "${template}".`;
@@ -40,9 +40,10 @@ export function route(name, ...rest) {
         result[method] = (options) =>
             request(
                 template,
-                Object.assign(options || {}, {
+                {
+                    ...options,
                     method: method.toUpperCase(),
-                })
+                }
             );
     }
     return result;

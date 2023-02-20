@@ -1,13 +1,18 @@
-from uuid import uuid4
 import json
+from uuid import uuid4
 from string import ascii_letters, printable
+from tempfile import NamedTemporaryFile
 
 import pytest
 import transaction
-from osgeo import ogr
+from osgeo import gdal, ogr
 
-from ...models import DBSession
+from .. import Feature
+from ..ogrdriver import EXPORT_FORMAT_OGR
+
 from ...auth import User
+from ...lib.geometry import Geometry
+from ...models import DBSession
 from ...spatial_ref_sys import SRS
 from ...vector_layer import VectorLayer
 
@@ -126,3 +131,67 @@ def test_field_escape(value, update_field, export_geojson):
 def test_intersects(intersects, count, export_geojson):
     geojson = export_geojson(intersects=intersects, intersects_srs=3857)
     assert len(geojson['features']) == count
+
+
+@pytest.fixture(scope='function')
+def resources(ngw_resource_group):
+    some = 3
+    params = []
+
+    with transaction.manager:
+        admin = User.by_keyname('administrator')
+        srs = SRS.filter_by(id=3857).one()
+        for i in range(some):
+            layer = VectorLayer(
+                parent_id=ngw_resource_group, display_name=f'Test layer {i}',
+                owner_user=admin, srs=srs, tbl_uuid=uuid4().hex,
+                geometry_type='POINT',
+            ).persist()
+
+            layer.setup_from_fields([])
+
+            DBSession.flush()
+
+            f = Feature()
+            f.geom = Geometry.from_wkt(f'POINT ({i} {i})')
+            layer.feature_create(f)
+
+            params.append(dict(id=layer.id, name=f'layer_{i}'))
+
+    yield params
+
+    with transaction.manager:
+        for param in params:
+            DBSession.delete(VectorLayer.filter_by(id=param['id']).one())
+
+
+@pytest.mark.parametrize('driver_label', [
+    pytest.param(label, id=label, marks=pytest.mark.skipif(
+        driver.display_name in ('Storage and eXchange Format (*.sxf)', 'MapInfo MIF/MID (*.mif/*.mid)'),
+        reason='Not readable'))
+    for label, driver in EXPORT_FORMAT_OGR.items()
+])
+def test_export_multi(driver_label, resources, ngw_webtest_app, ngw_auth_administrator):
+    driver = EXPORT_FORMAT_OGR[driver_label]
+    params = dict(
+        format=driver_label,
+        resources=resources
+    )
+    response = ngw_webtest_app.post_json('/api/component/feature_layer/export', params, status=200)
+
+    with NamedTemporaryFile(suffix='.zip') as t:
+        t.write(response.body)
+        t.flush()
+
+        for param in resources:
+            name = param['name']
+            if driver.single_file:
+                ogrfn = f'/vsizip/{t.name}/{name}.{driver.extension}'
+            else:
+                ogrfn = f'/vsizip/{t.name}/{name}/{name}.{driver.extension}'
+            ds = gdal.OpenEx(ogrfn, 0)
+            assert ds is not None
+
+            layer = ds.GetLayer(0)
+            assert layer is not None
+            assert layer.GetFeatureCount() == 1

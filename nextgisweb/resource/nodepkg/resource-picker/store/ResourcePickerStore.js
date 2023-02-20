@@ -4,8 +4,9 @@ import i18n from "@nextgisweb/pyramid/i18n!resource";
 import { makeAutoObservable, runInAction } from "mobx";
 import { loadParents } from "../../util/loadParents";
 
-const getThisMsg = i18n.gettext("Move to this group");
-const getSelectedMsg = i18n.gettext("Move to selected group");
+const getThisMsg = i18n.gettext("Pick this group");
+
+const getSelectedMsg = i18n.gettext("Pick selected");
 
 export class ResourcePickerStore {
     childrenLoadError = false;
@@ -25,14 +26,19 @@ export class ResourcePickerStore {
     showCls = [];
 
     disabledIds = [];
+
     enabledCls = [];
+    enabledInterfaces = [];
 
     allowSelection = true;
     allowMoveInside = true;
+    moveInsideCls = ["resource_group"];
 
     allowCreateResource = true;
 
     selected = [];
+
+    multiple = false;
 
     onNewGroup = null;
 
@@ -44,23 +50,35 @@ export class ResourcePickerStore {
     getSelectedMsg = getSelectedMsg;
 
     constructor({
+        showCls,
+        multiple,
         parentId,
+        selected,
+        enabledCls,
+        getThisMsg,
         onNewGroup,
         disabledIds,
-        enabledCls,
-        showCls,
         getSelectedMsg,
-        getThisMsg,
+        enabledInterfaces,
     }) {
-        this.parentId = parentId;
+        this.parentId = parentId ?? this.parentId;
         this.initialParentId = this.parentId;
         this.onNewGroup = onNewGroup;
 
+        if (selected) {
+            this.selected = selected;
+        }
         if (disabledIds) {
             this.disabledIds = disabledIds;
         }
+        if (multiple) {
+            this.multiple = multiple;
+        }
         if (enabledCls) {
             this.enabledCls = enabledCls;
+        }
+        if (enabledInterfaces) {
+            this.enabledInterfaces = enabledInterfaces;
         }
         if (showCls) {
             this.showCls = showCls;
@@ -92,6 +110,21 @@ export class ResourcePickerStore {
         this.abort();
     }
 
+    checkEnabled(resource) {
+        let enabled = true;
+        if (this.enabledCls.length) {
+            enabled = this.enabledCls.includes(resource.cls);
+        }
+        if (this.enabledInterfaces) {
+            enabled = resource.interfaces
+                ? resource.interfaces.some((intf) =>
+                    this.enabledInterfaces.includes(intf)
+                )
+                : false;
+        }
+        return enabled;
+    }
+
     refresh() {
         return this.setChildrenFor(this.parentId);
     }
@@ -102,7 +135,19 @@ export class ResourcePickerStore {
 
     setSelected(selected) {
         runInAction(() => {
-            this.selected = selected;
+            const newSelected = [];
+            // Imposible to remove disabled and alredy selected items
+            for (const disabledId of this.disabledIds) {
+                if (this.selected.includes(disabledId)) {
+                    newSelected.push(disabledId);
+                }
+            }
+            for (const s of selected) {
+                if (!newSelected.includes(s)) {
+                    newSelected.push(s);
+                }
+            }
+            this.selected = newSelected;
         });
     }
 
@@ -198,12 +243,15 @@ export class ResourcePickerStore {
                 const showClsAllowed =
                     s && s.length ? this.showCls.includes(cls) : true;
                 if (showClsAllowed) {
-                    resources.push({
+                    const formatedRes = {
                         id: res.id,
-                        displayName: res.display_name,
                         cls,
+                        displayName: res.display_name,
                         parent: { id: res.parent.id },
-                    });
+                        ...res
+                    }
+                    delete formatedRes.children;
+                    resources.push(formatedRes);
                 }
             }
             runInAction(() => {

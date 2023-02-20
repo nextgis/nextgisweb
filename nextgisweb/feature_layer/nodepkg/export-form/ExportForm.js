@@ -1,20 +1,29 @@
 import PropTypes from "prop-types";
+
+import WKT from "ol/format/WKT";
+import { fromExtent } from "ol/geom/Polygon";
+import { useEffect, useState, useCallback, useMemo } from "react";
+
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import {
     Checkbox,
     FieldsForm,
     Form,
+    ResourceSelectMultiple,
     Select,
     useForm,
 } from "@nextgisweb/gui/fields-form";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import {
+    route,
+    routeURL,
+    request,
+    LunkwillParam,
+} from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import i18n from "@nextgisweb/pyramid/i18n!";
+import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
-import { useEffect, useState } from "react";
-import { fromExtent } from "ol/geom/Polygon";
-import WKT from "ol/format/WKT";
 
 import { ExtentInput } from "./ExtentInput";
 
@@ -38,8 +47,12 @@ const fieldListToOptions = (fieldList) => {
     });
 };
 
-export function ExportForm({ id }) {
+export function ExportForm({ id, pick, multiple }) {
     const [status, setStatus] = useState("loading");
+
+    // TODO: use `react-router-dom` in future
+    const [urlParams, setUrlParams] = useState({});
+
     const { makeSignal } = useAbortController();
     const [srsOptions, setSrsOptions] = useState([]);
     const [fieldOptions, setFieldOptions] = useState([]);
@@ -49,30 +62,67 @@ export function ExportForm({ id }) {
     const [isReady, setIsReady] = useState(false);
     const form = useForm()[0];
 
-    async function load() {
+    const initialValues = useMemo(() => {
+        const initialVals = {
+            format,
+            fields: fieldOptions.map((field) => field.value),
+            srs: defaultSrs,
+            fid: "ngw_id",
+            encoding: "UTF-8",
+            display_name: false,
+            zipped: !!multiple,
+            ...urlParams,
+        };
+
+        return initialVals;
+    }, [defaultSrs, fieldOptions, format, multiple, urlParams]);
+
+    const load = useCallback(async () => {
         try {
             const signal = makeSignal();
+            const promises = [route("spatial_ref_sys.collection")];
+            if (id !== undefined) {
+                promises.push(route("resource.item", id));
+            }
             const [srsInfo, itemInfo] = await Promise.all(
-                [
-                    route("spatial_ref_sys.collection"),
-                    route("resource.item", id),
-                ].map((r) => r.get({ signal }))
+                promises.map((r) => r.get({ signal }))
             );
             setSrsOptions(srsListToOptions(srsInfo));
-            setDefaultSrs(itemInfo[itemInfo.resource.cls].srs.id);
-            setFieldOptions(fieldListToOptions(itemInfo.feature_layer.fields));
+            if (itemInfo) {
+                setDefaultSrs(itemInfo[itemInfo.resource.cls].srs.id);
+                setFieldOptions(
+                    fieldListToOptions(itemInfo.feature_layer.fields)
+                );
+            } else {
+                const defSrs = srsInfo.find((srs) => srs.id === 3857);
+                if (defSrs) {
+                    setDefaultSrs(defSrs.id);
+                }
+            }
         } catch (err) {
             errorModal(err);
         } finally {
             setStatus("loaded");
         }
-    }
+    }, [id, makeSignal]);
 
-    useEffect(() => load(), []);
+    useEffect(() => {
+        const {
+            resources: resStr,
+            fields: fieldsStr,
+            ...rest
+        } = Object.fromEntries(new URL(location.href).searchParams.entries());
+        const resources = resStr ? resStr.split(",").map(Number) : [];
+        const fields = fieldsStr ? fieldsStr.split(",").map(Number) : [];
+        setUrlParams({ resources, fields, ...rest });
+    }, []);
+
+    useEffect(() => load(), [load]);
 
     useEffect(() => {
         const exportFormat = exportFormats.find((f) => f.name === format);
         const dscoCfg = (exportFormat && exportFormat.dsco_configurable) ?? [];
+        let multipleFields = [];
         const dscoFields = [];
         const dscoFieldsValues = {};
         for (const d of dscoCfg) {
@@ -85,10 +135,25 @@ export function ExportForm({ id }) {
                 dscoFieldsValues[name] = value;
             }
         }
+        if (multipleFields && pick) {
+            multipleFields = [
+                {
+                    name: "resources",
+                    label: i18n.gettext("Resources"),
+                    widget: ResourceSelectMultiple,
+                    pickerOptions: {
+                        multiple: true,
+                        showCls: ["vector_layer", "resource_group"],
+                        enabledInterfaces: ["IFeatureLayer"],
+                    },
+                },
+            ];
+        }
         if (isReady && Object.keys(dscoFieldsValues).length) {
             form.setFieldsValue(dscoFieldsValues);
         }
         setFields([
+            ...multipleFields,
             {
                 name: "format",
                 label: i18n.gettext("Format"),
@@ -131,6 +196,7 @@ export function ExportForm({ id }) {
                 label: i18n.gettext("Fields"),
                 widget: Select,
                 mode: "multiple",
+                included: !multiple,
                 choices: fieldOptions,
             },
             {
@@ -142,10 +208,11 @@ export function ExportForm({ id }) {
                 name: "zipped",
                 label: i18n.gettext("Zip archive"),
                 widget: Checkbox,
-                disabled: !exportFormat.single_file,
+                included: !multiple,
+                disabled: !exportFormat.single_file || multiple,
             },
         ]);
-    }, [srsOptions, fieldOptions, format, isReady]);
+    }, [srsOptions, fieldOptions, format, isReady, form, multiple, pick]);
 
     const onChange = (e) => {
         if ("format" in e.value) {
@@ -153,17 +220,51 @@ export function ExportForm({ id }) {
         }
     };
 
-    const exportFeatureLayer = () => {
-        const { extent, ...fields } = form.getFieldsValue();
-        const params = new URLSearchParams(fields);
-
+    const exportFeatureLayer = async () => {
+        const { extent, resources, ...fields } = form.getFieldsValue();
+        const json = {};
         if (!extent.includes(null)) {
             const wkt = new WKT().writeGeometryText(fromExtent(extent));
-            params.append("intersects", wkt);
-            params.append("intersects_srs", "4326");
+            json.intersects = wkt;
+            json.intersects_srs = 4326;
+        }
+        for (const key in fields) {
+            const prop = fields[key];
+            if (prop !== undefined) {
+                json[key] = fields[key];
+            }
+        }
+        const params = new URLSearchParams(json);
+
+        const ids = id ? String(id).split(",") : resources;
+
+        let apiUrl;
+        if (ids.length === 1) {
+            apiUrl = routeURL("resource.export", ids[0]) + "?" + params.toString();
+        } else {
+            params.append("resources", ids.join(","));
+            apiUrl = routeURL("feature_layer.export") + "?" + params.toString();
         }
 
-        window.open(routeURL("resource.export", id) + "?" + params.toString());
+        if (pyramidSettings.lunkwill_enabled) {
+            const lunkwillParam = new LunkwillParam();
+            lunkwillParam.require();
+            try {
+                setStatus("loading");
+                const respUrl = await request(apiUrl, {
+                    lunkwill: lunkwillParam,
+                    lunkwillReturnUrl: true,
+                });
+                window.open(respUrl);
+            } catch (err) {
+                errorModal(err);
+                return;
+            } finally {
+                setStatus("loaded");
+            }
+        } else {
+            window.open(apiUrl);
+        }
     };
 
     if (status === "loading") {
@@ -178,15 +279,7 @@ export function ExportForm({ id }) {
                 setIsReady(true);
             }}
             onChange={onChange}
-            initialValues={{
-                format,
-                fields: fieldOptions.map((field) => field.value),
-                srs: defaultSrs,
-                fid: "ngw_id",
-                encoding: "UTF-8",
-                display_name: false,
-                zipped: false,
-            }}
+            initialValues={initialValues}
             labelCol={{ span: 6 }}
         >
             <Form.Item>
@@ -200,4 +293,6 @@ export function ExportForm({ id }) {
 
 ExportForm.propTypes = {
     id: PropTypes.number,
+    multiple: PropTypes.bool,
+    pick: PropTypes.bool,
 };

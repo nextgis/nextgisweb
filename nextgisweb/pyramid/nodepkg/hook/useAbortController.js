@@ -1,24 +1,38 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useReducer, useCallback } from "react";
+
+function reducer(state, action) {
+    switch (action.type) {
+        case "add":
+            return [...state, action.controller];
+        case "clean":
+            for (const a of state) {
+                a.abort();
+            }
+            return [];
+        default:
+            throw new Error();
+    }
+}
 
 export function useAbortController() {
-    const controllers = useRef([]);
+    const [controllers, dispatch] = useReducer(reducer, []);
 
-    const makeSignal = () => {
-        const abortController = new AbortController();
-        controllers.current = [...controllers.current, abortController];
-        return abortController.signal;
-    };
+    const makeSignal = useCallback(() => {
+        const controller = new AbortController();
+        dispatch({ type: "add", controller });
+        return controller.signal;
+    }, []);
 
-    const abort = () => {
-        for (const a of controllers.current) {
+    const abort = useCallback(() => {
+        for (const a of controllers) {
             a.abort();
         }
-        controllers.current = [];
-    };
+        dispatch({ type: "clean" });
+    }, [controllers]);
 
     useEffect(() => {
         return () => {
-            abort();
+            dispatch({ type: "clean" });
         };
     }, []);
 
