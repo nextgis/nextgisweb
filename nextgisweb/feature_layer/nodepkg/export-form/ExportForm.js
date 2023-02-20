@@ -14,9 +14,15 @@ import {
     Select,
     useForm,
 } from "@nextgisweb/gui/fields-form";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import {
+    route,
+    routeURL,
+    request,
+    LunkwillParam,
+} from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import i18n from "@nextgisweb/pyramid/i18n!";
+import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 
 import { ExtentInput } from "./ExtentInput";
@@ -231,15 +237,33 @@ export function ExportForm({ id, pick, multiple }) {
         const params = new URLSearchParams(json);
 
         const ids = id ? String(id).split(",") : resources;
+
+        let apiUrl;
         if (ids.length === 1) {
-            window.open(
-                routeURL("resource.export", ids[0]) + "?" + params.toString()
-            );
+            apiUrl = routeURL("resource.export", ids[0]) + "?" + params.toString();
         } else {
-            params.append('resources', ids.join(','))
-            window.open(
-                routeURL("feature_layer.export") + "?" + params.toString()
-            );
+            params.append("resources", ids.join(","));
+            apiUrl = routeURL("feature_layer.export") + "?" + params.toString();
+        }
+
+        if (pyramidSettings.lunkwill_enabled) {
+            const lunkwillParam = new LunkwillParam();
+            lunkwillParam.require();
+            try {
+                setStatus("loading");
+                const respUrl = await request(apiUrl, {
+                    lunkwill: lunkwillParam,
+                    lunkwillReturnUrl: true,
+                });
+                window.open(respUrl);
+            } catch (err) {
+                errorModal(err);
+                return;
+            } finally {
+                setStatus("loaded");
+            }
+        } else {
+            window.open(apiUrl);
         }
     };
 
@@ -259,10 +283,7 @@ export function ExportForm({ id, pick, multiple }) {
             labelCol={{ span: 6 }}
         >
             <Form.Item>
-                <SaveButton
-                    onClick={exportFeatureLayer}
-                    icon={null}
-                >
+                <SaveButton onClick={exportFeatureLayer} icon={null}>
                     {i18n.gettext("Save")}
                 </SaveButton>
             </Form.Item>
