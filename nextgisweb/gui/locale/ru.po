@@ -1,10 +1,10 @@
 #: nodepkg/confirm.js:8
 msgid "Confirmation required"
-msgstr ""
+msgstr "Необходимо подтверждение"
 
 #: nodepkg/confirm.js:9
 msgid "Please confirm this action."
-msgstr ""
+msgstr "Пожалуйста, подтвердите данное действие."
 
 #: nodepkg/confirm.js:11 nodepkg/error/shared.js:71
 msgid "OK"
@@ -12,7 +12,7 @@ msgstr "OK"
 
 #: nodepkg/confirm.js:35
 msgid "Please confirm the deletion."
-msgstr ""
+msgstr "Пожалуйста, подтвердите удаление."
 
 #: nodepkg/confirm.js:36 nodepkg/model-browse/ModelBrowse.js:192
 #: nodepkg/model-browse/ModelBrowse.js:259 nodepkg/model-form/ModelForm.js:13
@@ -21,7 +21,7 @@ msgstr "Удалить"
 
 #: nodepkg/confirm.js:37
 msgid "Failed to delete."
-msgstr ""
+msgstr "Ошибка удаления."
 
 #: nodepkg/example.js:77
 msgid "Internationalization test"

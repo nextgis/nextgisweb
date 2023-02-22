@@ -1,34 +1,38 @@
-#: api.py:97
-msgid "The export limit is set to {limit} features, but the layer contains {count}."
-msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
-
-#: api.py:106
+#: api.py:92
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:111
+#: api.py:94
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:155 api.py:693
+#: api.py:124 api.py:769
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api.py:164
+#: api.py:147
+msgid "The export limit is set to {limit} features, but the layer contains {count}."
+msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
+
+#: api.py:160
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api.py:341 api.py:416
+#: api.py:298
+msgid "File name parameter '{}' is not valid."
+msgstr "Недопустимое имя файла '{}'."
+
+#: api.py:417 api.py:492
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
 
-#: api.py:343
+#: api.py:419
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:349 api.py:421
+#: api.py:425 api.py:497
 #, python-format
 msgid "Date format '%s' is not supported."
 msgstr "Формат даты '%s' не поддерживается."
@@ -55,34 +59,34 @@ msgstr "Поле не найдено (ID=%d)."
 msgid "Field name is forbidden: '{}'. Please remove or rename it."
 msgstr "Недопустимое имя поля: '{}'. Пожалуйста удалите или переименуйте его."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:46
+#: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:45
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: view.py:68 view.py:91
+#: view.py:67 view.py:90
 #, python-format
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:142 view.py:214
+#: view.py:141 view.py:151 view.py:230
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:201
+#: view.py:217
 msgid "Features"
 msgstr "Объекты"
 
-#: template/section_fields.mako:21 view.py:206
+#: template/section_fields.mako:21 view.py:222
 msgid "Table"
 msgstr "Таблица"
 
-#: view.py:225
+#: view.py:241
 msgid "External access"
 msgstr "Внешний доступ"
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:193
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:230
+#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:246
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -103,7 +107,7 @@ msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
 
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:265
-#: nodepkg/export-form/ExportForm.js:194
+#: nodepkg/export-form/ExportForm.js:287
 msgid "Save"
 msgstr "Сохранить"
 
@@ -147,55 +151,59 @@ msgstr "Удалить"
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: nodepkg/export-form/ExportForm.js:94
+#: nodepkg/export-form/ExportForm.js:142
+msgid "Resources"
+msgstr "Ресурсы"
+
+#: nodepkg/export-form/ExportForm.js:159
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.js:104
+#: nodepkg/export-form/ExportForm.js:169
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.js:110
+#: nodepkg/export-form/ExportForm.js:175
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: nodepkg/export-form/ExportForm.js:120
+#: nodepkg/export-form/ExportForm.js:185
 msgid "FID field"
 msgstr "Поле FID"
 
-#: nodepkg/export-form/ExportForm.js:124
+#: nodepkg/export-form/ExportForm.js:189
 msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
-#: nodepkg/export-form/ExportForm.js:131
+#: nodepkg/export-form/ExportForm.js:196
 msgid "Fields"
 msgstr "Поля"
 
-#: nodepkg/export-form/ExportForm.js:138
+#: nodepkg/export-form/ExportForm.js:204
 msgid "Limit by extent"
 msgstr "Ограничить охватом"
 
-#: nodepkg/export-form/ExportForm.js:143
+#: nodepkg/export-form/ExportForm.js:209
 msgid "Zip archive"
 msgstr "Zip архив"
 
-#: nodepkg/export-form/ExtentInput.js:5
+#: nodepkg/export-form/ExtentInput.js:6
 msgid "deg."
 msgstr "град."
 
-#: nodepkg/export-form/ExtentInput.js:7
+#: nodepkg/export-form/ExtentInput.js:8
 msgid "Left"
 msgstr "Лево"
 
-#: nodepkg/export-form/ExtentInput.js:8
+#: nodepkg/export-form/ExtentInput.js:9
 msgid "Bottom"
 msgstr "Низ"
 
-#: nodepkg/export-form/ExtentInput.js:9
+#: nodepkg/export-form/ExtentInput.js:10
 msgid "Right"
 msgstr "Право"
 
-#: nodepkg/export-form/ExtentInput.js:10
+#: nodepkg/export-form/ExtentInput.js:11
 msgid "Top"
 msgstr "Верх"
 
