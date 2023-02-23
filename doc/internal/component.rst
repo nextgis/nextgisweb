@@ -21,10 +21,10 @@ Each component has an ID (``somecomp`` in an example above). The same ID
 is used in a class attribute :py:attr:`~nextgisweb.component.Component.identity`. 
 This ID must be unique among all packages of NGW.
 
-To join components together `объект-окружение` :py:class:`~nextgisweb.env.Env` class exemplar is used,
+To join components together instance of :py:class:`~nextgisweb.env.Env` class is used,
 created at init. Initialization runs like this:
 
-1. Component exemplars are created
+1. Component instances are created
 2. :py:meth:`~nextgisweb.component.Component.initialize` is called for each component
 3. :py:meth:`~nextgisweb.component.Component.configure` is called for each component
 
