@@ -1,11 +1,9 @@
 Components and environment
 ==========================
 
-Для обеспечения модульности в NGW используются разделение на компоненты. Один
-python-пакет может содержать один или несколько компонентов. Каждый компонент
-является наследником класса :py:class:`~nextgisweb.component.Component`, а для
-загрузки соответствующих модулей используются точки входа (entry points)
-setuptools.
+NGW uses components for modularity. One python-пакет can contain
+one or several components. Each component inherits class :py:class:`~nextgisweb.component.Component`, 
+to load packages setuptools entry points are used.
 
 .. code-block:: python
     
@@ -19,32 +17,29 @@ setuptools.
           'somepackage = somepackage:somemod:pkginfo'}
   )
 
-У каждого компонента есть идентификатор (``somecomp`` в примере выше). Так же
-этот идентификатор указываетс в атрибуте класса
-:py:attr:`~nextgisweb.component.Component.identity`. Этот идентификатор должен
-быть уникален в рамках всех пакетов NGW.
+Each component has an ID (``somecomp`` in an example above). The same ID 
+is used in a class attribute :py:attr:`~nextgisweb.component.Component.identity`. 
+This ID must be unique among all packages of NGW.
 
-Для объединения компонентов в единое целое используется `объект-окружение`,
-экземпляр класса :py:class:`~nextgisweb.env.Env`, который создается на этапе
-инициализации. Инициализация происходит следующим образом:
+To join components together `объект-окружение` :py:class:`~nextgisweb.env.Env` class exemplar is used,
+created at init. Initialization runs like this:
 
-1. Создаются экземпляры компонентов
-2. Для каждого компонента вызывается :py:meth:`~nextgisweb.component.Component.initialize`
-3. Для каждого компонента вызывается :py:meth:`~nextgisweb.component.Component.configure`
+1. Component exemplars are created
+2. :py:meth:`~nextgisweb.component.Component.initialize` is called for each component
+3. :py:meth:`~nextgisweb.component.Component.configure` is called for each component
 
 
 Dependencies between components
 -------------------------------
 
-Вызовы методов :py:meth:`~nextgisweb.component.Component.initialize` и
-:py:meth:`~nextgisweb.component.Component.configure` осуществляются с учетом
-зависимостей, которые могут быть указаны при помощи декоратора
-:py:func:`~nextgisweb.component.require`.
+Method calls for :py:meth:`~nextgisweb.component.Component.initialize` and
+:py:meth:`~nextgisweb.component.Component.configure` happen in accordance
+with dependencies, which can be set using decorator :py:func:`~nextgisweb.component.require`.
 
 .. autofunction:: nextgisweb.component.require
 
-Таким образом, если необходимо вызывать ``initialize()`` компонента ``B`` после
-``A``, то выглядеть это будет следующим образом:
+So, is you need to call ``initialize()`` of component ``B`` after
+``A`` do this:
 
 .. code-block:: python
 
