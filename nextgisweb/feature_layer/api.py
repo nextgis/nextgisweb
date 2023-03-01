@@ -589,9 +589,9 @@ def item_extent(resource, request):
     return dict(extent=extent)
 
 
-def get_box_bounds(resource, feature_id, srs):
+def get_box_bounds(resource, feature_id, srs_id):
     query = resource.feature_query()
-    query.srs(SRS.filter_by(id=srs).one())
+    query.srs(SRS.filter_by(id=srs_id).one())
     query.box()
 
     feature = query_feature_or_not_found(query, resource.id, feature_id)
@@ -617,7 +617,11 @@ def geometry_info(resource, request):
 
     srs_param = request.GET.get("srs")
     srs_id = int(srs_param) if srs_param is not None else 3857
-    srs = SRS.filter_by(id=srs_id).one()
+    try:
+        srs = SRS.filter_by(id=srs_id).one()
+    except NoResultFound:
+        raise ValidationError(message=_(f'Unknown spatial reference system'),
+                              data={"srs.id": srs_id})
     query.srs(srs)
 
     feature_id = int(request.matchdict['fid'])
@@ -627,8 +631,6 @@ def geometry_info(resource, request):
     shape = geom.shape
     geom_type = shape.geom_type
 
-    srs_wkt = sr_from_epsg(srs_id).ExportToWkt()
-
     minX, minY, maxX, maxY = get_box_bounds(resource, feature_id, srs_id)
     extent = dict(
         minX=minX,
@@ -637,8 +639,8 @@ def geometry_info(resource, request):
         maxY=maxY
     )
 
-    area = abs(geom_area(geom, srs_wkt))
-    length = abs(geom_length(geom, srs_wkt))
+    area = abs(geom_area(geom, srs.wkt))
+    length = abs(geom_length(geom, srs.wkt))
 
     if geom_type == 'Point':
         area = None
