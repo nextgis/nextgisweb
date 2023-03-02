@@ -49,7 +49,7 @@ const FeatureTable = ({
     const [effectiveWidths, setEffectiveWidths] = useState(null);
     const [userDefinedWidths, setUserDefinedWidths] = useState({});
 
-    const [visibleFields, setVisibleFields] = useState([
+    const [visibleFields, setVisibleFields] = useState(() => [
         KEY_FIELD_ID,
         ...fields.filter((f) => f.grid_visibility).map((f) => f.id),
     ]);

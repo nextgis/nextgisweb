@@ -288,13 +288,15 @@ export function useFeatureTable({
 
     useEffect(() => {
         setData([]);
-    }, [orderBy, query]);
+    }, [orderBy, query, visibleFields]);
 
     useEffect(() => {
-        scrollToIndex(0, { smoothScroll: false });
+        if (total) {
+            scrollToIndex(0, { smoothScroll: false });
+        }
         // to init first loading
         setQueryTotal(pageSize);
-    }, [query, pageSize, scrollToIndex]);
+    }, [query, pageSize, scrollToIndex, total]);
 
     useEffect(() => {
         const items = [...virtualItems];

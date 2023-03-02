@@ -29,7 +29,7 @@ const LoadingCol = () => "...";
 
 export const FeatureGrid = ({
     id,
-    query: q,
+    query: query_,
     onDelete,
     onSelect,
     deleteError,
@@ -81,10 +81,10 @@ export const FeatureGrid = ({
     }, [selectedIds, setSelected]);
 
     useEffect(() => {
-        if (q !== undefined) {
-            setQuery(q);
+        if (query_ !== undefined) {
+            setQuery(query_);
         }
-    }, [q]);
+    }, [query_]);
 
     const fields = useMemo(() => {
         if (resourceData) {
