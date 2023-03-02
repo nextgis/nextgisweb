@@ -69,9 +69,9 @@ def identify(request):
             query = layer.feature_query()
             query.intersects(geom)
 
-            # Limit number of identifyable features by 10 per layer,
+            # Limit number of identifiable features by 100 per layer,
             # otherwise the response might be too big.
-            query.limit(10)
+            query.limit(100)
 
             features = [
                 dict(id=f.id, layerId=layer.id,
