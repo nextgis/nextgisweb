@@ -34,15 +34,14 @@ define([
 
             xhr.get(route.layer.extent({id: item.layerId}), {
                 handleAs: "json"
-            }).then(function (data) {
-                var extent = data.extent;
-                plugin.display.map.olMap.getView().fit(
-                    ol.proj.transformExtent([
+            }).then(function ({extent}) {
+                const displayExtent = ol.proj.transformExtent([
                         extent.minLon, extent.minLat,
                         extent.maxLon, extent.maxLat
                     ],
                     plugin.display.lonlatProjection,
-                    plugin.display.displayProjection));
+                    plugin.display.displayProjection);
+                plugin.display.map.zoomToExtent(displayExtent);
             });
         }
     });
