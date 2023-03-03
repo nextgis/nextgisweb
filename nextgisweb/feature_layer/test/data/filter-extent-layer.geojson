@@ -1,0 +1,77 @@
+{
+  "type": "FeatureCollection",
+  "name": "layer",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "string": "0 10 20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "string": "10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.0,
+          10.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "string": "10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -10.0,
+          -10.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "string": "20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.0,
+          20.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "string": "20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -20.0,
+          -20.0
+        ]
+      }
+    }
+  ]
+}

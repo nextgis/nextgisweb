@@ -688,6 +688,55 @@ def idelete(resource, request):
     fid = int(request.matchdict['fid'])
     resource.feature_delete(fid)
 
+def apply_attr_filter(query, request, keynames):
+    # Fields filters
+    filter_ = []
+    for param in request.GET.keys():
+        if param.startswith('fld_'):
+            fld_expr = re.sub('^fld_', '', param)
+        elif param == 'id' or param.startswith('id__'):
+            fld_expr = param
+        else:
+            continue
+
+        try:
+            key, operator = fld_expr.rsplit('__', 1)
+        except ValueError:
+            key, operator = (fld_expr, 'eq')
+
+        if key != 'id' and key not in keynames:
+            raise ValidationError(message="Unknown field '%s'." % key)
+
+        filter_.append((key, operator, request.GET[param]))
+
+    if filter_:
+        query.filter(*filter_)
+
+    # Like
+    like = request.GET.get('like')
+    if like is not None and IFeatureQueryLike.providedBy(query):
+        query.like(like)
+
+
+def apply_intersect_filter(query, request, resource):
+    # Filtering by extent
+    if 'intersects' in request.GET:
+        wkt_intersects = request.GET['intersects']
+    # Workaround to pass huge geometry for intersection filter
+    elif (
+        request.content_type == 'application/json'
+        and 'intersects' in (json_body := request.json_body)
+    ):
+        wkt_intersects = json_body['intersects']
+    else:
+        wkt_intersects = None
+
+    if wkt_intersects is not None:
+        try:
+            geom = Geometry.from_wkt(wkt_intersects, srid=resource.srs.id)
+        except GeometryNotValid:
+            raise ValidationError(_("Parameter 'intersects' geometry is not valid."))
+        query.intersects(geom)
 
 def cget(resource, request):
     request.resource_permission(PERM_READ)
@@ -711,33 +760,7 @@ def cget(resource, request):
     if limit is not None:
         query.limit(int(limit), int(offset))
 
-    # Filtering by attributes
-    filter_ = []
-    for param in request.GET.keys():
-        if param.startswith('fld_'):
-            fld_expr = re.sub('^fld_', '', param)
-        elif param == 'id' or param.startswith('id__'):
-            fld_expr = param
-        else:
-            continue
-
-        try:
-            key, operator = fld_expr.rsplit('__', 1)
-        except ValueError:
-            key, operator = (fld_expr, 'eq')
-
-        if key != 'id' and key not in keys:
-            raise ValidationError(message="Unknown field '%s'." % key)
-
-        filter_.append((key, operator, request.GET[param]))
-
-    if filter_:
-        query.filter(*filter_)
-
-    # Like
-    like = request.GET.get('like')
-    if like is not None and IFeatureQueryLike.providedBy(query):
-        query.like(like)
+    apply_attr_filter(query, request, keys)
 
     # Ordering
     order_by = request.GET.get('order_by')
@@ -752,24 +775,7 @@ def cget(resource, request):
     if order_by_:
         query.order_by(*order_by_)
 
-    # Filtering by extent
-    if 'intersects' in request.GET:
-        wkt_intersects = request.GET['intersects']
-    # Workaround to pass really big geometry for intersection filter
-    elif (
-        request.content_type == 'application/json'
-        and 'intersects' in (json_body := request.json_body)
-    ):
-        wkt_intersects = json_body['intersects']
-    else:
-        wkt_intersects = None
-
-    if wkt_intersects is not None:
-        try:
-            geom = Geometry.from_wkt(wkt_intersects, srid=resource.srs.id)
-        except GeometryNotValid:
-            raise ValidationError(_("Parameter 'intersects' geometry is not valid."))
-        query.intersects(geom)
+    apply_intersect_filter(query, request, resource)
 
     # Selected fields
     fields = request.GET.get('fields')
@@ -884,6 +890,23 @@ def count(resource, request):
     return dict(total_count=total_count)
 
 
+def feature_extent(resource, request):
+    request.resource_permission(PERM_READ)
+
+    supported_ident = ['vector_layer', 'postgis_layer']
+    if not (resource.identity in supported_ident):
+        raise ValidationError('feature_layer.feature.extent can only be applied to vector and postgis layers')
+
+    keys = [fld.keyname for fld in resource.fields]
+    query = resource.feature_query()
+
+    apply_attr_filter(query, request, keys)
+    apply_intersect_filter(query, request, resource)
+
+    extent = query().extent
+    return dict(extent=extent)
+
+
 def store_collection(layer, request):
     request.resource_permission(PERM_READ)
 
@@ -992,6 +1015,11 @@ def setup_pyramid(comp, config):
         'feature_layer.feature.count', '/api/resource/{id}/feature_count',
         factory=resource_factory) \
         .add_view(count, context=IFeatureLayer, request_method='GET', renderer='json')
+
+    config.add_route(
+        'feature_layer.feature.extent', '/api/resource/{id}/feature_extent',
+        factory=resource_factory) \
+        .add_view(feature_extent, context=IFeatureLayer, request_method='GET', renderer='json')
 
     config.add_route(
         'feature_layer.store', r'/api/resource/{id:\d+}/store/',

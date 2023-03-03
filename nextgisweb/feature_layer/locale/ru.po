@@ -7,7 +7,7 @@ msgstr "Выходной формат не указан."
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:124 api.py:769
+#: api.py:124 api.py:736
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -207,21 +207,25 @@ msgstr "Право"
 msgid "Top"
 msgstr "Верх"
 
-#: nodepkg/feature-grid/FeatureGrid.js:23
+#: nodepkg/feature-grid/FeatureGrid.js:24
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/feature-grid/FeatureGrid.js:24
+#: nodepkg/feature-grid/FeatureGrid.js:25
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGrid.js:25
+#: nodepkg/feature-grid/FeatureGrid.js:26
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGrid.js:26
+#: nodepkg/feature-grid/FeatureGrid.js:27
 msgid "Edit"
 msgstr "Редактировать"
+
+#: nodepkg/feature-grid/component/ZoomToFiltered.js:11
+msgid "Zoom to filtered features"
+msgstr "Приблизить к найденным объектам"
 
 #: nodepkg/geometry-info/GeometryInfo.js:60
 msgid "Load geometry info..."

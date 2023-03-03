@@ -19,6 +19,8 @@ from ..interface import (
     IFeatureQueryOrderBy,
 )
 
+from .data import generate_filter_extents
+
 
 data_points = Path(__file__).parent / 'data' / 'points.geojson'
 filter_cases = (
@@ -206,3 +208,29 @@ def test_geometry(create_resource, geom_type, ngw_resource_group_sub, ngw_httpte
         assert result.total_count == len(gj_fs)
         for i, f in enumerate(result):
             cmp_geom(gj_fs[i]['geometry'], f.geom, srs)
+
+
+filter_extents_data = generate_filter_extents()
+
+
+@pytest.mark.parametrize('create_resource', (
+    pytest.param(create_vector_layer, id='vector_layer'),
+    pytest.param(create_postgis_layer, id='postgis_layer'),
+))
+@pytest.mark.parametrize('filter_, expected_extent', filter_extents_data)
+def test_filtered_extent(create_resource, filter_, expected_extent,
+                         ngw_resource_group_sub, ngw_httptest_app):
+    data = Path(__file__).parent \
+        / 'data' / 'filter-extent-layer.geojson'
+
+    ds = ogr.Open(str(data))
+    ogrlayer = ds.GetLayer(0)
+
+    with create_resource(ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app) as layer:
+        # Filtered extent
+        query = layer.feature_query()
+        if filter_ is not None:
+            query.filter(filter_)
+        actual_extent = query().extent
+
+        assert expected_extent == actual_extent

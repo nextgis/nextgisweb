@@ -108,7 +108,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
 
         layer = PostgisLayer(
             **res_common, display_name='Feature layer (postgis)',
-            connection=connection, srs=SRS.filter_by(id=3857).one(),
+            connection=connection, srs=SRS.filter_by(id=srid).one(),
             table=table.name, schema='public',
             column_id=column_id, column_geom=column_geom,
             geometry_type=geom_type, geometry_srid=srid,

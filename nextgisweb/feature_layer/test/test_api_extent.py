@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import pytest
 import transaction
@@ -10,11 +11,17 @@ from ...vector_layer import VectorLayer
 from ...spatial_ref_sys.model import SRS
 from ...auth import User
 
+from ...vector_layer.test import create_feature_layer as create_vector_layer
+from ...postgis.test import create_feature_layer as create_postgis_layer
+
+from .data import generate_filter_extents
+
+filter_extents_data = generate_filter_extents()
+
 
 @pytest.fixture(scope='module')
 def vector_layer_id(ngw_resource_group):
     with transaction.manager:
-
         obj = VectorLayer(
             parent_id=ngw_resource_group, display_name='vector_layer',
             owner_user=User.by_keyname('administrator'),
@@ -99,3 +106,31 @@ def test_item_extent(ngw_webtest_app, vector_layer_id, extent, fid, ngw_auth_adm
     for coord, value in resp.json['extent'].items():
         assert extent.pop(coord) == pytest.approx(value, 1e-8)
     assert len(extent) == 0
+
+
+@pytest.mark.parametrize('create_resource', (
+        pytest.param(create_vector_layer, id='vector_layer'),
+        pytest.param(create_postgis_layer, id='postgis_layer'),
+))
+@pytest.mark.parametrize('filter_, expected_extent', filter_extents_data)
+def test_filtered_extent(create_resource, filter_, expected_extent,
+                         ngw_resource_group_sub, ngw_httptest_app,
+                         ngw_webtest_app, ngw_auth_administrator):
+    data = Path(__file__).parent \
+           / 'data' / 'filter-extent-layer.geojson'
+
+    ds = ogr.Open(str(data))
+    ogrlayer = ds.GetLayer(0)
+
+    with create_resource(ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app) as layer:
+        query_filter = ''
+        if filter_ is not None:
+            t, op, v = filter_
+            like_v = v.replace('%', '')
+            query_filter = f'?like={like_v}'
+
+        req_str = f'/api/resource/{layer.id}/feature_extent{query_filter}'
+
+        resp = ngw_webtest_app.get(req_str)
+        actual_extent = resp.json['extent']
+        assert expected_extent == actual_extent

@@ -102,6 +102,26 @@ define([
             } else {
                 view.fit(extent);
             }
+        },
+
+        zoomToNgwExtent: function (ngwExtent, displayProjection) {
+            const {minLon, minLat, maxLon, maxLat} = ngwExtent;
+            if (minLon === null || minLat === null ||
+                maxLon === null || maxLat === null) {
+                return;
+            }
+
+            if (!displayProjection) {
+                displayProjection = "EPSG:3857";
+            }
+            const extent = ol.proj.transformExtent([
+                    minLon, minLat,
+                    maxLon, maxLat
+                ],
+                "EPSG:4326",
+                displayProjection
+            );
+            this.zoomToExtent(extent);
         }
     });
 });

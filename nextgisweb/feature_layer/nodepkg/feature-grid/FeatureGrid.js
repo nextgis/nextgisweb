@@ -13,6 +13,7 @@ import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
 import { deleteFeatures } from "./api/deleteFeatures";
 import { KEY_FIELD_KEYNAME } from "./constant";
 import FeatureTable from "./FeatureTable";
+import {ZoomToFiltered} from "./component/ZoomToFiltered";
 
 import DeleteIcon from "@material-icons/svg/delete";
 import EditIcon from "@material-icons/svg/edit";
@@ -38,6 +39,8 @@ export const FeatureGrid = ({
     beforeDelete,
     size = "middle",
     readonly = true,
+    hasMap = false,
+    onZoomToFiltered,
     cleanSelectedOnFilter = true,
 }) => {
     const { data: totalData, refresh: refreshTotal } = useRouteGet(
@@ -179,6 +182,18 @@ export const FeatureGrid = ({
         tableActions.push(customAction);
     }
 
+    let zoomToFiltered;
+    if (hasMap && onZoomToFiltered) {
+        zoomToFiltered = <div>
+            <ZoomToFiltered
+                size={size}
+                query={query}
+                id={id}
+                onZoomToFiltered={onZoomToFiltered}
+            />
+        </div>;
+    }
+
     return (
         <div className="ngw-feature-layer-feature-grid">
             <div className="toolbar">
@@ -189,19 +204,21 @@ export const FeatureGrid = ({
                 ))}
 
                 <div className="spacer" />
-                <div>
-                    <Button
-                        type="text"
-                        icon={<TuneIcon />}
-                        onClick={() => setSettingsOpen(!settingsOpen)}
-                        size={size}
-                    />
-                </div>
+
+                {zoomToFiltered}
                 <div>
                     <Input
                         placeholder={searchPlaceholderMsg}
                         onChange={(e) => setQuery(e.target.value)}
                         allowClear
+                        size={size}
+                    />
+                </div>
+                <div>
+                    <Button
+                        type="text"
+                        icon={<TuneIcon/>}
+                        onClick={() => setSettingsOpen(!settingsOpen)}
                         size={size}
                     />
                 </div>
@@ -238,5 +255,7 @@ FeatureGrid.propTypes = {
     onDelete: PropTypes.func,
     onSelect: PropTypes.func,
     readonly: PropTypes.bool,
+    hasMap: PropTypes.bool,
+    onZoomToFiltered: PropTypes.func,
     size: PropTypes.oneOf(["small", "middle", "large"]),
 };

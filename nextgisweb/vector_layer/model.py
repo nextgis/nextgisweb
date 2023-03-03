@@ -65,6 +65,15 @@ from ..registry import registry_maker
 from .kind_of_data import VectorLayerData
 from .util import _, COMP_ID, fix_encoding, utf8len
 
+st_force2d = func.st_force2d
+st_transform = func.st_transform
+st_extent = func.st_extent
+st_setsrid = func.st_setsrid
+st_xmax = func.st_xmax
+st_xmin = func.st_xmin
+st_ymax = func.st_ymax
+st_ymin = func.st_ymin
+
 
 GEOM_TYPE_DB = (
     'POINT', 'LINESTRING', 'POLYGON',
@@ -174,6 +183,39 @@ fid_params_default = dict(
 
 MIN_INT32 = - 2**31
 MAX_INT32 = 2**31 - 1
+
+
+def calculate_extent(layer, where=None, geomcol=None):
+    tableinfo = TableInfo.from_layer(layer)
+    tableinfo.setup_metadata(layer._tablename)
+
+    if not (where is None and geomcol is None) and len(where) > 0:
+        bbox = sql.select(st_extent(st_transform(st_setsrid(cast(
+            st_force2d(geomcol), ga.Geometry), layer.srs_id), 4326)
+        )).where(db.and_(True, *where)).label('bbox')
+    else:
+        model = tableinfo.model
+        bbox = st_extent(st_transform(st_setsrid(cast(
+            st_force2d(model.geom), ga.Geometry), layer.srs_id), 4326)
+        ).label('bbox')
+    sq = DBSession.query(bbox).subquery()
+
+    fields = (
+        st_xmax(sq.c.bbox),
+        st_xmin(sq.c.bbox),
+        st_ymax(sq.c.bbox),
+        st_ymin(sq.c.bbox),
+    )
+    maxLon, minLon, maxLat, minLat = DBSession.query(*fields).one()
+
+    extent = dict(
+        minLon=minLon,
+        maxLon=maxLon,
+        minLat=minLat,
+        maxLat=maxLat
+    )
+
+    return extent
 
 
 class FieldDef:
@@ -1098,43 +1140,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IBboxLayer implementation:
     @property
     def extent(self):
-        """Return layer's extent
-        """
-        st_force2d = func.st_force2d
-        st_transform = func.st_transform
-        st_extent = func.st_extent
-        st_setsrid = func.st_setsrid
-        st_xmax = func.st_xmax
-        st_xmin = func.st_xmin
-        st_ymax = func.st_ymax
-        st_ymin = func.st_ymin
-
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
-
-        model = tableinfo.model
-
-        bbox = st_extent(st_transform(st_setsrid(cast(
-            st_force2d(model.geom), ga.Geometry), self.srs_id), 4326)
-        ).label('bbox')
-        sq = DBSession.query(bbox).subquery()
-
-        fields = (
-            st_xmax(sq.c.bbox),
-            st_xmin(sq.c.bbox),
-            st_ymax(sq.c.bbox),
-            st_ymin(sq.c.bbox),
-        )
-        maxLon, minLon, maxLat, minLat = DBSession.query(*fields).one()
-
-        extent = dict(
-            minLon=minLon,
-            maxLon=maxLon,
-            minLat=minLat,
-            maxLat=maxLat
-        )
-
-        return extent
+        return calculate_extent(self)
 
 
 def estimate_vector_layer_data(resource):
@@ -1446,18 +1452,18 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         srs = self.layer.srs if self._srs is None else self._srs
 
         if srs.id != self.layer.srs_id:
-            geomexpr = func.st_transform(geomcol, srs.id)
+            geomexpr = st_transform(geomcol, srs.id)
         else:
             geomexpr = geomcol
 
         if self._clip_by_box is not None:
             if _clipbybox2d_exists():
-                clip = func.st_setsrid(
+                clip = st_setsrid(
                     func.st_makeenvelope(*self._clip_by_box.bounds),
                     self._clip_by_box.srid)
                 geomexpr = func.st_clipbybox2d(geomexpr, clip)
             else:
-                clip = func.st_setsrid(
+                clip = st_setsrid(
                     func.st_geomfromtext(self._clip_by_box.wkt),
                     self._clip_by_box.srid)
                 geomexpr = func.st_intersection(geomexpr, clip)
@@ -1469,14 +1475,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         if self._geom_len:
             columns.append(func.st_length(func.geography(
-                func.st_transform(geomexpr, 4326))).label('geom_len'))
+                st_transform(geomexpr, 4326))).label('geom_len'))
 
         if self._box:
             columns.extend((
-                func.st_xmin(geomexpr).label('box_left'),
-                func.st_ymin(geomexpr).label('box_bottom'),
-                func.st_xmax(geomexpr).label('box_right'),
-                func.st_ymax(geomexpr).label('box_top'),
+                st_xmin(geomexpr).label('box_left'),
+                st_ymin(geomexpr).label('box_bottom'),
+                st_xmax(geomexpr).label('box_right'),
+                st_ymax(geomexpr).label('box_top'),
             ))
 
         if self._geom:
@@ -1610,9 +1616,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 # Prevent tolerance condition error
                 bound_geom = func.st_makeenvelope(-180, -89.9, 180, 89.9)
                 int_geom = func.st_intersection(bound_geom, int_geom)
-            int_geom = func.st_setsrid(int_geom, int_srs.id)
+            int_geom = st_setsrid(int_geom, int_srs.id)
             if reproject:
-                int_geom = func.st_transform(int_geom, self.layer.srs_id)
+                int_geom = st_transform(int_geom, self.layer.srs_id)
 
             where.append(func.st_intersects(geomcol, int_geom))
 
@@ -1675,5 +1681,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     .where(db.and_(True, *where))
                 result = DBSession.connection().execute(query)
                 return result.scalar()
+
+            @property
+            def extent(self):
+                return calculate_extent(self.layer, where, geomcol)
 
         return QueryFeatureSet()

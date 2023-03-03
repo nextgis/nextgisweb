@@ -53,6 +53,15 @@ from .util import _
 
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
+st_force2d = func.st_force2d
+st_transform = func.st_transform
+st_extent = func.st_extent
+st_setsrid = func.st_setsrid
+st_xmax = func.st_xmax
+st_xmin = func.st_xmin
+st_ymax = func.st_ymax
+st_ymin = func.st_ymin
+
 
 GEOM_TYPE_DISPLAY = (
     _("Point"), _("Line"), _("Polygon"),
@@ -64,6 +73,41 @@ GEOM_TYPE_DISPLAY = (
 PC_READ = ConnectionScope.read
 PC_WRITE = ConnectionScope.write
 PC_CONNECT = ConnectionScope.connect
+
+
+def calculate_extent(layer, where=None, geomcol=None):
+    tab = layer._sa_table(True)
+
+    if not (where is None and geomcol is None) and len(where) > 0:
+        bbox = sql.select(st_extent(st_transform(st_setsrid(db.cast(
+            st_force2d(geomcol), ga.Geometry), layer.srs_id), 4326)
+        )).where(db.and_(True, *where)).label('bbox')
+    else:
+        geomcol = getattr(tab.columns, layer.column_geom)
+        bbox = st_extent(st_transform(st_setsrid(db.cast(
+            st_force2d(geomcol), ga.Geometry), layer.geometry_srid), 4326)
+        ).label('bbox')
+
+    sq = select(bbox).alias('t')
+
+    fields = (
+        st_xmax(sq.c.bbox),
+        st_xmin(sq.c.bbox),
+        st_ymax(sq.c.bbox),
+        st_ymin(sq.c.bbox),
+    )
+
+    with layer.connection.get_connection() as conn:
+        maxLon, minLon, maxLat, minLat = conn.execute(select(*fields)).first()
+
+    extent = dict(
+        minLon=minLon,
+        maxLon=maxLon,
+        minLat=minLat,
+        maxLat=maxLat
+    )
+
+    return extent
 
 
 class PostgisConnection(Base, Resource):
@@ -373,7 +417,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 values[f.column_name] = feature.fields[f.keyname]
 
         if feature.geom is not None:
-            values[self.column_geom] = func.st_transform(
+            values[self.column_geom] = st_transform(
                 ga.elements.WKBElement(bytearray(feature.geom.wkb), srid=self.srs_id),
                 self.geometry_srid)
 
@@ -434,42 +478,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IBboxLayer
     @property
     def extent(self):
-        st_force2d = func.st_force2d
-        st_transform = func.st_transform
-        st_extent = func.st_extent
-        st_setsrid = func.st_setsrid
-        st_xmax = func.st_xmax
-        st_xmin = func.st_xmin
-        st_ymax = func.st_ymax
-        st_ymin = func.st_ymin
-
-        tab = self._sa_table(True)
-
-        geomcol = getattr(tab.columns, self.column_geom)
-
-        bbox = st_extent(st_transform(st_setsrid(db.cast(
-            st_force2d(geomcol), ga.Geometry), self.geometry_srid), 4326)
-        ).label('bbox')
-        sq = select(bbox).alias('t')
-
-        fields = (
-            st_xmax(sq.c.bbox),
-            st_xmin(sq.c.bbox),
-            st_ymax(sq.c.bbox),
-            st_ymin(sq.c.bbox),
-        )
-
-        with self.connection.get_connection() as conn:
-            maxLon, minLon, maxLat, minLat = conn.execute(select(*fields)).first()
-
-        extent = dict(
-            minLon=minLon,
-            maxLon=maxLon,
-            minLat=minLat,
-            maxLat=maxLat
-        )
-
-        return extent
+        return calculate_extent(self)
 
 
 DataScope.read.require(
@@ -584,7 +593,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         srs = self.layer.srs if self._srs is None else self._srs
 
         if srs.id != self.layer.geometry_srid:
-            geomexpr = func.st_transform(geomcol, srs.id)
+            geomexpr = st_transform(geomcol, srs.id)
         else:
             geomexpr = geomcol
 
@@ -678,18 +687,18 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 # Prevent tolerance condition error
                 bound_geom = func.st_makeenvelope(-180, -89.9, 180, 89.9)
                 int_geom = func.st_intersection(bound_geom, int_geom)
-            int_geom = func.st_setsrid(int_geom, int_srs.id)
+            int_geom = st_setsrid(int_geom, int_srs.id)
             if reproject:
-                int_geom = func.st_transform(int_geom, self.layer.geometry_srid)
+                int_geom = st_transform(int_geom, self.layer.geometry_srid)
 
             where.append(func.st_intersects(geomcol, int_geom))
 
         if self._box:
             columns.extend((
-                func.st_xmin(geomexpr).label('box_left'),
-                func.st_ymin(geomexpr).label('box_bottom'),
-                func.st_xmax(geomexpr).label('box_right'),
-                func.st_ymax(geomexpr).label('box_top'),
+                st_xmin(geomexpr).label('box_left'),
+                st_ymin(geomexpr).label('box_bottom'),
+                st_xmax(geomexpr).label('box_right'),
+                st_ymax(geomexpr).label('box_top'),
             ))
 
         gt = self.layer.geometry_type
@@ -756,5 +765,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         .where(db.and_(True, *where))
                     result = conn.execute(query)
                     return result.scalar()
+
+            @property
+            def extent(self):
+                return calculate_extent(self.layer, where, geomcol)
 
         return QueryFeatureSet()

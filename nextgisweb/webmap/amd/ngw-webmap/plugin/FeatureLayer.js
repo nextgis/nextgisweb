@@ -115,6 +115,10 @@ define([
                             },
                         },
                     ],
+                    hasMap: true,
+                    onZoomToFiltered: (ngwExtent) => {
+                        widget.zoomToExtent(ngwExtent);
+                    }
                 },
                 this.domNode
             );
@@ -198,6 +202,11 @@ define([
                 });
             }
         },
+        
+        zoomToExtent: function (ngwExtent) {
+            const display = this.plugin.display;
+            display.map.zoomToNgwExtent(ngwExtent, display.displayProjection);
+        }
     });
 
     return declare([_PluginBase], {
