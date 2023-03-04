@@ -30,6 +30,7 @@ define([
     "dojo/topic",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/webmap/layers-tree",
+    "@nextgisweb/webmap/basemap-selector",
     "@nextgisweb/pyramid/icon",
     "@nextgisweb/gui/error",
     "@nextgisweb/pyramid/i18n!",
@@ -104,6 +105,7 @@ define([
     topic,
     reactApp,
     LayersTreeComp,
+    BasemapSelectorComp,
     icon,
     errorModule,
     i18n,
@@ -1023,24 +1025,46 @@ define([
 
             all([this._layersDeferred, this._mapDeferred, this._postCreateDeferred]).then(
                 function () {
-                    array.forEach(Object.keys(widget.map.layers), function (key) {
-                        var layer = widget.map.layers[key];
-                        if (layer.isBaseLayer) {
-                            widget.layersPanel.contentWidget.basemapSelect.addOption({
-                                value: key,
-                                label: layer.title
-                            });
-                        }
-                    });
+                    if (widget._urlParams.base) {
+                        widget._switchBasemap(widget._urlParams.base)
+                    }
 
-                    widget.layersPanel.contentWidget.basemapSelect.watch("value", function (attr, oldVal, newVal) {
-                        widget.map.layers[oldVal].olLayer.setVisible(false);
-                        widget.map.layers[newVal].olLayer.setVisible(true);
-                        widget._baseLayer = widget.map.layers[newVal];
-                    });
-                    if (widget._urlParams.base) { widget.layersPanel.contentWidget.basemapSelect.set("value", widget._urlParams.base); }
+                    reactApp.default(
+                        BasemapSelectorComp.default,
+                        {
+                            map: widget.map,
+                            basemapDefault: widget._getActiveBasemapKey(),
+                            onChange: (key) => widget._switchBasemap(key)
+                        },
+                        widget.layersPanel.contentWidget.basemapPane.domNode
+                    );
+                    widget.layersPanel.resize();
                 }
             ).then(undefined, function (err) { console.error(err); });
+        },
+        
+        _switchBasemap: function (basemapLayerKey) {
+            if (!(basemapLayerKey in this.map.layers)) {
+                return false;
+            }
+
+            if (this._baseLayer && this._baseLayer.name) {
+                const { name } = this._baseLayer;
+                this.map.layers[name].olLayer.setVisible(false);
+            }
+            
+            const newLayer = this.map.layers[basemapLayerKey];
+            newLayer.olLayer.setVisible(true);
+            this._baseLayer = newLayer;
+
+            return true;
+        },
+        
+        _getActiveBasemapKey: function () {
+            if (!this._baseLayer || !this._baseLayer.name) {
+                return undefined;
+            }
+            return this._baseLayer.name;
         },
 
         _buildLayersTree: function () {
