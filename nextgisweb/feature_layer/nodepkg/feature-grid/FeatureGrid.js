@@ -13,7 +13,6 @@ import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
 import { deleteFeatures } from "./api/deleteFeatures";
 import { KEY_FIELD_KEYNAME } from "./constant";
 import FeatureTable from "./FeatureTable";
-import {ZoomToFiltered} from "./component/ZoomToFiltered";
 
 import DeleteIcon from "@material-icons/svg/delete";
 import EditIcon from "@material-icons/svg/edit";
@@ -39,8 +38,6 @@ export const FeatureGrid = ({
     beforeDelete,
     size = "middle",
     readonly = true,
-    hasMap = false,
-    onZoomToFiltered,
     cleanSelectedOnFilter = true,
 }) => {
     const { data: totalData, refresh: refreshTotal } = useRouteGet(
@@ -96,18 +93,17 @@ export const FeatureGrid = ({
         return null;
     }, [resourceData]);
 
-    if (!totalData || !fields) {
-        return <LoadingWrapper />;
-    }
+    const goTo = useCallback(
+        (path) => {
+            const first = selected[0];
+            if (first) {
+                window.open(routeURL(path, id, first[KEY_FIELD_KEYNAME]));
+            }
+        },
+        [id, selected]
+    );
 
-    const goTo = (path) => {
-        const first = selected[0];
-        if (first) {
-            window.open(routeURL(path, id, first[KEY_FIELD_KEYNAME]));
-        }
-    };
-
-    const handleDelete = async () => {
+    const handleDelete = useCallback(async () => {
         const featureIds = selected.map((s) => s[KEY_FIELD_KEYNAME]);
         if (beforeDelete) {
             beforeDelete(featureIds);
@@ -127,9 +123,40 @@ export const FeatureGrid = ({
         }
         await refreshTotal();
         setSelected([]);
-    };
+    }, [
+        beforeDelete,
+        refreshTotal,
+        setSelected,
+        deleteError,
+        onDelete,
+        selected,
+        id,
+    ]);
 
-    const tableActions = [
+    const createButtonAction = useCallback(
+        ({ action, icon, title, ...rest }) => {
+            const btnAction = { size, ...rest };
+            if (action) {
+                const onClick = () => {
+                    action({ selected });
+                };
+                btnAction.onClick = onClick;
+            }
+            if (typeof btnAction.disabled === "function") {
+                btnAction.disabled = btnAction.disabled({ selected });
+            }
+            if (typeof icon === "string") {
+                btnAction.icon = <SvgIcon icon={icon} fill="currentColor" />;
+            }
+            return <Button {...btnAction}>{title}</Button>;
+        },
+        [selected, size]
+    );
+
+    const leftActions = [];
+    const rightActions = [];
+
+    const defActions = [
         {
             onClick: () => {
                 goTo("feature_layer.feature.show");
@@ -142,7 +169,7 @@ export const FeatureGrid = ({
     ];
 
     if (!readonly) {
-        tableActions.push(
+        defActions.push(
             {
                 onClick: () => {
                     goTo("feature_layer.feature.update");
@@ -165,47 +192,35 @@ export const FeatureGrid = ({
         );
     }
 
-    for (const { action, icon, ...rest } of actions) {
-        const customAction = { size, ...rest };
-        if (action) {
-            const onClick = () => {
-                action({ selected });
-            };
-            customAction.onClick = onClick;
+    let i = 0;
+    let isLeft = true;
+    for (const actionDef of [...defActions, ...actions]) {
+        i++;
+        if (typeof actionDef === "string") {
+            isLeft = false;
+            continue;
         }
-        if (typeof customAction.disabled === "function") {
-            customAction.disabled = customAction.disabled({ selected });
-        }
-        if (typeof icon === "string") {
-            customAction.icon = <SvgIcon icon={icon} fill="currentColor" />;
-        }
-        tableActions.push(customAction);
+        const action =
+            typeof actionDef === "function"
+                ? actionDef({ query, id, size })
+                : createButtonAction(actionDef);
+
+        [rightActions, leftActions][+isLeft].push(<div key={i}>{action}</div>);
     }
 
-    let zoomToFiltered;
-    if (hasMap && onZoomToFiltered) {
-        zoomToFiltered = <div>
-            <ZoomToFiltered
-                size={size}
-                query={query}
-                id={id}
-                onZoomToFiltered={onZoomToFiltered}
-            />
-        </div>;
+    if (!totalData || !fields) {
+        return <LoadingWrapper />;
     }
 
     return (
         <div className="ngw-feature-layer-feature-grid">
             <div className="toolbar">
-                {tableActions.map(({ title, ...s }, i) => (
-                    <div key={i}>
-                        <Button {...s}>{title}</Button>
-                    </div>
-                ))}
+                {leftActions}
 
                 <div className="spacer" />
 
-                {zoomToFiltered}
+                {rightActions}
+
                 <div>
                     <Input
                         placeholder={searchPlaceholderMsg}
@@ -217,7 +232,7 @@ export const FeatureGrid = ({
                 <div>
                     <Button
                         type="text"
-                        icon={<TuneIcon/>}
+                        icon={<TuneIcon />}
                         onClick={() => setSettingsOpen(!settingsOpen)}
                         size={size}
                     />
@@ -237,7 +252,7 @@ export const FeatureGrid = ({
                     setSelected,
                     settingsOpen,
                     setSettingsOpen,
-                    cleanSelectedOnFilter
+                    cleanSelectedOnFilter,
                 }}
             />
         </div>
@@ -245,7 +260,13 @@ export const FeatureGrid = ({
 };
 
 FeatureGrid.propTypes = {
-    actions: PropTypes.arrayOf(PropTypes.object),
+    actions: PropTypes.arrayOf(
+        PropTypes.oneOfType([
+            PropTypes.object,
+            PropTypes.string,
+            PropTypes.func,
+        ])
+    ),
     selectedIds: PropTypes.arrayOf(PropTypes.number),
     cleanSelectedOnFilter: PropTypes.bool,
     beforeDelete: PropTypes.func,

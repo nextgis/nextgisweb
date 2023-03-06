@@ -10,6 +10,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/feature-layer/feature-grid",
+    "@nextgisweb/webmap/zoom-to-filtered-btn",
     "ngw/route",
 ], function (
     declare,
@@ -23,6 +24,7 @@ define([
     i18n,
     reactApp,
     FeatureGrid,
+    ZoomToFilteredBtn,
     route
 ) {
     var Pane = declare([_WidgetBase], {
@@ -114,11 +116,14 @@ define([
                                 widget.zoomToFeature();
                             },
                         },
+                        'spacer',
+                        function(props) {
+                            props.onZoomToFiltered = function (ngwExtent) {
+                                widget.zoomToExtent(ngwExtent);
+                            }
+                            return ZoomToFilteredBtn.default(props)
+                        }
                     ],
-                    hasMap: true,
-                    onZoomToFiltered: (ngwExtent) => {
-                        widget.zoomToExtent(ngwExtent);
-                    }
                 },
                 this.domNode
             );

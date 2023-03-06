@@ -1,30 +1,29 @@
-import {PropTypes} from "prop-types";
+import { PropTypes } from "prop-types";
 
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
-import {Button} from "@nextgisweb/gui/antd";
-import {useRouteGet} from "@nextgisweb/pyramid/hook/useRouteGet";
+import { Button } from "@nextgisweb/gui/antd";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
 
 import ZoomInMap from "@material-icons/svg/zoom_in_map";
 
 const zoomToFilteredMsg = i18n.gettext("Zoom to filtered features");
 
-export const ZoomToFiltered = ({
-                                   id,
-                                   query,
-                                   size = "middle",
-                                   onZoomToFiltered
-                               }) => {
-
+export const ZoomToFilteredBtn = ({
+    id,
+    query,
+    size = "middle",
+    onZoomToFiltered,
+}) => {
     const {
         data: extentData,
         refresh: refreshExtent,
         isLoading: loading,
     } = useRouteGet(
         "feature_layer.feature.extent",
-        {id},
-        {query: {like: query}}
+        { id },
+        { query: { like: query } }
     );
 
     const [extentCache, setExtentCache] = useState();
@@ -48,30 +47,26 @@ export const ZoomToFiltered = ({
             return;
         }
 
-        const {extent} = extentData;
+        const { extent } = extentData;
         extentCache[query] = extent;
         onZoomToFiltered(extent);
     }, [extentData]);
 
     return (
-        <>
-            <div>
-                <Button
-                    type="text"
-                    title={zoomToFilteredMsg}
-                    icon={<ZoomInMap/>}
-                    onClick={click}
-                    size={size}
-                    loading={loading}
-                />
-            </div>
-        </>
+        <Button
+            type="text"
+            title={zoomToFilteredMsg}
+            icon={<ZoomInMap />}
+            onClick={click}
+            size={size}
+            loading={loading}
+        />
     );
 };
 
-ZoomToFiltered.propTypes = {
+ZoomToFilteredBtn.propTypes = {
     query: PropTypes.string,
     id: PropTypes.number,
     size: PropTypes.oneOf(["small", "middle", "large"]),
-    onZoomToFiltered: PropTypes.func
+    onZoomToFiltered: PropTypes.func,
 };

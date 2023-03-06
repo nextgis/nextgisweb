@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import debounce from "lodash/debounce";
 
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
+import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
 import { fetchFeatures } from "../api/fetchFeatures";
 import { createCacheKey } from "../util/createCacheKey";
@@ -86,25 +87,13 @@ export function useFeatureTable({
     /** For limit the number of API requests */
     const [fetchEnabled, setFetchEnabled] = useState(false);
 
-    const abortController = useRef();
-    const loaderCache = useRef(new LoaderCache());
+    const { makeSignal, abort } = useAbortController();
 
-    const abort = () => {
-        if (abortController.current) {
-            return abortController.current.abort();
-        }
-        abortController.current = null;
-    };
+    const loaderCache = useRef(new LoaderCache());
 
     useEffect(() => {
         loaderCache.current.clean();
     }, [total]);
-
-    const createSignal = useCallback(() => {
-        abort();
-        abortController.current = new AbortController();
-        return abortController.current.signal;
-    }, []);
 
     const [data, setData_] = useState([]);
 
@@ -118,12 +107,6 @@ export function useFeatureTable({
     };
 
     const queryMode = useMemo(() => !!query, [query]);
-
-    useEffect(() => {
-        return () => {
-            abort();
-        };
-    }, []);
 
     useEffect(() => {
         setFetchEnabled(false);
@@ -207,7 +190,7 @@ export function useFeatureTable({
                 ).flat();
                 handleFeatures(features);
             } else if (fetchEnabled) {
-                const signal = createSignal();
+                const signal = makeSignal();
                 const promises = [];
                 for (const { key, page } of cacheKeys) {
                     if (pages.includes(page)) {
@@ -233,7 +216,7 @@ export function useFeatureTable({
         handleFeatures,
         visibleFields,
         fetchEnabled,
-        createSignal,
+        makeSignal,
         fetchWrapper,
         pageSize,
         orderBy,
@@ -241,9 +224,11 @@ export function useFeatureTable({
         query,
     ]);
 
+    const count = useMemo(() => (queryMode ? queryTotal : total));
+
     const { getVirtualItems, measureElement, getTotalSize, scrollToIndex } =
         useVirtualizer({
-            count: queryMode ? queryTotal : total,
+            count,
             getScrollElement: () => tbodyRef.current,
             estimateSize: () => rowMinHeight,
         });
@@ -291,7 +276,7 @@ export function useFeatureTable({
     }, [orderBy, query, visibleFields]);
 
     useEffect(() => {
-        if (total) {
+        if (count) {
             scrollToIndex(0, { smoothScroll: false });
         }
         // to init first loading
