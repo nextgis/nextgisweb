@@ -49,15 +49,11 @@ define([
 
             xhr.get(route.webmap.extent({id: webmapId}), {
                 handleAs: "json"
-            }).then(extentData => {
-                const extent = [
-                    extentData.minLon, extentData.minLat,
-                    extentData.maxLon, extentData.maxLat
-                ];
-                const mapExtent = ol.proj.transformExtent(extent,
-                    this.display.lonlatProjection,
-                    this.display.displayProjection);
-                this.display.map.olMap.getView().fit(mapExtent);
+            }).then(extent => {
+                if (!extent) {
+                    return;
+                }
+                this.display.map.zoomToNgwExtent(extent, this.display.displayProjection);
             });
         }
     });

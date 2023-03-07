@@ -100,18 +100,31 @@ def annotation_idelete(resource, request):
     return None
 
 
+def add_extent(e1, e2):
+    def is_valid(extent):
+        if not extent:
+            return False
+        for k, v in extent.items():
+            if v is None:
+                return False
+        return True
+
+    e1_valid = is_valid(e1)
+    e2_valid = is_valid(e2)
+    if (not e1_valid) or (not e2_valid):
+        return (e2 if e2_valid else None) or \
+            (e1 if e1_valid else None)
+
+    return dict(
+        minLon=min(e1['minLon'], e2['minLon']),
+        maxLon=max(e1['maxLon'], e2['maxLon']),
+        minLat=min(e1['minLat'], e2['minLat']),
+        maxLat=max(e1['maxLat'], e2['maxLat']),
+    )
+
+
 def get_webmap_extent(resource, request):
     request.resource_permission(WebMap.scope.webmap.display)
-
-    def add_extent(e1, e2):
-        if (not e1) or (not e2):
-            return e1 if not e2 else e2
-        return dict(
-            minLon=min(e1['minLon'], e2['minLon']),
-            maxLon=max(e1['maxLon'], e2['maxLon']),
-            minLat=min(e1['minLat'], e2['minLat']),
-            maxLat=max(e1['maxLat'], e2['maxLat']),
-        )
 
     def traverse(item, extent):
         if item.item_type == 'layer':
