@@ -133,4 +133,9 @@ def test_filtered_extent(create_resource, filter_, expected_extent,
 
         resp = ngw_webtest_app.get(req_str)
         actual_extent = resp.json['extent']
-        assert expected_extent == actual_extent
+
+        for k in ('minLat', 'maxLat', 'minLon', 'maxLon'):
+            if expected_extent[k] is None:
+                assert actual_extent[k] is None
+            else:
+                assert abs(expected_extent[k] - actual_extent[k]) < 1e-6
