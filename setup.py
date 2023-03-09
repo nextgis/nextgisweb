@@ -40,7 +40,7 @@ requires = [
     'psycopg2==2.9.5',
     'pygdal' + (f'=={gv}.*,' if gv else '') + '>=3',
     'pyproj==3.4.1',
-    'pyramid==2.0',
+    'pyramid==2.0.1',
     'pyramid-debugtoolbar==4.10',
     'pyramid-mako==1.1.0',
     'pyramid-tm==2.5',
