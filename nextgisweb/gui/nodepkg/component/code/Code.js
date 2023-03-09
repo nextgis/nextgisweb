@@ -12,7 +12,7 @@ export function Code({ whenReady, ...props }) {
                 whenReady(editor);
             }
         }
-    }, [editor]);
+    }, [editor, whenReady]);
 
     return (
         <div

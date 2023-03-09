@@ -1,22 +1,27 @@
-import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { useMemo } from "react";
+
 import { Code } from "@nextgisweb/gui/component/code";
-import { Skeleton } from "@nextgisweb/gui/antd";
-import { route } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import { LoadingWrapper } from "@nextgisweb/gui/component";
 
 export function JsonView(props) {
-    const [body, setBody] = useState(null);
-    useEffect(async () => {
-        const data = await route('resource.item', props.id).get();
-        setBody(JSON.stringify(data, null, 2));
-    }, [])
+    const { data, isLoading } = useRouteGet(
+        "resource.item",
+        { id: props.id },
+        { cache: true }
+    );
 
-    if (body === null) {
-        return <Skeleton title={false} paragraph={{rows: 4}}/>
+    const body = useMemo(() => {
+        return JSON.stringify(data, null, 2);
+    }, [data]);
+
+    if (isLoading) {
+        return <LoadingWrapper />;
     }
-    return <Code
-        value={body}
-        lang="json"
-        readOnly
-        lineNumbers
-    ></Code>;
+    return <Code value={body} lang="json" readOnly lineNumbers></Code>;
 }
+
+JsonView.propTypes = {
+    id: PropTypes.number,
+};

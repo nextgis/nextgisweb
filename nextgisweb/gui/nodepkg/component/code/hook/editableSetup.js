@@ -1,11 +1,19 @@
-import { history, historyKeymap } from "@codemirror/history";
+import {
+    autocompletion,
+    closeBrackets,
+    closeBracketsKeymap,
+    completionKeymap,
+} from "@codemirror/autocomplete";
+import {
+    defaultKeymap,
+    history,
+    historyKeymap,
+    indentWithTab,
+} from "@codemirror/commands";
 import { indentOnInput } from "@codemirror/language";
-import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
-import { closeBrackets, closeBracketsKeymap } from "@codemirror/closebrackets";
-import { defaultKeymap, indentWithTab } from "@codemirror/commands";
-import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { commentKeymap } from "@codemirror/comment";
 import { lintKeymap } from "@codemirror/lint";
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
+
 import { keymap } from "@codemirror/view";
 
 export function editableSetup() {
@@ -20,7 +28,6 @@ export function editableSetup() {
             ...closeBracketsKeymap,
             ...defaultKeymap,
             ...searchKeymap,
-            ...commentKeymap,
             ...lintKeymap,
             ...historyKeymap,
             ...completionKeymap,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 
@@ -48,7 +48,12 @@ export function useCodeMirror({
 }) {
     const [editor, setEditor] = useState(null);
 
-    useEffect(async () => {
+    const destroy = useRef();
+
+    const createEditor = useCallback(async () => {
+        if (destroy.current) {
+            destroy.current();
+        }
         const parent = target.current;
         const langExtension = await getLang(lang);
         const setup = await customSetup({ lineNumbers, readOnly, fold });
@@ -71,11 +76,34 @@ export function useCodeMirror({
             source: cm,
             getValue: () => cm.state.doc.toString(),
         });
-
-        return () => {
+        destroy.current = () => {
             cm.destroy();
+            setEditor(null);
         };
-    }, [target]);
+        return cm;
+    }, [
+        autoHeight,
+        doc,
+        fold,
+        lang,
+        lineNumbers,
+        maxHeight,
+        minHeight,
+        readOnly,
+        target,
+    ]);
+
+    useEffect(() => {
+        createEditor();
+    }, [createEditor]);
+
+    useEffect(() => {
+        return () => {
+            if (destroy.current) {
+                destroy.current();
+            }
+        };
+    }, []);
 
     return editor;
 }

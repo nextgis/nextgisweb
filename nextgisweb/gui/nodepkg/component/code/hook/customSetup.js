@@ -1,54 +1,82 @@
 import {
-    highlightSpecialChars,
+    autocompletion,
+    closeBrackets,
+    closeBracketsKeymap,
+    completionKeymap,
+} from "@codemirror/autocomplete";
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import {
+    bracketMatching,
+    defaultHighlightStyle,
+    foldGutter,
+    foldKeymap,
+    indentOnInput,
+    syntaxHighlighting,
+} from "@codemirror/language";
+import { lintKeymap } from "@codemirror/lint";
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
+import { EditorState } from "@codemirror/state";
+import {
+    crosshairCursor,
     drawSelection,
     dropCursor,
     highlightActiveLine,
+    highlightActiveLineGutter,
+    highlightSpecialChars,
+    keymap,
+    lineNumbers,
+    rectangularSelection,
 } from "@codemirror/view";
-export { EditorView } from "@codemirror/view";
-import { EditorState } from "@codemirror/state";
-import { bracketMatching } from "@codemirror/matchbrackets";
-import { rectangularSelection } from "@codemirror/rectangular-selection";
-import { defaultHighlightStyle } from "@codemirror/highlight";
 
-export async function customSetup({ lineNumbers, readOnly, fold }) {
-    const keys = [];
+export async function customSetup({
+    lineNumbers: lineNumbers_,
+    readOnly,
+    fold,
+}) {
+    const keymap_ = [
+        ...closeBracketsKeymap,
+        ...defaultKeymap,
+        ...searchKeymap,
+        ...historyKeymap,
+        ...completionKeymap,
+        ...lintKeymap,
+    ];
 
     const customSetup = [
         highlightSpecialChars(),
+        history(),
         drawSelection(),
         dropCursor(),
         EditorState.allowMultipleSelections.of(true),
-        defaultHighlightStyle.fallback,
+        indentOnInput(),
+        syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         bracketMatching(),
+        closeBrackets(),
+        autocompletion(),
         rectangularSelection(),
+        crosshairCursor(),
         highlightActiveLine(),
+        highlightSelectionMatches(),
     ];
 
-    fold = fold ?? lineNumbers;
+    fold = fold ?? lineNumbers_;
 
-    if (lineNumbers) {
-        const { lineNumbers, highlightActiveLineGutter } = await import(
-            "@codemirror/gutter"
-        );
+    if (lineNumbers_) {
         customSetup.push(...[lineNumbers(), highlightActiveLineGutter()]);
     }
     if (fold) {
-        const { foldGutter, foldKeymap } = await import("@codemirror/fold");
         customSetup.push(foldGutter());
-        keys.push(foldKeymap);
+        keymap_.push(...foldKeymap);
     }
     if (readOnly) {
-        customSetup.push(
-            ...[
-                // the `@codemirror/matchbrackets` does not work with editable: false
-                // EditorView.editable.of(false),
-                EditorState.readOnly.of(true),
-            ]
-        );
+        customSetup.push(...[EditorState.readOnly.of(true)]);
+        customSetup.push(keymap.of(keymap_));
     } else {
         const { editableSetup } = await import("./editableSetup");
         customSetup.push(...editableSetup());
     }
+
+    
 
     return customSetup;
 }
