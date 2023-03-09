@@ -1,14 +1,22 @@
 import PropTypes from "prop-types";
-import { Form, Checkbox as CB } from "@nextgisweb/gui/antd";
+
+import { Checkbox as Checkbox_ } from "@nextgisweb/gui/antd";
+
+import { FormItem } from "./_FormItem";
 
 export function Checkbox({ disabled = false, ...props }) {
     return (
-        <Form.Item {...props} valuePropName="checked">
-            <CB {...{ disabled }}></CB>
-        </Form.Item>
+        <FormItem
+            valuePropName="checked"
+            input={(inputProps) => (
+                <Checkbox_ {...{ disabled, ...inputProps }}></Checkbox_>
+            )}
+            {...props}
+        />
     );
 }
 
 Checkbox.propTypes = {
     disabled: PropTypes.bool,
+    inputProps: PropTypes.object,
 };

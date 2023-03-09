@@ -1,8 +1,11 @@
 import { PropTypes } from "prop-types";
-import { Form, Input } from "@nextgisweb/gui/antd";
+
+import { Input } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
 
-export function KeynameTextBox({...props}) {
+import { FormItem } from "./_FormItem";
+
+export function KeynameTextBox({ ...props }) {
     const rules = [...props.rules] || [];
     rules.push({
         pattern: new RegExp(/^[A-Za-z][\w-]*$/g),
@@ -10,13 +13,14 @@ export function KeynameTextBox({...props}) {
     });
     const p = { ...props, rules };
     return (
-        <Form.Item {...p}>
-            <Input></Input>
-        </Form.Item>
+        <FormItem
+            {...p}
+            input={(inputProps) => <Input {...inputProps}></Input>}
+        />
     );
-
 }
 
 KeynameTextBox.propTypes = {
     rules: PropTypes.array,
+    inputProps: PropTypes.object,
 };

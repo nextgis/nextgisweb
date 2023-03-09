@@ -1,13 +1,17 @@
 import PropTypes from "prop-types";
-import { Form, InputNumber } from "@nextgisweb/gui/antd";
 
-export function Number({ min, max, inputProps, ...props }) {
-    const inputProps_ = { ...inputProps, min, max };
+import { InputNumber } from "@nextgisweb/gui/antd";
 
+import { FormItem } from "./_FormItem";
+
+export function Number({ min, max, ...props }) {
     return (
-        <Form.Item {...props}>
-            <InputNumber {...inputProps_} />
-        </Form.Item>
+        <FormItem
+            {...props}
+            input={(inputProps) => (
+                <InputNumber {...{ min, max, ...inputProps }} />
+            )}
+        />
     );
 }
 

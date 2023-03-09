@@ -1,39 +1,23 @@
-import { useEffect, useReducer, useCallback } from "react";
+import { useEffect, useRef } from "react";
 
-function reducer(state, action) {
-    switch (action.type) {
-        case "add":
-            return [...state, action.controller];
-        case "clean":
-            for (const a of state) {
-                a.abort();
-            }
-            return [];
-        default:
-            throw new Error();
-    }
-}
+import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
+
 
 export function useAbortController() {
-    const [controllers, dispatch] = useReducer(reducer, []);
+    const abortHelper = useRef();
 
-    const makeSignal = useCallback(() => {
-        const controller = new AbortController();
-        dispatch({ type: "add", controller });
-        return controller.signal;
-    }, []);
+    const makeSignal = () => {
+        return abortHelper.current.makeSignal();
+    };
 
-    const abort = useCallback(() => {
-        for (const a of controllers) {
-            a.abort();
-        }
-        dispatch({ type: "clean" });
-    }, [controllers]);
+    const abort = () => {
+        abortHelper.current.abort();
+    };
 
     useEffect(() => {
-        return () => {
-            dispatch({ type: "clean" });
-        };
+        abortHelper.current =  new AbortControllerHelper()
+        const abort_ = abortHelper.current.abort;
+        return abort_;
     }, []);
 
     return { makeSignal, abort };

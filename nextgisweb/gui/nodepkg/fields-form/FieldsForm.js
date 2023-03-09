@@ -1,19 +1,39 @@
 import { PropTypes } from "prop-types";
-import { Fragment, useMemo, useEffect } from "react";
-import { Form, Input, InputNumber } from "@nextgisweb/gui/antd";
-import { Checkbox } from "./field/Checkbox";
+
+import { Fragment, useEffect, useMemo, useRef } from "react";
+
+import { Form } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
 
+import {
+    Checkbox,
+    DateInput,
+    DateTimeInput,
+    Input,
+    Number,
+    Password,
+    Select,
+    TextArea,
+    TimeInput,
+} from "./field";
+
+const widgetsByName = {
+    checkbox: Checkbox,
+    date: DateInput,
+    datetime: DateTimeInput,
+    input: Input,
+    number: Number,
+    password: Password,
+    select: Select,
+    text: TextArea,
+    time: TimeInput,
+};
+
 export function FieldsForm(props) {
-    const {
-        fields,
-        initialValues,
-        onChange,
-        whenReady,
-        form,
-        ...formProps
-    } = props;
+    const { fields, initialValues, onChange, whenReady, form, ...formProps } =
+        props;
     const form_ = Form.useForm(form)[0];
+    const whenReady_ = useRef(whenReady);
 
     const isValid = async () => {
         return form_.getFieldsError().every((e) => {
@@ -55,19 +75,19 @@ export function FieldsForm(props) {
                     return true;
                 })
                 : [],
-        [fields]
+        [fields, initialValues]
     );
 
     useEffect(() => {
-        if (whenReady) {
-            whenReady();
+        if (whenReady_.current) {
+            whenReady_.current();
         }
     }, []);
 
     return (
         <Form labelWrap colon={false} {...formProps_} className="fields-form">
             {includedFormItems.map((f) => (
-                <Fragment key={f.name}>{FormItem({ ...f })}</Fragment>
+                <Fragment key={f.name}>{<FormItem {...f} />}</Fragment>
             ))}
             {props.children}
         </Form>
@@ -79,7 +99,6 @@ function FormItem(props) {
 
     delete formProps.included;
     delete formProps.value;
-
     formProps.rules = formProps.rules || [];
 
     if (required) {
@@ -89,32 +108,28 @@ function FormItem(props) {
         });
     }
 
-    const FormWidget = widget;
-    if (typeof widget === "function") {
-        return <FormWidget {...formProps}></FormWidget>;
-    }
-    if (widget === "checkbox") {
-        return <Checkbox {...formProps}></Checkbox>;
-    }
-
-    return (
-        <Form.Item {...formProps}>{getInputType(widget, formProps)}</Form.Item>
-    );
-}
-
-function getInputType(widget, props) {
+    let FormWidget;
     if (typeof widget === "string") {
-        widget = widget.toLowerCase();
-        if (widget === "password") {
-            return <Input.Password {...props} />;
-        } else if (widget === "textarea") {
-            return <Input.TextArea {...props} />;
-        } else if (widget === "number") {
-            return <InputNumber type="number" {...props} />;
-        }
+        FormWidget = widgetsByName[widget.toLowerCase()];
+    } else if (typeof widget === "function") {
+        FormWidget = widget;
     }
-    return <Input {...props} />;
+    FormWidget = FormWidget || Input;
+
+    return <FormWidget {...formProps}></FormWidget>;
 }
+
+const FormItemType = PropTypes.shape({
+    name: PropTypes.string,
+    label: PropTypes.string,
+    widget: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+    disabled: PropTypes.bool,
+    required: PropTypes.bool,
+    choices: PropTypes.array,
+    requiredMessage: PropTypes.string,
+    included: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]),
+    inputProps: PropTypes.object,
+});
 
 const FieldPropTypes = PropTypes.shape({
     name: PropTypes.string.isRequired,
@@ -146,4 +161,14 @@ FormItem.propTypes = {
     choices: PropTypes.array,
     requiredMessage: PropTypes.string,
     included: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]),
+    inputProps: PropTypes.object,
+};
+
+FieldsForm.propTypes = {
+    initialValues: PropTypes.object,
+    whenReady: PropTypes.func,
+    onChange: PropTypes.func,
+    children: PropTypes.node,
+    fields: PropTypes.arrayOf(FormItemType),
+    form: PropTypes.any,
 };

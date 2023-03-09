@@ -1,17 +1,21 @@
 import PropTypes from "prop-types";
-import { Form, Input } from "@nextgisweb/gui/antd";
+
+import { Input } from "@nextgisweb/gui/antd";
+
+import { FormItem } from "./_FormItem";
 
 export function Password({ autoComplete, placeholder, ...props }) {
-    const inputProps = { autoComplete, placeholder };
 
     return (
-        <Form.Item {...props}>
-            <Input.Password {...inputProps} />
-        </Form.Item>
+        <FormItem
+            {...props}
+            input={(inputProps) => <Input.Password {...{autoComplete, placeholder,...inputProps}} />}
+        />
     );
 }
 
 Password.propTypes = {
     autoComplete: PropTypes.string,
     placeholder: PropTypes.string,
+    inputProps: PropTypes.object,
 };

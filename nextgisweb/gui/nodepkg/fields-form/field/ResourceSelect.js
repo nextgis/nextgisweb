@@ -81,14 +81,16 @@ SelectInput.propTypes = {
     value: PropTypes.any,
 };
 
-export function ResourceSelect({ pickerOptions, ...props }) {
+export function ResourceSelect({ pickerOptions, inputProps, ...props }) {
     return (
         <Form.Item {...props}>
-            <SelectInput {...pickerOptions}></SelectInput>
+            <SelectInput {...{...pickerOptions, ...inputProps}}></SelectInput>
         </Form.Item>
     );
 }
 
 ResourceSelect.propTypes = {
+    // @deprecated use inputProps instead
     pickerOptions: PropTypes.object,
+    inputProps: PropTypes.object,
 };

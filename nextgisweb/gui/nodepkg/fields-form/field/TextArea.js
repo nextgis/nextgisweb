@@ -1,9 +1,18 @@
-import { Form, Input } from "@nextgisweb/gui/antd";
+import PropTypes from "prop-types";
+
+import { Input } from "@nextgisweb/gui/antd";
+
+import { FormItem } from "./_FormItem";
 
 export function TextArea({ ...props }) {
     return (
-        <Form.Item {...props}>
-            <Input.TextArea />
-        </Form.Item>
+        <FormItem
+            {...props}
+            input={(inputProps) => <Input.TextArea {...inputProps} />}
+        />
     );
 }
+
+TextArea.propTypes = {
+    inputProps: PropTypes.object,
+};

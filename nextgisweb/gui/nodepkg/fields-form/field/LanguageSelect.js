@@ -1,7 +1,10 @@
-import { Button, Form, Input, Select } from "@nextgisweb/gui/antd";
+import { PropTypes } from "prop-types";
+
+import { Button, Input, Select } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
-import { PropTypes } from "prop-types";
+
+import { FormItem } from "./_FormItem";
 
 const languageContributeUrl = settings.language_contribute_url;
 const translateProposalMsg = i18n.gettext("Improve or add new translation");
@@ -72,16 +75,20 @@ LanguageSelectInput.propTypes = {
 };
 
 export function LanguageSelect({ loading, contribute, ...props }) {
-    const selectProps = { loading, contribute };
-
     return (
-        <Form.Item {...props}>
-            <LanguageSelectInput {...selectProps} />
-        </Form.Item>
+        <FormItem
+            {...props}
+            input={(inputProps) => (
+                <LanguageSelectInput
+                    {...{ loading, contribute, ...inputProps }}
+                />
+            )}
+        />
     );
 }
 
 LanguageSelect.propTypes = {
     loading: PropTypes.bool,
     contribute: PropTypes.bool,
+    inputProps: PropTypes.object,
 };
