@@ -17,9 +17,6 @@ class BaseClass:
     def __init__(self, **kwargs):
         cls = type(self)
         for k, v in kwargs.items():
-            if not hasattr(cls, k):
-                continue
-
             clsattr = type(getattr(cls, k))
             if issubclass(clsattr, InstrumentedAttribute):
                 setattr(self, k, v)
