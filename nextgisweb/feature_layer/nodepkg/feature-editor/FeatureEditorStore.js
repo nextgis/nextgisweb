@@ -58,11 +58,6 @@ export class FeatureEditorStore {
             const resp = await route("resource.item", this.resourceId).get({
                 signal,
             });
-            if (resp.resource.cls !== "vector_layer") {
-                throw new Error(
-                    `The resource with ID#${this.resourceId} is not a 'vector_layer' cls`
-                );
-            }
             if (this.featureId !== undefined) {
                 const featureItem = await route(
                     "feature_layer.feature.item",
