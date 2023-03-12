@@ -4,12 +4,12 @@ import { Select as AntdSelect } from "@nextgisweb/gui/antd";
 
 import { FormItem } from "./_FormItem";
 
-export function Select({ choices, ...props }) {
+export function Select({ choices, mode, ...props }) {
     return (
         <FormItem
             {...props}
             input={(inputProps) => (
-                <AntdSelect {...inputProps }>
+                <AntdSelect {...{ mode, ...inputProps }}>
                     {choices.map(({ label, value, ...optionProps }) => (
                         <AntdSelect.Option
                             key={value}
@@ -33,5 +33,6 @@ Select.propTypes = {
                 .isRequired,
         })
     ),
+    mode: PropTypes.string,
     inputProps: PropTypes.object,
 };

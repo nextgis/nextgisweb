@@ -134,7 +134,7 @@ const FormItemType = PropTypes.shape({
 const FieldPropTypes = PropTypes.shape({
     name: PropTypes.string.isRequired,
     label: PropTypes.string,
-    widget: PropTypes.any,
+    widget: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
     mode: PropTypes.string,
     included: PropTypes.bool,
     choices: PropTypes.arrayOf(
@@ -154,7 +154,7 @@ FieldsForm.propTypes = {
 FormItem.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
-    widget: PropTypes.string,
+    widget: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
     widgetProps: PropTypes.object,
     disabled: PropTypes.bool,
     required: PropTypes.bool,
