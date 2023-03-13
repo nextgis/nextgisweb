@@ -8,9 +8,10 @@ export function Number({ min, max, ...props }) {
     return (
         <FormItem
             {...props}
-            input={(inputProps) => (
-                <InputNumber {...{ min, max, ...inputProps }} />
-            )}
+            input={(inputProps) => {
+                inputProps = {  min, max, ...inputProps, };
+                return <InputNumber {...inputProps} />;
+            }}
         />
     );
 }

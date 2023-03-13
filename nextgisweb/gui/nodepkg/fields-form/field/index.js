@@ -1,3 +1,4 @@
+import { BigInteger } from "./BigInteger";
 import { Checkbox } from "./Checkbox";
 import { DateInput } from "./DateInput";
 import { DateTimeInput } from "./DateTimeInput";
@@ -15,6 +16,7 @@ import { TimeInput } from "./TimeInput";
 import { ValidationTextBox } from "./ValidationTextBox";
 
 export {
+    BigInteger,
     Checkbox,
     DateInput,
     DateTimeInput,
