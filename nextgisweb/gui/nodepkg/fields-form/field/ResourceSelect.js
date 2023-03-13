@@ -23,11 +23,7 @@ const SelectInput = ({ value, onChange, ...pickerOptions }) => {
         } finally {
             setResourceLoading(false);
         }
-    }, [value]);
-
-    useEffect(() => {
-        return abort;
-    }, []);
+    }, [value, abort, makeSignal]);
 
     useEffect(() => {
         loadResource();

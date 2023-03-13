@@ -122,14 +122,12 @@ const SelectInput = ({
         onChange: onSelectChange,
     };
 
-    useEffect(() => {});
-
     useEffect(() => {
         loadResources();
         setSelectedRowKeys((old) => {
             return old.filter((oldId) => !ids.includes(oldId));
         });
-    }, [ids]);
+    }, [ids, loadResources]);
 
     return (
         <Input.Group compact>

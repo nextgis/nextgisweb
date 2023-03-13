@@ -119,7 +119,7 @@ function FormItem(props) {
     return <FormWidget {...formProps}></FormWidget>;
 }
 
-const FormItemType = PropTypes.shape({
+const FormItemType = {
     name: PropTypes.string,
     label: PropTypes.string,
     widget: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
@@ -129,7 +129,7 @@ const FormItemType = PropTypes.shape({
     requiredMessage: PropTypes.string,
     included: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]),
     inputProps: PropTypes.object,
-});
+};
 
 const FieldPropTypes = PropTypes.shape({
     name: PropTypes.string.isRequired,
@@ -151,24 +151,14 @@ FieldsForm.propTypes = {
     fields: PropTypes.arrayOf(FieldPropTypes),
     form: PropTypes.any,
 };
-FormItem.propTypes = {
-    name: PropTypes.string,
-    label: PropTypes.string,
-    widget: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-    widgetProps: PropTypes.object,
-    disabled: PropTypes.bool,
-    required: PropTypes.bool,
-    choices: PropTypes.array,
-    requiredMessage: PropTypes.string,
-    included: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]),
-    inputProps: PropTypes.object,
-};
+
+FormItem.propTypes = FormItemType;
 
 FieldsForm.propTypes = {
     initialValues: PropTypes.object,
     whenReady: PropTypes.func,
     onChange: PropTypes.func,
     children: PropTypes.node,
-    fields: PropTypes.arrayOf(FormItemType),
+    fields: PropTypes.arrayOf(PropTypes.shape(FormItemType)),
     form: PropTypes.any,
 };

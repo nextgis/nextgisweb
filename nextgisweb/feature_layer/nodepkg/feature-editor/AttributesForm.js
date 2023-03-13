@@ -1,13 +1,14 @@
 import { PropTypes } from "prop-types";
 
 import { observer } from "mobx-react-lite";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 
 import { LoadingWrapper } from "@nextgisweb/gui/component";
-import { Button } from "@nextgisweb/gui/antd";
+import { Button, Tooltip } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n!";
 
 import {
+    BigInteger,
     DateInput,
     DateTimeInput,
     FieldsForm,
@@ -18,20 +19,25 @@ import {
     useForm,
 } from "@nextgisweb/gui/fields-form";
 
+import BackspaceIcon from "@material-icons/svg/backspace";
+
+const style = { width: '100%' }
+
 const ngwTypeAliases = {
-    DATETIME: DateTimeInput,
-    INTEGER: Integer,
-    STRING: Input,
-    REAL: Number,
-    TIME: TimeInput,
-    DATE: DateInput,
-    BIGINT: Integer,
+    STRING: [Input],
+    REAL: [Number, { style }],
+    INTEGER: [Integer, { style }],
+    BIGINT: [BigInteger, { style }],
+    DATETIME: [DateTimeInput, { style, allowClear: false, }],
+    DATE: [DateInput, { style, allowClear: false, }],
+    TIME: [TimeInput, { style, allowClear: false, }],
 };
 
-const setNullMsg = i18n.gettext("Set NULL");
+const setNullTitle = i18n.gettext("Set field value to NULL (No data)");
 
 export const AttributesForm = observer(({ store }) => {
     const { fields, values, setValues, initLoading } = store;
+    const [size] = useState('small')
     const form = useForm()[0];
 
     const setNullForField = useCallback(
@@ -42,26 +48,33 @@ export const AttributesForm = observer(({ store }) => {
         [form, setValues]
     );
 
-    const formFiealds = useMemo(
+    const formFields = useMemo(
         () =>
             fields.map((field) => {
+                const widgetAlias = ngwTypeAliases[field.datatype];
+                const [widget, inputProps] = widgetAlias;
+
                 const props = {
                     name: field.keyname,
                     label: field.display_name,
-                    widget: ngwTypeAliases[field.datatype],
+                    widget,
+                    inputProps,
                     append: (
-                        <Button
-                            onClick={() => {
-                                setNullForField(field.keyname);
-                            }}
-                        >
-                            {setNullMsg}
-                        </Button>
+                        <Tooltip title={setNullTitle} placement="right">
+                            <Button
+                                onClick={() => {
+                                    setNullForField(field.keyname);
+                                }}
+                            >
+                                <BackspaceIcon />
+                            </Button>
+                        </Tooltip>
                     ),
                 };
                 const val = values[field.keyname];
                 if (val === null) {
                     props.placeholder = "NULL";
+
                 }
 
                 return props;
@@ -76,8 +89,8 @@ export const AttributesForm = observer(({ store }) => {
     return (
         <FieldsForm
             form={form}
-            size="small"
-            fields={formFiealds}
+            size={size}
+            fields={formFields}
             initialValues={values}
             onChange={async (v) => {
                 if (await v.isValid()) {
