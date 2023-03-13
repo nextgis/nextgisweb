@@ -50,7 +50,6 @@ const fieldListToOptions = (fieldList) => {
 export function ExportForm({ id, pick, multiple }) {
     const [status, setStatus] = useState("loading");
 
-    // TODO: use `react-router-dom` in future
     const [urlParams, setUrlParams] = useState({});
 
     const { makeSignal } = useAbortController();
@@ -73,7 +72,6 @@ export function ExportForm({ id, pick, multiple }) {
             zipped: !!multiple,
             ...urlParams,
         };
-
         return initialVals;
     }, [defaultSrs, fieldOptions, format, multiple, urlParams]);
 
@@ -112,9 +110,14 @@ export function ExportForm({ id, pick, multiple }) {
             fields: fieldsStr,
             ...rest
         } = Object.fromEntries(new URL(location.href).searchParams.entries());
-        const resources = resStr ? resStr.split(",").map(Number) : [];
-        const fields = fieldsStr ? fieldsStr.split(",").map(Number) : [];
-        setUrlParams({ resources, fields, ...rest });
+        const urlParamsToset = { ...rest };
+        if (resStr) {
+            urlParamsToset.resources = resStr.split(",").map(Number);
+        }
+        if (fieldsStr) {
+            urlParamsToset.fields = fieldsStr.split(",").map(Number);
+        }
+        setUrlParams(urlParamsToset);
     }, []);
 
     useEffect(() => load(), [load]);
@@ -240,7 +243,8 @@ export function ExportForm({ id, pick, multiple }) {
 
         let apiUrl;
         if (ids.length === 1) {
-            apiUrl = routeURL("resource.export", ids[0]) + "?" + params.toString();
+            apiUrl =
+                routeURL("resource.export", ids[0]) + "?" + params.toString();
         } else {
             params.append("resources", ids.join(","));
             apiUrl = routeURL("feature_layer.export") + "?" + params.toString();
