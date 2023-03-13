@@ -33,7 +33,6 @@ export class FeatureEditorStore {
             const val = this._attributes[keyname];
             values[keyname] = parseNgwAttribute(datatype, val);
         }
-        console.log(values);
         return values;
     }
 
@@ -47,7 +46,6 @@ export class FeatureEditorStore {
 
     get attributes() {
         return this._attributes
-        // return this._formatAttributes(this._attributes);
     }
 
     initialize = async () => {
