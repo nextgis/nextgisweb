@@ -33,6 +33,7 @@ export class FeatureEditorStore {
             const val = this._attributes[keyname];
             values[keyname] = parseNgwAttribute(datatype, val);
         }
+        console.log(values);
         return values;
     }
 
@@ -45,7 +46,8 @@ export class FeatureEditorStore {
     }
 
     get attributes() {
-        return this._attributes;
+        return this._attributes
+        // return this._formatAttributes(this._attributes);
     }
 
     initialize = async () => {
@@ -58,17 +60,17 @@ export class FeatureEditorStore {
             const resp = await route("resource.item", this.resourceId).get({
                 signal,
             });
+            runInAction(() => {
+                this._resourceItem = resp;
+            });
             if (this.featureId !== undefined) {
                 const featureItem = await route(
                     "feature_layer.feature.item",
                     this.resourceId,
                     this.featureId
-                ).get({ signal });
+                ).get({ signal, query: { dt_format: "iso" } });
                 this._setFeatureItem(featureItem);
             }
-            runInAction(() => {
-                this._resourceItem = resp;
-            });
         } finally {
             runInAction(() => {
                 this.initLoading = false;
@@ -81,16 +83,8 @@ export class FeatureEditorStore {
     };
 
     setValues = (values = {}) => {
-        const attributes = { ...this._attributes };
-        for (const key in values) {
-            const val = values[key];
-            const field = this.fields.find((f) => f.keyname === key);
-            if (field) {
-                attributes[key] = formatNgwAttribute(field.datatype, val);
-            }
-        }
         runInAction(() => {
-            this._attributes = attributes;
+            this._attributes = this._formatAttributes(values);
         });
     };
 
@@ -99,6 +93,18 @@ export class FeatureEditorStore {
             this._setFeatureItem(this._featureItem);
         }
     };
+
+    _formatAttributes(values) {
+        const attributes = { ...this._attributes };
+        for (const key in values) {
+            const val = values[key];
+            const field = this.fields.find((f) => f.keyname === key);
+            if (field) {
+                attributes[key] = formatNgwAttribute(field.datatype, val);
+            }
+        }
+        return attributes;
+    }
 
     _setFeatureItem(featureItem) {
         runInAction(() => {

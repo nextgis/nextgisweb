@@ -50,7 +50,6 @@ define([
     reactApp,
     loader
 ) {
-
     var FieldsWidget = declare([TableContainer], {
         title: i18n.gettext("Attributes"),
         style: "padding: 16px; box-sizing: border-box; height: 100%; overflow: auto;",
@@ -98,7 +97,6 @@ define([
                 content: i18n.gettext("Please wait. Processing request..."),
             }).placeAt(this);
 
-
             this._fwidget = new FieldsWidget({ store: this.store }).placeAt(
                 this._tabContainer
             );
@@ -142,10 +140,12 @@ define([
         },
 
         iurl: function () {
-            return route.feature_layer.feature.item({
+            var urlStr = route.feature_layer.feature.item({
                 id: this.resource,
                 fid: this.feature,
             });
+            var params = new URLSearchParams({ dt_format: "iso" });
+            return [urlStr, params].join("?");
         },
 
         load: function () {
