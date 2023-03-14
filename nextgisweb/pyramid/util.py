@@ -19,8 +19,11 @@ def viewargs(**kw):
 
     def wrap(f):
 
-        def wrapped(request, *args, **kwargs):
-            return f(request, *args, **kwargs)
+        def wrapped(*args):
+            if len(args) == 2 and f.__code__.co_argcount == 1:
+                context, request = args
+                return f(request)
+            return f(*args)
 
         wrapped.__name__ = 'args(%s)' % f.__name__
         wrapped.__viewargs__ = kw
