@@ -246,6 +246,8 @@ def export_single(resource, request):
 
 
 def view_geojson(resource, request):
+    request.resource_permission(PERM_READ)
+
     options = ExportOptions(format='GeoJSON')
 
     with tempfile.TemporaryDirectory() as tmp_dir:
