@@ -114,8 +114,11 @@ define([
                         var idx = 0;
 
                         array.forEach(layerResponse.features, function (feature) {
-                            var label = put("div[style=\"overflow: hidden; display: inline-block; text-align: left;\"] $ span[style=\"color: gray\"] $ <", feature.label, " (" + this.layerLabels[layerId] + ")");
+                            var label = put("div[style=\"overflow: hidden; display: inline-block; text-align: left;\"] $ span[style=\"color: gray\"] $ <", 
+                                feature.label, ` (${this.layerLabels[layerId]})`);
+                            feature.labelWithLayer = `${feature.label} (${this.layerLabels[layerId]})`;
                             domStyle.set(label, "width", (this.popupSize[0] - 35) + "px");
+
                             this.selectOptions.push({
                                 label: label.outerHTML,
                                 value: layerId + "/" + idx
@@ -184,8 +187,10 @@ define([
             var keys = selectValue.split("/");
             return this.response[keys[0]].features[keys[1]];
         },
-        _displayFeature: function (feature) {
-            var widget = this, lid = feature.layerId, fid = feature.id,
+        _displayFeature: function (featureInfo) {
+            var widget = this, 
+                lid = featureInfo.layerId, 
+                fid = featureInfo.id,
                 iurl = route.feature_layer.feature.item({id: lid, fid: fid});
 
             domConstruct.empty(widget.featureContainer.domNode);
@@ -258,7 +263,8 @@ define([
                                 });
 
                                 var pane = new FeatureEditorWidget({
-                                    resource: lid, feature: fid,
+                                    resource: lid, 
+                                    feature: fid,
                                     fields: data.feature_layer.fields,
                                     title: i18n.gettext("Feature") + " #" + fid,
                                     iconClass: "iconDescription",
@@ -282,7 +288,8 @@ define([
                 topic.publish("feature.highlight", {
                     geom: feature.geom, 
                     featureId: feature.id, 
-                    layerId: lid
+                    layerId: lid,
+                    featureInfo: featureInfo,
                 });
             });
         },
