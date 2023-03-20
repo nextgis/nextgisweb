@@ -5,6 +5,7 @@ from .base import (
 
 from .layer_info import LayerInfoPlugin
 from .layer_editor import LayerEditorPlugin
+from .layer_opacity import LayerOpacityPlugin
 from .feature_layer import FeatureLayerPlugin
 from .zoom_to_layer import ZoomToLayerPlugin
 from .zoom_to_webmap import ZoomToWebmapPlugin
@@ -14,6 +15,7 @@ __all__ = [
     'WebmapLayerPlugin',
     'LayerInfoPlugin',
     'LayerEditorPlugin',
+    'LayerOpacityPlugin',
     'FeatureLayerPlugin',
     'ZoomToLayerPlugin',
     'ZoomToWebmapPlugin',
