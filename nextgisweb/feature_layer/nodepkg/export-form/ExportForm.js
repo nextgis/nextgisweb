@@ -1,7 +1,5 @@
 import PropTypes from "prop-types";
 
-import WKT from "ol/format/WKT";
-import { fromExtent } from "ol/geom/Polygon";
 import { useEffect, useState, useCallback, useMemo } from "react";
 
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
@@ -14,18 +12,14 @@ import {
     Select,
     useForm,
 } from "@nextgisweb/gui/fields-form";
-import {
-    route,
-    routeURL,
-    request,
-    LunkwillParam,
-} from "@nextgisweb/pyramid/api";
+import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import i18n from "@nextgisweb/pyramid/i18n!";
-import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
+
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 
 import { ExtentInput } from "./ExtentInput";
+import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
 
 const exportFormats = settings.export_formats;
 
@@ -48,10 +42,11 @@ const fieldListToOptions = (fieldList) => {
 };
 
 export function ExportForm({ id, pick, multiple }) {
-    const [status, setStatus] = useState("loading");
+    const [staffLoading, setStaffLoading] = useState(true);
 
     const [urlParams, setUrlParams] = useState({});
 
+    const { exportFeatureLayer, exportLoading } = useExportFeatureLayer({ id });
     const { makeSignal } = useAbortController();
     const [srsOptions, setSrsOptions] = useState([]);
     const [fieldOptions, setFieldOptions] = useState([]);
@@ -60,6 +55,8 @@ export function ExportForm({ id, pick, multiple }) {
     const [fields, setFields] = useState([]);
     const [isReady, setIsReady] = useState(false);
     const form = useForm()[0];
+
+    const loading = staffLoading || exportLoading;
 
     const initialValues = useMemo(() => {
         const initialVals = {
@@ -100,7 +97,7 @@ export function ExportForm({ id, pick, multiple }) {
         } catch (err) {
             errorModal(err);
         } finally {
-            setStatus("loaded");
+            setStaffLoading(false);
         }
     }, [id, makeSignal]);
 
@@ -223,55 +220,7 @@ export function ExportForm({ id, pick, multiple }) {
         }
     };
 
-    const exportFeatureLayer = async () => {
-        const { extent, resources, ...fields } = form.getFieldsValue();
-        const json = {};
-        if (!extent.includes(null)) {
-            const wkt = new WKT().writeGeometryText(fromExtent(extent));
-            json.intersects = wkt;
-            json.intersects_srs = 4326;
-        }
-        for (const key in fields) {
-            const prop = fields[key];
-            if (prop !== undefined) {
-                json[key] = fields[key];
-            }
-        }
-        const params = new URLSearchParams(json);
-
-        const ids = id ? String(id).split(",") : resources;
-
-        let apiUrl;
-        if (ids.length === 1) {
-            apiUrl =
-                routeURL("resource.export", ids[0]) + "?" + params.toString();
-        } else {
-            params.append("resources", ids.join(","));
-            apiUrl = routeURL("feature_layer.export") + "?" + params.toString();
-        }
-
-        if (pyramidSettings.lunkwill_enabled) {
-            const lunkwillParam = new LunkwillParam();
-            lunkwillParam.require();
-            try {
-                setStatus("loading");
-                const respUrl = await request(apiUrl, {
-                    lunkwill: lunkwillParam,
-                    lunkwillReturnUrl: true,
-                });
-                window.open(respUrl);
-            } catch (err) {
-                errorModal(err);
-                return;
-            } finally {
-                setStatus("loaded");
-            }
-        } else {
-            window.open(apiUrl);
-        }
-    };
-
-    if (status === "loading") {
+    if (loading) {
         return <LoadingWrapper />;
     }
 
@@ -287,7 +236,12 @@ export function ExportForm({ id, pick, multiple }) {
             labelCol={{ span: 6 }}
         >
             <Form.Item>
-                <SaveButton onClick={exportFeatureLayer} icon={null}>
+                <SaveButton
+                    onClick={() => {
+                        exportFeatureLayer(form.getFieldsValue());
+                    }}
+                    icon={null}
+                >
                     {i18n.gettext("Save")}
                 </SaveButton>
             </Form.Item>

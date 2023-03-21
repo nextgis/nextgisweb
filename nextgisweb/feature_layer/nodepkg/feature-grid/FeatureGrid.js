@@ -1,15 +1,16 @@
 import { PropTypes } from "prop-types";
 
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button, Empty, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
-import { routeURL } from "@nextgisweb/pyramid/api";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
 
+import { ExportAction } from "./component/ExportAction";
 import { deleteFeatures } from "./api/deleteFeatures";
 import { KEY_FIELD_KEYNAME } from "./constant";
 import FeatureTable from "./FeatureTable";
@@ -18,6 +19,7 @@ import DeleteIcon from "@material-icons/svg/delete";
 import EditIcon from "@material-icons/svg/edit";
 import OpenIcon from "@material-icons/svg/open_in_new";
 import TuneIcon from "@material-icons/svg/tune";
+
 import "./FeatureGrid.less";
 
 const searchPlaceholderMsg = i18n.gettext("Search...");
@@ -191,6 +193,8 @@ export const FeatureGrid = ({
             }
         );
     }
+
+    defActions.push(ExportAction);
 
     let i = 0;
     let isLeft = true;
