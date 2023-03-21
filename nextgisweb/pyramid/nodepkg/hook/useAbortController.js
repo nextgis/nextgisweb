@@ -2,7 +2,6 @@ import { useEffect, useRef, useCallback } from "react";
 
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 
-
 export function useAbortController() {
     const abortHelper = useRef();
 
@@ -15,9 +14,9 @@ export function useAbortController() {
     }, []);
 
     useEffect(() => {
-        abortHelper.current =  new AbortControllerHelper()
-        const abort_ = abortHelper.current.abort;
-        return abort_;
+        const abortHelper_ = new AbortControllerHelper();
+        abortHelper.current = abortHelper_;
+        return () => abortHelper_.abort();
     }, []);
 
     return { makeSignal, abort };
