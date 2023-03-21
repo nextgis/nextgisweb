@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-import { useMemo, Fragment } from "react";
+import { useMemo } from "react";
 
 import { Dropdown, Divider, Space } from "@nextgisweb/gui/antd";
 import DescriptionIcon from "@material-icons/svg/description/outline";
@@ -110,7 +110,7 @@ export function DropdownActions({
                 }
                 menuItems_.push(menuItem);
             } else if (plugin.render) {
-                customMenuItems_.push(plugin.render(pluginInfo));
+                customMenuItems_.push(plugin.render.bind(plugin, pluginInfo));
             }
         });
         return [menuItems_, customMenuItems_];
@@ -182,11 +182,11 @@ export function DropdownActions({
                         <>
                             <Divider style={{ margin: 0 }} />
                             <Space
-                                style={{ padding: 8, width: "100%" }}
+                                style={{ padding: '5px 12px', width: "100%" }}
                                 direction="vertical"
                             >
-                                {customMenuItems.map((item, i) => (
-                                    <Fragment key={i}>{item}</Fragment>
+                                {customMenuItems.map((Item, i) => (
+                                    <Item key={i}></Item>
                                 ))}
                             </Space>
                         </>

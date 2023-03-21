@@ -16,9 +16,7 @@ export function useAbortController() {
     useEffect(() => {
         const abortHelper_ = new AbortControllerHelper();
         abortHelper.current = abortHelper_;
-        return () => {
-            abortHelper_.abort();
-        };
+        return () => abortHelper_.abort();
     }, []);
 
     return { makeSignal, abort };

@@ -12,18 +12,21 @@ define([
             return {
                 enabled:
                     nodeData.type === "layer" && nodeData.plugin[this.identity],
-                id: nodeData.id,
-                defaultValue: nodeData.transparency,
+                nodeData: nodeData,
+                map: this.display.map,
             };
         },
 
         render: function (state) {
-            var map = this.display.map;
+            var map = state.map;
+            var id = state.nodeData.id;
+            var defaultValue = state.nodeData.transparency;
             return LayerOpacitySlider.default({
-                defaultValue: state.defaultValue,
+                defaultValue: defaultValue,
                 onChange: function (val) {
-                    var layer = map.layers[state.id];
+                    var layer = map.layers[id];
                     if (layer && layer.olLayer && layer.olLayer.setOpacity) {
+                        state.nodeData.transparency = val;
                         layer.olLayer.setOpacity(val / 100);
                     }
                 },
