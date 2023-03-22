@@ -26,6 +26,7 @@ define([
 
         constructor: function (map, highlightStyle) {
             this._map = map;
+            this._zIndex = this._zIndex + map.layers.length
             this._overlay = new Vector('highlight', {
                 title: 'Highlight Overlay',
                 style: highlightStyle ? highlightStyle : this._getDefaultStyle()

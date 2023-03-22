@@ -80,7 +80,6 @@ export function useFeatureTable({
     visibleFields,
 }) {
     const [pages, setPages] = useState([]);
-    // const [fetchEnabled, setFetchEnabled] = useState(false);
     const [hasNextPage, setHasNextPage] = useState(false);
     const [queryTotal, setQueryTotal] = useState(0);
 
@@ -89,11 +88,7 @@ export function useFeatureTable({
 
     const { makeSignal, abort } = useAbortController();
 
-    const loaderCache = useRef(new LoaderCache());
-
-    useEffect(() => {
-        loaderCache.current.clean();
-    }, [total]);
+    const loaderCache = useRef();
 
     const [data, setData_] = useState([]);
 
@@ -107,11 +102,6 @@ export function useFeatureTable({
     };
 
     const queryMode = useMemo(() => !!query, [query]);
-
-    useEffect(() => {
-        setFetchEnabled(false);
-        debouncedFn(() => setFetchEnabled(true));
-    }, [pages, pageSize, query, orderBy]);
 
     const handleFeatures = useCallback(
         (features) => {
@@ -222,9 +212,13 @@ export function useFeatureTable({
         orderBy,
         pages,
         query,
+        abort,
     ]);
 
-    const count = useMemo(() => (queryMode ? queryTotal : total));
+    const count = useMemo(
+        () => (queryMode ? queryTotal : total),
+        [queryMode, queryTotal, total]
+    );
 
     const { getVirtualItems, measureElement, getTotalSize, scrollToIndex } =
         useVirtualizer({
@@ -235,8 +229,20 @@ export function useFeatureTable({
 
     const virtualItems = getVirtualItems();
 
-    const prevTotal = useRef(total);
+    useEffect(() => {
+        loaderCache.current = new LoaderCache();
+    }, []);
 
+    useEffect(() => {
+        loaderCache.current.clean();
+    }, [total]);
+
+    useEffect(() => {
+        setFetchEnabled(false);
+        debouncedFn(() => setFetchEnabled(true));
+    }, [pages, pageSize, query, orderBy]);
+
+    const prevTotal = useRef(total);
     useEffect(() => {
         if (total === prevTotal.current && pages.length && data.length) {
             const firstDataIndex = data[0].__rowIndex;
@@ -276,12 +282,12 @@ export function useFeatureTable({
     }, [orderBy, query, visibleFields]);
 
     useEffect(() => {
-        if (count) {
+        if (getTotalSize()) {
             scrollToIndex(0, { smoothScroll: false });
         }
         // to init first loading
         setQueryTotal(pageSize);
-    }, [query, pageSize, scrollToIndex, total]);
+    }, [query, pageSize, scrollToIndex, getTotalSize, total]);
 
     useEffect(() => {
         const items = [...virtualItems];
