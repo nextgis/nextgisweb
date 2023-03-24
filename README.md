@@ -1,7 +1,7 @@
 NextGIS Web
 ===========
 
-![Screenshot_1](https://nextgis.ru/wp-content/uploads/2018/02/ngw_ru-3.png)
+![Screenshot_1](https://nextgis.ru/wp-content/uploads/2023/03/ngw-new.png)
 
 NextGIS Web (NGW) is a server based application/server-side framework for geodata storage, management and visualization. NGW can be used on premise and in the cloud to:
 
