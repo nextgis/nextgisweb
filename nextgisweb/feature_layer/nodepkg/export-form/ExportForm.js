@@ -205,6 +205,10 @@ export function ExportForm({ id, pick, multiple }) {
                 widget: ExtentInput,
             },
             {
+                name: "like",
+                label: i18n.gettext("Search filter"),
+            },
+            {
                 name: "zipped",
                 label: i18n.gettext("Zip archive"),
                 widget: Checkbox,

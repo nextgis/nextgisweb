@@ -27,10 +27,10 @@ export const ExportAction = ({ id, query, size = "middle" }) => {
 
     const handleMenuClick = (e) => {
         if (e.key !== settingsKey) {
-            const params = { format: e.key, query };
+            const params = { format: e.key, like: query };
             exportFeatureLayer(params);
         } else {
-            openExportPage();
+            openExportPage({ like: query });
         }
     };
 
