@@ -14,9 +14,11 @@ from ...feature_layer import GEOM_TYPE, GEOM_TYPE_OGR_2_GEOM_TYPE
 from ...lib.ogrhelper import FIELD_GETTER
 from ...models import DBSession
 from ...spatial_ref_sys import SRS
-from ...vector_layer.model import (
-    _GEOM_TYPE_2_DB,
-    _FIELD_TYPE_2_ENUM, _FIELD_TYPE_2_DB)
+from ...vector_layer.util import (
+    GEOM_TYPE_2_DB,
+    FIELD_TYPE_2_ENUM,
+    FIELD_TYPE_2_DB,
+)
 
 from .. import PostgisConnection, PostgisLayer
 
@@ -48,7 +50,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
     column_geom = 'the_geom'
     geom_type = GEOM_TYPE_OGR_2_GEOM_TYPE[ogrlayer.GetGeomType()]
     dimension = 3 if geom_type in GEOM_TYPE.has_z else 2
-    geometry_type_db = _GEOM_TYPE_2_DB[geom_type]
+    geometry_type_db = GEOM_TYPE_2_DB[geom_type]
     osr_ = ogrlayer.GetSpatialRef()
     assert osr_.GetAuthorityName(None) == 'EPSG'
     srid = int(osr_.GetAuthorityCode(None))
@@ -68,8 +70,8 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
     for i in range(defn.GetFieldCount()):
         fld_defn = defn.GetFieldDefn(i)
         fld_name = fld_defn.GetNameRef()
-        fld_type = _FIELD_TYPE_2_ENUM[fld_defn.GetType()]
-        columns.append(sa.Column(keyname_column(fld_name), _FIELD_TYPE_2_DB[fld_type]))
+        fld_type = FIELD_TYPE_2_ENUM[fld_defn.GetType()]
+        columns.append(sa.Column(keyname_column(fld_name), FIELD_TYPE_2_DB[fld_type]))
 
     table = sa.Table('test_' + uuid4().hex, meta, *columns)
 

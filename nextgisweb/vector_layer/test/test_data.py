@@ -15,7 +15,8 @@ from ...feature_layer import FIELD_TYPE
 from ...lib.ogrhelper import read_dataset
 
 from .. import VectorLayer
-from ..model import error_limit, ERROR_FIX, FID_SOURCE
+from ..table_info import ERROR_LIMIT
+from ..util import ERROR_FIX, FID_SOURCE
 
 
 DATA_PATH = os.path.join(os.path.dirname(
@@ -257,9 +258,9 @@ def test_error_limit(ngw_resource_group):
 
     some = 3
 
-    for i in range(error_limit + some):
+    for i in range(ERROR_LIMIT + some):
         feature = ogr.Feature(defn)
-        if i < error_limit:
+        if i < ERROR_LIMIT:
             feature.SetGeometry(None)
         else:
             feature.SetGeometry(ogr.CreateGeometryFromWkt('POINT (0 0)'))
