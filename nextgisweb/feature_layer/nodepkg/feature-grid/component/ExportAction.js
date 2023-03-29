@@ -11,7 +11,7 @@ import ExportIcon from "@material-icons/svg/file_download";
 
 const exportFormats = settings.export_formats;
 
-const items = exportFormats.map((format) => ({
+let formatItems = exportFormats.map((format) => ({
     key: format.name,
     label: format.display_name,
 }));
@@ -26,24 +26,25 @@ export const ExportAction = ({ id, query, size = "middle" }) => {
         useExportFeatureLayer({ id });
 
     const handleMenuClick = (e) => {
-        if (e.key !== settingsKey) {
-            const params = { format: e.key, ilike: query };
-            exportFeatureLayer(params);
+        const params = { ilike: query };
+        if (e.key === settingsKey) {
+            openExportPage(params);
         } else {
-            openExportPage({ ilike: query });
+            params.format = e.key;
+            exportFeatureLayer(params);
         }
     };
 
     const menuProps = {
         items: [
-            ...items,
-            {
-                type: "divider",
-            },
             {
                 key: settingsKey,
                 label: gotToSettingsTitleMsg,
             },
+            {
+                type: "divider",
+            },
+            ...formatItems,
         ],
         onClick: handleMenuClick,
     };

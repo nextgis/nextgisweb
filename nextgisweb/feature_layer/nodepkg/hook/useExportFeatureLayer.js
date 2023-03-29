@@ -11,15 +11,11 @@ export function useExportFeatureLayer({ id }) {
 
     const openExportPage = useCallback(
         (pageParams) => {
-            let url = routeURL("feature_layer.feature.browse", id);
-            // TODO: create route for feature export page 
-            // OR 
-            // make ability to use `export_multiple` in a `single` mode without picker
-            url = url.replace("feature/", "export");
+            const url = routeURL("resource.export.page", id);
             const params = new URLSearchParams({
                 ...pageParams,
             });
-            window.open(`${url}?${params}`);
+            window.open(`${url}?${params.toString()}`);
         },
         [id]
     );

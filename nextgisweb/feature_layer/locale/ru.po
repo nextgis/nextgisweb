@@ -7,35 +7,39 @@ msgstr "Выходной формат не указан."
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:124 api.py:736
+#: api.py:124 api.py:746
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api.py:147
+#: api.py:149
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api.py:160
+#: api.py:162
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api.py:298
+#: api.py:305
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
-#: api.py:417 api.py:492
+#: api.py:424 api.py:499
 #, python-format
 msgid "Geometry format '%s' is not supported."
 msgstr "Формат геометрии '%s' не поддерживается."
 
-#: api.py:419
+#: api.py:426
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:425 api.py:497
+#: api.py:432 api.py:504
 #, python-format
 msgid "Date format '%s' is not supported."
 msgstr "Формат даты '%s' не поддерживается."
+
+#: api.py:630
+msgid "Unknown spatial reference system"
+msgstr ""
 
 #: exception.py:13
 msgid "Feature not found"
@@ -84,30 +88,18 @@ msgstr "Таблица"
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:193
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:54
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
 #: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:246
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:124
-msgid "Set NULL"
-msgstr "Установить NULL"
-
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:125
-msgid "Set field value to NULL (No data)"
-msgstr "Установить для атрибута значение NULL (Нет данных)"
-
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:136
-msgid "NULL"
-msgstr "NULL"
-
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:241
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:97
 msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:265
-#: nodepkg/export-form/ExportForm.js:287
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:123
+#: nodepkg/export-form/ExportForm.js:249
 msgid "Save"
 msgstr "Сохранить"
 
@@ -184,6 +176,10 @@ msgid "Limit by extent"
 msgstr "Ограничить охватом"
 
 #: nodepkg/export-form/ExportForm.js:209
+msgid "Filter text"
+msgstr "Текстовый фильтр"
+
+#: nodepkg/export-form/ExportForm.js:213
 msgid "Zip archive"
 msgstr "Zip архив"
 
@@ -207,25 +203,33 @@ msgstr "Право"
 msgid "Top"
 msgstr "Верх"
 
-#: nodepkg/feature-grid/FeatureGrid.js:24
+#: nodepkg/feature-editor/AttributesForm.js:36
+msgid "Set field value to NULL (No data)"
+msgstr "Установить для атрибута значение NULL (Нет данных)"
+
+#: nodepkg/feature-grid/FeatureGrid.js:25
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/feature-grid/FeatureGrid.js:25
+#: nodepkg/feature-grid/FeatureGrid.js:26
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGrid.js:26
+#: nodepkg/feature-grid/FeatureGrid.js:27
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGrid.js:27
+#: nodepkg/feature-grid/FeatureGrid.js:28
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/component/ZoomToFiltered.js:11
-msgid "Zoom to filtered features"
-msgstr "Приблизить к найденным объектам"
+#: nodepkg/feature-grid/component/ExportAction.js:19
+msgid "Export"
+msgstr ""
+
+#: nodepkg/feature-grid/component/ExportAction.js:20
+msgid "Export settigns"
+msgstr ""
 
 #: nodepkg/geometry-info/GeometryInfo.js:60
 msgid "Load geometry info..."
@@ -302,4 +306,13 @@ msgstr "Да"
 #: template/section_fields.mako:34 template/section_fields.mako:38
 msgid "No"
 msgstr "Нет"
+
+#~ msgid "Set NULL"
+#~ msgstr "Установить NULL"
+
+#~ msgid "NULL"
+#~ msgstr "NULL"
+
+#~ msgid "Zoom to filtered features"
+#~ msgstr "Приблизить к найденным объектам"
 

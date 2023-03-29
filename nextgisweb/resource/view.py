@@ -257,7 +257,7 @@ def setup_pyramid(comp, config):
     _resource_route('json', r'{id:\d+}/json', client=('id', )) \
         .add_view(json_view, renderer=REACT_RENDERER)
 
-    _resource_route('export.page', r'{id:\d+}/export', request_method='GET')
+    _resource_route('export.page', r'{id:\d+}/export', request_method='GET', client=True)
 
     _route('widget', 'widget', client=()).add_view(widget)
 

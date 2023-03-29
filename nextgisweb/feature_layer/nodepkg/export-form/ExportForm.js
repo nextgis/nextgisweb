@@ -206,7 +206,7 @@ export function ExportForm({ id, pick, multiple }) {
             },
             {
                 name: "ilike",
-                label: i18n.gettext("Search filter"),
+                label: i18n.gettext("Filter text"),
             },
             {
                 name: "zipped",
