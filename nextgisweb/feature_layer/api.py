@@ -80,12 +80,12 @@ def _extensions(extensions, layer):
 class ExportOptions:
     __slots__ = (
         'driver', 'dsco', 'lco', 'srs', 'intersects_geom', 'intersects_srs',
-        'fields', 'fid_field', 'use_display_name',
+        'fields', 'fid_field', 'use_display_name', 'ilike',
     )
 
     def __init__(
         self, *, format=None, encoding=None, srs=None,
-        intersects=None, intersects_srs=None,
+        intersects=None, intersects_srs=None, ilike=None,
         fields=None, fid='', display_name='false', **params,
     ):
         if format is None:
@@ -130,6 +130,8 @@ class ExportOptions:
         else:
             self.intersects_geom = self.intersects_srs = None
 
+        self.ilike = ilike
+
         self.fields = fields.split(',') if fields is not None else None
         self.fid_field = fid if fid != '' else None
 
@@ -162,6 +164,9 @@ def export(resource, options, filepath):
         else:
             intersects_geom = options.intersects_geom
         query.intersects(intersects_geom)
+
+    if options.ilike is not None and IFeatureQueryIlike.providedBy(query):
+        query.ilike(options.ilike)
 
     ogr_ds = _ogr_memory_ds()
     ogr_layer = _ogr_layer_from_features(  # NOQA: 841

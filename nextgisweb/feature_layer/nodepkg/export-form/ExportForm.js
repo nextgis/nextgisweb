@@ -205,7 +205,7 @@ export function ExportForm({ id, pick, multiple }) {
                 widget: ExtentInput,
             },
             {
-                name: "like",
+                name: "ilike",
                 label: i18n.gettext("Search filter"),
             },
             {
