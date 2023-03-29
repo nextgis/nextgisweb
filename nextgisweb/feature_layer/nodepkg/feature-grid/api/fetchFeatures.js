@@ -11,6 +11,7 @@ export function fetchFeatures({
     limit,
     cache,
     like,
+    ilike,
 }) {
     const query = {
         offset,
@@ -25,6 +26,8 @@ export function fetchFeatures({
     }
     if (like) {
         query.like = like;
+    } else if (ilike) {
+        query.ilike = ilike;
     }
 
     return route("feature_layer.feature.collection", resourceId)

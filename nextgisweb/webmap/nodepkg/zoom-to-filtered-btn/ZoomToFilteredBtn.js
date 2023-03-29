@@ -23,7 +23,7 @@ export const ZoomToFilteredBtn = ({
     } = useRouteGet(
         "feature_layer.feature.extent",
         { id },
-        { query: { like: query } }
+        { query: { ilike: query } }
     );
 
     const [extentCache, setExtentCache] = useState();

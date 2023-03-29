@@ -23,10 +23,10 @@ from ..resource import DataScope, Resource, resource_factory
 from ..resource.exception import ResourceNotFound
 from ..spatial_ref_sys import SRS
 from ..render.util import zxy_from_request
-from ..lib.osrhelper import sr_from_epsg
 
 from .interface import (
     IFeatureLayer,
+    IFeatureQueryIlike,
     IFeatureQueryLike,
     IWritableFeatureLayer,
     IFeatureQueryClipByBox,
@@ -690,6 +690,7 @@ def idelete(resource, request):
     fid = int(request.matchdict['fid'])
     resource.feature_delete(fid)
 
+
 def apply_attr_filter(query, request, keynames):
     # Fields filters
     filter_ = []
@@ -711,13 +712,13 @@ def apply_attr_filter(query, request, keynames):
 
         filter_.append((key, operator, request.GET[param]))
 
-    if filter_:
+    if len(filter_) > 0:
         query.filter(*filter_)
 
-    # Like
-    like = request.GET.get('like')
-    if like is not None and IFeatureQueryLike.providedBy(query):
-        query.like(like)
+    if 'like' in request.GET and IFeatureQueryLike.providedBy(query):
+        query.like(request.GET['like'])
+    elif 'ilike' in request.GET and IFeatureQueryIlike.providedBy(query):
+        query.ilike(request.GET['ilike'])
 
 
 def apply_intersect_filter(query, request, resource):
@@ -739,6 +740,7 @@ def apply_intersect_filter(query, request, resource):
         except GeometryNotValid:
             raise ValidationError(_("Parameter 'intersects' geometry is not valid."))
         query.intersects(geom)
+
 
 def cget(resource, request):
     request.resource_permission(PERM_READ)

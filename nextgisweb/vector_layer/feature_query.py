@@ -13,12 +13,13 @@ from ..feature_layer import (
     FeatureQueryIntersectsMixin,
     FeatureSet,
     IFeatureQuery,
+    IFeatureQueryClipByBox,
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
-    IFeatureQueryLike,
+    IFeatureQueryIlike,
     IFeatureQueryIntersects,
+    IFeatureQueryLike,
     IFeatureQueryOrderBy,
-    IFeatureQueryClipByBox,
     IFeatureQuerySimplify,
 )
 from ..models import DBSession
@@ -33,6 +34,7 @@ from .table_info import TableInfo
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryLike,
+    IFeatureQueryIlike,
     IFeatureQueryIntersects,
     IFeatureQueryOrderBy,
     IFeatureQueryClipByBox,
@@ -61,6 +63,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._filter_by = None
         self._filter_sql = None
         self._like = None
+        self._ilike = None
 
         self._order_by = None
 
@@ -110,6 +113,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def like(self, value):
         self._like = value
+
+    def ilike(self, value):
+        self._ilike = value
 
     def __call__(self):
         tableinfo = TableInfo.from_layer(self.layer)
@@ -194,7 +200,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     where.append(table.columns[field.key] == v)
 
         if self._filter:
-            token = []
+            _where_filter = []
             for k, o, v in self._filter:
                 supported_operators = (
                     "eq",
@@ -246,37 +252,46 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     field = tableinfo.find_field(keyname=k)
                     column = table.columns[field.key]
 
-                token.append(op(column, v))
+                _where_filter.append(op(column, v))
 
-            where.append(db.and_(True, *token))
+            if len(_where_filter) > 0:
+                where.append(db.and_(*_where_filter))
 
         if self._filter_sql:
-            token = []
+            _where_filter_sql = []
             for _filter_sql_item in self._filter_sql:
                 if len(_filter_sql_item) == 3:
                     table_column, op, val = _filter_sql_item
                     if table_column == 'id':
-                        token.append(op(idcol, val))
+                        _where_filter_sql.append(op(idcol, val))
                     else:
                         field = tableinfo.find_field(keyname=table_column)
-                        token.append(op(table.columns[field.key], val))
+                        _where_filter_sql.append(op(table.columns[field.key], val))
                 elif len(_filter_sql_item) == 4:
                     table_column, op, val1, val2 = _filter_sql_item
                     field = tableinfo.find_field(keyname=table_column)
-                    token.append(op(table.columns[field.key], val1, val2))
+                    _where_filter_sql.append(op(table.columns[field.key], val1, val2))
 
-            where.append(db.and_(True, *token))
+            if len(_where_filter_sql) > 0:
+                where.append(db.and_(_where_filter_sql))
 
         if self._like:
-            token = []
+            _where_like = []
             for f in tableinfo.fields:
-                token.append(
-                    cast(table.columns[f.key], db.Unicode).ilike(
-                        "%" + self._like + "%"
-                    )
-                )
+                _where_like.append(
+                    cast(table.columns[f.key], db.Unicode).like(f'%{self._like}%'))
 
-            where.append(db.or_(*token))
+            if len(_where_like) > 0:
+                where.append(db.or_(*_where_like))
+
+        elif self._ilike:
+            _where_ilike = []
+            for f in tableinfo.fields:
+                _where_ilike.append(
+                    cast(table.columns[f.key], db.Unicode).ilike(f'%{self._ilike}%'))
+
+            if len(_where_ilike) > 0:
+                where.append(db.or_(*_where_ilike))
 
         if self._intersects:
             reproject = self._intersects.srid is not None \
@@ -316,10 +331,12 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             def __iter__(self):
                 query = sql.select(*columns) \
-                    .where(db.and_(True, *where)) \
                     .limit(self._limit) \
                     .offset(self._offset) \
                     .order_by(*order_criterion)
+
+                if len(where) > 0:
+                    query = query.where(db.and_(*where))
 
                 result = DBSession.connection().execute(query)
                 for row in result.mappings():
@@ -350,8 +367,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             @property
             def total_count(self):
-                query = sql.select(func.count(idcol)) \
-                    .where(db.and_(True, *where))
+                query = sql.select(func.count(idcol))
+                if len(where) > 0:
+                    query = query.where(db.and_(*where))
                 result = DBSession.connection().execute(query)
                 return result.scalar()
 

@@ -178,6 +178,12 @@ class IFeatureQueryLike(IFeatureQuery):
         """ Set query by substring """
 
 
+class IFeatureQueryIlike(IFeatureQuery):
+
+    def ilike(self, value):
+        """ Set query by substring """
+
+
 class IFeatureQueryIntersects(IFeatureQuery):
 
     srs_supported = Attribute(""" List of supported SRS id """)

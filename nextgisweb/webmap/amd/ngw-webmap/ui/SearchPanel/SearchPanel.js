@@ -186,7 +186,7 @@ define([
                             xhr.get(url, {
                                 handleAs: "json",
                                 query: {
-                                    like: criteria,
+                                    ilike: criteria,
                                     limit: limit,
                                     geom_format: "geojson",
                                     label: true

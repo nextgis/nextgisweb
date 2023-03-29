@@ -146,7 +146,7 @@ export function useFeatureTable({
                         limit: pageSize,
                         cache: false,
                         offset: page,
-                        like: query,
+                        ilike: query,
                         resourceId,
                         orderBy,
                         signal,

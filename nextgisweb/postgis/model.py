@@ -2,9 +2,8 @@ import re
 from contextlib import contextmanager
 
 import geoalchemy2 as ga
-import sqlalchemy.sql as sql
 from shapely.geometry import box
-from sqlalchemy import func, select, text
+from sqlalchemy import cast, func, select, sql, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from sqlalchemy.engine.url import (
@@ -45,8 +44,10 @@ from ..feature_layer import (
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryLike,
+    IFeatureQueryIlike,
     IFeatureQueryIntersects,
-    IFeatureQueryOrderBy)
+    IFeatureQueryOrderBy,
+)
 
 from .exception import ExternalDatabaseError
 from .util import _
@@ -79,12 +80,12 @@ def calculate_extent(layer, where=None, geomcol=None):
     tab = layer._sa_table(True)
 
     if not (where is None and geomcol is None) and len(where) > 0:
-        bbox = sql.select(st_extent(st_transform(st_setsrid(db.cast(
+        bbox = sql.select(st_extent(st_transform(st_setsrid(cast(
             st_force2d(geomcol), ga.Geometry), layer.srs_id), 4326)
         )).where(db.and_(True, *where)).label('bbox')
     else:
         geomcol = getattr(tab.columns, layer.column_geom)
-        bbox = st_extent(st_transform(st_setsrid(db.cast(
+        bbox = st_extent(st_transform(st_setsrid(cast(
             st_force2d(geomcol), ga.Geometry), layer.geometry_srid), 4326)
         ).label('bbox')
 
@@ -527,13 +528,14 @@ class PostgisLayerSerializer(Serializer):
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryLike,
+    IFeatureQueryIlike,
     IFeatureQueryIntersects,
     IFeatureQueryOrderBy,
 )
 class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def __init__(self):
-        super(FeatureQueryBase, self).__init__()
+        super().__init__()
 
         self._srs = None
         self._geom = None
@@ -547,6 +549,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._filter = None
         self._filter_by = None
         self._like = None
+        self._ilike = None
 
         self._order_by = None
 
@@ -580,6 +583,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def like(self, value):
         self._like = value
+
+    def ilike(self, value):
+        self._ilike = value
 
     def __call__(self):
         tab = self.layer._sa_table(True)
@@ -621,7 +627,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     where.append(tab.columns[field.column_name] == v)
 
         if self._filter:
-            token = []
+            _where_filter = []
             for k, o, v in self._filter:
                 supported_operators = (
                     'eq',
@@ -662,19 +668,27 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     field = self.layer.field_by_keyname(k)
                     column = tab.columns[field.column_name]
 
-                token.append(op(column, v))
+                _where_filter.append(op(column, v))
 
-            where.append(db.and_(True, *token))
+            if len(_where_filter) > 0:
+                where.append(db.and_(*_where_filter))
 
         if self._like:
-            token = []
+            _where_like = []
             for fld in self.layer.fields:
-                token.append(db.sql.cast(
-                    tab.columns[fld.column_name],
-                    db.Unicode).ilike(
-                    '%' + self._like + '%'))
+                _where_like.append(
+                    cast(tab.columns[fld.column_name], db.Unicode).like(f'%{self._like}%'))
 
-            where.append(db.or_(*token))
+            if len(_where_like) > 0:
+                where.append(db.or_(*_where_like))
+        elif self._ilike:
+            _where_ilike = []
+            for fld in self.layer.fields:
+                _where_ilike.append(
+                    cast(tab.columns[fld.column_name], db.Unicode).ilike(f'%{self._ilike}%'))
+
+            if len(_where_ilike) > 0:
+                where.append(db.or_(*_where_ilike))
 
         if self._intersects:
             reproject = self._intersects.srid is not None \
@@ -730,10 +744,12 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             def __iter__(self):
                 query = sql.select(*columns) \
-                    .where(db.and_(True, *where)) \
                     .limit(self._limit) \
                     .offset(self._offset) \
                     .order_by(*order_criterion)
+
+                if len(where) > 0:
+                    query = query.where(db.and_(*where))
 
                 with self.layer.connection.get_connection() as conn:
                     result = conn.execute(query)
@@ -761,8 +777,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             @property
             def total_count(self):
                 with self.layer.connection.get_connection() as conn:
-                    query = sql.select(func.count(idcol)) \
-                        .where(db.and_(True, *where))
+                    query = sql.select(func.count(idcol))
+                    if len(where) > 0:
+                        query = query.where(db.and_(*where))
                     result = conn.execute(query)
                     return result.scalar()
 
