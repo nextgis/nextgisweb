@@ -38,6 +38,10 @@ msgstr "Значение параметра '{}' должно быть не от
 msgid "External access"
 msgstr "Внешний доступ"
 
+#: view.py:28
+msgid "Legend symbols"
+msgstr "Символы легенды"
+
 #: amd/ngw-render/template/TileCacheWidget.hbs:11
 msgid "Enabled"
 msgstr "Включен"

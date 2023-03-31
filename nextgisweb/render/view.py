@@ -2,6 +2,7 @@ from ..resource import (Widget, Resource)
 from ..env import env
 
 from .interface import IRenderableStyle
+from .legend import ILegendSymbols
 from .util import _
 
 
@@ -21,3 +22,11 @@ def setup_pyramid(comp, config):
         title=_("External access"),
         template='nextgisweb:render/template/section_api_renderable.mako',
         is_applicable=lambda obj: IRenderableStyle.providedBy(obj))
+
+    Resource.__psection__.register(
+        key='legend_symbols',
+        title=_("Legend symbols"),
+        template='nextgisweb:render/template/section_legend_symbols.mako',
+        is_applicable=lambda obj: (
+            env.render.options['legend_symbols_section']
+            and ILegendSymbols.providedBy(obj)))

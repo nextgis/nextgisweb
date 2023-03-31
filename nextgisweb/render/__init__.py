@@ -176,4 +176,5 @@ class RenderComponent(Component):
         Option('tile_cache.enabled', bool, default=True),
         Option('tile_cache.track_changes', bool, default=False),
         Option('tile_cache.seed', bool, default=False),
+        Option('legend_symbols_section', bool, default=False),
     )
