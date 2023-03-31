@@ -223,13 +223,21 @@ msgstr "Удалить"
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/component/ExportAction.js:19
-msgid "Export"
-msgstr ""
-
 #: nodepkg/feature-grid/component/ExportAction.js:20
-msgid "Export settigns"
-msgstr ""
+msgid "Export"
+msgstr "Экспорт"
+
+#: nodepkg/feature-grid/component/ExportAction.js:21
+msgid "Advanced Export"
+msgstr "Расширенный экспорт"
+
+#: nodepkg/feature-grid/component/ExportAction.js:22
+msgid "Quick Export"
+msgstr "Быстрый экспорт"
+
+#: nodepkg/feature-grid/component/ExportAction.js:23
+msgid "Filters are applied"
+msgstr "Применяются фильтры"
 
 #: nodepkg/geometry-info/GeometryInfo.js:60
 msgid "Load geometry info..."
@@ -306,13 +314,3 @@ msgstr "Да"
 #: template/section_fields.mako:34 template/section_fields.mako:38
 msgid "No"
 msgstr "Нет"
-
-#~ msgid "Set NULL"
-#~ msgstr "Установить NULL"
-
-#~ msgid "NULL"
-#~ msgstr "NULL"
-
-#~ msgid "Zoom to filtered features"
-#~ msgstr "Приблизить к найденным объектам"
-
