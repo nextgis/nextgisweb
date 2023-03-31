@@ -2,6 +2,7 @@ from io import BytesIO
 from math import log, ceil, floor
 from itertools import product
 from pathlib import Path
+from base64 import b64encode
 
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.response import Response
@@ -11,6 +12,7 @@ from ..core.exception import ValidationError, UserException
 from ..resource import Resource, ResourceNotFound, DataScope, resource_factory
 
 from .interface import ILegendableStyle, IRenderableStyle
+from .legend import ILegendSymbols
 from .util import _, af_transform, zxy_from_request
 
 
@@ -321,6 +323,28 @@ def legend(request):
     return Response(body_file=result, content_type='image/png')
 
 
+def legend_symbols(request):
+    request.resource_permission(PD_READ)
+
+    icon_size = int(request.GET.get('icon_size', '24'))
+
+    result = list()
+
+    for s in request.context.legend_symbols(icon_size):
+        buf = BytesIO()
+        s.icon.save(buf, 'png', compress_level=3)
+
+        result.append(dict(
+            display_name=s.display_name,
+            icon=dict(
+                format="png", 
+                data=b64encode(buf.getvalue()).decode('ascii'),
+            ),
+        ))
+    
+    return result
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         'render.tile', r'/api/component/render/tile'
@@ -342,3 +366,11 @@ def setup_pyramid(comp, config):
         'render.legend', r'/api/resource/{id:\d+}/legend',
         factory=resource_factory
     ).add_view(legend, context=ILegendableStyle, request_method='GET')
+
+    config.add_route(
+        'render.legend_symbols', r'/api/resource/{id:\d+}/legend_symbols',
+        factory=resource_factory
+    ).add_view(
+        legend_symbols, context=ILegendSymbols,
+        request_method='GET', renderer='json',
+    )

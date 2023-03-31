@@ -21,6 +21,7 @@ from .interface import (
     ITileRenderRequest,
     ILegendableStyle,
 )
+from .legend import ILegendSymbols, LegendSymbol
 from .model import Base, ResourceTileCache as RTC, TIMESTAMP_EPOCH
 from .event import (
     on_style_change,
@@ -35,6 +36,7 @@ __all__ = [
     'IExtentRenderRequest',
     'ITileRenderRequest',
     'ILegendableStyle',
+    'ILegendSymbols',
     'on_style_change',
     'on_data_change',
 ]
