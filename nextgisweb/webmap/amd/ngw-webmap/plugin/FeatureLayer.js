@@ -235,6 +235,17 @@ define([
             return Promise.resolve(undefined);
         },
 
+        getMenuItem: function () {
+            var widget = this;
+            return {
+                icon: "material-list_alt",
+                title: i18n.gettext("Feature table"),
+                onClick: function () {
+                    return widget.run();
+                }
+            }
+        },
+
         postCreate: function () {
             this._bindEvents();
         },

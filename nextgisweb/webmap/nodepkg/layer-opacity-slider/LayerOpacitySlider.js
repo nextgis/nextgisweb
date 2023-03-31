@@ -5,7 +5,7 @@ import i18n from "@nextgisweb/pyramid/i18n!webmap";
 
 import OpacityRationIcon from "@material-icons/svg/tonality/baseline";
 
-const titleMsg = i18n.gettext('Set layer transparency');
+const titleMsg = i18n.gettext('Opacity');
 
 export function LayerOpacitySlider({ onChange, defaultValue } = {}) {
     return (

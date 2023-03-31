@@ -2,7 +2,7 @@
     .ant-tree-node-content-wrapper {
         display: flex;
         width: 100%;
-        overflow-x: hidden;
+        min-width: 0;
 
         .ant-tree-title {
             min-width: 0;
@@ -29,5 +29,15 @@
                 }
             }
         }
+    }
+}
+
+.tree-item-menu {
+    .ant-dropdown-menu-title-content {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 5px;
+        align-items: baseline;
     }
 }

@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types";
 
-import { Button, Dropdown } from "@nextgisweb/gui/antd";
+import { Button, Dropdown, Space, Tooltip } from "@nextgisweb/gui/antd";
 
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
@@ -8,6 +8,7 @@ import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
 import { useExportFeatureLayer } from "../../hook/useExportFeatureLayer";
 
 import ExportIcon from "@material-icons/svg/file_download";
+import FilterIcon from "@material-icons/svg/filter_alt";
 
 const exportFormats = settings.export_formats;
 
@@ -17,13 +18,18 @@ let formatItems = exportFormats.map((format) => ({
 }));
 
 const exportTitleMsg = i18n.gettext("Export");
-const gotToSettingsTitleMsg = i18n.gettext("Export settigns");
+const gotToSettingsTitleMsg = i18n.gettext("Advanced Export");
+const quickExportTitleMsg = i18n.gettext("Quick Export");
+const filtersApplyiedTitleMsg = i18n.gettext("Filters are applied");
 
 const settingsKey = "go-to-settings";
+const quickExportKey = "quick-export";
 
 export const ExportAction = ({ id, query, size = "middle" }) => {
     const { exportFeatureLayer, openExportPage, exportLoading } =
         useExportFeatureLayer({ id });
+
+    const isFilterSet = query;
 
     const handleMenuClick = (e) => {
         const params = { ilike: query };
@@ -44,7 +50,20 @@ export const ExportAction = ({ id, query, size = "middle" }) => {
             {
                 type: "divider",
             },
-            ...formatItems,
+            {
+                key: quickExportKey,
+                label: (
+                    <Space>
+                        {quickExportTitleMsg}
+                        {isFilterSet && (
+                            <Tooltip title={filtersApplyiedTitleMsg}>
+                                <FilterIcon />
+                            </Tooltip>
+                        )}
+                    </Space>
+                ),
+                children: formatItems,
+            },
         ],
         onClick: handleMenuClick,
     };

@@ -4,21 +4,18 @@ define([
     "dojo/request/xhr",
     "ngw/route",
     "@nextgisweb/pyramid/i18n!",
-    "openlayers/ol"
 ], function (
     declare,
     _PluginBase,
     xhr,
     route,
-    i18n,
-    ol
+    i18n
 ) {
     return declare([_PluginBase], {
         
         getPluginState: function (nodeData) {
-            const {type} = nodeData;
             return {
-                enabled: type === "layer" &&
+                enabled: nodeData.type === "layer" &&
                     nodeData.plugin[this.identity],
             };
         },
@@ -26,6 +23,17 @@ define([
         run: function () {
             this.zoomToLayer();
             return Promise.resolve(undefined);
+        },
+
+        getMenuItem: function () {
+            var widget = this;
+            return {
+                icon: "material-aspect_ratio",
+                title: i18n.gettext("Zoom to layer"),
+                onClick: function () {
+                    return widget.run();
+                }
+            }
         },
 
         zoomToLayer: function () {

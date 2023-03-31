@@ -22,11 +22,11 @@ define([
             var id = state.nodeData.id;
             var defaultValue = state.nodeData.transparency;
             return LayerOpacitySlider.default({
-                defaultValue: defaultValue,
+                defaultValue: 100 - defaultValue,
                 onChange: function (val) {
                     var layer = map.layers[id];
                     if (layer && layer.olLayer && layer.olLayer.setOpacity) {
-                        state.nodeData.transparency = val;
+                        state.nodeData.transparency = 100 - val;
                         layer.olLayer.setOpacity(val / 100);
                     }
                 },

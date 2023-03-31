@@ -3,37 +3,48 @@ define([
     "./_PluginBase",
     "dojo/dom-construct",
     "dijit/layout/ContentPane",
-], function (
-    declare,
-    _PluginBase,
-    domConstruct,
-    ContentPane,
-) {
+    "@nextgisweb/pyramid/i18n!",
+], function (declare, _PluginBase, domConstruct, ContentPane, i18n) {
     var Pane = declare([ContentPane], {
         closable: true,
         iconClass: "iconDescription",
 
         postCreate: function () {
             if (this.data.description) {
-                domConstruct.create("div", {
-                    style: "max-width: 60em",
-                    innerHTML: this.data.description
-                }, this.domNode);
+                domConstruct.create(
+                    "div",
+                    {
+                        style: "max-width: 60em",
+                        innerHTML: this.data.description,
+                    },
+                    this.domNode
+                );
             }
-        }
+        },
     });
 
     return declare([_PluginBase], {
         getPluginState: function (nodeData) {
-            const {type} = nodeData;
+            const { type } = nodeData;
             return {
                 enabled: type === "layer",
             };
         },
-        
+
         run: function () {
             this.openLayerInfo();
             return Promise.resolve(undefined);
+        },
+
+        getMenuItem: function () {
+            var widget = this;
+            return {
+                icon: "material-description",
+                title: i18n.gettext("Description"),
+                onClick: function () {
+                    return widget.run();
+                },
+            };
         },
 
         openLayerInfo: function () {
@@ -43,11 +54,11 @@ define([
             var pane = new Pane({
                 title: item.label,
                 layerId: item.layerId,
-                data: data
+                data: data,
             });
 
             this.display.tabContainer.addChild(pane);
             this.display.tabContainer.selectChild(pane);
-        }
+        },
     });
 });
