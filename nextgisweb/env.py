@@ -196,9 +196,6 @@ class Env:
                 + '%(levelname)-8s [%(name)s] %(message)s'}
         config['loggers'] = loggers = {}
 
-        has_options = False
-        has_ini_config = 'logging.ini_config' in self.options
-
         # Set up logging.{level} loggers
         for level in _OPTIONS_LOGGING_LEVELS:
             if level_loggers := self.options[f'logging.{level}']:
@@ -213,26 +210,13 @@ class Env:
         for k in logging_options:
             v = self.options.get(k)
             if k.startswith('logger.'):
-                has_options = True
                 qaulname, level = v.split(':', 2)
                 level = level.upper()
                 loggers[qaulname] = dict(level=level)
-            elif k.startswith('logging.'):
-                if k != 'logging.ini_config':
-                    has_options = True
 
         logging.captureWarnings(True)
 
-        if has_options or (not has_ini_config):
-            logging.config.dictConfig(config)
-        elif has_ini_config:
-            logging.config.fileConfig(self.options['logging.ini_config'])
-
-        if has_options and has_ini_config:
-            logger.warning(
-                "Environment configuration option logging.ini_cofig was "
-                "ignored because other logging configuration options were "
-                "given.")
+        logging.config.dictConfig(config)
 
     @property
     def ngupdate_url(self):
@@ -257,8 +241,6 @@ class Env:
     ) + (
         Option('logging.timestamp', bool, default=False, doc=(
             "Print timestamps in log records or not.")),
-        Option('logging.ini_config', str, doc=(
-            "Deprecated. Load logging configuration from ini-style file.")),
 
         Option('logger.*', str, doc=(
             "Set logging level of the specific logger in the following "
