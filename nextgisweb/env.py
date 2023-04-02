@@ -12,6 +12,9 @@ from .component import Component, load_all
 from .package import pkginfo
 
 
+_OPTIONS_LOGGING_LEVELS = ('critical', 'error', 'warning', 'info', 'debug')
+
+
 class Env:
 
     def __init__(self, cfg=None, setup_logging=True, enable_disabled=False):
@@ -196,6 +199,12 @@ class Env:
         has_options = False
         has_ini_config = 'logging.ini_config' in self.options
 
+        # Set up logging.{level} loggers
+        for level in _OPTIONS_LOGGING_LEVELS:
+            if level_loggers := self.options[f'logging.{level}']:
+                for level_logger in level_loggers:
+                    loggers[level_logger] = dict(level=level.upper())      
+
         # TODO: Maybe there is a better way to iterate over options exists.
         logging_options = ['logger.waitress'] + [
             k for k in self.options._options.keys()
@@ -239,6 +248,13 @@ class Env:
 
         Option('logging.level', str, 'WARNING', doc=(
             "Default logging level which is set to root logger.")),
+    ) + tuple(
+
+        Option(f'logging.{level}', list, default=[], doc=(
+            f"Loggers which level set to {level.upper()}."))
+        for level in _OPTIONS_LOGGING_LEVELS
+
+    ) + (
         Option('logging.timestamp', bool, default=False, doc=(
             "Print timestamps in log records or not.")),
         Option('logging.ini_config', str, doc=(
