@@ -5,6 +5,7 @@ from collections import namedtuple
 from functools import lru_cache
 from hashlib import sha512
 from urllib.parse import urlencode
+from secrets import token_hex
 
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -17,13 +18,14 @@ from passlib.hash import sha256_crypt
 from ..env import env
 from ..lib.config import OptionAnnotations, Option
 from ..lib.logging import logger
+from ..lib.json import dumps as json_dumps
 from .. import db
 from ..models import DBSession
 from ..core.exception import UserException
 
 from .model import User, Group, Base
 from .exception import UserDisabledException
-from .util import _, clean_user_keyname, enum_name
+from .util import _, clean_user_keyname, enum_name, log_lazy_data as lf
 
 
 MAX_TOKEN_LENGTH = 250
@@ -156,7 +158,7 @@ class OAuthHelper:
             token = OAuthToken.filter_by(id=token_id).first()
 
         if token is not None:
-            logger.debug("Access token was read from cache (%s)", access_token)
+            logger.debug("[AT %s]: read from cache", lf(access_token))
         else:
             try:
                 tdata = self._server_request('introspection', dict(
@@ -189,7 +191,7 @@ class OAuthHelper:
             with DBSession.no_autoflush:
                 token = DBSession.execute(stmt).scalar()
 
-            logger.debug("Adding access token to cache (%s)", access_token)
+            logger.debug("[AT %s]: adding to cache", lf(access_token))
 
         return token
 
@@ -250,6 +252,8 @@ class OAuthHelper:
     def _server_request(self, endpoint, params):
         url = self.options['server.{}_endpoint'.format(endpoint)]
         method = self.options.get('server.{}_method'.format(endpoint), 'POST').lower()
+        timeout = self.options['timeout'].total_seconds()
+
         params = dict(params)
 
         if client_id := self.options.get('client.id'):
@@ -257,17 +261,21 @@ class OAuthHelper:
         if client_secret := self.options.get('client.secret'):
             params['client_secret'] = client_secret
 
-        logger.debug(
-            "%s request to %s endpoint: %s",
-            method.upper(), endpoint.upper(),
-            str(params))
+        log_reqid = token_hex(4)
+        logger.debug("[Request %s]: > %s %s", log_reqid, method.upper(), url)
+        logger.debug("[Request %s]: > %s", log_reqid, lf(params))
 
-        timeout = self.options['timeout'].total_seconds()
         response = getattr(requests, method.lower())(
             url, params, headers=self.server_headers, timeout=timeout)
+        
+        logger.debug(
+            "[Request %s]: < %d %s; %d bytes; %s", log_reqid,
+            response.status_code, response.reason, len(response.content),
+            response.headers.get('content-type'))
 
         try:
             result = response.json()
+            logger.debug("[Request %s]: < %s", log_reqid, lf(result))
         except InvalidJSONError:
             raise OAuthInvalidResponse("JSON decode error")
 
@@ -280,7 +288,7 @@ class OAuthHelper:
         return result
 
     def _token_request(self, grant_type, params):
-        data = self._server_request('token', dict(params, grant_type=grant_type))
+        data = self._server_request('token', dict(grant_type=grant_type, **params))
         exp = datetime.utcnow() + timedelta(seconds=data['expires_in'])
         refresh_exp = datetime.utcnow() + (
             timedelta(seconds=data['refresh_expires_in']) if 'refresh_expires_in' in data
