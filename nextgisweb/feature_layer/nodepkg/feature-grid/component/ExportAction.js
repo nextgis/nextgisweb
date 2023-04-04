@@ -7,7 +7,7 @@ import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
 
 import { useExportFeatureLayer } from "../../hook/useExportFeatureLayer";
 
-import ExportIcon from "@material-icons/svg/file_download";
+import ExportIcon from "@material-icons/svg/save_alt";
 import FilterIcon from "@material-icons/svg/filter_alt";
 
 const exportFormats = settings.export_formats;
@@ -17,7 +17,7 @@ let formatItems = exportFormats.map((format) => ({
     label: format.display_name,
 }));
 
-const exportTitleMsg = i18n.gettext("Export");
+const exportTitleMsg = i18n.gettext("Save as");
 const gotToSettingsTitleMsg = i18n.gettext("Advanced Export");
 const quickExportTitleMsg = i18n.gettext("Quick Export");
 const filtersApplyiedTitleMsg = i18n.gettext("Filters are applied");

@@ -200,24 +200,29 @@ export const FeatureGrid = ({
         );
     }
 
-    if (isExportAllowed) {
-        defActions.push((props) => <ExportAction {...props}/>);
-    }
+    const getAction = (Action) => (
+        <div key={i}>
+            {typeof Action === "function" ? (
+                <Action {...{ query, id, size }} />
+            ) : (
+                createButtonAction(Action)
+            )}
+        </div>
+    );
 
     let i = 0;
-    let isLeft = true;
+    if (isExportAllowed) {
+        rightActions.push(getAction((props) => <ExportAction {...props} />));
+    }
+
+    let addDirection = leftActions;
     for (const Action of [...defActions, ...actions]) {
         i++;
         if (typeof Action === "string") {
-            isLeft = false;
+            addDirection = rightActions;
             continue;
         }
-        const action =
-            typeof Action === "function"
-                ? <Action {...{ query, id, size }} />
-                : createButtonAction(Action);
-
-        [rightActions, leftActions][+isLeft].push(<div key={i}>{action}</div>);
+        addDirection.push(getAction(Action));
     }
 
     return (
