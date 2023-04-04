@@ -16,37 +16,17 @@ from .command import Command
 
 def main(argv=sys.argv):
     argparser = ArgumentParser()
-
-    argparser.add_argument(
-        '--config', help="Configuration file.")
-    argparser.add_argument(
-        '--logging', help="Deprecated. Logging library configuration file.")
+    argparser.add_argument('--config', help="Configuration file.")
 
     config = None
-    logging = None
-
     i = 1
-
     while i < len(argv):
         if argv[i] == '--config' and (i < len(argv) - 1):
             config = argv[i + 1]
-        if argv[i] == '--logging' and (i < len(argv) - 1):
-            logging = argv[i + 1]
-
         i += 2 if argv[i].startswith('--') else 1
 
     env = Env(cfg=load_config(config, None, hupper=True))
     setenv(env)
-
-    if logging is not None:
-        logger.warning(
-            "Deprecated command line option --logging was ignored! "
-            "Use environment logging.* and logger.* options instead.")
-
-    elif 'NEXTGISWEB_LOGGING' in os.environ:
-        logger.warning(
-            "Deprecated environment variable NEXTGISWEB_LOGGING was ignored! "
-            "Use environment logging.* and logger.* options instead.")
 
     subparsers = argparser.add_subparsers()
 
