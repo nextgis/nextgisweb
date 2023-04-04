@@ -1,5 +1,6 @@
 from sys import _getframe
 from logging import getLogger, Logger
+from functools import partial
 
 __all__ = ['DO_NOT_USE_WILDCARD_IMPORT']
 
@@ -34,3 +35,19 @@ def __getattr__(attr):
 
     else:
         raise ImportError(f"Cannot import '{attr}' from '{__name__}'")
+
+
+class LazyStr:
+    __slots__ = ('_value', '_fn')
+
+    def __init__(self, value, func):
+        self._value = value
+        self._fn = func
+
+    def __str__(self):
+        return self._fn(self._value)
+
+
+def lazy_str(func):
+    return partial(LazyStr, func=func)
+    
