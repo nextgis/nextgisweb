@@ -314,8 +314,8 @@ class PsqlCommand(Command):
 
     @classmethod
     def argparser_setup(cls, parser, env):
-        # TODO: Add support for bypassing options and arguments to psql
-        pass
+        parser.usage = '%(prog)s [-h] [-- [arg [arg ...]]'
+        parser.add_argument('arg', nargs="*", help="psql arguments and options")
 
     @classmethod
     def execute(cls, args, env):
@@ -326,7 +326,7 @@ class PsqlCommand(Command):
         environ = os.environ.copy()
         if password is not None:
             environ['PGPASSWORD'] = password
-        os.execve(psql_path, ['psql', ] + opts, environ)
+        os.execve(psql_path, ['psql', ] + opts + args.arg, environ)
 
 
 @Command.registry.register
