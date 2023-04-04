@@ -55,7 +55,7 @@ export function SingleSettingForm({
         }
     };
 
-    if (status == "loading") {
+    if (status === "loading") {
         return <LoadingWrapper rows={1} />;
     }
 

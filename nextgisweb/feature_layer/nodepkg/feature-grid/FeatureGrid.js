@@ -7,6 +7,7 @@ import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
+import { useResource } from "@nextgisweb/resource/hook/useResource";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
 
@@ -49,6 +50,7 @@ export const FeatureGrid = ({
         }
     );
     const { data: resourceData } = useRouteGet("resource.item", { id });
+    const { isExportAllowed } = useResource({ id });
 
     const [query, setQuery] = useState("");
     const [selected, setSelected_] = useState(() => []);
@@ -155,6 +157,10 @@ export const FeatureGrid = ({
         [selected, size]
     );
 
+    if (!totalData || !fields) {
+        return <LoadingWrapper />;
+    }
+
     const leftActions = [];
     const rightActions = [];
 
@@ -194,26 +200,24 @@ export const FeatureGrid = ({
         );
     }
 
-    defActions.push(ExportAction);
+    if (isExportAllowed) {
+        defActions.push((props) => <ExportAction {...props}/>);
+    }
 
     let i = 0;
     let isLeft = true;
-    for (const actionDef of [...defActions, ...actions]) {
+    for (const Action of [...defActions, ...actions]) {
         i++;
-        if (typeof actionDef === "string") {
+        if (typeof Action === "string") {
             isLeft = false;
             continue;
         }
         const action =
-            typeof actionDef === "function"
-                ? actionDef({ query, id, size })
-                : createButtonAction(actionDef);
+            typeof Action === "function"
+                ? <Action {...{ query, id, size }} />
+                : createButtonAction(Action);
 
         [rightActions, leftActions][+isLeft].push(<div key={i}>{action}</div>);
-    }
-
-    if (!totalData || !fields) {
-        return <LoadingWrapper />;
     }
 
     return (

@@ -148,6 +148,17 @@ class ResourceComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
+    
+    def client_settings(self, request):
+        result = dict()
+        try:
+            result['resource_export'] = request.env.core.settings_get(
+                'resource', 'resource_export')
+        except KeyError:
+            result['resource_export'] = 'data_read'
+        return result
+
+
     def query_stat(self):
         query = DBSession.query(Resource.cls, db.func.count(Resource.id)) \
             .group_by(Resource.cls)

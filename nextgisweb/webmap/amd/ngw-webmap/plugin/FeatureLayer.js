@@ -23,7 +23,7 @@ define([
     ol,
     i18n,
     reactApp,
-    FeatureGrid,
+    FeatureGridComp,
     ZoomToFilteredBtn,
     route
 ) {
@@ -59,7 +59,7 @@ define([
             }
 
             var component = reactApp.default(
-                FeatureGrid.default,
+                FeatureGridComp.default,
                 {
                     id: this.layerId,
                     readonly: data.readonly,
