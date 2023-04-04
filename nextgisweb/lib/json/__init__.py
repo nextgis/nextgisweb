@@ -1,13 +1,22 @@
+import sys
 import orjson
 from decimal import Decimal
 
-
 __all__ = ['dumpb', 'loadb', 'dumps', 'loads']
+
+
+if 'pytest' in sys.modules:
+    from freezegun.api import FakeDatetime, FakeDate
+    _pytest_freezegun = True
+else:
+    _pytest_freezegun = False
 
 
 def default(obj):
     if isinstance(obj, Decimal):
         return str(obj)
+    elif _pytest_freezegun and isinstance(obj, (FakeDatetime, FakeDate)):
+        return obj.isoformat()
     raise TypeError
 
 
