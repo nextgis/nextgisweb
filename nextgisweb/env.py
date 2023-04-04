@@ -45,26 +45,6 @@ class Env:
                 if cv is not None:
                     cfg_components[ci] = cv
 
-        packages_ignore = cfg.get('core.packages.ignore')
-        if packages_ignore is not None:
-            for pi in re.split(r'[,\s]+', packages_ignore):
-                logger.warning(
-                    "Environment config option 'package.{0} = false' "
-                    "should be used instead of core component option "
-                    "'packages.ignore = {0}'."
-                    .format(pi))
-                cfg_packages[pi] = False
-
-        components_ignore = cfg.get('core.components.ignore')
-        if components_ignore is not None:
-            for ci in re.split(r'[,\s]+', components_ignore):
-                logger.warning(
-                    "Environment config option 'component.{0} = false' "
-                    "should be used instead of core component option "
-                    "'component.ignore = {0}'."
-                    .format(ci))
-                cfg_components[ci] = False
-
         loaded_packages, loaded_components = load_all(
             packages=cfg_packages, components=cfg_components,
             enable_disabled=enable_disabled)
