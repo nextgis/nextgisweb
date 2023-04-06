@@ -159,11 +159,11 @@ define([
         },
 
         uploadReset: function() {
-          this.uploading = false;
-          this.data = undefined;
-          this.fileInfo.innerHTML = "";
-          domClass.remove(this.focusNode, this.stateClasses);
-          domClass.add(this.focusNode, "uploader--start");
+            this.uploading = false;
+            this.data = undefined;
+            this.fileInfo.innerHTML = "";
+            domClass.remove(this.focusNode, this.stateClasses);
+            domClass.add(this.focusNode, "uploader--start");
         },
 
         _getValueAttr: function () {

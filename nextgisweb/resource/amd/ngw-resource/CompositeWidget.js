@@ -149,7 +149,7 @@ define([
                         if (!success) {
                             domClass.add(member.controlButton.domNode, "dijitTabError");
                         } else {
-                             if(domClass.contains(member.controlButton.domNode, "dijitTabError"))
+                            if (domClass.contains(member.controlButton.domNode, "dijitTabError"))
                                 domClass.remove(member.controlButton.domNode, "dijitTabError");
                         }
                         return success;
@@ -294,14 +294,18 @@ define([
                 lunkwill: "true",
             }).then(
                 /* callback */ lang.hitch(this, function (data) {
-                    if (edit) {
-                        window.location = api.routeURL('resource.update', {id: data.id});
-                    } else {
-                        window.location = api.routeURL('resource.show', {id: data.id});
-                    }
+                    this.onCreateSuccess(data, edit);
                 }),
                 /* errback  */ lang.hitch(this, this.unlock)
             );
+        },
+
+        onCreateSuccess: function (data, edit) {
+            if (edit) {
+                window.location = api.routeURL('resource.update', {id: data.id});
+            } else {
+                window.location = api.routeURL('resource.show', {id: data.id});
+            }
         },
 
         updateObj: function () {

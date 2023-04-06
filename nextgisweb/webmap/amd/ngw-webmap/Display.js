@@ -30,6 +30,7 @@ define([
     "dojo/topic",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/webmap/layers-tree",
+    "@nextgisweb/webmap/store",
     "@nextgisweb/webmap/basemap-selector",
     "@nextgisweb/pyramid/icon",
     "@nextgisweb/gui/error",
@@ -105,6 +106,7 @@ define([
     topic,
     reactApp,
     LayersTreeComp,
+    WebmapStore,
     BasemapSelectorComp,
     icon,
     errorModule,
@@ -314,6 +316,7 @@ define([
             });
 
             this._itemStoreSetup();
+            this._webmapStoreSetup();
 
             this._mapDeferred.then(function () {
                 widget._itemStorePrepare();
@@ -676,36 +679,41 @@ define([
             this._startupDeferred.resolve();
         },
 
-        _itemStoreSetup: function () {
-            var itemConfigById = {};
+        prepareItem: function (item) {
+            var self = this;
+            var copy = {
+                id: item.id,
+                type: item.type,
+                label: item.label,
+            };
 
-            function prepare_item(item) {
-                var copy = {
-                    id: item.id,
-                    type: item.type,
-                    label: item.label,
-                };
+            if (copy.type === "layer") {
+                copy.layerId = item.layerId;
+                copy.styleId = item.styleId;
 
-                if (copy.type === "layer") {
-                    copy.layerId = item.layerId;
-                    copy.styleId = item.styleId;
-
-                    copy.visibility = null;
-                    copy.checked = item.visibility;
-                    copy.identifiable = item.identifiable;
-                    copy.position = item.drawOrderPosition;
-                } else if (copy.type === "group" || copy.type === "root") {
-                    copy.children = array.map(item.children, function (c) {
-                        return prepare_item(c);
-                    });
-                }
-
-                itemConfigById[item.id] = item;
-
-                return copy;
+                copy.visibility = null;
+                copy.checked = item.visibility;
+                copy.identifiable = item.identifiable;
+                copy.position = item.drawOrderPosition;
+            } else if (copy.type === "group" || copy.type === "root") {
+                copy.children = array.map(item.children, function (c) {
+                    return self.prepareItem(c);
+                });
             }
+            this._itemConfigById[item.id] = item;
 
-            var rootItem = prepare_item(this.config.rootItem);
+            return copy;
+        },
+
+        _webmapStoreSetup: function () {
+            this.webmapStore = new WebmapStore.default({
+                itemStore: this.itemStore,
+            });
+        },
+
+        _itemStoreSetup: function () {
+            this._itemConfigById = {};
+            var rootItem = this.prepareItem(this.config.rootItem);
 
             this.itemStore = new CustomItemFileWriteStore({
                 data: {
@@ -714,8 +722,6 @@ define([
                     items: [rootItem],
                 },
             });
-
-            this._itemConfigById = itemConfigById;
         },
 
         _itemStorePrepare: function () {
@@ -892,11 +898,14 @@ define([
                 this
             );
         },
+        _mapAddLayer: function (id) {
+            this.map.addLayer(this._layers[id]);
+        },
         _mapAddLayers: function () {
             array.forEach(
                 this._layer_order,
                 function (id) {
-                    this.map.addLayer(this._layers[id]);
+                    this._mapAddLayer(id);
                 },
                 this
             );
@@ -913,6 +922,28 @@ define([
                 },
                 this
             );
+        },
+
+        _onNewStoreItem: function (item) {
+            var widget = this,
+                store = this.itemStore,
+                visibleStyles = null;
+            widget._layerSetup(item);
+            widget._layer_order.unshift(store.getValue(item, "id"));
+
+            // Turn on layers from permalink
+            var cond,
+                layer = widget._layers[store.getValue(item, "id")];
+            if (visibleStyles) {
+                cond =
+                    array.indexOf(
+                        visibleStyles,
+                        store.getValue(item, "styleId")
+                    ) !== -1;
+                layer.olLayer.setVisible(cond);
+                layer.visibility = cond;
+                store.setValue(item, "checked", cond);
+            }
         },
 
         _layersSetup: function () {
@@ -944,22 +975,7 @@ define([
                       ]
                     : null,
                 onItem: function (item) {
-                    widget._layerSetup(item);
-                    widget._layer_order.unshift(store.getValue(item, "id"));
-
-                    // Turn on layers from permalink
-                    var cond,
-                        layer = widget._layers[store.getValue(item, "id")];
-                    if (visibleStyles) {
-                        cond =
-                            array.indexOf(
-                                visibleStyles,
-                                store.getValue(item, "styleId")
-                            ) !== -1;
-                        layer.olLayer.setVisible(cond);
-                        layer.visibility = cond;
-                        store.setValue(item, "checked", cond);
-                    }
+                    widget._onNewStoreItem(item);
                 },
                 onComplete: function () {
                     widget._layersDeferred.resolve();
@@ -1199,31 +1215,10 @@ define([
             const widget = this;
             const itemStore = this.itemStore;
 
-            const handleCheckChanged = (checkChanged) => {
-                const { checked, unchecked } = checkChanged;
-                checked.forEach((i) => {
-                    itemStore.fetchItemByIdentity({
-                        identity: i,
-                        onItem: (item) => {
-                            itemStore.setValue(item, "checked", true);
-                        },
-                    });
-                });
-                unchecked.forEach((i) => {
-                    itemStore.fetchItemByIdentity({
-                        identity: i,
-                        onItem: (item) => {
-                            itemStore.setValue(item, "checked", false);
-                        },
-                    });
-                });
-            };
-
             const handleSelect = (selectedKeys) => {
                 if (selectedKeys.length === 0 || selectedKeys.length < 1) {
                     return;
                 }
-
                 const itemId = selectedKeys[0];
                 itemStore.fetchItemByIdentity({
                     identity: itemId,
@@ -1243,15 +1238,15 @@ define([
                     layer.olLayer.setZIndex(zIndex);
                 }
             };
-
             const { expanded, checked } = widget.config.itemsStates;
-            reactApp.default(
+            this.webmapStore.setWebmapItems(widget.config.rootItem.children);
+            this.webmapStore.setChecked(checked);
+            this.webmapStore.setExpanded(expanded);
+
+            this.component = reactApp.default(
                 LayersTreeComp.default,
                 {
-                    webMapItems: widget.config.rootItem.children ?? [],
-                    expanded,
-                    checked,
-                    onCheckChanged: handleCheckChanged,
+                    store: this.webmapStore,
                     onSelect: handleSelect,
                     setLayerZIndex: setLayerZIndex,
                     getWebmapPlugins: () => widget._plugins,

@@ -62,7 +62,7 @@ define([
                 FeatureGridComp.default,
                 {
                     id: this.layerId,
-                    readonly: data.readonly,
+                    readonly: data ? data.readonly : true,
                     size: "small",
                     cleanSelectedOnFilter: false,
                     selectedIds: widget.selectedIds,
@@ -116,13 +116,13 @@ define([
                                 widget.zoomToFeature();
                             },
                         },
-                        'spacer',
-                        function(props) {
+                        "spacer",
+                        function (props) {
                             props.onZoomToFiltered = function (ngwExtent) {
                                 widget.zoomToExtent(ngwExtent);
-                            }
-                            return ZoomToFilteredBtn.default(props)
-                        }
+                            };
+                            return ZoomToFilteredBtn.default(props);
+                        },
                     ],
                 },
                 this.domNode
@@ -207,11 +207,11 @@ define([
                 });
             }
         },
-        
+
         zoomToExtent: function (ngwExtent) {
             const display = this.plugin.display;
             display.map.zoomToNgwExtent(ngwExtent, display.displayProjection);
-        }
+        },
     });
 
     return declare([_PluginBase], {
@@ -224,12 +224,12 @@ define([
         },
 
         getPluginState: function (nodeData) {
-            const {type, plugin} = nodeData;
+            const { type, plugin } = nodeData;
             return {
                 enabled: type === "layer" && plugin[this.identity],
             };
         },
-        
+
         run: function () {
             this.openFeatureGrid();
             return Promise.resolve(undefined);
@@ -242,8 +242,8 @@ define([
                 title: i18n.gettext("Feature table"),
                 onClick: function () {
                     return widget.run();
-                }
-            }
+                },
+            };
         },
 
         postCreate: function () {
@@ -287,12 +287,18 @@ define([
 
         _buildPane: function (layerId, item) {
             var data = this.display.get("itemConfig").plugin[this.identity];
+            var readonly = true;
+            var likeSearch = false;
+            if (data) {
+                readonly = data.readonly;
+                likeSearch = data.likeSearch;
+            }
 
             return new Pane({
                 title: item.label,
                 layerId: layerId,
-                readonly: data.readonly,
-                likeSearch: data.likeSearch,
+                readonly: readonly,
+                likeSearch: likeSearch,
                 plugin: this,
                 onClose: lang.hitch(this, function () {
                     delete this._openedLayersById[layerId];
