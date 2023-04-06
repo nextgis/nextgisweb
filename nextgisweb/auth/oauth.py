@@ -420,6 +420,9 @@ class OAuthHelper:
         Option('server.token_endpoint',
                doc="OAuth token endpoint URL."),
 
+        Option('server.token_method', default='POST', 
+               doc="Workaround for NGID OAuth implementation."),
+
         Option('server.introspection_endpoint', default=None,
                doc="OAuth token introspection endpoint URL."),
 
