@@ -757,7 +757,6 @@ def cget(resource, request):
         geom_format=request.GET.get('geom_format', 'wkt').lower(),
         dt_format=request.GET.get('dt_format', 'obj'),
         label=request.GET.get('label', False),
-        extensions=_extensions(request.GET.get('extensions'), resource),
     )
 
     keys = [fld.keyname for fld in resource.fields]
@@ -803,10 +802,31 @@ def cget(resource, request):
         if srlz_params['geom_format'] == 'wkt':
             query.geom_format('WKT')
 
-    result = [
-        serialize(feature, **srlz_params)
-        for feature in query()
-    ]
+    result = []
+    extensions = _extensions(request.GET.get('extensions'), resource)
+    extensions_count = dict([identity, ext.count()] for identity, ext in extensions)
+    bulk_size = 10
+    features = []
+
+    def append_result():
+        feature_data = [serialize(f, **srlz_params) for f in features]
+        for identity, ext in extensions:
+            if extensions_count[identity] > 0:
+                count, ext_data = ext.bulk_serialize(features)
+                extensions_count[identity] -= count
+                for i, feature_ext_data in enumerate(ext_data):
+                    feature_data[i]['extensions'][identity] = feature_ext_data
+            else:
+                for itm in feature_data:
+                    itm['extensions'][identity] = None
+        result.extend(feature_data)
+
+    for feature in query():
+        features.append(feature)
+        if len(features) == bulk_size:
+            append_result()
+            features.clear()
+    append_result()
 
     return result
 
