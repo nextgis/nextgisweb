@@ -1,27 +1,24 @@
-import { Col, message, Row, Typography, Space } from "@nextgisweb/gui/antd";
+import { useState } from "react";
+
+import { Col, Row, Space, Typography, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { Code } from "@nextgisweb/gui/component/code";
-import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
 import { errorModal } from "@nextgisweb/gui/error";
-import { useEffect, useState } from "react";
+import { route } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import i18n from "@nextgisweb/pyramid/i18n!pyramid";
 
 export function CustomCSSForm() {
-    const [status, setStatus] = useState("loading");
-    const [value, setValue] = useState(null);
+    const [saving, setSaving] = useState(false);
     const [editor, setEditor] = useState(null);
 
-    useEffect(async () => {
-        const data = await route("pyramid.custom_css").get({
-            query: { format: "json" },
-        });
-        setValue(data);
-        setStatus(null);
-    }, []);
+    const { data, isLoading } = useRouteGet("pyramid.custom_css", null, {
+        query: { format: "json" },
+    });
 
     const save = async () => {
         if (editor) {
-            setStatus("saving");
+            setSaving(true);
 
             const value = editor.getValue();
             try {
@@ -34,7 +31,7 @@ export function CustomCSSForm() {
             } catch (err) {
                 errorModal(err);
             } finally {
-                setStatus(null);
+                setSaving(false);
             }
         }
     };
@@ -43,7 +40,7 @@ export function CustomCSSForm() {
         setEditor(e);
     };
 
-    if (status == "loading") {
+    if (isLoading) {
         return <LoadingWrapper />;
     }
 
@@ -55,10 +52,10 @@ export function CustomCSSForm() {
                         lang="css"
                         lineNumbers
                         whenReady={onEditorReady}
-                        value={value}
+                        value={data}
                     />
                 </Col>
-                <Col  span={10}>
+                <Col span={10}>
                     <Typography.Paragraph>
                         {i18n.gettext(
                             "Enter custom CSS rules here. They will be used to redefine styles, design for all pages of your Web GIS."
@@ -67,7 +64,7 @@ export function CustomCSSForm() {
                 </Col>
             </Row>
             <Row>
-                <SaveButton onClick={save} loading={status === "saving"} />
+                <SaveButton onClick={save} loading={saving} />
             </Row>
         </Space>
     );
