@@ -515,7 +515,13 @@ class OAuthPasswordToken(Base):
 
 @lru_cache(maxsize=256)
 def _password_token_hash_cache(username, password, salt):
-    return sha256_crypt.hash(f"{username}:{password}:{salt if salt else 'ngw'}")
+    # NOTE: If salt kwarg isn't provided, it'll be generated during startup.
+    # Each proccess will have each own password hashes and pairs of tokens.
+
+    # Setting rounds to 5000 removes the rounds number form hashed.
+    return "".join(sha256_crypt.using(salt=salt[:16], rounds=5000).hash(
+        f"{username}:{password}",
+    ).split("$")[-2:]).replace('.', '')
 
 
 class OAuthToken(Base):
