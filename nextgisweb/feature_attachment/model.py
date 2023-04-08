@@ -32,6 +32,10 @@ class FeatureAttachment(Base):
     resource = db.relationship(Resource, backref=db.backref(
         '__feature_attachment', cascade='all'))
 
+    __table_args__ = (
+        db.Index('feature_attachment_resource_id_feature_id_idx', resource_id, feature_id),
+    )
+
     @property
     def is_image(self):
         return self.mime_type in ('image/jpeg', 'image/png')
