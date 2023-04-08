@@ -2,10 +2,8 @@ import warnings
 from dataclasses import dataclass
 
 from pyramid import httpexceptions
-from sqlalchemy import bindparam
 from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
-import sqlalchemy.ext.baked
 import zope.event
 
 from ..views import permalinker
@@ -35,9 +33,6 @@ PERM_CPERMISSIONS = ResourceScope.change_permissions
 PERM_MCHILDREN = ResourceScope.manage_children
 
 
-_rf_bakery = sqlalchemy.ext.baked.bakery()
-
-
 def resource_factory(request):
     # TODO: We'd like to use first key, but can't
     # as matchdiсt doesn't save keys order.
@@ -45,30 +40,21 @@ def resource_factory(request):
     if request.matchdict['id'] == '-':
         return None
 
-    bq_res_cls = _rf_bakery(
-        lambda session: session.query(
-            Resource.cls).filter_by(
-                id=bindparam('id')))
-
     # First, load base class resource
     res_id = int(request.matchdict['id'])
 
     try:
-        res_cls, = bq_res_cls(DBSession()).params(id=res_id).one()
+        res_cls, = DBSession.query(Resource.cls).where(
+            Resource.id == res_id).one()
     except NoResultFound:
         raise ResourceNotFound(res_id)
 
-    # Second, load resource of it's class
-    def res_query(session):
-        res = with_polymorphic(Resource, [Resource.registry[res_cls]])
-        return session.query(res).options(
-            joinedload(res.owner_user),
-            joinedload(res.parent),
-        ).filter_by(id=bindparam('id'))
+    polymorphic = with_polymorphic(Resource, [Resource.registry[res_cls]])
+    obj = DBSession.query(polymorphic).options(
+        joinedload(polymorphic.owner_user),
+        joinedload(polymorphic.parent),
+    ).where(polymorphic.id == res_id).one()
 
-    bq_obj = _rf_bakery(res_query, res_cls)
-
-    obj = bq_obj(DBSession()).params(id=res_id).one()
     request.audit_context(res_cls, res_id)
 
     return obj
