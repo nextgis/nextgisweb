@@ -1,3 +1,5 @@
+<%! from nextgisweb.auth.policy import AuthProvider %>
+
 <%
     distr_opts = request.env.options.with_prefix('distribution')
     distribution = {
@@ -11,7 +13,12 @@
         is_administrator = user.is_administrator
         is_guest = user.keyname == 'guest'
         user_display_name = user.display_name
-        invitation_session = bool(request.session.get('invite'))
+
+        if auth_result := request.environ.get('auth.result'):
+            invitation_session = auth_result.prv == AuthProvider.INVITE
+        else:
+            invitation_session = False
+
     except Exception:
         # Something like InvalidCredentials
         is_administrator = False

@@ -4,6 +4,7 @@ from functools import lru_cache
 from passlib.hash import sha256_crypt
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from sqlalchemy.dialects.postgresql import JSONB
 from zope.event import notify
 from zope.event.classhandler import handler
 
@@ -250,6 +251,29 @@ User.is_administrator = orm.column_property(
     .where(tab_group_user.c.user_id == User.principal_id)
     .exists().label('is_administrator'),
     deferred=True)
+
+
+class OAuthAToken(Base):
+    __tablename__ = 'auth_oauth_atoken'
+
+    id = sa.Column(sa.Unicode, primary_key=True)
+    exp = sa.Column(sa.BigInteger, nullable=False)
+    sub = sa.Column(sa.Unicode, nullable=False)
+    data = sa.Column(JSONB, nullable=False)
+
+
+class OAuthPToken(Base):
+    __tablename__ = 'auth_oauth_ptoken'
+
+    id = sa.Column(sa.Unicode, primary_key=True)
+    tstamp = sa.Column(sa.BigInteger, nullable=False)
+    user_id = sa.Column(sa.ForeignKey(User.id, ondelete='CASCADE'), nullable=False)
+    access_token = sa.Column(sa.Unicode, nullable=False)
+    access_exp = sa.Column(sa.BigInteger, nullable=False)
+    refresh_token = sa.Column(sa.Unicode, nullable=False)
+    refresh_exp = sa.Column(sa.BigInteger, nullable=False)
+
+    user = orm.relationship(User)
 
 
 @lru_cache(maxsize=256)

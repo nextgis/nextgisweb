@@ -9,6 +9,7 @@ import pytest
 from freezegun import freeze_time
 import transaction
 
+from ...lib.logging import logger
 from ...models import DBSession
 from ..oauth import OAuthHelper, OAuthErrorResponse
 from ..model import Group, User
@@ -85,10 +86,13 @@ def server_response_mock():
             if not match:
                 continue
 
+            logger.debug(f"{hobj.endpoint} <<< {hobj.params}")
+
             hobj.counter += 1
             if isinstance(hobj.response, Exception):
                 raise hobj.response
             else:
+                logger.debug(f"{hobj.endpoint} >>> {hobj.response}")
                 return hobj.response
 
         raise ValueError(f"No hook found for ({endpoint}, {params})")
@@ -221,7 +225,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     ouser1 = dict(
         sub=str(uuid4()),
         name="Oauth",
-        keyname="oauth-test",
+        keyname="oauth_test",
         pwd="oauth-pwd",
         first_name="OAuth",
         family_name="Test",
@@ -230,7 +234,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     ouser2 = dict(
         sub=str(uuid4()),
         name="Oauth2",
-        keyname="oauth-test2",
+        keyname="oauth_test2",
         pwd="oauth-secret",
         first_name="OAuthOauth",
         family_name="Test",
@@ -285,6 +289,9 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
         )
     ):
         user = ngw_webtest_app.get('/api/component/auth/current_user').json
+        assert user['keyname'] == ouser1['keyname']
+        assert user['auth_medium'] == 'session'
+        assert user['auth_provider'] == 'oauth_ac'
 
     access_token = access_token_next
     refresh_token = refresh_token_next
@@ -308,7 +315,9 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     with patch.object(ngw_env.auth.oauth, 'local_auth', new=True):
         ngw_webtest_app.post('/api/component/auth/login', dict(
             login=user['keyname'], password='test-password'))
-        assert ngw_webtest_app.get('/api/component/auth/current_user').json == user
+        
+        user_auth_local = dict(user, auth_provider='local_pw')
+        assert ngw_webtest_app.get('/api/component/auth/current_user').json == user_auth_local
         ngw_webtest_app.post('/api/component/auth/logout')
 
     # Disable local authentication for OAuth users
@@ -334,13 +343,15 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     ), patch.object(ngw_env.auth.oauth, 'password', new=True):
         ngw_webtest_app.post('/api/component/auth/login', dict(
             login=ouser1['keyname'], password=ouser1['pwd']))
-        assert ngw_webtest_app.get('/api/component/auth/current_user').json == user
+        user_auth_provider = dict(user, auth_provider='oauth_pw')
+        assert ngw_webtest_app.get('/api/component/auth/current_user').json == user_auth_provider
     ngw_webtest_app.post('/api/component/auth/logout')
 
     # Bearer authentication
     ngw_webtest_app.authorization = ('Bearer', access_token)
 
-    assert ngw_webtest_app.get('/api/component/auth/current_user').json == user
+    user_auth_medium = dict(user, auth_medium='bearer')
+    assert ngw_webtest_app.get('/api/component/auth/current_user').json == user_auth_medium
 
     freezegun.tick(ACCESS_TOKEN_LIFETIME + 5)
     assert ngw_webtest_app.get('/api/component/auth/current_user', status=401)
@@ -425,7 +436,10 @@ def test_password_token_basic(disabled_local_user, server_response_mock, freezeg
 
     def introspection_response():
         start_tstamp = int(datetime.utcnow().timestamp())
-        return dict(exp=start_tstamp + ACCESS_TOKEN_LIFETIME, sub='chapaev')
+        return dict(
+            exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
+            refresh_expires_in=REFRESH_TOKEN_LIFETIME,
+            sub='chapaev')
 
     with server_response_mock(
         'token', dict(

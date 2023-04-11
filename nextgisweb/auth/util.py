@@ -1,4 +1,5 @@
 import re
+from time import time
 
 from ..lib.i18n import trstr_factory
 from ..lib.logging import lazy_str
@@ -26,6 +27,10 @@ def enum_name(value, idx, sep='_'):
         value = value.rstrip(sep)
         value += sep + str(idx + 1)
     return value
+
+
+def current_tstamp(override=None):
+    return int(time()) if override is None else override
 
 
 _re_secret = re.compile(r'(?:^|.+_)(?:password|secret)(?:_.+|$)')

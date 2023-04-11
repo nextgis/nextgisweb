@@ -1,31 +1,30 @@
 import re
 import itertools
 from datetime import datetime, timedelta
-from collections import namedtuple
 from functools import lru_cache
 from hashlib import sha512
 from urllib.parse import urlencode
 from secrets import token_hex
+from dataclasses import dataclass
 
-import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import insert as pg_insert
-from sqlalchemy.orm.exc import NoResultFound
 import requests
-from requests.exceptions import InvalidJSONError
+import sqlalchemy as sa
 import zope.event
+from sqlalchemy.orm import load_only, defer, joinedload
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from requests.exceptions import InvalidJSONError
 from passlib.hash import sha256_crypt
 
-from ..env import env
 from ..lib.config import OptionAnnotations, Option
 from ..lib.logging import logger
-from ..lib.json import dumps as json_dumps
-from .. import db
+from ..env import env
 from ..models import DBSession
 from ..core.exception import UserException
 
-from .model import User, Group, Base
+from .model import User, Group, OAuthAToken, OAuthPToken
 from .exception import UserDisabledException
-from .util import _, clean_user_keyname, enum_name, log_lazy_data as lf
+from .util import _, current_tstamp, clean_user_keyname, enum_name, log_lazy_data as lf
 
 
 MAX_TOKEN_LENGTH = 250
@@ -94,46 +93,101 @@ class OAuthHelper:
 
         return self.options['server.auth_endpoint'] + '?' + urlencode(qs)
 
-    def grant_type_password(self, username, password):
-        client_id = self.options.get('client.id')
+    def authorize_credentials(self, username, password, *, return_tpair=False):
+        now = current_tstamp()
 
-        pwd_token_id = _password_token_hash_cache(username, password, client_id)
+        client_id = self.options.get('client.id')
+        ptoken_id = _password_token_hash_cache(username, password, client_id)
+
+        atoken, tpair = None, None
+        user = None
 
         try:
-            pwd_token = OAuthPasswordToken.filter_by(id=pwd_token_id).one()
+            attrs = [
+                OAuthPToken.tstamp,
+                OAuthPToken.access_exp,
+                OAuthPToken.user_id,
+            ] + ([
+                OAuthPToken.access_token,
+                OAuthPToken.refresh_token,
+                OAuthPToken.refresh_exp,
+            ] if return_tpair else [])
+
+            query = DBSession.query(OAuthPToken).options(
+                load_only(*attrs),
+            ).where(OAuthPToken.id == ptoken_id).options(
+                joinedload(OAuthPToken.user).options(
+                    load_only(User.keyname, User.oauth_tstamp)
+                )
+            )
+
+            ptoken = query.one()
+            user = ptoken.user
+
+            logger.debug(
+                "OAuthPToken(%s): bound to User(id=%d, keyname=%s)",
+                lf(ptoken_id), user.id, user.keyname)
+
         except NoResultFound:
-            # If no token found, create new one not adding it into DBSession.
-            # otherwise an error could happen when an incomplete token record is
-            # flushed to DB.
-            pwd_token = OAuthPasswordToken(id=pwd_token_id)
+            logger.debug("OAuthPToken(%s) not found", lf(ptoken_id))
+            try:
+                ptoken = OAuthPToken(id=ptoken_id)
+                tpair = self.grant_type_password(username, password)
+            except OAuthPasswordGrantTypeException:
+                return (None, None)
         else:
-            now = datetime.utcnow()
-            if pwd_token.exp > now:
-                return pwd_token.to_grant_response()
+            if ptoken.access_exp < now:
+                if ptoken.refresh_exp > now:
+                    logger.debug("OAuthPToken(%s): refreshing token pair", lf(ptoken_id))
+                    
+                    if not return_tpair:
+                        # There is no way to tell SA to load two columns
+                        # simultaneously, so we load them manually.
+                        access_token, refresh_token = DBSession.execute(
+                            sa.select(
+                                OAuthPToken.access_token,
+                                OAuthPToken.refresh_token,
+                            ).where(OAuthPToken.id == ptoken_id)
+                        ).one()
+                    else:
+                        access_token = ptoken.access_token
+                        refresh_token = ptoken.refresh_token
 
-            if pwd_token.refresh_exp > now:
-                try:
-                    tresp = self.grant_type_refresh_token(
-                        pwd_token.refresh_token, pwd_token.access_token)
-                except OAuthTokenRefreshException:
-                    pass
+                    try:
+                        tpair = self.grant_type_refresh_token(refresh_token, access_token)
+                    except OAuthATokenRefreshException:
+                        return (None, None)
                 else:
-                    pwd_token.update_from_grant_response(tresp)
-                    return tresp
+                    logger.debug("OAuthPToken(%s): obtaining new token pair")
+                    try:
+                        tpair = self.grant_type_password(username, password)
+                    except OAuthPasswordGrantTypeException:
+                        return (None, None)
 
+        if tpair:
+            ptoken.tstamp = now
+            ptoken.access_token = tpair.access_token
+            ptoken.access_exp = tpair.access_exp
+            ptoken.refresh_token = tpair.refresh_token
+            ptoken.refresh_exp = tpair.refresh_exp
+
+            # We don't trust expires_in from the grant response
+            atoken = self.query_introspection(tpair.access_token)
+            ptoken.access_exp = atoken.exp
+
+        ptoken.persist()
+        return (ptoken, atoken)
+
+    def grant_type_password(self, username, password):
         params = dict(username=username, password=password)
         if scope := self.options.get('scope'):
             params['scope'] = ' '.join(scope)
 
         try:
-            tresp = self._token_request('password', params)
+            return self._token_request('password', params)
         except OAuthErrorResponse as exc:
             logger.warning("Password grant type failed: %s", exc.code)
             raise OAuthPasswordGrantTypeException()
-
-        pwd_token.update_from_grant_response(tresp)
-        DBSession.merge(pwd_token)
-        return tresp
 
     def grant_type_authorization_code(self, code, redirect_uri):
         return self._token_request('authorization_code', dict(
@@ -146,7 +200,7 @@ class OAuthHelper:
                 access_token=access_token))
         except OAuthErrorResponse as exc:
             logger.warning("Token refresh failed: %s", exc.code)
-            raise OAuthTokenRefreshException()
+            raise OAuthATokenRefreshException()
 
     def query_introspection(self, access_token):
         if len(access_token) > MAX_TOKEN_LENGTH:
@@ -155,14 +209,15 @@ class OAuthHelper:
             token_id = 'raw:' + access_token
 
         with DBSession.no_autoflush:
-            token = OAuthToken.filter_by(id=token_id).first()
+            atoken = OAuthAToken.filter_by(id=token_id).options(
+                defer(OAuthAToken.data),
+            ).first()
 
-        if token is not None:
-            logger.debug("[AT %s]: read from cache", lf(access_token))
+        if atoken is not None:
+            logger.debug("OAuthAToken(%s): read from cache", lf(access_token))
         else:
             try:
-                tdata = self._server_request('introspection', dict(
-                    token=access_token))
+                tdata = self._server_request('introspection', dict(token=access_token))
             except OAuthErrorResponse as exc:
                 logger.warning("Token verification failed: %s", exc.code)
                 return None  # TODO: Use custom exception here instead of None
@@ -172,38 +227,45 @@ class OAuthHelper:
                 if (not set(self.options['scope']).issubset(token_scope)):
                     raise InvalidScopeException()
 
-            stmt = pg_insert(OAuthToken).values([dict(
+            stmt = pg_insert(OAuthAToken).values([dict(
                 id=token_id,
-                exp=datetime.utcfromtimestamp(tdata['exp']),
+                exp=int(tdata['exp']),
                 sub=str(tdata[self.options['profile.subject.attr']]),
                 data=tdata,
             )])
             stmt = stmt.on_conflict_do_update(
-                index_elements=[OAuthToken.id],
+                index_elements=[OAuthAToken.id],
                 set_=dict(
                     exp=stmt.excluded.exp,
                     sub=stmt.excluded.sub,
                     data=stmt.excluded.data)
-            ).returning(OAuthToken)
-            stmt = sa.select(OAuthToken).from_statement(stmt). \
+            ).returning(OAuthAToken)
+            stmt = sa.select(OAuthAToken).from_statement(stmt). \
                 execution_options(populate_existing=True)
 
             with DBSession.no_autoflush:
-                token = DBSession.execute(stmt).scalar()
+                atoken = DBSession.execute(stmt).scalar()
 
-            logger.debug("[AT %s]: adding to cache", lf(access_token))
+            logger.debug("OAuthAToken(%s): adding to cache", lf(access_token))
 
-        return token
+        return atoken
 
-    def access_token_to_user(self, access_token, bind_user=None):
-        token = self.query_introspection(access_token)
-        if token is None:
-            return None
-
-        token.check_expiration()
+    def access_token_to_user(
+        self, atoken, *,
+        bind_user=None,
+        from_existing=None,
+        min_oauth_tstamp=None,
+    ):
+        def _atoken():
+            nonlocal atoken
+            if callable(atoken):
+                atoken = atoken()
+            return atoken
 
         with DBSession.no_autoflush:
-            user = User.filter_by(oauth_subject=token.sub).first()
+            user = User.filter_by(oauth_subject=_atoken().sub).options(
+                load_only(User.id, User.oauth_tstamp, User.oauth_subject),
+            ).first() if from_existing is None else from_existing
 
             if bind_user is not None:
                 if user is not None and user.id != bind_user.id:
@@ -214,13 +276,13 @@ class OAuthHelper:
                             "This {dn} account ({sub}) is already bound to "
                             "the different user ({id}). Log in using this "
                             "account instead of binding it."
-                        ).format(dn=dn, sub=token.sub, id=user.id))
+                        ).format(dn=dn, sub=_atoken().sub, id=user.id))
                 user = bind_user
 
             if user is None:
                 # Register new user with default groups
                 if self.options['register']:
-                    user = User().persist()
+                    user = User(oauth_subject=_atoken().sub).persist()
                     env.auth.check_user_limit()
                     user.member_of = Group.filter_by(register=True).all()
                 else:
@@ -228,24 +290,22 @@ class OAuthHelper:
             elif user.disabled:
                 raise UserDisabledException()
 
-            user.oauth_subject = token.sub
-
-            if (
-                user.oauth_tstamp is not None
-                and self.options['profile.sync_timedelta'] is not None
-                and user.oauth_tstamp + self.options['profile.sync_timedelta'] > datetime.utcnow()
+            if user.oauth_tstamp is not None and (
+                (min_oauth_tstamp and user.oauth_tstamp > min_oauth_tstamp)
+                or (user.oauth_tstamp + self.options['profile.sync_timedelta']) > datetime.utcnow()
             ):
-                # Skip profile synchronization
-                return user
+                return user # Just skip profile synchronization
             elif bind_user is None:
-                self._update_user(user, token.data)
+                if user.id is not None:
+                    logger.debug(
+                        "User(id=%d, keyname=%s): updating from token",
+                        user.id, user.keyname)
+                self._update_user(user, _atoken().data)
 
             user.oauth_tstamp = datetime.utcnow()
 
-        DBSession.flush()  # Force user.id sequence value
-
-        event = OnAccessTokenToUser(user, token.data)
-        zope.event.notify(event)
+            event = OnAccessTokenToUser(user, _atoken().data)
+            zope.event.notify(event)
 
         return user
 
@@ -262,20 +322,20 @@ class OAuthHelper:
             params['client_secret'] = client_secret
 
         log_reqid = token_hex(4)
-        logger.debug("[Request %s]: > %s %s", log_reqid, method.upper(), url)
-        logger.debug("[Request %s]: > %s", log_reqid, lf(params))
+        logger.debug("Request(%s): > %s %s", log_reqid, method.upper(), url)
+        logger.debug("Request(%s): > %s", log_reqid, lf(params))
 
         response = getattr(requests, method.lower())(
             url, params, headers=self.server_headers, timeout=timeout)
         
         logger.debug(
-            "[Request %s]: < %d %s; %d bytes; %s", log_reqid,
+            "Request(%s): < %d %s; %d bytes; %s", log_reqid,
             response.status_code, response.reason, len(response.content),
             response.headers.get('content-type'))
 
         try:
             result = response.json()
-            logger.debug("[Request %s]: < %s", log_reqid, lf(result))
+            logger.debug("Request(%s): < %s", log_reqid, lf(result))
         except InvalidJSONError:
             raise OAuthInvalidResponse("JSON decode error")
 
@@ -289,23 +349,24 @@ class OAuthHelper:
 
     def _token_request(self, grant_type, params):
         data = self._server_request('token', dict(grant_type=grant_type, **params))
-        exp = datetime.utcnow() + timedelta(seconds=data['expires_in'])
-        refresh_exp = datetime.utcnow() + (
-            timedelta(seconds=data['refresh_expires_in']) if 'refresh_expires_in' in data
-            else self.options['server.refresh_expires_in'])
+        now = current_tstamp()
         return OAuthGrantResponse(
+            grant_type=grant_type,
             access_token=data['access_token'],
+            access_exp=now + int(data['expires_in']),
             refresh_token=data['refresh_token'],
-            expires=exp.timestamp(),
-            refresh_expires=refresh_exp.timestamp())
+            refresh_exp=now + int(
+                data['refresh_expires_in'] if 'refresh_expires_in' in data
+                else self.options['server.refresh_expires_in'].total_seconds()
+            ))
 
-    def _update_user(self, user, token):
+    def _update_user(self, user, tdata):
         opts = self.options.with_prefix('profile')
 
         if user.keyname is None or not opts['keyname.no_update']:
             profile_keyname = opts.get('keyname.attr', None)
             if profile_keyname is not None:
-                user.keyname = token[profile_keyname]
+                user.keyname = tdata[profile_keyname]
 
             # Check keyname/display_name uniqueness and add numbered suffix
             keyname_base = _fallback_value(user.keyname, user.oauth_subject)
@@ -323,9 +384,9 @@ class OAuthHelper:
             profile_display_name = opts.get('display_name.attr', None)
             if profile_display_name is not None:
                 user.display_name = ' '.join([
-                    token[key]
+                    tdata[key]
                     for key in re.split(r',\s*', profile_display_name)
-                    if key in token])
+                    if key in tdata])
 
             display_name_base = _fallback_value(user.display_name, user.keyname)
             for idx in itertools.count():
@@ -341,7 +402,7 @@ class OAuthHelper:
         if (mof_attr := opts['member_of.attr']) is not None:
             mof_attr_sub = mof_attr.format(client_id=self.options['client.id'])
             try:
-                mof = _member_of_from_token(token, mof_attr_sub)
+                mof = _member_of_from_token(tdata, mof_attr_sub)
             except ValueError:
                 logger.warning("Can't get token groups for user '%s'.", user.keyname)
                 mof = set()
@@ -371,7 +432,7 @@ class OAuthHelper:
                     user.member_of.extend(grp_add)
                 if len(grp_add) != len(mof):
                     miss = mof.difference(set(g.keyname.lower() for g in grp_add))
-                    logger.warn(
+                    logger.warning(
                         "Unmatched groups for user '%s': %s.", user.keyname,
                         ', '.join(f"'{m}'" for m in miss))
 
@@ -464,7 +525,7 @@ class OAuthHelper:
             "{client_id} substitution (like 'resource_access.{client_id}.roles' "
             "for Keycloak integration).")),
 
-        Option('profile.sync_timedelta', timedelta, default=None,
+        Option('profile.sync_timedelta', timedelta, default=timedelta(minutes=5),
                doc="Minimum time delta between profile synchronization with OAuth server."),
 
         Option('timeout', timedelta, default=timedelta(seconds=15), doc="OAuth server request timeout."),
@@ -486,31 +547,13 @@ class OnAccessTokenToUser:
         return self._profile
 
 
-OAuthGrantResponse = namedtuple('OAuthGrantResponse', [
-    'access_token', 'refresh_token', 'expires', 'refresh_expires'])
-
-
-class OAuthPasswordToken(Base):
-    __tablename__ = 'auth_oauth_password_token'
-
-    id = db.Column(db.Unicode, primary_key=True)
-    access_token = db.Column(db.Unicode, nullable=False)
-    exp = db.Column(db.DateTime, nullable=False)
-    refresh_token = db.Column(db.Unicode, nullable=False)
-    refresh_exp = db.Column(db.DateTime, nullable=False)
-
-    def update_from_grant_response(self, tresp):
-        self.access_token = tresp.access_token
-        self.refresh_token = tresp.refresh_token
-        self.exp = datetime.utcfromtimestamp(tresp.expires)
-        self.refresh_exp = datetime.utcfromtimestamp(tresp.refresh_expires)
-
-    def to_grant_response(self):
-        return OAuthGrantResponse(
-            access_token=self.access_token,
-            refresh_token=self.refresh_token,
-            expires=self.exp.timestamp(),
-            refresh_expires=self.refresh_exp.timestamp())
+@dataclass
+class OAuthGrantResponse:
+    grant_type: str
+    access_token: str
+    access_exp: int
+    refresh_token: str
+    refresh_exp: int
 
 
 @lru_cache(maxsize=256)
@@ -522,19 +565,6 @@ def _password_token_hash_cache(username, password, salt):
     return "".join(sha256_crypt.using(salt=salt[:16], rounds=5000).hash(
         f"{username}:{password}",
     ).split("$")[-2:]).replace('.', '')
-
-
-class OAuthToken(Base):
-    __tablename__ = 'auth_oauth_token'
-
-    id = db.Column(db.Unicode, primary_key=True)
-    exp = db.Column(db.DateTime, nullable=False)
-    sub = db.Column(db.Unicode, nullable=False)
-    data = db.Column(db.JSONB, nullable=False)
-
-    def check_expiration(self):
-        if self.exp < datetime.utcnow():
-            raise OAuthAccessTokenExpiredException()
 
 
 class OAuthInvalidResponse(Exception):
@@ -567,7 +597,7 @@ class OAuthPasswordGrantTypeException(UserException):
     http_status_code = 401
 
 
-class OAuthTokenRefreshException(UserException):
+class OAuthATokenRefreshException(UserException):
     title = _("OAuth token refresh failed")
     http_status_code = 401
 
@@ -586,8 +616,8 @@ def _fallback_value(*args):
     raise ValueError("No suitable value found")
 
 
-def _member_of_from_token(token, key):
-    value = token
+def _member_of_from_token(tdata, key):
+    value = tdata
     for k in key.split('.'):
         if isinstance(value, dict) and k in value:
             value = value[k]

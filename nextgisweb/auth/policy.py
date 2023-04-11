@@ -1,19 +1,88 @@
-import sqlalchemy as sa
+import warnings
 from datetime import datetime, timedelta
 from base64 import b64decode
+from dataclasses import dataclass
+from enum import Enum
+from typing import Optional
 
+import sqlalchemy as sa
 from zope.interface import implementer
+from zope.event import notify
+from sqlalchemy.orm import load_only
 from sqlalchemy.orm.exc import NoResultFound
+from pyramid.request import Request
 from pyramid.interfaces import ISecurityPolicy
 from pyramid.authorization import ACLHelper
-from pyramid.httpexceptions import HTTPUnauthorized
 
 from ..lib.config import OptionAnnotations, Option
+from ..lib.logging import logger
 from ..pyramid import SessionStore, WebSession
+from ..models import DBSession
 
 from .model import User
 from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, UserDisabledException
-from .oauth import OAuthTokenRefreshException, OAuthPasswordGrantTypeException
+from .oauth import OAuthATokenRefreshException, OAuthAccessTokenExpiredException, OAuthGrantResponse
+from .util import current_tstamp, log_lazy_data as lf
+
+
+class AuthProvider(Enum):
+    LOCAL_PW = 'local_pw'
+    OAUTH_AC = 'oauth_ac'
+    OAUTH_PW = 'oauth_pw'
+    INVITE = 'invite'
+
+
+class AuthMedium(Enum):
+    SESSION = 'session'
+    BASIC = 'basic'
+    BEARER = 'bearer'
+
+
+@dataclass
+class AuthState:
+    prv: AuthProvider
+    uid: int
+    exp: int
+    ref: Optional[int] = None
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            prv=AuthProvider(data['prv']),
+            uid=data['uid'],
+            exp=data['exp'],
+            ref=data.get('ref'),
+        )
+    
+    def to_dict(self):
+        result = dict(
+            prv=self.prv.value,
+            uid=self.uid,
+            exp=self.exp
+        )
+        if self.ref is not None:
+            result['ref'] = self.ref
+        return result
+
+
+@dataclass(frozen=True)
+class AuthResult:
+    uid: int
+    med: AuthMedium
+    src: AuthProvider
+
+
+@dataclass
+class OnUserLogin:
+    user: User
+    request: Request
+    next_url: str
+
+    def set_next_url(self, url):
+        warnings.warn(
+            "Use event.next_url = ... instead of event.set_next_url()",
+            DeprecationWarning, stacklevel=2)
+        self._next_url = url
 
 
 @implementer(ISecurityPolicy)
@@ -29,158 +98,177 @@ class SecurityPolicy:
     def oauth(self):
         return self.comp.oauth
 
-    def identity(self, request):
-        # Override current user in tests via ngw_auth_administrator fixture
-        if self.test_user is not None:
-            return User.by_keyname(self.test_user).id
-
-        session = request.session
-
-        # Session based authentication
-
-        current = session.get('auth.policy.current')
-        if current is not None:
-            atype, user_id, exp = current[0:3]
-            exp = datetime.fromtimestamp(int(exp))
-
-            now = datetime.utcnow()
-            expired = exp <= now
-
-            if atype == 'OAUTH':
-                if len(current) != 3:
-                    raise ValueError("Invalid OAuth session data")
-
-                if expired:
-                    try:
-                        tresp = self.oauth.grant_type_refresh_token(
-                            refresh_token=session['auth.policy.refresh_token'],
-                            access_token=session['auth.policy.access_token'])
-                        self.remember(request, (user_id, tresp))
-                    except OAuthTokenRefreshException:
-                        self.forget(request)
-                        return None
-
-                return user_id
-
-            elif atype == 'LOCAL':
-                if expired:
-                    return None
-
-                refresh, = current[3:]
-                if datetime.fromtimestamp(refresh) <= now:
-                    session['auth.policy.current'] = current[0:2] + [
-                        int((now + self.options['local.lifetime']).timestamp()),
-                        int((now + self.options['local.refresh']).timestamp()),
-                    ]
-
-                return user_id
-
-            else:
-                raise ValueError("Invalid authentication type: " + atype)
-
-        # HTTP based authentication
-
-        ahead = request.headers.get('Authorization')
-        if ahead is not None:
-            try:
-                amode, value = ahead.split(' ', maxsplit=1)
-            except ValueError:
-                raise InvalidAuthorizationHeader()
-            amode = amode.upper()
-
-            if amode == 'BASIC':
-                try:
-                    decoded = b64decode(value).decode('utf-8')
-                    username, password = decoded.split(':', maxsplit=1)
-                except ValueError:
-                    raise InvalidAuthorizationHeader()
-
-                # Allow token authorization via basic when
-                # username is empty (for legacy clients).
-
-                if username == '':
-                    amode = 'BEARER'
-                    value = password
-
-                else:
-                    user, _ = self.authenticate_with_password(
-                        username, password)
-                    return user.id
-
-            if amode == 'BEARER' and self.oauth is not None:
-                user = self.oauth.access_token_to_user(value)
-                if user is not None:
-                    return user.id
-
-            raise HTTPUnauthorized()
-
-        return None
+    # ISecurityPolicy implementation
 
     def authenticated_userid(self, request):
-        return self.identity(request)
-
-    def permits(self, request, context, permission):
-        return self.acl_helper.permits(context, [], permission)
+        if aresult := self._authenticate_request(request):
+            request.environ['auth.result'] = aresult
+            return aresult.uid
+        return None
 
     def remember(self, request, what, **kw):
         session = request.session
-        user_id, tresp = what
-        if user_id is None:
-            raise ValueError("Empty user_id in a session")
 
-        atype = 'LOCAL' if tresp is None else 'OAUTH'
-        exp = int((datetime.utcnow() + self.options['local.lifetime']).timestamp()) \
-            if tresp is None else tresp.expires
+        user_id, tpair = what
+        assert user_id is not None
 
-        session['auth.policy.current'] = (atype, user_id, int(exp)) + ((
-            int((datetime.utcnow() + self.options['local.refresh']).timestamp()),
-        ) if atype == 'LOCAL' else ())
-
-        for k in ('access_token', 'refresh_token'):
-            sk = 'auth.policy.{}'.format(k)
-            if tresp is None:
-                if sk in session:
-                    del session[sk]
+        if tpair is None:
+            prv = AuthProvider.LOCAL_PW
+            now = current_tstamp()
+            exp = int(now + self.options['local.lifetime'].total_seconds())
+            ref = int(now + self.options['local.refresh'].total_seconds())
+        else:
+            exp = tpair.access_exp
+            ref = None
+            if tpair.grant_type == 'authorization_code':
+                prv = AuthProvider.OAUTH_AC
+            elif tpair.grant_type == 'password':
+                prv = AuthProvider.OAUTH_PW
             else:
-                v = getattr(tresp, k)
-                assert v is not None, f"{k} must be defined"
+                raise ValueError
+        
+        state = AuthState(prv, user_id, exp, ref)
+        session['auth.state'] = state.to_dict()
+
+        if tpair:
+            for k in ('access_token', 'refresh_token'):
+                sk = f'auth.{k}'
+                v = getattr(tpair, k)
+                assert v is not None
                 session[sk] = v
 
         return ()
 
     def forget(self, request, **kw):
-        session = request.session
+        def forget_session(request, response):
+            cookie_name = request.env.pyramid.options['session.cookie.name']
+            cs = WebSession.cookie_settings(request)
+            response.delete_cookie(cookie_name, path=cs['path'], domain=cs['domain'])
 
-        for k in ('current', 'access_token', 'refresh_token'):
-            sk = 'auth.policy.{}'.format(k)
-            if sk in session:
-                del session[sk]
-
-        if session.get('invite'):
-
-            def forget_session(request, response):
-                cookie_name = request.env.pyramid.options['session.cookie.name']
-                cs = WebSession.cookie_settings(request)
-                response.delete_cookie(cookie_name, path=cs['path'], domain=cs['domain'])
-
-            request.add_response_callback(forget_session)
-
+        request.add_response_callback(forget_session)
         return ()
+
+    def permits(self, request, context, permission):
+        return self.acl_helper.permits(context, [], permission)
+
+    # Addons
+
+    def login(self, username, password, *, request):
+        user, _, tpair = self._validate_credentials(
+            username, password, return_tpair=True)
+
+        if user.id is None:
+            DBSession.flush()
+
+        event = OnUserLogin(user, request, None)
+        notify(event)
+
+        headers = self.remember(request, (user.id, tpair))
+        return user, headers, event
 
     def forget_user(self, user_id, request):
         SessionStore.filter(
             SessionStore.session_id != request.session.id,
-            SessionStore.key == 'auth.policy.current',
-            SessionStore.value.op('->>')(1).cast(sa.Integer) == user_id,
+            SessionStore.key == 'auth.state',
+            SessionStore.value.op('->>')('uid').cast(sa.Integer) == user_id,
         ).delete(synchronize_session=False)
 
-    def authenticate_with_password(self, username, password):
+    # Internals
+
+    def _authenticate_request(self, request):
+        now = current_tstamp()
+
+        # TODO:  Try headers first!
+        for m in (self._try_session, self._try_headers):
+            result = m(request, now=now)
+            if result is not None:
+                return result
+
+    def _try_session(self, request, *, now):
+        session = request.session
+        state_dict = session.get('auth.state')
+        if state_dict is None:
+            return
+        state = AuthState.from_dict(state_dict)
+
+        if state.prv in (AuthProvider.OAUTH_AC, AuthProvider.OAUTH_PW):
+            if state.exp <= now:
+                try:
+                    tpair = self.oauth.grant_type_refresh_token(
+                        refresh_token=session['auth.refresh_token'],
+                        access_token=session['auth.access_token'])
+
+                    state.exp = tpair.access_exp
+                    session['auth.state'] = state.to_dict()
+                    session['auth.access_token'] = tpair.access_token
+                    session['auth.refresh_token'] = tpair.refresh_token
+                except OAuthATokenRefreshException:
+                    self.forget(request)
+                    return None
+
+            return AuthResult(state.uid, AuthMedium.SESSION, state.prv)
+
+        elif state.prv in (AuthProvider.LOCAL_PW, AuthProvider.INVITE):
+            if state.exp <= now:
+                return None
+
+            if state.ref <= now:
+                state.exp = now + int(self.options['local.lifetime'].total_seconds())
+                state.ref = now + int(self.options['local.refresh'].total_seconds())
+                session['auth.state'] = state.to_dict()
+
+            return AuthResult(state.uid, AuthMedium.SESSION, state.prv)
+
+        raise ValueError(f"Invalid authentication source")
+
+    def _try_headers(self, request, *, now):
+        ahead = request.headers.get('Authorization')
+        if ahead is None:
+            return None
+
+        try:
+            amode, value = ahead.split(' ', maxsplit=1)
+        except ValueError:
+            raise InvalidAuthorizationHeader()
+        amode = amode.lower()
+
+        if amode == 'basic':
+            try:
+                decoded = b64decode(value).decode('utf-8')
+                username, password = decoded.split(':', maxsplit=1)
+            except ValueError:
+                raise InvalidAuthorizationHeader()
+
+            user, src, _ = self._validate_credentials(username, password)
+            if user.id is None:
+                DBSession.flush()
+            return AuthResult(user.id, AuthMedium.BASIC, src)
+
+        elif amode == 'bearer' and self.oauth is not None:
+            atoken = self.oauth.query_introspection(value)
+            if atoken is not None:
+                if atoken.exp < now:
+                    logger.debug("OAuthAToken(%s): expired bearer token", lf(atoken.id))
+                    raise OAuthAccessTokenExpiredException()
+
+                user = self.oauth.access_token_to_user(atoken)
+                if user.id is None:
+                    DBSession.flush()
+                
+                return AuthResult(user.id, AuthMedium.BEARER, AuthProvider.OAUTH_AC)
+
+        raise InvalidCredentialsException()
+
+    def _validate_credentials(self, username, password, *, return_tpair=False):
         user = None
-        tresp = None
+        prv = None
+        tpair = None
 
         # Step 1: Authentication with local credentials
 
-        q = User.filter(sa.func.lower(User.keyname) == username.lower())
+        q = User.filter(sa.func.lower(User.keyname) == username.lower()) \
+            .options(load_only(User.password_hash, User.disabled))
+
         if self.oauth and not self.oauth.local_auth:
             q = q.filter_by(oauth_subject=None)
 
@@ -193,21 +281,48 @@ class SecurityPolicy:
                 if test_user.disabled:
                     raise UserDisabledException()
                 user = test_user
+                prv = AuthProvider.LOCAL_PW
 
         # Step 2: Authentication with OAuth password if enabled
 
         if user is None and self.oauth is not None and self.oauth.password:
-            try:
-                tresp = self.oauth.grant_type_password(username, password)
-            except OAuthPasswordGrantTypeException:
-                pass
-            else:
-                user = self.oauth.access_token_to_user(tresp.access_token)
+            ptoken, atoken = self.oauth.authorize_credentials(
+                username, password, return_tpair=return_tpair)
+            
+            if ptoken is not None:
+
+                # An atoken may or may not be loaded by authorize_credentials,
+                # so do lazy atoken introspection. If it wasn't fetched by
+                # authorize_credentials, it will be fetched as needed.
+                def _get_atoken():
+                    nonlocal atoken
+                    if atoken is None:
+                        atoken = self.oauth.query_introspection(ptoken.access_token)
+                    return atoken
+
+                user = self.oauth.access_token_to_user(
+                    atoken=_get_atoken, from_existing=ptoken.user,
+                    min_oauth_tstamp=datetime.fromtimestamp(ptoken.tstamp))
+
+                if ptoken.user is None:
+                    ptoken.user = user
+
+                prv = AuthProvider.OAUTH_PW
+
+                if return_tpair:
+                    tpair = OAuthGrantResponse(
+                        grant_type='password',
+                        access_token=ptoken.access_token,
+                        access_exp=ptoken.access_exp,
+                        refresh_token=ptoken.refresh_token,
+                        refresh_exp=ptoken.refresh_exp)
 
         if user is None:
             raise InvalidCredentialsException()
 
-        return (user, tresp)
+        return (user, prv, tpair)
+
+    # Options
 
     option_annotations = OptionAnnotations((
         Option('local.lifetime', timedelta, default=timedelta(days=1),

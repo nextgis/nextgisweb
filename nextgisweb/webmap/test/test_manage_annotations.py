@@ -2,8 +2,10 @@ import geoalchemy2 as ga
 import pytest
 import transaction
 from pyramid.interfaces import ISecurityPolicy
+from unittest.mock import patch
 
 from ...auth import User
+from ...auth.policy import AuthResult, AuthMedium, AuthProvider
 from ...models import DBSession
 from ...resource import ACLRule, ResourceGroup
 from ...resource.model import ResourceACLRule
@@ -85,11 +87,13 @@ def webmap_id(ngw_resource_group):
 def ngw_auth_test_user(ngw_pyramid_config):
     policy = ngw_pyramid_config.registry.getUtility(ISecurityPolicy)
 
-    assert policy.test_user is None, "Security policy test_used is already defined!"
+    def _policy_authenticate(request):
+        return AuthResult(
+            User.by_keyname(TEST_USER_KEYNAME).id,
+            AuthMedium.SESSION, AuthProvider.LOCAL_PW)
 
-    policy.test_user = TEST_USER_KEYNAME
-    yield
-    policy.test_user = None
+    with patch.object(policy, '_authenticate_request', _policy_authenticate):
+        yield
 
 
 def test_no_admin_annotations_should_view_only_public_annotations_and_own_private(ngw_webtest_app, ngw_auth_test_user,

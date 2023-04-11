@@ -11,6 +11,7 @@ from pyramid.security import remember, forget
 from pyramid.renderers import render_to_response
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 from sqlalchemy.orm.exc import NoResultFound
+from pyramid.interfaces import ISecurityPolicy
 
 from ..gui import REACT_RENDERER
 from ..models import DBSession
@@ -22,7 +23,7 @@ from .model import Principal, User, Group
 
 from .exception import InvalidCredentialsException, UserDisabledException, ALinkException
 from .oauth import InvalidTokenException, AuthorizationException
-from .api import OnUserLogin
+from .policy import AuthProvider, AuthState, OnUserLogin
 from .util import _
 
 
@@ -32,16 +33,17 @@ def login(request):
     # TODO: Remove in 4.3+ release! We might need it for GDAL driver or
     # something else. But /api/compoment/auth/login must be used there.
     if request.method == 'POST':
+        policy = request.registry.getUtility(ISecurityPolicy)
         try:
-            user, headers = request.env.auth.authenticate(
-                request, request.POST['login'].strip(), request.POST['password'])
+            username = request.POST['login'].strip()
+            password = request.POST['password']
+            user, headers, event = policy.login(username, password, request=request)
         except (InvalidCredentialsException, UserDisabledException) as exc:
-            return dict(error=exc.title, next_url=next_url)
+            return dict(error=exc.title, next_url=next_url, props=None)
 
-        event = OnUserLogin(user, request, next_url)
-        zope.event.notify(event)
-
-        return HTTPFound(location=event.next_url, headers=headers)
+        return HTTPFound(
+            location=event.next_url if event.next_url else next_url,
+            headers=headers)
 
     return dict(
         custom_layout=True, next_url=next_url,
@@ -63,23 +65,22 @@ def session_invite(request):
 
     elif request.method == 'POST':
         sid = request.POST['sid']
-        expires = request.POST['expires']
+        expires = datetime.fromisoformat(request.POST['expires'])
 
         try:
-            store = SessionStore.filter_by(session_id=sid, key='auth.policy.current').one()
+            state = AuthState.from_dict(SessionStore.filter_by(
+                session_id=sid, key='auth.state').one().value)
         except NoResultFound:
             raise InvalidCredentialsException(message=_("Session not found."))
 
-        exp = datetime.fromtimestamp(store.value[2])
-        if datetime.fromisoformat(expires) != exp:
+        exp = datetime.fromtimestamp(state.exp)
+        if expires != exp or state.ref != 0:
             raise InvalidCredentialsException(message=_("Invalid 'expires' parameter."))
         now = datetime.utcnow()
         if exp <= now:
             raise InvalidCredentialsException(message=_("Session expired."))
 
         cookie_settings = WebSession.cookie_settings(request)
-        cookie_settings['max_age'] = int((exp - now).total_seconds())
-
         cookie_name = request.env.pyramid.options['session.cookie.name']
 
         response = HTTPFound(location=next_url)
@@ -157,20 +158,19 @@ def oauth(request):
         except ValueError:
             raise AuthorizationException("State cookie parse error")
 
-        tresp = oaserver.grant_type_authorization_code(
+        tpair = oaserver.grant_type_authorization_code(
             request.params['code'], oauth_url)
 
-        if data['bind'] == '1' and request.user.keyname != 'guest':
-            user = oaserver.access_token_to_user(
-                tresp.access_token, bind_user=request.user)
-        else:
-            user = oaserver.access_token_to_user(tresp.access_token)
-
-        if user is None:
+        atoken = oaserver.query_introspection(tpair.access_token)
+        if atoken is None:
             raise InvalidTokenException()
 
+        bind_user = request.user \
+            if data['bind'] == '1' and request.user.keyname != 'guest' else None
+        user = oaserver.access_token_to_user(atoken, bind_user=bind_user)
+
         DBSession.flush()
-        headers = remember(request, (user.id, tresp))
+        headers = remember(request, (user.id, tpair))
 
         event = OnUserLogin(user, request, data['next_url'])
         zope.event.notify(event)
@@ -207,8 +207,8 @@ def logout(request):
     if oaserver is not None:
         logout_endpoint = oaserver.options.get('server.logout_endpoint')
         if logout_endpoint is not None:
-            current = request.session.get('auth.policy.current')
-            if current is not None and current[0] == 'OAUTH':
+            state = request.session.get('auth.state')
+            if state is not None and state['src'] == AuthProvider.OAUTH_AC:
                 qs = dict(redirect_uri=request.application_url)
                 location = logout_endpoint + '?' + urlencode(qs)
 

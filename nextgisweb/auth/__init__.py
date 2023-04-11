@@ -5,7 +5,6 @@ import transaction
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import defer, undefer
 from pyramid.httpexceptions import HTTPForbidden
-from pyramid.interfaces import ISecurityPolicy
 
 from ..lib.config import OptionAnnotations, Option
 from ..lib.logging import logger
@@ -18,10 +17,9 @@ from .. import db
 
 from .model import Base, Principal, User, Group, OnFindReferencesData
 from .exception import UserDisabledException
-from .policy import SecurityPolicy
-from .oauth import OAuthHelper, OAuthPasswordToken, OAuthToken, OnAccessTokenToUser
+from .policy import SecurityPolicy, AuthState, AuthProvider, OnUserLogin
+from .oauth import OAuthHelper, OAuthPToken, OAuthAToken, OnAccessTokenToUser
 from .util import _
-from .api import OnUserLogin
 from . import command  # NOQA
 
 __all__ = [
@@ -144,8 +142,7 @@ class AuthComponent(Component):
 
         def require_authenticated(request):
             if request.authenticated_userid is None:
-                raise HTTPForbidden(
-                    explanation="Authentication required!")
+                raise HTTPForbidden(explanation="Authentication required!")
 
         config.add_request_method(user, property=True)
         config.add_request_method(require_administrator)
@@ -225,15 +222,6 @@ class AuthComponent(Component):
 
         return obj
 
-    def authenticate(self, request, login, password):
-        auth_policy = request.registry.getUtility(ISecurityPolicy)
-        user, tresp = auth_policy.authenticate_with_password(
-            username=login, password=password)
-
-        headers = auth_policy.remember(request, (user.id, tresp))
-
-        return user, headers
-
     def session_invite(self, keyname, url):
         user = User.filter_by(keyname=keyname, disabled=False).one_or_none()
         if user is None:
@@ -249,26 +237,16 @@ class AuthComponent(Component):
         result = urlparse(url)
 
         sid = gensecret(32)
-        utcnow = datetime.utcnow()
-        lifetime = timedelta(minutes=30)
-        expires = (utcnow + lifetime).replace(microsecond=0)
+        now = datetime.utcnow()
+        expires = (now + timedelta(minutes=30)).replace(microsecond=0)
 
-        session_expires = int(expires.timestamp())
-
-        options = self.env.auth.options.with_prefix('policy.local')
-        half_life = timedelta(seconds=int(lifetime.total_seconds()) / 2)
-        refresh = min(half_life, options['refresh'])
-        session_refresh = int((utcnow + refresh).timestamp())
-
-        current = ['LOCAL', user.id, session_expires, session_refresh]
+        state = AuthState(
+            AuthProvider.INVITE, user.id,
+            int(expires.timestamp()),  0)
 
         with transaction.manager:
-            Session(id=sid, created=utcnow, last_activity=utcnow).persist()
-            for k, v in (
-                ('auth.policy.current', current),
-                ('invite', True),
-            ):
-                SessionStore(session_id=sid, key=k, value=v).persist()
+            Session(id=sid, created=now, last_activity=now).persist()
+            SessionStore(session_id=sid, key='auth.state', value=state.to_dict()).persist()
 
         query = dict(sid=sid, expires=expires.isoformat())
         if (len(result.path) > 0 and result.path != '/'):
@@ -297,18 +275,19 @@ class AuthComponent(Component):
         with transaction.manager:
             # Add additional minute for clock skew
             exp = datetime.utcnow() + timedelta(seconds=60)
-            logger.debug("Cleaning up expired OAuth tokens (exp < %s)", exp)
+            tstamp = exp.timestamp()
+            logger.debug("Cleaning up access and password tokens (exp < %s)", exp)
 
-            rows = OAuthToken.filter(OAuthToken.exp < exp).delete()
-            logger.info("Expired cached OAuth tokens data deleted: %d", rows)
+            rows = OAuthAToken.filter(OAuthAToken.exp < tstamp).delete()
+            logger.info("Expired access tokens deleted: %d", rows)
 
-            rows = OAuthPasswordToken.filter(OAuthPasswordToken.refresh_exp < exp).delete()
-            logger.info("Expired cached OAuth password tokens deleted: %d", rows)
+            rows = OAuthPToken.filter(OAuthPToken.refresh_exp < tstamp).delete()
+            logger.info("Expired password tokens deleted: %d", rows)
 
     def backup_configure(self, config):
         super().backup_configure(config)
-        config.exclude_table_data('public', OAuthToken.__tablename__)
-        config.exclude_table_data('public', OAuthPasswordToken.__tablename__)
+        config.exclude_table_data('public', OAuthAToken.__tablename__)
+        config.exclude_table_data('public', OAuthPToken.__tablename__)
 
     option_annotations = OptionAnnotations((
         Option('register', bool, default=False,

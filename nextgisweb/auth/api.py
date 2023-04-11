@@ -188,9 +188,19 @@ def group_idelete(request):
 
 
 def current_user(request):
-    return dict(
-        id=request.user.id, keyname=request.user.keyname,
-        display_name=request.user.display_name, language=request.locale_name)
+    result = dict(
+        id=request.user.id,
+        keyname=request.user.keyname,
+        display_name=request.user.display_name,
+        language=request.locale_name)
+    
+    if aresult := request.environ.get('auth.result'):
+        if val := aresult.med:
+            result['auth_medium'] = val
+        if val := aresult.src:
+            result['auth_provider'] = val
+
+    return result
 
 
 def register(request):
@@ -218,29 +228,6 @@ def register(request):
     return dict(id=obj.id)
 
 
-class OnUserLogin:
-
-    def __init__(self, user, request, next_url):
-        self._user = user
-        self._request = request
-        self._next_url = next_url
-
-    @property
-    def user(self):
-        return self._user
-
-    @property
-    def request(self):
-        return self._request
-
-    @property
-    def next_url(self):
-        return self._next_url
-
-    def set_next_url(self, url):
-        self._next_url = url
-
-
 def login(request):
     if len(request.POST) > 0:
         login = request.POST.get('login')
@@ -255,12 +242,9 @@ def login(request):
     if not isinstance(login, str) or not isinstance(password, str):
         raise ValidationError()
 
-    user, headers = request.env.auth.authenticate(
-        request, login=login, password=password)
+    policy = request.registry.getUtility(ISecurityPolicy)
+    user, headers, event = policy.login(login, password, request=request)
     request.response.headerlist.extend(headers)
-
-    event = OnUserLogin(user, request, None)
-    notify(event)
 
     result = dict(
         id=user.id, keyname=user.keyname,
