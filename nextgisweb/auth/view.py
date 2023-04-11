@@ -208,9 +208,11 @@ def logout(request):
         logout_endpoint = oaserver.options.get('server.logout_endpoint')
         if logout_endpoint is not None:
             state = request.session.get('auth.state')
-            if state is not None and state['src'] == AuthProvider.OAUTH_AC:
-                qs = dict(redirect_uri=request.application_url)
-                location = logout_endpoint + '?' + urlencode(qs)
+            if state is not None:
+                state = AuthState.from_dict(state)
+                if state.prv == AuthProvider.OAUTH_AC:
+                    qs = dict(redirect_uri=request.application_url)
+                    location = logout_endpoint + '?' + urlencode(qs)
 
     headers = forget(request)
 

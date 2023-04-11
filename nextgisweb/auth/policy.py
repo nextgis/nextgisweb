@@ -69,7 +69,7 @@ class AuthState:
 class AuthResult:
     uid: int
     med: AuthMedium
-    src: AuthProvider
+    prv: AuthProvider
 
 
 @dataclass
@@ -239,10 +239,10 @@ class SecurityPolicy:
             except ValueError:
                 raise InvalidAuthorizationHeader()
 
-            user, src, _ = self._validate_credentials(username, password)
+            user, prv, _ = self._validate_credentials(username, password)
             if user.id is None:
                 DBSession.flush()
-            return AuthResult(user.id, AuthMedium.BASIC, src)
+            return AuthResult(user.id, AuthMedium.BASIC, prv)
 
         elif amode == 'bearer' and self.oauth is not None:
             atoken = self.oauth.query_introspection(value)

@@ -197,7 +197,7 @@ def current_user(request):
     if aresult := request.environ.get('auth.result'):
         if val := aresult.med:
             result['auth_medium'] = val
-        if val := aresult.src:
+        if val := aresult.prv:
             result['auth_provider'] = val
 
     return result
