@@ -17,7 +17,7 @@ from requests.exceptions import InvalidJSONError
 from passlib.hash import sha256_crypt
 
 from ..lib.config import OptionAnnotations, Option
-from ..lib.logging import logger
+from ..lib.logging import logger, lazy_str
 from ..env import env
 from ..models import DBSession
 from ..core.exception import UserException
@@ -125,8 +125,8 @@ class OAuthHelper:
             user = ptoken.user
 
             logger.debug(
-                "OAuthPToken(%s): bound to User(id=%d, keyname=%s)",
-                lf(ptoken_id), user.id, user.keyname)
+                "OAuthPToken(%s): bound to User(id=%d, keyname=%s), %s",
+                lf(ptoken_id), user.id, user.keyname, _lf_exp((ptoken, now)))
 
         except NoResultFound:
             logger.debug("OAuthPToken(%s) not found", lf(ptoken_id))
@@ -156,9 +156,12 @@ class OAuthHelper:
                     try:
                         tpair = self.grant_type_refresh_token(refresh_token, access_token)
                     except OAuthATokenRefreshException:
-                        return (None, None)
-                else:
-                    logger.debug("OAuthPToken(%s): obtaining new token pair")
+                        # Will try to obtain new tpair
+                        # TODO: Add test case for that
+                        pass
+
+                if tpair is None:
+                    logger.debug("OAuthPToken(%s): requesting new token pair", lf(ptoken_id))
                     try:
                         tpair = self.grant_type_password(username, password)
                     except OAuthPasswordGrantTypeException:
@@ -628,3 +631,13 @@ def _member_of_from_token(tdata, key):
         raise ValueError
 
     return set(v.lower() for v in value)
+
+
+@lazy_str
+def _lf_exp(value):
+    ptoken, now = value
+    access_exp = ptoken.access_exp
+    if access_exp >= now:
+        return "expires in %ds" % (access_exp - now)
+    else:
+        return "expired %ds ago" % (now - access_exp)
