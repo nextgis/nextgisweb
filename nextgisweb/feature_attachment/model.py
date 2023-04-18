@@ -1,5 +1,6 @@
 import io
 import os
+import re
 
 from collections import OrderedDict
 from shutil import copyfileobj
@@ -13,12 +14,16 @@ from ..file_storage import FileObj
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
 
+KEYNAME_RE = re.compile(r'[a-z_][a-z0-9_]*', re.IGNORECASE)
+
+
 class FeatureAttachment(Base):
     __tablename__ = 'feature_attachment'
 
     id = db.Column(db.Integer, primary_key=True)
     resource_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
     feature_id = db.Column(db.Integer, nullable=False)
+    keyname = db.Column(db.Unicode, nullable=True)
     fileobj_id = db.Column(db.ForeignKey(FileObj.id), nullable=False)
 
     name = db.Column(db.Unicode, nullable=True)
@@ -34,15 +39,26 @@ class FeatureAttachment(Base):
 
     __table_args__ = (
         db.Index('feature_attachment_resource_id_feature_id_idx', resource_id, feature_id),
+        db.UniqueConstraint(
+            resource_id, feature_id, keyname,
+            deferrable=True, initially='DEFERRED',
+            name="feature_attachment_keyname_unique",
+        ),
     )
 
     @property
     def is_image(self):
         return self.mime_type in ('image/jpeg', 'image/png')
+    
+    @db.validates('keyname')
+    def _validate_keyname(self, key, value):
+        if not KEYNAME_RE.match(value):
+            raise ValueError
+        return value
 
     def serialize(self):
         return OrderedDict((
-            ('id', self.id), ('name', self.name),
+            ('id', self.id), ('name', self.name), ('keyname', self.keyname),
             ('size', self.size), ('mime_type', self.mime_type),
             ('description', self.description),
             ('is_image', self.is_image)))
@@ -65,6 +81,6 @@ class FeatureAttachment(Base):
 
             self.size = os.stat(dstfile).st_size
 
-        for k in ('name', 'mime_type', 'description'):
+        for k in ('name', 'keyname', 'mime_type', 'description'):
             if k in data:
                 setattr(self, k, data[k])
