@@ -186,7 +186,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
     connection = db.relationship(
         Resource, foreign_keys=connection_id,
-        cascade=False, cascade_backrefs=False)
+        cascade='save-update, merge', cascade_backrefs=False)
 
     @classmethod
     def check_parent(cls, parent):

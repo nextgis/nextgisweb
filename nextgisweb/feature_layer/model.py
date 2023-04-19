@@ -2,7 +2,7 @@
 from collections import OrderedDict
 
 from osgeo import ogr
-from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
 
 from .. import db

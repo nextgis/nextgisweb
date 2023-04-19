@@ -394,7 +394,7 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     connection = db.relationship(
         WFSConnection, foreign_keys=connection_id,
-        cascade=False, cascade_backrefs=False,
+        cascade='save-update, merge', cascade_backrefs=False,
     )
 
     @classmethod

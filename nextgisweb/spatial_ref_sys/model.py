@@ -1,6 +1,5 @@
 import sqlalchemy as sa
-import sqlalchemy.orm as orm
-from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship, declared_attr
 
 from .. import db
 from ..lib.osrhelper import sr_from_wkt
@@ -182,4 +181,4 @@ class SRSMixin:
 
     @declared_attr
     def srs(cls):
-        return orm.relationship('SRS', lazy='joined')
+        return relationship('SRS', lazy='joined')
