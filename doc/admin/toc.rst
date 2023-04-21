@@ -6,5 +6,6 @@ NextGIS Web administrator's guide
 
    install
    configure
+   configure_options
    backup_restore
    upgrade
