@@ -1,9 +1,6 @@
-import argparse
-import csv
 import sys
 import os
 import os.path
-import fileinput
 import shutil
 from os.path import join as pthjoin
 from datetime import datetime, timedelta
@@ -16,7 +13,6 @@ from tempfile import TemporaryDirectory
 from zipfile import ZipFile, is_zipfile
 
 import transaction
-from sqlalchemy import text
 from zope.sqlalchemy import mark_changed
 
 from ..command import Command
@@ -255,56 +251,6 @@ class RestoreCommand(Command):
                      src if isinstance(src, str) else src.name, dst)
         with ZipFile(src, 'r') as zipf:
             zipf.extractall(dst)
-
-
-@Command.registry.register
-class SQLCommand(Command):
-    identity = 'sql'
-
-    @classmethod
-    def argparser_setup(cls, parser, env):
-        parser.add_argument(
-            'query', type=str, nargs='?', default='',
-            help="SQL query to execute")
-
-        parser.add_argument(
-            '-f', '--file', type=str, action='append',
-            help="SQL script from given file (can be used multiple times)")
-
-        parser.add_argument(
-            '-r', '--result', action='store_const', const=True, default=False,
-            help="Print query result to stdout in CSV format")
-
-    @classmethod
-    def execute(cls, args, env):
-        con = DBSession.connection(execution_options=dict(isolation_level='AUTOCOMMIT'))
-        with con.begin():
-
-            def _execute(sql):
-                return con.execute(text(sql))
-
-            sql = args.query
-
-            if sql == '':
-                finput = fileinput.input(args.file if args.file is not None else ['-', ])
-
-                for line in finput:
-                    if finput.isfirstline() and sql != '':
-                        res = _execute(sql)
-                        sql = ''
-                    sql = sql + '\n' + line
-
-            elif args.file is not None:
-                raise RuntimeError("Option -f or --file shouldn't be used with query argument")
-
-            if sql != '':
-                res = _execute(sql)
-
-            if args.result:
-                w = csv.writer(sys.stdout)
-                w.writerow(res.keys())
-                for row in res.fetchall():
-                    w.writerow(row)
 
 
 @Command.registry.register
