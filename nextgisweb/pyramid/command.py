@@ -1,6 +1,5 @@
 from ..lib.logging import logger
 from ..command import Command
-from ..package import amd_packages
 
 
 @Command.registry.register
@@ -37,16 +36,3 @@ class ServerCommand(Command):
             app, host=args.host, port=args.port, threads=1,
             clear_untrusted_proxy_headers=True)
 
-
-@Command.registry.register
-class AMDPackagesCommand():
-    identity = 'amd_packages'
-
-    @classmethod
-    def argparser_setup(cls, parser, env):
-        pass
-
-    @classmethod
-    def execute(cls, args, env):
-        for pname, path in amd_packages():
-            print(pname)

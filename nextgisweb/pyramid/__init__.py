@@ -19,7 +19,7 @@ from .util import (
     StaticFileResponse)
 from .model import Base, Session, SessionStore
 from .session import WebSession
-from .command import ServerCommand, AMDPackagesCommand  # NOQA
+from .command import ServerCommand  # NOQA
 from .util import _, gensecret
 
 __all__ = [
