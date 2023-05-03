@@ -2,8 +2,8 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from osgeo import ogr
 
+from ...lib.ogrhelper import read_dataset
 from ...models import DBSession
 from ...auth import User
 from ...core.exception import ValidationError
@@ -198,6 +198,17 @@ CREATE_TEST_PARAMS = (
         dict(skip_errors=True),
         dict(geometry_type='LINESTRING', feature_count=0),
     ),
+
+    (
+        'corrupted.zip',
+        dict(),
+        dict(exception=ValidationError),
+    ),
+    (
+        'corrupted.zip',
+        dict(fix_errors='LOSSY'),
+        dict(fields=('поле_', 'поле__1'), feature_count=1),
+    ),
 )
 
 
@@ -211,7 +222,7 @@ def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
     ).persist()
 
     src = str(path / filename)
-    ds = ogr.Open(src)
+    ds = read_dataset(src)
     layer = ds.GetLayer(0)
 
     geom_cast_params = dict(
@@ -228,7 +239,9 @@ def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
             load_kwargs['skip_other_geometry_types'] = options['skip_other_geometry_types']
 
         if 'fix_errors' in options:
+            setup_kwargs['fix_errors'] = options['fix_errors']
             load_kwargs['fix_errors'] = options['fix_errors']
+
         if 'skip_errors' in options:
             load_kwargs['skip_errors'] = options['skip_errors']
 
@@ -257,3 +270,10 @@ def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
             assert feature_count == exp_feature_count, \
                 "Expected feature count was {} but got {}".format(
                     exp_feature_count, feature_count)
+
+        if 'fields' in checks:
+            exp_fields = checks['fields']
+            fields = tuple(f.keyname for f in obj.fields)
+            assert exp_fields == fields, \
+                "Expected layer fields was {} but got {}".format(
+                    exp_fields, fields)

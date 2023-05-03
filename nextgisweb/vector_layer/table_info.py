@@ -351,7 +351,7 @@ class TableInfo:
             fld_name = fld_defn.GetNameRef()
             fixed_fld_name = fix_encoding(fld_name)
 
-            if fld_name != fixed_fld_name and fix_errors == ERROR_FIX.LOSSY:
+            if fld_name != fixed_fld_name and fix_errors != ERROR_FIX.LOSSY:
                 raise VE(_("Field '%s(?)' encoding is broken.") % fixed_fld_name)
 
             if fixed_fld_name.lower() in FIELD_FORBIDDEN_NAME:
