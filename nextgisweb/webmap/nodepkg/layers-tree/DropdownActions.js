@@ -39,8 +39,7 @@ export function DropdownActions({
             return;
         }
         const pluginInfo = plugin.getPluginState(nodeData);
-        const enabled = pluginInfo.enabled ?? true;
-        if (enabled) {
+        if (pluginInfo.enabled) {
             if (plugin.getMenuItem) {
                 const { icon, title, onClick } = plugin.getMenuItem(nodeData);
                 const onClick_ = async () => {
@@ -53,7 +52,7 @@ export function DropdownActions({
                     }
                     setMoreClickId(undefined);
                 };
-                
+
                 menuItems.push({
                     key: keyPlugin,
                     onClick: onClick_,
