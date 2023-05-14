@@ -221,6 +221,8 @@ define([
         modeURLParam: "panel",
         emptyModeURLValue: "none",
 
+        webmapStore: undefined,
+
         activeLeftPanel: "layersPanel",
         navigationMenuItems: [
             {
@@ -523,17 +525,6 @@ define([
                         );
 
                         // Bind checkboxes and layer visibility
-                        var store = widget.itemStore;
-                        store.on("Set", function (item, attr, oldVal, newVal) {
-                            if (
-                                attr === "checked" &&
-                                store.getValue(item, "type") === "layer"
-                            ) {
-                                var id = store.getValue(item, "id");
-                                var layer = widget._layers[id];
-                                layer.set("visibility", newVal);
-                            }
-                        });
                     })
                 )
                 .then(undefined, function (err) {
@@ -733,12 +724,6 @@ define([
                     widget._itemStorePrepareItem(item);
                 },
                 onComplete: function () {
-                    widget.itemStore.on("Set", function (item, attr) {
-                        if (attr === "checked") {
-                            widget._itemStoreVisibility(item);
-                        }
-                    });
-
                     widget._itemStoreDeferred.resolve();
                 },
                 onError: function () {
@@ -752,18 +737,10 @@ define([
         },
 
         _itemStoreVisibility: function (item) {
-            var store = this.itemStore;
+            var webmapStore = this.webmapStore;
 
-            if (store.getValue(item, "type") === "layer") {
-                var newVal = store.getValue(item, "checked");
-                if (store.getValue(item, "visibility") !== newVal) {
-                    console.log(
-                        "Layer [%s] visibility has changed to [%s]",
-                        store.getValue(item, "id"),
-                        newVal
-                    );
-                    store.setValue(item, "visibility", newVal);
-                }
+            if (webmapStore) {
+                webmapStore._itemStoreVisibility(item);
             }
         },
 
@@ -899,7 +876,7 @@ define([
             );
         },
         _mapAddLayer: function (id) {
-            this.map.addLayer(this._layers[id]);
+            this.map.addLayer(this.webmapStore._layers[id]);
         },
         _mapAddLayers: function () {
             array.forEach(
@@ -924,7 +901,7 @@ define([
             );
         },
 
-        _onNewStoreItem: function (item,) {
+        _onNewStoreItem: function (item) {
             var widget = this,
                 store = this.itemStore;
             widget._layerSetup(item);
@@ -938,7 +915,13 @@ define([
 
             this._adaptersSetup();
 
-            this._layers = {}; // Layer index by id
+            // Layer index by id
+            /** @deprecated use this.webmapStore._layers instead. Fore backward compatibility */
+            Object.defineProperty(this, "_layers", {
+                get: function () {
+                    return this.webmapStore._layers;
+                },
+            });
             this._layer_order = []; // Layers from back to front
 
             if (lang.isString(widget._urlParams.styles)) {
@@ -964,7 +947,10 @@ define([
 
                     // Turn on layers from permalink
                     var cond,
-                        layer = widget._layers[store.getValue(item, "id")];
+                        layer =
+                            widget.webmapStore._layers[
+                                store.getValue(item, "id")
+                            ];
                     if (visibleStyles) {
                         cond =
                             array.indexOf(
@@ -1006,7 +992,7 @@ define([
             layer.itemId = data.id;
             layer.itemConfig = data;
 
-            this._layers[data.id] = layer;
+            this.webmapStore._layers[data.id] = layer;
         },
 
         _toolsSetup: function () {
