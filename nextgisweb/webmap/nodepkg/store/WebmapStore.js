@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 
 export class WebmapStore {
     _webmapItems = [];
@@ -9,8 +9,33 @@ export class WebmapStore {
 
     constructor({ itemStore, checked }) {
         this._itemStore = itemStore;
-        this._checked = checked;
+        if (Array.isArray(checked)) {
+            this._checked = checked;
+        }
         makeAutoObservable(this, { _itemStore: false });
+
+        itemStore.on("Set", (item, attr, oldVal, val) => {
+            if (
+                attr === "checked" &&
+                itemStore.getValue(item, "type") === "layer"
+            ) {
+                const id = itemStore.getValue(item, "id");
+                const checked_ = [...this._checked];
+                if (val) {
+                    if (!checked_.includes(id)) {
+                        checked_.push(id);
+                    }
+                } else if (oldVal !== val) {
+                    const index = checked_.indexOf(id);
+                    if (index !== -1) {
+                        checked_.splice(index, 1);
+                    }
+                }
+                runInAction(() => {
+                    this._checked = checked_;
+                })
+            }
+        });
     }
 
     get webmapItems() {
@@ -38,7 +63,7 @@ export class WebmapStore {
                 );
             },
         });
-        this._checked = checkedKeysValue;
+        // this._checked = checkedKeysValue;
     };
 
     getIds = ({ query } = {}) => {

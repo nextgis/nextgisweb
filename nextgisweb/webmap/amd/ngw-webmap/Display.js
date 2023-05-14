@@ -924,26 +924,11 @@ define([
             );
         },
 
-        _onNewStoreItem: function (item) {
+        _onNewStoreItem: function (item,) {
             var widget = this,
-                store = this.itemStore,
-                visibleStyles = null;
+                store = this.itemStore;
             widget._layerSetup(item);
             widget._layer_order.unshift(store.getValue(item, "id"));
-
-            // Turn on layers from permalink
-            var cond,
-                layer = widget._layers[store.getValue(item, "id")];
-            if (visibleStyles) {
-                cond =
-                    array.indexOf(
-                        visibleStyles,
-                        store.getValue(item, "styleId")
-                    ) !== -1;
-                layer.olLayer.setVisible(cond);
-                layer.visibility = cond;
-                store.setValue(item, "checked", cond);
-            }
         },
 
         _layersSetup: function () {
@@ -975,7 +960,21 @@ define([
                       ]
                     : null,
                 onItem: function (item) {
-                    widget._onNewStoreItem(item);
+                    widget._onNewStoreItem(item, visibleStyles);
+
+                    // Turn on layers from permalink
+                    var cond,
+                        layer = widget._layers[store.getValue(item, "id")];
+                    if (visibleStyles) {
+                        cond =
+                            array.indexOf(
+                                visibleStyles,
+                                store.getValue(item, "styleId")
+                            ) !== -1;
+                        layer.olLayer.setVisible(cond);
+                        layer.visibility = cond;
+                        store.setValue(item, "checked", cond);
+                    }
                 },
                 onComplete: function () {
                     widget._layersDeferred.resolve();
@@ -1240,7 +1239,7 @@ define([
             };
             const { expanded, checked } = widget.config.itemsStates;
             this.webmapStore.setWebmapItems(widget.config.rootItem.children);
-            this.webmapStore.setChecked(checked);
+            // this.webmapStore.setChecked(checked);
             this.webmapStore.setExpanded(expanded);
 
             this.component = reactApp.default(
