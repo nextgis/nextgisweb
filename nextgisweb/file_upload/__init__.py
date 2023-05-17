@@ -9,7 +9,7 @@ from ..lib.config.otype import SizeInBytes
 from ..lib.logging import logger
 from ..component import Component
 
-from . import command  # NOQA
+from . import cli  # NOQA
 from .util import stat_dir
 
 __all__ = ["FileUploadComponent", ]

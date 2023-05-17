@@ -15,7 +15,7 @@ from ..core import BackupBase
 from ..models import DBSession
 
 from .models import Base, FileObj
-from . import command  # NOQA
+from . import cli  # NOQA
 
 __all__ = ['FileStorageComponent', 'FileObj']
 
