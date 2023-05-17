@@ -1,28 +1,22 @@
 from sqlalchemy.sql import text as literal_sql
 
 from ..lib.logging import logger
-from ..command import Command
+from ..cli import DryRunOptions, EnvCommand, cli, opt
 from ..models import DBSession
 
 from .model import SCHEMA
 
 
-@Command.registry.register
-class CleanupOrhpanedTablesCommand():
-    identity = 'vector_layer.cleanup_orphaned_tables'
+@cli.group()
+class vector_layer:
+    pass
 
-    @classmethod
-    def argparser_setup(cls, parser, env):
-        parser.add_argument(
-            '--confirm', action='store_true', default=False,
-            help="Actually deletes orphaned tables"
-        )
-        parser.add_argument(
-            '--table-per-transaction', dest='table_per_txn', action='store_true', default=False,
-            help='Drop one table per transaction')
 
-    @classmethod
-    def execute(cls, args, env):
+@vector_layer.command()
+class cleanup_orphaned_tables(DryRunOptions, EnvCommand):
+    one_per_txn: bool = opt(False, doc="Drop one table per transaction")
+
+    def __call__(self):
         con = DBSession.connection()
 
         regexp = r'^layer_[0-9a-f]{32}$'
@@ -49,16 +43,16 @@ class CleanupOrhpanedTablesCommand():
             WHERE base.orphan
         ''' % base_query), dict(schema=SCHEMA, regexp=regexp))
 
-        if not args.confirm:
+        if self.dry_run:
             return
 
-        if not args.table_per_txn:
+        if not self.one_per_txn:
             con.execute(literal_sql('BEGIN'))
 
         count = 0
         try:
             for row in result:
-                if args.table_per_txn:
+                if self.one_per_txn:
                     con.execute(literal_sql('BEGIN'))
 
                 if row['id'] is not None:
@@ -68,7 +62,7 @@ class CleanupOrhpanedTablesCommand():
                 logger.debug(drop_query)
                 con.execute(drop_query)
 
-                if args.table_per_txn:
+                if self.one_per_txn:
                     con.execute(literal_sql('COMMIT'))
 
                 count += 1
@@ -76,7 +70,7 @@ class CleanupOrhpanedTablesCommand():
             con.execute(literal_sql('ROLLBACK'))
             raise
         else:
-            if not args.table_per_txn:
+            if not self.one_per_txn:
                 con.execute(literal_sql('COMMIT'))
         finally:
             logger.info('%d orphaned tables deleted', count)

@@ -1,7 +1,7 @@
 from ..component import Component, require
 from ..lib.config import Option
 
-from . import command  # NOQA
+from . import cli  # NOQA
 from .kind_of_data import VectorLayerData
 from .model import Base, VectorLayer, estimate_vector_layer_data
 
