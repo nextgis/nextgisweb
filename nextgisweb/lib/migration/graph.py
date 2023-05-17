@@ -1,7 +1,5 @@
 from io import StringIO
 
-import networkx as nx
-
 from .operation import (
     InstallOperation, UninstallOperation,
     ForwardOperation, RewindOperation)
@@ -137,6 +135,8 @@ class OperationGraph:
         self.operations = opertaions
 
     def resolve(self, fstate, tstate):
+        import networkx as nx  # Slow import
+
         dg = nx.DiGraph()
         for op in self.operations:
             dg.add_node(op, transform=True)

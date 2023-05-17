@@ -6,7 +6,6 @@ from binascii import crc32
 from pyramid.httpexceptions import HTTPSeeOther
 from pyramid.response import Response
 from pyramid.events import NewRequest
-from ua_parser import user_agent_parser
 
 from ..lib.config import Option, OptionType, OptionAnnotations
 
@@ -60,8 +59,11 @@ option_annotations = OptionAnnotations([
 
 @lru_cache(maxsize=64)
 def parse_header(value):
+    from ua_parser import user_agent_parser  # Slow import!
+
     if value is None:
         return None
+
     parsed = user_agent_parser.ParseUserAgent(value)
     fid = parsed['family'].lower()
     if fid not in FAMILIES:

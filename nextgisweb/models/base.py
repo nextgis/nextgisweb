@@ -1,5 +1,3 @@
-from alembic.migration import MigrationContext
-from alembic.operations import Operations
 from sqlalchemy.orm import (
     declarative_base as sa_declarative_base,
     scoped_session,
@@ -63,6 +61,10 @@ Base = declarative_base()
 
 
 def migrate_operation():
+    # Slow imports with lots of dependecies
+    from alembic.migration import MigrationContext
+    from alembic.operations import Operations
+
     connection = DBSession.connection()
     ctx = MigrationContext.configure(connection)
     return Operations(ctx)

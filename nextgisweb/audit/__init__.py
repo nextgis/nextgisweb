@@ -1,9 +1,6 @@
 import json
 from pkg_resources import resource_filename
 
-from elasticsearch import Elasticsearch
-import elasticsearch.exceptions as esexc
-
 from ..component import Component
 from ..lib.config import Option
 
@@ -34,6 +31,8 @@ class AuditComponent(Component):
         self.audit_file_enabled = self.audit_enabled and self.audit_file is not None
 
         if self.audit_es_enabled:
+            from elasticsearch import Elasticsearch  # Slow import
+            
             self.es = Elasticsearch('%s:%d' % (
                 self.audit_es_host,
                 self.audit_es_port,
@@ -75,6 +74,8 @@ class AuditComponent(Component):
 
     def is_service_ready(self):
         if self.audit_es_enabled:
+            import elasticsearch.exceptions as esexc  # Slow import
+
             while True:
                 try:
                     with disable_logging():
