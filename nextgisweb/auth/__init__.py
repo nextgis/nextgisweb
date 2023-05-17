@@ -20,7 +20,7 @@ from .exception import UserDisabledException
 from .policy import SecurityPolicy, AuthState, AuthProvider, OnUserLogin
 from .oauth import OAuthHelper, OAuthPToken, OAuthAToken, OnAccessTokenToUser
 from .util import _
-from . import command  # NOQA
+from . import cli  # NOQA
 
 __all__ = [
     'Principal', 'User', 'Group', 'OnAccessTokenToUser',
@@ -244,9 +244,8 @@ class AuthComponent(Component):
             AuthProvider.INVITE, user.id,
             int(expires.timestamp()),  0)
 
-        with transaction.manager:
-            Session(id=sid, created=now, last_activity=now).persist()
-            SessionStore(session_id=sid, key='auth.state', value=state.to_dict()).persist()
+        Session(id=sid, created=now, last_activity=now).persist()
+        SessionStore(session_id=sid, key='auth.state', value=state.to_dict()).persist()
 
         query = dict(sid=sid, expires=expires.isoformat())
         if (len(result.path) > 0 and result.path != '/'):

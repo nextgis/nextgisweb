@@ -127,7 +127,8 @@ def test_legacy(user, ngw_webtest_app, ngw_env):
 def test_session_invite(user, ngw_env, ngw_webtest_app):
     sid_cookie = ngw_env.pyramid.options['session.cookie.name']
 
-    url = ngw_env.auth.session_invite(user.keyname, 'https://no-matter/some/path')
+    with transaction.manager:
+        url = ngw_env.auth.session_invite(user.keyname, 'https://no-matter/some/path')
     result = urlparse(url)
 
     query = parse_qs(result.query)
