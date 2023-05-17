@@ -23,6 +23,7 @@ requires = [
     'babel==2.11.0',
     'bunch==1.0.1',
     'cachetools==5.3.0',
+    'docstring-parser',
     'elasticsearch>=7.0.0,<8.0.0',
     'elasticsearch-dsl>=7.1.0,<8.0.0',
     'flatdict==4.0.1',

@@ -1,54 +1,24 @@
 import sys
-import os
 import logging
-from argparse import ArgumentParser
+from argparse import ArgumentParser as SystemArgumentParser
 from textwrap import wrap
 from contextlib import contextmanager
 
 # Workaround for https://bugs.python.org/issue47082
 import numpy  # NOQA
 
-from .lib.config import Option, NO_DEFAULT, load_config, key_to_environ
-from .lib.logging import logger
-from .env import Env, setenv
-from .command import Command
-
-
-def main(argv=sys.argv):
-    argparser = ArgumentParser()
-    argparser.add_argument('--config', help="Configuration file.")
-
-    config = None
-    i = 1
-    while i < len(argv):
-        if argv[i] == '--config' and (i < len(argv) - 1):
-            config = argv[i + 1]
-        i += 2 if argv[i].startswith('--') else 1
-
-    env = Env(cfg=load_config(config, None, hupper=True))
-    setenv(env)
-
-    subparsers = argparser.add_subparsers()
-
-    for cmd in Command.registry:
-        subparser = subparsers.add_parser(cmd.identity)
-        cmd.argparser_setup(subparser, env)
-        subparser.set_defaults(command=cmd)
-
-    args = argparser.parse_args(argv[1:])
-
-    no_initialize = hasattr(args.command, 'no_initialize') and args.command.no_initialize
-    if not no_initialize:
-        env.initialize()
-
-    args.command.execute(args, env)
+from .lib.clann import ArgumentParser, Command, NS_CMD_GRP_ATTR
+from .lib.config import Option, NO_DEFAULT, key_to_environ
+from .cli import cli, bootstrap, EnvCommand
+from .command import Command as LegacyCommand
+from .env import Env, env
 
 
 def config(argv=sys.argv):
     logging.basicConfig(level=logging.ERROR)
     logging.captureWarnings(True)
 
-    argparser = ArgumentParser()
+    argparser = SystemArgumentParser()
 
     argparser.add_argument(
         '--values-only', dest='values_only', action='store_true',
@@ -207,3 +177,56 @@ def config(argv=sys.argv):
                 with _section(_section_option(oa)):
                     _print_option_value(comp.identity, oa, required=oa.required)
                     _print('')
+
+
+def main(argv=sys.argv):
+    args = argv[1:]
+    args_len = len(args)
+
+    bs_parser = ArgumentParser(bootstrap, add_help=False)
+    ns_nspc, leftover = bs_parser.parse_known_args(args)
+    bs_parser.execute(ns_nspc)
+
+    # Replace "cmd.subcmd" with "cmd subcmd"
+    leftover_len = len(leftover)
+    if leftover_len > 0 and ('.' in leftover[0]):
+        leftover = leftover.pop(0).split('.') + leftover   
+    args = args[:args_len - leftover_len] + leftover
+
+    # Convert legacy commands
+    groups = {}
+    for cmd in LegacyCommand.registry:
+        parts = cmd.identity.split('.')
+        name = parts.pop(-1)
+        
+        parent = cli
+        path = []
+        for g in parts:
+            path.append(g)
+            k = '.'.join(path)
+            if gcli := groups.get(k):
+                parent = gcli
+            else:
+                parent = parent.group()(type(g, (), {}))
+                groups[k] = parent
+
+        def __call__(self):
+            self.__execute(self, self.env)
+
+        cmd_cls = type(name, (EnvCommand, ), {
+            '__execute': cmd.execute, '__call__': __call__,
+            'env_initialize': not getattr(cmd, 'no_initialize', False)})
+
+        class _Wrapper(Command):
+            argparser_setup = cmd.argparser_setup
+            
+            def setup_parser(self, parser):
+                parser.set_defaults(**{NS_CMD_GRP_ATTR: self})
+                self.argparser_setup(parser, env)
+
+        parent.members.append(_Wrapper(cmd_cls, parent=parent))
+
+    # Run command
+    cli_parser = ArgumentParser(cli)
+    cli_nspc = cli_parser.parse_args(args)
+    cli_parser.execute(cli_nspc)
