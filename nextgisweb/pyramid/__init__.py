@@ -10,6 +10,7 @@ from ..lib.config import Option, OptionAnnotations
 from ..lib.logging import logger
 from ..component import Component, require
 
+from . import cli  # NOQA
 from . import uacompat
 from .config import Configurator
 from .util import (
@@ -19,7 +20,6 @@ from .util import (
     StaticFileResponse)
 from .model import Base, Session, SessionStore
 from .session import WebSession
-from .command import ServerCommand  # NOQA
 from .util import _, gensecret
 
 __all__ = [
