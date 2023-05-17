@@ -14,7 +14,7 @@ from ..component import Component, require
 from ..core import KindOfData
 from ..models import DBSession
 
-from . import command  # NOQA
+from . import cli  # NOQA
 from .interface import (
     IRenderableStyle,
     IExtentRenderRequest,
