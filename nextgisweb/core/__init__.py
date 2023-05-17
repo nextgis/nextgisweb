@@ -494,12 +494,6 @@ class CoreComponent(
         Option('storage.limit', SizeInBytes, default=None, doc=(
             "Storage limit.")),
 
-        # Ignore packages and components
-        Option('packages.ignore', doc=(
-            "Deprecated, use environment package.* option instead.")),
-        Option('components.ignore', doc=(
-            "Deperected, use environment component.* option instead.")),
-
         # Healthckeck
         Option('healthcheck.free_space', float, default=10, doc=(
             "Free space check during healthcheck in percent (0 for don't check).")),
