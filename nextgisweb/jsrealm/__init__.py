@@ -6,7 +6,7 @@ from ..lib.config import Option
 from ..lib.logging import logger
 
 from .util import COMP_ID
-from . import command  # NOQA
+from . import cli  # NOQA
 
 
 class JSRealmComponent(Component):
