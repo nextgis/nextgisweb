@@ -42,9 +42,9 @@ from ..package import pkginfo, enable_qualifications
 
 from .util import _
 from .model import Base, Setting
-from .command import BackupCommand  # NOQA
 from .backup import BackupBase, BackupMetadata  # NOQA
 from .storage import StorageComponentMixin, KindOfData  # NOQA
+from . import cli  # NOQA
 
 
 class _NO_DEFAULT:
