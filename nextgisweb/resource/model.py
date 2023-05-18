@@ -35,45 +35,30 @@ PermissionSets = namedtuple('PermissionSets', ('allow', 'deny', 'mask'))
 
 class ResourceMeta(db.DeclarativeMeta):
 
-    def __new__(cls, name, bases, nmspc):
-        identity = nmspc['identity']
+    def __new__(cls, name, bases, nspc):
+        identity = nspc['identity']
 
-        if identity != 'resource' and 'id' not in nmspc:
-            # If id column isn't declared, let's declare it. Manual id column
-            # declaration may be needed if it's referenced in class declaration.
-            nmspc['id'] = Resource.id_column()
-
-        return super().__new__(cls, name, bases, nmspc)
-
-    def __init__(cls, classname, bases, nmspc):
-
-        # Table name is equal to resource id by default.
-        # It'll hardlybe ever needed otherwise, but let's keep this
-        # possibility.
-
-        if '__tablename__' not in cls.__dict__:
-            setattr(cls, '__tablename__', cls.identity)
-
-        # Child class can set it's own arguments, let's
-        # keep it possible. If not set, set our own.
-
-        if '__mapper_args__' not in cls.__dict__:
-            mapper_args = dict()
-            setattr(cls, '__mapper_args__', mapper_args)
+        if bases == (Base, ):
+            # Resource class itself
+            bres = None
         else:
-            mapper_args = getattr(cls, '__mapper_args__')
+            # First base class, which is subclass of Resource
+            bres = next((c for c in bases if issubclass(c, Resource)), None)
+            assert bres is not None, "Missing resource base class"
+        
+        nspc.setdefault('__tablename__', identity)
 
-        if 'polymorphic_identity' not in mapper_args:
-            mapper_args['polymorphic_identity'] = cls.identity
+        if (id_column := nspc.get('id')) is None:
+            id_column = nspc['id'] = bres.id_column()
 
-        if cls.identity != 'resource':
-            # Automatic parent link field detection may not work
-            # if there are two fields with external key to resource.id.
+        margs = nspc['__mapper_args__'] = nspc.get('__mapper_args__', {})
+        margs.setdefault('polymorphic_identity', identity)
+        if 'inherit_condition' not in margs and bres:
+            margs['inherit_condition'] = (id_column == bres.id)
 
-            if 'inherit_condition' not in mapper_args:
-                mapper_args['inherit_condition'] = (
-                    cls.id == Resource.id)
+        return super().__new__(cls, name, bases, nspc)
 
+    def __init__(cls, name, bases, nspc):
         scope = Bunch()
 
         for base in cls.__mro__:
@@ -90,7 +75,7 @@ class ResourceMeta(db.DeclarativeMeta):
 
         setattr(cls, 'scope', scope)
 
-        super().__init__(classname, bases, nmspc)
+        super().__init__(name, bases, nspc)
 
         resource_registry.register(cls)
 
@@ -136,8 +121,10 @@ class Resource(Base, metaclass=ResourceMeta):
 
     @classmethod
     def id_column(cls):
-        col = db.Column('id', db.ForeignKey(Resource.id), primary_key=True)
-        col._creation_order = Resource.id._creation_order
+        """Constructs new 'id' column with a foreign key to cls.id"""
+
+        col = db.Column('id', db.ForeignKey(cls.id), primary_key=True)
+        col._creation_order = cls.id._creation_order
         return col
 
     @classmethod
