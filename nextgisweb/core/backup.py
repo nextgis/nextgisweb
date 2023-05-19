@@ -8,6 +8,8 @@ import io
 import json
 
 import sqlalchemy as sa
+import transaction
+from zope.sqlalchemy import mark_changed
 from packaging.version import Version
 
 from ..lib.logging import logger
@@ -240,11 +242,10 @@ def backup(env, dst):
 
 
 def restore(env, src):
-    con = DBSession.connection()
-
-    with con.begin():
-        metadata = env.metadata()
-        metadata.drop_all(con)
+    metadata = env.metadata()
+    with transaction.manager:
+        metadata.drop_all(DBSession().connection())
+        mark_changed(DBSession())
 
     # POSTGRES RESTORE
     logger.info("Restoring PostgreSQL dump...")
@@ -265,7 +266,7 @@ def restore(env, src):
     logger.info("Restoring component data...")
 
     comp_root = os.path.join(src, 'component')
-    with con.begin():
+    with transaction.manager:
         for comp_identity in os.listdir(comp_root):
             comp = env._components[comp_identity]
             comp_dir = os.path.join(comp_root, comp_identity)
@@ -280,3 +281,4 @@ def restore(env, src):
                             binfn = os.path.join(comp_dir, '{:08d}'.format(record.id))
                             with io.open(binfn, 'rb') as fd:
                                 itm.restore(fd)
+        mark_changed(DBSession())
