@@ -49,12 +49,12 @@ class FeatureAttachment(Base):
     @property
     def is_image(self):
         return self.mime_type in ('image/jpeg', 'image/png')
-    
+
     @db.validates('keyname')
     def _validate_keyname(self, key, value):
-        if not KEYNAME_RE.match(value):
-            raise ValueError
-        return value
+        if value is None or KEYNAME_RE.match(value):
+            return value
+        raise ValueError
 
     def serialize(self):
         return OrderedDict((
