@@ -6,7 +6,7 @@ import pytest
 import transaction
 from osgeo import ogr
 
-from ...models import DBSession
+from ...env.model import DBSession
 from ...vector_layer import VectorLayer
 from ...spatial_ref_sys.model import SRS
 from ...auth import User

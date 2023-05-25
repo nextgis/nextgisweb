@@ -4,10 +4,10 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
 
 from .util import _
-from .. import db
+from ..lib import db
 from ..auth import User
 from ..env import env
-from ..models import declarative_base
+from ..env.model import declarative_base
 from ..resource import (
     Resource,
     Scope,

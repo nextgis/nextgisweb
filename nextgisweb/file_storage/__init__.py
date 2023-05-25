@@ -10,11 +10,11 @@ from sqlalchemy import sql, text, exists
 
 from ..lib.config import Option
 from ..lib.logging import logger
-from ..component import Component
+from ..env import Component
 from ..core import BackupBase
-from ..models import DBSession
+from ..env.model import DBSession
 
-from .models import Base, FileObj
+from .model import Base, FileObj
 from . import cli  # NOQA
 
 __all__ = ['FileStorageComponent', 'FileObj']

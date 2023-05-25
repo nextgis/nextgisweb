@@ -1,5 +1,5 @@
-from .. import db
-from ..models import declarative_base
+from ..lib import db
+from ..env.model import declarative_base
 from ..resource import Resource
 
 Base = declarative_base(dependencies=('resource', 'feature_layer'))

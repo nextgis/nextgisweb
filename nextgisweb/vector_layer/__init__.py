@@ -1,4 +1,4 @@
-from ..component import Component, require
+from ..env import Component, require
 from ..lib.config import Option
 
 from . import cli  # NOQA

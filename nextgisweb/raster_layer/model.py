@@ -14,7 +14,7 @@ from ..core.exception import ValidationError
 from ..core.util import format_size
 from ..lib.osrhelper import sr_from_epsg, sr_from_wkt, SpatialReferenceError
 from ..lib.logging import logger
-from ..models import declarative_base
+from ..env.model import declarative_base
 from ..resource import (
     Resource,
     DataStructureScope, DataScope,

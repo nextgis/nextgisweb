@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from ..component import Component
+from ..env import Component
 
 from .model import Base, Service, Layer
 from .wfs_handler import VERSION_DEFAULT, VERSION_SUPPORTED

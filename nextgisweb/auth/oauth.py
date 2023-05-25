@@ -19,7 +19,7 @@ from passlib.hash import sha256_crypt
 from ..lib.config import OptionAnnotations, Option
 from ..lib.logging import logger, lazy_str
 from ..env import env
-from ..models import DBSession
+from ..env.model import DBSession
 from ..core.exception import UserException
 
 from .model import User, Group, OAuthAToken, OAuthPToken

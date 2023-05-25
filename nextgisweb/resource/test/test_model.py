@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from ...lib.json import dumps
-from ...models import DBSession
+from ...env.model import DBSession
 from ...auth import User
 
 from .. import Resource, ResourceGroup

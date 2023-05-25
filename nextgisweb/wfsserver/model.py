@@ -1,8 +1,8 @@
 import re
 
-from .. import db
+from ..lib import db
 from ..core.exception import ValidationError
-from ..models import declarative_base
+from ..env.model import declarative_base
 from ..resource import (
     Resource,
     ServiceScope,

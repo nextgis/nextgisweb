@@ -10,8 +10,8 @@ from ...lib.migration import (
     revid, REVID_ZERO, MigrationKey, resolve,
     UninstallOperation, RewindOperation,
     PythonModuleMigration, SQLScriptMigration)
-from ...cli import EnvCommand, DryRunOptions, opt, arg, cli
-from ...models import DBSession
+from ...env.cli import EnvCommand, DryRunOptions, opt, arg, cli
+from ...env.model import DBSession
 
 from ..migration import MigrationRegistry, MigrationContext
 

@@ -10,9 +10,9 @@ from zope.sqlalchemy import mark_changed
 
 from ..lib.config import Option
 from ..lib.logging import logger
-from ..component import Component, require
+from ..env import Component, require
 from ..core import KindOfData
-from ..models import DBSession
+from ..env.model import DBSession
 
 from . import cli  # NOQA
 from .interface import (

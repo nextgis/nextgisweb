@@ -8,7 +8,7 @@ from babel.core import UnknownLocaleError
 
 from ..lib.config import Option, OptionAnnotations
 from ..lib.logging import logger
-from ..component import Component, require
+from ..env import Component, require
 
 from . import cli  # NOQA
 from . import uacompat

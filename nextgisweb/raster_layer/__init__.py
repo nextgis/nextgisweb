@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from ..component import Component, require
+from ..env import Component, require
 from ..lib.config import Option
 from ..lib.config.otype import SizeInBytes
 from ..lib.logging import logger

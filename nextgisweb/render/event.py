@@ -1,4 +1,4 @@
-from ..event import Event
+from ..lib.legacy_event import Event
 
 
 on_style_change = Event()

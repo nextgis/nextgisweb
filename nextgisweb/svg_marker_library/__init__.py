@@ -2,7 +2,7 @@ from os import path
 
 from cachetools import TTLCache
 
-from ..component import Component, require
+from ..env import Component, require
 from ..lib.config import Option, OptionAnnotations
 
 from .model import Base, SVGMarker, SVGMarkerLibrary, validate_filename

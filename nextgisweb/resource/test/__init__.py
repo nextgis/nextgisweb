@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 import transaction
 
-from ...models import DBSession
+from ...env.model import DBSession
 from ...auth import User
 
 from ..model import ResourceGroup

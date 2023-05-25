@@ -12,7 +12,7 @@ from ...auth import User
 from ...feature_layer import Feature
 from ...lib.geometry import Geometry
 from ...lib.json import dumpb
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 from ...vector_layer import VectorLayer
 

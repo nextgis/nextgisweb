@@ -1,5 +1,5 @@
 
-from ..event import Event
+from ..lib.legacy_event import Event
 
 
 on_data_change = Event()

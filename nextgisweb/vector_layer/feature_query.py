@@ -7,7 +7,7 @@ from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql import ColumnElement, null, text
 from zope.interface import implementer
 
-from .. import db
+from ..lib import db
 from ..feature_layer import (
     Feature,
     FeatureQueryIntersectsMixin,
@@ -22,7 +22,7 @@ from ..feature_layer import (
     IFeatureQueryOrderBy,
     IFeatureQuerySimplify,
 )
-from ..models import DBSession
+from ..env.model import DBSession
 from ..lib.geometry import Geometry
 from ..spatial_ref_sys import SRS
 

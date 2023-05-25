@@ -2,7 +2,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..views import permalinker
-from .. import dynmenu as dm
+from ..lib import dynmenu as dm
 from ..gui import REACT_RENDERER
 
 from .model import SRS

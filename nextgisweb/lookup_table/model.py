@@ -1,8 +1,8 @@
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.dialects.postgresql import HSTORE
 
-from .. import db
-from ..models import declarative_base
+from ..lib import db
+from ..env.model import declarative_base
 from ..resource import (
     DataScope,
     Resource,

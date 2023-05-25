@@ -3,7 +3,7 @@ import pytest
 from uuid import uuid4
 from osgeo import ogr
 
-from ...models import DBSession
+from ...env.model import DBSession
 from ...auth import User
 from ...spatial_ref_sys import SRS
 

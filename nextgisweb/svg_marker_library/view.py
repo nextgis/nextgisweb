@@ -1,4 +1,4 @@
-from ..dynmenu import DynItem, Label, Link
+from ..lib.dynmenu import DynItem, Label, Link
 from ..resource import Resource, Widget
 
 from .model import SVGMarkerLibrary

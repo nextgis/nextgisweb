@@ -3,7 +3,7 @@ import sqlalchemy.sql as sql
 import transaction
 
 from ...auth import Group, User
-from ...models import DBSession
+from ...env.model import DBSession
 from ...resource import ACLRule, Resource, ResourceGroup, ResourceScope
 from ...webmap import WebMap, WebMapItem, WebMapScope
 from ..presolver import PermissionResolver

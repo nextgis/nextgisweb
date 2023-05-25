@@ -1,9 +1,9 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship, declared_attr
 
-from .. import db
+from ..lib import db
 from ..lib.osrhelper import sr_from_wkt
-from ..models import declarative_base
+from ..env.model import declarative_base
 
 from .util import convert_to_proj
 

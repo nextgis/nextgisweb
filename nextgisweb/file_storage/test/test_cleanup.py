@@ -4,7 +4,7 @@ from datetime import timedelta
 
 import pytest
 
-from ...models import DBSession
+from ...env.model import DBSession
 from ...file_storage import FileObj
 
 

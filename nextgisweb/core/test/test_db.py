@@ -3,7 +3,7 @@ import re
 from packaging.version import Version
 from sqlalchemy import text
 
-from ...models import DBSession
+from ...env.model import DBSession
 
 
 def test_postgres_version(ngw_txn):

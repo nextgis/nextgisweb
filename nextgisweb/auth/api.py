@@ -8,7 +8,7 @@ from pyramid.security import forget
 from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
 from pyramid.interfaces import ISecurityPolicy
 
-from ..models import DBSession
+from ..env.model import DBSession
 from ..core.exception import ValidationError
 
 from .model import User, Group, Principal

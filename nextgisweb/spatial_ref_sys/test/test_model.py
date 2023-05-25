@@ -1,8 +1,8 @@
 import pytest
 
-from ... import db
+from ...lib import db
 from ...lib.osrhelper import sr_from_epsg
-from ...models import DBSession
+from ...env.model import DBSession
 from ...core.exception import ValidationError
 from ..model import (
     SRS, SRID_LOCAL,

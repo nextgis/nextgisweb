@@ -5,12 +5,12 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from osgeo import gdal, osr
 from zope.interface import implementer
 
-from .. import db
+from ..lib import db
 from ..core.exception import ValidationError
 from ..env import env
 from ..lib.geometry import Geometry
 from ..lib.osrhelper import sr_from_wkt
-from ..models import declarative_base, DBSession
+from ..env.model import declarative_base, DBSession
 from ..resource import (
     DataScope,
     DataStructureScope,

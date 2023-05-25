@@ -1,4 +1,4 @@
-from ..cli import cli, EnvCommand, arg
+from ..env.cli import cli, EnvCommand, arg
 
 from . import User
 

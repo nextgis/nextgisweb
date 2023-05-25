@@ -5,9 +5,9 @@ import re
 from collections import OrderedDict
 from shutil import copyfileobj
 
-from .. import db
+from ..lib import db
 from ..env import env
-from ..models import declarative_base
+from ..env.model import declarative_base
 from ..resource import Resource
 from ..file_storage import FileObj
 

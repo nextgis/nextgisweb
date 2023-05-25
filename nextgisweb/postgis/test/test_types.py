@@ -6,7 +6,7 @@ from sqlalchemy.engine.url import (
     make_url as make_engine_url)
 
 from ...auth import User
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 
 from .. import PostgisConnection, PostgisLayer

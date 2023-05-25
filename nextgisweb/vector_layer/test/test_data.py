@@ -8,7 +8,7 @@ import webtest
 from osgeo import gdal, ogr, osr
 
 from ...core.exception import ValidationError
-from ...models import DBSession
+from ...env.model import DBSession
 from ...auth import User
 from ...spatial_ref_sys import SRS
 from ...feature_layer import FIELD_TYPE

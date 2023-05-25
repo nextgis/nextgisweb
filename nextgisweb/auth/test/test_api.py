@@ -6,9 +6,9 @@ import pytest
 import transaction
 from freezegun import freeze_time
 
-from ... import db
+from ...lib import db
 from ...auth import User, Group
-from ...models import DBSession
+from ...env.model import DBSession
 
 
 @pytest.fixture(scope='module', autouse=True)

@@ -11,7 +11,7 @@ from shutil import rmtree
 from zipfile import ZipFile, is_zipfile
 
 from ...lib.logging import logger
-from ...cli import cli, EnvCommand, opt, arg
+from ...env.cli import cli, EnvCommand, opt, arg
 
 from .. import backup as mod
 

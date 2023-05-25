@@ -5,11 +5,11 @@ from shutil import copyfileobj
 import magic
 import zipfile
 
-from .. import db
+from ..lib import db
 from ..core.exception import ValidationError
 from ..env import env
 from ..file_storage import FileObj
-from ..models import DBSession, declarative_base
+from ..env.model import DBSession, declarative_base
 from ..resource import (
     Resource,
     Serializer,

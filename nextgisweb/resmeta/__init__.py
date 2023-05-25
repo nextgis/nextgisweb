@@ -1,4 +1,4 @@
-from ..component import Component, require
+from ..env import Component, require
 
 from .util import COMP_ID
 from .model import Base, ResourceMetadataItem

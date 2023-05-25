@@ -9,8 +9,8 @@ import numpy  # NOQA
 
 from .lib.clann import ArgumentParser, Command, NS_CMD_GRP_ATTR
 from .lib.config import Option, NO_DEFAULT, key_to_environ
-from .cli import cli, bootstrap, EnvCommand
-from .command import Command as LegacyCommand
+from .env.cli import cli, bootstrap, EnvCommand
+from .env.legacy_command import Command as LegacyCommand
 from .env import Env, env
 
 
@@ -35,7 +35,7 @@ def config(argv=sys.argv):
     args = argparser.parse_args(argv[1:])
 
     from .component import Component, load_all
-    from .package import pkginfo
+    from .env.package import pkginfo
     load_all()
 
     headers = []

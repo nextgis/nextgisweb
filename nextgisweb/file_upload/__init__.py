@@ -7,7 +7,7 @@ from ulid import ULID
 from ..lib.config import Option
 from ..lib.config.otype import SizeInBytes
 from ..lib.logging import logger
-from ..component import Component
+from ..env import Component
 
 from . import cli  # NOQA
 from .util import stat_dir

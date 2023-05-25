@@ -5,7 +5,7 @@ from pyramid.interfaces import ISession
 from sqlalchemy.orm.exc import NoResultFound
 from zope.interface import implementer
 
-from ..models import DBSession
+from ..env.model import DBSession
 
 from .model import Session, SessionStore
 from .util import gensecret, datetime_to_unix

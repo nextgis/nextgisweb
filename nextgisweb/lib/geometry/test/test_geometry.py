@@ -6,7 +6,7 @@ from shapely.wkt import loads as wkt_loads
 from shapely.wkb import loads as wkb_loads
 from sqlalchemy import func as sa_func
 
-from ....models import DBSession
+from ....env.model import DBSession
 
 from ...geometry import Geometry, GeometryNotValid
 from ...ogrhelper import cohere_bytes

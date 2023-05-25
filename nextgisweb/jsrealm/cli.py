@@ -3,8 +3,8 @@ from pathlib import Path
 from subprocess import check_call
 
 from ..lib.logging import logger
-from ..cli import cli, EnvCommand
-from ..package import amd_packages, pkginfo
+from ..env.cli import cli, EnvCommand
+from ..env.package import amd_packages, pkginfo
 from ..pyramid.uacompat import FAMILIES
 
 

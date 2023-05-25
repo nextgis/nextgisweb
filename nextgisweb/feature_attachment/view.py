@@ -3,7 +3,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from ..resource import resource_factory, DataScope, Resource
 from ..feature_layer import IFeatureLayer
 from ..gui import REACT_RENDERER
-from .. import dynmenu as dm
+from ..lib import dynmenu as dm
 
 from .util import _
 

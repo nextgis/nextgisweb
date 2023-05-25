@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import pytest
 
-from ...component import load_all
+from ...env import load_all
 from .. import Resource
 
 

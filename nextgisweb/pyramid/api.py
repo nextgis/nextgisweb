@@ -13,10 +13,10 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from ..lib import json
 from ..lib.logging import logger
 from ..env import env
-from ..package import pkginfo
+from ..env.package import pkginfo
 from ..core import KindOfData
 from ..core.exception import ValidationError
-from ..models import DBSession
+from ..env.model import DBSession
 from ..resource import Resource, MetadataScope
 
 from .util import _, ClientRoutePredicate, gensecret, parse_origin

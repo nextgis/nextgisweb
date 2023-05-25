@@ -1,5 +1,5 @@
 from ...lib.json import dumps
-from ...cli import cli, EnvCommand, opt
+from ...env.cli import cli, EnvCommand, opt
 
 
 @cli.command()

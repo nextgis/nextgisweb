@@ -2,7 +2,7 @@ import uuid
 
 import sqlalchemy as sa
 
-from ..models import declarative_base
+from ..env.model import declarative_base
 
 Base = declarative_base()
 

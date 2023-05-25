@@ -12,7 +12,7 @@ from ...auth import User
 from ...env import env
 from ...feature_layer import GEOM_TYPE, GEOM_TYPE_OGR_2_GEOM_TYPE
 from ...lib.ogrhelper import FIELD_GETTER
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 from ...vector_layer.util import (
     GEOM_TYPE_2_DB,

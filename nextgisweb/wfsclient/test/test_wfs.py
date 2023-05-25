@@ -8,7 +8,7 @@ from shapely import affinity
 from shapely.geometry import Polygon
 
 from ...auth import User
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 from ...vector_layer import VectorLayer
 from ...wfsserver.model import Layer as WFS_Service_Layer, Service as WFSService

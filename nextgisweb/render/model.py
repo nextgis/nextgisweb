@@ -17,8 +17,8 @@ from zope.sqlalchemy import mark_changed
 
 from ..lib.logging import logger
 from ..env import env
-from .. import db
-from ..models import declarative_base, DBSession
+from ..lib import db
+from ..env.model import declarative_base, DBSession
 from ..resource import (
     Resource,
     Serializer,

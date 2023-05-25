@@ -1,5 +1,6 @@
+from ..env import Component
+
 from .model import Base
-from ..component import Component
 
 
 class RasterMosaicComponent(Component):

@@ -13,8 +13,8 @@ from zope.sqlalchemy import mark_changed
 from packaging.version import Version
 
 from ..lib.logging import logger
-from ..registry import registry_maker
-from ..models import DBSession
+from ..lib.registry import registry_maker
+from ..env.model import DBSession
 
 
 IR_FIELDS = ('id', 'identity', 'payload')

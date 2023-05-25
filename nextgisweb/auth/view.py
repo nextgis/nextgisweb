@@ -14,10 +14,10 @@ from sqlalchemy.orm.exc import NoResultFound
 from pyramid.interfaces import ISecurityPolicy
 
 from ..gui import REACT_RENDERER
-from ..models import DBSession
+from ..env.model import DBSession
 from ..pyramid import SessionStore, WebSession
 from ..views import permalinker
-from .. import dynmenu as dm
+from ..lib import dynmenu as dm
 
 from .model import Principal, User, Group
 

@@ -4,7 +4,7 @@ import pytest
 import transaction
 from freezegun import freeze_time
 
-from ...models import DBSession
+from ...env.model import DBSession
 
 from .. import User
 

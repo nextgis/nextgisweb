@@ -4,12 +4,12 @@ from datetime import datetime
 from bunch import Bunch
 from sqlalchemy import event, text
 
-from .. import db
+from ..lib import db
 from ..auth import Principal, User, Group, OnFindReferencesData
 from ..core.exception import ValidationError, ForbiddenError
 from ..env import env
-from ..models import declarative_base, DBSession
-from ..registry import registry_maker
+from ..env.model import declarative_base, DBSession
+from ..lib.registry import registry_maker
 
 from .util import _
 from .interface import providedBy

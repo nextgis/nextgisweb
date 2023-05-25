@@ -1,6 +1,6 @@
 from .interface import IFeatureLayer
 from ..lib.geometry import Geometry
-from ..models import DBSession
+from ..env.model import DBSession
 from ..resource import (
     Resource,
     ResourceScope,

@@ -1,5 +1,5 @@
 from ..pyramid import viewargs
-from ..dynmenu import Link, DynItem
+from ..lib.dynmenu import Link, DynItem
 from ..feature_layer import IFeatureLayer
 from ..layer.interface import IBboxLayer
 from ..render import IRenderableStyle

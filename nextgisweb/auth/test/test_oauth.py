@@ -10,7 +10,7 @@ from freezegun import freeze_time
 import transaction
 
 from ...lib.logging import logger
-from ...models import DBSession
+from ...env.model import DBSession
 from ..oauth import OAuthHelper, OAuthErrorResponse
 from ..model import Group, User
 

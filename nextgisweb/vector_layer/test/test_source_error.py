@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 
 from ...lib.ogrhelper import read_dataset
-from ...models import DBSession
+from ...env.model import DBSession
 from ...auth import User
 from ...core.exception import ValidationError
 from ...spatial_ref_sys import SRS

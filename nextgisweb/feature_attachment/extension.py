@@ -1,5 +1,5 @@
 from ..feature_layer import FeatureExtension
-from ..models import DBSession
+from ..env.model import DBSession
 from .model import FeatureAttachment
 
 

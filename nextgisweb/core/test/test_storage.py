@@ -7,7 +7,7 @@ from freezegun import freeze_time
 
 from ...auth import User
 from ...feature_attachment import FeatureAttachmentData
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 from ...vector_layer import VectorLayer
 from .. import KindOfData

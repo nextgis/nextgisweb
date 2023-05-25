@@ -7,7 +7,7 @@ import transaction
 import xml.etree.ElementTree as ET
 
 from ...auth import User
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 from ...vector_layer import VectorLayer
 

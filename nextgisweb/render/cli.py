@@ -6,8 +6,8 @@ import transaction
 
 from ..lib.geometry import Geometry, Transformer
 from ..lib.logging import logger
-from ..cli import cli, EnvCommand
-from ..models import DBSession
+from ..env.cli import cli, EnvCommand
+from ..env.model import DBSession
 from ..spatial_ref_sys import WKT_EPSG_4326
 
 from .model import ResourceTileCache, TilestorWriter

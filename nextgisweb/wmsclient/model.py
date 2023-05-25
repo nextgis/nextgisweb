@@ -13,10 +13,10 @@ from owslib.map.common import WMSCapabilitiesReader
 from pyramid.url import urlencode
 from requests.exceptions import RequestException
 
-from .. import db
+from ..lib import db
 from ..core.exception import ExternalServiceError, ValidationError
 from ..env import env
-from ..models import declarative_base
+from ..env.model import declarative_base
 from ..resource import (
     Resource,
     ConnectionScope,

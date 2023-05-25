@@ -1,5 +1,5 @@
 
-from ..registry import registry_maker
+from ..lib.registry import registry_maker
 
 
 class FeatureExtension:

@@ -1,7 +1,7 @@
 from typing import Optional
 
 from ..lib.logging import logger
-from ..cli import cli, EnvCommand, opt
+from ..env.cli import cli, EnvCommand, opt
 
 
 @cli.command()

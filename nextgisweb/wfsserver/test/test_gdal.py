@@ -8,7 +8,7 @@ from osgeo import gdal
 from osgeo import ogr
 from packaging import version as pkg_version
 
-from ...models import DBSession
+from ...env.model import DBSession
 from ...auth import User
 from ...spatial_ref_sys import SRS
 from ...vector_layer import VectorLayer

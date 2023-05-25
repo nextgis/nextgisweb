@@ -1,4 +1,4 @@
-from ..cli import cli, EnvCommand
+from ..env.cli import cli, EnvCommand
 
 
 @cli.group()

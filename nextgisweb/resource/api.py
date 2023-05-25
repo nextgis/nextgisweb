@@ -5,9 +5,9 @@ from pyramid.httpexceptions import HTTPBadRequest
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 
-from .. import db
+from ..lib import db
 from ..core.exception import InsufficientPermissions
-from ..models import DBSession
+from ..env.model import DBSession
 from ..auth import User
 
 from .model import Resource, ResourceSerializer

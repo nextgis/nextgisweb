@@ -2,7 +2,7 @@ import pytest
 import transaction
 
 from ...lib.geometry import Geometry
-from ...models import DBSession
+from ...env.model import DBSession
 
 from ..model import SRS
 

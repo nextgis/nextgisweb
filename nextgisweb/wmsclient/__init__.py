@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from ..lib.config import Option
-from ..component import Component
+from ..env import Component
 from .model import Base, Connection, Layer, WMS_VERSIONS
 
 __all__ = ['Connection', 'Layer']

@@ -1,8 +1,8 @@
 import warnings
 
-from .lib.config import ConfigOptions
-from .lib.logging import logger
-from .registry import registry_maker
+from ..lib.config import ConfigOptions
+from ..lib.logging import logger
+from ..lib.registry import registry_maker
 from .package import pkginfo
 
 

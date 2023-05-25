@@ -17,7 +17,7 @@ from pyramid.authorization import ACLHelper
 from ..lib.config import OptionAnnotations, Option
 from ..lib.logging import logger
 from ..pyramid import SessionStore, WebSession
-from ..models import DBSession
+from ..env.model import DBSession
 
 from .model import User
 from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, UserDisabledException

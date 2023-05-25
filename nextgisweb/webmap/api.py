@@ -11,7 +11,7 @@ from .model import (
 )
 from ..env import env
 from ..layer import IBboxLayer
-from ..models import DBSession
+from ..env.model import DBSession
 from ..resource import resource_factory, DataScope
 
 

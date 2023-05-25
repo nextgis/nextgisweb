@@ -7,7 +7,7 @@ from osgeo import ogr, osr
 from sqlalchemy.orm import registry
 from sqlalchemy.sql import text
 
-from .. import db
+from ..lib import db
 from ..core.exception import ValidationError as VE
 from ..env import env
 from ..feature_layer import (
@@ -19,8 +19,8 @@ from ..feature_layer import (
 )
 from ..lib.json import dumps
 from ..lib.ogrhelper import FIELD_GETTER
-from ..models import DBSession
-from ..registry import registry_maker
+from ..env.model import DBSession
+from ..lib.registry import registry_maker
 
 from .util import (
     _, fix_encoding, utf8len,

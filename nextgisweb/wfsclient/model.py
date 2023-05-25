@@ -10,7 +10,7 @@ from requests.exceptions import RequestException
 from shapely.geometry import box
 from zope.interface import implementer
 
-from .. import db
+from ..lib import db
 from ..core.exception import ForbiddenError, ValidationError, ExternalServiceError
 from ..env import env
 from ..feature_layer import (
@@ -31,7 +31,7 @@ from ..feature_layer import (
 from ..layer import SpatialLayerMixin
 from ..lib.geometry import Geometry
 from ..lib.ows import FIELD_TYPE_WFS
-from ..models import declarative_base
+from ..env.model import declarative_base
 from ..resource import (
     ConnectionScope,
     DataScope,

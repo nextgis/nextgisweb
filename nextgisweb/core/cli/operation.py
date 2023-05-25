@@ -5,8 +5,8 @@ from time import sleep
 from typing import List
 
 from ...lib.logging import logger
-from ...cli import cli, EnvCommand, opt, arg
-from ...models import DBSession
+from ...env.cli import cli, EnvCommand, opt, arg
+from ...env.model import DBSession
 from ..backup import pg_connection_options
 
 

@@ -1,5 +1,6 @@
 import os
 
+from . import imptool
 from .lib.config import load_config
 from .lib.logging import logger
 from .env import Env, setenv

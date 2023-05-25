@@ -1,6 +1,6 @@
-from ..component import Component
+from ..env import Component
 
-from .models import SpatialLayerMixin
+from .model import SpatialLayerMixin
 from .interface import IBboxLayer
 
 __all__ = [

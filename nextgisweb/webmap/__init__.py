@@ -3,10 +3,10 @@ from pkg_resources import resource_filename
 from pathlib import Path
 
 from ..lib.config import Option
-from ..component import Component, require
+from ..env import Component, require
 from ..auth import User
-from ..models import DBSession
-from .. import db
+from ..env.model import DBSession
+from ..lib import db
 
 from .model import Base, WebMap, WebMapItem, WebMapScope
 from .adapter import WebMapAdapter

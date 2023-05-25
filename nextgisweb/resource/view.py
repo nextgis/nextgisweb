@@ -7,11 +7,11 @@ from sqlalchemy.orm.exc import NoResultFound
 import zope.event
 
 from ..views import permalinker
-from ..dynmenu import DynMenu, Label, Link, DynItem
-from ..psection import PageSections
+from ..lib.dynmenu import DynMenu, Label, Link, DynItem
 from ..pyramid import viewargs
 from ..pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
-from ..models import DBSession
+from ..pyramid.psection import PageSections
+from ..env.model import DBSession
 
 from ..gui import REACT_RENDERER
 from ..core.exception import InsufficientPermissions

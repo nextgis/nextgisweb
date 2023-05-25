@@ -1,4 +1,4 @@
-from ..component import Component
+from ..env import Component
 
 __all__ = ['LayerPreviewComponent', ]
 

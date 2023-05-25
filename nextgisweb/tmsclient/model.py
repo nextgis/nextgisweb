@@ -7,12 +7,12 @@ import PIL
 from osgeo import osr, ogr
 from zope.interface import implementer
 
-from .. import db
+from ..lib import db
 from ..lib.osrhelper import sr_from_epsg
 from ..core.exception import ExternalServiceError, ValidationError
 from ..env import env
 from ..layer import SpatialLayerMixin, IBboxLayer
-from ..models import declarative_base
+from ..env.model import declarative_base
 from ..render import IExtentRenderRequest, IRenderableStyle, ITileRenderRequest
 from ..resource import (
     ConnectionScope,

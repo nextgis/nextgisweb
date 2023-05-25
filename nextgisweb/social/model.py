@@ -2,10 +2,10 @@ from shutil import copyfile
 
 from PIL import Image
 
-from .. import db
+from ..lib import db
 from ..env import env
 from ..file_storage import FileObj
-from ..models import DBSession, declarative_base
+from ..env.model import DBSession, declarative_base
 from ..resource import (
     MetadataScope,
     Resource,

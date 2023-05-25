@@ -6,8 +6,8 @@ import sqlalchemy as sa
 from zope.sqlalchemy import mark_changed
 
 from ..lib.logging import logger
-from ..models import DBSession
-from ..registry import registry_maker
+from ..env.model import DBSession
+from ..lib.registry import registry_maker
 
 from .util import _, format_size
 from .exception import UserException

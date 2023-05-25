@@ -10,7 +10,7 @@ from zope.event.classhandler import handler
 
 from ..core.exception import ValidationError
 from ..env import env
-from ..models import DBSession, declarative_base
+from ..env.model import DBSession, declarative_base
 from ..pyramid.util import gensecret
 
 from .util import _

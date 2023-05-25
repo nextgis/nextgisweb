@@ -1,5 +1,5 @@
 from ..gui import REACT_RENDERER
-from ..dynmenu import DynItem, Link
+from ..lib.dynmenu import DynItem, Link
 from ..resource import ConnectionScope, DataScope, Widget, resource_factory, Resource
 
 from .model import PostgisConnection, PostgisLayer

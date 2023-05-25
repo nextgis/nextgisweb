@@ -25,7 +25,7 @@ from poeditor import POEditorAPI
 
 from ..lib.config import load_config
 from ..lib.logging import logger
-from ..package import pkginfo
+from ..env.package import pkginfo
 from ..env import Env, setenv, env
 
 from .util import to_gettext_locale, to_http_locale

@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from ..component import Component
+from ..env import Component
 from ..lib.config import Option
 from .util import COMP_ID
 from .model import Base, SRS, SRSMixin, WKT_EPSG_4326, WKT_EPSG_3857

@@ -1,7 +1,7 @@
 import re
 from subprocess import check_output
 
-from ..component import Component
+from ..env import Component
 from ..lib.config import Option
 from ..lib.logging import logger
 

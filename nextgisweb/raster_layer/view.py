@@ -1,6 +1,6 @@
 from pyramid.httpexceptions import HTTPNotFound
 
-from .. import dynmenu as dm
+from ..lib import dynmenu as dm
 from ..gui import REACT_RENDERER
 from ..resource import Widget, Resource
 

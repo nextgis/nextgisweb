@@ -1,8 +1,8 @@
 import json
 from pkg_resources import resource_filename
 
-from ..component import Component
 from ..lib.config import Option
+from ..env import Component
 
 from .util import disable_logging, OnResponse
 

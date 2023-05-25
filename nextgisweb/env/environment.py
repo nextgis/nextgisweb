@@ -6,10 +6,10 @@ from collections import OrderedDict
 
 import sqlalchemy as sa
 
-from .lib.config import OptionAnnotations, Option, ConfigOptions, load_config
-from .lib.logging import logger
-from .component import Component, load_all
+from ..lib.config import OptionAnnotations, Option, ConfigOptions, load_config
+from ..lib.logging import logger
 from .package import pkginfo
+from .component import Component, load_all
 
 
 _OPTIONS_LOGGING_LEVELS = ('critical', 'error', 'warning', 'info', 'debug')

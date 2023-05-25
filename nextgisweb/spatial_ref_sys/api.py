@@ -7,7 +7,7 @@ from sqlalchemy import sql
 from ..core.exception import ValidationError, ExternalServiceError
 from ..env import env
 from ..lib.geometry import Geometry, Transformer, geom_area, geom_length
-from ..models import DBSession
+from ..env.model import DBSession
 
 from .model import SRS
 from .util import convert_to_wkt, _

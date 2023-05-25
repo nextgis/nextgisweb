@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from ..component import Component, require
+from ..env import Component, require
 from ..lib.config import Option
 
 from .model import Base, PostgisConnection, PostgisLayer

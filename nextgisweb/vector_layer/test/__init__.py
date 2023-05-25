@@ -4,7 +4,7 @@ from uuid import uuid4
 import transaction
 
 from ...auth import User
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 
 from .. import VectorLayer

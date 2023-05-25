@@ -1,6 +1,6 @@
 import pytest
 
-from ...component import Component, load_all
+from ...env import Component, load_all
 from ...lib.config import Option
 
 

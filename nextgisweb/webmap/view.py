@@ -7,7 +7,7 @@ from .adapter import WebMapAdapter
 from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .util import webmap_items_to_tms_ids_list, _
-from ..dynmenu import DynItem, Label, Link
+from ..lib.dynmenu import DynItem, Label, Link
 from ..resource import Resource, Widget, resource_factory, DataScope, ResourceScope
 from ..gui import REACT_RENDERER
 

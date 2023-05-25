@@ -2,7 +2,7 @@ import pytest
 import transaction
 
 from ...auth import User
-from ...models import DBSession
+from ...env.model import DBSession
 
 from .. import WebMap, WebMapItem
 

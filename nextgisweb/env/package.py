@@ -7,7 +7,7 @@ from importlib.metadata import metadata
 
 from pathlib import Path
 
-from .lib.logging import logger
+from ..lib.logging import logger
 
 _version_re = re.compile(r'(.+)\+(?:git)?([0-9a-f]{4,})(\.dirty)?$', re.IGNORECASE)
 _qualifications = False

@@ -16,7 +16,7 @@ from ..core.exception import ValidationError
 from ..lib.json import dumpb, loadb
 from ..resource import DataScope, resource_factory
 from ..env import env
-from ..models import DBSession
+from ..env.model import DBSession
 from ..feature_layer.exception import FeatureNotFound
 
 from .exception import AttachmentNotFound

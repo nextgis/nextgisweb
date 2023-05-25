@@ -5,7 +5,7 @@ from pathlib import Path
 import transaction
 from zope.sqlalchemy import mark_changed
 
-from ..models import DBSession
+from ..env.model import DBSession
 from ..lib.logging import logger
 from ..lib.migration import (
     MigrationKey, InitialMigration,

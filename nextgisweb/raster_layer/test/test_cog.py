@@ -4,7 +4,7 @@ import transaction
 from osgeo import gdal
 
 from ...auth import User
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 
 from ..model import RasterLayer

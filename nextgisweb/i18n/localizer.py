@@ -9,7 +9,7 @@ from pkg_resources import resource_filename
 from babel.support import Translations as BabelTranslations
 
 from ..lib.logging import logger
-from ..package import pkginfo
+from ..env.package import pkginfo
 
 
 class Translations(BabelTranslations):

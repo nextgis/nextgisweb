@@ -8,12 +8,12 @@ from pyramid.httpexceptions import HTTPForbidden
 
 from ..lib.config import OptionAnnotations, Option
 from ..lib.logging import logger
-from ..component import Component
+from ..env import Component
 from ..core.exception import ValidationError
-from ..models import DBSession
+from ..env.model import DBSession
 from ..pyramid import Session, SessionStore
 from ..pyramid.util import gensecret
-from .. import db
+from ..lib import db
 
 from .model import Base, Principal, User, Group, OnFindReferencesData
 from .exception import UserDisabledException

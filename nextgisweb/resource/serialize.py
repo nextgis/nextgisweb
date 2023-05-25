@@ -3,8 +3,8 @@ from collections import OrderedDict
 
 from zope.interface import Interface, implementer
 
-from ..registry import registry_maker
-from ..models import BaseClass
+from ..lib.registry import registry_maker
+from ..env.model import BaseClass
 from ..core.exception import IUserException, ForbiddenError
 
 from .util import _

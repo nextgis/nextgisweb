@@ -3,7 +3,7 @@ from contextlib import contextmanager
 import pytest
 from transaction import manager
 
-from ...models import DBSession
+from ...env.model import DBSession
 
 
 @pytest.fixture()

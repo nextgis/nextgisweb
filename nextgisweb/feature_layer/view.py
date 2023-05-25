@@ -11,7 +11,7 @@ from ..resource import (
     resource_factory,
     Widget)
 from ..pyramid import viewargs
-from .. import dynmenu as dm
+from ..lib import dynmenu as dm
 
 from .interface import IFeatureLayer
 from .extension import FeatureExtension

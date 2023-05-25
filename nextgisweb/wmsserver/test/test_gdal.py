@@ -7,7 +7,7 @@ from PIL import Image, ImageStat
 from osgeo import gdal, gdalconst, gdal_array
 
 from ...auth import User
-from ...models import DBSession
+from ...env.model import DBSession
 from ...raster_layer import RasterLayer
 from ...raster_style import RasterStyle
 from ...spatial_ref_sys import SRS

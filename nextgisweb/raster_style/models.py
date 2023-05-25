@@ -6,7 +6,7 @@ from osgeo import gdal, gdalconst, gdal_array
 from pkg_resources import resource_filename
 from zope.interface import implementer
 
-from ..models import declarative_base
+from ..env.model import declarative_base
 from ..resource import Resource, DataScope
 from ..render import (
     IRenderableStyle,

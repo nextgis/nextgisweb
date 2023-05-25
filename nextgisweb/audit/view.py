@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from pyramid.httpexceptions import HTTPNotFound
 
-from .. import dynmenu as dm
+from ..lib import dynmenu as dm
 from .api import audit_cget
 from .util import _, es_index, audit_context
 

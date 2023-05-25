@@ -11,7 +11,7 @@ from osgeo import ogr
 from ...lib.geometry import Geometry
 from ...auth import User
 from ...feature_layer.ogrdriver import EXPORT_FORMAT_OGR
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys.model import SRS
 from ...vector_layer import VectorLayer
 

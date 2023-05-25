@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from ...auth import User
 from ...auth.policy import AuthResult, AuthMedium, AuthProvider
-from ...models import DBSession
+from ...env.model import DBSession
 from ...resource import ACLRule, ResourceGroup
 from ...resource.model import ResourceACLRule
 

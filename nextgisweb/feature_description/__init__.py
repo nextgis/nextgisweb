@@ -1,4 +1,4 @@
-from ..component import Component, require
+from ..env import Component, require
 
 from .model import Base, FeatureDescription
 

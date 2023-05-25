@@ -5,7 +5,7 @@ import transaction
 
 from ...auth import User
 from ...env import env
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 from ...vector_layer.test import create_feature_layer as create_vector_layer
 from ...wfsserver import Layer as WFS_Service_Layer, Service as WFSService

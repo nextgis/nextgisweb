@@ -19,10 +19,10 @@ from ..gui import REACT_RENDERER
 from ..lib.logging import logger
 from ..lib.json import dumps
 from ..env import env
-from .. import dynmenu as dm
+from ..lib import dynmenu as dm
 from ..core.exception import UserException
-from ..package import amd_packages
-from ..models import DBSession
+from ..env.package import amd_packages
+from ..env.model import DBSession
 
 from . import exception, renderer
 from .session import WebSession

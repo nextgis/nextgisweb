@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import transaction
 from freezegun import freeze_time
 
-from ...models import DBSession
+from ...env.model import DBSession
 from ..model import User
 
 

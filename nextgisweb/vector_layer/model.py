@@ -8,7 +8,7 @@ from shapely.geometry import box
 import geoalchemy2 as ga
 from sqlalchemy import event, func, sql
 
-from .. import db
+from ..lib import db
 from ..core.exception import ValidationError as VE
 from ..resource import (
     Resource,
@@ -20,7 +20,7 @@ from ..resource import (
     ResourceGroup)
 from ..spatial_ref_sys import SRS
 from ..env import env
-from ..models import declarative_base, DBSession, migrate_operation
+from ..env.model import declarative_base, DBSession, migrate_operation
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..lib.ogrhelper import read_dataset
 from ..feature_layer import (

@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 import pytest
 
-from ...component import Component, load_all
+from ...env import Component, load_all
 
 
 def pytest_generate_tests(metafunc):

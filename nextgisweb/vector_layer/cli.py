@@ -1,8 +1,8 @@
 from sqlalchemy.sql import text as literal_sql
 
 from ..lib.logging import logger
-from ..cli import DryRunOptions, EnvCommand, cli, opt
-from ..models import DBSession
+from ..env.cli import DryRunOptions, EnvCommand, cli, opt
+from ..env.model import DBSession
 
 from .model import SCHEMA
 

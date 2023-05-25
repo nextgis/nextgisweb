@@ -5,7 +5,7 @@ import transaction
 
 from ...auth import User
 from ...file_storage import FileObj
-from ...models import DBSession
+from ...env.model import DBSession
 
 from .. import SVGMarker, SVGMarkerLibrary
 

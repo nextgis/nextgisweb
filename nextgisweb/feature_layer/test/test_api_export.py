@@ -12,7 +12,7 @@ from ..ogrdriver import EXPORT_FORMAT_OGR
 
 from ...auth import User
 from ...lib.geometry import Geometry
-from ...models import DBSession
+from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 from ...vector_layer import VectorLayer
 

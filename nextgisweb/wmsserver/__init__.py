@@ -1,4 +1,4 @@
-from ..component import Component
+from ..env import Component
 
 from .model import Base, Service, Layer
 

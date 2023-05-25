@@ -30,15 +30,15 @@ warnings.filterwarnings(
     'ignore', r"^Not importing.*/core/migration.*__init__\.py$",
     category=ImportWarning)
 
-from .. import db
-from ..component import Component
+from ..lib import db
+from ..env import Component
 from ..lib.config import Option
 from ..lib.config.otype import SizeInBytes
 from ..lib import json
 from ..lib.logging import logger
-from ..models import DBSession
+from ..env.model import DBSession
 from ..i18n import Localizer, Translations
-from ..package import pkginfo, enable_qualifications
+from ..env.package import pkginfo, enable_qualifications
 
 from .util import _
 from .model import Base, Setting

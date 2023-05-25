@@ -1,4 +1,4 @@
-from .. import db
+from ..lib import db
 from ..lib.i18n import trstr_factory
 from ..feature_layer import FIELD_TYPE, FIELD_TYPE_OGR, GEOM_TYPE
 

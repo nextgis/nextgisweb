@@ -1,4 +1,4 @@
-from ..component import Component
+from ..env import Component
 
 from .util import COMP_ID, REACT_RENDERER
 

@@ -4,7 +4,7 @@ import sqlalchemy
 
 from ..lib.config import Option
 from ..lib.logging import logger
-from ..component import Component
+from ..env import Component
 from ..core.model import Setting
 
 __all__ = ['SentryComponent', ]
