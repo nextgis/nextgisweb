@@ -1,7 +1,6 @@
 from pyramid.httpexceptions import HTTPNotFound
 from sqlalchemy.orm.exc import NoResultFound
 
-from ..views import permalinker
 from ..lib import dynmenu as dm
 from ..gui import REACT_RENDERER
 
@@ -75,8 +74,6 @@ def setup_pyramid(comp, config):
         .add_view(srs_create_or_edit, renderer=REACT_RENDERER)
     config.add_route('srs.edit', '/srs/{id:\\d+}', client=True) \
         .add_view(srs_create_or_edit, renderer=REACT_RENDERER)
-
-    permalinker(SRS, 'srs.edit')
 
     class SRSMenu(dm.DynItem):
 

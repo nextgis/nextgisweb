@@ -16,7 +16,6 @@ from pyramid.interfaces import ISecurityPolicy
 from ..gui import REACT_RENDERER
 from ..env.model import DBSession
 from ..pyramid import SessionStore, WebSession
-from ..views import permalinker
 from ..lib import dynmenu as dm
 
 from .model import Principal, User, Group
@@ -390,9 +389,6 @@ def setup_pyramid(comp, config):
         .add_view(group_create_or_edit, renderer=REACT_RENDERER)
     config.add_route('auth.group.edit', '/auth/group/{id:\\d+}', client=True) \
         .add_view(group_create_or_edit, renderer=REACT_RENDERER)
-
-    permalinker(User, "auth.user.edit")
-    permalinker(Group, "auth.group.edit")
 
     class AuthComponentMenu(dm.DynItem):
 

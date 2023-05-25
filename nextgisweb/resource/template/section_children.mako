@@ -12,7 +12,7 @@
         if ResourceScope.read not in item.permissions(request.user):
             continue
         idata = dict(
-            id=item.id, displayName=item.display_name, link=item.permalink(request),
+            id=item.id, displayName=item.display_name, link=request.route_url('resource.show', id=item.id),
             cls=item.cls, clsDisplayName=tr(item.cls_display_name), creationDate=item.creation_date,
             ownerUserDisplayName=item.owner_user.display_name)
         

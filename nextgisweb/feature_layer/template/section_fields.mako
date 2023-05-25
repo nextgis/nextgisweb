@@ -29,7 +29,7 @@
                     %if have_lookup_table:
                         <td style="text-align: center;">
                         %if field.lookup_table is not None:
-                            <a href="${field.lookup_table.permalink(request)}">${tr(_("Yes"))}</a>
+                            <a href="${request.route_url('resource.show', id=field.lookup_table.id)}">${tr(_("Yes"))}</a>
                         %else:
                             ${tr(_("No"))}
                         %endif

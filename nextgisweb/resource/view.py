@@ -6,7 +6,6 @@ from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
 import zope.event
 
-from ..views import permalinker
 from ..lib.dynmenu import DynMenu, Label, Link, DynItem
 from ..pyramid import viewargs
 from ..pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
@@ -254,8 +253,6 @@ def setup_pyramid(comp, config):
         .add_view(update)
     _resource_route('delete', r'{id:\d+}/delete', client=('id', )) \
         .add_view(delete, renderer=REACT_RENDERER)
-
-    permalinker(Resource, 'resource.show')
 
     # Sections
 
