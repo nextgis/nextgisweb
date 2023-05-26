@@ -35,6 +35,8 @@ __all__ = [  # NOQA: F405
     'AfterResourceCollectionPost',
     'AfterResourcePut',
     'Resource',
+    'ResourceScope',
+    'resource_factory',
     'IResourceBase',
     'Serializer',
     'SerializedProperty',

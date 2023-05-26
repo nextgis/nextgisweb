@@ -1,7 +1,7 @@
 <%!
     from bunch import Bunch
-    from nextgisweb import dynmenu as dm
-    from nextgisweb.resource.scope import ResourceScope
+    from nextgisweb.lib import dynmenu as dm
+    from nextgisweb.resource import ResourceScope
 %>
 
 <div id="childrenSection"></div>

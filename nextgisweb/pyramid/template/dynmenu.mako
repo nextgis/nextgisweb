@@ -2,7 +2,7 @@
 
 <%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>
 
-<% from nextgisweb import dynmenu as dm %>
+<% from nextgisweb.lib import dynmenu as dm %>
 
 <ul class="sidebar-menu list-unstyled">
 <% label = None %>
