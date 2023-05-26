@@ -14,6 +14,7 @@ from ..resource import Resource, ResourceNotFound, DataScope, resource_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
 from .util import _, af_transform, zxy_from_request
+from .imgcodec import image_encoder_factory, FORMAT_PNG, COMPRESSION_FAST
 
 
 class InvalidOriginError(UserException):
@@ -52,6 +53,9 @@ def tile_debug_info(img, offset=(0, 0), color='black',
     return img
 
 
+image_encoder = image_encoder_factory(FORMAT_PNG, COMPRESSION_FAST)
+
+
 def image_response(img, empty_code, size):
     if img is None:
         if empty_code in ('204', '404'):
@@ -62,7 +66,7 @@ def image_response(img, empty_code, size):
             img = Image.new('RGBA', size)
 
     buf = BytesIO()
-    img.save(buf, 'png', compress_level=3)
+    image_encoder(img, buf)
     buf.seek(0)
 
     return Response(body_file=buf, content_type='image/png')

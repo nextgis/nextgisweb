@@ -19,7 +19,8 @@ from ..pyramid.exception import json_error
 from ..lib.json import dumps
 from ..lib.geometry import Geometry
 from ..lib.ows import parse_request, parse_srs, SRSParseError
-from ..render import ILegendableStyle
+from ..render import ILegendableStyle, image_encoder_factory
+from ..render import FORMAT_PNG, FORMAT_JPEG, COMPRESSION_FAST, COMPRESSION_DEFAULT
 from ..resource import (
     resource_factory,
     ServiceScope, DataScope)
@@ -223,6 +224,10 @@ def _validate_bgcolor(bgcolor):
     return color
 
 
+image_encoder_png = image_encoder_factory(FORMAT_PNG, COMPRESSION_FAST)
+image_encoder_jpeg = image_encoder_factory(FORMAT_JPEG, COMPRESSION_DEFAULT)
+
+
 def _get_map(obj, params, request):
     p_layers = params['LAYERS'].split(',')
     p_bbox = _validate_bbox([float(v) for v in params['BBOX'].split(',', 3)])
@@ -337,9 +342,11 @@ def _get_map(obj, params, request):
     buf = BytesIO()
 
     if p_format == IMAGE_FORMAT.JPEG:
-        img.convert('RGB').save(buf, 'jpeg')
+        image_encoder_jpeg(img, buf)
     elif p_format == IMAGE_FORMAT.PNG:
-        img.save(buf, 'png', compress_level=3)
+        image_encoder_png(img, buf)
+    else:
+        raise ValueError
 
     buf.seek(0)
 
@@ -482,9 +489,11 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
         buf = BytesIO()
 
         if p_format == IMAGE_FORMAT.JPEG:
-            img.convert('RGB').save(buf, 'jpeg')
+            image_encoder_jpeg(img, buf)
         elif p_format == IMAGE_FORMAT.PNG:
-            img.save(buf, 'png', compress_level=3)
+            image_encoder_png(img, buf)
+        else:
+            raise ValueError
 
         buf.seek(0)
 

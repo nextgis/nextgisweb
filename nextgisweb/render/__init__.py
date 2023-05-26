@@ -23,10 +23,10 @@ from .interface import (
 )
 from .legend import ILegendSymbols, LegendSymbol
 from .model import Base, ResourceTileCache as RTC, TIMESTAMP_EPOCH
-from .event import (
-    on_style_change,
-    on_data_change,
-)
+from .event import on_style_change, on_data_change
+from .imgcodec import image_encoder_factory
+from .imgcodec import FORMAT_PNG, FORMAT_JPEG
+from .imgcodec import COMPRESSION_DEFAULT, COMPRESSION_FAST, COMPRESSION_BEST
 from .util import _
 
 
@@ -39,6 +39,12 @@ __all__ = [
     'ILegendSymbols',
     'on_style_change',
     'on_data_change',
+    'FORMAT_PNG',
+    'FORMAT_JPEG',
+    'COMPRESSION_DEFAULT',
+    'COMPRESSION_FAST',
+    'COMPRESSION_BEST',
+    'image_encoder_factory',
 ]
 
 vacuum_freepage_coeff = 0.5
