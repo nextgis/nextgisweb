@@ -494,7 +494,7 @@ class CoreComponent(
         Option('storage.limit', SizeInBytes, default=None, doc=(
             "Storage limit.")),
 
-        # Healthckeck
+        # Healthcheck
         Option('healthcheck.free_space', float, default=10, doc=(
             "Free space check during healthcheck in percent (0 for don't check).")),
         Option('healthcheck.free_inodes', float, default=10, doc=(
