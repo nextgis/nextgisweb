@@ -4,13 +4,11 @@ import pytest
 
 
 def _env_initialize():
-    from .env import env, Env, setenv
+    from .env import env, Env
     result = env()
     if result:
         return result
-    result = Env()
-    result.initialize()
-    setenv(result)
+    result = Env(initialize=True, set_global=True)
     return result
 
 

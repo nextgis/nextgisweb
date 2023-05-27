@@ -26,7 +26,7 @@ from poeditor import POEditorAPI
 from ..lib.config import load_config
 from ..lib.logging import logger
 from ..env.package import pkginfo
-from ..env import Env, setenv, env
+from ..env import Env, env
 
 from .util import to_gettext_locale, to_http_locale
 
@@ -632,7 +632,8 @@ def main(argv=sys.argv):
 
     args = parser.parse_args(argv[1:])
 
-    env = Env(cfg=load_config(args.config, None), enable_disabled=True)
-    setenv(env)
+    env = Env(
+        cfg=load_config(args.config, None),
+        enable_disabled=True, set_global=True)
 
     args.func(args)

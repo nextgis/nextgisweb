@@ -5,7 +5,7 @@ import transaction
 from ..lib.clann import command, group
 from ..lib.clann import arg, opt
 from ..lib.config import load_config
-from . import Env, setenv, env
+from . import Env, env
 
 
 class EnvOptions:
@@ -27,8 +27,9 @@ class bootstrap(EnvOptions):
         pass
 
     def __call__(self):
-        env = Env(cfg=load_config(self.config, None, hupper=True))
-        setenv(env)
+        env = Env(
+            cfg=load_config(self.config, None, hupper=True),
+            set_global=True)
 
     def __exit__(self, type, value, traceback):
         pass

@@ -7,7 +7,7 @@ import psutil
 from . import imptool
 from .lib.config import load_config
 from .lib.logging import logger
-from .env import Env, setenv
+from .env import Env
 
 
 def pkginfo():
@@ -59,28 +59,7 @@ def pkginfo():
 def main(global_config=None, **settings):
     """ This function returns a Pyramid WSGI application. """
 
-    env = Env(cfg=load_config(None, None))
-
-    if 'NEXTGISWEB_LOGGING' in os.environ:
-        logger.error(
-            "Environment variable NEXTGISWEB_LOGGING was ignored! Use "
-            "environment logging.* and logger.* options instead.")
-
-    if 'logging' in settings:
-        logger.error("Parameter 'logging' was ignored! Use NEXTGISWEB_LOGGING variable instead.")
-
-    if 'config' in settings:
-        logger.error("Parameter 'config' was ignored! Use NEXTGISWEB_CONFIG variable instead.")
-
-    kset = set(settings.keys())
-    kset = kset.difference(set(('logging', 'config')))
-    if len(kset) > 0:
-        logger.warn("Ignored paster's parameters: %s", ', '.join(kset))
-
-    env.initialize()
-
-    setenv(env)
-
+    env = Env(cfg=load_config(None, None), initialize=True, set_global=True)
     config = env.pyramid.make_app({})
     app = config.make_wsgi_app()
     _log_startup_time()

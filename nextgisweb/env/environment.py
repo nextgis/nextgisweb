@@ -17,7 +17,13 @@ _OPTIONS_LOGGING_LEVELS = ('critical', 'error', 'warning', 'info', 'debug')
 
 class Env:
 
-    def __init__(self, cfg=None, setup_logging=True, enable_disabled=False):
+    def __init__(
+        self, cfg=None, *,
+        setup_logging=True,
+        enable_disabled=False,
+        initialize=False,
+        set_global=False,
+    ):
         if cfg is None:
             cfg = load_config(None, None)
 
@@ -83,6 +89,12 @@ class Env:
                 "Attribute name %s already used" % identity
 
             setattr(self, identity, instance)
+        
+        if initialize:
+            self.initialize()
+        
+        if set_global:
+            setenv(self)
 
     def chain(self, meth, first='core'):
         """ Building a sequence of method calls with dependencies.
