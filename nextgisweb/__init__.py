@@ -1,4 +1,8 @@
 import os
+import time
+import logging
+
+import psutil
 
 from . import imptool
 from .lib.config import load_config
@@ -78,7 +82,16 @@ def main(global_config=None, **settings):
     setenv(env)
 
     config = env.pyramid.make_app({})
-    return config.make_wsgi_app()
+    app = config.make_wsgi_app()
+    _log_startup_time()
+    return app
+
+
+def _log_startup_time(level=logging.INFO):
+    if logger.isEnabledFor(level):
+        psinfo = psutil.Process(os.getpid())
+        startup_time = int(1000 * (time.time() - psinfo.create_time()))
+        logger.log(level, "WSGI startup took %d msec", startup_time)
 
 
 def amd_packages():
