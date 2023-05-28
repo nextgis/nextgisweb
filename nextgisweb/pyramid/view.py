@@ -373,8 +373,10 @@ def setup_pyramid(comp, config):
         rproc = Process(os.getpid())
 
         # When running under control of uWSGI master process use master's startup time
-        if rproc.name() == 'uwsgi' and rproc.parent().name() == 'uwsgi':
-            rproc = rproc.parent()
+        if rproc.name() == 'uwsgi':
+            rproc_parent = rproc.parent()
+            if rproc_parent and rproc_parent.name() == 'uwsgi':
+                rproc = rproc_parent
             logger.debug("Found uWSGI master process PID=%d", rproc.pid)
 
         # Use 4-byte hex representation of 1/5 second intervals
