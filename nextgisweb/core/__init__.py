@@ -294,12 +294,17 @@ class CoreComponent(
 
         result.append(("Python", '.'.join(map(str, sys.version_info[0:3]))))
 
-        postgres_info = DBSession.scalar('SHOW server_version')
-        postgres_info = re.sub(r'\s\(.*\)$', '', postgres_info)
-        postgres_info += " ({}, {})".format(*DBSession.execute(text("""
+        postgres_version = DBSession.scalar('SHOW server_version')
+        postgres_version = re.sub(r'\s\(.*\)$', '', postgres_version)
+        postgres_extra = list(DBSession.execute(text('''
             SELECT datcollate, datctype FROM pg_database
-            WHERE datname = current_database()""")).first())
-        result.append(("PostgreSQL", postgres_info))
+            WHERE datname = current_database()''')).first())
+        if DBSession.scalar('''
+            SELECT EXISTS(SELECT * FROM pg_proc WHERE proname = 'pgpro_edition')
+        '''):
+            postgrespro_edition = DBSession.scalar('SELECT pgpro_edition()')
+            postgres_extra.append(f"Postgres Pro {postgrespro_edition.capitalize()}")
+        result.append(("PostgreSQL", f"{postgres_version} ({', '.join(postgres_extra)})"))
 
         postgis_version = DBSession.scalar('SELECT PostGIS_Lib_Version()')
         result.append(("PostGIS", postgis_version))
