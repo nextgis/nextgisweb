@@ -8,6 +8,7 @@ from pathlib import Path
 from pkg_resources import resource_filename
 from calendar import timegm
 from mimetypes import guess_type
+from typing import TypeVar
 
 from pyramid.response import FileResponse
 from pyramid.httpexceptions import HTTPNotFound
@@ -19,20 +20,15 @@ COMP_ID = 'pyramid'
 _ = trstr_factory(COMP_ID)
 
 
-def viewargs(**kw):
+JSONType = TypeVar('JSONType')
 
-    def wrap(f):
 
-        def wrapped(*args):
-            if len(args) == 2 and f.__code__.co_argcount == 1:
-                context, request = args
-                return f(request)
-            return f(*args)
+def viewargs(*, renderer=None):
 
-        wrapped.__name__ = 'args(%s)' % f.__name__
-        wrapped.__viewargs__ = kw
-
-        return wrapped
+    def wrap(func):
+        if renderer is not None:
+            func.__pyramid_renderer__ = renderer
+        return func
 
     return wrap
 

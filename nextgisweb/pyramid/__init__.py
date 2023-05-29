@@ -20,9 +20,10 @@ from .util import (
     StaticFileResponse)
 from .model import Base, Session, SessionStore
 from .session import WebSession
-from .util import _, gensecret
+from .util import _, gensecret, JSONType
 
 __all__ = [
+    'JSONType',
     'StaticFileResponse',
     'viewargs',
     'WebSession',

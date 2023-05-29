@@ -1,4 +1,9 @@
+from inspect import signature
+from warnings import warn
+
 from pyramid.config import Configurator as PyramidConfigurator
+
+from .util import JSONType, find_template
 
 
 class RouteHelper:
@@ -11,7 +16,7 @@ class RouteHelper:
         if 'route_name' not in kwargs:
             kwargs['route_name'] = self.name
 
-        self.config.add_view(view=view, **kwargs)
+        self.config.add_view(view=view, stacklevel=1, **kwargs)
         return self
 
 
@@ -41,9 +46,35 @@ class Configurator(PyramidConfigurator):
 
         return RouteHelper(name, self)
 
-    def add_view(self, view=None, **kwargs):
-        vargs = getattr(view, '__viewargs__', None)
-        if vargs:
-            kwargs = dict(vargs, **kwargs)
+    def add_view(self, view=None, stacklevel=0, **kwargs):
+        if view and kwargs.get('renderer') and view.__name__ != '<lambda>':
+            warn(
+                "Since nextgisweb 4.4.0.dev7 use @viewargs(renderer=val) "
+                "or JSONType return type annotation instead of "
+                "Configurator.add_view(..., renderer=val) agrument.",
+                stacklevel=2 + stacklevel)
+
+        if view is not None:
+            # Extract attrs missing in kwargs from view.__pyramid_{attr}__
+            attrs = {'renderer', }.difference(set(kwargs.keys()))
+
+            fn = view
+            while fn and len(attrs) > 0:
+                for attr in set(attrs):
+                    if (v := getattr(fn, f'__pyramid_{attr}__', None)) is not None:
+                        kwargs[attr] = v
+                        attrs.remove(attr)
+                fn = getattr(fn, '__wrapped__', None)
+
+            if kwargs.get('renderer') is None:
+                if signature(view).return_annotation is JSONType:
+                    kwargs['renderer'] = 'json'
+
+        if renderer := kwargs.get('renderer'):
+            if renderer == 'mako':
+                renderer = view.__name__ + '.mako'
+            if renderer.endswith('.mako') and (':' not in renderer):
+                renderer = find_template(renderer, view)
+            kwargs['renderer'] = renderer
 
         super().add_view(view=view, **kwargs)
