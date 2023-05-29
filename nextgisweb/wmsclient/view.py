@@ -23,17 +23,15 @@ class LayerVendorParamsWidget(Widget):
 
 def setup_pyramid(comp, conf):
     Resource.__psection__.register(
-        key='wmsclient_connection', priority=50,
-        title=_("WMS capabilities"),
-        is_applicable=lambda obj: (
+        key='wmsclient_connection', title=_("WMS capabilities"),
+        priority=50, is_applicable=lambda obj: (
             obj.cls == 'wmsclient_connection'
             and obj.capcache()),
-        template='nextgisweb:wmsclient/template/section_connection.mako')
+        template='section_connection.mako')
 
     Resource.__psection__.register(
-        key='wmsclient_layer_vendor_param', priority=50,
-        title=_("WMS vendor parameters"),
-        is_applicable=lambda obj: (
+        key='wmsclient_layer_vendor_param', title=_("WMS vendor parameters"),
+        priority=50, is_applicable=lambda obj: (
             obj.cls == 'wmsclient_layer'
             and len(obj.vendor_params) > 0),
-        template='nextgisweb:wmsclient/template/section_vendor_params.mako')
+        template='section_vendor_params.mako')

@@ -10,8 +10,6 @@ class Widget(Widget):
 
 def setup_pyramid(comp, config):
     Resource.__psection__.register(
-        key='resmeta',
-        priority=40,
-        title=_("Metadata"),
+        key='resmeta', title=_("Metadata"), priority=40,
         is_applicable=lambda obj: len(obj.resmeta) > 0,
-        template='nextgisweb:resmeta/template/section.mako')
+        template='section.mako')

@@ -237,12 +237,11 @@ def setup_pyramid(comp, config):
 
     if MVT_DRIVER_EXIST:
         Resource.__psection__.register(
-            key='description',
-            title=_("External access"),
-            template='nextgisweb:feature_layer/template/section_api_layer.mako',
+            key='description', title=_("External access"),
+            template='section_api_layer.mako',
             is_applicable=lambda obj: IFeatureLayer.providedBy(obj))
 
     Resource.__psection__.register(
         key='fields', title=_("Attributes"),
-        template="nextgisweb:feature_layer/template/section_fields.mako",
+        template="section_fields.mako",
         is_applicable=lambda obj: IFeatureLayer.providedBy(obj))

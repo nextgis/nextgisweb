@@ -292,7 +292,6 @@ def setup_pyramid(comp, config):
             args.request.route_url('webmap.control_panel.settings'))))
 
     Resource.__psection__.register(
-        key='description',
-        title=_("External access"),
-        template='nextgisweb:webmap/template/section_api_webmap.mako',
-        is_applicable=lambda obj: obj.cls == 'webmap' and webmap_items_to_tms_ids_list(obj))
+        key='description', title=_("External access"),
+        is_applicable=lambda obj: obj.cls == 'webmap' and webmap_items_to_tms_ids_list(obj),
+        template='section_api_webmap.mako')

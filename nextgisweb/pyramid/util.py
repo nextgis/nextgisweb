@@ -3,6 +3,9 @@ import os.path
 import re
 import secrets
 import string
+from sys import _getframe
+from pathlib import Path
+from pkg_resources import resource_filename
 from calendar import timegm
 from mimetypes import guess_type
 
@@ -10,6 +13,7 @@ from pyramid.response import FileResponse
 from pyramid.httpexceptions import HTTPNotFound
 
 from ..lib.i18n import trstr_factory
+from ..lib.logging import logger
 
 COMP_ID = 'pyramid'
 _ = trstr_factory(COMP_ID)
@@ -94,6 +98,38 @@ class StaticFileResponse(FileResponse):
             self.headers['Content-Encoding'] = found_encoding
 
         self.headers['Vary'] = 'Accept-Encoding'
+
+
+def find_template(name, func=None, stack_level=1):
+    if func is not None:
+        def _traverse():
+            f = func
+            while f is not None:
+                yield f.__module__
+                f = getattr(f, '__wrapped__', None)
+        modules = _traverse()
+    else:
+        fr = _getframe(stack_level)
+        modules = [fr.f_globals['__name__'], ]
+
+    probes = list()
+    for mod in modules:
+        mp = mod.split('.')
+        if len(mp) == 3 and (
+            mp[0] == 'nextgisweb'
+            or mp[0].startswith('nextgisweb_')
+        ):
+            rn = (mp[0], mp[1] + '/template/' + name)
+            fn = Path(resource_filename(*rn))
+            if fn.exists():
+                logger.debug(
+                    "Template '%s' at '%s' is '%s:%s'",
+                    name, mod, *rn)
+                return str(fn)
+            else:
+                probes.append(':'.join(rn))
+    
+    raise ValueError(f"Template '{name}' not found in {probes}")
 
 
 def gensecret(length):

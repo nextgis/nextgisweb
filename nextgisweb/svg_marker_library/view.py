@@ -28,4 +28,4 @@ def setup_pyramid(comp, config):
     Resource.__psection__.register(
         key='svg_marker_library', priority=20, title=_("SVG marker library"),
         is_applicable=lambda obj: isinstance(obj, SVGMarkerLibrary),
-        template='nextgisweb:svg_marker_library/template/section.mako')
+        template='section.mako')

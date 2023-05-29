@@ -260,24 +260,22 @@ def setup_pyramid(comp, config):
 
     Resource.__psection__.register(
         key='summary', priority=10,
-        template='nextgisweb:resource/template/section_summary.mako')
+        template='section_summary.mako')
 
     Resource.__psection__.register(
         key='children', priority=40,
         is_applicable=lambda obj: len(obj.children) > 0,
-        template='nextgisweb:resource/template/section_children.mako')
+        template='section_children.mako')
 
     Resource.__psection__.register(
-        key='description',
-        priority=20,
+        key='description', priority=20,
         is_applicable=lambda obj: obj.description is not None,
-        template='nextgisweb:resource/template/section_description.mako')
+        template='section_description.mako')
 
     Resource.__psection__.register(
-        key='permission',
-        priority=100,
+        key='permission', priority=100,
         title=_("User permissions"),
-        template='nextgisweb:resource/template/section_permission.mako')
+        template='section_permission.mako')
 
     # Actions
 
