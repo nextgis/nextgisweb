@@ -9,7 +9,7 @@ from ..raster_layer import RasterLayer
 from .util import _
 
 
-@viewargs(renderer="nextgisweb:layer_preview/template/preview.mako")
+@viewargs(renderer="preview.mako")
 def preview_map(resource, request):
     request.resource_permission(DataScope.read)
 

@@ -8,6 +8,8 @@ from pyramid.response import Response
 from pyramid.events import NewRequest
 
 from ..lib.config import Option, OptionType, OptionAnnotations
+from .util import viewargs
+
 
 FAMILIES = dict()
 FOPTIONS = []
@@ -110,6 +112,7 @@ def subscriber(event):
                     next=request.path_qs, hash=hash)))
 
 
+@viewargs(renderer='uacompat.mako')
 def page(request):
     arg_next = request.GET.get('next', request.application_url)
     arg_hash = request.GET.get('hash', None)
@@ -158,6 +161,4 @@ def page(request):
 
 def setup_pyramid(comp, config):
     config.add_subscriber(subscriber, NewRequest)
-
-    config.add_route('pyramid.uacompat', '/uacompat') \
-        .add_view(page, renderer='nextgisweb:pyramid/template/uacompat.mako')
+    config.add_route('pyramid.uacompat', '/uacompat').add_view(page)

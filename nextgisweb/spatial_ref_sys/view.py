@@ -2,7 +2,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..lib import dynmenu as dm
-from ..gui import REACT_RENDERER
+from ..pyramid import viewargs
 
 from .model import SRS
 from .util import _
@@ -16,6 +16,7 @@ def check_permission(request):
     request.require_administrator()
 
 
+@viewargs(renderer='react')
 def catalog_browse(request):
     check_permission(request)
 
@@ -25,6 +26,7 @@ def catalog_browse(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='react')
 def catalog_import(request):
     check_permission(request)
     catalog_id = int(request.matchdict['id'])
@@ -37,6 +39,7 @@ def catalog_import(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='react')
 def srs_browse(request):
     request.require_administrator()
 
@@ -46,6 +49,7 @@ def srs_browse(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='react')
 def srs_create_or_edit(request):
     request.require_administrator()
 
@@ -68,12 +72,9 @@ def srs_create_or_edit(request):
 
 def setup_pyramid(comp, config):
 
-    config.add_route('srs.browse', '/srs/', client=True) \
-        .add_view(srs_browse, renderer=REACT_RENDERER)
-    config.add_route('srs.create', '/srs/create', client=True) \
-        .add_view(srs_create_or_edit, renderer=REACT_RENDERER)
-    config.add_route('srs.edit', '/srs/{id:\\d+}', client=True) \
-        .add_view(srs_create_or_edit, renderer=REACT_RENDERER)
+    config.add_route('srs.browse', '/srs/', client=True).add_view(srs_browse)
+    config.add_route('srs.create', '/srs/create', client=True).add_view(srs_create_or_edit)
+    config.add_route('srs.edit', '/srs/{id:\\d+}', client=True).add_view(srs_create_or_edit)
 
     class SRSMenu(dm.DynItem):
 
@@ -122,9 +123,9 @@ def setup_pyramid(comp, config):
         config.add_route(
             'srs.catalog',
             '/srs/catalog', client=True
-        ).add_view(catalog_browse, renderer=REACT_RENDERER)
+        ).add_view(catalog_browse)
 
         config.add_route(
             'srs.catalog.import',
-            r'/srs/catalog/{id:\d+}', client=('id',)
-        ).add_view(catalog_import, renderer=REACT_RENDERER)
+            r'/srs/catalog/{id:\d+}', client=('id', )
+        ).add_view(catalog_import)

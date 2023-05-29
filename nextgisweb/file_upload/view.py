@@ -1,7 +1,8 @@
-from ..gui import REACT_RENDERER
+from ..pyramid import viewargs
 from .util import _
 
 
+@viewargs(renderer='react')
 def test(request):
     return dict(
         title=_("File Upload testing page"),
@@ -13,4 +14,4 @@ def setup_pyramid(comp, config):
     config.add_route(
         'file_upload.test',
         '/test/file_upload'
-    ).add_view(test, renderer=REACT_RENDERER)
+    ).add_view(test)

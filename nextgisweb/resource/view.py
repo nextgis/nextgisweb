@@ -12,7 +12,6 @@ from ..pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
 from ..pyramid.psection import PageSections
 from ..env.model import DBSession
 
-from ..gui import REACT_RENDERER
 from ..core.exception import InsufficientPermissions
 
 from .exception import ResourceNotFound
@@ -75,6 +74,7 @@ def show(request):
     return dict(obj=request.context, sections=request.context.__psection__)
 
 
+@viewargs(renderer='react')
 def json_view(request):
     request.resource_permission(PERM_READ)
     return dict(
@@ -117,7 +117,7 @@ class OnResourceCreateView:
     parent: Resource
 
 
-@viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
+@viewargs(renderer='composite_widget.mako')
 def create(request):
     request.resource_permission(PERM_MCHILDREN)
     cls = request.GET.get('cls')
@@ -126,13 +126,14 @@ def create(request):
                 query=dict(operation='create', cls=cls, parent=request.context.id))
 
 
-@viewargs(renderer='nextgisweb:resource/template/composite_widget.mako')
+@viewargs(renderer='composite_widget.mako')
 def update(request):
     request.resource_permission(PERM_UPDATE)
     return dict(obj=request.context, title=_("Update resource"), maxheight=True,
                 query=dict(operation='update', id=request.context.id))
 
 
+@viewargs(renderer='react')
 def delete(request):
     request.resource_permission(PERM_READ)
     return dict(
@@ -185,6 +186,7 @@ def widget(request):
         owner_user=owner_user.id)
 
 
+@viewargs(renderer='react')
 def resource_export(request):
     request.require_administrator()
     return dict(
@@ -240,19 +242,16 @@ def setup_pyramid(comp, config):
     _resource_route('show', r'{id:\d+}', client=('id', )).add_view(show)
 
     _resource_route('json', r'{id:\d+}/json', client=('id', )) \
-        .add_view(json_view, renderer=REACT_RENDERER)
+        .add_view(json_view)
 
     _resource_route('export.page', r'{id:\d+}/export', request_method='GET', client=True)
 
     _route('widget', 'widget', client=()).add_view(widget)
 
     # CRUD
-    _resource_route('create', r'{id:\d+}/create', client=('id', )) \
-        .add_view(create)
-    _resource_route('update', r'{id:\d+}/update', client=('id', )) \
-        .add_view(update)
-    _resource_route('delete', r'{id:\d+}/delete', client=('id', )) \
-        .add_view(delete, renderer=REACT_RENDERER)
+    _resource_route('create', r'{id:\d+}/create', client=('id', )).add_view(create)
+    _resource_route('update', r'{id:\d+}/update', client=('id', )).add_view(update)
+    _resource_route('delete', r'{id:\d+}/delete', client=('id', )).add_view(delete)
 
     # Sections
 
@@ -350,4 +349,4 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.control_panel.resource_export',
         '/control-panel/resource-export'
-    ).add_view(resource_export, renderer=REACT_RENDERER)
+    ).add_view(resource_export)

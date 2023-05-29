@@ -9,7 +9,7 @@ from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .util import webmap_items_to_tms_ids_list, _
 from ..lib.dynmenu import DynItem, Label, Link
 from ..resource import Resource, Widget, resource_factory, DataScope, ResourceScope
-from ..gui import REACT_RENDERER
+from ..pyramid import viewargs
 
 
 class ExtentWidget(Widget):
@@ -30,6 +30,7 @@ class SettingsWidget(Widget):
     amdmod = 'ngw-webmap/resource/OtherSettings/OtherSettings'
 
 
+@viewargs(renderer='react')
 def settings(request):
     request.require_administrator()
     return dict(
@@ -71,6 +72,7 @@ def check_origin(request):
     return True
 
 
+@viewargs(renderer='mako')
 def display(obj, request):
     is_valid_or_error = check_origin(request)
     if is_valid_or_error is not True:
@@ -216,6 +218,12 @@ def display(obj, request):
     )
 
 
+@viewargs(renderer='mako')
+def display_tiny(obj, request):
+    return display(obj, request)
+
+
+@viewargs(renderer='react')
 def clone(request):
     request.resource_permission(ResourceScope.read)
     return dict(
@@ -225,6 +233,7 @@ def clone(request):
         title=_("Clone web map"))
 
 
+@viewargs(renderer='mako')
 def preview_embedded(request):
     iframe = request.POST['iframe']
     request.response.headerlist.append(("X-XSS-Protection", "0"))
@@ -238,22 +247,22 @@ def preview_embedded(request):
 def setup_pyramid(comp, config):
     config.add_route(
         'webmap.display', r'/resource/{id:\d+}/display',
-        factory=resource_factory, client=('id',)
-    ).add_view(display, context=WebMap, renderer='nextgisweb:webmap/template/display.mako')
+        factory=resource_factory, client=('id', )
+    ).add_view(display, context=WebMap)
 
     config.add_route(
         'webmap.display.tiny', r'/resource/{id:\d+}/display/tiny',
-        factory=resource_factory, client=('id',)
-    ).add_view(display, context=WebMap, renderer='nextgisweb:webmap/template/display_tiny.mako')
+        factory=resource_factory, client=('id', )
+    ).add_view(display_tiny, context=WebMap)
 
     config.add_route(
         'webmap.preview_embedded', '/webmap/embedded-preview'
-    ).add_view(preview_embedded, renderer='nextgisweb:webmap/template/preview_embedded.mako')
+    ).add_view(preview_embedded)
 
     config.add_route(
         'webmap.clone', r'/resource/{id:\d+}/clone',
         factory=resource_factory, client=('id',)
-    ).add_view(clone, context=WebMap, renderer=REACT_RENDERER)
+    ).add_view(clone, context=WebMap)
 
     class DisplayMenu(DynItem):
         def build(self, args):
@@ -285,7 +294,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'webmap.control_panel.settings',
         '/control-panel/webmap-settings'
-    ).add_view(settings, renderer=REACT_RENDERER)
+    ).add_view(settings)
 
     comp.env.pyramid.control_panel.add(
         Link('settings.webmap', _("Web map"), lambda args: (

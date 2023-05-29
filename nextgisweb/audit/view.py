@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 from pyramid.httpexceptions import HTTPNotFound
 
 from ..lib import dynmenu as dm
+from ..pyramid import viewargs
+
 from .api import audit_cget
 from .util import _, es_index, audit_context
 
@@ -11,6 +13,7 @@ PAGE_SIZE = 20
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 
+@viewargs(renderer='browse.mako')
 def journal_browse(request):
     request.require_administrator()
 
@@ -57,6 +60,7 @@ def journal_browse(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='show.mako')
 def journal_show(request):
     request.require_administrator()
     rid = request.matchdict['id']
@@ -95,12 +99,12 @@ def setup_pyramid(comp, config):
             config.add_route(
                 'audit.control_panel.journal.browse',
                 '/control-panel/journal/'
-            ).add_view(journal_browse, renderer='nextgisweb:audit/template/browse.mako')
+            ).add_view(journal_browse)
 
             config.add_route(
                 'audit.control_panel.journal.show',
                 '/control-panel/journal/{id}'
-            ).add_view(journal_show, renderer='nextgisweb:audit/template/show.mako')
+            ).add_view(journal_show)
 
             comp.env.pyramid.control_panel.add(
                 dm.Label('audit', _("Audit")),

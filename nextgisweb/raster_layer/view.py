@@ -1,8 +1,8 @@
 from pyramid.httpexceptions import HTTPNotFound
 
 from ..lib import dynmenu as dm
-from ..gui import REACT_RENDERER
 from ..resource import Widget, Resource
+from ..pyramid import viewargs
 
 from .model import RasterLayer
 from .util import _
@@ -14,6 +14,7 @@ class RasterLayerWidget(Widget):
     amdmod = 'ngw-raster-layer/Widget'
 
 
+@viewargs(renderer='react')
 def export(request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
@@ -31,7 +32,6 @@ def setup_pyramid(comp, config):
         export,
         route_name='resource.export.page',
         context=RasterLayer,
-        renderer=REACT_RENDERER,
     )
 
     # Layer menu extension

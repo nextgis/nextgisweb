@@ -2,7 +2,6 @@ from collections import OrderedDict
 
 from pyramid.httpexceptions import HTTPNotFound
 
-from ..gui import REACT_RENDERER
 from ..resource import (
     Resource,
     ResourceScope,
@@ -34,6 +33,7 @@ PDS_W = DataStructureScope.write
 PR_R = ResourceScope.read
 
 
+@viewargs(renderer='react')
 def feature_browse(request):
     request.resource_permission(PD_READ)
     request.resource_permission(PDS_R)
@@ -50,7 +50,7 @@ def feature_browse(request):
     )
 
 
-@viewargs(renderer='nextgisweb:feature_layer/template/feature_show.mako')
+@viewargs(renderer='mako')
 def feature_show(request):
     request.resource_permission(PD_READ)
     request.resource_permission(PDS_R)
@@ -69,7 +69,7 @@ def feature_show(request):
         ext_mid=ext_mid)
 
 
-@viewargs(renderer='nextgisweb:feature_layer/template/widget.mako')
+@viewargs(renderer='widget.mako')
 def feature_update(request):
     request.resource_permission(PD_WRITE)
 
@@ -128,11 +128,12 @@ def store_item(layer, request):
     return result
 
 
-@viewargs(renderer='nextgisweb:feature_layer/template/test_mvt.mako')
+@viewargs(renderer='mako')
 def test_mvt(request):
     return dict()
 
 
+@viewargs(renderer='react')
 def export(request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
@@ -145,6 +146,7 @@ def export(request):
     )
 
 
+@viewargs(renderer='react')
 def export_multiple(request):
     return dict(
         obj=request.context,
@@ -161,14 +163,14 @@ def setup_pyramid(comp, config):
         'feature_layer.export_multiple',
         r'/resource/export_multiple',
         client=True
-    ).add_view(export_multiple, renderer=REACT_RENDERER)
+    ).add_view(export_multiple)
 
     config.add_route(
         'feature_layer.feature.browse',
         r'/resource/{id:\d+}/feature/',
         factory=resource_factory,
         client=('id', )
-    ).add_view(feature_browse, renderer=REACT_RENDERER)
+    ).add_view(feature_browse)
 
     config.add_route(
         'feature_layer.feature.show',
@@ -201,7 +203,6 @@ def setup_pyramid(comp, config):
         export,
         route_name='resource.export.page',
         context=IFeatureLayer,
-        renderer=REACT_RENDERER,
     )
 
     config.add_route(

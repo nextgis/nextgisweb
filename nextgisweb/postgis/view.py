@@ -1,6 +1,6 @@
-from ..gui import REACT_RENDERER
 from ..lib.dynmenu import DynItem, Link
 from ..resource import ConnectionScope, DataScope, Widget, resource_factory, Resource
+from ..pyramid import viewargs
 
 from .model import PostgisConnection, PostgisLayer
 from .util import _
@@ -24,8 +24,8 @@ def setup_pyramid(comp, config):
         r"/resource/{id:\d+}/postgis-diagnostics",
         factory=resource_factory
     ) \
-        .add_view(diagnostics_page, context=PostgisConnection, renderer=REACT_RENDERER) \
-        .add_view(diagnostics_page, context=PostgisLayer, renderer=REACT_RENDERER)
+        .add_view(diagnostics_page, context=PostgisConnection) \
+        .add_view(diagnostics_page, context=PostgisLayer)
 
     class PostgisMenu(DynItem):
         def build(self, args):
@@ -39,6 +39,7 @@ def setup_pyramid(comp, config):
     Resource.__dynmenu__.add(PostgisMenu())
 
 
+@viewargs(renderer='react')
 def diagnostics_page(context, request):
     if isinstance(context, PostgisConnection):
         request.resource_permission(ConnectionScope.connect)

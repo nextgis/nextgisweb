@@ -13,9 +13,8 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 from sqlalchemy.orm.exc import NoResultFound
 from pyramid.interfaces import ISecurityPolicy
 
-from ..gui import REACT_RENDERER
 from ..env.model import DBSession
-from ..pyramid import SessionStore, WebSession
+from ..pyramid import SessionStore, WebSession, viewargs
 from ..lib import dynmenu as dm
 
 from .model import Principal, User, Group
@@ -26,6 +25,7 @@ from .policy import AuthProvider, AuthState, OnUserLogin
 from .util import _
 
 
+@viewargs(renderer='mako')
 def login(request):
     next_url = request.params.get('next', request.application_url)
 
@@ -50,6 +50,7 @@ def login(request):
         title=_('Sign in to Web GIS'))
 
 
+@viewargs(renderer='mako')
 def session_invite(request):
     next_url = request.params.get('next', request.application_url)
 
@@ -270,6 +271,7 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
             return response
 
 
+@viewargs(renderer='react')
 def settings(request):
     if request.user.keyname == 'guest':
         return HTTPUnauthorized()
@@ -279,6 +281,7 @@ def settings(request):
         entrypoint='@nextgisweb/auth/settings-form')
 
 
+@viewargs(renderer='react')
 def user_browse(request):
     request.require_administrator()
     return dict(
@@ -287,6 +290,7 @@ def user_browse(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='react')
 def user_create_or_edit(request):
     request.require_administrator()
 
@@ -307,6 +311,7 @@ def user_create_or_edit(request):
     return result
 
 
+@viewargs(renderer='react')
 def group_browse(request):
     request.require_administrator()
     return dict(
@@ -315,6 +320,7 @@ def group_browse(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='react')
 def group_create_or_edit(request):
     request.require_administrator()
 
@@ -339,13 +345,12 @@ def setup_pyramid(comp, config):
     # Add it before default pyramid handlers
     comp.env.pyramid.error_handlers.insert(0, forbidden_error_handler)
 
-    config.add_route('auth.login', '/login') \
-        .add_view(login, renderer='nextgisweb:auth/template/login.mako')
+    config.add_route('auth.login', '/login').add_view(login)
 
     config.add_route(
         'auth.session_invite',
         '/session-invite'
-    ).add_view(session_invite, renderer='nextgisweb:auth/template/session_invite.mako')
+    ).add_view(session_invite)
 
     config.add_route('auth.alink', '/alink/{token}').add_view(alink)
 
@@ -354,7 +359,7 @@ def setup_pyramid(comp, config):
     config.add_route('auth.oauth', '/oauth', client=True).add_view(oauth)
 
     config.add_route('auth.settings', '/settings', client=True) \
-        .add_view(settings, renderer=REACT_RENDERER)
+        .add_view(settings)
 
     config.add_request_method(_login_url, name='login_url')
 
@@ -374,21 +379,21 @@ def setup_pyramid(comp, config):
         return result
 
     config.add_route('auth.principal_dump', '/auth/principal/dump') \
-        .add_view(principal_dump, renderer='json')
+        .add_view(principal_dump)
 
     config.add_route('auth.user.browse', '/auth/user/', client=True) \
-        .add_view(user_browse, renderer=REACT_RENDERER)
+        .add_view(user_browse)
     config.add_route('auth.user.create', '/auth/user/create', client=True) \
-        .add_view(user_create_or_edit, renderer=REACT_RENDERER)
+        .add_view(user_create_or_edit)
     config.add_route('auth.user.edit', '/auth/user/{id:\\d+}', client=True) \
-        .add_view(user_create_or_edit, renderer=REACT_RENDERER)
+        .add_view(user_create_or_edit)
 
     config.add_route('auth.group.browse', '/auth/group/', client=True) \
-        .add_view(group_browse, renderer=REACT_RENDERER)
+        .add_view(group_browse)
     config.add_route('auth.group.create', '/auth/group/create', client=True) \
-        .add_view(group_create_or_edit, renderer=REACT_RENDERER)
+        .add_view(group_create_or_edit)
     config.add_route('auth.group.edit', '/auth/group/{id:\\d+}', client=True) \
-        .add_view(group_create_or_edit, renderer=REACT_RENDERER)
+        .add_view(group_create_or_edit)
 
     class AuthComponentMenu(dm.DynItem):
 

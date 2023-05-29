@@ -2,12 +2,13 @@ from pyramid.httpexceptions import HTTPNotFound
 
 from ..resource import resource_factory, DataScope, Resource
 from ..feature_layer import IFeatureLayer
-from ..gui import REACT_RENDERER
+from ..pyramid import viewargs
 from ..lib import dynmenu as dm
 
 from .util import _
 
 
+@viewargs(renderer='react')
 def attachment(request):
     request.resource_permission(DataScope.read)
 
@@ -28,7 +29,7 @@ def setup_pyramid(comp, config):
         'feature_attachment.page',
         r'/resource/{id:\d+}/attachments',
         factory=resource_factory,
-    ).add_view(attachment, context=IFeatureLayer, renderer=REACT_RENDERER)
+    ).add_view(attachment, context=IFeatureLayer)
 
     # Layer menu extension
     class LayerMenuExt(dm.DynItem):

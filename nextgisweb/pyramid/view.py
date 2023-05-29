@@ -15,7 +15,6 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from sqlalchemy import text
 from markupsafe import Markup
 
-from ..gui import REACT_RENDERER
 from ..lib.logging import logger
 from ..lib.json import dumps
 from ..env import env
@@ -26,7 +25,7 @@ from ..env.model import DBSession
 
 from . import exception, renderer
 from .session import WebSession
-from .util import _, ErrorRendererPredicate, StaticFileResponse, set_output_buffering
+from .util import _, ErrorRendererPredicate, StaticFileResponse, set_output_buffering, viewargs
 
 
 def asset(request):
@@ -93,6 +92,7 @@ def home(request):
         return HTTPFound(location=request.route_url('resource.show', id=0))
 
 
+@viewargs(renderer='mako')
 def control_panel(request):
     request.require_administrator()
 
@@ -116,6 +116,7 @@ def locale(request):
     return HTTPFound(location=request.GET.get('next', request.application_url))
 
 
+@viewargs(renderer='mako')
 def sysinfo(request):
     request.require_administrator()
     return dict(
@@ -128,6 +129,7 @@ def pkginfo(request):
         'pyramid.control_panel.sysinfo'))
 
 
+@viewargs(renderer='react')
 def storage(request):
     request.require_administrator()
     return dict(
@@ -136,6 +138,7 @@ def storage(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='backup.mako')
 def backup_browse(request):
     if not request.env.pyramid.options['backup.download']:
         raise HTTPNotFound()
@@ -154,6 +157,7 @@ def backup_download(request):
     return FileResponse(fn)
 
 
+@viewargs(renderer='react')
 def cors(request):
     request.require_administrator()
     return dict(
@@ -162,6 +166,7 @@ def cors(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='react')
 def custom_css(request):
     request.require_administrator()
     return dict(
@@ -170,6 +175,7 @@ def custom_css(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='react')
 def cp_logo(request):
     request.require_administrator()
     return dict(
@@ -178,6 +184,7 @@ def cp_logo(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='react')
 def system_name(request):
     request.require_administrator()
     return dict(
@@ -186,6 +193,7 @@ def system_name(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+@viewargs(renderer='react')
 def home_path(request):
     request.require_administrator()
     return dict(
@@ -261,6 +269,11 @@ def test_timeout(reqest):
     resp = Response(app_iter=generator(), content_type='text/plain')
     set_output_buffering(reqest, resp, buffering, strict=True)
     return resp
+
+
+@viewargs(renderer='example.mako')
+def test_example(request):
+    return dict()
 
 
 def setup_pyramid(comp, config):
@@ -425,18 +438,17 @@ def setup_pyramid(comp, config):
 
     config.add_route('home', '/').add_view(home)
 
-    def ctpl(n):
-        return 'nextgisweb:pyramid/template/%s.mako' % n
-
-    config.add_route('pyramid.control_panel', '/control-panel', client=()) \
-        .add_view(control_panel, renderer=ctpl('control_panel'))
+    config.add_route(
+        'pyramid.control_panel',
+        '/control-panel', client=(),
+    ).add_view(control_panel)
 
     config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
 
     config.add_route(
         'pyramid.control_panel.sysinfo',
         '/control-panel/sysinfo', client=(),
-    ).add_view(sysinfo, renderer=ctpl('sysinfo'))
+    ).add_view(sysinfo)
 
     config.add_route(
         'pyramid.control_panel.pkginfo',
@@ -447,12 +459,12 @@ def setup_pyramid(comp, config):
         config.add_route(
             'pyramid.control_panel.storage',
             '/control-panel/storage'
-        ).add_view(storage, renderer=REACT_RENDERER)
+        ).add_view(storage)
 
     config.add_route(
         'pyramid.control_panel.backup.browse',
         '/control-panel/backup/'
-    ).add_view(backup_browse, renderer=ctpl('backup'))
+    ).add_view(backup_browse)
 
     config.add_route(
         'pyramid.control_panel.backup.download',
@@ -462,29 +474,27 @@ def setup_pyramid(comp, config):
     config.add_route(
         'pyramid.control_panel.cors',
         '/control-panel/cors', client=(),
-    ).add_view(cors, renderer=REACT_RENDERER)
+    ).add_view(cors)
 
     config.add_route(
         'pyramid.control_panel.custom_css',
         '/control-panel/custom-css'
-    ).add_view(custom_css, renderer=REACT_RENDERER)
+    ).add_view(custom_css)
 
     config.add_route(
         'pyramid.control_panel.logo',
         '/control-panel/logo'
-    ).add_view(cp_logo, renderer=REACT_RENDERER)
+    ).add_view(cp_logo)
 
     config.add_route(
         'pyramid.control_panel.system_name',
         '/control-panel/system-name'
-    ).add_view(
-        system_name,
-        renderer=REACT_RENDERER)
+    ).add_view(system_name)
 
     config.add_route(
         'pyramid.control_panel.home_path',
         '/control-panel/home-path'
-    ).add_view(home_path, renderer=REACT_RENDERER)
+    ).add_view(home_path)
 
     config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
 
@@ -502,7 +512,7 @@ def setup_pyramid(comp, config):
         .add_view(test_timeout)
 
     config.add_route('pyramid.test_example', '/test/pyramid/example') \
-        .add_view(lambda request: {}, renderer="nextgisweb:pyramid/template/example.mako")
+        .add_view(test_example)
 
     comp.control_panel = dm.DynMenu(
         dm.Label('info', _("Info")),
