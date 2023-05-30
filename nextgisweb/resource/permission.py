@@ -3,8 +3,6 @@ from functools import reduce
 
 from bunch import Bunch
 
-__all__ = ['Permission', 'Scope']
-
 
 class RequirementList(UserList):
 

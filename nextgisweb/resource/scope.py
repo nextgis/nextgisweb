@@ -1,19 +1,6 @@
-""" Universal sets of permissions
-=================================
-
-"""
-
 from .permission import Scope, Permission
 from .util import _
 
-__all__ = [
-    'ResourceScope',
-    'MetadataScope',
-    'DataStructureScope',
-    'DataScope',
-    'ConnectionScope',
-    'ServiceScope',
-]
 
 P = Permission
 

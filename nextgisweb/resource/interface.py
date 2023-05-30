@@ -1,12 +1,6 @@
 import zope.interface
 from zope.interface import implements
 
-__all__ = [
-    'IResourceBase',
-    'implements',
-    'providedBy',
-]
-
 
 class IResourceBase(zope.interface.Interface):
     pass

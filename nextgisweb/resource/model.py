@@ -23,9 +23,6 @@ from .permission import RequirementList
 from .exception import HierarchyError, DisplayNameNotUnique
 
 
-__all__ = ['Resource', ]
-
-
 Base = declarative_base(dependencies=('auth', ))
 
 resource_registry = registry_maker()

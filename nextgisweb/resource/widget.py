@@ -2,9 +2,6 @@ from collections import OrderedDict
 
 from .model import Resource
 
-
-__all__ = ['Widget', ]
-
 _registry = []
 
 
