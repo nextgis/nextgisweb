@@ -1,5 +1,7 @@
 from ..env.cli import cli, EnvCommand
 
+from .component import FileUploadComponent
+
 
 @cli.group()
 class file_upload:
@@ -7,5 +9,5 @@ class file_upload:
 
 
 @file_upload.command()
-def cleanup(self: EnvCommand):
-    self.env.file_upload.cleanup()
+def cleanup(self: EnvCommand, *, file_upload: FileUploadComponent):
+    file_upload.cleanup()

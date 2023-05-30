@@ -2,6 +2,9 @@ from typing import Optional
 
 from ..lib.logging import logger
 from ..env.cli import cli, EnvCommand, opt
+from ..core import CoreComponent
+
+from .component import PyramidComponent
 
 
 @cli.command()
@@ -10,6 +13,7 @@ def server(
     host: str = opt('0.0.0.0'),
     port: int = opt(8080),
     reload: Optional[bool] = opt(flag=True),
+    *, core: CoreComponent, pyramid: PyramidComponent,
 ):
     """Launch development-mode web server
     
@@ -19,7 +23,7 @@ def server(
 
     from waitress import serve
 
-    reload = (self.env.core.debug if reload is None else reload)
+    reload = (core.debug if reload is None else reload)
     if reload:
         from hupper import start_reloader
         start_reloader(
@@ -29,7 +33,7 @@ def server(
 
     self.env.initialize()
 
-    config = self.env.pyramid.make_app({})
+    config = pyramid.make_app({})
     app = config.make_wsgi_app()
     logger.debug("WSGI application created")
 

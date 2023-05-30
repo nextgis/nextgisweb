@@ -7,8 +7,9 @@ from typing import List
 from ...lib.logging import logger
 from ...env.cli import cli, EnvCommand, opt, arg
 from ...env.model import DBSession
-from ..backup import pg_connection_options
 
+from ..backup import pg_connection_options
+from ..component import CoreComponent
 
 
 @cli.command()
@@ -19,7 +20,7 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 
     components = [
         (comp, comp.is_service_ready())
-        for comp in self.env.components.values()
+        for comp in self.env._components.values()
         if hasattr(comp, 'is_service_ready')]
 
     messages = dict()
@@ -91,7 +92,11 @@ def psql(
 
 
 @cli.command()
-def maintenance(self: EnvCommand, estimate_storage: bool = opt(False)):
+def maintenance(
+    self: EnvCommand,
+    estimate_storage: bool = opt(False),
+    *, core: CoreComponent,
+):
     """Perform housekeeping tasks
     
     :param estimate_storage: Execute storage estimation after maintenance"""
@@ -101,7 +106,7 @@ def maintenance(self: EnvCommand, estimate_storage: bool = opt(False)):
         comp.maintenance()
 
     if estimate_storage:
-        self.env.core.estimate_storage_all()
+        core.estimate_storage_all()
 
 
 @cli.command()

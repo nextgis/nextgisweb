@@ -3,9 +3,12 @@ from pathlib import Path
 from subprocess import check_call
 
 from ..lib.logging import logger
+from ..env import Env
 from ..env.cli import cli, EnvCommand
 from ..env.package import amd_packages, pkginfo
+from ..pyramid import PyramidComponent
 from ..pyramid.uacompat import FAMILIES
+from ..core import CoreComponent
 
 
 @cli.group()
@@ -14,13 +17,14 @@ class jsrealm:
 
 
 @jsrealm.command()
-def install(self: EnvCommand.customize(env_initialize=False)):
-    env = self.env
-
+def install(
+    self: EnvCommand.customize(env_initialize=False),
+    *, env: Env, core: CoreComponent, pyramid: PyramidComponent,
+):
     client_packages = list()
     icon_sources = list()
 
-    debug = env.core.options['debug']
+    debug = core.options['debug']
     cwd = Path().resolve()
 
     for cid, cpath in pkginfo._comp_path.items():
@@ -50,16 +54,16 @@ def install(self: EnvCommand.customize(env_initialize=False)):
         pname for pname, _ in amd_packages()])
     config['nextgisweb_jsrealm_icon_sources'] = json.dumps(icon_sources)
 
-    ca = env.pyramid.options['compression.algorithms']
+    ca = pyramid.options['compression.algorithms']
     config['nextgisweb_pyramid_compression_algorithms'] = \
         json.dumps(ca if ca else [])
 
     config['nextgisweb_core_locale_available'] = \
-        ','.join(env.core.locale_available)
+        ','.join(core.locale_available)
 
     targets = dict()
     for k in FAMILIES.keys():
-        r = env.pyramid.options[f'uacompat.{k}']
+        r = pyramid.options[f'uacompat.{k}']
         if type(r) == bool:
             continue
         targets[k] = r

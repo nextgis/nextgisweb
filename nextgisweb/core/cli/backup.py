@@ -14,6 +14,7 @@ from ...lib.logging import logger
 from ...env.cli import cli, EnvCommand, opt, arg
 
 from .. import backup as mod
+from ..component import CoreComponent
 
 
 @cli.command()
@@ -21,13 +22,14 @@ def backup(
     self: EnvCommand,
     no_zip: bool = opt(False),
     target: Optional[str] = arg(metavar="path"),
+    *, core: CoreComponent,
 ):
     """Backup data into an archive
     
     :param no_zip: Don't compress a backup with ZIP
     :param target: Output file or directory"""
 
-    opts = self.env.core.options.with_prefix('backup')
+    opts = core.options.with_prefix('backup')
 
     if target is None:
         base_path = opts['path']
@@ -84,12 +86,16 @@ def backup(
 
 
 @cli.command()
-def restore(self: EnvCommand, source: str = arg(metavar='path')):
+def restore(
+    self: EnvCommand,
+    source: str = arg(metavar='path'),
+    *, core: CoreComponent,
+):
     """Restore data from a backup
     
     :param path: Path to a backup"""
 
-    opts = self.env.core.options.with_prefix('backup')
+    opts = core.options.with_prefix('backup')
 
     source = self.source
     from_stdin = source == '-'

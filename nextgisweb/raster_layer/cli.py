@@ -1,6 +1,8 @@
 from ..env.cli import cli, EnvCommand
 
 from .model import RasterLayer
+from .component import RasterLayerComponent
+
 
 @cli.group()
 class raster_layer:
@@ -14,5 +16,5 @@ def rebuild_overview(self: EnvCommand):
 
 
 @raster_layer.command()
-def cleanup(self: EnvCommand):
-    self.env.raster_layer.cleanup()
+def cleanup(self: EnvCommand, *, raster_layer: RasterLayerComponent):
+    raster_layer.cleanup()

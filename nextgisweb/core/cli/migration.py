@@ -13,11 +13,16 @@ from ...lib.migration import (
 from ...env.cli import EnvCommand, DryRunOptions, opt, arg, cli
 from ...env.model import DBSession
 
+from ..component import CoreComponent
 from ..migration import MigrationRegistry, MigrationContext
 
 
 @cli.command()
-def initialize_db(self: EnvCommand, drop: bool = opt(False)):
+def initialize_db(
+    self: EnvCommand,
+    drop: bool = opt(False),
+    *, core: CoreComponent,
+):
     """Initialize the database
     
     :param drop: Attempt to drop existing objects"""
@@ -43,7 +48,7 @@ def initialize_db(self: EnvCommand, drop: bool = opt(False)):
         # DDL commands don't change session status!
         mark_changed(DBSession())
 
-    if self.env.core.check_update():
+    if core.check_update():
         logger.info("New update available.")
 
 
@@ -122,7 +127,7 @@ class MigrationApplyCommand(
                 print("{:3d}. {}".format(idx, op))
             print("")
 
-            ctx = MigrationContext(self.registry, self.env)
+            ctx = MigrationContext(self.registry, env)
             ctx.execute_operations(solution, self.cstate)
 
             print("Migration operations completed!")
