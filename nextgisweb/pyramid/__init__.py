@@ -1,4 +1,3 @@
-from . import cli
 from .component import PyramidComponent
 from .model import Session, SessionStore
 from .session import WebSession

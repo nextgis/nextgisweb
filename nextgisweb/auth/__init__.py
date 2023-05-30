@@ -1,4 +1,3 @@
-from . import cli
 from .component import AuthComponent
 from .exception import UserDisabledException
 from .model import Group, OnFindReferencesData, Principal, User

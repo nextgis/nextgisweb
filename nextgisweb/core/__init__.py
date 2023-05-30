@@ -1,4 +1,3 @@
-from . import cli
 from .backup import BackupBase, BackupMetadata
 from .component import CoreComponent
 from .model import Setting

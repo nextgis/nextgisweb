@@ -1,4 +1,3 @@
-from . import cli
 from .component import RenderComponent
 from .event import on_data_change, on_style_change
 from .imgcodec import (

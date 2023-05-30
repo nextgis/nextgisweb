@@ -1,3 +1,4 @@
+import sys
 from typing import Optional
 
 import transaction
@@ -30,6 +31,15 @@ class bootstrap(EnvOptions):
         env = Env(
             cfg=load_config(self.config, None, hupper=True),
             set_global=True)
+        
+        # Scan for {component_module}.cli modules to populate commands
+        for comp in env.components.values():
+            candidate = f'{comp.module}.cli'
+            if candidate not in sys.modules:
+                try:
+                    __import__(candidate)
+                except ModuleNotFoundError:
+                    pass
 
     def __exit__(self, type, value, traceback):
         pass
