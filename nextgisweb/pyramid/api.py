@@ -225,7 +225,7 @@ def settings(request) ->  JSONType:
         raise ValidationError(message=_(
             "Required parameter 'component' is missing."))
 
-    comp = request.env._components.get(identity)
+    comp = request.env.components.get(identity)
     if comp is None:
         raise ValidationError(message=_("Invalid component identity."))
 
@@ -266,7 +266,7 @@ def locdata(request) -> JSONType:
     if skey and skey == request.env.pyramid.static_key[1:]:
         request.response.cache_control = 'public, max-age=31536000'
 
-    comp = request.env._components[component]
+    comp = request.env.components[component]
     jed_path = comp.root_path / 'locale' / f'{locale}.jed'
 
     if jed_path.is_file():
@@ -293,7 +293,7 @@ def pkg_version(request) -> JSONType:
 
 def healthcheck(request) -> JSONType:
     components = [
-        comp for comp in env._components.values()
+        comp for comp in env.components.values()
         if hasattr(comp, 'healthcheck')]
 
     result = OrderedDict(success=True)
@@ -313,7 +313,7 @@ def statistics(request) -> JSONType:
     request.require_administrator()
 
     result = dict()
-    for comp in request.env._components.values():
+    for comp in request.env.components.values():
         if hasattr(comp, 'query_stat'):
             result[comp.identity] = comp.query_stat()
     return result

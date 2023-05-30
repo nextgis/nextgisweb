@@ -25,7 +25,7 @@ def install(self: EnvCommand.customize(env_initialize=False)):
 
     for cid, cpath in pkginfo._comp_path.items():
         cpath = cpath.resolve().relative_to(cwd)
-        if cid not in env._components and debug:
+        if cid not in env.components and debug:
             logger.debug("Component [%s] excluded from build in debug mode", cid)
             continue
 

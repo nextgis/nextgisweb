@@ -158,7 +158,7 @@ class StorageComponentMixin:
                 details = storage_stat_dimension
                 totals = storage_stat_dimension_total
 
-                for comp in self.env._components.values():
+                for comp in self.env.components.values():
                     if hasattr(comp, 'estimate_storage'):
                         logger.debug("Estimating storage of component '%s'...", comp.identity)
                         for kind_of_data, resource_id, size in comp.estimate_storage():

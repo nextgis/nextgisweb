@@ -21,7 +21,7 @@ class MigrationRegistry(Registry):
         super().__init__()
         self._env = env
 
-        for cid, cobj in env._components.items():
+        for cid, cobj in env.components.items():
             self.scandir(cid, self.migration_path(cid))
             if cid not in self._by_component and hasattr(cobj, 'metadata'):
                 self.add(InitialMigration(cid))
@@ -29,7 +29,7 @@ class MigrationRegistry(Registry):
         self.validate()
 
     def migration_path(self, comp_id):
-        return self._env._components[comp_id].root_path / 'migration'
+        return self._env.components[comp_id].root_path / 'migration'
 
     @property
     def graph(self):
@@ -38,7 +38,7 @@ class MigrationRegistry(Registry):
 
         # Collect metadata dependencies
         dependencies = defaultdict(set)
-        for cid, comp in self._env._components.items():
+        for cid, comp in self._env.components.items():
             metadata = getattr(comp, 'metadata', None)
             if metadata is not None:
                 for dependent in metadata.dependencies:

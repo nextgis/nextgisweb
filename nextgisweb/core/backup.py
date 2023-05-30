@@ -268,7 +268,7 @@ def restore(env, src):
     comp_root = os.path.join(src, 'component')
     with transaction.manager:
         for comp_identity in os.listdir(comp_root):
-            comp = env._components[comp_identity]
+            comp = env.components[comp_identity]
             comp_dir = os.path.join(comp_root, comp_identity)
             idx_fn = os.path.join(comp_dir, '$index')
             if os.path.exists(idx_fn):

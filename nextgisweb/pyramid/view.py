@@ -33,7 +33,7 @@ def asset(request):
     subpath = request.matchdict['subpath']
 
     try:
-        comp_obj = env._components[component]
+        comp_obj = env.components[component]
     except KeyError:
         raise HTTPNotFound()
     

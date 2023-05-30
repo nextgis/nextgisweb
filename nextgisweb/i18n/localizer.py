@@ -26,7 +26,7 @@ class Translations(BabelTranslations):
 
     def load_envcomp(self, env, locale):
         self.locale = locale
-        for comp_id, comp in env._components.items():
+        for comp_id, comp in env.components.items():
             mo_path = comp.root_path / 'locale' / '{}.mo'.format(locale)
             if mo_path.is_file():
                 logger.debug(

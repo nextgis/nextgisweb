@@ -1,8 +1,9 @@
-import re
 import logging
 import logging.config
 import os
 from collections import OrderedDict
+from types import MappingProxyType
+from typing import Mapping
 
 import sqlalchemy as sa
 
@@ -16,6 +17,7 @@ _OPTIONS_LOGGING_LEVELS = ('critical', 'error', 'warning', 'info', 'debug')
 
 
 class Env:
+    components: Mapping[str, Component]
 
     def __init__(
         self, cfg=None, *,
@@ -72,6 +74,7 @@ class Env:
                 .format(', '.join(not_found_components)))
 
         self._components = dict()
+        self.components = MappingProxyType(self._components)
 
         for comp_class in Component.registry:
             identity = comp_class.identity
@@ -89,7 +92,7 @@ class Env:
                 "Attribute name %s already used" % identity
 
             setattr(self, identity, instance)
-        
+                
         if initialize:
             self.initialize()
         

@@ -107,7 +107,7 @@ def components_and_locales(args, work_in_progress=False):
     ext_packages = ext_meta.get('packages', [])
     ext_locales = ext_meta.get('locales', [])
 
-    for comp_id in env._components.keys():
+    for comp_id in env.components.keys():
         if len(args.component) > 0 and comp_id not in args.component:
             continue
         if (

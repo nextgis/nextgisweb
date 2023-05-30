@@ -12,7 +12,7 @@ def statistics(self: EnvCommand, estimate_storage: bool = opt(False)):
         self.env.core.estimate_storage_all()
 
     result = dict()
-    for comp in self.env._components.values():
+    for comp in self.env.components.values():
         if hasattr(comp, 'query_stat'):
             result[comp.identity] = comp.query_stat()
 
