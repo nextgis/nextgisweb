@@ -3,11 +3,12 @@ from requests.exceptions import RequestException
 
 from ..core.exception import ExternalServiceError
 from ..resource import ConnectionScope, resource_factory
+from ..pyramid import JSONType
 
 from .model import Connection, NEXTGIS_GEOSERVICES
 
 
-def inspect_connection(request):
+def inspect_connection(request) -> JSONType:
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
@@ -41,4 +42,4 @@ def setup_pyramid(comp, config):
     config.add_route(
         'tmsclient.connection.layers', '/api/component/tmsclient/{id}/layers/',
         factory=resource_factory
-    ).add_view(inspect_connection, context=Connection, request_method='GET', renderer='json')
+    ).add_view(inspect_connection, context=Connection, request_method='GET')

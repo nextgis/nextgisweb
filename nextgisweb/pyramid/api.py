@@ -18,6 +18,7 @@ from ..core import KindOfData
 from ..core.exception import ValidationError
 from ..env.model import DBSession
 from ..resource import Resource, MetadataScope
+from ..pyramid import JSONType
 
 from .util import _, ClientRoutePredicate, gensecret, parse_origin
 
@@ -129,12 +130,12 @@ def cors_tween_factory(handler, registry):
     return cors_tween
 
 
-def cors_get(request):
+def cors_get(request) -> JSONType:
     request.require_administrator()
     return dict(allow_origin=_get_cors_olist())
 
 
-def cors_put(request):
+def cors_put(request) -> JSONType:
     request.require_administrator()
 
     body = request.json_body
@@ -176,7 +177,7 @@ def cors_put(request):
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
-def system_name_get(request):
+def system_name_get(request) -> JSONType:
     try:
         full_name = env.core.settings_get('core', 'system.full_name')
     except KeyError:
@@ -185,7 +186,7 @@ def system_name_get(request):
     return dict(full_name=full_name)
 
 
-def system_name_put(request):
+def system_name_put(request) -> JSONType:
     request.require_administrator()
 
     body = request.json_body
@@ -199,7 +200,7 @@ def system_name_put(request):
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
-def home_path_get(request):
+def home_path_get(request) -> JSONType:
     request.require_administrator()
     try:
         home_path = env.core.settings_get('pyramid', 'home_path')
@@ -208,7 +209,7 @@ def home_path_get(request):
     return dict(home_path=home_path)
 
 
-def home_path_put(request):
+def home_path_put(request) -> JSONType:
     request.require_administrator()
 
     body = request.json_body
@@ -222,7 +223,7 @@ def home_path_put(request):
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
-def settings(request):
+def settings(request) ->  JSONType:
     identity = request.GET.get('component')
     if identity is None:
         raise ValidationError(message=_(
@@ -235,7 +236,7 @@ def settings(request):
     return comp.client_settings(request)
 
 
-def route(request):
+def route(request) -> JSONType:
     result = dict()
     route_re = re.compile(r'\{(\w+):{0,1}')
     introspector = request.registry.introspector
@@ -261,7 +262,7 @@ def route(request):
     return result
 
 
-def locdata(request):
+def locdata(request) -> JSONType:
     locale = request.matchdict['locale']
     component = request.matchdict['component']
 
@@ -291,11 +292,11 @@ def locdata(request):
     return dict(error="Locale data not found!")
 
 
-def pkg_version(request):
+def pkg_version(request) -> JSONType:
     return dict([(p.name, p.version) for p in request.env.packages.values()])
 
 
-def healthcheck(request):
+def healthcheck(request) -> JSONType:
     components = [
         comp for comp in env._components.values()
         if hasattr(comp, 'healthcheck')]
@@ -313,7 +314,7 @@ def healthcheck(request):
     return result
 
 
-def statistics(request):
+def statistics(request) -> JSONType:
     request.require_administrator()
 
     result = dict()
@@ -328,27 +329,27 @@ def require_storage_enabled(request):
         raise HTTPNotFound()
 
 
-def estimate_storage(request):
+def estimate_storage(request) ->  JSONType:
     require_storage_enabled(request)
     request.require_administrator()
 
     request.env.core.start_estimation()
 
 
-def storage_status(request):
+def storage_status(request) -> JSONType:
     require_storage_enabled(request)
     request.require_administrator()
 
     return dict(estimation_running=request.env.core.estimation_running())
 
 
-def storage(request):
+def storage(request) -> JSONType:
     require_storage_enabled(request)
     request.require_administrator()
     return dict((k, v) for k, v in request.env.core.query_storage().items())
 
 
-def kind_of_data(request):
+def kind_of_data(request) -> JSONType:
     request.require_administrator()
 
     result = dict()
@@ -392,7 +393,7 @@ def custom_css_put(request):
 
     request.env.core.settings_set('pyramid', 'custom_css.ckey', gensecret(8))
 
-    if is_json:
+    if not is_json:
         return Response(json.dumpb(None), content_type="application/json")
     else:
         return Response()
@@ -405,8 +406,7 @@ def logo_get(request):
         raise HTTPNotFound()
 
     bindata = base64.b64decode(logodata)
-    response = Response(
-        bindata, content_type='image/png')
+    response = Response(bindata, content_type='image/png')
 
     if (
         'ckey' in request.GET
@@ -469,62 +469,61 @@ def setup_pyramid(comp, config):
         'INGRESS'))
 
     config.add_route('pyramid.cors', '/api/component/pyramid/cors') \
-        .add_view(cors_get, request_method='GET', renderer='json') \
-        .add_view(cors_put, request_method='PUT', renderer='json')
+        .add_view(cors_get, request_method='GET') \
+        .add_view(cors_put, request_method='PUT')
 
     config.add_route('pyramid.system_name',
                      '/api/component/pyramid/system_name') \
-        .add_view(system_name_get, request_method='GET', renderer='json') \
-        .add_view(system_name_put, request_method='PUT', renderer='json')
+        .add_view(system_name_get, request_method='GET') \
+        .add_view(system_name_put, request_method='PUT')
 
     config.add_route('pyramid.settings', '/api/component/pyramid/settings') \
-        .add_view(settings, renderer='json')
+        .add_view(settings)
 
     config.add_route('pyramid.route', '/api/component/pyramid/route') \
-        .add_view(route, renderer='json', request_method='GET')
+        .add_view(route, request_method='GET')
 
     config.add_route(
         'pyramid.locdata',
         '/api/component/pyramid/locdata/{component}/{locale}',
-    ).add_view(locdata, renderer='json')
+    ).add_view(locdata)
 
     config.add_route(
         'pyramid.pkg_version',
         '/api/component/pyramid/pkg_version',
-    ).add_view(pkg_version, renderer='json')
+    ).add_view(pkg_version)
 
     config.add_route(
         'pyramid.healthcheck',
         '/api/component/pyramid/healthcheck',
-    ).add_view(healthcheck, renderer='json')
+    ).add_view(healthcheck)
 
     config.add_route(
         'pyramid.statistics',
         '/api/component/pyramid/statistics',
-    ).add_view(statistics, renderer='json')
+    ).add_view(statistics)
 
     config.add_route(
         'pyramid.estimate_storage',
         '/api/component/pyramid/estimate_storage',
-    ).add_view(estimate_storage, request_method='POST', renderer='json')
+    ).add_view(estimate_storage, request_method='POST')
 
     config.add_route(
         'pyramid.storage_status',
         '/api/component/pyramid/storage_status',
-    ).add_view(storage_status, request_method='GET', renderer='json')
+    ).add_view(storage_status, request_method='GET')
 
     config.add_route(
         'pyramid.storage',
         '/api/component/pyramid/storage',
-    ).add_view(storage, renderer='json')
+    ).add_view(storage)
 
     config.add_route(
         'pyramid.kind_of_data',
         '/api/component/pyramid/kind_of_data',
-    ).add_view(kind_of_data, renderer='json')
+    ).add_view(kind_of_data)
 
-    config.add_route(
-        'pyramid.custom_css', '/api/component/pyramid/custom_css') \
+    config.add_route('pyramid.custom_css', '/api/component/pyramid/custom_css') \
         .add_view(custom_css_get, request_method='GET') \
         .add_view(custom_css_put, request_method='PUT')
 
@@ -578,7 +577,6 @@ def setup_pyramid(comp, config):
 
     # TODO: Add PUT method for changing custom_css setting and GUI
 
-    config.add_route('pyramid.home_path',
-                     '/api/component/pyramid/home_path') \
-        .add_view(home_path_get, request_method='GET', renderer='json') \
-        .add_view(home_path_put, request_method='PUT', renderer='json')
+    config.add_route('pyramid.home_path', '/api/component/pyramid/home_path') \
+        .add_view(home_path_get, request_method='GET') \
+        .add_view(home_path_put, request_method='PUT')

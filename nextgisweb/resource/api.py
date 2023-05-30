@@ -9,6 +9,7 @@ from ..lib import db
 from ..core.exception import InsufficientPermissions
 from ..env.model import DBSession
 from ..auth import User
+from ..pyramid import JSONType
 
 from .model import Resource, ResourceSerializer
 from .scope import ResourceScope
@@ -26,7 +27,7 @@ PERM_MCHILDREN = ResourceScope.manage_children
 PERM_CPERM = ResourceScope.change_permissions
 
 
-def item_get(context, request):
+def item_get(context, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     serializer = CompositeSerializer(context, request.user)
@@ -35,7 +36,7 @@ def item_get(context, request):
     return serializer.data
 
 
-def item_put(context, request):
+def item_put(context, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     serializer = CompositeSerializer(context, request.user, request.json_body)
@@ -47,7 +48,7 @@ def item_put(context, request):
     return result
 
 
-def item_delete(context, request):
+def item_delete(context, request) -> JSONType:
 
     def delete(obj):
         request.resource_permission(PERM_DELETE, obj)
@@ -67,7 +68,7 @@ def item_delete(context, request):
     DBSession.flush()
 
 
-def collection_get(request):
+def collection_get(request) -> JSONType:
     parent = request.params.get('parent')
     parent = int(parent) if parent else None
 
@@ -86,7 +87,7 @@ def collection_get(request):
     return result
 
 
-def collection_post(request):
+def collection_post(request) -> JSONType:
     request.env.core.check_storage_limit()
 
     data = dict(request.json_body)
@@ -141,7 +142,7 @@ def collection_post(request):
     return result
 
 
-def permission(resource, request):
+def permission(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     # In some cases it is convenient to pass empty string instead of
@@ -173,7 +174,7 @@ def permission(resource, request):
     return result
 
 
-def permission_explain(request):
+def permission_explain(request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     req_scope = request.params.get('scope')
@@ -264,7 +265,7 @@ def permission_explain(request):
     return _explain_jsonify(resolver)
 
 
-def quota(request):
+def quota(request) -> JSONType:
     quota_limit = request.env.resource.quota_limit
     quota_resource_cls = request.env.resource.quota_resource_cls
 
@@ -283,7 +284,7 @@ def quota(request):
     return result
 
 
-def search(request):
+def search(request) -> JSONType:
     smap = dict(resource=ResourceSerializer, full=CompositeSerializer)
 
     smode = request.GET.pop('serialization', None)
@@ -343,7 +344,7 @@ def search(request):
     return result
 
 
-def resource_volume(resource, request):
+def resource_volume(resource, request) -> JSONType:
 
     ids = []
 
@@ -366,7 +367,7 @@ def resource_volume(resource, request):
     return dict(volume=volume)
 
 
-def quota_check(request):
+def quota_check(request) -> JSONType:
     result = request.env.resource.quota_check(request.json_body)
     if result['success']:
         return dict(success=True)
@@ -380,7 +381,7 @@ def quota_check(request):
     return dict(success=False, message=msg)
 
 
-def resource_export_get(request):
+def resource_export_get(request) -> JSONType:
     request.require_administrator()
     try:
         value = request.env.core.settings_get('resource', 'resource_export')
@@ -389,7 +390,7 @@ def resource_export_get(request):
     return dict(resource_export=value)
 
 
-def resource_export_put(request):
+def resource_export_put(request) -> JSONType:
     request.require_administrator()
 
     body = request.json_body
@@ -408,46 +409,46 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.item', r'/api/resource/{id:\d+}',
         factory=resource_factory) \
-        .add_view(item_get, request_method='GET', renderer='json') \
-        .add_view(item_put, request_method='PUT', renderer='json') \
-        .add_view(item_delete, request_method='DELETE', renderer='json')
+        .add_view(item_get, request_method='GET') \
+        .add_view(item_put, request_method='PUT') \
+        .add_view(item_delete, request_method='DELETE')
 
     config.add_route(
         'resource.collection', '/api/resource/') \
-        .add_view(collection_get, request_method='GET', renderer='json') \
-        .add_view(collection_post, request_method='POST', renderer='json')
+        .add_view(collection_get, request_method='GET') \
+        .add_view(collection_post, request_method='POST')
 
     config.add_route(
         'resource.permission', '/api/resource/{id}/permission',
         factory=resource_factory) \
-        .add_view(permission, request_method='GET', renderer='json')
+        .add_view(permission, request_method='GET')
 
     config.add_route(
         'resource.permission.explain', '/api/resource/{id}/permission/explain',
         factory=resource_factory) \
-        .add_view(permission_explain, request_method='GET', renderer='json')
+        .add_view(permission_explain, request_method='GET')
 
     config.add_route(
         'resource.volume', '/api/resource/{id}/volume',
         factory=resource_factory) \
-        .add_view(resource_volume, request_method='GET', renderer='json')
+        .add_view(resource_volume, request_method='GET')
 
     config.add_route(
         'resource.quota', '/api/resource/quota') \
-        .add_view(quota, request_method='GET', renderer='json')
+        .add_view(quota, request_method='GET')
 
     config.add_route(
         'resource.search', '/api/resource/search/') \
-        .add_view(search, request_method='GET', renderer='json')
+        .add_view(search, request_method='GET')
 
     config.add_route(
         'resource.quota_check', '/api/component/resource/check_quota') \
-        .add_view(quota_check, request_method='POST', renderer='json')
+        .add_view(quota_check, request_method='POST')
 
     config.add_route('resource.resource_export',
                      '/api/component/resource/resource_export') \
-        .add_view(resource_export_get, request_method='GET', renderer='json') \
-        .add_view(resource_export_put, request_method='PUT', renderer='json')
+        .add_view(resource_export_get, request_method='GET') \
+        .add_view(resource_export_put, request_method='PUT')
 
     config.add_route(
         'resource.export', '/api/resource/{id}/export',

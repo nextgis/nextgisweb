@@ -3,6 +3,7 @@ from sqlalchemy.exc import NoSuchTableError, SQLAlchemyError, NoResultFound
 
 from ..core.exception import ValidationError
 from ..resource import resource_factory, ConnectionScope, DataStructureScope
+from ..pyramid import JSONType
 
 from .diagnostics import Checker
 from .exception import ExternalDatabaseError
@@ -10,7 +11,7 @@ from .model import PostgisConnection, PostgisLayer
 from .util import _, coltype_as_str
 
 
-def inspect_connection(request):
+def inspect_connection(request) -> JSONType:
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
@@ -31,7 +32,7 @@ def inspect_connection(request):
     return result
 
 
-def inspect_table(request):
+def inspect_table(request) -> JSONType:
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
@@ -56,7 +57,7 @@ def inspect_table(request):
     return result
 
 
-def diagnostics(request):
+def diagnostics(request) -> JSONType:
     # Don't allow this for guest due to security reasons.
     request.require_authenticated()
 
@@ -120,15 +121,13 @@ def setup_pyramid(comp, config):
     config.add_route(
         'postgis.connection.inspect', '/api/resource/{id}/inspect/',
         factory=resource_factory
-    ).add_view(inspect_connection, context=PostgisConnection,
-               request_method='GET', renderer='json')
+    ).add_view(inspect_connection, context=PostgisConnection, request_method='GET')
 
     config.add_route(
         'postgis.connection.inspect.table', '/api/resource/{id}/inspect/{table_name}/',
         factory=resource_factory
-    ).add_view(inspect_table, context=PostgisConnection,
-               request_method='GET', renderer='json')
+    ).add_view(inspect_table, context=PostgisConnection, request_method='GET')
 
     config.add_route(
         'postgis.diagnostics', '/api/component/postgis/check',
-    ).add_view(diagnostics, request_method='POST', renderer='json')
+    ).add_view(diagnostics, request_method='POST')

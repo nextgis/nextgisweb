@@ -10,6 +10,7 @@ from pyramid.interfaces import ISecurityPolicy
 
 from ..env.model import DBSession
 from ..core.exception import ValidationError
+from ..pyramid import JSONType
 
 from .model import User, Group, Principal
 from .util import _
@@ -20,7 +21,7 @@ brief_keys = (
     'password', 'oauth_subject', 'last_activity', 'is_administrator')
 
 
-def user_cget(request):
+def user_cget(request) -> JSONType:
     request.require_administrator()
 
     brief = request.GET.get('brief') in ('true', 'yes', '1')
@@ -38,7 +39,7 @@ def user_cget(request):
     return result
 
 
-def user_cpost(request):
+def user_cpost(request) -> JSONType:
     request.require_administrator()
 
     data = request.json_body
@@ -52,7 +53,7 @@ def user_cpost(request):
     return dict(id=obj.id)
 
 
-def user_iget(request):
+def user_iget(request) -> JSONType:
     request.require_administrator()
     obj = User.filter_by(id=int(request.matchdict['id'])).options(
         undefer(User.is_administrator),
@@ -60,7 +61,7 @@ def user_iget(request):
     return obj.serialize()
 
 
-def user_iput(request):
+def user_iput(request) -> JSONType:
     request.require_administrator()
 
     data = request.json_body
@@ -84,7 +85,7 @@ def user_iput(request):
     return dict(id=obj.id)
 
 
-def user_idelete(request):
+def user_idelete(request) -> JSONType:
     request.require_administrator()
 
     obj = User.filter_by(id=int(request.matchdict['id'])).one()
@@ -94,7 +95,7 @@ def user_idelete(request):
     return None
 
 
-def profile_get(request):
+def profile_get(request) -> JSONType:
     user = request.user
 
     if user.keyname == 'guest':
@@ -109,7 +110,7 @@ def profile_get(request):
     return result
 
 
-def profile_set(request):
+def profile_set(request) -> JSONType:
     user = request.user
 
     if user.keyname == 'guest':
@@ -125,7 +126,7 @@ def profile_set(request):
     return None
 
 
-def group_cget(request):
+def group_cget(request) -> JSONType:
     request.require_administrator()
 
     brief = request.GET.get('brief') in ('true', 'yes', '1')
@@ -143,7 +144,7 @@ def group_cget(request):
     return result
 
 
-def group_cpost(request):
+def group_cpost(request) -> JSONType:
     request.require_administrator()
 
     data = request.json_body
@@ -158,13 +159,13 @@ def group_cpost(request):
     return dict(id=obj.id)
 
 
-def group_iget(request):
+def group_iget(request) -> JSONType:
     request.require_administrator()
     obj = Group.filter_by(id=int(request.matchdict['id'])).one()
     return obj.serialize()
 
 
-def group_iput(request):
+def group_iput(request) -> JSONType:
     request.require_administrator()
 
     data = request.json_body
@@ -178,7 +179,7 @@ def group_iput(request):
     return dict(id=obj.id)
 
 
-def group_idelete(request):
+def group_idelete(request) -> JSONType:
     request.require_administrator()
 
     obj = Group.filter_by(id=int(request.matchdict['id'])).one()
@@ -187,7 +188,7 @@ def group_idelete(request):
     return None
 
 
-def current_user(request):
+def current_user(request) -> JSONType:
     result = dict(
         id=request.user.id,
         keyname=request.user.keyname,
@@ -203,7 +204,7 @@ def current_user(request):
     return result
 
 
-def register(request):
+def register(request) -> JSONType:
     if not request.env.auth.options['register']:
         raise HTTPForbidden(explanation="Anonymous registration is not allowed!")
 
@@ -228,7 +229,7 @@ def register(request):
     return dict(id=obj.id)
 
 
-def login(request):
+def login(request) -> JSONType:
     if len(request.POST) > 0:
         login = request.POST.get('login')
         password = request.POST.get('password')
@@ -256,7 +257,7 @@ def login(request):
     return result
 
 
-def logout(request):
+def logout(request) -> JSONType:
     headers = forget(request)
     request.response.headerlist.extend(headers)
     return dict()
@@ -264,38 +265,38 @@ def logout(request):
 
 def setup_pyramid(comp, config):
     config.add_route('auth.user.collection', '/api/component/auth/user/') \
-        .add_view(user_cget, request_method='GET', renderer='json') \
-        .add_view(user_cpost, request_method='POST', renderer='json')
+        .add_view(user_cget, request_method='GET') \
+        .add_view(user_cpost, request_method='POST')
 
     config.add_route('auth.user.item', '/api/component/auth/user/{id}') \
-        .add_view(user_iget, request_method='GET', renderer='json') \
-        .add_view(user_iput, request_method='PUT', renderer='json') \
-        .add_view(user_idelete, request_method='DELETE', renderer='json')
+        .add_view(user_iget, request_method='GET') \
+        .add_view(user_iput, request_method='PUT') \
+        .add_view(user_idelete, request_method='DELETE')
 
     config.add_route('auth.profile', '/api/component/auth/profile') \
-        .add_view(profile_get, request_method='GET', renderer='json') \
-        .add_view(profile_set, request_method='PUT', renderer='json')
+        .add_view(profile_get, request_method='GET') \
+        .add_view(profile_set, request_method='PUT')
 
     config.add_route('auth.group.collection', '/api/component/auth/group/') \
-        .add_view(group_cget, request_method='GET', renderer='json') \
-        .add_view(group_cpost, request_method='POST', renderer='json')
+        .add_view(group_cget, request_method='GET') \
+        .add_view(group_cpost, request_method='POST')
 
     config.add_route('auth.group.item', '/api/component/auth/group/{id}') \
-        .add_view(group_iget, request_method='GET', renderer='json') \
-        .add_view(group_iput, request_method='PUT', renderer='json') \
-        .add_view(group_idelete, request_method='DELETE', renderer='json')
+        .add_view(group_iget, request_method='GET') \
+        .add_view(group_iput, request_method='PUT') \
+        .add_view(group_idelete, request_method='DELETE')
 
     config.add_route('auth.current_user', '/api/component/auth/current_user') \
-        .add_view(current_user, request_method='GET', renderer='json')
+        .add_view(current_user, request_method='GET')
 
     config.add_route('auth.register', '/api/component/auth/register') \
-        .add_view(register, request_method='POST', renderer='json')
+        .add_view(register, request_method='POST')
 
     config.add_route('auth.login_cookies', '/api/component/auth/login') \
-        .add_view(login, request_method='POST', renderer='json')
+        .add_view(login, request_method='POST')
 
     config.add_route('auth.logout_cookies', '/api/component/auth/logout') \
-        .add_view(logout, request_method='POST', renderer='json')
+        .add_view(logout, request_method='POST')
 
 
 class SystemPrincipalAttributeReadOnly(ValidationError):

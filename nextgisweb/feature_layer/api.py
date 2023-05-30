@@ -23,6 +23,7 @@ from ..resource import DataScope, Resource, resource_factory
 from ..resource.exception import ResourceNotFound
 from ..spatial_ref_sys import SRS
 from ..render.util import zxy_from_request
+from ..pyramid import JSONType
 
 from .interface import (
     IFeatureLayer,
@@ -562,7 +563,7 @@ def query_feature_or_not_found(query, resource_id, feature_id):
     raise FeatureNotFound(resource_id, feature_id)
 
 
-def iget(resource, request):
+def iget(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     geom_skip = request.GET.get("geom", 'yes').lower() == 'no'
@@ -589,7 +590,7 @@ def iget(resource, request):
     return result
 
 
-def item_extent(resource, request):
+def item_extent(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
     feature_id = int(request.matchdict['fid'])
     extent = get_extent(resource, feature_id, 4326)
@@ -615,7 +616,7 @@ def get_extent(resource, feature_id, srs):
     )
 
 
-def geometry_info(resource, request):
+def geometry_info(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     query = resource.feature_query()
@@ -663,7 +664,7 @@ def geometry_info(resource, request):
     )
 
 
-def iput(resource, request):
+def iput(resource, request) -> JSONType:
     request.resource_permission(PERM_WRITE)
 
     query = resource.feature_query()
@@ -689,7 +690,7 @@ def iput(resource, request):
     return dict(id=feature.id)
 
 
-def idelete(resource, request):
+def idelete(resource, request) -> JSONType:
     request.resource_permission(PERM_WRITE)
 
     fid = int(request.matchdict['fid'])
@@ -747,7 +748,7 @@ def apply_intersect_filter(query, request, resource):
         query.intersects(geom)
 
 
-def cget(resource, request):
+def cget(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     geom_skip = request.GET.get("geom", 'yes') == 'no'
@@ -811,7 +812,7 @@ def cget(resource, request):
     return result
 
 
-def cpost(resource, request):
+def cpost(resource, request) -> JSONType:
     request.resource_permission(PERM_WRITE)
 
     dsrlz_params = dict(
@@ -832,7 +833,7 @@ def cpost(resource, request):
     return dict(id=fid)
 
 
-def cpatch(resource, request):
+def cpatch(resource, request) -> JSONType:
     request.resource_permission(PERM_WRITE)
     result = list()
 
@@ -873,7 +874,7 @@ def cpatch(resource, request):
     return result
 
 
-def cdelete(resource, request):
+def cdelete(resource, request) -> JSONType:
     request.resource_permission(PERM_WRITE)
 
     if len(request.body) > 0:
@@ -890,7 +891,7 @@ def cdelete(resource, request):
     return result
 
 
-def count(resource, request):
+def count(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     query = resource.feature_query()
@@ -899,7 +900,7 @@ def count(resource, request):
     return dict(total_count=total_count)
 
 
-def feature_extent(resource, request):
+def feature_extent(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     supported_ident = ['vector_layer', 'postgis_layer']
@@ -916,7 +917,7 @@ def feature_extent(resource, request):
     return dict(extent=extent)
 
 
-def store_collection(layer, request):
+def store_collection(layer, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     query = layer.feature_query()
@@ -997,45 +998,44 @@ def setup_pyramid(comp, config):
     config.add_route(
         'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',
         factory=resource_factory) \
-        .add_view(iget, context=IFeatureLayer, request_method='GET', renderer='json') \
-        .add_view(iput, context=IFeatureLayer, request_method='PUT', renderer='json') \
-        .add_view(idelete, context=IWritableFeatureLayer,
-                  request_method='DELETE', renderer='json')
+        .add_view(iget, context=IFeatureLayer, request_method='GET') \
+        .add_view(iput, context=IFeatureLayer, request_method='PUT') \
+        .add_view(idelete, context=IWritableFeatureLayer, request_method='DELETE')
 
     config.add_route(
         'feature_layer.feature.item_extent', '/api/resource/{id}/feature/{fid}/extent',
         factory=resource_factory) \
-        .add_view(item_extent, context=IFeatureLayer, request_method='GET', renderer='json')
+        .add_view(item_extent, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
         'feature_layer.feature.geometry_info', '/api/resource/{id}/feature/{fid}/geometry_info',
         factory=resource_factory
-    ).add_view(geometry_info, context=IFeatureLayer, request_method='GET', renderer='json')
+    ).add_view(geometry_info, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
         'feature_layer.feature.collection', '/api/resource/{id}/feature/',
         factory=resource_factory) \
-        .add_view(cget, context=IFeatureLayer, request_method='GET', renderer='json') \
-        .add_view(cpost, context=IWritableFeatureLayer, request_method='POST', renderer='json') \
-        .add_view(cpatch, context=IWritableFeatureLayer, request_method='PATCH', renderer='json') \
-        .add_view(cdelete, context=IWritableFeatureLayer, request_method='DELETE', renderer='json')
+        .add_view(cget, context=IFeatureLayer, request_method='GET') \
+        .add_view(cpost, context=IWritableFeatureLayer, request_method='POST') \
+        .add_view(cpatch, context=IWritableFeatureLayer, request_method='PATCH') \
+        .add_view(cdelete, context=IWritableFeatureLayer, request_method='DELETE')
 
     config.add_route(
         'feature_layer.feature.count', '/api/resource/{id}/feature_count',
         factory=resource_factory) \
-        .add_view(count, context=IFeatureLayer, request_method='GET', renderer='json')
+        .add_view(count, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
         'feature_layer.feature.extent', '/api/resource/{id}/feature_extent',
         factory=resource_factory) \
-        .add_view(feature_extent, context=IFeatureLayer, request_method='GET', renderer='json')
+        .add_view(feature_extent, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
         'feature_layer.store', r'/api/resource/{id:\d+}/store/',
         factory=resource_factory) \
-        .add_view(store_collection, context=IFeatureLayer, request_method='GET', renderer='json')
+        .add_view(store_collection, context=IFeatureLayer, request_method='GET')
 
     from .identify import identify
     config.add_route(
         'feature_layer.identify', '/api/feature_layer/identify') \
-        .add_view(identify, request_method='POST', renderer='json')
+        .add_view(identify, request_method='POST')

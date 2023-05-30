@@ -1,10 +1,11 @@
 from ..core.exception import ValidationError
 from ..lib.ogrhelper import read_dataset
+from ..pyramid import JSONType
 
 from .util import _
 
 
-def dataset(request):
+def dataset(request) -> JSONType:
     source = request.json_body['source']
     datafile, metafile = request.env.file_upload.get_filename(source['id'])
     ogrds = read_dataset(datafile, source_filename=source['name'])
@@ -22,4 +23,4 @@ def dataset(request):
 def setup_pyramid(comp, config):
     config.add_route(
         'vector_layer.dataset', '/api/component/vector_layer/dataset'
-    ).add_view(dataset, request_method='POST', renderer='json')
+    ).add_view(dataset, request_method='POST')

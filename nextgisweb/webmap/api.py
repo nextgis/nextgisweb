@@ -13,6 +13,7 @@ from ..env import env
 from ..layer import IBboxLayer
 from ..env.model import DBSession
 from ..resource import resource_factory, DataScope
+from ..pyramid import JSONType
 
 
 def annotation_to_dict(obj, request, with_user_info=False):
@@ -50,7 +51,7 @@ def check_annotation_enabled(request):
         raise HTTPNotFound()
 
 
-def annotation_cget(resource, request):
+def annotation_cget(resource, request) -> JSONType:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
 
@@ -61,7 +62,7 @@ def annotation_cget(resource, request):
             if a.public or (not a.public and a.user_id == request.user.id)]
 
 
-def annotation_cpost(resource, request):
+def annotation_cpost(resource, request) -> JSONType:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
     obj = WebMapAnnotation()
@@ -73,7 +74,7 @@ def annotation_cpost(resource, request):
     return dict(id=obj.id)
 
 
-def annotation_iget(resource, request):
+def annotation_iget(resource, request) -> JSONType:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
     obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(
@@ -82,7 +83,7 @@ def annotation_iget(resource, request):
     return annotation_to_dict(obj, request, with_user_info)
 
 
-def annotation_iput(resource, request):
+def annotation_iput(resource, request) -> JSONType:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
     obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(
@@ -91,7 +92,7 @@ def annotation_iput(resource, request):
     return dict(id=obj.id)
 
 
-def annotation_idelete(resource, request):
+def annotation_idelete(resource, request) -> JSONType:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
     obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(
@@ -123,7 +124,7 @@ def add_extent(e1, e2):
     )
 
 
-def get_webmap_extent(resource, request):
+def get_webmap_extent(resource, request) -> JSONType:
     request.resource_permission(WebMap.scope.webmap.display)
 
     def traverse(item, extent):
@@ -146,7 +147,7 @@ def get_webmap_extent(resource, request):
     return traverse(resource.root_item, None)
 
 
-def settings_get(request):
+def settings_get(request) -> JSONType:
     result = dict()
     for k, default in WM_SETTINGS.items():
         try:
@@ -159,7 +160,7 @@ def settings_get(request):
     return result
 
 
-def settings_put(request):
+def settings_put(request) -> JSONType:
     request.require_administrator()
 
     body = request.json_body
@@ -175,16 +176,14 @@ def setup_pyramid(comp, config):
 
     comp.settings_view = settings_get
 
-    config.add_route('webmap.settings',
-                     '/api/component/webmap/settings') \
-        .add_view(settings_get, request_method='GET', renderer='json') \
-        .add_view(settings_put, request_method='PUT', renderer='json')
+    config.add_route('webmap.settings', '/api/component/webmap/settings') \
+        .add_view(settings_get, request_method='GET') \
+        .add_view(settings_put, request_method='PUT')
 
     config.add_route(
         'webmap.extent', r'/api/webmap/{id:\d+}/extent/',
         factory=resource_factory
-    ) \
-        .add_view(get_webmap_extent, context=WebMap, request_method='GET', renderer='json')
+    ).add_view(get_webmap_extent, context=WebMap, request_method='GET')
 
 
 def setup_annotations(config):
@@ -192,13 +191,13 @@ def setup_annotations(config):
         'webmap.annotation.collection', r'/api/resource/{id:\d+}/annotation/',
         factory=resource_factory
     ) \
-        .add_view(annotation_cget, context=WebMap, request_method='GET', renderer='json') \
-        .add_view(annotation_cpost, context=WebMap, request_method='POST', renderer='json')
+        .add_view(annotation_cget, context=WebMap, request_method='GET') \
+        .add_view(annotation_cpost, context=WebMap, request_method='POST')
 
     config.add_route(
         'webmap.annotation.item', r'/api/resource/{id:\d+}/annotation/{annotation_id:\d+}',
         factory=resource_factory
     ) \
-        .add_view(annotation_iget, context=WebMap, request_method='GET', renderer='json') \
-        .add_view(annotation_iput, context=WebMap, request_method='PUT', renderer='json') \
-        .add_view(annotation_idelete, context=WebMap, request_method='DELETE', renderer='json')
+        .add_view(annotation_iget, context=WebMap, request_method='GET') \
+        .add_view(annotation_iput, context=WebMap, request_method='PUT') \
+        .add_view(annotation_idelete, context=WebMap, request_method='DELETE')

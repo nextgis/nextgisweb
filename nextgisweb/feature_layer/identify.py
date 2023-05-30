@@ -5,11 +5,12 @@ from ..resource import (
     Resource,
     ResourceScope,
     DataScope)
+from ..pyramid import JSONType
 
 PR_R = ResourceScope.read
 
 
-def identify(request):
+def identify(request) -> JSONType:
     """
     ---
     post:

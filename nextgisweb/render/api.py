@@ -10,6 +10,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 
 from ..core.exception import ValidationError, UserException
 from ..resource import Resource, ResourceNotFound, DataScope, resource_factory
+from ..pyramid import JSONType
 
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
@@ -307,7 +308,7 @@ def image(request):
     return image_response(aimg, p_empty_code, p_size)
 
 
-def tile_cache_seed_status(request):
+def tile_cache_seed_status(request) -> JSONType:
     request.resource_permission(PD_READ)
     tc = request.context.tile_cache
     if tc is None:
@@ -327,7 +328,7 @@ def legend(request):
     return Response(body_file=result, content_type='image/png')
 
 
-def legend_symbols(request):
+def legend_symbols(request) -> JSONType:
     request.resource_permission(PD_READ)
 
     icon_size = int(request.GET.get('icon_size', '24'))
@@ -360,11 +361,8 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'render.tile_cache.seed_status', r'/api/resource/{id:\d+}/tile_cache/seed_status',
-        factory=resource_factory
-    ).add_view(
-        tile_cache_seed_status, context=IRenderableStyle,
-        request_method='GET', renderer='json'
-    )
+        factory=resource_factory,
+    ).add_view(tile_cache_seed_status, context=IRenderableStyle, request_method='GET')
 
     config.add_route(
         'render.legend', r'/api/resource/{id:\d+}/legend',
@@ -373,8 +371,5 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'render.legend_symbols', r'/api/resource/{id:\d+}/legend_symbols',
-        factory=resource_factory
-    ).add_view(
-        legend_symbols, context=ILegendSymbols,
-        request_method='GET', renderer='json',
-    )
+        factory=resource_factory,
+    ).add_view(legend_symbols, context=ILegendSymbols, request_method='GET')

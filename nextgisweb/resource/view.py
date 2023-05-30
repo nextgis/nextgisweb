@@ -7,7 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 import zope.event
 
 from ..lib.dynmenu import DynMenu, Label, Link, DynItem
-from ..pyramid import viewargs
+from ..pyramid import viewargs, JSONType
 from ..pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
 from ..pyramid.psection import PageSections
 from ..env.model import DBSession
@@ -87,8 +87,7 @@ def json_view(request):
 
 
 # TODO: Move to API
-@viewargs(renderer='json')
-def schema(request):
+def schema(request) -> JSONType:
     resources = dict()
     scopes = dict()
 
@@ -145,8 +144,7 @@ def delete(request):
     )
 
 
-@viewargs(renderer='json')
-def widget(request):
+def widget(request) -> JSONType:
     operation = request.GET.get('operation', None)
     resid = request.GET.get('id', None)
     clsid = request.GET.get('cls', None)

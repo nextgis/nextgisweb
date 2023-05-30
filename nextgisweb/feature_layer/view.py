@@ -9,7 +9,7 @@ from ..resource import (
     DataScope,
     resource_factory,
     Widget)
-from ..pyramid import viewargs
+from ..pyramid import viewargs, JSONType
 from ..lib import dynmenu as dm
 
 from .interface import IFeatureLayer
@@ -91,12 +91,12 @@ def feature_update(request):
         maxheight=True)
 
 
-def field_collection(request):
+def field_collection(request) -> JSONType:
     request.resource_permission(PDS_R)
     return [f.to_dict() for f in request.context.fields]
 
 
-def store_item(layer, request):
+def store_item(layer, request) -> JSONType:
     request.resource_permission(PD_READ)
 
     box = request.headers.get('x-feature-box')
@@ -190,14 +190,14 @@ def setup_pyramid(comp, config):
         'feature_layer.field', r'/resource/{id:\d+}/field/',
         factory=resource_factory,
         client=('id', )
-    ).add_view(field_collection, context=IFeatureLayer, renderer='json')
+    ).add_view(field_collection, context=IFeatureLayer)
 
     config.add_route(
         'feature_layer.store.item',
         r'/resource/{id:\d+}/store/{feature_id:\d+}',
         factory=resource_factory,
         client=('id', 'feature_id')
-    ).add_view(store_item, context=IFeatureLayer, renderer='json')
+    ).add_view(store_item, context=IFeatureLayer)
 
     config.add_view(
         export,

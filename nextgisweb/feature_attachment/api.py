@@ -18,6 +18,7 @@ from ..resource import DataScope, resource_factory
 from ..env import env
 from ..env.model import DBSession
 from ..feature_layer.exception import FeatureNotFound
+from ..pyramid import JSONType
 
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
@@ -88,7 +89,7 @@ def image(resource, request):
     return Response(body_file=buf, content_type=obj.mime_type)
 
 
-def iget(resource, request):
+def iget(resource, request) -> JSONType:
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(
@@ -99,7 +100,7 @@ def iget(resource, request):
     return obj.serialize()
 
 
-def idelete(resource, request):
+def idelete(resource, request) -> JSONType:
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(
@@ -110,7 +111,7 @@ def idelete(resource, request):
     DBSession.delete(obj)
 
 
-def iput(resource, request):
+def iput(resource, request) -> JSONType:
     request.resource_permission(DataScope.write)
 
     obj = attachment_or_not_found(
@@ -125,7 +126,7 @@ def iput(resource, request):
     return dict(id=obj.id)
 
 
-def cget(resource, request):
+def cget(resource, request) -> JSONType:
     request.resource_permission(DataScope.read)
 
     query = FeatureAttachment.filter_by(
@@ -137,7 +138,7 @@ def cget(resource, request):
     return result
 
 
-def cpost(resource, request):
+def cpost(resource, request) -> JSONType:
     request.resource_permission(DataScope.write)
 
     feature_id = int(request.matchdict['fid'])
@@ -211,7 +212,7 @@ def export(resource, request):
         return response
 
 
-def import_attachment(resource, request):
+def import_attachment(resource, request) -> JSONType:
     request.resource_permission(DataScope.write)
 
     data = request.json_body
@@ -359,27 +360,27 @@ def setup_pyramid(comp, config):
     config.add_route(
         'feature_attachment.download',
         itmurl + '/download',
-        factory=resource_factory) \
-        .add_view(download)
+        factory=resource_factory,
+    ).add_view(download)
 
     config.add_route(
         'feature_attachment.image',
         itmurl + '/image',
-        factory=resource_factory) \
-        .add_view(image)
+        factory=resource_factory,
+    ).add_view(image)
 
     config.add_route(
         'feature_attachment.item', itmurl,
         factory=resource_factory) \
-        .add_view(iget, request_method='GET', renderer='json') \
-        .add_view(iput, request_method='PUT', renderer='json') \
-        .add_view(idelete, request_method='DELETE', renderer='json')
+        .add_view(iget, request_method='GET') \
+        .add_view(iput, request_method='PUT') \
+        .add_view(idelete, request_method='DELETE')
 
     config.add_route(
         'feature_attachment.collection', colurl,
         factory=resource_factory) \
-        .add_view(cget, request_method='GET', renderer='json') \
-        .add_view(cpost, request_method='POST', renderer='json')
+        .add_view(cget, request_method='GET') \
+        .add_view(cpost, request_method='POST')
 
     config.add_route(
         'feature_attachment.export',
@@ -391,4 +392,4 @@ def setup_pyramid(comp, config):
         'feature_attachment.import',
         '/api/resource/{id}/feature_attachment/import',
         factory=resource_factory
-    ).add_view(import_attachment, request_method='PUT', renderer='json')
+    ).add_view(import_attachment, request_method='PUT')

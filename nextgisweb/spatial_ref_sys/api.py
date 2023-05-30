@@ -8,6 +8,7 @@ from ..core.exception import ValidationError, ExternalServiceError
 from ..env import env
 from ..lib.geometry import Geometry, Transformer, geom_area, geom_length
 from ..env.model import DBSession
+from ..pyramid import JSONType
 
 from .model import SRS
 from .util import convert_to_wkt, _
@@ -54,11 +55,11 @@ def deserialize(obj, data, *, create):
             pass
 
 
-def cget(request):
+def cget(request) -> JSONType:
     return [serialize(obj) for obj in SRS.query()]
 
 
-def cpost(request):
+def cpost(request) -> JSONType:
     request.require_administrator()
 
     obj = SRS().persist()
@@ -68,12 +69,12 @@ def cpost(request):
     return dict(id=obj.id)
 
 
-def iget(request):
+def iget(request) -> JSONType:
     obj = SRS.filter_by(id=request.matchdict["id"]).one()
     return serialize(obj)
 
 
-def iput(request):
+def iput(request) -> JSONType:
     request.require_administrator()
 
     obj = SRS.filter_by(id=int(request.matchdict['id'])).one()
@@ -81,7 +82,7 @@ def iput(request):
     return dict(id=obj.id)
 
 
-def idelete(request):
+def idelete(request) -> JSONType:
     request.require_administrator()
 
     obj = SRS.filter_by(id=int(request.matchdict['id'])).one()
@@ -93,7 +94,7 @@ def idelete(request):
     return None
 
 
-def srs_convert(request):
+def srs_convert(request) -> JSONType:
     data = request.json_body
     proj_str = data["projStr"]
     format = data["format"]
@@ -104,7 +105,7 @@ def srs_convert(request):
     return dict(wkt=wkt)
 
 
-def geom_transform(request):
+def geom_transform(request) -> JSONType:
     data = request.json_body
     srs_from = SRS.filter_by(id=int(data["srs"])).one()
     srs_to = SRS.filter_by(id=int(request.matchdict["id"])).one()
@@ -134,7 +135,7 @@ def geom_calc(request, measure_fun):
     return dict(value=value)
 
 
-def catalog_collection(request):
+def catalog_collection(request) -> JSONType:
     request.require_administrator()
 
     query = dict()
@@ -186,7 +187,7 @@ def get_srs_from_catalog(catalog_id):
     return res.json()
 
 
-def catalog_item(request):
+def catalog_item(request) -> JSONType:
     request.require_administrator()
 
     catalog_id = int(request.matchdict['id'])
@@ -195,7 +196,7 @@ def catalog_item(request):
     return dict(display_name=srs['display_name'], wkt=srs['wkt'])
 
 
-def catalog_import(request):
+def catalog_import(request) -> JSONType:
     request.require_administrator()
 
     catalog_id = int(request.json_body['catalog_id'])
@@ -241,17 +242,16 @@ def catalog_import(request):
 
 def setup_pyramid(comp, config):
     config.add_route("spatial_ref_sys.collection", "/api/component/spatial_ref_sys/") \
-        .add_view(cget, request_method="GET", renderer="json") \
-        .add_view(cpost, request_method='POST', renderer='json')
+        .add_view(cget, request_method="GET") \
+        .add_view(cpost, request_method='POST')
 
     config.add_route("spatial_ref_sys.convert", "/api/component/spatial_ref_sys/convert") \
-        .add_view(srs_convert, request_method="POST", renderer="json")
+        .add_view(srs_convert, request_method="POST")
 
     config.add_route(
         "spatial_ref_sys.geom_transform",
         r"/api/component/spatial_ref_sys/{id:\d+}/geom_transform"
-    ) \
-        .add_view(geom_transform, request_method="POST", renderer="json")
+    ).add_view(geom_transform, request_method="POST")
 
     config.add_route(
         "spatial_ref_sys.geom_length",
@@ -264,19 +264,19 @@ def setup_pyramid(comp, config):
     ).add_view(lambda r: geom_calc(r, geom_area), request_method="POST", renderer="json")
 
     config.add_route("spatial_ref_sys.item", r"/api/component/spatial_ref_sys/{id:\d+}")\
-        .add_view(iget, request_method="GET", renderer="json")\
-        .add_view(iput, request_method='PUT', renderer='json') \
-        .add_view(idelete, request_method='DELETE', renderer='json')
+        .add_view(iget, request_method='GET')\
+        .add_view(iput, request_method='PUT') \
+        .add_view(idelete, request_method='DELETE')
 
     if comp.options['catalog.enabled']:
         config.add_route(
             "spatial_ref_sys.catalog.collection", r"/api/component/spatial_ref_sys/catalog/",
-        ).add_view(catalog_collection, request_method="GET", renderer="json")
+        ).add_view(catalog_collection, request_method="GET")
 
         config.add_route(
             "spatial_ref_sys.catalog.item", r"/api/component/spatial_ref_sys/catalog/{id:\d+}",
-        ).add_view(catalog_item, request_method="GET", renderer="json")
+        ).add_view(catalog_item, request_method="GET")
 
         config.add_route(
             "spatial_ref_sys.catalog.import", r"/api/component/spatial_ref_sys/catalog/import",
-        ).add_view(catalog_import, request_method="POST", renderer="json")
+        ).add_view(catalog_import, request_method="POST")
