@@ -14,7 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from pyramid.interfaces import ISecurityPolicy
 
 from ..env.model import DBSession
-from ..pyramid import SessionStore, WebSession, viewargs
+from ..pyramid import SessionStore, WebSession, viewargs, JSONType
 from ..lib import dynmenu as dm
 
 from .model import Principal, User, Group
@@ -281,6 +281,22 @@ def settings(request):
         entrypoint='@nextgisweb/auth/settings-form')
 
 
+def principal_dump(request) -> JSONType:
+    query = sa.orm.with_polymorphic(Principal, '*').query()
+    result = []
+
+    for p in query:
+        result.append(dict(
+            id=p.id,
+            cls=p.cls,
+            system=p.system,
+            keyname=p.keyname,
+            display_name=p.display_name
+        ))
+
+    return result
+
+
 @viewargs(renderer='react')
 def user_browse(request):
     request.require_administrator()
@@ -362,21 +378,6 @@ def setup_pyramid(comp, config):
         .add_view(settings)
 
     config.add_request_method(_login_url, name='login_url')
-
-    def principal_dump(request):
-        query = sa.orm.with_polymorphic(Principal, '*').query()
-        result = []
-
-        for p in query:
-            result.append(dict(
-                id=p.id,
-                cls=p.cls,
-                system=p.system,
-                keyname=p.keyname,
-                display_name=p.display_name
-            ))
-
-        return result
 
     config.add_route('auth.principal_dump', '/auth/principal/dump') \
         .add_view(principal_dump)
