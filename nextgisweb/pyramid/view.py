@@ -36,13 +36,10 @@ def asset(request):
         comp_obj = env._components[component]
     except KeyError:
         raise HTTPNotFound()
-
-    package, rest = comp_obj.__class__.__module__.split('.', 1)
-    rest = rest.replace('.', '/')
-
-    fn = resource_filename(package, rest + '/asset/' + '/'.join(subpath))
-    if os.path.isfile(fn):
-        return FileResponse(fn, request=request, cache_max_age=3600)
+    
+    pth = comp_obj.resource_path('/'.join(('asset', ) + subpath))
+    if pth.is_file():
+        return FileResponse(pth, request=request, cache_max_age=3600)
     else:
         raise HTTPNotFound()
 

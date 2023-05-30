@@ -1,10 +1,6 @@
-import io
 import os
 import os.path
 import fnmatch
-from importlib import import_module
-from pathlib import Path
-from pkg_resources import resource_filename
 
 from babel.support import Translations as BabelTranslations
 
@@ -31,17 +27,12 @@ class Translations(BabelTranslations):
     def load_envcomp(self, env, locale):
         self.locale = locale
         for comp_id, comp in env._components.items():
-            package_path = Path(resource_filename(pkginfo.comp_pkg(comp_id), '')).parent
-
-            mod = import_module(pkginfo.comp_mod(comp_id))
-            locale_path = Path(mod.__path__[0]) / 'locale'
-            mo_path = locale_path / '{}.mo'.format(locale)
-
+            mo_path = comp.root_path / 'locale' / '{}.mo'.format(locale)
             if mo_path.is_file():
                 logger.debug(
-                    "Loading component [%s] translations for locale [%s] from [%s]",
-                    comp_id, locale, str(mo_path.relative_to(package_path)))
-                with io.open(mo_path, 'rb') as fp:
+                    "Loading [%s] component [%s] translation from [%s]",
+                    comp_id, locale, mo_path)
+                with mo_path.open('rb') as fp:
                     self.add(Translations(fp=fp, domain=comp_id))
 
     def translate(self, msg, *, domain, context):

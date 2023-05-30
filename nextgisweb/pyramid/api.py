@@ -2,9 +2,6 @@ import re
 import base64
 from datetime import timedelta
 from collections import OrderedDict
-from pathlib import Path
-from pkg_resources import resource_filename
-from importlib import import_module
 from urllib.parse import unquote
 
 from pyramid.response import Response, FileResponse
@@ -13,7 +10,6 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from ..lib import json
 from ..lib.logging import logger
 from ..env import env
-from ..env.package import pkginfo
 from ..core import KindOfData
 from ..core.exception import ValidationError
 from ..env.model import DBSession
@@ -270,9 +266,8 @@ def locdata(request) -> JSONType:
     if skey and skey == request.env.pyramid.static_key[1:]:
         request.response.cache_control = 'public, max-age=31536000'
 
-    mod = import_module(pkginfo.comp_mod(component))
-    locale_path = Path(mod.__path__[0]) / 'locale'
-    jed_path = locale_path / '{}.jed'.format(locale)
+    comp = request.env._components[component]
+    jed_path = comp.root_path / 'locale' / f'{locale}.jed'
 
     if jed_path.is_file():
         return FileResponse(jed_path, content_type='application/json')
@@ -449,7 +444,8 @@ def company_logo(request):
             pass
 
     if response is None:
-        response = FileResponse(resource_filename('nextgisweb', 'pyramid/asset/logo_outline.png'))
+        default = request.env.pyramid.resource_path('asset/logo_outline.png')
+        response = FileResponse(default)
 
     if (
         'ckey' in request.GET

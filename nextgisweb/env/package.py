@@ -2,7 +2,7 @@ import os
 import pkg_resources
 import subprocess
 import re
-import importlib
+from importlib.util import find_spec
 from importlib.metadata import metadata
 
 from pathlib import Path
@@ -25,10 +25,10 @@ def amd_packages():
     return result
 
 
-def _module_path(module_name):
-    spec = importlib.util.find_spec(module_name)
-    pathname = spec.submodule_search_locations[0]
-    return Path(pathname)
+def module_path(module_name: str) -> Path:
+    spec = find_spec(module_name)
+    assert len(spec.submodule_search_locations) == 1
+    return Path(spec.submodule_search_locations[0])
 
 
 class Package:
@@ -36,7 +36,7 @@ class Package:
     def __init__(self, entrypoint):
         self._name = entrypoint.dist.key.replace('-', '_')
         self._entrypoint = entrypoint
-        self._path = _module_path(self.name)
+        self._path = module_path(self.name)
 
         # Assume a version local part consists of commit id and dirtiness flag.
         self._version_raw = entrypoint.dist.version
@@ -140,7 +140,7 @@ class PkgInfo:
                 self._comp_mod[comp] = modname
                 self._comp_enabled[comp] = cdefn['enabled']
                 self._comp_pkg[comp] = package_name
-                self._comp_path[comp] = _module_path(modname)
+                self._comp_path[comp] = module_path(modname)
                 if package_name not in self._pkg_comp:
                     self._pkg_comp[package_name] = list()
                 self._pkg_comp[package_name].append(comp)

@@ -1,6 +1,4 @@
 from collections import defaultdict
-from importlib import import_module
-from pathlib import Path
 
 import transaction
 from zope.sqlalchemy import mark_changed
@@ -31,9 +29,7 @@ class MigrationRegistry(Registry):
         self.validate()
 
     def migration_path(self, comp_id):
-        mod = import_module(self._env._components[comp_id].__class__.__module__)
-        path = Path(mod.__file__).parent / 'migration'
-        return path
+        return self._env._components[comp_id].root_path / 'migration'
 
     @property
     def graph(self):

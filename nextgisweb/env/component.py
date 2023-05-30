@@ -1,9 +1,13 @@
 import warnings
+import sys
+from pathlib import Path
+from pkg_resources import resource_filename
+from typing import Callable
 
 from ..lib.config import ConfigOptions
 from ..lib.logging import logger
 from ..lib.registry import registry_maker
-from .package import pkginfo
+from .package import pkginfo, module_path
 
 
 class ComponentMeta(type):
@@ -14,15 +18,47 @@ class ComponentMeta(type):
         if cls.identity and not abstract:
             cls.registry.register(cls)
 
+        module = cls.__module__
+        module_parts = module.split('.')
+        if module_parts[-1] == 'component':
+            module_parts.pop(-1)
+
+        cls.package = module_parts[0]
+        cls.module = '.'.join(module_parts)
+        cls.root_path = module_path(cls.module)
+        cls.resource_path = ComponentMeta._resource_path_factory(cls.module)
+    
+    @classmethod
+    def _resource_path_factory(cls, module):
+        parts = module.split('.')
+        package = parts.pop(0)
+        
+        def _resource_path(cls, path: str) -> Path:
+            return Path(resource_filename(package, '/'.join(parts + [path, ])))
+
+        return classmethod(_resource_path)
+
 
 class Component(metaclass=ComponentMeta):
 
     identity = None
-    """ Component identifier that should be redefined in a
-    child class. Must be syntactically correct python id
-    as it is used as attribute name in some cases. """
+    """Identifier redefined in successors"""
 
     registry = registry_maker()
+    """Registry where successors are registered while subclassing"""
+
+    package: str
+    """Top-level package name, usually 'nextgisweb' or 'nextgisweb_*'"""
+
+    module: str
+    """Root module name, usually {package}.{identity} or {package} for
+    single-component packages"""
+
+    root_path: Path
+    """Path to a directory containing {module}"""
+
+    resource_path: Callable[[str], Path]
+    """Shortcut for pkg_resources.resource_filename()"""
 
     def __init__(self, env, settings):
         self._env = env
