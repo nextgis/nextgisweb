@@ -1,94 +1,27 @@
-from collections import OrderedDict
-
-from ..env import Component, require
-from ..lib.config import Option
-
+from .api import query_feature_or_not_found
+from .component import FeatureLayerComponent
+from .event import on_data_change
+from .extension import FeatureExtension
 from .feature import Feature, FeatureSet
-from .model import (
-    Base, LayerField, LayerFieldsMixin, FeatureQueryIntersectsMixin, FIELD_FORBIDDEN_NAME)
 from .interface import (
+    FIELD_TYPE,
+    FIELD_TYPE_OGR,
     GEOM_TYPE,
     GEOM_TYPE_OGR,
     GEOM_TYPE_OGR_2_GEOM_TYPE,
-    FIELD_TYPE,
-    FIELD_TYPE_OGR,
     IFeatureLayer,
-    IFieldEditableFeatureLayer,
-    IWritableFeatureLayer,
     IFeatureQuery,
+    IFeatureQueryClipByBox,
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
-    IFeatureQueryOrderBy,
     IFeatureQueryIlike,
-    IFeatureQueryLike,
     IFeatureQueryIntersects,
-    IFeatureQueryClipByBox,
+    IFeatureQueryLike,
+    IFeatureQueryOrderBy,
     IFeatureQuerySimplify,
-)
-from .event import on_data_change
-from .extension import FeatureExtension
-from .api import query_feature_or_not_found
-from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
-
-__all__ = [
-    'Feature',
-    'FeatureQueryIntersectsMixin',
-    'FeatureSet',
-    'LayerField',
-    'LayerFieldsMixin',
-    'GEOM_TYPE',
-    'GEOM_TYPE_OGR',
-    'GEOM_TYPE_OGR_2_GEOM_TYPE',
-    'FIELD_FORBIDDEN_NAME',
-    'FIELD_TYPE',
-    'FIELD_TYPE_OGR',
-    'IFeatureLayer',
-    'IFieldEditableFeatureLayer',
-    'IWritableFeatureLayer',
-    'IFeatureQuery',
-    'IFeatureQueryFilter',
-    'IFeatureQueryFilterBy',
-    'IFeatureQueryOrderBy',
-    'IFeatureQueryIlike',
-    'IFeatureQueryLike',
-    'IFeatureQueryIntersects',
-    'IFeatureQueryClipByBox',
-    'IFeatureQuerySimplify',
-    'on_data_change',
-    'query_feature_or_not_found',
-]
-
-
-class FeatureLayerComponent(Component):
-    identity = 'feature_layer'
-    metadata = Base.metadata
-
-    def initialize(self):
-        self.FeatureExtension = FeatureExtension
-        self.export_limit = self.options['export.limit']
-
-    @require('resource')
-    def setup_pyramid(self, config):
-        from . import view, api
-        view.setup_pyramid(self, config)
-        api.setup_pyramid(self, config)
-
-    def client_settings(self, request):
-        editor_widget = OrderedDict()
-        for k, ecls in FeatureExtension.registry._dict.items():
-            if hasattr(ecls, 'editor_widget'):
-                editor_widget[k] = ecls.editor_widget
-
-        return dict(
-            editor_widget=editor_widget,
-            extensions=dict(map(
-                lambda ext: (ext.identity, ext.display_widget),
-                FeatureExtension.registry
-            )),
-            export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
-            datatypes=FIELD_TYPE.enum,
-        )
-
-    option_annotations = (
-        Option('export.limit', int, default=None, doc='The export limit'),
-    )
+    IFieldEditableFeatureLayer,
+    IWritableFeatureLayer)
+from .model import (
+    FIELD_FORBIDDEN_NAME,
+    FeatureQueryIntersectsMixin,
+    LayerField, LayerFieldsMixin)
