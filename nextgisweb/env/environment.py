@@ -4,11 +4,14 @@ import os
 from collections import OrderedDict
 from types import MappingProxyType
 from typing import Mapping
+from functools import partial
+from inspect import isclass
 
 import sqlalchemy as sa
 
 from ..lib.config import OptionAnnotations, Option, ConfigOptions, load_config
 from ..lib.logging import logger
+from ..lib.dinject import Container, inject as _inject
 from .package import pkginfo
 from .component import Component, load_all
 
@@ -16,7 +19,7 @@ from .component import Component, load_all
 _OPTIONS_LOGGING_LEVELS = ('critical', 'error', 'warning', 'info', 'debug')
 
 
-class Env:
+class Env(Container):
     components: Mapping[str, Component]
 
     def __init__(
@@ -26,6 +29,9 @@ class Env:
         initialize=False,
         set_global=False,
     ):
+        super().__init__()
+        self.register(Env, self)
+
         if cfg is None:
             cfg = load_config(None, None)
 
@@ -87,6 +93,7 @@ class Env:
             cfgcomp = _filter_by_prefix(cfg, identity + '.')
             instance = comp_class(env=self, settings=cfgcomp)
             self._components[comp_class.identity] = instance
+            self.register(comp_class, instance)
 
             assert not hasattr(self, identity), \
                 "Attribute name %s already used" % identity
@@ -255,12 +262,26 @@ class Env:
     ))
 
 
+provide = Env.provide
+
+
+class EnvDependency:
+    """Helper class for marking auto-provided dependecies"""
+
+
+inject = partial(_inject, auto_provide={
+    Env: lambda a: isclass(a) and issubclass(a, (
+        Env, EnvDependency, Component,
+    )),
+})
+
 _env = None
 
 
 def setenv(env):
     global _env
     _env = env
+    env.wire()
 
 
 class EnvMetaClass(type):
