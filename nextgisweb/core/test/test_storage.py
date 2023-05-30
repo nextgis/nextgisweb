@@ -6,7 +6,7 @@ import transaction
 from freezegun import freeze_time
 
 from ...auth import User
-from ...feature_attachment import FeatureAttachmentData
+from ...feature_attachment.component import FeatureAttachmentData
 from ...env.model import DBSession
 from ...spatial_ref_sys import SRS
 from ...vector_layer import VectorLayer

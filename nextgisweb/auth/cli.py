@@ -1,6 +1,6 @@
 from ..env.cli import cli, EnvCommand, arg
 
-from . import User
+from .model import User
 
 
 @cli.command()

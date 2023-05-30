@@ -7,8 +7,7 @@ from unittest.mock import patch
 from ...auth import User
 from ...auth.policy import AuthResult, AuthMedium, AuthProvider
 from ...env.model import DBSession
-from ...resource import ACLRule, ResourceGroup
-from ...resource.model import ResourceACLRule
+from ...resource import ResourceACLRule, ResourceGroup
 
 from ..model import WebMap, WebMapItem, WebMapAnnotation
 
@@ -32,7 +31,7 @@ def make_annotation(webmap, public, user_id):
 
 
 def append_acl(resource, action, principal, scope, permission, identity):
-    resource.acl.append(ACLRule(
+    resource.acl.append(ResourceACLRule(
         principal=principal,
         identity=identity,
         scope=scope,

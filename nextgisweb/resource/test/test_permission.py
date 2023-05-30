@@ -4,9 +4,10 @@ import transaction
 
 from ...auth import Group, User
 from ...env.model import DBSession
-from ...resource import ACLRule, Resource, ResourceGroup, ResourceScope
 from ...webmap import WebMap, WebMapItem, WebMapScope
 from ..presolver import PermissionResolver
+from ..model import ResourceACLRule, Resource, ResourceGroup
+from ..scope import ResourceScope
 
 
 @pytest.fixture(scope='module')
@@ -39,7 +40,7 @@ def test_change_owner(ngw_resource_group, user_id, ngw_webtest_app, ngw_auth_adm
     ngw_webtest_app.put_json(url, owner_data(admin.id), status=200)
 
     with transaction.manager:
-        ACLRule(
+        ResourceACLRule(
             resource_id=ngw_resource_group,
             principal=admin,
             identity=ResourceGroup.identity,
@@ -73,17 +74,17 @@ def test_permission_requirement(ngw_txn, resolve):
     ).persist()
     assert resolve(rg, administrator) == set()
 
-    rg.acl.append(ACLRule(
+    rg.acl.append(ResourceACLRule(
         action='allow', principal=administrators,
         identity='', scope='', permission='',
         propagate=True))
     assert len(resolve(rg, administrator)) > 5
 
-    rg.acl.append(ACLRule(
+    rg.acl.append(ResourceACLRule(
         action='allow', principal=everyone,
         identity='', scope='resource', permission='read',
         propagate=True))
-    rg.acl.append(ACLRule(
+    rg.acl.append(ResourceACLRule(
         action='allow', principal=everyone,
         identity='', scope='webmap', permission='display',
         propagate=True))
@@ -105,7 +106,7 @@ def test_permission_requirement(ngw_txn, resolve):
     ).persist()
     assert resolve(wm, guest) == {ResourceScope.read, WebMapScope.display}
 
-    rg.acl.append(ACLRule(
+    rg.acl.append(ResourceACLRule(
         action='deny', principal=guest,
         identity='', scope='resource', permission='read',
         propagate=False))
