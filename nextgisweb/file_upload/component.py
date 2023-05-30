@@ -9,7 +9,6 @@ from ..lib.config.otype import SizeInBytes
 from ..lib.logging import logger
 from ..env import Component
 
-from . import cli  # NOQA
 from .util import stat_dir
 
 

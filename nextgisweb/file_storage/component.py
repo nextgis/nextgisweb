@@ -15,7 +15,6 @@ from ..core import BackupBase
 from ..env.model import DBSession
 
 from .model import Base, FileObj
-from . import cli  # NOQA
 
 BUF_SIZE = 1024 * 1024
 
