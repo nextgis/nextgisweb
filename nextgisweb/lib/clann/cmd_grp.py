@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import Optional, Union, Callable
 from inspect import signature
 
 from docstring_parser import parse as docstring_parse
@@ -21,12 +21,14 @@ class Command:
         name: Optional[str] = None,
         short_desc: Optional[str] = None,
         long_desc: Optional[str] = None,
+        decorator: Optional[Callable] = None,
     ):
         self.cmd_cls = cmd_cls
         self.parent = parent
         self.name = name if name else cmd_cls.__name__
         self.short_desc = short_desc
         self.long_desc = long_desc
+        self.decorator = decorator
 
         pskip = list()
         tp = self.parent
@@ -79,7 +81,9 @@ class Group(Command):
                 epilog=m.long_desc)
             m.setup_parser(subp)
 
-    def _decorator_factory(self, member_cls, name=None):
+    def _decorator_factory(self, member_cls, name=None, decorator=None):
+        if decorator is None:
+            decorator = self.decorator
 
         def _wrapper(cls_or_fn):
             nonlocal name
@@ -90,7 +94,13 @@ class Group(Command):
 
             if isinstance(cls_or_fn, type):
                 cmd_cls = cls_or_fn
+                if decorator is not None:
+                    cmd_cls = type(cmd_cls.__name__, (cmd_cls, ), {
+                        '__call__': decorator(cmd_cls.__call__),
+                    })
             else:
+                if self.decorator is not None:
+                    cls_or_fn = self.decorator(cls_or_fn)
                 base_cls, params = _fn_signature(cls_or_fn, dstr_param)
                 cmd_cls = type(cls_or_fn.__name__, (_FnWrapper, base_cls), {
                     '__annotations__': {k: v for k, v, _ in params},
@@ -100,7 +110,8 @@ class Group(Command):
             member = member_cls(
                 cmd_cls, parent=self, name=name,
                 short_desc=dstr.short_description,
-                long_desc=dstr.long_description)
+                long_desc=dstr.long_description,
+                decorator=decorator)
             self.members.append(member)
             return member
 

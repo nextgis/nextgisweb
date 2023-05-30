@@ -1,10 +1,13 @@
 from ...lib.clann import ArgumentParser
+from ...env import Env
+from ...core import CoreComponent
 from ..cli import bootstrap, cli, EnvCommand
 
 
 @cli.command()
-def do_test(this: EnvCommand):
-    pass
+def do_test(this: EnvCommand, *, env: Env, core: CoreComponent):
+    assert env is this.env
+    assert core is this.env.core
 
 
 def test_command(ngw_env):

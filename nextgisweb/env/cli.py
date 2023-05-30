@@ -6,7 +6,8 @@ import transaction
 from ..lib.clann import command, group
 from ..lib.clann import arg, opt
 from ..lib.config import load_config
-from . import Env, env
+from .environment import Env, env, inject
+from . import environment
 
 
 class EnvOptions:
@@ -28,10 +29,11 @@ class bootstrap(EnvOptions):
         pass
 
     def __call__(self):
-        env = Env(
-            cfg=load_config(self.config, None, hupper=True),
-            set_global=True)
-        
+        if environment._env is None:
+            Env(cfg=load_config(self.config, None, hupper=True), set_global=True)
+
+        assert environment._env is not None
+
         # Scan for {component_module}.cli modules to populate commands
         for comp in env.components.values():
             candidate = f'{comp.module}.cli'
@@ -55,7 +57,7 @@ class EnvCommand(EnvOptions):
         return type('CustomCommand', (cls, ), kwargs)
 
     def __enter__(self):
-        self.env = env
+        self.env = environment._env
 
         if self.env_initialize:
             self.env.initialize()
@@ -72,7 +74,7 @@ class EnvCommand(EnvOptions):
             transaction.manager.__exit__(type, value, traceback)
 
 
-@group()
+@group(decorator=inject())
 class cli(EnvOptions):
     pass
 
