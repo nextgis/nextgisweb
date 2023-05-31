@@ -93,10 +93,6 @@ entry_points = {
     ],
 
     'nextgisweb.packages': ['nextgisweb = nextgisweb:pkginfo', ],
-
-    'nextgisweb.amd_packages': [
-        'nextgisweb = nextgisweb:amd_packages',
-    ],
 }
 
 
