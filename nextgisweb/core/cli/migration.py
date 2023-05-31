@@ -127,7 +127,7 @@ class MigrationApplyCommand(
                 print("{:3d}. {}".format(idx, op))
             print("")
 
-            ctx = MigrationContext(self.registry, env)
+            ctx = MigrationContext(self.registry, self.env)
             ctx.execute_operations(solution, self.cstate)
 
             print("Migration operations completed!")
