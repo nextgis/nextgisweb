@@ -158,6 +158,13 @@ class RasterMosaicItem(Base):
                 has_nodata = (has_nodata is None or has_nodata) and (
                     band.GetNoDataValue() is not None)
 
+        # treat the fourth band as alpha
+        if ds.RasterCount == 4 and alpha_band is None:
+            alpha_band = 4
+            ds = gdal.Open(filename, gdal.GA_Update)
+            ds.GetRasterBand(alpha_band).SetColorInterpretation(gdal.GCI_AlphaBand)
+            ds = None
+
         src_osr = sr_from_wkt(dsproj)
         dst_osr = self.resource.srs.to_osr()
 
