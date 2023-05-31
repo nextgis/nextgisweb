@@ -3,11 +3,10 @@ from typing import Optional
 
 import transaction
 
-from ..lib.clann import command, group
-from ..lib.clann import arg, opt
-from ..lib.config import load_config
-from .environment import Env, env, inject
-from . import environment
+from ...lib.clann import command, group, opt
+from ...lib.config import load_config
+from ..environment import Env, env, inject
+from .. import environment
 
 
 class EnvOptions:
@@ -77,20 +76,3 @@ class EnvCommand(EnvOptions):
 @group(decorator=inject())
 class cli(EnvOptions):
     pass
-
-
-@cli.command()
-def dump_config(self: EnvCommand):
-    """Print configuration as INI-file"""
-    
-    def print_options(identity, options):
-        sprint = False
-        for k, v in options._options.items():
-            if not sprint:
-                print('[{}]'.format(identity))
-                sprint = True
-            print("{} = {}".format(k, v))
-
-    print_options('environment', self.env.options)
-    for comp in self.env.chain('initialize'):
-        print_options(comp.identity, comp.options)
