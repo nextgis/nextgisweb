@@ -181,7 +181,8 @@ def setup_pyramid(comp, config):
         .add_view(settings_put, request_method='PUT')
 
     config.add_route(
-        'webmap.extent', r'/api/webmap/{id:\d+}/extent/',
+        'webmap.extent',
+        r'/api/resource/{id:\d+}/webmap/extent',
         factory=resource_factory
     ).add_view(get_webmap_extent, context=WebMap, request_method='GET')
 
