@@ -344,10 +344,25 @@ define([
                 lang.hitch(this, this.deserialize)
             );
         },
+
+        suggestDN: function(value) {
+            this.set('sdnDynamic', value);
+            var reset = lang.hitch(this, function () {
+                if (reset == this.reset) {
+                    this.set('sdnDynamic', null);
+                }
+            });
+            this.reset = reset;
+            return reset;
+        }
     });
 
     CompositeWidget.bootstrap = function (options) {
         var deferred = new Deferred();
+
+        options.sdnBase = options.suggested_display_name;
+        options.sdnDynamic = null;
+        delete options.suggested_display_name;
 
         var amdmod = [];
         for (var i in options.config) { amdmod.push(i); }

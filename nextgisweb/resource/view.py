@@ -149,6 +149,7 @@ def widget(request) -> JSONType:
     resid = request.GET.get('id', None)
     clsid = request.GET.get('cls', None)
     parent_id = request.GET.get('parent', None)
+    suggested_display_name = None
 
     if operation == 'create':
         if resid is not None or clsid is None or parent_id is None:
@@ -161,7 +162,9 @@ def widget(request) -> JSONType:
             .filter_by(id=parent_id).one()
         owner_user = request.user
 
+        tr = request.localizer.translate
         obj = Resource.registry[clsid](parent=parent, owner_user=request.user)
+        suggested_display_name = obj.suggest_display_name(tr)
 
     elif operation in ('update', 'delete'):
         if resid is None or clsid is not None or parent_id is not None:
@@ -180,8 +183,8 @@ def widget(request) -> JSONType:
     widget = CompositeWidget(operation=operation, obj=obj, request=request)
     return dict(
         operation=operation, config=widget.config(), id=resid,
-        cls=clsid, parent=parent.id if parent else None,
-        owner_user=owner_user.id)
+        cls=clsid, parent=parent.id if parent else None, owner_user=owner_user.id,
+        suggested_display_name=suggested_display_name)
 
 
 @viewargs(renderer='react')

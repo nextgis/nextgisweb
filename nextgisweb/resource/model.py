@@ -1,8 +1,9 @@
 from collections import namedtuple, OrderedDict
 from datetime import datetime
+from itertools import count
 
 from bunch import Bunch
-from sqlalchemy import event, text
+from sqlalchemy import event, text, func
 
 from ..lib import db
 from ..auth import Principal, User, Group, OnFindReferencesData
@@ -82,6 +83,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     identity = 'resource'
     cls_display_name = _("Resource")
+    primary_display_name = None
 
     __scope__ = (ResourceScope, MetadataScope)
 
@@ -270,6 +272,31 @@ class Resource(Base, metaclass=ResourceMeta):
     def check_social_editable(cls):
         """ Can this resource social settings be editable? """
         return False
+    
+    # Suggest display name
+
+    def suggest_display_name(self, tr):
+        def _query(*args):
+            q = DBSession.query(*args)
+            if self.parent and self.parent.id is not None:
+                q = q.filter(Resource.parent_id == self.parent.id)
+            return q
+
+        def _candidates():
+            if self.identity.endswith('_style'):
+                q = _query(func.count(Resource.id))
+                if q.scalar() == 0:
+                    yield tr(_("Default style"))
+
+            yield tr(self.cls_display_name)
+
+            q = _query(func.count(Resource.id)).filter(Resource.cls == self.cls)
+            yield tr(self.cls_display_name) + ' ' + str(q.scalar() + 1)
+
+        for c in _candidates():
+            q = _query(Resource.id).filter(Resource.display_name == c)
+            if not q.scalar():
+                return c
 
 
 @event.listens_for(Resource, 'after_delete', propagate=True)

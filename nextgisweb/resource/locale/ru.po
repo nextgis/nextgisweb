@@ -98,7 +98,11 @@ msgstr "Ресурс не может быть родителем сам себе
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:331
+#: model.py:289
+msgid "Default style"
+msgstr "Стиль по умолчанию"
+
+#: model.py:342
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 

@@ -53,6 +53,7 @@ define([
             this.wSourceLayer.set("options", []);
             this.wSourceLayer.value = "";
             this.wSourceLayer._setDisplay("");
+            this.resetSDN && this.resetSDN();
         },
 
         postCreate: function () {
@@ -92,6 +93,7 @@ define([
                         });
                         this.wSourceLayer.set("options", options);
                         this.wSourceLayer.set("value", layers[0]);
+                        this.resetSDN = this.composite.suggestDN(layers[0]);
                     }
                 }), lang.hitch(this, function(err) {
                     this._resetSouce();
@@ -163,6 +165,10 @@ define([
                 return !!this.wSourceFile.get("value");
             }
             return true;
+        },
+
+        _onUploadComplete: function() {
+            console.log(arguments);
         }
 
     });

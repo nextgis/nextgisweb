@@ -51,12 +51,22 @@ define([
             this.wParent.set("disabled", this.composite.operation === "create");
             this.wOwnerUser.set("disabled", !ngwConfig.isAdministrator);
             if (this.params.composite.operation == "create") {
-                this.wDisplayName._hasBeenBlurred = true;
-                this.wDisplayName.validate();
+                this._suggestedDisplayName();
+                var self = this;
+                this.composite.watch('sdnDynamic', function(value) {
+                    self._suggestedDisplayName(value);
+                });
             }
         },
 
         serializeInMixin: function (data) {
+            if (this.params.composite.operation == "create") {
+                if (!this.wDisplayName.get("value")) {
+                    var c = this.composite;
+                    var v = c.sdnDynamic || c.sdnBase;                    
+                    lang.setObject("resource.display_name", v, data);
+                }
+            }
             if (!this.wParent.get("disabled")) {
                 lang.setObject(
                     "resource.parent",
@@ -68,6 +78,18 @@ define([
                     "resource.owner_user",
                     {id: this.wOwnerUser.get("value")},
                     data);
+            }
+        },
+
+        _suggestedDisplayName: function () {
+            var c = this.composite;
+            var v = c.sdnDynamic || c.sdnBase;
+            if (v) {
+                this.wDisplayName.set('placeholder', v);
+                this.wDisplayName.set('required', false);
+            } else {
+                this.wDisplayName.set('placeholder', "");
+                this.wDisplayName.set('required', true);
             }
         }
     });

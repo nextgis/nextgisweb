@@ -36,6 +36,19 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
+
+            this.wFile.on("begin", function () {
+                this.resetSDN && this.resetSDN();
+            }.bind(this));
+
+            this.wFile.on("complete", function() {
+                var fn = this.wFile.get("value").name;
+                var we = fn.replace(/\.tiff?$/, '');
+                if (fn != we) {
+                    this.resetSDN = this.composite.suggestDN(we);
+                }
+            }.bind(this));
+
             this.wCOG.set("checked", settings.cog_enabled);
         },
 
