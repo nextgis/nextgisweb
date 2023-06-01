@@ -1,4 +1,5 @@
 import re
+from enum import Enum
 from datetime import timedelta
 
 
@@ -11,6 +12,8 @@ class OptionType:
             return otype
         elif issubclass(otype, OptionType):
             return otype()
+        elif issubclass(otype, Enum):
+            return Choice(otype)
         elif otype in cls.OTYPE_MAPPING:
             return cls.OTYPE_MAPPING[otype]
         else:
@@ -149,6 +152,18 @@ class SizeInBytes(OptionType):
             m = 1024 ** power
             if value % m == 0:
                 return '{:d}{:s}'.format(value // m, suf)
+
+
+class Choice(OptionType):
+
+    def __init__(self, otype):
+        self._otype = otype
+
+    def loads(self, value):
+        return self._otype(value)
+    
+    def dumps(self, value):
+        return value.value
 
 
 OptionType.OTYPE_MAPPING[str] = Text()

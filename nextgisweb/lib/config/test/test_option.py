@@ -1,9 +1,15 @@
 from datetime import timedelta
 from inspect import isclass
+from enum import Enum
 
 import pytest
 
-from ..otype import OptionType, Text, Boolean, Integer, List, SizeInBytes
+from ..otype import OptionType, Text, Boolean, Integer, List, SizeInBytes, Choice
+
+
+class EnumTest(Enum):
+    A = 'a'
+    B = 'b'
 
 
 @pytest.mark.parametrize('otype, input, expected,', (
@@ -21,6 +27,9 @@ from ..otype import OptionType, Text, Boolean, Integer, List, SizeInBytes
     (List, 'ab, bc, cd', ['ab', 'bc', 'cd']),
     (List(Integer), '1, 2, 3', [1, 2, 3]),
     (List(str), 'en, ru', ['en', 'ru']),
+    (EnumTest, 'a', EnumTest.A),
+    (EnumTest, 'A', ValueError),
+    (EnumTest, 'c', ValueError),
     (SizeInBytes, '1024', 1024),
     (SizeInBytes, '-1', ValueError),
     (SizeInBytes, '4M', 4 * 1024 ** 2),
