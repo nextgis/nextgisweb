@@ -5,24 +5,40 @@ Authorization
 
 Send the following POST request to get authorization cookie.
 
-.. http:post:: /login
+.. http:post:: /api/component/auth/login
 
    Authorization request to NextGIS Web
 
-   :form login: Login
-   :form password: Password
-   :status 200: Success authorization
-   
-   
+   :reqheader Accept: must be ``*/*``
+   :<json string login: login
+   :<json string password: password
+   :>json int id: user identifier
+   :>json string keyname: user login
+   :>json string display_name: user full name
+   :statuscode 200: no error
+
 **Example request**:
-    
+
 .. sourcecode:: http
- 
-   POST /login
+
+   POST /api/component/auth/login
    Host: ngw_url
    Accept: */*
 
-   login=<login>&password=<password>
+   {
+      "login": "test_user",
+      "password":"secret"
+   }
+
+**Example response**:
+
+.. sourcecode:: json
+
+    {
+      "id": 10,
+      "keyname": "test_user",
+      "display_name": "Test user"
+    }
 
 If authorization succeeds, NextGIS Web will return HTTP code 200 and Set-Cookie. 
 Requests with this cookie into the header will be considered authorized.
@@ -44,6 +60,8 @@ Authorized data (HTTP AUTH) can be sent with each request.
 
     ``Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==``
 
+    If you have configured an OAuth server, you can use OAuth user credentials in the same way as the local user or send Bearer token.
+
 
 Managing users
 ==============
@@ -60,8 +78,8 @@ To create new user execute following request:
    :<json string keyname: user login
    :<json string description: user description
    :<json string password: user password
-   :>json id: new user identifier
-   :statuscode 201: no error
+   :>json int id: new user identifier
+   :statuscode 200: no error
 
 **Example request**:
 
@@ -278,7 +296,7 @@ To self creating user (anonymous user) execute following request:
    :<json string keyname: user login
    :<json string description: user description
    :<json string password: user password
-   :statuscode 201: no error
+   :statuscode 200: no error
    
 Administrator can configure anonymous user registration to the specific group
 (via setting checkbox on group in administrative user interface).
