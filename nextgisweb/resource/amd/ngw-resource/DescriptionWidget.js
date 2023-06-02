@@ -15,12 +15,15 @@ define([
 ) {
     return declare("ngw.resource.DescriptionWidget", [Editor, serialize.Mixin], {
         title: i18n.gettext("Description"),
+        order: 80,
+
         extraPlugins: ["|", {
             name: "dijit/_editor/plugins/LinkDialog",
             command: "createLink",
             // Allow everything except malicious javascript
             urlRegExp: '(?!\\s*javascript\\s*:).*',
         }, "unlink", "insertImage", "viewsource"],
+
         serattr: "resource.description",
 
         constructor: function () {

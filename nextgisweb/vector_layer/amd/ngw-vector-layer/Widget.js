@@ -36,6 +36,7 @@ define([
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
         title: i18n.gettext("Vector layer"),
+        activateOn: { create: true },
         prefix: "vector_layer",
 
         constructor: function() {

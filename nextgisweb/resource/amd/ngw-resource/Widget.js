@@ -30,6 +30,7 @@ define([
         templateString: i18n.renderTemplate(template),
         identity: "resource",
         title: i18n.gettext("Resource"),
+        order: -100,
 
         postCreate: function () {
             this.inherited(arguments);

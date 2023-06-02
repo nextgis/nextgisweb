@@ -9,6 +9,7 @@ define([
     return declare("ngw.resmeta.Widget", [_WidgetBase], {
         prefix: "resmeta",
         title: i18n.gettext("Metadata"),
+        order: 100,
 
         constructor: function () {
             this.store = new editor.EditorStore();

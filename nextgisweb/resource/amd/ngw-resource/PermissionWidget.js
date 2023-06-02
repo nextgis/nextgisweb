@@ -238,6 +238,7 @@ define([
 
     return declare([BorderContainer, serialize.Mixin], {
         title: i18n.gettext("Permissions"),
+        order: 50,
 
         style: "padding: 0px;",
         gutters: false,

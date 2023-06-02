@@ -38,8 +38,10 @@ define([
             _WidgetsInTemplateMixin,
         ],
         {
-            title: i18n.gettext("Settings"),
             templateString: i18n.renderTemplate(template),
+            title: i18n.gettext("Settings"),
+            order: 40,
+
             serializePrefix: "webmap",
 
             postCreate: function () {

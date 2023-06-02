@@ -23,6 +23,8 @@ define([
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
         templateString: i18n.renderTemplate(template),
         title: i18n.gettext("Tile cache"),
+        order: 40,
+
         prefix: "tile_cache",
 
         buildRendering: function() {

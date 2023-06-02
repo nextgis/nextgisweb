@@ -118,6 +118,9 @@ define([
 
     return declare([LayoutContainer, serialize.Mixin], {
         title: i18n.gettext("Attributes"),
+        activateOn: {update: true },
+        order: -50,
+
         prefix: "feature_layer",
         style: "padding: 0",
 

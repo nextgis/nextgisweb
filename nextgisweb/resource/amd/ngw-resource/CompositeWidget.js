@@ -60,10 +60,17 @@ define([
             for (var k in this.config) {
                 var membercls = this.config[k].cls;
                 var member = new membercls({composite: this});
-
-                member.placeAt(this.tabContainer);
+                member.order = member.order || 0;
                 this.members.push(member);
+
+                var activateOn = member.activateOn || {};
+                member.selected = !!activateOn[this.operation];
             }
+
+            this.members.sort(function (a, b) { return a.order - b.order });
+            this.members.forEach(function (m) {
+                m.placeAt(this.tabContainer);
+            }, this);
 
             this.buttons = [];
 

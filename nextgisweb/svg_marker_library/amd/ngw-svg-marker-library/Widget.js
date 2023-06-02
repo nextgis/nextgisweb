@@ -60,6 +60,8 @@ define([
 
     return declare([LayoutContainer, serialize.Mixin], {
         title: i18n.gettext("SVG marker library"),
+        activateOn: { update: true },
+
         serializePrefix: "svg_marker_library",
 
         constructor: function () {

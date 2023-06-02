@@ -240,8 +240,10 @@ define([
     });
 
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        title: i18n.gettext("Layers"),
         templateString: i18n.renderTemplate(template),
+        title: i18n.gettext("Layers"),
+        activateOn: { update: true },
+        order: -50,
 
         constructor: function () {
             this.itemStore = new ItemFileWriteStore({data: {

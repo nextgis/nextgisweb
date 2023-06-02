@@ -84,8 +84,10 @@ define([
     };
 
     return declare("ngw.lookup-table.Widget", [LayoutContainer, serialize.Mixin], {
-        prefix: "lookup_table",
         title: i18n.gettext("Lookup table"),
+        activateOn: { update: true },
+
+        prefix: "lookup_table",
 
         constructor: function () {
             this.store = new Observable(new Memory({idProperty: "id"}));

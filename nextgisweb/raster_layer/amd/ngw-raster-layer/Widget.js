@@ -28,6 +28,7 @@ define([
     return declare("ngw.raster.layer.Widget", [_WidgetBase, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
         title: i18n.gettext("Raster layer"),
+        order: -50, activateOn: { create: true },
         prefix: "raster_layer",
 
         constructor: function () {

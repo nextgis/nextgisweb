@@ -27,6 +27,7 @@ define([
         templateString: i18n.renderTemplate(template),
         serializePrefix: "social",
         title: i18n.gettext("Social"),
+        order: 90,
 
         postCreate: function () {
             this.inherited(arguments);
