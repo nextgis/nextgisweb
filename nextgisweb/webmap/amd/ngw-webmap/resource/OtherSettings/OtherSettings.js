@@ -1,8 +1,5 @@
 define([
     "dojo/_base/declare",
-    "dojo/_base/lang",
-    "dojo/request/xhr",
-    "ngw/route",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -15,11 +12,9 @@ define([
     // template
     "dijit/form/Select",
     "dojox/layout/TableContainer",
+    "ngw-webmap/form/LegendSymbolsSelect",
 ], function (
     declare,
-    lang,
-    xhr,
-    route,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
@@ -46,24 +41,9 @@ define([
 
             postCreate: function () {
                 this.inherited(arguments);
-
-                this._buildLegendSelect();
                 if (settingsWebmap.annotation) this._buildAnnotationsControls();
             },
             
-            _buildLegendSelect: function () {
-                this.selLegend = new Select({
-                    title: i18n.gettext("Legend"),
-                    options: [
-                        {label: i18n.gettext("Show"), value: "on"},
-                        {label: i18n.gettext("Hide"), value: "off"},
-                        {label: i18n.gettext("Disable"), value: "disable"},
-                        {label: i18n.gettext("Default"), value: "default"},
-                    ]
-                });
-                this.tcControls.addChild(this.selLegend);
-            },
-
             _buildAnnotationsControls: function () {
                 this.chbAnnotationEnabled = new CheckBox({
                     title: i18n.gettext("Enable annotations"),
@@ -87,8 +67,7 @@ define([
                 }
                 var value = data.webmap;
                 value.editable = this.chbEditable.get("checked");
-                value.legend_visible = this.selLegend.get("value");
-
+                value.legend_symbols = this.wLegendSymbols.get("value");
                 if (settingsWebmap.annotation) {
                     value.annotation_enabled = this.chbAnnotationEnabled.get("checked");
                     value.annotation_default = this.selAnnotationDefault.get("value");
@@ -98,8 +77,7 @@ define([
             deserializeInMixin: function (data) {
                 var value = data.webmap;
                 this.chbEditable.set("checked", value.editable);
-                this.selLegend.set("value", value.legend_visible);
-
+                this.wLegendSymbols.set("value", value.legend_symbols);
                 if (settingsWebmap.annotation) {
                     this.chbAnnotationEnabled.set(
                         "checked",

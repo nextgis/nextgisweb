@@ -1,4 +1,4 @@
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n!webmap";
 
 export const UnitsLengthOptions = [
     {
@@ -89,20 +89,8 @@ export const AddressGeocoderOptions = [
 ];
 
 export const LegendEnabledOptions = [
-    {
-        label: i18n.gettext("Show"),
-        value: "on"
-    },
-    {
-        label: i18n.gettext("Hide"),
-        value: "off"
-    },
-    {
-        label: i18n.gettext("Disable"),
-        value: "disable"
-    },
-    {
-        label: i18n.gettext("Default"),
-        value: "default"
-    },
+    { value: "default", label: i18n.gettext("Default") },
+    { value: "expand", label: i18n.gettext("Expand") },
+    { value: "collapse", label: i18n.gettext("Collapse") },
+    { value: "disable", label: i18n.gettext("Disable") },
 ];

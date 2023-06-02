@@ -8,7 +8,7 @@ from ..auth import User
 from ..env.model import DBSession
 from ..lib import db
 
-from .model import Base, WebMap, WebMapItem
+from .model import Base, WebMap, WebMapItem, LegendSymbolsEnum
 from .adapter import WebMapAdapter
 from .util import _
 
@@ -53,9 +53,6 @@ class WebMapComponent(Component):
         settings_view = self.settings_view(request)
         result.update(settings_view)
 
-        if 'legend_visible' in settings_view and settings_view['legend_visible'] == 'default':
-            result['legend_visible'] = 'on' if self.options['legend_visible'] else 'disabled'
-
         return result
 
     def query_stat(self):
@@ -63,6 +60,14 @@ class WebMapComponent(Component):
             WebMapItem.item_type, db.func.count(WebMapItem.id)
         ).group_by(WebMapItem.item_type)
         return dict(item_type=dict(query_item_type.all()))
+    
+    def effective_legend_symbols(self):
+        result = LegendSymbolsEnum.DISABLE + self.options['legend_symbols']
+        if s := self.env.core.settings_get('webmap', 'legend_symbols', None):
+            result += LegendSymbolsEnum(s)
+
+        return result
+
 
     option_annotations = (
         Option(
@@ -71,5 +76,5 @@ class WebMapComponent(Component):
         Option('annotation', bool, default=True, doc="Turn on / off annotations."),
         Option('enable_social_networks', bool, default=False),
         Option('check_origin', bool, default=False, doc="Check iframe Referer header."),
-        Option('legend_visible', str, default='off'),
+        Option('legend_symbols', LegendSymbolsEnum, default=None),
     )

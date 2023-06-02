@@ -1,7 +1,9 @@
+from enum import Enum
 import geoalchemy2 as ga
-from sqlalchemy import event, text, Enum
+from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
+
 
 from .util import _
 from ..lib import db
@@ -34,6 +36,15 @@ class WebMapScope(Scope):
     annotation_manage = Permission(_("Manage annotations")).require(annotation_write)
 
 
+class LegendSymbolsEnum(Enum):
+    EXPAND = 'expand'
+    COLLAPSE = 'collapse'
+    DISABLE = 'disable'
+
+    def __add__(self, other):
+        return (self if other is None else other)
+
+
 class WebMap(Base, Resource):
     identity = 'webmap'
     cls_display_name = _("Web map")
@@ -53,7 +64,7 @@ class WebMap(Base, Resource):
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
     annotation_default = db.Column(db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default='no')
-    legend_visible = db.Column(db.Enum('default', 'on', 'off', 'disable'), nullable=False, default='default')
+    legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
 
     root_item = db.relationship('WebMapItem', cascade='all')
 
@@ -136,6 +147,7 @@ class WebMapItem(Base):
     layer_max_scale_denom = db.Column(db.Float, nullable=True)
     layer_adapter = db.Column(db.Unicode, nullable=True)
     draw_order_position = db.Column(db.Integer, nullable=True)
+    legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
 
     parent = db.relationship(
         'WebMapItem', remote_side=id, backref=db.backref(
@@ -148,8 +160,6 @@ class WebMapItem(Base):
         # remove web-map elements when style is removed
         backref=db.backref('webmap_items', cascade='all')
     )
-
-    legend_visible = db.Column(db.Enum('default', 'on', 'off', 'disable'), nullable=True, default='default')
 
     def to_dict(self):
         if self.item_type in ('root', 'group'):
@@ -194,7 +204,7 @@ class WebMapItem(Base):
                 layer_max_scale_denom=self.layer_max_scale_denom,
                 layer_adapter=self.layer_adapter,
                 draw_order_position=self.draw_order_position,
-                legend_visible=self.legend_visible,
+                legend_symbols=self.legend_symbols,
                 payload=payload
             )
 
@@ -210,7 +220,7 @@ class WebMapItem(Base):
         for a in ('display_name', 'group_expanded', 'layer_enabled', 'layer_identifiable',
                   'layer_adapter', 'layer_style_id', 'layer_transparency',
                   'layer_min_scale_denom', 'layer_max_scale_denom',
-                  'draw_order_position', 'legend_visible'):
+                  'draw_order_position', 'legend_symbols'):
             if a in data:
                 setattr(self, a, data[a])
 
@@ -274,7 +284,7 @@ class WebMapSerializer(Serializer):
     annotation_enabled = SP(**_mdargs)
     annotation_default = SP(**_mdargs)
 
-    legend_visible = SP(**_mdargs)
+    legend_symbols = SP(**_mdargs)
 
     bookmark_resource = SRR(**_mdargs)
 
@@ -296,7 +306,7 @@ WM_SETTINGS = dict(
     units_area='sq.m',
     degree_format='dd',
     measurement_srid=4326,
-    legend_visible='default'
+    legend_symbols=None,
 )
 
 

@@ -135,14 +135,14 @@ msgstr "Сохранить"
 #: amd/ngw-webmap/ItemWidget.js:291
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:56
 #: nodepkg/settings/select-options.js:93
-msgid "Show"
-msgstr "Показывать"
+msgid "Expand"
+msgstr "Развернуть"
 
 #: amd/ngw-webmap/ItemWidget.js:292
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:57
 #: nodepkg/settings/select-options.js:97
-msgid "Hide"
-msgstr "Скрывать"
+msgid "Collapse"
+msgstr "Свернуть"
 
 #: amd/ngw-webmap/ItemWidget.js:293
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:58

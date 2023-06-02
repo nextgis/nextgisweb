@@ -20,7 +20,7 @@ import {
     DegreeFormatOptions,
     LegendEnabledOptions,
     UnitsAreaOptions,
-    UnitsLengthOptions
+    UnitsLengthOptions,
 } from "./select-options";
 
 const { Title } = Typography;
@@ -262,7 +262,12 @@ export const SettingsForm = ({
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item
-                        name="legend_visible"
+                        name="legend_symbols"
+                        normalize={(val) => (val == "default" ? null : val)}
+                        getValueProps={(val) => {
+                            val = !val ? "default" : val;
+                            return { value: val };
+                        }}
                         label={i18n.gettext("Visibility")}
                     >
                         <Select
