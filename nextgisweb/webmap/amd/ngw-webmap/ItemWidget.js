@@ -30,6 +30,7 @@ define([
     "dgrid/extensions/DijitRegistry",
     "ngw-resource/serialize",
     "ngw-resource/ResourcePicker",
+    "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     // resource
     "dojo/text!./template/ItemWidget.hbs",
@@ -82,6 +83,7 @@ define([
     DijitRegistry,
     serialize,
     ResourcePicker,
+    api,
     i18n,
     template,
     settings
@@ -321,21 +323,32 @@ define([
             // Add new layer
             this.btnAddLayer.on("click", lang.hitch(this, function () {
                 this.layerPicker.pick().then(lang.hitch(this, function (itm) {
-                    this.itemStore.newItem({
-                            "item_type": "layer",
-                            "display_name": itm.display_name,
-                            "layer_style_id": itm.id,
-                            "layer_enabled": true,
-                            "layer_identifiable": true,
-                            "layer_transparency": null,
-                            "layer_min_scale_denom": null,
-                            "layer_max_scale_denom": null,
-                            "layer_adapter": "image"
-                        }, {
-                            parent: widget.getAddParent(),
-                            attribute: "children"
-                        }
-                    );
+                    var resourceId = itm.id;
+                    var addItem = function (naming) {
+                        this.itemStore.newItem({
+                                "item_type": "layer",
+                                "display_name": naming.display_name,
+                                "layer_style_id": resourceId,
+                                "layer_enabled": true,
+                                "layer_identifiable": true,
+                                "layer_transparency": null,
+                                "layer_min_scale_denom": null,
+                                "layer_max_scale_denom": null,
+                                "layer_adapter": "image",
+                            }, {
+                                parent: widget.getAddParent(),
+                                attribute: "children"
+                            }
+                        );
+                    }.bind(this);
+
+                    if (itm.cls.endsWith('_style')) {
+                        // For resources with the "_style" suffix use a parent
+                        // resource as a naming source.
+                        api.route('resource.item', itm.parent.id).get().then(
+                            function (data) { addItem(data.resource) }
+                        )
+                    } else addItem(itm);
                 }));
             }));
 

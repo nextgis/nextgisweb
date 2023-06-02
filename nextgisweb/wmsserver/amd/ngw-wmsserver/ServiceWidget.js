@@ -10,6 +10,7 @@ define([
     "dijit/tree/TreeStoreModel",
     "dijit/Tree",
     "dijit/tree/dndSource",
+    "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     "ngw-resource/serialize",
     // resource
@@ -45,6 +46,7 @@ define([
     TreeStoreModel,
     Tree,
     dndSource,
+    api,
     i18n,
     serialize,
     template
@@ -111,22 +113,33 @@ define([
             // Add new layer
             this.btnAddLayer.on("click", lang.hitch(this, function () {
                 this.layerPicker.pick().then(lang.hitch(this, function (itm) {
-                    this.itemStore.newItem({
-                            "keyname": this._layerKeyname(itm),
-                            "display_name": itm.display_name,
-                            "resource_id": itm.id,
-                            "min_scale_denom": null,
-                            "max_scale_denom": null
-                        }, {
-                            parent: widget.itemModel.root,
-                            attribute: "children"
-                        }
-                    );
-                    this.itemIdx++;
-                    this.widgetTree.set("path", [
-                        this.widgetTreeRootNodeId,
-                        this.itemIdx
-                    ]);
+                    var resourceId = itm.id;
+                    var addItem = function (naming) {
+                        this.itemStore.newItem({
+                                "keyname": this._layerKeyname(naming),
+                                "display_name": naming.display_name,
+                                "resource_id": resourceId,
+                                "min_scale_denom": null,
+                                "max_scale_denom": null
+                            }, {
+                                parent: widget.itemModel.root,
+                                attribute: "children"
+                            }
+                        );
+                        this.itemIdx++;
+                        this.widgetTree.set("path", [
+                            this.widgetTreeRootNodeId,
+                            this.itemIdx
+                        ]);
+                    }.bind(this);
+
+                    if (itm.cls.endsWith('_style')) {
+                        // For resources with the "_style" suffix use a parent
+                        // resource as a naming source.
+                        api.route('resource.item', itm.parent.id).get().then(
+                            function (data) { addItem(data.resource) }
+                        )
+                    } else addItem(itm)
                 }));
             }));
 
