@@ -55,6 +55,7 @@ define([
 
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         title: i18n.gettext("WMS service"),
+        activateOn: {update: true },
         templateString: i18n.renderTemplate(template),
 
         constructor: function () {

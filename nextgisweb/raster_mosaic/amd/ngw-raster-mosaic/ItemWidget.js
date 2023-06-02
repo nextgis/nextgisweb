@@ -60,6 +60,7 @@ define([
 
     return declare([LayoutContainer, serialize.Mixin], {
         title: i18n.gettext("Items"),
+        activateOn: {update: true },
 
         constructor: function () {
             this.wSrs = SRSSelect({

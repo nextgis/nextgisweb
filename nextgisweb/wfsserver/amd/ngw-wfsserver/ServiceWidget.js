@@ -52,8 +52,9 @@ define([
     var keyname_pattern = '^[A-Za-z][\\w]*$';
 
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        title: i18n.gettext("WFS service"),
         templateString: i18n.renderTemplate(template),
+        title: i18n.gettext("WFS service"),
+        activateOn: {update: true },
 
         constructor: function () {
             this.itemStore = new ItemFileWriteStore({data: {
