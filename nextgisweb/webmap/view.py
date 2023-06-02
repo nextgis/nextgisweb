@@ -1,5 +1,6 @@
 from collections import namedtuple
 from urllib.parse import unquote, urljoin, urlparse
+from inspect import signature
 
 from pyramid.renderers import render_to_response
 
@@ -111,7 +112,7 @@ def display(obj, request):
 
         if item.item_type == 'layer':
             style = item.style
-            layer = style.parent
+            layer = style.parent if style.cls.endswith('_style') else style
 
             if not style.has_permission(DataScope.read, request.user):
                 return None
@@ -150,8 +151,12 @@ def display(obj, request):
 
             # Layer level plugins
             plugin = dict()
+            plugin_base_kwargs = dict(layer=layer, webmap=obj)
             for pcls in WebmapLayerPlugin.registry:
-                p_mid_data = pcls.is_layer_supported(layer, obj)
+                fn = pcls.is_layer_supported
+                plugin_kwargs = dict(plugin_base_kwargs, style=style) \
+                    if 'style' in signature(fn).parameters else plugin_base_kwargs
+                p_mid_data = fn(**plugin_kwargs)
                 if p_mid_data:
                     plugin.update((p_mid_data,))
 
