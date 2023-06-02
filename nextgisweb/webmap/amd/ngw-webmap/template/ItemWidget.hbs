@@ -17,7 +17,6 @@
                     data-dojo-attach-point="layerPicker"
                     data-dojo-props="interface: 'IRenderableStyle', dialogTitle: {{gettextString 'Select layer\'s style'}}">
                 </div>
-
             </div>
 
             <div data-dojo-type="dijit/form/Button"
@@ -40,7 +39,6 @@
                 class="dijitButton--signal">
                 {{gettext 'Layer order'}}
             </div>
-
         </div>
 
         <div data-dojo-attach-point="containerTree"
@@ -101,8 +99,14 @@
 
                         <div data-dojo-attach-point="wLayerAdapter"
                             data-dojo-type="dijit/form/Select"
-                            style="width: 100%;"
+                            style="width: 100%"
                             title="{{gettext 'Adapter'}}">
+                        </div>
+
+                        <div data-dojo-attach-point="wLayerLegend"
+                            data-dojo-type="dijit/form/Select"
+                            style="width: 100%"
+                            title="{{gettext 'Legend'}}">
                         </div>
 
                         <div data-dojo-attach-point="wLayerStyle"
@@ -110,9 +114,7 @@
                             style="width: 100%"
                             title="{{gettext 'Style resource'}}">
                         </div>
-
                     </div>
-
                 </div>
 
                 <div data-dojo-attach-point="paneGroup"
@@ -129,15 +131,9 @@
                         <div data-dojo-attach-point="widgetItemGroupExpanded"
                             data-dojo-type="dijit/form/CheckBox"
                             title="{{gettext 'Expanded'}}"></div>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>

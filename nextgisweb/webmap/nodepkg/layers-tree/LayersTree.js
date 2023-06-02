@@ -8,6 +8,7 @@ import DescriptionIcon from "@material-icons/svg/description/outline";
 import EditIcon from "@material-icons/svg/edit/outline";
 
 import { DropdownActions } from "./DropdownActions";
+import { LegendAction, Legend } from "./Legend.js";
 import PropTypes from "prop-types";
 
 import "./LayersTree.less";
@@ -40,11 +41,27 @@ const handleWebMapItem = (webMapItem) => {
             expanded ? <FolderOpenIcon /> : <FolderClosedIcon />;
     } else if (webMapItem.type === "layer") {
         webMapItem.isLeaf = true;
+
+        if (webMapItem.legendInfo) {
+            const { legendInfo } = webMapItem;
+            if (legendInfo.visible && legendInfo.single) {
+                webMapItem.legendIcon = <img
+                    width={15}
+                    height={15}
+                    src={"data:image/png;base64," + legendInfo.symbols[0].icon.data}
+                />;
+            }
+        }
+
         webMapItem.icon = (item) => {
             if (item.editable && item.editable === true) {
                 return <EditIcon />;
             } else {
-                return <DescriptionIcon />;
+                if (webMapItem.legendIcon) {
+                    return webMapItem.legendIcon;
+                } else {
+                    return <DescriptionIcon />;
+                }
             }
         };
     }
@@ -94,7 +111,11 @@ export const LayersTree = observer(
                         <Col flex="auto" className="tree-item-title">
                             {title}
                         </Col>
-                        <Col flex="none">
+                        <Col flex="50px" className="tree-item-action">
+                            <LegendAction
+                                nodeData={nodeData}
+                                onClick={() => setUpdate(!update)}
+                            />
                             <DropdownActions
                                 nodeData={nodeData}
                                 getWebmapPlugins={getWebmapPlugins}
@@ -105,6 +126,7 @@ export const LayersTree = observer(
                             />
                         </Col>
                     </Row>
+                    <Legend nodeData={nodeData} />
                 </>
             );
         };

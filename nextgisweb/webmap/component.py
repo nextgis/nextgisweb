@@ -50,7 +50,11 @@ class WebMapComponent(Component):
             check_origin=self.options['check_origin'],
         )
 
-        result.update(self.settings_view(request))
+        settings_view = self.settings_view(request)
+        result.update(settings_view)
+
+        if 'legend_visible' in settings_view and settings_view['legend_visible'] == 'default':
+            result['legend_visible'] = 'on' if self.options['legend_visible'] else 'disabled'
 
         return result
 
@@ -67,4 +71,5 @@ class WebMapComponent(Component):
         Option('annotation', bool, default=True, doc="Turn on / off annotations."),
         Option('enable_social_networks', bool, default=False),
         Option('check_origin', bool, default=False, doc="Check iframe Referer header."),
+        Option('legend_visible', str, default='off'),
     )

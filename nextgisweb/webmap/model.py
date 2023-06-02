@@ -53,6 +53,7 @@ class WebMap(Base, Resource):
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
     annotation_default = db.Column(db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default='no')
+    legend_visible = db.Column(db.Enum('default', 'on', 'off', 'disable'), nullable=False, default='default')
 
     root_item = db.relationship('WebMapItem', cascade='all')
 
@@ -148,6 +149,8 @@ class WebMapItem(Base):
         backref=db.backref('webmap_items', cascade='all')
     )
 
+    legend_visible = db.Column(db.Enum('default', 'on', 'off', 'disable'), nullable=True, default='default')
+
     def to_dict(self):
         if self.item_type in ('root', 'group'):
             children = list(self.children)
@@ -191,6 +194,7 @@ class WebMapItem(Base):
                 layer_max_scale_denom=self.layer_max_scale_denom,
                 layer_adapter=self.layer_adapter,
                 draw_order_position=self.draw_order_position,
+                legend_visible=self.legend_visible,
                 payload=payload
             )
 
@@ -206,8 +210,7 @@ class WebMapItem(Base):
         for a in ('display_name', 'group_expanded', 'layer_enabled', 'layer_identifiable',
                   'layer_adapter', 'layer_style_id', 'layer_transparency',
                   'layer_min_scale_denom', 'layer_max_scale_denom',
-                  'draw_order_position'):
-
+                  'draw_order_position', 'legend_visible'):
             if a in data:
                 setattr(self, a, data[a])
 
@@ -271,6 +274,8 @@ class WebMapSerializer(Serializer):
     annotation_enabled = SP(**_mdargs)
     annotation_default = SP(**_mdargs)
 
+    legend_visible = SP(**_mdargs)
+
     bookmark_resource = SRR(**_mdargs)
 
     root_item = _root_item_attr(**_mdargs)
@@ -291,6 +296,7 @@ WM_SETTINGS = dict(
     units_area='sq.m',
     degree_format='dd',
     measurement_srid=4326,
+    legend_visible='default'
 )
 
 

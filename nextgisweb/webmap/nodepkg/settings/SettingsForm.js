@@ -18,8 +18,9 @@ import i18n from "@nextgisweb/pyramid/i18n!";
 import {
     AddressGeocoderOptions,
     DegreeFormatOptions,
+    LegendEnabledOptions,
     UnitsAreaOptions,
-    UnitsLengthOptions,
+    UnitsLengthOptions
 } from "./select-options";
 
 const { Title } = Typography;
@@ -253,6 +254,22 @@ export const SettingsForm = ({
                             <Input style={INPUT_DEFAULT_WIDTH} />
                         </Form.Item>
                     )}
+                </Col>
+            </Row>
+
+            <Title level={4}>{i18n.gettext("Legend")}</Title>
+
+            <Row gutter={[16, 16]}>
+                <Col span={8}>
+                    <Form.Item
+                        name="legend_visible"
+                        label={i18n.gettext("Visibility")}
+                    >
+                        <Select
+                            options={LegendEnabledOptions}
+                            style={INPUT_DEFAULT_WIDTH}
+                        />
+                    </Form.Item>
                 </Col>
             </Row>
 

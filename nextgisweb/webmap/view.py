@@ -5,10 +5,12 @@ from inspect import signature
 from pyramid.renderers import render_to_response
 
 from .adapter import WebMapAdapter
-from .model import WebMap, WebMapScope
+from .model import WebMap, WebMapScope, WebMapItem
 from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .util import webmap_items_to_tms_ids_list, _
+from ..env import env
 from ..lib.dynmenu import DynItem, Label, Link
+from ..render.api import legend_symbols_by_resource
 from ..resource import Resource, Widget, resource_factory, DataScope, ResourceScope
 from ..pyramid import viewargs
 
@@ -73,6 +75,38 @@ def check_origin(request):
     return True
 
 
+def get_legend_visible_default() -> str:
+    webmaps_legend_setting = env.core.settings_get('webmap', 'legend_visible', 'default')
+    if webmaps_legend_setting != 'default':
+        legend_visible_default = webmaps_legend_setting
+    else:
+        config_legend_setting = env.webmap.options['legend_visible']
+        legend_visible_default = 'on' if config_legend_setting else 'disabled'
+    return legend_visible_default
+
+
+def get_legend_info(webmap: WebMap, webmap_item: WebMapItem, style, visible_default: str):
+    legend_visible = webmap_item.legend_visible
+
+    if legend_visible == 'default':
+        legend_visible = webmap.legend_visible if webmap.legend_visible != 'default' else visible_default
+
+    legend_info = dict(visible=legend_visible)
+
+    if legend_visible == 'on' or legend_visible == 'off':
+        has_legend = ILegendSymbols.providedBy(style)
+        legend_info.update(dict(has_legend=has_legend))
+        if has_legend:
+            legend_symbols = legend_symbols_by_resource(style, 15)
+            legend_info.update(dict(symbols=legend_symbols))
+            is_single = len(legend_symbols) == 1
+            legend_info.update(dict(single=is_single))
+            if not is_single:
+                legend_info.update(dict(open=legend_visible == 'on'))
+
+    return legend_info
+
+
 @viewargs(renderer='mako')
 def display(obj, request):
     is_valid_or_error = check_origin(request)
@@ -100,6 +134,8 @@ def display(obj, request):
         'expanded': [],
         'checked': []
     }
+
+    legend_visible_default = get_legend_visible_default()
 
     def traverse(item):
         data = dict(
@@ -143,6 +179,7 @@ def display(obj, request):
                 minScaleDenom=item.layer_min_scale_denom,
                 maxScaleDenom=item.layer_max_scale_denom,
                 drawOrderPosition=item.draw_order_position,
+                legendInfo=get_legend_info(obj, item, style, legend_visible_default),
             )
 
             data['adapter'] = WebMapAdapter.registry.get(
@@ -184,7 +221,7 @@ def display(obj, request):
 
     tmp = obj.to_dict()
 
-    config = dict(
+    display_config = dict(
         extent=tmp["extent"],
         extent_constrained=tmp["extent_constrained"],
         rootItem=traverse(obj.root_item),
@@ -202,11 +239,12 @@ def display(obj, request):
         webmapDescription=obj.description,
         webmapTitle=obj.display_name,
         webmapEditable=obj.editable,
+        webmapLegendVisible=obj.legend_visible,
         drawOrderEnabled=obj.draw_order_enabled,
     )
 
     if request.env.webmap.options['annotation']:
-        config['annotations'] = dict(
+        display_config['annotations'] = dict(
             enabled=obj.annotation_enabled,
             default=obj.annotation_default,
             scope=dict(
@@ -218,7 +256,7 @@ def display(obj, request):
 
     return dict(
         obj=obj,
-        display_config=config,
+        display_config=display_config,
         custom_layout=True
     )
 

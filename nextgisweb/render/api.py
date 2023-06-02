@@ -328,26 +328,28 @@ def legend(request):
     return Response(body_file=result, content_type='image/png')
 
 
-def legend_symbols(request) -> JSONType:
-    request.resource_permission(PD_READ)
-
-    icon_size = int(request.GET.get('icon_size', '24'))
-
+def legend_symbols_by_resource(resource, icon_size: int):
     result = list()
 
-    for s in request.context.legend_symbols(icon_size):
+    for s in resource.legend_symbols(icon_size):
         buf = BytesIO()
         s.icon.save(buf, 'png', compress_level=3)
 
         result.append(dict(
             display_name=s.display_name,
             icon=dict(
-                format="png", 
+                format="png",
                 data=b64encode(buf.getvalue()).decode('ascii'),
             ),
         ))
-    
+
     return result
+
+
+def legend_symbols(request) -> JSONType:
+    request.resource_permission(PD_READ)
+    icon_size = int(request.GET.get('icon_size', '24'))
+    return legend_symbols_by_resource(request.context, icon_size)
 
 
 def setup_pyramid(comp, config):

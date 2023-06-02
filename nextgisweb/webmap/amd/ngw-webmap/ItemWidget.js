@@ -289,6 +289,17 @@ define([
                 })
             });
 
+            this.legendOptionsStore = new ObjectStore({
+                objectStore: new Memory({
+                    data: [
+                        { id: "on", label: i18n.gettext("Show") },
+                        { id: "off", label: i18n.gettext("Hide") },
+                        { id: "disable", label: i18n.gettext("Disable") },
+                        { id: "default", label: i18n.gettext("Default") },
+                    ]
+                })
+            });
+
             this.layerOrder = new LayerOrder({
                 store: this.itemStore,
                 widget: this
@@ -300,6 +311,8 @@ define([
 
             // Adapters list
             this.wLayerAdapter.set("store", this.adaptersStore);
+
+            this.wLayerLegend.set("store", this.legendOptionsStore);
 
             // Create tree without model is not possible, so create it manually
             this.widgetTree.placeAt(this.containerTree).startup();
@@ -335,6 +348,7 @@ define([
                                 "layer_min_scale_denom": null,
                                 "layer_max_scale_denom": null,
                                 "layer_adapter": "image",
+                                "legend_visible": "default",
                             }, {
                                 parent: widget.getAddParent(),
                                 attribute: "children"
@@ -381,6 +395,7 @@ define([
                         widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale_denom"));
                         widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale_denom"));
                         widget.wLayerAdapter.set("value", widget.getItemValue("layer_adapter"));
+                        widget.wLayerLegend.set("value", widget.getItemValue("legend_visible"));
                         widget.wLayerStyle.set("value", widget.getItemValue("layer_style_id"));
                     }
 
@@ -434,6 +449,10 @@ define([
             this.wLayerAdapter.watch("value", function (attr, oldVal, newVal) {
                 widget.setItemValue("layer_adapter", newVal);
             });
+            
+            this.wLayerLegend.watch("value", function (attr, oldVal, newVal) {
+                widget.setItemValue("legend_visible", newVal);
+            });
         },
 
         startup: function () {
@@ -486,6 +505,7 @@ define([
                     layer_max_scale_denom: store.getValue(itm, "layer_max_scale_denom"),
                     layer_adapter: store.getValue(itm, "layer_adapter"),
                     draw_order_position: store.getValue(itm, "draw_order_position"),
+                    legend_visible: store.getValue(itm, "legend_visible"),
                     children: array.map(store.getValues(itm, "children"), function (i) { return traverse(i); })
                 };
             }
