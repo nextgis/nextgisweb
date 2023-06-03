@@ -117,7 +117,7 @@ def display(obj, request):
         if ls_layer in (LegendSymbolsEnum.EXPAND, LegendSymbolsEnum.COLLAPSE):
             has_legend = result['has_legend'] = ILegendSymbols.providedBy(style)
             if has_legend:
-                legend_symbols = legend_symbols_by_resource(style, 15)
+                legend_symbols = legend_symbols_by_resource(style, 20)
                 result.update(symbols=legend_symbols)
                 is_single = len(legend_symbols) == 1
                 result.update(single=is_single)

@@ -2,9 +2,6 @@ import { useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
 
 import { Row, Col, Tree } from "@nextgisweb/gui/antd";
-import FolderClosedIcon from "@material-icons/svg/folder/outline";
-import FolderOpenIcon from "@material-icons/svg/folder_open/outline";
-import DescriptionIcon from "@material-icons/svg/description/outline";
 import EditIcon from "@material-icons/svg/edit/outline";
 
 import { DropdownActions } from "./DropdownActions";
@@ -36,18 +33,15 @@ const forEachInTree = (data, callback) => {
 };
 
 const handleWebMapItem = (webMapItem) => {
-    if (webMapItem.type === "root" || webMapItem.type === "group") {
-        webMapItem.icon = ({ expanded }) =>
-            expanded ? <FolderOpenIcon /> : <FolderClosedIcon />;
-    } else if (webMapItem.type === "layer") {
+    if (webMapItem.type === "layer") {
         webMapItem.isLeaf = true;
 
         if (webMapItem.legendInfo) {
             const { legendInfo } = webMapItem;
             if (legendInfo.visible && legendInfo.single) {
                 webMapItem.legendIcon = <img
-                    width={15}
-                    height={15}
+                    width={20}
+                    height={20}
                     src={"data:image/png;base64," + legendInfo.symbols[0].icon.data}
                 />;
             }
@@ -59,8 +53,6 @@ const handleWebMapItem = (webMapItem) => {
             } else {
                 if (webMapItem.legendIcon) {
                     return webMapItem.legendIcon;
-                } else {
-                    return <DescriptionIcon />;
                 }
             }
         };
@@ -195,6 +187,7 @@ export const LayersTree = observer(
                 motion={false}
                 checkable
                 showIcon
+                showLine
                 onExpand={onExpand}
                 expandedKeys={store.expanded}
                 autoExpandParent={autoExpandParent}

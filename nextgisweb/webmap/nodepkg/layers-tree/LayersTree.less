@@ -3,23 +3,57 @@
         padding: 0;
     }
 
+    .ant-tree-switcher-line-icon {
+        vertical-align: -0.3em;
+    }
+
     .ant-tree-checkbox {
-        margin: 5px 0 0 0;
+        margin-top: 8px;
+        margin-right: 6px;
+
+        .ant-tree-checkbox-inner {
+            width: 12px;
+            height: 12px;
+        }
+    }
+
+    .ant-tree-checkbox-checked > .ant-tree-checkbox-inner::after {
+        width: 4px;
+        height: 6px;
+        left: 25%;
+    }
+
+    .ant-tree-checkbox-indeterminate > .ant-tree-checkbox-inner::after {
+        width: 6px;
+        height: 6px;
     }
 
     .ant-tree-node-content-wrapper {
         display: flex;
+        align-items: start;
+        column-gap: 6px;
         width: 100%;
         min-width: 0;
-        align-items: baseline;
+        padding-left: 0;
+        line-height: 28px;
+
+        .ant-row {
+            margin: 0;
+        }
 
         &.ant-tree-node-selected {
             background-color: transparent;
         }
 
         .ant-tree-icon__customize {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 28px;
+            width: auto;
+
             img {
-                vertical-align: text-top;
+                display: block;
             }
         }
 
