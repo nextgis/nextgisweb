@@ -39,11 +39,16 @@ const handleWebMapItem = (webMapItem) => {
         if (webMapItem.legendInfo) {
             const { legendInfo } = webMapItem;
             if (legendInfo.visible && legendInfo.single) {
-                webMapItem.legendIcon = <img
-                    width={20}
-                    height={20}
-                    src={"data:image/png;base64," + legendInfo.symbols[0].icon.data}
-                />;
+                webMapItem.legendIcon = (
+                    <img
+                        width={20}
+                        height={20}
+                        src={
+                            "data:image/png;base64," +
+                            legendInfo.symbols[0].icon.data
+                        }
+                    />
+                );
             }
         }
 
@@ -80,6 +85,15 @@ export const LayersTree = observer(
             () => prepareWebMapItems(store.webmapItems),
             [store.webmapItems]
         );
+
+        const hasGroups = useMemo(() => {
+            for (const itm of store.webmapItems) {
+                if (itm.type == "group") {
+                    return true;
+                }
+            }
+            return false;
+        }, [store.webmapItems]);
 
         const onExpand = (expandedKeysValue) => {
             store.setExpanded(expandedKeysValue);
@@ -182,12 +196,14 @@ export const LayersTree = observer(
 
         return (
             <Tree
-                className="ngw-webmap-layers-tree"
+                className={
+                    "ngw-webmap-layers-tree" + (!hasGroups ? " flat" : "")
+                }
                 virtual={false}
                 motion={false}
                 checkable
                 showIcon
-                showLine
+                showLine={hasGroups}
                 onExpand={onExpand}
                 expandedKeys={store.expanded}
                 autoExpandParent={autoExpandParent}
