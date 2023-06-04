@@ -7,11 +7,6 @@
             data-ngw-serialize="display_name"
             title="{{gettext 'Display name'}}" style="width: 100%"></div>
 
-        <div data-dojo-type="ngw-pyramid/form/KeynameTextBox"
-            data-dojo-attach-point="wKeyname"
-            data-ngw-serialize="keyname"
-            title="{{gettext 'Keyname'}}" style="width: 100%"></div>
-
         <div data-dojo-type="ngw-resource/ResourceBox"
             data-dojo-attach-point="wParent"
             data-dojo-props="required: true"
@@ -26,6 +21,13 @@
             data-dojo-attach-point="wCls"
             data-dojo-props="readonly: true"
             title="{{gettext 'Type'}}" style="width: 100%"></div>
+
+        <div data-dojo-type="ngw-pyramid/form/KeynameTextBox"
+            data-dojo-attach-point="wKeyname"
+            data-ngw-serialize="keyname"
+            title="{{gettext 'Keyname'}}"
+            placeholder="{{gettext 'Optional alphanumeric identifier for API integrations'}}"
+            style="width: 100%"></div>
 
     </div>
 </div>
