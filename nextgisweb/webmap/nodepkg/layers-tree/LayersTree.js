@@ -88,7 +88,7 @@ export const LayersTree = observer(
 
         const hasGroups = useMemo(() => {
             for (const itm of store.webmapItems) {
-                if (itm.type == "group") {
+                if (itm.type === "group") {
                     return true;
                 }
             }

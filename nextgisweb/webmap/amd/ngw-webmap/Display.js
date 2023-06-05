@@ -1033,7 +1033,9 @@ define([
         },
 
         _pluginsSetup: function (wmplugin) {
-            this._plugins = {};
+            if (!this._plugins) {
+                this._plugins = {};
+            }
 
             var widget = this,
                 plugins = wmplugin ? this._mid.wmplugin : this._mid.plugin;
@@ -1234,7 +1236,7 @@ define([
                     store: this.webmapStore,
                     onSelect: handleSelect,
                     setLayerZIndex: setLayerZIndex,
-                    getWebmapPlugins: () => widget._plugins,
+                    getWebmapPlugins: () => Object.assign({}, widget._plugins),
                 },
                 widget.layersPanel.contentWidget.layerTreePane.domNode
             );

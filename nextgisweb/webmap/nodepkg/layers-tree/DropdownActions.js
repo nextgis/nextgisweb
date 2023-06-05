@@ -34,9 +34,11 @@ export function DropdownActions({
 
     const menuItems = [];
     const customMenuItems = [];
-    Object.entries(getWebmapPlugins()).forEach(([keyPlugin, plugin]) => {
+    const plugins = getWebmapPlugins();
+    for (const keyPlugin in plugins) {
+        const plugin = plugins[keyPlugin];
         if (!plugin || !plugin.getPluginState) {
-            return;
+            continue;
         }
         const pluginInfo = plugin.getPluginState(nodeData);
         if (pluginInfo.enabled) {
@@ -59,9 +61,11 @@ export function DropdownActions({
                     label: (
                         <>
                             <span>
-                                {typeof icon === 'string' ? (
+                                {typeof icon === "string" ? (
                                     <SvgIcon icon={icon} fill="currentColor" />
-                                ) : icon}
+                                ) : (
+                                    icon
+                                )}
                             </span>
                             <span>{title}</span>
                         </>
@@ -71,7 +75,7 @@ export function DropdownActions({
                 customMenuItems.push(plugin.render.bind(plugin, pluginInfo));
             }
         }
-    });
+    }
 
     const menuProps = {
         items: menuItems,
@@ -93,7 +97,7 @@ export function DropdownActions({
             dropdownRender={(menu) => (
                 <div className="dropdown-content">
                     {menu}
-                    {customMenuItems.length && (
+                    {customMenuItems.length ? (
                         <>
                             <Divider style={{ margin: 0 }} />
                             <Space
@@ -105,6 +109,8 @@ export function DropdownActions({
                                 ))}
                             </Space>
                         </>
+                    ) : (
+                        ""
                     )}
                 </div>
             )}
