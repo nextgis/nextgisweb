@@ -345,8 +345,8 @@ msgid "Keyname"
 msgstr "Ключ"
 
 #: amd/ngw-resource/template/Widget.hbs:29
-msgid "Optional alphanumeric identifier for API integrations"
-msgstr "Необязательный буквенно-цифровой идентификатор для интеграций API"
+msgid "Identifier for API integration (optional)"
+msgstr "Идентификатор для API интеграции (необязательно)"
 
 #: amd/ngw-resource/template/Widget.hbs:18
 msgid "Parent"
