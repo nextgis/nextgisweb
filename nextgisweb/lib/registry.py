@@ -1,39 +1,134 @@
-import warnings
-from collections import OrderedDict
+from warnings import warn
+
+
+class ListRegistry:
+    
+    def __init__(self):
+        self._items = list()
+
+    def register(self, cls):
+        if cls in self._items:
+            warn(f"{cls} was already registered in the registry", stacklevel=2)
+            return cls
+        else:
+            self._items.append(cls)
+        return cls
+
+    def __iter__(self):
+        return self._items.__iter__()
+    
+
+class DictRegistry:
+
+    def __init__(self):
+        self._dict = dict()
+
+    def register(self, member):
+        identity = getattr(member, 'identity', None)
+        if identity is None or not isinstance(identity, str):
+            raise TypeError(f"{member!r} must have 'identity' attribute")
+        elif existing := self._dict.get(identity):
+            if existing is member:
+                warn(f"{member!r} was already registered in the registry", stacklevel=2)
+            else:
+                raise TypeError(f"{existing!r} already registered with '{identity}' key")
+        else:
+            self._dict[identity] = member
+
+        return member
+
+    def __iter__(self):
+        warn(f"Don't use the registry default iterator, use items() or keys() or values() instead", stacklevel=2)
+        for i in self._dict.values():
+            yield i
+
+    def items(self):
+        yield from self._dict.items()
+
+    def keys(self):
+        yield from self._dict.keys()
+
+    def values(self):
+        yield from self._dict.values()
+
+    def __getitem__(self, identity):
+        return self._dict[identity]
+
+    def __contains__(self, identity):
+        return self._dict.__contains__(identity)
+
+    def __len__(self):
+        return len(self._dict)
+
+    def get(self, identity, default=None):
+        return self._dict.get(identity, default)
+
+
+class LegacyRegistry:
+
+    def __init__(self):
+        self._items = []
+        self._dict = dict()
+
+    def register(self, member):
+        if member in self._items:
+            warn(f"{member!r} was already registered in the registry", stacklevel=2)
+            return member
+        else:
+            self._items.append(member)
+
+        identity = getattr(member, 'identity', None)
+
+        if identity is None:
+            pass
+        elif existing := self._dict.get(identity):
+            if existing is member:
+                warn(f"{member!r} was already registered in the registry", stacklevel=2)
+            else:
+                raise TypeError(f"{existing!r} already registered with '{identity}' key")
+        else:
+            self._dict[identity] = member
+
+        return member
+
+    def __iter__(self):
+        for i in self._items:
+            yield i
+
+    def __getitem__(self, identity):
+        return self._dict[identity]
+
+    def __contains__(self, identity):
+        return self._dict.__contains__(identity)
+
+    def __len__(self):
+        return len(self._items)
+
+    def get(self, identity, default=None):
+        return self._dict.get(identity, default)
 
 
 def registry_maker():
-    class ClassRegistry:
+    warn("registry_maker() is deprecated since 4.4.0.dev9", stacklevel=2)
+    return LegacyRegistry()
 
-        def __init__(self):
-            self._items = []
-            self._dict = OrderedDict()
 
-        def register(self, cls):
-            if cls in self._items:
-                warnings.warn(
-                    "Class registered multiple times: %s" % cls.__name__,
-                    stacklevel=2)
-                return cls
-            self._items.append(cls)
-            if hasattr(cls, 'identity'):
-                self._dict[cls.identity] = cls
-            return cls
+def _registry(cls, regcls):
+    assert not hasattr(cls, 'registry')
+    cls.registry = regcls()
 
-        def __iter__(self):
-            for i in self._items:
-                yield i
+    def _patched_init_subclass(subcls):
+        super(cls, subcls).__init_subclass__()
+        cls.registry.register(subcls)
 
-        def __getitem__(self, identity):
-            return self._dict[identity]
+    cls.__init_subclass__ = classmethod(_patched_init_subclass)
 
-        def __contains__(self, identity):
-            return self._dict.__contains__(identity)
+    return cls
 
-        def __len__(self):
-            return len(self._items)
 
-        def get(self, identity, default=None):
-            return self._dict.get(identity, default)
+def list_registry(cls):
+    return _registry(cls, ListRegistry)
 
-    return ClassRegistry()
+
+def dict_registry(cls):
+    return _registry(cls, DictRegistry)

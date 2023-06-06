@@ -10,8 +10,8 @@ def pytest_generate_tests(metafunc):
     if 'resource_cls' in metafunc.fixturenames:
         load_all()
         metafunc.parametrize('resource_cls', [
-            pytest.param(cls, id=cls.identity)
-            for cls in Resource.registry])
+            pytest.param(cls, id=identity)
+            for identity, cls in Resource.registry.items()])
 
 
 def test_requirement_ordering(resource_cls):

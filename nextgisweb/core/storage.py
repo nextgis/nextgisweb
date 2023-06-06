@@ -7,7 +7,7 @@ from zope.sqlalchemy import mark_changed
 
 from ..lib.logging import logger
 from ..env.model import DBSession
-from ..lib.registry import registry_maker
+from ..lib.registry import dict_registry
 
 from .util import _, format_size
 from .exception import UserException
@@ -18,20 +18,10 @@ from .model import (
     storage_stat_delta_total)
 
 
-class KindOfDataMeta(type):
-
-    def __init__(cls, name, bases, nmspc):
-        super().__init__(name, bases, nmspc)
-        if cls.identity is not None:
-            cls.registry.register(cls)
-
-
-class KindOfData(metaclass=KindOfDataMeta):
-
-    registry = registry_maker()
-
-    identity = None
-    display_name = None
+@dict_registry
+class KindOfData():
+    identity : str = None
+    display_name : str = None
 
 
 class StorageComponentMixin:

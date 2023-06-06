@@ -4,7 +4,6 @@ from ..env.model import DBSession
 from .model import FeatureDescription
 
 
-@FeatureExtension.registry.register
 class FeatureDescriptionExtension(FeatureExtension):
     identity = 'description'
 

@@ -6,7 +6,6 @@ from ...feature_layer.view import PD_WRITE
 from .base import WebmapLayerPlugin
 
 
-@WebmapLayerPlugin.registry.register
 class LayerEditorPlugin(WebmapLayerPlugin):
 
     @classmethod

@@ -8,7 +8,8 @@ def pytest_generate_tests(metafunc):
     if 'comp_option_annotations' in metafunc.fixturenames:
         load_all()
         metafunc.parametrize('comp_option_annotations', [
-            pytest.param(c, id=c.identity) for c in Component.registry
+            pytest.param(c, id=identity)
+            for identity, c in Component.registry.items()
             if hasattr(c, 'option_annotations')])
 
 

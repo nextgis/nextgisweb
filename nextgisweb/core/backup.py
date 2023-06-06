@@ -13,7 +13,7 @@ from zope.sqlalchemy import mark_changed
 from packaging.version import Version
 
 from ..lib.logging import logger
-from ..lib.registry import registry_maker
+from ..lib.registry import dict_registry
 from ..env.model import DBSession
 
 
@@ -57,8 +57,8 @@ class IndexFile:
             yield read()
 
 
+@dict_registry
 class BackupBase:
-    registry = registry_maker()
 
     def __init__(self, payload):
         self.payload = payload

@@ -8,7 +8,7 @@ from ...env import Component, load_all
 def pytest_generate_tests(metafunc):
     if "component" in metafunc.fixturenames:
         load_all()
-        metafunc.parametrize('component', [c.identity for c in Component.registry])
+        metafunc.parametrize('component', Component.registry.keys())
 
 
 @pytest.fixture(scope='module')

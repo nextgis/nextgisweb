@@ -3,13 +3,11 @@ from collections import OrderedDict
 
 from zope.interface import Interface, implementer
 
-from ..lib.registry import registry_maker
+from ..lib.registry import dict_registry
 from ..env.model import BaseClass
 from ..core.exception import IUserException, ForbiddenError
 
 from .util import _
-
-_registry = registry_maker()
 
 
 class SerializerBase:
@@ -149,13 +147,9 @@ class SerializerMeta(type):
 
         cls.proptab = sorted(proptab, key=lambda x: getattr(x[1], '__order__', 65535))
 
-        if not nmspc.get('__abstract__', False):
-            _registry.register(cls)
 
-
+@dict_registry
 class Serializer(SerializerBase, metaclass=SerializerMeta):
-    registry = _registry
-
     resclass = None
 
     def is_applicable(self):
@@ -185,7 +179,7 @@ class Serializer(SerializerBase, metaclass=SerializerMeta):
 
 
 class CompositeSerializer(SerializerBase):
-    registry = _registry
+    registry = Serializer.registry
 
     def __init__(self, obj, user, data=None):
         super().__init__(obj, user, data)

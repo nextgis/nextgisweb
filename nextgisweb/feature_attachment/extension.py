@@ -3,7 +3,6 @@ from ..env.model import DBSession
 from .model import FeatureAttachment
 
 
-@FeatureExtension.registry.register
 class FeatureAttachmentExtension(FeatureExtension):
     identity = 'attachment'
 

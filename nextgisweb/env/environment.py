@@ -82,8 +82,7 @@ class Env(Container):
         self._components = dict()
         self.components = MappingProxyType(self._components)
 
-        for comp_class in Component.registry:
-            identity = comp_class.identity
+        for identity, comp_class in Component.registry.items():
             if identity not in loaded_components:
                 logger.warning(
                     "Component '%s' was imported unexpectedly and won't "

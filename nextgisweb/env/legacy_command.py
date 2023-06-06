@@ -1,5 +1,6 @@
-from ..lib.registry import registry_maker
+from ..lib.registry import dict_registry
 
 
+@dict_registry
 class Command:
-    registry = registry_maker()
+    pass

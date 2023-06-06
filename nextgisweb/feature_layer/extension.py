@@ -1,9 +1,8 @@
+from ..lib.registry import dict_registry
 
-from ..lib.registry import registry_maker
 
-
+@dict_registry
 class FeatureExtension:
-    registry = registry_maker()
 
     def __init__(self, layer):
         self._layer = layer

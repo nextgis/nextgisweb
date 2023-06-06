@@ -71,9 +71,9 @@ def _extensions(extensions, layer):
 
     ext_filter = None if extensions is None else extensions.split(',')
 
-    for cls in FeatureExtension.registry:
-        if ext_filter is None or cls.identity in ext_filter:
-            result.append((cls.identity, cls(layer)))
+    for identity, cls in FeatureExtension.registry.items():
+        if ext_filter is None or identity in ext_filter:
+            result.append((identity, cls(layer)))
 
     return result
 
@@ -479,10 +479,10 @@ def deserialize(feat, data, geom_format='wkt', dt_format='obj', transformer=None
                 feat.fields[fld.keyname] = fval
 
     if 'extensions' in data:
-        for cls in FeatureExtension.registry:
-            if cls.identity in data['extensions']:
+        for identity, cls in FeatureExtension.registry.items():
+            if identity in data['extensions']:
                 ext = cls(feat.layer)
-                ext.deserialize(feat, data['extensions'][cls.identity])
+                ext.deserialize(feat, data['extensions'][identity])
 
 
 def serialize(feat, keys=None, geom_format='wkt', dt_format='obj', label=False, extensions=[]):

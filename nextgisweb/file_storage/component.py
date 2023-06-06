@@ -19,7 +19,6 @@ from .model import Base, FileObj
 BUF_SIZE = 1024 * 1024
 
 
-@BackupBase.registry.register
 class FileObjBackup(BackupBase):
     identity = 'fileobj'
     plget = itemgetter('component', 'uuid')

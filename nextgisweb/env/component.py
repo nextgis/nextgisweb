@@ -1,12 +1,11 @@
 import warnings
-import sys
 from pathlib import Path
 from pkg_resources import resource_filename
 from typing import Callable
 
 from ..lib.config import ConfigOptions
 from ..lib.logging import logger
-from ..lib.registry import registry_maker
+from ..lib.registry import dict_registry
 from .package import pkginfo, module_path
 
 
@@ -14,9 +13,6 @@ class ComponentMeta(type):
 
     def __init__(cls, name, bases, nmspc):
         super().__init__(name, bases, nmspc)
-        abstract = getattr(cls, '__abstract__', False)
-        if cls.identity and not abstract:
-            cls.registry.register(cls)
 
         module = cls.__module__
         module_parts = module.split('.')
@@ -39,13 +35,11 @@ class ComponentMeta(type):
         return classmethod(_resource_path)
 
 
+@dict_registry
 class Component(metaclass=ComponentMeta):
 
     identity = None
     """Identifier redefined in successors"""
-
-    registry = registry_maker()
-    """Registry where successors are registered while subclassing"""
 
     package: str
     """Top-level package name, usually 'nextgisweb' or 'nextgisweb_*'"""

@@ -1,7 +1,6 @@
 from .base import WebmapLayerPlugin
 
 
-@WebmapLayerPlugin.registry.register
 class LayerOpacityPlugin(WebmapLayerPlugin):
 
     @classmethod

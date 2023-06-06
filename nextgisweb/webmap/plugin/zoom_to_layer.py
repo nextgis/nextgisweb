@@ -3,7 +3,6 @@ from .base import WebmapLayerPlugin
 from ...layer import IBboxLayer
 
 
-@WebmapLayerPlugin.registry.register
 class ZoomToLayerPlugin(WebmapLayerPlugin):
 
     @classmethod

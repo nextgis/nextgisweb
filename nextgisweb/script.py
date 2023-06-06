@@ -195,7 +195,7 @@ def main(argv=sys.argv):
 
     # Convert legacy commands
     groups = {}
-    for cmd in LegacyCommand.registry:
+    for cmd in LegacyCommand.registry.values():
         parts = cmd.identity.split('.')
         name = parts.pop(-1)
         

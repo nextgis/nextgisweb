@@ -1,11 +1,12 @@
-from ...lib.registry import registry_maker
+from ...lib.registry import list_registry
 
 
+
+@list_registry
 class WebmapPlugin:
+    pass
 
-    registry = registry_maker()
 
-
+@list_registry
 class WebmapLayerPlugin:
-
-    registry = registry_maker()
+    pass

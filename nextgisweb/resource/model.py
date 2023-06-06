@@ -10,7 +10,7 @@ from ..auth import Principal, User, Group, OnFindReferencesData
 from ..core.exception import ValidationError, ForbiddenError
 from ..env import env
 from ..env.model import declarative_base, DBSession
-from ..lib.registry import registry_maker
+from ..lib.registry import DictRegistry
 
 from .util import _
 from .interface import providedBy
@@ -26,7 +26,7 @@ from .exception import HierarchyError, DisplayNameNotUnique
 
 Base = declarative_base(dependencies=('auth', ))
 
-resource_registry = registry_maker()
+resource_registry = DictRegistry()
 
 PermissionSets = namedtuple('PermissionSets', ('allow', 'deny', 'mask'))
 

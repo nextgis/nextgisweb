@@ -5,7 +5,6 @@ from ...resource import DataScope
 from .base import WebmapLayerPlugin
 
 
-@WebmapLayerPlugin.registry.register
 class FeatureLayerPlugin(WebmapLayerPlugin):
 
     @classmethod

@@ -25,7 +25,7 @@ class FeatureLayerComponent(Component):
 
     def client_settings(self, request):
         editor_widget = OrderedDict()
-        for k, ecls in FeatureExtension.registry._dict.items():
+        for k, ecls in FeatureExtension.registry.items():
             if hasattr(ecls, 'editor_widget'):
                 editor_widget[k] = ecls.editor_widget
 
@@ -33,7 +33,7 @@ class FeatureLayerComponent(Component):
             editor_widget=editor_widget,
             extensions=dict(map(
                 lambda ext: (ext.identity, ext.display_widget),
-                FeatureExtension.registry
+                FeatureExtension.registry.values()
             )),
             export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
             datatypes=FIELD_TYPE.enum,

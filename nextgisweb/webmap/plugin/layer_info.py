@@ -3,7 +3,6 @@ from .base import WebmapLayerPlugin
 from ...lib.logging import logger
 
 
-@WebmapLayerPlugin.registry.register
 class LayerInfoPlugin(WebmapLayerPlugin):
 
     @classmethod

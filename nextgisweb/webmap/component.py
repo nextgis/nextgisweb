@@ -44,7 +44,7 @@ class WebMapComponent(Component):
             adapters=dict(
                 (i.identity, dict(
                     display_name=request.localizer.translate(i.display_name)))
-                for i in WebMapAdapter.registry
+                for i in WebMapAdapter.registry.values()
             ),
             enable_social_networks=self.options['enable_social_networks'],
             check_origin=self.options['check_origin'],
