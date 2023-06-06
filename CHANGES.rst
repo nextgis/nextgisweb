@@ -10,6 +10,20 @@ Changes
 - Display the cursor location and an extent on webmaps.
 - Zoom to all layers on webmaps.
 - Support for linear and polygonal annotations.
+- Brand-new feature table based on React.
+- Ability to export a filtered set of features.
+- Changing layer opacity while viewing webmaps.
+- Reordering layers via drag-and-drop while viewing webmaps.
+- Default display names for resources during creation.
+- Improved tabs ordering and auto-activation.
+- Use a fast PNG encoder for rendering.
+
+
+4.3.2
+-----
+
+- Fix feature attachment download issues.
+
 
 4.3.1
 -----
