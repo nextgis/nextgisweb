@@ -1,6 +1,12 @@
 Changes
 =======
 
+4.3.2
+-----
+
+- Fix feature attachment download issues.
+
+
 4.3.1
 -----
 
