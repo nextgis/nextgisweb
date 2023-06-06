@@ -163,7 +163,7 @@ class Choice(OptionType):
         return self._otype(value)
     
     def dumps(self, value):
-        return value.value
+        return value.value if value is not None else ''
 
 
 OptionType.OTYPE_MAPPING[str] = Text()
