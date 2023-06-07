@@ -91,9 +91,9 @@ def schema(request) -> JSONType:
     resources = dict()
     scopes = dict()
 
-    for cls in Resource.registry:
-        resources[cls.identity] = dict(
-            identity=cls.identity,
+    for identity, cls in Resource.registry.items():
+        resources[identity] = dict(
+            identity=identity,
             label=request.localizer.translate(cls.cls_display_name),
             scopes=list(cls.scope.keys()))
 
