@@ -117,8 +117,11 @@ def _registry(cls, regcls):
     assert not hasattr(cls, 'registry')
     cls.registry = regcls()
 
+    original_init_subclass = cls.__init_subclass__
+
     def _patched_init_subclass(subcls):
-        super(cls, subcls).__init_subclass__()
+        if func := getattr(original_init_subclass, '__func__', None):
+            func(subcls)
         cls.registry.register(subcls)
 
     cls.__init_subclass__ = classmethod(_patched_init_subclass)
