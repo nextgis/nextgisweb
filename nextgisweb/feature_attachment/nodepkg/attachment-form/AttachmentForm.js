@@ -52,7 +52,7 @@ export function AttachmentForm({ id }) {
             <Button
                 type="primary"
                 disabled={loading && loading !== "export"}
-                loading={loading == "export"}
+                loading={loading === "export"}
                 onClick={doExport}
             >
                 {i18n.gettext("Export attachments to ZIP archive")}
@@ -140,7 +140,7 @@ export function AttachmentForm({ id }) {
                     type="primary"
                     danger={importReplace}
                     disabled={loading && loading !== "import"}
-                    loading={loading == "import"}
+                    loading={loading === "import"}
                 >
                     {i18n.gettext("Import attachments from ZIP archive")}
                 </Button>

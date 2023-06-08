@@ -1,23 +1,13 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
-    "dojo/_base/array",
-    "dojo/request/xhr",
-    "dojo/json",
     "dojo/dom-class",
-    "dojo/dom-construct",
-    "dojo/number",
     "dijit/_WidgetBase",
     "dijit/form/Button",
-    "dijit/form/TextBox",
-    "dijit/form/NumberTextBox",
-    "dijit/form/DateTextBox",
-    "dijit/form/TimeTextBox",
     "dijit/layout/ContentPane",
     "dijit/layout/BorderContainer",
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
-    "ngw/route",
     "ngw-pyramid/ErrorDialog/ErrorDialog",
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/feature-layer/feature-editor",
@@ -27,23 +17,13 @@ define([
 ], function (
     declare,
     lang,
-    array,
-    xhr,
-    json,
     domClass,
-    domConstruct,
-    number,
     _WidgetBase,
     Button,
-    TextBox,
-    NumberTextBox,
-    DateTextBox,
-    TimeTextBox,
     ContentPane,
     BorderContainer,
     TabContainer,
     TableContainer,
-    route,
     ErrorDialog,
     i18n,
     editor,
@@ -86,7 +66,6 @@ define([
                 resourceId: this.resource,
                 featureId: this.feature,
             });
-            this.store.initialize();
 
             this._tabContainer = new TabContainer({ region: "center" });
             this._tabContainer.placeAt(this);
@@ -106,6 +85,7 @@ define([
                 var widget = new loader[k]({
                     resource: this.resource,
                     feature: this.feature,
+                    store: this.store,
                 });
                 widget.placeAt(this._tabContainer);
                 this._ext[k] = widget;
@@ -139,27 +119,18 @@ define([
             this.btn.set("disabled", false);
         },
 
-        iurl: function () {
-            var urlStr = route.feature_layer.feature.item({
-                id: this.resource,
-                fid: this.feature,
-            });
-            var params = new URLSearchParams({ dt_format: "iso" });
-            return [urlStr, params].join("?");
-        },
-
         load: function () {
             var widget = this;
 
-            xhr(this.iurl(), {
-                method: "GET",
-                handleAs: "json",
-                preventCache: true,
-            }).then(function (data) {
+            this.store._initialize().then(function () {
+                var data = widget.store._featureItem;
+                // backward compatibility with no mobx widgets
                 for (var k in loader) {
-                    widget._ext[k].set("value", data.extensions[k]);
+                    var ext = widget._ext[k];
+                    if (ext.set) {
+                        ext.set("value", data.extensions[k]);
+                    }
                 }
-
                 widget.resize();
             });
         },
@@ -167,24 +138,23 @@ define([
         save: function () {
             this.lock();
 
-            var data = {
-                fields: this.store.attributes,
-                extensions: {},
-            };
+            var extensions = {};
 
+            // backward compatibility with no mobx widgets
             for (var k in loader) {
-                data.extensions[k] = this._ext[k].get("value");
+                var ext = this._ext[k];
+                if (ext.get) {
+                    var val = ext.get("value");
+                    if (val !== null) {
+                        extensions[k] = val
+                    }
+                }
             }
 
-            xhr(this.iurl(), {
-                method: "PUT",
-                handleAs: "json",
-                data: json.stringify(data),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-                .then(this.load.bind(this), ErrorDialog.xhrError)
+            this.store
+                .save({ extensions: extensions })
+                .then(this.load.bind(this))
+                .catch(ErrorDialog.xhrError)
                 .finally(this.unlock.bind(this));
         },
     });

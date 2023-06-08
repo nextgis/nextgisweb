@@ -19,21 +19,12 @@ export class FeatureEditorStore {
         this.featureId = featureId;
 
         this._attributes = {};
+        this._extensions = {};
         this._featureItem = null;
         this._resourceItem = null;
 
         this._abortController = new AbortControllerHelper();
-        makeAutoObservable(this, { _abortController: false });
-    }
-
-    get values() {
-        const values = {};
-        for (const field of this.fields) {
-            const { keyname, datatype } = field;
-            const val = this._attributes[keyname];
-            values[keyname] = parseNgwAttribute(datatype, val);
-        }
-        return values;
+        makeAutoObservable(this, { _abortController: false, route: false });
     }
 
     get fields() {
@@ -44,11 +35,35 @@ export class FeatureEditorStore {
         return fields ?? [];
     }
 
-    get attributes() {
-        return this._attributes
+    /** Feature field values formatted for web */
+    get values() {
+        const values = {};
+        for (const field of this.fields) {
+            const { keyname, datatype } = field;
+            const val = this._attributes[keyname];
+            values[keyname] = parseNgwAttribute(datatype, val);
+        }
+        return values;
     }
 
-    initialize = async () => {
+    /** Feature field values formatted in NGW way */
+    get attributes() {
+        return this._attributes;
+    }
+
+    get extensions() {
+        return this._extensions;
+    }
+
+    get route() {
+        return route(
+            "feature_layer.feature.item",
+            this.resourceId,
+            this.featureId
+        );
+    }
+
+    _initialize = async () => {
         this._abort();
         try {
             const signal = this._abortController.makeSignal();
@@ -62,11 +77,10 @@ export class FeatureEditorStore {
                 this._resourceItem = resp;
             });
             if (this.featureId !== undefined) {
-                const featureItem = await route(
-                    "feature_layer.feature.item",
-                    this.resourceId,
-                    this.featureId
-                ).get({ signal, query: { dt_format: "iso" } });
+                const featureItem = await this.route.get({
+                    signal,
+                    query: { dt_format: "iso" },
+                });
                 this._setFeatureItem(featureItem);
             }
         } finally {
@@ -74,6 +88,26 @@ export class FeatureEditorStore {
                 this.initLoading = false;
             });
         }
+    };
+
+    save = async ({ extensions }) => {
+
+        const extensionsToSave = { ...this.extensions };
+
+        for (const key in extensions) {
+            const storeExtension = extensions[key];
+            if (storeExtension !== undefined && storeExtension !== null) {
+                extensionsToSave[key] = storeExtension;
+            }
+        }
+
+        await this.route.put({
+            query: { dt_format: "iso" },
+            json: {
+                fields: this.attributes,
+                extensions: extensionsToSave,
+            },
+        });
     };
 
     destroy = () => {
@@ -84,6 +118,12 @@ export class FeatureEditorStore {
         runInAction(() => {
             this._attributes = this._formatAttributes(values);
         });
+    };
+
+    setExtension = (extension, value) => {
+        const extensions = { ...this._extensions };
+        extensions[extension] = value;
+        this._extensions = extensions;
     };
 
     reset = () => {
@@ -108,6 +148,7 @@ export class FeatureEditorStore {
         runInAction(() => {
             this._featureItem = featureItem;
             this._attributes = featureItem.fields;
+            this._extensions = featureItem.extensions;
         });
     }
 

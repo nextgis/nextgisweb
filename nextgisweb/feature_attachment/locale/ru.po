@@ -76,13 +76,9 @@ msgstr "Тип MIME"
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-feature-attachment/EditorWidget.js:130
-msgid "Upload"
-msgstr "Загрузить"
-
-#: amd/ngw-feature-attachment/EditorWidget.js:153
-msgid "Delete"
-msgstr "Удалить"
+#: nodepkg/attachment-editor/AttachmentEditor.js:164
+msgid "Preview"
+msgstr "Просмотр"
 
 #: nodepkg/attachment-form/AttachmentForm.js:48
 msgid ""
