@@ -86,6 +86,18 @@ def json_view(request):
     )
 
 
+@viewargs(renderer='react')
+def effective_permisssions(request):
+    request.resource_permission(PERM_READ)
+    return dict(
+        entrypoint='@nextgisweb/resource/effective-permissions',
+        props=dict(resourceId=request.context.id),
+        title=_("User permissions"),
+        obj=request.context,
+    )
+
+
+
 # TODO: Move to API
 def schema(request) -> JSONType:
     resources = dict()
@@ -244,6 +256,9 @@ def setup_pyramid(comp, config):
 
     _resource_route('json', r'{id:\d+}/json', client=('id', )) \
         .add_view(json_view)
+    
+    _resource_route('effective_permissions', r'{id:\d+}/permissions') \
+        .add_view(effective_permisssions)
 
     _resource_route('export.page', r'{id:\d+}/export', request_method='GET', client=True)
 
@@ -271,11 +286,6 @@ def setup_pyramid(comp, config):
         key='description', priority=20,
         is_applicable=lambda obj: obj.description is not None,
         template='section_description.mako')
-
-    Resource.__psection__.register(
-        key='permission', priority=100,
-        title=_("User permissions"),
-        template='section_permission.mako')
 
     # Actions
 
@@ -329,7 +339,13 @@ def setup_pyramid(comp, config):
                     lambda args: args.request.route_url(
                         'resource.json', id=args.obj.id),
                     icon='material-data_object')
-
+ 
+                yield Link(
+                    'extra/effective-permissions', _("User permissions"),
+                    lambda args: args.request.route_url(
+                        'resource.effective_permissions', id=args.obj.id),
+                    icon='material-key')
+ 
         def _url(self, cls):
             return lambda args: args.request.route_url(
                 'resource.create', id=args.obj.id,

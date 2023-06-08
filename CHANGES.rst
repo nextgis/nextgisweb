@@ -17,6 +17,7 @@ Changes
 - Default display names for resources during creation.
 - Improved tabs ordering and auto-activation.
 - Use a fast PNG encoder for rendering.
+- User permissions section is moved to the separate page.
 
 
 4.3.2
