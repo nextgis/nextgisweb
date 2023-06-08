@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Empty, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
-import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
@@ -137,32 +137,9 @@ export const FeatureGrid = ({
         id,
     ]);
 
-    const createButtonAction = useCallback(
-        ({ action, icon, title, ...rest }) => {
-            const btnAction = { size, ...rest };
-            if (action) {
-                const onClick = () => {
-                    action({ selected });
-                };
-                btnAction.onClick = onClick;
-            }
-            if (typeof btnAction.disabled === "function") {
-                btnAction.disabled = btnAction.disabled({ selected });
-            }
-            if (typeof icon === "string") {
-                btnAction.icon = <SvgIcon icon={icon} fill="currentColor" />;
-            }
-            return <Button {...btnAction}>{title}</Button>;
-        },
-        [selected, size]
-    );
-
     if (!totalData || !fields) {
         return <LoadingWrapper />;
     }
-
-    const leftActions = [];
-    const rightActions = [];
 
     const defActions = [
         {
@@ -200,40 +177,19 @@ export const FeatureGrid = ({
         );
     }
 
-    const getAction = (Action) => (
-        <div key={i}>
-            {typeof Action === "function" ? (
-                <Action {...{ query, id, size }} />
-            ) : (
-                createButtonAction(Action)
-            )}
-        </div>
-    );
-
-    let i = 0;
+    const rightActions = [];
     if (isExportAllowed) {
-        rightActions.push(getAction((props) => <ExportAction {...props} />));
-    }
-
-    let addDirection = leftActions;
-    for (const Action of [...defActions, ...actions]) {
-        i++;
-        if (typeof Action === "string") {
-            addDirection = rightActions;
-            continue;
-        }
-        addDirection.push(getAction(Action));
+        rightActions.push((props) => <ExportAction {...props} />);
     }
 
     return (
         <div className="ngw-feature-layer-feature-grid">
-            <div className="toolbar">
-                {leftActions}
-
-                <div className="spacer" />
-
-                {rightActions}
-
+            <ActionToolbar
+                size={size}
+                actions={[...defActions, ...actions]}
+                rightActions={rightActions}
+                actionProps={{ selected, query, id }}
+            >
                 <div>
                     <Input
                         placeholder={searchPlaceholderMsg}
@@ -250,7 +206,7 @@ export const FeatureGrid = ({
                         size={size}
                     />
                 </div>
-            </div>
+            </ActionToolbar>
 
             <FeatureTable
                 resourceId={id}
