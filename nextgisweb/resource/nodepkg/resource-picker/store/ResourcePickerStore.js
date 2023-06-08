@@ -115,7 +115,7 @@ export class ResourcePickerStore {
         if (this.enabledCls.length) {
             enabled = this.enabledCls.includes(resource.cls);
         }
-        if (this.enabledInterfaces) {
+        if (this.enabledInterfaces && this.enabledInterfaces.length) {
             enabled = resource.interfaces
                 ? resource.interfaces.some((intf) =>
                     this.enabledInterfaces.includes(intf)

@@ -49,7 +49,7 @@ define([
         },
 
         renderValue: function (value) {
-            if (!value) { return false };
+            if (!value) { return false }
 
             var images = [], others = [];
             array.forEach(value, function (i) {

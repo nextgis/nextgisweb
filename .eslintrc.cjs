@@ -18,6 +18,7 @@ module.exports = {
         "eqeqeq": "error",
         "indent": ["error", 4, { "SwitchCase": 1 }],
         "no-unused-vars": ["error", { args: "after-used" }],
+        "no-use-before-define": "error",
         "requirejs/no-object-define": "error",
         "requirejs/one-dependency-per-line": ["error"],
         "requirejs/amd-function-arity": [

@@ -21,23 +21,23 @@ import {
 
 import BackspaceIcon from "@material-icons/svg/backspace";
 
-const style = { width: '100%' }
+const style = { width: "100%" };
 
 const ngwTypeAliases = {
     STRING: [Input],
     REAL: [Number, { style }],
     INTEGER: [Integer, { style }],
     BIGINT: [BigInteger, { style }],
-    DATETIME: [DateTimeInput, { style, allowClear: false, }],
-    DATE: [DateInput, { style, allowClear: false, }],
-    TIME: [TimeInput, { style, allowClear: false, }],
+    DATETIME: [DateTimeInput, { style, allowClear: false }],
+    DATE: [DateInput, { style, allowClear: false }],
+    TIME: [TimeInput, { style, allowClear: false }],
 };
 
 const setNullTitle = i18n.gettext("Set field value to NULL (No data)");
 
 export const AttributesForm = observer(({ store }) => {
     const { fields, values, setValues, initLoading } = store;
-    const [size] = useState('small')
+    const [size] = useState("small");
     const form = useForm()[0];
 
     const setNullForField = useCallback(
@@ -66,7 +66,9 @@ export const AttributesForm = observer(({ store }) => {
                                     setNullForField(field.keyname);
                                 }}
                             >
-                                <BackspaceIcon />
+                                <BackspaceIcon
+                                    style={{ verticalAlign: "middle" }}
+                                />
                             </Button>
                         </Tooltip>
                     ),
@@ -74,7 +76,6 @@ export const AttributesForm = observer(({ store }) => {
                 const val = values[field.keyname];
                 if (val === null) {
                     props.placeholder = "NULL";
-
                 }
 
                 return props;
