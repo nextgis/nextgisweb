@@ -169,6 +169,7 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
         fields = feat.fields
         assert fields['null'] == field_as(ref, 'null', None)
         assert fields['int'] == field_as(ref, 'int', 'Integer')
+        assert fields['int64'] == field_as(ref, 'int64', 'Integer64')
         assert fields['real'] == field_as(ref, 'real', 'Double')
         assert fields['date'] == date(*field_as(ref, 'date', 'DateTime')[0:3])
         assert fields['time'] == time(*field_as(ref, 'time', 'DateTime')[3:6])

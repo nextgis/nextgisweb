@@ -127,11 +127,11 @@ def test_connection(connection_id, ngw_webtest_app, ngw_auth_administrator):
 def test_layer(layer_id, ngw_webtest_app, ngw_auth_administrator):
     layer_url = '/api/resource/%d' % layer_id
 
-    res = ngw_webtest_app.get('%s/feature/1' % layer_url, dict(geom_format='geojson'))
-    feature = res.json
+    feature1 = ngw_webtest_app.get('%s/feature/1' % layer_url, dict(geom_format='geojson')).json
+    feature2 = ngw_webtest_app.get('%s/feature/2' % layer_url, dict(geom_format='geojson')).json
 
     # Intersects
-    x, y = feature['geom']['coordinates']
+    x, y = feature1['geom']['coordinates']
 
     poly = Polygon((
         (x - 1, y - 1), (x - 1, y + 1),
@@ -140,7 +140,7 @@ def test_layer(layer_id, ngw_webtest_app, ngw_auth_administrator):
 
     res = ngw_webtest_app.get('%s/feature/' % layer_url, dict(
         geom_format='geojson', intersects=poly.wkt))
-    assert res.json == [feature]
+    assert res.json == [feature1]
 
     poly = affinity.translate(poly, 5, 5)
 
@@ -155,8 +155,8 @@ def test_layer(layer_id, ngw_webtest_app, ngw_auth_administrator):
 
     res = ngw_webtest_app.get('%s/feature/' % layer_url, dict(
         geom_format='geojson', limit=1, offset=1))
-    assert len(res.json) == 0
+    assert res.json == [feature2]
 
     res = ngw_webtest_app.get('%s/feature/' % layer_url, dict(
         geom_format='geojson', limit=1, offset=0))
-    assert res.json == [feature]
+    assert res.json == [feature1]
