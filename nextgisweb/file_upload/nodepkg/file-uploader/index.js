@@ -1,2 +1,3 @@
 import { FileUploader } from "./FileUploader";
-export { FileUploader };
+import { FileUploaderButton } from "./FileUploaderButton";
+export { FileUploader, FileUploaderButton };
