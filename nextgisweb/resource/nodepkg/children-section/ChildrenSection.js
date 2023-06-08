@@ -9,7 +9,7 @@ import { errorModal } from "@nextgisweb/gui/error";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
-import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
+import { sorterFactory } from "@nextgisweb/gui/util";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
 
