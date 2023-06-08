@@ -20,4 +20,8 @@
     </script>
 </%def>
 
+<!-- Fake fields to prevent Chrome from autocompleteion -->
+<input style="display: none" type="text" name="username" />
+<input style="display: none" type="password" name="password"/>
+
 <div id="widget" class="composite-widget" style="width: 100%; height: 100%;"></div>
