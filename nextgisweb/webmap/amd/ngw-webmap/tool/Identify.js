@@ -299,32 +299,23 @@ define([
                 class:"ngwPopup__coordinates",
             });
             this.addChild(this.coordinatePane);
-            this.coordinateSwitcher = new CoordinateSwitcher({
-                point: this.coordinates,
-                selectedFormat: localStorage.getItem('coordinatesFormat'),
-                projections: {
-                    initial: this.displayProjection,
-                    lonlat: this.lonlatProjection
-                }
+
+            const coordSwitcher = new CoordinateSwitcher({
+                point: this.coordinates
             });
-            this.coordinateSwitcher.placeAt(this.coordinatePane);
-            this.coordinateSwitcher.startup();
+            coordSwitcher.placeAt(this.coordinatePane);
+            coordSwitcher.startup();
 
-            on(this.coordinateSwitcher.dropDown.containerNode, "click",  lang.hitch(this, function(value){
-                var selectedFormat = this.coordinateSwitcher.options.filter(function(item){
-                    return item.selected;
-                })[0].format;
-
-                this.coordinateCopyBtn.copy();
-                localStorage.setItem('coordinatesFormat', selectedFormat);
-            }));
-
-            this.coordinateCopyBtn = new CopyButton({
-                target: this.coordinateSwitcher,
-                targetAttribute: "value",
+            const coordCopy = new CopyButton({
+                target: coordSwitcher,
+                targetAttribute: coordSwitcher.formattedSelectedValue,
                 class: "ngwPopup__coordinates-copy"
             });
-            this.coordinateCopyBtn.placeAt(this.coordinatePane, "first");
+            coordCopy.placeAt(this.coordinatePane, "first");
+            
+            on(coordSwitcher.dropDown.containerNode, "click",  () => {
+                coordCopy.copy();
+            });
         }
     });
 
