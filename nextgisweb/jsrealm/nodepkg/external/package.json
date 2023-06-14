@@ -18,7 +18,6 @@
         "jed": "^1.1.1",
         "jquery": "3.2.1",
         "ol": "6.15.x",
-        "proj4": "^2.7.2",
         "put-selector": "^0.3.6",
         "react-copy-to-clipboard": "5.1.0",
         "string-replace-loader": "^3.0.1",

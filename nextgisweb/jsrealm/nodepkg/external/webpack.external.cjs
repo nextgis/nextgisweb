@@ -85,11 +85,6 @@ addPackage("jed", {
     },
 });
 
-addPackage("proj4", {
-    from: "dist/proj4.js",
-    transform: null,
-});
-
 addPackage("codemirror");
 
 addPackage("jquery", {
