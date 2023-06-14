@@ -28,3 +28,7 @@
     from,
     to { color: #00b77e; }
 }
+
+div.dijitTooltip {
+  box-sizing: content-box;
+}
