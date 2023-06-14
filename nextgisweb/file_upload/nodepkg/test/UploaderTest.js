@@ -1,4 +1,4 @@
-import { FileUploader } from "../file-uploader";
+import { FileUploader, FileUploaderButton } from "../file-uploader";
 import { ImageUploader } from "../image-uploader";
 
 export function UploaderTest() {
@@ -8,6 +8,8 @@ export function UploaderTest() {
             <FileUploader></FileUploader>
             <h4>Image uploader</h4>
             <ImageUploader></ImageUploader>
+            <h4>Button uploader</h4>
+            <FileUploaderButton></FileUploaderButton>
         </>
     );
 }

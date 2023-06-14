@@ -75,4 +75,5 @@ export function ModelLogoForm({ model, messages = {}, accept }) {
 ModelLogoForm.propTypes = {
     model: PropTypes.string.isRequired,
     messages: PropTypes.object,
+    accept: PropTypes.string,
 };

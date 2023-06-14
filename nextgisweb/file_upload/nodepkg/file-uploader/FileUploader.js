@@ -1,9 +1,7 @@
 import CancelIcon from "@material-icons/svg/cancel";
 
-import { useEffect, useState } from "react";
-
 import { InboxOutlined } from "@ant-design/icons";
-import { Button, message, Upload } from "@nextgisweb/gui/antd";
+import { Button, Upload } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n!file_upload";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 
@@ -28,80 +26,27 @@ export function FileUploader({
     fileMeta,
     setFileMeta,
 }) {
-    const { upload: fileUploader, abort: abortFileUpload } = useFileUploader();
-    const [progressText, setProgressText] = useState(null);
-    const [fileMeta_, setFileMeta_] = useState(fileMeta);
-    const [docTitle] = useState(document.title);
-
-    useEffect(() => {
-        if (setFileMeta) {
-            setFileMeta(fileMeta_);
-        }
-    }, [fileMeta_, onChange, setFileMeta]);
-
-    useEffect(() => {
-        setFileMeta_(fileMeta);
-        if (onChange) {
-            onChange(fileMeta);
-        }
-    }, [fileMeta, onChange]);
-
-    const abort = () => {
-        abortFileUpload();
-    };
-
-    const onProgress = (evt) => {
-        if (evt.type === "progress") {
-            setProgressText(evt.percent + i18n.gettext(" uploaded..."));
-            if (showProgressInDocTitle) {
-                document.title = evt.percent + " | " + docTitle;
-            }
-        }
-    };
-
-    const upload = async (files) => {
-        try {
-            const uploadedFiles = await fileUploader({
-                files,
-                onProgress,
-            });
-            const uploadedFile = uploadedFiles && uploadedFiles[0];
-            if (uploadedFile) {
-                setFileMeta_(uploadedFile);
-            }
-        } catch (er) {
-            console.log(er);
-        } finally {
-            setProgressText(null);
-        }
-    };
-    const { onChange: inputPropsOnChange, ...restInputProps } = inputProps;
-    const props = {
-        name: "file",
-        multiple: false,
-        showUploadList: false,
-        customRequest: ({ file, onSuccess }) => onSuccess(file),
-        onChange(info) {
-            if (inputPropsOnChange) {
-                inputPropsOnChange(info);
-            }
-            const { status } = info.file;
-            if (status === "done") {
-                upload([info.file.originFileObj]);
-            } else if (status === "error") {
-                message.error(`${info.file.name} file upload failed.`);
-            }
-        },
-        ...restInputProps,
-    };
+    const { abort, progressText, props, meta, setMeta } = useFileUploader({
+        showProgressInDocTitle,
+        setFileMeta,
+        inputProps,
+        fileMeta: fileMeta,
+        onChange,
+        accept,
+    });
 
     const InputText = () => (
         <>
             <p className="ant-upload-text">
-                {fileMeta_ ? (
+                {meta ? (
                     <>
-                        {`${fileMeta_.name} (${formatSize(fileMeta_.size)})`}{" "}
-                        <Button type="link" onClick={() => setFileMeta_(null)}>
+                        {`${meta.name} (${formatSize(meta.size)})`}{" "}
+                        <Button
+                            type="link"
+                            onClick={() => {
+                                setMeta(null);
+                            }}
+                        >
                             {OVERWRITE_TEXT}
                         </Button>
                     </>

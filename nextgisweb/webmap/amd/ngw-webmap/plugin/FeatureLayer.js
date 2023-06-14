@@ -4,28 +4,26 @@ define([
     "dojo/_base/lang",
     "dijit/layout/TabContainer",
     "dijit/_WidgetBase",
-    "dojo/request/xhr",
     "dojo/topic",
     "openlayers/ol",
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/feature-layer/feature-grid",
     "@nextgisweb/webmap/zoom-to-filtered-btn",
-    "ngw/route",
+    "@nextgisweb/pyramid/api",
 ], function (
     declare,
     _PluginBase,
     lang,
     TabContainer,
     _WidgetBase,
-    xhr,
     topic,
     ol,
     i18n,
     reactApp,
     FeatureGridComp,
     ZoomToFilteredBtn,
-    route
+    api
 ) {
     var Pane = declare([_WidgetBase], {
         closable: true,
@@ -78,21 +76,20 @@ define([
                         widget.selectedIds = newVal;
                         var fid = newVal[0];
                         if (fid !== undefined) {
-                            xhr.get(
-                                route.feature_layer.feature.item({
-                                    id: widget.layerId,
-                                    fid: fid,
-                                }),
-                                {
-                                    handleAs: "json",
-                                }
-                            ).then(function (feature) {
-                                display.featureHighlighter.highlightFeature({
-                                    geom: feature.geom,
-                                    featureId: feature.id,
-                                    layerId: widget.layerId,
+                            api.route("feature_layer.feature.item", {
+                                id: widget.layerId,
+                                fid: fid,
+                            })
+                                .get()
+                                .then(function (feature) {
+                                    display.featureHighlighter.highlightFeature(
+                                        {
+                                            geom: feature.geom,
+                                            featureId: feature.id,
+                                            layerId: widget.layerId,
+                                        }
+                                    );
                                 });
-                            });
                         } else {
                             display.featureHighlighter.unhighlightFeature(
                                 function (f) {
@@ -118,10 +115,14 @@ define([
                         },
                         "spacer",
                         function (props) {
-                            props.onZoomToFiltered = function (ngwExtent) {
+                            var onZoomToFiltered = function (ngwExtent) {
                                 widget.zoomToExtent(ngwExtent);
                             };
-                            return ZoomToFilteredBtn.default(props);
+                            return ZoomToFilteredBtn.default(
+                                Object.assign({}, props, {
+                                    onZoomToFiltered: onZoomToFiltered,
+                                })
+                            );
                         },
                     ],
                 },
@@ -190,21 +191,18 @@ define([
 
             var fid = this.selectedIds[0];
             if (fid !== undefined) {
-                xhr.get(
-                    route.feature_layer.feature.item({
-                        id: this.layerId,
-                        fid: fid,
-                    }),
-                    {
-                        handleAs: "json",
-                    }
-                ).then(function (feature) {
-                    var geometry = wkt.readGeometry(feature.geom);
-                    display.map.zoomToFeature(
-                        new ol.Feature({ geometry: geometry })
-                    );
-                    display.tabContainer.selectChild(display.mainPane);
-                });
+                api.route("feature_layer.feature.item", {
+                    id: this.layerId,
+                    fid: fid,
+                })
+                    .get()
+                    .then(function (feature) {
+                        var geometry = wkt.readGeometry(feature.geom);
+                        display.map.zoomToFeature(
+                            new ol.Feature({ geometry: geometry })
+                        );
+                        display.tabContainer.selectChild(display.mainPane);
+                    });
             }
         },
 

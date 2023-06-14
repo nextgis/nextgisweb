@@ -1,7 +1,7 @@
-import AddCircleIcon from "@material-icons/svg/add_circle";
-import DeleteForeverIcon from "@material-icons/svg/delete_forever";
-import EditIcon from "@material-icons/svg/edit";
-import SearchIcon from "@material-icons/svg/search";
+import { PropTypes } from "prop-types";
+
+import React, { useEffect, useMemo, useState } from "react";
+
 import {
     Badge,
     Button,
@@ -13,13 +13,17 @@ import {
     Row,
     Space,
     Table,
-    Tooltip
+    Tooltip,
 } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n!gui";
-import { PropTypes } from "prop-types";
-import React, { useEffect, useMemo, useState } from "react";
+
+import AddCircleIcon from "@material-icons/svg/add_circle";
+import DeleteForeverIcon from "@material-icons/svg/delete_forever";
+import EditIcon from "@material-icons/svg/edit";
+import SearchIcon from "@material-icons/svg/search";
 
 import "./ModelBrowse.less";
 
@@ -53,17 +57,21 @@ export function ModelBrowse({
     const deleteBatchSuccess =
         msg.deleteBatchSuccess || i18n.gettext("Items deleted");
 
+    const { data, isLoading } = useRouteGet({
+        name: model.collection,
+        options: collectionOptions,
+    });
+
     const [rows, setRows] = useState([]);
-    const [status, setStatus] = useState("loading");
+    const [isDeleting, setIsDeleting] = useState(false);
     const [search, setSearch] = useState("");
     const [selected, setSelected] = useState([]);
 
-    useEffect(async () => {
-        const resp = await route(model.collection).get(collectionOptions);
-        const data = resp.filter(collectionFilter || (() => true));
-        setRows(data);
-        setStatus(null);
-    }, []);
+    useEffect(() => {
+        if (data) {
+            setRows(data.filter(collectionFilter || (() => true)));
+        }
+    }, [data, collectionFilter]);
 
     const filteredRows = useMemo(() => {
         if (search) {
@@ -101,7 +109,7 @@ export function ModelBrowse({
     };
 
     const deleteSelected = async () => {
-        setStatus("deleting");
+        setIsDeleting(true);
         try {
             const deleted = [];
             const deleteError = [];
@@ -137,7 +145,7 @@ export function ModelBrowse({
         } catch (err) {
             errorModal(err);
         } finally {
-            setStatus(null);
+            setIsDeleting(false);
         }
     };
 
@@ -253,7 +261,7 @@ export function ModelBrowse({
                 <Button
                     icon={<DeleteForeverIcon />}
                     onClick={onDeleteSelectedBtnClick}
-                    loading={status === "deleting"}
+                    loading={isDeleting}
                     danger
                 >
                     {i18n.gettext("Delete")}
@@ -277,7 +285,7 @@ export function ModelBrowse({
                     selectedRowKeys: selected,
                     ...rowSelection,
                 }}
-                loading={status === "loading"}
+                loading={isLoading}
                 columns={columns_}
                 dataSource={filteredRows}
                 pagination={false}

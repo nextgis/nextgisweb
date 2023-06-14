@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 
 import { Button, Space, Table } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
-import { sorterFactory } from "@nextgisweb/gui/util/sortedFactory";
+import { sorterFactory } from "@nextgisweb/gui/util";
 import i18n from "@nextgisweb/pyramid/i18n!resource";
 
 import FolderOpenIcon from "@material-icons/svg/arrow_forward";

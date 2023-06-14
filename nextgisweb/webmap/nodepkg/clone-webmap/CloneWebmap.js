@@ -34,9 +34,8 @@ export function CloneWebmap({ id }) {
                 name: "parent",
                 label: i18n.gettext("Resource group"),
                 widget: ResourceSelect,
-                inputOptions: {
-                    getSelectedMsg: i18n.gettext("Clone to selected group"),
-                    getThisMsg: i18n.gettext("Clone to this group"),
+                inputProps: {
+
                 },
                 required: true,
             },

@@ -35,19 +35,21 @@ export function ResourcePickerModal({
 }) {
     const [visible, setVisible] = useState(initVisible ?? true);
 
-    const [resourceStore] = useState(() => store ||
-        new ResourcePickerStore({
-            parentId: resourceId,
-            enabledInterfaces,
-            getSelectedMsg,
-            getThisMsg,
-            disabledIds,
-            enabledCls,
-            onNewGroup,
-            selected,
-            multiple,
-            showCls,
-        })
+    const [resourceStore] = useState(
+        () =>
+            store ||
+            new ResourcePickerStore({
+                parentId: resourceId,
+                enabledInterfaces,
+                getSelectedMsg,
+                getThisMsg,
+                disabledIds,
+                enabledCls,
+                onNewGroup,
+                selected,
+                multiple,
+                showCls,
+            })
     );
     const close = () => setVisible(false);
 
@@ -61,8 +63,10 @@ export function ResourcePickerModal({
     };
 
     useEffect(() => {
-        return () => resourceStore.destroy();
-    });
+        return () => {
+            resourceStore.destroy();
+        };
+    }, []);
 
     useEffect(() => {
         setVisible(initVisible);
