@@ -1,11 +1,9 @@
-import os.path
 from datetime import date, time, datetime
 from pathlib import Path
-from uuid import uuid4
 
 import pytest
 import webtest
-from osgeo import gdal, ogr, osr
+from osgeo import ogr, osr
 
 from ...core.exception import ValidationError
 from ...env.model import DBSession
@@ -19,8 +17,7 @@ from ..table_info import ERROR_LIMIT
 from ..util import ERROR_FIX, FID_SOURCE
 
 
-DATA_PATH = os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), 'data')
+DATA_PATH = Path(__file__).parent / 'data'
 
 
 def test_from_fields(ngw_resource_group, ngw_txn):
@@ -29,7 +26,6 @@ def test_from_fields(ngw_resource_group, ngw_txn):
         owner_user=User.by_keyname('administrator'),
         geometry_type='POINT',
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=uuid4().hex,
     )
 
     res.setup_from_fields([
@@ -49,26 +45,17 @@ def test_from_fields(ngw_resource_group, ngw_txn):
     DBSession.flush()
 
 
-@pytest.mark.parametrize('data', (
-    'shapefile-point-utf8.zip/layer.shp',
-    'shapefile-point-win1251.zip/layer.shp',
-    'geojson-point.zip/layer.geojson'))
-def test_from_ogr(data, ngw_resource_group, ngw_txn):
-    src = os.path.join(DATA_PATH, data)
-    dsource = ogr.Open('/vsizip/' + src)
-    layer = dsource.GetLayer(0)
-
+@pytest.mark.parametrize('filename', (
+    'shapefile-point-utf8.zip',
+    'shapefile-point-win1251.zip',
+    'geojson-point.zip',
+))
+def test_from_ogr(filename, ngw_resource_group, ngw_txn):
     res = VectorLayer(
         parent_id=ngw_resource_group, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=uuid4().hex,
-    )
-
-    res.persist()
-
-    res.setup_from_ogr(layer)
-    res.load_from_ogr(layer)
+    ).persist().from_ogr(DATA_PATH / filename)
 
     DBSession.flush()
 
@@ -89,25 +76,21 @@ def test_from_ogr(data, ngw_resource_group, ngw_txn):
 
 
 @pytest.mark.parametrize(
-    'data',
+    'filename',
     (
         'layer-lon-lat.csv',
         'layer-lon-lat.xlsx',
     ),
 )
-def test_from_csv_xlsx(data, ngw_resource_group, ngw_txn):
-    src = os.path.join(DATA_PATH, data)
-    dsource = read_dataset(src, source_filename=data)
+def test_from_csv_xlsx(filename, ngw_resource_group, ngw_txn):
+    dsource = read_dataset(DATA_PATH / filename, source_filename=filename)
     layer = dsource.GetLayer(0)
 
     res = VectorLayer(
         parent_id=ngw_resource_group, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=uuid4().hex,
-    )
-
-    res.persist()
+    ).persist()
 
     res.setup_from_ogr(layer)
     res.load_from_ogr(layer)
@@ -130,25 +113,13 @@ def test_from_csv_xlsx(data, ngw_resource_group, ngw_txn):
 
 
 def test_type_geojson(ngw_resource_group, ngw_txn):
-    src = Path(__file__).parent / 'data' / 'type.geojson'
-
-    dataset = ogr.Open(str(src))
-    assert dataset is not None, gdal.GetLastErrorMsg()
-
-    layer = dataset.GetLayer(0)
-    assert layer is not None, gdal.GetLastErrorMsg()
+    src = DATA_PATH / 'type.geojson'
 
     res = VectorLayer(
         parent_id=ngw_resource_group, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=uuid4().hex)
-
-    res.persist()
-
-    res.setup_from_ogr(layer)
-    res.load_from_ogr(layer)
-    layer.ResetReading()
+    ).persist().from_ogr(src)
 
     DBSession.flush()
 
@@ -164,6 +135,9 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
             result = [int(v) for v in result]
 
         return result
+
+    dataset = ogr.Open(str(src))
+    layer = dataset.GetLayer(0)
 
     for feat, ref in zip(res.feature_query()(), layer):
         fields = feat.fields
@@ -185,21 +159,16 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
     ('AUTO', ['not_exists'], 1),
 ))
 def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
-    src = Path(__file__).parent / 'data' / 'type.geojson'
+    src = DATA_PATH / 'type.geojson'
 
     dataset = ogr.Open(str(src))
-    assert dataset is not None, gdal.GetLastErrorMsg()
-
     layer = dataset.GetLayer(0)
-    assert layer is not None, gdal.GetLastErrorMsg()
 
     res = VectorLayer(
         parent_id=ngw_resource_group, display_name='test_fid',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=uuid4().hex)
-
-    res.persist()
+    ).persist()
 
     res.setup_from_ogr(layer, fid_params=dict(fid_source=fid_source, fid_field=fid_field))
     res.load_from_ogr(layer)
@@ -212,10 +181,9 @@ def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
 
 
 def test_multi_layers(ngw_webtest_app, ngw_auth_administrator):
-    data = 'two-layers.zip'
-    src = os.path.join(DATA_PATH, data)
+    src = DATA_PATH / 'two-layers.zip'
     resp = ngw_webtest_app.post('/api/component/file_upload/', dict(
-        file=webtest.Upload(src)))
+        file=webtest.Upload(str(src))))
     upload_meta = resp.json['upload_meta'][0]
 
     resp = ngw_webtest_app.post_json('/api/component/vector_layer/dataset',
@@ -246,8 +214,7 @@ def test_error_limit(ngw_resource_group):
         parent_id=ngw_resource_group, display_name='error-limit',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=uuid4().hex)
-    res.persist()
+    ).persist()
 
     ds = ogr.GetDriverByName('Memory').CreateDataSource('')
 
@@ -285,11 +252,10 @@ def test_geom_field(ngw_resource_group):
         parent_id=ngw_resource_group, display_name='test-geom-fld',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=uuid4().hex
     ).persist()
 
-    src = os.path.join(DATA_PATH, 'geom-fld.geojson')
-    ds = ogr.Open(src)
+    src = DATA_PATH / 'geom-fld.geojson'
+    ds = ogr.Open(str(src))
     layer = ds.GetLayer(0)
 
     with pytest.raises(ValidationError):
@@ -313,11 +279,10 @@ def test_id_field(data, ngw_resource_group):
         parent_id=ngw_resource_group, display_name=f'test-{data}',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=uuid4().hex
     ).persist()
 
-    src = os.path.join(DATA_PATH, f'{data}.geojson')
-    ds = ogr.Open(src)
+    src = DATA_PATH / f'{data}.geojson'
+    ds = ogr.Open(str(src))
     layer = ds.GetLayer(0)
 
     with pytest.raises(ValidationError):

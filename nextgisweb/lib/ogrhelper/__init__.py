@@ -1,4 +1,3 @@
-import os
 import pathlib
 import zipfile
 from contextlib import contextmanager
@@ -32,6 +31,7 @@ def ogr_use_exceptions():
 
 
 def read_dataset(filename, **kw):
+    vrt_layers = None
     source_filename = kw.pop("source_filename", None)
     allowed_drivers = kw.pop("allowed_drivers", ())
     if source_filename is not None:
@@ -42,16 +42,20 @@ def read_dataset(filename, **kw):
             if not (dst_path.is_symlink() or dst_path.is_file()):
                 dst_path.symlink_to(filename)
 
-            layers = ""
+            vrt_layers = ""
             ogrds = gdal.OpenEx(str(dst_path), 0)
             for i in range(ogrds.GetLayerCount()):
                 layer = ogrds.GetLayer(i)
-                layers += OGR_VRT_LAYER.format(layer.GetName(), dst_path)
-            filename = "<OGRVRTDataSource>{}</OGRVRTDataSource>".format(layers)
+                vrt_layers += OGR_VRT_LAYER.format(layer.GetName(), dst_path)
 
     kw["allowed_drivers"] = allowed_drivers
-    iszip = zipfile.is_zipfile(filename)
-    ogrfn = '/vsizip/{%s}' % filename if iszip else filename
+
+    if vrt_layers is not None:
+        ogrfn = "<OGRVRTDataSource>{}</OGRVRTDataSource>".format(vrt_layers)
+    elif zipfile.is_zipfile(filename):
+        ogrfn = '/vsizip/{%s}' % str(filename)
+    else:
+        ogrfn = str(filename)
     return gdal.OpenEx(ogrfn, 0, **kw)
 
 

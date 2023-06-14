@@ -107,6 +107,11 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     __field_class__ = VectorLayerField
 
+    def __init__(self, *args, **kwagrs):
+        if 'tbl_uuid' not in kwagrs:
+            kwagrs['tbl_uuid'] = uuid.uuid4().hex
+        super().__init__(*args, **kwagrs)
+
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
@@ -114,6 +119,13 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     @property
     def _tablename(self):
         return 'layer_%s' % self.tbl_uuid
+
+    def from_ogr(self, filename, *, layername=None):
+        ds = read_dataset(filename)
+        layer = ds.GetLayerByName(layername) if layername is not None else ds.GetLayer(0)
+        self.setup_from_ogr(layer)
+        self.load_from_ogr(layer)
+        return self
 
     def setup_from_ogr(self, ogrlayer,
                        skip_other_geometry_types=False,
@@ -389,8 +401,6 @@ class _source_attr(SP):
         finally:
             gdal.SetConfigOption("OGR_XLSX_HEADERS", None)
 
-        obj.tbl_uuid = uuid.uuid4().hex
-
         with DBSession.no_autoflush:
             obj.setup_from_ogr(ogrlayer, skip_other_geometry_types, fid_params,
                                geom_cast_params, fix_errors)
@@ -450,8 +460,6 @@ class _source_attr(SP):
 class _fields_attr(SP):
 
     def setter(self, srlzr, value):
-        srlzr.obj.tbl_uuid = uuid.uuid4().hex
-
         with DBSession.no_autoflush:
             srlzr.obj.setup_from_fields(value)
 
