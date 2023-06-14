@@ -3,8 +3,11 @@ import transaction
 
 from ...lib.geometry import Geometry
 from ...env.model import DBSession
-
 from ..model import SRS
+
+from .data import transform_batch_input, \
+    transform_batch_expected, srs_def, \
+    transform_batch_input_wrong_srs_to
 
 MOSCOW_VLADIVOSTOK = 'LINESTRING(37.62 55.75,131.9 43.12)'
 LENGTH_SPHERE = 6434561.600305
@@ -13,22 +16,26 @@ LENGTH_FLAT = 10718924.816779
 
 @pytest.fixture(scope='module')
 def srs_ids():
+    srs_add = dict()
     with transaction.manager:
-        obj = SRS(
-            display_name="MSK23",
-            wkt='PROJCS["МСК 23 зона 1",GEOGCS["GCS_Pulkovo_1942",DATUM["Pulkovo_1942",SPHEROID["Krassowsky_1940",6378245.0,298.3]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Transverse_Mercator"],PARAMETER["False_Easting",1300000.0],PARAMETER["False_Northing",-4511057.628],PARAMETER["Central_Meridian",37.98333333333],PARAMETER["Scale_Factor",1.0],PARAMETER["Latitude_Of_Origin",0.0],UNIT["Meter",1.0]]',  # NOQA: E501
-        ).persist()
-        DBSession.flush()
-        DBSession.expunge(obj)
+        for srs_info in srs_def:
+            display_name = srs_info["display_name"]
+            obj = SRS(
+                display_name=display_name,
+                wkt=srs_info["wkt"],
+            ).persist()
+            DBSession.flush()
+            DBSession.expunge(obj)
+            srs_add[display_name] = obj.id
 
-    yield {
+    yield dict({
         "EPSG:4326": 4326,
         "EPSG:3857": 3857,
-        "MSK": obj.id
-    }
+    }, **srs_add)
 
     with transaction.manager:
-        DBSession.delete(SRS.filter_by(id=obj.id).one())
+        for srs_id in srs_add.values():
+            DBSession.delete(SRS.filter_by(id=srs_id).one())
 
 
 def test_geom_transform(ngw_webtest_app):
@@ -47,6 +54,29 @@ def test_geom_transform(ngw_webtest_app):
     g1 = Geometry.from_wkt(result.json["geom"])
     g2 = Geometry.from_wkt(MOSCOW_VLADIVOSTOK)
     assert g2.shape.equals_exact(g1.shape, 5e-07)
+
+
+def test_geom_transform_batch(srs_ids, ngw_webtest_app):
+    result = ngw_webtest_app.post_json(
+        "/api/component/spatial_ref_sys/geom_transform",
+        transform_batch_input(srs_ids)
+    ).json
+
+    for i, expected_item in enumerate(transform_batch_expected(srs_ids)):
+        actual_item = result[i]
+        assert actual_item["srs_id"] == expected_item["srs_id"]
+        g_actual = Geometry.from_wkt(actual_item["geom"])
+        g_expected = Geometry.from_wkt(expected_item["geom"])
+        assert g_expected.shape.equals_exact(g_actual.shape, 5e-03)
+
+
+def test_geom_transform_batch_return_empty_if_srs_to_wrong(srs_ids, ngw_webtest_app):
+    result = ngw_webtest_app.post_json(
+        "/api/component/spatial_ref_sys/geom_transform",
+        transform_batch_input_wrong_srs_to(srs_ids)
+    ).json
+
+    assert len(result) == 0
 
 
 def test_geom_length(ngw_webtest_app):

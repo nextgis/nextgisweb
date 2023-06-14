@@ -14,12 +14,13 @@ from .model import SRS
 from .util import convert_to_wkt, _
 
 
-def serialize(obj):
+def serialize(obj: SRS):
     return dict(
         id=obj.id, display_name=obj.display_name,
         auth_name=obj.auth_name, auth_srid=obj.auth_srid,
         wkt=obj.wkt, catalog_id=obj.catalog_id,
         system=obj.system, protected=obj.protected,
+        geographic=obj.is_geographic
     )
 
 
@@ -115,6 +116,21 @@ def geom_transform(request) -> JSONType:
     geom = transformer.transform(geom)
 
     return dict(geom=geom.wkt)
+
+
+def geom_transform_batch(request) -> JSONType:
+    data = request.json_body
+    srs_from = SRS.filter_by(id=int(data["srs_from"])).one()
+    srs_to = SRS.filter(SRS.id.in_([int(s) for s in data["srs_to"]]))
+
+    result = []
+    for srs in srs_to:
+        transformer = Transformer(srs_from.wkt, srs.wkt)
+        geom = Geometry.from_wkt(data["geom"])
+        geom_srs_to = transformer.transform(geom)
+        result.append(dict(srs_id=srs.id, geom=geom_srs_to.wkt))
+
+    return result
 
 
 def geom_calc(request, measure_fun):
@@ -247,6 +263,11 @@ def setup_pyramid(comp, config):
 
     config.add_route("spatial_ref_sys.convert", "/api/component/spatial_ref_sys/convert") \
         .add_view(srs_convert, request_method="POST")
+
+    config.add_route(
+        "spatial_ref_sys.geom_transform.batch",
+        r"/api/component/spatial_ref_sys/geom_transform"
+    ).add_view(geom_transform_batch, request_method="POST")
 
     config.add_route(
         "spatial_ref_sys.geom_transform",
