@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 import os
 
@@ -104,6 +105,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         data_type = None
         alpha_band = None
         has_nodata = None
+        mask_flags = None
         for bidx in range(1, ds.RasterCount + 1):
             band = ds.GetRasterBand(bidx)
 
@@ -112,12 +114,30 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             elif data_type != band.DataType:
                 raise ValidationError(_("Mixed band data types are not supported."))
 
+            if mask_flags is None:
+                mask_flags = band.GetMaskFlags()
+            elif mask_flags != band.GetMaskFlags():
+                raise ValidationError(_("Mixed mask flags are not supported."))
+
             if band.GetRasterColorInterpretation() == gdal.GCI_AlphaBand:
                 assert alpha_band is None, "Multiple alpha bands found!"
                 alpha_band = bidx
             else:
                 has_nodata = (has_nodata is None or has_nodata) and (
                     band.GetNoDataValue() is not None)
+
+        # convert the mask band to the alpha band
+        if mask_flags == gdal.GMF_PER_DATASET:
+            bands = [bidx for bidx in range(1, ds.RasterCount + 1)]
+            bands.append("mask")
+            alpha_band = len(bands)
+            with NamedTemporaryFile(suffix=".tif", delete=False) as tf:
+                topts = gdal.TranslateOptions(bandList=bands)
+                ds = gdal.Translate(tf.name, ds, options=topts)
+                ds.GetRasterBand(alpha_band).SetColorInterpretation(gdal.GCI_AlphaBand)
+                ds = None
+                shutil.move(tf.name, filename)
+                ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
 
         try:
             src_osr = sr_from_wkt(dsproj)
