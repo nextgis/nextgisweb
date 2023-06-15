@@ -1,6 +1,5 @@
 import re
 import json
-from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
@@ -222,7 +221,7 @@ class Registry:
     def validate(self):
         mkeys = list(self._all_migrations.keys())
         mkeys.sort(key=lambda i: i.revision)
-        self._all_migrations = OrderedDict(((k, self._all_migrations[k]) for k in mkeys))
+        self._all_migrations = {k: self._all_migrations[k] for k in mkeys}
         self._validated = True
 
 
@@ -283,7 +282,7 @@ def _validate_revspec(value):
 
 def _metadata_to_jskeys(value, indent='    '):
     def _jskeys(*pairs):
-        od = OrderedDict()
+        od = dict()
         for k, v in pairs:
             if isinstance(v, datetime):
                 v = v.replace(microsecond=0).isoformat()

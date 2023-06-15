@@ -1,10 +1,10 @@
-import collections
+from collections import namedtuple
 
 
-EXPORT_FORMAT_GDAL = collections.OrderedDict()
+EXPORT_FORMAT_GDAL = dict()
 
 
-GDALDriver = collections.namedtuple(
+GDALDriver = namedtuple(
     "GDALDriver",
     [
         "name",

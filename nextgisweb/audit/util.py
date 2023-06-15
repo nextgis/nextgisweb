@@ -1,6 +1,5 @@
 
 import logging
-from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime
 
@@ -60,9 +59,9 @@ def audit_tween_factory(handler, registry):
         if not ignore:
             timestamp = datetime.utcnow()
 
-            body = OrderedDict((
+            body = dict((
                 ("@timestamp", timestamp),
-                ("request", OrderedDict(
+                ("request", dict(
                     method=request.method,
                     path=request.path,
                     remote_addr=request.remote_addr)),
@@ -74,11 +73,11 @@ def audit_tween_factory(handler, registry):
 
             user = request.environ.get("auth.user")
             if user is not None:
-                body['user'] = OrderedDict(
+                body['user'] = dict(
                     id=user['id'], keyname=user['keyname'],
                     display_name=user['display_name'])
 
-            body['response'] = body_response = OrderedDict(
+            body['response'] = body_response = dict(
                 status_code=response.status_code)
 
             if request.matched_route is not None:
@@ -86,7 +85,7 @@ def audit_tween_factory(handler, registry):
 
             context = request.environ.get('audit.context')
             if context is not None:
-                body['context'] = OrderedDict(zip(('model', 'id'), context))
+                body['context'] = dict(zip(('model', 'id'), context))
 
             event = OnResponse(request, response, body)
             zope.event.notify(event)

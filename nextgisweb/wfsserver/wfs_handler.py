@@ -1,5 +1,4 @@
 import re
-from collections import OrderedDict
 from datetime import datetime
 from os import path
 from tempfile import NamedTemporaryFile
@@ -49,30 +48,30 @@ XSD_DIR = path.join(path.dirname(
     path.abspath(__file__)), 'test/xsd/')
 
 _nsmap = dict(
-    wfs=OrderedDict((
+    wfs=dict((
         (v100, ('http://www.opengis.net/wfs', 'http://schemas.opengis.net/wfs/1.0.0/WFS-basic.xsd')),
         (v110, ('http://www.opengis.net/wfs', 'http://schemas.opengis.net/wfs/1.1.0/wfs.xsd')),
         (v200, ('http://www.opengis.net/wfs/2.0', 'http://schemas.opengis.net/wfs/2.0/wfs.xsd')),
     )),
-    gml=OrderedDict((
+    gml=dict((
         (v100, ('http://www.opengis.net/gml', 'http://schemas.opengis.net/gml/2.1.2/feature.xsd')),
         (v110, ('http://www.opengis.net/gml', 'http://schemas.opengis.net/gml/3.1.1/base/feature.xsd')),
         (v200, ('http://www.opengis.net/gml/3.2', 'http://schemas.opengis.net/gml/3.2.1/feature.xsd')),
     )),
-    ogc=OrderedDict((
+    ogc=dict((
         (v100, ('http://www.opengis.net/ogc', None)),
     )),
-    xsi=OrderedDict((
+    xsi=dict((
         (v100, ('http://www.w3.org/2001/XMLSchema-instance', None)),
     )),
-    ows=OrderedDict((
+    ows=dict((
         (v110, ('http://www.opengis.net/ows', None)),
         (v200, ('http://www.opengis.net/ows/1.1', None)),
     )),
-    xlink=OrderedDict((
+    xlink=dict((
         (v110, ('http://www.w3.org/1999/xlink', None)),
     )),
-    fes=OrderedDict((
+    fes=dict((
         (v200, ('http://www.opengis.net/fes/2.0', None)),
     ))
 )

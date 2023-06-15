@@ -1,7 +1,7 @@
 import os
 import re
 from contextlib import contextmanager
-from collections import namedtuple, OrderedDict
+from collections import namedtuple
 from functools import lru_cache
 from subprocess import check_call, check_output
 import io
@@ -36,7 +36,7 @@ class IndexFile:
 
             fp = write.fp
             fp.write(json.dumps(
-                OrderedDict(zip(IR_FIELDS, record)),
+                dict(zip(IR_FIELDS, record)),
                 ensure_ascii=False))
             fp.write('\n')
 

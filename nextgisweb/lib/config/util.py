@@ -1,7 +1,6 @@
 import os
 import io
 import re
-from collections import OrderedDict
 from configparser import RawConfigParser
 
 
@@ -115,7 +114,7 @@ def load_config(filenames, include, environ=os.environ, environ_prefix='NEXTGISW
     if include is None:
         include = environ.get(environ_prefix + '_CONFIG_INCLUDE')
 
-    result = OrderedDict()
+    result = dict()
 
     def apply_kv(key, value):
         if value != '':

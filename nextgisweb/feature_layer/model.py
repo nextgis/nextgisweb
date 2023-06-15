@@ -1,6 +1,3 @@
-
-from collections import OrderedDict
-
 from osgeo import ogr
 from sqlalchemy.orm import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
@@ -133,16 +130,18 @@ class LayerFieldsMixin:
 class _fields_attr(SP):
 
     def getter(self, srlzr):
-        return [OrderedDict((
-            ('id', f.id), ('keyname', f.keyname),
-            ('datatype', f.datatype), ('typemod', None),
-            ('display_name', f.display_name),
-            ('label_field', f == srlzr.obj.feature_label_field),
-            ('grid_visibility', f.grid_visibility),
-            ('lookup_table', (
+        return [{
+            'id': f.id,
+            'keyname': f.keyname,
+            'datatype': f.datatype,
+            'typemod': None,
+            'display_name': f.display_name,
+            'label_field': f == srlzr.obj.feature_label_field,
+            'grid_visibility': f.grid_visibility,
+            'lookup_table': (
                 dict(id=f.lookup_table.id)
-                if f.lookup_table else None)),
-        )) for f in srlzr.obj.fields]
+                if f.lookup_table else None),
+        } for f in srlzr.obj.fields]
 
     def setter(self, srlzr, value):
         obj = srlzr.obj

@@ -1,5 +1,4 @@
 import sys
-from collections import OrderedDict
 
 from zope.interface import Interface, implementer
 
@@ -17,7 +16,7 @@ class SerializerBase:
         self.user = user
 
         if data is None:
-            self.data = OrderedDict()
+            self.data = dict()
             self.keys = None
         else:
             self.data = data
@@ -129,9 +128,7 @@ class SerializedResourceRelationship(SerializedRelationship):
 
     def getter(self, srlzr):
         value = SerializedProperty.getter(self, srlzr)
-        return OrderedDict((
-            ('id', value.id), ('parent', dict(id=value.parent_id))
-        )) if value else None
+        return dict(id=value.id, parent=dict(id=value.parent_id)) if value else None
 
 
 class SerializerMeta(type):
@@ -184,7 +181,7 @@ class CompositeSerializer(SerializerBase):
     def __init__(self, obj, user, data=None):
         super().__init__(obj, user, data)
 
-        self.members = OrderedDict()
+        self.members = dict()
         for ident, mcls in self.registry._dict.items():
             if data is None or ident in data:
                 mdata = data[ident] if data else None

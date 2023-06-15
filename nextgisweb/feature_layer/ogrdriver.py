@@ -1,4 +1,4 @@
-import collections
+from collections import namedtuple
 
 from osgeo import ogr
 
@@ -12,10 +12,10 @@ def test_driver_capability(name, capability):
     return (driver is not None) and driver.TestCapability(capability)
 
 
-EXPORT_FORMAT_OGR = collections.OrderedDict()
+EXPORT_FORMAT_OGR = dict()
 
 
-OGRDriverT = collections.namedtuple(
+OGRDriverT = namedtuple(
     "OGRDriver",
     [
         "name",

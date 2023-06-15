@@ -6,7 +6,6 @@ import sqlalchemy.orm as orm
 
 from zope.interface import implementer
 
-from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 from osgeo import gdal, gdalconst, osr, ogr
 
@@ -35,24 +34,25 @@ Base = declarative_base(dependencies=('resource', ))
 
 SUPPORTED_DRIVERS = ('GTiff', )
 
-COLOR_INTERPRETATION = OrderedDict((
-    (gdal.GCI_Undefined, 'Undefined'),
-    (gdal.GCI_GrayIndex, 'GrayIndex'),
-    (gdal.GCI_PaletteIndex, 'PaletteIndex'),
-    (gdal.GCI_RedBand, 'Red'),
-    (gdal.GCI_GreenBand, 'Green'),
-    (gdal.GCI_BlueBand, 'Blue'),
-    (gdal.GCI_AlphaBand, 'Alpha'),
-    (gdal.GCI_HueBand, 'Hue'),
-    (gdal.GCI_SaturationBand, 'Saturation'),
-    (gdal.GCI_LightnessBand, 'Lightness'),
-    (gdal.GCI_CyanBand, 'Cyan'),
-    (gdal.GCI_MagentaBand, 'Magenta'),
-    (gdal.GCI_YellowBand, 'Yellow'),
-    (gdal.GCI_BlackBand, 'Black'),
-    (gdal.GCI_YCbCr_YBand, 'YCbCr_Y'),
-    (gdal.GCI_YCbCr_CbBand, 'YCbCr_Cb'),
-    (gdal.GCI_YCbCr_CrBand, 'YCbCr_Cr')))
+COLOR_INTERPRETATION = {
+    gdal.GCI_Undefined: 'Undefined',
+    gdal.GCI_GrayIndex: 'GrayIndex',
+    gdal.GCI_PaletteIndex: 'PaletteIndex',
+    gdal.GCI_RedBand: 'Red',
+    gdal.GCI_GreenBand: 'Green',
+    gdal.GCI_BlueBand: 'Blue',
+    gdal.GCI_AlphaBand: 'Alpha',
+    gdal.GCI_HueBand: 'Hue',
+    gdal.GCI_SaturationBand: 'Saturation',
+    gdal.GCI_LightnessBand: 'Lightness',
+    gdal.GCI_CyanBand: 'Cyan',
+    gdal.GCI_MagentaBand: 'Magenta',
+    gdal.GCI_YellowBand: 'Yellow',
+    gdal.GCI_BlackBand: 'Black',
+    gdal.GCI_YCbCr_YBand: 'YCbCr_Y',
+    gdal.GCI_YCbCr_CbBand: 'YCbCr_Cb',
+    gdal.GCI_YCbCr_CrBand: 'YCbCr_Cr',
+}
 
 
 @implementer(IBboxLayer)

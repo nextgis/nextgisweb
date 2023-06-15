@@ -1,9 +1,7 @@
 import re
-from collections import OrderedDict
 
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased, undefer
-from zope.event import notify
 from pyramid.security import forget
 from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
 from pyramid.interfaces import ISecurityPolicy
@@ -30,10 +28,7 @@ def user_cget(request) -> JSONType:
     for o in User.query().options(undefer(User.is_administrator)):
         data = o.serialize()
         if brief:
-            data = OrderedDict([
-                (k, v) for k, v in data.items()
-                if k in brief_keys
-            ])
+            data = {k: v for k, v in data.items() if k in brief_keys}
         result.append(data)
 
     return result
@@ -135,10 +130,7 @@ def group_cget(request) -> JSONType:
     for o in Group.query():
         data = o.serialize()
         if brief:
-            data = OrderedDict([
-                (k, v) for k, v in data.items()
-                if k in brief_keys
-            ])
+            data = {k: v for k, v in data.items() if k in brief_keys}
         result.append(data)
 
     return result

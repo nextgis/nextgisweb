@@ -1,7 +1,6 @@
 import re
 import base64
 from datetime import timedelta
-from collections import OrderedDict
 from urllib.parse import unquote
 
 from pyramid.response import Response, FileResponse
@@ -296,8 +295,8 @@ def healthcheck(request) -> JSONType:
         comp for comp in env.components.values()
         if hasattr(comp, 'healthcheck')]
 
-    result = OrderedDict(success=True)
-    result['component'] = OrderedDict()
+    result = dict(success=True)
+    result['component'] = dict()
 
     for comp in components:
         cresult = comp.healthcheck()

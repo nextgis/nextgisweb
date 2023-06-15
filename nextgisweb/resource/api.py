@@ -1,4 +1,3 @@
-from collections import OrderedDict
 import zope.event
 
 from pyramid.httpexceptions import HTTPBadRequest
@@ -130,7 +129,7 @@ def collection_post(request) -> JSONType:
     resource.persist()
     DBSession.flush()
 
-    result = OrderedDict(id=resource.id)
+    result = dict(id=resource.id)
     request.audit_context('resource', resource.id)
 
     # TODO: Parent is returned only for compatibility
@@ -162,9 +161,9 @@ def permission(resource, request) -> JSONType:
 
     effective = resource.permissions(user)
 
-    result = OrderedDict()
+    result = dict()
     for k, scope in resource.scope.items():
-        sres = OrderedDict()
+        sres = dict()
 
         for perm in scope.values(ordered=True):
             sres[perm.name] = perm in effective
@@ -202,7 +201,7 @@ def permission_explain(request) -> JSONType:
     resolver = PermissionResolver(request.context, user, permissions, explain=True)
 
     def _jsonify_principal(principal):
-        result = OrderedDict(id=principal.id)
+        result = dict(id=principal.id)
         result['cls'] = {'U': 'user', 'G': 'group'}[principal.cls]
         if principal.system:
             result['keyname'] = principal.keyname
@@ -212,46 +211,46 @@ def permission_explain(request) -> JSONType:
         if value is None:
             return None
 
-        result = OrderedDict()
+        result = dict()
         for scope_identity, scope in value.resource.scope.items():
             n_scope = result.get(scope_identity)
             for perm in scope.values(ordered=True):
                 if perm in value._result:
                     if n_scope is None:
-                        n_scope = result[scope_identity] = OrderedDict()
-                    n_perm = n_scope[perm.name] = OrderedDict()
+                        n_scope = result[scope_identity] = dict()
+                    n_perm = n_scope[perm.name] = dict()
                     n_perm['result'] = value._result[perm]
                     n_explain = n_perm['explain'] = list()
                     for item in value._explanation[perm]:
                         i_res = item.resource
 
-                        n_item = OrderedDict((
-                            ('result', item.result),
-                            ('resource', dict(id=i_res.id) if i_res else None),
-                        ))
+                        n_item = dict(
+                            result=item.result,
+                            resource=dict(id=i_res.id) if i_res else None,
+                        )
 
                         n_explain.append(n_item)
                         if isinstance(item, ExplainACLRule):
                             n_item['type'] = 'acl_rule'
                             if i_res.has_permission(PERM_READ, request.user):
-                                n_item['acl_rule'] = OrderedDict((
-                                    ('action', item.acl_rule.action),
-                                    ('principal', _jsonify_principal(item.acl_rule.principal)),
-                                    ('scope', item.acl_rule.scope),
-                                    ('permission', item.acl_rule.permission),
-                                    ('identity', item.acl_rule.identity),
-                                    ('propagate', item.acl_rule.propagate),
-                                ))
+                                n_item['acl_rule'] = {
+                                    'action': item.acl_rule.action,
+                                    'principal': _jsonify_principal(item.acl_rule.principal),
+                                    'scope': item.acl_rule.scope,
+                                    'permission': item.acl_rule.permission,
+                                    'identity': item.acl_rule.identity,
+                                    'propagate': item.acl_rule.propagate,
+                                }
 
                         elif isinstance(item, ExplainRequirement):
                             n_item['type'] = 'requirement'
                             if i_res is None or i_res.has_permission(PERM_READ, request.user):
-                                n_item['requirement'] = OrderedDict((
-                                    ('scope', item.requirement.src.scope.identity),
-                                    ('permission', item.requirement.src.name),
-                                    ('attr', item.requirement.attr),
-                                    ('attr_empty', item.requirement.attr_empty),
-                                ))
+                                n_item['requirement'] = {
+                                    'scope': item.requirement.src.scope.identity,
+                                    'permission': item.requirement.src.name,
+                                    'attr': item.requirement.attr,
+                                    'attr_empty': item.requirement.attr_empty
+                                }
                                 n_item['satisfied'] = item.satisfied
                                 n_item['explain'] = _explain_jsonify(item.resolver)
 

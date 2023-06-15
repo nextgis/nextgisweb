@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from ..graph import OperationGraph
 
 
@@ -21,9 +19,7 @@ _uc = set((chr(i) for i in range(ord('A'), ord('Z') + 1)))
 
 
 def a2d(s):
-    return OrderedDict((
-        (c.upper(), c in _uc)
-        for c in s))
+    return {c.upper(): c in _uc for c in s}
 
 
 def test_basic():

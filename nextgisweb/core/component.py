@@ -8,7 +8,6 @@ import io
 import re
 import uuid
 import warnings
-from collections import OrderedDict
 from datetime import datetime, timedelta
 from pathlib import Path
 from subprocess import check_output
@@ -138,36 +137,32 @@ class CoreComponent(
 
         if (free_space := self.options['healthcheck.free_space']) > 0:
             if (free_space_current := stat.f_bavail / stat.f_blocks * 100) < free_space:
-                return OrderedDict((
-                    ('success', False),
-                    ('message', "%.2f%% free space left on file storage." % free_space_current),
-                ))
+                return dict(
+                    success=False,
+                    message="%.2f%% free space left on file storage." % free_space_current)
 
         if (
             (free_inodes := self.options['healthcheck.free_inodes']) > 0
             and stat.f_ffree >= 0  # Not available in some FS
         ):
             if (free_inodes_current := stat.f_ffree / stat.f_files * 100) < free_inodes:
-                return OrderedDict((
-                    ('success', False),
-                    ('message', "%.2f%% free inodes left on file storage." % free_inodes_current),
-                ))
+                return dict(
+                    success=False,
+                    message="%.2f%% free inodes left on file storage." % free_inodes_current)
         try:
             with tempfile.TemporaryFile(dir=self.options['sdir']):
                 pass
         except IOError:
-            return OrderedDict((
-                ('success', False),
-                ('message', "Could not create a file on file storage."),
-            ))
+            return dict(
+                success=False,
+                message="Could not create a file on file storage.")
 
         try:
             sa_url = self._engine_url(error_on_pwfile=True)
         except IOError:
-            return OrderedDict((
-                ('success', False),
-                ('message', "Database password file is missing!")
-            ))
+            return dict(
+                success=False,
+                message="Database password file is missing!")
 
         sa_engine = create_engine(sa_url, connect_args=dict(connect_timeout=int(
             self.options['database.connect_timeout'].total_seconds())))
@@ -177,10 +172,10 @@ class CoreComponent(
                 conn.execute(text("SELECT 1"))
         except OperationalError as exc:
             msg = str(exc.orig).rstrip()
-            return OrderedDict((
-                ('success', False),
-                ('message', "Database connection failed: " + msg)
-            ))
+            return dict(
+                success=False,
+                message="Database connection failed: " + msg)
+
         sa_engine.dispose()
 
         return dict(success=True)
@@ -319,7 +314,7 @@ class CoreComponent(
         if ngupdate_url is None:
             return False
 
-        query = OrderedDict()
+        query = dict()
 
         distr_opts = self.env.options.with_prefix('distribution')
         if distr_opts.get('name') is not None:

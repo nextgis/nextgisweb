@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from ..env import Component, require
 from ..lib.config import Option
 
@@ -24,7 +22,7 @@ class FeatureLayerComponent(Component):
         api.setup_pyramid(self, config)
 
     def client_settings(self, request):
-        editor_widget = OrderedDict()
+        editor_widget = dict()
         for k, ecls in FeatureExtension.registry.items():
             if hasattr(ecls, 'editor_widget'):
                 editor_widget[k] = ecls.editor_widget

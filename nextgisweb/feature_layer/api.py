@@ -7,7 +7,6 @@ import itertools
 from urllib.parse import unquote
 
 import tempfile
-from collections import OrderedDict
 from datetime import datetime, date, time
 
 from osgeo import ogr, gdal
@@ -486,7 +485,7 @@ def deserialize(feat, data, geom_format='wkt', dt_format='obj', transformer=None
 
 
 def serialize(feat, keys=None, geom_format='wkt', dt_format='obj', label=False, extensions=[]):
-    result = OrderedDict(id=feat.id)
+    result = dict(id=feat.id)
 
     if label:
         result['label'] = feat.label
@@ -504,7 +503,7 @@ def serialize(feat, keys=None, geom_format='wkt', dt_format='obj', label=False, 
     if dt_format not in ('obj', 'iso'):
         raise ValidationError(_("Date format '%s' is not supported.") % dt_format)
 
-    result['fields'] = OrderedDict()
+    result['fields'] = dict()
     for fld in feat.layer.fields:
         if keys is not None and fld.keyname not in keys:
             continue
@@ -519,19 +518,19 @@ def serialize(feat, keys=None, geom_format='wkt', dt_format='obj', label=False, 
                 fval = val.isoformat()
             else:
                 if fld.datatype == FIELD_TYPE.DATE:
-                    fval = OrderedDict((
+                    fval = dict((
                         ('year', val.year),
                         ('month', val.month),
                         ('day', val.day)))
 
                 elif fld.datatype == FIELD_TYPE.TIME:
-                    fval = OrderedDict((
+                    fval = dict((
                         ('hour', val.hour),
                         ('minute', val.minute),
                         ('second', val.second)))
 
                 elif fld.datatype == FIELD_TYPE.DATETIME:
-                    fval = OrderedDict((
+                    fval = dict((
                         ('year', val.year),
                         ('month', val.month),
                         ('day', val.day),
@@ -544,7 +543,7 @@ def serialize(feat, keys=None, geom_format='wkt', dt_format='obj', label=False, 
 
         result['fields'][fld.keyname] = fval
 
-    result['extensions'] = OrderedDict()
+    result['extensions'] = dict()
     for identity, ext in extensions:
         result['extensions'][identity] = ext.serialize(feat)
 

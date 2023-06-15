@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from geoalchemy2.shape import to_shape
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 
@@ -17,7 +15,7 @@ from ..pyramid import JSONType
 
 
 def annotation_to_dict(obj, request, with_user_info=False):
-    result = OrderedDict()
+    result = dict()
 
     keys = ('id', 'description', 'style', 'geom', 'public')
     if with_user_info and (obj.public is False):

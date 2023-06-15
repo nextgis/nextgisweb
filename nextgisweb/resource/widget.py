@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from .model import Resource
 
 _registry = []
@@ -32,7 +30,7 @@ class Widget(WidgetBase, metaclass=WidgetMeta):
         return operation and resclass and interface
 
     def config(self):
-        return OrderedDict()
+        return dict()
 
 
 class CompositeWidget(WidgetBase):
@@ -46,7 +44,7 @@ class CompositeWidget(WidgetBase):
                 self.members.append(member)
 
     def config(self):
-        result = OrderedDict()
+        result = dict()
         for m in self.members:
             result[m.amdmod] = m.config()
         return result

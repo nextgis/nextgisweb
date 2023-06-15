@@ -1,8 +1,6 @@
 import io
 import os
 import re
-
-from collections import OrderedDict
 from shutil import copyfileobj
 
 from ..lib import db
@@ -57,11 +55,15 @@ class FeatureAttachment(Base):
         raise ValueError
 
     def serialize(self):
-        return OrderedDict((
-            ('id', self.id), ('name', self.name), ('keyname', self.keyname),
-            ('size', self.size), ('mime_type', self.mime_type),
-            ('description', self.description),
-            ('is_image', self.is_image)))
+        return {
+            'id': self.id,
+            'name': self.name,
+            'keyname': self.keyname,
+            'size': self.size,
+            'mime_type': self.mime_type,
+            'description': self.description,
+            'is_image': self.is_image,
+        }
 
     def deserialize(self, data):
         file_upload = data.get('file_upload')

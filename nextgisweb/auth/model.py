@@ -1,4 +1,4 @@
-from collections import namedtuple, OrderedDict
+from collections import namedtuple
 from functools import lru_cache
 
 from passlib.hash import sha256_crypt
@@ -133,23 +133,23 @@ class User(Principal):
         self.password_hash = sha256_crypt.hash(value) if value is not None else None
 
     def serialize(self):
-        return OrderedDict((
-            ('id', self.id),
-            ('system', self.system),
-            ('display_name', self.display_name),
-            ('description', self.description),
-            ('keyname', self.keyname),
-            ('superuser', self.superuser),
-            ('disabled', self.disabled),
-            ('password', self.password_hash is not None),
-            ('last_activity', self.last_activity),
-            ('language', self.language),
-            ('oauth_subject', self.oauth_subject),
-            ('oauth_tstamp', self.oauth_tstamp),
-            ('alink_token', self.alink_token),
-            ('member_of', [g.id for g in self.member_of]),
-            ('is_administrator', self.is_administrator),
-        ))
+        return {
+            'id': self.id,
+            'system': self.system,
+            'display_name': self.display_name,
+            'description': self.description,
+            'keyname': self.keyname,
+            'superuser': self.superuser,
+            'disabled': self.disabled,
+            'password': self.password_hash is not None,
+            'last_activity': self.last_activity,
+            'language': self.language,
+            'oauth_subject': self.oauth_subject,
+            'oauth_tstamp': self.oauth_tstamp,
+            'alink_token': self.alink_token,
+            'member_of': [g.id for g in self.member_of],
+            'is_administrator': self.is_administrator,
+        }
 
     def deserialize(self, data):
         was_disabled = self.disabled is not False
@@ -220,16 +220,16 @@ class Group(Principal):
             return user in self.members
 
     def serialize(self):
-        return OrderedDict((
-            ('id', self.id),
-            ('system', self.system),
-            ('display_name', self.display_name),
-            ('description', self.description),
-            ('keyname', self.keyname),
-            ('register', self.register),
-            ('oauth_mapping', self.oauth_mapping),
-            ('members', [u.id for u in self.members])
-        ))
+        return {
+            'id': self.id,
+            'system': self.system,
+            'display_name': self.display_name,
+            'description': self.description,
+            'keyname': self.keyname,
+            'register': self.register,
+            'oauth_mapping': self.oauth_mapping,
+            'members': [u.id for u in self.members],
+        }
 
     def deserialize(self, data):
         attrs = ('display_name', 'description', 'keyname', 'register', 'oauth_mapping')

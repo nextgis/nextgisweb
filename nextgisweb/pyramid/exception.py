@@ -2,7 +2,6 @@ import sys
 import os.path
 import warnings
 import traceback
-from collections import OrderedDict
 from hashlib import md5
 
 from pyramid import httpexceptions
@@ -144,7 +143,7 @@ def json_error(request, err_info, exc, exc_info, debug=True):
         return exc.__class__.__name__
     exc_full_name = exc_module + '.' + exc.__class__.__name__
 
-    result = OrderedDict()
+    result = dict()
 
     title = err_info_attr(err_info, exc, 'title')
     if title is not None:
@@ -170,7 +169,7 @@ def json_error(request, err_info, exc, exc_info, debug=True):
         result['guru_meditation'] = guru_meditation(tb)
         if debug:
             result['traceback'] = [
-                OrderedDict(zip(('file', 'line', 'func', 'text'), itm))
+                dict(zip(('file', 'line', 'func', 'text'), itm))
                 for itm in tb]
 
     return result

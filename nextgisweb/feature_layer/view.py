@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from pyramid.httpexceptions import HTTPNotFound
 
 from ..resource import (
@@ -57,7 +55,7 @@ def feature_show(request):
 
     feature_id = int(request.matchdict['feature_id'])
 
-    ext_mid = OrderedDict()
+    ext_mid = dict()
     for k, ecls in FeatureExtension.registry._dict.items():
         if hasattr(ecls, 'display_widget'):
             ext_mid[k] = ecls.display_widget
@@ -77,11 +75,11 @@ def feature_update(request):
 
     fields = []
     for f in request.context.fields:
-        fields.append(OrderedDict((
-            ('keyname', f.keyname),
-            ('display_name', f.display_name),
-            ('datatype', f.datatype),
-        )))
+        fields.append({
+            'keyname': f.keyname,
+            'display_name': f.display_name,
+            'datatype': f.datatype,
+        })
 
     return dict(
         obj=request.context,

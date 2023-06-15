@@ -10,7 +10,7 @@ from packaging import version as pkg_version
 from pathlib import Path
 from argparse import ArgumentParser, Namespace
 from pkg_resources import resource_filename
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from functools import partial
 from tempfile import NamedTemporaryFile
 from time import sleep
@@ -62,11 +62,11 @@ def compare_catalogs(fileA, fileB):
 
 
 def write_jed(fileobj, catalog):
-    data = OrderedDict()
-    data[''] = OrderedDict((
-        ('domain', catalog.domain),
-        ('lang', catalog.locale.language),
-        ('plural_forms', catalog.plural_forms)))
+    data = dict()
+    data[''] = dict(
+        domain=catalog.domain,
+        lang=catalog.locale.language,
+        plural_forms=catalog.plural_forms)
 
     for msg in catalog:
         if msg.id == '':

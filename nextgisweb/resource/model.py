@@ -1,6 +1,5 @@
-from collections import namedtuple, OrderedDict
+from collections import namedtuple
 from datetime import datetime
-from itertools import count
 
 from bunch import Bunch
 from sqlalchemy import event, text, func
@@ -386,14 +385,14 @@ class _perms_attr(SP):
         result = []
 
         for o in srlzr.obj.acl:
-            result.append(OrderedDict((
-                ('action', o.action),
-                ('principal', dict(id=o.principal_id)),
-                ('identity', o.identity),
-                ('scope', o.scope),
-                ('permission', o.permission),
-                ('propagate', o.propagate),
-            )))
+            result.append({
+                'action': o.action,
+                'principal': dict(id=o.principal_id),
+                'identity': o.identity,
+                'scope': o.scope,
+                'permission': o.permission,
+                'propagate': o.propagate,
+            })
 
         return result
 

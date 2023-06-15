@@ -1,7 +1,6 @@
 import logging
 import logging.config
 import os
-from collections import OrderedDict
 from types import MappingProxyType
 from typing import Mapping
 from functools import partial
@@ -43,8 +42,8 @@ class Env(Container):
         if len(cfg) == 0:
             logger.info("Creating environment without any configuration.")
 
-        cfg_components = OrderedDict()
-        cfg_packages = OrderedDict()
+        cfg_components = dict()
+        cfg_packages = dict()
 
         # TODO: Maybe there is a better way to iterate over options exists.
         for k, v in cfgenv.items():
@@ -301,6 +300,7 @@ class env(metaclass=EnvMetaClass):
 
 
 def _filter_by_prefix(cfg, prefix):
-    return OrderedDict([
-        (k[len(prefix):], v) for k, v in cfg.items()
-        if k.startswith(prefix)])
+    return {
+        k[len(prefix):]: v for k, v in cfg.items()
+        if k.startswith(prefix)
+    }

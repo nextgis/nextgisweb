@@ -2,7 +2,6 @@ import re
 import json
 from io import BytesIO
 from datetime import datetime
-from collections import OrderedDict
 
 import PIL
 import requests
@@ -86,20 +85,21 @@ class Connection(Base, Resource):
 
         layers = []
         for lid, layer in service.contents.items():
-            layers.append(OrderedDict((
-                ('id', lid), ('title', layer.title),
-                ('index', [int(i) for i in layer.index.split('.')]),
-                ('bbox', layer.boundingBoxWGS84),  # may be None
-            )))
+            layers.append({
+                'id': lid,
+                'title': layer.title,
+                'index': [int(i) for i in layer.index.split('.')],
+                'bbox': layer.boundingBoxWGS84,  # may be None
+            })
 
         layers.sort(key=lambda i: i['index'])
 
         for layer in layers:
             del layer['index']
 
-        data = OrderedDict((
-            ('formats', service.getOperationByName('GetMap').formatOptions),
-            ('layers', layers)))
+        data = dict(
+            formats=service.getOperationByName('GetMap').formatOptions,
+            layers=layers)
 
         self.capcache_json = json.dumps(data, ensure_ascii=False)
 

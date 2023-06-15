@@ -1,6 +1,6 @@
 import os
 import os.path
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from datetime import datetime as dt, timedelta
 from shutil import copyfileobj
 from operator import itemgetter
@@ -54,7 +54,7 @@ class FileStorageComponent(Component):
 
     def backup_objects(self):
         for fileobj in FileObj.query().order_by(FileObj.component, FileObj.uuid):
-            yield FileObjBackup(OrderedDict(
+            yield FileObjBackup(dict(
                 component=fileobj.component,
                 uuid=fileobj.uuid))
 
@@ -100,9 +100,9 @@ class FileStorageComponent(Component):
         # and per component size in filesystem
 
         def itm():
-            return OrderedDict(size=0, count=0)
+            return dict(size=0, count=0)
 
-        result = OrderedDict(
+        result = dict(
             total=itm(), component=defaultdict(itm))
 
         def add_item(itm, size):

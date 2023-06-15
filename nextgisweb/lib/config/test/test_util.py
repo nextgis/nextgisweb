@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 
 import pytest
@@ -21,7 +20,7 @@ from ..util import environ_substitution, load_config
     ),
 ))
 def test_environ_substitution(value, environ, expected):
-    items = OrderedDict(key=value)
+    items = dict(key=value)
     environ_substitution(items, environ)
     assert items['key'] == expected
 
