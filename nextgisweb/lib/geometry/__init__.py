@@ -163,13 +163,11 @@ class Transformer:
 
     def transform(self, geom):
         # NB: geom.srid is not considered
-        if self._transformation is None:
-            return geom
-        else:
-            ogr_geom = geom.ogr
+        ogr_geom = geom.ogr.Clone()
+        if self._transformation is not None:
             if ogr_geom.Transform(self._transformation) != 0:
                 raise ValueError(gdal.GetLastErrorMsg())
-            return Geometry.from_ogr(ogr_geom)
+        return Geometry.from_ogr(ogr_geom)
 
 
 def crs_unit_factor(crs):
