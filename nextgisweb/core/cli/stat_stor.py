@@ -18,7 +18,7 @@ def statistics(
         core.estimate_storage_all()
 
     result = dict()
-    for comp in self.env._components.values():
+    for comp in self.env.components.values():
         if hasattr(comp, 'query_stat'):
             result[comp.identity] = comp.query_stat()
 

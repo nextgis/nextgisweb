@@ -72,7 +72,7 @@
 
 <div class="content-box"><div class="table-wrapper">
     <table id="package-table" class="pure-table pure-table-horizontal"><tbody>
-    %for comp in request.env._components.values():
+    %for comp in request.env.components.values():
         %for k, v in comp.sys_info():
             <tr>
                 <th>${tr(k)}</th>

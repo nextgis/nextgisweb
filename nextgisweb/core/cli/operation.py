@@ -20,7 +20,7 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 
     components = [
         (comp, comp.is_service_ready())
-        for comp in self.env._components.values()
+        for comp in self.env.components.values()
         if hasattr(comp, 'is_service_ready')]
 
     messages = dict()
