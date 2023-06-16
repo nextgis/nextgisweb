@@ -64,14 +64,13 @@ define([
                 var value = event.value;
                 api.route('resource.item', value).get().then(function (resource) {
                     var connection = resource.tmsclient_connection;
+                    this._setLayerNameVision(connection.url_template.includes('{layer}'));
                     if (connection.capmode === 'nextgis_geoservices') {
                         api.route('tmsclient.connection.layers', value)
                             .get()
                             .then(this._updateStore.bind(this));
-                        this._setLayerNameVision(false);
                     } else {
                         this._updateStore([]);
-                        this._setLayerNameVision(connection.url_template.includes('{layer}'));
                     }
                 }.bind(this));
             }.bind(this));
