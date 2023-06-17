@@ -84,10 +84,6 @@ msgstr "Объекты"
 msgid "Table"
 msgstr "Таблица"
 
-#: view.py:241
-msgid "External access"
-msgstr "Внешний доступ"
-
 #: amd/ngw-feature-layer/FeatureEditorWidget.js:54
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
 #: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:246
@@ -290,18 +286,6 @@ msgid ""
 msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
-
-#: template/section_api_layer.mako:15
-msgid ""
-"https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-"
-"tiles"
-msgstr ""
-"https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-"
-"tiles"
-
-#: template/section_api_layer.mako:16
-msgid "Read more"
-msgstr "Подробнее"
 
 #: template/section_fields.mako:19
 msgid "Lookup table"

@@ -8,6 +8,7 @@ from ..resource import (
     resource_factory,
     Widget)
 from ..resource.view import resource_sections
+from ..resource.extaccess import ExternalAccessLink
 from ..pyramid import viewargs, JSONType
 from ..lib import dynmenu as dm
 
@@ -156,6 +157,22 @@ def export_multiple(request):
     )
 
 
+class MVTLink(ExternalAccessLink):
+    title = _("MVT Vector Tiles")
+    help = _("The Mapbox Vector Tile is an efficient encoding for map data into vector tiles that can be rendered dynamically.")
+    doc_url = "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles"
+
+    interface = IFeatureLayer
+
+    @classmethod
+    def is_applicable(cls, obj, request) -> bool:
+        return MVT_DRIVER_EXIST and super().is_applicable(obj, request)
+
+    @classmethod
+    def url_factory(cls, obj, request) -> str:
+        return request.route_url('feature_layer.mvt', _query=dict(
+            resource=obj.id)) + '&z={z}&x={x}&y={y}'
+
 def setup_pyramid(comp, config):
 
     config.add_route(
@@ -234,11 +251,6 @@ def setup_pyramid(comp, config):
                         icon='material-save_alt')
 
     Resource.__dynmenu__.add(LayerMenuExt())
-
-    if MVT_DRIVER_EXIST:
-        @resource_sections(title=_("External access"), template='section_api_layer.mako')
-        def resource_section_external_access(obj):
-            return IFeatureLayer.providedBy(obj)
 
     @resource_sections(title=_("Attributes"))
     def resource_section_fields(obj):

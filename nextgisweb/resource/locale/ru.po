@@ -515,3 +515,11 @@ msgstr "Используйте эти ссылки для подключения
 #: template/section_description.mako:5
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
+
+#: nodepkg/external-access/ExternalAccess.js:10
+msgid "Read more"
+msgstr "Подробнее"
+
+#: template/resource_section_external_access.mako:4
+msgid "External access"
+msgstr "Внешний доступ"

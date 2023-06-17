@@ -1,54 +1,61 @@
-import {PropTypes} from "prop-types";
-import {Popover} from "@nextgisweb/gui/antd";
+import { PropTypes } from "prop-types";
+import { Popover } from "@nextgisweb/gui/antd";
 import HelpOutlineIcon from "@material-icons/svg/help_outline";
 import ContentCopyIcon from "@material-icons/svg/content_copy";
-import {CopyToClipboard} from 'react-copy-to-clipboard';
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import i18n from "@nextgisweb/pyramid/i18n!resource";
 
 import "./ExternalAccess.less";
 
-export function ExternalAccess({htmlDataset}) {
-    const {title, tooltipText, url, externalDocUrl, externalDocText} = htmlDataset;
-    const externalDocEnabled = htmlDataset.externalDocEnabled === "True";
+const READ_MORE = i18n.gettext("Read more");
 
-    let externalDoc;
-    if (externalDocEnabled && externalDocUrl && externalDocText) {
-        externalDoc = <>
-            {" "}
-            <a target="_blank"
-               href={externalDocUrl}>
-                {externalDocText}
-            </a>
-        </>;
-    }
+const Help = ({ help, docUrl }) => (
+    <>
+        {help}
+        {docUrl && (
+            <>
+                {" "}
+                <a target="_blank" href={docUrl}>
+                    {READ_MORE}
+                </a>
+            </>
+        )}
+    </>
+);
 
-    const titleTooltip = <>
-        {tooltipText}
-        {externalDoc}
-    </>;
-
-    return (<div className="ngw-resource-external-access">
+const Link = ({ title, help, docUrl, url }) => (
+    <>
         <div className="row-title">
-            <div className="text">{title}</div>
-            {" "}
+            {title}{" "}
             <Popover
                 overlayClassName="ngw-resource-external-access-popover"
                 placement="right"
-                content={titleTooltip}
+                content={<Help help={help} docUrl={docUrl} />}
             >
-                <HelpOutlineIcon/>
+                <HelpOutlineIcon />
             </Popover>
         </div>
         <div className="row-input-info">
-            <div className="url-text">
-                {url}
-            </div>
+            <div className="url-text">{url}</div>
             <CopyToClipboard text={url}>
-                <span className="copy-icon"><ContentCopyIcon/></span>
+                <span className="copy-icon">
+                    <ContentCopyIcon />
+                </span>
             </CopyToClipboard>
         </div>
-    </div>)
+    </>
+);
+
+export function ExternalAccess({ links }) {
+    return (
+        <div className="ngw-resource-external-access">
+            {links.map((link, idx) => (
+                <Link key={idx} {...link} />
+            ))}
+        </div>
+    );
 }
 
 ExternalAccess.propTypes = {
-    htmlDataset: PropTypes.object,
+    links: PropTypes.array,
 };

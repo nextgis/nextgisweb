@@ -3,10 +3,6 @@
 msgid "WMS service"
 msgstr "Сервис WMS"
 
-#: view.py:16
-msgid "External access"
-msgstr "Внешний доступ"
-
 #: amd/ngw-wmsserver/template/ServiceWidget.hbs:14
 msgid "Add"
 msgstr "Добавить"
@@ -49,14 +45,3 @@ msgstr ""
 "Geospatial Consortium для предоставления географически привязанных "
 "изображений. Эти изображения обычно генерируются картографическим сервером из"
 " данных базы данных ГИС."
-
-#: template/section_api_wms.mako:14
-msgid ""
-"https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-"
-"connection"
-msgstr "https://docs.nextgis.ru/docs_ngweb/source/layers.html#id9"
-
-#: template/section_api_wms.mako:15
-msgid "Read more"
-msgstr "Подробнее"
-

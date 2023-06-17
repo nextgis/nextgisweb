@@ -1,5 +1,6 @@
 from ..resource import Widget, Resource
 from ..resource.view import resource_sections
+from ..resource.extaccess import ExternalAccessLink
 from ..env import env
 
 from .interface import IRenderableStyle
@@ -17,12 +18,21 @@ class TileCacheWidget(Widget):
             and super().is_applicable()
 
 
+class TMSLink(ExternalAccessLink):
+    title = _("TMS (Tile Map Service)")
+    help = _("TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map is a map displayed in a browser by seamlessly joining dozens of individually requested image.")
+    doc_url = "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html?lang={lang}#render"
+
+    interface = IRenderableStyle
+
+    @classmethod
+    def url_factory(cls, obj: Resource, request) -> str:
+        return request.route_url('render.tile', _query=dict(
+            resource=obj.id, nd=204)) + "&z={z}&x={x}&y={y}"
+
+
 def setup_pyramid(comp, config):
-    
-    @resource_sections(title=_("External access"), template='section_api_renderable.mako')
-    def resource_section_external_access(obj):
-        return IRenderableStyle.providedBy(obj)
-    
+
     @resource_sections(title=_("Legend symbols"))
     def resource_section_legend_symbols(obj):
         return env.render.options['legend_symbols_section'] \

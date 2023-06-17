@@ -34,10 +34,6 @@ msgstr ""
 msgid "The value of '{}' parameter must be a non-negative integer."
 msgstr "Значение параметра '{}' должно быть не отрицательным числом."
 
-#: view.py:21
-msgid "External access"
-msgstr "Внешний доступ"
-
 #: view.py:28
 msgid "Legend symbols"
 msgstr "Символы легенды"
@@ -83,12 +79,3 @@ msgstr ""
 "TMS (Tile Map Service) - это спецификация тайловых карт.  Тайловая карта - "
 "это карта, отображаемая в браузере путем бесшовного соединения десятков "
 "индивидуально запрашиваемых изображений (тайлов)."
-
-#: template/section_api_renderable.mako:17
-msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
-msgstr "https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#render"
-
-#: template/section_api_renderable.mako:18
-msgid "Read more"
-msgstr "Подробнее"
-

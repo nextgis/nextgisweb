@@ -12,6 +12,7 @@ from ..env import env
 from ..lib.dynmenu import DynItem, Label, Link
 from ..render.legend import ILegendSymbols
 from ..render.api import legend_symbols_by_resource
+from ..render.view import TMSLink
 from ..resource import Resource, Widget, resource_factory, DataScope, ResourceScope
 from ..resource.view import resource_sections
 from ..pyramid import viewargs
@@ -278,6 +279,16 @@ def preview_embedded(request):
     )
 
 
+class WebMapTMSLink(TMSLink):
+    resource = WebMap
+    interface = None
+
+    @classmethod
+    def url_factory(cls, obj, request) -> str:
+        rids = ','.join(map(str, webmap_items_to_tms_ids_list(obj)))
+        return request.route_url('render.tile') + '?resource=' + rids + '&nd=204&z={z}&x={x}&y={y}'
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         'webmap.display', r'/resource/{id:\d+}/display',
@@ -333,7 +344,3 @@ def setup_pyramid(comp, config):
     comp.env.pyramid.control_panel.add(
         Link('settings.webmap', _("Web map"), lambda args: (
             args.request.route_url('webmap.control_panel.settings'))))
-
-    @resource_sections(title=_("External access"), template='section_api_webmap.mako')
-    def resource_section_extenal_access(obj):
-        return obj.cls == 'webmap' and webmap_items_to_tms_ids_list(obj)

@@ -2,6 +2,7 @@ import warnings
 from dataclasses import dataclass
 
 from pyramid import httpexceptions
+from pyramid.threadlocal import get_current_request
 from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
 import zope.event
@@ -15,6 +16,7 @@ from ..env.model import DBSession
 from ..core.exception import InsufficientPermissions
 
 from .exception import ResourceNotFound
+from .extaccess import ExternalAccessLink
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
@@ -288,6 +290,15 @@ def setup_pyramid(comp, config):
     @resource_sections(priority=20)
     def resource_section_description(obj):
         return obj.description is not None
+    
+    @resource_sections()
+    def resource_section_external_access(obj):
+        items = list()
+        request = get_current_request()
+        for link in ExternalAccessLink.registry:
+            if itm := link.factory(obj, request):
+                items.append(itm)
+        return dict(links=items) if len(items) > 0 else None
 
     # Actions
 

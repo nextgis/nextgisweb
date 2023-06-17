@@ -46,10 +46,6 @@ msgstr "Просмотр встроенной веб-карты"
 msgid "Clone"
 msgstr "Клонировать"
 
-#: view.py:336
-msgid "External access"
-msgstr "Внешний доступ"
-
 #: amd/ngw-webmap/Display.js:229 amd/ngw-webmap/Display.js:1132
 #: amd/ngw-webmap/ItemWidget.js:243
 msgid "Layers"
@@ -939,26 +935,3 @@ msgstr "Встраивание веб-карты не разрешено для 
 #, python-format
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
-
-#: template/section_api_webmap.mako:12
-msgid "TMS (Tile Map Service)"
-msgstr "TMS (Tile Map Service)"
-
-#: template/section_api_webmap.mako:13
-msgid ""
-"TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map "
-"is a map displayed in a browser by seamlessly joining dozens of individually "
-"requested image."
-msgstr ""
-"TMS (Tile Map Service) - это спецификация тайловых карт.  Тайловая карта - "
-"это карта, отображаемая в браузере путем бесшовного соединения десятков "
-"индивидуально запрашиваемых изображений (тайлов)."
-
-#: template/section_api_webmap.mako:16
-msgid "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#render"
-msgstr "https://docs.nextgis.ru/docs_ngweb_dev/doc/developer/misc.html#render"
-
-#: template/section_api_webmap.mako:17
-msgid "Read more"
-msgstr "Подробнее"
-

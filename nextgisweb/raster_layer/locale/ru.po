@@ -95,10 +95,6 @@ msgstr "Сохранить как"
 msgid "Download"
 msgstr "Скачать"
 
-#: view.py:52
-msgid "External access"
-msgstr "Внешний доступ"
-
 #: amd/ngw-raster-layer/ExportForm.js:101
 msgid "Band"
 msgstr "Канал"
