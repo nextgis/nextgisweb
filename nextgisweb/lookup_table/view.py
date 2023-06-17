@@ -1,4 +1,5 @@
-from ..resource import Resource, Widget
+from ..resource import Widget
+from ..resource.view import resource_sections
 
 from .model import LookupTable
 from .util import _
@@ -11,7 +12,7 @@ class Widget(Widget):
 
 
 def setup_pyramid(comp, config):
-    Resource.__psection__.register(
-        key='lookup_table', title=_("Lookup table"), priority=10,
-        is_applicable=lambda obj: isinstance(obj, LookupTable),
-        template='section.mako')
+    @resource_sections(title=_("Lookup table"), priority=10)
+    def resource_section(obj):
+        if isinstance(obj, LookupTable):
+            return dict(items=obj.val.items())

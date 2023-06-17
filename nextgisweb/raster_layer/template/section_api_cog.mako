@@ -1,6 +1,6 @@
 <%! from nextgisweb.raster_layer.util import _ %>
 
-<%inherit file="nextgisweb:resource/template/section_api.mako"/>
+<%inherit file="nextgisweb:resource/template/resource_section_api.mako"/>
 
 <%block name="content">
 <% url_cog = request.route_url('raster_layer.cog', id=obj.id) %>

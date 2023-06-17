@@ -1,5 +1,6 @@
-<% import json %>
 <%! from nextgisweb.resource.util import _ %>
+<%page args="section"/>
+<% section.content_box = False %>
 
 <div class="content-box__description">${tr(_("Use these links to plug data into external applications."))}</div>
 

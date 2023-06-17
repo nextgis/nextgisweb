@@ -1,4 +1,5 @@
-from ..resource import Widget, Resource
+from ..resource import Widget
+from ..resource.view import resource_sections
 from .model import Service
 
 from .util import _
@@ -11,7 +12,6 @@ class ServiceWidget(Widget):
 
 
 def setup_pyramid(comp, config):
-    Resource.__psection__.register(
-        key='description', title=_("External access"),
-        is_applicable=lambda obj: obj.cls == 'wfsserver_service',
-        template='section_api_wfs.mako')
+    @resource_sections(title=_("External access"), template='section_api_wfs.mako')
+    def resource_section_external_access(obj):
+        return obj.cls == 'wfsserver_service'

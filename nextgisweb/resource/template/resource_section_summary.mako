@@ -1,4 +1,7 @@
 <%! from nextgisweb.resource.util import _ %>
+<%page args="section"/>
+<% section.content_box = False %>
+
 <table class="meta-info table-keyvalue pure-table">
     <tbody>
         <tr>

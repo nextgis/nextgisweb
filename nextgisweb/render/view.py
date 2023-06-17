@@ -1,4 +1,5 @@
-from ..resource import (Widget, Resource)
+from ..resource import Widget, Resource
+from ..resource.view import resource_sections
 from ..env import env
 
 from .interface import IRenderableStyle
@@ -17,14 +18,12 @@ class TileCacheWidget(Widget):
 
 
 def setup_pyramid(comp, config):
-    Resource.__psection__.register(
-        key='description', title=_("External access"),
-        is_applicable=lambda obj: IRenderableStyle.providedBy(obj),
-        template='section_api_renderable.mako')
-
-    Resource.__psection__.register(
-        key='legend_symbols', title=_("Legend symbols"),
-        is_applicable=lambda obj: (
-            env.render.options['legend_symbols_section']
-            and ILegendSymbols.providedBy(obj)),
-        template='section_legend_symbols.mako')
+    
+    @resource_sections(title=_("External access"), template='section_api_renderable.mako')
+    def resource_section_external_access(obj):
+        return IRenderableStyle.providedBy(obj)
+    
+    @resource_sections(title=_("Legend symbols"))
+    def resource_section_legend_symbols(obj):
+        return env.render.options['legend_symbols_section'] \
+            and ILegendSymbols.providedBy(obj)

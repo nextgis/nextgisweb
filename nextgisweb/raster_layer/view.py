@@ -2,6 +2,7 @@ from pyramid.httpexceptions import HTTPNotFound
 
 from ..lib import dynmenu as dm
 from ..resource import Widget, Resource
+from ..resource.view import resource_sections
 from ..pyramid import viewargs
 
 from .model import RasterLayer
@@ -57,7 +58,6 @@ def setup_pyramid(comp, config):
 
     Resource.__dynmenu__.add(LayerMenuExt())
 
-    Resource.__psection__.register(
-        key='description', title=_("External access"),
-        is_applicable=lambda obj: obj.cls == 'raster_layer' and obj.cog,
-        template='section_api_cog.mako')
+    @resource_sections(title=_("External access"), template='section_api_cog.mako')
+    def resource_section_external_access(obj):
+        return obj.cls == 'raster_layer' and obj.cog

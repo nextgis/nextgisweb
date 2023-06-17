@@ -1,5 +1,6 @@
 from ..lib.dynmenu import DynItem, Label, Link
 from ..resource import Resource, Widget
+from ..resource.view import resource_sections
 
 from .model import SVGMarkerLibrary
 from .util import _, COMP_ID
@@ -25,7 +26,7 @@ class SVGMarkerLibraryMenu(DynItem):
 def setup_pyramid(comp, config):
     Resource.__dynmenu__.add(SVGMarkerLibraryMenu())
 
-    Resource.__psection__.register(
-        key='svg_marker_library', priority=20, title=_("SVG marker library"),
-        is_applicable=lambda obj: isinstance(obj, SVGMarkerLibrary),
-        template='section.mako')
+    @resource_sections(title=_("SVG marker library"), priority=20)
+    def resource_section(obj):
+        return isinstance(obj, SVGMarkerLibrary)
+

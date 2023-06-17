@@ -1,4 +1,4 @@
-from ..resource import Resource, Widget
+from ..resource import Widget
 from .model import Connection, Layer
 from .util import _
 
@@ -16,8 +16,4 @@ class LayerWidget(Widget):
 
 
 def setup_pyramid(comp, config):
-    Resource.__psection__.register(
-        key='tmsclient_connection', priority=60,
-        title=_('TMS capabilities'),
-        is_applicable=lambda obj: False,
-    )
+    pass

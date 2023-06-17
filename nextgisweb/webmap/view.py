@@ -13,6 +13,7 @@ from ..lib.dynmenu import DynItem, Label, Link
 from ..render.legend import ILegendSymbols
 from ..render.api import legend_symbols_by_resource
 from ..resource import Resource, Widget, resource_factory, DataScope, ResourceScope
+from ..resource.view import resource_sections
 from ..pyramid import viewargs
 
 from .model import LegendSymbolsEnum
@@ -333,7 +334,6 @@ def setup_pyramid(comp, config):
         Link('settings.webmap', _("Web map"), lambda args: (
             args.request.route_url('webmap.control_panel.settings'))))
 
-    Resource.__psection__.register(
-        key='description', title=_("External access"),
-        is_applicable=lambda obj: obj.cls == 'webmap' and webmap_items_to_tms_ids_list(obj),
-        template='section_api_webmap.mako')
+    @resource_sections(title=_("External access"), template='section_api_webmap.mako')
+    def resource_section_extenal_access(obj):
+        return obj.cls == 'webmap' and webmap_items_to_tms_ids_list(obj)

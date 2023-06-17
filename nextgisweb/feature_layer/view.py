@@ -7,6 +7,7 @@ from ..resource import (
     DataScope,
     resource_factory,
     Widget)
+from ..resource.view import resource_sections
 from ..pyramid import viewargs, JSONType
 from ..lib import dynmenu as dm
 
@@ -235,12 +236,10 @@ def setup_pyramid(comp, config):
     Resource.__dynmenu__.add(LayerMenuExt())
 
     if MVT_DRIVER_EXIST:
-        Resource.__psection__.register(
-            key='description', title=_("External access"),
-            template='section_api_layer.mako',
-            is_applicable=lambda obj: IFeatureLayer.providedBy(obj))
+        @resource_sections(title=_("External access"), template='section_api_layer.mako')
+        def resource_section_external_access(obj):
+            return IFeatureLayer.providedBy(obj)
 
-    Resource.__psection__.register(
-        key='fields', title=_("Attributes"),
-        template="section_fields.mako",
-        is_applicable=lambda obj: IFeatureLayer.providedBy(obj))
+    @resource_sections(title=_("Attributes"))
+    def resource_section_fields(obj):
+        return IFeatureLayer.providedBy(obj)

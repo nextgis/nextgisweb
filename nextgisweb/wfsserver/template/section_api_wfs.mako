@@ -1,6 +1,6 @@
 <%! from nextgisweb.wfsserver.util import _ %>
 
-<%inherit file="nextgisweb:resource/template/section_api.mako"/>
+<%inherit file="nextgisweb:resource/template/resource_section_api.mako"/>
 
 <%block name="content">
 <% url_wfs = request.route_url('wfsserver.wfs', id=obj.id) %>

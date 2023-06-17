@@ -208,6 +208,9 @@ def resource_export(request):
         dynmenu=request.env.pyramid.control_panel)
 
 
+resource_sections = PageSections('resource_section')
+
+
 def setup_pyramid(comp, config):
 
     def resource_permission(request, permission, resource=None):
@@ -271,21 +274,20 @@ def setup_pyramid(comp, config):
 
     # Sections
 
-    Resource.__psection__ = PageSections()
+    # TODO: Deprecate, use resource_sections directly
+    Resource.__psection__ = resource_sections
 
-    Resource.__psection__.register(
-        key='summary', priority=10,
-        template='section_summary.mako')
-
-    Resource.__psection__.register(
-        key='children', priority=40,
-        is_applicable=lambda obj: len(obj.children) > 0,
-        template='section_children.mako')
-
-    Resource.__psection__.register(
-        key='description', priority=20,
-        is_applicable=lambda obj: obj.description is not None,
-        template='section_description.mako')
+    @resource_sections(priority=10)
+    def resource_section_summary(obj):
+        return True
+    
+    @resource_sections(priority=40)
+    def resource_section_children(obj):
+        return len(obj.children) > 0
+    
+    @resource_sections(priority=20)
+    def resource_section_description(obj):
+        return obj.description is not None
 
     # Actions
 

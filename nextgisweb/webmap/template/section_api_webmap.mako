@@ -1,6 +1,6 @@
 <%! from nextgisweb.webmap.util import webmap_items_to_tms_ids_list, _ %>
 
-<%inherit file="nextgisweb:resource/template/section_api.mako"/>
+<%inherit file="nextgisweb:resource/template/resource_section_api.mako"/>
 
 <%block name="content">
 <% layers_ids = webmap_items_to_tms_ids_list(obj) %>

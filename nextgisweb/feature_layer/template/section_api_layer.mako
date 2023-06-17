@@ -1,7 +1,7 @@
 <% import json %>
 <%! from nextgisweb.feature_layer.util import _ %>
 
-<%inherit file="nextgisweb:resource/template/section_api.mako"/>
+<%inherit file="nextgisweb:resource/template/resource_section_api.mako"/>
 
 <%block name="content">
 <% url_mvt = request.route_url('feature_layer.mvt', _query={'resource': obj.id }) + '&x={x}&y={y}&z={z}' %>

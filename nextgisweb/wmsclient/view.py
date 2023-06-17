@@ -1,4 +1,5 @@
-from ..resource import Widget, Resource
+from ..resource import Widget
+from ..resource.view import resource_sections
 from .model import Connection, Layer
 from .util import _
 
@@ -22,16 +23,6 @@ class LayerVendorParamsWidget(Widget):
 
 
 def setup_pyramid(comp, conf):
-    Resource.__psection__.register(
-        key='wmsclient_connection', title=_("WMS capabilities"),
-        priority=50, is_applicable=lambda obj: (
-            obj.cls == 'wmsclient_connection'
-            and obj.capcache()),
-        template='section_connection.mako')
-
-    Resource.__psection__.register(
-        key='wmsclient_layer_vendor_param', title=_("WMS vendor parameters"),
-        priority=50, is_applicable=lambda obj: (
-            obj.cls == 'wmsclient_layer'
-            and len(obj.vendor_params) > 0),
-        template='section_vendor_params.mako')
+    @resource_sections(title=_("WMS capabilities"), template='section_connection.mako', priority=50)
+    def resource_section_connection(obj):
+        return obj.cls == 'wmsclient_connection' and obj.capcache()
