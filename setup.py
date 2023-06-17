@@ -19,7 +19,6 @@ except CalledProcessError:
 
 requires = [
     'affine==2.4.0',
-    'alembic==1.9.2',
     'babel==2.11.0',
     'bunch==1.0.1',
     'cachetools==5.3.0',

@@ -6,7 +6,7 @@ from osgeo import gdal, ogr
 from shapely.geometry import box
 
 import geoalchemy2 as ga
-from sqlalchemy import event, func, sql
+from sqlalchemy import event, func, sql, inspect
 
 from ..lib import db
 from ..core.exception import ValidationError as VE
@@ -20,7 +20,7 @@ from ..resource import (
     ResourceGroup)
 from ..spatial_ref_sys import SRS
 from ..env import env
-from ..env.model import declarative_base, DBSession, migrate_operation
+from ..env.model import declarative_base, DBSession
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..lib.ogrhelper import read_dataset
 from ..feature_layer import (
@@ -190,18 +190,22 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def field_create(self, datatype):
         uid = uuid.uuid4().hex
         column = db.Column('fld_' + uid, FIELD_TYPE_2_DB[datatype])
-        op = migrate_operation()
-        op.add_column(self._tablename, column, schema=SCHEMA)
+
+        connection = inspect(self).session.connection()
+        dialect = connection.engine.dialect
+        connection.execute(db.text("ALTER TABLE {}.{} ADD COLUMN {} {}".format(
+            SCHEMA, self._tablename, column.name,
+            column.type.compile(dialect))))
 
         return VectorLayerField(datatype=datatype, fld_uuid=uid)
 
     def field_delete(self, field):
-        uid = field.fld_uuid
+        column_name = 'fld_' + field.fld_uuid
         DBSession.delete(field)
 
-        op = migrate_operation()
-        with op.batch_alter_table(self._tablename, schema=SCHEMA) as batch_op:
-            batch_op.drop_column('fld_' + uid)
+        connection = inspect(self).session.connection()
+        connection.execute(db.text("ALTER TABLE {}.{} DROP COLUMN {}".format(
+            SCHEMA, self._tablename, column_name)))
 
     # IWritableFeatureLayer
 
