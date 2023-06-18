@@ -89,7 +89,7 @@ def display(obj, request):
     if is_valid_or_error is not True:
         return is_valid_or_error
 
-    request.resource_permission(WebMap.scope.webmap.display)
+    request.resource_permission(WebMapScope.display)
 
     MID = namedtuple('MID', ['adapter', 'basemap', 'plugin'])
 

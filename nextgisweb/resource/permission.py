@@ -1,7 +1,7 @@
 from collections import UserList
 from functools import reduce
 
-from bunch import Bunch
+from ..lib.registry import DictRegistry
 
 
 class RequirementList(UserList):
@@ -94,33 +94,26 @@ class Permission:
         return self
 
 
+scope_registry = DictRegistry()
+
+
 class ScopeMeta(type):
 
-    def __init__(cls, classname, bases, nmspc):
-        Scope = globals().get('Scope', None)
+    def __new__(cls, name, bases, nmspc, *, abstract=False, **kwargs):
+        return super().__new__(cls, name, bases, nmspc, **kwargs)
 
-        assert Scope is None or 'identity' in cls.__dict__, \
-            'Attribute identity not found in %s' % classname
-
-        if Scope is not None:
+    def __init__(cls, classname, bases, nmspc, *, abstract=False):
+        if not abstract:
+            identity = nmspc.get('identity')
+            assert isinstance(identity, str)
             setattr(cls, 'requirements', RequirementList())
+            scope_registry.register(cls)
 
         for name, perm in cls.__dict__.items():
-            if not isinstance(perm, Permission):
-                continue
-
-            perm.bind(name, cls)
+            if isinstance(perm, Permission):
+                perm.bind(name, cls)
 
         super().__init__(classname, bases, nmspc)
-
-        if Scope is not None:
-            cls.registry[cls.__dict__['identity']] = cls
-
-    __registry = Bunch()
-
-    @property
-    def registry(cls):
-        return cls.__registry
 
     def values(cls, ordered=False):
         def _ordered(a):
@@ -133,9 +126,7 @@ class ScopeMeta(type):
         )):
             yield v
 
-    # NOTE: Backward compability
-    itervalues = values
 
+class Scope(metaclass=ScopeMeta, abstract=True):
+    registry = scope_registry
 
-class Scope(metaclass=ScopeMeta):
-    pass

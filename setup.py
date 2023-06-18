@@ -20,7 +20,6 @@ except CalledProcessError:
 requires = [
     'affine==2.4.0',
     'babel==2.11.0',
-    'bunch==1.0.1',
     'cachetools==5.3.0',
     'docstring-parser',
     'elasticsearch>=7.0.0,<8.0.0',

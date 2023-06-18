@@ -1,7 +1,7 @@
 from collections import namedtuple
 from datetime import datetime
+from types import MappingProxyType
 
-from bunch import Bunch
 from sqlalchemy import event, text, func
 
 from ..lib import db
@@ -56,22 +56,19 @@ class ResourceMeta(db.DeclarativeMeta):
         return super().__new__(cls, name, bases, nspc)
 
     def __init__(cls, name, bases, nspc):
-        scope = Bunch()
+        scope = dict()
 
         for base in cls.__mro__:
             bscope = base.__dict__.get('__scope__', None)
-
             if bscope is None:
                 continue
-
-            if bscope and not hasattr(bscope, '__iter__'):
+            if not hasattr(bscope, '__iter__'):
                 bscope = tuple((bscope, ))
 
             for s in bscope:
                 scope[s.identity] = s
 
-        setattr(cls, 'scope', scope)
-
+        setattr(cls, 'scope', MappingProxyType(scope))
         super().__init__(name, bases, nspc)
 
         resource_registry.register(cls)
@@ -412,7 +409,7 @@ class _scopes_attr(SP):
         return list(srlzr.obj.scope.keys())
 
 
-_scp = Resource.scope.resource
+_scp = ResourceScope
 
 
 def _ro(c):
