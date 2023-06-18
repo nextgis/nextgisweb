@@ -5,16 +5,14 @@ from inspect import signature
 from pyramid.renderers import render_to_response
 
 from .adapter import WebMapAdapter
-from .model import WebMap, WebMapScope, WebMapItem
+from .model import WebMap, WebMapScope
 from .plugin import WebmapPlugin, WebmapLayerPlugin
 from .util import webmap_items_to_tms_ids_list, _
-from ..env import env
 from ..lib.dynmenu import DynItem, Label, Link
 from ..render.legend import ILegendSymbols
 from ..render.api import legend_symbols_by_resource
 from ..render.view import TMSLink
-from ..resource import Resource, Widget, resource_factory, DataScope, ResourceScope
-from ..resource.view import resource_sections
+from ..resource import Widget, resource_factory, DataScope, ResourceScope
 from ..pyramid import viewargs
 
 from .model import LegendSymbolsEnum

@@ -2,7 +2,7 @@ import os.path
 import geoalchemy2 as ga
 from sqlalchemy import func
 from sqlalchemy.ext.orderinglist import ordering_list
-from osgeo import gdal, osr
+from osgeo import gdal
 from zope.interface import implementer
 
 from ..lib import db

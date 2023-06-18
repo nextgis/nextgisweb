@@ -1,6 +1,5 @@
 from ..resource import Widget
 from .model import Connection, Layer
-from .util import _
 
 
 class ClientWidget(Widget):

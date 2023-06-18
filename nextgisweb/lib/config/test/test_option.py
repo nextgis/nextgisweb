@@ -4,7 +4,7 @@ from enum import Enum
 
 import pytest
 
-from ..otype import OptionType, Text, Boolean, Integer, List, SizeInBytes, Choice
+from ..otype import OptionType, Text, Boolean, Integer, List, SizeInBytes
 
 
 class EnumTest(Enum):

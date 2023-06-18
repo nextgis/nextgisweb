@@ -1,7 +1,5 @@
 from .base import WebmapLayerPlugin
 
-from ...lib.logging import logger
-
 
 class LayerInfoPlugin(WebmapLayerPlugin):
 

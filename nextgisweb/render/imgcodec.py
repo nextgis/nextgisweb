@@ -1,7 +1,5 @@
 from enum import Enum
 
-from ..lib.logging import logger
-
 
 class CompressionEnum(Enum):
     DEFAULT = 'DEFAULT'

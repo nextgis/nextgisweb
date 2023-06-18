@@ -5,7 +5,6 @@ import fnmatch
 from babel.support import Translations as BabelTranslations
 
 from ..lib.logging import logger
-from ..env.package import pkginfo
 
 
 class Translations(BabelTranslations):
