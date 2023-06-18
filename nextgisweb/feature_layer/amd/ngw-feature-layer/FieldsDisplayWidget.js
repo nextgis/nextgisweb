@@ -38,7 +38,8 @@ define([
 
         grid_visibility: false,
 
-        urlRE: new RegExp("^(?:" + regexp.url({scheme: true}) + "|(?:mailto:|tel:|e1c://)[^\\s]+)$"),
+        urlRE: /^(\b(https?|ftp|file|mailto|tel|e1c):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])(\s+)?$/i,
+        
         emailRE: new RegExp("^" + regexp.emailAddress() + "$"),
 
         buildRendering: function () {
