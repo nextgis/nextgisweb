@@ -1,0 +1,40 @@
+line-length = 99
+select = ["E", "F", "W"]
+exclude = [
+    "docker.py",
+    "nextgisweb/raster_layer/test/validate_cloud_optimized_geotiff.py",
+]
+
+[per-file-ignores]
+"__init__.py" = ["F401"]
+
+# Absolute imports are more readable, relative ones are circuitous. So, let's
+# combine them with the following rules:
+#
+# 1. Environment (nextgisweb.env), library (nextgisweb.lib.*) and component
+#    (nextgisweb.*) modules must be imported using absolute imports.
+#
+# 2. Internal imports, which don't cross these boundaries must use relative
+#    imports. For example, you can import "nextgisweb.lib.foo.a" from
+#    "nextgisweb.lib.foo.b" as "from .a import ...", but can't import
+#    "from ..foo.a import ..." from "nextgisweb.lib.bar.c".
+#
+# Therefore, NextGIS Web extensions, like nextgisweb_qgis, will have the same
+# imports structure and that's nice!
+#
+# TODO: Do we need some flake8 for that?
+
+[isort]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "nextgisweb_env_lib",
+    "nextgisweb_comp",
+    "first-party",
+    "local-folder",
+]
+
+[isort.sections]
+"nextgisweb_env_lib" = ["nextgisweb.env", "nextgisweb.lib"]
+"nextgisweb_comp" = ["nextgisweb"]

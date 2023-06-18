@@ -59,7 +59,6 @@ requires = [
 
 extras_require = dict(development=[
     'coverage',
-    'flake8-coding',
     'flake8-future-import',
     'flake8',
     'freezegun',
@@ -67,6 +66,7 @@ extras_require = dict(development=[
     'pytest-flake8',
     'pytest-watch',
     'pytest==7.3.*',
+    'ruff',
     'webtest',
 ])
 
