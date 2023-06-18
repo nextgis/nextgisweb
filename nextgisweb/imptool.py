@@ -34,7 +34,7 @@ class NGWModuleDeprecation(UserWarning):
 
 
 class MetaPathFinder(abc.MetaPathFinder):
-    registry : Dict[str, Record]
+    registry: Dict[str, Record]
 
     def __init__(self):
         self.registry = dict()

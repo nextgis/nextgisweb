@@ -50,7 +50,7 @@ def generate_archive(files, webapp):
             for i in files:
                 assert ('content' in i) is not ('size' in i)
                 if 'content' in i:
-                    content = i['content']#.decode()
+                    content = i['content']
                 else:
                     content = b'0' * i['size']
                 z.writestr(i['name'], content)

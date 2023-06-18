@@ -218,7 +218,7 @@ def home_path_put(request) -> JSONType:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
-def settings(request) ->  JSONType:
+def settings(request) -> JSONType:
     identity = request.GET.get('component')
     if identity is None:
         raise ValidationError(message=_(
@@ -323,7 +323,7 @@ def require_storage_enabled(request):
         raise HTTPNotFound()
 
 
-def estimate_storage(request) ->  JSONType:
+def estimate_storage(request) -> JSONType:
     require_storage_enabled(request)
     request.require_administrator()
 

@@ -297,7 +297,7 @@ class OAuthHelper:
                 (min_oauth_tstamp and user.oauth_tstamp > min_oauth_tstamp)
                 or (user.oauth_tstamp + self.options['profile.sync_timedelta']) > datetime.utcnow()
             ):
-                return user # Just skip profile synchronization
+                return user  # Just skip profile synchronization
             elif bind_user is None:
                 if user.id is not None:
                     logger.debug(
@@ -612,7 +612,7 @@ class OAuthAccessTokenExpiredException(UserException):
 
 def _fallback_value(*args):
     for a in args:
-        if not(a is None or (
+        if not (a is None or (
             isinstance(a, str) and a.strip() == ''
         )):
             return a

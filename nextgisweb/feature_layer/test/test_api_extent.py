@@ -109,15 +109,14 @@ def test_item_extent(ngw_webtest_app, vector_layer_id, extent, fid, ngw_auth_adm
 
 
 @pytest.mark.parametrize('create_resource', (
-        pytest.param(create_vector_layer, id='vector_layer'),
-        pytest.param(create_postgis_layer, id='postgis_layer'),
+    pytest.param(create_vector_layer, id='vector_layer'),
+    pytest.param(create_postgis_layer, id='postgis_layer'),
 ))
 @pytest.mark.parametrize('filter_, expected_extent', filter_extents_data)
 def test_filtered_extent(create_resource, filter_, expected_extent,
                          ngw_resource_group_sub, ngw_httptest_app,
                          ngw_webtest_app, ngw_auth_administrator):
-    data = Path(__file__).parent \
-           / 'data' / 'filter-extent-layer.geojson'
+    data = Path(__file__).parent / 'data' / 'filter-extent-layer.geojson'
 
     ds = ogr.Open(str(data))
     ogrlayer = ds.GetLayer(0)

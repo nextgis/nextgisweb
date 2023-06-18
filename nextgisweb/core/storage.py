@@ -20,8 +20,8 @@ from .model import (
 
 @dict_registry
 class KindOfData():
-    identity : str = None
-    display_name : str = None
+    identity: str = None
+    display_name: str = None
 
 
 class StorageComponentMixin:
