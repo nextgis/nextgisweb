@@ -6,7 +6,6 @@ from lxml import etree, html
 from lxml.builder import ElementMaker
 from pkg_resources import resource_filename
 from PIL import Image, ImageColor, ImageDraw, ImageFont
-from bunch import Bunch
 
 from osgeo import gdal, gdal_array
 from pyramid.response import Response
@@ -410,7 +409,7 @@ def _get_feature_info(obj, params, request):
         features = list(query())
         fcount += len(features)
 
-        results.append(Bunch(
+        results.append(dict(
             keyname=layer.keyname, display_name=layer.display_name,
             feature_layer=flayer, features=features))
 
@@ -419,20 +418,14 @@ def _get_feature_info(obj, params, request):
             break
 
     if p_info_format == 'application/json':
-        result = [
-            dict(
-                keyname=result.keyname,
-                display_name=result.display_name,
-                features=[
-                    {
-                        fld.display_name: feature.fields[fld.keyname]
-                        for fld in result.feature_layer.fields
-                    }
-                    for feature in result.features
-                ],
-            )
-            for result in results
-        ]
+        result = [dict(
+            keyname=result['keyname'],
+            display_name=result['display_name'],
+            features=[{
+                fld.display_name: feature.fields[fld.keyname]
+                for fld in result['feature_layer'].fields
+            } for feature in result['features']],
+        ) for result in results]
         return Response(dumps(result), content_type='application/json', charset='utf-8')
 
     return Response(render_template(

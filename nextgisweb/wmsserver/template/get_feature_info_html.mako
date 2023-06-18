@@ -5,17 +5,14 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 </head><body>
 
-<% idx = 1 %>
+%for idx, result in enumerate(results, start=1):
+    <% flayer = result['feature_layer'] %>
 
-%for result in results:
-
-    <% flayer = result.feature_layer %>
-
-    %for feature in result.features:
+    %for feature in result['features']:
         <div style="margin-top: 1ex; font-size: 120%; background-color: #EEE;"> 
             <strong>${idx}.</strong>
             ${feature.label}
-            (<em>${result.keyname}</em>)
+            (<em>${result['keyname']}</em>)
         </div>
 
         <table>          
@@ -26,11 +23,7 @@
                 </tr>
             %endfor
         </table>
-
-        <% idx += 1 %>
-
     %endfor
-
 %endfor
 
 </body></html>
