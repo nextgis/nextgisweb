@@ -20,7 +20,7 @@ class WMSLink(ExternalAccessLink):
 
     @classmethod
     def url_factory(cls, obj, request) -> str:
-        return super().url_factory(obj, request)
+        return request.route_url('wmsserver.wms', id=obj.id)
 
 
 def setup_pyramid(comp, config):
