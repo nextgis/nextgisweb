@@ -68,7 +68,6 @@ class WebMapComponent(Component):
 
         return result
 
-
     option_annotations = (
         Option(
             'basemaps', default=resource_filename('nextgisweb', 'webmap/basemaps.json'),

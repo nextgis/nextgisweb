@@ -3,6 +3,7 @@ from warnings import warn
 
 from .util import find_template
 
+
 class PageSection:
 
     def __init__(

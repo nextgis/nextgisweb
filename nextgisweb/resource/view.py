@@ -99,7 +99,6 @@ def effective_permisssions(request):
     )
 
 
-
 # TODO: Move to API
 def schema(request) -> JSONType:
     resources = dict()

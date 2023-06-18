@@ -29,4 +29,3 @@ def setup_pyramid(comp, config):
     @resource_sections(title=_("SVG marker library"), priority=20)
     def resource_section(obj):
         return isinstance(obj, SVGMarkerLibrary)
-

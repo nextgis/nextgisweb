@@ -146,6 +146,7 @@ class ArgumentParser(_ArgumentParser):
         else:
             obj()
 
+
 def _fn_signature(fn, pdoc):
     base_cls = None
     params = list()

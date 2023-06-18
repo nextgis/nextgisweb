@@ -129,4 +129,3 @@ class ScopeMeta(type):
 
 class Scope(metaclass=ScopeMeta, abstract=True):
     registry = scope_registry
-

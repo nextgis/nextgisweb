@@ -35,7 +35,6 @@ class Enum(_Enum):
                 # does). So, swap names and values.
                 kwargs['values_callable'] = lambda o: [i.value for i in o]
 
-
         if 'length' not in kwargs:
             kwargs['length'] = 50
 

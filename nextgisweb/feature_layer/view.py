@@ -173,6 +173,7 @@ class MVTLink(ExternalAccessLink):
         return request.route_url('feature_layer.mvt', _query=dict(
             resource=obj.id)) + '&z={z}&x={x}&y={y}'
 
+
 def setup_pyramid(comp, config):
 
     config.add_route(

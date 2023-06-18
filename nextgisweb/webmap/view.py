@@ -78,9 +78,6 @@ def check_origin(request):
     return True
 
 
-
-
-
 @viewargs(renderer='mako')
 def display(obj, request):
     is_valid_or_error = check_origin(request)
@@ -125,7 +122,6 @@ def display(obj, request):
                     result.update(open=ls_layer == LegendSymbolsEnum.EXPAND)
 
         return result
-
 
     def traverse(item):
         data = dict(
