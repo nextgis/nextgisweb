@@ -1,5 +1,5 @@
 <%!
-    from bunch import Bunch
+    from types import SimpleNamespace
     from nextgisweb.lib import dynmenu as dm
     from nextgisweb.resource import ResourceScope
 %>
@@ -17,7 +17,7 @@
             ownerUserDisplayName=item.owner_user.display_name)
         
         iacts = idata["actions"] = list()
-        args = Bunch(obj=item, request=request)
+        args = SimpleNamespace(obj=item, request=request)
         for menu_item in item.__dynmenu__.build(args):
             if isinstance(menu_item, dm.Link) and menu_item.important and menu_item.icon is not None:
                 iacts.append(dict(

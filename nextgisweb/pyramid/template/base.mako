@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 
 <%!
-    from bunch import Bunch
+    from types import SimpleNamespace
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
     from nextgisweb.pyramid.util import _
 %>
@@ -85,13 +85,13 @@
                 <%
                     has_dynmenu = True
                     dynmenu = obj.__dynmenu__
-                    dynmenu_kwargs = Bunch(obj=obj, request=request)
+                    dynmenu_kwargs = SimpleNamespace(obj=obj, request=request)
                 %>
             %elif 'dynmenu' in context.keys():
                 <%
                     has_dynmenu = True
                     dynmenu = context['dynmenu']
-                    dynmenu_kwargs = context.get('dynmenu_kwargs', Bunch(request=request))
+                    dynmenu_kwargs = context.get('dynmenu_kwargs', SimpleNamespace(request=request))
                 %>
             %else:
                 <% has_dynmenu = False %>

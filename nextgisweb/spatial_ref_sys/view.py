@@ -95,7 +95,7 @@ def setup_pyramid(comp, config):
                     lambda kwargs: kwargs.request.route_url('srs.catalog')
                 )
 
-            if 'obj' in kwargs and isinstance(kwargs.obj, SRS):
+            if hasattr(kwargs, 'obj') and isinstance(kwargs.obj, SRS):
                 yield dm.Link(
                     self.sub('edit'), _("Edit"),
                     lambda kwargs: kwargs.request.route_url(
