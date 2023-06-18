@@ -40,7 +40,6 @@ requires = [
     'pygdal' + (f'=={gv}.*,' if gv else '') + '>=3',
     'pyproj==3.4.1',
     'pyramid==2.0.1',
-    'pyramid-debugtoolbar==4.10',
     'pyramid-mako==1.1.0',
     'pyramid-tm==2.5',
     'python-magic==0.4.27',
@@ -56,22 +55,20 @@ requires = [
     'zope.sqlalchemy==1.6',
     'zope.interface==5.5.2',
     'zope.event==4.6',
+]
 
-    # TODO: Move to dev or test dependencies
+extras_require = dict(development=[
     'coverage',
     'flake8-coding',
     'flake8-future-import',
     'flake8',
     'freezegun',
+    'pyramid-debugtoolbar==4.10',
     'pytest-flake8',
     'pytest-watch',
     'pytest==7.2.*',
     'webtest',
-]
-
-extras_require = {
-    'dev': ['pdbpp', 'ipython']
-}
+])
 
 entry_points = {
     'paste.app_factory': [

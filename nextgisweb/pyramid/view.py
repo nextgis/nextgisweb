@@ -544,12 +544,18 @@ def _setup_pyramid_debugtoolbar(comp, config):
     if not dt_opt.get('enabled', comp.env.core.debug):
         return
 
+    try:
+        import pyramid_debugtoolbar
+    except ModuleNotFoundError:
+        if dt_opt.get('enabled', None) is True:
+            raise
+        logger.warning("Unable to load pyramid_debugtoolbar")
+        return
+
     settings = config.registry.settings
     settings['debugtoolbar.hosts'] = dt_opt.get(
         'hosts', '0.0.0.0/0' if comp.env.core.debug else None)
     settings['debugtoolbar.exclude_prefixes'] = ['/static/', ]
-
-    import pyramid_debugtoolbar
     config.include(pyramid_debugtoolbar)
 
 
