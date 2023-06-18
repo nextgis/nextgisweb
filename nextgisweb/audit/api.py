@@ -4,13 +4,14 @@ from math import ceil
 
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound
-from elasticsearch_dsl import Search, Q
 from flatdict import FlatDict
 
 
 def audit_cget(
     request, date_from=None, date_to=None, user=None, order='desc', limit=None
 ):
+    from elasticsearch_dsl import Search, Q
+
     s = Search(
         using=request.env.audit.es,
         index="%s-*" % (request.env.audit.audit_es_index_prefix,)
