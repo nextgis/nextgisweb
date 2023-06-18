@@ -627,7 +627,7 @@ def geometry_info(resource, request) -> JSONType:
     try:
         srs = SRS.filter_by(id=srs_id).one()
     except NoResultFound:
-        raise ValidationError(message=_(f'Unknown spatial reference system'),
+        raise ValidationError(message=_('Unknown spatial reference system'),
                               data={"srs.id": srs_id})
     query.srs(srs)
 
@@ -903,7 +903,7 @@ def feature_extent(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
     supported_ident = ['vector_layer', 'postgis_layer']
-    if not (resource.identity in supported_ident):
+    if resource.identity not in supported_ident:
         raise ValidationError('feature_layer.feature.extent can only be applied to vector and postgis layers')
 
     keys = [fld.keyname for fld in resource.fields]

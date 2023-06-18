@@ -42,7 +42,7 @@ class ResourceMeta(db.DeclarativeMeta):
             # First base class, which is subclass of Resource
             bres = next((c for c in bases if issubclass(c, Resource)), None)
             assert bres is not None, "Missing resource base class"
-        
+
         nspc.setdefault('__tablename__', identity)
 
         if (id_column := nspc.get('id')) is None:
@@ -268,7 +268,7 @@ class Resource(Base, metaclass=ResourceMeta):
     def check_social_editable(cls):
         """ Can this resource social settings be editable? """
         return False
-    
+
     # Suggest display name
 
     def suggest_display_name(self, tr):

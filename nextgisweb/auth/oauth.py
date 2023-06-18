@@ -139,7 +139,7 @@ class OAuthHelper:
             if ptoken.access_exp < now:
                 if ptoken.refresh_exp > now:
                     logger.debug("OAuthPToken(%s): refreshing token pair", lf(ptoken_id))
-                    
+
                     if not return_tpair:
                         # There is no way to tell SA to load two columns
                         # simultaneously, so we load them manually.
@@ -330,7 +330,7 @@ class OAuthHelper:
 
         response = getattr(requests, method.lower())(
             url, params, headers=self.server_headers, timeout=timeout)
-        
+
         logger.debug(
             "Request(%s): < %d %s; %d bytes; %s", log_reqid,
             response.status_code, response.reason, len(response.content),
@@ -484,7 +484,7 @@ class OAuthHelper:
         Option('server.token_endpoint',
                doc="OAuth token endpoint URL."),
 
-        Option('server.token_method', default='POST', 
+        Option('server.token_method', default='POST',
                doc="Workaround for NGID OAuth implementation."),
 
         Option('server.introspection_endpoint', default=None,

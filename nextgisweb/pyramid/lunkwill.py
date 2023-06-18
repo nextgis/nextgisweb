@@ -79,7 +79,7 @@ def proxy(request):
     headers['Connection'] = 'close'
     pool = request.registry.settings['lunkwill.pool']
     resp = pool.request(
-        request.method, url, 
+        request.method, url,
         headers=headers, retries=False,
         preload_content=False)
     return Response(

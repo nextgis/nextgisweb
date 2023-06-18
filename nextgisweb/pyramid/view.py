@@ -36,7 +36,7 @@ def asset(request):
         comp_obj = env.components[component]
     except KeyError:
         raise HTTPNotFound()
-    
+
     pth = comp_obj.resource_path('/'.join(('asset', ) + subpath))
     if pth.is_file():
         return FileResponse(pth, request=request, cache_max_age=3600)

@@ -23,12 +23,12 @@ class ComponentMeta(type):
         cls.module = '.'.join(module_parts)
         cls.root_path = module_path(cls.module)
         cls.resource_path = ComponentMeta._resource_path_factory(cls.module)
-    
+
     @classmethod
     def _resource_path_factory(cls, module):
         parts = module.split('.')
         package = parts.pop(0)
-        
+
         def _resource_path(cls, path: str) -> Path:
             return Path(resource_filename(package, '/'.join(parts + [path, ])))
 

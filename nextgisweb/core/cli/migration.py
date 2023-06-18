@@ -24,7 +24,7 @@ def initialize_db(
     *, core: CoreComponent,
 ):
     """Initialize the database
-    
+
     :param drop: Attempt to drop existing objects"""
 
     metadata = self.env.metadata()
@@ -72,7 +72,7 @@ class NoExecuteOptions:
 class MigrationApplyCommand(
     DryRunOptions, NoExecuteOptions,
     RegistryMixin, EnvCommand,
-):  
+):
 
     def __call__(self):
         reg = self.registry
@@ -225,7 +225,7 @@ class create(RegistryMixin, EnvCommand.customize(env_initialize=False)):
 @migration.command()
 class init(MigrationApplyCommand):
     """Initialize database schema"""
-    
+
     def setup_target(self):
         self.tstate = {r: True for r in self.graph.select('head')}
         self.of_install = True
@@ -239,13 +239,13 @@ class upgrade(MigrationApplyCommand):
         self.cstate.update(self.registry.read_state())
         self.tstate = {r: True for r in self.graph.select('head')}
         self.of_install = True
-        self.of_forward = True        
+        self.of_forward = True
 
 
 @migration.command()
 class install(ComponentMigrationCommand):
     """Install one or more components"""
-    
+
     def setup_target(self):
         self.cstate.update(self.registry.read_state())
         self.tstate = dict(self.cstate)

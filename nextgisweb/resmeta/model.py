@@ -52,14 +52,14 @@ class ResourceMetadataItem(Base):
         self.vfloat = value if isinstance(value, float) else None
         self.vtext = value if isinstance(value, str) else None
         self.vboolean = value if isinstance(value, bool) else None
-    
+
 
 VTYPE_DISPLAY_NAME = {
     'string': _("String"),
     'number': _("Number"),
     'boolean': _("Boolean"),
     'null': _("Empty"),
-}      
+}
 
 
 class _items_attr(SerializedProperty):

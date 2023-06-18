@@ -315,7 +315,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     with patch.object(ngw_env.auth.oauth, 'local_auth', new=True):
         ngw_webtest_app.post('/api/component/auth/login', dict(
             login=user['keyname'], password='test-password'))
-        
+
         user_auth_local = dict(user, auth_provider='local_pw')
         assert ngw_webtest_app.get('/api/component/auth/current_user').json == user_auth_local
         ngw_webtest_app.post('/api/component/auth/logout')

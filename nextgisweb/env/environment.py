@@ -97,10 +97,10 @@ class Env(Container):
                 "Attribute name %s already used" % identity
 
             setattr(self, identity, instance)
-                
+
         if initialize:
             self.initialize()
-        
+
         if set_global:
             setenv(self)
 
@@ -200,7 +200,7 @@ class Env(Container):
         for level in _OPTIONS_LOGGING_LEVELS:
             if level_loggers := self.options[f'logging.{level}']:
                 for level_logger in level_loggers:
-                    loggers[level_logger] = dict(level=level.upper())      
+                    loggers[level_logger] = dict(level=level.upper())
 
         # TODO: Maybe there is a better way to iterate over options exists.
         logging_options = ['logger.waitress'] + [

@@ -7,7 +7,6 @@ import tempfile
 import io
 import re
 import uuid
-import warnings
 from datetime import datetime, timedelta
 from pathlib import Path
 from subprocess import check_output
@@ -22,12 +21,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.engine.url import (
     URL as EngineURL,
     make_url as make_engine_url)
-
-# Prevent warning about missing __init__.py in migration directory. Is's OK
-# and migration directory is intended for migration scripts.
-warnings.filterwarnings(
-    'ignore', r"^Not importing.*/core/migration.*__init__\.py$",
-    category=ImportWarning)
 
 from ..lib import db
 from ..env import Component

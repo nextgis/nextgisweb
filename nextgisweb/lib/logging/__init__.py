@@ -50,4 +50,3 @@ class LazyStr:
 
 def lazy_str(func):
     return partial(LazyStr, func=func)
-    

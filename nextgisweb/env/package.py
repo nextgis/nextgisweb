@@ -191,7 +191,7 @@ class PkgInfo:
     def pkg_comp(self, pkg):
         self.scan()
         return self._pkg_comp[pkg]
-    
+
     def amd_packages(self):
         cached = getattr(self, '_amd_packages', None)
         if cached is not None:

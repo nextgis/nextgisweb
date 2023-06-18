@@ -53,7 +53,7 @@ class AuthState:
             exp=data['exp'],
             ref=data.get('ref'),
         )
-    
+
     def to_dict(self):
         result = dict(
             prv=self.prv.value,
@@ -126,7 +126,7 @@ class SecurityPolicy:
                 prv = AuthProvider.OAUTH_PW
             else:
                 raise ValueError
-        
+
         state = AuthState(prv, user_id, exp, ref)
         session['auth.state'] = state.to_dict()
 
@@ -219,7 +219,7 @@ class SecurityPolicy:
 
             return AuthResult(state.uid, AuthMedium.SESSION, state.prv)
 
-        raise ValueError(f"Invalid authentication source")
+        raise ValueError("Invalid authentication source")
 
     def _try_headers(self, request, *, now):
         ahead = request.headers.get('Authorization')
@@ -254,7 +254,7 @@ class SecurityPolicy:
                 user = self.oauth.access_token_to_user(atoken)
                 if user.id is None:
                     DBSession.flush()
-                
+
                 return AuthResult(user.id, AuthMedium.BEARER, AuthProvider.OAUTH_AC)
 
         raise InvalidCredentialsException()
@@ -288,7 +288,7 @@ class SecurityPolicy:
         if user is None and self.oauth is not None and self.oauth.password:
             ptoken, atoken = self.oauth.authorize_credentials(
                 username, password, return_tpair=return_tpair)
-            
+
             if ptoken is not None:
 
                 # An atoken may or may not be loaded by authorize_credentials,

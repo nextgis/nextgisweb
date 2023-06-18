@@ -15,7 +15,7 @@ from ..component import CoreComponent
 @cli.command()
 def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metavar="SEC")):
     """Wait for required services and exit
-    
+
     :param timeout: Seconds to wait or fail"""
 
     components = [
@@ -66,14 +66,14 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 
 @cli.command()
 def psql(
-    self: EnvCommand.customize(env_initialize=False), 
+    self: EnvCommand.customize(env_initialize=False),
     arg: List[str] = arg(nargs='...'),
 ):
     """Launch psql connected to database
-    
+
     The psql executable must be installed and available in shell search path
     (PATH environment variable).
-    
+
     :param arg: Options and arguments passed to psql, use "--" prefix to separate"""
 
     opts, password = pg_connection_options(self.env)
@@ -98,7 +98,7 @@ def maintenance(
     *, core: CoreComponent,
 ):
     """Perform housekeeping tasks
-    
+
     :param estimate_storage: Execute storage estimation after maintenance"""
 
     for comp in self.env.chain('maintenance'):

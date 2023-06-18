@@ -16,7 +16,7 @@ def server(
     *, core: CoreComponent, pyramid: PyramidComponent,
 ):
     """Launch development-mode web server
-    
+
     :param host: Address to bind (default: 0.0.0.0)
     :param port: Port to bind (default: 8080)
     :param reload: Reload on file changes"""

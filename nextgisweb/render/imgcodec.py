@@ -65,7 +65,7 @@ def image_encoder_factory(
 def _has_fpng():
     try:
         import pillow_fpng
-    except ModuleNotFoundError as exc:
+    except ModuleNotFoundError:
         return False
     else:
         return True

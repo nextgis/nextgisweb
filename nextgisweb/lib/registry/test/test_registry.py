@@ -15,7 +15,7 @@ def test_super_init_subclass():
 
     class Sub(Base):
         __marker = False
-        
+
         def __init_subclass__(cls):
             cls.__marker = True
             super().__init_subclass__()

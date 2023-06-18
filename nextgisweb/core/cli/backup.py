@@ -25,7 +25,7 @@ def backup(
     *, core: CoreComponent,
 ):
     """Backup data into an archive
-    
+
     :param no_zip: Don't compress a backup with ZIP
     :param target: Output file or directory"""
 
@@ -92,7 +92,7 @@ def restore(
     *, core: CoreComponent,
 ):
     """Restore data from a backup
-    
+
     :param path: Path to a backup"""
 
     opts = core.options.with_prefix('backup')

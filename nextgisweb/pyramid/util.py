@@ -124,7 +124,7 @@ def find_template(name, func=None, stack_level=1):
                 return str(fn)
             else:
                 probes.append(':'.join(rn))
-    
+
     raise ValueError(f"Template '{name}' not found in {probes}")
 
 

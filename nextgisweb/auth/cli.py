@@ -24,7 +24,7 @@ def authenticate(
     *, auth: AuthComponent,
 ):
     """Impersonate an user via a link
-    
+
     :param keyname: User or group keyname
     :param base_url: Base URL for a link"""
 

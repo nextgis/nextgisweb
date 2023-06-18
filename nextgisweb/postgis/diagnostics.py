@@ -94,7 +94,7 @@ class Check:
         self.cleaned = False
         try:
             self.handler(**deps)
-        except Exception as exc:
+        except Exception:
             self.error(_("Got an unexpected error."))
             logger.exception("Unexpected check exception")
 
@@ -165,7 +165,7 @@ class PostgresCheck(ConnectionCheck):
             connect_timeout=5))
         try:
             conn = self._conn = engine.connect()
-        except OperationalError as exc:
+        except OperationalError:
             self.error(_("Failed to connect to the database."))
             return
 

@@ -754,7 +754,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 with self.layer.connection.get_connection() as conn:
                     result = conn.execute(query)
                     for row in result.mappings():
-                        fdict = dict((k, row[l]) for k, l in fieldmap)
+                        fdict = dict((k, row[v]) for k, v in fieldmap)
 
                         if self._geom:
                             if self._geom_format == 'WKB':

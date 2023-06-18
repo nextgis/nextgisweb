@@ -11,7 +11,7 @@ def statistics(
     *, core: CoreComponent,
 ):
     """Gather statistics and print as JSON
-    
+
     :param estimate_storage: Estimate storage before calculating statistics"""
 
     if estimate_storage:

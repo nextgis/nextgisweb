@@ -34,7 +34,7 @@ class Enum(_Enum):
                 # By default SA uses Enum's names instead of values (as orjson
                 # does). So, swap names and values.
                 kwargs['values_callable'] = lambda o: [i.value for i in o]
-                
+
 
         if 'length' not in kwargs:
             kwargs['length'] = 50

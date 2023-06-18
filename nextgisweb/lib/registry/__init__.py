@@ -2,7 +2,7 @@ from warnings import warn
 
 
 class ListRegistry:
-    
+
     def __init__(self):
         self._items = list()
 
@@ -16,7 +16,7 @@ class ListRegistry:
 
     def __iter__(self):
         return self._items.__iter__()
-    
+
 
 class DictRegistry:
 
@@ -38,7 +38,7 @@ class DictRegistry:
         return member
 
     def __iter__(self):
-        warn(f"Don't use the registry default iterator, use items() or keys() or values() instead", stacklevel=2)
+        warn("Don't use the registry default iterator, use items() or keys() or values() instead", stacklevel=2)
         for i in self._dict.values():
             yield i
 

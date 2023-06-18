@@ -186,7 +186,7 @@ def current_user(request) -> JSONType:
         keyname=request.user.keyname,
         display_name=request.user.display_name,
         language=request.locale_name)
-    
+
     if aresult := request.environ.get('auth.result'):
         if val := aresult.med:
             result['auth_medium'] = val

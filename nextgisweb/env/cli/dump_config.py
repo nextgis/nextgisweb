@@ -3,7 +3,7 @@ from .base import cli, EnvCommand
 @cli.command()
 def dump_config(self: EnvCommand):
     """Print configuration as INI-file"""
-    
+
     def print_options(identity, options):
         sprint = False
         for k, v in options._options.items():

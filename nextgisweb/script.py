@@ -190,7 +190,7 @@ def main(argv=sys.argv):
     # Replace "cmd.subcmd" with "cmd subcmd"
     leftover_len = len(leftover)
     if leftover_len > 0 and ('.' in leftover[0]):
-        leftover = leftover.pop(0).split('.') + leftover   
+        leftover = leftover.pop(0).split('.') + leftover
     args = args[:args_len - leftover_len] + leftover
 
     # Convert legacy commands
@@ -198,7 +198,7 @@ def main(argv=sys.argv):
     for cmd in LegacyCommand.registry.values():
         parts = cmd.identity.split('.')
         name = parts.pop(-1)
-        
+
         parent = cli
         path = []
         for g in parts:
@@ -219,7 +219,7 @@ def main(argv=sys.argv):
 
         class _Wrapper(Command):
             argparser_setup = cmd.argparser_setup
-            
+
             def setup_parser(self, parser):
                 parser.set_defaults(**{NS_CMD_GRP_ATTR: self})
                 self.argparser_setup(parser, env)

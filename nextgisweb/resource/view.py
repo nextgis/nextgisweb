@@ -261,7 +261,7 @@ def setup_pyramid(comp, config):
 
     _resource_route('json', r'{id:\d+}/json', client=('id', )) \
         .add_view(json_view)
-    
+
     _resource_route('effective_permissions', r'{id:\d+}/permissions') \
         .add_view(effective_permisssions)
 
@@ -282,15 +282,15 @@ def setup_pyramid(comp, config):
     @resource_sections(priority=10)
     def resource_section_summary(obj):
         return True
-    
+
     @resource_sections(priority=40)
     def resource_section_children(obj):
         return len(obj.children) > 0
-    
+
     @resource_sections(priority=20)
     def resource_section_description(obj):
         return obj.description is not None
-    
+
     @resource_sections()
     def resource_section_external_access(obj):
         items = list()
@@ -352,13 +352,13 @@ def setup_pyramid(comp, config):
                     lambda args: args.request.route_url(
                         'resource.json', id=args.obj.id),
                     icon='material-data_object')
- 
+
                 yield Link(
                     'extra/effective-permissions', _("User permissions"),
                     lambda args: args.request.route_url(
                         'resource.effective_permissions', id=args.obj.id),
                     icon='material-key')
- 
+
         def _url(self, cls):
             return lambda args: args.request.route_url(
                 'resource.create', id=args.obj.id,

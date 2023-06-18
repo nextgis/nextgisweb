@@ -161,7 +161,7 @@ class Choice(OptionType):
 
     def loads(self, value):
         return self._otype(value)
-    
+
     def dumps(self, value):
         return value.value if value is not None else ''
 

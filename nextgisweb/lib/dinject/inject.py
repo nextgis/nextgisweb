@@ -81,7 +81,7 @@ class inject_wrapper:
                             barg.key, partial(self._invalidate, name))
                     except KeyError:
                         raise UnresolvedDependency(barg.cnt, barg)
-      
+
         assert len(inj_values) == len(bound_args)
         return self.func(*args, **inj_values, **kwargs)
 

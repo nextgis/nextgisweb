@@ -11,18 +11,3 @@ from .util import (
     load_config,
     environ_to_key,
     key_to_environ)
-
-
-__all__ = [
-    'otype',
-    'Option',
-    'OptionType',
-    'OptionAnnotations',
-    'ConfigOptions',
-    'MissingAnnotationWarning',
-    'MissingDefaultError',
-    'NO_DEFAULT',
-    'load_config',
-    'environ_to_key',
-    'key_to_environ',
-]

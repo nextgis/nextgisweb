@@ -1,10 +1,15 @@
 import sys
-from warnings import warn
+from warnings import warn, filterwarnings
 from dataclasses import dataclass
 from importlib import abc
-from importlib.abc import Loader, MetaPathFinder
 from importlib.util import spec_from_loader
 from typing import Dict, Optional
+
+# Prevent warning about missing __init__.py in migration directory. Is's OK
+# and migration directory is intended for migration scripts.
+filterwarnings(
+    'ignore', r"^Not importing.*/core/migration.*__init__\.py$",
+    category=ImportWarning)
 
 
 @dataclass
@@ -43,7 +48,7 @@ class MetaPathFinder(abc.MetaPathFinder):
             rec = self.registry[fullname]
         except KeyError:
             return
-        
+
         s = spec_from_loader(rec.name, loader=Loader(rec))
         m = f"'{rec.name}' module has been deprecated by '{rec.repl}'" + (
             f" since {rec.since}" if rec.since else "") + (
