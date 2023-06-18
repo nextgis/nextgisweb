@@ -123,7 +123,7 @@ def add_extent(e1, e2):
 
 
 def get_webmap_extent(resource, request) -> JSONType:
-    request.resource_permission(WebMap.scope.webmap.display)
+    request.resource_permission(WebMapScope.display)
 
     def traverse(item, extent):
         if item.item_type == 'layer':
