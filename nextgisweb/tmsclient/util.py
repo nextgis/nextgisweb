@@ -7,6 +7,13 @@ COMP_ID = 'tmsclient'
 _ = trstr_factory(COMP_ID)
 
 
+class SCHEME:
+    XYZ = 'xyz'
+    TMS = 'tms'
+
+    enum = (XYZ, TMS)
+
+
 def crop_box(src_extent, dst_extent, width, height):
     left = round((dst_extent[0] - src_extent[0]) / (src_extent[2] - src_extent[0]) * width)
     right = round((dst_extent[2] - src_extent[0]) / (src_extent[2] - src_extent[0]) * width)
@@ -41,3 +48,7 @@ def quad_key(x, y, z):
             digit += 2
         quadKey = str(digit) + quadKey
     return quadKey
+
+
+def toggle_tms_xyz_y(z, y):
+    return (1 << z) - y - 1

@@ -18,6 +18,7 @@ Changes
 - Improved tabs ordering and auto-activation.
 - Use a fast PNG encoder for rendering.
 - User permissions section is moved to the separate page.
+- Improved TMS client performance as a result of parallel tiles fetching.
 
 
 4.3.2

@@ -1,7 +1,4 @@
 import re
-from io import BytesIO
-from requests.exceptions import RequestException
-from urllib.parse import urlparse
 
 import PIL
 from osgeo import osr, ogr
@@ -9,7 +6,7 @@ from zope.interface import implementer
 
 from ..lib import db
 from ..lib.osrhelper import sr_from_epsg
-from ..core.exception import ExternalServiceError, ValidationError
+from ..core.exception import ValidationError
 from ..env import env
 from ..layer import SpatialLayerMixin, IBboxLayer
 from ..env.model import declarative_base
@@ -25,8 +22,9 @@ from ..resource import (
     SerializedRelationship as SR,
     SerializedResourceRelationship as SRR,
 )
-from .util import _, crop_box, render_zoom, quad_key
-from .session_keeper import get_session
+
+from .tile_fetcher import TileFetcher
+from .util import _, crop_box, render_zoom, SCHEME
 
 
 Base = declarative_base(dependencies=('resource', ))
@@ -34,17 +32,6 @@ Base = declarative_base(dependencies=('resource', ))
 NEXTGIS_GEOSERVICES = 'nextgis_geoservices'
 
 url_template_pattern = re.compile(r'^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\{\}]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/\{\}?]*)?$', re.IGNORECASE | re.UNICODE)  # NOQA
-
-
-class SCHEME:
-    XYZ = 'xyz'
-    TMS = 'tms'
-
-    enum = (XYZ, TMS)
-
-
-def toggle_tms_xyz_y(z, y):
-    return (1 << z) - y - 1
 
 
 class Connection(Base, Resource):
@@ -73,39 +60,11 @@ class Connection(Base, Resource):
             params[self.apikey_param or 'apikey'] = self.apikey
         return params
 
-    def get_tile(self, tile, layer_name):
-        z, x, y = tile
-        if self.scheme == SCHEME.TMS:
-            y = toggle_tms_xyz_y(z, y)
-
-        session = get_session(self.id, urlparse(self.url_template).scheme,
-                              self.username, self.password)
-
-        try:
-            response = session.get(
-                self.url_template.format(
-                    x=x, y=y, z=z,
-                    q=quad_key(x, y, z),
-                    layer=layer_name
-                ),
-                params=self.query_params,
-                headers=env.tmsclient.headers,
-                timeout=env.tmsclient.options['timeout'].total_seconds(),
-                verify=not self.insecure
-            )
-        except RequestException:
-            raise ExternalServiceError()
-
-        if response.status_code == 200:
-            data = BytesIO(response.content)
-            try:
-                return PIL.Image.open(data)
-            except IOError:
-                raise ExternalServiceError("Image processing error.")
-        elif response.status_code in (204, 404):
-            return None
-        else:
-            raise ExternalServiceError()
+    def get_tiles(self, layer_name, zoom, xmin, xmax, ymin, ymax):
+        tile_fetcher = TileFetcher.instance()
+        return tile_fetcher.get_tiles(
+            self, layer_name,
+            zoom, xmin, xmax, ymin, ymax)
 
 
 class _url_template_attr(SP):
@@ -225,7 +184,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
                 p = ogr.Geometry(ogr.wkbPoint)
                 p.AddPoint(x, y)
                 p.Transform(ct)
-                return (p.GetX(), p.GetY())
+                return p.GetX(), p.GetY()
 
             return transform_point(*extent[0:2]) + transform_point(*extent[2:4])
 
@@ -261,31 +220,25 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         image = None
 
-        for x, xtile in enumerate(
-            range(xtile_from + x_offset, min(xtile_to, xtile_max) + 1),
-            start=x_offset
+        for (x, y), tile_image in self.connection.get_tiles(
+            self.layer_name, zoom,
+            xtile_from + x_offset, min(xtile_to, xtile_max),
+            ytile_from + y_offset, min(ytile_to, ytile_max),
         ):
-            for y, ytile in enumerate(
-                range(ytile_from + y_offset, min(ytile_to, ytile_max) + 1),
-                start=y_offset
-            ):
-                tile_image = self.connection.get_tile((zoom, xtile, ytile), self.layer_name)
-                if tile_image is None:
-                    continue
-                if image is None:
-                    image = PIL.Image.new('RGBA', (width, height))
-                image.paste(tile_image, (x * self.tilesize, y * self.tilesize))
+            if tile_image is None:
+                continue
+            if image is None:
+                image = PIL.Image.new('RGBA', (width, height))
+            image.paste(tile_image, ((x + x_offset) * self.tilesize, (y + y_offset) * self.tilesize))
 
-        if image is None:
-            return None
+        if image is not None:
+            a0x, a1y, a1x, a0y = self.srs.tile_extent((zoom, xtile_from, ytile_from))
+            b0x, b1y, b1x, b0y = self.srs.tile_extent((zoom, xtile_to, ytile_to))
+            box = crop_box((a0x, b1y, b1x, a0y), extent, width, height)
+            image = image.crop(box)
 
-        a0x, a1y, a1x, a0y = self.srs.tile_extent((zoom, xtile_from, ytile_from))
-        b0x, b1y, b1x, b0y = self.srs.tile_extent((zoom, xtile_to, ytile_to))
-        box = crop_box((a0x, b1y, b1x, a0y), extent, width, height)
-        image = image.crop(box)
-
-        if image.size != size:
-            image = image.resize(size)
+            if image.size != size:
+                image = image.resize(size)
 
         return image
 
