@@ -8,7 +8,7 @@ define([
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/settings!",
     "@nextgisweb/pyramid/i18n!",
-    "ngw-pyramid/ErrorDialog/ErrorDialog",
+    "ngw-pyramid/ErrorDialog",
     "dojo/text!./template/Uploader.hbs",
     "./FileUploader",
     //

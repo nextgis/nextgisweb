@@ -11,7 +11,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/TabContainer",
-    "ngw-pyramid/ErrorDialog/ErrorDialog",
+    "ngw-pyramid/ErrorDialog",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     "xstyle/css!./resource/CompositeWidget.css"

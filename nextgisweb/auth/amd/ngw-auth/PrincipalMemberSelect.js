@@ -3,7 +3,7 @@ define([
     "dojo/_base/lang",
     "dojo/dom-construct",
     "dojox/form/CheckedMultiSelect",
-    "ngw/route",
+    "ngw-pyramid/route",
     // css
     "xstyle/css!" + ngwConfig.amdUrl + 'dojox/form/resources/CheckedMultiSelect.css'
 ], function (

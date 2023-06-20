@@ -7,7 +7,7 @@ define([
     "dojo/_base/lang",
     "dijit/TooltipDialog",
     "openlayers/ol",
-    "ngw/route",
+    "ngw-pyramid/route",
     "@nextgisweb/pyramid/settings!",
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/webmap/utils",

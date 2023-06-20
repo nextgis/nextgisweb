@@ -16,7 +16,7 @@ define([
     "dgrid/Selection",
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",
-    "ngw/route",
+    "ngw-pyramid/route",
     "ngw-file-upload/FileUploader",
     "ngw-resource/serialize",
     "@nextgisweb/pyramid/i18n!",

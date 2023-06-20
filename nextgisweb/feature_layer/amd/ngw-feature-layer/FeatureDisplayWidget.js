@@ -4,7 +4,7 @@ define([
     "dojo/request/xhr",
     "dojo/dom-construct",
     "dijit/_WidgetBase",
-    "ngw/route",
+    "ngw-pyramid/route",
     "./FieldsDisplayWidget"
 ], function (
     declare,

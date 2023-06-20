@@ -21,7 +21,7 @@ define("ngw-file-upload/FileUploader", [
 	"dojo/i18n!dojox/form/nls/Uploader",
 	"dojo/text!dojox/form/resources/Uploader.html",
 	"@nextgisweb/file-upload/tus-client",
-	"ngw/route",
+	"ngw-pyramid/route",
 	"@nextgisweb/pyramid/settings!"
 ],function (
     kernel,

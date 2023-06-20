@@ -14,7 +14,7 @@ define([
     "dijit/ConfirmDialog",
     "dojox/widget/Standby",
     "openlayers/ol",
-    "ngw/route",
+    "ngw-pyramid/route",
     "ngw-webmap/ol/layer/Vector",
     "ngw-webmap/plugin/_PluginBase",
     "ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog",

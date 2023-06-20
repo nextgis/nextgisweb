@@ -8,7 +8,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/layout/TabContainer",
     "dojox/layout/TableContainer",
-    "ngw-pyramid/ErrorDialog/ErrorDialog",
+    "ngw-pyramid/ErrorDialog",
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/feature-layer/feature-editor",
     "@nextgisweb/gui/react-app",

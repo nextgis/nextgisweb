@@ -5,7 +5,7 @@ define([
     "dijit/layout/BorderContainer",
     "dojo/store/JsonRest",
     "dojo/store/Memory",
-    "ngw/route",
+    "ngw-pyramid/route",
     "dojo/on",
     "dojo/dom-construct",
     "dojo/_base/lang",

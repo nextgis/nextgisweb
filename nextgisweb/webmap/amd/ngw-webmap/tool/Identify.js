@@ -19,7 +19,7 @@ define([
     "dijit/form/Select",
     "dijit/form/Button",
     "put-selector/put",
-    "ngw/route",
+    "ngw-pyramid/route",
     "openlayers/ol",
     "ngw-webmap/ol/Popup",
     '@nextgisweb/pyramid/api',

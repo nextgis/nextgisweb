@@ -10,7 +10,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "ngw-resource/serialize",
     "ngw-spatial-ref-sys/SRSSelect",
-    "ngw/route",
+    "ngw-pyramid/route",
     // resource
     "dojo/text!./template/LayerWidget.hbs",
     // template

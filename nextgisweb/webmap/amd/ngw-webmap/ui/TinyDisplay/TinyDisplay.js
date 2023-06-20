@@ -23,7 +23,7 @@ define([
     "dojo/request/xhr",
     "dojo/data/ItemFileWriteStore",
     "dojo/topic",
-    "ngw/route",
+    "ngw-pyramid/route",
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/gui/error",
     "@nextgisweb/pyramid/icon",

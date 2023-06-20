@@ -4,7 +4,7 @@ define(["dojo/_base/declare", "@nextgisweb/gui/error"], function (
 ) {
     // prettier-ignore
     console.warn(
-        "Module 'ngw-pyramid/ErrorDialog/ErrorDialog' has been deprecated! " +
+        "Module 'ngw-pyramid/ErrorDialog' has been deprecated! " +
         "Use '@nextgisweb/gui/error' instead!");
 
     // Legacy error dialog wrapper

@@ -5,7 +5,7 @@ define([
     "dojo/on",
     "dojox/image/Lightbox",
     "put-selector/put",
-    "ngw/route",
+    "ngw-pyramid/route",
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/DisplayWidget",
     // css

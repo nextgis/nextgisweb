@@ -1,7 +1,7 @@
 define([
     "dojo/Deferred",
     "dojo/request/xhr",
-    "ngw/route"
+    "ngw-pyramid/route"
 ], function (
     Deferred,
     xhr,

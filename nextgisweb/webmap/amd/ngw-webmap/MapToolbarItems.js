@@ -6,7 +6,7 @@ define([
     'dijit/_WidgetBase',
     'dijit/form/ToggleButton',
     './controls/ToggleControl',
-    'ngw/route',
+    'ngw-pyramid/route',
     'ngw-webmap/MapStatesObserver',
     'dijit/ToolbarSeparator',
     'dijit/form/DropDownButton'

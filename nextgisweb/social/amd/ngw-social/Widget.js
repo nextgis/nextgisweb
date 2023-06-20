@@ -4,7 +4,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "ngw-resource/serialize",
-    "ngw/route",
+    "ngw-pyramid/route",
     "@nextgisweb/pyramid/i18n!",
     "ngw-file-upload/ImageUploader",
     // resource

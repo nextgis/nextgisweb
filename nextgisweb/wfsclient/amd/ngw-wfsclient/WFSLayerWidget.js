@@ -9,7 +9,7 @@ define([
     'dijit/_WidgetsInTemplateMixin',
     '@nextgisweb/pyramid/i18n!',
     'ngw-resource/serialize',
-    'ngw/route',
+    'ngw-pyramid/route',
     // resource
     'dojo/text!./template/WFSLayerWidget.hbs',
     // template

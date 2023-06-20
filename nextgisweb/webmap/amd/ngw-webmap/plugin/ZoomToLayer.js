@@ -2,7 +2,7 @@ define([
     "dojo/_base/declare",
     "./_PluginBase",
     "dojo/request/xhr",
-    "ngw/route",
+    "ngw-pyramid/route",
     "@nextgisweb/pyramid/i18n!",
 ], function (
     declare,

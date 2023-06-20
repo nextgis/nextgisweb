@@ -17,7 +17,7 @@ define([
     "dgrid/OnDemandGrid",
     "dgrid/Selection",
     "dgrid/extensions/DijitRegistry",
-    "ngw/route",
+    "ngw-pyramid/route",
     "ngw-auth/PrincipalSelect",
     "ngw-resource/serialize",
     // resource

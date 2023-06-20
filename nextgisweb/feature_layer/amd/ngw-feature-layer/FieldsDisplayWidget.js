@@ -8,7 +8,7 @@ define([
     "dojo/promise/all",
     "dojox/validate/regexp",
     "put-selector/put",
-    "ngw/route",
+    "ngw-pyramid/route",
     "@nextgisweb/pyramid/i18n!",
     "ngw-lookup-table/cached",
     "./DisplayWidget",

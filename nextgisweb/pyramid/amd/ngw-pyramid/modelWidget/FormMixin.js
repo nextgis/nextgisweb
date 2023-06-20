@@ -7,7 +7,7 @@ define([
     "dojo/dom-construct",
     "dijit/layout/ContentPane",
     "dijit/form/Button",
-    "ngw-pyramid/ErrorDialog/ErrorDialog",
+    "ngw-pyramid/ErrorDialog",
     "@nextgisweb/pyramid/i18n!"
 ], function (
     declare,

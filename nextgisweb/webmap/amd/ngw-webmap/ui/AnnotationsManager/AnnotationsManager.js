@@ -13,7 +13,7 @@ define([
     "dojox/widget/Standby",
     "openlayers/ol",
     "@nextgisweb/pyramid/api",
-    "ngw-pyramid/ErrorDialog/ErrorDialog",
+    "ngw-pyramid/ErrorDialog",
     "ngw-pyramid/make-singleton",
     "ngw-webmap/layers/annotations/AnnotationFeature",
     "ngw-webmap/layers/annotations/AnnotationsLayer",

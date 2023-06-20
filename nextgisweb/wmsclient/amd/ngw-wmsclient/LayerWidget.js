@@ -10,7 +10,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "put-selector/put",
-    "ngw/route",
+    "ngw-pyramid/route",
     "@nextgisweb/pyramid/i18n!",
     "ngw-resource/serialize",
     "ngw-spatial-ref-sys/SRSSelect",

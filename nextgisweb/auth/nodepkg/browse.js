@@ -3,7 +3,7 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!"
 import resourceSchema from "@nextgisweb/pyramid/api/load!resource/schema"
 import { default as ConfirmDialog } from "dijit/ConfirmDialog";
-import { default as ErrorDialog } from "ngw-pyramid/ErrorDialog/ErrorDialog"
+import { default as ErrorDialog } from "ngw-pyramid/ErrorDialog"
 
 window.principal_delete = function (cls, id) {
     const content = cls === 'U' ? i18n.gettext("Delete user?") : i18n.gettext("Delete group?")
