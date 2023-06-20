@@ -105,7 +105,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         data_type = None
         alpha_band = None
         has_nodata = None
-        mask_flags = None
+        mask_flags = []
         for bidx in range(1, ds.RasterCount + 1):
             band = ds.GetRasterBand(bidx)
 
@@ -114,10 +114,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             elif data_type != band.DataType:
                 raise ValidationError(_("Mixed band data types are not supported."))
 
-            if mask_flags is None:
-                mask_flags = band.GetMaskFlags()
-            elif mask_flags != band.GetMaskFlags():
-                raise ValidationError(_("Mixed mask flags are not supported."))
+            mask_flags.append(band.GetMaskFlags())
 
             if band.GetRasterColorInterpretation() == gdal.GCI_AlphaBand:
                 assert alpha_band is None, "Multiple alpha bands found!"
@@ -127,7 +124,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                     band.GetNoDataValue() is not None)
 
         # convert the mask band to the alpha band
-        if mask_flags == gdal.GMF_PER_DATASET:
+        if mask_flags.count(gdal.GMF_PER_DATASET) == len(mask_flags):
             bands = [bidx for bidx in range(1, ds.RasterCount + 1)]
             bands.append("mask")
             alpha_band = len(bands)
