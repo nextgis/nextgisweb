@@ -120,6 +120,11 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def _tablename(self):
         return 'layer_%s' % self.tbl_uuid
 
+    def _drop_table(self, connection):
+        tableinfo = TableInfo.from_layer(self)
+        tableinfo.setup_metadata(self._tablename)
+        tableinfo.metadata.drop_all(bind=connection)
+
     def from_ogr(self, filename, *, layername=None):
         ds = read_dataset(filename)
         layer = ds.GetLayerByName(layername) if layername is not None else ds.GetLayer(0)
@@ -348,9 +353,7 @@ event.listen(
 # Drop data table on vector layer deletion
 @event.listens_for(VectorLayer, 'before_delete')
 def drop_verctor_layer_table(mapper, connection, target):
-    tableinfo = TableInfo.from_layer(target)
-    tableinfo.setup_metadata(target._tablename)
-    tableinfo.metadata.drop_all(bind=connection)
+    target._drop_table(connection)
 
 
 class _source_attr(SP):
@@ -412,7 +415,8 @@ class _source_attr(SP):
 
     def setter(self, srlzr, value):
         if srlzr.obj.id is not None:
-            raise VE("Source parameter does not apply to update vector layer.")
+            srlzr.obj._drop_table(DBSession.connection())
+            srlzr.obj.tbl_uuid = uuid.uuid4().hex
 
         datafile, metafile = env.file_upload.get_filename(value['id'])
 

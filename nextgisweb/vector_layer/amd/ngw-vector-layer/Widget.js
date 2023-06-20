@@ -58,7 +58,7 @@ define([
         },
 
         postCreate: function () {
-            if (settings.show_create_mode) {
+            if (this.composite.operation == "create" && settings.show_create_mode) {
                 this.modeSwitcher.watch('value', function(attr, oldval, newval) {
                     var hideFile = newval === 'empty';
                     this.empty_layer_section.style.display = hideFile ? '' : 'none';
@@ -162,7 +162,10 @@ define([
         },
 
         validateDataInMixin: function (errback) {
-            if (this.modeSwitcher.get("value") === 'file') {
+            if (
+                this.composite.operation == "create"
+                && this.modeSwitcher.get("value") === 'file'
+            ) {
                 return !!this.wSourceFile.get("value");
             }
             return true;
