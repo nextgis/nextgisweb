@@ -35,5 +35,13 @@ define([
             }
             this.component = null;
         },
+
+        // Rewrite default widget methods to use feature store instead
+        get: function () {
+            return
+        },
+        set: function () {
+            return;
+        }
     });
 });
