@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { EditorState } from "@codemirror/state";
+import { Annotation, EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 
 import { customSetup } from "./customSetup";
 import { themeSetup } from "./themeSetup";
+
+const External = Annotation.define();
 
 const getLang = async (lang) => {
     const aliases = {
@@ -36,14 +38,15 @@ const getLang = async (lang) => {
 };
 
 export function useCodeMirror({
-    target,
+    fold,
     lang,
     value: doc,
+    target,
     readOnly,
-    fold,
-    autoHeight,
+    onChange,
     minHeight,
     maxHeight,
+    autoHeight,
     lineNumbers,
 }) {
     const [editor, setEditor] = useState(null);
@@ -62,7 +65,23 @@ export function useCodeMirror({
             langExtension(),
             themeSetup({ autoHeight, minHeight, maxHeight }),
         ];
-
+        if (onChange) {
+            // based on https://github.com/uiwjs/react-codemirror/blob/master/core/src/useCodeMirror.ts#L55
+            const updateListener = EditorView.updateListener.of((vu) => {
+                if (
+                    vu.docChanged &&
+                    typeof onChange === "function" &&
+                    // Fix echoing of the remote changes:
+                    // If transaction is market as remote we don't have to call `onChange` handler again
+                    !vu.transactions.some((tr) => tr.annotation(External))
+                ) {
+                    const doc = vu.state.doc;
+                    const value = doc.toString();
+                    onChange(value, vu);
+                }
+            });
+            extensions.push(updateListener)
+        }
         const state = EditorState.create({
             doc,
             extensions,
@@ -82,15 +101,15 @@ export function useCodeMirror({
         };
         return cm;
     }, [
-        autoHeight,
         doc,
         fold,
         lang,
-        lineNumbers,
-        maxHeight,
-        minHeight,
-        readOnly,
         target,
+        readOnly,
+        minHeight,
+        maxHeight,
+        autoHeight,
+        lineNumbers,
     ]);
 
     useEffect(() => {

@@ -30,6 +30,7 @@ Code.propTypes = {
     value: PropTypes.string,
     readOnly: PropTypes.bool,
     fold: PropTypes.bool,
+    onChange: PropTypes.func,
     autoHeight: PropTypes.bool,
     minHeight: PropTypes.string,
     maxHeight: PropTypes.string,
