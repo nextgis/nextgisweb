@@ -12,6 +12,8 @@ import { formatSize } from "@nextgisweb/gui/util";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n!feature_attachment";
 
+import { FileReaderImage } from "./component/FileReaderImage";
+
 import "./AttachmentEditor.css";
 
 const extension = "attachment";
@@ -20,35 +22,15 @@ function isFileImage(file) {
     return file && file["type"].split("/")[0] === "image";
 }
 
-function FileReaderImage({ file }) {
-    const [src, setSrc] = useState();
-    const fr = new FileReader();
-    fr.onload = function () {
-        setSrc(fr.result);
-    };
-    fr.readAsDataURL(file);
-    return (
-        <Image
-            width={80}
-            src={src}
-            preview={{
-                src,
-            }}
-        />
-    );
-}
-
-FileReaderImage.propTypes = {
-    file: PropTypes.object,
-};
-
 export const AttachmentEditor = observer(({ store }) => {
     const multiple = true;
 
+    const { extensions, setExtension, resourceId, featureId } = store;
+
     const dataSource = useMemo(() => {
-        const attachment = store.extensions[extension];
+        const attachment = extensions[extension];
         return attachment || [];
-    }, [store.extensions]);
+    }, [extensions]);
 
     const [scrollY, setScrollY] = useState();
     const wrapperElement = useRef();
@@ -62,11 +44,13 @@ export const AttachmentEditor = observer(({ store }) => {
             const toolbarHeight =
                 toolbarElement.current.getBoundingClientRect().height;
 
-            const tableHeaderHeight = wrapperElement.current
-                .querySelector(".ant-table-header")
-                .getBoundingClientRect().height;
-
-            setScrollY(parentHeight - toolbarHeight - tableHeaderHeight);
+            const tableHeader =
+                wrapperElement.current.querySelector(".ant-table-thead");
+            if (tableHeader) {
+                const tableHeaderHeight =
+                    tableHeader.getBoundingClientRect().height;
+                setScrollY(parentHeight - toolbarHeight - tableHeaderHeight);
+            }
         };
 
         const resizeObserver = new ResizeObserver(updateHeigh);
@@ -76,26 +60,30 @@ export const AttachmentEditor = observer(({ store }) => {
         };
     }, []);
 
-    const onChange = (metaList) => {
-        if (metaList && metaList.length) {
-            const newExtensions = [
-                ...dataSource,
-                ...metaList.map((meta) => {
-                    const { mime_type, id, name, size, _file } = meta;
-                    return {
-                        _file,
-                        lid: undefined,
-                        name,
-                        size,
-                        mime_type,
-                        description: "",
-                        file_upload: { id, size },
-                    };
-                }),
-            ];
-            store.setExtension(extension, newExtensions);
-        }
-    };
+    const onChange = useCallback(
+        (metaList) => {
+            if (metaList && metaList.length) {
+                setExtension(extension, (old) => {
+                    return [
+                        ...old,
+                        ...metaList.map((meta) => {
+                            const { mime_type, id, name, size, _file } = meta;
+                            return {
+                                _file,
+                                lid: undefined,
+                                name,
+                                size,
+                                mime_type,
+                                description: "",
+                                file_upload: { id, size },
+                            };
+                        }),
+                    ];
+                });
+            }
+        },
+        [setExtension]
+    );
 
     const { props } = useFileUploader({
         openFileDialogOnClick: false,
@@ -125,10 +113,10 @@ export const AttachmentEditor = observer(({ store }) => {
                     ...oldAttachment,
                     [field]: value,
                 });
-                store.setExtension(extension, updatedAttachments);
+                setExtension(extension, updatedAttachments);
             }
         },
-        [dataSource, store, findAttachmentIndex]
+        [dataSource, setExtension, findAttachmentIndex]
     );
 
     const handleDelete = useCallback(
@@ -137,10 +125,10 @@ export const AttachmentEditor = observer(({ store }) => {
             const index = findAttachmentIndex(row);
             if (index !== -1) {
                 newAttachments.splice(index, 1);
-                store.setExtension(extension, newAttachments);
+                setExtension(extension, newAttachments);
             }
         },
-        [findAttachmentIndex, store, dataSource]
+        [findAttachmentIndex, setExtension, dataSource]
     );
 
     const editableField = useCallback(
@@ -149,9 +137,9 @@ export const AttachmentEditor = observer(({ store }) => {
                 return (
                     <Input
                         value={text}
-                        onChange={(e) =>
-                            updateField(field, row, e.target.value)
-                        }
+                        onChange={(e) => {
+                            updateField(field, row, e.target.value);
+                        }}
                     />
                 );
             },
@@ -167,8 +155,8 @@ export const AttachmentEditor = observer(({ store }) => {
                 render: (_, row) => {
                     if (row.is_image) {
                         const url = routeURL("feature_attachment.image", {
-                            id: store.resourceId,
-                            fid: store.featureId,
+                            id: resourceId,
+                            fid: featureId,
                             aid: row.id,
                         });
                         return (
@@ -212,8 +200,6 @@ export const AttachmentEditor = observer(({ store }) => {
             {
                 title: "",
                 dataIndex: "actions",
-                // align: "center",
-                // width: "30px",
                 render: (_, record) => (
                     <SvgIconLink
                         onClick={() => handleDelete(record)}
@@ -226,19 +212,26 @@ export const AttachmentEditor = observer(({ store }) => {
                 ),
             },
         ],
-        [editableField, handleDelete, store.featureId, store.resourceId]
+        [editableField, handleDelete, featureId, resourceId]
     );
 
-    const actions = [
-        () => <FileUploaderButton multiple={multiple} onChange={onChange} />,
-    ];
+    const actions = useMemo(
+        () => [
+            <FileUploaderButton
+                key="file-uploader-button"
+                multiple={multiple}
+                onChange={onChange}
+            />,
+        ],
+        [multiple, onChange]
+    );
 
     return (
         <div ref={wrapperElement}>
             <ActionToolbar
                 ref={toolbarElement}
                 style={{ padding: "10px" }}
-                actions={[...actions]}
+                actions={actions}
                 actionProps={{}}
             ></ActionToolbar>
             <Upload {...props} className="drag-to-table-uploader">
@@ -250,7 +243,6 @@ export const AttachmentEditor = observer(({ store }) => {
                     columns={columns}
                     pagination={false}
                     scroll={{ y: scrollY }}
-                    sticky
                 ></Table>
             </Upload>
         </div>

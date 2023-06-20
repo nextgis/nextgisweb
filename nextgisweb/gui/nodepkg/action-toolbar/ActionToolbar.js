@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types";
 
-import { forwardRef } from "react";
+import { forwardRef, useCallback, useMemo, useRef, isValidElement  } from "react";
 
 import { useActionToolbar } from "./hook/useActionToolbar";
 
@@ -10,35 +10,50 @@ export const ActionToolbar = forwardRef(function ActionToolbar(
     { size, style, actions, rightActions = [], actionProps, children },
     ref
 ) {
+    const keyIndexRef = useRef(0);
     const { createButtonAction } = useActionToolbar({
         size,
         props: actionProps,
     });
 
-    let i = 0;
-    const getAction = (Action) => (
-        <div key={i++}>
-            {typeof Action === "function" ? (
-                <Action {...{ size, ...actionProps }} />
-            ) : (
-                createButtonAction(Action)
-            )}
-        </div>
+    const getAction = useCallback(
+        (Action) => {
+            keyIndexRef.current = keyIndexRef.current + 1
+            if (isValidElement(Action)) {
+                return Action;
+            } else {
+                return (
+                    <div key={keyIndexRef.current}>
+                        {typeof Action === "function" ? (
+                            <Action {...{ size, ...actionProps }} />
+                        ) : (
+                            createButtonAction(Action)
+                        )}
+                    </div>
+                );
+            }
+        },
+
+        [actionProps, createButtonAction, size]
     );
 
-    const leftActions_ = [];
-    const rightActions_ = [
-        ...rightActions.map((rightAction) => getAction(rightAction)),
-    ];
+    const [leftActions_, rightActions_] = useMemo(() => {
+        keyIndexRef.current = 0
+        const leftActions__ = [];
+        const rightActions__ = [
+            ...rightActions.map((rightAction) => getAction(rightAction)),
+        ];
 
-    let addDirection = leftActions_;
-    for (const Action of [...actions]) {
-        if (typeof Action === "string") {
-            addDirection = rightActions_;
-            continue;
+        let addDirection = leftActions__;
+        for (const Action of [...actions]) {
+            if (typeof Action === "string") {
+                addDirection = rightActions__;
+                continue;
+            }
+            addDirection.push(getAction(Action));
         }
-        addDirection.push(getAction(Action));
-    }
+        return [leftActions__, rightActions__];
+    }, [actions, getAction, rightActions]);
 
     return (
         <div ref={ref} className="action-toolbar" {...{ style }}>

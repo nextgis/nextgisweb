@@ -122,6 +122,9 @@ export class FeatureEditorStore {
 
     setExtension = (extension, value) => {
         const extensions = { ...this._extensions };
+        if (typeof value === 'function') {
+            value = value(extensions[extension])
+        }
         extensions[extension] = value;
         this._extensions = extensions;
     };

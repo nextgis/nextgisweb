@@ -34,8 +34,7 @@ export function useFileUploader({
         if (onChange) {
             onChange(meta);
         }
-        // do not include `onChange` to avoid a looped call
-    }, [meta, setInitMeta]);
+    }, [meta, onChange, setInitMeta]);
 
     useEffect(() => {
         setMeta(initMeta);
