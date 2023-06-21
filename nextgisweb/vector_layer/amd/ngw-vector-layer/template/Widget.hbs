@@ -6,19 +6,12 @@
         title="{{gettext 'Spatial reference system'}}" style="width: 100%"></div>
     -->
 
-    <div data-dojo-attach-point="mode_section"
-         data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150"
-         style="margin-bottom: 1em;">
-        <select data-dojo-attach-point="modeSwitcher"
-            data-dojo-type="dijit/form/Select"
-            title="{{gettext 'Mode'}}" style="width: 100%">
+    <select data-dojo-attach-point="modeSwitcher"
+        data-dojo-type="dijit/form/Select"
+        style="width: 99%; margin-bottom: 1em">
+    </select>
 
-            <option value="file" selected="selected">{{gettext 'From file'}}</option>
-            <option value="empty">{{gettext 'Empty layer'}}</option>
-        </select>
-    </div>
-
-    <div data-dojo-attach-point="empty_layer_section" style="display: none;">
+    <div data-dojo-attach-point="empty_layer_section" style="margin-bottom: 1em">
          <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
             <select data-dojo-attach-point="wGeometryType"
                 data-dojo-type="dijit/form/Select"
@@ -41,7 +34,7 @@
         </div>
     </div>
 
-    <div data-dojo-attach-point="file_section">
+    <div data-dojo-attach-point="file_section" style="margin-bottom: 1em">
         <div data-dojo-attach-point="wSourceFile"
                 data-dojo-type="ngw-file-upload/Uploader" data-dojo-attach-point="wFile" 
                 data-dojo-props="
@@ -135,5 +128,12 @@
 
             </div>
         </div>
+    </div>
+
+    <div data-dojo-attach-point="confirm_section">
+        <input id="_vlayer_change_confirm" data-dojo-attach-point="confirm"
+            data-dojo-type="dijit/form/CheckBox">
+            <label for="_vlayer_change_confirm">{{gettext 'Confirm layer update'}}</label>
+        </input>
     </div>
 </div>

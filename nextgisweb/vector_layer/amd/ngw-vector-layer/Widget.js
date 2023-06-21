@@ -11,7 +11,6 @@ define([
     "ngw-spatial-ref-sys/SRSSelect",
     // resource
     "dojo/text!./template/Widget.hbs",
-    "@nextgisweb/pyramid/settings!",
     // template
     "dojox/layout/TableContainer",
     "ngw-file-upload/Uploader",
@@ -31,8 +30,15 @@ define([
     serialize,
     SRSSelect,
     template,
-    settings
 ) {
+    var Modes = {
+        empty: "empty",
+        file: "file",
+        keep: "keep",
+        delete: "delete",
+        geom: "geom",
+    };
+    var danger_modes = [Modes.file, Modes.delete, Modes.geom];
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
         title: i18n.gettext("Vector layer"),
@@ -58,15 +64,30 @@ define([
         },
 
         postCreate: function () {
-            if (this.composite.operation == "create" && settings.show_create_mode) {
-                this.modeSwitcher.watch('value', function(attr, oldval, newval) {
-                    var hideFile = newval === 'empty';
-                    this.empty_layer_section.style.display = hideFile ? '' : 'none';
-                    this.file_section.style.display = hideFile ? 'none' : '';
-                }.bind(this));
-            } else {
-                this.mode_section.domNode.style.display = 'none';
+            if (this.composite.operation === "create") {
+                this.confirm_section.style.display = "none";
             }
+            this.modeSwitcher.watch("value", function(attr, oldval, newval) {
+                this.empty_layer_section.style.display = 
+                    [Modes.empty, Modes.geom].includes(newval) ? "" : "none";
+                this.file_section.style.display = newval === Modes.file ? "" : "none";
+                if (this.composite.operation === "update") {
+                    this.confirm_section.style.display = 
+                        danger_modes.includes(newval) ? "" : "none";
+                }
+            }.bind(this));
+
+            this.modeSwitcher.addOption(
+                this.composite.operation === "create" ? [
+                    { value: Modes.file, label: i18n.gettext("Load features from file"), selected: true },
+                    { value: Modes.empty, label: i18n.gettext("Create empty layer") },
+                ] : [
+                    { value: Modes.keep, label: i18n.gettext("Keep existing layer features"), selected: true },
+                    { value: Modes.file, label: i18n.gettext("Replace layer features from file") },
+                    { value: Modes.delete, label: i18n.gettext("Delete all features from layer") },
+                    // { value: Modes.geom, label: i18n.gettext("Change geometry type") },
+                ]
+            );
 
             this._layersVision(false);
             this.wSourceLayer.watch("options", function (attr, oldval, newval) {
@@ -76,7 +97,7 @@ define([
 
             this.wSourceFile.on("complete", function () {
                 var upload_meta = this.wSourceFile.get("value");
-                api.route('vector_layer.dataset').post({
+                api.route("vector_layer.dataset").post({
                     json: { source: upload_meta }
                 }).then(lang.hitch(this, function(data) {
                     var layers = data.layers;
@@ -102,20 +123,20 @@ define([
                 }))
             }.bind(this));
 
-            this.wFIDSource.watch('value', function(attr, oldval, newval) {
-                var hideFIDField = newval === 'SEQUENCE';
-                this.wFIDField.set('disabled', hideFIDField);
+            this.wFIDSource.watch("value", function(attr, oldval, newval) {
+                var hideFIDField = newval === "SEQUENCE";
+                this.wFIDField.set("disabled", hideFIDField);
             }.bind(this));
 
-            this.wCastGeometryType.watch('value', function(attr, oldval, newval) {
-                var hideSkipOtherGeometryType = newval === 'AUTO';
-                this.wSkipOtherGeometryTypes.set('disabled', hideSkipOtherGeometryType);
+            this.wCastGeometryType.watch("value", function(attr, oldval, newval) {
+                var hideSkipOtherGeometryType = newval === "AUTO";
+                this.wSkipOtherGeometryTypes.set("disabled", hideSkipOtherGeometryType);
             }.bind(this));
         },
 
         serialize: function(data, lunkwill) {
             this.inherited(arguments);
-            lunkwill.suggest(this.composite.operation == "create");
+            lunkwill.suggest(this.composite.operation === "create");
         },
 
         serializeInMixin: function (data) {
@@ -124,56 +145,66 @@ define([
 
             setObject("srs", { id: this.wSrs.get("value") });
 
-            if (this.modeSwitcher.get("value") === 'file') {
-                setObject("source", this.wSourceFile.get("value"));
-                if (this.wSourceLayer.get("options").length > 1) {
-                    setObject("source_layer", this.wSourceLayer.get("value"));
-                }
+            switch (this.modeSwitcher.get("value")) {
+                case Modes.empty:
+                    setObject("fields", []);
+                case Modes.geom:
+                    setObject("geometry_type", this.wGeometryType.get("value"));
+                    break;
 
-                setObject("fix_errors", this.wFixErrors.get("value"));
-                setObject("skip_errors", this.wSkipErrors.get("value"));
-                var cast_geometry_type = this.wCastGeometryType.get("value");
-                if (cast_geometry_type === "AUTO") {
-                    cast_geometry_type = null;
-                } else {
-                    setObject("skip_other_geometry_types", this.wSkipOtherGeometryTypes.get("value"));
-                }
-
-                setObject("cast_geometry_type", cast_geometry_type);
-                function bool_toggle (value) {
-                    switch (value) {
-                        case 'YES': return true;
-                        case 'NO': return false;
+                case Modes.file:
+                    setObject("source", this.wSourceFile.get("value"));
+                    if (this.wSourceLayer.get("options").length > 1) {
+                        setObject("source_layer", this.wSourceLayer.get("value"));
                     }
-                    return null;
-                }
-                setObject("cast_is_multi", bool_toggle(this.wCastIsMulti.get("value")));
-                setObject("cast_has_z", bool_toggle(this.wCastHasZ.get("value")));
+    
+                    setObject("fix_errors", this.wFixErrors.get("value"));
+                    setObject("skip_errors", this.wSkipErrors.get("value"));
+                    var cast_geometry_type = this.wCastGeometryType.get("value");
+                    if (cast_geometry_type === "AUTO") {
+                        cast_geometry_type = null;
+                    } else {
+                        setObject("skip_other_geometry_types", this.wSkipOtherGeometryTypes.get("value"));
+                    }
+    
+                    setObject("cast_geometry_type", cast_geometry_type);
+                    function bool_toggle (value) {
+                        switch (value) {
+                            case "YES": return true;
+                            case "NO": return false;
+                        }
+                        return null;
+                    }
+                    setObject("cast_is_multi", bool_toggle(this.wCastIsMulti.get("value")));
+                    setObject("cast_has_z", bool_toggle(this.wCastHasZ.get("value")));
+    
+                    var fid_source = this.wFIDSource.get("value");
+                    setObject("fid_source", fid_source);
+                    if (fid_source !== "SEQUENCE") {
+                        setObject("fid_field", this.wFIDField.get("value"));
+                    }
+                    break;
 
-                var fid_source = this.wFIDSource.get("value");
-                setObject("fid_source", fid_source);
-                if (fid_source !== 'SEQUENCE') {
-                    setObject("fid_field", this.wFIDField.get("value"));
-                }
-            } else {
-                setObject("fields", []);
-                setObject("geometry_type", this.wGeometryType.get("value"));
+                case Modes.delete:
+                    setObject("delete_all_features", true);
+                    break;
             }
         },
 
         validateDataInMixin: function (errback) {
             if (
-                this.composite.operation == "create"
-                && this.modeSwitcher.get("value") === 'file'
+                this.composite.operation === "create"
+                && this.modeSwitcher.get("value") === "file"
             ) {
                 return !!this.wSourceFile.get("value");
             }
+            if (
+                this.composite.operation === "update"
+                && danger_modes.includes(this.modeSwitcher.get("value"))
+            ) {
+                return this.confirm.get("value");
+            }
             return true;
         },
-
-        _onUploadComplete: function() {
-            console.log(arguments);
-        }
-
     });
 });

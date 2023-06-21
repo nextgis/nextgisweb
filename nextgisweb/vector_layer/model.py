@@ -476,13 +476,20 @@ class _geometry_type_attr(SP):
 
     def setter(self, srlzr, value):
         if value not in GEOM_TYPE.enum:
-            raise VE(_("Unsupported geometry type."))
+            raise VE(message=_("Unsupported geometry type."))
 
         if srlzr.obj.id is None:
             srlzr.obj.geometry_type = value
 
         elif srlzr.obj.geometry_type != value:
-            raise VE(_("Geometry type for existing resource can't be changed."))
+            raise VE(message=_("Geometry type for existing resource can't be changed."))
+
+
+class _delete_all_features_attr(SP):
+
+    def setter(self, srlzr, value):
+        if value:
+            srlzr.obj.feature_delete_all()
 
 
 P_DSS_READ = DataStructureScope.read
@@ -497,7 +504,9 @@ class VectorLayerSerializer(Serializer):
 
     srs = SR(read=P_DSS_READ, write=P_DSS_WRITE)
 
-    source = _source_attr(read=None, write=P_DS_WRITE)
+    source = _source_attr(write=P_DS_WRITE)
 
     geometry_type = _geometry_type_attr(read=P_DSS_READ, write=P_DSS_WRITE)
-    fields = _fields_attr(read=None, write=P_DS_WRITE)
+    fields = _fields_attr(write=P_DS_WRITE)
+
+    delete_all_features = _delete_all_features_attr(write=P_DS_WRITE)
