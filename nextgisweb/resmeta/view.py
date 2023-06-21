@@ -6,7 +6,7 @@ from .util import _
 class Widget(Widget):
     resource = Resource
     operation = ('create', 'update')
-    amdmod = 'ngw-resmeta/Widget'
+    amdmod = '@nextgisweb/resmeta/editor'
 
 
 def setup_pyramid(comp, config):

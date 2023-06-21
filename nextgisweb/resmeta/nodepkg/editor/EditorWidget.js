@@ -177,3 +177,6 @@ export const EditorWidget = observer(({ store }) => {
         </Table>
     );
 });
+
+EditorWidget.title = i18n.gettext("Metadata");
+EditorWidget.order = 100;

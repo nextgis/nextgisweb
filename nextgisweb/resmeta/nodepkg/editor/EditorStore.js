@@ -84,11 +84,12 @@ class Record {
 }
 
 export class EditorStore {
+    identity = "resmeta";
     items = [];
     nextId = 0;
 
     constructor() {
-        makeAutoObservable(this);
+        makeAutoObservable(this, { identity: false });
         this.addPlaceholder();
     }
 
@@ -106,6 +107,10 @@ export class EditorStore {
             items[itm.key] = itm.value;
         });
         return { items: toJS(items) };
+    }
+
+    get isValid() {
+        return this.items.every((r) => r.error === false);
     }
 
     delete(id) {

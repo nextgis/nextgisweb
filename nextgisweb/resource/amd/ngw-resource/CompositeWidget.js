@@ -365,23 +365,50 @@ define([
     });
 
     CompositeWidget.bootstrap = function (options) {
-        var deferred = new Deferred();
-
         options.sdnBase = options.suggested_display_name;
         options.sdnDynamic = null;
         delete options.suggested_display_name;
 
-        var amdmod = [];
-        for (var i in options.config) { amdmod.push(i); }
-        require(amdmod, function () {
-            for (var i = 0; i < amdmod.length; i++) {
-                var cls = arguments[i];
-                options.config[amdmod[i]].cls = cls;
-            }
-            deferred.resolve(new CompositeWidget(options));
-        });
+        function requireToDeferred(modules, fn) {
+            var def = new Deferred();
+            require(modules, function() {
+                def.resolve(fn.apply(null, arguments));
+            });
+            return def;
+        }
 
-        return deferred;
+        var promises = {};
+
+        function addPromise(entrypoint) {
+            if (entrypoint.startsWith('@nextgisweb/')) {
+                promises[entrypoint] = requireToDeferred([
+                    "ngw-resource/ReactWrapperWidget",
+                    entrypoint,
+                ], function (ReactWidget, module) {
+                    var wrapper = declare([ReactWidget], {
+                        identity: module.store.identity,
+                        entrypoint: entrypoint,
+                        module: module,
+                    });
+                    return wrapper;
+                })
+            } else {
+                promises[entrypoint] = requireToDeferred([entrypoint], function (module) {
+                    return module;
+                })
+            }
+        }
+
+        for (var k in options.config) {
+            addPromise(k);
+        };
+
+        return all(promises).then(function (config) {
+            for (var k in config) {
+                options.config[k].cls = config[k]
+            }
+            return new CompositeWidget(options);
+        })
     };
 
     return CompositeWidget;
