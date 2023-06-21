@@ -65,7 +65,7 @@ export const AttachmentEditor = observer(({ store }) => {
             if (metaList && metaList.length) {
                 setExtension(extension, (old) => {
                     return [
-                        ...old,
+                        ...old || [],
                         ...metaList.map((meta) => {
                             const { mime_type, id, name, size, _file } = meta;
                             return {

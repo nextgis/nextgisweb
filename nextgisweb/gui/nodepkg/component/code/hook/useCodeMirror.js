@@ -80,7 +80,7 @@ export function useCodeMirror({
                     onChange(value, vu);
                 }
             });
-            extensions.push(updateListener)
+            extensions.push(updateListener);
         }
         const state = EditorState.create({
             doc,
@@ -101,15 +101,16 @@ export function useCodeMirror({
         };
         return cm;
     }, [
-        doc,
-        fold,
-        lang,
-        target,
-        readOnly,
+        lineNumbers,
+        autoHeight,
         minHeight,
         maxHeight,
-        autoHeight,
-        lineNumbers,
+        onChange,
+        readOnly,
+        target,
+        lang,
+        fold,
+        doc,
     ]);
 
     useEffect(() => {
