@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Col, Row, Space, Typography, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
@@ -10,34 +10,31 @@ import i18n from "@nextgisweb/pyramid/i18n!pyramid";
 
 export function CustomCSSForm() {
     const [saving, setSaving] = useState(false);
-    const [editor, setEditor] = useState(null);
+    const [data, setData] = useState(null);
 
-    const { data, isLoading } = useRouteGet("pyramid.custom_css", null, {
+    const { data: initialData, isLoading } = useRouteGet("pyramid.custom_css", null, {
         query: { format: "json" },
     });
 
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
+
     const save = async () => {
-        if (editor) {
-            setSaving(true);
+        setSaving(true);
 
-            const value = editor.getValue();
-            try {
-                await route("pyramid.custom_css").put({
-                    json: value,
-                    query: { format: "json" },
-                });
-                // prettier-ignore
-                message.success(i18n.gettext("Custom styles saved. Reload the page to get them applied."));
-            } catch (err) {
-                errorModal(err);
-            } finally {
-                setSaving(false);
-            }
+        try {
+            await route("pyramid.custom_css").put({
+                json: data,
+                query: { format: "json" },
+            });
+        } catch (err) {
+            errorModal(err);
+        } finally {
+            // prettier-ignore
+            message.success(i18n.gettext("Custom styles saved. Reload the page to get them applied."));
+            setSaving(false);
         }
-    };
-
-    const onEditorReady = (e) => {
-        setEditor(e);
     };
 
     if (isLoading) {
@@ -49,10 +46,10 @@ export function CustomCSSForm() {
             <Row gutter={[16, 16]}>
                 <Col span={14} style={{ height: "300px" }}>
                     <Code
+                        value={initialData}
+                        onChange={setData}
                         lang="css"
                         lineNumbers
-                        whenReady={onEditorReady}
-                        value={data}
                     />
                 </Col>
                 <Col span={10}>

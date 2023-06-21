@@ -387,7 +387,7 @@ def custom_css_put(request):
 
     request.env.core.settings_set('pyramid', 'custom_css.ckey', gensecret(8))
 
-    if not is_json:
+    if is_json:
         return Response(json.dumpb(None), content_type="application/json")
     else:
         return Response()
