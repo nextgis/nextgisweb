@@ -14,11 +14,15 @@ Changes
 - Ability to export a filtered set of features.
 - Changing layer opacity while viewing webmaps.
 - Reordering layers via drag-and-drop while viewing webmaps.
+- Improved handling of resource descriptions on webmaps.
 - Default display names for resources during creation.
-- Improved tabs ordering and auto-activation.
+- Improved resource tabs ordering and auto-activation.
 - Use a fast PNG encoder for rendering.
+- Auto-generated and cofigurable legends on webmaps.
+- Improved layout and usability of the layers tree on webmaps.
 - User permissions section is moved to the separate page.
 - Improved TMS client performance as a result of parallel tiles fetching.
+- MapInfo formats support when creating a vector layer.
 - Creation of an empty vector layer without uploading a file.
 - Ability to replace existing vector layer features and fields from a file.
 - Instant deletion of existing vector layer features.
