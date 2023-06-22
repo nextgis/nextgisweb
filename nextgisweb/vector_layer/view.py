@@ -5,5 +5,5 @@ from .model import VectorLayer
 
 class VectorLayerWidget(Widget):
     resource = VectorLayer
-    operation = ('create', )
+    operation = ('create', 'update')
     amdmod = 'ngw-vector-layer/Widget'

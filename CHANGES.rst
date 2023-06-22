@@ -19,6 +19,9 @@ Changes
 - Use a fast PNG encoder for rendering.
 - User permissions section is moved to the separate page.
 - Improved TMS client performance as a result of parallel tiles fetching.
+- Creation of an empty vector layer without uploading a file.
+- Ability to replace existing vector layer features and fields from a file.
+- Instant deletion of existing vector layer features.
 
 
 4.3.2
