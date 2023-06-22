@@ -195,11 +195,12 @@ define([
 
         validateDataInMixin: function (errback) {
             if (
-                this.composite.operation === "create"
-                && this.modeSwitcher.get("value") === "file"
+                this.modeSwitcher.get("value") === "file"
+                && !this.wSourceFile.get("value")
             ) {
-                return !!this.wSourceFile.get("value");
+                return false;
             }
+
             if (
                 this.composite.operation === "update"
                 && danger_modes.includes(this.modeSwitcher.get("value"))
@@ -207,6 +208,7 @@ define([
                 domStyle.set(this.confirm_section, "color", "var(--danger)");
                 return this.confirm.get("value");
             }
+
             return true;
         },
     });
