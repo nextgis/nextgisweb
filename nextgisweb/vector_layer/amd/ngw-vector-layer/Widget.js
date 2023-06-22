@@ -1,6 +1,7 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
+    "dojo/dom-style",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/ContentPane",
@@ -21,6 +22,7 @@ define([
 ], function (
     declare,
     lang,
+    domStyle,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     ContentPane,
@@ -202,6 +204,7 @@ define([
                 this.composite.operation === "update"
                 && danger_modes.includes(this.modeSwitcher.get("value"))
             ) {
+                domStyle.set(this.confirm_section, "color", "var(--danger)");
                 return this.confirm.get("value");
             }
             return true;
