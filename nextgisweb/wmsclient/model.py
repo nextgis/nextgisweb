@@ -183,10 +183,18 @@ class Layer(Base, Resource, SpatialLayerMixin):
     connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
     wmslayers = db.Column(db.Unicode, nullable=False)
     imgformat = db.Column(db.Unicode, nullable=False)
+    vendor_params = db.Column(db.JSONB, nullable=False, default=dict)
 
     connection = db.relationship(
         Resource, foreign_keys=connection_id,
         cascade='save-update, merge', cascade_backrefs=False)
+
+    @db.validates('vendor_params')
+    def _validate_vendor_params(self, key, value):
+        for v in value.values():
+            if not isinstance(v, str):
+                raise ValidationError(message="Vendor params must be strings only.")
+        return value
 
     @classmethod
     def check_parent(cls, parent):
@@ -280,56 +288,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
         )
 
 
-class LayerVendorParam(Base):
-    __tablename__ = 'wmsclient_layer_vendor_param'
-
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    key = db.Column(db.Unicode(255), primary_key=True)
-    value = db.Column(db.Unicode)
-
-    resource = db.relationship(Resource, backref=db.backref(
-        'vendor_params', cascade='all, delete-orphan'))
-
-
-class _vendor_params_attr(SP):
-
-    def getter(self, srlzr):
-        result = {}
-
-        for itm in getattr(srlzr.obj, 'vendor_params'):
-            result[itm.key] = itm.value
-
-        return result
-
-    def setter(self, srlzr, value):
-        odata = getattr(srlzr.obj, 'vendor_params')
-
-        rml = []     # Records to be removed
-        imap = {}    # Records to be rewritten
-
-        for i in odata:
-            if i.key in value and value[i.key] is not None:
-                imap[i.key] = i
-            else:
-                rml.append(i)
-
-        # Remove records to be removed
-        map(lambda i: odata.remove(i), rml)
-
-        for k, val in value.items():
-            if val is None:
-                continue
-
-            itm = imap.get(k)
-
-            if itm is None:
-                # Create new record if there is no record to rewrite
-                itm = LayerVendorParam(key=k)
-                odata.append(itm)
-
-            itm.value = val
-
-
 DataScope.read.require(
     ConnectionScope.connect,
     attr='connection', cls=Layer)
@@ -339,12 +297,10 @@ class LayerSerializer(Serializer):
     identity = Layer.identity
     resclass = Layer
 
-    _defaults = dict(read=DataStructureScope.read,
-                     write=DataStructureScope.write)
+    _defaults = dict(read=DataStructureScope.read, write=DataStructureScope.write)
 
     connection = SRR(**_defaults)
     wmslayers = SP(**_defaults)
     imgformat = SP(**_defaults)
     srs = SR(**_defaults)
-
-    vendor_params = _vendor_params_attr(**_defaults)
+    vendor_params = SP(**_defaults)
