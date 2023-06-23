@@ -1,18 +1,26 @@
-#: __init__.py:47 amd/ngw-render/TileCacheWidget.js:25
-msgid "Tile cache"
-msgstr "Тайловый кэш"
-
-#: api.py:18
+#: api.py:22
 msgid "Invalid origin"
 msgstr "Недопустимый источник"
 
-#: api.py:19
+#: api.py:23
 msgid ""
 "Origin validation is enabled for rendering requests, but the given origin "
 "doesn't match with the CORS origins list."
 msgstr ""
 "Для запросов рендеринга включена проверка источника, однако указанный "
 "источник не совпадает со списком допустимых источников CORS."
+
+#: component.py:26 nodepkg/tile-cache-widget/TileCacheWidget.js:93
+msgid "Tile cache"
+msgstr "Тайловый кэш"
+
+#: component.py:58 nodepkg/tile-cache-widget/TileCacheWidget.js:27
+msgid "Enabled"
+msgstr "Включен"
+
+#: component.py:58
+msgid "Disabled"
+msgstr "Отключен"
 
 #: util.py:81
 msgid "Required parameter '{}' is missing."
@@ -34,43 +42,11 @@ msgstr ""
 msgid "The value of '{}' parameter must be a non-negative integer."
 msgstr "Значение параметра '{}' должно быть не отрицательным числом."
 
-#: view.py:28
-msgid "Legend symbols"
-msgstr "Символы легенды"
-
-#: amd/ngw-render/template/TileCacheWidget.hbs:11
-msgid "Enabled"
-msgstr "Включен"
-
-#: amd/ngw-render/template/TileCacheWidget.hbs:16
-msgid "Allow using tiles in non-tile requests"
-msgstr "Разрешить тайлы для запросов изображений"
-
-#: amd/ngw-render/template/TileCacheWidget.hbs:21
-msgid "Max zoom level"
-msgstr "Максимальный масштабный уровень"
-
-#: amd/ngw-render/template/TileCacheWidget.hbs:26
-msgid "TTL, sec."
-msgstr "TTL, сек."
-
-#: amd/ngw-render/template/TileCacheWidget.hbs:31
-msgid "Track changes"
-msgstr "Отслеживать изменения"
-
-#: amd/ngw-render/template/TileCacheWidget.hbs:37
-msgid "Seed zoom level"
-msgstr "Заполнить масштабный уровень"
-
-#: amd/ngw-render/template/TileCacheWidget.hbs:42
-msgid "Flush"
-msgstr "Очистить"
-
-#: template/section_api_renderable.mako:8
+#: view.py:29
 msgid "TMS (Tile Map Service)"
 msgstr "TMS (Tile Map Service)"
 
-#: template/section_api_renderable.mako:12
+#: view.py:30
 msgid ""
 "TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map "
 "is a map displayed in a browser by seamlessly joining dozens of individually "
@@ -79,3 +55,32 @@ msgstr ""
 "TMS (Tile Map Service) - это спецификация тайловых карт.  Тайловая карта - "
 "это карта, отображаемая в браузере путем бесшовного соединения десятков "
 "индивидуально запрашиваемых изображений (тайлов)."
+
+#: view.py:43
+msgid "Legend symbols"
+msgstr "Символы легенды"
+
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:36
+msgid "Allow using tiles in non-tile requests"
+msgstr "Разрешить тайлы для запросов изображений"
+
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:46
+msgid "Track changes"
+msgstr "Отслеживать изменения"
+
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:50
+msgid "Max zoom level"
+msgstr "Максимальный масштабный уровень"
+
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:63
+msgid "Seed zoom level"
+msgstr "Заполнить масштабный уровень"
+
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:76
+msgid "TTL, sec."
+msgstr "TTL, сек."
+
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:88
+msgid "Flush"
+msgstr "Очистить"
+

@@ -1,0 +1,16 @@
+.ngw-render-tile-cache-widget {
+    padding: 1ex;
+
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1ex;
+
+    & > .ant-checkbox-wrapper {
+        grid-column: 1 / span 2;
+        & + .ant-checkbox-wrapper {
+            margin-left: 0;
+        }
+    }
+
+
+}
