@@ -41,11 +41,16 @@ export async function request(path, options) {
         delete opt.json;
     }
 
-    const url =
-        ngwConfig.applicationUrl +
-        (path.startsWith("/") ? "" : "/") +
-        path +
-        urlParams;
+    let url;
+    if (opt.global) {
+        url = path +
+            urlParams;
+    } else {
+        url = ngwConfig.applicationUrl +
+            (path.startsWith("/") ? "" : "/") +
+            path +
+            urlParams;
+    }
 
     const makeRequest = async () => {
         let response;
