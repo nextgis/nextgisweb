@@ -1,6 +1,6 @@
 export class AbortControllerHelper {
     constructor() {
-        this._controllers = []
+        this._controllers = [];
     }
 
     makeSignal() {
@@ -11,8 +11,12 @@ export class AbortControllerHelper {
 
     abort() {
         for (const controller of this._controllers) {
-            controller.abort()
+            controller.abort();
         }
-        this._controllers = []
+        this._controllers = [];
+    }
+
+    get empty() {
+        return this._controllers.length === 0;
     }
 }
