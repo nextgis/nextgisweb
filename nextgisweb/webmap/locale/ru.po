@@ -1,53 +1,53 @@
-#: __init__.py:36
-msgid "Main web map"
-msgstr "Основная веб-карта"
-
-#: adapter.py:22
+#: adapter.py:24
 msgid "Tiles"
 msgstr "Тайлы"
 
-#: adapter.py:32
+#: adapter.py:33
 msgid "Image"
 msgstr "Изображение"
 
-#: model.py:29 model.py:39 view.py:300 view.py:331
+#: component.py:30
+msgid "Main web map"
+msgstr "Основная веб-карта"
+
+#: model.py:31 model.py:50 view.py:308 view.py:339
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:31 view.py:305
+#: model.py:33 view.py:313
 msgid "Display"
 msgstr "Открыть"
 
-#: model.py:32
+#: model.py:34
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:170 model.py:33
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:170 model.py:35
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: model.py:34
+#: model.py:36
 msgid "Manage annotations"
 msgstr "Администрировать аннотации"
 
-#: view.py:41
+#: view.py:44
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:265
+#: view.py:262
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:273
+#: view.py:271
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: nodepkg/clone-webmap/CloneWebmap.js:181 view.py:311
+#: nodepkg/clone-webmap/CloneWebmap.js:180 view.py:319
 msgid "Clone"
 msgstr "Клонировать"
 
-#: amd/ngw-webmap/Display.js:229 amd/ngw-webmap/Display.js:1132
-#: amd/ngw-webmap/ItemWidget.js:243
+#: amd/ngw-webmap/Display.js:229 amd/ngw-webmap/Display.js:1134
+#: amd/ngw-webmap/ItemWidget.js:247
 msgid "Layers"
 msgstr "Слои"
 
@@ -101,11 +101,11 @@ msgstr "Определить мое местоположение"
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:1329 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:669
+#: amd/ngw-webmap/Display.js:1331 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:669
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:1330 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:670
+#: amd/ngw-webmap/Display.js:1332 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:670
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -113,52 +113,53 @@ msgstr "Объект из параметров строки запроса не 
 msgid "Extent and bookmarks"
 msgstr "Охват и закладки"
 
-#: amd/ngw-webmap/ItemWidget.js:94 amd/ngw-webmap/template/ItemWidget.hbs:40
+#: amd/ngw-webmap/ItemWidget.js:97 amd/ngw-webmap/template/ItemWidget.hbs:40
 msgid "Layer order"
 msgstr "Порядок слоёв"
 
-#: amd/ngw-webmap/ItemWidget.js:144
+#: amd/ngw-webmap/ItemWidget.js:147
 msgid "Use on the map"
 msgstr "Учитывать на карте"
 
-#: amd/ngw-webmap/ItemWidget.js:148
+#: amd/ngw-webmap/ItemWidget.js:151
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:126
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:43
-#: nodepkg/settings/SettingsForm.js:291
+#: nodepkg/settings/SettingsForm.js:296
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-webmap/ItemWidget.js:291
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:56
-#: nodepkg/settings/select-options.js:93
-msgid "Expand"
-msgstr "Развернуть"
-
-#: amd/ngw-webmap/ItemWidget.js:292
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:57
-#: nodepkg/settings/select-options.js:97
-msgid "Collapse"
-msgstr "Свернуть"
-
-#: amd/ngw-webmap/ItemWidget.js:293
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:58
-#: nodepkg/settings/select-options.js:101
-msgid "Disable"
-msgstr "Отключить"
-
-#: amd/ngw-webmap/ItemWidget.js:294
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:59
-#: nodepkg/settings/select-options.js:105
-msgid "Default"
-msgstr "По умолчанию"
-
-#: amd/ngw-webmap/ItemWidget.js:322 amd/ngw-webmap/template/ItemWidget.hbs:25
+#: amd/ngw-webmap/ItemWidget.js:314 amd/ngw-webmap/template/ItemWidget.hbs:25
 msgid "Add group"
 msgstr "Добавить группу"
 
 #: amd/ngw-webmap/controls/MyLocation.js:124
 msgid "Your location could not be determined"
 msgstr "Определить местоположение не удалось"
+
+#: amd/ngw-webmap/form/LegendSymbolsSelect.js:7
+#: nodepkg/settings/SettingsForm.js:260
+msgid "Legend"
+msgstr "Легенда"
+
+#: amd/ngw-webmap/form/LegendSymbolsSelect.js:9
+#: nodepkg/settings/select-options.js:92
+msgid "Default"
+msgstr "По умолчанию"
+
+#: amd/ngw-webmap/form/LegendSymbolsSelect.js:10
+#: nodepkg/settings/select-options.js:93
+msgid "Expand"
+msgstr "Развернуть"
+
+#: amd/ngw-webmap/form/LegendSymbolsSelect.js:11
+#: nodepkg/settings/select-options.js:94
+msgid "Collapse"
+msgstr "Свернуть"
+
+#: amd/ngw-webmap/form/LegendSymbolsSelect.js:12
+#: nodepkg/settings/select-options.js:95
+msgid "Disable"
+msgstr "Отключить"
 
 #: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:25
 msgid "Your annotation text"
@@ -181,11 +182,11 @@ msgstr "Приватная аннотация"
 msgid "Edit annotation"
 msgstr "Редактировать аннотацию"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:110
+#: amd/ngw-webmap/plugin/FeatureLayer.js:107
 msgid "Go to"
 msgstr "Перейти"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:242
+#: amd/ngw-webmap/plugin/FeatureLayer.js:240
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -202,39 +203,33 @@ msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.hbs:10
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.hbs:15
 msgid "Enable layers editing"
 msgstr "Разрешить редактирование слоев"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:41
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:37
 msgid "Settings"
 msgstr "Настройки"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:54
-#: amd/ngw-webmap/template/ItemWidget.hbs:109 nodepkg/settings/SettingsForm.js:260
-msgid "Legend"
-msgstr "Легенда"
-
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:67
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:49
 msgid "Enable annotations"
 msgstr "Разрешить аннотирование"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:70
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:52
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:16
 msgid "Show annotations"
 msgstr "Показывать аннотации"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:72
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:54
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:17
 msgid "No"
 msgstr "Нет"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:73
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:55
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:18
 msgid "Yes"
 msgstr "Да"
 
-#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:74
+#: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:56
 #: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:19
 msgid "With messages"
 msgstr "С сообщениями"
@@ -292,8 +287,8 @@ msgid "Remove"
 msgstr "Удалить"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:71
-#: amd/ngw-webmap/template/ItemWidget.hbs:129
-#: nodepkg/clone-webmap/CloneWebmap.js:46
+#: amd/ngw-webmap/template/ItemWidget.hbs:128
+#: nodepkg/clone-webmap/CloneWebmap.js:45
 msgid "Display name"
 msgstr "Наименование"
 
@@ -321,11 +316,11 @@ msgstr "Макс. масштаб"
 msgid "Adapter"
 msgstr "Адаптер"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:115
+#: amd/ngw-webmap/template/ItemWidget.hbs:114
 msgid "Style resource"
 msgstr "Ресурс стиля"
 
-#: amd/ngw-webmap/template/ItemWidget.hbs:133
+#: amd/ngw-webmap/template/ItemWidget.hbs:132
 msgid "Expanded"
 msgstr "Развернута"
 
@@ -341,11 +336,11 @@ msgstr "Геометрия"
 msgid "Feature"
 msgstr "Объект"
 
-#: amd/ngw-webmap/tool/Identify.js:332 amd/ngw-webmap/tool/Identify.js:349
+#: amd/ngw-webmap/tool/Identify.js:323 amd/ngw-webmap/tool/Identify.js:340
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:467
+#: amd/ngw-webmap/tool/Identify.js:458
 msgid "Features"
 msgstr "Объектов"
 
@@ -610,19 +605,9 @@ msgid "Use Shift+drag for box zooming"
 msgstr "Используйте Shift+мышь для увеличения рамкой"
 
 #: amd/ngw-webmap/ui/SearchPanel/SearchPanel.hbs:6
+#: nodepkg/search-panel/SearchPanel.js:345
 msgid "Search on the map"
 msgstr "Поиск по карте"
-
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:162
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:210
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:270
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:338
-msgid "Refine search criterion"
-msgstr "Уточните критерий поиска"
-
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.js:352
-msgid "Not found"
-msgstr "Не найдено"
 
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:520
 msgid "Open full map"
@@ -632,14 +617,6 @@ msgstr "Открыть карту целиком"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/clone-webmap/CloneWebmap.js:38
-msgid "Clone to selected group"
-msgstr "Клонировать в выбранную группу"
-
-#: nodepkg/clone-webmap/CloneWebmap.js:39
-msgid "Clone to this group"
-msgstr "Клонировать в эту группу"
-
 #: nodepkg/layer-opacity-slider/LayerOpacitySlider.js:8
 msgid "Opacity"
 msgstr "Непрозрачность"
@@ -648,11 +625,11 @@ msgstr "Непрозрачность"
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/layers-tree/Legend.js:13
+#: nodepkg/layers-tree/Legend.js:10
 msgid "Show legend"
 msgstr "Показывать легенду"
 
-#: nodepkg/layers-tree/Legend.js:14
+#: nodepkg/layers-tree/Legend.js:11
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
@@ -663,6 +640,14 @@ msgstr "Показывать охват"
 #: nodepkg/map-viewer-info/MapViewerInfo.js:122
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
+
+#: nodepkg/search-panel/SearchPanel.js:297
+msgid "Not found"
+msgstr "Не найдено"
+
+#: nodepkg/search-panel/SearchPanel.js:303
+msgid "Refine search criterion. Displayed first 100 search results."
+msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
 #: nodepkg/settings/Settings.js:56
 msgid "Settings saved"
@@ -740,7 +725,7 @@ msgstr "Неверные значения. Например, ru или gb,de"
 msgid "Yandex.Maps API Geocoder Key"
 msgstr "Ключ геокодера API Яндекс.Карт"
 
-#: nodepkg/settings/SettingsForm.js:266
+#: nodepkg/settings/SettingsForm.js:271
 msgid "Visibility"
 msgstr "Видимость"
 
