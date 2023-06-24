@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 import transaction
 from freezegun import freeze_time
 
-from ...env.model import DBSession
+from nextgisweb.env import DBSession
+
 from ..model import User
 
 

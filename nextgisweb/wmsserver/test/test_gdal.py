@@ -1,18 +1,19 @@
-import numpy
 from pathlib import Path
 
+import numpy
 import pytest
 import transaction
+from osgeo import gdal, gdal_array, gdalconst
 from PIL import Image, ImageStat
-from osgeo import gdal, gdalconst, gdal_array
 
-from ...auth import User
-from ...env.model import DBSession
-from ...raster_layer import RasterLayer
-from ...raster_style import RasterStyle
-from ...spatial_ref_sys import SRS
+from nextgisweb.env import DBSession
 
-from .. import Service, Layer
+from nextgisweb.auth import User
+from nextgisweb.raster_layer import RasterLayer
+from nextgisweb.raster_style import RasterStyle
+from nextgisweb.spatial_ref_sys import SRS
+
+from .. import Layer, Service
 
 
 @pytest.fixture(scope='module')
@@ -25,7 +26,7 @@ def rlayer_id(ngw_env, ngw_resource_group):
             srs=SRS.filter_by(id=3857).one()
         ).persist()
 
-        from ...raster_layer import test as raster_layer_test
+        from nextgisweb.raster_layer import test as raster_layer_test
         path = Path(raster_layer_test.__file__).parent / 'data/rounds.tif'
 
         obj.load_file(str(path), ngw_env)

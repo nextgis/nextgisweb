@@ -3,11 +3,12 @@ from uuid import uuid4
 
 import pytest
 
-from ...lib.ogrhelper import read_dataset
-from ...env.model import DBSession
-from ...auth import User
-from ...core.exception import ValidationError
-from ...spatial_ref_sys import SRS
+from nextgisweb.env import DBSession
+from nextgisweb.lib.ogrhelper import read_dataset
+
+from nextgisweb.auth import User
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.spatial_ref_sys import SRS
 
 from .. import VectorLayer
 

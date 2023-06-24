@@ -1,9 +1,9 @@
 from datetime import timedelta
 
-from ..lib.config import Option
-from ..env import Component
+from nextgisweb.env import Component
+from nextgisweb.lib.config import Option
 
-from .model import Base, WMS_VERSIONS
+from .model import WMS_VERSIONS, Base
 
 
 class WMSClientComponent(Component):

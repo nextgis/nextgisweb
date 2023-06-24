@@ -1,7 +1,8 @@
-from ..resource import Widget, Resource
-from ..resource.view import resource_sections
-from ..resource.extaccess import ExternalAccessLink
-from ..env import env
+from nextgisweb.env import env
+
+from nextgisweb.resource import Resource, Widget
+from nextgisweb.resource.extaccess import ExternalAccessLink
+from nextgisweb.resource.view import resource_sections
 
 from .interface import IRenderableStyle
 from .legend import ILegendSymbols

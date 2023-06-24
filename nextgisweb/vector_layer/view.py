@@ -1,4 +1,4 @@
-from ..resource import Widget
+from nextgisweb.resource import Widget
 
 from .model import VectorLayer
 

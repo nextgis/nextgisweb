@@ -1,10 +1,10 @@
 from datetime import timedelta
-from inspect import isclass
 from enum import Enum
+from inspect import isclass
 
 import pytest
 
-from ..otype import OptionType, Text, Boolean, Integer, List, SizeInBytes
+from ..otype import Boolean, Integer, List, OptionType, SizeInBytes, Text
 
 
 class EnumTest(Enum):

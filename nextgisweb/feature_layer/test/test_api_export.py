@@ -1,20 +1,21 @@
 import json
-from uuid import uuid4
 from string import ascii_letters, printable
 from tempfile import NamedTemporaryFile
+from uuid import uuid4
 
 import pytest
 import transaction
 from osgeo import gdal, ogr
 
+from nextgisweb.env import DBSession
+from nextgisweb.lib.geometry import Geometry
+
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer import VectorLayer
+
 from .. import Feature
 from ..ogrdriver import EXPORT_FORMAT_OGR
-
-from ...auth import User
-from ...lib.geometry import Geometry
-from ...env.model import DBSession
-from ...spatial_ref_sys import SRS
-from ...vector_layer import VectorLayer
 
 
 @pytest.fixture(scope='module')

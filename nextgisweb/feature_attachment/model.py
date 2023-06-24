@@ -3,11 +3,11 @@ import os
 import re
 from shutil import copyfileobj
 
-from ..lib import db
-from ..env import env
-from ..env.model import declarative_base
-from ..resource import Resource
-from ..file_storage import FileObj
+from nextgisweb.env import declarative_base, env
+from nextgisweb.lib import db
+
+from nextgisweb.file_storage import FileObj
+from nextgisweb.resource import Resource
 
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
 

@@ -4,7 +4,7 @@ import pytest
 import transaction
 from freezegun import freeze_time
 
-from ...env.model import DBSession
+from nextgisweb.env import DBSession
 
 from .. import User
 

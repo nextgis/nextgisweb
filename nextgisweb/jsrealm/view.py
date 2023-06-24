@@ -1,7 +1,7 @@
 import os
 import os.path
 
-from ..pyramid import StaticFileResponse
+from nextgisweb.pyramid import StaticFileResponse
 
 
 def setup_pyramid(comp, config):

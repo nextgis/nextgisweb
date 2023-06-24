@@ -1,15 +1,15 @@
 import json
-from pkg_resources import resource_filename
 from pathlib import Path
+from pkg_resources import resource_filename
 
-from ..lib.config import Option
-from ..env import Component, require
-from ..auth import User
-from ..env.model import DBSession
-from ..lib import db
+from nextgisweb.env import Component, DBSession, require
+from nextgisweb.lib import db
+from nextgisweb.lib.config import Option
 
-from .model import Base, WebMap, WebMapItem, LegendSymbolsEnum
+from nextgisweb.auth import User
+
 from .adapter import WebMapAdapter
+from .model import Base, LegendSymbolsEnum, WebMap, WebMapItem
 from .util import _
 
 

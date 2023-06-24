@@ -1,20 +1,20 @@
+from datetime import datetime as dt
+from datetime import timedelta
 from os import environ
-from datetime import datetime as dt, timedelta
 from pkg_resources import resource_filename
 
 import transaction
 from babel import Locale
 from babel.core import UnknownLocaleError
 
-from ..lib.config import Option, OptionAnnotations
-from ..lib.logging import logger
-from ..env import Component, require
+from nextgisweb.env import Component, require
+from nextgisweb.lib.config import Option, OptionAnnotations
+from nextgisweb.lib.logging import logger
 
 from . import uacompat
 from .config import Configurator
-from .util import ClientRoutePredicate, ErrorRendererPredicate
 from .model import Base, Session, SessionStore
-from .util import _, gensecret
+from .util import ClientRoutePredicate, ErrorRendererPredicate, _, gensecret
 
 
 class PyramidComponent(Component):
@@ -41,7 +41,8 @@ class PyramidComponent(Component):
 
     @require('resource')
     def setup_pyramid(self, config):
-        from . import view, api, uacompat as uac
+        from . import api, view
+        from . import uacompat as uac
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
         uac.setup_pyramid(self, config)

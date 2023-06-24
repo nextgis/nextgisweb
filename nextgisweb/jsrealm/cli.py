@@ -2,13 +2,14 @@ import json
 from pathlib import Path
 from subprocess import check_call
 
-from ..lib.logging import logger
-from ..env import Env
-from ..env.cli import cli, EnvCommand
-from ..env.package import amd_packages, pkginfo
-from ..pyramid import PyramidComponent
-from ..pyramid.uacompat import FAMILIES
-from ..core import CoreComponent
+from nextgisweb.env import Env
+from nextgisweb.env.cli import EnvCommand, cli
+from nextgisweb.env.package import amd_packages, pkginfo
+from nextgisweb.lib.logging import logger
+
+from nextgisweb.core import CoreComponent
+from nextgisweb.pyramid import PyramidComponent
+from nextgisweb.pyramid.uacompat import FAMILIES
 
 
 @cli.group()

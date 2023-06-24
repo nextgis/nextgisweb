@@ -3,8 +3,8 @@ from functools import partial
 import pytest
 
 from ..container import Container
-from ..inject import inject as _inject, UnresolvedDependency
-
+from ..inject import UnresolvedDependency
+from ..inject import inject as _inject
 
 A = type('A', (str, ), {})
 B = type('B', (str, ), {})

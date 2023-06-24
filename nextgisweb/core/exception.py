@@ -1,7 +1,7 @@
-from collections import namedtuple
 import warnings
+from collections import namedtuple
 
-from zope.interface import Interface, Attribute, implementer, classImplements
+from zope.interface import Attribute, Interface, classImplements, implementer
 from zope.interface.interface import adapter_hooks
 
 from .util import _

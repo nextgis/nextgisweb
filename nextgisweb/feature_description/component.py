@@ -1,4 +1,4 @@
-from ..env import Component, require
+from nextgisweb.env import Component, require
 
 from .model import Base
 
@@ -9,4 +9,4 @@ class FeatureDescriptionComponent(Component):
 
     @require('feature_layer')
     def initialize(self):
-        from . import extension # NOQA
+        from . import extension  # NOQA

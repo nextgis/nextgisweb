@@ -1,4 +1,4 @@
-from ..env import Component
+from nextgisweb.env import Component
 
 
 class LayerPreviewComponent(Component):

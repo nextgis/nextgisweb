@@ -1,4 +1,4 @@
-from ..core.exception import UserException
+from nextgisweb.core.exception import UserException
 
 from .util import _
 

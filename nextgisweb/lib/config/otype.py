@@ -1,6 +1,6 @@
 import re
-from enum import Enum
 from datetime import timedelta
+from enum import Enum
 
 
 class OptionType:

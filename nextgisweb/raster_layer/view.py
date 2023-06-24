@@ -1,9 +1,10 @@
 from pyramid.httpexceptions import HTTPNotFound
 
-from ..lib import dynmenu as dm
-from ..resource import Widget, Resource
-from ..resource.extaccess import ExternalAccessLink
-from ..pyramid import viewargs
+from nextgisweb.lib import dynmenu as dm
+
+from nextgisweb.pyramid import viewargs
+from nextgisweb.resource import Resource, Widget
+from nextgisweb.resource.extaccess import ExternalAccessLink
 
 from .model import RasterLayer
 from .util import _

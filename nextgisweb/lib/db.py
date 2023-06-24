@@ -1,16 +1,12 @@
 from enum import Enum as StdEnum
 from inspect import isclass
 
-from sqlalchemy import *                    # NOQA
-from sqlalchemy.orm import *                # NOQA
-
-from sqlalchemy import event                # NOQA
-from sqlalchemy import sql                  # NOQA
-from sqlalchemy import func                 # NOQA
-from sqlalchemy import types                # NOQA
-
+from sqlalchemy import *  # NOQA
 from sqlalchemy import Enum as _Enum
-from sqlalchemy.dialects.postgresql import UUID as _UUID, JSONB  # NOQA
+from sqlalchemy import event, func, sql, types  # NOQA
+from sqlalchemy.dialects.postgresql import JSONB  # NOQA
+from sqlalchemy.dialects.postgresql import UUID as _UUID  # NOQA
+from sqlalchemy.orm import *  # NOQA
 
 
 class Enum(_Enum):

@@ -1,6 +1,5 @@
 from collections import namedtuple
 
-
 EXPORT_FORMAT_GDAL = dict()
 
 

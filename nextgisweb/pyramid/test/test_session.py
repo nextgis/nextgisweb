@@ -1,14 +1,13 @@
 from datetime import datetime, timedelta
 from http.cookies import SimpleCookie
 
-from freezegun import freeze_time
 import pytest
-from webtest import TestApp as BaseTestApp
 import transaction
+from freezegun import freeze_time
 from pyramid.response import Response
+from webtest import TestApp as BaseTestApp
 
 from .. import Session, SessionStore
-
 
 prefix = '_test_'
 

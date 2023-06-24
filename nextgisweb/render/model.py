@@ -1,35 +1,34 @@
-from datetime import datetime, timedelta
-from functools import lru_cache
-from uuid import uuid4
-from pathlib import Path
-from threading import Lock, Thread
-from time import time
+import atexit
 import os.path
 import sqlite3
+from datetime import datetime, timedelta
+from functools import lru_cache
 from io import BytesIO
-import atexit
-from queue import Queue, Empty, Full
+from pathlib import Path
+from queue import Empty, Full, Queue
+from threading import Lock, Thread
+from time import time
+from uuid import uuid4
 
 import transaction
 from PIL import Image
 from sqlalchemy import MetaData, Table
 from zope.sqlalchemy import mark_changed
 
-from ..lib.logging import logger
-from ..env import env
-from ..lib import db
-from ..env.model import declarative_base, DBSession
-from ..resource import (
+from nextgisweb.env import DBSession, declarative_base, env
+from nextgisweb.lib import db
+from nextgisweb.lib.logging import logger
+
+from nextgisweb.resource import (
     Resource,
-    Serializer,
-    SerializedProperty,
     ResourceScope,
+    SerializedProperty,
+    Serializer,
 )
 
+from .event import on_data_change, on_style_change
 from .interface import IRenderableStyle
-from .event import on_style_change, on_data_change
-from .util import imgcolor, affine_bounds_to_tile, pack_color, unpack_color
-
+from .util import affine_bounds_to_tile, imgcolor, pack_color, unpack_color
 
 TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
 

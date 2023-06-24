@@ -5,11 +5,9 @@ import warnings
 from importlib.metadata import metadata
 from importlib.util import find_spec
 from pathlib import Path
-
 from pkg_resources import iter_entry_points, resource_filename
 
-from ..lib.logging import logger
-
+from nextgisweb.lib.logging import logger
 
 _version_re = re.compile(r'(.+)\+(?:git)?([0-9a-f]{4,})(\.dirty)?$', re.IGNORECASE)
 _qualifications = False

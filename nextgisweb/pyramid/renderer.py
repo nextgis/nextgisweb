@@ -1,4 +1,4 @@
-from ..lib import json
+from nextgisweb.lib import json
 
 
 class JSON:

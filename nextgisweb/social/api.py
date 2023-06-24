@@ -1,8 +1,9 @@
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse
 
-from ..env import env
-from ..resource import resource_factory
+from nextgisweb.env import env
+
+from nextgisweb.resource import resource_factory
 
 
 def preview(resource, request):

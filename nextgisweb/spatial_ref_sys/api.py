@@ -4,14 +4,14 @@ import requests
 from requests.exceptions import RequestException
 from sqlalchemy import sql
 
-from ..core.exception import ValidationError, ExternalServiceError
-from ..env import env
-from ..lib.geometry import Geometry, Transformer, geom_area, geom_length
-from ..env.model import DBSession
-from ..pyramid import JSONType
+from nextgisweb.env import DBSession, env
+from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_length
+
+from nextgisweb.core.exception import ExternalServiceError, ValidationError
+from nextgisweb.pyramid import JSONType
 
 from .model import SRS
-from .util import convert_to_wkt, _
+from .util import _, convert_to_wkt
 
 
 def serialize(obj: SRS):

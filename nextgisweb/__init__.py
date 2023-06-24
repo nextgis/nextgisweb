@@ -1,13 +1,14 @@
+import logging
 import os
 import time
-import logging
 
 import psutil
 
+from nextgisweb.env import Env
+from nextgisweb.lib.config import load_config
+from nextgisweb.lib.logging import logger
+
 from . import imptool
-from .lib.config import load_config
-from .lib.logging import logger
-from .env import Env
 
 
 def pkginfo():

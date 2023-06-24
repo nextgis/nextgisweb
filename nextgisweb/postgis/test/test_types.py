@@ -1,13 +1,13 @@
 import pytest
 import sqlalchemy as sa
 import transaction
-from sqlalchemy.engine.url import (
-    URL as EngineURL,
-    make_url as make_engine_url)
+from sqlalchemy.engine.url import URL as EngineURL
+from sqlalchemy.engine.url import make_url as make_engine_url
 
-from ...auth import User
-from ...env.model import DBSession
-from ...spatial_ref_sys import SRS
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
 
 from .. import PostgisConnection, PostgisLayer
 from ..diagnostics import StatusEnum

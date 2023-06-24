@@ -1,15 +1,15 @@
 from itertools import combinations
 
 import pytest
-from osgeo import ogr, gdal
-from shapely.wkt import loads as wkt_loads
+from osgeo import gdal, ogr
 from shapely.wkb import loads as wkb_loads
+from shapely.wkt import loads as wkt_loads
 from sqlalchemy import func as sa_func
 
-from ....env.model import DBSession
+from nextgisweb.env import DBSession
+from nextgisweb.lib.ogrhelper import cohere_bytes
 
 from ...geometry import Geometry, GeometryNotValid
-from ...ogrhelper import cohere_bytes
 
 
 @pytest.mark.parametrize('wkt', (

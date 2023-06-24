@@ -11,17 +11,23 @@ from shapely.geometry import box
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 
-from ..core.exception import ValidationError
-from ..feature_layer import Feature, FIELD_TYPE, GEOM_TYPE
-from ..layer import IBboxLayer
-from ..lib.geometry import Geometry, GeometryNotValid, Transformer
-from ..lib.ows import parse_request, parse_srs, SRSParseError, get_work_version, FIELD_TYPE_WFS
-from ..resource import DataScope
-from ..spatial_ref_sys import SRS
+from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
+from nextgisweb.lib.ows import (
+    FIELD_TYPE_WFS,
+    SRSParseError,
+    get_work_version,
+    parse_request,
+    parse_srs,
+)
+
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.feature_layer import FIELD_TYPE, GEOM_TYPE, Feature
+from nextgisweb.layer import IBboxLayer
+from nextgisweb.resource import DataScope
+from nextgisweb.spatial_ref_sys import SRS
 
 from .model import Layer
 from .util import validate_tag
-
 
 wfsfld_pattern = re.compile(r'^wfsfld_(\d+)$')
 

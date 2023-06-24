@@ -3,7 +3,8 @@ from pyramid.config import Configurator
 from pyramid.response import Response
 from zope.interface import implementer
 
-from ...core.exception import IUserException
+from nextgisweb.core.exception import IUserException
+
 from .. import exception
 
 

@@ -2,7 +2,7 @@ import zipstream
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse, Response
 
-from ..resource import ResourceScope
+from nextgisweb.resource import ResourceScope
 
 from .model import SVGMarkerLibrary
 

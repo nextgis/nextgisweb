@@ -1,11 +1,12 @@
 import pytest
 import transaction
 
-from ...auth import User
-from ...env.model import DBSession
-from ...raster_layer import RasterLayer
-from ...raster_style import RasterStyle
-from ...spatial_ref_sys import SRS
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import User
+from nextgisweb.raster_layer import RasterLayer
+from nextgisweb.raster_style import RasterStyle
+from nextgisweb.spatial_ref_sys import SRS
 
 from .. import WebMap, WebMapItem
 from ..util import webmap_items_to_tms_ids_list

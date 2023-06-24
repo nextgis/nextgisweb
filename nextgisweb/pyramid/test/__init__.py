@@ -1,7 +1,7 @@
 import pytest
+from requests import Session as RequestsSession
 from webtest import TestApp as BaseTestApp
 from webtest.http import StopableWSGIServer
-from requests import Session as RequestsSession
 
 
 @pytest.fixture(scope='session')

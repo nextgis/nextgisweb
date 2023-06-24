@@ -3,8 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from inspect import formatannotationrelativeto
-from typing import Any, Dict, Optional, Type, Tuple, Hashable, Callable, List, TypeVar
-
+from typing import Any, Callable, Dict, Hashable, List, Optional, Tuple, Type, TypeVar
 
 KeyType = Tuple[Hashable, ...]
 TContainer = TypeVar('TContainer', bound='Container')

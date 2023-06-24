@@ -2,9 +2,10 @@ import sys
 
 from zope.interface import Interface, implementer
 
-from ..lib.registry import dict_registry
-from ..env.model import BaseClass
-from ..core.exception import IUserException, ForbiddenError
+from nextgisweb.env.model import BaseClass
+from nextgisweb.lib.registry import dict_registry
+
+from nextgisweb.core.exception import ForbiddenError, IUserException
 
 from .util import _
 

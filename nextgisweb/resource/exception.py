@@ -2,10 +2,7 @@ import warnings
 
 from zope.interface import implementer
 
-from ..core.exception import (
-    IUserException,
-    UserException,
-    ValidationError)
+from nextgisweb.core.exception import IUserException, UserException, ValidationError
 
 from .util import _
 

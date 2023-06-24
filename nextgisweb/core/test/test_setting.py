@@ -1,6 +1,5 @@
 import pytest
 
-
 test_comp = 'test'
 test_name = 'setting'
 

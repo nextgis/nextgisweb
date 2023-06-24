@@ -3,12 +3,12 @@ import os.path
 import transaction
 from osgeo import gdal
 
-from ...auth import User
-from ...env.model import DBSession
-from ...spatial_ref_sys import SRS
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
 
 from ..model import RasterLayer
-
 from .validate_cloud_optimized_geotiff import validate
 
 

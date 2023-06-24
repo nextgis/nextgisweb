@@ -1,13 +1,14 @@
 import os.path
+from tempfile import NamedTemporaryFile
 
 import pytest
 import transaction
 from osgeo import gdal, osr
-from tempfile import NamedTemporaryFile
 
-from ...env.model import DBSession
-from ...auth import User
-from ...spatial_ref_sys import SRS
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
 
 from ..model import RasterLayer
 

@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from ..migration import MigrationKey
-from ..registry import PythonModuleMigration, SQLScriptMigration, Registry
+from ..registry import PythonModuleMigration, Registry, SQLScriptMigration
 
 data_mformat = Path(__file__).parent / 'mformat'
 data_registry = Path(__file__).parent / 'registry'

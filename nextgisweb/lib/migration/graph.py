@@ -1,9 +1,7 @@
 from io import StringIO
 
-from .operation import (
-    InstallOperation, UninstallOperation,
-    ForwardOperation, RewindOperation)
 from .migration import MigrationKey
+from .operation import ForwardOperation, InstallOperation, RewindOperation, UninstallOperation
 
 
 class MigrationGraph:

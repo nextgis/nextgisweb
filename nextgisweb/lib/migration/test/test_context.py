@@ -1,11 +1,14 @@
 import sqlite3
-from textwrap import dedent
 from contextlib import contextmanager
+from textwrap import dedent
 
 from ..graph import (
+    ForwardOperation,
+    InstallOperation,
+    RewindOperation,
+    UninstallOperation,
     resolve,
-    InstallOperation, UninstallOperation,
-    ForwardOperation, RewindOperation)
+)
 
 
 def foo_install(ctx):

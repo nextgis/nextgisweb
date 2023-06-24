@@ -6,13 +6,14 @@ from urllib.parse import parse_qsl, urlsplit
 from uuid import uuid4
 
 import pytest
-from freezegun import freeze_time
 import transaction
+from freezegun import freeze_time
 
-from ...lib.logging import logger
-from ...env.model import DBSession
-from ..oauth import OAuthHelper, OAuthErrorResponse
+from nextgisweb.env import DBSession
+from nextgisweb.lib.logging import logger
+
 from ..model import Group, User
+from ..oauth import OAuthErrorResponse, OAuthHelper
 
 CLIENT_ID = token_hex(16)
 CLIENT_SECRET = token_urlsafe(16)

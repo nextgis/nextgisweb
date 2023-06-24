@@ -8,15 +8,15 @@ import transaction
 from sqlalchemy.dialects import postgresql, sqlite
 from zope.sqlalchemy import mark_changed
 
-from ..lib.config import Option
-from ..lib.logging import logger
-from ..env import Component, require
-from ..core import KindOfData
-from ..env.model import DBSession
+from nextgisweb.env import Component, DBSession, require
+from nextgisweb.lib.config import Option
+from nextgisweb.lib.logging import logger
 
-from .model import Base, ResourceTileCache as RTC, TIMESTAMP_EPOCH
+from nextgisweb.core import KindOfData
+
+from .model import TIMESTAMP_EPOCH, Base
+from .model import ResourceTileCache as RTC
 from .util import _
-
 
 vacuum_freepage_coeff = 0.5
 

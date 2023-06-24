@@ -2,10 +2,10 @@ from datetime import timedelta
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from ..env import Component
-from ..lib.config import Option
+from nextgisweb.env import Component
+from nextgisweb.lib.config import Option
 
-from .model import Base, SRS, WKT_EPSG_4326, WKT_EPSG_3857
+from .model import SRS, WKT_EPSG_3857, WKT_EPSG_4326, Base
 from .util import COMP_ID
 
 
@@ -40,7 +40,7 @@ class SpatialRefSysComponent(Component):
                 srs.persist()
 
     def setup_pyramid(self, config):
-        from . import view, api
+        from . import api, view
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 

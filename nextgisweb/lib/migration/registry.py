@@ -1,14 +1,14 @@
-import re
 import json
+import re
 from datetime import datetime
+from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from textwrap import dedent
-from importlib.machinery import SourceFileLoader
 
-from ..logging import logger
+from nextgisweb.lib.logging import logger
+
+from .migration import Dependency, InitialMigration, Migration, MigrationKey
 from .revision import REVID_ZERO
-from .migration import Dependency, MigrationKey, Migration, InitialMigration
-
 
 PLACEHOLDER = 'TODO: Write code here and remove this placeholder line!'
 

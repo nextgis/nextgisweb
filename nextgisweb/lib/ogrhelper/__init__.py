@@ -1,10 +1,9 @@
 import pathlib
 import zipfile
 from contextlib import contextmanager
-from datetime import date, time, datetime
+from datetime import date, datetime, time
 
 from osgeo import gdal, ogr
-
 
 FIELD_GETTER = {}
 

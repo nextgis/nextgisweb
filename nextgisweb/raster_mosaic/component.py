@@ -1,4 +1,4 @@
-from ..env import Component
+from nextgisweb.env import Component
 
 from .model import Base
 
@@ -8,8 +8,7 @@ class RasterMosaicComponent(Component):
     metadata = Base.metadata
 
     def setup_pyramid(self, config):
-        from . import api
-        from . import view  # NOQA: F401
+        from . import api, view  # NOQA: F401
         api.setup_pyramid(self, config)
 
     def workdir_filename(self, fobj, makedirs=False):

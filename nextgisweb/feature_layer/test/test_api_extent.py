@@ -1,18 +1,18 @@
 import json
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
 import transaction
-from uuid import uuid4
 from osgeo import ogr
 
-from ...env.model import DBSession
-from ...vector_layer import VectorLayer
-from ...spatial_ref_sys.model import SRS
-from ...auth import User
+from nextgisweb.env import DBSession
 
-from ...vector_layer.test import create_feature_layer as create_vector_layer
-from ...postgis.test import create_feature_layer as create_postgis_layer
+from nextgisweb.auth import User
+from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer import VectorLayer
+from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
 
 from .data import generate_filter_extents
 

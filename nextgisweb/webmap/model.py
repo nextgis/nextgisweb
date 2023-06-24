@@ -1,25 +1,27 @@
 from enum import Enum
+
 import geoalchemy2 as ga
 from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
 
+from nextgisweb.env import declarative_base, env
+from nextgisweb.lib import db
+
+from nextgisweb.auth import User
+from nextgisweb.resource import (
+    Permission,
+    Resource,
+    ResourceGroup,
+    ResourceScope,
+    Scope,
+    Serializer,
+)
+from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import SerializedResourceRelationship as SRR
+from nextgisweb.spatial_ref_sys import SRS
 
 from .util import _
-from ..lib import db
-from ..auth import User
-from ..env import env
-from ..env.model import declarative_base
-from ..resource import (
-    Resource,
-    Scope,
-    Permission,
-    ResourceScope,
-    Serializer,
-    SerializedProperty as SP,
-    SerializedResourceRelationship as SRR,
-    ResourceGroup)
-from ..spatial_ref_sys import SRS
 
 Base = declarative_base(dependencies=('resource', ))
 

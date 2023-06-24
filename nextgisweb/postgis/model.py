@@ -5,49 +5,49 @@ import geoalchemy2 as ga
 from shapely.geometry import box
 from sqlalchemy import cast, func, select, sql, text
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.engine.url import URL as EngineURL
+from sqlalchemy.engine.url import make_url as make_engine_url
 from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
-from sqlalchemy.engine.url import (
-    URL as EngineURL,
-    make_url as make_engine_url)
 from zope.interface import implementer
 
-from ..lib.logging import logger
-from ..lib import db
-from ..core.exception import ValidationError, ForbiddenError
-from ..env.model import declarative_base
-from ..resource import (
-    Resource,
-    ConnectionScope,
-    DataStructureScope,
-    DataScope,
-    Serializer,
-    SerializedProperty as SP,
-    SerializedRelationship as SR,
-    SerializedResourceRelationship as SRR,
-    ResourceGroup)
-from ..spatial_ref_sys import SRS
-from ..env import env
-from ..layer import IBboxLayer, SpatialLayerMixin
-from ..lib.geometry import Geometry
-from ..feature_layer import (
+from nextgisweb.env import declarative_base, env
+from nextgisweb.lib import db
+from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.logging import logger
+
+from nextgisweb.core.exception import ForbiddenError, ValidationError
+from nextgisweb.feature_layer import (
+    FIELD_FORBIDDEN_NAME,
+    FIELD_TYPE,
+    GEOM_TYPE,
     Feature,
     FeatureQueryIntersectsMixin,
     FeatureSet,
-    LayerField,
-    LayerFieldsMixin,
-    GEOM_TYPE,
-    FIELD_FORBIDDEN_NAME,
-    FIELD_TYPE,
     IFeatureLayer,
-    IWritableFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
-    IFeatureQueryLike,
     IFeatureQueryIlike,
     IFeatureQueryIntersects,
+    IFeatureQueryLike,
     IFeatureQueryOrderBy,
+    IWritableFeatureLayer,
+    LayerField,
+    LayerFieldsMixin,
 )
+from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
+from nextgisweb.resource import (
+    ConnectionScope,
+    DataScope,
+    DataStructureScope,
+    Resource,
+    ResourceGroup,
+    Serializer,
+)
+from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import SerializedRelationship as SR
+from nextgisweb.resource import SerializedResourceRelationship as SRR
+from nextgisweb.spatial_ref_sys import SRS
 
 from .exception import ExternalDatabaseError
 from .util import _

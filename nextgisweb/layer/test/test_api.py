@@ -1,11 +1,11 @@
 from pathlib import Path
 
 import pytest
-from osgeo import ogr, gdalconst
+from osgeo import gdalconst, ogr
 
-from ...feature_layer import test as feature_layer_test
-from ...postgis.test import create_feature_layer as create_postgis_layer
-from ...vector_layer.test import create_feature_layer as create_vector_layer
+from nextgisweb.feature_layer import test as feature_layer_test
+from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
+from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
 
 
 def layer_product():

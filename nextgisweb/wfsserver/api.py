@@ -1,11 +1,11 @@
 from pyramid.response import Response
 
-from ..pyramid.exception import json_error
-from ..resource import resource_factory, ServiceScope
-from ..core.exception import InsufficientPermissions
+from nextgisweb.core.exception import InsufficientPermissions
+from nextgisweb.pyramid.exception import json_error
+from nextgisweb.resource import ServiceScope, resource_factory
 
-from .wfs_handler import WFSHandler
 from .model import Service
+from .wfs_handler import WFSHandler
 
 
 def wfs(resource, request):

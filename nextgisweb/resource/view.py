@@ -1,27 +1,27 @@
 import warnings
 from dataclasses import dataclass
 
+import zope.event
 from pyramid import httpexceptions
 from pyramid.threadlocal import get_current_request
 from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
-import zope.event
 
-from ..lib.dynmenu import DynMenu, Label, Link, DynItem
-from ..pyramid import viewargs, JSONType
-from ..pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
-from ..pyramid.psection import PageSections
-from ..env.model import DBSession
+from nextgisweb.env import DBSession
+from nextgisweb.lib.dynmenu import DynItem, DynMenu, Label, Link
 
-from ..core.exception import InsufficientPermissions
+from nextgisweb.core.exception import InsufficientPermissions
+from nextgisweb.pyramid import JSONType, viewargs
+from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
+from nextgisweb.pyramid.psection import PageSections
 
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
-from .widget import CompositeWidget
 from .util import _
+from .widget import CompositeWidget
 
 __all__ = ['resource_factory', ]
 

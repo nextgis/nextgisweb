@@ -1,33 +1,27 @@
+import os
 import shutil
 import subprocess
-import os
+from tempfile import NamedTemporaryFile
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
-
+from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
 
-from tempfile import NamedTemporaryFile
-from osgeo import gdal, gdalconst, osr, ogr
+from nextgisweb.env import declarative_base, env
+from nextgisweb.lib.logging import logger
+from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_from_wkt
 
-from ..core.exception import ValidationError
-from ..core.util import format_size
-from ..lib.osrhelper import sr_from_epsg, sr_from_wkt, SpatialReferenceError
-from ..lib.logging import logger
-from ..env.model import declarative_base
-from ..resource import (
-    Resource,
-    DataStructureScope, DataScope,
-    Serializer,
-    SerializedProperty as SP,
-    SerializedRelationship as SR,
-    ResourceGroup)
-from ..env import env
-from ..layer import SpatialLayerMixin, IBboxLayer
-from ..file_storage import FileObj
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.core.util import format_size
+from nextgisweb.file_storage import FileObj
+from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
+from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceGroup, Serializer
+from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import SerializedRelationship as SR
 
 from .kind_of_data import RasterLayerData
-from .util import _, calc_overviews_levels, COMP_ID, raster_size
+from .util import COMP_ID, _, calc_overviews_levels, raster_size
 
 PYRAMID_TARGET_SIZE = 512
 

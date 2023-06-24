@@ -1,4 +1,4 @@
-from ..core import KindOfData
+from nextgisweb.core import KindOfData
 
 from .util import _
 

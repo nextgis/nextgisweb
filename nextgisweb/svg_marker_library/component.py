@@ -2,11 +2,10 @@ from os import path
 
 from cachetools import TTLCache
 
-from ..env import Component, require
-from ..lib.config import Option, OptionAnnotations
+from nextgisweb.env import Component, require
+from nextgisweb.lib.config import Option, OptionAnnotations
 
 from .model import Base, validate_filename
-
 
 PRESET_DIR = path.join(path.dirname(__file__), 'preset/')
 

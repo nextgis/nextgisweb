@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+
 import pytest
 
 good_domains = ['http://example.com', 'http://test.qqq']

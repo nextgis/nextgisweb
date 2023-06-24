@@ -1,9 +1,10 @@
 from pyramid.httpexceptions import HTTPNotFound
 
-from ..resource import resource_factory, DataScope, Resource
-from ..feature_layer import IFeatureLayer
-from ..pyramid import viewargs
-from ..lib import dynmenu as dm
+from nextgisweb.lib import dynmenu as dm
+
+from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.pyramid import viewargs
+from nextgisweb.resource import DataScope, Resource, resource_factory
 
 from .util import _
 

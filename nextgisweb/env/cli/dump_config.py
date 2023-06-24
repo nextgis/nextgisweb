@@ -1,4 +1,4 @@
-from .base import cli, EnvCommand
+from .base import EnvCommand, cli
 
 
 @cli.command()

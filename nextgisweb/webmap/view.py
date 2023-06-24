@@ -1,21 +1,21 @@
 from collections import namedtuple
-from urllib.parse import unquote, urljoin, urlparse
 from inspect import signature
+from urllib.parse import unquote, urljoin, urlparse
 
 from pyramid.renderers import render_to_response
 
-from .adapter import WebMapAdapter
-from .model import WebMap, WebMapScope
-from .plugin import WebmapPlugin, WebmapLayerPlugin
-from .util import webmap_items_to_tms_ids_list, _
-from ..lib.dynmenu import DynItem, Label, Link
-from ..render.legend import ILegendSymbols
-from ..render.api import legend_symbols_by_resource
-from ..render.view import TMSLink
-from ..resource import Widget, resource_factory, DataScope, ResourceScope
-from ..pyramid import viewargs
+from nextgisweb.lib.dynmenu import DynItem, Label, Link
 
-from .model import LegendSymbolsEnum
+from nextgisweb.pyramid import viewargs
+from nextgisweb.render.api import legend_symbols_by_resource
+from nextgisweb.render.legend import ILegendSymbols
+from nextgisweb.render.view import TMSLink
+from nextgisweb.resource import DataScope, ResourceScope, Widget, resource_factory
+
+from .adapter import WebMapAdapter
+from .model import LegendSymbolsEnum, WebMap, WebMapScope
+from .plugin import WebmapLayerPlugin, WebmapPlugin
+from .util import _, webmap_items_to_tms_ids_list
 
 
 class ExtentWidget(Widget):

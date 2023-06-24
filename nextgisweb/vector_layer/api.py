@@ -1,6 +1,7 @@
-from ..core.exception import ValidationError
-from ..lib.ogrhelper import read_dataset
-from ..pyramid import JSONType
+from nextgisweb.lib.ogrhelper import read_dataset
+
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.pyramid import JSONType
 
 from .util import _
 

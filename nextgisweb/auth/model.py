@@ -1,20 +1,19 @@
 from collections import namedtuple
 from functools import lru_cache
 
-from passlib.hash import sha256_crypt
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from passlib.hash import sha256_crypt
 from sqlalchemy.dialects.postgresql import JSONB
 from zope.event import notify
 from zope.event.classhandler import handler
 
-from ..core.exception import ValidationError
-from ..env import env
-from ..env.model import DBSession, declarative_base
-from ..pyramid.util import gensecret
+from nextgisweb.env import DBSession, declarative_base, env
+
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.pyramid.util import gensecret
 
 from .util import _
-
 
 Base = declarative_base()
 

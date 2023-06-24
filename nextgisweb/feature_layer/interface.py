@@ -1,9 +1,8 @@
 
 from osgeo import ogr
-from zope.interface import Interface, Attribute
+from zope.interface import Attribute, Interface
 
-from ..resource import IResourceBase
-
+from nextgisweb.resource import IResourceBase
 
 GEOM_TYPE_OGR = (
     ogr.wkbPoint,

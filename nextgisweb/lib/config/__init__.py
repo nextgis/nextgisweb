@@ -1,13 +1,10 @@
 from . import otype
 from .annotation import (
-    Option,
-    OptionAnnotations,
     ConfigOptions,
     MissingAnnotationWarning,
-    MissingDefaultError)
+    MissingDefaultError,
+    Option,
+    OptionAnnotations,
+)
 from .otype import OptionType
-from .util import (
-    NO_DEFAULT,
-    load_config,
-    environ_to_key,
-    key_to_environ)
+from .util import NO_DEFAULT, environ_to_key, key_to_environ, load_config

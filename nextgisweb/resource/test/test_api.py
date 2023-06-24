@@ -1,8 +1,9 @@
 import pytest
 import transaction
 
-from ...auth import User
-from ...env.model import DBSession
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import User
 
 from .. import ResourceGroup
 

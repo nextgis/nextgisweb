@@ -9,11 +9,11 @@ from typing import Optional, Tuple
 from aiohttp import ClientSession, TCPConnector
 from PIL import Image
 
-from ..core.exception import ExternalServiceError
-from ..env import env
+from nextgisweb.env import env
 
-from .util import quad_key, SCHEME, toggle_tms_xyz_y
+from nextgisweb.core.exception import ExternalServiceError
 
+from .util import SCHEME, quad_key, toggle_tms_xyz_y
 
 SHUTDOWN_TIMEOUT = 1
 

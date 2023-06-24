@@ -1,16 +1,17 @@
 import re
 
 import sqlalchemy as sa
-from sqlalchemy.orm import aliased, undefer
-from pyramid.security import forget
 from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
 from pyramid.interfaces import ISecurityPolicy
+from pyramid.security import forget
+from sqlalchemy.orm import aliased, undefer
 
-from ..env.model import DBSession
-from ..core.exception import ValidationError
-from ..pyramid import JSONType
+from nextgisweb.env import DBSession
 
-from .model import User, Group, Principal
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.pyramid import JSONType
+
+from .model import Group, Principal, User
 from .util import _
 
 keyname_pattern = re.compile(r'^[A-Za-z][A-Za-z0-9_\-]*$')

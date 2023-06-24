@@ -1,9 +1,9 @@
 import sqlalchemy as sa
-from sqlalchemy.orm import relationship, declared_attr
+from sqlalchemy.orm import declared_attr, relationship
 
-from ..lib import db
-from ..lib.osrhelper import sr_from_wkt
-from ..env.model import declarative_base
+from nextgisweb.env import declarative_base
+from nextgisweb.lib import db
+from nextgisweb.lib.osrhelper import sr_from_wkt
 
 from .util import convert_to_proj
 

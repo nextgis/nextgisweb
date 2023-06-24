@@ -1,4 +1,4 @@
-from ..resource import Resource, Widget
+from nextgisweb.resource import Resource, Widget
 
 
 class SocialWidget(Widget):

@@ -2,7 +2,8 @@ from collections import defaultdict
 
 import pytest
 
-from ...env import load_all
+from nextgisweb.env import load_all
+
 from .. import Resource
 
 

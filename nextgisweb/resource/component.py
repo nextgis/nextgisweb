@@ -2,14 +2,15 @@ import re
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from ..lib import db
-from ..lib.config import Option
-from ..lib.logging import logger
-from ..env import Component, require
-from ..auth import User, Group
-from ..env.model import DBSession
+from nextgisweb.env import Component, DBSession, require
+from nextgisweb.lib import db
+from nextgisweb.lib.config import Option
+from nextgisweb.lib.logging import logger
 
-from .model import Base, Resource, ResourceGroup, ResourceACLRule as ACLRule
+from nextgisweb.auth import Group, User
+
+from .model import Base, Resource, ResourceGroup
+from .model import ResourceACLRule as ACLRule
 from .util import _
 
 
@@ -112,7 +113,7 @@ class ResourceComponent(Component):
 
     @require('auth')
     def setup_pyramid(self, config):
-        from . import view, api
+        from . import api, view
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 

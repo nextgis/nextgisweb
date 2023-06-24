@@ -1,8 +1,8 @@
-import sys
-import os
 import json
-from subprocess import check_output
+import os
+import sys
 from pkg_resources import resource_filename
+from subprocess import check_output
 
 
 def extract(fileobj, keywords, comment_tags, options):

@@ -1,6 +1,6 @@
-from .base import WebmapLayerPlugin
+from nextgisweb.layer import IBboxLayer
 
-from ...layer import IBboxLayer
+from .base import WebmapLayerPlugin
 
 
 class ZoomToLayerPlugin(WebmapLayerPlugin):

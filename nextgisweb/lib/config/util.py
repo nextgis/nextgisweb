@@ -1,5 +1,5 @@
-import os
 import io
+import os
 import re
 from configparser import RawConfigParser
 
@@ -132,7 +132,7 @@ def load_config(filenames, include, environ=os.environ, environ_prefix='NEXTGISW
                 apply_kv(rkey, v)
 
     if hupper:
-        from hupper import is_active, get_reloader
+        from hupper import get_reloader, is_active
         if is_active():
             get_reloader().watch_files(filenames)
 

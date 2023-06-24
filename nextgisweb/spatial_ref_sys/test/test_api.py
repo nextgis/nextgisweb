@@ -1,13 +1,16 @@
 import pytest
 import transaction
 
-from ...lib.geometry import Geometry
-from ...env.model import DBSession
-from ..model import SRS
+from nextgisweb.env import DBSession
+from nextgisweb.lib.geometry import Geometry
 
-from .data import transform_batch_input, \
-    transform_batch_expected, srs_def, \
-    transform_batch_input_wrong_srs_to
+from ..model import SRS
+from .data import (
+    srs_def,
+    transform_batch_expected,
+    transform_batch_input,
+    transform_batch_input_wrong_srs_to,
+)
 
 MOSCOW_VLADIVOSTOK = 'LINESTRING(37.62 55.75,131.9 43.12)'
 LENGTH_SPHERE = 6434561.600305

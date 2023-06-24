@@ -1,18 +1,20 @@
 from io import BytesIO
+from pkg_resources import resource_filename
 
 import numpy
 import PIL
-from osgeo import gdal, gdalconst, gdal_array
-from pkg_resources import resource_filename
+from osgeo import gdal, gdal_array, gdalconst
 from zope.interface import implementer
 
-from ..env.model import declarative_base
-from ..resource import Resource, DataScope
-from ..render import (
-    IRenderableStyle,
-    ILegendableStyle,
+from nextgisweb.env import declarative_base
+
+from nextgisweb.render import (
     IExtentRenderRequest,
-    ITileRenderRequest)
+    ILegendableStyle,
+    IRenderableStyle,
+    ITileRenderRequest,
+)
+from nextgisweb.resource import DataScope, Resource
 
 from .util import _
 

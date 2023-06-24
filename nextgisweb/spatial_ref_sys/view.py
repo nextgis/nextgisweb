@@ -1,8 +1,9 @@
 from pyramid.httpexceptions import HTTPNotFound
 from sqlalchemy.orm.exc import NoResultFound
 
-from ..lib import dynmenu as dm
-from ..pyramid import viewargs
+from nextgisweb.lib import dynmenu as dm
+
+from nextgisweb.pyramid import viewargs
 
 from .model import SRS
 from .util import _

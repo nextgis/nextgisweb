@@ -1,4 +1,5 @@
-from babel.core import parse_locale as babel_parse_locale, get_locale_identifier
+from babel.core import get_locale_identifier
+from babel.core import parse_locale as babel_parse_locale
 
 
 def parse_locale(ident):

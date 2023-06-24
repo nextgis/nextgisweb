@@ -1,15 +1,17 @@
-from uuid import uuid4
 from time import sleep
+from uuid import uuid4
 
 import pytest
 import transaction
 from freezegun import freeze_time
 
-from ...auth import User
-from ...feature_attachment.component import FeatureAttachmentData
-from ...env.model import DBSession
-from ...spatial_ref_sys import SRS
-from ...vector_layer import VectorLayer
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import User
+from nextgisweb.feature_attachment.component import FeatureAttachmentData
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer import VectorLayer
+
 from .. import KindOfData
 from ..storage import SQL_LOCK, StorageLimitExceeded
 

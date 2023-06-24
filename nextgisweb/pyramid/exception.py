@@ -1,7 +1,7 @@
-import sys
 import os.path
-import warnings
+import sys
 import traceback
+import warnings
 from hashlib import md5
 
 from pyramid import httpexceptions
@@ -11,9 +11,11 @@ from pyramid.response import Response
 from zope.interface import implementer
 from zope.interface.interface import adapter_hooks
 
-from ..lib import json
-from ..lib.logging import logger
-from ..core.exception import IUserException, user_exception
+from nextgisweb.lib import json
+from nextgisweb.lib.logging import logger
+
+from nextgisweb.core.exception import IUserException, user_exception
+
 from .util import _
 
 

@@ -1,15 +1,17 @@
+from unittest.mock import patch
+
 import geoalchemy2 as ga
 import pytest
 import transaction
 from pyramid.interfaces import ISecurityPolicy
-from unittest.mock import patch
 
-from ...auth import User
-from ...auth.policy import AuthResult, AuthMedium, AuthProvider
-from ...env.model import DBSession
-from ...resource import ResourceACLRule, ResourceGroup
+from nextgisweb.env import DBSession
 
-from ..model import WebMap, WebMapItem, WebMapAnnotation
+from nextgisweb.auth import User
+from nextgisweb.auth.policy import AuthMedium, AuthProvider, AuthResult
+from nextgisweb.resource import ResourceACLRule, ResourceGroup
+
+from ..model import WebMap, WebMapAnnotation, WebMapItem
 
 TEST_USER_KEYNAME = 'test_user'
 

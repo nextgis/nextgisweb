@@ -1,7 +1,8 @@
 import pytest
 
-from ...env import Component, load_all
-from ...lib.migration.graph import MigrationGraph, resolve
+from nextgisweb.env import Component, load_all
+from nextgisweb.lib.migration.graph import MigrationGraph, resolve
+
 from ..migration import MigrationRegistry
 
 

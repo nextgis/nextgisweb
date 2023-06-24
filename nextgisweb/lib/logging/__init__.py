@@ -1,6 +1,6 @@
-from sys import _getframe
-from logging import getLogger, Logger
 from functools import partial
+from logging import Logger, getLogger
+from sys import _getframe
 
 __all__ = ['DO_NOT_USE_WILDCARD_IMPORT']
 

@@ -3,18 +3,18 @@ import os.path
 import re
 import secrets
 import string
-from sys import _getframe
-from pathlib import Path
-from pkg_resources import resource_filename
 from calendar import timegm
 from mimetypes import guess_type
+from pathlib import Path
+from pkg_resources import resource_filename
+from sys import _getframe
 from typing import TypeVar
 
-from pyramid.response import FileResponse
 from pyramid.httpexceptions import HTTPNotFound
+from pyramid.response import FileResponse
 
-from ..lib.i18n import trstr_factory
-from ..lib.logging import logger
+from nextgisweb.lib.i18n import trstr_factory
+from nextgisweb.lib.logging import logger
 
 COMP_ID = 'pyramid'
 _ = trstr_factory(COMP_ID)

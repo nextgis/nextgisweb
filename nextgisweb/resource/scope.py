@@ -1,6 +1,5 @@
-from .permission import Scope, Permission
+from .permission import Permission, Scope
 from .util import _
-
 
 P = Permission
 

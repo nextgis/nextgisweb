@@ -3,9 +3,9 @@ import struct
 import PIL.ImageStat
 from affine import Affine
 
-from ..lib.i18n import trstr_factory
-from ..core.exception import ValidationError
+from nextgisweb.lib.i18n import trstr_factory
 
+from nextgisweb.core.exception import ValidationError
 
 COMP_ID = 'render'
 _ = trstr_factory(COMP_ID)

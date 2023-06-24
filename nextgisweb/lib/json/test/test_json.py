@@ -1,12 +1,11 @@
+from collections import OrderedDict
 from datetime import date, datetime, time
 from decimal import Decimal
 from uuid import UUID
-from collections import OrderedDict
 
 import pytest
 
-from .. import dumpb, loadb, dumps, loads
-
+from .. import dumpb, dumps, loadb, loads
 
 int64min = -9223372036854775808
 int64max = 9223372036854775807

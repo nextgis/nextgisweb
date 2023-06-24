@@ -1,6 +1,7 @@
 # Borrowed from https://github.com/kylefox/python-image-orientation-patch
 
 from collections import namedtuple
+
 from PIL.Image import Transpose
 
 Orientation = namedtuple('Orientation', ['description', 'degrees'])

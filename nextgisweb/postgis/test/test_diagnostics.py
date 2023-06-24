@@ -1,6 +1,6 @@
 import pytest
 
-from ..diagnostics import Checker, PostgresCheck, SUCCESS, ERROR
+from ..diagnostics import ERROR, SUCCESS, Checker, PostgresCheck
 
 
 @pytest.fixture(scope="module")

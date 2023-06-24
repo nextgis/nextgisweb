@@ -1,7 +1,7 @@
 from pyramid import threadlocal
 
-from ...feature_layer import IFeatureLayer, IWritableFeatureLayer
-from ...feature_layer.view import PD_WRITE
+from nextgisweb.feature_layer import IFeatureLayer, IWritableFeatureLayer
+from nextgisweb.feature_layer.view import PD_WRITE
 
 from .base import WebmapLayerPlugin
 

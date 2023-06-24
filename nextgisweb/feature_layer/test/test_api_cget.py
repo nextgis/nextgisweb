@@ -1,16 +1,16 @@
-import random
 import json
+import random
 from uuid import uuid4
 
 import pytest
 import transaction
 from osgeo import ogr
 
-from ...env.model import DBSession
-from ...vector_layer import VectorLayer
-from ...spatial_ref_sys.model import SRS
-from ...auth import User
+from nextgisweb.env import DBSession
 
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer import VectorLayer
 
 check_list = [
     ['int', [5, 4, 1, 2, 3]],

@@ -1,23 +1,19 @@
 import os.path
+import zipfile
 from datetime import datetime
 from shutil import copyfileobj
 
 import magic
-import zipfile
 
-from ..lib import db
-from ..core.exception import ValidationError
-from ..env import env
-from ..file_storage import FileObj
-from ..env.model import DBSession, declarative_base
-from ..resource import (
-    Resource,
-    Serializer,
-    SerializedProperty as SP,
-    ResourceScope,
-    ResourceGroup)
+from nextgisweb.env import DBSession, declarative_base, env
+from nextgisweb.lib import db
 
-from .util import _, COMP_ID
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.file_storage import FileObj
+from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, Serializer
+from nextgisweb.resource import SerializedProperty as SP
+
+from .util import COMP_ID, _
 
 Base = declarative_base(dependencies=('resource', ))
 

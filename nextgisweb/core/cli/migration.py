@@ -1,20 +1,26 @@
-from typing import List, Optional
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from typing import List, Optional
 
 import transaction
 from zope.sqlalchemy import mark_changed
 
-from ...lib.logging import logger
-from ...lib.migration import (
-    revid, REVID_ZERO, MigrationKey, resolve,
-    UninstallOperation, RewindOperation,
-    PythonModuleMigration, SQLScriptMigration)
-from ...env.cli import EnvCommand, DryRunOptions, opt, arg, cli
-from ...env.model import DBSession
+from nextgisweb.env import DBSession
+from nextgisweb.env.cli import DryRunOptions, EnvCommand, arg, cli, opt
+from nextgisweb.lib.logging import logger
+from nextgisweb.lib.migration import (
+    REVID_ZERO,
+    MigrationKey,
+    PythonModuleMigration,
+    RewindOperation,
+    SQLScriptMigration,
+    UninstallOperation,
+    resolve,
+    revid,
+)
 
 from ..component import CoreComponent
-from ..migration import MigrationRegistry, MigrationContext
+from ..migration import MigrationContext, MigrationRegistry
 
 
 @cli.command()

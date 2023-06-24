@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 import pytest
 
-from ...env import Component, load_all
+from nextgisweb.env import Component, load_all
 
 
 def pytest_generate_tests(metafunc):

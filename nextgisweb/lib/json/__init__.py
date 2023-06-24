@@ -1,12 +1,13 @@
 import sys
-import orjson
 from decimal import Decimal
+
+import orjson
 
 __all__ = ['dumpb', 'loadb', 'dumps', 'loads']
 
 
 if 'pytest' in sys.modules:
-    from freezegun.api import FakeDatetime, FakeDate
+    from freezegun.api import FakeDate, FakeDatetime
     _pytest_freezegun = True
 else:
     _pytest_freezegun = False

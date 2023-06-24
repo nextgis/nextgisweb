@@ -1,4 +1,4 @@
-from ..env.cli import cli, EnvCommand, DryRunOptions, opt
+from nextgisweb.env.cli import DryRunOptions, EnvCommand, cli, opt
 
 from .component import FileStorageComponent
 

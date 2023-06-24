@@ -1,5 +1,5 @@
-from ..resource import ConnectionScope, resource_factory
-from ..pyramid import JSONType
+from nextgisweb.pyramid import JSONType
+from nextgisweb.resource import ConnectionScope, resource_factory
 
 from .model import WFSConnection
 

@@ -1,5 +1,5 @@
 from .component import ResourceComponent
-from .events import AfterResourcePut, AfterResourceCollectionPost
+from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import (
     DisplayNameNotUnique,
     ForbiddenError,
@@ -7,21 +7,24 @@ from .exception import (
     OperationalError,
     ResourceError,
     ResourceNotFound,
-    ValidationError)
+    ValidationError,
+)
 from .interface import IResourceBase
 from .model import Resource, ResourceACLRule, ResourceGroup
 from .permission import Permission, Scope
 from .scope import (
-    ResourceScope,
-    MetadataScope,
-    DataStructureScope,
-    DataScope,
     ConnectionScope,
-    ServiceScope)
+    DataScope,
+    DataStructureScope,
+    MetadataScope,
+    ResourceScope,
+    ServiceScope,
+)
 from .serialize import (
     SerializedProperty,
     SerializedRelationship,
     SerializedResourceRelationship,
-    Serializer)
+    Serializer,
+)
 from .view import resource_factory
 from .widget import Widget

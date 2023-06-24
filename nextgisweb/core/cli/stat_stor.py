@@ -1,5 +1,5 @@
-from ...lib.json import dumps
-from ...env.cli import cli, EnvCommand, opt
+from nextgisweb.env.cli import EnvCommand, cli, opt
+from nextgisweb.lib.json import dumps
 
 from ..component import CoreComponent
 

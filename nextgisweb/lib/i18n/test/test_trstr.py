@@ -1,10 +1,9 @@
-from logging import ERROR
 from contextlib import contextmanager
+from logging import ERROR
 
 import pytest
 
 from ..trstr import trstr_factory
-
 
 f = trstr_factory('test')
 

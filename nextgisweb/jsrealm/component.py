@@ -1,9 +1,9 @@
 import re
 from subprocess import check_output
 
-from ..env import Component
-from ..lib.config import Option
-from ..lib.logging import logger
+from nextgisweb.env import Component
+from nextgisweb.lib.config import Option
+from nextgisweb.lib.logging import logger
 
 from .util import COMP_ID
 

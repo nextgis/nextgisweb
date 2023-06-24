@@ -6,16 +6,16 @@ import pytest
 import transaction
 import webtest
 
+from nextgisweb.env import DBSession
+from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.json import dumpb
+
+from nextgisweb.auth import User
+from nextgisweb.feature_layer import Feature
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer import VectorLayer
+
 from .. import FeatureAttachment
-
-from ...auth import User
-from ...feature_layer import Feature
-from ...lib.geometry import Geometry
-from ...lib.json import dumpb
-from ...env.model import DBSession
-from ...spatial_ref_sys import SRS
-from ...vector_layer import VectorLayer
-
 
 att_ids = dict()
 

@@ -1,17 +1,18 @@
-from time import sleep
 import logging
+from time import sleep
 
 import pytest
 import transaction
 from PIL import Image, ImageDraw
 from shapely.geometry import Point
 
-from ...lib.geometry import Geometry
-from ...env.model import DBSession
-from ...raster_layer import RasterLayer
-from ...raster_style import RasterStyle
-from ...spatial_ref_sys import SRS
-from ...auth import User
+from nextgisweb.env import DBSession
+from nextgisweb.lib.geometry import Geometry
+
+from nextgisweb.auth import User
+from nextgisweb.raster_layer import RasterLayer
+from nextgisweb.raster_style import RasterStyle
+from nextgisweb.spatial_ref_sys import SRS
 
 from ..model import ResourceTileCache, TilestorWriter
 from ..util import pack_color, unpack_color

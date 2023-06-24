@@ -1,10 +1,12 @@
 from enum import Enum
-from socket import gethostbyname, gaierror
+from socket import gaierror, gethostbyname
 
 import geoalchemy2 as ga
 from sqlalchemy import func, inspect, select, sql
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.engine import Connection, URL as EngineURL, create_engine
+from sqlalchemy.engine import URL as EngineURL
+from sqlalchemy.engine import Connection, create_engine
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.pool import NullPool
 from sqlalchemy.types import (
     BigInteger,
@@ -15,13 +17,12 @@ from sqlalchemy.types import (
     String,
     Time,
 )
-from sqlalchemy.exc import OperationalError
 
-from ..feature_layer import FIELD_TYPE
-from ..lib.logging import logger
+from nextgisweb.lib.logging import logger
+
+from nextgisweb.feature_layer import FIELD_TYPE
 
 from .util import _, coltype_as_str
-
 
 # Field type - generic DB type
 _FIELD_TYPE_2_DB = {

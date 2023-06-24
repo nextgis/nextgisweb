@@ -1,6 +1,5 @@
-from ..lib import db
-from ..env.model import declarative_base
-
+from nextgisweb.env import declarative_base
+from nextgisweb.lib import db
 
 Base = declarative_base()
 

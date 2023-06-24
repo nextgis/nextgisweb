@@ -5,9 +5,9 @@ from datetime import datetime
 
 import zope.event
 
-from ..env import env
-from ..lib.i18n import trstr_factory
-from ..lib.json import dumps
+from nextgisweb.env import env
+from nextgisweb.lib.i18n import trstr_factory
+from nextgisweb.lib.json import dumps
 
 COMP_ID = 'audit'
 _ = trstr_factory(COMP_ID)

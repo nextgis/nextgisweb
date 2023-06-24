@@ -1,9 +1,9 @@
 from osgeo import osr
 
-from ..core.exception import ValidationError
+from nextgisweb.lib.i18n import trstr_factory
+from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_wkt
 
-from ..lib.i18n import trstr_factory
-from ..lib.osrhelper import sr_from_wkt, SpatialReferenceError
+from nextgisweb.core.exception import ValidationError
 
 COMP_ID = "spatial_ref_sys"
 _ = trstr_factory(COMP_ID)

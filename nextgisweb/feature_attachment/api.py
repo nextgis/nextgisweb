@@ -6,19 +6,19 @@ from itertools import count
 from shutil import copyfileobj
 from tempfile import NamedTemporaryFile
 from urllib.parse import quote_plus
-from zipfile import BadZipFile, ZIP_DEFLATED, ZipFile
+from zipfile import ZIP_DEFLATED, BadZipFile, ZipFile
 
 from magic import from_buffer as magic_from_buffer
 from PIL import Image
-from pyramid.response import Response, FileResponse
+from pyramid.response import FileResponse, Response
 
-from ..core.exception import ValidationError
-from ..lib.json import dumpb, loadb
-from ..resource import DataScope, resource_factory
-from ..env import env
-from ..env.model import DBSession
-from ..feature_layer.exception import FeatureNotFound
-from ..pyramid import JSONType
+from nextgisweb.env import DBSession, env
+from nextgisweb.lib.json import dumpb, loadb
+
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.feature_layer.exception import FeatureNotFound
+from nextgisweb.pyramid import JSONType
+from nextgisweb.resource import DataScope, resource_factory
 
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS

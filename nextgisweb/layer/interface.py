@@ -1,6 +1,6 @@
 from zope.interface import Attribute
 
-from ..resource import IResourceBase
+from nextgisweb.resource import IResourceBase
 
 
 class IBboxLayer(IResourceBase):

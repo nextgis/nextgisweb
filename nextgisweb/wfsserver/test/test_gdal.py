@@ -1,26 +1,26 @@
-from pathlib import Path
 from itertools import product
+from packaging import version as pkg_version
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
 import transaction
-from osgeo import gdal
-from osgeo import ogr
-from packaging import version as pkg_version
+from osgeo import gdal, ogr
 
-from ...env.model import DBSession
-from ...auth import User
-from ...spatial_ref_sys import SRS
-from ...vector_layer import VectorLayer
+from nextgisweb.env import DBSession
 
-from ..model import Service as WFSService, Layer as WFSLayer
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer import VectorLayer
 
+from ..model import Layer as WFSLayer
+from ..model import Service as WFSService
 
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
 
 
 def type_geojson_dataset(filename):
-    from ...vector_layer import test as vector_layer_test
+    from nextgisweb.vector_layer import test as vector_layer_test
     path = Path(vector_layer_test.__file__).parent / 'data' / filename
     result = ogr.Open(str(path))
     assert result is not None, gdal.GetLastErrorMsg()

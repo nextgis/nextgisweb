@@ -1,7 +1,7 @@
-from ..env.cli import cli, EnvCommand, arg
+from nextgisweb.env.cli import EnvCommand, arg, cli
 
-from .model import User
 from .component import AuthComponent
+from .model import User
 
 
 @cli.command()

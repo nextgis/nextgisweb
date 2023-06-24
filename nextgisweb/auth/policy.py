@@ -1,28 +1,38 @@
 import warnings
-from datetime import datetime, timedelta
 from base64 import b64decode
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import Optional
 
 import sqlalchemy as sa
-from zope.interface import implementer
-from zope.event import notify
+from pyramid.authorization import ACLHelper
+from pyramid.interfaces import ISecurityPolicy
+from pyramid.request import Request
 from sqlalchemy.orm import load_only
 from sqlalchemy.orm.exc import NoResultFound
-from pyramid.request import Request
-from pyramid.interfaces import ISecurityPolicy
-from pyramid.authorization import ACLHelper
+from zope.event import notify
+from zope.interface import implementer
 
-from ..lib.config import OptionAnnotations, Option
-from ..lib.logging import logger
-from ..pyramid import SessionStore, WebSession
-from ..env.model import DBSession
+from nextgisweb.env import DBSession
+from nextgisweb.lib.config import Option, OptionAnnotations
+from nextgisweb.lib.logging import logger
 
+from nextgisweb.pyramid import SessionStore, WebSession
+
+from .exception import (
+    InvalidAuthorizationHeader,
+    InvalidCredentialsException,
+    UserDisabledException,
+)
 from .model import User
-from .exception import InvalidAuthorizationHeader, InvalidCredentialsException, UserDisabledException
-from .oauth import OAuthATokenRefreshException, OAuthAccessTokenExpiredException, OAuthGrantResponse
-from .util import current_tstamp, log_lazy_data as lf
+from .oauth import (
+    OAuthAccessTokenExpiredException,
+    OAuthATokenRefreshException,
+    OAuthGrantResponse,
+)
+from .util import current_tstamp
+from .util import log_lazy_data as lf
 
 
 class AuthProvider(Enum):

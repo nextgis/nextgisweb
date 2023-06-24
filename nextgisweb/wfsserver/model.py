@@ -1,14 +1,11 @@
 import re
 
-from ..lib import db
-from ..core.exception import ValidationError
-from ..env.model import declarative_base
-from ..resource import (
-    Resource,
-    ServiceScope,
-    Serializer,
-    SerializedProperty as SP,
-    ResourceGroup)
+from nextgisweb.env import declarative_base
+from nextgisweb.lib import db
+
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.resource import Resource, ResourceGroup, Serializer, ServiceScope
+from nextgisweb.resource import SerializedProperty as SP
 
 from .util import _
 

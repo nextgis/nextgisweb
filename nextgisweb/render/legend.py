@@ -1,9 +1,9 @@
-from typing import List
 from dataclasses import dataclass
+from typing import List
 
 from PIL import Image
 
-from ..resource import IResourceBase
+from nextgisweb.resource import IResourceBase
 
 
 @dataclass

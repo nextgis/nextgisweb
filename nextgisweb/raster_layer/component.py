@@ -1,10 +1,10 @@
 import os
 from pathlib import Path
 
-from ..env import Component, require
-from ..lib.config import Option
-from ..lib.config.otype import SizeInBytes
-from ..lib.logging import logger
+from nextgisweb.env import Component, require
+from nextgisweb.lib.config import Option
+from nextgisweb.lib.config.otype import SizeInBytes
+from nextgisweb.lib.logging import logger
 
 from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
 from .kind_of_data import RasterLayerData
@@ -21,7 +21,7 @@ class RasterLayerComponent(Component):
         self.cog_enabled = self.options["cog_enabled"]
 
     def setup_pyramid(self, config):
-        from . import view, api # NOQA
+        from . import api, view  # NOQA
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 

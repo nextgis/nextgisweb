@@ -1,24 +1,23 @@
 import zope.event
-
 from pyramid.httpexceptions import HTTPBadRequest
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 
-from ..lib import db
-from ..core.exception import InsufficientPermissions
-from ..env.model import DBSession
-from ..auth import User
-from ..pyramid import JSONType
+from nextgisweb.env import DBSession
+from nextgisweb.lib import db
 
-from .model import Resource, ResourceSerializer
-from .scope import ResourceScope
+from nextgisweb.auth import User
+from nextgisweb.core.exception import InsufficientPermissions
+from nextgisweb.pyramid import JSONType
+
+from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import ResourceError, ValidationError
+from .model import Resource, ResourceSerializer
+from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
+from .scope import ResourceScope
 from .serialize import CompositeSerializer
-from .view import resource_factory
 from .util import _
-from .events import AfterResourcePut, AfterResourceCollectionPost
-from .presolver import PermissionResolver, ExplainACLRule, ExplainRequirement, ExplainDefault
-
+from .view import resource_factory
 
 PERM_READ = ResourceScope.read
 PERM_DELETE = ResourceScope.delete

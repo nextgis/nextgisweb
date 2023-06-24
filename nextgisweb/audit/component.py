@@ -1,8 +1,8 @@
 import json
 from pkg_resources import resource_filename
 
-from ..lib.config import Option
-from ..env import Component
+from nextgisweb.env import Component
+from nextgisweb.lib.config import Option
 
 from .util import disable_logging
 

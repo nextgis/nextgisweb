@@ -1,8 +1,9 @@
 from typing import Optional
 
-from ..lib.logging import logger
-from ..env.cli import cli, EnvCommand, opt
-from ..core import CoreComponent
+from nextgisweb.env.cli import EnvCommand, cli, opt
+from nextgisweb.lib.logging import logger
+
+from nextgisweb.core import CoreComponent
 
 from .component import PyramidComponent
 

@@ -1,6 +1,7 @@
+from datetime import datetime
+
 import pytest
 
-from datetime import datetime
 from ..util import es_index
 
 

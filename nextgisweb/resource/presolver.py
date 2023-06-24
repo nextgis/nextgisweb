@@ -1,6 +1,5 @@
 from collections import defaultdict, namedtuple
 
-
 ExplainDefault = namedtuple('ExplainDefault', ['result', 'resource'])
 ExplainACLRule = namedtuple('ExplainACLRule', ['result', 'resource', 'acl_rule'])
 ExplainRequirement = namedtuple('ExplainRequirement', [

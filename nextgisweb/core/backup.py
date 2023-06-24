@@ -1,21 +1,20 @@
-import os
-import re
-from contextlib import contextmanager
-from collections import namedtuple
-from functools import lru_cache
-from subprocess import check_call, check_output
 import io
 import json
+import os
+import re
+from collections import namedtuple
+from contextlib import contextmanager
+from functools import lru_cache
+from packaging.version import Version
+from subprocess import check_call, check_output
 
 import sqlalchemy as sa
 import transaction
 from zope.sqlalchemy import mark_changed
-from packaging.version import Version
 
-from ..lib.logging import logger
-from ..lib.registry import dict_registry
-from ..env.model import DBSession
-
+from nextgisweb.env import DBSession
+from nextgisweb.lib.logging import logger
+from nextgisweb.lib.registry import dict_registry
 
 IR_FIELDS = ('id', 'identity', 'payload')
 IndexRecord = namedtuple('IndexRecord', IR_FIELDS)

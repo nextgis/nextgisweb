@@ -1,9 +1,9 @@
 from sqlalchemy import inspect
-from sqlalchemy.exc import NoSuchTableError, SQLAlchemyError, NoResultFound
+from sqlalchemy.exc import NoResultFound, NoSuchTableError, SQLAlchemyError
 
-from ..core.exception import ValidationError
-from ..resource import resource_factory, ConnectionScope, DataStructureScope
-from ..pyramid import JSONType
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.pyramid import JSONType
+from nextgisweb.resource import ConnectionScope, DataStructureScope, resource_factory
 
 from .diagnostics import Checker
 from .exception import ExternalDatabaseError

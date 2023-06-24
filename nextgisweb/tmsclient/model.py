@@ -1,31 +1,30 @@
 import re
 
 import PIL
-from osgeo import osr, ogr
+from osgeo import ogr, osr
 from zope.interface import implementer
 
-from ..lib import db
-from ..lib.osrhelper import sr_from_epsg
-from ..core.exception import ValidationError
-from ..env import env
-from ..layer import SpatialLayerMixin, IBboxLayer
-from ..env.model import declarative_base
-from ..render import IExtentRenderRequest, IRenderableStyle, ITileRenderRequest
-from ..resource import (
+from nextgisweb.env import declarative_base, env
+from nextgisweb.lib import db
+from nextgisweb.lib.osrhelper import sr_from_epsg
+
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
+from nextgisweb.render import IExtentRenderRequest, IRenderableStyle, ITileRenderRequest
+from nextgisweb.resource import (
     ConnectionScope,
     DataScope,
     DataStructureScope,
     Resource,
     ResourceGroup,
     Serializer,
-    SerializedProperty as SP,
-    SerializedRelationship as SR,
-    SerializedResourceRelationship as SRR,
 )
+from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import SerializedRelationship as SR
+from nextgisweb.resource import SerializedResourceRelationship as SRR
 
 from .tile_fetcher import TileFetcher
-from .util import _, crop_box, render_zoom, SCHEME
-
+from .util import SCHEME, _, crop_box, render_zoom
 
 Base = declarative_base(dependencies=('resource', ))
 

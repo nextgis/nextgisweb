@@ -1,15 +1,16 @@
-from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy.ext.mutable import MutableDict
 
-from ..lib import db
-from ..env.model import declarative_base
-from ..resource import (
+from nextgisweb.env import declarative_base
+from nextgisweb.lib import db
+
+from nextgisweb.resource import (
     DataScope,
     Resource,
     ResourceGroup,
     ResourceScope,
+    SerializedProperty,
     Serializer,
-    SerializedProperty
 )
 
 from .util import _

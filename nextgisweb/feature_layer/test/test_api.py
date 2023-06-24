@@ -1,19 +1,19 @@
 import importlib
 import json
 from itertools import product
+from uuid import uuid4
 
 import pytest
 import transaction
-
-from uuid import uuid4
 from osgeo import ogr
 
-from ...lib.geometry import Geometry
-from ...auth import User
-from ...feature_layer.ogrdriver import EXPORT_FORMAT_OGR
-from ...env.model import DBSession
-from ...spatial_ref_sys.model import SRS
-from ...vector_layer import VectorLayer
+from nextgisweb.env import DBSession
+from nextgisweb.lib.geometry import Geometry
+
+from nextgisweb.auth import User
+from nextgisweb.feature_layer.ogrdriver import EXPORT_FORMAT_OGR
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer import VectorLayer
 
 
 def test_identify(ngw_webtest_app):

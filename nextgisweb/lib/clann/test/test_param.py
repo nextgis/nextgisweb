@@ -1,9 +1,9 @@
-from typing import Optional, List
 from functools import partial
+from typing import List, Optional
 
 import pytest
 
-from ..param import opt, arg
+from ..param import arg, opt
 
 
 def t(cls, name, annotation, *args, **kwargs):

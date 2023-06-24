@@ -1,6 +1,7 @@
 from sqlalchemy.exc import StatementError
 
-from ..core.exception import ExternalServiceError
+from nextgisweb.core.exception import ExternalServiceError
+
 from .util import _
 
 

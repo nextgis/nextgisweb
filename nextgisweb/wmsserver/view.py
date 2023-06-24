@@ -1,5 +1,5 @@
-from ..resource import Widget
-from ..resource.extaccess import ExternalAccessLink
+from nextgisweb.resource import Widget
+from nextgisweb.resource.extaccess import ExternalAccessLink
 
 from .model import Service
 from .util import _

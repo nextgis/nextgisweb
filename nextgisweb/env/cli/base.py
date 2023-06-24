@@ -3,10 +3,11 @@ from typing import Optional
 
 import transaction
 
-from ...lib.clann import command, group, opt
-from ...lib.config import load_config
-from ..environment import Env, env, inject
+from nextgisweb.lib.clann import command, group, opt
+from nextgisweb.lib.config import load_config
+
 from .. import environment
+from ..environment import Env, env, inject
 
 
 class EnvOptions:

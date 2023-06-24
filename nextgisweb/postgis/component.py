@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from ..env import Component, require
-from ..lib.config import Option
+from nextgisweb.env import Component, require
+from nextgisweb.lib.config import Option
 
 from .model import Base
 
@@ -16,7 +16,7 @@ class PostgisComponent(Component):
 
     @require('feature_layer')
     def setup_pyramid(self, config):
-        from . import view # NOQA
+        from . import view  # NOQA
         from . import api
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)

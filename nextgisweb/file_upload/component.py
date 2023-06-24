@@ -4,13 +4,12 @@ from shutil import rmtree
 
 from ulid import ULID
 
-from ..lib.config import Option
-from ..lib.config.otype import SizeInBytes
-from ..lib.logging import logger
-from ..env import Component
+from nextgisweb.env import Component
+from nextgisweb.lib.config import Option
+from nextgisweb.lib.config.otype import SizeInBytes
+from nextgisweb.lib.logging import logger
 
 from .util import stat_dir
-
 
 date_format = r'%Y-%m-%d'
 
@@ -41,7 +40,7 @@ class FileUploadComponent(Component):
         mod.forward(SimpleNamespace(env=self.env))
 
     def setup_pyramid(self, config):
-        from . import view, api
+        from . import api, view
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 

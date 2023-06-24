@@ -1,41 +1,39 @@
+import io
 import multiprocessing
 import os
 import os.path
 import platform
+import re
 import sys
 import tempfile
-import io
-import re
 import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 from subprocess import check_output
 
 import requests
-from requests.exceptions import RequestException, JSONDecodeError
+from requests.exceptions import JSONDecodeError, RequestException
 from sqlalchemy import create_engine, inspect, text, types
 from sqlalchemy.dialects.postgresql import dialect as pg_dialect
+from sqlalchemy.engine.url import URL as EngineURL
+from sqlalchemy.engine.url import make_url as make_engine_url
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.engine.url import (
-    URL as EngineURL,
-    make_url as make_engine_url)
 
-from ..lib import db
-from ..env import Component
-from ..lib.config import Option
-from ..lib.config.otype import SizeInBytes
-from ..lib import json
-from ..lib.logging import logger
-from ..env.model import DBSession
-from ..i18n import Localizer, Translations
-from ..env.package import pkginfo, enable_qualifications
+from nextgisweb.env import Component, DBSession
+from nextgisweb.env.package import enable_qualifications, pkginfo
+from nextgisweb.lib import db, json
+from nextgisweb.lib.config import Option
+from nextgisweb.lib.config.otype import SizeInBytes
+from nextgisweb.lib.logging import logger
 
-from .util import _
+from nextgisweb.i18n import Localizer, Translations
+
+from .backup import BackupMetadata
 from .model import Base, Setting
-from .backup import BackupBase, BackupMetadata  # NOQA
-from .storage import StorageComponentMixin, KindOfData  # NOQA
+from .storage import StorageComponentMixin
+from .util import _
 
 
 class _NO_DEFAULT:

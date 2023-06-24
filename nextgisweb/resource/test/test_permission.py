@@ -2,11 +2,13 @@ import pytest
 import sqlalchemy.sql as sql
 import transaction
 
-from ...auth import Group, User
-from ...env.model import DBSession
-from ...webmap import WebMap, WebMapItem, WebMapScope
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import Group, User
+from nextgisweb.webmap import WebMap, WebMapItem, WebMapScope
+
+from ..model import Resource, ResourceACLRule, ResourceGroup
 from ..presolver import PermissionResolver
-from ..model import ResourceACLRule, Resource, ResourceGroup
 from ..scope import ResourceScope
 
 

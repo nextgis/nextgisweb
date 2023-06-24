@@ -1,17 +1,18 @@
 from geoalchemy2.shape import to_shape
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 
+from nextgisweb.env import DBSession, env
+
+from nextgisweb.layer import IBboxLayer
+from nextgisweb.pyramid import JSONType
+from nextgisweb.resource import DataScope, resource_factory
+
 from .model import (
-    WebMap,
-    WebMapScope,
-    WebMapAnnotation,
     WM_SETTINGS,
+    WebMap,
+    WebMapAnnotation,
+    WebMapScope,
 )
-from ..env import env
-from ..layer import IBboxLayer
-from ..env.model import DBSession
-from ..resource import resource_factory, DataScope
-from ..pyramid import JSONType
 
 
 def annotation_to_dict(obj, request, with_user_info=False):

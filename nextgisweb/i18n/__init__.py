@@ -1,9 +1,9 @@
 import inspect
 
-from ..lib.logging import logger
-from ..lib.i18n import trstr_factory
+from nextgisweb.lib.i18n import trstr_factory
+from nextgisweb.lib.logging import logger
 
-from .localizer import Translations, Localizer
+from .localizer import Localizer, Translations
 
 __all__ = [
     'Translations',

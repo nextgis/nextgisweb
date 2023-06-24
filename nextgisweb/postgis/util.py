@@ -1,6 +1,6 @@
 from sqlalchemy.dialects.postgresql import dialect as pg_dialect
 
-from ..lib.i18n import trstr_factory
+from nextgisweb.lib.i18n import trstr_factory
 
 COMP_ID = 'postgis'
 _ = trstr_factory(COMP_ID)

@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 from time import sleep
 from typing import List
 
-from ...lib.logging import logger
-from ...env.cli import cli, EnvCommand, opt, arg
-from ...env.model import DBSession
+from nextgisweb.env import DBSession
+from nextgisweb.env.cli import EnvCommand, arg, cli, opt
+from nextgisweb.lib.logging import logger
 
 from ..backup import pg_connection_options
 from ..component import CoreComponent

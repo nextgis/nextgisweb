@@ -1,8 +1,8 @@
 import pytest
 from zope.interface import implementer
 
+from ..exception import IUserException, UserException, user_exception
 from ..util import _
-from ..exception import IUserException, user_exception, UserException
 
 
 def test_interface():

@@ -2,10 +2,11 @@ import json
 
 import sqlalchemy
 
-from ..lib.config import Option
-from ..lib.logging import logger
-from ..env import Component
-from ..core.model import Setting
+from nextgisweb.env import Component
+from nextgisweb.lib.config import Option
+from nextgisweb.lib.logging import logger
+
+from nextgisweb.core.model import Setting
 
 
 class SentryComponent(Component):

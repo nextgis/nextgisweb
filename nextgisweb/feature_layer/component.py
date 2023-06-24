@@ -1,9 +1,9 @@
-from ..env import Component, require
-from ..lib.config import Option
+from nextgisweb.env import Component, require
+from nextgisweb.lib.config import Option
 
-from .model import Base
-from .interface import FIELD_TYPE
 from .extension import FeatureExtension
+from .interface import FIELD_TYPE
+from .model import Base
 from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 
 
@@ -17,7 +17,7 @@ class FeatureLayerComponent(Component):
 
     @require('resource')
     def setup_pyramid(self, config):
-        from . import view, api
+        from . import api, view
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 

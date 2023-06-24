@@ -1,5 +1,5 @@
 line-length = 99
-select = ["E", "F", "W"]
+select = ["E", "F", "W", "I"]
 exclude = [
     "docker.py",
     "nextgisweb/raster_layer/test/validate_cloud_optimized_geotiff.py",
@@ -25,6 +25,7 @@ exclude = [
 # TODO: Do we need some flake8 for that?
 
 [isort]
+extra-standard-library = ["packaging", "pkg_resources"]
 section-order = [
     "future",
     "standard-library",

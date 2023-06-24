@@ -1,10 +1,12 @@
 from __future__ import annotations
+
 from typing import Optional, Type
 
 from pyramid.request import Request
 from zope.interface import Interface
 
-from ..lib.registry import list_registry
+from nextgisweb.lib.registry import list_registry
+
 from .model import Resource
 
 

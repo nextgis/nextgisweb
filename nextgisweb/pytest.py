@@ -4,7 +4,7 @@ import pytest
 
 
 def _env_initialize():
-    from .env import env, Env
+    from .env import Env, env
     result = env()
     if result:
         return result

@@ -1,15 +1,16 @@
 import json
+import xml.etree.ElementTree as ET
 from uuid import uuid4
 
 import pytest
-from osgeo import ogr
 import transaction
-import xml.etree.ElementTree as ET
+from osgeo import ogr
 
-from ...auth import User
-from ...env.model import DBSession
-from ...spatial_ref_sys import SRS
-from ...vector_layer import VectorLayer
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer import VectorLayer
 
 
 @pytest.fixture(scope='module')

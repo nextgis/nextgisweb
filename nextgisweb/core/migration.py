@@ -3,14 +3,20 @@ from collections import defaultdict
 import transaction
 from zope.sqlalchemy import mark_changed
 
-from ..env.model import DBSession
-from ..lib.logging import logger
-from ..lib.migration import (
-    MigrationKey, InitialMigration,
-    Registry, MigrationGraph,
-    InstallOperation, UninstallOperation,
-    ForwardOperation, RewindOperation,
-    PythonModuleMigration, SQLScriptMigration)
+from nextgisweb.env import DBSession
+from nextgisweb.lib.logging import logger
+from nextgisweb.lib.migration import (
+    ForwardOperation,
+    InitialMigration,
+    InstallOperation,
+    MigrationGraph,
+    MigrationKey,
+    PythonModuleMigration,
+    Registry,
+    RewindOperation,
+    SQLScriptMigration,
+    UninstallOperation,
+)
 
 from .model import Migration as MigrationModel
 

@@ -1,21 +1,21 @@
-from io import BytesIO
-from math import log, ceil, floor
-from itertools import product
-from pathlib import Path
 from base64 import b64encode
+from io import BytesIO
+from itertools import product
+from math import ceil, floor, log
+from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
-from pyramid.response import Response
 from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.response import Response
 
-from ..core.exception import ValidationError, UserException
-from ..resource import Resource, ResourceNotFound, DataScope, resource_factory
-from ..pyramid import JSONType
+from nextgisweb.core.exception import UserException, ValidationError
+from nextgisweb.pyramid import JSONType
+from nextgisweb.resource import DataScope, Resource, ResourceNotFound, resource_factory
 
+from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
 from .util import _, af_transform, zxy_from_request
-from .imgcodec import image_encoder_factory, FORMAT_PNG, COMPRESSION_FAST
 
 
 class InvalidOriginError(UserException):

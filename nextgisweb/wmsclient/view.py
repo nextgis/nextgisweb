@@ -1,5 +1,6 @@
-from ..resource import Widget
-from ..resource.view import resource_sections
+from nextgisweb.resource import Widget
+from nextgisweb.resource.view import resource_sections
+
 from .model import Connection, Layer
 from .util import _
 

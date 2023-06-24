@@ -1,5 +1,6 @@
+from nextgisweb.resource import Widget
+
 from .model import RasterMosaic
-from ..resource import Widget
 
 
 class ItemWidget(Widget):

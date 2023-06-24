@@ -7,23 +7,22 @@ from osgeo import ogr, osr
 from sqlalchemy.orm import registry
 from sqlalchemy.sql import text
 
-from ..lib import db
-from ..core.exception import ValidationError as VE
-from ..env import env
-from ..feature_layer import (
+from nextgisweb.env import DBSession, env
+from nextgisweb.lib import db
+from nextgisweb.lib.json import dumps
+from nextgisweb.lib.ogrhelper import FIELD_GETTER
+from nextgisweb.lib.registry import registry_maker
+
+from nextgisweb.core.exception import ValidationError as VE
+from nextgisweb.feature_layer import (
+    FIELD_FORBIDDEN_NAME,
     FIELD_TYPE,
     GEOM_TYPE,
     GEOM_TYPE_OGR,
     GEOM_TYPE_OGR_2_GEOM_TYPE,
-    FIELD_FORBIDDEN_NAME,
 )
-from ..lib.json import dumps
-from ..lib.ogrhelper import FIELD_GETTER
-from ..env.model import DBSession
-from ..lib.registry import registry_maker
 
 from .util import (
-    _, fix_encoding, utf8len,
     ERROR_FIX,
     FID_SOURCE,
     FIELD_TYPE_2_DB,
@@ -32,6 +31,9 @@ from .util import (
     GEOM_TYPE_2_DB,
     SCHEMA,
     TOGGLE,
+    _,
+    fix_encoding,
+    utf8len,
 )
 
 ERROR_LIMIT = 10

@@ -7,8 +7,11 @@ from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql import ColumnElement, null, text
 from zope.interface import implementer
 
-from ..lib import db
-from ..feature_layer import (
+from nextgisweb.env import DBSession
+from nextgisweb.lib import db
+from nextgisweb.lib.geometry import Geometry
+
+from nextgisweb.feature_layer import (
     Feature,
     FeatureQueryIntersectsMixin,
     FeatureSet,
@@ -22,9 +25,7 @@ from ..feature_layer import (
     IFeatureQueryOrderBy,
     IFeatureQuerySimplify,
 )
-from ..env.model import DBSession
-from ..lib.geometry import Geometry
-from ..spatial_ref_sys import SRS
+from nextgisweb.spatial_ref_sys import SRS
 
 from .table_info import TableInfo
 

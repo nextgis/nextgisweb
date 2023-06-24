@@ -1,6 +1,7 @@
 import numpy as np
 
-from ...spatial_ref_sys.model import SRS, BOUNDS_EPSG_3857
+from nextgisweb.spatial_ref_sys.model import BOUNDS_EPSG_3857, SRS
+
 from ..model import Layer
 
 

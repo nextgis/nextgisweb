@@ -1,9 +1,9 @@
 import sys
-from warnings import warn, filterwarnings
 from dataclasses import dataclass
 from importlib import abc
 from importlib.util import spec_from_loader
 from typing import Dict, Optional
+from warnings import filterwarnings, warn
 
 # Prevent warning about missing __init__.py in migration directory. Is's OK
 # and migration directory is intended for migration scripts.

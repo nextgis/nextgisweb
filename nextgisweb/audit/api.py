@@ -2,15 +2,15 @@ import csv
 from io import StringIO
 from math import ceil
 
-from pyramid.response import Response
-from pyramid.httpexceptions import HTTPNotFound
 from flatdict import FlatDict
+from pyramid.httpexceptions import HTTPNotFound
+from pyramid.response import Response
 
 
 def audit_cget(
     request, date_from=None, date_to=None, user=None, order='desc', limit=None
 ):
-    from elasticsearch_dsl import Search, Q
+    from elasticsearch_dsl import Q, Search
 
     s = Search(
         using=request.env.audit.es,

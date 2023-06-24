@@ -1,32 +1,35 @@
 import math
-import numpy
 from io import BytesIO
+from pkg_resources import resource_filename
 
+import numpy
 from lxml import etree, html
 from lxml.builder import ElementMaker
-from pkg_resources import resource_filename
-from PIL import Image, ImageColor, ImageDraw, ImageFont
-
 from osgeo import gdal, gdal_array
-from pyramid.response import Response
-from pyramid.renderers import render as render_template
+from PIL import Image, ImageColor, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.renderers import render as render_template
+from pyramid.response import Response
 from sqlalchemy.orm.exc import NoResultFound
 
-from ..core.exception import InsufficientPermissions, ValidationError
-from ..pyramid.exception import json_error
-from ..lib.json import dumps
-from ..lib.geometry import Geometry
-from ..lib.ows import parse_request, parse_srs, SRSParseError
-from ..render import ILegendableStyle, image_encoder_factory
-from ..render import FORMAT_PNG, FORMAT_JPEG, COMPRESSION_FAST, COMPRESSION_DEFAULT
-from ..resource import (
-    resource_factory,
-    ServiceScope, DataScope)
-from ..spatial_ref_sys import SRS
+from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.json import dumps
+from nextgisweb.lib.ows import SRSParseError, parse_request, parse_srs
+
+from nextgisweb.core.exception import InsufficientPermissions, ValidationError
+from nextgisweb.pyramid.exception import json_error
+from nextgisweb.render import (
+    COMPRESSION_DEFAULT,
+    COMPRESSION_FAST,
+    FORMAT_JPEG,
+    FORMAT_PNG,
+    ILegendableStyle,
+    image_encoder_factory,
+)
+from nextgisweb.resource import DataScope, ServiceScope, resource_factory
+from nextgisweb.spatial_ref_sys import SRS
 
 from .model import Service
-
 
 NS_XLINK = 'http://www.w3.org/1999/xlink'
 

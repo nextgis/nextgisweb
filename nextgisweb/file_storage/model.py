@@ -2,7 +2,7 @@ import uuid
 
 import sqlalchemy as sa
 
-from ..env.model import declarative_base
+from nextgisweb.env import declarative_base
 
 Base = declarative_base()
 

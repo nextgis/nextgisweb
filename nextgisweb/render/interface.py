@@ -1,6 +1,6 @@
-from zope.interface import Interface, Attribute
+from zope.interface import Attribute, Interface
 
-from ..resource import IResourceBase
+from nextgisweb.resource import IResourceBase
 
 
 class IRenderableStyle(IResourceBase):

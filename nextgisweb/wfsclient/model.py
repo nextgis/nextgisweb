@@ -2,24 +2,27 @@ import re
 from datetime import date, datetime, time
 from io import BytesIO
 
-from lxml import etree
-from owslib.crs import Crs
 import requests
+from lxml import etree
 from osgeo import ogr
+from owslib.crs import Crs
 from requests.exceptions import RequestException
 from shapely.geometry import box
 from zope.interface import implementer
 
-from ..lib import db
-from ..core.exception import ForbiddenError, ValidationError, ExternalServiceError
-from ..env import env
-from ..feature_layer import (
-    Feature,
-    FeatureQueryIntersectsMixin,
-    FeatureSet,
+from nextgisweb.env import declarative_base, env
+from nextgisweb.lib import db
+from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.ows import FIELD_TYPE_WFS
+
+from nextgisweb.core.exception import ExternalServiceError, ForbiddenError, ValidationError
+from nextgisweb.feature_layer import (
     FIELD_TYPE,
     GEOM_TYPE,
     GEOM_TYPE_OGR_2_GEOM_TYPE,
+    Feature,
+    FeatureQueryIntersectsMixin,
+    FeatureSet,
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
@@ -28,24 +31,21 @@ from ..feature_layer import (
     LayerField,
     LayerFieldsMixin,
 )
-from ..layer import SpatialLayerMixin
-from ..lib.geometry import Geometry
-from ..lib.ows import FIELD_TYPE_WFS
-from ..env.model import declarative_base
-from ..resource import (
+from nextgisweb.layer import SpatialLayerMixin
+from nextgisweb.resource import (
     ConnectionScope,
     DataScope,
     DataStructureScope,
     Resource,
     ResourceGroup,
-    SerializedProperty as SP,
-    SerializedRelationship as SR,
-    SerializedResourceRelationship as SRR,
     Serializer,
 )
-from ..spatial_ref_sys import SRS
+from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import SerializedRelationship as SR
+from nextgisweb.resource import SerializedResourceRelationship as SRR
+from nextgisweb.spatial_ref_sys import SRS
 
-from .util import _, COMP_ID
+from .util import COMP_ID, _
 
 WFS_2_FIELD_TYPE = {
     FIELD_TYPE_WFS.INT: FIELD_TYPE.INTEGER,

@@ -1,5 +1,6 @@
-from ..resource import DataScope, resource_factory
-from ..pyramid import JSONType
+from nextgisweb.pyramid import JSONType
+from nextgisweb.resource import DataScope, resource_factory
+
 from .interface import IBboxLayer
 
 

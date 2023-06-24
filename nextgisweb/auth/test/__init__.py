@@ -1,10 +1,10 @@
-import pytest
 from unittest.mock import patch
 
+import pytest
 from pyramid.interfaces import ISecurityPolicy
 
-from ..policy import AuthResult, AuthProvider, AuthMedium
 from ..model import User
+from ..policy import AuthMedium, AuthProvider, AuthResult
 
 
 @pytest.fixture()

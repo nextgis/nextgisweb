@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Optional, Union, Callable
 from inspect import signature
+from typing import Callable, Optional, Union
 
 from docstring_parser import parse as docstring_parse
 
-from .param import Param
 from .argparse import ArgumentParser as _ArgumentParser
-
+from .param import Param
 
 NS_CMD_GRP_ATTR = '_cmd_or_grp'
 NS_PARSER_ATTR = '_parser'

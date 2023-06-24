@@ -1,5 +1,6 @@
-from ..env import Component, require
-from ..core import KindOfData
+from nextgisweb.env import Component, require
+
+from nextgisweb.core import KindOfData
 
 from .model import Base, FeatureAttachment
 from .util import _
@@ -19,7 +20,7 @@ class FeatureAttachmentComponent(Component):
         from . import extension # NOQA
 
     def setup_pyramid(self, config):
-        from . import view, api
+        from . import api, view
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 

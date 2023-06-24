@@ -1,32 +1,32 @@
-import sys
 import io
+import json
+import logging
 import os
 import os.path
-import logging
-import json
 import re
+import sys
+from argparse import ArgumentParser, Namespace
+from collections import defaultdict
+from functools import partial
 from importlib import import_module
 from packaging import version as pkg_version
 from pathlib import Path
-from argparse import ArgumentParser, Namespace
 from pkg_resources import resource_filename
-from collections import defaultdict
-from functools import partial
 from tempfile import NamedTemporaryFile
 from time import sleep
 
+from attr import asdict, attrib, attrs
 from babel.messages.catalog import Catalog
-from babel.messages.frontend import parse_mapping
 from babel.messages.extract import extract_from_dir
-from babel.messages.pofile import write_po, read_po
+from babel.messages.frontend import parse_mapping
 from babel.messages.mofile import write_mo
-from attr import attrs, attrib, asdict
+from babel.messages.pofile import read_po, write_po
 from poeditor import POEditorAPI
 
-from ..lib.config import load_config
-from ..lib.logging import logger
-from ..env.package import pkginfo
-from ..env import Env, env
+from nextgisweb.env import Env, env
+from nextgisweb.env.package import pkginfo
+from nextgisweb.lib.config import load_config
+from nextgisweb.lib.logging import logger
 
 from .util import to_gettext_locale, to_http_locale
 

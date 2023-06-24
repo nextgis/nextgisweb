@@ -1,10 +1,6 @@
 import pytest
 
-from ..annotation import (
-    Option,
-    ConfigOptions,
-    MissingAnnotationWarning,
-    MissingDefaultError)
+from ..annotation import ConfigOptions, MissingAnnotationWarning, MissingDefaultError, Option
 
 
 @pytest.fixture(scope='module')

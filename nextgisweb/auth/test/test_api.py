@@ -1,14 +1,15 @@
 from datetime import datetime, timedelta
 from itertools import product
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 import transaction
 from freezegun import freeze_time
 
-from ...lib import db
-from ...auth import User, Group
-from ...env.model import DBSession
+from nextgisweb.env import DBSession
+from nextgisweb.lib import db
+
+from nextgisweb.auth import Group, User
 
 
 @pytest.fixture(scope='module', autouse=True)

@@ -1,7 +1,8 @@
-import pytest
 from packaging.version import Version
 
-from ..backup import IndexFile, IndexRecord, parse_pg_dump_version, backup
+import pytest
+
+from ..backup import IndexFile, IndexRecord, backup, parse_pg_dump_version
 
 
 def test_index_file_read_write(tmp_path):

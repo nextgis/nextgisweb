@@ -1,11 +1,11 @@
 import requests
 from requests.exceptions import RequestException
 
-from ..core.exception import ExternalServiceError
-from ..resource import ConnectionScope, resource_factory
-from ..pyramid import JSONType
+from nextgisweb.core.exception import ExternalServiceError
+from nextgisweb.pyramid import JSONType
+from nextgisweb.resource import ConnectionScope, resource_factory
 
-from .model import Connection, NEXTGIS_GEOSERVICES
+from .model import NEXTGIS_GEOSERVICES, Connection
 
 
 def inspect_connection(request) -> JSONType:

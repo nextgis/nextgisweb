@@ -2,23 +2,23 @@ from datetime import datetime, timedelta
 from urllib.parse import urlencode, urlparse
 
 import transaction
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.orm import defer, undefer
 from pyramid.httpexceptions import HTTPForbidden
+from sqlalchemy.orm import defer, undefer
+from sqlalchemy.orm.exc import NoResultFound
 
-from ..lib.config import OptionAnnotations, Option
-from ..lib.logging import logger
-from ..env import Component
-from ..core.exception import ValidationError
-from ..env.model import DBSession
-from ..pyramid import Session, SessionStore
-from ..pyramid.util import gensecret
-from ..lib import db
+from nextgisweb.env import Component, DBSession
+from nextgisweb.lib import db
+from nextgisweb.lib.config import Option, OptionAnnotations
+from nextgisweb.lib.logging import logger
 
-from .model import Base, User, Group
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.pyramid import Session, SessionStore
+from nextgisweb.pyramid.util import gensecret
+
 from .exception import UserDisabledException
-from .policy import SecurityPolicy, AuthState, AuthProvider
-from .oauth import OAuthHelper, OAuthPToken, OAuthAToken
+from .model import Base, Group, User
+from .oauth import OAuthAToken, OAuthHelper, OAuthPToken
+from .policy import AuthProvider, AuthState, SecurityPolicy
 from .util import _
 
 
@@ -146,7 +146,7 @@ class AuthComponent(Component):
         config.set_security_policy(SecurityPolicy(
             self, self.options.with_prefix('policy')))
 
-        from . import view, api
+        from . import api, view
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 

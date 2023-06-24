@@ -1,52 +1,47 @@
 import re
 import uuid
 
-from zope.interface import implementer
+import geoalchemy2 as ga
 from osgeo import gdal, ogr
 from shapely.geometry import box
+from sqlalchemy import event, func, inspect, sql
+from zope.interface import implementer
 
-import geoalchemy2 as ga
-from sqlalchemy import event, func, sql, inspect
+from nextgisweb.env import DBSession, declarative_base, env
+from nextgisweb.lib import db
+from nextgisweb.lib.ogrhelper import read_dataset
 
-from ..lib import db
-from ..core.exception import ValidationError as VE
-from ..resource import (
-    Resource,
-    DataScope,
-    DataStructureScope,
-    Serializer,
-    SerializedProperty as SP,
-    SerializedRelationship as SR,
-    ResourceGroup)
-from ..spatial_ref_sys import SRS
-from ..env import env
-from ..env.model import declarative_base, DBSession
-from ..layer import SpatialLayerMixin, IBboxLayer
-from ..lib.ogrhelper import read_dataset
-from ..feature_layer import (
-    LayerField,
-    LayerFieldsMixin,
-    GEOM_TYPE,
+from nextgisweb.core.exception import ValidationError as VE
+from nextgisweb.feature_layer import (
     FIELD_TYPE,
+    GEOM_TYPE,
     IFeatureLayer,
     IFieldEditableFeatureLayer,
     IWritableFeatureLayer,
+    LayerField,
+    LayerFieldsMixin,
     on_data_change,
-    query_feature_or_not_found)
+    query_feature_or_not_found,
+)
+from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
+from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceGroup, Serializer
+from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import SerializedRelationship as SR
+from nextgisweb.spatial_ref_sys import SRS
 
 from .feature_query import FeatureQueryBase, calculate_extent
-from .table_info import TableInfo
 from .kind_of_data import VectorLayerData
+from .table_info import TableInfo
 from .util import (
-    _, COMP_ID,
+    COMP_ID,
     ERROR_FIX,
     FID_SOURCE,
     FIELD_TYPE_2_DB,
     FIELD_TYPE_SIZE,
-    TOGGLE,
     SCHEMA,
+    TOGGLE,
+    _,
 )
-
 
 GEOM_TYPE_DISPLAY = (
     _("Point"), _("Line"), _("Polygon"),

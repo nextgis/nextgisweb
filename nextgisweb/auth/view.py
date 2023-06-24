@@ -1,26 +1,25 @@
-from datetime import datetime
-from urllib.parse import urlencode, parse_qsl
-
-import string
 import secrets
-import zope.event
+import string
+from datetime import datetime
+from urllib.parse import parse_qsl, urlencode
+
 import sqlalchemy as sa
-
+import zope.event
 from pyramid.events import BeforeRender
-from pyramid.security import remember, forget
-from pyramid.renderers import render_to_response
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
-from sqlalchemy.orm.exc import NoResultFound
 from pyramid.interfaces import ISecurityPolicy
+from pyramid.renderers import render_to_response
+from pyramid.security import forget, remember
+from sqlalchemy.orm.exc import NoResultFound
 
-from ..env.model import DBSession
-from ..pyramid import SessionStore, WebSession, viewargs, JSONType
-from ..lib import dynmenu as dm
+from nextgisweb.env import DBSession
+from nextgisweb.lib import dynmenu as dm
 
-from .model import Principal, User, Group
+from nextgisweb.pyramid import JSONType, SessionStore, WebSession, viewargs
 
-from .exception import InvalidCredentialsException, UserDisabledException, ALinkException
-from .oauth import InvalidTokenException, AuthorizationException
+from .exception import ALinkException, InvalidCredentialsException, UserDisabledException
+from .model import Group, Principal, User
+from .oauth import AuthorizationException, InvalidTokenException
 from .policy import AuthProvider, AuthState, OnUserLogin
 from .util import _
 

@@ -1,7 +1,7 @@
-from ..env import Component, require
+from nextgisweb.env import Component, require
 
-from .util import COMP_ID
 from .model import Base
+from .util import COMP_ID
 
 
 class SocialComponent(Component):

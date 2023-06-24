@@ -5,22 +5,20 @@ from pathlib import Path
 import pytest
 from osgeo import ogr
 
-from ...lib.geometry import Geometry, Transformer
-from ...postgis.test import create_feature_layer as create_postgis_layer
-from ...spatial_ref_sys import SRS
-from ...spatial_ref_sys.model import WKT_EPSG_4326
-from ...vector_layer.test import create_feature_layer as create_vector_layer
-from ...wfsclient import WFSLayer
-from ...wfsclient.test import create_feature_layer as create_wfs_layer
+from nextgisweb.lib.geometry import Geometry, Transformer
+
+from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
+from nextgisweb.spatial_ref_sys import SRS, WKT_EPSG_4326
+from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
+from nextgisweb.wfsclient import WFSLayer
+from nextgisweb.wfsclient.test import create_feature_layer as create_wfs_layer
 
 from ..interface import (
     IFeatureQueryFilter,
     IFeatureQueryFilterBy,
     IFeatureQueryOrderBy,
 )
-
 from .data import generate_filter_extents
-
 
 data_points = Path(__file__).parent / 'data' / 'points.geojson'
 filter_cases = (

@@ -1,9 +1,9 @@
 import re
-
 from packaging.version import Version
+
 from sqlalchemy import text
 
-from ...env.model import DBSession
+from nextgisweb.env import DBSession
 
 
 def test_postgres_version(ngw_txn):

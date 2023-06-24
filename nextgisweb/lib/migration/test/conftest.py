@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from nextgisweb.lib.migration.registry import Registry
-from nextgisweb.lib.migration.graph import MigrationGraph
+from ..graph import MigrationGraph
+from ..registry import Registry
 
 
 @pytest.fixture(scope='module')

@@ -1,10 +1,11 @@
-from ..pyramid import viewargs
-from ..lib.dynmenu import Link, DynItem
-from ..feature_layer import IFeatureLayer
-from ..layer.interface import IBboxLayer
-from ..render import IRenderableStyle
-from ..resource import DataScope, Resource, ResourceScope, resource_factory
-from ..raster_layer import RasterLayer
+from nextgisweb.lib.dynmenu import DynItem, Link
+
+from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.layer.interface import IBboxLayer
+from nextgisweb.pyramid import viewargs
+from nextgisweb.raster_layer import RasterLayer
+from nextgisweb.render import IRenderableStyle
+from nextgisweb.resource import DataScope, Resource, ResourceScope, resource_factory
 
 from .util import _
 

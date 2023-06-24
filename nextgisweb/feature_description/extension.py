@@ -1,5 +1,6 @@
-from ..feature_layer import FeatureExtension
-from ..env.model import DBSession
+from nextgisweb.env import DBSession
+
+from nextgisweb.feature_layer import FeatureExtension
 
 from .model import FeatureDescription
 

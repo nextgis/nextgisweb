@@ -1,2 +1,2 @@
 from .component import WMSServerComponent
-from .model import Service, Layer
+from .model import Layer, Service

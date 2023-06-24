@@ -1,4 +1,4 @@
-from ...lib.registry import list_registry
+from nextgisweb.lib.registry import list_registry
 
 
 @list_registry

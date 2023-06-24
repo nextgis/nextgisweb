@@ -1,9 +1,9 @@
 import re
 from time import time
 
-from ..lib.i18n import trstr_factory
-from ..lib.logging import lazy_str
-from ..lib.json import dumps as json_dumps
+from nextgisweb.lib.i18n import trstr_factory
+from nextgisweb.lib.json import dumps as json_dumps
+from nextgisweb.lib.logging import lazy_str
 
 COMP_ID = 'auth'
 _ = trstr_factory(COMP_ID)

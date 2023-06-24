@@ -1,6 +1,6 @@
 import pytest
 
-from ...spatial_ref_sys.model import SRS, BOUNDS_EPSG_3857, BOUNDS_EPSG_4326
+from nextgisweb.spatial_ref_sys.model import BOUNDS_EPSG_3857, BOUNDS_EPSG_4326, SRS
 
 from ..util import crop_box, render_zoom
 

@@ -1,6 +1,7 @@
-from ..lib import db
-from ..env.model import declarative_base
-from ..resource import Resource
+from nextgisweb.env import declarative_base
+from nextgisweb.lib import db
+
+from nextgisweb.resource import Resource
 
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
 

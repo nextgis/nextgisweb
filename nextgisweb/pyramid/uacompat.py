@@ -1,15 +1,15 @@
-from typing import Union, Optional
+from binascii import crc32
 from dataclasses import dataclass
 from functools import lru_cache
-from binascii import crc32
+from typing import Optional, Union
 
+from pyramid.events import NewRequest
 from pyramid.httpexceptions import HTTPSeeOther
 from pyramid.response import Response
-from pyramid.events import NewRequest
 
-from ..lib.config import Option, OptionType, OptionAnnotations
+from nextgisweb.lib.config import Option, OptionAnnotations, OptionType
+
 from .util import viewargs
-
 
 FAMILIES = dict()
 FOPTIONS = []

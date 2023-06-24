@@ -1,23 +1,18 @@
 from osgeo import ogr
-from sqlalchemy.orm import declared_attr
 from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.orm import declared_attr
 
-from ..lib import db
-from ..core.exception import ValidationError
-from ..lib.geometry import Transformer
-from ..env.model import declarative_base
-from ..resource import (
-    Resource,
-    DataStructureScope,
-    Serializer,
-    SerializedProperty as SP)
-from ..spatial_ref_sys import SRS
-from ..lookup_table import LookupTable
+from nextgisweb.env import declarative_base
+from nextgisweb.lib import db
+from nextgisweb.lib.geometry import Transformer
 
-from .interface import (
-    FIELD_TYPE,
-    FIELD_TYPE_OGR)
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.lookup_table import LookupTable
+from nextgisweb.resource import DataStructureScope, Resource, Serializer
+from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.spatial_ref_sys import SRS
 
+from .interface import FIELD_TYPE, FIELD_TYPE_OGR
 from .util import _
 
 Base = declarative_base(dependencies=('resource', 'lookup_table'))

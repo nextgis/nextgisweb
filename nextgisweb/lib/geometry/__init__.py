@@ -2,15 +2,14 @@ from warnings import warn
 
 from osgeo import gdal, ogr, osr
 from pyproj import CRS
-from shapely import wkt, wkb
-from shapely.geometry import (
-    mapping as geometry_mapping,
-    shape as geometry_shape,
-    box as geometry_box)
+from shapely import wkb, wkt
+from shapely.geometry import box as geometry_box
+from shapely.geometry import mapping as geometry_mapping
+from shapely.geometry import shape as geometry_shape
 from shapely.ops import transform as map_coords
 
-from ..osrhelper import sr_from_wkt
 from ..ogrhelper import cohere_bytes
+from ..osrhelper import sr_from_wkt
 
 
 class GeometryNotValid(ValueError):

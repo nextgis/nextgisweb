@@ -1,19 +1,21 @@
 from pyramid.httpexceptions import HTTPNotFound
 
-from ..resource import (
+from nextgisweb.lib import dynmenu as dm
+
+from nextgisweb.pyramid import JSONType, viewargs
+from nextgisweb.resource import (
+    DataScope,
+    DataStructureScope,
     Resource,
     ResourceScope,
-    DataStructureScope,
-    DataScope,
+    Widget,
     resource_factory,
-    Widget)
-from ..resource.view import resource_sections
-from ..resource.extaccess import ExternalAccessLink
-from ..pyramid import viewargs, JSONType
-from ..lib import dynmenu as dm
+)
+from nextgisweb.resource.extaccess import ExternalAccessLink
+from nextgisweb.resource.view import resource_sections
 
-from .interface import IFeatureLayer
 from .extension import FeatureExtension
+from .interface import IFeatureLayer
 from .ogrdriver import MVT_DRIVER_EXIST
 from .util import _
 

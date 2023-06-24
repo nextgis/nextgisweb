@@ -1,21 +1,21 @@
-import re
 import base64
+import re
 from datetime import timedelta
 from urllib.parse import unquote
 
-from pyramid.response import Response, FileResponse
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
+from pyramid.response import FileResponse, Response
 
-from ..lib import json
-from ..lib.logging import logger
-from ..env import env
-from ..core import KindOfData
-from ..core.exception import ValidationError
-from ..env.model import DBSession
-from ..resource import Resource, MetadataScope
-from ..pyramid import JSONType
+from nextgisweb.env import DBSession, env
+from nextgisweb.lib import json
+from nextgisweb.lib.logging import logger
 
-from .util import _, ClientRoutePredicate, gensecret, parse_origin
+from nextgisweb.core import KindOfData
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.pyramid import JSONType
+from nextgisweb.resource import MetadataScope, Resource
+
+from .util import ClientRoutePredicate, _, gensecret, parse_origin
 
 
 def _get_cors_olist():

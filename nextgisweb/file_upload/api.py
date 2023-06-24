@@ -1,21 +1,20 @@
 import pickle
 import re
+from base64 import b64decode
 from os import unlink
 from os.path import isfile
 from shutil import copyfileobj
-from base64 import b64decode
 
 import magic
-
 import pyramid.httpexceptions as exc
 from pyramid.response import Response
 
-from ..env import env
-from ..core.exception import UserException
-from ..lib import json
+from nextgisweb.env import env
+from nextgisweb.lib import json
+
+from nextgisweb.core.exception import UserException
 
 from .util import _
-
 
 BUF_SIZE = 1024 * 1024
 

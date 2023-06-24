@@ -1,8 +1,5 @@
-from sqlalchemy.orm import (
-    declarative_base as sa_declarative_base,
-    scoped_session,
-    sessionmaker,
-)
+from sqlalchemy.orm import declarative_base as sa_declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from zope.sqlalchemy import register
 

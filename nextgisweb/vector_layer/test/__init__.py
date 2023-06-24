@@ -3,9 +3,10 @@ from uuid import uuid4
 
 import transaction
 
-from ...auth import User
-from ...env.model import DBSession
-from ...spatial_ref_sys import SRS
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
 
 from .. import VectorLayer
 

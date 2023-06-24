@@ -1,4 +1,4 @@
-from ..env.cli import cli, EnvCommand
+from nextgisweb.env.cli import EnvCommand, cli
 
 from .component import FileUploadComponent
 

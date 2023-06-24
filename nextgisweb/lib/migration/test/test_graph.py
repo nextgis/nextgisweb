@@ -1,6 +1,6 @@
-from ..revision import REVID_ZERO
-from ..registry import MigrationKey
 from ..graph import resolve
+from ..registry import MigrationKey
+from ..revision import REVID_ZERO
 
 
 def test_ancestors(graph):

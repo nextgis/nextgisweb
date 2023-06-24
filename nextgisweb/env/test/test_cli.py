@@ -1,7 +1,9 @@
-from ...lib.clann import ArgumentParser
-from ...env import Env
-from ...core import CoreComponent
-from ..cli import bootstrap, cli, EnvCommand
+from nextgisweb.env import Env
+from nextgisweb.lib.clann import ArgumentParser
+
+from nextgisweb.core import CoreComponent
+
+from ..cli import EnvCommand, bootstrap, cli
 
 
 @cli.command()

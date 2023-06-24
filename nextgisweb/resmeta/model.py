@@ -1,10 +1,7 @@
-from ..lib import db
-from ..env.model import declarative_base
-from ..resource import (
-    Resource,
-    MetadataScope,
-    Serializer,
-    SerializedProperty)
+from nextgisweb.env import declarative_base
+from nextgisweb.lib import db
+
+from nextgisweb.resource import MetadataScope, Resource, SerializedProperty, Serializer
 
 from .util import COMP_ID, _
 

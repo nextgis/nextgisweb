@@ -3,9 +3,10 @@ import json
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from ...lib.json import dumps
-from ...env.model import DBSession
-from ...auth import User
+from nextgisweb.env import DBSession
+from nextgisweb.lib.json import dumps
+
+from nextgisweb.auth import User
 
 from .. import Resource, ResourceGroup
 from ..serialize import CompositeSerializer

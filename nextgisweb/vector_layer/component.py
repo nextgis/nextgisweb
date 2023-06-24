@@ -1,5 +1,4 @@
-from ..env import Component, require
-from ..lib.config import Option
+from nextgisweb.env import Component, require
 
 from .kind_of_data import VectorLayerData
 from .model import Base, VectorLayer, estimate_vector_layer_data

@@ -1,21 +1,21 @@
-from datetime import date, time, datetime
+from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
 import webtest
 from osgeo import ogr, osr
 
-from ...core.exception import ValidationError
-from ...env.model import DBSession
-from ...auth import User
-from ...spatial_ref_sys import SRS
-from ...feature_layer import FIELD_TYPE
-from ...lib.ogrhelper import read_dataset
+from nextgisweb.env import DBSession
+from nextgisweb.lib.ogrhelper import read_dataset
+
+from nextgisweb.auth import User
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.feature_layer import FIELD_TYPE
+from nextgisweb.spatial_ref_sys import SRS
 
 from .. import VectorLayer
 from ..table_info import ERROR_LIMIT
 from ..util import ERROR_FIX, FID_SOURCE
-
 
 DATA_PATH = Path(__file__).parent / 'data'
 

@@ -1,31 +1,31 @@
-import re
 import itertools
+import re
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import lru_cache
 from hashlib import sha512
-from urllib.parse import urlencode
 from secrets import token_hex
-from dataclasses import dataclass
+from urllib.parse import urlencode
 
 import requests
 import sqlalchemy as sa
 import zope.event
-from sqlalchemy.orm import load_only, defer, joinedload
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.dialects.postgresql import insert as pg_insert
-from requests.exceptions import InvalidJSONError
 from passlib.hash import sha256_crypt
+from requests.exceptions import InvalidJSONError
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.orm import defer, joinedload, load_only
+from sqlalchemy.orm.exc import NoResultFound
 
-from ..lib.config import OptionAnnotations, Option
-from ..lib.logging import logger, lazy_str
-from ..env import env
-from ..env.model import DBSession
-from ..core.exception import UserException
+from nextgisweb.env import DBSession, env
+from nextgisweb.lib.config import Option, OptionAnnotations
+from nextgisweb.lib.logging import lazy_str, logger
 
-from .model import User, Group, OAuthAToken, OAuthPToken
+from nextgisweb.core.exception import UserException
+
 from .exception import UserDisabledException
-from .util import _, current_tstamp, clean_user_keyname, enum_name, log_lazy_data as lf
-
+from .model import Group, OAuthAToken, OAuthPToken, User
+from .util import _, clean_user_keyname, current_tstamp, enum_name
+from .util import log_lazy_data as lf
 
 MAX_TOKEN_LENGTH = 250
 

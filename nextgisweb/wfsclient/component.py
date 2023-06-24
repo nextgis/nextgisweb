@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from ..env import Component, require
-from ..lib.config import Option
+from nextgisweb.env import Component, require
+from nextgisweb.lib.config import Option
 
 from .model import Base
 
@@ -19,8 +19,7 @@ class WFSClientComponent(Component):
 
     @require('feature_layer')
     def setup_pyramid(self, config):
-        from . import api
-        from . import view  # NOQA
+        from . import api, view  # NOQA: F401
         api.setup_pyramid(self, config)
 
     option_annotations = (

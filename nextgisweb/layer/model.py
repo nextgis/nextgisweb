@@ -1,4 +1,5 @@
-from ..spatial_ref_sys import SRSMixin
+from nextgisweb.spatial_ref_sys import SRSMixin
+
 from .util import _
 
 

@@ -1,36 +1,34 @@
-import re
 import json
-from io import BytesIO
+import re
 from datetime import datetime
+from io import BytesIO
 
 import PIL
 import requests
-from zope.interface import implementer
 from lxml import etree
-from owslib.wms import WebMapService
 from owslib.map.common import WMSCapabilitiesReader
+from owslib.wms import WebMapService
 from pyramid.url import urlencode
 from requests.exceptions import RequestException
+from zope.interface import implementer
 
-from ..lib import db
-from ..core.exception import ExternalServiceError, ValidationError
-from ..env import env
-from ..env.model import declarative_base
-from ..resource import (
-    Resource,
+from nextgisweb.env import declarative_base, env
+from nextgisweb.lib import db
+
+from nextgisweb.core.exception import ExternalServiceError, ValidationError
+from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
+from nextgisweb.render import IExtentRenderRequest, IRenderableStyle, ITileRenderRequest
+from nextgisweb.resource import (
     ConnectionScope,
-    DataStructureScope,
     DataScope,
+    DataStructureScope,
+    Resource,
+    ResourceGroup,
     Serializer,
-    SerializedProperty as SP,
-    SerializedRelationship as SR,
-    SerializedResourceRelationship as SRR,
-    ResourceGroup)
-from ..layer import SpatialLayerMixin, IBboxLayer
-from ..render import (
-    IRenderableStyle,
-    IExtentRenderRequest,
-    ITileRenderRequest)
+)
+from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import SerializedRelationship as SR
+from nextgisweb.resource import SerializedResourceRelationship as SRR
 
 from .util import _
 

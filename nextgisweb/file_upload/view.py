@@ -1,4 +1,5 @@
-from ..pyramid import viewargs
+from nextgisweb.pyramid import viewargs
+
 from .util import _
 
 

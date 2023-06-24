@@ -1,17 +1,17 @@
-import sys
 import logging
+import sys
 from argparse import ArgumentParser as SystemArgumentParser
-from textwrap import wrap
 from contextlib import contextmanager
+from textwrap import wrap
 
 # Workaround for https://bugs.python.org/issue47082
 import numpy  # NOQA
 
-from .lib.clann import ArgumentParser, Command, NS_CMD_GRP_ATTR
-from .lib.config import Option, NO_DEFAULT, key_to_environ
-from .env.cli import cli, bootstrap, EnvCommand
-from .env.legacy_command import Command as LegacyCommand
-from .env import Env, env
+from nextgisweb.env import Env, env
+from nextgisweb.env.cli import EnvCommand, bootstrap, cli
+from nextgisweb.env.legacy_command import Command as LegacyCommand
+from nextgisweb.lib.clann import NS_CMD_GRP_ATTR, ArgumentParser, Command
+from nextgisweb.lib.config import NO_DEFAULT, Option, key_to_environ
 
 
 def config(argv=sys.argv):

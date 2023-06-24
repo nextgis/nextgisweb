@@ -6,11 +6,8 @@ from .imgcodec import (
     COMPRESSION_FAST,
     FORMAT_JPEG,
     FORMAT_PNG,
-    image_encoder_factory)
-from .interface import (
-    IExtentRenderRequest,
-    ILegendableStyle,
-    IRenderableStyle,
-    ITileRenderRequest)
+    image_encoder_factory,
+)
+from .interface import IExtentRenderRequest, ILegendableStyle, IRenderableStyle, ITileRenderRequest
 from .legend import ILegendSymbols, LegendSymbol
 from .model import ResourceTileCache

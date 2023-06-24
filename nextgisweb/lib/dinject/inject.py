@@ -1,7 +1,7 @@
 from functools import partial, update_wrapper
-from inspect import signature, Signature
+from inspect import Signature, signature
 from types import MethodType
-from typing import Any, Callable, Dict, Hashable, Optional, Type, Sequence
+from typing import Any, Callable, Dict, Hashable, Optional, Sequence, Type
 
 from .container import Argument, BoundArgument, Container
 

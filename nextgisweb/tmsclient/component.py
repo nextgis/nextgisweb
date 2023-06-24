@@ -1,9 +1,9 @@
 from datetime import timedelta
 
-from ..env import Component, require
-from ..lib.config import Option
+from nextgisweb.env import Component, require
+from nextgisweb.lib.config import Option
 
-from .model import Base, SCHEME
+from .model import SCHEME, Base
 
 
 class TMSClientComponent(Component):

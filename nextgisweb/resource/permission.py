@@ -1,7 +1,7 @@
 from collections import UserList
 from functools import reduce
 
-from ..lib.registry import DictRegistry
+from nextgisweb.lib.registry import DictRegistry
 
 
 class RequirementList(UserList):

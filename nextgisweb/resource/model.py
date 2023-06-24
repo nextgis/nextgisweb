@@ -2,26 +2,24 @@ from collections import namedtuple
 from datetime import datetime
 from types import MappingProxyType
 
-from sqlalchemy import event, text, func
+from sqlalchemy import event, func, text
 
-from ..lib import db
-from ..auth import Principal, User, Group, OnFindReferencesData
-from ..core.exception import ValidationError, ForbiddenError
-from ..env import env
-from ..env.model import declarative_base, DBSession
-from ..lib.registry import DictRegistry
+from nextgisweb.env import DBSession, declarative_base, env
+from nextgisweb.lib import db
+from nextgisweb.lib.registry import DictRegistry
 
-from .util import _
+from nextgisweb.auth import Group, OnFindReferencesData, Principal, User
+from nextgisweb.core.exception import ForbiddenError, ValidationError
+
+from .exception import DisplayNameNotUnique, HierarchyError
 from .interface import providedBy
-from .serialize import (
-    Serializer,
-    SerializedProperty as SP,
-    SerializedRelationship as SR,
-    SerializedResourceRelationship as SRR)
-from .scope import DataScope, ResourceScope, MetadataScope
 from .permission import RequirementList
-from .exception import HierarchyError, DisplayNameNotUnique
-
+from .scope import DataScope, MetadataScope, ResourceScope
+from .serialize import SerializedProperty as SP
+from .serialize import SerializedRelationship as SR
+from .serialize import SerializedResourceRelationship as SRR
+from .serialize import Serializer
+from .util import _
 
 Base = declarative_base(dependencies=('auth', ))
 

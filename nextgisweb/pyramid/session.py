@@ -5,10 +5,10 @@ from pyramid.interfaces import ISession
 from sqlalchemy.orm.exc import NoResultFound
 from zope.interface import implementer
 
-from ..env.model import DBSession
+from nextgisweb.env import DBSession
 
 from .model import Session, SessionStore
-from .util import gensecret, datetime_to_unix
+from .util import datetime_to_unix, gensecret
 
 __all__ = ['WebSession']
 

@@ -4,8 +4,9 @@ from uuid import uuid4
 import pytest
 import transaction
 
-from ...env.model import DBSession
-from ...auth import User
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import User
 
 from ..model import ResourceGroup
 

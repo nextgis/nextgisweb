@@ -1,8 +1,8 @@
 from sqlalchemy.sql import text as literal_sql
 
-from ..lib.logging import logger
-from ..env.cli import DryRunOptions, EnvCommand, cli, opt
-from ..env.model import DBSession
+from nextgisweb.env import DBSession
+from nextgisweb.env.cli import DryRunOptions, EnvCommand, cli, opt
+from nextgisweb.lib.logging import logger
 
 from .model import SCHEMA
 

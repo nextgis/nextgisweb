@@ -1,7 +1,7 @@
-from ..lib import db
-from ..lib.i18n import trstr_factory
-from ..feature_layer import FIELD_TYPE, FIELD_TYPE_OGR, GEOM_TYPE
+from nextgisweb.lib import db
+from nextgisweb.lib.i18n import trstr_factory
 
+from nextgisweb.feature_layer import FIELD_TYPE, FIELD_TYPE_OGR, GEOM_TYPE
 
 COMP_ID = 'vector_layer'
 _ = trstr_factory(COMP_ID)

@@ -6,13 +6,14 @@ import pytest
 import transaction
 from osgeo import ogr
 
-from ...auth import User
-from ...env.model import DBSession
-from ...spatial_ref_sys import SRS
-from ...vector_layer import VectorLayer
+from nextgisweb.env import DBSession
 
-from ..model import Service as WFSService, Layer as WFSLayer
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer import VectorLayer
 
+from ..model import Layer as WFSLayer
+from ..model import Service as WFSService
 
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
 

@@ -1,5 +1,6 @@
 from functools import partial
-from .cmd_grp import Group, Command
+
+from .cmd_grp import Command, Group
 
 
 def _decorator(cls, *args, **kwargs):

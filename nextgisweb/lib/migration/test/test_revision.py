@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import pytest
 
-from ..revision import REVID_LENGTH, EPOCH_START, EPOCH_END, revid
+from ..revision import EPOCH_END, EPOCH_START, REVID_LENGTH, revid
 
 
 def test_start_end():

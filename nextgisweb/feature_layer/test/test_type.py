@@ -5,10 +5,11 @@ import pytest
 import transaction
 from osgeo import ogr
 
-from ...auth import User
-from ...env.model import DBSession
-from ...spatial_ref_sys import SRS
-from ...vector_layer import VectorLayer
+from nextgisweb.env import DBSession
+
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer import VectorLayer
 
 
 @pytest.fixture
@@ -21,7 +22,7 @@ def type_layer(ngw_resource_group):
             tbl_uuid=uuid4().hex,
         ).persist()
 
-        from ...vector_layer import test as vector_layer_test
+        from nextgisweb.vector_layer import test as vector_layer_test
         path = Path(vector_layer_test.__file__).parent / 'data/type.geojson'
         ogrds = ogr.Open(str(path))
         ogrlayer = ogrds.GetLayer(0)

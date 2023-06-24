@@ -1,10 +1,9 @@
 import json
-from datetime import date, time, datetime
+from datetime import date, datetime, time
 
 from osgeo import ogr
 
 from .. import read_layer_features
-
 
 DATA = {
     "type": "FeatureCollection",

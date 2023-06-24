@@ -3,12 +3,13 @@ from contextlib import contextmanager
 import pytest
 import transaction
 
-from ...auth import User
-from ...env import env
-from ...env.model import DBSession
-from ...spatial_ref_sys import SRS
-from ...vector_layer.test import create_feature_layer as create_vector_layer
-from ...wfsserver import Layer as WFS_Service_Layer, Service as WFSService
+from nextgisweb.env import DBSession, env
+
+from nextgisweb.auth import User
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
+from nextgisweb.wfsserver import Layer as WFS_Service_Layer
+from nextgisweb.wfsserver import Service as WFSService
 
 from .. import WFSConnection, WFSLayer
 

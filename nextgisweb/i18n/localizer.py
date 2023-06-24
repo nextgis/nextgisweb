@@ -1,10 +1,10 @@
+import fnmatch
 import os
 import os.path
-import fnmatch
 
 from babel.support import Translations as BabelTranslations
 
-from ..lib.logging import logger
+from nextgisweb.lib.logging import logger
 
 
 class Translations(BabelTranslations):

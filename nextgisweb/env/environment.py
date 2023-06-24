@@ -1,19 +1,20 @@
 import logging
 import logging.config
 import os
-from types import MappingProxyType
-from typing import Mapping
 from functools import partial
 from inspect import isclass
+from types import MappingProxyType
+from typing import Mapping
 
 import sqlalchemy as sa
 
-from ..lib.config import OptionAnnotations, Option, ConfigOptions, load_config
-from ..lib.logging import logger
-from ..lib.dinject import Container, inject as _inject
-from .package import pkginfo
-from .component import Component, load_all
+from nextgisweb.lib.config import ConfigOptions, Option, OptionAnnotations, load_config
+from nextgisweb.lib.dinject import Container
+from nextgisweb.lib.dinject import inject as _inject
+from nextgisweb.lib.logging import logger
 
+from .component import Component, load_all
+from .package import pkginfo
 
 _OPTIONS_LOGGING_LEVELS = ('critical', 'error', 'warning', 'info', 'debug')
 

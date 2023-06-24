@@ -1,29 +1,32 @@
 import os.path
+
 import geoalchemy2 as ga
+from osgeo import gdal
 from sqlalchemy import func
 from sqlalchemy.ext.orderinglist import ordering_list
-from osgeo import gdal
 from zope.interface import implementer
 
-from ..lib import db
-from ..core.exception import ValidationError
-from ..env import env
-from ..lib.geometry import Geometry
-from ..lib.osrhelper import sr_from_wkt
-from ..env.model import declarative_base, DBSession
-from ..resource import (
+from nextgisweb.env import DBSession, declarative_base, env
+from nextgisweb.lib import db
+from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.osrhelper import sr_from_wkt
+
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.file_storage import FileObj
+from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
+from nextgisweb.raster_layer.util import calc_overviews_levels
+from nextgisweb.resource import (
     DataScope,
     DataStructureScope,
-    ResourceScope,
     Resource,
     ResourceGroup,
+    ResourceScope,
     Serializer,
-    SerializedRelationship as SR,
-    SerializedProperty as SP)
-from ..raster_layer.util import calc_overviews_levels
-from ..file_storage import FileObj
-from ..layer import SpatialLayerMixin, IBboxLayer
-from .util import _, COMP_ID
+)
+from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import SerializedRelationship as SR
+
+from .util import COMP_ID, _
 
 Base = declarative_base()
 

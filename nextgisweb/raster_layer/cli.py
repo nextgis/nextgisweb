@@ -1,7 +1,7 @@
-from ..env.cli import cli, EnvCommand
+from nextgisweb.env.cli import EnvCommand, cli
 
-from .model import RasterLayer
 from .component import RasterLayerComponent
+from .model import RasterLayer
 
 
 @cli.group()

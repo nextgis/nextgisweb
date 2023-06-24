@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 from functools import partial
-from typing import Optional, Any, Union, Tuple, List, get_origin, get_args
+from typing import Any, List, Optional, Tuple, Union, get_args, get_origin
 
 from .argparse import ArgumentParser
 

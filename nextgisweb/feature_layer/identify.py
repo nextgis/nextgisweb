@@ -1,11 +1,10 @@
+from nextgisweb.env import DBSession
+from nextgisweb.lib.geometry import Geometry
+
+from nextgisweb.pyramid import JSONType
+from nextgisweb.resource import DataScope, Resource, ResourceScope
+
 from .interface import IFeatureLayer
-from ..lib.geometry import Geometry
-from ..env.model import DBSession
-from ..resource import (
-    Resource,
-    ResourceScope,
-    DataScope)
-from ..pyramid import JSONType
 
 PR_R = ResourceScope.read
 

@@ -1,11 +1,12 @@
-import os
 import io
+import os
 from datetime import timedelta
 
 import pytest
 
-from ...env.model import DBSession
-from ...file_storage import FileObj
+from nextgisweb.env import DBSession
+
+from nextgisweb.file_storage import FileObj
 
 
 @pytest.fixture(scope='module', autouse=True)
