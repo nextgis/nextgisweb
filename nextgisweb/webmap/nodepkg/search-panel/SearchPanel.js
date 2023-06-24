@@ -248,7 +248,7 @@ export const SearchPanel = ({ display, onSelectResult }) => {
     const searchChange = (e) => {
         const value = e.target.value;
         setSearchText(value);
-        if (value || value.trim()) {
+        if (value && value.trim() && value.trim().length > 1) {
             _search(value);
         } else {
             clearResults();
@@ -281,7 +281,6 @@ export const SearchPanel = ({ display, onSelectResult }) => {
         >
             <span>
                 {resultInfo.label}
-                {resultInfo.key}
                 {resultSourceIcon}
             </span>
         </div>;
@@ -342,7 +341,7 @@ export const SearchPanel = ({ display, onSelectResult }) => {
                     onChange={searchChange}
                     prefix={<SearchIcon/>}
                     suffix={suffix}
-                    placeholder={i18n.gettext("Search on the map")}
+                    placeholder={i18n.gettext("Enter at least 2 characters")}
                     value={searchText}
                 />
                 {info}
