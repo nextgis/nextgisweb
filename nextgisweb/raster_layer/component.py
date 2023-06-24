@@ -2,8 +2,7 @@ import os
 from pathlib import Path
 
 from nextgisweb.env import Component, require
-from nextgisweb.lib.config import Option
-from nextgisweb.lib.config.otype import SizeInBytes
+from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.logging import logger
 
 from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS

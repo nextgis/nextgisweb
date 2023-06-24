@@ -24,8 +24,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from nextgisweb.env import Component, DBSession
 from nextgisweb.env.package import enable_qualifications, pkginfo
 from nextgisweb.lib import db, json
-from nextgisweb.lib.config import Option
-from nextgisweb.lib.config.otype import SizeInBytes
+from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.i18n import Localizer, Translations

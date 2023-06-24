@@ -5,8 +5,7 @@ from shutil import rmtree
 from ulid import ULID
 
 from nextgisweb.env import Component
-from nextgisweb.lib.config import Option
-from nextgisweb.lib.config.otype import SizeInBytes
+from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.logging import logger
 
 from .util import stat_dir
