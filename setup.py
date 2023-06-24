@@ -1,13 +1,12 @@
-import sys
 import io
 import os
 import os.path
-from stat import S_IXUSR, S_IXGRP, S_IXOTH
-from subprocess import check_output, CalledProcessError
-from setuptools import setup, find_packages
+import sys
+from setuptools import find_packages, setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
-
+from stat import S_IXGRP, S_IXOTH, S_IXUSR
+from subprocess import CalledProcessError, check_output
 
 with io.open('VERSION', 'r') as fd:
     VERSION = fd.read().rstrip()

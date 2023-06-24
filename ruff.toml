@@ -8,6 +8,8 @@ exclude = [
 [per-file-ignores]
 "__init__.py" = ["F401"]
 
+[isort]
+
 # Absolute imports are more readable, relative ones are circuitous. So, let's
 # combine them with the following rules:
 #
@@ -24,8 +26,7 @@ exclude = [
 #
 # TODO: Do we need some flake8 for that?
 
-[isort]
-extra-standard-library = ["packaging", "pkg_resources"]
+extra-standard-library = ["packaging", "pkg_resources", "setuptools"]
 section-order = [
     "future",
     "standard-library",
