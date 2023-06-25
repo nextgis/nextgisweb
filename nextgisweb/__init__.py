@@ -56,7 +56,7 @@ def pkginfo():
         },
         amd_packages=[(k, 'external/{}'.format(k)) for k in (
             'dojo', 'dijit', 'dojox', 'dgrid', 'xstyle', 'put-selector',
-            'handlebars', 'jed', 'codemirror', 'jquery',
+            'handlebars', 'jed', 'jquery',
         )],
     )
 
