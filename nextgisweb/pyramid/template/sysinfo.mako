@@ -1,7 +1,7 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 <%!
     from nextgisweb.pyramid.util import _
-    from nextgisweb.pyramid.uacompat import FAMILIES
+    from nextgisweb.pyramid.uacompat import FAMILIES, parse_header as ua_parse_header
 %>
 
 <%def name="title_ext()">
@@ -87,6 +87,8 @@
 </div></div>
 
 <h2>${tr(_("Browser support"))}</h2>
+
+
 <div class="content-box"><div class="table-wrapper">
     <table id="browser-table" class="pure-table pure-table-horizontal"><tbody>
     %for fid, fam in FAMILIES.items():
@@ -102,6 +104,20 @@
             </td>
         </tr>
     %endfor
+    <%
+        ua_header = request.user_agent
+        ua_parsed = ua_parse_header(ua_header) if ua_header else None
+        ua_family, ua_version = ua_parsed if ua_parsed else (None, None)
+    %>
+    %if ua_family and ua_version:
+        <tr>
+            <th>${tr(_("Your browser"))}</th>
+            <td>
+                ${FAMILIES[ua_family].alias}
+                ${ua_version}
+            </td>
+        </tr>
+    %endif
     </tbody></table>
 </div></div>
 

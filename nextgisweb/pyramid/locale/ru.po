@@ -426,6 +426,10 @@ msgstr "или выше"
 msgid "Not supported"
 msgstr "Не поддерживается"
 
+#: template/sysinfo.mako:114
+msgid "Your browser"
+msgstr "Ваш браузер"
+
 #: template/uacompat.mako:4
 msgid "Browser compatibility test"
 msgstr "Проверка совместимости браузера"
