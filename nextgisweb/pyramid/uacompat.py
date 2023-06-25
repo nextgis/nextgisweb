@@ -41,12 +41,12 @@ class VersionOptionType(OptionType):
 
 
 for f in (
-    Family('chrome', 'Chrome', 94),
-    Family('safari', 'Safari', 14),
-    Family('edge', 'Edge', 94),
-    Family('firefox', 'Firefox', 91),
-    Family('opera', 'Opera', 76),
-    Family('ie', 'Internet Explorer', False),
+    Family('chrome', 'Chrome', 102),           # Latest for Windows 7
+    Family('safari', 'Safari', 15),            # Latest for macOS 10.15
+    Family('edge', 'Edge', 109),               # Latest for Windows 7
+    Family('firefox', 'Firefox', 102),         # ESR release
+    Family('opera', 'Opera', 88),              # Based on Chrome
+    Family('ie', 'Internet Explorer', False),  # Not supported
 ):
     FAMILIES[f.identity] = f
     FOPTIONS.append(Option(

@@ -26,6 +26,7 @@ Changes
 - Creation of an empty vector layer without uploading a file.
 - Ability to replace existing vector layer features and fields from a file.
 - Instant deletion of existing vector layer features.
+- Chrome 102+, Safari 15+, Edge 109+ or Firefox 102+ browser is required.
 
 
 4.3.2
