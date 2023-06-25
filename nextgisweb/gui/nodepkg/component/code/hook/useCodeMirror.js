@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { Annotation, EditorState } from "@codemirror/state";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { Annotation, EditorState, StateEffect } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 
 import { customSetup } from "./customSetup";
@@ -53,11 +54,7 @@ export function useCodeMirror({
 
     const destroy = useRef();
 
-    const createEditor = useCallback(async () => {
-        if (destroy.current) {
-            destroy.current();
-        }
-        const parent = target.current;
+    const getExtensions = useCallback(async () => {
         const langExtension = await getLang(lang);
         const setup = await customSetup({ lineNumbers, readOnly, fold });
         const extensions = [
@@ -82,9 +79,26 @@ export function useCodeMirror({
             });
             extensions.push(updateListener);
         }
+        return extensions;
+    }, [
+        fold,
+        lang,
+        onChange,
+        readOnly,
+        maxHeight,
+        minHeight,
+        autoHeight,
+        lineNumbers,
+    ]);
+
+    const createEditor = useCallback(async () => {
+        if (destroy.current) {
+            destroy.current();
+        }
+        const parent = target.current;
+
         const state = EditorState.create({
             doc,
-            extensions,
         });
         const cm = new EditorView({
             state,
@@ -100,18 +114,17 @@ export function useCodeMirror({
             setEditor(null);
         };
         return cm;
-    }, [
-        lineNumbers,
-        autoHeight,
-        minHeight,
-        maxHeight,
-        onChange,
-        readOnly,
-        target,
-        lang,
-        fold,
-        doc,
-    ]);
+    }, [doc, target]);
+
+    useEffect(() => {
+        if (editor) {
+            getExtensions().then((extensions) => {
+                editor.source.dispatch({
+                    effects: StateEffect.reconfigure.of(extensions),
+                });
+            });
+        }
+    }, [editor, getExtensions]);
 
     useEffect(() => {
         createEditor();
