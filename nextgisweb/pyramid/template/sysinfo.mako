@@ -1,5 +1,8 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
-<%! from nextgisweb.pyramid.util import _ %>
+<%!
+    from nextgisweb.pyramid.util import _
+    from nextgisweb.pyramid.uacompat import FAMILIES
+%>
 
 <%def name="title_ext()">
     <div id="info-copy-btn" style="float: right"></div>
@@ -75,7 +78,7 @@
     %for comp in request.env.components.values():
         %for k, v in comp.sys_info():
             <tr>
-                <th>${tr(k)}</th>
+                <th style="width: 20em">${tr(k)}</th>
                 <td>${tr(v)}</td>
             </tr>
         %endfor
@@ -83,6 +86,24 @@
     </tbody> </table>
 </div></div>
 
+<h2>${tr(_("Browser support"))}</h2>
+<div class="content-box"><div class="table-wrapper">
+    <table id="browser-table" class="pure-table pure-table-horizontal"><tbody>
+    %for fid, fam in FAMILIES.items():
+        <tr>
+            <th style="width: 20em">${fam.alias}</th>
+            <td>
+                <% min_ver = request.env.pyramid.options[f"uacompat.{fid}"] %> 
+                %if min_ver:
+                    ${min_ver} ${tr(_("or higher"))}
+                %else:
+                    ${tr(_("Not supported"))}
+                %endif
+            </td>
+        </tr>
+    %endfor
+    </tbody></table>
+</div></div>
 
 <script>
     require([

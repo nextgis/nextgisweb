@@ -414,6 +414,18 @@ msgstr "Версия"
 msgid "Platform"
 msgstr "Платформа"
 
+#: template/sysinfo.mako:89
+msgid "Browser support"
+msgstr "Поддержка браузеров"
+
+#: template/sysinfo.mako:98
+msgid "or higher"
+msgstr "или выше"
+
+#: template/sysinfo.mako:100
+msgid "Not supported"
+msgstr "Не поддерживается"
+
 #: template/uacompat.mako:4
 msgid "Browser compatibility test"
 msgstr "Проверка совместимости браузера"
