@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 import warnings
 from importlib.metadata import metadata
 from importlib.util import find_spec
@@ -43,6 +44,7 @@ def module_path(module_name: str) -> Path:
 
 
 class Package:
+    loading = threading.local()
 
     def __init__(self, entrypoint):
         self._name = entrypoint.dist.key.replace('-', '_')
@@ -95,7 +97,13 @@ class Package:
         mprefix = f'{self.name}.'
         mod_before = {k for k in sys.modules.keys() if k.startswith(mprefix)}
 
-        self._pkginfo = self._entrypoint.resolve()()
+        entrypoint_callable = self._entrypoint.resolve()
+
+        try:
+            self.loading.value = self
+            self._pkginfo = entrypoint_callable()
+        finally:
+            delattr(self.loading, 'value')
 
         mod_after = {k for k in sys.modules.keys() if k.startswith(mprefix)}
         mod_loaded = mod_after - mod_before
@@ -273,3 +281,11 @@ def git_dirty(path):
         return None
     finally:
         devnull.close()
+
+
+def single_component():
+    package = Package.loading.value.name
+    prefix = 'nextgisweb_'
+    assert package.startswith(prefix), "Package name must start with {prefix}"
+    component = package[len(prefix):]
+    return dict(components={component: package})

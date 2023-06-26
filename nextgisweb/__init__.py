@@ -2,9 +2,8 @@ import logging
 import os
 import time
 
-import psutil
-
 from nextgisweb.env import Env
+from nextgisweb.env.package import single_component
 from nextgisweb.lib.config import load_config
 from nextgisweb.lib.logging import logger
 
@@ -74,11 +73,7 @@ def main(global_config=None, **settings):
 
 def _log_startup_time(level=logging.INFO):
     if logger.isEnabledFor(level):
-        psinfo = psutil.Process(os.getpid())
+        from psutil import Process
+        psinfo = Process(os.getpid())
         startup_time = int(1000 * (time.time() - psinfo.create_time()))
         logger.log(level, "WSGI startup took %d msec", startup_time)
-
-
-# TODO: Remove in 4.5.0.dev0, entrypoint already removed
-def amd_packages():
-    return ()

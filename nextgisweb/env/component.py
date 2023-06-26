@@ -25,10 +25,14 @@ class ComponentMeta(type):
         cls.root_path = module_path(cls.module)
         cls.resource_path = ComponentMeta._resource_path_factory(cls.module)
 
-        expected_module = f'{cls.package}.{cls.identity}.component'
-        if cls.identity and module != expected_module:
+        expected_modules = [
+            f'{cls.package}.{cls.identity}.component',
+            f'{cls.package}.component']
+
+        if cls.identity and module not in expected_modules:
+            fmodules = ' or '.join(expected_modules)
             warnings.warn(
-                f"{cls.__name__} should be declared in {expected_module}, "
+                f"{cls.__name__} should be declared in {fmodules}, "
                 f"but was declared in {module}.", stacklevel=2)
 
     @classmethod
