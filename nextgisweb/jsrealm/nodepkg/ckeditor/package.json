@@ -1,0 +1,21 @@
+{
+    "name": "@nextgisweb/ckeditor",
+    "version": "0.0.0",
+    "type": "module",
+    "nextgisweb": {
+        "webpackConfigs": {
+            "ckeditor": "webpack.cjs"
+        }
+    },
+    "dependencies": {
+        "@ckeditor/ckeditor5-dev-translations": "^32.1.2",
+        "@ckeditor/ckeditor5-dev-utils": "^32.1.2",
+        "@ckeditor/ckeditor5-editor-classic": "^38.0.1",
+        "@ckeditor/ckeditor5-essentials": "^38.0.1",
+        "@ckeditor/ckeditor5-paragraph": "^38.0.1",
+        "@ckeditor/ckeditor5-theme-lark": "^38.0.1",
+        "postcss-loader": "^4.3.0",
+        "raw-loader": "^4.0.2",
+        "terser-webpack-plugin": "^4.2.3"
+    }
+}
