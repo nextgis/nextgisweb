@@ -32,7 +32,12 @@ import TableToolbar from "@ckeditor/ckeditor5-table/src/tabletoolbar.js";
 import TextTransformation from "@ckeditor/ckeditor5-typing/src/texttransformation.js";
 import Base64UploadAdapter from "@ckeditor/ckeditor5-upload/src/adapters/base64uploadadapter.js";
 
-class Editor extends ClassicEditor {}
+class Editor extends ClassicEditor {
+    constructor(element, config) {
+        config.language = window.ngwConfig.locale;
+        super(element, config);
+    }
+}
 
 // Plugins to include in the build.
 Editor.builtinPlugins = [
