@@ -66,7 +66,7 @@ EXPORT_FORMAT_OGR["GPKG"] = OGRDriver(
 
 EXPORT_FORMAT_OGR["GeoJSON"] = OGRDriver(
     "GeoJSON",
-    "GeoJSON (*.json)",
+    "GeoJSON (*.geojson)",
     "geojson",
     single_file=True,
     fid_support=True,
