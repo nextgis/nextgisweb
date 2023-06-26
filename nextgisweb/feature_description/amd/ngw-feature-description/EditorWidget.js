@@ -1,44 +1,46 @@
 define([
     "dojo/_base/declare",
-    "ngw-pyramid/modelWidget/Widget",
+    "dojo/dom-class",
+    "dojox/layout/TableContainer",
+    "@nextgisweb/gui/react-app",
+    "@nextgisweb/feature_description/description-editor",
     "@nextgisweb/pyramid/i18n!",
-    "dijit/Editor",
-    "dijit/_editor/plugins/LinkDialog",
-    "dijit/_editor/plugins/ViewSource",
+    // css
+    "xstyle/css!./resource/EditorWidget.css",
 ], function (
     declare,
-    Widget,
-    i18n,
-    Editor
+    domClass,
+    TableContainer,
+    reactApp,
+    DescriptionEditor,
+    i18n
 ) {
-    return declare([Widget, Editor], {
+    return declare([TableContainer], {
         title: i18n.gettext("Description"),
-        extraPlugins: ["|", {
-            name: "dijit/_editor/plugins/LinkDialog",
-            command: "createLink",
-            // Allow everything except malicious javascript
-            urlRegExp: '(?!\\s*javascript\\s*:).*',
-        }, "unlink", "insertImage", "viewsource"],
+        buildRendering: function () {
+            this.inherited(arguments);
 
-        hasData: function () {
-            return this.get('value') !== '';
+            domClass.add(this.domNode, "ngw-feature-description-EditorWidget");
+
+            this.component = reactApp.default(
+                DescriptionEditor.default,
+                { store: this.store, extension: this.extension },
+                this.domNode
+            );
+        },
+        destroy: function () {
+            if (this.component) {
+                this.component.unmount();
+            }
+            this.component = null;
         },
 
-        _getValueAttr: function () {
-            var value = this.getValue(true);
-            if (value) {
-                value = value.replace("<br _moz_editor_bogus_node=\"TRUE\" />", "");
-            }
-            if (value === '<br />') { value = ''; }
-            return value;
+        // Rewrite default widget methods to use feature store instead
+        get: function () {
+            return
         },
-
-        _setValueAttr: function (value) {
-            if (value !== null && value !== undefined) {
-                this.inherited(arguments);
-            } else {
-                this.set("value", "");
-            }
+        set: function () {
+            return;
         }
     });
 });

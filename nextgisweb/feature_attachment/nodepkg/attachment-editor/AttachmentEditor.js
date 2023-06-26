@@ -16,13 +16,11 @@ import { FileReaderImage } from "./component/FileReaderImage";
 
 import "./AttachmentEditor.css";
 
-const extension = "attachment";
-
 function isFileImage(file) {
     return file && file["type"].split("/")[0] === "image";
 }
 
-export const AttachmentEditor = observer(({ store }) => {
+export const AttachmentEditor = observer(({ store, extension }) => {
     const multiple = true;
 
     const { extensions, setExtension, resourceId, featureId } = store;
@@ -30,7 +28,7 @@ export const AttachmentEditor = observer(({ store }) => {
     const dataSource = useMemo(() => {
         const attachment = extensions[extension];
         return attachment || [];
-    }, [extensions]);
+    }, [extensions, extension]);
 
     const [scrollY, setScrollY] = useState();
     const wrapperElement = useRef();
@@ -65,7 +63,7 @@ export const AttachmentEditor = observer(({ store }) => {
             if (metaList && metaList.length) {
                 setExtension(extension, (old) => {
                     return [
-                        ...old || [],
+                        ...(old || []),
                         ...metaList.map((meta) => {
                             const { mime_type, id, name, size, _file } = meta;
                             return {
@@ -251,4 +249,5 @@ export const AttachmentEditor = observer(({ store }) => {
 
 AttachmentEditor.propTypes = {
     store: PropTypes.object,
+    extension: PropTypes.string,
 };

@@ -86,6 +86,7 @@ define([
                     resource: this.resource,
                     feature: this.feature,
                     store: this.store,
+                    extension: k,
                 });
                 widget.placeAt(this._tabContainer);
                 this._ext[k] = widget;

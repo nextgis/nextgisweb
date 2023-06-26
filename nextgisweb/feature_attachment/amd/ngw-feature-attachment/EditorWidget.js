@@ -25,7 +25,7 @@ define([
 
             this.component = reactApp.default(
                 AttachmentEditor.default,
-                { store: this.store },
+                { store: this.store, extension: this.extension },
                 this.domNode
             );
         },
@@ -38,10 +38,10 @@ define([
 
         // Rewrite default widget methods to use feature store instead
         get: function () {
-            return
+            return;
         },
         set: function () {
             return;
-        }
+        },
     });
 });
