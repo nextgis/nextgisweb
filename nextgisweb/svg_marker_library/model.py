@@ -31,6 +31,31 @@ class SVGMarkerLibrary(Base, Resource):
     def check_parent(self, parent):
         return isinstance(parent, ResourceGroup)
 
+    def from_archive(self, filename):
+        with zipfile.ZipFile(filename, mode='r', allowZip64=True) as archive:
+            for file_info in archive.infolist():
+                if file_info.is_dir():
+                    continue
+
+                filename = file_info.filename
+                validate_filename(filename)
+
+                name, ext = os.path.splitext(filename)
+                validate_ext(filename, ext)
+
+                fileobj = env.file_storage.fileobj(component=COMP_ID)
+
+                dstfile = env.file_storage.filename(fileobj, makedirs=True)
+                with archive.open(filename, 'r') as sf:
+                    validate_mime(filename, sf.read(1024))
+                    sf.seek(0)
+                    with open(dstfile, 'wb') as df:
+                        copyfileobj(sf, df)
+
+                self.files.append(SVGMarker(name=name, fileobj=fileobj))
+
+        return self
+
     def find_svg_marker(self, name):
         svg_marker = SVGMarker.filter_by(
             svg_marker_library_id=self.id,
@@ -94,27 +119,7 @@ class _archive_attr(SP):
 
         DBSession.flush()
 
-        with zipfile.ZipFile(archive_name, mode='r', allowZip64=True) as archive:
-            for file_info in archive.infolist():
-                if file_info.is_dir():
-                    continue
-
-                filename = file_info.filename
-                validate_filename(filename)
-
-                name, ext = os.path.splitext(filename)
-                validate_ext(filename, ext)
-
-                fileobj = env.file_storage.fileobj(component=COMP_ID)
-
-                dstfile = env.file_storage.filename(fileobj, makedirs=True)
-                with archive.open(filename, 'r') as sf:
-                    validate_mime(filename, sf.read(1024))
-                    sf.seek(0)
-                    with open(dstfile, 'wb') as df:
-                        copyfileobj(sf, df)
-
-                srlzr.obj.files.append(SVGMarker(name=name, fileobj=fileobj))
+        srlzr.obj.from_archive(archive_name)
 
 
 class _files_attr(SP):
