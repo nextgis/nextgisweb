@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import sys
 import warnings
 from importlib.metadata import metadata
 from importlib.util import find_spec
@@ -34,8 +35,11 @@ def amd_packages():
 
 def module_path(module_name: str) -> Path:
     spec = find_spec(module_name)
-    assert len(spec.submodule_search_locations) == 1
-    return Path(spec.submodule_search_locations[0])
+    if spec.submodule_search_locations:
+        assert len(spec.submodule_search_locations) == 1
+        return Path(spec.submodule_search_locations[0])
+    else:
+        return Path(spec.origin).parent
 
 
 class Package:
@@ -88,7 +92,22 @@ class Package:
             self._entrypoint.module_name,
             ','.join(self._entrypoint.attrs))
 
+        mprefix = f'{self.name}.'
+        mod_before = {k for k in sys.modules.keys() if k.startswith(mprefix)}
+
         self._pkginfo = self._entrypoint.resolve()()
+
+        mod_after = {k for k in sys.modules.keys() if k.startswith(mprefix)}
+        mod_loaded = mod_after - mod_before
+        if mod_loaded:
+            mod_fmt = ', '.join(m[len(self.name) + 1:] for m in mod_loaded)
+            warnings.warn_explicit(
+                f"Loading of {self.name} pkginfo entrypoint shouldn't import "
+                f"any additional modules, but the following {self.name}.* "
+                f"modules were imported: {mod_fmt}.",
+                UserWarning, sys.modules[self.name].__file__, 0,
+                module=self.name)
+
         return self._pkginfo
 
     @property
