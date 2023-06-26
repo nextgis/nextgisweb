@@ -12,6 +12,7 @@ Changes
 - Support for linear and polygonal annotations.
 - Brand-new feature table based on React.
 - Ability to export a filtered set of features.
+- Zoom to a filtered set of features on webmaps.
 - Changing layer opacity while viewing webmaps.
 - Reordering layers via drag-and-drop while viewing webmaps.
 - Improved handling of resource descriptions on webmaps.
@@ -27,6 +28,7 @@ Changes
 - Ability to replace existing vector layer features and fields from a file.
 - Instant deletion of existing vector layer features.
 - Chrome 102+, Safari 15+, Edge 109+ or Firefox 102+ browser is required.
+- Feature description editor updated to CKEditor 5.
 
 
 4.3.2
