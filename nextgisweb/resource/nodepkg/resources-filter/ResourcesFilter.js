@@ -120,6 +120,7 @@ export function ResourcesFilter({ onChange, cls, ...rest }) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 loading={loading}
+                autoComplete="off"
             />
         </AutoComplete>
     );
