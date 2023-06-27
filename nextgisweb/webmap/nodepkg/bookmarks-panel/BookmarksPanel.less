@@ -1,0 +1,31 @@
+.bookmarks-panel {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .results {
+        flex: auto;
+        overflow-y: auto;
+
+        .bookmark {
+            padding: 6px 10px 6px 10px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #eae9e9;
+            }
+
+            &.selected {
+                background-color: #eae9e9;
+                cursor: auto;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            color: #076dbf;
+            margin-top: 20px;
+        }
+    }
+}

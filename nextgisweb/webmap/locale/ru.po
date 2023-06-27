@@ -1,8 +1,8 @@
-#: adapter.py:24
+#: adapter.py:25
 msgid "Tiles"
 msgstr "Тайлы"
 
-#: adapter.py:33
+#: adapter.py:34
 msgid "Image"
 msgstr "Изображение"
 
@@ -10,23 +10,23 @@ msgstr "Изображение"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:31 model.py:50 view.py:308 view.py:339
+#: model.py:33 model.py:52 view.py:308 view.py:339
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:33 view.py:313
+#: model.py:35 view.py:313
 msgid "Display"
 msgstr "Открыть"
 
-#: model.py:34
+#: model.py:36
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:170 model.py:35
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:170 model.py:37
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: model.py:36
+#: model.py:38
 msgid "Manage annotations"
 msgstr "Администрировать аннотации"
 
@@ -67,7 +67,7 @@ msgstr "Распечатать карту"
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:431 amd/ngw-webmap/plugin/LayerInfo.js:43
+#: amd/ngw-webmap/Display.js:431 amd/ngw-webmap/plugin/LayerInfo.js:50
 msgid "Description"
 msgstr "Описание"
 
@@ -604,11 +604,6 @@ msgstr "Выберите масштаб"
 msgid "Use Shift+drag for box zooming"
 msgstr "Используйте Shift+мышь для увеличения рамкой"
 
-#: amd/ngw-webmap/ui/SearchPanel/SearchPanel.hbs:6
-#: nodepkg/search-panel/SearchPanel.js:345
-msgid "Search on the map"
-msgstr "Поиск по карте"
-
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:520
 msgid "Open full map"
 msgstr "Открыть карту целиком"
@@ -641,13 +636,17 @@ msgstr "Показывать охват"
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
-#: nodepkg/search-panel/SearchPanel.js:297
+#: nodepkg/search-panel/SearchPanel.js:296
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/search-panel/SearchPanel.js:303
+#: nodepkg/search-panel/SearchPanel.js:302
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
+
+#: nodepkg/search-panel/SearchPanel.js:344
+msgid "Enter at least 2 characters"
+msgstr "Введите минимум 2 символа"
 
 #: nodepkg/settings/Settings.js:56
 msgid "Settings saved"
