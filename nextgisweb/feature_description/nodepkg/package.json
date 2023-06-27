@@ -1,8 +1,5 @@
 {
     "name": "@nextgisweb/feature_description",
     "version": "0.0.0",
-    "type": "module",
-    "dependencies": {
-        "@ckeditor/ckeditor5-react": "6.0.0"
-    }
+    "type": "module"
 }
