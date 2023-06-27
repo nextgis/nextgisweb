@@ -21,6 +21,7 @@ from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedResourceRelationship as SRR
 from nextgisweb.spatial_ref_sys import SRS
 
+from .adapter import WebMapAdapter
 from .util import _
 
 Base = declarative_base(dependencies=('resource', ))
@@ -78,6 +79,11 @@ class WebMap(Base, Resource):
         'WebMapAnnotation', back_populates='webmap',
         cascade='all,delete-orphan', cascade_backrefs=False)
 
+    def __init__(self, *args, **kwagrs):
+        if 'root_item' not in kwagrs:
+            kwagrs['root_item'] = WebMapItem(item_type='root')
+        super().__init__(*args, **kwagrs)
+
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
@@ -103,25 +109,18 @@ class WebMap(Base, Resource):
         )
 
     def from_dict(self, data):
-        if 'display_name' in data:
-            self.display_name = data['display_name']
+        for k in (
+            'display_name', 'bookmark_resource_id', 'extent_constrained', 'editable',
+        ):
+            if k in data:
+                setattr(self, k, data[k])
 
         if 'root_item' in data:
-            self.root_item = WebMapItem(item_type='root')
             self.root_item.from_dict(data['root_item'])
-
-        if 'bookmark_resource_id' in data:
-            self.bookmark_resource_id = data['bookmark_resource_id']
 
         if 'extent' in data:
             self.extent_left, self.extent_bottom, \
                 self.extent_right, self.extent_top = data['extent']
-
-        if 'extent_constrained' in data:
-            self.extent_constrained = data['extent_constrained']
-
-        if 'editable' in data:
-            self.editable = data['editable']
 
 
 class WebMapItem(Base):
@@ -147,7 +146,7 @@ class WebMapItem(Base):
     layer_transparency = db.Column(db.Float, nullable=True)
     layer_min_scale_denom = db.Column(db.Float, nullable=True)
     layer_max_scale_denom = db.Column(db.Float, nullable=True)
-    layer_adapter = db.Column(db.Unicode, nullable=True)
+    layer_adapter = db.Column(db.Enum(*WebMapAdapter.registry.keys()), nullable=True)
     draw_order_position = db.Column(db.Integer, nullable=True)
     legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
 
@@ -164,25 +163,18 @@ class WebMapItem(Base):
     )
 
     def to_dict(self):
+        data = dict(item_type=self.item_type)
+
+        if self.item_type in ('group', 'layer'):
+            data['display_name'] = self.display_name
+
+        if self.item_type == 'group':
+            data['group_expanded'] = self.group_expanded
+
         if self.item_type in ('root', 'group'):
-            children = list(self.children)
-            sorted(children, key=lambda c: c.position)
+            data['children'] = [i.to_dict() for i in self.children]
 
-            if self.item_type == 'root':
-                return dict(
-                    item_type=self.item_type,
-                    children=[i.to_dict() for i in children],
-                )
-
-            elif self.item_type == 'group':
-                return dict(
-                    item_type=self.item_type,
-                    display_name=self.display_name,
-                    group_expanded=self.group_expanded,
-                    children=[i.to_dict() for i in children],
-                )
-
-        elif self.item_type == 'layer':
+        if self.item_type == 'layer':
             style_parent_id = None
             payload = None
             if self.style and self.style.parent:
@@ -194,9 +186,7 @@ class WebMapItem(Base):
                 ):
                     payload = style.payload
 
-            return dict(
-                item_type=self.item_type,
-                display_name=self.display_name,
+            data.update(dict(
                 layer_enabled=self.layer_enabled,
                 layer_identifiable=self.layer_identifiable,
                 layer_transparency=self.layer_transparency,
@@ -208,7 +198,9 @@ class WebMapItem(Base):
                 draw_order_position=self.draw_order_position,
                 legend_symbols=self.legend_symbols,
                 payload=payload
-            )
+            ))
+
+        return data
 
     def from_dict(self, data):
         assert data['item_type'] == self.item_type
@@ -225,6 +217,41 @@ class WebMapItem(Base):
                   'draw_order_position', 'legend_symbols'):
             if a in data:
                 setattr(self, a, data[a])
+
+    def from_children(self, children, *, defaults=dict()):
+        assert self.item_type in ('root', 'group')
+
+        for child in children:
+
+            def _set(item, k, default=False):
+                if k in child:
+                    setattr(item, k, child[k])
+                elif default and k in defaults:
+                    setattr(item, k, defaults[k])
+
+            assert ('style' in child) != ('children' in child)
+
+            if 'children' in child:
+                item = WebMapItem(item_type='group')
+                _set(item, 'group_expanded', True)
+
+                defaults_next = defaults.copy()
+                if 'defaults' in child:
+                    defaults_next.update(child['defaults'])
+                item.from_children(child['children'], defaults=defaults_next)
+            else:
+                item = WebMapItem(item_type='layer', style=child['style'])
+                _set(item, 'draw_order_position')
+                for k in (
+                    'layer_enabled', 'layer_identifiable', 'layer_transparency',
+                    'layer_min_scale_denom', 'layer_max_scale_denom', 'layer_adapter',
+                    'legend_symbols',
+                ):
+                    _set(item, k, True)
+
+            _set(item, 'display_name')
+
+            self.children.append(item)
 
 
 class WebMapAnnotation(Base):
@@ -264,9 +291,6 @@ class _root_item_attr(SP):
         return srlzr.obj.root_item.to_dict()
 
     def setter(self, srlzr, value):
-        if srlzr.obj.root_item is None:
-            srlzr.obj.root_item = WebMapItem(item_type='root')
-
         srlzr.obj.root_item.from_dict(value)
 
 
