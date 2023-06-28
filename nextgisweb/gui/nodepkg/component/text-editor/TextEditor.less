@@ -1,0 +1,17 @@
+.ngw-gui-component-text-editor {
+    &.borderless {
+        .ck.ck-rounded-corners {
+            .ck-toolbar {
+                border-width: 0px;
+                border-bottom-width: 1px;
+            }
+            .ck-content:not(.ck-focused) {
+                border-color: transparent;
+                box-shadow: none;
+                & + div > textarea {
+                    border-color: transparent;
+                }
+            }
+        }
+    }
+}

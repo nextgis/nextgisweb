@@ -9,7 +9,7 @@ export const DescriptionEditor = observer(({ store, extension }) => {
     const { extensions, setExtension } = store;
 
     const dataSource = useMemo(() => {
-        return extensions[extension] || '';
+        return extensions[extension] || "";
     }, [extensions, extension]);
 
     const onChange = (value) => {
@@ -19,7 +19,7 @@ export const DescriptionEditor = observer(({ store, extension }) => {
         setExtension(extension, value);
     };
 
-    return <TextEditor value={dataSource} onChange={onChange}></TextEditor>;
+    return <TextEditor value={dataSource} onChange={onChange} border={false} />;
 });
 
 DescriptionEditor.propTypes = {

@@ -1,11 +1,18 @@
 import { PropTypes } from "prop-types";
 
-import { useState, useRef, useCallback, useLayoutEffect } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { Editor } from "@nextgisweb/ckeditor";
 
-export const TextEditor = ({ value, onChange, fullHeight = true }) => {
+import "./TextEditor.less";
+
+export const TextEditor = ({
+    value,
+    onChange,
+    fullHeight = true,
+    border = true,
+}) => {
     const [editor, setEditor] = useState();
     const wrapperElement = useRef();
 
@@ -96,7 +103,12 @@ export const TextEditor = ({ value, onChange, fullHeight = true }) => {
     }, [editor, fullHeight, updateHeigh]);
 
     return (
-        <div ref={wrapperElement}>
+        <div
+            ref={wrapperElement}
+            className={
+                "ngw-gui-component-text-editor" + (!border ? " borderless" : "")
+            }
+        >
             <CKEditor
                 editor={Editor}
                 data={value}
@@ -113,4 +125,5 @@ TextEditor.propTypes = {
     value: PropTypes.string,
     onChange: PropTypes.func,
     fullHeight: PropTypes.bool,
+    border: PropTypes.bool,
 };

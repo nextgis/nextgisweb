@@ -10,6 +10,7 @@ export const DescriptionEditorWidget = observer(({ store }) => {
         <TextEditor
             value={store.value ? store.value : ""}
             onChange={onChange}
+            border={false}
         />
     );
 });
