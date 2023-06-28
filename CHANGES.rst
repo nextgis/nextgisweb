@@ -28,7 +28,7 @@ Changes
 - Ability to replace existing vector layer features and fields from a file.
 - Instant deletion of existing vector layer features.
 - Chrome 102+, Safari 15+, Edge 109+ or Firefox 102+ browser is required.
-- Feature description editor updated to CKEditor 5.
+- Resource and feature description editors updated to CKEditor 5.
 
 
 4.3.2

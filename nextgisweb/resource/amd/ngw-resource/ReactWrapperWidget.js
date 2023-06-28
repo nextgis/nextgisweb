@@ -5,7 +5,14 @@ define([
     "dojo/Deferred",
     "dijit/_WidgetBase",
     "@nextgisweb/gui/react-app",
-], function (declare, lang, domStyle, Deferred, _WidgetBase, reactApp) {
+], function (
+    declare,
+    lang,
+    domStyle,
+    Deferred,
+    _WidgetBase,
+    reactApp
+) {
     return declare([_WidgetBase], {
         identity: undefined,
         title: undefined,
@@ -41,21 +48,23 @@ define([
             );
         },
 
-        validateData: function (errback) {
+        validateData: function () {
             var deferred = new Deferred();
             deferred.resolve(this.store.isValid);
             return deferred;
         },
 
         serialize: function (data) {
-            data[this.store.identity] = this.store.dump();
+            lang.setObject(this.store.identity, this.store.dump(), data);
             var deferred = new Deferred();
             deferred.resolve(true);
             return deferred;
         },
 
         deserialize: function (data) {
-            this.store.load(data[this.store.identity]);
+            this.store.load(
+                lang.getObject(this.store.identity, undefined, data)
+            );
             var deferred = new Deferred();
             deferred.resolve(true);
             return deferred;
