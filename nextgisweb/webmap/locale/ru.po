@@ -10,23 +10,23 @@ msgstr "Изображение"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:33 model.py:52 view.py:308 view.py:339
+#: model.py:34 model.py:53 view.py:311 view.py:342
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:35 view.py:313
+#: model.py:36 view.py:316
 msgid "Display"
 msgstr "Открыть"
 
-#: model.py:36
+#: model.py:37
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:170 model.py:37
+#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:170 model.py:38
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: model.py:38
+#: model.py:39
 msgid "Manage annotations"
 msgstr "Администрировать аннотации"
 
@@ -38,11 +38,11 @@ msgstr "Настройки веб-карты"
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:271
+#: view.py:274
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: nodepkg/clone-webmap/CloneWebmap.js:180 view.py:319
+#: nodepkg/clone-webmap/CloneWebmap.js:180 view.py:322
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -76,16 +76,16 @@ msgid "Annotations"
 msgstr "Аннотации"
 
 #: amd/ngw-webmap/Display.js:778 amd/ngw-webmap/tool/Zoom.js:20
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:488
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:444
 msgid "Zoom in"
 msgstr "Приблизить"
 
 #: amd/ngw-webmap/Display.js:779 amd/ngw-webmap/tool/Zoom.js:23
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:489
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:445
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:783 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:493
+#: amd/ngw-webmap/Display.js:783 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:449
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
@@ -97,15 +97,15 @@ msgstr "Начальный охват"
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:807 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:502
+#: amd/ngw-webmap/Display.js:807 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:1331 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:669
+#: amd/ngw-webmap/Display.js:1331 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:625
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:1332 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:670
+#: amd/ngw-webmap/Display.js:1332 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:626
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -604,7 +604,7 @@ msgstr "Выберите масштаб"
 msgid "Use Shift+drag for box zooming"
 msgstr "Используйте Shift+мышь для увеличения рамкой"
 
-#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:520
+#: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:476
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
@@ -919,3 +919,18 @@ msgstr "Встраивание веб-карты не разрешено для 
 #, python-format
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
+
+#: template/preview_embedded.mako:10
+msgid "This page is for a preview of the web map to be embedded on the site."
+msgstr "Эта страница предназначена для предпросмотра веб карты, которую необходимо встроить на сайт."
+
+#: template/preview_embedded.mako:11
+msgid ""
+"Most likely, you went from the \"Share\" section of the web map and refreshed"
+" the page."
+msgstr "Скорее всего, вы перешли из секции \"Поделиться\" веб карты и обновили страницу."
+
+#: template/preview_embedded.mako:12
+msgid "To generate a preview, go back to the web map page and click \"Preview\"."
+msgstr "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите \"Предпросмотр\"."
+

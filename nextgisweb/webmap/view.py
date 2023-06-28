@@ -264,10 +264,13 @@ def clone(request):
 
 @viewargs(renderer='mako')
 def preview_embedded(request):
-    iframe = request.POST['iframe']
-    request.response.headerlist.append(("X-XSS-Protection", "0"))
+    iframe = None
+    if 'iframe' in request.POST:
+        iframe = unquote(unquote(request.POST['iframe']))
+        request.response.headerlist.append(("X-XSS-Protection", "0"))
+
     return dict(
-        iframe=unquote(unquote(iframe)),
+        iframe=iframe,
         title=_("Embedded webmap preview"),
         limit_width=False,
     )
