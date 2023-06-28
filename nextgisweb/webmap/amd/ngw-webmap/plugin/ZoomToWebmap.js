@@ -1,25 +1,15 @@
 define([
-    "dojo/_base/declare",
-    "./_PluginBase",
-    "dojo/request/xhr",
-    "ngw-pyramid/route",
-    "@nextgisweb/gui/react-app",
-    "@nextgisweb/webmap/layers-dropdown",
-    "@nextgisweb/pyramid/i18n!",
-    "openlayers/ol"
+    "dojo/_base/declare", "./_PluginBase",
+    "dojo/request/xhr", "ngw-pyramid/route",
+    "@nextgisweb/gui/react-app", "@nextgisweb/webmap/layers-dropdown"
 ], function (
-    declare,
-    _PluginBase,
-    xhr,
-    route,
-    reactApp,
-    LayersDropdownComp,
-    i18n,
-    ol
+    declare, _PluginBase,
+    xhr, route,
+    reactApp, LayersDropdownComp
 ) {
     return declare([_PluginBase], {
         postCreate: function () {
-            if (!this.display.layersPanel && !this.display.layersPanel.titleNode) {
+            if (!this.display.layersPanel || !this.display.layersPanel.titleNode) {
                 return;
             }
 
@@ -37,9 +27,7 @@ define([
 
             reactApp.default(
                 LayersDropdownComp.default,
-                {
-                    onClick: onClick
-                },
+                { onClick },
                 span
             );
         },

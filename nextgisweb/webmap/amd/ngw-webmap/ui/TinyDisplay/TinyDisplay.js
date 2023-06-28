@@ -279,13 +279,6 @@ define([
                 })
             ).then(undefined, function (err) { console.error(err); });
 
-            // TODO: Remove useless code
-            this._postCreateDeferred.then(
-                function () {
-                    //widget.loadBookmarks();
-                }
-            ).then(undefined, function (err) { console.error(err); });
-
             // Map and plugins
             all([this._midDeferred.basemap, this._midDeferred.webmapPlugin, this._startupDeferred]).then(
                 function () {
@@ -356,43 +349,6 @@ define([
         startup: function () {
             this.inherited(arguments);
             this._startupDeferred.resolve();
-        },
-
-        loadBookmarks: function () {
-            if (this.config.bookmarkLayerId) {
-                var store = new JsonRest({target: route.feature_layer.store({
-                    id: this.config.bookmarkLayerId
-                })});
-
-                var display = this;
-
-                store.query().then(
-                    function (data) {
-                        array.forEach(data, function (f) {
-                            display.bookmarkMenu.addChild(new MenuItem({
-                                label: f.label,
-                                onClick: function () {
-                                    // Request feature extent
-                                    xhr.get(route.feature_layer.store.item({
-                                        id: display.config.bookmarkLayerId,
-                                        feature_id: f.id
-                                    }), {
-                                        handleAs: "json",
-                                        headers: { "X-Feature-Box": true }
-                                    }).then(
-                                        function data(featuredata) {
-                                            display.map.olMap.getView().fit(featuredata.box);
-                                        }
-                                    );
-                                }
-                            }));
-                        });
-                    }
-                );
-            } else {
-                // Hide bookmarks button
-                domStyle.set(this.bookmarkButton.domNode, "display", "none");
-            }
         },
 
         _itemStoreSetup: function () {
