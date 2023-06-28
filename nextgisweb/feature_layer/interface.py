@@ -101,6 +101,13 @@ class IFieldEditableFeatureLayer(IFeatureLayer):
         """ Remove field """
 
 
+class IGeometryEditableFeatureLayer(IFeatureLayer):
+    """ Feature layer that supports geometry type editing """
+
+    def geometry_type_change(self, geom_type):
+        """ Change geometry type """
+
+
 class IWritableFeatureLayer(IFeatureLayer):
     """ Feature layer that supports writing """
 

@@ -20,6 +20,7 @@ from .interface import (
     IFeatureQueryOrderBy,
     IFeatureQuerySimplify,
     IFieldEditableFeatureLayer,
+    IGeometryEditableFeatureLayer,
     IWritableFeatureLayer,
 )
 from .model import FIELD_FORBIDDEN_NAME, FeatureQueryIntersectsMixin, LayerField, LayerFieldsMixin

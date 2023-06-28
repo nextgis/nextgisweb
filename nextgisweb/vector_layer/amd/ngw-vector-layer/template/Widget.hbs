@@ -11,25 +11,12 @@
         style="width: 99%; margin-bottom: 1em">
     </select>
 
-    <div data-dojo-attach-point="empty_layer_section" style="margin-bottom: 1em">
+    <div data-dojo-attach-point="geometry_section" style="margin-bottom: 1em">
          <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
             <select data-dojo-attach-point="wGeometryType"
                 data-dojo-type="dijit/form/Select"
                 data-ngw-serialize="geometry_type"
                 title="{{gettext 'Geometry type'}}" style="width: 100%">
-
-                <option value="POINT">{{gettext 'Point'}}</option>
-                <option value="LINESTRING">{{gettext 'Line'}}</option>
-                <option value="POLYGON">{{gettext 'Polygon'}}</option>
-                <option value="MULTIPOINT">{{gettext 'Multipoint'}}</option>
-                <option value="MULTILINESTRING">{{gettext 'Multiline'}}</option>
-                <option value="MULTIPOLYGON">{{gettext 'Multipolygon'}}</option>
-                <option value="POINTZ">{{gettext 'Point Z'}}</option>
-                <option value="LINESTRINGZ">{{gettext 'Line Z'}}</option>
-                <option value="POLYGONZ">{{gettext 'Polygon Z'}}</option>
-                <option value="MULTIPOINTZ">{{gettext 'Multipoint Z'}}</option>
-                <option value="MULTILINESTRINGZ">{{gettext 'Multiline Z'}}</option>
-                <option value="MULTIPOLYGONZ">{{gettext 'Multipolygon Z'}}</option>
             </select>
         </div>
     </div>
@@ -133,7 +120,7 @@
     <div data-dojo-attach-point="confirm_section">
         <input id="_vlayer_change_confirm" data-dojo-attach-point="confirm"
             data-dojo-type="dijit/form/CheckBox">
-            <label for="_vlayer_change_confirm">{{gettext 'Confirm deletion of existing features'}}</label>
+            <label data-dojo-attach-point="confirm_label" for="_vlayer_change_confirm"></label>
         </input>
     </div>
 </div>

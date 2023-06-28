@@ -4,7 +4,7 @@ import uuid
 import geoalchemy2 as ga
 from osgeo import gdal, ogr
 from shapely.geometry import box
-from sqlalchemy import event, func, inspect, sql
+from sqlalchemy import event, func, inspect, literal, sql
 from zope.interface import implementer
 
 from nextgisweb.env import DBSession, declarative_base, env
@@ -17,6 +17,7 @@ from nextgisweb.feature_layer import (
     GEOM_TYPE,
     IFeatureLayer,
     IFieldEditableFeatureLayer,
+    IGeometryEditableFeatureLayer,
     IWritableFeatureLayer,
     LayerField,
     LayerFieldsMixin,
@@ -91,7 +92,10 @@ class VectorLayerField(Base, LayerField):
     fld_uuid = db.Column(db.Unicode(32), nullable=False)
 
 
-@implementer(IFeatureLayer, IFieldEditableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
+@implementer(
+    IFeatureLayer, IFieldEditableFeatureLayer, IGeometryEditableFeatureLayer,
+    IWritableFeatureLayer, IBboxLayer,
+)
 class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = 'vector_layer'
     cls_display_name = _("Vector layer")
@@ -207,6 +211,50 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         connection = inspect(self).session.connection()
         connection.execute(db.text("ALTER TABLE {}.{} DROP COLUMN {}".format(
             SCHEMA, self._tablename, column_name)))
+
+    # IGeometryEditableFeatureLayer
+
+    def geometry_type_change(self, geometry_type):
+        if self.geometry_type == geometry_type:
+            return
+
+        for cls in (GEOM_TYPE.points, GEOM_TYPE.linestrings, GEOM_TYPE.polygons):
+            if self.geometry_type in cls:
+                geom_cls = cls
+                break
+
+        if geometry_type not in geom_cls:
+            raise VE(message="Can't convert {0} geometry type to {1}.".format(
+                self.geometry_type, geometry_type))
+
+        is_multi_1 = self.geometry_type in GEOM_TYPE.is_multi
+        is_multi_2 = geometry_type in GEOM_TYPE.is_multi
+        has_z_1 = self.geometry_type in GEOM_TYPE.has_z
+        has_z_2 = geometry_type in GEOM_TYPE.has_z
+
+        column_geom = db.Column('geom')
+        column_type_new = ga.types.Geometry(geometry_type=geometry_type, srid=self.srs_id)
+
+        expr = column_geom
+
+        if is_multi_1 and not is_multi_2:  # Multi -> single
+            expr = func.ST_GeometryN(expr, 1)
+        elif not is_multi_1 and is_multi_2:  # Single -> multi
+            expr = func.ST_Multi(expr)
+        
+        if has_z_1 and not has_z_2:  # Z -> not Z
+            expr = func.ST_Force2D(expr)
+        elif not has_z_1 and has_z_2:  # not Z -> Z
+            expr = func.ST_Force3D(expr)
+
+        text = db.text("ALTER TABLE {}.{} ALTER COLUMN {} TYPE {} USING {}".format(
+            SCHEMA, self._tablename, column_geom, column_type_new,
+            expr.compile(compile_kwargs=dict(literal_binds=True))))
+        connection = inspect(self).session.connection()
+        connection.execute(text)
+        
+
+        self.geometry_type = geometry_type
 
     # IWritableFeatureLayer
 
@@ -476,9 +524,10 @@ class _geometry_type_attr(SP):
 
         if srlzr.obj.id is None:
             srlzr.obj.geometry_type = value
-
-        elif srlzr.obj.geometry_type != value:
-            raise VE(message=_("Geometry type for existing resource can't be changed."))
+        elif srlzr.obj.geometry_type == value:
+            pass
+        else:
+            srlzr.obj.geometry_type_change(value)
 
 
 class _delete_all_features_attr(SP):

@@ -26,7 +26,7 @@ Changes
 - MapInfo formats support when creating a vector layer.
 - Creation of an empty vector layer without uploading a file.
 - Ability to replace existing vector layer features and fields from a file.
-- Instant deletion of existing vector layer features.
+- Deletion of all features and changing geometry type for vector layers.
 - Chrome 102+, Safari 15+, Edge 109+ or Firefox 102+ browser is required.
 - Resource and feature description editors updated to CKEditor 5.
 

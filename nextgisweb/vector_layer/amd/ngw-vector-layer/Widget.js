@@ -40,7 +40,6 @@ define([
         delete: "delete",
         geom: "geom",
     };
-    var danger_modes = [Modes.file, Modes.delete, Modes.geom];
     return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: i18n.renderTemplate(template),
         title: i18n.gettext("Vector layer"),
@@ -49,11 +48,44 @@ define([
 
         constructor: function() {
             this.wSrs = SRSSelect({allSrs: null});
+            this._geometry_type = null;
+            this._gt_options = [
+                { value: "POINT", label: i18n.gettext("Point") },
+                { value: "LINESTRING", label: i18n.gettext("Line") },
+                { value: "POLYGON", label: i18n.gettext("Polygon") },
+                { value: "MULTIPOINT", label: i18n.gettext("Multipoint") },
+                { value: "MULTILINESTRING", label: i18n.gettext("Multiline") },
+                { value: "MULTIPOLYGON", label: i18n.gettext("Multipolygon") },
+                { value: "POINTZ", label: i18n.gettext("Point Z") },
+                { value: "LINESTRINGZ", label: i18n.gettext("Line Z") },
+                { value: "POLYGONZ", label: i18n.gettext("Polygon Z") },
+                { value: "MULTIPOINTZ", label: i18n.gettext("Multipoint Z") },
+                { value: "MULTILINESTRINGZ", label: i18n.gettext("Multiline Z") },
+                { value: "MULTIPOLYGONZ", label: i18n.gettext("Multipolygon Z") },
+            ];
+        },
+
+        _confirmSectionVision: function (gt, mode) {
+            var hide;
+            if (gt === undefined) {
+                switch (mode) {
+                    case Modes.file:
+                    case Modes.delete:
+                        hide = false;
+                        break;
+                    case Modes.geom:
+                        hide = this.wGeometryType.get("value") === this._geometry_type;
+                        break;
+                    default:
+                        hide = true;
+                }
+            } else {
+                hide = gt === this._geometry_type;
+            }
+            this.confirm_section.style.display = hide ? "none" : "";
         },
 
         _layersVision: function (enable) {
-            // this.wLayerName.domNode.parentNode.parentNode
-            //     .style.display = show ? "" : "none";
             this.wSourceLayer.set("disabled", !enable);
         },
 
@@ -67,15 +99,32 @@ define([
 
         postCreate: function () {
             if (this.composite.operation === "create") {
+                this.wGeometryType.addOption(this._gt_options);
                 this.confirm_section.style.display = "none";
+            } else {
+                this.wGeometryType.watch("value", function(attr, oldval, newval) {
+                    this._confirmSectionVision(newval);
+                    this.confirm.set("checked", false);
+                }.bind(this));
             }
+
             this.modeSwitcher.watch("value", function(attr, oldval, newval) {
-                this.empty_layer_section.style.display = 
+                this.geometry_section.style.display = 
                     [Modes.empty, Modes.geom].includes(newval) ? "" : "none";
                 this.file_section.style.display = newval === Modes.file ? "" : "none";
                 if (this.composite.operation === "update") {
-                    this.confirm_section.style.display = 
-                        danger_modes.includes(newval) ? "" : "none";
+                    if ([Modes.file, Modes.delete, Modes.geom].includes(newval)) {
+                        switch (newval) {
+                            case Modes.file:
+                            case Modes.delete:
+                                this.confirm_label.innerText = i18n.gettext("Confirm deletion of existing features");
+                                break;
+                            case Modes.geom:
+                                this.confirm_label.innerText = i18n.gettext("Confirm change of geometry type");
+                        }
+                    }
+                    this._confirmSectionVision(undefined, newval);
+                    this.confirm.set("checked", false);
                 }
             }.bind(this));
 
@@ -87,7 +136,7 @@ define([
                     { value: Modes.keep, label: i18n.gettext("Keep existing layer features"), selected: true },
                     { value: Modes.file, label: i18n.gettext("Replace layer features from file") },
                     { value: Modes.delete, label: i18n.gettext("Delete all features from layer") },
-                    // { value: Modes.geom, label: i18n.gettext("Change geometry type") },
+                    { value: Modes.geom, label: i18n.gettext("Change geometry type") },
                 ]
             );
 
@@ -134,6 +183,22 @@ define([
                 var hideSkipOtherGeometryType = newval === "AUTO";
                 this.wSkipOtherGeometryTypes.set("disabled", hideSkipOtherGeometryType);
             }.bind(this));
+        },
+
+        deserializeInMixin: function (data) {
+            this._geometry_type = data[this.prefix].geometry_type;
+            var geom_class = this._geometry_type.replace(/^(MULTI)?(.*?)Z?$/, '$2');
+            var gt_options = [];
+            this._gt_options.forEach(function (option) {
+                if (option.value.includes(geom_class)) {
+                    if (option.value === this._geometry_type) {
+                        option.selected = true;
+                        option.label += ' <span style="color: gray">' + i18n.gettext("current") + '</span>';
+                    }
+                    gt_options.push(option);
+                }
+            }.bind(this));
+            this.wGeometryType.addOption(gt_options);
         },
 
         serialize: function(data, lunkwill) {
@@ -201,12 +266,18 @@ define([
                 return false;
             }
 
-            if (
-                this.composite.operation === "update"
-                && danger_modes.includes(this.modeSwitcher.get("value"))
-            ) {
-                domStyle.set(this.confirm_section, "color", "var(--danger)");
-                return this.confirm.get("value");
+            if (this.composite.operation === "update") {
+                var mode = this.modeSwitcher.get("value");
+                if (
+                    [Modes.file, Modes.delete].includes(mode)
+                    || (
+                        mode === Modes.geom
+                        && this.wGeometryType.get("value") !== this._geometry_type
+                    )
+                ) {
+                    domStyle.set(this.confirm_section, "color", "var(--danger)");
+                    return this.confirm.get("value");
+                }
             }
 
             return true;
