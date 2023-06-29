@@ -1,6 +1,6 @@
 from itertools import chain
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Optional
 
 from nextgisweb.lib.json import loads
 from nextgisweb.lib.logging import logger
@@ -36,7 +36,7 @@ def scan_for_nodepkgs(cid: str, cpath: Path) -> Generator[Path, None, None]:
         yield path
 
 
-def scan_for_icons(cid: str, cpath: Path) -> Generator[Path, None, None]:
+def scan_for_icons(cid: str, cpath: Path) -> Optional[Path]:
     for path in cpath.glob('icon'):
         logger.debug("Component [%s] icons found in %s", cid, path)
-        yield path
+        return path

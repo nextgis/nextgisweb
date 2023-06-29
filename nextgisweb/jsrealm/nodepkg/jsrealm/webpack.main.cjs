@@ -177,7 +177,7 @@ for (const lang of config.locales) {
 let spriteCode = "";
 const sharedIconIds = {};
 
-for (const [comp, dir] of config.iconSources) {
+for (const [comp, dir] of Object.entries(config.iconSources)) {
     const realDir = fs.realpathSync(dir);
     for (let fn of glob.sync(`${realDir}/**/*.svg`)) {
         const id = ("icon-" + comp + "-" +

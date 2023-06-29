@@ -1,5 +1,5 @@
-from itertools import chain
 import json
+from itertools import chain
 from pathlib import Path
 from subprocess import check_call
 
@@ -25,23 +25,29 @@ def install(
     self: EnvCommand.customize(env_initialize=False),
     *, env: Env, core: CoreComponent, pyramid: PyramidComponent,
 ):
-    npkg_scan = list()
-    icon_scan = list()
-
     debug = core.options['debug']
     cwd = Path().resolve()
 
+    cpaths = dict()
     for cid, cpath in pkginfo._comp_path.items():
         cpath = cpath.resolve().relative_to(cwd)
         if cid not in env.components and debug:
             logger.debug("Component [%s] excluded from build in debug mode", cid)
             continue
+        cpaths[cid] = cpath
 
-        npkg_scan.append(scan_for_nodepkgs(cid, cpath))
-        icon_scan.append(scan_for_icons(cid, cpath))
+    npkgs = [str(p) for p in chain(*[
+        scan_for_nodepkgs(cid, cpath)
+        for cid, cpath in cpaths.items()
+    ])]
 
-    npkgs = [str(p) for p in chain(*npkg_scan)]
-    icons = [str(p) for p in chain(*icon_scan)]
+    icons = {cid: str(ipath) for cid, ipath in filter(
+        lambda i: i[1] is not None,
+        [
+            (cid, scan_for_icons(cid, cpath))
+            for cid, cpath in cpaths.items()
+        ]
+    )}
 
     package_json = dict(private=True)
     package_json['config'] = config = dict()
