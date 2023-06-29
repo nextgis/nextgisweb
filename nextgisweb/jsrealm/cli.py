@@ -1,3 +1,4 @@
+from itertools import chain
 import json
 from pathlib import Path
 from subprocess import check_call
@@ -11,6 +12,8 @@ from nextgisweb.core import CoreComponent
 from nextgisweb.pyramid import PyramidComponent
 from nextgisweb.pyramid.uacompat import FAMILIES
 
+from .util import scan_for_icons, scan_for_nodepkgs
+
 
 @cli.group()
 class jsrealm:
@@ -22,8 +25,8 @@ def install(
     self: EnvCommand.customize(env_initialize=False),
     *, env: Env, core: CoreComponent, pyramid: PyramidComponent,
 ):
-    client_packages = list()
-    icon_sources = list()
+    npkg_scan = list()
+    icon_scan = list()
 
     debug = core.options['debug']
     cwd = Path().resolve()
@@ -34,26 +37,19 @@ def install(
             logger.debug("Component [%s] excluded from build in debug mode", cid)
             continue
 
-        jspkg = cpath / 'nodepkg'
-        if jspkg.exists():
-            for package_json in jspkg.glob('**/package.json'):
-                package_dir = package_json.parent
-                logger.debug("Node package %s (%s)", package_dir, cid)
-                client_packages.append(str(package_dir))
+        npkg_scan.append(scan_for_nodepkgs(cid, cpath))
+        icon_scan.append(scan_for_icons(cid, cpath))
 
-        icon_source = cpath / 'icon'
-        if icon_source.exists():
-            logger.debug("Icon source %s (%s)", icon_source, cid)
-            icon_sources.append([cid, str(icon_source)])
+    npkgs = [str(p) for p in chain(*npkg_scan)]
+    icons = [str(p) for p in chain(*icon_scan)]
 
     package_json = dict(private=True)
     package_json['config'] = config = dict()
     config['nextgisweb_core_debug'] = str(debug).lower()
     config['nextgisweb_jsrealm_root'] = str(cwd.resolve())
-    config['nextgisweb_jsrealm_packages'] = ','.join(client_packages)
-    config['nextgisweb_jsrealm_externals'] = ','.join([
-        pname for pname, _ in amd_packages()])
-    config['nextgisweb_jsrealm_icon_sources'] = json.dumps(icon_sources)
+    config['nextgisweb_jsrealm_packages'] = ','.join(npkgs)
+    config['nextgisweb_jsrealm_externals'] = ','.join([pn for pn, _ in amd_packages()])
+    config['nextgisweb_jsrealm_icon_sources'] = json.dumps(icons)
 
     ca = pyramid.options['compression.algorithms']
     config['nextgisweb_pyramid_compression_algorithms'] = \
@@ -78,7 +74,7 @@ def install(
     scripts['build'] = 'webpack --progress --config {}'.format(webpack_config)
     scripts['watch'] = 'webpack --progress --watch --config {}'.format(webpack_config)
 
-    package_json['workspaces'] = client_packages
+    package_json['workspaces'] = npkgs
 
     with open('package.json', 'w') as fd:
         fd.write(json.dumps(package_json, indent=4))
