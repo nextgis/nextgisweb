@@ -1,12 +1,12 @@
-#: api.py:24
+#: api.py:23
 msgid "Uploaded file too large"
 msgstr "Загруженный файл слишком большой"
 
-#: api.py:29
+#: api.py:28
 msgid "Upload is not completed"
 msgstr "Загрузка не завершена"
 
-#: view.py:8
+#: view.py:9
 msgid "File Upload testing page"
 msgstr "Страница тестирования загрузки файлов"
 
@@ -22,7 +22,7 @@ msgstr "максимум"
 msgid "Uploading..."
 msgstr "Идёт загрузка..."
 
-#: amd/ngw-file-upload/Uploader.js:121 nodepkg/hook/useFileUploader.js:47
+#: amd/ngw-file-upload/Uploader.js:121 nodepkg/hook/useFileUploader.js:46
 msgid " uploaded..."
 msgstr " загружено..."
 

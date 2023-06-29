@@ -24,15 +24,15 @@ msgstr "Диапазон %s не может быть прочитан."
 msgid "Rasters and pyramids"
 msgstr "Растры и пирамиды"
 
-#: amd/ngw-raster-layer/Widget.js:30 model.py:61 view.py:32
+#: amd/ngw-raster-layer/Widget.js:30 model.py:56 view.py:56
 msgid "Raster layer"
 msgstr "Растровый слой"
 
-#: model.py:82
+#: model.py:77
 msgid "GDAL library was unable to open the file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:90
+#: model.py:85
 #, python-format
 msgid ""
 "Raster has format '%(format)s', however only following formats are supported:"
@@ -41,19 +41,19 @@ msgstr ""
 "Формат загруженного растра '%(format)s', однако поддерживаются только "
 "следующие типы: %(all_formats)s."
 
-#: model.py:95
+#: model.py:90
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:113
+#: model.py:109
 msgid "Mixed band data types are not supported."
 msgstr "Смешанные типы каналов не поддерживаются."
 
-#: model.py:124
+#: model.py:136
 msgid "GDAL was uanble to parse the raster coordinate system."
 msgstr "GDAL не смог обработать определение системы координат растра."
 
-#: model.py:128
+#: model.py:140
 msgid ""
 "The source raster has a local coordinate system and can't be reprojected to "
 "the target coordinate system."
@@ -61,16 +61,16 @@ msgstr ""
 "Исходный растр имеет локальную систему координат и не может быть "
 "перепроецирован в целевую."
 
-#: model.py:144
+#: model.py:156
 msgid "Failed to reproject the raster to the target coordinate system."
 msgstr "Не удалось перепроецировать растр в целевую систему координат."
 
-#: model.py:147
+#: model.py:159
 #, python-format
 msgid "GDAL error message: %s"
 msgstr "Сообщение об ошибке GDAL: %s"
 
-#: model.py:160
+#: model.py:172
 #, python-format
 msgid ""
 "The uncompressed raster size (%(size)s) exceeds the limit (%(limit)s) by "
@@ -79,41 +79,38 @@ msgstr ""
 "Размер несжатого растра (%(size)s) превышает лимит (%(limit)s) на %(delta)s. "
 "Уменьшите растр, чтобы он вписывался в лимит."
 
-#: model.py:242
+#: model.py:259
 msgid "Data type"
 msgstr "Тип данных"
 
-#: model.py:243
+#: model.py:260
 msgid "COG"
 msgstr "COG"
 
-#: view.py:21 view.py:36
+#: view.py:25 view.py:60
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:42
+#: view.py:33
+msgid "Cloud Optimized GeoTIFF"
+msgstr "Cloud Optimized GeoTIFF"
+
+#: view.py:34
+msgid ""
+"A Cloud Optimized GeoTIFF (COG) is a regular GeoTIFF file, aimed at being "
+"hosted on a HTTP file server, with an internal organization that enables more"
+" efficient workflows on the cloud. It does this by leveraging the ability of "
+"clients issuing ​HTTP GET range requests to ask for just the parts of a file "
+"they need."
+msgstr ""
+"Cloud Optimized GeoTIFF (COG) это специально подготовленный к хранению на "
+"веб-сервере и эффективной работе в облаке файл GeoTIFF, позволяющий "
+"обращаться в HTTP запросах только к нужным частям растра, без необходимости "
+"загружать его в клиентское приложение целиком."
+
+#: view.py:66
 msgid "Download"
 msgstr "Скачать"
-
-#: amd/ngw-raster-layer/ExportForm.js:101
-msgid "Band"
-msgstr "Канал"
-
-#: amd/ngw-raster-layer/template/ExportForm.hbs:13
-msgid "Format"
-msgstr "Формат"
-
-#: amd/ngw-raster-layer/template/ExportForm.hbs:17
-msgid "SRS"
-msgstr "Система координат"
-
-#: amd/ngw-raster-layer/template/ExportForm.hbs:21
-msgid "Bands"
-msgstr "Каналы"
-
-#: amd/ngw-raster-layer/template/ExportForm.hbs:30
-msgid "Save"
-msgstr "Сохранить"
 
 #: amd/ngw-raster-layer/template/Widget.hbs:4
 msgid "Select a dataset"
@@ -131,19 +128,23 @@ msgstr "Система координат"
 msgid "Cloud Optimized GeoTIFF (COG)"
 msgstr "Cloud Optimized GeoTIFF (COG)"
 
-#: template/section_api_cog.mako:10
-msgid "Cloud Optimized GeoTIFF"
-msgstr "Cloud Optimized GeoTIFF"
+#: nodepkg/export-form/ExportForm.js:24
+msgid "Band"
+msgstr "Канал"
 
-#: template/section_api_cog.mako:11
-msgid ""
-"A Cloud Optimized GeoTIFF (COG) is a regular GeoTIFF file, aimed at being "
-"hosted on a HTTP file server, with an internal organization that enables more"
-" efficient workflows on the cloud. It does this by leveraging the ability of "
-"clients issuing ​HTTP GET range requests to ask for just the parts of a file "
-"they need."
-msgstr ""
-"Cloud Optimized GeoTIFF (COG) это специально подготовленный к хранению на "
-"веб-сервере и эффективной работе в облаке файл GeoTIFF, позволяющий "
-"обращаться в HTTP запросах только к нужным частям растра, без необходимости "
-"загружать его в клиентское приложение целиком."
+#: nodepkg/export-form/ExportForm.js:66
+msgid "Format"
+msgstr "Формат"
+
+#: nodepkg/export-form/ExportForm.js:75
+msgid "SRS"
+msgstr "Система координат"
+
+#: nodepkg/export-form/ExportForm.js:81
+msgid "Bands"
+msgstr "Каналы"
+
+#: nodepkg/export-form/ExportForm.js:116
+msgid "Save"
+msgstr "Сохранить"
+

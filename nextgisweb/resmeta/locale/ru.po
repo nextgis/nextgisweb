@@ -1,4 +1,20 @@
-#: amd/ngw-resmeta/Widget.js:12 view.py:15
+#: model.py:55 nodepkg/editor/EditorWidget.js:109
+msgid "String"
+msgstr "Строка"
+
+#: model.py:56 nodepkg/editor/EditorWidget.js:110
+msgid "Number"
+msgstr "Число"
+
+#: model.py:57 nodepkg/editor/EditorWidget.js:111
+msgid "Boolean"
+msgstr "Логический"
+
+#: model.py:58 nodepkg/editor/EditorWidget.js:112
+msgid "Empty"
+msgstr "Пусто"
+
+#: nodepkg/editor/EditorWidget.js:181 view.py:14
 msgid "Metadata"
 msgstr "Метаданные"
 
@@ -14,38 +30,23 @@ msgstr "Ключ не уникален."
 msgid "Type here to add a new key..."
 msgstr "Введите новый ключ здесь..."
 
-#: nodepkg/editor/EditorWidget.js:86
+#: nodepkg/editor/EditorWidget.js:86 template/resource_section.mako:21
 msgid "False"
 msgstr "Ложь"
 
-#: nodepkg/editor/EditorWidget.js:87
+#: nodepkg/editor/EditorWidget.js:87 template/resource_section.mako:21
 msgid "True"
 msgstr "Истина"
 
-#: nodepkg/editor/EditorWidget.js:109
-msgid "String"
-msgstr "Строка"
-
-#: nodepkg/editor/EditorWidget.js:110
-msgid "Number"
-msgstr "Число"
-
-#: nodepkg/editor/EditorWidget.js:111
-msgid "Boolean"
-msgstr "Логический"
-
-#: nodepkg/editor/EditorWidget.js:112
-msgid "Empty"
-msgstr "Пусто"
-
-#: nodepkg/editor/EditorWidget.js:127 template/section.mako:10
+#: nodepkg/editor/EditorWidget.js:127 template/resource_section.mako:12
 msgid "Key"
 msgstr "Ключ"
 
-#: nodepkg/editor/EditorWidget.js:138 template/section.mako:11
+#: nodepkg/editor/EditorWidget.js:138 template/resource_section.mako:13
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/editor/EditorWidget.js:148 template/section.mako:12
+#: nodepkg/editor/EditorWidget.js:148 template/resource_section.mako:14
 msgid "Value"
 msgstr "Значение"
+

@@ -42,11 +42,11 @@ msgstr ""
 msgid "The value of '{}' parameter must be a non-negative integer."
 msgstr "Значение параметра '{}' должно быть не отрицательным числом."
 
-#: view.py:29
+#: view.py:30
 msgid "TMS (Tile Map Service)"
 msgstr "TMS (Tile Map Service)"
 
-#: view.py:30
+#: view.py:31
 msgid ""
 "TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map "
 "is a map displayed in a browser by seamlessly joining dozens of individually "
@@ -56,7 +56,7 @@ msgstr ""
 "это карта, отображаемая в браузере путем бесшовного соединения десятков "
 "индивидуально запрашиваемых изображений (тайлов)."
 
-#: view.py:43
+#: view.py:44
 msgid "Legend symbols"
 msgstr "Символы легенды"
 

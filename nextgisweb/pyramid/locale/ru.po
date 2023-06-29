@@ -1,28 +1,28 @@
-#: __init__.py:146
-msgid "Enabled"
-msgstr "Включено"
-
-#: __init__.py:146
-msgid "Disabled"
-msgstr "Отключено"
-
-#: api.py:228
+#: api.py:224
 msgid "Required parameter 'component' is missing."
 msgstr "Отсутствует необходимый параметр 'component'."
 
-#: api.py:233
+#: api.py:229
 msgid "Invalid component identity."
 msgstr "Некорректный идентификатор компонента."
 
-#: api.py:570
+#: api.py:566
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: exception.py:202 exception.py:263
+#: component.py:137
+msgid "Enabled"
+msgstr "Включено"
+
+#: component.py:137
+msgid "Disabled"
+msgstr "Отключено"
+
+#: exception.py:203 exception.py:264
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:203
+#: exception.py:204
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -30,37 +30,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:232
+#: exception.py:233
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:233
+#: exception.py:234
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:240
+#: exception.py:241
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:241
+#: exception.py:242
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:245
+#: exception.py:246
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:246
+#: exception.py:247
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:250
+#: exception.py:251
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:251
+#: exception.py:252
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -69,15 +69,15 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:258
+#: exception.py:259
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:259
+#: exception.py:260
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:264
+#: exception.py:265
 msgid ""
 "The server has either erred or is incapable of performing the requested "
 "operation."
@@ -85,61 +85,61 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:271 exception.py:272
+#: exception.py:272 exception.py:273
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:276
+#: exception.py:277
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:277
+#: exception.py:278
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: nodepkg/layout/store.js:42 view.py:81
+#: nodepkg/layout/store.js:42 view.py:97
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:103 view.py:481
+#: view.py:120 view.py:516
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:116 view.py:498
+#: view.py:134 view.py:533
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:126 view.py:503
+#: view.py:145 view.py:538
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:142 view.py:487
+#: view.py:162 view.py:522
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:150 view.py:489
+#: view.py:171 view.py:524
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:158 view.py:491
+#: view.py:180 view.py:526
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:166 view.py:485
+#: view.py:189 view.py:520
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:174 view.py:493
+#: view.py:198 view.py:528
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:480
+#: view.py:515
 msgid "Info"
 msgstr "Информация"
 
-#: nodepkg/layout/Avatar.js:22 view.py:484
+#: nodepkg/layout/Avatar.js:22 view.py:519
 msgid "Settings"
 msgstr "Настройки"
 
@@ -257,11 +257,11 @@ msgstr "Вначале исправьте ошибку в форме"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/custom-css-form/CustomCSSForm.js:33
+#: nodepkg/custom-css-form/CustomCSSForm.js:35
 msgid "Custom styles saved. Reload the page to get them applied."
 msgstr "Изменения в стилях сохранены. Обновите страницу, чтобы увидеть изменения."
 
-#: nodepkg/custom-css-form/CustomCSSForm.js:63
+#: nodepkg/custom-css-form/CustomCSSForm.js:57
 msgid ""
 "Enter custom CSS rules here. They will be used to redefine styles, design for"
 " all pages of your Web GIS."
@@ -402,15 +402,15 @@ msgstr "Время (UTC)"
 msgid "Size"
 msgstr "Размер"
 
-#: template/sysinfo.mako:35
+#: template/sysinfo.mako:38
 msgid "Package"
 msgstr "Пакет"
 
-#: template/sysinfo.mako:36
+#: template/sysinfo.mako:39
 msgid "Version"
 msgstr "Версия"
 
-#: template/sysinfo.mako:71
+#: template/sysinfo.mako:74
 msgid "Platform"
 msgstr "Платформа"
 
@@ -418,11 +418,11 @@ msgstr "Платформа"
 msgid "Browser support"
 msgstr "Поддержка браузеров"
 
-#: template/sysinfo.mako:98
+#: template/sysinfo.mako:100
 msgid "or higher"
 msgstr "или выше"
 
-#: template/sysinfo.mako:100
+#: template/sysinfo.mako:102
 msgid "Not supported"
 msgstr "Не поддерживается"
 
@@ -503,3 +503,4 @@ msgid "If you are using an up-to-date browser the Web GIS should be fine."
 msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
+

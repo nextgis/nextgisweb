@@ -39,79 +39,95 @@ msgstr "Формат даты '%s' не поддерживается."
 
 #: api.py:630
 msgid "Unknown spatial reference system"
-msgstr ""
+msgstr "Неизвестная система координат"
 
-#: exception.py:13
+#: exception.py:12
 msgid "Feature not found"
 msgstr "Объект не найден"
 
-#: exception.py:14
+#: exception.py:13
 #, python-format
 msgid "Feature with id = %d was not found in resource with id = %d."
 msgstr "Объект с id = %d не найден в ресурсе с id = %d."
 
-#: exception.py:15
+#: exception.py:14
 msgid "The feature may have been deleted or an error in the address."
 msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
 
-#: model.py:165
+#: model.py:159
 #, python-format
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: model.py:175
+#: model.py:169
 msgid "Field name is forbidden: '{}'. Please remove or rename it."
 msgstr "Недопустимое имя поля: '{}'. Пожалуйста удалите или переименуйте его."
 
-#: amd/ngw-feature-layer/FieldsWidget.js:157 view.py:45
+#: amd/ngw-feature-layer/FieldsWidget.js:160 view.py:47
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: view.py:67 view.py:90
+#: view.py:69 view.py:92
 #, python-format
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:141 view.py:151 view.py:230
+#: nodepkg/feature-grid/component/ExportAction.js:20 view.py:144 view.py:155
+#: view.py:250
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: view.py:217
+#: view.py:163
+msgid "MVT Vector Tiles"
+msgstr "Векторные тайлы MVT"
+
+#: view.py:164
+msgid ""
+"The Mapbox Vector Tile is an efficient encoding for map data into vector "
+"tiles that can be rendered dynamically."
+msgstr ""
+"Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
+"тайлы которые могут быть динамически отрисованы."
+
+#: view.py:237
 msgid "Features"
 msgstr "Объекты"
 
-#: template/section_fields.mako:21 view.py:222
+#: template/resource_section_fields.mako:21 view.py:242
 msgid "Table"
 msgstr "Таблица"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:54
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:34
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:246
+#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:258
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:97
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:76
 msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
 
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:123
+#: amd/ngw-feature-layer/FeatureEditorWidget.js:104
 #: nodepkg/export-form/ExportForm.js:249
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-feature-layer/FieldsDisplayWidget.js:119
+#: amd/ngw-feature-layer/FieldsDisplayWidget.js:120
 msgid "N/A"
 msgstr "Н/Д"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:70 template/section_fields.mako:15
+#: amd/ngw-feature-layer/FieldsWidget.js:70
+#: template/resource_section_fields.mako:15
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:80 template/section_fields.mako:16
+#: amd/ngw-feature-layer/FieldsWidget.js:80
+#: template/resource_section_fields.mako:16
 msgid "Type"
 msgstr "Тип"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:84 template/section_fields.mako:17
+#: amd/ngw-feature-layer/FieldsWidget.js:84
+#: template/resource_section_fields.mako:17
 msgid "Display name"
 msgstr "Наименование"
 
@@ -123,15 +139,15 @@ msgstr "ТО"
 msgid "LA"
 msgstr "АН"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:152
+#: amd/ngw-feature-layer/FieldsWidget.js:155
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:229
+#: amd/ngw-feature-layer/FieldsWidget.js:232
 msgid "Add"
 msgstr "Добавить"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:235
+#: amd/ngw-feature-layer/FieldsWidget.js:238
 msgid "Remove"
 msgstr "Удалить"
 
@@ -203,25 +219,21 @@ msgstr "Верх"
 msgid "Set field value to NULL (No data)"
 msgstr "Установить для атрибута значение NULL (Нет данных)"
 
-#: nodepkg/feature-grid/FeatureGrid.js:25
+#: nodepkg/feature-grid/FeatureGrid.js:26
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/feature-grid/FeatureGrid.js:26
+#: nodepkg/feature-grid/FeatureGrid.js:27
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGrid.js:27
+#: nodepkg/feature-grid/FeatureGrid.js:28
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGrid.js:28
+#: nodepkg/feature-grid/FeatureGrid.js:29
 msgid "Edit"
 msgstr "Редактировать"
-
-#: nodepkg/feature-grid/component/ExportAction.js:20
-msgid "Export"
-msgstr "Экспорт"
 
 #: nodepkg/feature-grid/component/ExportAction.js:21
 msgid "Advanced Export"
@@ -275,26 +287,16 @@ msgstr "Охват (xMax)"
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
-#: template/section_api_layer.mako:11
-msgid "MVT Vector Tiles"
-msgstr "Векторные тайлы MVT"
-
-#: template/section_api_layer.mako:12
-msgid ""
-"The Mapbox Vector Tile is an efficient encoding for map data into vector "
-"tiles that can be rendered dynamically."
-msgstr ""
-"Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
-"тайлы которые могут быть динамически отрисованы."
-
-#: template/section_fields.mako:19
+#: template/resource_section_fields.mako:19
 msgid "Lookup table"
 msgstr "Справочник"
 
-#: template/section_fields.mako:32 template/section_fields.mako:38
+#: template/resource_section_fields.mako:32
+#: template/resource_section_fields.mako:38
 msgid "Yes"
 msgstr "Да"
 
-#: template/section_fields.mako:34 template/section_fields.mako:38
+#: template/resource_section_fields.mako:34
+#: template/resource_section_fields.mako:38
 msgid "No"
 msgstr "Нет"

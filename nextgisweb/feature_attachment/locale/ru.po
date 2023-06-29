@@ -1,82 +1,82 @@
-#: __init__.py:12
+#: component.py:11
 msgid "Feature attachments"
 msgstr "Прикрепленные к объектам файлы"
 
-#: api.py:225
-msgid "Invalid ZIP archive."
-msgstr "Некорректный ZIP-архив."
-
-#: api.py:253
-msgid "File '{}' isn't found in metadata."
-msgstr "Файл '{}' не найден в метаданных."
-
-#: api.py:258
-msgid "Invalid name for file '{}'."
-msgstr "Некорректное имя для файла '{}'."
-
-#: api.py:264
-msgid "Invalid feature ID for file '{}'."
-msgstr "Некорректный идентификатор объекта для файла '{}'."
-
-#: api.py:270
-msgid "Invalid MIME type for file '{}'."
-msgstr "Некорректный MIME-тип для файла '{}'."
-
-#: api.py:276
-msgid "Invalid description for file '{}'."
-msgstr "Некорректное описание для файла '{}'."
-
-#: api.py:288
-msgid "Could not determine feature ID for file '{}'."
-msgstr "Не удалось определить идентификатор объекта для файла '{}'."
-
-#: api.py:305
-msgid "File '{}' isn't found in the archive."
-msgstr "Файл '{}' не найден в архиве."
-
-#: exception.py:12
+#: exception.py:11
 msgid "Attachment not found"
 msgstr "Вложение не найдено"
 
-#: exception.py:13
+#: exception.py:12
 #, python-format
 msgid "Attachment with id = %d was not found in feature with id = %d."
 msgstr "Вложение с id = %d не найдено в объекте с id = %d."
 
-#: exception.py:14
+#: exception.py:13
 msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 
-#: view.py:19 view.py:40
+#: util.py:29
+msgid "Invalid ZIP archive."
+msgstr "Некорректный ZIP-архив."
+
+#: util.py:57
+msgid "File '{}' isn't found in metadata."
+msgstr "Файл '{}' не найден в метаданных."
+
+#: util.py:62
+msgid "Invalid name for file '{}'."
+msgstr "Некорректное имя для файла '{}'."
+
+#: util.py:68
+msgid "Invalid feature ID for file '{}'."
+msgstr "Некорректный идентификатор объекта для файла '{}'."
+
+#: util.py:74
+msgid "Invalid MIME type for file '{}'."
+msgstr "Некорректный MIME-тип для файла '{}'."
+
+#: util.py:80
+msgid "Invalid description for file '{}'."
+msgstr "Некорректное описание для файла '{}'."
+
+#: util.py:92
+msgid "Could not determine feature ID for file '{}'."
+msgstr "Не удалось определить идентификатор объекта для файла '{}'."
+
+#: util.py:109
+msgid "File '{}' isn't found in the archive."
+msgstr "Файл '{}' не найден в архиве."
+
+#: view.py:21 view.py:42
 msgid "Manage attachments"
 msgstr "Управление вложениями"
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:36
-#: amd/ngw-feature-attachment/EditorWidget.js:109
+#: amd/ngw-feature-attachment/EditorWidget.js:19
 msgid "Attachments"
 msgstr "Вложения"
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:91
-#: amd/ngw-feature-attachment/EditorWidget.js:76
+#: nodepkg/attachment-editor/AttachmentEditor.js:176
 msgid "File name"
 msgstr "Имя файла"
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:91
-#: amd/ngw-feature-attachment/EditorWidget.js:84
+#: nodepkg/attachment-editor/AttachmentEditor.js:182
 msgid "Size"
 msgstr "Размер"
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:91
-#: amd/ngw-feature-attachment/EditorWidget.js:90
+#: nodepkg/attachment-editor/AttachmentEditor.js:188
 msgid "MIME type"
 msgstr "Тип MIME"
 
 #: amd/ngw-feature-attachment/DisplayWidget.js:91
-#: amd/ngw-feature-attachment/EditorWidget.js:97
+#: nodepkg/attachment-editor/AttachmentEditor.js:193
 msgid "Description"
 msgstr "Описание"
 
-#: nodepkg/attachment-editor/AttachmentEditor.js:164
+#: nodepkg/attachment-editor/AttachmentEditor.js:150
 msgid "Preview"
 msgstr "Просмотр"
 

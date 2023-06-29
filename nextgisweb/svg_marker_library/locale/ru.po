@@ -1,23 +1,23 @@
-#: amd/ngw-svg-marker-library/Widget.js:62 model.py:28 view.py:16 view.py:29
+#: amd/ngw-svg-marker-library/Widget.js:62 model.py:25 view.py:18 view.py:30
 msgid "SVG marker library"
 msgstr "Библиотека маркеров SVG"
 
-#: model.py:71
+#: model.py:93
 #, python-format
 msgid "Insecure filename \"%s\"."
 msgstr "Небезопасное имя файла \"%s\"."
 
-#: model.py:76
+#: model.py:98
 #, python-format
 msgid "File \"%s\" has an invalid extension."
 msgstr "Неправильное расширение файла \"%s\"."
 
-#: model.py:82
+#: model.py:104
 #, python-format
 msgid "File type \"%s\" is not SVG."
 msgstr "Тип файла \"%s\" не SVG."
 
-#: view.py:20
+#: view.py:22
 msgid "Export"
 msgstr "Экспорт"
 
@@ -25,19 +25,19 @@ msgstr "Экспорт"
 msgid "File name"
 msgstr "Имя файла"
 
-#: amd/ngw-svg-marker-library/Widget.js:82
+#: amd/ngw-svg-marker-library/Widget.js:84
 msgid "Upload files"
 msgstr "Загрузить файлы"
 
-#: amd/ngw-svg-marker-library/Widget.js:102
+#: amd/ngw-svg-marker-library/Widget.js:104
 msgid "Upload archive"
 msgstr "Загрузить архив"
 
-#: amd/ngw-svg-marker-library/Widget.js:133
+#: amd/ngw-svg-marker-library/Widget.js:135
 msgid "Delete"
 msgstr "Удалить"
 
-#: template/section.mako:6
+#: template/resource_section.mako:6
 msgid "Name"
 msgstr "Имя"
 

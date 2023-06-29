@@ -922,15 +922,21 @@ msgstr "Посмотреть карту на %s"
 
 #: template/preview_embedded.mako:10
 msgid "This page is for a preview of the web map to be embedded on the site."
-msgstr "Эта страница предназначена для предпросмотра веб карты, которую необходимо встроить на сайт."
+msgstr ""
+"Эта страница предназначена для предпросмотра веб карты, которую необходимо "
+"встроить на сайт."
 
 #: template/preview_embedded.mako:11
 msgid ""
 "Most likely, you went from the \"Share\" section of the web map and refreshed"
 " the page."
-msgstr "Скорее всего, вы перешли из секции \"Поделиться\" веб карты и обновили страницу."
+msgstr ""
+"Скорее всего, вы перешли из секции \"Поделиться\" веб карты и обновили "
+"страницу."
 
 #: template/preview_embedded.mako:12
 msgid "To generate a preview, go back to the web map page and click \"Preview\"."
-msgstr "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите \"Предпросмотр\"."
+msgstr ""
+"Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
+"\"Предпросмотр\"."
 

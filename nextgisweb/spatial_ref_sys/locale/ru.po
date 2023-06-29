@@ -1,82 +1,82 @@
-#: api.py:31
+#: api.py:33
 msgid "SRS attribute '{}' cannot be changed or set during creation."
 msgstr "Атрибут СК '{}' не может быть изменен или установлен в процессе создания."
 
-#: api.py:36
+#: api.py:38
 msgid "SRS attribute '{}' must have a string value."
 msgstr "Атрибут СК '{}' должен иметь строковое значение."
 
-#: api.py:44
+#: api.py:46
 msgid "SRS display name is not unique."
 msgstr "Наименование СК не уникально."
 
-#: api.py:50
+#: api.py:52
 msgid "OGC WKT definition cannot be changed for this SRS."
 msgstr "Определение OGC WKT не может быть изменено для этой СК."
 
-#: api.py:89
+#: api.py:91
 msgid "System SRS cannot be deleted."
 msgstr "Системная СК не может быть удалена."
 
-#: api.py:102
+#: api.py:104
 msgid "Invalid SRS definition!"
 msgstr "Неверное определение SRS!"
 
-#: api.py:207
+#: api.py:224
 msgid "SRS authority attributes must be defined while importing from the catalog."
 msgstr "Аттрибуты организации СК должны быть указаны при импорте из каталога."
 
-#: api.py:232
+#: api.py:249
 msgid "SRS #{} already exists."
 msgstr "СК #{} уже существует."
 
-#: util.py:39
+#: util.py:40
 #, python-format
 msgid "Invalid MapInfo spatial reference system: %s"
 msgstr "Неверная система координат MapInfo: %s"
 
-#: util.py:60
+#: util.py:61
 #, python-format
 msgid "Unknown spatial reference system format: %s!"
 msgstr "Неверный формат системы координат: %s!"
 
-#: util.py:70
+#: util.py:72
 msgid "Invalid OGC WKT definition!"
 msgstr "Неверное определение OGC WKT!"
 
-#: view.py:24
+#: view.py:25
 msgid "Spatial reference system catalog"
 msgstr "Каталог систем координат"
 
-#: view.py:35
+#: view.py:37
 msgid "Spatial reference system"
 msgstr "Система координат"
 
-#: view.py:45 view.py:120
+#: view.py:48 view.py:119
 msgid "Spatial reference systems"
 msgstr "Системы координат"
 
-#: view.py:58
+#: view.py:62
 msgid "Create new Spatial reference system"
 msgstr "Создать новую Систему координат"
 
-#: view.py:85
+#: view.py:84
 msgid "List"
 msgstr "Список"
 
-#: view.py:90
+#: view.py:89
 msgid "Create"
 msgstr "Создать"
 
-#: view.py:96
+#: view.py:95
 msgid "Catalog"
 msgstr "Каталог"
 
-#: view.py:102
+#: view.py:101
 msgid "Edit"
 msgstr "Редактировать"
 
-#: view.py:110
+#: view.py:109
 msgid "Delete"
 msgstr "Удалить"
 
