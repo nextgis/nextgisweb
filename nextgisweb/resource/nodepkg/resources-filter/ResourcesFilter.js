@@ -112,6 +112,7 @@ export function ResourcesFilter({ onChange, cls, ...rest }) {
             options={options}
             status={acStatus}
             notFoundContent={i18n.gettext("Resources not found")}
+            autoComplete="one-time-code"
             {...rest}
         >
             <Input.Search
@@ -120,7 +121,6 @@ export function ResourcesFilter({ onChange, cls, ...rest }) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 loading={loading}
-                autoComplete="off"
             />
         </AutoComplete>
     );
