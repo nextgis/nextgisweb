@@ -98,38 +98,6 @@ def field_collection(request) -> JSONType:
     return [f.to_dict() for f in request.context.fields]
 
 
-def store_item(layer, request) -> JSONType:
-    request.resource_permission(PD_READ)
-
-    box = request.headers.get('x-feature-box')
-    ext = request.headers.get('x-feature-ext')
-
-    query = layer.feature_query()
-    query.filter_by(id=request.matchdict['feature_id'])
-
-    if box:
-        query.box()
-
-    feature = list(query())[0]
-
-    result = dict(
-        feature.fields,
-        id=feature.id, layerId=layer.id,
-        fields=feature.fields
-    )
-
-    if box:
-        result['box'] = feature.box.bounds
-
-    if ext:
-        result['ext'] = dict()
-        for extcls in FeatureExtension.registry:
-            extension = extcls(layer=layer)
-            result['ext'][extcls.identity] = extension.feature_data(feature)
-
-    return result
-
-
 @viewargs(renderer='mako')
 def test_mvt(request):
     return dict()
@@ -210,13 +178,6 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
         client=('id', )
     ).add_view(field_collection, context=IFeatureLayer)
-
-    config.add_route(
-        'feature_layer.store.item',
-        r'/resource/{id:\d+}/store/{feature_id:\d+}',
-        factory=resource_factory,
-        client=('id', 'feature_id')
-    ).add_view(store_item, context=IFeatureLayer)
 
     config.add_view(
         export,

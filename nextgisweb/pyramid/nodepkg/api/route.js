@@ -51,7 +51,7 @@ export function route(name, ...rest) {
 
 export const compatRoute = {};
 
-// Because both keys "feature_layer.store.item" and "feature_layer.store"
+// Because both keys "feature_layer.store"
 // exist functions should be created in alphabetical order.
 for (const key of Object.keys(routeData).sort()) {
     const fn = (...args) => {

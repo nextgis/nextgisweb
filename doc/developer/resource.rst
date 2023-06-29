@@ -89,11 +89,6 @@ Web. To get possible routes execute the following request:
         "pyramid.settings": [
             "/api/component/pyramid/settings"
         ],
-        "feature_layer.store.item": [
-            "/resource/{0}/store/{1}",
-            "id",
-            "feature_id"
-        ],
         "feature_layer.feature.update": [
             "/resource/{0}/feature/{1}/update",
             "id",
