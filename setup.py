@@ -18,7 +18,6 @@ except CalledProcessError:
 
 requires = [
     'affine==2.4.0',
-    'aiohttp==3.8.4',
     'babel==2.12.1',
     'cachetools==5.3.1',
     'docstring-parser==0.15',
@@ -26,6 +25,7 @@ requires = [
     'elasticsearch-dsl>=7.1.0,<8.0.0',
     'flatdict==4.0.1',
     'geoalchemy2==0.13.3',
+    'httpx[http2]==0.24.1',
     'humanize==4.6.0',
     'lxml==4.9.2',
     'numpy',

@@ -1,14 +1,15 @@
 import re
+from io import BytesIO
 
-import PIL
 from osgeo import ogr, osr
+from PIL import Image
 from zope.interface import implementer
 
 from nextgisweb.env import declarative_base, env
 from nextgisweb.lib import db
 from nextgisweb.lib.osrhelper import sr_from_epsg
 
-from nextgisweb.core.exception import ValidationError
+from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.render import IExtentRenderRequest, IRenderableStyle, ITileRenderRequest
 from nextgisweb.resource import (
@@ -219,15 +220,19 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         image = None
 
-        for (x, y), tile_image in self.connection.get_tiles(
+        for (x, y), tile_data in self.connection.get_tiles(
             self.layer_name, zoom,
             xtile_from + x_offset, min(xtile_to, xtile_max),
             ytile_from + y_offset, min(ytile_to, ytile_max),
         ):
-            if tile_image is None:
+            if tile_data is None:
                 continue
+            try:
+                tile_image = Image.open(BytesIO(tile_data))
+            except IOError:
+                raise ExternalServiceError(message="Image processing error.")
             if image is None:
-                image = PIL.Image.new('RGBA', (width, height))
+                image = Image.new('RGBA', (width, height))
             image.paste(tile_image, ((x + x_offset) * self.tilesize, (y + y_offset) * self.tilesize))
 
         if image is not None:

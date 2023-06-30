@@ -22,7 +22,7 @@ Changes
 - Auto-generated and cofigurable legends on webmaps.
 - Improved layout and usability of the layers tree on webmaps.
 - User permissions section is moved to the separate page.
-- Improved TMS client performance as a result of parallel tiles fetching.
+- Improved TMS client performance as a result of parallel fetching and HTTP/2.
 - MapInfo formats support when creating a vector layer.
 - Creation of an empty vector layer without uploading a file.
 - Ability to replace existing vector layer features and fields from a file.

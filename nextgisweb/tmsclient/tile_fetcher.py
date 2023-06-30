@@ -1,13 +1,11 @@
 import asyncio
 import atexit
 from dataclasses import dataclass
-from io import BytesIO
 from queue import Empty, Queue
 from threading import Thread
 from typing import Optional, Tuple
 
-from aiohttp import ClientSession, TCPConnector
-from PIL import Image
+from httpx import AsyncClient, Limits, Timeout, TimeoutException
 
 from nextgisweb.env import env
 
@@ -28,7 +26,7 @@ class FetchStatus:
 class FetchResult:
     status: FetchStatus
 
-    image: Optional[Image.Image] = None
+    data: Optional[bytes] = None
     position: Optional[Tuple[int, int]] = None
 
     exception: Optional[Exception] = None
@@ -59,7 +57,7 @@ class TileFetcher:
         return cls.__instance
 
     async def _get_tiles(
-        self, tasks, session, *, req_kw,
+        self, tasks, client, *, req_kw,
         scheme, url_template, layer_name,
         zoom, xmin, xmax, ymin, ymax,
     ):
@@ -73,21 +71,17 @@ class TileFetcher:
                 layer=layer_name)
 
             try:
-                async with session.get(url, **req_kw) as response:
-                    if response.status == 200:
-                        data = BytesIO(await response.read())
-                        try:
-                            image = Image.open(data)
-                        except IOError:
-                            raise ExternalServiceError(message="Image processing error.")
-                    elif response.status in (204, 404):
-                        image = None
-                    else:
-                        raise ExternalServiceError
-            except asyncio.TimeoutError:
+                response = await client.get(url, **req_kw)
+            except TimeoutException:
                 raise TimeoutError
+            if response.status_code == 200:
+                data = response.content
+            elif response.status_code in (204, 404):
+                data = None
+            else:
+                raise ExternalServiceError
 
-            return position, image
+            return position, data
 
         for x, xtile in enumerate(range(xmin, xmax + 1)):
             for y, ytile in enumerate(range(ymin, ymax + 1)):
@@ -101,8 +95,11 @@ class TileFetcher:
         self._shutdown = False
         atexit.register(self._wait_for_shutdown)
 
-        connector = TCPConnector(limit_per_host=8)
-        async with ClientSession(connector=connector, headers=env.tmsclient.headers) as session:
+        limits = Limits(max_keepalive_connections=8)
+        async with AsyncClient(
+            headers=env.tmsclient.headers,
+            limits=limits, http2=True,
+        ) as client:
             while True:
                 if self._shutdown:
                     break
@@ -116,8 +113,8 @@ class TileFetcher:
                 answer = data.pop('answer')
                 tasks = []
                 try:
-                    async for pos, image in self._get_tiles(tasks, session, **data):
-                        answer.put_nowait(FetchResult(FetchStatus.DATA, position=pos, image=image))
+                    async for pos, data in self._get_tiles(tasks, client, **data):
+                        answer.put_nowait(FetchResult(FetchStatus.DATA, position=pos, data=data))
                 except Exception as exc:
                     answer.put_nowait(FetchResult(FetchStatus.ERROR, exception=exc))
                     for task in tasks:
@@ -138,10 +135,10 @@ class TileFetcher:
         )
         data['req_kw'] = dict(
             params=connection.query_params,
-            timeout=self._request_timeout,
+            timeout=Timeout(timeout=self._request_timeout),
         )
         if connection.insecure:
-            data['req_kw']['ssl'] = False
+            data['req_kw']['verify'] = False
 
         answer = data['answer'] = Queue()
 
@@ -159,7 +156,7 @@ class TileFetcher:
                 break
             if result.status == FetchStatus.ERROR:
                 raise result.exception
-            yield result.position, result.image
+            yield result.position, result.data
 
 
     def _wait_for_shutdown(self):
