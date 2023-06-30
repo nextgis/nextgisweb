@@ -18,6 +18,7 @@ except CalledProcessError:
 
 requires = [
     'affine==2.4.0',
+    'attrs==23.1.0',
     'babel==2.12.1',
     'cachetools==5.3.1',
     'docstring-parser==0.15',
