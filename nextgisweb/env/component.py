@@ -3,11 +3,12 @@ from pathlib import Path
 from pkg_resources import resource_filename
 from typing import Callable
 
+from nextgisweb.imptool import module_path
 from nextgisweb.lib.config import ConfigOptions
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import dict_registry
 
-from .package import module_path, pkginfo
+from .package import pkginfo
 
 
 class ComponentMeta(type):

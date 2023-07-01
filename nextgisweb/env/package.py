@@ -5,10 +5,10 @@ import sys
 import threading
 import warnings
 from importlib.metadata import metadata
-from importlib.util import find_spec
 from pathlib import Path
 from pkg_resources import iter_entry_points, resource_filename
 
+from nextgisweb.imptool import module_path
 from nextgisweb.lib.logging import logger
 
 _version_re = re.compile(r'(.+)\+(?:git)?([0-9a-f]{4,})(\.dirty)?$', re.IGNORECASE)
@@ -32,16 +32,6 @@ def amd_packages():
 
     amd_packages.cached_result = tuple(result)
     return result
-
-
-def module_path(module_name: str) -> Path:
-    spec = find_spec(module_name)
-    if spec.submodule_search_locations:
-        assert len(spec.submodule_search_locations) == 1
-        return Path(spec.submodule_search_locations[0])
-    else:
-        return Path(spec.origin).parent
-
 
 class Package:
     loading = threading.local()

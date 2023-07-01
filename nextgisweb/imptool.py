@@ -1,3 +1,4 @@
+from pathlib import Path
 import sys
 from dataclasses import dataclass
 from importlib import abc
@@ -10,6 +11,27 @@ from warnings import filterwarnings, warn
 filterwarnings(
     'ignore', r"^Not importing.*/core/migration.*__init__\.py$",
     category=ImportWarning)
+
+
+def module_path(module_name: str) -> Path:
+    """Extract module's path from sys.modules and sys.meta_path
+    Importlib's find_spec() is always importing the top-level package for
+    modules which causes problems with single-component packages."""
+
+    rest = module_name.split('.')
+    root = rest.pop(0)
+
+    if root_mod := sys.modules.get(root):
+        root_path = Path(root_mod.__file__).parent
+    else:
+        for mp in sys.meta_path:
+            if root_spec := mp.find_spec(root, None):
+                root_path = Path(root_spec.origin).parent
+                break
+        else:
+            raise ValueError(f"{module_name} not found")
+
+    return (root_path / '/'.join(rest)) if rest else root_path
 
 
 @dataclass

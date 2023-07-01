@@ -38,5 +38,5 @@ section-order = [
 ]
 
 [isort.sections]
-"nextgisweb_env_lib" = ["nextgisweb.env", "nextgisweb.lib"]
+"nextgisweb_env_lib" = ["nextgisweb.env", "nextgisweb.lib", "nextgisweb.imptool"]
 "nextgisweb_comp" = ["nextgisweb"]
