@@ -15,24 +15,6 @@ _version_re = re.compile(r'(.+)\+(?:git)?([0-9a-f]{4,})(\.dirty)?$', re.IGNORECA
 _qualifications = False
 
 
-def amd_packages():
-    if hasattr(amd_packages, 'cached_result'):
-        return list(amd_packages.cached_result)
-
-    result = list(pkginfo.amd_packages())
-    for ep in iter_entry_points(group='nextgisweb.amd_packages'):
-        ep_resolved = ep.resolve()
-        for t in ep_resolved():
-            if t not in result:
-                result.append(t)
-            else:
-                warnings.warn(
-                    f"AMD package '{t[0]}' is reported by {ep.name} but it was "
-                    f"already auto-registered due to changes in 4.4.0.dev8.")
-
-    amd_packages.cached_result = tuple(result)
-    return result
-
 class Package:
     loading = threading.local()
 

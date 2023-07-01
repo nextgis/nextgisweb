@@ -16,7 +16,7 @@ from pyramid.response import FileResponse, Response
 from sqlalchemy import text
 
 from nextgisweb.env import DBSession, env
-from nextgisweb.env.package import amd_packages
+from nextgisweb.env.package import pkginfo
 from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
@@ -62,7 +62,7 @@ def static_amd_file(request):
 
 @lru_cache(maxsize=64)
 def _amd_package_path(name):
-    for p, asset in amd_packages():
+    for p, asset in pkginfo.amd_packages():
         if p == name:
             if asset.find(':') == -1:
                 return os.path.join(env.jsrealm.options['dist_path'], asset)
@@ -119,11 +119,6 @@ def sysinfo(request):
     return dict(
         title=_("System information"),
         dynmenu=request.env.pyramid.control_panel)
-
-
-def pkginfo(request):
-    return HTTPFound(location=request.route_url(
-        'pyramid.control_panel.sysinfo'))
 
 
 @viewargs(renderer='react')
@@ -446,11 +441,6 @@ def setup_pyramid(comp, config):
         'pyramid.control_panel.sysinfo',
         '/control-panel/sysinfo', client=(),
     ).add_view(sysinfo)
-
-    config.add_route(
-        'pyramid.control_panel.pkginfo',
-        '/control-panel/pkginfo'
-    ).add_view(pkginfo)
 
     if env.core.options['storage.enabled']:
         config.add_route(

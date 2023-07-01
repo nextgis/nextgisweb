@@ -5,7 +5,7 @@ from subprocess import check_call
 
 from nextgisweb.env import Env
 from nextgisweb.env.cli import EnvCommand, cli
-from nextgisweb.env.package import amd_packages, pkginfo
+from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent
@@ -54,7 +54,7 @@ def install(
     config['nextgisweb_core_debug'] = str(debug).lower()
     config['nextgisweb_jsrealm_root'] = str(cwd.resolve())
     config['nextgisweb_jsrealm_packages'] = ','.join(npkgs)
-    config['nextgisweb_jsrealm_externals'] = ','.join([pn for pn, _ in amd_packages()])
+    config['nextgisweb_jsrealm_externals'] = ','.join([pn for pn, _ in pkginfo.amd_packages()])
     config['nextgisweb_jsrealm_icon_sources'] = json.dumps(icons)
 
     ca = pyramid.options['compression.algorithms']
