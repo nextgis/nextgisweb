@@ -11,7 +11,6 @@ from functools import partial
 from importlib import import_module
 from packaging import version as pkg_version
 from pathlib import Path
-from pkg_resources import resource_filename
 from tempfile import NamedTemporaryFile
 from time import sleep
 
@@ -25,6 +24,7 @@ from poeditor import POEditorAPI
 
 from nextgisweb.env import Env, env
 from nextgisweb.env.package import pkginfo
+from nextgisweb.imptool import module_path
 from nextgisweb.lib.config import load_config
 from nextgisweb.lib.logging import logger
 
@@ -32,8 +32,8 @@ from .util import to_gettext_locale, to_http_locale
 
 
 def get_mappings():
-    fileobj = open(resource_filename('nextgisweb', 'babel.cfg'), 'r')
-    return parse_mapping(fileobj)
+    with (module_path('nextgisweb') / 'babel.cfg').open('r') as fd:
+        return parse_mapping(fd)
 
 
 def compare_catalogs(fileA, fileB):

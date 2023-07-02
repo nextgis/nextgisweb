@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
-from pkg_resources import resource_filename
 
 from nextgisweb.env import Component, DBSession, require
+from nextgisweb.imptool import module_path
 from nextgisweb.lib import db
 from nextgisweb.lib.config import Option
 
@@ -70,7 +70,7 @@ class WebMapComponent(Component):
 
     option_annotations = (
         Option(
-            'basemaps', default=resource_filename('nextgisweb', 'webmap/basemaps.json'),
+            'basemaps', default=module_path('nextgisweb.webmap') / 'basemaps.json',
             doc="Basemaps description file."),
         Option('annotation', bool, default=True, doc="Turn on / off annotations."),
         Option('enable_social_networks', bool, default=False),

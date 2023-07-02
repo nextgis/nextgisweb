@@ -1,13 +1,13 @@
 from datetime import datetime as dt
 from datetime import timedelta
 from os import environ
-from pkg_resources import resource_filename
 
 import transaction
 from babel import Locale
 from babel.core import UnknownLocaleError
 
 from nextgisweb.env import Component, require
+from nextgisweb.imptool import module_path
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.logging import logger
 
@@ -161,7 +161,7 @@ class PyramidComponent(Component):
         Option('help_page.enabled', bool, default=True),
         Option('help_page.url', default="https://nextgis.com/redirect/{lang}/help/"),
 
-        Option('favicon', default=resource_filename('nextgisweb', 'pyramid/asset/favicon.ico')),
+        Option('favicon', default=str(module_path('nextgisweb.pyramid') / 'asset/favicon.ico')),
         Option('company_url', default="https://nextgis.com"),
         Option('desktop_gis_example', default='NextGIS QGIS'),
         Option('nextgis_external_docs_links', default=True),

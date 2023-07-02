@@ -7,13 +7,14 @@ from calendar import timegm
 from collections import defaultdict
 from mimetypes import guess_type
 from pathlib import Path
-from pkg_resources import resource_filename
 from sys import _getframe
 from typing import TypeVar
 
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse
 
+from nextgisweb.env.package import pkginfo
+from nextgisweb.imptool import module_path
 from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.logging import logger
 
@@ -165,24 +166,19 @@ def find_template(name, func=None, stack_level=1):
         fr = _getframe(stack_level)
         modules = [fr.f_globals['__name__'], ]
 
-    probes = list()
-    for mod in modules:
-        mp = mod.split('.')
-        if len(mp) == 3 and (
-            mp[0] == 'nextgisweb'
-            or mp[0].startswith('nextgisweb_')
-        ):
-            rn = (mp[0], mp[1] + '/template/' + name)
-            fn = Path(resource_filename(*rn))
-            if fn.exists():
-                logger.debug(
-                    "Template '%s' at '%s' is '%s:%s'",
-                    name, mod, *rn)
-                return str(fn)
-            else:
-                probes.append(':'.join(rn))
+    for m in modules:
+        parts = m.split('.')
+        while parts:
+            if pkginfo._mod_comp.get('.'.join(parts)):
+                fn = module_path('.'.join(parts)) / 'template' / name
+                if fn.exists():
+                    logger.debug(
+                        "Template %s found in %s", name,
+                        fn.relative_to(Path().resolve()))
+                    return str(fn)
+            parts.pop(-1)
 
-    raise ValueError(f"Template '{name}' not found in {probes}")
+    raise ValueError(f"Template '{name}' not found")
 
 
 def gensecret(length):

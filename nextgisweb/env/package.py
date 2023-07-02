@@ -5,10 +5,11 @@ import sys
 import threading
 import warnings
 from importlib.metadata import metadata
-from pkg_resources import iter_entry_points
 
 from nextgisweb.imptool import module_path
 from nextgisweb.lib.logging import logger
+
+from .compat import entry_points
 
 _version_re = re.compile(r'(.+)\+(?:git)?([0-9a-f]{4,})(\.dirty)?$', re.IGNORECASE)
 _qualifications = False
@@ -18,7 +19,7 @@ class Package:
     loading = threading.local()
 
     def __init__(self, entrypoint):
-        self._name = entrypoint.dist.key.replace('-', '_')
+        self._name = entrypoint.dist.name.replace('-', '_')
         self._entrypoint = entrypoint
         self._path = module_path(self.name)
 
@@ -61,14 +62,13 @@ class Package:
             return self._pkginfo
 
         logger.debug(
-            "Loading entrypoint '%s:%s'...",
-            self._entrypoint.module_name,
-            ','.join(self._entrypoint.attrs))
+            "Loading entrypoint: %s = %s",
+            self._entrypoint.name, self._entrypoint.value)
 
         mprefix = f'{self.name}.'
         mod_before = {k for k in sys.modules.keys() if k.startswith(mprefix)}
 
-        entrypoint_callable = self._entrypoint.resolve()
+        entrypoint_callable = self._entrypoint.load()
 
         try:
             self.loading.value = self
@@ -128,7 +128,7 @@ class PkgInfo:
         if self.scanned:
             return
 
-        epoints = iter_entry_points(group='nextgisweb.packages')
+        epoints = entry_points(group='nextgisweb.packages')
         for epoint in epoints:
             package = Package(epoint)
             package_name = package.name

@@ -1,6 +1,5 @@
 import math
 from io import BytesIO
-from pkg_resources import resource_filename
 
 import numpy
 from lxml import etree, html
@@ -12,6 +11,7 @@ from pyramid.renderers import render as render_template
 from pyramid.response import Response
 from sqlalchemy.orm.exc import NoResultFound
 
+from nextgisweb.imptool import module_path
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.ows import SRSParseError, parse_request, parse_srs
@@ -477,9 +477,8 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
 
         img = Image.new('RGBA', p_size, (255, 255, 255, 0))
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype(
-            resource_filename('nextgisweb', 'wmsserver/fonts/DejaVuSansMono.ttf'), 10
-        )
+        ttf = str(module_path('nextgisweb.wmsserver') / 'fonts/DejaVuSansMono.ttf')
+        font = ImageFont.truetype(ttf, 10)
         draw.text((10, 10), message, font=font, fill='grey')
 
         buf = BytesIO()

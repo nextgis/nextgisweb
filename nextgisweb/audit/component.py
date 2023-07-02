@@ -1,5 +1,4 @@
 import json
-from pkg_resources import resource_filename
 
 from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
@@ -87,10 +86,9 @@ class AuditComponent(Component):
     def initialize_db(self):
         if self.audit_es_enabled:
             # OOPS: Elasticsearch mappings are not related to database!
-            with open(resource_filename('nextgisweb', 'audit/template.json')) as f:
-                template = json.load(f)
-                template['index_patterns'] = ['%s-*' % (self.audit_es_index_prefix,)]
-                self.es.indices.put_template('nextgisweb_audit', body=template)
+            template = json.loads(self.resource_path('template.json').read_text())
+            template['index_patterns'] = ['%s-*' % (self.audit_es_index_prefix,)]
+            self.es.indices.put_template('nextgisweb_audit', body=template)
 
     def setup_pyramid(self, config):
         from . import api, view

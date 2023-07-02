@@ -1,5 +1,4 @@
 from io import BytesIO
-from pkg_resources import resource_filename
 
 import numpy
 import PIL
@@ -7,6 +6,7 @@ from osgeo import gdal, gdal_array, gdalconst
 from zope.interface import implementer
 
 from nextgisweb.env import declarative_base
+from nextgisweb.imptool import module_path
 
 from nextgisweb.render import (
     IExtentRenderRequest,
@@ -95,9 +95,7 @@ class RasterStyle(Base, Resource):
     def render_legend(self):
         # Don't use real preview of raster layer as icon
         # because it may be slow
-        raster_icon = resource_filename('nextgisweb',
-                                        'raster_style/iconRaster.png')
-        img = PIL.Image.open(raster_icon)
+        img = PIL.Image.open(module_path('nextgisweb.raster_style') / 'iconRaster.png')
         buf = BytesIO()
         img.save(buf, 'png')
         buf.seek(0)

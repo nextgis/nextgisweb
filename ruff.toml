@@ -1,5 +1,5 @@
 line-length = 99
-select = ["E", "F", "W", "I"]
+select = ["E", "F", "W", "I", "TID251"]
 exclude = [
     "docker.py",
     "nextgisweb/raster_layer/test/validate_cloud_optimized_geotiff.py",
@@ -40,3 +40,8 @@ section-order = [
 [isort.sections]
 "nextgisweb_env_lib" = ["nextgisweb.env", "nextgisweb.lib", "nextgisweb.imptool"]
 "nextgisweb_comp" = ["nextgisweb"]
+
+[flake8-tidy-imports]
+
+[flake8-tidy-imports.banned-api]
+pkg_resources.msg = "Consider importlib.metadata or nextgisweb.imptool.module_path"

@@ -22,14 +22,17 @@ def module_path(module_name: str) -> Path:
     root = rest.pop(0)
 
     if root_mod := sys.modules.get(root):
-        root_path = Path(root_mod.__file__).parent
+        root_path = Path(root_mod.__file__)
     else:
         for mp in sys.meta_path:
             if root_spec := mp.find_spec(root, None):
-                root_path = Path(root_spec.origin).parent
+                root_path = Path(root_spec.origin)
                 break
         else:
             raise ValueError(f"{module_name} not found")
+
+    assert root_path.name == '__init__.py'
+    root_path = root_path.parent
 
     return (root_path / '/'.join(rest)) if rest else root_path
 
