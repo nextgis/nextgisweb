@@ -3,7 +3,7 @@ import os
 import sys
 from subprocess import check_output
 
-from nextgisweb.imptool import module_path
+from nextgisweb.lib.imptool import module_path
 
 
 def extract(fileobj, keywords, comment_tags, options):

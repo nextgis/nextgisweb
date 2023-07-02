@@ -14,8 +14,8 @@ from pyramid.response import FileResponse, Response
 from sqlalchemy import text
 
 from nextgisweb.env import DBSession, env
-from nextgisweb.imptool import module_path
 from nextgisweb.lib import dynmenu as dm
+from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
 

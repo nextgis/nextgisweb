@@ -11,8 +11,8 @@ from pyramid.renderers import render as render_template
 from pyramid.response import Response
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.imptool import module_path
 from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.ows import SRSParseError, parse_request, parse_srs
 

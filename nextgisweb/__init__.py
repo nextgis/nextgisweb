@@ -5,9 +5,8 @@ import time
 from nextgisweb.env import Env
 from nextgisweb.env.package import single_component
 from nextgisweb.lib.config import load_config
+from nextgisweb.lib.imptool import deprecate
 from nextgisweb.lib.logging import logger
-
-from . import imptool
 
 
 def pkginfo():
@@ -68,3 +67,16 @@ def _log_startup_time(level=logging.INFO):
         psinfo = Process(os.getpid())
         startup_time = int(1000 * (time.time() - psinfo.create_time()))
         logger.log(level, "WSGI startup took %d msec", startup_time)
+
+
+deprecate('nextgisweb.command', 'nextgisweb.env.legacy_command', since='4.4.0.dev6', remove='4.5.0.dev0')
+deprecate('nextgisweb.component', 'nextgisweb.env', since='4.4.0.dev6', remove='4.5.0.dev0')
+deprecate('nextgisweb.db', 'nextgisweb.lib.db', since='4.4.0.dev6', remove='4.5.0.dev0')
+deprecate('nextgisweb.dynmenu', 'nextgisweb.lib.dynmenu', since='4.4.0.dev6', remove='4.5.0.dev0')
+deprecate('nextgisweb.event', 'nextgisweb.lib.legacy_event', since='4.4.0.dev6', remove='4.5.0.dev0')
+deprecate('nextgisweb.file_storage.models', 'nextgisweb.file_storage.model', since='4.4.0.dev6', remove='4.5.0.dev0')
+deprecate('nextgisweb.layer.models', 'nextgisweb.layer.model', since='4.4.0.dev6', remove='4.5.0.dev0')
+deprecate('nextgisweb.models', 'nextgisweb.env.model', since='4.4.0.dev6', remove='4.5.0.dev0')
+deprecate('nextgisweb.package', 'nextgisweb.env.package', since='4.4.0.dev6', remove='4.5.0.dev0')
+deprecate('nextgisweb.psection', 'nextgisweb.pyramid.psection', since='4.4.0.dev6', remove='4.5.0.dev0')
+deprecate('nextgisweb.registry', 'nextgisweb.lib.registry', since='4.4.0.dev6', remove='4.5.0.dev0')

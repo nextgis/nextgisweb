@@ -6,7 +6,7 @@ import threading
 import warnings
 from importlib.metadata import metadata
 
-from nextgisweb.imptool import module_path
+from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 
 from .compat import entry_points

@@ -6,7 +6,7 @@ from osgeo import gdal, gdal_array, gdalconst
 from zope.interface import implementer
 
 from nextgisweb.env import declarative_base
-from nextgisweb.imptool import module_path
+from nextgisweb.lib.imptool import module_path
 
 from nextgisweb.render import (
     IExtentRenderRequest,

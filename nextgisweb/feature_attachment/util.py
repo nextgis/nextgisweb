@@ -5,10 +5,11 @@ from zipfile import BadZipFile, ZipFile
 
 from magic import from_buffer as magic_from_buffer
 
-from nextgisweb.core.exception import ValidationError
 from nextgisweb.env import DBSession, env
 from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.json import loadb
+
+from nextgisweb.core.exception import ValidationError
 
 from .model import FeatureAttachment
 

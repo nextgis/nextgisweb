@@ -2,9 +2,9 @@ import json
 from pathlib import Path
 
 from nextgisweb.env import Component, DBSession, require
-from nextgisweb.imptool import module_path
 from nextgisweb.lib import db
 from nextgisweb.lib.config import Option
+from nextgisweb.lib.imptool import module_path
 
 from nextgisweb.auth import User
 

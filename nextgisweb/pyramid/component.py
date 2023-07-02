@@ -7,8 +7,8 @@ from babel import Locale
 from babel.core import UnknownLocaleError
 
 from nextgisweb.env import Component, require
-from nextgisweb.imptool import module_path
 from nextgisweb.lib.config import Option, OptionAnnotations
+from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 
 from . import uacompat

@@ -24,8 +24,8 @@ from poeditor import POEditorAPI
 
 from nextgisweb.env import Env, env
 from nextgisweb.env.package import pkginfo
-from nextgisweb.imptool import module_path
 from nextgisweb.lib.config import load_config
+from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 
 from .util import to_gettext_locale, to_http_locale

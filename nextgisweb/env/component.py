@@ -1,8 +1,8 @@
 import warnings
 from pathlib import Path
 
-from nextgisweb.imptool import module_path
 from nextgisweb.lib.config import ConfigOptions
+from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import dict_registry
 
