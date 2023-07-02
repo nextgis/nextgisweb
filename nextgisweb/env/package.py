@@ -4,6 +4,7 @@ import subprocess
 import sys
 import threading
 import warnings
+from collections import defaultdict
 from importlib.metadata import metadata
 
 from nextgisweb.lib.imptool import module_path
@@ -124,6 +125,12 @@ class PkgInfo:
         self._packages = dict()
         self._pkg_comp = dict()
 
+        def _node():
+            return defaultdict(_node, {None: None})
+        
+        self._module_tree = _node()
+
+
     def scan(self):
         if self.scanned:
             return
@@ -141,8 +148,8 @@ class PkgInfo:
                     cdefn['enabled'] = True
                 modname = cdefn['module']
 
-                self._mod_comp[modname] = comp
-                self._comp_mod[comp] = modname
+                self._module_tree_insert(modname, comp)
+
                 self._comp_enabled[comp] = cdefn['enabled']
                 self._comp_pkg[comp] = package_name
                 self._comp_path[comp] = module_path(modname)
@@ -152,7 +159,6 @@ class PkgInfo:
 
         for k, v in self._pkg_comp.items():
             self._pkg_comp[k] = tuple(v)
-
         self.scanned = True
 
     @property
@@ -184,6 +190,28 @@ class PkgInfo:
     def pkg_comp(self, pkg):
         self.scan()
         return self._pkg_comp[pkg]
+
+    def component_by_module(self, module_name):
+        n = self._module_tree
+        r = module_name
+        while True:
+            k, __, r = r.partition('.')
+            if k in n:
+                n = n[k]
+            else:
+                return n[None]
+
+    def _module_tree_insert(self, module_name, comp):
+        self._mod_comp[module_name] = comp
+        self._comp_mod[comp] = module_name
+
+        n = self._module_tree
+        r = module_name
+        while r:
+            k, __, r = r.partition('.')
+            n = n[k]
+        n[None] = comp
+
 
 
 pkginfo = PkgInfo()

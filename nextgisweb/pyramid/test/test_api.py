@@ -33,7 +33,9 @@ def test_settings(component, webtest):
         webtest.get('/api/component/pyramid/settings?component={}'.format(component))
 
 
-def test_locdata(component, webtest):
+def test_locdata(component, webtest, ngw_env):
+    if component not in ngw_env.components:
+        pytest.skip(f"{component} disabled")
     webtest.get(f'/api/component/pyramid/locdata/{component}/en')
 
 

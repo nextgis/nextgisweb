@@ -2,6 +2,17 @@ from contextlib import contextmanager
 
 import pytest
 
+from nextgisweb.env.package import pkginfo
+
+
+@pytest.fixture(autouse=True)
+def ngw_skip_disabled_component(request):
+    if 'ngw_env' in request.fixturenames:
+        ngw_env = request.getfixturevalue('ngw_env')
+        comp = pkginfo.component_by_module(request.module.__name__)
+        if comp and comp not in ngw_env.components:
+            pytest.skip(f"{comp} disabled")
+
 
 def _env_initialize():
     from .env import Env, env
