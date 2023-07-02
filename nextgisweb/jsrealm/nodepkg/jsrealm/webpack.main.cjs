@@ -59,9 +59,8 @@ function scanForEntrypoints(pkg) {
 const entrypointList = {};
 const entrypointRules = [];
 
-for (const pkg of config.packages()) {
-    const entrypoints =
-        (pkg.json.nextgisweb || {}).entrypoints || scanForEntrypoints(pkg);
+for (const pkg of config.packages) {
+    const entrypoints = (pkg.json.nextgisweb || {}).entrypoints || scanForEntrypoints(pkg);
     for (const ep of entrypoints) {
         const epName =
             pkg.name + "/" + ep.replace(/(?:\/index)?\.(js|ts)$/, "");
@@ -292,12 +291,18 @@ module.exports = (env, argv) => ({
                 return callback(null, `amd ${request}`);
             }
 
-            // Use AMD loader for extrenal dependecies.
-            for (const ext of config.externals) {
-                if (request.startsWith(ext + "/")) {
+            // External packages
+            for (const external of config.externals) {
+                if (request.startsWith(external + "/")) {
                     return callback(null, `amd ${request}`);
                 }
             }
+
+            // Legacy component AMD modules
+            if (request.startsWith('ngw-')) {
+                return callback(null, `amd ${request}`);
+            }
+
             callback();
         },
     ],

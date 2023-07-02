@@ -29,8 +29,8 @@
     ngwConfig = {
         "debug": request.env.core.debug,
         "applicationUrl": request.application_url,
-        "amdUrl": request.route_url('pyramid.amd_package', subpath=""),
-        "distUrl": request.route_url('jsrealm.dist', subpath=''),
+        "amdUrl": request.static_url(),
+        "staticUrl": request.static_url(),
         "staticKey": request.env.pyramid.static_key[1:],
         "distribution": distribution,
         "packages": packages,
@@ -54,14 +54,12 @@
         "async": True,
         "isDebug": True,
         "packages": [
-            {"name": "dist", "location": request.route_url('jsrealm.dist', subpath='')},
-            {"name": "@nextgisweb", "location": request.route_url('jsrealm.dist', subpath='main/@nextgisweb')}
+            {"name": "@nextgisweb", "location": request.static_url('main/@nextgisweb')}
         ],
-        "baseUrl": request.route_url('pyramid.amd_package', subpath="dojo"),
+        "baseUrl": request.static_url('dojo'),
         "locale": request.locale_name,
         "aliases": [
-            ['openlayers/ol', 'dist/external-ol/ol'],
-            ['ckeditor/bundle', 'dist/ckeditor/bundle'],
+            ['openlayers/ol', 'external-ol/ol'],
             # TODO: Remove in 4.5.0
             ['ngw/route', 'ngw-pyramid/route'],
             ['ngw-pyramid/ErrorDialog/ErrorDialog', 'ngw-pyramid/ErrorDialog'],

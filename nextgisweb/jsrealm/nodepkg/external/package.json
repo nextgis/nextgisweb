@@ -6,7 +6,18 @@
         "webpackConfigs": {
             "external": "webpack.external.cjs",
             "external-ol": "webpack.external-ol.cjs"
-        }
+        },
+        "externals": [
+            "dgrid",
+            "dijit",
+            "dojo",
+            "dojox",
+            "handlebars",
+            "jed",
+            "jquery",
+            "put-selector",
+            "xstyle"
+        ]
     },
     "dependencies": {
         "dgrid": "SitePen/dgrid#v0.3.21",

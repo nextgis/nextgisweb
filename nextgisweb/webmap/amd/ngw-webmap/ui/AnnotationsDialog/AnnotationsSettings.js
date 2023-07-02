@@ -7,9 +7,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "dojo/text!./AnnotationsSettings.hbs",
     "xstyle/css!./AnnotationsSettings.css",
-    "xstyle/css!" +
-        ngwConfig.amdUrl +
-        "dojox/widget/ColorPicker/ColorPicker.css",
+    "xstyle/css!dojox/widget/ColorPicker/ColorPicker.css",
     "dijit/form/NumberTextBox",
     "dijit/form/DropDownButton",
     "dojox/widget/ColorPicker",

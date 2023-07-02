@@ -7,7 +7,6 @@ from subprocess import check_output
 
 def extract(fileobj, keywords, comment_tags, options):
     env = dict(os.environ)
-    env['NODE_PATH'] = resource_filename('nextgisweb', 'amd_packages/contrib')
 
     out = check_output(
         ['node', resource_filename('nextgisweb', 'i18n/hbs.js')],

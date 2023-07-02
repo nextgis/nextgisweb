@@ -9,7 +9,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/DisplayWidget",
     // css
-    "xstyle/css!" + ngwConfig.amdUrl + "dojox/image/resources/Lightbox.css",
+    "xstyle/css!dojox/image/resources/Lightbox.css",
     "xstyle/css!./resource/DisplayWidget.css"
 ], function (
     declare,

@@ -4,6 +4,7 @@ import re
 import secrets
 import string
 from calendar import timegm
+from collections import defaultdict
 from mimetypes import guess_type
 from pathlib import Path
 from pkg_resources import resource_filename
@@ -63,6 +64,62 @@ class ErrorRendererPredicate:
 
     def __repr__(self):
         return "<error_renderer>"
+
+
+class StaticMap:
+
+    def __init__(self):
+        def node():
+            res = defaultdict(node)
+            res[None] = None
+            return res
+        self.data = node()
+
+    def add(self, uri, path):
+        n = self.data
+        for p in uri.split('/'):
+            n = n[p]
+        n[None] = path
+
+    def lookup(self, subpath) -> Path:
+        n = self.data
+        u = list(subpath)
+        while True:
+            h = u.pop(0)
+            if h in n:
+                n = n[h]
+            else:
+                if p := n[None]:
+                    return p / h / '/'.join(u)
+                else:
+                    raise KeyError
+
+
+class StaticSourcePredicate:
+
+    def __init__(self, value, config):
+        assert value is True
+        self.value = value
+
+    def text(self):
+        return 'static_source'
+
+    phash = text
+
+    def __call__(self, context, request):
+        subpath = context['match']['subpath']
+        static_map = request.registry.settings['pyramid.static_map']
+
+        try:
+            path = static_map.lookup(subpath)
+        except KeyError:
+            return False
+        else:
+            request.environ['static_path'] = path
+            return True
+
+    def __repr__(self):
+        return self.text()
 
 
 class StaticFileResponse(FileResponse):

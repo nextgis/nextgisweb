@@ -13,7 +13,7 @@ define([], function () {
             // be loaded by AMD require loader.
             var chunks = ((value.assets || {}).js || []).slice(1, -1);
             tmp[entry] = chunks.map(function (c) {
-                return "dist/main/" + c.slice(0, -3);
+                return "main/" + c.slice(0, -3);
             });
         });
 
@@ -26,7 +26,7 @@ define([], function () {
 
     var oReq = new XMLHttpRequest();
     oReq.onload = onload;
-    oReq.open("get", ngwConfig.distUrl + "main/assets-manifest.json", true);
+    oReq.open("get", ngwConfig.staticUrl + "main/assets-manifest.json", true);
     oReq.send();
 
     return {

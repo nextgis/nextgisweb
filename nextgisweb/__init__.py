@@ -46,19 +46,10 @@ def pkginfo():
         'audit',
     )
 
-    return dict(
-        components={
-            comp: dict(
-                module='nextgisweb.{}'.format(comp),
-                enabled=comp not in ('wfsclient', 'raster_mosaic')
-            ) for comp in components
-        },
-        amd_packages=[(k, 'external/{}'.format(k)) for k in (
-            'dojo', 'dijit', 'dojox', 'dgrid', 'xstyle', 'put-selector',
-            'handlebars', 'jed', 'jquery',
-            'ckeditor',
-        )],
-    )
+    return dict(components={comp: dict(
+        module='nextgisweb.{}'.format(comp),
+        enabled=comp not in ('wfsclient', 'raster_mosaic')
+    ) for comp in components})
 
 
 def main(global_config=None, **settings):

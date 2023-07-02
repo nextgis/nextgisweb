@@ -31,10 +31,8 @@
 
     <%include file="nextgisweb:social/template/meta.mako" args="title=head_title"/>
 
-    <link href="${request.route_url('pyramid.favicon')}"
-        rel="shortcut icon" type="image/x-icon"/>
-    <link href="${request.route_url('jsrealm.dist', subpath='stylesheet/layout.css')}"
-        rel="stylesheet" type="text/css"/>
+    <link href="${request.route_url('pyramid.favicon')}" rel="shortcut icon" type="image/x-icon" />
+    <link href="${request.static_url('stylesheet/layout.css')}" rel="stylesheet" type="text/css" />
 
     <%
         custom_css_url = request.route_url('pyramid.custom_css', _query=dict(
@@ -44,8 +42,8 @@
 
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
 
-    <script src="${request.route_url('pyramid.amd_package', subpath='dojo/dojo.js')}"></script>
-    <script src="${request.route_url('jsrealm.dist', subpath='main/chunk/runtime.js')}"></script>
+    <script src="${request.static_url('dojo/dojo.js')}"></script>
+    <script src="${request.static_url('main/chunk/runtime.js')}"></script>
     
     %if hasattr(self, 'assets'):
         ${self.assets()}

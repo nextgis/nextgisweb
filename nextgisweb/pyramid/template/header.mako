@@ -7,14 +7,14 @@
         <div class="header__title">
             <a class="header__title-logo" href="${return_url if return_url else request.application_url}">
                 %if return_url:
-                    <img class="logo__pic" src="${request.route_url('pyramid.asset', component='pyramid', subpath='return-button.svg')}"/>
+                    <img class="logo__pic" src="${request.static_url('asset/pyramid/return-button.svg')}"/>
                 %else:
                     <%
                         if request.env.core.settings_exists('pyramid', 'logo'):
                             logo_url = request.route_url('pyramid.logo', _query=dict(
                                 ckey=request.env.core.settings_get('pyramid', 'logo.ckey')))
                         else:
-                            logo_url = request.route_url('pyramid.asset', component='pyramid', subpath='nextgis_logo_s.svg')
+                            logo_url = request.static_url('asset/pyramid/nextgis_logo_s.svg')
                     %>
                     <img class="logo__pic" src="${logo_url}"/>
                 %endif

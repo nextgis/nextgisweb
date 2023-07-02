@@ -54,7 +54,6 @@ def install(
     config['nextgisweb_core_debug'] = str(debug).lower()
     config['nextgisweb_jsrealm_root'] = str(cwd.resolve())
     config['nextgisweb_jsrealm_packages'] = ','.join(npkgs)
-    config['nextgisweb_jsrealm_externals'] = ','.join([pn for pn, _ in pkginfo.amd_packages()])
     config['nextgisweb_jsrealm_icon_sources'] = json.dumps(icons)
 
     ca = pyramid.options['compression.algorithms']

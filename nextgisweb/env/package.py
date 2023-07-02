@@ -5,8 +5,7 @@ import sys
 import threading
 import warnings
 from importlib.metadata import metadata
-from pathlib import Path
-from pkg_resources import iter_entry_points, resource_filename
+from pkg_resources import iter_entry_points
 
 from nextgisweb.imptool import module_path
 from nextgisweb.lib.logging import logger
@@ -124,7 +123,6 @@ class PkgInfo:
         self._comp_path = dict()
         self._packages = dict()
         self._pkg_comp = dict()
-        self._pkg_amd = list()
 
     def scan(self):
         if self.scanned:
@@ -135,7 +133,6 @@ class PkgInfo:
             package = Package(epoint)
             package_name = package.name
             self._packages[package_name] = package
-            self._pkg_amd.extend(package.pkginfo.get('amd_packages', []))
             components = package.pkginfo.get('components', dict())
             for (comp, cdefn) in components.items():
                 if isinstance(cdefn, str):
@@ -157,7 +154,6 @@ class PkgInfo:
             self._pkg_comp[k] = tuple(v)
 
         self.scanned = True
-        self.amd_packages()
 
     @property
     def components(self):
@@ -188,29 +184,6 @@ class PkgInfo:
     def pkg_comp(self, pkg):
         self.scan()
         return self._pkg_comp[pkg]
-
-    def amd_packages(self):
-        cached = getattr(self, '_amd_packages', None)
-        if cached is not None:
-            return cached
-
-        self.scan()
-
-        result = list(self._pkg_amd)
-        for modname in self._mod_comp:
-            parts = modname.split('.')
-            pkg = parts[0]
-            rest = parts[1:] + ['amd']
-            ap = Path(resource_filename(pkg, '/'.join(rest)))
-            if not ap.is_dir():
-                continue
-            for sub in ap.iterdir():
-                if sub.is_dir():
-                    sn = sub.name
-                    result.append((sn, f'{pkg}:' + '/'.join(rest + [sn])))
-
-        self._amd_packages = result
-        return result
 
 
 pkginfo = PkgInfo()

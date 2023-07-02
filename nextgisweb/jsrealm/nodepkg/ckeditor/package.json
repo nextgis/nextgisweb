@@ -5,7 +5,10 @@
     "nextgisweb": {
         "webpackConfigs": {
             "ckeditor": "webpack.cjs"
-        }
+        },
+        "externals": [
+            "ckeditor"
+        ]
     },
     "dependencies": {
         "@ckeditor/ckeditor5-adapter-ckfinder": "38.1.0",

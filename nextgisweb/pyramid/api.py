@@ -560,9 +560,7 @@ def setup_pyramid(comp, config):
         return defaults
 
     comp.preview_link_default_view = lambda request: dict(
-        image=request.route_url(
-            'pyramid.asset', component='pyramid',
-            subpath='webgis-for-social.png'),
+        image=request.static_url('asset/pyramid/webgis-for-social.png'),
         description=_("Your Web GIS at nextgis.com"))
 
     comp.preview_link_view = preview_link_view

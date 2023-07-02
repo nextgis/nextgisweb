@@ -41,7 +41,7 @@ class ComponentMeta(type):
         parts = module.split('.')
         package = parts.pop(0)
 
-        def _resource_path(cls, path: str) -> Path:
+        def _resource_path(cls, path: str = '') -> Path:
             return Path(resource_filename(package, '/'.join(parts + [path, ])))
 
         return classmethod(_resource_path)

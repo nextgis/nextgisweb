@@ -8,23 +8,21 @@ const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const env = process.env;
 const configRoot = env.npm_package_config_nextgisweb_jsrealm_root;
 
-function* packages() {
-    const packageJson = JSON.parse(
-        fs.readFileSync(`${configRoot}/package.json`)
-    );
-    for (const wsPath of packageJson.workspaces) {
-        const packageJson = JSON.parse(
-            fs.readFileSync(`${wsPath}/package.json`)
-        );
-        const packageName = packageJson.name;
-        yield { name: packageName, path: wsPath, json: packageJson };
-    }
+const packages = [];
+const externals = [];
+
+const packageJson = JSON.parse(fs.readFileSync(`${configRoot}/package.json`));
+for (const wsPath of packageJson.workspaces) {
+    const packageJson = JSON.parse(fs.readFileSync(`${wsPath}/package.json`));
+    const packageName = packageJson.name;
+    packages.push({ name: packageName, path: wsPath, json: packageJson });
+    externals.push(...(packageJson?.nextgisweb?.externals || []));
 }
 
 const rootPath = path.resolve(configRoot);
 const distPath = path.resolve(configRoot + "/dist");
 const debug = env.npm_package_config_nextgisweb_core_debug == "true";
-const locales = env.npm_package_config_nextgisweb_core_locale_available.split(/\s*,\s*/)
+const locales = env.npm_package_config_nextgisweb_core_locale_available.split(/\s*,\s*/);
 
 const compressRegExp = /\.(js|css|html|json|svg)$/i;
 const compressionPlugins = [];
@@ -70,11 +68,11 @@ module.exports = {
     debug,
     rootPath,
     distPath,
+    packages,
+    externals,
     locales,
-    externals: env.npm_package_config_nextgisweb_jsrealm_externals.split(","),
     targets: JSON.parse(env.npm_package_config_nextgisweb_jsrealm_targets),
     iconSources: JSON.parse(env.npm_package_config_nextgisweb_jsrealm_icon_sources),
-    packages: packages,
     compressionPlugins,
     bundleAnalyzerPlugins,
 };

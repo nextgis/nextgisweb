@@ -1,11 +1,9 @@
 import os
 import os.path
 from datetime import datetime, timedelta
-from functools import lru_cache
 from hashlib import md5
 from itertools import chain
 from pathlib import Path
-from pkg_resources import resource_filename
 from time import sleep
 
 from markupsafe import Markup
@@ -16,7 +14,7 @@ from pyramid.response import FileResponse, Response
 from sqlalchemy import text
 
 from nextgisweb.env import DBSession, env
-from nextgisweb.env.package import pkginfo
+from nextgisweb.imptool import module_path
 from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
@@ -25,7 +23,15 @@ from nextgisweb.core.exception import UserException
 
 from . import exception, renderer
 from .session import WebSession
-from .util import ErrorRendererPredicate, StaticFileResponse, _, set_output_buffering, viewargs
+from .util import (
+    ErrorRendererPredicate,
+    StaticFileResponse,
+    StaticMap,
+    StaticSourcePredicate,
+    _,
+    set_output_buffering,
+    viewargs,
+)
 
 
 def asset(request):
@@ -44,31 +50,9 @@ def asset(request):
         raise HTTPNotFound()
 
 
-def static_amd_file(request):
-    subpath = request.matchdict['subpath']
-    if len(subpath) == 0:
-        raise HTTPNotFound()
-
-    amd_package_name = subpath[0]
-    amd_package_path = '/'.join(subpath[1:])
-
-    ap_base_path = _amd_package_path(amd_package_name)
-    if ap_base_path is None:
-        raise HTTPNotFound()
-
-    filename = os.path.join(ap_base_path, amd_package_path)
-    return StaticFileResponse(filename, request=request)
-
-
-@lru_cache(maxsize=64)
-def _amd_package_path(name):
-    for p, asset in pkginfo.amd_packages():
-        if p == name:
-            if asset.find(':') == -1:
-                return os.path.join(env.jsrealm.options['dist_path'], asset)
-            else:
-                py_package, path = asset.split(':', 1)
-                return resource_filename(py_package, path)
+def static_view(request):
+    static_path = request.environ['static_path']
+    return StaticFileResponse(str(static_path), request=request)
 
 
 def home(request):
@@ -275,6 +259,7 @@ def setup_pyramid(comp, config):
     # Session factory
     config.set_session_factory(WebSession)
 
+    _setup_static(comp, config)
     _setup_pyramid_debugtoolbar(comp, config)
     _setup_pyramid_tm(comp, config)
     _setup_pyramid_mako(comp, config)
@@ -367,47 +352,6 @@ def setup_pyramid(comp, config):
         return request.accept_language.lookup(locale_sorted, default=locale_default)
 
     config.set_locale_negotiator(locale_negotiator)
-
-    # STATIC FILES
-
-    if 'static_key' in comp.options:
-        comp.static_key = '/' + comp.options['static_key']
-        logger.debug("Using static key from options '%s'", comp.static_key[1:])
-    elif is_debug:
-        # In debug build static_key from proccess startup time
-        rproc = Process(os.getpid())
-
-        # When running under control of uWSGI master process use master's startup time
-        if rproc.name() == 'uwsgi':
-            rproc_parent = rproc.parent()
-            if rproc_parent and rproc_parent.name() == 'uwsgi':
-                rproc = rproc_parent
-            logger.debug("Found uWSGI master process PID=%d", rproc.pid)
-
-        # Use 4-byte hex representation of 1/5 second intervals
-        comp.static_key = '/' + hex(int(rproc.create_time() * 5) % (2 ** 64)) \
-            .replace('0x', '').replace('L', '')
-        logger.debug("Using startup time static key [%s]", comp.static_key[1:])
-    else:
-        # In production mode build static_key from nextgisweb_* package versions
-        package_hash = md5('\n'.join((
-            '{}=={}+{}'.format(pobj.name, pobj.version, pobj.commit)
-            for pobj in comp.env.packages.values()
-        )).encode('utf-8'))
-        comp.static_key = '/' + package_hash.hexdigest()[:8]
-        logger.debug("Using package based static key '%s'", comp.static_key[1:])
-
-    # Component asset handler
-
-    config.add_route(
-        'pyramid.asset',
-        f'/static{comp.static_key}/asset/{{component}}/*subpath',
-    ).add_view(asset, request_method='GET')
-
-    # AMD package handler
-
-    config.add_route('pyramid.amd_package', '/static{}/amd/*subpath'.format(comp.static_key)) \
-        .add_view(static_amd_file)
 
     # Base template includes
 
@@ -529,6 +473,66 @@ def setup_pyramid(comp, config):
             args.request.route_url('pyramid.control_panel.backup.browse')))
 
 
+def _setup_static(comp, config):
+    config.registry.settings['pyramid.static_map'] = StaticMap()
+    config.add_route_predicate('static_source', StaticSourcePredicate)
+
+    if 'static_key' in comp.options:
+        comp.static_key = '/' + comp.options['static_key']
+        logger.debug("Using static key from options '%s'", comp.static_key[1:])
+    elif comp.env.core.debug:
+        # In debug build static_key from proccess startup time
+        rproc = Process(os.getpid())
+
+        # When running under control of uWSGI master process use master's startup time
+        if rproc.name() == 'uwsgi':
+            rproc_parent = rproc.parent()
+            if rproc_parent and rproc_parent.name() == 'uwsgi':
+                rproc = rproc_parent
+            logger.debug("Found uWSGI master process PID=%d", rproc.pid)
+
+        # Use 4-byte hex representation of 1/5 second intervals
+        comp.static_key = '/' + hex(int(rproc.create_time() * 5) % (2 ** 64)) \
+            .replace('0x', '').replace('L', '')
+        logger.debug("Using startup time static key [%s]", comp.static_key[1:])
+    else:
+        # In production mode build static_key from nextgisweb_* package versions
+        package_hash = md5('\n'.join((
+            '{}=={}+{}'.format(pobj.name, pobj.version, pobj.commit)
+            for pobj in comp.env.packages.values()
+        )).encode('utf-8'))
+        comp.static_key = '/' + package_hash.hexdigest()[:8]
+        logger.debug("Using package based static key '%s'", comp.static_key[1:])
+
+    config.add_route(
+        'pyramid.static',
+        '/static{}/*subpath'.format(comp.static_key),
+        static_source=True,
+    ).add_view(static_view)
+
+    def static_url(request, path=''):
+        return request.route_url('pyramid.static', subpath=path)
+
+    config.add_request_method(static_url, property=False)
+
+    def add_static_path(self, suffix, path):
+        self.registry.settings['pyramid.static_map'].add(suffix, path)
+        logger.debug(
+            "Static map: %s > %s", suffix,
+            path.resolve().relative_to(Path().resolve()))
+
+    config.add_directive('add_static_path', add_static_path)
+
+    for cid, c in comp.env.components.items():
+        asset_path = c.resource_path('asset')
+        if asset_path.is_dir():
+            config.add_static_path(f'asset/{cid}', asset_path)
+
+        for amd_package in c.resource_path().glob('amd/ngw-*'):
+            if amd_package.is_dir():
+                config.add_static_path(amd_package.name, amd_package)
+
+
 def _setup_pyramid_debugtoolbar(comp, config):
     dt_opt = comp.options.with_prefix('debugtoolbar')
     if not dt_opt.get('enabled', comp.env.core.debug):
@@ -545,8 +549,12 @@ def _setup_pyramid_debugtoolbar(comp, config):
     settings = config.registry.settings
     settings['debugtoolbar.hosts'] = dt_opt.get(
         'hosts', '0.0.0.0/0' if comp.env.core.debug else None)
-    settings['debugtoolbar.exclude_prefixes'] = ['/static/', ]
+    settings['debugtoolbar.exclude_prefixes'] = ['/static/', '/favicon.ico']
     config.include(pyramid_debugtoolbar)
+
+    config.add_static_path(
+        'pyramid_debugtoolbar:static',
+        module_path('pyramid_debugtoolbar') / 'static')
 
 
 def _setup_pyramid_tm(comp, config):
