@@ -1,10 +1,5 @@
 import os
 
-from nextgisweb.lib.i18n import trstr_factory
-
-COMP_ID = 'file_upload'
-_ = trstr_factory(COMP_ID)
-
 
 def stat_dir(path):
     files = bytes_ = 0

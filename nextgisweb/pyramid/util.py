@@ -14,13 +14,8 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse
 
 from nextgisweb.env.package import pkginfo
-from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
-
-COMP_ID = 'pyramid'
-_ = trstr_factory(COMP_ID)
-
 
 JSONType = TypeVar('JSONType')
 

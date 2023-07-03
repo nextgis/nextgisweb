@@ -5,16 +5,12 @@ from zipfile import BadZipFile, ZipFile
 
 from magic import from_buffer as magic_from_buffer
 
-from nextgisweb.env import DBSession, env
-from nextgisweb.lib.i18n import trstr_factory
+from nextgisweb.env import COMP_ID, DBSession, _, env
 from nextgisweb.lib.json import loadb
 
 from nextgisweb.core.exception import ValidationError
 
 from .model import FeatureAttachment
-
-COMP_ID = 'feature_attachment'
-_ = trstr_factory(COMP_ID)
 
 
 def attachments_import(resource, filename, *, replace):

@@ -1,10 +1,8 @@
+from nextgisweb.env import COMP_ID
 from nextgisweb.lib import db
-from nextgisweb.lib.i18n import trstr_factory
 
 from nextgisweb.feature_layer import FIELD_TYPE, FIELD_TYPE_OGR, GEOM_TYPE
 
-COMP_ID = 'vector_layer'
-_ = trstr_factory(COMP_ID)
 SCHEMA = COMP_ID
 
 

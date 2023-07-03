@@ -3,12 +3,9 @@ import struct
 import PIL.ImageStat
 from affine import Affine
 
-from nextgisweb.lib.i18n import trstr_factory
+from nextgisweb.env import _
 
 from nextgisweb.core.exception import ValidationError
-
-COMP_ID = 'render'
-_ = trstr_factory(COMP_ID)
 
 
 def imgcolor(img):

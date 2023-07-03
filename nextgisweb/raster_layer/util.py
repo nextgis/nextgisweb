@@ -1,10 +1,5 @@
 from osgeo import gdal
 
-from nextgisweb.lib.i18n import trstr_factory
-
-COMP_ID = 'raster_layer'
-_ = trstr_factory(COMP_ID)
-
 PYRAMID_TARGET_SIZE = 512
 
 

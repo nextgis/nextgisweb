@@ -1,9 +1,3 @@
-from nextgisweb.lib.i18n import trstr_factory
-
-COMP_ID = 'webmap'
-_ = trstr_factory(COMP_ID)
-
-
 def webmap_items_to_tms_ids_list(webmap):
     if not webmap:
         raise TypeError
