@@ -37,11 +37,8 @@ class bootstrap(EnvOptions):
         # Scan for {component_module}.cli modules to populate commands
         for comp in env.components.values():
             candidate = f'{comp.module}.cli'
-            if candidate not in sys.modules:
-                try:
-                    __import__(candidate)
-                except ModuleNotFoundError:
-                    pass
+            if candidate not in sys.modules and find_spec(candidate):
+                __import__(candidate)
 
     def __exit__(self, type, value, traceback):
         pass
