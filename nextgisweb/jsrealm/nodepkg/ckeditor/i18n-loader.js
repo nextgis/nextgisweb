@@ -3,12 +3,12 @@ import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 
 export function load(path, require, ready) {
     const lang = window.ngwConfig.locale;
-    if (lang == "en") {
+    if (lang === "en") {
         ready();
         return;
     }
 
-    const mod = `dist/ckeditor/translations/${lang}`;
+    const mod = `ckeditor/translations/${lang}`;
 
     entrypoint(mod).then(
         () => {
