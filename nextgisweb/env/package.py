@@ -130,7 +130,6 @@ class PkgInfo:
 
         self._module_tree = _node()
 
-
     def scan(self):
         if self.scanned:
             return
@@ -211,7 +210,6 @@ class PkgInfo:
             k, __, r = r.partition('.')
             n = n[k]
         n[None] = comp
-
 
 
 pkginfo = PkgInfo()

@@ -4,7 +4,7 @@ import uuid
 import geoalchemy2 as ga
 from osgeo import gdal, ogr
 from shapely.geometry import box
-from sqlalchemy import event, func, inspect, literal, sql
+from sqlalchemy import event, func, inspect, sql
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, DBSession, _, declarative_base, env
@@ -250,7 +250,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             expr.compile(compile_kwargs=dict(literal_binds=True))))
         connection = inspect(self).session.connection()
         connection.execute(text)
-
 
         self.geometry_type = geometry_type
 

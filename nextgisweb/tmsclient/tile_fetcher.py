@@ -158,7 +158,6 @@ class TileFetcher:
                 raise result.exception
             yield result.position, result.data
 
-
     def _wait_for_shutdown(self):
         self._shutdown = True
         self._worker.join(SHUTDOWN_TIMEOUT)

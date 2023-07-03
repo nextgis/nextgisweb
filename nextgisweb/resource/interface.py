@@ -1,5 +1,4 @@
 import zope.interface
-from zope.interface import implements
 
 
 class IResourceBase(zope.interface.Interface):

@@ -7,6 +7,7 @@ from .model import DBSession, declarative_base
 COMP_ID: str
 _: TrStr
 
+
 def __getattr__(name):
     if name == 'COMP_ID':
         from .component import _COMP_ID
