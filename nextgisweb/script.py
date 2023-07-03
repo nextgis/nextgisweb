@@ -7,10 +7,9 @@ from textwrap import wrap
 # Workaround for https://bugs.python.org/issue47082
 import numpy  # NOQA
 
-from nextgisweb.env import Env, env
-from nextgisweb.env.cli import EnvCommand, bootstrap, cli
-from nextgisweb.env.legacy_command import Command as LegacyCommand
-from nextgisweb.lib.clann import NS_CMD_GRP_ATTR, ArgumentParser, Command
+from nextgisweb.env import Env
+from nextgisweb.env.cli import bootstrap, cli
+from nextgisweb.lib.clann import ArgumentParser
 from nextgisweb.lib.config import NO_DEFAULT, Option, key_to_environ
 
 
@@ -192,39 +191,6 @@ def main(argv=sys.argv):
     if leftover_len > 0 and ('.' in leftover[0]):
         leftover = leftover.pop(0).split('.') + leftover
     args = args[:args_len - leftover_len] + leftover
-
-    # Convert legacy commands
-    groups = {}
-    for cmd in LegacyCommand.registry.values():
-        parts = cmd.identity.split('.')
-        name = parts.pop(-1)
-
-        parent = cli
-        path = []
-        for g in parts:
-            path.append(g)
-            k = '.'.join(path)
-            if gcli := groups.get(k):
-                parent = gcli
-            else:
-                parent = parent.group()(type(g, (), {}))
-                groups[k] = parent
-
-        def __call__(self):
-            self.__execute(self, self.env)
-
-        cmd_cls = type(name, (EnvCommand, ), {
-            '__execute': cmd.execute, '__call__': __call__,
-            'env_initialize': not getattr(cmd, 'no_initialize', False)})
-
-        class _Wrapper(Command):
-            argparser_setup = cmd.argparser_setup
-
-            def setup_parser(self, parser):
-                parser.set_defaults(**{NS_CMD_GRP_ATTR: self})
-                self.argparser_setup(parser, env)
-
-        parent.members.append(_Wrapper(cmd_cls, parent=parent))
 
     # Run command
     cli_parser = ArgumentParser(cli)

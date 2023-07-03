@@ -69,7 +69,6 @@ def _log_startup_time(level=logging.INFO):
         logger.log(level, "WSGI startup took %d msec", startup_time)
 
 
-deprecate('nextgisweb.command', 'nextgisweb.env.legacy_command', since='4.4.0.dev6', remove='4.5.0.dev0')
 deprecate('nextgisweb.component', 'nextgisweb.env', since='4.4.0.dev6', remove='4.5.0.dev0')
 deprecate('nextgisweb.db', 'nextgisweb.lib.db', since='4.4.0.dev6', remove='4.5.0.dev0')
 deprecate('nextgisweb.dynmenu', 'nextgisweb.lib.dynmenu', since='4.4.0.dev6', remove='4.5.0.dev0')
