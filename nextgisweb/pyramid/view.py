@@ -610,15 +610,13 @@ def _setup_pyramid_mako(comp, config):
     settings = config.registry.settings
 
     settings['pyramid.reload_templates'] = comp.env.core.debug
-    settings['mako.directories'] = 'nextgisweb:templates/'
     settings['mako.imports'] = [
         'from markupsafe import Markup',
-        'from nextgisweb.i18n import tcheck',
         'from nextgisweb.pyramid.view import json_js',
         'from nextgisweb.pyramid.view import _m_gettext',
         '_ = _m_gettext(_template_filename); del _m_gettext',
     ]
-    settings['mako.default_filters'] = ['tcheck', 'h'] if comp.env.core.debug else ['h', ]
+    settings['mako.default_filters'] = ['h']
 
     import pyramid_mako
     config.include(pyramid_mako)
