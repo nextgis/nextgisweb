@@ -8,6 +8,8 @@ from PIL import Image, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
 
+from nextgisweb.env import _
+
 from nextgisweb.core.exception import UserException, ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceNotFound, resource_factory
@@ -15,7 +17,7 @@ from nextgisweb.resource import DataScope, Resource, ResourceNotFound, resource_
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
-from .util import _, af_transform, zxy_from_request
+from .util import af_transform, zxy_from_request
 
 
 class InvalidOriginError(UserException):

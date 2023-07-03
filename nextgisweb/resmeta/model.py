@@ -1,9 +1,7 @@
-from nextgisweb.env import declarative_base
+from nextgisweb.env import COMP_ID, _, declarative_base
 from nextgisweb.lib import db
 
 from nextgisweb.resource import MetadataScope, Resource, SerializedProperty, Serializer
-
-from .util import COMP_ID, _
 
 Base = declarative_base(dependencies=('resource', ))
 

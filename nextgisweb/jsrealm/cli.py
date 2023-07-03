@@ -4,7 +4,7 @@ from pathlib import Path
 from subprocess import check_call
 
 from nextgisweb.env import Env
-from nextgisweb.env.cli import EnvCommand, cli
+from nextgisweb.env.cli import EnvCommand, comp_cli
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.logging import logger
 
@@ -15,12 +15,7 @@ from nextgisweb.pyramid.uacompat import FAMILIES
 from .util import scan_for_icons, scan_for_nodepkgs
 
 
-@cli.group()
-class jsrealm:
-    pass
-
-
-@jsrealm.command()
+@comp_cli.command()
 def install(
     self: EnvCommand.customize(env_initialize=False),
     *, env: Env, core: CoreComponent, pyramid: PyramidComponent,

@@ -1,10 +1,10 @@
+from nextgisweb.env import COMP_ID, _
 from nextgisweb.lib.dynmenu import DynItem, Label, Link
 
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.view import resource_sections
 
 from .model import SVGMarkerLibrary
-from .util import COMP_ID, _
 
 
 class Widget(Widget):

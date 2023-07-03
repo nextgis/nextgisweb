@@ -1,6 +1,6 @@
-from nextgisweb.spatial_ref_sys import SRSMixin
+from nextgisweb.env import _
 
-from .util import _
+from nextgisweb.spatial_ref_sys import SRSMixin
 
 
 class SpatialLayerMixin(SRSMixin):

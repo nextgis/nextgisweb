@@ -3,7 +3,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, _
 from nextgisweb.lib import db
 
 from nextgisweb.auth import User
@@ -16,7 +16,6 @@ from .model import Resource, ResourceSerializer
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .scope import ResourceScope
 from .serialize import CompositeSerializer
-from .util import _
 from .view import resource_factory
 
 PERM_READ = ResourceScope.read

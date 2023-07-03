@@ -6,7 +6,7 @@ import transaction
 from babel import Locale
 from babel.core import UnknownLocaleError
 
-from nextgisweb.env import Component, require
+from nextgisweb.env import Component, _, require
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
@@ -14,7 +14,7 @@ from nextgisweb.lib.logging import logger
 from . import uacompat
 from .config import Configurator
 from .model import Base, Session, SessionStore
-from .util import ClientRoutePredicate, ErrorRendererPredicate, StaticMap, _, gensecret
+from .util import ClientRoutePredicate, ErrorRendererPredicate, StaticMap, gensecret
 
 
 class PyramidComponent(Component):

@@ -2,7 +2,7 @@ from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
 
-from nextgisweb.env import declarative_base
+from nextgisweb.env import _, declarative_base
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Transformer
 
@@ -13,7 +13,6 @@ from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.spatial_ref_sys import SRS
 
 from .interface import FIELD_TYPE, FIELD_TYPE_OGR
-from .util import _
 
 Base = declarative_base(dependencies=('resource', 'lookup_table'))
 

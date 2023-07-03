@@ -7,7 +7,7 @@ from shapely.geometry import box
 from sqlalchemy import event, func, inspect, literal, sql
 from zope.interface import implementer
 
-from nextgisweb.env import DBSession, declarative_base, env
+from nextgisweb.env import COMP_ID, DBSession, _, declarative_base, env
 from nextgisweb.lib import db
 from nextgisweb.lib.ogrhelper import read_dataset
 
@@ -34,14 +34,12 @@ from .feature_query import FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
 from .table_info import TableInfo
 from .util import (
-    COMP_ID,
     ERROR_FIX,
     FID_SOURCE,
     FIELD_TYPE_2_DB,
     FIELD_TYPE_SIZE,
     SCHEMA,
     TOGGLE,
-    _,
 )
 
 GEOM_TYPE_DISPLAY = (
@@ -241,7 +239,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             expr = func.ST_GeometryN(expr, 1)
         elif not is_multi_1 and is_multi_2:  # Single -> multi
             expr = func.ST_Multi(expr)
-        
+
         if has_z_1 and not has_z_2:  # Z -> not Z
             expr = func.ST_Force2D(expr)
         elif not has_z_1 and has_z_2:  # not Z -> Z
@@ -252,7 +250,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             expr.compile(compile_kwargs=dict(literal_binds=True))))
         connection = inspect(self).session.connection()
         connection.execute(text)
-        
+
 
         self.geometry_type = geometry_type
 

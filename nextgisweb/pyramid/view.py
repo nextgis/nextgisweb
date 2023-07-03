@@ -13,7 +13,7 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.response import FileResponse, Response
 from sqlalchemy import text
 
-from nextgisweb.env import DBSession, env
+from nextgisweb.env import DBSession, _, env
 from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
@@ -28,7 +28,6 @@ from .util import (
     StaticFileResponse,
     StaticMap,
     StaticSourcePredicate,
-    _,
     set_output_buffering,
     viewargs,
 )

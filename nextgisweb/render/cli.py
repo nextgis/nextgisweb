@@ -5,7 +5,7 @@ from math import ceil, floor
 import transaction
 
 from nextgisweb.env import DBSession
-from nextgisweb.env.cli import EnvCommand, cli
+from nextgisweb.env.cli import EnvCommand, comp_cli
 from nextgisweb.lib.geometry import Geometry, Transformer
 from nextgisweb.lib.logging import logger
 
@@ -21,12 +21,7 @@ TILE_QUEUE_TIMEOUT = 60
 SHUTDOWN_TIMEOUT = 10 * TILE_QUEUE_TIMEOUT
 
 
-@cli.group()
-class render:
-    pass
-
-
-@render.command()
+@comp_cli.command()
 def tile_cache_seed(self: EnvCommand):
     transformers = dict()
 

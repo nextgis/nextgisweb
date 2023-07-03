@@ -5,7 +5,7 @@ from io import DEFAULT_BUFFER_SIZE
 from osgeo import gdal
 from pyramid.response import FileIter, FileResponse, Response
 
-from nextgisweb.env import env
+from nextgisweb.env import _, env
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid.util import set_output_buffering
@@ -14,7 +14,6 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from .gdaldriver import EXPORT_FORMAT_GDAL
 from .model import RasterLayer
-from .util import _
 
 PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write

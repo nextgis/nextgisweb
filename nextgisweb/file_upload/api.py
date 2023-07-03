@@ -9,12 +9,10 @@ import magic
 import pyramid.httpexceptions as exc
 from pyramid.response import Response
 
-from nextgisweb.env import env
+from nextgisweb.env import _, env
 from nextgisweb.lib import json
 
 from nextgisweb.core.exception import UserException
-
-from .util import _
 
 BUF_SIZE = 1024 * 1024
 

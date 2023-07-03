@@ -10,7 +10,7 @@ from requests.exceptions import RequestException
 from shapely.geometry import box
 from zope.interface import implementer
 
-from nextgisweb.env import declarative_base, env
+from nextgisweb.env import COMP_ID, _, declarative_base, env
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.ows import FIELD_TYPE_WFS
@@ -44,8 +44,6 @@ from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedRelationship as SR
 from nextgisweb.resource import SerializedResourceRelationship as SRR
 from nextgisweb.spatial_ref_sys import SRS
-
-from .util import COMP_ID, _
 
 WFS_2_FIELD_TYPE = {
     FIELD_TYPE_WFS.INT: FIELD_TYPE.INTEGER,

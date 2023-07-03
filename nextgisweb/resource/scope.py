@@ -1,5 +1,6 @@
+from nextgisweb.env import _
+
 from .permission import Permission, Scope
-from .util import _
 
 P = Permission
 

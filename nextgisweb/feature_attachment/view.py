@@ -1,12 +1,11 @@
 from pyramid.httpexceptions import HTTPNotFound
 
+from nextgisweb.env import _
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.pyramid import viewargs
 from nextgisweb.resource import DataScope, Resource, resource_factory
-
-from .util import _
 
 
 @viewargs(renderer='react')

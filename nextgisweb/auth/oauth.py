@@ -16,7 +16,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import defer, joinedload, load_only
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import DBSession, env
+from nextgisweb.env import DBSession, _, env
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.logging import lazy_str, logger
 
@@ -24,7 +24,7 @@ from nextgisweb.core.exception import UserException
 
 from .exception import UserDisabledException
 from .model import Group, OAuthAToken, OAuthPToken, User
-from .util import _, clean_user_keyname, current_tstamp, enum_name
+from .util import clean_user_keyname, current_tstamp, enum_name
 from .util import log_lazy_data as lf
 
 MAX_TOKEN_LENGTH = 250

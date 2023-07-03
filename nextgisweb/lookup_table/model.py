@@ -1,7 +1,7 @@
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 
-from nextgisweb.env import declarative_base
+from nextgisweb.env import _, declarative_base
 from nextgisweb.lib import db
 
 from nextgisweb.resource import (
@@ -12,8 +12,6 @@ from nextgisweb.resource import (
     SerializedProperty,
     Serializer,
 )
-
-from .util import _
 
 Base = declarative_base(dependencies=('resource', ))
 

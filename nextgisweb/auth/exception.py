@@ -1,6 +1,6 @@
-from nextgisweb.core.exception import UserException
+from nextgisweb.env import _
 
-from .util import _
+from nextgisweb.core.exception import UserException
 
 
 class InvalidAuthorizationHeader(UserException):

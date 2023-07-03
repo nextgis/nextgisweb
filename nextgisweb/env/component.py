@@ -1,5 +1,6 @@
 import warnings
 from pathlib import Path
+from sys import _getframe
 
 from nextgisweb.lib.config import ConfigOptions
 from nextgisweb.lib.imptool import module_path
@@ -162,3 +163,30 @@ def load_all(packages=None, components=None, enable_disabled=False):
                 raise
 
     return (loaded_packages, loaded_components)
+
+
+def component_utility(factory, *, depth=2):
+    memo = {}
+
+    def get():
+        cur_depth = depth
+        while True:
+            fr = _getframe(cur_depth)
+            mod = fr.f_globals['__name__']
+            if mod.startswith(('importlib.', 'nextgisweb.env.')):
+                cur_depth += 1
+            else:
+                break
+
+        component_id = pkginfo.component_by_module(mod)
+
+        try:
+            return memo[component_id]
+        except KeyError:
+            result = memo[component_id] = factory(component_id)
+            return result
+
+    return get
+
+
+_COMP_ID = component_utility(lambda component_id: component_id)

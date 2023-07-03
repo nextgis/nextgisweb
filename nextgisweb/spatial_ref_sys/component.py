@@ -2,11 +2,10 @@ from datetime import timedelta
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import Component
+from nextgisweb.env import COMP_ID, Component
 from nextgisweb.lib.config import Option
 
 from .model import SRS, WKT_EPSG_3857, WKT_EPSG_4326, Base
-from .util import COMP_ID
 
 
 class SpatialRefSysComponent(Component):

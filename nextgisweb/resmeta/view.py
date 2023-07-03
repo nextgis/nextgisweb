@@ -1,7 +1,7 @@
+from nextgisweb.env import _
+
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.view import resource_sections
-
-from .util import _
 
 
 class Widget(Widget):

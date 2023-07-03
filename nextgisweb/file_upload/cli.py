@@ -1,13 +1,8 @@
-from nextgisweb.env.cli import EnvCommand, cli
+from nextgisweb.env.cli import EnvCommand, comp_cli
 
 from .component import FileUploadComponent
 
 
-@cli.group()
-class file_upload:
-    pass
-
-
-@file_upload.command()
+@comp_cli.command()
 def cleanup(self: EnvCommand, *, file_upload: FileUploadComponent):
     file_upload.cleanup()

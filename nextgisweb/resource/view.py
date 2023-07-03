@@ -7,7 +7,7 @@ from pyramid.threadlocal import get_current_request
 from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, _
 from nextgisweb.lib.dynmenu import DynItem, DynMenu, Label, Link
 
 from nextgisweb.core.exception import InsufficientPermissions
@@ -20,7 +20,6 @@ from .extaccess import ExternalAccessLink
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
-from .util import _
 from .widget import CompositeWidget
 
 __all__ = ['resource_factory', ]

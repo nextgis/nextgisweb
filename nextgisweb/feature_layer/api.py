@@ -14,7 +14,7 @@ from pyramid.response import FileResponse, Response
 from shapely.geometry import box
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import env
+from nextgisweb.env import _, env
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geom_area, geom_length
 
 from nextgisweb.core.exception import ValidationError
@@ -37,7 +37,6 @@ from .interface import (
     IWritableFeatureLayer,
 )
 from .ogrdriver import EXPORT_FORMAT_OGR, MVT_DRIVER_EXIST
-from .util import _
 
 PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write

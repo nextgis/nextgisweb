@@ -1,8 +1,9 @@
 import pytest
 from zope.interface import implementer
 
+from nextgisweb.env import _
+
 from ..exception import IUserException, UserException, user_exception
-from ..util import _
 
 
 def test_interface():

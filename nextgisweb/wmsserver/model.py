@@ -2,14 +2,12 @@ import re
 
 from sqlalchemy.ext.orderinglist import ordering_list
 
-from nextgisweb.env import declarative_base
+from nextgisweb.env import _, declarative_base
 from nextgisweb.lib import db
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.resource import Resource, ResourceGroup, Serializer, ServiceScope
 from nextgisweb.resource import SerializedProperty as SP
-
-from .util import _
 
 Base = declarative_base(dependencies=('resource', ))
 

@@ -1,8 +1,9 @@
+from nextgisweb.env import _
+
 from nextgisweb.resource import Widget
 from nextgisweb.resource.view import resource_sections
 
 from .model import Connection, Layer
-from .util import _
 
 
 class ClientWidget(Widget):

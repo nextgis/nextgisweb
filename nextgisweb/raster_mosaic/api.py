@@ -1,13 +1,12 @@
 from pyramid.response import FileResponse
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import env
+from nextgisweb.env import _, env
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.resource import DataScope
 
 from .model import RasterMosaic, RasterMosaicItem
-from .util import _
 
 
 def export(resource, request):

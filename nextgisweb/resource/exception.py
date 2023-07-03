@@ -2,9 +2,9 @@ import warnings
 
 from zope.interface import implementer
 
-from nextgisweb.core.exception import IUserException, UserException, ValidationError
+from nextgisweb.env import _
 
-from .util import _
+from nextgisweb.core.exception import IUserException, UserException, ValidationError
 
 
 class ResourceNotFound(UserException):

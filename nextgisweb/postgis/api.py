@@ -1,6 +1,8 @@
 from sqlalchemy import inspect
 from sqlalchemy.exc import NoResultFound, NoSuchTableError, SQLAlchemyError
 
+from nextgisweb.env import _
+
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import ConnectionScope, DataStructureScope, resource_factory
@@ -8,7 +10,7 @@ from nextgisweb.resource import ConnectionScope, DataStructureScope, resource_fa
 from .diagnostics import Checker
 from .exception import ExternalDatabaseError
 from .model import PostgisConnection, PostgisLayer
-from .util import _, coltype_as_str
+from .util import coltype_as_str
 
 
 def inspect_connection(request) -> JSONType:

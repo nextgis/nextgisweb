@@ -11,12 +11,11 @@ from pyramid.response import Response
 from zope.interface import implementer
 from zope.interface.interface import adapter_hooks
 
+from nextgisweb.env import _
 from nextgisweb.lib import json
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import IUserException, user_exception
-
-from .util import _
 
 
 def includeme(config):

@@ -12,7 +12,7 @@ from pyramid.renderers import render_to_response
 from pyramid.security import forget, remember
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, _
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.pyramid import JSONType, SessionStore, WebSession, viewargs
@@ -21,7 +21,6 @@ from .exception import ALinkException, InvalidCredentialsException, UserDisabled
 from .model import Group, Principal, User
 from .oauth import AuthorizationException, InvalidTokenException
 from .policy import AuthProvider, AuthState, OnUserLogin
-from .util import _
 
 
 @viewargs(renderer='mako')

@@ -1,6 +1,5 @@
+from nextgisweb.env import _
 from nextgisweb.lib.registry import dict_registry
-
-from .util import _
 
 
 @dict_registry

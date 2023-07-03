@@ -4,6 +4,7 @@ from urllib.parse import unquote, urljoin, urlparse
 
 from pyramid.renderers import render_to_response
 
+from nextgisweb.env import _
 from nextgisweb.lib.dynmenu import DynItem, Label, Link
 
 from nextgisweb.pyramid import viewargs
@@ -15,7 +16,7 @@ from nextgisweb.resource import DataScope, ResourceScope, Widget, resource_facto
 from .adapter import WebMapAdapter
 from .model import LegendSymbolsEnum, WebMap, WebMapScope
 from .plugin import WebmapLayerPlugin, WebmapPlugin
-from .util import _, webmap_items_to_tms_ids_list
+from .util import webmap_items_to_tms_ids_list
 
 
 class ExtentWidget(Widget):

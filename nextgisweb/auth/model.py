@@ -8,12 +8,10 @@ from sqlalchemy.dialects.postgresql import JSONB
 from zope.event import notify
 from zope.event.classhandler import handler
 
-from nextgisweb.env import DBSession, declarative_base, env
+from nextgisweb.env import DBSession, _, declarative_base, env
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid.util import gensecret
-
-from .util import _
 
 Base = declarative_base()
 

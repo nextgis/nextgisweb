@@ -5,7 +5,7 @@ from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
 
-from nextgisweb.env import declarative_base, env
+from nextgisweb.env import _, declarative_base, env
 from nextgisweb.lib import db
 
 from nextgisweb.auth import User
@@ -22,7 +22,6 @@ from nextgisweb.resource import SerializedResourceRelationship as SRR
 from nextgisweb.spatial_ref_sys import SRS
 
 from .adapter import WebMapAdapter
-from .util import _
 
 Base = declarative_base(dependencies=('resource', ))
 

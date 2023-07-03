@@ -1,5 +1,6 @@
 from pyramid.httpexceptions import HTTPNotFound
 
+from nextgisweb.env import _
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.pyramid import JSONType, viewargs
@@ -17,7 +18,6 @@ from nextgisweb.resource.view import resource_sections
 from .extension import FeatureExtension
 from .interface import IFeatureLayer
 from .ogrdriver import MVT_DRIVER_EXIST
-from .util import _
 
 
 class FeatureLayerFieldsWidget(Widget):

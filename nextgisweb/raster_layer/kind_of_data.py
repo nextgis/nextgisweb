@@ -1,6 +1,6 @@
-from nextgisweb.core import KindOfData
+from nextgisweb.env import _
 
-from .util import _
+from nextgisweb.core import KindOfData
 
 
 class RasterLayerData(KindOfData):

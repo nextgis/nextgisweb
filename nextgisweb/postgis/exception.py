@@ -1,8 +1,8 @@
 from sqlalchemy.exc import StatementError
 
-from nextgisweb.core.exception import ExternalServiceError
+from nextgisweb.env import _
 
-from .util import _
+from nextgisweb.core.exception import ExternalServiceError
 
 
 class ExternalDatabaseError(ExternalServiceError):

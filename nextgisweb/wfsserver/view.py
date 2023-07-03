@@ -1,8 +1,9 @@
+from nextgisweb.env import _
+
 from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
 from .model import Service
-from .util import _
 
 
 class ServiceWidget(Widget):

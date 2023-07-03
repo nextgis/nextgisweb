@@ -1,4 +1,5 @@
 import sys
+from importlib.util import find_spec
 from typing import Optional
 
 import transaction
@@ -7,6 +8,7 @@ from nextgisweb.lib.clann import command, group, opt
 from nextgisweb.lib.config import load_config
 
 from .. import environment
+from ..component import component_utility
 from ..environment import Env, env, inject
 
 
@@ -74,3 +76,12 @@ class EnvCommand(EnvOptions):
 @group(decorator=inject())
 class cli(EnvOptions):
     pass
+
+
+@component_utility
+def _comp_cli(component: str):
+    @cli.group(name=component)
+    class result:
+        pass
+
+    return result

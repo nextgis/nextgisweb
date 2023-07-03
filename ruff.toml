@@ -9,6 +9,7 @@ exclude = [
 "__init__.py" = ["F401"]
 
 [isort]
+variables = ["_"]
 
 # Absolute imports are more readable, relative ones are circuitous. So, let's
 # combine them with the following rules:

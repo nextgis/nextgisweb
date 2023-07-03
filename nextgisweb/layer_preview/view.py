@@ -1,3 +1,4 @@
+from nextgisweb.env import _
 from nextgisweb.lib.dynmenu import DynItem, Link
 
 from nextgisweb.feature_layer import IFeatureLayer
@@ -6,8 +7,6 @@ from nextgisweb.pyramid import viewargs
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.render import IRenderableStyle
 from nextgisweb.resource import DataScope, Resource, ResourceScope, resource_factory
-
-from .util import _
 
 
 @viewargs(renderer="preview.mako")

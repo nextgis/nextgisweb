@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from nextgisweb.env import Component, DBSession, require
+from nextgisweb.env import Component, DBSession, _, require
 from nextgisweb.lib import db
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.imptool import module_path
@@ -10,7 +10,6 @@ from nextgisweb.auth import User
 
 from .adapter import WebMapAdapter
 from .model import Base, LegendSymbolsEnum, WebMap, WebMapItem
-from .util import _
 
 
 class WebMapComponent(Component):

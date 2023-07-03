@@ -1,9 +1,8 @@
+from nextgisweb.env import _
 from nextgisweb.lib.ogrhelper import read_dataset
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-
-from .util import _
 
 
 def dataset(request) -> JSONType:

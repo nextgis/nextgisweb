@@ -6,7 +6,7 @@ from urllib.parse import unquote
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from pyramid.response import FileResponse, Response
 
-from nextgisweb.env import DBSession, env
+from nextgisweb.env import DBSession, _, env
 from nextgisweb.lib import json
 from nextgisweb.lib.logging import logger
 
@@ -15,7 +15,7 @@ from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import MetadataScope, Resource
 
-from .util import ClientRoutePredicate, _, gensecret, parse_origin
+from .util import ClientRoutePredicate, gensecret, parse_origin
 
 
 def _get_cors_olist():

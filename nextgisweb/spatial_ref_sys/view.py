@@ -1,12 +1,12 @@
 from pyramid.httpexceptions import HTTPNotFound
 from sqlalchemy.orm.exc import NoResultFound
 
+from nextgisweb.env import _
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.pyramid import viewargs
 
 from .model import SRS
-from .util import _
 
 
 def check_permission(request):

@@ -18,11 +18,12 @@ from sqlalchemy.types import (
     Time,
 )
 
+from nextgisweb.env import _
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.feature_layer import FIELD_TYPE
 
-from .util import _, coltype_as_str
+from .util import coltype_as_str
 
 # Field type - generic DB type
 _FIELD_TYPE_2_DB = {

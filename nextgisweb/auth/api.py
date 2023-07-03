@@ -6,13 +6,12 @@ from pyramid.interfaces import ISecurityPolicy
 from pyramid.security import forget
 from sqlalchemy.orm import aliased, undefer
 
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, _
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
 
 from .model import Group, Principal, User
-from .util import _
 
 keyname_pattern = re.compile(r'^[A-Za-z][A-Za-z0-9_\-]*$')
 brief_keys = (

@@ -2,12 +2,13 @@ from datetime import datetime, timedelta
 
 from pyramid.httpexceptions import HTTPNotFound
 
+from nextgisweb.env import _
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.pyramid import viewargs
 
 from .api import audit_cget
-from .util import _, audit_context, es_index
+from .util import audit_context, es_index
 
 PAGE_SIZE = 20
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'

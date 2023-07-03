@@ -1,9 +1,8 @@
-from nextgisweb.env import Component, require
+from nextgisweb.env import Component, _, require
 
 from nextgisweb.core import KindOfData
 
 from .model import Base, FeatureAttachment
-from .util import _
 
 
 class FeatureAttachmentData(KindOfData):

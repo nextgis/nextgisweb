@@ -1,5 +1,6 @@
 from pyramid.httpexceptions import HTTPNotFound
 
+from nextgisweb.env import _
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.pyramid import viewargs
@@ -7,7 +8,6 @@ from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
 from .model import RasterLayer
-from .util import _
 
 
 class RasterLayerWidget(Widget):

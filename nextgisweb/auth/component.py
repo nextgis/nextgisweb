@@ -6,7 +6,7 @@ from pyramid.httpexceptions import HTTPForbidden
 from sqlalchemy.orm import defer, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import Component, DBSession
+from nextgisweb.env import Component, DBSession, _
 from nextgisweb.lib import db
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.logging import logger
@@ -19,7 +19,6 @@ from .exception import UserDisabledException
 from .model import Base, Group, User
 from .oauth import OAuthAToken, OAuthHelper, OAuthPToken
 from .policy import AuthProvider, AuthState, SecurityPolicy
-from .util import _
 
 
 class AuthComponent(Component):

@@ -1,6 +1,4 @@
-from nextgisweb.env import Component
-
-from .util import COMP_ID
+from nextgisweb.env import COMP_ID, Component
 
 
 class GUIComponent(Component):

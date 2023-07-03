@@ -1,14 +1,9 @@
-from nextgisweb.env.cli import DryRunOptions, EnvCommand, cli, opt
+from nextgisweb.env.cli import DryRunOptions, EnvCommand, comp_cli, opt
 
 from .component import FileStorageComponent
 
 
-@cli.group()
-class file_storage():
-    pass
-
-
-@file_storage.command()
+@comp_cli.command()
 class cleanup(DryRunOptions, EnvCommand):
     unreferenced: bool = opt(False, flag=True, doc="Delete or not (default) unreferenced")
     orphaned: bool = opt(True, flag=True, doc="Delete (default) or not orphaned")

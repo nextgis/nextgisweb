@@ -4,7 +4,7 @@ from collections import namedtuple
 from zope.interface import Attribute, Interface, classImplements, implementer
 from zope.interface.interface import adapter_hooks
 
-from .util import _
+from nextgisweb.env import _
 
 
 class IUserException(Interface):

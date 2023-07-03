@@ -21,7 +21,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import Component, DBSession
+from nextgisweb.env import Component, DBSession, _
 from nextgisweb.env.package import enable_qualifications, pkginfo
 from nextgisweb.lib import db, json
 from nextgisweb.lib.config import Option, SizeInBytes
@@ -32,7 +32,6 @@ from nextgisweb.i18n import Localizer, Translations
 from .backup import BackupMetadata
 from .model import Base, Setting
 from .storage import StorageComponentMixin
-from .util import _
 
 
 class _NO_DEFAULT:

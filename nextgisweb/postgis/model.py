@@ -10,7 +10,7 @@ from sqlalchemy.engine.url import make_url as make_engine_url
 from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from zope.interface import implementer
 
-from nextgisweb.env import declarative_base, env
+from nextgisweb.env import _, declarative_base, env
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
@@ -50,7 +50,6 @@ from nextgisweb.resource import SerializedResourceRelationship as SRR
 from nextgisweb.spatial_ref_sys import SRS
 
 from .exception import ExternalDatabaseError
-from .util import _
 
 Base = declarative_base(dependencies=('resource', 'feature_layer'))
 

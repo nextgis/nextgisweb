@@ -2,12 +2,11 @@ import sys
 
 from zope.interface import Interface, implementer
 
+from nextgisweb.env import _
 from nextgisweb.env.model import BaseClass
 from nextgisweb.lib.registry import dict_registry
 
 from nextgisweb.core.exception import ForbiddenError, IUserException
-
-from .util import _
 
 
 class SerializerBase:

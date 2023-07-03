@@ -7,7 +7,7 @@ from osgeo import ogr, osr
 from sqlalchemy.orm import registry
 from sqlalchemy.sql import text
 
-from nextgisweb.env import DBSession, env
+from nextgisweb.env import DBSession, _, env
 from nextgisweb.lib import db
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
@@ -31,7 +31,6 @@ from .util import (
     GEOM_TYPE_2_DB,
     SCHEMA,
     TOGGLE,
-    _,
     fix_encoding,
     utf8len,
 )

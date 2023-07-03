@@ -1,10 +1,10 @@
+from nextgisweb.env import _
 from nextgisweb.lib.dynmenu import DynItem, Link
 
 from nextgisweb.pyramid import viewargs
 from nextgisweb.resource import ConnectionScope, DataScope, Resource, Widget, resource_factory
 
 from .model import PostgisConnection, PostgisLayer
-from .util import _
 
 
 class PostgisConnectionWidget(Widget):

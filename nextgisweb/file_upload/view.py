@@ -1,6 +1,6 @@
-from nextgisweb.pyramid import viewargs
+from nextgisweb.env import _
 
-from .util import _
+from nextgisweb.pyramid import viewargs
 
 
 @viewargs(renderer='react')

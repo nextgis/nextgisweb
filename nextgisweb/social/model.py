@@ -2,7 +2,7 @@ from shutil import copyfile
 
 from PIL import Image
 
-from nextgisweb.env import DBSession, declarative_base, env
+from nextgisweb.env import COMP_ID, DBSession, declarative_base, env
 from nextgisweb.lib import db
 
 from nextgisweb.file_storage import FileObj
@@ -11,11 +11,7 @@ from nextgisweb.resource import (
     Resource,
     Serializer,
 )
-from nextgisweb.resource import (
-    SerializedProperty as SP,
-)
-
-from .util import COMP_ID
+from nextgisweb.resource import SerializedProperty as SP
 
 Base = declarative_base(dependencies=('resource', ))
 

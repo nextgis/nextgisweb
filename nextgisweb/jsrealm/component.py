@@ -1,11 +1,9 @@
 import re
 from subprocess import check_output
 
-from nextgisweb.env import Component
+from nextgisweb.env import COMP_ID, Component
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
-
-from .util import COMP_ID
 
 
 class JSRealmComponent(Component):

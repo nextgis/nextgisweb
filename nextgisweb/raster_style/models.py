@@ -5,7 +5,7 @@ import PIL
 from osgeo import gdal, gdal_array, gdalconst
 from zope.interface import implementer
 
-from nextgisweb.env import declarative_base
+from nextgisweb.env import _, declarative_base
 from nextgisweb.lib.imptool import module_path
 
 from nextgisweb.render import (
@@ -15,8 +15,6 @@ from nextgisweb.render import (
     ITileRenderRequest,
 )
 from nextgisweb.resource import DataScope, Resource
-
-from .util import _
 
 Base = declarative_base(dependencies=('resource', ))
 

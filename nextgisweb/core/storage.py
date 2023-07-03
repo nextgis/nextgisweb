@@ -5,7 +5,7 @@ import sqlalchemy as sa
 import transaction
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import DBSession
+from nextgisweb.env import DBSession, _
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import dict_registry
 
@@ -16,7 +16,7 @@ from .model import (
     storage_stat_dimension,
     storage_stat_dimension_total,
 )
-from .util import _, format_size
+from .util import format_size
 
 
 @dict_registry

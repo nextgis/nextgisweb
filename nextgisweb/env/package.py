@@ -127,7 +127,7 @@ class PkgInfo:
 
         def _node():
             return defaultdict(_node, {None: None})
-        
+
         self._module_tree = _node()
 
 
