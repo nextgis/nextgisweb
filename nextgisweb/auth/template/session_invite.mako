@@ -1,5 +1,4 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
-<%! from nextgisweb.pyramid.util import _ %>
 
 <form action="${request.route_url('auth.session_invite')}"
     method="POST" style="text-align: center;" >

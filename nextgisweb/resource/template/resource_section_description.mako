@@ -1,4 +1,3 @@
-<%! from nextgisweb.resource.util import _ %>
 <%page args="section" />
 <% section.content_box = False %>
 <%namespace file="nextgisweb:pyramid/template/clean.mako" import="clean_html"/>

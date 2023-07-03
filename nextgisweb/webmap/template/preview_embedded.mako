@@ -1,5 +1,4 @@
 <%inherit file='nextgisweb:pyramid/template/plain.mako' />
-<%! from nextgisweb.webmap.util import _ %>
 
 <h2>${tr(title)}</h2>
 

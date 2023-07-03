@@ -1,6 +1,4 @@
 <%!
-    from markupsafe import Markup
-    from nextgisweb.resmeta.util import _
     from nextgisweb.resmeta.model import VTYPE_DISPLAY_NAME
     from nextgisweb.resource import MetadataScope
 %>

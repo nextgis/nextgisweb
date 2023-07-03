@@ -3,7 +3,6 @@
 <%!
     from types import SimpleNamespace
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
-    from nextgisweb.pyramid.util import _
 %>
 
 <%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>

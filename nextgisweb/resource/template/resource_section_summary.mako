@@ -1,4 +1,3 @@
-<%! from nextgisweb.resource.util import _ %>
 <%page args="section"/>
 <% section.content_box = False %>
 

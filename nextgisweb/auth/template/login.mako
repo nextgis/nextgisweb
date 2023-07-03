@@ -1,5 +1,4 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
-<%! from nextgisweb.auth.util import _ %>
 
 <% system_name = request.env.core.system_full_name() %>
 

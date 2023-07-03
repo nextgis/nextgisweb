@@ -1,8 +1,5 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
-<%!
-    from nextgisweb.pyramid.util import _
-    from nextgisweb.pyramid.uacompat import FAMILIES, parse_header as ua_parse_header
-%>
+<%! from nextgisweb.pyramid.uacompat import FAMILIES, parse_header as ua_parse_header %>
 
 <%def name="title_ext()">
     <div id="info-copy-btn" style="float: right"></div>

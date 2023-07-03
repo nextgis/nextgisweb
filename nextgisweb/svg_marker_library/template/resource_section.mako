@@ -1,4 +1,3 @@
-<%! from nextgisweb.svg_marker_library.util import _ %>
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead>
         <tr>

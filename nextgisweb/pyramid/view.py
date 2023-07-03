@@ -14,7 +14,9 @@ from pyramid.response import FileResponse, Response
 from sqlalchemy import text
 
 from nextgisweb.env import DBSession, _, env
+from nextgisweb.env.package import pkginfo
 from nextgisweb.lib import dynmenu as dm
+from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
@@ -587,14 +589,34 @@ def json_js(value, pretty=False):
     return Markup(dumps(value, pretty=pretty))
 
 
+def _m_gettext(_template_filename):
+    head = _template_filename
+    comp_id = None
+    while head:
+        head, __, part = head.rpartition('/')
+        if part == 'template':
+            comp_id = head.rpartition('/')[-1]
+            break
+
+    if comp_id:
+        if comp_id.startswith('nextgisweb_'):
+            comp_id = comp_id[len('nextgisweb_'):]
+
+        assert comp_id in pkginfo.components, f"Component {comp_id} not found"
+        return trstr_factory(comp_id)
+
+
 def _setup_pyramid_mako(comp, config):
     settings = config.registry.settings
 
     settings['pyramid.reload_templates'] = comp.env.core.debug
     settings['mako.directories'] = 'nextgisweb:templates/'
     settings['mako.imports'] = [
+        'from markupsafe import Markup',
         'from nextgisweb.i18n import tcheck',
         'from nextgisweb.pyramid.view import json_js',
+        'from nextgisweb.pyramid.view import _m_gettext',
+        '_ = _m_gettext(_template_filename); del _m_gettext',
     ]
     settings['mako.default_filters'] = ['tcheck', 'h'] if comp.env.core.debug else ['h', ]
 

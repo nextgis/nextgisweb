@@ -1,4 +1,3 @@
-<% from nextgisweb.wmsclient.util import _ %>
 <div class="table-wrapper">
     <table class="pure-table pure-table-horizontal">
         <thead>

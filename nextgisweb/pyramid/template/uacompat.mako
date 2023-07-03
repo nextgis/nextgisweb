@@ -1,5 +1,4 @@
 <%inherit file='nextgisweb:pyramid/template/plain.mako' />
-<%! from nextgisweb.pyramid.util import _ %>
 
 <%def name="title()"><% return tr(_("Browser compatibility test")) %></%def>
 

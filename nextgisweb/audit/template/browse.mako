@@ -2,11 +2,7 @@
 <%!
     import json
     from datetime import datetime
-    from markupsafe import Markup
     from nextgisweb.auth.api import user_cget
-    from nextgisweb.audit.util import _
-
-    NBSP = Markup("&nbsp;")
 %>
 
 <%def name="head()">
@@ -115,8 +111,8 @@
                 </td>
                 <td class="text-center code-text">${hit['request']['method']}</td>
                 <td class="code-text" title="${hit['request']['path']}">${hit['request']['path']}</td>
-                <td class="code-text" title="${hit['response']['route_name'] if 'route_name' in hit['response'] else NBSP}">
-                    ${hit['response']['route_name'] if 'route_name' in hit['response'] else NBSP}</td>
+                <td class="code-text" title="${hit['response']['route_name'] if 'route_name' in hit['response'] else Markup("&nbsp;")}">
+                    ${hit['response']['route_name'] if 'route_name' in hit['response'] else Markup("&nbsp;")}</td>
                 %if 'context' in hit:
                     <td class="code-text" title="${hit['context']['model']}">${hit['context']['model']}</td>
                     <td class="code-text">${hit['context']['id']}</td>
@@ -124,7 +120,7 @@
                     <td class="code-text" style="white-space: nowrap; opacity: .8"> --- </td>
                     <td class="code-text" style="white-space: nowrap; opacity: .8"> --- </td>
                 %endif
-                <td>${hit['user']['keyname'] if 'user' in hit else NBSP}</td>
+                <td>${hit['user']['keyname'] if 'user' in hit else Markup("&nbsp;")}</td>
             </tr>
             %endfor
 

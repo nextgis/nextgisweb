@@ -1,4 +1,3 @@
-<%! from nextgisweb.lookup_table.util import _ %>
 <%page args="items" />
 
 <h2>${tr(_("Items"))}</h2>

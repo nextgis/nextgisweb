@@ -1,7 +1,5 @@
-<%!
-    from nextgisweb.feature_layer.util import _
-    from nextgisweb.resource import DataStructureScope
-%>
+<%! from nextgisweb.resource import DataStructureScope %>
+
 <%
     have_lookup_table = False
     for field in obj.fields:

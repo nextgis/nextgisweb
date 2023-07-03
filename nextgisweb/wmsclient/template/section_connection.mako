@@ -1,4 +1,3 @@
-<%! from nextgisweb.wmsclient.util import _ %>
 <% capcache = obj.capcache_dict %>
 
 <table class="table-keyvalue pure-table"><tbody>
