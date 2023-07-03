@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-import i18n from "@nextgisweb/pyramid/i18n!webmap";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import ViewListIcon from "@material-icons/svg/view_list/outline";
 import ExpandLessIcon from "@material-icons/svg/expand_less/outline";

@@ -6,7 +6,7 @@ import MessageIcon from "@material-icons/svg/message";
 import { Skeleton } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { errorModal } from "@nextgisweb/gui/error";
-import i18n from "@nextgisweb/pyramid/i18n!resource";
+import i18n from "@nextgisweb/pyramid/i18n";
 import "./DiagnosticsWidget.less";
 
 const STEXT = {

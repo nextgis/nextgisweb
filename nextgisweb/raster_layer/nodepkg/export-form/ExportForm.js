@@ -6,7 +6,7 @@ import { FieldsForm, Select, useForm } from "@nextgisweb/gui/fields-form";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useMemo, useState, useEffect } from "react";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 const srsListToOptions = (srsList) => {
     return srsList.map((srs) => {

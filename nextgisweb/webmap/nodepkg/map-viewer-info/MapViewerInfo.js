@@ -8,7 +8,7 @@ import {transform, transformExtent} from "ol/proj";
 
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import {getDecPlacesRoundCoordByProj} from "@nextgisweb/webmap/utils/format-units";
-import i18n from "@nextgisweb/pyramid/i18n!webmap";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import MouseIcon from "@material-icons/svg/mouse";
 import CropFreeIcon from "@material-icons/svg/crop_free";

@@ -1,4 +1,4 @@
-import i18n from "@nextgisweb/pyramid/i18n!webmap";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 export const getGeometryTypeTitle = (geometryType) => {
     switch (geometryType) {

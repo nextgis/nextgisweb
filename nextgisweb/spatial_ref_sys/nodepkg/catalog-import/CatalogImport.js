@@ -2,7 +2,7 @@ import { Button, Form } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useEffect, useState } from "react";
 

@@ -3,7 +3,7 @@ import CachedIcon from "@material-icons/svg/cached";
 import { route } from "@nextgisweb/pyramid/api";
 import { Button, Col, Row, Skeleton, Table, Typography } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!";
 import kindOfData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/kind_of_data";
 import "./StorageSummary.less";

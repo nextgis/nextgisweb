@@ -7,10 +7,13 @@ const glob = require("glob");
 const tmp = require("tmp");
 const doctrine = require("doctrine");
 
+const logging = require('webpack/lib/logging/runtime');
 const WebpackAssetsManifest = require("webpack-assets-manifest");
 const CopyPlugin = require("copy-webpack-plugin");
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+
+const logger = logging.getLogger("jsrealm");
 
 const babelOptions = require("./babelrc.cjs");
 const presetEnvOptIndex = babelOptions.presets.findIndex(
@@ -279,7 +282,7 @@ module.exports = (env, argv) => ({
         chunkFilename: "chunk/[id].js",
     },
     externals: [
-        function ({ request }, callback) {
+        function ({ context, request }, callback) {
             // Use AMD loader for with-chunks!some-entrypoint-name imports.
             if (request.startsWith("@nextgisweb/jsrealm/with-chunks!")) {
                 return callback(null, `amd ${request}`);
@@ -288,6 +291,17 @@ module.exports = (env, argv) => ({
             // Use AMD loader for all entrypoints.
             const requestModule = request.replace(/!.*$/, "");
             if (entrypointList[requestModule] !== undefined) {
+                if (['@nextgisweb/pyramid/i18n'].includes(requestModule)) {
+                    const loader = /(!.*|)$/.exec(request)[1];
+                    if (loader === '' || loader === '!') {
+                        const compId = /(?:\/nextgisweb_|\/)(\w+)\/nodepkg(?:$|\/)/.exec(context)[1];
+                        const newRequest = `${requestModule}!${compId}`;
+                        logger.debug(`"${request}" replaced with "${newRequest}"`);
+                        request = newRequest;
+                    } else {
+                        logger.warn(`Consider dropping "${loader}" in "${request}" for nextgisweb >= 4.5.dev3`);
+                    }
+                }
                 return callback(null, `amd ${request}`);
             }
 

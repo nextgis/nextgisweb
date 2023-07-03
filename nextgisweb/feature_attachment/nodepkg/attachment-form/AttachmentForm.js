@@ -10,7 +10,7 @@ import {
     LunkwillParam,
 } from "@nextgisweb/pyramid/api";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
-import i18n from "@nextgisweb/pyramid/i18n!feature_attachment";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import "./AttachmentForm.less";
 

@@ -3,7 +3,7 @@ import { PropTypes } from "prop-types";
 import { Button, Dropdown, Space, Tooltip } from "@nextgisweb/gui/antd";
 
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
-import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import { useExportFeatureLayer } from "../../hook/useExportFeatureLayer";
 

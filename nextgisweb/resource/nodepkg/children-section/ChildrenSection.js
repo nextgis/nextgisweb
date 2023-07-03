@@ -11,7 +11,7 @@ import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!resource";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import { showResourcePicker } from "../resource-picker";
 import { createResourceTableItemOptions } from "../resource-picker/util/createResourceTableItemOptions";

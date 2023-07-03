@@ -4,7 +4,7 @@ import { Badge, Button, Tooltip, Alert } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!auth";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { useState, useMemo } from "react";
 import getMessages from "../userMessages";
 import { default as oauth, makeTeamManageButton } from "../oauth";

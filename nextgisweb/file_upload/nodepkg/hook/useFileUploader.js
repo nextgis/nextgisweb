@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { fileUploader } from "@nextgisweb/file-upload";
 import { message } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!file_upload";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 export function useFileUploader({
     /** File types that can be accepted. See input accept {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept Attribute}  */

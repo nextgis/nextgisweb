@@ -9,7 +9,7 @@ import PreviewIcon from "@material-icons/svg/preview";
 import {routeURL} from "@nextgisweb/pyramid/api";
 import {getPermalink} from "@nextgisweb/webmap/utils/permalink";
 
-import i18n from "@nextgisweb/pyramid/i18n!webmap";
+import i18n from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!";
 
 import "./SharePanel.less";

@@ -1,6 +1,6 @@
 /** @entrypoint */
 import { Button, Modal } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
+import i18n from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 import { useEffect, useState } from "react";
 import { notesUrl, registerCallback } from ".";

@@ -10,7 +10,7 @@ import SearchIcon from "@material-icons/svg/search";
 import SyncIcon from "@material-icons/svg/sync";
 
 import { Button, Col, Input, Row, Tooltip } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!resource";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import { ResourcePickerBreadcrumb } from "../resource-picker-breadcrumb";
 import ResourcesFilter from "../../resources-filter";

@@ -55,7 +55,7 @@ export function callingComponent(arg, toAbsMid) {
     // if (component == req) {
     //     console.debug(
     //         `Consider to replace "@nextgisweb/pyramid/i18n!${req}" ` +
-    //         `with "@nextgisweb/pyramid/i18n!" in "${abs}".`
+    //         `with "@nextgisweb/pyramid/i18n" in "${abs}".`
     //     );
     // }
 

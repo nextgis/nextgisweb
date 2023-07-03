@@ -9,7 +9,7 @@ import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import { ExportAction } from "./component/ExportAction";
 import { deleteFeatures } from "./api/deleteFeatures";

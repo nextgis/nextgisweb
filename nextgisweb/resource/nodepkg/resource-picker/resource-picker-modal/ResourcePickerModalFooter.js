@@ -10,7 +10,7 @@ import HighlightOff from "@material-icons/svg/highlight_off";
 import { Button, Col, Input, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
-import i18n from "@nextgisweb/pyramid/i18n!resource";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 const createNewGroupMsg = i18n.gettext("Create group");
 const clearSelectionMsg = i18n.gettext("Clear selection");

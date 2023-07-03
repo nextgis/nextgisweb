@@ -2,7 +2,7 @@ import { Dropdown } from "@nextgisweb/gui/antd";
 import ZoomInMapIcon from "@material-icons/svg/zoom_in_map/outline";
 import MoreVertIcon from "@material-icons/svg/more_vert/outline";
 
-import i18n from "@nextgisweb/pyramid/i18n!webmap";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import PropTypes from "prop-types";
 

@@ -1,7 +1,7 @@
 import { PropTypes } from "prop-types";
 
 import { Button, Input, Select } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!gui";
+import i18n from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 
 import { FormItem } from "./_FormItem";

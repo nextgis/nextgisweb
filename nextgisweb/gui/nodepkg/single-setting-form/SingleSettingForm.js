@@ -3,7 +3,7 @@ import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n!gui";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
 

@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { Form, Input, Select } from "@nextgisweb/gui/antd";
 import { useEffect, useState, useMemo } from "react";
-import i18n from "@nextgisweb/pyramid/i18n!auth";
+import i18n from "@nextgisweb/pyramid/i18n";
 import oauth from "../oauth";
 
 const modes = [

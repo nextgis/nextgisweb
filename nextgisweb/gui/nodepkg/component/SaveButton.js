@@ -1,5 +1,5 @@
 import SaveOutlineIcon from "@material-icons/svg/save/outline";
-import i18n from "@nextgisweb/pyramid/i18n!gui";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { Button } from "@nextgisweb/gui/antd";
 import { PropTypes } from "prop-types";
 

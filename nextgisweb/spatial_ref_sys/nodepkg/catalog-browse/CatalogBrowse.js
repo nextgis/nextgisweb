@@ -15,7 +15,7 @@ import {
 import "@nextgisweb/gui/model-browse/ModelBrowse.less";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n";
 import debounce from "lodash/debounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 

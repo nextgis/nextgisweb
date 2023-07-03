@@ -1,5 +1,5 @@
 import { FieldsForm, Select } from "@nextgisweb/gui/fields-form";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { PropTypes } from "prop-types";
 import { useMemo, useState, useEffect } from "react";
 

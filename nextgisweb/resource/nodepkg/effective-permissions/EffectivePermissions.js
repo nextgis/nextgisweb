@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from "react";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
-import i18n from "@nextgisweb/pyramid/i18n!resource";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import "./EffectivePermissions.less";
 

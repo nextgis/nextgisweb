@@ -3,7 +3,7 @@ import loginModal from "@nextgisweb/auth/loginModal";
 import { authStore } from "@nextgisweb/auth/store";
 import { Popover } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
+import i18n from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
 import "./Avatar.less";
 

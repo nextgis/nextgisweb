@@ -14,7 +14,7 @@ import {
 } from "@nextgisweb/gui/fields-form";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 

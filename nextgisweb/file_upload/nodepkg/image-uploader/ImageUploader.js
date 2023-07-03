@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 
 import DeleteIcon from "@material-icons/svg/delete";
 import { Button } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!file_upload";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import { FileUploader } from "../file-uploader";
 import { FileUploaderType } from "../type/FileUploaderType";

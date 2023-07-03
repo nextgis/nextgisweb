@@ -3,7 +3,7 @@ import { PropTypes } from "prop-types";
 import { Fragment, useEffect, useMemo, useRef } from "react";
 
 import { Form } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!gui";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import {
     Checkbox,

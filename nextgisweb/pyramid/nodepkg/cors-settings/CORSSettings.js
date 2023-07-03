@@ -9,7 +9,7 @@ import {
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 
 import { useMemo, useState } from "react";

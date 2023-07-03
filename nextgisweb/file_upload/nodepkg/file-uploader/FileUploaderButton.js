@@ -1,6 +1,6 @@
 import { InboxOutlined } from "@ant-design/icons";
 import { Upload, Button } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!file_upload";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import { useFileUploader } from "../hook/useFileUploader";
 import { FileUploaderType } from "../type/FileUploaderType";

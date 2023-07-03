@@ -1,5 +1,5 @@
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
-import i18n from "@nextgisweb/pyramid/i18n!auth";
+import i18n from "@nextgisweb/pyramid/i18n";
 import getMessages from "../groupMessages";
 import { default as oauth } from "../oauth";
 

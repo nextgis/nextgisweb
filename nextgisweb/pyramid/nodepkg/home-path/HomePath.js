@@ -1,5 +1,5 @@
 import { SingleSettingForm } from "@nextgisweb/gui/single-setting-form";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 const saveSuccesText = i18n.gettext("The home path setting is saved.");
 

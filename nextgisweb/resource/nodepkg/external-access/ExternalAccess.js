@@ -3,7 +3,7 @@ import { Popover } from "@nextgisweb/gui/antd";
 import HelpOutlineIcon from "@material-icons/svg/help_outline";
 import ContentCopyIcon from "@material-icons/svg/content_copy";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import i18n from "@nextgisweb/pyramid/i18n!resource";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import "./ExternalAccess.less";
 

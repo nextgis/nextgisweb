@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { Form, Input, InputNumber } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 const unit = i18n.gettext("deg.");
 const parts = [

@@ -1,6 +1,6 @@
 /** @entrypoint */
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { routeURL } from "../api";
 
 const callbacks = [];

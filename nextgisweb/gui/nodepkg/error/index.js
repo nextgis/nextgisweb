@@ -1,6 +1,6 @@
 /** @entrypoint */
 import { NetworksResponseError } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!gui";
+import i18n from "@nextgisweb/pyramid/i18n";
 import showModal from "../showModal";
 import { ErrorModal } from "./ErrorModal";
 import { ErrorPage } from "./ErrorPage";

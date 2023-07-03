@@ -6,7 +6,7 @@ import { Code } from "@nextgisweb/gui/component/code";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n!pyramid";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 export function CustomCSSForm() {
     const [saving, setSaving] = useState(false);

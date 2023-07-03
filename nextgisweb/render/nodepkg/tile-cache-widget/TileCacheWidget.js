@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { InputNumber, Checkbox } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!render";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import "./TileCacheWidget.less";
 

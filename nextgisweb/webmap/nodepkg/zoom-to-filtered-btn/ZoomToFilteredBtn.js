@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n!feature_layer";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import ZoomInMap from "@material-icons/svg/zoom_in_map";
 

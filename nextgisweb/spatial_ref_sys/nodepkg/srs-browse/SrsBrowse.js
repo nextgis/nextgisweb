@@ -2,7 +2,7 @@ import { Button } from "@nextgisweb/gui/antd";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n";
 import getMessages from "../srsMessages";
 import { modelObj } from "../srsModel";
 

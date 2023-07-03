@@ -1,6 +1,6 @@
 import DeleteOutlineIcon from "@material-icons/svg/delete/outline";
 import { Button, Checkbox, Col, Row } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!resource";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useState } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api";

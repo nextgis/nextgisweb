@@ -11,7 +11,7 @@ import {
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n!auth";
+import i18n from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!auth";
 
 import { PrincipalMemberSelect } from "../field";

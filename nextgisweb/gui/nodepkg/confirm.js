@@ -1,6 +1,6 @@
 import { Modal, message } from "@nextgisweb/gui/antd";
 
-import i18n from "@nextgisweb/pyramid/i18n!gui";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 export function confirm({
     onOk,

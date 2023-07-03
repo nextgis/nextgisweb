@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import debounce from "lodash/debounce";
 import { Input, AutoComplete } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!resource";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { PropTypes } from "prop-types";
 
 import "./ResourcesFilter.less";

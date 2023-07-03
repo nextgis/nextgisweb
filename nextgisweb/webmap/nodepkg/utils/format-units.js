@@ -1,5 +1,5 @@
 import ReactDOMServer from "react-dom/server";
-import i18n from "@nextgisweb/pyramid/i18n!webmap";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 const m_to_km = 1E-3;
 const m_to_ft = 1 / 0.3048;

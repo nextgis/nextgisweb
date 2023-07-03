@@ -1,5 +1,5 @@
 import { toJS, makeAutoObservable } from "mobx";
-import i18n from "@nextgisweb/pyramid/i18n!resmeta";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 class Record {
     key;

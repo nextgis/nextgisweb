@@ -3,7 +3,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import { errorModal } from "@nextgisweb/gui/error";
 import { message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { SettingsForm } from "./SettingsForm";
 
 const ROUTE_WEBMAP_SETTINGS = route("webmap.settings");

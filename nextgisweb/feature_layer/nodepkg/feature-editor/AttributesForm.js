@@ -5,7 +5,7 @@ import { useMemo, useCallback, useState } from "react";
 
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { Button, Tooltip } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import {
     BigInteger,

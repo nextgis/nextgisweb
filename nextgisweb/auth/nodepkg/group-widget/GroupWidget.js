@@ -5,7 +5,7 @@ import { ContentBox } from "@nextgisweb/gui/component";
 import { KeynameTextBox } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!auth";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import { PrincipalMemberSelect } from "../field";
 import getMessages from "../groupMessages";

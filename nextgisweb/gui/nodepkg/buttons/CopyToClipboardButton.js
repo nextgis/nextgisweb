@@ -2,7 +2,7 @@ import {PropTypes} from "prop-types";
 import {Button, message} from "@nextgisweb/gui/antd";
 import ContentCopyIcon from "@material-icons/svg/content_copy";
 
-import i18n from "@nextgisweb/pyramid/i18n!gui";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 
 export function CopyToClipboardButton({children, messageInfo, getTextToCopy, type}) {

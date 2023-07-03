@@ -1,5 +1,5 @@
 import { Button, Modal, Progress, Col, Row } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!gui";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 const defTitleMsg = i18n.gettext("Operation in progress");
 const defCancelMsg = i18n.gettext("Cancel");

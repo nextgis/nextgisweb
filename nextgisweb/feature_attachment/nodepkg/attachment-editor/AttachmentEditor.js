@@ -10,7 +10,7 @@ import { Image, Input, Table, Upload } from "@nextgisweb/gui/antd";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { formatSize } from "@nextgisweb/gui/util";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!feature_attachment";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import { FileReaderImage } from "./component/FileReaderImage";
 

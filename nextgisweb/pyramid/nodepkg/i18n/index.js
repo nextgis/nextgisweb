@@ -4,7 +4,7 @@ import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 export * from "./load";
 
 // Load translation for pyramid component
-entrypoint("@nextgisweb/pyramid/i18n!pyramid");
+entrypoint("@nextgisweb/pyramid/i18n");
 
 export function compatHbs(template, jed, context) {
     if (ngwConfig.debug) {

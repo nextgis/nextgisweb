@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 
 import { Slider, Tooltip } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!webmap";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import OpacityRationIcon from "@material-icons/svg/tonality/baseline";
 

@@ -18,7 +18,7 @@ import {
 import { errorModal } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n!gui";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import AddCircleIcon from "@material-icons/svg/add_circle";
 import DeleteForeverIcon from "@material-icons/svg/delete_forever";

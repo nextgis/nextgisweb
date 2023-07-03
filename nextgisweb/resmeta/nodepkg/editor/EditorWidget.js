@@ -9,7 +9,7 @@ import {
     Select,
     Button,
 } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!resmeta";
+import i18n from "@nextgisweb/pyramid/i18n";
 import "./EditorWidget.less";
 
 const { Column } = Table;

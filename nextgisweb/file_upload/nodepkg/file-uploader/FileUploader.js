@@ -2,7 +2,7 @@ import CancelIcon from "@material-icons/svg/cancel";
 
 import { InboxOutlined } from "@ant-design/icons";
 import { Button, Upload } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!file_upload";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 
 import { useFileUploader } from "../hook/useFileUploader";

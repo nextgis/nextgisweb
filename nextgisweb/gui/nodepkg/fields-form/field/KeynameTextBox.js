@@ -1,7 +1,7 @@
 import { PropTypes } from "prop-types";
 
 import { Input } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n!gui";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import { FormItem } from "./_FormItem";
 

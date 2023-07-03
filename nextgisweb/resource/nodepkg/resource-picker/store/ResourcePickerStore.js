@@ -1,6 +1,6 @@
 import { extractError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!resource";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { makeAutoObservable, runInAction } from "mobx";
 import { loadParents } from "../../util/loadParents";
 

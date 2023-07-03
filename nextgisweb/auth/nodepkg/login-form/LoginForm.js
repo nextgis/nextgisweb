@@ -3,7 +3,7 @@ import { Alert, Button, Form } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n!auth";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { observer } from "mobx-react-lite";
 import { PropTypes } from "prop-types";
 import { useEffect, useMemo, useState } from "react";

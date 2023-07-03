@@ -13,7 +13,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 
 import { request, route } from "@nextgisweb/pyramid/api";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
-import i18n from "@nextgisweb/pyramid/i18n!webmap";
+import i18n from "@nextgisweb/pyramid/i18n";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
 import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";

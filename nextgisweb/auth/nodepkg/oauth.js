@@ -1,6 +1,6 @@
 import { Button } from "@nextgisweb/gui/antd";
 import settings from "@nextgisweb/pyramid/settings!auth";
-import i18n from "@nextgisweb/pyramid/i18n!auth";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 const {
     enabled,
