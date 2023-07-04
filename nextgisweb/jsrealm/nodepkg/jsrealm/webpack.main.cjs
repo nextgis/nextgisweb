@@ -1,19 +1,32 @@
 const config = require("@nextgisweb/jsrealm/config.cjs");
 
-const path = require("path");
 const fs = require("fs");
-const os = require("os");
 const glob = require("glob");
-const tmp = require("tmp");
-const doctrine = require("doctrine");
+const os = require("os");
+const path = require("path");
 
-const logging = require('webpack/lib/logging/runtime');
 const WebpackAssetsManifest = require("webpack-assets-manifest");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const { IconResolverPlugin, symbolId } = require("./icon-util.cjs");
+const tagParser = require("./tag-parser.cjs");
 
-const logger = logging.getLogger("jsrealm");
+
+// Inject the following construction into each entrypoint module
+// at compilation time:
+//
+//     import "@nextgisweb/jsrealm/with-chunks!entry-name";
+//
+// This import is handled by AMD loader and loads all chunks
+// required by the entrypoint.
+const withChunks = (ep) => `import "@nextgisweb/jsrealm/with-chunks!${ep}"`;
+const addCode = (fn, code) => `imports-loader?additionalCode=${encodeURI(code).replace("!", "%21")}!${fn}`;
+
+const vImport = (fn, code) => fn + "!=!data:text/javascript;base64," + Buffer.from(code).toString("base64");
+const stripIndex = (m) => m.replace(/(?:\/index)?\.(js|ts)$/, "");
+
+const logger = require('webpack/lib/logging/runtime').getLogger("jsrealm");
 
 const babelOptions = require("./babelrc.cjs");
 const presetEnvOptIndex = babelOptions.presets.findIndex(
@@ -27,91 +40,55 @@ if (presetEnvOptIndex !== -1) {
     }
 }
 
-const { IconResolverPlugin, iconSymbolId } = require("./icon-util.cjs");
-
-function scanForEntrypoints(pkg) {
+function scanForEntries() {
     const result = [];
-    for (const candidate of glob.sync("**/*.{js,ts}", {
-        cwd: pkg.path,
-        ignore: ["node_modules/**", "contrib/**"],
-    })) {
-        const content = fs.readFileSync(pkg.path + "/" + candidate, {
-            encoding: "utf-8",
-        });
-
-        const jsdoc = /\/\*\*.*(?:\*\/$|$(?:\s*\*\s?.*$)*\s*\*\/)/m.exec(
-            content
-        );
-        if (jsdoc !== null) {
-            const payload = doctrine.parse(jsdoc[0], {
-                unwrap: true,
-                tags: ["entrypoint"],
-            });
-            for (const { title } of payload.tags) {
-                if (title == "entrypoint") {
-                    // console.log(`@entrypoint tag was found in "${pkg.name}/${candidate}"`);
-                    result.push(candidate);
-                    break;
-                }
+    for (const pkg of config.packages) {
+        for (const candidate of glob.sync("**/*.{js,ts}", {
+            cwd: pkg.path,
+            ignore: ["node_modules/**", "contrib/**"],
+        })) {
+            const fn = pkg.path + "/" + candidate
+            const tag = tagParser(fn);
+            if (tag) {
+                tag.entry = pkg.name + '/' + stripIndex(candidate);
+                tag.fullname = path.resolve(fn);
+                result.push(tag);
             }
         }
     }
     return result;
 }
 
-const entrypointList = {};
-const entrypointRules = [];
+let isDynamicEntry;
 
-for (const pkg of config.packages) {
-    const entrypoints = (pkg.json.nextgisweb || {}).entrypoints || scanForEntrypoints(pkg);
-    for (const ep of entrypoints) {
-        const epName =
-            pkg.name + "/" + ep.replace(/(?:\/index)?\.(js|ts)$/, "");
-        const fullname = require.resolve(pkg.name + "/" + ep);
-
-        // Library name is required to get relative paths work.
-        entrypointList[epName] = {
-            import: fullname,
-            library: { type: "amd", name: epName },
-        };
-
-        // This rule injects the following construction into each entrypoint
-        // module at webpack compilation time:
-        //
-        //     import '@nextgisweb/jsrealm/with-chunks!some-entrypoint-name';
-        //
-        // The import is handled by AMD require loader and loads all chunks
-        // required by the entrypoint.
-
-        let addCode = `import '@nextgisweb/jsrealm/with-chunks!${epName}';`;
-        if (config.debug) {
-            // To debug the process of loading entrypoints uncomment the
-            // following lines:
-            // const m = `Webpack entrypoint '${epName}' is being executed...`
-            // addCode += `\nconsole.debug("${m}");`;
-        }
-        entrypointRules.push({
-            test: fullname,
-            exclude: /node_modules/,
-            use: {
-                loader: "imports-loader",
-                options: { additionalCode: addCode },
+const dynamicEntries = () => {
+    const entries = Object.fromEntries(
+        scanForEntries().map(({ entry, fullname }) => [
+            entry,
+            {
+                import: addCode(fullname, withChunks(entry)),
+                library: { type: "amd", name: entry },
             },
-        });
-    }
-}
+        ])
+    );
+
+    isDynamicEntry = (m) => entries[m] !== undefined;
+    return entries;
+};
+
+const staticEntries = {};
 
 function scanLocales(moduleName) {
     const result = {};
     const pat = path.join(require.resolve(moduleName), "..", "locale", "*.js");
     for (const filename of glob.sync(pat)) {
-        const m = filename.match(/\/([a-z]{2}(?:[\-_][a-z]{2})?)\.js$/i);
+        const m = filename.match(/\/([a-z]{2}(?:[-_][a-z]{2})?)\.js$/i);
         if (m) {
             const original = m[1];
             const key = original.replace('_', '-').toLowerCase();
             result[key] = {key, original, filename};
-        };
-    };
+        }
+    }
     return result;
 }
 
@@ -128,7 +105,7 @@ function lookupLocale(key, map) {
     } else {
         const cfl = DEFAULT_COUNTRY_FOR_LANGUAGE[lang];
         test.push(cfl ? `${lang}-${cfl}` : `${lang}-${lang}`);
-    };
+    }
 
     test.push(lang);
 
@@ -137,9 +114,9 @@ function lookupLocale(key, map) {
         if (m) { return m; }
     }
 
-    if (key != 'en') {
+    if (key !== 'en') {
         return lookupLocale('en', map);
-    };
+    }
 
     throw "Locale 'en' not found!";
 }
@@ -152,40 +129,34 @@ const localeOutDir = path.resolve(
     "..", "locale");
 
 for (const lang of config.locales) {
-    const entrypoint = `@nextgisweb/jsrealm/locale/${lang}`;
+    const entry = `@nextgisweb/jsrealm/locale/${lang}`;
     const antd = lookupLocale(lang, antdLocales);
     const dayjs = lookupLocale(lang, dayjsLocales);
 
-    const code = (
-        `import '@nextgisweb/jsrealm/with-chunks!${entrypoint}';\n` +
-        `\n` +
-        `import antdLocale from '${antd.filename}';\n` +
-        `export const antd = antdLocale.default;\n` +
-        `\n`+
-        `import dayjs from '@nextgisweb/gui/dayjs';\n` +
-        `\n` +
-        `import '${dayjs.filename}';\n` +
-        `dayjs.locale('${dayjs.original}');\n`
-    );
+    const code = [
+        withChunks(entry),
+        `import antdLocale from "${antd.filename}";`,
+        `export const antd = antdLocale.default;`,
+        `import dayjs from "@nextgisweb/gui/dayjs";`,
+        `import "${dayjs.filename}";`,
+        `dayjs.locale('${dayjs.original}');`,
+    ].join('\n');
 
-    const jsFile = path.join(localeOutDir, lang + '.js');
-    fs.writeFileSync(jsFile, code);
-    entrypointList[entrypoint] = {
-        import: jsFile,
-        library: { type: "amd", name: entrypoint },
+    staticEntries[entry] = {
+        import: vImport(path.join(localeOutDir, lang + '.js'), code),
+        library: { type: "amd", name: entry },
     };
 }
 
-let spriteCode = "";
 const sharedIconIds = {};
+const materialIcons = [];
 
 for (const [comp, dir] of Object.entries(config.iconSources)) {
     const realDir = fs.realpathSync(dir);
     for (let fn of glob.sync(`${realDir}/**/*.svg`)) {
         const id = ("icon-" + comp + "-" +
             path.relative(realDir, fn).replace(/\.svg$/, "")
-        ).replace(/\w+\-resource\/(\w+)/, (m, p) => `rescls-${p}`);
-        spriteCode = spriteCode + `import "${fn}";\n`;
+        ).replace(/\w+-resource\/(\w+)/, (m, p) => `rescls-${p}`);
         sharedIconIds[fs.realpathSync(fn)] = id;
     }
 
@@ -193,39 +164,38 @@ for (const [comp, dir] of Object.entries(config.iconSources)) {
     for (const fn of glob.sync(`${realDir}/material.json`)) {
         const body = JSON.parse(fs.readFileSync(fn));
         for (let ref of body) {
-            if (ref.match(/\w+/)) { ref = ref + '/baseline' };
-            spriteCode = spriteCode + `import "${materialBase}/${ref}.svg";\n`;
+            if (ref.match(/\w+/)) { ref = ref + '/baseline' }
+            materialIcons.push(`${materialBase}/${ref}.svg`);
         }
     }
 }
-
-const spriteModuleFile = tmp.fileSync({ postfix: ".js" }).name;
-fs.writeFileSync(spriteModuleFile, spriteCode);
 
 const babelLoader = {
     loader: "babel-loader",
     options: babelOptions,
 };
 
-const svgSpriteLoader = {
-    loader: "svg-sprite-loader",
-    options: {
-        runtimeGenerator: require.resolve('./icon-runtime.cjs'),
-        symbolId: (fn) => {
-            const shared = sharedIconIds[fn];
-            if (shared) { return shared };
-            return iconSymbolId(fn);
-        }
-    }
-};
-
-module.exports = (env, argv) => ({
+module.exports = (env) => ({
     mode: config.debug ? "development" : "production",
     devtool: config.debug ? "source-map" : false,
     bail: !env.WEBPACK_WATCH,
-    entry: entrypointList,
+    entry: () => ({...staticEntries, ...dynamicEntries()}),
     module: {
-        rules: entrypointRules.concat([
+        rules: [
+            {
+                test: require.resolve("@nextgisweb/jsrealm/shared-icon"),
+                use: [
+                    babelLoader,
+                    {
+                        loader: "imports-loader",
+                        options: {
+                            imports: Object.keys(sharedIconIds)
+                                .concat(materialIcons)
+                                .map((fn) => `side-effects ${fn}`)
+                        }
+                    }
+                ],
+            },
             {
                 test: /\.(m?js|ts?)$/,
                 // In development mode exclude everything in node_modules for
@@ -249,21 +219,33 @@ module.exports = (env, argv) => ({
             },
             {
                 test: /\.svg$/i,
-                use: [babelLoader, svgSpriteLoader, "svgo-loader"]
+                use: [
+                    babelLoader,
+                    {
+                        loader: "svg-sprite-loader",
+                        options: {
+                            runtimeGenerator: require.resolve("./icon-runtime.cjs"),
+                            symbolId: (fn) => {
+                                const shared = sharedIconIds[fn];
+                                if (shared) return shared;
+                                return symbolId(fn);
+                            }
+                        }
+                    },
+                    "svgo-loader",
+                ]
             }
-        ]),
-    },
-    resolve: {
-        plugins: [
-            new IconResolverPlugin({ shared: spriteModuleFile }),
         ],
     },
+    resolve: {
+        plugins: [ new IconResolverPlugin() ],
+    },
     plugins: [
-        new WebpackAssetsManifest({ entrypoints: true }),
+        new CleanWebpackPlugin(),
         new CopyPlugin({
-            // Copy with-chunks!some-entrypoint-name loader directly to the dist
-            // directly. It is written in ES5-compatible way as AMD module and
-            // mustn't be processed by webpack runtime loader.
+            // Copy @nextgisweb/jsrealm/with-chunks!entry-name loader directly
+            // to the dist directly. It is written in ES5-compatible way as AMD
+            // module and mustn't be processed by webpack runtime loader.
             patterns: [
                 {
                     from: require.resolve("./with-chunks.js"),
@@ -271,11 +253,12 @@ module.exports = (env, argv) => ({
                 },
             ],
         }),
-        new CleanWebpackPlugin(),
+        new WebpackAssetsManifest({ entrypoints: true }),
         ...config.compressionPlugins,
         ...config.bundleAnalyzerPlugins,
     ],
     output: {
+        enabledLibraryTypes: ['amd'],
         path: path.resolve(config.rootPath, "dist/main"),
         filename: (pathData) =>
             pathData.chunk.name !== undefined ? "[name].js" : "chunk/[name].js",
@@ -290,7 +273,7 @@ module.exports = (env, argv) => ({
 
             // Use AMD loader for all entrypoints.
             const requestModule = request.replace(/!.*$/, "");
-            if (entrypointList[requestModule] !== undefined) {
+            if (isDynamicEntry(requestModule)) {
                 if (['@nextgisweb/pyramid/i18n'].includes(requestModule)) {
                     const loader = /(!.*|)$/.exec(request)[1];
                     if (loader === '' || loader === '!') {

@@ -1,6 +1,4 @@
 /** @entrypoint */
-
-// PLACEHOLDER: Webpack will replace it with generated module
 import "@nextgisweb/jsrealm/shared-icon";
 
 export function html({ collection, glyph, variant }) {
