@@ -26,6 +26,10 @@ define([
         },
 
         query: function (query, options) {
+            if (query.name.toString().length == 0) {
+                return [];
+            }
+
             var qopts = lang.mixin({
                 "search": query.name
             }, this.queryOptions);
