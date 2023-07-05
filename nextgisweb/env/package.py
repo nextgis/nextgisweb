@@ -117,7 +117,6 @@ class PkgInfo:
 
     def __init__(self):
         self.scanned = False
-        self._mod_comp = dict()
         self._comp_mod = dict()
         self._comp_enabled = dict()
         self._comp_pkg = dict()
@@ -211,7 +210,6 @@ class PkgInfo:
                 return n[None]
 
     def _module_tree_insert(self, module_name, comp):
-        self._mod_comp[module_name] = comp
         self._comp_mod[comp] = module_name
 
         n = self._module_tree

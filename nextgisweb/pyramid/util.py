@@ -164,8 +164,10 @@ def find_template(name, func=None, stack_level=1):
     for m in modules:
         parts = m.split('.')
         while parts:
-            if pkginfo._mod_comp.get('.'.join(parts)):
-                fn = module_path('.'.join(parts)) / 'template' / name
+            mod = '.'.join(parts)
+            comp_id = pkginfo.component_by_module(mod)
+            if comp_id:
+                fn = module_path(mod) / 'template' / name
                 if fn.exists():
                     logger.debug(
                         "Template %s found in %s", name,
