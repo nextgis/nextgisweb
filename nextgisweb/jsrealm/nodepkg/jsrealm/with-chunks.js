@@ -18,9 +18,13 @@ define([], function () {
         load(entry, require, callback) {
             function doLoad() {
                 const deps = dependencies[entry];
-                require(deps.map((itm) => "main/" + itm), function () {
+                if (deps === undefined || deps === []) {
                     callback(null);
-                });
+                } else {
+                    require(deps.map((itm) => "main/" + itm), function () {
+                        callback(null);
+                    });
+                }
             }
 
             if (dependencies === undefined) {
