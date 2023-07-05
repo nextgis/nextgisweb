@@ -151,6 +151,12 @@ class PkgInfo:
                     cdefn['enabled'] = True
                 modname = cdefn['module']
 
+                if existing := self._comp_mod.get(comp):
+                    warnings.warn(
+                        f"Component '{comp}' was already registered in '{existing}'. "
+                        f"Instance from {modname} will be ignored!")
+                    continue
+
                 self._module_tree_insert(modname, comp)
 
                 self._comp_enabled[comp] = cdefn['enabled']
