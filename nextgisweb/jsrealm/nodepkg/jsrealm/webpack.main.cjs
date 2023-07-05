@@ -175,6 +175,29 @@ const babelLoader = {
     options: babelOptions,
 };
 
+const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
+    entrypoints: true,
+    output: "manifest.json",
+    transform(assets) {
+        const result = {};
+
+        const processEntry = ([entry, data]) => [
+            entry,
+            (data.assets?.js || [])
+                .filter((c) => c !== "chunk/runtime.js" && c !== `${entry}.js`)
+                .map((c) => c.replace(/\.js$/, "")),
+        ];
+
+        result.dependencies = Object.fromEntries(
+            Object.entries(assets.entrypoints)
+                .map(processEntry)
+                .filter((itm) => itm[1].length > 0)
+        );
+
+        return result;
+    },
+});
+
 module.exports = (env) => ({
     mode: config.debug ? "development" : "production",
     devtool: config.debug ? "source-map" : false,
@@ -253,7 +276,7 @@ module.exports = (env) => ({
                 },
             ],
         }),
-        new WebpackAssetsManifest({ entrypoints: true }),
+        webpackAssetsManifestPlugin,
         ...config.compressionPlugins,
         ...config.bundleAnalyzerPlugins,
     ],
