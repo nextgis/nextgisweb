@@ -134,7 +134,11 @@ class PkgInfo:
         if self.scanned:
             return
 
-        epoints = entry_points(group='nextgisweb.packages')
+        epoints = sorted(
+            entry_points(group='nextgisweb.packages'),
+            # Deterministic order: nextgisweb then others alphabetically
+            key=lambda ep: (ep.dist.name != 'nextgisweb', ep.dist.name))
+
         for epoint in epoints:
             package = Package(epoint)
             package_name = package.name
