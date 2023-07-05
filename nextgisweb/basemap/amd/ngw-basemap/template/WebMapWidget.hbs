@@ -1,0 +1,93 @@
+<div data-dojo-type="${baseClass}" style="width: 100%; height: 100%; padding: 0;">
+
+    <div data-dojo-attach-point="treeLayoutContainer"
+        data-dojo-type="dijit/layout/BorderContainer"
+        style="width: 100%; height: 100%; padding: 0;">
+
+        <div data-dojo-type="dijit/Toolbar"
+            data-dojo-props="region: 'top'"
+            style="border-top: none; border-right: none; border-left: none;">
+
+            <div data-dojo-type="dijit/form/Button"
+                data-dojo-attach-point="btnAddLayer"
+                data-dojo-props="iconClass: 'dijitIconNewTask'">
+                {{gettext 'Add'}}
+
+                <div data-dojo-type="ngw-resource/ResourcePicker"
+                    data-dojo-attach-point="layerPicker"
+                    data-dojo-props="cls: 'basemap_layer', dialogTitle: {{gettextString 'Select basemap'}}">
+                </div>
+
+            </div>
+
+            <div data-dojo-type="dijit/form/Button"
+                data-dojo-attach-point="btnDeleteItem"
+                data-dojo-props="iconClass: 'dijitEditorIcon dijitEditorIconDelete'"
+                disabled="disabled">
+                {{gettext 'Remove'}}
+            </div>
+        </div>
+
+        <div data-dojo-attach-point="containerTree"
+                data-dojo-type="dijit/layout/ContentPane"
+                data-dojo-props="region: 'center'"
+                style="padding: 0; margin-left: 5px; margin-bottom: 5px;">
+        </div>
+
+        <div data-dojo-attach-point="itemPane"
+            data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region: 'right', splitter: true"
+            style="width: 70%; margin-right: 5px; margin-bottom: 5px;">
+
+            <div data-dojo-attach-point="widgetProperties"
+                data-dojo-type="dijit/layout/StackContainer"
+                data-dojo-props="doLayout: false"
+                style="width: 100%;">
+
+                <div data-dojo-type="dijit/layout/ContentPane"></div>
+
+                <div data-dojo-attach-point="paneLayer"
+                    data-dojo-type="dijit/layout/ContentPane"
+                    style="padding: 0;">
+
+                    <div data-dojo-attach-point="widgetPropertiesForm"
+                        data-dojo-type="dijit/form/Form">
+
+                        <div data-dojo-type="dojox/layout/TableContainer"
+                            data-dojo-props="labelWidth: 150">
+
+                            <div data-dojo-attach-point="wDisplayName"
+                                data-dojo-type="ngw-pyramid/form/DisplayNameTextBox"
+                                title="{{gettext 'Display name'}}" style="width: 100%"></div>
+
+                            <div data-dojo-attach-point="wEnabled"
+                                data-dojo-type="dijit/form/CheckBox"
+                                title="{{gettext 'Enabled'}}">
+                            </div>
+
+                            <div data-dojo-attach-point="wOpacity"
+                                data-dojo-type="dijit/form/NumberTextBox"
+                                data-dojo-props="constraints: {min: 0, max: 1}"
+                                style="width: 100%"
+                                title="{{gettext 'Opacity'}}">
+                            </div>
+
+                            <div data-dojo-attach-point="wLink"
+                                data-dojo-type="ngw-resource/form/ResourceLink"
+                                style="width: 100%"
+                                title="{{gettext 'Resource'}}">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

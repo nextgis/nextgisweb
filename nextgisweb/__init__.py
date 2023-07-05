@@ -43,6 +43,7 @@ def pkginfo():
         'tmsclient',
         'file_upload',
         'audit',
+        'basemap',
     )
 
     return dict(components={comp: dict(

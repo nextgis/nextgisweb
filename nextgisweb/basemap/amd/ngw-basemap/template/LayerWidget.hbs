@@ -1,0 +1,26 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
+    data-ngw-serialize-prefix="${prefix}" class="padding-block">
+
+    <div data-dojo-attach-point="container" 
+        data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, labelWidth: 150">
+
+        <div data-dojo-attach-point="url"
+            data-dojo-type="dijit/form/ValidationTextBox"
+            data-dojo-props="required: true"
+            data-ngw-serialize="url"
+            title="{{gettext 'URL'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="copyrightText"
+            data-dojo-type="dijit/form/TextBox"
+            data-dojo-props="required: false"
+            data-ngw-serialize="copyright_text"
+            title="{{gettext 'Copyright text'}}" style="width: 100%"></div>
+
+        <div data-dojo-attach-point="copyrightUrl"
+            data-dojo-type="dijit/form/TextBox"
+            data-dojo-props="required: false"
+            data-ngw-serialize="copyright_url"
+            title="{{gettext 'Copyright URL'}}" style="width: 100%"></div>
+
+    </div>
+</div>
