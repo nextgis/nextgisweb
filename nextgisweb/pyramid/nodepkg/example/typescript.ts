@@ -1,4 +1,4 @@
-/** @entrypoint */
+/** @testentry call */
 import i18n from "@nextgisweb/pyramid/i18n";
 
 interface Foo {
@@ -6,7 +6,7 @@ interface Foo {
     other: string;
 }
 
-export default async () => {
+export default function() {
     let x: Foo = { some: 1, other: i18n.gettext("Create") };
-    alert(x.other);
+    return x.other;
 }

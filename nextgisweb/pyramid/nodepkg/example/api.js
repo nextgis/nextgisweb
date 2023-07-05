@@ -1,8 +1,8 @@
-/** @entrypoint */
+/** @testentry call */
 import { request } from "@nextgisweb/pyramid/api";
 import { errorModal } from "@nextgisweb/gui/error";
 
-export default async () => {
+export default async function () {
     let data;
     try {
         data = await request("/api/some");
@@ -10,4 +10,4 @@ export default async () => {
         errorModal(e);
     }
     return JSON.stringify(data);
-};
+}

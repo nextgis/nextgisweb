@@ -1,4 +1,4 @@
-/** @entrypoint */
-export default async () => {
-    alert(Promise);
-};
+/** @testentry call */
+export default function () {
+    return Promise;
+}

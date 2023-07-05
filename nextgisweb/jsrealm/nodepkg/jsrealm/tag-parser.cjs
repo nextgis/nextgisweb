@@ -10,10 +10,12 @@ module.exports = function tagParser(fn) {
         const jsdoc = match[0];
         const payload = doctrine.parse(jsdoc, {
             unwrap: true,
-            tags: ["entrypoint"],
+            tags: ["entrypoint", "testentry", "plugin"],
         });
-        for (const { title } of payload.tags) {
-            return { type: title };
+        for (const { title: type, description: value } of payload.tags) {
+            const result = { type };
+            if (value) result[type] = value;
+            return result;
         }
     }
 };

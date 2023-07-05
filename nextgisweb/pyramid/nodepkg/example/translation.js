@@ -1,6 +1,6 @@
-/** @entrypoint */
+/** @testentry call */
 import i18n from "@nextgisweb/pyramid/i18n";
 
-export default async () => {
-    alert(i18n.gettext("Translated text"));
-};
+export default function () {
+    return i18n.gettext("Translated text");
+}

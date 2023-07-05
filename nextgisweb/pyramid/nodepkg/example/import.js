@@ -1,5 +1,5 @@
-/** @entrypoint */
-export default async () => {
+/** @testentry call */
+export default async function () {
     console.log("Loading './auxiliary/foo' with absolute path...");
     const foo = await import("@nextgisweb/pyramid/example/auxiliary/foo");
     console.log(foo);
@@ -11,4 +11,6 @@ export default async () => {
     console.log("Loading entrypoint './auxiliary/entrypoint' with relative path...");
     const entrypoint = await import("./auxiliary/entrypoint");
     console.log(entrypoint);
-};
+
+    return "Done";
+}

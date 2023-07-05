@@ -5,6 +5,7 @@ const glob = require("glob");
 const os = require("os");
 const path = require("path");
 
+const { DefinePlugin } = require("webpack");
 const WebpackAssetsManifest = require("webpack-assets-manifest");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
@@ -61,9 +62,29 @@ function scanForEntries() {
 
 let isDynamicEntry;
 
+let plugins, testentries;
+
 const dynamicEntries = () => {
-    const entries = Object.fromEntries(
-        scanForEntries().map(({ entry, fullname }) => [
+    const entrypoints = scanForEntries();
+
+    plugins = {};
+
+    entrypoints
+        .filter((ep) => ep.type === "plugin")
+        .forEach(({ plugin, entry }) => {
+            const [cat, id] = plugin.split(/\s+/, 2);
+            if (plugins[cat] === undefined) plugins[cat] = {};
+            plugins[cat][id] = entry;
+        });
+
+    testentries = Object.fromEntries(
+        entrypoints
+            .filter(({ type }) => type === "testentry")
+            .map(({ entry, testentry: type }) => [entry, { type }])
+    );
+
+    const webpackEntries = Object.fromEntries(
+        entrypoints.map(({ entry, fullname }) => [
             entry,
             {
                 import: addCode(fullname, withChunks(entry)),
@@ -72,8 +93,8 @@ const dynamicEntries = () => {
         ])
     );
 
-    isDynamicEntry = (m) => entries[m] !== undefined;
-    return entries;
+    isDynamicEntry = (m) => webpackEntries[m] !== undefined;
+    return webpackEntries;
 };
 
 const staticEntries = {};
@@ -178,6 +199,7 @@ const babelLoader = {
 const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
     entrypoints: true,
     output: "manifest.json",
+
     transform(assets) {
         const result = {};
 
@@ -196,6 +218,13 @@ const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
 
         return result;
     },
+
+    done(manifest) {
+        // Piggyback on the assets manifest hook to write testentry.json
+        const fn = manifest.compiler.outputPath + '/testentry.json';
+        fs.writeFileSync(fn, JSON.stringify(testentries));
+    }
+
 });
 
 module.exports = (env) => ({
@@ -265,6 +294,9 @@ module.exports = (env) => ({
     },
     plugins: [
         new CleanWebpackPlugin(),
+        new DefinePlugin({
+            JSREALM_PLUGIN_REGISTRY: DefinePlugin.runtimeValue(() => JSON.stringify(plugins), true),
+        }),
         new CopyPlugin({
             // Copy @nextgisweb/jsrealm/with-chunks!entry-name loader directly
             // to the dist directly. It is written in ES5-compatible way as AMD

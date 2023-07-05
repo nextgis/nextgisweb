@@ -248,11 +248,6 @@ def test_timeout(reqest):
     return resp
 
 
-@viewargs(renderer='example.mako')
-def test_example(request):
-    return dict()
-
-
 def setup_pyramid(comp, config):
     env = comp.env
     is_debug = env.core.debug
@@ -442,9 +437,6 @@ def setup_pyramid(comp, config):
         .add_view(test_exception_transaction)
     config.add_route('pyramid.test_timeout', '/test/timeout') \
         .add_view(test_timeout)
-
-    config.add_route('pyramid.test_example', '/test/pyramid/example') \
-        .add_view(test_example)
 
     comp.control_panel = dm.DynMenu(
         dm.Label('info', _("Info")),
