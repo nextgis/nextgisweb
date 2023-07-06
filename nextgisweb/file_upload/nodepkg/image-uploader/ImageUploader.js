@@ -64,7 +64,7 @@ export function ImageUploader({ inputProps, file, image, ...rest }) {
         if (file) {
             readImage(file);
         }
-    }, []);
+    }, [file]);
 
     useEffect(() => {
         if (chosenFile && fileMeta) {
