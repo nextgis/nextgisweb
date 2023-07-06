@@ -95,11 +95,10 @@ class TileFetcher:
         self._shutdown = False
         atexit.register(self._wait_for_shutdown)
 
-        limits = Limits(max_keepalive_connections=8)
-        async with AsyncClient(
+        params = dict(
             headers=env.tmsclient.headers,
-            limits=limits, http2=True,
-        ) as client:
+            limits=Limits(max_keepalive_connections=8), http2=True)
+        async with AsyncClient(**params) as client, AsyncClient(verify=False, **params) as client_insecure:
             while True:
                 if self._shutdown:
                     break
@@ -111,9 +110,10 @@ class TileFetcher:
                     continue
 
                 answer = data.pop('answer')
+                _client = client_insecure if data.pop('insecure') else client
                 tasks = []
                 try:
-                    async for pos, data in self._get_tiles(tasks, client, **data):
+                    async for pos, data in self._get_tiles(tasks, _client, **data):
                         answer.put_nowait(FetchResult(FetchStatus.DATA, position=pos, data=data))
                 except Exception as exc:
                     answer.put_nowait(FetchResult(FetchStatus.ERROR, exception=exc))
@@ -137,9 +137,7 @@ class TileFetcher:
             params=connection.query_params,
             timeout=Timeout(timeout=self._request_timeout),
         )
-        if connection.insecure:
-            data['req_kw']['verify'] = False
-
+        data['insecure'] = connection.insecure
         answer = data['answer'] = Queue()
 
         self._queue.put_nowait(data)
