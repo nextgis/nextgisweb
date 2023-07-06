@@ -15,7 +15,7 @@ const imageUploaderMessages = {
 
 export const EditorWidget = observer(({ store }) => {
     return (
-        <div className="ngw-qgis-editor-widget">
+        <div className="ngw-social-editor-widget">
             <ImageUploader
                 image={store.imageExisting}
                 onChange={(value) => {
