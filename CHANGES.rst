@@ -1,6 +1,12 @@
 Changes
 =======
 
+4.5.0
+-----
+
+- Differentiate webmap intial and contstraining extents.
+
+
 4.4.0
 -----
 
