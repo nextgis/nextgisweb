@@ -13,7 +13,7 @@ from .model import RasterLayer
 class RasterLayerWidget(Widget):
     resource = RasterLayer
     operation = ('create', 'update')
-    amdmod = 'ngw-raster-layer/Widget'
+    amdmod = '@nextgisweb/raster_layer/editor-widget'
 
 
 @viewargs(renderer='react')

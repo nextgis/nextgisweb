@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import CancelIcon from "@material-icons/svg/cancel";
 
 import { InboxOutlined } from "@ant-design/icons";
@@ -25,8 +27,9 @@ export function FileUploader({
     inputProps = {},
     fileMeta,
     setFileMeta,
+    onUploading,
 }) {
-    const { abort, progressText, props, meta, setMeta } = useFileUploader({
+    const { abort, progressText, props, meta, setMeta, uploading } = useFileUploader({
         showProgressInDocTitle,
         setFileMeta,
         inputProps,
@@ -34,6 +37,10 @@ export function FileUploader({
         onChange,
         accept,
     });
+
+    useEffect(() => {
+        onUploading && onUploading(uploading);
+    }, [uploading, onUploading]);
 
     const InputText = () => (
         <>
