@@ -1,0 +1,17 @@
+.settings-extent-layer-labelCell {
+    display: inherit;
+}
+
+.settings-extent-layer-table {
+    width: auto;
+    margin: 0 0 10px 0;
+}
+
+.settings-extent-layer-table-horiz tr {
+    vertical-align: baseline;
+    height: 40px;
+}
+
+.label-settings {
+    font-weight: 600;
+}
