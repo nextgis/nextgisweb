@@ -12,7 +12,8 @@ define([
     "dojo/text!./template/ExtentWidget.hbs",
     // template
     "dijit/form/NumberTextBox",
-    "dijit/form/CheckBox",
+    "dijit/layout/ContentPane",
+    "dijit/Tooltip",
     "dojox/layout/TableContainer",
     "ngw-resource/ResourceBox",
     //css
