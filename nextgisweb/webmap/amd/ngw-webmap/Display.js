@@ -583,14 +583,14 @@ define([
             });
 
             const annotUrlParam = this._urlParams.annot;
-            let annotVisibleState;
+            let initialAnnotVisible;
             if (
                 annotUrlParam &&
                 (annotUrlParam === "no" ||
                     annotUrlParam === "yes" ||
                     annotUrlParam === "messages")
             ) {
-                annotVisibleState = annotUrlParam;
+                initialAnnotVisible = annotUrlParam;
             }
 
             var buildAnnotationsPanel = function (widget) {
@@ -602,7 +602,7 @@ define([
                     gutters: false,
                     withCloser: true,
                     display: widget,
-                    annotVisibleState,
+                    initialAnnotVisible,
                 });
 
                 if (widget.activeLeftPanel === "annotationPanel")

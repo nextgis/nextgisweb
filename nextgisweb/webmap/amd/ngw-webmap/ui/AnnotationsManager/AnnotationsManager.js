@@ -39,7 +39,7 @@ define([
     AnnotationFeature,
     AnnotationsLayer,
     AnnotationsEditableLayer,
-    AnnotationsDialog
+    AnnotationsDialog,
 ) {
     var wkt = new ol.format.WKT();
     const { route } = api;
@@ -59,13 +59,11 @@ define([
             constructor: function (options) {
                 if (!options.display || !options.panel) {
                     throw Error(
-                        'AnnotationsManager: "display" and "panel" are required parameter for first call!'
+                        'AnnotationsManager: "display" and "panel" are required parameter for first call!',
                     );
                 }
                 this._display = options.display;
                 this._annotationPanel = options.panel;
-
-                this._annotationsVisibleState = this._annotationPanel.getAnnotVisibleState();
 
                 this._annotationsDialog = new AnnotationsDialog({
                     annotationsManager: this,
@@ -73,11 +71,13 @@ define([
                 this._editable = this._display.config.annotations.scope.write;
 
                 this._display._layersDeferred.then(
-                    lang.hitch(this, this._init)
+                    lang.hitch(this, this._init),
                 );
             },
 
             _init: function () {
+                this._annotationsVisibleState =
+                    this._annotationPanel.getAnnotVisibleState();
                 this._buildAnnotationsLayers();
                 this._loadAnnotations();
                 this._buildStandby();
@@ -98,7 +98,7 @@ define([
                 this._annotationsLayer = new AnnotationsLayer();
                 this._annotationsLayer.addToMap(this._display.map);
                 this._editableLayer = new AnnotationsEditableLayer(
-                    this._display.map
+                    this._display.map,
                 );
             },
 
@@ -106,7 +106,9 @@ define([
                 try {
                     const annotations = await this._getAnnotationsCollection();
                     this._annotationsLayer.fillAnnotations(annotations);
-                    this._onAnnotationsVisibleChange(this._annotationsVisibleState);
+                    this._onAnnotationsVisibleChange(
+                        this._annotationsVisibleState,
+                    );
                 } catch (err) {
                     new ErrorDialog(err).show();
                 }
@@ -115,35 +117,35 @@ define([
             _bindEvents: function () {
                 topic.subscribe(
                     "webmap/annotations/add/activate",
-                    lang.hitch(this, this._onAddModeActivated)
+                    lang.hitch(this, this._onAddModeActivated),
                 );
                 topic.subscribe(
                     "webmap/annotations/add/deactivate",
-                    lang.hitch(this, this._onAddModeDeactivated)
+                    lang.hitch(this, this._onAddModeDeactivated),
                 );
 
                 topic.subscribe(
                     "webmap/annotations/layer/feature/created",
-                    lang.hitch(this, this._onCreateOlFeature)
+                    lang.hitch(this, this._onCreateOlFeature),
                 );
                 topic.subscribe(
                     "webmap/annotations/change/",
-                    lang.hitch(this, this._onChangeAnnotation)
+                    lang.hitch(this, this._onChangeAnnotation),
                 );
-                
+
                 topic.subscribe(
                     "webmap/annotations/change/geometryType",
-                    lang.hitch(this, this._onChangeGeometryType)
+                    lang.hitch(this, this._onChangeGeometryType),
                 );
 
                 topic.subscribe(
                     "/annotations/visible",
-                    lang.hitch(this, this._onAnnotationsVisibleChange)
+                    lang.hitch(this, this._onAnnotationsVisibleChange),
                 );
 
                 topic.subscribe(
                     "webmap/annotations/filter/changed",
-                    lang.hitch(this, this._onFilterChanged)
+                    lang.hitch(this, this._onFilterChanged),
                 );
             },
 
@@ -158,10 +160,14 @@ define([
              */
             _onAnnotationsVisibleChange: function (annotVisibleState) {
                 this._annotationsVisibleState = annotVisibleState;
-                
-                const annotVisible = annotVisibleState === 'yes' || annotVisibleState === 'messages';
-                this._annotationsLayer.getLayer().set("visibility", annotVisible);
-                
+
+                const annotVisible =
+                    annotVisibleState === "yes" ||
+                    annotVisibleState === "messages";
+                this._annotationsLayer
+                    .getLayer()
+                    .set("visibility", annotVisible);
+
                 if (this._isMessagesVisible()) {
                     this._annotationsLayer.showPopups();
                 } else {
@@ -169,12 +175,13 @@ define([
                 }
             },
 
-            _onAddModeActivated: function () {
+            _onAddModeActivated: function (geometryType) {
                 if (this._editable)
                     domClass.add(document.body, "annotations-edit");
-                const geometryType = this._annotationPanel.getGeometryType();
-                this._editableLayer.activate(this._annotationsLayer, geometryType);
-                this._annotationPanel.setAnnotationsShow('messages');
+                this._editableLayer.activate(
+                    this._annotationsLayer,
+                    geometryType,
+                );
             },
 
             _onAddModeDeactivated: function () {
@@ -198,13 +205,13 @@ define([
                     .showForEdit(annFeature)
                     .then(lang.hitch(this, this._dialogResultHandle));
             },
-            
+
             _onChangeGeometryType: function (geometryType) {
                 this._editableLayer.changeGeometryType(geometryType);
             },
-            
+
             _isMessagesVisible: function () {
-                return this._annotationsVisibleState === 'messages';
+                return this._annotationsVisibleState === "messages";
             },
 
             _dialogResultHandle: function (result, dialog) {
@@ -215,13 +222,13 @@ define([
                         this.createAnnotation(
                             annFeature,
                             result.newData,
-                            dialog
+                            dialog,
                         );
                     } else {
                         this.updateAnnotation(
                             annFeature,
                             result.newData,
-                            dialog
+                            dialog,
                         );
                     }
                 }
@@ -240,13 +247,13 @@ define([
             createAnnotation: async function (
                 annFeature,
                 newAnnotationInfo,
-                dialog
+                dialog,
             ) {
                 this._standby.show();
                 try {
                     const annotationInfo = await this._createAnnotation(
                         annFeature,
-                        newAnnotationInfo
+                        newAnnotationInfo,
                     );
                     annFeature.updateAnnotationInfo(annotationInfo);
                     if (this._isMessagesVisible()) {
@@ -264,11 +271,14 @@ define([
             updateAnnotation: async function (
                 annFeature,
                 newAnnotationInfo,
-                dialog
+                dialog,
             ) {
                 this._standby.show();
                 try {
-                    const annotationInfo = await this._updateAnnotation(annFeature, newAnnotationInfo);
+                    const annotationInfo = await this._updateAnnotation(
+                        annFeature,
+                        newAnnotationInfo,
+                    );
                     annFeature.updateAnnotationInfo(annotationInfo);
                     this._annotationsLayer.redrawFilter();
                 } catch (err) {
@@ -298,7 +308,7 @@ define([
 
                 const createInfo = await route(
                     "webmap.annotation.collection",
-                    this._display.config.webmapId
+                    this._display.config.webmapId,
                 )
                     .post({
                         json: newAnnotationInfo,
@@ -307,7 +317,7 @@ define([
 
                 return this._getAnnotation(
                     this._display.config.webmapId,
-                    createInfo.id
+                    createInfo.id,
                 );
             },
 
@@ -315,7 +325,7 @@ define([
                 return await route(
                     "webmap.annotation.item",
                     webmapId,
-                    annotationId
+                    annotationId,
                 )
                     .get()
                     .then((d) => d);
@@ -324,7 +334,7 @@ define([
             _getAnnotationsCollection: async function () {
                 return route(
                     "webmap.annotation.collection",
-                    this._display.config.webmapId
+                    this._display.config.webmapId,
                 )
                     .get()
                     .then((d) => d);
@@ -334,7 +344,7 @@ define([
                 return route(
                     "webmap.annotation.item",
                     this._display.config.webmapId,
-                    annFeature.getId()
+                    annFeature.getId(),
                 )
                     .delete()
                     .then((d) => d);
@@ -344,7 +354,7 @@ define([
                 const updateInfo = await route(
                     "webmap.annotation.item",
                     this._display.config.webmapId,
-                    annFeature.getId()
+                    annFeature.getId(),
                 )
                     .put({
                         json: newAnnotationInfo,
@@ -353,9 +363,9 @@ define([
 
                 return this._getAnnotation(
                     this._display.config.webmapId,
-                    updateInfo.id
+                    updateInfo.id,
                 );
             },
-        })
+        }),
     );
 });
