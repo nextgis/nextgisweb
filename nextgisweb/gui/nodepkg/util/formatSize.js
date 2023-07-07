@@ -1,9 +1,13 @@
+const UNITS_FROM_KIB = ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
 export function formatSize(size) {
-    const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    size /= 1024; // Convert into KB as units starts
+
     let i = 0;
     while (size >= 1024) {
         size /= 1024;
         ++i;
     }
-    return size.toFixed(1) + " " + units[i];
+
+    return size.toFixed(1) + " " + UNITS_FROM_KIB[i];
 }
