@@ -24,6 +24,7 @@ export const EditorWidget = observer(({ store }) => {
                     onUploading={(value) => {
                         store.uploding = value;
                     }}
+                    showMaxSize
                     {...uploaderMessages}
                 />
             </div>
