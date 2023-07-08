@@ -1,14 +1,13 @@
 import { useEffect } from "react";
 
+import BackspaceIcon from "@material-icons/svg/backspace";
 import CancelIcon from "@material-icons/svg/cancel";
-
 import { Button, Upload } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
-
 import { useFileUploader } from "../hook/useFileUploader";
 import { FileUploaderType } from "../type/FileUploaderType";
 
+import i18n from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!file_upload";
 
 import "./FileUploader.less";
@@ -17,7 +16,6 @@ const { Dragger } = Upload;
 
 const UPLOAD_TEXT = i18n.gettext("Select a file");
 const DND_TEXT = i18n.gettext("or drag and drop here");
-const OVERWRITE_TEXT = i18n.gettext("Overwrite?");
 const MAX_SIZE = formatSize(settings.max_size) + " " + i18n.gettext("max");
 
 export function FileUploader({
@@ -55,13 +53,13 @@ export function FileUploader({
                     {meta.name}{" "}
                     <span className="size">{formatSize(meta.size)}</span>
                     <Button
-                        type="link"
-                        onClick={() => {
+                        onClick={(e) => {
+                            e.stopPropagation();
                             setMeta(null);
                         }}
-                    >
-                        {OVERWRITE_TEXT}
-                    </Button>
+                        type="link"
+                        icon={<BackspaceIcon/>}
+                    />
                 </p>
             </>
         ) : (
