@@ -24,15 +24,22 @@ class ComponentMeta(type):
         cls.module = '.'.join(module_parts)
         cls.root_path = module_path(cls.module)
 
-        expected_modules = [
-            f'{cls.package}.{cls.identity}.component',
-            f'{cls.package}.component']
+        # Skip Component base class from processing
+        if name == 'Component' and bases == ():
+            return
 
-        if cls.identity and module not in expected_modules:
-            fmodules = ' or '.join(expected_modules)
-            warnings.warn(
-                f"{cls.__name__} should be declared in {fmodules}, "
-                f"but was declared in {module}.", stacklevel=2)
+        identity = cls.identity
+
+        expected_modules = [
+            f'{cls.package}.{identity}.component',
+            f'nextgisweb_{identity}.component']
+
+        assert module in expected_modules, (
+            f"{name} must be declared in {' or '.join(expected_modules)}, " \
+            f"but was declared in {module}.")
+
+        assert name.lower() == identity.replace('_', '').lower() + "component", (
+            f"Class name '{name}' doesn't match the '{identity}' identity.")
 
 
 @dict_registry
