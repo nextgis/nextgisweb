@@ -1,6 +1,7 @@
 from inspect import signature
 from warnings import warn
 
+from msgspec import Struct
 from pyramid.config import Configurator as PyramidConfigurator
 
 from .util import JSONType, find_template
@@ -67,8 +68,11 @@ class Configurator(PyramidConfigurator):
                 fn = getattr(fn, '__wrapped__', None)
 
             if kwargs.get('renderer') is None:
-                if signature(view).return_annotation is JSONType:
+                return_annotation = signature(view).return_annotation
+                if return_annotation is JSONType:
                     kwargs['renderer'] = 'json'
+                elif issubclass(return_annotation, Struct):
+                    kwargs['renderer'] = 'msgspec'
 
         if renderer := kwargs.get('renderer'):
             if renderer == 'mako':

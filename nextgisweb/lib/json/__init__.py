@@ -2,6 +2,8 @@ import sys
 from decimal import Decimal
 
 import orjson
+from msgspec import Struct
+from msgspec.structs import asdict as struct_to_dict
 
 __all__ = ['dumpb', 'loadb', 'dumps', 'loads']
 
@@ -16,6 +18,8 @@ else:
 def default(obj):
     if isinstance(obj, Decimal):
         return str(obj)
+    elif isinstance(obj, Struct):
+        return struct_to_dict(obj)
     elif _pytest_freezegun and isinstance(obj, (FakeDatetime, FakeDate)):
         return obj.isoformat()
     raise TypeError
