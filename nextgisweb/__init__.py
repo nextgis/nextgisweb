@@ -40,6 +40,7 @@ def pkginfo():
         'wfsclient',
         'wmsclient',
         'wmsserver',
+        'ogcfserver',
         'tmsclient',
         'file_upload',
         'audit',
