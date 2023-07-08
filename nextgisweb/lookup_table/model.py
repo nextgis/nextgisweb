@@ -1,7 +1,7 @@
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 
-from nextgisweb.env import _, declarative_base
+from nextgisweb.env import Base, _
 from nextgisweb.lib import db
 
 from nextgisweb.resource import (
@@ -13,7 +13,7 @@ from nextgisweb.resource import (
     Serializer,
 )
 
-Base = declarative_base(dependencies=('resource', ))
+Base.depends_on('resource')
 
 
 class LookupTable(Base, Resource):

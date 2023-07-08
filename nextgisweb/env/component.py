@@ -1,8 +1,10 @@
+import sys
+from importlib.util import find_spec
 from pathlib import Path
-from sys import _getframe
+from warnings import warn
 
 from nextgisweb.lib.config import ConfigOptions
-from nextgisweb.lib.imptool import module_path
+from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import dict_registry
 
@@ -39,6 +41,25 @@ class ComponentMeta(type):
 
         assert name.lower() == identity.replace('_', '').lower() + "component", (
             f"Class name '{name}' doesn't match the '{identity}' identity.")
+
+        from .model import _base
+
+        metadata = getattr(cls, 'metadata', None)
+        if metadata is not None:
+            memoized = _base.memo.get(identity)
+            assert memoized is not None
+            assert memoized.metadata is metadata
+            warn(
+                f"{name}.metadata definition can be removed starting from "
+                f"nextgisweb >= 4.5.0.dev6.", DeprecationWarning, 2)
+        else:
+            # TODO: Switch to upcoming component module slots
+            model_mod_name = f'{cls.module}.model'
+            if model_mod_name not in sys.modules and find_spec(model_mod_name):
+                __import__(model_mod_name)
+
+            if memoized := _base.memo.get(identity):
+                cls.metadata = memoized.metadata
 
 
 @dict_registry
@@ -164,19 +185,11 @@ def load_all(packages=None, components=None, enable_disabled=False):
     return (loaded_packages, loaded_components)
 
 
-def component_utility(factory, *, depth=2):
+def component_utility(factory):
     memo = {}
 
-    def get():
-        cur_depth = depth
-        while True:
-            fr = _getframe(cur_depth)
-            mod = fr.f_globals['__name__']
-            if mod.startswith(('importlib.', 'nextgisweb.env.')):
-                cur_depth += 1
-            else:
-                break
-
+    def get(depth=1):
+        mod = module_from_stack(depth, ('nextgisweb.env.', ))
         component_id = pkginfo.component_by_module(mod)
 
         try:
@@ -185,6 +198,7 @@ def component_utility(factory, *, depth=2):
             result = memo[component_id] = factory(component_id)
             return result
 
+    get.memo = memo
     return get
 
 

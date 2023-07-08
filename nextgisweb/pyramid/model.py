@@ -1,7 +1,5 @@
-from nextgisweb.env import declarative_base
+from nextgisweb.env import Base
 from nextgisweb.lib import db
-
-Base = declarative_base()
 
 
 class Session(Base):

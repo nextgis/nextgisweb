@@ -8,7 +8,7 @@ import sqlalchemy.orm as orm
 from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, _, declarative_base, env
+from nextgisweb.env import COMP_ID, Base, _, env
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_from_wkt
 
@@ -23,9 +23,9 @@ from nextgisweb.resource import SerializedRelationship as SR
 from .kind_of_data import RasterLayerData
 from .util import calc_overviews_levels, raster_size
 
-PYRAMID_TARGET_SIZE = 512
+Base.depends_on('resource')
 
-Base = declarative_base(dependencies=('resource', ))
+PYRAMID_TARGET_SIZE = 512
 
 SUPPORTED_DRIVERS = ('GTiff', )
 

@@ -5,7 +5,7 @@ from shutil import copyfileobj
 
 import magic
 
-from nextgisweb.env import COMP_ID, DBSession, _, declarative_base, env
+from nextgisweb.env import COMP_ID, Base, DBSession, _, env
 from nextgisweb.lib import db
 
 from nextgisweb.core.exception import ValidationError
@@ -13,7 +13,7 @@ from nextgisweb.file_storage import FileObj
 from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 
-Base = declarative_base(dependencies=('resource', ))
+Base.depends_on('resource')
 
 mime_valid = 'image/svg+xml'
 

@@ -5,7 +5,7 @@ from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
 
-from nextgisweb.env import _, declarative_base, env
+from nextgisweb.env import Base, _, env
 from nextgisweb.lib import db
 
 from nextgisweb.auth import User
@@ -23,7 +23,7 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from .adapter import WebMapAdapter
 
-Base = declarative_base(dependencies=('resource', ))
+Base.depends_on('resource')
 
 ANNOTATIONS_DEFAULT_VALUES = ('no', 'yes', 'messages')
 

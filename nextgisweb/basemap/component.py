@@ -1,12 +1,9 @@
 from nextgisweb.env import COMP_ID, Component, require
 from nextgisweb.lib.config import Option
 
-from .model import Base
-
 
 class BasemapComponent(Component):
     identity = COMP_ID
-    metadata = Base.metadata
 
     def initialize(self):
         from . import plugin  # noqa: F401

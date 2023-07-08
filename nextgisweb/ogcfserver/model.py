@@ -1,10 +1,10 @@
-from nextgisweb.env import _, declarative_base
+from nextgisweb.env import Base, _
 from nextgisweb.lib import db
 
 from nextgisweb.resource import Resource, ResourceGroup, Serializer, ServiceScope
 from nextgisweb.resource import SerializedProperty as SP
 
-Base = declarative_base(dependencies=('resource', 'feature_layer'))
+Base.depends_on('resource', 'feature_layer')
 
 
 class Service(Base, Resource):

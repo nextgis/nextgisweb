@@ -1,11 +1,8 @@
 from nextgisweb.env import COMP_ID, Component, require
 
-from .model import Base
-
 
 class SocialComponent(Component):
     identity = COMP_ID
-    metadata = Base.metadata
 
     @require('resource')
     def setup_pyramid(self, config):

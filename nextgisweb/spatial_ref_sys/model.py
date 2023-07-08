@@ -1,13 +1,11 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import declared_attr, relationship
 
-from nextgisweb.env import declarative_base
+from nextgisweb.env import Base
 from nextgisweb.lib import db
 from nextgisweb.lib.osrhelper import sr_from_wkt
 
 from .util import convert_to_proj
-
-Base = declarative_base()
 
 SRID_MAX = 998999     # PostGIS maximum srid (srs.id)
 SRID_LOCAL = 990001   # First local srid (srs.id)
