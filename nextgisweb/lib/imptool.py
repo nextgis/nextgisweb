@@ -54,10 +54,6 @@ class Loader(abc.Loader):
         exec(code, module.__dict__)
 
 
-class NGWModuleDeprecation(UserWarning):
-    pass
-
-
 class MetaPathFinder(abc.MetaPathFinder):
     registry: Dict[str, Record]
 
@@ -79,7 +75,7 @@ class MetaPathFinder(abc.MetaPathFinder):
             f" since {rec.since}" if rec.since else "") + (
             f", removing in {rec.remove}" if rec.remove else "")
 
-        warn(m, NGWModuleDeprecation, stacklevel=2)
+        warn(m, DeprecationWarning, stacklevel=2)
         return s
 
 

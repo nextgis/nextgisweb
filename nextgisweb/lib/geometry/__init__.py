@@ -143,11 +143,6 @@ class Geometry:
     def bounds(self):
         return self.shape.bounds
 
-    def simplify(self, *args, **kwargs):
-        warn("Geometry.simplify is deprecated! Use Geometry.shape object instead.",
-             DeprecationWarning)
-        return self.shape.simplify(*args, **kwargs)
-
 
 class Transformer:
 

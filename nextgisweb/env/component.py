@@ -1,4 +1,3 @@
-import warnings
 from pathlib import Path
 from sys import _getframe
 
@@ -106,13 +105,6 @@ class Component(metaclass=ComponentMeta):
         :py:class:`~nextgisweb.env.env`. """
 
         return self._env
-
-    @property
-    def settings(self):
-        warnings.warn(
-            "Deprecated attribute component.settings, use component.options instead.",
-            DeprecationWarning, stacklevel=2)
-        return self._settings
 
     @property
     def options(self):

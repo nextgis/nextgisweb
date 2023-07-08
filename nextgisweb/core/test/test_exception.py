@@ -74,7 +74,7 @@ def test_localizer():
 
 
 def test_positional_message():
-    with pytest.warns(UserWarning, match='^UserException accepted message as positional .*'):
+    with pytest.warns(match='^UserException keyword argument expected.*'):
         exc = UserException("Message")
     assert exc.message == "Message"
     assert exc.title is None

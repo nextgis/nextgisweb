@@ -53,7 +53,7 @@ class Configurator(PyramidConfigurator):
                 "Since nextgisweb 4.4.0.dev7 use @viewargs(renderer=val) "
                 "or JSONType return type annotation instead of "
                 "Configurator.add_view(..., renderer=val) agrument.",
-                stacklevel=2 + stacklevel)
+                DeprecationWarning, stacklevel=2 + stacklevel)
 
         if view is not None:
             # Extract attrs missing in kwargs from view.__pyramid_{attr}__

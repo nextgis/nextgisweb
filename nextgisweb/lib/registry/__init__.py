@@ -109,7 +109,7 @@ class LegacyRegistry:
 
 
 def registry_maker():
-    warn("registry_maker() is deprecated since 4.4.0.dev9", stacklevel=2)
+    warn("registry_maker() is deprecated since 4.4.0.dev9", DeprecationWarning, 2)
     return LegacyRegistry()
 
 

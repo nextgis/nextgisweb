@@ -1,5 +1,5 @@
-import warnings
 from collections import namedtuple
+from warnings import warn
 
 from zope.interface import Attribute, Interface, classImplements, implementer
 from zope.interface.interface import adapter_hooks
@@ -54,10 +54,9 @@ class UserException(Exception):
 
         if len(args) == 1 and message is None:
             message = args[0]
-            warnings.warn(
-                "{} accepted message as positional argument instead of keyword!"
-                .format(self.__class__.__name__),
-                stacklevel=2)
+            warn(
+                f"{self.__class__.__name__} keyword argument expected, got positional.",
+                DeprecationWarning, stacklevel=2)
         elif len(args) > 0:
             raise ValueError("UserException accepts only keyword arguments!")
 
