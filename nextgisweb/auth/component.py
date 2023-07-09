@@ -22,7 +22,6 @@ from .policy import AuthProvider, AuthState, SecurityPolicy
 
 
 class AuthComponent(Component):
-    identity = 'auth'
 
     def initialize(self):
         super().initialize()

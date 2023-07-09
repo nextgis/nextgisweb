@@ -5,7 +5,6 @@ from nextgisweb.lib.config import Option
 
 
 class PostgisComponent(Component):
-    identity = 'postgis'
 
     def initialize(self):
         super().initialize()

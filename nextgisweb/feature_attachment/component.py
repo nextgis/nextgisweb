@@ -11,7 +11,6 @@ class FeatureAttachmentData(KindOfData):
 
 
 class FeatureAttachmentComponent(Component):
-    identity = 'feature_attachment'
 
     @require('feature_layer')
     def initialize(self):

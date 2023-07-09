@@ -7,7 +7,6 @@ from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 
 
 class FeatureLayerComponent(Component):
-    identity = 'feature_layer'
 
     def initialize(self):
         self.FeatureExtension = FeatureExtension

@@ -13,7 +13,6 @@ from .model import LegendSymbolsEnum, WebMap, WebMapItem
 
 
 class WebMapComponent(Component):
-    identity = 'webmap'
 
     def initialize(self):
         super().initialize()

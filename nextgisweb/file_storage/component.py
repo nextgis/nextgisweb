@@ -43,7 +43,6 @@ class FileObjBackup(BackupBase):
 
 
 class FileStorageComponent(Component):
-    identity = 'file_storage'
 
     def initialize(self):
         self.path = self.options['path'] or self.env.core.gtsdir(self)

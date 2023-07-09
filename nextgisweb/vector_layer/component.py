@@ -5,7 +5,6 @@ from .model import VectorLayer, estimate_vector_layer_data
 
 
 class VectorLayerComponent(Component):
-    identity = 'vector_layer'
 
     @require('feature_layer')
     def setup_pyramid(self, config):

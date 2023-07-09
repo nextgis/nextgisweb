@@ -1,13 +1,12 @@
 import re
 from subprocess import check_output
 
-from nextgisweb.env import COMP_ID, Component
+from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
 
 
 class JSRealmComponent(Component):
-    identity = COMP_ID
 
     def sys_info(self):
         result = []

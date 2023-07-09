@@ -7,7 +7,6 @@ from .model import SCHEME
 
 
 class TMSClientComponent(Component):
-    identity = 'tmsclient'
 
     def initialize(self):
         super().initialize()

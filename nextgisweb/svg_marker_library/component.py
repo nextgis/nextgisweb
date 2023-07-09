@@ -11,7 +11,6 @@ PRESET_DIR = path.join(path.dirname(__file__), 'preset/')
 
 
 class SVGMarkerLibraryComponent(Component):
-    identity = 'svg_marker_library'
 
     def initialize(self):
         self.cache = TTLCache(maxsize=128, ttl=60)

@@ -11,7 +11,6 @@ from .model import RasterLayer, estimate_raster_layer_data
 
 
 class RasterLayerComponent(Component):
-    identity = 'raster_layer'
 
     def initialize(self):
         self.env.core.mksdir(self)

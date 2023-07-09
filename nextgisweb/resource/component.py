@@ -14,7 +14,6 @@ from .model import ResourceACLRule as ACLRule
 
 
 class ResourceComponent(Component):
-    identity = 'resource'
 
     def initialize(self):
         super().initialize()

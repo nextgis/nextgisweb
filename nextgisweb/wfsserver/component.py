@@ -4,7 +4,6 @@ from nextgisweb.env import Component
 
 
 class WFSServerComponent(Component):
-    identity = 'wfsserver'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

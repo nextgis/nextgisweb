@@ -26,7 +26,6 @@ class TileCacheData(KindOfData):
 
 
 class RenderComponent(Component):
-    identity = 'render'
 
     def initialize(self):
         opt_tcache = self.options.with_prefix('tile_cache')

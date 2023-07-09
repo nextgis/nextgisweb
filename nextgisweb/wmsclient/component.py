@@ -7,7 +7,6 @@ from .model import WMS_VERSIONS
 
 
 class WMSClientComponent(Component):
-    identity = 'wmsclient'
 
     def initialize(self):
         super().initialize()

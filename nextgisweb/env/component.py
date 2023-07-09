@@ -12,41 +12,61 @@ from .package import pkginfo
 
 
 class ComponentMeta(type):
+    def __new__(mcls, name, bases, nmspc):
+        module = nmspc['__module__']
+        module_parts = module.split('.')
+
+        last_part = module_parts.pop(-1)
+        nmspc['module'] = module_init = '.'.join(module_parts)
+        assert last_part == 'component', f"{name} must be declared in {module_init}.component"
+        assert 1 <= len(module_parts) <= 2
+
+        nmspc['package'] = package = module_parts[0]
+        assert package == 'nextgisweb' or package.startswith('nextgisweb_')
+
+        nmspc['root_path'] = module_path(module_init)
+
+        # Skip Component base class from processing
+        if bases != ():
+
+            # Determine the identity from module name
+            if len(module_parts) == 2:
+                auto_identity = module_parts[-1]
+            elif len(module_parts) == 1:
+                auto_identity = package[len('nextgisweb_'):]
+            else:
+                assert False
+
+            logger.debug("Identity '%s' determined from '%s' module.", auto_identity, module)
+
+            identity = nmspc.get('identity')
+            assert identity is None or identity == auto_identity
+
+            if identity is None:
+                nmspc['identity'] = identity = auto_identity
+            else:
+                assert identity == auto_identity
+                warn(
+                    f"{name}.identity definition can be removed starting from "
+                    f"nextgisweb >= 4.5.0.dev7.", DeprecationWarning, 2)
+
+            assert name.lower() == identity.replace('_', '').lower() + "component", (
+                f"Class name '{name}' doesn't match the '{identity}' identity.")
+
+        return super().__new__(mcls, name, bases, nmspc)
 
     def __init__(cls, name, bases, nmspc):
         super().__init__(name, bases, nmspc)
 
-        module = cls.__module__
-        module_parts = module.split('.')
-        if module_parts[-1] == 'component':
-            module_parts.pop(-1)
-
-        cls.package = module_parts[0]
-        cls.module = '.'.join(module_parts)
-        cls.root_path = module_path(cls.module)
-
         # Skip Component base class from processing
-        if name == 'Component' and bases == ():
+        if bases == ():
             return
-
-        identity = cls.identity
-
-        expected_modules = [
-            f'{cls.package}.{identity}.component',
-            f'nextgisweb_{identity}.component']
-
-        assert module in expected_modules, (
-            f"{name} must be declared in {' or '.join(expected_modules)}, " \
-            f"but was declared in {module}.")
-
-        assert name.lower() == identity.replace('_', '').lower() + "component", (
-            f"Class name '{name}' doesn't match the '{identity}' identity.")
 
         from .model import _base
 
         metadata = getattr(cls, 'metadata', None)
         if metadata is not None:
-            memoized = _base.memo.get(identity)
+            memoized = _base.memo.get(cls.identity)
             assert memoized is not None
             assert memoized.metadata is metadata
             warn(
@@ -58,7 +78,7 @@ class ComponentMeta(type):
             if model_mod_name not in sys.modules and find_spec(model_mod_name):
                 __import__(model_mod_name)
 
-            if memoized := _base.memo.get(identity):
+            if memoized := _base.memo.get(cls.identity):
                 cls.metadata = memoized.metadata
 
 

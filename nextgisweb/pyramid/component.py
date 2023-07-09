@@ -18,7 +18,6 @@ from .util import ClientRoutePredicate, ErrorRendererPredicate, StaticMap, gense
 
 
 class PyramidComponent(Component):
-    identity = 'pyramid'
 
     def make_app(self, settings=None):
         settings = dict(self._settings, **settings)

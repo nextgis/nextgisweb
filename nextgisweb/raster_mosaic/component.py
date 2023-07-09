@@ -2,7 +2,6 @@ from nextgisweb.env import Component
 
 
 class RasterMosaicComponent(Component):
-    identity = 'raster_mosaic'
 
     def setup_pyramid(self, config):
         from . import api, view  # NOQA: F401

@@ -45,7 +45,6 @@ class CoreComponent(
     StorageComponentMixin,
     Component
 ):
-    identity = 'core'
 
     def __init__(self, env, settings):
         super().__init__(env, settings)

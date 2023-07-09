@@ -5,7 +5,6 @@ from nextgisweb.lib.config import Option
 
 
 class WFSClientComponent(Component):
-    identity = 'wfsclient'
 
     def initialize(self):
         super().initialize()
