@@ -34,7 +34,7 @@ define([
     AnnotationFeature,
     i18n,
     Vector,
-    template
+    template,
 ) {
     const contentTemplate = i18n.renderTemplate(template);
 
@@ -62,6 +62,7 @@ define([
 
             this._popup.annFeature = annotationFeature;
             this._popup.cloneOlPopup = this.cloneOlPopup;
+            this._popup.annPopup = this;
         },
 
         _getAccessCssClass: function (annFeature) {
@@ -90,11 +91,15 @@ define([
             return this;
         },
 
+        getAnnFeature: function () {
+            return this._annFeature;
+        },
+
         cloneOlPopup: function (annFeature) {
             const popup = new olPopup({
                 insertFirst: false,
                 autoPan: false,
-                customCssClass: "annotation no-edit"
+                customCssClass: "annotation no-edit",
             });
 
             const coordinates = this._getPopupCoordinates(annFeature);
@@ -103,14 +108,14 @@ define([
             var contentWidget = new (declare(
                 [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
                 {
-                    templateString: contentTemplate
-                }
+                    templateString: contentTemplate,
+                },
             ))();
             contentWidget.placeAt(popup.content);
 
             html.set(
                 contentWidget.descriptionDiv,
-                annFeature.getDescriptionAsHtml()
+                annFeature.getDescriptionAsHtml(),
             );
 
             return popup;
@@ -132,8 +137,8 @@ define([
             this._contentWidget = new (declare(
                 [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
                 {
-                    templateString: contentTemplate
-                }
+                    templateString: contentTemplate,
+                },
             ))();
             this._contentWidget.placeAt(this._popup.content);
 
@@ -141,7 +146,7 @@ define([
 
             html.set(
                 this._contentWidget.descriptionDiv,
-                this._annFeature.getDescriptionAsHtml()
+                this._annFeature.getDescriptionAsHtml(),
             );
         },
 
@@ -164,7 +169,7 @@ define([
             on(
                 this._contentWidget.spanEditAnnotation,
                 "click",
-                lang.hitch(this, this._onEditAnnotation)
+                lang.hitch(this, this._onEditAnnotation),
             );
         },
 
@@ -184,7 +189,7 @@ define([
             if (!this._contentWidget) return false;
             html.set(
                 this._contentWidget.descriptionDiv,
-                this._annFeature.getDescriptionAsHtml()
+                this._annFeature.getDescriptionAsHtml(),
             );
         },
     });

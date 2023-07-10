@@ -2,10 +2,13 @@
 define([
     "dojo/_base/declare",
     "dojo/topic",
+    "@nextgisweb/gui/react-app",
+    "@nextgisweb/webmap/print-map-panel",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dojo/_base/array",
     "dojo/_base/lang",
+    "dojo/debounce",
     "dojo/on",
     "dojo/query",
     "dojo/has",
@@ -43,10 +46,13 @@ define([
 ], function (
     declare,
     topic,
+    reactApp,
+    printMapPanelComp,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     array,
     lang,
+    debounce,
     on,
     query,
     has,
@@ -75,7 +81,7 @@ define([
     olMapScale,
     DragZoomUnConstrained,
     template,
-    printingCssTemplate
+    printingCssTemplate,
 ) {
     return declare(
         [
@@ -85,16 +91,19 @@ define([
             _WidgetsInTemplateMixin,
         ],
         {
-            map: "undefined",
+            map: undefined,
             id: "printMapDialog",
             contentId: "printMapContent",
             printElement: null,
-            printElementMap: null,
             printMap: null,
             printCssElement: null,
             isFullWidth: true,
-            mode: "format", // 'format', 'custom'
             _mapScale: null,
+            _mapSizes: undefined,
+            _scalesControls: {
+                value: false,
+                line: false,
+            },
 
             constructor: function (options) {
                 declare.safeMixin(this, options);
@@ -108,168 +117,92 @@ define([
                         templateString: i18n.renderTemplate(template),
                         region: "top",
                         gutters: false,
-                    }
+                    },
                 ))();
+            },
+
+            makeComp: function (contentNode, options, scaleMap) {
+                reactApp.default(
+                    printMapPanelComp.default,
+                    {
+                        display: options.display,
+                        onAction: (action, payload) => {
+                            this._handleAction(action, payload);
+                        },
+                        scaleMap,
+                    },
+                    contentNode.querySelector(".print-panel-content"),
+                );
             },
 
             postCreate: function () {
                 this.inherited(arguments);
 
-                on(
-                    this.contentWidget.printButton,
-                    "click",
-                    lang.hitch(this, function () {
-                        window.print();
-                    })
-                );
-
-                this._processExportButtons();
-
-                on(
-                    this.contentWidget.sizesSelect,
-                    "change",
-                    lang.hitch(this, function () {
-                        var sizeValues = this.contentWidget.sizesSelect.get(
-                                "value"
-                            ),
-                            parsedSizeValues,
-                            height,
-                            width;
-
-                        if (sizeValues === "custom") {
-                            this._setMode("custom");
-                        } else if (sizeValues && sizeValues != "none") {
-                            this._setMode("format");
-                            parsedSizeValues = sizeValues.split("_");
-                            width = parsedSizeValues[0];
-                            height = parsedSizeValues[1];
-                            this.contentWidget.heightInput.set("value", height);
-                            this.contentWidget.widthInput.set("value", width);
-                            this._resizeMapContainer(width, height);
-                        }
-                    })
-                );
-
                 topic.subscribe(
                     "ol/mapscale/changed",
-                    lang.hitch(this, function (scaleValue) {
-                        this._setCurrentScale(scaleValue);
-                    })
+                    lang.hitch(
+                        this,
+                        debounce((scaleValue) => {
+                            this.makeComp(
+                                this.contentNode,
+                                this.options,
+                                scaleValue,
+                            );
+                        }, 500),
+                    ),
                 );
 
-                on(
-                    this.contentWidget.scalesSelect,
-                    "change",
-                    lang.hitch(this, function (scale) {
-                        var view = this.printMap.olMap.getView();
-                        var center = view.getCenter();
-                        var cosh = function (value) {
-                            return (Math.exp(value) + Math.exp(-value)) / 2;
-                        };
-                        var pointResolution3857 = cosh(center[1] / 6378137);
-                        var resolution =
-                            pointResolution3857 *
-                            (parseInt(scale, 10) / (96 * 39.3701));
-                        this.printMap.olMap.getView().setResolution(resolution);
-                    })
-                );
-
-                on(
-                    this.contentWidget.scaleDisplay,
-                    "change",
-                    lang.hitch(this, function (value) {
-                        this._onScaleCheckboxChange(value, "value");
-                    })
-                );
-
-                on(
-                    this.contentWidget.scaleBar,
-                    "change",
-                    lang.hitch(this, function (value) {
-                        this._onScaleCheckboxChange(value, "line");
-                    })
-                );
-
-                on(
-                    this.contentWidget.heightInput,
-                    "change",
-                    lang.hitch(this, function (newHeight) {
-                        this._resizeMapContainer(null, newHeight);
-                    })
-                );
-
-                on(
-                    this.contentWidget.widthInput,
-                    "change",
-                    lang.hitch(this, function (newWidth) {
-                        this._resizeMapContainer(newWidth);
-                    })
-                );
-
-                on(
-                    this.contentWidget.marginInput,
-                    "change",
-                    lang.hitch(this, function (newMargin) {
-                        this._resizeMapContainer(null, null, newMargin);
-                    })
-                );
-
-                on(
-                    this.contentWidget.closePanel, 
-                    "click", 
-                    () => {
-                        this.hide();
-                    }
-                );
+                on(this.contentWidget.closePanel, "click", () => {
+                    this.hide();
+                });
             },
 
-            _processExportButtons: function () {
-                if (has("ie") || sniff("trident") || has("safari")) {
-                    domStyle.set(
-                        this.contentWidget.exportButton.domNode,
-                        "display",
-                        "none"
+            _handleAction: function (action, payload) {
+                if (action === "change-map-size") {
+                    this._mapSizes = payload;
+                    this._resizeMapContainer();
+                    this._updateMapSize();
+                }
+
+                if (action === "change-scale") {
+                    this._setMapScale(payload);
+                }
+
+                if (action === "change-scale-controls") {
+                    this._changeScaleControls(payload.value, payload.type);
+                }
+
+                if (action === "export") {
+                    this._buildPrintCanvas(payload).then(
+                        lang.hitch(this, function (hrefCanvasEl) {
+                            hrefCanvasEl.click();
+                        }),
                     );
-                    return;
                 }
-
-                on(
-                    this.contentWidget.exportJpegButton,
-                    "click",
-                    lang.hitch(this, function () {
-                        this._buildPrintCanvas("jpeg").then(
-                            lang.hitch(this, function (hrefCanvasEl) {
-                                hrefCanvasEl.click();
-                            })
-                        );
-                    })
-                );
-
-                on(
-                    this.contentWidget.exportPngButton,
-                    "click",
-                    lang.hitch(this, function () {
-                        this._buildPrintCanvas("png").then(
-                            lang.hitch(this, function (hrefCanvasEl) {
-                                hrefCanvasEl.click();
-                            })
-                        );
-                    })
-                );
             },
 
-            _onScaleCheckboxChange: function (value, cssClass) {
+            _setMapScale: function (scale) {
+                const view = this.printMap.olMap.getView();
+                const center = view.getCenter();
+                const cosh = function (value) {
+                    return (Math.exp(value) + Math.exp(-value)) / 2;
+                };
+                const pointResolution3857 = cosh(center[1] / 6378137);
+                const resolution =
+                    pointResolution3857 *
+                    (parseInt(scale, 10) / (96 * 39.3701));
+                this.printMap.olMap.getView().setResolution(resolution);
+            },
+
+            _changeScaleControls: function (value, type) {
                 if (!this._mapScale) return;
-                var element = this._mapScale.element;
+                const element = this._mapScale.element;
                 if (value) {
-                    domClass.add(element, cssClass);
+                    domClass.add(element, type);
                 } else {
-                    domClass.remove(element, cssClass);
+                    domClass.remove(element, type);
                 }
-            },
-
-            _setCurrentScale: function (scaleValue) {
-                this.contentWidget.scalesSelect.setCurrentScale(scaleValue);
+                this._scalesControls[type] = value;
             },
 
             /**
@@ -281,21 +214,24 @@ define([
             _buildPrintCanvas: function (imageType) {
                 var deferred = new Deferred(),
                     domToImagePromise;
-                
+
+                this._resizeMapContainer();
+                this._updateMapSize();
+
                 switch (imageType) {
                     case "png":
                         domToImagePromise = domtoimage.toPng(
-                            this.contentWidget.mapPageContainer
+                            this.contentWidget.mapPageContainer,
                         );
                         break;
                     case "jpeg":
                         domToImagePromise = domtoimage.toJpeg(
-                            this.contentWidget.mapPageContainer
+                            this.contentWidget.mapPageContainer,
                         );
                         break;
                     default:
                         console.error(
-                            'Image type "' + imageType + '" is unknown.'
+                            'Image type "' + imageType + '" is unknown.',
                         );
                 }
 
@@ -304,10 +240,10 @@ define([
                         lang.hitch(this, function (dataUrl) {
                             var hrefCanvasEl = this._buildHrefCanvasElement(
                                 dataUrl,
-                                imageType
+                                imageType,
                             );
                             deferred.resolve(hrefCanvasEl);
-                        })
+                        }),
                     )
                     .catch(function (error) {
                         console.error(error);
@@ -345,54 +281,24 @@ define([
                 }
             },
 
-            _setMode: function (newMode) {
-                if (this.mode === newMode) {
-                    return false;
-                }
-
-                if (newMode === "format") {
-                    this._setFormatMode();
-                }
-
-                if (newMode === "custom") {
-                    this._setCustomMode();
-                }
-            },
-
-            _setFormatMode: function () {
-                this._disableInput(this.contentWidget.heightInput, true);
-                this._disableInput(this.contentWidget.widthInput, true);
-                this.mode = "format";
-            },
-
-            _setCustomMode: function () {
-                this._disableInput(this.contentWidget.heightInput, false);
-                this._disableInput(this.contentWidget.widthInput, false);
-                this.mode = "custom";
-            },
-
-            _disableInput: function (input, isDisabled) {
-                input.set("disabled", isDisabled);
-            },
-
             show: function () {
                 this.inherited(arguments);
 
                 this._buildPrintElement();
+                this._resizeMapContainer();
                 this._buildMap();
-                this.contentWidget.sizesSelect.attr("value", "210_297");
-                this.contentWidget.scaleDisplay.attr("checked", false);
-                this.contentWidget.scaleBar.attr("checked", false);
+                this._updateMapSize();
             },
 
-            _resizeMapContainer: function (width, height, margin) {
-                width = width || this.contentWidget.widthInput.get("value");
-                height = height || this.contentWidget.heightInput.get("value");
-                margin = margin || this.contentWidget.marginInput.get("value");
-
+            _resizeMapContainer: function () {
+                if (!this._mapSizes) return;
+                const { width, height, margin } = this._mapSizes;
                 this._buildPageStyle(width, height, margin);
+            },
+
+            _updateMapSize() {
+                if (!this.printMap || !this.printMap.olMap) return;
                 this.printMap.olMap.updateSize();
-                this._setPrintMapExtent();
             },
 
             hide: function () {
@@ -402,13 +308,12 @@ define([
                     function (layer) {
                         this.printMap.olMap.removeLayer(layer);
                     },
-                    this
+                    this,
                 );
                 this.printMap.olMap.setTarget(null);
                 this.printMap.olMap = null;
                 domClass.add(this.printElement, "inactive");
                 this._removePageStyle();
-                this.contentWidget.sizesSelect.attr("value", "none");
 
                 domConstruct.destroy(this.printCssElement);
             },
@@ -421,6 +326,10 @@ define([
             },
 
             _buildMap: function () {
+                if (!this._mapSizes || !this.contentWidget.mapContainer) {
+                    return;
+                }
+
                 var mapContainer = this.contentWidget.mapContainer,
                     interactions;
 
@@ -459,7 +368,7 @@ define([
                     "resize",
                     lang.hitch(this, function () {
                         this.printMap.olMap.updateSize();
-                    })
+                    }),
                 );
 
                 array.forEach(
@@ -469,22 +378,25 @@ define([
                             this.printMap.olMap.addLayer(layer);
                         }
                     },
-                    this
+                    this,
                 );
 
                 array.forEach(
                     this.map.getOverlays().getArray(),
                     this._buildAnnotationOverlay,
-                    this
+                    this,
                 );
 
-                this._setPrintMapExtent();
                 this._buildLogo();
+                this._buildScalesControls();
             },
 
             _buildAnnotationOverlay: function (overlay) {
-                if ("annFeature" in overlay && overlay.annFeature) {
-                    var clonedPopup = overlay.cloneOlPopup(overlay.annFeature);
+                if ("annPopup" in overlay && overlay.annPopup) {
+                    const annPopup = overlay.annPopup;
+                    const clonedPopup = annPopup.cloneOlPopup(
+                        annPopup.getAnnFeature(),
+                    );
                     this.printMap.olMap.addOverlay(clonedPopup);
                 }
             },
@@ -500,9 +412,12 @@ define([
                 domConstruct.place(newLogoElement, olViewport, "last");
             },
 
-            _setPrintMapExtent: function () {
-                this.map.getView().setCenter(this.map.getView().getCenter());
-                this.map.getView().setZoom(this.map.getView().getZoom());
+            _buildScalesControls: function () {
+                for (const [type, value] of Object.entries(
+                    this._scalesControls,
+                )) {
+                    this._changeScaleControls(value, type);
+                }
             },
 
             _buildPageStyle: function (width, height, margin) {
@@ -542,6 +457,6 @@ define([
                     this._pageStyle = null;
                 }
             },
-        }
+        },
     );
 });

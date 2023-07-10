@@ -31,8 +31,10 @@
   position: absolute;
   top: 40px;
   bottom: 0;
+  left: 0;
   width: 100%;
-  text-align: center;
+  box-sizing: border-box;
+  overflow: auto;
 }
 
 .printMap-panel div.dijitLayoutContainer.dijitContainer.dijitTableLayout {

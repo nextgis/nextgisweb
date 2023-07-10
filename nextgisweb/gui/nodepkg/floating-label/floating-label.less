@@ -3,12 +3,12 @@
     margin: 5px 0;
 
     .label {
-        font-size: 12px;
+        font-size: 14px;
         font-weight: normal;
         position: absolute;
         pointer-events: none;
         left: 12px;
-        top: 12px;
+        top: 6px;
         transition: 0.2s ease all;
     }
 
@@ -21,7 +21,8 @@
         padding: 0 3px;
     }
 
-    .ant-select-disabled ~ .float {
+    .ant-select-disabled ~ .float,
+    .ant-input-number-disabled ~ .float {
         background-color: rgba(255, 255, 255, 0.5);
     }
 }

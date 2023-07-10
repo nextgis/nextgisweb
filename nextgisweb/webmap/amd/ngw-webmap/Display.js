@@ -350,7 +350,11 @@ define([
             widget._layersPanelSetup();
 
             // Print panel
-            all([widget._layersDeferred, widget._postCreateDeferred])
+            all([
+                this._layersDeferred,
+                this._mapDeferred,
+                this._postCreateDeferred
+            ])
                 .then(function () {
                     widget.printMapPanel = new PrintMapPanel({
                         region: "left",
