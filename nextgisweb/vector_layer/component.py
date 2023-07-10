@@ -1,12 +1,10 @@
 from nextgisweb.env import Component, require
 
 from .kind_of_data import VectorLayerData
-from .model import Base, VectorLayer, estimate_vector_layer_data
+from .model import VectorLayer, estimate_vector_layer_data
 
 
 class VectorLayerComponent(Component):
-    identity = 'vector_layer'
-    metadata = Base.metadata
 
     @require('feature_layer')
     def setup_pyramid(self, config):

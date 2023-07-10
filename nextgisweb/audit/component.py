@@ -7,7 +7,6 @@ from .util import disable_logging
 
 
 class AuditComponent(Component):
-    identity = 'audit'
 
     def initialize(self):
         self.audit_enabled = self.options['enabled']

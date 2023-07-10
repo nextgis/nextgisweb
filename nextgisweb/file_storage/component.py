@@ -15,7 +15,7 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import BackupBase
 
-from .model import Base, FileObj
+from .model import FileObj
 
 BUF_SIZE = 1024 * 1024
 
@@ -43,8 +43,6 @@ class FileObjBackup(BackupBase):
 
 
 class FileStorageComponent(Component):
-    identity = 'file_storage'
-    metadata = Base.metadata
 
     def initialize(self):
         self.path = self.options['path'] or self.env.core.gtsdir(self)

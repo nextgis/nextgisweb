@@ -10,7 +10,6 @@ from nextgisweb.core.model import Setting
 
 
 class SentryComponent(Component):
-    identity = 'sentry'
 
     def initialize(self):
         super().initialize()

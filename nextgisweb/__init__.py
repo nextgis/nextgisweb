@@ -1,12 +1,16 @@
 import logging
 import os
 import time
+from warnings import filterwarnings
 
 from nextgisweb.env import Env
 from nextgisweb.env.package import single_component
 from nextgisweb.lib.config import load_config
 from nextgisweb.lib.imptool import deprecate
 from nextgisweb.lib.logging import logger
+
+# Enable deprecation warnings for nextgisweb and nextgisweb_* packages.
+filterwarnings("once", module=r"^nextgisweb(_\w+)?(\..*|$)", category=DeprecationWarning)
 
 
 def pkginfo():
@@ -40,6 +44,7 @@ def pkginfo():
         'wfsclient',
         'wmsclient',
         'wmsserver',
+        'ogcfserver',
         'tmsclient',
         'file_upload',
         'audit',

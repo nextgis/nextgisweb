@@ -2,7 +2,7 @@ from shutil import copyfile
 
 from PIL import Image
 
-from nextgisweb.env import COMP_ID, DBSession, declarative_base, env
+from nextgisweb.env import COMP_ID, Base, DBSession, env
 from nextgisweb.lib import db
 
 from nextgisweb.file_storage import FileObj
@@ -13,7 +13,7 @@ from nextgisweb.resource import (
 )
 from nextgisweb.resource import SerializedProperty as SP
 
-Base = declarative_base(dependencies=('resource', ))
+Base.depends_on('resource')
 
 MAX_SIZE = (1600, 630)
 

@@ -357,6 +357,7 @@ def setup_pyramid(comp, config):
     # RENDERERS
 
     config.add_renderer('json', renderer.JSON())
+    config.add_renderer('msgspec', renderer.MsgSpec())
 
     # Filter for quick translation. Defines function tr, which we can use
     # instead of request.localizer.translate in mako templates.

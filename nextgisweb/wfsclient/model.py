@@ -10,7 +10,7 @@ from requests.exceptions import RequestException
 from shapely.geometry import box
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, _, declarative_base, env
+from nextgisweb.env import COMP_ID, Base, _, env
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.ows import FIELD_TYPE_WFS
@@ -65,8 +65,6 @@ COMPARISON_OPERATORS = {
     'lt': 'PropertyIsLessThan',
     'le': 'PropertyIsLessThanOrEqualTo',
 }
-
-Base = declarative_base()
 
 layer_identity = COMP_ID + '_layer'
 

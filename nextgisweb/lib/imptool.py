@@ -15,6 +15,7 @@ filterwarnings(
 
 def module_path(module_name: str) -> Path:
     """Extract module's path from sys.modules and sys.meta_path
+
     Importlib's find_spec() is always importing the top-level package for
     modules which causes problems with single-component packages."""
 
@@ -37,6 +38,22 @@ def module_path(module_name: str) -> Path:
     return (root_path / '/'.join(rest)) if rest else root_path
 
 
+def module_from_stack(depth=0, skip=None):
+    """Extract module name from stack"""
+
+    cur_depth = 2 + depth
+    while True:
+        fr = sys._getframe(cur_depth)
+        mod = fr.f_globals['__name__']
+        if mod.startswith(('importlib.') or (skip and (
+            mod.startswith(skip)
+            or (mod + '.').startswith(skip)
+        ))):
+            cur_depth += 1
+        else:
+            return mod
+
+
 @dataclass
 class Record:
     name: str
@@ -52,10 +69,6 @@ class Loader(abc.Loader):
     def exec_module(self, module):
         code = f"from {self.rec.repl} import *"
         exec(code, module.__dict__)
-
-
-class NGWModuleDeprecation(UserWarning):
-    pass
 
 
 class MetaPathFinder(abc.MetaPathFinder):
@@ -79,7 +92,7 @@ class MetaPathFinder(abc.MetaPathFinder):
             f" since {rec.since}" if rec.since else "") + (
             f", removing in {rec.remove}" if rec.remove else "")
 
-        warn(m, NGWModuleDeprecation, stacklevel=2)
+        warn(m, DeprecationWarning, stacklevel=2)
         return s
 
 

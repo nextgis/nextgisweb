@@ -9,12 +9,10 @@ from nextgisweb.lib.imptool import module_path
 from nextgisweb.auth import User
 
 from .adapter import WebMapAdapter
-from .model import Base, LegendSymbolsEnum, WebMap, WebMapItem
+from .model import LegendSymbolsEnum, WebMap, WebMapItem
 
 
 class WebMapComponent(Component):
-    identity = 'webmap'
-    metadata = Base.metadata
 
     def initialize(self):
         super().initialize()

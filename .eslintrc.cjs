@@ -80,10 +80,11 @@ module.exports = {
             },
         },
         {
-            files: ["*/*/amd/**/*.js", "*/amd_packages/**/*.js"],
+            files: ["*/*/amd/**/*.js"],
             env: {
                 browser: true,
                 amd: true,
+                es2015: true,
             },
             rules: {
                 "eqeqeq": "off",

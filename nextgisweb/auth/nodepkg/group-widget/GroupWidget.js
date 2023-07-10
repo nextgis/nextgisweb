@@ -4,10 +4,9 @@ import { useState } from "react";
 import { ContentBox } from "@nextgisweb/gui/component";
 import { KeynameTextBox } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n";
 
-import { PrincipalMemberSelect } from "../field";
+import { PrincipalSelect } from "../field";
 import getMessages from "../groupMessages";
 import { default as oauth } from "../oauth";
 
@@ -28,14 +27,13 @@ export function GroupWidget({ id }) {
             {
                 name: "members",
                 label: i18n.gettext("Users"),
-                widget: PrincipalMemberSelect,
-                memberHref: (userId) => routeURL('auth.user.edit', userId),
-                choices: async () =>
-                    (
-                        await route("auth.user.collection").get({
-                            query: { brief: true },
-                        })
-                    ).filter((itm) => !itm.system || itm.keyname == "guest"),
+                widget: PrincipalSelect,
+                inputProps: {
+                    model: "user",
+                    multiple: true,
+                    systemUsers: ["guest"],
+                    editOnClick: true,
+                },
             },
             {
                 name: "register",
@@ -47,7 +45,7 @@ export function GroupWidget({ id }) {
         if (oauth.group_mapping) {
             fields_.push({
                 name: "oauth_mapping",
-                label: i18n.gettext("{dn} mapping").replace('{dn}', oauth.name),
+                label: i18n.gettext("{dn} mapping").replace("{dn}", oauth.name),
                 widget: "checkbox",
             });
         }
@@ -56,8 +54,8 @@ export function GroupWidget({ id }) {
             name: "description",
             label: i18n.gettext("Description"),
             widget: "textarea",
-        })
-        return fields_
+        });
+        return fields_;
     });
 
     const p = { fields, model: "auth.group", id, messages: getMessages() };

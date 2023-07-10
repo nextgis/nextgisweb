@@ -14,7 +14,6 @@ date_format = r'%Y-%m-%d'
 
 
 class FileUploadComponent(Component):
-    identity = 'file_upload'
 
     def initialize(self):
         self.path = self.options['path'] or self.env.core.gtsdir(self)

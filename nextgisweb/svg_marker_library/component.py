@@ -5,14 +5,12 @@ from cachetools import TTLCache
 from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option, OptionAnnotations
 
-from .model import Base, validate_filename
+from .model import validate_filename
 
 PRESET_DIR = path.join(path.dirname(__file__), 'preset/')
 
 
 class SVGMarkerLibraryComponent(Component):
-    identity = 'svg_marker_library'
-    metadata = Base.metadata
 
     def initialize(self):
         self.cache = TTLCache(maxsize=128, ttl=60)

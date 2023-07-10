@@ -1,0 +1,44 @@
+#: amd/ngw-ogcfserver/ServiceWidget.js:55 model.py:12
+msgid "OGC API Features service"
+msgstr "Сервис OGC API Features"
+
+#: view.py:16
+msgid "OGC API Features"
+msgstr "OGC API Features"
+
+#: view.py:17
+msgid ""
+"OGC API Features provides API building blocks to create, modify and query "
+"features on the Web."
+msgstr ""
+"OGC API Features предоставляют базовые API для создания, изменения и выборки "
+"объектов."
+
+#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:14
+msgid "Add"
+msgstr "Добавить"
+
+#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:18
+msgid "Select layer"
+msgstr "Выберите слой"
+
+#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:27
+msgid "Remove"
+msgstr "Удалить"
+
+#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:62
+msgid "Keyname"
+msgstr "Ключ"
+
+#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:66
+msgid "Display name"
+msgstr "Наименование"
+
+#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:70
+msgid "Default count of returned features"
+msgstr "Число возвращаемых объектов по умолчанию"
+
+#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:74
+msgid "Resource"
+msgstr "Ресурс"
+

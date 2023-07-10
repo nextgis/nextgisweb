@@ -1,56 +1,64 @@
-<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode"
-    data-ngw-serialize-prefix="${serializePrefix}"
-    class="padding-block">
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode" data-ngw-serialize-prefix="${serializePrefix}" class="padding-block ngw-webmap-extent-widget">
 
-    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2, labelWidth: 150">
-
-        <div data-dojo-attach-point="wExtentLeft"
-            data-dojo-type="dijit/form/NumberTextBox"
-            data-dojo-props="constraints: {min: -180, max: +180}, trim: true"
-            title="{{gettext 'Left, deg.'}}"
-            style="width: 100%"></div>
-
-        <div data-dojo-attach-point="wExtentTop"
-            data-dojo-type="dijit/form/NumberTextBox"
-            data-dojo-props="constraints: {min: -90, max: +90}, trim: true"
-            title="{{gettext 'Top, deg.'}}"
-            style="width: 100%"></div>
-
-        <div data-dojo-attach-point="wExtentRight"
-            data-dojo-type="dijit/form/NumberTextBox"
-            data-dojo-props="constraints: {min: -180, max: +180}, trim: true"
-            title="{{gettext 'Right, deg.'}}"
-            style="width: 100%"></div>
-
-        <div data-dojo-attach-point="wExtentBottom"
-            data-dojo-type="dijit/form/NumberTextBox"
-            data-dojo-props="constraints: {min: -90, max: +90}, trim: true"
-            title="{{gettext 'Bottom, deg.'}}"
-            style="width: 100%"></div>
-
-            <div data-dojo-type="dijit/form/Button"
-                data-dojo-attach-point="btnSetExtentFromLayer"
-                data-dojo-props="iconClass: 'dijitIconNewTask', showLabel: false">
-                {{gettext 'Set extent from layer'}}
-
-                <div data-dojo-type="ngw-resource/ResourcePicker"
-                    data-dojo-attach-point="layerPicker"
-                    data-dojo-props="interface: 'IBboxLayer', dialogTitle: {{gettextString 'Select layer'}}">
-                </div>
-
-            </div>
-
-        <input data-dojo-attach-point="wExtentConstrained"
-            data-dojo-type="dijit/form/CheckBox"
-            data-dojo-props="colspan: 2"
-            title="{{gettext 'Constrain to extent'}}" />
-
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 1, labelWidth: 200" style="margin-bottom: 1em">
         <div data-dojo-type="ngw-resource/ResourceBox"
             data-dojo-props="interface: 'IFeatureLayer', colspan: 2, dialogTitle: {{gettextString 'Select vector layer'}}"
-            data-ngw-serialize="bookmark_resource"
-            title="{{gettext 'Bookmark resource'}}"
-            style="width: 100%">
+            data-ngw-serialize="bookmark_resource" title="{{gettext 'Bookmark resource'}}" style="width: 100%">
+        </div>
+    </div>
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2, labelWidth: 200" style="margin-bottom: 1em">
+        <div data-dojo-type="dijit/layout/ContentPane" colspan="2" style="padding: 0"
+            title="<span title='{{gettext 'Web map will start at this extent'}}'>{{gettext 'Initial extent'}} ⓘ</span>">
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnSetExtentFromLayer">
+                {{gettext 'Set from layer'}}
+                <div data-dojo-type="ngw-resource/ResourcePicker" data-dojo-attach-point="layerPicker"
+                    data-dojo-props="interface: 'IBboxLayer', dialogTitle: {{gettextString 'Select layer'}}"></div>
+            </div>
         </div>
 
+        <div data-dojo-attach-point="wExtentLeft" data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -180, max: +180}, trim: true" title="{{gettext 'Left, deg.'}}"
+            style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wExtentBottom" data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -90, max: +90}, trim: true" title="{{gettext 'Bottom, deg.'}}"
+            style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wExtentRight" data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -180, max: +180}, trim: true" title="{{gettext 'Right, deg.'}}"
+            style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wExtentTop" data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -90, max: +90}, trim: true" title="{{gettext 'Top, deg.'}}"
+            style="width: 100%"></div>
     </div>
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols: 2, labelWidth: 200" style="margin-bottom: 1em">
+        <div data-dojo-type="dijit/layout/ContentPane" colspan="2" style="padding: 0"
+            title="<span title='{{gettext 'Web map will not allow to move outside of this extent'}}'>{{gettext 'Constraining extent'}} ⓘ</span>">
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="btnSetConstrainingExtent">
+                {{gettext 'Set from layer'}}
+                <div data-dojo-type="ngw-resource/ResourcePicker" data-dojo-attach-point="layerPickerSS"
+                    data-dojo-props="interface: 'IBboxLayer', dialogTitle: {{gettextString 'Select layer'}}"></div>
+            </div>
+        </div>
+
+        <div data-dojo-attach-point="wExtentLeftConst" data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -180, max: +180}, trim: true" title="{{gettext 'Left, deg.'}}"
+            style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wExtentBottomConst" data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -90, max: +90}, trim: true" title="{{gettext 'Bottom, deg.'}}"
+            style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wExtentRightConst" data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -180, max: +180}, trim: true" title="{{gettext 'Right, deg.'}}"
+            style="width: 100%"></div>
+
+        <div data-dojo-attach-point="wExtentTopConst" data-dojo-type="dijit/form/NumberTextBox"
+            data-dojo-props="constraints: {min: -90, max: +90}, trim: true" title="{{gettext 'Top, deg.'}}"
+            style="width: 100%"></div>
+    </div>
+
 </div>

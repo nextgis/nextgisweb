@@ -3,13 +3,13 @@ import os
 import re
 from shutil import copyfileobj
 
-from nextgisweb.env import declarative_base, env
+from nextgisweb.env import Base, env
 from nextgisweb.lib import db
 
 from nextgisweb.file_storage import FileObj
 from nextgisweb.resource import Resource
 
-Base = declarative_base(dependencies=('resource', 'feature_layer'))
+Base.depends_on('resource', 'feature_layer')
 
 
 KEYNAME_RE = re.compile(r'[a-z_][a-z0-9_]*', re.IGNORECASE)

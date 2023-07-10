@@ -30,7 +30,7 @@ from nextgisweb.lib.logging import logger
 from nextgisweb.i18n import Localizer, Translations
 
 from .backup import BackupMetadata
-from .model import Base, Setting
+from .model import Setting
 from .storage import StorageComponentMixin
 
 
@@ -45,8 +45,6 @@ class CoreComponent(
     StorageComponentMixin,
     Component
 ):
-    identity = 'core'
-    metadata = Base.metadata
 
     def __init__(self, env, settings):
         super().__init__(env, settings)

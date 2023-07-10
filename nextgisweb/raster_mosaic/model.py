@@ -6,7 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.ext.orderinglist import ordering_list
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, DBSession, _, declarative_base, env
+from nextgisweb.env import COMP_ID, Base, DBSession, _, env
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.osrhelper import sr_from_wkt
@@ -25,8 +25,6 @@ from nextgisweb.resource import (
 )
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedRelationship as SR
-
-Base = declarative_base()
 
 SUPPORTED_DRIVERS = ('GTiff', )
 

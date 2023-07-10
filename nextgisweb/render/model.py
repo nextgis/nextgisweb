@@ -15,7 +15,7 @@ from PIL import Image
 from sqlalchemy import MetaData, Table
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import DBSession, declarative_base, env
+from nextgisweb.env import Base, DBSession, env
 from nextgisweb.lib import db
 from nextgisweb.lib.logging import logger
 
@@ -30,9 +30,9 @@ from .event import on_data_change, on_style_change
 from .interface import IRenderableStyle
 from .util import affine_bounds_to_tile, imgcolor, pack_color, unpack_color
 
-TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
+Base.depends_on('resource')
 
-Base = declarative_base(dependencies=('resource', ))
+TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
 
 SEED_STATUS_ENUM = ('started', 'progress', 'completed', 'error')
 

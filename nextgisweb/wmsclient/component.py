@@ -3,12 +3,10 @@ from datetime import timedelta
 from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 
-from .model import WMS_VERSIONS, Base
+from .model import WMS_VERSIONS
 
 
 class WMSClientComponent(Component):
-    identity = 'wmsclient'
-    metadata = Base.metadata
 
     def initialize(self):
         super().initialize()

@@ -3,13 +3,10 @@ from nextgisweb.lib.config import Option
 
 from .extension import FeatureExtension
 from .interface import FIELD_TYPE
-from .model import Base
 from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 
 
 class FeatureLayerComponent(Component):
-    identity = 'feature_layer'
-    metadata = Base.metadata
 
     def initialize(self):
         self.FeatureExtension = FeatureExtension

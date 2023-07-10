@@ -1,8 +1,7 @@
-from nextgisweb.env import COMP_ID, Component
+from nextgisweb.env import Component
 
 
 class GUIComponent(Component):
-    identity = COMP_ID
 
     def setup_pyramid(self, config):
         from . import view

@@ -13,13 +13,11 @@ from nextgisweb.lib.logging import logger
 
 from . import uacompat
 from .config import Configurator
-from .model import Base, Session, SessionStore
+from .model import Session, SessionStore
 from .util import ClientRoutePredicate, ErrorRendererPredicate, StaticMap, gensecret
 
 
 class PyramidComponent(Component):
-    identity = 'pyramid'
-    metadata = Base.metadata
 
     def make_app(self, settings=None):
         settings = dict(self._settings, **settings)

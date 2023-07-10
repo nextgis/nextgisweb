@@ -1,6 +1,13 @@
 Changes
 =======
 
+4.5.0
+-----
+
+- Differentiate webmap intial and contstraining extents.
+- New OGC API Feature service with read and write support.
+
+
 4.4.0
 -----
 

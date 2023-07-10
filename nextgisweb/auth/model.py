@@ -8,12 +8,10 @@ from sqlalchemy.dialects.postgresql import JSONB
 from zope.event import notify
 from zope.event.classhandler import handler
 
-from nextgisweb.env import DBSession, _, declarative_base, env
+from nextgisweb.env import Base, DBSession, _, env
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid.util import gensecret
-
-Base = declarative_base()
 
 tab_group_user = sa.Table(
     'auth_group_user', Base.metadata,

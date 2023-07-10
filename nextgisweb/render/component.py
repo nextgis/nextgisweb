@@ -14,7 +14,7 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import KindOfData
 
-from .model import TIMESTAMP_EPOCH, Base
+from .model import TIMESTAMP_EPOCH
 from .model import ResourceTileCache as RTC
 
 vacuum_freepage_coeff = 0.5
@@ -26,8 +26,6 @@ class TileCacheData(KindOfData):
 
 
 class RenderComponent(Component):
-    identity = 'render'
-    metadata = Base.metadata
 
     def initialize(self):
         opt_tcache = self.options.with_prefix('tile_cache')

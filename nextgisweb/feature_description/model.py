@@ -1,9 +1,9 @@
-from nextgisweb.env import declarative_base
+from nextgisweb.env import Base
 from nextgisweb.lib import db
 
 from nextgisweb.resource import Resource
 
-Base = declarative_base(dependencies=('resource', 'feature_layer'))
+Base.depends_on('resource', 'feature_layer')
 
 
 class FeatureDescription(Base):

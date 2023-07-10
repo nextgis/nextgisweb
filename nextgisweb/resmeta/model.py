@@ -1,9 +1,9 @@
-from nextgisweb.env import COMP_ID, _, declarative_base
+from nextgisweb.env import COMP_ID, Base, _
 from nextgisweb.lib import db
 
 from nextgisweb.resource import MetadataScope, Resource, SerializedProperty, Serializer
 
-Base = declarative_base(dependencies=('resource', ))
+Base.depends_on('resource')
 
 
 class ResourceMetadataItem(Base):

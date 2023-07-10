@@ -2,7 +2,7 @@ from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
 
-from nextgisweb.env import _, declarative_base
+from nextgisweb.env import Base, _
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Transformer
 
@@ -14,7 +14,7 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from .interface import FIELD_TYPE, FIELD_TYPE_OGR
 
-Base = declarative_base(dependencies=('resource', 'lookup_table'))
+Base.depends_on('resource', 'lookup_table')
 
 FIELD_FORBIDDEN_NAME = ('id', 'geom')
 

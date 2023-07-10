@@ -7,12 +7,10 @@ from nextgisweb.lib.logging import logger
 
 from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
 from .kind_of_data import RasterLayerData
-from .model import Base, RasterLayer, estimate_raster_layer_data
+from .model import RasterLayer, estimate_raster_layer_data
 
 
 class RasterLayerComponent(Component):
-    identity = 'raster_layer'
-    metadata = Base.metadata
 
     def initialize(self):
         self.env.core.mksdir(self)

@@ -1,6 +1,6 @@
 from sqlalchemy.ext.orderinglist import ordering_list
 
-from nextgisweb.env import _, declarative_base
+from nextgisweb.env import Base, _
 from nextgisweb.lib import db
 
 from nextgisweb.resource import (
@@ -12,8 +12,6 @@ from nextgisweb.resource import (
 )
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.webmap import WebMap
-
-Base = declarative_base()
 
 
 class BasemapLayer(Base, Resource):

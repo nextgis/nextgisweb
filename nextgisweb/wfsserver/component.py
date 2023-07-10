@@ -2,12 +2,8 @@ from contextlib import contextmanager
 
 from nextgisweb.env import Component
 
-from .model import Base
-
 
 class WFSServerComponent(Component):
-    identity = 'wfsserver'
-    metadata = Base.metadata
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

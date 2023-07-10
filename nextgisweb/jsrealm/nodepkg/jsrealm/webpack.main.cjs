@@ -290,6 +290,7 @@ module.exports = (env) => ({
         ],
     },
     resolve: {
+        extensions: [".ts", "..."],
         plugins: [ new IconResolverPlugin() ],
     },
     plugins: [

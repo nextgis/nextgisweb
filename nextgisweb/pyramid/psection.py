@@ -1,5 +1,4 @@
 import re
-from warnings import warn
 
 from .util import find_template
 
@@ -37,10 +36,6 @@ class PageSections:
         items = list(self._items)
         items.sort(key=lambda itm: itm.priority)
         return items.__iter__()
-
-    def register(self, **kwargs):
-        warn("PageSections.register is deprecated in 4.4.0.dev11 and will be removed in 4.5.0.dev0", stacklevel=2)
-        self._items.append(PageSection(stack_level=1, **kwargs))
 
     def __call__(self, key=None, *, title=None, priority=50, template=None):
         s = PageSection(

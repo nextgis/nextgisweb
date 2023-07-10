@@ -5,13 +5,15 @@ define([
     "dojo/Deferred",
     "dijit/_WidgetBase",
     "@nextgisweb/gui/react-app",
+    "@nextgisweb/resource/util/compat-mobx",
 ], function (
     declare,
     lang,
     domStyle,
     Deferred,
     _WidgetBase,
-    reactApp
+    reactApp,
+    compatMobx
 ) {
     return declare([_WidgetBase], {
         identity: undefined,
@@ -27,7 +29,10 @@ define([
             var config = lang.clone(composite.config[this.entrypoint]);
             delete config.cls;
 
-            var storeClass = this.module.store;
+            config.composite = props.composite;
+            config.operation = props.composite.operation;
+
+            const storeClass = this.module.store;
             this.store = new storeClass(config);
             this.identity = storeClass.identity;
 
@@ -35,6 +40,25 @@ define([
             this.title = widgetClass.title;
             this.order = widgetClass.order;
             this.activateOn = widgetClass.activateOn;
+
+            if (props.composite.operation === "create") {
+                const suggests = Object.prototype.hasOwnProperty.call(
+                    this.store,
+                    "suggestedDisplayName"
+                );
+                if (suggests) {
+                    let reset = null;
+                    compatMobx.autorun(() => {
+                        const dn = this.store.suggestedDisplayName;
+                        if (dn) {
+                            reset = props.composite.suggestDN(dn);
+                        } else {
+                            reset && reset();
+                            reset = null;
+                        }
+                    });
+                }
+            }
         },
 
         buildRendering: function () {
@@ -54,8 +78,9 @@ define([
             return deferred;
         },
 
-        serialize: function (data) {
-            lang.setObject(this.store.identity, this.store.dump(), data);
+        serialize: function (data, lunkwill) {
+            const result = this.store.dump({ lunkwill });
+            lang.setObject(this.store.identity, result, data);
             var deferred = new Deferred();
             deferred.resolve(true);
             return deferred;

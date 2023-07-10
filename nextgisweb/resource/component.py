@@ -9,13 +9,11 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.auth import Group, User
 
-from .model import Base, Resource, ResourceGroup
+from .model import Resource, ResourceGroup
 from .model import ResourceACLRule as ACLRule
 
 
 class ResourceComponent(Component):
-    identity = 'resource'
-    metadata = Base.metadata
 
     def initialize(self):
         super().initialize()

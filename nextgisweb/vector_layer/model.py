@@ -7,7 +7,7 @@ from shapely.geometry import box
 from sqlalchemy import event, func, inspect, sql
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, DBSession, _, declarative_base, env
+from nextgisweb.env import COMP_ID, Base, DBSession, _, env
 from nextgisweb.lib import db
 from nextgisweb.lib.ogrhelper import read_dataset
 
@@ -42,14 +42,14 @@ from .util import (
     TOGGLE,
 )
 
+Base.depends_on('resource', 'feature_layer')
+
 GEOM_TYPE_DISPLAY = (
     _("Point"), _("Line"), _("Polygon"),
     _("Multipoint"), _("Multiline"), _("Multipolygon"),
     _("Point Z"), _("Line Z"), _("Polygon Z"),
     _("Multipoint Z"), _("Multiline Z"), _("Multipolygon Z"),
 )
-
-Base = declarative_base(dependencies=('resource', 'feature_layer'))
 
 
 class DRIVERS:

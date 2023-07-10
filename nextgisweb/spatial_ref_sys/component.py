@@ -2,15 +2,13 @@ from datetime import timedelta
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import COMP_ID, Component
+from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 
-from .model import SRS, WKT_EPSG_3857, WKT_EPSG_4326, Base
+from .model import SRS, WKT_EPSG_3857, WKT_EPSG_4326
 
 
 class SpatialRefSysComponent(Component):
-    identity = COMP_ID
-    metadata = Base.metadata
 
     def initialize_db(self):
         srs_list = (
@@ -45,11 +43,14 @@ class SpatialRefSysComponent(Component):
 
     def client_settings(self, request):
         cat_opts = self.options.with_prefix('catalog')
-        return dict(catalog=dict(
-            enabled=cat_opts['enabled'],
-            url=cat_opts['url'] if cat_opts['enabled'] else None,
-            coordinates_search=cat_opts['coordinates_search'],
-        ))
+        return dict(
+            default=dict(id=3857),
+            catalog=dict(
+                enabled=cat_opts['enabled'],
+                url=cat_opts['url'] if cat_opts['enabled'] else None,
+                coordinates_search=cat_opts['coordinates_search'],
+            ),
+        )
 
     def query_stat(self):
         return dict(count=SRS.query().count())

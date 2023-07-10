@@ -16,14 +16,12 @@ from nextgisweb.pyramid import Session, SessionStore
 from nextgisweb.pyramid.util import gensecret
 
 from .exception import UserDisabledException
-from .model import Base, Group, User
+from .model import Group, User
 from .oauth import OAuthAToken, OAuthHelper, OAuthPToken
 from .policy import AuthProvider, AuthState, SecurityPolicy
 
 
 class AuthComponent(Component):
-    identity = 'auth'
-    metadata = Base.metadata
 
     def initialize(self):
         super().initialize()

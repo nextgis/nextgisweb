@@ -2,9 +2,7 @@ import uuid
 
 import sqlalchemy as sa
 
-from nextgisweb.env import declarative_base
-
-Base = declarative_base()
+from nextgisweb.env import Base
 
 
 class FileObj(Base):

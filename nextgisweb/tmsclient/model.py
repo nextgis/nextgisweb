@@ -5,7 +5,7 @@ from osgeo import ogr, osr
 from PIL import Image
 from zope.interface import implementer
 
-from nextgisweb.env import _, declarative_base, env
+from nextgisweb.env import Base, _, env
 from nextgisweb.lib import db
 from nextgisweb.lib.osrhelper import sr_from_epsg
 
@@ -27,7 +27,7 @@ from nextgisweb.resource import SerializedResourceRelationship as SRR
 from .tile_fetcher import TileFetcher
 from .util import SCHEME, crop_box, render_zoom
 
-Base = declarative_base(dependencies=('resource', ))
+Base.depends_on('resource')
 
 NEXTGIS_GEOSERVICES = 'nextgis_geoservices'
 

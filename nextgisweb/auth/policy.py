@@ -1,9 +1,9 @@
-import warnings
 from base64 import b64decode
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import Optional
+from warnings import warn
 
 import sqlalchemy as sa
 from pyramid.authorization import ACLHelper
@@ -89,9 +89,7 @@ class OnUserLogin:
     next_url: str
 
     def set_next_url(self, url):
-        warnings.warn(
-            "Use event.next_url = ... instead of event.set_next_url()",
-            DeprecationWarning, stacklevel=2)
+        warn("Use event.next_url = ... instead of event.set_next_url()", DeprecationWarning, 2)
         self._next_url = url
 
 

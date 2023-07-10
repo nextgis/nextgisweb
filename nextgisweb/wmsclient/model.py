@@ -12,7 +12,7 @@ from pyramid.url import urlencode
 from requests.exceptions import RequestException
 from zope.interface import implementer
 
-from nextgisweb.env import _, declarative_base, env
+from nextgisweb.env import Base, _, env
 from nextgisweb.lib import db
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
@@ -30,7 +30,7 @@ from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedRelationship as SR
 from nextgisweb.resource import SerializedResourceRelationship as SRR
 
-Base = declarative_base(dependencies=('resource', ))
+Base.depends_on('resource')
 
 WMS_VERSIONS = ('1.1.1', '1.3.0')
 

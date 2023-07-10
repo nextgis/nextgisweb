@@ -2,7 +2,7 @@ from nextgisweb.env import Component, _, require
 
 from nextgisweb.core import KindOfData
 
-from .model import Base, FeatureAttachment
+from .model import FeatureAttachment
 
 
 class FeatureAttachmentData(KindOfData):
@@ -11,8 +11,6 @@ class FeatureAttachmentData(KindOfData):
 
 
 class FeatureAttachmentComponent(Component):
-    identity = 'feature_attachment'
-    metadata = Base.metadata
 
     @require('feature_layer')
     def initialize(self):

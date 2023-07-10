@@ -17,4 +17,8 @@ def __getattr__(name):
         from .i18n import _gettext
         return _gettext()
 
+    elif name == 'Base':
+        from .model import _base
+        return _base()
+
     raise AttributeError

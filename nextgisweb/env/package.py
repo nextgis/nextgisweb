@@ -200,6 +200,8 @@ class PkgInfo:
         return self._pkg_comp[pkg]
 
     def component_by_module(self, module_name):
+        self.scan()
+
         n = self._module_tree
         r = module_name
         while True:

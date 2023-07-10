@@ -4,7 +4,7 @@ from types import MappingProxyType
 
 from sqlalchemy import event, func, text
 
-from nextgisweb.env import DBSession, _, declarative_base, env
+from nextgisweb.env import Base, DBSession, _, env
 from nextgisweb.lib import db
 from nextgisweb.lib.registry import DictRegistry
 
@@ -20,7 +20,7 @@ from .serialize import SerializedRelationship as SR
 from .serialize import SerializedResourceRelationship as SRR
 from .serialize import Serializer
 
-Base = declarative_base(dependencies=('auth', ))
+Base.depends_on('auth')
 
 resource_registry = DictRegistry()
 
