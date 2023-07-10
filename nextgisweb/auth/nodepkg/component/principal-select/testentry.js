@@ -1,62 +1,38 @@
 /** @testentry react */
-
-import { Space } from "@nextgisweb/gui/antd";
-
 import { PrincipalSelect } from "./PrincipalSelect";
+
+const presets = [
+    ["Groups and users (default)", {}],
+    ["Multiple groups and users", { multiple: true }],
+    ["Users only", { model: "user" }],
+    ["Users including system ones", { model: "user", systemUsers: true }],
+    ["Users including guest", { model: "user", systemUsers: ["guest"] }],
+    ["Groups only", { model: "group" }],
+];
 
 function PrincipalSelectTest() {
     return (
-        <Space direction="vertical">
-            <div>
-                <h4>
-                    <p>Show users</p>
-                    <code>{`<PrincipalSelect model="user" />`}</code>
-                </h4>
-                <div style={{ width: "800px" }}>
-                    <PrincipalSelect multiple model="user" />
-                </div>
-            </div>
-            <div>
-                <h4>
-                    <p>Include system users</p>
-                    <code>{`<PrincipalSelect model="user" systemUsers />`}</code>
-                </h4>
-                <div style={{ width: "800px" }}>
-                    <PrincipalSelect multiple model="user" systemUsers />
-                </div>
-            </div>
-            <div>
-                <h4>
-                    <p>Include only &apos;guest&apos; system users</p>
-                    <code>{`<PrincipalSelect model="user" systemUsers={['guest']} />`}</code>
-                </h4>
-                <div style={{ width: "800px" }}>
-                    <PrincipalSelect
-                        model="user"
-                        multiple
-                        systemUsers={["guest"]}
-                    />
-                </div>
-            </div>
-            <div>
-                <h4>
-                    <p>Show groups</p>
-                    <code>{`<PrincipalSelect model="group" />`}</code>
-                </h4>
-                <div style={{ width: "800px" }}>
-                    <PrincipalSelect multiple model="group" />
-                </div>
-            </div>
-            <div>
-                <h4>
-                    <p>Show groups and local users (without system users)</p>
-                    <code>{`<PrincipalSelect />`}</code>
-                </h4>
-                <div style={{ width: "800px" }}>
-                    <PrincipalSelect multiple />
-                </div>
-            </div>
-        </Space>
+        <>
+            {presets.map(([title, props]) => {
+                const propsCode = Object.entries(props)
+                    .map(([k, v]) =>
+                        v === true ? k : k + "={" + JSON.stringify(v) + "}"
+                    )
+                    .join(" ");
+                return (
+                    <div key={title} style={{ marginBottom: "1em" }}>
+                        <h4>{title}</h4>
+                        <code>{`<PrincipalSelect ${propsCode}/>`}</code>
+                        <div style={{marginTop: "1ex"}}>
+                            <PrincipalSelect
+                                style={{ width: "40em" }}
+                                {...props}
+                            />
+                        </div>
+                    </div>
+                );
+            })}
+        </>
     );
 }
 
