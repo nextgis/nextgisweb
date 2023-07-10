@@ -6,17 +6,17 @@ import { ContentBox, LoadingWrapper } from "@nextgisweb/gui/component";
 import {
     KeynameTextBox,
     LanguageSelect,
-    Password
+    Password,
 } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
-import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!auth";
 
-import { PrincipalMemberSelect } from "../field";
-import { default as oauth, makeTeamManageButton } from "../oauth";
+import { PrincipalSelect } from "../field";
+import { makeTeamManageButton, default as oauth } from "../oauth";
 import getMessages from "../userMessages";
+
 import { UserWidgetAlinkToken } from "./UserWidgetAlinkToken";
 import { UserWidgetPassword } from "./UserWidgetPassword";
 
@@ -78,9 +78,12 @@ export function UserWidget({ id }) {
                 {
                     name: "member_of",
                     label: i18n.gettext("Groups"),
-                    widget: PrincipalMemberSelect,
-                    choices: group || [],
-                    memberHref: (userId) => routeURL('auth.group.edit', userId),
+                    widget: PrincipalSelect,
+                    inputProps: {
+                        model: "group",
+                        multiple: true,
+                        editOnClick: true,
+                    },
                     value:
                         group && isNewUser
                             ? group.filter((g) => g.register).map((g) => g.id)

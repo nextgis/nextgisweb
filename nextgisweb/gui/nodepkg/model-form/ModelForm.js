@@ -1,11 +1,13 @@
+import { PropTypes } from "prop-types";
+
+import { useEffect, useState } from "react";
+
 import { Button, Form, message, Popconfirm, Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n";
 import { errorModal } from "@nextgisweb/gui/error";
-import { PropTypes } from "prop-types";
-import { useEffect, useState } from "react";
 
 const btnTitleAliases = {
     create: i18n.gettext("Create"),
@@ -41,7 +43,7 @@ export function ModelForm(props) {
             }
             : m;
 
-    const form = props.form || Form.useForm()[0];
+    const form = Form.useForm(props.form)[0];
 
     const [status, setStatus] = useState("loading");
     const [value, setValue] = useState({});
@@ -116,7 +118,7 @@ export function ModelForm(props) {
         setStatus(null);
     }
 
-    useEffect(async () => {
+    useEffect(() => {
         setInitialValues();
         window.addEventListener("keydown", onKeyDown, false);
         return () => {

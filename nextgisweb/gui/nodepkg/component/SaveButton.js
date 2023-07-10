@@ -1,7 +1,8 @@
+import { PropTypes } from "prop-types";
+
 import SaveOutlineIcon from "@material-icons/svg/save/outline";
 import i18n from "@nextgisweb/pyramid/i18n";
 import { Button } from "@nextgisweb/gui/antd";
-import { PropTypes } from "prop-types";
 
 export function SaveButton({ children, loading = false, ...rest }) {
     return (
@@ -17,6 +18,6 @@ export function SaveButton({ children, loading = false, ...rest }) {
 }
 
 SaveButton.propTypes = {
-    loading: PropTypes.boolean,
+    loading: PropTypes.bool,
     children: PropTypes.node,
 };
