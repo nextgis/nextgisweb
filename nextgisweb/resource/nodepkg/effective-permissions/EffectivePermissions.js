@@ -1,63 +1,79 @@
-import { Fragment, useMemo } from "react";
-import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import { Fragment, useEffect, useMemo, useState } from "react";
+
+import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { route } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+
 import i18n from "@nextgisweb/pyramid/i18n";
 
 import "./EffectivePermissions.less";
 
-const pvLabel = {
-    [true]: i18n.gettext("Yes"),
-    [false]: i18n.gettext("No"),
-};
+const pvLabel = { [true]: i18n.gettext("Yes"), [false]: i18n.gettext("No") };
+const pvClass = { [true]: "value yes", [false]: "value no" };
 
-const pvClass = {
-    [true]: "value yes",
-    [false]: "value no",
-};
+const isCurrent = (userId) => userId === ngwConfig.userId;
 
-function useLoadData({ id }) {
-    const getPermission = useRouteGet("resource.permission", { id });
-    const getSchema = useRouteGet("resource.schema");
+function useLoadData({ resourceId, userId }) {
+    const { data: schema } = useRouteGet("resource.schema");
+    const [effective, setEffective] = useState(null);
+    const [seeOthers, setSeeOthers] = useState(null);
+
+    useEffect(() => {
+        route("resource.permission", resourceId)
+            .get({ query: !isCurrent(userId) ? { user: userId } : undefined })
+            .then(setEffective);
+    }, [resourceId, userId]);
+
+    useEffect(() => {
+        if (effective && isCurrent(userId)) {
+            setSeeOthers(effective.resource.change_permissions);
+        }
+    }, [userId, effective]);
 
     return useMemo(() => {
-        if (getPermission.isLoading || getSchema.isLoading) {
-            return [null, true];
-        }
+        if (!effective || seeOthers === null || !schema) return [null, false];
 
         const result = [];
 
-        for (const [sid, scope] of Object.entries(getSchema.data.scopes)) {
-            const pd = getPermission.data[sid];
+        for (const [sid, scope] of Object.entries(schema.scopes)) {
+            const pd = effective[sid];
             if (pd === undefined) continue;
 
             const sub = [];
             const itm = { key: sid, label: scope.label, items: sub };
 
-            for (const [pid, permission] of Object.entries(scope.permissions)) {
+            for (const [pid, pdesc] of Object.entries(scope.permissions)) {
                 sub.push({
                     key: pid,
-                    label: permission.label,
-                    value: getPermission.data[sid][pid],
+                    label: pdesc.label,
+                    value: effective[sid][pid],
                 });
             }
 
             result.push(itm);
         }
 
-        return [result, false];
-    }, [getPermission, getSchema]);
+        return [result, seeOthers];
+    }, [effective, schema, seeOthers]);
 }
 
 export function EffectivePermissions({ resourceId }) {
-    const [data, isLoading] = useLoadData({ id: resourceId });
+    const [userId, setUserId] = useState(ngwConfig.userId);
+    const [data, seeOthers] = useLoadData({ resourceId, userId });
 
-    if (isLoading) {
-        return <LoadingWrapper />;
-    }
+    if (!data) return <LoadingWrapper />;
 
     return (
         <div className="ngw-resource-effective-permisssions content-box">
-            {/* TODO: Add user widget here */}
+            <PrincipalSelect
+                model="user"
+                value={userId}
+                onChange={setUserId}
+                systemUsers={["guest"]}
+                disabled={!seeOthers}
+                allowClear={false}
+            />
             <div className="table-wrapper">
                 <table className="pure-table pure-table-horizontal">
                     <tbody>

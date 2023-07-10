@@ -12,6 +12,7 @@
         user = request.user
         is_administrator = user.is_administrator
         is_guest = user.keyname == 'guest'
+        user_id = user.id
         user_display_name = user.display_name
 
         if auth_result := request.environ.get('auth.result'):
@@ -23,6 +24,7 @@
         # Something like InvalidCredentials
         is_administrator = False
         is_guest = True
+        user_id = None
         user_display_name = None
         invitation_session = False
 
@@ -37,6 +39,7 @@
         "instanceId": request.env.core.instance_id,
         "isAdministrator": is_administrator,
         "isGuest": is_guest,
+        "userId": user_id,
         "userDisplayName": user_display_name,
         "invitationSession": invitation_session,
         "locale": request.locale_name,
