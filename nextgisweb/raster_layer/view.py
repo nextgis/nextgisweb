@@ -13,7 +13,7 @@ from .model import RasterLayer
 class RasterLayerWidget(Widget):
     resource = RasterLayer
     operation = ('create', 'update')
-    amdmod = '@nextgisweb/raster_layer/editor-widget'
+    amdmod = '@nextgisweb/raster-layer/editor-widget'
 
 
 @viewargs(renderer='react')
@@ -24,7 +24,7 @@ def export(request):
         obj=request.context,
         title=_("Save as"),
         props=dict(id=request.context.id),
-        entrypoint="@nextgisweb/raster_layer/export-form",
+        entrypoint="@nextgisweb/raster-layer/export-form",
         maxheight=True,
     )
 
