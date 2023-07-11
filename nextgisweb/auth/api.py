@@ -20,12 +20,15 @@ brief_keys = (
 
 
 def user_cget(request) -> JSONType:
-    request.require_administrator()
-
     brief = request.GET.get('brief') in ('true', 'yes', '1')
+    brief or request.require_administrator()
+
+    q = User.query()
+    if request.authenticated_userid is None:
+        q = q.filter_by(system=True)
 
     result = []
-    for o in User.query().options(undefer(User.is_administrator)):
+    for o in q.options(undefer(User.is_administrator)):
         data = o.serialize()
         if brief:
             data = {k: v for k, v in data.items() if k in brief_keys}
@@ -122,12 +125,15 @@ def profile_set(request) -> JSONType:
 
 
 def group_cget(request) -> JSONType:
-    request.require_administrator()
-
     brief = request.GET.get('brief') in ('true', 'yes', '1')
+    brief or request.require_administrator()
+
+    q = Group.query()
+    if request.authenticated_userid is None:
+        q = q.filter_by(system=True)
 
     result = []
-    for o in Group.query():
+    for o in q:
         data = o.serialize()
         if brief:
             data = {k: v for k, v in data.items() if k in brief_keys}
