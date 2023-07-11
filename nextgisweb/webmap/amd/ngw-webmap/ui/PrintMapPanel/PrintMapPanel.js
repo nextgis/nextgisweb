@@ -23,11 +23,12 @@ define([
     "openlayers/ol",
     "../../ol-ext/ol-mapscale",
     "../../ol-ext/DragZoomUnConstrained",
-    "dojo/text!./PrintMapPanel.hbs",
     "dojo/text!./PrintingPageStyle.css.hbs",
-    "dijit/form/Select",
-    "dijit/TooltipDialog",
-    "ngw-webmap/ui/ScalesSelect/ScalesSelect",
+    "dojo/text!./PrintMapPanel.hbs",
+    // Template dependencies
+    "dijit/layout/BorderContainer",
+    "dijit/layout/ContentPane",
+    // Side effects
     "xstyle/css!./PrintMapPanel.css",
     "./dom-to-image",
 ], function (
@@ -54,8 +55,8 @@ define([
     ol,
     olMapScale,
     DragZoomUnConstrained,
-    template,
-    printingCssTemplate
+    printingCssTemplate,
+    template
 ) {
     return declare(
         [
