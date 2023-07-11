@@ -11,26 +11,14 @@ define([
     "dojo/debounce",
     "dojo/on",
     "dojo/query",
-    "dojo/has",
-    "dojo/sniff",
     "dojo/aspect",
-    "dojo/_base/window",
-    "dojo/dom-style",
-    "dojo/dom",
     "dojo/dom-class",
     "dojo/dom-construct",
     "dojo/Deferred",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
-    "dojox/layout/TableContainer",
     "dojox/dtl",
     "dojox/dtl/Context",
-    "dijit/form/TextBox",
-    "dijit/form/NumberTextBox",
-    "dijit/form/DropDownButton",
-    "dijit/DropDownMenu",
-    "dijit/MenuItem",
-    "dijit/Toolbar",
     "@nextgisweb/pyramid/i18n!",
     "ngw-webmap/ol/Map",
     "openlayers/ol",
@@ -55,33 +43,21 @@ define([
     debounce,
     on,
     query,
-    has,
-    sniff,
     aspect,
-    win,
-    domStyle,
-    dom,
     domClass,
     domConstruct,
     Deferred,
     DynamicPanel,
     BorderContainer,
-    TableContainer,
     dtl,
     dtlContext,
-    TextBox,
-    NumberTextBox,
-    DropdownButton,
-    DropDownMenu,
-    MenuItem,
-    Toolbar,
     i18n,
     Map,
     ol,
     olMapScale,
     DragZoomUnConstrained,
     template,
-    printingCssTemplate,
+    printingCssTemplate
 ) {
     return declare(
         [
@@ -117,7 +93,7 @@ define([
                         templateString: i18n.renderTemplate(template),
                         region: "top",
                         gutters: false,
-                    },
+                    }
                 ))();
             },
 
@@ -131,7 +107,7 @@ define([
                         },
                         scaleMap,
                     },
-                    contentNode.querySelector(".print-panel-content"),
+                    contentNode.querySelector(".print-panel-content")
                 );
             },
 
@@ -146,10 +122,10 @@ define([
                             this.makeComp(
                                 this.contentNode,
                                 this.options,
-                                scaleValue,
+                                scaleValue
                             );
-                        }, 500),
-                    ),
+                        }, 500)
+                    )
                 );
 
                 on(this.contentWidget.closePanel, "click", () => {
@@ -176,7 +152,7 @@ define([
                     this._buildPrintCanvas(payload).then(
                         lang.hitch(this, function (hrefCanvasEl) {
                             hrefCanvasEl.click();
-                        }),
+                        })
                     );
                 }
             },
@@ -221,17 +197,17 @@ define([
                 switch (imageType) {
                     case "png":
                         domToImagePromise = domtoimage.toPng(
-                            this.contentWidget.mapPageContainer,
+                            this.contentWidget.mapPageContainer
                         );
                         break;
                     case "jpeg":
                         domToImagePromise = domtoimage.toJpeg(
-                            this.contentWidget.mapPageContainer,
+                            this.contentWidget.mapPageContainer
                         );
                         break;
                     default:
                         console.error(
-                            'Image type "' + imageType + '" is unknown.',
+                            'Image type "' + imageType + '" is unknown.'
                         );
                 }
 
@@ -240,10 +216,10 @@ define([
                         lang.hitch(this, function (dataUrl) {
                             var hrefCanvasEl = this._buildHrefCanvasElement(
                                 dataUrl,
-                                imageType,
+                                imageType
                             );
                             deferred.resolve(hrefCanvasEl);
-                        }),
+                        })
                     )
                     .catch(function (error) {
                         console.error(error);
@@ -308,7 +284,7 @@ define([
                     function (layer) {
                         this.printMap.olMap.removeLayer(layer);
                     },
-                    this,
+                    this
                 );
                 this.printMap.olMap.setTarget(null);
                 this.printMap.olMap = null;
@@ -368,7 +344,7 @@ define([
                     "resize",
                     lang.hitch(this, function () {
                         this.printMap.olMap.updateSize();
-                    }),
+                    })
                 );
 
                 array.forEach(
@@ -378,13 +354,13 @@ define([
                             this.printMap.olMap.addLayer(layer);
                         }
                     },
-                    this,
+                    this
                 );
 
                 array.forEach(
                     this.map.getOverlays().getArray(),
                     this._buildAnnotationOverlay,
-                    this,
+                    this
                 );
 
                 this._buildLogo();
@@ -395,7 +371,7 @@ define([
                 if ("annPopup" in overlay && overlay.annPopup) {
                     const annPopup = overlay.annPopup;
                     const clonedPopup = annPopup.cloneOlPopup(
-                        annPopup.getAnnFeature(),
+                        annPopup.getAnnFeature()
                     );
                     this.printMap.olMap.addOverlay(clonedPopup);
                 }
@@ -414,7 +390,7 @@ define([
 
             _buildScalesControls: function () {
                 for (const [type, value] of Object.entries(
-                    this._scalesControls,
+                    this._scalesControls
                 )) {
                     this._changeScaleControls(value, type);
                 }
@@ -457,6 +433,6 @@ define([
                     this._pageStyle = null;
                 }
             },
-        },
+        }
     );
 });

@@ -1,7 +1,6 @@
 define([
     "dojo/_base/declare",
     "dojo/topic",
-    "dijit/form/CheckBox",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "ngw-webmap/ui/AnnotationsManager/AnnotationsManager",
     "ngw-webmap/MapStatesObserver",
@@ -10,12 +9,11 @@ define([
 ], function (
     declare,
     topic,
-    CheckBox,
     DynamicPanel,
     AnnotationsManager,
     MapStatesObserver,
     reactApp,
-    annPanelComp,
+    annPanelComp
 ) {
     return declare([DynamicPanel], {
         _visibleState: null,
@@ -36,7 +34,7 @@ define([
                         },
                         onTopicPublish: this.onTopicPublish,
                     },
-                    contentNode,
+                    contentNode
                 );
             };
         },
