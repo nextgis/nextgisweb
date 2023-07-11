@@ -1,9 +1,6 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/array",
-    "dojo/dom-class",
-    "dojox/dtl",
-    "dojox/dtl/Context",
     "openlayers/ol",
     "../../ol-ext/ol-popup",
     "ngw-webmap/layers/annotations/AnnotationFeature",
@@ -11,9 +8,6 @@ define([
 ], function (
     declare,
     array,
-    domClass,
-    dtl,
-    dtlContext,
     ol,
     olPopup,
     AnnotationFeature,

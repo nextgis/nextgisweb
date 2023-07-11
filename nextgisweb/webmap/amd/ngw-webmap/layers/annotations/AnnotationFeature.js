@@ -1,22 +1,14 @@
 define([
     "dojo/_base/declare",
-    "dojo/_base/array",
     "dojo/json",
-    "dojo/dom-class",
     "dojox/html/entities",
-    "dojox/dtl",
-    "dojox/dtl/Context",
     "openlayers/ol",
     "@nextgisweb/pyramid/i18n!",
     "ngw-webmap/layers/annotations/AnnotationsPopup",
 ], function (
     declare,
-    array,
     json,
-    domClass,
     htmlEntities,
-    dtl,
-    dtlContext,
     ol,
     i18n,
     AnnotationsPopup

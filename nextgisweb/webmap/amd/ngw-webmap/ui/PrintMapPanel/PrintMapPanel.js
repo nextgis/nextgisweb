@@ -15,17 +15,16 @@ define([
     "dojo/dom-class",
     "dojo/dom-construct",
     "dojo/Deferred",
+    "handlebars/handlebars",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
-    "dojox/dtl",
-    "dojox/dtl/Context",
     "@nextgisweb/pyramid/i18n!",
     "ngw-webmap/ol/Map",
     "openlayers/ol",
     "../../ol-ext/ol-mapscale",
     "../../ol-ext/DragZoomUnConstrained",
     "dojo/text!./PrintMapPanel.hbs",
-    "dojo/text!./PrintingPageStyle.css.dtl",
+    "dojo/text!./PrintingPageStyle.css.hbs",
     "dijit/form/Select",
     "dijit/TooltipDialog",
     "ngw-webmap/ui/ScalesSelect/ScalesSelect",
@@ -47,10 +46,9 @@ define([
     domClass,
     domConstruct,
     Deferred,
+    handlebars,
     DynamicPanel,
     BorderContainer,
-    dtl,
-    dtlContext,
     i18n,
     Map,
     ol,
@@ -397,19 +395,15 @@ define([
             },
 
             _buildPageStyle: function (width, height, margin) {
-                var style = this._getPageStyle(),
-                    template,
-                    context;
-
-                template = new dtl.Template(printingCssTemplate);
-                context = new dtlContext({
+                const compiled = handlebars.compile(printingCssTemplate);
+                const html = compiled({
                     widthPage: width,
                     heightPage: height,
                     widthMap: width - margin * 2,
                     heightMap: height - margin * 2,
                     margin: margin,
                 });
-                style.innerHTML = template.render(context);
+                this._getPageStyle().innerHTML = html;
             },
 
             _pageStyle: null,
