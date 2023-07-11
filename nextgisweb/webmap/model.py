@@ -63,10 +63,10 @@ class WebMap(Base, Resource):
     extent_bottom = db.Column(db.Float, default=-90)
     extent_top = db.Column(db.Float, default=+90)
 
-    extent_const_left = db.Column(db.Float, default=-180)
-    extent_const_right = db.Column(db.Float, default=+180)
-    extent_const_bottom = db.Column(db.Float, default=-90)
-    extent_const_top = db.Column(db.Float, default=+90)
+    extent_const_left = db.Column(db.Float)
+    extent_const_right = db.Column(db.Float)
+    extent_const_bottom = db.Column(db.Float)
+    extent_const_top = db.Column(db.Float)
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
     annotation_default = db.Column(db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default='no')
