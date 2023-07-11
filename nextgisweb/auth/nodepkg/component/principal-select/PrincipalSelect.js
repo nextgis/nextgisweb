@@ -95,7 +95,11 @@ export function PrincipalSelect({
             if (loadUsers) {
                 promises.push(
                     route("auth.user.collection")
-                        .get({ signal: makeSignal(), cache: true })
+                        .get({
+                            query: { brief: true },
+                            signal: makeSignal(),
+                            cache: true,
+                        })
                         .then((data) => {
                             return data
                                 .filter((itm) => {
@@ -116,6 +120,7 @@ export function PrincipalSelect({
             if (loadGroups) {
                 promises.push(
                     route("auth.group.collection").get({
+                        query: { brief: true },
                         signal: makeSignal(),
                         cache: true,
                     })
