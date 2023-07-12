@@ -1,4 +1,7 @@
+from typing import Dict, List
+
 import zope.event
+from msgspec import Struct
 from pyramid.httpexceptions import HTTPBadRequest
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
@@ -14,7 +17,7 @@ from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import ResourceError, ValidationError
 from .model import Resource, ResourceSerializer
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
-from .scope import ResourceScope
+from .scope import ResourceScope, Scope
 from .serialize import CompositeSerializer
 from .view import resource_factory
 
@@ -22,6 +25,61 @@ PERM_READ = ResourceScope.read
 PERM_DELETE = ResourceScope.delete
 PERM_MCHILDREN = ResourceScope.manage_children
 PERM_CPERM = ResourceScope.change_permissions
+
+
+class BlueprintResponse(Struct):
+
+    class Resource(Struct):
+        identity: str
+        label: str
+        base_classes: List[str]
+        interfaces: List[str]
+        scopes: List[str]
+
+    resources: Dict[str, Resource]
+
+    class Scope(Struct):
+        identity: str
+        label: str
+
+        class Permission(Struct):
+            identity: str
+            label: str
+
+        permissions: Dict[str, Permission]
+
+    scopes: Dict[str, Scope]
+
+
+def blueprint(request) -> BlueprintResponse:
+    tr = request.localizer.translate
+
+    SResource = BlueprintResponse.Resource
+
+    resources = {identity: SResource(
+        identity=identity,
+        label=tr(cls.cls_display_name),
+        base_classes=list(reversed([
+            bc.identity for bc in cls.__mro__
+            if (bc != cls and issubclass(bc, Resource))
+        ])),
+        interfaces=[i.__name__ for i in cls.implemented_interfaces()],
+        scopes=list(cls.scope.keys()),
+    ) for identity, cls in Resource.registry.items()}
+
+    SScope = BlueprintResponse.Scope
+    SPermission = BlueprintResponse.Scope.Permission
+
+    scopes = {sid: SScope(
+        identity=sid,
+        label=tr(scope.label),
+        permissions={perm.name: SPermission(
+            identity=perm.name,
+            label=tr(perm.label),
+        ) for perm in scope.values()},
+    ) for sid, scope in Scope.registry.items()}
+
+    return BlueprintResponse(resources=resources, scopes=scopes)
 
 
 def item_get(context, request) -> JSONType:
@@ -402,6 +460,9 @@ def resource_export_put(request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
+
+    config.add_route('resource.blueprint', '/api/component/resource/blueprint') \
+        .add_view(blueprint, request_method='GET')
 
     config.add_route(
         'resource.item', r'/api/resource/{id:\d+}',

@@ -3,6 +3,7 @@ from datetime import datetime
 from types import MappingProxyType
 
 from sqlalchemy import event, func, text
+from zope.interface import implementedBy
 
 from nextgisweb.env import Base, DBSession, _, env
 from nextgisweb.lib import db
@@ -12,7 +13,7 @@ from nextgisweb.auth import Group, OnFindReferencesData, Principal, User
 from nextgisweb.core.exception import ForbiddenError, ValidationError
 
 from .exception import DisplayNameNotUnique, HierarchyError
-from .interface import providedBy
+from .interface import providedBy, IResourceBase
 from .permission import RequirementList
 from .scope import DataScope, MetadataScope, ResourceScope
 from .serialize import SerializedProperty as SP
@@ -123,6 +124,14 @@ class Resource(Base, metaclass=ResourceMeta):
     def check_parent(cls, parent):
         """ Can this resource be child for parent? """
         return False
+
+    @classmethod
+    def implemented_interfaces(cls):
+        """List resource interfaces implemented by class"""
+        return [
+            iface for iface in implementedBy(cls)
+            if iface != IResourceBase and issubclass(iface, IResourceBase)
+        ]
 
     @property
     def parents(self):

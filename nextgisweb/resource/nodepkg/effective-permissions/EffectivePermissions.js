@@ -15,7 +15,7 @@ const pvClass = { [true]: "value yes", [false]: "value no" };
 const isCurrent = (userId) => userId === ngwConfig.userId;
 
 function useLoadData({ resourceId, userId }) {
-    const { data: schema } = useRouteGet("resource.schema");
+    const { data: schema } = useRouteGet("resource.blueprint");
     const [effective, setEffective] = useState(null);
     const [seeOthers, setSeeOthers] = useState(null);
 
