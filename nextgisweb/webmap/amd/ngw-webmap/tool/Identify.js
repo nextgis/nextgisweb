@@ -237,6 +237,7 @@ define([
                         geometryWidget.placeAt(widget.extContainer);
                     }
 
+                    var deferreds = []
                     array.forEach(Object.keys(widget.extWidgetClasses), function (key) {
                         var cls = widget.extWidgetClasses[key],
                             ewidget = new cls({
@@ -245,45 +246,61 @@ define([
                                 compact: true
                             });
 
-                        if (ewidget.renderValue(feature.extensions[key]) !== false) {
-                            ewidget.placeAt(widget.extContainer);
+                        var deferred = new Deferred();
+                        deferreds.push(deferred);
+                        
+                        var resolve = function (val) {
+                            deferred.resolve(val && ewidget)
+                        }
+                        var resp = ewidget.renderValue(feature.extensions[key])
+                        if (typeof resp === 'object' && 'then' in resp) {
+                            resp.then(resolve)
+                        } else {
+                            resolve(resp)
                         }
                     });
 
-                    widget.editButton = new Button({
-                        iconClass: "dijitIconEdit",
-                        showLabel: true,
-                        onClick: function () {
-                            xhr(route.resource.item({id: lid}), {
-                                method: "GET",
-                                handleAs: "json"
-                            }).then(function (data) {
-                                var fieldmap = {};
-                                array.forEach(data.feature_layer.fields, function (itm) {
-                                    fieldmap[itm.keyname] = itm;
+                    all(deferreds).then((ewidgets) => {
+                        ewidgets.forEach((ewidget) => { 
+                            if (ewidget) {
+                                ewidget.placeAt(widget.extContainer)
+                            }
+                        });
+
+                        widget.editButton = new Button({
+                            iconClass: "dijitIconEdit",
+                            showLabel: true,
+                            onClick: function () {
+                                xhr(route.resource.item({id: lid}), {
+                                    method: "GET",
+                                    handleAs: "json"
+                                }).then(function (data) {
+                                    var fieldmap = {};
+                                    array.forEach(data.feature_layer.fields, function (itm) {
+                                        fieldmap[itm.keyname] = itm;
+                                    });
+    
+                                    var pane = new FeatureEditorWidget({
+                                        resource: lid, 
+                                        feature: fid,
+                                        fields: data.feature_layer.fields,
+                                        title: i18n.gettext("Feature") + " #" + fid,
+                                        iconClass: "iconDescription",
+                                        closable: true
+                                    });
+    
+                                    widget.tool.display.tabContainer.addChild(pane);
+                                    widget.tool.display.tabContainer.selectChild(pane);
+    
+                                    pane.startup();
+                                    pane.load();
                                 });
-
-                                var pane = new FeatureEditorWidget({
-                                    resource: lid, 
-                                    feature: fid,
-                                    fields: data.feature_layer.fields,
-                                    title: i18n.gettext("Feature") + " #" + fid,
-                                    iconClass: "iconDescription",
-                                    closable: true
-                                });
-
-                                widget.tool.display.tabContainer.addChild(pane);
-                                widget.tool.display.tabContainer.selectChild(pane);
-
-                                pane.startup();
-                                pane.load();
-                            });
-                        }
-                    }).placeAt(widget.extController, "last");
-                    domClass.add(widget.editButton.domNode, "no-label");
-
-                    widget.resize();
-
+                            }
+                        }).placeAt(widget.extController, "last");
+                        domClass.add(widget.editButton.domNode, "no-label");
+    
+                        widget.resize();
+                    })
                 });
 
                 topic.publish("feature.highlight", {
