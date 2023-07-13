@@ -53,7 +53,7 @@ class CompositeWidget(WidgetBase):
 class ResourceWidget(Widget):
     resource = Resource
     operation = ('create', 'update')
-    amdmod = 'ngw-resource/Widget'
+    amdmod = '@nextgisweb/resource/editor-widget'
 
 
 class ResourcePermissionWidget(Widget):

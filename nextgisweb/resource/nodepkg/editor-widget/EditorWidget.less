@@ -1,0 +1,14 @@
+.ngw-resource-editor-widget {
+    padding: 1em;
+
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1em;
+
+    & > label {
+        align-self: center;
+        &::after {
+            content: ":";
+        }
+    }
+}
