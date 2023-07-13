@@ -3,7 +3,6 @@ from datetime import datetime
 from types import MappingProxyType
 
 from sqlalchemy import event, func, text
-from zope.interface import implementedBy
 
 from nextgisweb.env import Base, DBSession, _, env
 from nextgisweb.lib import db
@@ -13,7 +12,7 @@ from nextgisweb.auth import Group, OnFindReferencesData, Principal, User
 from nextgisweb.core.exception import ForbiddenError, ValidationError
 
 from .exception import DisplayNameNotUnique, HierarchyError
-from .interface import providedBy, IResourceBase
+from .interface import IResourceAdapter, interface_registry
 from .permission import RequirementList
 from .scope import DataScope, MetadataScope, ResourceScope
 from .serialize import SerializedProperty as SP
@@ -128,10 +127,25 @@ class Resource(Base, metaclass=ResourceMeta):
     @classmethod
     def implemented_interfaces(cls):
         """List resource interfaces implemented by class"""
-        return [
-            iface for iface in implementedBy(cls)
-            if iface != IResourceBase and issubclass(iface, IResourceBase)
-        ]
+        return [i for i in interface_registry if (
+            i.implementedBy(cls) or IResourceAdapter((i, cls), None)
+        )]
+
+    def lookup_interface(self, iface):
+        """Get resource interface implementation"""
+        if iface.providedBy(self):
+            return self
+
+        if adapter := IResourceAdapter((iface, self.__class__), None):
+            result = adapter(self)
+            assert iface.providedBy(result)
+            return result
+
+        return None
+
+    def provided_interfaces(self):
+        """List resource interfaces provided by instance"""
+        return [i for i in interface_registry if self.lookup_interface(i)]
 
     @property
     def parents(self):
@@ -407,7 +421,7 @@ class _children_attr(SP):
 
 class _interfaces_attr(SP):
     def getter(self, srlzr):
-        return [i.getName() for i in providedBy(srlzr.obj)]
+        return [i.getName() for i in srlzr.obj.provided_interfaces()]
 
 
 class _scopes_attr(SP):

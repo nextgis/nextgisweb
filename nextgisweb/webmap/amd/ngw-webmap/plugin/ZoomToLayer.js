@@ -40,7 +40,7 @@ define([
             var plugin = this,
                 item = this.display.dumpItem();
 
-            xhr.get(route.layer.extent({id: item.layerId}), {
+            xhr.get(route.layer.extent({id: item.styleId}), {
                 handleAs: "json"
             }).then(function ({extent}) {
                 plugin.display.map.zoomToNgwExtent(extent, plugin.display.displayProjection);

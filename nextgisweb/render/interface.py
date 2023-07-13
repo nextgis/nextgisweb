@@ -1,6 +1,8 @@
 from zope.interface import Attribute, Interface
+from zope.interface.interface import adapter_hooks
 
-from nextgisweb.resource import IResourceBase
+from nextgisweb.layer import IBboxLayer
+from nextgisweb.resource import IResourceAdapter, IResourceBase
 
 
 class IRenderableStyle(IResourceBase):
@@ -27,3 +29,13 @@ class ITileRenderRequest(Interface):
 
     def render_tile(self, tile, size):
         pass
+
+
+@adapter_hooks.append
+def style_adapter_hook(iface, param):
+    if (
+        iface is IResourceAdapter
+        and param[0] is IBboxLayer
+        and param[1].identity.endswith('_style')
+    ):
+        return lambda res: res.parent

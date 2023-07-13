@@ -9,7 +9,7 @@ from .exception import (
     ResourceNotFound,
     ValidationError,
 )
-from .interface import IResourceBase
+from .interface import IResourceAdapter, IResourceBase, interface_registry
 from .model import Resource, ResourceACLRule, ResourceGroup
 from .permission import Permission, Scope
 from .scope import (

@@ -1,11 +1,18 @@
-import zope.interface
+from zope.interface import Interface
+
+interface_registry = list()
 
 
-class IResourceBase(zope.interface.Interface):
+class IResourceBaseMeta(type(Interface)):
+    def __init__(self, name, bases, attrs, __doc__=None, __module__=None):
+        super().__init__(name, bases, attrs, __doc__, __module__)
+        if name != 'IResourceBase':
+            interface_registry.append(self)
+
+
+class IResourceBase(Interface, metaclass=IResourceBaseMeta):
     pass
 
 
-def providedBy(obj):
-    for i in zope.interface.providedBy(obj):
-        if issubclass(i, IResourceBase) and i != IResourceBase:
-            yield i
+class IResourceAdapter(Interface):
+    pass

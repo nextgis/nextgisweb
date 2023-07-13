@@ -128,16 +128,10 @@ def get_webmap_extent(resource, request) -> JSONType:
 
     def traverse(item, extent):
         if item.item_type == 'layer':
-            res_style = item.style
-            style_has_extent = IBboxLayer.providedBy(res_style)
-            if style_has_extent and res_style.extent:
-                if not res_style.has_permission(DataScope.read, request.user):
+            if res := item.style.lookup_interface(IBboxLayer):
+                if not res.has_permission(DataScope.read, request.user):
                     return extent
-                extent = add_extent(extent, res_style.extent)
-            else:
-                res_layer = res_style.parent
-                if IBboxLayer.providedBy(res_layer) and res_layer.extent:
-                    extent = add_extent(extent, res_layer.extent)
+                extent = add_extent(extent, res.extent)
         elif item.item_type in ('root', 'group'):
             for i in item.children:
                 extent = traverse(i, extent)
