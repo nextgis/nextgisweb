@@ -3,10 +3,12 @@ import { PropTypes } from "prop-types";
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
 
-import { Button, Space, Table } from "@nextgisweb/gui/antd";
-import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import { Button, Table } from "@nextgisweb/gui/antd";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import i18n from "@nextgisweb/pyramid/i18n";
+
+import usePickerCard from "./hook/usePickerCard";
+import { renderResourceCls } from "./util/renderResourceCls";
 
 import FolderOpenIcon from "@material-icons/svg/arrow_forward";
 
@@ -14,46 +16,33 @@ const { Column } = Table;
 
 export const ResourcePickerChildren = observer(({ resourceStore }) => {
     const {
-        selected,
-        children,
         multiple,
-        disabledIds,
-        checkEnabled,
-        moveInsideCls,
+        selected,
+        resources,
         allowSelection,
         allowMoveInside,
-        childrenLoading,
+        resourcesLoading,
+        getResourceClasses,
+        traverseClasses,
     } = resourceStore;
 
-    const [selectionType] = useState(multiple ? "" : "radio");
+    const [selectionType] = useState(() => (multiple ? "" : "radio"));
+    const { getCheckboxProps } = usePickerCard({ resourceStore });
 
-    const getEnabledProps = (record, checks) => {
-        const props = { disabled: false };
-
-        const disableChecker = [
-            {
-                check: () => Array.isArray(disabledIds),
-                isDisabled: () => disabledIds.includes(record.id),
-            },
-            ...checks,
-        ];
-        props.disabled = disableChecker.some((check) => {
-            const ok = check.check ? check.check() : true;
-            if (ok) {
-                return check.isDisabled();
-            }
-            return true;
-        });
-
-        return props;
-    };
-    const getCheckboxProps = (record) => {
-        return getEnabledProps(record, [
-            {
-                isDisabled: () => !checkEnabled.call(resourceStore, record),
-            },
-        ]);
-    };
+    const dataSource = useMemo(() => {
+        const children_ = [];
+        for (const x of resources) {
+            const res = x.resource;
+            const formattedRes = {
+                displayName: res.display_name,
+                hasChildren: res.children,
+                ...res,
+            };
+            delete formattedRes.children;
+            children_.push(formattedRes);
+        }
+        return children_;
+    }, [resources]);
 
     const rowSelection = useMemo(() => {
         return {
@@ -63,15 +52,19 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
                 resourceStore.setSelected(selectedRowKeys);
             },
         };
-    }, [selected]);
+    }, [getCheckboxProps, resourceStore, selected]);
 
-    const renderActions = (actions, record) => {
-        const { disabled } = getEnabledProps(record, [
-            {
-                isDisabled: () => !moveInsideCls.includes(record.cls),
-            },
-        ]);
-        if (disabled || !allowMoveInside) {
+    const renderActions = (_, record) => {
+        const classes = getResourceClasses([record.cls]);
+        const isGroup = classes.some((cls) => cls === "resource_group");
+
+        const allowMoveToEmpty = isGroup ? true : record.hasChildren
+
+        const disabled =
+            traverseClasses &&
+            !classes.some((cls) => traverseClasses.includes(cls));
+
+        if (disabled || !allowMoveToEmpty || !allowMoveInside) {
             return <></>;
         }
         const onClick = (e) => {
@@ -92,11 +85,11 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
         <Table
             style={{ height: "100%" }}
             showHeader={false}
-            dataSource={children}
+            dataSource={dataSource}
             rowKey="id"
             pagination={false}
             size="middle"
-            loading={childrenLoading}
+            loading={resourcesLoading}
             rowSelection={
                 allowSelection && {
                     type: selectionType,
@@ -131,12 +124,9 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
                 className="displayName"
                 dataIndex="displayName"
                 sorter={sorterFactory("displayName")}
-                render={(value, record) => (
-                    <Space>
-                        <SvgIcon icon={`rescls-${record.cls}`} />
-                        {value}
-                    </Space>
-                )}
+                render={(value, record) =>
+                    renderResourceCls({ name: value, cls: record.cls })
+                }
             />
             <Column
                 width={30}

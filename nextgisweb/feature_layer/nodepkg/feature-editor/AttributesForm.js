@@ -16,7 +16,7 @@ import {
     Integer,
     Number,
     TimeInput,
-    useForm,
+    Form,
 } from "@nextgisweb/gui/fields-form";
 
 import BackspaceIcon from "@material-icons/svg/backspace";
@@ -38,7 +38,7 @@ const setNullTitle = i18n.gettext("Set field value to NULL (No data)");
 export const AttributesForm = observer(({ store }) => {
     const { fields, values, setValues, initLoading } = store;
     const [size] = useState("small");
-    const form = useForm()[0];
+    const form = Form.useForm()[0];
 
     const setNullForField = useCallback(
         (field) => {

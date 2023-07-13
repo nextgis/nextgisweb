@@ -12,21 +12,21 @@ import SyncIcon from "@material-icons/svg/sync";
 import { Button, Col, Input, Row, Tooltip } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
 
-import { ResourcePickerBreadcrumb } from "../resource-picker-breadcrumb";
+import { ResourcePickerBreadcrumb } from "./ResourcePickerBreadcrumb";
 import ResourcesFilter from "../../resources-filter";
 
 const returnToInitialGroupTitle = i18n.gettext("Go to initial group");
 const refreshGroupTitle = i18n.gettext("Refresh");
 
-export const ResourcePickerModalTitle = observer(
-    ({ resourceStore, onClose }) => {
+export const ResourcePickerTitle = observer(
+    ({ resourceStore, onClose, showClose }) => {
         const { initialParentId, parentId, allowMoveInside } = resourceStore;
 
         const [searchMode, setSearchMode] = useState(false);
 
         useEffect(() => {
             resourceStore.setAllowCreateResource(!searchMode);
-        }, [searchMode]);
+        }, [searchMode, resourceStore]);
 
         function SearchPanel() {
             return (
@@ -40,7 +40,7 @@ export const ResourcePickerModalTitle = observer(
                         </Col>
                         <Col flex="auto">
                             <ResourcesFilter
-                                cls={resourceStore.enabledCls.join(",")}
+                                cls={resourceStore.requireClass}
                                 onChange={(v, opt) => {
                                     resourceStore.changeParentTo(
                                         Number(opt.key)
@@ -98,17 +98,20 @@ export const ResourcePickerModalTitle = observer(
                 <Col flex="auto">
                     {searchMode ? <SearchPanel /> : <PathPanel />}
                 </Col>
-                <Col>
-                    <a color="primary" onClick={onClose}>
-                        <CloseIcon />
-                    </a>
-                </Col>
+                {showClose && (
+                    <Col>
+                        <a color="primary" onClick={onClose}>
+                            <CloseIcon />
+                        </a>
+                    </Col>
+                )}
             </Row>
         );
     }
 );
 
-ResourcePickerModalTitle.propTypes = {
+ResourcePickerTitle.propTypes = {
+    showClose: PropTypes.bool,
     resourceStore: PropTypes.object,
     onClose: PropTypes.func,
 };

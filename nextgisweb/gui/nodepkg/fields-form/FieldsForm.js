@@ -2,20 +2,30 @@ import { PropTypes } from "prop-types";
 
 import { Fragment, useEffect, useMemo, useRef } from "react";
 
-import { Form } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
 
+import { Checkbox } from "./field/Checkbox";
+import { DateInput } from "./field/DateInput";
+import { DateTimeInput } from "./field/DateTimeInput";
+import { Input } from "./field/Input";
+import { Number } from "./field/Number";
+import { Password } from "./field/Password";
+import { Select } from "./field/Select";
+import { TextArea } from "./field/TextArea";
+import { TimeInput } from "./field/TimeInput";
+
 import {
-    Checkbox,
-    DateInput,
-    DateTimeInput,
-    Input,
-    Number,
-    Password,
-    Select,
-    TextArea,
-    TimeInput,
-} from "./field";
+    // Checkbox,
+    // DateInput,
+    // DateTimeInput,
+    // Input,
+    // Number,
+    // Password,
+    // Select,
+    // TextArea,
+    // TimeInput,
+    Form,
+} from "./";
 
 const widgetsByName = {
     checkbox: Checkbox,

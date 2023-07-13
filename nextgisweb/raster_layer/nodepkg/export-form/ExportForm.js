@@ -1,8 +1,9 @@
+import PropTypes from "prop-types";
 import settings from "@nextgisweb/pyramid/settings!raster_layer";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
-import { Form } from "@nextgisweb/gui/antd";
-import { FieldsForm, Select, useForm } from "@nextgisweb/gui/fields-form";
+
+import { FieldsForm, Select, Form } from "@nextgisweb/gui/fields-form";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useMemo, useState, useEffect } from "react";
@@ -36,7 +37,7 @@ export function ExportForm({ id }) {
     const [srsOptions, setSrsOptions] = useState([]);
     const [bandOptions, setBandOptions] = useState([]);
     const [defaultSrs, setDefaultSrs] = useState();
-    const form = useForm()[0];
+    const form = Form.useForm()[0];
 
     async function load() {
         try {
@@ -48,7 +49,9 @@ export function ExportForm({ id }) {
                 ].map((r) => r.get({ signal }))
             );
             setSrsOptions(srsListToOptions(srsInfo));
-            setBandOptions(bandListToOptions(itemInfo.raster_layer.color_interpretation));
+            setBandOptions(
+                bandListToOptions(itemInfo.raster_layer.color_interpretation)
+            );
             setDefaultSrs(itemInfo.raster_layer.srs.id);
         } catch (err) {
             errorModal(err);
@@ -119,3 +122,7 @@ export function ExportForm({ id }) {
         </FieldsForm>
     );
 }
+
+ExportForm.propTypes = {
+    id: PropTypes.number,
+};

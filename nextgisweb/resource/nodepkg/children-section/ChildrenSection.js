@@ -13,8 +13,8 @@ import { sorterFactory } from "@nextgisweb/gui/util";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n";
 
-import { showResourcePicker } from "../resource-picker";
-import { createResourceTableItemOptions } from "../resource-picker/util/createResourceTableItemOptions";
+import { showResourcePicker } from "../component/resource-picker";
+import { createResourceTableItemOptions } from "./util/createResourceTableItemOptions";
 import { forEachSelected } from "./util/forEachSelected";
 
 import "./ChildrenSection.less";
@@ -162,10 +162,11 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
     const onNewGroup = useCallback(
         (newGroup) => {
             if (newGroup) {
-                if (newGroup.parent.id === resourceId)
+                if (newGroup.resource.parent.id === resourceId)
                     setItems((old) => {
-                        const newItem =
-                            createResourceTableItemOptions(newGroup);
+                        const newItem = createResourceTableItemOptions(
+                            newGroup.resource
+                        );
                         return [...old, newItem];
                     });
             }
@@ -310,9 +311,13 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 label: <>{i18n.gettext("Move")}</>,
                 onClick: () => {
                     const resourcePicker = showResourcePicker({
-                        resourceId,
-                        disabledIds: [...selected, resourceId],
-                        onNewGroup,
+                        pickerOptions: {
+                            parentId: resourceId,
+                            traverseClasses: ["resource_group"],
+                            hideUnavailable: true,
+                            disableResourceIds: [...selected, resourceId],
+                            onNewGroup,
+                        },
                         onSelect: (newParentId) => {
                             moveSelectedTo(newParentId);
                             resourcePicker.close();

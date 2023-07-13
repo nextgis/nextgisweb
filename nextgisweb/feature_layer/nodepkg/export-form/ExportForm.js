@@ -3,15 +3,16 @@ import PropTypes from "prop-types";
 import { useEffect, useState, useCallback, useMemo } from "react";
 
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
+
 import { errorModal } from "@nextgisweb/gui/error";
 import {
     Checkbox,
     FieldsForm,
     Form,
-    ResourceSelectMultiple,
     Select,
-    useForm,
 } from "@nextgisweb/gui/fields-form";
+import { ResourceSelectMultiple } from "@nextgisweb/resource/field/ResourceSelectMultiple";
+
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import i18n from "@nextgisweb/pyramid/i18n";
@@ -54,7 +55,7 @@ export function ExportForm({ id, pick, multiple }) {
     const [format, setFormat] = useState(exportFormats[0].name);
     const [fields, setFields] = useState([]);
     const [isReady, setIsReady] = useState(false);
-    const form = useForm()[0];
+    const form = Form.useForm()[0];
 
     const loading = staffLoading || exportLoading;
 
@@ -141,10 +142,13 @@ export function ExportForm({ id, pick, multiple }) {
                     name: "resources",
                     label: i18n.gettext("Resources"),
                     widget: ResourceSelectMultiple,
-                    pickerOptions: {
-                        multiple: true,
-                        showCls: ["vector_layer", "resource_group"],
-                        enabledInterfaces: ["IFeatureLayer"],
+                    inputProps: {
+                        pickerOptions: {
+                            traverseClasses: ["resource_group"],
+                            requireClass: "vector_layer",
+                            requireInterface: "IFeatureLayer",
+                            hideUnavailable: true,
+                        },
                     },
                 },
             ];

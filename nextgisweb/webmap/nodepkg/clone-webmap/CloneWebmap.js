@@ -1,10 +1,10 @@
 import { Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import {
+    Form,
     FieldsForm,
-    ResourceSelect,
-    useForm,
 } from "@nextgisweb/gui/fields-form";
+import { ResourceSelect } from "@nextgisweb/resource/field/ResourceSelect";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 
 export function CloneWebmap({ id }) {
-    const form = useForm()[0];
+    const form = Form.useForm()[0];
 
     const { data, isLoading } = useRouteGet(
         "resource.item",
@@ -35,7 +35,10 @@ export function CloneWebmap({ id }) {
                 label: i18n.gettext("Resource group"),
                 widget: ResourceSelect,
                 inputProps: {
-
+                    pickerOptions: {
+                        traverseClasses: ["resource_group"],
+                        hideUnavailable: true,
+                    }
                 },
                 required: true,
             },

@@ -1,22 +1,20 @@
 import PropTypes from "prop-types";
 
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import ManageSearchIcon from "@material-icons/svg/manage_search";
-import DeleteIcon from "@material-icons/svg/delete";
-
-import { Button, Form, Input, Space, Table } from "@nextgisweb/gui/antd";
-import {
-    showResourcePicker,
-    ResourcePickerStore,
-} from "@nextgisweb/resource/resource-picker";
+import { Button, Input, Space, Table } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
-const SelectInput = ({
+import { ResourcePickerStore, showResourcePicker } from "../resource-picker";
+
+import DeleteIcon from "@material-icons/svg/delete";
+import ManageSearchIcon from "@material-icons/svg/manage_search";
+
+const ResourceSelectMultiple = ({
     value: initResourceIds = [],
     onChange,
-    ...pickerOptions
+    pickerOptions = {},
 }) => {
     const { makeSignal, abort } = useAbortController();
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -28,7 +26,13 @@ const SelectInput = ({
     const [loading, setLoading] = useState(false);
     const [total] = useState(20);
 
-    const [store] = useState(() => new ResourcePickerStore(pickerOptions));
+    const [store] = useState(
+        () =>
+            new ResourcePickerStore({
+                ...pickerOptions,
+                multiple: true,
+            })
+    );
 
     const bottom = useMemo(() => {
         return resources.length > total ? "bottomCenter " : "none";
@@ -41,7 +45,7 @@ const SelectInput = ({
                 newIds.push(addId);
             }
         }
-        onChange(newIds);
+        onChange && onChange(newIds);
         setIds(newIds);
     };
 
@@ -99,10 +103,10 @@ const SelectInput = ({
     };
 
     const onClick = () => {
-        (store.disabledIds = ids),
-        (store.selected = ids),
+        store.disableResourceIds = ids;
+        // store.selected = ids;
         showResourcePicker({
-            ...pickerOptions,
+            pickerOptions,
             store,
             onSelect,
         });
@@ -156,19 +160,10 @@ const SelectInput = ({
     );
 };
 
-SelectInput.propTypes = {
-    onChange: PropTypes.func,
-    value: PropTypes.any,
-};
-
-export function ResourceSelectMultiple({ pickerOptions, ...props }) {
-    return (
-        <Form.Item {...props}>
-            <SelectInput {...pickerOptions}></SelectInput>
-        </Form.Item>
-    );
-}
+export { ResourceSelectMultiple };
 
 ResourceSelectMultiple.propTypes = {
+    onChange: PropTypes.func,
+    value: PropTypes.any,
     pickerOptions: PropTypes.object,
 };

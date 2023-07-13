@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 // Based on https://github.com/ant-design/ant-design/blob/master/components/modal/confirm.tsx
 export default function showModal(ModalComponent, config) {
     const container = document.createDocumentFragment();
-    let currentConfig = { ...config, close, visible: true };
+    let currentConfig = { ...config, visible: true };
 
     const render = ({ ...props }) => {
         setTimeout(() => {
@@ -44,6 +44,8 @@ export default function showModal(ModalComponent, config) {
         }
         render(currentConfig);
     }
+
+    currentConfig.close = close;
 
     render(currentConfig);
 

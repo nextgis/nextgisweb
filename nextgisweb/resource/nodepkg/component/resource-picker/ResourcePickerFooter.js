@@ -12,6 +12,8 @@ import { errorModal } from "@nextgisweb/gui/error";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import i18n from "@nextgisweb/pyramid/i18n";
 
+import usePickerCard from "./hook/usePickerCard";
+
 const createNewGroupMsg = i18n.gettext("Create group");
 const clearSelectionMsg = i18n.gettext("Clear selection");
 
@@ -20,17 +22,6 @@ const CreateControl = observer(({ setCreateMode, resourceStore }) => {
     const resourceNameInput = useRef(null);
 
     const [resourceName, setResourceName] = useState();
-
-    useKeydownListener("enter", () => {
-        onSave();
-    });
-
-    useEffect(() => {
-        const input = resourceNameInput.current;
-        if (input) {
-            input.focus();
-        }
-    }, []);
 
     const onSave = async () => {
         try {
@@ -42,6 +33,17 @@ const CreateControl = observer(({ setCreateMode, resourceStore }) => {
             errorModal(er);
         }
     };
+
+    useKeydownListener("enter", () => {
+        onSave();
+    });
+
+    useEffect(() => {
+        const input = resourceNameInput.current;
+        if (input) {
+            input.focus();
+        }
+    }, []);
 
     return (
         <Input.Group>
@@ -79,17 +81,33 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
         selected,
         parentId,
         multiple,
-        enabledCls,
+        parentItem,
         getThisMsg,
-        disabledIds,
         getSelectedMsg,
+        getResourceClasses,
+        disableResourceIds,
         allowCreateResource,
         createNewGroupLoading,
     } = resourceStore;
 
+    const { getCheckboxProps } = usePickerCard({ resourceStore });
+
     const pickThisGroupAllowed = useMemo(() => {
-        return enabledCls.includes("resource_group");
-    }, [enabledCls]);
+        if (parentItem) {
+            const { disabled } = getCheckboxProps(parentItem.resource);
+            return !disabled;
+        }
+        return false;
+    }, [getCheckboxProps, parentItem]);
+
+    const possibleToCreate = useMemo(() => {
+        if (parentItem) {
+            return getResourceClasses([parentItem.resource.cls]).includes(
+                "resource_group"
+            );
+        }
+        return false;
+    }, [getResourceClasses, parentItem]);
 
     const onCreateClick = () => {
         resourceStore.clearSelection();
@@ -112,7 +130,9 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
     return (
         <Row justify="space-between">
             <Col>
-                {allowCreateResource && !createNewGroupLoading && (
+                {allowCreateResource &&
+                    possibleToCreate &&
+                    !createNewGroupLoading && (
                     <Tooltip title={createNewGroupMsg}>
                         <a
                             style={{ fontSize: "1.5rem" }}
@@ -140,7 +160,7 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
                     <Button
                         type="primary"
                         onClick={() => onOk(parentId)}
-                        disabled={disabledIds.includes(parentId)}
+                        disabled={disableResourceIds.includes(parentId)}
                     >
                         {getThisMsg}
                     </Button>
@@ -152,7 +172,7 @@ const MoveControl = observer(({ setCreateMode, resourceStore, onOk }) => {
     );
 });
 
-export const ResourcePickerModalFooter = observer(
+export const ResourcePickerFooter = observer(
     ({ resourceStore, onOk, ...props }) => {
         const [createMode, setCreateMode] = useState(false);
 
@@ -170,7 +190,7 @@ export const ResourcePickerModalFooter = observer(
     }
 );
 
-ResourcePickerModalFooter.propTypes = {
+ResourcePickerFooter.propTypes = {
     onOk: PropTypes.func,
     resourceStore: PropTypes.object,
 };
