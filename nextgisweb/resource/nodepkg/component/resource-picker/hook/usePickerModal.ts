@@ -13,8 +13,8 @@ interface UsePickerModalProps {
 const usePickerModal = ({
     cardOptions = {},
     height,
-    cardTitleHeight = 56,
-    cardFooterHeight = 56,
+    cardTitleHeight = 58,
+    cardFooterHeight = 58,
 }: UsePickerModalProps) => {
 
     const cardHeight = height - cardTitleHeight - cardFooterHeight;

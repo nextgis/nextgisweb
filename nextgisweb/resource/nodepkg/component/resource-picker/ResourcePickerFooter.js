@@ -52,24 +52,25 @@ const CreateControl = observer(({ setCreateMode, resourceStore }) => {
                     <Button
                         icon={<ArrowBack />}
                         onClick={() => setCreateMode(false)}
-                    ></Button>
+                    />
                 </Col>
                 <Col flex="auto">
                     <Input
-                        style={{ width: "calc(100% - 40px)" }}
                         value={resourceName}
                         onChange={(e) => {
                             setResourceName(e.target.value);
                         }}
                         ref={resourceNameInput}
                     />
+                </Col>
+                <Col>
                     <Button
                         type="primary"
                         icon={<DoneIcon />}
                         loading={childrenLoading}
                         disabled={!resourceName}
                         onClick={onSave}
-                    ></Button>
+                    />
                 </Col>
             </Row>
         </Input.Group>

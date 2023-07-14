@@ -76,7 +76,7 @@ export function ResourcePickerCard({
         <Card
             style={style}
             bodyStyle={bodyStyle}
-            className="resource-picker-card"
+            className="ngw-resource-resource-picker-card"
             {...cardOptions}
             title={
                 <ResourcePickerTitle
