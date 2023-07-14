@@ -3,25 +3,7 @@ import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
 
 import { ResourcePickerCard } from "./ResourcePickerCard";
-
-const minHeight = 400;
-const cardTitleHeight = 56;
-const cardFooterHeight = 56;
-const cardHeight = minHeight - cardTitleHeight - cardFooterHeight;
-
-const MODAL_DEFAULTS = {
-    centered: true,
-    width: "40em",
-    transitionName: "",
-    maskTransitionName: "",
-};
-
-const DEFAULT_STYLE = { width: "100%", height: minHeight };
-
-const DEFAULT_BODY_STYLE = {
-    height: cardHeight,
-    overflow: "auto",
-};
+import usePickerModal from "./hook/usePickerModal";
 
 export function ResourcePickerModal({
     visible: initVisible,
@@ -30,13 +12,12 @@ export function ResourcePickerModal({
     closeOnSelect = true,
     pickerOptions = {},
     cardOptions = {},
-    ...props
+    height: height_ = 400,
+    ...rest
 }) {
     const [visible, setVisible] = useState(initVisible ?? true);
 
-    cardOptions = cardOptions || {};
-    cardOptions.bodyStyle = cardOptions.bodyStyle || DEFAULT_BODY_STYLE;
-    cardOptions.style = cardOptions.style || DEFAULT_STYLE;
+    const { modalProps, cardProps } = usePickerModal({ height: height_, cardOptions, ...rest });
 
     const close = () => setVisible(false);
 
@@ -55,25 +36,18 @@ export function ResourcePickerModal({
 
     return (
         <Modal
-            {...MODAL_DEFAULTS}
-            {...props}
+            className="resource-picker-modal"
             open={visible}
             destroyOnClose
-            className="resource-picker-modal"
-            bodyStyle={{
-                overflowY: "auto",
-                minHeight: minHeight,
-                height: "calc(50vh - 200px)",
-                padding: "0",
-            }}
             footer={null}
             closable={false}
             onCancel={() => setVisible(false)}
+            {...modalProps}
         >
             <ResourcePickerCard
                 store={store}
                 pickerOptions={pickerOptions}
-                cardOptions={cardOptions}
+                cardOptions={cardProps}
                 onSelect={onPick}
                 onClose={close}
                 showClose
@@ -89,4 +63,5 @@ ResourcePickerModal.propTypes = {
     onSelect: PropTypes.func,
     store: PropTypes.object,
     visible: PropTypes.bool,
+    height: PropTypes.number,
 };
