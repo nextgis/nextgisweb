@@ -121,8 +121,8 @@ export const EditorWidget = observer(({ store }) => {
             dataSource={store.items.slice()}
             pagination={false}
             className="ngw-resmeta-editor-widget"
+            parentHeight
             size="small"
-            sticky
         >
             <Column
                 title={i18n.gettext("Key")}
@@ -138,7 +138,6 @@ export const EditorWidget = observer(({ store }) => {
             <Column
                 title={i18n.gettext("Type")}
                 dataIndex="type"
-                width="10em"
                 render={(_, record) => {
                     return <SelectType record={record} />;
                 }}
@@ -158,7 +157,6 @@ export const EditorWidget = observer(({ store }) => {
                 })}
             />
             <Column
-                width="32px"
                 render={(_, record) => {
                     if (!record.placeholder) {
                         return (

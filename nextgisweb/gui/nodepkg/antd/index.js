@@ -49,7 +49,7 @@ export {
     Spin,
     Steps,
     Switch,
-    Table,
+    // Table,
     Transfer,
     Tree,
     TreeSelect,
@@ -65,3 +65,4 @@ export { default as Calendar} from "./calendar";
 export { default as ConfigProvider} from "./config-provider";
 export { default as DatePicker } from "./date-picker";
 export { default as TimePicker } from "./time-picker";
+export { default as Table } from "./table";
