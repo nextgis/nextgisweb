@@ -66,9 +66,3 @@ class ResourceDescriptionWiget(Widget):
     resource = Resource
     operation = ('create', 'update')
     amdmod = '@nextgisweb/resource/description-editor'
-
-
-class ResourceDeleteWidget(Widget):
-    resource = Resource
-    operation = ('delete', )
-    amdmod = 'ngw-resource/DeleteWidget'
