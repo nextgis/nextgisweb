@@ -75,13 +75,5 @@ def _log_startup_time(level=logging.INFO):
         logger.log(level, "WSGI startup took %d msec", startup_time)
 
 
-deprecate('nextgisweb.component', 'nextgisweb.env', since='4.4.0.dev6', remove='4.5.0.dev0')
-deprecate('nextgisweb.db', 'nextgisweb.lib.db', since='4.4.0.dev6', remove='4.5.0.dev0')
-deprecate('nextgisweb.dynmenu', 'nextgisweb.lib.dynmenu', since='4.4.0.dev6', remove='4.5.0.dev0')
-deprecate('nextgisweb.event', 'nextgisweb.lib.legacy_event', since='4.4.0.dev6', remove='4.5.0.dev0')
-deprecate('nextgisweb.file_storage.models', 'nextgisweb.file_storage.model', since='4.4.0.dev6', remove='4.5.0.dev0')
-deprecate('nextgisweb.layer.models', 'nextgisweb.layer.model', since='4.4.0.dev6', remove='4.5.0.dev0')
-deprecate('nextgisweb.models', 'nextgisweb.env.model', since='4.4.0.dev6', remove='4.5.0.dev0')
-deprecate('nextgisweb.package', 'nextgisweb.env.package', since='4.4.0.dev6', remove='4.5.0.dev0')
-deprecate('nextgisweb.psection', 'nextgisweb.pyramid.psection', since='4.4.0.dev6', remove='4.5.0.dev0')
-deprecate('nextgisweb.registry', 'nextgisweb.lib.registry', since='4.4.0.dev6', remove='4.5.0.dev0')
+# NOTE: For hot module replacement with deprecation warning:
+# deprecate('nextgisweb.some', 'nextgisweb.lib.some', since='4.5.0.dev0', remove='4.6.0.dev0')

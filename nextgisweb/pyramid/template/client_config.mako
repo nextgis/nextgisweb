@@ -63,9 +63,6 @@
         "locale": request.locale_name,
         "aliases": [
             ['openlayers/ol', 'external-ol/ol'],
-            # TODO: Remove in 4.5.0
-            ['ngw/route', 'ngw-pyramid/route'],
-            ['ngw-pyramid/ErrorDialog/ErrorDialog', 'ngw-pyramid/ErrorDialog'],
         ],
     }
 %>
