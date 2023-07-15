@@ -87,7 +87,6 @@ export const ResourcePickerChildren = observer(({ resourceStore }) => {
             showHeader={false}
             dataSource={dataSource}
             rowKey="id"
-            pagination={false}
             size="middle"
             loading={resourcesLoading}
             rowSelection={

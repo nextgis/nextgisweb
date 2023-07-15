@@ -208,7 +208,6 @@ export function CatalogBrowse() {
                 loading={status === "loading"}
                 columns={columns}
                 dataSource={rows}
-                pagination={false}
             />
         </Space>
     );

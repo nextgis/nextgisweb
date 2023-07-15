@@ -239,7 +239,6 @@ export const AttachmentEditor = observer(({ store, extension }) => {
                     }
                     dataSource={dataSource}
                     columns={columns}
-                    pagination={false}
                     scroll={{ y: scrollY }}
                 ></Table>
             </Upload>

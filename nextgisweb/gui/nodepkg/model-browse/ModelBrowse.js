@@ -288,7 +288,6 @@ export function ModelBrowse({
                 loading={isLoading}
                 columns={columns_}
                 dataSource={filteredRows}
-                pagination={false}
                 size="middle"
                 {...tableProps}
             />

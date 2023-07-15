@@ -3,7 +3,12 @@ import { Table as TableBase } from "antd";
 
 import "./index.less";
 
-export default function Table({ className, parentHeight = false, ...props }) {
+export default function Table({
+    className,
+    parentHeight = false,
+    pagination = false,
+    ...props
+}) {
     const ref = useRef();
 
     useEffect(() => {
@@ -30,7 +35,7 @@ export default function Table({ className, parentHeight = false, ...props }) {
     return (
         <TableBase
             {...(parentHeight ? { ref } : {})}
-            {...{ className }}
+            {...{ pagination, className }}
             {...props}
         />
     );

@@ -146,7 +146,6 @@ export function StorageSummary() {
                 columns={columns}
                 dataSource={rows}
                 className="pyramid-storage-summary"
-                pagination={false}
                 size="middle"
                 summary={renderSummary}
             />

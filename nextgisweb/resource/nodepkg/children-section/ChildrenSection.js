@@ -387,7 +387,6 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
             <Table
                 dataSource={items}
                 rowKey="id"
-                pagination={false}
                 size="middle"
                 rowSelection={rowSelection}
             >

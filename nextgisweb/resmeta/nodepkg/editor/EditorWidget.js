@@ -119,7 +119,6 @@ export const EditorWidget = observer(({ store }) => {
         <Table
             rowKey="id"
             dataSource={store.items.slice()}
-            pagination={false}
             className="ngw-resmeta-editor-widget"
             parentHeight
             size="small"
