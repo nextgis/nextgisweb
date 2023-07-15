@@ -261,3 +261,4 @@ export const PermissionsWidget = observer(({ store }) => {
 });
 
 PermissionsWidget.title = i18n.gettext("Permissions");
+PermissionsWidget.order = 50;
