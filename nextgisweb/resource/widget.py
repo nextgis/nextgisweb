@@ -59,7 +59,7 @@ class ResourceWidget(Widget):
 class ResourcePermissionWidget(Widget):
     resource = Resource
     operation = ('update', )
-    amdmod = 'ngw-resource/PermissionWidget'
+    amdmod = '@nextgisweb/resource/permissions-widget'
 
 
 class ResourceDescriptionWiget(Widget):

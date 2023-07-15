@@ -1,38 +1,38 @@
-#: api.py:61
+#: api.py:118
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:105
+#: api.py:162
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:108
+#: api.py:165
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:111
+#: api.py:168
 #, python-format
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: api.py:117
+#: api.py:174
 #, python-format
 msgid "Resource class '%s' disabled."
 msgstr "Класс ресурса '%s' отключен."
 
-#: api.py:196
+#: api.py:253
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
-#: api.py:374
+#: api.py:431
 msgid "Not enough resource quota: {0} required, but only {1} available."
 msgstr "Превышена квота на количество ресурсов: {0} запрошено, доступно {1}."
 
-#: api.py:378
+#: api.py:435
 msgid "Resource type - {}."
 msgstr "Тип ресурса - {}."
 
-#: component.py:106
+#: component.py:103
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
@@ -84,150 +84,149 @@ msgstr "Доступ запрещен"
 msgid "Operational error"
 msgstr "Операционная ошибка"
 
-#: amd/ngw-resource/PermissionWidget.js:94 amd/ngw-resource/PermissionWidget.js:183
-#: amd/ngw-resource/Widget.js:32 amd/ngw-resource/form/ResourceLink.js:35
-#: model.py:79 scope.py:11
+#: amd/ngw-resource/form/ResourceLink.js:35 model.py:78
+#: nodepkg/editor-widget/EditorWidget.js:62 scope.py:12
 msgid "Resource"
 msgstr "Ресурс"
 
-#: model.py:238
+#: model.py:260
 msgid "Resource can not be a parent himself."
 msgstr "Ресурс не может быть родителем сам себе."
 
-#: model.py:251
+#: model.py:273
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:283
+#: model.py:305
 msgid "Default style"
 msgstr "Стиль по умолчанию"
 
-#: model.py:336
+#: model.py:358
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:342
+#: model.py:364
 #, python-format
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:347
+#: model.py:369
 #, python-format
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:469
+#: model.py:491
 #, python-format
 msgid "Maximum number of resources exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов. Лимит %s."
 
-#: model.py:473
+#: model.py:495
 #, python-format
 msgid "Maximum number of resources '%s' exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов '%s'. Лимит %s."
 
-#: model.py:546
+#: model.py:568
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: scope.py:13 scope.py:52 scope.py:64 scope.py:74 scope.py:87
+#: scope.py:14 scope.py:53 scope.py:65 scope.py:75 scope.py:88
 msgid "Read"
 msgstr "Чтение"
 
-#: amd/ngw-resource/CompositeWidget.js:80 scope.py:19
+#: amd/ngw-resource/CompositeWidget.js:80 scope.py:20
 msgid "Create"
 msgstr "Создать"
 
-#: scope.py:26 view.py:335
+#: scope.py:27 view.py:334
 msgid "Update"
 msgstr "Изменить"
 
-#: amd/ngw-resource/CompositeWidget.js:99 amd/ngw-resource/PermissionWidget.js:322
-#: nodepkg/children-section/ChildrenSection.js:286
-#: nodepkg/delete-page/DeletePage.js:49 scope.py:30 view.py:343
+#: amd/ngw-resource/CompositeWidget.js:99
+#: nodepkg/children-section/ChildrenSection.js:287
+#: nodepkg/children-section/util/createResourceTableItemOptions.js:5
+#: nodepkg/delete-page/DeletePage.js:49 scope.py:31 view.py:342
 msgid "Delete"
 msgstr "Удалить"
 
-#: scope.py:35
+#: scope.py:36
 msgid "Manage children"
 msgstr "Управление дочерними ресурсами"
 
-#: scope.py:38
+#: scope.py:39
 msgid "Change permissions"
 msgstr "Изменение прав доступа"
 
-#: scope.py:50
+#: scope.py:51
 msgid "Metadata"
 msgstr "Метаданные"
 
-#: scope.py:53 scope.py:65 scope.py:75 scope.py:88
+#: scope.py:54 scope.py:66 scope.py:76 scope.py:89
 msgid "Write"
 msgstr "Запись"
 
-#: scope.py:62
+#: scope.py:63
 msgid "Data structure"
 msgstr "Структура данных"
 
-#: scope.py:72
+#: scope.py:73
 msgid "Data"
 msgstr "Данные"
 
-#: scope.py:85
+#: scope.py:86
 msgid "Connection"
 msgstr "Соединение"
 
-#: scope.py:89 scope.py:101
+#: scope.py:90 scope.py:102
 msgid "Connect"
 msgstr "Соединение"
 
-#: scope.py:99
+#: scope.py:100
 msgid "Service"
 msgstr "Сервис"
 
-#: scope.py:102
+#: scope.py:103
 msgid "Configure"
 msgstr "Конфигурация"
 
-#: serialize.py:94
+#: serialize.py:93
 #, python-format
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: view.py:85 view.py:350
+#: view.py:84 view.py:349
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:97 view.py:356
+#: view.py:96 view.py:355
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:137 view.py:367
+#: view.py:136 view.py:366
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:144
+#: view.py:143
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
-#: view.py:154
+#: view.py:153
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:208 view.py:375
+#: view.py:207 view.py:374
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:232
+#: view.py:231
 #, python-format
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: amd/ngw-resource/PermissionWidget.js:66 amd/ngw-resource/PermissionWidget.js:133
-#: view.py:368
+#: nodepkg/permissions-widget/PermissionsWidget.js:21 view.py:367
 msgid "Action"
 msgstr "Действие"
 
-#: view.py:369
+#: view.py:368
 msgid "Extra"
 msgstr "Дополнительно"
 
@@ -264,104 +263,17 @@ msgstr "При проверке данных обнаружена ошибка. 
 msgid "Validation failed"
 msgstr "Валидация провалилась"
 
-#: amd/ngw-resource/PermissionWidget.js:57
-msgid "All resources"
-msgstr "Все ресурсы"
-
-#: amd/ngw-resource/PermissionWidget.js:58
-msgid "All permissions"
-msgstr "Все права"
-
-#: amd/ngw-resource/PermissionWidget.js:69 amd/ngw-resource/PermissionWidget.js:136
-msgid "Allow"
-msgstr "Разрешить"
-
-#: amd/ngw-resource/PermissionWidget.js:70 amd/ngw-resource/PermissionWidget.js:137
-msgid "Deny"
-msgstr "Запретить"
-
-#: amd/ngw-resource/PermissionWidget.js:76 amd/ngw-resource/PermissionWidget.js:142
-msgid "Principal"
-msgstr "Субъект"
-
-#: amd/ngw-resource/PermissionWidget.js:82 amd/ngw-resource/PermissionWidget.js:177
-msgid "Permission"
-msgstr "Право"
-
-#: amd/ngw-resource/PermissionWidget.js:104
-#: amd/ngw-resource/PermissionWidget.js:189
-msgid "Propagate"
-msgstr "Распространять"
-
-#: amd/ngw-resource/PermissionWidget.js:107
-#: nodepkg/effective-permissions/EffectivePermissions.js:9
-msgid "Yes"
-msgstr "Да"
-
-#: amd/ngw-resource/PermissionWidget.js:109
-#: nodepkg/effective-permissions/EffectivePermissions.js:10
-msgid "No"
-msgstr "Нет"
-
-#: amd/ngw-resource/PermissionWidget.js:120
-msgid "Permission item"
-msgstr "Элемент правил доступа"
-
-#: amd/ngw-resource/PermissionWidget.js:197 amd/ngw-resource/ResourcePicker.js:56
-msgid "OK"
-msgstr "ОК"
-
-#: amd/ngw-resource/PermissionWidget.js:206 amd/ngw-resource/ResourcePicker.js:65
-msgid "Cancel"
-msgstr "Отмена"
-
-#: amd/ngw-resource/PermissionWidget.js:240
-msgid "Permissions"
-msgstr "Права доступа"
-
-#: amd/ngw-resource/PermissionWidget.js:309
-msgid "Add"
-msgstr "Добавить"
-
-#: amd/ngw-resource/PermissionWidget.js:315
-msgid "Edit"
-msgstr "Изменить"
-
 #: amd/ngw-resource/ResourcePicker.js:31
 msgid "Select resource"
 msgstr "Выберите ресурс"
 
-#: amd/ngw-resource/template/Widget.hbs:8
-#: nodepkg/children-section/ChildrenSection.js:390
-#: nodepkg/resource-picker/resource-picker-children/ResourcePickerChildren.js:130
-#: template/resource_section_summary.mako:9
-msgid "Display name"
-msgstr "Наименование"
+#: amd/ngw-resource/ResourcePicker.js:56
+msgid "OK"
+msgstr "ОК"
 
-#: amd/ngw-resource/template/Widget.hbs:13
-msgid "Parent"
-msgstr "Родитель"
-
-#: amd/ngw-resource/template/Widget.hbs:18
-#: nodepkg/children-section/ChildrenSection.js:411
-#: template/resource_section_summary.mako:47
-msgid "Owner"
-msgstr "Владелец"
-
-#: amd/ngw-resource/template/Widget.hbs:23
-#: nodepkg/children-section/ChildrenSection.js:404
-#: template/resource_section_summary.mako:39
-msgid "Type"
-msgstr "Тип"
-
-#: amd/ngw-resource/template/Widget.hbs:28
-#: template/resource_section_summary.mako:18
-msgid "Keyname"
-msgstr "Ключ"
-
-#: amd/ngw-resource/template/Widget.hbs:29
-msgid "Identifier for API integration (optional)"
-msgstr "Идентификатор для API интеграции (необязательно)"
+#: amd/ngw-resource/ResourcePicker.js:65
+msgid "Cancel"
+msgstr "Отмена"
 
 #: nodepkg/children-section/ChildrenSection.js:27
 msgid "Please confirm resource deletion. This action cannot be undone."
@@ -383,61 +295,107 @@ msgstr "Ресурс перемещен"
 msgid "Resources have been moved"
 msgstr "Ресурсы перемещены"
 
-#: nodepkg/children-section/ChildrenSection.js:189
+#: nodepkg/children-section/ChildrenSection.js:190
 msgid "Moving resources"
 msgstr "Перемещение ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:220
+#: nodepkg/children-section/ChildrenSection.js:221
 msgid "Deleting resources"
 msgstr "Удаление ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:252
+#: nodepkg/children-section/ChildrenSection.js:253
 msgid "Turn off multiple selection"
 msgstr "Отключить множественный выбор"
 
-#: nodepkg/children-section/ChildrenSection.js:253
+#: nodepkg/children-section/ChildrenSection.js:254
 msgid "Select multiple resources"
 msgstr "Выбрать несколько ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:262
+#: nodepkg/children-section/ChildrenSection.js:263
 msgid "Hide resources volume"
 msgstr "Скрыть размер ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:263
+#: nodepkg/children-section/ChildrenSection.js:264
 msgid "Show resources volume"
 msgstr "Показать размер ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:272
+#: nodepkg/children-section/ChildrenSection.js:273
 msgid "Hide resource creation date"
 msgstr "Скрыть дату создания ресурса"
 
-#: nodepkg/children-section/ChildrenSection.js:273
+#: nodepkg/children-section/ChildrenSection.js:274
 msgid "Show resource creation date"
 msgstr "Показать дату создания ресурса"
 
-#: nodepkg/children-section/ChildrenSection.js:295
+#: nodepkg/children-section/ChildrenSection.js:296
 msgid "Not all of the selected can be deleted."
 msgstr "Не все выделенные ресурсы могут быть удалены."
 
-#: nodepkg/children-section/ChildrenSection.js:310
+#: nodepkg/children-section/ChildrenSection.js:311
 msgid "Move"
 msgstr "Переместить"
 
-#: nodepkg/children-section/ChildrenSection.js:324
+#: nodepkg/children-section/ChildrenSection.js:329
 msgid "Export vector layers"
 msgstr "Экспорт векторных слоёв"
 
-#: nodepkg/children-section/ChildrenSection.js:419
+#: nodepkg/children-section/ChildrenSection.js:394
+#: nodepkg/component/resource-picker/ResourcePickerChildren.js:122
+#: nodepkg/editor-widget/EditorWidget.js:14
+#: template/resource_section_summary.mako:8
+msgid "Display name"
+msgstr "Наименование"
+
+#: nodepkg/children-section/ChildrenSection.js:408
+#: template/resource_section_summary.mako:38
+msgid "Type"
+msgstr "Тип"
+
+#: nodepkg/children-section/ChildrenSection.js:415
+#: nodepkg/editor-widget/EditorWidget.js:34
+#: template/resource_section_summary.mako:46
+msgid "Owner"
+msgstr "Владелец"
+
+#: nodepkg/children-section/ChildrenSection.js:423
 msgid "Created"
 msgstr "Дата создания"
 
-#: nodepkg/children-section/ChildrenSection.js:438
+#: nodepkg/children-section/ChildrenSection.js:442
 msgid "Volume"
 msgstr "Размер"
+
+#: nodepkg/children-section/util/createResourceTableItemOptions.js:4
+msgid "Change"
+msgstr "Изменить"
 
 #: nodepkg/children-section/util/forEachSelected.js:5
 msgid "Operation in progress"
 msgstr "Выполняется операция"
+
+#: nodepkg/component/resource-picker/ResourcePickerFooter.js:17
+msgid "Create group"
+msgstr "Создать группу"
+
+#: nodepkg/component/resource-picker/ResourcePickerFooter.js:18
+msgid "Clear selection"
+msgstr "Очистить выделение"
+
+#: nodepkg/component/resource-picker/ResourcePickerTitle.js:18
+msgid "Go to initial group"
+msgstr "Вернуться в исходную группу"
+
+#: nodepkg/component/resource-picker/ResourcePickerTitle.js:19
+msgid "Refresh"
+msgstr "Обновить"
+
+#: nodepkg/component/resource-picker/store/locale.js:4
+msgid "Pick this group"
+msgstr "Выбрать эту группу"
+
+#: nodepkg/component/resource-picker/store/locale.js:5
+msgid "Pick selected"
+msgstr "Выбрать отмеченное"
 
 #: nodepkg/delete-page/DeletePage.js:36
 msgid "Confirm deletion of the resource"
@@ -446,6 +404,27 @@ msgstr "Подтвердить удаление ресурса"
 #: nodepkg/description-editor/DescriptionEditorWidget.js:18
 msgid "Description"
 msgstr "Описание"
+
+#: nodepkg/editor-widget/EditorWidget.js:24
+msgid "Parent"
+msgstr "Родитель"
+
+#: nodepkg/editor-widget/EditorWidget.js:46
+#: template/resource_section_summary.mako:17
+msgid "Keyname"
+msgstr "Ключ"
+
+#: nodepkg/editor-widget/EditorWidget.js:50
+msgid "Identifier for API integration (optional)"
+msgstr "Идентификатор для API интеграции (необязательно)"
+
+#: nodepkg/effective-permissions/EffectivePermissions.js:12
+msgid "Yes"
+msgstr "Да"
+
+#: nodepkg/effective-permissions/EffectivePermissions.js:12
+msgid "No"
+msgstr "Нет"
 
 #: nodepkg/export-settings/ExportSettings.js:29
 msgid "The setting is saved."
@@ -483,47 +462,70 @@ msgstr ""
 msgid "Read more"
 msgstr "Подробнее"
 
-#: nodepkg/resource-picker/resource-picker-modal/ResourcePickerModalFooter.js:15
-msgid "Create group"
-msgstr "Создать группу"
+#: nodepkg/permissions-widget/PermissionsStore.js:6
+msgid "All fields are required"
+msgstr "Необходимо заполнить все поля"
 
-#: nodepkg/resource-picker/resource-picker-modal/ResourcePickerModalFooter.js:16
-msgid "Clear selection"
-msgstr "Очистить выделение"
+#: nodepkg/permissions-widget/PermissionsStore.js:7
+msgid "Row conflicts with another"
+msgstr "Конфликт строк"
 
-#: nodepkg/resource-picker/resource-picker-modal/ResourcePickerModalTitle.js:18
-msgid "Go to initial group"
-msgstr "Вернуться в исходную группу"
+#: nodepkg/permissions-widget/PermissionsWidget.js:22
+msgid "Principal"
+msgstr "Субъект"
 
-#: nodepkg/resource-picker/resource-picker-modal/ResourcePickerModalTitle.js:19
-msgid "Refresh"
-msgstr "Обновить"
+#: nodepkg/permissions-widget/PermissionsWidget.js:23
+msgid "Apply to"
+msgstr "Применить для"
 
-#: nodepkg/resource-picker/store/ResourcePickerStore.js:7
-msgid "Pick this group"
-msgstr "Выбрать эту группу"
+#: nodepkg/permissions-widget/PermissionsWidget.js:24
+msgid "Permission"
+msgstr "Право"
 
-#: nodepkg/resource-picker/store/ResourcePickerStore.js:9
-msgid "Pick selected"
-msgstr "Выбрать отмеченное"
+#: nodepkg/permissions-widget/PermissionsWidget.js:26
+msgid "Add"
+msgstr "Добавить"
+
+#: nodepkg/permissions-widget/PermissionsWidget.js:27
+msgid "Allow"
+msgstr "Разрешить"
+
+#: nodepkg/permissions-widget/PermissionsWidget.js:28
+msgid "Deny"
+msgstr "Запретить"
+
+#: nodepkg/permissions-widget/PermissionsWidget.js:30
+msgid "This and subresources"
+msgstr "Этого и дочерних ресурсов"
+
+#: nodepkg/permissions-widget/PermissionsWidget.js:31
+msgid "This resource only"
+msgstr "Только этого ресурса"
+
+#: nodepkg/permissions-widget/PermissionsWidget.js:33
+msgid "All permissions"
+msgstr "Все права"
+
+#: nodepkg/permissions-widget/PermissionsWidget.js:263
+msgid "Permissions"
+msgstr "Права доступа"
 
 #: nodepkg/resources-filter/ResourcesFilter.js:114
 msgid "Resources not found"
 msgstr "Ресурсы не найдены"
 
-#: nodepkg/resources-filter/ResourcesFilter.js:119
+#: nodepkg/resources-filter/ResourcesFilter.js:120
 msgid "Search resources"
 msgstr "Поиск ресурсов"
 
-#: template/resource_section_description.mako:9
+#: template/resource_section_description.mako:8
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
 
-#: template/resource_section_external_access.mako:4
+#: template/resource_section_external_access.mako:3
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: template/resource_section_external_access.mako:17
+#: template/resource_section_external_access.mako:16
 msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
-

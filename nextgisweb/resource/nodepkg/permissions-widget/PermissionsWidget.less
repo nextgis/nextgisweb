@@ -1,0 +1,44 @@
+.ngw-resource-permissions-widget {
+    height: 100%;
+
+    .ant-table {
+        td.ant-table-cell:not(.menu) {
+            padding-left: 0;
+            padding-right: 0;
+            .ant-select > .ant-select-selector {
+                padding: 0;
+                margin-left: 8px;
+                margin-right: 8px;
+            }
+        }
+
+        .ant-table-cell {
+            &.action {
+                min-width: var(--mw-action);
+                .ant-select-selection-placeholder {
+                    color: var(--primary-text);
+                }
+            }
+
+            &.principal,
+            &.permission {
+                width: 50%;
+            }
+
+            &.apply {
+                min-width: var(--mw-apply);
+            }
+
+            &.action,
+            &.apply,
+            &.menu {
+                white-space: nowrap;
+                width: 0%;
+            }
+        }
+
+        td.ant-table-cell.menu {
+            text-align: right;
+        }
+    }
+}
