@@ -25,7 +25,7 @@ const withChunks = (ep) => `import "@nextgisweb/jsrealm/with-chunks!${ep}"`;
 const addCode = (fn, code) => `imports-loader?additionalCode=${encodeURI(code).replace("!", "%21")}!${fn}`;
 
 const vImport = (fn, code) => fn + "!=!data:text/javascript;base64," + Buffer.from(code).toString("base64");
-const stripIndex = (m) => m.replace(/(?:\/index)?\.(js|ts)$/, "");
+const stripIndex = (m) => m.replace(/(?:\/index)?\.(js|tsx?)$/, "");
 
 const logger = require('webpack/lib/logging/runtime').getLogger("jsrealm");
 
@@ -44,7 +44,7 @@ if (presetEnvOptIndex !== -1) {
 function scanForEntries() {
     const result = [];
     for (const pkg of config.packages) {
-        for (const candidate of glob.sync("**/*.{js,ts}", {
+        for (const candidate of glob.sync("**/*.{js,ts,tsx}", {
             cwd: pkg.path,
             ignore: ["node_modules/**", "contrib/**"],
         })) {
@@ -249,7 +249,7 @@ module.exports = (env) => ({
                 ],
             },
             {
-                test: /\.(m?js|ts?)$/,
+                test: /\.(m?js|tsx?)$/,
                 // In development mode exclude everything in node_modules for
                 // better performance. In production mode exclude only specific
                 // packages for better browser compatibility.
@@ -290,7 +290,7 @@ module.exports = (env) => ({
         ],
     },
     resolve: {
-        extensions: [".ts", "..."],
+        extensions: ['.tsx', ".ts", "..."],
         plugins: [ new IconResolverPlugin() ],
     },
     plugins: [

@@ -2,9 +2,11 @@ const babelConfigPath = require.resolve('@nextgisweb/jsrealm/babelrc.cjs');
 
 module.exports = {
     root: true,
+    parser: '@typescript-eslint/parser',
     plugins: ["requirejs", "react"],
     extends: [
         "eslint:recommended",
+        'plugin:@typescript-eslint/recommended',
         "plugin:requirejs/recommended",
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",

@@ -2,6 +2,7 @@ import json
 from itertools import chain
 from pathlib import Path
 from subprocess import check_call
+from typing import List
 
 from nextgisweb.env import Env
 from nextgisweb.env.cli import EnvCommand, comp_cli
@@ -13,6 +14,38 @@ from nextgisweb.pyramid import PyramidComponent
 from nextgisweb.pyramid.uacompat import FAMILIES
 
 from .util import scan_for_icons, scan_for_nodepkgs
+
+
+def create_tsconfig(npkgs: List[str]):
+
+    compiler_options = dict(
+        target="es5",
+        lib=["dom", "dom.iterable", "esnext"],
+        allowJs=True,
+        skipLibCheck=True,
+        esModuleInterop=True,
+        strict=False,
+        moduleResolution= "node",
+        resolveJsonModule= True,
+        isolatedModules=True,
+        noEmit=True,
+        allowSyntheticDefaultImports=True,
+        forceConsistentCasingInFileNames= True,
+        noFallthroughCasesInSwitch= True,
+        module="esnext",
+        jsx= "react-jsx",
+        baseUrl= ".",
+        paths= {
+            "react": ["./node_modules/@types/react"]
+        }
+    )
+    tsconfig_json = dict(
+        compilerOptions=compiler_options,
+        include = ['{}/**/*'.format(pkg) for pkg in npkgs]
+    )
+
+    with open('tsconfig.json', 'w') as fd:
+        fd.write(json.dumps(tsconfig_json, indent=4))
 
 
 @comp_cli.command()
@@ -78,5 +111,7 @@ def install(
 
     with open('package.json', 'w') as fd:
         fd.write(json.dumps(package_json, indent=4))
+
+    create_tsconfig(npkgs)
 
     check_call(['yarn', 'install'])
