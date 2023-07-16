@@ -78,7 +78,7 @@ class Item {
         } else if (this.propagate === true) {
             return Object.keys(blueprint.scopes);
         }
-        return [];
+        return resourceScopes('resource');
     }
 
     get error() {
