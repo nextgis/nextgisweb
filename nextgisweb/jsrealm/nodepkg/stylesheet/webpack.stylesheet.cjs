@@ -40,9 +40,8 @@ module.exports = {
                             lessOptions: {
                                 rootpath: stylesheetRoot + "/css",
                                 globalVars: {
-                                    node_modules: path.resolve(
-                                        "./node_modules"
-                                    ),
+                                    node_modules:
+                                        path.resolve("./node_modules"),
                                 },
                                 javascriptEnabled: true,
                             },

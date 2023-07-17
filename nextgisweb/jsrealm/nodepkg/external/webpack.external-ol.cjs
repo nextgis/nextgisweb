@@ -2,15 +2,14 @@ const path = require("path");
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 const config = require("@nextgisweb/jsrealm/config.cjs");
 
 const entry = path.resolve(path.join(__dirname, "contrib/ol/entry.js"));
 const index = path.resolve(path.join(__dirname, "contrib/ol/index.js"));
 
-// Exclude large modules from explicit including into the bundle. But they still can
-// be implicit included by other modules.
+// Exclude large modules from explicit including into the bundle. But they still
+// can be implicit included by other modules.
 const EXCLUDE = [
     "ol/format/EsriJSON",
     "ol/format/GML",
@@ -71,7 +70,7 @@ function importReplace(match) {
     }
 
     for (const m of EXCLUDE) {
-        if (modname == m || modname.startsWith(m + "/")) {
+        if (modname === m || modname.startsWith(m + "/")) {
             return `const ${varname} = undefined;`;
         }
     }
@@ -99,7 +98,7 @@ module.exports = {
                             // Fix missing imports and remove unused
                             search: /^import .*$/gim,
                             replace: importReplace,
-                        }
+                        },
                     ],
                 },
             },
@@ -117,7 +116,7 @@ module.exports = {
                         ],
                     ],
                 },
-        },
+            },
             {
                 test: /\.css$/i,
                 use: ["style-loader", "css-loader"],

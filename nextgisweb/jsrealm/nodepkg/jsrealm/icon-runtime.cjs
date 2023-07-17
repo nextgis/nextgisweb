@@ -1,5 +1,5 @@
-const { stringifyRequest } = require('loader-utils');
-const { stringifySymbol } = require('svg-sprite-loader/lib/utils');
+const { stringifyRequest } = require("loader-utils");
+const { stringifySymbol } = require("svg-sprite-loader/lib/utils");
 
 module.exports = function ({ symbol, config, context }) {
     const { spriteModule, symbolModule } = config;
@@ -26,5 +26,4 @@ module.exports = function ({ symbol, config, context }) {
 
         export default Icon;
     `;
-
 };

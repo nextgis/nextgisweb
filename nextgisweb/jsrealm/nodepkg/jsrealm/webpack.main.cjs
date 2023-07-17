@@ -13,7 +13,6 @@ const CopyPlugin = require("copy-webpack-plugin");
 const { IconResolverPlugin, symbolId } = require("./icon-util.cjs");
 const tagParser = require("./tag-parser.cjs");
 
-
 // Inject the following construction into each entrypoint module
 // at compilation time:
 //
@@ -22,12 +21,19 @@ const tagParser = require("./tag-parser.cjs");
 // This import is handled by AMD loader and loads all chunks
 // required by the entrypoint.
 const withChunks = (ep) => `import "@nextgisweb/jsrealm/with-chunks!${ep}"`;
-const addCode = (fn, code) => `imports-loader?additionalCode=${encodeURI(code).replace("!", "%21")}!${fn}`;
 
-const vImport = (fn, code) => fn + "!=!data:text/javascript;base64," + Buffer.from(code).toString("base64");
+const addCode = (fn, code) =>
+    "imports-loader?additionalCode=" +
+    encodeURI(code).replace("!", "%21") +
+    `!${fn}`;
+
+const vImport = (fn, code) =>
+    `${fn}!=!data:text/javascript;base64,` +
+    Buffer.from(code).toString("base64");
+
 const stripIndex = (m) => m.replace(/(?:\/index)?\.(js|tsx?)$/, "");
 
-const logger = require('webpack/lib/logging/runtime').getLogger("jsrealm");
+const logger = require("webpack/lib/logging/runtime").getLogger("jsrealm");
 
 const babelOptions = require("./babelrc.cjs");
 const presetEnvOptIndex = babelOptions.presets.findIndex(
@@ -35,9 +41,9 @@ const presetEnvOptIndex = babelOptions.presets.findIndex(
 );
 if (presetEnvOptIndex !== -1) {
     const presetEnvOpt = babelOptions.presets[presetEnvOptIndex];
-    if (presetEnvOpt && typeof presetEnvOpt[1] === 'object') {
+    if (presetEnvOpt && typeof presetEnvOpt[1] === "object") {
         presetEnvOpt[1].targets = config.targets;
-        babelOptions.presets[presetEnvOptIndex] = presetEnvOpt
+        babelOptions.presets[presetEnvOptIndex] = presetEnvOpt;
     }
 }
 
@@ -48,10 +54,10 @@ function scanForEntries() {
             cwd: pkg.path,
             ignore: ["node_modules/**", "contrib/**"],
         })) {
-            const fn = pkg.path + "/" + candidate
+            const fn = pkg.path + "/" + candidate;
             const tag = tagParser(fn);
             if (tag) {
-                tag.entry = pkg.name + '/' + stripIndex(candidate);
+                tag.entry = pkg.name + "/" + stripIndex(candidate);
                 tag.fullname = path.resolve(fn);
                 result.push(tag);
             }
@@ -106,8 +112,8 @@ function scanLocales(moduleName) {
         const m = filename.match(/\/([a-z]{2}(?:[-_][a-z]{2})?)\.js$/i);
         if (m) {
             const original = m[1];
-            const key = original.replace('_', '-').toLowerCase();
-            result[key] = {key, original, filename};
+            const key = original.replace("_", "-").toLowerCase();
+            result[key] = { key, original, filename };
         }
     }
     return result;
@@ -132,12 +138,10 @@ function lookupLocale(key, map) {
 
     for (const c of test) {
         const m = map[c];
-        if (m) { return m; }
+        if (m) return m;
     }
 
-    if (key !== 'en') {
-        return lookupLocale('en', map);
-    }
+    if (key !== "en") return lookupLocale("en", map);
 
     throw "Locale 'en' not found!";
 }
@@ -147,7 +151,8 @@ const dayjsLocales = scanLocales("dayjs");
 
 const localeOutDir = path.resolve(
     require.resolve("@nextgisweb/jsrealm/locale-loader"),
-    "..", "locale");
+    "../locale"
+);
 
 for (const lang of config.locales) {
     const entry = `@nextgisweb/jsrealm/locale/${lang}`;
@@ -161,10 +166,10 @@ for (const lang of config.locales) {
         `import dayjs from "@nextgisweb/gui/dayjs";`,
         `import "${dayjs.filename}";`,
         `dayjs.locale('${dayjs.original}');`,
-    ].join('\n');
+    ].join("\n");
 
     staticEntries[entry] = {
-        import: vImport(path.join(localeOutDir, lang + '.js'), code),
+        import: vImport(path.join(localeOutDir, lang + ".js"), code),
         library: { type: "amd", name: entry },
     };
 }
@@ -175,17 +180,19 @@ const materialIcons = [];
 for (const [comp, dir] of Object.entries(config.iconSources)) {
     const realDir = fs.realpathSync(dir);
     for (let fn of glob.sync(`${realDir}/**/*.svg`)) {
-        const id = ("icon-" + comp + "-" +
-            path.relative(realDir, fn).replace(/\.svg$/, "")
-        ).replace(/\w+-resource\/(\w+)/, (m, p) => `rescls-${p}`);
+        const relSvgPath = path.relative(realDir, fn).replace(/\.svg$/, "");
+        const id = (`icon-${comp}-` + relSvgPath).replace(
+            /\w+-resource\/(\w+)/,
+            (m, p) => `rescls-${p}`
+        );
         sharedIconIds[fs.realpathSync(fn)] = id;
     }
 
-    const materialBase = path.resolve('./node_modules/@material-icons/svg/svg');
+    const materialBase = path.resolve("./node_modules/@material-icons/svg/svg");
     for (const fn of glob.sync(`${realDir}/material.json`)) {
         const body = JSON.parse(fs.readFileSync(fn));
         for (let ref of body) {
-            if (ref.match(/\w+/)) { ref = ref + '/baseline' }
+            if (ref.match(/\w+/)) ref = ref + "/baseline";
             materialIcons.push(`${materialBase}/${ref}.svg`);
         }
     }
@@ -221,17 +228,16 @@ const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
 
     done(manifest) {
         // Piggyback on the assets manifest hook to write testentry.json
-        const fn = manifest.compiler.outputPath + '/testentry.json';
+        const fn = manifest.compiler.outputPath + "/testentry.json";
         fs.writeFileSync(fn, JSON.stringify(testentries));
-    }
-
+    },
 });
 
 module.exports = (env) => ({
     mode: config.debug ? "development" : "production",
     devtool: config.debug ? "source-map" : false,
     bail: !env.WEBPACK_WATCH,
-    entry: () => ({...staticEntries, ...dynamicEntries()}),
+    entry: () => ({ ...staticEntries, ...dynamicEntries() }),
     module: {
         rules: [
             {
@@ -243,9 +249,9 @@ module.exports = (env) => ({
                         options: {
                             imports: Object.keys(sharedIconIds)
                                 .concat(materialIcons)
-                                .map((fn) => `side-effects ${fn}`)
-                        }
-                    }
+                                .map((fn) => `side-effects ${fn}`),
+                        },
+                    },
                 ],
             },
             {
@@ -253,11 +259,9 @@ module.exports = (env) => ({
                 // In development mode exclude everything in node_modules for
                 // better performance. In production mode exclude only specific
                 // packages for better browser compatibility.
-                exclude: config.debug ? /node_modules/ : [
-                    /node_modules\/core-js/,
-                    /node_modules\/react/,
-                    /node_modules\/react-dom/,
-                ],
+                exclude: config.debug
+                    ? /node_modules/
+                    : /node_modules\/(core-js|react|react-dom)/,
                 resolve: { fullySpecified: false },
                 use: babelLoader,
             },
@@ -276,27 +280,31 @@ module.exports = (env) => ({
                     {
                         loader: "svg-sprite-loader",
                         options: {
-                            runtimeGenerator: require.resolve("./icon-runtime.cjs"),
+                            runtimeGenerator:
+                                require.resolve("./icon-runtime.cjs"),
                             symbolId: (fn) => {
                                 const shared = sharedIconIds[fn];
                                 if (shared) return shared;
                                 return symbolId(fn);
-                            }
-                        }
+                            },
+                        },
                     },
                     "svgo-loader",
-                ]
-            }
+                ],
+            },
         ],
     },
     resolve: {
-        extensions: ['.tsx', ".ts", "..."],
-        plugins: [ new IconResolverPlugin() ],
+        extensions: [".tsx", ".ts", "..."],
+        plugins: [new IconResolverPlugin()],
     },
     plugins: [
         new CleanWebpackPlugin(),
         new DefinePlugin({
-            JSREALM_PLUGIN_REGISTRY: DefinePlugin.runtimeValue(() => JSON.stringify(plugins), true),
+            JSREALM_PLUGIN_REGISTRY: DefinePlugin.runtimeValue(
+                () => JSON.stringify(plugins),
+                true
+            ),
         }),
         new CopyPlugin({
             // Copy @nextgisweb/jsrealm/with-chunks!entry-name loader directly
@@ -314,7 +322,7 @@ module.exports = (env) => ({
         ...config.bundleAnalyzerPlugins,
     ],
     output: {
-        enabledLibraryTypes: ['amd'],
+        enabledLibraryTypes: ["amd"],
         path: path.resolve(config.rootPath, "dist/main"),
         filename: (pathData) =>
             pathData.chunk.name !== undefined ? "[name].js" : "chunk/[name].js",
@@ -330,15 +338,16 @@ module.exports = (env) => ({
             // Use AMD loader for all entrypoints.
             const requestModule = request.replace(/!.*$/, "");
             if (isDynamicEntry(requestModule)) {
-                if (['@nextgisweb/pyramid/i18n'].includes(requestModule)) {
+                if (["@nextgisweb/pyramid/i18n"].includes(requestModule)) {
                     const loader = /(!.*|)$/.exec(request)[1];
-                    if (loader === '' || loader === '!') {
-                        const compId = /(?:\/nextgisweb_|\/)(\w+)\/nodepkg(?:$|\/)/.exec(context)[1];
+                    if (loader === "" || loader === "!") {
+                        const re = /(?:\/nextgisweb_|\/)(\w+)\/nodepkg(?:$|\/)/;
+                        const compId = re.exec(context)[1];
                         const newRequest = `${requestModule}!${compId}`;
-                        logger.debug(`"${request}" replaced with "${newRequest}"`);
+                        logger.debug(
+                            `"${request}" replaced with "${newRequest}"`
+                        );
                         request = newRequest;
-                    } else {
-                        logger.warn(`Consider dropping "${loader}" in "${request}" for nextgisweb >= 4.5.dev3`);
                     }
                 }
                 return callback(null, `amd ${request}`);
@@ -352,7 +361,7 @@ module.exports = (env) => ({
             }
 
             // Legacy component AMD modules
-            if (request.startsWith('ngw-')) {
+            if (request.startsWith("ngw-")) {
                 return callback(null, `amd ${request}`);
             }
 

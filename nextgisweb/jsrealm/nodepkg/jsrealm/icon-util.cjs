@@ -1,27 +1,40 @@
-exports.IconResolverPlugin = class IconResolverPlugin {
-    apply(resolver) {
-        const target = resolver.ensureHook(this.target);
-        resolver.getHook("resolve").tapAsync(
-            "IconResolverPlugin", (request, resolveContext, callback) => {
-                const req = request.request;
-                if (req.startsWith("@material-icons/svg/")) {
-                    const m = req.match(/\@material-icons\/svg\/(?:svg\/)?(?<glyph>\w+)(?:\/(?<variant>\w+))?(?:\.svg)?/);
-                    if (m) {
-                        const { glyph, variant } = m.groups;
-                        const newRequest = "@material-icons/svg/svg/" + glyph + "/" + (variant || "baseline") + ".svg";
-                        request.request = newRequest;
-                    }
-                }
-                callback();
-            }
-        );
+// prettier-ignore
+const reReq = /@material-icons\/(?:svg\/){1,2}(?<glyph>\w+)(?:\/(?<variant>\w+))?(?:\.svg)?/,
+    reFname = /node_modules\/@material-icons\/svg\/svg\/(?<glyph>\w+)\/(?<variant>\w+)\.svg/;
+
+function glyphAndVariant(req) {
+    const match = req.match(reReq);
+    if (match) {
+        const { glyph, variant } = match.groups;
+        return glyph + "/" + (variant || "baseline");
     }
 }
 
-exports.symbolId = (fn) => {
-    const material = fn.match(/node_modules\/@material-icons\/svg\/svg\/(?<glyph>\w+)\/(?<variant>\w+)\.svg/);
-    if (material) {
-        const {glyph, variant} = material.groups;
-        return `icon-material-${glyph}` + (variant === "baseline" ? "" : `-${variant}`);
+exports.IconResolverPlugin = class IconResolverPlugin {
+    apply(resolver) {
+        resolver
+            .getHook("resolve")
+            .tapAsync(
+                "IconResolverPlugin",
+                (request, resolveContext, callback) => {
+                    const fn = request.request;
+                    const gv = glyphAndVariant(fn);
+                    if (gv) {
+                        request.request = `@material-icons/svg/svg/${gv}.svg`;
+                    }
+                    callback();
+                }
+            );
     }
-}
+};
+
+exports.symbolId = (fn) => {
+    const match = fn.match(reFname);
+    if (match) {
+        const { glyph, variant } = match.groups;
+        return (
+            `icon-material-${glyph}` +
+            (variant === "baseline" ? "" : `-${variant}`)
+        );
+    }
+};

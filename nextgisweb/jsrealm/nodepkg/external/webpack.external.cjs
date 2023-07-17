@@ -36,7 +36,7 @@ function addPackage(name, options) {
     options.info = options.info || { minimized: true };
 
     if (options.transform === null) {
-        options.transform = content => content;
+        options.transform = (content) => content;
     }
     options.transform =
         options.transform !== undefined ? options.transform : minify;

@@ -5,8 +5,8 @@ module.exports = {
         [
             "@babel/preset-react",
             {
-                "runtime": "automatic"
-            }
+                "runtime": "automatic",
+            },
         ],
         [
             "@babel/preset-env",
@@ -15,8 +15,8 @@ module.exports = {
                 "useBuiltIns": "usage",
                 // The "targets" key doesn't work with "@babel/eslint-parser".
                 // So it's defined in webpack config.
-            }
-        ]
+            },
+        ],
     ],
-    "plugins": ["@babel/plugin-transform-runtime"]
-}
+    "plugins": ["@babel/plugin-transform-runtime"],
+};
