@@ -1,18 +1,19 @@
-import { toJS, makeAutoObservable } from "mobx";
+import { makeAutoObservable } from "mobx";
+
 import i18n from "@nextgisweb/pyramid/i18n";
 
-class Record {
-    key;
-    value;
-    placeholder;
+let idSeq = 0;
 
-    constructor({ store, id, key, value, placeholder = false }) {
+class Record {
+    key = undefined;
+    value = undefined;
+
+    constructor(store, { key, value }) {
         makeAutoObservable(this);
         this.store = store;
-        this.id = id;
+        this.id = ++idSeq;
         this.key = key;
         this.value = value;
-        this.placeholder = placeholder;
     }
 
     get type() {
@@ -78,55 +79,69 @@ class Record {
             }
         }
 
-        this.placeholder = false;
-        this.store.addPlaceholder();
+        this.store.dirty = true;
+
+        this.store.rotatePlaceholder();
     }
 }
 
 export class EditorStore {
     identity = "resmeta";
-    items = [];
-    nextId = 0;
+
+    items = null;
+    dirty = false;
 
     constructor() {
         makeAutoObservable(this, { identity: false });
-        this.addPlaceholder();
+        this.items = [];
+
+        this.rotatePlaceholder();
     }
 
     load(value) {
         this.items = Object.entries(value.items).map(
-            ([key, value], id) => new Record({ store: this, id, key, value })
+            ([key, value]) => new Record(this, { key, value })
         );
-        this.nextId = this.items.length;
-        this.addPlaceholder();
+        this.dirty = false;
     }
 
     dump() {
-        const items = {};
-        this.items.forEach((itm) => {
-            items[itm.key] = itm.value;
-        });
-        return { items: toJS(items) };
+        if (!this.dirty) return undefined;
+        const items = Object.fromEntries(
+            this.items.map((i) => [i.key, i.value])
+        );
+        return { items };
     }
 
     get isValid() {
+        this.validate = true;
         return this.items.every((r) => r.error === false);
     }
 
-    delete(id) {
-        this.items = this.items.filter((itm) => itm.id !== id);
-        this.addPlaceholder();
+    // EdiTable
+
+    validate = false;
+    placeholder = null;
+
+    get rows() {
+        return this.items;
     }
 
-    addPlaceholder() {
-        if (
-            this.items.length == 0 ||
-            !this.items[this.items.length - 1].placeholder
-        ) {
-            this.items.push(
-                new Record({ store: this, id: this.nextId, placeholder: true })
-            );
-            this.nextId++;
-        }
+    rotatePlaceholder() {
+        if (this.placeholder && !this.placeholder.key) return;
+        this.placeholder && this.items.push(this.placeholder);
+        this.placeholder = new Record(this, {});
+    }
+
+    deleteRow(row) {
+        this.rows.splice(this.rows.indexOf(row), 1);
+        this.dirty = true;
+    }
+
+    cloneRow(row) {
+        const idx = this.items.indexOf(row);
+        const data = { key: row.key, value: row.value };
+        this.items.splice(idx + 1, 0, new Record(this, data));
+        this.dirty = true;
     }
 }

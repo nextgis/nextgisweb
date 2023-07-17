@@ -1,84 +1,59 @@
-import DeleteForeverIcon from "@material-icons/svg/delete_forever";
-import ErrorIcon from "@material-icons/svg/error";
 import { observer } from "mobx-react-lite";
-import {
-    Table,
-    Tooltip,
-    Input,
-    InputNumber,
-    Select,
-    Button,
-} from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
-import "./EditorWidget.less";
 
-const { Column } = Table;
+import { Input, InputNumber, Select } from "@nextgisweb/gui/antd";
+import { EdiTable } from "@nextgisweb/gui/edi-table";
+
+import i18n from "@nextgisweb/pyramid/i18n";
+
+const mTypeToAdd = i18n.gettext("Type here to add a new key...");
+
 const { Option } = Select;
 
-const KeyError = observer(({ record }) => {
-    if (record.error) {
-        return (
-            <Tooltip title={record.error}>
-                <span style={{ color: "var(--error)" }}>
-                    <ErrorIcon />
-                </span>
-            </Tooltip>
-        );
-    } else {
-        return <span />;
-    }
-});
-
-const InputKey = observer(({ record }) => {
+const InputKey = observer(({ row, placeholder }) => {
     return (
         <Input
-            value={record.key}
+            value={row.key}
             onChange={(e) => {
                 const props = { key: e.target.value };
-                if (record.value == undefined) {
+                if (row.value == undefined) {
                     props.value = "";
                 }
-                record.update(props);
+                row.update(props);
             }}
-            suffix={<KeyError record={record} />}
             bordered={false}
-            placeholder={
-                record.placeholder
-                    ? i18n.gettext("Type here to add a new key...")
-                    : undefined
-            }
+            placeholder={placeholder ? mTypeToAdd : undefined}
         />
     );
 });
 
-const InputValue = observer(({ record }) => {
-    if (record.type === "string") {
+const InputValue = observer(({ row }) => {
+    if (row.type === "string") {
         return (
             <Input
-                value={record.value}
+                value={row.value}
                 onChange={(e) => {
-                    record.update({ value: e.target.value });
+                    row.update({ value: e.target.value });
                 }}
                 bordered={false}
             />
         );
-    } else if (record.type === "number") {
+    } else if (row.type === "number") {
         return (
             <InputNumber
-                value={record.value}
+                value={row.value}
                 controls={false}
                 onChange={(newValue) => {
-                    record.update({ value: newValue });
+                    row.update({ value: newValue });
                 }}
                 bordered={false}
             />
         );
-    } else if (record.type === "boolean") {
+    } else if (row.type === "boolean") {
         return (
             <Select
-                value={record.value}
+                value={row.value}
                 onChange={(value) => {
-                    record.update({ value: value });
+                    row.update({ value: value });
                 }}
                 bordered={false}
                 dropdownMatchSelectWidth={false}
@@ -92,16 +67,12 @@ const InputValue = observer(({ record }) => {
     return <></>;
 });
 
-const SelectType = observer(({ record }) => {
-    if (record.placeholder) {
-        return <></>;
-    }
-
+const SelectType = observer(({ row }) => {
     return (
         <Select
-            value={record.type}
+            value={row.type}
             onChange={(value) => {
-                record.update({ type: value });
+                row.update({ type: value });
             }}
             bordered={false}
             dropdownMatchSelectWidth={false}
@@ -114,67 +85,29 @@ const SelectType = observer(({ record }) => {
     );
 });
 
+const columns = [
+    {
+        key: "key",
+        title: i18n.gettext("Key"),
+        width: "50%",
+        component: InputKey,
+    },
+    {
+        key: "type",
+        title: i18n.gettext("Type"),
+        shrink: "10ch",
+        component: SelectType,
+    },
+    {
+        key: "value",
+        title: i18n.gettext("Value"),
+        width: "50%",
+        component: InputValue,
+    },
+];
+
 export const EditorWidget = observer(({ store }) => {
-    return (
-        <Table
-            rowKey="id"
-            dataSource={store.items.slice()}
-            className="ngw-resmeta-editor-widget"
-            parentHeight
-            size="small"
-        >
-            <Column
-                title={i18n.gettext("Key")}
-                dataIndex="key"
-                width="50%"
-                render={(_, record) => {
-                    return <InputKey record={record} />;
-                }}
-                onCell={(record, _) => ({
-                    colSpan: record.placeholder ? 4 : 1,
-                })}
-            />
-            <Column
-                title={i18n.gettext("Type")}
-                dataIndex="type"
-                render={(_, record) => {
-                    return <SelectType record={record} />;
-                }}
-                onCell={(record, _) => ({
-                    colSpan: record.placeholder ? 0 : 1,
-                })}
-            />
-            <Column
-                title={i18n.gettext("Value")}
-                dataIndex="value"
-                width="50%"
-                render={(_, record) => {
-                    return <InputValue record={record} />;
-                }}
-                onCell={(record, _) => ({
-                    colSpan: record.placeholder ? 0 : 1,
-                })}
-            />
-            <Column
-                render={(_, record) => {
-                    if (!record.placeholder) {
-                        return (
-                            <Button
-                                type="text"
-                                shape="circle"
-                                icon={<DeleteForeverIcon />}
-                                onClick={() => store.delete(record.id)}
-                            />
-                        );
-                    }
-                    return <></>;
-                }}
-                onCell={(record, _) => ({
-                    colSpan: record.placeholder ? 0 : 1,
-                })}
-            />
-        </Table>
-    );
+    return <EdiTable {...{ store, columns }} rowKey="id" parentHeight />;
 });
 
 EditorWidget.title = i18n.gettext("Metadata");
