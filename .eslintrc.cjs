@@ -1,16 +1,16 @@
-const babelConfigPath = require.resolve('@nextgisweb/jsrealm/babelrc.cjs');
+const babelConfigPath = require.resolve("@nextgisweb/jsrealm/babelrc.cjs");
 
-module.exports = {
+/** @type {import("eslint").Linter.Config } */
+const config = {
     root: true,
-    parser: '@typescript-eslint/parser',
-    plugins: ["requirejs", "react"],
+    plugins: ["requirejs", "react", "prettier"],
     extends: [
         "eslint:recommended",
-        'plugin:@typescript-eslint/recommended',
         "plugin:requirejs/recommended",
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
         "plugin:react-hooks/recommended",
+        "plugin:prettier/recommended",
     ],
     globals: {
         dojoConfig: "readonly",
@@ -18,7 +18,6 @@ module.exports = {
     },
     rules: {
         "eqeqeq": "error",
-        "indent": ["error", 4, { "SwitchCase": 1 }],
         "no-unused-vars": ["error", { args: "after-used" }],
         "no-use-before-define": "error",
         "requirejs/no-object-define": "error",
@@ -59,7 +58,29 @@ module.exports = {
             },
         },
         {
+            files: ["*/*/nodepkg/**/*.ts", "*/*/nodepkg/**/*.tsx"],
+            parser: "@typescript-eslint/parser",
+            plugins: ["react", "@typescript-eslint"],
+            extends: [
+                "eslint:recommended",
+                "plugin:@typescript-eslint/recommended",
+                "plugin:react/recommended",
+                "plugin:react/jsx-runtime",
+                "plugin:react-hooks/recommended",
+                "plugin:prettier/recommended",
+            ],
+            parserOptions: {
+                sourceType: "module",
+                jsx: true,
+                babelOptions: {
+                    configFile: babelConfigPath,
+                },
+            },
+        },
+        {
             files: ["*/*/amd/**/*.js"],
+            plugins: ["requirejs"],
+            extends: ["eslint:recommended", "plugin:requirejs/recommended"],
             env: {
                 browser: true,
                 amd: true,
@@ -67,7 +88,14 @@ module.exports = {
             },
             rules: {
                 "eqeqeq": "off",
-            }
+            },
         },
     ],
+    settings: {
+        react: {
+            version: "17",
+        },
+    },
 };
+
+module.exports = config;
