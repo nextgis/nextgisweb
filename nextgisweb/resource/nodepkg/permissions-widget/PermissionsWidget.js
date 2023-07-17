@@ -2,19 +2,14 @@ import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
 import { PrincipalSelect } from "@nextgisweb/auth/component";
-import { Button, Select, Space, Table, Tooltip } from "@nextgisweb/gui/antd";
-import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import { Select, Space } from "@nextgisweb/gui/antd";
+import { EdiTable } from "@nextgisweb/gui/edi-table";
 import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
 
+import { ResourceIcon, AllowIcon, DenyIcon } from "../icon";
 import AddIcon from "@material-icons/svg/add_circle_outline";
-import AllowIcon from "@material-icons/svg/check_circle";
-import DeleteIcon from "@material-icons/svg/clear";
-import CloneIcon from "@material-icons/svg/copy_all";
-import ErrorIcon from "@material-icons/svg/error";
-import DenyIcon from "@material-icons/svg/remove_circle";
 
 import i18n from "@nextgisweb/pyramid/i18n";
-import "./PermissionsWidget.less";
 
 const { Option, OptGroup } = Select;
 
@@ -32,11 +27,14 @@ const applyThis = i18n.gettext("This resource only");
 
 const allPermissions = i18n.gettext("All permissions");
 
-const selectDefaults = {
-    allowClear: false,
-    style: { width: "100%" },
-    bordered: false,
-};
+const selectDefaults = { allowClear: false, bordered: false };
+
+const IconText = ({ icon, text }) => (
+    <Space>
+        {icon}
+        {text}
+    </Space>
+);
 
 const bindProp = (item, prop) => ({
     value: item[prop],
@@ -45,21 +43,15 @@ const bindProp = (item, prop) => ({
     },
 });
 
-const Action = observer(({ item }) => {
+const Action = observer(({ row }) => {
     const options = useMemo(() => {
         return (
             <>
                 <Option value="allow">
-                    <Space>
-                        <AllowIcon style={{ color: "var(--success)" }} />
-                        {actionAllow}
-                    </Space>
+                    <IconText icon={<AllowIcon />} text={actionAllow} />
                 </Option>
-                <Option value="deny" className="deny">
-                    <Space>
-                        <DenyIcon style={{ color: "var(--danger)" }} />
-                        {actionDeny}
-                    </Space>
+                <Option value="deny">
+                    <IconText icon={<DenyIcon />} text={actionDeny} />
                 </Option>
             </>
         );
@@ -67,28 +59,27 @@ const Action = observer(({ item }) => {
 
     return (
         <Select
-            {...bindProp(item, "action")}
+            {...bindProp(row, "action")}
             {...selectDefaults}
-            placeholder={<Space><AddIcon/>{actionAdd}</Space>}
+            placeholder={<IconText icon={<AddIcon />} text={actionAdd} />}
         >
             {options}
         </Select>
     );
 });
 
-const Principal = observer(({ item }) => {
-    if (item.isPlaceholder) return <></>;
+const Principal = observer(({ row }) => {
     return (
         <PrincipalSelect
             systemUsers
-            {...bindProp(item, "principal")}
+            {...bindProp(row, "principal")}
             {...selectDefaults}
             placeholder={colPrincipal}
         />
     );
 });
 
-const Apply = observer(({ item }) => {
+const Apply = observer(({ row }) => {
     const options = useMemo(() => {
         const result = [
             <Option key="false" value={false}>
@@ -103,10 +94,10 @@ const Apply = observer(({ item }) => {
             if (identity === "resource") continue;
             result.push(
                 <Option key={identity} value={identity}>
-                    <Space>
-                        <SvgIcon icon={"rescls-" + identity} />
-                        {label}
-                    </Space>
+                    <IconText
+                        icon={<ResourceIcon {...{ identity }} />}
+                        text={label}
+                    />
                 </Option>
             );
         }
@@ -114,14 +105,12 @@ const Apply = observer(({ item }) => {
         return result;
     }, []);
 
-    if (item.isPlaceholder) return <></>;
-
-    const value = item.identity ? item.identity : item.propagate;
+    const value = row.identity ? row.identity : row.propagate;
     const onChange = (v) => {
         if (typeof v === "boolean") {
-            item.update({ identity: "", propagate: v });
+            row.update({ identity: "", propagate: v });
         } else {
-            item.update({ identity: v, propagate: true });
+            row.update({ identity: v, propagate: true });
         }
     };
 
@@ -136,7 +125,7 @@ const Apply = observer(({ item }) => {
     );
 });
 
-const Permission = observer(({ item }) => {
+const Permission = observer(({ row }) => {
     const options = useMemo(() => {
         const result = [
             <Option key="" value="" label={allPermissions}>
@@ -144,7 +133,7 @@ const Permission = observer(({ item }) => {
             </Option>,
         ];
 
-        const scopes = [...item.scopes];
+        const scopes = [...row.scopes];
 
         for (const [sid, scope] of Object.entries(blueprint.scopes)) {
             if (!scopes.includes(sid)) continue;
@@ -174,15 +163,13 @@ const Permission = observer(({ item }) => {
             );
         }
         return result;
-    }, [item.propagate, item.identity]);
+    }, [row.propagate, row.identity]);
 
-    if (item.isPlaceholder) return <></>;
-
-    const { scope: scp, permission: perm } = item;
+    const { scope: scp, permission: perm } = row;
     const value = scp !== null ? scp + (perm ? ":" + perm : "") : null;
     const onChange = (v) => {
         const [scope, permission] = v.split(":", 2);
-        item.update({ scope: scope || "", permission: permission || "" });
+        row.update({ scope: scope || "", permission: permission || "" });
     };
 
     return (
@@ -197,67 +184,16 @@ const Permission = observer(({ item }) => {
     );
 });
 
-const MenuButton = ({ onClick, icon, tooltip, error }) => (
-    <Tooltip title={tooltip}>
-        <Button
-            onClick={onClick}
-            style={error ? { color: "var(--error" } : {}}
-            icon={icon}
-            type="text"
-            shape="circle"
-        />
-    </Tooltip>
-);
-
-const Menu = observer(({ item }) => {
-    if (item.isPlaceholder) return <></>;
-    return (
-        <>
-            {item.store.validate && item.error !== null && (
-                <MenuButton icon={<ErrorIcon />} tooltip={item.error} error />
-            )}
-            <MenuButton onClick={item.clone.bind(item)} icon={<CloneIcon />} />
-            <MenuButton
-                onClick={item.delete.bind(item)}
-                icon={<DeleteIcon />}
-            />
-        </>
-    );
-});
-
-const maxWidth = (a, p) => Math.max(...a.map((i) => i.length + p)) + "ch";
-
-const mwVars = {
-    "--mw-action": maxWidth([actionAllow, actionDeny, actionAdd], 6),
-    "--mw-apply": maxWidth([applyThis, applyPropagate], 2),
-};
-
-const column = (key, title, Render) => ({
-    key: key,
-    className: key,
-    title: title,
-    render: (_, item) => <Render {...{ item }} />,
-});
-
+// prettier-ignore
 const columns = [
-    column("action", colAction, Action),
-    column("principal", colPrincipal, Principal),
-    column("apply", colApply, Apply),
-    column("permission", colPermission, Permission),
-    column("menu", null, Menu),
+    { key: "action", title: colAction, shrink: true, component: Action },
+    { key: "principal", title: colPrincipal, width: "50%", component: Principal },
+    { key: "apply", title: colApply, shrink: applyPropagate.length + "ch", component: Apply },
+    { key: "permission", title: colPermission, width: "50%", component: Permission },
 ];
 
 export const PermissionsWidget = observer(({ store }) => {
-    return (
-        <div className="ngw-resource-permissions-widget" style={{ ...mwVars }}>
-            <Table
-                columns={columns}
-                dataSource={[...store.items]}
-                parentHeight
-                size="small"
-            />
-        </div>
-    );
+    return <EdiTable {...{ store, columns }} parentHeight />;
 });
 
 PermissionsWidget.title = i18n.gettext("Permissions");

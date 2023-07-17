@@ -59,17 +59,6 @@ class Item {
         });
     }
 
-    get isPlaceholder() {
-        return (
-            this.action === null &&
-            this.principal === null &&
-            this.scope === null &&
-            this.permission === null &&
-            this.identity === null &&
-            this.propagate === null
-        );
-    }
-
     get scopes() {
         if (this.identity) {
             return resourceScopes(this.identity);
@@ -78,12 +67,10 @@ class Item {
         } else if (this.propagate === true) {
             return Object.keys(blueprint.scopes);
         }
-        return resourceScopes('resource');
+        return resourceScopes("resource");
     }
 
     get error() {
-        if (this.isPlaceholder) return null;
-
         if (
             this.action === null ||
             this.principal === null ||
@@ -126,21 +113,9 @@ class Item {
             }
         }
         this.store.validate && this.error;
-        this.store.addPlaceholderIfMissing();
-        this.store.markDirty();
-    }
+        this.store.dirty = true;
 
-    clone() {
-        const idx = this.store.items.indexOf(this);
-        const copy = new Item(this.store, this.dump());
-        this.store.items.splice(idx + 1, 0, copy);
-        this.store.markDirty();
-    }
-
-    delete() {
-        this.store.items = this.store.items.filter((i) => i.key !== this.key);
-        this.store.addPlaceholderIfMissing();
-        this.store.markDirty();
+        this.store.rotatePlaceholder();
     }
 }
 
@@ -148,15 +123,14 @@ export class PermissionsStore {
     identity = "resource.permissions";
 
     items = null;
-    dirty = null;
-    validate = false;
+    dirty = false;
 
     constructor({ composite }) {
         makeAutoObservable(this, { identity: false });
         this.resourceClass = composite.cls;
         this.items = [];
-        this.addPlaceholderIfMissing();
-        this.dirty = false;
+
+        this.rotatePlaceholder();
     }
 
     load(value) {
@@ -165,14 +139,11 @@ export class PermissionsStore {
 
         this.items = value.map((data) => new Item(this, data)).filter(isUseful);
         this.dirty = false;
-        this.addPlaceholderIfMissing();
     }
 
     dump() {
         if (!this.dirty) return undefined;
-        return this.items
-            .filter((item) => !item.isPlaceholder)
-            .map((item) => item.dump());
+        return this.items.map((item) => item.dump());
     }
 
     get isValid() {
@@ -181,13 +152,29 @@ export class PermissionsStore {
         return this.items.every((item) => item.error === null);
     }
 
-    markDirty() {
+    // EdiTable
+
+    validate = false;
+    placeholder = null;
+
+    get rows() {
+        return this.items;
+    }
+
+    rotatePlaceholder() {
+        if (this.placeholder && this.placeholder.action === null) return;
+        this.placeholder && this.items.push(this.placeholder);
+        this.placeholder = new Item(this);
+    }
+
+    deleteRow(row) {
+        this.items.splice(this.items.indexOf(row), 1);
         this.dirty = true;
     }
 
-    addPlaceholderIfMissing() {
-        const last = this.items[this.items.length - 1];
-        if (last && last.isPlaceholder) return;
-        this.items.push(new Item(this));
+    cloneRow(row) {
+        const idx = this.items.indexOf(row);
+        this.items.splice(idx + 1, 0, new Item(this, row.dump()));
+        this.dirty = true;
     }
 }
