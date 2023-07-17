@@ -1,0 +1,1 @@
+export { EdiTable } from "./EdiTable";

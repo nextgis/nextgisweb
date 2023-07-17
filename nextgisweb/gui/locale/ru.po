@@ -14,8 +14,9 @@ msgstr "OK"
 msgid "Please confirm the deletion."
 msgstr "Пожалуйста, подтвердите удаление."
 
-#: nodepkg/confirm.js:36 nodepkg/model-browse/ModelBrowse.js:200
-#: nodepkg/model-browse/ModelBrowse.js:267 nodepkg/model-form/ModelForm.js:13
+#: nodepkg/confirm.js:36 nodepkg/edi-table/RowAction.js:39
+#: nodepkg/model-browse/ModelBrowse.js:200 nodepkg/model-browse/ModelBrowse.js:267
+#: nodepkg/model-form/ModelForm.js:15
 msgid "Delete"
 msgstr "Удалить"
 
@@ -35,9 +36,13 @@ msgstr "Скопиривано в буфер обмена"
 msgid "Copy to clipboard"
 msgstr "Копировать в буфер обмена"
 
-#: nodepkg/component/SaveButton.js:14 nodepkg/model-form/ModelForm.js:12
+#: nodepkg/component/SaveButton.js:15 nodepkg/model-form/ModelForm.js:14
 msgid "Save"
 msgstr "Сохранить"
+
+#: nodepkg/edi-table/RowAction.js:34
+msgid "Clone"
+msgstr "Клонировать"
 
 #: nodepkg/error/index.js:37
 msgid "Unexpected error"
@@ -59,7 +64,7 @@ msgstr "Написать в поддержку"
 msgid "Back to home"
 msgstr "На главную"
 
-#: nodepkg/fields-form/FieldsForm.js:107
+#: nodepkg/fields-form/FieldsForm.js:117
 msgid "This value is required"
 msgstr "Необходимо указать значение"
 
@@ -75,7 +80,7 @@ msgstr "Уточнить перевод или добавить новый"
 msgid "Browser default"
 msgstr "По умолчанию в браузере"
 
-#: nodepkg/model-browse/ModelBrowse.js:55 nodepkg/model-form/ModelForm.js:32
+#: nodepkg/model-browse/ModelBrowse.js:55 nodepkg/model-form/ModelForm.js:34
 msgid "Confirmation"
 msgstr "Подтверждение"
 
@@ -107,11 +112,11 @@ msgstr "Изменить"
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.js:245 nodepkg/model-form/ModelForm.js:11
+#: nodepkg/model-browse/ModelBrowse.js:245 nodepkg/model-form/ModelForm.js:13
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/model-form/ModelForm.js:65
+#: nodepkg/model-form/ModelForm.js:67
 msgid "Fix the form errors first"
 msgstr "Необходимо исправить ошибки в форме"
 
