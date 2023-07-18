@@ -233,7 +233,8 @@ const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
     },
 });
 
-module.exports = (env) => ({
+/** @type {import("webpack").Configuration} */
+const webpackConfig = (env) => ({
     mode: config.debug ? "development" : "production",
     devtool: config.debug ? "source-map" : false,
     bail: !env.WEBPACK_WATCH,
@@ -381,3 +382,5 @@ module.exports = (env) => ({
         ignored: "**/node_modules",
     },
 });
+
+module.exports = webpackConfig;

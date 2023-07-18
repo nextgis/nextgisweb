@@ -60,7 +60,7 @@ const config = {
         {
             files: ["*/*/nodepkg/**/*.ts", "*/*/nodepkg/**/*.tsx"],
             parser: "@typescript-eslint/parser",
-            plugins: ["react", "@typescript-eslint"],
+            plugins: ["react", "@typescript-eslint", "prettier"],
             extends: [
                 "eslint:recommended",
                 "plugin:@typescript-eslint/recommended",
