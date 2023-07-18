@@ -1,9 +1,9 @@
 /** @type {import("prettier").Options} */
 const config = {
-    trailingComma: 'es5',
+    trailingComma: "es5",
     tabWidth: 4,
-    quoteProps: 'preserve',
+    quoteProps: "preserve",
     semi: true,
-}
+};
 
-module.exports = config
+module.exports = config;
