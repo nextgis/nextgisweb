@@ -58,11 +58,13 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     multiple = false;
 
-    onNewGroup: null | OnNewGroupType = null;
+    readonly onNewGroup: null | OnNewGroupType = null;
+    readonly onTraverse: null | ((parentId: number) => void) = null;
 
-    setChildrenAbortController: AbortController | null = null;
+    setResourcesAbortController: AbortController | null = null;
     setBreadcrumbItemsAbortController: AbortController | null = null;
     createNewGroupAbortController: AbortController | null = null;
+    getSelectedParentAbortController: AbortController | null = null;
 
     getThisMsg = mPickThis;
     getSelectedMsg = mPickSelected;
@@ -75,18 +77,22 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         selected,
         getThisMsg,
         onNewGroup,
+        onTraverse,
         requireClass,
         getSelectedMsg,
         hideUnavailable,
         requireInterface,
         traverseClasses,
         disableResourceIds,
-    }: Partial<ResourcePickerStoreOptions>) {
+    }: ResourcePickerStoreOptions) {
         this.parentId = parentId ?? this.parentId;
         this.initialParentId = this.parentId;
 
         if (onNewGroup) {
             this.onNewGroup = onNewGroup;
+        }
+        if (onTraverse) {
+            this.onTraverse = onTraverse;
         }
         if (disableResourceIds) {
             this.disableResourceIds = disableResourceIds;
@@ -114,22 +120,48 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         }
         makeAutoObservable(this, {
             _id: false,
-            setChildrenAbortController: false,
+            setResourcesAbortController: false,
+            getSelectedParentAbortController: false,
             setBreadcrumbItemsAbortController: false,
             createNewGroupAbortController: false,
         });
-        this.changeParentTo(this.parentId);
-        if (selected) {
-            this.selected = selected;
-        }
+        this._initialize({ selected, parentId });
     }
 
-    async changeParentTo(parent) {
-        // this.clearSelection();
+    private async _initialize({ selected }: ResourcePickerStoreOptions) {
+        if (selected) {
+            this.selected = selected;
+            try {
+                runInAction(() => {
+                    this.resourcesLoading = true;
+                });
+                this.getSelectedParentAbortController = new AbortController();
+                const lastSelected: number = Array.isArray(selected)
+                    ? selected[selected.length - 1]
+                    : selected;
+                const selectedItem = (await route(
+                    "resource.item",
+                    lastSelected
+                ).get({
+                    signal: this.getSelectedParentAbortController.signal,
+                    cache: true,
+                })) as ResourceItem;
+                this.parentId = selectedItem.resource.parent.id;
+            } catch {
+                // ignore
+            }
+        }
+        this.changeParentTo(this.parentId);
+    }
+
+    async changeParentTo(parent: number) {
+        this.setChildrenFor(parent);
+        this.setBreadcrumbItems(parent);
         runInAction(() => {
             this.parentId = parent;
-            this.setChildrenFor(parent);
-            this.setBreadcrumbItems(parent);
+            if (this.onTraverse) {
+                this.onTraverse(parent);
+            }
         });
     }
 
@@ -219,6 +251,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         this._abortChildLoading();
         this._abortBreadcrumbsLoading();
         this._abortNewGroupCreation();
+        this._abortSelectedParentLoading();
     }
 
     async setBreadcrumbItems(parent: number): Promise<void> {
@@ -250,23 +283,23 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     async setChildrenFor(parent: number): Promise<void> {
         this._abortChildLoading();
         try {
-            this.setChildrenAbortController = new AbortController();
+            this.setResourcesAbortController = new AbortController();
             runInAction(() => {
                 this.resourcesLoading = true;
             });
             const blueprint = await route("resource.blueprint").get({
-                signal: this.setChildrenAbortController.signal,
+                signal: this.setResourcesAbortController.signal,
                 cache: true,
             });
             this.blueprint = blueprint;
             const parentItem = await route("resource.item", parent).get({
-                signal: this.setChildrenAbortController.signal,
+                signal: this.setResourcesAbortController.signal,
                 cache: true,
             });
             this.parentItem = parentItem;
             const resp = await route("resource.collection").get({
                 query: { parent },
-                signal: this.setChildrenAbortController.signal,
+                signal: this.setResourcesAbortController.signal,
             });
             const resources: ResourceItem[] = [];
             for (const x of resp) {
@@ -370,10 +403,10 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     }
 
     private _abortChildLoading(): void {
-        if (this.setChildrenAbortController) {
-            this.setChildrenAbortController.abort();
+        if (this.setResourcesAbortController) {
+            this.setResourcesAbortController.abort();
         }
-        this.setChildrenAbortController = null;
+        this.setResourcesAbortController = null;
     }
 
     private _abortBreadcrumbsLoading(): void {
@@ -381,6 +414,13 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
             this.setBreadcrumbItemsAbortController.abort();
         }
         this.setBreadcrumbItemsAbortController = null;
+    }
+
+    private _abortSelectedParentLoading(): void {
+        if (this.getSelectedParentAbortController) {
+            this.getSelectedParentAbortController.abort();
+        }
+        this.getSelectedParentAbortController = null;
     }
 
     private _abortNewGroupCreation(): void {

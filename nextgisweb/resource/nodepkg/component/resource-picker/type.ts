@@ -1,12 +1,13 @@
 import type { Card, Modal } from "@nextgisweb/gui/antd";
 
-import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 import type {
     Resource,
-    ResourcePermission,
     ResourceClass,
     ResourceInterface,
+    ResourceItem,
+    ResourcePermission,
 } from "../../type/Resource";
+import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 
 export type SelectValue = number | number[];
 
@@ -32,7 +33,7 @@ export interface ResourcePickerFooterProps {
     onOk?: (val: SelectValue) => void;
 }
 
-export type OnNewGroupType = (resource) => void;
+export type OnNewGroupType = (resource: ResourceItem) => void;
 
 export interface ResourcePickerTitleProps {
     resourceStore: ResourcePickerStore;
@@ -53,6 +54,7 @@ export interface ResourcePickerStoreOptions {
     traverseClasses?: ResourceClass[] | null;
     requirePermission?: ResourcePermission | null;
     hideUnavailable?: boolean;
+    onTraverse?: (parentId: number) => void;
 }
 
 export interface ResourcePickerCardProps {
@@ -65,8 +67,8 @@ export interface ResourcePickerCardProps {
 }
 
 export interface UsePickerModalProps {
-    cardOptions: CardProps;
-    height: number;
+    cardOptions?: CardProps;
+    height?: number;
     cardTitleHeight?: number;
     cardFooterHeight?: number;
 }

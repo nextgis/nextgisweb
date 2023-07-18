@@ -8,7 +8,10 @@ import { showResourcePicker } from "../resource-picker";
 import { renderResourceCls } from "../resource-picker/util/renderResourceCls";
 
 import type { ResourceItem, ResourceClass } from "../../type";
-import type { SelectValue } from "../resource-picker/type";
+import type {
+    ResourcePickerStoreOptions,
+    SelectValue,
+} from "../resource-picker/type";
 import type { ResourceSelectProps } from "./type";
 
 import "./ResourceSelect.less";
@@ -30,6 +33,7 @@ export const ResourceSelect = ({
     const { makeSignal, abort } = useAbortController();
     const [value_, setValue_] = useState(value);
     const [open, setOpen] = useState(false);
+    const pickerParentIdMem = useRef<number | null>(null);
     const [resource, setResource] = useState<ResourceItem | null>(null);
     const [resourceLoading, setResourceLoading] = useState(false);
 
@@ -73,9 +77,16 @@ export const ResourceSelect = ({
 
     useEffect(() => {
         if (open) {
-            const pickerOptions_ = {
+            const selected: number[] = [value_]
+                .flat()
+                .filter((v) => typeof v === "number");
+            const pickerOptions_: ResourcePickerStoreOptions = {
+                parentId: pickerParentIdMem.current,
                 ...pickerOptions,
-                selected: [value_].filter((v) => typeof v === "number"),
+                selected,
+                onTraverse: (val) => {
+                    pickerParentIdMem.current = val;
+                },
             };
             pickerModal.current = showResourcePicker({
                 pickerOptions: pickerOptions_,
