@@ -1,5 +1,7 @@
 import { observer } from "mobx-react-lite";
-import { InputNumber, Checkbox } from "@nextgisweb/gui/antd";
+
+import { Checkbox, InputNumber } from "@nextgisweb/gui/antd";
+
 import i18n from "@nextgisweb/pyramid/i18n";
 
 import "./TileCacheWidget.less";
@@ -10,18 +12,19 @@ export const TileCacheWidget = observer(({ store }) => {
             <Checkbox
                 checked={store.enabled}
                 onChange={(e) => {
-                    const checked = e.target.checked;
-                    store.enabled = checked;
+                    const enabled = e.target.checked;
+                    const data = { enabled };
                     if (
-                        checked &&
+                        enabled &&
                         !store.imageCompose &&
                         store.maxZ === null &&
                         store.ttl === null
                     ) {
-                        store.imageCompose = true;
-                        store.maxZ = 6;
-                        store.ttl = 2630000;
+                        data.imageCompose = true;
+                        data.maxZ = 6;
+                        data.ttl = 2630000;
                     }
+                    store.update(data);
                 }}
             >
                 {i18n.gettext("Enabled")}
@@ -29,9 +32,9 @@ export const TileCacheWidget = observer(({ store }) => {
 
             <Checkbox
                 checked={store.imageCompose}
-                onChange={(e) => {
-                    store.imageCompose = e.target.checked;
-                }}
+                onChange={(e) =>
+                    store.update({ imageCompose: e.target.checked })
+                }
             >
                 {i18n.gettext("Allow using tiles in non-tile requests")}
             </Checkbox>
@@ -40,49 +43,40 @@ export const TileCacheWidget = observer(({ store }) => {
                 <Checkbox
                     checked={store.trackChanges}
                     onChange={(e) => {
-                        store.trackChanges = e.target.checked;
+                        store.update({ trackChanges: e.target.checked });
                     }}
                 >
                     {i18n.gettext("Track changes")}
                 </Checkbox>
             )}
 
-            <label>{i18n.gettext("Max zoom level") + ":"}</label>
+            <label>{i18n.gettext("Max zoom level")}</label>
             <InputNumber
                 value={store.maxZ}
-                onChange={(v) => {
-                    store.maxZ = v;
-                }}
+                onChange={(v) => store.update({ maxZ: v })}
                 min={0}
                 max={18}
-                size="small"
             />
 
             {store.featureSeed && (
                 <>
-                    <label>{i18n.gettext("Seed zoom level") + ":"}</label>
+                    <label>{i18n.gettext("Seed zoom level")}</label>
                     <InputNumber
                         value={store.seedZ}
-                        onChange={(v) => {
-                            store.seedZ = v;
-                        }}
+                        onChange={(v) => store.update({ seedZ: v })}
                         min={0}
                         max={18}
-                        size="small"
                     />
                 </>
             )}
 
-            <label>{i18n.gettext("TTL, sec.") + ":"}</label>
+            <label>{i18n.gettext("TTL, sec.")}</label>
             <InputNumber
                 value={store.ttl}
-                onChange={(v) => {
-                    store.ttl = v;
-                }}
+                onChange={(v) => store.update({ ttl: v })}
                 min={0}
                 max={315360000}
                 step={86400}
-                size="small"
             />
 
             <Checkbox>{i18n.gettext("Flush")}</Checkbox>

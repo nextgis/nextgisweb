@@ -11,6 +11,8 @@ export class TileCacheStore {
     ttl = null;
     flush = null;
 
+    dirty = false;
+
     constructor({ featureTrackChanges, featureSeed }) {
         makeAutoObservable(this, { identity: false });
         this.featureTrackChanges = featureTrackChanges;
@@ -25,9 +27,12 @@ export class TileCacheStore {
         this.seedZ = value.seed_z;
         this.ttl = value.ttl;
         this.flush = value.flush;
+
+        this.dirty = false;
     }
 
     dump() {
+        if (!this.dirty) return;
         const result = {};
         result.enabled = this.enabled;
         result.image_compose = this.imageCompose;
@@ -41,5 +46,10 @@ export class TileCacheStore {
 
     get isValid() {
         return true;
+    }
+
+    update(source) {
+        Object.entries(source).forEach(([key, value]) => (this[key] = value));
+        this.dirty = true;
     }
 }

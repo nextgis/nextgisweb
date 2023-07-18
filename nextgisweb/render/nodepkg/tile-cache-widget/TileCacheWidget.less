@@ -1,9 +1,9 @@
 .ngw-render-tile-cache-widget {
-    padding: 1ex;
+    padding: 1em;
 
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 1ex;
+    gap: 1em;
 
     & > .ant-checkbox-wrapper {
         grid-column: 1 / span 2;
@@ -12,5 +12,11 @@
         }
     }
 
+    & > label {
+        align-self: center;
+        &::after {
+            content: ":";
+        }
+    }
 
 }
