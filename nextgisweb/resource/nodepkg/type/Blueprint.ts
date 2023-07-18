@@ -1,10 +1,14 @@
-export interface Blueprint {
-    resources: Resources;
-    scopes: Scopes;
+import type { ResourceClass } from "./Resource";
+
+interface Resource {
+    identity: string;
+    label: string;
+    base_classes: ResourceClass[];
+    interfaces: string[];
+    scopes: string[];
 }
 
-type Scopes = Record<string, Scope>;
-type Permissions = Record<string, any>;
+type Permissions = Record<string, unknown>;
 
 interface Scope {
     identity: string;
@@ -16,11 +20,9 @@ interface Resources {
     [key: string]: Resource;
 }
 
-interface Resource {
-    identity: string;
-    label: string;
-    base_classes: any[];
-    interfaces: any[];
-    scopes: string[];
-}
+type Scopes = Record<string, Scope>;
 
+export interface Blueprint {
+    resources: Resources;
+    scopes: Scopes;
+}

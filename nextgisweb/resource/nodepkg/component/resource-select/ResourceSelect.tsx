@@ -1,5 +1,3 @@
-import PropTypes from "prop-types";
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
@@ -9,20 +7,30 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import { showResourcePicker } from "../resource-picker";
 import { renderResourceCls } from "../resource-picker/util/renderResourceCls";
 
+import type { ResourceItem, ResourceClass } from "../../type";
+import type { SelectValue } from "../resource-picker/type";
+import type { ResourceSelectProps } from "./type";
+
 import "./ResourceSelect.less";
+
+interface Option {
+    label: string;
+    value: number;
+    cls: ResourceClass;
+}
 
 export const ResourceSelect = ({
     value,
     onChange,
     pickerOptions,
     ...selectOptions
-}) => {
-    const pickerModal = useRef();
+}: ResourceSelectProps) => {
+    const pickerModal = useRef<ReturnType<typeof showResourcePicker>>();
 
     const { makeSignal, abort } = useAbortController();
     const [value_, setValue_] = useState(value);
     const [open, setOpen] = useState(false);
-    const [resource, setResource] = useState(null);
+    const [resource, setResource] = useState<ResourceItem | null>(null);
     const [resourceLoading, setResourceLoading] = useState(false);
 
     const closePicker = () => {
@@ -48,7 +56,7 @@ export const ResourceSelect = ({
     }, [value_, abort, makeSignal]);
 
     const onPick = useCallback(
-        (val) => {
+        (val: SelectValue) => {
             setValue_(val);
             setOpen(false);
             if (onChange) {
@@ -83,15 +91,15 @@ export const ResourceSelect = ({
         }
     }, [value_, loadResource]);
 
-    const options = useMemo(() => {
+    const options = useMemo<Option[]>(() => {
         return resource
             ? [
-                {
-                    label: resource.resource.display_name,
-                    value: resource.resource.id,
-                    cls: resource.resource.cls,
-                },
-            ]
+                  {
+                      label: resource.resource.display_name,
+                      value: resource.resource.id,
+                      cls: resource.resource.cls,
+                  },
+              ]
             : [];
     }, [resource]);
 
@@ -121,10 +129,4 @@ export const ResourceSelect = ({
             })}
         </Select>
     );
-};
-
-ResourceSelect.propTypes = {
-    pickerOptions: PropTypes.object,
-    onChange: PropTypes.func,
-    value: PropTypes.any,
 };

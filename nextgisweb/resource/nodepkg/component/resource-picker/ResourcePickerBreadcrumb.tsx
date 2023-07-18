@@ -1,17 +1,18 @@
-import { PropTypes } from "prop-types";
-
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
 import HomeFilledIcon from "@material-icons/svg/home-filled";
 import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
 
+import type { ResourcePickerBreadcrumbProps } from "./type";
+import { ResourceItem } from "../../type";
+
 export const ResourcePickerBreadcrumb = observer(
     ({
         resourceStore,
         // TODO: make it dependent on the block length
         maxBreadcrumbItems = 2,
-    }) => {
+    }: ResourcePickerBreadcrumbProps) => {
         const { breadcrumbItems, breadcrumbItemsLoading, allowMoveInside } =
             resourceStore;
 
@@ -21,7 +22,11 @@ export const ResourcePickerBreadcrumb = observer(
                 resourceStore.changeParentTo(newLastResourceId);
             };
 
-            const createLabel = (resItem, name, link = true) => {
+            const createLabel = (
+                resItem: ResourceItem,
+                name?: string,
+                link = true
+            ) => {
                 const displayName = name || resItem.resource.display_name;
                 return (
                     <span className="resource-breadcrumb-item">
@@ -101,7 +106,12 @@ export const ResourcePickerBreadcrumb = observer(
                 }
             }
             return items;
-        }, [breadcrumbItems, allowMoveInside]);
+        }, [
+            maxBreadcrumbItems,
+            breadcrumbItems,
+            allowMoveInside,
+            resourceStore,
+        ]);
 
         return breadcrumbItemsLoading ? (
             <Space>
@@ -113,8 +123,3 @@ export const ResourcePickerBreadcrumb = observer(
         );
     }
 );
-
-ResourcePickerBreadcrumb.propTypes = {
-    resourceStore: PropTypes.object,
-    maxBreadcrumbItems: PropTypes.number,
-};

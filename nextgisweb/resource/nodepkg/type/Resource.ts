@@ -1,23 +1,8 @@
-export type ResourceClass = string
-export type ResourceInterface = string
+export type ResourceClass = string;
+export type ResourceInterface = string;
 
-export interface ResourceItem {
-    resource: Resource;
-}
-
-export interface Resource {
+interface Owneruser {
     id: number;
-    cls: ResourceClass;
-    creation_date: string;
-    parent: ResourceParent;
-    owner_user: Owneruser;
-    permissions: ResourcePermission[];
-    keyname?: any;
-    display_name: string;
-    description?: any;
-    children: boolean;
-    interfaces: ResourceInterface[];
-    scopes: string[];
 }
 
 export interface ResourcePermission {
@@ -29,15 +14,29 @@ export interface ResourcePermission {
     propagate: boolean;
 }
 
-interface Owneruser {
-    id: number;
+interface ResourceParentDeep {
+    id?: number;
 }
-
 interface ResourceParent {
     id: number;
     parent: ResourceParentDeep;
 }
 
-interface ResourceParentDeep {
-    id?: any;
+export interface Resource {
+    id: number;
+    cls: ResourceClass;
+    creation_date: string;
+    parent: ResourceParent;
+    owner_user: Owneruser;
+    permissions: ResourcePermission[];
+    keyname?: string;
+    display_name: string;
+    description?: string;
+    children: boolean;
+    interfaces: ResourceInterface[];
+    scopes: string[];
+}
+
+export interface ResourceItem {
+    resource: Resource;
 }

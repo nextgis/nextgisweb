@@ -1,5 +1,3 @@
-import { PropTypes } from "prop-types";
-
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
@@ -10,16 +8,19 @@ import SearchIcon from "@material-icons/svg/search";
 import SyncIcon from "@material-icons/svg/sync";
 
 import { Button, Col, Input, Row, Tooltip } from "@nextgisweb/gui/antd";
+
+import ResourcesFilter from "../../resources-filter";
+import { ResourcePickerBreadcrumb } from "./ResourcePickerBreadcrumb";
+
+import type { ResourcePickerTitleProps } from "./type";
+
 import i18n from "@nextgisweb/pyramid/i18n";
 
-import { ResourcePickerBreadcrumb } from "./ResourcePickerBreadcrumb";
-import ResourcesFilter from "../../resources-filter";
-
-const returnToInitialGroupTitle = i18n.gettext("Go to initial group");
-const refreshGroupTitle = i18n.gettext("Refresh");
+const mGotoInitialGroup = i18n.gettext("Go to initial group");
+const mRefresh = i18n.gettext("Refresh");
 
 export const ResourcePickerTitle = observer(
-    ({ resourceStore, onClose, showClose }) => {
+    ({ resourceStore, onClose, showClose }: ResourcePickerTitleProps) => {
         const { initialParentId, parentId, allowMoveInside } = resourceStore;
 
         const [searchMode, setSearchMode] = useState(false);
@@ -70,7 +71,7 @@ export const ResourcePickerTitle = observer(
 
                     {parentId !== initialParentId && allowMoveInside && (
                         <Col style={{ width: "30px" }}>
-                            <Tooltip title={returnToInitialGroupTitle}>
+                            <Tooltip title={mGotoInitialGroup}>
                                 <a
                                     onClick={() =>
                                         resourceStore.returnToInitial()
@@ -83,7 +84,7 @@ export const ResourcePickerTitle = observer(
                     )}
 
                     <Col style={{ width: "30px" }}>
-                        <Tooltip title={refreshGroupTitle}>
+                        <Tooltip title={mRefresh}>
                             <a onClick={() => resourceStore.refresh()}>
                                 <SyncIcon />
                             </a>
@@ -109,9 +110,3 @@ export const ResourcePickerTitle = observer(
         );
     }
 );
-
-ResourcePickerTitle.propTypes = {
-    showClose: PropTypes.bool,
-    resourceStore: PropTypes.object,
-    onClose: PropTypes.func,
-};

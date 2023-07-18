@@ -1,11 +1,12 @@
 import { Card } from "@nextgisweb/gui/antd";
-import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
 
 import { ResourcePickerChildren } from "./ResourcePickerChildren";
 import { ResourcePickerStore } from "./store/ResourcePickerStore";
 import { ResourcePickerFooter } from "./ResourcePickerFooter";
 import { ResourcePickerTitle } from "./ResourcePickerTitle";
+
+import type { ResourcePickerCardProps } from "./type";
 
 import "./ResourcePickerCard.less";
 
@@ -25,43 +26,15 @@ export function ResourcePickerCard({
     onSelect,
     onClose,
     store,
-}) {
+}: ResourcePickerCardProps) {
     const style = cardOptions.style || defaultStyle;
     const bodyStyle = cardOptions.bodyStyle || defaultBodyStyle;
 
-    const {
-        multiple,
-        parentId,
-        selected,
-        onNewGroup,
-        getThisMsg,
-        requireClass,
-        getSelectedMsg,
-        hideUnavailable,
-        requireInterface,
-        disableResourceIds,
-        ...restPickerProps
-    } = pickerOptions;
-
     const [resourceStore] = useState(
-        () =>
-            store ||
-            new ResourcePickerStore({
-                disableResourceIds,
-                requireInterface,
-                hideUnavailable,
-                getSelectedMsg,
-                requireClass,
-                getThisMsg,
-                onNewGroup,
-                selected,
-                parentId,
-                multiple,
-                ...restPickerProps,
-            })
+        () => store || new ResourcePickerStore(pickerOptions)
     );
 
-    const onOk_ = (resource) => {
+    const onOk_ = (resource: number | number[]) => {
         if (onSelect) {
             onSelect(resource);
         }
@@ -89,7 +62,6 @@ export function ResourcePickerCard({
                 <ResourcePickerFooter
                     key="footer"
                     resourceStore={resourceStore}
-                    allowCreateResourceBtn
                     onOk={onOk_}
                 />,
             ]}
@@ -98,33 +70,3 @@ export function ResourcePickerCard({
         </Card>
     );
 }
-
-const pickerOptions = {
-    disableResourceIds: PropTypes.arrayOf(PropTypes.number),
-    getSelectedMsg: PropTypes.string,
-    getThisMsg: PropTypes.string,
-    hideUnavailable: PropTypes.bool,
-    multiple: PropTypes.bool,
-    onClose: PropTypes.func,
-    onNewGroup: PropTypes.any,
-    onSelect: PropTypes.func,
-    requireClass: PropTypes.string,
-    requireInterface: PropTypes.string,
-    resourceId: PropTypes.number,
-    selected: PropTypes.array,
-    showClose: PropTypes.bool,
-};
-
-const cardOptions = {
-    style: PropTypes.object,
-    bodyStyle: PropTypes.object,
-};
-
-ResourcePickerCard.propTypes = {
-    store: PropTypes.object,
-    showClose: PropTypes.bool,
-    onSelect: PropTypes.func,
-    onClose: PropTypes.func,
-    pickerOptions: PropTypes.shape(pickerOptions),
-    cardOptions: PropTypes.shape(cardOptions),
-};

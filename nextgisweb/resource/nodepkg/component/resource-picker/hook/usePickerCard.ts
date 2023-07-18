@@ -1,18 +1,14 @@
 import { useCallback } from "react";
 
 import type { Resource } from "../../../type/Resource";
-import type { ResourcePickerStore } from '../store/ResourcePickerStore'
+import type { ResourcePickerStore } from "../store/ResourcePickerStore";
 
 interface UsePickerCardProps {
-    resourceStore: ResourcePickerStore
+    resourceStore: ResourcePickerStore;
 }
 
 const usePickerCard = ({ resourceStore }: UsePickerCardProps) => {
-    const {
-        checkEnabled,
-        disableResourceIds,
-    } = resourceStore;
-
+    const { checkEnabled, disableResourceIds } = resourceStore;
 
     const getEnabledProps = useCallback(
         (record, checks) => {
@@ -49,7 +45,7 @@ const usePickerCard = ({ resourceStore }: UsePickerCardProps) => {
         [checkEnabled, getEnabledProps, resourceStore]
     );
 
-    return { getCheckboxProps, getEnabledProps }
-}
+    return { getCheckboxProps, getEnabledProps };
+};
 
 export default usePickerCard;

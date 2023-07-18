@@ -1,14 +1,4 @@
-import type { Card, Modal } from "@nextgisweb/gui/antd";
-
-type CardProps = Parameters<typeof Card>[0];
-type ModalProps = Parameters<typeof Modal>[0];
-
-interface UsePickerModalProps {
-    cardOptions: CardProps;
-    height: number;
-    cardTitleHeight?: number;
-    cardFooterHeight?: number;
-}
+import type { UsePickerModalProps, CardProps, ModalProps } from "../type";
 
 const usePickerModal = ({
     cardOptions = {},
@@ -16,7 +6,6 @@ const usePickerModal = ({
     cardTitleHeight = 58,
     cardFooterHeight = 58,
 }: UsePickerModalProps) => {
-
     const cardHeight = height - cardTitleHeight - cardFooterHeight;
 
     const modalDefaultProps: ModalProps = {
@@ -26,10 +15,10 @@ const usePickerModal = ({
         maskTransitionName: "",
     };
 
-    const defaultCardStyle: CardProps['style'] = {
+    const defaultCardStyle: CardProps["style"] = {
         width: "100%",
         height,
-        boxSizing: 'border-box'
+        boxSizing: "border-box",
     };
 
     const defaultCardBodyStyle = {

@@ -1,24 +1,23 @@
+import { makeAutoObservable, runInAction } from "mobx";
+
 import { extractError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 
-import { makeAutoObservable, runInAction } from "mobx";
-import { loadParents } from "../../../util/loadParents";
-
-import locale from './locale'
-
+import { Blueprint } from "../../../type/Blueprint";
 import type {
-    ResourceItem,
     Resource,
-    ResourcePermission,
     ResourceClass,
-    ResourceInterface
-} from '../../../type/Resource';
-import type {
-    ResourcePickerStoreOptions,
-    OnNewGroupType
-} from '../../../type/ResourcePicker';
-import { Blueprint } from '../../../type/Blueprint';
+    ResourceInterface,
+    ResourceItem,
+    ResourcePermission,
+} from "../../../type/Resource";
+import { loadParents } from "../../../util/loadParents";
+import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
 
+import i18n from "@nextgisweb/pyramid/i18n";
+
+const mPickThis = i18n.gettext("Pick this group");
+const mPickSelected = i18n.gettext("Pick selected");
 
 let ID = 0;
 
@@ -31,7 +30,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     parentId = 0;
 
-    parentItem: Resource | null = null;
+    parentItem: ResourceItem | null = null;
     blueprint: Blueprint | null = null;
 
     setBreadcrumbItemsError = false;
@@ -65,10 +64,10 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     setBreadcrumbItemsAbortController: AbortController | null = null;
     createNewGroupAbortController: AbortController | null = null;
 
-    getThisMsg = locale.getThisMsg as string;
-    getSelectedMsg = locale.getSelectedMsg as string;
+    getThisMsg = mPickThis;
+    getSelectedMsg = mPickSelected;
 
-    private readonly initialParentId: number = 0;
+    readonly initialParentId: number = 0;
 
     constructor({
         multiple,
@@ -138,13 +137,15 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         this.abort();
     };
 
-    getResourceClasses = <T extends Resource['cls']>(classes: T[]): T[] => {
-        const resourceClasses: T[] = [...classes];
+    getResourceClasses = (classes: ResourceClass[]): ResourceClass[] => {
+        const resourceClasses: ResourceClass[] = [...classes];
         if (this.blueprint) {
             for (const cls of classes) {
-                const blueprintResourceClasses = this.blueprint.resources[cls]
+                const blueprintResourceClasses = this.blueprint.resources[cls];
                 if (blueprintResourceClasses) {
-                    resourceClasses.push(...blueprintResourceClasses.base_classes);
+                    resourceClasses.push(
+                        ...blueprintResourceClasses.base_classes
+                    );
                 }
             }
         }
@@ -156,13 +157,14 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         const requireClass = this.requireClass;
         const requireInterface = this.requireInterface;
         if (requireClass) {
-            checks.push(() => this.getResourceClasses([resource.cls])
-                .includes(requireClass));
+            checks.push(() =>
+                this.getResourceClasses([resource.cls]).includes(requireClass)
+            );
         }
         if (requireInterface) {
-            checks.push(() => resource.interfaces.some((intf) =>
-                requireInterface === intf
-            ));
+            checks.push(() =>
+                resource.interfaces.some((intf) => requireInterface === intf)
+            );
         }
         return checks.length ? checks.some((c) => c()) : true;
     }
@@ -252,17 +254,15 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
             runInAction(() => {
                 this.resourcesLoading = true;
             });
-            const blueprint = await route("resource.blueprint")
-                .get({
-                    signal: this.setChildrenAbortController.signal,
-                    cache: true
-                });
-            this.blueprint = blueprint
-            const parentItem = await route("resource.item", parent)
-                .get({
-                    signal: this.setChildrenAbortController.signal,
-                    cache: true
-                });
+            const blueprint = await route("resource.blueprint").get({
+                signal: this.setChildrenAbortController.signal,
+                cache: true,
+            });
+            this.blueprint = blueprint;
+            const parentItem = await route("resource.item", parent).get({
+                signal: this.setChildrenAbortController.signal,
+                cache: true,
+            });
             this.parentItem = parentItem;
             const resp = await route("resource.collection").get({
                 query: { parent },
@@ -341,7 +341,6 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     private _resourceVisible(resource: Resource): boolean {
         if (this.hideUnavailable) {
             return this._resourceAvailable(resource);
-
         }
         return true;
     }
@@ -351,14 +350,18 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         const traverseClasses = this.traverseClasses;
         const requireClass = this.requireClass;
         const requireInterface = this.requireInterface;
-        const checks: (() => boolean)[] = []
+        const checks: (() => boolean)[] = [];
         if (traverseClasses) {
-            checks.push(() => this.getResourceClasses([cls])
-                .some((cls) => traverseClasses.includes(cls)));
+            checks.push(() =>
+                this.getResourceClasses([cls]).some((cls) =>
+                    traverseClasses.includes(cls)
+                )
+            );
         }
         if (requireClass) {
-            checks.push(() => this.getResourceClasses([cls])
-                .includes(requireClass));
+            checks.push(() =>
+                this.getResourceClasses([cls]).includes(requireClass)
+            );
         }
         if (requireInterface) {
             checks.push(() => interfaces.includes(requireInterface));
