@@ -80,7 +80,9 @@ define([
 
         serialize: function (data, lunkwill) {
             const result = this.store.dump({ lunkwill });
-            lang.setObject(this.store.identity, result, data);
+            if (result !== undefined) {
+                lang.setObject(this.store.identity, result, data);
+            }
             var deferred = new Deferred();
             deferred.resolve(true);
             return deferred;
