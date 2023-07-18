@@ -1,4 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module "@material-icons/svg/*" {
-    const value: () => JSX.Element;
+    const value: any;
     export = value;
 }
