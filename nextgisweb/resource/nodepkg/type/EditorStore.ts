@@ -1,6 +1,6 @@
 import type { LunkwillParam } from "@nextgisweb/pyramid/api/request";
 
-export type Operations = 'create' | 'update' | 'delete';
+export type Operations = "create" | "update" | "delete";
 
 interface DumpParams {
     lunkwill: LunkwillParam;
@@ -12,7 +12,6 @@ export interface EditorStoreOptions {
 }
 
 export interface EditorStore {
-
     identity: string;
 
     uploading: boolean;
