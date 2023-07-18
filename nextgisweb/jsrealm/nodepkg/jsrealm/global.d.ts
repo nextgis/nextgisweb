@@ -1,4 +1,4 @@
 declare module "@material-icons/svg/*" {
-    const value: any;
+    const value: () => JSX.Element;
     export = value;
- }
+}

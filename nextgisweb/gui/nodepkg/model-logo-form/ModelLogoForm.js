@@ -16,34 +16,34 @@ const defaultMessages = {
 export function ModelLogoForm({ model, messages = {}, accept }) {
     const [status, setStatus] = useState("loading");
     const [logo, setLogo] = useState(null);
+    const [fileMeta, setFileMeta] = useState(null);
 
     const msg = { ...defaultMessages, ...messages };
 
-    const initLogo = async () => {
-        try {
-            const resp = await fetch(routeURL(model));
-            if (resp.ok) {
-                const existLogo = await resp.blob();
-                setLogo(existLogo);
-            } else {
-                throw new Error("The logo is not set");
-            }
-        } catch (err) {
-            // ignore error
-        } finally {
-            setStatus(null);
-        }
-    };
-
     useEffect(() => {
+        const initLogo = async () => {
+            try {
+                const resp = await fetch(routeURL(model));
+                if (resp.ok) {
+                    const existLogo = await resp.blob();
+                    setLogo(existLogo);
+                } else {
+                    throw new Error("The logo is not set");
+                }
+            } catch (err) {
+                // ignore error
+            } finally {
+                setStatus(null);
+            }
+        };
         initLogo();
-    }, []);
+    }, [model]);
 
     const save = async () => {
         try {
             await fetch(routeURL(model), {
                 method: "PUT",
-                body: JSON.stringify(logo),
+                body: JSON.stringify(fileMeta),
             });
             message.success(msg.saveSuccess);
         } catch (err) {
@@ -63,8 +63,8 @@ export function ModelLogoForm({ model, messages = {}, accept }) {
                 helpText={msg.helpText}
                 uploadText={msg.uploadText}
                 dragAndDropText={msg.dragAndDropText}
-                onChange={setLogo}
-                image={logo}
+                onChange={setFileMeta}
+                file={logo}
                 accept={accept}
             ></ImageUploader>
             <SaveButton onClick={save} loading={status === "saving"} />

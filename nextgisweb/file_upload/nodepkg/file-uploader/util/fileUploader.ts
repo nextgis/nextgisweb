@@ -2,15 +2,13 @@ import { Upload, isSupported } from "tus-js-client";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import settings from "@nextgisweb/pyramid/settings!file_upload";
 
-export function fileUploader(options) {
-    if (settings.tus.enabled && isSupported) {
-        return tusUpload(options);
-    } else {
-        return upload(options);
-    }
-}
+import type { FileMeta, FileUploaderOptions } from "../type";
 
-async function upload({ files, onProgress, signal }) {
+async function upload({
+    files,
+    onProgress,
+    signal,
+}: FileUploaderOptions): Promise<FileMeta[]> {
     return new Promise((resolve, reject) => {
         const data = new FormData();
         for (const file of files) {
@@ -45,11 +43,11 @@ async function upload({ files, onProgress, signal }) {
     });
 }
 
-async function tusUpload({ files, onProgress, signal }) {
+async function tusUpload({ files, onProgress, signal }: FileUploaderOptions) {
     const result = [];
 
     let totalFilesSize = 0;
-    let alreadyUloadedSize = 0;
+    let alreadyUploadedSize = 0;
 
     for (const file of files) {
         totalFilesSize += file.size;
@@ -64,7 +62,7 @@ async function tusUpload({ files, onProgress, signal }) {
                     if (onProgress) {
                         progressFileSize = bytesUploaded;
                         const decimal =
-                            (alreadyUloadedSize + progressFileSize) /
+                            (alreadyUploadedSize + progressFileSize) /
                             totalFilesSize;
                         const percent = (100 * decimal).toFixed(0) + "%";
                         onProgress({
@@ -75,15 +73,17 @@ async function tusUpload({ files, onProgress, signal }) {
                     }
                 },
                 onError: (error) => {
-                    const response = error.originalResponse;
-                    const respHeader = response.getHeader("Content-Type");
-                    if (respHeader === "application/json") {
-                        error = JSON.parse(response.getBody());
+                    if ("originalResponse" in error) {
+                        const response = error.originalResponse;
+                        const respHeader = response.getHeader("Content-Type");
+                        if (respHeader === "application/json") {
+                            error = JSON.parse(response.getBody());
+                        }
+                        reject(error);
                     }
-                    reject(error);
                 },
                 onSuccess: () => {
-                    alreadyUloadedSize += progressFileSize;
+                    alreadyUploadedSize += progressFileSize;
                     window
                         .fetch(uploader.url, { signal })
                         .then((resp) => resp.json().then(resolve))
@@ -102,4 +102,14 @@ async function tusUpload({ files, onProgress, signal }) {
     }
 
     return result;
+}
+
+export function fileUploader(
+    options: FileUploaderOptions
+): Promise<FileMeta[]> {
+    if (settings.tus.enabled && isSupported) {
+        return tusUpload(options);
+    } else {
+        return upload(options);
+    }
 }

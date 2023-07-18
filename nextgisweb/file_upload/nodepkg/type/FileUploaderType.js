@@ -9,6 +9,6 @@ export const FileUploaderType = {
     inputProps: PropTypes.object,
     accept: PropTypes.string,
     height: PropTypes.string,
-    fileMeta: PropTypes.object, 
+    fileMeta: PropTypes.object,
     setFileMeta: PropTypes.func,
-}
+};
