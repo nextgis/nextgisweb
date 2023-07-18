@@ -27,7 +27,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/gui/error",
     "@nextgisweb/pyramid/icon",
-    "ngw-pyramid/company-logo/company-logo",
+    "@nextgisweb/pyramid/company-logo",
     // tools
     "../../tool/Base",
     "../../tool/Zoom",
@@ -509,7 +509,7 @@ define([
                 idx = idx + 1;
             }, this);
 
-            companyLogo(this.mapNode);
+            companyLogo.appendTo(this.mapNode);
 
             this._setMapExtent();
             this._setBasemap();

@@ -35,7 +35,7 @@ define([
     "@nextgisweb/pyramid/icon",
     "@nextgisweb/gui/error",
     "@nextgisweb/pyramid/i18n!",
-    "ngw-pyramid/company-logo/company-logo",
+    "@nextgisweb/pyramid/company-logo",
     // tools
     "ngw-webmap/MapToolbar",
     "ngw-webmap/controls/InitialExtent",
@@ -869,7 +869,7 @@ define([
                 this
             );
 
-            companyLogo(this.mapNode);
+            companyLogo.appendTo(this.mapNode);
 
             this._setMapExtent();
 
