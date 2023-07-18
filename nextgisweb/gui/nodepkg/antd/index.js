@@ -65,4 +65,5 @@ export { default as Calendar} from "./calendar";
 export { default as ConfigProvider} from "./config-provider";
 export { default as DatePicker } from "./date-picker";
 export { default as TimePicker } from "./time-picker";
+export { default as RangePicker } from "./range-date-time-picker";
 export { default as Table } from "./table";
