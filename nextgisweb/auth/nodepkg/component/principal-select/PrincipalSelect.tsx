@@ -1,5 +1,3 @@
-import { PropTypes } from "prop-types";
-
 import { useEffect, useState, useMemo } from "react";
 
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -11,6 +9,10 @@ import RegularUserIcon from "@material-icons/svg/person";
 import SystemUserIcon from "@material-icons/svg/attribution";
 import GroupIcon from "@material-icons/svg/groups";
 
+import type { PrincipalSelectProps, Member, SelectProps } from "./type";
+
+type TagProps = Parameters<SelectProps["tagRender"]>[0];
+
 export function PrincipalSelect({
     editOnClick,
     systemUsers,
@@ -19,13 +21,14 @@ export function PrincipalSelect({
     model = "principal",
     value,
     ...restSelectProps
-}) {
-    const [members, setMembers] = useState([]);
+}: PrincipalSelectProps) {
+    const [members, setMembers] = useState<Member[]>([]);
     const { makeSignal } = useAbortController();
 
-    const memberById = (memberId) => members.find((itm) => itm.id === memberId);
+    const memberById = (memberId: number) =>
+        members.find((itm) => itm.id === memberId);
 
-    const editUrl = (member) => {
+    const editUrl = (member: Member) => {
         if (member) {
             const memberId = member.id;
             if (member._user) {
@@ -35,7 +38,7 @@ export function PrincipalSelect({
         }
     };
 
-    const getIcon = (member) => {
+    const getIcon = (member: Member) => {
         if (member._user) {
             if (member.is_administrator) {
                 return <AdministratorIcon />;
@@ -48,7 +51,13 @@ export function PrincipalSelect({
         }
     };
 
-    const optionRender = ({ label, value }) => {
+    const optionRender = ({
+        label,
+        value,
+    }: {
+        label: string;
+        value: number;
+    }) => {
         return (
             <Space>
                 {getIcon(memberById(value))}
@@ -57,16 +66,15 @@ export function PrincipalSelect({
         );
     };
 
-    const tagRender = (tagProps) => {
+    const tagRender = (tagProps: TagProps) => {
         const { label, closable, onClose, value } = tagProps;
-        const onPreventMouseDown = (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-        };
         const member = memberById(value);
         return (
             <Tag
-                onMouseDown={onPreventMouseDown}
+                onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}
                 closable={closable}
                 onClose={onClose}
                 style={{ marginRight: 3 }}
@@ -89,7 +97,7 @@ export function PrincipalSelect({
 
     useEffect(() => {
         const loadData = () => {
-            const promises = [];
+            const promises: Promise<Member[]>[] = [];
             const loadUsers = model === "principal" || model === "user";
             const loadGroups = model === "principal" || model === "group";
             if (loadUsers) {
@@ -126,12 +134,28 @@ export function PrincipalSelect({
                     })
                 );
             }
-            return Promise.all(promises).then((members) =>
-                members.flat().sort((a, b) => {
-                    if (a.system !== b.system) {
-                        return a.system ? -1 : 1;
+            return Promise.all(promises).then((members_) =>
+                members_.flat().sort((a, b) => {
+                    const aSystem = a.system && a._user;
+                    const bSystem = b.system && b._user;
+                    const aGroup = !a._user;
+                    const bGroup = !b._user;
+
+                    if (aSystem && bSystem) {
+                        return a.display_name.localeCompare(b.display_name);
                     }
-                    return a.display_name > b.display_name ? 1 : -1;
+
+                    if (aSystem && !bSystem) return -1;
+                    if (!aSystem && bSystem) return 1;
+
+                    if (aGroup && bGroup) {
+                        return a.display_name.localeCompare(b.display_name);
+                    }
+
+                    if (aGroup && b._user) return -1;
+                    if (a._user && bGroup) return 1;
+
+                    return a.display_name.localeCompare(b.display_name);
                 })
             );
         };
@@ -142,19 +166,22 @@ export function PrincipalSelect({
 
     const options = useMemo(() => {
         return members
-            ? members.map(({ display_name, id }) => ({
-                label: display_name,
-                value: id,
-            }))
+            ? members.map(({ display_name, id }) => {
+                  return {
+                      label: display_name,
+                      value: id,
+                  };
+              })
             : [];
     }, [members]);
 
     return (
         <Select
+            showSearch
             style={{ width: "100%" }}
             value={value}
             onChange={onChange}
-            mode={multiple ? "multiple" : null}
+            mode={multiple ? "multiple" : undefined}
             optionFilterProp="label"
             loading={!members}
             allowClear
@@ -173,15 +200,3 @@ export function PrincipalSelect({
         </Select>
     );
 }
-
-PrincipalSelect.propTypes = {
-    value: PropTypes.any,
-    onChange: PropTypes.func,
-    multiple: PropTypes.bool,
-    editOnClick: PropTypes.bool,
-    model: PropTypes.oneOf(["principal", "user", "group"]),
-    systemUsers: PropTypes.oneOfType([
-        PropTypes.bool,
-        PropTypes.arrayOf(PropTypes.string),
-    ]),
-};

@@ -3,6 +3,7 @@ import { PrincipalSelect } from "./PrincipalSelect";
 
 const presets = [
     ["Groups and users (default)", {}],
+    ["All users and groups", { systemUsers: true }],
     ["Multiple groups and users", { multiple: true }],
     ["Users only", { model: "user" }],
     ["Users including system ones", { model: "user", systemUsers: true }],
@@ -23,7 +24,7 @@ function PrincipalSelectTest() {
                     <div key={title} style={{ marginBottom: "1em" }}>
                         <h4>{title}</h4>
                         <code>{`<PrincipalSelect ${propsCode}/>`}</code>
-                        <div style={{marginTop: "1ex"}}>
+                        <div style={{ marginTop: "1ex" }}>
                             <PrincipalSelect
                                 style={{ width: "40em" }}
                                 {...props}
