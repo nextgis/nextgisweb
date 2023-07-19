@@ -8,7 +8,7 @@
     links = [dict(
         title=tr(link.title),
         help=tr(link.help) if link.help else None,
-        docUrl=link.doc_url if nextgis_docs else None,
+        docsUrl=link.docs_url if nextgis_docs else None,
         url=link.url,
     ) for link in links]
 %>

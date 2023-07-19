@@ -15,7 +15,7 @@ class ServiceWidget(Widget):
 class WFSLink(ExternalAccessLink):
     title = _("Web Feature Service (WFS)")
     help = _("Web Feature Service (WFS) provides an interface allowing requests for geographical features across the web using platform-independent calls.")
-    doc_url = "https://docs.nextgis.com/docs_ngweb/source/layers.html#wfs-service"
+    docs_url = "docs_ngweb/source/layers.html#wfs-service"
 
     resource = Service
 

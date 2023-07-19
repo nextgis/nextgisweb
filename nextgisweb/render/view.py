@@ -28,7 +28,7 @@ class TileCacheWidget(Widget):
 class TMSLink(ExternalAccessLink):
     title = _("TMS (Tile Map Service)")
     help = _("TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map is a map displayed in a browser by seamlessly joining dozens of individually requested image.")
-    doc_url = "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html?lang={lang}#render"
+    docs_url = "docs_ngweb_dev/doc/developer/misc.html#render"
 
     interface = IRenderableStyle
 

@@ -15,7 +15,7 @@ class ServiceWidget(Widget):
 class OGCFServerLink(ExternalAccessLink):
     title = _("OGC API Features")
     help = _("OGC API Features provides API building blocks to create, modify and query features on the Web.")
-    doc_url = "https://docs.nextgis.com/docs_ngweb/source/layers.html#ogcfserver-service"
+    docs_url = "docs_ngweb/source/layers.html#ogcfserver-service"
 
     resource = Service
 

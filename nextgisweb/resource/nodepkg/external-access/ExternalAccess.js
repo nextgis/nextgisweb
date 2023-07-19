@@ -3,19 +3,21 @@ import { Popover } from "@nextgisweb/gui/antd";
 import HelpOutlineIcon from "@material-icons/svg/help_outline";
 import ContentCopyIcon from "@material-icons/svg/content_copy";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { url } from "@nextgisweb/pyramid/nextgis";
+
 import i18n from "@nextgisweb/pyramid/i18n";
 
 import "./ExternalAccess.less";
 
 const READ_MORE = i18n.gettext("Read more");
 
-const Help = ({ help, docUrl }) => (
+const Help = ({ help, docsUrl }) => (
     <>
         {help}
-        {docUrl && (
+        {docsUrl && (
             <>
                 {" "}
-                <a target="_blank" href={docUrl}>
+                <a target="_blank" href={url("docs:" + docsUrl)}>
                     {READ_MORE}
                 </a>
             </>
@@ -23,14 +25,14 @@ const Help = ({ help, docUrl }) => (
     </>
 );
 
-const Link = ({ title, help, docUrl, url }) => (
+const Link = ({ title, help, docsUrl, url }) => (
     <>
         <div className="row-title">
             {title}{" "}
             <Popover
                 overlayClassName="ngw-resource-external-access-popover"
                 placement="right"
-                content={<Help help={help} docUrl={docUrl} />}
+                content={<Help help={help} docsUrl={docsUrl} />}
             >
                 <HelpOutlineIcon />
             </Popover>

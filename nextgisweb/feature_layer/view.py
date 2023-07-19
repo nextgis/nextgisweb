@@ -130,7 +130,7 @@ def export_multiple(request):
 class MVTLink(ExternalAccessLink):
     title = _("MVT Vector Tiles")
     help = _("The Mapbox Vector Tile is an efficient encoding for map data into vector tiles that can be rendered dynamically.")
-    doc_url = "https://docs.nextgis.com/docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles"
+    docs_url = "docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles"
 
     interface = IFeatureLayer
 

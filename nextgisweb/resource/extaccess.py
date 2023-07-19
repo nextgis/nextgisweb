@@ -14,7 +14,7 @@ from .model import Resource
 class ExternalAccessLink:
     title: str
     help: Optional[str] = None
-    doc_url: Optional[str] = None
+    docs_url: Optional[str] = None
 
     resource: Optional[Type[Resource]] = None
     interface: Optional[Type[Interface]] = None

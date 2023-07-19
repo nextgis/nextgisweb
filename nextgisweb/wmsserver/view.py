@@ -15,7 +15,7 @@ class ServiceWidget(Widget):
 class WMSLink(ExternalAccessLink):
     title = _("WMS service")
     help = _("Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map images. These images are typically produced by a map server from data provided by a GIS database.")
-    doc_url = "https://docs.nextgis.com/docs_ngweb/source/layers.html#using-wms-service-connection"
+    docs_url = "docs_ngweb/source/layers.html#using-wms-service-connection"
 
     resource = Service
 
