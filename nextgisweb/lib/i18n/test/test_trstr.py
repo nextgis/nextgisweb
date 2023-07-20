@@ -6,12 +6,28 @@ import pytest
 from ..trstr import trstr_factory
 
 f = trstr_factory('test')
-
+n = f.ngettext
+p = f.pgettext
+np = f.npgettext
 
 class UpperCaseTranslator:
-    def translate(self, msg, *, context=None, domain=None):
+    def translate(
+        self, msg, *,
+        plural=None,
+        number=None,
+        context=None,
+        domain=None,
+    ):
         assert domain == 'test'
-        return msg.upper().replace('%S', '%s')
+        result = msg
+        if number is not None:
+            assert plural is not None
+            if number > 1:
+                result = plural
+        result = result.upper().replace('%S', '%s')
+        if context is not None:
+            result += '@' + context.upper()
+        return result
 
 
 @pytest.fixture(scope='module')
@@ -22,6 +38,17 @@ def uc_tr():
         return value.__translate__(uct)
 
     return tr
+
+def test_context(uc_tr):
+    assert uc_tr(f('foo')) == 'FOO'
+    assert uc_tr(p('ctx', 'bar')) == 'BAR@CTX'
+
+
+def test_plural(uc_tr):
+    assert uc_tr(n("one", "many", 1)) == "ONE"
+    assert uc_tr(n("one", "many", 2)) == "MANY"
+    assert uc_tr(np('ctx', 'one', 'many', 1)) == "ONE@CTX"
+    assert uc_tr(np('ctx', 'one', 'many', 2)) == "MANY@CTX"
 
 
 def test_concat(uc_tr):
@@ -48,7 +75,13 @@ class DictTranslator:
     def add(self, msg, translation):
         self._dict[msg] = translation
 
-    def translate(self, msg, *, context=None, domain=None):
+    def translate(
+        self, msg, *,
+        plural=None,
+        number=None,
+        context=None,
+        domain=None,
+    ):
         assert domain == 'test'
         return self._dict[msg]
 

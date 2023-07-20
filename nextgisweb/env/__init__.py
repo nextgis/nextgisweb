@@ -1,11 +1,20 @@
-from nextgisweb.lib.i18n import TrStr
+import typing
 
 from .component import Component, load_all, require
 from .environment import Env, EnvDependency, env, inject, provide, setenv
 from .model import DBSession, declarative_base
 
-COMP_ID: str
-_: TrStr
+if typing.TYPE_CHECKING:
+    from nextgisweb.lib.i18n import TrStr
+
+    COMP_ID: str
+
+    def gettext(message: str) -> TrStr: pass
+    def pgettext(context: str, messsage: str) -> TrStr: pass
+    def ngettext(singual: str, plural: str, number: int) -> TrStr: pass
+    def npgettext(context: str, singual: str, plural: str, number: int) -> TrStr: pass
+
+    _ = gettext
 
 
 def __getattr__(name):
@@ -13,9 +22,9 @@ def __getattr__(name):
         from .component import _COMP_ID
         return _COMP_ID()
 
-    elif name == '_':
+    elif name in ('_', 'gettext', 'pgettext', 'ngettext', 'npgettext'):
         from .i18n import _gettext
-        return _gettext()
+        return getattr(_gettext(), 'gettext' if name == '_' else name)
 
     elif name == 'Base':
         from .model import _base

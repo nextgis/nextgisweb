@@ -71,7 +71,10 @@ def write_jed(fileobj, catalog):
     for msg in catalog:
         if msg.id == '':
             continue
-        data[msg.id] = (msg.string, ) if isinstance(msg.string, str) \
+        key = msg.id[0] if isinstance(msg.id, tuple) else msg.id
+        if msg.context is not None:
+            key = f"{msg.context}\u0004{key}"
+        data[key] = (msg.string, ) if isinstance(msg.string, str) \
             else msg.string
 
     fileobj.write(json.dumps(data, ensure_ascii=False, indent=2))

@@ -1,15 +1,22 @@
-from functools import partial
 from inspect import signature
 
 from ..logging import logger
 
 
 class TrStr:
+    __slots__ = ['msg', 'plural', 'number', 'context', 'domain']
 
-    def __init__(self, msg, *, domain, context=None):
+    def __init__(
+        self, msg, *,
+        plural=None, number=None,
+        context=None, domain
+    ):
         self.msg = msg
-        self.domain = domain
+        self.plural = plural
+        self.number = number
+
         self.context = context
+        self.domain = domain
 
     def __str__(self):
         return self.msg
@@ -28,7 +35,12 @@ class TrStr:
 
     def __translate__(self, translator):
         return translator.translate(
-            self.msg, domain=self.domain, context=self.context)
+            self.msg,
+            plural=self.plural,
+            number=self.number,
+            context=self.context,
+            domain=self.domain,
+        )
 
 
 class TrStrConcat:
@@ -162,12 +174,49 @@ def deep_cast_to_str(value):
     return value
 
 
-def trstr_factory(domain):
-    return partial(TrStr, domain=domain)
+class trstr_factory:
+
+    def __init__(self, domain: str):
+        self.domain = domain
+
+    def gettext(self, message: str) -> TrStr:
+        return TrStr(message, domain=self.domain)
+
+    def pgettext(self, context: str, message: str) -> TrStr:
+        return TrStr(message, context=context, domain=self.domain)
+
+    def ngettext(self, singular: str, plural: str, number: int) -> TrStr:
+        return TrStr(
+            singular,
+            plural=plural,
+            number=number,
+            domain=self.domain)
+
+    def npgettext(self, context: str, singular: str, plural: str, number: int) -> TrStr:
+        return TrStr(
+            singular,
+            plural=plural,
+            number=number,
+            context=context,
+            domain=self.domain)
+
+    def __call__(self, message: str) -> TrStr:
+        """Alias for gettext"""
+        return TrStr(message, domain=self.domain)
 
 
 class DummyTranslator:
-    def translate(self, msg, *, context=None, domain=None):
+    def translate(
+        self, msg, *,
+        plural=None,
+        number=None,
+        context=None,
+        domain=None,
+    ):
+        if plural is not None:
+            assert number is not None
+            if number > 1:
+                return plural
         return msg
 
 

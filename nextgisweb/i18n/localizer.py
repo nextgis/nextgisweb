@@ -34,8 +34,18 @@ class Translations(BabelTranslations):
                 with mo_path.open('rb') as fp:
                     self.add(Translations(fp=fp, domain=comp_id))
 
-    def translate(self, msg, *, domain, context):
-        return self.dugettext(domain, msg)
+    def translate(
+        self, message, *,
+        plural, number,
+        domain, context,
+    ):
+        # TODO: Call these methods directly from TrStr
+        if context is not None:
+            return self.dpgettext(domain, context, message) if plural is None \
+                else self.dnpgettext(domain, context, message, plural, number)
+        else:
+            return self.dgettext(domain, message) if plural is None \
+                else self.dngettext(domain, message, plural, number)
 
 
 class Localizer:

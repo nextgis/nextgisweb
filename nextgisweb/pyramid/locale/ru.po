@@ -504,3 +504,11 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
+#: nodepkg/i18n/testentry.js:4 test/test_i18n.py:8 test/test_i18n.py:9
+#: test/test_i18n.py:10
+msgctxt "test"
+msgid "unit"
+msgid_plural "units"
+msgstr[0] "штука"
+msgstr[1] "штуки"
+msgstr[2] "штук"
