@@ -240,7 +240,7 @@ def test_timeout(reqest):
             line = "idx = {}, elapsed = {:.3f}, timestamp = {}".format(
                 idx, elapsed, current.isoformat())
 
-            logger.warn("Timeout test: " + line)
+            logger.warning("Timeout test: " + line)
             yield (line + "\n").encode('utf-8')
 
     resp = Response(app_iter=generator(), content_type='text/plain')

@@ -244,7 +244,7 @@ def route(request) -> JSONType:
         api_pattern = route.pattern.startswith('/api/')
         if api_pattern or client_predicate:
             if api_pattern and client_predicate:
-                logger.warn(
+                logger.warning(
                     "API route '%s' has useless 'client' predicate!",
                     route.name)
             kys = route_re.findall(route.path)

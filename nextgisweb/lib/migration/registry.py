@@ -25,7 +25,7 @@ class PythonModuleMigration(Migration):
                 revision = m.group(1).lower()
                 yield PythonModuleMigration(component, revision, fn)
             else:
-                logger.warn('Failed to identify python migration: {}'.format(fn))
+                logger.warning('Failed to identify python migration: {}'.format(fn))
 
     _regexp_meta = re.compile(r'^(?:\s*\#[^\n]*\n|\s*\n)*\"{3}\s*(\{.+\})\s*\"{3}\s*(.*)$', re.S)
     _regexp_forward = re.compile(r'def\s+forward\s*\(')
@@ -105,7 +105,7 @@ class SQLScriptMigration(Migration):
                 migration = SQLScriptMigration(component, revision, fn)
                 yield migration
             else:
-                logger.warn('Failed to identify SQL script migration: {}'.format(fn))
+                logger.warning('Failed to identify SQL script migration: {}'.format(fn))
 
     @classmethod
     def template(cls, path, revision, forward=True, rewind=True, **meta):

@@ -268,7 +268,7 @@ class TilestorWriter:
         self._worker.join(timeout)
 
         if self._worker.is_alive():
-            logger.warn("Tile cache writer is still running. It'll be killed!")
+            logger.warning("Tile cache writer is still running. It'll be killed!")
             return False
         else:
             logger.debug("Tile cache writer has successfully shut down.")

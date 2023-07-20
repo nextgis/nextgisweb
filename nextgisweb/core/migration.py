@@ -63,13 +63,13 @@ class MigrationRegistry(Registry):
             if mk in known:
                 result[mk] = True
             else:
-                logger.warn("Unknown migration found: {}".format(mk))
+                logger.warning("Unknown migration found: {}".format(mk))
 
         # Set all ancestor migrations to applied state
         if ancestors:
             for anc in self.graph.ancestors(tuple(result.keys()), True):
                 if anc not in result:
-                    logger.warn("Setting [{}] to applied state".format(anc))
+                    logger.warning("Setting [{}] to applied state".format(anc))
                     result[anc] = True
 
         return result
