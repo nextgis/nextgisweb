@@ -23,8 +23,8 @@ def __getattr__(name):
         return _COMP_ID()
 
     elif name in ('_', 'gettext', 'pgettext', 'ngettext', 'npgettext'):
-        from .i18n import _gettext
-        return getattr(_gettext(), 'gettext' if name == '_' else name)
+        from .component import _tr_str_factory as _factory
+        return getattr(_factory(), 'gettext' if name == '_' else name)
 
     elif name == 'Base':
         from .model import _base

@@ -4,6 +4,7 @@ from pathlib import Path
 from warnings import warn
 
 from nextgisweb.lib.config import ConfigOptions
+from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import dict_registry
@@ -223,3 +224,4 @@ def component_utility(factory):
 
 
 _COMP_ID = component_utility(lambda component_id: component_id)
+_tr_str_factory = component_utility(trstr_factory)
