@@ -6,7 +6,7 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: component.py:29
+#: component.py:27
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
@@ -14,22 +14,25 @@ msgstr "Основная веб-карта"
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:35 view.py:317
+#: model.py:35
+msgctxt "permission"
 msgid "Display"
-msgstr "Открыть"
+msgstr "Открытие"
 
 #: model.py:36
+msgctxt "permission"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:172 model.py:37
-#: nodepkg/annotations-panel/AnnotationsPanel.js:72
-msgid "Edit annotations"
-msgstr "Редактировать аннотации"
+#: model.py:37
+msgctxt "permission"
+msgid "Draw annotations"
+msgstr "Рисование аннотаций"
 
 #: model.py:38
+msgctxt "permission"
 msgid "Manage annotations"
-msgstr "Администрировать аннотации"
+msgstr "Управление аннотациями"
 
 #: view.py:45
 msgid "Web map settings"
@@ -43,74 +46,79 @@ msgstr "Клонировать веб-карту"
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: nodepkg/clone-webmap/CloneWebmap.js:180 view.py:323
+#: view.py:317
+msgid "Display"
+msgstr "Открыть"
+
+#: nodepkg/clone-webmap/CloneWebmap.js:183 view.py:323
 msgid "Clone"
 msgstr "Клонировать"
 
-#: amd/ngw-webmap/Display.js:229 amd/ngw-webmap/Display.js:1140
+#: amd/ngw-webmap/Display.js:202 amd/ngw-webmap/Display.js:1117
 #: amd/ngw-webmap/ItemWidget.js:247
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:235 amd/ngw-webmap/Display.js:381
+#: amd/ngw-webmap/Display.js:208 amd/ngw-webmap/Display.js:358
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:241 amd/ngw-webmap/Display.js:472
+#: amd/ngw-webmap/Display.js:214 amd/ngw-webmap/Display.js:449
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:247
+#: amd/ngw-webmap/Display.js:220
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:403 amd/ngw-webmap/Display.js:414
+#: amd/ngw-webmap/Display.js:380 amd/ngw-webmap/Display.js:391
+#: amd/ngw-webmap/template/MapToolbarItems.hbs:5
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:437 amd/ngw-webmap/plugin/LayerInfo.js:50
+#: amd/ngw-webmap/Display.js:414 amd/ngw-webmap/plugin/LayerInfo.js:50
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:579 amd/ngw-webmap/Display.js:600
+#: amd/ngw-webmap/Display.js:556 amd/ngw-webmap/Display.js:577
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:784 amd/ngw-webmap/tool/Zoom.js:20
+#: amd/ngw-webmap/Display.js:761 amd/ngw-webmap/tool/Zoom.js:20
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:444
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:785 amd/ngw-webmap/tool/Zoom.js:23
+#: amd/ngw-webmap/Display.js:762 amd/ngw-webmap/tool/Zoom.js:23
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:445
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:789 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:449
+#: amd/ngw-webmap/Display.js:766 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:449
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:805 amd/ngw-webmap/template/ExtentWidget.hbs:12
+#: amd/ngw-webmap/Display.js:782 amd/ngw-webmap/template/ExtentWidget.hbs:12
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:810
+#: amd/ngw-webmap/Display.js:787
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:813 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
+#: amd/ngw-webmap/Display.js:790 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:1337 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:625
+#: amd/ngw-webmap/Display.js:1314 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:625
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:1338 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:626
+#: amd/ngw-webmap/Display.js:1315 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:626
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/ExtentWidget.js:35
+#: amd/ngw-webmap/ExtentWidget.js:34
 msgid "Extent and bookmarks"
 msgstr "Охват и закладки"
 
@@ -162,19 +170,19 @@ msgstr "Свернуть"
 msgid "Disable"
 msgstr "Отключить"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:25
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:17
 msgid "Your annotation text"
 msgstr "Ваш текст аннотации"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:143
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:135
 msgid "Public annotation"
 msgstr "Публичная аннотация"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:145
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:137
 msgid "My private annotation"
 msgstr "Моя приватная аннотация"
 
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:148
+#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:140
 msgid "Private annotation"
 msgstr "Приватная аннотация"
 
@@ -196,7 +204,7 @@ msgid "Stop editing"
 msgstr "Завершить редактирование"
 
 #: amd/ngw-webmap/plugin/LayerEditor.js:143
-#: nodepkg/annotations-panel/AnnotationsPanel.js:63
+#: nodepkg/annotations-panel/AnnotationsPanel.js:101
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -217,26 +225,22 @@ msgid "Enable annotations"
 msgstr "Разрешить аннотирование"
 
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:52
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:16
-#: nodepkg/annotations-panel/AnnotationsPanel.js:145
+#: nodepkg/annotations-panel/AnnotationsPanel.js:166
 msgid "Show annotations"
 msgstr "Показывать аннотации"
 
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:54
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:17
-#: nodepkg/annotations-panel/AnnotationsPanel.js:154
+#: nodepkg/annotations-panel/AnnotationsPanel.js:175
 msgid "No"
 msgstr "Нет"
 
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:55
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:18
-#: nodepkg/annotations-panel/AnnotationsPanel.js:155
+#: nodepkg/annotations-panel/AnnotationsPanel.js:176
 msgid "Yes"
 msgstr "Да"
 
 #: amd/ngw-webmap/resource/OtherSettings/OtherSettings.js:56
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:19
-#: nodepkg/annotations-panel/AnnotationsPanel.js:156
+#: nodepkg/annotations-panel/AnnotationsPanel.js:179
 msgid "With messages"
 msgstr "С сообщениями"
 
@@ -308,7 +312,7 @@ msgstr "Удалить"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:71
 #: amd/ngw-webmap/template/ItemWidget.hbs:128
-#: nodepkg/clone-webmap/CloneWebmap.js:45
+#: nodepkg/clone-webmap/CloneWebmap.js:48
 msgid "Display name"
 msgstr "Наименование"
 
@@ -464,58 +468,6 @@ msgstr "Размер пунсона, пикс"
 msgid "Invalid width: should be from 1 to 100 px"
 msgstr "Значение должно быть от 1 до 100 пикс."
 
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:7
-#: nodepkg/annotations-panel/AnnotationsPanel.js:141
-msgid "Annotations layer"
-msgstr "Слой аннотаций"
-
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:25
-#: nodepkg/annotations-panel/AnnotationsPanel.js:165
-msgid "Private annotations"
-msgstr "Приватные аннотации"
-
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:35
-#: nodepkg/annotations-panel/AnnotationsPanel.js:174
-msgid "Show annotation types"
-msgstr "Показать типы аннотаций"
-
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:41
-#: nodepkg/annotations-panel/AnnotationsPanel.js:184
-msgid "Public annotations"
-msgstr "Публичные аннотации"
-
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.hbs:47
-#: nodepkg/annotations-panel/AnnotationsPanel.js:194
-msgid "My private annotations"
-msgstr "Мои приватные аннотации"
-
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:181
-#: nodepkg/annotations-panel/AnnotationsPanel.js:77
-msgid "Geometry type"
-msgstr "Тип геометрии"
-
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:184
-#: nodepkg/annotations-panel/AnnotationsPanel.js:86
-#: nodepkg/utils/geometry-types.js:6
-msgid "Point"
-msgstr "Точка"
-
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:185
-#: nodepkg/annotations-panel/AnnotationsPanel.js:87
-msgid "Line"
-msgstr "Линия"
-
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:186
-#: nodepkg/annotations-panel/AnnotationsPanel.js:88
-#: nodepkg/utils/geometry-types.js:15
-msgid "Polygon"
-msgstr "Полигон"
-
-#: amd/ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel.js:223
-#: nodepkg/annotations-panel/AnnotationsPanel.js:105
-msgid "Other private annotations"
-msgstr "Другие приватные аннотации"
-
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:27
 msgid "Stopping editing"
 msgstr "Завершить редактирование?"
@@ -529,114 +481,63 @@ msgid "Don't save"
 msgstr "Не сохранять"
 
 #: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:10
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:96
+#: nodepkg/print-map-panel/PrintMapPanel.js:203
 msgid "Print"
 msgstr "Печать"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:20
-msgid "Paper format"
-msgstr "Формат бумаги"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:24
-msgid "Select format"
-msgstr "Выберите формат"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:26
-msgid "A4 - Portrait"
-msgstr "A4 - Портретный"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:27
-msgid "A4 - Landscape"
-msgstr "A4 - Альбомный"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:28
-msgid "A3 - Portrait"
-msgstr "A3 - Портретный"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:29
-msgid "A3 - Landscape"
-msgstr "A3 - Альбомный"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:30
-msgid "A2 - Portrait"
-msgstr "A2 - Портретный"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:31
-msgid "A2 - Landscape"
-msgstr "A2 - Альбомный"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:32
-msgid "A1 - Portrait"
-msgstr "A1 - Портретный"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:33
-msgid "A1 - Landscape"
-msgstr "A1 - Альбомный"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:34
-msgid "A0 - Portrait"
-msgstr "A0 - Портретный"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:35
-msgid "A0 - Landscape"
-msgstr "A0 - Альбомный"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:36
-msgid "Custom size"
-msgstr "Настраиваемый"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:42
-msgid "Height, mm"
-msgstr "Высота, мм"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:53
-msgid "Width, mm"
-msgstr "Ширина, мм"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:64
-msgid "Margin, mm"
-msgstr "Отступ, мм"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:74
-msgid "Scale value"
-msgstr "Значение масштаба"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:79
-msgid "Scale bar"
-msgstr "Масштабная линейка"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:84
-#: amd/ngw-webmap/ui/ScalesSelect/ScalesSelect.hbs:5
-msgid "Scale"
-msgstr "Масштаб"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:102
-msgid "Save as"
-msgstr "Сохранить как"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:109
-msgid "JPEG"
-msgstr "JPEG"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:116
-msgid "PNG"
-msgstr "PNG"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:123
+#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:16
 msgid "Close"
 msgstr "Закрыть"
-
-#: amd/ngw-webmap/ui/ScalesSelect/ScalesSelect.hbs:8
-msgid "Select scale"
-msgstr "Выберите масштаб"
-
-#: amd/ngw-webmap/ui/ScalesSelect/ScalesSelect.hbs:24
-msgid "Use Shift+drag for box zooming"
-msgstr "Используйте Shift+мышь для увеличения рамкой"
 
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:476
 msgid "Open full map"
 msgstr "Открыть карту целиком"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:106
+msgid "Edit annotations"
+msgstr "Редактировать аннотации"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:111
+msgid "Geometry type"
+msgstr "Тип геометрии"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:120
+#: nodepkg/utils/geometry-types.js:6
+msgid "Point"
+msgstr "Точка"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:123
+msgid "Line"
+msgstr "Линия"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:127
+#: nodepkg/utils/geometry-types.js:15
+msgid "Polygon"
+msgstr "Полигон"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:146
+msgid "Other private annotations"
+msgstr "Другие приватные аннотации"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:163
+msgid "Annotations layer"
+msgstr "Слой аннотаций"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:187
+msgid "Private annotations"
+msgstr "Приватные аннотации"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:195
+msgid "Show annotation types"
+msgstr "Показать типы аннотаций"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:205
+msgid "Public annotations"
+msgstr "Публичные аннотации"
+
+#: nodepkg/annotations-panel/AnnotationsPanel.js:215
+msgid "My private annotations"
+msgstr "Мои приватные аннотации"
 
 #: nodepkg/clone-webmap/CloneWebmap.js:35
 msgid "Resource group"
@@ -665,6 +566,95 @@ msgstr "Показывать охват"
 #: nodepkg/map-viewer-info/MapViewerInfo.js:122
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
+
+#: nodepkg/print-map-panel/PrintMapPanel.js:116
+msgid "Page"
+msgstr "Страница"
+
+#: nodepkg/print-map-panel/PrintMapPanel.js:119
+msgid "Paper format"
+msgstr "Формат бумаги"
+
+#: nodepkg/print-map-panel/PrintMapPanel.js:130
+msgid "Height, mm"
+msgstr "Высота, мм"
+
+#: nodepkg/print-map-panel/PrintMapPanel.js:142
+msgid "Width, mm"
+msgstr "Ширина, мм"
+
+#: nodepkg/print-map-panel/PrintMapPanel.js:154
+msgid "Margin, mm"
+msgstr "Отступ, мм"
+
+#: nodepkg/print-map-panel/PrintMapPanel.js:165
+#: nodepkg/print-map-panel/PrintMapPanel.js:187
+msgid "Scale"
+msgstr "Масштаб"
+
+#: nodepkg/print-map-panel/PrintMapPanel.js:173
+msgid "Scale value"
+msgstr "Значение масштаба"
+
+#: nodepkg/print-map-panel/PrintMapPanel.js:183
+msgid "Scale bar"
+msgstr "Масштабная линейка"
+
+#: nodepkg/print-map-panel/PrintMapPanel.js:209
+msgid "Save as"
+msgstr "Сохранить как"
+
+#: nodepkg/print-map-panel/options.js:6
+msgid "A4 - Portrait"
+msgstr "A4 - Портретный"
+
+#: nodepkg/print-map-panel/options.js:7
+msgid "A4 - Landscape"
+msgstr "A4 - Альбомный"
+
+#: nodepkg/print-map-panel/options.js:8
+msgid "A3 - Portrait"
+msgstr "A3 - Портретный"
+
+#: nodepkg/print-map-panel/options.js:9
+msgid "A3 - Landscape"
+msgstr "A3 - Альбомный"
+
+#: nodepkg/print-map-panel/options.js:10
+msgid "A2 - Portrait"
+msgstr "A2 - Портретный"
+
+#: nodepkg/print-map-panel/options.js:11
+msgid "A2 - Landscape"
+msgstr "A2 - Альбомный"
+
+#: nodepkg/print-map-panel/options.js:12
+msgid "A1 - Portrait"
+msgstr "A1 - Портретный"
+
+#: nodepkg/print-map-panel/options.js:13
+msgid "A1 - Landscape"
+msgstr "A1 - Альбомный"
+
+#: nodepkg/print-map-panel/options.js:14
+msgid "A0 - Portrait"
+msgstr "A0 - Портретный"
+
+#: nodepkg/print-map-panel/options.js:15
+msgid "A0 - Landscape"
+msgstr "A0 - Альбомный"
+
+#: nodepkg/print-map-panel/options.js:16
+msgid "Custom size"
+msgstr "Настраиваемый"
+
+#: nodepkg/print-map-panel/options.js:35
+msgid "JPEG"
+msgstr "JPEG"
+
+#: nodepkg/print-map-panel/options.js:36
+msgid "PNG"
+msgstr "PNG"
 
 #: nodepkg/search-panel/SearchPanel.js:296
 msgid "Not found"
@@ -969,4 +959,3 @@ msgid "To generate a preview, go back to the web map page and click \"Preview\".
 msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
-

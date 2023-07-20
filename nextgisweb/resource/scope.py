@@ -1,4 +1,4 @@
-from nextgisweb.env import _
+from nextgisweb.env import _, pgettext
 
 from .permission import Permission, Scope
 
@@ -11,33 +11,12 @@ class ResourceScope(Scope):
     identity = 'resource'
     label = _("Resource")
 
-    read = P(_("Read"))
-    """ Read: ability to read class, name and key of the
-    resource. Most of the other permissions depend on Read, for
-    example Update, so you can't change a resource
-    if you can't read it. """
-
-    create = P(_("Create")).require(read)
-    """ Create: a little bit fuzzy rule that is not used currently. The idea was
-    to check Create permission while creating a new resource,
-    but currenty only :py:attr:`manage_children` permission is checked
-    for child resource. Possibly will have to return to this one
-    as it is impossible to restrict creation of resources with certain types without this rule. """
-
-    update = P(_("Update")).require(read)
-    """ Update: change name and key of the resource
-    analogous to :py:attr:`read`. Doesn't affect changes to any other attributes. """
-
-    delete = P(_("Delete")).require(read)
-    """ Delete: permission to remove this resource. Besides that to really remove a resource
-    one will also need :py:attr:`manage_children` permission
-    for parent resource. """
-
-    manage_children = P(_("Manage children")).require(read)
-    """ Manage children resources """
-
-    change_permissions = P(_("Change permissions")).require(read)
-    """ Manage permissions """
+    read = P(pgettext("permission", "Read"))
+    create = P(pgettext("permission", "Create")).require(read)
+    update = P(pgettext("permission", "Modify")).require(read)
+    delete = P(pgettext("permission", "Delete")).require(read)
+    manage_children = P(pgettext("permission", "Manage subresources")).require(read)
+    change_permissions = P(pgettext("permission", "Configure permissions")).require(read)
 
 
 class MetadataScope(Scope):
@@ -50,8 +29,8 @@ class MetadataScope(Scope):
     identity = 'metadata'
     label = _("Metadata")
 
-    read = P(_("Read")).require(ResourceScope.read)  #: Read
-    write = P(_("Write")).require(read)  #: Write
+    read = P(pgettext("permission", "Read")).require(ResourceScope.read)
+    write = P(pgettext("permission", "Modify")).require(read)
 
 
 class DataStructureScope(Scope):
@@ -62,8 +41,8 @@ class DataStructureScope(Scope):
     identity = 'datastruct'
     label = _("Data structure")
 
-    read = P(_("Read")).require(ResourceScope.read)  #: Read
-    write = P(_("Write")).require(read)  #: Write
+    read = P(pgettext("permission", "Read")).require(ResourceScope.read)
+    write = P(pgettext("permission", "Modify")).require(read)
 
 
 class DataScope(Scope):
@@ -72,8 +51,8 @@ class DataScope(Scope):
     identity = 'data'
     label = _("Data")
 
-    read = P(_("Read")).require(ResourceScope.read)  #: Read
-    write = P(_("Write")).require(read)  #: Write
+    read = P(pgettext("permission", "Read")).require(ResourceScope.read)
+    write = P(pgettext("permission", "Modify")).require(read)
 
 
 class ConnectionScope(Scope):
@@ -85,9 +64,9 @@ class ConnectionScope(Scope):
     identity = 'connection'
     label = _("Connection")
 
-    read = P(_("Read")).require(ResourceScope.read)
-    write = P(_("Write")).require(read)
-    connect = P(_("Connect")).require(ResourceScope.read)
+    read = P(pgettext("permission", "Read")).require(ResourceScope.read)
+    write = P(pgettext("permission", "Configure")).require(read)
+    connect = P(pgettext("permission", "Use")).require(ResourceScope.read)
 
 
 class ServiceScope(Scope):
@@ -99,5 +78,5 @@ class ServiceScope(Scope):
     identity = 'service'
     label = _('Service')
 
-    connect = P(_("Connect")).require(ResourceScope.read)  #: Connection
-    configure = P(_("Configure")).require(connect)  #: Configuration
+    connect = P(pgettext("permission", "Access")).require(ResourceScope.read)
+    configure = P(pgettext("permission", "Configure")).require(connect)

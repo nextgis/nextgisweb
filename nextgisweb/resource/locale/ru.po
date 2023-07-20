@@ -129,64 +129,70 @@ msgstr "Превышено допустимое число ресурсов '%s'
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: scope.py:14 scope.py:53 scope.py:65 scope.py:75 scope.py:88
+#: scope.py:14 scope.py:32 scope.py:44 scope.py:54 scope.py:67
+msgctxt "permission"
 msgid "Read"
 msgstr "Чтение"
 
-#: amd/ngw-resource/CompositeWidget.js:80 scope.py:20
+#: scope.py:15
+msgctxt "permission"
 msgid "Create"
-msgstr "Создать"
+msgstr "Создание"
 
-#: scope.py:27 view.py:334
-msgid "Update"
-msgstr "Изменить"
+#: scope.py:16 scope.py:33 scope.py:45 scope.py:55 scope.py:68
+msgctxt "permission"
+msgid "Modify"
+msgstr "Изменение"
 
-#: amd/ngw-resource/CompositeWidget.js:99
-#: nodepkg/children-section/ChildrenSection.js:287
-#: nodepkg/children-section/util/createResourceTableItemOptions.js:5
-#: nodepkg/delete-page/DeletePage.js:49 scope.py:31 view.py:342
+#: scope.py:17
+msgctxt "permission"
 msgid "Delete"
-msgstr "Удалить"
+msgstr "Удаление"
 
-#: scope.py:36
-msgid "Manage children"
-msgstr "Управление дочерними ресурсами"
+#: scope.py:18
+msgctxt "permission"
+msgid "Manage subresources"
+msgstr "Управление вложенными"
 
-#: scope.py:39
-msgid "Change permissions"
-msgstr "Изменение прав доступа"
+#: scope.py:19
+msgctxt "permission"
+msgid "Configure permissions"
+msgstr "Настройка прав доступа"
 
-#: scope.py:51
+#: scope.py:30
 msgid "Metadata"
 msgstr "Метаданные"
 
-#: scope.py:54 scope.py:66 scope.py:76 scope.py:89
-msgid "Write"
-msgstr "Запись"
-
-#: scope.py:63
+#: scope.py:42
 msgid "Data structure"
 msgstr "Структура данных"
 
-#: scope.py:73
+#: scope.py:52
 msgid "Data"
 msgstr "Данные"
 
-#: scope.py:86
+#: scope.py:65
 msgid "Connection"
 msgstr "Соединение"
 
-#: scope.py:90 scope.py:102
-msgid "Connect"
-msgstr "Соединение"
+#: scope.py:69
+msgctxt "permission"
+msgid "Use"
+msgstr "Использование"
 
-#: scope.py:100
+#: scope.py:79
 msgid "Service"
 msgstr "Сервис"
 
-#: scope.py:103
+#: scope.py:81
+msgctxt "permission"
+msgid "Access"
+msgstr "Доступ"
+
+#: scope.py:82
+msgctxt "permission"
 msgid "Configure"
-msgstr "Конфигурация"
+msgstr "Настройка"
 
 #: serialize.py:93
 #, python-format
@@ -222,7 +228,18 @@ msgstr "Экспорт ресурсов"
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:21 view.py:367
+#: view.py:334
+msgid "Update"
+msgstr "Изменить"
+
+#: amd/ngw-resource/CompositeWidget.js:99
+#: nodepkg/children-section/ChildrenSection.js:287
+#: nodepkg/children-section/util/createResourceTableItemOptions.js:5
+#: nodepkg/delete-page/DeletePage.js:49 view.py:342
+msgid "Delete"
+msgstr "Удалить"
+
+#: nodepkg/permissions-widget/PermissionsWidget.js:16 view.py:367
 msgid "Action"
 msgstr "Действие"
 
@@ -233,6 +250,10 @@ msgstr "Дополнительно"
 #: amd/ngw-resource/CompositeWidget.js:49
 msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
+
+#: amd/ngw-resource/CompositeWidget.js:80
+msgid "Create"
+msgstr "Создать"
 
 #: amd/ngw-resource/CompositeWidget.js:85
 msgid "Create and edit"
@@ -340,7 +361,7 @@ msgid "Export vector layers"
 msgstr "Экспорт векторных слоёв"
 
 #: nodepkg/children-section/ChildrenSection.js:394
-#: nodepkg/component/resource-picker/ResourcePickerChildren.js:122
+#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:19
 #: nodepkg/editor-widget/EditorWidget.js:14
 #: template/resource_section_summary.mako:8
 msgid "Display name"
@@ -373,27 +394,27 @@ msgstr "Изменить"
 msgid "Operation in progress"
 msgstr "Выполняется операция"
 
-#: nodepkg/component/resource-picker/ResourcePickerFooter.js:17
+#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:29
 msgid "Create group"
 msgstr "Создать группу"
 
-#: nodepkg/component/resource-picker/ResourcePickerFooter.js:18
+#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:30
 msgid "Clear selection"
 msgstr "Очистить выделение"
 
-#: nodepkg/component/resource-picker/ResourcePickerTitle.js:18
+#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:19
 msgid "Go to initial group"
 msgstr "Вернуться в исходную группу"
 
-#: nodepkg/component/resource-picker/ResourcePickerTitle.js:19
+#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:20
 msgid "Refresh"
 msgstr "Обновить"
 
-#: nodepkg/component/resource-picker/store/locale.js:4
+#: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:19
 msgid "Pick this group"
 msgstr "Выбрать эту группу"
 
-#: nodepkg/component/resource-picker/store/locale.js:5
+#: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:20
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
@@ -458,7 +479,7 @@ msgstr ""
 "* Это не повлияет на REST API, который продолжит регулироваться правами "
 "доступа."
 
-#: nodepkg/external-access/ExternalAccess.js:10
+#: nodepkg/external-access/ExternalAccess.js:12
 msgid "Read more"
 msgstr "Подробнее"
 
@@ -470,43 +491,43 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:22
+#: nodepkg/permissions-widget/PermissionsWidget.js:17
 msgid "Principal"
 msgstr "Субъект"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:23
+#: nodepkg/permissions-widget/PermissionsWidget.js:18
 msgid "Apply to"
 msgstr "Применить для"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:24
+#: nodepkg/permissions-widget/PermissionsWidget.js:19
 msgid "Permission"
 msgstr "Право"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:26
+#: nodepkg/permissions-widget/PermissionsWidget.js:21
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:27
+#: nodepkg/permissions-widget/PermissionsWidget.js:22
 msgid "Allow"
 msgstr "Разрешить"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:28
+#: nodepkg/permissions-widget/PermissionsWidget.js:23
 msgid "Deny"
 msgstr "Запретить"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:30
+#: nodepkg/permissions-widget/PermissionsWidget.js:25
 msgid "This and subresources"
-msgstr "Этого и дочерних ресурсов"
+msgstr "Этот и вложенные ресурсов"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:31
+#: nodepkg/permissions-widget/PermissionsWidget.js:26
 msgid "This resource only"
 msgstr "Только этого ресурса"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:33
+#: nodepkg/permissions-widget/PermissionsWidget.js:28
 msgid "All permissions"
 msgstr "Все права"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:263
+#: nodepkg/permissions-widget/PermissionsWidget.js:199
 msgid "Permissions"
 msgstr "Права доступа"
 

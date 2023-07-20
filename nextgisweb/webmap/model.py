@@ -5,12 +5,12 @@ from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
 
-from nextgisweb.env import Base, _, env
+from nextgisweb.env import Base, _, env, pgettext
 from nextgisweb.lib import db
 
 from nextgisweb.auth import User
+from nextgisweb.resource import Permission as P
 from nextgisweb.resource import (
-    Permission,
     Resource,
     ResourceGroup,
     ResourceScope,
@@ -32,10 +32,10 @@ class WebMapScope(Scope):
     identity = 'webmap'
     label = _("Web map")
 
-    display = Permission(_("Display")).require(ResourceScope.read)
-    annotation_read = Permission(_("View annotations")).require(ResourceScope.read)
-    annotation_write = Permission(_("Edit annotations")).require(ResourceScope.read)
-    annotation_manage = Permission(_("Manage annotations")).require(annotation_write)
+    display = P(pgettext("permission", "Display")).require(ResourceScope.read)
+    annotation_read = P(pgettext("permission", "View annotations")).require(ResourceScope.read)
+    annotation_write = P(pgettext("permission", "Draw annotations")).require(ResourceScope.read)
+    annotation_manage = P(pgettext("permission", "Manage annotations")).require(annotation_write)
 
 
 class LegendSymbolsEnum(Enum):
