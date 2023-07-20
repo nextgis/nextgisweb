@@ -36,27 +36,29 @@ def get_mappings():
         return parse_mapping(fd)
 
 
-def compare_catalogs(fileA, fileB):
+def compare_catalogs(ca, cb):
     not_found = []
     not_translated = []
     obsolete = []
 
-    for msgA in fileA:
-        if msgA.id == '':
+    for ma in ca:
+        if ma.id == '':
             continue
-        msgB = fileB.get(msgA.id)
-        if not msgB:
-            not_found.append(msgA.id)
+        ka = (ma.id, ma.context)
+        mb = cb.get(*ka)
+        if not mb:
+            not_found.append(ka)
             continue
-        if not msgB.string:
-            not_translated.append(msgA.id)
+        if not mb.string:
+            not_translated.append(ka)
 
-    for msgB in fileB:
-        if msgB.id == '':
+    for mb in cb:
+        if mb.id == '':
             continue
-        msgA = fileA.get(msgB.id)
-        if msgA is None:
-            obsolete.append(msgB.id)
+        kb = (mb.id, mb.context)
+        ma = ca.get(*kb)
+        if ma is None:
+            obsolete.append(kb)
 
     return not_found, not_translated, obsolete
 
@@ -216,11 +218,11 @@ def cmd_update(args):
 
                 # Remove obsolete untranslated strings but keep translated ones.
                 # They might be useful during small changes in message ids.
-                for msg_id in [
-                    msg.id for msg in po.obsolete.values()
+                for key in [
+                    key for key, msg in po.obsolete.items()
                     if msg.string == ''
                 ]:
-                    del po.obsolete[msg_id]
+                    del po.obsolete[key]
 
                 with io.open(po_path, 'wb') as fd:
                     write_po(fd, po, width=80, omit_header=True)
