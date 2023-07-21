@@ -1,8 +1,6 @@
 import io
 import json
 import logging
-import os
-import os.path
 import re
 import sys
 from argparse import ArgumentParser, Namespace
@@ -16,24 +14,17 @@ from time import sleep
 
 from attr import asdict, attrib, attrs
 from babel.messages.catalog import Catalog
-from babel.messages.extract import extract_from_dir
-from babel.messages.frontend import parse_mapping
 from babel.messages.mofile import write_mo
 from babel.messages.pofile import read_po, write_po
 from poeditor import POEditorAPI
 
 from nextgisweb.env import Env, env
+from nextgisweb.env.i18n.extract import extract_component
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.config import load_config
-from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 
 from .util import to_gettext_locale, to_http_locale
-
-
-def get_mappings():
-    with (module_path('nextgisweb') / 'babel.cfg').open('r') as fd:
-        return parse_mapping(fd)
 
 
 def compare_catalogs(ca, cb):
@@ -141,26 +132,7 @@ def components_and_locales(args, work_in_progress=False):
 
 def cmd_extract(args):
     for cident, _ in components_and_locales(args):
-        module = import_module(pkginfo.comp_mod(cident))
-        modpath = module.__path__[0]
-
-        catalog = Catalog()
-        method_map, options_map = get_mappings()
-
-        def log_callback(filename, method, options):
-            if method != 'ignore':
-                filepath = os.path.normpath(os.path.join(modpath, filename))
-                logger.debug('Extracting messages from %s', filepath)
-
-        extracted = extract_from_dir(
-            modpath, method_map, options_map,
-            callback=log_callback)
-
-        for filename, lineno, message, comments, context in extracted:
-            catalog.add(
-                message, None, [(filename, lineno)],
-                auto_comments=comments, context=context)
-
+        catalog = extract_component(cident)
         logger.info("%d messages extracted from component [%s]", len(catalog), cident)
 
         outfn = catalog_filename(cident, None, ext='pot', mkdir=True)
@@ -213,6 +185,9 @@ def cmd_update(args):
                 logger.info(
                     "Updating component [%s] locale [%s]...",
                     comp_id, locale)
+
+                for m in po:
+                    m.flags = set()
 
                 po.update(pot, True)
 
