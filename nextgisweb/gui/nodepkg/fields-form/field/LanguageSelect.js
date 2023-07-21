@@ -20,12 +20,12 @@ const LanguageSelectInput = ({
         value = defValue;
     }
 
-    const langages = [
+    const languages = [
         {
             value: defValue,
             display_name: i18n.gettext("Browser default"),
         },
-        ...settings.langages,
+        ...settings.languages,
     ];
 
     const onChangeMW = (val) => {
@@ -40,11 +40,11 @@ const LanguageSelectInput = ({
             value={value}
             onChange={onChangeMW}
             // See https://ant.design/components/select/#FAQ
-            listHeight={32 * (settings.langages.length + 1)}
+            listHeight={32 * (settings.languages.length + 1)}
             style={{ flexGrow: 1 }}
             {...selectProps}
         >
-            {langages.map((opt) => (
+            {languages.map((opt) => (
                 <Select.Option key={opt.value} value={opt.value}>
                     {opt.display_name}
                 </Select.Option>

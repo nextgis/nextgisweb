@@ -88,7 +88,7 @@ class PyramidComponent(Component):
             ckey=self.env.core.settings_get('pyramid', 'company_logo.ckey'),
             link=self.company_url_view(request))
 
-        result['langages'] = []
+        result['languages'] = []
         for locale in self.env.core.locale_available:
             try:
                 babel_locale = Locale.parse(locale, sep='-')
@@ -96,7 +96,7 @@ class PyramidComponent(Component):
                 display_name = locale
             else:
                 display_name = babel_locale.get_display_name().title()
-            result['langages'].append(dict(
+            result['languages'].append(dict(
                 display_name=display_name,
                 value=locale))
         result['language_contribute_url'] = self.env.core.options['locale.contribute_url']
