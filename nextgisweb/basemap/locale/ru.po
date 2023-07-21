@@ -1,4 +1,4 @@
-#: amd/ngw-basemap/LayerWidget.js:33 model.py:24
+#: amd/ngw-basemap/LayerWidget.js:33 model.py:19
 msgid "Basemap"
 msgstr "Подложка веб-карты"
 
@@ -53,3 +53,4 @@ msgstr "Непрозрачность"
 #: amd/ngw-basemap/template/WebMapWidget.hbs:78
 msgid "Resource"
 msgstr "Ресурс"
+

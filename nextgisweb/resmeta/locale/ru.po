@@ -1,52 +1,52 @@
-#: model.py:55 nodepkg/editor/EditorWidget.js:109
+#: model.py:53 nodepkg/editor/EditorWidget.js:80
 msgid "String"
 msgstr "Строка"
 
-#: model.py:56 nodepkg/editor/EditorWidget.js:110
+#: model.py:54 nodepkg/editor/EditorWidget.js:81
 msgid "Number"
 msgstr "Число"
 
-#: model.py:57 nodepkg/editor/EditorWidget.js:111
+#: model.py:55 nodepkg/editor/EditorWidget.js:82
 msgid "Boolean"
 msgstr "Логический"
 
-#: model.py:58 nodepkg/editor/EditorWidget.js:112
+#: model.py:56 nodepkg/editor/EditorWidget.js:83
 msgid "Empty"
 msgstr "Пусто"
 
-#: nodepkg/editor/EditorWidget.js:181 view.py:14
+#: nodepkg/editor/EditorWidget.js:113 view.py:14
 msgid "Metadata"
 msgstr "Метаданные"
 
-#: nodepkg/editor/EditorStore.js:30
+#: nodepkg/editor/EditorStore.js:31
 msgid "Key name is required."
 msgstr "Необходимо указать ключ."
 
-#: nodepkg/editor/EditorStore.js:38
+#: nodepkg/editor/EditorStore.js:39
 msgid "Key name is not unique."
 msgstr "Ключ не уникален."
 
-#: nodepkg/editor/EditorWidget.js:47
+#: nodepkg/editor/EditorWidget.js:8
 msgid "Type here to add a new key..."
 msgstr "Введите новый ключ здесь..."
 
-#: nodepkg/editor/EditorWidget.js:86 template/resource_section.mako:21
+#: nodepkg/editor/EditorWidget.js:61 template/resource_section.mako:19
 msgid "False"
 msgstr "Ложь"
 
-#: nodepkg/editor/EditorWidget.js:87 template/resource_section.mako:21
+#: nodepkg/editor/EditorWidget.js:62 template/resource_section.mako:19
 msgid "True"
 msgstr "Истина"
 
-#: nodepkg/editor/EditorWidget.js:127 template/resource_section.mako:12
+#: nodepkg/editor/EditorWidget.js:91 template/resource_section.mako:10
 msgid "Key"
 msgstr "Ключ"
 
-#: nodepkg/editor/EditorWidget.js:138 template/resource_section.mako:13
+#: nodepkg/editor/EditorWidget.js:97 template/resource_section.mako:11
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/editor/EditorWidget.js:148 template/resource_section.mako:14
+#: nodepkg/editor/EditorWidget.js:103 template/resource_section.mako:12
 msgid "Value"
 msgstr "Значение"
 

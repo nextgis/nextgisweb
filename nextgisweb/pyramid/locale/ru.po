@@ -6,23 +6,23 @@ msgstr "Отсутствует необходимый параметр 'componen
 msgid "Invalid component identity."
 msgstr "Некорректный идентификатор компонента."
 
-#: api.py:566
+#: api.py:564
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:137
+#: component.py:136
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:137
+#: component.py:136
 msgid "Disabled"
 msgstr "Отключено"
 
-#: exception.py:203 exception.py:264
+#: exception.py:202 exception.py:263
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:204
+#: exception.py:203
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -30,37 +30,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:233
+#: exception.py:232
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:234
+#: exception.py:233
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:241
+#: exception.py:240
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:242
+#: exception.py:241
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:246
+#: exception.py:245
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:247
+#: exception.py:246
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:251
+#: exception.py:250
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:252
+#: exception.py:251
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -69,15 +69,15 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:259
+#: exception.py:258
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:260
+#: exception.py:259
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:265
+#: exception.py:264
 msgid ""
 "The server has either erred or is incapable of performing the requested "
 "operation."
@@ -85,61 +85,61 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:272 exception.py:273
+#: exception.py:271 exception.py:272
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:277
+#: exception.py:276
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:278
+#: exception.py:277
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: nodepkg/layout/store.js:42 view.py:97
+#: nodepkg/layout/store.js:44 view.py:82
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: view.py:120 view.py:516
+#: view.py:105 view.py:444
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:134 view.py:533
+#: view.py:114 view.py:461
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:145 view.py:538
+#: view.py:125 view.py:466
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:162 view.py:522
+#: view.py:142 view.py:450
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:171 view.py:524
+#: view.py:151 view.py:452
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:180 view.py:526
+#: view.py:160 view.py:454
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:189 view.py:520
+#: view.py:169 view.py:448
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:198 view.py:528
+#: view.py:178 view.py:456
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:515
+#: view.py:443
 msgid "Info"
 msgstr "Информация"
 
-#: nodepkg/layout/Avatar.js:22 view.py:519
+#: nodepkg/layout/Avatar.js:22 view.py:447
 msgid "Settings"
 msgstr "Настройки"
 
@@ -164,14 +164,6 @@ msgstr "Назад"
 msgid "Forward"
 msgstr "Вперёд"
 
-#: amd/ngw-pyramid/company-logo/company-logo.js:25
-msgid "Get your own Web GIS at nextgis.com"
-msgstr "Создайте свою Веб ГИС на nextgis.com"
-
-#: amd/ngw-pyramid/form/LangSelect.js:24
-msgid "Browser default"
-msgstr "По умолчанию в браузере"
-
 #: amd/ngw-pyramid/form/ScaleTextBox.js:18
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
@@ -187,6 +179,10 @@ msgstr "Сохранить"
 #: amd/ngw-pyramid/modelWidget/FormMixin.js:41
 msgid "Delete"
 msgstr "Удалить"
+
+#: nodepkg/company-logo.js:32
+msgid "Get your own Web GIS at nextgis.com"
+msgstr "Создайте свою Веб ГИС на nextgis.com"
 
 #: nodepkg/api/error.js:10 nodepkg/api/error.js:25
 msgid "Something went wrong."
@@ -277,6 +273,14 @@ msgstr "Переведенный текст"
 msgid "The home path setting is saved."
 msgstr "Настройка стартовой страницы сохранена."
 
+#: nodepkg/i18n/testentry.js:4 test/test_i18n.py:8
+msgctxt "test"
+msgid "unit"
+msgid_plural "units"
+msgstr[0] "штука"
+msgstr[1] "штуки"
+msgstr[2] "штук"
+
 #: nodepkg/layout/Avatar.js:10
 msgid "Sign in"
 msgstr "Войти"
@@ -289,11 +293,11 @@ msgstr "Пригласительная сессия"
 msgid "Sign out"
 msgstr "Выйти"
 
-#: nodepkg/layout/store.js:36
+#: nodepkg/layout/store.js:38
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.js:49
+#: nodepkg/layout/store.js:51
 msgid "Help"
 msgstr "Справка"
 
@@ -342,7 +346,7 @@ msgstr ""
 "Некоторые изменения могут быть отражены только после полной оценки "
 "использования хранилища."
 
-#: nodepkg/storage-summary/StorageSummary.js:162
+#: nodepkg/storage-summary/StorageSummary.js:161
 msgid "Estimate storage"
 msgstr "Оценка хранилища"
 
@@ -390,67 +394,67 @@ msgstr "<a>Обратитесь в поддержку</a> для установ�
 msgid "Show details"
 msgstr "Подробнее"
 
-#: template/backup.mako:9
+#: template/backup.mako:8
 msgid "Filename"
 msgstr "Имя файла"
 
-#: template/backup.mako:10
+#: template/backup.mako:9
 msgid "Timestamp (UTC)"
 msgstr "Время (UTC)"
 
-#: template/backup.mako:11
+#: template/backup.mako:10
 msgid "Size"
 msgstr "Размер"
 
-#: template/sysinfo.mako:38
+#: template/sysinfo.mako:35
 msgid "Package"
 msgstr "Пакет"
 
-#: template/sysinfo.mako:39
+#: template/sysinfo.mako:36
 msgid "Version"
 msgstr "Версия"
 
-#: template/sysinfo.mako:74
+#: template/sysinfo.mako:71
 msgid "Platform"
 msgstr "Платформа"
 
-#: template/sysinfo.mako:89
+#: template/sysinfo.mako:86
 msgid "Browser support"
 msgstr "Поддержка браузеров"
 
-#: template/sysinfo.mako:100
+#: template/sysinfo.mako:97
 msgid "or higher"
 msgstr "или выше"
 
-#: template/sysinfo.mako:102
+#: template/sysinfo.mako:99
 msgid "Not supported"
 msgstr "Не поддерживается"
 
-#: template/sysinfo.mako:114
+#: template/sysinfo.mako:111
 msgid "Your browser"
 msgstr "Ваш браузер"
 
-#: template/uacompat.mako:4
+#: template/uacompat.mako:3
 msgid "Browser compatibility test"
 msgstr "Проверка совместимости браузера"
 
-#: template/uacompat.mako:23
+#: template/uacompat.mako:22
 #, python-format
 msgid "%(name)s %(current)s supported"
 msgstr "%(name)s %(current)s поддерживается"
 
-#: template/uacompat.mako:24
+#: template/uacompat.mako:23
 msgid ""
 "Web GIS browser compatibility test has been passed! The Web GIS should work "
 "fine."
 msgstr "Проверка совместимости браузера пройдена! Веб ГИС должна работать корректно."
 
-#: template/uacompat.mako:27
+#: template/uacompat.mako:26
 #, python-format
 msgid "%(name)s not supported"
 msgstr "%(name)s не поддерживается"
 
-#: template/uacompat.mako:28
+#: template/uacompat.mako:27
 #, python-format
 msgid ""
 "You're using %(name)s although it's not supported by the Web GIS. It's an "
@@ -462,12 +466,12 @@ msgstr ""
 "другой браузер или свяжитесь с вашим системным администратором если другой "
 "браузер недоступен."
 
-#: template/uacompat.mako:30
+#: template/uacompat.mako:29
 #, python-format
 msgid "%(name)s %(current)s not supported"
 msgstr "%(name)s %(current)s не поддерживается"
 
-#: template/uacompat.mako:31
+#: template/uacompat.mako:30
 #, python-format
 msgid ""
 "You're using %(name)s %(current)s although it's not supported by the Web GIS."
@@ -480,7 +484,7 @@ msgstr ""
 " с вашим системным администратором для обновления или попробуйте использовать"
 " другой браузер."
 
-#: template/uacompat.mako:35
+#: template/uacompat.mako:34
 msgid ""
 "If you still want to continue using the current browser, click the link below"
 " to bypass the compatibility test. The Web GIS or some features may degrade "
@@ -490,25 +494,17 @@ msgstr ""
 "нажмите на ссылку ниже, чтобы пропустить проверку совместимости. Веб ГИС или "
 "часть ее функций могут работать некорректно в этом случае."
 
-#: template/uacompat.mako:36
+#: template/uacompat.mako:35
 msgid "I understood but want to proceed at my own risk. Skip the test!"
 msgstr "Понятно, но я хочу продолжить на свой страх и риск. Пропустить тест!"
 
-#: template/uacompat.mako:38
+#: template/uacompat.mako:37
 msgid "Unknown browser"
 msgstr "Неизвестный браузер"
 
-#: template/uacompat.mako:39
+#: template/uacompat.mako:38
 msgid "If you are using an up-to-date browser the Web GIS should be fine."
 msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
-#: nodepkg/i18n/testentry.js:4 test/test_i18n.py:8 test/test_i18n.py:9
-#: test/test_i18n.py:10
-msgctxt "test"
-msgid "unit"
-msgid_plural "units"
-msgstr[0] "штука"
-msgstr[1] "штуки"
-msgstr[2] "штук"

@@ -1,21 +1,21 @@
-#: api.py:48
+#: api.py:47
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:51
+#: api.py:50
 #, python-format
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:102
+#: api.py:101
 msgid "Requested raster is not COG."
 msgstr "Запрошенный растр не является COG"
 
-#: api.py:106
+#: api.py:105
 msgid "Range header is missed or invalid."
 msgstr "Заголовок 'Range' пропущен или некорректен."
 
-#: api.py:110
+#: api.py:109
 #, python-format
 msgid "Range %s can not be read."
 msgstr "Диапазон %s не может быть прочитан."
@@ -24,7 +24,7 @@ msgstr "Диапазон %s не может быть прочитан."
 msgid "Rasters and pyramids"
 msgstr "Растры и пирамиды"
 
-#: amd/ngw-raster-layer/Widget.js:30 model.py:56 view.py:56
+#: model.py:56 nodepkg/editor-widget/EditorWidget.js:45 view.py:56
 msgid "Raster layer"
 msgstr "Растровый слой"
 
@@ -112,39 +112,35 @@ msgstr ""
 msgid "Download"
 msgstr "Скачать"
 
-#: amd/ngw-raster-layer/template/Widget.hbs:4
+#: nodepkg/editor-widget/EditorWidget.js:12
 msgid "Select a dataset"
 msgstr "Выберите растровый слой"
 
-#: amd/ngw-raster-layer/template/Widget.hbs:5
+#: nodepkg/editor-widget/EditorWidget.js:13
 msgid "Dataset should be in GeoTIFF format."
 msgstr "Файл должен быть в формате GeoTIFF."
 
-#: amd/ngw-raster-layer/template/Widget.hbs:9
-msgid "Coordinate system"
-msgstr "Система координат"
-
-#: amd/ngw-raster-layer/template/Widget.hbs:14
+#: nodepkg/editor-widget/EditorWidget.js:38
 msgid "Cloud Optimized GeoTIFF (COG)"
 msgstr "Cloud Optimized GeoTIFF (COG)"
 
-#: nodepkg/export-form/ExportForm.js:24
+#: nodepkg/export-form/ExportForm.js:25
 msgid "Band"
 msgstr "Канал"
 
-#: nodepkg/export-form/ExportForm.js:66
+#: nodepkg/export-form/ExportForm.js:69
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.js:75
+#: nodepkg/export-form/ExportForm.js:78
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.js:81
+#: nodepkg/export-form/ExportForm.js:84
 msgid "Bands"
 msgstr "Каналы"
 
-#: nodepkg/export-form/ExportForm.js:116
+#: nodepkg/export-form/ExportForm.js:119
 msgid "Save"
 msgstr "Сохранить"
 

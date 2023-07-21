@@ -139,7 +139,7 @@ msgctxt "permission"
 msgid "Create"
 msgstr "Создание"
 
-#: scope.py:16 scope.py:33 scope.py:45 scope.py:55 scope.py:68
+#: scope.py:16 scope.py:33 scope.py:45 scope.py:55
 msgctxt "permission"
 msgid "Modify"
 msgstr "Изменение"
@@ -175,6 +175,11 @@ msgstr "Данные"
 msgid "Connection"
 msgstr "Соединение"
 
+#: scope.py:68 scope.py:82
+msgctxt "permission"
+msgid "Configure"
+msgstr "Настройка"
+
 #: scope.py:69
 msgctxt "permission"
 msgid "Use"
@@ -188,11 +193,6 @@ msgstr "Сервис"
 msgctxt "permission"
 msgid "Access"
 msgstr "Доступ"
-
-#: scope.py:82
-msgctxt "permission"
-msgid "Configure"
-msgstr "Настройка"
 
 #: serialize.py:93
 #, python-format
@@ -550,3 +550,4 @@ msgstr "Внешний доступ"
 #: template/resource_section_external_access.mako:16
 msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
+

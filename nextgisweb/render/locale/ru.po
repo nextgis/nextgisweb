@@ -1,8 +1,8 @@
-#: api.py:22
+#: api.py:24
 msgid "Invalid origin"
 msgstr "Недопустимый источник"
 
-#: api.py:23
+#: api.py:25
 msgid ""
 "Origin validation is enabled for rendering requests, but the given origin "
 "doesn't match with the CORS origins list."
@@ -10,27 +10,27 @@ msgstr ""
 "Для запросов рендеринга включена проверка источника, однако указанный "
 "источник не совпадает со списком допустимых источников CORS."
 
-#: component.py:26 nodepkg/tile-cache-widget/TileCacheWidget.js:93
+#: component.py:25 nodepkg/tile-cache-widget/TileCacheWidget.js:87
 msgid "Tile cache"
 msgstr "Тайловый кэш"
 
-#: component.py:58 nodepkg/tile-cache-widget/TileCacheWidget.js:27
+#: component.py:55 nodepkg/tile-cache-widget/TileCacheWidget.js:30
 msgid "Enabled"
 msgstr "Включен"
 
-#: component.py:58
+#: component.py:55
 msgid "Disabled"
 msgstr "Отключен"
 
-#: util.py:81
+#: util.py:78
 msgid "Required parameter '{}' is missing."
 msgstr "Отсутствует необходимый параметр '{}'."
 
-#: util.py:86
+#: util.py:83
 msgid "Placeholders {x}, {y} and {z} must be filled with values."
 msgstr "Вместо {x}, {y} и {z} должны быть указаны значения."
 
-#: util.py:88
+#: util.py:85
 msgid ""
 "It seems you are trying to open an URL template directly in a browser. To "
 "test it try adding some values for 'x', 'y' and 'z' parameters."
@@ -38,15 +38,15 @@ msgstr ""
 "Похоже вы пытаетесь открыть ссылку шаблон в браузере напрямую. Для проверки "
 "попробуйте указать значения параметров 'x', 'y' и 'z'."
 
-#: util.py:93
+#: util.py:90
 msgid "The value of '{}' parameter must be a non-negative integer."
 msgstr "Значение параметра '{}' должно быть не отрицательным числом."
 
-#: view.py:30
+#: view.py:29
 msgid "TMS (Tile Map Service)"
 msgstr "TMS (Tile Map Service)"
 
-#: view.py:31
+#: view.py:30
 msgid ""
 "TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map "
 "is a map displayed in a browser by seamlessly joining dozens of individually "
@@ -56,19 +56,19 @@ msgstr ""
 "это карта, отображаемая в браузере путем бесшовного соединения десятков "
 "индивидуально запрашиваемых изображений (тайлов)."
 
-#: view.py:44
+#: view.py:43
 msgid "Legend symbols"
 msgstr "Символы легенды"
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:36
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:39
 msgid "Allow using tiles in non-tile requests"
 msgstr "Разрешить тайлы для запросов изображений"
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:46
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:49
 msgid "Track changes"
 msgstr "Отслеживать изменения"
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:50
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:53
 msgid "Max zoom level"
 msgstr "Максимальный масштабный уровень"
 
@@ -76,11 +76,11 @@ msgstr "Максимальный масштабный уровень"
 msgid "Seed zoom level"
 msgstr "Заполнить масштабный уровень"
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:76
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:73
 msgid "TTL, sec."
 msgstr "TTL, сек."
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:88
+#: nodepkg/tile-cache-widget/TileCacheWidget.js:82
 msgid "Flush"
 msgstr "Очистить"
 

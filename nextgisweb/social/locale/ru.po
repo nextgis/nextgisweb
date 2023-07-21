@@ -1,16 +1,8 @@
-#: amd/ngw-social/Widget.js:29
-msgid "Social"
-msgstr "Соцсети"
-
-#: amd/ngw-social/template/Widget.hbs:4
-msgid "Preview for social media and messengers:"
-msgstr "Предпросмотр для социальных сетей и мессенджеров"
-
-#: amd/ngw-social/template/Widget.hbs:8
+#: nodepkg/editor-widget/EditorWidget.js:12
 msgid "Select a preview image"
 msgstr "Выберите изображение для предпросмотра"
 
-#: amd/ngw-social/template/Widget.hbs:9
+#: nodepkg/editor-widget/EditorWidget.js:13
 msgid ""
 "The image will be converted to PNG format and downscaled to 1600x630 pixels "
 "if it's bigger."
@@ -18,7 +10,11 @@ msgstr ""
 "Изображение будет сконвертировано в формат PNG и уменьшен размер до 1600x630"
 "  пикселей, если оно больше."
 
-#: amd/ngw-social/template/Widget.hbs:18
+#: nodepkg/editor-widget/EditorWidget.js:31
 msgid "Preview description"
 msgstr "Описание для предпросмотра"
+
+#: nodepkg/editor-widget/EditorWidget.js:38
+msgid "Social"
+msgstr "Соцсети"
 

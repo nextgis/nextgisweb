@@ -1,8 +1,8 @@
-#: amd/ngw-wmsserver/ServiceWidget.js:57 model.py:21 view.py:15
+#: amd/ngw-wmsserver/ServiceWidget.js:57 model.py:19 view.py:16
 msgid "WMS service"
 msgstr "Сервис WMS"
 
-#: view.py:16
+#: view.py:17
 msgid ""
 "Web Map Service (WMS) is a standard protocol developed by the Open Geospatial"
 " Consortium for serving georeferenced map images. These images are typically "

@@ -959,3 +959,4 @@ msgid "To generate a preview, go back to the web map page and click \"Preview\".
 msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
+

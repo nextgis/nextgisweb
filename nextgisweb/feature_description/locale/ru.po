@@ -1,3 +1,7 @@
+#: util.py:20
+msgid "Invalid ZIP archive."
+msgstr "Некорректный ZIP-архив."
+
 #: amd/ngw-feature-description/DisplayWidget.js:11
 #: amd/ngw-feature-description/EditorWidget.js:19
 msgid "Description"

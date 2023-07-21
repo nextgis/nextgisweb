@@ -1,69 +1,69 @@
-#: api.py:298
+#: api.py:303
 #, python-format
 msgid "The '%s' attribute of the system principal can't be changed."
 msgstr "Атрибут '%s' системного субъекта не может быть изменен."
 
-#: api.py:307
+#: api.py:312
 #, python-format
 msgid "Principal '%s' already exists."
 msgstr "Субъект '%s' уже существует."
 
-#: api.py:309
+#: api.py:314
 #, python-format
 msgid "Principal with full name '%s' already exists."
 msgstr "Субъект с наименованием '%s' уже существует."
 
-#: api.py:345
+#: api.py:350
 #, python-format
 msgid "User '%s' can't be a member of a group."
 msgstr "Пользователь '%s' не может быть участником группы."
 
-#: api.py:351
+#: api.py:356
 msgid "System principals can't be deleted."
 msgstr "Системные субъекты не могут быть удалены."
 
-#: api.py:367
+#: api.py:372
 msgid "User is referenced with resources"
 msgstr "Пользователь связан с ресурсами"
 
-#: api.py:368
+#: api.py:373
 msgid "Group is referenced with resources"
 msgstr "Группа связана с ресурсами"
 
-#: api.py:380
+#: api.py:385
 #, python-format
 msgid "Invalid principal name: '%s'."
 msgstr "Недопустимое имя субъекта: '%s'."
 
-#: api.py:415
+#: api.py:420
 msgid "The 'administrators' group must have at least one enabled member."
 msgstr "Группа 'administrators' должна иметь хотя бы одного включенного участника."
 
-#: component.py:39
+#: component.py:36
 msgid "Guest"
 msgstr "Гость"
 
-#: component.py:45
+#: component.py:42
 msgid "Everyone"
 msgstr "Любой пользователь"
 
-#: component.py:51
+#: component.py:48
 msgid "Authenticated"
 msgstr "Прошедший проверку"
 
-#: component.py:59
+#: component.py:56
 msgid "Administrators"
 msgstr "Администраторы"
 
-#: component.py:62
+#: component.py:59
 msgid "Administrator"
 msgstr "Администратор"
 
-#: component.py:71
+#: component.py:68
 msgid "Owner"
 msgstr "Владелец"
 
-#: component.py:264
+#: component.py:261
 #, python-format
 msgid "Maximum number of users is reached. Your current plan user number limit is %d."
 msgstr "Превышено максимальное количество пользователей. Лимит текущего плана - %d."
@@ -84,7 +84,7 @@ msgstr "Пользователь заблокирован"
 msgid "Invalid authorization link"
 msgstr "Некорректная ссылка для авторизации"
 
-#: model.py:169
+#: model.py:165
 msgid "Password is not set."
 msgstr "Пароль не установлен."
 
@@ -124,23 +124,23 @@ msgstr "Не удалось выполнить обновление токена
 msgid "OAuth access token is expired"
 msgstr "Срок действия токена OAuth истек"
 
-#: nodepkg/login-form/LoginForm.js:16 view.py:49
+#: nodepkg/login-form/LoginForm.js:16 view.py:48
 msgid "Sign in to Web GIS"
 msgstr "Войти в Веб ГИС"
 
-#: view.py:73
+#: view.py:72
 msgid "Session not found."
 msgstr "Сессия не найдена."
 
-#: view.py:77
+#: view.py:76
 msgid "Invalid 'expires' parameter."
 msgstr "Некорректный параметр 'expires'."
 
-#: view.py:80
+#: view.py:79
 msgid "Session expired."
 msgstr "Сессия устарела."
 
-#: view.py:98
+#: view.py:97
 msgid ""
 "Failed to authenticate using the given authorization link. Please check the "
 "link and contact the administrator."
@@ -148,15 +148,15 @@ msgstr ""
 "Не удалось выполнить авторизацию с использованием указанной авторизационной "
 "ссылки. Пожалуйста проверьте ссылку и свяжитесь с администратором."
 
-#: view.py:106
+#: view.py:105
 msgid "Usage of authorization link is forbidden for administrators."
 msgstr "Использование авторизационных ссылок запрещено для администраторов."
 
-#: view.py:145
+#: view.py:144
 msgid "Team membership required"
 msgstr "Необходимо участие в команде"
 
-#: view.py:146
+#: view.py:145
 msgid ""
 "You are not a member of this Web GIS team. Contact Web GIS administrator and "
 "ask to be added to the team."
@@ -164,27 +164,27 @@ msgstr ""
 "Вы не являетесь участником команды этой Веб ГИС. Свяжитесь с администратором "
 "Веб ГИС для добавления в команду."
 
-#: view.py:279
+#: view.py:278
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: nodepkg/group-widget/GroupWidget.js:30 view.py:303 view.py:402
+#: nodepkg/group-widget/GroupWidget.js:29 view.py:302 view.py:401
 msgid "Users"
 msgstr "Пользователи"
 
-#: view.py:317
+#: view.py:316
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: nodepkg/user-widget/UserWidget.js:80 view.py:333 view.py:406
+#: nodepkg/user-widget/UserWidget.js:80 view.py:332 view.py:405
 msgid "Groups"
 msgstr "Группы"
 
-#: view.py:347
+#: view.py:346
 msgid "Create new group"
 msgstr "Создать новую группу"
 
-#: view.py:410
+#: view.py:409
 msgid "Groups and users"
 msgstr "Группы и пользователи"
 
@@ -212,16 +212,16 @@ msgstr "Управлять командой"
 msgid "User deleted"
 msgstr "Пользователь удален"
 
-#: nodepkg/group-browse/GroupBrowse.js:9 nodepkg/group-widget/GroupWidget.js:19
+#: nodepkg/group-browse/GroupBrowse.js:9 nodepkg/group-widget/GroupWidget.js:18
 #: nodepkg/user-browse/UserBrowse.js:20 nodepkg/user-widget/UserWidget.js:35
 msgid "Full name"
 msgstr "Полное имя"
 
-#: nodepkg/group-browse/GroupBrowse.js:15 nodepkg/group-widget/GroupWidget.js:24
+#: nodepkg/group-browse/GroupBrowse.js:15 nodepkg/group-widget/GroupWidget.js:23
 msgid "Group name"
 msgstr "Имя группы"
 
-#: nodepkg/group-browse/GroupBrowse.js:21 nodepkg/group-widget/GroupWidget.js:42
+#: nodepkg/group-browse/GroupBrowse.js:21 nodepkg/group-widget/GroupWidget.js:40
 msgid "New users"
 msgstr "Новые пользователи"
 
@@ -235,11 +235,11 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/group-widget/GroupWidget.js:50
+#: nodepkg/group-widget/GroupWidget.js:48
 msgid "{dn} mapping"
 msgstr "{dn} маппинг"
 
-#: nodepkg/group-widget/GroupWidget.js:57 nodepkg/user-widget/UserWidget.js:97
+#: nodepkg/group-widget/GroupWidget.js:55 nodepkg/user-widget/UserWidget.js:100
 msgid "Description"
 msgstr "Описание"
 
@@ -247,7 +247,7 @@ msgstr "Описание"
 msgid "Sign in with {}"
 msgstr "Войти через {}"
 
-#: nodepkg/login-form/LoginForm.js:17 template/session_invite.mako:17
+#: nodepkg/login-form/LoginForm.js:17 template/session_invite.mako:16
 msgid "Sign in"
 msgstr "Войти"
 
@@ -277,7 +277,7 @@ msgstr "Привязать аккаунт"
 msgid "Account not bound"
 msgstr "Аккаунт не привязан"
 
-#: nodepkg/settings-form/SettingsForm.js:46 nodepkg/user-widget/UserWidget.js:91
+#: nodepkg/settings-form/SettingsForm.js:46 nodepkg/user-widget/UserWidget.js:94
 msgid "Language"
 msgstr "Язык"
 
@@ -338,7 +338,7 @@ msgstr "Для изменения пароля заполните это пол�
 msgid "Authorization link"
 msgstr "Авторизация по ссылке"
 
-#: nodepkg/user-widget/UserWidget.js:111
+#: nodepkg/user-widget/UserWidget.js:114
 msgid ""
 "Consider adding {name} user to your team instead of creating a new user with "
 "a password."

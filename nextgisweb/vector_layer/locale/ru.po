@@ -1,4 +1,4 @@
-#: api.py:14 model.py:416
+#: api.py:13 model.py:413
 msgid "GDAL library failed to open file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
@@ -57,143 +57,143 @@ msgstr "Мультилиния Z"
 msgid "Multipolygon Z"
 msgstr "Мультиполигон Z"
 
-#: amd/ngw-vector-layer/Widget.js:45 model.py:101
+#: amd/ngw-vector-layer/Widget.js:45 model.py:99
 msgid "Vector layer"
 msgstr "Векторный слой"
 
 #: amd/ngw-vector-layer/template/Widget.hbs:19
-#: amd/ngw-vector-layer/template/Widget.hbs:66 model.py:169
+#: amd/ngw-vector-layer/template/Widget.hbs:66 model.py:167
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: model.py:171
+#: model.py:169
 msgid "Feature count"
 msgstr "Количество объектов"
 
-#: model.py:308
+#: model.py:305
 #, python-format
 msgid "Geometry type (%s) does not match geometry column type (%s)."
 msgstr "Тип геометрии (%s) не соответствует типу поля геометрии (%s)."
 
-#: model.py:419
+#: model.py:416
 #, python-format
 msgid "Unsupport OGR driver: %s."
 msgstr "Драйвер OGR '%s' не поддерживается."
 
-#: amd/ngw-vector-layer/Widget.js:160 model.py:428
+#: amd/ngw-vector-layer/Widget.js:160 model.py:425
 msgid "Dataset doesn't contain layers."
 msgstr "Набор данных не содержит ни одного слоя."
 
-#: model.py:431
+#: model.py:428
 msgid "Dataset contains more than one layer."
 msgstr "Набор данных содержит более одного слоя."
 
-#: model.py:436
+#: model.py:433
 msgid "Unable to open layer."
 msgstr "Не удалось открыть слой."
 
-#: model.py:451
+#: model.py:448
 msgid "Layer doesn't contain coordinate system information."
 msgstr "Слой не содержит информации о системе координат."
 
-#: model.py:476
+#: model.py:473
 msgid "Unknown 'fix_errors' value."
 msgstr "Неизвестное значение параметра 'fix_errors'."
 
-#: model.py:483
+#: model.py:480
 msgid "Unknown 'cast_geometry_type' value."
 msgstr "Неизвестное значение параметра 'cast_geometry_type'."
 
-#: model.py:487
+#: model.py:484
 msgid "Unknown 'cast_is_multi' value."
 msgstr "Неизвестное значение параметра 'cast_is_multi'."
 
-#: model.py:491
+#: model.py:488
 msgid "Unknown 'cast_has_z' value."
 msgstr "Неизвестное значение параметра 'cast_has_z'."
 
-#: model.py:523
+#: model.py:520
 msgid "Unsupported geometry type."
 msgstr "Тип геометрии не поддерживается."
 
-#: table_info.py:300
+#: table_info.py:299
 msgid "Could not determine a geometry type."
 msgstr "Не удалось определить тип геометрии."
 
-#: table_info.py:302
+#: table_info.py:301
 msgid "Source layer contains no features satisfying the conditions."
 msgstr "Слой не содержит объектов, удовлетворяющих условиям."
 
-#: table_info.py:317
+#: table_info.py:316
 #, python-format
 msgid "Field '%s' is out of int32 range."
 msgstr "Значение поля '%s' находится за пределами диапазона int32."
 
-#: table_info.py:324
+#: table_info.py:323
 #, python-format
 msgid "Field '%s' contains non-unique or empty values."
 msgstr "Значение поля '%s' содержит неуникальное или пустое значение."
 
-#: table_info.py:336
+#: table_info.py:335
 msgid "Parameter 'fid_field' is missing."
 msgstr "Отсутствует параметр 'fid_field'"
 
-#: table_info.py:339
+#: table_info.py:338
 #, python-format
 msgid "Fields %s not found."
 msgstr "Поле %s не найдено"
 
-#: table_info.py:341
+#: table_info.py:340
 #, python-format
 msgid "None of fields %s are integer."
 msgstr "Ни одно из полей %d не является целочисленным."
 
-#: table_info.py:357
+#: table_info.py:356
 #, python-format
 msgid "Field '%s(?)' encoding is broken."
 msgstr "Кодировка поля '%s(?)' повреждена."
 
-#: table_info.py:361
+#: table_info.py:360
 #, python-format
 msgid "Field name is forbidden: '%s'. Please remove or rename it."
 msgstr "Недопустимое имя поля: '%s'. Удалите или переименуйте его."
 
-#: table_info.py:397
+#: table_info.py:396
 #, python-format
 msgid "Unsupported field type: %r."
 msgstr "Тип поля %r не поддерживается."
 
-#: table_info.py:562
+#: table_info.py:561
 #, python-format
 msgid "Feature (seq. #%d) doesn't have a FID field '%s'."
 msgstr "Объект (ном. #%d) не содержит поле FID '%s'."
 
-#: table_info.py:566
+#: table_info.py:565
 #, python-format
 msgid "Feature (seq. #%d) FID field '%s' is null."
 msgstr "Объект (ном. #%d) содержит пустое поле FID '%s'."
 
-#: table_info.py:579
+#: table_info.py:578
 #, python-format
 msgid "Feature #%d doesn't have geometry."
 msgstr "Объект #%d не содержит геометрии."
 
-#: table_info.py:612 table_info.py:656
+#: table_info.py:611 table_info.py:655
 #, python-format
 msgid "Feature #%d has multiple geometries satisfying the conditions."
 msgstr "Объект #%d содержит несколько геометрий, удовлетворяющих условиям."
 
-#: table_info.py:624
+#: table_info.py:623
 #, python-format
 msgid "Feature #%d has unknown geometry type: %d (%s)."
 msgstr "Объект #%d содержит неизвестный тип геометрии: %d (%s)."
 
-#: table_info.py:637
+#: table_info.py:636
 #, python-format
 msgid "Feature #%d has unsuitable geometry type: %d (%s)."
 msgstr "Объект #%d содержит неподходящий тип геометрии: %d (%s)."
 
-#: table_info.py:662
+#: table_info.py:661
 #, python-format
 msgid ""
 "Feature #%d has a geometry that can't be reprojected to target coordinate "
@@ -202,27 +202,27 @@ msgstr ""
 "Геометрия объект #%d не может быть перепроецирована в целевую систему "
 "координат."
 
-#: table_info.py:687
+#: table_info.py:686
 #, python-format
 msgid "Feature #%d has unclosed rings."
 msgstr "Объект #%d содержит незамкнутые кольца."
 
-#: table_info.py:701
+#: table_info.py:700
 #, python-format
 msgid "Feature #%d has less than 3 points in a polygon ring."
 msgstr "Объект #%d содержит меньше 3-х точек в кольце полигона."
 
-#: table_info.py:707
+#: table_info.py:706
 #, python-format
 msgid "Feature #%d has less than 2 points in a linestring."
 msgstr "Объект #%d содержит меньше 2-х точек в линии."
 
-#: table_info.py:749
+#: table_info.py:748
 #, python-format
 msgid "Feature #%d contains a broken encoding of field '%s'."
 msgstr "Объект #%d содержит поврежденную кодировку поля '%s'."
 
-#: table_info.py:773
+#: table_info.py:772
 msgid "Vector layer cannot be written due to errors."
 msgstr "Векторный слой не может быть записан из-за ошибок."
 
