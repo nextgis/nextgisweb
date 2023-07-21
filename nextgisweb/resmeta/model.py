@@ -1,7 +1,7 @@
 from nextgisweb.env import COMP_ID, Base, _
 from nextgisweb.lib import db
 
-from nextgisweb.resource import MetadataScope, Resource, SerializedProperty, Serializer
+from nextgisweb.resource import Resource, ResourceScope, SerializedProperty, Serializer
 
 Base.depends_on('resource')
 
@@ -102,4 +102,4 @@ class ResourceMetadataSerializer(Serializer):
     # without intermediate items key, but this is impossible right now
     # as serialization as a whole and serialization of attributes are mixed in one class.
 
-    items = _items_attr(read=MetadataScope.read, write=MetadataScope.write)
+    items = _items_attr(read=ResourceScope.read, write=ResourceScope.update)

@@ -13,7 +13,7 @@ from nextgisweb.lib.logging import logger
 from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import MetadataScope, Resource
+from nextgisweb.resource import Resource, ResourceScope
 
 from .util import ClientRoutePredicate, gensecret, parse_origin
 
@@ -542,7 +542,7 @@ def setup_pyramid(comp, config):
             and isinstance(request.context, Resource)
             and request.context in DBSession
         ):
-            if not request.context.has_permission(MetadataScope.read, request.user):
+            if not request.context.has_permission(ResourceScope.read, request.user):
                 return dict(image=None, description=None)
 
             social = request.context.social

@@ -7,7 +7,7 @@ from nextgisweb.lib import db
 
 from nextgisweb.file_storage import FileObj
 from nextgisweb.resource import (
-    MetadataScope,
+    ResourceScope,
     Resource,
     Serializer,
 )
@@ -84,7 +84,7 @@ class SocialSerializer(Serializer):
     identity = COMP_ID
     resclass = Resource
 
-    preview_file_upload = _preview_file_upload_attr(write=MetadataScope.write)
-    preview_image_exists = _preview_image_exists(read=MetadataScope.read)
+    preview_file_upload = _preview_file_upload_attr(write=ResourceScope.update)
+    preview_image_exists = _preview_image_exists(read=ResourceScope.read)
     preview_description = _preview_description_attr(
-        read=MetadataScope.read, write=MetadataScope.write)
+        read=ResourceScope.read, write=ResourceScope.update)

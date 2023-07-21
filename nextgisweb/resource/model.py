@@ -456,7 +456,7 @@ class ResourceSerializer(Serializer):
     keyname = _rw(SP)
     display_name = _rw(SP)
 
-    description = SP(read=MetadataScope.read, write=MetadataScope.write)
+    description = SP(read=ResourceScope.read, write=ResourceScope.update)
 
     children = _ro(_children_attr)
     interfaces = _ro(_interfaces_attr)
