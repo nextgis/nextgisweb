@@ -1,11 +1,10 @@
-const config = require("@nextgisweb/jsrealm/config.cjs");
-
 const path = require("path");
 
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const UglifyJS = require("uglify-js");
 const UglifyCSS = require("uglifycss");
+
+const defaults = require("../jsrealm/webpack/defaults.cjs");
 const { debug } = require("../jsrealm/config.cjs");
 
 function minify(content, path) {
@@ -95,16 +94,11 @@ addPackage("@nextgisweb/external", {
     to: "../../jquery",
 });
 
-module.exports = {
-    mode: config.debug ? "development" : "production",
-    devtool: false,
-    entry: {},
-    output: {
-        path: path.resolve(config.distPath + "/external"),
+module.exports = defaults(
+    "external",
+    {
+        entry: {},
+        plugins: [new CopyPlugin({ patterns: copyPatterns })],
     },
-    plugins: [
-        new CleanWebpackPlugin(),
-        new CopyPlugin({ patterns: copyPatterns }),
-        ...config.compressionPlugins,
-    ],
-};
+    { bundleAnalyzer: false }
+);

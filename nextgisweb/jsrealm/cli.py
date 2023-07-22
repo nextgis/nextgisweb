@@ -25,23 +25,21 @@ def create_tsconfig(npkgs: List[str]):
         skipLibCheck=True,
         esModuleInterop=True,
         strict=False,
-        moduleResolution= "node",
-        resolveJsonModule= True,
+        moduleResolution="node",
+        resolveJsonModule=True,
         isolatedModules=True,
         noEmit=True,
         allowSyntheticDefaultImports=True,
-        forceConsistentCasingInFileNames= True,
-        noFallthroughCasesInSwitch= True,
+        forceConsistentCasingInFileNames=True,
+        noFallthroughCasesInSwitch=True,
         module="esnext",
-        jsx= "react-jsx",
-        baseUrl= ".",
-        paths= {
-            "react": ["./node_modules/@types/react"]
-        }
+        jsx="react-jsx",
+        baseUrl=".",
+        paths={"react": ["./node_modules/@types/react"]}
     )
     tsconfig_json = dict(
         compilerOptions=compiler_options,
-        include = ['{}/**/*'.format(pkg) for pkg in npkgs]
+        include=['{}/**/*'.format(pkg) for pkg in npkgs]
     )
 
     with open('tsconfig.json', 'w') as fd:
@@ -78,34 +76,32 @@ def install(
     )}
 
     package_json = dict(private=True)
-    package_json['config'] = config = dict()
-    config['nextgisweb_core_debug'] = str(debug).lower()
-    config['nextgisweb_jsrealm_root'] = str(cwd.resolve())
-    config['nextgisweb_jsrealm_packages'] = ','.join(npkgs)
-    config['nextgisweb_jsrealm_icon_sources'] = json.dumps(icons)
+    package_json['nextgisweb'] = nextgisweb = dict()
 
-    ca = pyramid.options['compression.algorithms']
-    config['nextgisweb_pyramid_compression_algorithms'] = \
-        json.dumps(ca if ca else [])
+    s_core = nextgisweb['core'] = dict()
+    s_core['debug'] = debug
+    s_core['languages'] = core.locale_available
 
-    config['nextgisweb_core_locale_available'] = \
-        ','.join(core.locale_available)
+    s_jsrealm = nextgisweb['jsrealm'] = dict()
+    s_jsrealm['icons'] = icons
 
-    targets = dict()
+    o_pyramid = pyramid.options
+    c_pyramid = nextgisweb['pyramid'] = dict()
+    c_pyramid['compression'] = {algo: True for algo in o_pyramid['compression.algorithms']}
+
+    targets = s_jsrealm['targets'] = dict()
     for k in FAMILIES.keys():
-        r = pyramid.options[f'uacompat.{k}']
+        r = o_pyramid[f'uacompat.{k}']
         if type(r) == bool:
             continue
         targets[k] = r
-    config['nextgisweb_jsrealm_targets'] = json.dumps(targets)
 
-    webpack_config = (
-        Path(__file__).parent / 'nodepkg' / 'jsrealm' / 'webpack.root.cjs'
-    ).resolve().relative_to(cwd)
+    jsrealm_path = Path(__file__).parent / 'nodepkg' / 'jsrealm'
+    webpack_root = (jsrealm_path / 'webpack.root.cjs').resolve().relative_to(cwd)
 
     package_json['scripts'] = scripts = dict()
-    scripts['build'] = 'webpack --progress --config {}'.format(webpack_config)
-    scripts['watch'] = 'webpack --progress --watch --config {}'.format(webpack_config)
+    scripts['build'] = 'webpack --progress --config {}'.format(webpack_root)
+    scripts['watch'] = 'webpack --progress --watch --config {}'.format(webpack_root)
 
     package_json['workspaces'] = npkgs
 

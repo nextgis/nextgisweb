@@ -1,17 +1,16 @@
-const config = require("@nextgisweb/jsrealm/config.cjs");
-
 const fs = require("fs");
 const glob = require("glob");
-const os = require("os");
 const path = require("path");
 
 const { DefinePlugin } = require("webpack");
 const WebpackAssetsManifest = require("webpack-assets-manifest");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
-const { IconResolverPlugin, symbolId } = require("./icon-util.cjs");
+const config = require("./config.cjs");
 const tagParser = require("./tag-parser.cjs");
+const defaults = require("./webpack/defaults.cjs");
+const { injectCode, stripIndex, virtualImport } = require("./webpack/util.cjs");
+const { IconResolverPlugin, symbolId } = require("./icon/util.cjs");
 
 // Inject the following construction into each entrypoint module
 // at compilation time:
@@ -22,27 +21,17 @@ const tagParser = require("./tag-parser.cjs");
 // required by the entrypoint.
 const withChunks = (ep) => `import "@nextgisweb/jsrealm/with-chunks!${ep}"`;
 
-const addCode = (fn, code) =>
-    "imports-loader?additionalCode=" +
-    encodeURI(code).replace("!", "%21") +
-    `!${fn}`;
-
-const vImport = (fn, code) =>
-    `${fn}!=!data:text/javascript;base64,` +
-    Buffer.from(code).toString("base64");
-
-const stripIndex = (m) => m.replace(/(?:\/index)?\.(js|tsx?)$/, "");
-
 const logger = require("webpack/lib/logging/runtime").getLogger("jsrealm");
 
 const babelOptions = require("./babelrc.cjs");
 const presetEnvOptIndex = babelOptions.presets.findIndex(
     (item) => typeof item[0] === "string" && item[0] === "@babel/preset-env"
 );
+
 if (presetEnvOptIndex !== -1) {
     const presetEnvOpt = babelOptions.presets[presetEnvOptIndex];
     if (presetEnvOpt && typeof presetEnvOpt[1] === "object") {
-        presetEnvOpt[1].targets = config.targets;
+        presetEnvOpt[1].targets = config.jsrealm.targets;
         babelOptions.presets[presetEnvOptIndex] = presetEnvOpt;
     }
 }
@@ -93,7 +82,7 @@ const dynamicEntries = () => {
         entrypoints.map(({ entry, fullname }) => [
             entry,
             {
-                import: addCode(fullname, withChunks(entry)),
+                import: injectCode(fullname, withChunks(entry)),
                 library: { type: "amd", name: entry },
             },
         ])
@@ -154,7 +143,7 @@ const localeOutDir = path.resolve(
     "../locale"
 );
 
-for (const lang of config.locales) {
+for (const lang of config.core.languages) {
     const entry = `@nextgisweb/jsrealm/locale/${lang}`;
     const antd = lookupLocale(lang, antdLocales);
     const dayjs = lookupLocale(lang, dayjsLocales);
@@ -169,7 +158,7 @@ for (const lang of config.locales) {
     ].join("\n");
 
     staticEntries[entry] = {
-        import: vImport(path.join(localeOutDir, lang + ".js"), code),
+        import: virtualImport(path.join(localeOutDir, lang + ".js"), code),
         library: { type: "amd", name: entry },
     };
 }
@@ -177,7 +166,7 @@ for (const lang of config.locales) {
 const sharedIconIds = {};
 const materialIcons = [];
 
-for (const [comp, dir] of Object.entries(config.iconSources)) {
+for (const [comp, dir] of Object.entries(config.jsrealm.icons)) {
     const realDir = fs.realpathSync(dir);
     for (let fn of glob.sync(`${realDir}/**/*.svg`)) {
         const relSvgPath = path.relative(realDir, fn).replace(/\.svg$/, "");
@@ -234,10 +223,7 @@ const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
 });
 
 /** @type {import("webpack").Configuration} */
-const webpackConfig = (env) => ({
-    mode: config.debug ? "development" : "production",
-    devtool: config.debug ? "source-map" : false,
-    bail: !env.WEBPACK_WATCH,
+const webpackConfig = defaults("main", {
     entry: () => ({ ...staticEntries, ...dynamicEntries() }),
     module: {
         rules: [
@@ -282,7 +268,7 @@ const webpackConfig = (env) => ({
                         loader: "svg-sprite-loader",
                         options: {
                             runtimeGenerator:
-                                require.resolve("./icon-runtime.cjs"),
+                                require.resolve("./icon/runtime.cjs"),
                             symbolId: (fn) => {
                                 const shared = sharedIconIds[fn];
                                 if (shared) return shared;
@@ -300,7 +286,6 @@ const webpackConfig = (env) => ({
         plugins: [new IconResolverPlugin()],
     },
     plugins: [
-        new CleanWebpackPlugin(),
         new DefinePlugin({
             JSREALM_PLUGIN_REGISTRY: DefinePlugin.runtimeValue(
                 () => JSON.stringify(plugins),
@@ -319,12 +304,9 @@ const webpackConfig = (env) => ({
             ],
         }),
         webpackAssetsManifestPlugin,
-        ...config.compressionPlugins,
-        ...config.bundleAnalyzerPlugins,
     ],
     output: {
         enabledLibraryTypes: ["amd"],
-        path: path.resolve(config.rootPath, "dist/main"),
         filename: (pathData) =>
             pathData.chunk.name !== undefined ? "[name].js" : "chunk/[name].js",
         chunkFilename: "chunk/[id].js",
@@ -376,10 +358,6 @@ const webpackConfig = (env) => ({
             chunks: "all",
             minSize: 0,
         },
-    },
-    watchOptions: {
-        poll: os.release().match(/-WSL.?$/) ? 1000 : false,
-        ignored: "**/node_modules",
     },
 });
 

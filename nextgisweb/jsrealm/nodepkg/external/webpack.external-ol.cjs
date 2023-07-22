@@ -1,9 +1,9 @@
 const path = require("path");
 
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
-const config = require("@nextgisweb/jsrealm/config.cjs");
+const defaults = require("../jsrealm/webpack/defaults.cjs");
+const { jsrealm } = require("../jsrealm/config.cjs");
 
 const entry = path.resolve(path.join(__dirname, "contrib/ol/entry.js"));
 const index = path.resolve(path.join(__dirname, "contrib/ol/index.js"));
@@ -78,10 +78,8 @@ function importReplace(match) {
     return match;
 }
 
-module.exports = {
+module.exports = defaults("external-ol", {
     entry: entry,
-    devtool: "source-map",
-    mode: config.debug ? "development" : "production",
     module: {
         rules: [
             {
@@ -108,12 +106,7 @@ module.exports = {
                 options: {
                     sourceType: "unambiguous",
                     presets: [
-                        [
-                            "@babel/preset-env",
-                            {
-                                targets: config.targets,
-                            },
-                        ],
+                        ["@babel/preset-env", { targets: jsrealm.targets }],
                     ],
                 },
             },
@@ -124,7 +117,6 @@ module.exports = {
         ],
     },
     plugins: [
-        new CleanWebpackPlugin(),
         new CopyPlugin({
             patterns: [
                 {
@@ -133,15 +125,12 @@ module.exports = {
                 },
             ],
         }),
-        ...config.compressionPlugins,
-        ...config.bundleAnalyzerPlugins,
     ],
     output: {
-        path: path.resolve(config.distPath + "/external-ol"),
         publicPath: "",
         filename: "ol.js",
         library: "ol",
         libraryTarget: "umd",
         libraryExport: "default",
     },
-};
+});
