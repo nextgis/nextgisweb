@@ -37,6 +37,7 @@ class WebMapComponent(Component):
     def client_settings(self, request):
         result = dict(
             basemaps=self.basemaps,
+            editing=self.options['editing'],
             annotation=self.options['annotation'],
             adapters=dict(
                 (i.identity, dict(
@@ -70,6 +71,7 @@ class WebMapComponent(Component):
             'basemaps', default=module_path('nextgisweb.webmap') / 'basemaps.json',
             doc="Basemaps description file."),
         Option('annotation', bool, default=True, doc="Turn on / off annotations."),
+        Option('editing', bool, default=True),
         Option('enable_social_networks', bool, default=False),
         Option('check_origin', bool, default=False, doc="Check iframe Referer header."),
         Option('legend_symbols', LegendSymbolsEnum, default=None),

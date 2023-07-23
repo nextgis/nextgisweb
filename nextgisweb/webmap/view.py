@@ -34,7 +34,7 @@ class ItemWidget(Widget):
 class SettingsWidget(Widget):
     resource = WebMap
     operation = ('create', 'update')
-    amdmod = 'ngw-webmap/resource/OtherSettings/OtherSettings'
+    amdmod = '@nextgisweb/webmap/settings-widget'
 
 
 @viewargs(renderer='react')
