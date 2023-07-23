@@ -1,11 +1,14 @@
+from contextlib import contextmanager
+
 import pytest
 import transaction
+from sqlalchemy import func
 
 from nextgisweb.env import DBSession
 
 from nextgisweb.auth import User
 
-from .. import ResourceGroup
+from .. import Resource, ResourceGroup
 
 
 def test_disable_resources(
@@ -114,3 +117,94 @@ def test_resource_search_parent_id_recursive(
     keynames = {item['resource']['keyname'] for item in data}
 
     assert keynames == keynames_expected
+
+
+@pytest.fixture
+def resource_stat():
+    with DBSession.no_autoflush:
+        cls_count = dict(
+            (cls, count) for cls, count in DBSession.query(
+                Resource.cls, func.count(Resource.id)
+            ).group_by(Resource.cls))
+        total = sum(cls_count.values())
+
+    yield total, cls_count
+
+
+@pytest.fixture
+def override(ngw_env):
+    comp = ngw_env.resource
+    @contextmanager
+    def wrapped(**kw):
+        options = dict(
+            limit=None, resource_cls=None, resource_by_cls=dict(),
+        )
+        options.update(kw)
+
+        mem = dict()
+        for k, v in options.items():
+            attr = f'quota_{k}'
+            mem[attr] = getattr(comp, attr)
+            setattr(comp, attr, v)
+        try:
+            yield
+        finally:
+            for k, v in mem.items():
+                setattr(comp, k, v)
+    return wrapped
+
+
+def test_quota(
+    ngw_resource_group, resource_stat, override, ngw_webtest_app, ngw_auth_administrator
+):
+    total, cls_count = resource_stat
+
+    def create_resource_group(display_name, expected_status):
+        resp = ngw_webtest_app.post_json('/api/resource/', dict(resource=dict(
+            cls='resource_group', parent=dict(id=ngw_resource_group),
+            display_name=display_name)
+        ), status=expected_status)
+
+        if resp.status_code == 201:
+            resource_id = resp.json['id']
+            ngw_webtest_app.delete(f'/api/resource/{resource_id}')
+
+    def check_quota(data, expected_status, *, expected_result=None):
+        resp = ngw_webtest_app.post_json(
+            '/api/component/resource/check_quota', data, status=expected_status)
+        if expected_result is not None:
+            for k, v in expected_result.items():
+                assert resp.json[k] == v
+
+    with override():
+        check_quota(dict(resource_group=999), 200)
+        create_resource_group("No quota", 201)
+
+    with override(limit=total):
+        check_quota(dict(resource_group=0), 200)
+        check_quota(dict(resource_group=1), 402)
+        create_resource_group("Quota exceeded", 402)
+
+    rg_count = cls_count.get('resource_group', 0)
+
+    with override(limit=rg_count, resource_cls=['resource_group']):
+        check_quota(dict(resource_group=0), 200)
+        check_quota(dict(resource_group=1), 402)
+        create_resource_group("Quota exceeded resource_group", 402)
+
+    with override(limit=rg_count, resource_cls=['another_resource_cls']):
+        check_quota(dict(resource_group=999), 200)
+        create_resource_group("Quota exceeded another cls", 201)
+
+    with override(resource_by_cls=dict(resource_group=rg_count)):
+        check_quota(dict(resource_group=0), 200)
+        check_quota(dict(resource_group=1), 402)
+        create_resource_group("Quota by cls exceeded", 402)
+
+    with override(resource_by_cls=dict(another_resource_cls=rg_count)):
+        check_quota(dict(resource_group=999), 200)
+        create_resource_group("Quota by cls exceeded another cls", 201)
+
+    with override(limit=total + 5):
+        check_quota(dict(resource_group=5), 200)
+        check_quota(dict(resource_group=6), 402)
