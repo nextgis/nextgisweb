@@ -30,6 +30,11 @@ module.exports = (name, config, options) => {
         if (config.plugins === undefined) config.plugins = [];
         config.plugins.push(...plugins(options));
 
+        if (config.performance === undefined) config.performance = {};
+        if (config.performance.hints === undefined) {
+            config.performance.hints = false;
+        }
+
         return config;
     };
 };
