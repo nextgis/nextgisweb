@@ -167,10 +167,10 @@ def cmd_update(args):
                     "Updating component [%s] locale [%s]...",
                     comp_id, locale)
 
+                po.update(pot, True)
+
                 for m in po:
                     m.flags = set()
-
-                po.update(pot, True)
 
                 # Remove obsolete untranslated strings but keep translated ones.
                 # They might be useful during small changes in message ids.
