@@ -9,8 +9,8 @@
 </div>
 
 <script type="text/javascript">
-    var displayConfig = ${json_js(display_config)};
     require(["ngw-webmap/Display"], function (Display) {
+        const displayConfig = ${json_js(display_config)};
         new Display({ config: displayConfig })
             .placeAt(document.getElementById("display"))
             .startup();

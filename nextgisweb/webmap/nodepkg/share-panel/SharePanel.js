@@ -15,7 +15,6 @@ import settings from "@nextgisweb/pyramid/settings!";
 import "./SharePanel.less";
 
 let itemStoreListener;
-const previewMapUrl = displayConfig.testEmbeddedMapUrl;
 
 const makeIframeTag = (iframeSrc, height, width) => {
     return `<iframe src="${iframeSrc}" ` +
@@ -90,7 +89,7 @@ export const SharePanel = ({display, socialNetworksEnabled, eventVisibility}) =>
     const updateEmbedCode = () => {
         display.getVisibleItems().then((visibleItems) => {
             const permalinkOptions = {
-                urlWithoutParams: displayConfig.tinyDisplayUrl,
+                urlWithoutParams: routeURL('webmap.display.tiny', display.config.webmapId),
                 additionalParams: {
                     linkMainMap: addLinkToMap,
                     events: generateEvents
@@ -217,7 +216,7 @@ export const SharePanel = ({display, socialNetworksEnabled, eventVisibility}) =>
             <h5 className="heading">
                 {i18n.gettext("Preview")}
             </h5>
-            <form action={previewMapUrl}
+            <form action={routeURL("webmap.preview_embedded", display.config.webmapId)}
                   method="POST"
                   target="_blank">
                 <input type="hidden"

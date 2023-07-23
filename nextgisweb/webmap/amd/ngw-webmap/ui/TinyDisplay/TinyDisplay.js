@@ -471,7 +471,7 @@ define([
 
             if (this._urlParams.linkMainMap === 'true') {
                 this.map.olMap.addControl(new LinkToMainMap({
-                    url: mainDisplayUrl,
+                    url: this.mainDisplayUrl,
                     target: widget.leftBottomControlPane,
                     tipLabel: i18n.gettext('Open full map')
                 }));

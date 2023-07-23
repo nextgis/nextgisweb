@@ -220,8 +220,6 @@ def display(obj, request):
         ),
         webmapPlugin=plugin,
         bookmarkLayerId=obj.bookmark_resource_id,
-        tinyDisplayUrl=request.route_url('webmap.display.tiny', id=obj.id),
-        testEmbeddedMapUrl=request.route_url('webmap.preview_embedded', id=obj.id),
         webmapId=obj.id,
         webmapDescription=obj.description,
         webmapTitle=obj.display_name,
@@ -299,7 +297,7 @@ def setup_pyramid(comp, config):
     ).add_view(display_tiny, context=WebMap)
 
     config.add_route(
-        'webmap.preview_embedded', '/webmap/embedded-preview'
+        'webmap.preview_embedded', '/webmap/embedded-preview', client=True,
     ).add_view(preview_embedded)
 
     config.add_route(
