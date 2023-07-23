@@ -57,7 +57,10 @@
     %endfor
 
     <script type="text/javascript">
-        require(["@nextgisweb/pyramid/icon"]);
+        require([
+            "@nextgisweb/jsrealm/locale-loader!",
+            "@nextgisweb/pyramid/icon",
+        ]);
     </script>
 
     <%

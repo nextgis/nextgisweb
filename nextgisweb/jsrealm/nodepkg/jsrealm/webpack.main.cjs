@@ -143,19 +143,30 @@ const localeOutDir = path.resolve(
     "../locale"
 );
 
-for (const lang of config.core.languages) {
+for (const { code: lang, nplurals, plural } of config.i18n.languages) {
     const entry = `@nextgisweb/jsrealm/locale/${lang}`;
     const antd = lookupLocale(lang, antdLocales);
     const dayjs = lookupLocale(lang, dayjsLocales);
 
+    const pofiles = [];
+    Object.values(config.env.components).forEach((path) => {
+        pofiles.push(...glob.sync(path + `/locale/${lang}.po`));
+    });
+
+    config.i18n.external &&
+        pofiles.push(...glob.sync(config.i18n.external + `/*/*/${lang}.po`));
+
     const code = [
         withChunks(entry),
+        `ngwConfig.plurals = [${nplurals}, n => Number(${plural})];`,
         `import antdLocale from "${antd.filename}";`,
         `export const antd = antdLocale.default;`,
         `import dayjs from "@nextgisweb/gui/dayjs";`,
         `import "${dayjs.filename}";`,
         `dayjs.locale('${dayjs.original}');`,
-    ].join("\n");
+    ]
+        .concat(pofiles.map((fn) => `import "${path.resolve(fn)}";`))
+        .join("\n");
 
     staticEntries[entry] = {
         import: virtualImport(path.join(localeOutDir, lang + ".js"), code),
@@ -278,6 +289,10 @@ const webpackConfig = defaults("main", {
                     },
                     "svgo-loader",
                 ],
+            },
+            {
+                test: /\.po$/,
+                use: [babelLoader, require.resolve("./i18n/loader.cjs")],
             },
         ],
     },

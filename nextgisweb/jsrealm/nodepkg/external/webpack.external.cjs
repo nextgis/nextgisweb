@@ -78,12 +78,6 @@ addPackage("handlebars", {
     to: "handlebars.js",
 });
 
-addPackage("jed", {
-    globOptions: {
-        ignore: ["**/test/**"],
-    },
-});
-
 addPackage("jquery", {
     from: "dist/jquery.min.js",
     to: "jquery/jquery-3.2.1.min.js",

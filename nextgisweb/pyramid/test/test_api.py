@@ -33,19 +33,6 @@ def test_settings(component, webtest):
         webtest.get('/api/component/pyramid/settings?component={}'.format(component))
 
 
-def test_locdata(component, webtest, ngw_env):
-    if component not in ngw_env.components:
-        pytest.skip(f"{component} disabled")
-    webtest.get(f'/api/component/pyramid/locdata/{component}/en')
-
-
-def test_locdata_pyramid_ru(webtest, ngw_env):
-    jed_file = ngw_env.pyramid.root_path / 'locale' / 'ru.jed'
-    if not jed_file.is_file():
-        pytest.skip()
-    webtest.get('/api/component/pyramid/locdata/pyramid/ru')
-
-
 @pytest.fixture()
 def override(ngw_core_settings_override):
     @contextmanager

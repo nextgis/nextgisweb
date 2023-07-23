@@ -1,8 +1,3 @@
-declare module "@nextgisweb/pyramid/i18n" {
-    const value: { gettext: (val: string) => string };
-    export = value;
-}
-
 declare const ngwConfig: {
     debug: boolean;
     applicationUrl: string;
@@ -14,4 +9,6 @@ declare const ngwConfig: {
     userDisplayName: string;
     invitationSession: boolean;
     locale: string;
+    // Defined in @nextgisweb/jsrealm/locale-loader
+    plurals: [number, { (n: number): number }];
 };

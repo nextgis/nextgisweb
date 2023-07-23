@@ -32,6 +32,7 @@
         "eslint-plugin-requirejs": "^4.0.1",
         "eslint": "^8.44.0",
         "file-loader": "^6.2.0",
+        "gettext-parser": "^7.0.1",
         "imports-loader": "^2.0.0",
         "less-loader": "^8.1.1",
         "less": "^4.1.1",

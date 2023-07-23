@@ -560,7 +560,6 @@ def _setup_pyramid_tm(comp, config):
         '/static/',
         '/favicon.ico',
         '/api/component/pyramid/route',
-        '/api/component/pyramid/locdata/',
         '/_debug_toolbar/')
 
     def activate_hook(request):

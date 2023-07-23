@@ -51,6 +51,8 @@ def install(
     self: EnvCommand.customize(env_initialize=False),
     *, env: Env, core: CoreComponent, pyramid: PyramidComponent,
 ):
+    from babel.messages.plurals import PLURALS
+
     debug = core.options['debug']
     cwd = Path().resolve()
 
@@ -78,9 +80,24 @@ def install(
     package_json = dict(private=True)
     package_json['nextgisweb'] = nextgisweb = dict()
 
+    s_env = nextgisweb['env'] = dict()
+    s_env['packages'] = {
+        name: str(pkg._path.relative_to(cwd))
+        for name, pkg in pkginfo.packages.items()}
+    s_env['components'] = {
+        comp_id: str(pkginfo.comp_path(comp_id).relative_to(cwd))
+        for comp_id in pkginfo.components}
+
+    def language(lang):
+        nplurals, plural = PLURALS.get(lang, PLURALS.get(lang.split('-')[0]))
+        return dict(code=lang, nplurals=nplurals, plural=plural)
+
+    nextgisweb['i18n'] = {
+        "languages": [language(lang) for lang in core.locale_available],
+        "external": core.options['locale.external_path']}
+
     s_core = nextgisweb['core'] = dict()
     s_core['debug'] = debug
-    s_core['languages'] = core.locale_available
 
     s_jsrealm = nextgisweb['jsrealm'] = dict()
     s_jsrealm['icons'] = icons

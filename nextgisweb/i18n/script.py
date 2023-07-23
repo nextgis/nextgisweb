@@ -54,25 +54,6 @@ def compare_catalogs(ca, cb):
     return not_found, not_translated, obsolete
 
 
-def write_jed(fileobj, catalog):
-    data = dict()
-    data[''] = dict(
-        domain=catalog.domain,
-        lang=catalog.locale.language,
-        plural_forms=catalog.plural_forms)
-
-    for msg in catalog:
-        if msg.id == '':
-            continue
-        key = msg.id[0] if isinstance(msg.id, tuple) else msg.id
-        if msg.context is not None:
-            key = f"{msg.context}\u0004{key}"
-        data[key] = (msg.string, ) if isinstance(msg.string, str) \
-            else msg.string
-
-    fileobj.write(json.dumps(data, ensure_ascii=False, indent=2))
-
-
 def catalog_filename(component, locale, ext='po', internal=False, mkdir=False):
     if locale is None:
         locale = ''
@@ -213,10 +194,6 @@ def cmd_compile(args):
                 if mo_path.exists():
                     mo_path.unlink()
 
-                jed_path = catfn(ext='jed', internal=True)
-                if jed_path.exists():
-                    jed_path.unlink()
-
                 continue
 
             with po_path.open('r') as po:
@@ -228,9 +205,6 @@ def cmd_compile(args):
 
             with catfn(ext='mo', internal=True, mkdir=True).open('wb') as mo:
                 write_mo(mo, catalog)
-
-            with catfn(ext='jed', internal=True, mkdir=True).open('w') as jed:
-                write_jed(jed, catalog)
 
 
 @attrs

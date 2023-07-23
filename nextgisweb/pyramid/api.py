@@ -257,35 +257,6 @@ def route(request) -> JSONType:
     return result
 
 
-def locdata(request) -> JSONType:
-    locale = request.matchdict['locale']
-    component = request.matchdict['component']
-
-    skey = request.GET.get('skey')
-    if skey and skey == request.env.pyramid.static_key[1:]:
-        request.response.cache_control = 'public, max-age=31536000'
-
-    comp = request.env.components[component]
-    jed_path = comp.root_path / 'locale' / f'{locale}.jed'
-
-    if jed_path.is_file():
-        return FileResponse(jed_path, content_type='application/json')
-
-    # For english locale by default return empty translation, if
-    # real translation file was not found. This might be needed if
-    # instead of English strings we'll use msgid.
-
-    if locale == 'en':
-        return {"": {
-            "domain": component,
-            "lang": "en",
-            "plural_forms": "nplurals=2; plural=(n != 1);"
-        }}
-
-    request.response.status_code = 404
-    return dict(error="Locale data not found!")
-
-
 def pkg_version(request) -> JSONType:
     return dict([(p.name, p.version) for p in request.env.packages.values()])
 
@@ -477,11 +448,6 @@ def setup_pyramid(comp, config):
 
     config.add_route('pyramid.route', '/api/component/pyramid/route') \
         .add_view(route, request_method='GET')
-
-    config.add_route(
-        'pyramid.locdata',
-        '/api/component/pyramid/locdata/{component}/{locale}',
-    ).add_view(locdata)
 
     config.add_route(
         'pyramid.pkg_version',
