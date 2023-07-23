@@ -126,8 +126,7 @@ def resource_stat():
             (cls, count) for cls, count in DBSession.query(
                 Resource.cls, func.count(Resource.id)
             ).group_by(Resource.cls))
-        total = sum(cls_count.values())
-
+    total = sum(cls_count.values())
     yield total, cls_count
 
 
@@ -169,12 +168,11 @@ def test_quota(
             resource_id = resp.json['id']
             ngw_webtest_app.delete(f'/api/resource/{resource_id}')
 
-    def check_quota(data, expected_status, *, expected_result=None):
+    def check_quota(data, expected_status, expected_result=None):
         resp = ngw_webtest_app.post_json(
             '/api/component/resource/check_quota', data, status=expected_status)
         if expected_result is not None:
-            for k, v in expected_result.items():
-                assert resp.json[k] == v
+            assert expected_result.items() <= resp.json.items()
 
     with override():
         check_quota(dict(resource_group=999), 200)
@@ -182,14 +180,15 @@ def test_quota(
 
     with override(limit=total):
         check_quota(dict(resource_group=0), 200)
-        check_quota(dict(resource_group=1), 402)
+        check_quota(dict(resource_group=1), 402, dict(cls=None, required=1, available=0))
         create_resource_group("Quota exceeded", 402)
 
     rg_count = cls_count.get('resource_group', 0)
 
     with override(limit=rg_count, resource_cls=['resource_group']):
         check_quota(dict(resource_group=0), 200)
-        check_quota(dict(resource_group=1), 402)
+        check_quota(dict(resource_group=1), 402, dict(
+            cls=None, required=1, available=0))
         create_resource_group("Quota exceeded resource_group", 402)
 
     with override(limit=rg_count, resource_cls=['another_resource_cls']):
@@ -198,7 +197,8 @@ def test_quota(
 
     with override(resource_by_cls=dict(resource_group=rg_count)):
         check_quota(dict(resource_group=0), 200)
-        check_quota(dict(resource_group=1), 402)
+        check_quota(dict(resource_group=1), 402, dict(
+            cls='resource_group', required=1, available=0))
         create_resource_group("Quota by cls exceeded", 402)
 
     with override(resource_by_cls=dict(another_resource_cls=rg_count)):
@@ -207,4 +207,8 @@ def test_quota(
 
     with override(limit=total + 5):
         check_quota(dict(resource_group=5), 200)
-        check_quota(dict(resource_group=6), 402)
+        check_quota(dict(resource_group=6), 402, dict(cls=None, required=6, available=5))
+
+    with override(limit=rg_count + 5, resource_cls=['resource_group']):
+        check_quota(dict(resource_group=5), 200)
+        check_quota(dict(resource_group=7), 402, dict(cls=None, required=7, available=5))
