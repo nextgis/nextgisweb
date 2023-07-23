@@ -21,7 +21,6 @@ const config = {
         "no-unused-vars": ["error", { args: "after-used" }],
         "no-use-before-define": "error",
         "requirejs/no-object-define": "error",
-        "requirejs/one-dependency-per-line": ["error"],
         "requirejs/amd-function-arity": [
             "error",
             { allowExtraDependencies: true },
