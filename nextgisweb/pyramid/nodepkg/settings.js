@@ -7,10 +7,12 @@ const cache = new LoaderCache();
 export const normalize = callingComponent;
 
 export function load(component, require, ready) {
-    if (component == "") {
+    const readyEsm = (data) => ready({ _esModule: true, ...data });
+
+    if (!component) {
         const msg = "No identifier was given while importing settings!";
         console.error(new Error(msg));
-        ready({});
+        readyEsm({});
     }
 
     const loader = () => {
@@ -23,5 +25,5 @@ export function load(component, require, ready) {
             });
     };
 
-    cache.promiseFor(component, loader).then(ready, () => ready({}));
+    cache.promiseFor(component, loader).then(readyEsm, () => readyEsm({}));
 }
