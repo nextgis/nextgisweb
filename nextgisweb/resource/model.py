@@ -485,17 +485,7 @@ class ResourceSerializer(Serializer):
                 raise DisplayNameNotUnique(conflict.id)
 
         if self.obj.id is None:
-            result = env.resource.quota_check({self.obj.cls: 1})
-            if not result['success']:
-                if result['cls'] is None:
-                    msg = _(
-                        "Maximum number of resources exceeded. The limit is %s."
-                    ) % result['limit']
-                else:
-                    msg = _(
-                        "Maximum number of resources '%s' exceeded. The limit is %s."
-                    ) % (self.obj.cls_display_name, result['limit'])
-                raise ValidationError(message=msg)
+            env.resource.quota_check({self.obj.cls: 1})
 
 
 class ResourceACLRule(Base):

@@ -9,6 +9,7 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.auth import Group, User
 
+from .exception import QuotaExceeded
 from .model import Resource, ResourceGroup
 from .model import ResourceACLRule as ACLRule
 
@@ -61,16 +62,14 @@ class ResourceComponent(Component):
 
                 cls_quota_limit = self.quota_resource_by_cls[cls]
                 if count + required > cls_quota_limit:
-                    return dict(
-                        success=False,
-                        cls=cls,
-                        limit=cls_quota_limit,
-                        count=count,
+                    raise QuotaExceeded(
+                        cls=Resource.registry[cls],
                         required=required,
-                    )
+                        limit=cls_quota_limit,
+                        count=count)
 
         # Total quota checking
-        if required_total > 0 and self.quota_limit is not None:
+        if self.quota_limit is not None:
             query = DBSession.query(db.func.count(Resource.id))
             if self.quota_resource_cls is not None:
                 query = query.filter(Resource.cls.in_(self.quota_resource_cls))
@@ -79,15 +78,11 @@ class ResourceComponent(Component):
                 count_total = query.scalar()
 
             if count_total + required_total > self.quota_limit:
-                return dict(
-                    success=False,
+                raise QuotaExceeded(
                     cls=None,
-                    limit=self.quota_limit,
-                    count=count_total,
                     required=required_total,
-                )
-
-        return dict(success=True)
+                    limit=self.quota_limit,
+                    count=count_total)
 
     @require('auth')
     def initialize_db(self):

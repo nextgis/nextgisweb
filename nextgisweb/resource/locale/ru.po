@@ -551,3 +551,6 @@ msgstr "Внешний доступ"
 msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
 
+#: exception.py:42
+msgid "Quota exceeded"
+msgstr "Превышена квота"

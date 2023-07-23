@@ -14,7 +14,7 @@ from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid import JSONType
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
-from .exception import ResourceError, ValidationError
+from .exception import QuotaExceeded, ResourceError, ValidationError
 from .model import Resource, ResourceSerializer
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .scope import ResourceScope, Scope
@@ -423,17 +423,13 @@ def resource_volume(resource, request) -> JSONType:
 
 
 def quota_check(request) -> JSONType:
-    result = request.env.resource.quota_check(request.json_body)
-    if result['success']:
-        return dict(success=True)
-
-    tr = request.localizer.translate
-    msg = tr(_("Not enough resource quota: {0} required, but only {1} available.")) \
-        .format(result['required'], max(result['limit'] - result['count'], 0))
-    if result['cls'] is not None:
-        cls_display_name = tr(Resource.registry[result['cls']].cls_display_name)
-        msg += " " + tr(_("Resource type - {}.")).format(cls_display_name)
-    return dict(success=False, message=msg)
+    try:
+        request.env.resource.quota_check(request.json_body)
+    except QuotaExceeded as exc:
+        request.response.status_code = exc.http_status_code
+        tr = request.localizer.translate
+        return dict(exc.data, message=tr(exc.message))
+    return dict(success=True)
 
 
 def resource_export_get(request) -> JSONType:

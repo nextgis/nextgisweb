@@ -38,6 +38,27 @@ class HierarchyError(ValidationError):
     title = _("Hierarchy error")
 
 
+class QuotaExceeded(UserException):
+    title = _("Quota exceeded")
+    http_status_code = 402
+
+    def __init__(self, *, cls, required, limit, count):
+        available = max(limit - count, 0)
+        if required < 2:
+            msg = _("Maximum number of resources exceeded. The limit is %s.") % limit
+        else:
+            msg = _("Not enough resource quota: {0} required, but only {1} available.") \
+                .format(required, available)
+        if cls is not None:
+            msg += " " + _("Resource type - {}.").format(cls.cls_display_name)
+
+        super().__init__(message=msg, data=dict(
+            cls=cls.identity if cls else None,
+            required=required,
+            available=available,
+        ))
+
+
 # TODO: Rewrite old-style resource exception classes
 
 @implementer(IUserException)
