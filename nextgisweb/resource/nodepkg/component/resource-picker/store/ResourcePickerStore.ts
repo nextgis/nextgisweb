@@ -128,32 +128,6 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         this._initialize({ selected, parentId });
     }
 
-    private async _initialize({ selected }: ResourcePickerStoreOptions) {
-        if (selected) {
-            this.selected = selected;
-            try {
-                runInAction(() => {
-                    this.resourcesLoading = true;
-                });
-                this.getSelectedParentAbortController = new AbortController();
-                const lastSelected: number = Array.isArray(selected)
-                    ? selected[selected.length - 1]
-                    : selected;
-                const selectedItem = (await route(
-                    "resource.item",
-                    lastSelected
-                ).get({
-                    signal: this.getSelectedParentAbortController.signal,
-                    cache: true,
-                })) as ResourceItem;
-                this.parentId = selectedItem.resource.parent.id;
-            } catch {
-                // ignore
-            }
-        }
-        this.changeParentTo(this.parentId);
-    }
-
     async changeParentTo(parent: number) {
         this.setChildrenFor(parent);
         this.setBreadcrumbItems(parent);
@@ -369,6 +343,32 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
                 this.createNewGroupLoading = false;
             });
         }
+    }
+
+    private async _initialize({ selected }: ResourcePickerStoreOptions) {
+        if (selected && selected.length) {
+            this.selected = selected;
+            try {
+                runInAction(() => {
+                    this.resourcesLoading = true;
+                });
+                this.getSelectedParentAbortController = new AbortController();
+                const lastSelected: number = Array.isArray(selected)
+                    ? selected[selected.length - 1]
+                    : selected;
+                const selectedItem = (await route(
+                    "resource.item",
+                    lastSelected
+                ).get({
+                    signal: this.getSelectedParentAbortController.signal,
+                    cache: true,
+                })) as ResourceItem;
+                this.parentId = selectedItem.resource.parent.id;
+            } catch {
+                // ignore
+            }
+        }
+        this.changeParentTo(this.parentId);
     }
 
     private _resourceVisible(resource: Resource): boolean {

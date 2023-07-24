@@ -33,9 +33,13 @@ export const ResourceSelect = ({
     const { makeSignal, abort } = useAbortController();
     const [value_, setValue_] = useState(value);
     const [open, setOpen] = useState(false);
-    const pickerParentIdMem = useRef<number | null>(null);
+    const pickerParentIdMem = useRef<number | null>(
+        pickerOptions ? pickerOptions.parentId : null
+    );
     const [resource, setResource] = useState<ResourceItem | null>(null);
-    const [resourceLoading, setResourceLoading] = useState(false);
+    const [resourceLoading, setResourceLoading] = useState(
+        value_ !== undefined
+    );
 
     const closePicker = () => {
         if (pickerModal.current) {
@@ -97,10 +101,8 @@ export const ResourceSelect = ({
     }, [onPick, open, pickerOptions, value_]);
 
     useEffect(() => {
-        if (value_ !== undefined) {
-            loadResource();
-        }
-    }, [value_, loadResource]);
+        loadResource();
+    }, [loadResource]);
 
     const options = useMemo<Option[]>(() => {
         return resource
