@@ -33,7 +33,7 @@ def config(argv=sys.argv):
 
     args = argparser.parse_args(argv[1:])
 
-    from .component import Component, load_all
+    from .env.component import Component, load_all
     from .env.package import pkginfo
     load_all()
 
