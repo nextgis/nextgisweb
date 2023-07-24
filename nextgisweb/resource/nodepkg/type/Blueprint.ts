@@ -1,6 +1,6 @@
 import type { ResourceClass } from "./Resource";
 
-interface Resource {
+export interface BlueprintResource {
     identity: string;
     label: string;
     base_classes: ResourceClass[];
@@ -10,17 +10,17 @@ interface Resource {
 
 type Permissions = Record<string, unknown>;
 
-interface Scope {
+export interface BlueprintScope {
     identity: string;
     label: string;
     permissions: Permissions;
 }
 
 interface Resources {
-    [key: string]: Resource;
+    [key: ResourceClass]: BlueprintResource;
 }
 
-type Scopes = Record<string, Scope>;
+type Scopes = Record<string, BlueprintScope>;
 
 export interface Blueprint {
     resources: Resources;
