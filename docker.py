@@ -29,3 +29,11 @@ def on_user_dir(event):
     if font is not None:
         fontpath = Path(font)
         copyfiles([fontpath], event.source / 'build' / 'font', fontpath)
+
+
+@AppImage.on_virtualenv.handler
+def on_virtualenv(event):
+    event.after_install(
+        'ln -s package/nextgisweb/.prettierrc.cjs $NGWROOT/',
+        'ln -s package/nextgisweb/.eslintrc.cjs $NGWROOT/',
+    )

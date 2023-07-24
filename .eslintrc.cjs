@@ -1,5 +1,10 @@
 const babelConfigPath = require.resolve("@nextgisweb/jsrealm/babelrc.cjs");
 
+const expcomp = (pattern) => [
+    `nextgisweb/*/${pattern}`,
+    `**/nextgisweb_*/nextgisweb_*/**/${pattern}`,
+];
+
 /** @type {import("eslint").Linter.Config } */
 const config = {
     root: true,
@@ -26,7 +31,7 @@ const config = {
             { allowExtraDependencies: true },
         ],
     },
-    ignorePatterns: ["doc/"],
+    ignorePatterns: ["doc/", "contrib/", "dist/", "node_modules/", "env/lib/"],
     overrides: [
         {
             files: "*.cjs",
@@ -42,7 +47,7 @@ const config = {
             },
         },
         {
-            files: ["*/*/nodepkg/**/*.js"],
+            files: expcomp("nodepkg/**/*.js"),
             env: {
                 browser: true,
                 es2020: true,
@@ -57,7 +62,10 @@ const config = {
             },
         },
         {
-            files: ["*/*/nodepkg/**/*.ts", "*/*/nodepkg/**/*.tsx"],
+            files: [
+                ...expcomp("nodepkg/**/*.ts"),
+                ...expcomp("nodepkg/**/*.tsx"),
+            ],
             parser: "@typescript-eslint/parser",
             plugins: ["react", "@typescript-eslint", "prettier"],
             extends: [
@@ -77,7 +85,7 @@ const config = {
             },
         },
         {
-            files: ["*/*/amd/**/*.js"],
+            files: expcomp("amd/**/*.js"),
             plugins: ["requirejs"],
             extends: ["eslint:recommended", "plugin:requirejs/recommended"],
             env: {
