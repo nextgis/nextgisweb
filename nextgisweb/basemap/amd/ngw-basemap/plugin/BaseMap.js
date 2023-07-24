@@ -7,7 +7,7 @@ define([
     "dojo/dom-construct",
     "@nextgisweb/pyramid/i18n!",
     "openlayers/ol",
-    "../resource/proj4"
+    "../contrib/proj4"
 ], function (
     declare,
     array,
