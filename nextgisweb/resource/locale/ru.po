@@ -517,7 +517,7 @@ msgstr "Запретить"
 
 #: nodepkg/permissions-widget/PermissionsWidget.js:25
 msgid "This and subresources"
-msgstr "Этот и вложенные ресурсов"
+msgstr "Этого и вложенных ресурсов"
 
 #: nodepkg/permissions-widget/PermissionsWidget.js:26
 msgid "This resource only"
