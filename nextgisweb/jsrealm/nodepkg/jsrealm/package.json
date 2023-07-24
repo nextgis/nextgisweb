@@ -8,6 +8,7 @@
         }
     },
     "dependencies": {
+        "@types/lodash-es": "^4.17.8",
         "@babel/core": "^7.22.9",
         "@babel/eslint-parser": "^7.22.9",
         "@babel/plugin-transform-runtime": "^7.22.9",

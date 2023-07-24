@@ -1,7 +1,18 @@
-import { useEffect, useReducer, useMemo } from "react";
-import { route as apiRoute } from "../api";
+import { useEffect, useMemo, useReducer, useRef } from "react";
 
-const loadingCounterReducer = (state, action) => {
+import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
+
+import { route as apiRoute } from "../api";
+import { useAbortController } from "./useAbortController";
+
+import type { UseRouteParams } from "./type";
+
+type LoadingCounterState = "increment" | "decrement" | "reset";
+
+const loadingCounterReducer = (
+    state: { count: number },
+    action: LoadingCounterState | undefined
+) => {
     switch (action) {
         case "increment":
             return { count: state.count + 1 };
@@ -14,37 +25,34 @@ const loadingCounterReducer = (state, action) => {
     }
 };
 
-export function useRoute(name, { loadOnInit = false, ...params } = {}) {
-    const [abortController, dispatchAbortController] = useReducer(
-        (state, action) => {
-            if (action === "abort" && state) {
-                state.abort();
-                return null;
-            } else {
-                return new AbortController();
-            }
-        },
-        null
-    );
+export function useRoute(
+    name: string,
+    params?: UseRouteParams,
+    loadOnInit = false
+) {
+    const loadOnInit_ = useRef(loadOnInit);
+    const { abort, makeSignal } = useAbortController();
     const [loadingCounter, dispatchLoadingCounter] = useReducer(
         loadingCounterReducer,
-        { count: Number(!!loadOnInit) }
+        { count: Number(!!loadOnInit_) }
     );
 
+    const routerParams = useObjectState(params);
+
     const route = useMemo(() => {
-        const route_ = apiRoute(name, params);
-        dispatchAbortController();
+        const route_ = apiRoute(name, routerParams);
+        abort();
         for (const method of ["get", "post", "put", "delete"]) {
             const requestForMethodCb = route_[method];
             route_[method] = async (options) => {
-                if (loadOnInit) {
+                if (loadOnInit_.current) {
                     dispatchLoadingCounter("decrement");
-                    loadOnInit = false;
+                    loadOnInit_.current = false;
                 }
                 dispatchLoadingCounter("increment");
                 try {
                     return await requestForMethodCb({
-                        signal: abortController,
+                        signal: makeSignal(),
                         ...options,
                     });
                 } finally {
@@ -53,7 +61,7 @@ export function useRoute(name, { loadOnInit = false, ...params } = {}) {
             };
         }
         return route_;
-    }, [name]);
+    }, [abort, makeSignal, name, routerParams]);
 
     const isLoading = useMemo(() => {
         return loadingCounter.count !== 0;
@@ -63,11 +71,7 @@ export function useRoute(name, { loadOnInit = false, ...params } = {}) {
         return () => {
             abort();
         };
-    }, []);
-
-    const abort = () => {
-        dispatchAbortController("abort");
-    };
+    }, [abort]);
 
     return { route, isLoading, abort };
 }
