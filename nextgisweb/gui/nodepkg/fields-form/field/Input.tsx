@@ -1,10 +1,12 @@
-import PropTypes from "prop-types";
-
 import { Input as Input_ } from "@nextgisweb/gui/antd";
 
 import { FormItem } from "./_FormItem";
 
-export function Input(props) {
+import type { FormItemProps } from "../type";
+
+type InputProps = Parameters<typeof Input_>[0];
+
+export function Input(props: FormItemProps<InputProps>) {
     return (
         <FormItem
             {...props}
@@ -12,9 +14,3 @@ export function Input(props) {
         />
     );
 }
-
-Input.propTypes = {
-    placeholder: PropTypes.string,
-    inputProps: PropTypes.object,
-    label: PropTypes.string,
-};

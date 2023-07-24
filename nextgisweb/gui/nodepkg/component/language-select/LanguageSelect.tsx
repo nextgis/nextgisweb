@@ -1,20 +1,25 @@
-import { PropTypes } from "prop-types";
-
 import { Button, Input, Select } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 
-import { FormItem } from "./_FormItem";
+type InputProps = Parameters<typeof Select>[0];
+
+export interface LanguageSelectProps extends InputProps {
+    /** Add  proposal to contribute to the translation  */
+    contribute?: boolean;
+    value?: string;
+    onChange?: (val: string) => void;
+}
 
 const languageContributeUrl = settings.language_contribute_url;
 const translateProposalMsg = i18n.gettext("Improve or add new translation");
 
-const LanguageSelectInput = ({
+export const LanguageSelect = ({
     value,
     onChange,
     contribute = true,
     ...selectProps
-}) => {
+}: LanguageSelectProps) => {
     const defValue = "null";
     if (value === null) {
         value = defValue;
@@ -32,7 +37,9 @@ const LanguageSelectInput = ({
         if (val === defValue) {
             val = null;
         }
-        onChange(val);
+        if (onChange) {
+            onChange(val);
+        }
     };
 
     const SelectInput = () => (
@@ -54,7 +61,7 @@ const LanguageSelectInput = ({
 
     return (
         <Input.Group compact style={{ display: "flex" }}>
-            <SelectInput {...selectProps} />
+            <SelectInput />
             {contribute && languageContributeUrl && (
                 <Button
                     type="link"
@@ -66,29 +73,4 @@ const LanguageSelectInput = ({
             )}
         </Input.Group>
     );
-};
-
-LanguageSelectInput.propTypes = {
-    contribute: PropTypes.bool,
-    onChange: PropTypes.func,
-    value: PropTypes.any,
-};
-
-export function LanguageSelect({ loading, contribute, ...props }) {
-    return (
-        <FormItem
-            {...props}
-            input={(inputProps) => (
-                <LanguageSelectInput
-                    {...{ loading, contribute, ...inputProps }}
-                />
-            )}
-        />
-    );
-}
-
-LanguageSelect.propTypes = {
-    loading: PropTypes.bool,
-    contribute: PropTypes.bool,
-    inputProps: PropTypes.object,
 };

@@ -36,11 +36,11 @@ export function ModelForm(props) {
     const model =
         typeof m === "string"
             ? {
-                item: m + ".item",
-                collection: m + ".collection",
-                edit: m + ".edit",
-                browse: m + ".browse",
-            }
+                  item: m + ".item",
+                  collection: m + ".collection",
+                  edit: m + ".edit",
+                  browse: m + ".browse",
+              }
             : m;
 
     const form = Form.useForm(props.form)[0];

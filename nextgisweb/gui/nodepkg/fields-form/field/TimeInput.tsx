@@ -1,10 +1,13 @@
-import PropTypes from "prop-types";
-
 import { TimePicker } from "@nextgisweb/gui/antd";
 
 import { FormItem } from "./_FormItem";
 
-export function TimeInput({ ...props }) {
+import type { TimePickerProps } from "antd/lib/time-picker";
+import type { FormItemProps } from "../type";
+
+type InputProps = TimePickerProps;
+
+export function TimeInput({ ...props }: FormItemProps<InputProps>) {
     return (
         <FormItem
             {...props}
@@ -12,8 +15,3 @@ export function TimeInput({ ...props }) {
         />
     );
 }
-
-TimeInput.propTypes = {
-    placeholder: PropTypes.string,
-    inputProps: PropTypes.object,
-};

@@ -1,10 +1,20 @@
-import PropTypes from "prop-types";
-
 import { Select as AntdSelect } from "@nextgisweb/gui/antd";
+
+import { SelectProps as AntdSelectProps } from "antd/lib/select";
 
 import { FormItem } from "./_FormItem";
 
-export function Select({ choices, mode, ...props }) {
+import type { FormItemProps, FormFieldChoice } from "../type";
+
+type InputProps = Parameters<typeof AntdSelect>[0];
+
+type SelectProps = FormItemProps<AntdSelectProps> & {
+    choices?: FormFieldChoice[];
+    /** @deprecated move to inputProps */
+    mode?: InputProps["mode"];
+};
+
+export function Select({ choices, mode, ...props }: SelectProps) {
     return (
         <FormItem
             {...props}
@@ -24,15 +34,3 @@ export function Select({ choices, mode, ...props }) {
         />
     );
 }
-
-Select.propTypes = {
-    choices: PropTypes.arrayOf(
-        PropTypes.shape({
-            label: PropTypes.string.isRequired,
-            value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-                .isRequired,
-        })
-    ),
-    mode: PropTypes.string,
-    inputProps: PropTypes.object,
-};

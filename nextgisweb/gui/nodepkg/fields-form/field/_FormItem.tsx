@@ -1,7 +1,7 @@
-import PropTypes from "prop-types";
 import { Form, Space } from "@nextgisweb/gui/antd";
+import { FormItemProps, InputProps } from "../type";
 
-export function FormItem({
+export function FormItem<P extends InputProps = InputProps>({
     placeholder,
     inputProps,
     disabled,
@@ -10,13 +10,14 @@ export function FormItem({
     label,
     input,
     ...props
-}) {
-    const inputProps_ = { placeholder, disabled, ...inputProps };
+}: FormItemProps<P>) {
+    const inputProps_: P = { placeholder, disabled, ...inputProps };
 
-    const propsForInput = {};
+    const propsForInput = {} as P;
 
     for (const p in inputProps_) {
         const prop = inputProps_[p];
+
         if (prop !== undefined) {
             propsForInput[p] = prop;
         }
@@ -24,7 +25,7 @@ export function FormItem({
 
     return (
         <Form.Item label={label}>
-            <Space.Compact block >
+            <Space.Compact block>
                 {prepend ? prepend : null}
                 <Form.Item {...props} noStyle>
                     {input ? input(propsForInput) : null}
@@ -34,13 +35,3 @@ export function FormItem({
         </Form.Item>
     );
 }
-
-FormItem.propTypes = {
-    inputProps: PropTypes.object,
-    label: PropTypes.string,
-    disabled: PropTypes.bool,
-    input: PropTypes.func,
-    prepend: PropTypes.node,
-    append: PropTypes.node,
-    placeholder: PropTypes.string,
-};

@@ -1,10 +1,12 @@
-import { PropTypes } from "prop-types";
-
 import { Input } from "@nextgisweb/gui/antd";
 
 import { FormItem } from "./_FormItem";
 
-export function ValidationTextBox({ ...props }) {
+import type { FormItemProps } from "../type";
+
+type InputProps = Parameters<typeof Input>[0];
+
+export function ValidationTextBox({ ...props }: FormItemProps<InputProps>) {
     return (
         <FormItem
             {...props}
@@ -12,8 +14,3 @@ export function ValidationTextBox({ ...props }) {
         />
     );
 }
-
-ValidationTextBox.propTypes = {
-    disabled: PropTypes.boolean,
-    inputProps: PropTypes.object,
-};

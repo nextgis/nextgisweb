@@ -12,3 +12,11 @@ declare const ngwConfig: {
     // Defined in @nextgisweb/jsrealm/locale-loader
     plurals: [number, { (n: number): number }];
 };
+
+declare module "@nextgisweb/pyramid/settings!pyramid" {
+    const value: {
+        language_contribute_url: string;
+        langages: { value: string; display_name: string }[];
+    };
+    export = value;
+}

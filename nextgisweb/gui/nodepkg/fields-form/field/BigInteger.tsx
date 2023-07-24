@@ -1,18 +1,22 @@
-import PropTypes from "prop-types";
-
 import { InputNumber } from "@nextgisweb/gui/antd";
 
 import { FormItem } from "./_FormItem";
+import type { FormItemProps } from "../type";
 
-const InputNumber_ = ({ value, onChange, ...inputProps }) => {
+type InputNumberProps = Parameters<typeof InputNumber>[0];
+
+type BigIntegerProps = FormItemProps<InputNumberProps> & {
+    /** @deprecated move to inputProps */
+    min?: InputNumberProps["min"];
+    /** @deprecated move to inputProps */
+    max?: InputNumberProps["max"];
+};
+
+const InputNumber_ = ({ value, onChange, ...inputProps }: InputNumberProps) => {
     const formatter = (v) => {
-        v = v.match(/\d+/)
+        v = v.match(/\d+/);
         return v ? v[0] : "";
     };
-
-    // const onChange_ = (v) => {
-    //     onChange(BigInt(formatter(v)));
-    // };
 
     return (
         <InputNumber
@@ -25,12 +29,7 @@ const InputNumber_ = ({ value, onChange, ...inputProps }) => {
     );
 };
 
-InputNumber_.propTypes = {
-    onChange: PropTypes.func,
-    value: PropTypes.any,
-};
-
-export function BigInteger({ min, max, ...props }) {
+export function BigInteger({ min, max, ...props }: BigIntegerProps) {
     return (
         <FormItem
             {...props}
@@ -40,9 +39,3 @@ export function BigInteger({ min, max, ...props }) {
         />
     );
 }
-
-BigInteger.propTypes = {
-    inputProps: PropTypes.object,
-    max: PropTypes.number,
-    min: PropTypes.number,
-};
