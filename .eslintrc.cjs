@@ -25,6 +25,7 @@ const config = {
         "eqeqeq": "error",
         "no-unused-vars": ["error", { args: "after-used" }],
         "no-use-before-define": "error",
+        "prettier/prettier": "warn",
         "requirejs/no-object-define": "error",
         "requirejs/amd-function-arity": [
             "error",
@@ -76,6 +77,9 @@ const config = {
                 "plugin:react-hooks/recommended",
                 "plugin:prettier/recommended",
             ],
+            rules: {
+                "prettier/prettier": "warn",
+            },
             parserOptions: {
                 sourceType: "module",
                 jsx: true,
