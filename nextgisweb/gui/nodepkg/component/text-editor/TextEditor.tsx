@@ -1,9 +1,11 @@
-import { PropTypes } from "prop-types";
-
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { Editor } from "@nextgisweb/ckeditor";
+
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import type { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
+import { TextEditorProps } from "./type";
 
 import "./TextEditor.less";
 
@@ -12,23 +14,21 @@ export const TextEditor = ({
     onChange,
     fullHeight = true,
     border = true,
-}) => {
-    const [editor, setEditor] = useState();
-    const wrapperElement = useRef();
+}: TextEditorProps) => {
+    const [editor, setEditor] = useState<ClassicEditor>();
+    const wrapperElement = useRef<HTMLDivElement>();
 
     const onChange_ = (_, editor) => {
         if (onChange) {
-            let data = editor.getData();
+            const data = editor.getData();
             onChange(data);
         }
     };
-
     const updateHeigh = useCallback(() => {
         if (editor) {
-            if (wrapperElement.current && wrapperElement.current.parentNode) {
-                const parentHeight =
-                    wrapperElement.current.parentNode.getBoundingClientRect()
-                        .height;
+            const parentNode = wrapperElement.current.parentElement;
+            if (wrapperElement.current && parentNode) {
+                const parentHeight = parentNode.getBoundingClientRect().height;
                 const toolbarHeight =
                     editor.ui.view.toolbar.element.getBoundingClientRect()
                         .height;
@@ -44,7 +44,9 @@ export const TextEditor = ({
                 });
 
                 // A special case for setting the height when the html editor mode is enabled
-                const sourceEditingPlugin = editor.plugins.get("SourceEditing");
+                const sourceEditingPlugin = editor.plugins.get(
+                    "SourceEditing"
+                ) as SourceEditing;
                 if (
                     sourceEditingPlugin &&
                     sourceEditingPlugin.isSourceEditingMode
@@ -52,10 +54,11 @@ export const TextEditor = ({
                     const sourceEditingElement =
                         editor.ui.view.element.querySelector(
                             ".ck-source-editing-area"
-                        );
+                        ) as HTMLElement;
                     if (sourceEditingElement) {
                         sourceEditingElement.style.height = height + "px";
-                        const textArea = sourceEditingElement.firstChild;
+                        const textArea =
+                            sourceEditingElement.firstChild as HTMLElement;
                         if (textArea) {
                             textArea.style.height = height + "px";
                             textArea.style.overflowY = "auto";
@@ -119,11 +122,4 @@ export const TextEditor = ({
             />
         </div>
     );
-};
-
-TextEditor.propTypes = {
-    value: PropTypes.string,
-    onChange: PropTypes.func,
-    fullHeight: PropTypes.bool,
-    border: PropTypes.bool,
 };
