@@ -338,14 +338,6 @@ define([
                 });
                 this.printMap.olMap.addControl(this._mapScale);
 
-                aspect.after(
-                    mapContainer,
-                    "resize",
-                    lang.hitch(this, function () {
-                        this.printMap.olMap.updateSize();
-                    })
-                );
-
                 array.forEach(
                     this.map.getLayers().getArray(),
                     function (layer) {
@@ -394,17 +386,24 @@ define([
                     this._changeScaleControls(value, type);
                 }
             },
+            
+            _mmToPx: function (mm) {
+                // According to https://www.w3.org/TR/css3-values/#absolute-lengths
+                return mm / 10 *  (96 / 2.54);
+            },
 
             _buildPageStyle: function (width, height, margin) {
                 const compiled = handlebars.compile(printingCssTemplate);
-                const html = compiled({
+                width = Math.round(this._mmToPx(width));
+                height = Math.round(this._mmToPx(height));
+                margin = Math.round(this._mmToPx(margin));
+                this._getPageStyle().innerHTML = compiled({
                     widthPage: width,
                     heightPage: height,
                     widthMap: width - margin * 2,
                     heightMap: height - margin * 2,
                     margin: margin,
                 });
-                this._getPageStyle().innerHTML = html;
             },
 
             _pageStyle: null,

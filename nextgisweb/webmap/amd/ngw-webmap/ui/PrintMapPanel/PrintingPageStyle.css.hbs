@@ -7,26 +7,28 @@ body {
 
 div.print-map-page-wrapper,
 div.print-map-export-wrapper {
-  width: {{ widthPage }}mm;
-  height: {{ heightPage }}mm;
+  width: {{ widthPage }}px;
+  height: {{ heightPage }}px;
 }
 
 .print-map-page {
-  width: {{ widthPage }}mm;
-  height: {{ heightPage }}mm;
+  width: {{ widthPage }}px;
+  height: {{ heightPage }}px;
   padding: 0;
   background-color: white;
 }
 
 .print-map-page .print-map {
-    width: {{ widthMap }}mm;
-    height: {{ heightMap }}mm;
-    margin: {{ margin }}mm;
+    min-width: 100px;
+    min-height: 100px;
+    width: {{ widthMap }}px;
+    height: {{ heightMap }}px;
+    margin: {{ margin }}px;
 }
 
 .print-map-page .print-map div.ol-viewport {
-    width: {{ widthMap }}mm !important;
-    height: {{ heightMap }}mm !important;
+    width: {{ widthMap }}px !important;
+    height: {{ heightMap }}px !important;
 }
 
 .print-map-page .print-map img.map-logo {
@@ -37,23 +39,23 @@ div.print-map-export-wrapper {
 }
 
 @page {
-    size: {{ widthPage }}mm {{ heightPage }}mm;
-    margin: {{ margin }}mm;
+    size: {{ widthPage }}px {{ heightPage }}px;
+    margin: {{ margin }}px;
 }
 
 @media print {
     html, body {
-        width: {{ widthMap }}mm !important;
-        height: {{ heightMap }}mm !important;
+        width: {{ widthMap }}px !important;
+        height: {{ heightMap }}px !important;
         padding: 0 !important;
         margin: 0 !important;
-        min-width: {{ widthMap }}mm !important;
-        max-width: {{ widthMap }}mm !important;
+        min-width: {{ widthMap }}px !important;
+        max-width: {{ widthMap }}px !important;
     }
 
     .print-map-pane {
-      width: {{ widthPage }}mm !important;
-      height: {{ heightPage }}mm !important;
+      width: {{ widthPage }}px !important;
+      height: {{ heightPage }}px !important;
     }
 
     .print-map-page-wrapper {
@@ -77,15 +79,15 @@ div.print-map-export-wrapper {
     #webmap-wrapper div.leftPanelPane,
     .printMap-panel,
     .printMap-panel .dijitBorderContainer {
-      width: {{ widthPage }}mm !important;
-      height: {{ heightPage }}mm !important;
+      width: {{ widthPage }}px !important;
+      height: {{ heightPage }}px !important;
     }
 
     .print-map-export-wrapper,
     .print-map-page,
     .print-map {
-      width: {{ widthMap }}mm !important;
-      height: {{ heightMap }}mm !important;
+      width: {{ widthMap }}px !important;
+      height: {{ heightMap }}px !important;
       margin: 0 !important;
       padding: 0 !important;
       overflow: hidden !important;
@@ -93,7 +95,7 @@ div.print-map-export-wrapper {
 
     div.print-map-export-wrapper {
       position: absolute;
-      margin: {{ margin }}mm !important;
+      margin: {{ margin }}px !important;
     }
 
     #webmap-wrapper div.leftPanelPane,
