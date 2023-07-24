@@ -31,7 +31,7 @@ export function useRouteGet<D = unknown>(
     const [data, setData] = useState<D>();
     const [error, setError] = useState(null);
 
-    const routerOptions = useObjectState(options_);
+    const [routerOptions] = useObjectState(options_);
 
     const refresh = useCallback(async () => {
         abort();

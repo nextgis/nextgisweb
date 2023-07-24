@@ -37,7 +37,7 @@ export function useRoute(
         { count: Number(!!loadOnInit_) }
     );
 
-    const routerParams = useObjectState(params);
+    const [routerParams] = useObjectState(params);
 
     const route = useMemo(() => {
         const route_ = apiRoute(name, routerParams);
