@@ -9,6 +9,8 @@ export class EditorStore {
     imageUpdated = undefined;
     description = null;
 
+    dirty = false;
+
     constructor({ resourceId }) {
         makeAutoObservable(this, { identity: false });
         this.resourceId = resourceId;
@@ -28,9 +30,11 @@ export class EditorStore {
         }
 
         this.description = value.preview_description;
+        this.dirty = false;
     }
 
     dump() {
+        if (!this.dirty) return;
         const result = {};
         result.preview_description = this.description ? this.description : null;
         if (this.imageUpdated !== undefined) {
@@ -41,5 +45,10 @@ export class EditorStore {
 
     get isValid() {
         return this.imageExisting !== undefined;
+    }
+
+    update(data) {
+        for (const [k, v] of Object.entries(data)) this[k] = v;
+        this.dirty = true;
     }
 }

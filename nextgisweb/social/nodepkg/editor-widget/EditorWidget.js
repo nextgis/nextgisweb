@@ -19,14 +19,14 @@ export const EditorWidget = observer(({ store }) => {
             <ImageUploader
                 image={store.imageExisting}
                 onChange={(value) => {
-                    store.imageUpdated = value;
+                    store.update({ imageUpdated: value });
                 }}
                 {...imageUploaderMessages}
             />
             <TextArea
                 value={store.description}
                 onChange={(e) => {
-                    store.description = e.target.value;
+                    store.update({ description: e.target.value });
                 }}
                 placeholder={i18n.gettext("Preview description")}
                 autoSize
