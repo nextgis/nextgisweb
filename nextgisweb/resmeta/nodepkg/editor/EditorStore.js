@@ -48,7 +48,7 @@ class Record {
         }
 
         if (value !== undefined) {
-            this.value = value;
+            this.value = this.type === "number" ? 0 : value;
         }
 
         if (type !== undefined) {
