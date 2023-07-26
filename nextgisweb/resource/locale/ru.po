@@ -1,252 +1,3 @@
-#: api.py:118
-msgid "Root resource could not be deleted."
-msgstr "Корневой ресурс удалить невозможно."
-
-#: api.py:162
-msgid "Resource parent required."
-msgstr "Необходимо указать ресурс-родитель."
-
-#: api.py:165
-msgid "Resource class required."
-msgstr "Необходимо указать класс ресурса."
-
-#: api.py:168
-#, python-format
-msgid "Unknown resource class '%s'."
-msgstr "Неизвестный класс ресурса '%s'."
-
-#: api.py:174
-#, python-format
-msgid "Resource class '%s' disabled."
-msgstr "Класс ресурса '%s' отключен."
-
-#: api.py:253
-msgid "Permission not found"
-msgstr "Право доступа не найдено"
-
-#: api.py:431
-msgid "Not enough resource quota: {0} required, but only {1} available."
-msgstr "Превышена квота на количество ресурсов: {0} запрошено, доступно {1}."
-
-#: api.py:435
-msgid "Resource type - {}."
-msgstr "Тип ресурса - {}."
-
-#: component.py:103
-msgid "Main resource group"
-msgstr "Основная группа ресурсов"
-
-#: exception.py:11
-msgid "Resource not found"
-msgstr "Ресурс не найден"
-
-#: exception.py:12
-#, python-format
-msgid "Resource with id = %d was not found."
-msgstr "Ресурс с id = %d не найден."
-
-#: exception.py:13
-msgid ""
-"The resource may have been deleted or an error in the address. Correct the "
-"address or go to the home page and try to find the desired resource."
-msgstr ""
-"Возможно, ресурс удален либо в адресе допущена ошибка. Исправьте адрес или "
-"вернитесь на главную страницу и попробуйте найти нужный ресурс с помощью "
-"навигации."
-
-#: exception.py:25
-msgid "Resource display name is not unique"
-msgstr "Наименование ресурса не уникально"
-
-#: exception.py:26
-#, python-format
-msgid "Resource with same display name already exists (id = %d)."
-msgstr "Ресурс с таким наименованием уже существует (id = %d)."
-
-#: exception.py:27
-msgid ""
-"Within a single parent resource, each resource must have unique display name."
-" Give the resource a different display name or rename existing."
-msgstr ""
-"В рамках одного дочернего ресурса каждый ресурс должен иметь уникальное "
-"наименование. Присвойте ресурсу другое наименование или переименуйте "
-"существующий."
-
-#: exception.py:38
-msgid "Hierarchy error"
-msgstr "Ошибка иерархии"
-
-#: exception.py:56
-msgid "Forbidden"
-msgstr "Доступ запрещен"
-
-#: exception.py:64
-msgid "Operational error"
-msgstr "Операционная ошибка"
-
-#: amd/ngw-resource/form/ResourceLink.js:35 model.py:78
-#: nodepkg/editor-widget/EditorWidget.js:62 scope.py:12
-msgid "Resource"
-msgstr "Ресурс"
-
-#: model.py:260
-msgid "Resource can not be a parent himself."
-msgstr "Ресурс не может быть родителем сам себе."
-
-#: model.py:273
-msgid "Resource keyname is not unique."
-msgstr "Ключ ресурса не уникален."
-
-#: model.py:305
-msgid "Default style"
-msgstr "Стиль по умолчанию"
-
-#: model.py:358
-msgid "Resource can not be without a parent."
-msgstr "Ресурс не может быть без родителя"
-
-#: model.py:364
-#, python-format
-msgid "You are not allowed to manage children of resource with id = %d."
-msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
-
-#: model.py:369
-#, python-format
-msgid "Resource can not be a child of resource id = %d."
-msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
-
-#: model.py:491
-#, python-format
-msgid "Maximum number of resources exceeded. The limit is %s."
-msgstr "Превышено допустимое число ресурсов. Лимит %s."
-
-#: model.py:495
-#, python-format
-msgid "Maximum number of resources '%s' exceeded. The limit is %s."
-msgstr "Превышено допустимое число ресурсов '%s'. Лимит %s."
-
-#: model.py:568
-msgid "Resource group"
-msgstr "Группа ресурсов"
-
-#: scope.py:14 scope.py:32 scope.py:44 scope.py:54 scope.py:67
-msgctxt "permission"
-msgid "Read"
-msgstr "Чтение"
-
-#: scope.py:15
-msgctxt "permission"
-msgid "Create"
-msgstr "Создание"
-
-#: scope.py:16 scope.py:33 scope.py:45 scope.py:55
-msgctxt "permission"
-msgid "Modify"
-msgstr "Изменение"
-
-#: scope.py:17
-msgctxt "permission"
-msgid "Delete"
-msgstr "Удаление"
-
-#: scope.py:18
-msgctxt "permission"
-msgid "Manage subresources"
-msgstr "Управление вложенными"
-
-#: scope.py:19
-msgctxt "permission"
-msgid "Configure permissions"
-msgstr "Настройка прав доступа"
-
-#: scope.py:30
-msgid "Metadata"
-msgstr "Метаданные"
-
-#: scope.py:42
-msgid "Data structure"
-msgstr "Структура данных"
-
-#: scope.py:52
-msgid "Data"
-msgstr "Данные"
-
-#: scope.py:65
-msgid "Connection"
-msgstr "Соединение"
-
-#: scope.py:68 scope.py:82
-msgctxt "permission"
-msgid "Configure"
-msgstr "Настройка"
-
-#: scope.py:69
-msgctxt "permission"
-msgid "Use"
-msgstr "Использование"
-
-#: scope.py:79
-msgid "Service"
-msgstr "Сервис"
-
-#: scope.py:81
-msgctxt "permission"
-msgid "Access"
-msgstr "Доступ"
-
-#: serialize.py:93
-#, python-format
-msgid "Attribute '%s' forbidden."
-msgstr "Недостаточно прав, атрибут '%s'."
-
-#: view.py:84 view.py:349
-msgid "JSON view"
-msgstr "Представление JSON"
-
-#: view.py:96 view.py:355
-msgid "User permissions"
-msgstr "Права пользователя"
-
-#: view.py:136 view.py:366
-msgid "Create resource"
-msgstr "Создать ресурс"
-
-#: view.py:143
-msgid "Update resource"
-msgstr "Обновить ресурс"
-
-#: view.py:153
-msgid "Delete resource"
-msgstr "Удалить ресурс"
-
-#: view.py:207 view.py:374
-msgid "Resource export"
-msgstr "Экспорт ресурсов"
-
-#: view.py:231
-#, python-format
-msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
-msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
-
-#: view.py:334
-msgid "Update"
-msgstr "Изменить"
-
-#: amd/ngw-resource/CompositeWidget.js:99
-#: nodepkg/children-section/ChildrenSection.js:287
-#: nodepkg/children-section/util/createResourceTableItemOptions.js:5
-#: nodepkg/delete-page/DeletePage.js:49 view.py:342
-msgid "Delete"
-msgstr "Удалить"
-
-#: nodepkg/permissions-widget/PermissionsWidget.js:16 view.py:367
-msgid "Action"
-msgstr "Действие"
-
-#: view.py:368
-msgid "Extra"
-msgstr "Дополнительно"
-
 #: amd/ngw-resource/CompositeWidget.js:49
 msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
@@ -263,6 +14,13 @@ msgstr "Создать и изменить"
 #: nodepkg/export-settings/ExportSettings.js:73
 msgid "Save"
 msgstr "Сохранить"
+
+#: amd/ngw-resource/CompositeWidget.js:99
+#: nodepkg/children-section/ChildrenSection.js:287
+#: nodepkg/children-section/util/createResourceTableItemOptions.js:5
+#: nodepkg/delete-page/DeletePage.js:49 view.py:342
+msgid "Delete"
+msgstr "Удалить"
 
 #: amd/ngw-resource/CompositeWidget.js:248 amd/ngw-resource/CompositeWidget.js:264
 msgid "Unexpected error"
@@ -295,6 +53,139 @@ msgstr "ОК"
 #: amd/ngw-resource/ResourcePicker.js:65
 msgid "Cancel"
 msgstr "Отмена"
+
+#: amd/ngw-resource/form/ResourceLink.js:35 model.py:78
+#: nodepkg/editor-widget/EditorWidget.js:62 scope.py:12
+msgid "Resource"
+msgstr "Ресурс"
+
+#: api.py:118
+msgid "Root resource could not be deleted."
+msgstr "Корневой ресурс удалить невозможно."
+
+#: api.py:162
+msgid "Resource parent required."
+msgstr "Необходимо указать ресурс-родитель."
+
+#: api.py:165
+msgid "Resource class required."
+msgstr "Необходимо указать класс ресурса."
+
+#: api.py:168
+msgid "Unknown resource class '%s'."
+msgstr "Неизвестный класс ресурса '%s'."
+
+#: api.py:174
+msgid "Resource class '%s' disabled."
+msgstr "Класс ресурса '%s' отключен."
+
+#: api.py:253
+msgid "Permission not found"
+msgstr "Право доступа не найдено"
+
+#: component.py:98
+msgid "Main resource group"
+msgstr "Основная группа ресурсов"
+
+#: exception.py:11
+msgid "Resource not found"
+msgstr "Ресурс не найден"
+
+#: exception.py:12
+msgid "Resource with id = %d was not found."
+msgstr "Ресурс с id = %d не найден."
+
+#: exception.py:13
+msgid ""
+"The resource may have been deleted or an error in the address. Correct the "
+"address or go to the home page and try to find the desired resource."
+msgstr ""
+"Возможно, ресурс удален либо в адресе допущена ошибка. Исправьте адрес или "
+"вернитесь на главную страницу и попробуйте найти нужный ресурс с помощью "
+"навигации."
+
+#: exception.py:25
+msgid "Resource display name is not unique"
+msgstr "Наименование ресурса не уникально"
+
+#: exception.py:26
+msgid "Resource with same display name already exists (id = %d)."
+msgstr "Ресурс с таким наименованием уже существует (id = %d)."
+
+#: exception.py:27
+msgid ""
+"Within a single parent resource, each resource must have unique display name."
+" Give the resource a different display name or rename existing."
+msgstr ""
+"В рамках одного дочернего ресурса каждый ресурс должен иметь уникальное "
+"наименование. Присвойте ресурсу другое наименование или переименуйте "
+"существующий."
+
+#: exception.py:38
+msgid "Hierarchy error"
+msgstr "Ошибка иерархии"
+
+#: exception.py:42
+msgid "Quota exceeded"
+msgstr "Превышена квота"
+
+#: exception.py:48
+msgid "Maximum number of resources exceeded. The limit is %s."
+msgstr "Превышено допустимое число ресурсов. Лимит %s."
+
+#: exception.py:50
+msgid "Not enough resource quota: {0} required, but only {1} available."
+msgstr "Превышена квота на количество ресурсов: {0} запрошено, доступно {1}."
+
+#: exception.py:53
+msgid "Resource type - {}."
+msgstr "Тип ресурса - {}."
+
+#: exception.py:77
+msgid "Forbidden"
+msgstr "Доступ запрещен"
+
+#: exception.py:85
+msgid "Operational error"
+msgstr "Операционная ошибка"
+
+#: model.py:260
+msgid "Resource can not be a parent himself."
+msgstr "Ресурс не может быть родителем сам себе."
+
+#: model.py:273
+msgid "Resource keyname is not unique."
+msgstr "Ключ ресурса не уникален."
+
+#: model.py:305
+msgid "Default style"
+msgstr "Стиль по умолчанию"
+
+#: model.py:358
+msgid "Resource can not be without a parent."
+msgstr "Ресурс не может быть без родителя"
+
+#: model.py:364
+msgid "You are not allowed to manage children of resource with id = %d."
+msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
+
+#: model.py:369
+msgid "Resource can not be a child of resource id = %d."
+msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
+
+#: model.py:417
+msgid ""
+"Unable to revoke '{s}: {p}' permission for '{u}' as the user belongs to the "
+"administrators group. Administrators must always have ability to configure "
+"permissions of the main resource group."
+msgstr ""
+"Невозможно отозвать право '{s}: {p}' для '{u}', так как пользователь "
+"относится группе администраторов. Администраторы всегда должны иметь "
+"возможность настраивать права для основной группы ресурсов."
+
+#: model.py:584
+msgid "Resource group"
+msgstr "Группа ресурсов"
 
 #: nodepkg/children-section/ChildrenSection.js:27
 msgid "Please confirm resource deletion. This action cannot be undone."
@@ -491,6 +382,10 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
+#: nodepkg/permissions-widget/PermissionsWidget.js:16 view.py:367
+msgid "Action"
+msgstr "Действие"
+
 #: nodepkg/permissions-widget/PermissionsWidget.js:17
 msgid "Principal"
 msgstr "Субъект"
@@ -539,6 +434,75 @@ msgstr "Ресурсы не найдены"
 msgid "Search resources"
 msgstr "Поиск ресурсов"
 
+#: scope.py:14 scope.py:32 scope.py:44 scope.py:54 scope.py:67
+msgctxt "permission"
+msgid "Read"
+msgstr "Чтение"
+
+#: scope.py:15
+msgctxt "permission"
+msgid "Create"
+msgstr "Создание"
+
+#: scope.py:16 scope.py:33 scope.py:45 scope.py:55
+msgctxt "permission"
+msgid "Modify"
+msgstr "Изменение"
+
+#: scope.py:17
+msgctxt "permission"
+msgid "Delete"
+msgstr "Удаление"
+
+#: scope.py:18
+msgctxt "permission"
+msgid "Manage subresources"
+msgstr "Управление вложенными"
+
+#: scope.py:19
+msgctxt "permission"
+msgid "Configure permissions"
+msgstr "Настройка прав доступа"
+
+#: scope.py:30
+msgid "Metadata"
+msgstr "Метаданные"
+
+#: scope.py:42
+msgid "Data structure"
+msgstr "Структура данных"
+
+#: scope.py:52
+msgid "Data"
+msgstr "Данные"
+
+#: scope.py:65
+msgid "Connection"
+msgstr "Соединение"
+
+#: scope.py:68 scope.py:82
+msgctxt "permission"
+msgid "Configure"
+msgstr "Настройка"
+
+#: scope.py:69
+msgctxt "permission"
+msgid "Use"
+msgstr "Использование"
+
+#: scope.py:79
+msgid "Service"
+msgstr "Сервис"
+
+#: scope.py:81
+msgctxt "permission"
+msgid "Access"
+msgstr "Доступ"
+
+#: serialize.py:93
+msgid "Attribute '%s' forbidden."
+msgstr "Недостаточно прав, атрибут '%s'."
+
 #: template/resource_section_description.mako:8
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
@@ -551,6 +515,39 @@ msgstr "Внешний доступ"
 msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
 
-#: exception.py:42
-msgid "Quota exceeded"
-msgstr "Превышена квота"
+#: view.py:84 view.py:349
+msgid "JSON view"
+msgstr "Представление JSON"
+
+#: view.py:96 view.py:355
+msgid "User permissions"
+msgstr "Права пользователя"
+
+#: view.py:136 view.py:366
+msgid "Create resource"
+msgstr "Создать ресурс"
+
+#: view.py:143
+msgid "Update resource"
+msgstr "Обновить ресурс"
+
+#: view.py:153
+msgid "Delete resource"
+msgstr "Удалить ресурс"
+
+#: view.py:207 view.py:374
+msgid "Resource export"
+msgstr "Экспорт ресурсов"
+
+#: view.py:231
+msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
+msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
+
+#: view.py:334
+msgid "Update"
+msgstr "Изменить"
+
+#: view.py:368
+msgid "Extra"
+msgstr "Дополнительно"
+

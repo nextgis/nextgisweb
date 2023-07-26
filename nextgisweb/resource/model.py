@@ -379,6 +379,12 @@ class _owner_user_attr(SR):
         return super().setter(srlzr, value)
 
 
+REQUIRED_PERMISSIONS_FOR_ADMINISTATORS = [
+    ResourceScope.read,
+    ResourceScope.update,
+    ResourceScope.change_permissions]
+
+
 class _perms_attr(SP):
 
     def setter(self, srlzr, value):
@@ -397,6 +403,26 @@ class _perms_attr(SP):
                 id=itm['principal']['id']).one()
 
             srlzr.obj.acl.append(rule)
+
+        if srlzr.obj.id == 0:
+            for user in User.filter(
+                User.disabled.is_(False),
+                User.member_of.any(keyname='administrators')
+            ):
+                perms = srlzr.obj.permissions(user)
+                if not perms.issuperset(REQUIRED_PERMISSIONS_FOR_ADMINISTATORS):
+                    for p in REQUIRED_PERMISSIONS_FOR_ADMINISTATORS:
+                        if p in perms:
+                            continue
+                        raise ValidationError(message=_(
+                            "Unable to revoke '{s}: {p}' permission for '{u}' "
+                            "as the user belongs to the administrators group. "
+                            "Administrators must always have ability to "
+                            "configure permissions of the main resource group."
+
+                        ).format(s=p.scope.label, p=p.label, u=user.display_name))
+                    else:
+                        assert False
 
     def getter(self, srlzr):
         result = []

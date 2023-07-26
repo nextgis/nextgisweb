@@ -6,9 +6,9 @@ from sqlalchemy import func
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
+from nextgisweb.auth import Group, User
 
-from .. import Resource, ResourceGroup
+from .. import Resource, ResourceACLRule, ResourceGroup
 
 
 def test_disable_resources(
@@ -212,3 +212,41 @@ def test_quota(
     with override(limit=rg_count + 5, resource_cls=['resource_group']):
         check_quota(dict(resource_group=5), 200)
         check_quota(dict(resource_group=7), 402, dict(cls=None, required=7, available=5))
+
+
+@pytest.fixture
+def admin():
+    with transaction.manager:
+        admin = User(
+            keyname='test_admin',
+            display_name="Test admin",
+            member_of=[Group.filter_by(keyname='administrators').one()],
+        ).persist()
+    try:
+        yield admin.id
+    finally:
+        with transaction.manager:
+            ResourceACLRule.filter_by(principal_id=admin.id).delete()
+            DBSession.delete(User.filter_by(id=admin.id).one())
+
+
+def test_admin_permissions(admin, ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
+
+    permissions = ngw_webtest_app.get('/api/resource/0').json['resource']['permissions']
+
+    def check_perm_change(data, status_expected, *, resource_id=0):
+        perm_data = dict(
+            action='deny', identity='', permission='',
+            principal=dict(id=admin), propagate=False, scope='')
+        perm_data.update(data)
+        ngw_webtest_app.put_json(f'/api/resource/{resource_id}', dict(
+            resource=dict(permissions=permissions + [perm_data])
+        ), status=status_expected)
+
+    check_perm_change(dict(), 422)
+    check_perm_change(dict(), 200, resource_id=ngw_resource_group)
+    check_perm_change(dict(permission='manage_children'), 200)
+    check_perm_change(dict(scope='metadata', permission='read'), 200)
+    check_perm_change(dict(scope='resource', permission='read'), 422)
+    check_perm_change(dict(scope='resource', permission='update'), 422)
+    check_perm_change(dict(scope='resource', permission='change_permissions'), 422)
