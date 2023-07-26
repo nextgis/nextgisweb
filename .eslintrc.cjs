@@ -26,6 +26,7 @@ const config = {
         "no-unused-vars": ["error", { args: "after-used" }],
         "no-use-before-define": "error",
         "prettier/prettier": "warn",
+        "react/prop-types": "off",
         "requirejs/no-object-define": "error",
         "requirejs/amd-function-arity": [
             "error",
