@@ -1,0 +1,9 @@
+{
+    "name": "@nextgisweb/icon",
+    "version": "0.0.0",
+    "type": "module",
+    "dependencies": {
+        "@material-icons/svg": "^1.0.33",
+        "@mdi/svg": "^7.2.96"
+    }
+}

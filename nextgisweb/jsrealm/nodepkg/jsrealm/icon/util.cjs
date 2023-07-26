@@ -1,40 +1,52 @@
-// prettier-ignore
-const reReq = /@material-icons\/(?:svg\/){1,2}(?<glyph>\w+)(?:\/(?<variant>\w+))?(?:\.svg)?/,
-    reFname = /node_modules\/@material-icons\/svg\/svg\/(?<glyph>\w+)\/(?<variant>\w+)\.svg/;
+const PKG_ICON = "@nextgisweb/icon/";
+const COLLECTIONS = { mdi: "@mdi/svg", material: "@material-icons/svg" };
+const PMATERIAL = COLLECTIONS["material"] + "/";
 
-function glyphAndVariant(req) {
-    const match = req.match(reReq);
-    if (match) {
-        const { glyph, variant } = match.groups;
-        return glyph + "/" + (variant || "baseline");
-    }
+function normalize(col, p) {
+    return col === "mdi" ? p.replace("_", "-") : p.replace("-", "_");
 }
 
 exports.IconResolverPlugin = class IconResolverPlugin {
     apply(resolver) {
-        resolver
-            .getHook("resolve")
-            .tapAsync(
-                "IconResolverPlugin",
-                (request, resolveContext, callback) => {
-                    const fn = request.request;
-                    const gv = glyphAndVariant(fn);
-                    if (gv) {
-                        request.request = `@material-icons/svg/svg/${gv}.svg`;
+        const hook = (request, resolveContext, callback) => {
+            let r = request.request;
+
+            if (r.startsWith(PMATERIAL)) {
+                r = `${PKG_ICON}material/${r.slice(PMATERIAL.length)}`;
+            }
+
+            if (r.startsWith(PKG_ICON)) {
+                let [col, ...parts] = r.slice(PKG_ICON.length).split("/");
+
+                if (["mdi", "material"].includes(col)) {
+                    parts = parts
+                        .filter((p) => p !== "svg")
+                        .map((p) => normalize(col, p));
+
+                    if (col === "material" && parts.length === 1) {
+                        parts.push("baseline");
                     }
-                    callback();
+
+                    if (!parts[parts.length - 1].endsWith(".svg"))
+                        parts[parts.length - 1] += ".svg";
+
+                    request.request =
+                        `${COLLECTIONS[col]}/svg/` + parts.join("/");
                 }
-            );
+            }
+
+            callback();
+        };
+
+        resolver.getHook("resolve").tapAsync("IconResolverPlugin", hook);
     }
 };
 
 exports.symbolId = (fn) => {
-    const match = fn.match(reFname);
-    if (match) {
-        const { glyph, variant } = match.groups;
-        return (
-            `icon-material-${glyph}` +
-            (variant === "baseline" ? "" : `-${variant}`)
-        );
+    for (const [col, pkg] of Object.entries(COLLECTIONS)) {
+        if (!fn.includes("/node_modules/" + pkg + "/")) continue;
+        let id = fn.match(/\/(?:svg\/)+([\w-_/]+?)(?:\/baseline)?\.svg$/)[1];
+        id = id.replace("/", "-");
+        return `icon-${col}-${id}`;
     }
 };
