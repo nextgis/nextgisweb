@@ -177,7 +177,10 @@ for (const { code: lang, nplurals, plural } of config.i18n.languages) {
 const sharedIconIds = {};
 const materialIcons = [];
 
-for (const [comp, dir] of Object.entries(config.jsrealm.icons)) {
+for (const [comp, compDir] of Object.entries(config.env.components)) {
+    const dir = path.resolve(compDir, "icon");
+    if (!fs.existsSync(dir)) continue;
+
     const realDir = fs.realpathSync(dir);
     for (let fn of glob.sync(`${realDir}/**/*.svg`)) {
         const relSvgPath = path.relative(realDir, fn).replace(/\.svg$/, "");

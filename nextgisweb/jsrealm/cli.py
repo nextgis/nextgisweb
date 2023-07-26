@@ -13,7 +13,7 @@ from nextgisweb.core import CoreComponent
 from nextgisweb.pyramid import PyramidComponent
 from nextgisweb.pyramid.uacompat import FAMILIES
 
-from .util import scan_for_icons, scan_for_nodepkgs
+from .util import scan_for_nodepkgs
 
 
 def create_tsconfig(npkgs: List[str]):
@@ -69,14 +69,6 @@ def install(
         for cid, cpath in cpaths.items()
     ])]
 
-    icons = {cid: str(ipath) for cid, ipath in filter(
-        lambda i: i[1] is not None,
-        [
-            (cid, scan_for_icons(cid, cpath))
-            for cid, cpath in cpaths.items()
-        ]
-    )}
-
     package_json = dict(private=True)
     package_json['nextgisweb'] = nextgisweb = dict()
 
@@ -99,13 +91,11 @@ def install(
     s_core = nextgisweb['core'] = dict()
     s_core['debug'] = debug
 
-    s_jsrealm = nextgisweb['jsrealm'] = dict()
-    s_jsrealm['icons'] = icons
-
     o_pyramid = pyramid.options
     c_pyramid = nextgisweb['pyramid'] = dict()
     c_pyramid['compression'] = {algo: True for algo in o_pyramid['compression.algorithms']}
 
+    s_jsrealm = nextgisweb['jsrealm'] = dict()
     targets = s_jsrealm['targets'] = dict()
     for k in FAMILIES.keys():
         r = o_pyramid[f'uacompat.{k}']
