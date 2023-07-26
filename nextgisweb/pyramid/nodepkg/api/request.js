@@ -1,15 +1,86 @@
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import {
-    NetworksResponseError,
     InvalidResponseError,
-    ServerResponseError,
     LunkwillError,
     LunkwillRequestCancelled,
     LunkwillRequestFailed,
+    NetworksResponseError,
+    ServerResponseError,
 } from "./error";
 
 import { cache } from "./cache";
+
+function lunkwillCheckResponse(lwResp) {
+    const ct = lwResp.headers.get("content-type");
+    return (
+        ct !== undefined &&
+        ct.includes("application/vnd.lunkwill.request-summary+json")
+    );
+}
+
+async function responseJson(response) {
+    try {
+        return response.json();
+    } catch (e) {
+        throw new InvalidResponseError();
+    }
+}
+
+async function lunkwillResponseUrl(lwResp) {
+    let lwData = await responseJson(lwResp);
+    let delay = lwData.delay_ms;
+    const retry = lwData.retry_ms !== undefined ? lwData.retry_ms : 2000;
+    const sum = `/api/lunkwill/${lwData.id}/summary`;
+    const res = `/api/lunkwill/${lwData.id}/response`;
+
+    const sleep = (msec) => new Promise((resolve) => setTimeout(resolve, msec));
+
+    let failed = false;
+    let ready = false;
+    while (!ready) {
+        await sleep(failed ? retry : delay);
+        failed = false;
+
+        let lwResp, lwData;
+        try {
+            lwResp = await window.fetch(sum, { credentials: "same-origin" });
+            lwData = await lwResp.json();
+        } catch (e) {
+            failed = true;
+            continue;
+        }
+
+        switch (lwData.status) {
+            case undefined:
+                throw new LunkwillError(undefined, lwData);
+            case "ready":
+                ready = true;
+                break;
+            case "cancelled":
+                throw new LunkwillRequestCancelled(lwData);
+            case "failed":
+                throw new LunkwillRequestFailed(lwData);
+            case "spooled":
+            case "processing":
+            case "buffering":
+                delay = lwData.delay_ms;
+                break;
+            default:
+                throw new LunkwillError(undefined, lwData);
+        }
+    }
+
+    return res;
+}
+
+async function lunkwillFetch(lwRespUrl) {
+    try {
+        return await window.fetch(lwRespUrl, { credentials: "same-origin" });
+    } catch (e) {
+        throw new NetworksResponseError();
+    }
+}
 
 export async function request(path, options) {
     const defaults = {
@@ -43,10 +114,10 @@ export async function request(path, options) {
 
     let url;
     if (opt.global) {
-        url = path +
-            urlParams;
+        url = path + urlParams;
     } else {
-        url = ngwConfig.applicationUrl +
+        url =
+            ngwConfig.applicationUrl +
             (path.startsWith("/") ? "" : "/") +
             path +
             urlParams;
@@ -136,76 +207,5 @@ export class LunkwillParam {
         if (this.value !== null) {
             headers["X-Lunkwill"] = this.value;
         }
-    }
-}
-
-function lunkwillCheckResponse(lwResp) {
-    const ct = lwResp.headers.get("content-type");
-    return (
-        ct !== undefined &&
-        ct.includes("application/vnd.lunkwill.request-summary+json")
-    );
-}
-
-async function lunkwillResponseUrl(lwResp) {
-    let lwData = await responseJson(lwResp);
-    let delay = lwData.delay_ms;
-    const retry = lwData.retry_ms !== undefined ? lwData.retry_ms : 2000;
-    const sum = `/api/lunkwill/${lwData.id}/summary`;
-    const res = `/api/lunkwill/${lwData.id}/response`;
-
-    const sleep = (msec) => new Promise((resolve) => setTimeout(resolve, msec));
-
-    let failed = false;
-    let ready = false;
-    while (!ready) {
-        await sleep(failed ? retry : delay);
-        failed = false;
-
-        let lwResp, lwData;
-        try {
-            lwResp = await window.fetch(sum, { credentials: "same-origin" });
-            lwData = await lwResp.json();
-        } catch (e) {
-            failed = true;
-            continue;
-        }
-
-        switch (lwData.status) {
-            case undefined:
-                throw new LunkwillError(undefined, lwData);
-            case "ready":
-                ready = true;
-                break;
-            case "cancelled":
-                throw new LunkwillRequestCancelled(lwData);
-            case "failed":
-                throw new LunkwillRequestFailed(lwData);
-            case "spooled":
-            case "processing":
-            case "buffering":
-                delay = lwData.delay_ms;
-                break;
-            default:
-                throw new LunkwillError(undefined, lwData);
-        }
-    }
-
-    return res;
-}
-
-async function lunkwillFetch(lwRespUrl) {
-    try {
-        return await window.fetch(lwRespUrl, { credentials: "same-origin" });
-    } catch (e) {
-        throw new NetworksResponseError();
-    }
-}
-
-async function responseJson(response) {
-    try {
-        return response.json();
-    } catch (e) {
-        throw new InvalidResponseError();
     }
 }

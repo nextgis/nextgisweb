@@ -1,9 +1,12 @@
 /** @entrypoint */
+import { useEffect, useState } from "react";
+
 import { Button, Modal } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!pyramid";
-import { useEffect, useState } from "react";
+
 import { notesUrl, registerCallback } from ".";
+import settings from "@nextgisweb/pyramid/settings!pyramid";
+
 import "./sysinfo.less";
 
 export default function UpdateSysInfo() {
@@ -17,8 +20,8 @@ export default function UpdateSysInfo() {
         registerCallback((data) => {
             const st = data.distribution && data.distribution.status;
             if (st) {
-                setHasUpdate(st == "has_urgent_update" || st == "has_update");
-                setIsCritical(st == "has_urgent_update");
+                setHasUpdate(st === "has_urgent_update" || st === "has_update");
+                setIsCritical(st === "has_urgent_update");
                 const latest = data.distribution.latest;
                 if (latest) {
                     setLatestVersion(latest.version);
@@ -41,9 +44,9 @@ export default function UpdateSysInfo() {
 
     const [mUpdPre, mUpdLnk, mUpdPost] = hasUpdate
         ? i18n
-            .gettext("<a>Contact support</a> for update.")
-            .match(/(.*)<a>(.*)<\/a>(.*)/)
-            .slice(1)
+              .gettext("<a>Contact support</a> for update.")
+              .match(/(.*)<a>(.*)<\/a>(.*)/)
+              .slice(1)
         : [null, null, null];
 
     const showDetails = () => setDetailsVisible(true);
@@ -61,7 +64,11 @@ export default function UpdateSysInfo() {
                 {hasUpdate && (
                     <div>
                         {mUpdPre}
-                        <a href={settings.support_url} target="_blank" rel="noreferrer">
+                        <a
+                            href={settings.support_url}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
                             {mUpdLnk}
                         </a>
                         {mUpdPost}

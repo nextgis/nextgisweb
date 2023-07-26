@@ -1,15 +1,17 @@
 import { observer } from "mobx-react-lite";
+
 import loginModal from "@nextgisweb/auth/loginModal";
 import { authStore } from "@nextgisweb/auth/store";
 import { Popover } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
+
 import "./Avatar.less";
 
 const signInText = i18n.gettext("Sign in");
 
-export const Avatar = observer(({}) => {
+export const Avatar = observer(() => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
 
     const content = (

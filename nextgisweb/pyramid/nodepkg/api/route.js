@@ -38,13 +38,10 @@ export function route(name, ...rest) {
     const result = {};
     for (const method of ["get", "post", "put", "delete"]) {
         result[method] = (options) =>
-            request(
-                template,
-                {
-                    ...options,
-                    method: method.toUpperCase(),
-                }
-            );
+            request(template, {
+                ...options,
+                method: method.toUpperCase(),
+            });
     }
     return result;
 }

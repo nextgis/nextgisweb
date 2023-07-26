@@ -1,11 +1,21 @@
-import { useState, useEffect } from "react";
-import CachedIcon from "@material-icons/svg/cached";
-import { route } from "@nextgisweb/pyramid/api";
-import { Button, Col, Row, Skeleton, Table, Typography } from "@nextgisweb/gui/antd";
+import { useEffect, useState } from "react";
+
+import {
+    Button,
+    Col,
+    Row,
+    Skeleton,
+    Table,
+    Typography,
+} from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
+import { route } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!";
+
 import kindOfData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/kind_of_data";
+import settings from "@nextgisweb/pyramid/settings!";
+
+import CachedIcon from "@material-icons/svg/cached";
 import "./StorageSummary.less";
 
 function formatSize(value) {
@@ -25,9 +35,11 @@ export function StorageSummary() {
     async function load(waitForEstimation) {
         waitForEstimation && (await sleep(5000));
 
+        // eslint-disable-next-line no-constant-condition
         while (true) {
-            const newIsEstimating = (await route("pyramid.storage_status")
-                .get().estimation_running) === true;
+            const newIsEstimating =
+                (await route("pyramid.storage_status").get()
+                    .estimation_running) === true;
             setIsEstimating(newIsEstimating);
             if (!waitForEstimation || !newIsEstimating) break;
         }
@@ -71,7 +83,7 @@ export function StorageSummary() {
             <>
                 <span>{formatSize(v)} MiB</span>
                 <div className="wrapper">
-                    <div className="bar" style={{width: `${percent}%`}}></div>
+                    <div className="bar" style={{ width: `${percent}%` }}></div>
                 </div>
             </>
         );
@@ -108,11 +120,13 @@ export function StorageSummary() {
                             <>
                                 {" " + i18n.gettext("of") + " "}
                                 {formatSize(limit) + " MiB"} (
-                                {(100 * total.data_volume / limit)
-                                    .toFixed(0).toString() + " %"}
+                                {((100 * total.data_volume) / limit)
+                                    .toFixed(0)
+                                    .toString() + " %"}
                                 )
                             </>
-                        )) || " MiB"}
+                        )) ||
+                            " MiB"}
                     </Cell>
                 </Row>
             </Summary>
@@ -120,15 +134,22 @@ export function StorageSummary() {
     }
 
     function infoTextFirst() {
-        if (total.esimated != null && total.updated != null) {
-            return i18n.gettext("Storage usage was fully estimated at %s and updated at %s.")
+        if (total.esimated !== null && total.updated !== null) {
+            return i18n
+                .gettext(
+                    "Storage usage was fully estimated at %s and updated at %s."
+                )
                 .replace("%s", utc(total.esimated).local().format("L LTS"))
                 .replace("%s", utc(total.updated).local().format("L LTS"));
-        } else if (total.updated == null) {
-            return i18n.gettext("Storage usage was fully estimated at %s.")
+        } else if (total.updated === null) {
+            return i18n
+                .gettext("Storage usage was fully estimated at %s.")
                 .replace("%s", utc(total.esimated).local().format("L LTS"));
-        } else if (total.estimated == null) {
-            return i18n.gettext("Storage usage hasn't been estimated yet but was updated at %s.")
+        } else if (total.estimated === null) {
+            return i18n
+                .gettext(
+                    "Storage usage hasn't been estimated yet but was updated at %s."
+                )
                 .replace("%s", utc(total.updated).local().format("L LTS"));
         } else {
             return i18n.gettext("Storage usage hasn't been estimated yet.");
@@ -136,7 +157,9 @@ export function StorageSummary() {
     }
 
     function infoTextSecond() {
-        return i18n.gettext("Some changes may be reflected only after full estimation.");
+        return i18n.gettext(
+            "Some changes may be reflected only after full estimation."
+        );
     }
 
     return (
@@ -163,7 +186,8 @@ export function StorageSummary() {
                 </Col>
                 <Col flex="auto">
                     <Typography.Paragraph>
-                        {infoTextFirst()}<br />
+                        {infoTextFirst()}
+                        <br />
                         {infoTextSecond()}
                     </Typography.Paragraph>
                 </Col>

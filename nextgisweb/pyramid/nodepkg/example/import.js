@@ -8,7 +8,7 @@ export default async function () {
     const bar = await import("./auxiliary/bar");
     console.log(bar);
 
-    console.log("Loading entrypoint './auxiliary/entrypoint' with relative path...");
+    console.log("Loading './auxiliary/entrypoint' with relative path...");
     const entrypoint = await import("./auxiliary/entrypoint");
     console.log(entrypoint);
 

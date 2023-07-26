@@ -10,6 +10,7 @@ export class BaseAPIError extends BaseError {
 }
 
 export class NetworksResponseError extends BaseAPIError {
+    // prettier-ignore
     constructor(message) {
         super(message || gettext("There is no response from the server or problem connecting to server."));
         this.title = gettext("Network error");
@@ -34,6 +35,7 @@ export class ServerResponseError extends BaseAPIError {
 }
 
 export class LunkwillError extends BaseError {
+    // prettier-ignore
     constructor(message, data = {}) {
         super(message || gettext("Unexpected error while processing long-running request."));
         this.title = gettext("Long-running request error");

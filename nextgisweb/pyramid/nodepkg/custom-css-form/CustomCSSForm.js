@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Col, Row, Space, Typography, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
@@ -12,9 +12,11 @@ export function CustomCSSForm() {
     const [saving, setSaving] = useState(false);
     const [data, setData] = useState(null);
 
-    const { data: initialData, isLoading } = useRouteGet("pyramid.custom_css", null, {
-        query: { format: "json" },
-    });
+    const { data: initialData, isLoading } = useRouteGet(
+        "pyramid.custom_css",
+        null,
+        { query: { format: "json" } }
+    );
 
     useEffect(() => {
         setData(initialData);

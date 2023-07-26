@@ -1,3 +1,5 @@
+import { useMemo, useState } from "react";
+
 import {
     Col,
     Form,
@@ -9,17 +11,12 @@ import {
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { useMemo, useState } from "react";
-
-const helpMsg = i18n.gettext(
-    "Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."
-);
-const infoMsg = i18n.gettext(
-    "Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are allowed for third-level domains and higher."
-);
+// prettier-ignore
+const mHelp = gettext("Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."),
+    mInfo = gettext("Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are allowed for third-level domains and higher.");
 
 export function CORSSettings() {
     const [form] = Form.useForm();
@@ -44,21 +41,19 @@ export function CORSSettings() {
                 await route("pyramid.cors").put({
                     json: { allow_origin: list || null },
                 });
-                message.success(i18n.gettext("CORS settings updated"));
+                message.success(gettext("CORS settings updated"));
             } catch (err) {
                 errorModal(err);
             }
         } catch {
-            message.error(i18n.gettext("Fix the form errors first"));
+            message.error(gettext("Fix the form errors first"));
         } finally {
             setStatus(null);
         }
     }
 
     const validCORSRule = (val) => {
-        const expression =
-            /^(https?):\/\/(\*\.)?([\w\-\.]{3,})(:\d{2,5})?\/?$/gi;
-        const regex = new RegExp(expression);
+        const regex = /^(https?):\/\/(\*\.)?([\w\-.]{3,})(:\d{2,5})?\/?$/gi;
         const origins = val.split(/\r?\n/).map((x) => x.trim());
         return origins.filter(Boolean).every((x) => x.match(regex));
     };
@@ -68,9 +63,7 @@ export function CORSSettings() {
             validator(_, value) {
                 if (value && !validCORSRule(value)) {
                     return Promise.reject(
-                        new Error(
-                            i18n.gettext("The value entered is not valid")
-                        )
+                        new Error(gettext("The value entered is not valid"))
                     );
                 }
                 return Promise.resolve();
@@ -99,15 +92,12 @@ export function CORSSettings() {
                     </Form>
                 </Col>
                 <Col flex="none" span={10}>
-                    <Typography.Paragraph>{helpMsg}</Typography.Paragraph>
-                    <Typography.Paragraph>{infoMsg}</Typography.Paragraph>
+                    <Typography.Paragraph>{mHelp}</Typography.Paragraph>
+                    <Typography.Paragraph>{mInfo}</Typography.Paragraph>
                 </Col>
             </Row>
             <Row>
-                <SaveButton
-                    onClick={save}
-                    loading={status === "saving"}
-                ></SaveButton>
+                <SaveButton onClick={save} loading={status === "saving"} />
             </Row>
         </>
     );
