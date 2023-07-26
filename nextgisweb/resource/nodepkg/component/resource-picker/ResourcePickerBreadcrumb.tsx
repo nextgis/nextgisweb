@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
-import HomeFilledIcon from "@material-icons/svg/home-filled";
+import HomeFilledIcon from "@material-icons/svg/home";
 import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
 
 import type { ResourcePickerBreadcrumbProps } from "./type";
