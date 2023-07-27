@@ -37,9 +37,18 @@ def create_tsconfig(npkgs: List[str]):
         baseUrl=".",
         paths={"react": ["./node_modules/@types/react"]}
     )
+
+    include = []
+    
+    for pkg in npkgs:
+         include.append("{}/**/*.ts".format(pkg))
+         include.append("{}/**/*.tsx".format(pkg))
+         include.append("{}/**/*.js".format(pkg))
+
     tsconfig_json = dict(
         compilerOptions=compiler_options,
-        include=['{}/**/*'.format(pkg) for pkg in npkgs]
+        include=include,
+        exclude=["node_modules"]
     )
 
     with open('tsconfig.json', 'w') as fd:
