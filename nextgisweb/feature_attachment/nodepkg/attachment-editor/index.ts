@@ -1,5 +1,5 @@
 /** @entrypoint */
-import DescriptionEditorStore from "./AttachmentEditorStore";
+import AttachmentEditorStore from "./AttachmentEditorStore";
 
 import i18n from "@nextgisweb/pyramid/i18n";
 
@@ -10,7 +10,7 @@ const titleText = i18n.gettext("Attachments");
 
 const editorWidgetRegister: EditorWidgetRegister<DataSource[]> = {
     component: () => import("./AttachmentEditor"),
-    store: DescriptionEditorStore,
+    store: AttachmentEditorStore,
     label: titleText,
 };
 

@@ -1,11 +1,12 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, toJS } from "mobx";
+import isEqual from "lodash-es/isEqual";
 
 import { findAttachmentIndex } from "./util/findAttachmentIndex";
 
 import type {
     EditorStoreConstructorOptions,
     EditorStore as IEditorStore,
-    WidgetValue,
+    ExtensionValue,
 } from "@nextgisweb/feature-layer/type";
 
 import type {
@@ -14,21 +15,46 @@ import type {
 } from "@nextgisweb/file-upload/file-uploader/type";
 import type { DataSource, FileMetaToUpload } from "./type";
 
-class AttachmentEditorStore implements IEditorStore<DataSource[]> {
-    value: WidgetValue<DataSource[]> = null;
+class AttachmentEditorStore
+    implements IEditorStore<ExtensionValue<DataSource[]>>
+{
+    value: ExtensionValue<DataSource[]> = null;
 
     featureId: number;
     resourceId: number;
 
-    constructor({ featureId, resourceId }: EditorStoreConstructorOptions) {
-        this.featureId = featureId;
-        this.resourceId = resourceId;
+    _initValue: ExtensionValue<DataSource[]> = null;
+
+    constructor({ parentStore }: EditorStoreConstructorOptions) {
+        this.featureId = parentStore.featureId;
+        this.resourceId = parentStore.resourceId;
         makeAutoObservable(this, { featureId: false, resourceId: false });
     }
 
-    load(value: WidgetValue<DataSource[]>) {
-        this.value = value;
+    get counter() {
+        return this.value && String(this.value.length);
     }
+
+    get dirty() {
+        if (this.value && this._initValue) {
+            if (this.value.length !== this._initValue.length) {
+                return true;
+            }
+            return !this._initValue.every((val, index) =>
+                isEqual(val, this.value[index])
+            );
+        }
+        return false;
+    }
+
+    load = (value: ExtensionValue<DataSource[]>) => {
+        this.value = value;
+        this._initValue = toJS(value);
+    };
+
+    reset = () => {
+        this.load(this._initValue);
+    };
 
     append = (value: UploaderMeta[]) => {
         const newValue = [...(this.value || [])];

@@ -7,20 +7,16 @@ import { message } from "@nextgisweb/gui/antd";
 
 import i18n from "@nextgisweb/pyramid/i18n";
 
-import { parseNgwAttribute, formatNgwAttribute } from "../util/ngwAttributes";
-
 import type { ResourceItem } from "@nextgisweb/resource/type";
 import type {
     FeatureLayerField,
     FeatureItemExtensions,
 } from "@nextgisweb/feature-layer/type";
 import type { FeatureEditorStoreOptions } from "./type";
-import type { FeatureItem, EditorStore } from "../type";
+import type { FeatureItem as FeatureItem_, EditorStore } from "../type";
+import { NgwAttributeValue } from "../attribute-editor/type";
 
-/** This attributes for loading to NGW */
-type NgwAttributes = Record<string, unknown>;
-/** This attributes for using in web */
-type AppAttributes = Record<string, unknown>;
+type FeatureItem = FeatureItem_<NgwAttributeValue>;
 
 const saveSuccessMsg = i18n.gettext("Feature saved");
 
@@ -32,12 +28,12 @@ export class FeatureEditorStore {
 
     initLoading = false;
 
-    private _attributes: AppAttributes = {};
-    private _featureItem: FeatureItem = null;
-    private _resourceItem: ResourceItem = null;
+    private _resourceItem: ResourceItem | null = null;
+    private _featureItem: FeatureItem | null = null;
 
     _abortController = new AbortControllerHelper();
     private _extensionStores: Record<string, EditorStore> = {};
+    private _attributeStore: EditorStore | null = null;
 
     constructor({ resourceId, featureId }: FeatureEditorStoreOptions) {
         if (resourceId === undefined) {
@@ -60,22 +56,6 @@ export class FeatureEditorStore {
             this._resourceItem.feature_layer &&
             this._resourceItem.feature_layer.fields;
         return fields ?? [];
-    }
-
-    /** Feature field values formatted for web */
-    get values() {
-        const values: AppAttributes = {};
-        for (const field of this.fields) {
-            const { keyname, datatype } = field;
-            const val = this._attributes[keyname];
-            values[keyname] = parseNgwAttribute(datatype, val);
-        }
-        return values;
-    }
-
-    /** Feature field values formatted in NGW way */
-    get attributes() {
-        return this._attributes;
     }
 
     get route() {
@@ -114,12 +94,14 @@ export class FeatureEditorStore {
     };
 
     save = async () => {
-        const extensionsToSave: Record<string, unknown> = {};
+        const extensions: Record<string, unknown> = {};
         for (const key in this._extensionStores) {
             const storeExtension = this._extensionStores[key];
-            extensionsToSave[key] = toJS(storeExtension.value);
+            extensions[key] = toJS(storeExtension.value);
         }
-
+        const fields = this._attributeStore
+            ? toJS(this._attributeStore.value)
+            : {};
         runInAction(() => {
             this.saving = true;
         });
@@ -127,10 +109,12 @@ export class FeatureEditorStore {
             await this.route.put({
                 query: { dt_format: "iso" },
                 json: {
-                    fields: toJS(this.attributes),
-                    extensions: extensionsToSave,
+                    fields,
+                    extensions,
                 },
             });
+            // To update initial feature value
+            this._initialize();
             message.success(saveSuccessMsg);
         } finally {
             runInAction(() => {
@@ -143,15 +127,16 @@ export class FeatureEditorStore {
         this._abort();
     };
 
-    setValues = (values: AppAttributes = {}) => {
-        runInAction(() => {
-            this._attributes = this._formatAttributes(values);
-        });
+    attachAttributeStore = (attributeStore: EditorStore) => {
+        this._attributeStore = attributeStore;
+        if (this._featureItem) {
+            this._setAttributesValue(this._featureItem.fields);
+        }
     };
 
     addExtensionStore = (key: string, extensionStore: EditorStore) => {
         this._extensionStores[key] = extensionStore;
-        this._setExtensionValues(this._featureItem.extensions, {
+        this._setExtensionsValue(this._featureItem.extensions, {
             include: [key],
         });
     };
@@ -162,19 +147,18 @@ export class FeatureEditorStore {
         }
     };
 
-    private _formatAttributes(values: NgwAttributes) {
-        const attributes = { ...this._attributes };
-        for (const key in values) {
-            const val = values[key];
-            const field = this.fields.find((f) => f.keyname === key);
-            if (field) {
-                attributes[key] = formatNgwAttribute(field.datatype, val);
-            }
-        }
-        return attributes;
+    private _setStoreValues(featureItem: FeatureItem) {
+        this._setExtensionsValue(featureItem.extensions);
+        this._setAttributesValue(featureItem.fields);
     }
 
-    private _setExtensionValues(
+    private _setAttributesValue(attributes: NgwAttributeValue) {
+        if (this._attributeStore) {
+            this._attributeStore.load(attributes);
+        }
+    }
+
+    private _setExtensionsValue(
         extensions: FeatureItemExtensions,
         { include }: { include?: string[] } = {}
     ) {
@@ -195,9 +179,8 @@ export class FeatureEditorStore {
     private _setFeatureItem(featureItem: FeatureItem): void {
         runInAction(() => {
             this._featureItem = featureItem;
-            this._attributes = featureItem.fields;
         });
-        this._setExtensionValues(featureItem.extensions);
+        this._setStoreValues(featureItem);
     }
 
     private _abort(): void {

@@ -1,7 +1,5 @@
 import type { FeatureAttachment } from "../type";
 
-export type WidgetValue = string | null;
-
 interface Fileupload {
     id: string;
     size: number;

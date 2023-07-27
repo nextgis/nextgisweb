@@ -1,17 +1,28 @@
-export type WidgetValue<T> = null | T;
+import type { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 
 export interface EditorStoreConstructorOptions {
-    resourceId: number;
-    featureId: number;
+    parentStore: FeatureEditorStore;
 }
 
 export interface EditorStore<V = unknown> {
-    value: WidgetValue<V>;
+    value: V;
 
-    resourceId: number;
-    featureId: number;
+    /** True if value has been changed
+     * @default false
+     */
+    dirty?: boolean;
 
-    load: (value: WidgetValue<V>) => void;
+    /**
+     * Reset to initial values
+     */
+    reset?: () => void;
+
+    /**
+     * A quick report the number of records in storage value to extract for external component such as a tab
+     */
+    counter?: number | string;
+
+    load: (value: V) => void;
 
     isValid?: boolean;
 }

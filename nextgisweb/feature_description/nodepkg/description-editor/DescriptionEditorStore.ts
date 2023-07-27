@@ -1,25 +1,28 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, toJS } from "mobx";
 
 import type { EditorStore as IEditorStore } from "@nextgisweb/feature-layer/type";
-import type { WidgetValue } from "@nextgisweb/feature-layer/type";
-import { EditorStoreConstructorOptions } from "package/nextgisweb/nextgisweb/feature_layer/nodepkg/type/EditorStore";
+import type { ExtensionValue } from "@nextgisweb/feature-layer/type";
 
-class EditorStore implements IEditorStore<string> {
-    uploading = false;
+class EditorStore implements IEditorStore<ExtensionValue<string>> {
+    value: ExtensionValue<string> = null;
 
-    value: WidgetValue<string> = null;
+    _initValue: ExtensionValue<string> = null;
 
-    resourceId: number;
-    featureId: number;
-
-    constructor({ resourceId, featureId }: EditorStoreConstructorOptions) {
-        this.resourceId = resourceId;
-        this.featureId = featureId;
-        makeAutoObservable(this, { resourceId: false, featureId: false });
+    constructor() {
+        makeAutoObservable(this);
     }
 
-    load = (value: WidgetValue<string>) => {
+    get dirty() {
+        return this.value !== this._initValue;
+    }
+
+    load = (value: ExtensionValue<string>) => {
         this.value = value;
+        this._initValue = toJS(value);
+    };
+
+    reset = () => {
+        this.load(this._initValue);
     };
 }
 
