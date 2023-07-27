@@ -1,33 +1,60 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, runInAction, toJS } from "mobx";
 
 import { route } from "@nextgisweb/pyramid/api";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 
+import { message } from "@nextgisweb/gui/antd";
+
+import i18n from "@nextgisweb/pyramid/i18n";
+
 import { parseNgwAttribute, formatNgwAttribute } from "../util/ngwAttributes";
 
+import type { ResourceItem } from "@nextgisweb/resource/type";
+import type {
+    FeatureLayerField,
+    FeatureItemExtensions,
+} from "@nextgisweb/feature-layer/type";
+import type { FeatureEditorStoreOptions } from "./type";
+import type { FeatureItem, EditorStore } from "../type";
+
+/** This attributes for loading to NGW */
+type NgwAttributes = Record<string, unknown>;
+/** This attributes for using in web */
+type AppAttributes = Record<string, unknown>;
+
+const saveSuccessMsg = i18n.gettext("Feature saved");
+
 export class FeatureEditorStore {
-    constructor({ resourceId, featureId }) {
+    resourceId: number;
+    featureId: number;
+
+    saving = false;
+
+    initLoading = false;
+
+    private _attributes: AppAttributes = {};
+    private _featureItem: FeatureItem = null;
+    private _resourceItem: ResourceItem = null;
+
+    _abortController = new AbortControllerHelper();
+    private _extensionStores: Record<string, EditorStore> = {};
+
+    constructor({ resourceId, featureId }: FeatureEditorStoreOptions) {
         if (resourceId === undefined) {
             throw new Error(
                 "`resourceId` is required attribute for FeatureEditorStore"
             );
         }
 
-        this.initLoading = false;
-
         this.resourceId = resourceId;
         this.featureId = featureId;
 
-        this._attributes = {};
-        this._extensions = {};
-        this._featureItem = null;
-        this._resourceItem = null;
-
-        this._abortController = new AbortControllerHelper();
         makeAutoObservable(this, { _abortController: false, route: false });
+
+        this._initialize();
     }
 
-    get fields() {
+    get fields(): FeatureLayerField[] {
         const fields =
             this._resourceItem &&
             this._resourceItem.feature_layer &&
@@ -37,7 +64,7 @@ export class FeatureEditorStore {
 
     /** Feature field values formatted for web */
     get values() {
-        const values = {};
+        const values: AppAttributes = {};
         for (const field of this.fields) {
             const { keyname, datatype } = field;
             const val = this._attributes[keyname];
@@ -49,10 +76,6 @@ export class FeatureEditorStore {
     /** Feature field values formatted in NGW way */
     get attributes() {
         return this._attributes;
-    }
-
-    get extensions() {
-        return this._extensions;
     }
 
     get route() {
@@ -90,43 +113,47 @@ export class FeatureEditorStore {
         }
     };
 
-    save = async ({ extensions }) => {
-
-        const extensionsToSave = { ...this.extensions };
-
-        for (const key in extensions) {
-            const storeExtension = extensions[key];
-            if (storeExtension !== undefined && storeExtension !== null) {
-                extensionsToSave[key] = storeExtension;
-            }
+    save = async () => {
+        const extensionsToSave: Record<string, unknown> = {};
+        for (const key in this._extensionStores) {
+            const storeExtension = this._extensionStores[key];
+            extensionsToSave[key] = toJS(storeExtension.value);
         }
 
-        await this.route.put({
-            query: { dt_format: "iso" },
-            json: {
-                fields: this.attributes,
-                extensions: extensionsToSave,
-            },
+        runInAction(() => {
+            this.saving = true;
         });
+        try {
+            await this.route.put({
+                query: { dt_format: "iso" },
+                json: {
+                    fields: toJS(this.attributes),
+                    extensions: extensionsToSave,
+                },
+            });
+            message.success(saveSuccessMsg);
+        } finally {
+            runInAction(() => {
+                this.saving = false;
+            });
+        }
     };
 
     destroy = () => {
         this._abort();
     };
 
-    setValues = (values = {}) => {
+    setValues = (values: AppAttributes = {}) => {
         runInAction(() => {
             this._attributes = this._formatAttributes(values);
         });
     };
 
-    setExtension = (extension, value) => {
-        const extensions = { ...this._extensions };
-        if (typeof value === 'function') {
-            value = value(extensions[extension])
-        }
-        extensions[extension] = value;
-        this._extensions = extensions;
+    addExtensionStore = (key: string, extensionStore: EditorStore) => {
+        this._extensionStores[key] = extensionStore;
+        this._setExtensionValues(this._featureItem.extensions, {
+            include: [key],
+        });
     };
 
     reset = () => {
@@ -135,7 +162,7 @@ export class FeatureEditorStore {
         }
     };
 
-    _formatAttributes(values) {
+    private _formatAttributes(values: NgwAttributes) {
         const attributes = { ...this._attributes };
         for (const key in values) {
             const val = values[key];
@@ -147,15 +174,33 @@ export class FeatureEditorStore {
         return attributes;
     }
 
-    _setFeatureItem(featureItem) {
+    private _setExtensionValues(
+        extensions: FeatureItemExtensions,
+        { include }: { include?: string[] } = {}
+    ) {
+        for (const key in extensions) {
+            if (include) {
+                if (!include.includes(key)) {
+                    continue;
+                }
+            }
+            const extension = extensions[key];
+            const extensionStore = this._extensionStores[key];
+            if (extension && extensionStore) {
+                extensionStore.load(extension);
+            }
+        }
+    }
+
+    private _setFeatureItem(featureItem: FeatureItem): void {
         runInAction(() => {
             this._featureItem = featureItem;
             this._attributes = featureItem.fields;
-            this._extensions = featureItem.extensions;
         });
+        this._setExtensionValues(featureItem.extensions);
     }
 
-    _abort() {
+    private _abort(): void {
         this._abortController.abort();
     }
 }

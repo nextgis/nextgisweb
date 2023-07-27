@@ -8,7 +8,7 @@ from .model import FeatureDescription
 class FeatureDescriptionExtension(FeatureExtension):
     identity = 'description'
 
-    editor_widget = 'ngw-feature-description/EditorWidget'
+    editor_widget = '@nextgisweb/feature_description/description-editor'
     display_widget = 'ngw-feature-description/DisplayWidget'
 
     def serialize(self, feature):

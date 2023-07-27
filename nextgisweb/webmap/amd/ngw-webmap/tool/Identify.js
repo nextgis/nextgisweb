@@ -12,6 +12,7 @@ define([
     "dojo/dom-construct",
     "dojo/on",
     "dojo/topic",
+    "dijit/_WidgetBase",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/StackContainer",
@@ -25,7 +26,6 @@ define([
     '@nextgisweb/pyramid/api',
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/FieldsDisplayWidget",
-    "ngw-feature-layer/FeatureEditorWidget",
     "ngw-feature-layer/GeometryInfoWidget",
     "ngw-webmap/ui/CoordinateSwitcher/CoordinateSwitcher",
     "ngw-pyramid/CopyButton/CopyButton",
@@ -33,7 +33,9 @@ define([
     "@nextgisweb/pyramid/settings!feature_layer",
     "@nextgisweb/pyramid/settings!",
     // css
-    "xstyle/css!./resources/Identify.css"
+    "xstyle/css!./resources/Identify.css",
+    // TODO: Without preload tabs don't load
+    "@nextgisweb/feature-layer/feature-editor",
 ], function (
     declare,
     Base,
@@ -48,6 +50,7 @@ define([
     domConstruct,
     on,
     topic,
+    _WidgetBase,
     BorderContainer,
     ContentPane,
     StackContainer,
@@ -61,7 +64,6 @@ define([
     api,
     i18n,
     FieldsDisplayWidget,
-    FeatureEditorWidget,
     GeometryInfoWidget,
     CoordinateSwitcher,
     CopyButton,
@@ -87,6 +89,48 @@ define([
             evt.preventDefault();
         }
         return true;
+    };
+
+    const openFeatureEditorTab = ({ resourceId, featureId, mapDisplay }) => {
+        const tabTitle = (fid) => i18n.gettext("Feature") + " #" + fid;
+        require([
+            "@nextgisweb/gui/react-app",
+            "@nextgisweb/feature-layer/feature-editor",
+        ], (reactApp, featureEditor) => {
+            const FeatureTab = declare([_WidgetBase], {
+                style: "height: 100%; padding: 1em",
+                iconClass: "iconDescription",
+                closable: true,
+
+                constructor(options) {
+                    declare.safeMixin(this, options);
+                    this.title = tabTitle(this.featureId);
+                },
+
+                buildRendering() {
+                    this.inherited(arguments);
+                    this.component = reactApp.default(
+                        featureEditor.default,
+                        {
+                            resourceId: this.resourceId,
+                            featureId: this.featureId,
+                        },
+                        this.domNode
+                    );
+                },
+
+                destroyRecursive() {
+                    if (this.component) this.component.unmount();
+                    this.component = null;
+                    this.inherited(arguments);
+                },
+            });
+
+            const tab = FeatureTab({ resourceId, featureId });
+            mapDisplay.tabContainer.addChild(tab);
+            mapDisplay.tabContainer.selectChild(tab);
+            tab.startup();
+        });
     };
 
     var Widget = declare([BorderContainer], {
@@ -252,32 +296,12 @@ define([
                     widget.editButton = new Button({
                         iconClass: "dijitIconEdit",
                         showLabel: true,
-                        onClick: function () {
-                            xhr(route.resource.item({id: lid}), {
-                                method: "GET",
-                                handleAs: "json"
-                            }).then(function (data) {
-                                var fieldmap = {};
-                                array.forEach(data.feature_layer.fields, function (itm) {
-                                    fieldmap[itm.keyname] = itm;
-                                });
-
-                                var pane = new FeatureEditorWidget({
-                                    resource: lid, 
-                                    feature: fid,
-                                    fields: data.feature_layer.fields,
-                                    title: i18n.gettext("Feature") + " #" + fid,
-                                    iconClass: "iconDescription",
-                                    closable: true
-                                });
-
-                                widget.tool.display.tabContainer.addChild(pane);
-                                widget.tool.display.tabContainer.selectChild(pane);
-
-                                pane.startup();
-                                pane.load();
-                            });
-                        }
+                        onClick: () =>
+                            openFeatureEditorTab({
+                                resourceId: lid,
+                                featureId: fid,
+                                mapDisplay: widget.tool.display,
+                            }),
                     }).placeAt(widget.extController, "last");
                     domClass.add(widget.editButton.domNode, "no-label");
 

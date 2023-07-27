@@ -7,20 +7,20 @@ interface DumpParams {
 }
 
 export interface EditorStoreOptions {
-    composite: unknown;
-    operation: Operations;
+    composite?: unknown;
+    operation?: Operations;
 }
 
-export interface EditorStore {
-    identity: string;
+export interface EditorStore<V = unknown> {
+    identity?: string;
 
     uploading: boolean;
 
-    load: (value: unknown) => unknown;
+    load: (value: V) => unknown;
 
-    dump: (val: DumpParams) => unknown;
+    dump: (val: DumpParams) => V;
 
-    isValid: boolean;
+    isValid?: boolean;
 
     suggestedDisplayName?: string;
 }

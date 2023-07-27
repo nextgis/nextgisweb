@@ -71,24 +71,16 @@ def feature_show(request):
         ext_mid=ext_mid)
 
 
-@viewargs(renderer='widget.mako')
+@viewargs(renderer='react')
 def feature_update(request):
     request.resource_permission(PD_WRITE)
 
     feature_id = int(request.matchdict['feature_id'])
 
-    fields = []
-    for f in request.context.fields:
-        fields.append({
-            'keyname': f.keyname,
-            'display_name': f.display_name,
-            'datatype': f.datatype,
-        })
-
     return dict(
         obj=request.context,
-        feature_id=feature_id,
-        fields=fields,
+        entrypoint="@nextgisweb/feature-layer/feature-editor",
+        props=dict(resourceId=request.context.id, featureId=feature_id),
         title=_("Feature #%d") % feature_id,
         maxheight=True)
 

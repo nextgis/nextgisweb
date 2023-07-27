@@ -301,3 +301,10 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
+#: nodepkg/feature-editor/FeatureEditorStore.ts:21
+msgid "Feature saved"
+msgstr "Объект сохранен"
+
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:25
+msgid "Loading..."
+msgstr "Загрузка..."
