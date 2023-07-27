@@ -1,12 +1,16 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import { Skeleton } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
+import { route } from "@nextgisweb/pyramid/api";
+
+import i18n from "@nextgisweb/pyramid/i18n";
+
 import CheckCircleIcon from "@material-icons/svg/check_circle";
-import WarningIcon from "@material-icons/svg/warning";
 import ErrorIcon from "@material-icons/svg/error";
 import MessageIcon from "@material-icons/svg/message";
-import { Skeleton } from "@nextgisweb/gui/antd";
-import { route } from "@nextgisweb/pyramid/api";
-import { errorModal } from "@nextgisweb/gui/error";
-import i18n from "@nextgisweb/pyramid/i18n";
+import WarningIcon from "@material-icons/svg/warning";
+
 import "./DiagnosticsWidget.less";
 
 const STEXT = {
@@ -75,7 +79,7 @@ export function DiagnosticsWidget({ data }) {
     return (
         <div className="ngw-postgis-diagnostics-widget">
             {(() => {
-                if (status == "loading") {
+                if (status === "loading") {
                     return (
                         <Skeleton
                             title={false}
