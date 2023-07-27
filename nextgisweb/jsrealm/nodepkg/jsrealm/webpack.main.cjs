@@ -10,7 +10,7 @@ const config = require("./config.cjs");
 const tagParser = require("./tag-parser.cjs");
 const defaults = require("./webpack/defaults.cjs");
 const { injectCode, stripIndex, virtualImport } = require("./webpack/util.cjs");
-const { IconResolverPlugin, symbolId } = require("./icon/util.cjs");
+const iconUtil = require("./icon/util.cjs");
 
 // Inject the following construction into each entrypoint module
 // at compilation time:
@@ -175,28 +175,26 @@ for (const { code: lang, nplurals, plural } of config.i18n.languages) {
 }
 
 const sharedIconIds = {};
-const materialIcons = [];
+const iconsFromJson = [];
 
 for (const [comp, compDir] of Object.entries(config.env.components)) {
     const dir = path.resolve(compDir, "icon");
     if (!fs.existsSync(dir)) continue;
 
-    const realDir = fs.realpathSync(dir);
-    for (let fn of glob.sync(`${realDir}/**/*.svg`)) {
-        const relSvgPath = path.relative(realDir, fn).replace(/\.svg$/, "");
+    for (let fn of glob.sync(`${dir}/**/*.svg`)) {
+        const relSvgPath = path.relative(dir, fn).replace(/\.svg$/, "");
         const id = (`icon-${comp}-` + relSvgPath).replace(
             /\w+-resource\/(\w+)/,
             (m, p) => `rescls-${p}`
         );
-        sharedIconIds[fs.realpathSync(fn)] = id;
+        sharedIconIds[fn] = id;
     }
 
-    const materialBase = path.resolve("./node_modules/@material-icons/svg/svg");
-    for (const fn of glob.sync(`${realDir}/material.json`)) {
-        const body = JSON.parse(fs.readFileSync(fn));
-        for (let ref of body) {
-            if (ref.match(/\w+/)) ref = ref + "/baseline";
-            materialIcons.push(`${materialBase}/${ref}.svg`);
+    for (const collection of Object.keys(iconUtil.COLLECTIONS)) {
+        const fn = path.resolve(dir, `${collection}.json`);
+        if (!fs.existsSync(fn)) continue;
+        for (const ref of JSON.parse(fs.readFileSync(fn))) {
+            iconsFromJson.push(`@nextgisweb/icon/${collection}/${ref}`);
         }
     }
 }
@@ -249,7 +247,7 @@ const webpackConfig = defaults("main", {
                         loader: "imports-loader",
                         options: {
                             imports: Object.keys(sharedIconIds)
-                                .concat(materialIcons)
+                                .concat(iconsFromJson)
                                 .map((fn) => `side-effects ${fn}`),
                         },
                     },
@@ -286,7 +284,8 @@ const webpackConfig = defaults("main", {
                             symbolId: (fn) => {
                                 const shared = sharedIconIds[fn];
                                 if (shared) return shared;
-                                return symbolId(fn);
+                                const imported = iconUtil.symbolId(fn);
+                                if (imported) return imported;
                             },
                         },
                     },
@@ -301,7 +300,7 @@ const webpackConfig = defaults("main", {
     },
     resolve: {
         extensions: [".tsx", ".ts", "..."],
-        plugins: [new IconResolverPlugin()],
+        plugins: [new iconUtil.IconResolverPlugin()],
     },
     plugins: [
         new DefinePlugin({

@@ -6,6 +6,8 @@ function normalize(col, p) {
     return col === "mdi" ? p.replace("_", "-") : p.replace("-", "_");
 }
 
+exports.COLLECTIONS = COLLECTIONS;
+
 exports.IconResolverPlugin = class IconResolverPlugin {
     apply(resolver) {
         const hook = (request, resolveContext, callback) => {
