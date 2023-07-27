@@ -2,15 +2,15 @@
     "name": "@nextgisweb/stylesheet",
     "version": "0.0.0",
     "type": "module",
-    "nextgisweb": {
-        "webpackConfigs": {
-            "stylesheet": "webpack.stylesheet.cjs"
-        }
-    },
     "dependencies": {
         "@fontsource/roboto": "^4.2.3",
         "css-minimizer-webpack-plugin": "^2.0.0",
         "lato-font": "^3.0.0",
         "mini-css-extract-plugin": "^1.6.0"
+    },
+    "nextgisweb": {
+        "webpackConfigs": {
+            "stylesheet": "webpack.stylesheet.cjs"
+        }
     }
 }

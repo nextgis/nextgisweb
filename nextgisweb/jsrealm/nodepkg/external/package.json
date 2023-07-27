@@ -2,6 +2,21 @@
     "name": "@nextgisweb/external",
     "version": "0.0.0",
     "type": "module",
+    "dependencies": {
+        "dgrid": "SitePen/dgrid#v0.3.21",
+        "dijit": "1.16.x",
+        "dojo": "1.16.x",
+        "dojox": "1.16.x",
+        "handlebars": "^3.0.3",
+        "jquery": "3.2.1",
+        "ol": "6.15.x",
+        "put-selector": "^0.3.6",
+        "react-copy-to-clipboard": "5.1.0",
+        "string-replace-loader": "^3.0.1",
+        "uglify-js": "^3.13.4",
+        "uglifycss": "^0.0.29",
+        "xstyle": "^0.3.2"
+    },
     "nextgisweb": {
         "webpackConfigs": {
             "external": "webpack.external.cjs",
@@ -17,20 +32,5 @@
             "put-selector",
             "xstyle"
         ]
-    },
-    "dependencies": {
-        "dgrid": "SitePen/dgrid#v0.3.21",
-        "dijit": "1.16.x",
-        "dojo": "1.16.x",
-        "dojox": "1.16.x",
-        "handlebars": "^3.0.3",
-        "jquery": "3.2.1",
-        "ol": "6.15.x",
-        "put-selector": "^0.3.6",
-        "react-copy-to-clipboard": "5.1.0",
-        "string-replace-loader": "^3.0.1",
-        "uglify-js": "^3.13.4",
-        "uglifycss": "^0.0.29",
-        "xstyle": "^0.3.2"
     }
 }
