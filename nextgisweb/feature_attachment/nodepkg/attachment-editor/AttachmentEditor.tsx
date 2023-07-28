@@ -123,11 +123,6 @@ const AttachmentEditor = observer(
                     render: (text) => formatSize(text),
                 },
                 {
-                    title: i18n.gettext("MIME type"),
-                    dataIndex: "mime_type",
-                    key: "mime_type",
-                },
-                {
                     title: i18n.gettext("Description"),
                     dataIndex: "description",
                     key: "size",
