@@ -50,6 +50,7 @@ module.exports = (name, config, options) => {
             if (config[k] === undefined) config[k] = v;
         }
 
+        if (config.name === undefined) config.name = name;
         if (config.bail === undefined) config.bail = !env.WEBPACK_WATCH;
 
         if (config.output === undefined) config.output = {};
