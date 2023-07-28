@@ -3,6 +3,7 @@ const glob = require("glob");
 const path = require("path");
 
 const { DefinePlugin } = require("webpack");
+const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
 const WebpackAssetsManifest = require("webpack-assets-manifest");
 const CopyPlugin = require("copy-webpack-plugin");
 
@@ -235,7 +236,7 @@ const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
 });
 
 /** @type {import("webpack").Configuration} */
-const webpackConfig = defaults("main", {
+const webpackConfig = defaults("main", (env) => ({
     entry: () => ({ ...staticEntries, ...dynamicEntries() }),
     module: {
         rules: [
@@ -320,6 +321,9 @@ const webpackConfig = defaults("main", {
                 },
             ],
         }),
+        ...(config.jsrealm.tscheck || env.tscheck
+            ? [new ForkTsCheckerPlugin()]
+            : []),
         webpackAssetsManifestPlugin,
     ],
     output: {
@@ -376,6 +380,6 @@ const webpackConfig = defaults("main", {
             minSize: 0,
         },
     },
-});
+}));
 
 module.exports = webpackConfig;

@@ -13,6 +13,7 @@ from nextgisweb.core import CoreComponent
 from nextgisweb.pyramid import PyramidComponent
 from nextgisweb.pyramid.uacompat import FAMILIES
 
+from .component import JSRealmComponent
 from .util import scan_for_nodepkgs
 
 
@@ -39,7 +40,7 @@ def create_tsconfig(npkgs: List[str]):
     )
 
     include = []
-    
+
     for pkg in npkgs:
          include.append("{}/**/*.ts".format(pkg))
          include.append("{}/**/*.tsx".format(pkg))
@@ -58,7 +59,10 @@ def create_tsconfig(npkgs: List[str]):
 @comp_cli.command()
 def install(
     self: EnvCommand.customize(env_initialize=False),
-    *, env: Env, core: CoreComponent, pyramid: PyramidComponent,
+    *, env: Env,
+    core: CoreComponent,
+    pyramid: PyramidComponent,
+    jsrealm: JSRealmComponent,
 ):
     from babel.messages.plurals import PLURALS
 
@@ -105,6 +109,7 @@ def install(
     c_pyramid['compression'] = {algo: True for algo in o_pyramid['compression.algorithms']}
 
     s_jsrealm = nextgisweb['jsrealm'] = dict()
+    s_jsrealm['tscheck'] = jsrealm.options['tscheck']
     targets = s_jsrealm['targets'] = dict()
     for k in FAMILIES.keys():
         r = o_pyramid[f'uacompat.{k}']

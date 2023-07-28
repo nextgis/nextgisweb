@@ -28,6 +28,7 @@
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-requirejs": "^4.0.1",
         "file-loader": "^6.2.0",
+        "fork-ts-checker-webpack-plugin": "^8.0.0",
         "gettext-parser": "^7.0.1",
         "imports-loader": "^2.0.0",
         "less": "^4.1.1",
