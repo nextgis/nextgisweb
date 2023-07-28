@@ -131,7 +131,7 @@ export const ResourcePickerChildren = observer(
                     className="displayName"
                     dataIndex="displayName"
                     sorter={sorterFactory("displayName")}
-                    render={(value, record) =>
+                    render={(value, record: FormattedResource) =>
                         renderResourceCls({ name: value, cls: record.cls })
                     }
                 />
