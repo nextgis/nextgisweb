@@ -10,7 +10,7 @@ export interface EditorStore<V = unknown> {
     /** True if value has been changed
      * @default false
      */
-    dirty?: boolean;
+    dirty: boolean;
 
     /**
      * Reset to initial values

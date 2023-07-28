@@ -53,6 +53,8 @@ const AttributeEditor = observer(
         const [size] = useState<SizeType>("small");
         const form = Form.useForm()[0];
 
+        const isReady = !!value;
+
         const setNullForField = useCallback(
             (field) => {
                 form.setFieldValue(field, null);
@@ -62,8 +64,10 @@ const AttributeEditor = observer(
         );
 
         useEffect(() => {
-            form.setFieldsValue(attributes);
-        }, [form, attributes]);
+            if (isReady) {
+                form.setFieldsValue(attributes);
+            }
+        }, [isReady, form, attributes]);
 
         const formFields = useMemo(() => {
             return fields.map((field) => {
@@ -101,7 +105,7 @@ const AttributeEditor = observer(
             });
         }, [fields, attributes, setNullForField, _parentStore.saving]);
 
-        if (!value) {
+        if (!isReady) {
             return <LoadingWrapper />;
         }
 

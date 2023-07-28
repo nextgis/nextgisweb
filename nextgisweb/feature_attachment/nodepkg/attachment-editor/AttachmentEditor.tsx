@@ -27,6 +27,13 @@ const AttachmentEditor = observer(
     ({ store }: EditorWidgetProps<DataSource[], AttachmentEditorStore>) => {
         const multiple = true;
 
+        const dataSource = useMemo(() => {
+            if (Array.isArray(store.value)) {
+                return store.value;
+            }
+            return [];
+        }, [store.value]);
+
         const onChange = useCallback(
             (meta_: UploaderMeta) => {
                 if (!meta_) {
@@ -165,7 +172,7 @@ const AttachmentEditor = observer(
                                 ? record.file_upload.id
                                 : record.id
                         }
-                        dataSource={store.value}
+                        dataSource={dataSource}
                         columns={columns}
                         parentHeight
                         size="small"

@@ -44,7 +44,11 @@ class AttachmentEditorStore
                 isEqual(val, this.value[index])
             );
         }
-        return false;
+        // just one of two is array
+        const dirty =
+            [this.value, this._initValue].filter((x) => Array.isArray(x))
+                .length === 1;
+        return dirty;
     }
 
     load = (value: ExtensionValue<DataSource[]>) => {
@@ -97,7 +101,7 @@ class AttachmentEditorStore
         if (index !== -1) {
             const newAttachments = old;
             newAttachments.splice(index, 1);
-            this.value = newAttachments;
+            this.value = newAttachments.length ? newAttachments : null;
         }
     };
 }

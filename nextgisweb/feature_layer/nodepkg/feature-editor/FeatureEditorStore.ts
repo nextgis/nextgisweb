@@ -5,7 +5,7 @@ import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 
 import { message } from "@nextgisweb/gui/antd";
 
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ResourceItem } from "@nextgisweb/resource/type";
 import type {
@@ -18,7 +18,8 @@ import { NgwAttributeValue } from "../attribute-editor/type";
 
 type FeatureItem = FeatureItem_<NgwAttributeValue>;
 
-const saveSuccessMsg = i18n.gettext("Feature saved");
+const saveSuccessMsg = gettext("Feature saved");
+const noChangesMsg = gettext("No changes to save");
 
 export class FeatureEditorStore {
     resourceId: number;
@@ -66,7 +67,17 @@ export class FeatureEditorStore {
         );
     }
 
-    _initialize = async () => {
+    get dirty(): boolean {
+        const attributesDirty =
+            this._attributeStore && this._attributeStore.dirty;
+        const extensionsDirty = Object.values(this._extensionStores)
+            .filter((s) => s.dirty !== undefined)
+            .some((s) => s.dirty);
+
+        return attributesDirty || extensionsDirty;
+    }
+
+    private _initialize = async () => {
         this._abort();
         try {
             const signal = this._abortController.makeSignal();
@@ -94,6 +105,11 @@ export class FeatureEditorStore {
     };
 
     save = async () => {
+        if (!this.dirty) {
+            message.success(noChangesMsg);
+            return;
+        }
+
         const extensions: Record<string, unknown> = {};
         for (const key in this._extensionStores) {
             const storeExtension = this._extensionStores[key];
@@ -136,9 +152,11 @@ export class FeatureEditorStore {
 
     addExtensionStore = (key: string, extensionStore: EditorStore) => {
         this._extensionStores[key] = extensionStore;
-        this._setExtensionsValue(this._featureItem.extensions, {
-            include: [key],
-        });
+        if (this._featureItem) {
+            this._setExtensionsValue(this._featureItem.extensions, {
+                include: [key],
+            });
+        }
     };
 
     reset = () => {
@@ -170,7 +188,7 @@ export class FeatureEditorStore {
             }
             const extension = extensions[key];
             const extensionStore = this._extensionStores[key];
-            if (extension && extensionStore) {
+            if (extension !== undefined && extensionStore !== undefined) {
                 extensionStore.load(extension);
             }
         }

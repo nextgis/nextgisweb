@@ -308,3 +308,11 @@ msgstr "Объект сохранен"
 #: nodepkg/feature-editor/FeatureEditorWidget.tsx:25
 msgid "Loading..."
 msgstr "Загрузка..."
+
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:29
+msgid "Reset"
+msgstr "Сбросить"
+
+#: nodepkg/feature-editor/FeatureEditorStore.ts:22
+msgid "No changes to save"
+msgstr "Внесите изменения, чтобы сохранить их"
