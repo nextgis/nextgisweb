@@ -8,6 +8,12 @@ const plugins = require("./plugins.cjs");
 const defaults = {
     mode: debug ? "development" : "production",
     devtool: debug ? "source-map" : undefined,
+    stats: {
+        assets: false,
+        modules: false,
+        moduleAssets: false,
+        nestedModules: false,
+    },
     watchOptions: {
         poll: os.release().match(/-WSL.?$/) ? 1000 : false,
         ignored: "**/node_modules",
