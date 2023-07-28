@@ -41,6 +41,7 @@ class Item {
             if (
                 !this.propagate &&
                 this.identity !== "" &&
+                this.identity !== null &&
                 isSameOrSubclass(this.identity, this.store.resourceClass)
             ) {
                 this.identity = "";
