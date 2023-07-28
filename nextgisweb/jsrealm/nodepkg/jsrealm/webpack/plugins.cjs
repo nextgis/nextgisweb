@@ -6,7 +6,7 @@ const { BROTLI_PARAM_QUALITY } = require("zlib").constants;
 
 const { debug, pyramid } = require("../config.cjs");
 
-module.exports = ({ clean, compress, bundleAnalyzer } = {}) => {
+module.exports = ({ once, clean, compress, bundleAnalyzer } = {}) => {
     const result = [];
     const add = (plugin) => result.push(plugin);
 
@@ -49,12 +49,15 @@ module.exports = ({ clean, compress, bundleAnalyzer } = {}) => {
     (bundleAnalyzer || (!debug && bundleAnalyzer !== false)) &&
         add(new BundleAnalyzerPlugin({ analyzerMode: "static" }));
 
-    add(
-        new StatsWriterPlugin({
-            filename: "webpack-stats.json",
-            fields: ["errorsCount"],
-        })
-    );
+    if (once) {
+        // Enable only for permanent builds, as it's slow
+        add(
+            new StatsWriterPlugin({
+                filename: "webpack-stats.json",
+                fields: ["errorsCount"],
+            })
+        );
+    }
 
     return result;
 };
