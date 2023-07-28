@@ -1,3 +1,4 @@
+const { StatsWriterPlugin } = require("webpack-stats-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const CompressionPlugin = require("compression-webpack-plugin");
@@ -47,6 +48,13 @@ module.exports = ({ clean, compress, bundleAnalyzer } = {}) => {
 
     (bundleAnalyzer || (!debug && bundleAnalyzer !== false)) &&
         add(new BundleAnalyzerPlugin({ analyzerMode: "static" }));
+
+    add(
+        new StatsWriterPlugin({
+            filename: "webpack-stats.json",
+            fields: ["errorsCount"],
+        })
+    );
 
     return result;
 };

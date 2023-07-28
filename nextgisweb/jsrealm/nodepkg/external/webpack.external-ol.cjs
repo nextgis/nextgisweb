@@ -78,59 +78,63 @@ function importReplace(match) {
     return match;
 }
 
-module.exports = defaults("external-ol", {
-    entry: entry,
-    module: {
-        rules: [
-            {
-                test: index,
-                loader: "string-replace-loader",
-                options: {
-                    multiple: [
-                        {
-                            // Replace relative imports with absolute
-                            search: /^(import .*)['"]\.\/(.*)['"];$/gim,
-                            replace: '$1"$2";',
-                        },
-                        {
-                            // Fix missing imports and remove unused
-                            search: /^import .*$/gim,
-                            replace: importReplace,
-                        },
-                    ],
-                },
-            },
-            {
-                test: /\.js$/,
-                loader: "babel-loader",
-                options: {
-                    sourceType: "unambiguous",
-                    presets: [
-                        ["@babel/preset-env", { targets: jsrealm.targets }],
-                    ],
-                },
-            },
-            {
-                test: /\.css$/i,
-                use: ["style-loader", "css-loader"],
-            },
-        ],
-    },
-    plugins: [
-        new CopyPlugin({
-            patterns: [
+module.exports = defaults(
+    "external-ol",
+    {
+        entry: entry,
+        module: {
+            rules: [
                 {
-                    from: require.resolve("ol/ol.css"),
-                    to: "ol.css",
+                    test: index,
+                    loader: "string-replace-loader",
+                    options: {
+                        multiple: [
+                            {
+                                // Replace relative imports with absolute
+                                search: /^(import .*)['"]\.\/(.*)['"];$/gim,
+                                replace: '$1"$2";',
+                            },
+                            {
+                                // Fix missing imports and remove unused
+                                search: /^import .*$/gim,
+                                replace: importReplace,
+                            },
+                        ],
+                    },
+                },
+                {
+                    test: /\.js$/,
+                    loader: "babel-loader",
+                    options: {
+                        sourceType: "unambiguous",
+                        presets: [
+                            ["@babel/preset-env", { targets: jsrealm.targets }],
+                        ],
+                    },
+                },
+                {
+                    test: /\.css$/i,
+                    use: ["style-loader", "css-loader"],
                 },
             ],
-        }),
-    ],
-    output: {
-        publicPath: "",
-        filename: "ol.js",
-        library: "ol",
-        libraryTarget: "umd",
-        libraryExport: "default",
+        },
+        plugins: [
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: require.resolve("ol/ol.css"),
+                        to: "ol.css",
+                    },
+                ],
+            }),
+        ],
+        output: {
+            publicPath: "",
+            filename: "ol.js",
+            library: "ol",
+            libraryTarget: "umd",
+            libraryExport: "default",
+        },
     },
-});
+    { once: true }
+);

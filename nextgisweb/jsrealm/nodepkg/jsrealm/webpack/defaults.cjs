@@ -1,5 +1,7 @@
 const os = require("os");
+const fs = require("fs");
 const path = require("path");
+const chalk = require("chalk");
 const { debug, distPath } = require("../config.cjs");
 const plugins = require("./plugins.cjs");
 
@@ -12,7 +14,29 @@ const defaults = {
     },
 };
 
+function isUpToDate(name) {
+    const fn = path.resolve(distPath, name, "webpack-stats.json");
+    if (!fs.existsSync(fn)) return false;
+
+    const sdata = JSON.parse(fs.readFileSync(fn));
+    if (sdata.errorsCount !== 0) return false;
+
+    const lckct = fs.statSync(path.resolve("yarn.lock")).ctimeMs;
+    const pkgct = fs.statSync(path.resolve("package.json")).ctimeMs;
+    const bldct = fs.statSync(fn).ctimeMs;
+    return lckct < bldct && pkgct < bldct;
+}
+
+function notice(message) {
+    console.info(chalk.yellow("NOTICE:") + " " + message);
+}
+
 module.exports = (name, config, options) => {
+    if (debug && options?.once && isUpToDate(name)) {
+        notice(`${name} build is up-to-date, skipping!`);
+        return [];
+    }
+
     return (env) => {
         if (typeof config === "function") config = config(env);
 

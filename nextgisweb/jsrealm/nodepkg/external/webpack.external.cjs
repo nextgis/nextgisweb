@@ -94,5 +94,5 @@ module.exports = defaults(
         entry: {},
         plugins: [new CopyPlugin({ patterns: copyPatterns })],
     },
-    { bundleAnalyzer: false }
+    { once: true, bundleAnalyzer: false }
 );
