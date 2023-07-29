@@ -74,5 +74,5 @@ class WebMapComponent(Component):
         Option('editing', bool, default=True),
         Option('enable_social_networks', bool, default=False),
         Option('check_origin', bool, default=False, doc="Check iframe Referer header."),
-        Option('legend_symbols', LegendSymbolsEnum, default=None),
+        Option('legend_symbols', LegendSymbolsEnum, default=LegendSymbolsEnum.COLLAPSE),
     )
