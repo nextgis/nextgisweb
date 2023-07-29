@@ -4,8 +4,7 @@ import { useCallback, useMemo } from "react";
 import { useFileUploader } from "@nextgisweb/file-upload";
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Image, Input, Table, Upload } from "@nextgisweb/gui/antd";
-import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
+import { Button, Image, Input, Table, Upload } from "@nextgisweb/gui/antd";
 import { formatSize } from "@nextgisweb/gui/util";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n";
@@ -16,6 +15,8 @@ import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
 import type AttachmentEditorStore from "./AttachmentEditorStore";
 import type { DataSource } from "./type";
+
+import DeleteIcon from "@nextgisweb/icon/material/clear";
 
 import "./AttachmentEditor.less";
 
@@ -83,9 +84,8 @@ const AttachmentEditor = observer(
         const columns = useMemo(
             () => [
                 {
-                    title: i18n.gettext("Preview"),
                     key: "preview",
-                    width: "100px",
+                    className: "preview",
                     render: (_, row: DataSource) => {
                         if ("is_image" in row && row.is_image) {
                             const url = routeURL("feature_attachment.image", {
@@ -111,35 +111,33 @@ const AttachmentEditor = observer(
                     },
                 },
                 {
-                    title: i18n.gettext("File name"),
                     dataIndex: "name",
-                    key: "name",
+                    className: "name",
+                    title: i18n.gettext("File name"),
                     render: editableField("name"),
                 },
                 {
-                    title: i18n.gettext("Size"),
                     dataIndex: "size",
-                    key: "size",
+                    className: "size",
+                    title: i18n.gettext("Size"),
                     render: (text) => formatSize(text),
                 },
                 {
-                    title: i18n.gettext("Description"),
                     dataIndex: "description",
-                    key: "size",
+                    className: "description",
+                    title: i18n.gettext("Description"),
                     render: editableField("description"),
                 },
                 {
+                    key: "actions",
                     title: "",
-                    dataIndex: "actions",
                     render: (_, record) => (
-                        <SvgIconLink
+                        <Button
                             onClick={() => handleDelete(record)}
-                            iconProps={{
-                                style: { height: "24px", width: "24px" },
-                            }}
-                            icon="material-delete_forever"
-                            fill="currentColor"
-                        ></SvgIconLink>
+                            type="text"
+                            shape="circle"
+                            icon={<DeleteIcon />}
+                        />
                     ),
                 },
             ],

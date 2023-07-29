@@ -17,4 +17,46 @@
             height: 100%;
         }
     }
+
+    .ant-table table {
+        > thead > tr,
+        > tbody > tr {
+            td {
+                vertical-align: top;
+            }
+
+            .preview {
+                width: 0;
+                padding: 0;
+
+                &::before {
+                    display: none;
+                }
+
+                .ant-image {
+                    margin: 8px;
+                }
+            }
+
+            .name {
+                width: 40%;
+            }
+
+            .description {
+                width: 60%;
+                padding-right: 0;
+
+                &::before {
+                    display: none;
+                }
+            }
+
+            .size {
+                width: 0;
+                white-space: nowrap;
+                text-align: right;
+                line-height: 32px;
+            }
+        }
+    }
 }
