@@ -3,14 +3,6 @@
 
 <table class="meta-info table-keyvalue pure-table">
     <tbody>
-        <tr>
-            <th class="table-keyvalue__key">
-                <span class="table-keyvalue__key__inner">${tr(_("Display name"))}</span>
-            </th>
-            <td class="table-keyvalue__value">
-                <span class="table-keyvalue__value__inner">${obj.display_name}</span>
-            </td>
-        </tr>        
         %if obj.keyname:
             <tr>
                 <th class="table-keyvalue__key">
