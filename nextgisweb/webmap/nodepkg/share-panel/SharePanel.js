@@ -89,7 +89,8 @@ export const SharePanel = ({display, socialNetworksEnabled, eventVisibility}) =>
     const updateEmbedCode = () => {
         display.getVisibleItems().then((visibleItems) => {
             const permalinkOptions = {
-                urlWithoutParams: routeURL('webmap.display.tiny', display.config.webmapId),
+                urlWithoutParams:  ngwConfig.applicationUrl +
+                    routeURL("webmap.display.tiny", display.config.webmapId),
                 additionalParams: {
                     linkMainMap: addLinkToMap,
                     events: generateEvents
