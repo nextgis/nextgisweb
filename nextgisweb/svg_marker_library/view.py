@@ -10,7 +10,7 @@ from .model import SVGMarkerLibrary
 class Widget(Widget):
     resource = SVGMarkerLibrary
     operation = ('create', 'update')
-    amdmod = 'ngw-svg-marker-library/Widget'
+    amdmod = '@nextgisweb/svg-marker-library/resource-widget'
 
 
 class SVGMarkerLibraryMenu(DynItem):

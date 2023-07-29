@@ -65,7 +65,7 @@ export const EdiTable = observer(
                     if (shrink) className += " shrink";
                     const minWidth = shrink !== true ? shrink : undefined;
 
-                    const result = { key, ...columnProps };
+                    const result = { key, dataIndex: key, ...columnProps };
 
                     if (component) {
                         const Component = component;

@@ -88,18 +88,18 @@ class SVGMarker(Base):
 
 def validate_filename(filename):
     if os.path.isabs(filename) or filename != os.path.normpath(filename):
-        raise ValidationError(_("Insecure filename \"%s\".") % filename)
+        raise ValidationError(_("File '{}' has an insecure name.").format(filename))
 
 
 def validate_ext(filename, ext):
     if ext.lower() != '.svg':
-        raise ValidationError(_("File \"%s\" has an invalid extension.") % filename)
+        raise ValidationError(_("File '{}' has an invalid extension.").format(filename))
 
 
 def validate_mime(filename, buf):
     mime = magic.from_buffer(buf, mime=True)
     if mime != mime_valid:
-        raise ValidationError(_("File type \"%s\" is not SVG.") % filename)
+        raise ValidationError(_("File '{}' has a format different from SVG.").format(filename))
 
 
 class _archive_attr(SP):
