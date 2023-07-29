@@ -1,11 +1,10 @@
-import { useEffect, useRef } from "react";
 import { Table as TableBase } from "antd";
+
+import { ParamsOf } from "../../type";
 
 import "./index.less";
 
-type TableBaseProps = Parameters<typeof TableBase>[0];
-
-interface TableProps extends TableBaseProps {
+interface TableProps extends ParamsOf<typeof TableBase> {
     parentHeight?: boolean;
 }
 
@@ -15,24 +14,6 @@ export default function Table({
     pagination = false,
     ...props
 }: TableProps) {
-    const ref = useRef<HTMLDivElement>();
-
-    useEffect(() => {
-        if (!parentHeight) return;
-        const container = ref.current;
-        const resizeObserver = new ResizeObserver(() => {
-            const rect = container.getBoundingClientRect();
-            ref.current.style.setProperty(
-                "--container-height",
-                rect.height + "px"
-            );
-        });
-        resizeObserver.observe(container);
-        return () => {
-            resizeObserver.disconnect();
-        };
-    }, [parentHeight]);
-
     if (parentHeight) {
         className = (className ? className.split(" ") : [])
             .concat("ant-table-parent-height")
@@ -41,7 +22,7 @@ export default function Table({
 
     const tableProps: TableProps = { ...props, pagination, className };
 
-    return <TableBase ref={ref} {...tableProps} />;
+    return <TableBase {...tableProps} />;
 }
 
 Table.EXPAND_COLUMN = TableBase.EXPAND_COLUMN;

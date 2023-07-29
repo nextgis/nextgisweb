@@ -1,6 +1,6 @@
 export interface TextEditorProps {
     value?: string;
     onChange?: (val: string) => void;
-    fullHeight?: boolean;
+    parentHeight?: boolean;
     border?: boolean;
 }

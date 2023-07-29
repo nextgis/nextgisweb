@@ -1,14 +1,26 @@
 .ant-table-parent-height {
+    position: relative;
     height: 100%;
 
-    .ant-table-content {
-        height: var(--container-height);
-        overflow-y: scroll;
+    > .ant-spin-nested-loading {
+        position: absolute;
+        inset: 0;
 
-        table > thead {
-            position: sticky;
-            z-index: 5;
-            top: 0;
+        > .ant-spin-container {
+            position: absolute;
+            inset: 0;
+
+            > .ant-table {
+                position: absolute;
+                inset: 0;
+                overflow-y: auto;
+
+                table > thead {
+                    position: sticky;
+                    z-index: 5;
+                    top: 0;
+                }
+            }
         }
     }
 }
