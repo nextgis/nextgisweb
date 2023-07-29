@@ -18,18 +18,24 @@ body.annotations-edit .ol-popup.annotation:hover .edit-controls {
   border: none;
 }
 
-body.ann-types-display .ol-popup.annotation.public {
-  border-left: #97e07e 5px solid;
+body {
+  --annotation-public: #97e07e;
+  --annotation-own: #e8b3f8;
+  --annotation-private: #f88f8f;
+}
+
+body .ol-popup.annotation.public {
+  border-left: var(--annotation-public) 5px solid;
   left: -55px;
 }
 
-body.ann-types-display .ol-popup.annotation.own {
-  border-left: #e8b3f8 5px solid;
+body .ol-popup.annotation.own {
+  border-left: var(--annotation-own) 5px solid;
   left: -55px;
 }
 
-body.ann-types-display .ol-popup.annotation.private {
-  border-left: #f88f8f 5px solid;
+body .ol-popup.annotation.private {
+  border-left: var(--annotation-private) 5px solid;
   left: -55px;
 }
 

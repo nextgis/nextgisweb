@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
 import { PropTypes } from "prop-types";
-import { Switch, Select } from "@nextgisweb/gui/antd";
+import { useEffect, useState } from "react";
 
+import { Select, Switch } from "@nextgisweb/gui/antd";
 import { FloatingLabel } from "@nextgisweb/gui/floating-label";
+
 import i18n from "@nextgisweb/pyramid/i18n";
 
 import "./AnnotationsPanel.less";
@@ -21,7 +22,6 @@ export const AnnotationsPanel = ({
     const [edit, setEdit] = useState(false);
     const [annScope, setAnnScope] = useState(undefined);
     const [geomType, setGeomType] = useState("Point");
-    const [displayTypes, setDisplayTypes] = useState(undefined);
     const [annFilter, setAnnFilter] = useState({
         public: true,
         own: true,
@@ -45,21 +45,10 @@ export const AnnotationsPanel = ({
         }
     };
 
-    const changeAnnTypesDisplay = (shouldDisplay) => {
-        setDisplayTypes(shouldDisplay);
-        if (shouldDisplay) {
-            document.body.classList.add("ann-types-display");
-        } else {
-            document.body.classList.remove("ann-types-display");
-        }
-    };
-
     useEffect(() => {
         const visibleDefault =
             initialAnnotVisible || display.config.annotations.default;
         changeVisible(visibleDefault);
-
-        changeAnnTypesDisplay(true);
 
         const scope = display.config.annotations.scope;
         setAnnScope(scope);
@@ -102,7 +91,7 @@ export const AnnotationsPanel = ({
 
                 <div className="input-group">
                     <Switch checked={edit} onChange={(v) => changeEdit(v)} />
-                    <span className="checkbox__label">
+                    <span className="label">
                         {i18n.gettext("Edit annotations")}
                     </span>
                 </div>
@@ -129,23 +118,6 @@ export const AnnotationsPanel = ({
                         ]}
                     ></Select>
                 </FloatingLabel>
-            </>
-        );
-    }
-
-    let otherPrivateAnnSection;
-    if (annScope.manage) {
-        otherPrivateAnnSection = (
-            <>
-                <div className="input-group">
-                    <Switch
-                        checked={annFilter.private}
-                        onChange={(v) => changeAccessTypeFilters(v, "private")}
-                    />
-                    <span className="checkbox__label">
-                        {i18n.gettext("Other private annotations")}
-                    </span>
-                </div>
             </>
         );
     }
@@ -188,20 +160,10 @@ export const AnnotationsPanel = ({
 
             <div className="input-group">
                 <Switch
-                    checked={displayTypes}
-                    onChange={(v) => changeAnnTypesDisplay(v)}
-                />
-                <span className="checkbox__label">
-                    {i18n.gettext("Show annotation types")}
-                </span>
-            </div>
-
-            <div className="input-group">
-                <Switch
                     checked={annFilter.public}
                     onChange={(v) => changeAccessTypeFilters(v, "public")}
                 />
-                <span className="checkbox__label">
+                <span className="label public">
                     {i18n.gettext("Public annotations")}
                 </span>
             </div>
@@ -211,12 +173,22 @@ export const AnnotationsPanel = ({
                     checked={annFilter.own}
                     onChange={(v) => changeAccessTypeFilters(v, "own")}
                 />
-                <span className="checkbox__label">
+                <span className="label own">
                     {i18n.gettext("My private annotations")}
                 </span>
             </div>
 
-            {otherPrivateAnnSection}
+            {annScope.manage && (
+                <div className="input-group">
+                    <Switch
+                        checked={annFilter.private}
+                        onChange={(v) => changeAccessTypeFilters(v, "private")}
+                    />
+                    <span className="label private">
+                        {i18n.gettext("Other private annotations")}
+                    </span>
+                </div>
+            )}
         </div>
     );
 };

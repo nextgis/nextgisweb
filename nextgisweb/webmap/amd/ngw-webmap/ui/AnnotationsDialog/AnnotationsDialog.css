@@ -10,25 +10,21 @@
   display: none;
 }
 
+.annotation-dialog .annotation-access-type {  
+  border: 1px solid transparent;
+  border-left-width: 8px;
+}
+
 .annotation-dialog[data-access-type="public"] .annotation-access-type {
-  border-left: #97e07e 8px solid;
-  border-bottom: #97e07e 1px solid;
-  border-top: #97e07e 1px solid;
-  border-right: #97e07e 1px solid;  
+  border-color: var(--annotation-public);
 }
 
 .annotation-dialog[data-access-type="own"] .annotation-access-type {
-  border-left: #e8b3f8 8px solid;
-  border-bottom: #e8b3f8 1px solid;
-  border-top: #e8b3f8 1px solid;
-  border-right: #e8b3f8 1px solid;  
+  border-color: var(--annotation-own);
 }
 
 .annotation-dialog[data-access-type="private"] .annotation-access-type {
-  border-left: #f88f8f 8px solid;
-  border-bottom: #f88f8f 1px solid;
-  border-top: #f88f8f 1px solid;
-  border-right: #f88f8f 1px solid;  
+  border-color: var(--annotation-private);
 }
 
 

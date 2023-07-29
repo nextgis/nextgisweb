@@ -8,5 +8,32 @@
         flex-direction: row;
         gap: 4px;
         align-items: center;
+
+        .label {
+            flex-grow: 1;
+            max-width: 20em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+
+            &.public,
+            &.own,
+            &.private {
+                border-right: 6px solid transparent;
+                padding-right: 4px;
+
+                &.public {
+                    border-color: var(--annotation-public);
+                }
+
+                &.own {
+                    border-color: var(--annotation-own);
+                }
+
+                &.private {
+                    border-color: var(--annotation-private);
+                }
+            }
+        }
     }
 }
