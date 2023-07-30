@@ -78,16 +78,6 @@ addPackage("handlebars", {
     to: "handlebars.js",
 });
 
-addPackage("jquery", {
-    from: "dist/jquery.min.js",
-    to: "jquery/jquery-3.2.1.min.js",
-});
-
-addPackage("@nextgisweb/external", {
-    from: "contrib/jquery",
-    to: "../../jquery",
-});
-
 module.exports = defaults(
     "external",
     {
