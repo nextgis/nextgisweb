@@ -43,7 +43,7 @@ export function useFileUploader({
         if (onChange) {
             onChange(meta);
         }
-    }, [meta, onChange, setInitMeta]);
+    }, [meta]);
 
     useEffect(() => {
         setMeta(initMeta);
