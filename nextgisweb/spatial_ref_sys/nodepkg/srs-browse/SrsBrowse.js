@@ -19,7 +19,7 @@ export function SrsBrowse() {
     const headerControls = [];
 
     if (settings.catalog.enabled) {
-        headerControls.push(({ selected, rows, setRows }) => {
+        headerControls.push(() => {
             const importFromCatalog = () => {
                 const url = routeURL("srs.catalog");
                 window.open(url, "_self");

@@ -23,10 +23,14 @@ const config = {
     },
     rules: {
         "eqeqeq": "error",
-        "no-unused-vars": ["error", { args: "after-used" }],
-        "no-use-before-define": "error",
+        "no-unused-vars": [
+            "error",
+            { args: "after-used", destructuredArrayIgnorePattern: "^_" },
+        ],
+        "no-use-before-define": "warn",
         "prettier/prettier": "warn",
-        "react/prop-types": "off",
+        "react/prop-types": "off", // Use TypeScript instead
+        "react/jsx-no-target-blank": "off", // Unsupported browsers
         "requirejs/no-object-define": "error",
         "requirejs/amd-function-arity": [
             "error",
@@ -99,7 +103,7 @@ const config = {
                 es2015: true,
             },
             rules: {
-                "eqeqeq": "off",
+                "eqeqeq": "warn",
             },
         },
     ],

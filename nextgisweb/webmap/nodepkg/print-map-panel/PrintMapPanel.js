@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import debounce from "lodash/debounce";
 import { PropTypes } from "prop-types";
 import {
@@ -18,7 +18,7 @@ import { pageFormats, scalesList, exportFormats } from "./options.js";
 
 import "./PrintMapPanel.less";
 
-export const PrintMapPanel = ({ display, onAction, scaleMap }) => {
+export const PrintMapPanel = ({ onAction, scaleMap }) => {
     const [paperFormat, setPaperFormat] = useState("210_297");
     const [height, setHeight] = useState(297);
     const [width, setWidth] = useState(210);

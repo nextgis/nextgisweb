@@ -12,8 +12,8 @@ const RowActions = observer(({ row, store, actions }) => {
     return (
         <>
             {errorMessage && <ErrorButton message={errorMessage} />}
-            {actions.map(({ callback, ...props }) => (
-                <ActionButton onClick={() => callback(row)} {...props} />
+            {actions.map(({ key, callback: cb, ...props }) => (
+                <ActionButton key={key} onClick={() => cb(row)} {...props} />
             ))}
         </>
     );
@@ -124,7 +124,7 @@ export const EdiTable = observer(
             <Table
                 dataSource={rows}
                 columns={tableColumns}
-                {...{className, size, ...tableProps}}
+                {...{ className, size, ...tableProps }}
             />
         );
     }

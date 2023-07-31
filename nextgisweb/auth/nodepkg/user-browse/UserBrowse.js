@@ -86,13 +86,6 @@ columns.push({
 });
 
 export function UserBrowse() {
-    const DisableSelectedUsers = (props) => {
-        return ToggleSelectedUsers({ disable: true, ...props });
-    };
-    const EnableSelectedUsers = (props) => {
-        return ToggleSelectedUsers({ disable: false, ...props });
-    };
-
     const [toggleLoading, setToggleLoading] = useState(false);
 
     const ToggleSelectedUsers = ({ disable, selected, rows, setRows }) => {
@@ -152,6 +145,13 @@ export function UserBrowse() {
                 </Button>
             </Badge>
         );
+    };
+
+    const DisableSelectedUsers = (props) => {
+        return ToggleSelectedUsers({ disable: true, ...props });
+    };
+    const EnableSelectedUsers = (props) => {
+        return ToggleSelectedUsers({ disable: false, ...props });
     };
 
     // prettier-ignore

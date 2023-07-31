@@ -49,8 +49,6 @@ export const LoginForm = observer((props = {}) => {
         setCreds((oldVal) => ({ ...oldVal, ...e.value }));
     };
 
-    useKeydownListener("enter", () => login());
-
     const login = async () => {
         try {
             await form.validateFields();
@@ -66,6 +64,8 @@ export const LoginForm = observer((props = {}) => {
             // ignore
         }
     };
+
+    useKeydownListener("enter", () => login());
 
     const oauthUrl =
         routeURL("auth.oauth") +

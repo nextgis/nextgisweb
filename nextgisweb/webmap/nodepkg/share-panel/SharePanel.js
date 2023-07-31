@@ -61,7 +61,7 @@ const makeCORSWarning = () => {
     if (!regexLink.test(caption)) {
         return <></>;
     }
-    const [all, pre, refText, post] = regexLink.exec(caption);
+    const [_all, pre, refText, post] = regexLink.exec(caption);
     const message = <span>
         {pre}
         <a href={routeURL("pyramid.control_panel.cors")} target="_blank">{refText}</a>

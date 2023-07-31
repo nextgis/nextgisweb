@@ -12,7 +12,7 @@ const {
     group_mapping,
 } = settings.oauth;
 
-const isNGID = type == "nextgisid";
+const isNGID = type === "nextgisid";
 
 export function makeTeamManageButton(props) {
     if (isNGID && baseUrl) {

@@ -223,7 +223,7 @@ export const SettingsForm = ({
                     </Form.Item>
                 </Col>
                 <Col span={16}>
-                    {geocoder == "nominatim" ? (
+                    {geocoder === "nominatim" ? (
                         <Form.Item
                             name="nominatim_countrycodes"
                             label={i18n.gettext(
@@ -263,7 +263,7 @@ export const SettingsForm = ({
                 <Col span={8}>
                     <Form.Item
                         name="legend_symbols"
-                        normalize={(val) => (val == "default" ? null : val)}
+                        normalize={(val) => (val === "default" ? null : val)}
                         getValueProps={(val) => {
                             val = !val ? "default" : val;
                             return { value: val };
