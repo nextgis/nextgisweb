@@ -1,6 +1,10 @@
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { Editor } from "@nextgisweb/ckeditor";
 
+import { useSourceEditingWorkAround } from "./hook/useSourceEditingWorkAround";
+
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+
 import { TextEditorProps } from "./type";
 
 import "./TextEditor.less";
@@ -11,12 +15,13 @@ export const TextEditor = ({
     parentHeight = true,
     border = true,
 }: TextEditorProps) => {
-    const onChange_ = (_, editor) => {
-        if (onChange) {
-            const data = editor.getData();
-            onChange(data);
-        }
-    };
+    /**
+     * Without the Source Editor plugin, it would be possible to use the component just like that
+     * <CKEditor editor={Editor} data={value} onChange={onChange} />
+     * Otherwise an endless onChange call may happened by unclear circumstances.
+     * This hook is needed to solve this problem.
+     */
+    const { setEditor } = useSourceEditingWorkAround({ value, onChange });
 
     return (
         <div
@@ -26,7 +31,12 @@ export const TextEditor = ({
                 (parentHeight ? " parent-height" : "")
             }
         >
-            <CKEditor editor={Editor} data={value} onChange={onChange_} />
+            <CKEditor
+                editor={Editor}
+                onReady={(editor: ClassicEditor) => {
+                    setEditor(editor);
+                }}
+            />
         </div>
     );
 };
