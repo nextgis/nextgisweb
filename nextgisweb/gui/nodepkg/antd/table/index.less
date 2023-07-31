@@ -15,10 +15,17 @@
                 inset: 0;
                 overflow-y: auto;
 
-                table > thead {
-                    position: sticky;
-                    z-index: 5;
-                    top: 0;
+                > .ant-table-container > .ant-table-content > table {
+                    > thead {
+                        position: sticky;
+                        z-index: 5;
+                        top: 0;
+                    }
+
+                    > tbody > tr.ant-table-placeholder > td {
+                        position: absolute;
+                        inset: 0;
+                    }
                 }
             }
         }
