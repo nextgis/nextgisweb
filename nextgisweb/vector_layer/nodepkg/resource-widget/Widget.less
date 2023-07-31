@@ -1,0 +1,46 @@
+.ngw-vector-layer-resource-widget {
+    padding: 1em;
+
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1em;
+
+    & > label {
+        align-self: flex-start;
+        line-height: 32px;
+
+        &::after {
+            content: ":";
+        }
+    }
+
+    & > span,
+    & > .mode {
+        grid-column: 1 / span 2;
+    }
+
+    & > .ant-checkbox-wrapper {
+        grid-column: 1 / span 2;
+
+        & + .ant-checkbox-wrapper {
+            margin-left: 0;
+        }
+    }
+
+    & > .group {
+        display: flex;
+        gap: 0.5em 1em;
+        flex-wrap: wrap;
+
+        & > .ant-checkbox-wrapper {
+            align-self: center;
+        }
+
+        & > .ant-select,
+        & > .ant-input {
+            display: block;
+            flex-grow: 1;
+            width: auto;
+        }
+    }
+}
