@@ -169,8 +169,8 @@ const searchByYandex = async (criteria, limit, display, controller) => {
     }
 
     let isExceeded = false;
-    featureMembers.forEach(fm => {
-        if (isExceeded || !fm.GeoObject) return;
+    featureMembers.forEach(featureMember => {
+        if (isExceeded || !featureMember.GeoObject) return;
         const geoObject = featureMember.GeoObject;
         const [lon, lat] = featureMember.GeoObject.Point.pos.split(" ");
         const searchResult = {
