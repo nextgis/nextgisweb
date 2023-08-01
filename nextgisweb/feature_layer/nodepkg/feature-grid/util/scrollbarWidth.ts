@@ -1,4 +1,4 @@
-export const scrollbarWidth = () => {
+export function scrollbarWidth(): number {
     // thanks too https://davidwalsh.name/detect-scrollbar-width
     const scrollDiv = document.createElement("div");
     scrollDiv.setAttribute(
@@ -9,4 +9,4 @@ export const scrollbarWidth = () => {
     const scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
     document.body.removeChild(scrollDiv);
     return scrollbarWidth;
-};
+}

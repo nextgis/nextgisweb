@@ -2,6 +2,30 @@ import { route } from "@nextgisweb/pyramid/api";
 
 import { KEY_FIELD_KEYNAME } from "../constant";
 
+interface FeatureLayerQuery {
+    offset?: number;
+    limit?: number;
+    geom?: "yes" | "no";
+    extensions?: string;
+    dt_format?: "iso";
+    fields?: string[];
+    order_by?: string;
+    like?: string;
+    ilike?: string;
+}
+
+interface FetchFeaturesOptions {
+    resourceId: number;
+    orderBy?: string;
+    signal?: AbortSignal;
+    fields?: string[];
+    offset?: number;
+    limit?: number;
+    cache?: boolean;
+    like?: string;
+    ilike?: string;
+}
+
 export function fetchFeatures({
     resourceId,
     orderBy,
@@ -12,8 +36,8 @@ export function fetchFeatures({
     cache,
     like,
     ilike,
-}) {
-    const query = {
+}: FetchFeaturesOptions) {
+    const query: FeatureLayerQuery = {
         offset,
         limit,
         geom: "no",

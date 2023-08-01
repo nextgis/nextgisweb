@@ -1,14 +1,5 @@
-import { PropTypes } from "prop-types";
-
 import debounce from "lodash/debounce";
-import {
-    useCallback,
-    useLayoutEffect,
-    useMemo,
-    useRef,
-    useState,
-    useEffect,
-} from "react";
+import { useMemo, useRef, useState, useEffect, useLayoutEffect } from "react";
 import Draggable from "react-draggable";
 
 import SortIcon from "./component/SortIcon";
@@ -18,7 +9,30 @@ import { useFeatureTable } from "./hook/useFeatureTable";
 import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 import { scrollbarWidth } from "./util/scrollbarWidth";
 
+import type { ReactNode, ReactElement, Dispatch, SetStateAction } from "react";
+import type { FeatureLayerField } from "../type/FeatureLayer";
+import type { Selected } from "./type";
+
 import "./FeatureTable.less";
+
+interface FeatureTableProps {
+    cleanSelectedOnFilter?: boolean;
+    deletedFeatureIds?: number[];
+    empty?: () => ReactNode;
+    fields?: FeatureLayerField[];
+    loadingCol?: () => string;
+    query?: string;
+    resourceId: number;
+    selected?: Selected[];
+    setSelected: Dispatch<SetStateAction<Selected[]>>;
+    setSettingsOpen?: Dispatch<SetStateAction<boolean>>;
+    settingsOpen?: boolean;
+    total?: number;
+}
+
+interface FeatureLayerFieldCol extends FeatureLayerField {
+    flex?: string;
+}
 
 const RESIZE_HANDLE_WIDTH = 6;
 
@@ -29,32 +43,32 @@ const FeatureTable = ({
     fields,
     selected,
     resourceId,
-    LoadingCol,
+    loadingCol,
     setSelected,
     settingsOpen,
     setSettingsOpen,
     cleanSelectedOnFilter = true,
-}) => {
-    const tbodyRef = useRef(null);
-    const theadRef = useRef(null);
-    const columnRef = useRef({});
+}: FeatureTableProps) => {
+    const tbodyRef = useRef<HTMLDivElement>(null);
+    const theadRef = useRef<HTMLDivElement>(null);
+    const columnRef = useRef<Record<number, HTMLDivElement>>({});
 
     const [rowMinHeight] = useState(27);
     const [pageSize] = useState(100);
 
     /** Define sort params as tuple of field keyname and ordering (asc|desc) */
-    const [orderBy, setOrderBy] = useState([]);
+    const [orderBy, setOrderBy] = useState<string[]>([]);
 
     const [tableWidth, setTableWidth] = useState(0);
     const [effectiveWidths, setEffectiveWidths] = useState(null);
     const [userDefinedWidths, setUserDefinedWidths] = useState({});
 
-    const [visibleFields, setVisibleFields] = useState(() => [
+    const [visibleFields, setVisibleFields] = useState<number[]>(() => [
         KEY_FIELD_ID,
         ...fields.filter((f) => f.grid_visibility).map((f) => f.id),
     ]);
 
-    const columns = useMemo(() => {
+    const columns = useMemo<FeatureLayerFieldCol[]>(() => {
         const cols = [];
         const fields_ = [
             {
@@ -99,7 +113,6 @@ const FeatureTable = ({
         visibleFields,
         rowMinHeight,
         resourceId,
-        LoadingCol,
         pageSize,
         tbodyRef,
         columns,
@@ -114,9 +127,9 @@ const FeatureTable = ({
         }
     }, [query, cleanSelectedOnFilter, setSelected]);
 
-    const scrollBarSize = useMemo(() => scrollbarWidth(), []);
+    const scrollBarSize = useMemo<number>(() => scrollbarWidth(), []);
 
-    const toggleSorting = (keyname, curOrder = null) => {
+    const toggleSorting = (keyname: string, curOrder: string | null = null) => {
         if (keyname === KEY_FIELD_KEYNAME) {
             setOrderBy([]);
             return;
@@ -155,7 +168,7 @@ const FeatureTable = ({
         return () => {};
     }, [columns, tableWidth, userDefinedWidths]);
 
-    const Rows = useCallback(() => {
+    const rows = () => {
         const firstVirtual = virtualItems[0];
         if (!firstVirtual) {
             return null;
@@ -166,11 +179,9 @@ const FeatureTable = ({
                 <>
                     {columns.map((f) => {
                         const val = row && row[f.keyname];
-                        const renderValue = row ? (
-                            renderFeatureFieldValue(f, val) || val
-                        ) : (
-                            <LoadingCol />
-                        );
+                        const renderValue = row
+                            ? renderFeatureFieldValue(f, val) || val
+                            : loadingCol();
                         return (
                             <div
                                 key={f.id}
@@ -193,7 +204,7 @@ const FeatureTable = ({
 
             const row = data.find((d) => d.__rowIndex === virtualRow.index);
             if (row) {
-                isSelected = selected.find(
+                isSelected = !!selected.find(
                     (s) => s[KEY_FIELD_KEYNAME] === row[KEY_FIELD_KEYNAME]
                 );
             }
@@ -229,60 +240,48 @@ const FeatureTable = ({
                 </div>
             );
         });
-    }, [
-        data,
-        columns,
-        selected,
-        setSelected,
-        rowMinHeight,
-        virtualItems,
-        measureElement,
-        effectiveWidths,
-    ]);
+    };
 
     let isEmpty = total === 0;
     if (queryMode && !isEmpty) {
         isEmpty = !hasNextPage && queryTotal === 0;
     }
 
-    const HeaderCols = useCallback(() => {
-        return columns
-            .map((column) => {
-                const { keyname, id, display_name: label, flex } = column;
-                const colSort = orderBy[0] === keyname && orderBy[1];
+    const headerCols = () => {
+        const headers: ReactElement[] = columns.map((column) => {
+            const { keyname, id, display_name: label, flex } = column;
+            const colSort = orderBy[0] === keyname && orderBy[1];
 
-                const style = userDefinedWidths[id]
-                    ? { flex: `0 0 ${userDefinedWidths[id]}px` }
-                    : { flex };
+            const style = userDefinedWidths[id]
+                ? { flex: `0 0 ${userDefinedWidths[id]}px` }
+                : { flex };
 
-                return (
-                    <div
-                        key={id}
-                        ref={(element) => {
-                            columnRef.current[id] = element;
-                        }}
-                        className="th"
-                        style={style}
-                        onClick={() => toggleSorting(keyname)}
-                    >
-                        <div className="label">{label}</div>
-                        {colSort && (
-                            <div className="suffix">
-                                <SortIcon dir={colSort} />
-                            </div>
-                        )}
-                    </div>
-                );
-            })
-            .concat([
+            return (
                 <div
-                    key="scrollbar"
-                    style={{ flex: `0 0 ${scrollBarSize}px` }}
-                />,
-            ]);
-    }, [userDefinedWidths, columns, orderBy, scrollBarSize]);
+                    key={id}
+                    ref={(element) => {
+                        columnRef.current[id] = element;
+                    }}
+                    className="th"
+                    style={style}
+                    onClick={() => toggleSorting(keyname)}
+                >
+                    <div className="label">{label}</div>
+                    {colSort && (
+                        <div className="suffix">
+                            <SortIcon dir={colSort} />
+                        </div>
+                    )}
+                </div>
+            );
+        });
+        headers.push(
+            <div key="scrollbar" style={{ flex: `0 0 ${scrollBarSize}px` }} />
+        );
+        return headers;
+    };
 
-    const HeaderHandles = useCallback(() => {
+    const headerHandles = () => {
         let cumWidth = 0;
         return columns.map(({ id }) => {
             const width = effectiveWidths[id];
@@ -315,15 +314,13 @@ const FeatureTable = ({
                 </Draggable>
             );
         });
-    }, [columns, effectiveWidths]);
+    };
 
     return (
         <div className="ngw-feature-layer-feature-table">
             <div ref={theadRef} className="thead">
-                <div className="tr">
-                    <HeaderCols />
-                </div>
-                {effectiveWidths && <HeaderHandles />}
+                <div className="tr">{headerCols()}</div>
+                {effectiveWidths && headerHandles()}
             </div>
             <div
                 ref={tbodyRef}
@@ -336,7 +333,7 @@ const FeatureTable = ({
                     empty()
                 ) : (
                     <div className="tbody" style={{ height: getTotalSize() }}>
-                        {effectiveWidths && <Rows />}
+                        {effectiveWidths && rows()}
                     </div>
                 )}
             </div>
@@ -349,21 +346,6 @@ const FeatureTable = ({
             />
         </div>
     );
-};
-
-FeatureTable.propTypes = {
-    LoadingCol: PropTypes.func,
-    empty: PropTypes.func,
-    fields: PropTypes.arrayOf(PropTypes.object),
-    deletedFeatureIds: PropTypes.arrayOf(PropTypes.number),
-    query: PropTypes.string,
-    resourceId: PropTypes.number,
-    selected: PropTypes.arrayOf(PropTypes.object),
-    setSelected: PropTypes.func,
-    cleanSelectedOnFilter: PropTypes.bool,
-    setSettingsOpen: PropTypes.func,
-    settingsOpen: PropTypes.bool,
-    total: PropTypes.number,
 };
 
 export default FeatureTable;

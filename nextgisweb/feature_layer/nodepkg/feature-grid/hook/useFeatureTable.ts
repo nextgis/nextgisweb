@@ -8,6 +8,8 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import { fetchFeatures } from "../api/fetchFeatures";
 import { createCacheKey } from "../util/createCacheKey";
 
+import type { FeatureData } from "../type";
+
 const debouncedFn = debounce((fn) => {
     fn();
 }, 200);
@@ -88,11 +90,11 @@ export function useFeatureTable({
 
     const { makeSignal, abort } = useAbortController();
 
-    const loaderCache = useRef();
+    const loaderCache = useRef<LoaderCache<FeatureData>>();
 
-    const [data, setData_] = useState([]);
+    const [data, setData_] = useState<FeatureData[]>([]);
 
-    const setData = (features) => {
+    const setData = (features: FeatureData[]) => {
         setData_((old) => {
             if (!old.length && !features.length) {
                 return old;
@@ -104,7 +106,7 @@ export function useFeatureTable({
     const queryMode = useMemo(() => !!query, [query]);
 
     const handleFeatures = useCallback(
-        (features) => {
+        (features: FeatureData[]) => {
             let rowIndex = pages[0];
             for (const f of features) {
                 f.__rowIndex = rowIndex++;
@@ -124,7 +126,15 @@ export function useFeatureTable({
     );
 
     const fetchWrapper = useCallback(
-        ({ page, signal, key }) => {
+        ({
+            page,
+            signal,
+            key,
+        }: {
+            page: number;
+            signal: AbortSignal;
+            key: string;
+        }) => {
             return loaderCache.current
                 .promiseFor(key, () => {
                     return fetchFeatures({
@@ -206,8 +216,8 @@ export function useFeatureTable({
         handleFeatures,
         visibleFields,
         fetchEnabled,
-        makeSignal,
         fetchWrapper,
+        makeSignal,
         pageSize,
         orderBy,
         pages,
@@ -249,12 +259,12 @@ export function useFeatureTable({
             const lastDataIndex = data[data.length - 1].__rowIndex;
             const lastPageIndex = pages[0] + pageSize * pages.length - 1;
 
-            let curentDataInTheRange =
+            const currentDataInTheRange =
                 firstDataIndex === pages[0] &&
                 (hasNextPage
                     ? lastDataIndex === lastPageIndex
                     : lastDataIndex <= lastPageIndex);
-            if (curentDataInTheRange) {
+            if (currentDataInTheRange) {
                 return;
             }
         }
@@ -283,7 +293,7 @@ export function useFeatureTable({
 
     useEffect(() => {
         if (getTotalSize()) {
-            scrollToIndex(0, { smoothScroll: false });
+            scrollToIndex(0, { behavior: "smooth" });
         }
         // to init first loading
         setQueryTotal(pageSize);
