@@ -67,3 +67,7 @@ export { default as TimePicker } from "./time-picker";
 export { default as RangePicker } from "./range-date-time-picker";
 export { default as Table } from "./table";
 export { default as Tabs } from "./tabs";
+
+import type { SizeType } from "antd/lib/config-provider/SizeContext";
+
+export { SizeType };
