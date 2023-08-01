@@ -130,4 +130,15 @@ def install(
 
     create_tsconfig(npkgs)
 
+    ngw_root = pkginfo.packages['nextgisweb']._path.parent
+    pkg_root = ngw_root.parent
+    if len(list(pkg_root.glob("nextgisweb_*"))) > 0:
+        linters_configs = ['.eslintrc.cjs', '.prettierrc.cjs', '.editorconfig']
+        for lc in linters_configs:
+            tf = pkg_root / lc
+            if tf.exists():
+                continue
+            tf.symlink_to((ngw_root / lc).relative_to(pkg_root))
+
+
     check_call(['yarn', 'install'])
