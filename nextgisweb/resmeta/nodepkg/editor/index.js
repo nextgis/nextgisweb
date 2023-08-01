@@ -1,4 +1,3 @@
 /** @entrypoint */
-import { EditorStore } from "./EditorStore";
-import { EditorWidget } from "./EditorWidget";
-export { EditorStore as store, EditorWidget as widget };
+export { EditorStore as store } from "./EditorStore";
+export { EditorWidget as widget } from "./EditorWidget";

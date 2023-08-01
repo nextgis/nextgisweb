@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
 
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 let idSeq = 0;
 
@@ -17,27 +17,17 @@ class Record {
     }
 
     get type() {
-        if (this.value === null) {
-            return "null";
-        }
-        const t = typeof this.value;
-        if (t !== "undefined") {
-            return t;
-        }
+        return this.value === null ? "null" : typeof this.value;
     }
 
     get error() {
-        if (this.key == "") {
-            return i18n.gettext("Key name is required.");
-        }
+        if (this.key === "") return gettext("Key required");
 
         const duplicate = this.store.items.find(
-            (candidate) => candidate.key == this.key && candidate.id != this.id
+            (cnd) => cnd.key === this.key && cnd.id !== this.id
         );
 
-        if (duplicate) {
-            return i18n.gettext("Key name is not unique.");
-        }
+        if (duplicate) return gettext("Key not unique");
 
         return false;
     }
@@ -48,33 +38,35 @@ class Record {
         }
 
         if (value !== undefined) {
-            this.value = this.type === "number" ? 0 : value;
+            this.value = this.type === "number" && value === null ? 0 : value;
         }
 
         if (type !== undefined) {
-            if (type == "string") {
-                if (this.value == undefined || this.value == null) {
+            if (type === "string") {
+                if (this.value === undefined || this.value === null) {
                     this.value = "";
                 } else {
                     this.value = this.value.toString();
                 }
-                if (typeof this.value != "string") {
+                if (typeof this.value !== "string") {
                     this.value = "";
                 }
-            } else if (type == "number") {
-                if (typeof this.value == "boolean") {
+            } else if (type === "number") {
+                if (typeof this.value === "boolean") {
                     this.value = this.value ? 1 : 0;
                 } else {
                     try {
                         this.value = JSON.parse(this.value);
-                    } catch (e) {}
+                    } catch (e) {
+                        // Do nothing
+                    }
                 }
-                if (typeof this.value != "number") {
+                if (typeof this.value !== "number") {
                     this.value = 0;
                 }
-            } else if (type == "boolean") {
+            } else if (type === "boolean") {
                 this.value = !!this.value;
-            } else if (type == "null") {
+            } else if (type === "null") {
                 this.value = null;
             }
         }
