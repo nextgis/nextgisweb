@@ -6,49 +6,18 @@ msgstr "Загруженный файл слишком большой"
 msgid "Upload is not completed"
 msgstr "Загрузка не завершена"
 
-#: view.py:9
-msgid "File Upload testing page"
-msgstr "Страница тестирования загрузки файлов"
-
-#: amd/ngw-file-upload/Uploader.js:55
-msgid "Select"
-msgstr "Выбрать"
-
-#: amd/ngw-file-upload/Uploader.js:85 nodepkg/file-uploader/FileUploader.tsx:20
-msgid "max"
-msgstr "максимум"
-
-#: amd/ngw-file-upload/Uploader.js:113
-msgid "Uploading..."
-msgstr "Идёт загрузка..."
-
-#: amd/ngw-file-upload/Uploader.js:121
-#: nodepkg/file-uploader/hook/useFileUploader.ts:16
-msgid " uploaded..."
-msgstr " загружено..."
-
-#: amd/ngw-file-upload/Uploader.js:149
-msgid "Could not load file!"
-msgstr "Не удалось загрузить файл!"
-
-#: amd/ngw-file-upload/template/Uploader.hbs:9
 #: nodepkg/file-uploader/FileUploader.tsx:18
 #: nodepkg/image-uploader/ImageUploader.tsx:17
 msgid "Select a file"
 msgstr "Выберите файл"
 
-#: amd/ngw-file-upload/template/Uploader.hbs:10
-msgid "Overwrite?"
-msgstr "Заменить?"
-
-#: amd/ngw-file-upload/template/Uploader.hbs:11
-msgid "Try again"
-msgstr "Попробовать еще раз"
-
-#: amd/ngw-file-upload/template/Uploader.hbs:13
 #: nodepkg/file-uploader/FileUploader.tsx:19
 msgid "or drag and drop here"
 msgstr "или перетащите в эту область"
+
+#: nodepkg/file-uploader/FileUploader.tsx:20
+msgid "max"
+msgstr "максимум"
 
 #: nodepkg/file-uploader/FileUploader.tsx:21
 msgid "Stop"
@@ -57,8 +26,4 @@ msgstr "Стоп"
 #: nodepkg/file-uploader/FileUploaderButton.tsx:9
 msgid "Upload"
 msgstr "Загрузить"
-
-#: nodepkg/image-uploader/ImageUploader.tsx:18
-msgid "Delete"
-msgstr "Удалить"
 
