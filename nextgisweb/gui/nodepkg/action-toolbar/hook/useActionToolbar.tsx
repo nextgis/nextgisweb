@@ -5,9 +5,9 @@ import { Button } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
 import {
-    UseActionToolbarProps,
     ButtonProps,
     CreateButtonActionOptions,
+    UseActionToolbarProps,
 } from "../type";
 
 export function useActionToolbar({ size, props }: UseActionToolbarProps) {
@@ -26,9 +26,11 @@ export function useActionToolbar({ size, props }: UseActionToolbarProps) {
                 };
                 btnAction.onClick = onClick;
             }
-            if (typeof disabled === "function") {
-                btnAction.disabled = disabled(props);
+            if (disabled) {
+                btnAction.disabled =
+                    typeof disabled === "function" ? disabled(props) : disabled;
             }
+
             if (typeof icon === "string") {
                 btnAction.icon = <SvgIcon icon={icon} fill="currentColor" />;
             }
