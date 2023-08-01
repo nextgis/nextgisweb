@@ -19,7 +19,6 @@ msgid "Only RGB and RGBA rasters are supported."
 msgstr "Поддерживаются только RGB и RGBA растры."
 
 #: model.py:135
-#, python-format
 msgid ""
 "Raster has format '%(format)s', however only following formats are supported:"
 " %(all_formats)s."
@@ -35,19 +34,15 @@ msgstr "Растровые файлы без информации о проек�
 msgid "Complex data types are not supported."
 msgstr "Комплексные типы данных не поддерживаются."
 
-#: amd/ngw-raster-mosaic/ItemWidget.js:51
-msgid "File name"
-msgstr "Имя файла"
+#: nodepkg/resource-widget/Store.js:55
+msgid "File '{}' has an invalid extension."
+msgstr "У файла '{}' неправильное расширение."
 
-#: amd/ngw-raster-mosaic/ItemWidget.js:62
-msgid "Items"
-msgstr "Растры"
-
-#: amd/ngw-raster-mosaic/ItemWidget.js:91
+#: nodepkg/resource-widget/Widget.js:34
 msgid "Upload"
 msgstr "Загрузить"
 
-#: amd/ngw-raster-mosaic/ItemWidget.js:111
-msgid "Delete"
-msgstr "Удалить"
+#: nodepkg/resource-widget/Widget.js:53
+msgid "Rasters"
+msgstr "Растры"
 

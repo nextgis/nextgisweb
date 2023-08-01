@@ -6,4 +6,4 @@ from .model import RasterMosaic
 class ItemWidget(Widget):
     resource = RasterMosaic
     operation = ('create', 'update')
-    amdmod = 'ngw-raster-mosaic/ItemWidget'
+    amdmod = '@nextgisweb/raster-mosaic/resource-widget'
