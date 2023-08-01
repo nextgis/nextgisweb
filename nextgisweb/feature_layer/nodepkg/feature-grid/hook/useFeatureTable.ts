@@ -1,18 +1,31 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import debounce from "lodash/debounce";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
+import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import { fetchFeatures } from "../api/fetchFeatures";
 import { createCacheKey } from "../util/createCacheKey";
 
-import type { FeatureData } from "../type";
+import type { MutableRefObject } from "react";
+import type { FeatureData, FeatureLayerFieldCol, OrderBy } from "../type";
 
 const debouncedFn = debounce((fn) => {
     fn();
 }, 200);
+
+interface UseFeatureTableProps {
+    total?: number;
+    query?: string;
+    columns?: FeatureLayerFieldCol[];
+    orderBy?: OrderBy;
+    pageSize?: number;
+    tbodyRef?: MutableRefObject<HTMLElement>;
+    resourceId?: number;
+    rowMinHeight?: number;
+    visibleFields?: number[];
+}
 
 /**
  * This table component works in two modes:
@@ -80,7 +93,7 @@ export function useFeatureTable({
     resourceId,
     rowMinHeight,
     visibleFields,
-}) {
+}: UseFeatureTableProps) {
     const [pages, setPages] = useState([]);
     const [hasNextPage, setHasNextPage] = useState(false);
     const [queryTotal, setQueryTotal] = useState(0);
@@ -103,7 +116,7 @@ export function useFeatureTable({
         });
     };
 
-    const queryMode = useMemo(() => !!query, [query]);
+    const queryMode = useMemo<boolean>(() => !!query, [query]);
 
     const handleFeatures = useCallback(
         (features: FeatureData[]) => {

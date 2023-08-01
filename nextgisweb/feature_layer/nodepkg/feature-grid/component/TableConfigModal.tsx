@@ -2,19 +2,30 @@ import PropTypes from "prop-types";
 
 import { Modal, Checkbox } from "@nextgisweb/gui/antd";
 
+import type { Dispatch, SetStateAction } from "react";
+import type { FeatureLayerField } from "../../type/FeatureLayer";
+
+interface TableConfigModal {
+    isOpen?: boolean;
+    fields: FeatureLayerField[];
+    visibleFields: number[];
+    setVisibleFields: Dispatch<SetStateAction<number[]>>;
+    setIsOpen: Dispatch<SetStateAction<boolean>>;
+}
+
 export default function TableConfigModal({
     isOpen,
     fields,
     visibleFields,
     setVisibleFields,
     setIsOpen,
-}) {
+}: TableConfigModal) {
     const close = () => {
         setIsOpen(false);
     };
 
     return (
-        <Modal open={isOpen} nOk={close} onCancel={close} footer={null}>
+        <Modal open={isOpen} onOk={close} onCancel={close} footer={null}>
             {fields.map((f) => {
                 const checked = visibleFields.includes(f.id);
                 return (

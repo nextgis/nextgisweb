@@ -1,5 +1,5 @@
 interface CreateCacheKeyOptions {
-    visibleFields: string[];
+    visibleFields: number[];
     pageSize: number;
     orderBy: string[];
     query: string;

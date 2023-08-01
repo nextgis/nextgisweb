@@ -1,8 +1,12 @@
-import { PropTypes } from "prop-types";
-
 import StraightIcon from "@material-icons/svg/straight";
 
-export default function SortIcon({ dir }) {
+import type { ColOrder } from "../type";
+
+interface SortIconParams {
+    dir: ColOrder;
+}
+
+export default function SortIcon({ dir }: SortIconParams) {
     if (dir === "desc") {
         return (
             <span className="desc">
@@ -19,7 +23,3 @@ export default function SortIcon({ dir }) {
         return <></>;
     }
 }
-
-SortIcon.propTypes = {
-    dir: PropTypes.string,
-};

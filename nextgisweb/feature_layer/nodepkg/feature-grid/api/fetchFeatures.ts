@@ -16,7 +16,7 @@ interface FeatureLayerQuery {
 
 interface FetchFeaturesOptions {
     resourceId: number;
-    orderBy?: string;
+    orderBy?: string[];
     signal?: AbortSignal;
     fields?: string[];
     offset?: number;
