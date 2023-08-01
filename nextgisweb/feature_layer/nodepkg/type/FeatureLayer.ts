@@ -21,3 +21,7 @@ export interface FeatureLayerField {
 export interface FeatureLayer {
     fields: FeatureLayerField[];
 }
+
+export interface FeatureLayerCount {
+    total_count: number;
+}
