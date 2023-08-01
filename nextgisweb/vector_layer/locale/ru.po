@@ -6,63 +6,63 @@ msgstr "Библиотеке GDAL не удалось открыть файл."
 msgid "Vector layer features"
 msgstr "Объекты векторного слоя"
 
-#: model.py:48 nodepkg/resource-widget/Widget.js:35
-#: nodepkg/resource-widget/Widget.js:150
+#: model.py:48 nodepkg/resource-widget/Widget.js:36
+#: nodepkg/resource-widget/Widget.js:151
 msgid "Point"
 msgstr "Точка"
 
-#: model.py:48 nodepkg/resource-widget/Widget.js:36
-#: nodepkg/resource-widget/Widget.js:151
+#: model.py:48 nodepkg/resource-widget/Widget.js:37
+#: nodepkg/resource-widget/Widget.js:152
 msgid "Line"
 msgstr "Линия"
 
-#: model.py:48 nodepkg/resource-widget/Widget.js:37
-#: nodepkg/resource-widget/Widget.js:152
+#: model.py:48 nodepkg/resource-widget/Widget.js:38
+#: nodepkg/resource-widget/Widget.js:153
 msgid "Polygon"
 msgstr "Полигон"
 
-#: model.py:49 nodepkg/resource-widget/Widget.js:153
+#: model.py:49 nodepkg/resource-widget/Widget.js:154
 msgid "Multipoint"
 msgstr "Мультиточка"
 
-#: model.py:49 nodepkg/resource-widget/Widget.js:154
+#: model.py:49 nodepkg/resource-widget/Widget.js:155
 msgid "Multiline"
 msgstr "Мультилиния"
 
-#: model.py:49 nodepkg/resource-widget/Widget.js:155
+#: model.py:49 nodepkg/resource-widget/Widget.js:156
 msgid "Multipolygon"
 msgstr "Мультиполигон"
 
-#: model.py:50 nodepkg/resource-widget/Widget.js:156
+#: model.py:50 nodepkg/resource-widget/Widget.js:157
 msgid "Point Z"
 msgstr "Точка Z"
 
-#: model.py:50 nodepkg/resource-widget/Widget.js:157
+#: model.py:50 nodepkg/resource-widget/Widget.js:158
 msgid "Line Z"
 msgstr "Линия Z"
 
-#: model.py:50 nodepkg/resource-widget/Widget.js:158
+#: model.py:50 nodepkg/resource-widget/Widget.js:159
 msgid "Polygon Z"
 msgstr "Полигон Z"
 
-#: model.py:51 nodepkg/resource-widget/Widget.js:159
+#: model.py:51 nodepkg/resource-widget/Widget.js:160
 msgid "Multipoint Z"
 msgstr "Мультиточка Z"
 
-#: model.py:51 nodepkg/resource-widget/Widget.js:160
+#: model.py:51 nodepkg/resource-widget/Widget.js:161
 msgid "Multiline Z"
 msgstr "Мультилиния Z"
 
-#: model.py:51 nodepkg/resource-widget/Widget.js:161
+#: model.py:51 nodepkg/resource-widget/Widget.js:162
 msgid "Multipolygon Z"
 msgstr "Мультиполигон Z"
 
-#: model.py:99 nodepkg/resource-widget/Widget.js:253
+#: model.py:99 nodepkg/resource-widget/Widget.js:251
 msgid "Vector layer"
 msgstr "Векторный слой"
 
-#: model.py:167 nodepkg/resource-widget/Widget.js:81
-#: nodepkg/resource-widget/Widget.js:215
+#: model.py:167 nodepkg/resource-widget/Widget.js:82
+#: nodepkg/resource-widget/Widget.js:222
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
@@ -114,19 +114,19 @@ msgstr "Неизвестное значение параметра 'cast_has_z'.
 msgid "Unsupported geometry type."
 msgstr "Тип геометрии не поддерживается."
 
-#: nodepkg/resource-widget/Store.js:104
+#: nodepkg/resource-widget/Store.js:108
 msgid "Confirm deletion of existing features"
 msgstr "Подтвердить удаление существующих объектов"
 
-#: nodepkg/resource-widget/Store.js:111
+#: nodepkg/resource-widget/Store.js:115
 msgid "Confirm change of geometry type"
 msgstr "Подтвердить изменение типа геометрии"
 
-#: nodepkg/resource-widget/Widget.js:14
+#: nodepkg/resource-widget/Widget.js:15
 msgid "Select a dataset"
 msgstr "Выберите набор данных"
 
-#: nodepkg/resource-widget/Widget.js:15
+#: nodepkg/resource-widget/Widget.js:16
 msgid ""
 "ESRI Shapefile (zip), GeoPackage, GeoJSON, GML, KML, CSV or XLSX formats are "
 "supported. For CSV and XLSX only points are supported, coordinates must be "
@@ -136,48 +136,48 @@ msgstr ""
 "GeoJSON, GML, KML, CSV или XLSX. Для CSV и XLSX поддерживаются только точки, "
 "координаты должны быть в колонках lat и lon."
 
-#: nodepkg/resource-widget/Widget.js:26
-msgid "Whatever possible"
-msgstr "С возможными потерями"
-
 #: nodepkg/resource-widget/Widget.js:27
+msgid "Whenever possible"
+msgstr "Если возможно"
+
+#: nodepkg/resource-widget/Widget.js:28
 msgid "Without losing data"
 msgstr "Без потери данных"
 
-#: nodepkg/resource-widget/Widget.js:28
+#: nodepkg/resource-widget/Widget.js:29
 msgid "None"
 msgstr "Нет"
 
-#: nodepkg/resource-widget/Widget.js:34 nodepkg/resource-widget/Widget.js:43
-#: nodepkg/resource-widget/Widget.js:51
+#: nodepkg/resource-widget/Widget.js:35 nodepkg/resource-widget/Widget.js:44
+#: nodepkg/resource-widget/Widget.js:52
 msgid "Auto"
 msgstr "Авто"
 
-#: nodepkg/resource-widget/Widget.js:44
+#: nodepkg/resource-widget/Widget.js:45
 msgid "Yes"
 msgstr "Да"
 
-#: nodepkg/resource-widget/Widget.js:45
+#: nodepkg/resource-widget/Widget.js:46
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/resource-widget/Widget.js:52
+#: nodepkg/resource-widget/Widget.js:53
 msgid "Sequence"
 msgstr "Нумерация"
 
-#: nodepkg/resource-widget/Widget.js:53
+#: nodepkg/resource-widget/Widget.js:54
 msgid "Field"
 msgstr "Из поля"
 
-#: nodepkg/resource-widget/Widget.js:73
+#: nodepkg/resource-widget/Widget.js:74
 msgid "Fix errors"
 msgstr "Исправлять ошибки"
 
-#: nodepkg/resource-widget/Widget.js:77
+#: nodepkg/resource-widget/Widget.js:78
 msgid "Skip features with unfixable errors"
 msgstr "Пропускать объекты с неустранимыми ошибками"
 
-#: nodepkg/resource-widget/Widget.js:88
+#: nodepkg/resource-widget/Widget.js:90
 msgid "Only load features of the selected geometry type"
 msgstr "Загружать объекты только с выбранным типом геометрии"
 
@@ -193,39 +193,39 @@ msgstr "Координата Z"
 msgid "FID source"
 msgstr "Источник FID"
 
-#: nodepkg/resource-widget/Widget.js:124
+#: nodepkg/resource-widget/Widget.js:125
 msgid "Load features from file"
 msgstr "Загрузить объекты из файла"
 
-#: nodepkg/resource-widget/Widget.js:125
+#: nodepkg/resource-widget/Widget.js:126
 msgid "Create empty layer"
 msgstr "Создать пустой слой"
 
-#: nodepkg/resource-widget/Widget.js:127
+#: nodepkg/resource-widget/Widget.js:128
 msgid "Keep existing layer features"
 msgstr "Оставить существующие объекты"
 
-#: nodepkg/resource-widget/Widget.js:128
+#: nodepkg/resource-widget/Widget.js:129
 msgid "Change geometry type"
 msgstr "Изменить тип геометрии"
 
-#: nodepkg/resource-widget/Widget.js:129
+#: nodepkg/resource-widget/Widget.js:130
 msgid "Replace layer features from file"
 msgstr "Заменить объекты слоя из файла"
 
-#: nodepkg/resource-widget/Widget.js:130
+#: nodepkg/resource-widget/Widget.js:131
 msgid "Delete all features from layer"
 msgstr "Удалить все объекты из слоя"
 
-#: nodepkg/resource-widget/Widget.js:146
+#: nodepkg/resource-widget/Widget.js:147
 msgid "current"
 msgstr "текущий"
 
-#: nodepkg/resource-widget/Widget.js:203
+#: nodepkg/resource-widget/Widget.js:210
 msgid "Source layer"
 msgstr "Исходный слой"
 
-#: nodepkg/resource-widget/Widget.js:244
+#: nodepkg/resource-widget/Widget.js:242
 msgid "Advanced options"
 msgstr "Дополнительные параметры"
 
@@ -320,3 +320,4 @@ msgstr "Объект #%d содержит поврежденную кодиро�
 #: table_info.py:772
 msgid "Vector layer cannot be written due to errors."
 msgstr "Векторный слой не может быть записан из-за ошибок."
+

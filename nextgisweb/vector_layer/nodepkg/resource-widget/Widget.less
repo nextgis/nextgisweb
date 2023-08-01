@@ -15,7 +15,8 @@
     }
 
     & > span,
-    & > .mode {
+    & > .mode,
+    & > .ant-collapse {
         grid-column: 1 / span 2;
     }
 
@@ -27,20 +28,39 @@
         }
     }
 
-    & > .group {
-        display: flex;
-        gap: 0.5em 1em;
-        flex-wrap: wrap;
+    & > .ant-collapse > .ant-collapse-item > {
+        & > .ant-collapse-content > .ant-collapse-content-box {
+            padding: 1em;
 
-        & > .ant-checkbox-wrapper {
-            align-self: center;
-        }
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1em;
 
-        & > .ant-select,
-        & > .ant-input {
-            display: block;
-            flex-grow: 1;
-            width: auto;
+            & > label {
+                align-self: flex-start;
+                line-height: 32px;
+
+                &::after {
+                    content: ":";
+                }
+            }
+
+            & > .group {
+                display: flex;
+                gap: 0.5em 1em;
+                flex-wrap: wrap;
+
+                & > .ant-checkbox-wrapper {
+                    align-self: center;
+                }
+
+                & > .ant-select,
+                & > .ant-input {
+                    display: block;
+                    flex-grow: 1;
+                    width: auto;
+                }
+            }
         }
     }
 }

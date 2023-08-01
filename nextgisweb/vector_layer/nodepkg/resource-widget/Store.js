@@ -51,10 +51,14 @@ export class Store {
             result.srs = srsSettings.default;
 
             const so = toJS(this.sourceOptions);
-            const none = (k) => (so[k] = so[k] === "NONE" ? null : so[k]);
-            none("cast_geometry_type");
-            none("cast_is_multi");
-            none("cast_has_z");
+            const onull = (k) => (so[k] = so[k] === "NONE" ? null : so[k]);
+            const ayn = (k) => {
+                const vmap = { "NONE": null, "YES": true, "NO": false };
+                so[k] = vmap[so[k]];
+            };
+            onull("cast_geometry_type");
+            ayn("cast_is_multi");
+            ayn("cast_has_z");
             Object.assign(result, so);
         } else if (this.mode === "empty") {
             result.fields = [];

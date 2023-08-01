@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
-import { Checkbox, Input, Radio, Select } from "@nextgisweb/gui/antd";
+import { Checkbox, Input, Radio, Select, Collapse } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -24,7 +24,7 @@ const SourceOptions = observer(({ store }) => {
     const so = store.sourceOptions;
     const optsFixErrors = useMemo(() => {
         return [
-            { value: "LOSSY", label: gettext("Whatever possible") },
+            { value: "LOSSY", label: gettext("Whenever possible") },
             { value: "SAFE", label: gettext("Without losing data") },
             { value: "NONE", label: gettext("None") },
         ];
@@ -115,7 +115,6 @@ const SourceOptions = observer(({ store }) => {
 
 export const Widget = observer(({ store }) => {
     const [layerOpts, setLayerOpts] = useState();
-    const [sourceOptions, setSourceOptions] = useState(false);
 
     const { operation, mode, update, source, geometryTypeInitial } = store;
 
@@ -239,20 +238,11 @@ export const Widget = observer(({ store }) => {
                 </Checkbox>
             )}
             {mode === "file" && (
-                <>
-                    {sourceOptions ? (
+                <Collapse size="small">
+                    <Collapse.Panel header={gettext("Advanced options")}>
                         <SourceOptions {...{ store }} />
-                    ) : (
-                        <Checkbox
-                            checked={sourceOptions}
-                            onChange={({ target: { checked } }) => {
-                                setSourceOptions(checked);
-                            }}
-                        >
-                            {gettext("Advanced options")}
-                        </Checkbox>
-                    )}
-                </>
+                    </Collapse.Panel>
+                </Collapse>
             )}
         </div>
     );
