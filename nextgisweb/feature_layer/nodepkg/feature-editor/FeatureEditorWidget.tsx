@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 
 import { Tabs, Badge, Space, Button } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!";
+import settings from "@nextgisweb/pyramid/settings!feature_layer";
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import { SaveButton } from "@nextgisweb/gui/component/SaveButton";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";

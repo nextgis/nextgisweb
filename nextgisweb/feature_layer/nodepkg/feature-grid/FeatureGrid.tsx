@@ -20,7 +20,7 @@ import OpenIcon from "@material-icons/svg/open_in_new";
 import TuneIcon from "@material-icons/svg/tune";
 
 import type { SizeType } from "@nextgisweb/gui/antd";
-import type { ResourceItem } from "@nextgisweb/resource/type";
+import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 
 import type { FeatureLayerCount } from "../type/FeatureLayer";

@@ -13,34 +13,29 @@ declare const ngwConfig: {
     plurals: [number, { (n: number): number }];
 };
 
-interface Exportformat {
-    name: string;
-    display_name: string;
-    single_file: boolean;
-    lco_configurable?: boolean | null;
-    dsco_configurable?: boolean | null;
-}
-
-interface Editorwidget {
-    description: string;
-    attachment: string;
-}
-
-interface EditorWidgetSettings {
-    editor_widget: Editorwidget;
-    extensions: Editorwidget;
-    export_formats: Exportformat[];
-    datatypes: string[];
-}
-
-declare module "@nextgisweb/pyramid/settings!" {
-    const value: EditorWidgetSettings;
-    export = value;
-}
 declare module "@nextgisweb/pyramid/settings!pyramid" {
-    const value: {
-        language_contribute_url: string;
-        languages: { value: string; display_name: string }[];
-    };
+    interface Language {
+        display_name: string;
+        value: string;
+    }
+
+    interface Companylogo {
+        enabled: boolean;
+        ckey: string;
+        link?: string;
+    }
+
+    interface PyramidSettings {
+        _esModule: boolean;
+        support_url?: string;
+        help_page_url?: string;
+        company_logo: Companylogo;
+        languages: Language[];
+        language_contribute_url?: string;
+        storage_enabled: boolean;
+        storage_limit?: number;
+        lunkwill_enabled: boolean;
+    }
+    const value: PyramidSettings;
     export = value;
 }

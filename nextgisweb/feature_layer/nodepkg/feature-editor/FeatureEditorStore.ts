@@ -7,7 +7,7 @@ import { message } from "@nextgisweb/gui/antd";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ResourceItem } from "@nextgisweb/resource/type";
+import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 import type {
     FeatureLayerField,
     FeatureItemExtensions,
