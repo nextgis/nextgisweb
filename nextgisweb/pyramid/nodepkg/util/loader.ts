@@ -1,17 +1,24 @@
-export class LoaderCache {
+interface PromiseDef<T = unknown> {
+    fulfilled: boolean;
+    loader: Promise<T>;
+}
+
+export class LoaderCache<T = unknown> {
+    promises: Record<string, PromiseDef<T>> = {};
+
     constructor() {
         this.promises = {};
     }
 
-    fulfilled(key) {
+    fulfilled(key: string): boolean {
         return this.promises[key]?.fulfilled;
     }
 
-    resolve(key) {
+    resolve(key: string): Promise<T> {
         return this.promises[key]?.loader;
     }
 
-    promiseFor(key, loader) {
+    promiseFor(key: string, loader: () => Promise<T>) {
         let promise = this.promises[key];
         if (promise === undefined) {
             promise = {
@@ -34,7 +41,7 @@ export class LoaderCache {
         return promise.loader;
     }
 
-    clean(key = null) {
+    clean(key: string | null = null) {
         if (key) {
             delete this.promises[key];
         } else {
@@ -43,7 +50,10 @@ export class LoaderCache {
     }
 }
 
-export function callingComponent(arg, toAbsMid) {
+export function callingComponent(
+    arg: string,
+    toAbsMid: (val: string) => string
+) {
     const abs = toAbsMid(".");
     const parts = abs.split("/");
     const component = (
