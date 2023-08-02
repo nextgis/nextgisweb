@@ -7,6 +7,8 @@ Changes
 - Differentiate webmap intial and contstraining extents.
 - New OGC API Feature service with read and write support.
 - Check effective permissions of other users for a resource.
+- Legends for webmaps enabled by default.
+- Lots of improvements in feature editing widgets.
 
 
 4.4.0
