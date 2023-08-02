@@ -1,4 +1,4 @@
-import type { LunkwillParam } from "@nextgisweb/pyramid/api/request";
+import type { LunkwillParam } from "@nextgisweb/pyramid/api";
 
 export type Operations = "create" | "update" | "delete";
 

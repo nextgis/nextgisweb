@@ -1,7 +1,9 @@
 /** @testentry react */
 import { PrincipalSelect } from "./PrincipalSelect";
 
-const presets = [
+import type { PrincipalSelectProps } from "./type";
+
+const presets: [string, PrincipalSelectProps][] = [
     ["Groups and users (default)", {}],
     ["All users and groups", { systemUsers: true }],
     ["Multiple groups and users", { multiple: true }],

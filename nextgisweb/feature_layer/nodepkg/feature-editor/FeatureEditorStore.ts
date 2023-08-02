@@ -84,14 +84,17 @@ export class FeatureEditorStore {
             runInAction(() => {
                 this.initLoading = true;
             });
-            const resp = await route("resource.item", this.resourceId).get({
+            const resp = await route(
+                "resource.item",
+                this.resourceId
+            ).get<ResourceItem>({
                 signal,
             });
             runInAction(() => {
                 this._resourceItem = resp;
             });
             if (this.featureId !== undefined) {
-                const featureItem = await this.route.get({
+                const featureItem = await this.route.get<FeatureItem>({
                     signal,
                     query: { dt_format: "iso" },
                 });

@@ -10,6 +10,7 @@ import SystemUserIcon from "@material-icons/svg/attribution";
 import GroupIcon from "@material-icons/svg/groups";
 
 import type { PrincipalSelectProps, Member, SelectProps } from "./type";
+import type { Group, User } from "../../type";
 
 type TagProps = Parameters<SelectProps["tagRender"]>[0];
 
@@ -103,7 +104,7 @@ export function PrincipalSelect({
             if (loadUsers) {
                 promises.push(
                     route("auth.user.collection")
-                        .get({
+                        .get<User[]>({
                             query: { brief: true },
                             signal: makeSignal(),
                             cache: true,
@@ -127,11 +128,15 @@ export function PrincipalSelect({
             }
             if (loadGroups) {
                 promises.push(
-                    route("auth.group.collection").get({
-                        query: { brief: true },
-                        signal: makeSignal(),
-                        cache: true,
-                    })
+                    route("auth.group.collection")
+                        .get<Group[]>({
+                            query: { brief: true },
+                            signal: makeSignal(),
+                            cache: true,
+                        })
+                        .then((data) =>
+                            data.map((data) => ({ ...data, _user: false }))
+                        )
                 );
             }
             return Promise.all(promises).then((members_) =>

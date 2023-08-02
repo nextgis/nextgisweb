@@ -1,13 +1,23 @@
 import set from "lodash-es/set";
 
-import { request } from "./request";
 import routeData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/route";
 
-export function routeURL(name, ...rest) {
+import { request } from "./request";
+
+// ReExport for backward compatibility
+export * from "./LunkwillParam";
+
+import type { RequestMethod, RouteResults } from "./type";
+
+type UrlParamValue = string | number;
+type RouteUrlOpt = Record<string, UrlParamValue>;
+type RouteUrlOptOrArgs = (UrlParamValue | RouteUrlOpt)[];
+
+export function routeURL(name: string, ...rest: RouteUrlOptOrArgs): string {
     const [template, ...params] = routeData[name];
     const first = rest[0];
 
-    let sub;
+    let sub: UrlParamValue[];
     if (first === undefined) {
         sub = [];
     } else if (typeof first === "object" && first !== null) {
@@ -19,7 +29,7 @@ export function routeURL(name, ...rest) {
             sub[params.indexOf(p)] = v;
         }
     } else {
-        sub = rest;
+        sub = rest as UrlParamValue[];
     }
 
     return template.replace(/\{(\w+)\}/g, function (m, a) {
@@ -29,18 +39,22 @@ export function routeURL(name, ...rest) {
             const msg = `Undefined parameter ${idx} in "${template}".`;
             throw new Error(msg);
         }
-        return value;
+        return String(value);
     });
 }
 
-export function route(name, ...rest) {
+export function route(name: string, options: RouteUrlOpt): RouteResults;
+export function route(name: string, ...rest: UrlParamValue[]): RouteResults;
+
+export function route(name: string, ...rest: RouteUrlOptOrArgs): RouteResults {
     const template = routeURL(name, ...rest);
-    const result = {};
-    for (const method of ["get", "post", "put", "delete"]) {
+    const result = {} as RouteResults;
+    const methods: RequestMethod[] = ["get", "post", "put", "delete"];
+    for (const method of methods) {
         result[method] = (options) =>
             request(template, {
                 ...options,
-                method: method.toUpperCase(),
+                method: method.toUpperCase() as Uppercase<RequestMethod>,
             });
     }
     return result;
@@ -51,7 +65,7 @@ export const compatRoute = {};
 // Because both keys "feature_layer.store"
 // exist functions should be created in alphabetical order.
 for (const key of Object.keys(routeData).sort()) {
-    const fn = (...args) => {
+    const fn = (...args: RouteUrlOptOrArgs) => {
         if (ngwConfig.debug) {
             const msg =
                 `Module "ngw-pyramid/route" has been deprecated! Use ` +

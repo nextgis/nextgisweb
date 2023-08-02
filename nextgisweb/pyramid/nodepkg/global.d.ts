@@ -39,3 +39,8 @@ declare module "@nextgisweb/pyramid/settings!pyramid" {
     const value: PyramidSettings;
     export = value;
 }
+
+declare module "@nextgisweb/pyramid/api/load!/api/component/pyramid/route" {
+    const value: Record<string, string[]>;
+    export = value;
+}

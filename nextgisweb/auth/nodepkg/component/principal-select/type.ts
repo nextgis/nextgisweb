@@ -6,12 +6,12 @@ export type Model = "principal" | "user" | "group";
 
 export interface PrincipalSelectProps<V extends number = number>
     extends SelectProps {
-    editOnClick: boolean;
-    systemUsers: boolean | string[];
-    multiple: boolean;
-    onChange: (val: V) => void;
-    model: "principal" | "user" | "group";
-    value: V;
+    editOnClick?: boolean;
+    systemUsers?: boolean | string[];
+    multiple?: boolean;
+    onChange?: (val: V) => void;
+    model?: "principal" | "user" | "group";
+    value?: V;
 }
 
 interface Ures_ extends User {

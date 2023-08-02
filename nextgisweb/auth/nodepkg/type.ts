@@ -8,12 +8,11 @@ export interface User {
     last_activity?: string;
     oauth_subject?: string;
     is_administrator: boolean;
-  }
-
+}
 
 export interface Group {
-  id: number;
-  system: boolean;
-  display_name: string;
-  keyname: string;
+    id: number;
+    system: boolean;
+    display_name: string;
+    keyname: string;
 }

@@ -52,7 +52,10 @@ export const ResourceSelect = ({
         if (typeof value_ === "number") {
             try {
                 setResourceLoading(true);
-                const res = await route("resource.item", value_).get({
+                const res = await route(
+                    "resource.item",
+                    value_
+                ).get<ResourceItem>({
                     cache: true,
                     signal: makeSignal(),
                 });

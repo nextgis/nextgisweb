@@ -8,10 +8,11 @@ import {
     NetworksResponseError,
     ServerResponseError,
 } from "./error";
-
 import { cache } from "./cache";
 
-function lunkwillCheckResponse(lwResp) {
+import type { LunkwillData, RequestOptions } from "./type";
+
+function lunkwillCheckResponse(lwResp: Response) {
     const ct = lwResp.headers.get("content-type");
     return (
         ct !== undefined &&
@@ -27,8 +28,8 @@ async function responseJson(response) {
     }
 }
 
-async function lunkwillResponseUrl(lwResp) {
-    let lwData = await responseJson(lwResp);
+async function lunkwillResponseUrl(lwResp: Response) {
+    const lwData = await responseJson(lwResp);
     let delay = lwData.delay_ms;
     const retry = lwData.retry_ms !== undefined ? lwData.retry_ms : 2000;
     const sum = `/api/lunkwill/${lwData.id}/summary`;
@@ -42,9 +43,10 @@ async function lunkwillResponseUrl(lwResp) {
         await sleep(failed ? retry : delay);
         failed = false;
 
-        let lwResp, lwData;
+        let lwResp: Response;
+        let lwData: LunkwillData;
         try {
-            lwResp = await window.fetch(sum, { credentials: "same-origin" });
+            lwResp = await fetch(sum, { credentials: "same-origin" });
             lwData = await lwResp.json();
         } catch (e) {
             failed = true;
@@ -82,8 +84,8 @@ async function lunkwillFetch(lwRespUrl) {
     }
 }
 
-export async function request(path, options) {
-    const defaults = {
+export async function request(path: string, options: RequestOptions) {
+    const defaults: RequestOptions = {
         method: "GET",
         credentials: "same-origin",
         headers: {},
@@ -92,7 +94,11 @@ export async function request(path, options) {
 
     let urlParams = "";
     if (opt.query !== undefined) {
-        urlParams = "?" + new URLSearchParams(opt.query).toString();
+        const queryEntries = Object.entries(opt.query).map(([key, value]) => [
+            key,
+            String(value),
+        ]);
+        urlParams = "?" + new URLSearchParams(queryEntries).toString();
         delete opt.query;
     }
 
@@ -112,7 +118,7 @@ export async function request(path, options) {
         delete opt.json;
     }
 
-    let url;
+    let url: string;
     if (opt.global) {
         url = path + urlParams;
     } else {
@@ -124,9 +130,9 @@ export async function request(path, options) {
     }
 
     const makeRequest = async () => {
-        let response;
+        let response: Response;
         try {
-            response = await window.fetch(url, opt);
+            response = await fetch(url, opt);
         } catch (e) {
             if (e.name === "AbortError") {
                 throw e;
@@ -172,40 +178,4 @@ export async function request(path, options) {
         return cacheToUse.promiseFor(url, makeRequest);
     }
     return makeRequest();
-}
-
-export class LunkwillParam {
-    static VALUES = [null, "suggest", "require"];
-
-    constructor() {
-        this.value = LunkwillParam.VALUES[0];
-    }
-
-    update(value, cond = true) {
-        if (!cond) {
-            return;
-        }
-
-        const index = LunkwillParam.VALUES.indexOf(value);
-        if (index < 0) {
-            throw `Invalid lunkwill option value: ${value}`;
-        }
-
-        if (index > LunkwillParam.VALUES.indexOf(this.value)) {
-            this.value = value;
-        }
-    }
-
-    suggest(cond = true) {
-        this.update("suggest", cond);
-    }
-    require(cond = true) {
-        this.update("require", cond);
-    }
-
-    toHeaders(headers) {
-        if (this.value !== null) {
-            headers["X-Lunkwill"] = this.value;
-        }
-    }
 }

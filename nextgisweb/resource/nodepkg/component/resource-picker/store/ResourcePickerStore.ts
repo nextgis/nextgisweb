@@ -261,20 +261,25 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
             runInAction(() => {
                 this.resourcesLoading = true;
             });
-            const blueprint = await route("resource.blueprint").get({
+            const blueprint = await route("resource.blueprint").get<Blueprint>({
                 signal: this.setResourcesAbortController.signal,
                 cache: true,
             });
             this.blueprint = blueprint;
-            const parentItem = await route("resource.item", parent).get({
+            const parentItem = await route(
+                "resource.item",
+                parent
+            ).get<ResourceItem>({
                 signal: this.setResourcesAbortController.signal,
                 cache: true,
             });
             this.parentItem = parentItem;
-            const resp = await route("resource.collection").get({
-                query: { parent },
-                signal: this.setResourcesAbortController.signal,
-            });
+            const resp = await route("resource.collection").get<ResourceItem[]>(
+                {
+                    query: { parent: String(parent) },
+                    signal: this.setResourcesAbortController.signal,
+                }
+            );
             const resources: ResourceItem[] = [];
             for (const x of resp) {
                 const res = x.resource as Resource;
@@ -317,7 +322,9 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
                     cls: "resource_group",
                 },
             };
-            const createdItem = await route("resource.collection").post({
+            const createdItem = await route("resource.collection").post<{
+                id: number;
+            }>({
                 json: payload,
             });
 

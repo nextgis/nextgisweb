@@ -4,18 +4,18 @@ import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 
 import { useRoute } from "./useRoute";
 
-import type { GetQueryOptions } from "../api/type";
+import type { RequestOptions } from "../api/type";
 import type { UseRouteGetParams, UseRouteParams } from "./type";
 
 export function useRouteGet<D = unknown>(
     nameOrProps: UseRouteGetParams | string,
     params?: UseRouteParams,
-    options?: GetQueryOptions,
+    options?: RequestOptions,
     loadOnInit = true
 ) {
     let endpointName_ = "";
     let params_: UseRouteParams = { ...params };
-    let options_: GetQueryOptions = { ...options };
+    let options_: RequestOptions = { ...options };
     let loadOnInit_: boolean = loadOnInit;
     if (typeof nameOrProps === "string") {
         endpointName_ = nameOrProps;
@@ -38,7 +38,7 @@ export function useRouteGet<D = unknown>(
         setError(null);
         setIsLoading(true);
         try {
-            const data = await route.get(routerOptions);
+            const data = await route.get<D>(routerOptions);
             setData(data);
         } catch (er) {
             setError(er);

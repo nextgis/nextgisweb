@@ -7,19 +7,22 @@ interface LoadParentsOptions {
     cache?: boolean;
 }
 
-export async function loadParents(resourceId: number, { signal, cache = true }: LoadParentsOptions): Promise<ResourceItem[]> {
+export async function loadParents(
+    resourceId: number,
+    { signal, cache = true }: LoadParentsOptions
+): Promise<ResourceItem[]> {
     const parents: ResourceItem[] = [];
-    let parentIdOrNull: number | null | Resource['parent'] = resourceId;
+    let parentIdOrNull: number | null | Resource["parent"] = resourceId;
     while (typeof parentIdOrNull === "number") {
         const resourceItem = await route("resource.item", {
             id: parentIdOrNull,
-        }).get({
+        }).get<ResourceItem>({
             signal,
             cache,
-        }) as ResourceItem;
+        });
         parents.push(resourceItem);
         parentIdOrNull = resourceItem.resource.parent;
-        if (parentIdOrNull && typeof parentIdOrNull !== 'number') {
+        if (parentIdOrNull && typeof parentIdOrNull !== "number") {
             parentIdOrNull = parentIdOrNull.id;
         }
     }

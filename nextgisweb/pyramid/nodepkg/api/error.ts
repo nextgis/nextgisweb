@@ -2,16 +2,23 @@ import { BaseError } from "make-error";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { LunkwillData } from "./type";
+
 export class BaseAPIError extends BaseError {
-    constructor(message) {
+    readonly title: string;
+
+    constructor(message: string) {
         super(message || gettext("Something went wrong."));
         this.title = gettext("Unknown API error");
     }
 }
 
 export class NetworksResponseError extends BaseAPIError {
+    readonly title: string;
+    readonly detail: string;
+
     // prettier-ignore
-    constructor(message) {
+    constructor(message?: string) {
         super(message || gettext("There is no response from the server or problem connecting to server."));
         this.title = gettext("Network error");
         this.detail = gettext("Check network connectivity and try again later.");
@@ -19,14 +26,26 @@ export class NetworksResponseError extends BaseAPIError {
 }
 
 export class InvalidResponseError extends BaseAPIError {
-    constructor(message) {
+    readonly title: string;
+
+    constructor(message?: string) {
         super(message || gettext("Something went wrong."));
         this.title = gettext("Unexpected server response");
     }
 }
 
+interface ServerResponseErrorData {
+    message: string;
+    title?: string;
+    detail?: string;
+}
+
 export class ServerResponseError extends BaseAPIError {
-    constructor(data) {
+    readonly title: string;
+    readonly detail: string;
+    readonly data: ServerResponseErrorData;
+
+    constructor(data: ServerResponseErrorData) {
         super(data.message);
         this.title = data.title || this.title;
         this.detail = data.detail || null;
@@ -35,8 +54,11 @@ export class ServerResponseError extends BaseAPIError {
 }
 
 export class LunkwillError extends BaseError {
+    readonly title: string;
+    readonly data: LunkwillData;
+
     // prettier-ignore
-    constructor(message, data = {}) {
+    constructor(message: string, data: LunkwillData = {}) {
         super(message || gettext("Unexpected error while processing long-running request."));
         this.title = gettext("Long-running request error");
         this.data = data;
@@ -44,13 +66,13 @@ export class LunkwillError extends BaseError {
 }
 
 export class LunkwillRequestCancelled extends LunkwillError {
-    constructor(data) {
+    constructor(data: LunkwillData) {
         super(gettext("Long-running request was cancelled."), data);
     }
 }
 
 export class LunkwillRequestFailed extends LunkwillError {
-    constructor(data) {
+    constructor(data: LunkwillData) {
         super(undefined, data);
     }
 }
