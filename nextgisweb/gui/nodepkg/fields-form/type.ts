@@ -95,7 +95,8 @@ export interface FormField<W extends FormWidget = FormWidget>
 }
 
 export interface FieldsFormProps extends FormProps {
-    initialValues?: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    initialValues?: Record<string, any>;
     whenReady?: () => void;
     onChange?: (options: FormOnChangeOptions) => void;
     children?: ReactNode;
