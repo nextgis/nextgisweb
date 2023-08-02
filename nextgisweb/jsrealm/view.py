@@ -14,6 +14,7 @@ from .component import JSRealmComponent
 def read_testentries(*, comp: JSRealmComponent):
     return loadb((Path(comp.options['dist_path']) / 'main/testentry.json').read_bytes())
 
+
 @viewargs(renderer='mako')
 def testentry(request):
     testentries = read_testentries()
@@ -30,12 +31,11 @@ def testentry(request):
         custom_layout=True)
 
 
-
 def setup_pyramid(comp, config):
     dist_path = Path(comp.options['dist_path'])
     for p in filter(lambda p: p.is_dir(), dist_path.iterdir()):
         pn = p.name
-        if pn == 'external':
+        if pn in ('amd', 'external'):
             for sp in filter(lambda p: p.is_dir(), p.iterdir()):
                 config.add_static_path(sp.name, sp)
         else:

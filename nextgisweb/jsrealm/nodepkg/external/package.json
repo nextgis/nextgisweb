@@ -18,6 +18,7 @@
     },
     "nextgisweb": {
         "webpackConfigs": {
+            "amd": "webpack.amd.cjs",
             "external": "webpack.external.cjs",
             "external-ol": "webpack.external-ol.cjs"
         },

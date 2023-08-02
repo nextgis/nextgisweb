@@ -522,11 +522,6 @@ def _setup_static(comp, config):
         if asset_path.is_dir():
             config.add_static_path(f'asset/{cid}', asset_path)
 
-        for amd_package in c.resource_path().glob('amd/ngw-*'):
-            if amd_package.is_dir():
-                config.add_static_path(amd_package.name, amd_package)
-
-
 def _setup_pyramid_debugtoolbar(comp, config):
     dt_opt = comp.options.with_prefix('debugtoolbar')
     if not dt_opt.get('enabled', comp.env.core.debug):
