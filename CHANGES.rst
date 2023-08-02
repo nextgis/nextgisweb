@@ -9,6 +9,7 @@ Changes
 - Check effective permissions of other users for a resource.
 - Legends for webmaps enabled by default.
 - Lots of improvements in feature editing widgets.
+- New tileset resource for storing and serving prerendered tiles.
 
 
 4.4.0

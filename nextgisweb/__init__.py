@@ -48,6 +48,7 @@ def pkginfo():
         'tmsclient',
         'file_upload',
         'audit',
+        'tileset',
         'basemap',
     )
 
