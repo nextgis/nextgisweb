@@ -1,6 +1,8 @@
 import { lazy, Suspense } from "react";
+
 import { Button, Space, Spin } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 
 const CodeLazy = lazy(() => import("./CodeLazy"));
@@ -14,48 +16,42 @@ export function Body({ error }) {
     );
 }
 
-export function TechInfo({ state, error }) {
-    const [tinfoVisible, setTinfoVisible] = state;
+export function TechInfo({ error }) {
     return (
-        <>
-            {tinfoVisible && (
-                <Suspense
-                    fallback={
-                        <div
-                            style={{
-                                display: "flex",
-                                height: "150px",
-                                justifyContent: "center",
-                                alignContent: "center",
-                                flexDirection: "column",
-                            }}
-                        >
-                            <Spin delay={250} />
-                        </div>
-                    }
+        <Suspense
+            fallback={
+                <div
+                    style={{
+                        display: "flex",
+                        height: "150px",
+                        justifyContent: "center",
+                        alignContent: "center",
+                        flexDirection: "column",
+                    }}
                 >
-                    <CodeLazy
-                        value={JSON.stringify(error, null, 4)}
-                        lang="json"
-                        readOnly
-                        lineNumbers
-                        autoHeight
-                        minHeight="150px"
-                        maxHeight="300px"
-                    />
-                </Suspense>
-            )}
-        </>
+                    <Spin delay={250} />
+                </div>
+            }
+        >
+            <CodeLazy
+                value={JSON.stringify(error, null, 4)}
+                lang="json"
+                readOnly
+                lineNumbers
+                autoHeight
+                minHeight="150px"
+                maxHeight="300px"
+            />
+        </Suspense>
     );
 }
 
-export function Footer({ tinfoState, onOk }) {
-    const [tinfoVisible, setTinfoVisible] = tinfoState;
+export function Footer({ tinfo, setTinfo, onOk }) {
     return (
         <div style={{ display: "flex", marginTop: "1em" }}>
-            {tinfoVisible || (
-                <Button onClick={() => setTinfoVisible(true)}>
-                    {i18n.gettext("Technical information")}
+            {tinfo || (
+                <Button onClick={() => setTinfo(true)}>
+                    {gettext("Technical information")}
                 </Button>
             )}
             <Space style={{ marginLeft: "auto" }} direction="horizontal">
@@ -64,15 +60,15 @@ export function Footer({ tinfoState, onOk }) {
                     href={settings["support_url"]}
                     target="_blank"
                 >
-                    {i18n.gettext("Contact support")}
+                    {gettext("Contact support")}
                 </Button>
                 {onOk ? (
                     <Button type="primary" onClick={onOk}>
-                        {i18n.gettext("OK")}
+                        {gettext("OK")}
                     </Button>
                 ) : (
                     <Button type="primary" href={ngwConfig.applicationUrl}>
-                        {i18n.gettext("Back to home")}
+                        {gettext("Back to home")}
                     </Button>
                 )}
             </Space>

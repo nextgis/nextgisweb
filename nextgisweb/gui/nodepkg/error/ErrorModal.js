@@ -1,6 +1,7 @@
-import { Modal } from "@nextgisweb/gui/antd";
-import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
+
+import { Modal } from "@nextgisweb/gui/antd";
+
 import { Body, Footer, TechInfo } from "./shared";
 
 const DEFAULTS = {
@@ -12,7 +13,7 @@ const DEFAULTS = {
 
 export function ErrorModal({ error, visible: visibleInitial, ...props }) {
     const [visible, setVisible] = useState(visibleInitial ?? true);
-    const tinfoState = useState(false);
+    const [tinfo, setTinfo] = useState(false);
 
     const close = () => setVisible(false);
 
@@ -28,17 +29,10 @@ export function ErrorModal({ error, visible: visibleInitial, ...props }) {
             open={visible}
             destroyOnClose
             onCancel={() => setVisible(false)}
-            footer={<Footer tinfoState={tinfoState} onOk={close} />}
+            footer={<Footer onOk={close} {...{ tinfo, setTinfo }} />}
         >
             <Body error={error} />
-            <TechInfo state={tinfoState} error={error} />
+            {tinfo && <TechInfo error={error} />}
         </Modal>
     );
 }
-
-ErrorModal.propTypes = {
-    error: PropTypes.shape({
-        title: PropTypes.string,
-    }),
-    visible: PropTypes.bool,
-};
