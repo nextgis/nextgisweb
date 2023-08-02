@@ -1,10 +1,9 @@
 import { PropTypes } from "prop-types";
 import { Popover } from "@nextgisweb/gui/antd";
 import HelpOutlineIcon from "@material-icons/svg/help_outline";
-import ContentCopyIcon from "@material-icons/svg/content_copy";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { url } from "@nextgisweb/pyramid/nextgis";
 
+import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import i18n from "@nextgisweb/pyramid/i18n";
 
 import "./ExternalAccess.less";
@@ -39,11 +38,12 @@ const Link = ({ title, help, docsUrl, url }) => (
         </div>
         <div className="row-input-info">
             <div className="url-text">{url}</div>
-            <CopyToClipboard text={url}>
-                <span className="copy-icon">
-                    <ContentCopyIcon />
-                </span>
-            </CopyToClipboard>
+            <CopyToClipboardButton
+                type="link"
+                getTextToCopy={() => url}
+                messageInfo={i18n.gettext("The link copied to clipboard.")}
+                iconOnly
+            />
         </div>
     </>
 );
