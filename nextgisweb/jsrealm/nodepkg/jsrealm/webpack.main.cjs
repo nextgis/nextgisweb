@@ -4,6 +4,7 @@ const path = require("path");
 
 const { DefinePlugin } = require("webpack");
 const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
+const ESLintPlugin = require("eslint-webpack-plugin");
 const WebpackAssetsManifest = require("webpack-assets-manifest");
 const CopyPlugin = require("copy-webpack-plugin");
 
@@ -323,6 +324,9 @@ const webpackConfig = defaults("main", (env) => ({
         }),
         ...(config.jsrealm.tscheck || env.tscheck
             ? [new ForkTsCheckerPlugin()]
+            : []),
+        ...(config.jsrealm.eslint || env.eslint
+            ? [new ESLintPlugin({ quiet: true })]
             : []),
         webpackAssetsManifestPlugin,
     ],

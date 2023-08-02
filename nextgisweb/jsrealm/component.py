@@ -27,4 +27,5 @@ class JSRealmComponent(Component):
     option_annotations = (
         Option('dist_path', default='dist'),
         Option('tscheck', bool, default=None),
+        Option('eslint', bool, default=None),
     )
