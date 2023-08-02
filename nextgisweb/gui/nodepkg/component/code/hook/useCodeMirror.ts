@@ -6,9 +6,12 @@ import { EditorView } from "@codemirror/view";
 import { customSetup } from "./customSetup";
 import { themeSetup } from "./themeSetup";
 
+import { Extension } from "@codemirror/state";
+import type { CodeOptions, Editor, Lang } from "../type";
+
 const External = Annotation.define();
 
-const getLang = async (lang) => {
+const getLang = async (lang: Lang): Promise<() => Extension> => {
     const aliases = {
         js: "javascript",
         py: "python",
@@ -49,15 +52,15 @@ export function useCodeMirror({
     maxHeight,
     autoHeight,
     lineNumbers,
-}) {
-    const [editor, setEditor] = useState(null);
+}: CodeOptions) {
+    const [editor, setEditor] = useState<Editor>(null);
 
-    const destroy = useRef();
+    const destroy = useRef<() => void>();
 
     const getExtensions = useCallback(async () => {
         const langExtension = await getLang(lang);
         const setup = await customSetup({ lineNumbers, readOnly, fold });
-        const extensions = [
+        const extensions: Extension[] = [
             setup,
             langExtension(),
             themeSetup({ autoHeight, minHeight, maxHeight }),
@@ -91,7 +94,7 @@ export function useCodeMirror({
         lineNumbers,
     ]);
 
-    const createEditor = useCallback(async () => {
+    const createEditor = useCallback(async (): Promise<EditorView> => {
         if (destroy.current) {
             destroy.current();
         }

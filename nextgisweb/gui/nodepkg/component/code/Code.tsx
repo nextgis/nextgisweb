@@ -1,9 +1,14 @@
 import { useEffect, useRef } from "react";
-import { PropTypes } from "prop-types";
 import { useCodeMirror } from "./hook/useCodeMirror";
 
-export function Code({ whenReady, ...props }) {
-    const editorRef = useRef(null);
+import type { CodeOptions, Editor } from "./type";
+
+export interface CodeProps extends CodeOptions {
+    whenReady?: (editor: Editor) => void;
+}
+
+export function Code({ whenReady, ...props }: CodeProps) {
+    const editorRef = useRef<HTMLDivElement>(null);
     const editor = useCodeMirror({ target: editorRef, ...props });
 
     useEffect(() => {
@@ -24,16 +29,3 @@ export function Code({ whenReady, ...props }) {
         ></div>
     );
 }
-
-Code.propTypes = {
-    lang: PropTypes.string,
-    value: PropTypes.string,
-    readOnly: PropTypes.bool,
-    fold: PropTypes.bool,
-    onChange: PropTypes.func,
-    autoHeight: PropTypes.bool,
-    minHeight: PropTypes.string,
-    maxHeight: PropTypes.string,
-    lineNumbers: PropTypes.bool,
-    whenReady: PropTypes.func,
-};
