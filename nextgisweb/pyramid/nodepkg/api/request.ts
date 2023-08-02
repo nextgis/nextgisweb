@@ -10,7 +10,7 @@ import {
 } from "./error";
 import { cache } from "./cache";
 
-import type { LunkwillData, RequestOptions } from "./type";
+import type { LunkwillData, RequestOptions, ToReturn } from "./type";
 
 function lunkwillCheckResponse(lwResp: Response) {
     const ct = lwResp.headers.get("content-type");
@@ -20,7 +20,7 @@ function lunkwillCheckResponse(lwResp: Response) {
     );
 }
 
-async function responseJson(response) {
+async function responseJson(response: Response) {
     try {
         return response.json();
     } catch (e) {
@@ -35,7 +35,8 @@ async function lunkwillResponseUrl(lwResp: Response) {
     const sum = `/api/lunkwill/${lwData.id}/summary`;
     const res = `/api/lunkwill/${lwData.id}/response`;
 
-    const sleep = (msec) => new Promise((resolve) => setTimeout(resolve, msec));
+    const sleep = (msec: number) =>
+        new Promise((resolve) => setTimeout(resolve, msec));
 
     let failed = false;
     let ready = false;
@@ -76,7 +77,7 @@ async function lunkwillResponseUrl(lwResp: Response) {
     return res;
 }
 
-async function lunkwillFetch(lwRespUrl) {
+async function lunkwillFetch(lwRespUrl: string) {
     try {
         return await window.fetch(lwRespUrl, { credentials: "same-origin" });
     } catch (e) {
@@ -84,7 +85,10 @@ async function lunkwillFetch(lwRespUrl) {
     }
 }
 
-export async function request(path: string, options: RequestOptions) {
+export async function request<T = unknown, ReturnUrl extends boolean = false>(
+    path: string,
+    options: RequestOptions<ReturnUrl>
+): Promise<ToReturn<T, ReturnUrl>> {
     const defaults: RequestOptions = {
         method: "GET",
         credentials: "same-origin",
@@ -129,7 +133,7 @@ export async function request(path: string, options: RequestOptions) {
             urlParams;
     }
 
-    const makeRequest = async () => {
+    const makeRequest = async (): Promise<ToReturn<T, ReturnUrl>> => {
         let response: Response;
         try {
             response = await fetch(url, opt);
@@ -143,7 +147,7 @@ export async function request(path: string, options: RequestOptions) {
         if (useLunkwill && lunkwillCheckResponse(response)) {
             const lwRespUrl = await lunkwillResponseUrl(response);
             if (lunkwillReturnUrl) {
-                return lwRespUrl;
+                return lwRespUrl as ToReturn<T, ReturnUrl>;
             }
             response = await lunkwillFetch(lwRespUrl);
         }
@@ -160,7 +164,7 @@ export async function request(path: string, options: RequestOptions) {
             throw new InvalidResponseError();
         }
 
-        let body;
+        let body: T;
         try {
             body = await response.json();
         } catch (e) {
@@ -168,14 +172,17 @@ export async function request(path: string, options: RequestOptions) {
         }
 
         if (400 <= response.status && response.status <= 599) {
-            throw new ServerResponseError(body);
+            throw new ServerResponseError(body as ServerResponseError);
         }
 
-        return body;
+        return body as ToReturn<T, ReturnUrl>;
     };
     if (opt.method.toUpperCase() === "GET" && useCache) {
         const cacheToUse = useCache instanceof LoaderCache ? useCache : cache;
-        return cacheToUse.promiseFor(url, makeRequest);
+        return cacheToUse.promiseFor(url, makeRequest) as ToReturn<
+            T,
+            ReturnUrl
+        >;
     }
     return makeRequest();
 }

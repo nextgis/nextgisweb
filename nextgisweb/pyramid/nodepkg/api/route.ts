@@ -7,7 +7,12 @@ import { request } from "./request";
 // ReExport for backward compatibility
 export * from "./LunkwillParam";
 
-import type { RequestMethod, RouteResults } from "./type";
+import type {
+    RequestMethod,
+    RequestOptions,
+    RouteResults,
+    ToReturn,
+} from "./type";
 
 type UrlParamValue = string | number;
 type RouteUrlOpt = Record<string, UrlParamValue>;
@@ -51,9 +56,11 @@ export function route(name: string, ...rest: RouteUrlOptOrArgs): RouteResults {
     const result = {} as RouteResults;
     const methods: RequestMethod[] = ["get", "post", "put", "delete"];
     for (const method of methods) {
-        result[method] = (options) =>
-            request(template, {
-                ...options,
+        result[method] = <T = unknown, B extends boolean = false>(
+            requestOptions: RequestOptions<B>
+        ): Promise<ToReturn<T, B>> =>
+            request<T, B>(template, {
+                ...requestOptions,
                 method: method.toUpperCase() as Uppercase<RequestMethod>,
             });
     }

@@ -3,13 +3,15 @@ import type { LunkwillParam } from "./LunkwillParam";
 
 export type RequestMethod = "get" | "post" | "put" | "delete";
 
-export interface RequestOptions {
+export interface RequestOptions<ReturnUrl extends boolean = false> {
     method?: RequestMethod | Uppercase<RequestMethod>;
     credentials?: RequestCredentials;
     headers?: Record<string, string>;
     cache?: boolean | LoaderCache;
-    query?: Record<string, string | number | boolean>;
-    json?: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    query?: Record<string, any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    json?: Record<string, any>;
     /** Has lower priority than the json */
     body?: string;
 
@@ -18,7 +20,7 @@ export interface RequestOptions {
     signal?: AbortSignal;
 
     lunkwill?: LunkwillParam;
-    lunkwillReturnUrl?: boolean;
+    lunkwillReturnUrl?: ReturnUrl;
 }
 
 export type ApiRouteParams = Record<string, string>;
@@ -28,9 +30,22 @@ export interface LunkwillData {
     delay_ms?: number;
 }
 
+export type ToReturn<
+    T = unknown,
+    ReturnUrl extends boolean = false,
+> = ReturnUrl extends true ? string : T;
+
 export interface RouteResults {
-    get: <T = unknown>(options: RequestOptions) => Promise<T>;
-    post: <T = unknown>(options: RequestOptions) => Promise<T>;
-    put: <T = unknown>(options: RequestOptions) => Promise<T>;
-    delete: <T = unknown>(options: RequestOptions) => Promise<T>;
+    get: <T = unknown, B extends boolean = false>(
+        options?: RequestOptions<B>
+    ) => Promise<ToReturn<T, B>>;
+    post: <T = unknown, B extends boolean = false>(
+        options?: RequestOptions<B>
+    ) => Promise<ToReturn<T, B>>;
+    put: <T = unknown, B extends boolean = false>(
+        options?: RequestOptions<B>
+    ) => Promise<ToReturn<T, B>>;
+    delete: <T = unknown, B extends boolean = false>(
+        options?: RequestOptions<B>
+    ) => Promise<ToReturn<T, B>>;
 }
