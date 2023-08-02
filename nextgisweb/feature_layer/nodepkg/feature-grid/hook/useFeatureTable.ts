@@ -9,7 +9,7 @@ import { fetchFeatures } from "../api/fetchFeatures";
 import { createCacheKey } from "../util/createCacheKey";
 
 import type { MutableRefObject } from "react";
-import type { FeatureData, FeatureLayerFieldCol, OrderBy } from "../type";
+import type { FeatureLayerFieldCol, FeatureAttrs, OrderBy } from "../type";
 
 const debouncedFn = debounce((fn) => {
     fn();
@@ -103,37 +103,37 @@ export function useFeatureTable({
 
     const { makeSignal, abort } = useAbortController();
 
-    const loaderCache = useRef<LoaderCache<FeatureData>>();
+    const loaderCache = useRef<LoaderCache<FeatureAttrs[]>>();
 
-    const [data, setData_] = useState<FeatureData[]>([]);
+    const [data, setData_] = useState<FeatureAttrs[]>([]);
 
-    const setData = (features: FeatureData[]) => {
+    const setData = (attributes: FeatureAttrs[]) => {
         setData_((old) => {
-            if (!old.length && !features.length) {
+            if (!old.length && !attributes.length) {
                 return old;
             }
-            return features;
+            return attributes;
         });
     };
 
     const queryMode = useMemo<boolean>(() => !!query, [query]);
 
     const handleFeatures = useCallback(
-        (features: FeatureData[]) => {
+        (attributes: FeatureAttrs[]) => {
             let rowIndex = pages[0];
-            for (const f of features) {
+            for (const f of attributes) {
                 f.__rowIndex = rowIndex++;
             }
-            const hasNewPage = features.length / pages.length >= pageSize;
+            const hasNewPage = attributes.length / pages.length >= pageSize;
             setHasNextPage(hasNewPage);
             if (queryMode) {
                 const toSize = pages[0] + pageSize * pages.length;
                 const newTotal = hasNewPage
                     ? toSize + pageSize
-                    : toSize - (pageSize - (features.length % pageSize));
+                    : toSize - (pageSize - (attributes.length % pageSize));
                 setQueryTotal(newTotal);
             }
-            setData(features);
+            setData(attributes);
         },
         [pageSize, pages, queryMode]
     );
@@ -196,12 +196,12 @@ export function useFeatureTable({
             );
 
             if (allPageLoaded) {
-                const features = (
+                const attrs = (
                     await Promise.all(
                         cacheKeys.map((c) => cache.resolve(c.key))
                     )
                 ).flat();
-                handleFeatures(features);
+                handleFeatures(attrs);
             } else if (fetchEnabled) {
                 const signal = makeSignal();
                 const promises = [];
@@ -211,17 +211,17 @@ export function useFeatureTable({
                     }
                 }
                 const parts = await Promise.all(promises);
-                const features = [];
+                const attributes: FeatureAttrs[] = [];
                 // Fulfilled `parts` from `cache` are not cancelable and always return values
                 // Therefore, if there was aborted,
                 // the number of `features` will not mutch to the number of `pages`
                 if (parts.every(Boolean)) {
                     for (const p of parts.flat()) {
                         if (p) {
-                            features.push(p);
+                            attributes.push(p);
                         }
                     }
-                    handleFeatures(features);
+                    handleFeatures(attributes);
                 }
             }
         }

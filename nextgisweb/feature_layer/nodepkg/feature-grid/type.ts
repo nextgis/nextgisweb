@@ -1,11 +1,11 @@
-import type { FeatureItem } from "../type/FeatureItem";
+import type { NgwAttributeType } from "../type";
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
-export interface FeatureData extends FeatureItem {
+export type FeatureAttrs = Record<string, NgwAttributeType> & {
     __rowIndex?: number;
-}
+};
 
-export type Selected = FeatureData;
+export type Selected = FeatureAttrs;
 
 export type ColOrder = "asc" | "desc" | null;
 

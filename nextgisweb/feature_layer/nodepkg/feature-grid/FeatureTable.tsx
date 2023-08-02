@@ -13,7 +13,7 @@ import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { FeatureLayerField } from "../type/FeatureLayer";
 import type {
     ColOrder,
-    FeatureData,
+    FeatureAttrs,
     FeatureLayerFieldCol,
     OrderBy,
     Selected,
@@ -175,7 +175,7 @@ const FeatureTable = ({
             return null;
         }
 
-        const prepareCols = (row: FeatureData) => {
+        const prepareCols = (row: FeatureAttrs) => {
             return (
                 <>
                     {columns.map((f) => {

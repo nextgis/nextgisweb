@@ -1,10 +1,11 @@
 import { utc } from "@nextgisweb/gui/dayjs";
 
 import type { FeatureLayerDataType } from "../../type/FeatureLayer";
+import type { NgwAttributeType } from "../../type";
 
 export function renderFeatureFieldValue(
     { datatype }: { datatype: FeatureLayerDataType },
-    val: string
+    val: NgwAttributeType
 ): string {
     if (val) {
         if (datatype === "DATETIME") {
@@ -16,5 +17,5 @@ export function renderFeatureFieldValue(
             return utc(dt).local().format("LTS");
         }
     }
-    return val;
+    return String(val);
 }

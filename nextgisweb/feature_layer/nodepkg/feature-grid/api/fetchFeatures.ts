@@ -2,6 +2,8 @@ import { route } from "@nextgisweb/pyramid/api";
 
 import { KEY_FIELD_KEYNAME } from "../constant";
 
+import type { FeatureItem } from "../../type";
+
 interface FeatureLayerQuery {
     offset?: number;
     limit?: number;
@@ -55,7 +57,7 @@ export function fetchFeatures({
     }
 
     return route("feature_layer.feature.collection", resourceId)
-        .get({
+        .get<FeatureItem[]>({
             query,
             signal,
             cache,
