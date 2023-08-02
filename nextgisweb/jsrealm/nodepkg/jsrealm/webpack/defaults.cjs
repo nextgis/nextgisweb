@@ -1,4 +1,3 @@
-const os = require("os");
 const fs = require("fs");
 const path = require("path");
 const chalk = require("chalk");
@@ -15,7 +14,6 @@ const defaults = {
         nestedModules: false,
     },
     watchOptions: {
-        poll: os.release().match(/-WSL.?$/) ? 1000 : false,
         ignored: "**/node_modules",
     },
 };
