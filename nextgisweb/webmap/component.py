@@ -44,7 +44,6 @@ class WebMapComponent(Component):
                     display_name=request.localizer.translate(i.display_name)))
                 for i in WebMapAdapter.registry.values()
             ),
-            enable_social_networks=self.options['enable_social_networks'],
             check_origin=self.options['check_origin'],
         )
 
@@ -72,7 +71,6 @@ class WebMapComponent(Component):
             doc="Basemaps description file."),
         Option('annotation', bool, default=True, doc="Turn on / off annotations."),
         Option('editing', bool, default=True),
-        Option('enable_social_networks', bool, default=False),
         Option('check_origin', bool, default=False, doc="Check iframe Referer header."),
         Option('legend_symbols', LegendSymbolsEnum, default=LegendSymbolsEnum.COLLAPSE),
     )

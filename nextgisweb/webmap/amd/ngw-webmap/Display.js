@@ -450,7 +450,6 @@ define([
                         isOpen: widget.activeLeftPanel === "sharePanel",
                         gutters: false,
                         withCloser: true,
-                        socialNetworks: settings.enable_social_networks,
                         display: widget,
                         eventVisibility: undefined,
                     });

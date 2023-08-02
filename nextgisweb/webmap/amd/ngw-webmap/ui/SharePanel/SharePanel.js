@@ -15,7 +15,7 @@ define([
     DynamicPanel,
     BorderContainer,
     reactApp,
-    sharePanelComp,
+    sharePanelComp
 ) {
     return declare(
         [
@@ -32,9 +32,8 @@ define([
                     reactApp.default(
                         sharePanelComp.default,
                         {
-                            socialNetworksEnabled: options.socialNetworks,
                             display: options.display,
-                            eventVisibility: options.eventVisibility
+                            eventVisibility: options.eventVisibility,
                         },
                         contentNode
                     );
@@ -53,7 +52,7 @@ define([
             hide: function () {
                 this.emit("pre-hide");
                 this.inherited(arguments);
-            }
+            },
         }
     );
 });
