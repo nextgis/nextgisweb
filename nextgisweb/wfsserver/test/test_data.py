@@ -1,6 +1,4 @@
-
 import json
-from uuid import uuid4
 
 import pytest
 import transaction
@@ -31,7 +29,6 @@ def vlayer_id(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='test_cyrillic',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=uuid4().hex,
         ).persist()
 
         geojson = {

@@ -1,9 +1,7 @@
 from pathlib import Path
-from uuid import uuid4
 
 import pytest
 import transaction
-from osgeo import gdal, ogr
 from shapely import affinity
 from shapely.geometry import Polygon
 
@@ -12,20 +10,14 @@ from nextgisweb.env import DBSession
 from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
+from nextgisweb.vector_layer import test as vector_layer_test
 from nextgisweb.wfsserver.model import Layer as WFS_Service_Layer
 from nextgisweb.wfsserver.model import Service as WFSService
 
 from ..model import WFSConnection, WFSLayer
 
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', )
-
-
-def type_geojson_dataset(filename):
-    from nextgisweb.vector_layer import test as vector_layer_test
-    path = Path(vector_layer_test.__file__).parent / 'data' / filename
-    result = ogr.Open(str(path))
-    assert result is not None, gdal.GetLastErrorMsg()
-    return result
+DATA = Path(vector_layer_test.__file__).parent / 'data'
 
 
 @pytest.fixture
@@ -35,14 +27,7 @@ def wfs_service_path(ngw_resource_group, ngw_httptest_app):
             parent_id=ngw_resource_group, display_name='type',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=uuid4().hex,
-        ).persist()
-
-        dsource = type_geojson_dataset('type.geojson')
-        layer = dsource.GetLayer(0)
-
-        vl_type.setup_from_ogr(layer)
-        vl_type.load_from_ogr(layer)
+        ).persist().from_ogr(DATA / 'type.geojson')
 
         DBSession.flush()
 

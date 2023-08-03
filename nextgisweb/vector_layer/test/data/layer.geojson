@@ -1,0 +1,17 @@
+{
+    "type": "FeatureCollection",
+    "name": "layer",
+    "features": [{
+        "type": "Feature",
+        "properties": {
+            "int": -1,
+            "real": 0.33333333333333298,
+            "date": "2001\/01\/01",
+            "time": "23:59:59",
+            "datetime": "2001\/01\/01 23:59:00.000",
+            "string": "Foo bar",
+            "unicode": "Значимость этих проблем настолько очевидна, что реализация намеченных плановых заданий требуют определения и уточнения."
+        },
+        "geometry": { "type": "Point", "coordinates": [ 0.0, 0.0 ] } }
+    ]
+}

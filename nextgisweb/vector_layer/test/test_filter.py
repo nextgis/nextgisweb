@@ -1,8 +1,6 @@
-import os.path
-from uuid import uuid4
+from pathlib import Path
 
 import pytest
-from osgeo import ogr
 
 from nextgisweb.env import DBSession
 
@@ -11,8 +9,7 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from .. import VectorLayer
 
-DATA_PATH = os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), 'data')
+DATA_PATH = Path(__file__).parent / 'data'
 
 
 # key, operator, should_be_true, should_be_false
@@ -55,21 +52,11 @@ for key, operator, should_be_true, should_be_false in check_list:
 
 @pytest.fixture
 def resource(ngw_txn, ngw_resource_group):
-    src = os.path.join(DATA_PATH, 'geojson-point.zip/layer.geojson')
-    dsource = ogr.Open('/vsizip/' + src)
-    layer = dsource.GetLayer(0)
-
     resource = VectorLayer(
         parent_id=ngw_resource_group, display_name='from_ogr',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=uuid4().hex,
-    )
-
-    resource.persist()
-
-    resource.setup_from_ogr(layer)
-    resource.load_from_ogr(layer)
+    ).persist().from_ogr(DATA_PATH / 'layer.geojson')
 
     DBSession.flush()
     return resource

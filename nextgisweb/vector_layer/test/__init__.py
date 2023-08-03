@@ -1,5 +1,4 @@
 from contextlib import contextmanager
-from uuid import uuid4
 
 import transaction
 
@@ -18,7 +17,6 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
             parent_id=parent_id, display_name='Feature layer (vector)',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=uuid4().hex,
         ).persist()
 
         layer.setup_from_ogr(ogrlayer)

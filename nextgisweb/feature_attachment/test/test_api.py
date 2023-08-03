@@ -1,5 +1,4 @@
 from tempfile import NamedTemporaryFile
-from uuid import uuid4
 from zipfile import ZipFile
 
 import pytest
@@ -29,7 +28,6 @@ def layer_id(ngw_resource_group):
             owner_user=User.by_keyname('administrator'),
             geometry_type='POINT',
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=uuid4().hex,
         ).persist()
 
         res.setup_from_fields([])

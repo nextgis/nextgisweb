@@ -48,7 +48,7 @@ def test_from_fields(ngw_resource_group, ngw_txn):
 @pytest.mark.parametrize('filename', (
     'shapefile-point-utf8.zip',
     'shapefile-point-win1251.zip',
-    'geojson-point.zip',
+    'layer.geojson',
 ))
 def test_from_ogr(filename, ngw_resource_group, ngw_txn):
     res = VectorLayer(

@@ -1,7 +1,6 @@
 from itertools import product
 from packaging import version as pkg_version
 from pathlib import Path
-from uuid import uuid4
 
 import pytest
 import transaction
@@ -12,17 +11,17 @@ from nextgisweb.env import DBSession
 from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
+from nextgisweb.vector_layer import test as vector_layer_test
 
 from ..model import Layer as WFSLayer
 from ..model import Service as WFSService
 
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
+DATA = Path(vector_layer_test.__file__).parent / 'data'
 
 
-def type_geojson_dataset(filename):
-    from nextgisweb.vector_layer import test as vector_layer_test
-    path = Path(vector_layer_test.__file__).parent / 'data' / filename
-    result = ogr.Open(str(path))
+def read_dataset(filename):
+    result = ogr.Open(str(DATA / filename))
     assert result is not None, gdal.GetLastErrorMsg()
     return result
 
@@ -40,14 +39,7 @@ def service(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='type',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=uuid4().hex,
-        ).persist()
-
-        dsource = type_geojson_dataset('type.geojson')
-        layer = dsource.GetLayer(0)
-
-        vl_type.setup_from_ogr(layer)
-        vl_type.load_from_ogr(layer)
+        ).persist().from_ogr(DATA / 'type.geojson')
 
         DBSession.flush()
 
@@ -59,14 +51,7 @@ def service(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='pointz',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=uuid4().hex,
-        ).persist()
-
-        dsource = type_geojson_dataset('pointz.geojson')
-        layer = dsource.GetLayer(0)
-
-        vl_pointz.setup_from_ogr(layer)
-        vl_pointz.load_from_ogr(layer)
+        ).persist().from_ogr(DATA / 'pointz.geojson')
 
         DBSession.flush()
 
@@ -111,7 +96,7 @@ def features(service, ngw_httptest_app, ngw_auth_administrator):
             wfs_layer = wfs_ds.GetLayerByName('type')
             assert wfs_layer is not None, gdal.GetLastErrorMsg()
 
-            ref_ds = type_geojson_dataset('type.geojson')
+            ref_ds = read_dataset('type.geojson')
             ref_layer = ref_ds.GetLayer(0)
 
             factory._cache[version] = (

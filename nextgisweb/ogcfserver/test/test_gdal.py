@@ -1,5 +1,4 @@
 from pathlib import Path
-from uuid import uuid4
 
 import pytest
 import transaction
@@ -23,7 +22,6 @@ def vlayer_id(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='Vector layer',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=uuid4().hex,
         ).persist().from_ogr(DATA_PATH / 'ne_110m_populated_places.geojson')
 
         DBSession.flush()

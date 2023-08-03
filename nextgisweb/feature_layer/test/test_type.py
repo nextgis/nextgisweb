@@ -1,15 +1,16 @@
 from pathlib import Path
-from uuid import uuid4
 
 import pytest
 import transaction
-from osgeo import ogr
 
 from nextgisweb.env import DBSession
 
 from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
+from nextgisweb.vector_layer import test as vector_layer_test
+
+DATA = Path(vector_layer_test.__file__).parent / 'data'
 
 
 @pytest.fixture
@@ -19,16 +20,7 @@ def type_layer(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='type',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=uuid4().hex,
-        ).persist()
-
-        from nextgisweb.vector_layer import test as vector_layer_test
-        path = Path(vector_layer_test.__file__).parent / 'data/type.geojson'
-        ogrds = ogr.Open(str(path))
-        ogrlayer = ogrds.GetLayer(0)
-
-        vl_type.setup_from_ogr(ogrlayer)
-        vl_type.load_from_ogr(ogrlayer)
+        ).persist().from_ogr(DATA / 'type.geojson')
 
         DBSession.flush()
         DBSession.expunge(vl_type)

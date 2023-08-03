@@ -1,5 +1,4 @@
 from pathlib import Path
-from uuid import uuid4
 
 import pytest
 
@@ -219,7 +218,6 @@ def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
         parent_id=ngw_resource_group, display_name='vector_layer',
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
-        tbl_uuid=uuid4().hex
     ).persist()
 
     src = str(path / filename)

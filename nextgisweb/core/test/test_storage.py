@@ -1,5 +1,4 @@
 from time import sleep
-from uuid import uuid4
 
 import pytest
 import transaction
@@ -80,7 +79,6 @@ def vector_layer(display_name, parent_id):
         owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=3857).one(),
         geometry_type='POINT',
-        tbl_uuid=uuid4().hex,
     ).persist()
     res.setup_from_fields([])
     return res

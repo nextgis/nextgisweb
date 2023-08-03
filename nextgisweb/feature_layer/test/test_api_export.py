@@ -1,7 +1,6 @@
 import json
 from string import ascii_letters, printable
 from tempfile import NamedTemporaryFile
-from uuid import uuid4
 
 import pytest
 import transaction
@@ -25,7 +24,6 @@ def layer_id(ngw_resource_group):
             parent_id=ngw_resource_group, display_name='vector_layer',
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
-            tbl_uuid=uuid4().hex,
         ).persist()
 
         geojson = {
@@ -145,8 +143,7 @@ def resources(ngw_resource_group):
         for i in range(some):
             layer = VectorLayer(
                 parent_id=ngw_resource_group, display_name=f'Test layer {i}',
-                owner_user=admin, srs=srs, tbl_uuid=uuid4().hex,
-                geometry_type='POINT',
+                owner_user=admin, srs=srs, geometry_type='POINT',
             ).persist()
 
             layer.setup_from_fields([])
