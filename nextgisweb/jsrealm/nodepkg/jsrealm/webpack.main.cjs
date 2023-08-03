@@ -326,7 +326,12 @@ const webpackConfig = defaults("main", (env) => ({
             ? [new ForkTsCheckerPlugin()]
             : []),
         ...(config.jsrealm.eslint || env.eslint
-            ? [new ESLintPlugin({ quiet: true })]
+            ? [
+                  new ESLintPlugin({
+                      quiet: true,
+                      extensions: ["js", "ts", "tsx"],
+                  }),
+              ]
             : []),
         webpackAssetsManifestPlugin,
     ],
