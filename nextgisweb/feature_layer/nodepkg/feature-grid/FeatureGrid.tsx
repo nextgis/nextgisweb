@@ -120,7 +120,8 @@ export const FeatureGrid = ({
         (path) => {
             const first = selected[0];
             if (first) {
-                window.open(routeURL(path, id, first[KEY_FIELD_KEYNAME]));
+                const featureId = first[KEY_FIELD_KEYNAME] as string;
+                window.open(routeURL(path, id, featureId));
             }
         },
         [id, selected]
