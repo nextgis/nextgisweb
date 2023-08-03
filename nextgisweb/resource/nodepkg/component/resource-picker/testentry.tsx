@@ -37,7 +37,7 @@ function ResourceSelectTest() {
                 return (
                     <div key={title} style={{ marginBottom: "1em" }}>
                         <h2>{title}</h2>
-                        <code>{`<$ResourcePickerCard ${propsCode}/>`}</code>
+                        <code>{`<ResourcePickerCard ${propsCode}/>`}</code>
                         <div style={{ marginTop: "1em" }}>
                             <ResourcePickerCard {...props} />
                         </div>

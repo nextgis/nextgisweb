@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 
 import debounce from "lodash-es/debounce";
 
@@ -61,20 +61,24 @@ export const ResourcePickerChildren = observer(
             return s;
         }, [getCheckboxProps, resourceStore, selected]);
 
+        const canTraverse = useCallback(
+            (record: PickerResource) => {
+                const classes = getResourceClasses([record.cls]);
+                const isGroup = classes.some((cls) => cls === "resource_group");
+                const disabled =
+                    traverseClasses &&
+                    !classes.some((cls) => traverseClasses.includes(cls));
+                const allowMoveToEmpty = isGroup ? true : !!record.children;
+                return !(disabled || !allowMoveToEmpty || !allowMoveInside);
+            },
+            [allowMoveInside, getResourceClasses, traverseClasses]
+        );
+
         const renderActions: ColumnProps<PickerResource>["render"] = (
             _,
             record
         ) => {
-            const classes = getResourceClasses([record.cls]);
-            const isGroup = classes.some((cls) => cls === "resource_group");
-
-            const allowMoveToEmpty = isGroup ? true : !!record.children;
-
-            const disabled =
-                traverseClasses &&
-                !classes.some((cls) => traverseClasses.includes(cls));
-
-            if (disabled || !allowMoveToEmpty || !allowMoveInside) {
+            if (!canTraverse(record)) {
                 return <></>;
             }
             return (
@@ -112,7 +116,15 @@ export const ResourcePickerChildren = observer(
                     const select = (pick = false) => {
                         const r = record as PickerResource;
                         const props = getCheckboxProps(r);
+
                         if (props.disabled) {
+                            if (pick && canTraverse(r)) {
+                                resourceStore.changeParentTo(r.id);
+                            }
+                            return;
+                        }
+                        if (pick && onOk) {
+                            onOk(r.id);
                             return;
                         }
                         const existIndex = selected.indexOf(r.id);
@@ -121,18 +133,13 @@ export const ResourcePickerChildren = observer(
 
                         // unselect on second click
                         if (existIndex !== -1) {
-                            if (!(pick && onOk)) {
-                                newSelected = [...selected];
-                                newSelected.splice(existIndex, 1);
-                            }
+                            newSelected = [...selected];
+                            newSelected.splice(existIndex, 1);
                         } else {
                             newSelected.push(r.id);
                         }
 
                         resourceStore.setSelected(newSelected);
-                        if (pick && onOk) {
-                            onOk(r.id);
-                        }
                     };
                     return {
                         onDoubleClick: () => {
@@ -140,7 +147,7 @@ export const ResourcePickerChildren = observer(
                         },
                         onClick: debounce(() => {
                             select();
-                        }, 500),
+                        }, 150),
                     };
                 }}
             >
