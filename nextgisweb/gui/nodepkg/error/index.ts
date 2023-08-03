@@ -29,7 +29,7 @@ function extractError(error: ApiError): ApiError {
         ) {
             const fallback = new NetworksResponseError();
             return {
-                title: fallback.error,
+                title: fallback.title,
                 message: fallback.message,
                 detail: fallback.detail,
             };

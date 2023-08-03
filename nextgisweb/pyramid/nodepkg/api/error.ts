@@ -58,7 +58,7 @@ export class LunkwillError extends BaseError {
     readonly data: LunkwillData;
 
     // prettier-ignore
-    constructor(message: string, data: LunkwillData = {}) {
+    constructor(message?: string, data: LunkwillData = {}) {
         super(message || gettext("Unexpected error while processing long-running request."));
         this.title = gettext("Long-running request error");
         this.data = data;
