@@ -182,6 +182,15 @@ class Tileset(Base, Resource, SpatialLayerMixin):
             maxLat=extent[3],
         )
 
+    def get_info(self):
+        s = super()
+        return (s.get_info() if hasattr(s, 'get_info') else ()) + (
+            (_("Number of tiles"), sum(self.tileset_ntiles)),
+            (_("Zoom levels"), _("From {min} to {max}").format(
+                min=self.tileset_zmin,
+                max=self.tileset_zmax)),
+        )
+
 
 @list_registry
 class FileFormat:
