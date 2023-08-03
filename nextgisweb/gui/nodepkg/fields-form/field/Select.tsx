@@ -9,7 +9,7 @@ import type { FormItemProps, FormFieldChoice } from "../type";
 type InputProps = Parameters<typeof AntdSelect>[0];
 
 type SelectProps = FormItemProps<AntdSelectProps> & {
-    choices?: FormFieldChoice[];
+    choices: FormFieldChoice[];
     /** @deprecated move to inputProps */
     mode?: InputProps["mode"];
 };
