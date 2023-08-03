@@ -11,7 +11,7 @@ export interface RequestOptions<ReturnUrl extends boolean = false> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     query?: Record<string, any>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    json?: Record<string, any>;
+    json?: string | null | boolean | Record<string, any> | any[];
     /** Has lower priority than the json */
     body?: string;
 

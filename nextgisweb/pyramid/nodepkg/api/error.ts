@@ -42,7 +42,7 @@ interface ServerResponseErrorData {
 
 export class ServerResponseError extends BaseAPIError {
     readonly title: string;
-    readonly detail: string;
+    readonly detail: string | null;
     readonly data: ServerResponseErrorData;
 
     constructor(data: ServerResponseErrorData) {
