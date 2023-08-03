@@ -9,7 +9,6 @@ from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, DBSession, _, env
 from nextgisweb.lib import db
-from nextgisweb.lib.ogrhelper import read_dataset
 
 from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import (
@@ -34,12 +33,14 @@ from .feature_query import FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
 from .table_info import TableInfo
 from .util import (
+    DRIVERS,
     ERROR_FIX,
     FID_SOURCE,
     FIELD_TYPE_2_DB,
     FIELD_TYPE_SIZE,
     SCHEMA,
     TOGGLE,
+    read_dataset_vector,
 )
 
 Base.depends_on('resource', 'feature_layer')
@@ -50,21 +51,6 @@ GEOM_TYPE_DISPLAY = (
     _("Point Z"), _("Line Z"), _("Polygon Z"),
     _("Multipoint Z"), _("Multiline Z"), _("Multipolygon Z"),
 )
-
-
-class DRIVERS:
-    ESRI_SHAPEFILE = 'ESRI Shapefile'
-    GPKG = 'GPKG'
-    GEOJSON = 'GeoJSON'
-    KML = 'KML'
-    LIBKML = 'LIBKML'
-    GML = 'GML'
-    MAPINFO_FILE = 'MapInfo File'
-
-    enum = (ESRI_SHAPEFILE, GPKG, GEOJSON, KML, LIBKML, GML, MAPINFO_FILE)
-
-
-OPEN_OPTIONS = ('EXPOSE_FID=NO', )
 
 
 skip_errors_default = False
@@ -124,7 +110,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         tableinfo.metadata.drop_all(bind=connection)
 
     def from_ogr(self, filename, *, layername=None):
-        ds = read_dataset(filename)
+        ds = read_dataset_vector(filename)
         layer = ds.GetLayerByName(layername) if layername is not None else ds.GetLayer(0)
         self.setup_from_ogr(layer)
         self.load_from_ogr(layer)
@@ -400,10 +386,8 @@ def drop_verctor_layer_table(mapper, connection, target):
 class _source_attr(SP):
 
     def _ogrds(self, filename, source_filename=None):
-        ogrds = read_dataset(
+        ogrds = read_dataset_vector(
             filename,
-            allowed_drivers=DRIVERS.enum,
-            open_options=OPEN_OPTIONS,
             source_filename=source_filename,
         )
 

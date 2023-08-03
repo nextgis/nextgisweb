@@ -1,9 +1,22 @@
 from nextgisweb.env import COMP_ID
 from nextgisweb.lib import db
+from nextgisweb.lib.ogrhelper import read_dataset
 
 from nextgisweb.feature_layer import FIELD_TYPE, FIELD_TYPE_OGR, GEOM_TYPE
 
 SCHEMA = COMP_ID
+
+
+class DRIVERS:
+    ESRI_SHAPEFILE = 'ESRI Shapefile'
+    GPKG = 'GPKG'
+    GEOJSON = 'GeoJSON'
+    KML = 'KML'
+    LIBKML = 'LIBKML'
+    GML = 'GML'
+    MAPINFO_FILE = 'MapInfo File'
+
+    enum = (ESRI_SHAPEFILE, GPKG, GEOJSON, KML, LIBKML, GML, MAPINFO_FILE)
 
 
 class ERROR_FIX:
@@ -55,6 +68,15 @@ GEOM_TYPE_DB = (
     'MULTIPOINTZ', 'MULTILINESTRINGZ', 'MULTIPOLYGONZ',
 )
 GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
+
+
+def read_dataset_vector(filename, **kw):
+    return read_dataset(
+        filename,
+        allowed_drivers=DRIVERS.enum,
+        open_options=('EXPOSE_FID=NO', ),
+        **kw,
+    )
 
 
 def test_encoding(s):

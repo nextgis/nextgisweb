@@ -4,11 +4,13 @@ from nextgisweb.lib.ogrhelper import read_dataset
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
 
+from .util import read_dataset_vector
+
 
 def dataset(request) -> JSONType:
     source = request.json_body['source']
     datafile, metafile = request.env.file_upload.get_filename(source['id'])
-    ogrds = read_dataset(datafile, source_filename=source['name'])
+    ogrds = read_dataset_vector(datafile, source_filename=source['name'])
     if ogrds is None:
         raise ValidationError(_("GDAL library failed to open file."))
 
