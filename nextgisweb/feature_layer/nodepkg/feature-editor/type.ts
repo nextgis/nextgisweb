@@ -19,5 +19,5 @@ export interface EditorWidgetProps<
     V = unknown,
     S extends EditorStore<V> = EditorStore<V>,
 > {
-    store: S;
+    store?: S;
 }

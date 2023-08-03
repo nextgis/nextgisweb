@@ -20,15 +20,15 @@ import {
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import BackspaceIcon from "@material-icons/svg/backspace";
+import AttributeEditorStore from "./AttributeEditorStore";
 
 import type {
     SizeType,
     FormField,
     FormWidget,
 } from "@nextgisweb/gui/fields-form";
-import type AttributeEditorStore from "./AttributeEditorStore";
 import type { NgwAttributeValue } from "./type";
-import type { FeatureLayerDataType } from "../type";
+import type { FeatureLayerDataType, FeatureLayerField } from "../type";
 
 const style = { width: "100%" };
 
@@ -47,13 +47,28 @@ const ngwTypeAliases: Record<
 
 const setNullTitle = gettext("Set field value to NULL (No data)");
 
+interface AttributeEditorStoreProps
+    extends EditorWidgetProps<NgwAttributeValue, AttributeEditorStore> {
+    fields?: FeatureLayerField[];
+    onChange?: (value: NgwAttributeValue) => void;
+}
+
 const AttributeEditor = observer(
-    ({ store }: EditorWidgetProps<NgwAttributeValue, AttributeEditorStore>) => {
-        const { fields, attributes, value, setValues, _parentStore } = store;
+    ({
+        store: store_,
+        fields: fields_,
+        onChange,
+    }: AttributeEditorStoreProps) => {
+        const [store] = useState(() => {
+            if (store_) {
+                return store_;
+            }
+            return new AttributeEditorStore({ fields: fields_ });
+        });
+
+        const { fields, attributes, isReady, setValues, saving } = store;
         const [size] = useState<SizeType>("small");
         const form = Form.useForm()[0];
-
-        const isReady = !!value;
 
         const setNullForField = useCallback(
             (field) => {
@@ -69,6 +84,12 @@ const AttributeEditor = observer(
             }
         }, [isReady, form, attributes]);
 
+        useEffect(() => {
+            if (onChange) {
+                onChange(store.value);
+            }
+        }, [store.value, onChange]);
+
         const formFields = useMemo(() => {
             return fields.map((field) => {
                 const widgetAlias = ngwTypeAliases[field.datatype];
@@ -79,7 +100,7 @@ const AttributeEditor = observer(
                     label: field.display_name,
                     widget,
                     inputProps: {
-                        readOnly: _parentStore.saving,
+                        readOnly: saving,
                         ...inputProps,
                     },
                     append: (
@@ -103,7 +124,7 @@ const AttributeEditor = observer(
 
                 return props;
             });
-        }, [fields, attributes, setNullForField, _parentStore.saving]);
+        }, [fields, attributes, setNullForField, saving]);
 
         if (!isReady) {
             return <LoadingWrapper />;

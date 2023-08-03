@@ -1,5 +1,7 @@
+import type { NgwAttributeType } from "../type/FeatureItem";
+
 /** This attributes for loading to NGW */
-export type NgwAttributeValue = Record<string, number | string | null>;
+export type NgwAttributeValue = Record<string, NgwAttributeType> | null;
 
 /** This attributes for using in web */
 export type AppAttributes = Record<string, unknown>;

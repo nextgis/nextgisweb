@@ -13,20 +13,40 @@ import type { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 import type { AppAttributes, NgwAttributeValue } from "./type";
 
 class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
-    value: NgwAttributeValue | null = null;
+    value: NgwAttributeValue = null;
 
-    _initValue: NgwAttributeValue | null = null;
+    _initValue?: NgwAttributeValue;
 
-    readonly _parentStore: FeatureEditorStore;
+    readonly _parentStore?: FeatureEditorStore;
+    readonly _fields?: FeatureLayerField[];
 
-    constructor({ parentStore }: EditorStoreConstructorOptions) {
+    constructor({ parentStore, fields }: EditorStoreConstructorOptions = {}) {
         this._parentStore = parentStore;
-        makeAutoObservable(this, { _parentStore: false, _initValue: false });
+        this._fields = fields;
+        makeAutoObservable(this, {
+            _parentStore: false,
+            _initValue: false,
+            _fields: false,
+        });
+        if (this.fields) {
+            this.load(
+                Object.fromEntries(
+                    this.fields.map(({ keyname }) => [keyname, null])
+                )
+            );
+        }
     }
 
     load(value: NgwAttributeValue) {
         this.value = { ...value };
         this._initValue = toJS(value);
+    }
+
+    get isReady(): boolean {
+        if (this._parentStore) {
+            return !this._parentStore.initLoading;
+        }
+        return true;
     }
 
     /** Feature field values formatted for web */
@@ -43,7 +63,12 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
     }
 
     get fields(): FeatureLayerField[] {
-        return this._parentStore.fields;
+        if (this._parentStore) {
+            return this._parentStore.fields;
+        } else if (this._fields) {
+            return this._fields;
+        }
+        return [];
     }
 
     get dirty(): boolean {
@@ -53,8 +78,17 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
         return false;
     }
 
+    get saving(): boolean {
+        if (this._parentStore) {
+            return this._parentStore.saving;
+        }
+        return false;
+    }
+
     reset = () => {
-        this.load(this._initValue);
+        if (this._initValue) {
+            this.load(this._initValue);
+        }
     };
 
     setValues = (values: AppAttributes = {}) => {
@@ -64,7 +98,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
     };
 
     private _formatAttributes(values: AppAttributes) {
-        const attributes = { ...this.value };
+        const attributes: NgwAttributeValue = { ...this.value };
         for (const key in values) {
             const val = values[key];
             const field = this.fields.find((f) => f.keyname === key);

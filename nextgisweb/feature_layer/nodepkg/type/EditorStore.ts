@@ -1,7 +1,10 @@
+import type { FeatureLayerField } from "@nextgisweb/feature-layer/type";
+
 import type { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 
 export interface EditorStoreConstructorOptions {
-    parentStore: FeatureEditorStore;
+    parentStore?: FeatureEditorStore;
+    fields?: FeatureLayerField[];
 }
 
 export interface EditorStore<V = unknown> {
