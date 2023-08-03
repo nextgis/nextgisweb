@@ -8,12 +8,14 @@ import HighlightOff from "@material-icons/svg/highlight_off";
 import { Button, Col, Input, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import usePickerCard from "./hook/usePickerCard";
+
+import type { InputRef } from "antd/lib/input/Input";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 import type { ResourcePickerFooterProps } from "./type";
-
-import i18n from "@nextgisweb/pyramid/i18n";
 
 interface CreateControlProps {
     resourceStore: ResourcePickerStore;
@@ -32,7 +34,7 @@ const mClearSelection = i18n.gettext("Clear selection");
 const CreateControl = observer(
     ({ setCreateMode, resourceStore }: CreateControlProps) => {
         const { resourcesLoading } = resourceStore;
-        const resourceNameInput = useRef(null);
+        const resourceNameInput = useRef<InputRef>(null);
 
         const [resourceName, setResourceName] = useState<string>();
 
@@ -40,10 +42,12 @@ const CreateControl = observer(
             try {
                 if (resourceName) {
                     await resourceStore.createNewGroup(resourceName);
-                    setCreateMode(false);
+                    if (setCreateMode) {
+                        setCreateMode(false);
+                    }
                 }
             } catch (er) {
-                errorModal(er);
+                errorModal(er as ApiError);
             }
         };
 
@@ -64,7 +68,11 @@ const CreateControl = observer(
                     <Col>
                         <Button
                             icon={<ArrowBack />}
-                            onClick={() => setCreateMode(false)}
+                            onClick={() => {
+                                if (setCreateMode) {
+                                    setCreateMode(false);
+                                }
+                            }}
                         />
                     </Col>
                     <Col flex="auto">
@@ -127,7 +135,9 @@ const MoveControl = observer(
 
         const onCreateClick = () => {
             resourceStore.clearSelection();
-            setCreateMode(true);
+            if (setCreateMode) {
+                setCreateMode(true);
+            }
         };
 
         // eslint-disable-next-line react/prop-types
@@ -136,7 +146,11 @@ const MoveControl = observer(
                 <Button
                     type="primary"
                     disabled={disabled ?? !selected.length}
-                    onClick={() => onOk(multiple ? selected : selected[0])}
+                    onClick={() => {
+                        if (onOk) {
+                            onOk(multiple ? selected : selected[0]);
+                        }
+                    }}
                 >
                     {getSelectedMsg}
                 </Button>
@@ -175,7 +189,11 @@ const MoveControl = observer(
                     ) : pickThisGroupAllowed ? (
                         <Button
                             type="primary"
-                            onClick={() => onOk(parentId)}
+                            onClick={() => {
+                                if (onOk) {
+                                    onOk(parentId);
+                                }
+                            }}
                             disabled={disableResourceIds.includes(parentId)}
                         >
                             {getThisMsg}

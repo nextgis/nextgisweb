@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { ResourcePickerCard } from "./ResourcePickerCard";
 import usePickerModal from "./hook/usePickerModal";
 
-import type { ResourcePickerModalProps } from "./type";
+import type { ResourcePickerModalProps, SelectValue } from "./type";
 
 export function ResourcePickerModal({
-    visible: initVisible,
+    open: open_,
+    visible: visible_,
     store,
     onSelect,
     closeOnSelect = true,
@@ -16,7 +17,7 @@ export function ResourcePickerModal({
     height: height_ = 400,
     ...rest
 }: ResourcePickerModalProps) {
-    const [visible, setVisible] = useState(initVisible ?? true);
+    const [open, setOpen] = useState(open_ ?? visible_ ?? true);
 
     const { modalProps, cardProps } = usePickerModal({
         height: height_,
@@ -24,9 +25,9 @@ export function ResourcePickerModal({
         ...rest,
     });
 
-    const close = () => setVisible(false);
+    const close = () => setOpen(false);
 
-    const onPick = (resource) => {
+    const onPick = (resource: SelectValue) => {
         if (onSelect) {
             onSelect(resource);
         }
@@ -36,17 +37,17 @@ export function ResourcePickerModal({
     };
 
     useEffect(() => {
-        setVisible(initVisible);
-    }, [initVisible]);
+        setOpen(open_ ?? visible_ ?? true);
+    }, [open_, visible_]);
 
     return (
         <Modal
             className="resource-picker-modal"
-            open={visible}
+            open={open}
             destroyOnClose
             footer={null}
             closable={false}
-            onCancel={() => setVisible(false)}
+            onCancel={() => setOpen(false)}
             {...modalProps}
         >
             <ResourcePickerCard

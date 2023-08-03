@@ -1,5 +1,5 @@
-import type { Card, Modal } from "@nextgisweb/gui/antd";
-
+import type { ParamsOf } from "@nextgisweb/gui/type";
+import type { Card, Modal, Table } from "@nextgisweb/gui/antd";
 import type {
     Resource,
     ResourceClass,
@@ -14,10 +14,11 @@ export type SelectValue = number | number[];
 export type CardProps = Parameters<typeof Card>[0];
 export type ModalProps = Parameters<typeof Modal>[0];
 
-export interface FormattedResource extends Resource {
-    displayName: string;
-    hasChildren: boolean;
-}
+export type TableProps = ParamsOf<typeof Table>;
+export type RowSelection = Exclude<TableProps["rowSelection"], undefined>;
+export type RowSelectionType = RowSelection["type"];
+
+export type PickerResource = Resource;
 
 export interface ResourcePickerBreadcrumbProps {
     resourceStore: ResourcePickerStore;
@@ -26,6 +27,7 @@ export interface ResourcePickerBreadcrumbProps {
 
 export interface ResourcePickerChildrenProps {
     resourceStore: ResourcePickerStore;
+    onOk?: (val: number | number[]) => void;
 }
 
 export interface ResourcePickerFooterProps {
@@ -74,6 +76,8 @@ export interface UsePickerModalProps {
 }
 
 export interface ResourcePickerModalProps extends UsePickerModalProps {
+    open?: boolean;
+    /**@deprecated use open instead */
     visible?: boolean;
     store?: ResourcePickerStore;
     onSelect?: (val: SelectValue) => void;

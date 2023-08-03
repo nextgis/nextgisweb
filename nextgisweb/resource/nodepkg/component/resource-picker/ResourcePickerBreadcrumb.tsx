@@ -4,8 +4,9 @@ import { useMemo } from "react";
 import HomeFilledIcon from "@material-icons/svg/home";
 import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
 
+import { ReactElement } from "react";
 import type { ResourcePickerBreadcrumbProps } from "./type";
-import { ResourceItem } from "../../type";
+import type { ResourceItem } from "../../type";
 
 export const ResourcePickerBreadcrumb = observer(
     ({
@@ -18,13 +19,13 @@ export const ResourcePickerBreadcrumb = observer(
 
         const Breadcrumbs = useMemo(() => {
             const items = [];
-            const onClick = (newLastResourceId) => {
+            const onClick = (newLastResourceId: number) => {
                 resourceStore.changeParentTo(newLastResourceId);
             };
 
             const createLabel = (
                 resItem: ResourceItem,
-                name?: string,
+                name?: string | ReactElement,
                 link = true
             ) => {
                 const displayName = name || resItem.resource.display_name;
@@ -68,7 +69,7 @@ export const ResourcePickerBreadcrumb = observer(
 
             for (let i = 0; i < breadcrumbItems.length; i++) {
                 const parent = breadcrumbItems[i];
-                let name = null;
+                let name: ReactElement | string | undefined;
                 const isLink = i < breadcrumbItems.length - 1;
                 if (i === 0) {
                     if (breadcrumbItems.length > 1) {

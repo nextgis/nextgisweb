@@ -2,8 +2,10 @@ import { makeAutoObservable, runInAction } from "mobx";
 
 import { extractError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
+import i18n from "@nextgisweb/pyramid/i18n";
 
 import { Blueprint } from "../../../type/Blueprint";
+
 import type {
     Resource,
     ResourceClass,
@@ -13,8 +15,7 @@ import type {
 } from "../../../type/Resource";
 import { loadParents } from "../../../util/loadParents";
 import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
-
-import i18n from "@nextgisweb/pyramid/i18n";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 
 const mPickThis = i18n.gettext("Pick this group");
 const mPickSelected = i18n.gettext("Pick selected");
@@ -44,13 +45,13 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     disableResourceIds: number[] = [];
 
-    requireClass: ResourceClass | null = null;
-    requireInterface: ResourceInterface | null = null;
-    requirePermission: ResourcePermission | null = null;
+    requireClass?: ResourceClass;
+    requireInterface?: ResourceInterface;
+    requirePermission?: ResourcePermission;
 
     allowSelection = true;
     allowMoveInside = true;
-    traverseClasses: ResourceClass[] | null = null;
+    traverseClasses?: ResourceClass[];
 
     allowCreateResource = true;
 
@@ -61,10 +62,10 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     readonly onNewGroup?: OnNewGroupType;
     readonly onTraverse?: (parentId: number) => void;
 
-    setResourcesAbortController: AbortController | null = null;
-    setBreadcrumbItemsAbortController: AbortController | null = null;
-    createNewGroupAbortController: AbortController | null = null;
-    getSelectedParentAbortController: AbortController | null = null;
+    setResourcesAbortController?: AbortController;
+    setBreadcrumbItemsAbortController?: AbortController;
+    createNewGroupAbortController?: AbortController;
+    getSelectedParentAbortController?: AbortController;
 
     getThisMsg = mPickThis;
     getSelectedMsg = mPickSelected;
@@ -158,7 +159,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         return resourceClasses;
     };
 
-    checkEnabled(resource: Resource): boolean {
+    checkEnabled = (resource: Resource): boolean => {
         const checks: (() => boolean)[] = [];
         const requireClass = this.requireClass;
         const requireInterface = this.requireInterface;
@@ -173,7 +174,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
             );
         }
         return checks.length ? checks.some((c) => c()) : true;
-    }
+    };
 
     refresh() {
         return this.setChildrenFor(this.parentId);
@@ -242,7 +243,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
                 this.breadcrumbItems = parents;
             });
         } catch (er) {
-            const { title } = extractError(er);
+            const { title } = extractError(er as ApiError);
             runInAction(() => {
                 this.setBreadcrumbItemsError = title;
             });
@@ -292,7 +293,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
                 this.resources = resources;
             });
         } catch (er) {
-            const { title } = extractError(er);
+            const { title } = extractError(er as ApiError);
             runInAction(() => {
                 this.resourcesLoadError = title;
             });
@@ -340,7 +341,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
                 return newItem;
             }
         } catch (er) {
-            const { title } = extractError(er);
+            const { title } = extractError(er as ApiError);
             runInAction(() => {
                 this.createNewGroupError = title;
             });
@@ -413,27 +414,27 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         if (this.setResourcesAbortController) {
             this.setResourcesAbortController.abort();
         }
-        this.setResourcesAbortController = null;
+        this.setResourcesAbortController = undefined;
     }
 
     private _abortBreadcrumbsLoading(): void {
         if (this.setBreadcrumbItemsAbortController) {
             this.setBreadcrumbItemsAbortController.abort();
         }
-        this.setBreadcrumbItemsAbortController = null;
+        this.setBreadcrumbItemsAbortController = undefined;
     }
 
     private _abortSelectedParentLoading(): void {
         if (this.getSelectedParentAbortController) {
             this.getSelectedParentAbortController.abort();
         }
-        this.getSelectedParentAbortController = null;
+        this.getSelectedParentAbortController = undefined;
     }
 
     private _abortNewGroupCreation(): void {
         if (this.createNewGroupAbortController) {
             this.createNewGroupAbortController.abort();
         }
-        this.createNewGroupAbortController = null;
+        this.createNewGroupAbortController = undefined;
     }
 }

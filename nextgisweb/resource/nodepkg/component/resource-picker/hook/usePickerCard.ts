@@ -1,7 +1,10 @@
 import { useCallback } from "react";
 
-import type { Resource } from "../../../type/Resource";
 import type { ResourcePickerStore } from "../store/ResourcePickerStore";
+
+import type { RowSelection, PickerResource } from "../type";
+
+type GetCheckboxProps = NonNullable<RowSelection["getCheckboxProps"]>;
 
 interface UsePickerCardProps {
     resourceStore: ResourcePickerStore;
@@ -34,15 +37,16 @@ const usePickerCard = ({ resourceStore }: UsePickerCardProps) => {
         [disableResourceIds]
     );
 
-    const getCheckboxProps = useCallback(
-        (record: Resource) => {
+    const getCheckboxProps = useCallback<GetCheckboxProps>(
+        (record) => {
             return getEnabledProps(record, [
                 {
-                    isDisabled: () => !checkEnabled.call(resourceStore, record),
+                    isDisabled: () =>
+                        !checkEnabled(record as PickerResource),
                 },
             ]);
         },
-        [checkEnabled, getEnabledProps, resourceStore]
+        [checkEnabled, getEnabledProps]
     );
 
     return { getCheckboxProps, getEnabledProps };

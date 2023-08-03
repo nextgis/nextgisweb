@@ -66,7 +66,10 @@ export function ResourcePickerCard({
                 />,
             ]}
         >
-            <ResourcePickerChildren resourceStore={resourceStore} />
+            <ResourcePickerChildren
+                resourceStore={resourceStore}
+                onOk={onOk_}
+            />
         </Card>
     );
 }

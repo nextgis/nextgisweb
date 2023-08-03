@@ -1,10 +1,10 @@
 /** @testentry react */
 import { ResourcePickerCard } from "./ResourcePickerCard";
+import type { ResourcePickerCardProps } from "./type";
 
-const presets = [
-    [ResourcePickerCard, "Default resource picker card", {}],
+const presets: [string, ResourcePickerCardProps][] = [
+    ["Default resource picker card", {}],
     [
-        ResourcePickerCard,
         "Group select",
         {
             pickerOptions: {
@@ -14,7 +14,6 @@ const presets = [
         },
     ],
     [
-        ResourcePickerCard,
         "Feature layer select",
         {
             pickerOptions: {
@@ -28,8 +27,8 @@ const presets = [
 
 function ResourceSelectTest() {
     return (
-        <div style={{maxWidth: "60em"}}>
-            {presets.map(([Component, title, props]) => {
+        <div style={{ maxWidth: "60em" }}>
+            {presets.map(([title, props]) => {
                 const propsCode = Object.entries(props)
                     .map(([k, v]) =>
                         v === true ? k : k + "={" + JSON.stringify(v) + "}"
@@ -38,9 +37,9 @@ function ResourceSelectTest() {
                 return (
                     <div key={title} style={{ marginBottom: "1em" }}>
                         <h2>{title}</h2>
-                        <code>{`<${Component.name} ${propsCode}/>`}</code>
+                        <code>{`<$ResourcePickerCard ${propsCode}/>`}</code>
                         <div style={{ marginTop: "1em" }}>
-                            <Component {...props} />
+                            <ResourcePickerCard {...props} />
                         </div>
                     </div>
                 );
