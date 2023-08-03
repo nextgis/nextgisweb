@@ -1,0 +1,52 @@
+#: model.py:83
+msgid "Tilesets"
+msgstr "Наборы тайлов"
+
+#: model.py:113 nodepkg/resource-widget/Widget.js:31
+msgid "Tileset"
+msgstr "Набор тайлов"
+
+#: model.py:188
+msgid "Number of tiles"
+msgstr "Количество тайлов"
+
+#: model.py:189
+msgid "Zoom levels"
+msgstr "Масштабные уровни"
+
+#: model.py:189
+msgid "From {min} to {max}"
+msgstr "От {min} до {max}"
+
+#: model.py:219
+msgid "Tiles '{}' and '{}' are located in different subdirectories."
+msgstr "Тайлы '{}' и '{}' расположены в разных поддиректориях."
+
+#: model.py:223
+msgid "Tiles '{}' and '{}' have different extensions."
+msgstr "У тайлов '{}' и '{}' разные расширения."
+
+#: model.py:282 model.py:292
+msgid "Unsupported data format."
+msgstr "Неподдерживаемый формат данных."
+
+#: model.py:326
+msgid "Only 256x256 px tiles are supported."
+msgstr "Поддерживаются только тайлы размера 256x256 пикселей."
+
+#: model.py:346
+msgid "No tiles found in source."
+msgstr "В исходном файле нет тайлов."
+
+#: nodepkg/resource-widget/Widget.js:10
+msgid "Select a tileset"
+msgstr "Выберите набор тайлов"
+
+#: nodepkg/resource-widget/Widget.js:11
+msgid ""
+"MBTiles and ZIP archives of tiles are supported. Tiles should be in PNG or "
+"JPEG format and have a size of 256x256 pixels."
+msgstr ""
+"Поддерживаются MBTiles и ZIP-архивы с тайлами. Тайлы должны быть в формате "
+"PNG или JPEG и иметь размер 256x256 пикселей."
+
