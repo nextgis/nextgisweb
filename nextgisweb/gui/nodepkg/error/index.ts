@@ -8,9 +8,6 @@ import { ErrorPage } from "./ErrorPage";
 import type { ErrorModalProps } from "./ErrorModal";
 import type { ApiError } from "./type";
 
-const fallback = new NetworksResponseError();
-console.log(fallback);
-
 function extractError(error: ApiError): ApiError {
     // Temporary solution to detect instance of @nextgisweb/pyramid/api/BaseAPIError
     if (error.name && error.message && error.title) {

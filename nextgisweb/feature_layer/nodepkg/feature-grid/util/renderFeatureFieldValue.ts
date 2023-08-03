@@ -6,7 +6,7 @@ import type { NgwAttributeType } from "../../type";
 export function renderFeatureFieldValue(
     { datatype }: { datatype: FeatureLayerDataType },
     val: NgwAttributeType
-): string {
+): string | number | null {
     if (val) {
         if (datatype === "DATETIME") {
             return utc(new Date(val as string))
@@ -21,5 +21,5 @@ export function renderFeatureFieldValue(
             return utc(dt).local().format("LTS");
         }
     }
-    return String(val);
+    return val as string | number | null;
 }
