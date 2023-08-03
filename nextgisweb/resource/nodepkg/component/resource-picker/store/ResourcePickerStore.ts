@@ -24,7 +24,7 @@ let ID = 0;
 export class ResourcePickerStore implements ResourcePickerStoreOptions {
     readonly _id = ID++;
 
-    resourcesLoadError = false;
+    resourcesLoadError: string | boolean = false;
     resourcesLoading = false;
     resources: ResourceItem[] = [];
 
@@ -33,12 +33,12 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     parentItem: ResourceItem | null = null;
     blueprint: Blueprint | null = null;
 
-    setBreadcrumbItemsError = false;
+    setBreadcrumbItemsError: string | boolean = false;
     breadcrumbItemsLoading = false;
     breadcrumbItems: ResourceItem[] = [];
 
     createNewGroupLoading = false;
-    createNewGroupError = false;
+    createNewGroupError: string | boolean = false;
 
     hideUnavailable = false;
 
