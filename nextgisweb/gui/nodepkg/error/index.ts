@@ -5,14 +5,23 @@ import showModal from "../showModal";
 import { ErrorModal } from "./ErrorModal";
 import { ErrorPage } from "./ErrorPage";
 
-function extractError(error) {
+import type { ErrorModalProps } from "./ErrorModal";
+import type { ApiError } from "./type";
+
+const fallback = new NetworksResponseError();
+console.log(fallback);
+
+function extractError(error: ApiError): ApiError {
     // Temporary solution to detect instance of @nextgisweb/pyramid/api/BaseAPIError
     if (error.name && error.message && error.title) {
         return {
             title: error.title,
             message: error.message,
             detail: error.detail || null,
-            data: error.data && error.data.data ? error.data.data : null,
+            data:
+                error.data && typeof error.data !== "string" && error.data.data
+                    ? error.data.data
+                    : null,
         };
     } else if (error.response) {
         const response = error.response;
@@ -42,7 +51,7 @@ function extractError(error) {
     };
 }
 
-function errorModal(error, props) {
+function errorModal(error: ApiError, props?: Partial<ErrorModalProps>) {
     return showModal(ErrorModal, { error: extractError(error), ...props });
 }
 

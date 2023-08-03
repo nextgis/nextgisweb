@@ -4,6 +4,15 @@ import { Modal } from "@nextgisweb/gui/antd";
 
 import { Body, Footer, TechInfo } from "./shared";
 
+import { ParamsOf } from "../type";
+import type { ApiError } from "./type";
+
+type ModalProps = ParamsOf<typeof Modal>;
+
+export interface ErrorModalProps extends ModalProps {
+    error: ApiError;
+}
+
 const DEFAULTS = {
     centered: true,
     width: "40em",
@@ -11,24 +20,32 @@ const DEFAULTS = {
     maskTransitionName: "",
 };
 
-export function ErrorModal({ error, visible: visibleInitial, ...props }) {
-    const [visible, setVisible] = useState(visibleInitial ?? true);
+export function ErrorModal({
+    error,
+    open: open_,
+    visible,
+    ...props
+}: ErrorModalProps) {
+    const [open, setOpen] = useState(visible ?? open_ ?? true);
     const [tinfo, setTinfo] = useState(false);
 
-    const close = () => setVisible(false);
+    const close = () => setOpen(false);
 
     useEffect(() => {
-        setVisible(visibleInitial);
-    }, [visibleInitial]);
+        const isOpen = visible ?? open_;
+        if (typeof isOpen === "boolean") {
+            setOpen(isOpen);
+        }
+    }, [visible, open_]);
 
     return (
         <Modal
             {...DEFAULTS}
             {...props}
             title={error.title}
-            open={visible}
+            open={open}
             destroyOnClose
-            onCancel={() => setVisible(false)}
+            onCancel={() => setOpen(false)}
             footer={<Footer onOk={close} {...{ tinfo, setTinfo }} />}
         >
             <Body error={error} />
