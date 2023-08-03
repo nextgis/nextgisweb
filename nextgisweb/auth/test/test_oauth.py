@@ -158,7 +158,7 @@ def test_update_profile(ngw_env, ngw_txn):
     assert u3.display_name == "u3"
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def principals():
     groups = (
         ('test_group1', True),

@@ -11,7 +11,7 @@ from nextgisweb.env import DBSession, _, env
 from nextgisweb.lib import db
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
-from nextgisweb.lib.registry import registry_maker
+from nextgisweb.lib.registry import DictRegistry
 
 from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import (
@@ -90,7 +90,7 @@ class TableInfo:
 
         defn = ogrlayer.GetLayerDefn()
 
-        explorer_registry = registry_maker()
+        explorer_registry = DictRegistry()
 
         class Explorer:
             identity = None
@@ -270,7 +270,7 @@ class TableInfo:
 
             for feature in ogrlayer:
                 all_done = True
-                for explorer in explorer_registry:
+                for explorer in explorer_registry.values():
                     if not explorer.done:
                         explorer.work(feature)
                     all_done = all_done and explorer.done
@@ -332,12 +332,12 @@ class TableInfo:
             and fix_errors == ERROR_FIX.NONE
         ):
             if len(fid_params['fid_field']) == 0:
-                raise VE(_("Parameter 'fid_field' is missing."))
+                raise VE(message=_("Parameter 'fid_field' is missing."))
             else:
                 if not fid_field_found:
-                    raise VE(_("Fields %s not found.") % fid_params['fid_field'])
+                    raise VE(message=_("Fields %s not found.") % fid_params['fid_field'])
                 else:
-                    raise VE(_("None of fields %s are integer.") % fid_params['fid_field'])
+                    raise VE(message=_("None of fields %s are integer.") % fid_params['fid_field'])
 
         # Fields
 
@@ -353,7 +353,7 @@ class TableInfo:
             fixed_fld_name = fix_encoding(fld_name)
 
             if fld_name != fixed_fld_name and fix_errors != ERROR_FIX.LOSSY:
-                raise VE(_("Field '%s(?)' encoding is broken.") % fixed_fld_name)
+                raise VE(message=_("Field '%s(?)' encoding is broken.") % fixed_fld_name)
 
             if fixed_fld_name.lower() in FIELD_FORBIDDEN_NAME:
                 if fix_errors == ERROR_FIX.NONE:
@@ -393,7 +393,7 @@ class TableInfo:
                 try:
                     fld_type = FIELD_TYPE_2_ENUM[fld_type_ogr]
                 except KeyError:
-                    raise VE(_("Unsupported field type: %r.") %
+                    raise VE(message=_("Unsupported field type: %r.") %
                              fld_defn.GetTypeName())
 
             uid = uuid.uuid4().hex

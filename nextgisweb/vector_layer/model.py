@@ -394,10 +394,10 @@ class _source_attr(SP):
         if ogrds is None:
             ogrds = ogr.Open(filename, 0)
             if ogrds is None:
-                raise VE(_("GDAL library failed to open file."))
+                raise VE(message=_("GDAL library failed to open file."))
             else:
                 drivername = ogrds.GetDriver().GetName()
-                raise VE(_("Unsupport OGR driver: %s.") % drivername)
+                raise VE(message=_("Unsupport OGR driver: %s.") % drivername)
 
         return ogrds
 
@@ -406,15 +406,15 @@ class _source_attr(SP):
             ogrlayer = ogrds.GetLayerByName(layer_name)
         else:
             if ogrds.GetLayerCount() < 1:
-                raise VE(_("Dataset doesn't contain layers."))
+                raise VE(message=_("Dataset doesn't contain layers."))
 
             if ogrds.GetLayerCount() > 1:
-                raise VE(_("Dataset contains more than one layer."))
+                raise VE(message=_("Dataset contains more than one layer."))
 
             ogrlayer = ogrds.GetLayer(0)
 
         if ogrlayer is None:
-            raise VE(_("Unable to open layer."))
+            raise VE(message=_("Unable to open layer."))
 
         # Do not trust geometry type of shapefiles
         if ogrds.GetDriver().ShortName == DRIVERS.ESRI_SHAPEFILE:
@@ -429,7 +429,7 @@ class _source_attr(SP):
             # Apparently OGR_XLSX_HEADERS is taken into account during the GetSpatialRef call
             gdal.SetConfigOption("OGR_XLSX_HEADERS", "FORCE")
             if ogrlayer.GetSpatialRef() is None:
-                raise VE(_("Layer doesn't contain coordinate system information."))
+                raise VE(message=_("Layer doesn't contain coordinate system information."))
         finally:
             gdal.SetConfigOption("OGR_XLSX_HEADERS", None)
 
@@ -454,22 +454,22 @@ class _source_attr(SP):
 
         fix_errors = srlzr.data.get('fix_errors', ERROR_FIX.default)
         if fix_errors not in ERROR_FIX.enum:
-            raise VE(_("Unknown 'fix_errors' value."))
+            raise VE(message=_("Unknown 'fix_errors' value."))
 
         skip_errors = srlzr.data.get('skip_errors', skip_errors_default)
 
         geometry_type = srlzr.data.get(
             'cast_geometry_type', geom_cast_params_default['geometry_type'])
         if geometry_type not in (None, 'POINT', 'LINESTRING', 'POLYGON'):
-            raise VE(_("Unknown 'cast_geometry_type' value."))
+            raise VE(message=_("Unknown 'cast_geometry_type' value."))
 
         is_multi = srlzr.data.get('cast_is_multi', geom_cast_params_default['is_multi'])
         if is_multi not in TOGGLE.enum:
-            raise VE(_("Unknown 'cast_is_multi' value."))
+            raise VE(message=_("Unknown 'cast_is_multi' value."))
 
         has_z = srlzr.data.get('cast_has_z', geom_cast_params_default['has_z'])
         if has_z not in TOGGLE.enum:
-            raise VE(_("Unknown 'cast_has_z' value."))
+            raise VE(message=_("Unknown 'cast_has_z' value."))
 
         geom_cast_params = dict(
             geometry_type=geometry_type,
