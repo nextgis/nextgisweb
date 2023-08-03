@@ -1,13 +1,24 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import debounce from "lodash/debounce";
+
 import { Input, AutoComplete } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import i18n from "@nextgisweb/pyramid/i18n";
-import { PropTypes } from "prop-types";
+
+import type { ParamsOf } from "@nextgisweb/gui/type";
+import type { ResourceItem, ResourceClass } from "../type/Resource";
 
 import "./ResourcesFilter.less";
 
-const resourcesToOptions = (resourcesInfo) => {
+type AutoProps = ParamsOf<typeof AutoComplete>;
+
+interface ResourcesFilterProps extends AutoProps {
+    onChange?: AutoProps["onSelect"];
+    cls?: ResourceClass;
+}
+
+const resourcesToOptions = (resourcesInfo: ResourceItem[]) => {
     return resourcesInfo.map((resInfo) => {
         const { resource } = resInfo;
         const resourceUrl = routeURL("resource.show", {
@@ -38,34 +49,42 @@ const resourcesToOptions = (resourcesInfo) => {
     });
 };
 
-export function ResourcesFilter({ onChange, cls, ...rest }) {
-    const [options, setOptions] = useState([]);
+export function ResourcesFilter({
+    onChange,
+    cls,
+    ...rest
+}: ResourcesFilterProps) {
+    const { makeSignal, abort } = useAbortController();
+    const [options, setOptions] = useState<AutoProps["options"]>([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
-    const [acStatus, setAcSatus] = useState("");
+    const [acStatus, setAcSatus] = useState<AutoProps["status"]>("");
 
     const makeQuery = useMemo(() => {
         if (search && search.length > 2) {
-            const q = {};
+            const q = "";
             if (search) {
-                const query = { display_name__ilike: `%${search}%` };
+                const query: Record<string, string> = {
+                    display_name__ilike: `%${search}%`,
+                };
                 if (cls) {
                     query.cls = cls;
                 }
-                return {
-                    query,
-                };
+                return query;
             }
             return q;
         }
         return null;
-    }, [search]);
+    }, [search, cls]);
 
-    const makeSearchRequest = useCallback(
-        debounce(async ({ query: q, signal }) => {
+    const makeSearchRequest = useRef(
+        debounce(async ({ query: q }) => {
             setLoading(true);
             try {
-                const resources = await route("resource.search").get(q, signal);
+                abort();
+                const resources = await route("resource.search").get<
+                    ResourceItem[]
+                >({ query: q, signal: makeSignal() });
                 const options = resourcesToOptions(resources);
                 setOptions(options);
                 setAcSatus("");
@@ -74,30 +93,18 @@ export function ResourcesFilter({ onChange, cls, ...rest }) {
             } finally {
                 setLoading(false);
             }
-        }, 1000),
-        []
+        }, 1000)
     );
 
     useEffect(() => {
-        let signal;
-        let controller;
         if (makeQuery) {
-            if (window.AbortController) {
-                controller = new AbortController();
-                signal = controller.signal;
-            }
-            makeSearchRequest({ signal, query: makeQuery });
+            makeSearchRequest.current({ query: makeQuery });
         } else {
             setOptions([]);
         }
-        return () => {
-            if (controller) {
-                controller.abort();
-            }
-        };
     }, [makeQuery]);
 
-    const onSelect = (v, opt) => {
+    const onSelect: AutoProps["onSelect"] = (v, opt) => {
         if (onChange) {
             onChange(v, opt);
         }
@@ -112,7 +119,6 @@ export function ResourcesFilter({ onChange, cls, ...rest }) {
             options={options}
             status={acStatus}
             notFoundContent={i18n.gettext("Resources not found")}
-            autoComplete="one-time-code"
             {...rest}
         >
             <Input.Search
@@ -121,12 +127,8 @@ export function ResourcesFilter({ onChange, cls, ...rest }) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 loading={loading}
+                autoComplete="one-time-code"
             />
         </AutoComplete>
     );
 }
-
-ResourcesFilter.propTypes = {
-    onChange: PropTypes.func,
-    cls: PropTypes.string,
-};
