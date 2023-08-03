@@ -14,7 +14,7 @@ export async function loadParents(
     const parents: ResourceItem[] = [];
     let parentIdOrNull: number | null | Resource["parent"] = resourceId;
     while (typeof parentIdOrNull === "number") {
-        const resourceItem = await route("resource.item", {
+        const resourceItem: ResourceItem = await route("resource.item", {
             id: parentIdOrNull,
         }).get<ResourceItem>({
             signal,

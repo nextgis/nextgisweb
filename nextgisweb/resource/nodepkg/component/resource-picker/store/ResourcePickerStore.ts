@@ -58,8 +58,8 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     multiple = false;
 
-    readonly onNewGroup: null | OnNewGroupType = null;
-    readonly onTraverse: null | ((parentId: number) => void) = null;
+    readonly onNewGroup?: OnNewGroupType;
+    readonly onTraverse?: (parentId: number) => void;
 
     setResourcesAbortController: AbortController | null = null;
     setBreadcrumbItemsAbortController: AbortController | null = null;
@@ -246,7 +246,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
             runInAction(() => {
                 this.setBreadcrumbItemsError = title;
             });
-            throw new Error(er);
+            throw new Error(String(er));
         } finally {
             runInAction(() => {
                 this.breadcrumbItemsLoading = false;
@@ -296,7 +296,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
             runInAction(() => {
                 this.resourcesLoadError = title;
             });
-            throw new Error(er);
+            throw new Error(String(er));
         } finally {
             runInAction(() => {
                 this.resourcesLoading = false;

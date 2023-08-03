@@ -9,6 +9,6 @@ export type SelectProps = Parameters<typeof Select>[0];
 export interface ResourceSelectProps<V extends SelectValue = SelectValue>
     extends Omit<SelectProps, "onChange"> {
     pickerOptions?: ResourcePickerStoreOptions;
-    onChange?: (val: V) => void;
+    onChange?: (val: V | undefined) => void;
     value?: V;
 }

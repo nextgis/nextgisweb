@@ -33,8 +33,8 @@ export const ResourceSelect = ({
     const { makeSignal, abort } = useAbortController();
     const [value_, setValue_] = useState(value);
     const [open, setOpen] = useState(false);
-    const pickerParentIdMem = useRef<number | null>(
-        pickerOptions ? pickerOptions.parentId : null
+    const pickerParentIdMem = useRef<number | undefined>(
+        pickerOptions ? pickerOptions.parentId : undefined
     );
     const [resource, setResource] = useState<ResourceItem | null>(null);
     const [resourceLoading, setResourceLoading] = useState(
@@ -67,7 +67,7 @@ export const ResourceSelect = ({
     }, [value_, abort, makeSignal]);
 
     const onPick = useCallback(
-        (val: SelectValue) => {
+        (val: SelectValue | undefined) => {
             setValue_(val);
             setOpen(false);
             if (onChange) {
@@ -86,7 +86,7 @@ export const ResourceSelect = ({
         if (open) {
             const selected: number[] = [value_]
                 .flat()
-                .filter((v) => typeof v === "number");
+                .filter((v) => typeof v === "number") as number[];
             const pickerOptions_: ResourcePickerStoreOptions = {
                 parentId: pickerParentIdMem.current,
                 ...pickerOptions,
@@ -119,7 +119,7 @@ export const ResourceSelect = ({
             : [];
     }, [resource]);
 
-    const optionRender = ({ label, cls }) => {
+    const optionRender = ({ label, cls }: Pick<Option, "label" | "cls">) => {
         return renderResourceCls({ name: label, cls });
     };
 
@@ -132,7 +132,7 @@ export const ResourceSelect = ({
             popupClassName="ngw-resource-resource-select-hidden-dropdown"
             dropdownRender={() => <></>}
             onClear={() => {
-                onPick(null);
+                onPick(undefined);
             }}
             {...selectOptions}
         >
