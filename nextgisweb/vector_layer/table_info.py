@@ -502,7 +502,8 @@ class TableInfo:
                 sequence,
                 primary_key=True),
             db.Column('geom', ga.Geometry(
-                dimension=2, srid=self.srs.id,
+                dimension=3 if self.geometry_type in GEOM_TYPE.has_z else 2,
+                srid=self.srs.id,
                 geometry_type=geom_fldtype)),
             *map(lambda fld: db.Column(fld.key, FIELD_TYPE_2_DB[
                 fld.datatype]), self.fields)
