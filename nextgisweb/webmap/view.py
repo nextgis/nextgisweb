@@ -288,21 +288,21 @@ class WebMapTMSLink(TMSLink):
 def setup_pyramid(comp, config):
     config.add_route(
         'webmap.display', r'/resource/{id:uint}/display',
-        factory=resource_factory, client=('id', )
+        factory=resource_factory
     ).add_view(display, context=WebMap)
 
     config.add_route(
         'webmap.display.tiny', r'/resource/{id:uint}/display/tiny',
-        factory=resource_factory, client=('id', )
+        factory=resource_factory
     ).add_view(display_tiny, context=WebMap)
 
     config.add_route(
-        'webmap.preview_embedded', '/webmap/embedded-preview', client=True,
+        'webmap.preview_embedded', '/webmap/embedded-preview',
     ).add_view(preview_embedded)
 
     config.add_route(
         'webmap.clone', r'/resource/{id:uint}/clone',
-        factory=resource_factory, client=('id',)
+        factory=resource_factory,
     ).add_view(clone, context=WebMap)
 
     class DisplayMenu(DynItem):

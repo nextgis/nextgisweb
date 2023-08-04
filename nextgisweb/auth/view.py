@@ -370,9 +370,9 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.logout', '/logout').add_view(logout)
 
-    config.add_route('auth.oauth', '/oauth', client=True).add_view(oauth)
+    config.add_route('auth.oauth', '/oauth').add_view(oauth)
 
-    config.add_route('auth.settings', '/settings', client=True) \
+    config.add_route('auth.settings', '/settings') \
         .add_view(settings)
 
     config.add_request_method(_login_url, name='login_url')
@@ -380,18 +380,18 @@ def setup_pyramid(comp, config):
     config.add_route('auth.principal_dump', '/auth/principal/dump') \
         .add_view(principal_dump)
 
-    config.add_route('auth.user.browse', '/auth/user/', client=True) \
+    config.add_route('auth.user.browse', '/auth/user/') \
         .add_view(user_browse)
-    config.add_route('auth.user.create', '/auth/user/create', client=True) \
+    config.add_route('auth.user.create', '/auth/user/create') \
         .add_view(user_create_or_edit)
-    config.add_route('auth.user.edit', '/auth/user/{id:uint}', client=True) \
+    config.add_route('auth.user.edit', '/auth/user/{id:uint}') \
         .add_view(user_create_or_edit)
 
-    config.add_route('auth.group.browse', '/auth/group/', client=True) \
+    config.add_route('auth.group.browse', '/auth/group/') \
         .add_view(group_browse)
-    config.add_route('auth.group.create', '/auth/group/create', client=True) \
+    config.add_route('auth.group.create', '/auth/group/create') \
         .add_view(group_create_or_edit)
-    config.add_route('auth.group.edit', '/auth/group/{id:uint}', client=True) \
+    config.add_route('auth.group.edit', '/auth/group/{id:uint}') \
         .add_view(group_create_or_edit)
 
     class AuthComponentMenu(dm.DynItem):

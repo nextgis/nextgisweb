@@ -249,28 +249,28 @@ def setup_pyramid(comp, config):
             factory=resource_factory,
             **kwargs)
 
-    _route('schema', 'schema', client=()).add_view(schema)
+    _route('schema', 'schema').add_view(schema)
 
     _route('root', '').add_view(
         lambda r: httpexceptions.HTTPFound(
             r.route_url('resource.show', id=0)))
 
-    _resource_route('show', r'{id:uint}', client=('id', )).add_view(show)
+    _resource_route('show', r'{id:uint}').add_view(show)
 
-    _resource_route('json', r'{id:uint}/json', client=('id', )) \
+    _resource_route('json', r'{id:uint}/json') \
         .add_view(json_view)
 
     _resource_route('effective_permissions', r'{id:uint}/permissions') \
         .add_view(effective_permisssions)
 
-    _resource_route('export.page', r'{id:uint}/export', request_method='GET', client=True)
+    _resource_route('export.page', r'{id:uint}/export', request_method='GET')
 
-    _route('widget', 'widget', client=()).add_view(widget)
+    _route('widget', 'widget').add_view(widget)
 
     # CRUD
-    _resource_route('create', r'{id:uint}/create', client=('id', )).add_view(create)
-    _resource_route('update', r'{id:uint}/update', client=('id', )).add_view(update)
-    _resource_route('delete', r'{id:uint}/delete', client=('id', )).add_view(delete)
+    _resource_route('create', r'{id:uint}/create').add_view(create)
+    _resource_route('update', r'{id:uint}/update').add_view(update)
+    _resource_route('delete', r'{id:uint}/delete').add_view(delete)
 
     # Sections
 

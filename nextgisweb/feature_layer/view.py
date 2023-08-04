@@ -141,34 +141,29 @@ def setup_pyramid(comp, config):
     config.add_route(
         'feature_layer.export_multiple',
         r'/resource/export_multiple',
-        client=True
     ).add_view(export_multiple)
 
     config.add_route(
         'feature_layer.feature.browse',
         r'/resource/{id:uint}/feature/',
         factory=resource_factory,
-        client=('id', )
     ).add_view(feature_browse)
 
     config.add_route(
         'feature_layer.feature.show',
         r'/resource/{id:uint}/feature/{feature_id:int}',
         factory=resource_factory,
-        client=('id', 'feature_id')
     ).add_view(feature_show, context=IFeatureLayer)
 
     config.add_route(
         'feature_layer.feature.update',
         r'/resource/{id:uint}/feature/{feature_id:int}/update',
         factory=resource_factory,
-        client=('id', 'feature_id')
     ).add_view(feature_update, context=IFeatureLayer)
 
     config.add_route(
         'feature_layer.field', r'/resource/{id:uint}/field/',
         factory=resource_factory,
-        client=('id', )
     ).add_view(field_collection, context=IFeatureLayer)
 
     config.add_view(

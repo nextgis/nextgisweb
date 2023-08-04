@@ -369,18 +369,22 @@ def setup_pyramid(comp, config):
 
     # OTHERS
 
-    config.add_route('home', '/').add_view(home)
+    config.add_route('home', '/', client=False).add_view(home)
 
     config.add_route(
         'pyramid.control_panel',
-        '/control-panel', client=(),
+        '/control-panel',
     ).add_view(control_panel)
 
-    config.add_route('pyramid.favicon', '/favicon.ico').add_view(favicon)
+    config.add_route(
+        'pyramid.favicon',
+        '/favicon.ico',
+        client=False,
+    ).add_view(favicon)
 
     config.add_route(
         'pyramid.control_panel.sysinfo',
-        '/control-panel/sysinfo', client=(),
+        '/control-panel/sysinfo',
     ).add_view(sysinfo)
 
     if env.core.options['storage.enabled']:
@@ -401,7 +405,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'pyramid.control_panel.cors',
-        '/control-panel/cors', client=(),
+        '/control-panel/cors',
     ).add_view(cors)
 
     config.add_route(

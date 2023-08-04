@@ -73,9 +73,9 @@ def srs_create_or_edit(request):
 
 def setup_pyramid(comp, config):
 
-    config.add_route('srs.browse', '/srs/', client=True).add_view(srs_browse)
-    config.add_route('srs.create', '/srs/create', client=True).add_view(srs_create_or_edit)
-    config.add_route('srs.edit', '/srs/{id:uint}', client=True).add_view(srs_create_or_edit)
+    config.add_route('srs.browse', '/srs/').add_view(srs_browse)
+    config.add_route('srs.create', '/srs/create').add_view(srs_create_or_edit)
+    config.add_route('srs.edit', '/srs/{id:uint}').add_view(srs_create_or_edit)
 
     class SRSMenu(dm.DynItem):
 
@@ -123,10 +123,10 @@ def setup_pyramid(comp, config):
     if comp.options['catalog.enabled']:
         config.add_route(
             'srs.catalog',
-            '/srs/catalog', client=True
+            '/srs/catalog',
         ).add_view(catalog_browse)
 
         config.add_route(
             'srs.catalog.import',
-            r'/srs/catalog/{id:uint}', client=('id', )
+            r'/srs/catalog/{id:uint}'
         ).add_view(catalog_import)
