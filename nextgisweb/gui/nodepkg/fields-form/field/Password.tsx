@@ -10,7 +10,7 @@ type PasswordProps = FormItemProps<InputProps> & {
     /** @deprecated move to inputProps */
     autoComplete?: InputProps["autoComplete"];
     /** @deprecated move to inputProps */
-    placeholder?: InputProps["placeholder"];
+    placeholder?: string;
 };
 
 export function Password({

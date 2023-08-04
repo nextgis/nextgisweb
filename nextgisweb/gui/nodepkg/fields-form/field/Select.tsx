@@ -9,12 +9,15 @@ import type { FormItemProps, FormFieldChoice } from "../type";
 type InputProps = Parameters<typeof AntdSelect>[0];
 
 type SelectProps = FormItemProps<AntdSelectProps> & {
-    choices: FormFieldChoice[];
+    choices?: FormFieldChoice[];
     /** @deprecated move to inputProps */
     mode?: InputProps["mode"];
 };
 
 export function Select({ choices, mode, ...props }: SelectProps) {
+    if (!choices) {
+        throw new Error("The `choices` is required field for Select field");
+    }
     return (
         <FormItem
             {...props}

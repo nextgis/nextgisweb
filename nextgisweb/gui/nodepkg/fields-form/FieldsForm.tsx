@@ -24,11 +24,18 @@ export function FieldsForm({
         });
     };
     const onFieldsChange: FormProps["onFieldsChange"] = (changedFields) => {
-        const value = {};
+        const value: Record<string, unknown> = {};
         for (const c of changedFields) {
-            value[c.name[0]] = c.value;
+            const namePaths: (number | string)[] = Array.isArray(c.name)
+                ? c.name
+                : [c.name];
+            for (const name of namePaths) {
+                value[name] = c.value;
+            }
         }
-        onChange({ isValid, value });
+        if (onChange) {
+            onChange({ isValid, value });
+        }
     };
 
     const formProps_: Partial<FormProps> = {
@@ -50,15 +57,12 @@ export function FieldsForm({
                 ? fields.filter((f) => {
                       const included = f.included;
                       if (included !== undefined) {
-                          if (typeof included === "function") {
-                              return included(f, initialValues);
-                          }
                           return !!included;
                       }
                       return true;
                   })
                 : [],
-        [fields, initialValues]
+        [fields]
     );
 
     useEffect(() => {

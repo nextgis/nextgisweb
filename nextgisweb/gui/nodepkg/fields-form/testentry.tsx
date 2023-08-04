@@ -118,7 +118,7 @@ const presets: [title: string, props: FieldsFormProps][] = [
     ],
 ];
 
-function FormValues(props) {
+function FormValues(props: FieldsFormProps) {
     const [values, setValues] = useState<Record<string, unknown>>({});
     return (
         <>

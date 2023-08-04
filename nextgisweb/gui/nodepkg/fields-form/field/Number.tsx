@@ -6,7 +6,7 @@ import type { FormItemProps } from "../type";
 
 type InputNumberProps = Parameters<typeof InputNumber>[0];
 
-type NumberProps = FormItemProps<InputNumberProps> & {
+export type NumberProps = FormItemProps<InputNumberProps> & {
     /** @deprecated move to inputProps */
     min?: InputNumberProps["min"];
     /** @deprecated move to inputProps */

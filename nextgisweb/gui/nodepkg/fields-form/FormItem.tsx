@@ -41,10 +41,10 @@ export function FormItem(props: FormField) {
         });
     }
 
-    let FormWidget: ElementType;
+    let FormWidget: ElementType | undefined = undefined;
     if (typeof widget === "string") {
-        FormWidget = widgetsByName[widget.toLowerCase()];
-    } else {
+        FormWidget = widgetsByName[widget.toLowerCase() as WidgetName];
+    } else if (widget) {
         FormWidget = widget;
     }
     FormWidget = FormWidget || Input;

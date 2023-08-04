@@ -1,26 +1,20 @@
 import { Number } from "./Number";
 
-import type { InputNumberProps } from "antd/lib/input-number";
-import type { FormItemProps } from "../type";
-
-type NumberProps = FormItemProps<InputNumberProps<number>> & {
-    /** @deprecated move to inputProps */
-    min?: InputNumberProps<number>["min"];
-    /** @deprecated move to inputProps */
-    max?: InputNumberProps<number>["max"];
-};
+import type { NumberProps } from "./Number";
 
 export function Integer(props: NumberProps) {
     const inputProps = props.inputProps || {};
     const maxint = 2 ** 63 - 1;
-    inputProps.max = props.max ?? maxint;
+    const max: number = (props.max as number) ?? maxint;
+    inputProps.max = max;
 
     inputProps.formatter = (v) => {
         if (typeof v === "string") {
             const int = parseInt(v, 10);
-            const maxInt = int > inputProps.max ? inputProps.max : int;
+            const maxInt = int > max ? inputProps.max : int;
             return v ? String(maxInt) : "";
         }
+        return "";
     };
 
     return <Number inputProps={inputProps} {...props}></Number>;

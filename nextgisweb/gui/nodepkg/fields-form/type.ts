@@ -44,10 +44,11 @@ export interface FormOnChangeOptions {
 }
 
 export interface InputProps<V = unknown> {
-    // placeholder?: string;
+    placeholder?: ReactNode;
     disabled?: boolean;
     value?: V;
-    onChange?: (...args: unknown[]) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onChange?: (...args: any[]) => void;
 }
 
 export interface FormItemProps<P extends InputProps = InputProps>
@@ -58,22 +59,25 @@ export interface FormItemProps<P extends InputProps = InputProps>
     disabled?: boolean;
     prepend?: ReactNode;
     append?: ReactNode;
+
     input?: (props: P) => ReactNode;
 }
 
 export type WidgetName = keyof WidgetFieldMap;
 
-export type FormWidgetComponent = (
-    props: FormItemProps<InputProps & React.RefAttributes<unknown>>
-) => JSX.Element;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FormWidgetComponent = (props: FormItemProps<any>) => JSX.Element;
 
 export type FormWidget = WidgetName | FormWidgetComponent;
 
-type GetWidgetInputPropsFromName<W extends WidgetName> = Parameters<
-    WidgetFieldMap[W]
->[0]["inputProps"];
-type GetWidgetInputPropsFromComponent<W extends FormWidgetComponent> =
-    Parameters<W>[0]["inputProps"];
+type GetWidgetInputPropsFromName<W extends WidgetName> = Exclude<
+    Parameters<WidgetFieldMap[W]>[0]["inputProps"],
+    undefined
+>;
+type GetWidgetInputPropsFromComponent<W extends FormWidgetComponent> = Exclude<
+    Parameters<W>[0]["inputProps"],
+    undefined
+>;
 
 type GetWidgetInputProps<W extends FormWidget> = W extends WidgetName
     ? GetWidgetInputPropsFromName<W>
@@ -86,9 +90,7 @@ export interface FormField<W extends FormWidget = FormWidget>
     widget?: W;
     inputProps?: GetWidgetInputProps<W>;
     choices?: FormFieldChoice[];
-    included?:
-        | ((field: FormField<W>, values: Record<string, unknown>) => boolean)
-        | boolean;
+    included?: boolean;
     requiredMessage?: string;
     // TODO: remove usage
     value?: unknown;

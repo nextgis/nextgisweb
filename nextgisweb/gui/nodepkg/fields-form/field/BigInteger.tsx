@@ -13,17 +13,18 @@ type BigIntegerProps = FormItemProps<InputNumberProps> & {
 };
 
 const InputNumber_ = ({ value, onChange, ...inputProps }: InputNumberProps) => {
-    const formatter = (v) => {
-        v = v.match(/\d+/);
-        return v ? v[0] : "";
-    };
-
     return (
         <InputNumber
             stringMode
             value={value}
             onChange={onChange}
-            formatter={formatter}
+            formatter={(val) => {
+                if (typeof val === "string") {
+                    const v = val.match(/\d+/);
+                    return v ? v[0] : "";
+                }
+                return "";
+            }}
             {...inputProps}
         />
     );

@@ -11,7 +11,11 @@ export function FormItem<P extends InputProps = InputProps>({
     input,
     ...props
 }: FormItemProps<P>) {
-    const inputProps_: P = { placeholder, disabled, ...inputProps };
+    const inputProps_: P = {
+        placeholder,
+        disabled,
+        ...(inputProps || {}),
+    } as P;
 
     const propsForInput = {} as P;
 
