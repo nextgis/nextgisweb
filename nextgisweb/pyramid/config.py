@@ -1,3 +1,4 @@
+import re
 from inspect import signature
 from warnings import warn
 
@@ -21,6 +22,19 @@ class RouteHelper:
         return self
 
 
+ROUTE_PATTERN = dict(
+    str=None,
+    int=r'-?[0-9]+',
+    uint=r'[0-9]+',
+)
+
+ROUTE_RE = re.compile(
+    r'\{(?P<k>\w+)(?:\:(?P<t>(?:' +
+    '|'.join(ROUTE_PATTERN.keys()) +
+    r')))?(?:\:(?P<r>.+?))?\}'
+)
+
+
 class Configurator(PyramidConfigurator):
 
     def add_route(self, name, pattern=None, **kwargs):
@@ -42,8 +56,35 @@ class Configurator(PyramidConfigurator):
 
         """
 
-        super().add_route(
-            name, pattern=pattern, **kwargs)
+        if pattern is not None:
+            mdtypes = dict()
+            missing = False
+
+            def sub(m):
+                k, t, r = m.groups()
+                if t is not None:
+                    mdtypes[k] = t
+                    regexp = ROUTE_PATTERN[t]
+                    return f"{{{k}:{regexp}}}" if regexp else f"{{{k}}}"
+                elif r is None:
+                    nonlocal missing
+                    missing = True
+
+                return m.group(0)
+
+            pattern = ROUTE_RE.sub(sub, pattern)
+            if len(mdtypes) > 0:
+                kwargs['mdtypes'] = mdtypes
+
+            if missing:
+                warn(
+                    f"Some matchdict type specifiers are missing for route "
+                    f"{name} ({pattern}). Available since 4.5.0.dev13 and "
+                    f"will be required in 4.6.0.dev0.",
+                    DeprecationWarning, stacklevel=2)
+
+
+        super().add_route(name, pattern=pattern, **kwargs)
 
         return RouteHelper(name, self)
 

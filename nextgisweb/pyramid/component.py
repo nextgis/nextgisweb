@@ -14,7 +14,13 @@ from nextgisweb.lib.logging import logger
 from . import uacompat
 from .config import Configurator
 from .model import Session, SessionStore
-from .util import ClientRoutePredicate, ErrorRendererPredicate, StaticMap, gensecret
+from .util import (
+    ClientRoutePredicate,
+    ErrorRendererPredicate,
+    MatchDictTypesPredicate,
+    StaticMap,
+    gensecret,
+)
 
 
 class PyramidComponent(Component):
@@ -25,6 +31,7 @@ class PyramidComponent(Component):
         config = Configurator(settings=settings)
 
         config.add_route_predicate('client', ClientRoutePredicate)
+        config.add_route_predicate('mdtypes', MatchDictTypesPredicate)
         config.add_route_predicate('error_renderer', ErrorRendererPredicate)
 
         # Setup pyramid app for other components

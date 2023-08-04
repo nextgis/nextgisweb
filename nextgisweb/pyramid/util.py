@@ -46,6 +46,22 @@ class ClientRoutePredicate:
         return "<client>"
 
 
+class MatchDictTypesPredicate:
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return ', '.join(f"{k}: {v}" for k, v in self.val.items())
+
+    phash = text
+
+    def __call__(self, context, request):
+        return True
+
+    def __repr__(self):
+        return f"<mdtypes({self.text()})>"
+
+
 class ErrorRendererPredicate:
     def __init__(self, val, config):
         self.val = val
