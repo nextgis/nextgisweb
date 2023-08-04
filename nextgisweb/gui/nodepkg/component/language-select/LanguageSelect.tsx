@@ -7,8 +7,8 @@ type InputProps = Parameters<typeof Select>[0];
 export interface LanguageSelectProps extends InputProps {
     /** Add  proposal to contribute to the translation  */
     contribute?: boolean;
-    value?: string;
-    onChange?: (val: string) => void;
+    // value: string;
+    // onChange: (val: string) => void;
 }
 
 const languageContributeUrl = settings.language_contribute_url;
@@ -33,19 +33,17 @@ export const LanguageSelect = ({
         ...settings.languages,
     ];
 
-    const onChangeMW = (val) => {
-        if (val === defValue) {
-            val = null;
-        }
-        if (onChange) {
-            onChange(val);
-        }
-    };
-
     const SelectInput = () => (
         <Select
             value={value}
-            onChange={onChangeMW}
+            onChange={(val, opt) => {
+                if (val === defValue) {
+                    val = null;
+                }
+                if (onChange) {
+                    onChange(val, opt);
+                }
+            }}
             // See https://ant.design/components/select/#FAQ
             listHeight={32 * (settings.languages.length + 1)}
             style={{ flexGrow: 1 }}
