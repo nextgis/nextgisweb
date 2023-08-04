@@ -8,7 +8,7 @@ import {
 
 import { useActionToolbar } from "./hook/useActionToolbar";
 
-import { ActionToolbarProps } from "./type";
+import type { ActionToolbarAction, ActionToolbarProps } from "./type";
 
 import "./ActionToolbar.less";
 
@@ -46,7 +46,7 @@ export const ActionToolbar = forwardRef<HTMLDivElement, ActionToolbarProps>(
 
         const [leftActions_, rightActions_] = useMemo(() => {
             keyIndexRef.current = 0;
-            const leftActions__ = [];
+            const leftActions__: ActionToolbarAction[] = [];
             const rightActions__ = [
                 ...rightActions.map((rightAction) => getAction(rightAction)),
             ];

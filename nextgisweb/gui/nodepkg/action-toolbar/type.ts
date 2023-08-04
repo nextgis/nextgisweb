@@ -14,8 +14,8 @@ export interface UseActionToolbarProps {
 export interface CreateButtonActionOptions
     extends Omit<ButtonProps, "icon" | "disabled"> {
     icon?: string | JSX.Element;
-    action?: (val: Props) => void;
-    disabled?: ((val: Props) => boolean) | boolean;
+    action?: (val?: Props) => void;
+    disabled?: ((val?: Props) => boolean) | boolean;
 }
 
 export type ActionToolbarAction =
