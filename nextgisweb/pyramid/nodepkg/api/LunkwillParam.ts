@@ -7,7 +7,7 @@ export class LunkwillParam {
         this.value = LunkwillParam.VALUES[0];
     }
 
-    update(value, cond = true) {
+    update(value: string | null, cond = true) {
         if (!cond) {
             return;
         }
@@ -29,7 +29,7 @@ export class LunkwillParam {
         this.update("require", cond);
     }
 
-    toHeaders(headers) {
+    toHeaders(headers: Record<string, string>) {
         if (this.value !== null) {
             headers["X-Lunkwill"] = this.value;
         }

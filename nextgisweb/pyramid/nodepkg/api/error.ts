@@ -5,7 +5,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { LunkwillData } from "./type";
 
 export class BaseAPIError extends BaseError {
-    readonly title: string;
+    title: string;
 
     constructor(message: string) {
         super(message || gettext("Something went wrong."));
@@ -14,7 +14,6 @@ export class BaseAPIError extends BaseError {
 }
 
 export class NetworksResponseError extends BaseAPIError {
-    readonly title: string;
     readonly detail: string;
 
     // prettier-ignore
@@ -26,7 +25,6 @@ export class NetworksResponseError extends BaseAPIError {
 }
 
 export class InvalidResponseError extends BaseAPIError {
-    readonly title: string;
 
     constructor(message?: string) {
         super(message || gettext("Something went wrong."));
@@ -34,14 +32,13 @@ export class InvalidResponseError extends BaseAPIError {
     }
 }
 
-interface ServerResponseErrorData {
+export interface ServerResponseErrorData {
     message: string;
     title?: string;
     detail?: string;
 }
 
 export class ServerResponseError extends BaseAPIError {
-    readonly title: string;
     readonly detail: string | null;
     readonly data: ServerResponseErrorData;
 

@@ -5,6 +5,7 @@ import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 import { route as apiRoute } from "../api";
 import { useAbortController } from "./useAbortController";
 
+import type { RequestMethod } from "../api/type";
 import type { UseRouteParams } from "./type";
 
 type LoadingCounterState = "increment" | "decrement" | "reset";
@@ -37,12 +38,13 @@ export function useRoute(
         { count: Number(!!loadOnInit_) }
     );
 
-    const [routerParams] = useObjectState(params);
+    const [routerParams] = useObjectState<UseRouteParams>(params || {});
 
     const route = useMemo(() => {
         const route_ = apiRoute(name, routerParams);
         abort();
-        for (const method of ["get", "post", "put", "delete"]) {
+        const methods: RequestMethod[] = ["get", "post", "put", "delete"];
+        for (const method of methods) {
             const requestForMethodCb = route_[method];
             route_[method] = async (options) => {
                 if (loadOnInit_.current) {

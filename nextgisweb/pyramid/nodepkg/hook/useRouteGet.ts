@@ -4,6 +4,7 @@ import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 
 import { useRoute } from "./useRoute";
 
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import type { RequestOptions } from "../api/type";
 import type { UseRouteGetParams, UseRouteParams } from "./type";
 
@@ -29,7 +30,7 @@ export function useRouteGet<D = unknown>(
     const { route, abort } = useRoute(endpointName_, params_, loadOnInit_);
     const [isLoading, setIsLoading] = useState(!!loadOnInit_);
     const [data, setData] = useState<D>();
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<ApiError | null>(null);
 
     const [routerOptions] = useObjectState(options_);
 
@@ -41,7 +42,7 @@ export function useRouteGet<D = unknown>(
             const data = await route.get<D>(routerOptions);
             setData(data);
         } catch (er) {
-            setError(er);
+            setError(er as ApiError);
         } finally {
             setIsLoading(false);
         }

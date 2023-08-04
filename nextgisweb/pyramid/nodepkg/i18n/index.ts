@@ -7,7 +7,7 @@ export const normalize = callingComponent;
 export function load(
     component: string,
     require: unknown,
-    load: { (module: unknown) }
+    load: { (module: unknown): unknown }
 ) {
     const gettext = domain(component);
     const module = { renderTemplate: factory(gettext), ...gettext };

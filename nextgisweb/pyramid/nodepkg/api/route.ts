@@ -57,7 +57,7 @@ export function route(name: string, ...rest: RouteUrlOptOrArgs): RouteResults {
     const methods: RequestMethod[] = ["get", "post", "put", "delete"];
     for (const method of methods) {
         result[method] = <T = unknown, B extends boolean = false>(
-            requestOptions: RequestOptions<B>
+            requestOptions?: RequestOptions<B>
         ): Promise<ToReturn<T, B>> =>
             request<T, B>(template, {
                 ...requestOptions,

@@ -7,7 +7,7 @@ import { ResourceSelect } from "@nextgisweb/resource/component/resource-select";
 import { useRouteGet } from "./useRouteGet";
 
 export const UseRouterGetTest = () => {
-    const [resourceId, setResourceId] = useState(0);
+    const [resourceId, setResourceId] = useState<number>(0);
     const { data } = useRouteGet({
         name: "resource.item",
         params: { id: resourceId },
@@ -17,7 +17,9 @@ export const UseRouterGetTest = () => {
             <ResourceSelect
                 value={resourceId}
                 onChange={(e) => {
-                    setResourceId(Array.isArray(e) ? e[0] : e);
+                    if (e) {
+                        setResourceId(Array.isArray(e) ? e[0] : e);
+                    }
                 }}
             />
             <div>{data ? JSON.stringify(data, null, 2) : ""}</div>

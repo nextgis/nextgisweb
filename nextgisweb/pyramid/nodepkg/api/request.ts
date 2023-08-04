@@ -10,12 +10,14 @@ import {
 } from "./error";
 import { cache } from "./cache";
 
+import type { ServerResponseErrorData } from "./error";
 import type { LunkwillData, RequestOptions, ToReturn } from "./type";
 
 function lunkwillCheckResponse(lwResp: Response) {
     const ct = lwResp.headers.get("content-type");
     return (
         ct !== undefined &&
+        ct !== null &&
         ct.includes("application/vnd.lunkwill.request-summary+json")
     );
 }
@@ -108,7 +110,7 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
 
     let useLunkwill = false;
     if (opt.lunkwill !== undefined) {
-        opt.lunkwill.toHeaders(opt.headers);
+        opt.lunkwill.toHeaders(opt.headers || {});
         delete opt.lunkwill;
         useLunkwill = true;
     }
@@ -118,7 +120,9 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
 
     if (opt.json !== undefined) {
         opt.body = JSON.stringify(opt.json);
-        opt.headers["Content-Type"] = "application/json";
+        const headers = opt.headers || {};
+        headers["Content-Type"] = "application/json";
+        opt.headers = headers;
         delete opt.json;
     }
 
@@ -138,7 +142,7 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
         try {
             response = await fetch(url, opt);
         } catch (e) {
-            if (e.name === "AbortError") {
+            if ((e as Error).name === "AbortError") {
                 throw e;
             }
             throw new NetworksResponseError();
@@ -164,7 +168,7 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
             throw new InvalidResponseError();
         }
 
-        let body: T;
+        let body: T | ServerResponseErrorData;
         try {
             body = await response.json();
         } catch (e) {
@@ -172,12 +176,12 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
         }
 
         if (400 <= response.status && response.status <= 599) {
-            throw new ServerResponseError(body as ServerResponseError);
+            throw new ServerResponseError(body as ServerResponseErrorData);
         }
 
         return body as ToReturn<T, ReturnUrl>;
     };
-    if (opt.method.toUpperCase() === "GET" && useCache) {
+    if (opt.method && opt.method.toUpperCase() === "GET" && useCache) {
         const cacheToUse = useCache instanceof LoaderCache ? useCache : cache;
         return cacheToUse.promiseFor(url, makeRequest) as ToReturn<
             T,
