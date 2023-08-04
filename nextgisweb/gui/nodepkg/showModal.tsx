@@ -29,9 +29,9 @@ export default function showModal<
         });
     };
 
-    function destroy() {
+    const destroy = () => {
         ReactDOM.unmountComponentAtNode(container);
-    }
+    };
 
     function close(): void {
         currentConfig = {
@@ -43,7 +43,7 @@ export default function showModal<
                     config.afterClose();
                 }
 
-                destroy.apply(this);
+                destroy();
             },
         };
         render(currentConfig);
