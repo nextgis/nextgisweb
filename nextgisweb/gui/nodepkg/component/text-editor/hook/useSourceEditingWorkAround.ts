@@ -30,8 +30,8 @@ export function useSourceEditingWorkAround({
             };
 
             const onSourceEditingMode = (
-                evt,
-                name,
+                _evt: unknown,
+                _name: string,
                 isSourceEditingMode: boolean
             ) => {
                 if (isSourceEditingMode) {
