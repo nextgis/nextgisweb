@@ -29,8 +29,7 @@ export function SRSWidget({ id }) {
                 label: i18n.gettext("Authority and code"),
                 value: (record) => `${record.auth_name}:${record.auth_srid}`,
                 disabled: true,
-                included: (field, values) =>
-                    id !== undefined && values.protected,
+                included: id !== undefined && isProtected,
             },
             {
                 name: "wkt",
@@ -41,7 +40,7 @@ export function SRSWidget({ id }) {
                 disabled: isProtected,
             },
         ];
-    }, [isProtected]);
+    }, [isProtected, id]);
 
     const showModal = () => {
         setIsModalVisible(true);
