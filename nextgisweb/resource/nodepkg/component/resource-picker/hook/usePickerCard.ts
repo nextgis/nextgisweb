@@ -41,8 +41,7 @@ const usePickerCard = ({ resourceStore }: UsePickerCardProps) => {
         (record) => {
             return getEnabledProps(record, [
                 {
-                    isDisabled: () =>
-                        !checkEnabled(record as PickerResource),
+                    isDisabled: () => !checkEnabled(record as PickerResource),
                 },
             ]);
         },

@@ -14,7 +14,7 @@ export function ResourcePickerModal({
     closeOnSelect = true,
     pickerOptions = {},
     cardOptions = {},
-    height: height_ = 400,
+    height: height_,
     ...rest
 }: ResourcePickerModalProps) {
     const [open, setOpen] = useState(open_ ?? visible_ ?? true);

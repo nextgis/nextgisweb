@@ -2,7 +2,7 @@ import type { UsePickerModalProps, CardProps, ModalProps } from "../type";
 
 const usePickerModal = ({
     cardOptions = {},
-    height,
+    height = 400,
     cardTitleHeight = 58,
     cardFooterHeight = 58,
 }: UsePickerModalProps) => {
