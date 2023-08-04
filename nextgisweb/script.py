@@ -162,7 +162,7 @@ def config(argv=sys.argv):
 
                 _print('')
 
-    for comp in Component.registry:
+    for comp in Component.registry.values():
         if env_or_comp is not None and env_or_comp != comp.identity:
             continue
 

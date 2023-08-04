@@ -318,7 +318,7 @@ def kind_of_data(request) -> JSONType:
     request.require_administrator()
 
     result = dict()
-    for item in KindOfData.registry:
+    for item in KindOfData.registry.values():
         result[item.identity] = request.localizer.translate(item.display_name)
     return result
 
