@@ -161,7 +161,7 @@ class Env(Container):
         for comp in self.chain('initialize'):
             if hasattr(comp, 'metadata'):
                 for key, tab in comp.metadata.tables.items():
-                    ctab = tab.tometadata(metadata)
+                    ctab = tab.to_metadata(metadata)
                     ctab._component_identity = comp.identity
                     sa.event.listen(
                         ctab, 'after_create',
