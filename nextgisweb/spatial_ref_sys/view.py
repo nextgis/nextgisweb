@@ -75,7 +75,7 @@ def setup_pyramid(comp, config):
 
     config.add_route('srs.browse', '/srs/', client=True).add_view(srs_browse)
     config.add_route('srs.create', '/srs/create', client=True).add_view(srs_create_or_edit)
-    config.add_route('srs.edit', '/srs/{id:\\d+}', client=True).add_view(srs_create_or_edit)
+    config.add_route('srs.edit', '/srs/{id:uint}', client=True).add_view(srs_create_or_edit)
 
     class SRSMenu(dm.DynItem):
 
@@ -128,5 +128,5 @@ def setup_pyramid(comp, config):
 
         config.add_route(
             'srs.catalog.import',
-            r'/srs/catalog/{id:\d+}', client=('id', )
+            r'/srs/catalog/{id:uint}', client=('id', )
         ).add_view(catalog_import)

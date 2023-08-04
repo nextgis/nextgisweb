@@ -22,7 +22,7 @@ class PostgisLayerWidget(Widget):
 def setup_pyramid(comp, config):
     config.add_route(
         "postgis.diagnostics_page",
-        r"/resource/{id:\d+}/postgis-diagnostics",
+        r"/resource/{id:uint}/postgis-diagnostics",
         factory=resource_factory
     ) \
         .add_view(diagnostics_page, context=PostgisConnection) \

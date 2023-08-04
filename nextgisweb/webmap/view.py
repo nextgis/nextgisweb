@@ -287,12 +287,12 @@ class WebMapTMSLink(TMSLink):
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'webmap.display', r'/resource/{id:\d+}/display',
+        'webmap.display', r'/resource/{id:uint}/display',
         factory=resource_factory, client=('id', )
     ).add_view(display, context=WebMap)
 
     config.add_route(
-        'webmap.display.tiny', r'/resource/{id:\d+}/display/tiny',
+        'webmap.display.tiny', r'/resource/{id:uint}/display/tiny',
         factory=resource_factory, client=('id', )
     ).add_view(display_tiny, context=WebMap)
 
@@ -301,7 +301,7 @@ def setup_pyramid(comp, config):
     ).add_view(preview_embedded)
 
     config.add_route(
-        'webmap.clone', r'/resource/{id:\d+}/clone',
+        'webmap.clone', r'/resource/{id:uint}/clone',
         factory=resource_factory, client=('id',)
     ).add_view(clone, context=WebMap)
 

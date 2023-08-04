@@ -974,7 +974,7 @@ def store_collection(layer, request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'feature_layer.geojson', '/api/resource/{id}/geojson',
+        'feature_layer.geojson', '/api/resource/{id:uint}/geojson',
         factory=resource_factory) \
         .add_view(view_geojson, context=IFeatureLayer, request_method='GET')
 
@@ -994,24 +994,24 @@ def setup_pyramid(comp, config):
         .add_view(mvt, request_method='GET')
 
     config.add_route(
-        'feature_layer.feature.item', '/api/resource/{id}/feature/{fid}',
+        'feature_layer.feature.item', '/api/resource/{id:uint}/feature/{fid:int}',
         factory=resource_factory) \
         .add_view(iget, context=IFeatureLayer, request_method='GET') \
         .add_view(iput, context=IFeatureLayer, request_method='PUT') \
         .add_view(idelete, context=IWritableFeatureLayer, request_method='DELETE')
 
     config.add_route(
-        'feature_layer.feature.item_extent', '/api/resource/{id}/feature/{fid}/extent',
+        'feature_layer.feature.item_extent', '/api/resource/{id:uint}/feature/{fid:int}/extent',
         factory=resource_factory) \
         .add_view(item_extent, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
-        'feature_layer.feature.geometry_info', '/api/resource/{id}/feature/{fid}/geometry_info',
+        'feature_layer.feature.geometry_info', '/api/resource/{id:uint}/feature/{fid:int}/geometry_info',
         factory=resource_factory
     ).add_view(geometry_info, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
-        'feature_layer.feature.collection', '/api/resource/{id}/feature/',
+        'feature_layer.feature.collection', '/api/resource/{id:uint}/feature/',
         factory=resource_factory) \
         .add_view(cget, context=IFeatureLayer, request_method='GET') \
         .add_view(cpost, context=IWritableFeatureLayer, request_method='POST') \
@@ -1019,17 +1019,17 @@ def setup_pyramid(comp, config):
         .add_view(cdelete, context=IWritableFeatureLayer, request_method='DELETE')
 
     config.add_route(
-        'feature_layer.feature.count', '/api/resource/{id}/feature_count',
+        'feature_layer.feature.count', '/api/resource/{id:uint}/feature_count',
         factory=resource_factory) \
         .add_view(count, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
-        'feature_layer.feature.extent', '/api/resource/{id}/feature_extent',
+        'feature_layer.feature.extent', '/api/resource/{id:uint}/feature_extent',
         factory=resource_factory) \
         .add_view(feature_extent, context=IFeatureLayer, request_method='GET')
 
     config.add_route(
-        'feature_layer.store', r'/api/resource/{id:\d+}/store/',
+        'feature_layer.store', r'/api/resource/{id:uint}/store/',
         factory=resource_factory) \
         .add_view(store_collection, context=IFeatureLayer, request_method='GET')
 

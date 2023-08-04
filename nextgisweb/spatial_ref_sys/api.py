@@ -271,20 +271,20 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "spatial_ref_sys.geom_transform",
-        r"/api/component/spatial_ref_sys/{id:\d+}/geom_transform"
+        r"/api/component/spatial_ref_sys/{id:uint}/geom_transform"
     ).add_view(geom_transform, request_method="POST")
 
     config.add_route(
         "spatial_ref_sys.geom_length",
-        r"/api/component/spatial_ref_sys/{id:\d+}/geom_length"
+        r"/api/component/spatial_ref_sys/{id:uint}/geom_length"
     ).add_view(lambda r: geom_calc(r, geom_length), request_method="POST", renderer="json")
 
     config.add_route(
         "spatial_ref_sys.geom_area",
-        r"/api/component/spatial_ref_sys/{id:\d+}/geom_area"
+        r"/api/component/spatial_ref_sys/{id:uint}/geom_area"
     ).add_view(lambda r: geom_calc(r, geom_area), request_method="POST", renderer="json")
 
-    config.add_route("spatial_ref_sys.item", r"/api/component/spatial_ref_sys/{id:\d+}")\
+    config.add_route("spatial_ref_sys.item", r"/api/component/spatial_ref_sys/{id:uint}")\
         .add_view(iget, request_method='GET')\
         .add_view(iput, request_method='PUT') \
         .add_view(idelete, request_method='DELETE')
@@ -295,7 +295,7 @@ def setup_pyramid(comp, config):
         ).add_view(catalog_collection, request_method="GET")
 
         config.add_route(
-            "spatial_ref_sys.catalog.item", r"/api/component/spatial_ref_sys/catalog/{id:\d+}",
+            "spatial_ref_sys.catalog.item", r"/api/component/spatial_ref_sys/catalog/{id:uint}",
         ).add_view(catalog_item, request_method="GET")
 
         config.add_route(

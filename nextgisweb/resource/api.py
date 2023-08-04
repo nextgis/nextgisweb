@@ -461,7 +461,7 @@ def setup_pyramid(comp, config):
         .add_view(blueprint, request_method='GET')
 
     config.add_route(
-        'resource.item', r'/api/resource/{id:\d+}',
+        'resource.item', r'/api/resource/{id:uint}',
         factory=resource_factory) \
         .add_view(item_get, request_method='GET') \
         .add_view(item_put, request_method='PUT') \
@@ -473,17 +473,17 @@ def setup_pyramid(comp, config):
         .add_view(collection_post, request_method='POST')
 
     config.add_route(
-        'resource.permission', '/api/resource/{id}/permission',
+        'resource.permission', '/api/resource/{id:uint}/permission',
         factory=resource_factory) \
         .add_view(permission, request_method='GET')
 
     config.add_route(
-        'resource.permission.explain', '/api/resource/{id}/permission/explain',
+        'resource.permission.explain', '/api/resource/{id:uint}/permission/explain',
         factory=resource_factory) \
         .add_view(permission_explain, request_method='GET')
 
     config.add_route(
-        'resource.volume', '/api/resource/{id}/volume',
+        'resource.volume', '/api/resource/{id:uint}/volume',
         factory=resource_factory) \
         .add_view(resource_volume, request_method='GET')
 
@@ -505,9 +505,9 @@ def setup_pyramid(comp, config):
         .add_view(resource_export_put, request_method='PUT')
 
     config.add_route(
-        'resource.export', '/api/resource/{id}/export',
+        'resource.export', '/api/resource/{id:uint}/export',
         factory=resource_factory)
 
     config.add_route(
-        'resource.file_download', r'/api/resource/{id:\d+}/file/{name:.*}',
+        'resource.file_download', r'/api/resource/{id:uint}/file/{name:str}',
         factory=resource_factory)

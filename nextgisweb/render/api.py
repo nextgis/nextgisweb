@@ -364,16 +364,16 @@ def setup_pyramid(comp, config):
     ).add_view(image, http_cache=0)
 
     config.add_route(
-        'render.tile_cache.seed_status', r'/api/resource/{id:\d+}/tile_cache/seed_status',
+        'render.tile_cache.seed_status', r'/api/resource/{id:uint}/tile_cache/seed_status',
         factory=resource_factory,
     ).add_view(tile_cache_seed_status, context=IRenderableStyle, request_method='GET')
 
     config.add_route(
-        'render.legend', r'/api/resource/{id:\d+}/legend',
+        'render.legend', r'/api/resource/{id:uint}/legend',
         factory=resource_factory
     ).add_view(legend, context=ILegendableStyle, request_method='GET')
 
     config.add_route(
-        'render.legend_symbols', r'/api/resource/{id:\d+}/legend_symbols',
+        'render.legend_symbols', r'/api/resource/{id:uint}/legend_symbols',
         factory=resource_factory,
     ).add_view(legend_symbols, context=ILegendSymbols, request_method='GET')

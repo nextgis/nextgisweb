@@ -16,6 +16,6 @@ def preview(resource, request):
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'resource.preview', '/api/resource/{id}/preview.png',
+        'resource.preview', '/api/resource/{id:uint}/preview.png',
         factory=resource_factory
     ).add_view(preview, request_method='GET')

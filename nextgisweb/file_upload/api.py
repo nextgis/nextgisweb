@@ -370,5 +370,5 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'file_upload.item',
-        '/api/component/file_upload/{id}'
+        '/api/component/file_upload/{id:str}'
     ).add_view(item)

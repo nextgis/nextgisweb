@@ -219,8 +219,8 @@ def import_attachment(resource, request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
-    colurl = '/api/resource/{id}/feature/{fid}/attachment/'
-    itmurl = '/api/resource/{id}/feature/{fid}/attachment/{aid}'
+    colurl = '/api/resource/{id:uint}/feature/{fid:int}/attachment/'
+    itmurl = '/api/resource/{id:uint}/feature/{fid:int}/attachment/{aid:uint}'
 
     config.add_route(
         'feature_attachment.download',
@@ -249,12 +249,12 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'feature_attachment.export',
-        '/api/resource/{id}/feature_attachment/export',
+        '/api/resource/{id:uint}/feature_attachment/export',
         factory=resource_factory
     ).add_view(export)
 
     config.add_route(
         'feature_attachment.import',
-        '/api/resource/{id}/feature_attachment/import',
+        '/api/resource/{id:uint}/feature_attachment/import',
         factory=resource_factory
     ).add_view(import_attachment, request_method='PUT')

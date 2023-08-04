@@ -396,7 +396,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'pyramid.control_panel.backup.download',
-        '/control-panel/backup/{filename}'
+        '/control-panel/backup/{filename:str}'
     ).add_view(backup_download)
 
     config.add_route(
@@ -424,7 +424,7 @@ def setup_pyramid(comp, config):
         '/control-panel/home-path'
     ).add_view(home_path)
 
-    config.add_route('pyramid.locale', '/locale/{locale}').add_view(locale)
+    config.add_route('pyramid.locale', '/locale/{locale:str}').add_view(locale)
 
     comp.test_request_handler = None
     config.add_route('pyramid.test_request', '/test/request/') \

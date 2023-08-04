@@ -175,21 +175,21 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'webmap.extent',
-        r'/api/resource/{id:\d+}/webmap/extent',
+        r'/api/resource/{id:uint}/webmap/extent',
         factory=resource_factory
     ).add_view(get_webmap_extent, context=WebMap, request_method='GET')
 
 
 def setup_annotations(config):
     config.add_route(
-        'webmap.annotation.collection', r'/api/resource/{id:\d+}/annotation/',
+        'webmap.annotation.collection', r'/api/resource/{id:uint}/annotation/',
         factory=resource_factory
     ) \
         .add_view(annotation_cget, context=WebMap, request_method='GET') \
         .add_view(annotation_cpost, context=WebMap, request_method='POST')
 
     config.add_route(
-        'webmap.annotation.item', r'/api/resource/{id:\d+}/annotation/{annotation_id:\d+}',
+        'webmap.annotation.item', r'/api/resource/{id:uint}/annotation/{annotation_id:uint}',
         factory=resource_factory
     ) \
         .add_view(annotation_iget, context=WebMap, request_method='GET') \

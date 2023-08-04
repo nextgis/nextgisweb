@@ -366,7 +366,7 @@ def setup_pyramid(comp, config):
         '/session-invite'
     ).add_view(session_invite)
 
-    config.add_route('auth.alink', '/alink/{token}').add_view(alink)
+    config.add_route('auth.alink', '/alink/{token:str}').add_view(alink)
 
     config.add_route('auth.logout', '/logout').add_view(logout)
 
@@ -384,14 +384,14 @@ def setup_pyramid(comp, config):
         .add_view(user_browse)
     config.add_route('auth.user.create', '/auth/user/create', client=True) \
         .add_view(user_create_or_edit)
-    config.add_route('auth.user.edit', '/auth/user/{id:\\d+}', client=True) \
+    config.add_route('auth.user.edit', '/auth/user/{id:uint}', client=True) \
         .add_view(user_create_or_edit)
 
     config.add_route('auth.group.browse', '/auth/group/', client=True) \
         .add_view(group_browse)
     config.add_route('auth.group.create', '/auth/group/create', client=True) \
         .add_view(group_create_or_edit)
-    config.add_route('auth.group.edit', '/auth/group/{id:\\d+}', client=True) \
+    config.add_route('auth.group.edit', '/auth/group/{id:uint}', client=True) \
         .add_view(group_create_or_edit)
 
     class AuthComponentMenu(dm.DynItem):

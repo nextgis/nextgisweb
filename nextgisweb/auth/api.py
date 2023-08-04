@@ -266,7 +266,7 @@ def setup_pyramid(comp, config):
         .add_view(user_cget, request_method='GET') \
         .add_view(user_cpost, request_method='POST')
 
-    config.add_route('auth.user.item', '/api/component/auth/user/{id}') \
+    config.add_route('auth.user.item', '/api/component/auth/user/{id:uint}') \
         .add_view(user_iget, request_method='GET') \
         .add_view(user_iput, request_method='PUT') \
         .add_view(user_idelete, request_method='DELETE')
@@ -279,7 +279,7 @@ def setup_pyramid(comp, config):
         .add_view(group_cget, request_method='GET') \
         .add_view(group_cpost, request_method='POST')
 
-    config.add_route('auth.group.item', '/api/component/auth/group/{id}') \
+    config.add_route('auth.group.item', '/api/component/auth/group/{id:uint}') \
         .add_view(group_iget, request_method='GET') \
         .add_view(group_iput, request_method='PUT') \
         .add_view(group_idelete, request_method='DELETE')

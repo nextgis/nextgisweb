@@ -42,7 +42,7 @@ def preview_map(resource, request):
 def setup_pyramid(comp, config):
     config.add_route(
         "layer_preview.map",
-        r"/resource/{id:\d+}/preview",
+        r"/resource/{id:uint}/preview",
         factory=resource_factory
     ) \
         .add_view(preview_map, context=IFeatureLayer) \

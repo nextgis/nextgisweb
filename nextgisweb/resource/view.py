@@ -255,22 +255,22 @@ def setup_pyramid(comp, config):
         lambda r: httpexceptions.HTTPFound(
             r.route_url('resource.show', id=0)))
 
-    _resource_route('show', r'{id:\d+}', client=('id', )).add_view(show)
+    _resource_route('show', r'{id:uint}', client=('id', )).add_view(show)
 
-    _resource_route('json', r'{id:\d+}/json', client=('id', )) \
+    _resource_route('json', r'{id:uint}/json', client=('id', )) \
         .add_view(json_view)
 
-    _resource_route('effective_permissions', r'{id:\d+}/permissions') \
+    _resource_route('effective_permissions', r'{id:uint}/permissions') \
         .add_view(effective_permisssions)
 
-    _resource_route('export.page', r'{id:\d+}/export', request_method='GET', client=True)
+    _resource_route('export.page', r'{id:uint}/export', request_method='GET', client=True)
 
     _route('widget', 'widget', client=()).add_view(widget)
 
     # CRUD
-    _resource_route('create', r'{id:\d+}/create', client=('id', )).add_view(create)
-    _resource_route('update', r'{id:\d+}/update', client=('id', )).add_view(update)
-    _resource_route('delete', r'{id:\d+}/delete', client=('id', )).add_view(delete)
+    _resource_route('create', r'{id:uint}/create', client=('id', )).add_view(create)
+    _resource_route('update', r'{id:uint}/update', client=('id', )).add_view(update)
+    _resource_route('delete', r'{id:uint}/delete', client=('id', )).add_view(delete)
 
     # Sections
 

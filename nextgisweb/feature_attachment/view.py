@@ -27,7 +27,7 @@ def attachment(request):
 def setup_pyramid(comp, config):
     config.add_route(
         'feature_attachment.page',
-        r'/resource/{id:\d+}/attachments',
+        r'/resource/{id:uint}/attachments',
         factory=resource_factory,
     ).add_view(attachment, context=IFeatureLayer)
 
