@@ -30,36 +30,20 @@ def viewargs(*, renderer=None):
     return wrap
 
 
-class ClientRoutePredicate:
+class RouteMetadataPredicate:
     def __init__(self, val, config):
-        self.val = val
+        template, mdtypes, client = val
+        self.template = template
+        self.mdtypes = mdtypes
+        self.client = client
 
     def text(self):
-        return 'client'
+        return "meta"
 
-    phash = text
+    phash = __repr__ = text
 
     def __call__(self, context, request):
         return True
-
-    def __repr__(self):
-        return "<client>"
-
-
-class MatchDictTypesPredicate:
-    def __init__(self, val, config):
-        self.val = val
-
-    def text(self):
-        return ', '.join(f"{k}: {v}" for k, v in self.val.items())
-
-    phash = text
-
-    def __call__(self, context, request):
-        return True
-
-    def __repr__(self):
-        return f"<mdtypes({self.text()})>"
 
 
 class ErrorRendererPredicate:
@@ -69,13 +53,10 @@ class ErrorRendererPredicate:
     def text(self):
         return 'error_renderer'
 
-    phash = text
+    phash = __repr__ = text
 
     def __call__(self, context, request):
         return True
-
-    def __repr__(self):
-        return "<error_renderer>"
 
 
 class StaticMap:
@@ -116,7 +97,7 @@ class StaticSourcePredicate:
     def text(self):
         return 'static_source'
 
-    phash = text
+    phash = __repr__ = text
 
     def __call__(self, context, request):
         subpath = context['match']['subpath']
@@ -129,9 +110,6 @@ class StaticSourcePredicate:
         else:
             request.environ['static_path'] = path
             return True
-
-    def __repr__(self):
-        return self.text()
 
 
 class StaticFileResponse(FileResponse):

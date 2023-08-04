@@ -1,21 +1,19 @@
 import base64
 import re
 from datetime import timedelta
-from urllib.parse import unquote
 
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from pyramid.response import FileResponse, Response
 
 from nextgisweb.env import DBSession, _, env
 from nextgisweb.lib import json
-from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import Resource, ResourceScope
 
-from .util import ClientRoutePredicate, gensecret, parse_origin
+from .util import gensecret, parse_origin
 
 
 def _get_cors_olist():
@@ -232,29 +230,7 @@ def settings(request) -> JSONType:
 
 
 def route(request) -> JSONType:
-    result = dict()
-    route_re = re.compile(r'\{(\w+):{0,1}')
-    introspector = request.registry.introspector
-    for itm in introspector.get_category('routes'):
-        route = itm['introspectable']['object']
-        client_predicate = False
-        for p in route.predicates:
-            if isinstance(p, ClientRoutePredicate):
-                client_predicate = True
-        api_pattern = route.pattern.startswith('/api/')
-        if api_pattern or client_predicate:
-            if api_pattern and client_predicate:
-                logger.warning(
-                    "API route '%s' has useless 'client' predicate!",
-                    route.name)
-            kys = route_re.findall(route.path)
-            kvs = dict(
-                (k, '{%d}' % idx)
-                for idx, k in enumerate(kys))
-            tpl = unquote(route.generate(kvs))
-            result[route.name] = [tpl, ] + kys
-
-    return result
+    return request.env.pyramid.route_meta
 
 
 def pkg_version(request) -> JSONType:

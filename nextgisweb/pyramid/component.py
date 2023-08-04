@@ -15,9 +15,8 @@ from . import uacompat
 from .config import Configurator
 from .model import Session, SessionStore
 from .util import (
-    ClientRoutePredicate,
     ErrorRendererPredicate,
-    MatchDictTypesPredicate,
+    RouteMetadataPredicate,
     StaticMap,
     gensecret,
 )
@@ -30,14 +29,31 @@ class PyramidComponent(Component):
         settings['pyramid.static_map'] = StaticMap()
         config = Configurator(settings=settings)
 
-        config.add_route_predicate('client', ClientRoutePredicate)
-        config.add_route_predicate('mdtypes', MatchDictTypesPredicate)
+        config.add_route_predicate('meta', RouteMetadataPredicate)
         config.add_route_predicate('error_renderer', ErrorRendererPredicate)
 
         # Setup pyramid app for other components
         chain = self._env.chain('setup_pyramid', first='pyramid')
         for comp in chain:
             comp.setup_pyramid(config)
+
+        config.commit()
+
+        self.route_meta = route_meta = dict()
+        for itm in config.registry.introspector.get_category('routes'):
+            route = itm['introspectable']['object']
+
+            for p in route.predicates:
+                if isinstance(p, RouteMetadataPredicate):
+                    break
+            else:
+                continue
+
+            if not p.client:
+                continue
+
+            template = p.template
+            route_meta[route.name] = [template, ] + list(p.mdtypes.keys())
 
         return config
 

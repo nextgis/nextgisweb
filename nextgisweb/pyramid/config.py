@@ -56,33 +56,55 @@ class Configurator(PyramidConfigurator):
 
         """
 
-        if pattern is not None:
-            mdtypes = dict()
-            missing = False
+        client = True
+        if 'client' in kwargs:
+            pclient = kwargs['client']
+            if pclient is not False:
+                warn(
+                    "The value of 'client' predicate other than False make "
+                    "no sence since 4.5.0.dev14. You can safely remove it "
+                    "from route declarations.",
+                    DeprecationWarning, stacklevel=2)
+            else:
+                client = False
+            del kwargs['client']
 
-            def sub(m):
+        if pattern is not None:
+            pidx = 0
+
+            def _pnum(m):
+                nonlocal pidx
+                res = f"{{{pidx}}}"
+                pidx += 1
+                return res
+
+            template = ROUTE_RE.sub(_pnum, pattern)
+
+            mdtypes = dict()
+            tmissing = False
+
+            def _sub(m):
                 k, t, r = m.groups()
                 if t is not None:
                     mdtypes[k] = t
                     regexp = ROUTE_PATTERN[t]
                     return f"{{{k}:{regexp}}}" if regexp else f"{{{k}}}"
                 elif r is None:
-                    nonlocal missing
-                    missing = True
+                    nonlocal tmissing
+                    tmissing = True
 
                 return m.group(0)
 
-            pattern = ROUTE_RE.sub(sub, pattern)
-            if len(mdtypes) > 0:
-                kwargs['mdtypes'] = mdtypes
+            pattern =ROUTE_RE.sub(_sub, pattern)
 
-            if missing:
+            if tmissing:
                 warn(
                     f"Some matchdict type specifiers are missing for route "
                     f"{name} ({pattern}). Available since 4.5.0.dev13 and "
                     f"will be required in 4.6.0.dev0.",
                     DeprecationWarning, stacklevel=2)
 
+            kwargs['meta'] = (template, mdtypes, client)
 
         super().add_route(name, pattern=pattern, **kwargs)
 
