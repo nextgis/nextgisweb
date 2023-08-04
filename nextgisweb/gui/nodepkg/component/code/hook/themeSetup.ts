@@ -1,6 +1,16 @@
 import { EditorView } from "@codemirror/view";
 
-export function themeSetup({ autoHeight, minHeight, maxHeight }) {
+interface ThemeSetupOptions {
+    autoHeight?: boolean;
+    minHeight?: string;
+    maxHeight?: string;
+}
+
+export function themeSetup({
+    autoHeight,
+    minHeight = "",
+    maxHeight = "",
+}: ThemeSetupOptions) {
     const rootElementStyle = {
         border: "1px solid rgb(153, 153, 153)",
     };

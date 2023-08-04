@@ -22,11 +22,11 @@ export interface CodeOptions {
     lang: Lang;
     value?: string;
     fold?: boolean;
-    target?: MutableRefObject<HTMLDivElement>;
+    target?: MutableRefObject<HTMLDivElement | null>;
     readOnly?: boolean;
     onChange?: (val: string, view: ViewUpdate) => void;
-    minHeight?: number;
-    maxHeight?: number;
+    minHeight?: string;
+    maxHeight?: string;
     autoHeight?: boolean;
     lineNumbers?: boolean;
 }

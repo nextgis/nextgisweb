@@ -28,11 +28,17 @@ import {
     rectangularSelection,
 } from "@codemirror/view";
 
+interface CustomSetupOptions {
+    lineNumbers?: boolean;
+    readOnly?: boolean;
+    fold?: boolean;
+}
+
 export async function customSetup({
     lineNumbers: lineNumbers_,
     readOnly,
     fold,
-}) {
+}: CustomSetupOptions) {
     const keymap_ = [
         ...closeBracketsKeymap,
         ...defaultKeymap,
@@ -75,8 +81,6 @@ export async function customSetup({
         const { editableSetup } = await import("./editableSetup");
         customSetup.push(...editableSetup());
     }
-
-    
 
     return customSetup;
 }

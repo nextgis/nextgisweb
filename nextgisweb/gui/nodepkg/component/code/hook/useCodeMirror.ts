@@ -6,38 +6,45 @@ import { EditorView } from "@codemirror/view";
 import { customSetup } from "./customSetup";
 import { themeSetup } from "./themeSetup";
 
-import { Extension } from "@codemirror/state";
-import type { CodeOptions, Editor, Lang } from "../type";
+import type { Extension } from "@codemirror/state";
+import type { LanguageSupport } from "@codemirror/language";
+import type { CodeOptions, Editor, Lang, LangShortcut } from "../type";
+
+type FullLang = Exclude<Lang, LangShortcut>;
 
 const External = Annotation.define();
 
-const getLang = async (lang: Lang): Promise<() => Extension> => {
-    const aliases = {
+const getLang = async (lang: Lang): Promise<() => LanguageSupport> => {
+    const aliases: Partial<Record<Lang, Lang>> = {
         js: "javascript",
         py: "python",
         md: "markdown",
     };
-    lang = aliases[lang] || lang;
+    const fullLang: FullLang = (aliases[lang] || lang) as FullLang;
 
     // Unable to pass a variable when importing
     // - string concatenation
     // `"@codemirror/lang-" + "css"` - Ok
     // - from variable
     // `"@codemirror/lang-" + lang` - Runtime error
-    const importers = {
-        css: () => import("@codemirror/lang-css"),
-        xml: () => import("@codemirror/lang-xml"),
-        json: () => import("@codemirror/lang-json"),
-        html: () => import("@codemirror/lang-html"),
-        python: () => import("@codemirror/lang-python"),
-        markdown: () => import("@codemirror/lang-markdown"),
-        javascript: () => import("@codemirror/lang-javascript"),
+    const importers: Record<FullLang, () => Promise<() => LanguageSupport>> = {
+        css: () => import("@codemirror/lang-css").then((l) => l.css),
+        xml: () => import("@codemirror/lang-xml").then((l) => l.xml),
+        json: () => import("@codemirror/lang-json").then((l) => l.json),
+        html: () => import("@codemirror/lang-html").then((l) => l.html),
+        python: () => import("@codemirror/lang-python").then((l) => l.python),
+        markdown: () =>
+            import("@codemirror/lang-markdown").then((l) => l.markdown),
+        javascript: () =>
+            import("@codemirror/lang-javascript").then((l) => l.javascript),
     };
     try {
-        const module = await importers[lang]();
-        return module[lang];
+        const module = await importers[fullLang]();
+        return module;
     } catch (er) {
-        throw new Error(`CodeMirror language for '${lang}' is not installed`);
+        throw new Error(
+            `CodeMirror language for '${fullLang}' is not installed`
+        );
     }
 };
 
@@ -53,7 +60,7 @@ export function useCodeMirror({
     autoHeight,
     lineNumbers,
 }: CodeOptions) {
-    const [editor, setEditor] = useState<Editor>(null);
+    const [editor, setEditor] = useState<Editor | null>(null);
 
     const destroy = useRef<() => void>();
 
@@ -94,29 +101,32 @@ export function useCodeMirror({
         lineNumbers,
     ]);
 
-    const createEditor = useCallback(async (): Promise<EditorView> => {
+    const createEditor = useCallback(async (): Promise<
+        EditorView | undefined
+    > => {
         if (destroy.current) {
             destroy.current();
         }
-        const parent = target.current;
+        const parent = target && target.current;
+        if (parent) {
+            const state = EditorState.create({
+                doc,
+            });
+            const cm = new EditorView({
+                state,
+                parent,
+            });
 
-        const state = EditorState.create({
-            doc,
-        });
-        const cm = new EditorView({
-            state,
-            parent,
-        });
-
-        setEditor({
-            source: cm,
-            getValue: () => cm.state.doc.toString(),
-        });
-        destroy.current = () => {
-            cm.destroy();
-            setEditor(null);
-        };
-        return cm;
+            setEditor({
+                source: cm,
+                getValue: () => cm.state.doc.toString(),
+            });
+            destroy.current = () => {
+                cm.destroy();
+                setEditor(null);
+            };
+            return cm;
+        }
     }, [doc, target]);
 
     useEffect(() => {
