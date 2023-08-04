@@ -17,9 +17,9 @@ export interface UseFileUploaderProps {
     accept?: string;
     fileMeta?: UploaderMeta;
     multiple?: boolean;
-    onChange?: (meta: UploaderMeta) => void;
+    onChange?: (meta?: UploaderMeta) => void;
     inputProps?: UploadProps;
-    setFileMeta?: (meta: UploaderMeta) => void;
+    setFileMeta?: (meta?: UploaderMeta) => void;
     showUploadList?: boolean;
     openFileDialogOnClick?: boolean;
     showProgressInDocTitle?: boolean;

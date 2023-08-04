@@ -43,8 +43,12 @@ async function upload({
     });
 }
 
-async function tusUpload({ files, onProgress, signal }: FileUploaderOptions) {
-    const result = [];
+async function tusUpload({
+    files,
+    onProgress,
+    signal,
+}: FileUploaderOptions): Promise<FileMeta[]> {
+    const result: FileMeta[] = [];
 
     let totalFilesSize = 0;
     let alreadyUploadedSize = 0;
@@ -52,7 +56,7 @@ async function tusUpload({ files, onProgress, signal }: FileUploaderOptions) {
     for (const file of files) {
         totalFilesSize += file.size;
         let progressFileSize = 0;
-        const data = await new Promise((resolve, reject) => {
+        const data = await new Promise<FileMeta>((resolve, reject) => {
             const uploader = new Upload(file, {
                 endpoint: routeURL("file_upload.collection"),
                 storeFingerprintForResuming: false,
@@ -84,10 +88,14 @@ async function tusUpload({ files, onProgress, signal }: FileUploaderOptions) {
                 },
                 onSuccess: () => {
                     alreadyUploadedSize += progressFileSize;
-                    window
-                        .fetch(uploader.url, { signal })
-                        .then((resp) => resp.json().then(resolve))
-                        .catch(reject);
+                    const url_ = uploader.url;
+                    if (url_) {
+                        fetch(url_, { signal })
+                            .then((resp) => resp.json().then(resolve))
+                            .catch(reject);
+                    } else {
+                        reject("There is no ul in uploader");
+                    }
                 },
             });
             if (signal) {

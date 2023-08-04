@@ -57,8 +57,8 @@ export function ImageUploader({
     };
 
     const clean = () => {
-        setFileMeta(null);
-        setBackgroundImage(null);
+        setFileMeta(undefined);
+        setBackgroundImage(undefined);
     };
 
     const readImage = (file_: File | File[]) => {
@@ -78,7 +78,7 @@ export function ImageUploader({
 
     useEffect(() => {
         if (chosenFile && fileMeta) {
-            readImage(chosenFile);
+            readImage(chosenFile as File[]);
         }
     }, [chosenFile, fileMeta]);
 

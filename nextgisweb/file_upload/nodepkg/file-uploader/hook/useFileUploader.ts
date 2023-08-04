@@ -13,6 +13,8 @@ import { fileUploader } from "../util/fileUploader";
 
 import i18n from "@nextgisweb/pyramid/i18n";
 
+import type { UploadFile } from "antd/lib/upload/interface";
+
 const mProgress = i18n.gettext(" uploaded...");
 
 export function useFileUploader({
@@ -30,11 +32,11 @@ export function useFileUploader({
 
     const [docTitle] = useState(document.title);
 
-    const [fileList, setFileList] = useState([]);
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
 
     const [progressText, setProgressText] = useState<string | null>(null);
     const [uploading, setUploading] = useState<boolean>(false);
-    const [meta, setMeta] = useState<UploaderMeta>(initMeta);
+    const [meta, setMeta] = useState<UploaderMeta | undefined>(initMeta);
 
     useEffect(() => {
         if (setInitMeta) {
@@ -108,7 +110,11 @@ export function useFileUploader({
             multiple,
             showUploadList,
             openFileDialogOnClick,
-            customRequest: ({ file, onSuccess }) => onSuccess(file),
+            customRequest: ({ file, onSuccess }) => {
+                if (onSuccess) {
+                    onSuccess(file);
+                }
+            },
             onChange(info) {
                 if (inputPropsOnChange) {
                     inputPropsOnChange(info);

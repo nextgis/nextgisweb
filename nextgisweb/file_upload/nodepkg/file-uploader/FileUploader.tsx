@@ -59,7 +59,7 @@ export function FileUploader({
                     <Button
                         onClick={(e) => {
                             e.stopPropagation();
-                            setMeta(null);
+                            setMeta(undefined);
                         }}
                         type="link"
                         icon={<BackspaceIcon />}
