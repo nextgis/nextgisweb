@@ -49,7 +49,7 @@ class PyramidComponent(Component):
             else:
                 continue
 
-            if not p.client:
+            if not p.client or route.name.startswith('_'):
                 continue
 
             template = p.template
