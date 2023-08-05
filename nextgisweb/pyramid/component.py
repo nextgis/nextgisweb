@@ -40,6 +40,7 @@ class PyramidComponent(Component):
         config.commit()
 
         self.route_meta = route_meta = dict()
+        self.route_mdtypes = route_mdtypes = dict()
         for itm in config.registry.introspector.get_category('routes'):
             route = itm['introspectable']['object']
 
@@ -54,6 +55,7 @@ class PyramidComponent(Component):
 
             template = p.template
             route_meta[route.name] = [template, ] + list(p.mdtypes.keys())
+            route_mdtypes[route.name] = p.mdtypes
 
         return config
 
@@ -130,6 +132,22 @@ class PyramidComponent(Component):
         result['lunkwill_enabled'] = self.options['lunkwill.enabled']
 
         return result
+
+    def client_codegen(self):
+        self.make_app(settings=dict())
+
+        typemap = {'int': 'number', 'uint': 'number', 'str': 'string'}
+        code = ["export interface RouteParameters /* prettier-ignore */ {"]
+        for k, v in self.route_mdtypes.items():
+            if len(v) == 0:
+                cv = "[]"
+            else:
+                cv = ', '.join(p + ": " + typemap[t] for p, t in v.items())
+                cv = f"[{cv}] | [{{ {cv} }}]" if len(v) == 1 else f"[{{ {cv} }}]"
+            code.append(f'    "{k}": {cv};')
+        code.append("}")
+        nodepkg = self.root_path / 'nodepkg'
+        (nodepkg / 'api/route.inc.ts').write_text('\n'.join(code))
 
     @property
     def template_include(self):

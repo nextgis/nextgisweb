@@ -5,8 +5,8 @@ import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 import { route as apiRoute } from "../api";
 import { useAbortController } from "./useAbortController";
 
-import type { RequestMethod } from "../api/type";
-import type { UseRouteParams } from "./type";
+import type { RequestMethod, RouteResults } from "../api/type";
+import type { RouteParameters } from "../api/route.inc";
 
 type LoadingCounterState = "increment" | "decrement" | "reset";
 
@@ -26,9 +26,21 @@ const loadingCounterReducer = (
     }
 };
 
-export function useRoute(
-    name: string,
-    params?: UseRouteParams,
+function apiRouteOverloaded<RouteName extends keyof RouteParameters>(
+    name: RouteName,
+    obj?: (RouteParameters[RouteName] & [object])[0]
+): RouteResults;
+
+function apiRouteOverloaded<RouteName extends keyof RouteParameters>(
+    name: RouteName,
+    ...rest: RouteParameters[RouteName]
+): RouteResults {
+    return apiRoute(name, ...rest);
+}
+
+export function useRoute<RouteName extends keyof RouteParameters>(
+    name: RouteName,
+    params?: (RouteParameters[RouteName] & [object])[0],
     loadOnInit = false
 ) {
     const loadOnInit_ = useRef(loadOnInit);
@@ -38,15 +50,15 @@ export function useRoute(
         { count: Number(!!loadOnInit_) }
     );
 
-    const [routerParams] = useObjectState<UseRouteParams>(params || {});
+    const [routerParams] = useObjectState(params);
 
     const route = useMemo(() => {
-        const route_ = apiRoute(name, routerParams);
+        const result = apiRouteOverloaded(name, routerParams);
         abort();
         const methods: RequestMethod[] = ["get", "post", "put", "delete"];
         for (const method of methods) {
-            const requestForMethodCb = route_[method];
-            route_[method] = async (options) => {
+            const requestForMethodCb = result[method];
+            result[method] = async (options) => {
                 if (loadOnInit_.current) {
                     dispatchLoadingCounter("decrement");
                     loadOnInit_.current = false;
@@ -62,7 +74,7 @@ export function useRoute(
                 }
             };
         }
-        return route_;
+        return result;
     }, [abort, makeSignal, name, routerParams]);
 
     const isLoading = useMemo(() => {

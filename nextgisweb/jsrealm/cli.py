@@ -57,7 +57,7 @@ def create_tsconfig(npkgs: List[str]):
 
 @comp_cli.command()
 def install(
-    self: EnvCommand.customize(env_initialize=False),
+    self: EnvCommand.customize(),
     *, env: Env,
     core: CoreComponent,
     pyramid: PyramidComponent,
@@ -130,6 +130,9 @@ def install(
         fd.write(json.dumps(package_json, indent=4))
 
     create_tsconfig(npkgs)
+
+    for comp in env.chain('client_codegen'):
+        comp.client_codegen()
 
     ngw_root = pkginfo.packages['nextgisweb']._path.parent
     pkg_root = ngw_root.parent

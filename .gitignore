@@ -17,6 +17,9 @@ node_modules/
 *.pot
 *.jed
 
+# Generated client code
+**/nodepkg/**/*.inc.*
+
 # Sphinx documentation
 doc/_build/
 doc/*/_build/

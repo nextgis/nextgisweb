@@ -13,16 +13,16 @@ import type {
     RouteResults,
     ToReturn,
 } from "./type";
+import type { RouteParameters } from "./route.inc";
 
-type UrlParamValue = string | number;
-type RouteUrlOpt = Record<string, UrlParamValue>;
-type RouteUrlOptOrArgs = (UrlParamValue | RouteUrlOpt)[];
-
-export function routeURL(name: string, ...rest: RouteUrlOptOrArgs): string {
+export function routeURL<RouteName extends keyof RouteParameters>(
+    name: RouteName,
+    ...rest: RouteParameters[RouteName]
+): string {
     const [template, ...params] = routeData[name];
     const first = rest[0];
 
-    let sub: UrlParamValue[];
+    let sub: string[];
     if (first === undefined) {
         sub = [];
     } else if (typeof first === "object" && first !== null) {
@@ -31,10 +31,10 @@ export function routeURL(name: string, ...rest: RouteUrlOptOrArgs): string {
         }
         sub = [];
         for (const [p, v] of Object.entries(first)) {
-            sub[params.indexOf(p)] = v;
+            sub[params.indexOf(p)] = String(v);
         }
     } else {
-        sub = rest as UrlParamValue[];
+        sub = rest.map((v) => String(v));
     }
 
     return template.replace(/\{(\w+)\}/g, function (m, a) {
@@ -48,10 +48,10 @@ export function routeURL(name: string, ...rest: RouteUrlOptOrArgs): string {
     });
 }
 
-export function route(name: string, options: RouteUrlOpt): RouteResults;
-export function route(name: string, ...rest: UrlParamValue[]): RouteResults;
-
-export function route(name: string, ...rest: RouteUrlOptOrArgs): RouteResults {
+export function route<RouteName extends keyof RouteParameters>(
+    name: RouteName,
+    ...rest: RouteParameters[RouteName]
+): RouteResults {
     const template = routeURL(name, ...rest);
     const result = {} as RouteResults;
     const methods: RequestMethod[] = ["get", "post", "put", "delete"];
@@ -72,14 +72,17 @@ export const compatRoute = {};
 // Because both keys "feature_layer.store"
 // exist functions should be created in alphabetical order.
 for (const key of Object.keys(routeData).sort()) {
-    const fn = (...args: RouteUrlOptOrArgs) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fn = (...args: any[]) => {
         if (ngwConfig.debug) {
             const msg =
                 `Module "ngw-pyramid/route" has been deprecated! Use ` +
                 `routeURL() or route() from "@nextgisweb/pyramid/api" instead.`;
             console.warn(new Error(msg));
         }
-        return routeURL(key, ...args);
+        // We don't care about types in legacy code
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return routeURL(key as any, ...args);
     };
     set(compatRoute, key, fn);
 }

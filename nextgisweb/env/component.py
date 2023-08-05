@@ -139,6 +139,9 @@ class Component(metaclass=ComponentMeta):
     def setup_pyramid(self, config):
         pass
 
+    def client_codegen(self):
+        pass
+
     @property
     def env(self):
         """ Environment this component belongs too. Set
