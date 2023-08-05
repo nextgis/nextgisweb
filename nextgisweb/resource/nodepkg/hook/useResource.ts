@@ -4,15 +4,14 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 
 import settings from "@nextgisweb/pyramid/settings!resource";
 
-/**
- * @type {'administrators'|'data_read'|'data_write'}
- */
+import type { Permission } from "../type/Permission";
+
 const resourceExportSetting = settings.resource_export;
 
-export function useResource({ id }) {
-    const { data } = useRouteGet("resource.permission", { id });
+export function useResource({ id }: { id: number }) {
+    const { data } = useRouteGet<Permission>("resource.permission", { id });
 
-    const isUserAdministrator = window.ngwConfig.isAdministrator;
+    const isUserAdministrator = ngwConfig.isAdministrator;
 
     const isExportAllowed = useMemo(() => {
         if (isUserAdministrator) {
