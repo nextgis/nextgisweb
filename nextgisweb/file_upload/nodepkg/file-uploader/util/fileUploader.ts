@@ -94,7 +94,7 @@ async function tusUpload({
                             .then((resp) => resp.json().then(resolve))
                             .catch(reject);
                     } else {
-                        reject("There is no ul in uploader");
+                        reject("There is no url in uploader");
                     }
                 },
             });
