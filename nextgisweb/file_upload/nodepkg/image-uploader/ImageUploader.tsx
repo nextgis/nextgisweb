@@ -29,8 +29,6 @@ export function ImageUploader({
 
     const inputPropsOnChange = inputProps?.onChange;
 
-    // for backward compatibility
-    file = file ?? image;
     const height = 220;
     const props: FileUploaderProps = {
         file,
@@ -61,8 +59,8 @@ export function ImageUploader({
         setBackgroundImage(undefined);
     };
 
-    const readImage = (file_: File | File[]) => {
-        const f = Array.isArray(file_) ? file_[0] : file_;
+    const readImage = (image_: File | Blob | (File | Blob)[]) => {
+        const f = Array.isArray(image_) ? image_[0] : image_;
         const reader = new FileReader();
         reader.onloadend = () => {
             setBackgroundImage(`url(${reader.result})`);
@@ -71,10 +69,10 @@ export function ImageUploader({
     };
 
     useEffect(() => {
-        if (file) {
-            readImage(file);
+        if (image) {
+            readImage(image);
         }
-    }, [file]);
+    }, [image]);
 
     useEffect(() => {
         if (chosenFile && fileMeta) {
