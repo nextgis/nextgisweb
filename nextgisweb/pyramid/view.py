@@ -53,7 +53,8 @@ def asset(request):
 
 def static_view(request):
     static_path = request.environ['static_path']
-    return StaticFileResponse(str(static_path), request=request)
+    cache = request.matchdict['skey'] == request.env.pyramid.static_key[1:]
+    return StaticFileResponse(str(static_path), cache=cache, request=request)
 
 
 def home(request):
@@ -504,12 +505,12 @@ def _setup_static(comp, config):
 
     config.add_route(
         'pyramid.static',
-        '/static{}/*subpath'.format(comp.static_key),
+        '/static/{skey:str}/*subpath',
         static_source=True,
     ).add_view(static_view)
 
     def static_url(request, path=''):
-        return request.route_url('pyramid.static', subpath=path)
+        return request.route_url('pyramid.static', subpath=path, skey=comp.static_key[1:])
 
     config.add_request_method(static_url, property=False)
 

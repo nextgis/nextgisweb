@@ -114,7 +114,7 @@ class StaticSourcePredicate:
 
 class StaticFileResponse(FileResponse):
 
-    def __init__(self, filename, *, request) -> None:
+    def __init__(self, filename, *, cache=True, request) -> None:
         content_type, _ = guess_type(filename)
 
         found_encoding = None
@@ -134,7 +134,7 @@ class StaticFileResponse(FileResponse):
         super().__init__(
             filename,
             content_type=content_type,
-            cache_max_age=3600,
+            cache_max_age=3600 if cache else None,
             request=request)
 
         if found_encoding:
