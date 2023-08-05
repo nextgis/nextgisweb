@@ -4,8 +4,22 @@ import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n";
-import { PropTypes } from "prop-types";
+
 import { useEffect, useState } from "react";
+
+import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader";
+import type { ImageUploaderProps } from "@nextgisweb/file-upload/image-uploader";
+import type { ApiError } from "../error/type";
+
+interface ModelLogoFormProps extends ImageUploaderProps {
+    model: string;
+    messages?: {
+        saveSuccess?: string;
+        helpText?: string;
+        uploadText?: string;
+        dragAndDropText?: string;
+    };
+}
 
 const defaultMessages = {
     saveSuccess: i18n.gettext(
@@ -13,10 +27,16 @@ const defaultMessages = {
     ),
 };
 
-export function ModelLogoForm({ model, messages = {}, accept }) {
-    const [status, setStatus] = useState("loading");
-    const [logo, setLogo] = useState(null);
-    const [fileMeta, setFileMeta] = useState(null);
+export function ModelLogoForm({
+    model,
+    messages = {},
+    accept,
+}: ModelLogoFormProps) {
+    const [status, setStatus] = useState<"loading" | "saving" | null>(
+        "loading"
+    );
+    const [logo, setLogo] = useState<Blob>();
+    const [fileMeta, setFileMeta] = useState<UploaderMeta | null>(null);
 
     const msg = { ...defaultMessages, ...messages };
 
@@ -47,7 +67,7 @@ export function ModelLogoForm({ model, messages = {}, accept }) {
             });
             message.success(msg.saveSuccess);
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
             setStatus(null);
         }
@@ -63,17 +83,11 @@ export function ModelLogoForm({ model, messages = {}, accept }) {
                 helpText={msg.helpText}
                 uploadText={msg.uploadText}
                 dragAndDropText={msg.dragAndDropText}
-                onChange={setFileMeta}
-                file={logo}
+                onChange={(meta?: UploaderMeta) => setFileMeta(meta || null)}
+                image={logo}
                 accept={accept}
             ></ImageUploader>
             <SaveButton onClick={save} loading={status === "saving"} />
         </Space>
     );
 }
-
-ModelLogoForm.propTypes = {
-    model: PropTypes.string.isRequired,
-    messages: PropTypes.object,
-    accept: PropTypes.string,
-};

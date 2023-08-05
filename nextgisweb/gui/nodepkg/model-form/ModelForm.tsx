@@ -1,5 +1,3 @@
-import { PropTypes } from "prop-types";
-
 import { useEffect, useState } from "react";
 
 import { Button, Form, message, Popconfirm, Space } from "@nextgisweb/gui/antd";
@@ -8,6 +6,37 @@ import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import i18n from "@nextgisweb/pyramid/i18n";
 import { errorModal } from "@nextgisweb/gui/error";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
+
+import { useKeydownListener } from "../hook/useKeydownListener";
+
+import type { ReactNode } from "react";
+import type { FormInstance } from "antd/lib/form";
+import type { FormField } from "@nextgisweb/gui/fields-form";
+import type { ApiError } from "../error/type";
+
+interface Messages {
+    deleteConfirm?: TimeRanges;
+}
+
+interface Model {
+    item: string;
+    collection: string;
+    edit?: string;
+    browse: string;
+}
+
+interface ModelFormProps {
+    id: number;
+    children?: ReactNode;
+    model: string | Model;
+    value: unknown;
+    fields: FormField[];
+    form?: FormInstance;
+    onChange?: (val: unknown) => void;
+    allowDelete?: boolean;
+    messages?: Messages;
+}
 
 const btnTitleAliases = {
     create: i18n.gettext("Create"),
@@ -15,7 +44,7 @@ const btnTitleAliases = {
     delete: i18n.gettext("Delete"),
 };
 
-export function ModelForm(props) {
+export function ModelForm(props: ModelFormProps) {
     const {
         id,
         model: m,
@@ -33,7 +62,7 @@ export function ModelForm(props) {
     const deleteConfirm =
         messages.deleteConfirm || i18n.gettext("Confirmation");
 
-    const model =
+    const model: Model =
         typeof m === "string"
             ? {
                   item: m + ".item",
@@ -44,8 +73,11 @@ export function ModelForm(props) {
             : m;
 
     const form = Form.useForm(props.form)[0];
+    const { makeSignal } = useAbortController();
 
-    const [status, setStatus] = useState("loading");
+    const [status, setStatus] = useState<
+        "loading" | "saving" | "deleting" | null
+    >("loading");
     const [value, setValue] = useState({});
 
     const submit = async () => {
@@ -61,7 +93,7 @@ export function ModelForm(props) {
                 const url = routeURL(model.browse);
                 window.open(url, "_self");
             } catch (err) {
-                errorModal(err);
+                errorModal(err as ApiError);
             }
         } catch (err) {
             message.error(i18n.gettext("Fix the form errors first"));
@@ -78,24 +110,20 @@ export function ModelForm(props) {
             const url = routeURL(model.browse);
             window.open(url, "_self");
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
             setStatus(null);
         }
     };
 
-    const onKeyDown = (event) => {
-        if (event.key === "Enter") {
-            submit();
-        }
-    };
-
     async function setInitialValues() {
         setStatus("loading");
-        const initialValues = {};
+        const initialValues: Record<string, unknown> = {};
         if (id) {
             try {
-                const resp = await route(model.item, id).get();
+                const resp = await route(model.item, id).get({
+                    signal: makeSignal(),
+                });
                 Object.assign(initialValues, resp);
                 if (formProps.onChange) {
                     formProps.onChange({ value: initialValues });
@@ -118,12 +146,10 @@ export function ModelForm(props) {
         setStatus(null);
     }
 
+    useKeydownListener("Enter", submit);
+
     useEffect(() => {
         setInitialValues();
-        window.addEventListener("keydown", onKeyDown, false);
-        return () => {
-            window.removeEventListener("keydown", onKeyDown, false);
-        };
     }, []);
 
     if (status === "loading") {
@@ -165,15 +191,3 @@ export function ModelForm(props) {
         </Space>
     );
 }
-
-ModelForm.propTypes = {
-    id: PropTypes.number,
-    children: PropTypes.node,
-    model: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-    value: PropTypes.object,
-    fields: PropTypes.array.isRequired,
-    form: PropTypes.any,
-    onChange: PropTypes.func,
-    allowDelete: PropTypes.bool,
-    messages: PropTypes.object,
-};

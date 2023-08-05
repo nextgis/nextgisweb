@@ -1,11 +1,24 @@
+import { useEffect, useState } from "react";
+
 import { Col, Input, message, Row } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n";
-import { PropTypes } from "prop-types";
-import { useEffect, useState } from "react";
+
+import type { ParamsOf } from "../type";
+import type { ApiError } from "../error/type";
+
+type InputParams = ParamsOf<typeof Input>;
+
+interface SingleSettingFormParams {
+    model: string;
+    settingName?: string;
+    saveSuccessText?: string;
+    saveSuccessReloadText?: string;
+    inputProps?: InputParams;
+}
 
 const saveSuccesText_ = i18n.gettext("The setting is saved.");
 const saveSuccesReloadText_ = i18n.gettext(
@@ -15,14 +28,20 @@ const saveSuccesReloadText_ = i18n.gettext(
 export function SingleSettingForm({
     model,
     settingName,
-    saveSuccesText = saveSuccesText_,
-    saveSuccesReloadText = saveSuccesReloadText_,
+    saveSuccessText: saveSuccesText = saveSuccesText_,
+    saveSuccessReloadText: saveSuccesReloadText = saveSuccesReloadText_,
     inputProps = {},
-}) {
-    const [status, setStatus] = useState("loading");
-    const [value, setValue] = useState();
+}: SingleSettingFormParams) {
+    const [status, setStatus] = useState<"loading" | "saving" | null>(
+        "loading"
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [value, setValue] = useState<any>();
 
-    const { data } = useRouteGet({ name: model });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = useRouteGet<any>({
+        name: model,
+    });
 
     useEffect(() => {
         if (data !== undefined) {
@@ -30,7 +49,7 @@ export function SingleSettingForm({
             setValue(val);
             setStatus(null);
         }
-    }, [data]);
+    }, [data, settingName]);
 
     const save = async () => {
         setStatus("saving");
@@ -49,7 +68,7 @@ export function SingleSettingForm({
                 );
             }
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
             setStatus(null);
         }
@@ -75,10 +94,3 @@ export function SingleSettingForm({
         </Row>
     );
 }
-
-SingleSettingForm.propTypes = {
-    model: PropTypes.string.isRequired,
-    settingName: PropTypes.string,
-    inputProps: PropTypes.object,
-    saveSuccesText: PropTypes.string,
-};
