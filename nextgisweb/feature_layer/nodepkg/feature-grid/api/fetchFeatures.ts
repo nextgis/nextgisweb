@@ -3,6 +3,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import { KEY_FIELD_KEYNAME } from "../constant";
 
 import type { FeatureItem } from "../../type";
+import type { OrderBy } from "../type";
 
 interface FeatureLayerQuery {
     offset?: number;
@@ -18,7 +19,7 @@ interface FeatureLayerQuery {
 
 interface FetchFeaturesOptions {
     resourceId: number;
-    orderBy?: string[];
+    orderBy?: OrderBy;
     signal?: AbortSignal;
     fields?: string[];
     offset?: number;

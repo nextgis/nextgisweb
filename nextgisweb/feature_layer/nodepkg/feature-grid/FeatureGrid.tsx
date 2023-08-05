@@ -24,9 +24,15 @@ import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 
 import type { FeatureLayerCount } from "../type/FeatureLayer";
-import type { Selected } from "./type";
+import type { FeatureAttrs } from "./type";
 
 import "./FeatureGrid.less";
+
+interface ActionProps {
+    id: number;
+    query: string;
+    size?: SizeType;
+}
 
 interface FeatureGridProps {
     id: number;
@@ -39,7 +45,7 @@ interface FeatureGridProps {
     beforeDelete?: (featureIds: number[]) => void;
     deleteError?: (featureIds: number[]) => void;
     onDelete?: (featureIds: number[]) => void;
-    onSelect?: (selected: Selected[], oldValue: Selected[]) => void;
+    onSelect?: (selected: number[]) => void;
 }
 
 const searchPlaceholderMsg = i18n.gettext("Search...");
@@ -72,36 +78,23 @@ export const FeatureGrid = ({
     const { isExportAllowed } = useResource({ id });
 
     const [query, setQuery] = useState("");
-    const [selected, setSelected_] = useState<Selected[]>(() => []);
+    const [selected, setSelected] = useState<FeatureAttrs[]>(() => []);
     const [settingsOpen, setSettingsOpen] = useState(false);
-
-    const setSelected = useCallback(
-        (val) => {
-            setSelected_((old) => {
-                let newVal = val;
-                if (typeof val === "function") {
-                    newVal = val(old);
-                }
-                if (onSelect) {
-                    onSelect(
-                        newVal.map((s) => s[KEY_FIELD_KEYNAME]),
-                        old
-                    );
-                }
-                if (!old && !newVal) {
-                    return old;
-                }
-                return newVal;
-            });
-        },
-        [onSelect]
-    );
 
     useEffect(() => {
         if (selectedIds) {
             setSelected(selectedIds.map((s) => ({ [KEY_FIELD_KEYNAME]: s })));
         }
-    }, [selectedIds, setSelected]);
+    }, [selectedIds, setSelected, onSelect]);
+
+    useEffect(() => {
+        if (onSelect) {
+            const selectedIds_ = selected.map((s) =>
+                Number(s[KEY_FIELD_KEYNAME])
+            );
+            onSelect(selectedIds_ || []);
+        }
+    }, [onSelect, selected]);
 
     useEffect(() => {
         if (query_ !== undefined) {
@@ -113,7 +106,7 @@ export const FeatureGrid = ({
         if (resourceData) {
             return resourceData.feature_layer.fields;
         }
-        return null;
+        return undefined;
     }, [resourceData]);
 
     const goTo = useCallback(
@@ -201,7 +194,7 @@ export const FeatureGrid = ({
         );
     }
 
-    const rightActions = [];
+    const rightActions: ActionToolbarAction<ActionProps>[] = [];
     if (isExportAllowed) {
         rightActions.push((props) => <ExportAction {...props} />);
     }
@@ -235,7 +228,6 @@ export const FeatureGrid = ({
             <FeatureTable
                 resourceId={id}
                 total={totalData.total_count}
-                fields={fields}
                 empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
                 {...{
                     query,

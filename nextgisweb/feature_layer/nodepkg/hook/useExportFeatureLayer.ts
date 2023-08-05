@@ -6,6 +6,8 @@ import { errorModal } from "@nextgisweb/gui/error";
 import { routeURL, request, LunkwillParam } from "@nextgisweb/pyramid/api";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 
+import type { ApiError } from "package/nextgisweb/nextgisweb/gui/nodepkg/error/type";
+
 interface UseExportFeatureLayerProps {
     id: number;
 }
@@ -35,52 +37,58 @@ export function useExportFeatureLayer({ id }: UseExportFeatureLayerProps) {
         async (values: ExportFeatureLayerOptions) => {
             const { extent, resources, ...fields } = values;
             const json: Record<string, string> = {};
-            if (extent && !extent.includes(null)) {
+            if (extent && !(extent as (number | null)[]).includes(null)) {
                 const wkt = new WKT().writeGeometry(fromExtent(extent));
 
                 json.intersects = wkt;
                 json.intersects_srs = String(4326);
             }
-            for (const key in fields) {
+            let key: keyof typeof fields;
+            for (key in fields) {
                 const prop = fields[key];
                 if (prop !== undefined) {
-                    json[key] = fields[key];
+                    json[key] = prop;
                 }
             }
             const params = new URLSearchParams(json);
 
             const ids = id ? String(id).split(",") : resources;
 
-            let apiUrl: string;
-            if (ids.length === 1) {
-                apiUrl =
-                    routeURL("resource.export", ids[0]) +
-                    "?" +
-                    params.toString();
-            } else {
-                params.append("resources", ids.join(","));
-                apiUrl =
-                    routeURL("feature_layer.export") + "?" + params.toString();
-            }
-
-            if (pyramidSettings.lunkwill_enabled) {
-                const lunkwillParam = new LunkwillParam();
-                lunkwillParam.require();
-                try {
-                    setExportLoading(true);
-                    const respUrl = await request(apiUrl, {
-                        lunkwill: lunkwillParam,
-                        lunkwillReturnUrl: true,
-                    });
-                    window.open(respUrl);
-                } catch (err) {
-                    errorModal(err);
-                    return;
-                } finally {
-                    setExportLoading(false);
+            let apiUrl: string | undefined = undefined;
+            if (ids) {
+                if (ids.length === 1) {
+                    apiUrl =
+                        routeURL("resource.export", ids[0]) +
+                        "?" +
+                        params.toString();
+                } else {
+                    params.append("resources", ids.join(","));
+                    apiUrl =
+                        routeURL("feature_layer.export") +
+                        "?" +
+                        params.toString();
                 }
-            } else {
-                window.open(apiUrl);
+            }
+            if (apiUrl) {
+                if (pyramidSettings.lunkwill_enabled) {
+                    const lunkwillParam = new LunkwillParam();
+                    lunkwillParam.require();
+                    try {
+                        setExportLoading(true);
+                        const respUrl = await request(apiUrl, {
+                            lunkwill: lunkwillParam,
+                            lunkwillReturnUrl: true,
+                        });
+                        window.open(respUrl);
+                    } catch (err) {
+                        errorModal(err as ApiError);
+                        return;
+                    } finally {
+                        setExportLoading(false);
+                    }
+                } else {
+                    window.open(apiUrl);
+                }
             }
         },
         [id]

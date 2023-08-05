@@ -12,28 +12,29 @@ import { scrollbarWidth } from "./util/scrollbarWidth";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { FeatureLayerField } from "../type/FeatureLayer";
 import type {
+    OrderBy,
     ColOrder,
     FeatureAttrs,
     FeatureLayerFieldCol,
-    OrderBy,
-    Selected,
 } from "./type";
 
 import "./FeatureTable.less";
 
+type EffectiveWidths = Record<string, number>;
+
 interface FeatureTableProps {
-    empty?: () => ReactNode;
-    total?: number;
-    query?: string;
-    fields?: FeatureLayerField[];
-    selected?: Selected[];
+    empty: () => ReactNode;
+    total: number;
+    query: string;
+    fields: FeatureLayerField[];
+    selected: FeatureAttrs[];
     resourceId: number;
-    loadingCol?: () => string;
-    setSelected: Dispatch<SetStateAction<Selected[]>>;
-    settingsOpen?: boolean;
-    setSettingsOpen?: Dispatch<SetStateAction<boolean>>;
+    loadingCol: () => string;
+    setSelected: Dispatch<SetStateAction<FeatureAttrs[]>>;
+    settingsOpen: boolean;
+    setSettingsOpen: Dispatch<SetStateAction<boolean>>;
     deletedFeatureIds?: number[];
-    cleanSelectedOnFilter?: boolean;
+    cleanSelectedOnFilter: boolean;
 }
 
 const RESIZE_HANDLE_WIDTH = 6;
@@ -62,8 +63,10 @@ const FeatureTable = ({
     const [orderBy, setOrderBy] = useState<OrderBy>();
 
     const [tableWidth, setTableWidth] = useState(0);
-    const [effectiveWidths, setEffectiveWidths] = useState(null);
-    const [userDefinedWidths, setUserDefinedWidths] = useState({});
+    const [effectiveWidths, setEffectiveWidths] = useState<EffectiveWidths>({});
+    const [userDefinedWidths, setUserDefinedWidths] = useState<
+        Record<string, number>
+    >({});
 
     const [visibleFields, setVisibleFields] = useState<number[]>(() => [
         KEY_FIELD_ID,
@@ -72,7 +75,7 @@ const FeatureTable = ({
 
     const columns = useMemo<FeatureLayerFieldCol[]>(() => {
         const cols = [];
-        const fields_ = [
+        const fields_: FeatureLayerFieldCol[] = [
             {
                 id: KEY_FIELD_ID,
                 keyname: KEY_FIELD_KEYNAME, // keyname for toggleSorting
@@ -84,7 +87,7 @@ const FeatureTable = ({
 
         for (const field of fields_) {
             const { id, datatype } = field;
-            let flex = {};
+            let flex;
             if (id === KEY_FIELD_ID) {
                 flex = "0 0 5em";
             } else if (datatype === "INTEGER" || datatype === "REAL") {
@@ -133,13 +136,16 @@ const FeatureTable = ({
 
     const toggleSorting = (keyname: string, curOrder: ColOrder = null) => {
         if (keyname === KEY_FIELD_KEYNAME) {
-            setOrderBy(null);
+            setOrderBy(undefined);
             return;
         }
         const sortOrderSeq: ColOrder[] = ["asc", "desc", null];
-        setOrderBy(([oldSortKey, oldSortOrder]) => {
-            if (oldSortKey === keyname) {
-                curOrder = oldSortOrder;
+        setOrderBy((old) => {
+            if (old) {
+                const [oldSortKey, oldSortOrder] = old;
+                if (oldSortKey === keyname) {
+                    curOrder = oldSortOrder;
+                }
             }
             const curOrderIndex = sortOrderSeq.indexOf(curOrder);
             const nextOrderIndex = (curOrderIndex + 1) % sortOrderSeq.length;
@@ -149,19 +155,23 @@ const FeatureTable = ({
     };
 
     useLayoutEffect(() => {
+        const tbodyRefElement = tbodyRef.current;
+        if (!tbodyRefElement) {
+            throw "unreachable";
+        }
         const updateTableWidth = () => {
-            setTableWidth(tbodyRef.current.offsetWidth);
+            setTableWidth(tbodyRefElement.offsetWidth);
         };
         const debouncedUpdate = debounce(updateTableWidth, 100);
         const tableResizeObserver = new ResizeObserver(debouncedUpdate);
-        tableResizeObserver.observe(tbodyRef.current);
+        tableResizeObserver.observe(tbodyRefElement);
         return () => {
             tableResizeObserver.disconnect();
         };
     }, []);
 
     useLayoutEffect(() => {
-        const newEffectiveWidths = {};
+        const newEffectiveWidths: EffectiveWidths = {};
         for (const { id } of columns) {
             newEffectiveWidths[id] =
                 columnRef.current[id].getBoundingClientRect().width;
@@ -175,14 +185,15 @@ const FeatureTable = ({
             return null;
         }
 
-        const prepareCols = (row: FeatureAttrs) => {
+        const prepareCols = (row?: FeatureAttrs) => {
             return (
                 <>
                     {columns.map((f) => {
                         const val = row && row[f.keyname];
-                        const renderValue = row
-                            ? renderFeatureFieldValue(f, val) || val
-                            : loadingCol();
+                        const renderValue =
+                            val !== undefined
+                                ? renderFeatureFieldValue(f, val) || val
+                                : loadingCol();
                         return (
                             <div
                                 key={f.id}
@@ -202,14 +213,17 @@ const FeatureTable = ({
         return (
             <>
                 {virtualItems.map((virtualRow) => {
-                    let isSelected = false;
+                    let isSelected: FeatureAttrs | undefined = undefined;
                     let className = "tr";
 
                     const row = data.find(
                         (d) => d.__rowIndex === virtualRow.index
                     );
+                    // if (!row) {
+                    //     throw "unreachable";
+                    // }
                     if (row) {
-                        isSelected = !!selected.find(
+                        isSelected = selected.find(
                             (s) =>
                                 s[KEY_FIELD_KEYNAME] === row[KEY_FIELD_KEYNAME]
                         );
@@ -229,17 +243,20 @@ const FeatureTable = ({
                                 transform: `translateY(${virtualRow.start}px)`,
                             }}
                             onClick={() => {
-                                if (isSelected) {
-                                    setSelected((old) =>
-                                        old.filter(
+                                setSelected((old) => {
+                                    if (isSelected) {
+                                        const selectedKey =
+                                            isSelected[KEY_FIELD_KEYNAME];
+                                        return old.filter(
                                             (o) =>
                                                 o[KEY_FIELD_KEYNAME] !==
-                                                isSelected[KEY_FIELD_KEYNAME]
-                                        )
-                                    );
-                                } else if (row) {
-                                    setSelected([row]);
-                                }
+                                                selectedKey
+                                        );
+                                    } else if (row) {
+                                        return [row];
+                                    }
+                                    return old;
+                                });
                             }}
                         >
                             {prepareCols(row)}
@@ -277,7 +294,9 @@ const FeatureTable = ({
                             <div
                                 key={id}
                                 ref={(element) => {
-                                    columnRef.current[id] = element;
+                                    if (element) {
+                                        columnRef.current[id] = element;
+                                    }
                                 }}
                                 className="th"
                                 style={style}
@@ -353,7 +372,10 @@ const FeatureTable = ({
                 ref={tbodyRef}
                 className="tbody-scroller"
                 onScroll={() => {
-                    theadRef.current.scrollLeft = tbodyRef.current.scrollLeft;
+                    if (theadRef.current && tbodyRef.current) {
+                        theadRef.current.scrollLeft =
+                            tbodyRef.current.scrollLeft;
+                    }
                 }}
             >
                 {isEmpty && empty ? (

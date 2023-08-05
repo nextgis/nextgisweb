@@ -8,7 +8,7 @@ import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 import { fetchFeatures } from "../api/fetchFeatures";
 import { createCacheKey } from "../util/createCacheKey";
 
-import type { MutableRefObject } from "react";
+import type { RefObject } from "react";
 import type { FeatureLayerFieldCol, FeatureAttrs, OrderBy } from "../type";
 
 const debouncedFn = debounce((fn) => {
@@ -16,15 +16,15 @@ const debouncedFn = debounce((fn) => {
 }, 200);
 
 interface UseFeatureTableProps {
-    total?: number;
-    query?: string;
-    columns?: FeatureLayerFieldCol[];
+    total: number;
+    query: string;
+    columns: FeatureLayerFieldCol[];
     orderBy?: OrderBy;
-    pageSize?: number;
-    tbodyRef?: MutableRefObject<HTMLElement>;
-    resourceId?: number;
-    rowMinHeight?: number;
-    visibleFields?: number[];
+    pageSize: number;
+    tbodyRef?: RefObject<HTMLDivElement>;
+    resourceId: number;
+    rowMinHeight: number;
+    visibleFields: number[];
 }
 
 /**
@@ -94,7 +94,7 @@ export function useFeatureTable({
     rowMinHeight,
     visibleFields,
 }: UseFeatureTableProps) {
-    const [pages, setPages] = useState([]);
+    const [pages, setPages] = useState<number[]>([]);
     const [hasNextPage, setHasNextPage] = useState(false);
     const [queryTotal, setQueryTotal] = useState(0);
 
@@ -148,6 +148,9 @@ export function useFeatureTable({
             signal: AbortSignal;
             key: string;
         }) => {
+            if (!loaderCache.current) {
+                return [];
+            }
             return loaderCache.current
                 .promiseFor(key, () => {
                     return fetchFeatures({
@@ -181,6 +184,10 @@ export function useFeatureTable({
         if (pages.length) {
             const cache = loaderCache.current;
 
+            if (!cache) {
+                throw "unreachable";
+            }
+
             const cacheKeys = pages.map((page) => ({
                 page,
                 key: createCacheKey({
@@ -191,14 +198,16 @@ export function useFeatureTable({
                     page,
                 }),
             }));
-            const allPageLoaded = cacheKeys.every((c) =>
-                cache.fulfilled(c.key)
-            );
+            const allPageLoaded = cacheKeys.every((c) => {
+                cache.fulfilled(c.key);
+            });
 
             if (allPageLoaded) {
                 const attrs = (
-                    await Promise.all(
-                        cacheKeys.map((c) => cache.resolve(c.key))
+                    await Promise.all<FeatureAttrs[]>(
+                        cacheKeys.map((c) => {
+                            return cache.resolve(c.key);
+                        })
                     )
                 ).flat();
                 handleFeatures(attrs);
@@ -246,7 +255,7 @@ export function useFeatureTable({
     const { getVirtualItems, measureElement, getTotalSize, scrollToIndex } =
         useVirtualizer({
             count,
-            getScrollElement: () => tbodyRef.current,
+            getScrollElement: () => (tbodyRef ? tbodyRef.current : null),
             estimateSize: () => rowMinHeight,
         });
 
@@ -257,7 +266,9 @@ export function useFeatureTable({
     }, []);
 
     useEffect(() => {
-        loaderCache.current.clean();
+        if (loaderCache.current) {
+            loaderCache.current.clean();
+        }
     }, [total]);
 
     useEffect(() => {
@@ -271,14 +282,15 @@ export function useFeatureTable({
             const firstDataIndex = data[0].__rowIndex;
             const lastDataIndex = data[data.length - 1].__rowIndex;
             const lastPageIndex = pages[0] + pageSize * pages.length - 1;
-
-            const currentDataInTheRange =
-                firstDataIndex === pages[0] &&
-                (hasNextPage
-                    ? lastDataIndex === lastPageIndex
-                    : lastDataIndex <= lastPageIndex);
-            if (currentDataInTheRange) {
-                return;
+            if (firstDataIndex !== undefined && lastDataIndex !== undefined) {
+                const currentDataInTheRange =
+                    firstDataIndex === pages[0] &&
+                    (hasNextPage
+                        ? lastDataIndex === lastPageIndex
+                        : lastDataIndex <= lastPageIndex);
+                if (currentDataInTheRange) {
+                    return;
+                }
             }
         }
         queryFn();

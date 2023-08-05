@@ -5,8 +5,6 @@ export type FeatureAttrs = Record<string, NgwAttributeType> & {
     __rowIndex?: number;
 };
 
-export type Selected = FeatureAttrs;
-
 export type ColOrder = "asc" | "desc" | null;
 
 export type OrderBy = [keynme: string, ordering: ColOrder];

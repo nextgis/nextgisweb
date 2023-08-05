@@ -1,7 +1,9 @@
+import type { OrderBy } from "../type";
+
 interface CreateCacheKeyOptions {
     visibleFields: number[];
     pageSize: number;
-    orderBy: string[];
+    orderBy?: OrderBy;
     query: string;
     page: number;
 }

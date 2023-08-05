@@ -13,8 +13,8 @@ export interface FeatureLayerField {
     datatype: FeatureLayerDataType;
     typemod?: unknown;
     display_name: string;
-    label_field: boolean;
-    grid_visibility: boolean;
+    label_field?: boolean;
+    grid_visibility?: boolean;
     lookup_table?: unknown;
 }
 
