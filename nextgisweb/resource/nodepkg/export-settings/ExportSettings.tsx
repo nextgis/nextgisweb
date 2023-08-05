@@ -8,17 +8,21 @@ import {
     Typography,
     message,
 } from "@nextgisweb/gui/antd";
-import { SaveButton, LoadingWrapper } from "@nextgisweb/gui/component";
+import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n";
 
+import type { ApiError } from "@nextgisweb/gui/error/type";
+
 export function ExportSettings() {
     const [saving, setSaving] = useState(false);
 
-    const { data, isLoading } = useRouteGet("resource.resource_export");
-    const [value, setValue] = useState();
+    const { data, isLoading } = useRouteGet<{ resource_export: string }>(
+        "resource.resource_export"
+    );
+    const [value, setValue] = useState<string>();
 
     async function save() {
         setSaving(true);
@@ -28,7 +32,7 @@ export function ExportSettings() {
             });
             message.success(i18n.gettext("The setting is saved."));
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
             setSaving(false);
         }
@@ -40,7 +44,7 @@ export function ExportSettings() {
         }
     }, [data]);
 
-    if (isLoading === "loading") {
+    if (isLoading) {
         return <LoadingWrapper />;
     }
 
