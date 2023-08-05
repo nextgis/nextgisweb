@@ -48,9 +48,9 @@ const ngwTypeAliases: Record<
 const setNullTitle = gettext("Set field value to NULL (No data)");
 
 interface AttributeEditorStoreProps
-    extends EditorWidgetProps<NgwAttributeValue, AttributeEditorStore> {
+    extends EditorWidgetProps<NgwAttributeValue | null, AttributeEditorStore> {
     fields?: FeatureLayerField[];
-    onChange?: (value: NgwAttributeValue) => void;
+    onChange?: (value: NgwAttributeValue | null) => void;
 }
 
 const AttributeEditor = observer(

@@ -1,27 +1,37 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
 
 import { TextEditor } from "@nextgisweb/gui/component/text-editor";
+import DescriptionEditorStore from "./DescriptionEditorStore";
 
 import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
 
-const DescriptionEditor = observer(({ store }: EditorWidgetProps<string>) => {
-    const value = useMemo(() => {
-        if (store.value) {
-            return store.value;
-        }
-        return "";
-    }, [store.value]);
+const DescriptionEditor = observer(
+    ({ store }: EditorWidgetProps<string | null>) => {
+        const [store_] = useState(() => {
+            if (store) {
+                return store;
+            }
+            return new DescriptionEditorStore();
+        });
 
-    const onChange = (val: string) => {
-        if (val) {
-            store.value = val;
-        } else {
-            store.value = null;
-        }
-    };
+        const value = useMemo(() => {
+            if (store_.value) {
+                return store_.value;
+            }
+            return "";
+        }, [store_.value]);
 
-    return <TextEditor value={value} onChange={onChange} border={false} />;
-});
+        const onChange = (val: string) => {
+            if (val) {
+                store_.value = val;
+            } else {
+                store_.value = null;
+            }
+        };
+
+        return <TextEditor value={value} onChange={onChange} border={false} />;
+    }
+);
 
 export default DescriptionEditor;

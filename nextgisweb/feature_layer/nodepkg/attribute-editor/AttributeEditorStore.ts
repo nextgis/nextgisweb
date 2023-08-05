@@ -12,10 +12,10 @@ import type {
 import type { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 import type { AppAttributes, NgwAttributeValue } from "./type";
 
-class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
-    value: NgwAttributeValue = null;
+class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
+    value: NgwAttributeValue | null = null;
 
-    _initValue?: NgwAttributeValue;
+    _initValue: NgwAttributeValue | null = null;
 
     readonly _parentStore?: FeatureEditorStore;
     readonly _fields?: FeatureLayerField[];
@@ -37,7 +37,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
         }
     }
 
-    load(value: NgwAttributeValue) {
+    load(value: NgwAttributeValue | null) {
         this.value = { ...value };
         this._initValue = toJS(value);
     }

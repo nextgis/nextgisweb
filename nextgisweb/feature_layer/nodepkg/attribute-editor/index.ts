@@ -7,7 +7,10 @@ import type { NgwAttributeValue } from "./type";
 
 const titleText = gettext("Attributes");
 
-const editorWidgetRegister: EditorWidgetRegister<NgwAttributeValue> = {
+const editorWidgetRegister: EditorWidgetRegister<
+    NgwAttributeValue | null,
+    AttributeEditorStore
+> = {
     component: () => import("./AttributeEditor"),
     store: AttributeEditorStore,
     label: titleText,

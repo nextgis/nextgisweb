@@ -11,7 +11,8 @@ export interface EditorStoreOptions {
     operation?: Operations;
 }
 
-export interface EditorStore<V = unknown> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface EditorStore<V = any> {
     identity?: string;
 
     uploading: boolean;

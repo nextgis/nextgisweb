@@ -6,7 +6,6 @@ import { findAttachmentIndex } from "./util/findAttachmentIndex";
 import type {
     EditorStoreConstructorOptions,
     EditorStore as IEditorStore,
-    ExtensionValue,
 } from "@nextgisweb/feature-layer/type";
 
 import type {
@@ -15,17 +14,21 @@ import type {
 } from "@nextgisweb/file-upload/file-uploader/type";
 import type { DataSource, FileMetaToUpload } from "./type";
 
-class AttachmentEditorStore
-    implements IEditorStore<ExtensionValue<DataSource[]>>
-{
-    value: ExtensionValue<DataSource[]> = null;
+class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
+    value: DataSource[] | null = null;
 
     featureId: number;
     resourceId: number;
 
-    _initValue: ExtensionValue<DataSource[]> = null;
+    _initValue: DataSource[] | null = null;
 
     constructor({ parentStore }: EditorStoreConstructorOptions) {
+        if (!parentStore) {
+            throw new Error(
+                "The `parentStore` is required for AttachmentEditorStore"
+            );
+        }
+
         this.featureId = parentStore.featureId;
         this.resourceId = parentStore.resourceId;
         makeAutoObservable(this, { featureId: false, resourceId: false });
@@ -36,12 +39,14 @@ class AttachmentEditorStore
     }
 
     get dirty() {
-        if (this.value && this._initValue) {
-            if (this.value.length !== this._initValue.length) {
+        const value = this.value;
+        const _initValue = this._initValue;
+        if (value && _initValue) {
+            if (value.length !== _initValue.length) {
                 return true;
             }
-            return !this._initValue.every((val, index) =>
-                isEqual(val, this.value[index])
+            return !_initValue.every((val, index) =>
+                isEqual(val, value[index])
             );
         }
         // just one of two is array
@@ -51,7 +56,7 @@ class AttachmentEditorStore
         return dirty;
     }
 
-    load = (value: ExtensionValue<DataSource[]>) => {
+    load = (value: DataSource[] | null) => {
         this.value = value;
         this._initValue = toJS(value);
     };
@@ -82,7 +87,7 @@ class AttachmentEditorStore
     };
 
     updateItem = (item: FileMeta, field: string, value: unknown) => {
-        const old = [...this.value];
+        const old = this.value ? [...this.value] : [];
         const index = findAttachmentIndex(item, old);
         if (index !== -1) {
             const updatedAttachments = old;
@@ -96,7 +101,7 @@ class AttachmentEditorStore
     };
 
     deleteItem = (item: FileMeta) => {
-        const old = [...this.value];
+        const old = this.value ? [...this.value] : [];
         const index = findAttachmentIndex(item, old);
         if (index !== -1) {
             const newAttachments = old;

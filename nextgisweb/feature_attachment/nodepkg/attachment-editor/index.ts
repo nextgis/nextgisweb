@@ -8,7 +8,10 @@ import type { DataSource } from "./type";
 
 const titleText = i18n.gettext("Attachments");
 
-const editorWidgetRegister: EditorWidgetRegister<DataSource[]> = {
+const editorWidgetRegister: EditorWidgetRegister<
+    DataSource[] | null,
+    AttachmentEditorStore
+> = {
     component: () => import("./AttachmentEditor"),
     store: AttachmentEditorStore,
     label: titleText,

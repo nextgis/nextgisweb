@@ -29,8 +29,8 @@ export class FeatureEditorStore {
 
     initLoading = false;
 
-    private _resourceItem: ResourceItem | null = null;
-    private _featureItem: FeatureItem | null = null;
+    private _resourceItem?: ResourceItem;
+    private _featureItem?: FeatureItem;
 
     _abortController = new AbortControllerHelper();
     private _extensionStores: Record<string, EditorStore> = {};

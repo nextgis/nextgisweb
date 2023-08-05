@@ -21,7 +21,7 @@ import type { FeatureEditorWidgetProps } from "./type";
 
 import "./FeatureEditorWidget.less";
 
-type TabItems = ParamOf<typeof Tabs, "items">;
+type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
 type TabItem = TabItems[0];
 
 const mLoading = gettext("Loading...");
@@ -93,11 +93,15 @@ export const FeatureEditorWidget = observer(
 
         useEffect(() => {
             const loadWidgets = async () => {
-                for (const key in settings.editor_widget) {
+                let key: keyof typeof settings.editor_widget;
+                for (key in settings.editor_widget) {
                     const mid = settings.editor_widget[key];
                     try {
-                        const widgetResource = (await entrypoint(mid))
-                            .default as EditorWidgetRegister;
+                        const widgetResource = (
+                            await entrypoint<{ default: EditorWidgetRegister }>(
+                                mid
+                            )
+                        ).default;
                         const { widgetStore } = registerEditorWidget(
                             key,
                             widgetResource
@@ -111,7 +115,7 @@ export const FeatureEditorWidget = observer(
 
             const { widgetStore } = registerEditorWidget(
                 "attributes",
-                editorWidgetRegister
+                editorWidgetRegister as unknown as EditorWidgetRegister
             );
             store.attachAttributeStore(widgetStore);
 

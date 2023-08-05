@@ -17,8 +17,8 @@ interface EditorWidgetOptions {
     order?: number;
 }
 
-export type EditorWidgetComponent = (
-    | FunctionComponent<unknown>
-    | ForwardRefRenderFunction<unknown>
+export type EditorWidgetComponent<P = unknown> = (
+    | FunctionComponent<P>
+    | ForwardRefRenderFunction<unknown, P>
 ) &
     EditorWidgetOptions;

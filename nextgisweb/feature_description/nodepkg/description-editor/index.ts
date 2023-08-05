@@ -7,7 +7,10 @@ import type { EditorWidgetRegister } from "@nextgisweb/feature-layer/type";
 
 const titleText = i18n.gettext("Description");
 
-const editorWidgetRegister: EditorWidgetRegister<string> = {
+const editorWidgetRegister: EditorWidgetRegister<
+    string | null,
+    DescriptionEditorStore
+> = {
     component: () => import("./DescriptionEditor"),
     store: DescriptionEditorStore,
     label: titleText,
