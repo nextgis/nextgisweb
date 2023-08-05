@@ -12,7 +12,7 @@ import GroupIcon from "@material-icons/svg/groups";
 import type { PrincipalSelectProps, Member, SelectProps } from "./type";
 import type { Group, User } from "../../type";
 
-type TagProps = Parameters<SelectProps["tagRender"]>[0];
+type TagProps = Parameters<NonNullable<SelectProps["tagRender"]>>[0];
 
 export function PrincipalSelect({
     editOnClick,
@@ -26,10 +26,10 @@ export function PrincipalSelect({
     const [members, setMembers] = useState<Member[]>([]);
     const { makeSignal } = useAbortController();
 
-    const memberById = (memberId: number) =>
+    const memberById = (memberId: number): Member | undefined =>
         members.find((itm) => itm.id === memberId);
 
-    const editUrl = (member: Member) => {
+    const editUrl = (member?: Member) => {
         if (member) {
             const memberId = member.id;
             if (member._user) {
@@ -39,8 +39,8 @@ export function PrincipalSelect({
         }
     };
 
-    const getIcon = (member: Member) => {
-        if (member._user) {
+    const getIcon = (member?: Member) => {
+        if (member && member._user) {
             if (member.is_administrator) {
                 return <AdministratorIcon />;
             } else if (member.system) {

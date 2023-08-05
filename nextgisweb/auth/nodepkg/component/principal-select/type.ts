@@ -9,7 +9,7 @@ export interface PrincipalSelectProps<V extends number = number>
     editOnClick?: boolean;
     systemUsers?: boolean | string[];
     multiple?: boolean;
-    onChange?: (val: V) => void;
+    // onChange?: (val: V) => void;
     model?: "principal" | "user" | "group";
     value?: V;
 }
