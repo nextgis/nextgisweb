@@ -23,5 +23,8 @@ export function deleteFeature({
     resourceId,
     featureId,
 }: DeleteFeatureOptions): Promise<unknown> {
-    return route("feature_layer.feature.item", resourceId, featureId).delete();
+    return route("feature_layer.feature.item", {
+        id: resourceId,
+        fid: featureId,
+    }).delete();
 }

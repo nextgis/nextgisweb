@@ -60,11 +60,10 @@ export class FeatureEditorStore {
     }
 
     get route() {
-        return route(
-            "feature_layer.feature.item",
-            this.resourceId,
-            this.featureId
-        );
+        return route("feature_layer.feature.item", {
+            id: this.resourceId,
+            fid: this.featureId,
+        });
     }
 
     get dirty(): boolean {
