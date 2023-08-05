@@ -4,30 +4,31 @@ import type { CSSProperties, ReactNode } from "react";
 
 export type ButtonProps = Parameters<typeof Button>[0];
 
-type Props = Record<string, unknown>;
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CreateButtonActionProps = Record<string, any>;
 export interface UseActionToolbarProps {
     size?: SizeType;
-    props?: Props;
+    props?: CreateButtonActionProps;
 }
 
 export interface CreateButtonActionOptions
     extends Omit<ButtonProps, "icon" | "disabled"> {
     icon?: string | JSX.Element;
-    action?: (val?: Props) => void;
-    disabled?: ((val?: Props) => boolean) | boolean;
+    action?: (val?: CreateButtonActionProps) => void;
+    disabled?: ((val?: CreateButtonActionProps) => boolean) | boolean;
 }
 
-export type ActionToolbarAction =
-    | string
-    | JSX.Element
-    | CreateButtonActionOptions;
+export type ActionToolbarAction<
+    P extends CreateButtonActionProps = CreateButtonActionProps,
+> = string | ReactNode | ((props: P) => ReactNode) | CreateButtonActionOptions;
 
-export interface ActionToolbarProps {
+export interface ActionToolbarProps<
+P extends CreateButtonActionProps = CreateButtonActionProps,
+> {
     size?: SizeType;
     style?: CSSProperties;
-    actions: ActionToolbarAction[];
-    rightActions?: ActionToolbarAction[];
-    actionProps?: Props;
+    actions: ActionToolbarAction<P>[];
+    rightActions?: ActionToolbarAction<P>[];
+    actionProps?: P;
     children?: ReactNode;
 }

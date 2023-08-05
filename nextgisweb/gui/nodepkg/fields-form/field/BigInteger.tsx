@@ -6,9 +6,9 @@ import type { FormItemProps } from "../type";
 type InputNumberProps = Parameters<typeof InputNumber>[0];
 
 type BigIntegerProps = FormItemProps<InputNumberProps> & {
-    /** @deprecated move to inputProps */
+    /** @deprecated moved to {@link FormItemProps.inputProps} */
     min?: InputNumberProps["min"];
-    /** @deprecated move to inputProps */
+    /** @deprecated moved to {@link FormItemProps.inputProps} */
     max?: InputNumberProps["max"];
 };
 

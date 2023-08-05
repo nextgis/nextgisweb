@@ -8,7 +8,11 @@ import {
 
 import { useActionToolbar } from "./hook/useActionToolbar";
 
-import type { ActionToolbarAction, ActionToolbarProps } from "./type";
+import type {
+    ActionToolbarAction,
+    ActionToolbarProps,
+    CreateButtonActionOptions,
+} from "./type";
 
 import "./ActionToolbar.less";
 
@@ -24,7 +28,7 @@ export const ActionToolbar = forwardRef<HTMLDivElement, ActionToolbarProps>(
         });
 
         const getAction = useCallback(
-            (Action) => {
+            (Action: ActionToolbarAction) => {
                 keyIndexRef.current = keyIndexRef.current + 1;
                 if (isValidElement(Action)) {
                     return Action;
@@ -33,9 +37,11 @@ export const ActionToolbar = forwardRef<HTMLDivElement, ActionToolbarProps>(
                         <div key={keyIndexRef.current}>
                             {typeof Action === "function" ? (
                                 <Action {...{ size, ...actionProps }} />
-                            ) : (
-                                createButtonAction(Action)
-                            )}
+                            ) : Action && typeof Action === "object" ? (
+                                createButtonAction(
+                                    Action as CreateButtonActionOptions
+                                )
+                            ) : null}
                         </div>
                     );
                 }
