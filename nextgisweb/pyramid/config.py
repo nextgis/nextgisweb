@@ -79,6 +79,7 @@ class Configurator(PyramidConfigurator):
                 return res
 
             template = ROUTE_RE.sub(_pnum, pattern)
+            wotypes = ROUTE_RE.sub(lambda m: f"{{{m.group('k')}}}", pattern)
 
             mdtypes = dict()
             tmissing = False
@@ -95,7 +96,7 @@ class Configurator(PyramidConfigurator):
 
                 return m.group(0)
 
-            pattern =ROUTE_RE.sub(_sub, pattern)
+            pattern = ROUTE_RE.sub(_sub, pattern)
 
             if tmissing:
                 warn(
@@ -104,7 +105,7 @@ class Configurator(PyramidConfigurator):
                     f"will be required in 4.6.0.dev0.",
                     DeprecationWarning, stacklevel=2)
 
-            kwargs['meta'] = (template, mdtypes, client)
+            kwargs['meta'] = (template, wotypes, mdtypes, client)
 
         super().add_route(name, pattern=pattern, **kwargs)
 

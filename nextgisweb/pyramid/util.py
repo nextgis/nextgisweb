@@ -32,8 +32,9 @@ def viewargs(*, renderer=None):
 
 class RouteMetadataPredicate:
     def __init__(self, val, config):
-        template, mdtypes, client = val
+        template, wotypes, mdtypes, client = val
         self.template = template
+        self.wotypes = wotypes
         self.mdtypes = mdtypes
         self.client = client
 
