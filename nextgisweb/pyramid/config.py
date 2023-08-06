@@ -5,7 +5,7 @@ from warnings import warn
 from msgspec import Struct
 from pyramid.config import Configurator as PyramidConfigurator
 
-from .util import JSONType, find_template
+from .util import JSONType, RouteMeta, ViewMeta, find_template
 
 
 class RouteHelper:
@@ -36,6 +36,7 @@ ROUTE_RE = re.compile(
 
 
 class Configurator(PyramidConfigurator):
+    predicates_ready = False
 
     def add_route(self, name, pattern=None, **kwargs):
         """ Advanced route addition
@@ -105,7 +106,7 @@ class Configurator(PyramidConfigurator):
                     f"will be required in 4.6.0.dev0.",
                     DeprecationWarning, stacklevel=2)
 
-            kwargs['meta'] = (template, wotypes, mdtypes, client)
+            kwargs['meta'] = RouteMeta(template, wotypes, mdtypes, client)
 
         super().add_route(name, pattern=pattern, **kwargs)
 
@@ -120,6 +121,8 @@ class Configurator(PyramidConfigurator):
                 DeprecationWarning, stacklevel=2 + stacklevel)
 
         if view is not None:
+            meta = ViewMeta(func=view)
+
             # Extract attrs missing in kwargs from view.__pyramid_{attr}__
             attrs = {'renderer', }.difference(set(kwargs.keys()))
 
@@ -135,8 +138,13 @@ class Configurator(PyramidConfigurator):
                 return_annotation = signature(view).return_annotation
                 if return_annotation is JSONType:
                     kwargs['renderer'] = 'json'
+                    meta.return_type = return_annotation
                 elif issubclass(return_annotation, Struct):
                     kwargs['renderer'] = 'msgspec'
+                    meta.return_type = return_annotation
+
+            if self.predicates_ready:
+                kwargs['meta'] = meta
 
         if renderer := kwargs.get('renderer'):
             if renderer == 'mako':

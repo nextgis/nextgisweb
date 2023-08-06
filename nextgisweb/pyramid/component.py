@@ -16,8 +16,9 @@ from .config import Configurator
 from .model import Session, SessionStore
 from .util import (
     ErrorRendererPredicate,
-    RouteMetadataPredicate,
+    RouteMetaPredicate,
     StaticMap,
+    ViewMetaPredicate,
     gensecret,
 )
 
@@ -29,8 +30,10 @@ class PyramidComponent(Component):
         settings['pyramid.static_map'] = StaticMap()
         config = Configurator(settings=settings)
 
-        config.add_route_predicate('meta', RouteMetadataPredicate)
+        config.add_route_predicate('meta', RouteMetaPredicate)
+        config.add_view_predicate('meta', ViewMetaPredicate)
         config.add_route_predicate('error_renderer', ErrorRendererPredicate)
+        config.predicates_ready = True
 
         # Setup pyramid app for other components
         chain = self._env.chain('setup_pyramid', first='pyramid')
@@ -44,18 +47,20 @@ class PyramidComponent(Component):
         for itm in config.registry.introspector.get_category('routes'):
             route = itm['introspectable']['object']
 
-            for p in route.predicates:
-                if isinstance(p, RouteMetadataPredicate):
+            meta = None
+            for pmeta in route.predicates:
+                if isinstance(pmeta, RouteMetaPredicate):
+                    meta = pmeta.value
                     break
-            else:
+            if meta is None:
                 continue
 
-            if not p.client or route.name.startswith('_'):
+            if not meta.client or route.name.startswith('_'):
                 continue
 
-            template = p.template
-            route_meta[route.name] = [template, ] + list(p.mdtypes.keys())
-            route_mdtypes[route.name] = p.mdtypes
+            template = meta.template
+            route_meta[route.name] = [template, ] + list(meta.mdtypes.keys())
+            route_mdtypes[route.name] = meta.mdtypes
 
         return config
 

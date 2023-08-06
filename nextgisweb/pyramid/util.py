@@ -5,10 +5,11 @@ import secrets
 import string
 from calendar import timegm
 from collections import defaultdict
+from dataclasses import dataclass
 from mimetypes import guess_type
 from pathlib import Path
 from sys import _getframe
-from typing import TypeVar
+from typing import Any, Dict, TypeVar
 
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse
@@ -30,13 +31,40 @@ def viewargs(*, renderer=None):
     return wrap
 
 
-class RouteMetadataPredicate:
-    def __init__(self, val, config):
-        template, wotypes, mdtypes, client = val
-        self.template = template
-        self.wotypes = wotypes
-        self.mdtypes = mdtypes
-        self.client = client
+@dataclass
+class RouteMeta:
+    template: str
+    wotypes: str
+    mdtypes: Dict[str, str]
+    client: bool
+
+
+class RouteMetaPredicate:
+    value: RouteMeta
+
+    def __init__(self, value, config):
+        self.value = value
+
+    def text(self):
+        return "meta"
+
+    phash = __repr__ = text
+
+    def __call__(self, context, request):
+        return True
+
+
+@dataclass
+class ViewMeta:
+    func: Any = None
+    return_type: Any = None
+
+
+class ViewMetaPredicate:
+    value: ViewMeta
+
+    def __init__(self, value, config):
+        self.value = value
 
     def text(self):
         return "meta"
