@@ -8,6 +8,12 @@ from .imgcodec import (
     FORMAT_PNG,
     image_encoder_factory,
 )
-from .interface import IExtentRenderRequest, ILegendableStyle, IRenderableStyle, ITileRenderRequest
+from .interface import (
+    IExtentRenderRequest,
+    ILegendableStyle,
+    IRenderableNonCached,
+    IRenderableStyle,
+    ITileRenderRequest,
+)
 from .legend import ILegendSymbols, LegendSymbol
 from .model import ResourceTileCache

@@ -24,7 +24,12 @@ from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
-from nextgisweb.render import IExtentRenderRequest, IRenderableStyle, ITileRenderRequest
+from nextgisweb.render import (
+    IExtentRenderRequest,
+    IRenderableNonCached,
+    IRenderableStyle,
+    ITileRenderRequest,
+)
 from nextgisweb.resource import (
     DataScope,
     DataStructureScope,
@@ -108,7 +113,7 @@ def get_tile_db(db_path):
     return sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)
 
 
-@implementer(IRenderableStyle, IBboxLayer)
+@implementer(IRenderableStyle, IRenderableNonCached, IBboxLayer)
 class Tileset(Base, Resource, SpatialLayerMixin):
     identity = 'tileset'
     cls_display_name = _("Tileset")

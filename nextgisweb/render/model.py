@@ -27,7 +27,7 @@ from nextgisweb.resource import (
 )
 
 from .event import on_data_change, on_style_change
-from .interface import IRenderableStyle
+from .interface import IRenderableNonCached, IRenderableStyle
 from .util import affine_bounds_to_tile, imgcolor, pack_color, unpack_color
 
 Base.depends_on('resource')
@@ -553,7 +553,9 @@ class ResourceTileCacheSerializer(Serializer):
     seed_z = ResourceTileCacheSeializedProperty(**__permissions)
 
     def is_applicable(self):
-        return IRenderableStyle.providedBy(self.obj)
+        return (
+            IRenderableStyle.providedBy(self.obj)
+            and not IRenderableNonCached.providedBy(self.obj))
 
     def deserialize(self):
         super().deserialize()

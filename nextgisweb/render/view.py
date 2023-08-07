@@ -4,7 +4,7 @@ from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
-from .interface import IRenderableStyle
+from .interface import IRenderableNonCached, IRenderableStyle
 from .legend import ILegendSymbols
 
 
@@ -14,8 +14,10 @@ class TileCacheWidget(Widget):
     amdmod = '@nextgisweb/render/tile-cache-widget'
 
     def is_applicable(self):
-        return env.render.tile_cache_enabled \
-            and super().is_applicable()
+        return (
+            env.render.tile_cache_enabled
+            and not IRenderableNonCached.providedBy(self.obj)
+            and super().is_applicable())
 
     def config(self):
         result = super().config()

@@ -31,6 +31,10 @@ class ITileRenderRequest(Interface):
         pass
 
 
+class IRenderableNonCached(IRenderableStyle):
+    pass
+
+
 @adapter_hooks.append
 def style_adapter_hook(iface, param):
     if (
