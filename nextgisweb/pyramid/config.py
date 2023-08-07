@@ -1,11 +1,13 @@
 import re
-from inspect import signature
+from inspect import isclass, signature
 from warnings import warn
 
 from msgspec import Struct
 from pyramid.config import Configurator as PyramidConfigurator
 
-from .util import JSONType, RouteMeta, ViewMeta, find_template
+from nextgisweb.lib.apitype import AsJSONMarker, JSONType
+
+from .util import RouteMeta, ViewMeta, find_template
 
 
 class RouteHelper:
@@ -135,13 +137,21 @@ class Configurator(PyramidConfigurator):
                 fn = getattr(fn, '__wrapped__', None)
 
             if kwargs.get('renderer') is None:
-                return_annotation = signature(view).return_annotation
-                if return_annotation is JSONType:
+                sig = signature(view)
+                return_type = sig.return_annotation
+                if return_type is sig.empty:
+                    pass
+                elif return_type is JSONType:
                     kwargs['renderer'] = 'json'
-                    meta.return_type = return_annotation
-                elif issubclass(return_annotation, Struct):
+                    meta.return_type = return_type
+                elif isclass(return_type) and issubclass(return_type, Struct):
                     kwargs['renderer'] = 'msgspec'
-                    meta.return_type = return_annotation
+                    meta.return_type = return_type
+                else:
+                    metadata = getattr(return_type, '__metadata__', ())
+                    if AsJSONMarker in metadata:
+                        kwargs['renderer'] = 'msgspec'
+                        meta.return_type = return_type
 
             if self.predicates_ready:
                 kwargs['meta'] = meta

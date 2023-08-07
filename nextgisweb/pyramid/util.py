@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from mimetypes import guess_type
 from pathlib import Path
 from sys import _getframe
-from typing import Any, Dict, TypeVar
+from typing import Any, Dict
 
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse
@@ -17,8 +17,6 @@ from pyramid.response import FileResponse
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
-
-JSONType = TypeVar('JSONType')
 
 
 def viewargs(*, renderer=None):
