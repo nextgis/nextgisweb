@@ -915,10 +915,10 @@ def feature_extent(resource, request) -> JSONType:
     return dict(extent=extent)
 
 
-def store_collection(layer, request) -> JSONType:
+def store_collection(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
-    query = layer.feature_query()
+    query = resource.feature_query()
 
     http_range = request.headers.get('range')
     if http_range and http_range.startswith('items='):

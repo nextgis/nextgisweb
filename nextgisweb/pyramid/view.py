@@ -217,11 +217,11 @@ def test_exception_transaction(request):
     DBSession.execute(text("SELECT 1"))
 
 
-def test_timeout(reqest):
-    duration = float(reqest.GET.get('t', '60'))
-    interval = float(reqest.GET['i']) if 'i' in reqest.GET else None
-    buffering = (reqest.GET['b'].lower() in ('true', '1', 'yes')) \
-        if 'b' in reqest.GET else None
+def test_timeout(request):
+    duration = float(request.GET.get('t', '60'))
+    interval = float(request.GET['i']) if 'i' in request.GET else None
+    buffering = (request.GET['b'].lower() in ('true', '1', 'yes')) \
+        if 'b' in request.GET else None
 
     start = datetime.utcnow()
     finish = start + timedelta(seconds=duration)
@@ -245,7 +245,7 @@ def test_timeout(reqest):
             yield (line + "\n").encode('utf-8')
 
     resp = Response(app_iter=generator(), content_type='text/plain')
-    set_output_buffering(reqest, resp, buffering, strict=True)
+    set_output_buffering(request, resp, buffering, strict=True)
     return resp
 
 
