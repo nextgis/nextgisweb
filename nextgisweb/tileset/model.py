@@ -206,11 +206,14 @@ class FileFormat:
             obj = super().__new__(cls)
             obj.filename = filename
             obj.prefix = match['prefix']
-            ext = match['ext'].lower() if 'ext' in cls.pattern.groupindex else None
-            if ext in JPEG_EXTS:
-                obj.ext = JPEG_EXTS
+            if 'ext' in cls.pattern.groupindex:
+                ext = match['ext'].lower()
+                if ext in JPEG_EXTS:
+                    obj.ext = JPEG_EXTS
+                else:
+                    obj.ext = (ext,)
             else:
-                obj.ext = (ext,)
+                obj.ext = None
             return obj
 
     def get_tile(self, filename):
