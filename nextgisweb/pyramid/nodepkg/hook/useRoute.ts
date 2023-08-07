@@ -5,7 +5,7 @@ import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 import { route as apiRoute } from "../api";
 import { useAbortController } from "./useAbortController";
 
-import type { RequestMethod, RouteResults } from "../api/type";
+import type { GetRouteParam, RequestMethod, RouteResults } from "../api/type";
 import type { RouteParameters } from "../api/route.inc";
 
 type LoadingCounterState = "increment" | "decrement" | "reset";
@@ -28,7 +28,7 @@ const loadingCounterReducer = (
 
 function apiRouteOverloaded<RouteName extends keyof RouteParameters>(
     name: RouteName,
-    obj?: (RouteParameters[RouteName] & [object])[0]
+    obj?: GetRouteParam<RouteName>
 ): RouteResults;
 
 function apiRouteOverloaded<RouteName extends keyof RouteParameters>(
@@ -40,7 +40,7 @@ function apiRouteOverloaded<RouteName extends keyof RouteParameters>(
 
 export function useRoute<RouteName extends keyof RouteParameters>(
     name: RouteName,
-    params?: (RouteParameters[RouteName] & [object])[0],
+    params?: GetRouteParam<RouteName>,
     loadOnInit = false
 ) {
     const loadOnInit_ = useRef(loadOnInit);

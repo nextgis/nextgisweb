@@ -1,7 +1,13 @@
 import type { LoaderCache } from "../util/loader";
 import type { LunkwillParam } from "./LunkwillParam";
+import type { RouteParameters } from "./route.inc";
 
 export type RequestMethod = "get" | "post" | "put" | "delete";
+
+export type RouteName = keyof RouteParameters;
+
+export type GetRouteParam<R extends RouteName> = (RouteParameters[R] &
+    [object])[0];
 
 export interface RequestOptions<ReturnUrl extends boolean = false> {
     method?: RequestMethod | Uppercase<RequestMethod>;

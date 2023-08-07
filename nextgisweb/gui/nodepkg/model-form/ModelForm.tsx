@@ -12,6 +12,7 @@ import { useKeydownListener } from "../hook/useKeydownListener";
 
 import type { ReactNode } from "react";
 import type { FormInstance } from "antd/lib/form";
+import type { RouteName } from "@nextgisweb/pyramid/api/type";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import type { ApiError } from "../error/type";
 
@@ -20,16 +21,16 @@ interface Messages {
 }
 
 interface Model {
-    item: string;
-    collection: string;
-    edit?: string;
-    browse: string;
+    item: RouteName;
+    collection: RouteName;
+    edit?: RouteName;
+    browse: RouteName;
 }
 
 interface ModelFormProps {
     id: number;
     children?: ReactNode;
-    model: string | Model;
+    model: RouteName | Model;
     value: unknown;
     fields: FormField[];
     form?: FormInstance;
@@ -64,12 +65,12 @@ export function ModelForm(props: ModelFormProps) {
 
     const model: Model =
         typeof m === "string"
-            ? {
+            ? ({
                   item: m + ".item",
                   collection: m + ".collection",
                   edit: m + ".edit",
                   browse: m + ".browse",
-              }
+              } as Model)
             : m;
 
     const form = Form.useForm(props.form)[0];

@@ -9,11 +9,12 @@ import i18n from "@nextgisweb/pyramid/i18n";
 
 import type { ParamsOf } from "../type";
 import type { ApiError } from "../error/type";
+import type { RouteName } from "@nextgisweb/pyramid/api/type";
 
 type InputParams = ParamsOf<typeof Input>;
 
 interface SingleSettingFormParams {
-    model: string;
+    model: RouteName;
     settingName?: string;
     saveSuccessText?: string;
     saveSuccessReloadText?: string;

@@ -1,5 +1,5 @@
 export interface FeatureAttachment {
-    id: number | string;
+    id: number;
     name: string;
     keyname?: string;
     size: number;

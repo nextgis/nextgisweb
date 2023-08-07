@@ -5,24 +5,29 @@ import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 import { useRoute } from "./useRoute";
 
 import type { ApiError } from "@nextgisweb/gui/error/type";
-import type { RequestOptions } from "../api/type";
-import type { UseRouteGetParams, UseRouteParams } from "./type";
+import type { GetRouteParam, RequestOptions, RouteName } from "../api/type";
+import type { UseRouteGetParams } from "./type";
 
 export function useRouteGet<D = unknown>(
-    nameOrProps: UseRouteGetParams | string,
-    params?: UseRouteParams,
+    nameOrProps: UseRouteGetParams | RouteName,
+    params?: GetRouteParam<RouteName>,
     options?: RequestOptions,
     loadOnInit = true
 ) {
-    let endpointName_ = "";
-    let params_: UseRouteParams = { ...params };
+    let endpointName_: RouteName;
+    let params_: GetRouteParam<RouteName> = {
+        ...params,
+    } as GetRouteParam<RouteName>;
     let options_: RequestOptions = { ...options };
     let loadOnInit_: boolean = loadOnInit;
     if (typeof nameOrProps === "string") {
         endpointName_ = nameOrProps;
     } else {
         endpointName_ = nameOrProps.name;
-        params_ = { ...nameOrProps.params, ...params };
+        params_ = {
+            ...nameOrProps.params,
+            ...params,
+        } as GetRouteParam<RouteName>;
         options_ = { ...nameOrProps.options, ...options };
         loadOnInit_ = nameOrProps.loadOnInit ?? loadOnInit;
     }

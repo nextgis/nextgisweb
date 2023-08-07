@@ -30,14 +30,14 @@ const AttachmentEditor = observer(
     }: EditorWidgetProps<DataSource[] | null, AttachmentEditorStore>) => {
         const multiple = true;
 
-        const [store_] = useState(() => {
+        const [store_] = useState<AttachmentEditorStore>(() => {
             if (store) {
                 return store;
             }
             return new AttachmentEditorStore({});
         });
 
-        const dataSource = useMemo(() => {
+        const dataSource = useMemo<DataSource[]>(() => {
             if (Array.isArray(store_.value)) {
                 return store_.value;
             }
@@ -62,7 +62,7 @@ const AttachmentEditor = observer(
         });
 
         const updateField = useCallback(
-            (field, row, value) => {
+            (field: string, row: DataSource, value: string) => {
                 store_.updateItem(row, field, value);
             },
             [store_]

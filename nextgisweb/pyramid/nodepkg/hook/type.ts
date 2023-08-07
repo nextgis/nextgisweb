@@ -1,10 +1,9 @@
-import { RequestOptions } from "../api/type";
-import type { RouterEntrypoint } from "../type";
+import type { RequestOptions, RouteName } from "../api/type";
 
 export type UseRouteParams = Record<string, string | number>;
 
 export interface UseRouteGetParams {
-    name: RouterEntrypoint;
+    name: RouteName;
     params?: UseRouteParams;
     options?: RequestOptions;
     loadOnInit?: boolean;

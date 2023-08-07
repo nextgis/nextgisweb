@@ -8,10 +8,7 @@ import type {
     EditorStore as IEditorStore,
 } from "@nextgisweb/feature-layer/type";
 
-import type {
-    FileMeta,
-    UploaderMeta,
-} from "@nextgisweb/file-upload/file-uploader/type";
+import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
 import type { DataSource, FileMetaToUpload } from "./type";
 
 class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
@@ -86,7 +83,7 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
         this.value = newValue;
     };
 
-    updateItem = (item: FileMeta, field: string, value: unknown) => {
+    updateItem = (item: DataSource, field: string, value: unknown) => {
         const old = this.value ? [...this.value] : [];
         const index = findAttachmentIndex(item, old);
         if (index !== -1) {
@@ -100,7 +97,7 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
         }
     };
 
-    deleteItem = (item: FileMeta) => {
+    deleteItem = (item: DataSource) => {
         const old = this.value ? [...this.value] : [];
         const index = findAttachmentIndex(item, old);
         if (index !== -1) {

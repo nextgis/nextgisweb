@@ -58,7 +58,7 @@ export function useExportFeatureLayer({ id }: UseExportFeatureLayerProps) {
             if (ids) {
                 if (ids.length === 1) {
                     apiUrl =
-                        routeURL("resource.export", ids[0]) +
+                        routeURL("resource.export", Number(ids[0])) +
                         "?" +
                         params.toString();
                 } else {

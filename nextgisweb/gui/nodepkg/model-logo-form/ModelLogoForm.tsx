@@ -9,10 +9,11 @@ import { useEffect, useState } from "react";
 
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader";
 import type { ImageUploaderProps } from "@nextgisweb/file-upload/image-uploader";
+import type { RouteName } from "@nextgisweb/pyramid/api/type";
 import type { ApiError } from "../error/type";
 
 interface ModelLogoFormProps extends ImageUploaderProps {
-    model: string;
+    model: RouteName;
     messages?: {
         saveSuccess?: string;
         helpText?: string;
