@@ -226,35 +226,36 @@ def setup_pyramid(comp, config):
         'feature_attachment.download',
         itmurl + '/download',
         factory=resource_factory,
-    ).add_view(download)
+        get=download)
 
     config.add_route(
         'feature_attachment.image',
         itmurl + '/image',
         factory=resource_factory,
-    ).add_view(image)
+        get=image)
 
     config.add_route(
         'feature_attachment.item', itmurl,
-        factory=resource_factory) \
-        .add_view(iget, request_method='GET') \
-        .add_view(iput, request_method='PUT') \
-        .add_view(idelete, request_method='DELETE')
+        factory=resource_factory,
+        get=iget,
+        put=iput,
+        delete=idelete)
 
     config.add_route(
-        'feature_attachment.collection', colurl,
-        factory=resource_factory) \
-        .add_view(cget, request_method='GET') \
-        .add_view(cpost, request_method='POST')
+        'feature_attachment.collection',
+        colurl,
+        factory=resource_factory,
+        get=cget,
+        post=cpost)
 
     config.add_route(
         'feature_attachment.export',
         '/api/resource/{id:uint}/feature_attachment/export',
-        factory=resource_factory
-    ).add_view(export)
+        factory=resource_factory,
+        get=export)
 
     config.add_route(
         'feature_attachment.import',
         '/api/resource/{id:uint}/feature_attachment/import',
-        factory=resource_factory
-    ).add_view(import_attachment, request_method='PUT')
+        factory=resource_factory,
+        put=import_attachment)

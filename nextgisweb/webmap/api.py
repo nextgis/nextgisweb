@@ -169,29 +169,33 @@ def setup_pyramid(comp, config):
 
     comp.settings_view = settings_get
 
-    config.add_route('webmap.settings', '/api/component/webmap/settings') \
-        .add_view(settings_get, request_method='GET') \
-        .add_view(settings_put, request_method='PUT')
+    config.add_route(
+        'webmap.settings',
+        '/api/component/webmap/settings',
+        get=settings_get,
+        put=settings_put)
 
     config.add_route(
         'webmap.extent',
-        r'/api/resource/{id:uint}/webmap/extent',
-        factory=resource_factory
-    ).add_view(get_webmap_extent, context=WebMap, request_method='GET')
+        '/api/resource/{id:uint}/webmap/extent',
+        factory=resource_factory,
+    ).get(get_webmap_extent, context=WebMap)
 
 
 def setup_annotations(config):
     config.add_route(
-        'webmap.annotation.collection', r'/api/resource/{id:uint}/annotation/',
+        'webmap.annotation.collection',
+        '/api/resource/{id:uint}/annotation/',
         factory=resource_factory
     ) \
-        .add_view(annotation_cget, context=WebMap, request_method='GET') \
-        .add_view(annotation_cpost, context=WebMap, request_method='POST')
+        .get(annotation_cget, context=WebMap) \
+        .post(annotation_cpost, context=WebMap)
 
     config.add_route(
-        'webmap.annotation.item', r'/api/resource/{id:uint}/annotation/{annotation_id:uint}',
+        'webmap.annotation.item',
+        '/api/resource/{id:uint}/annotation/{annotation_id:uint}',
         factory=resource_factory
     ) \
-        .add_view(annotation_iget, context=WebMap, request_method='GET') \
-        .add_view(annotation_iput, context=WebMap, request_method='PUT') \
-        .add_view(annotation_idelete, context=WebMap, request_method='DELETE')
+        .get(annotation_iget, context=WebMap) \
+        .put(annotation_iput, context=WebMap) \
+        .delete(annotation_idelete, context=WebMap)

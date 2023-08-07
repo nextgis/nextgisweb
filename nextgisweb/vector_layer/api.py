@@ -24,5 +24,6 @@ def dataset(request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'vector_layer.dataset', '/api/component/vector_layer/dataset'
-    ).add_view(dataset, request_method='POST')
+        'vector_layer.dataset',
+        '/api/component/vector_layer/dataset',
+        post=dataset)

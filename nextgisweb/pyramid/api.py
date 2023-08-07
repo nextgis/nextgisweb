@@ -410,63 +410,74 @@ def setup_pyramid(comp, config):
         'nextgisweb.pyramid.exception.handled_exception_tween_factory',
         'INGRESS'))
 
-    config.add_route('pyramid.cors', '/api/component/pyramid/cors') \
-        .add_view(cors_get, request_method='GET') \
-        .add_view(cors_put, request_method='PUT')
+    config.add_route(
+        'pyramid.cors',
+        '/api/component/pyramid/cors',
+        get=cors_get,
+        put=cors_put)
 
-    config.add_route('pyramid.system_name',
-                     '/api/component/pyramid/system_name') \
-        .add_view(system_name_get, request_method='GET') \
-        .add_view(system_name_put, request_method='PUT')
+    config.add_route(
+        'pyramid.system_name',
+        '/api/component/pyramid/system_name',
+        get=system_name_get,
+        put=system_name_put)
 
-    config.add_route('pyramid.settings', '/api/component/pyramid/settings') \
-        .add_view(settings)
+    config.add_route(
+        'pyramid.settings',
+        '/api/component/pyramid/settings',
+        get=settings)
 
-    config.add_route('pyramid.route', '/api/component/pyramid/route') \
-        .add_view(route, request_method='GET')
+    config.add_route(
+        'pyramid.route',
+        '/api/component/pyramid/route',
+        get=route)
 
     config.add_route(
         'pyramid.pkg_version',
         '/api/component/pyramid/pkg_version',
-    ).add_view(pkg_version)
+        get=pkg_version)
 
     config.add_route(
         'pyramid.healthcheck',
         '/api/component/pyramid/healthcheck',
-    ).add_view(healthcheck)
+        get=healthcheck)
 
     config.add_route(
         'pyramid.statistics',
         '/api/component/pyramid/statistics',
-    ).add_view(statistics)
+        get=statistics)
 
     config.add_route(
         'pyramid.estimate_storage',
         '/api/component/pyramid/estimate_storage',
-    ).add_view(estimate_storage, request_method='POST')
+        post=estimate_storage)
 
     config.add_route(
         'pyramid.storage_status',
         '/api/component/pyramid/storage_status',
-    ).add_view(storage_status, request_method='GET')
+        get=storage_status)
 
     config.add_route(
         'pyramid.storage',
         '/api/component/pyramid/storage',
-    ).add_view(storage)
+        get=storage)
 
     config.add_route(
         'pyramid.kind_of_data',
         '/api/component/pyramid/kind_of_data',
-    ).add_view(kind_of_data)
+        get=kind_of_data)
 
-    config.add_route('pyramid.custom_css', '/api/component/pyramid/custom_css') \
-        .add_view(custom_css_get, request_method='GET') \
-        .add_view(custom_css_put, request_method='PUT')
+    config.add_route(
+        'pyramid.custom_css',
+        '/api/component/pyramid/custom_css',
+        get=custom_css_get,
+        put=custom_css_put)
 
-    config.add_route('pyramid.logo', '/api/component/pyramid/logo') \
-        .add_view(logo_get, request_method='GET') \
-        .add_view(logo_put, request_method='PUT')
+    config.add_route(
+        'pyramid.logo',
+        '/api/component/pyramid/logo',
+        get=logo_get,
+        put=logo_put)
 
     # Methods for customization in components
     comp.company_logo_enabled = lambda request: True
@@ -507,11 +518,15 @@ def setup_pyramid(comp, config):
 
     comp.preview_link_view = preview_link_view
 
-    config.add_route('pyramid.company_logo', '/api/component/pyramid/company_logo') \
-        .add_view(company_logo, request_method='GET')
+    config.add_route(
+        'pyramid.company_logo',
+        '/api/component/pyramid/company_logo',
+        get=company_logo)
 
     # TODO: Add PUT method for changing custom_css setting and GUI
 
-    config.add_route('pyramid.home_path', '/api/component/pyramid/home_path') \
-        .add_view(home_path_get, request_method='GET') \
-        .add_view(home_path_put, request_method='PUT')
+    config.add_route(
+        'pyramid.home_path',
+        '/api/component/pyramid/home_path',
+        get=home_path_get,
+        put=home_path_put)

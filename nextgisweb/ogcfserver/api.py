@@ -550,35 +550,49 @@ def openapi(resource, request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        "ogcfserver.openapi", r"/api/resource/{id:uint}/ogcf/openapi",
-        factory=resource_factory) \
-        .add_view(openapi, context=Service, request_method="GET")
+        "ogcfserver.openapi",
+        "/api/resource/{id:uint}/ogcf/openapi",
+        factory=resource_factory,
+    ).get(openapi, context=Service)
+
     config.add_route(
-        "ogcfserver.landing_page", r"/api/resource/{id:uint}/ogcf",
-        factory=resource_factory) \
-        .add_view(landing_page, context=Service, request_method="GET")
+        "ogcfserver.landing_page", "/api/resource/{id:uint}/ogcf",
+        factory=resource_factory,
+    ).get(landing_page, context=Service)
+
     config.add_route(
-        "ogcfserver.conformance", r"/api/resource/{id:uint}/ogcf/conformance",
-        factory=resource_factory) \
-        .add_view(conformance, context=Service, request_method="GET")
+        "ogcfserver.conformance",
+        "/api/resource/{id:uint}/ogcf/conformance",
+        factory=resource_factory,
+    ).get(conformance, context=Service)
+
     config.add_route(
-        "ogcfserver.collections", r"/api/resource/{id:uint}/ogcf/collections",
-        factory=resource_factory) \
-        .add_view(collections, context=Service, request_method="GET")
+        "ogcfserver.collections",
+        "/api/resource/{id:uint}/ogcf/collections",
+        factory=resource_factory
+    ).get(collections, context=Service)
+
     config.add_route(
-        "ogcfserver.collection", r"/api/resource/{id:uint}/ogcf/collections/{collection_id:str}",
-        factory=resource_factory) \
-        .add_view(collection, context=Service, request_method="GET")
+        "ogcfserver.collection",
+        "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}",
+        factory=resource_factory,
+    ).get(collection, context=Service)
+
     config.add_route(
-        "ogcfserver.items", r"/api/resource/{id:uint}/ogcf/collections/{collection_id:str}/items",
-        factory=resource_factory) \
-        .add_view(items, context=Service, request_method="GET") \
-        .add_view(create, context=Service, request_method="POST") \
-        .add_view(options, context=Service, request_method="OPTIONS")
+        "ogcfserver.items",
+        "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}/items",
+        factory=resource_factory,
+    ) \
+        .get(items, context=Service) \
+        .post(create, context=Service) \
+        .options(options, context=Service)
+
     config.add_route(
-        "ogcfserver.item", r"/api/resource/{id:uint}/ogcf/collections/{collection_id:str}/items/{item_id:int}",
-        factory=resource_factory) \
-        .add_view(iget, context=Service, request_method="GET") \
-        .add_view(iput, context=Service, request_method="PUT") \
-        .add_view(idelete, context=Service, request_method="DELETE") \
-        .add_view(options, context=Service, request_method="OPTIONS")
+        "ogcfserver.item",
+        "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}/items/{item_id:int}",
+        factory=resource_factory,
+    ) \
+        .get(iget, context=Service) \
+        .put(iput, context=Service) \
+        .delete(idelete, context=Service) \
+        .options(options, context=Service)

@@ -139,13 +139,17 @@ def download(request):
 
 def setup_pyramid(comp, config):
     config.add_view(
-        export, route_name="resource.export", context=RasterLayer, request_method="GET"
-    )
+        export, route_name="resource.export",
+        context=RasterLayer, request_method="GET")
+
     config.add_route(
-        "raster_layer.cog", "/api/resource/{id:uint}/cog",
-        factory=resource_factory) \
-        .add_view(cog, context=RasterLayer, request_method="GET")
+        "raster_layer.cog",
+        "/api/resource/{id:uint}/cog",
+        factory=resource_factory,
+    ).get(cog, context=RasterLayer)
+
     config.add_route(
-        "raster_layer.download", "/api/resource/{id:uint}/download",
-        factory=resource_factory) \
-        .add_view(download, context=RasterLayer, request_method="GET")
+        "raster_layer.download",
+        "/api/resource/{id:uint}/download",
+        factory=resource_factory,
+    ).get(download, context=RasterLayer)

@@ -23,9 +23,10 @@ def inspect_layer(resource, request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'wfsclient.connection.inspect', '/api/resource/{id:uint}/wfs_connection/inspect/',
-        factory=resource_factory) \
-        .add_view(inspect_connection, context=WFSConnection, request_method='GET')
+        'wfsclient.connection.inspect',
+        '/api/resource/{id:uint}/wfs_connection/inspect/',
+        factory=resource_factory,
+    ).get(inspect_connection, context=WFSConnection)
 
     config.add_route(
         'wfsclient.connection.inspect.layer',

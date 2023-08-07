@@ -44,7 +44,8 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'wfsserver.wfs', r'/api/resource/{id:uint}/wfs',
+        'wfsserver.wfs',
+        '/api/resource/{id:uint}/wfs',
         factory=resource_factory,
         error_renderer=error_renderer
     ).add_view(wfs, context=Service)

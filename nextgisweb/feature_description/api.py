@@ -35,5 +35,5 @@ def setup_pyramid(comp, config):
     config.add_route(
         'feature_description.export',
         '/api/resource/{id:uint}/feature_description/export',
-        factory=resource_factory
-    ).add_view(export)
+        factory=resource_factory,
+        get=export)

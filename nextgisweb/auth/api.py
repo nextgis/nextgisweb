@@ -108,7 +108,7 @@ def profile_get(request) -> JSONType:
     return result
 
 
-def profile_set(request) -> JSONType:
+def profile_put(request) -> JSONType:
     user = request.user
 
     if user.keyname == 'guest':
@@ -262,39 +262,57 @@ def logout(request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
-    config.add_route('auth.user.collection', '/api/component/auth/user/') \
-        .add_view(user_cget, request_method='GET') \
-        .add_view(user_cpost, request_method='POST')
+    config.add_route(
+        'auth.user.collection',
+        '/api/component/auth/user/',
+        get=user_cget,
+        post=user_cpost)
 
-    config.add_route('auth.user.item', '/api/component/auth/user/{id:uint}') \
-        .add_view(user_iget, request_method='GET') \
-        .add_view(user_iput, request_method='PUT') \
-        .add_view(user_idelete, request_method='DELETE')
+    config.add_route(
+        'auth.user.item',
+        '/api/component/auth/user/{id:uint}',
+        get=user_iget,
+        put=user_iput,
+        delete=user_idelete)
 
-    config.add_route('auth.profile', '/api/component/auth/profile') \
-        .add_view(profile_get, request_method='GET') \
-        .add_view(profile_set, request_method='PUT')
+    config.add_route(
+        'auth.profile',
+        '/api/component/auth/profile',
+        get=profile_get,
+        put=profile_put)
 
-    config.add_route('auth.group.collection', '/api/component/auth/group/') \
-        .add_view(group_cget, request_method='GET') \
-        .add_view(group_cpost, request_method='POST')
+    config.add_route(
+        'auth.group.collection',
+        '/api/component/auth/group/',
+        get=group_cget,
+        post=group_cpost)
 
-    config.add_route('auth.group.item', '/api/component/auth/group/{id:uint}') \
-        .add_view(group_iget, request_method='GET') \
-        .add_view(group_iput, request_method='PUT') \
-        .add_view(group_idelete, request_method='DELETE')
+    config.add_route(
+        'auth.group.item',
+        '/api/component/auth/group/{id:uint}',
+        get=group_iget,
+        put=group_iput,
+        delete=group_idelete)
 
-    config.add_route('auth.current_user', '/api/component/auth/current_user') \
-        .add_view(current_user, request_method='GET')
+    config.add_route(
+        'auth.current_user',
+        '/api/component/auth/current_user',
+        get=current_user)
 
-    config.add_route('auth.register', '/api/component/auth/register') \
-        .add_view(register, request_method='POST')
+    config.add_route(
+        'auth.register',
+        '/api/component/auth/register',
+        post=register)
 
-    config.add_route('auth.login_cookies', '/api/component/auth/login') \
-        .add_view(login, request_method='POST')
+    config.add_route(
+        'auth.login_cookies',
+        '/api/component/auth/login',
+        post=login)
 
-    config.add_route('auth.logout_cookies', '/api/component/auth/logout') \
-        .add_view(logout, request_method='POST')
+    config.add_route(
+        'auth.logout_cookies',
+        '/api/component/auth/logout',
+        post=logout)
 
 
 class SystemPrincipalAttributeReadOnly(ValidationError):

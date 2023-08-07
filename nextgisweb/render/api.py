@@ -356,24 +356,29 @@ def legend_symbols(request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'render.tile', r'/api/component/render/tile'
-    ).add_view(tile)
+        'render.tile',
+        '/api/component/render/tile',
+        get=tile)
 
     config.add_route(
-        'render.image', r'/api/component/render/image'
-    ).add_view(image, http_cache=0)
+        'render.image',
+        '/api/component/render/image'
+    ).get(image, http_cache=0)
 
     config.add_route(
-        'render.tile_cache.seed_status', r'/api/resource/{id:uint}/tile_cache/seed_status',
+        'render.tile_cache.seed_status',
+        '/api/resource/{id:uint}/tile_cache/seed_status',
         factory=resource_factory,
-    ).add_view(tile_cache_seed_status, context=IRenderableStyle, request_method='GET')
+    ).get(tile_cache_seed_status, context=IRenderableStyle)
 
     config.add_route(
-        'render.legend', r'/api/resource/{id:uint}/legend',
+        'render.legend',
+        '/api/resource/{id:uint}/legend',
         factory=resource_factory
-    ).add_view(legend, context=ILegendableStyle, request_method='GET')
+    ).get(legend, context=ILegendableStyle)
 
     config.add_route(
-        'render.legend_symbols', r'/api/resource/{id:uint}/legend_symbols',
+        'render.legend_symbols',
+        '/api/resource/{id:uint}/legend_symbols',
         factory=resource_factory,
-    ).add_view(legend_symbols, context=ILegendSymbols, request_method='GET')
+    ).get(legend_symbols, context=ILegendSymbols)

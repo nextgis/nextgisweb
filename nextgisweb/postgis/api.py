@@ -121,15 +121,18 @@ def diagnostics(request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'postgis.connection.inspect', '/api/resource/{id:uint}/inspect/',
+        'postgis.connection.inspect',
+        '/api/resource/{id:uint}/inspect/',
         factory=resource_factory
-    ).add_view(inspect_connection, context=PostgisConnection, request_method='GET')
+    ).get(inspect_connection, context=PostgisConnection)
 
     config.add_route(
-        'postgis.connection.inspect.table', '/api/resource/{id:uint}/inspect/{table_name:str}/',
+        'postgis.connection.inspect.table',
+        '/api/resource/{id:uint}/inspect/{table_name:str}/',
         factory=resource_factory
-    ).add_view(inspect_table, context=PostgisConnection, request_method='GET')
+    ).get(inspect_table, context=PostgisConnection)
 
     config.add_route(
-        'postgis.diagnostics', '/api/component/postgis/check',
-    ).add_view(diagnostics, request_method='POST')
+        'postgis.diagnostics',
+        '/api/component/postgis/check',
+        post=diagnostics)

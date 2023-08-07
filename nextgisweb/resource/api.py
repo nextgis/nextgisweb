@@ -457,57 +457,71 @@ def resource_export_put(request) -> JSONType:
 
 def setup_pyramid(comp, config):
 
-    config.add_route('resource.blueprint', '/api/component/resource/blueprint') \
-        .add_view(blueprint, request_method='GET')
+    config.add_route(
+        'resource.blueprint',
+        '/api/component/resource/blueprint',
+        get=blueprint)
 
     config.add_route(
-        'resource.item', r'/api/resource/{id:uint}',
-        factory=resource_factory) \
-        .add_view(item_get, request_method='GET') \
-        .add_view(item_put, request_method='PUT') \
-        .add_view(item_delete, request_method='DELETE')
+        'resource.item',
+        '/api/resource/{id:uint}',
+        factory=resource_factory,
+        get=item_get,
+        put=item_put,
+        delete=item_delete)
 
     config.add_route(
-        'resource.collection', '/api/resource/') \
-        .add_view(collection_get, request_method='GET') \
-        .add_view(collection_post, request_method='POST')
+        'resource.collection', '/api/resource/',
+        get=collection_get,
+        post=collection_post)
 
     config.add_route(
-        'resource.permission', '/api/resource/{id:uint}/permission',
-        factory=resource_factory) \
-        .add_view(permission, request_method='GET')
+        'resource.permission',
+        '/api/resource/{id:uint}/permission',
+        factory=resource_factory,
+        get=permission)
 
     config.add_route(
-        'resource.permission.explain', '/api/resource/{id:uint}/permission/explain',
-        factory=resource_factory) \
-        .add_view(permission_explain, request_method='GET')
+        'resource.permission.explain',
+        '/api/resource/{id:uint}/permission/explain',
+        factory=resource_factory,
+        get=permission_explain)
 
     config.add_route(
-        'resource.volume', '/api/resource/{id:uint}/volume',
-        factory=resource_factory) \
-        .add_view(resource_volume, request_method='GET')
+        'resource.volume',
+        '/api/resource/{id:uint}/volume',
+        factory=resource_factory,
+        get=resource_volume)
 
     config.add_route(
-        'resource.quota', '/api/resource/quota') \
-        .add_view(quota, request_method='GET')
+        'resource.quota',
+        '/api/resource/quota',
+        get=quota)
 
     config.add_route(
-        'resource.search', '/api/resource/search/') \
-        .add_view(search, request_method='GET')
+        'resource.search',
+        '/api/resource/search/',
+        get=search)
 
     config.add_route(
-        'resource.quota_check', '/api/component/resource/check_quota') \
-        .add_view(quota_check, request_method='POST')
-
-    config.add_route('resource.resource_export',
-                     '/api/component/resource/resource_export') \
-        .add_view(resource_export_get, request_method='GET') \
-        .add_view(resource_export_put, request_method='PUT')
+        'resource.quota_check', 
+        '/api/component/resource/check_quota',
+        post=quota_check)
 
     config.add_route(
-        'resource.export', '/api/resource/{id:uint}/export',
+        'resource.resource_export',
+        '/api/component/resource/resource_export',
+        get=resource_export_get,
+        put=resource_export_put)
+
+    # Overloaded routes
+
+    config.add_route(
+        'resource.export',
+        '/api/resource/{id:uint}/export',
         factory=resource_factory)
 
     config.add_route(
-        'resource.file_download', r'/api/resource/{id:uint}/file/{name:str}',
+        'resource.file_download',
+        '/api/resource/{id:uint}/file/{name:str}',
         factory=resource_factory)

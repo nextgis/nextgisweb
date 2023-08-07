@@ -358,10 +358,9 @@ def setup_pyramid(comp, config):
     # TODO: Remove legacy routes
     config.add_route(
         'file_upload.upload',
-        '/api/component/file_upload/upload'
-    ) \
-        .add_view(_collection_post, request_method='POST') \
-        .add_view(_collection_put, request_method='PUT')
+        '/api/component/file_upload/upload',
+        post=_collection_post,
+        put=_collection_put)
 
     config.add_route(
         'file_upload.collection',

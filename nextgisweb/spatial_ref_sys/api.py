@@ -257,47 +257,57 @@ def catalog_import(request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
-    config.add_route("spatial_ref_sys.collection", "/api/component/spatial_ref_sys/") \
-        .add_view(cget, request_method="GET") \
-        .add_view(cpost, request_method='POST')
+    config.add_route(
+        "spatial_ref_sys.collection",
+        "/api/component/spatial_ref_sys/",
+        get=cget,
+        post=cpost)
 
-    config.add_route("spatial_ref_sys.convert", "/api/component/spatial_ref_sys/convert") \
-        .add_view(srs_convert, request_method="POST")
+    config.add_route(
+        "spatial_ref_sys.convert",
+        "/api/component/spatial_ref_sys/convert",
+        post=srs_convert)
 
     config.add_route(
         "spatial_ref_sys.geom_transform.batch",
-        r"/api/component/spatial_ref_sys/geom_transform"
-    ).add_view(geom_transform_batch, request_method="POST")
+        "/api/component/spatial_ref_sys/geom_transform",
+        post=geom_transform_batch)
 
     config.add_route(
         "spatial_ref_sys.geom_transform",
-        r"/api/component/spatial_ref_sys/{id:uint}/geom_transform"
-    ).add_view(geom_transform, request_method="POST")
+        "/api/component/spatial_ref_sys/{id:uint}/geom_transform",
+        post=geom_transform)
 
     config.add_route(
         "spatial_ref_sys.geom_length",
-        r"/api/component/spatial_ref_sys/{id:uint}/geom_length"
-    ).add_view(lambda r: geom_calc(r, geom_length), request_method="POST", renderer="json")
+        "/api/component/spatial_ref_sys/{id:uint}/geom_length",
+    ).post(lambda r: geom_calc(r, geom_length), renderer="json")
 
     config.add_route(
         "spatial_ref_sys.geom_area",
-        r"/api/component/spatial_ref_sys/{id:uint}/geom_area"
-    ).add_view(lambda r: geom_calc(r, geom_area), request_method="POST", renderer="json")
+        "/api/component/spatial_ref_sys/{id:uint}/geom_area"
+    ).post(lambda r: geom_calc(r, geom_area), renderer="json")
 
-    config.add_route("spatial_ref_sys.item", r"/api/component/spatial_ref_sys/{id:uint}")\
-        .add_view(iget, request_method='GET')\
-        .add_view(iput, request_method='PUT') \
-        .add_view(idelete, request_method='DELETE')
+    config.add_route(
+        "spatial_ref_sys.item",
+        "/api/component/spatial_ref_sys/{id:uint}",
+        get=iget,
+        put=iput,
+        delete=idelete)
 
     if comp.options['catalog.enabled']:
         config.add_route(
-            "spatial_ref_sys.catalog.collection", r"/api/component/spatial_ref_sys/catalog/",
-        ).add_view(catalog_collection, request_method="GET")
+            "spatial_ref_sys.catalog.collection",
+            "/api/component/spatial_ref_sys/catalog/",
+            get=catalog_collection)
 
         config.add_route(
-            "spatial_ref_sys.catalog.item", r"/api/component/spatial_ref_sys/catalog/{id:uint}",
-        ).add_view(catalog_item, request_method="GET")
+            "spatial_ref_sys.catalog.item",
+            "/api/component/spatial_ref_sys/catalog/{id:uint}",
+            get=catalog_item)
 
         config.add_route(
-            "spatial_ref_sys.catalog.import", r"/api/component/spatial_ref_sys/catalog/import",
-        ).add_view(catalog_import, request_method="POST")
+            "spatial_ref_sys.catalog.import",
+            "/api/component/spatial_ref_sys/catalog/import",
+            post=catalog_import,
+        )

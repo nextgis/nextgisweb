@@ -509,7 +509,8 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'wmsserver.wms', r'/api/resource/{id:uint}/wms',
+        'wmsserver.wms',
+        '/api/resource/{id:uint}/wms',
         factory=resource_factory,
         error_renderer=error_renderer
     ).add_view(handler, context=Service)

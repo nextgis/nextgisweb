@@ -36,9 +36,8 @@ def export(resource, request):
 def setup_pyramid(comp, config):
     config.add_view(
         file_download, route_name='resource.file_download',
-        context=SVGMarkerLibrary, request_method='GET'
-    )
+        context=SVGMarkerLibrary, request_method='GET')
 
     config.add_view(
-        export, route_name='resource.export', context=SVGMarkerLibrary, request_method='GET'
-    )
+        export, route_name='resource.export',
+        context=SVGMarkerLibrary, request_method='GET')

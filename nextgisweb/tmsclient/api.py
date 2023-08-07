@@ -40,6 +40,7 @@ def inspect_connection(request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'tmsclient.connection.layers', '/api/component/tmsclient/{id:uint}/layers/',
+        'tmsclient.connection.layers',
+        '/api/component/tmsclient/{id:uint}/layers/',
         factory=resource_factory
-    ).add_view(inspect_connection, context=Connection, request_method='GET')
+    ).get(inspect_connection, context=Connection)
