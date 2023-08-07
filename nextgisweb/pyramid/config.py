@@ -10,6 +10,13 @@ from nextgisweb.lib.apitype import AsJSONMarker, JSONType
 from .util import RouteMeta, ViewMeta, find_template
 
 
+def _stacklevel(kwargs, push):
+    result = kwargs.pop('stacklevel', 1) + 1
+    if push:
+        kwargs['stacklevel'] = result
+    return result
+
+
 class RouteHelper:
 
     def __init__(self, name, config):
@@ -17,11 +24,37 @@ class RouteHelper:
         self.name = name
 
     def add_view(self, view=None, **kwargs):
+        _stacklevel(kwargs, True)
+
         if 'route_name' not in kwargs:
             kwargs['route_name'] = self.name
 
-        self.config.add_view(view=view, stacklevel=1, **kwargs)
+        self.config.add_view(view=view, **kwargs)
         return self
+
+    def get(self, *args, **kwargs):
+        _stacklevel(kwargs, True)
+        return self.add_view(*args, request_method='GET', **kwargs)
+
+    def post(self, *args, **kwargs):
+        _stacklevel(kwargs, True)
+        return self.add_view(*args, request_method='POST', **kwargs)
+
+    def put(self, *args, **kwargs):
+        _stacklevel(kwargs, True)
+        return self.add_view(*args, request_method='PUT', **kwargs)
+
+    def delete(self, *args, **kwargs):
+        _stacklevel(kwargs, True)
+        return self.add_view(*args, request_method='DELETE', **kwargs)
+
+    def options(self, *args, **kwargs):
+        _stacklevel(kwargs, True)
+        return self.add_view(*args, request_method='OPTIONS', **kwargs)
+
+    def patch(self, *args, **kwargs):
+        _stacklevel(kwargs, True)
+        return self.add_view(*args, request_method='PATCH', **kwargs)
 
 
 ROUTE_PATTERN = dict(
@@ -40,25 +73,8 @@ ROUTE_RE = re.compile(
 class Configurator(PyramidConfigurator):
     predicates_ready = False
 
-    def add_route(self, name, pattern=None, **kwargs):
-        """ Advanced route addition
-
-        Syntax sugar that allows to record frequently used
-        structure like:
-
-            config.add_route('foo', '/foo')
-            config.add_view(foo_get, route_name='foo', request_method='GET')
-            config.add_view(foo_post, route_name='foo', request_method='POST')
-
-
-        In a more compact way:
-
-            config.add_route('foo', '/foo') \
-                .add_view(foo_get, request_method='GET') \
-                .add_view(foo_post, request_method='POST')
-
-        """
-
+    def add_route(self, name, pattern=None, **kwargs) -> RouteHelper:
+        stacklevel = _stacklevel(kwargs, False)
         client = True
         if 'client' in kwargs:
             pclient = kwargs['client']
@@ -67,7 +83,7 @@ class Configurator(PyramidConfigurator):
                     "The value of 'client' predicate other than False make "
                     "no sence since 4.5.0.dev14. You can safely remove it "
                     "from route declarations.",
-                    DeprecationWarning, stacklevel=2)
+                    DeprecationWarning, stacklevel=stacklevel)
             else:
                 client = False
             del kwargs['client']
@@ -106,21 +122,32 @@ class Configurator(PyramidConfigurator):
                     f"Some matchdict type specifiers are missing for route "
                     f"{name} ({pattern}). Available since 4.5.0.dev13 and "
                     f"will be required in 4.6.0.dev0.",
-                    DeprecationWarning, stacklevel=2)
+                    DeprecationWarning, stacklevel=stacklevel)
 
             kwargs['meta'] = RouteMeta(template, wotypes, mdtypes, client)
 
+        methods = dict()
+        for m in ('get', 'post', 'put', 'delete', 'options', 'patch'):
+            if v := kwargs.pop(m, None):
+                methods[m] = v
+
         super().add_route(name, pattern=pattern, **kwargs)
+        helper = RouteHelper(name, self)
 
-        return RouteHelper(name, self)
+        for m, v in methods.items():
+            getattr(helper, m)(v)
 
-    def add_view(self, view=None, stacklevel=0, **kwargs):
+        return helper
+
+    def add_view(self, view=None, **kwargs):
+        stacklevel = _stacklevel(kwargs, False)
+
         if view and kwargs.get('renderer') and view.__name__ != '<lambda>':
             warn(
                 "Since nextgisweb 4.4.0.dev7 use @viewargs(renderer=val) "
                 "or JSONType return type annotation instead of "
                 "Configurator.add_view(..., renderer=val) agrument.",
-                DeprecationWarning, stacklevel=2 + stacklevel)
+                DeprecationWarning, stacklevel=stacklevel)
 
         if view is not None:
             meta = ViewMeta(func=view)
