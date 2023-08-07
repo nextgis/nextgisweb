@@ -1,6 +1,7 @@
 import os
 import re
 import sqlite3
+from contextlib import closing
 from functools import lru_cache
 from io import BytesIO
 from shutil import copyfile
@@ -259,35 +260,28 @@ def read_file(fn):
                     yield z, x, y, data
         return
 
-    try:
-        connection = sqlite3.connect(f'file:{fn}?mode=ro', uri=True)
-    except sqlite3.OperationalError:
-        pass
-    else:
+    with sqlite3.connect(f'file:{fn}?mode=ro', uri=True) as connection, closing(connection.cursor()) as cursor:  # NOQA waiting for python 3.10
+        sql_tiles = '''
+            SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles
+            ORDER BY zoom_level, tile_column, tile_row
+        '''
         try:
-            sql_tiles = '''
-                SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles
-                ORDER BY zoom_level, tile_column, tile_row
-            '''
-            cursor = connection.cursor()
-            try:
-                row = cursor.execute(sql_tiles + ' LIMIT 1').fetchone()
-            except sqlite3.OperationalError:
-                pass
-            else:
-                if row is not None:
-                    try:
-                        Image.open(BytesIO(row[3]))
-                    except IOError:
-                        raise ValidationError(message=_("Unsupported data format."))
+            row = cursor.execute(sql_tiles + ' LIMIT 1').fetchone()
+        except sqlite3.DatabaseError:
+            pass  # Not MBTiles
+        else:
+            if row is not None:
+                try:
+                    Image.open(BytesIO(row[3]))
+                except IOError:
+                    raise ValidationError(message=_("Unsupported data format."))
 
+            try:
                 for z, x, y, data in cursor.execute(sql_tiles):
                     yield z, x, toggle_tms_xyz_y(z, y), data
                 return
-        except sqlite3.OperationalError:
-            raise ValidationError(message="Error reading SQLite DB.")
-        finally:
-            connection.close()
+            except sqlite3.OperationalError:
+                raise ValidationError(message="Error reading SQLite DB.")
 
     raise ValidationError(message=_("Unsupported data format."))
 
