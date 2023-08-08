@@ -11,7 +11,9 @@ import type { FormField } from "../../fields-form";
 import type { Blueprint } from "@nextgisweb/resource/type";
 
 function CodeTest() {
-    const { data: blueprint } = useRouteGet<Blueprint>("resource.blueprint");
+    const { data: blueprint } = useRouteGet<Blueprint, "resource.blueprint">(
+        "resource.blueprint"
+    );
     const [props, setProps] = useState<CodeProps>({
         lang: "json",
         readOnly: true,

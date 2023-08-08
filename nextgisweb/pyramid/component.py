@@ -142,15 +142,25 @@ class PyramidComponent(Component):
         self.make_app(settings=dict())
 
         typemap = {'int': 'number', 'uint': 'number', 'str': 'string'}
-        code = ["export interface RouteParameters /* prettier-ignore */ {"]
+        code = []
+        params_code = ["export interface RouteParameters /* prettier-ignore */ {"]
+        array_code = ["export interface RouteParametersArray /* prettier-ignore */ {"]
         for k, v in self.route_mdtypes.items():
             if len(v) == 0:
-                cv = "[]"
+                cv = "undefined"
+                params_code.append(f'    "{k}": {cv};')
+                array_code.append(f'    "{k}": {cv};')
             else:
                 cv = ', '.join(p + ": " + typemap[t] for p, t in v.items())
-                cv = f"[{cv}] | [{{ {cv} }}]" if len(v) == 1 else f"[{{ {cv} }}]"
-            code.append(f'    "{k}": {cv};')
-        code.append("}")
+                params_code.append(f'    "{k}": {{ {cv} }};')
+                array_code.append(f'    "{k}": [{cv}];')
+        params_code.append("}")
+        params_code.append("")
+        array_code.append("}")
+        array_code.append("")
+
+        code.append('\n'.join(params_code))
+        code.append('\n'.join(array_code))
         nodepkg = self.root_path / 'nodepkg'
         (nodepkg / 'api/route.inc.ts').write_text('\n'.join(code))
 

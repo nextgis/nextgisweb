@@ -19,9 +19,10 @@ import type { ApiError } from "@nextgisweb/gui/error/type";
 export function ExportSettings() {
     const [saving, setSaving] = useState(false);
 
-    const { data, isLoading } = useRouteGet<{ resource_export: string }>(
+    const { data, isLoading } = useRouteGet<
+        { resource_export: string },
         "resource.resource_export"
-    );
+    >("resource.resource_export");
     const [value, setValue] = useState<string>();
 
     async function save() {

@@ -7,14 +7,14 @@ import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n";
 
+import type { UndefinedRoutes } from "@nextgisweb/pyramid/api/type";
 import type { ParamsOf } from "../type";
 import type { ApiError } from "../error/type";
-import type { RouteName } from "@nextgisweb/pyramid/api/type";
 
 type InputParams = ParamsOf<typeof Input>;
 
 interface SingleSettingFormParams {
-    model: RouteName;
+    model: UndefinedRoutes;
     settingName?: string;
     saveSuccessText?: string;
     saveSuccessReloadText?: string;

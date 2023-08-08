@@ -13,7 +13,9 @@ import {
 } from "@nextgisweb/resource/type";
 
 const SvgIconTest = () => {
-    const { data: blueprint } = useRouteGet<Blueprint>("resource.blueprint");
+    const { data: blueprint } = useRouteGet<Blueprint, "resource.blueprint">(
+        "resource.blueprint"
+    );
 
     const allResourceClasses = useMemo<
         (BlueprintResource & { cls: ResourceClass })[]

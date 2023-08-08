@@ -68,13 +68,16 @@ export const FeatureGrid = ({
     readonly = true,
     cleanSelectedOnFilter = true,
 }: FeatureGridProps) => {
-    const { data: totalData, refresh: refreshTotal } =
-        useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
-            id,
-        });
-    const { data: resourceData } = useRouteGet<ResourceItem>("resource.item", {
+    const { data: totalData, refresh: refreshTotal } = useRouteGet<
+        FeatureLayerCount,
+        "feature_layer.feature.count"
+    >("feature_layer.feature.count", {
         id,
     });
+    const { data: resourceData } = useRouteGet<ResourceItem, "resource.item">(
+        "resource.item",
+        { id }
+    );
     const { isExportAllowed } = useResource({ id });
 
     const [query, setQuery] = useState("");

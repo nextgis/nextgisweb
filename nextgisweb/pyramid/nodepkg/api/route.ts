@@ -8,17 +8,29 @@ import { request } from "./request";
 export * from "./LunkwillParam";
 
 import type {
+    UndefinedRoutes,
     RequestMethod,
     RequestOptions,
     RouteResults,
+    RouteName,
     ToReturn,
 } from "./type";
-import type { RouteParameters } from "./route.inc";
+import { RouteParameters, RouteParametersArray } from "./route.inc";
 
-export function routeURL<RouteName extends keyof RouteParameters>(
-    name: RouteName,
-    ...rest: RouteParameters[RouteName]
-): string {
+export function routeURL<N extends UndefinedRoutes>(name: N): string;
+export function routeURL<N extends RouteName>(
+    name: N,
+    params: RouteParameters[N]
+): string;
+export function routeURL<N extends RouteName>(
+    name: N,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...rest: RouteParametersArray[N] extends any[]
+        ? RouteParametersArray[N]
+        : never
+): string;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function routeURL<N extends RouteName>(name: N, ...rest: any[]): string {
     const [template, ...params] = routeData[name];
     const first = rest[0];
 
@@ -48,9 +60,24 @@ export function routeURL<RouteName extends keyof RouteParameters>(
     });
 }
 
-export function route<RouteName extends keyof RouteParameters>(
-    name: RouteName,
-    ...rest: RouteParameters[RouteName]
+export function route<N extends UndefinedRoutes>(name: N): RouteResults;
+export function route<N extends RouteName>(
+    name: N,
+    params: RouteParameters[N]
+): RouteResults;
+export function route<N extends RouteName>(
+    name: N,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...rest: RouteParametersArray[N] extends any[]
+        ? RouteParametersArray[N]
+        : never
+): RouteResults;
+export function route<N extends RouteName>(
+    name: N,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...rest: RouteParametersArray[N] extends any[]
+        ? RouteParametersArray[N]
+        : never
 ): RouteResults {
     const template = routeURL(name, ...rest);
     const result = {} as RouteResults;

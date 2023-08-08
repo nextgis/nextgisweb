@@ -5,7 +5,7 @@ import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 import { route as apiRoute } from "../api";
 import { useAbortController } from "./useAbortController";
 
-import type { GetRouteParam, RequestMethod, RouteResults } from "../api/type";
+import type { RequestMethod, RouteName } from "../api/type";
 import type { RouteParameters } from "../api/route.inc";
 
 type LoadingCounterState = "increment" | "decrement" | "reset";
@@ -26,21 +26,21 @@ const loadingCounterReducer = (
     }
 };
 
-function apiRouteOverloaded<RouteName extends keyof RouteParameters>(
-    name: RouteName,
-    obj?: GetRouteParam<RouteName>
-): RouteResults;
+// function apiRouteOverloaded<N extends RouteName>(
+//     name: N,
+//     obj?: SingleArgRoute<N>
+// ): RouteResults;
 
-function apiRouteOverloaded<RouteName extends keyof RouteParameters>(
-    name: RouteName,
-    ...rest: RouteParameters[RouteName]
-): RouteResults {
-    return apiRoute(name, ...rest);
-}
+// function apiRouteOverloaded<N extends RouteName>(
+//     name: N,
+//     ...rest: MultiArgRoute<N>
+// ): RouteResults {
+//     return apiRoute(name, ...rest);
+// }
 
-export function useRoute<RouteName extends keyof RouteParameters>(
-    name: RouteName,
-    params?: GetRouteParam<RouteName>,
+export function useRoute<N extends RouteName>(
+    name: N,
+    params?: RouteParameters[N],
     loadOnInit = false
 ) {
     const loadOnInit_ = useRef(loadOnInit);
@@ -50,10 +50,10 @@ export function useRoute<RouteName extends keyof RouteParameters>(
         { count: Number(!!loadOnInit_) }
     );
 
-    const [routerParams] = useObjectState(params);
+    const [routerParams] = useObjectState(params as RouteParameters[N]);
 
     const route = useMemo(() => {
-        const result = apiRouteOverloaded(name, routerParams);
+        const result = apiRoute(name, routerParams);
         abort();
         const methods: RequestMethod[] = ["get", "post", "put", "delete"];
         for (const method of methods) {

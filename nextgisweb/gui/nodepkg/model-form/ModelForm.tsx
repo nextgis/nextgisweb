@@ -12,7 +12,7 @@ import { useKeydownListener } from "../hook/useKeydownListener";
 
 import type { ReactNode } from "react";
 import type { FormInstance } from "antd/lib/form";
-import type { RouteName } from "@nextgisweb/pyramid/api/type";
+import type { RouteName, UndefinedRoutes } from "@nextgisweb/pyramid/api/type";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import type { ApiError } from "../error/type";
 
@@ -22,9 +22,9 @@ interface Messages {
 
 interface Model {
     item: RouteName;
-    collection: RouteName;
+    collection: UndefinedRoutes;
     edit?: RouteName;
-    browse: RouteName;
+    browse: UndefinedRoutes;
 }
 
 interface ModelFormProps {
@@ -87,7 +87,8 @@ export function ModelForm(props: ModelFormProps) {
             const json = await form.validateFields();
             const req =
                 id !== undefined
-                    ? route(model.item, id).put
+                    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      route(model.item, id as any).put
                     : route(model.collection).post;
             try {
                 await req({ json });
@@ -107,7 +108,8 @@ export function ModelForm(props: ModelFormProps) {
         setStatus("deleting");
 
         try {
-            await route(model.item, id).delete();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await route(model.item, id as any).delete();
             const url = routeURL(model.browse);
             window.open(url, "_self");
         } catch (err) {
@@ -122,7 +124,8 @@ export function ModelForm(props: ModelFormProps) {
         const initialValues: Record<string, unknown> = {};
         if (id) {
             try {
-                const resp = await route(model.item, id).get({
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const resp = await route(model.item, id as any).get({
                     signal: makeSignal(),
                 });
                 Object.assign(initialValues, resp);

@@ -5,19 +5,34 @@ import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 import { useRoute } from "./useRoute";
 
 import type { ApiError } from "@nextgisweb/gui/error/type";
-import type { GetRouteParam, RequestOptions, RouteName } from "../api/type";
-import type { UseRouteGetParams } from "./type";
+import type { RequestOptions, RouteName } from "../api/type";
+import type { RouteParameters } from "../api/route.inc";
 
-export function useRouteGet<D = unknown>(
-    nameOrProps: UseRouteGetParams | RouteName,
-    params?: GetRouteParam<RouteName>,
+interface RouterGet<D> {
+    data?: D;
+    error: ApiError | null;
+    isLoading: boolean;
+    abort: () => void;
+    refresh: () => void;
+}
+
+export interface UseRouteGetParams<N extends RouteName> {
+    name: N;
+    params?: RouteParameters[N];
+    options?: RequestOptions;
+    loadOnInit?: boolean;
+}
+
+export function useRouteGet<D, N extends RouteName = RouteName>(
+    nameOrProps: UseRouteGetParams<N> | N,
+    params?: RouteParameters[N],
     options?: RequestOptions,
     loadOnInit = true
-) {
-    let endpointName_: RouteName;
-    let params_: GetRouteParam<RouteName> = {
-        ...params,
-    } as GetRouteParam<RouteName>;
+): RouterGet<D> {
+    let endpointName_: N;
+    let params_: RouteParameters[N] = {
+        ...(params || {}),
+    } as RouteParameters[N];
     let options_: RequestOptions = { ...options };
     let loadOnInit_: boolean = loadOnInit;
     if (typeof nameOrProps === "string") {
@@ -25,14 +40,14 @@ export function useRouteGet<D = unknown>(
     } else {
         endpointName_ = nameOrProps.name;
         params_ = {
-            ...nameOrProps.params,
-            ...params,
-        } as GetRouteParam<RouteName>;
+            ...(nameOrProps.params || {}),
+            ...(params || {}),
+        } as RouteParameters[N];
         options_ = { ...nameOrProps.options, ...options };
         loadOnInit_ = nameOrProps.loadOnInit ?? loadOnInit;
     }
 
-    const { route, abort } = useRoute(endpointName_, params_, loadOnInit_);
+    const { route, abort } = useRoute<N>(endpointName_, params_, loadOnInit_);
     const [isLoading, setIsLoading] = useState(!!loadOnInit_);
     const [data, setData] = useState<D>();
     const [error, setError] = useState<ApiError | null>(null);

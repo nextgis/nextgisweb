@@ -6,8 +6,12 @@ export type RequestMethod = "get" | "post" | "put" | "delete";
 
 export type RouteName = keyof RouteParameters;
 
-export type GetRouteParam<R extends RouteName> = (RouteParameters[R] &
-    [object])[0];
+export type KeysWithUndefined<T> = {
+    [K in keyof T]: T[K] extends undefined ? K : never;
+}[keyof T];
+
+export type UndefinedRoutes = KeysWithUndefined<RouteParameters>;
+export type NonUndefinedRoutes = Exclude<RouteParameters, UndefinedRoutes>;
 
 export interface RequestOptions<ReturnUrl extends boolean = false> {
     method?: RequestMethod | Uppercase<RequestMethod>;

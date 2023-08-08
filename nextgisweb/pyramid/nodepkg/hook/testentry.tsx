@@ -6,9 +6,11 @@ import { ResourceSelect } from "@nextgisweb/resource/component/resource-select";
 
 import { useRouteGet } from "./useRouteGet";
 
+import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
+
 export const UseRouterGetTest = () => {
     const [resourceId, setResourceId] = useState<number>(0);
-    const { data } = useRouteGet({
+    const { data } = useRouteGet<ResourceItem, "resource.item">({
         name: "resource.item",
         params: { id: resourceId },
     });
