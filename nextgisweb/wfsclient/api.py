@@ -28,6 +28,7 @@ def setup_pyramid(comp, config):
         .add_view(inspect_connection, context=WFSConnection, request_method='GET')
 
     config.add_route(
-        'wfsclient.connection.inspect.layer', '/api/resource/{id:uint}/wfs_connection/inspect/{layer}/',
+        'wfsclient.connection.inspect.layer',
+        '/api/resource/{id:uint}/wfs_connection/inspect/{layer:str}/',
         factory=resource_factory) \
         .add_view(inspect_layer, context=WFSConnection, request_method='GET')
