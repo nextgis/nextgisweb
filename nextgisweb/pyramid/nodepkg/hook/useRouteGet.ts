@@ -13,7 +13,7 @@ interface RouterGet<D> {
     error: ApiError | null;
     isLoading: boolean;
     abort: () => void;
-    refresh: () => void;
+    refresh: () => Promise<void>;
 }
 
 export interface UseRouteGetParams<N extends RouteName> {
