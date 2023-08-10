@@ -8,14 +8,15 @@ from .util import disable_logging
 
 class AuditComponent(Component):
 
-    def initialize(self):
+    def __init__(self, env, settings):
+        super().__init__(env, settings)
+
         self.audit_enabled = self.options['enabled']
 
         self.audit_es_host = self.options.get('elasticsearch.host', None)
         self.audit_es_port = self.options['elasticsearch.port']
         self.audit_es_index_prefix = self.options['elasticsearch.index.prefix']
         self.audit_es_index_suffix = self.options['elasticsearch.index.suffix']
-
         self.audit_file = self.options.get('file', None)
 
         if self.audit_enabled and (
@@ -26,6 +27,7 @@ class AuditComponent(Component):
         self.audit_es_enabled = self.audit_enabled and self.audit_es_host is not None
         self.audit_file_enabled = self.audit_enabled and self.audit_file is not None
 
+    def initialize(self):
         if self.audit_es_enabled:
             from elasticsearch import Elasticsearch  # Slow import
 

@@ -57,7 +57,7 @@ def create_tsconfig(npkgs: List[str]):
 
 @comp_cli.command()
 def install(
-    self: EnvCommand.customize(),
+    self: EnvCommand.customize(env_initialize=False),
     *, env: Env,
     core: CoreComponent,
     pyramid: PyramidComponent,
