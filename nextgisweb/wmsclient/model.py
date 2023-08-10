@@ -214,8 +214,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
         )
 
         # Vendor-specific parameters
-        for p in self.vendor_params:
-            query[p.key] = p.value
+        query.update(self.vendor_params)
 
         # In the GetMap operation the srs parameter is called crs in 1.3.0.
         srs = 'crs' if self.connection.version == '1.3.0' else 'srs'
