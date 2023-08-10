@@ -35,6 +35,7 @@ class RouteMeta:
     wotypes: str
     mdtypes: Dict[str, str]
     client: bool
+    component: str
 
 
 class RouteMetaPredicate:
@@ -58,6 +59,8 @@ class ViewMeta:
     param_types: Any = None
     body_type: Any = None
     return_type: Any = None
+    component: str = None
+    deprecated: bool = False
 
 
 class ViewMetaPredicate:

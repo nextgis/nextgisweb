@@ -359,6 +359,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         'file_upload.upload',
         '/api/component/file_upload/upload',
+        deprecated=True,
         post=_collection_post,
         put=_collection_put)
 

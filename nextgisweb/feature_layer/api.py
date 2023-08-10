@@ -1042,6 +1042,7 @@ def setup_pyramid(comp, config):
         'feature_layer.store',
         '/api/resource/{id:uint}/store/',
         factory=resource_factory,
+        deprecated=True,
     ).get(store_collection, context=IFeatureLayer)
 
     from .identify import identify

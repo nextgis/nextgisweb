@@ -9,6 +9,7 @@ from msgspec.inspect import _is_typeddict
 from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
 
+from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import (
     ContentType,
     JSONType,
@@ -16,6 +17,7 @@ from nextgisweb.lib.apitype import (
     is_optional,
     param_decoder,
 )
+from nextgisweb.lib.imptool import module_from_stack
 
 from nextgisweb.core.exception import ValidationError
 
@@ -33,7 +35,7 @@ def is_json_type(t: Type) -> bool:
 
 
 def _stacklevel(kwargs, push):
-    result = kwargs.pop('stacklevel', 1) + 1
+    result = kwargs.pop('stacklevel', 0) + 1
     if push:
         kwargs['stacklevel'] = result
     return result
@@ -41,9 +43,10 @@ def _stacklevel(kwargs, push):
 
 class RouteHelper:
 
-    def __init__(self, name, config):
+    def __init__(self, name, config, *, deprecated=False):
         self.config = config
         self.name = name
+        self.deprecated = deprecated
 
     def add_view(self, view=None, **kwargs):
         _stacklevel(kwargs, True)
@@ -51,7 +54,9 @@ class RouteHelper:
         if 'route_name' not in kwargs:
             kwargs['route_name'] = self.name
 
-        self.config.add_view(view=view, **kwargs)
+        deprecated = kwargs.pop('deprecated', self.deprecated)
+        self.config.add_view(view=view, deprecated=deprecated, **kwargs)
+
         return self
 
     def get(self, *args, **kwargs):
@@ -143,8 +148,10 @@ def _view_driver_factory(view, pextractor, pass_context):
 class Configurator(PyramidConfigurator):
     predicates_ready = False
 
-    def add_route(self, name, pattern=None, **kwargs) -> RouteHelper:
+    def add_route(self, name, pattern=None, deprecated=False, **kwargs) -> RouteHelper:
         stacklevel = _stacklevel(kwargs, False)
+        component = pkginfo.component_by_module(module_from_stack(stacklevel - 1))
+
         client = True
         if 'client' in kwargs:
             pclient = kwargs['client']
@@ -194,7 +201,7 @@ class Configurator(PyramidConfigurator):
                     f"will be required in 4.6.0.dev0.",
                     DeprecationWarning, stacklevel=stacklevel)
 
-            kwargs['meta'] = RouteMeta(template, wotypes, mdtypes, client)
+            kwargs['meta'] = RouteMeta(template, wotypes, mdtypes, client, component)
 
         methods = dict()
         for m in ('get', 'post', 'put', 'delete', 'options', 'patch'):
@@ -202,15 +209,16 @@ class Configurator(PyramidConfigurator):
                 methods[m] = v
 
         super().add_route(name, pattern=pattern, **kwargs)
-        helper = RouteHelper(name, self)
+        helper = RouteHelper(name, self, deprecated=deprecated)
 
         for m, v in methods.items():
-            getattr(helper, m)(v)
+            getattr(helper, m)(v, stacklevel=stacklevel)
 
         return helper
 
-    def add_view(self, view=None, **kwargs):
+    def add_view(self, view=None, *, deprecated=False, **kwargs):
         stacklevel = _stacklevel(kwargs, False)
+        component = pkginfo.component_by_module(module_from_stack(stacklevel - 1))
 
         if view and kwargs.get('renderer') and view.__name__ != '<lambda>':
             warn(
@@ -220,7 +228,7 @@ class Configurator(PyramidConfigurator):
                 DeprecationWarning, stacklevel=stacklevel)
 
         if view is not None:
-            meta = ViewMeta(func=view)
+            meta = ViewMeta(func=view, component=component, deprecated=deprecated)
 
             # Extract attrs missing in kwargs from view.__pyramid_{attr}__
             attrs = {'renderer', }.difference(set(kwargs.keys()))
