@@ -16,6 +16,7 @@ from sqlalchemy import text
 from nextgisweb.env import DBSession, _, env
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib import dynmenu as dm
+from nextgisweb.lib.apitype import JSONType
 from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
@@ -24,6 +25,7 @@ from nextgisweb.lib.logging import logger
 from nextgisweb.core.exception import UserException
 
 from . import exception, renderer
+from .openapi import openapi
 from .session import WebSession
 from .util import (
     ErrorRendererPredicate,
@@ -73,6 +75,23 @@ def home(request):
         return HTTPFound(url)
     else:
         return HTTPFound(location=request.route_url('resource.show', id=0))
+
+
+def openapi_json(request) -> JSONType:
+    return openapi(request.registry.introspector)
+
+
+def openapi_json_test(request) -> JSONType:
+   from .test.test_openapi import config
+   return openapi(config.registry.introspector, prefix='/')
+
+
+@viewargs(renderer='react')
+def swagger(request):
+    return dict(
+        title=_("HTTP API documentation"),
+        entrypoint='@nextgisweb/pyramid/swagger-ui',
+        props=dict(url=request.route_url('pyramid.openapi_json')))
 
 
 @viewargs(renderer='mako')
@@ -373,6 +392,18 @@ def setup_pyramid(comp, config):
     config.add_route('home', '/', client=False).add_view(home)
 
     config.add_route(
+        'pyramid.openapi_json',
+        '/openapi.json',
+        get=openapi_json)
+
+    config.add_route(
+        'pyramid.openapi_json_test',
+        '/test/openapi.json',
+        get=openapi_json_test)
+
+    config.add_route('pyramid.swagger', '/doc/api', get=swagger)
+
+    config.add_route(
         'pyramid.control_panel',
         '/control-panel',
     ).add_view(control_panel)
@@ -526,6 +557,7 @@ def _setup_static(comp, config):
         asset_path = c.resource_path('asset')
         if asset_path.is_dir():
             config.add_static_path(f'asset/{cid}', asset_path)
+
 
 def _setup_pyramid_debugtoolbar(comp, config):
     dt_opt = comp.options.with_prefix('debugtoolbar')
