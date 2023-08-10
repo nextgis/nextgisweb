@@ -1,4 +1,5 @@
 import re
+from typing import Optional, TypedDict
 
 import sqlalchemy as sa
 from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
@@ -93,34 +94,32 @@ def user_idelete(request) -> JSONType:
     return None
 
 
-def profile_get(request) -> JSONType:
-    user = request.user
+class ProfileResponse(TypedDict):
+    oauth_subject: Optional[str]
+    language: Optional[str]
 
+
+def profile_get(request) -> ProfileResponse:
+    """Read profile of the current user"""
+    user = request.user
     if user.keyname == 'guest':
         return HTTPUnauthorized()
 
-    data = user.serialize()
-
-    result = dict()
-    for k in ('language', 'oauth_subject'):
-        result[k] = data[k]
-
-    return result
+    return ProfileResponse(
+        oauth_subject=user.oauth_subject,
+        language=user.language)
 
 
-def profile_put(request) -> JSONType:
-    user = request.user
+class ProfileBody(TypedDict, total=False):
+    language: Optional[str]
 
-    if user.keyname == 'guest':
+
+def profile_put(request, body: ProfileBody) -> JSONType:
+    """Update profile of the current user"""
+    if request.user.keyname == 'guest':
         return HTTPUnauthorized()
 
-    data = request.json_body
-    for k in data:
-        if k not in ('language', ):
-            raise ValidationError("Attribute '%s' is not allowed!" % k)
-
-    user.deserialize(data)
-
+    request.user.language = body['language']
     return None
 
 
@@ -186,12 +185,23 @@ def group_idelete(request) -> JSONType:
     return None
 
 
-def current_user(request) -> JSONType:
-    result = dict(
+class CurrentUserResponse(TypedDict):
+    id: int
+    keyname: str
+    display_name: str
+    language: str
+    auth_medium: Optional[str]
+    auth_provider: Optional[str]
+
+
+def current_user(request) -> CurrentUserResponse:
+    """Read current user info"""
+    result = CurrentUserResponse(
         id=request.user.id,
         keyname=request.user.keyname,
         display_name=request.user.display_name,
-        language=request.locale_name)
+        language=request.locale_name,
+        auth_medium=None, auth_provider=None)
 
     if aresult := request.environ.get('auth.result'):
         if val := aresult.med:

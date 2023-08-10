@@ -1,12 +1,15 @@
 import base64
 import re
 from datetime import timedelta
+from typing import Any, Dict, List, Optional, TypedDict
 
-from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
+from msgspec import Meta
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse, Response
+from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, _, env
-from nextgisweb.lib import json
+from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
 
 from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
@@ -14,6 +17,10 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import Resource, ResourceScope
 
 from .util import gensecret, parse_origin
+
+CKey = Annotated[str, Meta(title="CKey", description=(
+    "An unique hash key for content. If the requested content key mathes "
+    "the current, the server will set caching headers."))]
 
 
 def _get_cors_olist():
@@ -123,121 +130,116 @@ def cors_tween_factory(handler, registry):
     return cors_tween
 
 
-def cors_get(request) -> JSONType:
+ORIGIN_RE = (
+    r'^SCHEME(\*\.)?(HOST\.)+(HOST)\.?(\:PORT)?\/?$'
+    .replace('SCHEME', r'https?\:\/\/')
+    .replace('HOST', r'[a-z_\-][a-z_\-0-9]+')
+    .replace('PORT', r'[1-9][0-9]{1,4}'))
+
+Origin = Annotated[str, Meta(
+    pattern=ORIGIN_RE, description=(
+        "An origin including scheme, domain and optional port if differs "
+        "from the default (80 for HTTP and 443 for HTTPS). Wildcards are "
+        "allowed on the third level and below."),
+    examples=['https://example.com', 'https://*.example.com'])]
+
+
+class CORSSettings(TypedDict):
+    allow_origin: Annotated[List[Origin], Meta(description="The list of allowed origins")]
+
+
+def cors_get(request) -> CORSSettings:
+    """Read CORS settings"""
     request.require_administrator()
-    return dict(allow_origin=_get_cors_olist())
+    return CORSSettings(allow_origin=_get_cors_olist())
 
 
-def cors_put(request) -> JSONType:
+def cors_put(request, body: CORSSettings) -> JSONType:
+    """Update CORS settings"""
     request.require_administrator()
 
-    body = request.json_body
-    for k, v in body.items():
-        if k == 'allow_origin':
-            if v is None:
-                v = []
+    v = [o.lower().rstrip('/') for o in body['allow_origin']]
+    for origin in v:
+        if v.count(origin) > 1:
+            raise ValidationError("Duplicate origin '%s'" % origin)
 
-            if not isinstance(v, list):
-                raise HTTPBadRequest(explanation="Invalid key '%s' value!" % k)
-
-            # The scheme and host are case-insensitive
-            # and normally provided in lowercase.
-            # https://tools.ietf.org/html/rfc7230
-            v = [o.lower() for o in v]
-
-            for origin in v:
-                if not isinstance(origin, str):
-                    raise ValidationError(message="Invalid origin: '%s'." % origin)
-                try:
-                    is_wildcard, schema, domain, port = parse_origin(origin)
-                except ValueError:
-                    raise ValidationError(message="Invalid origin: '%s'." % origin)
-                if is_wildcard and domain.count('.') < 2:
-                    raise ValidationError(
-                        message="Second-level and above wildcard domain "
-                        "is not supported: '%s'." % origin
-                    )
-
-            # Strip trailing slashes
-            v = [(o[:-1] if o.endswith('/') else o) for o in v]
-
-            for origin in v:
-                if v.count(origin) > 1:
-                    raise ValidationError("Duplicate origin '%s'" % origin)
-
-            env.core.settings_set('pyramid', 'cors_allow_origin', v)
-        else:
-            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
+    env.core.settings_set('pyramid', 'cors_allow_origin', v)
 
 
-def system_name_get(request) -> JSONType:
+class SystemNameSettings(TypedDict):
+    full_name: Optional[str]
+
+
+def system_name_get(request) -> AsJSON[SystemNameSettings]:
+    """Read system name settings"""
     try:
-        full_name = env.core.settings_get('core', 'system.full_name')
+        value = env.core.settings_get('core', 'system.full_name')
     except KeyError:
-        full_name = None
+        value = None
+    return SystemNameSettings(full_name=value)
 
-    return dict(full_name=full_name)
 
-
-def system_name_put(request) -> JSONType:
+def system_name_put(request, body: SystemNameSettings) -> JSONType:
+    """Update system name settings"""
     request.require_administrator()
 
-    body = request.json_body
-    for k, v in body.items():
-        if k == 'full_name':
-            if v is not None and v != "":
-                env.core.settings_set('core', 'system.full_name', v)
-            else:
-                env.core.settings_delete('core', 'system.full_name')
-        else:
-            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
+    if value := body['full_name']:
+        env.core.settings_set('core', 'system.full_name', value)
+    else:
+        env.core.settings_delete('core', 'system.full_name')
 
 
-def home_path_get(request) -> JSONType:
-    request.require_administrator()
+class HomePathSettings(TypedDict):
+    home_path: Optional[str]
+
+
+def home_path_get(request) -> AsJSON[HomePathSettings]:
+    """Read home path settings"""
     try:
-        home_path = env.core.settings_get('pyramid', 'home_path')
+        value = env.core.settings_get('pyramid', 'home_path')
     except KeyError:
-        home_path = None
-    return dict(home_path=home_path)
+        value = None
+    return HomePathSettings(home_path=value)
 
 
-def home_path_put(request) -> JSONType:
+def home_path_put(request, body: HomePathSettings) -> JSONType:
+    """Update home path settings"""
     request.require_administrator()
 
-    body = request.json_body
-    for k, v in body.items():
-        if k == 'home_path':
-            if v:
-                env.core.settings_set('pyramid', 'home_path', v)
-            else:
-                env.core.settings_delete('pyramid', 'home_path')
-        else:
-            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
+    if value := body['home_path']:
+        env.core.settings_set('pyramid', 'home_path', value)
+    else:
+        env.core.settings_delete('pyramid', 'home_path')
 
 
-def settings(request) -> JSONType:
-    identity = request.GET.get('component')
-    if identity is None:
-        raise ValidationError(message=_(
-            "Required parameter 'component' is missing."))
-
-    comp = request.env.components.get(identity)
+def settings(request, *, component: str) -> JSONType:
+    comp = request.env.components.get(component)
     if comp is None:
         raise ValidationError(message=_("Invalid component identity."))
 
     return comp.client_settings(request)
 
 
-def route(request) -> JSONType:
+def route(request) -> AsJSON[Dict[str, Annotated[List[str], Meta(min_length=1)]]]:
+    """Read route metadata"""
     return request.env.pyramid.route_meta
 
 
-def pkg_version(request) -> JSONType:
-    return dict([(p.name, p.version) for p in request.env.packages.values()])
+def pkg_version(request) -> AsJSON[Dict[str, str]]:
+    """Read packages versions"""
+    return {pn: p.version for pn, p in request.env.packages.items()}
 
 
-def healthcheck(request) -> JSONType:
+class HealthcheckResponse(TypedDict):
+    success: bool
+    component: Dict[str, Any]
+
+
+def healthcheck(request) -> AnyOf[
+    Annotated[HealthcheckResponse, StatusCode(200)],
+    Annotated[HealthcheckResponse, StatusCode(503)],
+]:
+    """Run healtchecks and return the result"""
     components = [
         comp for comp in env.components.values()
         if hasattr(comp, 'healthcheck')]
@@ -299,45 +301,49 @@ def kind_of_data(request) -> JSONType:
     return result
 
 
-def custom_css_get(request):
+CSSGetPutContent = AnyOf[
+    Annotated[str, ContentType("application/json")],
+    Annotated[str, ContentType("text/css")],
+]
+
+
+def custom_css_get(request, *, ckey: Optional[CKey]) -> CSSGetPutContent:
+    """Read custom CSS styles as plain CSS or as JSON string
+
+    :param ckey: Caching key
+    :returns: Current custom CSS rules"""
     try:
         body = request.env.core.settings_get('pyramid', 'custom_css')
     except KeyError:
         body = ""
 
-    is_json = request.GET.get('format', 'css').lower() == 'json'
-    if is_json:
-        response = Response(json.dumpb(body), content_type='application/json')
-    else:
+    m = request.accept.best_match(("application/json", "text/css"))
+    if m == "application/json":
+        return body
+    elif m == "text/css":
         response = Response(body, content_type='text/css', charset='utf-8')
 
-    if (
-        'ckey' in request.GET
-        and request.GET['ckey'] == request.env.core.settings_get('pyramid', 'custom_css.ckey')
-    ):
-        response.cache_control.public = True
-        response.cache_control.max_age = int(timedelta(days=1).total_seconds())
+    if ckey == request.env.core.settings_get('pyramid', 'custom_css.ckey'):
+        request.response.cache_control.public = True
+        request.response.cache_control.max_age = 86400
 
     return response
 
 
-def custom_css_put(request):
+def custom_css_put(request, body: CSSGetPutContent) -> AsJSON[CKey]:
+    """Update custom CSS styles from plain CSS or JSON string
+
+    :returns: New caching key"""
     request.require_administrator()
 
-    is_json = request.GET.get('format', 'css').lower() == 'json'
-    data = request.json_body if is_json else request.body.decode(request.charset)
-
-    if data is None or re.match(r'^\s*$', data, re.MULTILINE):
+    if body is None or re.match(r'^\s*$', body, re.MULTILINE):
         request.env.core.settings_delete('pyramid', 'custom_css')
     else:
-        request.env.core.settings_set('pyramid', 'custom_css', data)
+        request.env.core.settings_set('pyramid', 'custom_css', body)
 
-    request.env.core.settings_set('pyramid', 'custom_css.ckey', gensecret(8))
-
-    if is_json:
-        return Response(json.dumpb(None), content_type="application/json")
-    else:
-        return Response()
+    ckey = gensecret(8)
+    request.env.core.settings_set('pyramid', 'custom_css.ckey', ckey)
+    return ckey
 
 
 def logo_get(request):

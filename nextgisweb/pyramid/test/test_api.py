@@ -61,10 +61,10 @@ def test_custom_css(override, webtest, ngw_auth_administrator):
     api_url = '/api/component/pyramid/custom_css'
     value = 'any text'
     with override('pyramid', 'custom_css'):
-        webtest.put(api_url, value, status=200)
+        webtest.put(api_url, value, content_type="text/css", status=200)
 
-        resp = webtest.get(api_url, status=200)
+        resp = webtest.get(api_url, headers=dict(accept="text/css"), status=200)
         assert resp.text == value
 
-        resp = webtest.get(api_url, dict(format='json'), status=200)
+        resp = webtest.get(api_url, status=200)
         assert resp.json == value

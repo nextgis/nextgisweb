@@ -6,17 +6,13 @@ import { Code } from "@nextgisweb/gui/component/code";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export function CustomCSSForm() {
     const [saving, setSaving] = useState(false);
     const [data, setData] = useState(null);
 
-    const { data: initialData, isLoading } = useRouteGet(
-        "pyramid.custom_css",
-        null,
-        { query: { format: "json" } }
-    );
+    const { data: initialData, isLoading } = useRouteGet("pyramid.custom_css");
 
     useEffect(() => {
         setData(initialData);
@@ -26,15 +22,12 @@ export function CustomCSSForm() {
         setSaving(true);
 
         try {
-            await route("pyramid.custom_css").put({
-                json: data,
-                query: { format: "json" },
-            });
+            await route("pyramid.custom_css").put({ json: data });
         } catch (err) {
             errorModal(err);
         } finally {
             // prettier-ignore
-            message.success(i18n.gettext("Custom styles saved. Reload the page to get them applied."));
+            message.success(gettext("Custom styles saved. Reload the page to get them applied."));
             setSaving(false);
         }
     };
@@ -56,7 +49,7 @@ export function CustomCSSForm() {
                 </Col>
                 <Col span={10}>
                     <Typography.Paragraph>
-                        {i18n.gettext(
+                        {gettext(
                             "Enter custom CSS rules here. They will be used to redefine styles, design for all pages of your Web GIS."
                         )}
                     </Typography.Paragraph>

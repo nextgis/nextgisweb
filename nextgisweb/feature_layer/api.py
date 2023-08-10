@@ -6,20 +6,23 @@ import tempfile
 import uuid
 import zipfile
 from datetime import date, datetime, time
+from typing import List, Optional
 from urllib.parse import unquote
 
+from msgspec import Meta
 from osgeo import gdal, ogr
 from pyramid.httpexceptions import HTTPNoContent, HTTPNotFound
 from pyramid.response import FileResponse, Response
 from shapely.geometry import box
 from sqlalchemy.orm.exc import NoResultFound
+from typing_extensions import Annotated
 
 from nextgisweb.env import _, env
+from nextgisweb.lib.apitype import AnyOf, ContentType, StatusCode
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geom_area, geom_length
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.render.util import zxy_from_request
 from nextgisweb.resource import DataScope, Resource, resource_factory
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
@@ -317,26 +320,28 @@ def export_multi(request):
         return _zip_response(request, tmp_dir, 'layers')
 
 
-def mvt(request):
+def mvt(
+    request, *,
+    resource: Annotated[List[int], Meta(min_length=1)],
+    z: Annotated[int, Meta(ge=0, le=22)],
+    x: Annotated[int, Meta(ge=0)],
+    y: Annotated[int, Meta(ge=0)],
+    extent: int = 4096,
+    simplification: Optional[float],
+    padding: Annotated[float, Meta(ge=0, le=0.5)] = 0.05,
+) -> AnyOf[
+    Annotated[None, ContentType("application/vnd.mapbox-vector-tile")],
+    Annotated[None, StatusCode(204)],
+]:
     if not MVT_DRIVER_EXIST:
         return HTTPNotFound(explanation='MVT GDAL driver not found')
 
-    z, x, y = zxy_from_request(request)
-
-    extent = int(request.GET.get('extent', 4096))
-    simplification = float(request.GET.get("simplification", extent / 512))
-
-    resids = map(
-        int,
-        filter(None, request.GET["resource"].split(",")),
-    )
+    if simplification is None:
+        simplification = extent / 512
 
     # web mercator
     merc = SRS.filter_by(id=3857).one()
     minx, miny, maxx, maxy = merc.tile_extent((z, x, y))
-
-    # 5% padding by default
-    padding = float(request.GET.get("padding", 0.05))
 
     bbox = (
         minx - (maxx - minx) * padding,
@@ -359,7 +364,7 @@ def mvt(request):
 
     vsibuf = ds.GetName()
 
-    for resid in resids:
+    for resid in resource:
         try:
             obj = Resource.filter_by(id=resid).one()
         except NoResultFound:
