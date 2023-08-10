@@ -1,13 +1,35 @@
 import re
 from inspect import isclass, signature
+from typing import Type
 from warnings import warn
 
-from msgspec import Struct
+from msgspec import UNSET, Struct
+from msgspec import ValidationError as MsgSpecValidationError
+from msgspec.inspect import _is_typeddict
+from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
 
-from nextgisweb.lib.apitype import AsJSONMarker, JSONType
+from nextgisweb.lib.apitype import (
+    ContentType,
+    JSONType,
+    enumerate_anyof,
+    is_optional,
+    param_decoder,
+)
+
+from nextgisweb.core.exception import ValidationError
 
 from .util import RouteMeta, ViewMeta, find_template
+
+
+def is_json_type(t: Type) -> bool:
+    if isclass(t) and (issubclass(t, Struct) or _is_typeddict(t)):
+        return True
+
+    if ContentType.JSON in getattr(t, '__metadata__', ()):
+        return True
+
+    return False
 
 
 def _stacklevel(kwargs, push):
@@ -68,6 +90,54 @@ ROUTE_RE = re.compile(
     '|'.join(ROUTE_PATTERN.keys()) +
     r')))?(?:\:(?P<r>.+?))?\}'
 )
+
+
+def _json_generic(request):
+    return request.json_body
+
+
+def _json_msgspec_factory(typedef):
+    decoder = Decoder(typedef)
+
+    def _json_msgspec(request):
+        try:
+            return decoder.decode(request.body)
+        except MsgSpecValidationError as exc:
+            raise ValidationError(message=exc.args[0]) from exc
+
+    return _json_msgspec
+
+
+def _param_factory(name, tdef, default):
+    optional, tdef = is_optional(tdef)
+    if optional and default is UNSET:
+        default = None
+
+    decoder = param_decoder(tdef)
+
+    def _param(request):
+        s = request.GET.get(name, UNSET)
+        if s is UNSET:
+            if default is UNSET:
+                raise ValueError
+            return default
+
+        try:
+            res = decoder(s)
+        except MsgSpecValidationError as exc:
+            raise ValidationError(message=str(exc.args[0])) from exc
+        return res
+
+    return _param
+
+
+def _view_driver_factory(view, pextractor, pass_context):
+
+    def _view(context, request):
+        kw = {k: f(request) for k, f in pextractor.items()}
+        return view(context, request, **kw) if pass_context else view(request, **kw)
+
+    return _view
 
 
 class Configurator(PyramidConfigurator):
@@ -163,22 +233,78 @@ class Configurator(PyramidConfigurator):
                         attrs.remove(attr)
                 fn = getattr(fn, '__wrapped__', None)
 
+            sig = signature(view)
+
+            pass_context = False
+            meta.param_types = param_types = dict()
+            pextractor = dict()
+            for idx, (name, p) in enumerate(sig.parameters.items()):
+                if name == 'request':
+                    continue
+
+                if idx == 0 and name != 'request':
+                    pass_context = True
+                    if p.annotation is not p.empty and 'context' not in kwargs:
+                        kwargs['context'] = p.annotation
+
+                assert idx < 2 or p.kind != p.POSITIONAL_ONLY
+
+                if name in ('body', 'json_body'):
+                    assert p.annotation is not p.empty
+
+                    btype = p.annotation
+                    bextract = None
+
+                    if btype is JSONType:
+                        bextract = _json_generic
+                    elif is_json_type(btype):
+                        bextract = _json_msgspec_factory(btype)
+                    else:
+                        ctmap = dict()
+                        for bt, ct in enumerate_anyof(btype, ContentType()):
+                            assert ct is not None
+                            ctmap[ct] = bt
+                        if len(ctmap) > 0:
+                            def bextract(request):
+                                rct = request.content_type
+                                for ct, bt in ctmap.items():
+                                    if ct != rct:
+                                        continue
+                                    if ct == "application/json":
+                                        d = Decoder(bt)
+                                        res = d.decode(request.body)
+                                        return res
+                                    elif ct.startswith("text/"):
+                                        return request.body.decode(request.charset)
+
+                                raise ValueError
+
+
+                    assert bextract is not None
+                    meta.body_type = btype
+
+                    pextractor[name] = bextract
+
+                elif p.kind == p.KEYWORD_ONLY:
+                    ptype = p.annotation
+                    pdefault = p.default if p.default is not p.empty else UNSET
+
+                    param_types[name] = (ptype, pdefault)
+                    pextractor[name] = _param_factory(name, ptype, pdefault)
+
+            if len(pextractor) > 0:
+                view = _view_driver_factory(view, pextractor, pass_context)
+
             if kwargs.get('renderer') is None:
-                sig = signature(view)
                 return_type = sig.return_annotation
                 if return_type is sig.empty:
                     pass
                 elif return_type is JSONType:
                     kwargs['renderer'] = 'json'
                     meta.return_type = return_type
-                elif isclass(return_type) and issubclass(return_type, Struct):
+                elif is_json_type(return_type) or getattr(return_type, '_oneof', False):
                     kwargs['renderer'] = 'msgspec'
                     meta.return_type = return_type
-                else:
-                    metadata = getattr(return_type, '__metadata__', ())
-                    if AsJSONMarker in metadata:
-                        kwargs['renderer'] = 'msgspec'
-                        meta.return_type = return_type
 
             if self.predicates_ready:
                 kwargs['meta'] = meta

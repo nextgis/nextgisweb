@@ -55,6 +55,8 @@ class RouteMetaPredicate:
 @dataclass
 class ViewMeta:
     func: Any = None
+    param_types: Any = None
+    body_type: Any = None
     return_type: Any = None
 
 
