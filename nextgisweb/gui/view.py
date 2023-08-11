@@ -14,14 +14,6 @@ def react_renderer_factory(info):
     return _render
 
 
-def example(request):
-    return dict(entrypoint='@nextgisweb/gui/example')
-
-
 def setup_pyramid(comp, config):
     config.add_renderer('react', react_renderer_factory)
 
-    config.add_route(
-        'gui.example',
-        '/test/gui/example'
-    ).add_view(example)
