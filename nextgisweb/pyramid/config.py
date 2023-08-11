@@ -13,8 +13,8 @@ from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import (
     ContentType,
     JSONType,
-    enumerate_anyof,
     is_optional,
+    iter_anyof,
     param_decoder,
 )
 from nextgisweb.lib.imptool import module_from_stack
@@ -269,7 +269,7 @@ class Configurator(PyramidConfigurator):
                         bextract = _json_msgspec_factory(btype)
                     else:
                         ctmap = dict()
-                        for bt, ct in enumerate_anyof(btype, ContentType()):
+                        for bt, ct in iter_anyof(btype, ContentType()):
                             assert ct is not None
                             ctmap[ct] = bt
                         if len(ctmap) > 0:
