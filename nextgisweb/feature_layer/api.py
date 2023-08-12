@@ -271,6 +271,10 @@ def view_geojson(resource, request):
         return response
 
 
+def view_geojson_head(resource, request):
+    return view_geojson(resource, request)
+
+
 def export_multi(request):
     if request.method == 'GET':
         params = dict(request.GET)
@@ -978,11 +982,14 @@ def store_collection(resource, request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
-    config.add_route(
+    geojson_route = config.add_route(
         'feature_layer.geojson',
         '/api/resource/{id:uint}/geojson',
         factory=resource_factory,
     ).get(view_geojson, context=IFeatureLayer)
+
+    # HEAD method is required for GDAL /vsicurl/ and QGIS connect
+    geojson_route.head(view_geojson_head, context=IFeatureLayer, deprecated=True)
 
     config.add_view(
         export_single,

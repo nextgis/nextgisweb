@@ -23,7 +23,12 @@ from nextgisweb.core.exception import ValidationError
 
 from .helper import RouteHelper
 from .inspect import iter_routes
-from .predicate import ErrorRendererPredicate, RouteMeta, ViewMeta
+from .predicate import (
+    ErrorRendererPredicate,
+    RequestMethodPredicate,
+    RouteMeta,
+    ViewMeta,
+)
 from .util import ROUTE_PATTERN, ROUTE_RE, is_json_type, push_stacklevel
 
 
@@ -109,8 +114,24 @@ def find_template(name, func=None, stack_level=1):
 
 class Configurator(PyramidConfigurator):
     def add_default_view_predicates(self):
+        import pyramid.predicates as pp
+
         self.add_view_predicate("meta", ViewMeta.as_predicate())
-        return super().add_default_view_predicates()
+        self.add_view_predicate("request_method", RequestMethodPredicate)
+
+        # Default pyramid predicates except RequestMethodPredicate
+        self.add_view_predicate("xhr", pp.XHRPredicate)
+        self.add_view_predicate("path_info", pp.PathInfoPredicate)
+        self.add_view_predicate("request_param", pp.RequestParamPredicate)
+        self.add_view_predicate("header", pp.HeaderPredicate)
+        self.add_view_predicate("accept", pp.AcceptPredicate)
+        self.add_view_predicate("containment", pp.ContainmentPredicate)
+        self.add_view_predicate("request_type", pp.RequestTypePredicate)
+        self.add_view_predicate("match_param", pp.MatchParamPredicate)
+        self.add_view_predicate("physical_path", pp.PhysicalPathPredicate)
+        self.add_view_predicate("is_authenticated", pp.IsAuthenticatedPredicate)
+        self.add_view_predicate("effective_principals", pp.EffectivePrincipalsPredicate)
+        self.add_view_predicate("custom", pp.CustomPredicate)
 
     def add_default_route_predicates(self):
         self.add_route_predicate("meta", RouteMeta.as_predicate())
@@ -184,17 +205,13 @@ class Configurator(PyramidConfigurator):
                 mdtypes=mdtypes,
             )
 
-        methods = dict()
-        for m in ("get", "post", "put", "delete", "options", "patch"):
-            if v := kwargs.pop(m, None):
-                methods[m] = v
-
-        super().add_route(name, pattern=pattern, **kwargs)
         helper = RouteHelper(name, self, deprecated=deprecated)
 
-        for m, v in methods.items():
-            getattr(helper, m)(v, stacklevel=stacklevel)
+        for m in ("head", "get", "post", "put", "delete", "options", "patch"):
+            if v := kwargs.pop(m, None):
+                 getattr(helper, m)(v, stacklevel=stacklevel)
 
+        super().add_route(name, pattern=pattern, **kwargs)
         return helper
 
     def add_view(self, view=None, *, deprecated=False, **kwargs):

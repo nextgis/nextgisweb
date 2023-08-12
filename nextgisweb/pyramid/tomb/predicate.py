@@ -3,6 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Optional, Tuple, Type
 
+from pyramid.predicates import RequestMethodPredicate as PyramidRequestMethodPredicate
+from pyramid.predicates import as_sorted_tuple  # type: ignore
+
 
 class MetaPredicateBase:
     def text(self):
@@ -59,3 +62,9 @@ class ErrorRendererPredicate:
 
     def __call__(self, context, request):
         return True
+
+
+class RequestMethodPredicate(PyramidRequestMethodPredicate):
+    def __init__(self, val, config):
+        # GET does not imply HEAD as Pyramid does
+        self.val = as_sorted_tuple(val)

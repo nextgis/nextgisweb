@@ -18,6 +18,10 @@ class RouteHelper:
 
         return self
 
+    def head(self, *args, **kwargs):
+        push_stacklevel(kwargs, True)
+        return self.add_view(*args, request_method="HEAD", **kwargs)
+
     def get(self, *args, **kwargs):
         push_stacklevel(kwargs, True)
         return self.add_view(*args, request_method="GET", **kwargs)
