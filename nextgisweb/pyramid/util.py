@@ -5,18 +5,11 @@ import secrets
 import string
 from calendar import timegm
 from collections import defaultdict
-from dataclasses import dataclass
 from mimetypes import guess_type
 from pathlib import Path
-from sys import _getframe
-from typing import Any, Dict
 
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse
-
-from nextgisweb.env.package import pkginfo
-from nextgisweb.lib.imptool import module_path
-from nextgisweb.lib.logging import logger
 
 
 def viewargs(*, renderer=None):
@@ -27,68 +20,6 @@ def viewargs(*, renderer=None):
         return func
 
     return wrap
-
-
-@dataclass
-class RouteMeta:
-    template: str
-    wotypes: str
-    mdtypes: Dict[str, str]
-    client: bool
-    component: str
-
-
-class RouteMetaPredicate:
-    value: RouteMeta
-
-    def __init__(self, value, config):
-        self.value = value
-
-    def text(self):
-        return "meta"
-
-    phash = __repr__ = text
-
-    def __call__(self, context, request):
-        return True
-
-
-@dataclass
-class ViewMeta:
-    func: Any = None
-    param_types: Any = None
-    body_type: Any = None
-    return_type: Any = None
-    component: str = None
-    deprecated: bool = False
-
-
-class ViewMetaPredicate:
-    value: ViewMeta
-
-    def __init__(self, value, config):
-        self.value = value
-
-    def text(self):
-        return "meta"
-
-    phash = __repr__ = text
-
-    def __call__(self, context, request):
-        return True
-
-
-class ErrorRendererPredicate:
-    def __init__(self, val, config):
-        self.val = val
-
-    def text(self):
-        return 'error_renderer'
-
-    phash = __repr__ = text
-
-    def __call__(self, context, request):
-        return True
 
 
 class StaticMap:
@@ -173,35 +104,6 @@ class StaticFileResponse(FileResponse):
             self.headers['Content-Encoding'] = found_encoding
 
         self.headers['Vary'] = 'Accept-Encoding'
-
-
-def find_template(name, func=None, stack_level=1):
-    if func is not None:
-        def _traverse():
-            f = func
-            while f is not None:
-                yield f.__module__
-                f = getattr(f, '__wrapped__', None)
-        modules = _traverse()
-    else:
-        fr = _getframe(stack_level)
-        modules = [fr.f_globals['__name__'], ]
-
-    for m in modules:
-        parts = m.split('.')
-        while parts:
-            mod = '.'.join(parts)
-            comp_id = pkginfo.component_by_module(mod)
-            if comp_id:
-                fn = module_path(mod) / 'template' / name
-                if fn.exists():
-                    logger.debug(
-                        "Template %s found in %s", name,
-                        fn.relative_to(Path().resolve()))
-                    return str(fn)
-            parts.pop(-1)
-
-    raise ValueError(f"Template '{name}' not found")
 
 
 def gensecret(length):

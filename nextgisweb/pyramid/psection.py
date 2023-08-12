@@ -1,6 +1,6 @@
 import re
 
-from .util import find_template
+from .tomb.config import find_template
 
 
 class PageSection:

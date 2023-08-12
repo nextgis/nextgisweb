@@ -27,8 +27,8 @@ from nextgisweb.core.exception import UserException
 from . import exception, renderer
 from .openapi import openapi
 from .session import WebSession
+from .tomb.predicate import ErrorRendererPredicate
 from .util import (
-    ErrorRendererPredicate,
     StaticFileResponse,
     StaticMap,
     StaticSourcePredicate,

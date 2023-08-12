@@ -5,13 +5,9 @@ from typing_extensions import Annotated
 
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, JSONType, StatusCode
 
-from ..config import Configurator
-from ..util import RouteMetaPredicate, ViewMetaPredicate
+from ..tomb import Configurator
 
 config = Configurator(settings={})
-config.add_route_predicate('meta', RouteMetaPredicate)
-config.add_view_predicate('meta', ViewMetaPredicate)
-config.predicates_ready = True
 
 
 # JSON without type specification, orjson parses and renders them. JSONType is

@@ -9,47 +9,8 @@ from nextgisweb.lib.apitype import ContentType as CType
 from nextgisweb.lib.apitype import JSONType, deannotated, is_optional, iter_anyof
 from nextgisweb.lib.apitype import StatusCode as SCode
 
-from ..config import is_json_type
-from ..util import RouteMetaPredicate, ViewMetaPredicate
+from ..tomb import is_json_type, iter_routes
 from .docstring import Doctring
-
-
-def _route_views(source):
-    for itm in source["related"]:
-        if itm.category_name != "views":
-            continue
-
-        m = itm["request_methods"]
-        if not isinstance(m, str):
-            continue
-
-        meta = None
-        for pmeta in itm["predicates"]:
-            if isinstance(pmeta, ViewMetaPredicate):
-                meta = pmeta.value
-        if meta is None:
-            continue
-
-        yield m.lower(), meta
-
-
-def _routes(introspector, *, prefix):
-    for itm in introspector.get_category("routes"):
-        route = itm["introspectable"]["object"]
-
-        meta = None
-        for pmeta in route.predicates:
-            if isinstance(pmeta, RouteMetaPredicate):
-                meta = pmeta.value
-                break
-        if meta is None:
-            continue
-
-        if not meta.client or not meta.wotypes.startswith(prefix):
-            continue
-
-        yield route.name, meta, _route_views(itm)
-
 
 _PATH_TYPE = dict(
     int=int,
@@ -109,28 +70,34 @@ def openapi(introspector, prefix="/api/"):
             obj["schema"] = schema_ref(tdef)
 
     # Paths
-    for route_name, meta, views in _routes(introspector, prefix=prefix):
-        path = paths[meta.wotypes] = dict()
+    for route in iter_routes(introspector):
+        if not route.template.startswith(prefix):
+            continue
+
+        path = paths[route.wotypes] = dict()
 
         # Path parameters
         p_params, p_param = _pfact("path", required=True)
-        for pname, ptype in meta.mdtypes.items():
+        for pname, ptype in route.mdtypes.items():
             p_param(pname, schema=schema_ref(_PATH_TYPE[ptype]))
 
         # Operations
-        for m, vmeta in views:
-            dstr = Doctring(vmeta.func)
+        for view in route.views:
+            if type(view.method) != str:
+                continue
 
-            oper = path[m] = dict(
-                tags=[_ctag(vmeta.component)],
-                summary=_first_true(dstr.short, route_name),
+            dstr = Doctring(view.func)
+
+            oper = path[view.method.lower()] = dict(
+                tags=[_ctag(view.component)],
+                summary=_first_true(dstr.short, route.name),
                 description=_first_true(dstr.long),
-                deprecated=vmeta.deprecated,
+                deprecated=view.deprecated,
             )
 
             # Operation parameters
             o_params, o_param = _pfact("query", style="form", explode=False)
-            for pname, (ptype, pdefault) in vmeta.param_types.items():
+            for pname, (ptype, pdefault) in view.param_types.items():
                 o_param(
                     pname,
                     required=not is_optional(ptype)[0] and pdefault is UNSET,
@@ -142,7 +109,7 @@ def openapi(introspector, prefix="/api/"):
             oper["parameters"] = p_params + o_params
 
             # Request body
-            if btype := vmeta.body_type:
+            if btype := view.body_type:
                 rbody = oper["requestBody"] = dict()
                 rbody_content = rbody["content"] = dict()
                 for t, ct in iter_anyof(btype, CType()):
@@ -153,7 +120,7 @@ def openapi(introspector, prefix="/api/"):
 
             # Responses
             responses = oper["responses"] = defaultdict(lambda: dict(content=dict()))
-            if rtype := vmeta.return_type:
+            if rtype := view.return_type:
                 for t, sc, ct in iter_anyof(rtype, SCode(200), CType()):
                     ct = _apply_json_content_type(ct, t)
                     response = responses[str(sc)]

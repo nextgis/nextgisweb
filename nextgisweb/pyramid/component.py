@@ -12,15 +12,9 @@ from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 
 from . import uacompat
-from .config import Configurator
 from .model import Session, SessionStore
-from .util import (
-    ErrorRendererPredicate,
-    RouteMetaPredicate,
-    StaticMap,
-    ViewMetaPredicate,
-    gensecret,
-)
+from .tomb import Configurator, iter_routes
+from .util import StaticMap, gensecret
 
 
 class PyramidComponent(Component):
@@ -29,11 +23,6 @@ class PyramidComponent(Component):
         settings = dict(self._settings, **settings)
         settings['pyramid.static_map'] = StaticMap()
         config = Configurator(settings=settings)
-
-        config.add_route_predicate('meta', RouteMetaPredicate)
-        config.add_view_predicate('meta', ViewMetaPredicate)
-        config.add_route_predicate('error_renderer', ErrorRendererPredicate)
-        config.predicates_ready = True
 
         # Setup pyramid app for other components
         chain = self._env.chain('setup_pyramid', first='pyramid')
@@ -44,23 +33,12 @@ class PyramidComponent(Component):
 
         self.route_meta = route_meta = dict()
         self.route_mdtypes = route_mdtypes = dict()
-        for itm in config.registry.introspector.get_category('routes'):
-            route = itm['introspectable']['object']
-
-            meta = None
-            for pmeta in route.predicates:
-                if isinstance(pmeta, RouteMetaPredicate):
-                    meta = pmeta.value
-                    break
-            if meta is None:
+        for route in iter_routes(config.registry.introspector):
+            if not route.client or route.name.startswith('_'):
                 continue
-
-            if not meta.client or route.name.startswith('_'):
-                continue
-
-            template = meta.template
-            route_meta[route.name] = [template, ] + list(meta.mdtypes.keys())
-            route_mdtypes[route.name] = meta.mdtypes
+            template = route.template
+            route_meta[route.name] = [template, ] + list(route.mdtypes.keys())
+            route_mdtypes[route.name] = route.mdtypes
 
         return config
 
