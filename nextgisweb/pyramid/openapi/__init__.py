@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import Any, Dict
 
 from msgspec import UNSET, Meta
 from msgspec.json import schema_components
@@ -25,10 +26,6 @@ def _apply_json_content_type(ct, tdef):
     return ct
 
 
-def _first_true(*args):
-    return next((a for a in args if a is not None), None)
-
-
 def _pfact(pin, **defaults):
     res = list()
 
@@ -47,8 +44,21 @@ def _ctag(cid):
     return Component.registry[cid].__name__[: -len("Component")]
 
 
+def _context_str(context):
+    if context is None:
+        return None
+    if identity := getattr(context, "identity", None):
+        return identity
+    return context.__name__
+
+
+def _context_param(value):
+    desc = "OpenAPI discriminator for overloaded operations ignored during request processing"
+    return dict(schema=dict(type="string", enum=[value]), description=desc)
+
+
 def openapi(introspector, prefix="/api/"):
-    doc = dict(openapi="3.1.0")
+    doc: Dict[str, Any] = dict(openapi="3.1.0")
     paths = doc["paths"] = defaultdict(dict)
     components = doc["components"] = dict()
 
@@ -74,8 +84,6 @@ def openapi(introspector, prefix="/api/"):
         if not route.template.startswith(prefix):
             continue
 
-        path = paths[route.wotypes] = dict()
-
         # Path parameters
         p_params, p_param = _pfact("path", required=True)
         for pname, ptype in route.mdtypes.items():
@@ -86,17 +94,37 @@ def openapi(introspector, prefix="/api/"):
             if type(view.method) != str:
                 continue
 
-            dstr = Doctring(view.func)
+            o_params, o_param = _pfact("query", style="form", explode=False)
 
-            oper = path[view.method.lower()] = dict(
+            # Handle operation overloading
+            oper_pattern = route.wotypes
+            oper_context = _context_str(view.context)
+            assert type(route.overloaded) == bool
+            if route.overloaded:
+                oper_pattern += f"?context={oper_context}"
+                o_param("context", **_context_param(oper_context))
+
+            # Create operation object
+            oper: Dict[str, Any] = dict(
                 tags=[_ctag(view.component)],
-                summary=_first_true(dstr.short, route.name),
-                description=_first_true(dstr.long),
                 deprecated=view.deprecated,
             )
 
+            # Register operation at path
+            paths[oper_pattern][view.method.lower()] = oper
+
+            # Parse function docstring
+            dstr = Doctring(view.func)
+            oper["summary"] = dstr.short
+            oper["description"] = dstr.long
+
+            # Add extended properties
+            oper["x-nextgisweb-route"] = route.name
+            oper["x-nextgisweb-overloaded"] = route.overloaded
+            oper["x-nextgisweb-component"] = view.component
+            oper["x-nextgisweb-context"] = oper_context
+
             # Operation parameters
-            o_params, o_param = _pfact("query", style="form", explode=False)
             for pname, (ptype, pdefault) in view.param_types.items():
                 o_param(
                     pname,

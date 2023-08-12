@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple, Type
 
 
 class MetaPredicateBase:
@@ -31,6 +31,7 @@ class MetaPredicateBase:
 class ViewMeta(MetaPredicateBase):
     component: str
     func: Callable
+    context: Type
     deprecated: bool
     param_types: Dict[str, Tuple[type, Any]]
     body_type: Optional[type]
@@ -41,6 +42,7 @@ class ViewMeta(MetaPredicateBase):
 class RouteMeta(MetaPredicateBase):
     component: str
     template: str
+    overloaded: bool
     client: bool
     wotypes: str
     mdtypes: Dict[str, str]

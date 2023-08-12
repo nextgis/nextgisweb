@@ -174,9 +174,11 @@ class Configurator(PyramidConfigurator):
                     stacklevel + 1,
                 )
 
+            overloaded = kwargs.pop("overloaded", False)
             kwargs["meta"] = RouteMeta(
                 component=component,
                 template=template,
+                overloaded=overloaded,
                 client=client,
                 wotypes=wotypes,
                 mdtypes=mdtypes,
@@ -287,6 +289,7 @@ class Configurator(PyramidConfigurator):
 
             kwargs["meta"] = ViewMeta(
                 func=view,
+                context=kwargs.get("context"),
                 deprecated=deprecated,
                 component=component,
                 param_types=param_types,
@@ -309,6 +312,7 @@ class Configurator(PyramidConfigurator):
 
         for route in iter_routes(self.introspector):
             is_api = route.template.startswith("/api/")
+            methods = set()
             for view in route.views:
                 if is_api and type(view.method) != str:
                     _warn_from_info(
@@ -317,6 +321,15 @@ class Configurator(PyramidConfigurator):
                         f"for API routes since 4.5.0.dev16.",
                         view.info,
                     )
+
+                if is_api and not route.overloaded and view.method in methods:
+                    _warn_from_info(
+                        f"Route '{route.name}' seems to be overloaded. Route "
+                        f"predicate 'overloaded' is required for such routes "
+                        f"since 4.5.0.dev17.",
+                        view.info,
+                    )
+                methods.add(view.method)
 
 
 def _warn_from_info(message, info):

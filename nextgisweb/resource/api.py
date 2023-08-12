@@ -519,9 +519,11 @@ def setup_pyramid(comp, config):
     config.add_route(
         'resource.export',
         '/api/resource/{id:uint}/export',
-        factory=resource_factory)
+        factory=resource_factory,
+        overloaded=True)
 
     config.add_route(
         'resource.file_download',
         '/api/resource/{id:uint}/file/{name:str}',
-        factory=resource_factory)
+        factory=resource_factory,
+        overloaded=True)
