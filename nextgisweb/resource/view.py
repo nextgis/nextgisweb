@@ -2,7 +2,7 @@ import warnings
 from dataclasses import dataclass
 
 import zope.event
-from pyramid import httpexceptions
+from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
 from pyramid.threadlocal import get_current_request
 from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
@@ -73,6 +73,10 @@ def resource_breadcrumb(obj, request):
 def show(request):
     request.resource_permission(PERM_READ)
     return dict(obj=request.context, sections=request.context.__psection__)
+
+
+def root(request):
+    return HTTPFound(request.route_url('resource.show', id=0))
 
 
 @viewargs(renderer='react')
@@ -165,10 +169,10 @@ def widget(request) -> JSONType:
 
     if operation == 'create':
         if resid is not None or clsid is None or parent_id is None:
-            raise httpexceptions.HTTPBadRequest()
+            raise HTTPBadRequest()
 
         if clsid not in Resource.registry._dict:
-            raise httpexceptions.HTTPBadRequest()
+            raise HTTPBadRequest()
 
         parent = with_polymorphic(Resource, '*') \
             .filter_by(id=parent_id).one()
@@ -180,7 +184,7 @@ def widget(request) -> JSONType:
 
     elif operation in ('update', 'delete'):
         if resid is None or clsid is not None or parent_id is not None:
-            raise httpexceptions.HTTPBadRequest()
+            raise HTTPBadRequest()
 
         obj = with_polymorphic(Resource, '*') \
             .filter_by(id=resid).one()
@@ -190,7 +194,7 @@ def widget(request) -> JSONType:
         owner_user = obj.owner_user
 
     else:
-        raise httpexceptions.HTTPBadRequest()
+        raise HTTPBadRequest()
 
     widget = CompositeWidget(operation=operation, obj=obj, request=request)
     return dict(
@@ -251,9 +255,7 @@ def setup_pyramid(comp, config):
 
     _route('schema', 'schema').add_view(schema)
 
-    _route('root', '').add_view(
-        lambda r: httpexceptions.HTTPFound(
-            r.route_url('resource.show', id=0)))
+    _route('root', '', get=root)
 
     _resource_route('show', r'{id:uint}').add_view(show)
 

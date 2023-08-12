@@ -1,6 +1,7 @@
 import json
 
 import requests
+from msgspec import Struct
 from requests.exceptions import RequestException
 from sqlalchemy import sql
 
@@ -133,6 +134,10 @@ def geom_transform_batch(request) -> JSONType:
     return result
 
 
+class GeometryPropertyResponse(Struct):
+    value: float
+
+
 def geom_calc(request, measure_fun):
     data = request.json_body
     srs_to = SRS.filter_by(id=int(request.matchdict['id'])).one()
@@ -148,7 +153,15 @@ def geom_calc(request, measure_fun):
         geom = transformer.transform(geom)
 
     value = measure_fun(geom, srs_to.wkt)
-    return dict(value=value)
+    return GeometryPropertyResponse(value=value)
+
+
+def geom_length_post(request) -> GeometryPropertyResponse:
+    return geom_calc(request, geom_length)
+
+
+def geom_area_post(request) -> GeometryPropertyResponse:
+    return geom_calc(request, geom_area)
 
 
 def catalog_collection(request) -> JSONType:
@@ -281,12 +294,14 @@ def setup_pyramid(comp, config):
     config.add_route(
         "spatial_ref_sys.geom_length",
         "/api/component/spatial_ref_sys/{id:uint}/geom_length",
-    ).post(lambda r: geom_calc(r, geom_length), renderer="json")
+        post=geom_length_post,
+    )
 
     config.add_route(
         "spatial_ref_sys.geom_area",
-        "/api/component/spatial_ref_sys/{id:uint}/geom_area"
-    ).post(lambda r: geom_calc(r, geom_area), renderer="json")
+        "/api/component/spatial_ref_sys/{id:uint}/geom_area",
+        post=geom_area_post,
+    )
 
     config.add_route(
         "spatial_ref_sys.item",

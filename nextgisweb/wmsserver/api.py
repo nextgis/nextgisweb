@@ -53,15 +53,17 @@ def layer_by_keyname(service, keyname):
 
 
 def handler(obj, request):
+    """WMS endpoint"""
     try:
         request.resource_permission(ServiceScope.connect)
     except InsufficientPermissions:
         if request.authenticated_userid is None:
-            # Force 401 Unauthorized for unauthenticated users. It's useful for MapInfo
-            # because there is no way to give user credentials directly there.
+            # Force 401 Unauthorized for unauthenticated users. It's useful for
+            # MapInfo because there is no way to give user credentials directly
+            # there.
 
-            # TODO: Maybe it should be implemented in the error handler with an additional
-            # option to enable this behavior.
+            # TODO: Maybe it should be implemented in the error handler with an
+            # additional option to enable this behavior.
 
             return Response(status_code=401, headers={'WWW-Authenticate': "Basic"})
         else:
@@ -508,9 +510,12 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
 
 
 def setup_pyramid(comp, config):
-    config.add_route(
+    route = config.add_route(
         'wmsserver.wms',
         '/api/resource/{id:uint}/wms',
         factory=resource_factory,
-        error_renderer=error_renderer
-    ).add_view(handler, context=Service)
+        error_renderer=error_renderer,
+    )
+
+    route.get(handler, context=Service)
+    route.post(handler, context=Service)

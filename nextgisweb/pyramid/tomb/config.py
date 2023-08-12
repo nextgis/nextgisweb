@@ -310,17 +310,11 @@ class Configurator(PyramidConfigurator):
         for route in iter_routes(self.introspector):
             is_api = route.template.startswith("/api/")
             for view in route.views:
-                if getattr(view.func, "__name__", None) == "<lambda>":
-                    _warn_from_info(
-                        f"View for route '{route.name}' has a lambda-function "
-                        f"handler, which is unsupported since 4.5.0.dev16.",
-                        view.info,
-                    )
                 if is_api and type(view.method) != str:
                     _warn_from_info(
                         f"View for route '{route.name}' has invalid or missing "
-                        f"request method, which is required for API "
-                        f"routes since 4.5.0.dev16.",
+                        f"request method ({view.method}), which is required "
+                        f"for API routes since 4.5.0.dev16.",
                         view.info,
                     )
 
