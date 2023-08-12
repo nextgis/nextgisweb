@@ -7,7 +7,6 @@ import sqlalchemy as sa
 import zope.event
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
-from pyramid.interfaces import ISecurityPolicy
 from pyramid.renderers import render_to_response
 from pyramid.security import forget, remember
 from sqlalchemy.orm.exc import NoResultFound
@@ -26,22 +25,6 @@ from .policy import AuthProvider, AuthState, OnUserLogin
 @viewargs(renderer='mako')
 def login(request):
     next_url = request.params.get('next', request.application_url)
-
-    # TODO: Remove in 4.3+ release! We might need it for GDAL driver or
-    # something else. But /api/compoment/auth/login must be used there.
-    if request.method == 'POST':
-        policy = request.registry.getUtility(ISecurityPolicy)
-        try:
-            username = request.POST['login'].strip()
-            password = request.POST['password']
-            user, headers, event = policy.login(username, password, request=request)
-        except (InvalidCredentialsException, UserDisabledException) as exc:
-            return dict(error=exc.title, next_url=next_url, props=None)
-
-        return HTTPFound(
-            location=event.next_url if event.next_url else next_url,
-            headers=headers)
-
     return dict(
         custom_layout=True, next_url=next_url,
         props=dict(reloadAfterLogin=False),
@@ -359,7 +342,7 @@ def setup_pyramid(comp, config):
     # Add it before default pyramid handlers
     comp.env.pyramid.error_handlers.insert(0, forbidden_error_handler)
 
-    config.add_route('auth.login', '/login').add_view(login)
+    config.add_route('auth.login', '/login', get=login)
 
     config.add_route(
         'auth.session_invite',
@@ -368,7 +351,7 @@ def setup_pyramid(comp, config):
 
     config.add_route('auth.alink', '/alink/{token:str}').add_view(alink)
 
-    config.add_route('auth.logout', '/logout').add_view(logout)
+    config.add_route('auth.logout', '/logout', get=logout)
 
     config.add_route('auth.oauth', '/oauth').add_view(oauth)
 
