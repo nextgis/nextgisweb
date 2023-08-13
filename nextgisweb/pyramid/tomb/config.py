@@ -76,6 +76,7 @@ def _view_driver_factory(view, pextractor, pass_context):
         kw = {k: f(request) for k, f in pextractor.items()}
         return view(context, request, **kw) if pass_context else view(request, **kw)
 
+    _view.__doc__ = view.__doc__
     return _view
 
 
