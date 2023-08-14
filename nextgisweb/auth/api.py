@@ -1,252 +1,430 @@
-import re
-from typing import Optional, TypedDict
+from datetime import datetime
+from typing import List, Optional, TypeVar, Union
 
 import sqlalchemy as sa
+from msgspec import UNSET, Meta, Struct, UnsetType
 from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
 from pyramid.interfaces import ISecurityPolicy
 from pyramid.security import forget
 from sqlalchemy.orm import aliased, undefer
+from typing_extensions import Annotated
 
-from nextgisweb.env import DBSession, _
+from nextgisweb.env import DBSession, gettext, inject
+from nextgisweb.lib.apitype import DEF, OP, REQ, RO, AsJSON, Derived, flag, omit, struct_items
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid.util import gensecret
 
+from .component import AuthComponent
 from .model import Group, Principal, User
 
-keyname_pattern = re.compile(r'^[A-Za-z][A-Za-z0-9_\-]*$')
-brief_keys = (
-    'id', 'system', 'keyname', 'display_name', 'disabled',
-    'password', 'oauth_subject', 'last_activity', 'is_administrator')
+T = TypeVar("T")
+BRIEF = flag("Brief")
+DEF_NB = DEF[Annotated[T, omit(BRIEF)]]
+RO_NB = RO[Annotated[T, omit(BRIEF)]]
+
+Language = Annotated[str, Meta(pattern=r"^[a-z]{2,3}(\-[a-z]{2,3})?$")]
+Keyname = Annotated[str, Meta(min_length=1, pattern=r"^[A-Za-z][A-Za-z0-9_\-]*$")]
+DisplayName = Annotated[str, Meta(min_length=1)]
 
 
-def user_cget(request) -> JSONType:
-    brief = request.GET.get('brief') in ('true', 'yes', '1')
-    brief or request.require_administrator()
+def serialize_principal(src, cls):
+    attrs = dict()
+    for k in cls.__struct_fields__:
+        if k in ("members", "member_of"):
+            attrs[k] = [m.id for m in getattr(src, k)]
+        elif k == "password":
+            attrs[k] = src.password_hash is not None
+        elif k == "alink":
+            attrs[k] = src.alink_token
+        else:
+            attrs[k] = getattr(src, k)
+    return cls(**attrs)
 
-    q = User.query()
+
+class SystemPrincipalAttributeReadOnly(ValidationError):
+    def __init__(self, attr):
+        m = gettext("The '%s' attribute of the system principal can't be changed.")
+        super().__init__(message=m % attr)
+
+
+class PrincipalNotUnique(ValidationError):
+    def __init__(self, attr, value):
+        if attr == "keyname":
+            message = gettext("Principal '%s' already exists.") % value
+        elif attr == "display_name":
+            message = gettext("Principal with full name '%s' already exists.") % value
+        else:
+            raise ValueError(f"Invalid attribute: {attr}")
+        super().__init__(message=message)
+
+
+def validate_keyname(obj, keyname):
+    principal_cls = type(obj)
+
+    query = principal_cls.filter(sa.func.lower(principal_cls.keyname) == keyname.lower())
+    if obj.id is not None:
+        query = query.filter(principal_cls.id != obj.id)
+
+    if DBSession.query(query.exists()).scalar():
+        raise PrincipalNotUnique("keyname", keyname)
+
+
+def validate_display_name(obj, display_name):
+    query = Principal.filter(
+        Principal.cls == obj.cls, sa.func.lower(Principal.display_name) == display_name.lower()
+    )
+    if obj.id is not None:
+        query = query.filter(Principal.id != obj.id)
+
+    is_unique = not DBSession.query(query.exists()).scalar()
+    if not is_unique:
+        raise PrincipalNotUnique("display_name", display_name)
+
+
+@inject()
+def deserialize_principal(src, obj, *, create: bool, auth: AuthComponent):
+    updated = set()
+
+    is_group = isinstance(obj, Group)
+    is_user = isinstance(obj, User)
+
+    with DBSession.no_autoflush:
+        for k, v in struct_items(src):
+            attr = k
+            if k == "alink":
+                attr = "alink_token"
+
+            if k == "members" and set(m.id for m in obj.members) == set(v):
+                continue
+            elif k == "member_of" and set(m.id for m in obj.member_of) == set(v):
+                continue
+            elif k == "password" and type(v) == bool:
+                phash = obj.password_hash
+                if v and phash is None:
+                    raise ValidationError(message=gettext("Password is not set."))
+                if (v and phash) or (not v and not phash):
+                    continue
+            elif getattr(obj, attr) == v:
+                continue
+
+            if (obj.system is True) and (
+                (is_group and k not in ("register", "members", "oauth_mapping"))
+                or (is_user and (k != "member_of" or obj.keyname != "guest"))
+            ):
+                raise SystemPrincipalAttributeReadOnly(k)
+
+            if k == "keyname":
+                validate_keyname(obj, v)
+            elif k == "display_name":
+                validate_display_name(obj, v)
+            elif k == "members":
+                validate_members(obj, v)
+                v = [User.filter_by(id=id).one() for id in v]
+            elif k == "member_of":
+                v = [Group.filter_by(id=id).one() for id in v]
+            elif k == "password" and v is False:
+                v = None
+            elif k == "alink":
+                v = gensecret(32) if v else None
+
+            setattr(obj, attr, v)
+            updated.add(k)
+
+    if create:
+        obj.persist()
+        DBSession.flush()
+
+    if is_user and not obj.disabled and (create or "disabled" in updated):
+        auth.check_user_limit(obj.id)
+
+    return updated
+
+
+class UserRef(Struct, kw_only=True):
+    id: int
+
+
+class _User(Struct, kw_only=True):
+    id: RO[int]
+    system: RO[bool]
+    keyname: REQ[Keyname]
+    display_name: REQ[DisplayName]
+    description: DEF_NB[Optional[str]]
+    superuser: RO_NB[bool]
+    disabled: DEF[bool]
+    password: DEF[Union[bool, str]]
+    last_activity: RO[Optional[datetime]]
+    language: DEF_NB[Optional[Language]]
+    oauth_subject: RO[str]
+    oauth_tstamp: RO_NB[Optional[datetime]]
+    alink: DEF_NB[Union[bool, str]]
+    member_of: DEF_NB[List[int]]
+    is_administrator: RO[bool]
+
+
+UserCreate = Derived[_User, OP.CREATE]
+UserRead = Derived[_User, OP.READ]
+UserUpdate = Derived[_User, OP.UPDATE]
+UserReadBrief = Derived[_User, OP.READ, BRIEF]
+
+
+def user_cget(request, *, brief: bool = False) -> AsJSON[List[UserRead]]:
+    """Read users
+
+    :param brief: Return limited set of attributes
+    :returns: Array of user objects"""
+    brief or request.require_administrator()  # pyright: ignore[reportUnusedExpression]
+
+    q = User.query().options(undefer(User.is_administrator))
     if request.authenticated_userid is None:
         q = q.filter_by(system=True)
 
-    result = []
-    for o in q.options(undefer(User.is_administrator)):
-        data = o.serialize()
-        if brief:
-            data = {k: v for k, v in data.items() if k in brief_keys}
-        result.append(data)
-
-    return result
+    cls = UserReadBrief if brief else UserRead
+    return [serialize_principal(o, cls) for o in q]
 
 
-def user_cpost(request) -> JSONType:
+def user_cpost(request, *, body: UserCreate) -> UserRef:
+    """Create user
+
+    :returns: User reference"""
     request.require_administrator()
 
-    data = request.json_body
     obj = User(system=False)
-    check_keyname(obj, data)
-    check_display_name(obj, data)
-    obj.deserialize(data)
-    obj.persist()
-
-    DBSession.flush()
-    return dict(id=obj.id)
+    deserialize_principal(body, obj, create=True)
+    return UserRef(id=obj.id)
 
 
-def user_iget(request) -> JSONType:
-    request.require_administrator()
-    obj = User.filter_by(id=int(request.matchdict['id'])).options(
-        undefer(User.is_administrator),
-    ).one()
-    return obj.serialize()
+def user_iget(request) -> UserRead:
+    """Read user
 
-
-def user_iput(request) -> JSONType:
+    :returns: User object"""
     request.require_administrator()
 
-    data = request.json_body
-    obj = User.filter_by(id=int(request.matchdict['id'])).one()
+    q = User.filter_by(id=int(request.matchdict["id"]))
+    q = q.options(undefer(User.is_administrator))
 
-    if (
-        obj.id != request.authenticated_userid and (
-            ('keyname' in data and obj.keyname != data['keyname'])
-            or ('password' in data and data['password'] is not True)
-            or data.get('alink_token') is not None
-        )
-    ):
+    return serialize_principal(q.one(), UserRead)
+
+
+def user_iput(request, *, body: UserUpdate) -> UserRef:
+    """Update user
+
+    :returns: User reference"""
+    request.require_administrator()
+
+    obj = User.filter_by(id=int(request.matchdict["id"])).one()
+    updated = deserialize_principal(body, obj, create=False)
+
+    if obj.id != request.authenticated_userid and ({"keyname", "password", "alink"} & updated):
         auth_policy = request.registry.getUtility(ISecurityPolicy)
         auth_policy.forget_user(obj.id, request)
 
-    check_keyname(obj, data)
-    check_display_name(obj, data)
-    check_system_user(obj, data)
-    obj.deserialize(data)
-    check_last_administrator()
-    return dict(id=obj.id)
+    if {"member_of", "disabled"} & updated:
+        check_last_administrator()
+
+    return UserRef(id=obj.id)
 
 
 def user_idelete(request) -> JSONType:
+    """Delete user"""
     request.require_administrator()
 
-    obj = User.filter_by(id=int(request.matchdict['id'])).one()
+    obj = User.filter_by(id=int(request.matchdict["id"])).one()
     check_principal_delete(obj)
     DBSession.delete(obj)
+
     check_last_administrator()
+
     return None
 
 
-class ProfileResponse(TypedDict):
-    oauth_subject: Optional[str]
-    language: Optional[str]
+class GroupRef(Struct, kw_only=True):
+    id: int
 
 
-def profile_get(request) -> ProfileResponse:
-    """Read profile of the current user"""
-    user = request.user
-    if user.keyname == 'guest':
-        return HTTPUnauthorized()
-
-    return ProfileResponse(
-        oauth_subject=user.oauth_subject,
-        language=user.language)
-
-
-class ProfileBody(TypedDict, total=False):
-    language: Optional[str]
+class _Group(Struct, kw_only=True):
+    id: RO[int]
+    system: RO[bool]
+    keyname: REQ[Keyname]
+    display_name: REQ[DisplayName]
+    description: DEF_NB[Optional[str]]
+    register: DEF_NB[bool]
+    oauth_mapping: DEF_NB[bool]
+    members: DEF_NB[List[int]]
 
 
-def profile_put(request, body: ProfileBody) -> JSONType:
-    """Update profile of the current user"""
-    if request.user.keyname == 'guest':
-        return HTTPUnauthorized()
-
-    request.user.language = body['language']
-    return None
+GroupCreate = Derived[_Group, OP.CREATE]
+GroupRead = Derived[_Group, OP.READ]
+GroupUpdate = Derived[_Group, OP.UPDATE]
+GroupReadBrief = Derived[_Group, OP.READ, BRIEF]
 
 
-def group_cget(request) -> JSONType:
-    brief = request.GET.get('brief') in ('true', 'yes', '1')
-    brief or request.require_administrator()
+def group_cget(request, *, brief: bool = False) -> AsJSON[List[_Group]]:
+    """Read groups
+
+    :param brief: Return limited set of attributes
+    :returns: Array of group objects"""
+    brief or request.require_administrator()  # pyright: ignore[reportUnusedExpression]
 
     q = Group.query()
     if request.authenticated_userid is None:
         q = q.filter_by(system=True)
 
-    result = []
-    for o in q:
-        data = o.serialize()
-        if brief:
-            data = {k: v for k, v in data.items() if k in brief_keys}
-        result.append(data)
+    cls = GroupReadBrief if brief else GroupRead
+    result = [serialize_principal(o, cls) for o in q]
 
     return result
 
 
-def group_cpost(request) -> JSONType:
+def group_cpost(request, *, body: GroupCreate) -> GroupRef:
+    """Create group
+
+    :returns: Group reference"""
     request.require_administrator()
 
-    data = request.json_body
     obj = Group(system=False)
-    check_keyname(obj, data)
-    check_display_name(obj, data)
-    check_group_members(obj, data)
-    obj.deserialize(data)
-    obj.persist()
+    deserialize_principal(body, obj, create=True)
 
-    DBSession.flush()
-    return dict(id=obj.id)
+    return GroupRef(id=obj.id)
 
 
-def group_iget(request) -> JSONType:
+def group_iget(request) -> GroupRead:
+    """Read group
+
+    :returns: Group object"""
     request.require_administrator()
-    obj = Group.filter_by(id=int(request.matchdict['id'])).one()
-    return obj.serialize()
+    obj = Group.filter_by(id=int(request.matchdict["id"])).one()
+    return serialize_principal(obj, GroupRead)
 
 
-def group_iput(request) -> JSONType:
+def group_iput(request, *, body: GroupUpdate) -> GroupRef:
+    """Update group
+
+    :returns: Group reference"""
     request.require_administrator()
 
-    data = request.json_body
-    obj = Group.filter_by(id=int(request.matchdict['id'])).one()
-    check_keyname(obj, data)
-    check_display_name(obj, data)
-    check_system_group(obj, data)
-    check_group_members(obj, data)
-    obj.deserialize(data)
-    check_last_administrator()
-    return dict(id=obj.id)
+    obj = Group.filter_by(id=int(request.matchdict["id"])).one()
+    updated = deserialize_principal(body, obj, create=False)
+    if {"members"} & updated:
+        check_last_administrator()
+
+    return GroupRef(id=obj.id)
 
 
 def group_idelete(request) -> JSONType:
+    """Delete group"""
     request.require_administrator()
 
-    obj = Group.filter_by(id=int(request.matchdict['id'])).one()
+    obj = Group.filter_by(id=int(request.matchdict["id"])).one()
     check_principal_delete(obj)
     DBSession.delete(obj)
+
     return None
 
 
-class CurrentUserResponse(TypedDict):
+class Profile(Struct, kw_only=True):
+    oauth_subject: RO[Optional[str]]
+    language: DEF[Optional[Language]]
+
+
+ProfileRead = Derived[Profile, OP.READ]
+ProfileUpdate = Derived[Profile, OP.UPDATE]
+
+
+def profile_get(request) -> AsJSON[ProfileRead]:
+    """Read profile of the current user
+
+    :returns: User profile"""
+    if request.user.keyname == "guest":
+        return HTTPUnauthorized()
+
+    return serialize_principal(request.user, ProfileRead)
+
+
+def profile_put(request, body: ProfileUpdate) -> JSONType:
+    """Update profile of the current user"""
+    if request.user.keyname == "guest":
+        return HTTPUnauthorized()
+
+    deserialize_principal(body, request.user, create=False)
+
+    return None
+
+
+class CurrentUser(Struct):
     id: int
-    keyname: str
-    display_name: str
-    language: str
+    keyname: Keyname
+    display_name: DisplayName
+    language: Language
     auth_medium: Optional[str]
     auth_provider: Optional[str]
 
 
-def current_user(request) -> CurrentUserResponse:
-    """Read current user info"""
-    result = CurrentUserResponse(
+def current_user(request) -> CurrentUser:
+    """Read current user info
+
+    :returns: User info"""
+    result = CurrentUser(
         id=request.user.id,
         keyname=request.user.keyname,
         display_name=request.user.display_name,
         language=request.locale_name,
-        auth_medium=None, auth_provider=None)
+        auth_medium=None,
+        auth_provider=None,
+    )
 
-    if aresult := request.environ.get('auth.result'):
+    if aresult := request.environ.get("auth.result"):
         if val := aresult.med:
-            result['auth_medium'] = val
+            result.auth_medium = val
         if val := aresult.prv:
-            result['auth_provider'] = val
+            result.auth_provider = val
 
     return result
 
 
-def register(request) -> JSONType:
-    if not request.env.auth.options['register']:
+class RegisterBody(Struct, kw_only=True):
+    keyname: REQ[Keyname]
+    display_name: REQ[str]
+    password: REQ[str]
+
+
+def register(request, *, body: RegisterBody) -> UserRef:
+    """Self-register user
+
+    :returns: User reference"""
+    if not request.env.auth.options["register"]:
         raise HTTPForbidden(explanation="Anonymous registration is not allowed!")
 
-    # For self-registration only certain attributes of the user are required
-    rkeys = ('display_name', 'description', 'keyname', 'password')
-    src = request.json_body
-    data = dict()
-    for k in rkeys:
-        if k in src:
-            data[k] = src[k]
-
-    # Add groups automatically assigned on registration
-    data['member_of'] = map(
-        lambda group: group.id,
-        Group.filter_by(register=True))
-
     obj = User(system=False)
-    obj.deserialize(data)
-    obj.persist()
+    obj.member_of = list(Group.filter_by(register=True))
+    deserialize_principal(body, obj, create=True)
 
-    DBSession.flush()
-    return dict(id=obj.id)
+    return UserRef(id=obj.id)
 
 
-def login(request) -> JSONType:
+class LoginResponse(Struct, kw_only=True):
+    id: int
+    keyname: Keyname
+    display_name: DisplayName
+    home_url: Union[str, UnsetType] = UNSET
+
+
+def login(request) -> LoginResponse:
+    """Log in into session
+
+    Parameters `login` and `password` can be passed in a JSON encoded body or as
+    POST parameters (`application/x-www-form-urlencoded`)."""
     if len(request.POST) > 0:
-        login = request.POST.get('login')
-        password = request.POST.get('password')
+        login = request.POST.get("login")
+        password = request.POST.get("password")
     else:
         json_body = request.json_body
         if not isinstance(json_body, dict):
             raise ValidationError()
-        login = json_body.get('login')
-        password = json_body.get('password')
+        login = json_body.get("login")
+        password = json_body.get("password")
 
     if not isinstance(login, str) or not isinstance(password, str):
         raise ValidationError()
@@ -255,17 +433,16 @@ def login(request) -> JSONType:
     user, headers, event = policy.login(login, password, request=request)
     request.response.headerlist.extend(headers)
 
-    result = dict(
-        id=user.id, keyname=user.keyname,
-        display_name=user.display_name)
+    result = LoginResponse(id=user.id, keyname=user.keyname, display_name=user.display_name)
 
     if event.next_url:
-        result['home_url'] = event.next_url
+        result.home_url = event.next_url
 
     return result
 
 
 def logout(request) -> JSONType:
+    """Log out and close session"""
     headers = forget(request)
     request.response.headerlist.extend(headers)
     return dict()
@@ -273,116 +450,56 @@ def logout(request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'auth.user.collection',
-        '/api/component/auth/user/',
-        get=user_cget,
-        post=user_cpost)
+        "auth.user.collection", "/api/component/auth/user/", get=user_cget, post=user_cpost
+    )
 
     config.add_route(
-        'auth.user.item',
-        '/api/component/auth/user/{id:uint}',
+        "auth.user.item",
+        "/api/component/auth/user/{id:uint}",
         get=user_iget,
         put=user_iput,
-        delete=user_idelete)
+        delete=user_idelete,
+    )
 
     config.add_route(
-        'auth.profile',
-        '/api/component/auth/profile',
-        get=profile_get,
-        put=profile_put)
+        "auth.profile", "/api/component/auth/profile", get=profile_get, put=profile_put
+    )
 
     config.add_route(
-        'auth.group.collection',
-        '/api/component/auth/group/',
-        get=group_cget,
-        post=group_cpost)
+        "auth.group.collection", "/api/component/auth/group/", get=group_cget, post=group_cpost
+    )
 
     config.add_route(
-        'auth.group.item',
-        '/api/component/auth/group/{id:uint}',
+        "auth.group.item",
+        "/api/component/auth/group/{id:uint}",
         get=group_iget,
         put=group_iput,
-        delete=group_idelete)
+        delete=group_idelete,
+    )
 
-    config.add_route(
-        'auth.current_user',
-        '/api/component/auth/current_user',
-        get=current_user)
+    config.add_route("auth.current_user", "/api/component/auth/current_user", get=current_user)
 
-    config.add_route(
-        'auth.register',
-        '/api/component/auth/register',
-        post=register)
+    config.add_route("auth.register", "/api/component/auth/register", post=register)
 
-    config.add_route(
-        'auth.login_cookies',
-        '/api/component/auth/login',
-        post=login)
+    config.add_route("auth.login_cookies", "/api/component/auth/login", post=login)
 
-    config.add_route(
-        'auth.logout_cookies',
-        '/api/component/auth/logout',
-        post=logout)
+    config.add_route("auth.logout_cookies", "/api/component/auth/logout", post=logout)
 
 
-class SystemPrincipalAttributeReadOnly(ValidationError):
-
-    def __init__(self, attr):
-        super().__init__(message=_(
-            "The '%s' attribute of the system principal can't be changed."
-        ) % attr)
-
-
-class PrincipalNotUnique(ValidationError):
-
-    def __init__(self, attr, value):
-        if attr == 'keyname':
-            message = _("Principal '%s' already exists.") % value
-        elif attr == 'display_name':
-            message = _("Principal with full name '%s' already exists.") % value
-        else:
-            raise ValueError(f"Invalid attribute: {attr}")
-        super().__init__(message=message)
-
-
-def check_system_user(obj, data):
-    if not obj.system:
-        return
-
-    for k, v in data.items():
-        if not (getattr(obj, k) == data[k] or (
-            obj.keyname == 'guest' and k == 'member_of'
-        )):
-            raise SystemPrincipalAttributeReadOnly(k)
-
-
-def check_system_group(obj, data):
-    if not obj.system:
-        return
-
-    allowed_attrs = ('register', 'members', 'oauth_mapping')
-    for k in data:
-        if not (getattr(obj, k) == data[k] or k in allowed_attrs):
-            raise SystemPrincipalAttributeReadOnly(k)
-
-
-def check_group_members(obj, data):
-    if 'members' not in data:
-        return
-
+def validate_members(obj, members):
     user = User.filter(
         User.system,
-        User.keyname != 'guest',
-        User.id.in_(data['members'])).first()
+        User.keyname != "guest",
+        User.id.in_(members),
+    ).first()
     if user is not None:
-        raise ValidationError(message=_(
-            "User '%s' can't be a member of a group.") % user.display_name)
+        m = gettext("User '%s' can't be a member of a group.")
+        raise ValidationError(message=m % user.display_name)
 
 
 def check_principal_delete(obj):
     if obj.system:
-        raise ValidationError(message=_(
-            "System principals can't be deleted."))
+        raise ValidationError(message=gettext("System principals can't be deleted."))
     check_principal_references(obj)
 
 
@@ -397,54 +514,26 @@ def check_principal_references(obj):
 
     if len(references_data) > 0:
         raise ValidationError(
-            message=_("User is referenced with resources")
-            if isinstance(obj, User) else _("Group is referenced with resources"),
-            data=dict(references_data=references_data))
+            message=gettext("User is referenced with resources")
+            if isinstance(obj, User)
+            else gettext("Group is referenced with resources"),
+            data=dict(references_data=references_data),
+        )
 
 
-def check_keyname(obj, data):
-    if 'keyname' not in data or obj.keyname == data['keyname']:
-        return
-
-    principal_cls = type(obj)
-    keyname = data['keyname']
-
-    if not keyname_pattern.match(keyname):
-        raise ValidationError(message=_(
-            "Invalid principal name: '%s'.") % keyname)
-
-    query = principal_cls.filter(
-        sa.func.lower(principal_cls.keyname) == keyname.lower())
-    if obj.id is not None:
-        query = query.filter(principal_cls.id != obj.id)
-
-    is_unique = not DBSession.query(query.exists()).scalar()
-    if not is_unique:
-        raise PrincipalNotUnique('keyname', keyname)
-
-
-def check_display_name(obj, data):
-    if 'display_name' not in data or obj.display_name == data['display_name']:
-        return
-
-    display_name = data['display_name']
-
-    query = Principal.filter(
-        Principal.cls == obj.cls,
-        sa.func.lower(Principal.display_name) == display_name.lower())
-    if obj.id is not None:
-        query = query.filter(Principal.id != obj.id)
-
-    is_unique = not DBSession.query(query.exists()).scalar()
-    if not is_unique:
-        raise PrincipalNotUnique('display_name', display_name)
+class AdministratorRequired(ValidationError):
+    title = gettext("Administrator required")
+    message = gettext("The 'administrators' group must have at least one enabled member.")
 
 
 def check_last_administrator():
     member = aliased(User, flat=True)
-    query = DBSession.query(Group).filter_by(keyname='administrators') \
-        .join(Group.members.of_type(member)).filter_by(disabled=False).limit(1)
+    query = (
+        DBSession.query(Group)
+        .filter_by(keyname="administrators")
+        .join(Group.members.of_type(member))
+        .filter_by(disabled=False)
+        .limit(1)
+    )
     if query.count() == 0:
-        raise ValidationError(message=_(
-            "The 'administrators' group must have at least one enabled member."
-        ))
+        raise AdministratorRequired()

@@ -8,10 +8,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from zope.event import notify
 from zope.event.classhandler import handler
 
-from nextgisweb.env import Base, DBSession, _, env
-
-from nextgisweb.core.exception import ValidationError
-from nextgisweb.pyramid.util import gensecret
+from nextgisweb.env import Base
 
 tab_group_user = sa.Table(
     'auth_group_user', Base.metadata,
@@ -127,55 +124,6 @@ class User(Principal):
     def password(self, value):
         self.password_hash = sha256_crypt.hash(value) if value is not None else None
 
-    def serialize(self):
-        return {
-            'id': self.id,
-            'system': self.system,
-            'display_name': self.display_name,
-            'description': self.description,
-            'keyname': self.keyname,
-            'superuser': self.superuser,
-            'disabled': self.disabled,
-            'password': self.password_hash is not None,
-            'last_activity': self.last_activity,
-            'language': self.language,
-            'oauth_subject': self.oauth_subject,
-            'oauth_tstamp': self.oauth_tstamp,
-            'alink_token': self.alink_token,
-            'member_of': [g.id for g in self.member_of],
-            'is_administrator': self.is_administrator,
-        }
-
-    def deserialize(self, data):
-        was_disabled = self.disabled is not False
-
-        attrs = ('display_name', 'description', 'keyname',
-                 'superuser', 'disabled', 'language')
-        with DBSession.no_autoflush:
-            for a in attrs:
-                if a in data:
-                    setattr(self, a, data[a])
-
-            if 'member_of' in data:
-                self.member_of = [Group.filter_by(id=gid).one()
-                                  for gid in data['member_of']]
-            if (pwd := data.get('password')) is not None:
-                if pwd is True:
-                    if self.password_hash is None:
-                        raise ValidationError(message=_("Password is not set."))
-                elif pwd is False:
-                    self.password = None
-                else:
-                    self.password = pwd
-
-            if (alink_token := data.get('alink_token')) is not None:
-                self.alink_token = gensecret(32) if alink_token else None
-
-        enabled = not self.disabled and was_disabled
-
-        if not self.system and enabled:
-            env.auth.check_user_limit(self.id)
-
     @classmethod
     def by_keyname(cls, keyname):
         return cls.filter(sa.func.lower(User.keyname) == keyname.lower()).one()
@@ -213,29 +161,6 @@ class Group(Principal):
 
         else:
             return user in self.members
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'system': self.system,
-            'display_name': self.display_name,
-            'description': self.description,
-            'keyname': self.keyname,
-            'register': self.register,
-            'oauth_mapping': self.oauth_mapping,
-            'members': [u.id for u in self.members],
-        }
-
-    def deserialize(self, data):
-        attrs = ('display_name', 'description', 'keyname', 'register', 'oauth_mapping')
-        with DBSession.no_autoflush:
-            for a in attrs:
-                if a in data:
-                    setattr(self, a, data[a])
-
-            if 'members' in data:
-                self.members = [User.filter_by(id=uid).one()
-                                for uid in data['members']]
 
 
 auth_group_administrators = Group.__table__.alias('auth_group_administrators')
