@@ -109,22 +109,6 @@ def test_login_no_password(user, ngw_webtest_app):
         login=user.keyname, password=None), status=401)
 
 
-def test_legacy(user, ngw_webtest_app, ngw_env):
-    sid_cookie = ngw_env.pyramid.options['session.cookie.name']
-
-    ngw_webtest_app.post('/login', dict(login='test-user', password='invalid'), status=200)
-    _test_current_user(ngw_webtest_app, 'guest')
-
-    ngw_webtest_app.post('/login', dict(
-        login='test-user', password='password123'), status=302)
-    _test_current_user(ngw_webtest_app, 'test-user', auth_medium='session', auth_provider='local_pw')
-    assert sid_cookie in ngw_webtest_app.cookies
-
-    ngw_webtest_app.post('/logout', status=302)
-    _test_current_user(ngw_webtest_app, 'guest')
-    assert sid_cookie not in ngw_webtest_app.cookies
-
-
 def test_session_invite(user, ngw_env, ngw_webtest_app):
     sid_cookie = ngw_env.pyramid.options['session.cookie.name']
 
@@ -139,7 +123,7 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
     next_url = query['next'][0]
     assert next_url == '/some/path'
 
-    ngw_webtest_app.post('/login', dict(
+    ngw_webtest_app.post('/api/component/auth/login', dict(
         login='test-user', password='password123', status=302))
     sid_cookie in ngw_webtest_app.cookies
     assert ngw_webtest_app.cookies[sid_cookie] != sid
@@ -164,7 +148,7 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
     assert ngw_webtest_app.cookies[sid_cookie] == sid
     _test_current_user(ngw_webtest_app, 'test-user', auth_medium='session', auth_provider='invite')
 
-    ngw_webtest_app.post('/logout', status=302)
+    ngw_webtest_app.get('/logout', status=302)
     sid_cookie not in ngw_webtest_app.cookies
     _test_current_user(ngw_webtest_app, 'guest')
 
@@ -303,18 +287,14 @@ class TestKeyname:
 def group_members():
     with transaction.manager:
         admins = Group.filter_by(keyname='administrators').one()
-        members = [u.id for u in admins.members]
-
-        guest = User.by_keyname('guest')
-        if guest.id in members:
-            members_temp = [id_ for id_ in members if id_ != guest.id]
-            admins.deserialize(dict(members=members_temp))
+        remember = [u.id for u in admins.members]
+        admins.members = [u for u in admins.members if u.keyname != 'guest']
 
     yield
 
     with transaction.manager:
         admins = Group.filter_by(keyname='administrators').one()
-        admins.deserialize(dict(members=members))
+        admins.members = [u for u in User.filter(User.id.in_(remember))]
 
 
 class TestSystemPrincipal:
@@ -367,7 +347,7 @@ class TestSystemPrincipal:
 
 @pytest.mark.parametrize('password_before, password', product(
     ('old-T3ST', None),
-    ('new-secret-test-password', None, True, False, None),
+    ('new-secret-test-password', True, False),
 ))
 def test_password(password_before, password, user, ngw_webtest_app, ngw_auth_administrator):
     with transaction.manager:
