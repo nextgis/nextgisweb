@@ -290,7 +290,7 @@ To create vector layer execute following request:
    :<json string description: description text, HTML supported (optional)
    :<json jsonobj vector_layer: vector layer JSON object
    :<json jsonobj source: JSON object with file upload response
-   :<json jsonobj srs: spatial reference of creating vector layer. Should be the same as web map
+   :<json jsonobj srs: spatial reference of creating vector layer. Only EPSG:3857 is supported
    :<json int id: EPSG code
    :<json string cast_geometry_type: layer geometry type: ``POINT``, ``LINESTRING`` or ``POLYGON``. ``null`` for auto-detect (default)
    :<json bool cast_is_multi: is layer geometry multi. ``null`` for auto-detect (default)
