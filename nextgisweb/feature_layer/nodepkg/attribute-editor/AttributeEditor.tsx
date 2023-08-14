@@ -46,6 +46,7 @@ const ngwTypeAliases: Record<
 };
 
 const setNullTitle = gettext("Set field value to NULL (No data)");
+const noFieldsTitle = gettext("There are no attributes in the vector layer");
 
 interface AttributeEditorStoreProps
     extends EditorWidgetProps<NgwAttributeValue | null, AttributeEditorStore> {
@@ -142,7 +143,9 @@ const AttributeEditor = observer(
                             setValues(v.value);
                         }
                     }}
-                />
+                >
+                    {!formFields.length && <p>{noFieldsTitle}</p>}
+                </FieldsForm>
             </div>
         );
     }

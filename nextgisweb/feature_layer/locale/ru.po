@@ -1,116 +1,8 @@
-#: api.py:91
-msgid "Output format is not provided."
-msgstr "Выходной формат не указан."
-
-#: api.py:93
-#, python-format
-msgid "Format '%s' is not supported."
-msgstr "Формат '%s' не поддерживается."
-
-#: api.py:123 api.py:745
-msgid "Parameter 'intersects' geometry is not valid."
-msgstr "Параметр 'intersects' содержит невалидную геометрию."
-
-#: api.py:148
-msgid "The export limit is set to {limit} features, but the layer contains {count}."
-msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
-
-#: api.py:161
-msgid "Failed to reproject 'intersects' geometry."
-msgstr "Не удалось перепроецировать геометрию 'intersects'."
-
-#: api.py:304
-msgid "File name parameter '{}' is not valid."
-msgstr "Недопустимое имя файла '{}'."
-
-#: api.py:423 api.py:498
-#, python-format
-msgid "Geometry format '%s' is not supported."
-msgstr "Формат геометрии '%s' не поддерживается."
-
-#: api.py:425
-msgid "Geometry is not valid."
-msgstr "Невалидная геометрия"
-
-#: api.py:431 api.py:503
-#, python-format
-msgid "Date format '%s' is not supported."
-msgstr "Формат даты '%s' не поддерживается."
-
-#: api.py:629
-msgid "Unknown spatial reference system"
-msgstr "Неизвестная система координат"
-
-#: exception.py:12
-msgid "Feature not found"
-msgstr "Объект не найден"
-
-#: exception.py:13
-#, python-format
-msgid "Feature with id = %d was not found in resource with id = %d."
-msgstr "Объект с id = %d не найден в ресурсе с id = %d."
-
-#: exception.py:14
-msgid "The feature may have been deleted or an error in the address."
-msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
-
-#: model.py:158
-#, python-format
-msgid "Field not found (ID=%d)."
-msgstr "Поле не найдено (ID=%d)."
-
-#: model.py:168
-msgid "Field name is forbidden: '{}'. Please remove or rename it."
-msgstr "Недопустимое имя поля: '{}'. Пожалуйста удалите или переименуйте его."
-
-#: amd/ngw-feature-layer/FieldsWidget.js:160 view.py:47
-msgid "Feature table"
-msgstr "Таблица объектов"
-
-#: view.py:69 view.py:92
-#, python-format
-msgid "Feature #%d"
-msgstr "Объект #%d"
-
-#: nodepkg/feature-grid/component/ExportAction.js:20 view.py:112 view.py:123
-#: view.py:211
-msgid "Save as"
-msgstr "Сохранить как"
-
-#: view.py:131
-msgid "MVT Vector Tiles"
-msgstr "Векторные тайлы MVT"
-
-#: view.py:132
-msgid ""
-"The Mapbox Vector Tile is an efficient encoding for map data into vector "
-"tiles that can be rendered dynamically."
-msgstr ""
-"Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
-"тайлы которые могут быть динамически отрисованы."
-
-#: view.py:198
-msgid "Features"
-msgstr "Объекты"
-
-#: template/resource_section_fields.mako:19 view.py:203
-msgid "Table"
-msgstr "Таблица"
-
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:34
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: amd/ngw-feature-layer/FieldsWidget.js:120 view.py:219
+#: amd/ngw-feature-layer/FieldsWidget.js:120 nodepkg/attribute-editor/index.ts:8
+#: view.py:206
 msgid "Attributes"
 msgstr "Атрибуты"
-
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:76
-msgid "Please wait. Processing request..."
-msgstr "Пожалуйста подождите, идет обработка запроса..."
-
-#: amd/ngw-feature-layer/FeatureEditorWidget.js:104
-#: nodepkg/export-form/ExportForm.js:253
-msgid "Save"
-msgstr "Сохранить"
 
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:120
 msgid "N/A"
@@ -143,6 +35,10 @@ msgstr "АН"
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
+#: amd/ngw-feature-layer/FieldsWidget.js:160 view.py:47
+msgid "Feature table"
+msgstr "Таблица объектов"
+
 #: amd/ngw-feature-layer/FieldsWidget.js:232
 msgid "Add"
 msgstr "Добавить"
@@ -154,6 +50,74 @@ msgstr "Удалить"
 #: amd/ngw-feature-layer/GeometryInfoWidget.js:15
 msgid "Geometry"
 msgstr "Геометрия"
+
+#: api.py:94
+msgid "Output format is not provided."
+msgstr "Выходной формат не указан."
+
+#: api.py:96
+msgid "Format '%s' is not supported."
+msgstr "Формат '%s' не поддерживается."
+
+#: api.py:126 api.py:754
+msgid "Parameter 'intersects' geometry is not valid."
+msgstr "Параметр 'intersects' содержит невалидную геометрию."
+
+#: api.py:151
+msgid "The export limit is set to {limit} features, but the layer contains {count}."
+msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
+
+#: api.py:164
+msgid "Failed to reproject 'intersects' geometry."
+msgstr "Не удалось перепроецировать геометрию 'intersects'."
+
+#: api.py:311
+msgid "File name parameter '{}' is not valid."
+msgstr "Недопустимое имя файла '{}'."
+
+#: api.py:432 api.py:507
+msgid "Geometry format '%s' is not supported."
+msgstr "Формат геометрии '%s' не поддерживается."
+
+#: api.py:434
+msgid "Geometry is not valid."
+msgstr "Невалидная геометрия"
+
+#: api.py:440 api.py:512
+msgid "Date format '%s' is not supported."
+msgstr "Формат даты '%s' не поддерживается."
+
+#: api.py:638
+msgid "Unknown spatial reference system"
+msgstr "Неизвестная система координат"
+
+#: exception.py:12
+msgid "Feature not found"
+msgstr "Объект не найден"
+
+#: exception.py:13
+msgid "Feature with id = %d was not found in resource with id = %d."
+msgstr "Объект с id = %d не найден в ресурсе с id = %d."
+
+#: exception.py:14
+msgid "The feature may have been deleted or an error in the address."
+msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
+
+#: model.py:158
+msgid "Field not found (ID=%d)."
+msgstr "Поле не найдено (ID=%d)."
+
+#: model.py:168
+msgid "Field name is forbidden: '{}'. Please remove or rename it."
+msgstr "Недопустимое имя поля: '{}'. Пожалуйста удалите или переименуйте его."
+
+#: nodepkg/attribute-editor/AttributeEditor.tsx:48
+msgid "Set field value to NULL (No data)"
+msgstr "Установить для атрибута значение NULL (Нет данных)"
+
+#: nodepkg/attribute-editor/AttributeEditor.tsx:49
+msgid "There are no attributes in the vector layer"
+msgstr "В векторном слое нет атрибутов"
 
 #: nodepkg/export-form/ExportForm.js:143
 msgid "Resources"
@@ -195,6 +159,11 @@ msgstr "Текстовый фильтр"
 msgid "Zip archive"
 msgstr "Zip архив"
 
+#: nodepkg/export-form/ExportForm.js:253
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:28
+msgid "Save"
+msgstr "Сохранить"
+
 #: nodepkg/export-form/ExtentInput.js:6
 msgid "deg."
 msgstr "град."
@@ -215,81 +184,102 @@ msgstr "Право"
 msgid "Top"
 msgstr "Верх"
 
-#: nodepkg/feature-editor/AttributesForm.js:36
-msgid "Set field value to NULL (No data)"
-msgstr "Установить для атрибута значение NULL (Нет данных)"
+#: nodepkg/feature-editor/FeatureEditorStore.ts:21
+msgid "Feature saved"
+msgstr "Объект сохранен"
 
-#: nodepkg/feature-grid/FeatureGrid.js:26
+#: nodepkg/feature-editor/FeatureEditorStore.ts:22
+msgid "No changes to save"
+msgstr "Внесите изменения, чтобы сохранить их"
+
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:27
+msgid "Loading..."
+msgstr "Загрузка..."
+
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:29
+msgid "Reset"
+msgstr "Сбросить"
+
+#: nodepkg/feature-grid/FeatureGrid.tsx:51
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/feature-grid/FeatureGrid.js:27
+#: nodepkg/feature-grid/FeatureGrid.tsx:52
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGrid.js:28
+#: nodepkg/feature-grid/FeatureGrid.tsx:53
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGrid.js:29
+#: nodepkg/feature-grid/FeatureGrid.tsx:54
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/component/ExportAction.js:21
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:104 view.py:115
+#: view.py:198
+msgid "Save as"
+msgstr "Сохранить как"
+
+#: nodepkg/feature-grid/component/ExportAction.tsx:31
 msgid "Advanced Export"
 msgstr "Расширенный экспорт"
 
-#: nodepkg/feature-grid/component/ExportAction.js:22
+#: nodepkg/feature-grid/component/ExportAction.tsx:32
 msgid "Quick Export"
 msgstr "Быстрый экспорт"
 
-#: nodepkg/feature-grid/component/ExportAction.js:23
+#: nodepkg/feature-grid/component/ExportAction.tsx:33
 msgid "Filters are applied"
 msgstr "Применяются фильтры"
 
-#: nodepkg/geometry-info/GeometryInfo.js:60
+#: nodepkg/geometry-info/GeometryInfo.js:58
 msgid "Load geometry info..."
 msgstr "Загрузка информации..."
 
-#: nodepkg/geometry-info/GeometryInfo.js:70
+#: nodepkg/geometry-info/GeometryInfo.js:67
 msgid "Failed to get information about the geometry"
 msgstr "Не удалось получить информацию о геометрии"
 
-#: nodepkg/geometry-info/GeometryInfo.js:81
+#: nodepkg/geometry-info/GeometryInfo.js:77
 msgid "Perimeter"
 msgstr "Периметр"
 
-#: nodepkg/geometry-info/GeometryInfo.js:81
+#: nodepkg/geometry-info/GeometryInfo.js:78
 msgid "Length"
 msgstr "Длина"
 
-#: nodepkg/geometry-info/GeometryInfo.js:93
+#: nodepkg/geometry-info/GeometryInfo.js:86
 msgid "Area"
 msgstr "Площадь"
 
-#: nodepkg/geometry-info/GeometryInfo.js:107
+#: nodepkg/geometry-info/GeometryInfo.js:94
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: nodepkg/geometry-info/GeometryInfo.js:117
+#: nodepkg/geometry-info/GeometryInfo.js:102
 msgid "Extent (xMin)"
 msgstr "Охват (xMin)"
 
-#: nodepkg/geometry-info/GeometryInfo.js:125
+#: nodepkg/geometry-info/GeometryInfo.js:106
 msgid "Extent (yMin)"
 msgstr "Охват (yMin)"
 
-#: nodepkg/geometry-info/GeometryInfo.js:133
+#: nodepkg/geometry-info/GeometryInfo.js:110
 msgid "Extent (xMax)"
 msgstr "Охват (xMax)"
 
-#: nodepkg/geometry-info/GeometryInfo.js:141
+#: nodepkg/geometry-info/GeometryInfo.js:114
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
 #: template/resource_section_fields.mako:17
 msgid "Lookup table"
 msgstr "Справочник"
+
+#: template/resource_section_fields.mako:19 view.py:190
+msgid "Table"
+msgstr "Таблица"
 
 #: template/resource_section_fields.mako:30
 #: template/resource_section_fields.mako:36
@@ -301,18 +291,26 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/feature-editor/FeatureEditorStore.ts:21
-msgid "Feature saved"
-msgstr "Объект сохранен"
+#: view.py:69 view.py:84
+msgid "Feature #%d"
+msgstr "Объект #%d"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:25
-msgid "Loading..."
-msgstr "Загрузка..."
+#: view.py:123
+msgid "MVT Vector Tiles"
+msgstr "Векторные тайлы MVT"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:29
-msgid "Reset"
-msgstr "Сбросить"
+#: view.py:124
+msgid ""
+"The Mapbox Vector Tile is an efficient encoding for map data into vector "
+"tiles that can be rendered dynamically."
+msgstr ""
+"Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
+"тайлы которые могут быть динамически отрисованы."
 
-#: nodepkg/feature-editor/FeatureEditorStore.ts:22
-msgid "No changes to save"
-msgstr "Внесите изменения, чтобы сохранить их"
+#: view.py:185
+msgid "Features"
+msgstr "Объекты"
+
+#~ msgid "Please wait. Processing request..."
+#~ msgstr "Пожалуйста подождите, идет обработка запроса..."
+

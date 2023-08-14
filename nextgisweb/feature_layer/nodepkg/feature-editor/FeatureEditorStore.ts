@@ -28,8 +28,8 @@ export class FeatureEditorStore {
     saving = false;
 
     initLoading = false;
+    fields: FeatureLayerField[] = [];
 
-    private _resourceItem?: ResourceItem;
     private _featureItem?: FeatureItem;
 
     _abortController = new AbortControllerHelper();
@@ -49,14 +49,6 @@ export class FeatureEditorStore {
         makeAutoObservable(this, { _abortController: false, route: false });
 
         this._initialize();
-    }
-
-    get fields(): FeatureLayerField[] {
-        const fields =
-            this._resourceItem &&
-            this._resourceItem.feature_layer &&
-            this._resourceItem.feature_layer.fields;
-        return fields ?? [];
     }
 
     get route() {
@@ -90,7 +82,11 @@ export class FeatureEditorStore {
                 signal,
             });
             runInAction(() => {
-                this._resourceItem = resp;
+                const fields =
+                    resp && resp.feature_layer && resp.feature_layer.fields;
+                if (fields) {
+                    this.fields = fields;
+                }
             });
             if (this.featureId !== undefined) {
                 const featureItem = await this.route.get<FeatureItem>({
