@@ -36,6 +36,7 @@ class ViewMeta(MetaPredicateBase):
     func: Callable
     context: Type
     deprecated: bool
+    openapi: bool
     param_types: Dict[str, Tuple[type, Any]]
     body_type: Optional[type]
     return_type: Optional[type]

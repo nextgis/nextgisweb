@@ -91,7 +91,7 @@ def openapi(introspector, prefix="/api/"):
 
         # Operations
         for view in route.views:
-            if type(view.method) != str:
+            if type(view.method) != str or not view.openapi:
                 continue
 
             o_params, o_param = _pfact("query", style="form", explode=False)

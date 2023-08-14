@@ -2,10 +2,11 @@ from .util import push_stacklevel
 
 
 class RouteHelper:
-    def __init__(self, name, config, *, deprecated=False):
+    def __init__(self, name, config, *, deprecated, openapi):
         self.config = config
         self.name = name
         self.deprecated = deprecated
+        self.openapi = openapi
 
     def add_view(self, view=None, **kwargs):
         push_stacklevel(kwargs, True)
@@ -14,7 +15,8 @@ class RouteHelper:
             kwargs["route_name"] = self.name
 
         deprecated = kwargs.pop("deprecated", self.deprecated)
-        self.config.add_view(view=view, deprecated=deprecated, **kwargs)
+        openapi = kwargs.pop("openapi", self.openapi)
+        self.config.add_view(view=view, deprecated=deprecated, openapi=openapi, **kwargs)
 
         return self
 

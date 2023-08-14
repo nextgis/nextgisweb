@@ -9,13 +9,7 @@ from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
 
 from nextgisweb.env.package import pkginfo
-from nextgisweb.lib.apitype import (
-    ContentType,
-    JSONType,
-    is_optional,
-    iter_anyof,
-    param_decoder,
-)
+from nextgisweb.lib.apitype import ContentType, JSONType, is_optional, iter_anyof, param_decoder
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 
@@ -23,12 +17,7 @@ from nextgisweb.core.exception import ValidationError
 
 from .helper import RouteHelper
 from .inspect import iter_routes
-from .predicate import (
-    ErrorRendererPredicate,
-    RequestMethodPredicate,
-    RouteMeta,
-    ViewMeta,
-)
+from .predicate import ErrorRendererPredicate, RequestMethodPredicate, RouteMeta, ViewMeta
 from .util import ROUTE_PATTERN, ROUTE_RE, is_json_type, push_stacklevel
 
 
@@ -139,7 +128,7 @@ class Configurator(PyramidConfigurator):
         self.add_route_predicate("error_renderer", ErrorRendererPredicate)
         return super().add_default_route_predicates()
 
-    def add_route(self, name, pattern=None, deprecated=False, **kwargs) -> RouteHelper:
+    def add_route(self, name, pattern=None, deprecated=False, openapi=True, **kwargs) -> RouteHelper:
         stacklevel = push_stacklevel(kwargs, False, True)
         component = pkginfo.component_by_module(module_from_stack(stacklevel - 1))
 
@@ -206,16 +195,16 @@ class Configurator(PyramidConfigurator):
                 mdtypes=mdtypes,
             )
 
-        helper = RouteHelper(name, self, deprecated=deprecated)
+        helper = RouteHelper(name, self, deprecated=deprecated, openapi=openapi)
 
         for m in ("head", "get", "post", "put", "delete", "options", "patch"):
             if v := kwargs.pop(m, None):
-                 getattr(helper, m)(v, stacklevel=stacklevel)
+                getattr(helper, m)(v, stacklevel=stacklevel)
 
         super().add_route(name, pattern=pattern, **kwargs)
         return helper
 
-    def add_view(self, view=None, *, deprecated=False, **kwargs):
+    def add_view(self, view=None, *, deprecated=False, openapi=True, **kwargs):
         stacklevel = push_stacklevel(kwargs, False, True)
         component = pkginfo.component_by_module(module_from_stack(stacklevel - 1))
 
@@ -309,6 +298,7 @@ class Configurator(PyramidConfigurator):
                 func=view,
                 context=kwargs.get("context"),
                 deprecated=deprecated,
+                openapi=openapi,
                 component=component,
                 param_types=param_types,
                 body_type=body_type,

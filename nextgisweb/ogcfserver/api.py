@@ -78,12 +78,8 @@ def feature_to_ogc(feature):
     )
 
 
-def conformance(request) -> JSONType:
-    request.resource_permission(ServiceScope.connect)
-    return dict(conformsTo=CONFORMANCE)
-
-
 def landing_page(resource, request) -> JSONType:
+    """OGC API Features endpoint"""
     request.resource_permission(ServiceScope.connect)
 
     def route_url(rname):
@@ -119,6 +115,11 @@ def landing_page(resource, request) -> JSONType:
             }
         ],
     )
+
+
+def conformance(request) -> JSONType:
+    request.resource_permission(ServiceScope.connect)
+    return dict(conformsTo=CONFORMANCE)
 
 
 def collections(resource, request) -> JSONType:
@@ -550,38 +551,43 @@ def openapi(resource, request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        "ogcfserver.openapi",
-        "/api/resource/{id:uint}/ogcf/openapi",
-        factory=resource_factory,
-    ).get(openapi, context=Service)
-
-    config.add_route(
         "ogcfserver.landing_page", "/api/resource/{id:uint}/ogcf",
         factory=resource_factory,
     ).get(landing_page, context=Service)
 
     config.add_route(
+        "ogcfserver.openapi",
+        "/api/resource/{id:uint}/ogcf/openapi",
+        factory=resource_factory,
+        openapi=False,
+    ).get(openapi, context=Service)
+
+    config.add_route(
         "ogcfserver.conformance",
         "/api/resource/{id:uint}/ogcf/conformance",
         factory=resource_factory,
+        openapi=False,
     ).get(conformance, context=Service)
 
     config.add_route(
         "ogcfserver.collections",
         "/api/resource/{id:uint}/ogcf/collections",
-        factory=resource_factory
+        factory=resource_factory,
+        openapi=False,
     ).get(collections, context=Service)
 
     config.add_route(
         "ogcfserver.collection",
         "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}",
         factory=resource_factory,
+        openapi=False,
     ).get(collection, context=Service)
 
     config.add_route(
         "ogcfserver.items",
         "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}/items",
         factory=resource_factory,
+        openapi=False,
     ) \
         .get(items, context=Service) \
         .post(create, context=Service) \
@@ -591,6 +597,7 @@ def setup_pyramid(comp, config):
         "ogcfserver.item",
         "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}/items/{item_id:int}",
         factory=resource_factory,
+        openapi=False,
     ) \
         .get(iget, context=Service) \
         .put(iput, context=Service) \
