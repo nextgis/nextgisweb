@@ -1,7 +1,7 @@
 from typing import Union, get_args, get_origin
 
 from msgspec.inspect import Metadata, type_info
-from typing_extensions import _AnnotatedAlias
+from typing_extensions import Annotated, _AnnotatedAlias
 
 NoneType = type(None)
 
@@ -11,6 +11,18 @@ def deannotated(tdef):
     if origin is not None and type(tdef) is _AnnotatedAlias:
         return origin
     return tdef
+
+
+def expannotated(tdef):
+    if type(tdef) is _AnnotatedAlias:
+        return get_origin(tdef), getattr(tdef, "__metadata__")
+    return tdef, ()
+
+
+def mkannotated(tdef, annotations):
+    if len(annotations) == 0:
+        return tdef
+    return Annotated[(tdef,) + tuple(annotations)]  # type: ignore
 
 
 def is_optional(tdef):
