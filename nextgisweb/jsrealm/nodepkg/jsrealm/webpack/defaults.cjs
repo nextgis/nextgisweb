@@ -6,7 +6,7 @@ const plugins = require("./plugins.cjs");
 
 const defaults = {
     mode: debug ? "development" : "production",
-    devtool: debug ? "source-map" : undefined,
+    devtool: "source-map",
     stats: {
         assets: false,
         modules: false,
