@@ -1,6 +1,6 @@
 import { Upload, isSupported } from "tus-js-client";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import settings from "@nextgisweb/pyramid/settings!file_upload";
+import { chunkSize } from "@nextgisweb/pyramid/settings!file_upload";
 
 import type { FileMeta, FileUploaderOptions } from "../type";
 
@@ -60,7 +60,7 @@ async function tusUpload({
             const uploader = new Upload(file, {
                 endpoint: routeURL("file_upload.collection"),
                 storeFingerprintForResuming: false,
-                chunkSize: settings.tus.chunk_size.default,
+                chunkSize: chunkSize,
                 metadata: { name: file.name },
                 onProgress: (bytesUploaded) => {
                     if (onProgress) {
@@ -115,7 +115,7 @@ async function tusUpload({
 export function fileUploader(
     options: FileUploaderOptions
 ): Promise<FileMeta[]> {
-    if (settings.tus.enabled && isSupported) {
+    if (isSupported) {
         return tusUpload(options);
     } else {
         return upload(options);

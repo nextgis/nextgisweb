@@ -27,3 +27,11 @@ msgstr "Стоп"
 msgid "Upload"
 msgstr "Загрузить"
 
+#: nodepkg/file-uploader/hook/useFileUploader.ts:18
+msgid "{} uploaded..."
+msgstr "{} загружено..."
+
+#: nodepkg/image-uploader/ImageUploader.tsx:18
+msgid "Delete"
+msgstr "Удалить"
+

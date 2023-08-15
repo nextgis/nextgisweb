@@ -1,6 +1,5 @@
 from subprocess import check_call, check_output
 
-import pytest
 import webtest
 
 TEST_FILENAME = 'file.ext'
@@ -8,22 +7,6 @@ TEST_CONTENT = 'content'.encode('utf-8')
 
 TEST_FILENAME2 = 'file2.ext'
 TEST_CONTENT2 = 'content2'.encode('utf-8')
-
-
-@pytest.fixture(scope='module', autouse=True)
-def tus_enable(ngw_env):
-    value = ngw_env.file_upload.tus_enabled
-    ngw_env.file_upload.tus_enabled = True
-    yield
-    ngw_env.file_upload.tus_enabled = value
-
-
-@pytest.fixture()
-def tus_disable(ngw_env):
-    value = ngw_env.file_upload.tus_enabled
-    ngw_env.file_upload.tus_enabled = False
-    yield
-    ngw_env.file_upload.tus_enabled = value
 
 
 def test_options(ngw_env, ngw_webtest_app):

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type {
     FileUploaderOptions,
@@ -11,11 +12,9 @@ import type {
 } from "../type";
 import { fileUploader } from "../util/fileUploader";
 
-import i18n from "@nextgisweb/pyramid/i18n";
-
 import type { UploadFile } from "antd/lib/upload/interface";
 
-const mProgress = i18n.gettext(" uploaded...");
+const mProgress = gettext("{} uploaded...");
 
 export function useFileUploader({
     accept,
@@ -54,7 +53,7 @@ export function useFileUploader({
     const onProgress = useCallback(
         (evt) => {
             if (evt.type === "progress") {
-                setProgressText(evt.percent + mProgress);
+                setProgressText(mProgress.replace("{}", evt.percent));
                 if (showProgressInDocTitle) {
                     document.title = evt.percent + " | " + docTitle;
                 }

@@ -8,17 +8,17 @@ import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { useFileUploader } from "./hook/useFileUploader";
 import { FileUploaderProps } from "./type";
 
-import i18n from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!file_upload";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { maxSize } from "@nextgisweb/pyramid/settings!file_upload";
 
 import "./FileUploader.less";
 
 const { Dragger } = Upload;
 
-const mUpload = i18n.gettext("Select a file");
-const mDragAndDrop = i18n.gettext("or drag and drop here");
-const mMaxSize = formatSize(settings.max_size) + " " + i18n.gettext("max");
-const mStop = i18n.gettext("Stop");
+const mUpload = gettext("Select a file");
+const mDragAndDrop = gettext("or drag and drop here");
+const mMaxSize = formatSize(maxSize) + " " + gettext("max");
+const mStop = gettext("Stop");
 
 export function FileUploader({
     accept,

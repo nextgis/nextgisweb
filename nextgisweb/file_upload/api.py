@@ -33,11 +33,10 @@ def collection(request):
 
     if method == 'OPTIONS':
         headers = {}
-        if comp.tus_enabled:
-            headers['Tus-Resumable'] = '1.0.0'
-            headers['Tus-Version'] = '1.0.0'
-            headers['Tus-Extension'] = 'creation,termination'
-            headers['Tus-Max-Size'] = str(comp.max_size)
+        headers['Tus-Resumable'] = '1.0.0'
+        headers['Tus-Version'] = '1.0.0'
+        headers['Tus-Extension'] = 'creation,termination'
+        headers['Tus-Max-Size'] = str(comp.max_size)
         return Response(status=200, headers=headers)
 
     tus = _tus_resumable_header(request)
@@ -263,11 +262,6 @@ def _item_patch_tus(request):
     # Don't upload more than declared file size.
     if upload_offset + request.content_length > size:
         raise UploadedFileTooLarge()
-
-    # Check minimum chunk size to prevent misconfiguration
-    remain = size - upload_offset
-    if request.content_length < min(remain, comp.tus_chunk_size_minimum):
-        raise exc.HTTPBadRequest()
 
     with open(fnd, 'ab') as fd:
         # Check for upload conflict
