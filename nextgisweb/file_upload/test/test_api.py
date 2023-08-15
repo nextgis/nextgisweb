@@ -67,7 +67,7 @@ def test_tus_method(ngw_webtest_app):
     assert get.json['size'] == len(TEST_CONTENT)
     assert get.json['name'] == 'test'
 
-    ngw_webtest_app.delete(location, status=200)
+    ngw_webtest_app.delete(location, status=204)
     ngw_webtest_app.delete(location, status=404)
 
 
