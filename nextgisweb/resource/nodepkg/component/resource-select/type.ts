@@ -12,3 +12,4 @@ export interface ResourceSelectProps<V extends SelectValue = SelectValue>
     onChange?: (val: V | undefined) => void;
     value?: V;
 }
+

@@ -6,7 +6,7 @@ import usePickerModal from "./hook/usePickerModal";
 
 import type { ResourcePickerModalProps, SelectValue } from "./type";
 
-export function ResourcePickerModal({
+export function ResourcePickerModal<V extends SelectValue = SelectValue>({
     open: open_,
     visible: visible_,
     store,
@@ -16,7 +16,7 @@ export function ResourcePickerModal({
     cardOptions = {},
     height: height_,
     ...rest
-}: ResourcePickerModalProps) {
+}: ResourcePickerModalProps<V>) {
     const [open, setOpen] = useState(open_ ?? visible_ ?? true);
 
     const { modalProps, cardProps } = usePickerModal({
@@ -27,7 +27,7 @@ export function ResourcePickerModal({
 
     const close = () => setOpen(false);
 
-    const onPick = (resource: SelectValue) => {
+    const onPick = (resource: V) => {
         if (onSelect) {
             onSelect(resource);
         }

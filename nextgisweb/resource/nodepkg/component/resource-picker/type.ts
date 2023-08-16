@@ -25,14 +25,14 @@ export interface ResourcePickerBreadcrumbProps {
     maxBreadcrumbItems?: number;
 }
 
-export interface ResourcePickerChildrenProps {
+export interface ResourcePickerChildrenProps<V extends SelectValue = SelectValue> {
     resourceStore: ResourcePickerStore;
-    onOk?: (val: number | number[]) => void;
+    onOk?: (val: V) => void;
 }
 
-export interface ResourcePickerFooterProps {
+export interface ResourcePickerFooterProps<V extends SelectValue = SelectValue> {
     resourceStore: ResourcePickerStore;
-    onOk?: (val: SelectValue) => void;
+    onOk?: (val: V) => void;
 }
 
 export type OnNewGroupType = (resource: ResourceItem) => void;
@@ -59,11 +59,11 @@ export interface ResourcePickerStoreOptions {
     onTraverse?: (parentId: number) => void;
 }
 
-export interface ResourcePickerCardProps {
+export interface ResourcePickerCardProps<V extends SelectValue = SelectValue> {
     pickerOptions?: ResourcePickerStoreOptions;
     cardOptions?: CardProps;
     showClose?: boolean;
-    onSelect?: (res: SelectValue) => void;
+    onSelect?: (res: V) => void;
     onClose?: () => void;
     store?: ResourcePickerStore;
 }
@@ -75,12 +75,12 @@ export interface UsePickerModalProps {
     cardFooterHeight?: number;
 }
 
-export interface ResourcePickerModalProps extends UsePickerModalProps {
+export interface ResourcePickerModalProps<V extends SelectValue = SelectValue> extends UsePickerModalProps {
     open?: boolean;
     /**@deprecated use open instead */
     visible?: boolean;
     store?: ResourcePickerStore;
-    onSelect?: (val: SelectValue) => void;
+    onSelect?: (val: V) => void;
     closeOnSelect?: boolean;
     pickerOptions?: ResourcePickerStoreOptions;
 }

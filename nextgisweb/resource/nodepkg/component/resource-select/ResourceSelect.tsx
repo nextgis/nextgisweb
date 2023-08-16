@@ -22,16 +22,16 @@ interface Option {
     cls: ResourceClass;
 }
 
-export const ResourceSelect = ({
+export const ResourceSelect = <V extends SelectValue = SelectValue>({
     value,
     onChange,
     pickerOptions,
     ...selectOptions
-}: ResourceSelectProps) => {
-    const pickerModal = useRef<ReturnType<typeof showResourcePicker>>();
+}: ResourceSelectProps<V>) => {
+    const pickerModal = useRef<ReturnType<typeof showResourcePicker<V>>>();
 
     const { makeSignal, abort } = useAbortController();
-    const [value_, setValue_] = useState(value);
+    const [value_, setValue_] = useState<V | undefined>(value);
     const [open, setOpen] = useState(false);
     const pickerParentIdMem = useRef<number | undefined>(
         pickerOptions ? pickerOptions.parentId : undefined
@@ -67,7 +67,7 @@ export const ResourceSelect = ({
     }, [value_, abort, makeSignal]);
 
     const onPick = useCallback(
-        (val: SelectValue | undefined) => {
+        (val: V | undefined) => {
             setValue_(val);
             setOpen(false);
             if (onChange) {
@@ -97,7 +97,11 @@ export const ResourceSelect = ({
             };
             pickerModal.current = showResourcePicker({
                 pickerOptions: pickerOptions_,
-                onSelect: onPick,
+                onSelect: (v) => {
+                    if (v) {
+                        onPick(v);
+                    }
+                },
             });
         }
         return closePicker;

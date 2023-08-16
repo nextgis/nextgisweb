@@ -6,7 +6,7 @@ import { ResourcePickerStore } from "./store/ResourcePickerStore";
 import { ResourcePickerFooter } from "./ResourcePickerFooter";
 import { ResourcePickerTitle } from "./ResourcePickerTitle";
 
-import type { ResourcePickerCardProps } from "./type";
+import type { ResourcePickerCardProps, SelectValue } from "./type";
 
 import "./ResourcePickerCard.less";
 
@@ -19,14 +19,14 @@ const defaultBodyStyle = {
     overflow: "auto",
 };
 
-export function ResourcePickerCard({
+export function ResourcePickerCard<V extends SelectValue = SelectValue>({
     pickerOptions = {},
     cardOptions = {},
     showClose,
     onSelect,
     onClose,
     store,
-}: ResourcePickerCardProps) {
+}: ResourcePickerCardProps<V>) {
     const style = cardOptions.style || defaultStyle;
     const bodyStyle = cardOptions.bodyStyle || defaultBodyStyle;
 
@@ -34,7 +34,7 @@ export function ResourcePickerCard({
         () => store || new ResourcePickerStore(pickerOptions)
     );
 
-    const onOk_ = (resource: number | number[]) => {
+    const onOk_ = (resource: V) => {
         if (onSelect) {
             onSelect(resource);
         }

@@ -15,17 +15,17 @@ import usePickerCard from "./hook/usePickerCard";
 import type { InputRef } from "antd/lib/input/Input";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import type { ResourcePickerStore } from "./store/ResourcePickerStore";
-import type { ResourcePickerFooterProps } from "./type";
+import type { ResourcePickerFooterProps, SelectValue } from "./type";
 
 interface CreateControlProps {
     resourceStore: ResourcePickerStore;
     setCreateMode?: (val: boolean) => void;
 }
 
-interface MoveControlProps {
+interface MoveControlProps<V extends SelectValue = SelectValue> {
     resourceStore: ResourcePickerStore;
     setCreateMode?: (val: boolean) => void;
-    onOk?: (val: number | number[]) => void;
+    onOk?: (val: V) => void;
 }
 
 const mCreateGroup = i18n.gettext("Create group");
@@ -99,128 +99,138 @@ const CreateControl = observer(
     }
 );
 
-const MoveControl = observer(
-    ({ setCreateMode, resourceStore, onOk }: MoveControlProps) => {
-        const {
-            selected,
-            parentId,
-            multiple,
-            parentItem,
-            getThisMsg,
-            getSelectedMsg,
-            getResourceClasses,
-            disableResourceIds,
-            allowCreateResource,
-            createNewGroupLoading,
-        } = resourceStore;
+const MoveControlInner = <V extends SelectValue = SelectValue>({
+    setCreateMode,
+    resourceStore,
+    onOk,
+}: MoveControlProps<V>) => {
+    const {
+        selected,
+        parentId,
+        multiple,
+        parentItem,
+        getThisMsg,
+        getSelectedMsg,
+        getResourceClasses,
+        disableResourceIds,
+        allowCreateResource,
+        createNewGroupLoading,
+    } = resourceStore;
 
-        const { getCheckboxProps } = usePickerCard({ resourceStore });
+    const { getCheckboxProps } = usePickerCard({ resourceStore });
 
-        const pickThisGroupAllowed = useMemo(() => {
-            if (parentItem) {
-                const { disabled } = getCheckboxProps(parentItem.resource);
-                return !disabled;
-            }
-            return false;
-        }, [getCheckboxProps, parentItem]);
+    const pickThisGroupAllowed = useMemo(() => {
+        if (parentItem) {
+            const { disabled } = getCheckboxProps(parentItem.resource);
+            return !disabled;
+        }
+        return false;
+    }, [getCheckboxProps, parentItem]);
 
-        const possibleToCreate = useMemo(() => {
-            if (parentItem) {
-                return getResourceClasses([parentItem.resource.cls]).includes(
-                    "resource_group"
-                );
-            }
-            return false;
-        }, [getResourceClasses, parentItem]);
-
-        const onCreateClick = () => {
-            resourceStore.clearSelection();
-            if (setCreateMode) {
-                setCreateMode(true);
-            }
-        };
-
-        // eslint-disable-next-line react/prop-types
-        const OkBtn = ({ disabled }: { disabled?: boolean }) => {
-            return (
-                <Button
-                    type="primary"
-                    disabled={disabled ?? !selected.length}
-                    onClick={() => {
-                        if (onOk) {
-                            onOk(multiple ? selected : selected[0]);
-                        }
-                    }}
-                >
-                    {getSelectedMsg}
-                </Button>
+    const possibleToCreate = useMemo(() => {
+        if (parentItem) {
+            return getResourceClasses([parentItem.resource.cls]).includes(
+                "resource_group"
             );
-        };
+        }
+        return false;
+    }, [getResourceClasses, parentItem]);
 
+    const onCreateClick = () => {
+        resourceStore.clearSelection();
+        if (setCreateMode) {
+            setCreateMode(true);
+        }
+    };
+
+    const OkBtn = ({ disabled }: { disabled?: boolean }) => {
         return (
-            <Row justify="space-between">
-                <Col>
-                    {allowCreateResource &&
-                        possibleToCreate &&
-                        !createNewGroupLoading && (
-                            <Tooltip title={mCreateGroup}>
-                                <a
-                                    style={{ fontSize: "1.5rem" }}
-                                    onClick={onCreateClick}
-                                >
-                                    <CreateNewFolder />
-                                </a>
-                            </Tooltip>
-                        )}
-                </Col>
-                <Col>
-                    {selected.length ? (
-                        <Space>
-                            <Tooltip title={mClearSelection}>
-                                <Button
-                                    icon={<HighlightOff />}
-                                    onClick={() => {
-                                        resourceStore.clearSelection();
-                                    }}
-                                ></Button>
-                            </Tooltip>
-                            <OkBtn />
-                        </Space>
-                    ) : pickThisGroupAllowed ? (
-                        <Button
-                            type="primary"
-                            onClick={() => {
-                                if (onOk) {
-                                    onOk(parentId);
-                                }
-                            }}
-                            disabled={disableResourceIds.includes(parentId)}
-                        >
-                            {getThisMsg}
-                        </Button>
-                    ) : (
-                        <OkBtn disabled={true}></OkBtn>
+            <Button
+                type="primary"
+                disabled={disabled ?? !selected.length}
+                onClick={() => {
+                    if (onOk) {
+                        onOk((multiple ? selected : selected[0]) as V);
+                    }
+                }}
+            >
+                {getSelectedMsg}
+            </Button>
+        );
+    };
+
+    return (
+        <Row justify="space-between">
+            <Col>
+                {allowCreateResource &&
+                    possibleToCreate &&
+                    !createNewGroupLoading && (
+                        <Tooltip title={mCreateGroup}>
+                            <a
+                                style={{ fontSize: "1.5rem" }}
+                                onClick={onCreateClick}
+                            >
+                                <CreateNewFolder />
+                            </a>
+                        </Tooltip>
                     )}
-                </Col>
-            </Row>
-        );
-    }
-);
-
-export const ResourcePickerFooter = observer(
-    ({ resourceStore, onOk, ...props }: ResourcePickerFooterProps) => {
-        const [createMode, setCreateMode] = useState(false);
-
-        return (
-            <>
-                {createMode ? (
-                    <CreateControl {...{ resourceStore, setCreateMode }} />
+            </Col>
+            <Col>
+                {selected.length ? (
+                    <Space>
+                        <Tooltip title={mClearSelection}>
+                            <Button
+                                icon={<HighlightOff />}
+                                onClick={() => {
+                                    resourceStore.clearSelection();
+                                }}
+                            ></Button>
+                        </Tooltip>
+                        <OkBtn />
+                    </Space>
+                ) : pickThisGroupAllowed ? (
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            if (onOk) {
+                                const toSelect = multiple
+                                    ? [parentId]
+                                    : parentId;
+                                onOk(toSelect as V);
+                            }
+                        }}
+                        disabled={disableResourceIds.includes(parentId)}
+                    >
+                        {getThisMsg}
+                    </Button>
                 ) : (
-                    <MoveControl
-                        {...{ resourceStore, setCreateMode, onOk, ...props }}
-                    />
+                    <OkBtn disabled={true}></OkBtn>
                 )}
-            </>
-        );
-    }
-);
+            </Col>
+        </Row>
+    );
+};
+
+const MoveControl = observer(MoveControlInner);
+
+const ResourcePickerFooterInner = <V extends SelectValue = SelectValue>({
+    resourceStore,
+    onOk,
+    ...props
+}: ResourcePickerFooterProps<V>) => {
+    const [createMode, setCreateMode] = useState(false);
+
+    return (
+        <>
+            {createMode ? (
+                <CreateControl {...{ resourceStore, setCreateMode }} />
+            ) : (
+                <MoveControl
+                    {...{ resourceStore, setCreateMode, onOk, ...props }}
+                />
+            )}
+        </>
+    );
+};
+
+export const ResourcePickerFooter = observer(ResourcePickerFooterInner);

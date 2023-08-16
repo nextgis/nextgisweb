@@ -1,6 +1,5 @@
-import PropTypes from "prop-types";
-
 import { useCallback, useEffect, useMemo, useState } from "react";
+import uniq from "lodash-es/uniq";
 
 import { Button, Input, Space, Table } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -11,20 +10,25 @@ import { ResourcePickerStore, showResourcePicker } from "../resource-picker";
 import DeleteIcon from "@material-icons/svg/delete";
 import ManageSearchIcon from "@material-icons/svg/manage_search";
 
+import type { ParamsOf } from "@nextgisweb/gui/type";
+import type { Resource, ResourceItem } from "../../type";
+import type { ResourceSelectProps } from "./type";
+import type { SelectValue } from "../resource-picker/type";
+
+type TableProps = ParamsOf<typeof Table>;
+type ColumnParams = NonNullable<TableProps["columns"]>
+type RowSelection = NonNullable<TableProps["rowSelection"]>
+
 const ResourceSelectMultiple = ({
     value: initResourceIds = [],
     onChange,
     pickerOptions = {},
-}) => {
+}: ResourceSelectProps<number[]>) => {
     const { makeSignal, abort } = useAbortController();
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    const [ids, setIds] = useState(
-        // Remove duplicates
-        [...new Set(initResourceIds)]
-    );
-    const [resources, setResources] = useState([]);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
+    const [ids, setIds] = useState(() => uniq(initResourceIds));
+    const [resources, setResources] = useState<Resource[]>([]);
     const [loading, setLoading] = useState(false);
-    const [total] = useState(20);
 
     const [store] = useState(
         () =>
@@ -34,13 +38,9 @@ const ResourceSelectMultiple = ({
             })
     );
 
-    const bottom = useMemo(() => {
-        return resources.length > total ? "bottomCenter " : "none";
-    }, [resources, total]);
-
-    const onSelect = (addIds) => {
+    const onSelect = (addIds: SelectValue) => {
         const newIds = [...ids];
-        for (const addId of addIds) {
+        for (const addId of [addIds].flat()) {
             if (!newIds.includes(addId)) {
                 newIds.push(addId);
             }
@@ -53,40 +53,40 @@ const ResourceSelectMultiple = ({
         abort();
         setLoading(true);
 
-        const promises = [];
+        const promises: Promise<ResourceItem>[] = [];
         const getOpt = {
             cache: true,
             signal: makeSignal(),
         };
         for (const id of ids) {
-            const promise = Promise.all([
-                route("resource.item", id).get(getOpt),
-            ]);
+            const promise = route("resource.item", id).get<ResourceItem>(
+                getOpt
+            );
             promises.push(promise);
         }
         try {
             const resp = await Promise.all(promises);
             const resources_ = resp.map((r) => {
-                const res = r[0].resource;
-                delete res.children;
+                const res = r.resource;
                 return res;
             });
-            setResources(
-                resources_.filter((r) => store.checkEnabled.call(store, r))
+            const enabledResources = resources_.filter((r) =>
+                store.checkEnabled(r)
             );
+            setResources(enabledResources);
         } finally {
             setLoading(false);
         }
     }, [ids, abort, makeSignal, store]);
 
-    const columns = [
+    const columns: ColumnParams = [
         {
             title: "Name",
             dataIndex: "display_name",
             render: (text, row) => {
                 return (
                     <a
-                        href={routeURL("resource.show", row.id)}
+                        href={routeURL("resource.show", (row as Resource).id)}
                         onClick={(evt) => evt.stopPropagation()}
                         target="_blank"
                         rel="noreferrer"
@@ -98,13 +98,8 @@ const ResourceSelectMultiple = ({
         },
     ];
 
-    const onSelectChange = (newSelectedRowKeys) => {
-        setSelectedRowKeys(newSelectedRowKeys);
-    };
-
     const onClick = () => {
         store.disableResourceIds = ids;
-        // store.selected = ids;
         showResourcePicker({
             pickerOptions,
             store,
@@ -121,9 +116,11 @@ const ResourceSelectMultiple = ({
         });
     };
 
-    const rowSelection = {
+    const rowSelection: RowSelection = {
         selectedRowKeys,
-        onChange: onSelectChange,
+        onChange: (newSelectedRowKeys) => {
+            setSelectedRowKeys(newSelectedRowKeys.map(Number));
+        },
     };
 
     useEffect(() => {
@@ -148,12 +145,13 @@ const ResourceSelectMultiple = ({
                 </div>
                 <Table
                     rowKey="id"
+                    expandable={{childrenColumnName: "children_"}}
                     rowSelection={rowSelection}
                     dataSource={resources}
                     columns={columns}
                     showHeader={false}
                     loading={loading}
-                    pagination={{ position: ["none", bottom], total }}
+                    pagination={false}
                 />
             </div>
         </Input.Group>
@@ -161,9 +159,3 @@ const ResourceSelectMultiple = ({
 };
 
 export { ResourceSelectMultiple };
-
-ResourceSelectMultiple.propTypes = {
-    onChange: PropTypes.func,
-    value: PropTypes.any,
-    pickerOptions: PropTypes.object,
-};
