@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { Form, Input, InputNumber } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
@@ -11,9 +10,20 @@ const parts = [
     { key: "maxy", label: i18n.gettext("Top"), min: -90, max: 90 },
 ];
 
-const Widget = ({ value, onChange }) => {
+type Extent = (null | number)[]
+
+interface ExtentInputProps {
+    value?: Extent;
+    onChange?: (val: Extent) => void;
+}
+
+const Widget = ({ value, onChange }: ExtentInputProps) => {
     const [values, setValues] = useState(value ? value : parts.map(() => null));
-    useEffect(() => onChange(values), [values, onChange]);
+    useEffect(() => {
+        if (onChange) {
+            onChange(values);
+        }
+    }, [values, onChange]);
 
     return (
         <Input.Group style={{ display: "flex", columnGap: "1em" }}>
@@ -33,11 +43,6 @@ const Widget = ({ value, onChange }) => {
             ))}
         </Input.Group>
     );
-};
-
-Widget.propTypes = {
-    onChange: PropTypes.func,
-    value: PropTypes.any,
 };
 
 export function ExtentInput({ ...props }) {

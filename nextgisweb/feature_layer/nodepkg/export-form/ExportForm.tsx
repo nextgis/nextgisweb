@@ -1,5 +1,3 @@
-import PropTypes from "prop-types";
-
 import { useEffect, useState, useCallback, useMemo } from "react";
 
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
@@ -9,6 +7,7 @@ import {
     Checkbox,
     FieldsForm,
     Form,
+    type FormField,
     Select,
 } from "@nextgisweb/gui/fields-form";
 import { ResourceSelectMultiple } from "@nextgisweb/resource/field/ResourceSelectMultiple";
@@ -22,18 +21,35 @@ import settings from "@nextgisweb/pyramid/settings!feature_layer";
 import { ExtentInput } from "./ExtentInput";
 import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
 
+import type { ApiError } from "@nextgisweb/gui/error/type";
+import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
+import type { SpatialReferenceSystem } from "@nextgisweb/spatial-ref-sys/type";
+import type { FeatureLayerField } from "../type";
+
+interface ExportFormProps {
+    id: number;
+    pick: boolean;
+    multiple?: boolean;
+}
+
+interface SrsOption {
+    label: string;
+    value: number;
+}
+interface FieldOption {
+    label: string;
+    value: string;
+}
+
 const exportFormats = settings.export_formats;
 
-const srsListToOptions = (srsList) => {
-    return srsList.map((srs) => {
-        return {
-            label: srs.display_name,
-            value: srs.id,
-        };
-    });
-};
+const srsListToOptions = (srsList: SpatialReferenceSystem[]): SrsOption[] =>
+    srsList.map((srs) => ({
+        label: srs.display_name,
+        value: srs.id,
+    }));
 
-const fieldListToOptions = (fieldList) => {
+const fieldListToOptions = (fieldList: FeatureLayerField[]) => {
     return fieldList.map((field) => {
         return {
             label: field.display_name,
@@ -42,18 +58,18 @@ const fieldListToOptions = (fieldList) => {
     });
 };
 
-export function ExportForm({ id, pick, multiple }) {
+export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const [staffLoading, setStaffLoading] = useState(true);
 
     const [urlParams, setUrlParams] = useState({});
 
     const { exportFeatureLayer, exportLoading } = useExportFeatureLayer({ id });
     const { makeSignal } = useAbortController();
-    const [srsOptions, setSrsOptions] = useState([]);
-    const [fieldOptions, setFieldOptions] = useState([]);
-    const [defaultSrs, setDefaultSrs] = useState();
+    const [srsOptions, setSrsOptions] = useState<SrsOption[]>([]);
+    const [fieldOptions, setFieldOptions] = useState<FieldOption[]>([]);
+    const [defaultSrs, setDefaultSrs] = useState<number>();
     const [format, setFormat] = useState(exportFormats[0].name);
-    const [fields, setFields] = useState([]);
+    const [fields, setFields] = useState<FormField[]>([]);
     const [isReady, setIsReady] = useState(false);
     const form = Form.useForm()[0];
 
@@ -80,12 +96,16 @@ export function ExportForm({ id, pick, multiple }) {
             if (id !== undefined) {
                 promises.push(route("resource.item", id));
             }
-            const [srsInfo, itemInfo] = await Promise.all(
+            const [srsInfo, itemInfo] = (await Promise.all(
                 promises.map((r) => r.get({ signal }))
-            );
+            )) as [SpatialReferenceSystem[], ResourceItem];
             setSrsOptions(srsListToOptions(srsInfo));
-            if (itemInfo) {
-                setDefaultSrs(itemInfo[itemInfo.resource.cls].srs.id);
+            if (itemInfo && itemInfo.feature_layer) {
+                const cls = itemInfo.resource.cls as "vector_layer";
+                const vectorLayer = itemInfo[cls];
+                if (vectorLayer) {
+                    setDefaultSrs(vectorLayer.srs.id);
+                }
                 setFieldOptions(
                     fieldListToOptions(itemInfo.feature_layer.fields)
                 );
@@ -96,7 +116,7 @@ export function ExportForm({ id, pick, multiple }) {
                 }
             }
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
             setStaffLoading(false);
         }
@@ -108,7 +128,7 @@ export function ExportForm({ id, pick, multiple }) {
             fields: fieldsStr,
             ...rest
         } = Object.fromEntries(new URL(location.href).searchParams.entries());
-        const urlParamsToset = { ...rest };
+        const urlParamsToset: Record<string, string | number[]> = { ...rest };
         if (resStr) {
             urlParamsToset.resources = resStr.split(",").map(Number);
         }
@@ -118,14 +138,16 @@ export function ExportForm({ id, pick, multiple }) {
         setUrlParams(urlParamsToset);
     }, []);
 
-    useEffect(() => load(), [load]);
+    useEffect(() => {
+        load();
+    }, [load]);
 
     useEffect(() => {
         const exportFormat = exportFormats.find((f) => f.name === format);
         const dscoCfg = (exportFormat && exportFormat.dsco_configurable) ?? [];
-        let multipleFields = [];
-        const dscoFields = [];
-        const dscoFieldsValues = {};
+        let multipleFields: FormField[] = [];
+        const dscoFields: FormField[] = [];
+        const dscoFieldsValues: Record<string, string> = {};
         for (const d of dscoCfg) {
             const [name, value] = d.split(":");
             dscoFields.push({
@@ -156,7 +178,8 @@ export function ExportForm({ id, pick, multiple }) {
         if (isReady && Object.keys(dscoFieldsValues).length) {
             form.setFieldsValue(dscoFieldsValues);
         }
-        setFields([
+
+        const fieldsToSet = [
             ...multipleFields,
             {
                 name: "format",
@@ -217,16 +240,13 @@ export function ExportForm({ id, pick, multiple }) {
                 label: i18n.gettext("Zip archive"),
                 widget: Checkbox,
                 included: !multiple,
-                disabled: !exportFormat.single_file || multiple,
+                disabled:
+                    (exportFormat && !exportFormat.single_file) || multiple,
             },
-        ]);
-    }, [srsOptions, fieldOptions, format, isReady, form, multiple, pick]);
+        ];
 
-    const onChange = (e) => {
-        if ("format" in e.value) {
-            setFormat(e.value.format);
-        }
-    };
+        setFields(fieldsToSet);
+    }, [srsOptions, fieldOptions, format, isReady, form, multiple, pick]);
 
     if (loading) {
         return <LoadingWrapper />;
@@ -239,7 +259,11 @@ export function ExportForm({ id, pick, multiple }) {
             whenReady={() => {
                 setIsReady(true);
             }}
-            onChange={onChange}
+            onChange={(e) => {
+                if ("format" in e.value) {
+                    setFormat(e.value.format);
+                }
+            }}
             initialValues={initialValues}
             labelCol={{ span: 6 }}
         >
@@ -256,9 +280,3 @@ export function ExportForm({ id, pick, multiple }) {
         </FieldsForm>
     );
 }
-
-ExportForm.propTypes = {
-    id: PropTypes.number,
-    multiple: PropTypes.bool,
-    pick: PropTypes.bool,
-};
