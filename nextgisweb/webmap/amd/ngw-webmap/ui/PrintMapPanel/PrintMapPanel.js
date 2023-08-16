@@ -84,6 +84,8 @@ define([
                 this.withTitle = false;
                 this.withCloser = false;
 
+                this.map = this.display.map.olMap;
+
                 this.contentWidget = new (declare(
                     [BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin],
                     {

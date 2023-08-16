@@ -6,7 +6,6 @@ define([
     "dojo/promise/all",
     "dojo/aspect",
     "dojo/dom-construct",
-    "dojo/dom-class",
     "dojo/dom-style",
     "dojo/topic",
     "dojo/data/ItemFileWriteStore",
@@ -24,7 +23,6 @@ define([
     "@nextgisweb/webmap/basemap-selector",
     "@nextgisweb/webmap/panels-manager",
     "./ol/Map",
-    "./ol/layer/Vector",
     "./MapToolbar",
     "./controls/InitialExtent",
     "./controls/InfoScale",
@@ -32,7 +30,6 @@ define([
     "./FeatureHighlighter",
     "./MapStatesObserver",
     // tools
-    "./tool/Base",
     "./tool/Zoom",
     "./tool/Measure",
     "./tool/Identify",
@@ -66,7 +63,6 @@ define([
     all,
     aspect,
     domConstruct,
-    domClass,
     domStyle,
     topic,
     ItemFileWriteStore,
@@ -84,14 +80,12 @@ define([
     BasemapSelectorComp,
     PanelsManager,
     Map,
-    Vector,
     MapToolbar,
     InitialExtent,
     InfoScale,
     MyLocation,
     FeatureHighlighter,
     MapStatesObserver,
-    ToolBase,
     ToolZoom,
     ToolMeasure,
     Identify,
@@ -1058,7 +1052,6 @@ define([
                     menuIcon: "material-print",
                     splitter: false,
                     display: this,
-                    map: this.map.olMap,
                 },
             });
 
@@ -1074,7 +1067,6 @@ define([
                         order: 50,
                         menuIcon: "material-bookmark",
                         display: this,
-                        bookmarkLayerId: this.config.bookmarkLayerId,
                     },
                 };
                 resolve(panel);
@@ -1094,7 +1086,6 @@ define([
                         menuIcon: "material-info",
                         class: "info-panel dynamic-panel--fullwidth",
                         withTitle: false,
-                        description: this.config.webmapDescription,
                         display: this,
                     },
                 };
@@ -1110,16 +1101,6 @@ define([
                 ) {
                     resolve(undefined);
                 }
-                const annotUrlParam = this._urlParams.annot;
-                let initialAnnotVisible;
-                if (
-                    annotUrlParam &&
-                    (annotUrlParam === "no" ||
-                        annotUrlParam === "yes" ||
-                        annotUrlParam === "messages")
-                ) {
-                    initialAnnotVisible = annotUrlParam;
-                }
 
                 const panel = {
                     cls: AnnotationsPanel,
@@ -1129,7 +1110,6 @@ define([
                         order: 30,
                         menuIcon: "material-message",
                         display: this,
-                        initialAnnotVisible,
                     },
                 };
                 resolve(panel);
@@ -1144,7 +1124,6 @@ define([
                     order: 60,
                     menuIcon: "material-share",
                     display: this,
-                    eventVisibility: undefined,
                 },
             });
 

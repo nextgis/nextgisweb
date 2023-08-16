@@ -20,7 +20,18 @@ define([
 
         constructor: function (options) {
             declare.safeMixin(this, options);
-            this._visibleState = options.initialAnnotVisible;
+
+            const annotUrlParam = this.display._urlParams.annot;
+            let initialAnnotVisible;
+            if (
+                annotUrlParam &&
+                (annotUrlParam === "no" ||
+                    annotUrlParam === "yes" ||
+                    annotUrlParam === "messages")
+            ) {
+                initialAnnotVisible = annotUrlParam;
+            }
+            this._visibleState = initialAnnotVisible;
 
             this.makeComp = (contentNode, options) => {
                 reactApp.default(
@@ -28,7 +39,7 @@ define([
                     {
                         display: options.display,
                         mapStates: MapStatesObserver.getInstance(),
-                        initialAnnotVisible: options.initialAnnotVisible,
+                        initialAnnotVisible,
                         onChangeVisible: (visible) => {
                             this._visibleState = visible;
                         },
