@@ -23,7 +23,7 @@ export type SizeType = FormProps["size"];
 
 export interface FormFieldChoice {
     label?: string;
-    value: string;
+    value: string | number;
 }
 
 export interface WidgetFieldMap {
