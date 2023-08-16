@@ -40,7 +40,8 @@ export interface WidgetFieldMap {
 
 export interface FormOnChangeOptions {
     isValid: () => Promise<boolean>;
-    value: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    value: Record<string, any>;
 }
 
 export interface InputProps<V = unknown> {
@@ -51,9 +52,11 @@ export interface InputProps<V = unknown> {
     onChange?: (...args: any[]) => void;
 }
 
-export interface FormItemProps<P extends InputProps = InputProps>
-    extends AntdFormItemProps {
-    name: string;
+export interface FormItemProps<
+    P extends InputProps = InputProps,
+    N extends string = string,
+> extends AntdFormItemProps {
+    name: N;
     placeholder?: string;
     inputProps?: P;
     disabled?: boolean;
@@ -85,8 +88,10 @@ type GetWidgetInputProps<W extends FormWidget> = W extends WidgetName
     ? GetWidgetInputPropsFromComponent<W>
     : GetWidgetInputPropsFromName<"input">;
 
-export interface FormField<W extends FormWidget = FormWidget>
-    extends FormItemProps<GetWidgetInputProps<W>> {
+export interface FormField<
+    N extends string = string,
+    W extends FormWidget = FormWidget,
+> extends FormItemProps<GetWidgetInputProps<W>, N> {
     widget?: W;
     inputProps?: GetWidgetInputProps<W>;
     choices?: FormFieldChoice[];

@@ -11,7 +11,7 @@ export function FormItem<P extends InputProps = InputProps>({
     input,
     ...props
 }: FormItemProps<P>) {
-    const inputProps_: P = {
+    const combinedProps: P = {
         placeholder,
         disabled,
         ...(inputProps || {}),
@@ -19,8 +19,8 @@ export function FormItem<P extends InputProps = InputProps>({
 
     const propsForInput = {} as P;
 
-    for (const p in inputProps_) {
-        const prop = inputProps_[p];
+    for (const p in combinedProps) {
+        const prop = combinedProps[p];
 
         if (prop !== undefined) {
             propsForInput[p] = prop;
@@ -30,11 +30,11 @@ export function FormItem<P extends InputProps = InputProps>({
     return (
         <Form.Item label={label}>
             <Space.Compact block>
-                {prepend ? prepend : null}
+                {prepend && prepend}
                 <Form.Item {...props} noStyle>
-                    {input ? input(propsForInput) : null}
+                    {input && input(propsForInput)}
                 </Form.Item>
-                {append ? append : null}
+                {append && append}
             </Space.Compact>
         </Form.Item>
     );

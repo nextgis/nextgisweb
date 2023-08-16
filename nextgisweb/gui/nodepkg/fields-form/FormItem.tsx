@@ -27,9 +27,12 @@ export const widgetsByName: Record<WidgetName, FormWidgetComponent> = {
     time: TimeInput,
 };
 
-export function FormItem(props: FormField) {
-    const { required, requiredMessage, widget, ...formProps } = props;
-
+export function FormItem({
+    required,
+    requiredMessage,
+    widget,
+    ...formProps
+}: FormField) {
     delete formProps.included;
     delete formProps.value;
     formProps.rules = formProps.rules || [];
@@ -41,13 +44,13 @@ export function FormItem(props: FormField) {
         });
     }
 
-    let FormWidget: ElementType | undefined = undefined;
+    let FormWidget: ElementType = Input;
+
     if (typeof widget === "string") {
-        FormWidget = widgetsByName[widget.toLowerCase() as WidgetName];
+        FormWidget = widgetsByName[widget.toLowerCase() as WidgetName] || Input;
     } else if (widget) {
         FormWidget = widget;
     }
-    FormWidget = FormWidget || Input;
 
-    return <FormWidget {...formProps}></FormWidget>;
+    return <FormWidget {...formProps} />;
 }
