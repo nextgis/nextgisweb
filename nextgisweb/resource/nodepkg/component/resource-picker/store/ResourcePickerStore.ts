@@ -31,7 +31,13 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     parentId = 0;
 
-    parentItem: ResourceItem | null = null;
+    get parentItem(): ResourceItem | null {
+        return this._parentItem;
+    }
+    set parentItem(v: ResourceItem | null) {
+        this._parentItem = v;
+    }
+    private _parentItem: ResourceItem | null = null;
     blueprint: Blueprint | null = null;
 
     setBreadcrumbItemsError: string | boolean = false;
