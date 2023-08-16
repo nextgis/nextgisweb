@@ -4,6 +4,7 @@ import type { EditorStore, EditorStoreConstructorOptions } from "./EditorStore";
 import type { EditorWidgetProps } from "../feature-editor/type";
 export * from "./FeatureLayer";
 export * from "./FeatureItem";
+export * from "./GeometryType"
 
 export { EditorStore, EditorStoreConstructorOptions };
 
