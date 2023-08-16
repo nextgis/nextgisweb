@@ -10,6 +10,7 @@ Changes
 - Legends for webmaps enabled by default.
 - Lots of improvements in feature editing widgets.
 - New tileset resource for storing and serving prerendered tiles.
+- React library upgraded to 18.
 
 
 4.4.0
