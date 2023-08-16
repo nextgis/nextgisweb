@@ -1,13 +1,14 @@
 import {
+    Fragment,
     forwardRef,
     useCallback,
     useMemo,
-    useRef,
     isValidElement,
 } from "react";
 
 import { useActionToolbar } from "./hook/useActionToolbar";
 
+import type { Ref, ReactElement } from "react";
 import type {
     ActionToolbarAction,
     ActionToolbarProps,
@@ -16,68 +17,92 @@ import type {
 
 import "./ActionToolbar.less";
 
-export const ActionToolbar = forwardRef<HTMLDivElement, ActionToolbarProps>(
-    function ActionToolbar(
-        { size, style, actions, rightActions = [], actionProps, children },
-        ref
-    ) {
-        const keyIndexRef = useRef(0);
-        const { createButtonAction } = useActionToolbar({
-            size,
-            props: actionProps,
-        });
+function ActionToolbarInput<
+    P extends Record<string, any> = Record<string, any>,
+>(
+    {
+        size,
+        style,
+        actions,
+        rightActions = [],
+        actionProps,
+        children,
+    }: ActionToolbarProps<P>,
+    ref: Ref<HTMLDivElement>
+) {
+    const { createButtonAction } = useActionToolbar({
+        size,
+        props: actionProps,
+    });
 
-        const getAction = useCallback(
-            (Action: ActionToolbarAction) => {
-                keyIndexRef.current = keyIndexRef.current + 1;
-                if (isValidElement(Action)) {
-                    return Action;
-                } else {
-                    return (
-                        <div key={keyIndexRef.current}>
-                            {typeof Action === "function" ? (
-                                <Action {...{ size, ...actionProps }} />
-                            ) : Action && typeof Action === "object" ? (
-                                createButtonAction(
-                                    Action as CreateButtonActionOptions
-                                )
-                            ) : null}
-                        </div>
-                    );
-                }
-            },
-
-            [actionProps, createButtonAction, size]
-        );
-
-        const [leftActions_, rightActions_] = useMemo(() => {
-            keyIndexRef.current = 0;
-            const leftActions__: ActionToolbarAction[] = [];
-            const rightActions__ = [
-                ...rightActions.map((rightAction) => getAction(rightAction)),
-            ];
-
-            let addDirection = leftActions__;
-            for (const Action of [...actions]) {
-                if (typeof Action === "string") {
-                    addDirection = rightActions__;
-                    continue;
-                }
-                addDirection.push(getAction(Action));
+    const getAction = useCallback(
+        (action: ActionToolbarAction<P>): React.ReactElement | null => {
+            if (isValidElement(action)) {
+                return action;
             }
-            return [leftActions__, rightActions__];
-        }, [actions, getAction, rightActions]);
 
-        return (
-            <div ref={ref} className="action-toolbar" {...{ style }}>
-                {leftActions_}
+            if (typeof action === "function") {
+                const ActionComponent = action as React.ComponentType<
+                    Record<string, unknown>
+                >;
+                return <ActionComponent {...{ size, ...actionProps }} />;
+            }
 
-                <div className="spacer" />
+            if (action && typeof action === "object") {
+                return createButtonAction(action as CreateButtonActionOptions);
+            }
 
-                {rightActions_}
+            return null;
+        },
+        [actionProps, createButtonAction, size]
+    );
 
-                {children}
-            </div>
-        );
-    }
-);
+    const [leftActions_, rightActions_] = useMemo(() => {
+        const leftActionsList: React.ReactElement[] = [];
+
+        const rightActionsList: React.ReactElement[] = [];
+
+        for (const rightAction of rightActions) {
+            const a = getAction(rightAction);
+            if (a) {
+                rightActionsList.push(a);
+            }
+        }
+
+        let addDirection = leftActionsList;
+        for (const action of actions) {
+            if (typeof action === "string") {
+                addDirection = rightActionsList;
+                continue;
+            }
+            const actionElement = getAction(action);
+            if (actionElement) {
+                addDirection.push(actionElement);
+            }
+        }
+
+        return [leftActionsList, rightActionsList];
+    }, [actions, getAction, rightActions]);
+
+    return (
+        <div ref={ref} className="action-toolbar" style={style}>
+            {leftActions_.map((action, index) => (
+                <Fragment key={index}>{action}</Fragment>
+            ))}
+
+            <div className="spacer" />
+
+            {rightActions_.map((action, index) => (
+                <Fragment key={index}>{action}</Fragment>
+            ))}
+
+            {children}
+        </div>
+    );
+}
+
+export const ActionToolbar = forwardRef(ActionToolbarInput) as <
+    P extends Record<string, any> = Record<string, any>,
+>(
+    p: ActionToolbarProps<P> & { ref?: Ref<HTMLDivElement> }
+) => ReactElement;

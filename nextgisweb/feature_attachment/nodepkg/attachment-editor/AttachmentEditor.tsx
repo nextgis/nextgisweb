@@ -69,14 +69,14 @@ const AttachmentEditor = observer(
         );
 
         const handleDelete = useCallback(
-            (row) => {
-                store_.deleteItem(row);
+            (row: object) => {
+                store_.deleteItem(row as DataSource);
             },
             [store_]
         );
 
         const editableField = useCallback(
-            (field) =>
+            (field: string) =>
                 function EditableField(text: string, row: object) {
                     const r = row as DataSource;
                     return (

@@ -14,7 +14,7 @@ const usePickerCard = ({ resourceStore }: UsePickerCardProps) => {
     const { checkEnabled, disableResourceIds } = resourceStore;
 
     const getEnabledProps = useCallback(
-        (record, checks) => {
+        (record: PickerResource, checks: Record<string, () => boolean>[]) => {
             const props = { disabled: false };
 
             const disableChecker = [
@@ -39,7 +39,7 @@ const usePickerCard = ({ resourceStore }: UsePickerCardProps) => {
 
     const getCheckboxProps = useCallback<GetCheckboxProps>(
         (record) => {
-            return getEnabledProps(record, [
+            return getEnabledProps(record as PickerResource, [
                 {
                     isDisabled: () => !checkEnabled(record as PickerResource),
                 },

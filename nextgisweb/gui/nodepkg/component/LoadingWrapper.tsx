@@ -19,5 +19,5 @@ export function LoadingWrapper({
         return <Skeleton paragraph={{ rows }} {...skeletonProps} />;
     }
     children = children || content;
-    return <>{typeof children === "function" ? children() : children}</>;
+    return <>{children}</>;
 }

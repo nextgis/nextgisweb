@@ -22,9 +22,7 @@ export type ActionToolbarAction<
     P extends CreateButtonActionProps = CreateButtonActionProps,
 > = string | ReactNode | ((props: P) => ReactNode) | CreateButtonActionOptions;
 
-export interface ActionToolbarProps<
-P extends CreateButtonActionProps = CreateButtonActionProps,
-> {
+export interface ActionToolbarProps<P extends CreateButtonActionProps = CreateButtonActionProps> {
     size?: SizeType;
     style?: CSSProperties;
     actions: ActionToolbarAction<P>[];

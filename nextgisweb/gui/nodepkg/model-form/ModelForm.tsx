@@ -4,7 +4,7 @@ import { Button, Form, message, Popconfirm, Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 
@@ -40,9 +40,9 @@ interface ModelFormProps {
 }
 
 const btnTitleAliases = {
-    create: i18n.gettext("Create"),
-    edit: i18n.gettext("Save"),
-    delete: i18n.gettext("Delete"),
+    create: gettext("Create"),
+    edit: gettext("Save"),
+    delete: gettext("Delete"),
 };
 
 export function ModelForm(props: ModelFormProps) {
@@ -60,8 +60,9 @@ export function ModelForm(props: ModelFormProps) {
     const operation = id !== undefined ? "edit" : "create";
 
     const messages = msg ?? {};
-    const deleteConfirm =
-        messages.deleteConfirm || i18n.gettext("Confirmation");
+    const deleteConfirm = (
+        <>{messages.deleteConfirm || gettext("Confirmation")})</>
+    );
 
     const model: Model =
         typeof m === "string"
@@ -97,7 +98,7 @@ export function ModelForm(props: ModelFormProps) {
                 errorModal(err as ApiError);
             }
         } catch (err) {
-            message.error(i18n.gettext("Fix the form errors first"));
+            message.error(gettext("Fix the form errors first"));
         } finally {
             setStatus(null);
         }

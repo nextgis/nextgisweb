@@ -23,10 +23,10 @@ export function useExportFeatureLayer({ id }: UseExportFeatureLayerProps) {
     const [exportLoading, setExportLoading] = useState(false);
 
     const openExportPage = useCallback(
-        (pageParams) => {
+        (pageParams: ExportFeatureLayerOptions) => {
             const url = routeURL("resource.export.page", id);
             const params = new URLSearchParams({
-                ...pageParams,
+                ...(pageParams as Record<string, string>),
             });
             window.open(`${url}?${params.toString()}`);
         },

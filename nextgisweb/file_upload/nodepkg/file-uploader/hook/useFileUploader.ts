@@ -6,6 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type {
     FileUploaderOptions,
+    Progress,
     UploadProps,
     UploaderMeta,
     UseFileUploaderProps,
@@ -51,7 +52,7 @@ export function useFileUploader({
     }, [initMeta]);
 
     const onProgress = useCallback(
-        (evt) => {
+        (evt: Progress) => {
             if (evt.type === "progress") {
                 setProgressText(mProgress.replace("{}", evt.percent));
                 if (showProgressInDocTitle) {
@@ -71,7 +72,7 @@ export function useFileUploader({
     );
 
     const upload = useCallback(
-        async (files) => {
+        async (files: File[]) => {
             setUploading(true);
             try {
                 const uploadedFiles = await fileUploaderWrapper({
@@ -122,7 +123,7 @@ export function useFileUploader({
                 const error = info.fileList.some((f) => f.status === "error");
                 setFileList([...info.fileList]);
                 if (done) {
-                    upload(info.fileList.map((f) => f.originFileObj));
+                    upload(info.fileList.map((f) => f.originFileObj as File));
                     setFileList([]);
                 } else if (error) {
                     message.error(`${info.file.name} file upload failed.`);

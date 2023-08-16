@@ -32,6 +32,7 @@ interface ActionProps {
     id: number;
     query: string;
     size?: SizeType;
+    selected?: FeatureAttrs[];
 }
 
 interface FeatureGridProps {
@@ -110,11 +111,13 @@ export const FeatureGrid = ({
     }, [resourceData]);
 
     const goTo = useCallback(
-        (path) => {
+        (
+            path: "feature_layer.feature.update" | "feature_layer.feature.show"
+        ) => {
             const first = selected[0];
             if (first) {
-                const featureId = first[KEY_FIELD_KEYNAME] as string;
-                window.open(routeURL(path, id, featureId));
+                const featureId = first[KEY_FIELD_KEYNAME] as number;
+                window.open(routeURL(path, { id, feature_id: featureId }));
             }
         },
         [id, selected]
@@ -156,7 +159,7 @@ export const FeatureGrid = ({
         return <LoadingWrapper />;
     }
 
-    const defActions: ActionToolbarAction[] = [
+    const defActions: ActionToolbarAction<ActionProps>[] = [
         {
             onClick: () => {
                 goTo("feature_layer.feature.show");
@@ -199,13 +202,15 @@ export const FeatureGrid = ({
         rightActions.push((props) => <ExportAction {...props} />);
     }
 
+    const actionProps: ActionProps = { selected, query, id };
+
     return (
         <div className="ngw-feature-layer-feature-grid">
             <ActionToolbar
                 size={size}
                 actions={[...defActions, ...actions]}
                 rightActions={rightActions}
-                actionProps={{ selected, query, id }}
+                actionProps={actionProps}
             >
                 <div>
                     <Input

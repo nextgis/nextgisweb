@@ -72,7 +72,7 @@ const AttributeEditor = observer(
         const form = Form.useForm()[0];
 
         const setNullForField = useCallback(
-            (field) => {
+            (field: string) => {
                 form.setFieldValue(field, null);
                 setValues({ [field]: null });
             },

@@ -192,7 +192,7 @@ const FeatureTable = ({
                         const val = row && row[f.keyname];
                         const renderValue =
                             val !== undefined
-                                ? renderFeatureFieldValue(f, val) || val
+                                ? renderFeatureFieldValue(f, val)
                                 : loadingCol();
                         return (
                             <div
