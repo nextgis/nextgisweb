@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Form, Input, InputNumber } from "@nextgisweb/gui/antd";
+import { Form, Space, InputNumber } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
 
 const unit = i18n.gettext("deg.");
@@ -26,7 +26,7 @@ const Widget = ({ value, onChange }: ExtentInputProps) => {
     }, [values, onChange]);
 
     return (
-        <Input.Group style={{ display: "flex", columnGap: "1em" }}>
+        <Space.Compact style={{ display: "flex", columnGap: "1em" }}>
             {parts.map(({ label, ...part }, idx) => (
                 <InputNumber
                     {...part}
@@ -41,7 +41,7 @@ const Widget = ({ value, onChange }: ExtentInputProps) => {
                     }
                 />
             ))}
-        </Input.Group>
+        </Space.Compact>
     );
 };
 

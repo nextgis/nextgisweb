@@ -63,7 +63,7 @@ const CreateControl = observer(
         }, []);
 
         return (
-            <Input.Group>
+            <Space.Compact>
                 <Row>
                     <Col>
                         <Button
@@ -94,7 +94,7 @@ const CreateControl = observer(
                         />
                     </Col>
                 </Row>
-            </Input.Group>
+            </Space.Compact>
         );
     }
 );

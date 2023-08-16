@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import uniq from "lodash-es/uniq";
 
-import { Button, Input, Space, Table } from "@nextgisweb/gui/antd";
+import { Button, Space, Table } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
@@ -131,7 +131,7 @@ const ResourceSelectMultiple = ({
     }, [ids, loadResources]);
 
     return (
-        <Input.Group compact>
+        <Space.Compact>
             <div style={{ width: "100%" }}>
                 <div style={{ marginBottom: 16 }}>
                     <Space>
@@ -154,7 +154,7 @@ const ResourceSelectMultiple = ({
                     pagination={false}
                 />
             </div>
-        </Input.Group>
+        </Space.Compact>
     );
 };
 

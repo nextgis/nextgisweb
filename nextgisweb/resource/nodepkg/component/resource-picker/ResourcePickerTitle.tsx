@@ -7,7 +7,7 @@ import StartIcon from "@material-icons/svg/first_page";
 import SearchIcon from "@material-icons/svg/search";
 import SyncIcon from "@material-icons/svg/sync";
 
-import { Button, Col, Input, Row, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Col, Space, Row, Tooltip } from "@nextgisweb/gui/antd";
 
 import ResourcesFilter from "../../resources-filter";
 import { ResourcePickerBreadcrumb } from "./ResourcePickerBreadcrumb";
@@ -31,7 +31,7 @@ export const ResourcePickerTitle = observer(
 
         function SearchPanel() {
             return (
-                <Input.Group>
+                <Space.Compact>
                     <Row>
                         <Col>
                             <Button
@@ -51,7 +51,7 @@ export const ResourcePickerTitle = observer(
                             />
                         </Col>
                     </Row>
-                </Input.Group>
+                </Space.Compact>
             );
         }
 

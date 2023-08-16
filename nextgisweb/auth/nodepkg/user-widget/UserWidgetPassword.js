@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Form, Input, Select } from "@nextgisweb/gui/antd";
+import { Form, Input, Select, Space } from "@nextgisweb/gui/antd";
 import { useEffect, useState, useMemo } from "react";
 import i18n from "@nextgisweb/pyramid/i18n";
 import oauth from "../oauth";
@@ -41,7 +41,7 @@ const PasswordInput = ({ value, onChange, ...inputProps }) => {
     }, []);
 
     return (
-        <Input.Group compact style={{ display: "flex" }}>
+        <Space.Compact style={{ display: "flex" }}>
             <Select
                 onChange={setMode}
                 dropdownMatchSelectWidth={false}
@@ -62,7 +62,7 @@ const PasswordInput = ({ value, onChange, ...inputProps }) => {
                     {...inputProps}
                 ></Input.Password>
             )}
-        </Input.Group>
+        </Space.Compact>
     );
 };
 

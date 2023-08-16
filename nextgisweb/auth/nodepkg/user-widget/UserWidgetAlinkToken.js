@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Form, Input, Select } from "@nextgisweb/gui/antd";
+import { Form, Input, Select, Space } from "@nextgisweb/gui/antd";
 import { useEffect, useState, useMemo } from "react";
 import i18n from "@nextgisweb/pyramid/i18n";
 
@@ -41,7 +41,7 @@ const AlinkInput = ({ value, onChange }) => {
     }, []);
 
     return (
-        <Input.Group compact style={{ display: "flex" }}>
+        <Space.Compact compact style={{ display: "flex" }}>
             <Select
                 onChange={setMode}
                 dropdownMatchSelectWidth={false}
@@ -67,7 +67,7 @@ const AlinkInput = ({ value, onChange }) => {
                     disabled={true}
                 ></Input>
             )}
-        </Input.Group>
+        </Space.Compact>
     );
 };
 

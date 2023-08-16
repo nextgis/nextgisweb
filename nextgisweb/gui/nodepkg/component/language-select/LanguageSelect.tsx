@@ -1,4 +1,4 @@
-import { Button, Input, Select } from "@nextgisweb/gui/antd";
+import { Button, Space, Select } from "@nextgisweb/gui/antd";
 import i18n from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 
@@ -58,7 +58,7 @@ export const LanguageSelect = ({
     );
 
     return (
-        <Input.Group compact style={{ display: "flex" }}>
+        <Space.Compact style={{ display: "flex" }}>
             <SelectInput />
             {contribute && languageContributeUrl && (
                 <Button
@@ -69,6 +69,6 @@ export const LanguageSelect = ({
                     {translateProposalMsg}
                 </Button>
             )}
-        </Input.Group>
+        </Space.Compact>
     );
 };
