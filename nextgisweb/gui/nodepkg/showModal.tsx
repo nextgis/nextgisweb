@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 import type { ReactElement } from "react";
 import type { Modal } from "@nextgisweb/gui/antd";
@@ -20,20 +20,13 @@ export default function showModal<
     const container = document.createDocumentFragment();
     let currentConfig: T = { ...config, open: true, visible: true };
 
-    const render = ({ ...props }: T) => {
-        setTimeout(() => {
-            ReactDOM.render(
-                <ModalComponent {...props}></ModalComponent>,
-                container
-            );
-        });
+    const root = createRoot(container);
+
+    const render = (props: T) => {
+        root.render(<ModalComponent {...props} />);
     };
 
-    const destroy = () => {
-        ReactDOM.unmountComponentAtNode(container);
-    };
-
-    function close(): void {
+    const close = () => {
         currentConfig = {
             ...currentConfig,
             visible: false,
@@ -42,12 +35,11 @@ export default function showModal<
                 if (typeof config.afterClose === "function") {
                     config.afterClose();
                 }
-
-                destroy();
+                root.unmount();
             },
         };
         render(currentConfig);
-    }
+    };
 
     function update(configUpdate: T | ((conf: T) => T)) {
         if (typeof configUpdate === "function") {
