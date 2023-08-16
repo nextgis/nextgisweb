@@ -105,7 +105,7 @@ export const FeatureGrid = ({
 
     const fields = useMemo(() => {
         if (resourceData) {
-            return resourceData.feature_layer.fields;
+            return resourceData.feature_layer?.fields;
         }
         return undefined;
     }, [resourceData]);
