@@ -28,12 +28,12 @@ define([
             constructor: function (options) {
                 declare.safeMixin(this, options);
 
-                this.makeComp = (contentNode, options) => {
+                this.makeComp = (contentNode, options, eventVisibility) => {
                     reactApp.default(
                         sharePanelComp.default,
                         {
                             display: options.display,
-                            eventVisibility: options.eventVisibility,
+                            eventVisibility,
                         },
                         contentNode
                     );
@@ -45,13 +45,14 @@ define([
             },
 
             show: function () {
-                this.emit("pre-show");
                 this.inherited(arguments);
+                const eventVisibility = "pre-show";
+                this.makeComp(this.contentNode, this.options, eventVisibility);
             },
 
             hide: function () {
-                this.emit("pre-hide");
-                this.inherited(arguments);
+                const eventVisibility = "pre-hide";
+                this.makeComp(this.contentNode, this.options, eventVisibility);
             },
         }
     );

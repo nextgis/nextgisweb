@@ -9,11 +9,12 @@ define([
 ) {
     return declare([_PluginBase], {
         postCreate: function () {
-            if (!this.display.layersPanel || !this.display.layersPanel.titleNode) {
+            const layersPanel = this.display.panelsManager.getPanel("layers");
+            if (!layersPanel || !layersPanel.titleNode) {
                 return;
             }
 
-            const titleNode = this.display.layersPanel.titleNode;
+            const titleNode = layersPanel.titleNode;
             const span = document.createElement("span");
             span.style.margin = "0 0 0 5px";
             span.style.cursor = "pointer";

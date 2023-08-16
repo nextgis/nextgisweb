@@ -15,7 +15,6 @@ define([
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/BorderContainer",
     "openlayers/ol",
-    "ngw-pyramid/navigation-menu/NavigationMenu",
     "@nextgisweb/gui/react-app",
     "@nextgisweb/gui/error",
     "@nextgisweb/pyramid/icon",
@@ -23,6 +22,7 @@ define([
     "@nextgisweb/webmap/layers-tree",
     "@nextgisweb/webmap/store",
     "@nextgisweb/webmap/basemap-selector",
+    "@nextgisweb/webmap/panels-manager",
     "./ol/Map",
     "./ol/layer/Vector",
     "./MapToolbar",
@@ -52,10 +52,9 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/pyramid/settings!",
     "dojo/text!./template/Display.hbs",
-    // template
+    "dijit/layout/ContentPane",
     "dijit/layout/TabContainer",
     "dijit/layout/BorderContainer",
-    "dijit/layout/ContentPane",
     "dojox/layout/TableContainer",
     // css
     "xstyle/css!./template/resources/Display.css",
@@ -76,7 +75,6 @@ define([
     _WidgetsInTemplateMixin,
     BorderContainer,
     ol,
-    NavigationMenu,
     reactApp,
     errorModule,
     icon,
@@ -84,6 +82,7 @@ define([
     LayersTreeComp,
     WebmapStore,
     BasemapSelectorComp,
+    PanelsManager,
     Map,
     Vector,
     MapToolbar,
@@ -178,6 +177,7 @@ define([
 
         _itemStoreDeferred: undefined,
         _mapDeferred: undefined,
+        _mapExtentDeferred: undefined,
         _layersDeferred: undefined,
         _postCreateDeferred: undefined,
         _startupDeferred: undefined,
@@ -196,33 +196,6 @@ define([
 
         webmapStore: undefined,
 
-        activeLeftPanel: "layersPanel",
-        navigationMenuItems: [
-            {
-                title: i18n.gettext("Layers"),
-                icon: "material-layers",
-                name: "layers",
-                value: "layersPanel",
-            },
-            {
-                title: i18n.gettext("Search"),
-                icon: "material-search",
-                name: "search",
-                value: "searchPanel",
-            },
-            {
-                title: i18n.gettext("Share"),
-                icon: "material-share",
-                name: "share",
-                value: "sharePanel",
-            },
-            {
-                title: i18n.gettext("Print map"),
-                icon: "material-print",
-                name: "print",
-                value: "printMapPanel",
-            },
-        ],
         constructor: function (options) {
             declare.safeMixin(this, options);
 
@@ -230,6 +203,7 @@ define([
 
             this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
             this._mapDeferred = new LoggedDeferred("_mapDeferred");
+            this._mapExtentDeferred = new LoggedDeferred("_mapExtentDeferred");
             this._layersDeferred = new LoggedDeferred("_layersDeferred");
             this._postCreateDeferred = new LoggedDeferred(
                 "_postCreateDeferred"
@@ -244,6 +218,20 @@ define([
             var mids = this.config.mid;
 
             this.clientSettings = settings;
+            
+            const activePanelKey = this._urlParams[this.modeURLParam];
+            const onChangePanel = (panel) => {
+                if (panel) {
+                    URL.setURLParam(this.modeURLParam, panel.name);
+                } else {
+                    URL.setURLParam(this.modeURLParam, this.emptyModeURLValue);
+                }
+            };
+            this.panelsManager = new PanelsManager.default(
+                activePanelKey,
+                onChangePanel
+            );
+            this._buildPanels();
 
             // Add basemap's AMD modules
             mids.basemap.push(
@@ -322,158 +310,6 @@ define([
             // Layers panel
             widget._layersPanelSetup();
 
-            // Print panel
-            all([
-                this._layersDeferred,
-                this._mapDeferred,
-                this._postCreateDeferred
-            ])
-                .then(function () {
-                    widget.printMapPanel = new PrintMapPanel({
-                        region: "left",
-                        splitter: false,
-                        isOpen: widget.activeLeftPanel === "printMapPanel",
-                        class: "dynamic-panel--fullwidth",
-                        gutters: false,
-                        map: widget.map.olMap,
-                    });
-
-                    if (widget.activeLeftPanel === "printMapPanel")
-                        widget.activatePanel(widget.printMapPanel);
-
-                    widget.printMapPanel.on("closed", function () {
-                        widget.navigationMenu.reset();
-                    });
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
-
-            // Search panel
-            all([widget._layersDeferred, widget._postCreateDeferred])
-                .then(function () {
-                    widget.searchPanel = new SearchPanel({
-                        region: "left",
-                        class: "dynamic-panel--fullwidth",
-                        title: i18n.gettext("Search"),
-                        isOpen: widget.activeLeftPanel === "searchPanel",
-                        gutters: false,
-                        withCloser: true,
-                        display: widget,
-                    });
-
-                    if (widget.activeLeftPanel === "searchPanel") {
-                        widget.activatePanel(widget.searchPanel);
-                    }
-
-                    widget.searchPanel.on("closed", function () {
-                        widget.navigationMenu.reset();
-                    });
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
-
-            // Bookmark panel
-            if (this.config.bookmarkLayerId) {
-                this.navigationMenuItems.splice(2, 0, {
-                    title: i18n.gettext("Bookmarks"),
-                    name: "bookmark",
-                    icon: "material-bookmark",
-                    value: "bookmarkPanel",
-                });
-
-                all([widget._layersDeferred, widget._postCreateDeferred])
-                    .then(function () {
-                        widget.bookmarkPanel = new BookmarkPanel({
-                            region: "left",
-                            class: "dynamic-panel--fullwidth",
-                            title: i18n.gettext("Bookmarks"),
-                            isOpen: widget.activeLeftPanel === "bookmarkPanel",
-                            gutters: false,
-                            withCloser: true,
-                            display: widget,
-                            bookmarkLayerId: widget.config.bookmarkLayerId,
-                        });
-
-                        if (widget.activeLeftPanel === "bookmarkPanel")
-                            widget.activatePanel(widget.bookmarkPanel);
-
-                        widget.bookmarkPanel.on("closed", function () {
-                            widget.navigationMenu.reset();
-                        });
-                    })
-                    .then(undefined, function (err) {
-                        console.error(err);
-                    });
-            }
-
-            // Description panel
-            if (this.config.webmapDescription) {
-                this.navigationMenuItems.splice(2, 0, {
-                    title: i18n.gettext("Description"),
-                    name: "info",
-                    icon: "material-info",
-                    value: "infoPanel",
-                });
-                // Do it asynchronious way to get URL params work
-                setTimeout(function () {
-                    widget.infoPanel = new InfoPanel({
-                        region: "left",
-                        class: "info-panel dynamic-panel--fullwidth",
-                        withTitle: false,
-                        isOpen: widget.activeLeftPanel === "infoPanel",
-                        gutters: false,
-                        withCloser: true,
-                        description: widget.config.webmapDescription,
-                        display: widget,
-                    });
-
-                    if (widget.activeLeftPanel === "infoPanel")
-                        widget.activatePanel(widget.infoPanel);
-
-                    widget.infoPanel.on("closed", function () {
-                        widget.navigationMenu.reset();
-                    });
-                }, 0);
-            }
-
-            this._buildAnnotationsPanel();
-
-            // Share panel
-            all([widget._layersDeferred, widget._postCreateDeferred])
-                .then(function () {
-                    widget.sharePanel = new SharePanel({
-                        region: "left",
-                        class: "dynamic-panel--fullwidth",
-                        title: i18n.gettext("Share"),
-                        isOpen: widget.activeLeftPanel === "sharePanel",
-                        gutters: false,
-                        withCloser: true,
-                        display: widget,
-                        eventVisibility: undefined,
-                    });
-
-                    widget.sharePanel.on("closed", function () {
-                        widget.navigationMenu.reset();
-                    });
-
-                    widget.sharePanel.on("pre-show", function () {
-                        widget.sharePanel.options.eventVisibility = "pre-show";
-                    });
-
-                    widget.sharePanel.on("pre-hide", function () {
-                        widget.sharePanel.options.eventVisibility = "pre-hide";
-                    });
-
-                    if (widget.activeLeftPanel === "sharePanel") {
-                        widget.activatePanel(widget.sharePanel);
-                    }
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
-
             // Map and plugins
             all([
                 this._midDeferred.basemap,
@@ -501,12 +337,9 @@ define([
                 .then(
                     lang.hitch(this, function () {
                         widget._mapAddLayers();
-
                         widget.featureHighlighter = new FeatureHighlighter(
                             this.map
                         );
-
-                        // Bind checkboxes and layer visibility
                     })
                 )
                 .then(undefined, function (err) {
@@ -525,79 +358,7 @@ define([
                     console.error(err);
                 });
 
-            // Switch to panel from permalink
-            var panelNameFromURL = this._urlParams[this.modeURLParam];
-            if (panelNameFromURL) {
-                if (panelNameFromURL === this.emptyModeURLValue) {
-                    this.activeLeftPanel = "";
-                } else {
-                    var menuItem =
-                        this._findNavigationMenuItem(panelNameFromURL);
-                    if (menuItem) {
-                        this.activeLeftPanel = menuItem.value;
-                    }
-                }
-            }
-
             this.tools = [];
-        },
-
-        _buildAnnotationsPanel: function () {
-            if (
-                !this.config.annotations ||
-                !this.config.annotations.enabled ||
-                !this.config.annotations.scope.read
-            ) {
-                return false;
-            }
-
-            this.navigationMenuItems.splice(2, 0, {
-                title: i18n.gettext("Annotations"),
-                name: "annotation",
-                icon: "material-message",
-                value: "annotationPanel",
-            });
-
-            const annotUrlParam = this._urlParams.annot;
-            let initialAnnotVisible;
-            if (
-                annotUrlParam &&
-                (annotUrlParam === "no" ||
-                    annotUrlParam === "yes" ||
-                    annotUrlParam === "messages")
-            ) {
-                initialAnnotVisible = annotUrlParam;
-            }
-
-            var buildAnnotationsPanel = function (widget) {
-                widget.annotationPanel = new AnnotationsPanel({
-                    region: "left",
-                    class: "dynamic-panel--fullwidth",
-                    title: i18n.gettext("Annotations"),
-                    isOpen: widget.activeLeftPanel === "annotationPanel",
-                    gutters: false,
-                    withCloser: true,
-                    display: widget,
-                    initialAnnotVisible,
-                });
-
-                if (widget.activeLeftPanel === "annotationPanel")
-                    widget.activatePanel(widget.annotationPanel);
-
-                widget.annotationPanel.on("closed", function () {
-                    widget.navigationMenu.reset();
-                });
-            };
-
-            all([this._layersDeferred, this._postCreateDeferred])
-                .then(
-                    lang.hitch(this, function () {
-                        buildAnnotationsPanel(this);
-                    })
-                )
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
         },
 
         postCreate: function () {
@@ -635,14 +396,19 @@ define([
                 },
             });
 
-            this._navigationMenuSetup();
-
             this.leftPanelPane = new BorderContainer({
                 class: "leftPanelPane",
                 region: "left",
                 gutters: false,
                 splitter: true,
             });
+
+            const domElements = {
+                main: this.mainContainer,
+                leftPanel: this.leftPanelPane,
+                navigation: this.navigationMenuPane.domNode,
+            };
+            this.panelsManager.initDomElements(domElements);
 
             this._postCreateDeferred.resolve();
         },
@@ -842,9 +608,6 @@ define([
             );
 
             companyLogo.appendTo(this.mapNode);
-
-            this._setMapExtent();
-
             this._mapDeferred.resolve();
         },
 
@@ -1014,6 +777,7 @@ define([
             topic.publish("/webmap/tools/initialized");
         },
 
+        _pluginsPanels: [],
         _pluginsSetup: function (wmplugin) {
             if (!this._plugins) {
                 this._plugins = {};
@@ -1050,90 +814,14 @@ define([
             );
         },
 
-        _findNavigationMenuItem: function (itemValue) {
-            for (var fry = 0; fry < this.navigationMenuItems.length; fry++) {
-                var menuItem = this.navigationMenuItems[fry];
-                if (
-                    [menuItem.icon, menuItem.value, menuItem.name].indexOf(
-                        itemValue
-                    ) !== -1
-                ) {
-                    return menuItem;
-                }
-            }
-            return false;
-        },
-
-        _setActivePanelURL: function () {
-            if (this.activeLeftPanel) {
-                var menuItem = this._findNavigationMenuItem(
-                    this.activeLeftPanel
-                );
-                if (menuItem) {
-                    URL.setURLParam(this.modeURLParam, menuItem.name);
-                }
-            } else {
-                URL.setURLParam(this.modeURLParam, this.emptyModeURLValue);
-            }
-        },
-
-        _navigationMenuSetup: function () {
-            var widget = this;
-
-            this.navigationMenu = new NavigationMenu({
-                value: this.activeLeftPanel,
-                items: this.navigationMenuItems,
-                region: "left",
-            }).placeAt(this.navigationMenuPane);
-
-            this.navigationMenu.watch(
-                "value",
-                function (name, oldValue, value) {
-                    if (oldValue && widget[oldValue]) {
-                        widget.deactivatePanel(widget[oldValue]);
-                    }
-
-                    if (widget[value]) {
-                        widget.activatePanel(widget[value]);
-                    }
-
-                    widget.activeLeftPanel = value;
-                    widget._setActivePanelURL();
-                }
-            );
-            this._setActivePanelURL();
-        },
-
         _layersPanelSetup: function () {
-            var widget = this,
-                itemStore = this.itemStore;
-
-            all([widget._layersDeferred, widget._postCreateDeferred])
-                .then(function () {
-                    widget.layersPanel = new LayersPanel({
-                        region: "left",
-                        class: "dynamic-panel--fullwidth",
-                        title: i18n.gettext("Layers"),
-                        isOpen: widget.activeLeftPanel === "layersPanel",
-                        gutters: false,
-                        withCloser: true,
-                    });
-
-                    if (widget.activeLeftPanel === "layersPanel")
-                        widget.activatePanel(widget.layersPanel);
-
-                    widget.layersPanel.on("closed", function () {
-                        widget.navigationMenu.reset();
-                    });
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
+            var widget = this;
 
             all([
                 this._layersDeferred,
                 this._mapDeferred,
                 this._postCreateDeferred,
+                this.panelsManager.panelsReady.promise,
             ])
                 .then(function () {
                     if (widget._urlParams.base) {
@@ -1147,9 +835,12 @@ define([
                             basemapDefault: widget._getActiveBasemapKey(),
                             onChange: (key) => widget._switchBasemap(key),
                         },
-                        widget.layersPanel.contentWidget.basemapPane.domNode
+                        widget.panelsManager.getPanel("layers").contentWidget
+                            .basemapPane.domNode
                     );
-                    widget.layersPanel.resize();
+                    widget.panelsManager.getPanel("layers").resize();
+                    widget._setMapExtent();
+                    widget._mapExtentDeferred.resolve();
                 })
                 .then(undefined, function (err) {
                     console.error(err);
@@ -1209,19 +900,22 @@ define([
             };
             const { expanded, checked } = widget.config.itemsStates;
             this.webmapStore.setWebmapItems(widget.config.rootItem.children);
-            // this.webmapStore.setChecked(checked);
             this.webmapStore.setExpanded(expanded);
 
-            this.component = reactApp.default(
-                LayersTreeComp.default,
-                {
-                    store: this.webmapStore,
-                    onSelect: handleSelect,
-                    setLayerZIndex: setLayerZIndex,
-                    getWebmapPlugins: () => Object.assign({}, widget._plugins),
-                },
-                widget.layersPanel.contentWidget.layerTreePane.domNode
-            );
+            this.panelsManager.panelsReady.promise.then(() => {
+                this.component = reactApp.default(
+                    LayersTreeComp.default,
+                    {
+                        store: this.webmapStore,
+                        onSelect: handleSelect,
+                        setLayerZIndex: setLayerZIndex,
+                        getWebmapPlugins: () =>
+                            Object.assign({}, widget._plugins),
+                    },
+                    widget.panelsManager.getPanel("layers").contentWidget
+                        .layerTreePane.domNode
+                );
+            });
         },
 
         getVisibleItems: function () {
@@ -1318,36 +1012,144 @@ define([
                 });
         },
 
-        activatePanel: function (panel) {
-            if (panel.isFullWidth) {
-                domClass.add(
-                    this.leftPanelPane.domNode,
-                    "leftPanelPane--fullwidth"
-                );
-                this.leftPanelPane.set("splitter", false);
-            }
+        _buildPanels: function () {
+            const promises = all([
+                this._layersDeferred,
+                this._postCreateDeferred,
+            ]);
 
-            this.leftPanelPane.addChild(panel);
-            this.mainContainer.addChild(this.leftPanelPane);
-
-            panel.show();
+            promises
+                .then(lang.hitch(this, this._makePanels))
+                .then(undefined, (err) => {
+                    console.error(err);
+                });
         },
 
-        deactivatePanel: function (panel) {
-            this.mainContainer.removeChild(this.leftPanelPane);
-            this.leftPanelPane.removeChild(panel);
+        _makePanels: function () {
+            const panels = [];
 
-            if (panel.isFullWidth) {
-                domClass.remove(
-                    this.leftPanelPane.domNode,
-                    "leftPanelPane--fullwidth"
-                );
-                this.leftPanelPane.set("splitter", true);
-            }
+            panels.push({
+                cls: LayersPanel,
+                params: {
+                    title: i18n.gettext("Layers"),
+                    name: "layers",
+                    order: 10,
+                    menuIcon: "material-layers",
+                },
+            });
 
-            if (panel.isOpen) {
-                panel.hide();
-            }
+            panels.push({
+                cls: SearchPanel,
+                params: {
+                    title: i18n.gettext("Search"),
+                    name: "search",
+                    order: 20,
+                    menuIcon: "material-search",
+                    display: this,
+                },
+            });
+
+            panels.push({
+                cls: PrintMapPanel,
+                params: {
+                    title: i18n.gettext("Print map"),
+                    name: "print",
+                    order: 70,
+                    menuIcon: "material-print",
+                    splitter: false,
+                    display: this,
+                    map: this.map.olMap,
+                },
+            });
+
+            const makeBookmarkPanel = new Promise((resolve) => {
+                if (!this.config.bookmarkLayerId) {
+                    resolve(undefined);
+                }
+                const panel = {
+                    cls: BookmarkPanel,
+                    params: {
+                        title: i18n.gettext("Bookmarks"),
+                        name: "bookmark",
+                        order: 50,
+                        menuIcon: "material-bookmark",
+                        display: this,
+                        bookmarkLayerId: this.config.bookmarkLayerId,
+                    },
+                };
+                resolve(panel);
+            });
+            panels.push(makeBookmarkPanel);
+
+            const makeInfoPanel = new Promise((resolve) => {
+                if (!this.config.webmapDescription) {
+                    resolve(undefined);
+                }
+                const panel = {
+                    cls: InfoPanel,
+                    params: {
+                        title: i18n.gettext("Description"),
+                        name: "info",
+                        order: 40,
+                        menuIcon: "material-info",
+                        class: "info-panel dynamic-panel--fullwidth",
+                        withTitle: false,
+                        description: this.config.webmapDescription,
+                        display: this,
+                    },
+                };
+                resolve(panel);
+            });
+            panels.push(makeInfoPanel);
+
+            const makeAnnotationsPanel = new Promise((resolve) => {
+                if (
+                    !this.config.annotations ||
+                    !this.config.annotations.enabled ||
+                    !this.config.annotations.scope.read
+                ) {
+                    resolve(undefined);
+                }
+                const annotUrlParam = this._urlParams.annot;
+                let initialAnnotVisible;
+                if (
+                    annotUrlParam &&
+                    (annotUrlParam === "no" ||
+                        annotUrlParam === "yes" ||
+                        annotUrlParam === "messages")
+                ) {
+                    initialAnnotVisible = annotUrlParam;
+                }
+
+                const panel = {
+                    cls: AnnotationsPanel,
+                    params: {
+                        title: i18n.gettext("Annotations"),
+                        name: "annotation",
+                        order: 30,
+                        menuIcon: "material-message",
+                        display: this,
+                        initialAnnotVisible,
+                    },
+                };
+                resolve(panel);
+            });
+            panels.push(makeAnnotationsPanel);
+
+            panels.push({
+                cls: SharePanel,
+                params: {
+                    title: i18n.gettext("Share"),
+                    name: "share",
+                    order: 60,
+                    menuIcon: "material-share",
+                    display: this,
+                    eventVisibility: undefined,
+                },
+            });
+
+            this.panelsManager.addPanels(panels);
+            this.panelsManager.initFinalize();
         },
     });
 });

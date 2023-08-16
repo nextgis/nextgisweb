@@ -11,7 +11,6 @@ define([
     "dojo/debounce",
     "dojo/on",
     "dojo/query",
-    "dojo/aspect",
     "dojo/dom-class",
     "dojo/dom-construct",
     "dojo/Deferred",
@@ -43,7 +42,6 @@ define([
     debounce,
     on,
     query,
-    aspect,
     domClass,
     domConstruct,
     Deferred,
@@ -128,7 +126,7 @@ define([
                 );
 
                 on(this.contentWidget.closePanel, "click", () => {
-                    this.hide();
+                    this.emit("closed", this);
                 });
             },
 
@@ -259,10 +257,12 @@ define([
             show: function () {
                 this.inherited(arguments);
 
-                this._buildPrintElement();
-                this._resizeMapContainer();
-                this._buildMap();
-                this._updateMapSize();
+                this.options.display._mapExtentDeferred.then(() => {
+                    this._buildPrintElement();
+                    this._resizeMapContainer();
+                    this._buildMap();
+                    this._updateMapSize();
+                });
             },
 
             _resizeMapContainer: function () {
@@ -277,7 +277,6 @@ define([
             },
 
             hide: function () {
-                this.inherited(arguments);
                 array.forEach(
                     this.printMap.olMap.getLayers().getArray(),
                     function (layer) {
@@ -386,10 +385,10 @@ define([
                     this._changeScaleControls(value, type);
                 }
             },
-            
+
             _mmToPx: function (mm) {
                 // According to https://www.w3.org/TR/css3-values/#absolute-lengths
-                return mm / 10 *  (96 / 2.54);
+                return (mm / 10) * (96 / 2.54);
             },
 
             _buildPageStyle: function (width, height, margin) {

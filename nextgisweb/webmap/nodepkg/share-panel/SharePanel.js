@@ -88,8 +88,10 @@ export const SharePanel = ({ display, eventVisibility }) => {
     };
 
     const updateTexts = useCallback(() => {
-        updatePermalinkUrl();
-        updateEmbedCode();
+        display._mapExtentDeferred.then(() => {
+            updatePermalinkUrl();
+            updateEmbedCode();
+        });
     }, []);
 
     const handleShow = () => {
@@ -106,7 +108,9 @@ export const SharePanel = ({ display, eventVisibility }) => {
     };
 
     useEffect(() => {
-        updateEmbedCode();
+        display._mapExtentDeferred.then(() => {
+            updateEmbedCode();
+        });
     }, [widthMap, heightMap, addLinkToMap, generateEvents]);
 
     useEffect(() => {

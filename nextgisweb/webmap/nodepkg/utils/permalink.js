@@ -9,8 +9,9 @@ export const getPermalink = (display, visibleItems, options) => {
         toLonLat(display.map.olMap.getView().getCenter());
 
     let annot;
-    if (display && display.annotationPanel) {
-        annot = display.annotationPanel.getAnnotVisibleState();
+    const annotationPanel = display.panelsManager.getPanel("annotation");
+    if (display && annotationPanel) {
+        annot = annotationPanel.getAnnotVisibleState();
     }
 
     let params = {

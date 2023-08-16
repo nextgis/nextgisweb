@@ -18,7 +18,7 @@ import { pageFormats, scalesList, exportFormats } from "./options.js";
 
 import "./PrintMapPanel.less";
 
-export const PrintMapPanel = ({ onAction, scaleMap }) => {
+export const PrintMapPanel = ({ display, onAction, scaleMap }) => {
     const [paperFormat, setPaperFormat] = useState("210_297");
     const [height, setHeight] = useState(297);
     const [width, setWidth] = useState(210);
@@ -34,7 +34,9 @@ export const PrintMapPanel = ({ onAction, scaleMap }) => {
     };
 
     useEffect(() => {
-        onChangeMapSize();
+        display._mapExtentDeferred.then(() => {
+            onChangeMapSize();
+        });
     }, []);
 
     useEffect(() => {
