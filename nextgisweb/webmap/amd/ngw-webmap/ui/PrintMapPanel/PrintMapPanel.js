@@ -77,6 +77,7 @@ define([
                 value: false,
                 line: false,
             },
+            _initComp: new Deferred(),
 
             constructor: function (options) {
                 declare.safeMixin(this, options);
@@ -137,6 +138,7 @@ define([
                     this._mapSizes = payload;
                     this._resizeMapContainer();
                     this._updateMapSize();
+                    this._initComp.resolve();
                 }
 
                 if (action === "change-scale") {
@@ -259,7 +261,10 @@ define([
             show: function () {
                 this.inherited(arguments);
 
-                this.options.display._mapExtentDeferred.then(() => {
+                Promise.all([
+                    this._initComp,
+                    this.options.display._mapExtentDeferred,
+                ]).then(() => {
                     this._buildPrintElement();
                     this._resizeMapContainer();
                     this._buildMap();
