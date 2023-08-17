@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 
 import { Row, Col, Tree } from "@nextgisweb/gui/antd";
@@ -74,7 +74,7 @@ const prepareWebMapItems = (webMapItems) => {
 };
 
 export const LayersTree = observer(
-    ({ store, onSelect, setLayerZIndex, getWebmapPlugins }) => {
+    ({ store, onSelect, setLayerZIndex, getWebmapPlugins, onReady }) => {
         const [draggable] = useState(true);
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
@@ -94,6 +94,12 @@ export const LayersTree = observer(
             }
             return false;
         }, [store.webmapItems]);
+
+        useEffect(() => {
+            if (onReady) {
+                onReady();
+            }
+        }, []);
 
         const onExpand = (expandedKeysValue) => {
             store.setExpanded(expandedKeysValue);
@@ -230,4 +236,5 @@ LayersTree.propTypes = {
     onSelect: PropTypes.func,
     getWebmapPlugins: PropTypes.func,
     setLayerZIndex: PropTypes.func,
+    onReady: PropTypes.func,
 };

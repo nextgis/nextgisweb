@@ -832,7 +832,6 @@ define([
                         widget.panelsManager.getPanel("layers").contentWidget
                             .basemapPane.domNode
                     );
-                    widget.panelsManager.getPanel("layers").resize();
                     widget._setMapExtent();
                     widget._mapExtentDeferred.resolve();
                 })
@@ -892,7 +891,7 @@ define([
                     layer.olLayer.setZIndex(zIndex);
                 }
             };
-            const { expanded, checked } = widget.config.itemsStates;
+            const { expanded } = widget.config.itemsStates;
             this.webmapStore.setWebmapItems(widget.config.rootItem.children);
             this.webmapStore.setExpanded(expanded);
 
@@ -905,8 +904,11 @@ define([
                         setLayerZIndex: setLayerZIndex,
                         getWebmapPlugins: () =>
                             Object.assign({}, widget._plugins),
+                        onReady: () => {
+                            this.panelsManager.getPanel("layers").resize();
+                        },
                     },
-                    widget.panelsManager.getPanel("layers").contentWidget
+                    this.panelsManager.getPanel("layers").contentWidget
                         .layerTreePane.domNode
                 );
             });
