@@ -2,14 +2,23 @@
 import { createRoot } from "react-dom/client";
 import { ConfigProvider } from "./antd";
 
+import type { Root } from "react-dom/client";
+
 type PropsType = Record<string, unknown>;
+
+const rootsMap = new Map<HTMLElement, Root>();
 
 export default function reactApp<P extends PropsType = PropsType>(
     Component: React.ComponentType<P>,
     props: P,
     domNode: HTMLElement
 ) {
-    const root = createRoot(domNode);
+    let root = rootsMap.get(domNode);
+
+    if (!root) {
+        root = createRoot(domNode);
+        rootsMap.set(domNode, root);
+    }
 
     root.render(
         <ConfigProvider>
@@ -18,7 +27,8 @@ export default function reactApp<P extends PropsType = PropsType>(
     );
 
     const unmount = () => {
-        root.unmount();
+        root!.unmount();
+        rootsMap.delete(domNode);
     };
 
     return {
