@@ -1,37 +1,55 @@
 import orderBy from "lodash/orderBy";
 import reactApp from "@nextgisweb/gui/react-app";
+
 import NavigationMenu from "@nextgisweb/webmap/navigation-menu";
 
-function Deferred() {
-    this.promise = new Promise((resolve, reject) => {
-        this.reject = reject;
-        this.resolve = resolve;
-    });
+import type { DojoItem, PanelDojoItem } from "./type";
+
+interface PanelElements {
+    main: DojoItem;
+    leftPanel: PanelDojoItem;
+    navigation: HTMLElement;
 }
 
-const isFuncReactComponent = (cls) => {
+class Deferred<T> {
+    promise: Promise<T>;
+    resolve!: (value: T | PromiseLike<T>) => void;
+    reject!: (reason: unknown) => void;
+
+    constructor() {
+        this.promise = new Promise<T>((resolve, reject) => {
+            this.resolve = resolve;
+            this.reject = reject;
+        });
+    }
+}
+
+function isFuncReactComponent(cls: any): cls is React.FC {
     return (
         typeof cls === "function" &&
         String(cls).includes("return React.createElement")
     );
-};
+}
 
 export class PanelsManager {
-    private _domElements;
-    private _activePanelKey;
-    private _panels = new Map();
+    private _domElements!: PanelElements;
+    private _activePanelKey?: string;
+    private _panels = new Map<string, PanelDojoItem>();
     private _initialized = false;
-    private _initPromises = [];
+    private _initPromises: Promise<PanelDojoItem>[] = [];
 
-    private _onChangePanel;
-    private _panelsReady = new Deferred();
+    private _onChangePanel: (panel?: PanelDojoItem) => void;
+    private _panelsReady = new Deferred<void>();
 
-    constructor(activePanelKey, onChangePanel) {
+    constructor(
+        activePanelKey: string | undefined,
+        onChangePanel: (panel?: PanelDojoItem) => void
+    ) {
         this._activePanelKey = activePanelKey;
         this._onChangePanel = onChangePanel;
     }
 
-    private _clickNavigationMenu(newPanel) {
+    private _clickNavigationMenu(newPanel: PanelDojoItem): void {
         const { name } = newPanel;
 
         if (this._activePanelKey === name) {
@@ -39,7 +57,10 @@ export class PanelsManager {
             this._activePanelKey = undefined;
         } else {
             if (this._activePanelKey) {
-                this._deactivatePanel(this._panels.get(this._activePanelKey));
+                const activePanel = this._panels.get(this._activePanelKey);
+                if (activePanel) {
+                    this._deactivatePanel(activePanel);
+                }
             }
             this._activatePanel(newPanel);
             this._activePanelKey = name;
@@ -48,19 +69,19 @@ export class PanelsManager {
         this._buildNavigationMenu();
     }
 
-    private _buildNavigationMenu() {
+    private _buildNavigationMenu(): void {
         reactApp(
             NavigationMenu,
             {
                 panels: this._panels,
                 active: this._activePanelKey,
-                onClick: (p) => this._clickNavigationMenu(p),
+                onClick: (p: PanelDojoItem) => this._clickNavigationMenu(p),
             },
             this._domElements.navigation
         );
     }
 
-    private _activatePanel(panel) {
+    private _activatePanel(panel: PanelDojoItem): void {
         if (panel.isFullWidth) {
             this._domElements.leftPanel.domNode.classList.add(
                 "leftPanelPane--fullwidth"
@@ -75,7 +96,7 @@ export class PanelsManager {
         this._onChangePanel(panel);
     }
 
-    private _deactivatePanel(panel) {
+    private _deactivatePanel(panel: PanelDojoItem): void {
         this._domElements.main.removeChild(this._domElements.leftPanel);
         this._domElements.leftPanel.removeChild(panel);
 
@@ -90,12 +111,12 @@ export class PanelsManager {
         this._onChangePanel(undefined);
     }
 
-    private _closePanel(panel) {
+    private _closePanel(panel: PanelDojoItem): void {
         this._deactivatePanel(panel);
         this._activePanelKey = undefined;
     }
 
-    private _handleInitActive() {
+    private _handleInitActive(): void {
         if (this._initialized) {
             return;
         }
@@ -106,25 +127,28 @@ export class PanelsManager {
             this._panelsReady.resolve();
         }
 
-        if (this._panels.has(this._activePanelKey)) {
-            this._activatePanel(this._panels.get(this._activePanelKey));
-            this._initialized = true;
-            this._panelsReady.resolve();
+        if (this._activePanelKey && this._panels.has(this._activePanelKey)) {
+            const activePanel = this._panels.get(this._activePanelKey);
+            if (activePanel) {
+                this._activatePanel(activePanel);
+                this._initialized = true;
+                this._panelsReady.resolve();
+            }
         }
     }
 
-    private _activateFirstPanel() {
+    private _activateFirstPanel(): void {
         const [name, firstPanel] = this._panels.entries().next().value;
         this._activePanelKey = name;
         this._activatePanel(firstPanel);
     }
 
-    private _makePanel(panel) {
+    private _makePanel(panel: PanelDojoItem): void {
         if (!panel) {
             return;
         }
 
-        let newPanel: object;
+        let newPanel: PanelDojoItem;
         let name: string;
         if (panel.cls) {
             const { cls, params } = panel;
@@ -134,16 +158,20 @@ export class PanelsManager {
                 throw new Error("Panel React rendering is not implemented");
             } else {
                 const widget = new cls(params);
-                widget.on("closed", (panel) => {
+                widget.on("closed", (panel: PanelDojoItem) => {
+                    // can't reach this event
                     this._closePanel(panel);
                 });
                 newPanel = widget;
             }
         } else {
             name = panel.name;
-            panel.on("closed", (panel) => {
-                this._closePanel(panel);
-            });
+            if (panel.on) {
+                panel.on("closed", (panel: PanelDojoItem) => {
+                    // can't reach this event
+                    this._closePanel(panel);
+                });
+            }
             newPanel = panel;
         }
 
@@ -160,13 +188,13 @@ export class PanelsManager {
         this._handleInitActive();
     }
 
-    initDomElements(domElements) {
+    initDomElements(domElements: PanelElements): void {
         const { main, leftPanel, navigation } = domElements;
         this._domElements = { main, leftPanel, navigation };
         this._buildNavigationMenu();
     }
 
-    initFinalize() {
+    initFinalize(): void {
         Promise.all(this._initPromises).then(() => {
             this._handleInitActive();
             if (!this._initialized) {
@@ -174,17 +202,19 @@ export class PanelsManager {
                 this._panelsReady.resolve();
                 this._initialized = true;
             }
-            this._initPromises = undefined;
+            this._initPromises.length = 0;
         });
     }
 
-    async addPanels(panelsInfo) {
-        let panels = panelsInfo;
-        if (!Array.isArray(panelsInfo)) {
-            panels = [panelsInfo];
-        }
+    async addPanels(
+        panelsInfo: PanelDojoItem[] | PanelDojoItem | Promise<PanelDojoItem>[]
+    ): Promise<void> {
+        const panels: (PanelDojoItem | Promise<PanelDojoItem>)[] =
+            Array.isArray(panelsInfo) ? panelsInfo : [panelsInfo];
+        const promises = panels.filter(
+            (p): p is Promise<PanelDojoItem> => p instanceof Promise
+        );
 
-        const promises = panels.filter((p) => p instanceof Promise);
         promises.forEach((p) =>
             p.then((panelInfo) => {
                 this._makePanel(panelInfo);
@@ -195,17 +225,19 @@ export class PanelsManager {
             this._initPromises.push(...promises);
         }
 
-        const readyPanels = panels.filter((p) => !(p instanceof Promise));
+        const readyPanels = panels.filter(
+            (p): p is PanelDojoItem => !(p instanceof Promise)
+        );
         readyPanels.forEach((panelInfo) => {
             this._makePanel(panelInfo);
         });
     }
 
-    getPanel(name) {
+    getPanel(name: string): PanelDojoItem | undefined {
         return this._panels.get(name);
     }
 
-    get panelsReady() {
+    get panelsReady(): Deferred<void> {
         return this._panelsReady;
     }
 }
