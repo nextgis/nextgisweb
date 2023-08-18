@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from secrets import token_hex
 
 import pytest
 import transaction
@@ -25,10 +26,11 @@ def create_feature_layer(ogrlayer, parent_id, ngw_httptest_app):
                 parent_id=parent_id,
                 owner_user=User.by_keyname('administrator'))
             service = WFSService(
-                **res_common, display_name='WFS service',
+                display_name=token_hex(),
+                **res_common,
             ).persist()
             service_layer = WFS_Service_Layer(
-                resource_id=vlayer.id, display_name='Layer',
+                resource_id=vlayer.id, display_name=token_hex(),
                 keyname='layer'
             )
             service.layers.append(service_layer)
@@ -36,13 +38,13 @@ def create_feature_layer(ogrlayer, parent_id, ngw_httptest_app):
         with transaction.manager:
             wfs_path = '{}/api/resource/{}/wfs'.format(ngw_httptest_app.base_url, service.id)
             connection = WFSConnection(
-                **res_common, display_name='WFS connection',
+                **res_common, display_name=token_hex(),
                 path=wfs_path, version='2.0.2',
                 username='administrator', password='admin',
             ).persist()
 
             layer = WFSLayer(
-                **res_common, display_name='Feature layer (WFS)',
+                **res_common, display_name=token_hex(),
                 connection=connection, srs=SRS.filter_by(id=3857).one(),
                 layer_name=service_layer.keyname, column_geom='geom',
                 geometry_srid=vlayer.srs_id, geometry_type='POINT',

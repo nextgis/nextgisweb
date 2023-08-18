@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from secrets import token_hex
 
 import transaction
 
@@ -14,7 +15,8 @@ from .. import VectorLayer
 def create_feature_layer(ogrlayer, parent_id, **kwargs):
     with transaction.manager:
         layer = VectorLayer(
-            parent_id=parent_id, display_name='Feature layer (vector)',
+            parent_id=parent_id,
+            display_name=token_hex(),
             owner_user=User.by_keyname('administrator'),
             srs=SRS.filter_by(id=3857).one(),
         ).persist()

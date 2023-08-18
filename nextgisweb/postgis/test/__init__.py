@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from secrets import token_hex
 from uuid import uuid4
 
 import geoalchemy2 as ga
@@ -103,14 +104,14 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
             owner_user=User.by_keyname('administrator'))
 
         connection = PostgisConnection(
-            **res_common, display_name='PostGIS connection',
+            **res_common, display_name=token_hex(),
             hostname=opts_db['host'], port=opts_db['port'],
             database=opts_db['name'], username=opts_db['user'],
             password=opts_db['password']
         ).persist()
 
         layer = PostgisLayer(
-            **res_common, display_name='Feature layer (postgis)',
+            **res_common, display_name=token_hex(),
             connection=connection, srs=SRS.filter_by(id=srid).one(),
             table=table.name, schema='public',
             column_id=column_id, column_geom=column_geom,
