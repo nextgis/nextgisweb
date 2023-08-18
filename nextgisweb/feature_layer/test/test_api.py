@@ -9,10 +9,10 @@ from osgeo import ogr
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
-from nextgisweb.auth import User
 from nextgisweb.feature_layer.ogrdriver import EXPORT_FORMAT_OGR
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
 def test_identify(ngw_webtest_app):
@@ -26,13 +26,9 @@ def test_identify(ngw_webtest_app):
 
 
 @pytest.fixture(scope='module')
-def vector_layer_id(ngw_resource_group):
+def vector_layer_id():
     with transaction.manager:
-        obj = VectorLayer(
-            parent_id=ngw_resource_group, display_name='vector_layer',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist()
+        obj = VectorLayer().persist()
 
         geojson = {
             'type': 'FeatureCollection',
@@ -58,11 +54,8 @@ def vector_layer_id(ngw_resource_group):
 
     yield obj.id
 
-    with transaction.manager:
-        DBSession.delete(VectorLayer.filter_by(id=obj.id).one())
 
-
-def test_fields_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+def test_fields_edit(ngw_webtest_app, vector_layer_id):
     resp = ngw_webtest_app.get('/api/resource/%d' % vector_layer_id)
     fields = resp.json['feature_layer']['fields']
 
@@ -133,7 +126,7 @@ def test_fields_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     assert fields[2]['keyname'] == 'new_field2'
 
 
-def test_geom_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+def test_geom_edit(ngw_webtest_app, vector_layer_id):
 
     def wkt_compare(wkt1, wkt2):
         g1 = Geometry.from_wkt(wkt1)
@@ -168,7 +161,7 @@ def test_geom_edit(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     assert round(coords[1], 3) == 5621521.486
 
 
-def test_fields_unique(ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
+def test_fields_unique(ngw_webtest_app, ngw_resource_group):
     url_create = '/api/resource/'
 
     fields = [dict(
@@ -233,7 +226,7 @@ def test_fields_unique(ngw_webtest_app, ngw_auth_administrator, ngw_resource_gro
 @pytest.mark.parametrize('fmt, zipped, srs', product(
     EXPORT_FORMAT_OGR.keys(), ('true', 'false'), (4326, 3857)
 ))
-def test_export(fmt, zipped, srs, ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+def test_export(fmt, zipped, srs, ngw_webtest_app, vector_layer_id):
     ngw_webtest_app.get('/api/resource/%d/export' % vector_layer_id,
                         dict(format=fmt, zipped=zipped, srs=srs), status=200)
 
@@ -242,7 +235,7 @@ def test_export(fmt, zipped, srs, ngw_webtest_app, vector_layer_id, ngw_auth_adm
     (4096, 6.5, 0.1),
     (2048, 4.1, 0.01),
 ))
-def test_mvt(extent, simplification, padding, ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+def test_mvt(extent, simplification, padding, ngw_webtest_app, vector_layer_id):
     params = dict(z=0, x=0, y=0, resource=vector_layer_id,
                   extent=extent, simplification=simplification, padding=padding)
     ngw_webtest_app.get('/api/component/feature_layer/mvt', params, status=200)
@@ -252,7 +245,7 @@ def test_mvt(extent, simplification, padding, ngw_webtest_app, vector_layer_id, 
     (True, 200),
     (False, 404),
 ))
-def test_mvt_should_return_not_found_if_mvt_driver_not_available(mvt_driver_exist, status_expected, ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+def test_mvt_should_return_not_found_if_mvt_driver_not_available(mvt_driver_exist, status_expected, ngw_webtest_app, vector_layer_id):
     from .. import ogrdriver
     old_MVT_DRIVER_EXIST = ogrdriver.MVT_DRIVER_EXIST
     ogrdriver.MVT_DRIVER_EXIST = mvt_driver_exist
@@ -268,7 +261,7 @@ def test_mvt_should_return_not_found_if_mvt_driver_not_available(mvt_driver_exis
     importlib.reload(api)
 
 
-def test_filter(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+def test_filter(ngw_webtest_app, vector_layer_id):
     url = '/api/resource/%d/feature/' % vector_layer_id
 
     resp = ngw_webtest_app.get(url, dict(fld_price__ge=-1), status=200)
@@ -278,7 +271,7 @@ def test_filter(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
     ngw_webtest_app.get(url, dict(fld_not_exists='no matter'), status=422)
 
 
-def test_cdelete(ngw_webtest_app, vector_layer_id, ngw_auth_administrator):
+def test_cdelete(ngw_webtest_app, vector_layer_id):
     url = '/api/resource/%d/feature/' % vector_layer_id
 
     resp = ngw_webtest_app.delete_json(url, [])

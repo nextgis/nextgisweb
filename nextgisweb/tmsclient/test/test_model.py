@@ -1,8 +1,11 @@
 import numpy as np
+import pytest
 
 from nextgisweb.spatial_ref_sys.model import BOUNDS_EPSG_3857, SRS
 
 from ..model import Layer
+
+pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
 
 
 def image_compare(im1, im2):
@@ -11,7 +14,7 @@ def image_compare(im1, im2):
     return np.array_equal(arr1, arr2)
 
 
-def test_layer(ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
+def test_layer(ngw_webtest_app, ngw_resource_group):
     data = dict(
         resource=dict(
             cls='tmsclient_connection', display_name='test-tms_connection',

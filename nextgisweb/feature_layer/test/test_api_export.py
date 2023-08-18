@@ -9,22 +9,18 @@ from osgeo import gdal, ogr
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 
 from .. import Feature
 from ..ogrdriver import EXPORT_FORMAT_OGR
 
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
+
 
 @pytest.fixture(scope='module')
-def layer_id(ngw_resource_group):
+def layer_id():
     with transaction.manager:
-        obj = VectorLayer(
-            parent_id=ngw_resource_group, display_name='vector_layer',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist()
+        obj = VectorLayer().persist()
 
         geojson = {
             "type": "FeatureCollection",
@@ -51,12 +47,9 @@ def layer_id(ngw_resource_group):
 
     yield obj.id
 
-    with transaction.manager:
-        DBSession.delete(VectorLayer.filter_by(id=obj.id).one())
-
 
 @pytest.fixture()
-def update_field(layer_id, ngw_webtest_app, ngw_auth_administrator):
+def update_field(layer_id, ngw_webtest_app):
 
     def wrapped(**field):
         if 'keyname' not in field:
@@ -76,7 +69,7 @@ def update_field(layer_id, ngw_webtest_app, ngw_auth_administrator):
 
 
 @pytest.fixture()
-def export_geojson(layer_id, ngw_webtest_app, ngw_auth_administrator):
+def export_geojson(layer_id, ngw_webtest_app):
 
     def wrapped(display_name=False, fid=None, intersects=None, intersects_srs=None):
         qs = dict(
@@ -133,19 +126,13 @@ def test_intersects(intersects, count, export_geojson):
 
 
 @pytest.fixture(scope='function')
-def resources(ngw_resource_group):
+def resources():
     some = 3
     params = []
 
     with transaction.manager:
-        admin = User.by_keyname('administrator')
-        srs = SRS.filter_by(id=3857).one()
         for i in range(some):
-            layer = VectorLayer(
-                parent_id=ngw_resource_group, display_name=f'Test layer {i}',
-                owner_user=admin, srs=srs, geometry_type='POINT',
-            ).persist()
-
+            layer = VectorLayer(geometry_type='POINT').persist()
             layer.setup_from_fields([])
 
             DBSession.flush()
@@ -158,10 +145,6 @@ def resources(ngw_resource_group):
 
     yield params
 
-    with transaction.manager:
-        for param in params:
-            DBSession.delete(VectorLayer.filter_by(id=param['id']).one())
-
 
 @pytest.mark.parametrize('driver_label', [
     pytest.param(label, id=label, marks=pytest.mark.skipif(
@@ -169,7 +152,7 @@ def resources(ngw_resource_group):
         reason='Not readable'))
     for label, driver in EXPORT_FORMAT_OGR.items()
 ])
-def test_export_multi(driver_label, resources, ngw_webtest_app, ngw_auth_administrator):
+def test_export_multi(driver_label, resources, ngw_webtest_app):
     driver = EXPORT_FORMAT_OGR[driver_label]
     params = dict(
         format=driver_label,

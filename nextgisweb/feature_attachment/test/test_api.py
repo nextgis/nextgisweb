@@ -9,26 +9,21 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.json import dumpb
 
-from nextgisweb.auth import User
 from nextgisweb.feature_layer import Feature
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 
 from .. import FeatureAttachment
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 att_ids = dict()
 
 
 @pytest.fixture(scope='module')
-def layer_id(ngw_resource_group):
+def layer_id():
     att_ids.clear()
     with transaction.manager:
-        res = VectorLayer(
-            parent_id=ngw_resource_group, display_name='Test attachments',
-            owner_user=User.by_keyname('administrator'),
-            geometry_type='POINT',
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist()
+        res = VectorLayer(geometry_type='POINT').persist()
 
         res.setup_from_fields([])
 
@@ -104,7 +99,7 @@ def clear(layer_id):
         dict(error=True)
     ),
 ))
-def test_import(files, result, layer_id, clear, ngw_webtest_app, ngw_auth_administrator):
+def test_import(files, result, layer_id, clear, ngw_webtest_app):
     upload_meta = generate_archive(files, ngw_webtest_app)
 
     status = 422 if result.get('error') else 200
@@ -135,7 +130,7 @@ def test_import(files, result, layer_id, clear, ngw_webtest_app, ngw_auth_admini
     assert import_result['imported'] == imported
 
 
-def test_import_multiple(layer_id, ngw_webtest_app, ngw_auth_administrator):
+def test_import_multiple(layer_id, ngw_webtest_app):
     files = (
         dict(name='00001/test_A', content='AAA'),
         dict(name='00001/test_B', content='BBB'),

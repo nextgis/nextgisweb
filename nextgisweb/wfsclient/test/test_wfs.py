@@ -7,8 +7,6 @@ from shapely.geometry import Polygon
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer import test as vector_layer_test
 from nextgisweb.wfsserver.model import Layer as WFS_Service_Layer
@@ -16,18 +14,16 @@ from nextgisweb.wfsserver.model import Service as WFSService
 
 from ..model import WFSConnection, WFSLayer
 
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
+
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', )
 DATA = Path(vector_layer_test.__file__).parent / 'data'
 
 
 @pytest.fixture
-def wfs_service_path(ngw_resource_group, ngw_httptest_app):
+def wfs_service_path(ngw_httptest_app):
     with transaction.manager:
-        vl_type = VectorLayer(
-            parent_id=ngw_resource_group, display_name='type',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist().from_ogr(DATA / 'type.geojson')
+        vl_type = VectorLayer().persist().from_ogr(DATA / 'type.geojson')
 
         DBSession.flush()
 
@@ -35,10 +31,7 @@ def wfs_service_path(ngw_resource_group, ngw_httptest_app):
         # XSD schema parsing. Delete the time field to pass tests.
         DBSession.delete(vl_type.field_by_keyname('time'))
 
-        wfs_service = WFSService(
-            parent_id=ngw_resource_group, display_name='test_wfsserver_service',
-            owner_user=User.by_keyname('administrator'),
-        ).persist()
+        wfs_service = WFSService().persist()
         wfs_service.layers.append(
             WFS_Service_Layer(
                 resource=vl_type, keyname='type',
@@ -53,35 +46,25 @@ def wfs_service_path(ngw_resource_group, ngw_httptest_app):
     path = '{}/api/resource/{}/wfs'.format(ngw_httptest_app.base_url, wfs_service.id)
     yield path
 
-    with transaction.manager:
-        DBSession.delete(VectorLayer.filter_by(id=vl_type.id).one())
-        DBSession.delete(WFSService.filter_by(id=wfs_service.id).one())
-
 
 @pytest.fixture
-def connection_id(ngw_resource_group, wfs_service_path):
+def connection_id(wfs_service_path):
     with transaction.manager:
-        admin = User.by_keyname('administrator')
         obj = WFSConnection(
-            parent_id=ngw_resource_group, display_name='wfs_connection',
-            owner_user=admin, path=wfs_service_path,
-            username='administrator', password='admin',
+            path=wfs_service_path,
+            username='administrator',
+            password='admin',
             version='2.0.2'
         ).persist()
 
     yield obj.id
 
-    with transaction.manager:
-        DBSession.delete(WFSConnection.filter_by(id=obj.id).one())
-
 
 @pytest.fixture
-def layer_id(ngw_resource_group, connection_id):
+def layer_id(connection_id):
     with transaction.manager:
-        admin = User.by_keyname('administrator')
         obj = WFSLayer(
-            parent_id=ngw_resource_group, display_name='wfs_layer',
-            owner_user=admin, srs_id=3857, connection_id=connection_id,
+            srs_id=3857, connection_id=connection_id,
             layer_name='type', column_geom='geom', geometry_srid=3857,
             geometry_type='POINT'
         ).persist()
@@ -91,11 +74,8 @@ def layer_id(ngw_resource_group, connection_id):
 
     yield obj.id
 
-    with transaction.manager:
-        DBSession.delete(WFSLayer.filter_by(id=obj.id).one())
 
-
-def test_connection(connection_id, ngw_webtest_app, ngw_auth_administrator):
+def test_connection(connection_id, ngw_webtest_app):
     res = ngw_webtest_app.get('/api/resource/%d/wfs_connection/inspect/' % connection_id)
     assert res.json == [dict(name='type', srid=3857)]
 
@@ -103,7 +83,7 @@ def test_connection(connection_id, ngw_webtest_app, ngw_auth_administrator):
         connection_id, 'type'), status=200)
 
 
-def test_layer(layer_id, ngw_webtest_app, ngw_auth_administrator):
+def test_layer(layer_id, ngw_webtest_app):
     layer_url = '/api/resource/%d' % layer_id
 
     feature1 = ngw_webtest_app.get('%s/feature/1' % layer_url, dict(geom_format='geojson')).json

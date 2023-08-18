@@ -6,11 +6,10 @@ from sqlalchemy.engine.url import make_url as make_engine_url
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
-
 from .. import PostgisConnection, PostgisLayer
 from ..diagnostics import StatusEnum
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
 @pytest.fixture()
@@ -68,22 +67,16 @@ def creds(ngw_env):
                 conn.execute(sa.text('DROP TABLE test_types;'))
 
 
-def test_types(creds, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
+def test_types(creds, ngw_webtest_app):
     with transaction.manager:
-        admin = User.by_keyname('administrator')
-
         connection = PostgisConnection(
-            parent_id=ngw_resource_group, owner_user=admin,
-            display_name='Test types connection',
             hostname=creds['host'], port=creds['port'],
             database=creds['database'], username=creds['username'],
             password=creds['password']
         ).persist()
 
         layer = PostgisLayer(
-            parent_id=ngw_resource_group, owner_user=admin,
-            display_name='Test types layer',
-            connection=connection, srs=SRS.filter_by(id=3857).one(),
+            connection=connection,
             schema='public', table='test_types', column_id='id', column_geom='geom',
         ).persist()
 

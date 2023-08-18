@@ -20,6 +20,8 @@ from ..interface import (
 )
 from .data import generate_filter_extents
 
+pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
+
 data_points = Path(__file__).parent / 'data' / 'points.geojson'
 filter_cases = (
     ((('null', 'isnull', 'yes'), ), [1, 2]),
@@ -76,7 +78,7 @@ def cmp_geom(gj_geom, geom2, srs):
     pytest.param(create_wfs_layer, id='wfsclient_layer'),
     pytest.param(create_postgis_layer, id='postgis_layer'),
 ))
-def test_attributes(create_resource, ngw_resource_group_sub, ngw_auth_administrator, ngw_httptest_app):
+def test_attributes(create_resource, ngw_resource_group_sub, ngw_httptest_app):
     geojson = json.loads(data_points.read_text())
     gj_fs = geojson['features']
 

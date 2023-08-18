@@ -4,6 +4,8 @@ import pytest
 
 from nextgisweb.env import Component, load_all
 
+pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
+
 
 def pytest_generate_tests(metafunc):
     if "component" in metafunc.fixturenames:
@@ -49,7 +51,7 @@ def override(ngw_core_settings_override):
     ('system_name', 'core', 'system.full_name', 'full_name', 'test_sysname'),
     ('home_path', 'pyramid', 'home_path', 'home_path', '/resource/-1'),
 ))
-def test_misc_settings(api_key, comp, setting_key, key, value, override, webtest, ngw_auth_administrator):
+def test_misc_settings(api_key, comp, setting_key, key, value, override, webtest):
     api_url = f'/api/component/pyramid/{api_key}'
     with override(comp, setting_key):
         webtest.put_json(api_url, {key: value}, status=200)
@@ -57,7 +59,7 @@ def test_misc_settings(api_key, comp, setting_key, key, value, override, webtest
         assert resp.json[key] == value
 
 
-def test_custom_css(override, webtest, ngw_auth_administrator):
+def test_custom_css(override, webtest):
     api_url = '/api/component/pyramid/custom_css'
     value = 'any text'
     with override('pyramid', 'custom_css'):

@@ -8,13 +8,13 @@ from osgeo import gdal, ogr
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer import test as vector_layer_test
 
 from ..model import Layer as WFSLayer
 from ..model import Service as WFSService
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
 DATA = Path(vector_layer_test.__file__).parent / 'data'
@@ -33,13 +33,9 @@ def force_schema_validation(ngw_env):
 
 
 @pytest.fixture(scope='module')
-def service(ngw_resource_group):
+def service():
     with transaction.manager:
-        vl_type = VectorLayer(
-            parent_id=ngw_resource_group, display_name='type',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist().from_ogr(DATA / 'type.geojson')
+        vl_type = VectorLayer().persist().from_ogr(DATA / 'type.geojson')
 
         DBSession.flush()
 
@@ -47,18 +43,11 @@ def service(ngw_resource_group):
         # XSD schema parsing. Delete the time field to pass tests.
         DBSession.delete(vl_type.field_by_keyname('time'))
 
-        vl_pointz = VectorLayer(
-            parent_id=ngw_resource_group, display_name='pointz',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist().from_ogr(DATA / 'pointz.geojson')
+        vl_pointz = VectorLayer().persist().from_ogr(DATA / 'pointz.geojson')
 
         DBSession.flush()
 
-        res_wfs = WFSService(
-            parent_id=ngw_resource_group, display_name='test_wfsserver_service',
-            owner_user=User.by_keyname('administrator'),
-        ).persist()
+        res_wfs = WFSService().persist()
 
         res_wfs.layers.extend((
             WFSLayer(resource=vl_type, keyname='type', display_name='type', maxfeatures=1000),
@@ -73,14 +62,9 @@ def service(ngw_resource_group):
 
     yield res_wfs.id
 
-    with transaction.manager:
-        DBSession.delete(VectorLayer.filter_by(id=vl_type.id).one())
-        DBSession.delete(VectorLayer.filter_by(id=vl_pointz.id).one())
-        DBSession.delete(WFSService.filter_by(id=res_wfs.id).one())
-
 
 @pytest.fixture()
-def features(service, ngw_httptest_app, ngw_auth_administrator):
+def features(service, ngw_httptest_app):
     # Module scope doesn't work here because of function scope fixtures.
     # Let's manually cache result in function attribute _cached_result.
 
@@ -110,7 +94,7 @@ def features(service, ngw_httptest_app, ngw_auth_administrator):
 
 
 @pytest.mark.parametrize('version', TEST_WFS_VERSIONS)
-def test_layer_name(version, service, ngw_httptest_app, ngw_auth_administrator):
+def test_layer_name(version, service, ngw_httptest_app):
     driver = ogr.GetDriverByName('WFS')
     wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
         ngw_httptest_app.base_url, service, version), True)
@@ -203,7 +187,7 @@ for version in TEST_WFS_VERSIONS:
 
 
 @pytest.mark.parametrize('version, layer, fields, wkt', test_edit_params)
-def test_edit(version, layer, fields, wkt, service, ngw_httptest_app, ngw_auth_administrator):
+def test_edit(version, layer, fields, wkt, service, ngw_httptest_app):
     driver = ogr.GetDriverByName('WFS')
     wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
         ngw_httptest_app.base_url, service, version), True)
@@ -247,7 +231,7 @@ def test_edit(version, layer, fields, wkt, service, ngw_httptest_app, ngw_auth_a
 
 
 @pytest.mark.parametrize('version, layer, wkt', test_create_delete_params)
-def test_create_delete(version, layer, wkt, service, ngw_httptest_app, ngw_auth_administrator):
+def test_create_delete(version, layer, wkt, service, ngw_httptest_app):
     driver = ogr.GetDriverByName('WFS')
     wfs_ds = driver.Open("WFS:{}/api/resource/{}/wfs?VERSION={}".format(
         ngw_httptest_app.base_url, service, version), True)

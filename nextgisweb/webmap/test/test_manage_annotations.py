@@ -13,7 +13,9 @@ from nextgisweb.resource import ResourceACLRule, ResourceGroup
 
 from ..model import WebMap, WebMapAnnotation, WebMapItem
 
-TEST_USER_KEYNAME = 'test_user'
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
+
+TEST_USER_KEYNAME = 'test_webmap'
 
 
 def make_annotation_json(public: bool):
@@ -57,8 +59,6 @@ def webmap_id(ngw_resource_group):
         append_acl(test_resource_group, 'allow', user, 'resource', 'read', ResourceGroup.identity)
 
         webmap = WebMap(
-            parent_id=ngw_resource_group,
-            display_name=__name__,
             owner_user=user,
             root_item=WebMapItem(item_type='root')
         ).persist()

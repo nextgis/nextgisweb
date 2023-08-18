@@ -33,7 +33,7 @@ BAR = Enum.BAR
     [int, "000", 0],
     [FortyTwo, "42", 42],
     [List[int], "0", [0]],
-    [List[int], "1,2", [1,2]],
+    [List[int], "1,2", [1, 2]],
 
     [float, '3.14', 3.14],
     [float, '42', 42.0],

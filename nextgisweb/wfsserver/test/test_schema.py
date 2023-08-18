@@ -7,12 +7,12 @@ from osgeo import ogr
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 
 from ..model import Layer as WFSLayer
 from ..model import Service as WFSService
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
 
@@ -24,13 +24,9 @@ def force_schema_validation(ngw_env):
 
 
 @pytest.fixture(scope='module')
-def service_id(ngw_resource_group):
+def service_id():
     with transaction.manager:
-        res_vl = VectorLayer(
-            parent_id=ngw_resource_group, display_name='test_vector_layer',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist()
+        res_vl = VectorLayer().persist()
 
         geojson = {
             'type': 'FeatureCollection',
@@ -53,10 +49,7 @@ def service_id(ngw_resource_group):
 
         DBSession.flush()
 
-        res_wfs = WFSService(
-            parent_id=ngw_resource_group, display_name='test_wfsserver_service',
-            owner_user=User.by_keyname('administrator'),
-        ).persist()
+        res_wfs = WFSService().persist()
 
         res_wfs.layers.append(WFSLayer(
             resource=res_vl, keyname='test',
@@ -69,10 +62,6 @@ def service_id(ngw_resource_group):
         DBSession.expunge(res_wfs)
 
     yield res_wfs.id
-
-    with transaction.manager:
-        DBSession.delete(VectorLayer.filter_by(id=res_vl.id).one())
-        DBSession.delete(WFSService.filter_by(id=res_wfs.id).one())
 
 
 XML_VALID_FIXTURES = []
@@ -91,7 +80,7 @@ for version in TEST_WFS_VERSIONS:
 
 
 @pytest.mark.parametrize('version, query', XML_VALID_FIXTURES)
-def test_schema(version, query, service_id, ngw_webtest_app, ngw_auth_administrator):
+def test_schema(version, query, service_id, ngw_webtest_app):
     query['VERSION'] = version
     query['VALIDATESCHEMA'] = '1'
     ngw_webtest_app.get('/api/resource/%d/wfs' % service_id, query, status=200)

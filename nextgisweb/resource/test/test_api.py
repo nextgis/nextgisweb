@@ -10,11 +10,10 @@ from nextgisweb.auth import Group, User
 
 from .. import Resource, ResourceACLRule, ResourceGroup
 
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
-def test_disable_resources(
-    ngw_env, ngw_webtest_app,
-    ngw_auth_administrator, ngw_resource_group
-):
+
+def test_disable_resources(ngw_env, ngw_webtest_app, ngw_resource_group):
     def create_resource_group(display_name, expected_status):
         ngw_webtest_app.post_json('/api/resource/', dict(resource=dict(
             cls='resource_group', parent=dict(id=ngw_resource_group),
@@ -29,12 +28,11 @@ def test_disable_resources(
 
 
 @pytest.fixture(scope='module')
-def resource(ngw_resource_group):
+def resource():
     with transaction.manager:
         obj = ResourceGroup(
-            parent_id=ngw_resource_group, display_name='Test Юникод Symbols ~%',
+            display_name='Test Юникод Symbols ~%',
             keyname='Test-Keyname',
-            owner_user=User.by_keyname('administrator'),
         ).persist()
 
         DBSession.flush()
@@ -42,11 +40,8 @@ def resource(ngw_resource_group):
 
     yield obj
 
-    with transaction.manager:
-        DBSession.delete(ResourceGroup.filter_by(id=obj.id).one())
 
-
-def test_resource_search(resource, ngw_webtest_app, ngw_auth_administrator):
+def test_resource_search(resource, ngw_webtest_app):
     api_url = '/api/resource/search/'
 
     resp = ngw_webtest_app.get(api_url, dict(
@@ -64,42 +59,38 @@ def test_resource_search(resource, ngw_webtest_app, ngw_auth_administrator):
 
 
 @pytest.fixture(scope='module')
-def resources(ngw_resource_group):
+def resources():
     # R - A
     #   - B - C
     #       - D
     with transaction.manager:
-        admin = User.by_keyname('administrator')
         res_R = ResourceGroup(
-            parent_id=ngw_resource_group, display_name='Test resource ROOT',
-            keyname='test_res_R', owner_user=admin,
+            display_name='Test resource ROOT',
+            keyname='test_res_R',
         ).persist()
-        res_A = ResourceGroup(
+
+        ResourceGroup(
             parent=res_R, display_name='Test resource A',
-            keyname='test_res_A', owner_user=admin,
+            keyname='test_res_A',
         ).persist()
+
         res_B = ResourceGroup(
             parent=res_R, display_name='Test resource B',
-            keyname='test_res_B', owner_user=admin,
+            keyname='test_res_B',
         ).persist()
-        res_C = ResourceGroup(
+
+        ResourceGroup(
             parent=res_B, display_name='Test resource C',
-            keyname='test_res_C', owner_user=admin,
+            keyname='test_res_C',
         ).persist()
-        res_D = ResourceGroup(
+
+        ResourceGroup(
             parent=res_B, display_name='Test resource D',
-            keyname='test_res_D', owner_user=admin,
+            keyname='test_res_D',
         ).persist()
         DBSession.flush()
 
     yield
-
-    with transaction.manager:
-        DBSession.delete(res_D)
-        DBSession.delete(res_C)
-        DBSession.delete(res_B)
-        DBSession.delete(res_A)
-        DBSession.delete(res_R)
 
 
 @pytest.mark.parametrize('root_keyname, keynames_expected', (
@@ -108,7 +99,6 @@ def resources(ngw_resource_group):
 ))
 def test_resource_search_parent_id_recursive(
     resources, root_keyname, keynames_expected, ngw_webtest_app,
-    ngw_auth_administrator
 ):
     response = ngw_webtest_app.get('/api/resource/search/', dict(keyname=root_keyname))
     root_id = response.json[0]['resource']['id']
@@ -133,6 +123,7 @@ def resource_stat():
 @pytest.fixture
 def override(ngw_env):
     comp = ngw_env.resource
+
     @contextmanager
     def wrapped(**kw):
         options = dict(
@@ -153,9 +144,7 @@ def override(ngw_env):
     return wrapped
 
 
-def test_quota(
-    ngw_resource_group, resource_stat, override, ngw_webtest_app, ngw_auth_administrator
-):
+def test_quota(ngw_resource_group, resource_stat, override, ngw_webtest_app):
     total, cls_count = resource_stat
 
     def create_resource_group(display_name, expected_status):
@@ -230,7 +219,7 @@ def admin():
             DBSession.delete(User.filter_by(id=admin.id).one())
 
 
-def test_admin_permissions(admin, ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
+def test_admin_permissions(admin, ngw_webtest_app, ngw_resource_group):
 
     permissions = ngw_webtest_app.get('/api/resource/0').json['resource']['permissions']
 

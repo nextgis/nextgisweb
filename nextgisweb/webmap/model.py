@@ -134,6 +134,7 @@ class WebMap(Base, Resource):
             self.extent_const_left, self.extent_const_bottom, \
                 self.extent_const_right, self.extent_const_top = data['extent_const']
 
+
 class WebMapItem(Base):
     __tablename__ = 'webmap_item'
 

@@ -42,8 +42,8 @@ def create_tsconfig(npkgs: List[str]):
     include = []
 
     for pkg in npkgs:
-         include.append("{}/**/*.ts".format(pkg))
-         include.append("{}/**/*.tsx".format(pkg))
+        include.append("{}/**/*.ts".format(pkg))
+        include.append("{}/**/*.tsx".format(pkg))
 
     tsconfig_json = dict(
         compilerOptions=compiler_options,
@@ -143,6 +143,5 @@ def install(
             if tf.exists():
                 continue
             tf.symlink_to((ngw_root / lc).relative_to(pkg_root))
-
 
     check_call(['yarn', 'install'])

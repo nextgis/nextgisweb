@@ -7,19 +7,15 @@ from osgeo import ogr
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
 @pytest.fixture(scope='module')
-def vector_layer_id(ngw_resource_group):
+def vector_layer_id():
     with transaction.manager:
-        obj = VectorLayer(
-            parent_id=ngw_resource_group, display_name='test_wfs_vector_layer',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist()
+        obj = VectorLayer().persist()
 
         geojson = {
             'type': 'FeatureCollection',
@@ -45,11 +41,8 @@ def vector_layer_id(ngw_resource_group):
 
     yield obj.id
 
-    with transaction.manager:
-        DBSession.delete(VectorLayer.filter_by(id=obj.id).one())
 
-
-def test_api(vector_layer_id, ngw_webtest_app, ngw_auth_administrator, ngw_resource_group):
+def test_api(vector_layer_id, ngw_webtest_app, ngw_resource_group):
     data = dict(
         resource=dict(
             cls='wfsserver_service', display_name="test_wfs",

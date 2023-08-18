@@ -5,33 +5,26 @@ import transaction
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer import test as vector_layer_test
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 DATA = Path(vector_layer_test.__file__).parent / 'data'
 
 
 @pytest.fixture
-def type_layer(ngw_resource_group):
+def type_layer():
     with transaction.manager:
-        vl_type = VectorLayer(
-            parent_id=ngw_resource_group, display_name='type',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist().from_ogr(DATA / 'type.geojson')
+        vl_type = VectorLayer().persist().from_ogr(DATA / 'type.geojson')
 
         DBSession.flush()
         DBSession.expunge(vl_type)
 
     yield vl_type.id
 
-    with transaction.manager:
-        DBSession.delete(VectorLayer.filter_by(id=vl_type.id).one())
 
-
-def test_datatype(type_layer, ngw_webtest_app, ngw_auth_administrator):
+def test_datatype(type_layer, ngw_webtest_app):
     api_url = '/api/resource/%d/feature/1' % type_layer
 
     resp = ngw_webtest_app.get(api_url, status=200)

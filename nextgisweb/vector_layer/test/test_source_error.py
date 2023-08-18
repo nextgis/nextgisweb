@@ -5,11 +5,11 @@ import pytest
 from nextgisweb.env import DBSession
 from nextgisweb.lib.ogrhelper import read_dataset
 
-from nextgisweb.auth import User
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.spatial_ref_sys import SRS
 
 from .. import VectorLayer
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 
 path = Path(__file__).parent / 'data' / 'errors'
 
@@ -213,12 +213,8 @@ CREATE_TEST_PARAMS = (
 
 
 @pytest.mark.parametrize('filename, options, checks', CREATE_TEST_PARAMS)
-def test_create(filename, options, checks, ngw_resource_group, ngw_txn):
-    obj = VectorLayer(
-        parent_id=ngw_resource_group, display_name='vector_layer',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist()
+def test_create(filename, options, checks, ngw_txn):
+    obj = VectorLayer().persist()
 
     src = str(path / filename)
     ds = read_dataset(src)

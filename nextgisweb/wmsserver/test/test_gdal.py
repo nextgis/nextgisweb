@@ -8,23 +8,18 @@ from PIL import Image, ImageStat
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.raster_style import RasterStyle
-from nextgisweb.spatial_ref_sys import SRS
 
 from .. import Layer, Service
 
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
+
 
 @pytest.fixture(scope='module')
-def rlayer_id(ngw_env, ngw_resource_group):
+def rlayer_id(ngw_env):
     with transaction.manager:
-        obj = RasterLayer(
-            parent_id=ngw_resource_group,
-            display_name='test-wms-rlayer',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one()
-        ).persist()
+        obj = RasterLayer().persist()
 
         from nextgisweb.raster_layer import test as raster_layer_test
         path = Path(raster_layer_test.__file__).parent / 'data/rounds.tif'
@@ -36,36 +31,22 @@ def rlayer_id(ngw_env, ngw_resource_group):
 
     yield obj.id
 
-    with transaction.manager:
-        DBSession.delete(RasterLayer.filter_by(id=obj.id).one())
-
 
 @pytest.fixture(scope='module')
 def rstyle_id(ngw_env, rlayer_id):
     with transaction.manager:
-        obj = RasterStyle(
-            parent_id=rlayer_id,
-            display_name='test-wms-rstyle',
-            owner_user=User.by_keyname('administrator')
-        ).persist()
+        obj = RasterStyle(parent_id=rlayer_id).persist()
 
         DBSession.flush()
         DBSession.expunge(obj)
 
     yield obj.id
 
-    with transaction.manager:
-        DBSession.delete(RasterStyle.filter_by(id=obj.id).one())
-
 
 @pytest.fixture(scope='module')
-def service_id(ngw_resource_group, rstyle_id):
+def service_id(rstyle_id):
     with transaction.manager:
-        obj = Service(
-            parent_id=ngw_resource_group,
-            display_name='test-wms-service',
-            owner_user=User.by_keyname('administrator')
-        ).persist()
+        obj = Service().persist()
 
         DBSession.flush()
 
@@ -77,11 +58,8 @@ def service_id(ngw_resource_group, rstyle_id):
 
     yield obj.id
 
-    with transaction.manager:
-        DBSession.delete(Service.filter_by(id=obj.id).one())
 
-
-def test_read(service_id, ngw_httptest_app, ngw_auth_administrator):
+def test_read(service_id, ngw_httptest_app):
     wms_path = 'WMS:{}/api/resource/{}/wms'.format(
         ngw_httptest_app.base_url, service_id)
 

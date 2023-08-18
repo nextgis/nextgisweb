@@ -16,4 +16,3 @@ def react_renderer_factory(info):
 
 def setup_pyramid(comp, config):
     config.add_renderer('react', react_renderer_factory)
-

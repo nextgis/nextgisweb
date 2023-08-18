@@ -1,27 +1,26 @@
 import os.path
 
+import pytest
 import transaction
 from osgeo import gdal
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
 from nextgisweb.spatial_ref_sys import SRS
 
 from ..model import RasterLayer
 from .validate_cloud_optimized_geotiff import validate
 
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
-def test_cog(ngw_webtest_app, ngw_auth_administrator, ngw_resource_group, ngw_env):
+
+def test_cog(ngw_webtest_app, ngw_env):
     source = "sochi-aster-dem.tif"
     source_srs_id = 4326
     src = os.path.join(os.path.split(__file__)[0], "data", source)
 
     with transaction.manager:
         res = RasterLayer(
-            parent_id=ngw_resource_group,
-            display_name="test_cog:{}".format(source),
-            owner_user=User.by_keyname("administrator"),
             srs=SRS.filter_by(id=source_srs_id).one(),
         ).persist()
 

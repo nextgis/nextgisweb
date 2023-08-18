@@ -7,7 +7,6 @@ class ContentType(str):
     TEXT: ContentType
 
 
-
 ContentType.EMPTY = ContentType()
 ContentType.JSON = ContentType("application/json")
 ContentType.TEXT = ContentType("text/plain")

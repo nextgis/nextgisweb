@@ -7,26 +7,15 @@ from osgeo import gdal, osr
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
-
 from ..model import RasterLayer
 
-
-@pytest.fixture(autouse=True)
-def auth_administrator(ngw_auth_administrator):
-    pass
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
 @pytest.fixture(scope="module")
-def raster_layer_id(ngw_env, ngw_resource_group):
+def raster_layer_id(ngw_env):
     with transaction.manager:
-        obj = RasterLayer(
-            parent_id=ngw_resource_group,
-            display_name="raster_layer.test:export",
-            owner_user=User.by_keyname("administrator"),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist()
+        obj = RasterLayer().persist()
 
         obj.load_file(
             os.path.join(
@@ -39,9 +28,6 @@ def raster_layer_id(ngw_env, ngw_resource_group):
         DBSession.expunge(obj)
 
     yield obj.id
-
-    with transaction.manager:
-        DBSession.delete(RasterLayer.filter_by(id=obj.id).one())
 
 
 @pytest.mark.parametrize("epsg", [4326, 3857, ])

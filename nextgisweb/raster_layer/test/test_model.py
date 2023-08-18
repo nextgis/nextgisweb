@@ -6,12 +6,13 @@ from osgeo import gdal
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.spatial_ref_sys import SRS
 
 from ..model import RasterLayer
 from .validate_cloud_optimized_geotiff import validate
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 
 
 @pytest.mark.parametrize('source, band_count, srs_id', [
@@ -24,11 +25,9 @@ from .validate_cloud_optimized_geotiff import validate
 ])
 @pytest.mark.parametrize('cog', [False, True])
 def test_load_file(
-    source, band_count, srs_id, ngw_env, ngw_txn, ngw_resource_group, cog
+    source, band_count, srs_id, ngw_env, ngw_txn, cog
 ):
     res = RasterLayer(
-        parent_id=ngw_resource_group, display_name='test:{}'.format(source),
-        owner_user=User.by_keyname('administrator'),
         srs=SRS.filter_by(id=srs_id).one(),
     ).persist()
 
@@ -60,12 +59,8 @@ def test_load_file(
     (1000, 10, 6, 2, gdal.GDT_CFloat32, True),
     (1000, 10, 7, 2, gdal.GDT_CFloat32, False),
 ))
-def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env, ngw_resource_group):
-    res = RasterLayer(
-        parent_id=ngw_resource_group, display_name='test-raster-limit',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist()
+def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env):
+    res = RasterLayer().persist()
 
     driver = gdal.GetDriverByName('GTiff')
     proj = res.srs.to_osr()
@@ -92,12 +87,8 @@ def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env
     ('sochi-aster-colorized.tif', 13800),
     ('sochi-aster-dem.tif', 608224)
 ))
-def test_size_limit_reproj(source, size_expect, ngw_env, ngw_resource_group):
-    res = RasterLayer(
-        parent_id=ngw_resource_group, display_name='test-raster-limit-reproj',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist()
+def test_size_limit_reproj(source, size_expect, ngw_env):
+    res = RasterLayer().persist()
 
     filename = os.path.join(os.path.split(__file__)[0], 'data', source)
 

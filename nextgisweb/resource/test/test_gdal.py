@@ -1,6 +1,8 @@
 import pytest
 from osgeo import gdal
 
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
+
 
 @pytest.fixture(scope='module')
 def drv():
@@ -11,7 +13,7 @@ def drv():
     yield result
 
 
-def test_resource_group(drv, ngw_httptest_app, ngw_auth_administrator, ngw_resource_group):
+def test_resource_group(drv, ngw_httptest_app, ngw_resource_group):
     url_create = 'NGW:' + ngw_httptest_app.base_url + \
         '/resource/{}/gdal-test'.format(ngw_resource_group)
 

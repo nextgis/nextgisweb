@@ -5,10 +5,11 @@ import transaction
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
 from nextgisweb.file_storage import FileObj
 
 from .. import SVGMarker, SVGMarkerLibrary
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 
 DATA_DIR = path.join(path.dirname(__file__), 'data/')
 FOLDER1 = path.join(DATA_DIR, 'folder1/')
@@ -22,39 +23,36 @@ def options(ngw_env):
 
 
 @pytest.fixture(scope='module')
-def svg_lib(ngw_env, ngw_resource_group):
+def svg_lib(ngw_env):
     with transaction.manager:
-        svg_lib = SVGMarkerLibrary(
-            parent_id=ngw_resource_group, display_name='test_marker_lib',
-            owner_user=User.by_keyname('administrator')
-        ).persist()
-
+        res = SVGMarkerLibrary().persist()
         DBSession.flush()
 
         fileobj1 = FileObj(component='svg_marker_library').persist()
         fileobj2 = FileObj(component='svg_marker_library').persist()
 
-        SVGMarker(
-            svg_marker_library_id=svg_lib.id,
+        marker1 = SVGMarker(
+            svg_marker_library_id=res.id,
             fileobj=fileobj1,
             name='marker1'
         ).persist()
 
         marker2 = SVGMarker(
-            svg_marker_library_id=svg_lib.id,
+            svg_marker_library_id=res.id,
             fileobj=fileobj2,
             name='marker2'
         ).persist()
 
         DBSession.flush()
 
-    yield svg_lib
+    yield res
 
     with transaction.manager:
+        DBSession.delete(marker1)
         DBSession.delete(marker2)
         DBSession.delete(fileobj1)
         DBSession.delete(fileobj2)
-        DBSession.delete(svg_lib)
+        DBSession.delete(res)
 
 
 def test_lookup(svg_lib, ngw_env, ngw_webtest_app):

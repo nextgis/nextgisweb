@@ -504,7 +504,7 @@ def setup_pyramid(comp, config):
         get=search)
 
     config.add_route(
-        'resource.quota_check', 
+        'resource.quota_check',
         '/api/component/resource/check_quota',
         post=quota_check)
 

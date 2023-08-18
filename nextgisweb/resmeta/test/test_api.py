@@ -3,29 +3,23 @@ import transaction
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
 from nextgisweb.resource import ResourceGroup
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
 @pytest.fixture
-def resource_id(ngw_resource_group):
+def resource_id():
     with transaction.manager:
-        res = ResourceGroup(
-            parent_id=ngw_resource_group,
-            display_name='test-resource-group',
-            owner_user=User.by_keyname('administrator')
-        ).persist()
+        res = ResourceGroup().persist()
 
         DBSession.flush()
         DBSession.expunge(res)
 
     yield res.id
 
-    with transaction.manager:
-        DBSession.delete(res)
 
-
-def test_items(ngw_webtest_app, resource_id, ngw_auth_administrator):
+def test_items(ngw_webtest_app, resource_id):
     items = dict(key1='text1', key2='text2')
 
     res_url = '/api/resource/%d' % resource_id
@@ -49,7 +43,7 @@ def test_items(ngw_webtest_app, resource_id, ngw_auth_administrator):
 @pytest.mark.parametrize('value', (
     'text', -123, 4.5, True, False, None,
 ))
-def test_item_type(value, ngw_webtest_app, resource_id, ngw_auth_administrator):
+def test_item_type(value, ngw_webtest_app, resource_id):
     res_url = '/api/resource/%d' % resource_id
 
     items = dict(key=value)

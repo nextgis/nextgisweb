@@ -7,25 +7,21 @@ from osgeo import ogr
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
 from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
 
 from .data import generate_filter_extents
 
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
+
 filter_extents_data = generate_filter_extents()
 
 
 @pytest.fixture(scope='module')
-def vector_layer_id(ngw_resource_group):
+def vector_layer_id():
     with transaction.manager:
-        obj = VectorLayer(
-            parent_id=ngw_resource_group, display_name='vector_layer',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist()
+        obj = VectorLayer().persist()
 
         geojson = {
             "type": "FeatureCollection",
@@ -73,9 +69,6 @@ def vector_layer_id(ngw_resource_group):
 
     yield obj.id
 
-    with transaction.manager:
-        DBSession.delete(VectorLayer.filter_by(id=obj.id).one())
-
 
 item_one_extent = {
     'minLat': 53.7714928132034,
@@ -98,7 +91,7 @@ item_check_list = [
 
 
 @pytest.mark.parametrize('fid, extent', item_check_list)
-def test_item_extent(ngw_webtest_app, vector_layer_id, extent, fid, ngw_auth_administrator):
+def test_item_extent(ngw_webtest_app, vector_layer_id, extent, fid):
     req_str = '/api/resource/%d/feature/%d/extent' % (vector_layer_id, fid)
     resp = ngw_webtest_app.get(req_str)
     for coord, value in resp.json['extent'].items():
@@ -113,7 +106,7 @@ def test_item_extent(ngw_webtest_app, vector_layer_id, extent, fid, ngw_auth_adm
 @pytest.mark.parametrize('filter_, expected_extent', filter_extents_data)
 def test_filtered_extent(create_resource, filter_, expected_extent,
                          ngw_resource_group_sub, ngw_httptest_app,
-                         ngw_webtest_app, ngw_auth_administrator):
+                         ngw_webtest_app):
     data = Path(__file__).parent / 'data' / 'filter-extent-layer.geojson'
 
     ds = ogr.Open(str(data))

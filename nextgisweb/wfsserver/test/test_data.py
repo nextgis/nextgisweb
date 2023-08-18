@@ -6,12 +6,12 @@ from osgeo import gdal, ogr
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 
 from ..model import Layer as WFSLayer
 from ..model import Service as WFSService
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 TEST_WFS_VERSIONS = ('2.0.2', '2.0.0', '1.1.0', '1.0.0', )
 
@@ -23,13 +23,9 @@ def force_schema_validation(ngw_env):
 
 
 @pytest.fixture(scope='module')
-def vlayer_id(ngw_resource_group):
+def vlayer_id():
     with transaction.manager:
-        res_vl = VectorLayer(
-            parent_id=ngw_resource_group, display_name='test_cyrillic',
-            owner_user=User.by_keyname('administrator'),
-            srs=SRS.filter_by(id=3857).one(),
-        ).persist()
+        res_vl = VectorLayer().persist()
 
         geojson = {
             'type': 'FeatureCollection',
@@ -56,17 +52,11 @@ def vlayer_id(ngw_resource_group):
 
     yield res_vl.id
 
-    with transaction.manager:
-        DBSession.delete(VectorLayer.filter_by(id=res_vl.id).one())
-
 
 @pytest.fixture(scope='module')
-def service_id(vlayer_id, ngw_resource_group):
+def service_id(vlayer_id):
     with transaction.manager:
-        res_wfs = WFSService(
-            parent_id=ngw_resource_group, display_name='test_cyrillic_service',
-            owner_user=User.by_keyname('administrator'),
-        ).persist()
+        res_wfs = WFSService().persist()
 
         res_wfs.layers.append(WFSLayer(
             resource_id=vlayer_id, keyname='test',
@@ -79,11 +69,8 @@ def service_id(vlayer_id, ngw_resource_group):
 
     yield res_wfs.id
 
-    with transaction.manager:
-        DBSession.delete(WFSService.filter_by(id=res_wfs.id).one())
 
-
-def test_cyrillic(service_id, vlayer_id, ngw_httptest_app, ngw_auth_administrator):
+def test_cyrillic(service_id, vlayer_id, ngw_httptest_app):
     driver = ogr.GetDriverByName('WFS')
     wfs_ds = driver.Open('WFS:{}/api/resource/{}/wfs'.format(
         ngw_httptest_app.base_url, service_id), True)

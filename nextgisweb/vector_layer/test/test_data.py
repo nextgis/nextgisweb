@@ -8,25 +8,20 @@ from osgeo import ogr, osr
 from nextgisweb.env import DBSession
 from nextgisweb.lib.ogrhelper import read_dataset
 
-from nextgisweb.auth import User
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import FIELD_TYPE
-from nextgisweb.spatial_ref_sys import SRS
 
 from .. import VectorLayer
 from ..table_info import ERROR_LIMIT
 from ..util import ERROR_FIX, FID_SOURCE
 
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
+
 DATA_PATH = Path(__file__).parent / 'data'
 
 
-def test_from_fields(ngw_resource_group, ngw_txn):
-    res = VectorLayer(
-        parent_id=ngw_resource_group, display_name='from_fields',
-        owner_user=User.by_keyname('administrator'),
-        geometry_type='POINT',
-        srs=SRS.filter_by(id=3857).one(),
-    )
+def test_from_fields(ngw_txn):
+    res = VectorLayer(geometry_type='POINT')
 
     res.setup_from_fields([
         dict(keyname='integer', datatype=FIELD_TYPE.INTEGER),
@@ -50,12 +45,8 @@ def test_from_fields(ngw_resource_group, ngw_txn):
     'shapefile-point-win1251.zip',
     'layer.geojson',
 ))
-def test_from_ogr(filename, ngw_resource_group, ngw_txn):
-    res = VectorLayer(
-        parent_id=ngw_resource_group, display_name='from_ogr',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist().from_ogr(DATA_PATH / filename)
+def test_from_ogr(filename, ngw_txn):
+    res = VectorLayer().persist().from_ogr(DATA_PATH / filename)
 
     DBSession.flush()
 
@@ -82,15 +73,11 @@ def test_from_ogr(filename, ngw_resource_group, ngw_txn):
         'layer-lon-lat.xlsx',
     ),
 )
-def test_from_csv_xlsx(filename, ngw_resource_group, ngw_txn):
+def test_from_csv_xlsx(filename, ngw_txn):
     dsource = read_dataset(DATA_PATH / filename, source_filename=filename)
     layer = dsource.GetLayer(0)
 
-    res = VectorLayer(
-        parent_id=ngw_resource_group, display_name='from_ogr',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist()
+    res = VectorLayer().persist()
 
     res.setup_from_ogr(layer)
     res.load_from_ogr(layer)
@@ -112,14 +99,10 @@ def test_from_csv_xlsx(filename, ngw_resource_group, ngw_txn):
     assert fields['unicode'] == 'Значимость этих проблем настолько очевидна, что реализация намеченных плановых заданий требуют определения и уточнения.'  # NOQA: E501
 
 
-def test_type_geojson(ngw_resource_group, ngw_txn):
+def test_type_geojson(ngw_txn):
     src = DATA_PATH / 'type.geojson'
 
-    res = VectorLayer(
-        parent_id=ngw_resource_group, display_name='from_ogr',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist().from_ogr(src)
+    res = VectorLayer().persist().from_ogr(src)
 
     DBSession.flush()
 
@@ -158,17 +141,13 @@ def test_type_geojson(ngw_resource_group, ngw_txn):
     ('AUTO', ['not_exists', 'int'], -1),
     ('AUTO', ['not_exists'], 1),
 ))
-def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
+def test_fid(fid_source, fid_field, id_expect, ngw_txn):
     src = DATA_PATH / 'type.geojson'
 
     dataset = ogr.Open(str(src))
     layer = dataset.GetLayer(0)
 
-    res = VectorLayer(
-        parent_id=ngw_resource_group, display_name='test_fid',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist()
+    res = VectorLayer().persist()
 
     res.setup_from_ogr(layer, fid_params=dict(fid_source=fid_source, fid_field=fid_field))
     res.load_from_ogr(layer)
@@ -180,7 +159,7 @@ def test_fid(fid_source, fid_field, id_expect, ngw_resource_group, ngw_txn):
     assert query().total_count == 1
 
 
-def test_multi_layers(ngw_webtest_app, ngw_auth_administrator):
+def test_multi_layers(ngw_webtest_app):
     src = DATA_PATH / 'two-layers.zip'
     resp = ngw_webtest_app.post('/api/component/file_upload/', dict(
         file=webtest.Upload(str(src))))
@@ -209,12 +188,8 @@ def test_multi_layers(ngw_webtest_app, ngw_auth_administrator):
     ngw_webtest_app.delete('/api/resource/%d' % layer_id)
 
 
-def test_error_limit(ngw_resource_group):
-    res = VectorLayer(
-        parent_id=ngw_resource_group, display_name='error-limit',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist()
+def test_error_limit():
+    res = VectorLayer().persist()
 
     ds = ogr.GetDriverByName('Memory').CreateDataSource('')
 
@@ -247,12 +222,8 @@ def test_error_limit(ngw_resource_group):
     assert res.feature_query()().total_count == some
 
 
-def test_geom_field(ngw_resource_group):
-    res = VectorLayer(
-        parent_id=ngw_resource_group, display_name='test-geom-fld',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist()
+def test_geom_field():
+    res = VectorLayer().persist()
 
     src = DATA_PATH / 'geom-fld.geojson'
     ds = ogr.Open(str(src))
@@ -274,12 +245,8 @@ def test_geom_field(ngw_resource_group):
 @pytest.mark.parametrize('data', (
     'int64', 'id-non-uniq', 'id-empty',
 ))
-def test_id_field(data, ngw_resource_group):
-    res = VectorLayer(
-        parent_id=ngw_resource_group, display_name=f'test-{data}',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist()
+def test_id_field(data):
+    res = VectorLayer().persist()
 
     src = DATA_PATH / f'{data}.geojson'
     ds = ogr.Open(str(src))

@@ -7,9 +7,7 @@ from importlib.util import find_spec
 from os import scandir
 from os.path import join as path_join
 from pathlib import Path
-from typing import List, Optional, Set, Tuple
-
-from nextgisweb.lib.logging import logger
+from typing import List, Optional, Set
 
 from ..package import pkginfo
 

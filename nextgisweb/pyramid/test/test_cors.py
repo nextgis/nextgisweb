@@ -2,6 +2,8 @@ from contextlib import contextmanager
 
 import pytest
 
+pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
+
 good_domains = ['http://example.com', 'http://test.qqq']
 bad_domains = ['http://very.bad', 'http://bad.domain']
 
@@ -27,7 +29,7 @@ def override(ngw_core_settings_override):
     ('https://*.sub.domain.com.', True),
     ('https://*.*.domain.com', False),
 ))
-def test_validation(domain, ok, ngw_webtest_app, ngw_auth_administrator, override):
+def test_validation(domain, ok, ngw_webtest_app, override):
     API_URL = '/api/component/pyramid/cors'
     with override():
         ngw_webtest_app.put_json(API_URL, dict(allow_origin=[domain]), status=200 if ok else 422)
@@ -39,7 +41,6 @@ def test_validation(domain, ok, ngw_webtest_app, ngw_auth_administrator, overrid
     (bad_domains[0], False, False),
     (bad_domains[1], True, False),
 ))
-@pytest.mark.usefixtures('ngw_auth_administrator')
 def test_headers(domain, resource_exists, expected_ok, ngw_webtest_app, override):
     with override(good_domains):
         url = '/api/resource/%d' % (0 if resource_exists else -1)
@@ -57,7 +58,6 @@ def test_headers(domain, resource_exists, expected_ok, ngw_webtest_app, override
     (bad_domains[0], False, False),
     (bad_domains[1], True, False),
 ))
-@pytest.mark.usefixtures('ngw_auth_administrator')
 def test_options(domain, resource_exists, expected_ok, ngw_webtest_app, override):
     with override(good_domains):
         url = '/api/resource/%d' % (0 if resource_exists else -1)

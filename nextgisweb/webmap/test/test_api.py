@@ -3,9 +3,9 @@ import transaction
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
-
 from .. import WebMap, WebMapItem
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 ANNOTATION_SAMPLE = dict(
     description='1', geom='POINT (0 0)', public=True, own=False,
@@ -20,23 +20,16 @@ def enable_annotation(ngw_env):
 
 
 @pytest.fixture(scope='module')
-def webmap(ngw_env, ngw_resource_group):
+def webmap(ngw_env):
     with transaction.manager:
-        obj = WebMap(
-            parent_id=ngw_resource_group, display_name=__name__,
-            owner_user=User.by_keyname('administrator'),
-            root_item=WebMapItem(item_type='root')
-        ).persist()
+        obj = WebMap(root_item=WebMapItem(item_type='root')).persist()
         DBSession.flush()
         DBSession.expunge(obj)
 
     yield obj
 
-    with transaction.manager:
-        DBSession.delete(WebMap.filter_by(id=obj.id).one())
 
-
-def test_annotation_post_get(webmap, ngw_webtest_app, ngw_auth_administrator):
+def test_annotation_post_get(webmap, ngw_webtest_app):
     result = ngw_webtest_app.post_json(
         '/api/resource/%d/annotation/' % webmap.id,
         ANNOTATION_SAMPLE)

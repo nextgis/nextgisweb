@@ -11,6 +11,8 @@ from ..model import Resource, ResourceACLRule, ResourceGroup
 from ..presolver import PermissionResolver
 from ..scope import ResourceScope
 
+pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
+
 
 @pytest.fixture(scope='module')
 def user_id(ngw_resource_group):
@@ -31,7 +33,7 @@ def user_id(ngw_resource_group):
         DBSession.delete(User.filter_by(id=user.id).one())
 
 
-def test_change_owner(ngw_resource_group, user_id, ngw_webtest_app, ngw_auth_administrator):
+def test_change_owner(ngw_resource_group, user_id, ngw_webtest_app):
     url = '/api/resource/%d' % ngw_resource_group
 
     def owner_data(owner_id):

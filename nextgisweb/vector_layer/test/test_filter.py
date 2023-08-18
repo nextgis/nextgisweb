@@ -4,10 +4,9 @@ import pytest
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
-from nextgisweb.spatial_ref_sys import SRS
-
 from .. import VectorLayer
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 
 DATA_PATH = Path(__file__).parent / 'data'
 
@@ -51,12 +50,8 @@ for key, operator, should_be_true, should_be_false in check_list:
 
 
 @pytest.fixture
-def resource(ngw_txn, ngw_resource_group):
-    resource = VectorLayer(
-        parent_id=ngw_resource_group, display_name='from_ogr',
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-    ).persist().from_ogr(DATA_PATH / 'layer.geojson')
+def resource(ngw_txn):
+    resource = VectorLayer().persist().from_ogr(DATA_PATH / 'layer.geojson')
 
     DBSession.flush()
     return resource

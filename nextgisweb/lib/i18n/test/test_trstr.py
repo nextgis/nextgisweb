@@ -10,6 +10,7 @@ n = f.ngettext
 p = f.pgettext
 np = f.npgettext
 
+
 class UpperCaseTranslator:
     def translate(
         self, msg, *,
@@ -38,6 +39,7 @@ def uc_tr():
         return value.__translate__(uct)
 
     return tr
+
 
 def test_context(uc_tr):
     assert uc_tr(f('foo')) == 'FOO'

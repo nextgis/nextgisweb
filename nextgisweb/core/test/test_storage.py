@@ -6,13 +6,13 @@ from freezegun import freeze_time
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import User
 from nextgisweb.feature_attachment.component import FeatureAttachmentData
-from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 
 from .. import KindOfData
 from ..storage import SQL_LOCK, StorageLimitExceeded
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
 class TestKOD1(KindOfData):
@@ -42,7 +42,7 @@ def reset_storage(ngw_env):
         ngw_env.core.estimate_storage_all()
 
 
-def test_storage(ngw_env, ngw_webtest_app, ngw_auth_administrator):
+def test_storage(ngw_env, ngw_webtest_app):
     reserve_storage = ngw_env.core.reserve_storage
     with freeze_time() as dt, transaction.manager:
         assert 'storage.res' not in DBSession().info
@@ -72,23 +72,17 @@ def test_storage(ngw_env, ngw_webtest_app, ngw_auth_administrator):
     assert res.json[TestKOD2.identity]['data_volume'] == 100
 
 
-def vector_layer(display_name, parent_id):
-    res = VectorLayer(
-        parent_id=parent_id,
-        display_name=display_name,
-        owner_user=User.by_keyname('administrator'),
-        srs=SRS.filter_by(id=3857).one(),
-        geometry_type='POINT',
-    ).persist()
+def vector_layer():
+    res = VectorLayer(geometry_type='POINT').persist()
     res.setup_from_fields([])
     return res
 
 
-def test_resource(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
+def test_resource(ngw_env, ngw_webtest_app):
     reserve_storage = ngw_env.core.reserve_storage
     with transaction.manager:
-        res1 = vector_layer('test-resource-1', ngw_resource_group)
-        res2 = vector_layer('test-resource-2', ngw_resource_group)
+        res1 = vector_layer()
+        res2 = vector_layer()
 
         reserve_storage('test_comp', TestKOD1, resource=res1, value_data_volume=100)
         reserve_storage('test_comp', TestKOD2, resource=res1, value_data_volume=10)
@@ -129,9 +123,9 @@ def estimage(app):
         DBSession.execute(SQL_LOCK)
 
 
-def test_estimate_all(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
+def test_estimate_all(ngw_env, ngw_webtest_app):
     with transaction.manager:
-        res = vector_layer('test-vector-layer', ngw_resource_group)
+        res = vector_layer()
         DBSession.flush()
         DBSession.expunge(res)
 
@@ -171,9 +165,9 @@ def test_storage_limit_exceeded(ngw_env):
                 core.check_storage_limit()
 
 
-def test_check_limit_after_estimate(ngw_env, ngw_resource_group, ngw_webtest_app, ngw_auth_administrator):
+def test_check_limit_after_estimate(ngw_env, ngw_webtest_app):
     with transaction.manager:
-        res = vector_layer('test-vector-layer', ngw_resource_group)
+        res = vector_layer()
         DBSession.flush()
 
     feature = dict(geom='POINT (0 0)')

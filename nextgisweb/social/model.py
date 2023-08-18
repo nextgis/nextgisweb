@@ -7,8 +7,8 @@ from nextgisweb.lib import db
 
 from nextgisweb.file_storage import FileObj
 from nextgisweb.resource import (
-    ResourceScope,
     Resource,
+    ResourceScope,
     Serializer,
 )
 from nextgisweb.resource import SerializedProperty as SP

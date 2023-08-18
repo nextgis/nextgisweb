@@ -82,8 +82,8 @@ def openapi_json(request) -> JSONType:
 
 
 def openapi_json_test(request) -> JSONType:
-   from .test.test_openapi import config
-   return openapi(config.registry.introspector, prefix='/')
+    from .test.test_openapi import config
+    return openapi(config.registry.introspector, prefix='/')
 
 
 @viewargs(renderer='react')
