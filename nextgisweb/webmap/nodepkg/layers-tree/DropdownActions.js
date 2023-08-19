@@ -100,14 +100,13 @@ export function DropdownActions({
                     {customMenuItems.length ? (
                         <>
                             <Divider style={{ margin: 0 }} />
-                            <Space
-                                style={{ padding: "5px 12px", width: "100%" }}
-                                direction="vertical"
-                            >
+                            <div className="ant-dropdown-menu">
                                 {customMenuItems.map((Item, i) => (
-                                    <Item key={i}></Item>
+                                    <div key={i}>
+                                        <Item />
+                                    </div>
                                 ))}
-                            </Space>
+                            </div>
                         </>
                     ) : (
                         ""

@@ -1,20 +1,19 @@
-import PropTypes from "prop-types";
-
 import { Slider, Tooltip } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import OpacityRationIcon from "@material-icons/svg/tonality/baseline";
+import Icon from "@nextgisweb/icon/mdi/circle-opacity";
 
-const titleMsg = i18n.gettext('Opacity');
+import "./LayerOpacitySlider.less";
 
-export function LayerOpacitySlider({ onChange, defaultValue } = {}) {
+const mTooltip = gettext("Opacity");
+
+export function LayerOpacitySlider({ onChange, defaultValue }) {
     return (
-        <div className="ant-dropdown-menu-title-content">
-            <Tooltip title={titleMsg}>
-                <OpacityRationIcon></OpacityRationIcon>
+        <div className="ngw-webmap-layer-opacity-slider">
+            <Tooltip title={mTooltip}>
+                <Icon />
             </Tooltip>
             <Slider
-                style={{ width: "calc(100% - 20px)" }}
                 defaultValue={defaultValue}
                 onChange={onChange}
                 min={0}
@@ -24,8 +23,3 @@ export function LayerOpacitySlider({ onChange, defaultValue } = {}) {
         </div>
     );
 }
-
-LayerOpacitySlider.propTypes = {
-    onChange: PropTypes.func,
-    defaultValue: PropTypes.number,
-};
