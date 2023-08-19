@@ -23,8 +23,8 @@
 
 /* -- BOX-SIZING -- */
 
-/* Dijit widgets assume box-sizing: content-box, but antd sets
-box-sizing: border-box for all elements. Override box-sizing where it matters. */
+/* Dijit widgets assume box-sizing: content-box, but Antd 4 sets box-sizing:
+border-box for all elements. Override box-sizing where it matters. */
 
 div.dijitContentPane,
 div.dijitTabPaneWrapper,
@@ -35,6 +35,12 @@ td.tableContainer-labelCell,
 div.content__container
 {
   box-sizing: content-box;
+}
+
+/* Antd 5 doesn't set box-sizing: border-box, but we rely on it. */ 
+
+div.dijitTabPane {
+  box-sizing: border-box;
 }
 
 /* -- BASE STYLES -- */
