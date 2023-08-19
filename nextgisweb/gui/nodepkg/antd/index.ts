@@ -47,7 +47,6 @@ export {
     Spin,
     Steps,
     Switch,
-    // Table,
     Transfer,
     Tree,
     TreeSelect,
