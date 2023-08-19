@@ -44,7 +44,7 @@ const PasswordInput = ({ value, onChange, ...inputProps }) => {
         <Space.Compact style={{ display: "flex" }}>
             <Select
                 onChange={setMode}
-                dropdownMatchSelectWidth={false}
+                popupMatchSelectWidth={false}
                 value={mode}
             >
                 {availableModes.map((m) => (

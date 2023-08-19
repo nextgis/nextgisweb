@@ -44,7 +44,7 @@ const AlinkInput = ({ value, onChange }) => {
         <Space.Compact compact style={{ display: "flex" }}>
             <Select
                 onChange={setMode}
-                dropdownMatchSelectWidth={false}
+                popupMatchSelectWidth={false}
                 value={mode}
             >
                 {availableModes.map((m) => (

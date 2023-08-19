@@ -113,7 +113,7 @@ export function ResourcesFilter({
     return (
         <AutoComplete
             popupClassName="ngw-resource-resource-filter-dropdown"
-            dropdownMatchSelectWidth={290}
+            popupMatchSelectWidth={290}
             style={{ width: "100%" }}
             onSelect={onSelect}
             options={options}

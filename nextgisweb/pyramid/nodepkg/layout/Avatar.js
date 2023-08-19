@@ -52,7 +52,7 @@ export const Avatar = observer(() => {
                     title={userDisplayName}
                     content={content}
                     overlayClassName="ngw-pyramid-avatar-popover"
-                    arrowPointAtCenter
+                    arrow={{ pointAtCenter: true }}
                 >
                     <div className="ngw-pyramid-avatar-label">
                         {userDisplayName

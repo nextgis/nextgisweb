@@ -53,7 +53,7 @@ const InputValue = observer(({ row }) => {
                     row.update({ value: value });
                 }}
                 bordered={false}
-                dropdownMatchSelectWidth={false}
+                popupMatchSelectWidth={false}
             >
                 <Option value={false}>{gettext("False")}</Option>
                 <Option value={true}>{gettext("True")}</Option>
@@ -72,7 +72,7 @@ const SelectType = observer(({ row }) => {
                 row.update({ type: value });
             }}
             bordered={false}
-            dropdownMatchSelectWidth={false}
+            popupMatchSelectWidth={false}
         >
             <Option value="string">{gettext("String")}</Option>
             <Option value="number">{gettext("Number")}</Option>
