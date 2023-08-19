@@ -1,7 +1,7 @@
 export {
     Affix,
     Anchor,
-    AutoComplete,
+    // AutoComplete,
     Alert,
     Avatar,
     BackTop,
@@ -34,13 +34,13 @@ export {
     notification,
     Pagination,
     Popconfirm,
-    Popover,
+    // Popover,
     Progress,
     Radio,
     Rate,
     Result,
     Row,
-    Select,
+    // Select,
     Skeleton,
     Slider,
     Space,
@@ -64,6 +64,12 @@ export { default as TimePicker } from "./time-picker";
 export { default as RangePicker } from "./range-date-time-picker";
 export { default as Table } from "./table";
 export { default as Tabs } from "./tabs";
+
+// Antd 5 forward-compatible wrappers
+// TODO: Remove and uncomment the lines above
+export { default as AutoComplete } from "./compat/AutoComplete";
+export { default as Popover } from "./compat/Popover";
+export { default as Select } from "./compat/Select";
 
 import type { SizeType } from "antd/lib/config-provider/SizeContext";
 
