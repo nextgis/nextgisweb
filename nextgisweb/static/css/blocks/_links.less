@@ -25,26 +25,3 @@ a, .link {
   }
 
 }
-
-.link {
-  &--action {
-    font-family: var(--heading-font-family), 'lato_local', sans-serif;
-    font-size: @font-size-md;
-    text-decoration: none;
-  }
-
-  &--muted {
-    color: var(--text-secondary);
-  }
-
-  &__icon {
-    vertical-align: middle;
-    transition: transform .3s;
-  }
-
-  &--dropdown.active {
-    .link__icon {
-      transform: rotate(-180deg);
-    }
-  }
-}
