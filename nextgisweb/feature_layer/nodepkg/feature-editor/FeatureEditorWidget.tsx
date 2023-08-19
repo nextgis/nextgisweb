@@ -64,10 +64,10 @@ export const FeatureEditorWidget = observer(
                             {(widgetStore.counter && (
                                 <Badge
                                     count={widgetStore.counter}
-                                    status={
+                                    color={
                                         widgetStore.dirty
-                                            ? "processing"
-                                            : "default"
+                                            ? "var(--primary)"
+                                            : "var(--text-secondary)"
                                     }
                                     size="small"
                                 />
