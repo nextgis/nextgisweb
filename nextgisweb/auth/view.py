@@ -3,7 +3,6 @@ import string
 from datetime import datetime
 from urllib.parse import parse_qsl, urlencode
 
-import sqlalchemy as sa
 import zope.event
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
@@ -14,10 +13,10 @@ from sqlalchemy.orm.exc import NoResultFound
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib import dynmenu as dm
 
-from nextgisweb.pyramid import JSONType, SessionStore, WebSession, viewargs
+from nextgisweb.pyramid import SessionStore, WebSession, viewargs
 
 from .exception import ALinkException, InvalidCredentialsException, UserDisabledException
-from .model import Group, Principal, User
+from .model import Group, User
 from .oauth import AuthorizationException, InvalidTokenException
 from .policy import AuthProvider, AuthState, OnUserLogin
 
@@ -262,22 +261,6 @@ def settings(request):
         entrypoint='@nextgisweb/auth/settings-form')
 
 
-def principal_dump(request) -> JSONType:
-    query = sa.orm.with_polymorphic(Principal, '*').query()
-    result = []
-
-    for p in query:
-        result.append(dict(
-            id=p.id,
-            cls=p.cls,
-            system=p.system,
-            keyname=p.keyname,
-            display_name=p.display_name
-        ))
-
-    return result
-
-
 @viewargs(renderer='react')
 def user_browse(request):
     request.require_administrator()
@@ -359,9 +342,6 @@ def setup_pyramid(comp, config):
         .add_view(settings)
 
     config.add_request_method(_login_url, name='login_url')
-
-    config.add_route('auth.principal_dump', '/auth/principal/dump') \
-        .add_view(principal_dump)
 
     config.add_route('auth.user.browse', '/auth/user/') \
         .add_view(user_browse)
