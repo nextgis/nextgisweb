@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 
 import type { ReactElement } from "react";
-import type { Modal } from "@nextgisweb/gui/antd";
+import { Modal, ConfigProvider } from "@nextgisweb/gui/antd";
 import { ParamsOf } from "@nextgisweb/gui/type";
 
 type ModalParams = ParamsOf<typeof Modal>;
@@ -23,7 +23,11 @@ export default function showModal<
     const root = createRoot(container);
 
     const render = (props: T) => {
-        root.render(<ModalComponent {...props} />);
+        root.render(
+            <ConfigProvider>
+                <ModalComponent {...props} />
+            </ConfigProvider>
+        );
     };
 
     const close = () => {
