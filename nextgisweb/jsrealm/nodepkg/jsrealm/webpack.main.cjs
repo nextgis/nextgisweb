@@ -96,10 +96,11 @@ const dynamicEntries = () => {
 
 const staticEntries = {};
 
-function scanLocales(moduleName) {
+function scanLocales(pkg, subpath = "") {
+    const root = require.resolve(pkg + "/package.json");
+    const pattern = path.resolve(root, "..", subpath, "locale/*.js");
     const result = {};
-    const pat = path.join(require.resolve(moduleName), "..", "locale", "*.js");
-    for (const filename of glob.sync(pat)) {
+    for (const filename of glob.sync(pattern)) {
         const m = filename.match(/\/([a-z]{2}(?:[-_][a-z]{2})?)\.js$/i);
         if (m) {
             const original = m[1];
@@ -137,7 +138,7 @@ function lookupLocale(key, map) {
     throw "Locale 'en' not found!";
 }
 
-const antdLocales = scanLocales("antd");
+const antdLocales = scanLocales("antd", "es");
 const dayjsLocales = scanLocales("dayjs");
 
 const localeOutDir = path.resolve(
@@ -161,8 +162,7 @@ for (const { code: lang, nplurals, plural } of config.i18n.languages) {
     const code = [
         withChunks(entry),
         `ngwConfig.plurals = [${nplurals}, n => Number(${plural})];`,
-        `import antdLocale from "${antd.filename}";`,
-        `export const antd = antdLocale.default;`,
+        `export { default as antd } from "${antd.filename}";`,
         `import dayjs from "@nextgisweb/gui/dayjs";`,
         `import "${dayjs.filename}";`,
         `dayjs.locale('${dayjs.original}');`,
