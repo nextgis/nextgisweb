@@ -6,6 +6,8 @@ import usePickerModal from "./hook/usePickerModal";
 
 import type { ResourcePickerModalProps, SelectValue } from "./type";
 
+import "./ResourcePickerModal.less";
+
 export function ResourcePickerModal<V extends SelectValue = SelectValue>({
     open: open_,
     visible: visible_,
