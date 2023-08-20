@@ -5,6 +5,7 @@ import {
     Button,
     Input,
     InputNumber,
+    Space,
     Switch,
 } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
@@ -51,7 +52,19 @@ const makeCORSWarning = () => {
     return <Alert message={message} type="warning" />;
 };
 
+function CodeArea(props) {
+    return (
+        <Input.TextArea
+            style={{ wordBreak: "break-all", overflow: "hidden" }}
+            spellCheck={false}
+            {...props}
+        />
+    );
+}
+
 export const SharePanel = ({ display, eventVisibility }) => {
+    const webmapId = display.config.webmapId;
+
     const [mapLink, setMapLink] = useState("");
     const [widthMap, setWidthMap] = useState(600);
     const [heightMap, setHeightMap] = useState(400);
@@ -71,7 +84,7 @@ export const SharePanel = ({ display, eventVisibility }) => {
             const permalinkOptions = {
                 urlWithoutParams:
                     ngwConfig.applicationUrl +
-                    routeURL("webmap.display.tiny", display.config.webmapId),
+                    routeURL("webmap.display.tiny", webmapId),
                 additionalParams: {
                     linkMainMap: addLinkToMap,
                     events: generateEvents,
@@ -123,12 +136,13 @@ export const SharePanel = ({ display, eventVisibility }) => {
     }, [eventVisibility]);
 
     const CORSWarning = useMemo(() => makeCORSWarning(), []);
+    const previewUrl = routeURL("webmap.preview_embedded", webmapId);
 
     return (
         <div className="share-panel">
             <h5 className="heading">{gettext("Map link")}</h5>
             <div className="input-group">
-                <Input.TextArea value={mapLink} />
+                <CodeArea value={mapLink} />
             </div>
             <CopyToClipboardButton
                 getTextToCopy={() => mapLink}
@@ -143,10 +157,8 @@ export const SharePanel = ({ display, eventVisibility }) => {
 
             {settings["check_origin"] && CORSWarning}
 
-            <div className="input-group input-group--inline">
-                <span className="input-group__label">
-                    {gettext("Map size:")}
-                </span>
+            <div className="input-group">
+                <span className="grow">{gettext("Map size:")}</span>
                 <InputNumber
                     title={gettext("Width, px")}
                     value={widthMap}
@@ -158,7 +170,7 @@ export const SharePanel = ({ display, eventVisibility }) => {
                     value={heightMap}
                     onChange={(v) => setHeightMap(v)}
                 />
-                <span className="input-group__label">{gettext("px")}</span>
+                <span>{gettext("px")}</span>
             </div>
             <div className="input-group">
                 <Switch
@@ -179,34 +191,28 @@ export const SharePanel = ({ display, eventVisibility }) => {
                 </span>
             </div>
             <div className="input-group">
-                <Input.TextArea value={embedCode} />
+                <CodeArea value={embedCode} rows={4} />
             </div>
 
-            <CopyToClipboardButton
-                getTextToCopy={() => embedCode}
-                messageInfo={gettext("The embed code copied to clipboard.")}
-            >
-                {gettext("Copy code")}
-            </CopyToClipboardButton>
-            <div className="divider"></div>
-
-            <h5 className="heading">{gettext("Preview")}</h5>
-            <form
-                action={routeURL(
-                    "webmap.preview_embedded",
-                    display.config.webmapId
-                )}
-                method="POST"
-                target="_blank"
-            >
+            <form action={previewUrl} method="POST" target="_blank">
                 <input
                     type="hidden"
                     name="iframe"
                     value={encodeURI(embedCode)}
                 />
-                <Button type="primary" htmlType="submit" icon={<PreviewIcon />}>
-                    {gettext("Preview")}
-                </Button>
+                <Space.Compact>
+                    <CopyToClipboardButton
+                        getTextToCopy={() => embedCode}
+                        messageInfo={gettext(
+                            "The embed code copied to clipboard."
+                        )}
+                    >
+                        {gettext("Copy code")}
+                    </CopyToClipboardButton>
+                    <Button icon={<PreviewIcon />} htmlType="submit">
+                        {gettext("Preview")}
+                    </Button>
+                </Space.Compact>
             </form>
         </div>
     );

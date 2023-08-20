@@ -8,6 +8,14 @@
         flex-direction: row;
         gap: 4px;
         align-items: center;
+
+        span.grow {
+            flex-grow: 1;
+        }
+
+        .ant-input-number {
+            width: 9ch;
+        }
     }
 
     .divider {
@@ -17,25 +25,5 @@
 
     .previewMap-button {
         margin-top: 8px;
-    }
-
-
-    .social-links {
-        line-height: 1;
-
-        .social-link {
-            border: none;
-            text-decoration: none;
-            height: 32px;
-            display: inline-block;
-
-            &:hover {
-                opacity: .8;
-            }
-
-            & + & {
-                margin-left: 2px;
-            }
-        }
     }
 }
