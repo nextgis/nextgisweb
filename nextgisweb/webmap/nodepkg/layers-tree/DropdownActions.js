@@ -56,18 +56,17 @@ export function DropdownActions({
                 menuItems.push({
                     key: keyPlugin,
                     onClick: onClick_,
-                    label: (
-                        <>
-                            <span>
-                                {typeof icon === "string" ? (
-                                    <SvgIcon icon={icon} fill="currentColor" />
-                                ) : (
-                                    icon
-                                )}
-                            </span>
-                            <span>{title}</span>
-                        </>
-                    ),
+                    icon:
+                        typeof icon === "string" ? (
+                            <SvgIcon
+                                className="icon"
+                                icon={icon}
+                                fill="currentColor"
+                            />
+                        ) : (
+                            icon
+                        ),
+                    label: title,
                 });
             } else if (plugin.render) {
                 customMenuItems.push(plugin.render.bind(plugin, pluginInfo));
@@ -86,7 +85,6 @@ export function DropdownActions({
     return (
         <Dropdown
             menu={menuProps}
-            overlayClassName="tree-item-menu"
             onOpenChange={onOpenChange}
             trigger={["click"]}
             destroyPopupOnHide
