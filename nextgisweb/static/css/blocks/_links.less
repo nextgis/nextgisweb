@@ -1,27 +1,27 @@
 @import "../settings/_variables";
 
 a.action {
-  text-decoration: none; 
-  border-bottom: 1px dashed blue;
-  cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px dashed blue;
+    cursor: pointer;
 }
 
-a, .link {
-  color: var(--link-color);
-  text-decoration: underline;
-  cursor: pointer;
-
-  svg.icon {
-    color: var(--icon-color);
-  }
-
-  &:hover {
-    color: var(--link-hover-color);
-    border-color: var(--link-hover-color);
+:where(a:not(.ant-btn)),
+.link {
+    color: var(--link-color);
+    text-decoration: underline;
+    cursor: pointer;
 
     svg.icon {
-      color: inherit;
+        color: var(--icon-color);
     }
-  }
 
+    &:hover {
+        color: var(--link-hover-color);
+        border-color: var(--link-hover-color);
+
+        svg.icon {
+            color: inherit;
+        }
+    }
 }
