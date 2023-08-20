@@ -131,7 +131,6 @@ export const SharePanel = ({ display, eventVisibility }) => {
                 <Input.TextArea value={mapLink} />
             </div>
             <CopyToClipboardButton
-                type="secondary"
                 getTextToCopy={() => mapLink}
                 messageInfo={gettext("The map link copied to clipboard.")}
             >
@@ -184,7 +183,6 @@ export const SharePanel = ({ display, eventVisibility }) => {
             </div>
 
             <CopyToClipboardButton
-                type="secondary"
                 getTextToCopy={() => embedCode}
                 messageInfo={gettext("The embed code copied to clipboard.")}
             >

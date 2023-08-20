@@ -1,3 +1,1 @@
-import {CopyToClipboardButton} from "./CopyToClipboardButton";
-
-export {CopyToClipboardButton};
+export { CopyToClipboardButton } from "./CopyToClipboardButton";

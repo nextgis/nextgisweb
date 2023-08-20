@@ -1,8 +1,6 @@
-import { PropTypes } from "prop-types";
-import { Button, message } from "@nextgisweb/gui/antd";
 import ContentCopyIcon from "@material-icons/svg/content_copy";
-
-import i18n from "@nextgisweb/pyramid/i18n";
+import { Button, message } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export function CopyToClipboardButton({
     children,
@@ -13,17 +11,17 @@ export function CopyToClipboardButton({
 }) {
     const copyToClipboard = async () => {
         await navigator.clipboard.writeText(getTextToCopy());
-        message.info(messageInfo || i18n.gettext("Copied to clipboard"));
+        message.info(messageInfo || gettext("Copied to clipboard"));
     };
 
     let buttonContent = null;
     if (!iconOnly) {
-        buttonContent = children || i18n.gettext("Copy to clipboard");
+        buttonContent = children || gettext("Copy to clipboard");
     }
 
     return (
         <Button
-            type={type || "primary"}
+            type={type}
             icon={<ContentCopyIcon />}
             onClick={() => copyToClipboard()}
         >
@@ -31,11 +29,3 @@ export function CopyToClipboardButton({
         </Button>
     );
 }
-
-CopyToClipboardButton.propTypes = {
-    getTextToCopy: PropTypes.any,
-    children: PropTypes.node,
-    type: PropTypes.string,
-    messageInfo: PropTypes.string,
-    iconOnly: PropTypes.bool,
-};
