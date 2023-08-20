@@ -46,7 +46,7 @@ define([
         getMenuItem: function () {
             var widget = this;
             return {
-                icon: "material-description",
+                icon: "material-info-outline",
                 title: i18n.gettext("Description"),
                 onClick: function () {
                     return widget.run();

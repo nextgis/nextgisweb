@@ -28,7 +28,7 @@ define([
         getMenuItem: function () {
             var widget = this;
             return {
-                icon: "material-aspect_ratio",
+                icon: "material-zoom_in_map-outline",
                 title: i18n.gettext("Zoom to layer"),
                 onClick: function () {
                     return widget.run();

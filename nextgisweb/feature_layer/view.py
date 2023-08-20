@@ -191,7 +191,7 @@ def setup_pyramid(comp, config):
                             lambda args: args.request.route_url(
                                 "feature_layer.feature.browse",
                                 id=args.obj.id),
-                            important=True, icon='material-table_view')
+                            important=True, icon='mdi-table-large')
 
                 if args.obj.has_export_permission(args.request.user):
                     yield dm.Link(

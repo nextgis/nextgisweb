@@ -1085,7 +1085,7 @@ define([
                         title: i18n.gettext("Description"),
                         name: "info",
                         order: 40,
-                        menuIcon: "material-info",
+                        menuIcon: "material-info-outline",
                         class: "info-panel dynamic-panel--fullwidth",
                         withTitle: false,
                         display: this,

@@ -236,7 +236,7 @@ define([
         getMenuItem: function () {
             var widget = this;
             return {
-                icon: "material-list_alt",
+                icon: "mdi-table-large",
                 title: i18n.gettext("Feature table"),
                 onClick: function () {
                     return widget.run();
