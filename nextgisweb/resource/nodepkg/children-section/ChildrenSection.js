@@ -1,6 +1,3 @@
-import MoreVertIcon from "@material-icons/svg/more_vert";
-import PriorityHighIcon from "@material-icons/svg/priority_high";
-import PropTypes from "prop-types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Badge, Dropdown, message, Table, Tooltip } from "@nextgisweb/gui/antd";
@@ -11,11 +8,14 @@ import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { showResourcePicker } from "../component/resource-picker";
 import { createResourceTableItemOptions } from "./util/createResourceTableItemOptions";
 import { forEachSelected } from "./util/forEachSelected";
+
+import MoreVertIcon from "@nextgisweb/icon/material/more_vert";
+import PriorityHighIcon from "@nextgisweb/icon/material/priority_high";
 
 import "./ChildrenSection.less";
 
@@ -24,7 +24,7 @@ const { Column } = Table;
 function confirmThenDelete(onOk) {
     confirmDelete({
         onOk,
-        content: i18n.gettext(
+        content: gettext(
             "Please confirm resource deletion. This action cannot be undone."
         ),
     });
@@ -32,21 +32,19 @@ function confirmThenDelete(onOk) {
 
 function notifySuccessfulDeletion(count) {
     message.success(
-        count === 1
-            ? i18n.gettext("Resource deleted")
-            : i18n.gettext("Resources deleted")
+        count === 1 ? gettext("Resource deleted") : gettext("Resources deleted")
     );
 }
 function notifySuccessfulMove(count) {
     message.success(
         count === 1
-            ? i18n.gettext("Resource has been moved")
-            : i18n.gettext("Resources have been moved")
+            ? gettext("Resource has been moved")
+            : gettext("Resources have been moved")
     );
 }
 function notifyMoveWithError(successItems, errorItems) {
     message.warning(
-        `${i18n.gettext("Not all resources moved")} (${successItems.length}/${
+        `${gettext("Not all resources moved")} (${successItems.length}/${
             errorItems.length
         })`
     );
@@ -54,10 +52,10 @@ function notifyMoveWithError(successItems, errorItems) {
 function notifyMoveAbsolutError(errorItems) {
     const count = errorItems.length;
     message.error(
-        i18n.gettext(
+        gettext(
             count === 1
-                ? i18n.gettext("Failed to move resource")
-                : i18n.gettext("Failed to move resources")
+                ? gettext("Failed to move resource")
+                : gettext("Failed to move resources")
         )
     );
 }
@@ -187,7 +185,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
     const moveSelectedTo = useCallback(
         (parentId) => {
             forEachSelected({
-                title: i18n.gettext("Moving resources"),
+                title: gettext("Moving resources"),
                 setItems,
                 setSelected,
                 selected,
@@ -218,7 +216,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
 
     const deleteSelected = useCallback(() => {
         forEachSelected({
-            title: i18n.gettext("Deleting resources"),
+            title: gettext("Deleting resources"),
             setItems,
             setSelected,
             setInProgress: setBatchDeletingInProgress,
@@ -250,8 +248,8 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         const menuItems_ = [];
         menuItems_.push({
             label: allowBatch
-                ? i18n.gettext("Turn off multiple selection")
-                : i18n.gettext("Select multiple resources"),
+                ? gettext("Turn off multiple selection")
+                : gettext("Select multiple resources"),
             onClick: () => {
                 setAllowBatch(!allowBatch);
             },
@@ -260,8 +258,8 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         if (storageEnabled) {
             menuItems_.push({
                 label: volumeVisible
-                    ? i18n.gettext("Hide resources volume")
-                    : i18n.gettext("Show resources volume"),
+                    ? gettext("Hide resources volume")
+                    : gettext("Show resources volume"),
                 onClick: () => {
                     setVolumeVisible(!volumeVisible);
                     !volumeVisible && loadVolumes(data, setVolumeValues);
@@ -270,8 +268,8 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         }
         menuItems_.push({
             label: creationDateVisible
-                ? i18n.gettext("Hide resource creation date")
-                : i18n.gettext("Show resource creation date"),
+                ? gettext("Hide resource creation date")
+                : gettext("Show resource creation date"),
             onClick: () => {
                 setCreationDateVisible(!creationDateVisible);
             },
@@ -284,7 +282,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
             const deleteOperationConfig = {
                 label: (
                     <>
-                        {i18n.gettext("Delete")}{" "}
+                        {gettext("Delete")}{" "}
                         {selectedAllowedForDelete.length > 0 && (
                             <Badge
                                 size="small"
@@ -293,7 +291,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                         )}{" "}
                         {checkNotAllForDelete && (
                             <Tooltip
-                                title={i18n.gettext(
+                                title={gettext(
                                     "Not all of the selected can be deleted."
                                 )}
                             >
@@ -308,7 +306,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
 
             // Batch change parent
             const moveOperationConfig = {
-                label: <>{i18n.gettext("Move")}</>,
+                label: <>{gettext("Move")}</>,
                 onClick: () => {
                     const resourcePicker = showResourcePicker({
                         pickerOptions: {
@@ -326,7 +324,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 },
             };
             const exportFeaturesOperationConfig = {
-                label: <>{i18n.gettext("Export vector layers")}</>,
+                label: <>{gettext("Export vector layers")}</>,
                 disabled: !selectedAllowedForFeatureExport.length,
                 onClick: () => {
                     window.open(
@@ -391,7 +389,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 rowSelection={rowSelection}
             >
                 <Column
-                    title={i18n.gettext("Display name")}
+                    title={gettext("Display name")}
                     className="displayName"
                     dataIndex="displayName"
                     sorter={sorterFactory("displayName")}
@@ -405,14 +403,14 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                     )}
                 />
                 <Column
-                    title={i18n.gettext("Type")}
+                    title={gettext("Type")}
                     responsive={["md"]}
                     className="cls"
                     dataIndex="clsDisplayName"
                     sorter={sorterFactory("clsDisplayName")}
                 />
                 <Column
-                    title={i18n.gettext("Owner")}
+                    title={gettext("Owner")}
                     responsive={["xl"]}
                     className="ownerUser"
                     dataIndex="ownerUserDisplayName"
@@ -420,7 +418,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 />
                 {creationDateVisible && (
                     <Column
-                        title={i18n.gettext("Created")}
+                        title={gettext("Created")}
                         responsive={["xl"]}
                         className="creationDate"
                         dataIndex="creationDate"
@@ -439,7 +437,7 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
                 )}
                 {storageEnabled && volumeVisible && (
                     <Column
-                        title={i18n.gettext("Volume")}
+                        title={gettext("Volume")}
                         className="volume"
                         sorter={(a, b) =>
                             volumeValues[a.id] - volumeValues[b.id]
@@ -465,9 +463,3 @@ export function ChildrenSection({ data, storageEnabled, resourceId }) {
         </div>
     );
 }
-
-ChildrenSection.propTypes = {
-    data: PropTypes.arrayOf(PropTypes.object),
-    resourceId: PropTypes.number,
-    storageEnabled: PropTypes.bool,
-};

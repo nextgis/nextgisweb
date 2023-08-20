@@ -1,12 +1,12 @@
-import { useMemo, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
+import { useEffect, useMemo, useState } from "react";
 
-import { Row, Col, Tree } from "@nextgisweb/gui/antd";
-import EditIcon from "@material-icons/svg/edit/outline";
+import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 
 import { DropdownActions } from "./DropdownActions";
-import { LegendAction, Legend } from "./Legend.js";
-import PropTypes from "prop-types";
+import { Legend, LegendAction } from "./Legend.js";
+
+import EditIcon from "@nextgisweb/icon/material/edit/outline";
 
 import "./LayersTree.less";
 
@@ -232,12 +232,3 @@ export const LayersTree = observer(
         );
     }
 );
-
-LayersTree.propTypes = {
-    store: PropTypes.object,
-    webMapItems: PropTypes.array,
-    onSelect: PropTypes.func,
-    getWebmapPlugins: PropTypes.func,
-    setLayerZIndex: PropTypes.func,
-    onReady: PropTypes.func,
-};

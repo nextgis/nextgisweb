@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 
-import BackspaceIcon from "@material-icons/svg/backspace";
-import CancelIcon from "@material-icons/svg/cancel";
 import { Button, Upload } from "@nextgisweb/gui/antd";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 
@@ -10,6 +8,9 @@ import { FileUploaderProps } from "./type";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { maxSize } from "@nextgisweb/pyramid/settings!file_upload";
+
+import BackspaceIcon from "@nextgisweb/icon/material/backspace";
+import CancelIcon from "@nextgisweb/icon/material/cancel";
 
 import "./FileUploader.less";
 

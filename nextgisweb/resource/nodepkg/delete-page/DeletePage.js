@@ -1,9 +1,11 @@
-import DeleteOutlineIcon from "@material-icons/svg/delete/outline";
-import { Button, Checkbox, Col, Row } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
-import { errorModal } from "@nextgisweb/gui/error";
 import { useState } from "react";
+
+import { Button, Checkbox, Col, Row } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import DeleteOutlineIcon from "@nextgisweb/icon/material/delete/outline";
 
 export function DeletePage({ id }) {
     const [deleteConfirmed, setDeleteConfirmed] = useState(false);
@@ -33,7 +35,7 @@ export function DeletePage({ id }) {
                     <Checkbox
                         onChange={(e) => setDeleteConfirmed(e.target.checked)}
                     >
-                        {i18n.gettext("Confirm deletion of the resource")}
+                        {gettext("Confirm deletion of the resource")}
                     </Checkbox>
                 </Col>
             </Row>
@@ -46,7 +48,7 @@ export function DeletePage({ id }) {
                         icon={<DeleteOutlineIcon />}
                         onClick={onDeleteClick}
                     >
-                        {i18n.gettext("Delete")}
+                        {gettext("Delete")}
                     </Button>
                 </Col>
             </Row>

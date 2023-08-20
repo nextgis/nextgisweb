@@ -1,6 +1,6 @@
-import SearchIcon from "@material-icons/svg/search";
-import InputOutlineIcon from "@material-icons/svg/input";
-import OpenInNewIcon from "@material-icons/svg/open_in_new";
+import debounce from "lodash/debounce";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import {
     Button,
     Divider,
@@ -14,10 +14,12 @@ import {
 // TODO: make global custom antd table style
 import "@nextgisweb/gui/model-browse/ModelBrowse.less";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
-import i18n from "@nextgisweb/pyramid/i18n";
-import debounce from "lodash/debounce";
-import { useCallback, useEffect, useMemo, useState } from "react";
+
+import InputOutlineIcon from "@nextgisweb/icon/material/input";
+import OpenInNewIcon from "@nextgisweb/icon/material/open_in_new";
+import SearchIcon from "@nextgisweb/icon/material/search";
 
 export function CatalogBrowse() {
     const [status, setStatus] = useState(null);
@@ -102,14 +104,14 @@ export function CatalogBrowse() {
 
     const columns = [
         {
-            title: i18n.gettext("Display name"),
+            title: gettext("Display name"),
             dataIndex: "display_name",
             key: "display_name",
             sorter: (a, b) => (a.display_name > b.display_name ? 1 : -1),
             render: (text, record) => (
                 <>
                     {text}{" "}
-                    <Tooltip title={i18n.gettext("Show in catalog")}>
+                    <Tooltip title={gettext("Show in catalog")}>
                         <a
                             href={settings.catalog.url + "/srs/" + record.id}
                             target="_blank"
@@ -121,7 +123,7 @@ export function CatalogBrowse() {
             ),
         },
         {
-            title: i18n.gettext("Authority and code"),
+            title: gettext("Authority and code"),
             dataIndex: "auth_name_srid",
             key: "auth_name_srid",
             sorter: (a, b) => (a.auth_name_srid > b.auth_name_srid ? 1 : -1),
@@ -133,7 +135,7 @@ export function CatalogBrowse() {
             align: "center",
             render: (text, record) => (
                 <div style={{ whiteSpace: "nowrap" }}>
-                    <Tooltip title={i18n.gettext("Import")}>
+                    <Tooltip title={gettext("Import")}>
                         <Button
                             type="text"
                             shape="circle"
@@ -150,7 +152,7 @@ export function CatalogBrowse() {
         <Form layout="inline">
             <Form.Item>
                 <Input
-                    placeholder={i18n.gettext("Search")}
+                    placeholder={gettext("Search")}
                     value={search}
                     onChange={(e) => {
                         setSearch(e.target.value);
@@ -167,7 +169,7 @@ export function CatalogBrowse() {
                     <Form.Item>
                         <InputNumber
                             style={{ maxWidth: "10em" }}
-                            placeholder={i18n.gettext("Latitude")}
+                            placeholder={gettext("Latitude")}
                             value={lat}
                             type="number"
                             onChange={(e) => {
@@ -180,7 +182,7 @@ export function CatalogBrowse() {
                     <Form.Item>
                         <InputNumber
                             style={{ maxWidth: "10em" }}
-                            placeholder={i18n.gettext("Longitude")}
+                            placeholder={gettext("Longitude")}
                             value={lon}
                             type="number"
                             onChange={(e) => {

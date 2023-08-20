@@ -1,20 +1,23 @@
-import LoginIcon from "@material-icons/svg/login";
+import { observer } from "mobx-react-lite";
+import { useEffect, useMemo, useState } from "react";
+
 import { Alert, Button, Form } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
-import { observer } from "mobx-react-lite";
-import { PropTypes } from "prop-types";
-import { useEffect, useMemo, useState } from "react";
-import { authStore } from "../store";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import oauth from "../oauth";
+import { authStore } from "../store";
+
+import LoginIcon from "@nextgisweb/icon/material/login";
+
 import "./LoginForm.less";
 
-const oauthText = i18n.gettext("Sign in with {}").replace("{}", oauth.name);
+const oauthText = gettext("Sign in with {}").replace("{}", oauth.name);
 
-const titleText = i18n.gettext("Sign in to Web GIS");
-const loginText = i18n.gettext("Sign in");
+const titleText = gettext("Sign in to Web GIS");
+const loginText = gettext("Sign in");
 
 export const LoginForm = observer((props = {}) => {
     const [creds, setCreds] = useState();
@@ -23,19 +26,22 @@ export const LoginForm = observer((props = {}) => {
     const queryParams = new URLSearchParams(location.search);
     const nextQueryParam = queryParams.get("next");
 
-    const fields = useMemo(() => [
-        {
-            name: "login",
-            placeholder: i18n.gettext("Login"),
-            required: true,
-        },
-        {
-            name: "password",
-            placeholder: i18n.gettext("Password"),
-            widget: "password",
-            required: true,
-        },
-    ], []);
+    const fields = useMemo(
+        () => [
+            {
+                name: "login",
+                placeholder: gettext("Login"),
+                required: true,
+            },
+            {
+                name: "password",
+                placeholder: gettext("Password"),
+                widget: "password",
+                required: true,
+            },
+        ],
+        []
+    );
 
     const p = { fields, size: "large", form };
 
@@ -86,9 +92,7 @@ export const LoginForm = observer((props = {}) => {
                         </Button>
                     </div>
                     <div className="separator">
-                        <span>
-                            {i18n.gettext("or using login and password")}
-                        </span>
+                        <span>{gettext("or using login and password")}</span>
                     </div>
                 </>
             )}
@@ -112,9 +116,3 @@ export const LoginForm = observer((props = {}) => {
         </div>
     );
 });
-
-LoginForm.propTypes = {
-    onChange: PropTypes.func,
-    reloadAfterLogin: PropTypes.bool,
-    form: PropTypes.object,
-};

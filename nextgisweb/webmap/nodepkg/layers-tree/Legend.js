@@ -1,14 +1,12 @@
-import PropTypes from "prop-types";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import i18n from "@nextgisweb/pyramid/i18n";
-
-import ViewListIcon from "@material-icons/svg/view_list/outline";
-import ExpandLessIcon from "@material-icons/svg/expand_less/outline";
+import ExpandLessIcon from "@nextgisweb/icon/material/expand_less/outline";
+import ViewListIcon from "@nextgisweb/icon/material/view_list/outline";
 
 import "./Legend.less";
 
-const showLegendMessage = i18n.gettext("Show legend");
-const hideLegendMessage = i18n.gettext("Hide legend");
+const showLegendMessage = gettext("Show legend");
+const hideLegendMessage = gettext("Hide legend");
 
 export function LegendAction({ nodeData, onClick }) {
     if (
@@ -60,12 +58,3 @@ export function Legend({ nodeData }) {
         </div>
     );
 }
-
-LegendAction.propTypes = {
-    nodeData: PropTypes.object,
-    onClick: PropTypes.func,
-};
-
-Legend.propTypes = {
-    nodeData: PropTypes.object,
-};

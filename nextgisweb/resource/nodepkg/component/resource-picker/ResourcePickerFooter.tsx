@@ -1,21 +1,22 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import ArrowBack from "@material-icons/svg/arrow_back";
-import CreateNewFolder from "@material-icons/svg/create_new_folder";
-import DoneIcon from "@material-icons/svg/done";
-import HighlightOff from "@material-icons/svg/highlight_off";
 import { Button, Col, Input, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import usePickerCard from "./hook/usePickerCard";
 
-import type { InputRef } from "antd/lib/input/Input";
 import type { ApiError } from "@nextgisweb/gui/error/type";
+import type { InputRef } from "antd/lib/input/Input";
 import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 import type { ResourcePickerFooterProps, SelectValue } from "./type";
+
+import ArrowBack from "@nextgisweb/icon/material/arrow_back";
+import CreateNewFolder from "@nextgisweb/icon/material/create_new_folder";
+import DoneIcon from "@nextgisweb/icon/material/done";
+import HighlightOff from "@nextgisweb/icon/material/highlight_off";
 
 interface CreateControlProps {
     resourceStore: ResourcePickerStore;
@@ -28,8 +29,8 @@ interface MoveControlProps<V extends SelectValue = SelectValue> {
     onOk?: (val: V) => void;
 }
 
-const mCreateGroup = i18n.gettext("Create group");
-const mClearSelection = i18n.gettext("Clear selection");
+const mCreateGroup = gettext("Create group");
+const mClearSelection = gettext("Clear selection");
 
 const CreateControl = observer(
     ({ setCreateMode, resourceStore }: CreateControlProps) => {

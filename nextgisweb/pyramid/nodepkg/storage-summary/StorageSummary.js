@@ -10,12 +10,13 @@ import {
 } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import kindOfData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/kind_of_data";
 import settings from "@nextgisweb/pyramid/settings!";
 
-import CachedIcon from "@material-icons/svg/cached";
+import CachedIcon from "@nextgisweb/icon/material/cached";
+
 import "./StorageSummary.less";
 
 function formatSize(value) {
@@ -91,13 +92,13 @@ export function StorageSummary() {
 
     const columns = [
         {
-            title: i18n.gettext("Kind of data"),
+            title: gettext("Kind of data"),
             dataIndex: "kind_of_data",
             render: (v) => kindOfData[v],
             sorter: (a, b) => (a.kind_of_data > b.kind_of_data ? 1 : -1),
         },
         {
-            title: i18n.gettext("Volume"),
+            title: gettext("Volume"),
             dataIndex: "data_volume",
             className: "data-volume",
             render: renderDataVolumeCell,
@@ -113,12 +114,12 @@ export function StorageSummary() {
         return (
             <Summary fixed>
                 <Row>
-                    <Cell>{i18n.gettext("Total")}</Cell>
+                    <Cell>{gettext("Total")}</Cell>
                     <Cell align="right">
                         {formatSize(total.data_volume || 0)}
                         {(limit && (
                             <>
-                                {" " + i18n.gettext("of") + " "}
+                                {" " + gettext("of") + " "}
                                 {formatSize(limit) + " MiB"} (
                                 {((100 * total.data_volume) / limit)
                                     .toFixed(0)
@@ -152,12 +153,12 @@ export function StorageSummary() {
                 )
                 .replace("%s", utc(total.updated).local().format("L LTS"));
         } else {
-            return i18n.gettext("Storage usage hasn't been estimated yet.");
+            return gettext("Storage usage hasn't been estimated yet.");
         }
     }
 
     function infoTextSecond() {
-        return i18n.gettext(
+        return gettext(
             "Some changes may be reflected only after full estimation."
         );
     }
@@ -181,7 +182,7 @@ export function StorageSummary() {
                         icon={<CachedIcon />}
                         size="large"
                     >
-                        {i18n.gettext("Estimate storage")}
+                        {gettext("Estimate storage")}
                     </Button>
                 </Col>
                 <Col flex="auto">

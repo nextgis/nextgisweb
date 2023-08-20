@@ -1,6 +1,7 @@
-import ContentCopyIcon from "@material-icons/svg/content_copy";
 import { Button, message } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import ContentCopyIcon from "@nextgisweb/icon/material/content_copy";
 
 export function CopyToClipboardButton({
     children,

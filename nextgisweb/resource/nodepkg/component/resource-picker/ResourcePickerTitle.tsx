@@ -1,23 +1,22 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
-import ArrowBack from "@material-icons/svg/arrow_back";
-import CloseIcon from "@material-icons/svg/close";
-import StartIcon from "@material-icons/svg/first_page";
-import SearchIcon from "@material-icons/svg/search";
-import SyncIcon from "@material-icons/svg/sync";
-
-import { Button, Col, Space, Row, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Col, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import ResourcesFilter from "../../resources-filter";
 import { ResourcePickerBreadcrumb } from "./ResourcePickerBreadcrumb";
 
 import type { ResourcePickerTitleProps } from "./type";
 
-import i18n from "@nextgisweb/pyramid/i18n";
+import ArrowBack from "@nextgisweb/icon/material/arrow_back";
+import CloseIcon from "@nextgisweb/icon/material/close";
+import StartIcon from "@nextgisweb/icon/material/first_page";
+import SearchIcon from "@nextgisweb/icon/material/search";
+import SyncIcon from "@nextgisweb/icon/material/sync";
 
-const mGotoInitialGroup = i18n.gettext("Go to initial group");
-const mRefresh = i18n.gettext("Refresh");
+const mGotoInitialGroup = gettext("Go to initial group");
+const mRefresh = gettext("Refresh");
 
 export const ResourcePickerTitle = observer(
     ({ resourceStore, onClose, showClose }: ResourcePickerTitleProps) => {

@@ -7,17 +7,12 @@ import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ExportAction } from "./component/ExportAction";
 import { deleteFeatures } from "./api/deleteFeatures";
 import { KEY_FIELD_KEYNAME } from "./constant";
 import FeatureTable from "./FeatureTable";
-
-import DeleteIcon from "@material-icons/svg/delete";
-import EditIcon from "@material-icons/svg/edit";
-import OpenIcon from "@material-icons/svg/open_in_new";
-import TuneIcon from "@material-icons/svg/tune";
 
 import type { SizeType } from "@nextgisweb/gui/antd";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
@@ -25,6 +20,11 @@ import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 
 import type { FeatureLayerCount } from "../type/FeatureLayer";
 import type { FeatureAttrs } from "./type";
+
+import DeleteIcon from "@nextgisweb/icon/material/delete";
+import EditIcon from "@nextgisweb/icon/material/edit";
+import OpenIcon from "@nextgisweb/icon/material/open_in_new";
+import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import "./FeatureGrid.less";
 
@@ -49,10 +49,10 @@ interface FeatureGridProps {
     onSelect?: (selected: number[]) => void;
 }
 
-const searchPlaceholderMsg = i18n.gettext("Search...");
-const openTitleMsg = i18n.gettext("Open");
-const deleteTitleMsg = i18n.gettext("Delete");
-const editTitleMsg = i18n.gettext("Edit");
+const searchPlaceholderMsg = gettext("Search...");
+const openTitleMsg = gettext("Open");
+const deleteTitleMsg = gettext("Delete");
+const editTitleMsg = gettext("Edit");
 
 const loadingCol = () => "...";
 

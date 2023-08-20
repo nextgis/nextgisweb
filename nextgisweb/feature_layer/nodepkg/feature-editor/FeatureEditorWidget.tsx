@@ -1,23 +1,23 @@
-import { Suspense, useState, useEffect, lazy, useCallback } from "react";
 import { observer } from "mobx-react-lite";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 
-import { Tabs, Badge, Space, Button } from "@nextgisweb/gui/antd";
+import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
+import { Badge, Button, Space, Tabs } from "@nextgisweb/gui/antd";
+import { SaveButton } from "@nextgisweb/gui/component/SaveButton";
+import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
-import entrypoint from "@nextgisweb/jsrealm/entrypoint";
-import { SaveButton } from "@nextgisweb/gui/component/SaveButton";
-import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 
-import { FeatureEditorStore } from "./FeatureEditorStore";
 import editorWidgetRegister from "../attribute-editor";
-
-import CircleIcon from "@material-icons/svg/circle";
-import ResetIcon from "@material-icons/svg/restart_alt";
+import { FeatureEditorStore } from "./FeatureEditorStore";
 
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import type { ParamOf } from "@nextgisweb/gui/type";
 import type { EditorWidgetRegister } from "../type";
 import type { FeatureEditorWidgetProps } from "./type";
+
+import CircleIcon from "@nextgisweb/icon/material/circle";
+import ResetIcon from "@nextgisweb/icon/material/restart_alt";
 
 import "./FeatureEditorWidget.less";
 

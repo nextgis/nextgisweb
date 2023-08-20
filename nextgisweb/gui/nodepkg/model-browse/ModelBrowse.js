@@ -1,5 +1,3 @@
-import { PropTypes } from "prop-types";
-
 import React, { useEffect, useMemo, useState } from "react";
 
 import {
@@ -18,12 +16,12 @@ import {
 import { errorModal } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import AddCircleIcon from "@material-icons/svg/add_circle";
-import DeleteForeverIcon from "@material-icons/svg/delete_forever";
-import EditIcon from "@material-icons/svg/edit";
-import SearchIcon from "@material-icons/svg/search";
+import AddCircleIcon from "@nextgisweb/icon/material/add_circle";
+import DeleteForeverIcon from "@nextgisweb/icon/material/delete_forever";
+import EditIcon from "@nextgisweb/icon/material/edit";
+import SearchIcon from "@nextgisweb/icon/material/search";
 
 import "./ModelBrowse.less";
 
@@ -43,19 +41,19 @@ export function ModelBrowse({
     const model =
         typeof m === "string"
             ? {
-                item: m + ".item",
-                collection: m + ".collection",
-                edit: m + ".edit",
-                browse: m + ".browse",
-                create: m + ".create",
-            }
+                  item: m + ".item",
+                  collection: m + ".collection",
+                  edit: m + ".edit",
+                  browse: m + ".browse",
+                  create: m + ".create",
+              }
             : m;
 
     const msg = messages || {};
-    const deleteConfirm = msg.deleteConfirm || i18n.gettext("Confirmation");
-    const deleteSuccess = msg.deleteSuccess || i18n.gettext("Item deleted");
+    const deleteConfirm = msg.deleteConfirm || gettext("Confirmation");
+    const deleteSuccess = msg.deleteSuccess || gettext("Item deleted");
     const deleteBatchSuccess =
-        msg.deleteBatchSuccess || i18n.gettext("Items deleted");
+        msg.deleteBatchSuccess || gettext("Items deleted");
 
     const { data, isLoading } = useRouteGet({
         name: model.collection,
@@ -124,11 +122,11 @@ export function ModelBrowse({
             if (deleteError.length) {
                 Modal.confirm({
                     type: "error",
-                    title: i18n.gettext("The errors occurred during execution"),
+                    title: gettext("The errors occurred during execution"),
                     content: (
                         <>
                             <p>
-                                {i18n.gettext("Failed to delete items:")}{" "}
+                                {gettext("Failed to delete items:")}{" "}
                                 {deleteError.join(", ")}
                             </p>
                         </>
@@ -151,7 +149,7 @@ export function ModelBrowse({
 
     const onDeleteSelectedBtnClick = async () => {
         Modal.confirm({
-            title: i18n.gettext("Do you want to delete these items?"),
+            title: gettext("Do you want to delete these items?"),
             onOk() {
                 deleteSelected();
             },
@@ -188,7 +186,7 @@ export function ModelBrowse({
             align: "center",
             render: (text, record) => (
                 <div style={{ whiteSpace: "nowrap" }}>
-                    <Tooltip title={i18n.gettext("Edit")}>
+                    <Tooltip title={gettext("Edit")}>
                         <Button
                             type="text"
                             shape="circle"
@@ -197,7 +195,7 @@ export function ModelBrowse({
                         />
                     </Tooltip>
                     {canDelete(record) && (
-                        <Tooltip title={i18n.gettext("Delete")}>
+                        <Tooltip title={gettext("Delete")}>
                             <Popconfirm
                                 placement="bottom"
                                 title={deleteConfirm}
@@ -220,7 +218,7 @@ export function ModelBrowse({
         <Row type="flex" justify="space-between">
             <Col>
                 <Input
-                    placeholder={i18n.gettext("Search")}
+                    placeholder={gettext("Search")}
                     value={search}
                     onChange={(e) => {
                         setSearch(e.target.value);
@@ -242,7 +240,7 @@ export function ModelBrowse({
                         onClick={goToCreatePage}
                         {...createProps}
                     >
-                        {i18n.gettext("Create")}
+                        {gettext("Create")}
                     </Button>
                 </Space>
             </Col>
@@ -264,7 +262,7 @@ export function ModelBrowse({
                     loading={isDeleting}
                     danger
                 >
-                    {i18n.gettext("Delete")}
+                    {gettext("Delete")}
                 </Button>
             </Badge>
         </Space>
@@ -294,19 +292,3 @@ export function ModelBrowse({
         </Space>
     );
 }
-
-ModelBrowse.propTypes = {
-    model: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-    columns: PropTypes.array.isRequired,
-    messages: PropTypes.object,
-    itemProps: PropTypes.object,
-    createProps: PropTypes.object,
-    headerControls: PropTypes.array,
-    selectedControls: PropTypes.array,
-    collectionOptions: PropTypes.object,
-    collectionFilter: PropTypes.func,
-    callbacks: PropTypes.shape({
-        deleteSelected: PropTypes.func,
-        deleteModelItem: PropTypes.func,
-    }),
-};

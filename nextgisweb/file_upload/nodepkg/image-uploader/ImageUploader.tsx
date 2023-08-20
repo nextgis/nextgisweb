@@ -1,21 +1,23 @@
 import { useState, useEffect } from "react";
 
-import DeleteIcon from "@material-icons/svg/delete";
 import { Button } from "@nextgisweb/gui/antd";
-import type { UploadFile } from "antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FileUploader } from "../file-uploader";
+
+import type { UploadFile } from "antd";
+
 import type { FileUploaderProps, UploaderMeta } from "../file-uploader/type";
 import type { ImageUploaderProps } from "./type";
 
-import i18n from "@nextgisweb/pyramid/i18n";
+import DeleteIcon from "@nextgisweb/icon/material/delete";
 
 import "./ImageUploader.less";
 
 type OriginFileObj = UploadFile["originFileObj"];
 
-const mUpload = i18n.gettext("Select a file");
-const mDelete = i18n.gettext("Delete");
+const mUpload = gettext("Select a file");
+const mDelete = gettext("Delete");
 
 export function ImageUploader({
     inputProps,

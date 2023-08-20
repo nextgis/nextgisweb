@@ -1,10 +1,8 @@
 import { Dropdown } from "@nextgisweb/gui/antd";
-import ZoomInMapIcon from "@material-icons/svg/zoom_in_map/outline";
-import MoreVertIcon from "@material-icons/svg/more_vert/outline";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import i18n from "@nextgisweb/pyramid/i18n";
-
-import PropTypes from "prop-types";
+import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
+import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 
 import "./LayersDropdown.less";
 
@@ -17,7 +15,7 @@ export function LayersDropdown({ onClick }) {
                     <span>
                         <ZoomInMapIcon />
                     </span>
-                    <span>{i18n.gettext("Zoom to all layers")}</span>
+                    <span>{gettext("Zoom to all layers")}</span>
                 </>
             ),
         },
@@ -43,7 +41,3 @@ export function LayersDropdown({ onClick }) {
         </Dropdown>
     );
 }
-
-LayersDropdown.propTypes = {
-    onClick: PropTypes.func,
-};

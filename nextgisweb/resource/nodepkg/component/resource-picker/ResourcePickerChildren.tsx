@@ -1,13 +1,12 @@
-import { observer } from "mobx-react-lite";
-import { useMemo, useState, useCallback } from "react";
-
 import debounce from "lodash-es/debounce";
+import { observer } from "mobx-react-lite";
+import { useCallback, useMemo, useState } from "react";
 
-import FolderOpenIcon from "@material-icons/svg/arrow_forward";
 import { Button, Table } from "@nextgisweb/gui/antd";
 import { sorterFactory } from "@nextgisweb/gui/util";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import usePickerCard from "./hook/usePickerCard";
+import type { ColumnProps } from "antd/lib/table/Column";
 import type {
     PickerResource,
     ResourcePickerChildrenProps,
@@ -15,15 +14,15 @@ import type {
     RowSelectionType,
     SelectValue,
 } from "./type";
+
+import usePickerCard from "./hook/usePickerCard";
 import { renderResourceCls } from "./util/renderResourceCls";
 
-import i18n from "@nextgisweb/pyramid/i18n";
-
-import type { ColumnProps } from "antd/lib/table/Column";
+import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
 
 const { Column } = Table;
 
-const mDisplayName = i18n.gettext("Display name");
+const mDisplayName = gettext("Display name");
 
 function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     resourceStore,
@@ -127,7 +126,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                         return;
                     }
                     if (pick && onOk) {
-                        const toPick = multiple ? [r.id] : r.id
+                        const toPick = multiple ? [r.id] : r.id;
                         onOk(toPick as V);
                         return;
                     }
@@ -172,5 +171,5 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             />
         </Table>
     );
-};
+}
 export const ResourcePickerChildren = observer(ResourcePickerChildrenInner);

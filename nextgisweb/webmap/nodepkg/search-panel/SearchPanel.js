@@ -1,22 +1,21 @@
-import { useState, useCallback } from "react";
-import { PropTypes } from "prop-types";
 import debounce from "lodash/debounce";
-import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
 import GeoJSON from "ol/format/GeoJSON";
+import { useCallback, useState } from "react";
 
-import PublicIcon from "@material-icons/svg/public";
-import LayersIcon from "@material-icons/svg/layers";
-import LocationOnIcon from "@material-icons/svg/location_on";
-import SearchIcon from "@material-icons/svg/search";
-import CloseIcon from "@material-icons/svg/close";
-import { LoadingOutlined } from "@ant-design/icons";
-
+import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
 import { request, route } from "@nextgisweb/pyramid/api";
-import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
-import i18n from "@nextgisweb/pyramid/i18n";
-import { parse } from "@nextgisweb/webmap/coordinates/parser";
-import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
+import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
+import { parse } from "@nextgisweb/webmap/coordinates/parser";
+
+import { LoadingOutlined } from "@ant-design/icons";
+import CloseIcon from "@nextgisweb/icon/material/close";
+import LayersIcon from "@nextgisweb/icon/material/layers";
+import LocationOnIcon from "@nextgisweb/icon/material/location_on";
+import PublicIcon from "@nextgisweb/icon/material/public";
+import SearchIcon from "@nextgisweb/icon/material/search";
 
 import "./SearchPanel.less";
 
@@ -26,16 +25,19 @@ const parseCoordinatesInput = async (criteria, limit, display) => {
     const coordinates = parse(criteria);
     const searchResults = [];
     const featureProjection = display.displayProjection;
-    coordinates.forEach(c => {
+    coordinates.forEach((c) => {
         const { lat, lon } = c;
         const searchResult = {
             label: lonLatToDM([lon, lat]),
-            geometry: GEO_JSON_FORMAT.readGeometry({
-                "type": "Point",
-                "coordinates": [lon, lat]
-            }, { featureProjection }),
+            geometry: GEO_JSON_FORMAT.readGeometry(
+                {
+                    "type": "Point",
+                    "coordinates": [lon, lat],
+                },
+                { featureProjection }
+            ),
             type: "place",
-            key: limit
+            key: limit,
         };
         searchResults.push(searchResult);
         limit = limit - 1;
@@ -46,7 +48,7 @@ const parseCoordinatesInput = async (criteria, limit, display) => {
 const searchByLayers = async (criteria, limit, display, controller) => {
     const visibleItems = await display.getVisibleItems();
     const requests = [];
-    visibleItems.forEach(i => {
+    visibleItems.forEach((i) => {
         const id = display.itemStore.getValue(i, "id");
         const layerId = display.itemStore.getValue(i, "layerId");
         const itmConfig = display._itemConfigById[id];
@@ -58,11 +60,12 @@ const searchByLayers = async (criteria, limit, display, controller) => {
             ilike: criteria,
             limit: limit,
             geom_format: "geojson",
-            label: true
+            label: true,
         };
         const signal = controller.makeSignal();
         const request = route("feature_layer.feature.collection", layerId).get({
-            query, signal
+            query,
+            signal,
         });
         requests.push(request);
     });
@@ -70,15 +73,15 @@ const searchByLayers = async (criteria, limit, display, controller) => {
     const results = await Promise.allSettled(requests);
     const searchResults = [];
     let isExceeded = false;
-    results.forEach(r => {
+    results.forEach((r) => {
         if (r.status !== "fulfilled" || !r.value || limit < 1) return;
-        r.value.forEach(feature => {
+        r.value.forEach((feature) => {
             if (isExceeded) return;
             const searchResult = {
                 label: feature.label,
                 geometry: GEO_JSON_FORMAT.readGeometry(feature.geom),
                 type: "layers",
-                key: limit
+                key: limit,
             };
             searchResults.push(searchResult);
             limit = limit - 1;
@@ -91,8 +94,10 @@ const searchByLayers = async (criteria, limit, display, controller) => {
 
 const searchByNominatim = async (criteria, limit, display, controller) => {
     const searchResults = [];
-    if (!webmapSettings.address_search_enabled ||
-        webmapSettings.address_geocoder !== "nominatim") {
+    if (
+        !webmapSettings.address_search_enabled ||
+        webmapSettings.address_geocoder !== "nominatim"
+    ) {
         return [limit, searchResults];
     }
 
@@ -100,7 +105,7 @@ const searchByNominatim = async (criteria, limit, display, controller) => {
         format: "geojson",
         limit: "30",
         q: criteria,
-        polygon_geojson: 1
+        polygon_geojson: 1,
     };
 
     if (webmapSettings.address_search_extent) {
@@ -117,18 +122,23 @@ const searchByNominatim = async (criteria, limit, display, controller) => {
     const headers = { "X-Requested-With": null };
     const global = true;
     const signal = controller.makeSignal();
-    const geojson = await request(NOMINATIM_SEARCH_URL, { query, headers, signal, global });
+    const geojson = await request(NOMINATIM_SEARCH_URL, {
+        query,
+        headers,
+        signal,
+        global,
+    });
     const features = geojson.features;
     let isExceeded = false;
-    features.forEach(f => {
+    features.forEach((f) => {
         if (isExceeded) return;
         const searchResult = {
             label: f.properties.display_name,
             geometry: GEO_JSON_FORMAT.readGeometry(f.geometry, {
-                featureProjection: display.displayProjection
+                featureProjection: display.displayProjection,
             }),
             type: "public",
-            key: limit
+            key: limit,
         };
         searchResults.push(searchResult);
         limit = limit - 1;
@@ -140,8 +150,10 @@ const searchByNominatim = async (criteria, limit, display, controller) => {
 
 const searchByYandex = async (criteria, limit, display, controller) => {
     const searchResults = [];
-    if (!webmapSettings.address_search_enabled ||
-        webmapSettings.address_geocoder !== "yandex") {
+    if (
+        !webmapSettings.address_search_enabled ||
+        webmapSettings.address_geocoder !== "yandex"
+    ) {
         return [limit, searchResults];
     }
 
@@ -149,7 +161,7 @@ const searchByYandex = async (criteria, limit, display, controller) => {
     const query = {
         apikey,
         geocode: criteria,
-        format: "json"
+        format: "json",
     };
 
     if (webmapSettings.address_search_extent && display.config.extent) {
@@ -160,29 +172,40 @@ const searchByYandex = async (criteria, limit, display, controller) => {
     const YANDEX_SEARCH_URL = "https://geocode-maps.yandex.ru/1.x/";
     const global = true;
     const signal = controller.makeSignal();
-    const yaGeocoderResponse = await request(YANDEX_SEARCH_URL, { query, global, signal });
+    const yaGeocoderResponse = await request(YANDEX_SEARCH_URL, {
+        query,
+        global,
+        signal,
+    });
     let featureMembers = [];
-    if (yaGeocoderResponse && yaGeocoderResponse.response &&
+    if (
+        yaGeocoderResponse &&
+        yaGeocoderResponse.response &&
         yaGeocoderResponse.response.GeoObjectCollection &&
-        yaGeocoderResponse.response.GeoObjectCollection.featureMember) {
-        featureMembers = yaGeocoderResponse.response.GeoObjectCollection.featureMember;
+        yaGeocoderResponse.response.GeoObjectCollection.featureMember
+    ) {
+        featureMembers =
+            yaGeocoderResponse.response.GeoObjectCollection.featureMember;
     }
 
     let isExceeded = false;
-    featureMembers.forEach(featureMember => {
+    featureMembers.forEach((featureMember) => {
         if (isExceeded || !featureMember.GeoObject) return;
         const geoObject = featureMember.GeoObject;
         const [lon, lat] = featureMember.GeoObject.Point.pos.split(" ");
         const searchResult = {
             label: geoObject.name,
-            geometry: GEO_JSON_FORMAT.readGeometry({
-                "type": "Point",
-                "coordinates": [lon, lat]
-            }, {
-                featureProjection: display.displayProjection
-            }),
+            geometry: GEO_JSON_FORMAT.readGeometry(
+                {
+                    "type": "Point",
+                    "coordinates": [lon, lat],
+                },
+                {
+                    featureProjection: display.displayProjection,
+                }
+            ),
             type: "public",
-            key: limit
+            key: limit,
         };
         searchResults.push(searchResult);
         limit = limit - 1;
@@ -196,7 +219,7 @@ const searchSteps = [
     parseCoordinatesInput,
     searchByLayers,
     searchByNominatim,
-    searchByYandex
+    searchByYandex,
 ];
 
 const search = async (criteria, searchController, display) => {
@@ -227,7 +250,6 @@ const search = async (criteria, searchController, display) => {
     return [searchResults, isExceeded];
 };
 
-
 export const SearchPanel = ({ display, onSelectResult }) => {
     const [loading, setLoading] = useState(false);
     const [searchResults, setSearchResults] = useState(undefined);
@@ -235,15 +257,18 @@ export const SearchPanel = ({ display, onSelectResult }) => {
     const [searchText, setSearchText] = useState(undefined);
     const [searchController, setSearchController] = useState(undefined);
 
-    const _search = useCallback(debounce(async (searchText) => {
-        clearResults();
-        setLoading(true);
-        const controller = new AbortControllerHelper();
-        setSearchController(controller);
-        const results = await search(searchText, controller, display);
-        setSearchResults(results);
-        setLoading(false);
-    }, 1000), []);
+    const _search = useCallback(
+        debounce(async (searchText) => {
+            clearResults();
+            setLoading(true);
+            const controller = new AbortControllerHelper();
+            setSearchController(controller);
+            const results = await search(searchText, controller, display);
+            setSearchResults(results);
+            setLoading(false);
+        }, 1000),
+        []
+    );
 
     const searchChange = (e) => {
         const value = e.target.value;
@@ -262,54 +287,56 @@ export const SearchPanel = ({ display, onSelectResult }) => {
         }
     };
 
-    const makeResult = resultInfo => {
-        const isSelected = resultSelected && resultSelected.key === resultInfo.key;
+    const makeResult = (resultInfo) => {
+        const isSelected =
+            resultSelected && resultSelected.key === resultInfo.key;
 
-        let resultSourceIcon = <PublicIcon/>;
+        let resultSourceIcon = <PublicIcon />;
         if (resultInfo.type === "public") {
-            resultSourceIcon = <PublicIcon/>;
+            resultSourceIcon = <PublicIcon />;
         } else if (resultInfo.type === "place") {
-            resultSourceIcon = <LocationOnIcon/>;
+            resultSourceIcon = <LocationOnIcon />;
         } else if (resultInfo.type === "layers") {
-            resultSourceIcon = <LayersIcon/>;
+            resultSourceIcon = <LayersIcon />;
         }
 
-        return <div
-            className={`result ${isSelected ? "selected" : ""}`}
-            key={resultInfo.key}
-            onClick={() => selectResult(resultInfo)}
-        >
-            <span>
-                {resultInfo.label}
-                {resultSourceIcon}
-            </span>
-        </div>;
+        return (
+            <div
+                className={`result ${isSelected ? "selected" : ""}`}
+                key={resultInfo.key}
+                onClick={() => selectResult(resultInfo)}
+            >
+                <span>
+                    {resultInfo.label}
+                    {resultSourceIcon}
+                </span>
+            </div>
+        );
     };
 
     let results = null;
     let info = null;
     if (searchResults && !loading) {
         const [resultsInfo, isExceeded] = searchResults;
-        results = resultsInfo.map(r => makeResult(r));
+        results = resultsInfo.map((r) => makeResult(r));
         if (resultsInfo.length === 0) {
-            info = <Alert
-                message={i18n.gettext("Not found")}
-                type="info"
-                showIcon
-            />;
+            info = (
+                <Alert message={gettext("Not found")} type="info" showIcon />
+            );
         } else if (isExceeded) {
-            info = <Alert
-                message={i18n.gettext("Refine search criterion. Displayed first 100 search results.")}
-                type="warning"
-                showIcon
-            />;
+            info = (
+                <Alert
+                    message={gettext(
+                        "Refine search criterion. Displayed first 100 search results."
+                    )}
+                    type="warning"
+                    showIcon
+                />
+            );
         }
     } else if (loading) {
-        const indicator = <LoadingOutlined style={{ fontSize: 30 }} spin/>;
-        results = <Spin
-            className="loading"
-            indicator={indicator}
-        />;
+        const indicator = <LoadingOutlined style={{ fontSize: 30 }} spin />;
+        results = <Spin className="loading" indicator={indicator} />;
     }
 
     const clearSearchText = () => {
@@ -328,10 +355,9 @@ export const SearchPanel = ({ display, onSelectResult }) => {
 
     let suffix = null;
     if (searchText && searchText.trim()) {
-        suffix = <CloseIcon
-            onClick={() => clearSearchText()}
-            className="close"
-        />;
+        suffix = (
+            <CloseIcon onClick={() => clearSearchText()} className="close" />
+        );
     }
 
     return (
@@ -339,22 +365,14 @@ export const SearchPanel = ({ display, onSelectResult }) => {
             <div className="control">
                 <Input
                     onChange={searchChange}
-                    prefix={<SearchIcon/>}
+                    prefix={<SearchIcon />}
                     suffix={suffix}
-                    placeholder={i18n.gettext("Enter at least 2 characters")}
+                    placeholder={gettext("Enter at least 2 characters")}
                     value={searchText}
                 />
                 {info}
             </div>
-            <div className="results">
-                {results}
-            </div>
-
+            <div className="results">{results}</div>
         </div>
     );
-};
-
-SearchPanel.propTypes = {
-    display: PropTypes.object,
-    onSelectResult: PropTypes.func
 };

@@ -1,16 +1,16 @@
 import { Button, Dropdown, Space, Tooltip } from "@nextgisweb/gui/antd";
 
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
-import i18n from "@nextgisweb/pyramid/i18n";
 
 import { useExportFeatureLayer } from "../../hook/useExportFeatureLayer";
 
-import ExportIcon from "@material-icons/svg/save_alt";
-import FilterIcon from "@material-icons/svg/filter_alt";
-
-import type { ParamsOf } from "@nextgisweb/gui/type";
 import type { SizeType } from "@nextgisweb/gui/antd";
+import type { ParamsOf } from "@nextgisweb/gui/type";
 import type { ExportFeatureLayerOptions } from "../../hook/useExportFeatureLayer";
+
+import FilterIcon from "@nextgisweb/icon/material/filter_alt";
+import ExportIcon from "@nextgisweb/icon/material/save_alt";
 
 type MenuItems = ParamsOf<typeof Dropdown>["menu"];
 
@@ -27,10 +27,10 @@ const formatItems = exportFormats.map((format) => ({
     label: format.display_name,
 }));
 
-const exportTitleMsg = i18n.gettext("Save as");
-const gotToSettingsTitleMsg = i18n.gettext("Advanced Export");
-const quickExportTitleMsg = i18n.gettext("Quick Export");
-const filtersApplyiedTitleMsg = i18n.gettext("Filters are applied");
+const exportTitleMsg = gettext("Save as");
+const gotToSettingsTitleMsg = gettext("Advanced Export");
+const quickExportTitleMsg = gettext("Quick Export");
+const filtersApplyiedTitleMsg = gettext("Filters are applied");
 
 const settingsKey = "go-to-settings";
 const quickExportKey = "quick-export";

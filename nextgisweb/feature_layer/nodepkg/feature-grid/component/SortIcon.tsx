@@ -1,6 +1,6 @@
-import StraightIcon from "@material-icons/svg/straight";
-
 import type { ColOrder } from "../type";
+
+import StraightIcon from "@nextgisweb/icon/material/straight";
 
 interface SortIconParams {
     dir: ColOrder;

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import uniq from "lodash-es/uniq";
+import { useCallback, useEffect, useState } from "react";
 
 import { Button, Space, Table } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -7,17 +7,17 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 
 import { ResourcePickerStore, showResourcePicker } from "../resource-picker";
 
-import DeleteIcon from "@material-icons/svg/delete";
-import ManageSearchIcon from "@material-icons/svg/manage_search";
-
 import type { ParamsOf } from "@nextgisweb/gui/type";
 import type { Resource, ResourceItem } from "../../type";
-import type { ResourceSelectProps } from "./type";
 import type { SelectValue } from "../resource-picker/type";
+import type { ResourceSelectProps } from "./type";
+
+import DeleteIcon from "@nextgisweb/icon/material/delete";
+import ManageSearchIcon from "@nextgisweb/icon/material/manage_search";
 
 type TableProps = ParamsOf<typeof Table>;
-type ColumnParams = NonNullable<TableProps["columns"]>
-type RowSelection = NonNullable<TableProps["rowSelection"]>
+type ColumnParams = NonNullable<TableProps["columns"]>;
+type RowSelection = NonNullable<TableProps["rowSelection"]>;
 
 const ResourceSelectMultiple = ({
     value: initResourceIds = [],
@@ -145,7 +145,7 @@ const ResourceSelectMultiple = ({
                 </div>
                 <Table
                     rowKey="id"
-                    expandable={{childrenColumnName: "children_"}}
+                    expandable={{ childrenColumnName: "children_" }}
                     rowSelection={rowSelection}
                     dataSource={resources}
                     columns={columns}

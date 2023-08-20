@@ -1,9 +1,13 @@
-import { useState } from "react";
 import { observer } from "mobx-react";
+import { useState } from "react";
+
 import { Drawer } from "@nextgisweb/gui/antd";
+
 import { layoutStore } from "./store";
-import CircleIcon from "@material-icons/svg/circle";
-import MenuIcon from "@material-icons/svg/menu";
+
+import CircleIcon from "@nextgisweb/icon/material/circle";
+import MenuIcon from "@nextgisweb/icon/material/menu";
+
 import "./Menu.less";
 
 const MenuItem = observer(({ title, ...rest }) => <a {...rest}>{title}</a>);

@@ -1,14 +1,12 @@
-import { PropTypes } from "prop-types";
-
 import { useEffect, useState } from "react";
 
 import { Button } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import ZoomInMap from "@material-icons/svg/zoom_in_map";
+import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 
-const zoomToFilteredMsg = i18n.gettext("Zoom to filtered features");
+const zoomToFilteredMsg = gettext("Zoom to filtered features");
 
 export const ZoomToFilteredBtn = ({
     id,
@@ -62,11 +60,4 @@ export const ZoomToFilteredBtn = ({
             loading={loading}
         />
     );
-};
-
-ZoomToFilteredBtn.propTypes = {
-    query: PropTypes.string,
-    id: PropTypes.number,
-    size: PropTypes.oneOf(["small", "middle", "large"]),
-    onZoomToFiltered: PropTypes.func,
 };

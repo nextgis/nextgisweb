@@ -1,23 +1,26 @@
-import AdministratorIcon from "@material-icons/svg/local_police";
-import RegularUserIcon from "@material-icons/svg/person";
-import { Badge, Button, Tooltip, Alert } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
+
+import { Alert, Badge, Button, Tooltip } from "@nextgisweb/gui/antd";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
-import { useState, useMemo } from "react";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { useMemo, useState } from "react";
+
+import { makeTeamManageButton, default as oauth } from "../oauth";
 import getMessages from "../userMessages";
-import { default as oauth, makeTeamManageButton } from "../oauth";
+
+import AdministratorIcon from "@nextgisweb/icon/material/local_police";
+import RegularUserIcon from "@nextgisweb/icon/material/person";
 
 const messages = {
-    disabled: i18n.gettext("Disabled"),
-    enabled: i18n.gettext("Enabled"),
+    disabled: gettext("Disabled"),
+    enabled: gettext("Enabled"),
 };
 
 const columns = [];
 
 columns.push({
-    title: i18n.gettext("Full name"),
+    title: gettext("Full name"),
     dataIndex: "display_name",
     key: "display_name",
     render: (text, record) => (
@@ -34,7 +37,7 @@ columns.push({
 });
 
 columns.push({
-    title: i18n.gettext("Login"),
+    title: gettext("Login"),
     dataIndex: "keyname",
     key: "keyname",
     sorter: (a, b) => (a.keyname > b.keyname ? 1 : -1),
@@ -43,27 +46,27 @@ columns.push({
 if (oauth.enabled) {
     columns.push({
         title: // prettier-ignore
-            <Tooltip title={i18n.gettext("Users with a password can sign in with login and password.")}>
-                {i18n.gettext("Password")}
+            <Tooltip title={gettext("Users with a password can sign in with login and password.")}>
+                {gettext("Password")}
             </Tooltip>,
         dataIndex: "password",
-        render: (value) => (value ? i18n.gettext("Yes") : i18n.gettext("No")),
+        render: (value) => (value ? gettext("Yes") : gettext("No")),
         sorter: (a, b) => (a.password > b.password ? 1 : -1),
     });
 
     columns.push({
         title: // prettier-ignore
-            <Tooltip title={i18n.gettext("Users bound to {dn} can sign in with {dn}.").replaceAll('{dn}', oauth.name)}>
+            <Tooltip title={gettext("Users bound to {dn} can sign in with {dn}.").replaceAll('{dn}', oauth.name)}>
                 {oauth.name}
             </Tooltip>,
         dataIndex: "oauth_subject",
-        render: (value) => (value ? i18n.gettext("Yes") : i18n.gettext("No")),
+        render: (value) => (value ? gettext("Yes") : gettext("No")),
         sorter: (a, b) => (!!a.oauth_subject > !!b.oauth_subject ? 1 : -1),
     });
 }
 
 columns.push({
-    title: i18n.gettext("Last activity"),
+    title: gettext("Last activity"),
     dataIndex: "last_activity",
     key: "last_activity",
     sorter: (a, b) => {
@@ -76,7 +79,7 @@ columns.push({
 });
 
 columns.push({
-    title: i18n.gettext("Status"),
+    title: gettext("Status"),
     dataIndex: "disabled",
     key: "disabled",
     render: (text) => {
@@ -141,7 +144,7 @@ export function UserBrowse() {
                 }
             >
                 <Button onClick={toggleUser} loading={toggleLoading}>
-                    {disable ? i18n.gettext("Disable") : i18n.gettext("Enable")}
+                    {disable ? gettext("Disable") : gettext("Enable")}
                 </Button>
             </Badge>
         );
@@ -157,7 +160,7 @@ export function UserBrowse() {
     // prettier-ignore
     const infoNGID = useMemo(() => oauth.isNGID && <Alert
         type="info" style={{marginTop: "1ex"}}
-        message={i18n.gettext("Your team members won't be shown here until their first logon. Set \"New users\" flag for a group to automatically assign new user to this group. You may also modify permission for authenticated users to manage access for your team members.").replace("{name}", oauth.name)}
+        message={gettext("Your team members won't be shown here until their first logon. Set \"New users\" flag for a group to automatically assign new user to this group. You may also modify permission for authenticated users to manage access for your team members.").replace("{name}", oauth.name)}
     />, []);
 
     const tmBtn = makeTeamManageButton({ target: "_blank" });

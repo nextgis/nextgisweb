@@ -1,9 +1,10 @@
-import SaveOutlineIcon from "@material-icons/svg/save/outline";
-import i18n from "@nextgisweb/pyramid/i18n";
 import { Button } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ReactNode } from "react";
 import type { ParamsOf } from "../type";
+
+import SaveOutlineIcon from "@nextgisweb/icon/material/save/outline";
 
 type ButtonProps = ParamsOf<typeof Button>;
 
@@ -14,7 +15,7 @@ export interface SaveButtonProps extends ButtonProps {
 export function SaveButton({ children, ...rest }: SaveButtonProps) {
     return (
         <Button type="primary" icon={<SaveOutlineIcon />} {...rest}>
-            {children || i18n.gettext("Save")}
+            {children || gettext("Save")}
         </Button>
     );
 }

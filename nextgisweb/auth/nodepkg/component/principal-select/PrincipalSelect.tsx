@@ -4,10 +4,10 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { Select, Tag, Space } from "@nextgisweb/gui/antd";
 
-import AdministratorIcon from "@material-icons/svg/local_police";
-import RegularUserIcon from "@material-icons/svg/person";
-import SystemUserIcon from "@material-icons/svg/attribution";
-import GroupIcon from "@material-icons/svg/groups";
+import AdministratorIcon from "@nextgisweb/icon/material/local_police";
+import RegularUserIcon from "@nextgisweb/icon/material/person";
+import SystemUserIcon from "@nextgisweb/icon/material/attribution";
+import GroupIcon from "@nextgisweb/icon/material/groups";
 
 import type { PrincipalSelectProps, Member, SelectProps } from "./type";
 import type { Group, User } from "../../type";

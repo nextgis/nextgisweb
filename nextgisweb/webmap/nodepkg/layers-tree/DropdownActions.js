@@ -1,9 +1,7 @@
-import PropTypes from "prop-types";
-
-import { Dropdown, Divider, Space } from "@nextgisweb/gui/antd";
+import { Divider, Dropdown } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
-import MoreVertIcon from "@material-icons/svg/more_vert/outline";
+import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 
 import "./DropdownActions.less";
 
@@ -120,12 +118,3 @@ export function DropdownActions({
         </Dropdown>
     );
 }
-
-DropdownActions.propTypes = {
-    nodeData: PropTypes.object,
-    getWebmapPlugins: PropTypes.func,
-    moreClickId: PropTypes.number,
-    setMoreClickId: PropTypes.func,
-    update: PropTypes.bool,
-    setUpdate: PropTypes.func,
-};

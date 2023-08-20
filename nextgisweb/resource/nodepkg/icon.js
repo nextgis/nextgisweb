@@ -1,7 +1,7 @@
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
-import MAllowIcon from "@material-icons/svg/check_circle";
-import MDenyIcon from "@material-icons/svg/remove_circle";
+import MAllowIcon from "@nextgisweb/icon/material/check_circle";
+import MDenyIcon from "@nextgisweb/icon/material/remove_circle";
 
 export function ResourceIcon({ identity, ...props }) {
     return <SvgIcon icon={"rescls-" + identity} {...props} />;

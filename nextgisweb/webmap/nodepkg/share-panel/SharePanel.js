@@ -15,8 +15,8 @@ import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 import settings from "@nextgisweb/pyramid/settings!";
 
-import CloseIcon from "@material-icons/svg/close";
-import PreviewIcon from "@material-icons/svg/preview";
+import CloseIcon from "@nextgisweb/icon/material/close";
+import PreviewIcon from "@nextgisweb/icon/material/preview";
 
 import "./SharePanel.less";
 

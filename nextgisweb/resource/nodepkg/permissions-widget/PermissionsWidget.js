@@ -4,28 +4,27 @@ import { useMemo } from "react";
 import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Select, Space } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import { AllowIcon, DenyIcon, ResourceIcon } from "../icon";
+import AddIcon from "@nextgisweb/icon/material/add_circle_outline";
 import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
-
-import { ResourceIcon, AllowIcon, DenyIcon } from "../icon";
-import AddIcon from "@material-icons/svg/add_circle_outline";
-
-import i18n from "@nextgisweb/pyramid/i18n";
 
 const { Option, OptGroup } = Select;
 
-const colAction = i18n.gettext("Action");
-const colPrincipal = i18n.gettext("Principal");
-const colApply = i18n.gettext("Apply to");
-const colPermission = i18n.gettext("Permission");
+const colAction = gettext("Action");
+const colPrincipal = gettext("Principal");
+const colApply = gettext("Apply to");
+const colPermission = gettext("Permission");
 
-const actionAdd = i18n.gettext("Add");
-const actionAllow = i18n.gettext("Allow");
-const actionDeny = i18n.gettext("Deny");
+const actionAdd = gettext("Add");
+const actionAllow = gettext("Allow");
+const actionDeny = gettext("Deny");
 
-const applyPropagate = i18n.gettext("This and subresources");
-const applyThis = i18n.gettext("This resource only");
+const applyPropagate = gettext("This and subresources");
+const applyThis = gettext("This resource only");
 
-const allPermissions = i18n.gettext("All permissions");
+const allPermissions = gettext("All permissions");
 
 const selectDefaults = { allowClear: false, bordered: false };
 
@@ -196,5 +195,5 @@ export const PermissionsWidget = observer(({ store }) => {
     return <EdiTable {...{ store, columns }} parentHeight />;
 });
 
-PermissionsWidget.title = i18n.gettext("Permissions");
+PermissionsWidget.title = gettext("Permissions");
 PermissionsWidget.order = 50;

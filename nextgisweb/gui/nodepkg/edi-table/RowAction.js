@@ -1,10 +1,9 @@
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Button, Tooltip } from "../antd";
 
-import DeleteIcon from "@material-icons/svg/clear";
-import CloneIcon from "@material-icons/svg/copy_all";
-import ErrorIcon from "@material-icons/svg/error";
-
-import i18n from "@nextgisweb/pyramid/i18n";
+import DeleteIcon from "@nextgisweb/icon/material/clear";
+import CloneIcon from "@nextgisweb/icon/material/copy_all";
+import ErrorIcon from "@nextgisweb/icon/material/error";
 
 export function ActionButton({ onClick, title, icon, ...buttonProps }) {
     return (
@@ -31,12 +30,12 @@ export const ErrorButton = ({ message }) => (
 export const WELLKNOWN_ROW_ACTIONS = {
     clone: {
         callback: "cloneRow",
-        title: i18n.gettext("Clone"),
-        icon: <CloneIcon/>,
+        title: gettext("Clone"),
+        icon: <CloneIcon />,
     },
     delete: {
         callback: "deleteRow",
-        title: i18n.gettext("Delete"),
-        icon: <DeleteIcon/>,
+        title: gettext("Delete"),
+        icon: <DeleteIcon />,
     },
 };
