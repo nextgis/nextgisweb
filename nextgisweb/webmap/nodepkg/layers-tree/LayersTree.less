@@ -22,25 +22,10 @@
     }
 
     .ant-tree-checkbox {
-        margin-top: 8px;
+        margin-top: 6px;
         margin-right: 6px;
         align-self: start;
-
-        .ant-tree-checkbox-inner {
-            width: 12px;
-            height: 12px;
-        }
-    }
-
-    .ant-tree-checkbox-checked > .ant-tree-checkbox-inner::after {
-        width: 4px;
-        height: 6px;
-        left: 25%;
-    }
-
-    .ant-tree-checkbox-indeterminate > .ant-tree-checkbox-inner::after {
-        width: 6px;
-        height: 6px;
+        scale: 0.75;
     }
 
     .ant-tree-node-content-wrapper {
@@ -66,6 +51,10 @@
             justify-content: center;
             height: 28px;
             width: auto;
+
+            &:empty {
+                display: none;
+            }
 
             img {
                 display: block;

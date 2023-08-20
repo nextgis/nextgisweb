@@ -123,7 +123,10 @@ export const LayersTree = observer(
                         <Col flex="auto" className="tree-item-title">
                             {title}
                         </Col>
-                        <Col flex="50px" className="tree-item-action">
+                        <Col
+                            className="tree-item-action"
+                            style={{ alignItems: "center" }}
+                        >
                             <LegendAction
                                 nodeData={nodeData}
                                 onClick={() => setUpdate(!update)}
