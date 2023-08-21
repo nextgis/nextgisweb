@@ -573,8 +573,8 @@ def _setup_pyramid_debugtoolbar(comp, config):
         return
 
     settings = config.registry.settings
-    settings['debugtoolbar.hosts'] = dt_opt.get(
-        'hosts', '0.0.0.0/0' if comp.env.core.debug else None)
+    if hosts := dt_opt.get('hosts', '0.0.0.0/0' if comp.env.core.debug else None):
+        settings['debugtoolbar.hosts'] = hosts
     settings['debugtoolbar.exclude_prefixes'] = ['/static/', '/favicon.ico']
     config.include(pyramid_debugtoolbar)
 
