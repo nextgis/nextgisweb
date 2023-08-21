@@ -17,18 +17,3 @@
     });
 </script>
 
-<script type="text/javascript">
-    require(["dojo/dom", "dojo/dom-style", "dojo/dom-geometry", "dojo/on", "dojo/domReady!"],
-    function (dom, domStyle, domGeom, on) {
-        var webmapWrapper = dom.byId("webmap-wrapper"),
-            header = dom.byId("header");
-
-        function resize() {
-            var height = domGeom.getMarginBox(header, domStyle.getComputedStyle(header)).h;
-            domStyle.set(webmapWrapper, "top", height + "px");
-        }
-        resize();
-        on(window, 'resize', resize);
-    });
-
-</script>
