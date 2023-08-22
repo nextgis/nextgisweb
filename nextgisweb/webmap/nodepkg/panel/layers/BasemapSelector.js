@@ -2,6 +2,8 @@ import { useMemo } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
 
+import { UpOutlined } from "@ant-design/icons";
+
 export function BasemapSelector({ map, basemapDefault, onChange }) {
     const options = useMemo(() => {
         const options_ = [];
@@ -21,6 +23,8 @@ export function BasemapSelector({ map, basemapDefault, onChange }) {
             options={options}
             onChange={(key) => onChange(key)}
             style={{ width: "100%" }}
+            bordered={false}
+            suffixIcon={<UpOutlined style={{ pointerEvents: "none" }} />}
         />
     );
 }
