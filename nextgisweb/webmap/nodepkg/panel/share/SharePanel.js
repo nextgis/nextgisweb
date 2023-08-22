@@ -19,8 +19,7 @@ import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
 
 import "./SharePanel.less";
-
-let itemStoreListener;
+import { PanelHeader } from "../header";
 
 const makeIframeTag = (iframeSrc, height, width) => {
     return (
@@ -62,7 +61,7 @@ function CodeArea(props) {
     );
 }
 
-export const SharePanel = ({ display, eventVisibility }) => {
+export const SharePanel = ({ display, title, close }) => {
     const webmapId = display.config.webmapId;
 
     const [mapLink, setMapLink] = useState("");
@@ -107,18 +106,15 @@ export const SharePanel = ({ display, eventVisibility }) => {
         });
     }, []);
 
-    const handleShow = () => {
+    useEffect(() => {
         display.map.olMap.getView().on("change", updateTexts);
-        itemStoreListener = display.itemStore.on("Set", updateTexts);
+        const listener = display.itemStore.on("Set", updateTexts);
         updateTexts();
-    };
-
-    const handleHide = () => {
-        display.map.olMap.getView().un("change", updateTexts);
-        if (itemStoreListener) {
-            itemStoreListener.remove();
-        }
-    };
+        return () => {
+            display.map.olMap.getView().un("change", updateTexts);
+            listener.remove();
+        };
+    }, [updateTexts]);
 
     useEffect(() => {
         display._mapExtentDeferred.then(() => {
@@ -126,94 +122,89 @@ export const SharePanel = ({ display, eventVisibility }) => {
         });
     }, [widthMap, heightMap, addLinkToMap, generateEvents]);
 
-    useEffect(() => {
-        if (eventVisibility === "pre-show") {
-            handleShow();
-        }
-        if (eventVisibility === "pre-hide") {
-            handleHide();
-        }
-    }, [eventVisibility]);
-
     const CORSWarning = useMemo(() => makeCORSWarning(), []);
     const previewUrl = routeURL("webmap.preview_embedded", webmapId);
 
     return (
-        <div className="share-panel">
-            <h5 className="heading">{gettext("Map link")}</h5>
-            <div className="input-group">
-                <CodeArea value={mapLink} />
-            </div>
-            <CopyToClipboardButton
-                getTextToCopy={() => mapLink}
-                messageInfo={gettext("The map link copied to clipboard.")}
-            >
-                {gettext("Copy link")}
-            </CopyToClipboardButton>
+        <div className="ngw-webmap-share-panel">
+            <PanelHeader {...{ title, close }} />
+            <section>
+                <h5 className="heading">{gettext("Map link")}</h5>
+                <div className="input-group">
+                    <CodeArea value={mapLink} />
+                </div>
+                <CopyToClipboardButton
+                    getTextToCopy={() => mapLink}
+                    messageInfo={gettext("The map link copied to clipboard.")}
+                >
+                    {gettext("Copy link")}
+                </CopyToClipboardButton>
+            </section>
+            <section>
+                <h5 className="heading">
+                    {gettext("Embed code for your site")}
+                </h5>
 
-            <div className="divider"></div>
+                {settings["check_origin"] && CORSWarning}
 
-            <h5 className="heading">{gettext("Embed code for your site")}</h5>
+                <div className="input-group">
+                    <span className="grow">{gettext("Map size:")}</span>
+                    <InputNumber
+                        title={gettext("Width, px")}
+                        value={widthMap}
+                        onChange={(v) => setWidthMap(v)}
+                    />
+                    <CloseIcon />
+                    <InputNumber
+                        title={gettext("Height, px")}
+                        value={heightMap}
+                        onChange={(v) => setHeightMap(v)}
+                    />
+                    <span>{gettext("px")}</span>
+                </div>
+                <div className="input-group">
+                    <Switch
+                        checked={addLinkToMap}
+                        onChange={(v) => setAddLinkToMap(v)}
+                    />
+                    <span className="checkbox__label">
+                        {gettext("Link to main map")}
+                    </span>
+                </div>
+                <div className="input-group">
+                    <Switch
+                        checked={generateEvents}
+                        onChange={(v) => setGenerateEvents(v)}
+                    />
+                    <span className="checkbox__label">
+                        {gettext("Generate events")}
+                    </span>
+                </div>
+                <div className="input-group">
+                    <CodeArea value={embedCode} rows={4} />
+                </div>
 
-            {settings["check_origin"] && CORSWarning}
-
-            <div className="input-group">
-                <span className="grow">{gettext("Map size:")}</span>
-                <InputNumber
-                    title={gettext("Width, px")}
-                    value={widthMap}
-                    onChange={(v) => setWidthMap(v)}
-                />
-                <CloseIcon />
-                <InputNumber
-                    title={gettext("Height, px")}
-                    value={heightMap}
-                    onChange={(v) => setHeightMap(v)}
-                />
-                <span>{gettext("px")}</span>
-            </div>
-            <div className="input-group">
-                <Switch
-                    checked={addLinkToMap}
-                    onChange={(v) => setAddLinkToMap(v)}
-                />
-                <span className="checkbox__label">
-                    {gettext("Link to main map")}
-                </span>
-            </div>
-            <div className="input-group">
-                <Switch
-                    checked={generateEvents}
-                    onChange={(v) => setGenerateEvents(v)}
-                />
-                <span className="checkbox__label">
-                    {gettext("Generate events")}
-                </span>
-            </div>
-            <div className="input-group">
-                <CodeArea value={embedCode} rows={4} />
-            </div>
-
-            <form action={previewUrl} method="POST" target="_blank">
-                <input
-                    type="hidden"
-                    name="iframe"
-                    value={encodeURI(embedCode)}
-                />
-                <Space.Compact>
-                    <CopyToClipboardButton
-                        getTextToCopy={() => embedCode}
-                        messageInfo={gettext(
-                            "The embed code copied to clipboard."
-                        )}
-                    >
-                        {gettext("Copy code")}
-                    </CopyToClipboardButton>
-                    <Button icon={<PreviewIcon />} htmlType="submit">
-                        {gettext("Preview")}
-                    </Button>
-                </Space.Compact>
-            </form>
+                <form action={previewUrl} method="POST" target="_blank">
+                    <input
+                        type="hidden"
+                        name="iframe"
+                        value={encodeURI(embedCode)}
+                    />
+                    <Space.Compact>
+                        <CopyToClipboardButton
+                            getTextToCopy={() => embedCode}
+                            messageInfo={gettext(
+                                "The embed code copied to clipboard."
+                            )}
+                        >
+                            {gettext("Copy code")}
+                        </CopyToClipboardButton>
+                        <Button icon={<PreviewIcon />} htmlType="submit">
+                            {gettext("Preview")}
+                        </Button>
+                    </Space.Compact>
+                </form>
+            </section>
         </div>
     );
 };

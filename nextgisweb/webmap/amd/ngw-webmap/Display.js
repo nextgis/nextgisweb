@@ -12,15 +12,12 @@ define([
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
-    "dijit/layout/BorderContainer",
+    "dijit/layout/ContentPane",
     "openlayers/ol",
-    "@nextgisweb/gui/react-app",
     "@nextgisweb/gui/error",
     "@nextgisweb/pyramid/icon",
     "@nextgisweb/pyramid/company-logo",
-    "@nextgisweb/webmap/layers-tree",
     "@nextgisweb/webmap/store",
-    "@nextgisweb/webmap/basemap-selector",
     "@nextgisweb/webmap/panels-manager",
     "./ol/Map",
     "./MapToolbar",
@@ -29,19 +26,20 @@ define([
     "./controls/MyLocation",
     "./FeatureHighlighter",
     "./MapStatesObserver",
+    "./ui/react-panel",
     // tools
     "./tool/Zoom",
     "./tool/Measure",
     "./tool/Identify",
     "./tool/ViewerInfo",
     "./tool/Swipe",
-    // left panel
-    "./ui/LayersPanel/LayersPanel",
+    // panels
+    "@nextgisweb/webmap/panel/layers",
+    "@nextgisweb/webmap/panel/description",
+    "@nextgisweb/webmap/panel/search",
+    "@nextgisweb/webmap/panel/bookmarks",
+    "@nextgisweb/webmap/panel/share",
     "./ui/PrintMapPanel/PrintMapPanel",
-    "./ui/SearchPanel/SearchPanel",
-    "./ui/BookmarkPanel/BookmarkPanel",
-    "./ui/SharePanel/SharePanel",
-    "./ui/InfoPanel/InfoPanel",
     "./ui/AnnotationsPanel/AnnotationsPanel",
     // utils
     "./utils/URL",
@@ -69,15 +67,12 @@ define([
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
-    BorderContainer,
+    ContentPane,
     ol,
-    reactApp,
     errorModule,
     icon,
     companyLogo,
-    LayersTreeComp,
     WebmapStore,
-    BasemapSelectorComp,
     PanelsManager,
     Map,
     MapToolbar,
@@ -86,17 +81,18 @@ define([
     MyLocation,
     FeatureHighlighter,
     MapStatesObserver,
+    reactPanel,
     ToolZoom,
     ToolMeasure,
     Identify,
     ToolViewerInfo,
     ToolSwipe,
-    LayersPanel,
+    LayersPanelModule,
+    DescriptionPanelModule,
+    SearchPanelModule,
+    BookmarksPanelModule,
+    SharePanelModule,
     PrintMapPanel,
-    SearchPanel,
-    BookmarkPanel,
-    SharePanel,
-    InfoPanel,
     AnnotationsPanel,
     URL,
     i18n,
@@ -212,7 +208,7 @@ define([
             var mids = this.config.mid;
 
             this.clientSettings = settings;
-            
+
             const activePanelKey = this._urlParams[this.modeURLParam];
             const onChangePanel = (panel) => {
                 if (panel) {
@@ -222,6 +218,7 @@ define([
                 }
             };
             this.panelsManager = new PanelsManager.default(
+                this,
                 activePanelKey,
                 onChangePanel
             );
@@ -390,7 +387,7 @@ define([
                 },
             });
 
-            this.leftPanelPane = new BorderContainer({
+            this.leftPanelPane = new ContentPane({
                 class: "leftPanelPane",
                 region: "left",
                 gutters: false,
@@ -821,17 +818,6 @@ define([
                     if (widget._urlParams.base) {
                         widget._switchBasemap(widget._urlParams.base);
                     }
-
-                    reactApp.default(
-                        BasemapSelectorComp.default,
-                        {
-                            map: widget.map,
-                            basemapDefault: widget._getActiveBasemapKey(),
-                            onChange: (key) => widget._switchBasemap(key),
-                        },
-                        widget.panelsManager.getPanel("layers").contentWidget
-                            .basemapPane.domNode
-                    );
                     widget._setMapExtent();
                     widget._mapExtentDeferred.resolve();
                 })
@@ -865,53 +851,30 @@ define([
         },
 
         _buildLayersTree: function () {
-            const widget = this;
-            const itemStore = this.itemStore;
-
-            const handleSelect = (selectedKeys) => {
-                if (selectedKeys.length === 0 || selectedKeys.length < 1) {
-                    return;
-                }
-                const itemId = selectedKeys[0];
-                itemStore.fetchItemByIdentity({
-                    identity: itemId,
-                    onItem: (item) => {
-                        widget.set(
-                            "itemConfig",
-                            widget._itemConfigById[itemId]
-                        );
-                        widget.set("item", item);
-                    },
-                });
-            };
-
-            const setLayerZIndex = (id, zIndex) => {
-                const layer = widget.map.layers[id];
-                if (layer && layer.olLayer && layer.olLayer.setZIndex) {
-                    layer.olLayer.setZIndex(zIndex);
-                }
-            };
-            const { expanded } = widget.config.itemsStates;
-            this.webmapStore.setWebmapItems(widget.config.rootItem.children);
+            const { expanded } = this.config.itemsStates;
+            this.webmapStore.setWebmapItems(this.config.rootItem.children);
             this.webmapStore.setExpanded(expanded);
+        },
 
-            this.panelsManager.panelsReady.promise.then(() => {
-                this.component = reactApp.default(
-                    LayersTreeComp.default,
-                    {
-                        store: this.webmapStore,
-                        onSelect: handleSelect,
-                        setLayerZIndex: setLayerZIndex,
-                        getWebmapPlugins: () =>
-                            Object.assign({}, widget._plugins),
-                        onReady: () => {
-                            this.panelsManager.getPanel("layers").resize();
-                        },
-                    },
-                    this.panelsManager.getPanel("layers").contentWidget
-                        .layerTreePane.domNode
-                );
+        handleSelect: function (selectedKeys) {
+            if (selectedKeys.length === 0 || selectedKeys.length < 1) {
+                return;
+            }
+            const itemId = selectedKeys[0];
+            this.itemStore.fetchItemByIdentity({
+                identity: itemId,
+                onItem: (item) => {
+                    this.set("itemConfig", this._itemConfigById[itemId]);
+                    this.set("item", item);
+                },
             });
+        },
+
+        setLayerZIndex: function (id, zIndex) {
+            const layer = this.map.layers[id];
+            if (layer && layer.olLayer && layer.olLayer.setZIndex) {
+                layer.olLayer.setZIndex(zIndex);
+            }
         },
 
         getVisibleItems: function () {
@@ -1025,7 +988,9 @@ define([
             const panels = [];
 
             panels.push({
-                cls: LayersPanel,
+                cls: reactPanel(LayersPanelModule.default, {
+                    waitFor: [this.panelsManager.panelsReady.promise],
+                }),
                 params: {
                     title: i18n.gettext("Layers"),
                     name: "layers",
@@ -1035,13 +1000,12 @@ define([
             });
 
             panels.push({
-                cls: SearchPanel,
+                cls: reactPanel(SearchPanelModule.default),
                 params: {
                     title: i18n.gettext("Search"),
                     name: "search",
                     order: 20,
                     menuIcon: "material-search",
-                    display: this,
                 },
             });
 
@@ -1053,7 +1017,6 @@ define([
                     order: 70,
                     menuIcon: "material-print",
                     splitter: false,
-                    display: this,
                 },
             });
 
@@ -1062,13 +1025,12 @@ define([
                     resolve(undefined);
                 }
                 const panel = {
-                    cls: BookmarkPanel,
+                    cls: reactPanel(BookmarksPanelModule.default),
                     params: {
                         title: i18n.gettext("Bookmarks"),
                         name: "bookmark",
                         order: 50,
                         menuIcon: "material-bookmark",
-                        display: this,
                     },
                 };
                 resolve(panel);
@@ -1080,7 +1042,7 @@ define([
                     resolve(undefined);
                 }
                 const panel = {
-                    cls: InfoPanel,
+                    cls: reactPanel(DescriptionPanelModule.default),
                     params: {
                         title: i18n.gettext("Description"),
                         name: "info",
@@ -1088,7 +1050,6 @@ define([
                         menuIcon: "material-info-outline",
                         class: "info-panel dynamic-panel--fullwidth",
                         withTitle: false,
-                        display: this,
                     },
                 };
                 resolve(panel);
@@ -1111,7 +1072,6 @@ define([
                         name: "annotation",
                         order: 30,
                         menuIcon: "material-message",
-                        display: this,
                     },
                 };
                 resolve(panel);
@@ -1119,18 +1079,24 @@ define([
             panels.push(makeAnnotationsPanel);
 
             panels.push({
-                cls: SharePanel,
+                cls: reactPanel(SharePanelModule.default),
                 params: {
                     title: i18n.gettext("Share"),
                     name: "share",
                     order: 60,
                     menuIcon: "material-share",
-                    display: this,
                 },
             });
 
             this.panelsManager.addPanels(panels);
             this.panelsManager.initFinalize();
+        },
+
+        highlightGeometry: function (geometry) {
+            this.map.zoomToFeature(new ol.Feature({ geometry }));
+            topic.publish("feature.highlight", {
+                olGeometry: geometry,
+            });
         },
     });
 });

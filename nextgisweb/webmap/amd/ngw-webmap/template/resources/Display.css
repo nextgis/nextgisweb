@@ -211,8 +211,9 @@ body > .webmap-wrapper {
 
 /* leftPanelPane */
 
-.leftPanelPane{
+div.dijitContentPane.leftPanelPane {
     width: 350px;
+    padding: 0;
     border-right: 1px solid rgba(0,0,0,.12);
 }
 

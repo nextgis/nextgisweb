@@ -1,27 +1,29 @@
 import { useMemo, useEffect, useRef } from "react";
-import { PropTypes } from "prop-types";
 
-import "./InfoPanel.less";
+import { CloseButton } from "../header/CloseButton";
+
+import "./DescriptionPanel.less";
 
 const zoomToFeature = (display, resourceId, featureId) => {
-    display
-        .featureHighlighter
+    display.featureHighlighter
         .highlightFeatureById(featureId, resourceId)
-        .then(feature => {
+        .then((feature) => {
             display.map.zoomToFeature(feature);
         });
 };
 
-export const InfoPanel = ({ description, display }) => {
+export function DescriptionPanel({ display, close }) {
     const nodeRef = useRef();
 
     const content = useMemo(() => {
-        return <div
-            className="content"
-            ref={nodeRef}
-            dangerouslySetInnerHTML={{ __html: description }}
-        >
-        </div>;
+        const content = display.config.webmapDescription;
+        return (
+            <div
+                className="content"
+                ref={nodeRef}
+                dangerouslySetInnerHTML={{ __html: content }}
+            />
+        );
     }, []);
 
     useEffect(() => {
@@ -32,7 +34,9 @@ export const InfoPanel = ({ description, display }) => {
 
         nodeRef.current.querySelectorAll("a, span").forEach((el) => {
             const tagName = el.tagName.toLowerCase();
-            const linkText = el.getAttribute((tagName === "a") ? "href" : "data-target");
+            const linkText = el.getAttribute(
+                tagName === "a" ? "href" : "data-target"
+            );
             if (/^\d+:\d+$/.test(linkText)) {
                 el.addEventListener("click", (e) => {
                     e.preventDefault();
@@ -45,13 +49,9 @@ export const InfoPanel = ({ description, display }) => {
     }, []);
 
     return (
-        <div className="info-panel">
+        <div className="ngw-webmap-description-panel">
+            <CloseButton {...{ close }} />
             {content}
         </div>
     );
-};
-
-InfoPanel.propTypes = {
-    description: PropTypes.string,
-    display: PropTypes.object
-};
+}

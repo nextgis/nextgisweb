@@ -1,12 +1,11 @@
 type DojoDisplay = any;
 type DojoPanel = any;
 
-
 export interface DojoItem extends HTMLElement {
     set: (key: string, value: unknown) => void;
     domNode: HTMLElement;
     on?: (eventName: string, callback: (panel: PanelDojoItem) => void) => void;
-    addChild: (child: DojoItem) => void
+    addChild: (child: DojoItem) => void;
 }
 
 export interface PanelDojoItem extends DojoItem {
@@ -21,10 +20,7 @@ export interface PanelDojoItem extends DojoItem {
     isFullWidth?: boolean;
     show: () => void;
     hide: () => void;
-
 }
-
-
 
 export interface PanelClsParams {
     display: DojoDisplay;

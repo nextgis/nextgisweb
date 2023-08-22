@@ -1,28 +1,19 @@
-.search-panel {
-    padding: 0;
+.ngw-webmap-search-panel {
     display: flex;
     flex-direction: column;
     height: 100%;
 
-    .control {
-        flex: none;
+    > .control {
+        display: flex;
+        padding: 2px;
+        border-bottom: 1px solid var(--divider-color);
 
-        .ant-input-affix-wrapper {
-            border-top: none;
-            border-right: none;
-            border-left: none;
-        }
-
-        .ant-input-suffix {
-            cursor: pointer;
-        }
-
-        .ant-alert-message {
-            line-height: 1;
+        button {
+            color: var(--icon-color);
         }
     }
 
-    .results {
+    > .results {
         flex: auto;
         overflow-y: auto;
 

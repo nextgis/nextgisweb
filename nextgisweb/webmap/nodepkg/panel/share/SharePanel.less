@@ -1,0 +1,32 @@
+.ngw-webmap-share-panel {
+    display: flex;
+    flex-direction: column;
+
+    > section {
+        padding: 12px 8px;
+        border-bottom: 1px solid var(--divider-color);
+
+        > h5 {
+            margin: 0;
+        }
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        align-items: center;
+
+        span.grow {
+            flex-grow: 1;
+        }
+
+        .ant-input-number {
+            width: 9ch;
+        }
+    }
+}

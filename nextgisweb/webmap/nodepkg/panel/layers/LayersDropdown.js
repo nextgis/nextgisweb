@@ -1,23 +1,15 @@
-import { Dropdown } from "@nextgisweb/gui/antd";
+import { Dropdown, Button } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 
-import "./LayersDropdown.less";
-
 export function LayersDropdown({ onClick }) {
     const menuItems = [
         {
             key: "zoomToAllLayers",
-            label: (
-                <>
-                    <span>
-                        <ZoomInMapIcon />
-                    </span>
-                    <span>{gettext("Zoom to all layers")}</span>
-                </>
-            ),
+            icon: <ZoomInMapIcon />,
+            label: gettext("Zoom to all layers"),
         },
     ];
 
@@ -32,12 +24,11 @@ export function LayersDropdown({ onClick }) {
     return (
         <Dropdown
             menu={menuProps}
-            overlayClassName="layers-dropdown"
             trigger={["click"]}
             destroyPopupOnHide
             placement="bottomRight"
         >
-            <MoreVertIcon />
+            <Button type="text" shape="circle" icon={<MoreVertIcon />} />
         </Dropdown>
     );
 }

@@ -32,6 +32,7 @@ function isFuncReactComponent(cls: any): cls is React.FC {
 }
 
 export class PanelsManager {
+    private _display: any;
     private _domElements!: PanelElements;
     private _activePanelKey?: string;
     private _panels = new Map<string, PanelDojoItem>();
@@ -42,9 +43,11 @@ export class PanelsManager {
     private _panelsReady = new Deferred<void>();
 
     constructor(
+        display,
         activePanelKey: string | undefined,
         onChangePanel: (panel?: PanelDojoItem) => void
     ) {
+        this._display = display;
         this._activePanelKey = activePanelKey;
         this._onChangePanel = onChangePanel;
     }
@@ -70,7 +73,8 @@ export class PanelsManager {
     }
 
     private _buildNavigationMenu(): void {
-        reactApp(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        reactApp<any>(
             NavigationMenu,
             {
                 panels: this._panels,
@@ -92,7 +96,7 @@ export class PanelsManager {
         this._domElements.leftPanel.addChild(panel);
         this._domElements.main.addChild(this._domElements.leftPanel);
 
-        panel.show();
+        panel.show && panel.show(); // DynamicPanel compatibility
         this._onChangePanel(panel);
     }
 
@@ -107,7 +111,7 @@ export class PanelsManager {
             this._domElements.leftPanel.set("splitter", true);
         }
 
-        panel.hide();
+        panel.hide && panel.hide(); // DynamicPanel compatibility
         this._onChangePanel(undefined);
     }
 
@@ -157,7 +161,7 @@ export class PanelsManager {
             if (isFuncReactComponent(cls)) {
                 throw new Error("Panel React rendering is not implemented");
             } else {
-                const widget = new cls(params);
+                const widget = new cls({ display: this._display, ...params });
                 widget.on("closed", (panel: PanelDojoItem) => {
                     // can't reach this event
                     this._closePanel(panel);

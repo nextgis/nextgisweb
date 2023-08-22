@@ -2,7 +2,7 @@ import debounce from "lodash/debounce";
 import GeoJSON from "ol/format/GeoJSON";
 import { useCallback, useState } from "react";
 
-import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
+import { Alert, Button, Input, Spin } from "@nextgisweb/gui/antd";
 import { request, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
@@ -10,12 +10,13 @@ import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
 
+import { CloseButton } from "../header/CloseButton";
+
 import { LoadingOutlined } from "@ant-design/icons";
-import CloseIcon from "@nextgisweb/icon/material/close";
 import LayersIcon from "@nextgisweb/icon/material/layers";
 import LocationOnIcon from "@nextgisweb/icon/material/location_on";
 import PublicIcon from "@nextgisweb/icon/material/public";
-import SearchIcon from "@nextgisweb/icon/material/search";
+import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 
 import "./SearchPanel.less";
 
@@ -250,7 +251,7 @@ const search = async (criteria, searchController, display) => {
     return [searchResults, isExceeded];
 };
 
-export const SearchPanel = ({ display, onSelectResult }) => {
+export const SearchPanel = ({ display, close }) => {
     const [loading, setLoading] = useState(false);
     const [searchResults, setSearchResults] = useState(undefined);
     const [resultSelected, setResultSelected] = useState(undefined);
@@ -282,9 +283,7 @@ export const SearchPanel = ({ display, onSelectResult }) => {
 
     const selectResult = (resultInfo) => {
         setResultSelected(resultInfo);
-        if (onSelectResult) {
-            onSelectResult(resultInfo);
-        }
+        display.highlightGeometry(resultInfo.geometry);
     };
 
     const makeResult = (resultInfo) => {
@@ -353,25 +352,26 @@ export const SearchPanel = ({ display, onSelectResult }) => {
         setLoading(false);
     };
 
-    let suffix = null;
-    if (searchText && searchText.trim()) {
-        suffix = (
-            <CloseIcon onClick={() => clearSearchText()} className="close" />
-        );
-    }
-
     return (
-        <div className="search-panel">
+        <div className="ngw-webmap-search-panel">
             <div className="control">
                 <Input
                     onChange={searchChange}
-                    prefix={<SearchIcon />}
-                    suffix={suffix}
+                    bordered={false}
                     placeholder={gettext("Enter at least 2 characters")}
                     value={searchText}
                 />
-                {info}
+                {searchText && searchText.trim() && (
+                    <Button
+                        onClick={() => clearSearchText()}
+                        type="text"
+                        shape="circle"
+                        icon={<BackspaceIcon />}
+                    />
+                )}
+                <CloseButton {...{ close }} />
             </div>
+            {info}
             <div className="results">{results}</div>
         </div>
     );

@@ -9,7 +9,11 @@ export interface NavigationMenuProps {
     active?: string;
 }
 
-export function NavigationMenu({ panels, onClick, active }: NavigationMenuProps) {
+export function NavigationMenu({
+    panels,
+    onClick,
+    active,
+}: NavigationMenuProps) {
     const onClickItem = (item: PanelDojoItem) => {
         if (onClick) {
             onClick(item);
