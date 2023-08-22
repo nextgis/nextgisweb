@@ -3,7 +3,7 @@ import reactApp from "@nextgisweb/gui/react-app";
 
 import NavigationMenu from "@nextgisweb/webmap/navigation-menu";
 
-import type { DojoItem, PanelDojoItem } from "./type";
+import type { DojoDisplay, DojoItem, PanelDojoItem } from "./type";
 
 interface PanelElements {
     main: DojoItem;
@@ -32,7 +32,7 @@ function isFuncReactComponent(cls: any): cls is React.FC {
 }
 
 export class PanelsManager {
-    private _display: any;
+    private _display: DojoDisplay;
     private _domElements!: PanelElements;
     private _activePanelKey?: string;
     private _panels = new Map<string, PanelDojoItem>();
@@ -43,7 +43,7 @@ export class PanelsManager {
     private _panelsReady = new Deferred<void>();
 
     constructor(
-        display,
+        display: DojoDisplay,
         activePanelKey: string | undefined,
         onChangePanel: (panel?: PanelDojoItem) => void
     ) {
@@ -161,11 +161,13 @@ export class PanelsManager {
             if (isFuncReactComponent(cls)) {
                 throw new Error("Panel React rendering is not implemented");
             } else {
-                const widget = new cls({ display: this._display, ...params });
-                widget.on("closed", (panel: PanelDojoItem) => {
-                    // can't reach this event
-                    this._closePanel(panel);
-                });
+                const widget = new cls({ ...params, display: this._display });
+                if (widget.on) {
+                    widget.on("closed", (panel: PanelDojoItem) => {
+                        // can't reach this event
+                        this._closePanel(panel);
+                    });
+                }
                 newPanel = widget;
             }
         } else {

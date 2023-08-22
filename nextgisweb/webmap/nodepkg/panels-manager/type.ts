@@ -1,5 +1,5 @@
-type DojoDisplay = any;
-type DojoPanel = any;
+export type DojoDisplay = DojoItem;
+export type DojoPanel = PanelDojoItem;
 
 export interface DojoItem extends HTMLElement {
     set: (key: string, value: unknown) => void;
@@ -14,7 +14,7 @@ export interface PanelDojoItem extends DojoItem {
     title: string;
 
     order?: number;
-    cls?: new (params: PanelClsParams) => DojoPanel;
+    cls?: new (params: PanelClsParams) => PanelDojoItem;
     params: PanelClsParams;
 
     isFullWidth?: boolean;
