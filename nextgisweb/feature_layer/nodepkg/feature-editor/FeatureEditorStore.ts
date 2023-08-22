@@ -95,6 +95,7 @@ export class FeatureEditorStore {
                 });
                 this._setFeatureItem(featureItem);
             }
+            return resp;
         } finally {
             runInAction(() => {
                 this.initLoading = false;
@@ -128,8 +129,9 @@ export class FeatureEditorStore {
                 },
             });
             // To update initial feature value
-            this._initialize();
+            const resp = await this._initialize();
             message.success(saveSuccessMsg);
+            return resp;
         } finally {
             runInAction(() => {
                 this.saving = false;

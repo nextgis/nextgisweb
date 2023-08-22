@@ -2,21 +2,25 @@ import { observer } from "mobx-react-lite";
 import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Badge, Button, Space, Tabs } from "@nextgisweb/gui/antd";
+import { Button, Tabs } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component/SaveButton";
+import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 
 import editorWidgetRegister from "../attribute-editor";
 import { FeatureEditorStore } from "./FeatureEditorStore";
+import { TabLabel } from "./component/TabLabel";
 
-import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
+import type {
+    ActionToolbarAction,
+    ActionToolbarProps,
+} from "@nextgisweb/gui/action-toolbar";
 import type { ParamOf } from "@nextgisweb/gui/type";
 import type { EditorWidgetRegister } from "../type";
 import type { FeatureEditorWidgetProps } from "./type";
 
-import CircleIcon from "@nextgisweb/icon/material/circle";
 import ResetIcon from "@nextgisweb/icon/material/restart_alt";
 
 import "./FeatureEditorWidget.less";
@@ -24,12 +28,16 @@ import "./FeatureEditorWidget.less";
 type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
 type TabItem = TabItems[0];
 
-const mLoading = gettext("Loading...");
-const saveText = gettext("Save");
-const resetText = gettext("Reset");
+const msgLoading = gettext("Loading...");
+const msgSave = gettext("Save");
+const msgReset = gettext("Reset");
+
+const ATTRIBUTES = "attributes";
 
 export const FeatureEditorWidget = observer(
-    ({ resourceId, featureId }: FeatureEditorWidgetProps) => {
+    ({ resourceId, featureId, toolbar, onSave }: FeatureEditorWidgetProps) => {
+        const [activeKey, setActiveKey] = useState(ATTRIBUTES);
+
         const [store] = useState(
             () => new FeatureEditorStore({ resourceId, featureId })
         );
@@ -46,41 +54,17 @@ export const FeatureEditorWidget = observer(
                     async () => await newEditorWidget.component()
                 );
 
-                const DirtyMark = observer(() => {
-                    // We can add revert all changes of the tab via reset(),
-                    // but it should not fire on regular tab clicks.
-                    return (
-                        (widgetStore.dirty && (
-                            <CircleIcon style={{ color: "var(--primary)" }} />
-                        )) ||
-                        null
-                    );
-                });
-
-                const TabLabel = observer(() => {
-                    return (
-                        <Space>
-                            {newEditorWidget.label}
-                            {(widgetStore.counter && (
-                                <Badge
-                                    count={widgetStore.counter}
-                                    color={
-                                        widgetStore.dirty
-                                            ? "var(--primary)"
-                                            : "var(--text-secondary)"
-                                    }
-                                    size="small"
-                                />
-                            )) || <DirtyMark />}
-                        </Space>
-                    );
-                });
-
                 const newWidget: TabItem = {
                     key,
-                    label: <TabLabel />,
+                    label: (
+                        <TabLabel
+                            counter={widgetStore.counter}
+                            dirty={widgetStore.dirty}
+                            label={newEditorWidget.label}
+                        />
+                    ),
                     children: (
-                        <Suspense fallback={mLoading}>
+                        <Suspense fallback={msgLoading}>
                             <Widget store={widgetStore}></Widget>
                         </Suspense>
                     ),
@@ -114,7 +98,7 @@ export const FeatureEditorWidget = observer(
             };
 
             const { widgetStore } = registerEditorWidget(
-                "attributes",
+                ATTRIBUTES,
                 editorWidgetRegister as unknown as EditorWidgetRegister
             );
             store.attachAttributeStore(widgetStore);
@@ -122,29 +106,25 @@ export const FeatureEditorWidget = observer(
             loadWidgets();
         }, [store, registerEditorWidget]);
 
-        useEffect(() => {
-            const alertUnsaved = (event: BeforeUnloadEvent) => {
-                if (store.dirty) {
-                    event.preventDefault();
-                    event.returnValue = "";
-                }
-            };
-
-            window.addEventListener("beforeunload", alertUnsaved);
-
-            return () => {
-                window.removeEventListener("beforeunload", alertUnsaved);
-            };
-        }, [store.dirty]);
+        useUnsavedChanges({ dirty: store.dirty });
 
         const actions: ActionToolbarAction[] = [
             <SaveButton
                 disabled={!store.dirty}
                 key="save"
                 loading={store.saving}
-                onClick={store.save}
+                onClick={async () => {
+                    try {
+                        const res = await store.save();
+                        if (onSave) {
+                            onSave(res);
+                        }
+                    } catch {
+                        // ignore
+                    }
+                }}
             >
-                {saveText}
+                {msgSave}
             </SaveButton>,
         ];
         const rightActions: ActionToolbarAction[] = [];
@@ -157,15 +137,28 @@ export const FeatureEditorWidget = observer(
                     }}
                     icon={<ResetIcon />}
                 >
-                    {resetText}
+                    {msgReset}
                 </Button>
             );
         }
 
+        const toolbarProps: Partial<ActionToolbarProps> = { ...toolbar };
+        toolbarProps.actions = [...actions, ...(toolbarProps.actions || [])];
+        toolbarProps.rightActions = [
+            ...rightActions,
+            ...(toolbarProps.rightActions || []),
+        ];
+
         return (
             <div className="ngw-feature-layer-editor">
-                <Tabs type="card" items={items} parentHeight />
-                <ActionToolbar actions={actions} rightActions={rightActions} />
+                <Tabs
+                    type="card"
+                    activeKey={activeKey}
+                    onChange={setActiveKey}
+                    items={items}
+                    parentHeight
+                />
+                <ActionToolbar {...toolbarProps} />
             </div>
         );
     }

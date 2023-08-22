@@ -1,5 +1,8 @@
+import type { ActionToolbarProps } from "@nextgisweb/gui/action-toolbar";
+
 import type { EditorStore } from "../type/EditorStore";
 import type { FeatureEditorStore } from "./FeatureEditorStore";
+import { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 export interface AttributesFormProps {
     store: FeatureEditorStore;
@@ -8,6 +11,8 @@ export interface AttributesFormProps {
 export interface FeatureEditorWidgetProps {
     resourceId: number;
     featureId: number;
+    toolbar?: Partial<ActionToolbarProps>;
+    onSave?: (value: ResourceItem | undefined) => void;
 }
 
 export interface FeatureEditorStoreOptions {
