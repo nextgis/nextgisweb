@@ -8,7 +8,9 @@ type Props = ParamsOf<typeof Base>;
 const computed = window.getComputedStyle(document.body);
 const cvar = (name: string): string => computed.getPropertyValue("--" + name);
 
-const token: Props["theme"]["token"] = {
+type Theme = NonNullable<Props["theme"]>
+
+const token: Theme["token"] = {
     borderRadius: 4,
     colorError: cvar("error"),
     colorInfo: cvar("primary"),
@@ -18,7 +20,7 @@ const token: Props["theme"]["token"] = {
     motion: false,
 };
 
-const components: Props["theme"]["components"] = {
+const components: Theme["components"] = {
     Modal: { titleFontSize: 20 },
 };
 
