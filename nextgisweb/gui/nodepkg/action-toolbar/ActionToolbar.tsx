@@ -23,7 +23,7 @@ function ActionToolbarInput<
     {
         size,
         style,
-        actions,
+        actions = [],
         rightActions = [],
         actionProps,
         children,
