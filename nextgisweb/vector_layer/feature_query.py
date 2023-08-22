@@ -390,9 +390,8 @@ def calculate_extent(layer, where=None, geomcol=None):
             func.st_force2d(geomcol), ga.Geometry), layer.srs_id), 4326)
         )).where(db.and_(True, *where)).label('bbox')
     else:
-        model = tableinfo.model
         bbox = func.st_extent(func.st_transform(func.st_setsrid(cast(
-            func.st_force2d(model.geom), ga.Geometry), layer.srs_id), 4326)
+            func.st_force2d(tableinfo.geom_column), ga.Geometry), layer.srs_id), 4326)
         ).label('bbox')
     sq = DBSession.query(bbox).subquery()
 

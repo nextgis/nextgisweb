@@ -208,7 +208,7 @@ def export(resource, options, filepath):
         filepath, ogr_ds,
         options=gdal.VectorTranslateOptions(
             options=vtopts,
-            layerName=re.sub(r'[^\w ]', '', resource.display_name),
+            layerName=resource.display_name,
             geometryType=resource.geometry_type,
         )
     )

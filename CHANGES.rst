@@ -11,6 +11,7 @@ Changes
 - Lots of improvements in feature editing widgets.
 - New tileset resource for storing and serving prerendered tiles.
 - React library upgraded to 18.
+- 2x speed-up of vector layer import.
 
 
 4.4.0

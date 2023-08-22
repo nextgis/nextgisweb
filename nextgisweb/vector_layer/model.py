@@ -112,8 +112,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def from_ogr(self, filename, *, layername=None):
         ds = read_dataset_vector(filename)
         layer = ds.GetLayerByName(layername) if layername is not None else ds.GetLayer(0)
-        self.setup_from_ogr(layer)
-        self.load_from_ogr(layer)
+        with DBSession.no_autoflush:
+            self.setup_from_ogr(layer)
+            self.load_from_ogr(layer, validate=False)
         return self
 
     def setup_from_ogr(self, ogrlayer,
@@ -141,10 +142,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         self.tableinfo = tableinfo
 
-    def load_from_ogr(self, ogrlayer, skip_other_geometry_types=False,
-                      fix_errors=ERROR_FIX.default, skip_errors=skip_errors_default):
+    def load_from_ogr(
+            self, ogrlayer, skip_other_geometry_types=False, fix_errors=ERROR_FIX.default,
+            skip_errors=skip_errors_default, validate=True,
+        ):
         size = self.tableinfo.load_from_ogr(
-            ogrlayer, skip_other_geometry_types, fix_errors, skip_errors)
+            ogrlayer, skip_other_geometry_types, fix_errors, skip_errors, validate)
 
         env.core.reserve_storage(COMP_ID, VectorLayerData, value_data_volume=size, resource=self)
 
