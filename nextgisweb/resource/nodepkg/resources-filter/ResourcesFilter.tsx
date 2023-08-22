@@ -4,6 +4,7 @@ import debounce from "lodash/debounce";
 import { Input, AutoComplete } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
+import { AutoCompleteHoneypot } from "@nextgisweb/gui/component";
 import i18n from "@nextgisweb/pyramid/i18n";
 
 import type { ParamsOf } from "@nextgisweb/gui/type";
@@ -111,24 +112,26 @@ export function ResourcesFilter({
     };
 
     return (
-        <AutoComplete
-            popupClassName="ngw-resource-resource-filter-dropdown"
-            popupMatchSelectWidth={290}
-            style={{ width: "100%" }}
-            onSelect={onSelect}
-            options={options}
-            status={acStatus}
-            notFoundContent={i18n.gettext("Resources not found")}
-            {...rest}
-        >
-            <Input.Search
-                size="middle"
-                placeholder={i18n.gettext("Search resources")}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                loading={loading}
-                autoComplete="one-time-code"
-            />
-        </AutoComplete>
+        <>
+            <AutoCompleteHoneypot />
+            <AutoComplete
+                popupClassName="ngw-resource-resource-filter-dropdown"
+                popupMatchSelectWidth={290}
+                style={{ width: "100%" }}
+                onSelect={onSelect}
+                options={options}
+                status={acStatus}
+                notFoundContent={i18n.gettext("Resources not found")}
+                {...rest}
+            >
+                <Input.Search
+                    size="middle"
+                    placeholder={i18n.gettext("Search resources")}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    loading={loading}
+                />
+            </AutoComplete>
+        </>
     );
 }
