@@ -27,6 +27,7 @@ interface FeatureTableProps {
     total: number;
     query: string;
     fields: FeatureLayerField[];
+    version?: number
     selected: FeatureAttrs[];
     resourceId: number;
     loadingCol: () => string;
@@ -44,6 +45,7 @@ const FeatureTable = ({
     total,
     query,
     fields,
+    version,
     selected,
     resourceId,
     loadingCol,
@@ -122,6 +124,7 @@ const FeatureTable = ({
         tbodyRef,
         columns,
         orderBy,
+        version,
         query,
         total,
     });
@@ -219,9 +222,6 @@ const FeatureTable = ({
                     const row = data.find(
                         (d) => d.__rowIndex === virtualRow.index
                     );
-                    // if (!row) {
-                    //     throw "unreachable";
-                    // }
                     if (row) {
                         isSelected = selected.find(
                             (s) =>

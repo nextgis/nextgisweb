@@ -4,6 +4,7 @@ interface CreateCacheKeyOptions {
     visibleFields: number[];
     pageSize: number;
     orderBy?: OrderBy;
+    version?: number;
     query: string;
     page: number;
 }
@@ -12,6 +13,7 @@ export function createCacheKey({
     visibleFields,
     pageSize,
     orderBy,
+    version,
     query,
     page,
 }: CreateCacheKeyOptions): string {
@@ -22,6 +24,8 @@ export function createCacheKey({
         query,
         "page",
         page,
+        "version",
+        version,
         "visibleFields",
         visibleFields.sort().join("_"),
         "orderBy",

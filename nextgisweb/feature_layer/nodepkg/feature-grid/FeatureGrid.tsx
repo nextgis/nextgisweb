@@ -1,22 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { Button, Empty, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
-import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
+import showModal from "@nextgisweb/gui/showModal";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import { useResource } from "@nextgisweb/resource/hook/useResource";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { useResource } from "@nextgisweb/resource/hook/useResource";
 
-import { ExportAction } from "./component/ExportAction";
-import { deleteFeatures } from "./api/deleteFeatures";
-import { KEY_FIELD_KEYNAME } from "./constant";
+import { FeatureEditorModal } from "../feature-editor/FeatureEditorModal";
+
 import FeatureTable from "./FeatureTable";
+import { deleteFeatures } from "./api/deleteFeatures";
+import { ExportAction } from "./component/ExportAction";
+import { KEY_FIELD_KEYNAME } from "./constant";
 
+import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import type { SizeType } from "@nextgisweb/gui/antd";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
-import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 
 import type { FeatureLayerCount } from "../type/FeatureLayer";
 import type { FeatureAttrs } from "./type";
@@ -41,6 +44,7 @@ interface FeatureGridProps {
     size?: SizeType;
     query?: string;
     readonly?: boolean;
+    editOnNewPage?: boolean;
     cleanSelectedOnFilter?: boolean;
     actions?: ActionToolbarAction[];
     beforeDelete?: (featureIds: number[]) => void;
@@ -65,6 +69,7 @@ export const FeatureGrid = ({
     actions = [],
     selectedIds,
     beforeDelete,
+    editOnNewPage,
     size = "middle",
     readonly = true,
     cleanSelectedOnFilter = true,
@@ -79,6 +84,7 @@ export const FeatureGrid = ({
     const { isExportAllowed } = useResource({ id });
 
     const [query, setQuery] = useState("");
+    const [version, setVersion] = useState(0);
     const [selected, setSelected] = useState<FeatureAttrs[]>(() => []);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -176,7 +182,28 @@ export const FeatureGrid = ({
             ...[
                 {
                     onClick: () => {
-                        goTo("feature_layer.feature.update");
+                        if (editOnNewPage ) {
+                            goTo("feature_layer.feature.update");
+                        } else {
+                            const first = selected[0];
+                            if (first) {
+                                const featureId = first[
+                                    KEY_FIELD_KEYNAME
+                                ] as number;
+                                showModal(FeatureEditorModal, {
+                                    bodyStyle: { height: "500px" },
+
+                                    editorOptions: {
+                                        featureId,
+                                        resourceId: id,
+                                        onSave: () => {
+                                            setVersion((old) => old + 1);
+                                        },
+                                    },
+                                });
+                            }
+                            
+                        }
                     },
                     icon: <EditIcon />,
                     title: editTitleMsg,
@@ -233,6 +260,7 @@ export const FeatureGrid = ({
             <FeatureTable
                 resourceId={id}
                 total={totalData.total_count}
+                version={version}
                 empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
                 {...{
                     query,

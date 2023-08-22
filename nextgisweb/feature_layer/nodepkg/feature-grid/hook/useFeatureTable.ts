@@ -19,6 +19,7 @@ interface UseFeatureTableProps {
     total: number;
     query: string;
     columns: FeatureLayerFieldCol[];
+    version?: number;
     orderBy?: OrderBy;
     pageSize: number;
     tbodyRef?: RefObject<HTMLDivElement>;
@@ -87,6 +88,7 @@ export function useFeatureTable({
     total,
     query,
     columns,
+    version,
     orderBy,
     pageSize,
     tbodyRef,
@@ -185,7 +187,7 @@ export function useFeatureTable({
             const cache = loaderCache.current;
 
             if (!cache) {
-                throw "unreachable";
+                throw new Error("unreachable");
             }
 
             const cacheKeys = pages.map((page) => ({
@@ -193,6 +195,7 @@ export function useFeatureTable({
                 key: createCacheKey({
                     visibleFields,
                     pageSize,
+                    version,
                     orderBy,
                     query,
                     page,
@@ -242,6 +245,7 @@ export function useFeatureTable({
         makeSignal,
         pageSize,
         orderBy,
+        version,
         pages,
         query,
         abort,
@@ -277,22 +281,29 @@ export function useFeatureTable({
     }, [pages, pageSize, query, orderBy]);
 
     const prevTotal = useRef(total);
+    const prevVersion = useRef(version);
     useEffect(() => {
-        if (total === prevTotal.current && pages.length && data.length) {
-            const firstDataIndex = data[0].__rowIndex;
-            const lastDataIndex = data[data.length - 1].__rowIndex;
-            const lastPageIndex = pages[0] + pageSize * pages.length - 1;
-            if (firstDataIndex !== undefined && lastDataIndex !== undefined) {
-                const currentDataInTheRange =
-                    firstDataIndex === pages[0] &&
-                    (hasNextPage
-                        ? lastDataIndex === lastPageIndex
-                        : lastDataIndex <= lastPageIndex);
-                if (currentDataInTheRange) {
-                    return;
+        if (prevVersion.current === version) {
+            if (total === prevTotal.current && pages.length && data.length) {
+                const firstDataIndex = data[0].__rowIndex;
+                const lastDataIndex = data[data.length - 1].__rowIndex;
+                const lastPageIndex = pages[0] + pageSize * pages.length - 1;
+                if (
+                    firstDataIndex !== undefined &&
+                    lastDataIndex !== undefined
+                ) {
+                    const currentDataInTheRange =
+                        firstDataIndex === pages[0] &&
+                        (hasNextPage
+                            ? lastDataIndex === lastPageIndex
+                            : lastDataIndex <= lastPageIndex);
+                    if (currentDataInTheRange) {
+                        return;
+                    }
                 }
             }
         }
+        prevVersion.current = version;
         queryFn();
     }, [
         visibleFields,
@@ -301,6 +312,7 @@ export function useFeatureTable({
         pageSize,
         orderBy,
         queryFn,
+        version,
         query,
         total,
         pages,
@@ -318,7 +330,7 @@ export function useFeatureTable({
 
     useEffect(() => {
         if (getTotalSize()) {
-            scrollToIndex(0, { behavior: "smooth" });
+            scrollToIndex(0);
         }
         // to init first loading
         setQueryTotal(pageSize);
