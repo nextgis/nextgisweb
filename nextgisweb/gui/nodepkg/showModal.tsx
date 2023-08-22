@@ -13,12 +13,29 @@ interface ShowModalOptions extends ModalParams {
     close?: () => void;
 }
 
+function handleVisibleDeprecation<T extends ShowModalOptions>(config: T): T {
+    if (config.visible !== undefined) {
+        console.warn(
+            "The 'visible' prop is deprecated. Please use 'open' instead."
+        );
+        if (config.open === undefined) {
+            config.open = config.visible;
+        }
+    }
+    // Remove the 'visible' prop from the config
+    const { visible, ...restConfig } = config;
+    return restConfig as T;
+}
+
 // Based on https://github.com/ant-design/ant-design/blob/master/components/modal/confirm.tsx
 export default function showModal<
     T extends ShowModalOptions = ShowModalOptions,
 >(ModalComponent: (props: T) => ReactElement, config: T) {
     const container = document.createDocumentFragment();
-    let currentConfig: T = { ...config, open: true, visible: true };
+
+    config = handleVisibleDeprecation(config);
+
+    let currentConfig: T = { ...config, open: config.open ?? true };
 
     const root = createRoot(container);
 
@@ -33,7 +50,6 @@ export default function showModal<
     const close = () => {
         currentConfig = {
             ...currentConfig,
-            visible: false,
             open: false,
             afterClose: () => {
                 if (typeof config.afterClose === "function") {
@@ -49,6 +65,7 @@ export default function showModal<
         if (typeof configUpdate === "function") {
             currentConfig = configUpdate(currentConfig);
         } else {
+            configUpdate = handleVisibleDeprecation(configUpdate);
             currentConfig = {
                 ...currentConfig,
                 ...configUpdate,
