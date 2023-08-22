@@ -4,9 +4,12 @@ import { useMemo } from "react";
 import HomeFilledIcon from "@nextgisweb/icon/material/home";
 import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
 
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 import type { ResourcePickerBreadcrumbProps } from "./type";
 import type { ResourceItem } from "../../type";
+import type { ParamsOf } from "@nextgisweb/gui/type";
+
+type BreadcrumbItems = NonNullable<ParamsOf<typeof Breadcrumb>["items"]>;
 
 export const ResourcePickerBreadcrumb = observer(
     ({
@@ -17,8 +20,8 @@ export const ResourcePickerBreadcrumb = observer(
         const { breadcrumbItems, breadcrumbItemsLoading, allowMoveInside } =
             resourceStore;
 
-        const Breadcrumbs = useMemo(() => {
-            const items = [];
+        const breadcrumbs = useMemo<BreadcrumbItems>(() => {
+            const items: BreadcrumbItems = [];
             const onClick = (newLastResourceId: number) => {
                 resourceStore.changeParentTo(newLastResourceId);
             };
@@ -87,22 +90,18 @@ export const ResourcePickerBreadcrumb = observer(
                         );
                     }
                 }
-                const item = (
-                    <Breadcrumb.Item key={parent.resource.id}>
-                        {createLabel(parent, name, isLink)}
-                    </Breadcrumb.Item>
-                );
+                const item: BreadcrumbItems[0] = {
+                    title: createLabel(parent, name, isLink),
+                    key: parent.resource.id,
+                };
                 items.push(item);
                 if (i === 0 && packFirstItemsToMenu) {
                     if (packFirstItemsToMenu) {
-                        items.push(
-                            <Breadcrumb.Item
-                                key="-1"
-                                menu={{ items: menuItems }}
-                            >
-                                ...
-                            </Breadcrumb.Item>
-                        );
+                        items.push({
+                            title: "...",
+                            key: "-1",
+                            menu: { items: menuItems },
+                        });
                     }
                 }
             }
@@ -120,7 +119,7 @@ export const ResourcePickerBreadcrumb = observer(
                 <Skeleton.Input active size="small" />
             </Space>
         ) : (
-            <Breadcrumb>{Breadcrumbs}</Breadcrumb>
+            <Breadcrumb items={breadcrumbs} />
         );
     }
 );

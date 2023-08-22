@@ -12,6 +12,7 @@ Changes
 - New tileset resource for storing and serving prerendered tiles.
 - React library upgraded to 18.
 - 2x speed-up of vector layer import.
+- Ant Design library upgraded to 5.
 
 
 4.4.0
