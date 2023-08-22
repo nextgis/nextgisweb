@@ -347,8 +347,10 @@ define([
                 array.forEach(
                     this.map.getLayers().getArray(),
                     function (layer) {
-                        if (layer.getVisible()) {
-                            this.printMap.olMap.addLayer(layer);
+                        if (layer.getVisible() && layer.printingCopy) {
+                            // Adding the same layer to different maps causes
+                            // infinite loading, thus we need a copy.
+                            this.printMap.olMap.addLayer(layer.printingCopy());
                         }
                     },
                     this

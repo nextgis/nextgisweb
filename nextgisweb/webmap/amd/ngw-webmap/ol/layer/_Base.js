@@ -2,16 +2,11 @@ define([
     "dojo/_base/declare",
     "dojo/_base/lang",
     "dojo/Stateful",
-    "openlayers/ol"
-], function (
-    declare,
-    lang,
-    Stateful,
-    ol
-) {
+    "openlayers/ol",
+], function (declare, lang, Stateful, ol) {
     return declare([Stateful], {
         "-chains-": {
-            constructor: "manual"
+            constructor: "manual",
         },
 
         olLayerClassName: "layer.Layer",
@@ -28,6 +23,16 @@ define([
             this.olSource = new scls(soptions);
 
             this.olLayer.setSource(this.olSource);
+
+            this.olLayer.printingCopy = () => {
+                // Create a printable clone of the layer
+                const layer = this.olLayer;
+                const opts = Object.assign({}, loptions, {
+                    opacity: layer.getOpacity(),
+                    source: new scls(soptions),
+                });
+                return new lcls(opts);
+            };
 
             var layer = this;
 
@@ -56,7 +61,6 @@ define([
                 this.olLayer.setVisible(value);
                 this._visibility = value;
             }
-        }
-
+        },
     });
 });
