@@ -16,7 +16,7 @@ msgid "Save"
 msgstr "Сохранить"
 
 #: amd/ngw-resource/CompositeWidget.js:99
-#: nodepkg/children-section/ChildrenSection.js:285
+#: nodepkg/children-section/ChildrenSection.js:291
 #: nodepkg/children-section/util/createResourceTableItemOptions.js:5
 #: nodepkg/delete-page/DeletePage.js:51 view.py:344
 msgid "Delete"
@@ -192,87 +192,86 @@ msgid "Please confirm resource deletion. This action cannot be undone."
 msgstr "Пожалуйста подтвердите удаление. Это действие не может быть отменено."
 
 #: nodepkg/children-section/ChildrenSection.js:35
-msgid "Resource deleted"
-msgstr "Ресурс удален"
+msgid "The resource has been deleted"
+msgid_plural "{} resources have been deleted"
+msgstr[0] "Ресурс удален"
+msgstr[1] "Удалено {} ресурса"
+msgstr[2] "Удалено {} ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:35
-msgid "Resources deleted"
-msgstr "Ресурсы удалены"
+#: nodepkg/children-section/ChildrenSection.js:44
+#: nodepkg/children-section/ChildrenSection.js:61
+msgid "The resource has been moved"
+msgid_plural "{} resources have been moved"
+msgstr[0] "Ресурс перемещен"
+msgstr[1] "Перемещено {} ресурса"
+msgstr[2] "Перемещено {} ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:41
-msgid "Resource has been moved"
-msgstr "Ресурс перемещен"
-
-#: nodepkg/children-section/ChildrenSection.js:42
-msgid "Resources have been moved"
-msgstr "Ресурсы перемещены"
-
-#: nodepkg/children-section/ChildrenSection.js:188
+#: nodepkg/children-section/ChildrenSection.js:194
 msgid "Moving resources"
 msgstr "Перемещение ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:219
+#: nodepkg/children-section/ChildrenSection.js:225
 msgid "Deleting resources"
 msgstr "Удаление ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:251
+#: nodepkg/children-section/ChildrenSection.js:257
 msgid "Turn off multiple selection"
 msgstr "Отключить множественный выбор"
 
-#: nodepkg/children-section/ChildrenSection.js:252
+#: nodepkg/children-section/ChildrenSection.js:258
 msgid "Select multiple resources"
 msgstr "Выбрать несколько ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:261
+#: nodepkg/children-section/ChildrenSection.js:267
 msgid "Hide resources volume"
 msgstr "Скрыть размер ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:262
+#: nodepkg/children-section/ChildrenSection.js:268
 msgid "Show resources volume"
 msgstr "Показать размер ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:271
+#: nodepkg/children-section/ChildrenSection.js:277
 msgid "Hide resource creation date"
 msgstr "Скрыть дату создания ресурса"
 
-#: nodepkg/children-section/ChildrenSection.js:272
+#: nodepkg/children-section/ChildrenSection.js:278
 msgid "Show resource creation date"
 msgstr "Показать дату создания ресурса"
 
-#: nodepkg/children-section/ChildrenSection.js:294
+#: nodepkg/children-section/ChildrenSection.js:300
 msgid "Not all of the selected can be deleted."
 msgstr "Не все выделенные ресурсы могут быть удалены."
 
-#: nodepkg/children-section/ChildrenSection.js:309
+#: nodepkg/children-section/ChildrenSection.js:315
 msgid "Move"
 msgstr "Переместить"
 
-#: nodepkg/children-section/ChildrenSection.js:327
+#: nodepkg/children-section/ChildrenSection.js:333
 msgid "Export vector layers"
 msgstr "Экспорт векторных слоёв"
 
-#: nodepkg/children-section/ChildrenSection.js:392
+#: nodepkg/children-section/ChildrenSection.js:398
 #: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:25
 #: nodepkg/editor-widget/EditorWidget.js:14
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/children-section/ChildrenSection.js:406
+#: nodepkg/children-section/ChildrenSection.js:412
 #: template/resource_section_summary.mako:30
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/children-section/ChildrenSection.js:413
+#: nodepkg/children-section/ChildrenSection.js:419
 #: nodepkg/editor-widget/EditorWidget.js:34
 #: template/resource_section_summary.mako:38
 msgid "Owner"
 msgstr "Владелец"
 
-#: nodepkg/children-section/ChildrenSection.js:421
+#: nodepkg/children-section/ChildrenSection.js:427
 msgid "Created"
 msgstr "Дата создания"
 
-#: nodepkg/children-section/ChildrenSection.js:440
+#: nodepkg/children-section/ChildrenSection.js:446
 msgid "Volume"
 msgstr "Размер"
 
@@ -553,4 +552,3 @@ msgstr "Изменить"
 #: view.py:370
 msgid "Extra"
 msgstr "Дополнительно"
-

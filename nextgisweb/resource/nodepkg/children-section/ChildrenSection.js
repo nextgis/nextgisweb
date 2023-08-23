@@ -8,7 +8,7 @@ import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, ngettext } from "@nextgisweb/pyramid/i18n";
 
 import { showResourcePicker } from "../component/resource-picker";
 import { createResourceTableItemOptions } from "./util/createResourceTableItemOptions";
@@ -32,14 +32,20 @@ function confirmThenDelete(onOk) {
 
 function notifySuccessfulDeletion(count) {
     message.success(
-        count === 1 ? gettext("Resource deleted") : gettext("Resources deleted")
+        ngettext(
+            "The resource has been deleted",
+            "{} resources have been deleted",
+            count
+        ).replace("{}", count)
     );
 }
 function notifySuccessfulMove(count) {
     message.success(
-        count === 1
-            ? gettext("Resource has been moved")
-            : gettext("Resources have been moved")
+        ngettext(
+            "The resource has been moved",
+            "{} resources have been moved",
+            count
+        ).replace("{}", count)
     );
 }
 function notifyMoveWithError(successItems, errorItems) {
@@ -52,11 +58,11 @@ function notifyMoveWithError(successItems, errorItems) {
 function notifyMoveAbsolutError(errorItems) {
     const count = errorItems.length;
     message.error(
-        gettext(
-            count === 1
-                ? gettext("Failed to move resource")
-                : gettext("Failed to move resources")
-        )
+        ngettext(
+            "The resource has been moved",
+            "{} resources have been moved",
+            count
+        ).replace("{}", count)
     );
 }
 
