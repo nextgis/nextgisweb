@@ -35,7 +35,8 @@ export default function reactApp<P extends PropsType = PropsType>(
         ref: domNode,
         unmount,
         update: (newProps: P) => {
-            reactApp(Component, { ...props, ...newProps }, domNode);
+            props = { ...props, ...newProps }
+            reactApp(Component, props, domNode);
         },
     };
 }
