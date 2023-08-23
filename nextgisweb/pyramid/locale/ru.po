@@ -1,20 +1,41 @@
-#: api.py:224
-msgid "Required parameter 'component' is missing."
-msgstr "Отсутствует необходимый параметр 'component'."
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:28
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:30
+msgid "Copy to clipboard"
+msgstr "Копировать"
 
-#: api.py:229
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:31
+msgid "Copied"
+msgstr "Скопировано"
+
+#: amd/ngw-pyramid/CopyButton/CopyButton.js:32
+msgid "Unable to copy"
+msgstr "Не удалось скопировать"
+
+#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:28
+msgid "Backward"
+msgstr "Назад"
+
+#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:29
+msgid "Forward"
+msgstr "Вперёд"
+
+#: amd/ngw-pyramid/form/ScaleTextBox.js:18
+msgid "Enter the correct scale value, e.g. 1:"
+msgstr "Введите корректное значение масштаба, например 1:"
+
+#: api.py:218
 msgid "Invalid component identity."
 msgstr "Некорректный идентификатор компонента."
 
-#: api.py:564
+#: api.py:523
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:136
+#: component.py:160
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:136
+#: component.py:160
 msgid "Disabled"
 msgstr "Отключено"
 
@@ -99,130 +120,49 @@ msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: nodepkg/layout/store.js:44 view.py:82
-msgid "Control panel"
-msgstr "Панель управления"
-
-#: view.py:105 view.py:444
-msgid "System information"
-msgstr "Информация о системе"
-
-#: view.py:114 view.py:461
-msgid "Storage"
-msgstr "Хранилище"
-
-#: view.py:125 view.py:466
-msgid "Backups"
-msgstr "Резервные копии"
-
-#: view.py:142 view.py:450
-msgid "Cross-origin resource sharing (CORS)"
-msgstr "Cross-origin resource sharing (CORS)"
-
-#: view.py:151 view.py:452
-msgid "Custom CSS"
-msgstr "Пользовательские стили CSS"
-
-#: view.py:160 view.py:454
-msgid "Custom logo"
-msgstr "Логотип"
-
-#: view.py:169 view.py:448
-msgid "Web GIS name"
-msgstr "Название Веб ГИС"
-
-#: view.py:178 view.py:456
-msgid "Home path"
-msgstr "Стартовая страница"
-
-#: view.py:443
-msgid "Info"
-msgstr "Информация"
-
-#: nodepkg/layout/Avatar.js:22 view.py:447
-msgid "Settings"
-msgstr "Настройки"
-
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:28
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:30
-msgid "Copy to clipboard"
-msgstr "Копировать"
-
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:31
-msgid "Copied"
-msgstr "Скопировано"
-
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:32
-msgid "Unable to copy"
-msgstr "Не удалось скопировать"
-
-#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:28
-msgid "Backward"
-msgstr "Назад"
-
-#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:29
-msgid "Forward"
-msgstr "Вперёд"
-
-#: amd/ngw-pyramid/form/ScaleTextBox.js:18
-msgid "Enter the correct scale value, e.g. 1:"
-msgstr "Введите корректное значение масштаба, например 1:"
-
-#: amd/ngw-pyramid/modelWidget/FormMixin.js:37 nodepkg/example/typescript.ts:10
-msgid "Create"
-msgstr "Создать"
-
-#: amd/ngw-pyramid/modelWidget/FormMixin.js:39
-msgid "Save"
-msgstr "Сохранить"
-
-#: amd/ngw-pyramid/modelWidget/FormMixin.js:41
-msgid "Delete"
-msgstr "Удалить"
-
-#: nodepkg/company-logo.js:32
-msgid "Get your own Web GIS at nextgis.com"
-msgstr "Создайте свою Веб ГИС на nextgis.com"
-
-#: nodepkg/api/error.js:10 nodepkg/api/error.js:25
+#: nodepkg/api/error.ts:11 nodepkg/api/error.ts:30
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
 
-#: nodepkg/api/error.js:11
+#: nodepkg/api/error.ts:12
 msgid "Unknown API error"
 msgstr "Неизвестная ошибка API"
 
-#: nodepkg/api/error.js:17
+#: nodepkg/api/error.ts:21
 msgid "There is no response from the server or problem connecting to server."
 msgstr ""
 "Не удалось получить ответ от сервера либо в процессе соединения возникла "
 "ошибка."
 
-#: nodepkg/api/error.js:18
+#: nodepkg/api/error.ts:22
 msgid "Network error"
 msgstr "Сетевая ошибка"
 
-#: nodepkg/api/error.js:19
+#: nodepkg/api/error.ts:23
 msgid "Check network connectivity and try again later."
 msgstr "Проверьте сетевое соединение и попробуйте повторить позже."
 
-#: nodepkg/api/error.js:26
+#: nodepkg/api/error.ts:31
 msgid "Unexpected server response"
 msgstr "Неожидаемый ответ сервера"
 
-#: nodepkg/api/error.js:41
+#: nodepkg/api/error.ts:59
 msgid "Unexpected error while processing long-running request."
 msgstr "Неожиданная ошибка во время выполнения длительного запроса."
 
-#: nodepkg/api/error.js:42
+#: nodepkg/api/error.ts:60
 msgid "Long-running request error"
 msgstr "Ошибка длительного запроса"
 
-#: nodepkg/api/error.js:49
+#: nodepkg/api/error.ts:67
 msgid "Long-running request was cancelled."
 msgstr "Длительный запрос был отменен."
 
-#: nodepkg/cors-settings/CORSSettings.js:17
+#: nodepkg/company-logo.js:32
+msgid "Get your own Web GIS at nextgis.com"
+msgstr "Создайте свою Веб ГИС на nextgis.com"
+
+#: nodepkg/cors-settings/CORSSettings.js:18
 msgid ""
 "Enter allowed origins for cross domain requests to use HTTP API of this Web "
 "GIS on other websites. One origin per line."
@@ -231,7 +171,7 @@ msgstr ""
 "использования HTTP API этой Веб ГИС на других веб-сайтах. По одному источнику"
 " в строке."
 
-#: nodepkg/cors-settings/CORSSettings.js:20
+#: nodepkg/cors-settings/CORSSettings.js:19
 msgid ""
 "Please note that different protocols (HTTP and HTTPS) and subdomains "
 "(example.com and www.example.com) are different origins. Wildcards are "
@@ -241,23 +181,23 @@ msgstr ""
 " www.example.com) считаются разными источниками. Символ подстановки (*) "
 "допустим для доменов третьего уровней и выше."
 
-#: nodepkg/cors-settings/CORSSettings.js:47
+#: nodepkg/cors-settings/CORSSettings.js:44
 msgid "CORS settings updated"
 msgstr "Настройки CORS обновлены"
 
-#: nodepkg/cors-settings/CORSSettings.js:52
+#: nodepkg/cors-settings/CORSSettings.js:49
 msgid "Fix the form errors first"
 msgstr "Вначале исправьте ошибку в форме"
 
-#: nodepkg/cors-settings/CORSSettings.js:72
+#: nodepkg/cors-settings/CORSSettings.js:66
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/custom-css-form/CustomCSSForm.js:35
+#: nodepkg/custom-css-form/CustomCSSForm.js:30
 msgid "Custom styles saved. Reload the page to get them applied."
 msgstr "Изменения в стилях сохранены. Обновите страницу, чтобы увидеть изменения."
 
-#: nodepkg/custom-css-form/CustomCSSForm.js:57
+#: nodepkg/custom-css-form/CustomCSSForm.js:52
 msgid ""
 "Enter custom CSS rules here. They will be used to redefine styles, design for"
 " all pages of your Web GIS."
@@ -269,11 +209,15 @@ msgstr ""
 msgid "Translated text"
 msgstr "Переведенный текст"
 
+#: nodepkg/example/typescript.ts:10
+msgid "Create"
+msgstr "Создать"
+
 #: nodepkg/home-path/HomePath.js:4
 msgid "The home path setting is saved."
 msgstr "Настройка стартовой страницы сохранена."
 
-#: nodepkg/i18n/testentry.js:4 test/test_i18n.py:8
+#: nodepkg/i18n/testentry.ts:7 nodepkg/i18n/testentry.ts:10 test/test_i18n.py:8
 msgctxt "test"
 msgid "unit"
 msgid_plural "units"
@@ -281,15 +225,19 @@ msgstr[0] "штука"
 msgstr[1] "штуки"
 msgstr[2] "штук"
 
-#: nodepkg/layout/Avatar.js:10
+#: nodepkg/layout/Avatar.js:12
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/layout/Avatar.js:19
+#: nodepkg/layout/Avatar.js:21
 msgid "Invitation session"
 msgstr "Пригласительная сессия"
 
-#: nodepkg/layout/Avatar.js:24
+#: nodepkg/layout/Avatar.js:24 view.py:483
+msgid "Settings"
+msgstr "Настройки"
+
+#: nodepkg/layout/Avatar.js:26
 msgid "Sign out"
 msgstr "Выйти"
 
@@ -297,56 +245,57 @@ msgstr "Выйти"
 msgid "Resources"
 msgstr "Ресурсы"
 
+#: nodepkg/layout/store.js:44 view.py:102
+msgid "Control panel"
+msgstr "Панель управления"
+
 #: nodepkg/layout/store.js:51
 msgid "Help"
 msgstr "Справка"
 
-#: nodepkg/logo-form/LogoForm.js:5
+#: nodepkg/logo-form/LogoForm.tsx:5
 msgid "We recommend height of 45 px and width of up to 200 px."
 msgstr "Рекомендуемая высота 45 px и ширина до 200 px."
 
-#: nodepkg/storage-summary/StorageSummary.js:82
+#: nodepkg/storage-summary/StorageSummary.js:95
 msgid "Kind of data"
 msgstr "Вид данных"
 
-#: nodepkg/storage-summary/StorageSummary.js:88
+#: nodepkg/storage-summary/StorageSummary.js:101
 msgid "Volume"
 msgstr "Размер"
 
-#: nodepkg/storage-summary/StorageSummary.js:104
+#: nodepkg/storage-summary/StorageSummary.js:117
 msgid "Total"
 msgstr "Итого"
 
-#: nodepkg/storage-summary/StorageSummary.js:109
+#: nodepkg/storage-summary/StorageSummary.js:122
 msgid "of"
 msgstr "из"
 
-#: nodepkg/storage-summary/StorageSummary.js:124
-#, python-format
+#: nodepkg/storage-summary/StorageSummary.js:140
 msgid "Storage usage was fully estimated at %s and updated at %s."
 msgstr "Использование хранилища было полностью оценено в %s и обновлено в %s."
 
-#: nodepkg/storage-summary/StorageSummary.js:128
-#, python-format
+#: nodepkg/storage-summary/StorageSummary.js:147
 msgid "Storage usage was fully estimated at %s."
 msgstr "Использование хранилища было полностью оценено в %s."
 
-#: nodepkg/storage-summary/StorageSummary.js:131
-#, python-format
+#: nodepkg/storage-summary/StorageSummary.js:151
 msgid "Storage usage hasn't been estimated yet but was updated at %s."
 msgstr "Использование хранилища еще не было полностью оценено, но было обновлено в %s."
 
-#: nodepkg/storage-summary/StorageSummary.js:134
+#: nodepkg/storage-summary/StorageSummary.js:156
 msgid "Storage usage hasn't been estimated yet."
 msgstr "Использование хранилища еще не было полностью оценено."
 
-#: nodepkg/storage-summary/StorageSummary.js:139
+#: nodepkg/storage-summary/StorageSummary.js:161
 msgid "Some changes may be reflected only after full estimation."
 msgstr ""
 "Некоторые изменения могут быть отражены только после полной оценки "
 "использования хранилища."
 
-#: nodepkg/storage-summary/StorageSummary.js:161
+#: nodepkg/storage-summary/StorageSummary.js:185
 msgid "Estimate storage"
 msgstr "Оценка хранилища"
 
@@ -366,11 +315,11 @@ msgstr "Доступны обновления"
 msgid "Click to see what's new"
 msgstr "Нажмите и узнайте, что нового"
 
-#: nodepkg/update/sysinfo.js:32
+#: nodepkg/update/sysinfo.js:35
 msgid "Checking for updates..."
 msgstr "Проверяем наличие обновлений..."
 
-#: nodepkg/update/sysinfo.js:35
+#: nodepkg/update/sysinfo.js:38
 msgid ""
 "Critical updates are available: {version}. Please consider updating an soon "
 "as possible."
@@ -378,19 +327,19 @@ msgstr ""
 "Доступны критические обновления: {version}. Рекомендуем установить их как "
 "можно быстрее."
 
-#: nodepkg/update/sysinfo.js:36
+#: nodepkg/update/sysinfo.js:39
 msgid "New version of {distribution} is available: {version}."
 msgstr "Доступна новая версия {distribution}: {version}."
 
-#: nodepkg/update/sysinfo.js:37
+#: nodepkg/update/sysinfo.js:40
 msgid "Your {distribution} is up-to-date."
 msgstr "У вас последняя версия {distribution}."
 
-#: nodepkg/update/sysinfo.js:44
+#: nodepkg/update/sysinfo.js:47
 msgid "<a>Contact support</a> for update."
 msgstr "<a>Обратитесь в поддержку</a> для установки обновлений."
 
-#: nodepkg/update/sysinfo.js:74
+#: nodepkg/update/sysinfo.js:81
 msgid "Show details"
 msgstr "Подробнее"
 
@@ -439,7 +388,6 @@ msgid "Browser compatibility test"
 msgstr "Проверка совместимости браузера"
 
 #: template/uacompat.mako:22
-#, python-format
 msgid "%(name)s %(current)s supported"
 msgstr "%(name)s %(current)s поддерживается"
 
@@ -450,12 +398,10 @@ msgid ""
 msgstr "Проверка совместимости браузера пройдена! Веб ГИС должна работать корректно."
 
 #: template/uacompat.mako:26
-#, python-format
 msgid "%(name)s not supported"
 msgstr "%(name)s не поддерживается"
 
 #: template/uacompat.mako:27
-#, python-format
 msgid ""
 "You're using %(name)s although it's not supported by the Web GIS. It's an "
 "outdated browser lacking required features. Try a different browser or "
@@ -467,12 +413,10 @@ msgstr ""
 "браузер недоступен."
 
 #: template/uacompat.mako:29
-#, python-format
 msgid "%(name)s %(current)s not supported"
 msgstr "%(name)s %(current)s не поддерживается"
 
 #: template/uacompat.mako:30
-#, python-format
 msgid ""
 "You're using %(name)s %(current)s although it's not supported by the Web GIS."
 " It's an outdated version lacking required features. Contact your system "
@@ -508,3 +452,42 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
+#: view.py:92
+msgid "HTTP API documentation"
+msgstr "Документация HTTP API"
+
+#: view.py:125 view.py:480
+msgid "System information"
+msgstr "Информация о системе"
+
+#: view.py:134 view.py:497
+msgid "Storage"
+msgstr "Хранилище"
+
+#: view.py:145 view.py:502
+msgid "Backups"
+msgstr "Резервные копии"
+
+#: view.py:162 view.py:486
+msgid "Cross-origin resource sharing (CORS)"
+msgstr "Cross-origin resource sharing (CORS)"
+
+#: view.py:171 view.py:488
+msgid "Custom CSS"
+msgstr "Пользовательские стили CSS"
+
+#: view.py:180 view.py:490
+msgid "Custom logo"
+msgstr "Логотип"
+
+#: view.py:189 view.py:484
+msgid "Web GIS name"
+msgstr "Название Веб ГИС"
+
+#: view.py:198 view.py:492
+msgid "Home path"
+msgstr "Стартовая страница"
+
+#: view.py:479
+msgid "Info"
+msgstr "Информация"

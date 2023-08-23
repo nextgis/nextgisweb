@@ -1,34 +1,4 @@
-#: nodepkg/confirm.js:8
-msgid "Confirmation required"
-msgstr "Необходимо подтверждение"
-
-#: nodepkg/confirm.js:9
-msgid "Please confirm this action."
-msgstr "Пожалуйста, подтвердите данное действие."
-
-#: nodepkg/confirm.js:11 nodepkg/error/shared.js:71
-msgid "OK"
-msgstr "OK"
-
-#: nodepkg/confirm.js:35
-msgid "Please confirm the deletion."
-msgstr "Пожалуйста, подтвердите удаление."
-
-#: nodepkg/confirm.js:36 nodepkg/edi-table/RowAction.js:39
-#: nodepkg/model-browse/ModelBrowse.js:200 nodepkg/model-browse/ModelBrowse.js:267
-#: nodepkg/model-form/ModelForm.js:15
-msgid "Delete"
-msgstr "Удалить"
-
-#: nodepkg/confirm.js:37
-msgid "Failed to delete."
-msgstr "Ошибка удаления."
-
-#: nodepkg/example.js:77
-msgid "Internationalization test"
-msgstr "Тест интернационализации"
-
-#: nodepkg/buttons/CopyToClipboardButton.js:11
+#: nodepkg/buttons/CopyToClipboardButton.js:15
 msgid "Copied to clipboard"
 msgstr "Скопиривано в буфер обмена"
 
@@ -36,107 +6,132 @@ msgstr "Скопиривано в буфер обмена"
 msgid "Copy to clipboard"
 msgstr "Копировать в буфер обмена"
 
-#: nodepkg/component/SaveButton.js:15 nodepkg/model-form/ModelForm.js:14
+#: nodepkg/component/SaveButton.tsx:18 nodepkg/model-form/ModelForm.tsx:44
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/edi-table/RowAction.js:34
-msgid "Clone"
-msgstr "Клонировать"
-
-#: nodepkg/error/index.js:37
-msgid "Unexpected error"
-msgstr "Неожиданная ошибка"
-
-#: nodepkg/error/index.js:41
-msgid "Something went wrong."
-msgstr "Что-то пошло не так."
-
-#: nodepkg/error/shared.js:58
-msgid "Technical information"
-msgstr "Техническая информация"
-
-#: nodepkg/error/shared.js:67
-msgid "Contact support"
-msgstr "Написать в поддержку"
-
-#: nodepkg/error/shared.js:75
-msgid "Back to home"
-msgstr "На главную"
-
-#: nodepkg/fields-form/FieldsForm.js:117
-msgid "This value is required"
-msgstr "Необходимо указать значение"
-
-#: nodepkg/fields-form/field/KeynameTextBox.js:12
-msgid "The value entered is not valid"
-msgstr "Введенное значение некорректно"
-
-#: nodepkg/fields-form/field/LanguageSelect.js:10
+#: nodepkg/component/language-select/LanguageSelect.tsx:15
 msgid "Improve or add new translation"
 msgstr "Уточнить перевод или добавить новый"
 
-#: nodepkg/fields-form/field/LanguageSelect.js:26
+#: nodepkg/component/language-select/LanguageSelect.tsx:31
 msgid "Browser default"
 msgstr "По умолчанию в браузере"
 
-#: nodepkg/model-browse/ModelBrowse.js:55 nodepkg/model-form/ModelForm.js:34
+#: nodepkg/confirm.ts:14
+msgid "Confirmation required"
+msgstr "Необходимо подтверждение"
+
+#: nodepkg/confirm.ts:15
+msgid "Please confirm this action."
+msgstr "Пожалуйста, подтвердите данное действие."
+
+#: nodepkg/confirm.ts:17 nodepkg/error/shared.js:67
+msgid "OK"
+msgstr "OK"
+
+#: nodepkg/confirm.ts:44
+msgid "Please confirm the deletion."
+msgstr "Пожалуйста, подтвердите удаление."
+
+#: nodepkg/confirm.ts:45 nodepkg/edi-table/RowAction.js:38
+#: nodepkg/model-browse/ModelBrowse.js:198 nodepkg/model-browse/ModelBrowse.js:265
+#: nodepkg/model-form/ModelForm.tsx:45
+msgid "Delete"
+msgstr "Удалить"
+
+#: nodepkg/confirm.ts:46
+msgid "Failed to delete."
+msgstr "Ошибка удаления."
+
+#: nodepkg/edi-table/RowAction.js:33
+msgid "Clone"
+msgstr "Клонировать"
+
+#: nodepkg/error/index.ts:43
+msgid "Unexpected error"
+msgstr "Неожиданная ошибка"
+
+#: nodepkg/error/index.ts:47
+msgid "Something went wrong."
+msgstr "Что-то пошло не так."
+
+#: nodepkg/error/shared.js:54
+msgid "Technical information"
+msgstr "Техническая информация"
+
+#: nodepkg/error/shared.js:63
+msgid "Contact support"
+msgstr "Написать в поддержку"
+
+#: nodepkg/error/shared.js:71
+msgid "Back to home"
+msgstr "На главную"
+
+#: nodepkg/fields-form/FormItem.tsx:43
+msgid "This value is required"
+msgstr "Необходимо указать значение"
+
+#: nodepkg/fields-form/field/KeynameTextBox.tsx:14
+msgid "The value entered is not valid"
+msgstr "Введенное значение некорректно"
+
+#: nodepkg/model-browse/ModelBrowse.js:53 nodepkg/model-form/ModelForm.tsx:64
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: nodepkg/model-browse/ModelBrowse.js:56
+#: nodepkg/model-browse/ModelBrowse.js:54
 msgid "Item deleted"
 msgstr "Элемент удален"
 
-#: nodepkg/model-browse/ModelBrowse.js:58
+#: nodepkg/model-browse/ModelBrowse.js:56
 msgid "Items deleted"
 msgstr "Элементы удалены"
 
-#: nodepkg/model-browse/ModelBrowse.js:127
+#: nodepkg/model-browse/ModelBrowse.js:125
 msgid "The errors occurred during execution"
 msgstr "Во время выполнения возникли ошибки"
 
-#: nodepkg/model-browse/ModelBrowse.js:131
+#: nodepkg/model-browse/ModelBrowse.js:129
 msgid "Failed to delete items:"
 msgstr "Не удалось удалить элементы:"
 
-#: nodepkg/model-browse/ModelBrowse.js:154
+#: nodepkg/model-browse/ModelBrowse.js:152
 msgid "Do you want to delete these items?"
 msgstr "Вы хотите удалить эти элементы?"
 
-#: nodepkg/model-browse/ModelBrowse.js:191
+#: nodepkg/model-browse/ModelBrowse.js:189
 msgid "Edit"
 msgstr "Изменить"
 
-#: nodepkg/model-browse/ModelBrowse.js:223
+#: nodepkg/model-browse/ModelBrowse.js:221
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.js:245 nodepkg/model-form/ModelForm.js:13
+#: nodepkg/model-browse/ModelBrowse.js:243 nodepkg/model-form/ModelForm.tsx:43
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/model-form/ModelForm.js:67
+#: nodepkg/model-form/ModelForm.tsx:101
 msgid "Fix the form errors first"
 msgstr "Необходимо исправить ошибки в форме"
 
-#: nodepkg/model-logo-form/ModelLogoForm.js:11
+#: nodepkg/model-logo-form/ModelLogoForm.tsx:26
 msgid "Logo saved. Reload the page to get them applied."
 msgstr "Логотип сохранен. Для просмотра изменений обновите страницу."
 
-#: nodepkg/progress-modal/ProgressModal.js:4
+#: nodepkg/progress-modal/ProgressModal.tsx:6
 msgid "Operation in progress"
 msgstr "Выполняется операция"
 
-#: nodepkg/progress-modal/ProgressModal.js:5
+#: nodepkg/progress-modal/ProgressModal.tsx:7
 msgid "Cancel"
 msgstr "Отмена"
 
-#: nodepkg/single-setting-form/SingleSettingForm.js:10
+#: nodepkg/single-setting-form/SingleSettingForm.tsx:24
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/single-setting-form/SingleSettingForm.js:11
+#: nodepkg/single-setting-form/SingleSettingForm.tsx:25
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
-

@@ -11,14 +11,14 @@ msgid "Create and edit"
 msgstr "Создать и изменить"
 
 #: amd/ngw-resource/CompositeWidget.js:92
-#: nodepkg/export-settings/ExportSettings.js:73
+#: nodepkg/export-settings/ExportSettings.tsx:77
 msgid "Save"
 msgstr "Сохранить"
 
 #: amd/ngw-resource/CompositeWidget.js:99
-#: nodepkg/children-section/ChildrenSection.js:287
+#: nodepkg/children-section/ChildrenSection.js:285
 #: nodepkg/children-section/util/createResourceTableItemOptions.js:5
-#: nodepkg/delete-page/DeletePage.js:49 view.py:342
+#: nodepkg/delete-page/DeletePage.js:51 view.py:344
 msgid "Delete"
 msgstr "Удалить"
 
@@ -191,89 +191,88 @@ msgstr "Группа ресурсов"
 msgid "Please confirm resource deletion. This action cannot be undone."
 msgstr "Пожалуйста подтвердите удаление. Это действие не может быть отменено."
 
-#: nodepkg/children-section/ChildrenSection.js:36
+#: nodepkg/children-section/ChildrenSection.js:35
 msgid "Resource deleted"
 msgstr "Ресурс удален"
 
-#: nodepkg/children-section/ChildrenSection.js:37
+#: nodepkg/children-section/ChildrenSection.js:35
 msgid "Resources deleted"
 msgstr "Ресурсы удалены"
 
-#: nodepkg/children-section/ChildrenSection.js:43
+#: nodepkg/children-section/ChildrenSection.js:41
 msgid "Resource has been moved"
 msgstr "Ресурс перемещен"
 
-#: nodepkg/children-section/ChildrenSection.js:44
+#: nodepkg/children-section/ChildrenSection.js:42
 msgid "Resources have been moved"
 msgstr "Ресурсы перемещены"
 
-#: nodepkg/children-section/ChildrenSection.js:190
+#: nodepkg/children-section/ChildrenSection.js:188
 msgid "Moving resources"
 msgstr "Перемещение ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:221
+#: nodepkg/children-section/ChildrenSection.js:219
 msgid "Deleting resources"
 msgstr "Удаление ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:253
+#: nodepkg/children-section/ChildrenSection.js:251
 msgid "Turn off multiple selection"
 msgstr "Отключить множественный выбор"
 
-#: nodepkg/children-section/ChildrenSection.js:254
+#: nodepkg/children-section/ChildrenSection.js:252
 msgid "Select multiple resources"
 msgstr "Выбрать несколько ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:263
+#: nodepkg/children-section/ChildrenSection.js:261
 msgid "Hide resources volume"
 msgstr "Скрыть размер ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:264
+#: nodepkg/children-section/ChildrenSection.js:262
 msgid "Show resources volume"
 msgstr "Показать размер ресурсов"
 
-#: nodepkg/children-section/ChildrenSection.js:273
+#: nodepkg/children-section/ChildrenSection.js:271
 msgid "Hide resource creation date"
 msgstr "Скрыть дату создания ресурса"
 
-#: nodepkg/children-section/ChildrenSection.js:274
+#: nodepkg/children-section/ChildrenSection.js:272
 msgid "Show resource creation date"
 msgstr "Показать дату создания ресурса"
 
-#: nodepkg/children-section/ChildrenSection.js:296
+#: nodepkg/children-section/ChildrenSection.js:294
 msgid "Not all of the selected can be deleted."
 msgstr "Не все выделенные ресурсы могут быть удалены."
 
-#: nodepkg/children-section/ChildrenSection.js:311
+#: nodepkg/children-section/ChildrenSection.js:309
 msgid "Move"
 msgstr "Переместить"
 
-#: nodepkg/children-section/ChildrenSection.js:329
+#: nodepkg/children-section/ChildrenSection.js:327
 msgid "Export vector layers"
 msgstr "Экспорт векторных слоёв"
 
-#: nodepkg/children-section/ChildrenSection.js:394
-#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:19
+#: nodepkg/children-section/ChildrenSection.js:392
+#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:25
 #: nodepkg/editor-widget/EditorWidget.js:14
-#: template/resource_section_summary.mako:8
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/children-section/ChildrenSection.js:408
-#: template/resource_section_summary.mako:38
+#: nodepkg/children-section/ChildrenSection.js:406
+#: template/resource_section_summary.mako:30
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/children-section/ChildrenSection.js:415
+#: nodepkg/children-section/ChildrenSection.js:413
 #: nodepkg/editor-widget/EditorWidget.js:34
-#: template/resource_section_summary.mako:46
+#: template/resource_section_summary.mako:38
 msgid "Owner"
 msgstr "Владелец"
 
-#: nodepkg/children-section/ChildrenSection.js:423
+#: nodepkg/children-section/ChildrenSection.js:421
 msgid "Created"
 msgstr "Дата создания"
 
-#: nodepkg/children-section/ChildrenSection.js:442
+#: nodepkg/children-section/ChildrenSection.js:440
 msgid "Volume"
 msgstr "Размер"
 
@@ -285,31 +284,31 @@ msgstr "Изменить"
 msgid "Operation in progress"
 msgstr "Выполняется операция"
 
-#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:29
+#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:32
 msgid "Create group"
 msgstr "Создать группу"
 
-#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:30
+#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:33
 msgid "Clear selection"
 msgstr "Очистить выделение"
 
-#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:19
+#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:18
 msgid "Go to initial group"
 msgstr "Вернуться в исходную группу"
 
-#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:20
+#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:19
 msgid "Refresh"
 msgstr "Обновить"
 
-#: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:19
+#: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:20
 msgid "Pick this group"
 msgstr "Выбрать эту группу"
 
-#: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:20
+#: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:21
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
-#: nodepkg/delete-page/DeletePage.js:36
+#: nodepkg/delete-page/DeletePage.js:38
 msgid "Confirm deletion of the resource"
 msgstr "Подтвердить удаление ресурса"
 
@@ -322,7 +321,7 @@ msgid "Parent"
 msgstr "Родитель"
 
 #: nodepkg/editor-widget/EditorWidget.js:46
-#: template/resource_section_summary.mako:17
+#: template/resource_section_summary.mako:9
 msgid "Keyname"
 msgstr "Ключ"
 
@@ -330,19 +329,19 @@ msgstr "Ключ"
 msgid "Identifier for API integration (optional)"
 msgstr "Идентификатор для API интеграции (необязательно)"
 
-#: nodepkg/effective-permissions/EffectivePermissions.js:12
-msgid "Yes"
-msgstr "Да"
-
-#: nodepkg/effective-permissions/EffectivePermissions.js:12
+#: nodepkg/effective-permissions/EffectivePermissions.js:10
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/export-settings/ExportSettings.js:29
+#: nodepkg/effective-permissions/EffectivePermissions.js:10
+msgid "Yes"
+msgstr "Да"
+
+#: nodepkg/export-settings/ExportSettings.tsx:33
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/export-settings/ExportSettings.js:50
+#: nodepkg/export-settings/ExportSettings.tsx:54
 msgid ""
 "Select the category of users who can use the \"Save as\" link to download "
 "resource data."
@@ -350,19 +349,19 @@ msgstr ""
 "Выберите категорию пользователей, которые могут видеть ссылку \"Сохранить "
 "как\" для скачивания данных ресурса."
 
-#: nodepkg/export-settings/ExportSettings.js:60
+#: nodepkg/export-settings/ExportSettings.tsx:64
 msgid "Users with \"Data: Read\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Чтение\""
 
-#: nodepkg/export-settings/ExportSettings.js:63
+#: nodepkg/export-settings/ExportSettings.tsx:67
 msgid "Users with \"Data: Write\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Запись\""
 
-#: nodepkg/export-settings/ExportSettings.js:66
+#: nodepkg/export-settings/ExportSettings.tsx:70
 msgid "Administrators"
 msgstr "Администраторы"
 
-#: nodepkg/export-settings/ExportSettings.js:81
+#: nodepkg/export-settings/ExportSettings.tsx:85
 msgid ""
 "* This will not affect REST API use which will continue to be governed by "
 "permissions."
@@ -370,9 +369,13 @@ msgstr ""
 "* Это не повлияет на REST API, который продолжит регулироваться правами "
 "доступа."
 
-#: nodepkg/external-access/ExternalAccess.js:12
+#: nodepkg/external-access/ExternalAccess.js:10
 msgid "Read more"
 msgstr "Подробнее"
+
+#: nodepkg/external-access/ExternalAccess.js:43
+msgid "The link copied to clipboard."
+msgstr "Ссылка скопирована в буфер обмена."
 
 #: nodepkg/permissions-widget/PermissionsStore.js:6
 msgid "All fields are required"
@@ -382,55 +385,55 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:16 view.py:367
+#: nodepkg/permissions-widget/PermissionsWidget.js:15 view.py:369
 msgid "Action"
 msgstr "Действие"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:17
+#: nodepkg/permissions-widget/PermissionsWidget.js:16
 msgid "Principal"
 msgstr "Субъект"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:18
+#: nodepkg/permissions-widget/PermissionsWidget.js:17
 msgid "Apply to"
 msgstr "Применить для"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:19
+#: nodepkg/permissions-widget/PermissionsWidget.js:18
 msgid "Permission"
 msgstr "Право"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:21
+#: nodepkg/permissions-widget/PermissionsWidget.js:20
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:22
+#: nodepkg/permissions-widget/PermissionsWidget.js:21
 msgid "Allow"
 msgstr "Разрешить"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:23
+#: nodepkg/permissions-widget/PermissionsWidget.js:22
 msgid "Deny"
 msgstr "Запретить"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:25
+#: nodepkg/permissions-widget/PermissionsWidget.js:24
 msgid "This and subresources"
 msgstr "Этого и вложенных ресурсов"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:26
+#: nodepkg/permissions-widget/PermissionsWidget.js:25
 msgid "This resource only"
 msgstr "Только этого ресурса"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:28
+#: nodepkg/permissions-widget/PermissionsWidget.js:27
 msgid "All permissions"
 msgstr "Все права"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:199
+#: nodepkg/permissions-widget/PermissionsWidget.js:198
 msgid "Permissions"
 msgstr "Права доступа"
 
-#: nodepkg/resources-filter/ResourcesFilter.js:114
+#: nodepkg/resources-filter/ResourcesFilter.tsx:124
 msgid "Resources not found"
 msgstr "Ресурсы не найдены"
 
-#: nodepkg/resources-filter/ResourcesFilter.js:120
+#: nodepkg/resources-filter/ResourcesFilter.tsx:129
 msgid "Search resources"
 msgstr "Поиск ресурсов"
 
@@ -515,39 +518,39 @@ msgstr "Внешний доступ"
 msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
 
-#: view.py:84 view.py:349
+#: view.py:88 view.py:351
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:96 view.py:355
+#: view.py:100 view.py:357
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:136 view.py:366
+#: view.py:140 view.py:368
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:143
+#: view.py:147
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
-#: view.py:153
+#: view.py:157
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:207 view.py:374
+#: view.py:211 view.py:376
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:231
+#: view.py:235
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:334
+#: view.py:336
 msgid "Update"
 msgstr "Изменить"
 
-#: view.py:368
+#: view.py:370
 msgid "Extra"
 msgstr "Дополнительно"
 

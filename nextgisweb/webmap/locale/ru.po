@@ -6,69 +6,67 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:202 amd/ngw-webmap/Display.js:1116
-#: amd/ngw-webmap/ItemWidget.js:247
-msgid "Layers"
-msgstr "Слои"
-
-#: amd/ngw-webmap/Display.js:208 amd/ngw-webmap/Display.js:358
-msgid "Search"
-msgstr "Поиск"
-
-#: amd/ngw-webmap/Display.js:214 amd/ngw-webmap/Display.js:449
-msgid "Share"
-msgstr "Поделиться"
-
-#: amd/ngw-webmap/Display.js:220
-msgid "Print map"
-msgstr "Распечатать карту"
-
-#: amd/ngw-webmap/Display.js:380 amd/ngw-webmap/Display.js:391
-#: amd/ngw-webmap/template/MapToolbarItems.hbs:5
-msgid "Bookmarks"
-msgstr "Закладки"
-
-#: amd/ngw-webmap/Display.js:414 amd/ngw-webmap/plugin/LayerInfo.js:50
-msgid "Description"
-msgstr "Описание"
-
-#: amd/ngw-webmap/Display.js:555 amd/ngw-webmap/Display.js:576
-msgid "Annotations"
-msgstr "Аннотации"
-
-#: amd/ngw-webmap/Display.js:760 amd/ngw-webmap/tool/Zoom.js:20
+#: amd/ngw-webmap/Display.js:517 amd/ngw-webmap/tool/Zoom.js:20
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:444
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:761 amd/ngw-webmap/tool/Zoom.js:23
+#: amd/ngw-webmap/Display.js:518 amd/ngw-webmap/tool/Zoom.js:23
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:445
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:765 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:449
+#: amd/ngw-webmap/Display.js:522 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:449
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:781 amd/ngw-webmap/template/ExtentWidget.hbs:12
+#: amd/ngw-webmap/Display.js:538 amd/ngw-webmap/template/ExtentWidget.hbs:12
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:786
+#: amd/ngw-webmap/Display.js:543
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:789 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
+#: amd/ngw-webmap/Display.js:546 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:458
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:1313 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:625
+#: amd/ngw-webmap/Display.js:966 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:625
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:1314 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:626
+#: amd/ngw-webmap/Display.js:967 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:626
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
+
+#: amd/ngw-webmap/Display.js:995 amd/ngw-webmap/ItemWidget.js:247
+msgid "Layers"
+msgstr "Слои"
+
+#: amd/ngw-webmap/Display.js:1005
+msgid "Search"
+msgstr "Поиск"
+
+#: amd/ngw-webmap/Display.js:1015
+msgid "Print map"
+msgstr "Распечатать карту"
+
+#: amd/ngw-webmap/Display.js:1030 amd/ngw-webmap/template/MapToolbarItems.hbs:5
+msgid "Bookmarks"
+msgstr "Закладки"
+
+#: amd/ngw-webmap/Display.js:1047 amd/ngw-webmap/plugin/LayerInfo.js:50
+msgid "Description"
+msgstr "Описание"
+
+#: amd/ngw-webmap/Display.js:1071
+msgid "Annotations"
+msgstr "Аннотации"
+
+#: amd/ngw-webmap/Display.js:1084
+msgid "Share"
+msgstr "Поделиться"
 
 #: amd/ngw-webmap/ExtentWidget.js:34
 msgid "Extent and bookmarks"
@@ -148,11 +146,11 @@ msgstr "Приватная аннотация"
 msgid "Edit annotation"
 msgstr "Редактировать аннотацию"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:107
+#: amd/ngw-webmap/plugin/FeatureLayer.js:111
 msgid "Go to"
 msgstr "Перейти"
 
-#: amd/ngw-webmap/plugin/FeatureLayer.js:240
+#: amd/ngw-webmap/plugin/FeatureLayer.js:268
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -273,23 +271,19 @@ msgstr "Ресурс стиля"
 msgid "Expanded"
 msgstr "Развернута"
 
-#: amd/ngw-webmap/tool/Identify.js:95
-msgid "Feature"
-msgstr "Объект"
-
-#: amd/ngw-webmap/tool/Identify.js:266
+#: amd/ngw-webmap/tool/Identify.js:251
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: amd/ngw-webmap/tool/Identify.js:278
+#: amd/ngw-webmap/tool/Identify.js:263
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: amd/ngw-webmap/tool/Identify.js:347 amd/ngw-webmap/tool/Identify.js:364
+#: amd/ngw-webmap/tool/Identify.js:332 amd/ngw-webmap/tool/Identify.js:349
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:482
+#: amd/ngw-webmap/tool/Identify.js:467
 msgid "Features"
 msgstr "Объектов"
 
@@ -406,7 +400,7 @@ msgid "Don't save"
 msgstr "Не сохранять"
 
 #: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:10
-#: nodepkg/print-map-panel/PrintMapPanel.js:203
+#: nodepkg/print-map-panel/PrintMapPanel.js:205
 msgid "Print"
 msgstr "Печать"
 
@@ -520,60 +514,130 @@ msgstr "Клонировать"
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: nodepkg/layers-dropdown/LayersDropdown.js:20
-msgid "Zoom to all layers"
-msgstr "Увеличить до всех слоев"
-
-#: nodepkg/layers-tree/Legend.js:10
+#: nodepkg/layers-tree/Legend.js:8
 msgid "Show legend"
 msgstr "Показывать легенду"
 
-#: nodepkg/layers-tree/Legend.js:11
+#: nodepkg/layers-tree/Legend.js:9
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.js:121
+#: nodepkg/map-viewer-info/MapViewerInfo.js:123
 msgid "Show extent"
 msgstr "Показывать охват"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.js:122
+#: nodepkg/map-viewer-info/MapViewerInfo.js:124
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
-#: nodepkg/print-map-panel/PrintMapPanel.js:116
+#: nodepkg/panel/layers/LayersDropdown.js:12
+msgid "Zoom to all layers"
+msgstr "Увеличить до всех слоев"
+
+#: nodepkg/panel/search/SearchPanel.js:323
+msgid "Not found"
+msgstr "Не найдено"
+
+#: nodepkg/panel/search/SearchPanel.js:328
+msgid "Refine search criterion. Displayed first 100 search results."
+msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
+
+#: nodepkg/panel/search/SearchPanel.js:361
+msgid "Enter at least 2 characters"
+msgstr "Введите минимум 2 символа"
+
+#: nodepkg/panel/share/SharePanel.js:36
+msgid ""
+"<a>CORS</a> must be enabled for the target origin when embedding a web map on"
+" a different domain."
+msgstr "<a>CORS</a> должен быть включен при встраивании веб-карты на домене."
+
+#: nodepkg/panel/share/SharePanel.js:132
+msgid "Map link"
+msgstr "Ссылка на карту"
+
+#: nodepkg/panel/share/SharePanel.js:138
+msgid "The map link copied to clipboard."
+msgstr "Ссылка на карту скопирована в буфер обмена."
+
+#: nodepkg/panel/share/SharePanel.js:140
+msgid "Copy link"
+msgstr "Копировать ссылку"
+
+#: nodepkg/panel/share/SharePanel.js:145
+msgid "Embed code for your site"
+msgstr "Вставить карту на сайт"
+
+#: nodepkg/panel/share/SharePanel.js:151
+msgid "Map size:"
+msgstr "Размер карты:"
+
+#: nodepkg/panel/share/SharePanel.js:153 nodepkg/settings/SettingsForm.js:59
+msgid "Width, px"
+msgstr "Ширина, пикс."
+
+#: nodepkg/panel/share/SharePanel.js:159 nodepkg/settings/SettingsForm.js:72
+msgid "Height, px"
+msgstr "Высота, пикс."
+
+#: nodepkg/panel/share/SharePanel.js:163
+msgid "px"
+msgstr "px"
+
+#: nodepkg/panel/share/SharePanel.js:171
+msgid "Link to main map"
+msgstr "Ссылка на основную карту"
+
+#: nodepkg/panel/share/SharePanel.js:180
+msgid "Generate events"
+msgstr "Генерация событий"
+
+#: nodepkg/panel/share/SharePanel.js:196
+msgid "The embed code copied to clipboard."
+msgstr "Код для встраивания скопирован в буфер обмена."
+
+#: nodepkg/panel/share/SharePanel.js:200
+msgid "Copy code"
+msgstr "Копировать код"
+
+#: nodepkg/panel/share/SharePanel.js:203
+msgid "Preview"
+msgstr "Предпросмотр"
+
+#: nodepkg/print-map-panel/PrintMapPanel.js:118
 msgid "Page"
 msgstr "Страница"
 
-#: nodepkg/print-map-panel/PrintMapPanel.js:119
+#: nodepkg/print-map-panel/PrintMapPanel.js:121
 msgid "Paper format"
 msgstr "Формат бумаги"
 
-#: nodepkg/print-map-panel/PrintMapPanel.js:130
+#: nodepkg/print-map-panel/PrintMapPanel.js:132
 msgid "Height, mm"
 msgstr "Высота, мм"
 
-#: nodepkg/print-map-panel/PrintMapPanel.js:142
+#: nodepkg/print-map-panel/PrintMapPanel.js:144
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
-#: nodepkg/print-map-panel/PrintMapPanel.js:154
+#: nodepkg/print-map-panel/PrintMapPanel.js:156
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
-#: nodepkg/print-map-panel/PrintMapPanel.js:165
-#: nodepkg/print-map-panel/PrintMapPanel.js:187
+#: nodepkg/print-map-panel/PrintMapPanel.js:167
+#: nodepkg/print-map-panel/PrintMapPanel.js:189
 msgid "Scale"
 msgstr "Масштаб"
 
-#: nodepkg/print-map-panel/PrintMapPanel.js:173
+#: nodepkg/print-map-panel/PrintMapPanel.js:175
 msgid "Scale value"
 msgstr "Значение масштаба"
 
-#: nodepkg/print-map-panel/PrintMapPanel.js:183
+#: nodepkg/print-map-panel/PrintMapPanel.js:185
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/print-map-panel/PrintMapPanel.js:209
+#: nodepkg/print-map-panel/PrintMapPanel.js:211
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -629,18 +693,6 @@ msgstr "JPEG"
 msgid "PNG"
 msgstr "PNG"
 
-#: nodepkg/search-panel/SearchPanel.js:296
-msgid "Not found"
-msgstr "Не найдено"
-
-#: nodepkg/search-panel/SearchPanel.js:302
-msgid "Refine search criterion. Displayed first 100 search results."
-msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
-
-#: nodepkg/search-panel/SearchPanel.js:344
-msgid "Enter at least 2 characters"
-msgstr "Введите минимум 2 символа"
-
 #: nodepkg/settings-widget/SettingsWidget.js:27
 msgid "Enable layers editing"
 msgstr "Разрешить редактирование слоев"
@@ -660,14 +712,6 @@ msgstr "Настройки сохранены"
 #: nodepkg/settings/SettingsForm.js:53
 msgid "Identify popup"
 msgstr "Окно идентификации"
-
-#: nodepkg/settings/SettingsForm.js:59 nodepkg/share-panel/SharePanel.js:136
-msgid "Width, px"
-msgstr "Ширина, пикс."
-
-#: nodepkg/settings/SettingsForm.js:72 nodepkg/share-panel/SharePanel.js:142
-msgid "Height, px"
-msgstr "Высота, пикс."
 
 #: nodepkg/settings/SettingsForm.js:85
 msgid "Radius, px"
@@ -809,56 +853,6 @@ msgstr "Nominatim (OSM)"
 msgid "Yandex.Maps API Geocoder"
 msgstr "Геокодер API Яндекс.Карт"
 
-#: nodepkg/share-panel/SharePanel.js:28
-msgid ""
-"<a>CORS</a> must be enabled for the target origin when embedding a web map on"
-" a different domain."
-msgstr "<a>CORS</a> должен быть включен при встраивании веб-карты на домене."
-
-#: nodepkg/share-panel/SharePanel.js:109
-msgid "Map link"
-msgstr "Ссылка на карту"
-
-#: nodepkg/share-panel/SharePanel.js:118
-msgid "The map link copied to clipboard."
-msgstr "Ссылка на карту скопирована в буфер обмена."
-
-#: nodepkg/share-panel/SharePanel.js:120
-msgid "Copy link"
-msgstr "Копировать ссылку"
-
-#: nodepkg/share-panel/SharePanel.js:126
-msgid "Embed code for your site"
-msgstr "Вставить карту на сайт"
-
-#: nodepkg/share-panel/SharePanel.js:133
-msgid "Map size:"
-msgstr "Размер карты:"
-
-#: nodepkg/share-panel/SharePanel.js:147
-msgid "px"
-msgstr "px"
-
-#: nodepkg/share-panel/SharePanel.js:156
-msgid "Link to main map"
-msgstr "Ссылка на основную карту"
-
-#: nodepkg/share-panel/SharePanel.js:165
-msgid "Generate events"
-msgstr "Генерация событий"
-
-#: nodepkg/share-panel/SharePanel.js:175
-msgid "The embed code copied to clipboard."
-msgstr "Код для встраивания скопирован в буфер обмена."
-
-#: nodepkg/share-panel/SharePanel.js:177
-msgid "Copy code"
-msgstr "Копировать код"
-
-#: nodepkg/share-panel/SharePanel.js:183 nodepkg/share-panel/SharePanel.js:194
-msgid "Preview"
-msgstr "Предпросмотр"
-
 #: nodepkg/utils/format-units.js:11
 msgid "m"
 msgstr "м"
@@ -907,7 +901,7 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/zoom-to-filtered-btn/ZoomToFilteredBtn.js:11
+#: nodepkg/zoom-to-filtered-btn/ZoomToFilteredBtn.js:9
 msgid "Zoom to filtered features"
 msgstr "Приблизить к найденным объектам"
 
@@ -954,4 +948,3 @@ msgstr "Просмотр встроенной веб-карты"
 #: view.py:315
 msgid "Display"
 msgstr "Открыть"
-
