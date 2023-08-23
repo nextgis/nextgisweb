@@ -40,22 +40,17 @@ export const FeatureEditorWidget = observer(
         featureId,
         toolbar,
         onSave,
-        store: store_,
+        store: storeProp,
     }: FeatureEditorWidgetProps) => {
         const [activeKey, setActiveKey] = useState(ATTRIBUTES);
-
-        if (!store_ && (resourceId === undefined || featureId === undefined)) {
-            throw new Error("Either 'store' should be provided or both 'resourceId' and 'featureId'");
-        }
-
-        const [store] = useState<FeatureEditorStore>(() => {
-            if (store_) {
-                return store_;
-            } else if (resourceId !== undefined && featureId !== undefined) {
+        const store = useState<FeatureEditorStore>(() => {
+            if (storeProp) return storeProp;
+            if (resourceId && featureId)
                 return new FeatureEditorStore({ resourceId, featureId });
-            }
-            throw new Error("unreachable");
-        });
+            throw new Error(
+                "Either 'store' should be provided or both 'resourceId' and 'featureId'"
+            );
+        })[0];
 
         const [items, setItems] = useState<TabItems>([]);
 
@@ -69,15 +64,17 @@ export const FeatureEditorWidget = observer(
                     async () => await newEditorWidget.component()
                 );
 
+                const ObserverTableLabel = observer(() => (
+                    <TabLabel
+                        counter={widgetStore.counter}
+                        dirty={widgetStore.dirty}
+                        label={newEditorWidget.label}
+                    />
+                ))
+
                 const newWidget: TabItem = {
                     key,
-                    label: (
-                        <TabLabel
-                            counter={widgetStore.counter}
-                            dirty={widgetStore.dirty}
-                            label={newEditorWidget.label}
-                        />
-                    ),
+                    label: <ObserverTableLabel />,
                     children: (
                         <Suspense fallback={msgLoading}>
                             <Widget store={widgetStore}></Widget>
