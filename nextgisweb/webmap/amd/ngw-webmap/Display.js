@@ -35,10 +35,6 @@ define([
     "./tool/Swipe",
     // panels
     "@nextgisweb/webmap/panel/layers",
-    "@nextgisweb/webmap/panel/description",
-    "@nextgisweb/webmap/panel/search",
-    "@nextgisweb/webmap/panel/bookmarks",
-    "@nextgisweb/webmap/panel/share",
     "./ui/PrintMapPanel/PrintMapPanel",
     "./ui/AnnotationsPanel/AnnotationsPanel",
     // utils
@@ -88,10 +84,6 @@ define([
     ToolViewerInfo,
     ToolSwipe,
     LayersPanelModule,
-    DescriptionPanelModule,
-    SearchPanelModule,
-    BookmarksPanelModule,
-    SharePanelModule,
     PrintMapPanel,
     AnnotationsPanel,
     URL,
@@ -1000,7 +992,7 @@ define([
             });
 
             panels.push({
-                cls: reactPanel(SearchPanelModule.default),
+                cls: reactPanel("@nextgisweb/webmap/panel/search"),
                 params: {
                     title: i18n.gettext("Search"),
                     name: "search",
@@ -1025,7 +1017,7 @@ define([
                     resolve(undefined);
                 }
                 const panel = {
-                    cls: reactPanel(BookmarksPanelModule.default),
+                    cls: reactPanel("@nextgisweb/webmap/panel/bookmarks"),
                     params: {
                         title: i18n.gettext("Bookmarks"),
                         name: "bookmark",
@@ -1042,7 +1034,7 @@ define([
                     resolve(undefined);
                 }
                 const panel = {
-                    cls: reactPanel(DescriptionPanelModule.default),
+                    cls: reactPanel("@nextgisweb/webmap/panel/description"),
                     params: {
                         title: i18n.gettext("Description"),
                         name: "info",
@@ -1079,7 +1071,7 @@ define([
             panels.push(makeAnnotationsPanel);
 
             panels.push({
-                cls: reactPanel(SharePanelModule.default),
+                cls: reactPanel("@nextgisweb/webmap/panel/share"),
                 params: {
                     title: i18n.gettext("Share"),
                     name: "share",

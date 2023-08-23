@@ -6,27 +6,45 @@ define([
     "@nextgisweb/gui/react-app",
 ], function (declare, domStyle, all, _WidgetBase, reactApp) {
     return function (fcomp, { waitFor = [] } = {}) {
-        return declare(fcomp.name, [_WidgetBase], {
+        return declare([_WidgetBase], {
             app: undefined,
 
             buildRendering: function () {
                 this.inherited(arguments);
                 domStyle.set(this.domNode, "height", "100%");
-                const pm = this.display.panelsManager;
+            },
 
+            show: function () {
+                if (this.app) {
+                    this.app.update({ visible: true });
+                } else if (typeof fcomp === "string") {
+                    // Lazy panel module loading
+                    require([fcomp], (fcompMod) => {
+                        fcomp = fcompMod.default;
+                        this.runReactApp({ visible: true });
+                    });
+                } else {
+                    this.runReactApp({ visible: true });
+                }
+            },
+
+            hide: function () {
+                this.app.update({ visible: false });
+            },
+
+            runReactApp: function ({ visible }) {
+                const pm = this.display.panelsManager;
                 all(waitFor).then(() => {
-                    const { update } = reactApp.default(
+                    this.app = reactApp.default(
                         fcomp,
                         {
                             display: this.display,
                             title: this.title,
                             close: () => pm._closePanel(pm.getPanel("layers")),
+                            visible,
                         },
                         this.domNode
                     );
-                    this.watch("isOpen", (attr, oldVal, newVal) => {
-                        update({ [attr]: newVal });
-                    });
                 });
             },
         });

@@ -61,7 +61,7 @@ function CodeArea(props) {
     );
 }
 
-export const SharePanel = ({ display, title, close, isOpen }) => {
+export const SharePanel = ({ display, title, close, visible }) => {
     const webmapId = display.config.webmapId;
 
     const [mapLink, setMapLink] = useState("");
@@ -104,7 +104,7 @@ export const SharePanel = ({ display, title, close, isOpen }) => {
             updatePermalinkUrl();
             updateEmbedCode();
         });
-    }, [isOpen]);
+    }, [visible]);
 
     useEffect(() => {
         display.map.olMap.getView().on("change", updateTexts);
