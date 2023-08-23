@@ -46,7 +46,7 @@ def feature_browse(request):
         obj=request.context,
         title=_("Feature table"),
         entrypoint="@nextgisweb/feature-layer/feature-grid",
-        props=dict(id=request.context.id, readonly=readonly),
+        props=dict(id=request.context.id, readonly=readonly, editOnNewPage=True),
         maxwidth=True,
         maxheight=True
     )
