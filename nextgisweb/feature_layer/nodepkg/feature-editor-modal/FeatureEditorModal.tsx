@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 import { FeatureEditorWidget } from "../feature-editor/FeatureEditorWidget";
 
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
@@ -16,6 +17,10 @@ export interface FeatureEditorModalProps extends ModalProps {
 }
 
 const msgCancel = gettext("Cancel");
+const msgConfirmTitle = gettext("Are you sure?");
+const msgConfirmContent = gettext(
+    "You have unsaved changes. Do you really want to close this modal?"
+);
 
 export function FeatureEditorModal({
     open: open_,
@@ -23,49 +28,71 @@ export function FeatureEditorModal({
     ...modalProps
 }: FeatureEditorModalProps) {
     const [open, setOpen] = useState(open_);
-
     const { resourceId, featureId, onSave } = editorOptions || {};
+    const [modal, contextHolder] = Modal.useModal();
 
     if (!resourceId || !featureId) {
         throw new Error(
             "The `editorOptions.resourceId` and `editorOptions.featureId` are reuqired"
         );
     }
+    const [store] = useState(
+        () => new FeatureEditorStore({ resourceId, featureId })
+    );
 
-    const close = () => setOpen(false);
+    const close = () => {
+        setOpen(false);
+    };
+
+    const handleClose = () => {
+        if (store.dirty) {
+            modal.confirm({
+                title: msgConfirmTitle,
+                content: msgConfirmContent,
+                onOk: close,
+                onCancel: () => {},
+            });
+        } else {
+            close();
+        }
+    };
 
     useEffect(() => {
         setOpen(open_);
     }, [open_]);
 
     return (
-        <Modal
-            className="ngw-feature-layer-feature-editor-modal"
-            width={null}
-            open={open}
-            destroyOnClose
-            footer={null}
-            closable={false}
-            onCancel={close}
-            {...modalProps}
-        >
-            <FeatureEditorWidget
-                resourceId={resourceId}
-                featureId={featureId}
-                onSave={(e) => {
-                    close();
-                    if (onSave) {
-                        onSave(e);
-                    }
-                }}
-                toolbar={{
-                    rightActions: [
-                        <Button key="reset" onClick={close}>
-                            {msgCancel}
-                        </Button>,
-                    ],
-                }}
-            />
-        </Modal>
+        <div>
+            <Modal
+                className="ngw-feature-layer-feature-editor-modal"
+                width={undefined}
+                open={open}
+                destroyOnClose
+                footer={null}
+                closable={false}
+                onCancel={handleClose}
+                {...modalProps}
+            >
+                <FeatureEditorWidget
+                    resourceId={resourceId}
+                    featureId={featureId}
+                    store={store}
+                    onSave={(e) => {
+                        close();
+                        if (onSave) {
+                            onSave(e);
+                        }
+                    }}
+                    toolbar={{
+                        rightActions: [
+                            <Button key="reset" onClick={handleClose}>
+                                {msgCancel}
+                            </Button>,
+                        ],
+                    }}
+                />
+            </Modal>
+            {contextHolder}
+        </div>
     );
 }
