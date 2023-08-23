@@ -91,45 +91,24 @@ define([
         return true;
     };
 
-    const openFeatureEditorTab = ({ resourceId, featureId, mapDisplay }) => {
-        const tabTitle = (fid) => i18n.gettext("Feature") + " #" + fid;
-        require([
-            "@nextgisweb/gui/react-app",
-            "@nextgisweb/feature-layer/feature-editor",
-        ], (reactApp, featureEditor) => {
-            const FeatureTab = declare([_WidgetBase], {
-                style: "height: 100%; padding: 1em",
-                iconClass: "iconDescription",
-                closable: true,
-
-                constructor(options) {
-                    declare.safeMixin(this, options);
-                    this.title = tabTitle(this.featureId);
-                },
-
-                buildRendering() {
-                    this.inherited(arguments);
-                    this.component = reactApp.default(
-                        featureEditor.default,
-                        {
-                            resourceId: this.resourceId,
-                            featureId: this.featureId,
-                        },
-                        this.domNode
-                    );
-                },
-
-                destroyRecursive() {
-                    if (this.component) this.component.unmount();
-                    this.component = null;
-                    this.inherited(arguments);
+    const openFeatureEditorTab = ({ resourceId, featureId, widget }) => {
+        require(["@nextgisweb/feature-layer/feature-editor-modal"], (
+            featureEditorModal
+        ) => {
+            featureEditorModal.showFeatureEditorModal({
+                bodyStyle: { height: "500px" },
+                editorOptions: {
+                    featureId,
+                    resourceId,
+                    onSave: () => {
+                        widget.reset();
+                        topic.publish("feature.updated", {
+                            resourceId,
+                            featureId,
+                        });
+                    },
                 },
             });
-
-            const tab = FeatureTab({ resourceId, featureId });
-            mapDisplay.tabContainer.addChild(tab);
-            mapDisplay.tabContainer.selectChild(tab);
-            tab.startup();
         });
     };
 
@@ -210,6 +189,12 @@ define([
 
             this.extWidgetClassesDeferred = all(deferreds);
         },
+
+        reset: function () {
+            this.domNode.innerHTML = "";
+            this.postCreate();
+        },
+
         _displaySelectPane: function() {
             this.selectPane = new ContentPane({
                 region: "top", layoutPriority: 1,
@@ -300,7 +285,7 @@ define([
                             openFeatureEditorTab({
                                 resourceId: lid,
                                 featureId: fid,
-                                mapDisplay: widget.tool.display,
+                                widget: widget,
                             }),
                     }).placeAt(widget.extController, "last");
                     domClass.add(widget.editButton.domNode, "no-label");

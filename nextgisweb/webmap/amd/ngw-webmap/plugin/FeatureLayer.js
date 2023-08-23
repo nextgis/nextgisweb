@@ -34,6 +34,7 @@ define([
 
         postCreate: function () {
             var widget = this;
+            this._version = 0;
             this.inherited(arguments);
             var plugin = this.plugin;
             var data = plugin.display.get("itemConfig").plugin[plugin.identity];
@@ -65,12 +66,15 @@ define([
                     cleanSelectedOnFilter: false,
                     selectedIds: widget.selectedIds,
                     onDelete: function () {
-                        if (display) {
-                            var layer = display._layers[widget.layerId];
-                            if (layer) {
-                                layer.reload();
-                            }
+                        widget.reloadLayer();
+                    },
+                    onSave: function () {
+                        const popupWidget =
+                            widget.plugin.display.identify._popup.widget;
+                        if (popupWidget) {
+                            popupWidget.reset();
                         }
+                        widget.reloadLayer();
                     },
                     onSelect: function (newVal) {
                         widget.selectedIds = newVal;
@@ -134,8 +138,26 @@ define([
             this.component = component;
         },
 
+        reloadLayer: function () {
+            var display = this.plugin.display;
+            if (display) {
+                var layer = display._layers[this.layerId];
+                if (layer) {
+                    layer.reload();
+                }
+            }
+        },
+
         featureUnhighlightedEvent: function () {
             this.component.update({ selectedIds: [] });
+        },
+
+        featureUpdatedEvent: function ({ resourceId }) {
+            if (this.layerId === resourceId) {
+                this._version += 1;
+                this.component.update({ version: this._version });
+                this.reloadLayer();
+            }
         },
 
         featureHighlightedEvent: function (e) {
@@ -160,6 +182,12 @@ define([
                 topic.subscribe(
                     "feature.unhighlight",
                     this.featureUnhighlightedEvent.bind(this)
+                )
+            );
+            this.topicHandlers.push(
+                topic.subscribe(
+                    "feature.updated",
+                    this.featureUpdatedEvent.bind(this)
                 )
             );
         },
