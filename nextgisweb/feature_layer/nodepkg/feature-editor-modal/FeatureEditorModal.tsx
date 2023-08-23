@@ -62,7 +62,7 @@ export function FeatureEditorModal({
     }, [open_]);
 
     return (
-        <div>
+        <div style={{width: "100%", height: "100%"}}>
             <Modal
                 className="ngw-feature-layer-feature-editor-modal"
                 width={undefined}
