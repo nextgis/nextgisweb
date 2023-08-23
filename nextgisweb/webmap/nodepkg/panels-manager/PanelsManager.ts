@@ -96,7 +96,8 @@ export class PanelsManager {
         this._domElements.leftPanel.addChild(panel);
         this._domElements.main.addChild(this._domElements.leftPanel);
 
-        panel.show && panel.show(); // DynamicPanel compatibility
+        panel.show && panel.show(); // DynamicPanel
+        panel.set("isOpen", true); // React panel wrapper
         this._onChangePanel(panel);
     }
 
@@ -111,7 +112,8 @@ export class PanelsManager {
             this._domElements.leftPanel.set("splitter", true);
         }
 
-        panel.hide && panel.hide(); // DynamicPanel compatibility
+        panel.hide && panel.hide(); // DynamicPanel
+        panel.set("isOpen", false); // React panel wrapper
         this._onChangePanel(undefined);
     }
 
