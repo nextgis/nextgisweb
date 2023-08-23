@@ -61,6 +61,7 @@ const Action = observer(({ row }) => {
             {...bindProp(row, "action")}
             {...selectDefaults}
             placeholder={<IconText icon={<AddIcon />} text={actionAdd} />}
+            popupMatchSelectWidth={false}
         >
             {options}
         </Select>
