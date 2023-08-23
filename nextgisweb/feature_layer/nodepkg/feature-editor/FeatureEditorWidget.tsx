@@ -35,12 +35,27 @@ const msgReset = gettext("Reset");
 const ATTRIBUTES = "attributes";
 
 export const FeatureEditorWidget = observer(
-    ({ resourceId, featureId, toolbar, onSave }: FeatureEditorWidgetProps) => {
+    ({
+        resourceId,
+        featureId,
+        toolbar,
+        onSave,
+        store: store_,
+    }: FeatureEditorWidgetProps) => {
         const [activeKey, setActiveKey] = useState(ATTRIBUTES);
 
-        const [store] = useState(
-            () => new FeatureEditorStore({ resourceId, featureId })
-        );
+        if (!store_ && (resourceId === undefined || featureId === undefined)) {
+            throw new Error("Either 'store' should be provided or both 'resourceId' and 'featureId'");
+        }
+
+        const [store] = useState<FeatureEditorStore>(() => {
+            if (store_) {
+                return store_;
+            } else if (resourceId !== undefined && featureId !== undefined) {
+                return new FeatureEditorStore({ resourceId, featureId });
+            }
+            throw new Error("unreachable");
+        });
 
         const [items, setItems] = useState<TabItems>([]);
 

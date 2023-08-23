@@ -9,10 +9,11 @@ export interface AttributesFormProps {
 }
 
 export interface FeatureEditorWidgetProps {
-    resourceId: number;
-    featureId: number;
+    resourceId?: number;
+    featureId?: number;
     toolbar?: Partial<ActionToolbarProps>;
     onSave?: (value: ResourceItem | undefined) => void;
+    store?: FeatureEditorStore;
 }
 
 export interface FeatureEditorStoreOptions {
