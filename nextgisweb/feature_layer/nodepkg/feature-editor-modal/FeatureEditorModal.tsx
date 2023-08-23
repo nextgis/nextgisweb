@@ -3,15 +3,15 @@ import { useEffect, useState } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { FeatureEditorWidget } from "./FeatureEditorWidget";
+import { FeatureEditorWidget } from "../feature-editor/FeatureEditorWidget";
 
-import type { FeatureEditorWidgetProps } from "./type";
+import type { FeatureEditorWidgetProps } from "../feature-editor/type";
 
 import "./FeatureEditorModal.less";
 
 export type ModalProps = Parameters<typeof Modal>[0];
 
-interface FeatureEditorModalProps extends ModalProps {
+export interface FeatureEditorModalProps extends ModalProps {
     editorOptions?: FeatureEditorWidgetProps;
 }
 
@@ -40,7 +40,8 @@ export function FeatureEditorModal({
 
     return (
         <Modal
-            className="resource-picker-modal"
+            className="ngw-feature-layer-feature-editor-modal"
+            width={null}
             open={open}
             destroyOnClose
             footer={null}

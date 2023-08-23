@@ -10,7 +10,7 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
 
-import { FeatureEditorModal } from "../feature-editor/FeatureEditorModal";
+import { FeatureEditorModal } from "../feature-editor-modal";
 
 import FeatureTable from "./FeatureTable";
 import { deleteFeatures } from "./api/deleteFeatures";
@@ -43,6 +43,7 @@ interface FeatureGridProps {
     selectedIds?: number[];
     size?: SizeType;
     query?: string;
+    version?: number;
     readonly?: boolean;
     editOnNewPage?: boolean;
     cleanSelectedOnFilter?: boolean;
@@ -50,6 +51,7 @@ interface FeatureGridProps {
     beforeDelete?: (featureIds: number[]) => void;
     deleteError?: (featureIds: number[]) => void;
     onDelete?: (featureIds: number[]) => void;
+    onSave?: (value: ResourceItem | undefined) => void;
     onSelect?: (selected: number[]) => void;
 }
 
@@ -63,6 +65,8 @@ const loadingCol = () => "...";
 export const FeatureGrid = ({
     id,
     query: query_,
+    onSave,
+    version: version_,
     onDelete,
     onSelect,
     deleteError,
@@ -84,10 +88,15 @@ export const FeatureGrid = ({
     const { isExportAllowed } = useResource({ id });
 
     const [query, setQuery] = useState("");
-    const [version, setVersion] = useState(0);
+    const [version, setVersion] = useState(version_ || 0);
     const [selected, setSelected] = useState<FeatureAttrs[]>(() => []);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
+    useEffect(() => {
+        if (version_ !== undefined) {
+            setVersion(version + version_);
+        }
+    }, [version_]);
     useEffect(() => {
         if (selectedIds) {
             setSelected(selectedIds.map((s) => ({ [KEY_FIELD_KEYNAME]: s })));
@@ -182,7 +191,7 @@ export const FeatureGrid = ({
             ...[
                 {
                     onClick: () => {
-                        if (editOnNewPage ) {
+                        if (editOnNewPage) {
                             goTo("feature_layer.feature.update");
                         } else {
                             const first = selected[0];
@@ -191,18 +200,18 @@ export const FeatureGrid = ({
                                     KEY_FIELD_KEYNAME
                                 ] as number;
                                 showModal(FeatureEditorModal, {
-                                    bodyStyle: { height: "500px" },
-
                                     editorOptions: {
                                         featureId,
                                         resourceId: id,
-                                        onSave: () => {
+                                        onSave: (e) => {
+                                            if (onSave) {
+                                                onSave(e);
+                                            }
                                             setVersion((old) => old + 1);
                                         },
                                     },
                                 });
                             }
-                            
                         }
                     },
                     icon: <EditIcon />,
