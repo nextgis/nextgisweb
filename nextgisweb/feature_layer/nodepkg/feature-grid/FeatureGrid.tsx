@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Button, Empty, Input } from "@nextgisweb/gui/antd";
+import { Button, Empty, Input, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
 import showModal from "@nextgisweb/gui/showModal";
@@ -25,7 +25,7 @@ import type { FeatureLayerCount } from "../type/FeatureLayer";
 import type { FeatureAttrs } from "./type";
 
 import DeleteIcon from "@nextgisweb/icon/material/delete";
-import EditIcon from "@nextgisweb/icon/material/edit";
+import EditInNewpageIcon from "@nextgisweb/icon/material/launch";
 import OpenIcon from "@nextgisweb/icon/material/open_in_new";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
@@ -55,10 +55,11 @@ interface FeatureGridProps {
     onSelect?: (selected: number[]) => void;
 }
 
-const searchPlaceholderMsg = gettext("Search...");
-const openTitleMsg = gettext("Open");
-const deleteTitleMsg = gettext("Delete");
-const editTitleMsg = gettext("Edit");
+const msgSearchPlaceholder = gettext("Search...");
+const msgOpenTitle = gettext("Open");
+const msgDeleteTitle = gettext("Delete");
+const msgEditTitle = gettext("Edit");
+const msgEditOnNewPage = gettext("Edit on a new page");
 
 const loadingCol = () => "...";
 
@@ -180,7 +181,7 @@ export const FeatureGrid = ({
                 goTo("feature_layer.feature.show");
             },
             icon: <OpenIcon />,
-            title: openTitleMsg,
+            title: msgOpenTitle,
             disabled: !selected.length,
             size,
         },
@@ -189,11 +190,11 @@ export const FeatureGrid = ({
     if (!readonly) {
         defActions.push(
             ...[
-                {
-                    onClick: () => {
-                        if (editOnNewPage) {
-                            goTo("feature_layer.feature.update");
-                        } else {
+                <Space.Compact>
+                    <Button
+                        disabled={!selected.length}
+                        size={size}
+                        onClick={() => {
                             const first = selected[0];
                             if (first) {
                                 const featureId = first[
@@ -212,19 +213,29 @@ export const FeatureGrid = ({
                                     },
                                 });
                             }
-                        }
-                    },
-                    icon: <EditIcon />,
-                    title: editTitleMsg,
-                    disabled: !selected.length,
-                    size,
-                },
+                        }}
+                    >
+                        {msgEditTitle}
+                    </Button>
+                    {editOnNewPage && (
+                        <Tooltip title={msgEditOnNewPage} key="leftButton">
+                            <Button
+                                disabled={!selected.length}
+                                size={size}
+                                onClick={() => {
+                                    goTo("feature_layer.feature.update");
+                                }}
+                                icon={<EditInNewpageIcon />}
+                            ></Button>
+                        </Tooltip>
+                    )}
+                </Space.Compact>,
                 {
                     onClick: () => {
                         confirmDelete({ onOk: handleDelete });
                     },
                     icon: <DeleteIcon />,
-                    title: deleteTitleMsg,
+                    title: msgDeleteTitle,
                     danger: true,
                     disabled: !selected.length,
                     size,
@@ -250,7 +261,7 @@ export const FeatureGrid = ({
             >
                 <div>
                     <Input
-                        placeholder={searchPlaceholderMsg}
+                        placeholder={msgSearchPlaceholder}
                         onChange={(e) => setQuery(e.target.value)}
                         allowClear
                         size={size}
