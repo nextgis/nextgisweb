@@ -1,6 +1,6 @@
-import { Button, Modal } from "@nextgisweb/gui/antd";
 import { useEffect, useState } from "react";
 
+import { Button, Modal } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
@@ -62,10 +62,10 @@ export function FeatureEditorModal({
     }, [open_]);
 
     return (
-        <div style={{width: "100%", height: "100%"}}>
+        <>
             <Modal
                 className="ngw-feature-layer-feature-editor-modal"
-                width={undefined}
+                width="" // Do not set the default (520px) width
                 open={open}
                 destroyOnClose
                 footer={null}
@@ -93,6 +93,6 @@ export function FeatureEditorModal({
                 />
             </Modal>
             {contextHolder}
-        </div>
+        </>
     );
 }
