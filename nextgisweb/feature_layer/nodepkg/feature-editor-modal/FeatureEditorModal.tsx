@@ -19,7 +19,7 @@ export interface FeatureEditorModalProps extends ModalProps {
 const msgCancel = gettext("Cancel");
 const msgConfirmTitle = gettext("Are you sure?");
 const msgConfirmContent = gettext(
-    "You have unsaved changes. Do you really want to close this modal?"
+    "Unsaved changes will be lost if you close the window."
 );
 
 export function FeatureEditorModal({

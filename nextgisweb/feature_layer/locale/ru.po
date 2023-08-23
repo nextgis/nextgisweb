@@ -184,9 +184,17 @@ msgstr "Право"
 msgid "Top"
 msgstr "Верх"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:18
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:19
 msgid "Cancel"
 msgstr "Отмена"
+
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:20
+msgid "Are you sure?"
+msgstr "Вы уверены?"
+
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:21
+msgid "Unsaved changes will be lost if you close the window."
+msgstr "Несохраненные изменения будут потеряны, если вы закроете окно."
 
 #: nodepkg/feature-editor/FeatureEditorStore.ts:21
 msgid "Feature saved"
@@ -219,6 +227,10 @@ msgstr "Удалить"
 #: nodepkg/feature-grid/FeatureGrid.tsx:61
 msgid "Edit"
 msgstr "Редактировать"
+
+#: nodepkg/feature-grid/FeatureGrid.tsx:62
+msgid "Edit on a new page"
+msgstr "Редактировать на новой странице"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:104 view.py:115
 #: view.py:198
@@ -314,3 +326,4 @@ msgstr ""
 #: view.py:185
 msgid "Features"
 msgstr "Объекты"
+
