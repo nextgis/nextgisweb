@@ -25,6 +25,12 @@ class Feature:
     def id(self):
         return self._id
 
+    @id.setter
+    def id(self, value):
+        if self._id is not None:
+            raise ValueError("Existing feature ID can't be changed.")
+        self._id = value
+
     @property
     def label(self):
         if self._layer and self._layer.feature_label_field:

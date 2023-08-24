@@ -425,7 +425,7 @@ def mvt(
         gdal.Unlink(vsibuf)
 
 
-def deserialize(feat, data, geom_format='wkt', dt_format='obj', transformer=None):
+def deserialize(feat, data, geom_format='wkt', dt_format='obj', transformer=None, create=False):
     if 'geom' in data:
         try:
             if geom_format == 'wkt':
@@ -488,6 +488,9 @@ def deserialize(feat, data, geom_format='wkt', dt_format='obj', transformer=None
                     fval = val
 
                 feat.fields[fld.keyname] = fval
+
+    if create:
+        feat.id = feat.layer.feature_create(feat)
 
     if 'extensions' in data:
         for identity, cls in FeatureExtension.registry.items():
@@ -838,10 +841,9 @@ def cpost(resource, request) -> JSONType:
         dsrlz_params['transformer'] = Transformer(srs_from.wkt, resource.srs.wkt)
 
     feature = Feature(layer=resource)
-    deserialize(feature, request.json_body, **dsrlz_params)
-    fid = resource.feature_create(feature)
+    deserialize(feature, request.json_body, create=True, **dsrlz_params)
 
-    return dict(id=fid)
+    return dict(id=feature.id)
 
 
 def cpatch(resource, request) -> JSONType:
@@ -863,14 +865,12 @@ def cpatch(resource, request) -> JSONType:
         if 'id' not in fdata:
             # Create new feature
             feature = Feature(layer=resource)
-            deserialize(feature, fdata, **dsrlz_params)
-            fid = resource.feature_create(feature)
+            deserialize(feature, fdata, create=True, **dsrlz_params)
         else:
             # Update existing feature
-            fid = fdata['id']
             query = resource.feature_query()
             query.geom()
-            query.filter_by(id=fid)
+            query.filter_by(id=fdata['id'])
             query.limit(1)
 
             feature = None
@@ -880,7 +880,7 @@ def cpatch(resource, request) -> JSONType:
             deserialize(feature, fdata, **dsrlz_params)
             resource.feature_put(feature)
 
-        result.append(dict(id=fid))
+        result.append(dict(id=feature.id))
 
     return result
 
