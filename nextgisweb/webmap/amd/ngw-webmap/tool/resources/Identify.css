@@ -17,49 +17,59 @@
     border-radius: 0;
 }
 
-.ngwWebmapToolIdentify-controller .dijitToggleButton:first-child .dijitButtonNode,
+.ngwWebmapToolIdentify-controller
+    .dijitToggleButton:first-child
+    .dijitButtonNode,
 .ngwWebmapToolIdentify-controller .dijitButton:first-child .dijitButtonNode {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
 }
 
-.ngwWebmapToolIdentify-controller .dijitToggleButton:last-child .dijitButtonNode,
+.ngwWebmapToolIdentify-controller
+    .dijitToggleButton:last-child
+    .dijitButtonNode,
 .ngwWebmapToolIdentify-controller .dijitButton:last-child .dijitButtonNode {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
 
-
-.ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode .dijitButtonText,
-.ngwWebmapToolIdentify-controller .dijitButton .dijitButtonNode .dijitButtonText {
+.ngwWebmapToolIdentify-controller
+    .dijitToggleButton
+    .dijitButtonNode
+    .dijitButtonText,
+.ngwWebmapToolIdentify-controller
+    .dijitButton
+    .dijitButtonNode
+    .dijitButtonText {
     padding: 1px 2px;
 }
 
 /* На кнопках без подписи прячем элемент подписи совсем */
 
-.dijitButton.no-label .dijitButtonText { display: none; }
+.dijitButton.no-label .dijitButtonText {
+    display: none;
+}
 
 .ngwPopup__coordinates,
-.claro .ngwPopup__coordinates{
+.claro .ngwPopup__coordinates {
     box-sizing: border-box;
     width: 100% !important;
     padding: 3px 3px 2px 2px;
 }
 
-.ngwPopup__coordinates-copy{
+.ngwPopup__coordinates-copy {
     float: right;
     margin-top: 3px;
 }
 
 .ngwPopup__coordinates-copy svg.icon {
-  font-size: 16px;
+    font-size: 16px;
 }
 
-
-.ngwPopup__coordinates .coordinate-switcher{
+.ngwPopup__coordinates .coordinate-switcher {
     margin-left: -2px;
 }
 
-.ngwPopup__features{
+.ngwPopup__features {
     border-bottom: 1px solid #efefef;
 }

@@ -1,26 +1,20 @@
 define([
-    'dojo/_base/declare',
-    "dojo/on",
+    "dojo/_base/declare",
     "dojo/dom-construct",
-    'dijit/form/ToggleButton'
-], function (
-    declare,
-    on,
-    domConstruct,
-    ToggleButton
-) {
+    "dijit/form/ToggleButton",
+], function (declare, domConstruct, ToggleButton) {
     return declare(ToggleButton, {
         content: "content",
-        constructor: function(options){
+        constructor: function (options) {
             this.inherited(arguments);
-            declare.safeMixin(this,options);
+            declare.safeMixin(this, options);
         },
-        postCreate: function(){
-            if (this.tool.customIcon){
+        postCreate: function () {
+            if (this.tool.customIcon) {
                 domConstruct.destroy(this.iconNode);
                 this.iconNode = domConstruct.toDom(this.tool.customIcon);
                 this.titleNode.appendChild(this.iconNode);
             }
-        }
+        },
     });
 });

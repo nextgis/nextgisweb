@@ -1,17 +1,11 @@
-define([
-    "dojo/_base/declare"
-], function (
-    declare
-) {
+define(["dojo/_base/declare"], function (declare) {
     return declare([], {
         constructor: function (options) {
             declare.safeMixin(this, options);
         },
 
-        postCreate: function () {
-        },
+        postCreate: function () {},
 
-        startup: function () {
-        }
+        startup: function () {},
     });
 });

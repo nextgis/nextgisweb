@@ -241,7 +241,7 @@ define([
     });
 
     return declare([_PluginBase], {
-        constructor: function (options) {
+        constructor: function () {
             this.tabContainer = new TabContainer({
                 region: "bottom",
                 style: "height: 45%",
@@ -328,7 +328,7 @@ define([
                 plugin: this,
                 onClose: lang.hitch(this, function () {
                     delete this._openedLayersById[layerId];
-                    if (this.tabContainer.getChildren().length == 1) {
+                    if (this.tabContainer.getChildren().length === 1) {
                         this.display.mapContainer.removeChild(
                             this.tabContainer
                         );

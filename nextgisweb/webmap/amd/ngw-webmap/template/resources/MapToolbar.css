@@ -1,57 +1,52 @@
 .claro .map-toolbar .dijitButton,
 .claro .map-toolbar .dijitToggleButton,
 .claro .map-toolbar .dijitDropDownButton,
-.claro .map-toolbar .dijitComboButton{
+.claro .map-toolbar .dijitComboButton {
     margin: 0;
 }
 
-
-.claro .control-pane--bottom .map-toolbar .ol-control{
+.claro .control-pane--bottom .map-toolbar .ol-control {
     position: relative;
     display: inline-block;
     vertical-align: middle;
     margin-left: 6px;
     z-index: 10;
 }
-    .claro .control-pane--bottom .map-toolbar .ol-control:first-child{
-        margin-left: 0;
-    }
+.claro .control-pane--bottom .map-toolbar .ol-control:first-child {
+    margin-left: 0;
+}
 
-.claro .control-pane--top .map-toolbar .ol-control{
+.claro .control-pane--top .map-toolbar .ol-control {
     margin-top: 8px;
 }
-    .claro .control-pane--top .map-toolbar .ol-control:first-child{
-        margin-top: 0;
-    }
+.claro .control-pane--top .map-toolbar .ol-control:first-child {
+    margin-top: 0;
+}
 
-    .claro .map-toolbar .ol-control .dijitButtonNode{
-        padding: 0;
-        border: 0;
-        width: 30px;
-        height: 30px;
-        line-height: 30px;
-        background: #fff;
-        color: var(--primary);
-        fill: var(--primary);
-        box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
-        transition: none;
-        text-shadow: none;
-    }
+.claro .map-toolbar .ol-control .dijitButtonNode {
+    padding: 0;
+    border: 0;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    background: #fff;
+    color: var(--primary);
+    fill: var(--primary);
+    box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+    transition: none;
+    text-shadow: none;
+}
 
-    .claro .map-toolbar .ol-control .dijitButtonNode:hover{
-        background: #f9fafb;
-    }
+.claro .map-toolbar .ol-control .dijitButtonNode:hover {
+    background: #f9fafb;
+}
 
-    .claro .map-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode{
-        background: var(--primary);
-        color: #fff;
-        fill: #fff;
-    }
+.claro .map-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode {
+    background: var(--primary);
+    color: #fff;
+    fill: #fff;
+}
 
-    .claro .map-toolbar .ol-control .dijitButtonNode .dijitButtonContents{
-        display: inline-block;
-    }
-
-
-
-
+.claro .map-toolbar .ol-control .dijitButtonNode .dijitButtonContents {
+    display: inline-block;
+}

@@ -1,16 +1,21 @@
 define(function () {
     return {
-
         getURLParams: function () {
             var params = {};
-            window.location.href.replace(/[?&]+(\w+)([^&]*)/gi, function (m, key) {
-                params[key] = true;
-                return ""; // does not matter
-            });
-            window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
-                params[key] = decodeURIComponent(value);
-                return ""; // does not matter
-            });
+            window.location.href.replace(
+                /[?&]+(\w+)([^&]*)/gi,
+                function (m, key) {
+                    params[key] = true;
+                    return ""; // does not matter
+                }
+            );
+            window.location.href.replace(
+                /[?&]+([^=&]+)=([^&]*)/gi,
+                function (m, key, value) {
+                    params[key] = decodeURIComponent(value);
+                    return ""; // does not matter
+                }
+            );
             return params;
         },
 
@@ -21,8 +26,10 @@ define(function () {
                 var urlParams = this.getURLParams();
                 var existUrlParam = urlParams[name];
                 if (existUrlParam) {
-                    search = location.search.replace(new RegExp("([?|&]" + name + "=)" + "(.+?)(&|$)"),
-                        "$1" + urlComponent + "$3");
+                    search = location.search.replace(
+                        new RegExp("([?|&]" + name + "=)" + "(.+?)(&|$)"),
+                        "$1" + urlComponent + "$3"
+                    );
                 } else if (location.search.length) {
                     search = location.search + "&" + name + "=" + urlComponent;
                 } else {
@@ -30,7 +37,10 @@ define(function () {
                 }
                 var params = {};
                 params[name] = value;
-                var data = { state: { url: search, params: params }, url: search };
+                var data = {
+                    state: { url: search, params: params },
+                    url: search,
+                };
                 this._pushState(data);
                 return data;
             } else {
@@ -43,7 +53,8 @@ define(function () {
             var rtn = sourceUrl.split("?")[0];
             var param;
             var paramsArr;
-            var queryString = (sourceUrl.indexOf("?") !== -1) ? sourceUrl.split("?")[1] : "";
+            var queryString =
+                sourceUrl.indexOf("?") !== -1 ? sourceUrl.split("?")[1] : "";
             if (queryString !== "") {
                 paramsArr = queryString.split("&");
                 for (var i = paramsArr.length - 1; i >= 0; i -= 1) {
@@ -65,6 +76,6 @@ define(function () {
             if (history) {
                 history.replaceState(data.state, document.title, data.url);
             }
-        }
-    }
+        },
+    };
 });

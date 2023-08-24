@@ -1,8 +1,4 @@
-define([
-    "dojo/_base/declare"
-], function (
-    declare
-) {
+define(["dojo/_base/declare"], function (declare) {
     return declare(null, {
         display: null,
 
@@ -12,12 +8,8 @@ define([
             declare.safeMixin(this, options);
         },
 
-        activate: function () {
+        activate: function () {},
 
-        },
-
-        deactivate: function () {
-            
-        }
+        deactivate: function () {},
     });
 });

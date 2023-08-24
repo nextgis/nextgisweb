@@ -1,13 +1,13 @@
 .ol-dragzoom {
-  border-color: rgb(7, 109, 191);
+    border-color: rgb(7, 109, 191);
 }
 
 .viewer-info {
-  display: inline-block;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  left: -3px;
-  top: -1px;
-  z-index: 1;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    left: -3px;
+    top: -1px;
+    z-index: 1;
 }

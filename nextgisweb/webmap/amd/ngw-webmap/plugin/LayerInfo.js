@@ -4,13 +4,7 @@ define([
     "dojo/dom-construct",
     "dijit/layout/ContentPane",
     "@nextgisweb/pyramid/i18n!",
-], function (
-    declare,
-    _PluginBase,
-    domConstruct,
-    ContentPane,
-    i18n
-) {
+], function (declare, _PluginBase, domConstruct, ContentPane, i18n) {
     var Pane = declare([ContentPane], {
         closable: true,
         iconClass: "iconDescription",
@@ -34,7 +28,10 @@ define([
             var type = nodeData.type;
             var data = this.display.get("itemConfig").plugin[this.identity];
             return {
-                enabled: type === "layer" && nodeData.plugin[this.identity] && data.description,
+                enabled:
+                    type === "layer" &&
+                    nodeData.plugin[this.identity] &&
+                    data.description,
             };
         },
 

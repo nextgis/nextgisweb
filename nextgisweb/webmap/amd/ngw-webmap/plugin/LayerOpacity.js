@@ -2,11 +2,7 @@ define([
     "dojo/_base/declare",
     "./_PluginBase",
     "@nextgisweb/webmap/layer-opacity-slider",
-], function (
-    declare,
-    _PluginBase,
-    LayerOpacitySlider
-) {
+], function (declare, _PluginBase, LayerOpacitySlider) {
     return declare([_PluginBase], {
         getPluginState: function (nodeData) {
             return {

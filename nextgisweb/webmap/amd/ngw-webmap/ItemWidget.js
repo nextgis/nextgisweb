@@ -51,7 +51,7 @@ define([
     "ngw-webmap/form/LegendSymbolsSelect",
 
     //css
-    "xstyle/css!./template/resources/ItemWidget.css"
+    "xstyle/css!./template/resources/ItemWidget.css",
 ], function (
     declare,
     array,
@@ -105,17 +105,31 @@ define([
 
             this.ordinalWidget = new OrdinalWidget({
                 region: "center",
-                columns: [{
-                    field: this.labelField,
-                    sortable: false
-                }],
+                columns: [
+                    {
+                        field: this.labelField,
+                        sortable: false,
+                    },
+                ],
                 showHeader: false,
-                class: "layer-order__grid layer-order__grid--faded"
+                class: "layer-order__grid layer-order__grid--faded",
             });
 
-            aspect.after(this.store, "onNew", lang.hitch(this, this.setOrdinalWidgetStore));
-            aspect.after(this.store, "onDelete", lang.hitch(this, this.setOrdinalWidgetStore));
-            aspect.after(this.store, "onSet", lang.hitch(this, this.setOrdinalWidgetStore));
+            aspect.after(
+                this.store,
+                "onNew",
+                lang.hitch(this, this.setOrdinalWidgetStore)
+            );
+            aspect.after(
+                this.store,
+                "onDelete",
+                lang.hitch(this, this.setOrdinalWidgetStore)
+            );
+            aspect.after(
+                this.store,
+                "onSet",
+                lang.hitch(this, this.setOrdinalWidgetStore)
+            );
         },
 
         buildRendering: function () {
@@ -123,52 +137,83 @@ define([
 
             this.container = new BorderContainer({
                 style: "width: 400px; height: 300px",
-                class: "layer-order"
+                class: "layer-order",
             }).placeAt(this);
 
-            domConstruct.place(this.ordinalWidget.domNode, this.container.domNode);
+            domConstruct.place(
+                this.ordinalWidget.domNode,
+                this.container.domNode
+            );
 
-            this.actionBar = domConstruct.create("div", {
-                class: "dijitDialogPaneActionBar"
-            }, this.containerNode);
+            this.actionBar = domConstruct.create(
+                "div",
+                {
+                    class: "dijitDialogPaneActionBar",
+                },
+                this.containerNode
+            );
 
-            this.checkboxContainer = domConstruct.create("div", {
-                style: "float: left; margin-top: 3px"
-            }, this.actionBar);
+            this.checkboxContainer = domConstruct.create(
+                "div",
+                {
+                    style: "float: left; margin-top: 3px",
+                },
+                this.actionBar
+            );
 
-            this.chckbxEnabled =  new CheckBox({
+            this.chckbxEnabled = new CheckBox({
                 id: "layerOrderEnabled",
-                name: "layerOrderEnabled"
+                name: "layerOrderEnabled",
             }).placeAt(this.checkboxContainer);
 
-            this.checkboxContainer.appendChild(domConstruct.create("label", {
-                for : "layerOrderEnabled",
-                style: "vertical-align: middle; padding-left: 4px;",
-                innerHTML: i18n.gettext("Use on the map")
-            }));
+            this.checkboxContainer.appendChild(
+                domConstruct.create("label", {
+                    for: "layerOrderEnabled",
+                    style: "vertical-align: middle; padding-left: 4px;",
+                    innerHTML: i18n.gettext("Use on the map"),
+                })
+            );
 
             this.btnOk = new Button({
                 label: i18n.gettext("Save"),
-                onClick: lang.hitch(this, this.save)
+                onClick: lang.hitch(this, this.save),
             }).placeAt(this.actionBar);
         },
 
         postCreate: function () {
             this.inherited(arguments);
 
-            this.watch("enabled", lang.hitch(this, function (attr, oval, nval) {
-                this.chckbxEnabled.set("checked", nval);
-            }));
+            this.watch(
+                "enabled",
+                lang.hitch(this, function (attr, oval, nval) {
+                    this.chckbxEnabled.set("checked", nval);
+                })
+            );
 
-            this.chckbxEnabled.watch("checked", lang.hitch(this, function (attr, oval, nval) {
-                if (nval) {
-                    domClass.add(this.widget.btnLayerOrder.domNode, "dijitButton--signal-active");
-                    domClass.remove(this.ordinalWidget.domNode, "layer-order__grid--faded");
-                } else {
-                    domClass.remove(this.widget.btnLayerOrder.domNode, "dijitButton--signal-active");
-                    domClass.add(this.ordinalWidget.domNode, "layer-order__grid--faded");
-                }
-            }));
+            this.chckbxEnabled.watch(
+                "checked",
+                lang.hitch(this, function (attr, oval, nval) {
+                    if (nval) {
+                        domClass.add(
+                            this.widget.btnLayerOrder.domNode,
+                            "dijitButton--signal-active"
+                        );
+                        domClass.remove(
+                            this.ordinalWidget.domNode,
+                            "layer-order__grid--faded"
+                        );
+                    } else {
+                        domClass.remove(
+                            this.widget.btnLayerOrder.domNode,
+                            "dijitButton--signal-active"
+                        );
+                        domClass.add(
+                            this.ordinalWidget.domNode,
+                            "layer-order__grid--faded"
+                        );
+                    }
+                })
+            );
         },
 
         onHide: function () {
@@ -177,11 +222,13 @@ define([
         },
 
         createOrderedStore: function (store) {
-            return new Observable(new OrderedStore({
-                data: store.data,
-                idProperty: store.idProperty,
-                ordinal: this.ordinal
-            }));
+            return new Observable(
+                new OrderedStore({
+                    data: store.data,
+                    idProperty: store.idProperty,
+                    ordinal: this.ordinal,
+                })
+            );
         },
 
         setOrdinalWidgetStore: function () {
@@ -195,27 +242,33 @@ define([
                 onItem: function (item) {
                     var element = {
                         "id": this.store.getIdentity(item),
-                        "label": this.store.getValue(item, "display_name")
+                        "label": this.store.getValue(item, "display_name"),
                     };
-                    element[this.ordinal] = this.store.getValue(item, this.layerOrdinal) ||
-                                            this.store.getIdentity(item);
+                    element[this.ordinal] =
+                        this.store.getValue(item, this.layerOrdinal) ||
+                        this.store.getIdentity(item);
                     data.push(element);
                 },
                 onComplete: function () {
                     deferred.resolve(data);
-                }
+                },
             });
 
-            deferred.promise.then(lang.hitch(this, function (data) {
-                var store = new Memory({ data: data });
-                this.ordinalWidget.set("store", this.createOrderedStore(store));
-            }));
+            deferred.promise.then(
+                lang.hitch(this, function (data) {
+                    var store = new Memory({ data: data });
+                    this.ordinalWidget.set(
+                        "store",
+                        this.createOrderedStore(store)
+                    );
+                })
+            );
         },
 
         save: function () {
             var i = 1;
 
-            this.ordinalWidget.store.query({}, {}).forEach(function(item) {
+            this.ordinalWidget.store.query({}, {}).forEach(function (item) {
                 item[this.ordinal] = i;
                 i += 1;
             }, this);
@@ -229,296 +282,453 @@ define([
                         item,
                         this.layerOrdinal,
                         this.ordinalWidget.store.get(
-                            this.store.getIdentity(item))[this.ordinal],
+                            this.store.getIdentity(item)
+                        )[this.ordinal],
                         false // callOnSet
                     );
                 },
                 onComplete: function () {
                     this.hide();
-                }
+                },
             });
 
             this.set("enabled", this.chckbxEnabled.get("checked"));
-        }
+        },
     });
 
-    return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: i18n.renderTemplate(template),
-        title: i18n.gettext("Layers"),
-        activateOn: { update: true },
-        order: -50,
+    return declare(
+        [
+            ContentPane,
+            serialize.Mixin,
+            _TemplatedMixin,
+            _WidgetsInTemplateMixin,
+        ],
+        {
+            templateString: i18n.renderTemplate(template),
+            title: i18n.gettext("Layers"),
+            activateOn: { update: true },
+            order: -50,
 
-        constructor: function () {
-            this.itemStore = new ItemFileWriteStore({data: {
-                items: [{item_type: "root"}]
-            }});
+            constructor: function () {
+                this.itemStore = new ItemFileWriteStore({
+                    data: {
+                        items: [{ item_type: "root" }],
+                    },
+                });
 
-            this.itemModel = new TreeStoreModel({
-                store: this.itemStore,
-                query: {}
-            });
+                this.itemModel = new TreeStoreModel({
+                    store: this.itemStore,
+                    query: {},
+                });
 
-            var widget = this;
+                var widget = this;
 
-            this.widgetTree = new Tree({
-                model: this.itemModel,
-                showRoot: false,
-                getLabel: function (item) { return item.display_name; },
-                getIconClass: function(item, opened){
-                    return item.item_type == "group" ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : "dijitLeaf";
-                },
-                persist: false,
-                dndController: dndSource,
-                checkItemAcceptance: function (node, source, position) {
-                    var item = registry.getEnclosingWidget(node).item,
-                        item_type = widget.itemStore.getValue(item, "item_type");
-                    // Block possibility to drag an element inside the layer
-                    // drag-n-drop can be done only for groups
-                    return item_type === "group" || (item_type === "layer" && position !== "over");
-                },
-                betweenThreshold: 5
-            });
+                this.widgetTree = new Tree({
+                    model: this.itemModel,
+                    showRoot: false,
+                    getLabel: function (item) {
+                        return item.display_name;
+                    },
+                    getIconClass: function (item, opened) {
+                        return item.item_type === "group"
+                            ? opened
+                                ? "dijitFolderOpened"
+                                : "dijitFolderClosed"
+                            : "dijitLeaf";
+                    },
+                    persist: false,
+                    dndController: dndSource,
+                    checkItemAcceptance: function (node, source, position) {
+                        var item = registry.getEnclosingWidget(node).item,
+                            item_type = widget.itemStore.getValue(
+                                item,
+                                "item_type"
+                            );
+                        // Block possibility to drag an element inside the layer
+                        // drag-n-drop can be done only for groups
+                        return (
+                            item_type === "group" ||
+                            (item_type === "layer" && position !== "over")
+                        );
+                    },
+                    betweenThreshold: 5,
+                });
 
-            this.adaptersStore = new ObjectStore({
-                objectStore: new Memory({
-                    data: array.map(Object.keys(settings.adapters), function (key) {
-                        return {
-                            id: key,
-                            label: i18n.gettext(settings.adapters[key].display_name)
-                        };
+                this.adaptersStore = new ObjectStore({
+                    objectStore: new Memory({
+                        data: array.map(
+                            Object.keys(settings.adapters),
+                            function (key) {
+                                return {
+                                    id: key,
+                                    label: i18n.gettext(
+                                        settings.adapters[key].display_name
+                                    ),
+                                };
+                            }
+                        ),
+                    }),
+                });
+
+                this.layerOrder = new LayerOrder({
+                    store: this.itemStore,
+                    widget: this,
+                });
+            },
+
+            postCreate: function () {
+                this.inherited(arguments);
+
+                // Adapters list
+                this.wLayerAdapter.set("store", this.adaptersStore);
+
+                // Create tree without model is not possible, so create it manually
+                this.widgetTree.placeAt(this.containerTree).startup();
+
+                var widget = this;
+
+                // Add new group
+                this.btnAddGroup.on("click", function () {
+                    widget.itemStore.newItem(
+                        {
+                            display_name: i18n.gettext("Add group"),
+                            item_type: "group",
+                            group_expanded: null,
+                        },
+                        {
+                            parent: widget.getAddParent(),
+                            attribute: "children",
+                        }
+                    );
+                });
+
+                // Add new layer
+                this.btnAddLayer.on(
+                    "click",
+                    lang.hitch(this, function () {
+                        this.layerPicker.pick().then(
+                            lang.hitch(this, function (itm) {
+                                var resourceId = itm.id;
+                                var addItem = function (naming) {
+                                    this.itemStore.newItem(
+                                        {
+                                            "item_type": "layer",
+                                            "display_name": naming.display_name,
+                                            "layer_style_id": resourceId,
+                                            "layer_enabled": true,
+                                            "layer_identifiable": true,
+                                            "layer_transparency": null,
+                                            "layer_min_scale_denom": null,
+                                            "layer_max_scale_denom": null,
+                                            "layer_adapter": "image",
+                                            "legend_symbols": null,
+                                        },
+                                        {
+                                            parent: widget.getAddParent(),
+                                            attribute: "children",
+                                        }
+                                    );
+                                }.bind(this);
+
+                                if (itm.cls.endsWith("_style")) {
+                                    // For resources with the "_style" suffix use a parent
+                                    // resource as a naming source.
+                                    api.route("resource.item", itm.parent.id)
+                                        .get()
+                                        .then(function (data) {
+                                            addItem(data.resource);
+                                        });
+                                } else addItem(itm);
+                            })
+                        );
                     })
-                })
-            });
+                );
 
-            this.layerOrder = new LayerOrder({
-                store: this.itemStore,
-                widget: this
-            });
-        },
+                // Remove a group or a layer
+                this.btnDeleteItem.on("click", function () {
+                    widget.itemStore.deleteItem(widget.widgetTree.selectedItem);
+                    widget.treeLayoutContainer.removeChild(widget.itemPane);
+                    widget.btnDeleteItem.set("disabled", true);
+                });
 
-        postCreate: function () {
-            this.inherited(arguments);
+                // Set up layer ordering
+                this.btnLayerOrder.on(
+                    "click",
+                    lang.hitch(this, function () {
+                        this.layerOrder.show();
+                    })
+                );
 
-            // Adapters list
-            this.wLayerAdapter.set("store", this.adaptersStore);
+                this.widgetTree.watch(
+                    "selectedItem",
+                    function (attr, oldValue, newValue) {
+                        if (newValue) {
+                            // On change of selected element move values to widgets
+                            // and show needed panel: one for layers, another for groups.
+                            if (newValue.item_type === "group") {
+                                widget.widgetItemDisplayNameGroup.set(
+                                    "value",
+                                    widget.getItemValue("display_name")
+                                );
+                                widget.widgetProperties.selectChild(
+                                    widget.paneGroup
+                                );
+                                widget.widgetItemGroupExpanded.set(
+                                    "checked",
+                                    widget.getItemValue("group_expanded")
+                                );
+                            } else if (newValue.item_type === "layer") {
+                                widget.widgetItemDisplayNameLayer.set(
+                                    "value",
+                                    widget.getItemValue("display_name")
+                                );
+                                widget.widgetProperties.selectChild(
+                                    widget.paneLayer
+                                );
+                                widget.wdgtItemLayerEnabled.set(
+                                    "checked",
+                                    widget.getItemValue("layer_enabled")
+                                );
+                                widget.wdgtItemLayerIdentifiable.set(
+                                    "checked",
+                                    widget.getItemValue("layer_identifiable")
+                                );
+                                widget.wLayerTransparency.set(
+                                    "value",
+                                    widget.getItemValue("layer_transparency")
+                                );
+                                widget.wLayerMinScale.set(
+                                    "value",
+                                    widget.getItemValue("layer_min_scale_denom")
+                                );
+                                widget.wLayerMaxScale.set(
+                                    "value",
+                                    widget.getItemValue("layer_max_scale_denom")
+                                );
+                                widget.wLayerAdapter.set(
+                                    "value",
+                                    widget.getItemValue("layer_adapter")
+                                );
+                                widget.wLayerLegend.set(
+                                    "value",
+                                    widget.getItemValue("legend_symbols")
+                                );
+                                widget.wLayerStyle.set(
+                                    "value",
+                                    widget.getItemValue("layer_style_id")
+                                );
+                            }
 
-            // Create tree without model is not possible, so create it manually
-            this.widgetTree.placeAt(this.containerTree).startup();
+                            // Initially the side panel with current element properties is
+                            // hidden. As the element is selected - open it up.
+                            if (!oldValue) {
+                                domStyle.set(
+                                    widget.itemPane.domNode,
+                                    "display",
+                                    "block"
+                                );
+                                widget.treeLayoutContainer.addChild(
+                                    widget.itemPane
+                                );
+                            }
 
-            var widget = this;
-
-            // Add new group
-            this.btnAddGroup.on("click", function () {
-                widget.itemStore.newItem(
-                    {
-                        display_name: i18n.gettext("Add group"),
-                        item_type: "group",
-                        group_expanded: null
-                    }, {
-                        parent: widget.getAddParent(),
-                        attribute: "children"
+                            // Activate layer/group deletion button
+                            widget.btnDeleteItem.set("disabled", false);
+                        }
                     }
                 );
-            });
 
-            // Add new layer
-            this.btnAddLayer.on("click", lang.hitch(this, function () {
-                this.layerPicker.pick().then(lang.hitch(this, function (itm) {
-                    var resourceId = itm.id;
-                    var addItem = function (naming) {
-                        this.itemStore.newItem({
-                                "item_type": "layer",
-                                "display_name": naming.display_name,
-                                "layer_style_id": resourceId,
-                                "layer_enabled": true,
-                                "layer_identifiable": true,
-                                "layer_transparency": null,
-                                "layer_min_scale_denom": null,
-                                "layer_max_scale_denom": null,
-                                "layer_adapter": "image",
-                                "legend_symbols": null,
-                            }, {
-                                parent: widget.getAddParent(),
-                                attribute: "children"
-                            }
-                        );
-                    }.bind(this);
-
-                    if (itm.cls.endsWith('_style')) {
-                        // For resources with the "_style" suffix use a parent
-                        // resource as a naming source.
-                        api.route('resource.item', itm.parent.id).get().then(
-                            function (data) { addItem(data.resource) }
-                        )
-                    } else addItem(itm);
-                }));
-            }));
-
-            // Remove a group or a layer
-            this.btnDeleteItem.on("click", function() {
-                widget.itemStore.deleteItem(widget.widgetTree.selectedItem);
-                widget.treeLayoutContainer.removeChild(widget.itemPane);
-                widget.btnDeleteItem.set("disabled", true);
-            });
-
-            // Set up layer ordering
-            this.btnLayerOrder.on("click", lang.hitch(this, function () {
-                this.layerOrder.show();
-            }));
-
-            this.widgetTree.watch("selectedItem", function (attr, oldValue, newValue) {
-                if (newValue) {
-                    // On change of selected element move values to widgets
-                    // and show needed panel: one for layers, another for groups.
-                    if (newValue.item_type == "group") {
-                        widget.widgetItemDisplayNameGroup.set("value", widget.getItemValue("display_name"));
-                        widget.widgetProperties.selectChild(widget.paneGroup);
-                        widget.widgetItemGroupExpanded.set("checked", widget.getItemValue("group_expanded"));
-                    } else if (newValue.item_type == "layer") {
-                        widget.widgetItemDisplayNameLayer.set("value", widget.getItemValue("display_name"));
-                        widget.widgetProperties.selectChild(widget.paneLayer);
-                        widget.wdgtItemLayerEnabled.set("checked", widget.getItemValue("layer_enabled"));
-                        widget.wdgtItemLayerIdentifiable.set("checked", widget.getItemValue("layer_identifiable"));
-                        widget.wLayerTransparency.set("value", widget.getItemValue("layer_transparency"));
-                        widget.wLayerMinScale.set("value", widget.getItemValue("layer_min_scale_denom"));
-                        widget.wLayerMaxScale.set("value", widget.getItemValue("layer_max_scale_denom"));
-                        widget.wLayerAdapter.set("value", widget.getItemValue("layer_adapter"));
-                        widget.wLayerLegend.set("value", widget.getItemValue("legend_symbols"));
-                        widget.wLayerStyle.set("value", widget.getItemValue("layer_style_id"));
+                // When values are changed - move them to the model
+                this.widgetItemDisplayNameGroup.watch(
+                    "value",
+                    function (attr, oldValue, newValue) {
+                        widget.setItemValue("display_name", newValue);
                     }
+                );
 
-                    // Initially the side panel with current element properties is 
-                    // hidden. As the element is selected - open it up.
-                    if (!oldValue) {
-                        domStyle.set(widget.itemPane.domNode, "display", "block");
-                        widget.treeLayoutContainer.addChild(widget.itemPane);
+                this.widgetItemDisplayNameLayer.watch(
+                    "value",
+                    function (attr, oldValue, newValue) {
+                        widget.setItemValue("display_name", newValue);
                     }
+                );
 
-                    // Activate layer/group deletion button
-                    widget.btnDeleteItem.set("disabled", false);
+                // NB: "checked", "value" doesn't work
+                this.widgetItemGroupExpanded.watch(
+                    "checked",
+                    function (attr, oldValue, newValue) {
+                        widget.setItemValue("group_expanded", newValue);
+                    }
+                );
+
+                // NB: "checked", "value" doesn't work
+                this.wdgtItemLayerEnabled.watch(
+                    "checked",
+                    function (attr, oldValue, newValue) {
+                        widget.setItemValue("layer_enabled", newValue);
+                    }
+                );
+
+                this.wdgtItemLayerIdentifiable.watch(
+                    "checked",
+                    function (attr, oldValue, newValue) {
+                        widget.setItemValue("layer_identifiable", newValue);
+                    }
+                );
+
+                this.wLayerTransparency.watch(
+                    "value",
+                    function (attr, oldVal, newVal) {
+                        widget.setItemValue("layer_transparency", newVal);
+                    }
+                );
+
+                this.wLayerMinScale.watch(
+                    "value",
+                    function (attr, oldVal, newVal) {
+                        widget.setItemValue("layer_min_scale_denom", newVal);
+                    }
+                );
+
+                this.wLayerMaxScale.watch(
+                    "value",
+                    function (attr, oldVal, newVal) {
+                        widget.setItemValue("layer_max_scale_denom", newVal);
+                    }
+                );
+
+                this.wLayerAdapter.watch(
+                    "value",
+                    function (attr, oldVal, newVal) {
+                        widget.setItemValue("layer_adapter", newVal);
+                    }
+                );
+
+                this.wLayerLegend.watch("value", function () {
+                    widget.setItemValue(
+                        "legend_symbols",
+                        widget.wLayerLegend.get("value")
+                    );
+                });
+            },
+
+            startup: function () {
+                this.inherited(arguments);
+            },
+
+            getAddParent: function () {
+                if (this.getItemValue("item_type") === "group") {
+                    return this.widgetTree.selectedItem;
+                } else {
+                    return this.itemModel.root;
                 }
-            });
+            },
 
-            // When values are changed - move them to the model
-            this.widgetItemDisplayNameGroup.watch("value", function (attr, oldValue, newValue) {
-                widget.setItemValue("display_name", newValue);
-            });
+            // set current element attribute value
+            setItemValue: function (attr, value) {
+                this.itemStore.setValue(
+                    this.widgetTree.selectedItem,
+                    attr,
+                    value
+                );
+            },
 
-            this.widgetItemDisplayNameLayer.watch("value", function (attr, oldValue, newValue) {
-                widget.setItemValue("display_name", newValue);
-            });
+            // current element attribute value
+            getItemValue: function (attr) {
+                if (this.widgetTree.selectedItem) {
+                    return this.itemStore.getValue(
+                        this.widgetTree.selectedItem,
+                        attr
+                    );
+                }
+            },
 
-            // NB: "checked", "value" doesn't work
-            this.widgetItemGroupExpanded.watch("checked", function (attr, oldValue, newValue) {
-                widget.setItemValue("group_expanded", newValue);
-            });
+            serializeInMixin: function (data) {
+                if (data.webmap === undefined) {
+                    data.webmap = {};
+                }
+                const store = this.itemStore;
 
-            // NB: "checked", "value" doesn't work
-            this.wdgtItemLayerEnabled.watch("checked", function (attr, oldValue, newValue) {
-                widget.setItemValue("layer_enabled", newValue);
-            });
+                data.webmap.draw_order_enabled = this.layerOrder.get("enabled");
+                if (data.webmap.draw_order_enabled) {
+                    this.layerOrder.save();
+                }
 
-            this.wdgtItemLayerIdentifiable.watch("checked", function (attr, oldValue, newValue) {
-                widget.setItemValue("layer_identifiable", newValue);
-            });
+                // There is no simple way to make data dump from itemStore for some rease
+                // so walk through recursively.
+                function traverse(itm) {
+                    return {
+                        item_type: store.getValue(itm, "item_type"),
+                        display_name: store.getValue(itm, "display_name"),
+                        group_expanded: store.getValue(itm, "group_expanded"),
+                        layer_style_id: store.getValue(itm, "layer_style_id"),
+                        layer_enabled: store.getValue(itm, "layer_enabled"),
+                        layer_identifiable: store.getValue(
+                            itm,
+                            "layer_identifiable"
+                        ),
+                        layer_transparency: store.getValue(
+                            itm,
+                            "layer_transparency"
+                        ),
+                        layer_min_scale_denom: store.getValue(
+                            itm,
+                            "layer_min_scale_denom"
+                        ),
+                        layer_max_scale_denom: store.getValue(
+                            itm,
+                            "layer_max_scale_denom"
+                        ),
+                        layer_adapter: store.getValue(itm, "layer_adapter"),
+                        draw_order_position: store.getValue(
+                            itm,
+                            "draw_order_position"
+                        ),
+                        legend_symbols: store.getValue(itm, "legend_symbols"),
+                        children: array.map(
+                            store.getValues(itm, "children"),
+                            function (i) {
+                                return traverse(i);
+                            }
+                        ),
+                    };
+                }
 
-            this.wLayerTransparency.watch("value", function (attr, oldVal, newVal) {
-                widget.setItemValue("layer_transparency", newVal);
-            });
+                data.webmap.root_item = traverse(this.itemModel.root);
+            },
 
-            this.wLayerMinScale.watch("value", function (attr, oldVal, newVal) {
-                widget.setItemValue("layer_min_scale_denom", newVal);
-            });
+            deserializeInMixin: function (data) {
+                var value = data.webmap.root_item;
+                if (value === undefined) {
+                    return;
+                }
 
-            this.wLayerMaxScale.watch("value", function (attr, oldVal, newVal) {
-                widget.setItemValue("layer_max_scale_denom", newVal);
-            });
+                var widget = this;
 
-            this.wLayerAdapter.watch("value", function (attr, oldVal, newVal) {
-                widget.setItemValue("layer_adapter", newVal);
-            });
-            
-            this.wLayerLegend.watch("value", function (attr, oldVal, newVal) {
-                widget.setItemValue("legend_symbols", widget.wLayerLegend.get("value"));
-            });
-        },
-
-        startup: function () {
-            this.inherited(arguments);
-        },
-
-        getAddParent: function () {
-            if (this.getItemValue("item_type") == "group") {
-                return this.widgetTree.selectedItem;
-            } else {
-                return this.itemModel.root;
-            }
-        },
-
-        // set current element attribute value
-        setItemValue: function (attr, value) {
-            this.itemStore.setValue(this.widgetTree.selectedItem, attr, value);
-        },
-
-        // current element attribute value
-        getItemValue: function (attr) {
-            if (this.widgetTree.selectedItem) {
-                return this.itemStore.getValue(this.widgetTree.selectedItem, attr);
-            }
-        },
-
-        serializeInMixin: function (data) {
-            if (data.webmap === undefined) {
-                data.webmap = {};
-            }
-            const store = this.itemStore;
-            
-            data.webmap.draw_order_enabled = this.layerOrder.get("enabled");
-            if (data.webmap.draw_order_enabled) {
-                this.layerOrder.save();
-            }
-
-            // There is no simple way to make data dump from itemStore for some rease
-            // so walk through recursively.
-            function traverse(itm) {
-                return {
-                    item_type: store.getValue(itm, "item_type"),
-                    display_name: store.getValue(itm, "display_name"),
-                    group_expanded: store.getValue(itm, "group_expanded"),
-                    layer_style_id: store.getValue(itm, "layer_style_id"),
-                    layer_enabled: store.getValue(itm, "layer_enabled"),
-                    layer_identifiable: store.getValue(itm, "layer_identifiable"),
-                    layer_transparency: store.getValue(itm, "layer_transparency"),
-                    layer_min_scale_denom: store.getValue(itm, "layer_min_scale_denom"),
-                    layer_max_scale_denom: store.getValue(itm, "layer_max_scale_denom"),
-                    layer_adapter: store.getValue(itm, "layer_adapter"),
-                    draw_order_position: store.getValue(itm, "draw_order_position"),
-                    legend_symbols: store.getValue(itm, "legend_symbols"),
-                    children: array.map(store.getValues(itm, "children"), function (i) { return traverse(i); })
-                };
-            }
-
-            data.webmap.root_item = traverse(this.itemModel.root);
-        },
-
-        deserializeInMixin: function (data) {
-            var value = data.webmap.root_item;
-            if (value === undefined) { return; }
-
-            var widget = this;
-
-            function traverse(item, parent) {
-                array.forEach(item.children, function(i) {
-                    var element = {};
-                    for (var key in i) {
-                        if (key !== "children") { element[key] = i[key]; }
-                    }
-                    var new_item = widget.itemStore.newItem(element, {parent: parent, attribute: "children"});
-                    if (i.children) { traverse(i, new_item); }
-                }, widget);
-            }
-            traverse(value, this.itemModel.root);
-            this.layerOrder.set("enabled", data.webmap.draw_order_enabled);
+                function traverse(item, parent) {
+                    array.forEach(
+                        item.children,
+                        function (i) {
+                            var element = {};
+                            for (var key in i) {
+                                if (key !== "children") {
+                                    element[key] = i[key];
+                                }
+                            }
+                            var new_item = widget.itemStore.newItem(element, {
+                                parent: parent,
+                                attribute: "children",
+                            });
+                            if (i.children) {
+                                traverse(i, new_item);
+                            }
+                        },
+                        widget
+                    );
+                }
+                traverse(value, this.itemModel.root);
+                this.layerOrder.set("enabled", data.webmap.draw_order_enabled);
+            },
         }
-    });
+    );
 });

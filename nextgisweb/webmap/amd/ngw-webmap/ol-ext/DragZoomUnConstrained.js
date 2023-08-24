@@ -1,6 +1,4 @@
-define([
-    'openlayers/ol'
-], function (ol) {
+define(["openlayers/ol"], function (ol) {
     function getCenter(extent) {
         return [(extent[0] + extent[2]) / 2, (extent[1] + extent[3]) / 2];
     }
@@ -9,7 +7,9 @@ define([
         var map = this.getMap(),
             view = map.getView(),
             size = map.getSize(),
-            extent, resolution, center;
+            extent,
+            resolution,
+            center;
 
         extent = this.getGeometry().getExtent();
         resolution = view.getResolutionForExtent(extent, size);
@@ -19,7 +19,7 @@ define([
             resolution: resolution,
             center: center,
             duration: this.duration_,
-            easing: ol.easing.easeOut
+            easing: ol.easing.easeOut,
         });
     }
 
@@ -27,17 +27,19 @@ define([
         function DragZoomUnConstrained() {
             DragBox.call(this, {
                 condition: ol.events.condition.shiftKeyOnly,
-                className: 'ol-dragzoom',
-                onBoxEnd: onBoxEnd
+                className: "ol-dragzoom",
+                onBoxEnd: onBoxEnd,
             });
         }
 
         if (DragBox) DragZoomUnConstrained.__proto__ = DragBox;
-        DragZoomUnConstrained.prototype = Object.create(DragBox && DragBox.prototype);
+        DragZoomUnConstrained.prototype = Object.create(
+            DragBox && DragBox.prototype
+        );
         DragZoomUnConstrained.prototype.constructor = DragZoomUnConstrained;
 
         return DragZoomUnConstrained;
-    }(ol.interaction.DragBox));
+    })(ol.interaction.DragBox);
 
     return DragZoomUnConstrained;
 });

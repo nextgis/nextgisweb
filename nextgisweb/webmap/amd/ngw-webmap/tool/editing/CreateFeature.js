@@ -2,13 +2,8 @@ define([
     "dojo/_base/declare",
     "../Base",
     "@nextgisweb/pyramid/i18n!",
-    "@nextgisweb/pyramid/icon"
-], function (
-    declare,
-    Base,
-    i18n,
-    icon
-) {
+    "@nextgisweb/pyramid/icon",
+], function (declare, Base, i18n, icon) {
     return declare(Base, {
         layerEditor: null,
 
@@ -16,7 +11,10 @@ define([
             declare.safeMixin(this, options);
 
             this.label = i18n.gettext("Create features");
-            this.customIcon = '<span class="ol-control__icon">' + icon.html({glyph: "add_box"}) + '</span>';
+            this.customIcon =
+                '<span class="ol-control__icon">' +
+                icon.html({ glyph: "add_box" }) +
+                "</span>";
         },
 
         activate: function () {
@@ -25,6 +23,6 @@ define([
 
         deactivate: function () {
             this.layerEditor.deactivateCreatingMode();
-        }
+        },
     });
 });

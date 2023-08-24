@@ -1,8 +1,4 @@
-define([
-    "dojo/_base/declare",
-    "dojo/Stateful",
-    "openlayers/ol"
-], function (
+define(["dojo/_base/declare", "dojo/Stateful", "openlayers/ol"], function (
     declare,
     Stateful,
     ol
@@ -11,7 +7,7 @@ define([
         DPI: 1000 / 39.37 / 0.28,
 
         IPM: 39.37,
-        
+
         // limit extent to applying smart zoom
         SMART_ZOOM_EXTENT: 100,
 
@@ -25,15 +21,15 @@ define([
                 olMap = this.olMap,
                 olView = this.olMap.getView();
 
-            olView.on("change:resolution", function (evt) {
+            olView.on("change:resolution", function () {
                 widget.set("resolution", olView.getResolution());
             });
 
-            olView.on("change:center", function (evt) {
+            olView.on("change:center", function () {
                 widget.set("center", olView.getCenter());
             });
 
-            olMap.on("moveend", function (evt) {
+            olMap.on("moveend", function () {
                 widget.set("position", widget.getPosition(), this);
             });
         },
@@ -48,11 +44,11 @@ define([
             delete this.layers[layer.name];
         },
 
-        getScaleForResolution: function(res, mpu) {
+        getScaleForResolution: function (res, mpu) {
             return parseFloat(res) * (mpu * this.IPM * this.DPI);
         },
 
-        getResolutionForScale: function(scale, mpu) {
+        getResolutionForScale: function (scale, mpu) {
             return parseFloat(scale) / (mpu * this.IPM * this.DPI);
         },
 
@@ -60,12 +56,12 @@ define([
             var view = this.olMap.getView();
             var center = view.getCenter();
             var mapCrs = view.getProjection().getCode();
-            if (crs && (crs !== mapCrs)) {
+            if (crs && crs !== mapCrs) {
                 center = ol.proj.transform(center, mapCrs, crs);
             }
             return {
                 zoom: view.getZoom(),
-                center: center
+                center: center,
             };
         },
 
@@ -73,7 +69,7 @@ define([
             var view = this.olMap.getView();
             var extent = view.calculateExtent();
             var mapCrs = view.getProjection().getCode();
-            if (crs && (crs !== mapCrs)) {
+            if (crs && crs !== mapCrs) {
                 extent = ol.proj.transform(extent, mapCrs, crs);
             }
             return extent;
@@ -83,7 +79,7 @@ define([
             var geometry = feature.getGeometry(),
                 extent = geometry.getExtent();
 
-            this.zoomToExtent(extent)
+            this.zoomToExtent(extent);
         },
 
         zoomToExtent: function (extent) {
@@ -93,7 +89,10 @@ define([
                 center;
 
             // If feature extent smaller than SMART_ZOOM_EXTENT then applying smart zoom to it
-            if (widthExtent < this.SMART_ZOOM_EXTENT && heightExtent < this.SMART_ZOOM_EXTENT) {
+            if (
+                widthExtent < this.SMART_ZOOM_EXTENT &&
+                heightExtent < this.SMART_ZOOM_EXTENT
+            ) {
                 center = ol.extent.getCenter(extent);
                 view.setCenter(center);
                 if (view.getZoom() < this.SMART_ZOOM) {
@@ -105,23 +104,25 @@ define([
         },
 
         zoomToNgwExtent: function (ngwExtent, displayProjection) {
-            const {minLon, minLat, maxLon, maxLat} = ngwExtent;
-            if (minLon === null || minLat === null ||
-                maxLon === null || maxLat === null) {
+            const { minLon, minLat, maxLon, maxLat } = ngwExtent;
+            if (
+                minLon === null ||
+                minLat === null ||
+                maxLon === null ||
+                maxLat === null
+            ) {
                 return;
             }
 
             if (!displayProjection) {
                 displayProjection = "EPSG:3857";
             }
-            const extent = ol.proj.transformExtent([
-                    minLon, minLat,
-                    maxLon, maxLat
-                ],
+            const extent = ol.proj.transformExtent(
+                [minLon, minLat, maxLon, maxLat],
                 "EPSG:4326",
                 displayProjection
             );
             this.zoomToExtent(extent);
-        }
+        },
     });
 });

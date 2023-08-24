@@ -344,13 +344,12 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
-            var widget = this;
 
             // Modify TabContainer to hide tabs if there is only one tab.
             declare.safeMixin(this.tabContainer, {
                 updateTabVisibility: function () {
                     var currstate =
-                            domStyle.get(this.tablist.domNode, "display") !=
+                            domStyle.get(this.tablist.domNode, "display") !==
                             "none",
                         newstate = this.getChildren().length > 1;
 

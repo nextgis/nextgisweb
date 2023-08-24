@@ -1,4 +1,11 @@
-body, html { width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden; }
+body,
+html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
 
 body {
     display: flex;
@@ -10,17 +17,17 @@ body > .webmap-wrapper {
     min-width: 0;
 }
 
-.webmap-display > div > .dijitTabContainer > .dijitTabPaneWrapper{
+.webmap-display > div > .dijitTabContainer > .dijitTabPaneWrapper {
     border: 0;
 }
 
-.nextgis .ol-rotate{
-    left: .5em;
+.nextgis .ol-rotate {
+    left: 0.5em;
     right: auto;
     top: 4.643em;
 }
 
-.nextgis .ol-touch .ol-control{
+.nextgis .ol-touch .ol-control {
     font-size: 1.5em;
 }
 
@@ -29,7 +36,7 @@ body > .webmap-wrapper {
 }
 
 /* Global ol styles */
-.nextgis .ol-selectable{
+.nextgis .ol-selectable {
     -ms-user-select: text;
     -moz-user-select: text;
     -webkit-user-select: text;
@@ -38,29 +45,29 @@ body > .webmap-wrapper {
 
 /* Control panes */
 
-.control-pane{
+.control-pane {
     position: absolute;
     z-index: 10;
 }
 
-.control-pane--left{
+.control-pane--left {
     left: 16px;
 }
-.control-pane--top{
+.control-pane--top {
     top: 16px;
 }
-.control-pane--right{
+.control-pane--right {
     right: 16px;
 }
-.control-pane--bottom{
+.control-pane--bottom {
     bottom: 17px;
 }
 
-.control-pane--bottom.control-pane--right{
+.control-pane--bottom.control-pane--right {
     bottom: 0;
     right: 0;
-    background-color: rgba(255,255,255,.48);
-    line-height:1;
+    background-color: rgba(255, 255, 255, 0.48);
+    line-height: 1;
     padding: 1px 2px 3px;
     overflow: hidden;
     border-top-left-radius: 2px;
@@ -68,7 +75,7 @@ body > .webmap-wrapper {
 }
 
 .control-pane .ol-control,
-.control-pane .ol-scale-line{
+.control-pane .ol-scale-line {
     position: static;
     left: auto;
     top: auto;
@@ -79,26 +86,26 @@ body > .webmap-wrapper {
 }
 
 .control-pane--bottom .ol-control,
-.control-pane--bottom .ol-scale-line{
+.control-pane--bottom .ol-scale-line {
     display: inline-block;
     vertical-align: bottom;
     margin-left: 8px;
-    color: rgba(0,0,0,.46);
+    color: rgba(0, 0, 0, 0.46);
     font-size: 10px;
 }
-    .control-pane--bottom .ol-control:first-child,
-    .control-pane--bottom .ol-scale-line:first-child{
-        margin-left: 0;
-    }
+.control-pane--bottom .ol-control:first-child,
+.control-pane--bottom .ol-scale-line:first-child {
+    margin-left: 0;
+}
 
 .control-pane--top .ol-control,
-.control-pane--top .ol-scale-line{
+.control-pane--top .ol-scale-line {
     margin-top: 8px;
 }
-    .control-pane--top .ol-control:first-child,
-    .control-pane--top .ol-scale-line:first-child{
-        margin-top: 0px;
-    }
+.control-pane--top .ol-control:first-child,
+.control-pane--top .ol-scale-line:first-child {
+    margin-top: 0px;
+}
 
 /* Map buttons */
 
@@ -107,62 +114,62 @@ body > .webmap-wrapper {
     padding: 0;
 }
 
-    .nextgis .ol-control button,
-    .nextgis .ol-control button:active,
-    .nextgis .ol-control button:focus,
-    .nextgis .ol-control__btn,
-    .nextgis .ol-control__btn:active,
-    .nextgis .ol-control__btn:focus{
-        display: block;
-        width: 30px;
-        height: 30px;
-        background-color: #fff;
-        margin: 1px 0 0;
-        box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
-        text-decoration: none;
-        line-height:30px;
-        border-radius: 2px;
-        padding-top: 2px;
-        text-align: center;
-    }
-    .nextgis .ol-control button,
-    .nextgis .ol-control__btn {
-        color: var(--primary);
-        fill: var(--primary);
-        cursor: pointer;
-    }
+.nextgis .ol-control button,
+.nextgis .ol-control button:active,
+.nextgis .ol-control button:focus,
+.nextgis .ol-control__btn,
+.nextgis .ol-control__btn:active,
+.nextgis .ol-control__btn:focus {
+    display: block;
+    width: 30px;
+    height: 30px;
+    background-color: #fff;
+    margin: 1px 0 0;
+    box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+    text-decoration: none;
+    line-height: 30px;
+    border-radius: 2px;
+    padding-top: 2px;
+    text-align: center;
+}
+.nextgis .ol-control button,
+.nextgis .ol-control__btn {
+    color: var(--primary);
+    fill: var(--primary);
+    cursor: pointer;
+}
 
-    .nextgis .ol-control.error button {
-        color: var(--error);
-        fill: var(--error);
-    }
+.nextgis .ol-control.error button {
+    color: var(--error);
+    fill: var(--error);
+}
 
-    .nextgis .ol-control:first-child button{
-        margin-top:1px;
-    }
+.nextgis .ol-control:first-child button {
+    margin-top: 1px;
+}
 
-    .control-pane--bottom .ol-control button{
-        text-shadow: none;
-    }
+.control-pane--bottom .ol-control button {
+    text-shadow: none;
+}
 
-    .nextgis .ol-control__icon{
-        color: inherit;
-        fill: inherit;
-        font-size: 24px;
-    }
+.nextgis .ol-control__icon {
+    color: inherit;
+    fill: inherit;
+    font-size: 24px;
+}
 
-    .nextgis .ol-control:hover{
-        background-color: transparent;
-    }
+.nextgis .ol-control:hover {
+    background-color: transparent;
+}
 
-    .nextgis .ol-control button:hover,
-    .nextgis .ol-control .ol-control__button:hover{
-        background-color: #f9fafb;
-    }
+.nextgis .ol-control button:hover,
+.nextgis .ol-control .ol-control__button:hover {
+    background-color: #f9fafb;
+}
 
 /* Rotate control */
 
-.nextgis .ol-compass{
+.nextgis .ol-compass {
     font-size: 24px;
     font-weight: normal;
     display: inline-block;
@@ -171,50 +178,50 @@ body > .webmap-wrapper {
 /* Scale line */
 
 .nextgis .ol-scale-line,
-.control-pane .ol-scale-line{
+.control-pane .ol-scale-line {
     position: relative;
     padding: 0;
     background-color: transparent;
     top: 1px;
 }
 
-    .nextgis .ol-scale-line-inner{
-        margin: 0;
-        border-color: rgba(0,0,0,.46);
-        color: rgba(0,0,0,.46);
-        float: right;
-    }
+.nextgis .ol-scale-line-inner {
+    margin: 0;
+    border-color: rgba(0, 0, 0, 0.46);
+    color: rgba(0, 0, 0, 0.46);
+    float: right;
+}
 
 /* Attribution */
 
-.nextgis .ol-attribution:not(.ol-collapsed){
+.nextgis .ol-attribution:not(.ol-collapsed) {
     background: transparent;
     height: auto;
     line-height: inherit;
 }
-    .nextgis .ol-attribution ul{
-        padding: 0;
-        text-shadow: inherit;
-        color: inherit;
-        line-height:1;
-    }
+.nextgis .ol-attribution ul {
+    padding: 0;
+    text-shadow: inherit;
+    color: inherit;
+    line-height: 1;
+}
 
-    .nextgis .ol-attribution a{
-        text-decoration: none;
-    }
+.nextgis .ol-attribution a {
+    text-decoration: none;
+}
 
-    .nextgis .ol-attribution.ol-uncollapsible img {
-        height: 14px;
-        margin-top: -3px;
-        margin-bottom: -1px;
-    }
+.nextgis .ol-attribution.ol-uncollapsible img {
+    height: 14px;
+    margin-top: -3px;
+    margin-bottom: -1px;
+}
 
 /* leftPanelPane */
 
 div.dijitContentPane.leftPanelPane {
     width: 350px;
     padding: 0;
-    border-right: 1px solid rgba(0,0,0,.12);
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .leftPanelPane--fullwidth {
@@ -223,5 +230,5 @@ div.dijitContentPane.leftPanelPane {
 }
 
 .navigation {
-  width: 50px;
+    width: 50px;
 }

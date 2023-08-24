@@ -35,7 +35,7 @@ define([
 
     const srsCoordinates = {};
     if (spatialRefSysList) {
-        spatialRefSysList.forEach(srsInfo => {
+        spatialRefSysList.forEach((srsInfo) => {
             srsCoordinates[srsInfo.id] = srsInfo;
         });
     }
@@ -51,16 +51,14 @@ define([
             console.log(this.selectedFormat);
             declare.safeMixin(this, options);
 
-            this._transform().then(
-                transformedCoord => {
-                    this._setOptions(transformedCoord);
-                    this._bindEvents();
-                }
-            );
+            this._transform().then((transformedCoord) => {
+                this._setOptions(transformedCoord);
+                this._bindEvents();
+            });
         },
 
         formattedSelectedValue: function (that) {
-            return that.options.find(o => o.selected).formatValue;
+            return that.options.find((o) => o.selected).formatValue;
         },
 
         postCreate: function () {
@@ -69,7 +67,10 @@ define([
 
         buildRendering: function () {
             this.inherited(arguments);
-            domClass.add(this.dropDown.domNode, "coordinate-switcher__dropdown");
+            domClass.add(
+                this.dropDown.domNode,
+                "coordinate-switcher__dropdown"
+            );
         },
 
         _transform: function () {
@@ -77,23 +78,25 @@ define([
             const point = new ol.geom.Point(this.point);
             const wktPoint = wkt.writeGeometry(point);
             const srsTo = Object.keys(srsCoordinates);
-            const urlBatchTransformSrs = api.routeURL("spatial_ref_sys.geom_transform.batch");
+            const urlBatchTransformSrs = api.routeURL(
+                "spatial_ref_sys.geom_transform.batch"
+            );
 
             const batchTransformData = {
                 geom: wktPoint,
                 srs_from: 3857,
-                srs_to: srsTo
+                srs_to: srsTo,
             };
 
             const getTransformPoints = xhr.post(urlBatchTransformSrs, {
                 handleAs: "json",
                 data: json.stringify(batchTransformData),
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json" },
             });
 
-            getTransformPoints.then(transformed => {
+            getTransformPoints.then((transformed) => {
                 const transformedCoord = {};
-                transformed.forEach(t => {
+                transformed.forEach((t) => {
                     const wktPoint = wkt.readGeometry(t.geom);
                     transformedCoord[t.srs_id] = wktPoint.getCoordinates();
                 });
@@ -106,24 +109,25 @@ define([
         _buildOption: function (formatCoords, srsInfo) {
             const element = put(
                 "span span $ + span.ngwPopup__coordinates-srs-name $ <",
-                formatCoords, srsInfo.display_name
+                formatCoords,
+                srsInfo.display_name
             );
 
             return {
                 label: element.innerHTML,
                 value: srsInfo.id,
-                formatValue: formatCoords
+                formatValue: formatCoords,
             };
         },
 
         _setOptions: function (transformedCoord) {
             this.options = [];
-            array.forEach(Object.keys(transformedCoord), srsId => {
+            array.forEach(Object.keys(transformedCoord), (srsId) => {
                 const coord = transformedCoord[srsId];
                 const srsInfo = srsCoordinates[srsId];
-                const formatCoords = srsInfo.geographic ?
-                    this._formatGeographicCoords(coord) :
-                    this._formatNotGeographicCoords(coord);
+                const formatCoords = srsInfo.geographic
+                    ? this._formatGeographicCoords(coord)
+                    : this._formatNotGeographicCoords(coord);
                 const option = this._buildOption(formatCoords, srsInfo);
                 this.options.push(option);
             });
@@ -138,11 +142,23 @@ define([
                 fx = x.toFixed(6);
                 fy = y.toFixed(6);
             } else if (degreeFormatSetting === "ddm") {
-                fx = CoordinateConverter.DDtoDM(x, { lon: true, needString: true });
-                fy = CoordinateConverter.DDtoDM(y, { lon: false, needString: true });
+                fx = CoordinateConverter.DDtoDM(x, {
+                    lon: true,
+                    needString: true,
+                });
+                fy = CoordinateConverter.DDtoDM(y, {
+                    lon: false,
+                    needString: true,
+                });
             } else if (degreeFormatSetting === "dms") {
-                fx = CoordinateConverter.DDtoDMS(x, { lon: true, needString: true });
-                fy = CoordinateConverter.DDtoDMS(y, { lon: false, needString: true });
+                fx = CoordinateConverter.DDtoDMS(x, {
+                    lon: true,
+                    needString: true,
+                });
+                fy = CoordinateConverter.DDtoDMS(y, {
+                    lon: false,
+                    needString: true,
+                });
             }
             return `${fx}, ${fy}`;
         },
@@ -153,7 +169,7 @@ define([
         },
 
         _bindEvents: function () {
-            this.on("change", srsId => {
+            this.on("change", (srsId) => {
                 localStorage.setItem(localStorageKey, srsId);
             });
         },
@@ -166,6 +182,6 @@ define([
                 localStorage.setItem(localStorageKey, defaultSrs);
                 this.set("value", defaultSrsId);
             }
-        }
+        },
     });
 });

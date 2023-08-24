@@ -21,10 +21,10 @@ define([
 
         _getValueAttr: function () {
             var value = this.value;
-            if (value == "default") {
+            if (value === "default") {
                 value = null;
             }
             return value;
-        }
+        },
     });
 });

@@ -1,162 +1,162 @@
 .printMap-panel {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 .printMap-panel div.print-controls-pane {
-  width: 350px;
-  margin: 0;
-  padding: 0;
-  border-right: 1px #b5bcc7 solid;
-  border-left: none;
-  border-top: none;
-  border-bottom: none;
+    width: 350px;
+    margin: 0;
+    padding: 0;
+    border-right: 1px #b5bcc7 solid;
+    border-left: none;
+    border-top: none;
+    border-bottom: none;
 }
 
 .printMap-panel .dynamic-panel__title {
-  text-align: left;
+    text-align: left;
 }
 
 .printMap-panel .close {
-  position: absolute;
-  right: 4px;
-  top: 8px;
+    position: absolute;
+    right: 4px;
+    top: 8px;
 }
 
 .close svg.icon {
-  color: var(--icon-color);
+    color: var(--icon-color);
 }
 
 .printMap-panel .print-panel-content {
-  position: absolute;
-  top: 40px;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  box-sizing: border-box;
-  overflow: auto;
+    position: absolute;
+    top: 40px;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: auto;
 }
 
 .printMap-panel div.dijitLayoutContainer.dijitContainer.dijitTableLayout {
-  display: inline-block;
-  text-align: left;
+    display: inline-block;
+    text-align: left;
 }
 
 .printMap-panel div.print-controls-pane .buttons-section {
-  margin-top: 10px;
-  text-align: left;
+    margin-top: 10px;
+    text-align: left;
 }
 
 .printMap-panel div.print-controls-pane span.dijitArrowButtonInner {
-  height: 7px;
+    height: 7px;
 }
 
 .printMap-panel div.print-controls-pane .tableContainer-labelCell {
-  line-height: 1em;
+    line-height: 1em;
 }
 
 td.tableContainer-labelCell {
-  vertical-align: top;
-  padding-top: 8px !important;
+    vertical-align: top;
+    padding-top: 8px !important;
 }
 
 .dijitButton.export-option .dijitButtonNode {
-  background-color: var(--secondary);
-  border-color: #c8e5f7;
-  color: #096ebf;
+    background-color: var(--secondary);
+    border-color: #c8e5f7;
+    color: #096ebf;
 }
 
 .dijitButton.export-option .dijitButtonNode:hover {
-  background-color: #c8e5f7;
+    background-color: #c8e5f7;
 }
 
 div.print-map-page-wrapper {
-  display: block;
-  margin: 10px auto;
-  z-index: 400;
-  -webkit-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
-  -moz-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
-  box-shadow: 0 0 6px 0 rgb(23, 68, 107);
-  background-color: white;
+    display: block;
+    margin: 10px auto;
+    z-index: 400;
+    -webkit-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
+    -moz-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
+    box-shadow: 0 0 6px 0 rgb(23, 68, 107);
+    background-color: white;
 }
 
 .print-map-page,
 div.print-map-export-wrapper {
-  border: 0;
-  margin: 0;
-  padding: 0;
+    border: 0;
+    margin: 0;
+    padding: 0;
 }
 
 div.print-map-export-wrapper {
-  position: relative;
+    position: relative;
 }
 
 .print-map-page .print-map {
-  display: block;
-  position: absolute;
-  padding: 0;
-  border: none;
+    display: block;
+    position: absolute;
+    padding: 0;
+    border: none;
 }
 
 .print-map-page .print-map div.map-container {
-  border: 0;
-  position: relative;
-  display: block;
-  z-index: 1000;
+    border: 0;
+    position: relative;
+    display: block;
+    z-index: 1000;
 }
 
 .print-map-page .print-map.inactive {
-  display: none;
+    display: none;
 }
 
 .print-map-page .print-map .map-logo {
-  bottom: 12px;
+    bottom: 12px;
 }
 
 .print-map-page .print-map .ol-scale-line-inner {
-  top: -26px;
-  left: unset;
+    top: -26px;
+    left: unset;
 }
 
 .print-map-page .print-map .ol-mapscale {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  background: white;
-  color: black;
-  font-size: 14px;
-  overflow: hidden;
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: white;
+    color: black;
+    font-size: 14px;
+    overflow: hidden;
 }
 
 .print-map-page .print-map .ol-mapscale * {
-  color: black;
-  font-size: 10px;
-  margin: 2px;
+    color: black;
+    font-size: 10px;
+    margin: 2px;
 }
 
 .print-map-page .print-map .ol-mapscale .ol-scale-value,
 .print-map-page .print-map .ol-mapscale .ol-scale-line-target {
-  display: none;
+    display: none;
 }
 
 .print-map-page .print-map .ol-mapscale.value .ol-scale-value {
-  display: block;
+    display: block;
 }
 
 .print-map-page .print-map .ol-mapscale.line .ol-scale-line-target {
-  display: block;
+    display: block;
 }
 
 .print-map-page .print-map .ol-mapscale .ol-scale-line {
-  position: static;
-  background: none;
-  padding: 0;
+    position: static;
+    background: none;
+    padding: 0;
 }
 
 .print-map-page .print-map .ol-mapscale .ol-scale-line-inner {
-  border: 1px solid black;
-  border-top: none;
-  text-align: center;
-  margin: 1px 1px 4px 0;
-  will-change: contents, width;
+    border: 1px solid black;
+    border-top: none;
+    text-align: center;
+    margin: 1px 1px 4px 0;
+    will-change: contents, width;
 }

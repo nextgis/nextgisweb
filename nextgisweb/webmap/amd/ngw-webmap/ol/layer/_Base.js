@@ -38,7 +38,7 @@ define([
 
             this._visibility = this.olLayer.getVisible();
             this.olLayer.on("change:visible", function () {
-                if (layer.get("visibility") != layer.olLayer.getVisible()) {
+                if (layer.get("visibility") !== layer.olLayer.getVisible()) {
                     layer.set("visibility", layer.olLayer.getVisible());
                 }
             });
@@ -57,7 +57,7 @@ define([
         },
 
         _visibilitySetter: function (value) {
-            if (this._visibility != value) {
+            if (this._visibility !== value) {
                 this.olLayer.setVisible(value);
                 this._visibility = value;
             }

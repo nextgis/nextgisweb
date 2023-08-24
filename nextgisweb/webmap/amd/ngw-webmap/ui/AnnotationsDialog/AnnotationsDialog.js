@@ -276,7 +276,11 @@ define([
 
             this.accessTypeSection.accessContainer.innerHTML =
                 annFeature.getAccessTypeTitle();
-            domAttr.set(this.domNode, "data-access-type", accessType || "empty");
+            domAttr.set(
+                this.domNode,
+                "data-access-type",
+                accessType || "empty"
+            );
         },
     });
 });

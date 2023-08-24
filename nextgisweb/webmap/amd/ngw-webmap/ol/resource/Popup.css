@@ -1,12 +1,12 @@
-.ngwPopup__content--nofeature{
+.ngwPopup__content--nofeature {
     height: 28px !important;
 }
 
-.ngwPopup__title{
+.ngwPopup__title {
     background-color: #eee;
     padding: 2px 4px 0;
 }
 
-.ngwPopup .dijitTooltipContainer{
+.ngwPopup .dijitTooltipContainer {
     overflow: hidden;
 }

@@ -5,18 +5,10 @@ define([
     "openlayers/ol",
     "@nextgisweb/pyramid/i18n!",
     "ngw-webmap/layers/annotations/AnnotationsPopup",
-], function (
-    declare,
-    json,
-    htmlEntities,
-    ol,
-    i18n,
-    AnnotationsPopup
-) {
+], function (declare, json, htmlEntities, ol, i18n, AnnotationsPopup) {
     const wkt = new ol.format.WKT();
     const defaultDescription = i18n.gettext("Your annotation text");
     const defaultStyle = {
-        
         circle: {
             radius: 5,
             stroke: { color: "#d27a00", width: 1 },
@@ -184,10 +176,10 @@ define([
                 image: new ol.style.Circle({
                     radius: jsonStyle.circle.radius,
                     fill: new ol.style.Fill(jsonStyle.circle.fill),
-                    stroke: new ol.style.Stroke(jsonStyle.circle.stroke)
+                    stroke: new ol.style.Stroke(jsonStyle.circle.stroke),
                 }),
                 fill: new ol.style.Fill(jsonStyle.circle.fill),
-                stroke: new ol.style.Stroke(jsonStyle.circle.stroke)
+                stroke: new ol.style.Stroke(jsonStyle.circle.stroke),
             });
         },
 

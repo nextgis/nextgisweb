@@ -6,23 +6,18 @@ define([
     "@nextgisweb/webmap/map-viewer-info",
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/pyramid/icon",
-    "xstyle/css!./resources/Zoom.css"
-], function (
-    declare,
-    Base,
-    ol,
-    reactApp,
-    MapViewerInfoComp,
-    i18n,
-    icon
-) {
+    "xstyle/css!./resources/Zoom.css",
+], function (declare, Base, ol, reactApp, MapViewerInfoComp, i18n, icon) {
     return declare(Base, {
         mapViewerInfoCompDomNode: undefined,
         customCssClass: "viewer-info-tool",
 
         constructor: function () {
             this.label = i18n.gettext("Show cursor coordinates / extent");
-            this.customIcon = "<span class=\"ol-control__icon\">" + icon.html({glyph: "location_searching"}) + "</svg></span>";
+            this.customIcon =
+                '<span class="ol-control__icon">' +
+                icon.html({ glyph: "location_searching" }) +
+                "</svg></span>";
         },
 
         activate: function () {
@@ -46,12 +41,10 @@ define([
                 MapViewerInfoComp.default,
                 {
                     show,
-                    map: olMap
-
+                    map: olMap,
                 },
                 this.mapViewerInfoCompDomNode
             );
-        }
-
+        },
     });
 });

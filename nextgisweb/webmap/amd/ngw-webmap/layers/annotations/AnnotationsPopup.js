@@ -1,12 +1,10 @@
 define([
     "dojo/_base/declare",
     "dojo/_base/lang",
-    "dojo/_base/array",
     "dojo/on",
     "dojo/topic",
     "dojo/html",
     "dojo/dom-class",
-    "dojo/dom-construct",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
@@ -20,12 +18,10 @@ define([
 ], function (
     declare,
     lang,
-    array,
     on,
     topic,
     html,
     domClass,
-    domConstruct,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
@@ -34,7 +30,7 @@ define([
     AnnotationFeature,
     i18n,
     Vector,
-    template,
+    template
 ) {
     const contentTemplate = i18n.renderTemplate(template);
 
@@ -109,13 +105,13 @@ define([
                 [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
                 {
                     templateString: contentTemplate,
-                },
+                }
             ))();
             contentWidget.placeAt(popup.content);
 
             html.set(
                 contentWidget.descriptionDiv,
-                annFeature.getDescriptionAsHtml(),
+                annFeature.getDescriptionAsHtml()
             );
 
             return popup;
@@ -138,7 +134,7 @@ define([
                 [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin],
                 {
                     templateString: contentTemplate,
-                },
+                }
             ))();
             this._contentWidget.placeAt(this._popup.content);
 
@@ -146,7 +142,7 @@ define([
 
             html.set(
                 this._contentWidget.descriptionDiv,
-                this._annFeature.getDescriptionAsHtml(),
+                this._annFeature.getDescriptionAsHtml()
             );
         },
 
@@ -169,7 +165,7 @@ define([
             on(
                 this._contentWidget.spanEditAnnotation,
                 "click",
-                lang.hitch(this, this._onEditAnnotation),
+                lang.hitch(this, this._onEditAnnotation)
             );
         },
 
@@ -189,7 +185,7 @@ define([
             if (!this._contentWidget) return false;
             html.set(
                 this._contentWidget.descriptionDiv,
-                this._annFeature.getDescriptionAsHtml(),
+                this._annFeature.getDescriptionAsHtml()
             );
         },
     });

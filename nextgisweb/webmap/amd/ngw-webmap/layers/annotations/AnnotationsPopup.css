@@ -1,73 +1,73 @@
 body .ol-popup.annotation .edit-controls {
-  display: none;
+    display: none;
 }
 
 body.annotations-edit .ol-popup.annotation.no-edit .edit-controls {
-  display: none;
+    display: none;
 }
 
 body.annotations-edit .ol-popup.annotation:hover .edit-controls {
-  display: block;
+    display: block;
 }
 
 .ol-popup.annotation {
-  min-height: 30px;
-  padding: 6px 8px 8px;
-  border-radius: 2px;
-  box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
-  border: none;
+    min-height: 30px;
+    padding: 6px 8px 8px;
+    border-radius: 2px;
+    box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+    border: none;
 }
 
 body {
-  --annotation-public: #97e07e;
-  --annotation-own: #e8b3f8;
-  --annotation-private: #f88f8f;
+    --annotation-public: #97e07e;
+    --annotation-own: #e8b3f8;
+    --annotation-private: #f88f8f;
 }
 
 body .ol-popup.annotation.public {
-  border-left: var(--annotation-public) 5px solid;
-  left: -55px;
+    border-left: var(--annotation-public) 5px solid;
+    left: -55px;
 }
 
 body .ol-popup.annotation.own {
-  border-left: var(--annotation-own) 5px solid;
-  left: -55px;
+    border-left: var(--annotation-own) 5px solid;
+    left: -55px;
 }
 
 body .ol-popup.annotation.private {
-  border-left: var(--annotation-private) 5px solid;
-  left: -55px;
+    border-left: var(--annotation-private) 5px solid;
+    left: -55px;
 }
 
 .ol-popup.annotation:before {
-  border: none;
+    border: none;
 }
 
 .ol-popup.annotation .ol-popup-closer {
-  display: none;
+    display: none;
 }
 
 .ol-popup.annotation .edit-controls {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  box-shadow: 0 2px 3px rgba(2, 34, 60, 0.24);
-  padding: 3px;
-  border-radius: 2px;
-  background-color: #f1f1f1;
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    box-shadow: 0 2px 3px rgba(2, 34, 60, 0.24);
+    padding: 3px;
+    border-radius: 2px;
+    background-color: #f1f1f1;
 }
 
 .ol-popup.annotation .edit-controls span {
-  cursor: pointer;
-  display: block;
-  font-size: 16px;
-  color: var(--icon-color);
+    cursor: pointer;
+    display: block;
+    font-size: 16px;
+    color: var(--icon-color);
 }
 
 .ol-popup.annotation .edit-controls span:hover {
-  color: var(--primary);
+    color: var(--primary);
 }
 
 .annotation-layer {
-  z-index: -1;
+    z-index: -1;
 }

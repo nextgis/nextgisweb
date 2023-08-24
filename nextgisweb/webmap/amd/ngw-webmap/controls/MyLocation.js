@@ -38,7 +38,11 @@ define([
 
             this.element = domConstruct.create("div", {
                 class: "ol-control ol-unselectable",
-                innerHTML: '<button><span class="ol-control__icon">' + icon.html({glyph: "my_location"}) + '</span></button>', title: this.tipLabel,
+                innerHTML:
+                    '<button><span class="ol-control__icon">' +
+                    icon.html({ glyph: "my_location" }) +
+                    "</span></button>",
+                title: this.tipLabel,
             });
 
             if (
