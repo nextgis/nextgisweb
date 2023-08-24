@@ -11,6 +11,7 @@ import {
 } from "@nextgisweb/gui/antd";
 import { DownOutlined } from "@ant-design/icons";
 
+import { route } from "@nextgisweb/pyramid/api";
 import { FloatingLabel } from "@nextgisweb/gui/floating-label";
 import i18n from "@nextgisweb/pyramid/i18n";
 
@@ -18,7 +19,7 @@ import { pageFormats, scalesList, exportFormats } from "./options.js";
 
 import "./PrintMapPanel.less";
 
-export const PrintMapPanel = ({ display, onAction, scaleMap }) => {
+export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
     const [paperFormat, setPaperFormat] = useState("210_297");
     const [height, setHeight] = useState(297);
     const [width, setWidth] = useState(210);
@@ -110,6 +111,27 @@ export const PrintMapPanel = ({ display, onAction, scaleMap }) => {
         onAction("change-scale-controls", {
             value,
             type,
+        });
+    };
+
+    const makePdf = () => {
+        const formData = new FormData();
+        formData.append("width", width);
+        formData.append("height", height);
+        formData.append("margin", margin);
+
+        getImage().then((dataUrl) => {
+            formData.append("img", dataUrl);
+
+            route("webmap.print.make.pdf")
+                .post({
+                    body: formData,
+                })
+                .then((blob) => {
+                    const file = window.URL.createObjectURL(blob);
+                    let tab = window.open();
+                    tab.location.href = file;
+                });
         });
     };
 
@@ -213,6 +235,15 @@ export const PrintMapPanel = ({ display, onAction, scaleMap }) => {
                         </Space>
                     </Button>
                 </Dropdown>
+
+                <Button
+                    type="deafult"
+                    onClick={() => {
+                        makePdf();
+                    }}
+                >
+                    {i18n.gettext("PDF")}
+                </Button>
             </div>
         </div>
     );
@@ -221,5 +252,6 @@ export const PrintMapPanel = ({ display, onAction, scaleMap }) => {
 PrintMapPanel.propTypes = {
     display: PropTypes.object,
     onAction: PropTypes.func,
+    getImage: PropTypes.func,
     scaleMap: PropTypes.number,
 };

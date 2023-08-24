@@ -18,14 +18,6 @@ div.print-map-export-wrapper {
   background-color: white;
 }
 
-.print-map-page .print-map {
-    min-width: 100px;
-    min-height: 100px;
-    width: {{ widthMap }}px;
-    height: {{ heightMap }}px;
-    margin: {{ margin }}px;
-}
-
 .print-map-page .print-map div.ol-viewport {
     width: {{ widthMap }}px !important;
     height: {{ heightMap }}px !important;
@@ -36,6 +28,14 @@ div.print-map-export-wrapper {
     z-index: 9999999;
     top: 2px;
     right: 2px;
+}
+
+.print-map {
+    width: {{ widthMap }}px !important;
+    height: {{ heightMap }}px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    margin: {{ margin }}px;
 }
 
 @page {
@@ -53,6 +53,10 @@ div.print-map-export-wrapper {
         max-width: {{ widthMap }}px !important;
     }
 
+    #pDebug {
+        display: none;
+    }
+
     .print-map-pane {
       width: {{ widthPage }}px !important;
       height: {{ heightPage }}px !important;
@@ -61,6 +65,7 @@ div.print-map-export-wrapper {
     .print-map-page-wrapper {
       box-shadow: none !important;
       margin: 0 !important;
+      padding: 0 !important;
     }
 
     body #header,
@@ -107,26 +112,5 @@ div.print-map-export-wrapper {
 
     #webmap-wrapper {
       top: 0 !important;
-    }
-
-    .print-map-page .print-map {
-        display: block!important;
-        position: relative;
-        margin: 0;
-        border: initial;
-        border-radius: initial;
-        min-height: initial;
-        box-shadow: initial;
-        background: initial;
-        page-break-after: always;
-        top: 0!important;
-        left: 0!important;
-        bottom: 0!important;
-        right: 0!important;
-        margin: 0!important;
-        max-width: 100%!important;
-        overflow: hidden;
-        padding: 0;
-        border: none;
     }
 }

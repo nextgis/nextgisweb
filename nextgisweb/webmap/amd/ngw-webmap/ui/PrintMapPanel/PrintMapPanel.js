@@ -106,6 +106,9 @@ define([
                             this._handleAction(action, payload);
                         },
                         scaleMap,
+                        getImage: () => {
+                            return this._buildPrintCanvas("png", true);
+                        },
                     },
                     contentNode.querySelector(".print-panel-content")
                 );
@@ -151,7 +154,11 @@ define([
 
                 if (action === "export") {
                     this._buildPrintCanvas(payload).then(
-                        lang.hitch(this, function (hrefCanvasEl) {
+                        lang.hitch(this, function (dataUrl) {
+                            var hrefCanvasEl = this._buildHrefCanvasElement(
+                                dataUrl,
+                                payload
+                            );
                             hrefCanvasEl.click();
                         })
                     );
@@ -179,7 +186,6 @@ define([
                 } else {
                     domClass.remove(element, type);
                 }
-                this._scalesControls[type] = value;
             },
 
             /**
@@ -188,23 +194,27 @@ define([
              * @param {string} imageType - "png" or "jpeg"
              * @return {Deferred} A good string
              */
-            _buildPrintCanvas: function (imageType) {
+            _buildPrintCanvas: function (imageType, onlyMap) {
                 var deferred = new Deferred(),
-                    domToImagePromise;
+                    domToImagePromise,
+                    elementToRender;
 
                 this._resizeMapContainer();
                 this._updateMapSize();
 
+                if (onlyMap) {
+                    elementToRender =
+                        this.contentWidget.mapContainer.firstChild;
+                } else {
+                    elementToRender = this.contentWidget.mapPageContainer;
+                }
+
                 switch (imageType) {
                     case "png":
-                        domToImagePromise = domtoimage.toPng(
-                            this.contentWidget.mapPageContainer
-                        );
+                        domToImagePromise = domtoimage.toPng(elementToRender);
                         break;
                     case "jpeg":
-                        domToImagePromise = domtoimage.toJpeg(
-                            this.contentWidget.mapPageContainer
-                        );
+                        domToImagePromise = domtoimage.toJpeg(elementToRender);
                         break;
                     default:
                         console.error(
@@ -215,11 +225,7 @@ define([
                 domToImagePromise
                     .then(
                         lang.hitch(this, function (dataUrl) {
-                            var hrefCanvasEl = this._buildHrefCanvasElement(
-                                dataUrl,
-                                imageType
-                            );
-                            deferred.resolve(hrefCanvasEl);
+                            deferred.resolve(dataUrl);
                         })
                     )
                     .catch(function (error) {

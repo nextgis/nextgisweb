@@ -164,13 +164,16 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
                     "application/vnd.lunkwill.request-summary+json"
                 ));
 
-        if (!respJSON) {
+        const respPdf = respCType && respCType.includes("application/pdf");
+
+        if (!(respJSON || respPdf)) {
             throw new InvalidResponseError();
         }
 
         let body: T | ServerResponseErrorData;
+
         try {
-            body = await response.json();
+            body = await (respJSON ? response.json() : response.blob());
         } catch (e) {
             throw new InvalidResponseError();
         }

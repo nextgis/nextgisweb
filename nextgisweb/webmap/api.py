@@ -1,5 +1,12 @@
+import base64
+import pathlib
+import subprocess
+import uuid
+
 from geoalchemy2.shape import to_shape
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
+from pyramid.renderers import render
+from pyramid.response import Response
 
 from nextgisweb.env import DBSession, env
 
@@ -164,8 +171,56 @@ def settings_put(request) -> JSONType:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
+def make_print_pdf(request) -> Response:
+    tmp = pathlib.Path('/tmp')
+    temp_dir = tmp / 'ngw' / 'print'
+    temp_dir.mkdir(parents=True, exist_ok=True)
+
+    img_base64 = request.POST['img']
+    img_name = str(uuid.uuid4())
+    img_file = (temp_dir / img_name).with_suffix('.png')
+    with open(img_file, "wb") as fh:
+        base64_clear = img_base64.replace('data:image/png;base64,', '')
+        fh.write(base64.b64decode(base64_clear))
+
+    html_content = render('template/print.mako', {
+        'img': "{}.png".format(img_name),
+        'width': int(request.POST['width']),
+        'height': int(request.POST['height']),
+        'margin': int(request.POST['margin']),
+    }, request)
+
+    html_name = str(uuid.uuid4())
+    html_file = (temp_dir / html_name).with_suffix('.html')
+    with open(html_file, "w") as html:
+        html.write(html_content)
+
+    pdf_file_name = str(uuid.uuid4())
+    pdf_path = (temp_dir / pdf_file_name).with_suffix('.pdf')
+
+    process = subprocess.Popen(
+        ['chromium-browser', '--headless', '--no-sandbox', '--disable-gpu', \
+        '--run-all-compositor-stages-before-draw', '--print-to-pdf-no-header', \
+        '--virtual-time-budget=10000', f'--print-to-pdf={pdf_path}', \
+        f'{html_file}'], stdout=None, stderr=None, shell=False
+    )
+    process.wait()
+
+    with open(pdf_path, 'rb') as f:
+        result = f.read()
+
+    img_file.unlink()
+    html_file.unlink()
+    pdf_path.unlink()
+
+    response = Response(body=result)
+    response.headers['Content-Type'] = ('application/pdf')
+    return response
+
+
 def setup_pyramid(comp, config):
     setup_annotations(config)
+    setup_print(config)
 
     comp.settings_view = settings_get
 
@@ -180,6 +235,13 @@ def setup_pyramid(comp, config):
         '/api/resource/{id:uint}/webmap/extent',
         factory=resource_factory,
     ).get(get_webmap_extent, context=WebMap)
+
+
+def setup_print(config):
+    config.add_route(
+        'webmap.print.make.pdf',
+        '/api/component/webmap/print/',
+        post=make_print_pdf)
 
 
 def setup_annotations(config):
