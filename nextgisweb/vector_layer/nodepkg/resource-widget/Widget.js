@@ -238,11 +238,16 @@ export const Widget = observer(({ store }) => {
                 </Checkbox>
             )}
             {mode === "file" && (
-                <Collapse size="small">
-                    <Collapse.Panel header={gettext("Advanced options")}>
-                        <SourceOptions {...{ store }} />
-                    </Collapse.Panel>
-                </Collapse>
+                <Collapse
+                    size="small"
+                    items={[
+                        {
+                            key: "default",
+                            label: gettext("Advanced options"),
+                            children: <SourceOptions {...{ store }} />,
+                        },
+                    ]}
+                />
             )}
         </div>
     );
