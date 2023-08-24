@@ -10,8 +10,15 @@
 <div style="position: absolute; top: 50px; bottom: 0px; right: 0px;  width: 100%; display: flex">
 
 <div style="flex-grow: 0; white-space: nowrap; padding: 1ex; border-right: 4px solid lightgray; overflow-y: scroll">
-    %for e in testentries:
-        <a style="display: block" href="${request.route_url('jsrealm.testentry', subpath=e)}">${e}</a></li>
+    %for te in testentries:
+        <%
+            label = te
+            if label.startswith("@nextgisweb/"):
+                label = label[len("@nextgisweb/"):]
+            if label.endswith("/testentry"):
+                label = label[:-len("/testentry")]
+        %>
+        <a style="display: block" href="${request.route_url('jsrealm.testentry', subpath=te)}">${label}</a>
     %endfor
 </div>
 
