@@ -36,7 +36,6 @@ define([
     // panels
     "@nextgisweb/webmap/panel/layers",
     "./ui/PrintMapPanel/PrintMapPanel",
-    "./ui/AnnotationsPanel/AnnotationsPanel",
     // utils
     "./utils/URL",
     // settings
@@ -85,7 +84,6 @@ define([
     ToolSwipe,
     LayersPanelModule,
     PrintMapPanel,
-    AnnotationsPanel,
     URL,
     i18n,
     settings,
@@ -1055,18 +1053,21 @@ define([
                     !this.config.annotations.scope.read
                 ) {
                     resolve(undefined);
+                } else {
+                    require([
+                        "ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel",
+                    ], (AnnotationsPanel) => {
+                        resolve({
+                            cls: AnnotationsPanel,
+                            params: {
+                                title: i18n.gettext("Annotations"),
+                                name: "annotation",
+                                order: 30,
+                                menuIcon: "material-message",
+                            },
+                        });
+                    });
                 }
-
-                const panel = {
-                    cls: AnnotationsPanel,
-                    params: {
-                        title: i18n.gettext("Annotations"),
-                        name: "annotation",
-                        order: 30,
-                        menuIcon: "material-message",
-                    },
-                };
-                resolve(panel);
             });
             panels.push(makeAnnotationsPanel);
 
