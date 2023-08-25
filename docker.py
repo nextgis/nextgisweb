@@ -1,5 +1,6 @@
 import ngwdocker
-ngwdocker.require_version('>=2.0.0.dev16')
+
+ngwdocker.require_version(">=2.0.0.dev16")
 
 from pathlib import Path
 
@@ -14,26 +15,30 @@ class Package(PackageBase):
 
 @AppImage.on_apt.handler
 def on_apt(event):
-    event.package(
-        'libpcre3', 'libpcre3-dev',  # uWSGI internal routing support
-    )
+    event.package("libpcre3", "libpcre3-dev")  # uWSGI internal routing support
+
     if event.image.context.is_development():
-        event.image.environment['SQLALCHEMY_WARN_20'] = '1'
+        event.image.environment["SQLALCHEMY_WARN_20"] = "1"
+
+    # Chromium for printing
+    event.add_repository("ppa:savoury1/ffmpeg4")
+    event.add_repository("ppa:savoury1/chromium")
+    event.package("chromium-browser")
 
 
 @AppImage.on_user_dir.handler
 def on_user_dir(event):
-    nextgisweb_package = event.image.context.packages['nextgisweb']
+    nextgisweb_package = event.image.context.packages["nextgisweb"]
 
-    font = nextgisweb_package.settings.get('font')
+    font = nextgisweb_package.settings.get("font")
     if font is not None:
         fontpath = Path(font)
-        copyfiles([fontpath], event.source / 'build' / 'font', fontpath)
+        copyfiles([fontpath], event.source / "build" / "font", fontpath)
 
 
 @AppImage.on_virtualenv.handler
 def on_virtualenv(event):
     event.after_install(
-        'ln -s package/nextgisweb/.prettierrc.cjs $NGWROOT/',
-        'ln -s package/nextgisweb/.eslintrc.cjs $NGWROOT/',
+        "ln -s package/nextgisweb/.prettierrc.cjs $NGWROOT/",
+        "ln -s package/nextgisweb/.eslintrc.cjs $NGWROOT/",
     )
