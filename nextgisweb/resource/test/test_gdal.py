@@ -1,4 +1,5 @@
 import pytest
+from lxml.html import document_fromstring
 from osgeo import gdal
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -21,7 +22,8 @@ def test_resource_group(drv, ngw_httptest_app, ngw_resource_group):
         'DESCRIPTION=test resource group'])
     assert ds is not None, gdal.GetLastErrorMsg()
 
-    assert ds.GetMetadataItem('description', '') == 'test resource group'
+    description = ds.GetMetadataItem('description', '')
+    assert document_fromstring(description).text_content() == 'test resource group'
 
     url_delete = 'NGW:' + ngw_httptest_app.base_url + '/resource/{}'.format(
         ds.GetMetadataItem('id', ''))

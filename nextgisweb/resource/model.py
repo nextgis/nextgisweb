@@ -7,6 +7,7 @@ from sqlalchemy import event, func, text
 from nextgisweb.env import Base, DBSession, _, env
 from nextgisweb.lib import db
 from nextgisweb.lib.registry import DictRegistry
+from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.auth import Group, OnFindReferencesData, Principal, User
 from nextgisweb.core.exception import ForbiddenError, ValidationError
@@ -440,6 +441,14 @@ class _perms_attr(SP):
         return result
 
 
+class _description_attr(SP):
+
+    def setter(self, srlzr, value):
+        if value is not None:
+            value = sanitize(value)
+        super().setter(srlzr, value)
+
+
 class _children_attr(SP):
     def getter(self, srlzr):
         return len(srlzr.obj.children) > 0
@@ -482,7 +491,7 @@ class ResourceSerializer(Serializer):
     keyname = _rw(SP)
     display_name = _rw(SP)
 
-    description = SP(read=ResourceScope.read, write=ResourceScope.update)
+    description = _description_attr(read=ResourceScope.read, write=ResourceScope.update)
 
     children = _ro(_children_attr)
     interfaces = _ro(_interfaces_attr)

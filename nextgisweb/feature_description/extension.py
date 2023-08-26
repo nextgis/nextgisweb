@@ -1,4 +1,5 @@
 from nextgisweb.env import DBSession
+from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.feature_layer import FeatureExtension
 
@@ -28,16 +29,16 @@ class FeatureDescriptionExtension(FeatureExtension):
             feature_id=feature.id
         ).first()
 
-        if obj is None:
-            if data is not None:
+        if data is not None:
+            data = sanitize(data)
+
+            if obj is None:
                 obj = FeatureDescription(
                     resource_id=self.layer.id,
-                    feature_id=feature.id,
-                    value=data)
-                obj.persist()
+                    feature_id=feature.id
+                ).persist()
 
-        else:
-            if data is None:
-                DBSession.delete(obj)
-            else:
-                obj.value = data
+            obj.value = data
+
+        elif obj is not None:
+            DBSession.delete(obj)
