@@ -1,21 +1,22 @@
-import { useState, useEffect } from "react";
 import debounce from "lodash/debounce";
-import { PropTypes } from "prop-types";
+import { useEffect, useState } from "react";
+
 import {
-    Switch,
-    Select,
-    InputNumber,
     Button,
     Dropdown,
+    InputNumber,
+    Select,
     Space,
+    Switch,
 } from "@nextgisweb/gui/antd";
-import { DownOutlined } from "@ant-design/icons";
 
-import { route } from "@nextgisweb/pyramid/api";
 import { FloatingLabel } from "@nextgisweb/gui/floating-label";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { route } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { pageFormats, scalesList, exportFormats } from "./options.js";
+import { exportFormats, pageFormats, scalesList } from "./options.js";
+
+import { DownOutlined } from "@ant-design/icons";
 
 import "./PrintMapPanel.less";
 
@@ -56,13 +57,6 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
         setScales(newScales);
         setScale(scaleMap);
     }, [scaleMap]);
-
-    const exportFormatsProps = {
-        items: exportFormats,
-        onClick: (item) => {
-            onAction("export", item.key);
-        },
-    };
 
     const changePaperFormat = (newPaperFormat) => {
         setPaperFormat(newPaperFormat);
@@ -115,18 +109,16 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
     };
 
     const makePdf = () => {
-        const formData = new FormData();
-        formData.append("width", width);
-        formData.append("height", height);
-        formData.append("margin", margin);
-
         getImage().then((dataUrl) => {
-            formData.append("img", dataUrl);
+            const body = {
+                width: parseInt(width),
+                height: parseInt(height),
+                margin: parseInt(margin),
+                map_image: dataUrl.substring("data:image/png;base64,".length),
+            };
 
-            route("webmap.print.make.pdf")
-                .post({
-                    body: formData,
-                })
+            route("webmap.print")
+                .post({ json: body })
                 .then((blob) => {
                     const file = window.URL.createObjectURL(blob);
                     let tab = window.open();
@@ -135,14 +127,22 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
         });
     };
 
+    const exportFormatsProps = {
+        items: exportFormats,
+        onClick: (item) => {
+            if (item.key === "pdf") {
+                makePdf();
+            } else {
+                onAction("export", item.key);
+            }
+        },
+    };
+
     return (
         <div className="print-map-panel">
-            <h5 className="heading">{i18n.gettext("Page")}</h5>
+            <h5 className="heading">{gettext("Page")}</h5>
 
-            <FloatingLabel
-                label={i18n.gettext("Paper format")}
-                value={paperFormat}
-            >
+            <FloatingLabel label={gettext("Paper format")} value={paperFormat}>
                 <Select
                     style={{ width: "100%" }}
                     onChange={(v) => changePaperFormat(v)}
@@ -151,7 +151,7 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
                 ></Select>
             </FloatingLabel>
 
-            <FloatingLabel label={i18n.gettext("Height, mm")} value={height}>
+            <FloatingLabel label={gettext("Height, mm")} value={height}>
                 <InputNumber
                     style={{ width: "100%" }}
                     onChange={(v) => onChangeSizes(v, "height")}
@@ -163,7 +163,7 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
                 ></InputNumber>
             </FloatingLabel>
 
-            <FloatingLabel label={i18n.gettext("Width, mm")} value={width}>
+            <FloatingLabel label={gettext("Width, mm")} value={width}>
                 <InputNumber
                     style={{ width: "100%" }}
                     onChange={(v) => onChangeSizes(v, "width")}
@@ -175,7 +175,7 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
                 ></InputNumber>
             </FloatingLabel>
 
-            <FloatingLabel label={i18n.gettext("Margin, mm")} value={margin}>
+            <FloatingLabel label={gettext("Margin, mm")} value={margin}>
                 <InputNumber
                     style={{ width: "100%" }}
                     onChange={(v) => onChangeSizes(v, "margin")}
@@ -186,7 +186,7 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
                 ></InputNumber>
             </FloatingLabel>
 
-            <h5 className="heading">{i18n.gettext("Scale")}</h5>
+            <h5 className="heading">{gettext("Scale")}</h5>
 
             <div className="input-group">
                 <Switch
@@ -194,7 +194,7 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
                     onChange={(v) => changeScaleControls(v, "value")}
                 />
                 <span className="checkbox__label">
-                    {i18n.gettext("Scale value")}
+                    {gettext("Scale value")}
                 </span>
             </div>
 
@@ -203,12 +203,10 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
                     checked={isScaleBar}
                     onChange={(v) => changeScaleControls(v, "line")}
                 />
-                <span className="checkbox__label">
-                    {i18n.gettext("Scale bar")}
-                </span>
+                <span className="checkbox__label">{gettext("Scale bar")}</span>
             </div>
 
-            <FloatingLabel label={i18n.gettext("Scale")} value={scale}>
+            <FloatingLabel label={gettext("Scale")} value={scale}>
                 <Select
                     style={{ width: "100%" }}
                     onChange={(value) => changeScale(value)}
@@ -217,41 +215,24 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
                 ></Select>
             </FloatingLabel>
 
-            <div className="actions">
+            <Space.Compact>
                 <Button
                     type="primary"
                     onClick={() => {
                         window.print();
                     }}
                 >
-                    {i18n.gettext("Print")}
+                    {gettext("Print")}
                 </Button>
-
                 <Dropdown menu={exportFormatsProps}>
                     <Button>
                         <Space>
-                            {i18n.gettext("Save as")}
+                            {gettext("Save as")}
                             <DownOutlined />
                         </Space>
                     </Button>
                 </Dropdown>
-
-                <Button
-                    type="deafult"
-                    onClick={() => {
-                        makePdf();
-                    }}
-                >
-                    {i18n.gettext("PDF")}
-                </Button>
-            </div>
+            </Space.Compact>
         </div>
     );
-};
-
-PrintMapPanel.propTypes = {
-    display: PropTypes.object,
-    onAction: PropTypes.func,
-    getImage: PropTypes.func,
-    scaleMap: PropTypes.number,
 };

@@ -1,12 +1,13 @@
-import base64
-import pathlib
-import subprocess
-import uuid
+from pathlib import Path
+from subprocess import check_call
+from tempfile import TemporaryDirectory
 
 from geoalchemy2.shape import to_shape
+from msgspec import Meta, Struct
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from pyramid.renderers import render
 from pyramid.response import Response
+from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, env
 
@@ -171,51 +172,54 @@ def settings_put(request) -> JSONType:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
-def make_print_pdf(request) -> Response:
-    tmp = pathlib.Path('/tmp')
-    temp_dir = tmp / 'ngw' / 'print'
-    temp_dir.mkdir(parents=True, exist_ok=True)
+class PrintBody(Struct):
+    width: Annotated[float, Meta(gt=0, le=500)]
+    height: Annotated[float, Meta(gt=0, le=500)]
+    margin: Annotated[float, Meta(ge=0, le=100)]
+    map_image: bytes
 
-    img_base64 = request.POST['img']
-    img_name = str(uuid.uuid4())
-    img_file = (temp_dir / img_name).with_suffix('.png')
-    with open(img_file, "wb") as fh:
-        base64_clear = img_base64.replace('data:image/png;base64,', '')
-        fh.write(base64.b64decode(base64_clear))
 
-    html_content = render('template/print.mako', {
-        'img': "{}.png".format(img_name),
-        'width': int(request.POST['width']),
-        'height': int(request.POST['height']),
-        'margin': int(request.POST['margin']),
-    }, request)
+def print(request, *, body: PrintBody) -> Response:
+    with TemporaryDirectory() as temp_name:
+        temp_dir = Path(temp_name)
 
-    html_name = str(uuid.uuid4())
-    html_file = (temp_dir / html_name).with_suffix('.html')
-    with open(html_file, "w") as html:
-        html.write(html_content)
+        map_image_file = temp_dir / "img.png"
+        map_image_file.write_bytes(body.map_image)
 
-    pdf_file_name = str(uuid.uuid4())
-    pdf_path = (temp_dir / pdf_file_name).with_suffix('.pdf')
+        index_html = temp_dir / "index.html"
+        index_html.write_text(
+            render(
+                "template/print.mako",
+                {
+                    "map_image": map_image_file.relative_to(temp_dir),
+                    "width": int(body.width),
+                    "height": int(body.height),
+                    "margin": int(body.margin),
+                },
+                request,
+            )
+        )
 
-    process = subprocess.Popen(
-        ['chromium-browser', '--headless', '--no-sandbox', '--disable-gpu', \
-        '--run-all-compositor-stages-before-draw', '--print-to-pdf-no-header', \
-        '--virtual-time-budget=10000', f'--print-to-pdf={pdf_path}', \
-        f'{html_file}'], stdout=None, stderr=None, shell=False
-    )
-    process.wait()
+        output_pdf = temp_dir / "output.pdf"
+        check_call(
+            [
+                "chromium-browser",
+                "--headless",
+                "--no-sandbox",
+                "--disable-gpu",
+                "--run-all-compositor-stages-before-draw",
+                "--virtual-time-budget=10000",
+                "--print-to-pdf-no-header",
+                f"--print-to-pdf={output_pdf}",
+                f"{index_html}",
+            ]
+        )
 
-    with open(pdf_path, 'rb') as f:
-        result = f.read()
-
-    img_file.unlink()
-    html_file.unlink()
-    pdf_path.unlink()
-
-    response = Response(body=result)
-    response.headers['Content-Type'] = ('application/pdf')
-    return response
+        return Response(
+            app_iter=output_pdf.open('rb'),
+            content_type="application/pdf",
+            request=request,
+        )
 
 
 def setup_pyramid(comp, config):
@@ -239,9 +243,9 @@ def setup_pyramid(comp, config):
 
 def setup_print(config):
     config.add_route(
-        'webmap.print.make.pdf',
-        '/api/component/webmap/print/',
-        post=make_print_pdf)
+        'webmap.print',
+        '/api/component/webmap/print',
+        post=print)
 
 
 def setup_annotations(config):

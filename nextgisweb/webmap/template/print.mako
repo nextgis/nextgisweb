@@ -19,15 +19,15 @@
                 }
 
                 img.map {
-                  margin: ${margin}mm; 
-                  width: ${width - margin * 2}mm;
-                  height: ${height - margin * 2}mm;
-                  overflow: hidden;
+                    margin: ${margin}mm;
+                    width: ${width - margin * 2}mm;
+                    height: ${height - margin * 2}mm;
+                    overflow: hidden;
                 }
             }
         </style>
     </head>
     <body>
-        <img class="map" src="./${img}" />
+        <img class="map" src="${map_image}" />
     </body>
 </html>

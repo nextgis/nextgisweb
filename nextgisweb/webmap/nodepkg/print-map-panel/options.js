@@ -1,20 +1,30 @@
-import { FileJpgOutlined, FileImageOutlined } from "@ant-design/icons";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import i18n from "@nextgisweb/pyramid/i18n";
+import {
+    FileImageOutlined,
+    FileJpgOutlined,
+    FilePdfOutlined,
+} from "@ant-design/icons";
 
-export const pageFormats = [
-    { value: "210_297", label: i18n.gettext("A4 - Portrait") },
-    { value: "297_210", label: i18n.gettext("A4 - Landscape") },
-    { value: "297_420", label: i18n.gettext("A3 - Portrait") },
-    { value: "420_297", label: i18n.gettext("A3 - Landscape") },
-    { value: "420_594", label: i18n.gettext("A2 - Portrait") },
-    { value: "594_420", label: i18n.gettext("A2 - Landscape") },
-    { value: "594_841", label: i18n.gettext("A1 - Portrait") },
-    { value: "841_594", label: i18n.gettext("A1 - Landscape") },
-    { value: "841_1189", label: i18n.gettext("A0 - Portrait") },
-    { value: "1189_841", label: i18n.gettext("A0 - Landscape") },
-    { value: "custom", label: i18n.gettext("Custom size") },
-];
+const msgPortrait = gettext("Portrait");
+const msgLandscape = gettext("Landscape");
+
+export const pageFormats = [];
+
+function addPageFormat(label, width, height) {
+    pageFormats.push({
+        value: `${width}_${height}`,
+        label: `${label} - ${msgPortrait}`,
+    });
+    pageFormats.push({
+        value: `${height}_${width}`,
+        label: `${label} - ${msgLandscape}`,
+    });
+}
+
+addPageFormat("A4", 210, 297);
+addPageFormat("A3", 297, 420);
+pageFormats.push({ value: "custom", label: gettext("Custom size") });
 
 export const scalesList = [
     { value: 5000, label: "1 : 5 000" },
@@ -32,6 +42,7 @@ export const scalesList = [
 ];
 
 export const exportFormats = [
-    { label: i18n.gettext("JPEG"), key: "jpeg", icon: <FileJpgOutlined /> },
-    { label: i18n.gettext("PNG"), key: "png", icon: <FileImageOutlined /> },
+    { label: gettext("JPEG"), key: "jpeg", icon: <FileJpgOutlined /> },
+    { label: gettext("PNG"), key: "png", icon: <FileImageOutlined /> },
+    { label: gettext("PDF"), key: "pdf", icon: <FilePdfOutlined /> },
 ];

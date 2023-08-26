@@ -13,6 +13,7 @@ Changes
 - React library upgraded to 18.
 - 2x speed-up of vector layer import.
 - Ant Design library upgraded to 5.
+- Save to PDF from the webmap printing panel.
 
 
 4.4.0
