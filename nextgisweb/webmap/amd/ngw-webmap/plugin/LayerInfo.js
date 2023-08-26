@@ -1,28 +1,9 @@
 define([
     "dojo/_base/declare",
     "./_PluginBase",
-    "dojo/dom-construct",
-    "dijit/layout/ContentPane",
+    "ngw-webmap/ui/react-panel",
     "@nextgisweb/pyramid/i18n!",
-], function (declare, _PluginBase, domConstruct, ContentPane, i18n) {
-    var Pane = declare([ContentPane], {
-        closable: true,
-        iconClass: "iconDescription",
-
-        postCreate: function () {
-            if (this.data.description) {
-                domConstruct.create(
-                    "div",
-                    {
-                        style: "max-width: 60em",
-                        innerHTML: this.data.description,
-                    },
-                    this.domNode
-                );
-            }
-        },
-    });
-
+], function (declare, _PluginBase, reactPanel, { gettext }) {
     return declare([_PluginBase], {
         getPluginState: function (nodeData) {
             var type = nodeData.type;
@@ -43,8 +24,8 @@ define([
         getMenuItem: function () {
             var widget = this;
             return {
-                icon: "material-info-outline",
-                title: i18n.gettext("Description"),
+                icon: "mdi-text-long",
+                title: gettext("Description"),
                 onClick: function () {
                     return widget.run();
                 },
@@ -52,17 +33,40 @@ define([
         },
 
         openLayerInfo: function () {
-            var item = this.display.dumpItem(),
-                data = this.display.get("itemConfig").plugin[this.identity];
+            const pm = this.display.panelsManager;
+            const pkey = "resource-description";
+            const item = this.display.dumpItem();
+            const data = this.display.get("itemConfig").plugin[this.identity];
             if (data !== undefined) {
-                var pane = new Pane({
-                    title: item.label,
-                    layerId: item.layerId,
-                    data: data,
-                });
-
-                this.display.tabContainer.addChild(pane);
-                this.display.tabContainer.selectChild(pane);
+                const content = data.description;
+                let panel = pm.getPanel(pkey);
+                if (panel) {
+                    if (panel.app) {
+                        panel.app.update({ content });
+                    } else {
+                        panel.props = { content };
+                    }
+                } else {
+                    const cls = reactPanel(
+                        "@nextgisweb/webmap/panel/description",
+                        {
+                            props: { content },
+                        }
+                    );
+                    pm.addPanels([
+                        {
+                            cls: cls,
+                            params: {
+                                title: item.label,
+                                name: pkey,
+                                order: 100,
+                                menuIcon: "mdi-text-long",
+                            },
+                        },
+                    ]);
+                    panel = pm.getPanel(pkey);
+                }
+                pm._clickNavigationMenu(panel);
             }
         },
     });

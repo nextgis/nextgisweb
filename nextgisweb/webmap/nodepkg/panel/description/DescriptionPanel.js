@@ -12,19 +12,23 @@ const zoomToFeature = (display, resourceId, featureId) => {
         });
 };
 
-export function DescriptionPanel({ display, close }) {
+export function DescriptionPanel({ display, close, content }) {
     const nodeRef = useRef();
 
-    const content = useMemo(() => {
-        const content = display.config.webmapDescription;
+    const contentDiv = useMemo(() => {
         return (
             <div
                 className="content"
                 ref={nodeRef}
-                dangerouslySetInnerHTML={{ __html: content }}
+                dangerouslySetInnerHTML={{
+                    __html:
+                        content === undefined
+                            ? display.config.webmapDescription
+                            : content,
+                }}
             />
         );
-    }, []);
+    }, [content]);
 
     useEffect(() => {
         if (!nodeRef || !nodeRef.current) {
@@ -51,7 +55,7 @@ export function DescriptionPanel({ display, close }) {
     return (
         <div className="ngw-webmap-description-panel">
             <CloseButton {...{ close }} />
-            {content}
+            {contentDiv}
         </div>
     );
 }

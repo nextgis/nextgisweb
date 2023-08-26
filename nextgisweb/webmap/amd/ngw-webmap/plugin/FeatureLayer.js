@@ -229,7 +229,6 @@ define([
                         display.map.zoomToFeature(
                             new ol.Feature({ geometry: geometry })
                         );
-                        display.tabContainer.selectChild(display.mainPane);
                     });
             }
         },

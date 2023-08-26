@@ -5,9 +5,10 @@ define([
     "dijit/_WidgetBase",
     "@nextgisweb/gui/react-app",
 ], function (declare, domStyle, all, _WidgetBase, reactApp) {
-    return function (fcomp, { waitFor = [] } = {}) {
+    return function (fcomp, { waitFor = [], props } = {}) {
         return declare([_WidgetBase], {
             app: undefined,
+            props: props,
 
             buildRendering: function () {
                 this.inherited(arguments);
@@ -35,16 +36,16 @@ define([
             runReactApp: function ({ visible }) {
                 const pm = this.display.panelsManager;
                 all(waitFor).then(() => {
-                    this.app = reactApp.default(
-                        fcomp,
-                        {
-                            display: this.display,
-                            title: this.title,
-                            close: () => pm._closePanel(pm.getPanel("layers")),
-                            visible,
+                    const props = {
+                        display: this.display,
+                        title: this.title,
+                        close: () => {
+                            pm._closePanel(pm.getPanel(pm._activePanelKey));
                         },
-                        this.domNode
-                    );
+                        visible,
+                    };
+                    if (this.props) Object.assign(props, this.props);
+                    this.app = reactApp.default(fcomp, props, this.domNode);
                 });
             },
         });

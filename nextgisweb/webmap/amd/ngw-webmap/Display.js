@@ -6,7 +6,6 @@ define([
     "dojo/promise/all",
     "dojo/aspect",
     "dojo/dom-construct",
-    "dojo/dom-style",
     "dojo/topic",
     "dojo/data/ItemFileWriteStore",
     "dijit/_WidgetBase",
@@ -42,10 +41,9 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/pyramid/settings!",
     "dojo/text!./template/Display.hbs",
-    "dijit/layout/ContentPane",
-    "dijit/layout/TabContainer",
+    // template
     "dijit/layout/BorderContainer",
-    "dojox/layout/TableContainer",
+    "dijit/layout/ContentPane",
     // css
     "xstyle/css!./template/resources/Display.css",
 ], function (
@@ -56,7 +54,6 @@ define([
     all,
     aspect,
     domConstruct,
-    domStyle,
     topic,
     ItemFileWriteStore,
     _WidgetBase,
@@ -85,7 +82,7 @@ define([
     LayersPanelModule,
     PrintMapPanel,
     URL,
-    i18n,
+    { gettext, renderTemplate },
     settings,
     template
 ) {
@@ -150,7 +147,7 @@ define([
     });
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: i18n.renderTemplate(template),
+        templateString: renderTemplate(template),
 
         // AMD module loading: adapter, basemap, plugin
         _midDeferred: undefined,
@@ -345,37 +342,6 @@ define([
         postCreate: function () {
             this.inherited(arguments);
 
-            // Modify TabContainer to hide tabs if there is only one tab.
-            declare.safeMixin(this.tabContainer, {
-                updateTabVisibility: function () {
-                    var currstate =
-                            domStyle.get(this.tablist.domNode, "display") !==
-                            "none",
-                        newstate = this.getChildren().length > 1;
-
-                    if (currstate && !newstate) {
-                        domStyle.set(this.tablist.domNode, "display", "none");
-                        this.resize();
-                    } else if (!currstate && newstate) {
-                        domStyle.set(this.tablist.domNode, "display", "block");
-                        this.resize();
-                    }
-                },
-
-                addChild: function () {
-                    this.inherited(arguments);
-                    this.updateTabVisibility();
-                },
-                removeChild: function () {
-                    this.inherited(arguments);
-                    this.updateTabVisibility();
-                },
-                startup: function () {
-                    this.inherited(arguments);
-                    this.updateTabVisibility();
-                },
-            });
-
             this.leftPanelPane = new ContentPane({
                 class: "leftPanelPane",
                 region: "left",
@@ -503,12 +469,12 @@ define([
                         class: "ol-control__icon",
                         innerHTML: icon.html({ glyph: "remove" }),
                     }),
-                    zoomInTipLabel: i18n.gettext("Zoom in"),
-                    zoomOutTipLabel: i18n.gettext("Zoom out"),
+                    zoomInTipLabel: gettext("Zoom in"),
+                    zoomOutTipLabel: gettext("Zoom out"),
                     target: widget.leftTopControlPane,
                 }),
                 new ol.control.Attribution({
-                    tipLabel: i18n.gettext("Attributions"),
+                    tipLabel: gettext("Attributions"),
                     target: widget.rightBottomControlPane,
                     collapsible: false,
                 }),
@@ -524,15 +490,15 @@ define([
                 new InitialExtent({
                     display: widget,
                     target: widget.leftTopControlPane,
-                    tipLabel: i18n.gettext("Initial extent"),
+                    tipLabel: gettext("Initial extent"),
                 }),
                 new MyLocation({
                     display: widget,
                     target: widget.leftTopControlPane,
-                    tipLabel: i18n.gettext("Locate me"),
+                    tipLabel: gettext("Locate me"),
                 }),
                 new ol.control.Rotate({
-                    tipLabel: i18n.gettext("Reset rotation"),
+                    tipLabel: gettext("Reset rotation"),
                     target: widget.leftTopControlPane,
                     label: domConstruct.create("span", {
                         class: "ol-control__icon",
@@ -952,8 +918,8 @@ define([
                 .then((result) => {
                     if (result) return;
                     errorModule.errorModal({
-                        title: i18n.gettext("Object not found"),
-                        message: i18n.gettext(
+                        title: gettext("Object not found"),
+                        message: gettext(
                             "Object from URL parameters not found"
                         ),
                     });
@@ -981,7 +947,7 @@ define([
                     waitFor: [this.panelsManager.panelsReady.promise],
                 }),
                 params: {
-                    title: i18n.gettext("Layers"),
+                    title: gettext("Layers"),
                     name: "layers",
                     order: 10,
                     menuIcon: "material-layers",
@@ -991,7 +957,7 @@ define([
             panels.push({
                 cls: reactPanel("@nextgisweb/webmap/panel/search"),
                 params: {
-                    title: i18n.gettext("Search"),
+                    title: gettext("Search"),
                     name: "search",
                     order: 20,
                     menuIcon: "material-search",
@@ -1001,7 +967,7 @@ define([
             panels.push({
                 cls: PrintMapPanel,
                 params: {
-                    title: i18n.gettext("Print map"),
+                    title: gettext("Print map"),
                     name: "print",
                     order: 70,
                     menuIcon: "material-print",
@@ -1016,7 +982,7 @@ define([
                 const panel = {
                     cls: reactPanel("@nextgisweb/webmap/panel/bookmarks"),
                     params: {
-                        title: i18n.gettext("Bookmarks"),
+                        title: gettext("Bookmarks"),
                         name: "bookmark",
                         order: 50,
                         menuIcon: "material-bookmark",
@@ -1033,7 +999,7 @@ define([
                 const panel = {
                     cls: reactPanel("@nextgisweb/webmap/panel/description"),
                     params: {
-                        title: i18n.gettext("Description"),
+                        title: gettext("Description"),
                         name: "info",
                         order: 40,
                         menuIcon: "material-info-outline",
@@ -1059,7 +1025,7 @@ define([
                         resolve({
                             cls: AnnotationsPanel,
                             params: {
-                                title: i18n.gettext("Annotations"),
+                                title: gettext("Annotations"),
                                 name: "annotation",
                                 order: 30,
                                 menuIcon: "material-message",
@@ -1073,7 +1039,7 @@ define([
             panels.push({
                 cls: reactPanel("@nextgisweb/webmap/panel/share"),
                 params: {
-                    title: i18n.gettext("Share"),
+                    title: gettext("Share"),
                     name: "share",
                     order: 60,
                     menuIcon: "material-share",
