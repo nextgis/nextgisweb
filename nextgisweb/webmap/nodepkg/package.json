@@ -1,5 +1,8 @@
 {
     "name": "@nextgisweb/webmap",
     "version": "0.0.0",
-    "type": "module"
+    "type": "module",
+    "dependencies": {
+        "html-to-image": "^1.11.11"
+    }
 }

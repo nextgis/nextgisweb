@@ -1,4 +1,3 @@
-/* global domtoimage */
 define([
     "dojo/_base/declare",
     "dojo/topic",
@@ -17,6 +16,7 @@ define([
     "handlebars/handlebars",
     "ngw-pyramid/dynamic-panel/DynamicPanel",
     "dijit/layout/BorderContainer",
+    "@nextgisweb/webmap/compat/html-to-image",
     "@nextgisweb/pyramid/i18n!",
     "ngw-webmap/ol/Map",
     "openlayers/ol",
@@ -29,7 +29,6 @@ define([
     "dijit/layout/ContentPane",
     // Side effects
     "xstyle/css!./PrintMapPanel.css",
-    "./dom-to-image",
 ], function (
     declare,
     topic,
@@ -48,6 +47,7 @@ define([
     handlebars,
     DynamicPanel,
     BorderContainer,
+    { toPng, toJpeg },
     i18n,
     Map,
     ol,
@@ -211,10 +211,10 @@ define([
 
                 switch (imageType) {
                     case "png":
-                        domToImagePromise = domtoimage.toPng(elementToRender);
+                        domToImagePromise = toPng(elementToRender);
                         break;
                     case "jpeg":
-                        domToImagePromise = domtoimage.toJpeg(elementToRender);
+                        domToImagePromise = toJpeg(elementToRender);
                         break;
                     default:
                         console.error(
