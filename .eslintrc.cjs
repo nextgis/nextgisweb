@@ -8,7 +8,7 @@ const expcomp = (pattern) => [
 /** @type {import("eslint").Linter.Config } */
 const config = {
     root: true,
-    plugins: ["requirejs", "react", "prettier"],
+    plugins: ["requirejs", "react", "prettier", "import"],
     extends: [
         "eslint:recommended",
         "plugin:requirejs/recommended",
@@ -35,6 +35,25 @@ const config = {
         "requirejs/amd-function-arity": [
             "error",
             { allowExtraDependencies: true },
+        ],
+
+        "no-restricted-imports": [
+            "error",
+            {
+                "paths": [
+                    {
+                        "name": "lodash",
+                        "message": "Use 'lodash-es' instead 'lodash'.",
+                    },
+                ],
+                "patterns": [
+                    {
+                        "group": ["lodash/*"],
+                        "message":
+                            "Use 'lodash-es/[util]' instead 'lodash/[util]'.",
+                    },
+                ],
+            },
         ],
     },
     ignorePatterns: ["doc/", "contrib/", "dist/", "node_modules/", "env/lib/"],
