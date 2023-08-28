@@ -465,7 +465,8 @@ define([
                         if (newValue) {
                             // On change of selected element move values to widgets
                             // and show needed panel: one for layers, another for groups.
-                            if (newValue.item_type === "group") {
+                            const itemType = newValue.item_type[0];
+                            if (itemType === "group") {
                                 widget.widgetItemDisplayNameGroup.set(
                                     "value",
                                     widget.getItemValue("display_name")
@@ -477,7 +478,7 @@ define([
                                     "checked",
                                     widget.getItemValue("group_expanded")
                                 );
-                            } else if (newValue.item_type === "layer") {
+                            } else if (itemType === "layer") {
                                 widget.widgetItemDisplayNameLayer.set(
                                     "value",
                                     widget.getItemValue("display_name")
