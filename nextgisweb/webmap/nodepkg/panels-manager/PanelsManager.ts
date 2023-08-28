@@ -1,4 +1,4 @@
-import orderBy from "lodash/orderBy";
+import orderBy from "lodash-es/orderBy";
 import reactApp from "@nextgisweb/gui/react-app";
 
 import NavigationMenu from "@nextgisweb/webmap/navigation-menu";

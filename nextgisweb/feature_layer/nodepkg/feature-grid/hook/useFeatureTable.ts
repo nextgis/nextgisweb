@@ -1,5 +1,5 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
