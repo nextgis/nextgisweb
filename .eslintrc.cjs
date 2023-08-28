@@ -128,7 +128,7 @@ const config = {
     ],
     settings: {
         react: {
-            version: "17",
+            version: "18",
         },
     },
 };
