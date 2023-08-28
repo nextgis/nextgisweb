@@ -330,7 +330,7 @@ define([
                         return item.display_name;
                     },
                     getIconClass: function (item, opened) {
-                        return item.item_type === "group"
+                        return item.item_type[0] === "group"
                             ? opened
                                 ? "dijitFolderOpened"
                                 : "dijitFolderClosed"
