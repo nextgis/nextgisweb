@@ -10,6 +10,7 @@ from nextgisweb.lib.apitype import ContentType
 
 ROUTE_PATTERN = dict(
     str=None,
+    any=r".*",
     int=r"-?[0-9]+",
     uint=r"[0-9]+",
 )

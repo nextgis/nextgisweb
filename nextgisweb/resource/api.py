@@ -524,6 +524,6 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'resource.file_download',
-        '/api/resource/{id:uint}/file/{name:str}',
+        '/api/resource/{id:uint}/file/{name:any}',
         factory=resource_factory,
         overloaded=True)

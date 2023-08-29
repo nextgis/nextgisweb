@@ -14,9 +14,10 @@ from ..tomb import is_json_type, iter_routes
 from .docstring import Doctring
 
 _PATH_TYPE = dict(
+    str=str,
+    any=str,
     int=int,
     uint=Annotated[int, Meta(ge=0)],
-    str=str,
 )
 
 
