@@ -2,12 +2,24 @@
 import { useEffect, useState } from "react";
 
 import { Button, Modal } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { TemplateLink } from "@nextgisweb/gui/component";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { notesUrl, registerCallback } from ".";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 
 import "./sysinfo.less";
+
+const msgChecking = gettext("Checking for updates...");
+const msgContactSupport = gettext("<a>Contact support</a> for update.");
+const msgShowDetails = gettext("Show details");
+
+// prettier-ignore
+const [msgCritical, msgUpdate, msgUpToDate] = [
+    gettext("Critical updates are available: {version}. Please consider updating an soon as possible."),
+    gettext("New version of {distribution} is available: {version}."),
+    gettext("Your {distribution} is up-to-date."),
+]
 
 export default function UpdateSysInfo() {
     const [loaded, setLoaded] = useState(false);
@@ -32,22 +44,10 @@ export default function UpdateSysInfo() {
     }, []);
 
     const res = !loaded
-        ? i18n.gettext("Checking for updates...")
-        : /* prettier-ignore */ (hasUpdate
-            ? isCritical
-                ? i18n.gettext("Critical updates are available: {version}. Please consider updating an soon as possible.")
-                : i18n.gettext("New version of {distribution} is available: {version}.")
-            : i18n.gettext("Your {distribution} is up-to-date.")
-        )
-            .replace("{distribution}", ngwConfig.distribution.description)
-            .replace("{version}", latestVersion);
-
-    const [mUpdPre, mUpdLnk, mUpdPost] = hasUpdate
-        ? i18n
-              .gettext("<a>Contact support</a> for update.")
-              .match(/(.*)<a>(.*)<\/a>(.*)/)
-              .slice(1)
-        : [null, null, null];
+        ? msgChecking
+        : (hasUpdate ? (isCritical ? msgCritical : msgUpdate) : msgUpToDate)
+              .replace("{distribution}", ngwConfig.distribution.description)
+              .replace("{version}", latestVersion);
 
     const showDetails = () => setDetailsVisible(true);
     const hideDetails = () => setDetailsVisible(false);
@@ -63,22 +63,18 @@ export default function UpdateSysInfo() {
                 <div>{res}</div>
                 {hasUpdate && (
                     <div>
-                        {mUpdPre}
-                        <a
-                            href={settings.support_url}
+                        <TemplateLink
+                            template={msgContactSupport}
+                            link={settings.support_url}
                             target="_blank"
-                            rel="noreferrer"
-                        >
-                            {mUpdLnk}
-                        </a>
-                        {mUpdPost}
+                        />
                     </div>
                 )}
             </div>
             {hasUpdate && (
                 <div className="btn">
                     <Button type="primary" ghost onClick={showDetails}>
-                        {i18n.gettext("Show details")}
+                        {msgShowDetails}
                     </Button>
                     <Modal
                         wrapClassName="ngw-pyramid-update-sysinfo-modal"

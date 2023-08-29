@@ -8,6 +8,7 @@ import {
     Space,
     Switch,
 } from "@nextgisweb/gui/antd";
+import { TemplateLink } from "@nextgisweb/gui/component";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -21,6 +22,9 @@ import PreviewIcon from "@nextgisweb/icon/material/preview";
 import "./SharePanel.less";
 import { PanelHeader } from "../header";
 
+// prettier-ignore
+const msgCORS = gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain.");
+
 const makeIframeTag = (iframeSrc, height, width) => {
     return (
         `<iframe src="${iframeSrc}" ` +
@@ -29,27 +33,21 @@ const makeIframeTag = (iframeSrc, height, width) => {
     );
 };
 
-const regexLink = /(.+)?<a>(.*?)<\/a>(.+)?/;
-
-const makeCORSWarning = () => {
-    // prettier-ignore
-    const caption = gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain.");
-    if (!regexLink.test(caption)) {
-        return <></>;
-    }
-    const [_all, pre, refText, post] = regexLink.exec(caption);
-    const message = (
-        <span>
-            {pre}
-            <a href={routeURL("pyramid.control_panel.cors")} target="_blank">
-                {refText}
-            </a>
-            {post}
-        </span>
+function CORSWarning() {
+    if (!settings["check_origin"]) return <></>;
+    return (
+        <Alert
+            type="warning"
+            message={
+                <TemplateLink
+                    template={msgCORS}
+                    link={routeURL("pyramid.control_panel.cors")}
+                    target="_blank"
+                />
+            }
+        />
     );
-
-    return <Alert message={message} type="warning" />;
-};
+}
 
 function CodeArea(props) {
     return (
@@ -122,7 +120,6 @@ export const SharePanel = ({ display, title, close, visible }) => {
         });
     }, [widthMap, heightMap, addLinkToMap, generateEvents]);
 
-    const CORSWarning = useMemo(() => makeCORSWarning(), []);
     const previewUrl = routeURL("webmap.preview_embedded", webmapId);
 
     return (
@@ -144,8 +141,6 @@ export const SharePanel = ({ display, title, close, visible }) => {
                 <h5 className="heading">
                     {gettext("Embed code for your site")}
                 </h5>
-
-                {settings["check_origin"] && CORSWarning}
 
                 <div className="input-group">
                     <span className="grow">{gettext("Map size:")}</span>
@@ -204,6 +199,7 @@ export const SharePanel = ({ display, title, close, visible }) => {
                         </Button>
                     </Space.Compact>
                 </form>
+                <CORSWarning />
             </section>
         </div>
     );
