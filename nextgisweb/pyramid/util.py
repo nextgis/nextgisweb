@@ -1,15 +1,9 @@
-import os
-import os.path
 import re
 import secrets
 import string
 from calendar import timegm
 from collections import defaultdict
-from mimetypes import guess_type
 from pathlib import Path
-
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.response import FileResponse
 
 
 def viewargs(*, renderer=None):
@@ -73,37 +67,6 @@ class StaticSourcePredicate:
         else:
             request.environ['static_path'] = path
             return True
-
-
-class StaticFileResponse(FileResponse):
-
-    def __init__(self, filename, *, cache=True, request) -> None:
-        content_type, _ = guess_type(filename)
-
-        found_encoding = None
-        if (
-            (pref := request.env.pyramid.options['compression.algorithms'])
-            and (aenc := request.accept_encoding)
-            and (match := aenc.best_match(pref))
-        ):
-            try_filename = filename + '.' + match
-            if os.path.isfile(try_filename):
-                filename = try_filename
-                found_encoding = match
-
-        if found_encoding is None and not os.path.isfile(filename):
-            raise HTTPNotFound()
-
-        super().__init__(
-            filename,
-            content_type=content_type,
-            cache_max_age=3600 if cache else None,
-            request=request)
-
-        if found_encoding:
-            self.headers['Content-Encoding'] = found_encoding
-
-        self.headers['Vary'] = 'Accept-Encoding'
 
 
 def gensecret(length):

@@ -13,6 +13,7 @@ from nextgisweb.lib.json import dumpb
 
 from nextgisweb.feature_layer.exception import FeatureNotFound
 from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid.tomb import UnsafeFileResponse
 from nextgisweb.resource import DataScope, resource_factory
 
 from .exception import AttachmentNotFound
@@ -44,7 +45,7 @@ def download(resource, request):
     )
 
     fn = env.file_storage.filename(obj.fileobj)
-    response = FileResponse(fn, content_type=obj.mime_type, request=request)
+    response = UnsafeFileResponse(fn, content_type=obj.mime_type, request=request)
     response.content_disposition = f'filename*=utf-8\'\'{quote_plus(obj.name)}'
     return response
 

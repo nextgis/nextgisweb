@@ -28,8 +28,8 @@ from . import exception, renderer
 from .openapi import openapi
 from .session import WebSession
 from .tomb.predicate import ErrorRendererPredicate
+from .tomb.response import StaticFileResponse
 from .util import (
-    StaticFileResponse,
     StaticMap,
     StaticSourcePredicate,
     set_output_buffering,
