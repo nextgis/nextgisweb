@@ -72,7 +72,9 @@ export function StorageSummary() {
         await load(true);
     }
 
-    useEffect(() => load(false), []);
+    useEffect(() => {
+        load(false);
+    }, []);
 
     if (skeleton) {
         return <Skeleton paragraph={{ rows: 8 }} />;
@@ -136,22 +138,20 @@ export function StorageSummary() {
 
     function infoTextFirst() {
         if (total.esimated !== null && total.updated !== null) {
-            return i18n
-                .gettext(
-                    "Storage usage was fully estimated at %s and updated at %s."
-                )
+            return gettext(
+                "Storage usage was fully estimated at %s and updated at %s."
+            )
                 .replace("%s", utc(total.esimated).local().format("L LTS"))
                 .replace("%s", utc(total.updated).local().format("L LTS"));
         } else if (total.updated === null) {
-            return i18n
-                .gettext("Storage usage was fully estimated at %s.")
-                .replace("%s", utc(total.esimated).local().format("L LTS"));
+            return gettext("Storage usage was fully estimated at %s.").replace(
+                "%s",
+                utc(total.esimated).local().format("L LTS")
+            );
         } else if (total.estimated === null) {
-            return i18n
-                .gettext(
-                    "Storage usage hasn't been estimated yet but was updated at %s."
-                )
-                .replace("%s", utc(total.updated).local().format("L LTS"));
+            return gettext(
+                "Storage usage hasn't been estimated yet but was updated at %s."
+            ).replace("%s", utc(total.updated).local().format("L LTS"));
         } else {
             return gettext("Storage usage hasn't been estimated yet.");
         }
