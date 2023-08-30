@@ -119,7 +119,13 @@ class PyramidComponent(Component):
     def client_codegen(self):
         self.make_app(settings=dict())
 
-        typemap = {'int': 'number', 'uint': 'number', 'str': 'string'}
+        typemap = {
+            'int': 'number',
+            'uint': 'number',
+            'str': 'string',
+            'any': 'string',
+        }
+
         code = ["export interface RouteParameters /* prettier-ignore */ {"]
         for k, v in self.route_mdtypes.items():
             if len(v) == 0:
