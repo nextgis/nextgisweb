@@ -76,7 +76,7 @@ def image(resource, request):
     if 'size' in request.GET:
         image.thumbnail(
             list(map(int, request.GET['size'].split('x'))),
-            Image.ANTIALIAS)
+            Image.LANCZOS)
 
     buf = BytesIO()
     image.save(buf, ext)
