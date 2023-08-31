@@ -23,8 +23,8 @@
       &:hover,
       &.dijitDropDownButtonHover {
         .dijitButtonNode {
-          border-color: @hover-bg-base;
-          background-color: @hover-bg-base;
+          border-color: rgba(0, 0, 0, 0.04);
+          background-color: rgba(0, 0, 0, 0.04);
         }
       }
     }
@@ -50,19 +50,19 @@
     background-color: var(--primary);
     color: #fff;
     border-color: var(--primary);
-    font-family: @base-font;
+    font-family: var(--body-font-family);
   }
 
   .dijitCalendarSelectedDate.dijitCalendarHoveredDate .dijitCalendarDateLabel {
-    background-color: darken(@primary, 10%);
-    border-color: darken(@primary, 10%);
+    background-color: var(--primary);
+    border-color: var(--primary);
     color: #fff;
   }
 
   .dijitCalendarHoveredDate .dijitCalendarDateLabel {
-    background-color: @hover-bg-base;
+    background-color: rgba(0, 0, 0, 0.04);
     color: var(--primary);
-    border-color: @hover-bg-base;
+    border-color: rgba(0, 0, 0, 0.04);
   }
 
   .dijitCalendarDayLabel {
@@ -91,9 +91,9 @@
     &.dijitCalendarNextYearHover,
     &.dijitCalendarPreviousYearHover {
       padding: 2px 4px;
-      background-color: @hover-bg-base;
+      background-color: rgba(0, 0, 0, 0.04);
       border: 0;
-      border-radius: @border-radius-base;
+      border-radius: var(--border-radius-root);
     }
   }
 
@@ -103,8 +103,8 @@
 
   .dijitCalendarMonthMenu .dijitCalendarMonthLabelHover,
   .dijitCalendarMonthMenu .dijitCalendarMonthLabelActive {
-    background-color: @hover-bg-base;
-    border-color: @hover-bg-base;
+    background-color: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.04);
     background-image: none;
   }
 }

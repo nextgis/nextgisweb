@@ -1,105 +1,35 @@
-/* -- Variables -- */
-@screen-sm-min: 768px;
-@screen-md-min: 1024px;
-
-@min-width: 680px;
-@headerHeight: 42px;
-
-@text-color: #212121;
-@light-text: #AFB8C0;
-@light-text-2: #777;
-@text-muted: #808A93;
-
-@blue: #076dbf;
-@darkBlue: #036997;
-@lightBlue: #e5eef7;
-@lightBlue-2: #EEF4F7;
-@black: #000;
-@white: #fff;
-@bgColor: #fafafa;
-@light-border: #efefef;
-@light-border-2: #dedede;
-@yellow: #FFBA3F;
-@yellow-light: #fdf8c3;
-@green: #00C775;
-@red: #F44336;
-@link-hover: #2196F3;
-@gray-bg: #f0f1f3;
-@hover-bg-base: rgba(0, 0, 0, 0.04);
-
-@elevation-base: 0 1px 2px rgba(57, 70, 78, .3);
-@border-radius-base: 4px;
-
-@base-font: "Roboto";
-@header-font: "lato_local";
-
-@font-size-md: 16px;
-
-@icon-color: #B3B9BE;
-
-@input-border-color: rgba(0, 0, 0, .16);
-
-
-/* theme */
-
-@primary: @blue;
-@secondary: @lightBlue;
-@accent: @green;
-@danger: #F44336;
-@warning: #FFBA3F;
-@success: @green;
-
-:root{
-// Colors
-  --primary: @primary;
-  --secondary: @secondary;
-  --accent: @accent;
-  --danger: @danger;
-  --error: @danger;
-  --warning: @warning;
-  --success: @success;
-  --on-primary-text: #fff;
-  --on-secondary-text: var(--primary);
-  --on-accent-text: #fff;
-  --on-error-text: #fff;
-  --on-warning-text: #fff;
-  // Global
-  --border-radius-root: @border-radius-base;
-  --bg-base: @bgColor;
-  --link-color: var(--primary);
-  --link-hover-color: @link-hover;
-  --icon-color: @icon-color;
-  --hover-opacity-root: .08;
-  --surface-bg: @lightBlue-2;
-  --surface-bg-darker: @gray-bg;
-  --surface-bg-success: rgba(0, 199, 117, .24);
-  --surface-bg-danger: rgba(244, 67, 54, .24);
-  --on-surface-text: var(--text-base);
-// Typography
-  --text-base: @text-color;
-  --text-secondary: #808A93;
-  --text-disabled: #AFB8C0;
-  --body-font-family: @base-font;
-  --body-font-weight: 400;
-  --heading-font-family: @header-font;
-  --heading-font-weight: 700;
-// Dividers
-  --divider-opacity: .12; // used for styling dividers of variable colors
-  --divider-color: rgba(0,0,0, .08);
-  --divider-color-lighter: rgba(0,0,0, .04);
-  --divider-primary-color: fade(@primary, 48);
-// Inputs
-  --input-border-color: @input-border-color;
-// Header
-  --header-bg: @secondary;
-  --on-header-text: @primary;
-// User avatar
-  --user-avatar-bg: var(--primary);
-  --user-avata-text: var(--on-primary-text);
-// Sidebar panel (resource type, right menu)
-  --sidebar-bg: #fff;
-  --sidebar-text: var(--text-base);
-// Icon menu (left menu on the map)
-  --icon-menu-bg: var(--primary);
-  --icon-menu-text: var(--on-primary-text);
+:root {
+    // Colors
+    --primary: #076dbf;
+    --secondary: #e5eef7;
+    --accent: #00c775;
+    --danger: #f44336;
+    --error: #f44336;
+    --warning: #ffba3f;
+    --success: #00c775;
+    --on-primary-text: #fff;
+    --on-secondary-text: var(--primary);
+    --on-accent-text: #fff;
+    --on-error-text: #fff;
+    --on-warning-text: #fff;
+    // Global
+    --border-radius-root: 4px;
+    --bg-base: #fafafa;
+    --link-color: var(--primary);
+    --link-hover-color: #2196f3;
+    --icon-color: #b3b9be;
+    --hover-opacity-root: 0.08;
+    --surface-bg-success: rgba(0, 199, 117, 0.24);
+    --surface-bg-danger: rgba(244, 67, 54, 0.24);
+    // Typography
+    --text-base: #212121;
+    --text-secondary: #808a93;
+    --body-font-family: "Roboto";
+    --body-font-weight: 400;
+    --heading-font-family: "lato_local";
+    --heading-font-weight: 700;
+    // Dividers
+    --divider-color: rgba(0, 0, 0, 0.08);
+    // Inputs
+    --input-border-color: rgba(0, 0, 0, 0.16);
 }
