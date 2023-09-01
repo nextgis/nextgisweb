@@ -729,8 +729,12 @@ define([
                 this._plugins = {};
             }
 
-            var widget = this,
-                plugins = wmplugin ? this._mid.wmplugin : this._mid.plugin;
+            var plugins = wmplugin ? this._mid.wmplugin : this._mid.plugin;
+            this._installPlugins(plugins);
+        },
+
+        _installPlugins: function (plugins) {
+            var widget = this;
 
             array.forEach(
                 Object.keys(plugins),
@@ -740,7 +744,7 @@ define([
                     var plugin = new plugins[key]({
                         identity: key,
                         display: this,
-                        itemStore: wmplugin ? false : this.itemStore,
+                        itemStore: plugins ? false : this.itemStore,
                     });
 
                     widget._postCreateDeferred.then(function () {
