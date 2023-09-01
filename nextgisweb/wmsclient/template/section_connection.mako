@@ -1,23 +1,15 @@
+<%page args="section"/>
+<% section.content_box = False %>
+
 <% capcache = obj.capcache_dict %>
 
-<table class="table-keyvalue pure-table"><tbody>
-    <tr>
-        <th class="table-keyvalue__key">
-            <span class="table-keyvalue__key__inner">${tr(_('Timestamp'))}</span>
-        </th>
-        <td class="table-keyvalue__value">
-            <span class="table-keyvalue__value__inner">${obj.capcache_tstamp}</span>
-        </td>
-    </tr>
-    <tr>
-        <th class="table-keyvalue__key">
-            <span class="table-keyvalue__key__inner">${tr(_('Image format'))}</span>
-        </th>
-        <td class="table-keyvalue__value">
-            <span class="table-keyvalue__value__inner">${', '.join(capcache['formats'])}</span>
-        </td>
-    </tr>
-</tbody></table>
+<dl class="ngw-kv ngw-resource-section">
+    <dt>${tr(_('Timestamp'))}</dt>
+    <dd>${obj.capcache_tstamp}</dd>
+    
+    <dt>${tr(_('Image format'))}</dt>
+    <dd>${', '.join(capcache['formats'])}</dd>
+</dl>
 
 
 <table class="pure-table pure-table-horizontal ngw-card" style="width: 100%">

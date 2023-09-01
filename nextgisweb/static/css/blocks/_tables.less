@@ -4,9 +4,6 @@ table {
   font-size: inherit;
 }
 
-table.data tr th { background-color: #eee; font-weight: bold; }
-table.data tr th, table.data tr td { padding: 0.2ex 0.5ex; }
-
 /* redefine pure css style */
 .pure-table {
   border: 0;
@@ -86,71 +83,4 @@ table.data tr th, table.data tr td { padding: 0.2ex 0.5ex; }
   td, th {
     padding: 8px 6px;
   }
-}
-
-.table-keyvalue {
-  margin-bottom: 30px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  td, th {
-    padding-top: .615em;
-    padding-bottom: 0;
-    border-bottom-color: transparent;
-    padding-left: 0;
-    vertical-align: bottom;
-
-    &:last-child {
-      padding-right: 0;
-    }
-
-    &.table-keyvalue__key {
-      border-bottom-color: var(--divider-color);
-      font-weight: normal;
-      color: var(--text-secondary);
-      letter-spacing: 0;
-    }
-
-    &.table-keyvalue__value {
-      padding-left: 3px;
-    }
-  }
-
-  th {
-    min-width: 160px;
-    max-width: 300px;
-  }
-
-  tbody tr {
-    &:first-child {
-      td, th {
-        padding-top: 0;
-      }
-    }
-
-    &:hover {
-      td, th {
-        background-color: transparent;
-      }
-    }
-  }
-}
-
-.table-keyvalue__key__inner,
-.table-keyvalue__value__inner {
-  position: relative;
-  top: 4px;
-}
-
-.content-box {
-  .table-keyvalue__key__inner,
-  .table-keyvalue__value__inner {
-    background-color: white;
-  }
-}
-
-.table-keyvalue__key__inner {
-  padding-right: 3px;
 }

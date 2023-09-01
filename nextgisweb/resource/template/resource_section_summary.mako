@@ -1,45 +1,22 @@
 <%page args="section"/>
 <% section.content_box = False %>
 
-<table class="meta-info table-keyvalue pure-table">
-    <tbody>
-        %if obj.keyname:
-            <tr>
-                <th class="table-keyvalue__key">
-                    <span class="table-keyvalue__key__inner">${tr(_("Keyname"))}</span>
-                </th>
-                <td class="table-keyvalue__value">
-                    <span class="table-keyvalue__value__inner">${obj.keyname}</span>
-                </td>
-            </tr>
-        %endif        
-        %if hasattr(obj, 'get_info'):
-            %for key, value in obj.get_info():
-            <tr>
-                <th class="table-keyvalue__key">
-                    <span class="table-keyvalue__key__inner">${tr(key)}</span>
-                </th>
-                <td class="table-keyvalue__value">
-                    <span class="table-keyvalue__value__inner">${tr(value)}</span>
-                </td>
-            </tr>
-            %endfor
-        %endif
-        <tr>
-            <th class="table-keyvalue__key">
-                <span class="table-keyvalue__key__inner">${tr(_("Type"))}</span>
-            </th>
-            <td class="table-keyvalue__value">
-                <span class="table-keyvalue__value__inner">${tr(obj.cls_display_name)} (${obj.cls})</span>
-            </td>
-        </tr>
-        <tr>
-            <th class="table-keyvalue__key">
-                <span class="table-keyvalue__key__inner">${tr(_("Owner"))}</span>
-            </th>
-            <td class="table-keyvalue__value">
-                <span class="table-keyvalue__value__inner">${obj.owner_user}</span>
-            </td>
-        </tr>
-    </tbody>
-</table>
+<dl class="ngw-kv ngw-resource-section">
+    %if obj.keyname:
+        <dt>${tr(_("Keyname"))}</dt>
+        <dd>${obj.keyname}</dd>
+    %endif
+
+    %if hasattr(obj, 'get_info'):
+        %for key, value in obj.get_info():
+            <dt>${tr(key)}</dt>
+            <dd>${tr(value)}</dd>
+        %endfor
+    %endif
+
+    <dt>${tr(_("Type"))}</dt>
+    <dd>${tr(obj.cls_display_name)} (${obj.cls})</dd>
+
+    <dt>${tr(_("Owner"))}</dt>
+    <dd>${obj.owner_user}</dd>
+</dl>     
