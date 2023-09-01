@@ -166,10 +166,10 @@ export function StorageSummary() {
     return (
         <>
             <Table
+                className="ngw-pyramid-storage-summary ngw-card"
                 rowKey="kind_of_data"
                 columns={columns}
                 dataSource={rows}
-                className="pyramid-storage-summary"
                 size="middle"
                 summary={renderSummary}
             />

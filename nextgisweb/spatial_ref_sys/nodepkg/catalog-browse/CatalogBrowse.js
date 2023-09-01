@@ -11,8 +11,6 @@ import {
     Table,
     Tooltip,
 } from "@nextgisweb/gui/antd";
-// TODO: make global custom antd table style
-import "@nextgisweb/gui/model-browse/ModelBrowse.less";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
@@ -198,11 +196,7 @@ export function CatalogBrowse() {
     );
 
     return (
-        <Space
-            direction="vertical"
-            style={{ width: "100%" }}
-            className="ngw-gui-model-browse"
-        >
+        <Space direction="vertical" style={{ width: "100%" }}>
             {TableControl()}
             <Table
                 rowKey="id"

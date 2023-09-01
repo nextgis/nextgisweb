@@ -61,7 +61,7 @@ export function EffectivePermissions({ resourceId }) {
     if (!data) return <LoadingWrapper />;
 
     return (
-        <div className="ngw-resource-effective-permisssions content-box">
+        <div className="ngw-resource-effective-permisssions ">
             <PrincipalSelect
                 model="user"
                 value={userId}
@@ -70,27 +70,25 @@ export function EffectivePermissions({ resourceId }) {
                 disabled={!seeOthers}
                 allowClear={false}
             />
-            <div className="table-wrapper">
-                <table className="pure-table pure-table-horizontal">
-                    <tbody>
-                        {data.map(({ key, label, items }) => (
-                            <Fragment key={key}>
-                                <tr>
-                                    <th colSpan={2}>{label}</th>
+            <table className="pure-table pure-table-horizontal ngw-card">
+                <tbody>
+                    {data.map(({ key, label, items }) => (
+                        <Fragment key={key}>
+                            <tr>
+                                <th colSpan={2}>{label}</th>
+                            </tr>
+                            {items.map(({ key, label, value }) => (
+                                <tr key={key} className="permission">
+                                    <td className="label">{label}</td>
+                                    <td className={pvClass[Number(value)]}>
+                                        <div>{pvLabel[Number(value)]}</div>
+                                    </td>
                                 </tr>
-                                {items.map(({ key, label, value }) => (
-                                    <tr key={key} className="permission">
-                                        <td className="label">{label}</td>
-                                        <td className={pvClass[Number(value)]}>
-                                            <div>{pvLabel[Number(value)]}</div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </Fragment>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                            ))}
+                        </Fragment>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 }

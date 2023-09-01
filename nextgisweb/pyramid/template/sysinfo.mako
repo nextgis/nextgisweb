@@ -27,67 +27,61 @@
         </script>
     %endif
 %endif
-<div class="content-box">
-    <div class="table-wrapper">
-        <table id="package-table" class="pure-table pure-table-horizontal">
 
-            <thead><tr> 
-                <th class="sort-default" style="width: 100%; text-align: inherit;">${tr(_('Package'))}</th>
-                <th style="width: 8em; text-align: inherit;" colspan="2" data-sort-method='dotsep'>${tr(_('Version'))}</th>
-            </tr></thead>
-
-            <tbody>
-
-            <%
-                packages = list(request.env.packages.items())
-                packages.sort(key=lambda i: '' if i[0] == 'nextgisweb' else i[0])
-            %>
-            
-            %for pname, pobj in packages:
-            <tr>
-                <td><%
-                    value = pobj.metadata['Summary']
-                    if value == 'UNKNOWN':
-                        value = None
-                    if not value:
-                        value = pobj.name
-                %>${value}</td>
-                <td>${pobj.version}</td>
-                <td>
-                    %if pobj.commit:
-                        ${pobj.commit + ('+' if pobj.dirty else '')}
-                    %else:
-                        &nbsp;
-                    %endif
-                </td>
-            </tr>
-            %endfor
-
-            </tbody>
-        </table>
-    </div>
-</div>
+<table id="package-table" class="pure-table pure-table-horizontal ngw-card" style="width: 100%">
+    <thead>
+        <tr> 
+            <th class="sort-default" style="width: 100%; text-align: inherit;">${tr(_('Package'))}</th>
+            <th style="width: 8em; text-align: inherit;" colspan="2" data-sort-method='dotsep'>${tr(_('Version'))}</th>
+        </tr>
+    </thead>
+    <tbody>
+    <%
+        packages = list(request.env.packages.items())
+        packages.sort(key=lambda i: '' if i[0] == 'nextgisweb' else i[0])
+    %>
+    %for pname, pobj in packages:
+        <tr>
+            <td><%
+                value = pobj.metadata['Summary']
+                if value == 'UNKNOWN':
+                    value = None
+                if not value:
+                    value = pobj.name
+            %>${value}</td>
+            <td>${pobj.version}</td>
+            <td>
+                %if pobj.commit:
+                    ${pobj.commit + ('+' if pobj.dirty else '')}
+                %else:
+                    &nbsp;
+                %endif
+            </td>
+        </tr>
+    %endfor
+    </tbody>
+</table>
 
 <h2>${tr(_('Platform'))}</h2>
 
-<div class="content-box"><div class="table-wrapper">
-    <table id="package-table" class="pure-table pure-table-horizontal"><tbody>
+<table id="package-table" class="pure-table pure-table-horizontal ngw-card" style="width: 100%">
+    <tbody>
     %for comp in request.env.components.values():
         %for k, v in comp.sys_info():
-            <tr>
-                <th style="width: 20em">${tr(k)}</th>
-                <td>${tr(v)}</td>
-            </tr>
+        <tr>
+            <th style="width: 20em">${tr(k)}</th>
+            <td>${tr(v)}</td>
+        </tr>
         %endfor
     %endfor
-    </tbody> </table>
-</div></div>
+    </tbody>
+</table>
 
 <h2>${tr(_("Browser support"))}</h2>
 
 
-<div class="content-box"><div class="table-wrapper">
-    <table id="browser-table" class="pure-table pure-table-horizontal"><tbody>
+<table id="browser-table" class="pure-table pure-table-horizontal ngw-card" style="width: 100%">
+    <tbody>
     %for fid, fam in FAMILIES.items():
         <tr>
             <th style="width: 20em">${fam.alias}</th>
@@ -115,8 +109,8 @@
             </td>
         </tr>
     %endif
-    </tbody></table>
-</div></div>
+    </tbody>
+</table>
 
 <script>
     require([

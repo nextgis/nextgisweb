@@ -13,7 +13,7 @@
     ) for link in links]
 %>
 
-<div class="content-box__description">${tr(_("Use these links to plug data into external applications."))}</div>
+<p>${tr(_("Use these links to plug data into external applications."))}</p>
 
 <div class="content-box">
     <div id="externalAccessSection"></div>

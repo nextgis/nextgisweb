@@ -1,10 +1,9 @@
 <%page args="dynmenu, args" />
 
+<%! from nextgisweb.lib import dynmenu as dm %>
 <%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>
 
-<% from nextgisweb.lib import dynmenu as dm %>
-
-<ul class="sidebar-menu list-unstyled">
+<ul class="sidebar-menu">
 <% label = None %>
 %for item in dynmenu.build(args):
     %if isinstance(item, dm.Label):

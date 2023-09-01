@@ -23,8 +23,6 @@ import DeleteForeverIcon from "@nextgisweb/icon/material/delete_forever";
 import EditIcon from "@nextgisweb/icon/material/edit";
 import SearchIcon from "@nextgisweb/icon/material/search";
 
-import "./ModelBrowse.less";
-
 export function ModelBrowse({
     model: m,
     columns,
@@ -276,6 +274,7 @@ export function ModelBrowse({
         >
             {selected.length ? SelectedControl() : TableControl()}
             <Table
+                className="ngw-card"
                 rowKey="id"
                 showSorterTooltip={false}
                 rowSelection={{
