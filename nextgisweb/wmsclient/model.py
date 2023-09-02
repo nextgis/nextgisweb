@@ -99,6 +99,16 @@ class Connection(Base, Resource):
 
         self.capcache_json = json.dumps(data, ensure_ascii=False)
 
+    def get_info(self):
+        s = super()
+        result = s.get_info() if hasattr(s, 'get_info') else ()
+        if self.capcache_tstamp is not None:
+            result += (
+                (_("WMS capabilities"), self.capcache_tstamp),
+                (_("Image format"), ', '.join(self.capcache_dict['formats']))
+            )
+        return result
+
     def capcache_clear(self):
         self.capcache_xml = None
         self.capcache_json = None

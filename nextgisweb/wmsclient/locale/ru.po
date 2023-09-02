@@ -3,21 +3,11 @@
 msgid "WMS connection"
 msgstr "Соединение WMS"
 
-#: amd/ngw-wmsclient/LayerWidget.js:45 model.py:175
-msgid "WMS layer"
-msgstr "Слой WMS"
-
-#: view.py:28
-msgid "WMS capabilities"
-msgstr "Возможности WMS"
-
 #: amd/ngw-wmsclient/LayerVendorParamsWidget.js:44
-#: template/section_vendor_params.mako:5
 msgid "Key"
 msgstr "Ключ"
 
 #: amd/ngw-wmsclient/LayerVendorParamsWidget.js:53
-#: template/section_vendor_params.mako:6
 msgid "Value"
 msgstr "Значение"
 
@@ -32,6 +22,10 @@ msgstr "Добавить"
 #: amd/ngw-wmsclient/LayerVendorParamsWidget.js:96
 msgid "Delete"
 msgstr "Удалить"
+
+#: amd/ngw-wmsclient/LayerWidget.js:45 model.py:185
+msgid "WMS layer"
+msgstr "Слой WMS"
 
 #: amd/ngw-wmsclient/template/ConnectionWidget.hbs:10
 msgid "URL"
@@ -73,8 +67,7 @@ msgstr "Выберите соединение WMS"
 msgid "Coordinate system"
 msgstr "Система координат"
 
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:29
-#: template/section_connection.mako:14
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:29 model.py:108
 msgid "Image format"
 msgstr "Формат изображения"
 
@@ -82,15 +75,15 @@ msgstr "Формат изображения"
 msgid "WMS layers"
 msgstr "Слои WMS"
 
-#: template/section_connection.mako:6
-msgid "Timestamp"
-msgstr "Метка времени"
+#: model.py:107 view.py:28
+msgid "WMS capabilities"
+msgstr "Возможности WMS"
 
-#: template/section_connection.mako:25
+#: template/section_connection.mako:10
 msgid "Layer"
 msgstr "Слой"
 
-#: template/section_connection.mako:26
+#: template/section_connection.mako:11
 msgid "Title"
 msgstr "Наименование"
 

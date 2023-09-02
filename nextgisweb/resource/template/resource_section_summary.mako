@@ -2,6 +2,9 @@
 <% section.content_box = False %>
 
 <dl class="ngw-kv ngw-resource-section">
+    <dt>${tr(_("Type"))}</dt>
+    <dd>${tr(obj.cls_display_name)} (${obj.cls})</dd>
+
     %if obj.keyname:
         <dt>${tr(_("Keyname"))}</dt>
         <dd>${obj.keyname}</dd>
@@ -13,9 +16,6 @@
             <dd>${tr(value)}</dd>
         %endfor
     %endif
-
-    <dt>${tr(_("Type"))}</dt>
-    <dd>${tr(obj.cls_display_name)} (${obj.cls})</dd>
 
     <dt>${tr(_("Owner"))}</dt>
     <dd>${obj.owner_user}</dd>

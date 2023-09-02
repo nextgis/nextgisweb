@@ -3,15 +3,6 @@
 
 <% capcache = obj.capcache_dict %>
 
-<dl class="ngw-kv ngw-resource-section">
-    <dt>${tr(_('Timestamp'))}</dt>
-    <dd>${obj.capcache_tstamp}</dd>
-    
-    <dt>${tr(_('Image format'))}</dt>
-    <dd>${', '.join(capcache['formats'])}</dd>
-</dl>
-
-
 <table class="pure-table pure-table-horizontal ngw-card" style="width: 100%">
     <thead>
         <tr>

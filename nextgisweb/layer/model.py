@@ -8,5 +8,5 @@ class SpatialLayerMixin(SRSMixin):
     def get_info(self):
         s = super()
         return (s.get_info() if hasattr(s, 'get_info') else ()) + (
-            (_("SRS identifier"), self.srs_id),
+            (_("Spatial reference system"), self.srs.display_name),
         )
