@@ -1,9 +1,24 @@
 .ngw-resource-external-access {
-    .row-input-info {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1em;
+
+    > .text {
+        grid-column: 1 / span 2;
+    }
+
+    > .label {
+        align-self: center;
+        white-space: nowrap;
+    }
+
+    > .url {
         display: flex;
-        border: 1px solid rgba(0, 0, 0, 0.08);
-        border-radius: 4px;
+        width: 100%;
+        min-width: 0;
         padding: 4px;
+        border: 1px solid var(--divider-color);
+        border-radius: var(--border-radius-root);
         align-items: center;
 
         .url-text {
@@ -14,8 +29,14 @@
             user-select: all;
         }
 
-        svg.icon {
-            flex-shrink: 0;
+        .ant-btn {
+            height: auto;
+            width: auto;
+            padding: 0;
+
+            svg.icon {
+                flex-shrink: 0;
+            }
         }
     }
 }

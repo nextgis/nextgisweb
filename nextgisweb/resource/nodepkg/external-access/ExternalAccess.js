@@ -1,4 +1,4 @@
-import { Popover, Space } from "@nextgisweb/gui/antd";
+import { Popover } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { url } from "@nextgisweb/pyramid/nextgis";
@@ -7,6 +7,8 @@ import HelpOutlineIcon from "@nextgisweb/icon/material/help_outline";
 
 import "./ExternalAccess.less";
 
+// prettier-ignore
+const msgUsage = gettext("Use these links to plug data into external applications.");
 const msgReadMore = gettext("Read more");
 
 const Help = ({ help, docsUrl }) => (
@@ -24,9 +26,9 @@ const Help = ({ help, docsUrl }) => (
 );
 
 const Link = ({ title, help, docsUrl, url }) => (
-    <Space direction="vertical" style={{ width: "100%" }}>
-        <Space>
-            {title}
+    <>
+        <div className="label">
+            {title}{" "}
             <Popover
                 overlayClassName="ngw-resource-external-access-popover"
                 placement="right"
@@ -34,22 +36,22 @@ const Link = ({ title, help, docsUrl, url }) => (
             >
                 <HelpOutlineIcon />
             </Popover>
-        </Space>
-        <div className="row-input-info">
+        </div>
+        <div className="url">
             <div className="url-text">{url}</div>
             <CopyToClipboardButton
                 type="link"
                 getTextToCopy={() => url}
-                messageInfo={gettext("The link copied to clipboard.")}
                 iconOnly
             />
         </div>
-    </Space>
+    </>
 );
 
 export function ExternalAccess({ links }) {
     return (
         <div className="ngw-resource-external-access">
+            <div className="text">{msgUsage}</div>
             {links.map((link, idx) => (
                 <Link key={idx} {...link} />
             ))}
