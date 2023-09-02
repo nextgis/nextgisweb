@@ -3,9 +3,8 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "@fontsource/roboto": "^4.2.3",
+        "@fontsource/roboto": "^5.0.8",
         "css-minimizer-webpack-plugin": "^2.0.0",
-        "lato-font": "^3.0.0",
         "mini-css-extract-plugin": "^1.6.0"
     },
     "nextgisweb": {
