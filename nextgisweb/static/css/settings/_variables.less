@@ -23,12 +23,15 @@
     // Typography
     --text-base: #212121;
     --text-secondary: #808a93;
-    --body-font-family: "Roboto";
-    --body-font-weight: 400;
-    --heading-font-family: "lato_local";
-    --heading-font-weight: 700;
     // Dividers
     --divider-color: rgba(0, 0, 0, 0.08);
     // Inputs
     --input-border-color: rgba(0, 0, 0, 0.16);
+}
+
+:root {
+  --ngw-text-font-family-list: var(--ngw-text-font-family, "Roboto"), sans-serif;
+  --ngw-text-font-weight: 400;
+  --ngw-head-font-family-list: var(--ngw-head-font-family, "Lato"), sans-serif;
+  --ngw-head-font-weight: 700;
 }

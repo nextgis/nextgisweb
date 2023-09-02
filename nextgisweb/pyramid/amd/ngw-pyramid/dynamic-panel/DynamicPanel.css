@@ -20,9 +20,9 @@
         line-height: 40px;
         border-bottom: 1px solid rgba(0,0,0,.12);
         box-sizing: border-box;
-        font-family: 'lato_local', 'Roboto', sans-serif;
+        font-family: var(--ngw-head-font-family-list);
+        font-weight: var(--ngw-text-font-weight);
         font-size: 15px;
-        font-weight: bold;
     }
 
     .dynamic-panel__content{

@@ -17,11 +17,13 @@ const token: Theme["token"] = {
     colorPrimary: cvar("primary"),
     colorSuccess: cvar("success"),
     colorWarning: cvar("warning"),
+    fontFamily: cvar("ngw-text-font-family-list"),
     motion: false,
 };
 
 const components: Theme["components"] = {
     Modal: { titleFontSize: 20 },
+    // Table: { fontWeightStrong: 500 },
 };
 
 const defaults: Props = {

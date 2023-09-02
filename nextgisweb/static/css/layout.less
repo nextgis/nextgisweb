@@ -39,21 +39,21 @@ div.dijitTabPane {
 /* -- BASE STYLES -- */
 
 @font-face {
-  font-family: Roboto;
+  font-family: "Roboto";
   src: url('@{node_modules}/@fontsource/roboto/files/roboto-all-400-normal.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: Roboto;
+  font-family: "Roboto";
   src: url('@{node_modules}/@fontsource/roboto/files/roboto-all-700-normal.woff') format('woff');
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
-  font-family: lato_local;
+  font-family: "Lato";
   src:
     url('@{node_modules}/lato-font/fonts/lato-normal/lato-normal.woff2') format('woff2'),
     url('@{node_modules}/lato-font/fonts/lato-normal/lato-normal.woff') format('woff');
@@ -62,7 +62,7 @@ div.dijitTabPane {
 }
 
 @font-face {
-  font-family: lato_local;
+  font-family: "Lato";
   src:
     url('@{node_modules}/lato-font/fonts/lato-bold/lato-bold.woff2') format('woff2'),
     url('@{node_modules}/lato-font/fonts/lato-bold/lato-bold.woff') format('woff');
@@ -72,7 +72,7 @@ div.dijitTabPane {
 
 body, html {
   height: 100%;
-  font-family: var(--body-font-family), 'Roboto', sans-serif;
+  font-family: var(--ngw-text-font-family-list);
 }
 
 body {
@@ -173,7 +173,7 @@ a[class*=" icon-"]:hover:before {
   z-index: 10;
   line-height: 1.5;
   font-size: 15px;
-  font-family: var(--heading-font-family), 'lato_local', sans-serif;
+  font-family: var(--ngw-head-font-family-list);
   color: var(--primary);
   border-bottom: 1px solid var(--divider-color);
 
@@ -189,7 +189,7 @@ a[class*=" icon-"]:hover:before {
     align-items: center;
     color: inherit;
     vertical-align: top;
-    font-weight: var(--heading-font-weight);
+    font-weight: var(--ngw-head-font-weight);
   }
 }
 
@@ -197,7 +197,7 @@ a[class*=" icon-"]:hover:before {
   margin: -9px 0;
   list-style-type: none;
   padding: 0;
-  font-weight: var(--heading-font-weight);
+  font-weight: var(--ngw-head-font-weight);
   white-space: nowrap;
 
   &__item {
