@@ -48,40 +48,25 @@ export function WebMapFeatureGridTab({
     );
 
     const reloadLayer = useCallback(() => {
-        if (display.current) {
-            const layer = display.current._layers[layerId];
-            if (layer) {
-                layer.reload();
-            }
-        }
+        const layer = display.current?._layers[layerId];
+        layer?.reload();
     }, [layerId]);
 
-    const updateSearch = () => {
-        setQuery("");
-    };
-
-    const unsubscribe = () => {
-        for (const t of topicHandlers.current) {
-            t.remove();
-        }
-        topicHandlers.current.length = 0;
-    };
-
-    const featureUnhighlightedEvent = useCallback(() => {
-        setSelectedIds([]);
-    }, []);
-
     const featureHighlightedEvent = useCallback(
-        ({ featureId, layerId }: { featureId: number; layerId: number }) => {
-            if (featureId !== undefined) {
-                if (layerId === layerId) {
-                    setSelectedIds([featureId]);
-                } else {
-                    featureUnhighlightedEvent();
-                }
+        ({
+            featureId,
+            layerId: eventLayerId,
+        }: {
+            featureId: number;
+            layerId: number;
+        }) => {
+            if (featureId !== undefined && eventLayerId === layerId) {
+                setSelectedIds([featureId]);
+            } else {
+                setSelectedIds([]);
             }
         },
-        [featureUnhighlightedEvent]
+        [layerId]
     );
 
     const featureUpdatedEvent = useCallback(
@@ -95,34 +80,30 @@ export function WebMapFeatureGridTab({
     );
 
     const subscribe = useCallback(() => {
-        unsubscribe();
         topicHandlers.current.push(
-            ...[
-                topic.subscribe("feature.highlight", featureHighlightedEvent),
-                topic.subscribe(
-                    "feature.unhighlight",
-                    featureUnhighlightedEvent
-                ),
-                topic.subscribe("feature.updated", featureUpdatedEvent),
-                topic.subscribe("/webmap/feature-table/refresh", updateSearch),
-            ]
+            topic.subscribe("feature.highlight", featureHighlightedEvent),
+            topic.subscribe(
+                "feature.unhighlight",
+                setSelectedIds.bind(null, [])
+            ),
+            topic.subscribe("feature.updated", featureUpdatedEvent),
+            topic.subscribe(
+                "/webmap/feature-table/refresh",
+                setQuery.bind(null, "")
+            )
         );
-    }, [
-        featureHighlightedEvent,
-        featureUnhighlightedEvent,
-        featureUpdatedEvent,
-        topic,
-    ]);
+    }, [featureHighlightedEvent, featureUpdatedEvent, topic]);
+
+    const unsubscribe = () => {
+        topicHandlers.current.forEach((handler) => handler.remove());
+        topicHandlers.current = [];
+    };
 
     const zoomToFeature = useCallback(() => {
         const wkt = new WKT();
-
         const fid = selectedIds[0];
         if (fid !== undefined) {
-            route("feature_layer.feature.item", {
-                id: layerId,
-                fid: fid,
-            })
+            route("feature_layer.feature.item", { id: layerId, fid })
                 .get<FeatureItem>()
                 .then((feature) => {
                     const geometry = wkt.readGeometry(feature.geom);
@@ -133,78 +114,50 @@ export function WebMapFeatureGridTab({
         }
     }, [layerId, selectedIds]);
 
-    const zoomToExtent = (ngwExtent: NgwExtent) => {
-        display.current.map.zoomToNgwExtent(
-            ngwExtent,
-            display.current.displayProjection
-        );
-    };
-
     useEffect(() => {
         subscribe();
 
         const highlightedFeatures =
             display.current.featureHighlighter.getHighlighted();
-        const selected: number[] = [];
-        for (const f of highlightedFeatures) {
-            if (f.getProperties) {
-                const { layerId, featureId } = f.getProperties();
-                if (layerId === layerId) {
-                    selected.push(featureId);
-                }
-            }
-        }
+        const selected: number[] = highlightedFeatures
+            .filter((f) => f.getProperties?.()?.layerId === layerId)
+            .map((f) => f.getProperties().featureId);
+
         setSelectedIds(selected);
 
-        return () => {
-            unsubscribe();
-        };
-    }, [subscribe]);
+        return unsubscribe;
+    }, [subscribe, layerId]);
 
-    const featureGridProps = useMemo(() => {
-        const props: FeatureGridProps = {
+    const featureGridProps = useMemo<FeatureGridProps>(() => {
+        return {
             id: layerId,
             query,
-            readonly: data.current ? data.current.readonly : true,
+            readonly: data.current?.readonly ?? true,
             size: "small",
             cleanSelectedOnFilter: false,
-            onDelete: function () {
-                reloadLayer();
-            },
-            onSave: function () {
-                const popupWidget = display.current.identify._popup.widget;
-                if (popupWidget) {
-                    popupWidget.reset();
-                }
+            onDelete: reloadLayer,
+            onSave: () => {
+                display.current.identify._popup.widget?.reset();
                 reloadLayer();
             },
             onSelect: function (newVal) {
                 setSelectedIds(newVal);
                 const fid = newVal[0];
                 if (fid !== undefined) {
-                    route("feature_layer.feature.item", {
-                        id: layerId,
-                        fid: fid,
-                    })
+                    route("feature_layer.feature.item", { id: layerId, fid })
                         .get<FeatureItem>()
                         .then((feature) => {
                             display.current.featureHighlighter.highlightFeature(
                                 {
                                     geom: feature.geom,
                                     featureId: feature.id,
-                                    layerId: layerId,
+                                    layerId,
                                 }
                             );
                         });
                 } else {
                     display.current.featureHighlighter.unhighlightFeature(
-                        (f) => {
-                            if (f && f.getProperties) {
-                                const props = f.getProperties();
-                                return props.layerId === layerId;
-                            }
-                            return true;
-                        }
+                        (f) => f?.getProperties?.()?.layerId === layerId
                     );
                 }
             },
@@ -212,22 +165,23 @@ export function WebMapFeatureGridTab({
                 {
                     title: msgGoto,
                     icon: "material-center_focus_weak",
-                    disabled: (params) =>
-                        params ? !params.selected?.length : false,
-                    action: function () {
-                        zoomToFeature();
-                    },
+                    disabled: (params) => !params?.selected?.length,
+                    action: zoomToFeature,
                 },
                 "separator",
                 (props) => (
                     <ZoomToFilteredBtn
                         {...props}
-                        onZoomToFiltered={zoomToExtent}
+                        onZoomToFiltered={(ngwExtent: NgwExtent) => {
+                            display.current.map.zoomToNgwExtent(
+                                ngwExtent,
+                                display.current.displayProjection
+                            );
+                        }}
                     />
                 ),
             ],
         };
-        return props;
     }, [layerId, query, reloadLayer, zoomToFeature]);
 
     return (
@@ -235,6 +189,6 @@ export function WebMapFeatureGridTab({
             selectedIds={selectedIds}
             version={version}
             {...featureGridProps}
-        ></FeatureGrid>
+        />
     );
 }
