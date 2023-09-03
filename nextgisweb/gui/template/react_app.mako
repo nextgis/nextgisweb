@@ -1,7 +1,5 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<div id='root' style="${'height: 100%' if maxheight else ''}"></div>
-
 <script type="text/javascript">
     require([
         ${json_js(entrypoint)},
@@ -11,7 +9,7 @@
 
         reactApp.default(
             comp.default, props,
-            document.getElementById('root')
+            document.getElementById('content')
         );
     });
 </script>
