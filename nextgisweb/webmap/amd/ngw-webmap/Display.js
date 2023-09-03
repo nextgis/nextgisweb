@@ -26,6 +26,7 @@ define([
     "./FeatureHighlighter",
     "./MapStatesObserver",
     "./ui/react-panel",
+    "./ui/react-webmap-tabs",
     // tools
     "./tool/Zoom",
     "./tool/Measure",
@@ -74,6 +75,7 @@ define([
     FeatureHighlighter,
     MapStatesObserver,
     reactPanel,
+    ReactWebMapTabs,
     ToolZoom,
     ToolMeasure,
     Identify,
@@ -210,6 +212,8 @@ define([
                 onChangePanel
             );
             this._buildPanels();
+
+            this.tabContainer = new ReactWebMapTabs({ display: this });
 
             // Add basemap's AMD modules
             mids.basemap.push(
