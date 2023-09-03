@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import isEqual from "lodash-es/isEqual";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { Button, Empty, Input, Space, Tooltip } from "@nextgisweb/gui/antd";
@@ -98,18 +99,23 @@ export const FeatureGrid = ({
             setVersion((old) => old + propVersion);
         }
     }, [propVersion]);
+
     useEffect(() => {
         if (selectedIds) {
             setSelected(selectedIds.map((s) => ({ [KEY_FIELD_KEYNAME]: s })));
         }
-    }, [selectedIds, setSelected, onSelect]);
+    }, [selectedIds, setSelected]);
 
+    const prevSelectedIds = useRef(selectedIds);
     useEffect(() => {
         if (onSelect) {
             const selectedIds_ = selected.map((s) =>
                 Number(s[KEY_FIELD_KEYNAME])
             );
-            onSelect(selectedIds_ || []);
+            if (!isEqual(selectedIds_, prevSelectedIds.current)) {
+                prevSelectedIds.current = selectedIds_;
+                onSelect(selectedIds_ || []);
+            }
         }
     }, [onSelect, selected]);
 
