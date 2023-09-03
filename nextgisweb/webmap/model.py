@@ -4,8 +4,9 @@ import geoalchemy2 as ga
 from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
+from sqlalchemy.orm.attributes import set_committed_value
 
-from nextgisweb.env import Base, _, env, pgettext
+from nextgisweb.env import Base, DBSession, _, env, pgettext
 from nextgisweb.lib import db
 
 from nextgisweb.auth import User
@@ -255,6 +256,12 @@ class WebMapItem(Base):
             self.children.append(item)
 
 
+@event.listens_for(WebMapItem, "load")
+def load_webmap_item_children(target, context):
+    if target.item_type == "layer":
+        set_committed_value(target, "children", ())
+
+
 class WebMapAnnotation(Base):
     __tablename__ = 'webmap_annotation'
 
@@ -292,6 +299,11 @@ class _root_item_attr(SP):
         return srlzr.obj.root_item.to_dict()
 
     def setter(self, srlzr, value):
+        children = list(srlzr.obj.root_item.children)
+        srlzr.obj.root_item.children = []
+        for child in children:
+            DBSession.delete(child)
+
         srlzr.obj.root_item.from_dict(value)
 
 
