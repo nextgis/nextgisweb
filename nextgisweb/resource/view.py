@@ -281,7 +281,7 @@ def setup_pyramid(comp, config):
 
     @resource_sections(priority=10)
     def resource_section_summary(obj):
-        return obj.id != 0
+        return True
 
     @resource_sections(priority=40)
     def resource_section_children(obj):

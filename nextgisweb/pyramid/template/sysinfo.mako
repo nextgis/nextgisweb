@@ -123,7 +123,7 @@
         var domCopyButton = document.getElementById("info-copy-btn")
         var copyButton = new CopyButton({
             targetAttribute: function (target) {
-                return document.getElementById("content-wrapper").innerText;
+                return document.getElementById("content").innerText;
             }
         });
         copyButton.placeAt(domCopyButton);

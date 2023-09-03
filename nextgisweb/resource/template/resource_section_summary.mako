@@ -1,7 +1,7 @@
 <%page args="section"/>
 <% section.content_box = False %>
 
-<dl class="ngw-kv ngw-resource-section">
+<dl class="ngw-pyramid-kv ngw-resource-section">
     <dt>${tr(_("Type"))}</dt>
     <dd>${tr(obj.cls_display_name)} (${obj.cls})</dd>
 

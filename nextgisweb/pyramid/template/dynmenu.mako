@@ -3,19 +3,19 @@
 <%! from nextgisweb.lib import dynmenu as dm %>
 <%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>
 
-<ul class="sidebar-menu">
+<ul class="ngw-pyramid-dynmenu">
 <% label = None %>
 %for item in dynmenu.build(args):
     %if isinstance(item, dm.Label):
         <% label = item %>
     %elif isinstance(item, dm.Link):
         %if label is not None:
-            <li class="sidebar-menu__heading heading">${tr(label.label)}</li>
+            <li class="label">${tr(label.label)}</li>
             <% label = None %>
         %endif
         <% url = item.url(args) %>
-        <li class="sidebar-menu__item${' sidebar-menu__item--selected' if url == request.url else ''}">
-            <a href="${url}" target="${item.target}" class="sidebar-menu__link withIcon withIcon-s">
+        <li class="item${' selected' if url == request.url else ''}">
+            <a href="${url}" target="${item.target}">
                 %if item.icon:
                     ${icon_svg(item.icon)}
                 %endif

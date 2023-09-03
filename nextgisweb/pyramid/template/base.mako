@@ -70,16 +70,20 @@
             include_head = ""
     %>
     ${include_head | n}
-
 </head>
 
 <body class="claro nextgis <%block name='body_class'/>">
-
     %if not custom_layout:
-        <div class="layout ${'maxwidth' if maxwidth else ''}">
-
-            <%include file="nextgisweb:pyramid/template/header.mako" args="title=system_name,
-                hide_resource_filter=hasattr(self, 'hide_resource_filter')"/>
+        <%
+            lclasses = ["ngw-pyramid-layout"]
+            if maxwidth: lclasses += ["ngw-pyramid-layout-hstretch"]
+            if maxheight: lclasses += ["ngw-pyramid-layout-vstretch"]
+        %>
+        <div class="${' '.join(lclasses)}">
+            <%include
+                file="nextgisweb:pyramid/template/header.mako"
+                args="title=system_name, hide_resource_filter=hasattr(self, 'hide_resource_filter')"
+            />
 
             %if obj and hasattr(obj,'__dynmenu__'):
                 <%
@@ -97,90 +101,52 @@
                 <% has_dynmenu = False %>
             %endif
 
-            <div class="content ${'content_with-sidebar' if has_dynmenu else ''}">
-                <div class="content__inner expand">
-                    <div id="title" class="title">
-                        <div class="content__container container">
-                            %if len(bcpath) > 0:
-                                <div class="path">
-                                    %for idx, bc in enumerate(bcpath):
-                                        <span class="path__item">
-                                            <a class="path__link" href="${bc.link}">
-                                                %if bc.icon:
-                                                    ${icon_svg(bc.icon)}
-                                                %endif
-                                                %if bc.label:
-                                                    ${tr(bc.label)}
-                                                %endif
-                                            </a>
-                                        </span>
-                                    %endfor
-                                </div>
+            <div class="ngw-pyramid-layout-crow">
+                <div class="ngw-pyramid-layout-mwrapper">
+                    <div class="ngw-pyramid-layout-main">
+                        %if len(bcpath) > 0:
+                            <div class="ngw-pyramid-layout-bcrumb">
+                                %for idx, bc in enumerate(bcpath):
+                                    <span>
+                                        <a href="${bc.link}">
+                                            %if bc.icon:
+                                                ${icon_svg(bc.icon)}
+                                            %endif
+                                            %if bc.label:
+                                                ${tr(bc.label)}
+                                            %endif
+                                        </a>
+                                    </span>
+                                %endfor
+                            </div>
+                        %endif
+
+                        <h1 class="ngw-pyramid-layout-title">
+                            ${tr(effective_title)}
+                            %if hasattr(next, 'title_ext'):
+                                <div class="ext">${next.title_ext()}</div>
                             %endif
-                            <div class="title-header">
-                                <h1 class="txt">${tr(effective_title)}</h1>
-                                %if hasattr(next, 'title_ext'):
-                                    <div class="ext">${next.title_ext()}</div>
-                                %endif
+                        </h1>
+
+                        %if hasattr(next, 'body'):
+                            <div id="content" class="content">
+                                ${next.body()}
                             </div>
-                        </div>
-                    </div>
-                    <div id="content-wrapper" class="content-wrapper ${'content-maxheight' if maxheight else ''}">
-                        <div class="expand">
-                            <div class="content__container container expand">
-                                %if hasattr(next, 'body'):
-                                    ${next.body()}
-                                %endif
-                            </div>
-                        </div>
+                        %endif
                     </div>
                 </div>
                 %if has_dynmenu:
-                    <div class="sidebar-helper"></div>
-                    <div class="sidebar">
-                        <%include file="nextgisweb:pyramid/template/dynmenu.mako" args="dynmenu=dynmenu, args=dynmenu_kwargs" />
+                    <div class="ngw-pyramid-layout-sidebar">
+                        <%include
+                            file="nextgisweb:pyramid/template/dynmenu.mako"
+                            args="dynmenu=dynmenu, args=dynmenu_kwargs"
+                        />
                     </div>
                 %endif
-            </div> <!--/.content-wrapper -->
-        </div> <!--/.layout -->
+            </div>
+        </div>
     %else:
-
         ${next.body()}
-
-    %endif
-
-    %if maxheight:
-
-        <script type="text/javascript">
-
-            require(["dojo/dom", "dojo/dom-style", "dojo/dom-geometry", "dojo/on", "dojo/domReady!"],
-            function (dom, domStyle, domGeom, on) {
-                var content = dom.byId("content-wrapper"),
-                    header = [ ];
-
-                for (var id in {"header": true, "title": true}) {
-                    var node = dom.byId(id);
-                    if (node) { header.push(node) }
-                }
-
-                function resize() {
-                    var h = 0;
-                    for (var i = 0; i < header.length; i++) {
-                        var n = header[i], cs = domStyle.getComputedStyle(n);
-                        h = h + domGeom.getMarginBox(n, cs).h;
-                    }
-                    domStyle.set(content, "top", h + "px");
-                }
-
-                resize();
-
-                on(window, 'resize', resize);
-
-            });
-
-        </script>
-
     %endif
 </body>
-
 </html>
