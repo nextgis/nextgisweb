@@ -6,6 +6,19 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 
+import type { SizeType } from "@nextgisweb/gui/antd";
+import type {
+    FeatureExtent,
+    NgwExtent,
+} from "@nextgisweb/feature-layer/type/FeatureExtent";
+
+interface ZoomToFilteredBtnProps {
+    id: number;
+    query: string;
+    size?: SizeType;
+    onZoomToFiltered?: (val: NgwExtent) => void;
+}
+
 const zoomToFilteredMsg = gettext("Zoom to filtered features");
 
 export const ZoomToFilteredBtn = ({
@@ -13,18 +26,18 @@ export const ZoomToFilteredBtn = ({
     query,
     size = "middle",
     onZoomToFiltered,
-}) => {
+}: ZoomToFilteredBtnProps) => {
     const {
         data: extentData,
         refresh: refreshExtent,
         isLoading: loading,
-    } = useRouteGet(
+    } = useRouteGet<FeatureExtent>(
         "feature_layer.feature.extent",
         { id },
         { query: { ilike: query } }
     );
 
-    const [extentCache, setExtentCache] = useState();
+    const [extentCache, setExtentCache] = useState<Record<string, NgwExtent>>();
 
     const click = () => {
         if (!onZoomToFiltered) {
