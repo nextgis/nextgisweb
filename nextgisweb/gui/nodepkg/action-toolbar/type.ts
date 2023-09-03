@@ -11,18 +11,25 @@ export interface UseActionToolbarProps {
     props?: CreateButtonActionProps;
 }
 
-export interface CreateButtonActionOptions
-    extends Omit<ButtonProps, "icon" | "disabled"> {
+export interface CreateButtonActionOptions<
+    P extends CreateButtonActionProps = CreateButtonActionProps,
+> extends Omit<ButtonProps, "icon" | "disabled"> {
     icon?: string | JSX.Element;
-    action?: (val?: CreateButtonActionProps) => void;
-    disabled?: ((val?: CreateButtonActionProps) => boolean) | boolean;
+    action?: (val?: P) => void;
+    disabled?: ((val?: P) => boolean) | boolean;
 }
 
 export type ActionToolbarAction<
     P extends CreateButtonActionProps = CreateButtonActionProps,
-> = string | ReactNode | ((props: P) => ReactNode) | CreateButtonActionOptions;
+> =
+    | string
+    | ReactNode
+    | ((props: P) => ReactNode)
+    | CreateButtonActionOptions<P>;
 
-export interface ActionToolbarProps<P extends CreateButtonActionProps = CreateButtonActionProps> {
+export interface ActionToolbarProps<
+    P extends CreateButtonActionProps = CreateButtonActionProps,
+> {
     size?: SizeType;
     style?: CSSProperties;
     actions?: ActionToolbarAction<P>[];
