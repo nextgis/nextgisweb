@@ -1,37 +1,42 @@
 .nextgis.claro {
+    .dgrid-header,
+    .dgrid-footer {
+        background: var(--secondary);
+        filter: none;
 
-  .dgrid-header,
-  .dgrid-footer {
-    background: var(--secondary);
-    filter: none;
+        .dgrid-cell {
+            border-color: var(--divider-color);
+
+            &:hover {
+                background: none;
+                filter: none;
+            }
+        }
+    }
 
     .dgrid-cell {
-      border-color: var(--divider-color);
-
-      &:hover {
-        background: none;
-        filter: none;
-      }
-    }
-  }
-
-  .dgrid-cell {
-    border-color: var(--divider-color);
-  }
-
-  .dgrid-row {
-    background: #fff;
-
-    &:hover {
-      background-color: #f8f8f8;
+        border-color: var(--divider-color);
     }
 
-    &.dgrid-selected {
-      background-color: #fdf8c3;
+    .dgrid-row {
+        background: #fff;
+
+        &:hover {
+            background-color: #f8f8f8;
+        }
+
+        &.dgrid-selected {
+            background-color: #fdf8c3;
+        }
     }
-  }
 }
 
-.dgrid-header-row .dgrid-row-table tr th { color: rgba(0, 0, 0, 0.7); }
-.dgrid-border-fix .dgrid-row-table .dgrid-cell:first-child { border-left-width: 0; }
-.dgrid-border-fix .dgrid-row-table .dgrid-cell:last-child  { border-right-width: 0; }
+.dgrid-header-row .dgrid-row-table tr th {
+    color: rgba(0, 0, 0, 0.7);
+}
+.dgrid-border-fix .dgrid-row-table .dgrid-cell:first-child {
+    border-left-width: 0;
+}
+.dgrid-border-fix .dgrid-row-table .dgrid-cell:last-child {
+    border-right-width: 0;
+}

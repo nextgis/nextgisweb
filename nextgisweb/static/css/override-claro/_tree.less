@@ -1,49 +1,48 @@
 .dijitTree {
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
 }
 
 .nextgis.claro {
+    .dijitTreeRow,
+    .dijitTreeNode .dojoDndItemBefore,
+    .dijitTreeNode .dojoDndItemAfter {
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
 
-  .dijitTreeRow,
-  .dijitTreeNode .dojoDndItemBefore,
-  .dijitTreeNode .dojoDndItemAfter {
-    padding-top: 3px;
-    padding-bottom: 3px;
-  }
+    .dijitTreeRowSelected,
+    .dijitTreeRowHover,
+    .dijitTreeRowActive {
+        padding-top: 3px;
+        padding-bottom: 3px;
+        background-image: none;
+        border: 0;
+    }
 
-  .dijitTreeRowSelected,
-  .dijitTreeRowHover,
-  .dijitTreeRowActive {
-    padding-top: 3px;
-    padding-bottom: 3px;
-    background-image: none;
-    border: 0;
-  }
-
-  .dijitTreeRowHover {
-    background-color: rgba(0, 0, 0, 0.04);
-  }
-
-  .dijitTreeRowSelected {
-    background-color: rgba(0, 0, 0, 0.04);
-  }
-
-  .dijitTreeNode * {
-    cursor: pointer;
-  }
-
-  .dijitTreeNodeDisabled {
-    opacity: .24;
-
-    * {
-      cursor: not-allowed;
+    .dijitTreeRowHover {
+        background-color: rgba(0, 0, 0, 0.04);
     }
 
     .dijitTreeRowSelected {
-      background: transparent;
+        background-color: rgba(0, 0, 0, 0.04);
     }
-  }
+
+    .dijitTreeNode * {
+        cursor: pointer;
+    }
+
+    .dijitTreeNodeDisabled {
+        opacity: 0.24;
+
+        * {
+            cursor: not-allowed;
+        }
+
+        .dijitTreeRowSelected {
+            background: transparent;
+        }
+    }
 }

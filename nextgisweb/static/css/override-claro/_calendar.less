@@ -1,110 +1,111 @@
 .nextgis.claro {
-  .dijitCalendar {
-    background-color: #fff;
-    border: 0;
+    .dijitCalendar {
+        background-color: #fff;
+        border: 0;
 
-    &:hover,
-    &.dijitCalendarHover,
-    &.dijitCalendarActive {
-      background-color: #fff;
-      border: 0;
-    }
-
-    table {
-      margin-top: 8px;
-      margin-bottom: 4px;
-    }
-
-    .dijitDropDownButton {
-      .dijitButtonNode {
-        border-color: var(--input-border-color);
-      }
-
-      &:hover,
-      &.dijitDropDownButtonHover {
-        .dijitButtonNode {
-          border-color: rgba(0, 0, 0, 0.04);
-          background-color: rgba(0, 0, 0, 0.04);
+        &:hover,
+        &.dijitCalendarHover,
+        &.dijitCalendarActive {
+            background-color: #fff;
+            border: 0;
         }
-      }
+
+        table {
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        .dijitDropDownButton {
+            .dijitButtonNode {
+                border-color: var(--input-border-color);
+            }
+
+            &:hover,
+            &.dijitDropDownButtonHover {
+                .dijitButtonNode {
+                    border-color: rgba(0, 0, 0, 0.04);
+                    background-color: rgba(0, 0, 0, 0.04);
+                }
+            }
+        }
     }
-  }
 
-  .dijitCalendarPreviousMonth,
-  .dijitCalendarNextMonth {
-    background-color: var(--secondary);
-    border-bottom-color: var(--divider-color);
+    .dijitCalendarPreviousMonth,
+    .dijitCalendarNextMonth {
+        background-color: var(--secondary);
+        border-bottom-color: var(--divider-color);
 
-    .dijitCalendarDateLabel {
-      border-color: var(--secondary);
+        .dijitCalendarDateLabel {
+            border-color: var(--secondary);
+        }
     }
-  }
 
-  .dijitCalendarDateTemplate {
-    font-weight: normal;
-    color: var(--text-base);
-    font-size: 13px;
-  }
-
-  .dijitCalendarSelectedDate .dijitCalendarDateLabel {
-    background-color: var(--primary);
-    color: #fff;
-    border-color: var(--primary);
-    font-family: var(--ngw-text-font-family-list);
-  }
-
-  .dijitCalendarSelectedDate.dijitCalendarHoveredDate .dijitCalendarDateLabel {
-    background-color: var(--primary);
-    border-color: var(--primary);
-    color: #fff;
-  }
-
-  .dijitCalendarHoveredDate .dijitCalendarDateLabel {
-    background-color: rgba(0, 0, 0, 0.04);
-    color: var(--primary);
-    border-color: rgba(0, 0, 0, 0.04);
-  }
-
-  .dijitCalendarDayLabel {
-    font-size: 13px;
-    color: var(--text-base);
-  }
-
-  .dijitCalendarMonthLabel {
-    color: var(--text-base);
-    font-size: 14px;
-  }
-
-  .dijitCalendarYearLabel {
-    color: var(--text-base);
-    font-size: 14px;
-    padding: 2px 0 3px;
-  }
-
-  .dijitCalendarNextYear,
-  .dijitCalendarPreviousYear {
-    color: var(--text-base);
-    font-size: 13px;
-    padding: 2px 4px;
-
-    &:hover,
-    &.dijitCalendarNextYearHover,
-    &.dijitCalendarPreviousYearHover {
-      padding: 2px 4px;
-      background-color: rgba(0, 0, 0, 0.04);
-      border: 0;
-      border-radius: var(--border-radius-root);
+    .dijitCalendarDateTemplate {
+        font-weight: normal;
+        color: var(--text-base);
+        font-size: 13px;
     }
-  }
 
-  .dijitCalendarPopup {
-    margin-top: 6px;
-  }
+    .dijitCalendarSelectedDate .dijitCalendarDateLabel {
+        background-color: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        font-family: var(--ngw-text-font-family-list);
+    }
 
-  .dijitCalendarMonthMenu .dijitCalendarMonthLabelHover,
-  .dijitCalendarMonthMenu .dijitCalendarMonthLabelActive {
-    background-color: rgba(0, 0, 0, 0.04);
-    border-color: rgba(0, 0, 0, 0.04);
-    background-image: none;
-  }
+    .dijitCalendarSelectedDate.dijitCalendarHoveredDate
+        .dijitCalendarDateLabel {
+        background-color: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+    }
+
+    .dijitCalendarHoveredDate .dijitCalendarDateLabel {
+        background-color: rgba(0, 0, 0, 0.04);
+        color: var(--primary);
+        border-color: rgba(0, 0, 0, 0.04);
+    }
+
+    .dijitCalendarDayLabel {
+        font-size: 13px;
+        color: var(--text-base);
+    }
+
+    .dijitCalendarMonthLabel {
+        color: var(--text-base);
+        font-size: 14px;
+    }
+
+    .dijitCalendarYearLabel {
+        color: var(--text-base);
+        font-size: 14px;
+        padding: 2px 0 3px;
+    }
+
+    .dijitCalendarNextYear,
+    .dijitCalendarPreviousYear {
+        color: var(--text-base);
+        font-size: 13px;
+        padding: 2px 4px;
+
+        &:hover,
+        &.dijitCalendarNextYearHover,
+        &.dijitCalendarPreviousYearHover {
+            padding: 2px 4px;
+            background-color: rgba(0, 0, 0, 0.04);
+            border: 0;
+            border-radius: var(--border-radius-root);
+        }
+    }
+
+    .dijitCalendarPopup {
+        margin-top: 6px;
+    }
+
+    .dijitCalendarMonthMenu .dijitCalendarMonthLabelHover,
+    .dijitCalendarMonthMenu .dijitCalendarMonthLabelActive {
+        background-color: rgba(0, 0, 0, 0.04);
+        border-color: rgba(0, 0, 0, 0.04);
+        background-image: none;
+    }
 }

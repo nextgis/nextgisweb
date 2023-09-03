@@ -1,62 +1,61 @@
 .nextgis.claro {
-  .dijitTabPaneWrapper,
-  .dijitTabContainerTop-tabs,
-  .dijitTabContainerBottom-tabs,
-  .dijitTabContainerLeft-tabs,
-  .dijitTabContainerRight-tabs {
-    border-color: var(--divider-color);
+    .dijitTabPaneWrapper,
+    .dijitTabContainerTop-tabs,
+    .dijitTabContainerBottom-tabs,
+    .dijitTabContainerLeft-tabs,
+    .dijitTabContainerRight-tabs {
+        border-color: var(--divider-color);
 
-    .dijitTab {
-      padding: 0px 12px;
-      text-transform: uppercase;
-      letter-spacing: .8px;
-      font-size: 13px;
-      background: none;
-      border: 1px solid transparent;
-      border-bottom: 0;
-      box-shadow: none;
-      margin-right: 0;
-      .transition(none);
-      color:var(--text-secondary);
-      height: 39px;
-      line-height: 38px;
+        .dijitTab {
+            padding: 0px 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-size: 13px;
+            background: none;
+            border: 1px solid transparent;
+            border-bottom: 0;
+            box-shadow: none;
+            margin-right: 0;
+            .transition(none);
+            color: var(--text-secondary);
+            height: 39px;
+            line-height: 38px;
 
-      &:hover {
-        color: var(--text-base);
-      }
+            &:hover {
+                color: var(--text-base);
+            }
+        }
+
+        .dijitTabChecked {
+            color: var(--text-base);
+        }
+
+        .dijitTabError {
+            color: fade(#f44336, 54%);
+
+            &:hover,
+            &.dijitTabChecked {
+                color: fade(#f44336, 87%);
+            }
+        }
     }
 
-    .dijitTabChecked {
-      color: var(--text-base);
+    .dijitTabContainerTop-tabs {
+        .dijitTab {
+            border-top: 3px solid transparent;
+            top: 0;
+            margin-bottom: -1px;
+        }
+
+        .dijitTabChecked {
+            border-top-color: var(--primary);
+            border-left-color: var(--divider-color);
+            border-right-color: var(--divider-color);
+            background-color: #fff;
+        }
     }
 
-    .dijitTabError {
-      color: fade(#f44336, 54%);
-
-      &:hover,
-      &.dijitTabChecked {
-        color: fade(#f44336, 87%);
-      }
+    .dijitTabContainerTopChildWrapper.dijitVisible {
+        overflow: auto;
     }
-  }
-
-
-  .dijitTabContainerTop-tabs {
-    .dijitTab {
-      border-top: 3px solid transparent;
-      top: 0;
-      margin-bottom: -1px;
-    }
-
-    .dijitTabChecked {
-      border-top-color: var(--primary);
-      border-left-color: var(--divider-color);
-      border-right-color: var(--divider-color);
-      background-color: #fff;
-    }
-  }
-
-  .dijitTabContainerTopChildWrapper.dijitVisible {
-    overflow: auto;
-  }
 }

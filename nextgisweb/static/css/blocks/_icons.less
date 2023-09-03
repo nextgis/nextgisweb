@@ -1,64 +1,64 @@
 svg.icon {
-  display: inline-block;
-  line-height: 1;
-  width: 1em;
-  height: 1em;
-  vertical-align: -15%;
+    display: inline-block;
+    line-height: 1;
+    width: 1em;
+    height: 1em;
+    vertical-align: -15%;
 
-  &-s {
-    font-size: 16px;
-  }
+    &-s {
+        font-size: 16px;
+    }
 
-  &-m {
-    font-size: 24px;
-  }
+    &-m {
+        font-size: 24px;
+    }
 
-  &-l {
-    font-size: 32px;
-  }
+    &-l {
+        font-size: 32px;
+    }
 }
 
 .withIcon {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 
-  & > svg.icon:first-child {
-    flex-shrink: 0;
-  }
-
-  &-s {
-    gap: 4px;
-
-    & > svg.icon {
-      width: 16px;
-      height: 16px;
+    & > svg.icon:first-child {
+        flex-shrink: 0;
     }
-  }
 
-  &-m {
-    gap: 6px;
+    &-s {
+        gap: 4px;
 
-    & > svg.icon {
-      width: 24px;
-      height: 24px;
+        & > svg.icon {
+            width: 16px;
+            height: 16px;
+        }
     }
-  }
+
+    &-m {
+        gap: 6px;
+
+        & > svg.icon {
+            width: 24px;
+            height: 24px;
+        }
+    }
 }
 
 .ant-btn > svg.icon {
-  font-size: 16px;
-  margin-right: 6px; // Allign custom and material icons with antd ones
+    font-size: 16px;
+    margin-right: 6px; // Allign custom and material icons with antd ones
 }
 
 .ant-btn-icon-only > svg.icon {
-  margin-right: 0px; // Reset alignment
+    margin-right: 0px; // Reset alignment
 }
 
 .ant-input-prefix > svg.icon {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .ant-dropdown-menu-item > svg.icon {
-  font-size: 14px;
-  margin-right: 8px;
+    font-size: 14px;
+    margin-right: 8px;
 }

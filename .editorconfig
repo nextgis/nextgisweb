@@ -8,10 +8,10 @@ indent_style = space
 trim_trailing_whitespace = false
 insert_final_newline = false
 
-[*.js]
+[*.{js,less}]
 indent_size = 4
 
-[*.{less,css}]
+[*.{css}]
 indent_size = 2
 
 [**/nodepkg/**.{js,jsx,cjs,ts,tsx,css,less}]
