@@ -1,3 +1,9 @@
+<%!
+    from pathlib import Path
+    import nextgisweb.pyramid as m
+    svglogo = Markup((Path(m.__file__).parent / "asset/nextgis_logo_s.svg").read_text())
+%>
+
 <%page args="title, hide_resource_filter=False"/>
 
 <% return_url = request.GET['return'] if 'return' in request.GET else False %>
@@ -9,7 +15,7 @@
             <% ckey = request.env.core.settings_get('pyramid', 'logo.ckey') %>
             <img src="${request.route_url('pyramid.logo', _query=dict(ckey=ckey))}"/>
         %else:
-            <img src="${request.static_url('asset/pyramid/nextgis_logo_s.svg')}"/>
+            ${svglogo}
         %endif
     </a>
     <div class="text">${title}</div>
