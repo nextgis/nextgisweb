@@ -31,14 +31,14 @@ import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import "./FeatureGrid.less";
 
-interface ActionProps {
+export interface ActionProps {
     id: number;
     query: string;
     size?: SizeType;
     selected?: FeatureAttrs[];
 }
 
-interface FeatureGridProps {
+export interface FeatureGridProps {
     id: number;
     selectedIds?: number[];
     size?: SizeType;
@@ -47,7 +47,7 @@ interface FeatureGridProps {
     readonly?: boolean;
     editOnNewPage?: boolean;
     cleanSelectedOnFilter?: boolean;
-    actions?: ActionToolbarAction[];
+    actions?: ActionToolbarAction<ActionProps>[];
     beforeDelete?: (featureIds: number[]) => void;
     deleteError?: (featureIds: number[]) => void;
     onDelete?: (featureIds: number[]) => void;
@@ -65,9 +65,9 @@ const loadingCol = () => "...";
 
 export const FeatureGrid = ({
     id,
-    query: query_,
+    query: propQuery,
     onSave,
-    version: version_,
+    version: propVersion,
     onDelete,
     onSelect,
     deleteError,
@@ -89,15 +89,15 @@ export const FeatureGrid = ({
     const { isExportAllowed } = useResource({ id });
 
     const [query, setQuery] = useState("");
-    const [version, setVersion] = useState(version_ || 0);
+    const [version, setVersion] = useState(propVersion || 0);
     const [selected, setSelected] = useState<FeatureAttrs[]>(() => []);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
     useEffect(() => {
-        if (version_ !== undefined) {
-            setVersion(version + version_);
+        if (propVersion !== undefined) {
+            setVersion((old) => old + propVersion);
         }
-    }, [version_]);
+    }, [propVersion]);
     useEffect(() => {
         if (selectedIds) {
             setSelected(selectedIds.map((s) => ({ [KEY_FIELD_KEYNAME]: s })));
@@ -114,10 +114,10 @@ export const FeatureGrid = ({
     }, [onSelect, selected]);
 
     useEffect(() => {
-        if (query_ !== undefined) {
-            setQuery(query_);
+        if (propQuery !== undefined) {
+            setQuery(propQuery);
         }
-    }, [query_]);
+    }, [propQuery]);
 
     const fields = useMemo(() => {
         if (resourceData) {
@@ -190,7 +190,7 @@ export const FeatureGrid = ({
     if (!readonly) {
         defActions.push(
             ...[
-                <Space.Compact>
+                <Space.Compact key="feature-item-edit">
                     <Button
                         disabled={!selected.length}
                         size={size}

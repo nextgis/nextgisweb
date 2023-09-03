@@ -70,7 +70,7 @@ export const FeatureEditorWidget = observer(
                         dirty={widgetStore.dirty}
                         label={newEditorWidget.label}
                     />
-                ))
+                ));
 
                 const newWidget: TabItem = {
                     key,
