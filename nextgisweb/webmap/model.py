@@ -135,6 +135,16 @@ class WebMap(Base, Resource):
                 self.extent_const_right, self.extent_const_top = data['extent_const']
 
 
+def _layer_enabled_default(context):
+    if context.get_current_parameters()['item_type'] == 'layer':
+        return False
+
+
+def _layer_identifiable_default(context):
+    if context.get_current_parameters()['item_type'] == 'layer':
+        return True
+
+
 class WebMapItem(Base):
     __tablename__ = 'webmap_item'
 
@@ -145,16 +155,8 @@ class WebMapItem(Base):
     display_name = db.Column(db.Unicode, nullable=True)
     group_expanded = db.Column(db.Boolean, nullable=True)
     layer_style_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
-
-    def layer_enabled_default(context):
-        if context.get_current_parameters()['item_type'] == 'layer':
-            return False
-    layer_enabled = db.Column(db.Boolean, nullable=True, default=layer_enabled_default)
-
-    def layer_identifiable_default(context):
-        if context.get_current_parameters()['item_type'] == 'layer':
-            return True
-    layer_identifiable = db.Column(db.Boolean, nullable=True, default=layer_identifiable_default)
+    layer_enabled = db.Column(db.Boolean, nullable=True, default=_layer_enabled_default)
+    layer_identifiable = db.Column(db.Boolean, nullable=True, default=_layer_identifiable_default)
     layer_transparency = db.Column(db.Float, nullable=True)
     layer_min_scale_denom = db.Column(db.Float, nullable=True)
     layer_max_scale_denom = db.Column(db.Float, nullable=True)
@@ -187,30 +189,17 @@ class WebMapItem(Base):
             data['children'] = [i.to_dict() for i in self.children]
 
         if self.item_type == 'layer':
-            style_parent_id = None
-            payload = None
-            if self.style and self.style.parent:
-                style = self.style
-                style_parent_id = style.parent.id
-
-                if hasattr(style, 'payload') or isinstance(
-                    getattr(type(style), 'payload', None), property
-                ):
-                    payload = style.payload
-
-            data.update(dict(
+            data.update(
                 layer_enabled=self.layer_enabled,
                 layer_identifiable=self.layer_identifiable,
                 layer_transparency=self.layer_transparency,
                 layer_style_id=self.layer_style_id,
-                style_parent_id=style_parent_id,
                 layer_min_scale_denom=self.layer_min_scale_denom,
                 layer_max_scale_denom=self.layer_max_scale_denom,
                 layer_adapter=self.layer_adapter,
                 draw_order_position=self.draw_order_position,
                 legend_symbols=self.legend_symbols,
-                payload=payload
-            ))
+            )
 
         return data
 
