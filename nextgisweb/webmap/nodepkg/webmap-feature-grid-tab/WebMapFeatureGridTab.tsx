@@ -34,7 +34,7 @@ export function WebMapFeatureGridTab({
 }: WebMapFeatureGridTabProps) {
     const [version, setVersion] = useState(0);
     const [query, setQuery] = useState("");
-    const selectedIds = useRef<number[]>([]);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const topicHandlers = useRef<TopicSubscription[]>([]);
 
     const display = useRef<DojoDisplay>(plugin.display as DojoDisplay);
@@ -46,10 +46,6 @@ export function WebMapFeatureGridTab({
             plugin.identity as string
         ] as FeatureLayerWebMapPluginConfig
     );
-
-    const setSelectedIds = (ids: number[]) => {
-        selectedIds.current = ids;
-    };
 
     const reloadLayer = useCallback(() => {
         if (display.current) {
@@ -121,7 +117,7 @@ export function WebMapFeatureGridTab({
     const zoomToFeature = useCallback(() => {
         const wkt = new WKT();
 
-        const fid = selectedIds.current[0];
+        const fid = selectedIds[0];
         if (fid !== undefined) {
             route("feature_layer.feature.item", {
                 id: layerId,
@@ -135,7 +131,7 @@ export function WebMapFeatureGridTab({
                     );
                 });
         }
-    }, [layerId]);
+    }, [layerId, selectedIds]);
 
     const zoomToExtent = (ngwExtent: NgwExtent) => {
         display.current.map.zoomToNgwExtent(
@@ -146,6 +142,19 @@ export function WebMapFeatureGridTab({
 
     useEffect(() => {
         subscribe();
+
+        const highlightedFeatures =
+            display.current.featureHighlighter.getHighlighted();
+        const selected: number[] = [];
+        for (const f of highlightedFeatures) {
+            if (f.getProperties) {
+                const { layerId, featureId } = f.getProperties();
+                if (layerId === layerId) {
+                    selected.push(featureId);
+                }
+            }
+        }
+        setSelectedIds(selected);
 
         return () => {
             unsubscribe();
@@ -204,7 +213,7 @@ export function WebMapFeatureGridTab({
                     title: msgGoto,
                     icon: "material-center_focus_weak",
                     disabled: (params) =>
-                        params ? !!params.selected?.length : false,
+                        params ? !params.selected?.length : false,
                     action: function () {
                         zoomToFeature();
                     },
@@ -221,5 +230,11 @@ export function WebMapFeatureGridTab({
         return props;
     }, [layerId, query, reloadLayer, zoomToFeature]);
 
-    return <FeatureGrid version={version} {...featureGridProps}></FeatureGrid>;
+    return (
+        <FeatureGrid
+            selectedIds={selectedIds}
+            version={version}
+            {...featureGridProps}
+        ></FeatureGrid>
+    );
 }

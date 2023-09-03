@@ -43,6 +43,7 @@ interface HighlightFeatureData {
 }
 interface FeatureHighlighter {
     highlightFeature: (data: HighlightFeatureData) => void;
+    getHighlighted: () => Feature[];
     unhighlightFeature: (filter: (feature: Feature) => boolean) => void;
 }
 
