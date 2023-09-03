@@ -23,6 +23,7 @@ export function Password({
             {...props}
             input={(inputProps) => (
                 <Input.Password
+                    visibilityToggle={false}
                     {...{ autoComplete, placeholder, ...inputProps }}
                 />
             )}
