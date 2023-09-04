@@ -1,10 +1,10 @@
+import { useMemo, useState } from "react";
+
 import { Button, Form, Modal } from "@nextgisweb/gui/antd";
-import { ContentBox } from "@nextgisweb/gui/component";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
-import { PropTypes } from "prop-types";
-import { useMemo, useState } from "react";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import getMessages from "../srsMessages";
 import { modelObj } from "../srsModel";
 import { SRSImportFrom } from "./SRSImportForm";
@@ -21,19 +21,19 @@ export function SRSWidget({ id }) {
         return [
             {
                 name: "display_name",
-                label: i18n.gettext("Display name"),
+                label: gettext("Display name"),
                 required: true,
             },
             {
                 name: "auth_name_srid",
-                label: i18n.gettext("Authority and code"),
+                label: gettext("Authority and code"),
                 value: (record) => `${record.auth_name}:${record.auth_srid}`,
                 disabled: true,
                 included: id !== undefined && isProtected,
             },
             {
                 name: "wkt",
-                label: i18n.gettext("OGC WKT definition"),
+                label: gettext("OGC WKT definition"),
                 widget: "textarea",
                 rows: 4,
                 required: true,
@@ -77,7 +77,7 @@ export function SRSWidget({ id }) {
     };
 
     // to not exec gettext on closed modal
-    const Title = () => <>{i18n.gettext("Import definition")}</>;
+    const Title = () => <>{gettext("Import definition")}</>;
 
     const props = {
         id,
@@ -100,12 +100,12 @@ export function SRSWidget({ id }) {
     };
 
     return (
-        <ContentBox>
+        <>
             <ModelForm allowDelete={!isSystem} {...props}>
                 {!isProtected && (
                     <Form.Item wrapperCol={{ offset: 5 }}>
                         <Button size="small" onClick={showModal}>
-                            {i18n.gettext("Import definition")}
+                            {gettext("Import definition")}
                         </Button>
                     </Form.Item>
                 )}
@@ -118,10 +118,6 @@ export function SRSWidget({ id }) {
             >
                 <SRSImportFrom {...DEFAULT_DATA} form={modalForm} />
             </Modal>
-        </ContentBox>
+        </>
     );
 }
-
-SRSWidget.propTypes = {
-    id: PropTypes.number,
-};

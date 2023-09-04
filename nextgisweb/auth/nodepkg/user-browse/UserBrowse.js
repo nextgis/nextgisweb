@@ -1,20 +1,21 @@
-import { utc } from "@nextgisweb/gui/dayjs";
+import { useMemo, useState } from "react";
 
 import { Alert, Badge, Button, Tooltip } from "@nextgisweb/gui/antd";
+import { utc } from "@nextgisweb/gui/dayjs";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { useMemo, useState } from "react";
 
 import { makeTeamManageButton, default as oauth } from "../oauth";
-import getMessages from "../userMessages";
 
 import AdministratorIcon from "@nextgisweb/icon/material/local_police";
 import RegularUserIcon from "@nextgisweb/icon/material/person";
 
+const msgDisabled = gettext("Disabled");
+const msgEnabled = gettext("Enabled");
 const messages = {
-    disabled: gettext("Disabled"),
-    enabled: gettext("Enabled"),
+    deleteConfirm: gettext("Delete user?"),
+    deleteSuccess: gettext("User deleted"),
 };
 
 const columns = [];
@@ -83,7 +84,7 @@ columns.push({
     dataIndex: "disabled",
     key: "disabled",
     render: (text) => {
-        return text ? messages.disabled : messages.enabled;
+        return text ? msgDisabled : msgEnabled;
     },
     sorter: (a, b) => (a.disabled > b.disabled ? 1 : -1),
 });
@@ -170,7 +171,7 @@ export function UserBrowse() {
             <ModelBrowse
                 model="auth.user"
                 columns={columns}
-                messages={getMessages()}
+                messages={messages}
                 collectionOptions={{ query: { brief: true } }}
                 collectionFilter={(itm) => !itm.system}
                 headerControls={(tmBtn && [() => tmBtn]) || []}

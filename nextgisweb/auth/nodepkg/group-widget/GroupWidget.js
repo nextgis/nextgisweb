@@ -1,32 +1,34 @@
-import { PropTypes } from "prop-types";
 import { useState } from "react";
 
-import { ContentBox } from "@nextgisweb/gui/component";
 import { KeynameTextBox } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { PrincipalSelect } from "../field";
-import getMessages from "../groupMessages";
 import { default as oauth } from "../oauth";
+
+const messages = {
+    deleteConfirm: gettext("Delete group?"),
+    deleteSuccess: gettext("Group deleted"),
+};
 
 export function GroupWidget({ id }) {
     const [fields] = useState(() => {
         const fields_ = [
             {
                 name: "display_name",
-                label: i18n.gettext("Full name"),
+                label: gettext("Full name"),
                 required: true,
             },
             {
                 name: "keyname",
-                label: i18n.gettext("Group name"),
+                label: gettext("Group name"),
                 required: true,
                 widget: KeynameTextBox,
             },
             {
                 name: "members",
-                label: i18n.gettext("Users"),
+                label: gettext("Users"),
                 widget: PrincipalSelect,
                 inputProps: {
                     model: "user",
@@ -37,7 +39,7 @@ export function GroupWidget({ id }) {
             },
             {
                 name: "register",
-                label: i18n.gettext("New users"),
+                label: gettext("New users"),
                 widget: "checkbox",
             },
         ];
@@ -45,28 +47,18 @@ export function GroupWidget({ id }) {
         if (oauth.group_mapping) {
             fields_.push({
                 name: "oauth_mapping",
-                label: i18n.gettext("{dn} mapping").replace("{dn}", oauth.name),
+                label: gettext("{dn} mapping").replace("{dn}", oauth.name),
                 widget: "checkbox",
             });
         }
 
         fields_.push({
             name: "description",
-            label: i18n.gettext("Description"),
+            label: gettext("Description"),
             widget: "textarea",
         });
         return fields_;
     });
 
-    const p = { fields, model: "auth.group", id, messages: getMessages() };
-
-    return (
-        <ContentBox>
-            <ModelForm {...p}></ModelForm>
-        </ContentBox>
-    );
+    return <ModelForm model="auth.group" {...{ fields, id, messages }} />;
 }
-
-GroupWidget.propTypes = {
-    id: PropTypes.number,
-};

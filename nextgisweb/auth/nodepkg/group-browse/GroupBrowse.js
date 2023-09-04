@@ -1,28 +1,32 @@
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
-import i18n from "@nextgisweb/pyramid/i18n";
-import getMessages from "../groupMessages";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import { default as oauth } from "../oauth";
+
+const messages = {
+    deleteConfirm: gettext("Delete group?"),
+    deleteSuccess: gettext("Group deleted"),
+};
 
 export function GroupBrowse() {
     const columns = [
         {
-            title: i18n.gettext("Full name"),
+            title: gettext("Full name"),
             dataIndex: "display_name",
             key: "display_name",
             sorter: (a, b) => (a.display_name > b.display_name ? 1 : -1),
         },
         {
-            title: i18n.gettext("Group name"),
+            title: gettext("Group name"),
             dataIndex: "keyname",
             key: "keyname",
             sorter: (a, b) => (a.keyname > b.keyname ? 1 : -1),
         },
         {
-            title: i18n.gettext("New users"),
+            title: gettext("New users"),
             dataIndex: "register",
             key: "register",
-            render: (value) =>
-                value ? i18n.gettext("Yes") : i18n.gettext("No"),
+            render: (value) => (value ? gettext("Yes") : gettext("No")),
         },
     ];
 
@@ -31,16 +35,9 @@ export function GroupBrowse() {
             title: oauth.name,
             dataIndex: "oauth_mapping",
             key: "oauth_mapping",
-            render: (value) =>
-                value ? i18n.gettext("Yes") : i18n.gettext("No"),
+            render: (value) => (value ? gettext("Yes") : gettext("No")),
         });
     }
 
-    return (
-        <ModelBrowse
-            model="auth.group"
-            columns={columns}
-            messages={getMessages()}
-        />
-    );
+    return <ModelBrowse model="auth.group" {...{ columns, messages }} />;
 }

@@ -1,8 +1,7 @@
-import { PropTypes } from "prop-types";
 import { useMemo } from "react";
 
 import { Alert } from "@nextgisweb/gui/antd";
-import { ContentBox, LoadingWrapper } from "@nextgisweb/gui/component";
+import { LoadingWrapper } from "@nextgisweb/gui/component";
 import {
     KeynameTextBox,
     LanguageSelect,
@@ -10,15 +9,19 @@ import {
 } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!auth";
 
 import { PrincipalSelect } from "../field";
 import { makeTeamManageButton, default as oauth } from "../oauth";
-import getMessages from "../userMessages";
 
 import { UserWidgetAlinkToken } from "./UserWidgetAlinkToken";
 import { UserWidgetPassword } from "./UserWidgetPassword";
+
+const messages = {
+    deleteConfirm: gettext("Delete user?"),
+    deleteSuccess: gettext("User deleted"),
+};
 
 export function UserWidget({ id }) {
     const { data: group, isLoading } = useRouteGet("auth.group.collection");
@@ -32,22 +35,22 @@ export function UserWidget({ id }) {
             ...[
                 {
                     name: "display_name",
-                    label: i18n.gettext("Full name"),
+                    label: gettext("Full name"),
                     required: true,
                 },
                 {
                     name: "keyname",
-                    label: i18n.gettext("Login"),
+                    label: gettext("Login"),
                     required: true,
                     widget: KeynameTextBox,
                 },
                 {
                     name: "password",
-                    label: i18n.gettext("Password"),
+                    label: gettext("Password"),
                     widget: isNewUser ? Password : UserWidgetPassword,
                     required: true,
                     autoComplete: "new-password",
-                    placeholder: i18n.gettext("Enter new password here"),
+                    placeholder: gettext("Enter new password here"),
                 },
             ]
         );
@@ -63,7 +66,7 @@ export function UserWidget({ id }) {
         if (settings.alink) {
             fields_.push({
                 name: "alink_token",
-                label: i18n.gettext("Authorization link"),
+                label: gettext("Authorization link"),
                 widget: UserWidgetAlinkToken,
             });
         }
@@ -72,12 +75,12 @@ export function UserWidget({ id }) {
             ...[
                 {
                     name: "disabled",
-                    label: i18n.gettext("Disabled"),
+                    label: gettext("Disabled"),
                     widget: "checkbox",
                 },
                 {
                     name: "member_of",
-                    label: i18n.gettext("Groups"),
+                    label: gettext("Groups"),
                     widget: PrincipalSelect,
                     inputProps: {
                         model: "group",
@@ -91,13 +94,13 @@ export function UserWidget({ id }) {
                 },
                 {
                     name: "language",
-                    label: i18n.gettext("Language"),
+                    label: gettext("Language"),
                     widget: LanguageSelect,
                     value: null,
                 },
                 {
                     name: "description",
-                    label: i18n.gettext("Description"),
+                    label: gettext("Description"),
                     widget: "textarea",
                 },
             ]
@@ -106,12 +109,12 @@ export function UserWidget({ id }) {
         return fields_;
     }, [group, isNewUser]);
 
-    const props = { fields, model: "auth.user", id, messages: getMessages() };
+    const props = { fields, model: "auth.user", id, messages };
 
     // prettier-ignore
     const infoNGID = useMemo(() => oauth.isNGID && isNewUser && <Alert
         type="info" style={{marginBottom: "1ex"}}
-        message={i18n.gettext("Consider adding {name} user to your team instead of creating a new user with a password.").replace("{name}", oauth.name)}
+        message={gettext("Consider adding {name} user to your team instead of creating a new user with a password.").replace("{name}", oauth.name)}
         action={makeTeamManageButton()}
     />, []);
 
@@ -122,13 +125,7 @@ export function UserWidget({ id }) {
     return (
         <div className="ngw-auth-user-widget">
             {infoNGID}
-            <ContentBox>
-                <ModelForm {...props}></ModelForm>
-            </ContentBox>
+            <ModelForm {...props}></ModelForm>
         </div>
     );
 }
-
-UserWidget.propTypes = {
-    id: PropTypes.number,
-};

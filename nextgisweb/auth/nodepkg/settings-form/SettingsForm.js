@@ -1,18 +1,19 @@
-import PropTypes from "prop-types";
-import { useEffect, useState, useMemo } from "react";
-import { message, Form, Button } from "@nextgisweb/gui/antd";
-import { ContentBox, LoadingWrapper } from "@nextgisweb/gui/component";
+import { useEffect, useMemo, useState } from "react";
+
+import { Button, Form, message } from "@nextgisweb/gui/antd";
+import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { errorModal } from "@nextgisweb/gui/error";
 import { FieldsForm, LanguageSelect } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
-import { errorModal } from "@nextgisweb/gui/error";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import oauth from "../oauth";
 
 function OAuthStatus({ oauthSubject }) {
     if (oauthSubject) {
         return (
             <>
-                {i18n.gettext("Account bound")} <span>({oauthSubject})</span>
+                {gettext("Account bound")} <span>({oauthSubject})</span>
             </>
         );
     } else if (oauth.bind) {
@@ -23,15 +24,11 @@ function OAuthStatus({ oauthSubject }) {
                 ["bind", "1"],
                 ["next", window.location],
             ]);
-        return <Button href={bindUrl}>{i18n.gettext("Bind account")}</Button>;
+        return <Button href={bindUrl}>{gettext("Bind account")}</Button>;
     } else {
-        return <>{i18n.gettext("Account not bound")}</>;
+        return <>{gettext("Account not bound")}</>;
     }
 }
-
-OAuthStatus.propTypes = {
-    oauthSubject: PropTypes.string,
-};
 
 export function SettingsForm() {
     const [status, setStatus] = useState("loading");
@@ -43,7 +40,7 @@ export function SettingsForm() {
             name: "language",
             widget: LanguageSelect,
             loading: status === "saved",
-            label: i18n.gettext("Language"),
+            label: gettext("Language"),
         });
 
         if (oauth.enabled) {
@@ -61,24 +58,24 @@ export function SettingsForm() {
         return result;
     }, [status, profile]);
 
-    useEffect(async () => {
-        try {
-            const resp = await route("auth.profile").get();
-            setProfile(resp);
-        } catch {
-            // ignore error
-        } finally {
-            setStatus(null);
-        }
+    useEffect(() => {
+        (async () => {
+            try {
+                const resp = await route("auth.profile").get();
+                setProfile(resp);
+            } catch {
+                // ignore error
+            } finally {
+                setStatus(null);
+            }
+        })();
     }, []);
-
-    const p = { fields };
 
     const onChange = async ({ value: json }) => {
         setStatus("saving");
         try {
             await route("auth.profile").put({ json });
-            message.success(i18n.gettext("Saved"));
+            message.success(gettext("Saved"));
         } catch (err) {
             errorModal(err);
         } finally {
@@ -91,13 +88,5 @@ export function SettingsForm() {
     const initialValues = {
         language: profile.language,
     };
-    return (
-        <ContentBox>
-            <FieldsForm
-                {...p}
-                onChange={onChange}
-                initialValues={initialValues}
-            ></FieldsForm>
-        </ContentBox>
-    );
+    return <FieldsForm {...{ fields, onChange, initialValues }} />;
 }
