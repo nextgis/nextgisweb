@@ -190,6 +190,11 @@ class WebMapItem(Base):
             data['children'] = [i.to_dict() for i in self.children]
 
         if self.item_type == 'layer':
+            style_parent_id = None
+            if self.style and self.style.parent:
+                style = self.style
+                style_parent_id = style.parent.id
+
             data.update(
                 layer_enabled=self.layer_enabled,
                 layer_identifiable=self.layer_identifiable,
@@ -200,6 +205,7 @@ class WebMapItem(Base):
                 layer_adapter=self.layer_adapter,
                 draw_order_position=self.draw_order_position,
                 legend_symbols=self.legend_symbols,
+                style_parent_id=style_parent_id,
             )
 
         return data
