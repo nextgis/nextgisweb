@@ -1,28 +1,28 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<% system_name = request.env.core.system_full_name() %>
-
-<%include
-    file="nextgisweb:pyramid/template/header.mako"
-    args="title=system_name, hide_resource_filter=True"
-/>
-
-<div style="position: absolute; top: 50px; bottom: 0px; right: 0px;  width: 100%; display: flex">
-
-<div style="flex-grow: 0; white-space: nowrap; padding: 1ex; border-right: 4px solid lightgray; overflow-y: scroll">
+<%def name="sidebar()">
+    <ul class="ngw-pyramid-dynmenu">
+    <% cgroup = None %>
     %for te in testentries:
         <%
-            label = te
-            if label.startswith("@nextgisweb/"):
-                label = label[len("@nextgisweb/"):]
-            if label.endswith("/testentry"):
-                label = label[:-len("/testentry")]
+            parts = te.split("/")
+            group = "/".join(parts[0:2])
+            if len(parts) > 3 and parts[-1] == "testentry":
+                parts = parts[:-1]
+            text = "/".join(parts[2:])
         %>
-        <a style="display: block" href="${request.route_url('jsrealm.testentry', subpath=te)}">${label}</a>
+        %if cgroup != group:
+            <% cgroup = group %>
+            <li class="label">${group}</li>
+        %endif
+        <li class="item${' selected' if selected == te else ''}">
+            <a href="${request.route_url('jsrealm.testentry', subpath=te)}">${text}</a>
+        </li>
     %endfor
-</div>
+    </ul>
+</%def>
 
-<div id="teTarget" style="flex-grow: 1; overflow: scroll; padding: 1ex;">
+<div id="teTarget">
     %if selected:
         <script type="text/javascript">
             require([
@@ -34,6 +34,4 @@
             })
         </script>
     %endif
-</div>
-
 </div>

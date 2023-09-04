@@ -135,7 +135,9 @@
                         %endif
                     </div>
                 </div>
-                %if has_dynmenu:
+                %if sidebar := getattr(next, 'sidebar', None):
+                    <div class="ngw-pyramid-layout-sidebar">${sidebar()}</div>
+                %elif has_dynmenu:
                     <div class="ngw-pyramid-layout-sidebar">
                         <%include
                             file="nextgisweb:pyramid/template/dynmenu.mako"

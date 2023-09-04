@@ -28,7 +28,7 @@ def testentry(request):
     return dict(
         testentries=read_testentries(),
         selected=selected,
-        custom_layout=True)
+        title=selected if selected else "")
 
 
 def setup_pyramid(comp, config):
