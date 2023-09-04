@@ -1,20 +1,18 @@
+@import "variables.less";
+
 @import (css) "@{node_modules}/@fontsource/roboto/400.css";
 @import (css) "@{node_modules}/@fontsource/roboto/500.css";
 
-@import "settings/_variables";
+@import "blocks/_decorations.less";
+@import "blocks/_icons.less";
+@import "blocks/_links.less";
+@import "blocks/_list.less";
+@import "blocks/_tables.less";
+@import "blocks/_typography.less";
 
-@import "helpers/_mixin";
-@import "helpers/_utilities";
-@import "blocks/_decorations";
-@import "blocks/_icons";
-@import "blocks/_links";
-@import "blocks/_list";
-@import "blocks/_tables";
-@import "blocks/_typography";
-
-@import "ngw-ui/_ngw-buttons";
-@import "ngw-ui/_ngw-date-picker";
-@import "ngw-ui/_ngw-toolbar";
+@import "ngw-ui/_ngw-buttons.less";
+@import "ngw-ui/_ngw-date-picker.less";
+@import "ngw-ui/_ngw-toolbar.less";
 
 // Antd 5 doesn't set box-sizing: border-box as Antd 4, but we rely on it.
 div.dijitTabPane,
@@ -51,7 +49,6 @@ body {
         color: inherit;
         margin-left: 0;
         margin-right: 0;
-        .transition(color 0.2s);
     }
 }
 
@@ -288,13 +285,12 @@ a[class*=" icon-"]:hover:before {
             left: -24px;
             top: 0;
             background-color: var(--primary);
-            .opacity(0);
-            .transition(opacity 0.2s);
+            opacity: 0;
         }
 
         &:hover {
             &:after {
-                .opacity(1);
+                opacity: 1;
             }
         }
 
@@ -371,5 +367,4 @@ dl.ngw-pyramid-kv {
 
 @import (css) "@{node_modules}/dijit/themes/claro/claro.css";
 @import (css) "@{node_modules}/dgrid/css/skins/claro.css";
-
-@import "override-claro";
+@import "override-claro.less";
