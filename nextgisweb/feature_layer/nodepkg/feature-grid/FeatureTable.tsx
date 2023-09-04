@@ -2,6 +2,8 @@ import debounce from "lodash-es/debounce";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Draggable from "react-draggable";
 
+import { useThemeVariables } from "@nextgisweb/gui/hook";
+
 import SortIcon from "./component/SortIcon";
 import TableConfigModal from "./component/TableConfigModal";
 import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
@@ -27,7 +29,7 @@ interface FeatureTableProps {
     total: number;
     query: string;
     fields: FeatureLayerField[];
-    version?: number
+    version?: number;
     selected: FeatureAttrs[];
     resourceId: number;
     loadingCol: () => string;
@@ -181,6 +183,16 @@ const FeatureTable = ({
         }
         setEffectiveWidths(newEffectiveWidths);
     }, [columns, tableWidth, userDefinedWidths]);
+
+    const themeVariables = useThemeVariables({
+        "color-container": "colorBgContainer",
+        "color-alter": "colorFillAlter",
+        "color-secondary": "colorFillSecondary",
+        "color-border": "colorBorderSecondary",
+        "color-active": "controlItemBgActive",
+        "border-radius": "borderRadius",
+        "font-weight-strong": "fontWeightStrong",
+    });
 
     const Rows = () => {
         const firstVirtual = virtualItems[0];
@@ -361,7 +373,7 @@ const FeatureTable = ({
     };
 
     return (
-        <div className="ngw-feature-layer-feature-table">
+        <div className="ngw-feature-layer-feature-table" style={themeVariables}>
             <div ref={theadRef} className="thead">
                 <div className="tr">
                     <HeaderCols />
