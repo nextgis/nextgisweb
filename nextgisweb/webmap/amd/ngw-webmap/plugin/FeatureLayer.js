@@ -1,27 +1,10 @@
 define([
     "dojo/_base/declare",
     "./_PluginBase",
-    "dijit/layout/TabContainer",
-    "dijit/_WidgetBase",
     "dojo/topic",
     "@nextgisweb/pyramid/i18n!",
-], function (
-    declare,
-    _PluginBase,
-    TabContainer,
-    _WidgetBase,
-    topic,
-    i18n
-) {
+], function (declare, _PluginBase, topic, { gettext }) {
     return declare([_PluginBase], {
-        constructor: function () {
-            this.tabContainer = new TabContainer({
-                region: "bottom",
-                style: "height: 45%",
-                splitter: true,
-            });
-        },
-
         getPluginState: function (nodeData) {
             const { type, plugin } = nodeData;
             return {
@@ -29,18 +12,13 @@ define([
             };
         },
 
-        run: function () {
-            this.openFeatureGrid();
-            return Promise.resolve(undefined);
-        },
-
         getMenuItem: function () {
-            var widget = this;
             return {
                 icon: "mdi-table-large",
-                title: i18n.gettext("Feature table"),
-                onClick: function () {
-                    return widget.run();
+                title: gettext("Feature table"),
+                onClick: () => {
+                    this.openFeatureGrid();
+                    return Promise.resolve(undefined);
                 },
             };
         },
@@ -60,7 +38,6 @@ define([
                             resolve(module);
                         });
                     }),
-
                 props: {
                     topic,
                     layerId: layerId,
