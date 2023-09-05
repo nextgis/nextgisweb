@@ -135,7 +135,13 @@
                         %endif
                     </div>
                 </div>
-                %if sidebar := getattr(next, 'sidebar', None):
+                <% 
+                    sidebar = getattr(next, 'sidebar', None)
+                    has_sidebar = getattr(next, 'has_sidebar', lambda: True)()
+                %>
+                %if not has_sidebar:
+                    <% pass %>
+                %elif sidebar := getattr(next, 'sidebar', None):
                     <div class="ngw-pyramid-layout-sidebar">${sidebar()}</div>
                 %elif has_dynmenu:
                     <div class="ngw-pyramid-layout-sidebar">
