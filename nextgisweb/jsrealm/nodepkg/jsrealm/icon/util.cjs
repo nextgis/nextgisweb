@@ -1,6 +1,5 @@
 const PKG_ICON = "@nextgisweb/icon/";
 const COLLECTIONS = { mdi: "@mdi/svg", material: "@material-icons/svg" };
-const PMATERIAL = COLLECTIONS["material"] + "/";
 
 function normalize(col, p) {
     return col === "mdi" ? p.replace("_", "-") : p.replace("-", "_");
@@ -12,10 +11,6 @@ exports.IconResolverPlugin = class IconResolverPlugin {
     apply(resolver) {
         const hook = (request, resolveContext, callback) => {
             let r = request.request;
-
-            if (r.startsWith(PMATERIAL)) {
-                r = `${PKG_ICON}material/${r.slice(PMATERIAL.length)}`;
-            }
 
             if (r.startsWith(PKG_ICON)) {
                 let [col, ...parts] = r.slice(PKG_ICON.length).split("/");
