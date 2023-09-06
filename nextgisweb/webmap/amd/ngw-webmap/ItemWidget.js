@@ -99,6 +99,7 @@ define([
         layerOrdinal: "draw_order_position",
         labelField: "label",
         enabled: false,
+        isUpdating: false,
 
         constructor: function (kwargs) {
             declare.safeMixin(this, kwargs);
@@ -118,17 +119,17 @@ define([
             aspect.after(
                 this.store,
                 "onNew",
-                lang.hitch(this, this.setOrdinalWidgetStore)
+                () => this.isUpdating || this.setOrdinalWidgetStore()
             );
             aspect.after(
                 this.store,
                 "onDelete",
-                lang.hitch(this, this.setOrdinalWidgetStore)
+                () => this.isUpdating || this.setOrdinalWidgetStore()
             );
             aspect.after(
                 this.store,
                 "onSet",
-                lang.hitch(this, this.setOrdinalWidgetStore)
+                () => this.isUpdating || this.setOrdinalWidgetStore()
             );
         },
 
@@ -727,8 +728,12 @@ define([
                         widget
                     );
                 }
+
+                this.layerOrder.isUpdating = true;
                 traverse(value, this.itemModel.root);
                 this.layerOrder.set("enabled", data.webmap.draw_order_enabled);
+                this.layerOrder.isUpdating = false;
+                this.layerOrder.setOrdinalWidgetStore();
             },
         }
     );
