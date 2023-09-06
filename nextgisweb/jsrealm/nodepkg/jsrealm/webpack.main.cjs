@@ -2,7 +2,6 @@ const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
-const { DefinePlugin } = require("webpack");
 const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const WebpackAssetsManifest = require("webpack-assets-manifest");
@@ -57,22 +56,12 @@ function scanForEntries() {
     return result;
 }
 
-let isDynamicEntry;
+let isDynamicEntry, isPluginFile;
 
-let plugins, testentries;
+let testentries;
 
 const dynamicEntries = () => {
     const entrypoints = scanForEntries();
-
-    plugins = {};
-
-    entrypoints
-        .filter((ep) => ep.type === "plugin")
-        .forEach(({ plugin, entry }) => {
-            const [cat, id] = plugin.split(/\s+/, 2);
-            if (plugins[cat] === undefined) plugins[cat] = {};
-            plugins[cat][id] = entry;
-        });
 
     testentries = Object.fromEntries(
         entrypoints
@@ -80,17 +69,59 @@ const dynamicEntries = () => {
             .map(({ entry, testentry: type }) => [entry, { type }])
     );
 
+    const plugins = {};
+    const pluginFiles = [];
+
+    entrypoints
+        .filter(({ type }) => type === "plugin")
+        .forEach(({ plugin, fullname }) => {
+            if (plugins[plugin] === undefined) plugins[plugin] = [];
+            plugins[plugin].push(fullname);
+            pluginFiles.push(fullname);
+        });
+
     const webpackEntries = Object.fromEntries(
-        entrypoints.map(({ entry, fullname }) => [
-            entry,
-            {
-                import: injectCode(fullname, withChunks(entry)),
-                library: { type: "amd", name: entry },
-            },
-        ])
+        entrypoints
+            .filter(({ type }) => type !== "plugin")
+            .map(({ type, entry, fullname, registry }) => {
+                if (type === "registry") {
+                    pluginFiles.push(fullname);
+                    const wrapper = fullname.replace(
+                        /\.[tj]?sx?$/,
+                        "-wrapper.js"
+                    );
+
+                    const code = [
+                        withChunks(entry),
+                        `import { registry } from "${fullname}";`,
+                        ...plugins[registry].map((fn) => `import "${fn}";`),
+                        `export * from "${fullname}";`,
+                        `if (!registry) throw new Error("Registry '${registry}' is not defined");`,
+                        "registry.seal();",
+                    ];
+
+                    return [
+                        entry,
+                        {
+                            import: virtualImport(wrapper, code.join("\n")),
+                            library: { type: "amd", name: entry },
+                        },
+                    ];
+                } else {
+                    return [
+                        entry,
+                        {
+                            import: injectCode(fullname, withChunks(entry)),
+                            library: { type: "amd", name: entry },
+                        },
+                    ];
+                }
+            })
     );
 
     isDynamicEntry = (m) => webpackEntries[m] !== undefined;
+    isPluginFile = (m) => pluginFiles.includes(m);
+
     return webpackEntries;
 };
 
@@ -305,12 +336,6 @@ const webpackConfig = defaults("main", (env) => ({
         plugins: [new iconUtil.IconResolverPlugin()],
     },
     plugins: [
-        new DefinePlugin({
-            JSREALM_PLUGIN_REGISTRY: DefinePlugin.runtimeValue(
-                () => JSON.stringify(plugins),
-                true
-            ),
-        }),
         new CopyPlugin({
             // Copy @nextgisweb/jsrealm/with-chunks!entry-name loader directly
             // to the dist directly. It is written in ES5-compatible way as AMD
@@ -342,15 +367,19 @@ const webpackConfig = defaults("main", (env) => ({
         chunkFilename: "chunk/[id].js",
     },
     externals: [
-        function ({ context, request }, callback) {
+        function ({ context, request, contextInfo }, callback) {
             // Use AMD loader for with-chunks!some-entrypoint-name imports.
             if (request.startsWith("@nextgisweb/jsrealm/with-chunks!")) {
                 return callback(null, `amd ${request}`);
             }
 
-            // Use AMD loader for all entrypoints.
+            // Use AMD loader for all entrypoints except plugins.
             const requestModule = request.replace(/!.*$/, "");
             if (isDynamicEntry(requestModule)) {
+                // For plugin registries and registrating modules AMD loader
+                // mustn't be used. Otherwise we'll have a circular import.
+                if (isPluginFile(contextInfo.issuer)) return callback();
+
                 if (["@nextgisweb/pyramid/i18n"].includes(requestModule)) {
                     const loader = /(!.*|)$/.exec(request)[1];
                     if (loader === "" || loader === "!") {
@@ -363,6 +392,7 @@ const webpackConfig = defaults("main", (env) => ({
                         request = newRequest;
                     }
                 }
+
                 return callback(null, `amd ${request}`);
             }
 

@@ -31,11 +31,14 @@
     <div id="teTarget">
         <script type="text/javascript">
             require([
-                "@nextgisweb/jsrealm/plugin!jsrealm.testentry/" + ${testentries[selected]['type'] | json_js},
+                "@nextgisweb/jsrealm/testentry/driver",
                 ${selected | json_js},
                 "dojo/domReady!"
-            ], (runner, {default: module}) => {
-                runner(module, document.getElementById('teTarget'));
+            ], ({ registry }, { default: module }) => {
+                const teType = ${testentries[selected]['type'] | json_js};
+                registry.load({identity: teType}).then((runner) => {
+                    runner(module, document.getElementById('teTarget'));
+                });
             })
         </script>
     </div>

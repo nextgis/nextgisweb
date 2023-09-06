@@ -1,0 +1,1 @@
+export { PluginRegistry } from "./registry";
