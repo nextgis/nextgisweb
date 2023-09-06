@@ -1,4 +1,5 @@
 declare const ngwConfig: {
+    components: string[];
     debug: boolean;
     applicationUrl: string;
     staticUrl: string;

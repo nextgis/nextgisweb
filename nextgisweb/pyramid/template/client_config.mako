@@ -29,6 +29,7 @@
         invitation_session = False
 
     ngwConfig = {
+        "components": list(request.env.components.keys()),
         "debug": request.env.core.debug,
         "applicationUrl": request.application_url,
         "amdUrl": request.static_url(),
