@@ -4,20 +4,16 @@ define([
     "dojo/number",
     "dijit/form/ValidationTextBox",
     "@nextgisweb/pyramid/i18n!",
-], function (
-    declare,
-    _WidgetBase,
-    number,
-    ValidationTextBox,
-    i18n
-) {
+], function (declare, _WidgetBase, number, ValidationTextBox, i18n) {
     return declare(_WidgetBase, {
         constructor: function (params) {
             this._textbox = new ValidationTextBox({
                 pattern: "1\\ *: *" + number.regexp(),
-                invalidMessage: i18n.gettext("Enter the correct scale value, e.g. 1:") + number.format(10000),
+                invalidMessage:
+                    i18n.gettext("Enter the correct scale value, e.g. 1:") +
+                    number.format(10000),
                 required: params.required,
-                style: "width: 100%"
+                style: "width: 100%",
             });
         },
 
@@ -35,7 +31,6 @@ define([
                     widget.set("value", null);
                 }
             });
-
         },
 
         value: null,
@@ -44,9 +39,12 @@ define([
             if (this.value != value) {
                 this._set("value", value);
                 if (this._textbox.isValid()) {
-                    this._textbox.set("value", value ? "1 : " + number.format(value) : null);
+                    this._textbox.set(
+                        "value",
+                        value ? "1 : " + number.format(value) : null
+                    );
                 }
             }
-        }
+        },
     });
 });

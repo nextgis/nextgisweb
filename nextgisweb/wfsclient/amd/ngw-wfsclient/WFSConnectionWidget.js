@@ -10,7 +10,7 @@ define([
     // template
     "dijit/form/Select",
     "dijit/form/ValidationTextBox",
-    "dojox/layout/TableContainer"
+    "dojox/layout/TableContainer",
 ], function (
     declare,
     _WidgetBase,
@@ -20,20 +20,29 @@ define([
     serialize,
     template
 ) {
-    var url_re = /^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&'()*+,;=:@\/?]*)?$/i;
+    var url_re =
+        /^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&'()*+,;=:@/?]*)?$/i;
 
-    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
-        title: i18n.gettext("WFS connection"),
-        templateString: i18n.renderTemplate(template),
-        prefix: "wfsclient_connection",
+    return declare(
+        [
+            _WidgetBase,
+            _TemplatedMixin,
+            _WidgetsInTemplateMixin,
+            serialize.Mixin,
+        ],
+        {
+            title: i18n.gettext("WFS connection"),
+            templateString: i18n.renderTemplate(template),
+            prefix: "wfsclient_connection",
 
-        postCreate: function () {
-            this.inherited(arguments);
+            postCreate: function () {
+                this.inherited(arguments);
 
-            this.wPath.validator = function (value) {
-                var success = url_re.test(value);
-                return success;
-            }.bind(this);
+                this.wPath.validator = function (value) {
+                    var success = url_re.test(value);
+                    return success;
+                }.bind(this);
+            },
         }
-    });
+    );
 });

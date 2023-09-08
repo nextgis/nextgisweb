@@ -3,48 +3,45 @@ define([
     "dojo/_base/lang",
     "dojo/_base/xhr",
     "dojo/store/JsonRest",
-    "@nextgisweb/pyramid/settings!"
-], function (
-    declare,
-    lang,
-    xhr,
-    JsonRest,
-    settings
-) {
+    "@nextgisweb/pyramid/settings!",
+], function (declare, lang, xhr, JsonRest, settings) {
     return declare(JsonRest, {
-        get: function (id, options) {
+        get: function (id) {
             return xhr("GET", {
                 url: lang.replace("{url}{id}/?format=json", {
                     url: settings.qms_geoservices_url,
-                    id: id
+                    id: id,
                 }),
                 handleAs: "json",
                 headers: {
-                    "X-Requested-With": null
-                }
+                    "X-Requested-With": null,
+                },
             });
         },
 
-        query: function (query, options) {
-            if (query.name.toString().length == 0) {
+        query: function (query) {
+            if (query.name.toString().length === 0) {
                 return [];
             }
 
-            var qopts = lang.mixin({
-                "search": query.name
-            }, this.queryOptions);
+            var qopts = lang.mixin(
+                {
+                    "search": query.name,
+                },
+                this.queryOptions
+            );
             query = xhr.objectToQuery(qopts);
 
             return xhr("GET", {
                 url: lang.replace("{url}?{query}&format=json", {
                     url: settings.qms_geoservices_url,
-                    query: query
+                    query: query,
                 }),
                 handleAs: "json",
                 headers: {
-                    "X-Requested-With": null
-                }
+                    "X-Requested-With": null,
+                },
             });
-        }
+        },
     });
 });

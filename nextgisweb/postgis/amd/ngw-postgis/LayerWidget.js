@@ -19,7 +19,7 @@ define([
     "dijit/form/ComboBox",
     "dojox/layout/TableContainer",
     "ngw-resource/ResourceBox",
-    "ngw-pyramid/form/IntegerValueTextBox"
+    "ngw-pyramid/form/IntegerValueTextBox",
 ], function (
     declare,
     array,
@@ -35,89 +35,155 @@ define([
     route,
     template
 ) {
-    return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, serialize.Mixin], {
-        title: i18n.gettext("PostGIS layer"),
-        templateString: i18n.renderTemplate(template),
-        prefix: "postgis_layer",
+    return declare(
+        [
+            _WidgetBase,
+            _TemplatedMixin,
+            _WidgetsInTemplateMixin,
+            serialize.Mixin,
+        ],
+        {
+            title: i18n.gettext("PostGIS layer"),
+            templateString: i18n.renderTemplate(template),
+            prefix: "postgis_layer",
 
-        constructor: function () {
-            this.srs = SRSSelect({allSrs: null});
-        },
+            constructor: function () {
+                this.srs = SRSSelect({ allSrs: null });
+            },
 
-        postCreate: function () {
-            this.inherited(arguments);
+            postCreate: function () {
+                this.inherited(arguments);
 
-            this.geometrySRID.set("disabled", this.composite.operation !== "create");
-            this.geometryType.set("disabled", this.composite.operation !== "create");
-            this.srs.set("disabled", this.composite.operation !== "create");
-            this.fields.set("value", this.composite.operation == "create" ? "update" : "keep");
+                this.geometrySRID.set(
+                    "disabled",
+                    this.composite.operation !== "create"
+                );
+                this.geometryType.set(
+                    "disabled",
+                    this.composite.operation !== "create"
+                );
+                this.srs.set("disabled", this.composite.operation !== "create");
+                this.fields.set(
+                    "value",
+                    this.composite.operation === "create" ? "update" : "keep"
+                );
 
-            // once connection is selected populate schemas
-            this.wConnection.on("update", lang.hitch(this, this.populateSchemas));
+                // once connection is selected populate schemas
+                this.wConnection.on(
+                    "update",
+                    lang.hitch(this, this.populateSchemas)
+                );
 
-            // track schema and table changes
-            this.wSchema.watch("value", lang.hitch(this, function (attr, oldval, newval) {
-                this.populateTables(newval);
-            }));
-            this.wTable.watch("value", lang.hitch(this, function (attr, oldval, newval) {
-                this.populateColumns(this.wSchema.get("value"), newval);
-            }));
-        },
+                // track schema and table changes
+                this.wSchema.watch(
+                    "value",
+                    lang.hitch(this, function (attr, oldval, newval) {
+                        this.populateTables(newval);
+                    })
+                );
+                this.wTable.watch(
+                    "value",
+                    lang.hitch(this, function (attr, oldval, newval) {
+                        this.populateColumns(this.wSchema.get("value"), newval);
+                    })
+                );
+            },
 
-        serializeInMixin: function (data) {
-            if (data.postgis_layer === undefined) { data.postgis_layer = {}; }
-            var value = data.postgis_layer;
-            value.srs = { id: this.srs.get("value") };
-            if (value.geometry_type === "") {
-                value.geometry_type = null;
-            }
-            if (value.geometry_srid !== null) {
-                value.geometry_srid = parseInt(value.geometry_srid);
-            }
-        },
+            serializeInMixin: function (data) {
+                if (data.postgis_layer === undefined) {
+                    data.postgis_layer = {};
+                }
+                var value = data.postgis_layer;
+                value.srs = { id: this.srs.get("value") };
+                if (value.geometry_type === "") {
+                    value.geometry_type = null;
+                }
+                if (value.geometry_srid !== null) {
+                    value.geometry_srid = parseInt(value.geometry_srid);
+                }
+            },
 
-        populateSchemas: function (connection) {
-            this.connection = connection.value;
-            this.schemas = {};
-            xhr.get(route.postgis.connection.inspect(this.connection), {
-                handleAs: "json"
-            }).then(lang.hitch(this, function (response) {
-                array.forEach(response, function (item) {
-                    this.schemas[item.schema] = item.tables.concat(item.views);
-                }, this);
-                var data = array.map(Object.keys(this.schemas), function (schema) {
-                    return { id: schema };
+            populateSchemas: function (connection) {
+                this.connection = connection.value;
+                this.schemas = {};
+                xhr.get(route.postgis.connection.inspect(this.connection), {
+                    handleAs: "json",
+                }).then(
+                    lang.hitch(this, function (response) {
+                        array.forEach(
+                            response,
+                            function (item) {
+                                this.schemas[item.schema] = item.tables.concat(
+                                    item.views
+                                );
+                            },
+                            this
+                        );
+                        var data = array.map(
+                            Object.keys(this.schemas),
+                            function (schema) {
+                                return { id: schema };
+                            }
+                        );
+                        this.wSchema.set("store", new Memory({ data: data }));
+                    })
+                );
+            },
+
+            populateTables: function (schema) {
+                if (!schema) {
+                    return;
+                }
+                var data = array.map(this.schemas[schema], function (table) {
+                    return { id: table };
                 });
-                this.wSchema.set("store", new Memory({data: data}));
-            }));
-        },
+                this.wTable.set("store", new Memory({ data: data }));
+            },
 
-        populateTables: function (schema) {
-            if (!schema) { return; }
-            var data = array.map(this.schemas[schema], function (table) {
-                return { id: table };
-            });
-            this.wTable.set("store", new Memory({data: data}));
-        },
-
-        populateColumns: function (schema, table) {
-            if (!table) { return; }
-            xhr.get(route.postgis.connection.inspect.table(this.connection.id, table), {
-                handleAs: "json",
-                query: { schema: schema }
-            }).then(lang.hitch(this, function (response) {
-                var idcols = [], geomcols = [];
-                array.forEach(response, function (item) {
-                    if (!item.type.toLowerCase().startsWith("geometry")) {
-                        idcols.push({id: item.name});
-                    } else {
-                        geomcols.push({id: item.name});
+            populateColumns: function (schema, table) {
+                if (!table) {
+                    return;
+                }
+                xhr.get(
+                    route.postgis.connection.inspect.table(
+                        this.connection.id,
+                        table
+                    ),
+                    {
+                        handleAs: "json",
+                        query: { schema: schema },
                     }
-                }, this);
+                ).then(
+                    lang.hitch(this, function (response) {
+                        var idcols = [],
+                            geomcols = [];
+                        array.forEach(
+                            response,
+                            function (item) {
+                                if (
+                                    !item.type
+                                        .toLowerCase()
+                                        .startsWith("geometry")
+                                ) {
+                                    idcols.push({ id: item.name });
+                                } else {
+                                    geomcols.push({ id: item.name });
+                                }
+                            },
+                            this
+                        );
 
-                this.wColumnID.set("store", new Memory({data: idcols}));
-                this.wColumnGeometry.set("store", new Memory({data: geomcols}));
-            }));
+                        this.wColumnID.set(
+                            "store",
+                            new Memory({ data: idcols })
+                        );
+                        this.wColumnGeometry.set(
+                            "store",
+                            new Memory({ data: geomcols })
+                        );
+                    })
+                );
+            },
         }
-    });
+    );
 });

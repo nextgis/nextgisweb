@@ -6,19 +6,9 @@ define([
     "dojo/Deferred",
     "dojo/when",
     "dojo/promise/all",
-    "dijit/registry"
-], function (
-    declare,
-    lang,
-    array,
-    query,
-    Deferred,
-    when,
-    all,
-    registry
-) {
+    "dijit/registry",
+], function (declare, lang, array, query, Deferred, when, all, registry) {
     var Mixin = declare([], {
-
         constructor: function () {
             this.serattrmap = [];
         },
@@ -53,7 +43,7 @@ define([
             if (this.serializeInMixin !== undefined) {
                 promises.push(when(this.serializeInMixin(data)));
             }
-            
+
             return all(promises);
         },
 
@@ -76,26 +66,38 @@ define([
 
         postCreate: function () {
             this.inherited(arguments);
-            
-            array.forEach(query("*[data-ngw-serialize]", this.domNode), function (node) {
-                var widget = registry.byId(node.id),
-                    attr = node.getAttribute("data-ngw-serialize");
-                if (widget === undefined) {
-                    console.warn("Could not find corresponding widget for node:", node);
-                } else {
-                    var current = node, key = attr;
-                    do {
-                        var a = current.getAttribute("data-ngw-serialize-prefix");
-                        if (a) { key = a + "." + key; }
-                        current = current.parentNode;
-                    } while (current !== this.domNode.parentNode);
-                    this.serattrmap.push({ key: key, widget: widget });
-                }
-            }, this);
-        }
+
+            array.forEach(
+                query("*[data-ngw-serialize]", this.domNode),
+                function (node) {
+                    var widget = registry.byId(node.id),
+                        attr = node.getAttribute("data-ngw-serialize");
+                    if (widget === undefined) {
+                        console.warn(
+                            "Could not find corresponding widget for node:",
+                            node
+                        );
+                    } else {
+                        var current = node,
+                            key = attr;
+                        do {
+                            var a = current.getAttribute(
+                                "data-ngw-serialize-prefix"
+                            );
+                            if (a) {
+                                key = a + "." + key;
+                            }
+                            current = current.parentNode;
+                        } while (current !== this.domNode.parentNode);
+                        this.serattrmap.push({ key: key, widget: widget });
+                    }
+                },
+                this
+            );
+        },
     });
 
     return {
-        Mixin: Mixin
+        Mixin: Mixin,
     };
 });

@@ -6,7 +6,7 @@ define([
     "dijit/tree/ObjectStoreModel",
     "ngw-pyramid/make-singleton",
     "./ResourceStore",
-    "./TreeNode"
+    "./TreeNode",
 ], function (
     declare,
     lang,
@@ -17,33 +17,35 @@ define([
     ResourceStore,
     TreeNode
 ) {
+    var ResourceObjectStoreModel = makeSingleton(
+        declare([ObjectStoreModel], {
+            store: new ResourceStore(),
 
-    var ResourceObjectStoreModel = makeSingleton(declare([ObjectStoreModel], {
-        store: new ResourceStore(),
+            labelAttr: "display_name",
 
-        labelAttr: "display_name",
+            // Indication that root node is loaded. Used instead of original
+            // root property, which is always null now. This is done to avoid
+            // double root node loading when a page uses several ResourcePicker
+            _root: undefined,
 
-        // Indication that root node is loaded. Used instead of 
-        // original root property, which is always null now. This is done
-        // to avoid double root node loading
-        // when a page uses several ResourcePicker
-        _root: undefined,
+            constructor: function () {
+                this._root = new Deferred();
+                this.store.query(this.query).then(
+                    lang.hitch(this, function (items) {
+                        this._root.resolve(items[0].resource);
+                    })
+                );
+            },
 
-        constructor: function () {
-            this._root = new Deferred();
-            this.store.query(this.query).then(
-                lang.hitch(this, function (items) { this._root.resolve(items[0].resource); })
-            );
-        },
+            getRoot: function (onItem, onError) {
+                this._root.promise.then(onItem, onError);
+            },
 
-        getRoot: function (onItem, onError) {
-            this._root.promise.then(onItem, onError);
-        },
-
-        mayHaveChildren: function (item) {
-            return item.children;
-        }
-    }));
+            mayHaveChildren: function (item) {
+                return item.children;
+            },
+        })
+    );
 
     return declare("ngw.resource.Tree", [Tree], {
         showRoot: true,
@@ -55,22 +57,23 @@ define([
         constructor: function (kwArgs) {
             declare.safeMixin(this, kwArgs);
 
-            if (this.resourceId === undefined) { this.resourceId = 0; }
+            if (this.resourceId === undefined) {
+                this.resourceId = 0;
+            }
 
-            // All trees that are exemplars of this class use
-            // the same model. As a result there are less requests
-            // to server, but exemplars can't have different 
-            // root nodes. This might become useful sometimes.
+            // All trees that are exemplars of this class use the same model. As
+            // a result there are less requests to server, but exemplars can't
+            // have different root nodes. This might become useful sometimes.
             this.model = ResourceObjectStoreModel.getInstance();
             this.store = this.model.store;
         },
 
-        getIconClass: function (item, opened) {
+        getIconClass: function () {
             return;
         },
 
         _createTreeNode: function (args) {
             return new TreeNode(args);
-        }
+        },
     });
 });

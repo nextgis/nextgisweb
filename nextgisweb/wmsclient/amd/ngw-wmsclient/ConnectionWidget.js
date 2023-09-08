@@ -14,7 +14,7 @@ define([
     "dijit/form/ValidationTextBox",
     "dijit/form/Select",
     "dijit/form/CheckBox",
-    "dojox/layout/TableContainer"
+    "dojox/layout/TableContainer",
 ], function (
     declare,
     lang,
@@ -27,44 +27,68 @@ define([
     template,
     settings
 ) {
-    var url_re = /^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&'()*+,;=:@\/?]*)?$/i;
+    var url_re =
+        /^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&'()*+,;=:@/?]*)?$/i;
 
-    return declare([ContentPane, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: i18n.renderTemplate(template),
-        title: i18n.gettext("WMS connection"),
-        serializePrefix: "wmsclient_connection",
+    return declare(
+        [
+            ContentPane,
+            serialize.Mixin,
+            _TemplatedMixin,
+            _WidgetsInTemplateMixin,
+        ],
+        {
+            templateString: i18n.renderTemplate(template),
+            title: i18n.gettext("WMS connection"),
+            serializePrefix: "wmsclient_connection",
 
-        postCreate: function () {
-            this.inherited(arguments);
+            postCreate: function () {
+                this.inherited(arguments);
 
-            array.forEach(settings.wms_versions, function (i) {
-                this.wVersion.addOption([{value: i, label: i}]);
-            }, this);
+                array.forEach(
+                    settings.wms_versions,
+                    function (i) {
+                        this.wVersion.addOption([{ value: i, label: i }]);
+                    },
+                    this
+                );
 
-            if (this.value) {
-                this.wVersion.set("value", this.value.version);
-            }
+                if (this.value) {
+                    this.wVersion.set("value", this.value.version);
+                }
 
-            this.wURL.validator = function (value) {
-                var success = url_re.test(value);
-                return success;
-            }.bind(this);
-        },
+                this.wURL.validator = function (value) {
+                    var success = url_re.test(value);
+                    return success;
+                }.bind(this);
+            },
 
-        serializeInMixin: function (data) {
-            var capcache = this.wCapCache.get("value"),
-                username = this.wUsername.get("value"),
-                password = this.wPassword.get("value");
-            if (capcache !== "") {
-                lang.setObject(this.serializePrefix + ".capcache", capcache, data);
-            }
-            if (username === "") {
-                lang.setObject(this.serializePrefix + ".username", null, data);
-            }
-            if (password === "") {
-                lang.setObject(this.serializePrefix + ".password", null, data);
-            }
+            serializeInMixin: function (data) {
+                var capcache = this.wCapCache.get("value"),
+                    username = this.wUsername.get("value"),
+                    password = this.wPassword.get("value");
+                if (capcache !== "") {
+                    lang.setObject(
+                        this.serializePrefix + ".capcache",
+                        capcache,
+                        data
+                    );
+                }
+                if (username === "") {
+                    lang.setObject(
+                        this.serializePrefix + ".username",
+                        null,
+                        data
+                    );
+                }
+                if (password === "") {
+                    lang.setObject(
+                        this.serializePrefix + ".password",
+                        null,
+                        data
+                    );
+                }
+            },
         }
-
-    });
+    );
 });

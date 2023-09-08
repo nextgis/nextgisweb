@@ -3,8 +3,6 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "dojo/query",
     "dojo/_base/lang",
-    "dojo/_base/array",
-    "dojo/dom",
     "dojo/dom-construct",
     "dojo/dom-class",
     "dijit/_TemplatedMixin",
@@ -19,8 +17,6 @@ define([
     i18n,
     query,
     lang,
-    array,
-    dom,
     domConstruct,
     domClass,
     _TemplatedMixin,
@@ -47,7 +43,7 @@ define([
             this.options = options;
             declare.safeMixin(this, options);
         },
-        
+
         setDefaultOptions: function (options) {
             if (!("gutters" in options)) {
                 options.gutters = false;

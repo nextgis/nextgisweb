@@ -8,7 +8,7 @@ define([
     "dijit/tree/ObjectStoreModel",
     "dijit/form/Button",
     "dijit/layout/BorderContainer",
-    "@nextgisweb/pyramid/i18n!"
+    "@nextgisweb/pyramid/i18n!",
 ], function (
     declare,
     lang,
@@ -33,12 +33,14 @@ define([
                     query: { index: -1 },
                     store: options.store,
                     getLabel: function (item) {
-                        return item.layer + ' (' + item.description + ')';
+                        return item.layer + " (" + item.description + ")";
                     },
-                    mayHaveChildren: function (object) { return 'children' in object; }
+                    mayHaveChildren: function (object) {
+                        return "children" in object;
+                    },
                 }),
                 region: "center",
-                style: "width: 100%; height: 100%;"
+                style: "width: 100%; height: 100%;",
             });
         },
 
@@ -46,18 +48,28 @@ define([
             this.inherited(arguments);
 
             this.container = new BorderContainer({
-                style: "width: 400px; height: 300px"
+                style: "width: 400px; height: 300px",
             }).placeAt(this);
 
             this.tree.placeAt(this.container);
 
-            this.tree.on("click", lang.hitch(this, function () {
-                this.btnOk.set("disabled", !this.checkItemAcceptance(this.tree.selectedItem));
-            }));
+            this.tree.on(
+                "click",
+                lang.hitch(this, function () {
+                    this.btnOk.set(
+                        "disabled",
+                        !this.checkItemAcceptance(this.tree.selectedItem)
+                    );
+                })
+            );
 
-            this.actionBar = domConstruct.create("div", {
-                class: "dijitDialogPaneActionBar"
-            }, this.containerNode);
+            this.actionBar = domConstruct.create(
+                "div",
+                {
+                    class: "dijitDialogPaneActionBar",
+                },
+                this.containerNode
+            );
 
             this.btnOk = new Button({
                 label: i18n.gettext("OK"),
@@ -65,7 +77,7 @@ define([
                 onClick: lang.hitch(this, function () {
                     this._deferred.resolve(this.tree.get("selectedItem"));
                     this.hide();
-                })
+                }),
             }).placeAt(this.actionBar);
 
             new Button({
@@ -73,7 +85,7 @@ define([
                 onClick: lang.hitch(this, function () {
                     this._deferred.reject("No layer selected");
                     this.hide();
-                })
+                }),
             }).placeAt(this.actionBar);
         },
 
@@ -85,6 +97,6 @@ define([
             this._deferred = new Deferred();
             this.show();
             return this._deferred;
-        }
+        },
     });
 });

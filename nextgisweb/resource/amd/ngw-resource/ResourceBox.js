@@ -2,18 +2,19 @@ define([
     "dojo/_base/declare",
     "dojo/_base/lang",
     "ngw-pyramid/form/PickerBox",
-    "./ResourcePicker"
-], function (declare,
-             lang,
-             PickerBox,
-             ResourcePicker) {
+    "./ResourcePicker",
+], function (declare, lang, PickerBox, ResourcePicker) {
     return declare([PickerBox], {
         buildRendering: function () {
             this.inherited(arguments);
-            this.picker = new ResourcePicker({cls: this.cls, interface: this.interface, dialogTitle: this.dialogTitle });
+            this.picker = new ResourcePicker({
+                cls: this.cls,
+                interface: this.interface,
+                dialogTitle: this.dialogTitle,
+            });
             this.store = this.picker.tree.store;
             if (this.required) {
-                this._clearButtonNode.style.display = 'none';
+                this._clearButtonNode.style.display = "none";
             }
         },
 
@@ -37,12 +38,14 @@ define([
                 return;
             }
             this.inherited(arguments);
-            this.picker.pick().then(lang.hitch(this, function (itm) {
-                this.set("value", {id: itm.id});
-                this.emit("picked", {
-                    resource: itm
-                });
-            }));
+            this.picker.pick().then(
+                lang.hitch(this, function (itm) {
+                    this.set("value", { id: itm.id });
+                    this.emit("picked", {
+                        resource: itm,
+                    });
+                })
+            );
         },
 
         _clearButtonClick: function () {
@@ -51,6 +54,6 @@ define([
             }
             this.inherited(arguments);
             this.set("value", null);
-        }
+        },
     });
 });

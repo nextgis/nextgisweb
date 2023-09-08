@@ -2,19 +2,17 @@ define([
     "dojo/_base/declare",
     "dojo/_base/lang",
     "dojo/Deferred",
-    "dojo/dom-class",
     "dojo/dom-construct",
     "dijit/Dialog",
     "dijit/form/Button",
     "dijit/layout/BorderContainer",
     "dojox/collections/Set",
     "./Tree",
-    "@nextgisweb/pyramid/i18n!"
+    "@nextgisweb/pyramid/i18n!",
 ], function (
     declare,
     lang,
     Deferred,
-    domClass,
     domConstruct,
     Dialog,
     Button,
@@ -31,26 +29,42 @@ define([
             this.title = this.dialogTitle || i18n.gettext("Select resource");
 
             this.container = new BorderContainer({
-                style: "width: 400px; height: 300px"
+                style: "width: 400px; height: 300px",
             }).placeAt(this);
 
             this.tree = new Tree({
                 region: "center",
                 style: "width: 100%; height: 100%;",
-                _createTreeNode: function(args) {
+                _createTreeNode: function (args) {
                     var treeNode = this.inherited(arguments);
-                    treeNode.set('disabled', !(args.item.children || widget.checkItemAcceptance(args.item)));
+                    treeNode.set(
+                        "disabled",
+                        !(
+                            args.item.children ||
+                            widget.checkItemAcceptance(args.item)
+                        )
+                    );
                     return treeNode;
-                }
+                },
             }).placeAt(this.container);
 
-            this.tree.on("click", lang.hitch(this, function () {
-                this.btnOk.set("disabled", !this.checkItemAcceptance(this.tree.selectedItem));
-            }));
+            this.tree.on(
+                "click",
+                lang.hitch(this, function () {
+                    this.btnOk.set(
+                        "disabled",
+                        !this.checkItemAcceptance(this.tree.selectedItem)
+                    );
+                })
+            );
 
-            this.actionBar = domConstruct.create("div", {
-                class: "dijitDialogPaneActionBar"
-            }, this.containerNode);
+            this.actionBar = domConstruct.create(
+                "div",
+                {
+                    class: "dijitDialogPaneActionBar",
+                },
+                this.containerNode
+            );
 
             this.btnOk = new Button({
                 label: i18n.gettext("OK"),
@@ -58,7 +72,7 @@ define([
                 onClick: lang.hitch(this, function () {
                     this._deferred.resolve(this.tree.get("selectedItem"));
                     this.hide();
-                })
+                }),
             }).placeAt(this.actionBar);
 
             new Button({
@@ -66,18 +80,35 @@ define([
                 onClick: lang.hitch(this, function () {
                     this._deferred.reject("No resource selected");
                     this.hide();
-                })
+                }),
             }).placeAt(this.actionBar);
         },
 
         checkItemAcceptance: function (itm) {
-            if (itm === undefined || itm === null) { return false; }
-            if (this.interface !== undefined && itm.interfaces.indexOf(this.interface) == -1) { return false; }
-            if (this.interfaces !== undefined &&
-                (set.intersection(itm.interfaces, this.interfaces).count == 0)) { return false; }
-            if (this.cls !== undefined && itm.cls != this.cls) { return false; }
-            if (this.clases !== undefined &&
-                (set.intersection([itm.cls], this.clases).count == 0)) { return false; }
+            if (itm === undefined || itm === null) {
+                return false;
+            }
+            if (
+                this.interface !== undefined &&
+                itm.interfaces.indexOf(this.interface) == -1
+            ) {
+                return false;
+            }
+            if (
+                this.interfaces !== undefined &&
+                set.intersection(itm.interfaces, this.interfaces).count == 0
+            ) {
+                return false;
+            }
+            if (this.cls !== undefined && itm.cls != this.cls) {
+                return false;
+            }
+            if (
+                this.clases !== undefined &&
+                set.intersection([itm.cls], this.clases).count == 0
+            ) {
+                return false;
+            }
 
             return true;
         },
@@ -86,6 +117,6 @@ define([
             this._deferred = new Deferred();
             this.show();
             return this._deferred;
-        }
+        },
     });
 });

@@ -16,7 +16,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "ngw-resource/serialize",
     //
-    "xstyle/css!./resource/LayerVendorParamsWidget.css"
+    "xstyle/css!./resource/LayerVendorParamsWidget.css",
 ], function (
     declare,
     lang,
@@ -45,7 +45,7 @@ define([
                 sortable: false,
                 autoSave: true,
                 editor: TextBox,
-                editorArgs: {style: "width: 100%; border: none;"}
+                editorArgs: { style: "width: 100%; border: none;" },
             }),
 
             editor({
@@ -54,10 +54,9 @@ define([
                 sortable: false,
                 autoSave: true,
                 editor: TextBox,
-                editorArgs: {style: "width: 100%; border: none;"}
-            })
-
-        ]
+                editorArgs: { style: "width: 100%; border: none;" },
+            }),
+        ],
     });
 
     return declare([LayoutContainer, serialize.Mixin], {
@@ -65,15 +64,18 @@ define([
         serializePrefix: "wmsclient_layer",
 
         constructor: function () {
-            this.store = new Observable(new Memory({idProperty: "id"}));
+            this.store = new Observable(new Memory({ idProperty: "id" }));
         },
 
         buildRendering: function () {
             this.inherited(arguments);
 
-            domClass.add(this.domNode, "ngw-wmsclient-layer-vendor-params-widget");
+            domClass.add(
+                this.domNode,
+                "ngw-wmsclient-layer-vendor-params-widget"
+            );
 
-            this.grid = new GridClass({store: this.store});
+            this.grid = new GridClass({ store: this.store });
             this.grid.region = "center";
 
             domClass.add(this.grid.domNode, "dgrid-border-fix");
@@ -82,25 +84,30 @@ define([
 
             this.toolbar = new Toolbar({});
 
-            var store = this.store, add = function () {
-                store.add({key: "", value: ""});
-            };
+            var store = this.store,
+                add = function () {
+                    store.add({ key: "", value: "" });
+                };
 
-            this.toolbar.addChild(new Button({
-                label: i18n.gettext("Add"),
-                iconClass: "dijitIconNewTask",
-                onClick: add
-            }));
-
-            this.toolbar.addChild(new Button({
-                label: i18n.gettext("Delete"),
-                iconClass: "dijitIconDelete",
-                onClick: lang.hitch(this, function () {
-                    for (var key in this.grid.selection) {
-                        this.store.remove(key);
-                    }
+            this.toolbar.addChild(
+                new Button({
+                    label: i18n.gettext("Add"),
+                    iconClass: "dijitIconNewTask",
+                    onClick: add,
                 })
-            }));
+            );
+
+            this.toolbar.addChild(
+                new Button({
+                    label: i18n.gettext("Delete"),
+                    iconClass: "dijitIconDelete",
+                    onClick: lang.hitch(this, function () {
+                        for (var key in this.grid.selection) {
+                            this.store.remove(key);
+                        }
+                    }),
+                })
+            );
 
             this.toolbar.region = "top";
             this.addChild(this.toolbar);
@@ -112,12 +119,14 @@ define([
 
             for (var key in items) {
                 var value = items[key];
-                store.add({key: key, value: value.toString()});
+                store.add({ key: key, value: value.toString() });
             }
         },
 
         serializeInMixin: function (data) {
-            if (data[this.serializePrefix] === undefined) { data[this.serializePrefix] = {}; }
+            if (data[this.serializePrefix] === undefined) {
+                data[this.serializePrefix] = {};
+            }
             data[this.serializePrefix].vendor_params = {};
 
             var items = data[this.serializePrefix].vendor_params;
@@ -128,6 +137,6 @@ define([
                     items[f.key] = value;
                 }
             });
-        }
+        },
     });
 });
