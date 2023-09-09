@@ -183,7 +183,6 @@ export function PrincipalSelect({
     return (
         <Select
             showSearch
-            style={{ width: "100%" }}
             value={value}
             onChange={onChange}
             mode={multiple ? "multiple" : undefined}
