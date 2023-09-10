@@ -14,6 +14,7 @@ Changes
 - 2x speed-up of vector layer import.
 - Ant Design library upgraded to 5.
 - Save to PDF from the webmap printing panel.
+- Store audit journal in PostgreSQL database instead of ElasticSearch.
 
 
 4.4.0

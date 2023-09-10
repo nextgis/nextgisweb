@@ -1,116 +1,56 @@
-import json
+from __future__ import annotations
+
+from datetime import timedelta
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Mapping, Optional
 
 from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 
-from .util import disable_logging
+if TYPE_CHECKING:
+    from .backend import BackendBase
 
 
 class AuditComponent(Component):
-
-    def __init__(self, env, settings):
-        super().__init__(env, settings)
-
-        self.audit_enabled = self.options['enabled']
-
-        self.audit_es_host = self.options.get('elasticsearch.host', None)
-        self.audit_es_port = self.options['elasticsearch.port']
-        self.audit_es_index_prefix = self.options['elasticsearch.index.prefix']
-        self.audit_es_index_suffix = self.options['elasticsearch.index.suffix']
-        self.audit_file = self.options.get('file', None)
-
-        if self.audit_enabled and (
-            self.audit_es_host is None and self.audit_file is None
-        ):
-            raise ValueError("Elasticsearch or file not specified for audit.")
-
-        self.audit_es_enabled = self.audit_enabled and self.audit_es_host is not None
-        self.audit_file_enabled = self.audit_enabled and self.audit_file is not None
+    backends: Optional[Mapping[str, BackendBase]] = None
 
     def initialize(self):
-        if self.audit_es_enabled:
-            from elasticsearch import Elasticsearch  # Slow import
+        from .backend import registry
 
-            self.es = Elasticsearch('%s:%d' % (
-                self.audit_es_host,
-                self.audit_es_port,
-            ))
-
-        if self.audit_file_enabled:
-            self.file = open(self.options['file'], 'a')
-
-        # Setup filters from options
-        self.request_filters = request_filters = []
-
-        if self.audit_enabled:
-            request_filters.append(lambda req: not req.path_info.startswith(
-                ("/static/", "/_debug_toolbar/", "/favicon.ico")))
-
-            f_method_inc = self.options['request_method.include']
-            if f_method_inc is not None:
-                f_method_inc = tuple(f_method_inc)
-                request_filters.append(
-                    lambda req: req.method in f_method_inc)
-
-            f_method_exc = self.options['request_method.exclude']
-            if f_method_exc is not None:
-                f_method_exc = tuple(f_method_exc)
-                request_filters.append(
-                    lambda req: req.method not in f_method_exc)
-
-            f_path_inc = self.options['request_path.include']
-            if f_path_inc is not None:
-                f_path_inc = tuple(f_path_inc)
-                request_filters.append(
-                    lambda req: req.path_info.startswith(f_path_inc))
-
-            f_path_exc = self.options['request_path.exclude']
-            if f_path_exc is not None:
-                f_path_exc = tuple(f_path_exc)
-                request_filters.append(
-                    lambda req: not req.path_info.startswith(f_path_exc))
-
-    def is_service_ready(self):
-        if self.audit_es_enabled:
-            import elasticsearch.exceptions as esexc  # Slow import
-
-            while True:
-                try:
-                    with disable_logging():
-                        self.es.cluster.health(
-                            wait_for_status='yellow',
-                            request_timeout=1 / 4)
-                    break
-                except (esexc.ConnectionError, esexc.ConnectionTimeout) as exc:
-                    yield exc.info.message
-
-    def initialize_db(self):
-        if self.audit_es_enabled:
-            # OOPS: Elasticsearch mappings are not related to database!
-            template = json.loads(self.resource_path('template.json').read_text())
-            template['index_patterns'] = ['%s-*' % (self.audit_es_index_prefix,)]
-            self.es.indices.put_template('nextgisweb_audit', body=template)
+        super().initialize()
+        self.backends = MappingProxyType(
+            {
+                identity: cls(self)
+                for identity, cls in registry.items()
+                if self.options[cls.identity + ".enabled"]
+            }
+        )
 
     def setup_pyramid(self, config):
         from . import api, view
+
+        if self.backends and len(self.backends) > 0:
+            config.add_tween(
+                "nextgisweb.audit.tween.factory",
+                over=("nextgisweb.pyramid.exception.unhandled_exception_tween_factory",),
+            )
+
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
+    def maintenance(self):
+        super().maintenance()
+        for backend in self.backends.values():
+            backend.maintenance()
+
     option_annotations = (
-        Option('enabled', bool, default=False),
-        Option('elasticsearch.host'),
-        Option('elasticsearch.port', int, default=9200),
-        Option('elasticsearch.index.prefix', default='nextgisweb-audit'),
-        Option('elasticsearch.index.suffix', default='%Y.%m'),
-        Option('file', doc='Log events in ndjson format'),
-
-        Option('request_method.include', list, default=None,
-               doc="Log only given request methods"),
-        Option('request_method.exclude', list, default=None,
-               doc="Don't log given request methods"),
-
-        Option('request_path.include', list, default=None,
-               doc="Log only given request path prefixes"),
-        Option('request_path.exclude', list, default=None,
-               doc="Don't log given request path prefixes"),
+        # File
+        Option("file.enabled", bool, default=False),
+        Option("file.path", str, default="/dev/stderr"),
+        # Database
+        Option("dbase.enabled", bool, default=False),
+        Option("dbase.retention", timedelta, default=timedelta(days=92)),
+        # Filter
+        Option("filter.request_method", list, default=None),
+        Option("filter.request_path", list, default=None),
     )

@@ -1,110 +1,132 @@
 import csv
+from datetime import datetime
+from enum import Enum
 from io import StringIO
-from math import ceil
+from typing import Dict, List, Optional, Union
 
-from flatdict import FlatDict
-from pyramid.httpexceptions import HTTPNotFound
+import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as pg
+from msgspec import Meta
+from msgspec.json import decode as msgspec_decode
 from pyramid.response import Response
+from typing_extensions import Annotated
+
+from nextgisweb.env import DBSession, inject
+
+from nextgisweb.pyramid import JSONType
+
+from .backend import require_backend
+from .component import AuditComponent
+from .model import tab_journal
+
+MAX_ROWS = 1_000_000
+TIMESTAMP_PATTERN = r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?$"
+FIELD_PATTERN = r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
+
+Timestamp = Annotated[str, Meta(pattern=TIMESTAMP_PATTERN)]
+Field = Annotated[str, Meta(pattern=FIELD_PATTERN)]
+Filter = Dict[Field, Union[None, str, int, bool]]
 
 
-def audit_cget(
-    request, date_from=None, date_to=None, user=None, order='desc', limit=None
-):
-    from elasticsearch_dsl import Q, Search
-
-    s = Search(
-        using=request.env.audit.es,
-        index="%s-*" % (request.env.audit.audit_es_index_prefix,)
-    )
-    s = s.using(request.env.audit.es)
-    s = s.sort('%s%s' % ({'asc': '', 'desc': '-'}[order], '@timestamp'))
-
-    if user is not None and user != '__all':
-        if user == '__non_empty':
-            s = s.query(Q('exists', **{'field': 'user.keyname'}))
-        else:
-            s = s.query(Q('term', **{'user.keyname': user}))
-
-    if date_from is None and date_to is None:
-        return []
-
-    if date_from is not None and date_from != '':
-        s = s.query(Q('range', **{'@timestamp': {'gte': date_from}}))
-
-    if date_to is not None and date_to != '':
-        s = s.query(Q('range', **{'@timestamp': {'lte': date_to}}))
-
-    def hits(chunk_size=100, limit=None):
-        response = s.execute()
-        total = response.hits.total.value
-
-        if limit is not None:
-            total = min(total, limit)
-            chunk_size = min(chunk_size, limit)
-
-        nchunks = int(ceil(total / chunk_size))
-        for nchunk in range(nchunks):
-            for hit in s[nchunk * chunk_size:(nchunk + 1) * chunk_size]:
-                yield hit
-
-    return hits(limit=limit)
+class QueryFormat(Enum):
+    ARRAY = "array"
+    OBJECT = "object"
+    CSV = "csv"
 
 
-def export(request):
+def _field_expr(dcol, field):
+    return dcol.op("#>")(sa.text(f"'{{{','.join(field.split('.'))}}}'"))
+
+
+def _select_fields(dcol, fields):
+    terms = []
+    op = dcol.op("#>")
+    for field in fields:
+        parts = field.split(".")
+        terms.append(op(sa.text(f"'{{{','.join(parts)}}}'")))
+    return terms
+
+
+@inject()
+def dbase(
+    request,
+    *,
+    format: QueryFormat,
+    eq: Optional[Timestamp] = None,
+    gt: Optional[Timestamp] = None,
+    ge: Optional[Timestamp] = None,
+    lt: Optional[Timestamp] = None,
+    le: Optional[Timestamp] = None,
+    fields: List[Field] = [],
+    filter: Optional[str] = None,
+    limit: Annotated[int, Meta(gt=0, le=MAX_ROWS)] = MAX_ROWS,
+    comp: AuditComponent,
+) -> JSONType:
     request.require_administrator()
+    require_backend("dbase")
 
-    date_from = request.params.get("date_from")
-    date_to = request.params.get("date_to")
-    user = request.params.get("user")
+    tcol = tab_journal.c.tstamp
+    dcol = tab_journal.c.data
 
-    hits = audit_cget(
-        request=request,
-        date_from=date_from,
-        date_to=date_to,
-        user=user,
+    if format in (QueryFormat.ARRAY, QueryFormat.CSV):
+        terms = _select_fields(dcol, fields)
+    else:
+        terms = [dcol]
+
+    oldest = datetime.utcnow() - comp.backends["dbase"].options["retention"]
+    q = sa.select(tcol, *terms).where(
+        tcol >= oldest,
+        *(
+            ([tcol == eq] if eq else [])
+            + ([tcol > gt] if gt else [])
+            + ([tcol >= ge] if ge else [])
+            + ([tcol < lt] if lt else [])
+            + ([tcol <= le] if le else [])
+        ),
     )
+    q = q.order_by(tcol.asc(), tab_journal.c.ident.asc()).limit(limit)
 
-    hits = map(lambda h: h.to_dict(), hits)
-    hits = map(lambda h: FlatDict(h, delimiter='.'), hits)
-    hits = list(hits)
+    if filter is not None:
+        filter_obj = msgspec_decode(filter, type=Filter)
+        for k, v in filter_obj.items():
+            q = q.where(_field_expr(dcol, k) == sa.cast(v, pg.JSONB))
 
-    if len(hits) == 0:
-        raise HTTPNotFound()
+    rows = DBSession.execute(q)
 
-    buf = StringIO()
-    writer = csv.writer(buf, dialect='excel')
+    if format == QueryFormat.ARRAY:
+        return [list(row) for row in rows]
+    elif format == QueryFormat.OBJECT:
+        return [data for _, data in rows]
+    elif format == QueryFormat.CSV:
+        buf = StringIO()
+        writer = csv.writer(buf, dialect="excel")
+        writer.writerow(["@timestamp"] + fields)
 
-    headrow = (
-        '@timestamp',
-        'request.method',
-        'request.path',
-        'request.query_string',
-        'request.remote_addr',
-        'response.status_code',
-        'response.route_name',
-        'user.id',
-        'user.keyname',
-        'user.display_name',
-        'context.id',
-        'context.model',
-    )
-    writer.writerow(headrow)
+        first = None
+        last = None
+        for row in rows:
+            tstamp = last = row[0]
+            if first is None:
+                first = tstamp
+            writer.writerow(row)
 
-    for hit in hits:
-        datarow = map(lambda key: hit.get(key), headrow)
-        writer.writerow(datarow)
+        fnparts = ["journal"]
+        if first:
+            fnparts.append(first.strftime(r"%Y%m%d_%H%M%S"))
+        if last:
+            fnparts.append(last.strftime(r"%Y%m%d_%H%M%S"))
+        fn = "-".join(fnparts) + ".csv"
 
-    content_disposition = 'attachment; filename=audit.csv'
-
-    return Response(
-        buf.getvalue(),
-        content_type='text/csv',
-        content_disposition=content_disposition
-    )
+        return Response(
+            buf.getvalue(),
+            content_type="text/csv",
+            content_disposition=f"attachment; filename={fn}",
+        )
 
 
 def setup_pyramid(comp, config):
-    if comp.audit_es_enabled:
-        config.add_route(
-            'audit.export', '/api/component/audit/export') \
-            .add_view(export, request_method='GET')
+    config.add_route(
+        "audit.dbase",
+        "/api/component/audit/dbase",
+        get=dbase,
+    )

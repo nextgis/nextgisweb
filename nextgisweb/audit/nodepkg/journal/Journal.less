@@ -1,0 +1,133 @@
+.ngw-audit-journal {
+    box-sizing: border-box;
+    height: 100%;
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+
+    > .head {
+        flex-grow: 0;
+        display: flex;
+        gap: 8px;
+
+        .ant-picker-input > input {
+            max-width: 18ch;
+        }
+    }
+
+    > .wrapper {
+        position: relative;
+        flex-grow: 1;
+        border: 1px solid var(--color-border);
+        border-radius: var(--border-radius);
+        background-color: var(--color-container);
+
+        > .scroll {
+            position: absolute;
+            inset: 0;
+            overflow-y: scroll;
+
+            > table {
+                width: 100%;
+                border-collapse: collapse;
+
+                thead {
+                    position: sticky;
+                    top: 0;
+
+                    &::before,
+                    &::after {
+                        position: absolute;
+                        inset: 0;
+                        content: "";
+                        z-index: -5;
+                        border-top-left-radius: var(--border-radius);
+                        border-top-right-radius: var(--border-radius);
+                        background-color: var(--color-container);
+                    }
+
+                    &::before {
+                        background-color: var(--color-container);
+                    }
+
+                    &::after {
+                        background-color: var(--color-alter);
+                        border-bottom: 1px solid var(--color-border);
+                    }
+                }
+
+                tr {
+                    &.summary,
+                    &.detail.last {
+                        border-bottom: 1px solid var(--color-border);
+                    }
+
+                    &.summary {
+                        cursor: pointer;
+
+                        &:hover {
+                            background-color: var(--color-alter);
+                        }
+                    }
+
+                    &.detail td {
+                        line-height: 1.25;
+                    }
+                }
+
+                td,
+                th {
+                    padding: 2px 8px;
+                    vertical-align: top;
+                    border-left: 1px solid var(--color-border);
+
+                    &:first-child {
+                        border-left: none;
+                    }
+                }
+
+                th {
+                    font-weight: var(--font-weight-strong);
+                    text-align: left;
+                    white-space: nowrap;
+                }
+
+                .c-timestamp {
+                    white-space: nowrap;
+                    width: 0;
+                }
+
+                .c-request {
+                    white-space: nowrap;
+                    width: 100%;
+
+                    span.status {
+                        margin-right: 1ch;
+
+                        &.status-2xx {
+                            color: var(--success);
+                        }
+
+                        &.status-4xx,
+                        &.status-5xx {
+                            color: var(--error);
+                        }
+                    }
+
+                    span.method {
+                        margin-right: 1ch;
+                    }
+                }
+
+                .c-detail-key {
+                    color: var(--text-secondary);
+                    text-align: right;
+                }
+
+                .c-detail-val {
+                    text-align: left;
+                }
+            }
+        }
+    }
+}

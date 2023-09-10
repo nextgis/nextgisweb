@@ -1,61 +1,61 @@
-#: view.py:34
-msgid "'date_first' and 'date_last' are mutually exclusive."
-msgstr "'date_first' и 'date_last' взаимоисключающие"
+#: backend/base.py:41
+msgid "Audit backend not configured"
+msgstr "Серверная часть аудита не настроена"
 
-#: view.py:54 view.py:112
-msgid "Journal"
-msgstr "Журнал"
+#: nodepkg/journal/Journal.js:45
+msgid "Request"
+msgstr "Запрос"
 
-#: view.py:85
-#, python-format
-msgid "Journal record: %s"
-msgstr "Запись журнала: %s"
+#: nodepkg/journal/Journal.js:62
+msgid "IP address"
+msgstr "IP адрес"
 
-#: view.py:111
-msgid "Audit"
-msgstr "Аудит"
+#: nodepkg/journal/Journal.js:66
+msgid "User"
+msgstr "Пользователь"
 
-#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:17
-msgid "Search"
-msgstr "Поиск"
-
-#: amd/ngw-audit/JournalFilter/JournalFilter.hbs:23
-msgid "Export"
-msgstr "Экспорт"
-
-#: template/browse.mako:41
-msgid "All users"
-msgstr "Все пользователи"
-
-#: template/browse.mako:42
-msgid "Non-empty users"
-msgstr "Непустые пользователи"
-
-#: template/browse.mako:84
-msgid "Timestamp"
-msgstr "Время"
-
-#: template/browse.mako:85
-msgid "Status"
-msgstr "Статус"
-
-#: template/browse.mako:86
-msgid "Method"
-msgstr "Метод"
-
-#: template/browse.mako:87
-msgid "Path"
-msgstr "Путь"
-
-#: template/browse.mako:88
+#: nodepkg/journal/Journal.js:70
 msgid "Route name"
 msgstr "Имя маршрута"
 
-#: template/browse.mako:89
+#: nodepkg/journal/Journal.js:74
 msgid "Context"
 msgstr "Контекст"
 
-#: template/browse.mako:90
-msgid "User"
-msgstr "Пользователь"
+#: nodepkg/journal/Journal.js:156
+msgid "Last {} minute"
+msgid_plural "Last {} minutes"
+msgstr[0] "За {} минуту"
+msgstr[1] "За {} минуты"
+msgstr[2] "За {} минут"
+
+#: nodepkg/journal/Journal.js:158
+msgid "Last {} hour"
+msgid_plural "Last {} hours"
+msgstr[0] "За {} час"
+msgstr[1] "За {} часа"
+msgstr[2] "За {} часов"
+
+#: nodepkg/journal/Journal.js:160
+msgid "Last {} day"
+msgid_plural "Last {} days"
+msgstr[0] "За {} день"
+msgstr[1] "За {} дня"
+msgstr[2] "За {} дней"
+
+#: nodepkg/journal/Journal.js:281
+msgid "Filter by user"
+msgstr "Фильтр по пользователю"
+
+#: nodepkg/journal/Journal.js:285
+msgid "Export CSV"
+msgstr "Экспорт в CSV"
+
+#: nodepkg/journal/Journal.js:294
+msgid "Timestamp"
+msgstr "Время"
+
+#: view.py:15 view.py:41
+msgid "Journal"
+msgstr "Журнал"
 
