@@ -1,0 +1,36 @@
+.ngw-pyramid-analytics-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    > .placeholder {
+        padding: 1em;
+    }
+
+    > .ant-tabs {
+        > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
+            height: 20em;
+            padding: 1em;
+
+            > div.grid {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                gap: 1em;
+
+                & > label {
+                    align-self: center;
+                    &::after {
+                        content: ":";
+                    }
+                }
+
+                & > .ant-checkbox-wrapper {
+                    grid-column: 1 / span 2;
+                    & + .ant-checkbox-wrapper {
+                        margin-left: 0;
+                    }
+                }
+            }
+        }
+    }
+}

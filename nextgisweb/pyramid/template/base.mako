@@ -63,6 +63,7 @@
         ]);
     </script>
 
+    <%include file="nextgisweb:pyramid/template/metrics.mako"/>
     <%
         try:
             include_head = request.env.core.settings_get('pyramid', 'include_head')

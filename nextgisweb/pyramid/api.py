@@ -1,9 +1,9 @@
 import base64
 import re
 from datetime import timedelta
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict, Union
 
-from msgspec import Meta
+from msgspec import UNSET, Meta, Struct, UnsetType, convert, to_builtins
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse, Response
 from typing_extensions import Annotated
@@ -210,6 +210,41 @@ def home_path_put(request, body: HomePathSettings) -> JSONType:
         env.core.settings_set('pyramid', 'home_path', value)
     else:
         env.core.settings_delete('pyramid', 'home_path')
+
+
+class GoogleAnalytics(Struct):
+    id: str
+
+
+class YandexMetrica(Struct):
+    id: str
+    webvisor: bool
+
+
+class MetricsSettings(Struct):
+    google_analytics: Union[GoogleAnalytics, UnsetType] = UNSET
+    yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
+
+
+def metrics_get(request) -> MetricsSettings:
+    request.require_administrator()
+
+    try:
+        value = env.core.settings_get('pyramid', 'metrics')
+    except KeyError:
+        value = {}
+
+    return convert(value, MetricsSettings)
+
+
+def metrics_put(request, *, body: MetricsSettings) -> JSONType:
+    request.require_administrator()
+
+    value = to_builtins(body)
+    if len(value) == 0:
+        env.core.settings_delete('pyramid', 'metrics')
+    else:
+        env.core.settings_set('pyramid', 'metrics', value)
 
 
 def settings(request, *, component: str) -> JSONType:
@@ -536,3 +571,9 @@ def setup_pyramid(comp, config):
         '/api/component/pyramid/home_path',
         get=home_path_get,
         put=home_path_put)
+
+    config.add_route(
+        'pyramid.metrics',
+        '/api/component/pyramid/metrics',
+        get=metrics_get,
+        put=metrics_put)
