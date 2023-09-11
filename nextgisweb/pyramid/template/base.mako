@@ -103,7 +103,7 @@
 
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
-                    <div class="ngw-pyramid-layout-main">
+                    <div id="main" class="ngw-pyramid-layout-main">
                         %if len(bcpath) > 0:
                             <div class="ngw-pyramid-layout-bcrumb">
                                 %for idx, bc in enumerate(bcpath):
@@ -121,7 +121,7 @@
                             </div>
                         %endif
 
-                        <h1 class="ngw-pyramid-layout-title">
+                        <h1 id="title" class="ngw-pyramid-layout-title">
                             ${tr(effective_title)}
                             %if hasattr(next, 'title_ext'):
                                 <div class="ext">${next.title_ext()}</div>
