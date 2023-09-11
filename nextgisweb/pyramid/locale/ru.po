@@ -11,31 +11,23 @@ msgstr "Скопировано"
 msgid "Unable to copy"
 msgstr "Не удалось скопировать"
 
-#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:28
-msgid "Backward"
-msgstr "Назад"
-
-#: amd/ngw-pyramid/NGWPagination/NGWPagination.js:29
-msgid "Forward"
-msgstr "Вперёд"
-
-#: amd/ngw-pyramid/form/ScaleTextBox.js:18
+#: amd/ngw-pyramid/form/ScaleTextBox.js:13
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
 
-#: api.py:218
+#: api.py:253
 msgid "Invalid component identity."
 msgstr "Некорректный идентификатор компонента."
 
-#: api.py:523
+#: api.py:558
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:160
+#: component.py:166
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:160
+#: component.py:166
 msgid "Disabled"
 msgstr "Отключено"
 
@@ -233,7 +225,7 @@ msgstr "Войти"
 msgid "Invitation session"
 msgstr "Пригласительная сессия"
 
-#: nodepkg/layout/Avatar.js:24 view.py:483
+#: nodepkg/layout/Avatar.js:24 view.py:495
 msgid "Settings"
 msgstr "Настройки"
 
@@ -257,23 +249,67 @@ msgstr "Справка"
 msgid "We recommend height of 45 px and width of up to 200 px."
 msgstr "Рекомендуемая высота 45 px и ширина до 200 px."
 
-#: nodepkg/storage-summary/StorageSummary.js:95
+#: nodepkg/metrics/GoogleAnalyticsTab.tsx:29
+msgid "Measurement ID"
+msgstr "Идентификатор потока данных"
+
+#: nodepkg/metrics/MetricSettings.tsx:14
+msgid "Add"
+msgstr "Добавить"
+
+#: nodepkg/metrics/MetricSettings.tsx:15
+msgid "The setting is saved."
+msgstr "Настройка сохранена."
+
+#: nodepkg/metrics/MetricSettings.tsx:16
+msgid "Reload the page to get them applied."
+msgstr "Обновите страницу, чтобы настройки вступили в силу."
+
+#: nodepkg/metrics/MetricSettings.tsx:20
+msgid "Add one or more counters to your Web GIS."
+msgstr "Добавьте один или несколько счетчиков в вашу Веб ГИС."
+
+#: nodepkg/metrics/MetricSettings.tsx:21
+msgid ""
+"HTML code of these counters will be embeded into each page and will allow you"
+" to track user activity."
+msgstr ""
+"HTML-код этих счетчиков будет встроен в каждую страницу и позволит "
+"отслеживать активность пользователей."
+
+#: nodepkg/metrics/YandexMetricaTab.tsx:31
+msgid "Tag number"
+msgstr "Номер счетчика"
+
+#: nodepkg/metrics/YandexMetricaTab.tsx:49
+msgid "Webvisor"
+msgstr "Вебвизор"
+
+#: nodepkg/metrics/tab.ts:26
+msgid "Google Analytics"
+msgstr "Google Аналитика"
+
+#: nodepkg/metrics/tab.ts:33
+msgid "Yandex.Metrica"
+msgstr "Яндекс.Метрика"
+
+#: nodepkg/storage-summary/StorageSummary.js:97
 msgid "Kind of data"
 msgstr "Вид данных"
 
-#: nodepkg/storage-summary/StorageSummary.js:101
+#: nodepkg/storage-summary/StorageSummary.js:103
 msgid "Volume"
 msgstr "Размер"
 
-#: nodepkg/storage-summary/StorageSummary.js:117
+#: nodepkg/storage-summary/StorageSummary.js:119
 msgid "Total"
 msgstr "Итого"
 
-#: nodepkg/storage-summary/StorageSummary.js:122
+#: nodepkg/storage-summary/StorageSummary.js:124
 msgid "of"
 msgstr "из"
 
-#: nodepkg/storage-summary/StorageSummary.js:140
+#: nodepkg/storage-summary/StorageSummary.js:141
 msgid "Storage usage was fully estimated at %s and updated at %s."
 msgstr "Использование хранилища было полностью оценено в %s и обновлено в %s."
 
@@ -281,7 +317,7 @@ msgstr "Использование хранилища было полность�
 msgid "Storage usage was fully estimated at %s."
 msgstr "Использование хранилища было полностью оценено в %s."
 
-#: nodepkg/storage-summary/StorageSummary.js:151
+#: nodepkg/storage-summary/StorageSummary.js:152
 msgid "Storage usage hasn't been estimated yet but was updated at %s."
 msgstr "Использование хранилища еще не было полностью оценено, но было обновлено в %s."
 
@@ -315,11 +351,19 @@ msgstr "Доступны обновления"
 msgid "Click to see what's new"
 msgstr "Нажмите и узнайте, что нового"
 
-#: nodepkg/update/sysinfo.js:35
+#: nodepkg/update/sysinfo.js:13
 msgid "Checking for updates..."
 msgstr "Проверяем наличие обновлений..."
 
-#: nodepkg/update/sysinfo.js:38
+#: nodepkg/update/sysinfo.js:14
+msgid "<a>Contact support</a> for update."
+msgstr "<a>Обратитесь в поддержку</a> для установки обновлений."
+
+#: nodepkg/update/sysinfo.js:15
+msgid "Show details"
+msgstr "Подробнее"
+
+#: nodepkg/update/sysinfo.js:19
 msgid ""
 "Critical updates are available: {version}. Please consider updating an soon "
 "as possible."
@@ -327,59 +371,51 @@ msgstr ""
 "Доступны критические обновления: {version}. Рекомендуем установить их как "
 "можно быстрее."
 
-#: nodepkg/update/sysinfo.js:39
+#: nodepkg/update/sysinfo.js:20
 msgid "New version of {distribution} is available: {version}."
 msgstr "Доступна новая версия {distribution}: {version}."
 
-#: nodepkg/update/sysinfo.js:40
+#: nodepkg/update/sysinfo.js:21
 msgid "Your {distribution} is up-to-date."
 msgstr "У вас последняя версия {distribution}."
 
-#: nodepkg/update/sysinfo.js:47
-msgid "<a>Contact support</a> for update."
-msgstr "<a>Обратитесь в поддержку</a> для установки обновлений."
-
-#: nodepkg/update/sysinfo.js:81
-msgid "Show details"
-msgstr "Подробнее"
-
-#: template/backup.mako:8
+#: template/backup.mako:5
 msgid "Filename"
 msgstr "Имя файла"
 
-#: template/backup.mako:9
+#: template/backup.mako:6
 msgid "Timestamp (UTC)"
 msgstr "Время (UTC)"
 
-#: template/backup.mako:10
+#: template/backup.mako:7
 msgid "Size"
 msgstr "Размер"
 
-#: template/sysinfo.mako:35
+#: template/sysinfo.mako:34
 msgid "Package"
 msgstr "Пакет"
 
-#: template/sysinfo.mako:36
+#: template/sysinfo.mako:35
 msgid "Version"
 msgstr "Версия"
 
-#: template/sysinfo.mako:71
+#: template/sysinfo.mako:65
 msgid "Platform"
 msgstr "Платформа"
 
-#: template/sysinfo.mako:86
+#: template/sysinfo.mako:80
 msgid "Browser support"
 msgstr "Поддержка браузеров"
 
-#: template/sysinfo.mako:97
+#: template/sysinfo.mako:91
 msgid "or higher"
 msgstr "или выше"
 
-#: template/sysinfo.mako:99
+#: template/sysinfo.mako:93
 msgid "Not supported"
 msgstr "Не поддерживается"
 
-#: template/sysinfo.mako:111
+#: template/sysinfo.mako:105
 msgid "Your browser"
 msgstr "Ваш браузер"
 
@@ -456,38 +492,43 @@ msgstr ""
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:125 view.py:480
+#: view.py:125 view.py:492
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:134 view.py:497
+#: view.py:134 view.py:511
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:145 view.py:502
+#: view.py:145 view.py:516
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:162 view.py:486
+#: view.py:162 view.py:498
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:171 view.py:488
+#: view.py:171 view.py:500
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:180 view.py:490
+#: view.py:180 view.py:502
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:189 view.py:484
+#: view.py:189 view.py:496
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:198 view.py:492
+#: view.py:198 view.py:504
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:479
+#: view.py:206 view.py:506
+msgid "Metrics and analytics"
+msgstr "Метрики и аналитика"
+
+#: view.py:491
 msgid "Info"
 msgstr "Информация"
+
