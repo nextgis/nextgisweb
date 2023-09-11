@@ -91,10 +91,11 @@ const dynamicEntries = () => {
                         "-wrapper.js"
                     );
 
+                    const incFiles = plugins[registry] || [];
                     const code = [
                         withChunks(entry),
                         `import { registry } from "${fullname}";`,
-                        ...plugins[registry].map((fn) => `import "${fn}";`),
+                        ...incFiles.map((fn) => `import "${fn}";`),
                         `export * from "${fullname}";`,
                         `if (!registry) throw new Error("Registry '${registry}' is not defined");`,
                         "registry.seal();",
