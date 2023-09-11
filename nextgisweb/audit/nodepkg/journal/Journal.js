@@ -13,6 +13,7 @@ import dayjs, { utc } from "@nextgisweb/gui/dayjs";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext, ngettext } from "@nextgisweb/pyramid/i18n";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
+import { PageTitle } from "@nextgisweb/pyramid/layout";
 
 import "./Journal.less";
 
@@ -252,69 +253,80 @@ export function Journal() {
     });
 
     return (
-        <div className="ngw-audit-journal" style={themeVariables}>
-            <div className="head">
-                <RangePicker
-                    allowEmpty={[true, true]}
-                    showTime={{ minuteStep: 5, secondStep: 5 }}
-                    onChange={(dates) => {
-                        const [ge, lt] = dates ? dates : [null, null];
-                        setParams({
-                            ...params,
-                            ge: ge ? dayjsToApi(ge) : undefined,
-                            lt: lt ? dayjsToApi(lt) : undefined,
-                        });
-                    }}
-                    presets={[
-                        rangePresetLast(5, "minute"),
-                        rangePresetLast(15, "minute"),
-                        rangePresetLast(1, "hour"),
-                        rangePresetLast(6, "hour"),
-                        rangePresetLast(12, "hour"),
-                        rangePresetLast(24, "hour"),
-                        rangePresetLast(2, "day"),
-                        rangePresetLast(7, "day"),
-                    ]}
-                />
-                <PrincipalSelect
-                    model="user"
-                    systemUsers={["guest"]}
-                    onChange={(value) => {
-                        setParams({
-                            ...params,
-                            ...(value === null
-                                ? { user: undefined }
-                                : { user: value }),
-                        });
-                    }}
-                    placeholder={gettext("Filter by user")}
-                    style={{ minWidth: "25ch" }}
-                />
-                <Button onClick={exportCsv} style={{ marginLeft: "auto" }}>
-                    {gettext("Export CSV")}
-                </Button>
-            </div>
-            <div className="wrapper">
-                <div className="scroll" ref={refParent} onScroll={onScroll}>
-                    <table ref={refTable}>
-                        <thead>
-                            <tr>
-                                <th className="c-timestamp">
-                                    {gettext("Timestamp")}
-                                </th>
-                                {COLUMNS.map((col, idx) => (
-                                    <th key={idx} className={col.className}>
-                                        {col.title}
+        <>
+            <PageTitle>
+                <div className="ngw-audit-journal-page-title">
+                    <RangePicker
+                        allowEmpty={[true, true]}
+                        showTime={{ minuteStep: 5, secondStep: 5 }}
+                        onChange={(dates) => {
+                            const [ge, lt] = dates ? dates : [null, null];
+                            setParams({
+                                ...params,
+                                ge: ge ? dayjsToApi(ge) : undefined,
+                                lt: lt ? dayjsToApi(lt) : undefined,
+                            });
+                        }}
+                        presets={[
+                            rangePresetLast(5, "minute"),
+                            rangePresetLast(15, "minute"),
+                            rangePresetLast(1, "hour"),
+                            rangePresetLast(6, "hour"),
+                            rangePresetLast(12, "hour"),
+                            rangePresetLast(24, "hour"),
+                            rangePresetLast(2, "day"),
+                            rangePresetLast(7, "day"),
+                        ]}
+                    />
+                    <PrincipalSelect
+                        model="user"
+                        systemUsers={["guest"]}
+                        onChange={(value) => {
+                            setParams({
+                                ...params,
+                                ...(value === null
+                                    ? { user: undefined }
+                                    : { user: value }),
+                            });
+                        }}
+                        placeholder={gettext("Filter by user")}
+                        style={{ minWidth: "25ch" }}
+                    />
+                    <Button
+                        onClick={exportCsv}
+                        type="primary"
+                        style={{ marginLeft: "auto" }}
+                        ghost
+                    >
+                        {gettext("Export CSV")}
+                    </Button>
+                </div>
+            </PageTitle>
+            <div className="ngw-audit-journal" style={themeVariables}>
+                <div className="wrapper">
+                    <div className="scroll" ref={refParent} onScroll={onScroll}>
+                        <table ref={refTable}>
+                            <thead>
+                                <tr>
+                                    <th className="c-timestamp">
+                                        {gettext("Timestamp")}
                                     </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        {blocks.map((rows, idx) => (
-                            <Block key={idx} rows={rows} />
-                        ))}
-                    </table>
+                                    {COLUMNS.map((col, idx) => (
+                                        <th key={idx} className={col.className}>
+                                            {col.title}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            {blocks.map((rows, idx) => (
+                                <Block key={idx} rows={rows} />
+                            ))}
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
+
+Journal.targetElementId = "main";
