@@ -267,6 +267,12 @@ const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
     },
 });
 
+/* Does the path belongs to NGW component with JS package? */ /* prettier-ignore */
+const ngwCompRegExp = new RegExp("/(?:nextgisweb(?:_\\w+)?/)(\\w+)/nodepkg(?:$|/)");
+
+/* Does the module name belongs to an external or legacy AMD? */ /* prettier-ignore */
+const extOrLegacyRegExp = new RegExp(`^(((${config.externals.join("|")})(/|$))|ngw-)`);
+
 /** @type {import("webpack").Configuration} */
 const webpackConfig = defaults("main", (env) => ({
     entry: () => ({ ...staticEntries, ...dynamicEntries() }),
@@ -373,6 +379,10 @@ const webpackConfig = defaults("main", (env) => ({
                 return callback(null, `amd ${request}`);
             }
 
+            if (extOrLegacyRegExp.test(request)) {
+                return callback(null, `amd ${request}`);
+            }
+
             const swith = (w) => request.startsWith(w);
             const rtype = swith(".") ? "rel" : swith("/") ? "abs" : null;
 
@@ -380,7 +390,7 @@ const webpackConfig = defaults("main", (env) => ({
             if (swith("@nextgisweb/")) {
                 rpkg = request;
             } else if (
-                /(?:\/nextgisweb_|\/)\w+\/nodepkg(?:$|\/)/.test(context) &&
+                ngwCompRegExp.test(context) &&
                 !/^[a-z][0-9a-z-_]*:/i.test(context) &&
                 rtype
             ) {
@@ -415,18 +425,6 @@ const webpackConfig = defaults("main", (env) => ({
                     const mod = rmod + (rarg !== undefined ? "!" + rarg : "");
                     return callback(null, `amd ${mod}`);
                 }
-            }
-
-            // External packages
-            for (const external of config.externals) {
-                if (request.startsWith(external + "/")) {
-                    return callback(null, `amd ${request}`);
-                }
-            }
-
-            // Legacy component AMD modules
-            if (request.startsWith("ngw-")) {
-                return callback(null, `amd ${request}`);
             }
 
             callback();
