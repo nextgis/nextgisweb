@@ -1,6 +1,7 @@
 /** @registry pyramid/metrics/tab */
-import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PluginRegistry } from "@nextgisweb/jsrealm/plugin";
+
+import { gettext } from "../i18n";
 
 import type { FC } from "react";
 

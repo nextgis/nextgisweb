@@ -1,5 +1,5 @@
 /** @plugin jsrealm/plugin/testentry */
-import { registry } from "@nextgisweb/jsrealm/plugin/testentry/registry";
+import { registry } from "../registry";
 
 registry.register({
     component: "jsrealm",

@@ -1,5 +1,5 @@
 /** @plugin jsrealm/testentry/driver */
-import { registry } from "@nextgisweb/jsrealm/testentry/driver";
+import { registry } from "../driver";
 
 registry.register({
     component: "jsrealm",

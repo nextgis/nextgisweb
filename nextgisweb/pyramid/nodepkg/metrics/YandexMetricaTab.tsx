@@ -1,7 +1,8 @@
 import { useState } from "react";
 
 import { Checkbox, Input } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import { gettext } from "../i18n";
 
 import type { TabProps } from "./tab";
 

@@ -1,5 +1,5 @@
 /** @testentry call */
-import { registry } from "@nextgisweb/jsrealm/plugin/testentry/registry";
+import { registry } from "./registry";
 
 export default async function () {
     (await registry.load({ operation: "create" }))("MU");

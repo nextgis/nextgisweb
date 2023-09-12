@@ -1,13 +1,13 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button, Dropdown, Tabs, message } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import { route } from "@nextgisweb/pyramid/api";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { route } from "../api";
+import { gettext } from "../i18n";
 import { PageTitle } from "../layout";
-import { registry } from "@nextgisweb/pyramid/metrics/tab";
+import { registry } from "./tab";
 
 import "./MetricSettings.less";
 
