@@ -590,6 +590,8 @@ def _setup_pyramid_debugtoolbar(comp, config):
     if hosts := dt_opt.get('hosts', '0.0.0.0/0' if comp.env.core.debug else None):
         settings['debugtoolbar.hosts'] = hosts
     settings['debugtoolbar.exclude_prefixes'] = ['/static/', '/favicon.ico']
+    settings['debugtoolbar.show_on_exc_only'] = True
+    settings['debugtoolbar.max_visible_requests'] = 25
     config.include(pyramid_debugtoolbar)
 
     config.add_static_path(
