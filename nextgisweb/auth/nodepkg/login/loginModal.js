@@ -1,6 +1,7 @@
 import { Modal } from "@nextgisweb/gui/antd";
 import showModal from "@nextgisweb/gui/showModal";
-import LoginForm from "./login-form";
+
+import { LoginForm } from "./LoginForm";
 
 const LoginModal = (props) => {
     return (
@@ -10,7 +11,7 @@ const LoginModal = (props) => {
     );
 };
 
-export default function loginModal() {
+export function loginModal() {
     const onCancel = () => {
         modal.destroy();
     };

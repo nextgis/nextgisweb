@@ -15,14 +15,9 @@
 </div>
 
 <script type="text/javascript">
-    require([
-        '@nextgisweb/auth/login-box',
-        "@nextgisweb/gui/react-app",
-        "@nextgisweb/auth/store"
-    ], function (loginFormModule, reactApp, store) {
-        store.authStore.setShowLoginModal(false);
-        reactApp.default(
-            loginFormModule.default, ${json_js(props)},
+    require(["@nextgisweb/auth/store"], function ({ authStore }) {
+        authStore.runApp(
+            ${json_js(props)},
             document.getElementById('content')
         );
     });

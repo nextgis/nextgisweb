@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
 
-import loginModal from "@nextgisweb/auth/loginModal";
 import { authStore } from "@nextgisweb/auth/store";
 import { Popover } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
@@ -33,7 +32,7 @@ export const Avatar = observer(() => {
             const qs = new URLSearchParams([["next", window.location]]);
             window.open(routeURL("auth.oauth") + "?" + qs.toString(), "_self");
         } else {
-            loginModal();
+            authStore.showModal();
         }
     };
 

@@ -1,4 +1,2 @@
 /** @entrypoint */
-import { authStore } from "./authStore";
-
-export { authStore };
+export { authStore } from "./authStore";

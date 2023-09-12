@@ -1,6 +1,8 @@
-import { extractError } from "@nextgisweb/gui/error";
-import { route } from "@nextgisweb/pyramid/api";
 import { makeAutoObservable } from "mobx";
+
+import { extractError } from "@nextgisweb/gui/error";
+import entrypoint from "@nextgisweb/jsrealm/entrypoint";
+import { route } from "@nextgisweb/pyramid/api";
 
 class AuthStore {
     loginError = "";
@@ -41,8 +43,18 @@ class AuthStore {
         window.open(window.ngwConfig.logoutUrl, "_self");
     }
 
-    setShowLoginModal(val) {
-        this.showLoginModal = val;
+    async showModal() {
+        const { loginModal } = await import("../login");
+        loginModal();
+    }
+
+    async runApp(props, el) {
+        this.showLoginModal = false; // Do not show new modal on "Sign in" click
+        const [{ default: reactApp }, { LoginBox }] = await Promise.all([
+            entrypoint("@nextgisweb/gui/react-app"),
+            import("../login"),
+        ]);
+        reactApp(LoginBox, props, el);
     }
 
     _logout() {
