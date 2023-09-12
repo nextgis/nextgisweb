@@ -106,13 +106,15 @@ class LayerFieldsMixin:
             post_update=True
         )
 
-    def to_ogr(self, ogr_ds, name=r'', fid=None):
+    def to_ogr(self, ogr_ds, *, name='', fields=None, use_display_name=False, fid=None):
+        if fields is None:
+            fields = self.fields
         sr = self.srs.to_osr()
         ogr_layer = ogr_ds.CreateLayer(name, srs=sr)
-        for field in self.fields:
+        for field in fields:
             ogr_layer.CreateField(
                 ogr.FieldDefn(
-                    field.keyname,
+                    field.keyname if not use_display_name else field.display_name,
                     _FIELD_TYPE_2_ENUM_REVERSED[field.datatype],
                 )
             )

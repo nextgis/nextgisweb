@@ -1,4 +1,3 @@
-import itertools
 import json
 import os
 import re
@@ -56,13 +55,26 @@ def _ogr_ds(driver, options):
     )
 
 
-def _ogr_layer_from_features(layer, features, name='', ds=None, fid=None):
-    ogr_layer = layer.to_ogr(ds, name=name, fid=fid)
+def _ogr_layer_from_features(
+    layer, features, *, ds, name='', fields=None, use_display_name=False, fid=None
+):
+    layer_fields = layer.fields if fields is None \
+        else sorted(
+            (field for field in layer.fields if field.keyname in fields),
+            key=lambda field: fields.index(field.keyname))
+    ogr_layer = layer.to_ogr(
+        ds, name=name, fields=layer_fields, use_display_name=use_display_name, fid=fid)
     layer_defn = ogr_layer.GetLayerDefn()
+
+    f_kw = dict()
+    if fid is not None:
+        f_kw["fid"] = fid
+    if use_display_name:
+        f_kw["aliases"] = {field.keyname: field.display_name for field in layer_fields}
 
     for f in features:
         ogr_layer.CreateFeature(
-            f.to_ogr(layer_defn, fid=fid))
+            f.to_ogr(layer_defn, **f_kw))
 
     return ogr_layer
 
@@ -170,48 +182,36 @@ def export(resource, options, filepath):
     if options.ilike is not None and IFeatureQueryIlike.providedBy(query):
         query.ilike(options.ilike)
 
+    if options.fields is not None:
+        query.fields(*options.fields)
+
     ogr_ds = _ogr_memory_ds()
-    ogr_layer = _ogr_layer_from_features(  # NOQA: 841
-        resource, query(), ds=ogr_ds, fid=options.fid_field)
+    _ogr_layer = _ogr_layer_from_features(  # NOQA: 841
+        resource, query(), ds=ogr_ds,
+        fields=options.fields, use_display_name=options.use_display_name, fid=options.fid_field)
 
     driver = options.driver
     srs = options.srs if options.srs is not None else resource.srs
-    vtopts = (
-        [
-            '-f', driver.name,
-            '-t_srs', srs.wkt,
-        ]
-        + list(itertools.chain(*[('-lco', o) for o in options.lco]))
-        + list(itertools.chain(*[('-dsco', o) for o in options.dsco]))
+
+    vtopts = dict(
+        options=[],
+        format=driver.name,
+        dstSRS=srs.wkt,
+        layerName=resource.display_name,
+        geometryType=resource.geometry_type,
     )
-
-    # CPLES_SQLI == 7
-    flds = [
-        '"{}" as "{}"'.format(
-            fld.keyname.replace('"', r'\"'),
-            (fld.display_name if options.use_display_name else fld.keyname).replace(
-                '"', r'\"'
-            ),
-        )
-        for fld in resource.fields
-        if options.fields is None or fld.keyname in options.fields
-    ]
-    if options.fid_field is not None:
-        flds += ['FID as "{}"'.format(options.fid_field.replace('"', r'\"'))]
-    vtopts += ['-sql', 'select {} from ""'.format(', '.join(
-        flds if len(flds) > 0 else '*'))]
-
     if driver.fid_support and options.fid_field is None:
-        vtopts.append('-preserve_fid')
+        vtopts["options"].append('-preserve_fid')
+    if len(options.lco) > 0:
+        vtopts["layerCreationOptions"] = options.lco
+    if len(options.dsco) > 0:
+        vtopts["datasetCreationOptions"] = options.dsco
 
-    gdal.VectorTranslate(
+    if gdal.VectorTranslate(
         filepath, ogr_ds,
-        options=gdal.VectorTranslateOptions(
-            options=vtopts,
-            layerName=resource.display_name,
-            geometryType=resource.geometry_type,
-        )
-    )
+        options=gdal.VectorTranslateOptions(**vtopts)
+    ) is None:
+        raise RuntimeError(gdal.GetLastErrorMsg())
 
 
 def _zip_response(request, directory, filename):

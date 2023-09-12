@@ -79,13 +79,14 @@ class Feature:
             geometry=self.geom.shape,
         )
 
-    def to_ogr(self, layer_defn, fid=None):
+    def to_ogr(self, layer_defn, *, aliases=None, fid=None):
         ogr_feature = ogr.Feature(layer_defn)
         ogr_feature.SetFID(self.id)
         ogr_feature.SetGeometry(self.geom.ogr)
 
-        for field in self.fields:
-            ogr_feature[field] = self.fields[field]
+        for k, v in self.fields.items():
+            name = k if aliases is None else aliases[k]
+            ogr_feature[name] = v
 
         if fid is not None:
             ogr_feature[fid] = self.id
