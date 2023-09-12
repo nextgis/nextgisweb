@@ -8,7 +8,7 @@ import transaction
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
-from nextgisweb.feature_layer.ogrdriver import EXPORT_FORMAT_OGR
+from nextgisweb.feature_layer.ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 from nextgisweb.vector_layer import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -221,7 +221,7 @@ def test_fields_unique(ngw_webtest_app, ngw_resource_group):
 @pytest.mark.parametrize(
     "fmt, zipped, srs",
     product(
-        EXPORT_FORMAT_OGR.keys(),
+        [f["name"] for f in OGR_DRIVER_NAME_2_EXPORT_FORMATS],
         ("true", "false"),
         (4326, 3857),
     ),
