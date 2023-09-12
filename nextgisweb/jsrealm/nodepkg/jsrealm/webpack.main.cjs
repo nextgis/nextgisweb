@@ -56,9 +56,8 @@ function scanForEntries() {
     return result;
 }
 
-let isDynamicEntry, isPluginFile;
-
-let testentries;
+let isDynamicEntry;
+let testentries, plRegistries, plFileScope;
 
 const dynamicEntries = () => {
     const entrypoints = scanForEntries();
@@ -69,15 +68,17 @@ const dynamicEntries = () => {
             .map(({ entry, testentry: type }) => [entry, { type }])
     );
 
-    const plugins = {};
-    const pluginFiles = [];
+    plRegistries = [];
+    plFileScope = {};
+
+    const plScopeFiles = {};
 
     entrypoints
         .filter(({ type }) => type === "plugin")
         .forEach(({ plugin, fullname }) => {
-            if (plugins[plugin] === undefined) plugins[plugin] = [];
-            plugins[plugin].push(fullname);
-            pluginFiles.push(fullname);
+            if (plScopeFiles[plugin] === undefined) plScopeFiles[plugin] = [];
+            plFileScope[fullname] = plugin;
+            plScopeFiles[plugin].push(fullname);
         });
 
     const webpackEntries = Object.fromEntries(
@@ -85,13 +86,13 @@ const dynamicEntries = () => {
             .filter(({ type }) => type !== "plugin")
             .map(({ type, entry, fullname, registry }) => {
                 if (type === "registry") {
-                    pluginFiles.push(fullname);
+                    plRegistries.push({ scope: registry, fullname, entry });
                     const wrapper = fullname.replace(
                         /\.[tj]?sx?$/,
                         "-wrapper.js"
                     );
 
-                    const incFiles = plugins[registry] || [];
+                    const incFiles = plScopeFiles[registry] || [];
                     const code = [
                         withChunks(entry),
                         `import { registry } from "${fullname}";`,
@@ -121,8 +122,6 @@ const dynamicEntries = () => {
     );
 
     isDynamicEntry = (m) => webpackEntries[m] !== undefined;
-    isPluginFile = (m) => pluginFiles.includes(m);
-
     return webpackEntries;
 };
 
@@ -374,27 +373,48 @@ const webpackConfig = defaults("main", (env) => ({
                 return callback(null, `amd ${request}`);
             }
 
-            // Use AMD loader for all entrypoints except plugins.
-            const requestModule = request.replace(/!.*$/, "");
-            if (isDynamicEntry(requestModule)) {
-                // For plugin registries and registrating modules AMD loader
-                // mustn't be used. Otherwise we'll have a circular import.
-                if (isPluginFile(contextInfo.issuer)) return callback();
+            const swith = (w) => request.startsWith(w);
+            const rtype = swith(".") ? "rel" : swith("/") ? "abs" : null;
 
-                if (["@nextgisweb/pyramid/i18n"].includes(requestModule)) {
-                    const loader = /(!.*|)$/.exec(request)[1];
-                    if (loader === "" || loader === "!") {
-                        const re = /(?:\/nextgisweb_|\/)(\w+)\/nodepkg(?:$|\/)/;
-                        const compId = re.exec(context)[1];
-                        const newRequest = `${requestModule}!${compId}`;
-                        logger.debug(
-                            `"${request}" replaced with "${newRequest}"`
-                        );
-                        request = newRequest;
-                    }
+            let rpkg = null;
+            if (swith("@nextgisweb/")) {
+                rpkg = request;
+            } else if (
+                /(?:\/nextgisweb_|\/)\w+\/nodepkg(?:$|\/)/.test(context) &&
+                !/^[a-z][0-9a-z-_]*:/i.test(context) &&
+                rtype
+            ) {
+                if (rtype === "rel") {
+                    const contextPkg = config.pathToModule(context);
+                    rpkg = path.join(contextPkg, request);
+                    if (rpkg.startsWith(".")) rpkg = null;
+                } else if (rtype === "abs") {
+                    rpkg = config.pathToModule(request);
                 }
+            }
 
-                return callback(null, `amd ${request}`);
+            if (rpkg) {
+                let [rmod, rarg] = rpkg.split("!", 2);
+                if (isDynamicEntry(rmod)) {
+                    if (rmod === "@nextgisweb/pyramid/i18n" && !rarg) {
+                        rarg = config.pathToComponent(context);
+                    }
+
+                    // If it's a plugin for some registry, we must import an
+                    // unwrapped registry module. Plugins must import registries
+                    // from modules with @registry.
+                    const iscope = plFileScope[contextInfo.issuer];
+                    if (iscope) {
+                        for (const { scope, entry } of plRegistries) {
+                            if (iscope === scope && rmod === entry) {
+                                return callback();
+                            }
+                        }
+                    }
+
+                    const mod = rmod + (rarg !== undefined ? "!" + rarg : "");
+                    return callback(null, `amd ${mod}`);
+                }
             }
 
             // External packages
