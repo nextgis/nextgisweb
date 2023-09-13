@@ -28,18 +28,18 @@
 %if not selected:
     ${dynmenu()}
 %else:
-    <div id="teTarget">
-        <script type="text/javascript">
-            require([
-                "@nextgisweb/jsrealm/testentry/driver",
-                ${selected | json_js},
-                "dojo/domReady!"
-            ], ({ registry }, { default: module }) => {
+    <script type="text/javascript">
+        (function () {
+            const element = document.createElement("div");
+            const current = document.currentScript;
+            current.parentNode.insertBefore(element, current.nextSibling);
+
+            require(["@nextgisweb/jsrealm/testentry/driver"], ({ registry }) => {
                 const teType = ${testentries[selected]['type'] | json_js};
                 registry.load({identity: teType}).then((runner) => {
-                    runner(module, document.getElementById('teTarget'));
+                    runner(${json_js(selected)}, element);
                 });
             })
-        </script>
-    </div>
+        })();
+    </script>
 %endif

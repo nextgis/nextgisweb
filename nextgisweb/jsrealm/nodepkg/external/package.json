@@ -27,6 +27,7 @@
             "dojo",
             "dojox",
             "handlebars",
+            "mocha",
             "put-selector",
             "xstyle"
         ]

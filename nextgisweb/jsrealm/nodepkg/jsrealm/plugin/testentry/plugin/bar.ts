@@ -4,5 +4,5 @@ import { registry } from "../registry";
 registry.register({
     component: "jsrealm",
     operation: "update",
-    import: () => import("."),
+    value: (what: string) => `bar:${what}`,
 });

@@ -6,12 +6,11 @@ registry.register({
     component: "gui",
     identity: "react",
     loader: async () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const reactApp: any = await entrypoint("@nextgisweb/gui/react-app");
-        return (module, el) => {
-            const wrapper = document.createElement("div");
-            el.appendChild(wrapper);
-            reactApp.default(module, {}, wrapper);
+        const { default: reactApp } = await import("@nextgisweb/gui/react-app");
+        return (name: string, el: HTMLElement) => {
+            entrypoint(name).then(({ default: Component }) => {
+                reactApp(Component, {}, el);
+            });
         };
     },
 });

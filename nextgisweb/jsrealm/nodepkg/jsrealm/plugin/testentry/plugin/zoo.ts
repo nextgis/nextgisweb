@@ -3,8 +3,7 @@ import { registry } from "../registry";
 
 registry.register({
     component: "jsrealm",
-    operation: "create",
-    value: (what: string) => {
-        console.log(`Foo creates ${what}`);
-    },
+    operation: "delete",
+    loader: () =>
+        new Promise((resolve) => resolve((what: string) => `zoo:${what}`)),
 });

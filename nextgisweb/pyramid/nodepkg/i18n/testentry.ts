@@ -1,17 +1,15 @@
-/** @testentry call */
-import { INDEX } from "@nextgisweb/jsrealm/i18n/catalog";
+/** @testentry mocha */
+import { assert } from "chai";
+
 import { pgettext, npgettext } from "@nextgisweb/pyramid/i18n";
 
-console.log(INDEX);
+describe("Gettext implementation", () => {
+    it("pgettext returns something", () => {
+        assert.isNotEmpty(pgettext("test", "unit"));
+    });
 
-const mUnits = (num: number) => npgettext("test", "unit", "units", num);
-
-export default function () {
-    console.log(pgettext("test", "unit"));
-
-    const logNumberOfUnits = (num: number) =>
-        console.log(`${num} ${mUnits(num)}`);
-    logNumberOfUnits(1);
-    logNumberOfUnits(2);
-    logNumberOfUnits(5);
-}
+    it("translates plurals", () => {
+        const f = (num: number) => npgettext("test", "unit", "units", num);
+        assert.notStrictEqual(f(1), f(2));
+    });
+});

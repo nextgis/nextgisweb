@@ -78,6 +78,10 @@ addPackage("handlebars", {
     to: "handlebars.js",
 });
 
+addPackage("mocha", {
+    from: "mocha.*",
+});
+
 module.exports = defaults(
     "external",
     {
