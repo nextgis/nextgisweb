@@ -81,26 +81,55 @@ const dynamicEntries = () => {
             plScopeFiles[plugin].push(fullname);
         });
 
+    entrypoints
+        .filter(({ type }) => type === "registry")
+        .forEach(({ entry, fullname, registry }) => {
+            plRegistries.push({
+                scope: registry,
+                fullname,
+                entry,
+                component: config.pathToComponent(fullname),
+            });
+        });
+
     const webpackEntries = Object.fromEntries(
         entrypoints
             .filter(({ type }) => type !== "plugin")
             .map(({ type, entry, fullname, registry }) => {
                 if (type === "registry") {
-                    plRegistries.push({ scope: registry, fullname, entry });
                     const wrapper = fullname.replace(
                         /\.[tj]?sx?$/,
                         "-wrapper.js"
                     );
 
-                    const incFiles = plScopeFiles[registry] || [];
                     const code = [
                         withChunks(entry),
+                        `import entrypoint from "@nextgisweb/jsrealm/entrypoint";`,
                         `import { registry } from "${fullname}";`,
-                        ...incFiles.map((fn) => `import "${fn}";`),
+                        ...(plScopeFiles[registry] || []).map(
+                            (fn) => `import "${fn}";`
+                        ),
+                    ];
+
+                    if (registry === "jsrealm/plugin/meta") {
+                        for (const itm of plRegistries) {
+                            // Do not include meta registry itself
+                            if (itm.scope === "jsrealm/plugin/meta") continue;
+                            code.push(
+                                `registry.register({`,
+                                `    component: "${itm.component}", `,
+                                `    identity: "${itm.scope}",`,
+                                `    import: () => entrypoint("${itm.entry}").then(({ registry }) => ({ default: registry }))`,
+                                `});`
+                            );
+                        }
+                    }
+
+                    code.push(
                         `export * from "${fullname}";`,
                         `if (!registry) throw new Error("Registry '${registry}' is not defined");`,
-                        "registry.seal();",
-                    ];
+                        "registry.seal();"
+                    );
 
                     return [
                         entry,

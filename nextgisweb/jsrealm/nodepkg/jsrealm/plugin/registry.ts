@@ -39,8 +39,8 @@ interface QueryParams<M> {
 export class PluginRegistry<V, M> {
     readonly identity: string;
     protected readonly items: Plugin<V, M>[];
-    protected sealed: boolean = false;
-    protected skipped: number = 0;
+    protected _sealed: boolean = false;
+    protected _skipped: number = 0;
 
     constructor(identity: string) {
         this.identity = identity;
@@ -48,11 +48,11 @@ export class PluginRegistry<V, M> {
     }
 
     register({ component, ...rest }: RegisterParams<V, M>) {
-        if (this.sealed)
+        if (this._sealed)
             throw new Error(`Registry '${this.identity}' already sealed`);
 
         if (!ngwConfig.components.includes(component)) {
-            this.skipped += 1;
+            this._skipped += 1;
             return;
         }
 
@@ -89,16 +89,28 @@ export class PluginRegistry<V, M> {
     }
 
     seal() {
-        this.sealed = true;
+        this._sealed = true;
         console.debug(
             `Registry '${this.identity}': ` +
                 `${this.items.length} plugins registered, ` +
-                `${this.skipped} skipped`
+                `${this._skipped} skipped`
         );
     }
 
+    get sealed() {
+        return this._sealed;
+    }
+
+    get count() {
+        return this.items.length;
+    }
+
+    get skipped() {
+        return this._skipped;
+    }
+
     *query({ selector, filter }: QueryParams<M> = {}) {
-        if (!this.sealed)
+        if (!this._sealed)
             throw new Error(`Registry '${this.identity}' hasn't been sealed`);
 
         const pselector = selector ? matches(selector) : () => true;
