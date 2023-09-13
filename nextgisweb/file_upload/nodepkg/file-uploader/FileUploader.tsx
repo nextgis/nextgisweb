@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Balancer } from "react-wrap-balancer";
 
 import { Button, Upload } from "@nextgisweb/gui/antd";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
@@ -68,14 +69,14 @@ export function FileUploader({
                 </p>
             </>
         ) : (
-            <>
+            <Balancer ratio={0.62}>
                 <p className="ant-upload-text">
                     <span className="clickable">{uploadText}</span>{" "}
                     {dragAndDropText}
                 </p>
                 {helpText ? <p className="ant-upload-hint">{helpText}</p> : ""}
                 {showMaxSize && <p className="ant-upload-hint">{mMaxSize}</p>}
-            </>
+            </Balancer>
         );
     };
 

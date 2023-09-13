@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import { Balancer } from "react-wrap-balancer";
 
-import { Button, Dropdown, Tabs, message } from "@nextgisweb/gui/antd";
+import { Button, Card, Dropdown, Tabs, message } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 
@@ -21,8 +22,10 @@ const msgInfo = [
     gettext("HTML code of these counters will be embeded into each page and will allow you to track user activity."),
 ];
 
-const placeholder = (
-    <div className="ngw-card placeholder">{msgInfo.join(" ")}</div>
+const PlaceholderCard = () => (
+    <Card size="small">
+        <Balancer ratio={0.62}>{msgInfo.join(" ")}</Balancer>
+    </Card>
 );
 
 function useTabComponents() {
@@ -145,7 +148,7 @@ export function MetricsSettings() {
             {titems && (
                 <div className="ngw-pyramid-analytics-settings">
                     {titems.length === 0 ? (
-                        placeholder
+                        <PlaceholderCard />
                     ) : (
                         <Tabs
                             type="editable-card"
