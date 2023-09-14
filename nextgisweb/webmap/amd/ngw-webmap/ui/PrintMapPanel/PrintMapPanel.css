@@ -4,13 +4,13 @@
 }
 
 .printMap-panel div.print-controls-pane {
-    width: 350px;
     margin: 0;
-    padding: 0;
-    border-right: 1px #b5bcc7 solid;
-    border-left: none;
     border-top: none;
+    border-right: 1px #b5bcc7 solid;
     border-bottom: none;
+    border-left: none;
+    padding: 0;
+    width: 350px;
 }
 
 .printMap-panel .dynamic-panel__title {
@@ -19,8 +19,8 @@
 
 .printMap-panel .close {
     position: absolute;
-    right: 4px;
     top: 8px;
+    right: 4px;
 }
 
 .close svg.icon {
@@ -32,8 +32,8 @@
     top: 40px;
     bottom: 0;
     left: 0;
-    width: 100%;
     box-sizing: border-box;
+    width: 100%;
     overflow: auto;
 }
 
@@ -61,8 +61,8 @@ td.tableContainer-labelCell {
 }
 
 .dijitButton.export-option .dijitButtonNode {
-    background-color: var(--secondary);
     border-color: #c8e5f7;
+    background-color: var(--secondary);
     color: #096ebf;
 }
 
@@ -71,19 +71,19 @@ td.tableContainer-labelCell {
 }
 
 div.print-map-page-wrapper {
-    display: block;
-    margin: 10px auto;
-    z-index: 400;
     -webkit-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
     -moz-box-shadow: 0 0 6px 0 rgb(23, 68, 107);
+    display: block;
+    z-index: 400;
+    margin: 10px auto;
     box-shadow: 0 0 6px 0 rgb(23, 68, 107);
     background-color: white;
 }
 
 .print-map-page,
 div.print-map-export-wrapper {
-    border: 0;
     margin: 0;
+    border: 0;
     padding: 0;
 }
 
@@ -94,15 +94,15 @@ div.print-map-export-wrapper {
 .print-map-page .print-map {
     display: block;
     position: absolute;
-    padding: 0;
     border: none;
+    padding: 0;
 }
 
 .print-map-page .print-map div.map-container {
-    border: 0;
-    position: relative;
     display: block;
+    position: relative;
     z-index: 1000;
+    border: 0;
 }
 
 .print-map-page .print-map.inactive {
@@ -123,15 +123,15 @@ div.print-map-export-wrapper {
     bottom: 8px;
     left: 8px;
     background: white;
+    overflow: hidden;
     color: black;
     font-size: 14px;
-    overflow: hidden;
 }
 
 .print-map-page .print-map .ol-mapscale * {
+    margin: 2px;
     color: black;
     font-size: 10px;
-    margin: 2px;
 }
 
 .print-map-page .print-map .ol-mapscale .ol-scale-value,
@@ -154,9 +154,9 @@ div.print-map-export-wrapper {
 }
 
 .print-map-page .print-map .ol-mapscale .ol-scale-line-inner {
+    will-change: contents, width;
+    margin: 1px 1px 4px 0;
     border: 1px solid black;
     border-top: none;
     text-align: center;
-    margin: 1px 1px 4px 0;
-    will-change: contents, width;
 }

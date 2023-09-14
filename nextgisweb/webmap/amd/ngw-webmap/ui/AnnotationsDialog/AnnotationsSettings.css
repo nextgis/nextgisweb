@@ -1,6 +1,6 @@
 .annotations-settings table {
-    width: 100%;
     margin-top: 3px;
+    width: 100%;
 }
 
 .annotations-settings table .row {
@@ -8,8 +8,8 @@
 }
 
 .annotations-settings table .row .title {
-    width: 40%;
     padding: 3px;
+    width: 40%;
 }
 
 .annotations-settings table .row .controls {
@@ -34,7 +34,7 @@
 }
 
 div.dijitPopup.Popup {
-    padding: 2px;
     margin-top: 1px;
     background-color: #ededed;
+    padding: 2px;
 }

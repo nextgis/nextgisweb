@@ -1,11 +1,24 @@
-.ngw-feature-layer-FieldsDisplayWidget .pure-table { width: 100%; table-layout: fixed; }
+.ngw-feature-layer-FieldsDisplayWidget .pure-table {
+    width: 100%;
+    table-layout: fixed;
+}
 
-.ngw-feature-layer-FieldsDisplayWidget .pure-table .display_name { width: 25%;}
+.ngw-feature-layer-FieldsDisplayWidget .pure-table .display_name {
+    width: 25%;
+}
 
-.ngw-feature-layer-FieldsDisplayWidget span.null { color: #999; }
+.ngw-feature-layer-FieldsDisplayWidget span.null {
+    color: #999;
+}
 
-.ngw-feature-layer-FieldsDisplayWidget  .pure-table tr:first-child:last-child>td,
-.ngw-feature-layer-FieldsDisplayWidget  .pure-table tr:first-child:last-child>th{
+.ngw-feature-layer-FieldsDisplayWidget
+    .pure-table
+    tr:first-child:last-child
+    > td,
+.ngw-feature-layer-FieldsDisplayWidget
+    .pure-table
+    tr:first-child:last-child
+    > th {
     border-bottom: 1px solid #efefef;
 }
 
@@ -15,18 +28,18 @@
 }
 
 .ngw-feature-layer-FieldsDisplayWidget.compact .pure-table {
-    font-size: 12px;
-    line-height: 1.2;
     margin-top: 7px;
     border-top: 1px solid #efefef;
     border-bottom: 1px solid #efefef;
+    font-size: 12px;
+    line-height: 1.2;
 }
 
-.ngw-feature-layer-FieldsDisplayWidget.compact .pure-table:last-child{
+.ngw-feature-layer-FieldsDisplayWidget.compact .pure-table:last-child {
     border-bottom: 0;
 }
 
-.ngw-feature-layer-FieldsDisplayWidget.compact  .pure-table td, 
-.ngw-feature-layer-FieldsDisplayWidget.compact  .pure-table th {
+.ngw-feature-layer-FieldsDisplayWidget.compact .pure-table td,
+.ngw-feature-layer-FieldsDisplayWidget.compact .pure-table th {
     padding: 3px 5px;
 }

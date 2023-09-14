@@ -1,34 +1,36 @@
-.copy-button__icon{
-    cursor:pointer;
+.copy-button__icon {
+    cursor: pointer;
     user-select: none;
 }
 
-.copy-button__icon:hover{
+.copy-button__icon:hover {
     color: #00b77e;
 }
 
-.copy-button__input{
-    position: fixed;
-    left:0;
-    top:0;
-    z-index: -1000;
+.copy-button__input {
     display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
     opacity: 0;
+    z-index: -1000;
 }
 
-.copy-button{
+.copy-button {
     display: inline-block;
 }
 
-.copy-button.activated .copy-button__icon{
-    animation: copyButton-highlight .4s ease-in-out;
+.copy-button.activated .copy-button__icon {
+    animation: copyButton-highlight 0.4s ease-in-out;
 }
 
 @keyframes copyButton-highlight {
     from,
-    to { color: #00b77e; }
+    to {
+        color: #00b77e;
+    }
 }
 
 div.dijitTooltip {
-  box-sizing: content-box;
+    box-sizing: content-box;
 }

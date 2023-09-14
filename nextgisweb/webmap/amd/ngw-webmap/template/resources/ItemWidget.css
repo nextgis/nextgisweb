@@ -1,11 +1,11 @@
 .layer-order__grid--faded:after {
-    content: "";
     position: absolute;
     top: 0;
     left: 0;
+    background-color: rgba(255, 255, 255, 0.82);
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.82);
+    content: "";
 }
 
 .layer-order__grid .dgrid-content {
@@ -17,9 +17,9 @@
 }
 
 .layer-order__grid .dgrid-content .dgrid-row-table .dgrid-cell::before {
+    margin-right: 8px;
     content: counter(row) ".";
     color: #777;
-    margin-right: 8px;
 }
 
 .layer-order__grid .dgrid-cell {

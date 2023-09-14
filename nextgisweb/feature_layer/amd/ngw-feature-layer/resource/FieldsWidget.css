@@ -1,14 +1,22 @@
-.ngw-feature-layer-fields-widget .field-idx { width: 3em; }
-.ngw-feature-layer-fields-widget .field-datatype { width: 10em; }
-.ngw-feature-layer-fields-widget .field-display_name { width: 50%; }
+.ngw-feature-layer-fields-widget .field-idx {
+    width: 3em;
+}
+.ngw-feature-layer-fields-widget .field-datatype {
+    width: 10em;
+}
+.ngw-feature-layer-fields-widget .field-display_name {
+    width: 50%;
+}
 
-.ngw-feature-layer-fields-widget .field-grid_visibility, 
+.ngw-feature-layer-fields-widget .field-grid_visibility,
 .ngw-feature-layer-fields-widget .field-label_field {
-    width: 3em; text-align: center; }
+    width: 3em;
+    text-align: center;
+}
 
 .dgrid-row.deleted {
     text-decoration: line-through;
 }
 .dgrid-row.deleted:not(.dgrid-selected) {
-    background: #e8e8e8
+    background: #e8e8e8;
 }

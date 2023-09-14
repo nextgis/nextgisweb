@@ -4,10 +4,10 @@
 }
 
 .dijitClearButtonInner {
-    border: 1px solid #ffffff;
     margin: 0;
-    width: 16px;
+    border: 1px solid #ffffff;
     background: no-repeat center;
+    width: 16px;
     color: grey;
     text-align: center;
 }

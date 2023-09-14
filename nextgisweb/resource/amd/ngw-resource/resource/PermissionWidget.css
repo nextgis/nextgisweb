@@ -1,2 +1,6 @@
-.ngw-resource-permission-widget .field-action { width: 10em; }
-.ngw-resource-permission-widget .field-propagate { width: 10.5em; }
+.ngw-resource-permission-widget .field-action {
+    width: 10em;
+}
+.ngw-resource-permission-widget .field-propagate {
+    width: 10.5em;
+}

@@ -1,8 +1,8 @@
 /* Делаем кнопки внутри StackController со спец классом компактней */
 .ngwWebmapToolIdentify-controller .dijitToggleButton,
 .ngwWebmapToolIdentify-controller .dijitButton {
-    margin-left: -1px;
     margin-right: 0;
+    margin-left: -1px;
 }
 
 .ngwWebmapToolIdentify-controller .dijitToggleButton:first-child,
@@ -12,9 +12,9 @@
 
 .ngwWebmapToolIdentify-controller .dijitToggleButton .dijitButtonNode,
 .ngwWebmapToolIdentify-controller .dijitButton .dijitButtonNode {
+    border-radius: 0;
     padding: 1px;
     height: 20px;
-    border-radius: 0;
 }
 
 .ngwWebmapToolIdentify-controller
@@ -53,8 +53,8 @@
 .ngwPopup__coordinates,
 .claro .ngwPopup__coordinates {
     box-sizing: border-box;
-    width: 100% !important;
     padding: 3px 3px 2px 2px;
+    width: 100% !important;
 }
 
 .ngwPopup__coordinates-copy {

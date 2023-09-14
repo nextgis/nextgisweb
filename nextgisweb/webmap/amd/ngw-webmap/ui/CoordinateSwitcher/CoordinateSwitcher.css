@@ -1,14 +1,14 @@
 .coordinate-switcher,
 .claro .coordinate-switcher {
-    font-size: 12px;
     border-color: transparent !important;
     color: #555;
+    font-size: 12px;
 }
 
 .coordinate-switcher__dropdown,
 .claro .coordinate-switcher__dropdown {
-    font-size: 12px;
     border: 0;
+    font-size: 12px;
 }
 
 .nextgis.claro .coordinate-switcher__dropdown .dijitMenuItem td {
@@ -17,8 +17,8 @@
 
 .coordinate-switcher .dijitArrowButton,
 .claro .coordinate-switcher .dijitArrowButton {
-    background-color: transparent;
     background-image: none;
+    background-color: transparent;
 }
 
 .claro .coordinate-switcher .dijitButtonContents,
@@ -29,9 +29,9 @@
 /* fixes to display coordinate selector and copy button in one line */
 
 .ngwPopup.dijitTooltipBelow .coordinate-switcher.dijitSelect {
-    user-select: none;
     width: calc(100% - 20px);
     table-layout: auto;
+    user-select: none;
 }
 
 .ngwPopup.dijitTooltipBelow

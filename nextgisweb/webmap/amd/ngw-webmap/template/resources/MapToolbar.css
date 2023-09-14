@@ -6,11 +6,11 @@
 }
 
 .claro .control-pane--bottom .map-toolbar .ol-control {
-    position: relative;
     display: inline-block;
+    position: relative;
     vertical-align: middle;
-    margin-left: 6px;
     z-index: 10;
+    margin-left: 6px;
 }
 .claro .control-pane--bottom .map-toolbar .ol-control:first-child {
     margin-left: 0;
@@ -24,16 +24,16 @@
 }
 
 .claro .map-toolbar .ol-control .dijitButtonNode {
-    padding: 0;
+    fill: var(--primary);
+    transition: none;
+    box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
     border: 0;
+    background: #fff;
+    padding: 0;
     width: 30px;
     height: 30px;
-    line-height: 30px;
-    background: #fff;
     color: var(--primary);
-    fill: var(--primary);
-    box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
-    transition: none;
+    line-height: 30px;
     text-shadow: none;
 }
 
@@ -42,9 +42,9 @@
 }
 
 .claro .map-toolbar .ol-control.dijitToggleButtonChecked .dijitButtonNode {
+    fill: #fff;
     background: var(--primary);
     color: #fff;
-    fill: #fff;
 }
 
 .claro .map-toolbar .ol-control .dijitButtonNode .dijitButtonContents {
