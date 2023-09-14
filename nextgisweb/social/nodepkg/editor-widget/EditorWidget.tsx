@@ -4,6 +4,12 @@ import { ImageUploader } from "@nextgisweb/file-upload/image-uploader";
 import { Input } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type {
+    EditorWidgetComponent,
+    EditorWidgetProps,
+} from "@nextgisweb/resource/type";
+import type { EditorStore } from "./EditorStore";
+
 import "./EditorWidget.less";
 
 const { TextArea } = Input;
@@ -14,7 +20,9 @@ const msgImageUploader = {
     helpText: gettext("The image will be converted to PNG format and downscaled to 1600x630 pixels if it's bigger."),
 }
 
-export const EditorWidget = observer(({ store }) => {
+export const EditorWidget: EditorWidgetComponent<
+    EditorWidgetProps<EditorStore>
+> = observer(({ store }) => {
     return (
         <div className="ngw-social-editor-widget">
             <ImageUploader
@@ -27,7 +35,7 @@ export const EditorWidget = observer(({ store }) => {
                 {...msgImageUploader}
             />
             <TextArea
-                value={store.description}
+                value={store.description || ""}
                 onChange={(e) => {
                     store.update({ description: e.target.value });
                 }}
