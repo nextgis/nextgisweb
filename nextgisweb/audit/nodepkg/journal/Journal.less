@@ -1,9 +1,9 @@
 .ngw-audit-journal {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     box-sizing: border-box;
     height: 100%;
-    display: flex;
-    gap: 8px;
-    flex-direction: column;
 
     > .wrapper {
         position: relative;
@@ -18,8 +18,8 @@
             overflow-y: scroll;
 
             > table {
-                width: 100%;
                 border-collapse: collapse;
+                width: 100%;
 
                 thead {
                     position: sticky;
@@ -28,12 +28,12 @@
                     &::before,
                     &::after {
                         position: absolute;
-                        inset: 0;
-                        content: "";
                         z-index: -5;
-                        border-top-left-radius: var(--border-radius);
+                        inset: 0;
                         border-top-right-radius: var(--border-radius);
+                        border-top-left-radius: var(--border-radius);
                         background-color: var(--color-container);
+                        content: "";
                     }
 
                     &::before {
@@ -41,8 +41,8 @@
                     }
 
                     &::after {
-                        background-color: var(--color-alter);
                         border-bottom: 1px solid var(--color-border);
+                        background-color: var(--color-alter);
                     }
                 }
 
@@ -67,9 +67,9 @@
 
                 td,
                 th {
-                    padding: 2px 8px;
                     vertical-align: top;
                     border-left: 1px solid var(--color-border);
+                    padding: 2px 8px;
 
                     &:first-child {
                         border-left: none;
@@ -83,13 +83,13 @@
                 }
 
                 .c-timestamp {
-                    white-space: nowrap;
                     width: 0;
+                    white-space: nowrap;
                 }
 
                 .c-request {
-                    white-space: nowrap;
                     width: 100%;
+                    white-space: nowrap;
 
                     span.status {
                         margin-right: 1ch;
@@ -123,12 +123,12 @@
 }
 
 .ngw-audit-journal-page-title {
-    flex-grow: 1;
     display: flex;
+    flex-grow: 1;
     gap: 8px;
 
     .ant-picker-input > input {
-        max-width: 18ch;
         min-width: 10ch;
+        max-width: 18ch;
     }
 }

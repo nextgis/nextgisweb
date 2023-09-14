@@ -14,26 +14,26 @@
 
     > .url {
         display: flex;
+        align-items: center;
         box-sizing: border-box;
-        width: 100%;
-        min-width: 0;
-        padding: 4px;
         border: 1px solid var(--divider-color);
         border-radius: var(--border-radius-root);
-        align-items: center;
+        padding: 4px;
+        width: 100%;
+        min-width: 0;
 
         .url-text {
             flex-grow: 1;
             overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
             user-select: all;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .ant-btn {
-            height: auto;
-            width: auto;
             padding: 0;
+            width: auto;
+            height: auto;
 
             svg.icon {
                 flex-shrink: 0;

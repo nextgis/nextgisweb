@@ -7,19 +7,19 @@
         border-color: var(--divider-color);
 
         .dijitTab {
-            padding: 0px 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            font-size: 13px;
-            background: none;
+            transition: none;
+            margin-right: 0;
+            box-shadow: none;
             border: 1px solid transparent;
             border-bottom: 0;
-            box-shadow: none;
-            margin-right: 0;
-            transition: none;
-            color: var(--text-secondary);
+            background: none;
+            padding: 0px 12px;
             height: 39px;
+            color: var(--text-secondary);
+            font-size: 13px;
             line-height: 38px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
 
             &:hover {
                 color: var(--text-base);
@@ -42,15 +42,15 @@
 
     .dijitTabContainerTop-tabs {
         .dijitTab {
-            border-top: 3px solid transparent;
             top: 0;
             margin-bottom: -1px;
+            border-top: 3px solid transparent;
         }
 
         .dijitTabChecked {
             border-top-color: var(--primary);
-            border-left-color: var(--divider-color);
             border-right-color: var(--divider-color);
+            border-left-color: var(--divider-color);
             background-color: #fff;
         }
     }

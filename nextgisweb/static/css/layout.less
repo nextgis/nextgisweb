@@ -25,10 +25,10 @@ html {
 
 body {
     margin: 0;
+    min-width: 680px;
+    color: var(--text-base);
     font-size: 14px;
     line-height: 1.55;
-    color: var(--text-base);
-    min-width: 680px;
 }
 
 *:focus {
@@ -41,9 +41,9 @@ body {
     text-decoration: none;
 
     &:before {
-        color: inherit;
-        margin-left: 0;
         margin-right: 0;
+        margin-left: 0;
+        color: inherit;
     }
 }
 
@@ -55,8 +55,8 @@ a[class*=" icon-"]:hover:before {
 }
 
 .middle-text {
-    font-size: 16px;
     font-weight: bold;
+    font-size: 16px;
 }
 
 .label-text {
@@ -66,42 +66,42 @@ a[class*=" icon-"]:hover:before {
 /* -- Layout -- */
 
 .ngw-pyramid-layout {
-    position: relative;
-    min-height: 100%;
-    min-width: 680px;
     display: flex;
+    position: relative;
     flex-direction: column;
+    min-width: 680px;
+    min-height: 100%;
 
     > .ngw-pyramid-layout-crow {
+        display: flex;
         flex-grow: 1;
         margin: 0;
         padding: 0;
-        display: flex;
 
         > .ngw-pyramid-layout-mwrapper {
-            flex-grow: 1;
             display: flex;
+            flex-grow: 1;
             justify-content: center;
             align-items: stretch;
 
             > .ngw-pyramid-layout-main {
-                flex-grow: 1;
-                max-width: 1000px;
-                padding: 12px;
                 display: flex;
-                gap: 6px;
+                flex-grow: 1;
                 flex-direction: column;
+                gap: 6px;
+                padding: 12px;
+                max-width: 1000px;
 
                 > .ngw-pyramid-layout-bcrumb {
                     color: var(--text-secondary);
 
                     > span {
                         &::before {
-                            content: "●";
+                            vertical-align: 30%;
                             opacity: 0.5;
                             margin: 0 4px;
+                            content: "●";
                             font-size: 6px;
-                            vertical-align: 30%;
                         }
 
                         &:first-child::before {
@@ -124,10 +124,10 @@ a[class*=" icon-"]:hover:before {
                 }
 
                 > h1.ngw-pyramid-layout-title {
-                    margin: 0 0 6px 0;
                     display: flex;
                     align-items: center;
                     gap: 8px;
+                    margin: 0 0 6px 0;
                     min-height: 32px;
                 }
             }
@@ -160,31 +160,31 @@ a[class*=" icon-"]:hover:before {
 /* -- Header --*/
 
 .ngw-pyramid-layout-header {
-    position: relative;
-    box-sizing: border-box;
-    min-height: 50px;
-    padding: 5px 5px;
     display: flex;
-    gap: 10px;
+    position: relative;
     align-items: center;
-    min-width: 0;
+    gap: 10px;
+    box-sizing: border-box;
     border-bottom: 1px solid var(--divider-color);
+    padding: 5px 5px;
+    min-width: 0;
+    min-height: 50px;
 
     &::before {
-        content: "";
         position: absolute;
-        inset: 0;
-        z-index: -1;
         opacity: 0.1;
+        z-index: -1;
+        inset: 0;
         background-color: var(--primary);
+        content: "";
     }
 
     > a {
-        flex-shrink: 1;
         display: flex;
+        flex-shrink: 1;
+        justify-content: center;
         box-sizing: content-box;
         min-width: 40px;
-        justify-content: center;
 
         > img {
             display: block;
@@ -193,16 +193,16 @@ a[class*=" icon-"]:hover:before {
 
     > div.text {
         flex-grow: 1;
-        font-family: var(--ngw-head-font-family-list);
+        color: var(--primary);
         font-weight: var(--ngw-head-font-weight);
         font-size: 16px;
-        color: var(--primary);
+        font-family: var(--ngw-head-font-family-list);
     }
 
     > div.container {
         display: flex;
-        gap: 6px;
         align-items: center;
+        gap: 6px;
         min-width: 0;
         min-height: 32px;
     }
@@ -211,9 +211,9 @@ a[class*=" icon-"]:hover:before {
 /* -- CONTENT STYLES -- */
 
 .ngw-card {
-    background: white;
     border: 1px solid #f0f0f0;
     border-radius: var(--border-radius-root);
+    background: white;
 }
 
 .ngw-resource-section {
@@ -222,11 +222,11 @@ a[class*=" icon-"]:hover:before {
 
 .content-box {
     position: relative;
-    background: white;
-    padding: 12px;
     margin-bottom: 32px;
     border: 1px solid #f0f0f0;
     border-radius: var(--border-radius-root);
+    background: white;
+    padding: 12px;
 
     & > p:first-child,
     & > p:last-child,
@@ -240,14 +240,14 @@ a[class*=" icon-"]:hover:before {
 /* Sidebar */
 
 .ngw-pyramid-layout-sidebar {
-    width: 25%;
-    min-width: 25ch;
-    background: white;
     position: relative;
     box-sizing: border-box;
     border-left: 1px solid var(--divider-color);
+    background: white;
     padding: 12px;
     padding-left: 24px;
+    width: 25%;
+    min-width: 25ch;
 }
 
 .ngw-pyramid-dynmenu {
@@ -257,11 +257,11 @@ a[class*=" icon-"]:hover:before {
 
     > li.label {
         margin: 6px 0 6px 0;
-        color: var(--text-secondary);
-        font-family: var(--ngw-head-font-family-list);
-        font-weight: var(--ngw-text-font-weight);
-        text-transform: uppercase;
         border-bottom: 1px solid var(--divider-color);
+        color: var(--text-secondary);
+        font-weight: var(--ngw-text-font-weight);
+        font-family: var(--ngw-head-font-family-list);
+        text-transform: uppercase;
 
         &:first-child {
             margin-top: 0;
@@ -274,15 +274,15 @@ a[class*=" icon-"]:hover:before {
         padding-bottom: 3px;
 
         &:after {
-            content: "";
-            width: 3px;
+            position: absolute;
+            top: 0;
             top: 0;
             bottom: 0;
-            position: absolute;
             left: -24px;
-            top: 0;
-            background-color: var(--primary);
             opacity: 0;
+            background-color: var(--primary);
+            width: 3px;
+            content: "";
         }
 
         &:hover {
@@ -337,8 +337,6 @@ dl.ngw-pyramid-kv {
         &:after {
             display: inline-block;
             flex-grow: 1;
-            min-width: 2em;
-            content: "";
             background-image: radial-gradient(
                 circle,
                 currentcolor 0.75px,
@@ -347,6 +345,8 @@ dl.ngw-pyramid-kv {
             background-position: left 0 top 10px;
             background-size: 6px 10px;
             background-repeat: repeat-x;
+            min-width: 2em;
+            content: "";
         }
     }
 }
@@ -358,11 +358,11 @@ dl.ngw-pyramid-kv {
 .overlay {
     display: none;
     position: fixed;
-    z-index: 500;
-    left: 0;
     top: 0;
     right: 0;
     bottom: 0;
+    left: 0;
+    z-index: 500;
     background-color: rgba(0, 0, 0, 0.6);
 }
 

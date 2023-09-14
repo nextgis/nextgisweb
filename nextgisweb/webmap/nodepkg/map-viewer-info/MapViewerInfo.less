@@ -1,21 +1,21 @@
 .map-viewer-info {
     display: flex;
-    align-items: center;
-    padding: 0;
-    margin: 0;
-    height: auto;
-    background-color: white;
     position: relative;
+    align-items: center;
+    margin: 0;
     border: solid 1px #83b6df;
     border-radius: 3px;
+    background-color: white;
+    padding: 0;
+    height: auto;
 
     .coordinates {
-        padding: 0 10px 0 10px;
-        font-size: 0.8em;
-        color: gray;
-        z-index: 1;
         display: flex;
         justify-content: space-around;
+        z-index: 1;
+        padding: 0 10px 0 10px;
+        color: gray;
+        font-size: 0.8em;
         white-space: nowrap;
 
         &.type-mouse.round-0 {
@@ -36,11 +36,11 @@
     }
 
     .switch {
-        border-radius: 2px;
-        font-size: 15px;
-        height: 28px;
-        padding: 0.4px 0;
         vertical-align: -3px;
+        border-radius: 2px;
+        padding: 0.4px 0;
         width: 28px;
+        height: 28px;
+        font-size: 15px;
     }
 }

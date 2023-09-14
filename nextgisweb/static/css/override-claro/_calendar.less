@@ -1,13 +1,13 @@
 .nextgis.claro {
     .dijitCalendar {
-        background-color: #fff;
         border: 0;
+        background-color: #fff;
 
         &:hover,
         &.dijitCalendarHover,
         &.dijitCalendarActive {
-            background-color: #fff;
             border: 0;
+            background-color: #fff;
         }
 
         table {
@@ -32,8 +32,8 @@
 
     .dijitCalendarPreviousMonth,
     .dijitCalendarNextMonth {
-        background-color: var(--secondary);
         border-bottom-color: var(--divider-color);
+        background-color: var(--secondary);
 
         .dijitCalendarDateLabel {
             border-color: var(--secondary);
@@ -41,34 +41,34 @@
     }
 
     .dijitCalendarDateTemplate {
-        font-weight: normal;
         color: var(--text-base);
+        font-weight: normal;
         font-size: 13px;
     }
 
     .dijitCalendarSelectedDate .dijitCalendarDateLabel {
+        border-color: var(--primary);
         background-color: var(--primary);
         color: #fff;
-        border-color: var(--primary);
         font-family: var(--ngw-text-font-family-list);
     }
 
     .dijitCalendarSelectedDate.dijitCalendarHoveredDate
         .dijitCalendarDateLabel {
-        background-color: var(--primary);
         border-color: var(--primary);
+        background-color: var(--primary);
         color: #fff;
     }
 
     .dijitCalendarHoveredDate .dijitCalendarDateLabel {
+        border-color: rgba(0, 0, 0, 0.04);
         background-color: rgba(0, 0, 0, 0.04);
         color: var(--primary);
-        border-color: rgba(0, 0, 0, 0.04);
     }
 
     .dijitCalendarDayLabel {
-        font-size: 13px;
         color: var(--text-base);
+        font-size: 13px;
     }
 
     .dijitCalendarMonthLabel {
@@ -77,24 +77,24 @@
     }
 
     .dijitCalendarYearLabel {
+        padding: 2px 0 3px;
         color: var(--text-base);
         font-size: 14px;
-        padding: 2px 0 3px;
     }
 
     .dijitCalendarNextYear,
     .dijitCalendarPreviousYear {
+        padding: 2px 4px;
         color: var(--text-base);
         font-size: 13px;
-        padding: 2px 4px;
 
         &:hover,
         &.dijitCalendarNextYearHover,
         &.dijitCalendarPreviousYearHover {
-            padding: 2px 4px;
-            background-color: rgba(0, 0, 0, 0.04);
             border: 0;
             border-radius: var(--border-radius-root);
+            background-color: rgba(0, 0, 0, 0.04);
+            padding: 2px 4px;
         }
     }
 
@@ -104,8 +104,8 @@
 
     .dijitCalendarMonthMenu .dijitCalendarMonthLabelHover,
     .dijitCalendarMonthMenu .dijitCalendarMonthLabelActive {
-        background-color: rgba(0, 0, 0, 0.04);
         border-color: rgba(0, 0, 0, 0.04);
         background-image: none;
+        background-color: rgba(0, 0, 0, 0.04);
     }
 }

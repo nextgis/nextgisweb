@@ -3,33 +3,31 @@
     user-select: none;
 
     > a {
-        font-size: 16px;
         font-weight: bold;
+        font-size: 16px;
         text-decoration: none;
     }
 
     &-label {
         display: inline-block;
         vertical-align: middle;
+        border-radius: 2px;
+        background: var(--primary);
         width: 32px;
         height: 32px;
-        line-height: 32px;
-        border-radius: 2px;
         color: var(--on-primary-text);
-        background: var(--primary);
         font-size: 20px;
+        line-height: 32px;
         text-align: center;
     }
 }
 
-
 .ngw-pyramid-avatar-danger {
     .ngw-pyramid-avatar-label {
-        color: var(--on-primary);
         background-color: var(--surface-bg-danger);
+        color: var(--on-primary);
     }
 }
-
 
 .ngw-pyramid-avatar-popover {
     .ant-popover-title {
@@ -42,15 +40,15 @@
 
         div.warning {
             display: block;
-            padding: 6px 12px;
             background-color: var(--surface-bg-danger);
+            padding: 6px 12px;
         }
 
         a {
             display: block;
             padding: 6px 12px;
-            text-decoration: none;
             color: var(--text-base);
+            text-decoration: none;
 
             &:hover {
                 background-color: rgba(0, 0, 0, 0.04);

@@ -2,30 +2,30 @@
     display: inline-block;
     position: relative;
     vertical-align: middle;
+    cursor: pointer;
+    border-radius: 2px;
     width: 32px;
     height: 32px;
-    line-height: 32px;
-    border-radius: 2px;
     color: var(--primary);
+    line-height: 32px;
     text-align: center;
-    cursor: pointer;
 
     > svg.icon {
-        font-size: 32px;
         color: inherit;
+        font-size: 32px;
     }
 
     > span.main {
-        line-height: 34px;
         color: inherit;
+        line-height: 34px;
     }
 
     > span.more {
-        position: absolute;
-        right: -2px;
-        top: -6px;
-        height: 16px;
         display: block;
+        position: absolute;
+        top: -6px;
+        right: -2px;
+        height: 16px;
 
         > svg.icon {
             font-size: 16px;
@@ -44,8 +44,8 @@
 
 .ngw-pyramid-menu-drawer {
     .ant-drawer-header {
-        padding: 16px 12px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        padding: 16px 12px;
 
         .ant-drawer-header-title .ant-drawer-close {
             margin-left: auto;
@@ -58,9 +58,9 @@
         a {
             display: block;
             padding: 12px 24px;
-            text-decoration: none;
-            line-height: 1.25;
             color: var(--text-base);
+            line-height: 1.25;
+            text-decoration: none;
 
             &:hover {
                 background-color: rgba(0, 0, 0, 0.04);

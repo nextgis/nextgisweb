@@ -6,8 +6,8 @@
                 border-bottom-width: 1px;
             }
             .ck-content:not(.ck-focused) {
-                border-color: transparent;
                 box-shadow: none;
+                border-color: transparent;
                 & + div > textarea {
                     border-color: transparent;
                 }
@@ -19,15 +19,16 @@
         height: 100%;
 
         > .ck-editor {
-            height: 100%;
             display: flex;
             flex-direction: column;
+            height: 100%;
 
             > .ck-editor__main {
                 position: relative;
                 flex-grow: 1;
 
-                > .ck-content, > .ck-source-editing-area {
+                > .ck-content,
+                > .ck-source-editing-area {
                     position: absolute;
                     inset: 0;
 

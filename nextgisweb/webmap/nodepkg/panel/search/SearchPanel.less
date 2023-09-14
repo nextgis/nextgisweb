@@ -5,8 +5,8 @@
 
     > .control {
         display: flex;
-        padding: 2px;
         border-bottom: 1px solid var(--divider-color);
+        padding: 2px;
 
         button {
             color: var(--icon-color);
@@ -18,12 +18,12 @@
         overflow-y: auto;
 
         .result {
-            padding: 6px 10px 6px 10px;
             cursor: pointer;
+            padding: 6px 10px 6px 10px;
 
             svg {
-                color: gray;
                 padding-left: 2px;
+                color: gray;
             }
 
             &:first-child {
@@ -35,15 +35,15 @@
             }
 
             &.selected {
-                background-color: #eae9e9;
                 cursor: auto;
+                background-color: #eae9e9;
             }
         }
 
         .loading {
-            text-align: center;
-            color: #076dbf;
             margin-top: 20px;
+            color: #076dbf;
+            text-align: center;
         }
     }
 }

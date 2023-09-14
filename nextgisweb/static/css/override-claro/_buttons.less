@@ -5,16 +5,16 @@
         &:hover {
             position: relative;
             &::before {
-                content: "";
                 position: absolute;
                 top: 0;
-                left: 0;
                 right: 0;
                 bottom: 0;
+                left: 0;
+                opacity: var(--hover-opacity-root);
                 z-index: 2;
                 background-color: currentColor;
-                opacity: var(--hover-opacity-root);
                 pointer-events: none;
+                content: "";
             }
         }
 
@@ -35,17 +35,17 @@
             }
 
             .dijitButtonNode {
-                height: 36px;
-                line-height: 35px;
-                font-size: inherit;
+                transition: none;
+                border: 0;
+                border-radius: var(--border-radius-root);
                 background-image: none;
                 background-color: inherit;
-                border: 0;
-                color: inherit;
-                border-radius: var(--border-radius-root);
                 padding: 0 16px;
+                height: 36px;
+                color: inherit;
+                font-size: inherit;
+                line-height: 35px;
                 font-family: var(--ngw-head-font-family-list);
-                transition: none;
 
                 .dijitReset {
                     line-height: inherit;
@@ -71,9 +71,9 @@
             font-size: 14px;
 
             .dijitButtonNode {
-                height: 32px;
-                padding-left: 12px;
                 padding-right: 12px;
+                padding-left: 12px;
+                height: 32px;
                 line-height: 27px;
             }
         }
@@ -84,16 +84,16 @@
             }
 
             .dijitButtonContents::after {
-                content: "";
+                display: none;
                 position: absolute;
-                left: -1px;
                 top: -1px;
-                width: 5px;
-                height: 5px;
+                left: -1px;
+                border: 2px solid #fff;
                 border-radius: var(--border-radius-root);
                 background-color: var(--accent);
-                border: 2px solid #fff;
-                display: none;
+                width: 5px;
+                height: 5px;
+                content: "";
             }
 
             &-active {
