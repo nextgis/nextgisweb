@@ -69,7 +69,7 @@ const AttributeEditor = observer(
         });
 
         const { fields, attributes, isReady, setValues, saving } = store;
-        const [size] = useState<SizeType>("small");
+        const [size] = useState<SizeType>();
         const form = Form.useForm()[0];
 
         const setNullForField = useCallback(
