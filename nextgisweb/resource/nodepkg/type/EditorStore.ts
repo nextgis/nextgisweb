@@ -9,13 +9,14 @@ interface DumpParams {
 export interface EditorStoreOptions {
     composite?: unknown;
     operation?: Operations;
+    resourceId?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface EditorStore<V = any> {
     identity?: string;
 
-    uploading: boolean;
+    uploading?: boolean;
 
     load: (value: V) => unknown;
 
