@@ -20,7 +20,7 @@ from .util import scan_for_nodepkgs
 def create_tsconfig(npkgs: List[str]):
 
     compiler_options = dict(
-        target="es5",
+        target="es2015",
         lib=["dom", "dom.iterable", "esnext"],
         allowJs=True,
         skipLibCheck=True,
