@@ -1,7 +1,7 @@
 /** @testentry mocha */
 import { assert } from "chai";
 
-function check(m) {
+function check(m: { default: string; named: string }) {
     assert.equal(m.default, "default");
     assert.equal(m.named, "named");
 }

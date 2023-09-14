@@ -10,7 +10,7 @@ interface PageTitleProps {
 export function PageTitle({ title, children }: PageTitleProps) {
     const ititle = useMemo(() => {
         // Capture an existing page title if not set
-        return title || document.getElementById("title").innerText;
+        return title || document.getElementById("title")?.innerText;
     }, [title]);
 
     return (

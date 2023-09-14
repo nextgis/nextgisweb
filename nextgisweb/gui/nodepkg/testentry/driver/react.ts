@@ -8,7 +8,9 @@ registry.register({
     loader: async () => {
         const { default: reactApp } = await import("@nextgisweb/gui/react-app");
         return (name: string, el: HTMLElement) => {
-            entrypoint(name).then(({ default: Component }) => {
+            entrypoint<{
+                default: React.ComponentType;
+            }>(name).then(({ default: Component }) => {
                 reactApp(Component, {}, el);
             });
         };

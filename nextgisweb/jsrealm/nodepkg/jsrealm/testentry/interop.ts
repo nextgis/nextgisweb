@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /** @testentry mocha */
+// @ts-ignore
 import Deferred from "dojo/Deferred";
+// @ts-ignore
 import { publish, subscribe } from "dojo/topic";
 
 describe("Interoperability with Dojo", () => {

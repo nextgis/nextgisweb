@@ -1,10 +1,13 @@
 /** @testentry mocha */
 import { assert } from "chai";
 
-import { meta } from "..";
+import { PluginRegistry, meta } from "..";
 
 Array.from(meta.query()).map((registry) => {
-    const lit = (assertion, callback) => {
+    const lit = (
+        assertion: string,
+        callback: (val: PluginRegistry<never, never>) => void
+    ) => {
         it(assertion, async () => {
             await callback(await registry.load());
         });
