@@ -1,8 +1,14 @@
 import matches from "lodash-es/matches";
 import omit from "lodash-es/omit";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RegisterValue = any;
+
 type Loader<V> = () => Promise<V>;
-type ImportLoader<V> = () => Promise<{ default: V }>;
+
+type ImportLoader<V extends RegisterValue> = () => Promise<{
+    default: V;
+}>;
 
 class PluginBase<V> {
     readonly component: string;
@@ -28,7 +34,7 @@ type Plugin<V, M> = PluginBase<V> & M;
 
 type Selector<M> = { component?: string } & M;
 
-type RegisterParams<V, M> = { component: string } & M &
+type RegisterParams<V extends RegisterValue, M> = { component: string } & M &
     ({ value: V } | { loader: Loader<V> } | { import: ImportLoader<V> });
 
 interface QueryParams<M> {
@@ -36,7 +42,7 @@ interface QueryParams<M> {
     filter?: (selector: Selector<M>) => boolean;
 }
 
-export class PluginRegistry<V, M> {
+export class PluginRegistry<V extends RegisterValue, M> {
     readonly identity: string;
     protected readonly items: Plugin<V, M>[];
     protected _sealed: boolean = false;
