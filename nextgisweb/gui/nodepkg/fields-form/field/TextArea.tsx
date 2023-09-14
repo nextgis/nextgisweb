@@ -7,10 +7,5 @@ import type { FormItemProps } from "../type";
 type InputProps = Parameters<typeof Input.TextArea>[0];
 
 export function TextArea({ ...props }: FormItemProps<InputProps>) {
-    return (
-        <FormItem
-            {...props}
-            input={(inputProps) => <Input.TextArea {...inputProps} />}
-        />
-    );
+    return <FormItem {...props} input={Input.TextArea} />;
 }

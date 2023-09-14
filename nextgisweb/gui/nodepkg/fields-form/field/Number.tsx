@@ -13,13 +13,8 @@ export type NumberProps = FormItemProps<InputNumberProps> & {
     max?: InputNumberProps["max"];
 };
 
-export function Number({ min, max, ...props }: NumberProps) {
-    return (
-        <FormItem
-            {...props}
-            input={(inputProps) => {
-                return <InputNumber {...{ min, max, ...inputProps }} />;
-            }}
-        />
-    );
+export function Number({ min, max, inputProps, ...props }: NumberProps) {
+    inputProps = inputProps ?? {};
+    inputProps = { min, max, ...inputProps };
+    return <FormItem inputProps={inputProps} {...props} input={InputNumber} />;
 }

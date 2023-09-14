@@ -14,10 +14,5 @@ export function KeynameTextBox({ ...props }: FormItemProps<InputProps>) {
         message: i18n.gettext("The value entered is not valid"),
     });
     const p = { ...props, rules };
-    return (
-        <FormItem
-            {...p}
-            input={(inputProps) => <Input {...inputProps}></Input>}
-        />
-    );
+    return <FormItem {...p} input={Input} />;
 }

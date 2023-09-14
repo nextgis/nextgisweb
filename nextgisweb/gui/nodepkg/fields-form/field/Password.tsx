@@ -16,17 +16,17 @@ type PasswordProps = FormItemProps<InputProps> & {
 export function Password({
     placeholder,
     autoComplete,
+    inputProps,
     ...props
 }: PasswordProps) {
+    inputProps = inputProps ?? {};
+    inputProps = {
+        visibilityToggle: false,
+        autoComplete,
+        placeholder,
+        ...inputProps,
+    };
     return (
-        <FormItem
-            {...props}
-            input={(inputProps) => (
-                <Input.Password
-                    visibilityToggle={false}
-                    {...{ autoComplete, placeholder, ...inputProps }}
-                />
-            )}
-        />
+        <FormItem {...props} inputProps={inputProps} input={Input.Password} />
     );
 }

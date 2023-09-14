@@ -30,13 +30,13 @@ const InputNumber_ = ({ value, onChange, ...inputProps }: InputNumberProps) => {
     );
 };
 
-export function BigInteger({ min, max, ...props }: BigIntegerProps) {
-    return (
-        <FormItem
-            {...props}
-            input={(inputProps) => (
-                <InputNumber_ {...{ min, max, ...inputProps }} />
-            )}
-        />
-    );
+export function BigInteger({
+    min,
+    max,
+    inputProps,
+    ...props
+}: BigIntegerProps) {
+    inputProps = inputProps ?? {};
+    inputProps = { min, max, ...inputProps };
+    return <FormItem {...props} inputProps={inputProps} input={InputNumber_} />;
 }

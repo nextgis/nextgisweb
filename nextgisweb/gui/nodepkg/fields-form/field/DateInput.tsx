@@ -8,10 +8,5 @@ import type { FormItemProps } from "../type";
 type InputProps = DatePickerProps;
 
 export function DateInput({ ...props }: FormItemProps<InputProps>) {
-    return (
-        <FormItem
-            input={(inputProps) => <DatePicker {...inputProps} />}
-            {...props}
-        />
-    );
+    return <FormItem input={DatePicker} {...props} />;
 }

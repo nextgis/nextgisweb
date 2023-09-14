@@ -7,10 +7,5 @@ import type { FormItemProps } from "../type";
 type InputProps = Parameters<typeof Input>[0];
 
 export function ValidationTextBox({ ...props }: FormItemProps<InputProps>) {
-    return (
-        <FormItem
-            {...props}
-            input={(inputProps) => <Input {...inputProps} />}
-        />
-    );
+    return <FormItem {...props} input={Input} />;
 }

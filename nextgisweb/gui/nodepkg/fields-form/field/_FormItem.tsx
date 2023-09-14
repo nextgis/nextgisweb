@@ -1,38 +1,62 @@
+import { useMemo, useState } from "react";
+import isEqual from "lodash-es/isEqual";
+
 import { Form, Space } from "@nextgisweb/gui/antd";
-import { FormItemProps, InputProps } from "../type";
+
+import type { FormItemProps, InputProps } from "../type";
+import { useEffect } from "react";
 
 export function FormItem<P extends InputProps = InputProps>({
     placeholder,
-    inputProps,
+    inputProps: inputPropsFromProps,
     disabled,
     prepend,
     append,
     label,
-    input,
+    input: Input,
     ...props
 }: FormItemProps<P>) {
-    const combinedProps: P = {
-        placeholder,
-        disabled,
-        ...(inputProps || {}),
-    } as P;
+    const [inputProps, setInputProps] = useState<P>(
+        () => inputPropsFromProps || ({} as P)
+    );
 
-    const propsForInput = {} as P;
+    const memoizedInputComponent = useMemo(() => {
+        const combinedProps: P = {
+            placeholder,
+            disabled,
+            ...inputProps,
+        };
 
-    for (const p in combinedProps) {
-        const prop = combinedProps[p];
+        const propsForInput = {} as P;
 
-        if (prop !== undefined) {
-            propsForInput[p] = prop;
+        for (const p in combinedProps) {
+            const prop = combinedProps[p];
+
+            if (prop !== undefined) {
+                propsForInput[p] = prop;
+            }
         }
-    }
+
+        return Input && <Input {...propsForInput} />;
+    }, [disabled, inputProps, Input, placeholder]);
+
+    useEffect(() => {
+        if (inputPropsFromProps) {
+            setInputProps((old) => {
+                if (!isEqual(old, inputPropsFromProps)) {
+                    return inputPropsFromProps;
+                }
+                return old;
+            });
+        }
+    }, [inputPropsFromProps]);
 
     return (
         <Form.Item label={label}>
             <Space.Compact block>
                 {prepend && prepend}
                 <Form.Item {...props} noStyle>
-                    {input && input(propsForInput)}
+                    {memoizedInputComponent}
                 </Form.Item>
                 {append && append}
             </Space.Compact>

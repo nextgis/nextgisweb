@@ -7,10 +7,5 @@ import type { FormItemProps } from "../type";
 type InputProps = Parameters<typeof Input_>[0];
 
 export function Input(props: FormItemProps<InputProps>) {
-    return (
-        <FormItem
-            {...props}
-            input={(inputProps) => <Input_ {...inputProps} />}
-        />
-    );
+    return <FormItem {...props} input={Input_} />;
 }

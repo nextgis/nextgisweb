@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, ComponentType } from "react";
 import type { Form } from "@nextgisweb/gui/antd";
 import type {
     FormInstance,
@@ -63,7 +63,7 @@ export interface FormItemProps<
     prepend?: ReactNode;
     append?: ReactNode;
 
-    input?: (props: P) => ReactNode;
+    input?: ComponentType<P>;
 }
 
 export type WidgetName = keyof WidgetFieldMap;

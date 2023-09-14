@@ -18,16 +18,16 @@ type LanguageSelectInputProps = FormItemProps<LanguageSelectProps> & {
 export function LanguageSelect({
     loading,
     contribute,
+    inputProps,
     ...props
 }: LanguageSelectInputProps) {
+    inputProps = inputProps ?? {};
+    inputProps = { loading, contribute, ...inputProps };
     return (
         <FormItem
+            inputProps={inputProps}
             {...props}
-            input={(inputProps) => (
-                <LanguageSelectInput
-                    {...{ loading, contribute, ...inputProps }}
-                />
-            )}
+            input={LanguageSelectInput}
         />
     );
 }

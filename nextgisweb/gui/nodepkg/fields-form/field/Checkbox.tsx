@@ -8,14 +8,17 @@ type CheckboxInputProps = Parameters<typeof Checkbox_>[0];
 
 export function Checkbox({
     disabled = false,
+    inputProps,
     ...props
 }: FormItemProps<CheckboxInputProps>) {
+    inputProps = inputProps ?? {};
+    inputProps = { disabled, ...inputProps };
+
     return (
         <FormItem
             valuePropName="checked"
-            input={(inputProps) => (
-                <Checkbox_ {...{ disabled, ...inputProps }}></Checkbox_>
-            )}
+            inputProps={inputProps}
+            input={Checkbox_}
             {...props}
         />
     );

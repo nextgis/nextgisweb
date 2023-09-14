@@ -1,3 +1,6 @@
+import i18n from "@nextgisweb/pyramid/i18n";
+import { useMemo } from "react";
+
 import {
     Checkbox,
     DateInput,
@@ -10,10 +13,7 @@ import {
     TimeInput,
 } from "./fields";
 
-import i18n from "@nextgisweb/pyramid/i18n";
-
-import type { ElementType } from "react";
-import type { FormField, WidgetName, FormWidgetComponent } from "./type";
+import type { FormField, FormWidgetComponent, WidgetName } from "./type";
 
 export const widgetsByName: Record<WidgetName, FormWidgetComponent> = {
     checkbox: Checkbox,
@@ -35,7 +35,7 @@ export function FormItem({
 }: FormField) {
     delete formProps.included;
     delete formProps.value;
-    formProps.rules = formProps.rules || [];
+    formProps.rules = formProps.rules ? [...formProps.rules] : [];
 
     if (required) {
         formProps.rules.push({
@@ -44,13 +44,14 @@ export function FormItem({
         });
     }
 
-    let FormWidget: ElementType = Input;
-
-    if (typeof widget === "string") {
-        FormWidget = widgetsByName[widget.toLowerCase() as WidgetName] || Input;
-    } else if (widget) {
-        FormWidget = widget;
-    }
+    const FormWidget = useMemo(() => {
+        if (typeof widget === "string") {
+            return widgetsByName[widget.toLowerCase() as WidgetName] || Input;
+        } else if (widget) {
+            return widget;
+        }
+        return Input;
+    }, [widget]);
 
     return <FormWidget {...formProps} />;
 }
