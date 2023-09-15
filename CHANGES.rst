@@ -16,6 +16,7 @@ Changes
 - Save to PDF from the webmap printing panel.
 - Store audit journal in PostgreSQL database instead of ElasticSearch.
 - Support for Google Analytics and Yandex.Metrica metrics.
+- Support for user-defined SLD styles.
 
 
 4.4.0

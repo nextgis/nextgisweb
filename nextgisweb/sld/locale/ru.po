@@ -1,0 +1,68 @@
+#: nodepkg/style-editor/component/KindEditor.tsx:28
+msgid "Symbolizer unknown!"
+msgstr "Неизвестный тип символики"
+
+#: nodepkg/style-editor/component/TypeSelect/TypeField.tsx:15
+msgid "Mark"
+msgstr "Маркер"
+
+#: nodepkg/style-editor/component/TypeSelect/TypeField.tsx:16
+msgid "Fill"
+msgstr "Заливка"
+
+#: nodepkg/style-editor/component/TypeSelect/TypeField.tsx:17
+msgid "Line"
+msgstr "Линия"
+
+#: nodepkg/style-editor/component/TypeSelect/TypeSelect.tsx:18
+msgid "Type"
+msgstr "Тип"
+
+#: nodepkg/style-editor/component/editor/FillEditor.tsx:14
+#: nodepkg/style-editor/component/editor/LineEditor.tsx:14
+#: nodepkg/style-editor/component/editor/MarkEditor.tsx:16
+msgid "Fill color"
+msgstr "Цвет заливки"
+
+#: nodepkg/style-editor/component/editor/FillEditor.tsx:15
+#: nodepkg/style-editor/component/editor/MarkEditor.tsx:17
+msgid "Stroke color"
+msgstr "Цвет контура"
+
+#: nodepkg/style-editor/component/editor/FillEditor.tsx:16
+#: nodepkg/style-editor/component/editor/MarkEditor.tsx:18
+msgid "Stroke width"
+msgstr "Ширина контура"
+
+#: nodepkg/style-editor/component/editor/LineEditor.tsx:15
+msgid "Width"
+msgstr "Ширина"
+
+#: nodepkg/style-editor/component/editor/MarkEditor.tsx:15
+msgid "Size"
+msgstr "Размер"
+
+#: nodepkg/style-editor/field/ColorInput.tsx:15
+msgid "None"
+msgstr "Нет"
+
+#: nodepkg/style-editor/util/constant.ts:5
+msgid "Square"
+msgstr "Квадрат"
+
+#: nodepkg/style-editor/util/constant.ts:6
+msgid "Circle"
+msgstr "Круг"
+
+#: nodepkg/style-editor/util/constant.ts:7
+msgid "Triangle"
+msgstr "Треугольник"
+
+#: nodepkg/style-editor/util/constant.ts:8
+msgid "Star"
+msgstr "Звезда"
+
+#: nodepkg/style-editor/util/constant.ts:9
+msgid "Cross"
+msgstr "Крест"
+
