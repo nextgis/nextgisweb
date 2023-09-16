@@ -1003,8 +1003,11 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        'feature_layer.export', '/api/component/feature_layer/export'
-    ).add_view(export_multi, request_method=('POST', 'GET'))
+        'feature_layer.export',
+        '/api/component/feature_layer/export',
+        get=export_multi,
+        post=export_multi,
+    )
 
     config.add_route(
         'feature_layer.mvt',
