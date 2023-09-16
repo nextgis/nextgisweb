@@ -40,13 +40,15 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         'lunkwill.summary',
-        '/api/lunkwill/{id}/summary'
-    ).add_view(proxy)
+        '/api/lunkwill/{id:str}/summary',
+        get=proxy,
+    )
 
     config.add_route(
         'lunkwill.response',
-        '/api/lunkwill/{id}/response'
-    ).add_view(proxy)
+        '/api/lunkwill/{id:str}/response',
+        get=proxy,
+    )
 
 
 def tween_factory(handler, registry):
