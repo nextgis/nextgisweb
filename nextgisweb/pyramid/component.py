@@ -54,8 +54,18 @@ class PyramidComponent(Component):
         api.setup_pyramid(self, config)
         uac.setup_pyramid(self, config)
 
+        rt_not_set = self.options['request_timeout'] is None
+
         try:
             import uwsgi
+
+            if rt_not_set:
+                if ev := environ.get('UWSGI_HARAKIRI_ORIGINAL'):
+                    # Even if lunkwill is disabled it can override uWSGI option
+                    self.options['request_timeout'] = timedelta(seconds=int(ev))
+                elif ev := uwsgi.opt.get('harakiri'):
+                    self.options['request_timeout'] = timedelta(seconds=int(ev))
+
             lunkwill_rpc = b'lunkwill' in uwsgi.rpc_list()
         except ImportError:
             uwsgi = None
@@ -85,6 +95,9 @@ class PyramidComponent(Component):
             lunkwill.setup_pyramid(self, config)
         else:
             logger.debug("Lunkwill extension disabled")
+
+        if rt_not_set and (ev := self.options['request_timeout']):
+            logger.debug("Request timeout %s detected from uWSGI", str(ev))
 
     def client_settings(self, request):
         result = dict()
@@ -162,6 +175,9 @@ class PyramidComponent(Component):
         except ImportError:
             pass
 
+        if t := self.options['request_timeout']:
+            yield (_("Request timeout"), t)
+
         lunkwill = self.options['lunkwill.enabled']
         yield ("Lunkwill", _("Enabled") if lunkwill else _("Disabled"))
 
@@ -205,6 +221,9 @@ class PyramidComponent(Component):
 
         Option('static_key', default=None),
 
+        Option('request_timeout', timedelta, default=None, doc=(
+            "Request timeout reported to a client. For uWSGI deployments it's "
+            "autodetected from uWSGI options.")),
         Option('response_buffering', bool, default=None, doc=(
             "Does the reverse proxy server in front of NextGIS Web use "
             "output buffering or not? It's enabled by default in Nginx, "
