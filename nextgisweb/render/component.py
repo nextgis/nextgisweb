@@ -1,7 +1,6 @@
 import os
-import os.path
 from datetime import datetime
-from pathlib import Path
+from uuid import UUID
 
 import sqlalchemy as sa
 import transaction
@@ -60,36 +59,36 @@ class RenderComponent(Component):
     def cleanup(self):
         logger.info("Cleaning up tile cache tables...")
 
-        root = Path(self.tile_cache_path)
+        tile_cache_path = os.path.abspath(self.tile_cache_path)
         deleted_tiles = deleted_files = deleted_tables = 0
+        uuid_keep = []
+        now_unix = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
 
+        # Drop tables and collect tile cache UUIDs that should remain
         with transaction.manager:
-            for row in DBSession.execute(sa.text('''
-                SELECT t.tablename
+            for tablename, exists in DBSession.execute(sa.text('''
+                SELECT t.tablename, r.resource_id IS NOT NULL
                 FROM pg_catalog.pg_tables t
                 LEFT JOIN resource_tile_cache r
                     ON replace(r.uuid::character varying, '-', '') = t.tablename::character varying
-                WHERE t.schemaname = 'tile_cache' AND r.resource_id IS NULL
+                WHERE t.schemaname = 'tile_cache'
             ''')):
-                tablename = row[0]
-                db_path = root / tablename[0:2] / tablename[2:4] / tablename
-                if db_path.exists():
-                    db_path.unlink()
-                    deleted_files += 1
-                DBSession.execute(sa.text('DROP TABLE "tile_cache"."%s"' % tablename))
-                deleted_tables += 1
+                if not exists:
+                    DBSession.execute(sa.text('DROP TABLE "tile_cache"."%s"' % tablename))
+                    deleted_tables += 1
+                else:
+                    uuid_keep.append(tablename)
 
             if deleted_tables > 0:
                 mark_changed(DBSession())
 
-        now_unix = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
-
+        # Clean postgres and sqlite tile records
         with transaction.manager:
             conn_pg = DBSession.connection()
 
             for tc in RTC.filter(
                 sa.or_(RTC.ttl.isnot(None), RTC.max_z.isnot(None))
-            ).all():
+            ):
                 cond = []
                 if tc.max_z is not None:
                     cond.append(sa.column('z') > tc.max_z)
@@ -128,6 +127,32 @@ class RenderComponent(Component):
                         conn_sqlite.execute('VACUUM;')
 
             mark_changed(DBSession())
+
+        # Clean file system
+        for dirpath, dirnames, filenames in os.walk(tile_cache_path, topdown=False):
+            relist = False
+
+            for fn in filenames:
+                fullfn = os.path.join(dirpath, fn)
+                uuid = fn[:-4] if fn.endswith(('-shm', '-wal')) else fn
+                try:
+                    UUID(hex=uuid, version=4)
+                except ValueError:
+                    logger.warning("File {} unrecognized, skipping...".format(fullfn))
+                    continue
+                if uuid not in uuid_keep and os.stat(fullfn).st_ctime < now_unix:
+                    os.remove(fullfn)
+                    deleted_files += 1
+                    relist = True
+
+            if (
+                dirpath != tile_cache_path
+                and (
+                    (not relist and len(filenames) == 0 and len(dirnames) == 0)
+                    or len(os.listdir(dirpath)) == 0
+                )
+            ):
+                os.rmdir(dirpath)
 
         logger.info(
             "Deleted: %d tile records, %d files, %d tables.",
