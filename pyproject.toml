@@ -1,16 +1,20 @@
+[tool.black]
+line-length = 99
+
+[tool.ruff]
 line-length = 99
 select = ["E", "F", "W", "I", "TID251"]
+ignore = ["E501"]
 exclude = [
     "docker.py",
     "nextgisweb/raster_layer/test/validate_cloud_optimized_geotiff.py",
 ]
 
-[per-file-ignores]
+[tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]
 
-[isort]
+[tool.ruff.isort]
 variables = ["_"]
-
 # Absolute imports are more readable, relative ones are circuitous. So, let's
 # combine them with the following rules:
 #
@@ -26,7 +30,6 @@ variables = ["_"]
 # imports structure and that's nice!
 #
 # TODO: Do we need some flake8 for that?
-
 extra-standard-library = ["packaging", "pkg_resources", "setuptools"]
 section-order = [
     "future",
@@ -38,11 +41,11 @@ section-order = [
     "local-folder",
 ]
 
-[isort.sections]
+[tool.ruff.isort.sections]
 "nextgisweb_env_lib" = ["nextgisweb.env", "nextgisweb.lib"]
 "nextgisweb_comp" = ["nextgisweb"]
 
-[flake8-tidy-imports]
+[tool.ruff.flake8-tidy-imports]
 
-[flake8-tidy-imports.banned-api]
+[tool.ruff.flake8-tidy-imports.banned-api]
 pkg_resources.msg = "Consider importlib.metadata or nextgisweb.imptool.module_path"
