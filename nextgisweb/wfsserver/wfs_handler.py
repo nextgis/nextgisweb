@@ -554,6 +554,9 @@ class WFSHandler():
                     ns_attr('xlink', 'href', self.p_version):
                     wfs_url + '?' if req_mehtod == 'Get' else wfs_url
                 }, namespace=_ns_ows, parent=__http)
+            if wfs_operation in (DESCRIBE_FEATURE_TYPE, GET_FEATURE):
+                __parameter = El('Parameter', dict(name='OutputFormat'), namespace=_ns_ows, parent=__wfs_op)
+                El('Value', text="text/xml; subtype=gml/2.1.2", namespace=_ns_ows, parent=__parameter)
 
         __parameter = El('Parameter', dict(name='AcceptVersions'), namespace=_ns_ows, parent=__op_md)
         for version in VERSION_SUPPORTED:
@@ -624,6 +627,10 @@ class WFSHandler():
             for req_mehtod in req_methods:
                 El(req_mehtod, {ns_attr('xlink', 'href', self.p_version): wfs_url},
                    namespace=_ns_ows, parent=__http)
+            if wfs_operation in (DESCRIBE_FEATURE_TYPE, GET_FEATURE):
+                __parameter = El('Parameter', dict(name='OutputFormat'), namespace=_ns_ows, parent=__wfs_op)
+                __values = El('AllowedValues', namespace=_ns_ows, parent=__parameter)
+                El('Value', text="application/gml+xml;version=3.2", namespace=_ns_ows, parent=__values)
 
         __parameter = El('Parameter', dict(name='version'), namespace=_ns_ows, parent=__op_md)
         __values = El('AllowedValues', namespace=_ns_ows, parent=__parameter)
