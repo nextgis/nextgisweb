@@ -23,7 +23,7 @@ System requirements
 
 - GDAL >= 3.
 
-- Node.js 14.x or higher and Yarn 1.x package manager. We recommend using
+- Node.js 16.x or higher and Yarn 1.x package manager. We recommend using
   NodeSource and Yarn package repositories.
 
 - PostgreSQL database with PostGIS and hstore extensions enabled:
@@ -123,7 +123,7 @@ the latest tagged version:
   $ cd nextgisweb
   $ git checkout $(git tag -l '*.*.*' | tail -1)
   $ git describe --tags
-  3.5.1
+  4.3.2
   $ cd ..
 
 Now install ``nextgisweb`` python package into virtualenv in editable mode and
@@ -131,6 +131,7 @@ compile i18n translations:
 
 .. code-block:: none
 
+  $ export SETUPTOOLS_ENABLE_FEATURES=legacy-editable
   $ pip install -e nextgisweb/
   $ nextgisweb-i18n -p nextgisweb compile
 
@@ -177,7 +178,7 @@ build necessary files:
 
 .. code-block:: none
 
-  $ nextgisweb jsrealm.install
+  $ nextgisweb jsrealm install
   $ mkdir dist
   $ yarn run build
 

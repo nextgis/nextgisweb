@@ -41,17 +41,18 @@ available version tags:
   $ cd package/nextgisweb
   $ git pull
   $ git tag -l '*.*.*'
-  3.5.1
-  3.6.0
-  3.7.0
+  4.3.0
+  4.3.1
+  4.3.2
+  4.4.0
 
 Of course, you can use any other version, including a ``master`` branch, but
-here we consider an upgrade to the ``3.7.0`` version as an example. So check it
+here we consider an upgrade to the ``4.4.0`` version as an example. So check it
 out, upgrade the package in virtualenv and recompile i18n translations:
 
 .. code-block:: none
 
-  $ git checkout 3.7.0
+  $ git checkout 4.4.0
   $ cd ..
   $ pip install -e nextgisweb
   $ nextgisweb-i18n -p nextgisweb compile
@@ -62,7 +63,7 @@ environment with workspaces, and build necessary files:
 .. code-block:: none
 
   $ cd
-  $ nextgisweb jsrealm.install
+  $ nextgisweb jsrealm install
   $ yarn run build
 
 Repeat these steps with additional packages such as ``nextgisweb_qgis`` and
@@ -88,13 +89,13 @@ upgrading from ``3.7.0`` or higher, check required migrations with:
 
 .. code-block:: none
 
-  $ nextgisweb migration.upgrade
+  $ nextgisweb migration upgrade
 
 And then apply them with:
 
 .. code-block:: none
 
-  $ nextgisweb migration.upgrade --no-dry-run
+  $ nextgisweb migration upgrade --no-dry-run
 
 Upgrading from previous versions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -118,8 +119,8 @@ commands given above:
 
 .. code-block:: none
 
-  $ nextgisweb migration.upgrade
-  $ nextgisweb migration.upgrade --no-dry-run
+  $ nextgisweb migration upgrade
+  $ nextgisweb migration upgrade --no-dry-run
 
 
 Starting services

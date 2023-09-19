@@ -53,17 +53,14 @@ needed options, which start with a semi-colon.
   ### Component 'file_upload'
   [file_upload]
 
-  ## Option: max_size (integer) (default: 8589934592)
-  ; max_size = 8589934592
+  ## Option: path (text)
+  ; path = 
 
-  ## Option: tus.enabled (boolean) (default: true)
-  ; tus.enabled = true
+  ## Option: max_size (size_in_bytes) (default: 8G)
+  ; max_size = 8G
 
-  ## Option: tus.chunk_size.default (integer) (default: 16777216)
-  ; tus.chunk_size.default = 16777216
-
-  ## Option: tus.chunk_size.minimum (integer) (default: 1048576)
-  ; tus.chunk_size.minimum = 1048576
+  ## Option: chunk_size (size_in_bytes) (default: 16M)
+  ; chunk_size = 16M
 
 It's possible to store all configuration in one file or use multiple files. To
 point NextGIS Web to a specific configuration file, the environment variable
@@ -125,15 +122,11 @@ format using option ``--env-vars``. For example, command ``nextgisweb-config
 
   ### Component 'file_upload'
 
-  ## Option: max_size (integer) (default: 8589934592)
-  # NEXTGISWEB__FILE_UPLOAD__MAX_SIZE=8589934592
+  ## Option: path (text)
+  # NEXTGISWEB__FILE_UPLOAD__PATH=
 
-  ## Option: tus.enabled (boolean) (default: true)
-  # NEXTGISWEB__FILE_UPLOAD__TUS__ENABLED=true
+  ## Option: max_size (size_in_bytes) (default: 8G)
+  # NEXTGISWEB__FILE_UPLOAD__MAX_SIZE=8G
 
-  ## Option: tus.chunk_size.default (integer) (default: 16777216)
-  # NEXTGISWEB__FILE_UPLOAD__TUS__CHUNK_SIZE__DEFAULT=16777216
-
-  ## Option: tus.chunk_size.minimum (integer) (default: 1048576)
-  # NEXTGISWEB__FILE_UPLOAD__TUS__CHUNK_SIZE__MINIMUM=1048576
-
+  ## Option: chunk_size (size_in_bytes) (default: 16M)
+  # NEXTGISWEB__FILE_UPLOAD__CHUNK_SIZE=16M
