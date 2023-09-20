@@ -18,6 +18,7 @@ from typing_extensions import Annotated
 
 from nextgisweb.env import _, env
 from nextgisweb.lib.apitype import AnyOf, ContentType, StatusCode
+from nextgisweb.lib.fs import filename_strip
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geom_area, geom_length
 
 from nextgisweb.core.exception import ValidationError
@@ -197,7 +198,7 @@ def export(resource, options, filepath):
         options=[],
         format=driver.name,
         dstSRS=srs.wkt,
-        layerName=resource.display_name,
+        layerName=filename_strip(resource.display_name),
         geometryType=resource.geometry_type,
     )
     if driver.fid_support and options.fid_field is None:
