@@ -22,37 +22,37 @@ ACCESS_TOKEN_LIFETIME = 60
 REFRESH_TOKEN_LIFETIME = 1800
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def setup_oauth(ngw_env, request):
     auth = ngw_env.auth
     options = {
-        'oauth.enabled': True,
-        'oauth.register': True,
-        'oauth.scope': None,
-        'oauth.client.id': CLIENT_ID,
-        'oauth.client.secret': CLIENT_SECRET,
-        'oauth.server.type': None,
-        'oauth.server.authorization_code': True,
-        'oauth.server.password': False,
-        'oauth.server.token_endpoint': 'http://oauth/token',
-        'oauth.server.auth_endpoint': 'http://oauth/auth',
-        'oauth.server.introspection_endpoint': 'http://oauth/introspect',
-        'oauth.profile.subject.attr': 'sub',
-        'oauth.profile.keyname.attr': None,
-        'oauth.profile.display_name.attr': None,
-        'oauth.profile.member_of.attr': None,
+        "oauth.enabled": True,
+        "oauth.register": True,
+        "oauth.scope": None,
+        "oauth.client.id": CLIENT_ID,
+        "oauth.client.secret": CLIENT_SECRET,
+        "oauth.server.type": None,
+        "oauth.server.authorization_code": True,
+        "oauth.server.password": False,
+        "oauth.server.token_endpoint": "http://oauth/token",
+        "oauth.server.auth_endpoint": "http://oauth/auth",
+        "oauth.server.introspection_endpoint": "http://oauth/introspect",
+        "oauth.profile.subject.attr": "sub",
+        "oauth.profile.keyname.attr": None,
+        "oauth.profile.display_name.attr": None,
+        "oauth.profile.member_of.attr": None,
     }
-    if hasattr(request, 'param'):
+    if hasattr(request, "param"):
         options.update(request.param)
 
     prev_helper = auth.oauth
     with auth.options.override(options):
-        auth.oauth = OAuthHelper(auth.options.with_prefix('oauth'))
+        auth.oauth = OAuthHelper(auth.options.with_prefix("oauth"))
         yield
     auth.oauth = prev_helper
 
 
-@pytest.fixture(scope='module', autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 def cleanup(ngw_env):
     existing = [row.id for row in DBSession.query(User.id)]
 
@@ -107,7 +107,8 @@ def server_response_mock():
         hooks.remove(hobj)
 
     with patch.object(
-        OAuthHelper, '_server_request',
+        OAuthHelper,
+        "_server_request",
         new=server_request_interceptor,
     ):
         yield add_hook
@@ -119,19 +120,23 @@ def freezegun():
         yield v
 
 
-@pytest.mark.parametrize('setup_oauth', [{
-    'oauth.profile.keyname.attr': 'preferred_username',
-    'oauth.profile.display_name.attr': 'first_name, last_name',
-}], indirect=['setup_oauth'])
+@pytest.mark.parametrize(
+    "setup_oauth",
+    [
+        {
+            "oauth.profile.keyname.attr": "preferred_username",
+            "oauth.profile.display_name.attr": "first_name, last_name",
+        }
+    ],
+    indirect=["setup_oauth"],
+)
 def test_update_profile(ngw_env, ngw_txn):
     u1 = User(oauth_subject=str(uuid4())).persist()
 
     with DBSession.no_autoflush:
-        ngw_env.auth.oauth._update_user(u1, {
-            "preferred_username": "john_doe",
-            "first_name": "John",
-            "last_name": "Doe"
-        })
+        ngw_env.auth.oauth._update_user(
+            u1, {"preferred_username": "john_doe", "first_name": "John", "last_name": "Doe"}
+        )
         DBSession.flush()
 
     assert u1.keyname == "john_doe"
@@ -139,11 +144,9 @@ def test_update_profile(ngw_env, ngw_txn):
 
     u2 = User(oauth_subject=str(uuid4())).persist()
     with DBSession.no_autoflush:
-        ngw_env.auth.oauth._update_user(u2, {
-            "preferred_username": "JOHN_DOE",
-            "first_name": "JOHN",
-            "last_name": "DOE"
-        })
+        ngw_env.auth.oauth._update_user(
+            u2, {"preferred_username": "JOHN_DOE", "first_name": "JOHN", "last_name": "DOE"}
+        )
         DBSession.flush()
 
     assert u2.keyname == "JOHN_DOE_2"
@@ -158,22 +161,26 @@ def test_update_profile(ngw_env, ngw_txn):
     assert u3.display_name == "u3"
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def principals():
     groups = (
-        ('test_group1', True),
-        ('Test_group2', False),
-        ('test_group3', True),
-        ('Test_group4', False),
+        ("test_group1", True),
+        ("Test_group2", False),
+        ("test_group3", True),
+        ("Test_group4", False),
     )
     with transaction.manager:
         user = User(
-            keyname='test_user',
-            display_name='Test member_of user',
-            oauth_subject=str(uuid4())
+            keyname="test_user",
+            display_name="Test member_of user",
+            oauth_subject=str(uuid4()),
         ).persist()
         for keyname, oauth_mapping in groups:
-            Group(keyname=keyname, display_name=keyname, oauth_mapping=oauth_mapping).persist()
+            Group(
+                keyname=keyname,
+                display_name=keyname,
+                oauth_mapping=oauth_mapping,
+            ).persist()
 
     yield
 
@@ -183,45 +190,51 @@ def principals():
             DBSession.delete(Group.filter_by(keyname=keyname).one())
 
 
-@pytest.mark.parametrize('setup_oauth, roles, result', [
-    ({'oauth.profile.member_of.attr': 'resource_access.{client_id}.roles'}, ) + line for line in [
-        ([], {'Test_group2'}),
-        (['Test_group3', 'test_group4'], {'Test_group2', 'test_group3'}),
-    ]
-], indirect=['setup_oauth'])
+@pytest.mark.parametrize(
+    "setup_oauth, roles, result",
+    [
+        ({"oauth.profile.member_of.attr": "resource_access.{client_id}.roles"},) + line
+        for line in [
+            ([], {"Test_group2"}),
+            (["Test_group3", "test_group4"], {"Test_group2", "test_group3"}),
+        ]
+    ],
+    indirect=["setup_oauth"],
+)
 def test_update_member_of(roles, result, ngw_env, ngw_txn, principals):
-    user = User.filter_by(keyname='test_user').one()
-    user.member_of = Group.filter(
-        Group.keyname.in_(('test_group1', 'Test_group2'))).all()
+    user = User.filter_by(keyname="test_user").one()
+    user.member_of = Group.filter(Group.keyname.in_(("test_group1", "Test_group2"))).all()
 
     with DBSession.no_autoflush:
-        ngw_env.auth.oauth._update_user(user, {
-            "resource_access": {
-                CLIENT_ID: {"roles": roles}
-            }
-        })
+        ngw_env.auth.oauth._update_user(user, {"resource_access": {CLIENT_ID: {"roles": roles}}})
 
     assert {g.keyname for g in user.member_of} == result
 
 
-@pytest.mark.parametrize('setup_oauth', [{
-    'oauth.profile.keyname.attr': 'preferred_username',
-    'oauth.profile.display_name.attr': 'family_name',
-}], indirect=['setup_oauth'])
+@pytest.mark.parametrize(
+    "setup_oauth",
+    [
+        {
+            "oauth.profile.keyname.attr": "preferred_username",
+            "oauth.profile.display_name.attr": "family_name",
+        }
+    ],
+    indirect=["setup_oauth"],
+)
 def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ngw_env):
-    options = ngw_env.auth.options.with_prefix('oauth')
+    options = ngw_env.auth.options.with_prefix("oauth")
 
     next_url = "http://localhost/some-location"
-    resp = ngw_webtest_app.get('/oauth', params=dict(next=next_url), status=302)
-    redirect = resp.headers['Location']
-    assert redirect.startswith(options['server.auth_endpoint'])
+    resp = ngw_webtest_app.get("/oauth", params=dict(next=next_url), status=302)
+    redirect = resp.headers["Location"]
+    assert redirect.startswith(options["server.auth_endpoint"])
     redirect_qs = dict(parse_qsl(urlsplit(redirect).query))
-    assert redirect_qs['response_type'] == 'code'
-    assert redirect_qs['redirect_uri'] == "http://localhost/oauth"
-    assert redirect_qs['client_id'] == CLIENT_ID
-    state_key = redirect_qs['state']
-    state = dict(parse_qsl(ngw_webtest_app.cookies[f'ngw-oastate-{state_key}']))
-    assert state['next_url'] == next_url
+    assert redirect_qs["response_type"] == "code"
+    assert redirect_qs["redirect_uri"] == "http://localhost/oauth"
+    assert redirect_qs["client_id"] == CLIENT_ID
+    state_key = redirect_qs["state"]
+    state = dict(parse_qsl(ngw_webtest_app.cookies[f"ngw-oastate-{state_key}"]))
+    assert state["next_url"] == next_url
 
     ouser1 = dict(
         sub=str(uuid4()),
@@ -250,29 +263,31 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
         start_tstamp = int(datetime.utcnow().timestamp())
         return dict(
             exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
-            sub=user['sub'],
-            name=user['name'],
-            first_name=user['first_name'],
-            family_name=user['family_name'],
-            preferred_username=user['keyname'],
-            active=user['active'],
+            sub=user["sub"],
+            name=user["name"],
+            first_name=user["first_name"],
+            family_name=user["family_name"],
+            preferred_username=user["keyname"],
+            active=user["active"],
         )
 
     with server_response_mock(
-        'token', dict(grant_type='authorization_code'),
+        "token",
+        dict(grant_type="authorization_code"),
         response=dict(
             access_token=access_token,
             expires_in=ACCESS_TOKEN_LIFETIME,
             refresh_token=refresh_token,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        )
+        ),
     ), server_response_mock(
-        'introspection', dict(token=access_token),
-        response=introspection_response(ouser1)
+        "introspection",
+        dict(token=access_token),
+        response=introspection_response(ouser1),
     ):
         cb_url = f"/oauth?state={state_key}&code={code}"
         resp = ngw_webtest_app.get(cb_url, status=302)
-        assert resp.headers['Location'] == next_url
+        assert resp.headers["Location"] == next_url
 
     # Access token will expire and have to be refreshed
     freezegun.tick(ACCESS_TOKEN_LIFETIME + 5)
@@ -281,18 +296,19 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     refresh_token_next = token_urlsafe(32)
 
     with server_response_mock(
-        'token', dict(grant_type='refresh_token', refresh_token=refresh_token),
+        "token",
+        dict(grant_type="refresh_token", refresh_token=refresh_token),
         response=dict(
             access_token=access_token_next,
             expires_in=ACCESS_TOKEN_LIFETIME,
             refresh_token=refresh_token_next,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        )
+        ),
     ):
-        user = ngw_webtest_app.get('/api/component/auth/current_user').json
-        assert user['keyname'] == ouser1['keyname']
-        assert user['auth_medium'] == 'session'
-        assert user['auth_provider'] == 'oauth_ac'
+        user = ngw_webtest_app.get("/api/component/auth/current_user").json
+        assert user["keyname"] == ouser1["keyname"]
+        assert user["auth_medium"] == "session"
+        assert user["auth_provider"] == "oauth_ac"
 
     access_token = access_token_next
     refresh_token = refresh_token_next
@@ -301,88 +317,112 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     freezegun.tick(REFRESH_TOKEN_LIFETIME + 5)
 
     with server_response_mock(
-        'token', dict(grant_type='refresh_token', refresh_token=refresh_token),
+        "token",
+        dict(grant_type="refresh_token", refresh_token=refresh_token),
         response=OAuthErrorResponse("expired"),
     ):
-        ngw_webtest_app.get('/api/component/auth/current_user')
+        ngw_webtest_app.get("/api/component/auth/current_user")
 
     # Local authentication of the created user
 
     with transaction.manager:
-        User.filter_by(id=user['id']).one().password = 'test-password'
+        User.filter_by(id=user["id"]).one().password = "test-password"
 
-    ngw_webtest_app.post('/api/component/auth/logout')
+    ngw_webtest_app.post("/api/component/auth/logout")
 
-    with patch.object(ngw_env.auth.oauth, 'local_auth', new=True):
-        ngw_webtest_app.post('/api/component/auth/login', dict(
-            login=user['keyname'], password='test-password'))
+    with patch.object(ngw_env.auth.oauth, "local_auth", new=True):
+        ngw_webtest_app.post(
+            "/api/component/auth/login",
+            dict(login=user["keyname"], password="test-password"),
+        )
 
-        user_auth_local = dict(user, auth_provider='local_pw')
-        assert ngw_webtest_app.get('/api/component/auth/current_user').json == user_auth_local
-        ngw_webtest_app.post('/api/component/auth/logout')
+        user_auth_local = dict(user, auth_provider="local_pw")
+        assert ngw_webtest_app.get("/api/component/auth/current_user").json == user_auth_local
+        ngw_webtest_app.post("/api/component/auth/logout")
 
     # Disable local authentication for OAuth users
 
-    with patch.object(ngw_env.auth.oauth, 'local_auth', new=False):
-        ngw_webtest_app.post('/api/component/auth/login', dict(
-            login=user['keyname'], password='test-password'), status=401)
+    with patch.object(ngw_env.auth.oauth, "local_auth", new=False):
+        ngw_webtest_app.post(
+            "/api/component/auth/login",
+            dict(login=user["keyname"], password="test-password"),
+            status=401,
+        )
 
     # Oauth password authentication
     access_token = token_urlsafe(32)
     refresh_token = token_urlsafe(32)
 
     with server_response_mock(
-        'token', dict(grant_type='password', username=ouser1['keyname'], password=ouser1['pwd']),
+        "token",
+        dict(grant_type="password", username=ouser1["keyname"], password=ouser1["pwd"]),
         dict(
             access_token=access_token,
             refresh_token=refresh_token,
             expires_in=ACCESS_TOKEN_LIFETIME,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        )
+        ),
     ), server_response_mock(
-        'introspection', dict(token=access_token), introspection_response(ouser1)
-    ), patch.object(ngw_env.auth.oauth, 'password', new=True):
-        ngw_webtest_app.post('/api/component/auth/login', dict(
-            login=ouser1['keyname'], password=ouser1['pwd']))
-        user_auth_provider = dict(user, auth_provider='oauth_pw')
-        assert ngw_webtest_app.get('/api/component/auth/current_user').json == user_auth_provider
-    ngw_webtest_app.post('/api/component/auth/logout')
+        "introspection",
+        dict(token=access_token),
+        introspection_response(ouser1),
+    ), patch.object(
+        ngw_env.auth.oauth, "password", new=True
+    ):
+        ngw_webtest_app.post(
+            "/api/component/auth/login",
+            dict(login=ouser1["keyname"], password=ouser1["pwd"]),
+        )
+        user_auth_provider = dict(user, auth_provider="oauth_pw")
+        assert ngw_webtest_app.get("/api/component/auth/current_user").json == user_auth_provider
+    ngw_webtest_app.post("/api/component/auth/logout")
 
     # Bearer authentication
-    ngw_webtest_app.authorization = ('Bearer', access_token)
+    ngw_webtest_app.authorization = ("Bearer", access_token)
 
-    user_auth_medium = dict(user, auth_medium='bearer')
-    assert ngw_webtest_app.get('/api/component/auth/current_user').json == user_auth_medium
+    user_auth_medium = dict(user, auth_medium="bearer")
+    assert ngw_webtest_app.get("/api/component/auth/current_user").json == user_auth_medium
 
     freezegun.tick(ACCESS_TOKEN_LIFETIME + 5)
-    assert ngw_webtest_app.get('/api/component/auth/current_user', status=401)
+    assert ngw_webtest_app.get("/api/component/auth/current_user", status=401)
 
     # Register user with bearer authentication
     access_token = token_urlsafe(32)
 
-    ngw_webtest_app.authorization = ('Bearer', access_token)
+    ngw_webtest_app.authorization = ("Bearer", access_token)
     with server_response_mock(
-        'introspection', dict(token=access_token), introspection_response(ouser2)
+        "introspection",
+        dict(token=access_token),
+        introspection_response(ouser2),
     ):
-        keyname = ngw_webtest_app.get('/api/component/auth/current_user').json['keyname']
+        keyname = ngw_webtest_app.get("/api/component/auth/current_user").json["keyname"]
         user2 = User.filter_by(keyname=keyname).one()
-        assert user2.display_name == ouser2['family_name'] + ' 2'
-        assert user2.oauth_subject == ouser2['sub']
+        assert user2.display_name == ouser2["family_name"] + " 2"
+        assert user2.oauth_subject == ouser2["sub"]
 
 
-@pytest.mark.parametrize('setup_oauth', [{
-    'oauth.scope': ['user.read', 'user.write'],
-}], indirect=['setup_oauth'])
-@pytest.mark.parametrize('scope, ok', (
-    (['user.read'], False),
-    (['user.read', 'user.write'], True),
-    (['user.write', 'user.read', 'other'], True),
-))
+@pytest.mark.parametrize(
+    "setup_oauth",
+    [
+        {
+            "oauth.scope": ["user.read", "user.write"],
+        }
+    ],
+    indirect=["setup_oauth"],
+)
+@pytest.mark.parametrize(
+    "scope, ok",
+    (
+        (["user.read"], False),
+        (["user.read", "user.write"], True),
+        (["user.write", "user.read", "other"], True),
+    ),
+)
 def test_scope(scope, ok, server_response_mock, ngw_webtest_app):
-    resp = ngw_webtest_app.get('/oauth', status=302)
-    redirect = resp.headers['Location']
+    resp = ngw_webtest_app.get("/oauth", status=302)
+    redirect = resp.headers["Location"]
     redirect_qs = dict(parse_qsl(urlsplit(redirect).query))
-    state_key = redirect_qs['state']
+    state_key = redirect_qs["state"]
 
     code = token_urlsafe(16)
     access_token = token_urlsafe(32)
@@ -390,32 +430,34 @@ def test_scope(scope, ok, server_response_mock, ngw_webtest_app):
 
     start_tstamp = int(datetime.utcnow().timestamp())
     with server_response_mock(
-        'token', dict(grant_type='authorization_code'),
+        "token",
+        dict(grant_type="authorization_code"),
         response=dict(
             access_token=access_token,
             expires_in=ACCESS_TOKEN_LIFETIME,
             refresh_token=refresh_token,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        )
+        ),
     ), server_response_mock(
-        'introspection', dict(token=access_token),
+        "introspection",
+        dict(token=access_token),
         response=dict(
             exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
-            sub='sub',
-            scope=' '.join(scope),
-        )
+            sub="sub",
+            scope=" ".join(scope),
+        ),
     ):
         cb_url = f"/oauth?state={state_key}&code={code}"
         ngw_webtest_app.get(cb_url, status=302 if ok else 401)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def disabled_local_user():
     with transaction.manager:
         user = User(
-            keyname='chapaev',
-            display_name='Chapaev V. I.',
-            password='pustota',
+            keyname="chapaev",
+            display_name="Chapaev V. I.",
+            password="pustota",
             disabled=True,
         ).persist()
         DBSession.flush()
@@ -426,44 +468,53 @@ def disabled_local_user():
         DBSession.delete(User.filter_by(id=user.id).one())
 
 
-@pytest.mark.parametrize('setup_oauth', [{
-    'oauth.server.password': True,
-}], indirect=['setup_oauth'])
-def test_password_token_basic(disabled_local_user, server_response_mock, freezegun, ngw_webtest_app):
+@pytest.mark.parametrize(
+    "setup_oauth",
+    [
+        {
+            "oauth.server.password": True,
+        }
+    ],
+    indirect=["setup_oauth"],
+)
+def test_password_token_basic(
+    disabled_local_user, server_response_mock, freezegun, ngw_webtest_app
+):
     access_token = token_urlsafe(32)
     refresh_token = token_urlsafe(32)
 
-    creds = dict(login='chapaev', password=token_urlsafe(4))
+    creds = dict(login="chapaev", password=token_urlsafe(4))
 
     def introspection_response():
         start_tstamp = int(datetime.utcnow().timestamp())
         return dict(
             exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-            sub='chapaev')
+            sub="chapaev",
+        )
 
     with server_response_mock(
-        'token', dict(
-            grant_type='password',
-            username=creds['login'],
-            password=creds['password'],
+        "token",
+        dict(
+            grant_type="password",
+            username=creds["login"],
+            password=creds["password"],
         ),
         response=dict(
             access_token=access_token,
             expires_in=ACCESS_TOKEN_LIFETIME,
             refresh_token=refresh_token,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        )
+        ),
     ), server_response_mock(
-        'introspection', dict(token=access_token),
-        response=introspection_response()
+        "introspection", dict(token=access_token), response=introspection_response()
     ):
-        ngw_webtest_app.authorization = ('Basic', tuple(creds.values()))
-        resp = ngw_webtest_app.get('/api/component/auth/current_user', creds).json
-        assert resp['keyname'] == 'chapaev_2'
+        ngw_webtest_app.authorization = ("Basic", tuple(creds.values()))
+        resp = ngw_webtest_app.get("/api/component/auth/current_user", creds).json
+        assert resp["keyname"] == "chapaev_2"
 
     # Check caching: it'll fail if server request occurs
-    ngw_webtest_app.get('/api/component/auth/current_user', creds)
+    ngw_webtest_app.get("/api/component/auth/current_user", creds)
 
     # Expire access token, refresh token will be used
     freezegun.tick(ACCESS_TOKEN_LIFETIME + 5)
@@ -472,19 +523,19 @@ def test_password_token_basic(disabled_local_user, server_response_mock, freezeg
     refresh_token_next = token_urlsafe(32)
 
     with server_response_mock(
-        'token', dict(grant_type='refresh_token', refresh_token=refresh_token),
+        "token",
+        dict(grant_type="refresh_token", refresh_token=refresh_token),
         response=dict(
             access_token=access_token_next,
             expires_in=ACCESS_TOKEN_LIFETIME,
             refresh_token=refresh_token_next,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        )
+        ),
     ), server_response_mock(
-        'introspection', dict(token=access_token_next),
-        response=introspection_response()
+        "introspection", dict(token=access_token_next), response=introspection_response()
     ):
-        resp = ngw_webtest_app.get('/api/component/auth/current_user', creds).json
-        assert resp['keyname'] == 'chapaev_2'
+        resp = ngw_webtest_app.get("/api/component/auth/current_user", creds).json
+        assert resp["keyname"] == "chapaev_2"
 
     # Expire refresh token, new token will be requested
     freezegun.tick(REFRESH_TOKEN_LIFETIME + 5)
@@ -493,51 +544,57 @@ def test_password_token_basic(disabled_local_user, server_response_mock, freezeg
     refresh_token_next = token_urlsafe(32)
 
     with server_response_mock(
-        'token', dict(grant_type='password'),
+        "token",
+        dict(grant_type="password"),
         response=dict(
             access_token=access_token_next,
             expires_in=ACCESS_TOKEN_LIFETIME,
             refresh_token=refresh_token_next,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        )
+        ),
     ), server_response_mock(
-        'introspection', dict(token=access_token_next),
-        response=introspection_response()
+        "introspection", dict(token=access_token_next), response=introspection_response()
     ):
-        resp = ngw_webtest_app.get('/api/component/auth/current_user', creds).json
-        assert resp['keyname'] == 'chapaev_2'
+        resp = ngw_webtest_app.get("/api/component/auth/current_user", creds).json
+        assert resp["keyname"] == "chapaev_2"
 
 
-@pytest.mark.parametrize('setup_oauth', [{
-    'oauth.server.password': True,
-}], indirect=['setup_oauth'])
+@pytest.mark.parametrize(
+    "setup_oauth",
+    [
+        {
+            "oauth.server.password": True,
+        }
+    ],
+    indirect=["setup_oauth"],
+)
 def test_password_token_session(server_response_mock, freezegun, ngw_webtest_app):
     access_token = token_urlsafe(32)
     refresh_token = token_urlsafe(32)
 
-    creds = dict(login='vasechkin', password=token_urlsafe(4))
+    creds = dict(login="vasechkin", password=token_urlsafe(4))
 
     def introspection_response():
         start_tstamp = int(datetime.utcnow().timestamp())
-        return dict(exp=start_tstamp + ACCESS_TOKEN_LIFETIME, sub='vasechkin')
+        return dict(exp=start_tstamp + ACCESS_TOKEN_LIFETIME, sub="vasechkin")
 
     with server_response_mock(
-        'token', dict(grant_type='password'),
+        "token",
+        dict(grant_type="password"),
         response=dict(
             access_token=access_token,
             expires_in=ACCESS_TOKEN_LIFETIME,
             refresh_token=refresh_token,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        )
+        ),
     ), server_response_mock(
-        'introspection', dict(token=access_token),
-        response=introspection_response()
+        "introspection", dict(token=access_token), response=introspection_response()
     ):
-        ngw_webtest_app.post('/api/component/auth/login', creds)
+        ngw_webtest_app.post("/api/component/auth/login", creds)
 
     # Check caching: it'll fail if server request occurs
-    ngw_webtest_app.post('/api/component/auth/logout', creds)
-    ngw_webtest_app.post('/api/component/auth/login', creds)
+    ngw_webtest_app.post("/api/component/auth/logout", creds)
+    ngw_webtest_app.post("/api/component/auth/login", creds)
 
     # Expire access token, refresh token will be used
     freezegun.tick(ACCESS_TOKEN_LIFETIME + 5)
@@ -546,23 +603,25 @@ def test_password_token_session(server_response_mock, freezegun, ngw_webtest_app
     refresh_token_next = token_urlsafe(32)
 
     with server_response_mock(
-        'token', dict(grant_type='refresh_token', refresh_token=refresh_token),
+        "token",
+        dict(grant_type="refresh_token", refresh_token=refresh_token),
         response=dict(
             access_token=access_token_next,
             expires_in=ACCESS_TOKEN_LIFETIME,
             refresh_token=refresh_token_next,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
-        )
+        ),
     ):
-        resp = ngw_webtest_app.get('/api/component/auth/current_user').json
-        assert resp['keyname'] == 'vasechkin'
+        resp = ngw_webtest_app.get("/api/component/auth/current_user").json
+        assert resp["keyname"] == "vasechkin"
 
     # Expire refresh token, user will be logged out
     freezegun.tick(REFRESH_TOKEN_LIFETIME + 5)
 
     with server_response_mock(
-        'token', dict(grant_type='refresh_token', refresh_token=refresh_token_next),
-        response=OAuthErrorResponse('expired'),
+        "token",
+        dict(grant_type="refresh_token", refresh_token=refresh_token_next),
+        response=OAuthErrorResponse("expired"),
     ):
-        resp = ngw_webtest_app.get('/api/component/auth/current_user').json
-        assert resp['keyname'] == 'guest'
+        resp = ngw_webtest_app.get("/api/component/auth/current_user").json
+        assert resp["keyname"] == "guest"

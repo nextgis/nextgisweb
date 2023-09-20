@@ -21,7 +21,8 @@ def authenticate(
     self: EnvCommand.customize(use_transaction=True),
     keyname: str = arg(metavar="user|group"),
     base_url: str = arg(),
-    *, auth: AuthComponent,
+    *,
+    auth: AuthComponent,
 ):
     """Impersonate an user via a link
 

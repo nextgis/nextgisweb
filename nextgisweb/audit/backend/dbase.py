@@ -44,7 +44,7 @@ class DatabaseBackend(BackendBase):
     def maintenance(self):
         super().maintenance()
         with transaction.manager:
-            ts = datetime.utcnow() - self.options['retention']
+            ts = datetime.utcnow() - self.options["retention"]
             q_delete = tab_journal.delete().where(tab_journal.c.tstamp < ts)
             DBSession.connection().execute(q_delete)
             mark_changed(DBSession())

@@ -13,8 +13,10 @@ def ngw_auth_administrator(ngw_pyramid_config):
 
     def _policy_authenticate(request):
         return AuthResult(
-            User.by_keyname('administrator').id,
-            AuthMedium.SESSION, AuthProvider.LOCAL_PW)
+            User.by_keyname("administrator").id,
+            AuthMedium.SESSION,
+            AuthProvider.LOCAL_PW,
+        )
 
-    with patch.object(policy, '_authenticate_request', _policy_authenticate):
+    with patch.object(policy, "_authenticate_request", _policy_authenticate):
         yield

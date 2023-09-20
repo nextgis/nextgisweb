@@ -36,16 +36,16 @@ from .util import log_lazy_data as lf
 
 
 class AuthProvider(Enum):
-    LOCAL_PW = 'local_pw'
-    OAUTH_AC = 'oauth_ac'
-    OAUTH_PW = 'oauth_pw'
-    INVITE = 'invite'
+    LOCAL_PW = "local_pw"
+    OAUTH_AC = "oauth_ac"
+    OAUTH_PW = "oauth_pw"
+    INVITE = "invite"
 
 
 class AuthMedium(Enum):
-    SESSION = 'session'
-    BASIC = 'basic'
-    BEARER = 'bearer'
+    SESSION = "session"
+    BASIC = "basic"
+    BEARER = "bearer"
 
 
 @dataclass
@@ -58,20 +58,16 @@ class AuthState:
     @classmethod
     def from_dict(cls, data):
         return cls(
-            prv=AuthProvider(data['prv']),
-            uid=data['uid'],
-            exp=data['exp'],
-            ref=data.get('ref'),
+            prv=AuthProvider(data["prv"]),
+            uid=data["uid"],
+            exp=data["exp"],
+            ref=data.get("ref"),
         )
 
     def to_dict(self):
-        result = dict(
-            prv=self.prv.value,
-            uid=self.uid,
-            exp=self.exp
-        )
+        result = dict(prv=self.prv.value, uid=self.uid, exp=self.exp)
         if self.ref is not None:
-            result['ref'] = self.ref
+            result["ref"] = self.ref
         return result
 
 
@@ -95,7 +91,6 @@ class OnUserLogin:
 
 @implementer(ISecurityPolicy)
 class SecurityPolicy:
-
     def __init__(self, comp, options):
         self.comp = comp
         self.options = options
@@ -110,7 +105,7 @@ class SecurityPolicy:
 
     def authenticated_userid(self, request):
         if aresult := self._authenticate_request(request):
-            request.environ['auth.result'] = aresult
+            request.environ["auth.result"] = aresult
             return aresult.uid
         return None
 
@@ -123,24 +118,24 @@ class SecurityPolicy:
         if tpair is None:
             prv = AuthProvider.LOCAL_PW
             now = current_tstamp()
-            exp = int(now + self.options['local.lifetime'].total_seconds())
-            ref = int(now + self.options['local.refresh'].total_seconds())
+            exp = int(now + self.options["local.lifetime"].total_seconds())
+            ref = int(now + self.options["local.refresh"].total_seconds())
         else:
             exp = tpair.access_exp
             ref = None
-            if tpair.grant_type == 'authorization_code':
+            if tpair.grant_type == "authorization_code":
                 prv = AuthProvider.OAUTH_AC
-            elif tpair.grant_type == 'password':
+            elif tpair.grant_type == "password":
                 prv = AuthProvider.OAUTH_PW
             else:
                 raise ValueError
 
         state = AuthState(prv, user_id, exp, ref)
-        session['auth.state'] = state.to_dict()
+        session["auth.state"] = state.to_dict()
 
         if tpair:
-            for k in ('access_token', 'refresh_token'):
-                sk = f'auth.{k}'
+            for k in ("access_token", "refresh_token"):
+                sk = f"auth.{k}"
                 v = getattr(tpair, k)
                 assert v is not None
                 session[sk] = v
@@ -149,9 +144,9 @@ class SecurityPolicy:
 
     def forget(self, request, **kw):
         def forget_session(request, response):
-            cookie_name = request.env.pyramid.options['session.cookie.name']
+            cookie_name = request.env.pyramid.options["session.cookie.name"]
             cs = WebSession.cookie_settings(request)
-            response.delete_cookie(cookie_name, path=cs['path'], domain=cs['domain'])
+            response.delete_cookie(cookie_name, path=cs["path"], domain=cs["domain"])
 
         request.add_response_callback(forget_session)
         return ()
@@ -162,8 +157,7 @@ class SecurityPolicy:
     # Addons
 
     def login(self, username, password, *, request):
-        user, _, tpair = self._validate_credentials(
-            username, password, return_tpair=True)
+        user, _, tpair = self._validate_credentials(username, password, return_tpair=True)
 
         if user.id is None:
             DBSession.flush()
@@ -177,8 +171,8 @@ class SecurityPolicy:
     def forget_user(self, user_id, request):
         SessionStore.filter(
             SessionStore.session_id != request.session.id,
-            SessionStore.key == 'auth.state',
-            SessionStore.value.op('->>')('uid').cast(sa.Integer) == user_id,
+            SessionStore.key == "auth.state",
+            SessionStore.value.op("->>")("uid").cast(sa.Integer) == user_id,
         ).delete(synchronize_session=False)
 
     # Internals
@@ -194,7 +188,7 @@ class SecurityPolicy:
 
     def _try_session(self, request, *, now):
         session = request.session
-        state_dict = session.get('auth.state')
+        state_dict = session.get("auth.state")
         if state_dict is None:
             return
         state = AuthState.from_dict(state_dict)
@@ -203,13 +197,14 @@ class SecurityPolicy:
             if state.exp <= now:
                 try:
                     tpair = self.oauth.grant_type_refresh_token(
-                        refresh_token=session['auth.refresh_token'],
-                        access_token=session['auth.access_token'])
+                        refresh_token=session["auth.refresh_token"],
+                        access_token=session["auth.access_token"],
+                    )
 
                     state.exp = tpair.access_exp
-                    session['auth.state'] = state.to_dict()
-                    session['auth.access_token'] = tpair.access_token
-                    session['auth.refresh_token'] = tpair.refresh_token
+                    session["auth.state"] = state.to_dict()
+                    session["auth.access_token"] = tpair.access_token
+                    session["auth.refresh_token"] = tpair.refresh_token
                 except OAuthATokenRefreshException:
                     self.forget(request)
                     return None
@@ -221,29 +216,29 @@ class SecurityPolicy:
                 return None
 
             if state.ref <= now:
-                state.exp = now + int(self.options['local.lifetime'].total_seconds())
-                state.ref = now + int(self.options['local.refresh'].total_seconds())
-                session['auth.state'] = state.to_dict()
+                state.exp = now + int(self.options["local.lifetime"].total_seconds())
+                state.ref = now + int(self.options["local.refresh"].total_seconds())
+                session["auth.state"] = state.to_dict()
 
             return AuthResult(state.uid, AuthMedium.SESSION, state.prv)
 
         raise ValueError("Invalid authentication source")
 
     def _try_headers(self, request, *, now):
-        ahead = request.headers.get('Authorization')
+        ahead = request.headers.get("Authorization")
         if ahead is None:
             return None
 
         try:
-            amode, value = ahead.split(' ', maxsplit=1)
+            amode, value = ahead.split(" ", maxsplit=1)
         except ValueError:
             raise InvalidAuthorizationHeader()
         amode = amode.lower()
 
-        if amode == 'basic':
+        if amode == "basic":
             try:
-                decoded = b64decode(value).decode('utf-8')
-                username, password = decoded.split(':', maxsplit=1)
+                decoded = b64decode(value).decode("utf-8")
+                username, password = decoded.split(":", maxsplit=1)
             except ValueError:
                 raise InvalidAuthorizationHeader()
 
@@ -252,7 +247,7 @@ class SecurityPolicy:
                 DBSession.flush()
             return AuthResult(user.id, AuthMedium.BASIC, prv)
 
-        elif amode == 'bearer' and self.oauth is not None:
+        elif amode == "bearer" and self.oauth is not None:
             atoken = self.oauth.query_introspection(value)
             if atoken is not None:
                 if atoken.exp < now:
@@ -274,8 +269,9 @@ class SecurityPolicy:
 
         # Step 1: Authentication with local credentials
 
-        q = User.filter(sa.func.lower(User.keyname) == username.lower()) \
-            .options(load_only(User.password_hash, User.disabled))
+        q = User.filter(sa.func.lower(User.keyname) == username.lower()).options(
+            load_only(User.password_hash, User.disabled)
+        )
 
         if self.oauth and not self.oauth.local_auth:
             q = q.filter_by(oauth_subject=None)
@@ -295,10 +291,10 @@ class SecurityPolicy:
 
         if user is None and self.oauth is not None and self.oauth.password:
             ptoken, atoken = self.oauth.authorize_credentials(
-                username, password, return_tpair=return_tpair)
+                username, password, return_tpair=return_tpair
+            )
 
             if ptoken is not None:
-
                 # An atoken may or may not be loaded by authorize_credentials,
                 # so do lazy atoken introspection. If it wasn't fetched by
                 # authorize_credentials, it will be fetched as needed.
@@ -309,8 +305,10 @@ class SecurityPolicy:
                     return atoken
 
                 user = self.oauth.access_token_to_user(
-                    atoken=_get_atoken, from_existing=ptoken.user,
-                    min_oauth_tstamp=datetime.fromtimestamp(ptoken.tstamp))
+                    atoken=_get_atoken,
+                    from_existing=ptoken.user,
+                    min_oauth_tstamp=datetime.fromtimestamp(ptoken.tstamp),
+                )
 
                 if ptoken.user is None:
                     ptoken.user = user
@@ -319,23 +317,21 @@ class SecurityPolicy:
 
                 if return_tpair:
                     tpair = OAuthGrantResponse(
-                        grant_type='password',
+                        grant_type="password",
                         access_token=ptoken.access_token,
                         access_exp=ptoken.access_exp,
                         refresh_token=ptoken.refresh_token,
-                        refresh_exp=ptoken.refresh_exp)
+                        refresh_exp=ptoken.refresh_exp,
+                    )
 
         if user is None:
             raise InvalidCredentialsException()
 
         return (user, prv, tpair)
 
-    # Options
-
+    # fmt: off
     option_annotations = OptionAnnotations((
-        Option('local.lifetime', timedelta, default=timedelta(days=1),
-               doc="Local authentication lifetime."),
-
-        Option('local.refresh', timedelta, default=timedelta(hours=1),
-               doc="Refresh local authentication lifetime interval.")
+        Option("local.lifetime", timedelta, default=timedelta(days=1), doc="Local authentication lifetime."),
+        Option("local.refresh", timedelta, default=timedelta(hours=1), doc="Refresh local authentication lifetime interval."),
     ))
+    # fmt: on

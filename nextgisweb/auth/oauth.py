@@ -31,23 +31,22 @@ MAX_TOKEN_LENGTH = 250
 
 
 class OAuthHelper:
-
     def __init__(self, options):
         self.options = options
         self._apply_server_type()
 
-        self.authorization_code = options['server.authorization_code']
-        self.password = options['server.password']
-        self.local_auth = options['local_auth']
+        self.authorization_code = options["server.authorization_code"]
+        self.password = options["server.password"]
+        self.local_auth = options["local_auth"]
 
         self.server_headers = {}
-        if 'server.authorization_header' in options:
-            self.server_headers['Authorization'] = options['server.authorization_header']
+        if "server.authorization_header" in options:
+            self.server_headers["Authorization"] = options["server.authorization_header"]
 
     def _apply_server_type(self):
         options = self.options
 
-        stype = options['server.type']
+        stype = options["server.type"]
         if stype is None:
             return
 
@@ -55,48 +54,45 @@ class OAuthHelper:
             if k not in options:
                 options[k] = value
 
-        base_url = options['server.base_url'].rstrip('/')
+        base_url = options["server.base_url"].rstrip("/")
 
-        if stype == 'nextgisid':
+        if stype == "nextgisid":
             oauth_url = f"{base_url}/oauth2"
-            _set('server.display_name', "NextGIS ID")
-            _set('server.token_endpoint', f"{oauth_url}/token/")
-            _set('server.auth_endpoint', f"{oauth_url}/authorize/")
-            _set('server.introspection_endpoint', f"{oauth_url}/introspect/")
-            _set('profile.subject.attr', 'sub')
-            _set('profile.keyname.attr', 'username')
-            _set('profile.display_name.attr', 'first_name, last_name')
+            _set("server.display_name", "NextGIS ID")
+            _set("server.token_endpoint", f"{oauth_url}/token/")
+            _set("server.auth_endpoint", f"{oauth_url}/authorize/")
+            _set("server.introspection_endpoint", f"{oauth_url}/introspect/")
+            _set("profile.subject.attr", "sub")
+            _set("profile.keyname.attr", "username")
+            _set("profile.display_name.attr", "first_name, last_name")
 
-        elif stype == 'keycloak':
+        elif stype == "keycloak":
             oidc_url = f"{base_url}/protocol/openid-connect"
-            _set('server.token_endpoint', f"{oidc_url}/token")
-            _set('server.auth_endpoint', f"{oidc_url}/auth")
-            _set('server.introspection_endpoint', f"{oidc_url}/token/introspect")
-            _set('profile.subject.attr', 'sub')
-            _set('profile.keyname.attr', 'preferred_username')
-            _set('profile.display_name.attr', 'name')
-            _set('profile.member_of.attr', 'resource_access.{client_id}.roles')
+            _set("server.token_endpoint", f"{oidc_url}/token")
+            _set("server.auth_endpoint", f"{oidc_url}/auth")
+            _set("server.introspection_endpoint", f"{oidc_url}/token/introspect")
+            _set("profile.subject.attr", "sub")
+            _set("profile.keyname.attr", "preferred_username")
+            _set("profile.display_name.attr", "name")
+            _set("profile.member_of.attr", "resource_access.{client_id}.roles")
 
         else:
             raise ValueError(f"Invalid value: {stype}")
 
     def authorization_code_url(self, redirect_uri, **kwargs):
-        qs = dict(
-            response_type='code',
-            redirect_uri=redirect_uri,
-            **kwargs)
+        qs = dict(response_type="code", redirect_uri=redirect_uri, **kwargs)
 
-        if client_id := self.options.get('client.id'):
-            qs['client_id'] = client_id
-        if scope := self.options.get('scope'):
-            qs['scope'] = ' '.join(scope)
+        if client_id := self.options.get("client.id"):
+            qs["client_id"] = client_id
+        if scope := self.options.get("scope"):
+            qs["scope"] = " ".join(scope)
 
-        return self.options['server.auth_endpoint'] + '?' + urlencode(qs)
+        return self.options["server.auth_endpoint"] + "?" + urlencode(qs)
 
     def authorize_credentials(self, username, password, *, return_tpair=False):
         now = current_tstamp()
 
-        client_id = self.options.get('client.id')
+        client_id = self.options.get("client.id")
         ptoken_id = _password_token_hash_cache(username, password, client_id)
 
         atoken, tpair = None, None
@@ -107,17 +103,26 @@ class OAuthHelper:
                 OAuthPToken.tstamp,
                 OAuthPToken.access_exp,
                 OAuthPToken.user_id,
-            ] + ([
-                OAuthPToken.access_token,
-                OAuthPToken.refresh_token,
-                OAuthPToken.refresh_exp,
-            ] if return_tpair else [])
+            ] + (
+                [
+                    OAuthPToken.access_token,
+                    OAuthPToken.refresh_token,
+                    OAuthPToken.refresh_exp,
+                ]
+                if return_tpair
+                else []
+            )
 
-            query = DBSession.query(OAuthPToken).options(
-                load_only(*attrs),
-            ).where(OAuthPToken.id == ptoken_id).options(
-                joinedload(OAuthPToken.user).options(
-                    load_only(User.keyname, User.oauth_tstamp)
+            query = (
+                DBSession.query(OAuthPToken)
+                .options(
+                    load_only(*attrs),
+                )
+                .where(OAuthPToken.id == ptoken_id)
+                .options(
+                    joinedload(OAuthPToken.user).options(
+                        load_only(User.keyname, User.oauth_tstamp)
+                    )
                 )
             )
 
@@ -126,7 +131,11 @@ class OAuthHelper:
 
             logger.debug(
                 "OAuthPToken(%s): bound to User(id=%d, keyname=%s), %s",
-                lf(ptoken_id), user.id, user.keyname, _lf_exp((ptoken, now)))
+                lf(ptoken_id),
+                user.id,
+                user.keyname,
+                _lf_exp((ptoken, now)),
+            )
 
         except NoResultFound:
             logger.debug("OAuthPToken(%s) not found", lf(ptoken_id))
@@ -183,68 +192,77 @@ class OAuthHelper:
 
     def grant_type_password(self, username, password):
         params = dict(username=username, password=password)
-        if scope := self.options.get('scope'):
-            params['scope'] = ' '.join(scope)
+        if scope := self.options.get("scope"):
+            params["scope"] = " ".join(scope)
 
         try:
-            return self._token_request('password', params)
+            return self._token_request("password", params)
         except OAuthErrorResponse as exc:
             logger.warning("Password grant type failed: %s", exc.code)
             raise OAuthPasswordGrantTypeException()
 
     def grant_type_authorization_code(self, code, redirect_uri):
-        return self._token_request('authorization_code', dict(
-            redirect_uri=redirect_uri, code=code))
+        return self._token_request(
+            "authorization_code", dict(redirect_uri=redirect_uri, code=code)
+        )
 
     def grant_type_refresh_token(self, refresh_token, access_token):
         try:
-            return self._token_request('refresh_token', dict(
-                refresh_token=refresh_token,
-                access_token=access_token))
+            return self._token_request(
+                "refresh_token", dict(refresh_token=refresh_token, access_token=access_token)
+            )
         except OAuthErrorResponse as exc:
             logger.warning("Token refresh failed: %s", exc.code)
             raise OAuthATokenRefreshException()
 
     def query_introspection(self, access_token):
         if len(access_token) > MAX_TOKEN_LENGTH:
-            token_id = 'sha512:' + sha512(access_token.encode('utf-8')).hexdigest()
+            token_id = "sha512:" + sha512(access_token.encode("utf-8")).hexdigest()
         else:
-            token_id = 'raw:' + access_token
+            token_id = "raw:" + access_token
 
         with DBSession.no_autoflush:
-            atoken = OAuthAToken.filter_by(id=token_id).options(
-                defer(OAuthAToken.data),
-            ).first()
+            atoken = (
+                OAuthAToken.filter_by(id=token_id)
+                .options(
+                    defer(OAuthAToken.data),
+                )
+                .first()
+            )
 
         if atoken is not None:
             logger.debug("OAuthAToken(%s): read from cache", lf(access_token))
         else:
             try:
-                tdata = self._server_request('introspection', dict(token=access_token))
+                tdata = self._server_request("introspection", dict(token=access_token))
             except OAuthErrorResponse as exc:
                 logger.warning("Token verification failed: %s", exc.code)
                 return None  # TODO: Use custom exception here instead of None
 
-            if self.options.get('scope') is not None:
-                token_scope = set(tdata['scope'].split(' ')) if 'scope' in tdata else set()
-                if (not set(self.options['scope']).issubset(token_scope)):
+            if self.options.get("scope") is not None:
+                token_scope = set(tdata["scope"].split(" ")) if "scope" in tdata else set()
+                if not set(self.options["scope"]).issubset(token_scope):
                     raise InvalidScopeException()
 
-            stmt = pg_insert(OAuthAToken).values([dict(
-                id=token_id,
-                exp=int(tdata['exp']),
-                sub=str(tdata[self.options['profile.subject.attr']]),
-                data=tdata,
-            )])
+            stmt = pg_insert(OAuthAToken).values(
+                [
+                    dict(
+                        id=token_id,
+                        exp=int(tdata["exp"]),
+                        sub=str(tdata[self.options["profile.subject.attr"]]),
+                        data=tdata,
+                    )
+                ]
+            )
             stmt = stmt.on_conflict_do_update(
                 index_elements=[OAuthAToken.id],
-                set_=dict(
-                    exp=stmt.excluded.exp,
-                    sub=stmt.excluded.sub,
-                    data=stmt.excluded.data)
+                set_=dict(exp=stmt.excluded.exp, sub=stmt.excluded.sub, data=stmt.excluded.data),
             ).returning(OAuthAToken)
-            stmt = sa.select(OAuthAToken).from_statement(stmt). \
-                execution_options(populate_existing=True)
+            stmt = (
+                sa.select(OAuthAToken)
+                .from_statement(stmt)
+                .execution_options(populate_existing=True)
+            )
 
             with DBSession.no_autoflush:
                 atoken = DBSession.execute(stmt).scalar()
@@ -254,7 +272,9 @@ class OAuthHelper:
         return atoken
 
     def access_token_to_user(
-        self, atoken, *,
+        self,
+        atoken,
+        *,
         bind_user=None,
         from_existing=None,
         min_oauth_tstamp=None,
@@ -266,25 +286,32 @@ class OAuthHelper:
             return atoken
 
         with DBSession.no_autoflush:
-            user = User.filter_by(oauth_subject=_atoken().sub).options(
-                load_only(User.id, User.oauth_tstamp, User.oauth_subject),
-            ).first() if from_existing is None else from_existing
+            user = (
+                User.filter_by(oauth_subject=_atoken().sub)
+                .options(
+                    load_only(User.id, User.oauth_tstamp, User.oauth_subject),
+                )
+                .first()
+                if from_existing is None
+                else from_existing
+            )
 
             if bind_user is not None:
                 if user is not None and user.id != bind_user.id:
-                    dn = self.options['server.display_name']
+                    dn = self.options["server.display_name"]
                     raise AuthorizationException(
                         title=_("{} binding error").format(dn),
                         message=_(
                             "This {dn} account ({sub}) is already bound to "
                             "the different user ({id}). Log in using this "
                             "account instead of binding it."
-                        ).format(dn=dn, sub=_atoken().sub, id=user.id))
+                        ).format(dn=dn, sub=_atoken().sub, id=user.id),
+                    )
                 user = bind_user
 
             if user is None:
                 # Register new user with default groups
-                if self.options['register']:
+                if self.options["register"]:
                     user = User(oauth_subject=_atoken().sub).persist()
                     env.auth.check_user_limit()
                     user.member_of = Group.filter_by(register=True).all()
@@ -295,14 +322,14 @@ class OAuthHelper:
 
             if user.oauth_tstamp is not None and (
                 (min_oauth_tstamp and user.oauth_tstamp > min_oauth_tstamp)
-                or (user.oauth_tstamp + self.options['profile.sync_timedelta']) > datetime.utcnow()
+                or (user.oauth_tstamp + self.options["profile.sync_timedelta"]) > datetime.utcnow()
             ):
                 return user  # Just skip profile synchronization
             elif bind_user is None:
                 if user.id is not None:
                     logger.debug(
-                        "User(id=%d, keyname=%s): updating from token",
-                        user.id, user.keyname)
+                        "User(id=%d, keyname=%s): updating from token", user.id, user.keyname
+                    )
                 self._update_user(user, _atoken().data)
 
             user.oauth_tstamp = datetime.utcnow()
@@ -313,28 +340,33 @@ class OAuthHelper:
         return user
 
     def _server_request(self, endpoint, params):
-        url = self.options['server.{}_endpoint'.format(endpoint)]
-        method = self.options.get('server.{}_method'.format(endpoint), 'POST').lower()
-        timeout = self.options['timeout'].total_seconds()
+        url = self.options["server.{}_endpoint".format(endpoint)]
+        method = self.options.get("server.{}_method".format(endpoint), "POST").lower()
+        timeout = self.options["timeout"].total_seconds()
 
         params = dict(params)
 
-        if client_id := self.options.get('client.id'):
-            params['client_id'] = client_id
-        if client_secret := self.options.get('client.secret'):
-            params['client_secret'] = client_secret
+        if client_id := self.options.get("client.id"):
+            params["client_id"] = client_id
+        if client_secret := self.options.get("client.secret"):
+            params["client_secret"] = client_secret
 
         log_reqid = token_hex(4)
         logger.debug("Request(%s): > %s %s", log_reqid, method.upper(), url)
         logger.debug("Request(%s): > %s", log_reqid, lf(params))
 
         response = getattr(requests, method.lower())(
-            url, params, headers=self.server_headers, timeout=timeout)
+            url, params, headers=self.server_headers, timeout=timeout
+        )
 
         logger.debug(
-            "Request(%s): < %d %s; %d bytes; %s", log_reqid,
-            response.status_code, response.reason, len(response.content),
-            response.headers.get('content-type'))
+            "Request(%s): < %d %s; %d bytes; %s",
+            log_reqid,
+            response.status_code,
+            response.reason,
+            len(response.content),
+            response.headers.get("content-type"),
+        )
 
         try:
             result = response.json()
@@ -343,7 +375,7 @@ class OAuthHelper:
             raise OAuthInvalidResponse("JSON decode error")
 
         if not (200 <= response.status_code <= 299):
-            error = result.get('error')
+            error = result.get("error")
             if error is None or not isinstance(error, str):
                 raise OAuthInvalidResponse("Error key missing")
             raise OAuthErrorResponse(error)
@@ -351,23 +383,26 @@ class OAuthHelper:
         return result
 
     def _token_request(self, grant_type, params):
-        data = self._server_request('token', dict(grant_type=grant_type, **params))
+        data = self._server_request("token", dict(grant_type=grant_type, **params))
         now = current_tstamp()
         return OAuthGrantResponse(
             grant_type=grant_type,
-            access_token=data['access_token'],
-            access_exp=now + int(data['expires_in']),
-            refresh_token=data['refresh_token'],
-            refresh_exp=now + int(
-                data['refresh_expires_in'] if 'refresh_expires_in' in data
-                else self.options['server.refresh_expires_in'].total_seconds()
-            ))
+            access_token=data["access_token"],
+            access_exp=now + int(data["expires_in"]),
+            refresh_token=data["refresh_token"],
+            refresh_exp=now
+            + int(
+                data["refresh_expires_in"]
+                if "refresh_expires_in" in data
+                else self.options["server.refresh_expires_in"].total_seconds()
+            ),
+        )
 
     def _update_user(self, user, tdata):
-        opts = self.options.with_prefix('profile')
+        opts = self.options.with_prefix("profile")
 
-        if user.keyname is None or not opts['keyname.no_update']:
-            profile_keyname = opts.get('keyname.attr', None)
+        if user.keyname is None or not opts["keyname.no_update"]:
+            profile_keyname = opts.get("keyname.attr", None)
             if profile_keyname is not None:
                 user.keyname = tdata[profile_keyname]
 
@@ -376,34 +411,37 @@ class OAuthHelper:
             for idx in itertools.count():
                 candidate = clean_user_keyname(keyname_base)
                 candidate = enum_name(candidate, idx, sep="_")
-                if User.filter(
-                    sa.func.lower(User.keyname) == candidate.lower(),
-                    User.id != user.id
-                ).first() is None:
+                if (
+                    User.filter(
+                        sa.func.lower(User.keyname) == candidate.lower(), User.id != user.id
+                    ).first()
+                    is None
+                ):
                     user.keyname = candidate
                     break
 
-        if user.display_name is None or not opts['display_name.no_update']:
-            profile_display_name = opts.get('display_name.attr', None)
+        if user.display_name is None or not opts["display_name.no_update"]:
+            profile_display_name = opts.get("display_name.attr", None)
             if profile_display_name is not None:
-                user.display_name = ' '.join([
-                    tdata[key]
-                    for key in re.split(r',\s*', profile_display_name)
-                    if key in tdata])
+                user.display_name = " ".join(
+                    [tdata[key] for key in re.split(r",\s*", profile_display_name) if key in tdata]
+                )
 
             display_name_base = _fallback_value(user.display_name, user.keyname)
             for idx in itertools.count():
                 candidate = enum_name(display_name_base, idx, sep=" ")
-                if User.filter(
-                    sa.func.lower(User.display_name) == candidate.lower(),
-                    User.id != user.id
-                ).first() is None:
+                if (
+                    User.filter(
+                        sa.func.lower(User.display_name) == candidate.lower(), User.id != user.id
+                    ).first()
+                    is None
+                ):
                     user.display_name = candidate
                     break
 
         # Group membership (member_of)
-        if (mof_attr := opts['member_of.attr']) is not None:
-            mof_attr_sub = mof_attr.format(client_id=self.options['client.id'])
+        if (mof_attr := opts["member_of.attr"]) is not None:
+            mof_attr_sub = mof_attr.format(client_id=self.options["client.id"])
             try:
                 mof = _member_of_from_token(tdata, mof_attr_sub)
             except ValueError:
@@ -411,8 +449,10 @@ class OAuthHelper:
                 mof = set()
             else:
                 logger.debug(
-                    "Token groups for user '%s': %s", user.keyname,
-                    ', '.join(f"'{m}'" for m in mof))
+                    "Token groups for user '%s': %s",
+                    user.keyname,
+                    ", ".join(f"'{m}'" for m in mof),
+                )
 
             for group in list(user.member_of):
                 if not group.oauth_mapping:
@@ -426,117 +466,77 @@ class OAuthHelper:
                     user.member_of.remove(group)
 
             if len(mof) > 0:
-                grp_add = Group.filter(Group.oauth_mapping, sa.func.lower(
-                    Group.keyname).in_(mof)).all()
+                grp_add = Group.filter(
+                    Group.oauth_mapping, sa.func.lower(Group.keyname).in_(mof)
+                ).all()
                 if len(grp_add) > 0:
                     logger.info(
-                        "Adding user '%s' into groups: %s.", user.keyname,
-                        ', '.join(f"'{g.keyname}'" for g in grp_add))
+                        "Adding user '%s' into groups: %s.",
+                        user.keyname,
+                        ", ".join(f"'{g.keyname}'" for g in grp_add),
+                    )
                     user.member_of.extend(grp_add)
                 if len(grp_add) != len(mof):
                     miss = mof.difference(set(g.keyname.lower() for g in grp_add))
                     logger.warning(
-                        "Unmatched groups for user '%s': %s.", user.keyname,
-                        ', '.join(f"'{m}'" for m in miss))
+                        "Unmatched groups for user '%s': %s.",
+                        user.keyname,
+                        ", ".join(f"'{m}'" for m in miss),
+                    )
 
+    # fmt: off
     option_annotations = OptionAnnotations((
-        Option('enabled', bool, default=False,
-               doc="Enable OAuth authentication."),
-
-        Option('default', bool, default=False, doc=(
+        Option("enabled", bool, default=False, doc="Enable OAuth authentication."),
+        Option("default", bool, default=False, doc=(
             "Use OAuth authentication by default. Unauthenticated user viewing "
             "forbidden page will be redirected to OAuth server without showing "
             "login dialog. Login dialog will be available at /login URL.")),
+        Option("register", bool, default=True, doc="Allow registering new users via OAuth."),
+        Option("local_auth", bool, default=True, doc="Allow authentication with local password for OAuth users."),
+        Option("bind", bool, default=True, doc="Allow binding local user to OAuth user."),
+        Option("scope", list, default=None, doc="OAuth scopes"),
 
-        Option('register', bool, default=True,
-               doc="Allow registering new users via OAuth."),
+        Option("client.id", default=None, doc="OAuth client ID"),
+        Option("client.secret", default=None, secure=True, doc="OAuth client secret"),
 
-        Option('local_auth', bool, default=True,
-               doc="Allow authentication with local password for OAuth users."),
+        Option("server.type", default=None, doc="OAuth server: nextgisid or keycloak (requires base URL)."),
+        Option("server.base_url", doc=(
+                "OAuth server base URL. For NextGIS ID - https://nextgisid, "
+                "for Keycloak - https://keycloak/auth/realms/master.")),
+        Option("server.display_name", default="OAuth"),
+        Option("server.authorization_code", bool, default=True, doc="Use authorization code grant type."),
+        Option("server.password", bool, default=False, doc="Use password grant type."),
+        Option("server.token_endpoint", doc="OAuth token endpoint URL."),
+        Option("server.token_method", default="POST", doc="Workaround for NGID OAuth implementation."),
+        Option("server.introspection_endpoint", default=None, doc="OAuth token introspection endpoint URL."),
+        Option("server.introspection_method", default="POST", doc="Workaround for NGID OAuth implementation."),
+        Option("server.auth_endpoint", default=None, doc="OAuth authorization code endpoint URL."),
+        Option("server.authorization_header", default=None, doc="Add Authorization HTTP header to requests to OAuth server."),
+        Option("server.refresh_expires_in", timedelta, default=timedelta(days=7), doc=(
+            "Default refresh token expiration (if not set by OAuth server).")),
+        Option("server.logout_endpoint", default=None, doc="OAuth logout endpoint URL."),
+        Option("profile.endpoint", default=None, doc="OpenID Connect endpoint URL"),
 
-        Option('bind', bool, default=True,
-               doc="Allow binding local user to OAuth user."),
-
-        Option('scope', list, default=None,
-               doc="OAuth scopes"),
-
-        Option('client.id', default=None,
-               doc="OAuth client ID"),
-
-        Option('client.secret', default=None, secure=True,
-               doc="OAuth client secret"),
-
-        Option('server.type', default=None, doc=(
-            "OAuth server: nextgisid or keycloak (requires base URL).")),
-
-        Option('server.base_url', doc=(
-            "OAuth server base URL. For NextGIS ID - https://nextgisid, "
-            "for Keycloak - https://keycloak/auth/realms/master.")),
-
-        Option('server.display_name', default='OAuth'),
-
-        Option('server.authorization_code', bool, default=True,
-               doc="Use authorization code grant type."),
-
-        Option('server.password', bool, default=False,
-               doc="Use password grant type."),
-
-        Option('server.token_endpoint',
-               doc="OAuth token endpoint URL."),
-
-        Option('server.token_method', default='POST',
-               doc="Workaround for NGID OAuth implementation."),
-
-        Option('server.introspection_endpoint', default=None,
-               doc="OAuth token introspection endpoint URL."),
-
-        Option('server.introspection_method', default='POST',
-               doc="Workaround for NGID OAuth implementation."),
-
-        Option('server.auth_endpoint', default=None,
-               doc="OAuth authorization code endpoint URL."),
-
-        Option('server.authorization_header', default=None,
-               doc="Add Authorization HTTP header to requests to OAuth server."),
-
-        Option('server.refresh_expires_in', timedelta, default=timedelta(days=7),
-               doc="Default refresh token expiration (if not set by OAuth server)."),
-
-        Option('server.logout_endpoint', default=None,
-               doc="OAuth logout endpoint URL."),
-
-        Option('profile.endpoint', default=None,
-               doc="OpenID Connect endpoint URL"),
-
-        Option('profile.subject.attr', default='sub',
-               doc="OAuth profile subject identifier"),
-
-        Option('profile.keyname.attr', default='preferred_username',
-               doc="OAuth profile keyname (user name)"),
-        Option('profile.keyname.no_update', bool, default=False,
-               doc="Turn off keyname secondary synchronization"),
-
-        Option('profile.display_name.attr', default='name',
-               doc="OAuth profile display name"),
-        Option('profile.display_name.no_update', bool, default=False,
-               doc="Turn off display_name secondary synchronization"),
-
-        Option('profile.member_of.attr', default=None, doc=(
+        Option("profile.subject.attr", default="sub", doc="OAuth profile subject identifier"),
+        Option("profile.keyname.attr", default="preferred_username", doc="OAuth profile keyname (user name)"),
+        Option("profile.keyname.no_update", bool, default=False, doc="Turn off keyname secondary synchronization"),
+        Option("profile.display_name.attr", default="name", doc="OAuth profile display name"),
+        Option("profile.display_name.no_update", bool, default=False, doc="Turn off display_name secondary synchronization"),
+        Option("profile.member_of.attr", default=None, doc=(
             "OAuth group attribute used for automatic group assignment. Users "
             "get membership in groups with keynames that match the values of "
             "the attribute and have OAuth mapping flag. Supports dots and "
             "{client_id} substitution (like 'resource_access.{client_id}.roles' "
             "for Keycloak integration).")),
+        Option("profile.sync_timedelta", timedelta, default=timedelta(minutes=5), doc=(
+            "Minimum time delta between profile synchronization with OAuth server.")),
 
-        Option('profile.sync_timedelta', timedelta, default=timedelta(minutes=5),
-               doc="Minimum time delta between profile synchronization with OAuth server."),
-
-        Option('timeout', timedelta, default=timedelta(seconds=15), doc="OAuth server request timeout."),
+        Option("timeout", timedelta, default=timedelta(seconds=15), doc="OAuth server request timeout."),
     ))
+    # fmt: on
 
 
 class OnAccessTokenToUser:
-
     def __init__(self, user, profile):
         self._user = user
         self._profile = profile
@@ -565,9 +565,13 @@ def _password_token_hash_cache(username, password, salt):
     # Each proccess will have each own password hashes and pairs of tokens.
 
     # Setting rounds to 5000 removes the rounds number form hashed.
-    return "".join(sha256_crypt.using(salt=salt[:16], rounds=5000).hash(
-        f"{username}:{password}",
-    ).split("$")[-2:]).replace('.', '')
+    return "".join(
+        sha256_crypt.using(salt=salt[:16], rounds=5000)
+        .hash(
+            f"{username}:{password}",
+        )
+        .split("$")[-2:]
+    ).replace(".", "")
 
 
 class OAuthInvalidResponse(Exception):
@@ -612,16 +616,14 @@ class OAuthAccessTokenExpiredException(UserException):
 
 def _fallback_value(*args):
     for a in args:
-        if not (a is None or (
-            isinstance(a, str) and a.strip() == ''
-        )):
+        if not (a is None or (isinstance(a, str) and a.strip() == "")):
             return a
     raise ValueError("No suitable value found")
 
 
 def _member_of_from_token(tdata, key):
     value = tdata
-    for k in key.split('.'):
+    for k in key.split("."):
         if isinstance(value, dict) and k in value:
             value = value[k]
         else:
