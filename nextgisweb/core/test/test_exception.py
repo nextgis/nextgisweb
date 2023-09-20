@@ -7,7 +7,6 @@ from ..exception import IUserException, UserException, user_exception
 
 
 def test_interface():
-
     @implementer(IUserException)
     class TestException(Exception):
         title = "Title"
@@ -27,17 +26,19 @@ def test_interface():
 
 
 def test_adaptaion():
-
     class TestException(Exception):
         pass
 
-    uexc = IUserException(user_exception(
-        TestException(),
-        title="Title",
-        message="Message",
-        detail="Detail",
-        http_status_code=418,
-        data=dict(key="value")))
+    uexc = IUserException(
+        user_exception(
+            TestException(),
+            title="Title",
+            message="Message",
+            detail="Detail",
+            http_status_code=418,
+            data=dict(key="value"),
+        )
+    )
 
     assert uexc.title == "Title"
     assert uexc.message == "Message"
@@ -57,9 +58,12 @@ def test_not_implemented():
 def test_user_exception():
     try:
         raise UserException(
-            title="Title", message="Message",
-            detail="Detail", data=dict(key="value"),
-            http_status_code=418)
+            title="Title",
+            message="Message",
+            detail="Detail",
+            data=dict(key="value"),
+            http_status_code=418,
+        )
     except UserException as exc:
         assert str(exc) == "UserException: Message"
         assert exc.title == "Title"
@@ -69,12 +73,12 @@ def test_user_exception():
 
 
 def test_localizer():
-    exc = UserException(message=_('The answer is %d') % 42)
+    exc = UserException(message=_("The answer is %d") % 42)
     assert str(exc) == "UserException: The answer is 42"
 
 
 def test_positional_message():
-    with pytest.warns(match='^UserException keyword argument expected.*'):
+    with pytest.warns(match="^UserException keyword argument expected.*"):
         exc = UserException("Message")
     assert exc.message == "Message"
     assert exc.title is None

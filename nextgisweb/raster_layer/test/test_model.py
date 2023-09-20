@@ -15,18 +15,19 @@ from .validate_cloud_optimized_geotiff import validate
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 
 
-@pytest.mark.parametrize('source, band_count, srs_id', [
-    # Both rasters haven't NODATA value, so the alpha band is expected to be
-    # added in case of reprojection from EPSG:4326 to EPSG:3857.
-    ('sochi-aster-colorized.tif', 4, 3857),
-    ('sochi-aster-colorized.tif', 3, 4326),
-    ('sochi-aster-dem.tif', 2, 3857),
-    ('sochi-aster-dem.tif', 1, 4326),
-])
-@pytest.mark.parametrize('cog', [False, True])
-def test_load_file(
-    source, band_count, srs_id, ngw_env, ngw_txn, cog
-):
+@pytest.mark.parametrize(
+    "source, band_count, srs_id",
+    [
+        # Both rasters haven't NODATA value, so the alpha band is expected to be
+        # added in case of reprojection from EPSG:4326 to EPSG:3857.
+        ("sochi-aster-colorized.tif", 4, 3857),
+        ("sochi-aster-colorized.tif", 3, 4326),
+        ("sochi-aster-dem.tif", 2, 3857),
+        ("sochi-aster-dem.tif", 1, 4326),
+    ],
+)
+@pytest.mark.parametrize("cog", [False, True])
+def test_load_file(source, band_count, srs_id, ngw_env, ngw_txn, cog):
     res = RasterLayer(
         srs=SRS.filter_by(id=srs_id).one(),
     ).persist()
@@ -52,22 +53,25 @@ def test_load_file(
         assert len(errors) == 1
 
 
-@pytest.mark.parametrize('size_limit, width, height, band_count, datatype, ok', (
-    (100, 10, 10, 1, gdal.GDT_Byte, True),
-    (100, 10, 10, 1, gdal.GDT_UInt16, False),
-    (None, 10, 10, 1, gdal.GDT_UInt16, True),
-    (1000, 10, 6, 2, gdal.GDT_CFloat32, True),
-    (1000, 10, 7, 2, gdal.GDT_CFloat32, False),
-))
+@pytest.mark.parametrize(
+    "size_limit, width, height, band_count, datatype, ok",
+    (
+        (100, 10, 10, 1, gdal.GDT_Byte, True),
+        (100, 10, 10, 1, gdal.GDT_UInt16, False),
+        (None, 10, 10, 1, gdal.GDT_UInt16, True),
+        (1000, 10, 6, 2, gdal.GDT_CFloat32, True),
+        (1000, 10, 7, 2, gdal.GDT_CFloat32, False),
+    ),
+)
 def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env):
     res = RasterLayer().persist()
 
-    driver = gdal.GetDriverByName('GTiff')
+    driver = gdal.GetDriverByName("GTiff")
     proj = res.srs.to_osr()
     proj_wkt = proj.ExportToWkt()
 
     with ngw_env.raster_layer.options.override(dict(size_limit=size_limit)):
-        with NamedTemporaryFile('w') as f:
+        with NamedTemporaryFile("w") as f:
             ds = driver.Create(f.name, width, height, band_count, datatype)
             ds.SetProjection(proj_wkt)
             ds.FlushCache()
@@ -83,14 +87,13 @@ def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env
     DBSession.expunge(res)
 
 
-@pytest.mark.parametrize('source, size_expect', (
-    ('sochi-aster-colorized.tif', 13800),
-    ('sochi-aster-dem.tif', 608224)
-))
+@pytest.mark.parametrize(
+    "source, size_expect", (("sochi-aster-colorized.tif", 13800), ("sochi-aster-dem.tif", 608224))
+)
 def test_size_limit_reproj(source, size_expect, ngw_env):
     res = RasterLayer().persist()
 
-    filename = os.path.join(os.path.split(__file__)[0], 'data', source)
+    filename = os.path.join(os.path.split(__file__)[0], "data", source)
 
     with ngw_env.raster_layer.options.override(dict(size_limit=size_expect - 100)):
         with pytest.raises(ValidationError):

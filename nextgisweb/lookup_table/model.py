@@ -13,11 +13,11 @@ from nextgisweb.resource import (
     Serializer,
 )
 
-Base.depends_on('resource')
+Base.depends_on("resource")
 
 
 class LookupTable(Base, Resource):
-    identity = 'lookup_table'
+    identity = "lookup_table"
     cls_display_name = _("Lookup table")
 
     __scope__ = DataScope
@@ -30,7 +30,6 @@ class LookupTable(Base, Resource):
 
 
 class _items_attr(SerializedProperty):
-
     def getter(self, srlzr):
         return srlzr.obj.val
 

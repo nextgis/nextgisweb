@@ -22,30 +22,32 @@ def backup(
     self: EnvCommand,
     no_zip: bool = opt(False),
     target: Optional[str] = arg(metavar="path"),
-    *, core: CoreComponent,
+    *,
+    core: CoreComponent,
 ):
     """Backup data into an archive
 
     :param no_zip: Don't compress a backup with ZIP
     :param target: Output file or directory"""
 
-    opts = core.options.with_prefix('backup')
+    opts = core.options.with_prefix("backup")
 
     if target is None:
-        base_path = opts['path']
+        base_path = opts["path"]
         if base_path is None:
             raise RuntimeError("Default backup path (core.backup.path) isn't set")
-        autoname = datetime.today().strftime(opts['filename'])
+        autoname = datetime.today().strftime(opts["filename"])
         target = path_join(base_path, autoname)
 
-    to_stdout = target == '-'
+    to_stdout = target == "-"
 
-    tmp_root = opts.get('tmpdir', None if to_stdout else path_split(target)[0])
+    tmp_root = opts.get("tmpdir", None if to_stdout else path_split(target)[0])
 
     if not to_stdout and path_exists(target):
         raise RuntimeError("Target already exists!")
 
     if no_zip:
+
         @contextmanager
         def tgt_context():
             tmpdir = mkdtemp(dir=tmp_root)
@@ -58,12 +60,15 @@ def backup(
                 raise
 
     elif to_stdout:
+
         @contextmanager
         def tgt_context():
             with TemporaryDirectory(dir=tmp_root) as tmp_dir:
                 yield tmp_dir
                 _compress(tmp_dir, sys.stdout.buffer)
+
     else:
+
         @contextmanager
         def tgt_context():
             with TemporaryDirectory(dir=tmp_root) as tmp_dir:
@@ -88,32 +93,38 @@ def backup(
 @cli.command()
 def restore(
     self: EnvCommand,
-    source: str = arg(metavar='path'),
-    *, core: CoreComponent,
+    source: str = arg(metavar="path"),
+    *,
+    core: CoreComponent,
 ):
     """Restore data from a backup
 
     :param path: Path to a backup"""
 
-    opts = core.options.with_prefix('backup')
+    opts = core.options.with_prefix("backup")
 
     source = self.source
-    from_stdin = source == '-'
+    from_stdin = source == "-"
     if from_stdin:
+
         @contextmanager
         def src_context():
-            tmp_root = opts.get('tmpdir', None)
+            tmp_root = opts.get("tmpdir", None)
             with TemporaryDirectory(dir=tmp_root) as tmpdir:
                 _decompress(sys.stdin.buffer, tmpdir)
                 yield tmpdir
+
     elif is_zipfile(source):
+
         @contextmanager
         def src_context():
-            tmp_root = opts.get('tmpdir', path_split(source)[0])
+            tmp_root = opts.get("tmpdir", path_split(source)[0])
             with TemporaryDirectory(dir=tmp_root) as tmpdir:
                 _decompress(source, tmpdir)
                 yield tmpdir
+
     else:
+
         @contextmanager
         def src_context():
             yield source
@@ -123,10 +134,8 @@ def restore(
 
 
 def _compress(src, dst):
-    logger.debug(
-        "Compressing '%s' to '%s'...", src,
-        dst if isinstance(dst, str) else dst.name)
-    with ZipFile(dst, 'w', allowZip64=True) as zipf:
+    logger.debug("Compressing '%s' to '%s'...", src, dst if isinstance(dst, str) else dst.name)
+    with ZipFile(dst, "w", allowZip64=True) as zipf:
         for root, dirs, files in os.walk(src):
             zipf.write(root, os.path.relpath(root, src))
             for fn in files:
@@ -138,8 +147,6 @@ def _compress(src, dst):
 
 
 def _decompress(src, dst):
-    logger.debug(
-        "Decompressing '%s' to '%s'...",
-        src if isinstance(src, str) else src.name, dst)
-    with ZipFile(src, 'r') as zipf:
+    logger.debug("Decompressing '%s' to '%s'...", src if isinstance(src, str) else src.name, dst)
+    with ZipFile(src, "r") as zipf:
         zipf.extractall(dst)

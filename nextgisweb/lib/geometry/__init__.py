@@ -17,10 +17,10 @@ class GeometryNotValid(ValueError):
 
 
 class Geometry:
-    """ Initialization format is kept "as is".
+    """Initialization format is kept "as is".
     Other formats are calculated as needed."""
 
-    __slots__ = ('_wkb', '_wkt', '_ogr', '_shape', '_srid')
+    __slots__ = ("_wkb", "_wkt", "_ogr", "_shape", "_srid")
 
     def __init__(self, wkb=None, wkt=None, ogr=None, shape=None, srid=None, validate=False):
         if wkb is None and wkt is None and ogr is None and shape is None:
@@ -75,9 +75,7 @@ class Geometry:
 
     @classmethod
     def from_box(cls, minx, miny, maxx, maxy, srid=None):
-        return cls.from_shape(
-            geometry_box(minx, miny, maxx, maxy),
-            srid=srid)
+        return cls.from_shape(geometry_box(minx, miny, maxx, maxy), srid=srid)
 
     # Base output formats
 
@@ -145,7 +143,6 @@ class Geometry:
 
 
 class Transformer:
-
     def __init__(self, wkt_from, wkt_to):
         sr_from = sr_from_wkt(wkt_from)
         sr_to = sr_from_wkt(wkt_to)
@@ -185,4 +182,4 @@ def geom_area(geom, crs_wkt):
     if crs.is_geographic:
         return crs.get_geod().geometry_area_perimeter(shape)[0]
     else:
-        return shape.area * crs_unit_factor(crs)**2
+        return shape.area * crs_unit_factor(crs) ** 2

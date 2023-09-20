@@ -6,7 +6,7 @@ from inspect import formatannotationrelativeto
 from typing import Any, Callable, Dict, Hashable, List, Optional, Tuple, Type, TypeVar
 
 KeyType = Tuple[Hashable, ...]
-TContainer = TypeVar('TContainer', bound='Container')
+TContainer = TypeVar("TContainer", bound="Container")
 
 
 class Container:
@@ -38,18 +38,23 @@ class Container:
         return self
 
     def register(
-        self, tdef: Hashable, value: Any, *,
+        self,
+        tdef: Hashable,
+        value: Any,
+        *,
         selector: Tuple[Hashable, ...] = (),
     ) -> None:
-        key = (tdef, ) + selector
+        key = (tdef,) + selector
         self._invalidate_key(key)
         self._container_registry[key] = value
 
     def unregister(
-        self, tdef: Hashable, *,
+        self,
+        tdef: Hashable,
+        *,
         selector: Tuple[Hashable, ...] = (),
     ) -> None:
-        key = (tdef, ) + selector
+        key = (tdef,) + selector
         self._invalidate_key(key)
         self._container_registry.pop(key)
 
@@ -59,7 +64,8 @@ class Container:
 
     @classmethod
     def _from_container(
-        cls, key: Tuple[Hashable, ...],
+        cls,
+        key: Tuple[Hashable, ...],
         invalidate: Callable[[], None],
     ) -> Any:
         instance = cls._instance
@@ -84,7 +90,7 @@ class Argument:
     selector: KeyType = ()
 
     def bind(self, name: str, tdef: Hashable) -> BoundArgument:
-        return BoundArgument(self.cnt, name, (tdef, ) + self.selector)
+        return BoundArgument(self.cnt, name, (tdef,) + self.selector)
 
 
 @dataclass(frozen=True)
@@ -105,5 +111,5 @@ class ContainerNotWiredError(Exception):
 class ContainerWiredError(Exception):
     def __init__(self, cls: TContainer, new: Container) -> None:
         super().__init__(
-            f"{cls!r} is already wired to {cls._instance!r} "
-            f"but trying to wire to {new!r}")
+            f"{cls!r} is already wired to {cls._instance!r} " f"but trying to wire to {new!r}"
+        )

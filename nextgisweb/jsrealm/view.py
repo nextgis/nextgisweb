@@ -12,33 +12,32 @@ from .component import JSRealmComponent
 
 @inject()
 def read_testentries(*, comp: JSRealmComponent):
-    return loadb((Path(comp.options['dist_path']) / 'main/testentry.json').read_bytes())
+    return loadb((Path(comp.options["dist_path"]) / "main/testentry.json").read_bytes())
 
 
-@viewargs(renderer='mako')
+@viewargs(renderer="mako")
 def testentry(request):
     testentries = read_testentries()
 
-    selected = '/'.join(request.matchdict['subpath'])
+    selected = "/".join(request.matchdict["subpath"])
     if selected == "":
         selected = None
     elif selected not in testentries:
         raise HTTPNotFound()
 
     return dict(
-        testentries=read_testentries(),
-        selected=selected,
-        title=selected if selected else "")
+        testentries=read_testentries(), selected=selected, title=selected if selected else ""
+    )
 
 
 def setup_pyramid(comp, config):
-    dist_path = Path(comp.options['dist_path'])
+    dist_path = Path(comp.options["dist_path"])
     for p in filter(lambda p: p.is_dir(), dist_path.iterdir()):
         pn = p.name
-        if pn in ('amd', 'external'):
+        if pn in ("amd", "external"):
             for sp in filter(lambda p: p.is_dir(), p.iterdir()):
                 config.add_static_path(sp.name, sp)
         else:
             config.add_static_path(pn, p)
 
-    config.add_route('jsrealm.testentry', '/testentry/*subpath').add_view(testentry)
+    config.add_route("jsrealm.testentry", "/testentry/*subpath").add_view(testentry)

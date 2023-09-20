@@ -6,12 +6,12 @@ from ..backup import IndexFile, IndexRecord, backup, parse_pg_dump_version
 
 
 def test_index_file_read_write(tmp_path):
-    ifile = IndexFile(str(tmp_path / 'index'))
+    ifile = IndexFile(str(tmp_path / "index"))
 
     data = [
-        IndexRecord(1, 'none-value', None),
-        IndexRecord(2, 'zero-byte', '\x00'),
-        IndexRecord(3, 'complex', dict(int=1, str='str')),
+        IndexRecord(1, "none-value", None),
+        IndexRecord(2, "zero-byte", "\x00"),
+        IndexRecord(3, "complex", dict(int=1, str="str")),
     ]
 
     with ifile.writer() as write:
@@ -22,10 +22,13 @@ def test_index_file_read_write(tmp_path):
         assert list(read) == data
 
 
-@pytest.mark.parametrize('output, expected', [
-    ('pg_dump (PostgreSQL) 10.10 (Ubuntu 10.10-0ubuntu0.18.04.1)', '10.10'),
-    ('pg_dump (PostgreSQL) 9.3.22', '9.3.22'),
-])
+@pytest.mark.parametrize(
+    "output, expected",
+    [
+        ("pg_dump (PostgreSQL) 10.10 (Ubuntu 10.10-0ubuntu0.18.04.1)", "10.10"),
+        ("pg_dump (PostgreSQL) 9.3.22", "9.3.22"),
+    ],
+)
 def test_parse_pg_dump_version(output, expected):
     assert parse_pg_dump_version(output) == Version(expected)
 

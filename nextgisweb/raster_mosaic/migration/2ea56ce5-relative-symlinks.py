@@ -25,8 +25,13 @@ def forward(ctx):
 
                 file_storage_dir_relative = os.path.relpath(file_storage_dir, root)
 
-                dst_new = os.path.join(file_storage_dir_relative, comp.identity,
-                                       level0, level1, fname)
+                dst_new = os.path.join(
+                    file_storage_dir_relative,
+                    comp.identity,
+                    level0,
+                    level1,
+                    fname,
+                )
                 os.unlink(fpath)
                 os.symlink(dst_new, fpath)
 
@@ -46,7 +51,6 @@ def rewind(ctx):
                 level0_dir, level1 = os.path.split(root)
                 level0 = os.path.basename(level0_dir)
 
-                dst_new = os.path.join(file_storage_dir, comp.identity,
-                                       level0, level1, fname)
+                dst_new = os.path.join(file_storage_dir, comp.identity, level0, level1, fname)
                 os.unlink(fpath)
                 os.symlink(dst_new, fpath)

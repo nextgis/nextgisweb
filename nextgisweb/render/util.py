@@ -9,7 +9,7 @@ from nextgisweb.core.exception import ValidationError
 
 
 def imgcolor(img):
-    """ Check image color and return color tuple if all pixels have same color """
+    """Check image color and return color tuple if all pixels have same color"""
     if img is None:
         return (0, 0, 0, 0)
 
@@ -29,11 +29,12 @@ def imgcolor(img):
 
 
 def af_transform(a, b):
-    """ Crate affine transform from coordinate system A to B """
+    """Crate affine transform from coordinate system A to B"""
     return ~(
-        Affine.translation(a[0], a[3]) * Affine.scale(
-            (a[2] - a[0]) / b[2], (a[1] - a[3]) / b[3]
-        ) * Affine.translation(b[0], b[1]))
+        Affine.translation(a[0], a[3])
+        * Affine.scale((a[2] - a[0]) / b[2], (a[1] - a[3]) / b[3])
+        * Affine.translation(b[0], b[1])
+    )
 
 
 def affine_from_bounds(a, b):
@@ -42,32 +43,31 @@ def affine_from_bounds(a, b):
     b = [float(i) for i in b]
 
     return ~(
-        Affine.translation(a[0], a[1]) * Affine.scale(
-            (a[2] - a[0]) / (b[2] - b[0]),
-            (a[3] - a[1]) / (b[3] - b[1])
-        ) * Affine.translation(- b[0], - b[1]))
+        Affine.translation(a[0], a[1])
+        * Affine.scale((a[2] - a[0]) / (b[2] - b[0]), (a[3] - a[1]) / (b[3] - b[1]))
+        * Affine.translation(-b[0], -b[1])
+    )
 
 
 def affine_bounds_to_tile(bounds, zoom):
-    tilemax = 2 ** zoom
-    return affine_from_bounds(
-        bounds, (0, tilemax, tilemax, 0))
+    tilemax = 2**zoom
+    return affine_from_bounds(bounds, (0, tilemax, tilemax, 0))
 
 
 def pack_color(color):
-    """ Pack color tuple to integer value. """
-    return struct.unpack('!i', bytearray(color))[0]
+    """Pack color tuple to integer value."""
+    return struct.unpack("!i", bytearray(color))[0]
 
 
 def unpack_color(value):
-    """ Unpack color integer value to color tuple. """
-    return tuple(iter(struct.pack('!i', value)))
+    """Unpack color integer value to color tuple."""
+    return tuple(iter(struct.pack("!i", value)))
 
 
 def zxy_from_request(request):
     result = []
 
-    for p in 'zxy':
+    for p in "zxy":
         try:
             raw = request.GET[p]
             val = int(raw)
@@ -75,20 +75,19 @@ def zxy_from_request(request):
                 raise ValueError
             result.append(val)
         except KeyError:
-            raise ValidationError(message=_(
-                "Required parameter '{}' is missing."
-            ).format(p))
+            raise ValidationError(message=_("Required parameter '{}' is missing.").format(p))
         except ValueError:
-            if request.GET[p] == ('{' + p + '}'):
-                raise ValidationError(message=_(
-                    "Placeholders {x}, {y} and {z} must be filled with values."
-                ), detail=_(
-                    "It seems you are trying to open an URL template directly "
-                    "in a browser. To test it try adding some values for 'x', "
-                    "'y' and 'z' parameters."
-                ))
-            raise ValidationError(message=_(
-                "The value of '{}' parameter must be a non-negative integer."
-            ).format(p))
+            if request.GET[p] == ("{" + p + "}"):
+                raise ValidationError(
+                    message=_("Placeholders {x}, {y} and {z} must be filled with values."),
+                    detail=_(
+                        "It seems you are trying to open an URL template directly "
+                        "in a browser. To test it try adding some values for 'x', "
+                        "'y' and 'z' parameters."
+                    ),
+                )
+            raise ValidationError(
+                message=_("The value of '{}' parameter must be a non-negative integer.").format(p)
+            )
 
     return result

@@ -10,7 +10,7 @@ from nextgisweb.env import DBSession
 from .model import Session, SessionStore
 from .util import datetime_to_unix, gensecret
 
-__all__ = ['WebSession']
+__all__ = ["WebSession"]
 
 
 @implementer(ISession)
@@ -20,8 +20,8 @@ class WebSession(dict):
         self._updated = list()
         self._cleared = False
         self._deleted = list()
-        self._cookie_name = request.env.pyramid.options['session.cookie.name']
-        self._cookie_max_age = request.env.pyramid.options['session.cookie.max_age']
+        self._cookie_name = request.env.pyramid.options["session.cookie.name"]
+        self._cookie_max_age = request.env.pyramid.options["session.cookie.max_age"]
         self._session_id = request.cookies.get(self._cookie_name)
         self._last_activity = None
 
@@ -29,8 +29,8 @@ class WebSession(dict):
             try:
                 actual_date = datetime.utcnow() - self._cookie_max_age
                 session = Session.filter(
-                    Session.id == self._session_id,
-                    Session.last_activity > actual_date).one()
+                    Session.id == self._session_id, Session.last_activity > actual_date
+                ).one()
                 self.new = False
                 self.created = datetime_to_unix(session.created)
                 self._last_activity = session.last_activity
@@ -51,15 +51,15 @@ class WebSession(dict):
                     if self._cleared:
                         SessionStore.filter(
                             SessionStore.session_id == self._session_id,
-                            ~SessionStore.key.in_(self._updated)
+                            ~SessionStore.key.in_(self._updated),
                         ).delete(synchronize_session=False)
                     elif len(self._deleted) > 0:
                         SessionStore.filter(
                             SessionStore.session_id == self._session_id,
-                            SessionStore.key.in_(self._deleted)
+                            SessionStore.key.in_(self._deleted),
                         ).delete(synchronize_session=False)
 
-                    activity_delta = request.env.pyramid.options['session.activity_delta']
+                    activity_delta = request.env.pyramid.options["session.activity_delta"]
                     if utcnow - self._last_activity > activity_delta:
                         DBSession.query(Session).filter_by(
                             id=self._session_id, last_activity=self._last_activity
@@ -70,9 +70,7 @@ class WebSession(dict):
                     if self._session_id is None:
                         self._session_id = gensecret(32)
                         Session(
-                            id=self._session_id,
-                            created=utcnow,
-                            last_activity=utcnow
+                            id=self._session_id, created=utcnow, last_activity=utcnow
                         ).persist()
                         update_cookie = True
 
@@ -80,8 +78,8 @@ class WebSession(dict):
                         for key in self._updated:
                             try:
                                 kv = SessionStore.filter_by(
-                                    session_id=self._session_id,
-                                    key=key).one()
+                                    session_id=self._session_id, key=key
+                                ).one()
                             except NoResultFound:
                                 kv = SessionStore(session_id=self._session_id, key=key).persist()
                             kv.value = self[key]
@@ -89,24 +87,23 @@ class WebSession(dict):
             if update_cookie:
                 # Check if another session is set
                 for h, v in response.headerlist:
-                    if h == 'Set-Cookie' and v.startswith(self._cookie_name + '='):
+                    if h == "Set-Cookie" and v.startswith(self._cookie_name + "="):
                         return
                 cookie_settings = WebSession.cookie_settings(request)
-                cookie_settings['max_age'] = int(self._cookie_max_age.total_seconds())
-                response.set_cookie(self._cookie_name, value=self._session_id,
-                                    **cookie_settings)
+                cookie_settings["max_age"] = int(self._cookie_max_age.total_seconds())
+                response.set_cookie(self._cookie_name, value=self._session_id, **cookie_settings)
 
         request.add_response_callback(check_save)
 
     @staticmethod
     def cookie_settings(request):
-        is_https = request.scheme == 'https'
+        is_https = request.scheme == "https"
         return dict(
-            path='/',
+            path="/",
             domain=None,
             httponly=True,
-            samesite='None' if is_https else 'Lax',
-            secure=is_https
+            samesite="None" if is_https else "Lax",
+            secure=is_https,
         )
 
     @property
@@ -120,8 +117,9 @@ class WebSession(dict):
     def _refresh_all(self):
         if self._session_id is None or self._refreshed:
             return
-        for kv in SessionStore.filter(SessionStore.session_id == self._session_id,
-                                      ~SessionStore.key.in_(self._keys)).all():
+        for kv in SessionStore.filter(
+            SessionStore.session_id == self._session_id, ~SessionStore.key.in_(self._keys)
+        ).all():
             self[kv.key] = kv.value
         self._refreshed = True
 
@@ -137,13 +135,13 @@ class WebSession(dict):
 
     # ISession
 
-    def flash(self, msg, queue='', allow_duplicate=True):
+    def flash(self, msg, queue="", allow_duplicate=True):
         raise NotImplementedError()
 
-    def pop_flash(self, queue=''):
+    def pop_flash(self, queue=""):
         raise NotImplementedError()
 
-    def peek_flash(self, queue=''):
+    def peek_flash(self, queue=""):
         raise NotImplementedError()
 
     # dict

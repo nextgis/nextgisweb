@@ -16,26 +16,27 @@ class IUserException(Interface):
     data = Attribute("Error specific JSON-serializable dictionary")
 
 
-UserException = namedtuple('UserException', [
-    'title', 'message', 'detail', 'http_status_code', 'data'])
+UserException = namedtuple(
+    "UserException", ["title", "message", "detail", "http_status_code", "data"]
+)
 classImplements(UserException, IUserException)
 
 
-def user_exception(
-    exc, title=None, message=None, detail=None,
-    http_status_code=None, data=None
-):
+def user_exception(exc, title=None, message=None, detail=None, http_status_code=None, data=None):
     exc.__user_exception__ = UserException(
-        title=title, message=message, detail=detail,
+        title=title,
+        message=message,
+        detail=detail,
         http_status_code=http_status_code,
-        data=data if data else dict())
+        data=data if data else dict(),
+    )
     return exc
 
 
 @adapter_hooks.append
 def adapt_exception_to_user_exception(iface, obj):
     if isinstance(obj, Exception) and issubclass(iface, IUserException):
-        if hasattr(obj, '__user_exception__'):
+        if hasattr(obj, "__user_exception__"):
             return obj.__user_exception__
 
 
@@ -46,17 +47,19 @@ class UserException(Exception):
 
     def __init__(self, *args, **kwargs):
         # Some magic for compabilty with legacy error classes
-        title = kwargs.get('title')
-        message = kwargs.get('message')
-        detail = kwargs.get('detail')
-        data = kwargs.get('data')
-        http_status_code = kwargs.get('http_status_code')
+        title = kwargs.get("title")
+        message = kwargs.get("message")
+        detail = kwargs.get("detail")
+        data = kwargs.get("data")
+        http_status_code = kwargs.get("http_status_code")
 
         if len(args) == 1 and message is None:
             message = args[0]
             warn(
                 f"{self.__class__.__name__} keyword argument expected, got positional.",
-                DeprecationWarning, stacklevel=2)
+                DeprecationWarning,
+                stacklevel=2,
+            )
         elif len(args) > 0:
             raise ValueError("UserException accepts only keyword arguments!")
 
@@ -69,12 +72,12 @@ class UserException(Exception):
                 # Do not set attribute for proper warnings
                 pass
 
-        _self_attr('message', message)
-        _self_attr('detail', detail)
-        _self_attr('title', title)
-        _self_attr('data', dict(data) if data is not None else dict())
+        _self_attr("message", message)
+        _self_attr("detail", detail)
+        _self_attr("title", title)
+        _self_attr("data", dict(data) if data is not None else dict())
 
-        _self_attr('http_status_code', http_status_code)
+        _self_attr("http_status_code", http_status_code)
 
     def __str__(self):
         return "{}: {}".format(self.__class__.__name__, self.message)

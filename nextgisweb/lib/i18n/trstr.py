@@ -4,13 +4,9 @@ from ..logging import logger
 
 
 class TrStr:
-    __slots__ = ['msg', 'plural', 'number', 'context', 'domain']
+    __slots__ = ["msg", "plural", "number", "context", "domain"]
 
-    def __init__(
-        self, msg, *,
-        plural=None, number=None,
-        context=None, domain
-    ):
+    def __init__(self, msg, *, plural=None, number=None, context=None, domain):
         self.msg = msg
         self.plural = plural
         self.number = number
@@ -44,10 +40,10 @@ class TrStr:
 
 
 class TrStrConcat:
-
     def __init__(self, a, b):
-        self._items = (a._items if isinstance(a, TrStrConcat) else [a]) \
-            + (b._items if isinstance(b, TrStrConcat) else [b])
+        self._items = (a._items if isinstance(a, TrStrConcat) else [a]) + (
+            b._items if isinstance(b, TrStrConcat) else [b]
+        )
 
     def __str__(self):
         return "".join(map(str, deep_cast_to_str(self._items)))
@@ -63,13 +59,15 @@ class TrStrConcat:
 
 
 def translate_guard(errors):
-
     def actual_decorator(func):
-        translate_args = 'translate_args' in signature(func).parameters
+        translate_args = "translate_args" in signature(func).parameters
 
         def wrapper(trstr, original_translator):
-            kwargs = dict() if not translate_args else dict(
-                translate_args=trstr.__translate_args__(original_translator))
+            kwargs = (
+                dict()
+                if not translate_args
+                else dict(translate_args=trstr.__translate_args__(original_translator))
+            )
 
             try:
                 return func(trstr, original_translator, **kwargs)
@@ -82,8 +80,10 @@ def translate_guard(errors):
                     logger.exception(
                         'Got an exception during translation into "%s". '
                         'Falling back to untranslated message "%s".',
-                        getattr(original_translator, 'locale', 'unknown'),
-                        str(trstr), exc_info=exc)
+                        getattr(original_translator, "locale", "unknown"),
+                        str(trstr),
+                        exc_info=exc,
+                    )
                     return result
 
         return wrapper
@@ -92,7 +92,6 @@ def translate_guard(errors):
 
 
 class TrStrModFormat:
-
     def __init__(self, trstr, arg):
         self.trstr = trstr
         self.arg = arg
@@ -115,7 +114,6 @@ class TrStrModFormat:
 
 
 class TrStrFormat:
-
     def __init__(self, trstr, args, kwargs):
         self.trstr = trstr
         self.args = args
@@ -123,7 +121,8 @@ class TrStrFormat:
 
     def __str__(self):
         return str(self.trstr).format(
-            *deep_cast_to_str(self.args), **deep_cast_to_str(self.kwargs))
+            *deep_cast_to_str(self.args), **deep_cast_to_str(self.kwargs)
+        )
 
     def __add__(self, other):
         return TrStrConcat(self, other)
@@ -132,10 +131,7 @@ class TrStrFormat:
         return TrStrConcat(other, self)
 
     def __translate_args__(self, translator):
-        return (
-            deep_translate(self.args, translator),
-            deep_translate(self.kwargs, translator)
-        )
+        return (deep_translate(self.args, translator), deep_translate(self.kwargs, translator))
 
     def __translate_message__(self, translator):
         return self.trstr.__translate__(translator)
@@ -149,7 +145,7 @@ class TrStrFormat:
 def deep_translate(value, translator):
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
-    if trmeth := getattr(value, '__translate__', None):
+    if trmeth := getattr(value, "__translate__", None):
         return trmeth(translator)
     if isinstance(value, tuple):
         return tuple(deep_translate(i, translator) for i in value)
@@ -163,7 +159,7 @@ def deep_translate(value, translator):
 def deep_cast_to_str(value):
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
-    if hasattr(value, '__translate__'):
+    if hasattr(value, "__translate__"):
         return str(value)
     if isinstance(value, tuple):
         return tuple(deep_cast_to_str(i) for i in value)
@@ -175,7 +171,6 @@ def deep_cast_to_str(value):
 
 
 class trstr_factory:
-
     def __init__(self, domain: str):
         self.domain = domain
 
@@ -186,19 +181,10 @@ class trstr_factory:
         return TrStr(message, context=context, domain=self.domain)
 
     def ngettext(self, singular: str, plural: str, number: int) -> TrStr:
-        return TrStr(
-            singular,
-            plural=plural,
-            number=number,
-            domain=self.domain)
+        return TrStr(singular, plural=plural, number=number, domain=self.domain)
 
     def npgettext(self, context: str, singular: str, plural: str, number: int) -> TrStr:
-        return TrStr(
-            singular,
-            plural=plural,
-            number=number,
-            context=context,
-            domain=self.domain)
+        return TrStr(singular, plural=plural, number=number, context=context, domain=self.domain)
 
     def __call__(self, message: str) -> TrStr:
         """Alias for gettext"""
@@ -207,7 +193,9 @@ class trstr_factory:
 
 class DummyTranslator:
     def translate(
-        self, msg, *,
+        self,
+        msg,
+        *,
         plural=None,
         number=None,
         context=None,

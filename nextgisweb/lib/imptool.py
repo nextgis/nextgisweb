@@ -9,8 +9,10 @@ from warnings import filterwarnings, warn
 # Prevent warning about missing __init__.py in migration directory. Is's OK
 # and migration directory is intended for migration scripts.
 filterwarnings(
-    'ignore', r"^Not importing.*/core/migration.*__init__\.py$",
-    category=ImportWarning)
+    "ignore",
+    r"^Not importing.*/core/migration.*__init__\.py$",
+    category=ImportWarning,
+)
 
 
 def module_path(module_name: str) -> Path:
@@ -19,7 +21,7 @@ def module_path(module_name: str) -> Path:
     Importlib's find_spec() is always importing the top-level package for
     modules which causes problems with single-component packages."""
 
-    rest = module_name.split('.')
+    rest = module_name.split(".")
     root = rest.pop(0)
 
     if root_mod := sys.modules.get(root):
@@ -32,10 +34,10 @@ def module_path(module_name: str) -> Path:
         else:
             raise ValueError(f"{module_name} not found")
 
-    assert root_path.name == '__init__.py'
+    assert root_path.name == "__init__.py"
     root_path = root_path.parent
 
-    return (root_path / '/'.join(rest)) if rest else root_path
+    return (root_path / "/".join(rest)) if rest else root_path
 
 
 def module_from_stack(depth=0, skip=None):
@@ -44,11 +46,10 @@ def module_from_stack(depth=0, skip=None):
     cur_depth = 2 + depth
     while True:
         fr = sys._getframe(cur_depth)
-        mod = fr.f_globals['__name__']
-        if mod.startswith(('importlib.') or (skip and (
-            mod.startswith(skip)
-            or (mod + '.').startswith(skip)
-        ))):
+        mod = fr.f_globals["__name__"]
+        if mod.startswith(
+            ("importlib.") or (skip and (mod.startswith(skip) or (mod + ".").startswith(skip)))
+        ):
             cur_depth += 1
         else:
             return mod
@@ -88,9 +89,11 @@ class MetaPathFinder(abc.MetaPathFinder):
             return
 
         s = spec_from_loader(rec.name, loader=Loader(rec))
-        m = f"'{rec.name}' module has been deprecated by '{rec.repl}'" + (
-            f" since {rec.since}" if rec.since else "") + (
-            f", removing in {rec.remove}" if rec.remove else "")
+        m = (
+            f"'{rec.name}' module has been deprecated by '{rec.repl}'"
+            + (f" since {rec.since}" if rec.since else "")
+            + (f", removing in {rec.remove}" if rec.remove else "")
+        )
 
         warn(m, DeprecationWarning, stacklevel=2)
         return s

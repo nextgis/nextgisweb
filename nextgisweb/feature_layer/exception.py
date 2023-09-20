@@ -1,10 +1,9 @@
-
 from nextgisweb.env import _
 
 from nextgisweb.core.exception import UserException
 
 __all__ = [
-    'FeatureNotFound',
+    "FeatureNotFound",
 ]
 
 
@@ -17,4 +16,5 @@ class FeatureNotFound(UserException):
     def __init__(self, resource_id, feature_id):
         super().__init__(
             message=self.__class__.message % (feature_id, resource_id),
-            data=dict(resource_id=resource_id, feature_id=feature_id))
+            data=dict(resource_id=resource_id, feature_id=feature_id),
+        )

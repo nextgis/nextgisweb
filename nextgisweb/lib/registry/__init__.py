@@ -2,7 +2,6 @@ from warnings import warn
 
 
 class ListRegistry:
-
     def __init__(self):
         self._items = list()
 
@@ -19,12 +18,11 @@ class ListRegistry:
 
 
 class DictRegistry:
-
     def __init__(self):
         self._dict = dict()
 
     def register(self, member):
-        identity = getattr(member, 'identity', None)
+        identity = getattr(member, "identity", None)
         if identity is None or not isinstance(identity, str):
             raise TypeError(f"{member!r} must have 'identity' attribute")
         elif existing := self._dict.get(identity):
@@ -38,7 +36,10 @@ class DictRegistry:
         return member
 
     def __iter__(self):
-        warn("Don't use the registry default iterator, use items() or keys() or values() instead", stacklevel=2)
+        warn(
+            "Don't use the registry default iterator, use items() or keys() or values() instead",
+            stacklevel=2,
+        )
         for i in self._dict.values():
             yield i
 
@@ -65,7 +66,6 @@ class DictRegistry:
 
 
 class LegacyRegistry:
-
     def __init__(self):
         self._items = []
         self._dict = dict()
@@ -77,7 +77,7 @@ class LegacyRegistry:
         else:
             self._items.append(member)
 
-        identity = getattr(member, 'identity', None)
+        identity = getattr(member, "identity", None)
 
         if identity is None:
             pass
@@ -114,13 +114,13 @@ def registry_maker():
 
 
 def _registry(cls, regcls):
-    assert not hasattr(cls, 'registry')
+    assert not hasattr(cls, "registry")
     cls.registry = regcls()
 
     original_init_subclass = cls.__init_subclass__
 
     def _patched_init_subclass(subcls):
-        if func := getattr(original_init_subclass, '__func__', None):
+        if func := getattr(original_init_subclass, "__func__", None):
             func(subcls)
         cls.registry.register(subcls)
 

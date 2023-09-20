@@ -3,21 +3,21 @@ from nextgisweb.lib import db
 
 
 class CState(Base):
-    __tablename__ = 'core_cstate'
+    __tablename__ = "core_cstate"
 
     component = db.Column(db.Unicode, primary_key=True)
     heads = db.Column(db.Unicode, nullable=False)
 
 
 class Migration(Base):
-    __tablename__ = 'core_migration'
+    __tablename__ = "core_migration"
 
     component = db.Column(db.Unicode, primary_key=True)
     revision = db.Column(db.Unicode, primary_key=True)
 
 
 class Setting(Base):
-    __tablename__ = 'setting'
+    __tablename__ = "setting"
 
     component = db.Column(db.Unicode, primary_key=True)
     name = db.Column(db.Unicode, primary_key=True)
@@ -25,42 +25,50 @@ class Setting(Base):
 
 
 storage_stat_dimension = db.Table(
-    'core_storage_stat_dimension', Base.metadata,
-    db.Column('tstamp', db.TIMESTAMP, nullable=False),
-    db.Column('component', db.Unicode, nullable=False),
-    db.Column('kind_of_data', db.Unicode, nullable=False),
-    db.Column('resource_id', db.Integer, index=True),
-    db.Column('value_data_volume', db.BigInteger),
+    "core_storage_stat_dimension",
+    Base.metadata,
+    db.Column("tstamp", db.TIMESTAMP, nullable=False),
+    db.Column("component", db.Unicode, nullable=False),
+    db.Column("kind_of_data", db.Unicode, nullable=False),
+    db.Column("resource_id", db.Integer, index=True),
+    db.Column("value_data_volume", db.BigInteger),
 )
 
 
 storage_stat_dimension_total = db.Table(
-    'core_storage_stat_dimension_total', Base.metadata,
-    db.Column('tstamp', db.TIMESTAMP, nullable=False),
-    db.Column('kind_of_data', db.Unicode, primary_key=True),
-    db.Column('value_data_volume', db.BigInteger),
+    "core_storage_stat_dimension_total",
+    Base.metadata,
+    db.Column("tstamp", db.TIMESTAMP, nullable=False),
+    db.Column("kind_of_data", db.Unicode, primary_key=True),
+    db.Column("value_data_volume", db.BigInteger),
 )
 
 
 storage_stat_delta = db.Table(
-    'core_storage_stat_delta', Base.metadata,
-    db.Column('tstamp', db.TIMESTAMP, nullable=False),
-    db.Column('component', db.Unicode, nullable=False),
-    db.Column('kind_of_data', db.Unicode, nullable=False),
-    db.Column('resource_id', db.Integer, index=True),
-    db.Column('value_data_volume', db.BigInteger),
+    "core_storage_stat_delta",
+    Base.metadata,
+    db.Column("tstamp", db.TIMESTAMP, nullable=False),
+    db.Column("component", db.Unicode, nullable=False),
+    db.Column("kind_of_data", db.Unicode, nullable=False),
+    db.Column("resource_id", db.Integer, index=True),
+    db.Column("value_data_volume", db.BigInteger),
 )
 
 
 storage_stat_delta_total = db.Table(
-    'core_storage_stat_delta_total', Base.metadata,
-    db.Column('tstamp', db.TIMESTAMP, nullable=False),
-    db.Column('kind_of_data', db.Unicode, primary_key=True),
-    db.Column('value_data_volume', db.BigInteger),
+    "core_storage_stat_delta_total",
+    Base.metadata,
+    db.Column("tstamp", db.TIMESTAMP, nullable=False),
+    db.Column("kind_of_data", db.Unicode, primary_key=True),
+    db.Column("value_data_volume", db.BigInteger),
 )
 
 
-db.event.listen(storage_stat_delta, 'after_create', db.DDL('''
+db.event.listen(
+    storage_stat_delta,
+    "after_create",
+    db.DDL(
+        """
     CREATE FUNCTION core_storage_stat_delta_after_insert() RETURNS trigger
     LANGUAGE 'plpgsql' AS $BODY$
     BEGIN
@@ -90,9 +98,19 @@ db.event.listen(storage_stat_delta, 'after_create', db.DDL('''
 
     CREATE TRIGGER after_insert AFTER INSERT ON core_storage_stat_delta
     FOR EACH ROW EXECUTE PROCEDURE core_storage_stat_delta_after_insert();
-'''), propagate=True)
+"""
+    ),
+    propagate=True,
+)
 
 
-db.event.listen(storage_stat_delta, 'after_drop', db.DDL('''
+db.event.listen(
+    storage_stat_delta,
+    "after_drop",
+    db.DDL(
+        """
     DROP FUNCTION core_storage_stat_delta_after_insert();
-'''), propagate=True)
+"""
+    ),
+    propagate=True,
+)

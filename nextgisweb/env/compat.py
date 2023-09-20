@@ -5,4 +5,4 @@ if sys.version_info < (3, 10):
 else:
     from importlib.metadata import entry_points
 
-__all__ = ['entry_points']
+__all__ = ["entry_points"]

@@ -24,13 +24,14 @@ class InvalidOriginError(UserException):
     title = _("Invalid origin")
     message = _(
         "Origin validation is enabled for rendering requests, but the given "
-        "origin doesn't match with the CORS origins list.")
+        "origin doesn't match with the CORS origins list."
+    )
     http_status_code = 403
 
 
 PD_READ = DataScope.read
 
-with open(Path(__file__).parent / 'empty_256x256.png', 'rb') as f:
+with open(Path(__file__).parent / "empty_256x256.png", "rb") as f:
     EMPTY_TILE_256x256 = f.read()
 
 
@@ -38,9 +39,8 @@ def rtoint(arg):
     return tuple(map(lambda c: int(round(c)), arg))
 
 
-def tile_debug_info(img, offset=(0, 0), color='black',
-                    zxy=None, extent=None, msg=None):
-    """ Print tile debug info on image at given tile offset """
+def tile_debug_info(img, offset=(0, 0), color="black", zxy=None, extent=None, msg=None):
+    """Print tile debug info on image at given tile offset"""
     drw = ImageDraw.Draw(img)
     drw.rectangle(offset + tuple(map(lambda c: c + 255, offset)), outline=color)
     ImageFont.load_default()
@@ -52,7 +52,7 @@ def tile_debug_info(img, offset=(0, 0), color='black',
         text.append(str(extent[2:4]))
     if msg:
         text.append(msg)
-    drw.text((8 + offset[0], 8 + offset[1]), '\n'.join(text), fill=color)
+    drw.text((8 + offset[0], 8 + offset[1]), "\n".join(text), fill=color)
     return img
 
 
@@ -61,23 +61,23 @@ image_encoder = image_encoder_factory(FORMAT_PNG, COMPRESSION_FAST)
 
 def image_response(img, empty_code, size):
     if img is None:
-        if empty_code in ('204', '404'):
+        if empty_code in ("204", "404"):
             return Response(status=empty_code)
         elif size == (256, 256):
-            return Response(EMPTY_TILE_256x256, content_type='image/png')
+            return Response(EMPTY_TILE_256x256, content_type="image/png")
         else:
-            img = Image.new('RGBA', size)
+            img = Image.new("RGBA", size)
 
     buf = BytesIO()
     image_encoder(img, buf)
     buf.seek(0)
 
-    return Response(body_file=buf, content_type='image/png')
+    return Response(body_file=buf, content_type="image/png")
 
 
 def check_origin(request):
-    if request.env.render.options['check_origin']:
-        origin = request.headers.get('Origin')
+    if request.env.render.options["check_origin"]:
+        origin = request.headers.get("Origin")
         if (
             origin is not None
             and not origin.startswith(request.application_url)
@@ -91,10 +91,12 @@ def tile(request):
 
     z, x, y = zxy_from_request(request)
 
-    p_resource = map(int, filter(None, request.GET['resource'].split(',')))
-    p_cache = request.GET.get('cache', 'true').lower() in ('true', 'yes', '1') \
+    p_resource = map(int, filter(None, request.GET["resource"].split(",")))
+    p_cache = (
+        request.GET.get("cache", "true").lower() in ("true", "yes", "1")
         and request.env.render.tile_cache_enabled
-    p_empty_code = request.GET.get('nd', '200')
+    )
+    p_empty_code = request.GET.get("nd", "200")
 
     aimg = None
     for resid in p_resource:
@@ -113,8 +115,12 @@ def tile(request):
         tcache = obj.tile_cache
 
         # Is requested tile may be cached?
-        cache_enabled = p_cache and tcache is not None and tcache.enabled \
+        cache_enabled = (
+            p_cache
+            and tcache is not None
+            and tcache.enabled
             and (tcache.max_z is None or z <= tcache.max_z)
+        )
 
         cache_exists = False
         if cache_enabled:
@@ -137,8 +143,9 @@ def tile(request):
                 aimg = Image.alpha_composite(aimg, rimg)
             except ValueError:
                 raise HTTPBadRequest(
-                    explanation="Image (ID=%d) must have mode %s, but it is %s mode." %
-                    (obj.id, aimg.mode, rimg.mode))
+                    explanation="Image (ID=%d) must have mode %s, but it is %s mode."
+                    % (obj.id, aimg.mode, rimg.mode)
+                )
 
     return image_response(aimg, p_empty_code, (256, 256))
 
@@ -146,15 +153,17 @@ def tile(request):
 def image(request):
     check_origin(request)
 
-    p_extent = tuple(map(float, request.GET['extent'].split(',')))
-    p_size = tuple(map(int, request.GET['size'].split(',')))
-    p_resource = map(int, filter(None, request.GET['resource'].split(',')))
-    p_cache = request.GET.get('cache', 'true').lower() in ('true', 'yes', '1') \
+    p_extent = tuple(map(float, request.GET["extent"].split(",")))
+    p_size = tuple(map(int, request.GET["size"].split(",")))
+    p_resource = map(int, filter(None, request.GET["resource"].split(",")))
+    p_cache = (
+        request.GET.get("cache", "true").lower() in ("true", "yes", "1")
         and request.env.render.tile_cache_enabled
-    p_empty_code = request.GET.get('nd', '200')
+    )
+    p_empty_code = request.GET.get("nd", "200")
 
     # Print tile debug info on resulting image
-    tdi = request.GET.get('tdi', '').lower() in ('yes', 'true')
+    tdi = request.GET.get("tdi", "").lower() in ("yes", "true")
 
     resolution = (
         (p_extent[2] - p_extent[0]) / p_size[0],
@@ -189,9 +198,13 @@ def image(request):
 
         # Is requested image may be cached via tiles?
         cache_enabled = (
-            p_cache and zexact and tcache is not None
-            and tcache.enabled and tcache.image_compose  # NOQA: W503
-            and (tcache.max_z is None or ztile <= tcache.max_z))  # NOQA: W503
+            p_cache
+            and zexact
+            and tcache is not None
+            and tcache.enabled
+            and tcache.image_compose
+            and (tcache.max_z is None or ztile <= tcache.max_z)
+        )
 
         ext_extent = p_extent
         ext_size = p_size
@@ -201,7 +214,8 @@ def image(request):
             # Affine transform from layer to tile
             at_l2t = af_transform(
                 (obj.srs.minx, obj.srs.miny, obj.srs.maxx, obj.srs.maxy),
-                (0, 0, 2 ** ztile, 2 ** ztile))
+                (0, 0, 2**ztile, 2**ztile),
+            )
             at_t2l = ~at_l2t
 
             # Affine transform from layer to image
@@ -236,17 +250,20 @@ def image(request):
                     break
                 else:
                     if rimg is None:
-                        rimg = Image.new('RGBA', p_size)
+                        rimg = Image.new("RGBA", p_size)
 
                     if tdi:
-                        msg = 'CACHED'
+                        msg = "CACHED"
                         if timg is None:
-                            timg = Image.new('RGBA', p_size)
-                            msg += ' EMPTY'
+                            timg = Image.new("RGBA", p_size)
+                            msg += " EMPTY"
                         timg = tile_debug_info(
-                            timg.convert('RGBA'), color='blue', zxy=(ztile, tx, ty),
+                            timg.convert("RGBA"),
+                            color="blue",
+                            zxy=(ztile, tx, ty),
                             extent=at_t2l * (tx, ty) + at_t2l * (tx + 1, ty + 1),
-                            msg=msg)
+                            msg=msg,
+                        )
 
                     if timg is None:
                         continue
@@ -271,18 +288,23 @@ def image(request):
                         timg = rimg.crop(t_offset + (t_offset[0] + 256, t_offset[1] + 256))
 
                     tile_cache_failed = tile_cache_failed or (
-                        not obj.tile_cache.put_tile((ztile, tx, ty), timg))
+                        not obj.tile_cache.put_tile((ztile, tx, ty), timg)
+                    )
 
                     if tdi:
                         if rimg is None:
-                            rimg = Image.new('RGBA', ext_size)
-                        msg = 'NEW'
+                            rimg = Image.new("RGBA", ext_size)
+                        msg = "NEW"
                         if empty_image:
-                            msg += ' EMPTY'
+                            msg += " EMPTY"
                         rimg = tile_debug_info(
-                            rimg, offset=t_offset, color='red', zxy=(ztile, tx, ty),
+                            rimg,
+                            offset=t_offset,
+                            color="red",
+                            zxy=(ztile, tx, ty),
                             extent=at_t2l * (tx, ty) + at_t2l * (tx + 1, ty + 1),
-                            msg=msg)
+                            msg=msg,
+                        )
 
                     elif tile_cache_failed:
                         # Stop putting to the tile cache in case of its failure.
@@ -291,11 +313,14 @@ def image(request):
             if rimg is None:
                 continue
 
-            rimg = rimg.crop((
-                ext_offset[0], ext_offset[1],
-                ext_offset[0] + p_size[0],
-                ext_offset[1] + p_size[1]
-            ))
+            rimg = rimg.crop(
+                (
+                    ext_offset[0],
+                    ext_offset[1],
+                    ext_offset[0] + p_size[0],
+                    ext_offset[1] + p_size[1],
+                )
+            )
 
         if aimg is None:
             aimg = rimg
@@ -304,8 +329,9 @@ def image(request):
                 aimg = Image.alpha_composite(aimg, rimg)
             except ValueError:
                 raise HTTPBadRequest(
-                    explanation="Image (ID=%d) must have mode %s, but it is %s mode." %
-                    (obj.id, aimg.mode, rimg.mode))
+                    explanation="Image (ID=%d) must have mode %s, but it is %s mode."
+                    % (obj.id, aimg.mode, rimg.mode)
+                )
 
     return image_response(aimg, p_empty_code, p_size)
 
@@ -327,7 +353,7 @@ def tile_cache_seed_status(request) -> JSONType:
 def legend(request):
     request.resource_permission(PD_READ)
     result = request.context.render_legend()
-    return Response(body_file=result, content_type='image/png')
+    return Response(body_file=result, content_type="image/png")
 
 
 def legend_symbols_by_resource(resource, icon_size: int):
@@ -335,50 +361,53 @@ def legend_symbols_by_resource(resource, icon_size: int):
 
     for s in resource.legend_symbols(icon_size):
         buf = BytesIO()
-        s.icon.save(buf, 'png', compress_level=3)
+        s.icon.save(buf, "png", compress_level=3)
 
-        result.append(dict(
-            display_name=s.display_name,
-            icon=dict(
-                format="png",
-                data=b64encode(buf.getvalue()).decode('ascii'),
-            ),
-        ))
+        result.append(
+            dict(
+                display_name=s.display_name,
+                icon=dict(
+                    format="png",
+                    data=b64encode(buf.getvalue()).decode("ascii"),
+                ),
+            )
+        )
 
     return result
 
 
 def legend_symbols(request) -> JSONType:
     request.resource_permission(PD_READ)
-    icon_size = int(request.GET.get('icon_size', '24'))
+    icon_size = int(request.GET.get("icon_size", "24"))
     return legend_symbols_by_resource(request.context, icon_size)
 
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'render.tile',
-        '/api/component/render/tile',
-        get=tile)
+        "render.tile",
+        "/api/component/render/tile",
+        get=tile,
+    )
 
     config.add_route(
-        'render.image',
-        '/api/component/render/image'
+        "render.image",
+        "/api/component/render/image",
     ).get(image, http_cache=0)
 
     config.add_route(
-        'render.tile_cache.seed_status',
-        '/api/resource/{id:uint}/tile_cache/seed_status',
+        "render.tile_cache.seed_status",
+        "/api/resource/{id:uint}/tile_cache/seed_status",
         factory=resource_factory,
     ).get(tile_cache_seed_status, context=IRenderableStyle)
 
     config.add_route(
-        'render.legend',
-        '/api/resource/{id:uint}/legend',
-        factory=resource_factory
+        "render.legend",
+        "/api/resource/{id:uint}/legend",
+        factory=resource_factory,
     ).get(legend, context=ILegendableStyle)
 
     config.add_route(
-        'render.legend_symbols',
-        '/api/resource/{id:uint}/legend_symbols',
+        "render.legend_symbols",
+        "/api/resource/{id:uint}/legend_symbols",
         factory=resource_factory,
     ).get(legend_symbols, context=ILegendSymbols)

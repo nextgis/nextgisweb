@@ -1,15 +1,21 @@
 class BaseOperation:
-    opname = 'base'
+    opname = "base"
     oprank = 0
 
     def __init__(self, condition, action, migration=None, component=None, revision=None):
         self.condition = condition
         self.action = action
         self.migration = migration
-        self.component = component if component is not None else (
-            migration.component if migration is not None else None)
-        self.revision = revision if revision is not None else (
-            migration.revision if migration is not None else None)
+        self.component = (
+            component
+            if component is not None
+            else (migration.component if migration is not None else None)
+        )
+        self.revision = (
+            revision
+            if revision is not None
+            else (migration.revision if migration is not None else None)
+        )
 
     def apply(self, state):
         result = dict(state)
@@ -18,7 +24,7 @@ class BaseOperation:
 
 
 class ForwardOperation(BaseOperation):
-    opname = 'forward'
+    opname = "forward"
     oprank = 1
     gvcolor = '"#92c5de"'
 
@@ -30,7 +36,7 @@ class ForwardOperation(BaseOperation):
 
 
 class RewindOperation(BaseOperation):
-    opname = 'rewind'
+    opname = "rewind"
     oprank = 1
     gvinv = True
     gvcolor = '"#f4a582"'
@@ -43,7 +49,7 @@ class RewindOperation(BaseOperation):
 
 
 class InstallOperation(BaseOperation):
-    opname = 'install'
+    opname = "install"
     oprank = 2
     gvinv = False
     gvcolor = '"#0571b0"'
@@ -56,7 +62,7 @@ class InstallOperation(BaseOperation):
 
 
 class UninstallOperation(BaseOperation):
-    opname = 'uninstall'
+    opname = "uninstall"
     oprank = 2
     gvinv = True
     gvcolor = '"#ca0020"'

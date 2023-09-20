@@ -8,7 +8,8 @@ from ..component import CoreComponent
 def statistics(
     self: EnvCommand,
     estimate_storage: bool = opt(False),
-    *, core: CoreComponent,
+    *,
+    core: CoreComponent,
 ):
     """Gather statistics and print as JSON
 
@@ -19,7 +20,7 @@ def statistics(
 
     result = dict()
     for comp in self.env.components.values():
-        if hasattr(comp, 'query_stat'):
+        if hasattr(comp, "query_stat"):
             result[comp.identity] = comp.query_stat()
 
     print(dumps(result, pretty=True))

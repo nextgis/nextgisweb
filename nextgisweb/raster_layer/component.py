@@ -11,7 +11,6 @@ from .model import RasterLayer, estimate_raster_layer_data
 
 
 class RasterLayerComponent(Component):
-
     def initialize(self):
         self.env.core.mksdir(self)
         self.wdir = self.env.core.gtsdir(self)
@@ -19,6 +18,7 @@ class RasterLayerComponent(Component):
 
     def setup_pyramid(self, config):
         from . import api, view  # NOQA
+
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
@@ -31,7 +31,7 @@ class RasterLayerComponent(Component):
     def workdir_filename(self, fobj, makedirs=False):
         return self.env.file_storage.workdir_filename(self, fobj, makedirs)
 
-    @require('file_storage')
+    @require("file_storage")
     def maintenance(self):
         super().maintenance()
         self.build_missing_overviews()
@@ -43,7 +43,7 @@ class RasterLayerComponent(Component):
             resource.build_overview(missing_only=True)
 
     def cleanup(self):
-        logger.info('Cleaning up raster layer storage...')
+        logger.info("Cleaning up raster layer storage...")
 
         deleted_symlinks = deleted_ovr = deleted_bytes = 0
         kept_symlinks = kept_ovr = kept_bytes = 0
@@ -54,7 +54,7 @@ class RasterLayerComponent(Component):
 
             for fn in filenames:
                 fullfn = Path(dirpath) / fn
-                if fullfn.suffix == '.ovr':
+                if fullfn.suffix == ".ovr":
                     overviews.append(fullfn)
                 elif fullfn.is_symlink():
                     size = fullfn.lstat().st_size
@@ -69,7 +69,7 @@ class RasterLayerComponent(Component):
 
             for fullfn in overviews:
                 size = fullfn.stat().st_size
-                if fullfn.with_suffix('').exists():
+                if fullfn.with_suffix("").exists():
                     kept_ovr += 1
                     kept_bytes += size
                 else:
@@ -78,22 +78,25 @@ class RasterLayerComponent(Component):
                     deleted_ovr += 1
                     deleted_bytes += size
 
-            if (
-                dirpath != os.path.normpath(self.wdir)
-                and (
-                    (not relist and len(filenames) == 0 and len(dirnames) == 0)
-                    or len(os.listdir(dirpath)) == 0
-                )
+            if dirpath != os.path.normpath(self.wdir) and (
+                (not relist and len(filenames) == 0 and len(dirnames) == 0)
+                or len(os.listdir(dirpath)) == 0
             ):
                 os.rmdir(dirpath)
 
         logger.info(
             "Deleted: %d symlinks, %d raster overviews (%d bytes)",
-            deleted_symlinks, deleted_ovr, deleted_bytes)
+            deleted_symlinks,
+            deleted_ovr,
+            deleted_bytes,
+        )
 
         logger.info(
             "Preserved: %d symlinks, %d raster overviews (%d bytes)",
-            kept_symlinks, kept_ovr, kept_bytes)
+            kept_symlinks,
+            kept_ovr,
+            kept_bytes,
+        )
 
     def estimate_storage(self):
         for resource in RasterLayer.query():
@@ -101,6 +104,6 @@ class RasterLayerComponent(Component):
             yield RasterLayerData, resource.id, size
 
     option_annotations = (
-        Option('cog_enabled', bool, default=True),
-        Option('size_limit', SizeInBytes, default=None),
+        Option("cog_enabled", bool, default=True),
+        Option("size_limit", SizeInBytes, default=None),
     )

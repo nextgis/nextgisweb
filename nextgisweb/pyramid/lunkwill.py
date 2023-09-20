@@ -7,66 +7,63 @@ from pyramid.response import Response
 
 
 def setup_pyramid(comp, config):
-    opts = comp.options.with_prefix('lunkwill')
+    opts = comp.options.with_prefix("lunkwill")
     st = config.registry.settings
 
-    st['lunkwill.url'] = 'http://{}:{}'.format(opts['host'], opts['port'])
-    st['lunkwill.pool'] = urllib3.PoolManager()
+    st["lunkwill.url"] = "http://{}:{}".format(opts["host"], opts["port"])
+    st["lunkwill.pool"] = urllib3.PoolManager()
 
     def lunkwill(request):
-        v = request.headers.get('X-Lunkwill')
+        v = request.headers.get("X-Lunkwill")
         if v is not None:
             v = v.lower()
-            if v not in ('suggest', 'require'):
+            if v not in ("suggest", "require"):
                 raise HTTPBadRequest(explanation="Invalid X-Lunkwill header")
             return v
         return None
 
     def lunkwill_request(request):
-        v = request.headers.get('X-Lunkwill-Request')
+        v = request.headers.get("X-Lunkwill-Request")
         if v is not None:
             try:
                 return UUID(v)
             except ValueError:
-                raise HTTPBadRequest(explanation='Invalid X-Lunkwill-Request header')
+                raise HTTPBadRequest(explanation="Invalid X-Lunkwill-Request header")
         return None
 
     config.add_request_method(lunkwill, reify=True)
     config.add_request_method(lunkwill_request, reify=True)
 
     config.add_tween(
-        'nextgisweb.pyramid.lunkwill.tween_factory',
-        under=['nextgisweb.pyramid.api.cors_tween_factory'])
+        "nextgisweb.pyramid.lunkwill.tween_factory",
+        under=["nextgisweb.pyramid.api.cors_tween_factory"],
+    )
 
     config.add_route(
-        'lunkwill.summary',
-        '/api/lunkwill/{id:str}/summary',
+        "lunkwill.summary",
+        "/api/lunkwill/{id:str}/summary",
         get=proxy,
     )
 
     config.add_route(
-        'lunkwill.response',
-        '/api/lunkwill/{id:str}/response',
+        "lunkwill.response",
+        "/api/lunkwill/{id:str}/response",
         get=proxy,
     )
 
 
 def tween_factory(handler, registry):
-    pool = registry.settings['lunkwill.pool']
-    headers_rm = {h.lower() for h in ('X-Lunkwill', )}
+    pool = registry.settings["lunkwill.pool"]
+    headers_rm = {h.lower() for h in ("X-Lunkwill",)}
 
     def tween(request):
         if request.lunkwill is not None:
-            url = urlrebase(request.url, registry.settings['lunkwill.url'])
-            headers = {
-                k: v for k, v in request.headers.items()
-                if k.lower() not in headers_rm}
+            url = urlrebase(request.url, registry.settings["lunkwill.url"])
+            headers = {k: v for k, v in request.headers.items() if k.lower() not in headers_rm}
             resp = pool.request(
-                request.method, url, headers=headers,
-                body=request.body_file, retries=False)
-            return Response(
-                body=resp.data, status=resp.status,
-                headerlist=resp.headers.items())
+                request.method, url, headers=headers, body=request.body_file, retries=False
+            )
+            return Response(body=resp.data, status=resp.status, headerlist=resp.headers.items())
 
         return handler(request)
 
@@ -74,19 +71,12 @@ def tween_factory(handler, registry):
 
 
 def proxy(request):
-    url = urlrebase(request.url, request.registry.settings['lunkwill.url'])
-    headers = {
-        k: v for k, v in request.headers.items()
-        if k.lower() not in ('connection',)}
-    headers['Connection'] = 'close'
-    pool = request.registry.settings['lunkwill.pool']
-    resp = pool.request(
-        request.method, url,
-        headers=headers, retries=False,
-        preload_content=False)
-    return Response(
-        status=resp.status, headerlist=resp.headers.items(),
-        app_iter=resp.stream())
+    url = urlrebase(request.url, request.registry.settings["lunkwill.url"])
+    headers = {k: v for k, v in request.headers.items() if k.lower() not in ("connection",)}
+    headers["Connection"] = "close"
+    pool = request.registry.settings["lunkwill.pool"]
+    resp = pool.request(request.method, url, headers=headers, retries=False, preload_content=False)
+    return Response(status=resp.status, headerlist=resp.headers.items(), app_iter=resp.stream())
 
 
 def urlrebase(ngw_url, lw_url):

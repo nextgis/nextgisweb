@@ -12,6 +12,7 @@ from ..graph import (
 
 
 def foo_install(ctx):
+    # fmt: off
     ctx.execute(dedent("""
         CREATE TABLE foo (
             id INTEGER PRIMARY KEY,
@@ -23,17 +24,21 @@ def foo_install(ctx):
 
         INSERT INTO foo VALUES (1, 'value');
     """))
+    # fmt: on
 
 
 def foo_uninstall(ctx):
+    # fmt: off
     ctx.execute(dedent("""
         DROP TABLE foo_b;
         DROP TABLE foo_a;
         DROP TABLE foo;
     """))
+    # fmt: on
 
 
 def bar_install(ctx):
+    # fmt: off
     ctx.execute(dedent("""
         CREATE TABLE bar (
             id INTEGER PRIMARY KEY,
@@ -43,6 +48,7 @@ def bar_install(ctx):
 
         INSERT INTO bar VALUES (1, 1);
     """))
+    # fmt: on
 
 
 def bar_uninstall(ctx):
@@ -50,6 +56,7 @@ def bar_uninstall(ctx):
 
 
 def initial(ctx):
+    # fmt: off
     ctx.execute(dedent("""
         CREATE TABLE foo (
             id TEXT PRIMARY KEY,
@@ -66,31 +73,30 @@ def initial(ctx):
 
         INSERT INTO bar VALUES (1, '1');
     """))
+    # fmt: on
     return ctx
 
 
 class Context:
-
     def __init__(self):
-        self._conn = sqlite3.connect(':memory:')
-        self._conn.execute('PRAGMA foreign_keys = ON')
+        self._conn = sqlite3.connect(":memory:")
+        self._conn.execute("PRAGMA foreign_keys = ON")
 
     def execute(self, sql):
         self._conn.executescript(sql)
 
     def operation(self, operation):
         if isinstance(operation, (InstallOperation, UninstallOperation)):
-            m = globals().get('{}_{}'.format(operation.component, operation.opname))
+            m = globals().get("{}_{}".format(operation.component, operation.opname))
             m(self)
         elif isinstance(operation, (ForwardOperation, RewindOperation)):
-            m = getattr(operation.migration, '{}_callable'.format(operation.opname))
+            m = getattr(operation.migration, "{}_callable".format(operation.opname))
             m(self)
 
     def dump(self):
-        return '\n'.join((
-            line for line in self._conn.iterdump()
-            if not line.startswith(('BEGIN ', 'COMMIT'))
-        ))
+        return "\n".join(
+            (line for line in self._conn.iterdump() if not line.startswith(("BEGIN ", "COMMIT")))
+        )
 
     def install(self):
         foo_install(self)
@@ -125,8 +131,10 @@ def test_install_unistall(graph):
 
     with compare_ctx(ctx):
         solution = resolve(
-            operations, {k: False for k in graph._nodes},
-            {k: True for k in graph._nodes})
+            operations,
+            {k: False for k in graph._nodes},
+            {k: True for k in graph._nodes},
+        )
 
         for op in solution:
             ctx.operation(op)
@@ -134,9 +142,10 @@ def test_install_unistall(graph):
         solution = resolve(
             operations,
             {k: True for k in graph._nodes},
-            {k: False for k in graph._nodes})
+            {k: False for k in graph._nodes},
+        )
 
-        print('\n'.join(map(str, solution)))
+        print("\n".join(map(str, solution)))
 
         for op in solution:
             ctx.operation(op)
@@ -151,9 +160,10 @@ def test_forward(graph):
     solution = resolve(
         operations,
         {k: k in graph._tails for k in graph._nodes},
-        {k: True for k in graph._nodes})
+        {k: True for k in graph._nodes},
+    )
 
-    print('\n'.join(map(str, solution)))
+    print("\n".join(map(str, solution)))
 
     for op in solution:
         ctx.operation(op)
@@ -170,9 +180,10 @@ def test_rewind(graph):
     solution = resolve(
         operations,
         {k: True for k in graph._nodes},
-        {k: k in graph._tails for k in graph._nodes})
+        {k: k in graph._tails for k in graph._nodes},
+    )
 
-    print('\n'.join(map(str, solution)))
+    print("\n".join(map(str, solution)))
 
     for op in solution:
         ctx.operation(op)

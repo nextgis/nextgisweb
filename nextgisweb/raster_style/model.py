@@ -16,12 +16,11 @@ from nextgisweb.render import (
 )
 from nextgisweb.resource import DataScope, Resource
 
-Base.depends_on('resource')
+Base.depends_on("resource")
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)
 class RenderRequest:
-
     def __init__(self, style, srs, cond):
         self.style = style
         self.srs = srs
@@ -37,7 +36,7 @@ class RenderRequest:
 
 @implementer(IRenderableStyle, ILegendableStyle)
 class RasterStyle(Base, Resource):
-    identity = 'raster_style'
+    identity = "raster_style"
     cls_display_name = _("Raster style")
 
     __scope__ = DataScope
@@ -70,10 +69,15 @@ class RasterStyle(Base, Resource):
             return result
 
         ds = gdal.Warp(
-            "", parent_ds,
+            "",
+            parent_ds,
             options=gdal.WarpOptions(
-                width=size[0], height=size[1], outputBounds=extent, format="MEM",
-                warpOptions=['UNIFIED_SRC_NODATA=ON'], dstAlpha=True,
+                width=size[0],
+                height=size[1],
+                outputBounds=extent,
+                format="MEM",
+                warpOptions=["UNIFIED_SRC_NODATA=ON"],
+                dstAlpha=True,
             ),
         )
 
@@ -81,7 +85,9 @@ class RasterStyle(Base, Resource):
         array = numpy.zeros((size[1], size[0], band_count), numpy.uint8)
 
         for i in range(band_count):
-            array[:, :, i] = gdal_array.BandReadAsArray(ds.GetRasterBand(i + 1),)
+            array[:, :, i] = gdal_array.BandReadAsArray(
+                ds.GetRasterBand(i + 1),
+            )
 
         ds = None
         parent_ds = None
@@ -93,9 +99,9 @@ class RasterStyle(Base, Resource):
     def render_legend(self):
         # Don't use real preview of raster layer as icon
         # because it may be slow
-        img = PIL.Image.open(module_path('nextgisweb.raster_style') / 'iconRaster.png')
+        img = PIL.Image.open(module_path("nextgisweb.raster_style") / "iconRaster.png")
         buf = BytesIO()
-        img.save(buf, 'png')
+        img.save(buf, "png")
         buf.seek(0)
 
         return buf

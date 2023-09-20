@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def forward(ctx):
-    fn = Path(ctx.env.core.gtsdir(ctx.env.pyramid)) / 'secret'
+    fn = Path(ctx.env.core.gtsdir(ctx.env.pyramid)) / "secret"
     fn.unlink(missing_ok=True)
 
 

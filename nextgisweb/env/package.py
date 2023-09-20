@@ -12,7 +12,7 @@ from nextgisweb.lib.logging import logger
 
 from .compat import entry_points
 
-_version_re = re.compile(r'(.+)\+(?:git)?([0-9a-f]{4,})(\.dirty)?$', re.IGNORECASE)
+_version_re = re.compile(r"(.+)\+(?:git)?([0-9a-f]{4,})(\.dirty)?$", re.IGNORECASE)
 _qualifications = False
 
 
@@ -20,7 +20,7 @@ class Package:
     loading = threading.local()
 
     def __init__(self, entrypoint):
-        self._name = entrypoint.dist.name.replace('-', '_')
+        self._name = entrypoint.dist.name.replace("-", "_")
         self._entrypoint = entrypoint
         self._path = module_path(self.name)
 
@@ -59,14 +59,16 @@ class Package:
 
     @property
     def pkginfo(self):
-        if hasattr(self, '_pkginfo'):
+        if hasattr(self, "_pkginfo"):
             return self._pkginfo
 
         logger.debug(
             "Loading entrypoint: %s = %s",
-            self._entrypoint.name, self._entrypoint.value)
+            self._entrypoint.name,
+            self._entrypoint.value,
+        )
 
-        mprefix = f'{self.name}.'
+        mprefix = f"{self.name}."
         mod_before = {k for k in sys.modules.keys() if k.startswith(mprefix)}
 
         entrypoint_callable = self._entrypoint.load()
@@ -75,24 +77,27 @@ class Package:
             self.loading.value = self
             self._pkginfo = entrypoint_callable()
         finally:
-            delattr(self.loading, 'value')
+            delattr(self.loading, "value")
 
         mod_after = {k for k in sys.modules.keys() if k.startswith(mprefix)}
         mod_loaded = mod_after - mod_before
         if mod_loaded:
-            mod_fmt = ', '.join(m[len(self.name) + 1:] for m in mod_loaded)
+            mod_fmt = ", ".join(m[len(self.name) + 1 :] for m in mod_loaded)
             warnings.warn_explicit(
                 f"Loading of {self.name} pkginfo entrypoint shouldn't import "
                 f"any additional modules, but the following {self.name}.* "
                 f"modules were imported: {mod_fmt}.",
-                UserWarning, sys.modules[self.name].__file__, 0,
-                module=self.name)
+                UserWarning,
+                sys.modules[self.name].__file__,
+                0,
+                module=self.name,
+            )
 
         return self._pkginfo
 
     @property
     def metadata(self):
-        if cached := getattr(self, '_metadata', None):
+        if cached := getattr(self, "_metadata", None):
             return cached
         value = metadata(self.name)
         self._metadata = value
@@ -114,7 +119,6 @@ class Package:
 
 
 class PkgInfo:
-
     def __init__(self):
         self.scanned = False
         self._comp_mod = dict()
@@ -134,31 +138,33 @@ class PkgInfo:
             return
 
         epoints = sorted(
-            entry_points(group='nextgisweb.packages'),
+            entry_points(group="nextgisweb.packages"),
             # Deterministic order: nextgisweb then others alphabetically
-            key=lambda ep: (ep.dist.name != 'nextgisweb', ep.dist.name))
+            key=lambda ep: (ep.dist.name != "nextgisweb", ep.dist.name),
+        )
 
         for epoint in epoints:
             package = Package(epoint)
             package_name = package.name
             self._packages[package_name] = package
-            components = package.pkginfo.get('components', dict())
-            for (comp, cdefn) in components.items():
+            components = package.pkginfo.get("components", dict())
+            for comp, cdefn in components.items():
                 if isinstance(cdefn, str):
                     cdefn = dict(module=cdefn, enabled=True)
-                if 'enabled' not in cdefn:
-                    cdefn['enabled'] = True
-                modname = cdefn['module']
+                if "enabled" not in cdefn:
+                    cdefn["enabled"] = True
+                modname = cdefn["module"]
 
                 if existing := self._comp_mod.get(comp):
                     warnings.warn(
                         f"Component '{comp}' was already registered in '{existing}'. "
-                        f"Instance from {modname} will be ignored!")
+                        f"Instance from {modname} will be ignored!"
+                    )
                     continue
 
                 self._module_tree_insert(modname, comp)
 
-                self._comp_enabled[comp] = cdefn['enabled']
+                self._comp_enabled[comp] = cdefn["enabled"]
                 self._comp_pkg[comp] = package_name
                 self._comp_path[comp] = module_path(modname)
                 if package_name not in self._pkg_comp:
@@ -205,7 +211,7 @@ class PkgInfo:
         n = self._module_tree
         r = module_name
         while True:
-            k, __, r = r.partition('.')
+            k, __, r = r.partition(".")
             if k in n:
                 n = n[k]
             else:
@@ -217,7 +223,7 @@ class PkgInfo:
         n = self._module_tree
         r = module_name
         while r:
-            k, __, r = r.partition('.')
+            k, __, r = r.partition(".")
             n = n[k]
         n[None] = comp
 
@@ -232,10 +238,13 @@ def enable_qualifications(enabled):
 
 def git_commit(path):
     try:
-        devnull = open(os.devnull, 'w')
+        devnull = open(os.devnull, "w")
         commit = subprocess.check_output(
-            ['git', 'rev-parse', '--short=8', 'HEAD'],
-            cwd=path, universal_newlines=True, stderr=devnull)
+            ["git", "rev-parse", "--short=8", "HEAD"],
+            cwd=path,
+            universal_newlines=True,
+            stderr=devnull,
+        )
     except Exception as exc:
         if isinstance(exc, subprocess.CalledProcessError) and exc.returncode == 128:
             pass  # Not a git repository
@@ -249,11 +258,16 @@ def git_commit(path):
 
 def git_dirty(path):
     try:
-        devnull = open(os.devnull, 'w')
-        return subprocess.call(
-            ['git', 'diff', '--no-ext-diff', '--quiet'],
-            cwd=path, universal_newlines=True, stderr=devnull
-        ) != 0
+        devnull = open(os.devnull, "w")
+        return (
+            subprocess.call(
+                ["git", "diff", "--no-ext-diff", "--quiet"],
+                cwd=path,
+                universal_newlines=True,
+                stderr=devnull,
+            )
+            != 0
+        )
     except Exception as exc:
         if isinstance(exc, subprocess.CalledProcessError) and exc.returncode == 128:
             pass  # Not a git repository
@@ -266,7 +280,7 @@ def git_dirty(path):
 
 def single_component():
     package = Package.loading.value.name
-    prefix = 'nextgisweb_'
+    prefix = "nextgisweb_"
     assert package.startswith(prefix), "Package name must start with {prefix}"
-    component = package[len(prefix):]
+    component = package[len(prefix) :]
     return dict(components={component: package})

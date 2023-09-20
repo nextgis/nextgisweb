@@ -11,10 +11,12 @@ from .component import PyramidComponent
 @cli.command()
 def server(
     self: EnvCommand.customize(env_initialize=False),
-    host: str = opt('0.0.0.0'),
+    host: str = opt("0.0.0.0"),
     port: int = opt(8080),
     reload: Optional[bool] = opt(flag=True),
-    *, core: CoreComponent, pyramid: PyramidComponent,
+    *,
+    core: CoreComponent,
+    pyramid: PyramidComponent,
 ):
     """Launch development-mode web server
 
@@ -24,12 +26,11 @@ def server(
 
     from waitress import serve
 
-    reload = (core.debug if reload is None else reload)
+    reload = core.debug if reload is None else reload
     if reload:
         from hupper import start_reloader
-        start_reloader(
-            'nextgisweb.script.main',
-            reload_interval=0.25)
+
+        start_reloader("nextgisweb.script.main", reload_interval=0.25)
         logger.info("File monitor started")
 
     self.env.initialize()
@@ -38,6 +39,4 @@ def server(
     app = config.make_wsgi_app()
     logger.debug("WSGI application created")
 
-    serve(
-        app, host=host, port=port, threads=1,
-        clear_untrusted_proxy_headers=True)
+    serve(app, host=host, port=port, threads=1, clear_untrusted_proxy_headers=True)

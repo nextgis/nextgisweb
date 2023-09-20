@@ -22,22 +22,22 @@ from .data import generate_filter_extents
 
 pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
 
-data_points = Path(__file__).parent / 'data' / 'points.geojson'
+data_points = Path(__file__).parent / "data" / "points.geojson"
 filter_cases = (
-    ((('null', 'isnull', 'yes'), ), [1, 2]),
-    ((('null', 'isnull', 'no'), ), [3]),
-    ((('string', 'eq', 'Foo bar'), ), [1, 3]),
-    ((('string', 'ne', 'Foo bar'), ), [2]),
-    ((('int', 'eq', 0), ), [2]),
-    ((('int', 'eq', 0), ('unicode', 'eq', 'Юникод')), [2]),
-    ((('int64', 'ge', 500), ), [1, 2]),
-    ((('int64', 'gt', 500), ), [1]),
-    ((('int64', 'le', 500), ), [2, 3]),
-    ((('int64', 'lt', 500), ), [3]),
+    ((("null", "isnull", "yes"),), [1, 2]),
+    ((("null", "isnull", "no"),), [3]),
+    ((("string", "eq", "Foo bar"),), [1, 3]),
+    ((("string", "ne", "Foo bar"),), [2]),
+    ((("int", "eq", 0),), [2]),
+    ((("int", "eq", 0), ("unicode", "eq", "Юникод")), [2]),
+    ((("int64", "ge", 500),), [1, 2]),
+    ((("int64", "gt", 500),), [1]),
+    ((("int64", "le", 500),), [2, 3]),
+    ((("int64", "lt", 500),), [3]),
 )
 order_by_cases = (
-    ((('asc', 'real'), ), [1, 3, 2]),
-    ((('asc', 'date'), ('desc', 'int')), [2, 1, 3]),
+    ((("asc", "real"),), [1, 3, 2]),
+    ((("asc", "date"), ("desc", "int")), [2, 1, 3]),
 )
 
 
@@ -73,35 +73,39 @@ def cmp_geom(gj_geom, geom2, srs):
     assert g1.equals_exact(g2, 5e-07)
 
 
-@pytest.mark.parametrize('create_resource', (
-    pytest.param(create_vector_layer, id='vector_layer'),
-    pytest.param(create_wfs_layer, id='wfsclient_layer'),
-    pytest.param(create_postgis_layer, id='postgis_layer'),
-))
+@pytest.mark.parametrize(
+    "create_resource",
+    (
+        pytest.param(create_vector_layer, id="vector_layer"),
+        pytest.param(create_wfs_layer, id="wfsclient_layer"),
+        pytest.param(create_postgis_layer, id="postgis_layer"),
+    ),
+)
 def test_attributes(create_resource, ngw_resource_group_sub, ngw_httptest_app):
     geojson = json.loads(data_points.read_text())
-    gj_fs = geojson['features']
+    gj_fs = geojson["features"]
 
     ds = ogr.Open(str(data_points))
     ogrlayer = ds.GetLayer(0)
 
-    with create_resource(ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app) as layer:
-
+    with create_resource(
+        ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
+    ) as layer:
         # IFeatureQuery
 
         query = layer.feature_query()
         result = query()
         assert result.total_count == len(gj_fs)
         for i, f in enumerate(result):
-            cmp_fields(gj_fs[i]['properties'], f.fields)
+            cmp_fields(gj_fs[i]["properties"], f.fields)
             assert f.geom is None
 
         # - fields
-        fields = ('int', 'string')
+        fields = ("int", "string")
         query = layer.feature_query()
         query.fields(*fields)
         for i, f in enumerate(query()):
-            gjfields = {k: gj_fs[i]['properties'][k] for k in fields}
+            gjfields = {k: gj_fs[i]["properties"][k] for k in fields}
             cmp_fields(gjfields, f.fields)
 
         # - limit
@@ -110,14 +114,14 @@ def test_attributes(create_resource, ngw_resource_group_sub, ngw_httptest_app):
         query.limit(limit)
         fs = list(query())
         assert len(fs) == limit
-        cmp_fields(gj_fs[limit - 1]['properties'], fs[limit - 1].fields)
+        cmp_fields(gj_fs[limit - 1]["properties"], fs[limit - 1].fields)
 
         offset = 1
         query = layer.feature_query()
         query.limit(limit, offset)
         fs = list(query())
         assert len(fs) == limit
-        cmp_fields(gj_fs[offset + limit - 1]['properties'], fs[limit - 1].fields)
+        cmp_fields(gj_fs[offset + limit - 1]["properties"], fs[limit - 1].fields)
 
         q = layer.feature_query()
 
@@ -127,7 +131,7 @@ def test_attributes(create_resource, ngw_resource_group_sub, ngw_httptest_app):
                 skip = False
                 if isinstance(layer, WFSLayer):
                     for k, op, v in filter_:
-                        if op == 'isnull' and v == 'no':
+                        if op == "isnull" and v == "no":
                             skip = True
                             break
                 if skip:
@@ -143,7 +147,7 @@ def test_attributes(create_resource, ngw_resource_group_sub, ngw_httptest_app):
                 filter_by = dict()
                 skip = False
                 for k, o, v in filter_:
-                    if o != 'eq':
+                    if o != "eq":
                         skip = True
                         break
                     filter_by[k] = v
@@ -164,31 +168,40 @@ def test_attributes(create_resource, ngw_resource_group_sub, ngw_httptest_app):
 
 def geom_type_product():
     for cfunc, alias in (
-        (create_vector_layer, 'vector_layer'),
-        (create_postgis_layer, 'postgis_layer'),
-        (create_wfs_layer, 'wfsclient_layer'),
+        (create_vector_layer, "vector_layer"),
+        (create_postgis_layer, "postgis_layer"),
+        (create_wfs_layer, "wfsclient_layer"),
     ):
         for geom_type in (
-            'point', 'pointz', 'multipoint', 'multipointz',
-            'linestring', 'linestringz', 'multilinestring', 'multilinestringz',
-            'polygon', 'polygonz', 'multipolygon', 'multipolygonz',
+            "point",
+            "pointz",
+            "multipoint",
+            "multipointz",
+            "linestring",
+            "linestringz",
+            "multilinestring",
+            "multilinestringz",
+            "polygon",
+            "polygonz",
+            "multipolygon",
+            "multipolygonz",
         ):
-            yield pytest.param(cfunc, geom_type, id=f'{alias}-{geom_type}')
+            yield pytest.param(cfunc, geom_type, id=f"{alias}-{geom_type}")
 
 
-@pytest.mark.parametrize('create_resource, geom_type', geom_type_product())
+@pytest.mark.parametrize("create_resource, geom_type", geom_type_product())
 def test_geometry(create_resource, geom_type, ngw_resource_group_sub, ngw_httptest_app):
-    data = Path(__file__).parent \
-        / 'data' / 'geometry' / f'{geom_type}.geojson'
+    data = Path(__file__).parent / "data" / "geometry" / f"{geom_type}.geojson"
 
     geojson = json.loads(data.read_text())
-    gj_fs = geojson['features']
+    gj_fs = geojson["features"]
 
     ds = ogr.Open(str(data))
     ogrlayer = ds.GetLayer(0)
 
-    with create_resource(ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app) as layer:
-
+    with create_resource(
+        ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
+    ) as layer:
         # IFeatureQuery
 
         # - geom
@@ -197,7 +210,7 @@ def test_geometry(create_resource, geom_type, ngw_resource_group_sub, ngw_httpte
         result = query()
         assert result.total_count == len(gj_fs)
         for i, f in enumerate(result):
-            cmp_geom(gj_fs[i]['geometry'], f.geom, layer.srs)
+            cmp_geom(gj_fs[i]["geometry"], f.geom, layer.srs)
 
         # - srs
         srs = SRS.filter_by(id=4326).one()
@@ -207,33 +220,38 @@ def test_geometry(create_resource, geom_type, ngw_resource_group_sub, ngw_httpte
         result = query()
         assert result.total_count == len(gj_fs)
         for i, f in enumerate(result):
-            cmp_geom(gj_fs[i]['geometry'], f.geom, srs)
+            cmp_geom(gj_fs[i]["geometry"], f.geom, srs)
 
 
 filter_extents_data = generate_filter_extents()
 
 
-@pytest.mark.parametrize('create_resource', (
-    pytest.param(create_vector_layer, id='vector_layer'),
-    pytest.param(create_postgis_layer, id='postgis_layer'),
-))
-@pytest.mark.parametrize('filter_, expected_extent', filter_extents_data)
-def test_filtered_extent(create_resource, filter_, expected_extent,
-                         ngw_resource_group_sub, ngw_httptest_app):
-    data = Path(__file__).parent \
-        / 'data' / 'filter-extent-layer.geojson'
+@pytest.mark.parametrize(
+    "create_resource",
+    (
+        pytest.param(create_vector_layer, id="vector_layer"),
+        pytest.param(create_postgis_layer, id="postgis_layer"),
+    ),
+)
+@pytest.mark.parametrize("filter_, expected_extent", filter_extents_data)
+def test_filtered_extent(
+    create_resource, filter_, expected_extent, ngw_resource_group_sub, ngw_httptest_app
+):
+    data = Path(__file__).parent / "data" / "filter-extent-layer.geojson"
 
     ds = ogr.Open(str(data))
     ogrlayer = ds.GetLayer(0)
 
-    with create_resource(ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app) as layer:
+    with create_resource(
+        ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
+    ) as layer:
         # Filtered extent
         query = layer.feature_query()
         if filter_ is not None:
             query.filter(filter_)
         actual_extent = query().extent
 
-        for k in ('minLat', 'maxLat', 'minLon', 'maxLon'):
+        for k in ("minLat", "maxLat", "minLon", "maxLon"):
             if expected_extent[k] is None:
                 assert actual_extent[k] is None
             else:

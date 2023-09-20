@@ -12,13 +12,16 @@ from nextgisweb.lib.ogrhelper import cohere_bytes
 from ...geometry import Geometry, GeometryNotValid
 
 
-@pytest.mark.parametrize('wkt', (
-    pytest.param('POINT (1 2)', id='point-2d'),
-    pytest.param('POINT Z (1 2 3)', id='point-3d'),
-    pytest.param('GEOMETRYCOLLECTION EMPTY', id='empty-col'),
-    # NOTE: M and ZM geometries don't work here because of lack
-    # of support in the Shapely library.
-))
+@pytest.mark.parametrize(
+    "wkt",
+    (
+        pytest.param("POINT (1 2)", id="point-2d"),
+        pytest.param("POINT Z (1 2 3)", id="point-3d"),
+        pytest.param("GEOMETRYCOLLECTION EMPTY", id="empty-col"),
+        # NOTE: M and ZM geometries don't work here because of lack
+        # of support in the Shapely library.
+    ),
+)
 def test_wkt_wkb(wkt, ngw_txn):
     ogr_geom = ogr.CreateGeometryFromWkt(wkt)
     assert ogr_geom is not None, gdal.GetLastErrorMsg()
@@ -43,19 +46,22 @@ def test_wkt_wkb(wkt, ngw_txn):
     assert Geometry.from_wkt(wkt_iso).wkb == wkb_ext, "WKT parsing has failed"
 
 
-@pytest.mark.parametrize('src, is_valid', (
-    (dict(wkt='DICH'), False),
-    (dict(wkt='POINT (0)'), False),
-    (dict(wkt='POINT (0 0.0)'), True),
-    (dict(wkt='POINT Z (1 2 3)'), True),
-    (dict(wkt='GEOMETRYCOLLECTION EMPTY'), True),
-    (dict(wkt='POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))'), True),
-    (dict(wkb='000000000140000000000000004010000000000000'), True),
-    (dict(wkb='FF0000000140000000000000004010000000000000'), False),
-))
+@pytest.mark.parametrize(
+    "src, is_valid",
+    (
+        (dict(wkt="DICH"), False),
+        (dict(wkt="POINT (0)"), False),
+        (dict(wkt="POINT (0 0.0)"), True),
+        (dict(wkt="POINT Z (1 2 3)"), True),
+        (dict(wkt="GEOMETRYCOLLECTION EMPTY"), True),
+        (dict(wkt="POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"), True),
+        (dict(wkb="000000000140000000000000004010000000000000"), True),
+        (dict(wkb="FF0000000140000000000000004010000000000000"), False),
+    ),
+)
 def test_valid(src, is_valid):
-    if 'wkb' in src:
-        src['wkb'] = bytes.fromhex(src['wkb'])
+    if "wkb" in src:
+        src["wkb"] = bytes.fromhex(src["wkb"])
     if not is_valid:
         with pytest.raises(GeometryNotValid):
             Geometry(validate=True, **src)
@@ -64,7 +70,7 @@ def test_valid(src, is_valid):
 
 
 def test_wkt_wkb_ogr_shape():
-    wkt = Geometry.from_wkt('POINT Z (1 2 3)')
+    wkt = Geometry.from_wkt("POINT Z (1 2 3)")
 
     wkb = Geometry.from_wkb(wkt.wkb)
     assert wkt.wkt == wkb.wkt
@@ -76,11 +82,9 @@ def test_wkt_wkb_ogr_shape():
     assert shape.wkt == wkt.wkt
 
 
-@pytest.mark.parametrize('fmt_src, fmt_dst', combinations(
-    ('wkb', 'wkt', 'ogr', 'shape'), 2
-))
+@pytest.mark.parametrize("fmt_src, fmt_dst", combinations(("wkb", "wkt", "ogr", "shape"), 2))
 def test_convert(fmt_src, fmt_dst):
-    geom_wkt = 'POINT Z (1 2 3)'
+    geom_wkt = "POINT Z (1 2 3)"
     geom_ogr = ogr.CreateGeometryFromWkt(geom_wkt)
 
     sample = dict(
@@ -90,29 +94,28 @@ def test_convert(fmt_src, fmt_dst):
         shape=wkt_loads(geom_wkt),
     )
 
-    val_src = getattr(Geometry, 'from_' + fmt_src)(sample[fmt_src])
+    val_src = getattr(Geometry, "from_" + fmt_src)(sample[fmt_src])
     val_dst = getattr(val_src, fmt_dst)
 
-    if fmt_dst == 'ogr':
+    if fmt_dst == "ogr":
         assert val_dst.Equal(sample[fmt_dst])
     else:
         assert val_dst == sample[fmt_dst]
 
 
 def _pg_wkt_to_wkb_iso(wkt):
-    return _query_scalar_bytes(sa_func.st_asbinary(
-        sa_func.st_geomfromtext(wkt), 'NDR'))
+    return _query_scalar_bytes(sa_func.st_asbinary(sa_func.st_geomfromtext(wkt), "NDR"))
 
 
 def _pg_wkt_to_wkb_ext(wkt):
-    return _query_scalar_bytes(sa_func.st_asewkb(
-        sa_func.st_geomfromtext(wkt), 'NDR'))
+    return _query_scalar_bytes(sa_func.st_asewkb(sa_func.st_geomfromtext(wkt), "NDR"))
 
 
 def _pg_wkb(wkb):
     _wkb = wkb.hex()
-    return _query_scalar_bytes(sa_func.st_asewkb(
-        sa_func.st_geomfromwkb(sa_func.decode(_wkb, 'hex')), 'NDR'))
+    return _query_scalar_bytes(
+        sa_func.st_asewkb(sa_func.st_geomfromwkb(sa_func.decode(_wkb, "hex")), "NDR")
+    )
 
 
 def _query_scalar_bytes(query):

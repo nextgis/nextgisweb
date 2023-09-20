@@ -16,9 +16,7 @@ ROUTE_PATTERN = dict(
 )
 
 ROUTE_RE = re.compile(
-    r"\{(?P<k>\w+)(?:\:(?P<t>(?:"
-    + "|".join(ROUTE_PATTERN.keys())
-    + r")))?(?:\:(?P<r>.+?))?\}"
+    r"\{(?P<k>\w+)(?:\:(?P<t>(?:" + "|".join(ROUTE_PATTERN.keys()) + r")))?(?:\:(?P<r>.+?))?\}"
 )
 
 

@@ -4,7 +4,6 @@ from .cmd_grp import Command, Group
 
 
 def _decorator(cls, *args, **kwargs):
-
     def _wrapper(cls_or_fn):
         return cls(cls_or_fn, *args, **kwargs)
 

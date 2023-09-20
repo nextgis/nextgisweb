@@ -13,7 +13,6 @@ register(DBSession)
 
 
 class BaseClass:
-
     def __init__(self, **kwargs):
         cls = type(self)
         for k, v in kwargs.items():
@@ -25,7 +24,7 @@ class BaseClass:
 
     def postinit(self, **kwargs):
         sup = super()
-        if hasattr(sup, 'postinit'):
+        if hasattr(sup, "postinit"):
             sup.postinit(**kwargs)
 
     @classmethod
@@ -51,7 +50,10 @@ _CLASS_REGISTRY = dict()
 def declarative_base(dependencies=None):
     warn(
         "Usage of declarative_base() isn't encouraged since nextgisweb >= 4.5.0.dev6. Use "
-        "'from nextgisweb.env import Base' instead.", DeprecationWarning, stacklevel=2)
+        "'from nextgisweb.env import Base' instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     result = _base()
     if dependencies:
@@ -60,9 +62,7 @@ def declarative_base(dependencies=None):
 
 
 def _base_factory(comp_id):
-    result = sa_declarative_base(
-        cls=BaseClass, constructor=None,
-        class_registry=_CLASS_REGISTRY)
+    result = sa_declarative_base(cls=BaseClass, constructor=None, class_registry=_CLASS_REGISTRY)
     result.metadata.dependencies = []
 
     def depends_on(*other_component_ids):

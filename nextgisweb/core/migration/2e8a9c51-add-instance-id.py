@@ -15,16 +15,20 @@ from nextgisweb.models import DBSession
 
 def forward(ctx):
     connection = DBSession.connection()
+    instance_id = ctx.env.core.options.get("provision.instance_id", str(uuid.uuid4()))
 
-    instance_id = ctx.env.core.options.get('provision.instance_id', str(uuid.uuid4()))
+    # fmt: off
     connection.execute(text("""
         INSERT INTO setting (component, name, value)
         VALUES ('core', 'instance_id', :instance_id)
     """), dict(instance_id=json.dumps(instance_id)))
+    # fmt: on
 
 
 def rewind(ctx):
+    # fmt: off
     DBSession.execute(text("""
         DELETE FROM setting
         WHERE component = 'core' AND name = 'instance_id';
     """))
+    # fmt: on

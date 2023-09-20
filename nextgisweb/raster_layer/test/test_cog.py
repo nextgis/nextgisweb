@@ -33,7 +33,8 @@ def test_cog(ngw_webtest_app, ngw_env):
     cs = ds.GetRasterBand(1).Checksum()
 
     ngw_webtest_app.put_json(
-        f"/api/resource/{res.id}", dict(raster_layer=dict(cog=True))
+        f"/api/resource/{res.id}",
+        dict(raster_layer=dict(cog=True)),
     )
     res = RasterLayer.filter_by(id=res.id).one()
     fn = ngw_env.raster_layer.workdir_filename(res.fileobj)
@@ -41,7 +42,8 @@ def test_cog(ngw_webtest_app, ngw_env):
     assert len(errors) == 0
 
     ngw_webtest_app.put_json(
-        f"/api/resource/{res.id}", dict(raster_layer=dict(cog=False))
+        f"/api/resource/{res.id}",
+        dict(raster_layer=dict(cog=False)),
     )
     res = RasterLayer.filter_by(id=res.id).one()
     fn = ngw_env.raster_layer.workdir_filename(res.fileobj)

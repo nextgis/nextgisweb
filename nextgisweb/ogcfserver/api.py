@@ -56,12 +56,14 @@ def collection_to_ogc(collection, request):
         itemType="feature",
         extent={
             "spatial": {
-                "bbox": [(
-                    extent["minLon"],
-                    extent["minLat"],
-                    extent["maxLon"],
-                    extent["maxLat"],
-                )],
+                "bbox": [
+                    (
+                        extent["minLon"],
+                        extent["minLat"],
+                        extent["maxLon"],
+                        extent["maxLat"],
+                    )
+                ],
                 "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84",
             }
         },
@@ -111,8 +113,8 @@ def landing_page(resource, request) -> JSONType:
                 "rel": "service-desc",
                 "type": "application/vnd.oai.openapi+json;version=3.0",
                 "title": "The OpenAPI definition",
-                "href": route_url("ogcfserver.openapi")
-            }
+                "href": route_url("ogcfserver.openapi"),
+            },
         ],
     )
 
@@ -214,7 +216,7 @@ def items(resource, request) -> JSONType:
                             "ogcfserver.items",
                             id=resource.id,
                             collection_id=collection_id,
-                            _query=request.params
+                            _query=request.params,
                         ),
                     },
                     {
@@ -339,10 +341,9 @@ def options(resource, request):
 _PARAM_OFFSET = {
     "name": "offset",
     "in": "query",
-    "description":
-        "The optional offset parameter indicates the index within the result set from which "
-        "the server shall begin presenting results in the response document. "
-        "The first element has an index of 0 (default).",
+    "description": "The optional offset parameter indicates the index within the result set from which "
+    "the server shall begin presenting results in the response document. "
+    "The first element has an index of 0 (default).",
     "required": False,
     "style": "form",
     "explode": False,
@@ -356,19 +357,13 @@ _PARAM_OFFSET = {
 _PARAM_BBOX = {
     "name": "bbox",
     "in": "query",
-    "description":
-        "Only features that have a geometry that intersects the bounding box are selected. "
-        "The bounding box is provided as four or six numbers, depending on whether "
-        "the coordinate reference system includes a vertical axis (height or depth).",
+    "description": "Only features that have a geometry that intersects the bounding box are selected. "
+    "The bounding box is provided as four or six numbers, depending on whether "
+    "the coordinate reference system includes a vertical axis (height or depth).",
     "required": False,
     "style": "form",
     "explode": False,
-    "schema": {
-        "type": "array",
-        "minItems": 4,
-        "maxItems": 6,
-        "items": {"type": "number"}
-    },
+    "schema": {"type": "array", "minItems": 4, "maxItems": 6, "items": {"type": "number"}},
 }
 
 
@@ -377,21 +372,19 @@ def openapi(resource, request) -> JSONType:
 
     paths = {}
 
-    oas = {
-        "openapi": "3.0.2",
-        "tags": []
-    }
-    info = {
-        "title": resource.display_name,
-        "version": "1.0.0"
-    }
+    oas = {"openapi": "3.0.2", "tags": []}
+    info = {"title": resource.display_name, "version": "1.0.0"}
     oas["info"] = info
-    oas["servers"] = [{
-        "url": request.route_url("ogcfserver.landing_page", id=resource.id),
-        "description": "Web GIS framework by NextGIS"
-    }]
+    oas["servers"] = [
+        {
+            "url": request.route_url("ogcfserver.landing_page", id=resource.id),
+            "description": "Web GIS framework by NextGIS",
+        }
+    ]
 
-    ogcapi_yaml_url = "http://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml"
+    ogcapi_yaml_url = (
+        "http://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml"
+    )
 
     paths["/"] = {
         "get": {
@@ -399,9 +392,7 @@ def openapi(resource, request) -> JSONType:
             "description": "Landing page",
             "operationId": "getLandingPage",
             "parameters": [],
-            "responses": {
-                "200": {"$ref": f"{ogcapi_yaml_url}#/components/responses/LandingPage"}
-            }
+            "responses": {"200": {"$ref": f"{ogcapi_yaml_url}#/components/responses/LandingPage"}},
         }
     }
 
@@ -413,8 +404,8 @@ def openapi(resource, request) -> JSONType:
             "parameters": [],
             "responses": {
                 "200": {"$ref": "#/components/responses/200"},
-                "default": {"$ref": "#/components/responses/default"}
-            }
+                "default": {"$ref": "#/components/responses/default"},
+            },
         }
     }
 
@@ -426,7 +417,7 @@ def openapi(resource, request) -> JSONType:
             "parameters": [],
             "responses": {
                 "200": {"$ref": f"{ogcapi_yaml_url}#/components/responses/ConformanceDeclaration"}
-            }
+            },
         }
     }
 
@@ -437,9 +428,7 @@ def openapi(resource, request) -> JSONType:
             "tags": ["server"],
             "operationId": "getCollections",
             "parameters": [],
-            "responses": {
-                "200": {"$ref": f"{ogcapi_yaml_url}#/components/responses/Collections"}
-            }
+            "responses": {"200": {"$ref": f"{ogcapi_yaml_url}#/components/responses/Collections"}},
         }
     }
 
@@ -448,7 +437,7 @@ def openapi(resource, request) -> JSONType:
             "200": {"description": "successful operation"},
             "default": {"description": "unexpected error"},
         },
-        "parameters": {"offset": _PARAM_OFFSET, "bbox": _PARAM_BBOX}
+        "parameters": {"offset": _PARAM_OFFSET, "bbox": _PARAM_BBOX},
     }
 
     for c in resource.collections:
@@ -462,7 +451,7 @@ def openapi(resource, request) -> JSONType:
                 "operationId": f"describe{c.keyname}Collection",
                 "responses": {
                     "200": {"$ref": f"{ogcapi_yaml_url}#/components/responses/Collection"}
-                }
+                },
             }
         }
 
@@ -478,7 +467,7 @@ def openapi(resource, request) -> JSONType:
                 ],
                 "responses": {
                     "200": {"$ref": f"{ogcapi_yaml_url}#/components/responses/Features"},
-                }
+                },
             },
             "post": {
                 "summary": f"Add {c.keyname} items",
@@ -486,17 +475,13 @@ def openapi(resource, request) -> JSONType:
                 "operationId": f"add{c.keyname}Features",
                 "requestBody": {
                     "description": "Adds item to collection",
-                    "content": {
-                        "application/geo+json": {
-                            "schema": {}
-                        }
-                    },
-                    "required": True
+                    "content": {"application/geo+json": {"schema": {}}},
+                    "required": True,
                 },
                 "responses": {
                     "201": {"description": "Successful creation"},
-                }
-            }
+                },
+            },
         }
 
         paths[f"{collection_name_path}/items/{{featureId}}"] = {
@@ -509,7 +494,7 @@ def openapi(resource, request) -> JSONType:
                 ],
                 "responses": {
                     "200": {"$ref": f"{ogcapi_yaml_url}#/components/responses/Feature"},
-                }
+                },
             },
             "delete": {
                 "summary": f"Delete {c.keyname} items",
@@ -518,9 +503,7 @@ def openapi(resource, request) -> JSONType:
                 "parameters": [
                     {"$ref": f"{ogcapi_yaml_url}#/components/parameters/featureId"},
                 ],
-                "responses": {
-                    "200": {"description": "Successful delete"}
-                }
+                "responses": {"200": {"description": "Successful delete"}},
             },
             "put": {
                 "summary": f"Update {c.keyname} items",
@@ -531,17 +514,13 @@ def openapi(resource, request) -> JSONType:
                 ],
                 "requestBody": {
                     "description": "Updates item in collection",
-                    "content": {
-                        "application/geo+json": {
-                            "schema": {}
-                        }
-                    },
-                    "required": True
+                    "content": {"application/geo+json": {"schema": {}}},
+                    "required": True,
                 },
                 "responses": {
                     "200": {"description": "Successful update"},
-                }
-            }
+                },
+            },
         }
 
     oas["paths"] = paths
@@ -551,7 +530,8 @@ def openapi(resource, request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        "ogcfserver.landing_page", "/api/resource/{id:uint}/ogcf",
+        "ogcfserver.landing_page",
+        "/api/resource/{id:uint}/ogcf",
         factory=resource_factory,
     ).get(landing_page, context=Service)
 
@@ -588,18 +568,15 @@ def setup_pyramid(comp, config):
         "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}/items",
         factory=resource_factory,
         openapi=False,
-    ) \
-        .get(items, context=Service) \
-        .post(create, context=Service) \
-        .options(options, context=Service)
+    ).get(items, context=Service).post(create, context=Service).options(options, context=Service)
 
     config.add_route(
         "ogcfserver.item",
         "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}/items/{item_id:int}",
         factory=resource_factory,
         openapi=False,
-    ) \
-        .get(iget, context=Service) \
-        .put(iput, context=Service) \
-        .delete(idelete, context=Service) \
-        .options(options, context=Service)
+    ).get(iget, context=Service).put(iput, context=Service).delete(
+        idelete, context=Service
+    ).options(
+        options, context=Service
+    )

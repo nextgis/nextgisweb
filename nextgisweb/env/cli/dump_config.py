@@ -9,10 +9,10 @@ def dump_config(self: EnvCommand):
         sprint = False
         for k, v in options._options.items():
             if not sprint:
-                print('[{}]'.format(identity))
+                print("[{}]".format(identity))
                 sprint = True
             print("{} = {}".format(k, v))
 
-    print_options('environment', self.env.options)
-    for comp in self.env.chain('initialize'):
+    print_options("environment", self.env.options)
+    for comp in self.env.chain("initialize"):
         print_options(comp.identity, comp.options)

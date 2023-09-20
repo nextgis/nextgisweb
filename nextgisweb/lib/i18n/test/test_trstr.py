@@ -5,7 +5,7 @@ import pytest
 
 from ..trstr import trstr_factory
 
-f = trstr_factory('test')
+f = trstr_factory("test")
 n = f.ngettext
 p = f.pgettext
 np = f.npgettext
@@ -13,25 +13,27 @@ np = f.npgettext
 
 class UpperCaseTranslator:
     def translate(
-        self, msg, *,
+        self,
+        msg,
+        *,
         plural=None,
         number=None,
         context=None,
         domain=None,
     ):
-        assert domain == 'test'
+        assert domain == "test"
         result = msg
         if number is not None:
             assert plural is not None
             if number > 1:
                 result = plural
-        result = result.upper().replace('%S', '%s')
+        result = result.upper().replace("%S", "%s")
         if context is not None:
-            result += '@' + context.upper()
+            result += "@" + context.upper()
         return result
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def uc_tr():
     uct = UpperCaseTranslator()
 
@@ -42,15 +44,15 @@ def uc_tr():
 
 
 def test_context(uc_tr):
-    assert uc_tr(f('foo')) == 'FOO'
-    assert uc_tr(p('ctx', 'bar')) == 'BAR@CTX'
+    assert uc_tr(f("foo")) == "FOO"
+    assert uc_tr(p("ctx", "bar")) == "BAR@CTX"
 
 
 def test_plural(uc_tr):
     assert uc_tr(n("one", "many", 1)) == "ONE"
     assert uc_tr(n("one", "many", 2)) == "MANY"
-    assert uc_tr(np('ctx', 'one', 'many', 1)) == "ONE@CTX"
-    assert uc_tr(np('ctx', 'one', 'many', 2)) == "MANY@CTX"
+    assert uc_tr(np("ctx", "one", "many", 1)) == "ONE@CTX"
+    assert uc_tr(np("ctx", "one", "many", 2)) == "MANY@CTX"
 
 
 def test_concat(uc_tr):
@@ -70,7 +72,6 @@ def test_format(uc_tr):
 
 
 class DictTranslator:
-
     def __init__(self):
         self._dict = dict()
 
@@ -78,13 +79,15 @@ class DictTranslator:
         self._dict[msg] = translation
 
     def translate(
-        self, msg, *,
+        self,
+        msg,
+        *,
         plural=None,
         number=None,
         context=None,
         domain=None,
     ):
-        assert domain == 'test'
+        assert domain == "test"
         return self._dict[msg]
 
 
@@ -110,7 +113,7 @@ def test_guard(caplog):
         assert tr(f("M%s") % "a") == "Ma"
 
     dt.add("M{}", "T{}")
-    dt.add('M%d', 'T%d')
+    dt.add("M%d", "T%d")
     assert tr(f("M{}").format("a")) == "Ta"
     assert tr(f("M{}").format("a") + f("M%d") % 1) == "TaT1"
     with pytest.raises(TypeError):

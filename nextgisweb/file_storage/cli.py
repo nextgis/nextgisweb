@@ -10,9 +10,8 @@ class cleanup(DryRunOptions, EnvCommand):
 
     def __call__(self, *, file_storage: FileStorageComponent):
         file_storage.cleanup(
-            dry_run=self.dry_run,
-            unreferenced=self.unreferenced,
-            orphaned=self.orphaned)
+            dry_run=self.dry_run, unreferenced=self.unreferenced, orphaned=self.orphaned
+        )
 
         if self.dry_run:
             print("Use --no-dry-run option to make the changes!")

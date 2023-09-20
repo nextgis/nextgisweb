@@ -9,25 +9,30 @@ if typing.TYPE_CHECKING:
 
     COMP_ID: str
 
+    # fmt: off
     def gettext(message: str) -> TrStr: pass
     def pgettext(context: str, messsage: str) -> TrStr: pass
     def ngettext(singual: str, plural: str, number: int) -> TrStr: pass
     def npgettext(context: str, singual: str, plural: str, number: int) -> TrStr: pass
+    # fmt: on
 
     _ = gettext
 
 
 def __getattr__(name):
-    if name == 'COMP_ID':
+    if name == "COMP_ID":
         from .component import _COMP_ID
+
         return _COMP_ID()
 
-    elif name in ('_', 'gettext', 'pgettext', 'ngettext', 'npgettext'):
+    elif name in ("_", "gettext", "pgettext", "ngettext", "npgettext"):
         from .component import _tr_str_factory as _factory
-        return getattr(_factory(), 'gettext' if name == '_' else name)
 
-    elif name == 'Base':
+        return getattr(_factory(), "gettext" if name == "_" else name)
+
+    elif name == "Base":
         from .model import _base
+
         return _base()
 
     raise AttributeError

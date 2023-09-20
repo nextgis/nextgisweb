@@ -14,7 +14,7 @@ def test_tails(graph):
 
 
 def test_heads(graph):
-    for key in graph.select('head'):
+    for key in graph.select("head"):
         assert key.revision != REVID_ZERO
 
 
@@ -23,24 +23,21 @@ def test_tail_to_head(graph):
 
     cstate = {k: k in graph._tails for k in graph._nodes}
 
-    solution = resolve(
-        operations, cstate,
-        {k: True for k in graph.select('head')})
+    solution = resolve(operations, cstate, {k: True for k in graph.select("head")})
 
     assert solution is not None
-    print('\n' + '\n'.join(map(str, solution)))
+    print("\n" + "\n".join(map(str, solution)))
 
 
 def test_head_to_tail(graph):
     operations = graph.operations()
 
     solution = resolve(
-        operations,
-        {k: True for k in graph._nodes},
-        {k: k in graph._tails for k in graph._nodes})
+        operations, {k: True for k in graph._nodes}, {k: k in graph._tails for k in graph._nodes}
+    )
 
     assert solution is not None
-    print('\n' + '\n'.join(map(str, solution)))
+    print("\n" + "\n".join(map(str, solution)))
 
 
 def test_install(graph):
@@ -49,14 +46,15 @@ def test_install(graph):
     s = resolve(
         operations,
         {k: False for k in graph._nodes},
-        {k: True for k in graph._nodes if k.revision == REVID_ZERO})
+        {k: True for k in graph._nodes if k.revision == REVID_ZERO},
+    )
 
     assert s is not None
-    print('\n' + '\n'.join(map(str, s)))
+    print("\n" + "\n".join(map(str, s)))
 
     assert len(s) == 2
-    assert s[0].component == 'foo' and s[0].opname == 'install'
-    assert s[1].component == 'bar' and s[1].opname == 'install'
+    assert s[0].component == "foo" and s[0].opname == "install"
+    assert s[1].component == "bar" and s[1].opname == "install"
 
 
 def test_uninstall(graph):
@@ -68,8 +66,8 @@ def test_uninstall(graph):
     s = resolve(operations, cstate, tstate)
 
     assert s is not None
-    print('\n' + '\n'.join(map(str, s)))
+    print("\n" + "\n".join(map(str, s)))
 
     assert len(s) == 2
-    assert s[0].component == 'bar' and s[0].opname == 'uninstall'
-    assert s[1].component == 'foo' and s[1].opname == 'uninstall'
+    assert s[0].component == "bar" and s[0].opname == "uninstall"
+    assert s[1].component == "foo" and s[1].opname == "uninstall"

@@ -98,8 +98,10 @@ class FileUploadComponent(Component):
             chunkSize=self.chunk_size,
         )
 
+    # fmt: off
     option_annotations = (
         Option("path", default=None),
         Option("max_size", SizeInBytes, default=8 * 2**30),
         Option("chunk_size", SizeInBytes, default=16 * 2**20),
     )
+    # fmt: on

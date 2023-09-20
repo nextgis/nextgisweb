@@ -7,15 +7,14 @@ from .model import FeatureDescription
 
 
 class FeatureDescriptionExtension(FeatureExtension):
-    identity = 'description'
+    identity = "description"
 
-    editor_widget = '@nextgisweb/feature-description/description-editor'
-    display_widget = 'ngw-feature-description/DisplayWidget'
+    editor_widget = "@nextgisweb/feature-description/description-editor"
+    display_widget = "ngw-feature-description/DisplayWidget"
 
     def serialize(self, feature):
         obj = FeatureDescription.filter_by(
-            resource_id=self.layer.id,
-            feature_id=feature.id
+            resource_id=self.layer.id, feature_id=feature.id
         ).first()
 
         if obj is None:
@@ -26,7 +25,7 @@ class FeatureDescriptionExtension(FeatureExtension):
     def deserialize(self, feature, data):
         obj = FeatureDescription.filter_by(
             resource_id=self.layer.id,
-            feature_id=feature.id
+            feature_id=feature.id,
         ).first()
 
         if data is not None:
@@ -35,7 +34,7 @@ class FeatureDescriptionExtension(FeatureExtension):
             if obj is None:
                 obj = FeatureDescription(
                     resource_id=self.layer.id,
-                    feature_id=feature.id
+                    feature_id=feature.id,
                 ).persist()
 
             obj.value = data

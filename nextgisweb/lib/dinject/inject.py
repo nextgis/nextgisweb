@@ -58,7 +58,8 @@ class inject_wrapper:
     _bound_args: Dict[str, BoundArgument]
 
     def __init__(
-        self, func: TFunc,
+        self,
+        func: TFunc,
         iargs: Sequence[BoundArgument],
         signature: Signature,
     ) -> None:
@@ -78,7 +79,8 @@ class inject_wrapper:
                 if name not in inj_values:
                     try:
                         inj_values[name] = barg.cnt._from_container(
-                            barg.key, partial(self._invalidate, name))
+                            barg.key, partial(self._invalidate, name)
+                        )
                     except KeyError:
                         raise UnresolvedDependency(barg.cnt, barg)
 
@@ -89,7 +91,7 @@ class inject_wrapper:
         return MethodType(self, instance)
 
     def __repr__(self) -> str:
-        arepr = ', '.join(repr(ba) for ba in self._bound_args.values())
+        arepr = ", ".join(repr(ba) for ba in self._bound_args.values())
         return f"inject_wrapper({self.func!r}, {arepr})"
 
     def _invalidate(self, name: str) -> None:

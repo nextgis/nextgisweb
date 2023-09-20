@@ -2,7 +2,6 @@ from .. import list_registry
 
 
 def test_super_init_subclass():
-
     @list_registry
     class Base:
         __marker = False

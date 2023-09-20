@@ -4,7 +4,6 @@ from .interface import FIELD_TYPE
 
 
 class Feature:
-
     def __init__(self, layer=None, id=None, fields=None, geom=None, box=None, calculations=None):
         self._layer = layer
 
@@ -42,7 +41,7 @@ class Feature:
                 if label_field.datatype == FIELD_TYPE.STRING:
                     return value
                 else:
-                    return '{}'.format(value)
+                    return "{}".format(value)
 
         # Otherwise use object id
         return "#%d" % self._id
@@ -95,7 +94,6 @@ class Feature:
 
 
 class FeatureSet:
-
     def one(self):
         data = list(self.__iter__())
         return data[0]
@@ -104,5 +102,5 @@ class FeatureSet:
     def __geo_interface__(self):
         return dict(
             type="FeatureCollection",
-            features=[f.__geo_interface__ for f in self]
+            features=[f.__geo_interface__ for f in self],
         )

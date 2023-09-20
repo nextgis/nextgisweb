@@ -26,8 +26,7 @@ def tile_cache_seed(self: EnvCommand):
     transformers = dict()
 
     for tc in DBSession.query(ResourceTileCache).filter(
-        ResourceTileCache.enabled,
-        ResourceTileCache.seed_z != None  # NOQA: E711
+        ResourceTileCache.enabled, ResourceTileCache.seed_z != None  # NOQA: E711
     ):
         rend_res = tc.resource
         data_res = rend_res.parent
@@ -36,8 +35,11 @@ def tile_cache_seed(self: EnvCommand):
         # TODO: Add arbitrary SRS support
         extent_4326 = data_res.extent
         extent_4326_geom = Geometry.from_box(
-            extent_4326['minLon'], extent_4326['minLat'],
-            extent_4326['maxLon'], extent_4326['maxLat'])
+            extent_4326["minLon"],
+            extent_4326["minLat"],
+            extent_4326["maxLon"],
+            extent_4326["maxLat"],
+        )
 
         if srs.id not in transformers:
             transformers[srs.id] = Transformer(WKT_EPSG_4326, srs.wkt)
@@ -68,7 +70,7 @@ def tile_cache_seed(self: EnvCommand):
             rcount += count
             rlevel.append((z, rx, ry, count))
 
-        tc.update_seed_status('started')
+        tc.update_seed_status("started")
 
         # Reload expired session objects
         transaction.commit()
@@ -99,7 +101,7 @@ def tile_cache_seed(self: EnvCommand):
                     (datetime.utcnow() - b_start).total_seconds() > SEED_INTERVAL
                 ):
                     b_start = datetime.utcnow()
-                    tc.update_seed_status('progress', progress=progress, total=rcount)
+                    tc.update_seed_status("progress", progress=progress, total=rcount)
 
                     # Reload expired session objects
                     transaction.commit()
@@ -109,14 +111,20 @@ def tile_cache_seed(self: EnvCommand):
 
                     logger.debug(
                         "%d tiles processed and %d rendered for resource %d (%.2f)",
-                        progress, rendered, rend_res.id, 100.0 * progress / rcount)
+                        progress,
+                        rendered,
+                        rend_res.id,
+                        100.0 * progress / rcount,
+                    )
 
-        tc.update_seed_status('completed', total=rcount)
+        tc.update_seed_status("completed", total=rcount)
         transaction.commit()
 
         logger.info(
             "Completed seeding cache for resource %d (%d tiles processed, %d rendered)",
-            rend_res.id, progress, rendered)
+            rend_res.id,
+            progress,
+            rendered,
+        )
 
-    TilestorWriter.getInstance().wait_for_shutdown(
-        timeout=SHUTDOWN_TIMEOUT)
+    TilestorWriter.getInstance().wait_for_shutdown(timeout=SHUTDOWN_TIMEOUT)

@@ -128,7 +128,14 @@ class Configurator(PyramidConfigurator):
         self.add_route_predicate("error_renderer", ErrorRendererPredicate)
         return super().add_default_route_predicates()
 
-    def add_route(self, name, pattern=None, deprecated=False, openapi=True, **kwargs) -> RouteHelper:
+    def add_route(
+        self,
+        name,
+        pattern=None,
+        deprecated=False,
+        openapi=True,
+        **kwargs,
+    ) -> RouteHelper:
         stacklevel = push_stacklevel(kwargs, False, True)
         component = pkginfo.component_by_module(module_from_stack(stacklevel - 1))
 

@@ -23,36 +23,36 @@ from nextgisweb.resource import SerializedRelationship as SR
 from .kind_of_data import RasterLayerData
 from .util import calc_overviews_levels, raster_size
 
-Base.depends_on('resource')
+Base.depends_on("resource")
 
 PYRAMID_TARGET_SIZE = 512
 
-SUPPORTED_DRIVERS = ('GTiff', )
+SUPPORTED_DRIVERS = ("GTiff",)
 
 COLOR_INTERPRETATION = {
-    gdal.GCI_Undefined: 'Undefined',
-    gdal.GCI_GrayIndex: 'GrayIndex',
-    gdal.GCI_PaletteIndex: 'PaletteIndex',
-    gdal.GCI_RedBand: 'Red',
-    gdal.GCI_GreenBand: 'Green',
-    gdal.GCI_BlueBand: 'Blue',
-    gdal.GCI_AlphaBand: 'Alpha',
-    gdal.GCI_HueBand: 'Hue',
-    gdal.GCI_SaturationBand: 'Saturation',
-    gdal.GCI_LightnessBand: 'Lightness',
-    gdal.GCI_CyanBand: 'Cyan',
-    gdal.GCI_MagentaBand: 'Magenta',
-    gdal.GCI_YellowBand: 'Yellow',
-    gdal.GCI_BlackBand: 'Black',
-    gdal.GCI_YCbCr_YBand: 'YCbCr_Y',
-    gdal.GCI_YCbCr_CbBand: 'YCbCr_Cb',
-    gdal.GCI_YCbCr_CrBand: 'YCbCr_Cr',
+    gdal.GCI_Undefined: "Undefined",
+    gdal.GCI_GrayIndex: "GrayIndex",
+    gdal.GCI_PaletteIndex: "PaletteIndex",
+    gdal.GCI_RedBand: "Red",
+    gdal.GCI_GreenBand: "Green",
+    gdal.GCI_BlueBand: "Blue",
+    gdal.GCI_AlphaBand: "Alpha",
+    gdal.GCI_HueBand: "Hue",
+    gdal.GCI_SaturationBand: "Saturation",
+    gdal.GCI_LightnessBand: "Lightness",
+    gdal.GCI_CyanBand: "Cyan",
+    gdal.GCI_MagentaBand: "Magenta",
+    gdal.GCI_YellowBand: "Yellow",
+    gdal.GCI_BlackBand: "Black",
+    gdal.GCI_YCbCr_YBand: "YCbCr_Y",
+    gdal.GCI_YCbCr_CbBand: "YCbCr_Cb",
+    gdal.GCI_YCbCr_CrBand: "YCbCr_Cr",
 }
 
 
 @implementer(IBboxLayer)
 class RasterLayer(Base, Resource, SpatialLayerMixin):
-    identity = 'raster_layer'
+    identity = "raster_layer"
     cls_display_name = _("Raster layer")
 
     __scope__ = (DataStructureScope, DataScope)
@@ -65,7 +65,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     band_count = sa.Column(sa.Integer, nullable=False)
     cog = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    fileobj = orm.relationship(FileObj, cascade='all')
+    fileobj = orm.relationship(FileObj, cascade="all")
 
     @classmethod
     def check_parent(cls, parent):
@@ -82,7 +82,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         if dsdriver.ShortName not in SUPPORTED_DRIVERS:
             raise ValidationError(
-                _("Raster has format '%(format)s', however only following formats are supported: %(all_formats)s.")  # NOQA: E501
+                _(
+                    "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
+                )
                 % dict(format=dsdriver.ShortName, all_formats=", ".join(SUPPORTED_DRIVERS))
             )
 
@@ -92,9 +94,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         # Workaround for broken encoding in WKT. Otherwise, it'll cause SWIG
         # TypeError (not a string) while passing to GDAL.
         try:
-            dsproj.encode('utf-8', 'strict')
+            dsproj.encode("utf-8", "strict")
         except UnicodeEncodeError:
-            dsproj = dsproj.encode('utf-8', 'replace').decode('utf-8')
+            dsproj = dsproj.encode("utf-8", "replace").decode("utf-8")
 
         data_type = None
         alpha_band = None
@@ -115,7 +117,8 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 alpha_band = bidx
             else:
                 has_nodata = (has_nodata is None or has_nodata) and (
-                    band.GetNoDataValue() is not None)
+                    band.GetNoDataValue() is not None
+                )
 
         # convert the mask band to the alpha band
         if mask_flags.count(gdal.GMF_PER_DATASET) == len(mask_flags):
@@ -133,13 +136,15 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         try:
             src_osr = sr_from_wkt(dsproj)
         except SpatialReferenceError:
-            raise ValidationError(_(
-                "GDAL was uanble to parse the raster coordinate system."))
+            raise ValidationError(_("GDAL was uanble to parse the raster coordinate system."))
 
         if src_osr.IsLocal():
-            raise ValidationError(_(
-                "The source raster has a local coordinate system and can't be "
-                "reprojected to the target coordinate system."))
+            raise ValidationError(
+                _(
+                    "The source raster has a local coordinate system and can't be "
+                    "reprojected to the target coordinate system."
+                )
+            )
 
         dst_osr = self.srs.to_osr()
 
@@ -147,42 +152,44 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         add_alpha = reproject and not has_nodata and alpha_band is None
 
         if reproject:
-            cmd = ['gdalwarp', '-of', 'GTiff', '-t_srs', 'EPSG:%d' % self.srs.id]
+            cmd = ["gdalwarp", "-of", "GTiff", "-t_srs", "EPSG:%d" % self.srs.id]
             if add_alpha:
-                cmd.append('-dstalpha')
-            ds_measure = gdal.AutoCreateWarpedVRT(
-                ds, src_osr.ExportToWkt(), dst_osr.ExportToWkt())
+                cmd.append("-dstalpha")
+            ds_measure = gdal.AutoCreateWarpedVRT(ds, src_osr.ExportToWkt(), dst_osr.ExportToWkt())
             if ds_measure is None:
                 message = _("Failed to reproject the raster to the target coordinate system.")
                 gdal_err = gdal.GetLastErrorMsg().strip()
-                if gdal_err != '':
-                    message += ' ' + _("GDAL error message: %s") % gdal_err
+                if gdal_err != "":
+                    message += " " + _("GDAL error message: %s") % gdal_err
                 raise ValidationError(message=message)
         else:
-            cmd = ['gdal_translate', '-of', 'GTiff']
+            cmd = ["gdal_translate", "-of", "GTiff"]
             ds_measure = ds
 
         size_expected = raster_size(
-            ds_measure, 1 if add_alpha else 0,
-            data_type=data_type if gdal.VersionInfo() < '3030300' else None)  # https://github.com/OSGeo/gdal/issues/4469
+            ds_measure,
+            1 if add_alpha else 0,
+            data_type=data_type if gdal.VersionInfo() < "3030300" else None,
+        )  # https://github.com/OSGeo/gdal/issues/4469
         ds_measure = None
 
-        size_limit = env.raster_layer.options['size_limit']
+        size_limit = env.raster_layer.options["size_limit"]
         if size_limit is not None and size_expected > size_limit:
-            raise ValidationError(message=_(
-                "The uncompressed raster size (%(size)s) exceeds the limit "
-                "(%(limit)s) by %(delta)s. Reduce raster size to fit the limit."
-            ) % dict(
-                size=format_size(size_expected),
-                limit=format_size(size_limit),
-                delta=format_size(size_expected - size_limit),
-            ))
+            raise ValidationError(
+                message=_(
+                    "The uncompressed raster size (%(size)s) exceeds the limit "
+                    "(%(limit)s) by %(delta)s. Reduce raster size to fit the limit."
+                )
+                % dict(
+                    size=format_size(size_expected),
+                    limit=format_size(size_limit),
+                    delta=format_size(size_expected - size_limit),
+                )
+            )
 
-        cmd.extend(('-co', 'COMPRESS=DEFLATE',
-                    '-co', 'TILED=YES',
-                    '-co', 'BIGTIFF=YES', filename))
+        cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "TILED=YES", "-co", "BIGTIFF=YES", filename))
 
-        fobj = FileObj(component='raster_layer')
+        fobj = FileObj(component="raster_layer")
         dst_file = env.raster_layer.workdir_filename(fobj, makedirs=True)
         self.fileobj = fobj
 
@@ -197,13 +204,23 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 subprocess.check_call(cmd + [tmp_file])
                 self.build_overview(fn=tmp_file)
 
-                cmd = ['gdal_translate', '-of', 'Gtiff']
-                cmd.extend(('-co', 'COMPRESS=DEFLATE',
-                            '-co', 'TILED=YES',
-                            '-co', 'BIGTIFF=YES',
-                            '-co', 'COPY_SRC_OVERVIEWS=YES', tmp_file, dst_file))
+                cmd = ["gdal_translate", "-of", "Gtiff"]
+                cmd.extend(
+                    (
+                        "-co",
+                        "COMPRESS=DEFLATE",
+                        "-co",
+                        "TILED=YES",
+                        "-co",
+                        "BIGTIFF=YES",
+                        "-co",
+                        "COPY_SRC_OVERVIEWS=YES",
+                        tmp_file,
+                        dst_file,
+                    )
+                )
                 subprocess.check_call(cmd)
-                os.unlink(tmp_file + '.ovr')
+                os.unlink(tmp_file + ".ovr")
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
@@ -225,37 +242,45 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         if fn is None:
             fn = env.raster_layer.workdir_filename(self.fileobj)
 
-        if missing_only and os.path.isfile(fn + '.ovr'):
+        if missing_only and os.path.isfile(fn + ".ovr"):
             return
 
         ds = gdal.Open(fn, gdalconst.GA_ReadOnly)
         levels = list(map(str, calc_overviews_levels(ds)))
 
-        cmd = ['gdaladdo', '-q', '-clean', fn]
+        cmd = ["gdaladdo", "-q", "-clean", fn]
 
-        logger.debug('Removing existing overviews with command: ' + ' '.join(cmd))
+        logger.debug("Removing existing overviews with command: " + " ".join(cmd))
         subprocess.check_call(cmd)
 
         data_type = ds.GetRasterBand(1).DataType
-        resampling = (
-            'nearest' if gdal.DataTypeIsComplex(data_type) else 'gauss'
-        )
+        resampling = "nearest" if gdal.DataTypeIsComplex(data_type) else "gauss"
         ds = None
 
         cmd = [
-            'gdaladdo', '-q', '-ro', '-r', resampling,
-            '--config', 'COMPRESS_OVERVIEW', 'DEFLATE',
-            '--config', 'INTERLEAVE_OVERVIEW', 'PIXEL',
-            '--config', 'BIGTIFF_OVERVIEW', 'YES',
-            fn
+            "gdaladdo",
+            "-q",
+            "-ro",
+            "-r",
+            resampling,
+            "--config",
+            "COMPRESS_OVERVIEW",
+            "DEFLATE",
+            "--config",
+            "INTERLEAVE_OVERVIEW",
+            "PIXEL",
+            "--config",
+            "BIGTIFF_OVERVIEW",
+            "YES",
+            fn,
         ] + levels
 
-        logger.debug('Building raster overview with command: ' + ' '.join(cmd))
+        logger.debug("Building raster overview with command: " + " ".join(cmd))
         subprocess.check_call(cmd)
 
     def get_info(self):
         s = super()
-        return (s.get_info() if hasattr(s, 'get_info') else ()) + (
+        return (s.get_info() if hasattr(s, "get_info") else ()) + (
             (_("Data type"), self.dtype),
             (_("COG"), self.cog),
         )
@@ -263,8 +288,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     # IBboxLayer implementation:
     @property
     def extent(self):
-        """Возвращает охват слоя
-        """
+        """Возвращает охват слоя"""
 
         src_osr = self.srs.to_osr()
         dst_osr = sr_from_epsg(4326)
@@ -290,18 +314,12 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         ur.AddPoint(x_lr, y_ul)
         ur.Transform(coordTrans)
 
-        extent = dict(
-            minLon=ll.GetX(),
-            maxLon=ur.GetX(),
-            minLat=ll.GetY(),
-            maxLat=ur.GetY()
-        )
+        extent = dict(minLon=ll.GetX(), maxLon=ur.GetX(), minLat=ll.GetY(), maxLat=ur.GetY())
 
         return extent
 
 
 def estimate_raster_layer_data(resource):
-
     def file_size(fn):
         stat = os.stat(fn)
         return stat.st_size
@@ -311,30 +329,29 @@ def estimate_raster_layer_data(resource):
     # Size of source file with overviews
     size = file_size(fn)
     if not resource.cog:
-        size += file_size(fn + '.ovr')
+        size += file_size(fn + ".ovr")
     return size
 
 
 class _source_attr(SP):
-
     def setter(self, srlzr, value):
         cog = srlzr.data.get("cog", env.raster_layer.cog_enabled)
 
         cur_size = 0 if srlzr.obj.id is None else estimate_raster_layer_data(srlzr.obj)
 
-        filedata, filemeta = env.file_upload.get_filename(value['id'])
+        filedata, filemeta = env.file_upload.get_filename(value["id"])
         srlzr.obj.load_file(filedata, env, cog)
 
         new_size = estimate_raster_layer_data(srlzr.obj)
         size = new_size - cur_size
 
         size = estimate_raster_layer_data(srlzr.obj)
-        env.core.reserve_storage(COMP_ID, RasterLayerData, value_data_volume=size,
-                                 resource=srlzr.obj)
+        env.core.reserve_storage(
+            COMP_ID, RasterLayerData, value_data_volume=size, resource=srlzr.obj
+        )
 
 
 class _cog_attr(SP):
-
     def setter(self, srlzr, value):
         if (
             srlzr.data.get("source") is None
@@ -358,7 +375,6 @@ class _cog_attr(SP):
 
 
 class _color_interpretation(SP):
-
     def getter(self, srlzr):
         ds = gdal.OpenEx(env.raster_layer.workdir_filename(srlzr.obj.fileobj))
         return [

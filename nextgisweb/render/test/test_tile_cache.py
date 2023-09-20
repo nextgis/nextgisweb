@@ -22,7 +22,10 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 def frtc():
     with transaction.manager:
         layer = RasterLayer(
-            xsize=100, ysize=100, dtype='Byte', band_count=3,
+            xsize=100,
+            ysize=100,
+            dtype="Byte",
+            band_count=3,
         ).persist()
 
         style = RasterStyle(parent=layer).persist()
@@ -40,35 +43,35 @@ def frtc():
 
 @pytest.fixture
 def img_cross_red():
-    result = Image.new('RGBA', (256, 256))
+    result = Image.new("RGBA", (256, 256))
     draw = ImageDraw.Draw(result)
-    draw.line((0, 0, 256, 256), fill='red')
-    draw.line((0, 256, 256, 0), fill='red')
+    draw.line((0, 0, 256, 256), fill="red")
+    draw.line((0, 256, 256, 0), fill="red")
     return result
 
 
 @pytest.fixture
 def img_cross_green():
-    result = Image.new('RGBA', (256, 256))
+    result = Image.new("RGBA", (256, 256))
     draw = ImageDraw.Draw(result)
-    draw.line((0, 0, 256, 256), fill='green')
-    draw.line((0, 256, 256, 0), fill='green')
+    draw.line((0, 0, 256, 256), fill="green")
+    draw.line((0, 256, 256, 0), fill="green")
     return result
 
 
 @pytest.fixture
 def img_fill():
-    result = Image.new('RGBA', (256, 256), (100, 100, 100, 100))
+    result = Image.new("RGBA", (256, 256), (100, 100, 100, 100))
     return result
 
 
 @pytest.fixture
 def img_empty():
-    result = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
+    result = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
     return result
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def wait_for_shutdown():
     yield
     TilestorWriter.getInstance().wait_for_shutdown()
@@ -131,9 +134,12 @@ def test_invalidate(frtc, img_cross_red, img_cross_green, img_fill, caplog):
     frtc.put_tile(tile_invalid, img_cross_red)
     frtc.put_tile(tile_valid, img_cross_red)
 
-    frtc.invalidate(Geometry.from_shape(Point(
-        *frtc.resource.srs.tile_center(tile_invalid)),
-        srid=None))
+    frtc.invalidate(
+        Geometry.from_shape(
+            Point(*frtc.resource.srs.tile_center(tile_invalid)),
+            srid=None,
+        )
+    )
 
     exists, cimg = frtc.get_tile(tile_invalid)
     assert not exists

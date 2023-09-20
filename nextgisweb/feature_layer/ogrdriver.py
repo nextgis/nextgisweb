@@ -129,7 +129,7 @@ EXPORT_FORMAT_OGR["KML"] = OGRDriver(
     "KML (*.kml)",
     "kml",
     single_file=True,
-    mime="application/vnd.google-earth.kml+xml"
+    mime="application/vnd.google-earth.kml+xml",
 )
 
 EXPORT_FORMAT_OGR["KMZ"] = OGRDriver(
@@ -137,7 +137,7 @@ EXPORT_FORMAT_OGR["KMZ"] = OGRDriver(
     "KMZ (*.kmz)",
     "kmz",
     single_file=True,
-    mime="application/vnd.google-earth.kmz"
+    mime="application/vnd.google-earth.kmz",
 )
 
 EXPORT_FORMAT_OGR["DXF"] = OGRDriver(
@@ -170,5 +170,6 @@ OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
 ]
 
 MVT_DRIVER_NAME = "MVT"
-MVT_DRIVER_EXIST = (get_driver_by_name(MVT_DRIVER_NAME) is not None) \
-    and test_driver_capability(MVT_DRIVER_NAME, ogr.ODrCCreateDataSource)
+MVT_DRIVER_EXIST = (get_driver_by_name(MVT_DRIVER_NAME) is not None) and test_driver_capability(
+    MVT_DRIVER_NAME, ogr.ODrCCreateDataSource
+)

@@ -10,45 +10,10 @@ PR_R = ResourceScope.read
 
 
 def identify(request) -> JSONType:
-    """
-    ---
-    post:
-      summary: Identification service for layers that support IFeatureLayer.
-      description:
-      tags:
-        - feature_layer
-      parameters:
-      - in: body
-        name: body
-        schema:
-          type: object
-          properties:
-            geom:
-              description: Polygon geometry in WKT.
-              type: string
-            layers:
-              description: Array of layers identifiers
-              type: array
-            srs:
-              description: EPSG code of definition of coordinate reference systems
-              type: number
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        200:
-          description: success
-          schema:
-            type: object
-            description: Dictionary where key - layer identifier, value - features count
-            and array of features
-    """
-
     data = request.json_body
-    srs = int(data['srs'])
-    geom = Geometry.from_wkt(data['geom'], srid=srs)
-    layers = map(int, data['layers'])
+    srs = int(data["srs"])
+    geom = Geometry.from_wkt(data["geom"], srid=srs)
+    layers = map(int, data["layers"])
 
     layer_list = DBSession.query(Resource).filter(Resource.id.in_(layers))
 
@@ -74,8 +39,12 @@ def identify(request) -> JSONType:
             query.limit(100)
 
             features = [
-                dict(id=f.id, layerId=layer.id,
-                     label=f.label, fields=f.fields)
+                dict(
+                    id=f.id,
+                    layerId=layer.id,
+                    label=f.label,
+                    fields=f.fields,
+                )
                 for f in query()
             ]
 
@@ -85,15 +54,12 @@ def identify(request) -> JSONType:
 
             if allow:
                 for feature in features:
-                    feature['parent'] = layer.parent.display_name
+                    feature["parent"] = layer.parent.display_name
 
-            result[layer_id_str] = dict(
-                features=features,
-                featureCount=len(features)
-            )
+            result[layer_id_str] = dict(features=features, featureCount=len(features))
 
             feature_count += len(features)
 
-    result['featureCount'] = feature_count
+    result["featureCount"] = feature_count
 
     return result

@@ -36,5 +36,8 @@ def export(resource, request):
 
 def setup_pyramid(comp, config):
     config.add_view(
-        export, route_name="resource.export",
-        context=RasterMosaic, request_method="GET")
+        export,
+        route_name="resource.export",
+        context=RasterMosaic,
+        request_method="GET",
+    )

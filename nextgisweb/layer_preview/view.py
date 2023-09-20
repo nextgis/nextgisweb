@@ -43,11 +43,12 @@ def setup_pyramid(comp, config):
     config.add_route(
         "layer_preview.map",
         r"/resource/{id:uint}/preview",
-        factory=resource_factory
-    ) \
-        .add_view(preview_map, context=IFeatureLayer) \
-        .add_view(preview_map, context=IRenderableStyle) \
-        .add_view(preview_map, context=RasterLayer)
+        factory=resource_factory,
+    ).add_view(preview_map, context=IFeatureLayer).add_view(
+        preview_map, context=IRenderableStyle
+    ).add_view(
+        preview_map, context=RasterLayer
+    )
 
     class LayerMenuExt(DynItem):
         def build(self, args):
@@ -55,14 +56,13 @@ def setup_pyramid(comp, config):
                 IFeatureLayer.providedBy(args.obj)
                 or IRenderableStyle.providedBy(args.obj)
                 or (isinstance(args.obj, RasterLayer) and args.obj.cog)
-            ) and (
-                args.obj.has_permission(DataScope.read, args.request.user)
-            ):
+            ) and (args.obj.has_permission(DataScope.read, args.request.user)):
                 yield Link(
-                    "extra/preview", _("Preview"),
-                    lambda args: args.request.route_url(
-                        "layer_preview.map", id=args.obj.id
-                    ),
-                    important=True, icon='material-preview')
+                    "extra/preview",
+                    _("Preview"),
+                    lambda args: args.request.route_url("layer_preview.map", id=args.obj.id),
+                    important=True,
+                    icon="material-preview",
+                )
 
     Resource.__dynmenu__.add(LayerMenuExt())

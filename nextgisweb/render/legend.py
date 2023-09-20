@@ -13,6 +13,5 @@ class LegendSymbol:
 
 
 class ILegendSymbols(IResourceBase):
-
     def legend_symbols(self, icon_size: int) -> List[LegendSymbol]:
         pass

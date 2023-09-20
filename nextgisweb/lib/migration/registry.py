@@ -10,32 +10,31 @@ from nextgisweb.lib.logging import logger
 from .migration import Dependency, InitialMigration, Migration, MigrationKey
 from .revision import REVID_ZERO
 
-PLACEHOLDER = 'TODO: Write code here and remove this placeholder line!'
+PLACEHOLDER = "TODO: Write code here and remove this placeholder line!"
 
 
 class PythonModuleMigration(Migration):
-
-    _regexp_file = re.compile(r'^([0-9a-z]+)(?:\-.*)?\.py$')
+    _regexp_file = re.compile(r"^([0-9a-z]+)(?:\-.*)?\.py$")
 
     @classmethod
     def scandir(cls, component, path):
-        for fn in path.glob('*.py'):
+        for fn in path.glob("*.py"):
             m = cls._regexp_file.match(fn.name)
             if m and fn.is_file():
                 revision = m.group(1).lower()
                 yield PythonModuleMigration(component, revision, fn)
             else:
-                logger.warning('Failed to identify python migration: {}'.format(fn))
+                logger.warning("Failed to identify python migration: {}".format(fn))
 
-    _regexp_meta = re.compile(r'^(?:\s*\#[^\n]*\n|\s*\n)*\"{3}\s*(\{.+\})\s*\"{3}\s*(.*)$', re.S)
-    _regexp_forward = re.compile(r'def\s+forward\s*\(')
-    _regexp_rewind = re.compile(r'def\s+rewind\s*\(')
+    _regexp_meta = re.compile(r"^(?:\s*\#[^\n]*\n|\s*\n)*\"{3}\s*(\{.+\})\s*\"{3}\s*(.*)$", re.S)
+    _regexp_forward = re.compile(r"def\s+forward\s*\(")
+    _regexp_rewind = re.compile(r"def\s+rewind\s*\(")
 
     def __init__(self, component, revision, mpath):
         super().__init__(component, revision)
         self._mod_path = str(mpath)
 
-        with mpath.open('r') as fd:
+        with mpath.open("r") as fd:
             m = self._regexp_meta.match(fd.read())
 
         if m:
@@ -44,105 +43,118 @@ class PythonModuleMigration(Migration):
         else:
             raise ValueError("Metadata not found in {}".format(mpath))
 
-        assert meta['revision'] == revision, "Revision mismatch!"
+        assert meta["revision"] == revision, "Revision mismatch!"
 
         self._parents = tuple(
-            MigrationKey(component, r)
-            for r in meta.get('parents', [REVID_ZERO]))
-        self._date = meta.get('date')
-        self._message = meta.get('message')
+            MigrationKey(component, r) for r in meta.get("parents", [REVID_ZERO])
+        )
+        self._date = meta.get("date")
+        self._message = meta.get("message")
         self._dependencies = [
-            (Dependency(i[0]), Dependency(i[1]))
-            for i in meta.get('dependencies', ())]
+            (Dependency(i[0]), Dependency(i[1])) for i in meta.get("dependencies", ())
+        ]
 
         self._has_forward = self._regexp_forward.search(body) is not None
         self._has_rewind = self._regexp_rewind.search(body) is not None
 
     @classmethod
     def template(cls, path, revision, forward=True, rewind=True, **meta):
-        meta['revision'] = revision
+        meta["revision"] = revision
 
-        message = meta.get('message')
-        basename = revision + ('-' + _slugify(message) if message else '')
+        message = meta.get("message")
+        basename = revision + ("-" + _slugify(message) if message else "")
 
-        fwpath = path / '{}.py'.format(basename)
+        fwpath = path / "{}.py".format(basename)
         assert not fwpath.exists()
-        with fwpath.open('w') as fd:
-            fd.write("\"\"\" {\n" + _metadata_to_jskeys(meta, '    ') + "\n} \"\"\"\n")
+        with fwpath.open("w") as fd:
+            fd.write('""" {\n' + _metadata_to_jskeys(meta, "    ") + '\n} """\n')
             if forward:
-                fd.write('\n' + dedent("""
+                fd.write(
+                    "\n"
+                    + dedent(
+                        """
                     def forward(ctx):
                         pass  # {}
-                """.format(PLACEHOLDER)))
+                """.format(
+                            PLACEHOLDER
+                        )
+                    )
+                )
 
             if rewind:
-                fd.write('\n' + dedent("""
+                fd.write(
+                    "\n"
+                    + dedent(
+                        """
                     def rewind(ctx):
                         pass  # {}
-                """.format(PLACEHOLDER)))
+                """.format(
+                            PLACEHOLDER
+                        )
+                    )
+                )
 
-        return (fwpath, )
+        return (fwpath,)
 
     @property
     def forward_callable(self):
-        return getattr(SourceFileLoader('', self._mod_path).load_module(), 'forward')
+        return getattr(SourceFileLoader("", self._mod_path).load_module(), "forward")
 
     @property
     def rewind_callable(self):
-        return getattr(SourceFileLoader('', self._mod_path).load_module(), 'rewind')
+        return getattr(SourceFileLoader("", self._mod_path).load_module(), "rewind")
 
 
 class SQLScriptMigration(Migration):
-
-    _regexp_file = re.compile(r'^([0-9a-z]+)(?:\-.*)?\.fw\.sql$')
+    _regexp_file = re.compile(r"^([0-9a-z]+)(?:\-.*)?\.fw\.sql$")
 
     @classmethod
     def scandir(cls, component, path):
-        for fn in path.glob('*.fw.sql'):
+        for fn in path.glob("*.fw.sql"):
             m = cls._regexp_file.match(fn.name)
             if m:
                 revision = m.group(1).lower()
                 migration = SQLScriptMigration(component, revision, fn)
                 yield migration
             else:
-                logger.warning('Failed to identify SQL script migration: {}'.format(fn))
+                logger.warning("Failed to identify SQL script migration: {}".format(fn))
 
     @classmethod
     def template(cls, path, revision, forward=True, rewind=True, **meta):
-        meta['revision'] = revision
+        meta["revision"] = revision
 
         outfiles = list()
-        message = meta.get('message')
-        basename = revision + ('-' + _slugify(message) if message else '')
+        message = meta.get("message")
+        basename = revision + ("-" + _slugify(message) if message else "")
 
-        fwpath = path / '{}.fw.sql'.format(basename)
+        fwpath = path / "{}.fw.sql".format(basename)
         assert not fwpath.exists()
-        with fwpath.open('w') as fd:
-            fd.write("/*** {\n" + _metadata_to_jskeys(meta, '    ') + "\n} ***/\n\n")
+        with fwpath.open("w") as fd:
+            fd.write("/*** {\n" + _metadata_to_jskeys(meta, "    ") + "\n} ***/\n\n")
             if forward:
-                fd.write('-- {}\n'.format(PLACEHOLDER))
+                fd.write("-- {}\n".format(PLACEHOLDER))
             outfiles.append(fwpath)
 
         if rewind:
-            rwpath = path / '{}.rw.sql'.format(basename)
+            rwpath = path / "{}.rw.sql".format(basename)
             assert not rwpath.exists()
-            with rwpath.open('w') as fd:
-                fd.write("/*** { " + _metadata_to_jskeys(
-                    dict(revision=revision), ''
-                ) + " } ***/\n\n")
-                fd.write('-- {}\n'.format(PLACEHOLDER))
+            with rwpath.open("w") as fd:
+                fd.write(
+                    "/*** { " + _metadata_to_jskeys(dict(revision=revision), "") + " } ***/\n\n"
+                )
+                fd.write("-- {}\n".format(PLACEHOLDER))
             outfiles.append(rwpath)
 
         return tuple(outfiles)
 
-    _regexp_meta = re.compile(r'^\/\*{3}\s*(\{.+\})\s*\*{3}\/\s*(.*)$', re.I + re.S)
+    _regexp_meta = re.compile(r"^\/\*{3}\s*(\{.+\})\s*\*{3}\/\s*(.*)$", re.I + re.S)
 
     def __init__(self, component, revision, fwpath):
         super().__init__(component, revision)
         self.fwpath = fwpath
 
         def _readfile(fpath, reverse=False):
-            with fpath.open('r') as fd:
+            with fpath.open("r") as fd:
                 fcontent = fd.read()
 
             m = self._regexp_meta.match(fcontent)
@@ -152,41 +164,40 @@ class SQLScriptMigration(Migration):
                 return meta, body
 
         fwmeta, fwbody = _readfile(fwpath, False)
-        assert revision == fwmeta['revision']
+        assert revision == fwmeta["revision"]
 
         self._parents = tuple(
-            MigrationKey(component, r)
-            for r in fwmeta.get('parents', (REVID_ZERO, )))
+            MigrationKey(component, r) for r in fwmeta.get("parents", (REVID_ZERO,))
+        )
 
-        self._date = fwmeta.get('date')
-        self._message = fwmeta.get('message')
+        self._date = fwmeta.get("date")
+        self._message = fwmeta.get("message")
         self._dependencies = [
-            (Dependency(i[0]), Dependency(i[1]))
-            for i in fwmeta.get('dependencies', ())]
+            (Dependency(i[0]), Dependency(i[1])) for i in fwmeta.get("dependencies", ())
+        ]
 
         self._has_forward = True
 
-        revpath = Path(re.sub(r'\.fw\.sql$', '.rw.sql', str(fwpath)))
+        revpath = Path(re.sub(r"\.fw\.sql$", ".rw.sql", str(fwpath)))
         self._has_rewind = revpath.is_file()
         if self._has_rewind:
             self.rwpath = revpath
             revmeta, revbody = _readfile(revpath, True)
-            assert tuple(revmeta.keys()) == ('revision', )
-            assert revision == revmeta['revision']
+            assert tuple(revmeta.keys()) == ("revision",)
+            assert revision == revmeta["revision"]
         else:
             self.rwpath = None
 
     def forward_script(self):
-        with self.fwpath.open('r') as fd:
+        with self.fwpath.open("r") as fd:
             return fd.read()
 
     def rewind_script(self):
-        with self.rwpath.open('r') as fd:
+        with self.rwpath.open("r") as fd:
             return fd.read()
 
 
 class Registry:
-
     def __init__(self):
         self._all_migrations = dict()
         self._by_component = dict()
@@ -229,35 +240,35 @@ def _normalize_metadata(value, component, revision):
     result = dict()
     for k, v in value.items():
         k = k.lower()
-        if k == 'revision':
+        if k == "revision":
             _validate_revision(v)
-        elif k == 'parents':
+        elif k == "parents":
             if isinstance(v, str):
-                v = (v, )
+                v = (v,)
             elif isinstance(v, list):
                 v = tuple(v)
             for pr in v:
                 _validate_revision(pr)
-        elif k == 'message':
+        elif k == "message":
             assert isinstance(v, str)
-        elif k == 'date':
+        elif k == "date":
             assert isinstance(v, str)
-        elif k == 'dependencies':
+        elif k == "dependencies":
             if isinstance(v, list):
                 v = tuple(v)
             assert isinstance(v, tuple)
             deps = list()
             for d in v:
                 if isinstance(d, str):
-                    d = ('this', d)
+                    d = ("this", d)
                 if isinstance(d, list):
                     d = tuple(d)
                 assert isinstance(d, tuple)
                 assert len(d) == 2
                 nd = list()
                 for s in d:
-                    if s == 'this':
-                        s = '{}=={}'.format(component, revision)
+                    if s == "this":
+                        s = "{}=={}".format(component, revision)
                     else:
                         _validate_revspec(s)
                     nd.append(s)
@@ -272,43 +283,49 @@ def _normalize_metadata(value, component, revision):
 
 def _validate_revision(value):
     assert isinstance(value, str)
-    assert re.match(r'^[0-9a-f]{8}$', value) is not None
+    assert re.match(r"^[0-9a-f]{8}$", value) is not None
 
 
 def _validate_revspec(value):
     assert isinstance(value, str)
-    assert re.match(r'^\w+==[0-9a-f]{8}$', value) is not None
+    assert re.match(r"^\w+==[0-9a-f]{8}$", value) is not None
 
 
-def _metadata_to_jskeys(value, indent='    '):
+def _metadata_to_jskeys(value, indent="    "):
     def _jskeys(*pairs):
         od = dict()
         for k, v in pairs:
             if isinstance(v, datetime):
                 v = v.replace(microsecond=0).isoformat()
             od[k] = v
-        return json.dumps(od, )[1:-1]
+        return json.dumps(
+            od,
+        )[1:-1]
 
     lines = list()
     rk = set(value.keys())
 
     for group in (
-        ('revision', 'parents', ),
-        ('date', ), ('message', ),
-        ('dependencies', ),
+        (
+            "revision",
+            "parents",
+        ),
+        ("date",),
+        ("message",),
+        ("dependencies",),
     ):
         pk = [k for k in group if k in value]
         if len(pk) > 0:
             rk.difference_update(pk)
             lines.append(_jskeys(*[(k, value[k]) for k in pk]))
 
-    return ',\n'.join(((indent + line) for line in lines))
+    return ",\n".join(((indent + line) for line in lines))
 
 
 def _slugify(message):
     result = message.lower()
-    result = re.sub(r'\W', '-', result)
-    result = re.sub(r'\-+', '-', result)
-    result = re.sub(r'^\-', '', result)
-    result = re.sub(r'\-$', '', result)
+    result = re.sub(r"\W", "-", result)
+    result = re.sub(r"\-+", "-", result)
+    result = re.sub(r"^\-", "", result)
+    result = re.sub(r"\-$", "", result)
     return result

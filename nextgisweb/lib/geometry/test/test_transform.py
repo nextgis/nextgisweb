@@ -8,7 +8,7 @@ def test_transform():
     sr1 = sr_from_epsg(4326)
     sr2 = sr_from_epsg(3857)
 
-    geom = Geometry.from_wkt('POINT (131.885 43.114)')
+    geom = Geometry.from_wkt("POINT (131.885 43.114)")
 
     transformer = Transformer(sr1.ExportToWkt(), sr2.ExportToWkt())
 

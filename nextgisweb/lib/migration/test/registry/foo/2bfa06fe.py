@@ -6,6 +6,7 @@ from textwrap import dedent
 
 
 def forward(ctx):
+    # fmt: off
     ctx.execute(dedent("""
         ALTER TABLE foo RENAME TO foo_tmp;
 
@@ -17,9 +18,11 @@ def forward(ctx):
         INSERT INTO foo SELECT * FROM foo_tmp;
         DROP TABLE foo_tmp;
     """))
+    # fmt: on
 
 
 def rewind(ctx):
+    # fmt: off
     ctx.execute(dedent("""
         ALTER TABLE foo RENAME TO foo_tmp;
 
@@ -31,3 +34,4 @@ def rewind(ctx):
         INSERT INTO foo SELECT * FROM foo_tmp;
         DROP TABLE foo_tmp;
     """))
+    # fmt: on

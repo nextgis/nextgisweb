@@ -8,8 +8,8 @@ from .argparse import ArgumentParser
 
 
 class ParamType(Enum):
-    OPTION = 'OPTION'
-    ARGUMENT = 'ARGUMENT'
+    OPTION = "OPTION"
+    ARGUMENT = "ARGUMENT"
 
 
 OPTION = ParamType.OPTION
@@ -17,16 +17,16 @@ ARGUMENT = ParamType.ARGUMENT
 
 
 class NoDefaultType(Enum):
-    NO_DEFAULT = 'NO_DEFAULT'
+    NO_DEFAULT = "NO_DEFAULT"
 
 
 NO_DEFAULT = NoDefaultType.NO_DEFAULT
 
 
 class Param:
-
     def __init__(
-        self, ptype: ParamType,
+        self,
+        ptype: ParamType,
         default: Any = NO_DEFAULT,
         *,
         short: Optional[str] = None,
@@ -89,7 +89,7 @@ class Param:
             elif is_list:
                 default = []
             elif iopt:
-                kwargs['required'] = True
+                kwargs["required"] = True
         elif default is None and not is_optional:
             raise ValueError("Default is None for non optional type")
 
@@ -100,44 +100,43 @@ class Param:
 
         if iopt and annnotation == bool and not is_list:
             if self.flag:
-                kwargs['action'] = 'flag'
+                kwargs["action"] = "flag"
                 annnotation = None
             elif default is False:
-                kwargs['action'] = 'store_true'
+                kwargs["action"] = "store_true"
                 annnotation = None
 
         if annnotation is None:
             pass
         elif iopt:
             if is_list:
-                kwargs['action'] = 'append'
+                kwargs["action"] = "append"
         elif iarg:
             if is_optional:
                 assert not is_list
-                kwargs['nargs'] = '?'
+                kwargs["nargs"] = "?"
             elif is_list:
-                kwargs['nargs'] = '+'
+                kwargs["nargs"] = "+"
 
         if annnotation is None:
             pass
         elif annnotation in (int, str, bool):
-            kwargs['type'] = annnotation
+            kwargs["type"] = annnotation
         else:
             raise NotImplementedError(f"Unsupported type: {annnotation}")
 
         if default is not NO_DEFAULT:
-            kwargs['default'] = default
+            kwargs["default"] = default
 
         if self.doc is not None:
-            kwargs['help'] = self.doc
+            kwargs["help"] = self.doc
 
         kwargs.update(self.extra)
         return args, kwargs
 
     def _option_strings(self) -> List[str]:
         assert self.name is not None
-        return (['-' + self.short] if self.short else []) + [
-            '--' + self.name.replace('_', '-')]
+        return (["-" + self.short] if self.short else []) + ["--" + self.name.replace("_", "-")]
 
 
 opt = partial(Param, OPTION)

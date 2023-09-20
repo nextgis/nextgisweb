@@ -21,41 +21,38 @@ BUF_SIZE = 1024 * 1024
 
 
 class FileObjBackup(BackupBase):
-    identity = 'fileobj'
-    plget = itemgetter('component', 'uuid')
+    identity = "fileobj"
+    plget = itemgetter("component", "uuid")
 
     def blob(self):
         return True
 
     def backup(self, dst):
-        with open(self.component.filename(self.plget(self.payload)), 'rb') as fd:
+        with open(self.component.filename(self.plget(self.payload)), "rb") as fd:
             copyfileobj(fd, dst, length=BUF_SIZE)
 
     def restore(self, src):
         fn = self.component.filename(self.plget(self.payload), makedirs=True)
         if os.path.isfile(fn):
             logger.debug(
-                "Skipping restoration of fileobj %s: file already exists!",
-                self.payload['uuid'])
+                "Skipping restoration of fileobj %s: file already exists!", self.payload["uuid"]
+            )
         else:
-            with open(fn, 'wb') as fd:
+            with open(fn, "wb") as fd:
                 copyfileobj(src, fd, length=BUF_SIZE)
 
 
 class FileStorageComponent(Component):
-
     def initialize(self):
-        self.path = self.options['path'] or self.env.core.gtsdir(self)
+        self.path = self.options["path"] or self.env.core.gtsdir(self)
 
     def initialize_db(self):
-        if 'path' not in self.options:
+        if "path" not in self.options:
             self.env.core.mksdir(self)
 
     def backup_objects(self):
         for fileobj in FileObj.query().order_by(FileObj.component, FileObj.uuid):
-            yield FileObjBackup(dict(
-                component=fileobj.component,
-                uuid=fileobj.uuid))
+            yield FileObjBackup(dict(component=fileobj.component, uuid=fileobj.uuid))
 
     def fileobj(self, component):
         obj = FileObj(component=component)
@@ -101,17 +98,16 @@ class FileStorageComponent(Component):
         def itm():
             return dict(size=0, count=0)
 
-        result = dict(
-            total=itm(), component=defaultdict(itm))
+        result = dict(total=itm(), component=defaultdict(itm))
 
         def add_item(itm, size):
-            itm['size'] += size
-            itm['count'] += 1
+            itm["size"] += size
+            itm["count"] += 1
 
         for fileobj in FileObj.query():
             statres = os.stat(self.filename(fileobj))
-            add_item(result['total'], statres.st_size)
-            add_item(result['component'][fileobj.component], statres.st_size)
+            add_item(result["total"], statres.st_size)
+            add_item(result["component"][fileobj.component], statres.st_size)
 
         return result
 
@@ -120,7 +116,7 @@ class FileStorageComponent(Component):
         self.cleanup(dry_run=False)
 
     def cleanup(self, *, dry_run, unreferenced=False, orphaned=True):
-        logger.info('Cleaning up file storage...')
+        logger.info("Cleaning up file storage...")
 
         if unreferenced:
             self.cleanup_unreferenced(dry_run=dry_run)
@@ -129,13 +125,16 @@ class FileStorageComponent(Component):
 
     def cleanup_unreferenced(self, *, dry_run):
         id_min, id_max = DBSession.query(
-            sql.func.min(FileObj.id), sql.func.max(FileObj.id)).first()
+            sql.func.min(FileObj.id),
+            sql.func.max(FileObj.id),
+        ).first()
         if id_min is None:
             logger.info("fileobj is empty!")
             return
 
         schema = FileObj.metadata.schema
 
+        # fmt: off
         db_set = set()
         for row in DBSession.execute(text("""
             SELECT kcu.table_schema, kcu.table_name, kcu.column_name
@@ -157,6 +156,7 @@ class FileStorageComponent(Component):
             column=FileObj.id.name
         )):
             db_set.add(row)
+        # fmt: on
 
         sa_set = set()
         metadata = self.env.metadata()
@@ -167,14 +167,18 @@ class FileStorageComponent(Component):
                     and fk.column.table.schema == schema
                     and fk.column.name == FileObj.id.name
                 ):
-                    sa_set.add((
-                        table.schema if table.schema is not None else 'public',
-                        table.name, fk.parent.name))
+                    sa_set.add(
+                        (
+                            table.schema if table.schema is not None else "public",
+                            table.name,
+                            fk.parent.name,
+                        )
+                    )
 
         if sa_set != db_set:
             raise RuntimeError(
-                "FileObj DB and SQLAlchemy references mismatch: "
-                "{} != {}".format(db_set, sa_set))
+                "FileObj DB and SQLAlchemy references mismatch: " "{} != {}".format(db_set, sa_set)
+            )
 
         q = DBSession.query(FileObj)
         for schema, table, column in db_set:
@@ -194,9 +198,9 @@ class FileStorageComponent(Component):
         deleted_files = deleted_bytes = 0
         kept_files = kept_bytes = 0
 
-        delta = self.options['cleanup_keep_interval']
+        delta = self.options["cleanup_keep_interval"]
 
-        for (dirpath, dirnames, filenames) in os.walk(self.path, topdown=False):
+        for dirpath, dirnames, filenames in os.walk(self.path, topdown=False):
             relist = False
 
             for fn in filenames:
@@ -224,13 +228,8 @@ class FileStorageComponent(Component):
             ):
                 os.rmdir(dirpath)
 
-        logger.info(
-            "%d orphaned files found (%d bytes)",
-            deleted_files, deleted_bytes)
-
-        logger.info(
-            "%d files remain (%d bytes)",
-            kept_files, kept_bytes)
+        logger.info("%d orphaned files found (%d bytes)", deleted_files, deleted_bytes)
+        logger.info("%d files remain (%d bytes)", kept_files, kept_bytes)
 
     def check_integrity(self):
         for fileobj in FileObj.query():
@@ -238,7 +237,9 @@ class FileStorageComponent(Component):
             if not os.path.isfile(filepath):
                 yield f"File '{filepath}' not found."
 
+    # fmt: off
     option_annotations = (
-        Option('path', default=None),
-        Option('cleanup_keep_interval', timedelta, default=timedelta(days=2)),
+        Option("path", default=None),
+        Option("cleanup_keep_interval", timedelta, default=timedelta(days=2)),
     )
+    # fmt: on

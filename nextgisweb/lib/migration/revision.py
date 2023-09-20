@@ -1,11 +1,11 @@
 from datetime import datetime
 
 REVID_LENGTH = 8
-REVID_ZERO = '0' * REVID_LENGTH
+REVID_ZERO = "0" * REVID_LENGTH
 
 EPOCH_START = datetime(2015, 1, 1)
 EPOCH_END = datetime(2050, 1, 1)
-EPOCH_DELTA = (EPOCH_END - EPOCH_START).total_seconds() / (16 ** REVID_LENGTH - 1)
+EPOCH_DELTA = (EPOCH_END - EPOCH_START).total_seconds() / (16**REVID_LENGTH - 1)
 
 
 def revid(date=None):

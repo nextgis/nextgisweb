@@ -4,7 +4,7 @@ from nextgisweb.lib import db
 from nextgisweb.resource import Resource, ResourceGroup, Serializer, ServiceScope
 from nextgisweb.resource import SerializedProperty as SP
 
-Base.depends_on('resource', 'feature_layer')
+Base.depends_on("resource", "feature_layer")
 
 
 class Service(Base, Resource):
@@ -38,9 +38,7 @@ class Collection(Base):
     resource = db.relationship(
         Resource,
         foreign_keys=resource_id,
-        backref=db.backref(
-            "_ogcfserver_collections", cascade="all", cascade_backrefs=False
-        ),
+        backref=db.backref("_ogcfserver_collections", cascade="all", cascade_backrefs=False),
     )
 
     def to_dict(self):
@@ -53,7 +51,6 @@ class Collection(Base):
 
 
 class _collections_attr(SP):
-
     def getter(self, srlzr):
         return [collection.to_dict() for collection in srlzr.obj.collections]
 
@@ -61,16 +58,14 @@ class _collections_attr(SP):
         m = dict((collection.resource_id, collection) for collection in srlzr.obj.collections)
         keep = set()
         for lv in value:
-            if lv['resource_id'] in m:
-                lo = m[lv['resource_id']]
-                keep.add(lv['resource_id'])
+            if lv["resource_id"] in m:
+                lo = m[lv["resource_id"]]
+                keep.add(lv["resource_id"])
             else:
-                lo = Collection(resource_id=lv['resource_id'])
+                lo = Collection(resource_id=lv["resource_id"])
                 srlzr.obj.collections.append(lo)
 
-            for a in (
-                'keyname', 'display_name', 'maxfeatures'
-            ):
+            for a in ("keyname", "display_name", "maxfeatures"):
                 setattr(lo, a, lv[a])
 
         for lrid, lo in m.items():

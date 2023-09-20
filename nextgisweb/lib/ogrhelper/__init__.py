@@ -52,19 +52,19 @@ def read_dataset(filename, **kw):
     if vrt_layers is not None:
         ogrfn = "<OGRVRTDataSource>{}</OGRVRTDataSource>".format(vrt_layers)
     elif zipfile.is_zipfile(filename):
-        ogrfn = '/vsizip/{%s}' % str(filename)
+        ogrfn = "/vsizip/{%s}" % str(filename)
     else:
         ogrfn = str(filename)
     return gdal.OpenEx(ogrfn, 0, **kw)
 
 
 def read_layer_features(layer, geometry_format=None):
-    geometry_format = 'wkt' if geometry_format is None else geometry_format.lower()
-    if geometry_format == 'raw':
+    geometry_format = "wkt" if geometry_format is None else geometry_format.lower()
+    if geometry_format == "raw":
         geom_func = _geometry_copy
-    elif geometry_format == 'wkt':
+    elif geometry_format == "wkt":
         geom_func = _geometry_wkt
-    elif geometry_format == 'wkb':
+    elif geometry_format == "wkb":
         geom_func = _geometry_wkb
 
     defn = layer.GetLayerDefn()
@@ -81,10 +81,12 @@ def read_layer_features(layer, geometry_format=None):
             geom = geom_func(geom)
 
         yield (
-            feat.GetFID(), geom, [
+            feat.GetFID(),
+            geom,
+            [
                 (fname, fget(feat, fidx) if not feat.IsFieldNull(fidx) else None)
                 for (fidx, fname, fget) in fieldmap  # NOQA: F812
-            ]
+            ],
         )
 
 

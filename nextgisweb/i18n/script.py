@@ -33,7 +33,7 @@ def compare_catalogs(ca, cb):
     obsolete = []
 
     for ma in ca:
-        if ma.id == '':
+        if ma.id == "":
             continue
         ka = (ma.id, ma.context)
         mb = cb.get(*ka)
@@ -44,7 +44,7 @@ def compare_catalogs(ca, cb):
             not_translated.append(ka)
 
     for mb in cb:
-        if mb.id == '':
+        if mb.id == "":
             continue
         kb = (mb.id, mb.context)
         ma = ca.get(*kb)
@@ -54,14 +54,14 @@ def compare_catalogs(ca, cb):
     return not_found, not_translated, obsolete
 
 
-def catalog_filename(component, locale, ext='po', internal=False, mkdir=False):
+def catalog_filename(component, locale, ext="po", internal=False, mkdir=False):
     if locale is None:
-        locale = ''
+        locale = ""
 
-    external_path = env.core.options['locale.external_path']
-    if internal or locale == '' or locale == 'ru':
+    external_path = env.core.options["locale.external_path"]
+    if internal or locale == "" or locale == "ru":
         cpath = Path(import_module(pkginfo.comp_mod(component)).__path__[0])
-        base = cpath / 'locale'
+        base = cpath / "locale"
     elif external_path is not None:
         epath = Path(external_path)
         ppath = epath / pkginfo.comp_pkg(component)
@@ -78,36 +78,34 @@ def catalog_filename(component, locale, ext='po', internal=False, mkdir=False):
 
 
 def components_and_locales(args, work_in_progress=False):
-    ext_path = env.core.options['locale.external_path']
-    ext_meta = json.loads((Path(ext_path) / 'metadata.json').read_text()) \
-        if ext_path is not None else {}
-    ext_packages = ext_meta.get('packages', [])
-    ext_locales = ext_meta.get('locales', [])
+    ext_path = env.core.options["locale.external_path"]
+    ext_meta = (
+        json.loads((Path(ext_path) / "metadata.json").read_text()) if ext_path is not None else {}
+    )
+    ext_packages = ext_meta.get("packages", [])
+    ext_locales = ext_meta.get("locales", [])
 
     for comp_id in env.components.keys():
         if len(args.component) > 0 and comp_id not in args.component:
             continue
-        if (
-            not getattr(args, 'all_packages', False)
-            and pkginfo.comp_pkg(comp_id) != args.package
-        ):
+        if not getattr(args, "all_packages", False) and pkginfo.comp_pkg(comp_id) != args.package:
             continue
 
-        if len(getattr(args, 'locale', [])) > 0:
+        if len(getattr(args, "locale", [])) > 0:
             locales = list(args.locale)
         else:
-            locales = ['ru']
+            locales = ["ru"]
             if pkginfo.comp_pkg(comp_id) in ext_packages:
                 locales.extend(ext_locales)
             if work_in_progress and ext_path is not None:
                 comp_path = Path(ext_path) / pkginfo.comp_pkg(comp_id) / comp_id
-                for fn in comp_path.glob('*.po'):
-                    candidate = fn.with_suffix('').name
+                for fn in comp_path.glob("*.po"):
+                    candidate = fn.with_suffix("").name
                     if candidate not in locales:
                         locales.append(candidate)
 
         locales.sort()
-        logger.debug("Locale list for [%s] = %s", comp_id, ' '.join(locales))
+        logger.debug("Locale list for [%s] = %s", comp_id, " ".join(locales))
         yield comp_id, locales
 
 
@@ -116,24 +114,31 @@ def cmd_extract(args):
         catalog = extract_component(cident)
         logger.info("%d messages extracted from component [%s]", len(catalog), cident)
 
-        outfn = catalog_filename(cident, None, ext='pot', mkdir=True)
+        outfn = catalog_filename(cident, None, ext="pot", mkdir=True)
         logger.debug("Writing POT-file to %s", outfn)
 
-        with io.open(outfn, 'wb') as outfd:
+        with io.open(outfn, "wb") as outfd:
             write_po(outfd, catalog, ignore_obsolete=True, omit_header=True)
 
 
 def cmd_update(args):
     for comp_id, locales in components_and_locales(args, work_in_progress=True):
-        pot_path = catalog_filename(comp_id, '', ext='pot', mkdir=True)
+        pot_path = catalog_filename(comp_id, "", ext="pot", mkdir=True)
 
         if not pot_path.is_file() or args.extract:
-            cmd_extract(Namespace(package=pkginfo.comp_pkg(comp_id), component=[comp_id, ]))
+            cmd_extract(
+                Namespace(
+                    package=pkginfo.comp_pkg(comp_id),
+                    component=[
+                        comp_id,
+                    ],
+                )
+            )
 
         for locale in locales:
             po_path = catalog_filename(comp_id, locale, mkdir=True)
 
-            with io.open(pot_path, 'r') as pot_fd:
+            with io.open(pot_path, "r") as pot_fd:
                 pot = read_po(pot_fd, locale=to_gettext_locale(locale))
                 pot_is_empty = len(pot) == 0 and len(pot.obsolete) == 0
 
@@ -141,31 +146,25 @@ def cmd_update(args):
                 if pot_is_empty:
                     continue
 
-                logger.info(
-                    "Creating component [%s] locale [%s]...",
-                    comp_id, locale)
+                logger.info("Creating component [%s] locale [%s]...", comp_id, locale)
 
-                with io.open(po_path, 'wb') as fd:
+                with io.open(po_path, "wb") as fd:
                     write_po(fd, pot, width=80, omit_header=True)
 
                 continue
 
             if pot_is_empty:
-                logger.info(
-                    "Deleting component [%s] locale [%s]...",
-                    comp_id, locale)
+                logger.info("Deleting component [%s] locale [%s]...", comp_id, locale)
                 po_path.unlink()
                 continue
 
-            with io.open(po_path, 'r') as po_fd:
+            with io.open(po_path, "r") as po_fd:
                 po = read_po(po_fd, locale=to_gettext_locale(locale))
 
             not_found, _, obsolete = compare_catalogs(pot, po)
 
             if not_found or obsolete or args.force:
-                logger.info(
-                    "Updating component [%s] locale [%s]...",
-                    comp_id, locale)
+                logger.info("Updating component [%s] locale [%s]...", comp_id, locale)
 
                 po.update(pot, True)
 
@@ -174,13 +173,10 @@ def cmd_update(args):
 
                 # Remove obsolete untranslated strings but keep translated ones.
                 # They might be useful during small changes in message ids.
-                for key in [
-                    key for key, msg in po.obsolete.items()
-                    if msg.string == ''
-                ]:
+                for key in [key for key, msg in po.obsolete.items() if msg.string == ""]:
                     del po.obsolete[key]
 
-                with io.open(po_path, 'wb') as fd:
+                with io.open(po_path, "wb") as fd:
                     write_po(fd, po, width=80, omit_header=True)
 
 
@@ -190,20 +186,23 @@ def cmd_compile(args):
             catfn = partial(catalog_filename, comp_id, locale)
             po_path = catfn()
             if not po_path.exists():
-                mo_path = catfn(ext='mo', internal=True)
+                mo_path = catfn(ext="mo", internal=True)
                 if mo_path.exists():
                     mo_path.unlink()
 
                 continue
 
-            with po_path.open('r') as po:
+            with po_path.open("r") as po:
                 catalog = read_po(po, locale=to_gettext_locale(locale), domain=comp_id)
 
             logger.info(
                 "Compiling component [%s] locale [%s] (%d messages)...",
-                comp_id, locale, len(catalog))
+                comp_id,
+                locale,
+                len(catalog),
+            )
 
-            with catfn(ext='mo', internal=True, mkdir=True).open('wb') as mo:
+            with catfn(ext="mo", internal=True, mkdir=True).open("wb") as mo:
                 write_mo(mo, catalog)
 
 
@@ -235,8 +234,11 @@ def group_stat_records(records, keys, with_details=False):
             temp[key] = (agg, details)
 
         for a in (
-            'count', 'translated',
-            'not_found', 'not_translated', 'obsolete',
+            "count",
+            "translated",
+            "not_found",
+            "not_translated",
+            "obsolete",
         ):
             setattr(agg, a, getattr(agg, a) + getattr(r, a))
 
@@ -245,7 +247,7 @@ def group_stat_records(records, keys, with_details=False):
 
     result = list(temp.values())
     result.sort(key=lambda r: tuple(getattr(r[0], k) for k in keys))
-    return (result if with_details else [i[0] for i in result])
+    return result if with_details else [i[0] for i in result]
 
 
 def cmd_stat(args):
@@ -254,41 +256,49 @@ def cmd_stat(args):
     all_components = set()
     all_locales = set()
 
-    for comp_id, locales in components_and_locales(
-        args, work_in_progress=args.work_in_progress
-    ):
+    for comp_id, locales in components_and_locales(args, work_in_progress=args.work_in_progress):
         all_packages.add(pkginfo.comp_pkg(comp_id))
         all_components.add(comp_id)
 
-        pot_path = catalog_filename(comp_id, None, ext='pot', mkdir=False)
+        pot_path = catalog_filename(comp_id, None, ext="pot", mkdir=False)
         if not pot_path.is_file() or args.extract:
-            cmd_extract(Namespace(package=pkginfo.comp_pkg(comp_id), component=[comp_id, ]))
+            cmd_extract(
+                Namespace(
+                    package=pkginfo.comp_pkg(comp_id),
+                    component=[
+                        comp_id,
+                    ],
+                )
+            )
 
         if pot_path.exists():
-            with pot_path.open('r') as fd:
+            with pot_path.open("r") as fd:
                 pot = read_po(fd)
         else:
             pot = Catalog()
 
         for locale in locales:
             all_locales.add(locale)
-            po_path = catalog_filename(comp_id, locale, ext='po', mkdir=False)
+            po_path = catalog_filename(comp_id, locale, ext="po", mkdir=False)
             if po_path.exists():
-                with po_path.open('r') as po_fd:
+                with po_path.open("r") as po_fd:
                     po = read_po(po_fd, locale=to_gettext_locale(locale))
             else:
                 po = Catalog(locale=to_gettext_locale(locale))
 
             not_found, not_translated, obsolete = compare_catalogs(pot, po)
-            data.append(StatRecord(
-                package=pkginfo.comp_pkg(comp_id),
-                component=comp_id,
-                locale=locale,
-                count=len(pot),
-                translated=len(pot) - len(not_found) - len(not_translated),
-                not_found=len(not_found),
-                not_translated=len(not_translated),
-                obsolete=len(obsolete)))
+            data.append(
+                StatRecord(
+                    package=pkginfo.comp_pkg(comp_id),
+                    component=comp_id,
+                    locale=locale,
+                    count=len(pot),
+                    translated=len(pot) - len(not_found) - len(not_translated),
+                    not_found=len(not_found),
+                    not_translated=len(not_translated),
+                    obsolete=len(obsolete),
+                )
+            )
 
     if args.json:
         print(json.dumps([asdict(i) for i in data], indent=2))
@@ -296,34 +306,36 @@ def cmd_stat(args):
 
     locales = sorted(list(all_locales))
 
-    len_pkg = max(len('package'), max(len(p) for p in all_packages))
-    len_comp = max(len('component'), max(len(c) for c in all_components))
+    len_pkg = max(len("package"), max(len(p) for p in all_packages))
+    len_comp = max(len("component"), max(len(c) for c in all_components))
     len_count = 5
     len_loc = 6
 
-    header_cols = ["{:{}}".format(c, lc) for c, lc in (
-        ('PACKAGE', len_pkg),
-        ('COMPONENT', len_comp),
-        ('COUNT', len_count),
-    )] + ["{:>{}}".format(lc, len_loc) for lc in locales]
+    header_cols = [
+        "{:{}}".format(c, lc)
+        for c, lc in (
+            ("PACKAGE", len_pkg),
+            ("COMPONENT", len_comp),
+            ("COUNT", len_count),
+        )
+    ] + ["{:>{}}".format(lc, len_loc) for lc in locales]
 
-    header = ' '.join(header_cols)
+    header = " ".join(header_cols)
     print(header)
-    print('=' * len(header))
+    print("=" * len(header))
 
     def print_records(records, grouping, title=None):
         if title:
-            print("{:-^{}}".format(' ' + title + ' ', len(header)))
+            print("{:-^{}}".format(" " + title + " ", len(header)))
 
         grouped = group_stat_records(records, grouping, with_details=True)
         for r, detail in grouped:
             cols = [
-                "{:{}}".format(r.package if r.package else ' ', len_pkg),
-                "{:{}}".format(r.component if r.component else ' ', len_comp),
+                "{:{}}".format(r.package if r.package else " ", len_pkg),
+                "{:{}}".format(r.component if r.component else " ", len_comp),
             ]
 
-            by_locale = {r.locale: r for r in group_stat_records(
-                detail, ('locale', ))}
+            by_locale = {r.locale: r for r in group_stat_records(detail, ("locale",))}
 
             for _, locale_record in by_locale.items():
                 cols.append("{:{}}".format(locale_record.count, len_count))
@@ -334,29 +346,35 @@ def cmd_stat(args):
                 if locale_record is not None:
                     c = locale_record.completeness
                     if c == 1:
-                        cols.append("{:>{}}".format('OK', len_loc))
+                        cols.append("{:>{}}".format("OK", len_loc))
                     else:
                         cols.append("{:>{}.1f}".format(c * 100, len_loc))
                 else:
-                    cols.append("{:>{}}".format('-', len_loc))
+                    cols.append("{:>{}}".format("-", len_loc))
 
-            print(' '.join(cols))
+            print(" ".join(cols))
 
-    print_records(data, ('package', 'component', ))
+    print_records(
+        data,
+        (
+            "package",
+            "component",
+        ),
+    )
     if len(args.component) == 0:
-        print_records(data, ('package', ), title='PACKAGE SUMMARY')
+        print_records(data, ("package",), title="PACKAGE SUMMARY")
 
 
 def cmd_poeditor_sync(args):
-    opts = env.core.options.with_prefix('locale.poeditor')
+    opts = env.core.options.with_prefix("locale.poeditor")
 
-    if 'project_id' not in opts:
+    if "project_id" not in opts:
         raise RuntimeError("POEditor project ID isn't set!")
-    poeditor_project_id = opts['project_id']
+    poeditor_project_id = opts["project_id"]
 
-    if 'api_token' not in opts:
+    if "api_token" not in opts:
         raise RuntimeError("POEditor API token isn't set!")
-    poeditor_api_token = opts['api_token']
+    poeditor_api_token = opts["api_token"]
 
     client = POEditorAPI(api_token=poeditor_api_token)
 
@@ -369,30 +387,34 @@ def cmd_poeditor_sync(args):
         if pkg_version.parse(local_ver) < pkg_version.parse(remote_ver):
             raise RuntimeError(
                 "Version of the '%s' package must be not lower than %s in order to use translations from the POEditor "
-                "(current version: %s)."
-                % (args.package, remote_ver, local_ver)
+                "(current version: %s)." % (args.package, remote_ver, local_ver)
             )
 
     # Update local po-files
     poeditor_terms = {}
     reference_catalogs = {}
     for comp_id, locales in components_and_locales(args, work_in_progress=True):
-        cmd_update(Namespace(
-            package=pkginfo.comp_pkg(comp_id),
-            component=[comp_id, ],
-            locale=[lc for lc in locales if lc != 'ru'],
-            extract=args.extract,
-            force=False))
+        cmd_update(
+            Namespace(
+                package=pkginfo.comp_pkg(comp_id),
+                component=[
+                    comp_id,
+                ],
+                locale=[lc for lc in locales if lc != "ru"],
+                extract=args.extract,
+                force=False,
+            )
+        )
 
         for locale in locales:
-            if locale == 'ru' and locales != ['ru']:
+            if locale == "ru" and locales != ["ru"]:
                 po_path = catalog_filename(comp_id, locale)
                 if po_path.exists():
                     ref_catalog = reference_catalogs.get(locale)
                     if ref_catalog is None:
                         ref_catalog = Catalog(locale=to_gettext_locale(locale))
                         reference_catalogs[locale] = ref_catalog
-                    with po_path.open('r') as po_fd:
+                    with po_path.open("r") as po_fd:
                         for m in read_po(po_fd, locale=to_gettext_locale(locale)):
                             m.context = comp_id
                             ref_catalog[m.id] = m
@@ -401,27 +423,29 @@ def cmd_poeditor_sync(args):
             terms = poeditor_terms.get(locale)
             if not terms:
                 logger.debug("Fetching translations from POEditor for locale [%s]...", locale)
-                terms = client.view_project_terms(poeditor_project_id, language_code=to_http_locale(locale))
+                terms = client.view_project_terms(
+                    poeditor_project_id, language_code=to_http_locale(locale)
+                )
                 poeditor_terms[locale] = terms
 
             # Filter terms by context
-            terms = [term for term in terms if comp_id == term['context']]
+            terms = [term for term in terms if comp_id == term["context"]]
 
             po_path = catalog_filename(comp_id, locale)
 
             if not po_path.exists():
                 continue
 
-            with po_path.open('r') as po_fd:
+            with po_path.open("r") as po_fd:
                 po = read_po(po_fd, locale=to_gettext_locale(locale))
 
             updated = 0
 
             for msg in po:
                 for term in terms:
-                    if msg.id == term['term']:
+                    if msg.id == term["term"]:
                         cur_tr = msg.string
-                        new_tr = term['translation']['content']
+                        new_tr = term["translation"]["content"]
 
                         if cur_tr != new_tr:
                             msg.string = new_tr
@@ -430,27 +454,30 @@ def cmd_poeditor_sync(args):
                         break
 
             if updated != 0:
-                with io.open(po_path, 'wb') as fd:
+                with io.open(po_path, "wb") as fd:
                     write_po(fd, po, width=80, omit_header=True)
 
                 logger.info(
                     "%d messages translated for component [%s] locale [%s]",
-                    updated, comp_id, locale)
+                    updated,
+                    comp_id,
+                    locale,
+                )
 
     # Synchronize terms
     remote_terms = defaultdict(set)
     target_state = defaultdict(dict)
 
     for item in client.view_project_terms(poeditor_project_id):
-        remote_terms[item['term']].add(item['context'])
+        remote_terms[item["term"]].add(item["context"])
 
     comps = []
     for comp_id, _ in components_and_locales(args, work_in_progress=True):
-        pot_path = catalog_filename(comp_id, '', ext='pot')
-        with pot_path.open('r') as fd:
+        pot_path = catalog_filename(comp_id, "", ext="pot")
+        with pot_path.open("r") as fd:
             pot = read_po(fd)
         for msg in pot:
-            if msg.id == '':
+            if msg.id == "":
                 continue
             target_state[msg.id][comp_id] = True
         comps.append(comp_id)
@@ -496,16 +523,15 @@ def cmd_poeditor_sync(args):
     if len(reference_catalogs) > 0:
         logger.info(
             "Upload the following reference translations to POEditor: "
-            + ", ".join(reference_catalogs.keys()))
+            + ", ".join(reference_catalogs.keys())
+        )
         if args.no_dry_run:
             wait_for_rate_limit = False
             for locale, catalog in reference_catalogs.items():
-                with NamedTemporaryFile(suffix='.po') as fd:
+                with NamedTemporaryFile(suffix=".po") as fd:
                     write_po(fd, catalog, width=80, omit_header=True)
                     fd.flush()
-                    logger.debug(
-                        "Uploading %s reference translation...",
-                        locale)
+                    logger.debug("Uploading %s reference translation...", locale)
 
                     # Free account allows doing 1 upload per 20 seconds
                     sleep(20 if wait_for_rate_limit else 0)
@@ -513,16 +539,16 @@ def cmd_poeditor_sync(args):
 
                     client.update_terms_translations(
                         project_id=poeditor_project_id,
-                        language_code=locale.replace('-', '_'),
-                        overwrite=True, sync_terms=False,
-                        file_path=fd.name)
+                        language_code=locale.replace("-", "_"),
+                        overwrite=True,
+                        sync_terms=False,
+                        file_path=fd.name,
+                    )
 
     if len(terms_to_add) > 0 or len(terms_to_del) > 0:
         if args.no_dry_run:
             description.update(args.package, local_ver)
-        logger.info(
-            "Set '%s' package version to %s in the POEditor.", args.package, local_ver
-        )
+        logger.info("Set '%s' package version to %s in the POEditor.", args.package, local_ver)
 
     # TODO: Russian language as a reference
 
@@ -536,11 +562,11 @@ class POEditorDescription:
 
     def populate(self):
         details = self.client.view_project_details(self.project_id)
-        self.packages = json.loads(re.search(r'\((.+?)\)', details['description']).group(1))
+        self.packages = json.loads(re.search(r"\((.+?)\)", details["description"]).group(1))
 
     def update(self, package, version):
         self.packages[package] = version
-        description = '[//]: # (%s)' % (json.dumps(self.packages))
+        description = "[//]: # (%s)" % (json.dumps(self.packages))
         self.client.update_project(project_id=self.project_id, description=description)
 
 
@@ -548,46 +574,44 @@ def main(argv=sys.argv):
     logging.basicConfig(level=logging.INFO)
 
     parser = ArgumentParser()
-    parser.add_argument('-p', '--package', default='nextgisweb')
-    parser.add_argument('--all-packages', action='store_true', default=False)
-    parser.add_argument('--config')
+    parser.add_argument("-p", "--package", default="nextgisweb")
+    parser.add_argument("--all-packages", action="store_true", default=False)
+    parser.add_argument("--config")
 
     subparsers = parser.add_subparsers()
 
-    pextract = subparsers.add_parser('extract')
-    pextract.add_argument('component', nargs='*')
+    pextract = subparsers.add_parser("extract")
+    pextract.add_argument("component", nargs="*")
     pextract.set_defaults(func=cmd_extract)
 
-    pupdate = subparsers.add_parser('update')
-    pupdate.add_argument('component', nargs='*')
-    pupdate.add_argument('--locale', default=[], action='append')
-    pupdate.add_argument('--force', action='store_true', default=False)
-    pupdate.add_argument('--extract', action='store_true', default=False)
+    pupdate = subparsers.add_parser("update")
+    pupdate.add_argument("component", nargs="*")
+    pupdate.add_argument("--locale", default=[], action="append")
+    pupdate.add_argument("--force", action="store_true", default=False)
+    pupdate.add_argument("--extract", action="store_true", default=False)
     pupdate.set_defaults(func=cmd_update)
 
-    pcompile = subparsers.add_parser('compile')
-    pcompile.add_argument('component', nargs='*')
+    pcompile = subparsers.add_parser("compile")
+    pcompile.add_argument("component", nargs="*")
     pcompile.set_defaults(func=cmd_compile)
 
-    pstat = subparsers.add_parser('stat')
-    pstat.add_argument('component', nargs='*')
-    pstat.add_argument('--extract', action='store_true', default=False)
-    pstat.add_argument('--locale', default=[], action='append')
-    pstat.add_argument('--work-in-progress', action='store_true', default=False)
-    pstat.add_argument('--json', action='store_true', default=False)
+    pstat = subparsers.add_parser("stat")
+    pstat.add_argument("component", nargs="*")
+    pstat.add_argument("--extract", action="store_true", default=False)
+    pstat.add_argument("--locale", default=[], action="append")
+    pstat.add_argument("--work-in-progress", action="store_true", default=False)
+    pstat.add_argument("--json", action="store_true", default=False)
     pstat.set_defaults(func=cmd_stat)
 
-    ppoeditor_pull = subparsers.add_parser('poeditor-sync')
-    ppoeditor_pull.add_argument('component', nargs='*')
-    ppoeditor_pull.add_argument('--extract', action='store_true', default=False)
-    ppoeditor_pull.add_argument('--locale', default=[], action='append')
-    ppoeditor_pull.add_argument('--no-dry-run', action='store_true', default=False)
+    ppoeditor_pull = subparsers.add_parser("poeditor-sync")
+    ppoeditor_pull.add_argument("component", nargs="*")
+    ppoeditor_pull.add_argument("--extract", action="store_true", default=False)
+    ppoeditor_pull.add_argument("--locale", default=[], action="append")
+    ppoeditor_pull.add_argument("--no-dry-run", action="store_true", default=False)
     ppoeditor_pull.set_defaults(func=cmd_poeditor_sync)
 
     args = parser.parse_args(argv[1:])
 
-    Env(
-        cfg=load_config(args.config, None),
-        enable_disabled=True, set_global=True)
+    Env(cfg=load_config(args.config, None), enable_disabled=True, set_global=True)
 
     args.func(args)

@@ -20,7 +20,7 @@ class OptionType:
             raise TypeError("Invalid option type!")
 
     def __str__(self):
-        return 'unknown'
+        return "unknown"
 
     def loads(self, value):
         raise NotImplementedError()
@@ -30,63 +30,57 @@ class OptionType:
 
 
 class Text(OptionType):
-
     def __str__(self):
-        return 'text'
+        return "text"
 
     def loads(self, value):
         return value
 
     def dumps(self, value):
-        return value if value is not None else ''
+        return value if value is not None else ""
 
 
 class Boolean(OptionType):
-
     def __str__(self):
-        return 'boolean'
+        return "boolean"
 
     def loads(self, value):
         lw = value.lower()
-        if lw in ('true', 'yes', '1'):
+        if lw in ("true", "yes", "1"):
             return True
-        elif lw in ('false', 'no', '0'):
+        elif lw in ("false", "no", "0"):
             return False
         else:
             raise ValueError("Invalid boolean value!")
 
     def dumps(self, value):
-        return {True: 'true', False: 'false', None: ''}[value] \
-            if value is not None else ''
+        return {True: "true", False: "false", None: ""}[value] if value is not None else ""
 
 
 class Integer(OptionType):
-
     def __str__(self):
-        return 'integer'
+        return "integer"
 
     def loads(self, value):
         return int(value)
 
     def dumps(self, value):
-        return str(value) if value is not None else ''
+        return str(value) if value is not None else ""
 
 
 class Float(OptionType):
-
     def __str__(self):
-        return 'float'
+        return "float"
 
     def loads(self, value):
         return float(value)
 
     def dumps(self, value):
-        return str(value) if value is not None else ''
+        return str(value) if value is not None else ""
 
 
 class List(OptionType):
-
-    def __init__(self, otype=str, separator=r'\s*\,\s*'):
+    def __init__(self, otype=str, separator=r"\s*\,\s*"):
         self._otype = OptionType.normalize(otype)
         self._separator = separator
 
@@ -97,44 +91,36 @@ class List(OptionType):
         return [self._otype.loads(v) for v in re.split(self._separator, value)]
 
     def dumps(self, value):
-        return ', '.join(self._otype.dumps(v) for v in value) \
-            if value is not None else ''
+        return ", ".join(self._otype.dumps(v) for v in value) if value is not None else ""
 
 
 class Timedelta(OptionType):
-    _parts = (
-        ('d', 24 * 60 * 60),
-        ('h', 60 * 60),
-        ('m', 60),
-        ('', 1)
-    )
+    _parts = (("d", 24 * 60 * 60), ("h", 60 * 60), ("m", 60), ("", 1))
 
     def __str__(self):
-        return 'timedelta'
+        return "timedelta"
 
     def loads(self, value):
         for a, m in self._parts:
-            if a == '' or value.lower().endswith(a):
-                return timedelta(seconds=int(
-                    value[:-len(a)] if a != ''
-                    else value) * m)
+            if a == "" or value.lower().endswith(a):
+                return timedelta(seconds=int(value[: -len(a)] if a != "" else value) * m)
         raise ValueError("Invalid timedelta value: " + value)
 
     def dumps(self, value):
         if value is None:
-            return ''
+            return ""
         seconds = int(value.total_seconds())
         for a, m in self._parts:
             if seconds % m == 0:
-                return '{}{}'.format(seconds // m, a)
+                return "{}{}".format(seconds // m, a)
 
 
 class SizeInBytes(OptionType):
-    _parts = ('', 'K', 'M', 'G', 'T')
-    _pattern = re.compile(r'^(\d+) ?([KMGT]?)B?$', re.IGNORECASE)
+    _parts = ("", "K", "M", "G", "T")
+    _pattern = re.compile(r"^(\d+) ?([KMGT]?)B?$", re.IGNORECASE)
 
     def __str__(self):
-        return 'size_in_bytes'
+        return "size_in_bytes"
 
     def loads(self, value):
         if match := self._pattern.match(value):
@@ -142,20 +128,19 @@ class SizeInBytes(OptionType):
             suffix = match[2].upper()
             if suffix in self._parts:
                 power = self._parts.index(suffix)
-                return units * 1024 ** power
+                return units * 1024**power
         raise ValueError("Invalid SizeInBytes value: " + value)
 
     def dumps(self, value):
         if value is None:
-            return ''
+            return ""
         for power, suf in reversed(list(enumerate(self._parts))):
-            m = 1024 ** power
+            m = 1024**power
             if value % m == 0:
-                return '{:d}{:s}'.format(value // m, suf)
+                return "{:d}{:s}".format(value // m, suf)
 
 
 class Choice(OptionType):
-
     def __init__(self, otype):
         self._otype = otype
 
@@ -163,7 +148,7 @@ class Choice(OptionType):
         return self._otype(value)
 
     def dumps(self, value):
-        return value.value if value is not None else ''
+        return value.value if value is not None else ""
 
 
 OptionType.OTYPE_MAPPING[str] = Text()

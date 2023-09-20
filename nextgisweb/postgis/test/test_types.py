@@ -14,26 +14,27 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administ
 
 @pytest.fixture()
 def creds(ngw_env):
-    opts_db = ngw_env.core.options.with_prefix('test.database')
+    opts_db = ngw_env.core.options.with_prefix("test.database")
 
-    for o in ('host', 'name', 'user'):
+    for o in ("host", "name", "user"):
         if o not in opts_db:
             pytest.skip(f"Option test.database.{o} isn't set")
 
     con_args = dict(
-        host=opts_db['host'],
-        port=opts_db['port'],
-        database=opts_db['name'],
-        username=opts_db['user'],
-        password=opts_db['password'])
+        host=opts_db["host"],
+        port=opts_db["port"],
+        database=opts_db["name"],
+        username=opts_db["user"],
+        password=opts_db["password"],
+    )
 
-    engine_url = make_engine_url(EngineURL.create(
-        'postgresql+psycopg2', **con_args))
+    engine_url = make_engine_url(EngineURL.create("postgresql+psycopg2", **con_args))
     engine = sa.create_engine(engine_url)
 
     with engine.connect() as conn:
         with conn.begin():
-            conn.execute(sa.text('''
+            # fmt: off
+            conn.execute(sa.text("""
                 CREATE TABLE test_types
                 (
                     id bigserial PRIMARY KEY,
@@ -58,31 +59,40 @@ def creds(ngw_env):
                     1.1, 1.2,
                     now(), now(), now()
                 );
-            '''))
+            """))
+            # fmt: on
 
         try:
             yield con_args
         finally:
             with conn.begin():
-                conn.execute(sa.text('DROP TABLE test_types;'))
+                conn.execute(sa.text("DROP TABLE test_types;"))
 
 
 def test_types(creds, ngw_webtest_app):
     with transaction.manager:
         connection = PostgisConnection(
-            hostname=creds['host'], port=creds['port'],
-            database=creds['database'], username=creds['username'],
-            password=creds['password']
+            hostname=creds["host"],
+            port=creds["port"],
+            database=creds["database"],
+            username=creds["username"],
+            password=creds["password"],
         ).persist()
 
         layer = PostgisLayer(
             connection=connection,
-            schema='public', table='test_types', column_id='id', column_geom='geom',
+            schema="public",
+            table="test_types",
+            column_id="id",
+            column_geom="geom",
         ).persist()
 
         layer.setup()
 
         DBSession.flush()
 
-    resp = ngw_webtest_app.post_json('/api/component/postgis/check', dict(layer=dict(id=layer.id)))
-    assert StatusEnum(resp.json['status']) is StatusEnum.SUCCESS
+    resp = ngw_webtest_app.post_json(
+        "/api/component/postgis/check",
+        dict(layer=dict(id=layer.id)),
+    )
+    assert StatusEnum(resp.json["status"]) is StatusEnum.SUCCESS

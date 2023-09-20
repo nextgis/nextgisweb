@@ -21,17 +21,15 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
     components = [
         (comp, comp.is_service_ready())
         for comp in self.env.components.values()
-        if hasattr(comp, 'is_service_ready')]
+        if hasattr(comp, "is_service_ready")
+    ]
 
     messages = dict()
 
     def log_messages(logfunc):
         for comp, it in components:
             if messages[comp] is not None:
-                logfunc(
-                    "Message from [%s]: %s",
-                    comp.identity,
-                    messages[comp])
+                logfunc("Message from [%s]: %s", comp.identity, messages[comp])
 
     start = datetime.now()
     deadline = start + timedelta(seconds=timeout)
@@ -46,20 +44,28 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
             except StopIteration:
                 logger.debug(
                     "Service ready for component [%s] in %0.2f seconds",
-                    comp.identity, (datetime.now() - start).total_seconds())
+                    comp.identity,
+                    (datetime.now() - start).total_seconds(),
+                )
 
         components = nxt
         if datetime.now() > deadline:
             log_messages(logger.error)
-            logger.critical("Wait for service failed in components: {}!".format(
-                ', '.join([comp.identity for comp, it in components])))
+            logger.critical(
+                "Wait for service failed in components: {}!".format(
+                    ", ".join([comp.identity for comp, it in components])
+                )
+            )
             exit(1)
 
         elif len(components) > 0:
             if backoff == maxinterval:
                 log_messages(logger.info)
-                logger.info("Waiting {} seconds to retry in components: {}".format(
-                    backoff, ', '.join([comp.identity for comp, it in components])))
+                logger.info(
+                    "Waiting {} seconds to retry in components: {}".format(
+                        backoff, ", ".join([comp.identity for comp, it in components])
+                    )
+                )
             sleep(backoff)
             backoff = min(2 * backoff, maxinterval)
 
@@ -67,7 +73,7 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 @cli.command()
 def psql(
     self: EnvCommand.customize(env_initialize=False),
-    arg: List[str] = arg(nargs='...'),
+    arg: List[str] = arg(nargs="..."),
 ):
     """Launch psql connected to database
 
@@ -77,31 +83,40 @@ def psql(
     :param arg: Options and arguments passed to psql, use "--" prefix to separate"""
 
     opts, password = pg_connection_options(self.env)
-    psql_path = shutil.which('psql')
+    psql_path = shutil.which("psql")
     if psql_path is None:
         raise RuntimeError("Executable 'psql' not found!")
     environ = os.environ.copy()
     if password is not None:
-        environ['PGPASSWORD'] = password
+        environ["PGPASSWORD"] = password
 
     psql_arg = list(arg)
-    if len(psql_arg) > 0 and psql_arg[0] == '--':
+    if len(psql_arg) > 0 and psql_arg[0] == "--":
         psql_arg.pop(0)
 
-    os.execve(psql_path, ['psql', ] + opts + psql_arg, environ)
+    os.execve(
+        psql_path,
+        [
+            "psql",
+        ]
+        + opts
+        + psql_arg,
+        environ,
+    )
 
 
 @cli.command()
 def maintenance(
     self: EnvCommand,
     estimate_storage: bool = opt(False),
-    *, core: CoreComponent,
+    *,
+    core: CoreComponent,
 ):
     """Perform housekeeping tasks
 
     :param estimate_storage: Execute storage estimation after maintenance"""
 
-    for comp in self.env.chain('maintenance'):
+    for comp in self.env.chain("maintenance"):
         logger.debug("Maintenance for component: %s...", comp.identity)
         comp.maintenance()
 
@@ -114,16 +129,18 @@ def check_integrity(self: EnvCommand):
     """Check data integrity"""
 
     fail = False
-    with DBSession.connection(execution_options=dict(
-        isolation_level='SERIALIZABLE',
-        postgresql_readonly=True,
-        postgresql_deferrable=True,
-    )) as con:
-        for comp in self.env.chain('check_integrity'):
+    with DBSession.connection(
+        execution_options=dict(
+            isolation_level="SERIALIZABLE",
+            postgresql_readonly=True,
+            postgresql_deferrable=True,
+        )
+    ) as con:
+        for comp in self.env.chain("check_integrity"):
             with con.begin_nested():
                 try:
                     citer = comp.check_integrity()
-                    if citer is not None and hasattr(citer, '__next__'):
+                    if citer is not None and hasattr(citer, "__next__"):
                         for error in citer:
                             logger.error(f"Fault for [{comp.identity}]: {error}")
                             fail = True

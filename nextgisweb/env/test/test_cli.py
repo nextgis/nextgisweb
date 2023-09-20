@@ -13,7 +13,7 @@ def do_test(this: EnvCommand, *, env: Env, core: CoreComponent):
 
 
 def test_command(ngw_env):
-    args = ['do_test']
+    args = ["do_test"]
 
     bs_parser = ArgumentParser(bootstrap, add_help=False)
     ns_nspc, _ = bs_parser.parse_known_args(args)

@@ -7,10 +7,14 @@ from .util import NO_DEFAULT
 
 
 class Option:
-
     def __init__(
-        self, key, otype=str, default=NO_DEFAULT,
-        required=False, secure=False, doc=None
+        self,
+        key,
+        otype=str,
+        default=NO_DEFAULT,
+        required=False,
+        secure=False,
+        doc=None,
     ):
         self._key = key
         self._otype = OptionType.normalize(otype)
@@ -45,19 +49,17 @@ class Option:
 
 
 class OptionAnnotations(tuple):
-
     def with_prefix(self, prefix):
         def _copy(item):
             result = item.__class__.__new__(item.__class__)
             result.__dict__.update(item.__dict__)
-            result._key = prefix + '.' + result.key
+            result._key = prefix + "." + result.key
             return result
 
         return OptionAnnotations(map(_copy, self))
 
 
 class ConfigOptions:
-
     def __init__(self, options, annotations):
         self._options = options
         self._annotations = annotations
@@ -70,7 +72,7 @@ class ConfigOptions:
         self._aindex = idxitm()
         for a in self._annotations:
             node = self._aindex
-            for kp in a.key.split('.'):
+            for kp in a.key.split("."):
                 node = node[kp]
             node[None] = a
 
@@ -87,11 +89,11 @@ class ConfigOptions:
         """
 
         node = self._aindex
-        for kp in key.split('.'):
+        for kp in key.split("."):
             if kp in node:
                 node = node[kp]
-            elif '*' in node:
-                node = node['*']
+            elif "*" in node:
+                node = node["*"]
             else:
                 return None
 
@@ -102,7 +104,9 @@ class ConfigOptions:
         if result is None:
             warnings.warn(
                 "Missing annotation for key: {}!".format(key),
-                MissingAnnotationWarning, stacklevel=3)
+                MissingAnnotationWarning,
+                stacklevel=3,
+            )
             result = Option(None)
         return result
 
@@ -138,15 +142,18 @@ class ConfigOptions:
         self._values[key] = value
 
     def get(self, key, default=NO_DEFAULT):
-        """ Get option by key with given default value. """
+        """Get option by key with given default value."""
 
         annotation = self._akey_warn(key)
 
         try:
             value = self.__getitem__(key, annotation=annotation, use_default=False)
         except KeyError:
-            default = default if default != NO_DEFAULT else (
-                annotation.default if annotation.default != NO_DEFAULT else NO_DEFAULT)
+            default = (
+                default
+                if default != NO_DEFAULT
+                else (annotation.default if annotation.default != NO_DEFAULT else NO_DEFAULT)
+            )
             if default == NO_DEFAULT:
                 raise MissingDefaultError(key)
             value = default
@@ -180,13 +187,12 @@ class ConfigOptions:
                     del self._values[k]
 
     def with_prefix(self, prefix):
-        """ Key prefixed proxy object for options access. """
+        """Key prefixed proxy object for options access."""
 
         return ConfigOptionsPrefixProxy(self, prefix)
 
 
 class ConfigOptionsPrefixProxy:
-
     def __init__(self, parent, prefix):
         self._parent = parent
         self._prefix = prefix
@@ -204,7 +210,7 @@ class ConfigOptionsPrefixProxy:
         return self._parent.get(self._pkey(key), default=default)
 
     def with_prefix(self, prefix):
-        return self._parent.with_prefix(self._prefix + '.' + prefix)
+        return self._parent.with_prefix(self._prefix + "." + prefix)
 
     def override(self, *args, **kwargs):
         if len(args) > 1:
@@ -218,7 +224,7 @@ class ConfigOptionsPrefixProxy:
         return self._parent.override(prefixed)
 
     def _pkey(self, key):
-        return self._prefix + '.' + key
+        return self._prefix + "." + key
 
 
 class MissingAnnotationWarning(Warning):
@@ -226,7 +232,5 @@ class MissingAnnotationWarning(Warning):
 
 
 class MissingDefaultError(Exception):
-
     def __init__(self, key):
-        super().__init__(
-            "Missing default for key: {}".format(key))
+        super().__init__("Missing default for key: {}".format(key))

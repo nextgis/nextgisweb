@@ -7,8 +7,12 @@ from ..diagnostics import ERROR, SUCCESS, Checker, PostgresCheck
 def con_args(ngw_env):
     src = ngw_env.core._db_connection_args()
     return dict(
-        hostname=src['host'], port=src['port'], database=src['database'],
-        username=src['username'], password=src['password'])
+        hostname=src["host"],
+        port=src["port"],
+        database=src["database"],
+        username=src["username"],
+        password=src["password"],
+    )
 
 
 def test_postgres_check(con_args):
@@ -29,6 +33,6 @@ def test_unresolvable_hostname(con_args):
 
 
 def test_invalid_credentials(con_args):
-    con_args = dict(con_args, username='invalid')
+    con_args = dict(con_args, username="invalid")
     checker = Checker(connection=con_args)
     assert checker.status == ERROR

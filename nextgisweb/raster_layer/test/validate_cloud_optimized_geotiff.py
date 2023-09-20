@@ -29,6 +29,8 @@
 #  DEALINGS IN THE SOFTWARE.
 # *****************************************************************************
 
+# fmt: off
+
 import os.path
 import struct
 import sys

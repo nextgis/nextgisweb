@@ -17,7 +17,8 @@ def extent(resource, request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'layer.extent',
-        '/api/resource/{id:uint}/extent',
+        "layer.extent",
+        "/api/resource/{id:uint}/extent",
         factory=resource_factory,
-        get=extent)
+        get=extent,
+    )

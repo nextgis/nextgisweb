@@ -18,9 +18,7 @@ class Doctring:
             if returns := parsed.returns:
                 self.returns = returns.description
             self.params = {
-                p.arg_name: p.description
-                for p in parsed.params
-                if p.description is not None
+                p.arg_name: p.description for p in parsed.params if p.description is not None
             }
         else:
             self.params = dict()

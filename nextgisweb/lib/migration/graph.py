@@ -5,7 +5,6 @@ from .operation import ForwardOperation, InstallOperation, RewindOperation, Unin
 
 
 class MigrationGraph:
-
     def __init__(self, registry, install_dependencies={}):
         self._install_dependecies = install_dependencies
         self._nodes = _nodes = dict()
@@ -39,7 +38,7 @@ class MigrationGraph:
 
     def ancestors(self, mkeys, recursive=False):
         if not isinstance(mkeys, (set, tuple, list)) or isinstance(mkeys, MigrationKey):
-            mkeys = (mkeys, )
+            mkeys = (mkeys,)
 
         result = set()
         for mkey in mkeys:
@@ -52,7 +51,7 @@ class MigrationGraph:
 
     def descendants(self, mkeys, recursive=False):
         if not isinstance(mkeys, (set, tuple, list)) or isinstance(mkeys, MigrationKey):
-            mkeys = (mkeys, )
+            mkeys = (mkeys,)
 
         result = set()
         for mkey in mkeys:
@@ -70,13 +69,13 @@ class MigrationGraph:
             else:
                 return set(filter(lambda m: m.component == component, iterable))
 
-        if selector == 'all':
+        if selector == "all":
             assert from_nodes is None
             return _fcomponent(self._nodes)
-        elif selector == 'head':
+        elif selector == "head":
             assert from_nodes is None
             return _fcomponent(self._heads)
-        elif selector == 'tail':
+        elif selector == "tail":
             assert from_nodes is None
             return _fcomponent(self._tails)
         else:
@@ -108,27 +107,38 @@ class MigrationGraph:
 
         for component in self._components:
             if install:
-                icond = {key: False for key in (
-                    self.select('head', component=component) |  # NOQA: W504
-                    self.select('tail', component=component))}
+                icond = {
+                    key: False
+                    for key in (
+                        self.select("head", component=component)
+                        | self.select("tail", component=component)
+                    )
+                }
                 for depcomp in self._install_dependecies.get(component, ()):
-                    icond.update({key: True for key in self.select('head', component=depcomp)})
-                result.append(InstallOperation(icond, {
-                    k: True for k in self.select('all', component=component)
-                }, component))
+                    icond.update({key: True for key in self.select("head", component=depcomp)})
+                result.append(
+                    InstallOperation(
+                        icond,
+                        {k: True for k in self.select("all", component=component)},
+                        component,
+                    )
+                )
             if uninstall:
-                ucond = {key: True for key in self.select('head', component=component)}
+                ucond = {key: True for key in self.select("head", component=component)}
                 for k, v in self._install_dependecies.items():
                     if component in v:
-                        ucond.update({key: False for key in self.select('tail', component=k)})
-                result.append(UninstallOperation(ucond, {
-                    k: False for k in self.select('all', component=component)
-                }, component))
+                        ucond.update({key: False for key in self.select("tail", component=k)})
+                result.append(
+                    UninstallOperation(
+                        ucond,
+                        {k: False for k in self.select("all", component=component)},
+                        component,
+                    )
+                )
         return result
 
 
 class OperationGraph:
-
     def __init__(self, opertaions):
         self.operations = opertaions
 
@@ -171,7 +181,7 @@ class OperationGraph:
                     resolved, unres = set(), set()
                     wrongway = False
                     for pnode in path[1:]:
-                        if dg.nodes[pnode].get('transform', False):
+                        if dg.nodes[pnode].get("transform", False):
                             for n in dg.predecessors(pnode):
                                 if n not in src:
                                     unres.add(n)
@@ -191,8 +201,11 @@ class OperationGraph:
                             continue
                         else:
                             sub = resolve(
-                                src | resolved, unres, rectgt | frozenset((t, )),
-                                reclimit - 1)
+                                src | resolved,
+                                unres,
+                                rectgt | frozenset((t,)),
+                                reclimit - 1,
+                            )
                             if sub is None:
                                 mask.add(path[0])
                                 continue
@@ -207,7 +220,7 @@ class OperationGraph:
         if res is None:
             return None
 
-        ops = frozenset([op for op in res if dg.nodes[op].get('transform')])
+        ops = frozenset([op for op in res if dg.nodes[op].get("transform")])
         subg = dg.subgraph(res)
         assert nx.is_directed_acyclic_graph(subg)
 
@@ -234,56 +247,65 @@ class OperationGraph:
 
         def w(line):
             out.write(line)
-            out.write('\n')
+            out.write("\n")
 
         def sc(a, b):
             if a is None:
                 return "?"
-            return '●' if a == b else '○'
+            return "●" if a == b else "○"
 
-        w('digraph {')
+        w("digraph {")
         for s in skeys:
             w(
-                '  S{} ['.format(skeys[s]) + 'shape=plaintext label=<' + ''
-                '<table border="0" cellborder="1" cellpadding="4" cellspacing="0"><tr>' + ''
-                '<td port="F" bgcolor="{1}">{0}</td>'.format(sc(fstate.get(s), False), 'gray' if tstate.get(s) is False else 'white') + ''  # NOQA: E501
-                '<td>{}</td>'.format(s) + ''
-                '<td port="T" bgcolor="{1}">{0}</td>'.format(sc(fstate.get(s), True), 'gray' if tstate.get(s) is True else 'white') + ''  # NOQA: E501
-                '</tr></table>>]'
+                "  S{} [".format(skeys[s]) + "shape=plaintext label=<" + ""
+                '<table border="0" cellborder="1" cellpadding="4" cellspacing="0"><tr>' + ""
+                '<td port="F" bgcolor="{1}">{0}</td>'.format(
+                    sc(fstate.get(s), False), "gray" if tstate.get(s) is False else "white"
+                )
+                + ""
+                "<td>{}</td>".format(s) + ""
+                '<td port="T" bgcolor="{1}">{0}</td>'.format(
+                    sc(fstate.get(s), True), "gray" if tstate.get(s) is True else "white"
+                )
+                + ""
+                "</tr></table>>]"
             )
 
         for o in self.operations:
             tmp = list()
-            fwd = not getattr(o, 'gvinv', False)
-            gvcolor = getattr(o, 'gvcolor', 'green' if fwd else 'red')
-            tmp.append('O{0} [shape=rect label="{1}" style=filled fillcolor={2}]'.format(okeys[o], o, gvcolor))  # NOQA: E501
+            fwd = not getattr(o, "gvinv", False)
+            gvcolor = getattr(o, "gvcolor", "green" if fwd else "red")
+            tmp.append(
+                'O{0} [shape=rect label="{1}" style=filled fillcolor={2}]'.format(
+                    okeys[o], o, gvcolor
+                )
+            )
 
             for ck, cv in o.action.items():
-                link = ('O{}'.format(okeys[o]), 'S{}:{}'.format(skeys[ck], 'T' if cv else 'F'))
+                link = ("O{}".format(okeys[o]), "S{}:{}".format(skeys[ck], "T" if cv else "F"))
                 lopts = list()
                 if not fwd:
                     link = (link[1], link[0])
-                    lopts.append('dir=back')
-                tmp.append('{} -> {} [{}]'.format(link[0], link[1], ' '.join(lopts)))
+                    lopts.append("dir=back")
+                tmp.append("{} -> {} [{}]".format(link[0], link[1], " ".join(lopts)))
 
             for ck, cv in o.condition.items():
-                link = ('S{0}:{1}'.format(skeys[ck], 'T' if cv else 'F'), 'O{}'.format(okeys[o]))
+                link = ("S{0}:{1}".format(skeys[ck], "T" if cv else "F"), "O{}".format(okeys[o]))
                 lopts = list()
                 if not fwd:
                     link = (link[1], link[0])
-                    lopts.append('dir=back')
+                    lopts.append("dir=back")
                 if ck in o.action:
-                    lopts.append('constraint=false')
-                tmp.append('{} -> {} [{}]'.format(link[0], link[1], ' '.join(lopts)))
+                    lopts.append("constraint=false")
+                tmp.append("{} -> {} [{}]".format(link[0], link[1], " ".join(lopts)))
 
-            w('  ' + '; '.join(tmp))
+            w("  " + "; ".join(tmp))
 
-        w('}')
+        w("}")
 
         return out.getvalue()
 
 
 def resolve(operations, fstate, tstate):
     r = OperationGraph(operations)
-    # print(r.to_dot(fstate, tstate))
     return r.resolve(fstate, tstate)

@@ -18,20 +18,12 @@ EXPORT_FORMAT_GDAL["GTiff"] = GDALDriver(
     "GTiff",
     "GeoTIFF (*.tif)",
     "tif",
-    options=(
-        "COMPRESS=LZW",
-    ),
+    options=("COMPRESS=LZW",),
     mime="image/tiff; application=geotiff",
 )
 
 EXPORT_FORMAT_GDAL["HFA"] = GDALDriver(
-    "HFA",
-    "ERDAS IMAGINE HFA (*.img)",
-    "img",
-    options=(
-        "BLOCKSIZE=64",
-    ),
-    mime=None
+    "HFA", "ERDAS IMAGINE HFA (*.img)", "img", options=("BLOCKSIZE=64",), mime=None
 )
 
 EXPORT_FORMAT_GDAL["RMF"] = GDALDriver(
@@ -46,9 +38,6 @@ EXPORT_FORMAT_GDAL["RMF"] = GDALDriver(
 )
 
 GDAL_DRIVER_NAME_2_EXPORT_FORMATS = [
-    {
-        "name": format.name,
-        "display_name": format.display_name
-    }
+    {"name": format.name, "display_name": format.display_name}
     for _, format in EXPORT_FORMAT_GDAL.items()
 ]

@@ -38,10 +38,9 @@ class RangeFileWrapper(FileIter):
 def export(resource, request):
     request.resource_permission(PERM_READ)
 
-    srs = SRS.filter_by(id=int(request.GET['srs'])).one() \
-        if 'srs' in request.GET else resource.srs
-    format = request.GET.get('format', 'GTiff')
-    bands = request.GET['bands'].split(',') if 'bands' in request.GET else None
+    srs = SRS.filter_by(id=int(request.GET["srs"])).one() if "srs" in request.GET else resource.srs
+    format = request.GET.get("format", "GTiff")
+    bands = request.GET["bands"].split(",") if "bands" in request.GET else None
 
     if format is None:
         raise ValidationError(_("Output format is not provided."))
@@ -51,7 +50,10 @@ def export(resource, request):
 
     driver = EXPORT_FORMAT_GDAL[format]
 
-    filename = "%d.%s" % (resource.id, driver.extension,)
+    filename = "%d.%s" % (
+        resource.id,
+        driver.extension,
+    )
     content_disposition = "attachment; filename=%s" % filename
 
     def _warp(source_filename):
@@ -59,10 +61,10 @@ def export(resource, request):
             try:
                 gdal.UseExceptions()
                 gdal.Warp(
-                    tmp_file.name, source_filename,
+                    tmp_file.name,
+                    source_filename,
                     options=gdal.WarpOptions(
-                        format=driver.name, dstSRS=srs.wkt,
-                        creationOptions=driver.options
+                        format=driver.name, dstSRS=srs.wkt, creationOptions=driver.options
                     ),
                 )
             except RuntimeError as e:
@@ -93,7 +95,7 @@ def cog(resource, request):
         return Response(
             accept_ranges="bytes",
             content_length=filesize,
-            content_type="image/geo+tiff"
+            content_type="image/geo+tiff",
         )
 
     if request.method == "GET":
@@ -110,15 +112,11 @@ def cog(resource, request):
 
         content_length = content_range.stop - content_range.start
         response = Response(
-            status_code=206,
-            content_range=content_range,
-            content_type="image/geo+tiff"
+            status_code=206, content_range=content_range, content_type="image/geo+tiff"
         )
 
         response.app_iter = RangeFileWrapper(
-            open(fn, "rb"),
-            offset=content_range.start,
-            length=content_length
+            open(fn, "rb"), offset=content_range.start, length=content_length
         )
         response.content_length = content_length
 
@@ -130,8 +128,10 @@ def download(request):
 
     filename = env.raster_layer.workdir_filename(request.context.fileobj)
     response = FileResponse(
-        filename, content_type="image/tiff; application=geotiff",
-        request=request)
+        filename,
+        content_type="image/tiff; application=geotiff",
+        request=request,
+    )
     response.content_disposition = "attachment; filename=%s.tif" % request.context.id
     set_output_buffering(request, response, False)
     return response
@@ -139,8 +139,11 @@ def download(request):
 
 def setup_pyramid(comp, config):
     config.add_view(
-        export, route_name="resource.export",
-        context=RasterLayer, request_method="GET")
+        export,
+        route_name="resource.export",
+        context=RasterLayer,
+        request_method="GET",
+    )
 
     route_cog = config.add_route(
         "raster_layer.cog",

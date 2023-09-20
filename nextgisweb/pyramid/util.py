@@ -7,7 +7,6 @@ from pathlib import Path
 
 
 def viewargs(*, renderer=None):
-
     def wrap(func):
         if renderer is not None:
             func.__pyramid_renderer__ = renderer
@@ -17,17 +16,17 @@ def viewargs(*, renderer=None):
 
 
 class StaticMap:
-
     def __init__(self):
         def node():
             res = defaultdict(node)
             res[None] = None
             return res
+
         self.data = node()
 
     def add(self, uri, path):
         n = self.data
-        for p in uri.split('/'):
+        for p in uri.split("/"):
             n = n[p]
         n[None] = path
 
@@ -40,47 +39,44 @@ class StaticMap:
                 n = n[h]
             else:
                 if p := n[None]:
-                    return p / h / '/'.join(u)
+                    return p / h / "/".join(u)
                 else:
                     raise KeyError
 
 
 class StaticSourcePredicate:
-
     def __init__(self, value, config):
         assert value is True
         self.value = value
 
     def text(self):
-        return 'static_source'
+        return "static_source"
 
     phash = __repr__ = text
 
     def __call__(self, context, request):
-        subpath = context['match']['subpath']
-        static_map = request.registry.settings['pyramid.static_map']
+        subpath = context["match"]["subpath"]
+        static_map = request.registry.settings["pyramid.static_map"]
 
         try:
             path = static_map.lookup(subpath)
         except KeyError:
             return False
         else:
-            request.environ['static_path'] = path
+            request.environ["static_path"] = path
             return True
 
 
 def gensecret(length):
     symbols = string.ascii_letters + string.digits
-    return ''.join([
-        secrets.choice(symbols)
-        for i in range(length)])
+    return "".join([secrets.choice(symbols) for i in range(length)])
 
 
 def datetime_to_unix(dt):
     return timegm(dt.timetuple())
 
 
-origin_pattern = re.compile(r'^(https?)://(\*\.)?([\w\-\.]{3,})(:\d{2,5})?/?$')
+origin_pattern = re.compile(r"^(https?)://(\*\.)?([\w\-\.]{3,})(:\d{2,5})?/?$")
 
 
 def parse_origin(url):
@@ -88,7 +84,7 @@ def parse_origin(url):
     if m is None:
         raise ValueError("Invalid origin.")
     scheme, wildcard, domain, port = m[1], m[2], m[3], m[4]
-    domain = domain.rstrip('.')
+    domain = domain.rstrip(".")
     is_wildcard = wildcard is not None
     if is_wildcard:
         domain = wildcard + domain
@@ -100,12 +96,12 @@ def set_output_buffering(request, response, value, *, strict=False):
         return
 
     opts = request.env.pyramid.options
-    default = opts['response_buffering']
+    default = opts["response_buffering"]
     if value == default:
         return
 
-    x_accel_buffering = opts['x_accel_buffering']
+    x_accel_buffering = opts["x_accel_buffering"]
     if x_accel_buffering:
-        response.headers['X-Accel-Buffering'] = 'yes' if value else 'no'
+        response.headers["X-Accel-Buffering"] = "yes" if value else "no"
     elif strict:
         raise RuntimeError("Failed to set output buffering")

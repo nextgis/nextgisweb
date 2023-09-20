@@ -26,7 +26,6 @@ class DryRunOptions:
 
 @command()
 class bootstrap(EnvOptions):
-
     def __enter__(self):
         pass
 
@@ -38,7 +37,7 @@ class bootstrap(EnvOptions):
 
         # Scan for {component_module}.cli modules to populate commands
         for comp in env.components.values():
-            candidate = f'{comp.module}.cli'
+            candidate = f"{comp.module}.cli"
             if candidate not in sys.modules and find_spec(candidate):
                 __import__(candidate)
 
@@ -53,7 +52,7 @@ class EnvCommand(EnvOptions):
 
     @classmethod
     def customize(cls, **kwargs):
-        return type('CustomCommand', (cls, ), kwargs)
+        return type("CustomCommand", (cls,), kwargs)
 
     def __enter__(self):
         self.env = environment._env

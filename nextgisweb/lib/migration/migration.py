@@ -3,13 +3,12 @@ from collections import namedtuple
 
 from .revision import REVID_ZERO
 
-MigrationKey = namedtuple('MigrationKey', ('component', 'revision'))
+MigrationKey = namedtuple("MigrationKey", ("component", "revision"))
 MigrationKey.__repr__ = lambda self: "<{}:{}>".format(*self)
 MigrationKey.__str__ = lambda self: "{}:{}".format(*self)
 
 
 class Migration:
-
     def __init__(self, component, revision):
         self._component = component
         self._revision = revision
@@ -54,20 +53,18 @@ class Migration:
 
 
 class InitialMigration(Migration):
-
     def __init__(self, component):
         super().__init__(component, REVID_ZERO)
         self._parents = ()
-        self._message = 'Initial migration'
+        self._message = "Initial migration"
         self._dependencies = ()
         self._has_forward = False
         self._has_rewind = False
 
 
 class Dependency:
-
     def __init__(self, value):
-        m = re.match(r'^(.+)(==|[\>\<]=?)(.+)$', value)
+        m = re.match(r"^(.+)(==|[\>\<]=?)(.+)$", value)
         if m:
             self._component = m.group(1)
             self._operation = m.group(2)

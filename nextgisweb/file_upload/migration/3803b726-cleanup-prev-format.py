@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 from shutil import rmtree
 
-pattern = re.compile(r'^[0-9a-f]{2}$')
+pattern = re.compile(r"^[0-9a-f]{2}$")
 
 
 def forward(ctx):

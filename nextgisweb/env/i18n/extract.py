@@ -80,7 +80,7 @@ class DirectoryMapping:
 
 
 def load_extract_modules():
-    if getattr(load_extract_modules, '_loaded', False):
+    if getattr(load_extract_modules, "_loaded", False):
         return
     for comp_id in pkginfo.components:
         mod = pkginfo.comp_mod(comp_id) + ".i18n"
@@ -97,20 +97,22 @@ def extract_component(comp_id):
     catalog_messages = dict()
     path = pkginfo.comp_path(comp_id)
     for f in extraction_root.scan(str(path), ""):
-        with (path / f.path).open('rb') as fd:
+        with (path / f.path).open("rb") as fd:
             extracted = babel_extract(extraction_methods[f.method], fd)
-            for (ln, message, comments, context) in extracted:
-                key = (message, context) if isinstance(message, str) \
-                    else (message[0], context)
+            for ln, message, comments, context in extracted:
+                key = (message, context) if isinstance(message, str) else (message[0], context)
                 cat_msg = catalog_messages.get(key)
                 if cat_msg is None:
                     cat_msg = catalog_messages[key] = Message(
-                        message, context=context, flags=set(),
-                        user_comments=comments)
+                        message,
+                        context=context,
+                        flags=set(),
+                        user_comments=comments,
+                    )
                 cat_msg.locations.append((str(f.path), ln))
                 cat_msg.flags = cat_msg.flags.union(f.tags)
 
-    loc_sort_key = lambda loc: loc[0] + ':' + "{:04d}".format(loc[1])
+    loc_sort_key = lambda loc: loc[0] + ":" + "{:04d}".format(loc[1])
     msg_sort_key = lambda msg: loc_sort_key(msg.locations[0])
 
     sorting = list()
@@ -123,9 +125,11 @@ def extract_component(comp_id):
     cat = Catalog(domain=comp_id)
     for cm in sorting:
         cat.add(
-            cm.id, context=cm.context,
+            cm.id,
+            context=cm.context,
             locations=cm.locations,
-            flags=cm.flags)
+            flags=cm.flags,
+        )
 
     return cat
 

@@ -30,14 +30,15 @@ def json(request, body: JSONType) -> JSONType:
 
 
 class EnumParam(Enum):
-    FOO = 'foo'
-    BAR = 'bar'
+    FOO = "foo"
+    BAR = "bar"
 
 
 # Query parameters can be declared as keyword-only parameters of view.
 # Parameters descriptions from docstrings are mapped to OpenAPI descriptions.
 def param(
-    request, *,
+    request,
+    *,
     rstr: str,
     rint: int,
     enum: EnumParam = EnumParam.FOO,
@@ -55,7 +56,9 @@ def param(
     return "OK"
 
 
-def anyof(request) -> AnyOf[
+def anyof(
+    request,
+) -> AnyOf[
     AsJSON[Union[str, int, bool]],
     Annotated[str, StatusCode(201), ContentType("text/plain")],
 ]:
@@ -64,7 +67,8 @@ def anyof(request) -> AnyOf[
 
 
 def body(
-    request, *,
+    request,
+    *,
     body: AnyOf[
         Annotated[str, ContentType("application/json")],
         Annotated[str, ContentType("text/plain")],
@@ -82,19 +86,18 @@ class BarResponse(TypedDict):
     bar: str
 
 
-def tdict(request) -> AnyOf[
-    Annotated[FooResponse, StatusCode(200)],
-    Annotated[BarResponse, StatusCode(201)],
-]:
+def tdict(
+    request,
+) -> AnyOf[Annotated[FooResponse, StatusCode(200)], Annotated[BarResponse, StatusCode(201)],]:
     """Generate response from TypedDict"""
     return FooResponse(foo="foo")
 
 
-config.add_route('json', '/json', post=json)
-config.add_route('param', '/param', get=param)
-config.add_route('anyof', '/anyof', get=anyof)
-config.add_route('body', '/body', post=body)
-config.add_route('tdict', '/tdict', get=tdict)
+config.add_route("json", "/json", post=json)
+config.add_route("param", "/param", get=param)
+config.add_route("anyof", "/anyof", get=anyof)
+config.add_route("body", "/body", post=body)
+config.add_route("tdict", "/tdict", get=tdict)
 
 
 config.commit()
