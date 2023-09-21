@@ -11,12 +11,13 @@ def preview(resource, request):
         raise HTTPNotFound()
 
     path = env.file_storage.filename(resource.social.preview_fileobj)
-    return FileResponse(path, content_type='image/png', request=request)
+    return FileResponse(path, content_type="image/png", request=request)
 
 
 def setup_pyramid(comp, config):
     config.add_route(
-        'resource.preview',
-        '/api/resource/{id:uint}/preview.png',
+        "resource.preview",
+        "/api/resource/{id:uint}/preview.png",
         factory=resource_factory,
-        get=preview)
+        get=preview,
+    )

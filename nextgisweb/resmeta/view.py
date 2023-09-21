@@ -6,8 +6,8 @@ from nextgisweb.resource.view import resource_sections
 
 class Widget(Widget):
     resource = Resource
-    operation = ('create', 'update')
-    amdmod = '@nextgisweb/resmeta/editor'
+    operation = ("create", "update")
+    amdmod = "@nextgisweb/resmeta/editor"
 
 
 def setup_pyramid(comp, config):

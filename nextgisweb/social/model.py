@@ -13,32 +13,37 @@ from nextgisweb.resource import (
 )
 from nextgisweb.resource import SerializedProperty as SP
 
-Base.depends_on('resource')
+Base.depends_on("resource")
 
 MAX_SIZE = (1600, 630)
 
 
 class ResourceSocial(Base):
-    __tablename__ = 'resource_social'
+    __tablename__ = "resource_social"
 
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     preview_fileobj_id = db.Column(db.ForeignKey(FileObj.id))
     preview_description = db.Column(db.Unicode)
 
-    resource = db.relationship(Resource, backref=db.backref(
-        'social', cascade='all, delete-orphan', uselist=False))
-    preview_fileobj = db.relationship(FileObj, lazy='joined')
+    resource = db.relationship(
+        Resource,
+        backref=db.backref(
+            "social",
+            cascade="all, delete-orphan",
+            uselist=False,
+        ),
+    )
+    preview_fileobj = db.relationship(FileObj, lazy="joined")
 
 
 class _preview_file_upload_attr(SP):
-
     def setter(self, srlzr, value):
         if srlzr.obj.social is None:
             srlzr.obj.social = ResourceSocial()
 
         social = srlzr.obj.social
         if value is not None:
-            srcfile, _ = env.file_upload.get_filename(value['id'])
+            srcfile, _ = env.file_upload.get_filename(value["id"])
 
             fileobj = env.file_storage.fileobj(component=COMP_ID)
             dstfile = env.file_storage.filename(fileobj, makedirs=True)
@@ -47,10 +52,10 @@ class _preview_file_upload_attr(SP):
                 width, height = image.size
                 resize = width > MAX_SIZE[0] or height > MAX_SIZE[1]
 
-                if image.format != 'PNG' or resize:
+                if image.format != "PNG" or resize:
                     if resize:
                         image.thumbnail(MAX_SIZE)
-                    image.save(dstfile, 'png', optimize=True)
+                    image.save(dstfile, "png", optimize=True)
                 else:
                     copyfile(srcfile, dstfile)
 
@@ -62,14 +67,12 @@ class _preview_file_upload_attr(SP):
 
 
 class _preview_image_exists(SP):
-
     def getter(self, srlzr):
         social = srlzr.obj.social
         return social is not None and social.preview_fileobj_id is not None
 
 
 class _preview_description_attr(SP):
-
     def getter(self, srlzr):
         social = srlzr.obj.social
         return social.preview_description if social is not None else None
@@ -87,4 +90,6 @@ class SocialSerializer(Serializer):
     preview_file_upload = _preview_file_upload_attr(write=ResourceScope.update)
     preview_image_exists = _preview_image_exists(read=ResourceScope.read)
     preview_description = _preview_description_attr(
-        read=ResourceScope.read, write=ResourceScope.update)
+        read=ResourceScope.read,
+        write=ResourceScope.update,
+    )
