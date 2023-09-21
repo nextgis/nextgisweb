@@ -37,7 +37,7 @@ WMS_VERSIONS = ("1.1.1", "1.3.0")
 url_pattern = re.compile(
     r"^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/?]*)?$",
     re.IGNORECASE | re.UNICODE,
-)  # NOQA
+)
 
 
 class Connection(Base, Resource):

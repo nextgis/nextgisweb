@@ -113,7 +113,7 @@ class User(Principal):
     def password(self):
         return PasswordHashValue(self.password_hash) if self.password_hash is not None else None
 
-    @password.setter  # NOQA
+    @password.setter
     def password(self, value):
         self.password_hash = sha256_crypt.hash(value) if value is not None else None
 

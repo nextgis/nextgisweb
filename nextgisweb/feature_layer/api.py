@@ -205,7 +205,7 @@ def export(resource, options, filepath):
         query.fields(*options.fields)
 
     ogr_ds = _ogr_memory_ds()
-    _ogr_layer = _ogr_layer_from_features(  # NOQA: 841
+    _ogr_layer = _ogr_layer_from_features(
         resource,
         query(),
         ds=ogr_ds,

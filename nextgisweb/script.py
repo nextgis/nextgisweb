@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from textwrap import wrap
 
 # Workaround for https://bugs.python.org/issue47082
-import numpy  # NOQA
+import numpy  # noqa: F401
 
 from nextgisweb.env import Env
 from nextgisweb.env.cli import bootstrap, cli

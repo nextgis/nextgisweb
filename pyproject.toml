@@ -4,7 +4,7 @@ line-length = 99
 [tool.ruff]
 line-length = 99
 select = ["E", "F", "W", "I", "TID251"]
-ignore = ["E501"]
+ignore = ["E501", "E731"]
 exclude = [
     "docker.py",
     "nextgisweb/raster_layer/test/validate_cloud_optimized_geotiff.py",

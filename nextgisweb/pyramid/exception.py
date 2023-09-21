@@ -215,7 +215,7 @@ class InternalServerError(Exception):
 def adapt_httpexception(iface, obj):
     if issubclass(iface, IUserException) and isinstance(
         obj, httpexceptions.HTTPError
-    ):  # NOQA: W503
+    ):
         user_exception(
             obj, title=obj.title, message=obj.explanation, detail=None, http_status_code=obj.code
         )

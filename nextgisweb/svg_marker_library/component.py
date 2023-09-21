@@ -7,17 +7,17 @@ from nextgisweb.lib.config import Option, OptionAnnotations
 
 from .model import validate_filename
 
-PRESET_DIR = path.join(path.dirname(__file__), 'preset/')
+PRESET_DIR = path.join(path.dirname(__file__), "preset/")
 
 
 class SVGMarkerLibraryComponent(Component):
-
     def initialize(self):
         self.cache = TTLCache(maxsize=128, ttl=60)
 
-    @require('resource')
+    @require("resource")
     def setup_pyramid(self, config):
-        from . import api, view  # NOQA
+        from . import api, view
+
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
@@ -38,8 +38,8 @@ class SVGMarkerLibraryComponent(Component):
                 self.cache[ckey] = result
                 return result
 
-        name = name + '.svg'
-        for svg_dir in self.options['path']:
+        name = name + ".svg"
+        for svg_dir in self.options["path"]:
             candidate = path.join(svg_dir, name)
             if path.isfile(candidate):
                 self.cache[ckey] = candidate
@@ -47,6 +47,8 @@ class SVGMarkerLibraryComponent(Component):
 
         return None
 
+    # fmt: off
     option_annotations = OptionAnnotations((
-        Option('path', list, default=[PRESET_DIR], doc="Search paths for SVG files."),
+        Option("path", list, default=[PRESET_DIR], doc="Search paths for SVG files."),
     ))
+    # fmt: on

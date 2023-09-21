@@ -196,8 +196,8 @@ class Resource(Base, metaclass=ResourceMeta):
         for res in tuple(self.parents) + (self, ):
             rules = filter(lambda rule: (
                 (rule.propagate or res == self)
-                and rule.cmp_identity(self.identity)  # NOQA: W503
-                and rule.cmp_user(user)),  # NOQA: W503
+                and rule.cmp_identity(self.identity)
+                and rule.cmp_user(user)),
                 res.acl)
 
             for rule in rules:
@@ -568,8 +568,8 @@ class ResourceACLRule(Base):
         pscope = permission.scope.identity
 
         return ((self.scope == '' and self.permission == '')
-                or (self.scope == pscope and self.permission == '')  # NOQA: W503
-                or (self.scope == pscope and self.permission == pname))  # NOQA: W503
+                or (self.scope == pscope and self.permission == '')
+                or (self.scope == pscope and self.permission == pname))
 
 
 @Principal.on_find_references.handler

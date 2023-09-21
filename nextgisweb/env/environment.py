@@ -173,7 +173,7 @@ class Env(Container):
                             "COMMENT ON TABLE %(fullname)s IS "
                             + "'"
                             + comp.identity
-                            + "'"  # NOQA: W503
+                            + "'"
                         ),
                     )
 

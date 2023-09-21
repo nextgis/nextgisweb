@@ -222,9 +222,9 @@ class CompositeSerializer(SerializerBase):
 def serval(value):
     if (
         value is None
-        or isinstance(value, int)  # NOQA: W503
-        or isinstance(value, float)  # NOQA: W503
-        or isinstance(value, str)  # NOQA: W503
+        or isinstance(value, int)
+        or isinstance(value, float)
+        or isinstance(value, str)
     ):
         return value
 

@@ -37,7 +37,7 @@ class RenderComponent(Component):
 
     @require("resource")
     def setup_pyramid(self, config):
-        from . import api, view  # NOQA
+        from . import api, view
 
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)

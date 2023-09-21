@@ -136,7 +136,7 @@ class PostgisConnection(Base, Resource):
     port = db.Column(db.Integer, nullable=True)
 
     @classmethod
-    def check_parent(cls, parent):  # NOQA
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
     def get_engine(self):
@@ -259,7 +259,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     )
 
     @classmethod
-    def check_parent(cls, parent):  # NOQA
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
     @property
@@ -312,7 +312,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                         _(
                             "SRID missing in geometry_columns table! You should specify it manually."
                         )
-                    )  # NOQA
+                    )
 
                 if self.geometry_srid == 0:
                     raise ValidationError(_("0 is an invalid SRID."))
@@ -324,7 +324,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 ):
                     raise ValidationError(
                         _("SRID in geometry_columns table does not match specified!")
-                    )  # NOQA
+                    )
 
                 if self.geometry_srid is None:
                     self.geometry_srid = geometry_srid
@@ -336,7 +336,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                         _(
                             "Geometry type missing in geometry_columns table! You should specify it manually."
                         )
-                    )  # NOQA
+                    )
 
                 if row["coord_dimension"] == 3:
                     tab_geom_type += "Z"
@@ -348,7 +348,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 ):
                     raise ValidationError(
                         _("Geometry type in geometry_columns table does not match specified!")
-                    )  # NOQA
+                    )
 
                 if self.geometry_type is None:
                     self.geometry_type = tab_geom_type
@@ -361,7 +361,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                     if not isinstance(column["type"], db.Integer):
                         raise ValidationError(
                             _("To use column as ID it should have integer type!")
-                        )  # NOQA
+                        )
                     colfound_id = True
 
                 elif column["name"] == self.column_geom:
@@ -404,12 +404,12 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if not colfound_id:
                 raise ValidationError(
                     _("Column '%(column)s' not found!") % dict(column=self.column_id)
-                )  # NOQA
+                )
 
             if not colfound_geom:
                 raise ValidationError(
                     _("Column '%(column)s' not found!") % dict(column=self.column_geom)
-                )  # NOQA
+                )
 
     def get_info(self):
         return super().get_info() + (

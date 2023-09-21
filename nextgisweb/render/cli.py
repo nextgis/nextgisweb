@@ -26,7 +26,8 @@ def tile_cache_seed(self: EnvCommand):
     transformers = dict()
 
     for tc in DBSession.query(ResourceTileCache).filter(
-        ResourceTileCache.enabled, ResourceTileCache.seed_z != None  # NOQA: E711
+        ResourceTileCache.enabled,
+        ResourceTileCache.seed_z != None,  # noqa: E711
     ):
         rend_res = tc.resource
         data_res = rend_res.parent

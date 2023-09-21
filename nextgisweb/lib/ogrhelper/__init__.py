@@ -85,7 +85,7 @@ def read_layer_features(layer, geometry_format=None):
             geom,
             [
                 (fname, fget(feat, fidx) if not feat.IsFieldNull(fidx) else None)
-                for (fidx, fname, fget) in fieldmap  # NOQA: F812
+                for (fidx, fname, fget) in fieldmap
             ],
         )
 

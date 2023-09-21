@@ -17,7 +17,7 @@ class RasterLayerComponent(Component):
         self.cog_enabled = self.options["cog_enabled"]
 
     def setup_pyramid(self, config):
-        from . import api, view  # NOQA
+        from . import api, view
 
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
