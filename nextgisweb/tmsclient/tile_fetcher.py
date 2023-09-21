@@ -17,9 +17,9 @@ SHUTDOWN_TIMEOUT = 1
 
 
 class FetchStatus:
-    DONE = 'done'
-    DATA = 'data'
-    ERROR = 'error'
+    DONE = "done"
+    DATA = "data"
+    ERROR = "error"
 
 
 @dataclass
@@ -41,7 +41,7 @@ class TileFetcher:
 
     def __init__(self):
         if TileFetcher.__instance is None:
-            self._request_timeout = env.tmsclient.options['timeout'].total_seconds()
+            self._request_timeout = env.tmsclient.options["timeout"].total_seconds()
             self._session_timeout = self._request_timeout * 2
 
             self._queue = Queue(maxsize=1)
@@ -57,18 +57,27 @@ class TileFetcher:
         return cls.__instance
 
     async def _get_tiles(
-        self, tasks, client, *, req_kw,
-        scheme, url_template, layer_name,
-        zoom, xmin, xmax, ymin, ymax,
+        self,
+        tasks,
+        client,
+        *,
+        req_kw,
+        scheme,
+        url_template,
+        layer_name,
+        zoom,
+        xmin,
+        xmax,
+        ymin,
+        ymax,
     ):
         async def _get_tile(position, xtile, ytile):
             if scheme == SCHEME.TMS:
                 ytile = toggle_tms_xyz_y(zoom, ytile)
 
             url = url_template.format(
-                x=xtile, y=ytile, z=zoom,
-                q=quad_key(xtile, ytile, zoom),
-                layer=layer_name)
+                x=xtile, y=ytile, z=zoom, q=quad_key(xtile, ytile, zoom), layer=layer_name
+            )
 
             try:
                 response = await client.get(url, **req_kw)
@@ -97,8 +106,12 @@ class TileFetcher:
 
         params = dict(
             headers=env.tmsclient.headers,
-            limits=Limits(max_keepalive_connections=8), http2=True)
-        async with AsyncClient(**params) as client, AsyncClient(verify=False, **params) as client_insecure:
+            limits=Limits(max_keepalive_connections=8),
+            http2=True,
+        )
+        async with AsyncClient(**params) as client, AsyncClient(
+            verify=False, **params
+        ) as client_insecure:
             while True:
                 if self._shutdown:
                     break
@@ -109,8 +122,8 @@ class TileFetcher:
                 except Empty:
                     continue
 
-                answer = data.pop('answer')
-                _client = client_insecure if data.pop('insecure') else client
+                answer = data.pop("answer")
+                _client = client_insecure if data.pop("insecure") else client
                 tasks = []
                 try:
                     async for pos, data in self._get_tiles(tasks, _client, **data):
@@ -125,20 +138,23 @@ class TileFetcher:
     def _job(self):
         self._loop.run_until_complete(self._ajob())
 
-    def get_tiles(
-        self, connection, layer_name,
-        zoom, xmin, xmax, ymin, ymax
-    ):
+    def get_tiles(self, connection, layer_name, zoom, xmin, xmax, ymin, ymax):
         data = dict(
-            scheme=connection.scheme, url_template=connection.url_template, layer_name=layer_name,
-            zoom=zoom, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax,
+            scheme=connection.scheme,
+            url_template=connection.url_template,
+            layer_name=layer_name,
+            zoom=zoom,
+            xmin=xmin,
+            xmax=xmax,
+            ymin=ymin,
+            ymax=ymax,
         )
-        data['req_kw'] = dict(
+        data["req_kw"] = dict(
             params=connection.query_params,
             timeout=Timeout(timeout=self._request_timeout),
         )
-        data['insecure'] = connection.insecure
-        answer = data['answer'] = Queue()
+        data["insecure"] = connection.insecure
+        answer = data["answer"] = Queue()
 
         self._queue.put_nowait(data)
 

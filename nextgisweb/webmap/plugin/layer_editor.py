@@ -7,7 +7,6 @@ from .base import WebmapLayerPlugin
 
 
 class LayerEditorPlugin(WebmapLayerPlugin):
-
     @classmethod
     def is_layer_supported(cls, layer, webmap):
         if IFeatureLayer.providedBy(layer):
@@ -15,7 +14,10 @@ class LayerEditorPlugin(WebmapLayerPlugin):
             write_permission = layer.has_permission(PD_WRITE, request.user)
             if not write_permission:
                 return False
-            return ("ngw-webmap/plugin/LayerEditor", dict(
-                writable=IWritableFeatureLayer.providedBy(layer),
-                geometry_type=layer.geometry_type
-            ))
+            return (
+                "ngw-webmap/plugin/LayerEditor",
+                dict(
+                    writable=IWritableFeatureLayer.providedBy(layer),
+                    geometry_type=layer.geometry_type,
+                ),
+            )

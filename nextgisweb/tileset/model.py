@@ -42,8 +42,8 @@ from nextgisweb.resource import (
 from nextgisweb.tmsclient.util import crop_box, render_zoom, toggle_tms_xyz_y
 
 TILE_SIZE = 256
-JPEG_EXTS = ('jpg', 'jpeg')
-COLOR_MAGIC = 'NGT1'.encode("ascii")
+JPEG_EXTS = ("jpg", "jpeg")
+COLOR_MAGIC = "NGT1".encode("ascii")
 
 
 def imgcolor(img):
@@ -52,7 +52,7 @@ def imgcolor(img):
         extrema = [extrema]
         rgba = False
     else:
-        rgba = img.mode == 'RGBA'
+        rgba = img.mode == "RGBA"
 
     if rgba:
         alpha = extrema[3]
@@ -64,7 +64,7 @@ def imgcolor(img):
             return None
 
     if not rgba:
-        extrema = img.convert('RGBA').getextrema()
+        extrema = img.convert("RGBA").getextrema()
 
     return [c[0] for c in extrema]
 
@@ -81,11 +81,11 @@ def transform_extent(extent, src_osr, dst_osr):
     return transform_point(*extent[0:2]) + transform_point(*extent[2:4])
 
 
-Base.depends_on('resource')
+Base.depends_on("resource")
 
 
 class TilesetData(KindOfData):
-    identity = 'tileset'
+    identity = "tileset"
     display_name = _("Tilesets")
 
 
@@ -110,12 +110,12 @@ class RenderRequest:
 
 @lru_cache(maxsize=32)
 def get_tile_db(db_path):
-    return sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)
+    return sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
 
 
 @implementer(IRenderableStyle, IRenderableNonCached, IBboxLayer)
 class Tileset(Base, Resource, SpatialLayerMixin):
-    identity = 'tileset'
+    identity = "tileset"
     cls_display_name = _("Tileset")
 
     __scope__ = (DataStructureScope, DataScope)
@@ -123,13 +123,16 @@ class Tileset(Base, Resource, SpatialLayerMixin):
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
     tileset_zmin = sa.Column(sa.SmallInteger, nullable=False)
     tileset_zmax = sa.Column(sa.SmallInteger, nullable=False)
-    tileset_ntiles = sa.Column(pg.ARRAY(sa.Integer, dimensions=1, zero_indexes=True), nullable=False)
+    tileset_ntiles = sa.Column(
+        pg.ARRAY(sa.Integer, dimensions=1, zero_indexes=True),
+        nullable=False,
+    )
     minx = sa.Column(sa.Float, nullable=False)
     miny = sa.Column(sa.Float, nullable=False)
     maxx = sa.Column(sa.Float, nullable=False)
     maxy = sa.Column(sa.Float, nullable=False)
 
-    fileobj = orm.relationship(FileObj, cascade='all')
+    fileobj = orm.relationship(FileObj, cascade="all")
 
     @classmethod
     def check_parent(cls, parent):
@@ -150,19 +153,24 @@ class Tileset(Base, Resource, SpatialLayerMixin):
 
         db_path = env.file_storage.filename(self.fileobj)
         connection = get_tile_db(db_path)
-        for x, y, data in connection.execute('''
+
+        # fmt: off
+        for x, y, data in connection.execute("""
             SELECT x, y, data FROM tile
             WHERE z = ? AND (x BETWEEN ? AND ?) AND (y BETWEEN ? AND ?)
-        ''', (zoom, xtile_from, xtile_to, ytile_from, ytile_to)):
+        """, (zoom, xtile_from, xtile_to, ytile_from, ytile_to)):
+        # fmt: on
             if data.startswith(COLOR_MAGIC):
                 tile_image = Image.new(
-                    'RGBA', (TILE_SIZE, TILE_SIZE),
-                    tuple(data[len(COLOR_MAGIC):]))
+                    "RGBA",
+                    (TILE_SIZE, TILE_SIZE),
+                    tuple(data[len(COLOR_MAGIC) :]),
+                )
             else:
                 tile_image = Image.open(BytesIO(data))
 
             if image is None:
-                image = Image.new('RGBA', (width, height))
+                image = Image.new("RGBA", (width, height))
             image.paste(tile_image, ((x - xtile_from) * TILE_SIZE, (y - ytile_from) * TILE_SIZE))
 
         if image is not None:
@@ -180,7 +188,9 @@ class Tileset(Base, Resource, SpatialLayerMixin):
     def extent(self):
         extent = transform_extent(
             (self.minx, self.miny, self.maxx, self.maxy),
-            self.srs.to_osr(), sr_from_epsg(4326))
+            self.srs.to_osr(),
+            sr_from_epsg(4326),
+        )
         return dict(
             minLon=extent[0],
             maxLon=extent[2],
@@ -190,11 +200,12 @@ class Tileset(Base, Resource, SpatialLayerMixin):
 
     def get_info(self):
         s = super()
-        return (s.get_info() if hasattr(s, 'get_info') else ()) + (
+        return (s.get_info() if hasattr(s, "get_info") else ()) + (
             (_("Number of tiles"), sum(self.tileset_ntiles)),
-            (_("Zoom levels"), _("From {min} to {max}").format(
-                min=self.tileset_zmin,
-                max=self.tileset_zmax)),
+            (
+                _("Zoom levels"),
+                _("From {min} to {max}").format(min=self.tileset_zmin, max=self.tileset_zmax),
+            ),
         )
 
 
@@ -210,9 +221,9 @@ class FileFormat:
         if match := cls.pattern.match(filename):
             obj = super().__new__(cls)
             obj.filename = filename
-            obj.prefix = match['prefix']
-            if 'ext' in cls.pattern.groupindex:
-                ext = match['ext'].lower()
+            obj.prefix = match["prefix"]
+            if "ext" in cls.pattern.groupindex:
+                ext = match["ext"].lower()
                 if ext in JPEG_EXTS:
                     obj.ext = JPEG_EXTS
                 else:
@@ -223,27 +234,31 @@ class FileFormat:
 
     def get_tile(self, filename):
         if match := self.pattern.match(filename):
-            if match['prefix'] != self.prefix:
+            if match["prefix"] != self.prefix:
                 raise ValidationError(
-                    message=_("Tiles '{}' and '{}' are located in different subdirectories.")
-                    .format(self.filename, filename))
-            if self.ext is not None and match['ext'].lower() not in self.ext:
+                    message=_(
+                        "Tiles '{}' and '{}' are located in different subdirectories."
+                    ).format(self.filename, filename)
+                )
+            if self.ext is not None and match["ext"].lower() not in self.ext:
                 raise ValidationError(
-                    message=_("Tiles '{}' and '{}' have different extensions.")
-                    .format(self.filename, filename))
+                    message=_("Tiles '{}' and '{}' have different extensions.").format(
+                        self.filename, filename
+                    )
+                )
             return (
-                int(match['z']) + self.offset_z,
-                int(match['x']),
-                int(match['y']),
+                int(match["z"]) + self.offset_z,
+                int(match["x"]),
+                int(match["y"]),
             )
 
 
 class XYZ(FileFormat):
-    pattern = r'^(?P<prefix>.*/)?(?P<z>\d+)/(?P<x>\d+)/(?P<y>\d+)\.(?P<ext>(?i:png|jpe?g))$'
+    pattern = r"^(?P<prefix>.*/)?(?P<z>\d+)/(?P<x>\d+)/(?P<y>\d+)\.(?P<ext>(?i:png|jpe?g))$"
 
 
 class SASPlanet(FileFormat):
-    pattern = r'^(?P<prefix>.*/)?z(?P<z>\d+)/\d+/x(?P<x>\d+)/\d+/y(?P<y>\d+)\.(?:png)$'
+    pattern = r"^(?P<prefix>.*/)?z(?P<z>\d+)/\d+/x(?P<x>\d+)/\d+/y(?P<y>\d+)\.(?:png)$"
     offset_z = -1
 
 
@@ -254,7 +269,7 @@ def read_file(fn):
             for info in zf.infolist():
                 if info.is_dir():
                     continue
-                filename = info.filename.replace('\\', '/')  # Fix wrong separator issues
+                filename = info.filename.replace("\\", "/")  # Fix wrong separator issues
                 if fmt is None:
                     for candidate in FileFormat.registry:
                         if _fmt := candidate(filename):
@@ -268,13 +283,15 @@ def read_file(fn):
                     yield z, x, y, data
         return
 
-    with sqlite3.connect(f'file:{fn}?mode=ro', uri=True) as connection, closing(connection.cursor()) as cursor:  # NOQA waiting for python 3.10
-        sql_tiles = '''
+    with sqlite3.connect(f"file:{fn}?mode=ro", uri=True) as connection, closing(
+        connection.cursor()
+    ) as cursor:  # NOQA waiting for python 3.10
+        sql_tiles = """
             SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles
             ORDER BY zoom_level, tile_column, tile_row
-        '''
+        """
         try:
-            row = cursor.execute(sql_tiles + ' LIMIT 1').fetchone()
+            row = cursor.execute(sql_tiles + " LIMIT 1").fetchone()
         except sqlite3.DatabaseError:
             pass  # Not MBTiles
         else:
@@ -295,7 +312,6 @@ def read_file(fn):
 
 
 class _source_attr(SerializedProperty):
-
     def setter(self, srlzr, value):
         if srlzr.obj.id is None:
             srlzr.obj.fileobj = env.file_storage.fileobj(component=COMP_ID)
@@ -304,23 +320,26 @@ class _source_attr(SerializedProperty):
             dstfile = env.file_storage.filename(srlzr.obj.fileobj)
             size = os.stat(dstfile).st_size
             env.core.reserve_storage(
-                COMP_ID, TilesetData, value_data_volume=-size, resource=srlzr.obj)
+                COMP_ID, TilesetData, value_data_volume=-size, resource=srlzr.obj
+            )
 
-        fn, fn_meta = env.file_upload.get_filename(value['id'])
+        fn, fn_meta = env.file_upload.get_filename(value["id"])
         stat = dict()
         with NamedTemporaryFile() as tf:
             with sqlite3.connect(tf.name) as connection:
                 cursor = connection.cursor()
-                cursor.execute('PRAGMA page_size = 8192')
-                cursor.execute('PRAGMA journal_mode = OFF')
-                cursor.execute('PRAGMA synchronous = OFF')
-                cursor.execute('''
+                cursor.execute("PRAGMA page_size = 8192")
+                cursor.execute("PRAGMA journal_mode = OFF")
+                cursor.execute("PRAGMA synchronous = OFF")
+                # fmt: off
+                cursor.execute("""
                     CREATE TABLE tile (
                         z INTEGER, x INTEGER, y INTEGER,
                         data BLOB NOT NULL,
                         PRIMARY KEY (z, x, y)
                     )
-                ''')
+                """)
+                # fmt: on
 
                 for z, x, y, img_data in read_file(fn):
                     img = Image.open(BytesIO(img_data))
@@ -328,7 +347,7 @@ class _source_attr(SerializedProperty):
                         raise ValidationError(message=_("Only 256x256 px tiles are supported."))
                     color = imgcolor(img)
                     data = img_data if color is None else COLOR_MAGIC + bytes(color)
-                    cursor.execute('INSERT INTO tile VALUES (?, ?, ?, ?)', (z, x, y, data))
+                    cursor.execute("INSERT INTO tile VALUES (?, ?, ?, ?)", (z, x, y, data))
 
                     if z not in stat:
                         stat[z] = [x, x, y, y, 1]
@@ -348,13 +367,14 @@ class _source_attr(SerializedProperty):
                     raise ValidationError(message=_("No tiles found in source."))
 
                 connection.commit()
-                cursor.execute('VACUUM')
+                cursor.execute("VACUUM")
 
             copyfile(tf.name, dstfile)
 
             size = os.stat(dstfile).st_size
             env.core.reserve_storage(
-                COMP_ID, TilesetData, value_data_volume=size, resource=srlzr.obj)
+                COMP_ID, TilesetData, value_data_volume=size, resource=srlzr.obj
+            )
 
         zmin = zmax = None
         for z in stat.keys():
@@ -369,8 +389,8 @@ class _source_attr(SerializedProperty):
         srlzr.obj.tileset_zmin = zmin
         srlzr.obj.tileset_zmax = zmax
         srlzr.obj.tileset_ntiles = tuple(
-            (stat[z][4] if z in stat else 0)
-            for z in range(zmin, zmax + 1))
+            (stat[z][4] if z in stat else 0) for z in range(zmin, zmax + 1)
+        )
 
         xtile_min, xtile_max, ytile_min, ytile_max, _ntiles = stat[zmax]
         _minx, _miny, _nvm1, _nvm2 = srlzr.obj.srs.tile_extent((zmax, xtile_min, ytile_min))

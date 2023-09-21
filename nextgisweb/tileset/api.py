@@ -11,12 +11,15 @@ def export(resource, request):
     request.resource_permission(DataScope.read)
 
     fn = env.file_storage.filename(resource.fileobj)
-    response = FileResponse(fn, content_type='application/vnd.sqlite3')
-    response.content_disposition = f'attachment; filename={resource.id}.ngwtiles'
+    response = FileResponse(fn, content_type="application/vnd.sqlite3")
+    response.content_disposition = f"attachment; filename={resource.id}.ngwtiles"
     return response
 
 
 def setup_pyramid(comp, config):
     config.add_view(
-        export, route_name='resource.export',
-        context=Tileset, request_method='GET')
+        export,
+        route_name="resource.export",
+        context=Tileset,
+        request_method="GET",
+    )

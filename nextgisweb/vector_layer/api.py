@@ -7,9 +7,9 @@ from .util import read_dataset_vector
 
 
 def dataset(request) -> JSONType:
-    source = request.json_body['source']
-    datafile, metafile = request.env.file_upload.get_filename(source['id'])
-    ogrds = read_dataset_vector(datafile, source_filename=source['name'])
+    source = request.json_body["source"]
+    datafile, metafile = request.env.file_upload.get_filename(source["id"])
+    ogrds = read_dataset_vector(datafile, source_filename=source["name"])
     if ogrds is None:
         raise ValidationError(_("GDAL library failed to open file."))
 
@@ -22,7 +22,4 @@ def dataset(request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
-    config.add_route(
-        'vector_layer.dataset',
-        '/api/component/vector_layer/dataset',
-        post=dataset)
+    config.add_route("vector_layer.dataset", "/api/component/vector_layer/dataset", post=dataset)

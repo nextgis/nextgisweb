@@ -4,5 +4,5 @@ from nextgisweb.core import KindOfData
 
 
 class VectorLayerData(KindOfData):
-    identity = 'vector_layer'
+    identity = "vector_layer"
     display_name = _("Vector layer features")

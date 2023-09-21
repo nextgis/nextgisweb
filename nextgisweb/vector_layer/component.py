@@ -5,10 +5,10 @@ from .model import VectorLayer, estimate_vector_layer_data
 
 
 class VectorLayerComponent(Component):
-
-    @require('feature_layer')
+    @require("feature_layer")
     def setup_pyramid(self, config):
         from . import api, view  # NOQA: F401
+
         api.setup_pyramid(self, config)
 
     def estimate_storage(self):

@@ -57,20 +57,28 @@ WFS_2_FIELD_TYPE = {
 }
 
 COMPARISON_OPERATORS = {
-    'eq': 'PropertyIsEqualTo',
-    'ne': 'PropertyIsNotEqualTo',
-    'isnull': 'PropertyIsNil',
-    'gt': 'PropertyIsGreaterThan',
-    'ge': 'PropertyIsGreaterThanOrEqualTo',
-    'lt': 'PropertyIsLessThan',
-    'le': 'PropertyIsLessThanOrEqualTo',
+    "eq": "PropertyIsEqualTo",
+    "ne": "PropertyIsNotEqualTo",
+    "isnull": "PropertyIsNil",
+    "gt": "PropertyIsGreaterThan",
+    "ge": "PropertyIsGreaterThanOrEqualTo",
+    "lt": "PropertyIsLessThan",
+    "le": "PropertyIsLessThanOrEqualTo",
 }
 
-layer_identity = COMP_ID + '_layer'
+layer_identity = COMP_ID + "_layer"
 
-WFS_VERSIONS = ('1.0.0', '1.1.0', '2.0.0', '2.0.2', )
+WFS_VERSIONS = (
+    "1.0.0",
+    "1.1.0",
+    "2.0.0",
+    "2.0.2",
+)
 
-url_pattern = re.compile(r'^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/?]*)?$', re.IGNORECASE | re.UNICODE)  # NOQA
+url_pattern = re.compile(
+    r"^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/?]*)?$",
+    re.IGNORECASE | re.UNICODE,
+)
 
 
 # TODO: WFS helper module
@@ -79,13 +87,13 @@ def find_tags(element, tag):
 
 
 def ns_trim(value):
-    pos = max(value.find('}'), value.rfind(':'))
-    return value[pos + 1:]
+    pos = max(value.find("}"), value.rfind(":"))
+    return value[pos + 1 :]
 
 
 def geom_from_gml(el):
-    value = etree.tostring(el, encoding='utf-8')
-    ogr_geom = ogr.CreateGeometryFromGML(value.decode('utf-8'))
+    value = etree.tostring(el, encoding="utf-8")
+    ogr_geom = ogr.CreateGeometryFromGML(value.decode("utf-8"))
     return Geometry.from_ogr(ogr_geom)
 
 
@@ -99,18 +107,18 @@ def get_srid(value):
 
 def fid_int(fid, layer_name):
     # Check pattern 'layer_name_without_namespace.FID' and return FID
-    m = re.search(r'^(.*:)?%s\.(\d+)$' % re.sub('^.*:', '', layer_name), fid)
+    m = re.search(r"^(.*:)?%s\.(\d+)$" % re.sub("^.*:", "", layer_name), fid)
     if m is None:
         raise ValidationError("Feature ID encoding is not supported")
     return int(m.group(2))
 
 
 def fid_str(fid, layer_name):
-    return '%s.%d' % (layer_name, fid)
+    return "%s.%d" % (layer_name, fid)
 
 
 class WFSConnection(Base, Resource):
-    identity = COMP_ID + '_connection'
+    identity = COMP_ID + "_connection"
     cls_display_name = _("WFS connection")
 
     __scope__ = ConnectionScope
@@ -125,28 +133,29 @@ class WFSConnection(Base, Resource):
         return isinstance(parent, ResourceGroup)
 
     def request_wfs(self, method, xml_root=None, **kwargs):
-        if method == 'GET':
-            if 'params' not in kwargs:
-                kwargs['params'] = dict()
-            kwargs['params']['version'] = self.version
-            kwargs['params']['service'] = 'WFS'
-        elif method == 'POST':
+        if method == "GET":
+            if "params" not in kwargs:
+                kwargs["params"] = dict()
+            kwargs["params"]["version"] = self.version
+            kwargs["params"]["service"] = "WFS"
+        elif method == "POST":
             if xml_root is not None:
-                xml_root.attrib['version'] = self.version
-                xml_root.attrib['service'] = 'WFS'
-                kwargs['data'] = etree.tostring(xml_root)
+                xml_root.attrib["version"] = self.version
+                xml_root.attrib["service"] = "WFS"
+                kwargs["data"] = etree.tostring(xml_root)
         else:
             raise NotImplementedError()
 
         if self.username is not None:
-            kwargs['auth'] = requests.auth.HTTPBasicAuth(self.username, self.password)
+            kwargs["auth"] = requests.auth.HTTPBasicAuth(self.username, self.password)
 
         try:
             response = requests.request(
-                method, self.path,
+                method,
+                self.path,
                 headers=env.wfsclient.headers,
-                timeout=env.wfsclient.options['timeout'].total_seconds(),
-                **kwargs
+                timeout=env.wfsclient.options["timeout"].total_seconds(),
+                **kwargs,
             )
         except RequestException:
             raise ExternalServiceError()
@@ -157,90 +166,109 @@ class WFSConnection(Base, Resource):
             raise ExternalServiceError()
 
     def get_capabilities(self):
-        root = self.request_wfs('GET', params=dict(REQUEST='GetCapabilities'))
+        root = self.request_wfs("GET", params=dict(REQUEST="GetCapabilities"))
 
         layers = []
-        for el in find_tags(root, 'FeatureType'):
-            srid = get_srid(find_tags(el, 'DefaultCRS')[0].text)
+        for el in find_tags(root, "FeatureType"):
+            srid = get_srid(find_tags(el, "DefaultCRS")[0].text)
 
             is_supported = type(srid) == int
             if not is_supported:
                 continue
 
-            layers.append(dict(
-                name=find_tags(el, 'Name')[0].text,
-                srid=srid,
-            ))
+            layers.append(
+                dict(
+                    name=find_tags(el, "Name")[0].text,
+                    srid=srid,
+                )
+            )
 
         return dict(layers=layers)
 
     def get_fields(self, layer_name):
-        root = self.request_wfs('GET', params=dict(
-            request='DescribeFeatureType', typeNames=layer_name))
-        cplx = find_tags(root, 'complexType')[0]
+        root = self.request_wfs(
+            "GET",
+            params=dict(request="DescribeFeatureType", typeNames=layer_name),
+        )
+        cplx = find_tags(root, "complexType")[0]
 
         fields = []
-        for el in find_tags(cplx, 'element'):
-            field_type = el.attrib.get('type')
+        for el in find_tags(cplx, "element"):
+            field_type = el.attrib.get("type")
             if field_type is None:
-                restriction = find_tags(cplx, 'restriction')[0]
-                field_type = restriction.attrib['base']
-            if not field_type.startswith('gml:'):
+                restriction = find_tags(cplx, "restriction")[0]
+                field_type = restriction.attrib["base"]
+            if not field_type.startswith("gml:"):
                 field_type = ns_trim(field_type)
-            fields.append(dict(
-                name=el.attrib['name'],
-                type=field_type,
-            ))
+            fields.append(
+                dict(
+                    name=el.attrib["name"],
+                    type=field_type,
+                )
+            )
 
         return fields
 
-    def get_feature(self, layer, fid=None, filter_=None, intersects=None, propertyname=None,
-                    get_count=False, limit=None, offset=None, srs=None, add_box=False):
-        NS_WFS = 'http://www.opengis.net/wfs/2.0'
-        NS_FES = 'http://www.opengis.net/fes/2.0'
+    def get_feature(
+        self,
+        layer,
+        fid=None,
+        filter_=None,
+        intersects=None,
+        propertyname=None,
+        get_count=False,
+        limit=None,
+        offset=None,
+        srs=None,
+        add_box=False,
+    ):
+        NS_WFS = "http://www.opengis.net/wfs/2.0"
+        NS_FES = "http://www.opengis.net/fes/2.0"
 
-        req_root = etree.Element(etree.QName(NS_WFS, 'GetFeature'), nsmap=dict(
-            wfs=NS_WFS, fes=NS_FES))
+        req_root = etree.Element(
+            etree.QName(NS_WFS, "GetFeature"), nsmap=dict(wfs=NS_WFS, fes=NS_FES)
+        )
 
-        __query = etree.Element(etree.QName(NS_WFS, 'Query'), dict(typeNames=layer.layer_name))
+        __query = etree.Element(etree.QName(NS_WFS, "Query"), dict(typeNames=layer.layer_name))
         req_root.append(__query)
 
         # Filter {
-        __filter = etree.Element(etree.QName(NS_FES, 'Filter'))
+        __filter = etree.Element(etree.QName(NS_FES, "Filter"))
 
         if fid is not None:
             __rid = etree.Element(
-                etree.QName(NS_FES, 'ResourceId'),
-                dict(rid=fid_str(fid, layer.layer_name)))
+                etree.QName(NS_FES, "ResourceId"), dict(rid=fid_str(fid, layer.layer_name))
+            )
             __filter.append(__rid)
 
         if filter_ is not None:
-            __and = etree.Element(etree.QName(NS_FES, 'And'))
+            __and = etree.Element(etree.QName(NS_FES, "And"))
             for k, o, v in filter_:
                 if o not in COMPARISON_OPERATORS.keys():
                     raise ValidationError("Operator '%s' is not supported." % o)
                 __op = etree.Element(etree.QName(NS_FES, COMPARISON_OPERATORS[o]))
-                __value_reference = etree.Element(etree.QName(NS_FES, 'ValueReference'))
+                __value_reference = etree.Element(etree.QName(NS_FES, "ValueReference"))
                 __value_reference.text = k
                 __op.append(__value_reference)
-                if o == 'isnull':
-                    if v == 'yes':
+                if o == "isnull":
+                    if v == "yes":
                         pass
-                    elif v == 'no':
-                        raise ValidationError("Value '%s' for operator '%s' is not supported."
-                                              % (v, o))
+                    elif v == "no":
+                        raise ValidationError(
+                            "Value '%s' for operator '%s' is not supported." % (v, o)
+                        )
                     else:
                         raise ValueError("Invalid value '%s' for operator '%s'." % (v, o))
                 else:
-                    __literal = etree.Element(etree.QName(NS_FES, 'Literal'))
+                    __literal = etree.Element(etree.QName(NS_FES, "Literal"))
                     __literal.text = str(v)
                     __op.append(__literal)
                 __and.append(__op)
             __filter.append(__and)
 
         if intersects is not None:
-            __intersects = etree.Element(etree.QName(NS_FES, 'Intersects'))
-            __value_reference = etree.Element(etree.QName(NS_FES, 'ValueReference'))
+            __intersects = etree.Element(etree.QName(NS_FES, "Intersects"))
+            __value_reference = etree.Element(etree.QName(NS_FES, "ValueReference"))
             __value_reference.text = layer.column_geom
             __intersects.append(__value_reference)
             if intersects.srid is not None:
@@ -250,11 +278,14 @@ class WFSConnection(Base, Resource):
             osr_intersects = srs_intersects.to_osr()
             geom = intersects.ogr
             geom.AssignSpatialReference(osr_intersects)
-            geom_gml = geom.ExportToGML([
-                'FORMAT=GML32',
-                'NAMESPACE_DECL=YES',
-                'SRSNAME_FORMAT=SHORT',
-                'GMLID=filter-geom-1'])
+            geom_gml = geom.ExportToGML(
+                [
+                    "FORMAT=GML32",
+                    "NAMESPACE_DECL=YES",
+                    "SRSNAME_FORMAT=SHORT",
+                    "GMLID=filter-geom-1",
+                ]
+            )
             __gml = etree.fromstring(geom_gml)
             __intersects.append(__gml)
             __filter.append(__intersects)
@@ -265,29 +296,29 @@ class WFSConnection(Base, Resource):
 
         if propertyname is not None:
             for p in propertyname:
-                __p = etree.Element(etree.QName(NS_WFS, 'PropertyName'))
+                __p = etree.Element(etree.QName(NS_WFS, "PropertyName"))
                 __p.text = p
                 __query.append(__p)
 
         if get_count:
-            req_root.attrib['resultType'] = 'hits'
+            req_root.attrib["resultType"] = "hits"
 
         if limit is not None:
-            req_root.attrib['count'] = str(limit)
+            req_root.attrib["count"] = str(limit)
             if offset is not None:
-                req_root.attrib['startIndex'] = str(offset)
+                req_root.attrib["startIndex"] = str(offset)
 
         if srs is not None:
-            req_root.attrib['srsName'] = 'EPSG:%d' % srs
+            req_root.attrib["srsName"] = "EPSG:%d" % srs
 
-        root = self.request_wfs('POST', xml_root=req_root)
+        root = self.request_wfs("POST", xml_root=req_root)
 
         features = []
-        n_matched = root.attrib['numberMatched']
-        count = None if n_matched == 'unknown' else int(n_matched)
+        n_matched = root.attrib["numberMatched"]
+        count = None if n_matched == "unknown" else int(n_matched)
 
         if not get_count:
-            _members = find_tags(root, 'member')
+            _members = find_tags(root, "member")
 
             fld_map = dict()
             for field in layer.fields:
@@ -306,8 +337,8 @@ class WFSConnection(Base, Resource):
                         continue
 
                     datatype = fld_map[key]
-                    nil_attr = r'{http://www.w3.org/2001/XMLSchema-instance}nil'
-                    if _property.attrib.get(nil_attr, 'false') == 'true':
+                    nil_attr = r"{http://www.w3.org/2001/XMLSchema-instance}nil"
+                    if _property.attrib.get(nil_attr, "false") == "true":
                         value = None
                     elif datatype in (FIELD_TYPE.INTEGER, FIELD_TYPE.BIGINT):
                         value = int(_property.text)
@@ -315,7 +346,7 @@ class WFSConnection(Base, Resource):
                         value = float(_property.text)
                     elif datatype == FIELD_TYPE.STRING:
                         if _property.text is None:
-                            value = ''
+                            value = ""
                         else:
                             value = _property.text
                     elif datatype == FIELD_TYPE.DATE:
@@ -328,21 +359,25 @@ class WFSConnection(Base, Resource):
                         raise ValidationError("Unknown data type: %s" % datatype)
                     fields[key] = value
 
-                fid = _feature.attrib['{http://www.opengis.net/gml/3.2}id']
+                fid = _feature.attrib["{http://www.opengis.net/gml/3.2}id"]
                 if add_box:
                     _box = box(*geom.bounds)
                 else:
                     _box = None
-                features.append(Feature(
-                    layer=layer, id=fid_int(fid, layer.layer_name),
-                    fields=fields, geom=geom, box=_box
-                ))
+                features.append(
+                    Feature(
+                        layer=layer,
+                        id=fid_int(fid, layer.layer_name),
+                        fields=fields,
+                        geom=geom,
+                        box=_box,
+                    )
+                )
 
         return features, count
 
 
 class _path_attr(SP):
-
     def setter(self, srlzr, value):
         if not url_pattern.match(value):
             raise ValidationError("Path is not a valid url.")
@@ -354,8 +389,7 @@ class WFSConnectionSerializer(Serializer):
     identity = WFSConnection.identity
     resclass = WFSConnection
 
-    _defaults = dict(read=ConnectionScope.read,
-                     write=ConnectionScope.write)
+    _defaults = dict(read=ConnectionScope.read, write=ConnectionScope.write)
 
     path = _path_attr(**_defaults)
     username = SP(**_defaults)
@@ -366,7 +400,7 @@ class WFSConnectionSerializer(Serializer):
 class WFSLayerField(Base, LayerField):
     identity = layer_identity
 
-    __tablename__ = LayerField.__tablename__ + '_' + identity
+    __tablename__ = LayerField.__tablename__ + "_" + identity
     __mapper_args__ = dict(polymorphic_identity=identity)
 
     id = db.Column(db.ForeignKey(LayerField.id), primary_key=True)
@@ -389,8 +423,10 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     __field_class__ = WFSLayerField
 
     connection = db.relationship(
-        WFSConnection, foreign_keys=connection_id,
-        cascade='save-update, merge', cascade_backrefs=False,
+        WFSConnection,
+        foreign_keys=connection_id,
+        cascade="save-update, merge",
+        cascade_backrefs=False,
     )
 
     @classmethod
@@ -400,9 +436,7 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def setup(self):
         fdata = dict()
         for f in self.fields:
-            fdata[f.keyname] = dict(
-                display_name=f.display_name,
-                grid_visibility=f.grid_visibility)
+            fdata[f.keyname] = dict(display_name=f.display_name, grid_visibility=f.grid_visibility)
 
         for f in list(self.fields):
             self.fields.remove(f)
@@ -410,20 +444,23 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         self.feature_label_field = None
 
         for field in self.connection.get_fields(self.layer_name):
-            if field['name'] == self.column_geom:
+            if field["name"] == self.column_geom:
                 continue
 
-            datatype = WFS_2_FIELD_TYPE.get(field['type'])
+            datatype = WFS_2_FIELD_TYPE.get(field["type"])
             if datatype is None:
-                raise ValidationError("Unknown data type: %s" % field['type'])
+                raise ValidationError("Unknown data type: %s" % field["type"])
 
-            fopts = dict(display_name=field['name'])
-            fopts.update(fdata.get(field['name'], dict()))
-            self.fields.append(WFSLayerField(
-                keyname=field['name'],
-                datatype=datatype,
-                column_name=field['name'],
-                **fopts))
+            fopts = dict(display_name=field["name"])
+            fopts.update(fdata.get(field["name"], dict()))
+            self.fields.append(
+                WFSLayerField(
+                    keyname=field["name"],
+                    datatype=datatype,
+                    column_name=field["name"],
+                    **fopts,
+                )
+            )
 
         # Check feature id readable
         features, count = self.connection.get_feature(self, limit=1)
@@ -431,16 +468,16 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         if self.geometry_type is None:
             example_feature = features[0]
             self.geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[
-                example_feature.geom.ogr.GetGeometryType()]
+                example_feature.geom.ogr.GetGeometryType()
+            ]
 
     # IFeatureLayer
 
     @property
     def feature_query(self):
-
         class BoundFeatureQuery(FeatureQueryBase):
             layer = self
-            srs_supported = (self.geometry_srid, )
+            srs_supported = (self.geometry_srid,)
 
         return BoundFeatureQuery
 
@@ -453,16 +490,16 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
 
 class _fields_action(SP):
-    """ Special write-only attribute that allows updating
-    list of fields from the server """
+    """Special write-only attribute that allows updating
+    list of fields from the server"""
 
     def setter(self, srlzr, value):
-        if value == 'update':
+        if value == "update":
             if srlzr.obj.connection.has_permission(ConnectionScope.connect, srlzr.user):
                 srlzr.obj.setup()
             else:
                 raise ForbiddenError()
-        elif value != 'keep':
+        elif value != "keep":
             raise ValidationError("Invalid 'fields' parameter.")
 
 
@@ -483,7 +520,7 @@ class WFSLayerSerializer(Serializer):
     fields = _fields_action(write=DataStructureScope.write)
 
     def deserialize(self):
-        self.data['srs'] = dict(id=3857)
+        self.data["srs"] = dict(id=3857)
         super().deserialize()
 
 
@@ -494,7 +531,6 @@ class WFSLayerSerializer(Serializer):
     IFeatureQueryIntersects,
 )
 class FeatureQueryBase(FeatureQueryIntersectsMixin):
-
     def __init__(self):
         self._srs = None
         self._geom = False
@@ -541,35 +577,34 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def __call__(self):
         params = dict()
         if self._filter_by is not None:
-            if 'id' in self._filter_by:
-                params['fid'] = self._filter_by.pop('id')
+            if "id" in self._filter_by:
+                params["fid"] = self._filter_by.pop("id")
             if len(self._filter_by) > 0:
                 if self._filter is None:
                     self._filter = list()
                 for k, v in self._filter_by.items():
-                    self._filter.append((k, 'eq', v))
+                    self._filter.append((k, "eq", v))
         if self._filter is not None and len(self._filter) > 0:
-            params['filter_'] = self._filter
+            params["filter_"] = self._filter
         if self._limit is not None:
-            params['limit'] = self._limit
-            params['offset'] = self._offset
+            params["limit"] = self._limit
+            params["offset"] = self._offset
         if self._srs is not None:
-            params['srs'] = self._srs.id
+            params["srs"] = self._srs.id
         if self._box:
-            params['add_box'] = True
+            params["add_box"] = True
         if self._intersects:
-            params['intersects'] = self._intersects
+            params["intersects"] = self._intersects
 
         if not self._geom and self._fields is not None:
-            params['propertyname'] = self._fields
+            params["propertyname"] = self._fields
         elif not self._geom:
-            params['propertyname'] = [f.keyname for f in self.layer.fields]
+            params["propertyname"] = [f.keyname for f in self.layer.fields]
         elif self._fields is not None:
-            params['propertyname'] = self._fields
-            params['propertyname'].append(self.layer.column_geom)
+            params["propertyname"] = self._fields
+            params["propertyname"].append(self.layer.column_geom)
 
-        features, count = self.layer.connection.get_feature(
-            self.layer, **params)
+        features, count = self.layer.connection.get_feature(self.layer, **params)
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer
@@ -582,7 +617,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             def total_count(self):
                 if count is None:
                     raise ExternalServiceError(
-                        message="Couldn't determine feature count in the current request.")
+                        message="Couldn't determine feature count in the current request."
+                    )
                 return count
 
         return QueryFeatureSet()

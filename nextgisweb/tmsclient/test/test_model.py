@@ -17,36 +17,39 @@ def image_compare(im1, im2):
 def test_layer(ngw_webtest_app, ngw_resource_group):
     data = dict(
         resource=dict(
-            cls='tmsclient_connection', display_name='test-tms_connection',
+            cls="tmsclient_connection",
+            display_name="test-tms_connection",
             parent=dict(id=ngw_resource_group),
         ),
         tmsclient_connection=dict(
-            url_template='https://tile-c.openstreetmap.fr/{layer}/{z}/{x}/{y}.png',
-            scheme='xyz',
+            url_template="https://tile-c.openstreetmap.fr/{layer}/{z}/{x}/{y}.png",
+            scheme="xyz",
         ),
     )
-    resp = ngw_webtest_app.post_json('/api/resource/', data, status=201)
-    connection_id = resp.json['id']
+    resp = ngw_webtest_app.post_json("/api/resource/", data, status=201)
+    connection_id = resp.json["id"]
 
     maxzoom = 3
     data = dict(
         resource=dict(
-            cls='tmsclient_layer', display_name='test-tms_layer',
+            cls="tmsclient_layer",
+            display_name="test-tms_layer",
             parent=dict(id=ngw_resource_group),
         ),
         tmsclient_layer=dict(
             connection=dict(id=connection_id),
             srs=dict(id=3857),
-            layer_name='hot',
+            layer_name="hot",
             minzoom=0,
             maxzoom=maxzoom,
         ),
     )
-    resp = ngw_webtest_app.post_json('/api/resource/', data, status=201)
-    layer_id = resp.json['id']
+    resp = ngw_webtest_app.post_json("/api/resource/", data, status=201)
+    layer_id = resp.json["id"]
 
-    ngw_webtest_app.get('/api/component/render/tile?z=%d&x=0&y=0&resource=%d' % (
-        maxzoom + 1, layer_id), status=422)
+    ngw_webtest_app.get(
+        "/api/component/render/tile?z=%d&x=0&y=0&resource=%d" % (maxzoom + 1, layer_id), status=422
+    )
 
     layer = Layer.filter_by(id=layer_id).one()
     srs = SRS.filter_by(id=3857).one()
@@ -61,5 +64,5 @@ def test_layer(ngw_webtest_app, ngw_resource_group):
 
     assert image_compare(image1, image2.crop((0, 0, 256, 256)))
 
-    ngw_webtest_app.delete('/api/resource/%d' % layer_id, status=200)
-    ngw_webtest_app.delete('/api/resource/%d' % connection_id, status=200)
+    ngw_webtest_app.delete("/api/resource/%d" % layer_id, status=200)
+    ngw_webtest_app.delete("/api/resource/%d" % connection_id, status=200)

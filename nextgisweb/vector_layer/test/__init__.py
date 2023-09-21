@@ -17,7 +17,7 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
         layer = VectorLayer(
             parent_id=parent_id,
             display_name=token_hex(),
-            owner_user=User.by_keyname('administrator'),
+            owner_user=User.by_keyname("administrator"),
             srs=SRS.filter_by(id=3857).one(),
         ).persist()
 

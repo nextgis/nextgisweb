@@ -6,9 +6,9 @@ from .model import Tileset, TilesetData
 
 
 class TilesetComponent(Component):
-
     def setup_pyramid(self, config):
         from . import api, view
+
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 

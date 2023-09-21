@@ -5,5 +5,5 @@ from .model import VectorLayer
 
 class VectorLayerWidget(Widget):
     resource = VectorLayer
-    operation = ('create', 'update')
-    amdmod = '@nextgisweb/vector-layer/resource-widget'
+    operation = ("create", "update")
+    amdmod = "@nextgisweb/vector-layer/resource-widget"

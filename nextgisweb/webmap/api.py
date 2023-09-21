@@ -26,18 +26,21 @@ from .model import (
 def annotation_to_dict(obj, request, with_user_info=False):
     result = dict()
 
-    keys = ('id', 'description', 'style', 'geom', 'public')
+    keys = ("id", "description", "style", "geom", "public")
     if with_user_info and (obj.public is False):
-        keys = keys + ('user_id', 'user',)
+        keys = keys + (
+            "user_id",
+            "user",
+        )
 
     user_id = request.user.id
-    result['own'] = user_id == obj.user_id
+    result["own"] = user_id == obj.user_id
 
     for k in keys:
         v = getattr(obj, k)
-        if k == 'geom':
+        if k == "geom":
             v = to_shape(v).wkt
-        if k == 'user' and (v is not None):
+        if k == "user" and (v is not None):
             v = v.display_name
         if v is not None:
             result[k] = v
@@ -45,16 +48,16 @@ def annotation_to_dict(obj, request, with_user_info=False):
 
 
 def annotation_from_dict(obj, data):
-    for k in ('description', 'style', 'geom', 'public'):
+    for k in ("description", "style", "geom", "public"):
         if k in data:
             v = data[k]
-            if k == 'geom':
-                v = 'SRID=3857;' + v
+            if k == "geom":
+                v = "SRID=3857;" + v
             setattr(obj, k, v)
 
 
 def check_annotation_enabled(request):
-    if not request.env.webmap.options['annotation']:
+    if not request.env.webmap.options["annotation"]:
         raise HTTPNotFound()
 
 
@@ -65,8 +68,11 @@ def annotation_cget(resource, request) -> JSONType:
     if resource.has_permission(WebMapScope.annotation_manage, request.user):
         return [annotation_to_dict(a, request, with_user_info=True) for a in resource.annotations]
 
-    return [annotation_to_dict(a, request) for a in resource.annotations
-            if a.public or (not a.public and a.user_id == request.user.id)]
+    return [
+        annotation_to_dict(a, request)
+        for a in resource.annotations
+        if a.public or (not a.public and a.user_id == request.user.id)
+    ]
 
 
 def annotation_cpost(resource, request) -> JSONType:
@@ -84,8 +90,9 @@ def annotation_cpost(resource, request) -> JSONType:
 def annotation_iget(resource, request) -> JSONType:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
-    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(
-        request.matchdict['annotation_id'])).one()
+    obj = WebMapAnnotation.filter_by(
+        webmap_id=resource.id, id=int(request.matchdict["annotation_id"])
+    ).one()
     with_user_info = resource.has_permission(WebMapScope.annotation_manage, request.user)
     return annotation_to_dict(obj, request, with_user_info)
 
@@ -93,8 +100,9 @@ def annotation_iget(resource, request) -> JSONType:
 def annotation_iput(resource, request) -> JSONType:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
-    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(
-        request.matchdict['annotation_id'])).one()
+    obj = WebMapAnnotation.filter_by(
+        webmap_id=resource.id, id=int(request.matchdict["annotation_id"])
+    ).one()
     annotation_from_dict(obj, request.json_body)
     return dict(id=obj.id)
 
@@ -102,8 +110,9 @@ def annotation_iput(resource, request) -> JSONType:
 def annotation_idelete(resource, request) -> JSONType:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
-    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=int(
-        request.matchdict['annotation_id'])).one()
+    obj = WebMapAnnotation.filter_by(
+        webmap_id=resource.id, id=int(request.matchdict["annotation_id"])
+    ).one()
     DBSession.delete(obj)
     return None
 
@@ -120,14 +129,13 @@ def add_extent(e1, e2):
     e1_valid = is_valid(e1)
     e2_valid = is_valid(e2)
     if (not e1_valid) or (not e2_valid):
-        return (e2 if e2_valid else None) or \
-            (e1 if e1_valid else None)
+        return (e2 if e2_valid else None) or (e1 if e1_valid else None)
 
     return dict(
-        minLon=min(e1['minLon'], e2['minLon']),
-        maxLon=max(e1['maxLon'], e2['maxLon']),
-        minLat=min(e1['minLat'], e2['minLat']),
-        maxLat=max(e1['maxLat'], e2['maxLat']),
+        minLon=min(e1["minLon"], e2["minLon"]),
+        maxLon=max(e1["maxLon"], e2["maxLon"]),
+        minLat=min(e1["minLat"], e2["minLat"]),
+        maxLat=max(e1["maxLat"], e2["maxLat"]),
     )
 
 
@@ -135,12 +143,12 @@ def get_webmap_extent(resource, request) -> JSONType:
     request.resource_permission(WebMapScope.display)
 
     def traverse(item, extent):
-        if item.item_type == 'layer':
+        if item.item_type == "layer":
             if res := item.style.lookup_interface(IBboxLayer):
                 if not res.has_permission(DataScope.read, request.user):
                     return extent
                 extent = add_extent(extent, res.extent)
-        elif item.item_type in ('root', 'group'):
+        elif item.item_type in ("root", "group"):
             for i in item.children:
                 extent = traverse(i, extent)
         return extent
@@ -152,7 +160,7 @@ def settings_get(request) -> JSONType:
     result = dict()
     for k, default in WM_SETTINGS.items():
         try:
-            v = env.core.settings_get('webmap', k)
+            v = env.core.settings_get("webmap", k)
             if v is not None:
                 result[k] = v
         except KeyError:
@@ -167,7 +175,7 @@ def settings_put(request) -> JSONType:
     body = request.json_body
     for k, v in body.items():
         if k in WM_SETTINGS.keys():
-            env.core.settings_set('webmap', k, v)
+            env.core.settings_set("webmap", k, v)
         else:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
@@ -216,7 +224,7 @@ def print(request, *, body: PrintBody) -> Response:
         )
 
         return Response(
-            app_iter=output_pdf.open('rb'),
+            app_iter=output_pdf.open("rb"),
             content_type="application/pdf",
             request=request,
         )
@@ -229,39 +237,31 @@ def setup_pyramid(comp, config):
     comp.settings_view = settings_get
 
     config.add_route(
-        'webmap.settings',
-        '/api/component/webmap/settings',
-        get=settings_get,
-        put=settings_put)
+        "webmap.settings", "/api/component/webmap/settings", get=settings_get, put=settings_put
+    )
 
     config.add_route(
-        'webmap.extent',
-        '/api/resource/{id:uint}/webmap/extent',
+        "webmap.extent",
+        "/api/resource/{id:uint}/webmap/extent",
         factory=resource_factory,
     ).get(get_webmap_extent, context=WebMap)
 
 
 def setup_print(config):
-    config.add_route(
-        'webmap.print',
-        '/api/component/webmap/print',
-        post=print)
+    config.add_route("webmap.print", "/api/component/webmap/print", post=print)
 
 
 def setup_annotations(config):
     config.add_route(
-        'webmap.annotation.collection',
-        '/api/resource/{id:uint}/annotation/',
-        factory=resource_factory
-    ) \
-        .get(annotation_cget, context=WebMap) \
-        .post(annotation_cpost, context=WebMap)
+        "webmap.annotation.collection",
+        "/api/resource/{id:uint}/annotation/",
+        factory=resource_factory,
+    ).get(annotation_cget, context=WebMap).post(annotation_cpost, context=WebMap)
 
     config.add_route(
-        'webmap.annotation.item',
-        '/api/resource/{id:uint}/annotation/{annotation_id:uint}',
-        factory=resource_factory
-    ) \
-        .get(annotation_iget, context=WebMap) \
-        .put(annotation_iput, context=WebMap) \
-        .delete(annotation_idelete, context=WebMap)
+        "webmap.annotation.item",
+        "/api/resource/{id:uint}/annotation/{annotation_id:uint}",
+        factory=resource_factory,
+    ).get(annotation_iget, context=WebMap).put(annotation_iput, context=WebMap).delete(
+        annotation_idelete, context=WebMap
+    )

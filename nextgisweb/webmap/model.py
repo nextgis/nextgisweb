@@ -24,13 +24,13 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from .adapter import WebMapAdapter
 
-Base.depends_on('resource')
+Base.depends_on("resource")
 
-ANNOTATIONS_DEFAULT_VALUES = ('no', 'yes', 'messages')
+ANNOTATIONS_DEFAULT_VALUES = ("no", "yes", "messages")
 
 
 class WebMapScope(Scope):
-    identity = 'webmap'
+    identity = "webmap"
     label = _("Web map")
 
     display = P(pgettext("permission", "Display")).require(ResourceScope.read)
@@ -40,21 +40,21 @@ class WebMapScope(Scope):
 
 
 class LegendSymbolsEnum(Enum):
-    EXPAND = 'expand'
-    COLLAPSE = 'collapse'
-    DISABLE = 'disable'
+    EXPAND = "expand"
+    COLLAPSE = "collapse"
+    DISABLE = "disable"
 
     def __add__(self, other):
-        return (self if other is None else other)
+        return self if other is None else other
 
 
 class WebMap(Base, Resource):
-    identity = 'webmap'
+    identity = "webmap"
     cls_display_name = _("Web map")
 
     __scope__ = WebMapScope
 
-    root_item_id = db.Column(db.ForeignKey('webmap_item.id'), nullable=False)
+    root_item_id = db.Column(db.ForeignKey("webmap_item.id"), nullable=False)
     bookmark_resource_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
     draw_order_enabled = db.Column(db.Boolean, nullable=True)
     editable = db.Column(db.Boolean, nullable=False, default=False)
@@ -70,22 +70,27 @@ class WebMap(Base, Resource):
     extent_const_top = db.Column(db.Float)
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
-    annotation_default = db.Column(db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default='no')
+    annotation_default = db.Column(
+        db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default="no"
+    )
     legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
 
-    root_item = db.relationship('WebMapItem', cascade='all')
+    root_item = db.relationship("WebMapItem", cascade="all")
 
     bookmark_resource = db.relationship(
-        Resource, foreign_keys=bookmark_resource_id,
-        backref=db.backref('bookmarked_webmaps'))
+        Resource, foreign_keys=bookmark_resource_id, backref=db.backref("bookmarked_webmaps")
+    )
 
     annotations = db.relationship(
-        'WebMapAnnotation', back_populates='webmap',
-        cascade='all,delete-orphan', cascade_backrefs=False)
+        "WebMapAnnotation",
+        back_populates="webmap",
+        cascade="all,delete-orphan",
+        cascade_backrefs=False,
+    )
 
     def __init__(self, *args, **kwagrs):
-        if 'root_item' not in kwagrs:
-            kwagrs['root_item'] = WebMapItem(item_type='root')
+        if "root_item" not in kwagrs:
+            kwagrs["root_item"] = WebMapItem(item_type="root")
         super().__init__(*args, **kwagrs)
 
     @classmethod
@@ -119,39 +124,46 @@ class WebMap(Base, Resource):
 
     def from_dict(self, data):
         for k in (
-            'display_name', 'bookmark_resource_id', 'editable',
+            "display_name",
+            "bookmark_resource_id",
+            "editable",
         ):
             if k in data:
                 setattr(self, k, data[k])
 
-        if 'root_item' in data:
-            self.root_item.from_dict(data['root_item'])
+        if "root_item" in data:
+            self.root_item.from_dict(data["root_item"])
 
-        if 'extent' in data:
-            self.extent_left, self.extent_bottom, \
-                self.extent_right, self.extent_top = data['extent']
+        if "extent" in data:
+            self.extent_left, self.extent_bottom, self.extent_right, self.extent_top = data[
+                "extent"
+            ]
 
-        if 'extent_const' in data:
-            self.extent_const_left, self.extent_const_bottom, \
-                self.extent_const_right, self.extent_const_top = data['extent_const']
+        if "extent_const" in data:
+            (
+                self.extent_const_left,
+                self.extent_const_bottom,
+                self.extent_const_right,
+                self.extent_const_top,
+            ) = data["extent_const"]
 
 
 def _layer_enabled_default(context):
-    if context.get_current_parameters()['item_type'] == 'layer':
+    if context.get_current_parameters()["item_type"] == "layer":
         return False
 
 
 def _layer_identifiable_default(context):
-    if context.get_current_parameters()['item_type'] == 'layer':
+    if context.get_current_parameters()["item_type"] == "layer":
         return True
 
 
 class WebMapItem(Base):
-    __tablename__ = 'webmap_item'
+    __tablename__ = "webmap_item"
 
     id = db.Column(db.Integer, primary_key=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey('webmap_item.id'))
-    item_type = db.Column(db.Enum('root', 'group', 'layer'), nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey("webmap_item.id"))
+    item_type = db.Column(db.Enum("root", "group", "layer"), nullable=False)
     position = db.Column(db.Integer, nullable=True)
     display_name = db.Column(db.Unicode, nullable=True)
     group_expanded = db.Column(db.Boolean, nullable=True)
@@ -166,30 +178,36 @@ class WebMapItem(Base):
     legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
 
     parent = db.relationship(
-        'WebMapItem', remote_side=id, backref=db.backref(
-            'children', order_by=position, cascade='all, delete-orphan',
-            collection_class=ordering_list('position')))
+        "WebMapItem",
+        remote_side=id,
+        backref=db.backref(
+            "children",
+            order_by=position,
+            cascade="all, delete-orphan",
+            collection_class=ordering_list("position"),
+        ),
+    )
 
     style = db.relationship(
-        'Resource',
+        "Resource",
         # Temporary solution that allows to automatically
         # remove web-map elements when style is removed
-        backref=db.backref('webmap_items', cascade='all')
+        backref=db.backref("webmap_items", cascade="all"),
     )
 
     def to_dict(self):
         data = dict(item_type=self.item_type)
 
-        if self.item_type in ('group', 'layer'):
-            data['display_name'] = self.display_name
+        if self.item_type in ("group", "layer"):
+            data["display_name"] = self.display_name
 
-        if self.item_type == 'group':
-            data['group_expanded'] = self.group_expanded
+        if self.item_type == "group":
+            data["group_expanded"] = self.group_expanded
 
-        if self.item_type in ('root', 'group'):
-            data['children'] = [i.to_dict() for i in self.children]
+        if self.item_type in ("root", "group"):
+            data["children"] = [i.to_dict() for i in self.children]
 
-        if self.item_type == 'layer':
+        if self.item_type == "layer":
             style_parent_id = None
             if self.style and self.style.parent:
                 style = self.style
@@ -211,23 +229,32 @@ class WebMapItem(Base):
         return data
 
     def from_dict(self, data):
-        assert data['item_type'] == self.item_type
-        if data['item_type'] in ('root', 'group') and 'children' in data:
+        assert data["item_type"] == self.item_type
+        if data["item_type"] in ("root", "group") and "children" in data:
             self.children = []
-            for i in data['children']:
-                child = WebMapItem(parent=self, item_type=i['item_type'])
+            for i in data["children"]:
+                child = WebMapItem(parent=self, item_type=i["item_type"])
                 child.from_dict(i)
                 self.children.append(child)
 
-        for a in ('display_name', 'group_expanded', 'layer_enabled', 'layer_identifiable',
-                  'layer_adapter', 'layer_style_id', 'layer_transparency',
-                  'layer_min_scale_denom', 'layer_max_scale_denom',
-                  'draw_order_position', 'legend_symbols'):
+        for a in (
+            "display_name",
+            "group_expanded",
+            "layer_enabled",
+            "layer_identifiable",
+            "layer_adapter",
+            "layer_style_id",
+            "layer_transparency",
+            "layer_min_scale_denom",
+            "layer_max_scale_denom",
+            "draw_order_position",
+            "legend_symbols",
+        ):
             if a in data:
                 setattr(self, a, data[a])
 
     def from_children(self, children, *, defaults=dict()):
-        assert self.item_type in ('root', 'group')
+        assert self.item_type in ("root", "group")
 
         for child in children:
 
@@ -237,27 +264,31 @@ class WebMapItem(Base):
                 elif default and k in defaults:
                     setattr(item, k, defaults[k])
 
-            assert ('style' in child) != ('children' in child)
+            assert ("style" in child) != ("children" in child)
 
-            if 'children' in child:
-                item = WebMapItem(item_type='group')
-                _set(item, 'group_expanded', True)
+            if "children" in child:
+                item = WebMapItem(item_type="group")
+                _set(item, "group_expanded", True)
 
                 defaults_next = defaults.copy()
-                if 'defaults' in child:
-                    defaults_next.update(child['defaults'])
-                item.from_children(child['children'], defaults=defaults_next)
+                if "defaults" in child:
+                    defaults_next.update(child["defaults"])
+                item.from_children(child["children"], defaults=defaults_next)
             else:
-                item = WebMapItem(item_type='layer', style=child['style'])
-                _set(item, 'draw_order_position')
+                item = WebMapItem(item_type="layer", style=child["style"])
+                _set(item, "draw_order_position")
                 for k in (
-                    'layer_enabled', 'layer_identifiable', 'layer_transparency',
-                    'layer_min_scale_denom', 'layer_max_scale_denom', 'layer_adapter',
-                    'legend_symbols',
+                    "layer_enabled",
+                    "layer_identifiable",
+                    "layer_transparency",
+                    "layer_min_scale_denom",
+                    "layer_max_scale_denom",
+                    "layer_adapter",
+                    "legend_symbols",
                 ):
                     _set(item, k, True)
 
-            _set(item, 'display_name')
+            _set(item, "display_name")
 
             self.children.append(item)
 
@@ -269,7 +300,7 @@ def load_webmap_item_children(target, context):
 
 
 class WebMapAnnotation(Base):
-    __tablename__ = 'webmap_annotation'
+    __tablename__ = "webmap_annotation"
 
     id = db.Column(db.Integer, primary_key=True)
     webmap_id = db.Column(db.ForeignKey(WebMap.id), nullable=False)
@@ -279,17 +310,20 @@ class WebMapAnnotation(Base):
     public = db.Column(db.Boolean, nullable=False, default=True)
     user_id = db.Column(db.ForeignKey(User.id), nullable=True)
 
-    webmap = db.relationship(WebMap, back_populates='annotations')
-    user = db.relationship(User, backref=db.backref(
-        'webmap_annotations',
-        cascade='all, delete-orphan',
-    ))
+    webmap = db.relationship(WebMap, back_populates="annotations")
+    user = db.relationship(
+        User,
+        backref=db.backref(
+            "webmap_annotations",
+            cascade="all, delete-orphan",
+        ),
+    )
 
-    @validates('public', 'user_id')
+    @validates("public", "user_id")
     def validates_read_only_fields(self, key, value):
         val = getattr(self, key)
         if val or val is False:
-            raise ValueError('WebMapAnnotation.%s cannot be modified.' % key)
+            raise ValueError("WebMapAnnotation.%s cannot be modified." % key)
         return value
 
 
@@ -300,7 +334,6 @@ _mdargs = dict(read=PR_READ, write=PR_UPDATE)
 
 
 class _root_item_attr(SP):
-
     def getter(self, srlzr):
         return srlzr.obj.root_item.to_dict()
 
@@ -348,27 +381,29 @@ WM_SETTINGS = dict(
     popup_height=200,
     address_search_enabled=True,
     address_search_extent=False,
-    address_geocoder='nominatim',
-    yandex_api_geocoder_key='',
-    nominatim_countrycodes='',
-    units_length='m',
-    units_area='sq.m',
-    degree_format='dd',
+    address_geocoder="nominatim",
+    yandex_api_geocoder_key="",
+    nominatim_countrycodes="",
+    units_length="m",
+    units_area="sq.m",
+    degree_format="dd",
     measurement_srid=4326,
     legend_symbols=None,
 )
 
 
-@event.listens_for(SRS, 'after_delete')
+@event.listens_for(SRS, "after_delete")
 def check_measurement_srid(mapper, connection, target):
     try:
-        measurement_srid = env.core.settings_get('webmap', 'measurement_srid')
+        measurement_srid = env.core.settings_get("webmap", "measurement_srid")
     except KeyError:
         return
 
     if measurement_srid == target.id:
-        srid_default = WM_SETTINGS['measurement_srid']
+        srid_default = WM_SETTINGS["measurement_srid"]
+        # fmt: off
         connection.execute(text("""
             UPDATE setting SET value = :srid
             WHERE component = 'webmap' AND name = 'measurement_srid'
         """), dict(srid=srid_default))
+        # fmt: on

@@ -27,16 +27,19 @@ from nextgisweb.resource import SerializedResourceRelationship as SRR
 from .tile_fetcher import TileFetcher
 from .util import SCHEME, crop_box, render_zoom
 
-Base.depends_on('resource')
+Base.depends_on("resource")
 
-NEXTGIS_GEOSERVICES = 'nextgis_geoservices'
+NEXTGIS_GEOSERVICES = "nextgis_geoservices"
 
-url_template_pattern = re.compile(r'^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\{\}]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/\{\}?]*)?$', re.IGNORECASE | re.UNICODE)  # NOQA
+url_template_pattern = re.compile(
+    r"^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\{\}]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/\{\}?]*)?$",
+    re.IGNORECASE | re.UNICODE,
+)
 
 
 class Connection(Base, Resource):
-    identity = 'tmsclient_connection'
-    cls_display_name = _('TMS connection')
+    identity = "tmsclient_connection"
+    cls_display_name = _("TMS connection")
 
     __scope__ = ConnectionScope
 
@@ -57,18 +60,15 @@ class Connection(Base, Resource):
     def query_params(self):
         params = dict()
         if self.apikey:
-            params[self.apikey_param or 'apikey'] = self.apikey
+            params[self.apikey_param or "apikey"] = self.apikey
         return params
 
     def get_tiles(self, layer_name, zoom, xmin, xmax, ymin, ymax):
         tile_fetcher = TileFetcher.instance()
-        return tile_fetcher.get_tiles(
-            self, layer_name,
-            zoom, xmin, xmax, ymin, ymax)
+        return tile_fetcher.get_tiles(self, layer_name, zoom, xmin, xmax, ymin, ymax)
 
 
 class _url_template_attr(SP):
-
     def setter(self, srlzr, value):
         if value is not None and not url_template_pattern.match(value):
             raise ValidationError("Invalid url template.")
@@ -77,20 +77,19 @@ class _url_template_attr(SP):
 
 
 class _capmode_attr(SP):
-
     def setter(self, srlzr, value):
         if value is None:
             pass
         elif value == NEXTGIS_GEOSERVICES:
             if srlzr.obj.id is None or srlzr.obj.capmode != NEXTGIS_GEOSERVICES:
-                apikey = srlzr.data.get('apikey')
+                apikey = srlzr.data.get("apikey")
                 if apikey is None or len(apikey) == 0:
                     raise ValidationError(message=_("API key required."))
-            srlzr.obj.url_template = env.tmsclient.options['nextgis_geoservices.url_template']
-            srlzr.obj.apikey_param = 'apikey'
+            srlzr.obj.url_template = env.tmsclient.options["nextgis_geoservices.url_template"]
+            srlzr.obj.apikey_param = "apikey"
             srlzr.obj.scheme = SCHEME.XYZ
         else:
-            raise ValidationError(message='Invalid capmode value!')
+            raise ValidationError(message="Invalid capmode value!")
 
         super().setter(srlzr, value)
 
@@ -99,8 +98,7 @@ class ConnectionSerializer(Serializer):
     identity = Connection.identity
     resclass = Connection
 
-    _defaults = dict(read=ConnectionScope.read,
-                     write=ConnectionScope.write)
+    _defaults = dict(read=ConnectionScope.read, write=ConnectionScope.write)
 
     url_template = _url_template_attr(**_defaults)
     apikey = SP(**_defaults)
@@ -135,8 +133,8 @@ class RenderRequest:
 
 @implementer(IRenderableStyle, IBboxLayer)
 class Layer(Base, Resource, SpatialLayerMixin):
-    identity = 'tmsclient_layer'
-    cls_display_name = _('TMS layer')
+    identity = "tmsclient_layer"
+    cls_display_name = _("TMS layer")
 
     __scope__ = (DataStructureScope, DataScope)
 
@@ -151,8 +149,10 @@ class Layer(Base, Resource, SpatialLayerMixin):
     extent_top = db.Column(db.Float, default=+90.0)
 
     connection = db.relationship(
-        Connection, foreign_keys=connection_id,
-        cascade='save-update, merge', cascade_backrefs=False,
+        Connection,
+        foreign_keys=connection_id,
+        cascade="save-update, merge",
+        cascade_backrefs=False,
     )
 
     @classmethod
@@ -163,7 +163,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
         return RenderRequest(self, srs, cond)
 
     def render_image(self, extent, size, srs, zoom):
-
         #################################
         #  ":" - requested extent
         #  "|" - received extent from TMS
@@ -190,13 +189,17 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
         def prepare_geog_extent(extent):
             return (
-                extent[0], max(extent[1], -85.0511),
-                extent[2], min(extent[3], 85.0511),
+                extent[0],
+                max(extent[1], -85.0511),
+                extent[2],
+                min(extent[3], 85.0511),
             )
 
         dst_osr = self.srs.to_osr()
 
-        extent_max = prepare_geog_extent((self.extent_left, self.extent_bottom, self.extent_right, self.extent_top))
+        extent_max = prepare_geog_extent(
+            (self.extent_left, self.extent_bottom, self.extent_right, self.extent_top)
+        )
         if self.srs.id != 4326:
             wgs84_osr = sr_from_epsg(4326)
             extent_max = transform_extent(extent_max, wgs84_osr, dst_osr)
@@ -221,9 +224,12 @@ class Layer(Base, Resource, SpatialLayerMixin):
         image = None
 
         for (x, y), tile_data in self.connection.get_tiles(
-            self.layer_name, zoom,
-            xtile_from + x_offset, min(xtile_to, xtile_max),
-            ytile_from + y_offset, min(ytile_to, ytile_max),
+            self.layer_name,
+            zoom,
+            xtile_from + x_offset,
+            min(xtile_to, xtile_max),
+            ytile_from + y_offset,
+            min(ytile_to, ytile_max),
         ):
             if tile_data is None:
                 continue
@@ -232,8 +238,10 @@ class Layer(Base, Resource, SpatialLayerMixin):
             except IOError:
                 raise ExternalServiceError(message="Image processing error.")
             if image is None:
-                image = Image.new('RGBA', (width, height))
-            image.paste(tile_image, ((x + x_offset) * self.tilesize, (y + y_offset) * self.tilesize))
+                image = Image.new("RGBA", (width, height))
+            image.paste(
+                tile_image, ((x + x_offset) * self.tilesize, (y + y_offset) * self.tilesize)
+            )
 
         if image is not None:
             a0x, a1y, a1x, a0y = self.srs.tile_extent((zoom, xtile_from, ytile_from))
@@ -259,18 +267,17 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
 DataScope.read.require(
     ConnectionScope.connect,
-    attr='connection', cls=Layer,
+    attr="connection",
+    cls=Layer,
 )
 
 
 class _layer_name_attr(SP):
-
     def setter(self, srlzr, value):
         if srlzr.obj.id is None or srlzr.obj.layer_name != value:
             if (
-                (value is None or len(value) == 0)
-                and r'{layer}' in srlzr.obj.connection.url_template
-            ):
+                value is None or len(value) == 0
+            ) and r"{layer}" in srlzr.obj.connection.url_template:
                 raise ValidationError(message=_("Layer name required."))
 
         super().setter(srlzr, value)
@@ -280,8 +287,7 @@ class LayerSerializer(Serializer):
     identity = Layer.identity
     resclass = Layer
 
-    _defaults = dict(read=DataStructureScope.read,
-                     write=DataStructureScope.write)
+    _defaults = dict(read=DataStructureScope.read, write=DataStructureScope.write)
 
     connection = SRR(**_defaults)
     srs = SR(**_defaults)

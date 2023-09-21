@@ -7,8 +7,8 @@ from nextgisweb.env.package import pkginfo
 
 @pytest.fixture(autouse=True)
 def ngw_skip_disabled_component(request):
-    if 'ngw_env' in request.fixturenames:
-        ngw_env = request.getfixturevalue('ngw_env')
+    if "ngw_env" in request.fixturenames:
+        ngw_env = request.getfixturevalue("ngw_env")
         comp = pkginfo.component_by_module(request.module.__name__)
         if comp and comp not in ngw_env.components:
             pytest.skip(f"{comp} disabled")
@@ -16,6 +16,7 @@ def ngw_skip_disabled_component(request):
 
 def _env_initialize():
     from .env import Env, env
+
     result = env()
     if result:
         return result
@@ -23,7 +24,7 @@ def _env_initialize():
     return result
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def ngw_env():
     return _env_initialize()
 

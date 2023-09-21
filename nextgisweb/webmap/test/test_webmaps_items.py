@@ -17,7 +17,7 @@ def make_webmap_item_layer(layer_style):
     return {
         "item_type": "layer",
         "layer_style_id": style_id,
-        "draw_order_position": draw_order_position
+        "draw_order_position": draw_order_position,
     }
 
 
@@ -33,23 +33,21 @@ def make_webmap_items(layers_styles):
             make_webmap_item_layer(layers_styles_sort[0]),
             {
                 "item_type": "group",
-                "children": map(lambda ls: make_webmap_item_layer(ls), layers_styles_sort[1:3])
+                "children": map(lambda ls: make_webmap_item_layer(ls), layers_styles_sort[1:3]),
             },
             {
                 "item_type": "group",
-                "children": map(lambda ls: make_webmap_item_layer(ls), layers_styles_sort[3:5])
+                "children": map(lambda ls: make_webmap_item_layer(ls), layers_styles_sort[3:5]),
             },
-            make_webmap_item_layer(layers_styles_sort[5])
-        ]
+            make_webmap_item_layer(layers_styles_sort[5]),
+        ],
     }
 
-    return {
-        "root_item": dict_items
-    }
+    return {"root_item": dict_items}
 
 
 def make_layer_style(num):
-    layer = RasterLayer(xsize=100, ysize=100, dtype='Byte', band_count=3).persist()
+    layer = RasterLayer(xsize=100, ysize=100, dtype="Byte", band_count=3).persist()
     style = RasterStyle(parent=layer).persist()
     DBSession.flush()
     DBSession.expunge(style)
@@ -57,7 +55,7 @@ def make_layer_style(num):
     return layer.id, style.id
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def fixt_layers_styles(ngw_env, ngw_resource_group):
     layers_styles_ = []
 
@@ -70,10 +68,10 @@ def fixt_layers_styles(ngw_env, ngw_resource_group):
     yield layers_styles_
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def webmap_with_items(fixt_layers_styles):
     with transaction.manager:
-        webmap = WebMap(root_item=WebMapItem(item_type='root'))
+        webmap = WebMap(root_item=WebMapItem(item_type="root"))
         webmap.from_dict(make_webmap_items(fixt_layers_styles))
         webmap.persist()
 

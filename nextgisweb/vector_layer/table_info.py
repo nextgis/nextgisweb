@@ -38,7 +38,7 @@ from .util import (
 
 ERROR_LIMIT = 10
 
-MIN_INT32 = - 2**31
+MIN_INT32 = -(2**31)
 MAX_INT32 = 2**31 - 1
 
 STRING_CAST_TYPES = (
@@ -54,10 +54,16 @@ def translate(trstring):
 
 
 class FieldDef:
-
     def __init__(
-        self, key, keyname, datatype, uuid, display_name=None,
-        label_field=None, grid_visibility=None, ogrindex=None
+        self,
+        key,
+        keyname,
+        datatype,
+        uuid,
+        display_name=None,
+        label_field=None,
+        grid_visibility=None,
+        ogrindex=None,
     ):
         self.key = key
         self.keyname = keyname
@@ -70,7 +76,6 @@ class FieldDef:
 
 
 class TableInfo:
-
     def __init__(self, srs):
         self.srs = srs
         self.metadata = None
@@ -109,29 +114,29 @@ class TableInfo:
 
         # Geom type
 
-        if geom_cast_params['geometry_type'] == GEOM_TYPE.POINT:
+        if geom_cast_params["geometry_type"] == GEOM_TYPE.POINT:
             geom_filter = set(GEOM_TYPE.points)
-        elif geom_cast_params['geometry_type'] == GEOM_TYPE.LINESTRING:
+        elif geom_cast_params["geometry_type"] == GEOM_TYPE.LINESTRING:
             geom_filter = set(GEOM_TYPE.linestrings)
-        elif geom_cast_params['geometry_type'] == GEOM_TYPE.POLYGON:
+        elif geom_cast_params["geometry_type"] == GEOM_TYPE.POLYGON:
             geom_filter = set(GEOM_TYPE.polygons)
         else:
             geom_filter = set(GEOM_TYPE.enum)
 
-        if geom_cast_params['is_multi'] == TOGGLE.NO:
+        if geom_cast_params["is_multi"] == TOGGLE.NO:
             geom_filter -= set(GEOM_TYPE.is_multi)
-        elif geom_cast_params['is_multi'] == TOGGLE.YES:
+        elif geom_cast_params["is_multi"] == TOGGLE.YES:
             geom_filter = geom_filter.intersection(set(GEOM_TYPE.is_multi))
 
-        if geom_cast_params['has_z'] == TOGGLE.NO:
+        if geom_cast_params["has_z"] == TOGGLE.NO:
             geom_filter -= set(GEOM_TYPE.has_z)
-        elif geom_cast_params['has_z'] == TOGGLE.YES:
+        elif geom_cast_params["has_z"] == TOGGLE.YES:
             geom_filter = geom_filter.intersection(set(GEOM_TYPE.has_z))
 
         ltype = ogrlayer.GetGeomType()
 
         class GeomTypeExplorer(Explorer):
-            identity = 'geom_type'
+            identity = "geom_type"
 
             def __init__(self, geom_filter):
                 super().__init__()
@@ -162,9 +167,11 @@ class TableInfo:
                     return False
                 geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype]
 
-                if geom_cast_params['geometry_type'] == TOGGLE.AUTO:
+                if geom_cast_params["geometry_type"] == TOGGLE.AUTO:
                     for _geom_types in (
-                        GEOM_TYPE.points, GEOM_TYPE.linestrings, GEOM_TYPE.polygons
+                        GEOM_TYPE.points,
+                        GEOM_TYPE.linestrings,
+                        GEOM_TYPE.polygons,
                     ):
                         if geometry_type in _geom_types:
                             self.geom_filter = self.geom_filter.intersection(set(_geom_types))
@@ -173,14 +180,16 @@ class TableInfo:
                     return False
 
                 if (
-                    geom_cast_params['is_multi'] == TOGGLE.AUTO and not self.is_multi
+                    geom_cast_params["is_multi"] == TOGGLE.AUTO
+                    and not self.is_multi
                     and geometry_type in GEOM_TYPE.is_multi
                 ):
                     self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.is_multi))
                     self.is_multi = True
 
                 if (
-                    geom_cast_params['has_z'] == TOGGLE.AUTO and not self.has_z
+                    geom_cast_params["has_z"] == TOGGLE.AUTO
+                    and not self.has_z
                     and geometry_type in GEOM_TYPE.has_z
                 ):
                     self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.has_z))
@@ -193,14 +202,13 @@ class TableInfo:
         elif ltype in GEOM_TYPE_OGR and GEOM_TYPE_OGR_2_GEOM_TYPE[ltype] in geom_filter:
             self.geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[ltype]
         elif len(geom_filter) > 1:
-
             # Can't determine single geometry type, need exploration
             GeomTypeExplorer(geom_filter)
 
         # FID field
 
         class Int32RangeExplorer(Explorer):
-            identity = 'int32_range'
+            identity = "int32_range"
 
             def __init__(self, field_index):
                 super().__init__()
@@ -218,7 +226,7 @@ class TableInfo:
                     return True
 
         class UniquenessExplorer(Explorer):
-            identity = 'unique'
+            identity = "unique"
 
             def __init__(self, field_index, field_type):
                 super().__init__()
@@ -247,8 +255,8 @@ class TableInfo:
 
         fid_field_index = None
         fid_field_found = False
-        if fid_params['fid_source'] in (FID_SOURCE.AUTO, FID_SOURCE.FIELD):
-            for fid_field in fid_params['fid_field']:
+        if fid_params["fid_source"] in (FID_SOURCE.AUTO, FID_SOURCE.FIELD):
+            for fid_field in fid_params["fid_field"]:
                 idx = defn.GetFieldIndex(fid_field)
                 if idx != -1:
                     fid_field_found = True
@@ -267,7 +275,6 @@ class TableInfo:
         # Explore layer
 
         if len(explorer_registry) > 0:
-
             for feature in ogrlayer:
                 all_done = True
                 for explorer in explorer_registry.values():
@@ -286,10 +293,10 @@ class TableInfo:
 
             geom_filter = gt_explorer.geom_filter
 
-            if geom_cast_params['is_multi'] == TOGGLE.AUTO and not gt_explorer.is_multi:
+            if geom_cast_params["is_multi"] == TOGGLE.AUTO and not gt_explorer.is_multi:
                 geom_filter = geom_filter - set(GEOM_TYPE.is_multi)
 
-            if geom_cast_params['has_z'] == TOGGLE.AUTO and not gt_explorer.has_z:
+            if geom_cast_params["has_z"] == TOGGLE.AUTO and not gt_explorer.has_z:
                 geom_filter = geom_filter - set(GEOM_TYPE.has_z)
 
             if len(geom_filter) == 1:
@@ -320,28 +327,30 @@ class TableInfo:
                 if not uniqueness_explorer.result_ok:
                     fid_field_ok = False
                     if fix_errors == ERROR_FIX.NONE:
-                        raise VE(message=_(
-                            "Field '%s' contains non-unique or empty values.") % fid_field_name)
+                        raise VE(
+                            message=_("Field '%s' contains non-unique or empty values.")
+                            % fid_field_name
+                        )
 
             if fid_field_ok:
                 self.fid_field_index = fid_field_index
 
         if (
             self.fid_field_index is None
-            and fid_params['fid_source'] == FID_SOURCE.FIELD
+            and fid_params["fid_source"] == FID_SOURCE.FIELD
             and fix_errors == ERROR_FIX.NONE
         ):
-            if len(fid_params['fid_field']) == 0:
+            if len(fid_params["fid_field"]) == 0:
                 raise VE(message=_("Parameter 'fid_field' is missing."))
             else:
                 if not fid_field_found:
-                    raise VE(message=_("Fields %s not found.") % fid_params['fid_field'])
+                    raise VE(message=_("Fields %s not found.") % fid_params["fid_field"])
                 else:
-                    raise VE(message=_("None of fields %s are integer.") % fid_params['fid_field'])
+                    raise VE(message=_("None of fields %s are integer.") % fid_params["fid_field"])
 
         # Fields
 
-        field_suffix_pattern = re.compile(r'(.*)_(\d+)')
+        field_suffix_pattern = re.compile(r"(.*)_(\d+)")
 
         for i in range(defn.GetFieldCount()):
             if i == self.fid_field_index:
@@ -356,15 +365,16 @@ class TableInfo:
 
             if fixed_fld_name.lower() in FIELD_FORBIDDEN_NAME:
                 if fix_errors == ERROR_FIX.NONE:
-                    raise VE(message=_(
-                        "Field name is forbidden: '%s'. Please remove or "
-                        "rename it.") % fld_name)
+                    raise VE(
+                        message=_("Field name is forbidden: '%s'. Please remove or " "rename it.")
+                        % fld_name
+                    )
                 else:
-                    fixed_fld_name += '_1'
+                    fixed_fld_name += "_1"
 
             if fld_name != fixed_fld_name:
-                if fixed_fld_name == '':
-                    fixed_fld_name = 'fld_1'
+                if fixed_fld_name == "":
+                    fixed_fld_name = "fld_1"
                 while True:
                     unique_check = True
                     for field in self.fields:
@@ -373,10 +383,10 @@ class TableInfo:
 
                             match = field_suffix_pattern.match(fixed_fld_name)
                             if match is None:
-                                fixed_fld_name += '_1'
+                                fixed_fld_name += "_1"
                             else:
                                 n = int(match[2]) + 1
-                                fixed_fld_name = '%s_%d' % (match[1], n)
+                                fixed_fld_name = "%s_%d" % (match[1], n)
                             break
                     if unique_check:
                         break
@@ -389,17 +399,10 @@ class TableInfo:
                 try:
                     fld_type = FIELD_TYPE_2_ENUM[fld_type_ogr]
                 except KeyError:
-                    raise VE(message=_("Unsupported field type: %r.") %
-                             fld_defn.GetTypeName())
+                    raise VE(message=_("Unsupported field type: %r.") % fld_defn.GetTypeName())
 
             uid = uuid.uuid4().hex
-            self.fields.append(FieldDef(
-                'fld_%s' % uid,
-                fld_name,
-                fld_type,
-                uid,
-                ogrindex=i
-            ))
+            self.fields.append(FieldDef("fld_%s" % uid, fld_name, fld_type, uid, ogrindex=i))
 
         return self
 
@@ -410,15 +413,17 @@ class TableInfo:
 
         for fld in fields:
             uid = uuid.uuid4().hex
-            self.fields.append(FieldDef(
-                'fld_%s' % uid,
-                fld.get('keyname'),
-                fld.get('datatype'),
-                uid,
-                fld.get('display_name'),
-                fld.get('label_field'),
-                fld.get('grid_visibility')
-            ))
+            self.fields.append(
+                FieldDef(
+                    "fld_%s" % uid,
+                    fld.get("keyname"),
+                    fld.get("datatype"),
+                    uid,
+                    fld.get("display_name"),
+                    fld.get("label_field"),
+                    fld.get("grid_visibility"),
+                )
+            )
 
         return self
 
@@ -429,12 +434,7 @@ class TableInfo:
         self.geometry_type = layer.geometry_type
 
         for f in layer.fields:
-            self.fields.append(FieldDef(
-                'fld_%s' % f.fld_uuid,
-                f.keyname,
-                f.datatype,
-                f.fld_uuid
-            ))
+            self.fields.append(FieldDef("fld_%s" % f.fld_uuid, f.keyname, f.datatype, f.fld_uuid))
 
         return self
 
@@ -467,7 +467,7 @@ class TableInfo:
                 keyname=f.keyname,
                 datatype=f.datatype,
                 display_name=f.display_name,
-                fld_uuid=f.uuid
+                fld_uuid=f.uuid,
             )
             if f.grid_visibility is not None:
                 field.grid_visibility = f.grid_visibility
@@ -487,20 +487,22 @@ class TableInfo:
                 for k, v in kwargs.items():
                     setattr(self, k, v)
 
-        sequence = db.Sequence(tablename + '_id_seq', start=1,
-                               minvalue=-2**31, metadata=metadata)
+        sequence = db.Sequence(
+            tablename + "_id_seq", start=1, minvalue=-(2**31), metadata=metadata
+        )
         table = db.Table(
             tablename,
-            metadata, db.Column(
-                'id', db.Integer,
-                sequence,
-                primary_key=True),
-            db.Column('geom', ga.Geometry(
-                dimension=3 if self.geometry_type in GEOM_TYPE.has_z else 2,
-                srid=self.srs.id,
-                geometry_type=geom_fldtype)),
-            *map(lambda fld: db.Column(fld.key, FIELD_TYPE_2_DB[
-                fld.datatype]), self.fields)
+            metadata,
+            db.Column("id", db.Integer, sequence, primary_key=True),
+            db.Column(
+                "geom",
+                ga.Geometry(
+                    dimension=3 if self.geometry_type in GEOM_TYPE.has_z else 2,
+                    srid=self.srs.id,
+                    geometry_type=geom_fldtype,
+                ),
+            ),
+            *map(lambda fld: db.Column(fld.key, FIELD_TYPE_2_DB[fld.datatype]), self.fields)
         )
 
         mapper_registry = registry()
@@ -514,14 +516,21 @@ class TableInfo:
         self.geom_column = table.c.geom
 
     def load_from_ogr(
-            self, ogrlayer, skip_other_geometry_types, fix_errors, skip_errors, validate,
-        ):
-
+        self,
+        ogrlayer,
+        skip_other_geometry_types,
+        fix_errors,
+        skip_errors,
+        validate,
+    ):
         source_osr = ogrlayer.GetSpatialRef()
         target_osr = self.srs.to_osr()
 
-        transform = osr.CoordinateTransformation(source_osr, target_osr) \
-            if not source_osr.IsSame(target_osr) else None
+        transform = (
+            osr.CoordinateTransformation(source_osr, target_osr)
+            if not source_osr.IsSame(target_osr)
+            else None
+        )
 
         errors = []
 
@@ -567,12 +576,15 @@ class TableInfo:
                 fid = i
             else:
                 if not feature.IsFieldSet(self.fid_field_index):
-                    errors.append(_(
-                        "Feature (seq. #%d) doesn't have a FID field '%s'.") % (i, fid_field_name))
+                    errors.append(
+                        _("Feature (seq. #%d) doesn't have a FID field '%s'.")
+                        % (i, fid_field_name)
+                    )
                     continue
                 if feature.IsFieldNull(self.fid_field_index):
-                    errors.append(_(
-                        "Feature (seq. #%d) FID field '%s' is null.") % (i, fid_field_name))
+                    errors.append(
+                        _("Feature (seq. #%d) FID field '%s' is null.") % (i, fid_field_name)
+                    )
                     continue
                 fid = fid_fget(feature)
 
@@ -590,7 +602,8 @@ class TableInfo:
 
                 # Extract GeometryCollection
                 if (
-                    geom.GetGeometryType() in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D)
+                    geom.GetGeometryType()
+                    in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D)
                     and fix_errors != ERROR_FIX.NONE
                 ):
                     geom_candidate = None
@@ -600,24 +613,48 @@ class TableInfo:
                         if col_gtype not in GEOM_TYPE_OGR:
                             continue
                         if (
-                            (self.geometry_type in GEOM_TYPE.points and col_gtype in (
-                                ogr.wkbPoint, ogr.wkbPoint25D,
-                                ogr.wkbMultiPoint, ogr.wkbMultiPoint25D))
-                            or (self.geometry_type in GEOM_TYPE.linestrings and col_gtype in (
-                                ogr.wkbLineString, ogr.wkbLineString25D,
-                                ogr.wkbMultiLineString, ogr.wkbMultiLineString25D))
-                            or (self.geometry_type in GEOM_TYPE.polygons and col_gtype in (
-                                ogr.wkbPolygon, ogr.wkbPolygon25D,
-                                ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D))
+                            (
+                                self.geometry_type in GEOM_TYPE.points
+                                and col_gtype
+                                in (
+                                    ogr.wkbPoint,
+                                    ogr.wkbPoint25D,
+                                    ogr.wkbMultiPoint,
+                                    ogr.wkbMultiPoint25D,
+                                )
+                            )
+                            or (
+                                self.geometry_type in GEOM_TYPE.linestrings
+                                and col_gtype
+                                in (
+                                    ogr.wkbLineString,
+                                    ogr.wkbLineString25D,
+                                    ogr.wkbMultiLineString,
+                                    ogr.wkbMultiLineString25D,
+                                )
+                            )
+                            or (
+                                self.geometry_type in GEOM_TYPE.polygons
+                                and col_gtype
+                                in (
+                                    ogr.wkbPolygon,
+                                    ogr.wkbPolygon25D,
+                                    ogr.wkbMultiPolygon,
+                                    ogr.wkbMultiPolygon25D,
+                                )
+                            )
                         ):
                             if geom_candidate is None:
                                 geom_candidate = col_geom
                                 if fix_errors == ERROR_FIX.LOSSY:
                                     break
                             else:
-                                errors.append(_(
-                                    "Feature #%d has multiple geometries satisfying the conditions."
-                                ) % fid)
+                                errors.append(
+                                    _(
+                                        "Feature #%d has multiple geometries satisfying the conditions."
+                                    )
+                                    % fid
+                                )
                                 continue
                     if geom_candidate is not None:
                         geom = geom_candidate
@@ -627,22 +664,32 @@ class TableInfo:
                 # Check geometry type
                 if gtype not in GEOM_TYPE_OGR:
                     if not skip_other_geometry_types:
-                        errors.append(_(
-                            "Feature #%d has unknown geometry type: %d (%s).") % (
-                            fid, gtype, ogr.GeometryTypeToName(gtype)))
+                        errors.append(
+                            _("Feature #%d has unknown geometry type: %d (%s).")
+                            % (fid, gtype, ogr.GeometryTypeToName(gtype))
+                        )
                     continue
-                elif not any((
-                    (self.geometry_type in GEOM_TYPE.points
-                        and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.points),
-                    (self.geometry_type in GEOM_TYPE.linestrings
-                        and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.linestrings),
-                    (self.geometry_type in GEOM_TYPE.polygons
-                        and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.polygons),
-                )):
+                elif not any(
+                    (
+                        (
+                            self.geometry_type in GEOM_TYPE.points
+                            and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.points
+                        ),
+                        (
+                            self.geometry_type in GEOM_TYPE.linestrings
+                            and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.linestrings
+                        ),
+                        (
+                            self.geometry_type in GEOM_TYPE.polygons
+                            and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.polygons
+                        ),
+                    )
+                ):
                     if not skip_other_geometry_types:
-                        errors.append(_(
-                            "Feature #%d has unsuitable geometry type: %d (%s).") % (
-                            fid, gtype, ogr.GeometryTypeToName(gtype)))
+                        errors.append(
+                            _("Feature #%d has unsuitable geometry type: %d (%s).")
+                            % (fid, gtype, ogr.GeometryTypeToName(gtype))
+                        )
                     continue
 
                 # Force single geometries to multi
@@ -653,24 +700,35 @@ class TableInfo:
                         geom = ogr.ForceToMultiLineString(geom)
                     elif gtype in (ogr.wkbPolygon, ogr.wkbPolygon25D):
                         geom = ogr.ForceToMultiPolygon(geom)
-                elif gtype in (ogr.wkbMultiPoint, ogr.wkbMultiPoint25D,
-                            ogr.wkbMultiLineString, ogr.wkbMultiLineString25D,
-                            ogr.wkbMultiPolygon, ogr.wkbMultiPolygon25D):
+                elif gtype in (
+                    ogr.wkbMultiPoint,
+                    ogr.wkbMultiPoint25D,
+                    ogr.wkbMultiLineString,
+                    ogr.wkbMultiLineString25D,
+                    ogr.wkbMultiPolygon,
+                    ogr.wkbMultiPolygon25D,
+                ):
                     if geom.GetGeometryCount() == 1 or fix_errors == ERROR_FIX.LOSSY:
                         geom = geom.GetGeometryRef(0)
                     else:
-                        errors.append(_(
-                            "Feature #%d has multiple geometries satisfying the conditions.") % fid)
+                        errors.append(
+                            _("Feature #%d has multiple geometries satisfying the conditions.")
+                            % fid
+                        )
                         continue
 
             if transform is not None:
                 if geom.Transform(transform) != 0:
-                    errors.append(_("Feature #%d has a geometry that can't be reprojected to "
-                                    "target coordinate system") % fid)
+                    errors.append(
+                        _(
+                            "Feature #%d has a geometry that can't be reprojected to "
+                            "target coordinate system"
+                        )
+                        % fid
+                    )
                     continue
 
             if validate:
-
                 # Force Z
                 has_z = self.geometry_type in GEOM_TYPE.has_z
                 if has_z and not geom.Is3D():
@@ -701,19 +759,23 @@ class TableInfo:
                     # linestrings with fewer than 2 points.
                     if not geom.IsValid():
                         error_found = False
-                        for part in ((geom, ) if is_single else geom):
+                        for part in (geom,) if is_single else geom:
                             if is_polygon:
                                 for ring in part:
                                     if ring.GetPointCount() < 4:
                                         # TODO: Invalid parts can be removed from multipart geometries in LOSSY mode.
-                                        errors.append(_(
-                                            "Feature #%d has less than 3 points in a polygon ring."
-                                        ) % fid)
+                                        errors.append(
+                                            _(
+                                                "Feature #%d has less than 3 points in a polygon ring."
+                                            )
+                                            % fid
+                                        )
                                         error_found = True
                             elif part.GetPointCount() < 2:
                                 # TODO: Invalid parts can be removed from multipart geometries in LOSSY mode.
-                                errors.append(_(
-                                    "Feature #%d has less than 2 points in a linestring.") % fid)
+                                errors.append(
+                                    _("Feature #%d has less than 2 points in a linestring.") % fid
+                                )
                                 error_found = True
                             if error_found:
                                 break
@@ -753,9 +815,10 @@ class TableInfo:
                             if fix_errors == ERROR_FIX.LOSSY:
                                 fld_value = fixed_fld_value
                             else:
-                                errors.append(_(
-                                    "Feature #%d contains a broken encoding of field '%s'.")
-                                    % (fid, field.keyname))
+                                errors.append(
+                                    _("Feature #%d contains a broken encoding of field '%s'.")
+                                    % (fid, field.keyname)
+                                )
                                 continue
 
                 fld_values[field.key] = fld_value
@@ -770,15 +833,15 @@ class TableInfo:
             dynamic_size += len(geom_bytes)
 
             record = dict(
-                id=fid, geom=ga.elements.WKBElement(geom_bytes, srid=self.srs.id),
-                **fld_values)
+                id=fid, geom=ga.elements.WKBElement(geom_bytes, srid=self.srs.id), **fld_values
+            )
             add_record(record)
 
             num_features += 1
         add_record(None)
 
         if len(errors) > 0 and not skip_errors:
-            detail = '<br>'.join(html_escape(translate(error), quote=False) for error in errors)
+            detail = "<br>".join(html_escape(translate(error), quote=False) for error in errors)
             raise VE(message=_("Vector layer cannot be written due to errors."), detail=detail)
 
         size = static_size * num_features + dynamic_size
@@ -786,7 +849,11 @@ class TableInfo:
         # Set sequence next value
         if max_fid is not None:
             connection = DBSession.connection()
-            connection.execute(text('ALTER SEQUENCE "%s"."%s" RESTART WITH %d' %
-                               (self.sequence.schema, self.sequence.name, max_fid + 1)))
+            connection.execute(
+                text(
+                    'ALTER SEQUENCE "%s"."%s" RESTART WITH %d'
+                    % (self.sequence.schema, self.sequence.name, max_fid + 1)
+                )
+            )
 
         return size
