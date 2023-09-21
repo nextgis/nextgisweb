@@ -1,60 +1,60 @@
-#: amd/ngw-resource/CompositeWidget.js:49
+#: amd/ngw-resource/CompositeWidget.js:52
 msgid "Please wait. Processing request..."
 msgstr "Пожалуйста подождите, идет обработка запроса..."
 
-#: amd/ngw-resource/CompositeWidget.js:80
+#: amd/ngw-resource/CompositeWidget.js:85
 msgid "Create"
 msgstr "Создать"
 
-#: amd/ngw-resource/CompositeWidget.js:85
+#: amd/ngw-resource/CompositeWidget.js:94
 msgid "Create and edit"
 msgstr "Создать и изменить"
 
-#: amd/ngw-resource/CompositeWidget.js:92
+#: amd/ngw-resource/CompositeWidget.js:103
 #: nodepkg/export-settings/ExportSettings.tsx:77
 msgid "Save"
 msgstr "Сохранить"
 
-#: amd/ngw-resource/CompositeWidget.js:99
+#: amd/ngw-resource/CompositeWidget.js:110
 #: nodepkg/children-section/ChildrenSection.js:291
 #: nodepkg/children-section/util/createResourceTableItemOptions.js:5
 #: nodepkg/delete-page/DeletePage.js:51 view.py:344
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-resource/CompositeWidget.js:248 amd/ngw-resource/CompositeWidget.js:264
+#: amd/ngw-resource/CompositeWidget.js:273 amd/ngw-resource/CompositeWidget.js:295
 msgid "Unexpected error"
 msgstr "Внезапная ошибка"
 
-#: amd/ngw-resource/CompositeWidget.js:249
+#: amd/ngw-resource/CompositeWidget.js:274
 msgid "Serialization failed"
 msgstr "Сериализация не удалась"
 
-#: amd/ngw-resource/CompositeWidget.js:256
+#: amd/ngw-resource/CompositeWidget.js:285
 msgid "Validation error"
 msgstr "Ошибка валидации"
 
-#: amd/ngw-resource/CompositeWidget.js:257
+#: amd/ngw-resource/CompositeWidget.js:286
 msgid "Errors found during data validation. Tabs with errors marked in red."
 msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
 
-#: amd/ngw-resource/CompositeWidget.js:265
+#: amd/ngw-resource/CompositeWidget.js:296
 msgid "Validation failed"
 msgstr "Валидация провалилась"
 
-#: amd/ngw-resource/ResourcePicker.js:31
+#: amd/ngw-resource/ResourcePicker.js:29
 msgid "Select resource"
 msgstr "Выберите ресурс"
 
-#: amd/ngw-resource/ResourcePicker.js:56
+#: amd/ngw-resource/ResourcePicker.js:70
 msgid "OK"
 msgstr "ОК"
 
-#: amd/ngw-resource/ResourcePicker.js:65
+#: amd/ngw-resource/ResourcePicker.js:79
 msgid "Cancel"
 msgstr "Отмена"
 
-#: amd/ngw-resource/form/ResourceLink.js:35 model.py:78
+#: amd/ngw-resource/form/ResourceLink.js:35 model.py:79
 #: nodepkg/editor-widget/EditorWidget.js:62 scope.py:12
 msgid "Resource"
 msgstr "Ресурс"
@@ -149,31 +149,31 @@ msgstr "Доступ запрещен"
 msgid "Operational error"
 msgstr "Операционная ошибка"
 
-#: model.py:260
+#: model.py:261
 msgid "Resource can not be a parent himself."
 msgstr "Ресурс не может быть родителем сам себе."
 
-#: model.py:273
+#: model.py:274
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:305
+#: model.py:306
 msgid "Default style"
 msgstr "Стиль по умолчанию"
 
-#: model.py:358
+#: model.py:359
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:364
+#: model.py:365
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:369
+#: model.py:370
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:417
+#: model.py:418
 msgid ""
 "Unable to revoke '{s}: {p}' permission for '{u}' as the user belongs to the "
 "administrators group. Administrators must always have ability to configure "
@@ -183,7 +183,7 @@ msgstr ""
 "относится группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для основной группы ресурсов."
 
-#: model.py:584
+#: model.py:593
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -257,13 +257,13 @@ msgid "Display name"
 msgstr "Наименование"
 
 #: nodepkg/children-section/ChildrenSection.js:412
-#: template/resource_section_summary.mako:30
+#: template/resource_section_summary.mako:5
 msgid "Type"
 msgstr "Тип"
 
 #: nodepkg/children-section/ChildrenSection.js:419
 #: nodepkg/editor-widget/EditorWidget.js:34
-#: template/resource_section_summary.mako:38
+#: template/resource_section_summary.mako:20
 msgid "Owner"
 msgstr "Владелец"
 
@@ -368,13 +368,13 @@ msgstr ""
 "* Это не повлияет на REST API, который продолжит регулироваться правами "
 "доступа."
 
-#: nodepkg/external-access/ExternalAccess.js:10
+#: nodepkg/external-access/ExternalAccess.js:11
+msgid "Use these links to plug data into external applications."
+msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
+
+#: nodepkg/external-access/ExternalAccess.js:12
 msgid "Read more"
 msgstr "Подробнее"
-
-#: nodepkg/external-access/ExternalAccess.js:43
-msgid "The link copied to clipboard."
-msgstr "Ссылка скопирована в буфер обмена."
 
 #: nodepkg/permissions-widget/PermissionsStore.js:6
 msgid "All fields are required"
@@ -424,7 +424,7 @@ msgstr "Только этого ресурса"
 msgid "All permissions"
 msgstr "Все права"
 
-#: nodepkg/permissions-widget/PermissionsWidget.js:198
+#: nodepkg/permissions-widget/PermissionsWidget.js:199
 msgid "Permissions"
 msgstr "Права доступа"
 
@@ -505,17 +505,13 @@ msgstr "Доступ"
 msgid "Attribute '%s' forbidden."
 msgstr "Недостаточно прав, атрибут '%s'."
 
-#: template/resource_section_description.mako:8
+#: template/resource_section_description.mako:5
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
 
 #: template/resource_section_external_access.mako:3
 msgid "External access"
 msgstr "Внешний доступ"
-
-#: template/resource_section_external_access.mako:16
-msgid "Use these links to plug data into external applications."
-msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
 
 #: view.py:88 view.py:351
 msgid "JSON view"

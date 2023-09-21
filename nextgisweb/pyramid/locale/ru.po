@@ -15,27 +15,31 @@ msgstr "Не удалось скопировать"
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
 
-#: api.py:253
+#: api.py:265
 msgid "Invalid component identity."
 msgstr "Некорректный идентификатор компонента."
 
-#: api.py:558
+#: api.py:588
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:166
+#: component.py:181
+msgid "Request timeout"
+msgstr "Таймаут запроса"
+
+#: component.py:184
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:166
+#: component.py:184
 msgid "Disabled"
 msgstr "Отключено"
 
-#: exception.py:202 exception.py:263
+#: exception.py:200 exception.py:261
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:203
+#: exception.py:201
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -43,37 +47,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:232
+#: exception.py:230
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:233
+#: exception.py:231
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:240
+#: exception.py:238
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:241
+#: exception.py:239
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:245
+#: exception.py:243
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:246
+#: exception.py:244
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:250
+#: exception.py:248
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:251
+#: exception.py:249
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -82,15 +86,15 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:258
+#: exception.py:256
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:259
+#: exception.py:257
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:264
+#: exception.py:262
 msgid ""
 "The server has either erred or is incapable of performing the requested "
 "operation."
@@ -98,15 +102,15 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:271 exception.py:272
+#: exception.py:266 exception.py:267
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:276
+#: exception.py:271
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:277
+#: exception.py:272
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
@@ -197,19 +201,11 @@ msgstr ""
 "Здесь можно задать стили CSS. Они будут использованы для оформления всех "
 "страниц вашей Веб ГИС."
 
-#: nodepkg/example/translation.js:5
-msgid "Translated text"
-msgstr "Переведенный текст"
-
-#: nodepkg/example/typescript.ts:10
-msgid "Create"
-msgstr "Создать"
-
 #: nodepkg/home-path/HomePath.js:4
 msgid "The home path setting is saved."
 msgstr "Настройка стартовой страницы сохранена."
 
-#: nodepkg/i18n/testentry.ts:7 nodepkg/i18n/testentry.ts:10 test/test_i18n.py:8
+#: nodepkg/i18n/testentry.ts:8 nodepkg/i18n/testentry.ts:12 test/test_i18n.py:8
 msgctxt "test"
 msgid "unit"
 msgid_plural "units"
@@ -217,19 +213,19 @@ msgstr[0] "штука"
 msgstr[1] "штуки"
 msgstr[2] "штук"
 
-#: nodepkg/layout/Avatar.js:12
+#: nodepkg/layout/Avatar.js:11
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/layout/Avatar.js:21
+#: nodepkg/layout/Avatar.js:20
 msgid "Invitation session"
 msgstr "Пригласительная сессия"
 
-#: nodepkg/layout/Avatar.js:24 view.py:495
+#: nodepkg/layout/Avatar.js:23 view.py:488
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/layout/Avatar.js:26
+#: nodepkg/layout/Avatar.js:25
 msgid "Sign out"
 msgstr "Выйти"
 
@@ -237,7 +233,7 @@ msgstr "Выйти"
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.js:44 view.py:102
+#: nodepkg/layout/store.js:44 view.py:103
 msgid "Control panel"
 msgstr "Панель управления"
 
@@ -249,27 +245,27 @@ msgstr "Справка"
 msgid "We recommend height of 45 px and width of up to 200 px."
 msgstr "Рекомендуемая высота 45 px и ширина до 200 px."
 
-#: nodepkg/metrics/GoogleAnalyticsTab.tsx:29
+#: nodepkg/metrics/GoogleAnalyticsTab.tsx:30
 msgid "Measurement ID"
 msgstr "Идентификатор потока данных"
 
-#: nodepkg/metrics/MetricSettings.tsx:14
+#: nodepkg/metrics/MetricSettings.tsx:15
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/metrics/MetricSettings.tsx:15
+#: nodepkg/metrics/MetricSettings.tsx:16
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/metrics/MetricSettings.tsx:16
+#: nodepkg/metrics/MetricSettings.tsx:17
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
 
-#: nodepkg/metrics/MetricSettings.tsx:20
+#: nodepkg/metrics/MetricSettings.tsx:21
 msgid "Add one or more counters to your Web GIS."
 msgstr "Добавьте один или несколько счетчиков в вашу Веб ГИС."
 
-#: nodepkg/metrics/MetricSettings.tsx:21
+#: nodepkg/metrics/MetricSettings.tsx:22
 msgid ""
 "HTML code of these counters will be embeded into each page and will allow you"
 " to track user activity."
@@ -277,19 +273,19 @@ msgstr ""
 "HTML-код этих счетчиков будет встроен в каждую страницу и позволит "
 "отслеживать активность пользователей."
 
-#: nodepkg/metrics/YandexMetricaTab.tsx:31
+#: nodepkg/metrics/YandexMetricaTab.tsx:32
 msgid "Tag number"
 msgstr "Номер счетчика"
 
-#: nodepkg/metrics/YandexMetricaTab.tsx:49
+#: nodepkg/metrics/YandexMetricaTab.tsx:50
 msgid "Webvisor"
 msgstr "Вебвизор"
 
-#: nodepkg/metrics/tab.ts:26
+#: nodepkg/metrics/tab.ts:27
 msgid "Google Analytics"
 msgstr "Google Аналитика"
 
-#: nodepkg/metrics/tab.ts:33
+#: nodepkg/metrics/tab.ts:34
 msgid "Yandex.Metrica"
 msgstr "Яндекс.Метрика"
 
@@ -488,47 +484,47 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
-#: view.py:92
+#: view.py:93
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:125 view.py:492
+#: view.py:122 view.py:485
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:134 view.py:511
+#: view.py:130 view.py:525
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:145 view.py:516
+#: view.py:141 view.py:534
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:162 view.py:498
+#: view.py:157 view.py:496
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:171 view.py:500
+#: view.py:167 view.py:501
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:180 view.py:502
+#: view.py:177 view.py:506
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:189 view.py:496
+#: view.py:187 view.py:491
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:198 view.py:504
+#: view.py:197 view.py:511
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:206 view.py:506
+#: view.py:207 view.py:516
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:491
+#: view.py:482
 msgid "Info"
 msgstr "Информация"
 
