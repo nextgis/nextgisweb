@@ -12,10 +12,11 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import type { MarkSymbolizer } from "geostyler-style";
 import type { EditorProps } from "../../type";
 
-const radiusLabel = gettext("Size");
-const fillColorLabel = gettext("Fill color");
-const strokeColorLabel = gettext("Stroke color");
-const strokeWidthLabel = gettext("Stroke width");
+const msgShape = gettext("Shape");
+const msgRadius = gettext("Size");
+const msgFillColor = gettext("Fill color");
+const msgStrokeColor = gettext("Stroke color");
+const msgStrokeWidth = gettext("Stroke width");
 
 export function MarkEditor({ value, onChange }: EditorProps<MarkSymbolizer>) {
     const onSymbolizer = (v: MarkSymbolizer) => {
@@ -49,13 +50,13 @@ export function MarkEditor({ value, onChange }: EditorProps<MarkSymbolizer>) {
     const fields = useMemo<FormField<keyof MarkSymbolizer>[]>(
         () => [
             {
-                label: radiusLabel,
+                label: msgShape,
                 name: "wellKnownName",
                 widget: "select",
                 choices: wellKnownNames,
             },
             {
-                label: radiusLabel,
+                label: msgRadius,
                 name: "radius",
                 widget: "number",
                 inputProps: {
@@ -63,17 +64,17 @@ export function MarkEditor({ value, onChange }: EditorProps<MarkSymbolizer>) {
                 },
             },
             {
-                label: fillColorLabel,
+                label: msgFillColor,
                 name: "color",
                 widget: ColorField,
             },
             {
-                label: strokeColorLabel,
+                label: msgStrokeColor,
                 name: "strokeColor",
                 widget: ColorField,
             },
             {
-                label: strokeWidthLabel,
+                label: msgStrokeWidth,
                 name: "strokeWidth",
                 widget: "number",
                 inputProps: {

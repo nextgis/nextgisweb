@@ -20,17 +20,17 @@ msgstr "Тип"
 
 #: nodepkg/style-editor/component/editor/FillEditor.tsx:14
 #: nodepkg/style-editor/component/editor/LineEditor.tsx:14
-#: nodepkg/style-editor/component/editor/MarkEditor.tsx:16
+#: nodepkg/style-editor/component/editor/MarkEditor.tsx:17
 msgid "Fill color"
 msgstr "Цвет заливки"
 
 #: nodepkg/style-editor/component/editor/FillEditor.tsx:15
-#: nodepkg/style-editor/component/editor/MarkEditor.tsx:17
+#: nodepkg/style-editor/component/editor/MarkEditor.tsx:18
 msgid "Stroke color"
 msgstr "Цвет контура"
 
 #: nodepkg/style-editor/component/editor/FillEditor.tsx:16
-#: nodepkg/style-editor/component/editor/MarkEditor.tsx:18
+#: nodepkg/style-editor/component/editor/MarkEditor.tsx:19
 msgid "Stroke width"
 msgstr "Ширина контура"
 
@@ -39,6 +39,10 @@ msgid "Width"
 msgstr "Ширина"
 
 #: nodepkg/style-editor/component/editor/MarkEditor.tsx:15
+msgid "Shape"
+msgstr "Форма"
+
+#: nodepkg/style-editor/component/editor/MarkEditor.tsx:16
 msgid "Size"
 msgstr "Размер"
 
