@@ -4,19 +4,20 @@ Changes
 4.5.0
 -----
 
-- Differentiate webmap intial and contstraining extents.
+- New tileset resource for storing and serving prerendered tiles.
 - New OGC API Feature service with read and write support.
+- Up to 2x speed-up of loading vector layer data.
+- Differentiate webmap intial and contstraining extents.
+- Support for Google Analytics and Yandex.Metrica metrics.
+- Support for basic user-defined styles.
+- Save to PDF from the webmap printing panel.
 - Check effective permissions of other users for a resource.
 - Legends for webmaps enabled by default.
 - Lots of improvements in feature editing widgets.
-- New tileset resource for storing and serving prerendered tiles.
-- React library upgraded to 18.
-- 2x speed-up of vector layer import.
-- Ant Design library upgraded to 5.
-- Save to PDF from the webmap printing panel.
+- OutputFormat declaration in WFS for better compatibility.
 - Store audit journal in PostgreSQL database instead of ElasticSearch.
-- Support for Google Analytics and Yandex.Metrica metrics.
-- Support for user-defined SLD styles.
+- React library upgraded to 18.
+- Ant Design library upgraded to 5.
 
 
 4.4.0
@@ -47,6 +48,7 @@ Changes
 - Chrome 102+, Safari 15+, Edge 109+ or Firefox 102+ is required.
 - User permissions section is moved to a separate page.
 - OAuth-based automatic group assignment.
+
 
 4.3.2
 -----
@@ -150,6 +152,7 @@ Changes
 - Synchronization of translations with POEditor.
 - Yandex Maps-based address search on the webmap.
 
+
 3.9.0
 -----
 
@@ -166,6 +169,7 @@ Changes
 - Layers with an "id" field can be loaded if the field has an integer type.
 - Information about available distribution versions in the control panel.
 - Experimental storage accounting and estimation subsystem.
+
 
 3.8.0
 -----
@@ -186,6 +190,7 @@ Changes
 - OpenLayers library upgraded to 6.5.0.
 - OAuth server logout support via logout redirect endpoint.
 
+
 3.7.0
 -----
 
@@ -202,6 +207,7 @@ Changes
   message is returned.
 - Vector layer export to MapInfo MIF/MID format.
 - Vector layer export to Panorama SXF format.
+
 
 3.6.0
 -----
@@ -224,6 +230,7 @@ Changes
 - Fix GDAL > 3 compability issues, including axis orientation.
 - SVG marker library resource available to renderers.
 
+
 3.5.0
 -----
 
@@ -243,15 +250,18 @@ Changes
 - Fix coordinates display format in web map identification popup.
 - Fix tile distortion issue for raster styles
 
+
 3.4.2
 -----
 
 - Fix WMS layer creation.
 
+
 3.4.1
 -----
 
 - Fix layout scroll bug in vector layer fields editing.
+
 
 3.4.0
 -----
