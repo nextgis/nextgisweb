@@ -8,11 +8,11 @@ Changes
 - New OGC API Feature service with read and write support.
 - Up to 2x speed-up of loading vector layer data.
 - Differentiate webmap intial and contstraining extents.
-- Support for Google Analytics and Yandex.Metrica metrics.
+- Support for Google Analytics metrics.
 - Support for basic user-defined styles.
 - Save to PDF from the webmap printing panel.
 - Check effective permissions of other users for a resource.
-- Legends for webmaps enabled by default.
+- Legends for webmaps is enabled by default.
 - Lots of improvements in feature editing widgets.
 - OutputFormat declaration in WFS for better compatibility.
 - Store audit journal in PostgreSQL database instead of ElasticSearch.
