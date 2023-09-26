@@ -15,6 +15,7 @@ function compFromPath(path) {
 }
 
 function potFlagged(comp) {
+    if (!(comp in env.components)) return;
     const fn = path.resolve(env.components[comp], "locale/.pot");
     if (!fs.existsSync(fn)) return;
 
