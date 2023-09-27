@@ -17,7 +17,7 @@ const componentMap: Partial<
     Record<
         SymbolizerKind,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        React.ComponentType<EditorProps<any>>
+        React.FC<EditorProps<any>>
     >
 > = {
     "Mark": MarkEditor,
@@ -31,9 +31,10 @@ export function KindEditor({ symbolizer, setSymbolizer }: SymbolizerKindProps) {
     const kind = symbolizer.kind;
     const Component = componentMap[kind];
 
-    return Component ? (
-        <Component key={kind} value={symbolizer} onChange={setSymbolizer} />
-    ) : (
-        <>{unknownSymbolizerText}</>
-    );
+    if (Component) {
+        return (
+            <Component key={kind} value={symbolizer} onChange={setSymbolizer} />
+        );
+    }
+    return <>{unknownSymbolizerText}</>;
 }

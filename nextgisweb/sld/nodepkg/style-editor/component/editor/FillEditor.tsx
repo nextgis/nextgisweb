@@ -5,6 +5,7 @@ import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ColorField } from "../../field/ColorField";
+import { hexWithOpacity } from "../../util/hexWithOpacity";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
 
 import type { FormField } from "@nextgisweb/gui/fields-form";
@@ -65,8 +66,12 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
         []
     );
 
-    const initialValue = {
+    const { color, opacity, fillOpacity, outlineColor, outlineOpacity } = value;
+
+    const initialValue: FillSymbolizer = {
         ...value,
+        color: hexWithOpacity(color, opacity || fillOpacity),
+        outlineColor: hexWithOpacity(outlineColor, outlineOpacity),
     };
 
     return (

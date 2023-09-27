@@ -6,6 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ColorField } from "../../field/ColorField";
 import { wellKnownNames } from "../../util/constant";
+import { hexWithOpacity } from "../../util/hexWithOpacity";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
 
 import type { FormField } from "@nextgisweb/gui/fields-form";
@@ -85,8 +86,12 @@ export function MarkEditor({ value, onChange }: EditorProps<MarkSymbolizer>) {
         []
     );
 
-    const initialValue = {
+    const { color, opacity, fillOpacity, strokeColor, strokeOpacity } = value;
+
+    const initialValue: MarkSymbolizer = {
         ...value,
+        color: hexWithOpacity(color, opacity || fillOpacity),
+        strokeColor: hexWithOpacity(strokeColor, strokeOpacity),
         radius:
             typeof value.radius === "number" ? value.radius * 2 : value.radius,
     };
