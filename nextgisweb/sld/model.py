@@ -49,7 +49,7 @@ class Fill(Struct):
 
     def xml(self):
         _fill = E.Fill()
-        if self.color is not None:
+        if self.color is not UNSET:
             _fill.append(E.SvgParameter(dict(name="fill"), self.color))
         if self.opacity is not UNSET:
             _fill.append(E.SvgParameter(dict(name="fill-opacity"), str(self.opacity)))
