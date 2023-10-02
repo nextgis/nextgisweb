@@ -4,7 +4,7 @@ import { ParamsOf } from "../../type";
 
 import "./index.less";
 
-interface TableProps extends ParamsOf<typeof TableBase> {
+export interface TableProps extends ParamsOf<typeof TableBase> {
     parentHeight?: boolean;
 }
 

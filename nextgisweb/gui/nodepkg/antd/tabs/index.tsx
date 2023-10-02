@@ -4,7 +4,7 @@ import "./index.less";
 
 type TabsBaseProps = Parameters<typeof TabsBase>[0];
 
-interface TabsProps extends TabsBaseProps {
+export interface TabsProps extends TabsBaseProps {
     parentHeight?: boolean;
 }
 
