@@ -1,4 +1,4 @@
-import { Button } from "@nextgisweb/gui/antd";
+import { Button, type ButtonProps } from "@nextgisweb/gui/antd";
 import settings from "@nextgisweb/pyramid/settings!auth";
 import i18n from "@nextgisweb/pyramid/i18n";
 
@@ -14,7 +14,7 @@ const {
 
 const isNGID = type === "nextgisid";
 
-export function makeTeamManageButton(props) {
+export function makeTeamManageButton(props: ButtonProps) {
     if (isNGID && baseUrl) {
         const url =
             baseUrl.replace(/\/$/, "") +
