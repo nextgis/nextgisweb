@@ -3,13 +3,15 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { default as oauth } from "../oauth";
 
+import type { TableProps } from "@nextgisweb/gui/antd";
+
 const messages = {
     deleteConfirm: gettext("Delete group?"),
     deleteSuccess: gettext("Group deleted"),
 };
 
 export function GroupBrowse() {
-    const columns = [
+    const columns: TableProps["columns"] = [
         {
             title: gettext("Full name"),
             dataIndex: "display_name",
