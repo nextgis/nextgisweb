@@ -10,6 +10,14 @@ import { gettext } from "../i18n";
 import { PageTitle } from "../layout";
 import { registry } from "./tab";
 
+import type { ApiError } from "@nextgisweb/gui/error/type";
+import type {
+    MetricSettingsTab,
+    PyramidMetrics,
+    PyramidMetricsComponent,
+    PyramidMetricsKey,
+} from "./type";
+
 import "./MetricSettings.less";
 
 const msgAdd = gettext("Add");
@@ -29,15 +37,15 @@ const PlaceholderCard = () => (
 );
 
 function useTabComponents() {
-    const [value, setValue] = useState(undefined);
+    const [value, setValue] = useState<MetricSettingsTab[]>();
     useEffect(() => {
-        const promises = [];
+        const promises: Promise<MetricSettingsTab>[] = [];
         for (const tab of registry.query()) {
             promises.push(
                 tab.load().then((component) => ({
-                    key: tab.key,
+                    key: tab.key as PyramidMetricsKey,
                     label: tab.label,
-                    component,
+                    component: component as PyramidMetricsComponent,
                 }))
             );
         }
@@ -49,13 +57,13 @@ function useTabComponents() {
 export function MetricsSettings() {
     const tabComponents = useTabComponents();
 
-    const [value, setValue] = useState(undefined);
+    const [value, setValue] = useState<PyramidMetrics>();
     const [status, setStatus] = useState<string | null>("loading");
-    const [activeTab, setActiveTab] = useState<string | undefined>();
+    const [activeTab, setActiveTab] = useState<string>();
 
     useEffect(() => {
         route("pyramid.metrics")
-            .get()
+            .get<PyramidMetrics>()
             .then((data) => {
                 setValue(data);
                 setStatus(null);
@@ -94,13 +102,13 @@ export function MetricsSettings() {
 
     const [messageApi, contextHolder] = message.useMessage();
 
-    const add = (key) => {
+    const add = (key: PyramidMetricsKey) => {
         if (status !== null) return;
         setValue({ ...value, [key]: null });
         setActiveTab(key);
     };
 
-    const remove = (key) => {
+    const remove = (key: PyramidMetricsKey) => {
         if (status !== null) return;
         const newValue = { ...value };
         delete newValue[key];
@@ -112,16 +120,19 @@ export function MetricsSettings() {
         setStatus("saving");
         try {
             await route("pyramid.metrics").put({
-                json: Object.fromEntries(
-                    Object.entries(value).filter(([k, v]) => v)
-                ),
+                json:
+                    value !== undefined
+                        ? Object.fromEntries(
+                              Object.entries(value).filter(([, v]) => v)
+                          )
+                        : null,
             });
             messageApi.open({
                 type: "success",
                 content: msgSuccess + " " + msgSuccessReload,
             });
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
             setStatus(null);
         }
@@ -135,7 +146,7 @@ export function MetricsSettings() {
                     <Dropdown
                         menu={{
                             items: aitems,
-                            onClick: ({ key }) => add(key),
+                            onClick: ({ key }) => add(key as PyramidMetricsKey),
                         }}
                         trigger={["click"]}
                     >
@@ -156,7 +167,8 @@ export function MetricsSettings() {
                             activeKey={activeTab}
                             onChange={setActiveTab}
                             onEdit={(key, action) =>
-                                action === "remove" && remove(key)
+                                action === "remove" &&
+                                remove(String(key) as PyramidMetricsKey)
                             }
                             hideAdd
                         />

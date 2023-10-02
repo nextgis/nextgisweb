@@ -4,6 +4,9 @@ import { PluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import { gettext } from "../i18n";
 
 import type { FC } from "react";
+import type { TV as YandexMetric } from "./YandexMetricaTab";
+import type { TV as GoogleAnalytics } from "./GoogleAnalyticsTab";
+import type { PyramidMetricsKey } from "./type";
 
 export interface TabProps<TV> {
     value: TV | null;
@@ -12,12 +15,15 @@ export interface TabProps<TV> {
 }
 
 export interface MetadataType {
-    readonly key: string;
+    readonly key: PyramidMetricsKey;
     readonly label: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const registry = new PluginRegistry<FC<TabProps<never>>, MetadataType>(
+type PluginRegistryValue =
+    | FC<TabProps<YandexMetric>>
+    | FC<TabProps<GoogleAnalytics>>;
+
+export const registry = new PluginRegistry<PluginRegistryValue, MetadataType>(
     "pyramid/metrics/tab"
 );
 

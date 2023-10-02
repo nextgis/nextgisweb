@@ -6,7 +6,7 @@ import { gettext } from "../i18n";
 
 import type { TabProps } from "./tab";
 
-interface TV {
+export interface TV {
     id: string;
 }
 
@@ -19,7 +19,7 @@ export default function GoogleAnalyticsTab({
         id: value?.id || "",
     }));
 
-    const update = (k, v) => {
+    const update = (k: string, v: unknown) => {
         const newIvalue = { ...ivalue, [k]: v };
         setIvalue(newIvalue);
         onChange && onChange(newIvalue.id ? newIvalue : null);
