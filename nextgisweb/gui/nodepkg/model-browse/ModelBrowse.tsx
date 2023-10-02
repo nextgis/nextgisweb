@@ -30,7 +30,7 @@ import type { ParamsOf } from "../type";
 
 type TableProps = ParamsOf<typeof Table>;
 
-interface Data {
+export interface ModalBrowseData {
     id: number;
 }
 
@@ -42,7 +42,15 @@ interface Model {
     create: RouteName;
 }
 
-interface ModelBrowseProps extends TableProps {
+export interface ControlProps<Data extends ModalBrowseData = ModalBrowseData> {
+    disable?: boolean;
+    selected: number[];
+    rows: Data[];
+    setRows: React.Dispatch<React.SetStateAction<Data[]>>;
+}
+
+interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
+    extends TableProps {
     model: string | Model;
     messages?: {
         deleteConfirm?: string;
@@ -57,13 +65,13 @@ interface ModelBrowseProps extends TableProps {
         canDelete?: (args: { item: Data }) => boolean;
     };
     createProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
-    headerControls?: FC[];
-    selectedControls?: FC[];
+    headerControls?: FC<ControlProps<Data>>[];
+    selectedControls?: FC<ControlProps<Data>>[];
     collectionOptions?: RequestOptions;
     collectionFilter?: (item: Data) => boolean;
 }
 
-export function ModelBrowse({
+export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     model: m,
     columns,
     messages,
@@ -72,10 +80,10 @@ export function ModelBrowse({
     createProps = {},
     headerControls = [],
     selectedControls = [],
-    collectionOptions,
     collectionFilter,
+    collectionOptions,
     ...tableProps
-}: ModelBrowseProps) {
+}: ModelBrowseProps<Data>) {
     const model: Model =
         typeof m === "string"
             ? ({
@@ -269,9 +277,9 @@ export function ModelBrowse({
             </Col>
             <Col>
                 <Space direction="horizontal">
-                    {headerControls.map((control, idx) => (
+                    {headerControls.map((Control, idx) => (
                         <Fragment key={idx}>
-                            {control({ selected, rows, setRows })}
+                            <Control {...{ selected, rows, setRows }} />
                         </Fragment>
                     ))}
                     <Button
@@ -289,9 +297,9 @@ export function ModelBrowse({
 
     const SelectedControl = () => (
         <Space direction="horizontal">
-            {selectedControls.map((control, idx) => (
+            {selectedControls.map((Control, idx) => (
                 <Fragment key={idx}>
-                    {control({ selected, rows, setRows })}
+                    <Control {...{ selected, rows, setRows }} />
                 </Fragment>
             ))}
 
