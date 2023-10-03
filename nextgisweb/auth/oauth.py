@@ -372,12 +372,12 @@ class OAuthHelper:
             result = response.json()
             logger.debug("Request(%s): < %s", log_reqid, lf(result))
         except InvalidJSONError:
-            raise OAuthInvalidResponse("JSON decode error")
+            raise OAuthInvalidResponse("JSON decode error", response)
 
         if not (200 <= response.status_code <= 299):
             error = result.get("error")
             if error is None or not isinstance(error, str):
-                raise OAuthInvalidResponse("Error key missing")
+                raise OAuthInvalidResponse("Error key missing", response)
             raise OAuthErrorResponse(error)
 
         return result
@@ -575,7 +575,9 @@ def _password_token_hash_cache(username, password, salt):
 
 
 class OAuthInvalidResponse(Exception):
-    pass
+    def __init__(self, message, response):
+        ct = response.headers.get("content-type", "unknown")
+        super().__init__(f"{message} (status: {response.status_code}; content-type: \"{ct}\")")
 
 
 class OAuthErrorResponse(Exception):
