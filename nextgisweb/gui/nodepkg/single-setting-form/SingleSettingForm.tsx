@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 
-import { Col, Input, message, Row } from "@nextgisweb/gui/antd";
+import { Input, message, Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import i18n from "@nextgisweb/pyramid/i18n";
 
-import type { ParamsOf } from "../type";
-import type { ApiError } from "../error/type";
 import type { RouteName } from "@nextgisweb/pyramid/api/type";
+import type { ApiError } from "../error/type";
+import type { ParamsOf } from "../type";
 
 type InputParams = ParamsOf<typeof Input>;
 
@@ -80,18 +80,14 @@ export function SingleSettingForm({
     }
 
     return (
-        <Row>
-            <Col flex="auto">
-                <Input
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                    allowClear
-                    {...inputProps}
-                />
-            </Col>
-            <Col flex="none">
-                <SaveButton loading={status === "saving"} onClick={save} />
-            </Col>
-        </Row>
+        <Space.Compact style={{ "width": "100%" }}>
+            <Input
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                allowClear
+                {...inputProps}
+            />
+            <SaveButton loading={status === "saving"} onClick={save} />
+        </Space.Compact>
     );
 }
