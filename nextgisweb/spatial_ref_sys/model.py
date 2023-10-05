@@ -7,8 +7,8 @@ from nextgisweb.lib.osrhelper import sr_from_wkt
 
 from .util import convert_to_proj
 
-SRID_MAX = 998999     # PostGIS maximum srid (srs.id)
-SRID_LOCAL = 990001   # First local srid (srs.id)
+SRID_MAX = 998999  # PostGIS maximum srid (srs.id)
+SRID_LOCAL = 990001  # First local srid (srs.id)
 
 WKT_EPSG_4326 = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]'
 WKT_EPSG_3857 = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]'
@@ -18,15 +18,23 @@ BOUNDS_EPSG_3857 = (-20037508.34, -20037508.34, 20037508.34, 20037508.34)
 
 
 class SRS(Base):
-    __tablename__ = 'srs'
+    __tablename__ = "srs"
 
     id_seq = db.Sequence(
-        'srs_id_seq', metadata=Base.metadata,
-        start=SRID_LOCAL, minvalue=SRID_LOCAL, maxvalue=SRID_MAX)
+        "srs_id_seq",
+        metadata=Base.metadata,
+        start=SRID_LOCAL,
+        minvalue=SRID_LOCAL,
+        maxvalue=SRID_MAX,
+    )
 
     id = sa.Column(
-        sa.Integer, id_seq, primary_key=True, autoincrement=False,
-        server_default=id_seq.next_value())
+        sa.Integer,
+        id_seq,
+        primary_key=True,
+        autoincrement=False,
+        server_default=id_seq.next_value(),
+    )
     display_name = sa.Column(sa.Unicode, nullable=False)
     auth_name = sa.Column(sa.Unicode)  # NULL auth_* used for
     auth_srid = sa.Column(sa.Integer)  # custom local projection
@@ -39,19 +47,16 @@ class SRS(Base):
     catalog_id = sa.Column(sa.Integer, unique=True)
 
     __table_args__ = (
+        db.CheckConstraint("id > 0 AND id <= %d" % SRID_MAX, name="srs_id_check"),
         db.CheckConstraint(
-            'id > 0 AND id <= %d' % SRID_MAX,
-            name='srs_id_check'),
-        db.CheckConstraint(
-            '(auth_name IS NULL AND auth_srid IS NULL) '
-            'OR (auth_name IS NOT NULL AND auth_srid IS NOT NULL)',
-            name='srs_auth_check'),
-        db.UniqueConstraint(
-            'auth_name', 'auth_srid',
-            name="srs_auth_unique"),
+            "(auth_name IS NULL AND auth_srid IS NULL) "
+            "OR (auth_name IS NOT NULL AND auth_srid IS NOT NULL)",
+            name="srs_auth_check",
+        ),
+        db.UniqueConstraint("auth_name", "auth_srid", name="srs_auth_unique"),
     )
 
-    @db.validates('wkt')
+    @db.validates("wkt")
     def _validate_wkt(self, key, value):
         self.proj4 = convert_to_proj(value)
         return value
@@ -69,10 +74,10 @@ class SRS(Base):
         return 1
 
     def _tile_step_x(self, z):
-        return (self.maxx - self.minx) / (2 ** z) / self._zero_level_numtiles_x
+        return (self.maxx - self.minx) / (2**z) / self._zero_level_numtiles_x
 
     def _tile_step_y(self, z):
-        return (self.maxy - self.miny) / (2 ** z) / self._zero_level_numtiles_y
+        return (self.maxy - self.miny) / (2**z) / self._zero_level_numtiles_y
 
     def tile_extent(self, tile):
         z, x, y = tile
@@ -94,7 +99,7 @@ class SRS(Base):
     def _point_tilexy(self, px, py, ztile):
         return (
             (px - self.minx) / self._tile_step_x(ztile),
-            (self.maxy - py) / self._tile_step_y(ztile)
+            (self.maxy - py) / self._tile_step_y(ztile),
         )
 
     def extent_tile_range(self, extent, ztile):
@@ -129,7 +134,8 @@ class SRS(Base):
         return bool(self.auth_name or self.auth_srid or self.catalog_id)
 
 
-db.event.listen(SRS.__table__, 'after_create', db.DDL("""
+# fmt: off
+db.event.listen(SRS.__table__, "after_create", db.DDL("""
     CREATE OR REPLACE FUNCTION srs_spatial_ref_sys_sync() RETURNS TRIGGER
     LANGUAGE 'plpgsql' AS $BODY$
     BEGIN
@@ -167,16 +173,16 @@ db.event.listen(SRS.__table__, 'after_create', db.DDL("""
 
 
 db.event.listen(SRS.__table__, 'after_drop', db.DDL("""
-DROP FUNCTION IF EXISTS srs_spatial_ref_sys_sync();
+    DROP FUNCTION IF EXISTS srs_spatial_ref_sys_sync();
 """), propagate=True)
+# fmt: on
 
 
 class SRSMixin:
-
     @declared_attr
     def srs_id(cls):
         return sa.Column(sa.Integer, sa.ForeignKey(SRS.id), nullable=False)
 
     @declared_attr
     def srs(cls):
-        return relationship('SRS', lazy='joined')
+        return relationship("SRS", lazy="joined")

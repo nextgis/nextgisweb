@@ -169,12 +169,7 @@ class Env(Container):
                         "after_create",
                         # After table creation write component's name
                         # in comments, for debug purposes.
-                        sa.DDL(
-                            "COMMENT ON TABLE %(fullname)s IS "
-                            + "'"
-                            + comp.identity
-                            + "'"
-                        ),
+                        sa.DDL("COMMENT ON TABLE %(fullname)s IS " + "'" + comp.identity + "'"),
                     )
 
         return metadata

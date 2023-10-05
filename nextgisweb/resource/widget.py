@@ -6,12 +6,11 @@ _registry = []
 class WidgetMeta(type):
     def __init__(cls, name, bases, nmspc):
         super().__init__(name, bases, nmspc)
-        if not nmspc.get('__abstract__', False):
+        if not nmspc.get("__abstract__", False):
             _registry.append(cls)
 
 
 class WidgetBase:
-
     def __init__(self, operation, obj, request):
         self.operation = operation
         self.obj = obj
@@ -23,10 +22,13 @@ class Widget(WidgetBase, metaclass=WidgetMeta):
 
     def is_applicable(self):
         operation = self.operation in self.__class__.operation
-        resclass = not hasattr(self.__class__, 'resource') \
-            or isinstance(self.obj, self.__class__.resource)
-        interface = not hasattr(self.__class__, 'interface') \
-            or self.__class__.interface.providedBy(self.obj)
+        resclass = not hasattr(self.__class__, "resource") or isinstance(
+            self.obj,
+            self.__class__.resource,
+        )
+        interface = not hasattr(
+            self.__class__, "interface"
+        ) or self.__class__.interface.providedBy(self.obj)
         return operation and resclass and interface
 
     def config(self):
@@ -34,7 +36,6 @@ class Widget(WidgetBase, metaclass=WidgetMeta):
 
 
 class CompositeWidget(WidgetBase):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.members = []
@@ -52,17 +53,17 @@ class CompositeWidget(WidgetBase):
 
 class ResourceWidget(Widget):
     resource = Resource
-    operation = ('create', 'update')
-    amdmod = '@nextgisweb/resource/editor-widget'
+    operation = ("create", "update")
+    amdmod = "@nextgisweb/resource/editor-widget"
 
 
 class ResourcePermissionWidget(Widget):
     resource = Resource
-    operation = ('update', )
-    amdmod = '@nextgisweb/resource/permissions-widget'
+    operation = ("update",)
+    amdmod = "@nextgisweb/resource/permissions-widget"
 
 
 class ResourceDescriptionWiget(Widget):
     resource = Resource
-    operation = ('create', 'update')
-    amdmod = '@nextgisweb/resource/description-editor'
+    operation = ("create", "update")
+    amdmod = "@nextgisweb/resource/description-editor"

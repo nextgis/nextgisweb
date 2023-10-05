@@ -19,14 +19,16 @@ def test_root_serialize(ngw_txn):
 
     data = json.loads(dumps(srlzr.data))
 
-    assert 'resource' in data
-    assert data['resource']['cls'] == 'resource_group'
+    assert "resource" in data
+    assert data["resource"]["cls"] == "resource_group"
 
 
 def test_same_display_name(ngw_txn, ngw_resource_group):
     margs = dict(
-        parent_id=ngw_resource_group, display_name='display name',
-        owner_user=User.by_keyname('administrator'))
+        parent_id=ngw_resource_group,
+        display_name="display name",
+        owner_user=User.by_keyname("administrator"),
+    )
 
     with pytest.raises(IntegrityError, match='"resource_parent_id_display_name_key"'):
         ResourceGroup(**margs).persist()

@@ -5,7 +5,6 @@ from .component import SLDComponent
 
 @comp_cli.command()
 class cleanup(DryRunOptions, EnvCommand):
-
     def __call__(self, *, sld: SLDComponent):
         sld.cleanup(dry_run=self.dry_run)
 

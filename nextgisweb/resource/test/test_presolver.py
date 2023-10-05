@@ -8,11 +8,12 @@ from .. import Resource
 
 
 def pytest_generate_tests(metafunc):
-    if 'resource_cls' in metafunc.fixturenames:
+    if "resource_cls" in metafunc.fixturenames:
         load_all()
-        metafunc.parametrize('resource_cls', [
-            pytest.param(cls, id=identity)
-            for identity, cls in Resource.registry.items()])
+        metafunc.parametrize(
+            "resource_cls",
+            [pytest.param(cls, id=identity) for identity, cls in Resource.registry.items()],
+        )
 
 
 def test_requirement_ordering(resource_cls):
@@ -24,6 +25,6 @@ def test_requirement_ordering(resource_cls):
 
     for req in requirements:
         if req.attr is None:
-            assert len(dependencies[req.src]) == 0, "{} evaluated before {}".format(
-                req, tuple(dependencies[req.src]))
+            d = dependencies[req.src]
+            assert len(d) == 0, "{} evaluated before {}".format(req, tuple(d))
         dependencies[req.dst].remove(req)

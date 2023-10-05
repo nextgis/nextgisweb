@@ -12,12 +12,12 @@ from .data import (
     transform_batch_input_wrong_srs_to,
 )
 
-MOSCOW_VLADIVOSTOK = 'LINESTRING(37.62 55.75,131.9 43.12)'
+MOSCOW_VLADIVOSTOK = "LINESTRING(37.62 55.75,131.9 43.12)"
 LENGTH_SPHERE = 6434561.600305
 LENGTH_FLAT = 10718924.816779
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def srs_ids():
     srs_add = dict()
     with transaction.manager:
@@ -31,10 +31,7 @@ def srs_ids():
             DBSession.expunge(obj)
             srs_add[display_name] = obj.id
 
-    yield dict({
-        "EPSG:4326": 4326,
-        "EPSG:3857": 3857,
-    }, **srs_add)
+    yield dict({"EPSG:4326": 4326, "EPSG:3857": 3857}, **srs_add)
 
     with transaction.manager:
         for srs_id in srs_add.values():
@@ -44,7 +41,7 @@ def srs_ids():
 def test_geom_transform(ngw_webtest_app):
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_transform" % 3857,
-        dict(geom=MOSCOW_VLADIVOSTOK, srs=4326)
+        dict(geom=MOSCOW_VLADIVOSTOK, srs=4326),
     )
     g1 = Geometry.from_wkt(result.json["geom"])
     g2 = Geometry.from_wkt("LINESTRING(4187839.2436 7508807.8513,14683040.8356 5330254.9437)")
@@ -52,7 +49,7 @@ def test_geom_transform(ngw_webtest_app):
 
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_transform" % 4326,
-        dict(geom=result.json["geom"], srs=3857)
+        dict(geom=result.json["geom"], srs=3857),
     )
     g1 = Geometry.from_wkt(result.json["geom"])
     g2 = Geometry.from_wkt(MOSCOW_VLADIVOSTOK)
@@ -62,7 +59,7 @@ def test_geom_transform(ngw_webtest_app):
 def test_geom_transform_batch(srs_ids, ngw_webtest_app):
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/geom_transform",
-        transform_batch_input(srs_ids)
+        transform_batch_input(srs_ids),
     ).json
 
     for i, expected_item in enumerate(transform_batch_expected(srs_ids)):
@@ -76,7 +73,7 @@ def test_geom_transform_batch(srs_ids, ngw_webtest_app):
 def test_geom_transform_batch_return_empty_if_srs_to_wrong(srs_ids, ngw_webtest_app):
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/geom_transform",
-        transform_batch_input_wrong_srs_to(srs_ids)
+        transform_batch_input_wrong_srs_to(srs_ids),
     ).json
 
     assert len(result) == 0
@@ -85,42 +82,54 @@ def test_geom_transform_batch_return_empty_if_srs_to_wrong(srs_ids, ngw_webtest_
 def test_geom_length(ngw_webtest_app):
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_length" % 4326,
-        dict(geom=MOSCOW_VLADIVOSTOK)
+        dict(geom=MOSCOW_VLADIVOSTOK),
     )
     assert abs(result.json["value"] - LENGTH_SPHERE) < 1e-6
 
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_length" % 4326,
-        dict(geom=MOSCOW_VLADIVOSTOK)
+        dict(geom=MOSCOW_VLADIVOSTOK),
     )
     assert abs(result.json["value"] - LENGTH_SPHERE) < 1e-6
 
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_length" % 3857,
-        dict(geom=MOSCOW_VLADIVOSTOK, srs=4326)
+        dict(geom=MOSCOW_VLADIVOSTOK, srs=4326),
     )
     assert abs(result.json["value"] - LENGTH_FLAT) < 1e-6
 
 
-@pytest.mark.parametrize("wkt, srs_geom, srs_calc, area", [
-    pytest.param(
-        'POLYGON((484000 1400000, 484000 1400100, 484100 1400100, 484100 1400000, 484000 1400000))',
-        'MSK', 'MSK', 10000, id='hectare-cw-msk'),
-    pytest.param(
-        'POLYGON((484000 1400000, 484100 1400000, 484100 1400100, 484000 1400100, 484000 1400000))',
-        'MSK', 'MSK', 10000, id='hectare-ccw-msk'),
-    pytest.param(
-        'POLYGON((0 1, 1 0, 0 -1, -1 0, 0 1))',
-        'EPSG:3857', 'EPSG:4326', -2, id='zero-cw-4326'),
-    pytest.param(
-        'POLYGON((0 1, -1 0, 0 -1, 1 0, 0 1))',
-        'EPSG:3857', 'EPSG:4326', 2, id='zero-ccw-4326'),
-    pytest.param(
-        'POLYGON((0 1, 1 0, 0 -1, -1 0, 0 1))',
-        'EPSG:3857', 'EPSG:3857', 2, id='zero-3857'),
-])
+@pytest.mark.parametrize(
+    "wkt, srs_geom, srs_calc, area",
+    [
+        pytest.param(
+            "POLYGON((484000 1400000, 484000 1400100, 484100 1400100, 484100 1400000, 484000 1400000))",
+            "MSK",
+            "MSK",
+            10000,
+            id="hectare-cw-msk",
+        ),
+        pytest.param(
+            "POLYGON((484000 1400000, 484100 1400000, 484100 1400100, 484000 1400100, 484000 1400000))",
+            "MSK",
+            "MSK",
+            10000,
+            id="hectare-ccw-msk",
+        ),
+        pytest.param(
+            "POLYGON((0 1, 1 0, 0 -1, -1 0, 0 1))", "EPSG:3857", "EPSG:4326", -2, id="zero-cw-4326"
+        ),
+        pytest.param(
+            "POLYGON((0 1, -1 0, 0 -1, 1 0, 0 1))", "EPSG:3857", "EPSG:4326", 2, id="zero-ccw-4326"
+        ),
+        pytest.param(
+            "POLYGON((0 1, 1 0, 0 -1, -1 0, 0 1))", "EPSG:3857", "EPSG:3857", 2, id="zero-3857"
+        ),
+    ],
+)
 def test_geom_area(wkt, srs_geom, srs_calc, area, srs_ids, ngw_webtest_app):
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_area" % srs_ids[srs_calc],
-        dict(geom=wkt, srs=srs_ids[srs_geom]))
+        dict(geom=wkt, srs=srs_ids[srs_geom]),
+    )
     assert result.json["value"] == pytest.approx(area, rel=0.025)

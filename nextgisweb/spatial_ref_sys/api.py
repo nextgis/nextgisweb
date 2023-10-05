@@ -17,43 +17,42 @@ from .util import convert_to_wkt
 
 def serialize(obj: SRS):
     return dict(
-        id=obj.id, display_name=obj.display_name,
-        auth_name=obj.auth_name, auth_srid=obj.auth_srid,
-        wkt=obj.wkt, catalog_id=obj.catalog_id,
-        system=obj.system, protected=obj.protected,
-        geographic=obj.is_geographic
+        id=obj.id,
+        display_name=obj.display_name,
+        auth_name=obj.auth_name,
+        auth_srid=obj.auth_srid,
+        wkt=obj.wkt,
+        catalog_id=obj.catalog_id,
+        system=obj.system,
+        protected=obj.protected,
+        geographic=obj.is_geographic,
     )
 
 
 def deserialize(obj, data, *, create):
     for k, v in data.items():
-        if (
-            (k in ('id', 'auth_name', 'auth_srid', 'catalog_id'))
-            and (create or v != getattr(obj, k))
+        if (k in ("id", "auth_name", "auth_srid", "catalog_id")) and (
+            create or v != getattr(obj, k)
         ):
-            raise ValidationError(message=_(
-                "SRS attribute '{}' cannot be changed or set during creation."
-            ).format(k))
-        elif k in ('display_name', 'wkt'):
+            raise ValidationError(
+                message=_("SRS attribute '{}' cannot be changed or set during creation.").format(k)
+            )
+        elif k in ("display_name", "wkt"):
             if not isinstance(v, str):
-                raise ValidationError(message=_(
-                    "SRS attribute '{}' must have a string value."
-                ).format(k))
-            if k == 'display_name':
+                raise ValidationError(
+                    message=_("SRS attribute '{}' must have a string value.").format(k)
+                )
+            if k == "display_name":
                 with DBSession.no_autoflush:
-                    existing = SRS.filter_by(display_name=v) \
-                        .filter(SRS.id != obj.id).first()
+                    existing = SRS.filter_by(display_name=v).filter(SRS.id != obj.id).first()
                     if existing:
-                        raise ValidationError(message=_(
-                            "SRS display name is not unique."))
-            if (
-                k == 'wkt' and not create and obj.protected
-                and v != getattr(obj, k)
-            ):
-                raise ValidationError(message=_(
-                    "OGC WKT definition cannot be changed for this SRS."))
+                        raise ValidationError(message=_("SRS display name is not unique."))
+            if k == "wkt" and not create and obj.protected and v != getattr(obj, k):
+                raise ValidationError(
+                    message=_("OGC WKT definition cannot be changed for this SRS.")
+                )
             setattr(obj, k, v)
-        elif k in ('system', 'protected'):
+        elif k in ("system", "protected"):
             pass
 
 
@@ -79,7 +78,7 @@ def iget(request) -> JSONType:
 def iput(request) -> JSONType:
     request.require_administrator()
 
-    obj = SRS.filter_by(id=int(request.matchdict['id'])).one()
+    obj = SRS.filter_by(id=int(request.matchdict["id"])).one()
     deserialize(obj, request.json_body, create=False)
     return dict(id=obj.id)
 
@@ -87,10 +86,9 @@ def iput(request) -> JSONType:
 def idelete(request) -> JSONType:
     request.require_administrator()
 
-    obj = SRS.filter_by(id=int(request.matchdict['id'])).one()
+    obj = SRS.filter_by(id=int(request.matchdict["id"])).one()
     if obj.system:
-        raise ValidationError(message=_(
-            "System SRS cannot be deleted."))
+        raise ValidationError(message=_("System SRS cannot be deleted."))
 
     DBSession.delete(obj)
     return None
@@ -140,12 +138,14 @@ class GeometryPropertyResponse(Struct):
 
 def geom_calc(request, measure_fun):
     data = request.json_body
-    srs_to = SRS.filter_by(id=int(request.matchdict['id'])).one()
-    srs_from_id = data.get('srs', srs_to.id)
+    srs_to = SRS.filter_by(id=int(request.matchdict["id"])).one()
+    srs_from_id = data.get("srs", srs_to.id)
 
-    geom = Geometry.from_geojson(data['geom']) \
-        if data.get('geom_format') == 'geojson' \
-        else Geometry.from_wkt(data['geom'])
+    geom = (
+        Geometry.from_geojson(data["geom"])
+        if data.get("geom_format") == "geojson"
+        else Geometry.from_wkt(data["geom"])
+    )
 
     if srs_from_id != srs_to.id:
         srs_from = SRS.filter_by(id=srs_from_id).one()
@@ -169,22 +169,21 @@ def catalog_collection(request) -> JSONType:
 
     query = dict()
 
-    q = request.GET.get('q')
+    q = request.GET.get("q")
     if q is not None:
-        query['q'] = q
+        query["q"] = q
 
-    if request.env.spatial_ref_sys.options['catalog.coordinates_search']:
-        lat = request.GET.get('lat')
-        lon = request.GET.get('lon')
+    if request.env.spatial_ref_sys.options["catalog.coordinates_search"]:
+        lat = request.GET.get("lat")
+        lon = request.GET.get("lon")
         if lat is not None and lon is not None:
-            query['intersects'] = json.dumps(dict(
-                type='Point',
-                coordinates=(float(lon), float(lat))
-            ))
+            query["intersects"] = json.dumps(
+                dict(type="Point", coordinates=(float(lon), float(lat)))
+            )
 
-    catalog_url = env.spatial_ref_sys.options['catalog.url']
-    url = catalog_url + '/api/v1/spatial_ref_sys/'
-    timeout = env.spatial_ref_sys.options['catalog.timeout'].total_seconds()
+    catalog_url = env.spatial_ref_sys.options["catalog.url"]
+    url = catalog_url + "/api/v1/spatial_ref_sys/"
+    timeout = env.spatial_ref_sys.options["catalog.timeout"].total_seconds()
     try:
         res = requests.get(url, query, timeout=timeout)
         res.raise_for_status()
@@ -193,20 +192,22 @@ def catalog_collection(request) -> JSONType:
 
     items = list()
     for srs in res.json():
-        items.append(dict(
-            id=srs['id'],
-            display_name=srs['display_name'],
-            auth_name=srs['auth_name'],
-            auth_srid=srs['auth_srid']
-        ))
+        items.append(
+            dict(
+                id=srs["id"],
+                display_name=srs["display_name"],
+                auth_name=srs["auth_name"],
+                auth_srid=srs["auth_srid"],
+            )
+        )
 
     return items
 
 
 def get_srs_from_catalog(catalog_id):
-    catalog_url = env.spatial_ref_sys.options['catalog.url']
-    url = catalog_url + '/api/v1/spatial_ref_sys/' + str(catalog_id)
-    timeout = env.spatial_ref_sys.options['catalog.timeout'].total_seconds()
+    catalog_url = env.spatial_ref_sys.options["catalog.url"]
+    url = catalog_url + "/api/v1/spatial_ref_sys/" + str(catalog_id)
+    timeout = env.spatial_ref_sys.options["catalog.timeout"].total_seconds()
     try:
         res = requests.get(url, timeout=timeout)
         res.raise_for_status()
@@ -219,49 +220,50 @@ def get_srs_from_catalog(catalog_id):
 def catalog_item(request) -> JSONType:
     request.require_administrator()
 
-    catalog_id = int(request.matchdict['id'])
+    catalog_id = int(request.matchdict["id"])
     srs = get_srs_from_catalog(catalog_id)
 
-    return dict(display_name=srs['display_name'], wkt=srs['wkt'])
+    return dict(display_name=srs["display_name"], wkt=srs["wkt"])
 
 
 def catalog_import(request) -> JSONType:
     request.require_administrator()
 
-    catalog_id = int(request.json_body['catalog_id'])
+    catalog_id = int(request.json_body["catalog_id"])
     srs = get_srs_from_catalog(catalog_id)
 
-    auth_name = srs['auth_name']
-    auth_srid = srs['auth_srid']
+    auth_name = srs["auth_name"]
+    auth_srid = srs["auth_srid"]
     if auth_name is None or auth_srid is None:
-        raise ValidationError(message=_(
-            "SRS authority attributes must be defined "
-            "while importing from the catalog."))
+        raise ValidationError(
+            message=_(
+                "SRS authority attributes must be defined " "while importing from the catalog."
+            )
+        )
 
     obj = SRS(
-        display_name=srs['display_name'],
-        wkt=srs['wkt'],
+        display_name=srs["display_name"],
+        wkt=srs["wkt"],
         auth_name=auth_name,
         auth_srid=auth_srid,
-        catalog_id=srs['id'])
+        catalog_id=srs["id"],
+    )
 
     conflict_filter = [
-        SRS.catalog_id == srs['id'],
+        SRS.catalog_id == srs["id"],
         sql.and_(
             SRS.auth_name == auth_name,
             SRS.auth_srid == auth_srid,
         ),
     ]
 
-    if postgis_srid := srs['postgis_srid']:
+    if postgis_srid := srs["postgis_srid"]:
         obj.id = postgis_srid
         conflict_filter.append(SRS.id == postgis_srid)
 
     conflict = SRS.filter(sql.or_(*conflict_filter)).first()
     if conflict:
-        raise ValidationError(message=_(
-            "SRS #{} already exists."
-        ).format(conflict.id))
+        raise ValidationError(message=_("SRS #{} already exists.").format(conflict.id))
 
     obj.persist()
     DBSession.flush()
@@ -271,25 +273,24 @@ def catalog_import(request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        "spatial_ref_sys.collection",
-        "/api/component/spatial_ref_sys/",
-        get=cget,
-        post=cpost)
+        "spatial_ref_sys.collection", "/api/component/spatial_ref_sys/", get=cget, post=cpost
+    )
 
     config.add_route(
-        "spatial_ref_sys.convert",
-        "/api/component/spatial_ref_sys/convert",
-        post=srs_convert)
+        "spatial_ref_sys.convert", "/api/component/spatial_ref_sys/convert", post=srs_convert
+    )
 
     config.add_route(
         "spatial_ref_sys.geom_transform.batch",
         "/api/component/spatial_ref_sys/geom_transform",
-        post=geom_transform_batch)
+        post=geom_transform_batch,
+    )
 
     config.add_route(
         "spatial_ref_sys.geom_transform",
         "/api/component/spatial_ref_sys/{id:uint}/geom_transform",
-        post=geom_transform)
+        post=geom_transform,
+    )
 
     config.add_route(
         "spatial_ref_sys.geom_length",
@@ -308,18 +309,21 @@ def setup_pyramid(comp, config):
         "/api/component/spatial_ref_sys/{id:uint}",
         get=iget,
         put=iput,
-        delete=idelete)
+        delete=idelete,
+    )
 
-    if comp.options['catalog.enabled']:
+    if comp.options["catalog.enabled"]:
         config.add_route(
             "spatial_ref_sys.catalog.collection",
             "/api/component/spatial_ref_sys/catalog/",
-            get=catalog_collection)
+            get=catalog_collection,
+        )
 
         config.add_route(
             "spatial_ref_sys.catalog.item",
             "/api/component/spatial_ref_sys/catalog/{id:uint}",
-            get=catalog_item)
+            get=catalog_item,
+        )
 
         config.add_route(
             "spatial_ref_sys.catalog.import",

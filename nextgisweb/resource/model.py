@@ -21,19 +21,18 @@ from .serialize import SerializedRelationship as SR
 from .serialize import SerializedResourceRelationship as SRR
 from .serialize import Serializer
 
-Base.depends_on('auth')
+Base.depends_on("auth")
 
 resource_registry = DictRegistry()
 
-PermissionSets = namedtuple('PermissionSets', ('allow', 'deny', 'mask'))
+PermissionSets = namedtuple("PermissionSets", ("allow", "deny", "mask"))
 
 
 class ResourceMeta(db.DeclarativeMeta):
-
     def __new__(cls, name, bases, nspc):
-        identity = nspc['identity']
+        identity = nspc["identity"]
 
-        if bases == (Base, ):
+        if bases == (Base,):
             # Resource class itself
             bres = None
         else:
@@ -41,15 +40,15 @@ class ResourceMeta(db.DeclarativeMeta):
             bres = next((c for c in bases if issubclass(c, Resource)), None)
             assert bres is not None, "Missing resource base class"
 
-        nspc.setdefault('__tablename__', identity)
+        nspc.setdefault("__tablename__", identity)
 
-        if (id_column := nspc.get('id')) is None:
-            id_column = nspc['id'] = bres.id_column()
+        if (id_column := nspc.get("id")) is None:
+            id_column = nspc["id"] = bres.id_column()
 
-        margs = nspc['__mapper_args__'] = nspc.get('__mapper_args__', {})
-        margs.setdefault('polymorphic_identity', identity)
-        if 'inherit_condition' not in margs and bres:
-            margs['inherit_condition'] = (id_column == bres.id)
+        margs = nspc["__mapper_args__"] = nspc.get("__mapper_args__", {})
+        margs.setdefault("polymorphic_identity", identity)
+        if "inherit_condition" not in margs and bres:
+            margs["inherit_condition"] = id_column == bres.id
 
         return super().__new__(cls, name, bases, nspc)
 
@@ -57,16 +56,16 @@ class ResourceMeta(db.DeclarativeMeta):
         scope = dict()
 
         for base in cls.__mro__:
-            bscope = base.__dict__.get('__scope__', None)
+            bscope = base.__dict__.get("__scope__", None)
             if bscope is None:
                 continue
-            if not hasattr(bscope, '__iter__'):
-                bscope = tuple((bscope, ))
+            if not hasattr(bscope, "__iter__"):
+                bscope = tuple((bscope,))
 
             for s in bscope:
                 scope[s.identity] = s
 
-        setattr(cls, 'scope', MappingProxyType(scope))
+        setattr(cls, "scope", MappingProxyType(scope))
         super().__init__(name, bases, nspc)
 
         resource_registry.register(cls)
@@ -75,7 +74,7 @@ class ResourceMeta(db.DeclarativeMeta):
 class Resource(Base, metaclass=ResourceMeta):
     registry = resource_registry
 
-    identity = 'resource'
+    identity = "resource"
     cls_display_name = _("Resource")
     primary_display_name = None
 
@@ -88,8 +87,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     keyname = db.Column(db.Unicode, unique=True)
     display_name = db.Column(db.Unicode, nullable=False)
-    creation_date = db.Column(db.TIMESTAMP, nullable=False,
-                              default=datetime.utcnow)
+    creation_date = db.Column(db.TIMESTAMP, nullable=False, default=datetime.utcnow)
 
     owner_user_id = db.Column(db.ForeignKey(User.id), nullable=False)
 
@@ -97,15 +95,15 @@ class Resource(Base, metaclass=ResourceMeta):
 
     __mapper_args__ = dict(polymorphic_on=cls)
     __table_args__ = (
-        db.CheckConstraint('parent_id IS NOT NULL OR id = 0'),
+        db.CheckConstraint("parent_id IS NOT NULL OR id = 0"),
         db.UniqueConstraint(parent_id, display_name),
     )
 
     parent = db.relationship(
-        'Resource', remote_side=[id],
-        backref=db.backref(
-            'children', cascade=None,
-            order_by=display_name))
+        "Resource",
+        remote_side=[id],
+        backref=db.backref("children", cascade=None, order_by=display_name),
+    )
 
     owner_user = db.relationship(User)
 
@@ -116,21 +114,23 @@ class Resource(Base, metaclass=ResourceMeta):
     def id_column(cls):
         """Constructs new 'id' column with a foreign key to cls.id"""
 
-        col = db.Column('id', db.ForeignKey(cls.id), primary_key=True)
+        col = db.Column("id", db.ForeignKey(cls.id), primary_key=True)
         col._creation_order = cls.id._creation_order
         return col
 
     @classmethod
     def check_parent(cls, parent):
-        """ Can this resource be child for parent? """
+        """Can this resource be child for parent?"""
         return False
 
     @classmethod
     def implemented_interfaces(cls):
         """List resource interfaces implemented by class"""
-        return [i for i in interface_registry if (
-            i.implementedBy(cls) or IResourceAdapter((i, cls), None)
-        )]
+        return [
+            i
+            for i in interface_registry
+            if (i.implementedBy(cls) or IResourceAdapter((i, cls), None))
+        ]
 
     def lookup_interface(self, iface):
         """Get resource interface implementation"""
@@ -150,7 +150,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     @property
     def parents(self):
-        """ List of all parents from root to current parent """
+        """List of all parents from root to current parent"""
         result = []
         current = self
         while current.parent:
@@ -163,7 +163,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     @classmethod
     def class_permissions(cls):
-        """ Permissions applicable to this resource class """
+        """Permissions applicable to this resource class"""
 
         result = set()
         for scope in cls.scope.values():
@@ -185,34 +185,33 @@ class Resource(Base, metaclass=ResourceMeta):
         class_permissions = self.class_permissions()
 
         if user.superuser:
-            return PermissionSets(
-                allow=set(class_permissions),
-                deny=set(), mask=set())
+            return PermissionSets(allow=set(class_permissions), deny=set(), mask=set())
 
         allow = set()
         deny = set()
         mask = set()
 
-        for res in tuple(self.parents) + (self, ):
-            rules = filter(lambda rule: (
-                (rule.propagate or res == self)
-                and rule.cmp_identity(self.identity)
-                and rule.cmp_user(user)),
-                res.acl)
+        for res in tuple(self.parents) + (self,):
+            rules = filter(
+                lambda rule: (
+                    (rule.propagate or res == self)
+                    and rule.cmp_identity(self.identity)
+                    and rule.cmp_user(user)
+                ),
+                res.acl,
+            )
 
             for rule in rules:
                 for perm in class_permissions:
                     if rule.cmp_permission(perm):
-                        if rule.action == 'allow':
+                        if rule.action == "allow":
                             allow.add(perm)
-                        elif rule.action == 'deny':
+                        elif rule.action == "deny":
                             deny.add(perm)
 
         for req in self.class_requirements():
             if req.attr is None:
-                has_req = req.src in allow \
-                    and req.src not in deny \
-                    and req.src not in mask
+                has_req = req.src in allow and req.src not in deny and req.src not in mask
             else:
                 attrval = getattr(self, req.attr)
 
@@ -235,14 +234,14 @@ class Resource(Base, metaclass=ResourceMeta):
 
     def has_export_permission(self, user):
         try:
-            value = env.core.settings_get('resource', 'resource_export')
+            value = env.core.settings_get("resource", "resource_export")
         except KeyError:
-            value = 'data_read'
+            value = "data_read"
 
-        if value == 'administrators':
+        if value == "administrators":
             return user.is_administrator
 
-        if value == 'data_write':
+        if value == "data_write":
             permission = DataScope.write
         else:
             permission = DataScope.read
@@ -251,9 +250,9 @@ class Resource(Base, metaclass=ResourceMeta):
 
     # Data validation
 
-    @db.validates('parent')
+    @db.validates("parent")
     def _validate_parent(self, key, value):
-        """ Test for closed loops in hierarchy """
+        """Test for closed loops in hierarchy"""
 
         with DBSession.no_autoflush:
             if value is not None:
@@ -262,23 +261,23 @@ class Resource(Base, metaclass=ResourceMeta):
 
         return value
 
-    @db.validates('keyname')
+    @db.validates("keyname")
     def _validate_keyname(self, key, value):
-        """ Test for key uniqueness """
+        """Test for key uniqueness"""
 
         with DBSession.no_autoflush:
-            if value is not None and Resource.filter(
-                Resource.keyname == value,
-                Resource.id != self.id
-            ).first():
+            if (
+                value is not None
+                and Resource.filter(Resource.keyname == value, Resource.id != self.id).first()
+            ):
                 raise ValidationError(_("Resource keyname is not unique."))
 
         return value
 
-    @db.validates('owner_user')
+    @db.validates("owner_user")
     def _validate_owner_user(self, key, value):
         with DBSession.no_autoflush:
-            if value.system and value.keyname != 'guest':
+            if value.system and value.keyname != "guest":
                 raise ValidationError("System user cannot be a resource owner.")
 
         return value
@@ -287,7 +286,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     @classmethod
     def check_social_editable(cls):
-        """ Can this resource social settings be editable? """
+        """Can this resource social settings be editable?"""
         return False
 
     # Suggest display name
@@ -300,7 +299,7 @@ class Resource(Base, metaclass=ResourceMeta):
             return q
 
         def _candidates():
-            if self.identity.endswith('_style'):
+            if self.identity.endswith("_style"):
                 q = _query(func.count(Resource.id))
                 if q.scalar() == 0:
                     yield tr(_("Default style"))
@@ -308,7 +307,7 @@ class Resource(Base, metaclass=ResourceMeta):
             yield tr(self.cls_display_name)
 
             q = _query(func.count(Resource.id)).filter(Resource.cls == self.cls)
-            yield tr(self.cls_display_name) + ' ' + str(q.scalar() + 1)
+            yield tr(self.cls_display_name) + " " + str(q.scalar() + 1)
 
         for c in _candidates():
             q = _query(Resource.id).filter(Resource.display_name == c)
@@ -316,9 +315,10 @@ class Resource(Base, metaclass=ResourceMeta):
                 return c
 
 
-@event.listens_for(Resource, 'after_delete', propagate=True)
+@event.listens_for(Resource, "after_delete", propagate=True)
 def resource_after_delete(mapper, connection, target):
-    connection.execute(text('''
+    # fmt: off
+    connection.execute(text("""
         INSERT INTO core_storage_stat_delta (
             tstamp, component, kind_of_data,
             resource_id, value_data_volume
@@ -335,16 +335,18 @@ def resource_after_delete(mapper, connection, target):
         ) t
         WHERE resource_id = :resource_id
         GROUP BY component, kind_of_data
-    '''), dict(timestamp=datetime.utcnow(), resource_id=target.id))
+    """), dict(timestamp=datetime.utcnow(), resource_id=target.id))
+    # fmt: on
 
 
 ResourceScope.read.require(
     ResourceScope.read,
-    attr='parent', attr_empty=True)
+    attr="parent",
+    attr_empty=True,
+)
 
 
 class _parent_attr(SRR):
-
     def writeperm(self, srlzr):
         return True
 
@@ -360,68 +362,68 @@ class _parent_attr(SRR):
 
         for parent in (old_parent, srlzr.obj.parent):
             if parent is not None and not parent.has_permission(
-                    ResourceScope.manage_children, srlzr.user):
+                ResourceScope.manage_children, srlzr.user
+            ):
                 raise ForbiddenError(
                     _("You are not allowed to manage children of resource with id = %d.")
-                    % parent.id)
+                    % parent.id
+                )
 
         if not srlzr.obj.check_parent(srlzr.obj.parent):
             raise HierarchyError(
-                _("Resource can not be a child of resource id = %d.")
-                % srlzr.obj.parent.id)
+                _("Resource can not be a child of resource id = %d.") % srlzr.obj.parent.id
+            )
 
 
 class _owner_user_attr(SR):
-
     def setter(self, srlzr, value):
         if not srlzr.user.is_administrator:
-            raise ForbiddenError(
-                "Membership in group 'administrators' required!")
+            raise ForbiddenError("Membership in group 'administrators' required!")
         return super().setter(srlzr, value)
 
 
 REQUIRED_PERMISSIONS_FOR_ADMINISTATORS = [
     ResourceScope.read,
     ResourceScope.update,
-    ResourceScope.change_permissions]
+    ResourceScope.change_permissions,
+]
 
 
 class _perms_attr(SP):
-
     def setter(self, srlzr, value):
         for r in list(srlzr.obj.acl):
             srlzr.obj.acl.remove(r)
 
         for itm in value:
             rule = ResourceACLRule(
-                identity=itm['identity'],
-                scope=itm['scope'],
-                permission=itm['permission'],
-                propagate=itm['propagate'],
-                action=itm['action'])
+                identity=itm["identity"],
+                scope=itm["scope"],
+                permission=itm["permission"],
+                propagate=itm["propagate"],
+                action=itm["action"],
+            )
 
-            rule.principal = Principal.filter_by(
-                id=itm['principal']['id']).one()
+            rule.principal = Principal.filter_by(id=itm["principal"]["id"]).one()
 
             srlzr.obj.acl.append(rule)
 
         if srlzr.obj.id == 0:
             for user in User.filter(
-                User.disabled.is_(False),
-                User.member_of.any(keyname='administrators')
+                User.disabled.is_(False), User.member_of.any(keyname="administrators")
             ):
                 perms = srlzr.obj.permissions(user)
                 if not perms.issuperset(REQUIRED_PERMISSIONS_FOR_ADMINISTATORS):
                     for p in REQUIRED_PERMISSIONS_FOR_ADMINISTATORS:
                         if p in perms:
                             continue
-                        raise ValidationError(message=_(
-                            "Unable to revoke '{s}: {p}' permission for '{u}' "
-                            "as the user belongs to the administrators group. "
-                            "Administrators must always have ability to "
-                            "configure permissions of the main resource group."
-
-                        ).format(s=p.scope.label, p=p.label, u=user.display_name))
+                        raise ValidationError(
+                            message=_(
+                                "Unable to revoke '{s}: {p}' permission for '{u}' "
+                                "as the user belongs to the administrators group. "
+                                "Administrators must always have ability to "
+                                "configure permissions of the main resource group."
+                            ).format(s=p.scope.label, p=p.label, u=user.display_name)
+                        )
                     else:
                         assert False
 
@@ -429,20 +431,21 @@ class _perms_attr(SP):
         result = []
 
         for o in srlzr.obj.acl:
-            result.append({
-                'action': o.action,
-                'principal': dict(id=o.principal_id),
-                'identity': o.identity,
-                'scope': o.scope,
-                'permission': o.permission,
-                'propagate': o.propagate,
-            })
+            result.append(
+                {
+                    "action": o.action,
+                    "principal": dict(id=o.principal_id),
+                    "identity": o.identity,
+                    "scope": o.scope,
+                    "permission": o.permission,
+                    "propagate": o.propagate,
+                }
+            )
 
         return result
 
 
 class _description_attr(SP):
-
     def setter(self, srlzr, value):
         if value is not None:
             value = sanitize(value)
@@ -499,8 +502,8 @@ class ResourceSerializer(Serializer):
 
     def deserialize(self, *args, **kwargs):
         # As the test for uniqueness within group is dependent on two attributes
-        # (parent, display_name), it is possible to correctly check its completion
-        # after serialization of both attributes.
+        # (parent, display_name), it is possible to correctly check its
+        # completion after serialization of both attributes.
 
         # Save old values to track changes
         parent, display_name = self.obj.parent, self.obj.display_name
@@ -511,9 +514,10 @@ class ResourceSerializer(Serializer):
             with DBSession.no_autoflush:
                 conflict = Resource.filter(
                     Resource.parent_id == self.obj.parent.id
-                    if self.obj.parent is not None else None,
+                    if self.obj.parent is not None
+                    else None,
                     Resource.display_name == self.obj.display_name,
-                    Resource.id != self.obj.id
+                    Resource.id != self.obj.id,
                 ).first()
 
             if conflict is not None:
@@ -529,15 +533,15 @@ class ResourceACLRule(Base):
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
     principal_id = db.Column(db.ForeignKey(Principal.id), primary_key=True)
 
-    identity = db.Column(db.Unicode, primary_key=True, default='')
+    identity = db.Column(db.Unicode, primary_key=True, default="")
     identity.__doc__ = """
         Тип ресурса для которого действует это правило. Пустая строка
         означает, что оно действует для всех типов ресурсов."""
 
     # Permission for which this rule is applicable. Empty line means
     # full set of permissions for all types of resources.
-    scope = db.Column(db.Unicode, primary_key=True, default='')
-    permission = db.Column(db.Unicode, primary_key=True, default='')
+    scope = db.Column(db.Unicode, primary_key=True, default="")
+    permission = db.Column(db.Unicode, primary_key=True, default="")
 
     propagate = db.Column(db.Boolean, primary_key=True, default=True)
     propagate.__doc__ = """
@@ -549,27 +553,28 @@ class ResourceACLRule(Base):
         Действие над правом: allow (разрешение) или deny (запрет). При этом
         правила запрета имеют приоритет над разрешениями."""
 
-    resource = db.relationship(
-        Resource, backref=db.backref(
-            'acl', cascade='all, delete-orphan'))
+    resource = db.relationship(Resource, backref=db.backref("acl", cascade="all, delete-orphan"))
 
     principal = db.relationship(Principal)
 
     def cmp_user(self, user):
         principal = self.principal
-        return (isinstance(principal, User) and principal.compare(user)) \
-            or (isinstance(principal, Group) and principal.is_member(user))
+        return (isinstance(principal, User) and principal.compare(user)) or (
+            isinstance(principal, Group) and principal.is_member(user)
+        )
 
     def cmp_identity(self, identity):
-        return (self.identity == '') or (self.identity == identity)
+        return (self.identity == "") or (self.identity == identity)
 
     def cmp_permission(self, permission):
         pname = permission.name
         pscope = permission.scope.identity
 
-        return ((self.scope == '' and self.permission == '')
-                or (self.scope == pscope and self.permission == '')
-                or (self.scope == pscope and self.permission == pname))
+        return (
+            (self.scope == "" and self.permission == "")
+            or (self.scope == pscope and self.permission == "")
+            or (self.scope == pscope and self.permission == pname)
+        )
 
 
 @Principal.on_find_references.handler
@@ -579,17 +584,27 @@ def _on_find_references(event):
 
     for acl in ResourceACLRule.filter_by(principal_id=principal.id).all():
         resource = acl.resource
-        data.append(OnFindReferencesData(
-            cls=resource.cls, id=resource.id, autoremove=False))
+        data.append(
+            OnFindReferencesData(
+                cls=resource.cls,
+                id=resource.id,
+                autoremove=False,
+            )
+        )
 
     if isinstance(principal, User):
         for resource in Resource.filter_by(owner_user_id=principal.id).all():
-            data.append(OnFindReferencesData(
-                cls=resource.cls, id=resource.id, autoremove=False))
+            data.append(
+                OnFindReferencesData(
+                    cls=resource.cls,
+                    id=resource.id,
+                    autoremove=False,
+                )
+            )
 
 
 class ResourceGroup(Resource):
-    identity = 'resource_group'
+    identity = "resource_group"
     cls_display_name = _("Resource group")
 
     @classmethod

@@ -8,7 +8,6 @@ from .model import SLD
 
 
 class SLDComponent(Component):
-
     def cleanup(self, *, dry_run):
         logger.info("Cleaning up styled layer descriptors...")
 

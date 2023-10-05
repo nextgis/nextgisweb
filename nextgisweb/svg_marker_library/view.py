@@ -9,8 +9,8 @@ from .model import SVGMarkerLibrary
 
 class Widget(Widget):
     resource = SVGMarkerLibrary
-    operation = ('create', 'update')
-    amdmod = '@nextgisweb/svg-marker-library/resource-widget'
+    operation = ("create", "update")
+    amdmod = "@nextgisweb/svg-marker-library/resource-widget"
 
 
 class SVGMarkerLibraryMenu(DynItem):
@@ -19,8 +19,9 @@ class SVGMarkerLibraryMenu(DynItem):
 
         if isinstance(args.obj, SVGMarkerLibrary):
             yield Link(
-                'svg_marker_library/export', _('Export'),
-                lambda args: args.request.route_url('resource.export', id=args.obj.id),
+                "svg_marker_library/export",
+                _("Export"),
+                lambda args: args.request.route_url("resource.export", id=args.obj.id),
             )
 
 

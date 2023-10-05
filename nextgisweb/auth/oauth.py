@@ -577,7 +577,7 @@ def _password_token_hash_cache(username, password, salt):
 class OAuthInvalidResponse(Exception):
     def __init__(self, message, response):
         ct = response.headers.get("content-type", "unknown")
-        super().__init__(f"{message} (status: {response.status_code}; content-type: \"{ct}\")")
+        super().__init__(f'{message} (status: {response.status_code}; content-type: "{ct}")')
 
 
 class OAuthErrorResponse(Exception):

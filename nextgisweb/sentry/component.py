@@ -10,10 +10,9 @@ from nextgisweb.core.model import Setting
 
 
 class SentryComponent(Component):
-
     def initialize(self):
         super().initialize()
-        self.enabled = 'dsn' in self.options
+        self.enabled = "dsn" in self.options
         if self.enabled:
             self.initialize_sentry_sdk()
 
@@ -27,20 +26,20 @@ class SentryComponent(Component):
         sentry_sdk.utils.MAX_STRING_LENGTH = 8192
 
         sentry_sdk.init(
-            self.options['dsn'],
+            self.options["dsn"],
             integrations=[
                 PyramidIntegration(),
                 SqlalchemyIntegration(),
             ],
             ignore_errors=[KeyboardInterrupt],
-            environment=self.options['environment'],
-            shutdown_timeout=self.options['shutdown_timeout'],
+            environment=self.options["environment"],
+            shutdown_timeout=self.options["shutdown_timeout"],
         )
 
         ts = Setting.__table__
-        qs = ts.select().where(sqlalchemy.and_(
-            ts.c.component == 'core',
-            ts.c.name == 'instance_id'))
+        qs = ts.select().where(
+            sqlalchemy.and_(ts.c.component == "core", ts.c.name == "instance_id")
+        )
 
         event_user = None
 
@@ -48,12 +47,12 @@ class SentryComponent(Component):
             nonlocal event_user
             if event_user is None:
                 try:
-                    row = self.env.core.DBSession.connection() \
-                        .execute(qs).fetchone()
+                    row = self.env.core.DBSession.connection().execute(qs).fetchone()
                 except sqlalchemy.exc.ProgrammingError:
                     logger.debug(
                         "Failed to get instance_id, the database may not "
-                        "have been initialized yet")
+                        "have been initialized yet"
+                    )
                 except Exception:
                     logger.error("Got an exception while getting instance_id")
                 else:
@@ -64,15 +63,17 @@ class SentryComponent(Component):
                         logger.debug("Missing instance_id")
 
             if event_user is not None:
-                event['user'] = event_user
+                event["user"] = event_user
 
             return event
 
         with sentry_sdk.configure_scope() as scope:
             scope.add_event_processor(add_instance_id)
 
+    # fmt: off
     option_annotations = (
-        Option('dsn'),
-        Option('environment', default=None),
-        Option('shutdown_timeout', int, default=30)
+        Option("dsn"),
+        Option("environment", default=None),
+        Option("shutdown_timeout", int, default=30),
     )
+    # fmt: on

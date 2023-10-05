@@ -6,9 +6,9 @@ P = Permission
 
 
 class ResourceScope(Scope):
-    """ Base set of resource permissions """
+    """Base set of resource permissions"""
 
-    identity = 'resource'
+    identity = "resource"
     label = _("Resource")
 
     read = P(pgettext("permission", "Read"))
@@ -20,13 +20,13 @@ class ResourceScope(Scope):
 
 
 class MetadataScope(Scope):
-    """ Set of permissions for resource metadata. Typical example of resource metadata -
+    """Set of permissions for resource metadata. Typical example of resource metadata -
     is its description in free form. This description doesn't affect anything
     it's change doesn't change data structure or anything else.
     As every resource has description this set of permissions is
-    included for all resources at Resource class level. """
+    included for all resources at Resource class level."""
 
-    identity = 'metadata'
+    identity = "metadata"
     label = _("Metadata")
 
     read = P(pgettext("permission", "Read")).require(ResourceScope.read)
@@ -34,11 +34,11 @@ class MetadataScope(Scope):
 
 
 class DataStructureScope(Scope):
-    """ Set of permissions for data structure, for example fields structure
+    """Set of permissions for data structure, for example fields structure
     of vector layer, its change might lead to change
-    in data itself. """
+    in data itself."""
 
-    identity = 'datastruct'
+    identity = "datastruct"
     label = _("Data structure")
 
     read = P(pgettext("permission", "Read")).require(ResourceScope.read)
@@ -46,9 +46,9 @@ class DataStructureScope(Scope):
 
 
 class DataScope(Scope):
-    """ Set of permissions for data access """
+    """Set of permissions for data access"""
 
-    identity = 'data'
+    identity = "data"
     label = _("Data")
 
     read = P(pgettext("permission", "Read")).require(ResourceScope.read)
@@ -56,12 +56,12 @@ class DataScope(Scope):
 
 
 class ConnectionScope(Scope):
-    """ Set of permissions for external connection parameters. In some cases
+    """Set of permissions for external connection parameters. In some cases
     we need to store access parameters to external resources. These
     parameters may be sensitive, logins and passwords
-    to access remote DB for example. """
+    to access remote DB for example."""
 
-    identity = 'connection'
+    identity = "connection"
     label = _("Connection")
 
     read = P(pgettext("permission", "Read")).require(ResourceScope.read)
@@ -70,13 +70,13 @@ class ConnectionScope(Scope):
 
 
 class ServiceScope(Scope):
-    """ Set of permissions for services such as WMS or WFS. This is
+    """Set of permissions for services such as WMS or WFS. This is
     needed to separate permissions for service parameters and its actual usage.
     Though if service is using other resources inside, we need to
-    their permissions separately. """
+    their permissions separately."""
 
-    identity = 'service'
-    label = _('Service')
+    identity = "service"
+    label = _("Service")
 
     connect = P(pgettext("permission", "Access")).require(ResourceScope.read)
     configure = P(pgettext("permission", "Configure")).require(connect)
