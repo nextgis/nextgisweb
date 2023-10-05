@@ -1,8 +1,7 @@
 Backup and restore
 ==================
 
-As mentioned above NextGIS Web uses two data storages for different types of
-data:
+NextGIS Web uses two data storages for different types of data:
 
 - PostgreSQL database used as general purpose relational database.
 - Filesystem storage used for storing BLOBs like raster, attachments, etc.
