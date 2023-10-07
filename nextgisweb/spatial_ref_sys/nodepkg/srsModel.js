@@ -6,4 +6,4 @@ export const modelObj = {
     browse: "srs.browse",
     edit: "srs.edit",
     create: "srs.create",
-}
+};

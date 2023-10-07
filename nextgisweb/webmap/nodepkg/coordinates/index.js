@@ -1,4 +1,4 @@
 /** @entrypoint */
-import {parse} from './parser.js';
+import { parse } from "./parser";
 
 export default parse;

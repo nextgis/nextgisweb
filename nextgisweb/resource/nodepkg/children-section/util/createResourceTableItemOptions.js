@@ -1,21 +1,21 @@
 import { routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-const editMsg = i18n.gettext('Change');
-const deleteMsg = i18n.gettext('Delete');
+const msgChange = gettext("Change");
+const msgDelete = gettext("Delete");
 
 export function createResourceTableItemOptions(resource) {
     return {
         actions: [
             {
                 href: routeURL("resource.update", resource.id),
-                title: editMsg,
+                title: msgChange,
                 icon: "material-edit",
                 key: ["operation", "10-update"],
             },
             {
                 href: "",
-                title: deleteMsg,
+                title: msgDelete,
                 icon: "material-delete_forever",
                 key: ["operation", "20-delete"],
             },
@@ -23,6 +23,6 @@ export function createResourceTableItemOptions(resource) {
         cls: "resource_group",
         displayName: resource.display_name,
         id: resource.id,
-        link: routeURL("resource.show", resource.id)
+        link: routeURL("resource.show", resource.id),
     };
 }

@@ -1,10 +1,10 @@
-import type { ReactNode, ComponentType } from "react";
-
-import type { EditorStore, EditorStoreConstructorOptions } from "./EditorStore";
+import type { ComponentType, ReactNode } from "react";
 import type { EditorWidgetProps } from "../feature-editor/type";
-export * from "./FeatureLayer";
+import type { EditorStore, EditorStoreConstructorOptions } from "./EditorStore";
+
 export * from "./FeatureItem";
-export * from "./GeometryType"
+export * from "./FeatureLayer";
+export * from "./GeometryType";
 
 export { EditorStore, EditorStoreConstructorOptions };
 

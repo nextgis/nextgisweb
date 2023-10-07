@@ -8,7 +8,7 @@ type Props = ParamsOf<typeof Base>;
 const computed = window.getComputedStyle(document.body);
 const cvar = (name: string): string => computed.getPropertyValue("--" + name);
 
-type Theme = NonNullable<Props["theme"]>
+type Theme = NonNullable<Props["theme"]>;
 
 const token: Theme["token"] = {
     borderRadius: 4,

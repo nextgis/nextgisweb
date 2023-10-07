@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
-import { Form, Space, InputNumber } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { useEffect, useState } from "react";
 
-const unit = i18n.gettext("deg.");
+import { Form, InputNumber, Space } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
+const unit = gettext("deg.");
 const parts = [
-    { key: "minx", label: i18n.gettext("Left"), min: -180, max: 180 },
-    { key: "miny", label: i18n.gettext("Bottom"), min: -90, max: 90 },
-    { key: "maxx", label: i18n.gettext("Right"), min: -180, max: 180 },
-    { key: "maxy", label: i18n.gettext("Top"), min: -90, max: 90 },
+    { key: "minx", label: gettext("Left"), min: -180, max: 180 },
+    { key: "miny", label: gettext("Bottom"), min: -90, max: 90 },
+    { key: "maxx", label: gettext("Right"), min: -180, max: 180 },
+    { key: "maxy", label: gettext("Top"), min: -90, max: 90 },
 ];
 
-type Extent = (null | number)[]
+type Extent = (null | number)[];
 
 interface ExtentInputProps {
     value?: Extent;

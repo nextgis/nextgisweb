@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { route } from "@nextgisweb/pyramid/api";
-import { errorModal } from "@nextgisweb/gui/error";
+
 import { message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { errorModal } from "@nextgisweb/gui/error";
+import { route } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import { SettingsForm } from "./SettingsForm";
 
 const ROUTE_WEBMAP_SETTINGS = route("webmap.settings");
@@ -53,7 +55,7 @@ export function Settings() {
         try {
             await saveSettings(values);
             setStatus("loaded");
-            message.success(i18n.gettext("Settings saved"))
+            message.success(gettext("Settings saved"));
         } catch (err) {
             errorModal(err);
         }

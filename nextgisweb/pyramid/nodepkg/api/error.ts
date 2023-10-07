@@ -25,7 +25,6 @@ export class NetworksResponseError extends BaseAPIError {
 }
 
 export class InvalidResponseError extends BaseAPIError {
-
     constructor(message?: string) {
         super(message || gettext("Something went wrong."));
         this.title = gettext("Unexpected server response");

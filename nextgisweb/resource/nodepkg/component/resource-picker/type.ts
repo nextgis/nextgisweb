@@ -25,12 +25,16 @@ export interface ResourcePickerBreadcrumbProps {
     maxBreadcrumbItems?: number;
 }
 
-export interface ResourcePickerChildrenProps<V extends SelectValue = SelectValue> {
+export interface ResourcePickerChildrenProps<
+    V extends SelectValue = SelectValue,
+> {
     resourceStore: ResourcePickerStore;
     onOk?: (val: V) => void;
 }
 
-export interface ResourcePickerFooterProps<V extends SelectValue = SelectValue> {
+export interface ResourcePickerFooterProps<
+    V extends SelectValue = SelectValue,
+> {
     resourceStore: ResourcePickerStore;
     onOk?: (val: V) => void;
 }
@@ -75,7 +79,8 @@ export interface UsePickerModalProps {
     cardFooterHeight?: number;
 }
 
-export interface ResourcePickerModalProps<V extends SelectValue = SelectValue> extends UsePickerModalProps {
+export interface ResourcePickerModalProps<V extends SelectValue = SelectValue>
+    extends UsePickerModalProps {
     open?: boolean;
     /**@deprecated use open instead */
     visible?: boolean;

@@ -1,28 +1,31 @@
 import ReactDOMServer from "react-dom/server";
-import i18n from "@nextgisweb/pyramid/i18n";
 
-const m_to_km = 1E-3;
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
+const m_to_km = 1e-3;
 const m_to_ft = 1 / 0.3048;
 const ft_to_mi = 1 / 5280;
-const m2_to_ha = 1E-4;
+const m2_to_ha = 1e-4;
 const m2_to_ac = 1 / 4046.86;
 const ac_to_mi2 = 1 / 640;
 
-const SI_m = i18n.gettext("m");
-const SI_km = i18n.gettext("km");
-const SI_ft = i18n.gettext("ft");
-const SI_mi = i18n.gettext("mi");
-const SI_ha = i18n.gettext("ha");
-const SI_ac = i18n.gettext("ac");
+const SI_m = gettext("m");
+const SI_km = gettext("km");
+const SI_ft = gettext("ft");
+const SI_mi = gettext("mi");
+const SI_ha = gettext("ha");
+const SI_ac = gettext("ac");
 
 const defaultConfig = {
     format: "html-string",
-    locale: "en"
+    locale: "en",
 };
 
 export const roundValue = (num, places) => {
-    return Math.round((num + Number.EPSILON) * Math.pow(10, places)) /
-        Math.pow(10, places);
+    return (
+        Math.round((num + Number.EPSILON) * Math.pow(10, places)) /
+        Math.pow(10, places)
+    );
 };
 
 const formatPlacesValue = (value) => {
@@ -45,7 +48,11 @@ const formatLocaleNumber = (value, locale) => {
 };
 
 const makeDomResult = (value, postfix, format) => {
-    const domResult = <>{value} {postfix}</>;
+    const domResult = (
+        <>
+            {value} {postfix}
+        </>
+    );
     if (format === "html-string") {
         return ReactDOMServer.renderToStaticMarkup(domResult);
     } else if (format === "jsx") {
@@ -99,7 +106,7 @@ const metersLengthToUnit = (meters, unit) => {
 
     return {
         value: resultValue,
-        postfix
+        postfix,
     };
 };
 
@@ -110,15 +117,30 @@ const metersAreaToUnit = (meters, unit) => {
     switch (unit) {
         case "sq_km":
             resultValue = meters * m_to_km * m_to_km;
-            postfix = <>{SI_km}<sup>2</sup></>;
+            postfix = (
+                <>
+                    {SI_km}
+                    <sup>2</sup>
+                </>
+            );
             break;
         case "metric":
-            if (meters > 1E5) {
+            if (meters > 1e5) {
                 resultValue = meters * m_to_km * m_to_km;
-                postfix = <>{SI_km}<sup>2</sup></>;
+                postfix = (
+                    <>
+                        {SI_km}
+                        <sup>2</sup>
+                    </>
+                );
             } else {
                 resultValue = meters;
-                postfix = <>{SI_m}<sup>2</sup></>;
+                postfix = (
+                    <>
+                        {SI_m}
+                        <sup>2</sup>
+                    </>
+                );
             }
             break;
         case "ha":
@@ -131,13 +153,23 @@ const metersAreaToUnit = (meters, unit) => {
             break;
         case "sq_mi":
             resultValue = meters * m2_to_ac * ac_to_mi2;
-            postfix = <>{SI_mi}<sup>2</sup></>;
+            postfix = (
+                <>
+                    {SI_mi}
+                    <sup>2</sup>
+                </>
+            );
             break;
         case "imperial":
             resultValue = meters * m2_to_ac;
-            if (resultValue > (640 * 100)) {
+            if (resultValue > 640 * 100) {
                 resultValue = resultValue * ac_to_mi2;
-                postfix = <>{SI_mi}<sup>2</sup></>;
+                postfix = (
+                    <>
+                        {SI_mi}
+                        <sup>2</sup>
+                    </>
+                );
             } else {
                 resultValue = meters;
                 postfix = SI_ac;
@@ -145,17 +177,27 @@ const metersAreaToUnit = (meters, unit) => {
             break;
         case "sq_ft":
             resultValue = meters * m_to_ft * m_to_ft;
-            postfix = <>{SI_ft}<sup>2</sup></>;
+            postfix = (
+                <>
+                    {SI_ft}
+                    <sup>2</sup>
+                </>
+            );
             break;
         case "sq_m":
         default:
             resultValue = meters;
-            postfix = <>{SI_m}<sup>2</sup></>;
+            postfix = (
+                <>
+                    {SI_m}
+                    <sup>2</sup>
+                </>
+            );
     }
 
     return {
         value: resultValue,
-        postfix
+        postfix,
     };
 };
 
@@ -176,7 +218,10 @@ export const formatCoordinatesValue = (value, locale) => {
  */
 export const getDecPlacesRoundCoordByProj = (proj) => {
     const extent = proj.getExtent();
-    const max = Math.max.apply(null, extent.map(e => Math.abs(e)));
+    const max = Math.max.apply(
+        null,
+        extent.map((e) => Math.abs(e))
+    );
     return max < 1000 ? 2 : 0;
 };
 
@@ -187,7 +232,7 @@ export const getDecPlacesRoundCoordByProj = (proj) => {
  */
 export const roundCoords = (coords, places) => {
     if (coords instanceof Array) {
-        return coords.map(c => roundValue(c, places));
+        return coords.map((c) => roundValue(c, places));
     }
     return roundValue(coords, places);
 };
@@ -203,7 +248,7 @@ export const roundCoords = (coords, places) => {
 export const formatMetersLength = (meters, unit, config) => {
     let _config = config || defaultConfig;
 
-    let {value, postfix} = metersLengthToUnit(meters, unit);
+    let { value, postfix } = metersLengthToUnit(meters, unit);
     value = formatPlacesValue(value);
     value = formatLocaleNumber(value, _config.locale);
     return makeDomResult(value, postfix, _config.format);
@@ -220,7 +265,7 @@ export const formatMetersLength = (meters, unit, config) => {
 export const formatMetersArea = (meters, unit, config) => {
     let _config = config || defaultConfig;
 
-    let {value, postfix} = metersAreaToUnit(meters, unit);
+    let { value, postfix } = metersAreaToUnit(meters, unit);
     value = formatPlacesValue(value);
     value = formatLocaleNumber(value, _config.locale);
     return makeDomResult(value, postfix, _config.format);

@@ -1,4 +1,2 @@
-import { Code } from "./Code";
-import { useCodeMirror } from './hook/useCodeMirror';
-
-export { Code, useCodeMirror };
+export { Code } from "./Code";
+export { useCodeMirror } from "./hook/useCodeMirror";

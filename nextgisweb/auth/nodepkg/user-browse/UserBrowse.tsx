@@ -22,15 +22,18 @@ const msgDisabled = gettext("Disabled");
 const msgEnabled = gettext("Enabled");
 const msgFullName = gettext("Full name");
 const msgLogin = gettext("Login");
-// eslint-disable-next-line prettier/prettier
-const msgPasswordTooltip = gettext("Users with a password can sign in with login and password.");
 const msgPassword = gettext("Password");
 const msgYes = gettext("Yes");
 const msgNo = gettext("No");
-// eslint-disable-next-line prettier/prettier
-const msgOauthTooltip = gettext("Users bound to {dn} can sign in with {dn}.").replaceAll("{dn}", oauth.name);
 const msgLastActivity = gettext("Last activity");
 const msgStatus = gettext("Status");
+
+// prettier-ignore
+const [msgPasswordTooltip, msgOAuthTooltip] = [
+    gettext("Users with a password can sign in with login and password."),
+    gettext("Users bound to {dn} can sign in with {dn}.").replaceAll("{dn}", oauth.name),
+];
+
 const messages = {
     deleteConfirm: gettext("Delete user?"),
     deleteSuccess: gettext("User deleted"),
@@ -68,7 +71,7 @@ const createOauthColumns = (): Col[] => [
         sorter: (a, b) => (a.password > b.password ? 1 : -1),
     },
     {
-        title: <Tooltip title={msgOauthTooltip}>{oauth.name}</Tooltip>,
+        title: <Tooltip title={msgOAuthTooltip}>{oauth.name}</Tooltip>,
         dataIndex: "oauth_subject",
         render: (value) => (value ? msgYes : msgNo),
         sorter: (a, b) => (!!a.oauth_subject > !!b.oauth_subject ? 1 : -1),

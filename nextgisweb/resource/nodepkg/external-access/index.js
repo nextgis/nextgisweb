@@ -1,4 +1,4 @@
 /** @entrypoint */
-import {ExternalAccess} from "./ExternalAccess";
+import { ExternalAccess } from "./ExternalAccess";
 
 export default ExternalAccess;
