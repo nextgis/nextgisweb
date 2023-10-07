@@ -6,7 +6,7 @@ import { errorModal } from "@nextgisweb/gui/error";
 import { routeURL, request, LunkwillParam } from "@nextgisweb/pyramid/api";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 
-import type { ApiError } from "package/nextgisweb/nextgisweb/gui/nodepkg/error/type";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 
 interface UseExportFeatureLayerProps {
     id: number;
