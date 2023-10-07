@@ -1,5 +1,5 @@
 import type Feature from "ol/Feature";
-import { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
+import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 export interface TopicSubscription {
     remove: () => void;

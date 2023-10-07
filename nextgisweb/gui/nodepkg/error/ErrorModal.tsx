@@ -4,7 +4,7 @@ import { Modal } from "@nextgisweb/gui/antd";
 
 import { Body, Footer, TechInfo } from "./shared";
 
-import { ParamsOf } from "../type";
+import type { ParamsOf } from "../type";
 import type { ApiError } from "./type";
 
 type ModalProps = ParamsOf<typeof Modal>;

@@ -1,5 +1,6 @@
 /** @entrypoint */
-import { FeatureGrid, FeatureGridProps } from "./FeatureGrid";
+import type { FeatureGridProps } from "./FeatureGrid";
+import { FeatureGrid } from "./FeatureGrid";
 
 export type { FeatureGridProps };
 

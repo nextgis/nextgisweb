@@ -1,5 +1,5 @@
 import Color from "color";
-import {
+import type {
     GeoStylerNumberFunction,
     GeoStylerStringFunction,
 } from "geostyler-style";

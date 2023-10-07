@@ -6,7 +6,7 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 
 import { SvgIcon } from "./SvgIcon";
 
-import {
+import type {
     Blueprint,
     BlueprintResource,
     ResourceClass,

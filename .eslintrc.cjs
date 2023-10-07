@@ -28,15 +28,6 @@ const config = {
             { args: "after-used", destructuredArrayIgnorePattern: "^_" },
         ],
         "no-use-before-define": "warn",
-        "prettier/prettier": "warn",
-        "react/prop-types": "off", // Use TypeScript instead
-        "react/jsx-no-target-blank": "off", // Unsupported browsers
-        "requirejs/no-object-define": "error",
-        "requirejs/amd-function-arity": [
-            "error",
-            { allowExtraDependencies: true },
-        ],
-
         "no-restricted-imports": [
             "error",
             {
@@ -58,6 +49,16 @@ const config = {
                     },
                 ],
             },
+        ],
+        "@typescript-eslint/consistent-type-imports": "error",
+        "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
+        "prettier/prettier": "warn",
+        "react/prop-types": "off", // Use TypeScript instead
+        "react/jsx-no-target-blank": "off", // Unsupported browsers
+        "requirejs/no-object-define": "error",
+        "requirejs/amd-function-arity": [
+            "error",
+            { allowExtraDependencies: true },
         ],
     },
     ignorePatterns: ["doc/", "contrib/", "dist/", "node_modules/", "env/lib/"],

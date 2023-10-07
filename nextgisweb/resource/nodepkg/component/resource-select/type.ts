@@ -1,5 +1,5 @@
 import type { Select } from "@nextgisweb/gui/antd";
-import {
+import type {
     ResourcePickerStoreOptions,
     SelectValue,
 } from "../resource-picker/type";
@@ -12,4 +12,3 @@ export interface ResourceSelectProps<V extends SelectValue = SelectValue>
     onChange?: (val: V | undefined) => void;
     value?: V;
 }
-

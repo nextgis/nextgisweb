@@ -26,26 +26,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
 import _get from "lodash-es/get";
 import _uniqueId from "lodash-es/uniqueId";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import OlFeature from "ol/Feature";
 import OlMap from "ol/Map";
+import OlView from "ol/View";
+import OlGeomLineString from "ol/geom/LineString";
+import OlGeomPoint from "ol/geom/Point";
+import OlGeomPolygon from "ol/geom/Polygon";
 import OlLayerVector from "ol/layer/Vector";
 import OlSourceVector from "ol/source/Vector";
-import OlGeomPoint from "ol/geom/Point";
-import OlGeomLineString from "ol/geom/LineString";
-import OlGeomPolygon from "ol/geom/Polygon";
-import OlFeature from "ol/Feature";
-import OlView from "ol/View";
 
 import OlStyleParser from "geostyler-openlayers-parser";
 
 import type { Style, Symbolizer, SymbolizerKind } from "geostyler-style";
-
-import "./OlRenderer.less";
+import type React from "react";
 
 import "ol/ol.css";
+import "./OlRenderer.less";
 
 export interface OlRendererProps {
     symbolizers: Symbolizer[];

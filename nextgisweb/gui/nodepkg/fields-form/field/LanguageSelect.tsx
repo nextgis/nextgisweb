@@ -1,4 +1,4 @@
-import { Select } from "@nextgisweb/gui/antd";
+import type { Select } from "@nextgisweb/gui/antd";
 
 import { LanguageSelect as LanguageSelectInput } from "../../component/language-select";
 import { FormItem } from "./_FormItem";

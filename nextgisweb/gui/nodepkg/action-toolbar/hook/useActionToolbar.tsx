@@ -4,7 +4,7 @@ import { Button } from "@nextgisweb/gui/antd";
 
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
-import {
+import type {
     ButtonProps,
     CreateButtonActionOptions,
     UseActionToolbarProps,

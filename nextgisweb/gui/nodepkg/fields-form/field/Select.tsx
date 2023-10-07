@@ -1,10 +1,9 @@
 import { Select as AntdSelect } from "@nextgisweb/gui/antd";
 
-import { SelectProps as AntdSelectProps } from "antd/lib/select";
-
 import { FormItem } from "./_FormItem";
 
-import type { FormItemProps, FormFieldChoice } from "../type";
+import type { SelectProps as AntdSelectProps } from "antd/lib/select";
+import type { FormFieldChoice, FormItemProps } from "../type";
 
 type InputProps = Parameters<typeof AntdSelect>[0];
 

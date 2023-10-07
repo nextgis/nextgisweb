@@ -3,12 +3,12 @@ import { Balancer } from "react-wrap-balancer";
 
 import { Button, Upload } from "@nextgisweb/gui/antd";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
-
-import { useFileUploader } from "./hook/useFileUploader";
-import { FileUploaderProps } from "./type";
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { maxSize } from "@nextgisweb/pyramid/settings!file_upload";
+
+import { useFileUploader } from "./hook/useFileUploader";
+
+import type { FileUploaderProps } from "./type";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import CancelIcon from "@nextgisweb/icon/material/cancel";

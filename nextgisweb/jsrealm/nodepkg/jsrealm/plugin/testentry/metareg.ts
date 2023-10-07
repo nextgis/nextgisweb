@@ -1,7 +1,9 @@
 /** @testentry mocha */
 import { assert } from "chai";
 
-import { PluginRegistry, meta } from "..";
+import { meta } from "..";
+
+import type { PluginRegistry } from "..";
 
 Array.from(meta.query()).map((registry) => {
     const lit = (

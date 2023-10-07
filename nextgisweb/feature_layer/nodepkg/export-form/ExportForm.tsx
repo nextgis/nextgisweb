@@ -7,9 +7,9 @@ import {
     Checkbox,
     FieldsForm,
     Form,
-    type FormField,
     Select,
 } from "@nextgisweb/gui/fields-form";
+import type { FormField } from "@nextgisweb/gui/fields-form";
 import { ResourceSelectMultiple } from "@nextgisweb/resource/field/ResourceSelectMultiple";
 
 import { route } from "@nextgisweb/pyramid/api";

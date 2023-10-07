@@ -1,6 +1,6 @@
 import { Table as TableBase } from "antd";
 
-import { ParamsOf } from "../../type";
+import type { ParamsOf } from "../../type";
 
 import "./index.less";
 

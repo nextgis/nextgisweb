@@ -1,7 +1,10 @@
 import { useEffect, useRef } from "react";
+
 import { Form } from "@nextgisweb/gui/antd";
+
 import { FormItem } from "./FormItem";
-import { FieldsFormProps, FormProps } from "./type";
+
+import type { FieldsFormProps, FormProps } from "./type";
 
 export function FieldsForm({
     form,

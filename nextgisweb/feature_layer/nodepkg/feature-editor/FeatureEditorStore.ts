@@ -14,7 +14,7 @@ import type {
 } from "@nextgisweb/feature-layer/type";
 import type { FeatureEditorStoreOptions } from "./type";
 import type { FeatureItem as FeatureItem_, EditorStore } from "../type";
-import { NgwAttributeValue } from "../attribute-editor/type";
+import type { NgwAttributeValue } from "../attribute-editor/type";
 
 type FeatureItem = FeatureItem_<NgwAttributeValue>;
 

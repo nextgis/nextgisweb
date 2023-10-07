@@ -4,8 +4,7 @@ import { Editor } from "@nextgisweb/ckeditor";
 import { useSourceEditingWorkAround } from "./hook/useSourceEditingWorkAround";
 
 import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-
-import { TextEditorProps } from "./type";
+import type { TextEditorProps } from "./type";
 
 import "./TextEditor.less";
 
