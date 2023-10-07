@@ -19,8 +19,8 @@
         "@types/react-dom": "18.2.7",
         "antd": "^5.8.3",
         "dayjs": "^1.11.9",
-        "mobx": "^6.4.0",
-        "mobx-react": "^7.3.0",
+        "mobx": "^6.10.0",
+        "mobx-react-lite": "^4.0.5",
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-wrap-balancer": "^1.1.0"
