@@ -1,17 +1,14 @@
+import { useEffect, useMemo, useState } from "react";
+
 import { Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
-import {
-    Form,
-    FieldsForm,
-} from "@nextgisweb/gui/fields-form";
-import { ResourceSelect } from "@nextgisweb/resource/field/ResourceSelect";
 import { errorModal } from "@nextgisweb/gui/error";
+import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n";
-import { useEffect, useMemo, useState } from "react";
-import PropTypes from "prop-types";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { ResourceSelect } from "@nextgisweb/resource/field/ResourceSelect";
 
 export function CloneWebmap({ id }) {
     const form = Form.useForm()[0];
@@ -32,20 +29,20 @@ export function CloneWebmap({ id }) {
         () => [
             {
                 name: "parent",
-                label: i18n.gettext("Resource group"),
+                label: gettext("Resource group"),
                 widget: ResourceSelect,
                 inputProps: {
                     pickerOptions: {
                         traverseClasses: ["resource_group"],
                         hideUnavailable: true,
-                    }
+                    },
                 },
                 required: true,
             },
             {
                 name: "name",
                 disabled: nameLoading,
-                label: i18n.gettext("Display name"),
+                label: gettext("Display name"),
                 required: true,
             },
         ],
@@ -180,13 +177,9 @@ export function CloneWebmap({ id }) {
             <Space direction="vertical" style={{ width: "100%" }}>
                 <FieldsForm {...props}></FieldsForm>
                 <SaveButton loading={saving} onClick={clone}>
-                    {i18n.gettext("Clone")}
+                    {gettext("Clone")}
                 </SaveButton>
             </Space>
         </>
     );
 }
-
-CloneWebmap.propTypes = {
-    id: PropTypes.number,
-};

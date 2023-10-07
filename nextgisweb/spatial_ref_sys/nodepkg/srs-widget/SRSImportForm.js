@@ -1,7 +1,7 @@
-import { FieldsForm, Select } from "@nextgisweb/gui/fields-form";
-import i18n from "@nextgisweb/pyramid/i18n";
-import { PropTypes } from "prop-types";
 import { useMemo, useState, useEffect } from "react";
+
+import { FieldsForm, Select } from "@nextgisweb/gui/fields-form";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 const PLACEHOLDERS = {
     epsg: "4326",
@@ -17,7 +17,7 @@ export function SRSImportFrom({ format: f, projStr, onChange, form }) {
         () => [
             {
                 name: "format",
-                label: i18n.gettext("Format"),
+                label: gettext("Format"),
                 widget: Select,
                 choices: [
                     { value: "proj4", label: "PROJ" },
@@ -28,7 +28,7 @@ export function SRSImportFrom({ format: f, projStr, onChange, form }) {
             },
             {
                 name: "projStr",
-                label: i18n.gettext("Definition"),
+                label: gettext("Definition"),
                 widget: "textarea",
                 placeholder: PLACEHOLDERS[format],
                 required: true,
@@ -64,10 +64,3 @@ export function SRSImportFrom({ format: f, projStr, onChange, form }) {
         ></FieldsForm>
     );
 }
-
-SRSImportFrom.propTypes = {
-    format: PropTypes.oneOf(["epsg", "mapinfo", "proj4", "esri"]),
-    projStr: PropTypes.string,
-    onChange: PropTypes.func,
-    form: PropTypes.any,
-};

@@ -1,10 +1,8 @@
-import { PropTypes } from "prop-types";
 import { useEffect, useState } from "react";
 
 import { Select, Switch } from "@nextgisweb/gui/antd";
 import { FloatingLabel } from "@nextgisweb/gui/floating-label";
-
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./AnnotationsPanel.less";
 
@@ -87,17 +85,15 @@ export const AnnotationsPanel = ({
     if (editable) {
         editSection = (
             <>
-                <h5 className="heading">{i18n.gettext("Edit")}</h5>
+                <h5 className="heading">{gettext("Edit")}</h5>
 
                 <div className="input-group">
                     <Switch checked={edit} onChange={(v) => changeEdit(v)} />
-                    <span className="label">
-                        {i18n.gettext("Edit annotations")}
-                    </span>
+                    <span className="label">{gettext("Edit annotations")}</span>
                 </div>
 
                 <FloatingLabel
-                    label={i18n.gettext("Geometry type")}
+                    label={gettext("Geometry type")}
                     value={geomType}
                 >
                     <Select
@@ -106,14 +102,14 @@ export const AnnotationsPanel = ({
                         disabled={!edit}
                         value={geomType}
                         options={[
-                            { value: "Point", label: i18n.gettext("Point") },
+                            { value: "Point", label: gettext("Point") },
                             {
                                 value: "LineString",
-                                label: i18n.gettext("Line"),
+                                label: gettext("Line"),
                             },
                             {
                                 value: "Polygon",
-                                label: i18n.gettext("Polygon"),
+                                label: gettext("Polygon"),
                             },
                         ]}
                     ></Select>
@@ -132,10 +128,10 @@ export const AnnotationsPanel = ({
 
     return (
         <div className="annotations-panel">
-            <h5 className="heading">{i18n.gettext("Annotations layer")}</h5>
+            <h5 className="heading">{gettext("Annotations layer")}</h5>
 
             <FloatingLabel
-                label={i18n.gettext("Show annotations")}
+                label={gettext("Show annotations")}
                 name="name"
                 value={visible}
             >
@@ -144,11 +140,11 @@ export const AnnotationsPanel = ({
                     onChange={(value) => changeVisible(value)}
                     value={visible}
                     options={[
-                        { value: "no", label: i18n.gettext("No") },
-                        { value: "yes", label: i18n.gettext("Yes") },
+                        { value: "no", label: gettext("No") },
+                        { value: "yes", label: gettext("Yes") },
                         {
                             value: "messages",
-                            label: i18n.gettext("With messages"),
+                            label: gettext("With messages"),
                         },
                     ]}
                 ></Select>
@@ -156,7 +152,7 @@ export const AnnotationsPanel = ({
 
             {editSection}
 
-            <h5 className="heading">{i18n.gettext("Private annotations")}</h5>
+            <h5 className="heading">{gettext("Private annotations")}</h5>
 
             <div className="input-group">
                 <Switch
@@ -164,7 +160,7 @@ export const AnnotationsPanel = ({
                     onChange={(v) => changeAccessTypeFilters(v, "public")}
                 />
                 <span className="label public">
-                    {i18n.gettext("Public annotations")}
+                    {gettext("Public annotations")}
                 </span>
             </div>
 
@@ -174,7 +170,7 @@ export const AnnotationsPanel = ({
                     onChange={(v) => changeAccessTypeFilters(v, "own")}
                 />
                 <span className="label own">
-                    {i18n.gettext("My private annotations")}
+                    {gettext("My private annotations")}
                 </span>
             </div>
 
@@ -185,18 +181,10 @@ export const AnnotationsPanel = ({
                         onChange={(v) => changeAccessTypeFilters(v, "private")}
                     />
                     <span className="label private">
-                        {i18n.gettext("Other private annotations")}
+                        {gettext("Other private annotations")}
                     </span>
                 </div>
             )}
         </div>
     );
-};
-
-AnnotationsPanel.propTypes = {
-    display: PropTypes.object,
-    mapStates: PropTypes.object,
-    initialAnnotVisible: PropTypes.string,
-    onTopicPublish: PropTypes.func,
-    onChangeVisible: PropTypes.func,
 };

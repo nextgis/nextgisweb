@@ -23,6 +23,7 @@ function handleVisibleDeprecation<T extends ShowModalOptions>(config: T): T {
         }
     }
     // Remove the 'visible' prop from the config
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { visible, ...restConfig } = config;
     return restConfig as T;
 }

@@ -1,13 +1,12 @@
-import PropTypes from "prop-types";
-import settings from "@nextgisweb/pyramid/settings!raster_layer";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
+import { useEffect, useMemo, useState } from "react";
 
-import { FieldsForm, Select, Form } from "@nextgisweb/gui/fields-form";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import { useMemo, useState, useEffect } from "react";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { FieldsForm, Form, Select } from "@nextgisweb/gui/fields-form";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import settings from "@nextgisweb/pyramid/settings!raster_layer";
 
 const srsListToOptions = (srsList) => {
     return srsList.map((srs) => {
@@ -22,7 +21,7 @@ const bandListToOptions = (bandList) => {
     return bandList.map((band, idx) => {
         return {
             label:
-                i18n.gettext("Band") +
+                gettext("Band") +
                 " " +
                 (idx + 1) +
                 (band !== "Undefined" ? " (" + band + ")" : ""),
@@ -66,7 +65,7 @@ export function ExportForm({ id }) {
         () => [
             {
                 name: "format",
-                label: i18n.gettext("Format"),
+                label: gettext("Format"),
                 widget: Select,
                 choices: settings.export_formats.map((format) => ({
                     value: format.name,
@@ -75,13 +74,13 @@ export function ExportForm({ id }) {
             },
             {
                 name: "srs",
-                label: i18n.gettext("SRS"),
+                label: gettext("SRS"),
                 widget: Select,
                 choices: srsOptions,
             },
             {
                 name: "bands",
-                label: i18n.gettext("Bands"),
+                label: gettext("Bands"),
                 widget: Select,
                 mode: "multiple",
                 choices: bandOptions,
@@ -116,13 +115,9 @@ export function ExportForm({ id }) {
         >
             <Form.Item>
                 <SaveButton onClick={exportRaster} icon={null}>
-                    {i18n.gettext("Save")}
+                    {gettext("Save")}
                 </SaveButton>
             </Form.Item>
         </FieldsForm>
     );
 }
-
-ExportForm.propTypes = {
-    id: PropTypes.number,
-};

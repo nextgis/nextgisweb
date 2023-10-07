@@ -45,6 +45,10 @@ const config = {
                         "name": "lodash",
                         "message": "Use 'lodash-es' instead 'lodash'.",
                     },
+                    {
+                        "name": "prop-types",
+                        "message": "Use TypeScript for typing",
+                    },
                 ],
                 "patterns": [
                     {

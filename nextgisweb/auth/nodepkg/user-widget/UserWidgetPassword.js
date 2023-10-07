@@ -1,22 +1,23 @@
-import PropTypes from "prop-types";
+import { useEffect, useMemo, useState } from "react";
+
 import { Form, Input, Select, Space } from "@nextgisweb/gui/antd";
-import { useEffect, useState, useMemo } from "react";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import oauth from "../oauth";
 
 const modes = [
     {
-        label: i18n.gettext("Keep existing"),
+        label: gettext("Keep existing"),
         value: "keep",
     },
     {
-        label: i18n.gettext("Assign new"),
+        label: gettext("Assign new"),
         value: "assign",
     },
     {
         label: oauth.enabled
-            ? i18n.gettext("{name} only").replace("{name}", oauth.name)
-            : i18n.gettext("Turn off"),
+            ? gettext("{name} only").replace("{name}", oauth.name)
+            : gettext("Turn off"),
         value: "turn_off",
     },
 ];
@@ -66,11 +67,6 @@ const PasswordInput = ({ value, onChange, ...inputProps }) => {
     );
 };
 
-PasswordInput.propTypes = {
-    onChange: PropTypes.func,
-    value: PropTypes.any,
-};
-
 export function UserWidgetPassword({ autoComplete, placeholder, ...props }) {
     const inputProps = { autoComplete, placeholder };
 
@@ -80,8 +76,3 @@ export function UserWidgetPassword({ autoComplete, placeholder, ...props }) {
         </Form.Item>
     );
 }
-
-UserWidgetPassword.propTypes = {
-    autoComplete: PropTypes.string,
-    placeholder: PropTypes.string,
-};

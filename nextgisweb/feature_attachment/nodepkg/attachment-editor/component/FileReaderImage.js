@@ -1,9 +1,6 @@
-import { PropTypes } from "prop-types";
-
 import { useState } from "react";
 
 import { Image } from "@nextgisweb/gui/antd";
-
 
 export function FileReaderImage({ file }) {
     const [src, setSrc] = useState();
@@ -22,7 +19,3 @@ export function FileReaderImage({ file }) {
         />
     );
 }
-
-FileReaderImage.propTypes = {
-    file: PropTypes.object,
-};

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
     Alert,
@@ -8,19 +8,19 @@ import {
     Space,
     Switch,
 } from "@nextgisweb/gui/antd";
-import { TemplateLink } from "@nextgisweb/gui/component";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
+import { TemplateLink } from "@nextgisweb/gui/component";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import settings from "@nextgisweb/pyramid/settings!";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
-import settings from "@nextgisweb/pyramid/settings!";
+import { PanelHeader } from "../header";
 
 import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
 
 import "./SharePanel.less";
-import { PanelHeader } from "../header";
 
 // prettier-ignore
 const msgCORS = gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain.");

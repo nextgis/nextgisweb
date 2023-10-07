@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PropTypes } from "prop-types";
+
 import { SaveOutlined, WarningOutlined } from "@ant-design/icons";
 import {
     Button,
@@ -9,11 +9,11 @@ import {
     InputNumber,
     Row,
     Select,
+    Space,
     Switch,
     Typography,
-    Space,
 } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import {
     AddressGeocoderOptions,
@@ -50,13 +50,13 @@ export const SettingsForm = ({
             onValuesChange={onValuesChange}
             layout="vertical"
         >
-            <Title level={4}>{i18n.gettext("Identify popup")}</Title>
+            <Title level={4}>{gettext("Identify popup")}</Title>
 
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item
                         name="popup_width"
-                        label={i18n.gettext("Width, px")}
+                        label={gettext("Width, px")}
                         rules={[
                             {
                                 required: true,
@@ -69,7 +69,7 @@ export const SettingsForm = ({
                 <Col span={8}>
                     <Form.Item
                         name="popup_height"
-                        label={i18n.gettext("Height, px")}
+                        label={gettext("Height, px")}
                         rules={[
                             {
                                 required: true,
@@ -82,7 +82,7 @@ export const SettingsForm = ({
                 <Col span={8}>
                     <Form.Item
                         name="identify_radius"
-                        label={i18n.gettext("Radius, px")}
+                        label={gettext("Radius, px")}
                         rules={[
                             {
                                 required: true,
@@ -105,7 +105,7 @@ export const SettingsForm = ({
                             >
                                 <Switch />
                             </Form.Item>
-                            {i18n.gettext("Show feature attributes")}
+                            {gettext("Show feature attributes")}
                         </Space>
                     </Form.Item>
                 </Col>
@@ -119,19 +119,19 @@ export const SettingsForm = ({
                             >
                                 <Switch />
                             </Form.Item>
-                            {i18n.gettext("Show geometry info")}
+                            {gettext("Show geometry info")}
                         </Space>
                     </Form.Item>
                 </Col>
             </Row>
 
-            <Title level={4}>{i18n.gettext("Measurement")}</Title>
+            <Title level={4}>{gettext("Measurement")}</Title>
 
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item
                         name="units_length"
-                        label={i18n.gettext("Length units")}
+                        label={gettext("Length units")}
                     >
                         <Select
                             options={UnitsLengthOptions}
@@ -140,10 +140,7 @@ export const SettingsForm = ({
                     </Form.Item>
                 </Col>
                 <Col span={8}>
-                    <Form.Item
-                        name="units_area"
-                        label={i18n.gettext("Area units")}
-                    >
+                    <Form.Item name="units_area" label={gettext("Area units")}>
                         <Select
                             options={UnitsAreaOptions}
                             style={INPUT_DEFAULT_WIDTH}
@@ -153,7 +150,7 @@ export const SettingsForm = ({
                 <Col span={8}>
                     <Form.Item
                         name="degree_format"
-                        label={i18n.gettext("Degree format")}
+                        label={gettext("Degree format")}
                     >
                         <Select
                             options={DegreeFormatOptions}
@@ -167,7 +164,7 @@ export const SettingsForm = ({
                 <Col span={24}>
                     <Form.Item
                         name="measurement_srid"
-                        label={i18n.gettext("Measurement SRID")}
+                        label={gettext("Measurement SRID")}
                     >
                         <Select
                             options={srsOptions}
@@ -177,7 +174,7 @@ export const SettingsForm = ({
                 </Col>
             </Row>
 
-            <Title level={4}>{i18n.gettext("Address search")}</Title>
+            <Title level={4}>{gettext("Address search")}</Title>
 
             <Row gutter={[16, 16]}>
                 <Col span={8}>
@@ -190,7 +187,7 @@ export const SettingsForm = ({
                             >
                                 <Switch />
                             </Form.Item>
-                            {i18n.gettext("Enable")}
+                            {gettext("Enable")}
                         </Space>
                     </Form.Item>
                 </Col>
@@ -204,7 +201,7 @@ export const SettingsForm = ({
                             >
                                 <Switch />
                             </Form.Item>
-                            {i18n.gettext("Limit by web map initial extent")}
+                            {gettext("Limit by web map initial extent")}
                         </Space>
                     </Form.Item>
                 </Col>
@@ -214,7 +211,7 @@ export const SettingsForm = ({
                 <Col span={8}>
                     <Form.Item
                         name="address_geocoder"
-                        label={i18n.gettext("Provider")}
+                        label={gettext("Provider")}
                     >
                         <Select
                             options={AddressGeocoderOptions}
@@ -226,9 +223,7 @@ export const SettingsForm = ({
                     {geocoder === "nominatim" ? (
                         <Form.Item
                             name="nominatim_countrycodes"
-                            label={i18n.gettext(
-                                "Limit search results to countries"
-                            )}
+                            label={gettext("Limit search results to countries")}
                             rules={[
                                 {
                                     pattern: new RegExp(
@@ -236,7 +231,7 @@ export const SettingsForm = ({
                                     ),
                                     message: (
                                         <div>
-                                            {i18n.gettext(
+                                            {gettext(
                                                 "Invalid countries. For example ru or gb,de"
                                             )}
                                         </div>
@@ -249,7 +244,7 @@ export const SettingsForm = ({
                     ) : (
                         <Form.Item
                             name="yandex_api_geocoder_key"
-                            label={i18n.gettext("Yandex.Maps API Geocoder Key")}
+                            label={gettext("Yandex.Maps API Geocoder Key")}
                         >
                             <Input style={INPUT_DEFAULT_WIDTH} />
                         </Form.Item>
@@ -257,7 +252,7 @@ export const SettingsForm = ({
                 </Col>
             </Row>
 
-            <Title level={4}>{i18n.gettext("Legend")}</Title>
+            <Title level={4}>{gettext("Legend")}</Title>
 
             <Row gutter={[16, 16]}>
                 <Col span={8}>
@@ -268,7 +263,7 @@ export const SettingsForm = ({
                             val = !val ? "default" : val;
                             return { value: val };
                         }}
-                        label={i18n.gettext("Visibility")}
+                        label={gettext("Visibility")}
                     >
                         <Select
                             options={LegendEnabledOptions}
@@ -293,17 +288,10 @@ export const SettingsForm = ({
                         }
                         loading={status === "saving"}
                     >
-                        {i18n.gettext("Save")}
+                        {gettext("Save")}
                     </Button>
                 </Col>
             </Row>
         </Form>
     );
-};
-
-SettingsForm.propTypes = {
-    initialValues: PropTypes.object,
-    onFinish: PropTypes.func,
-    srsOptions: PropTypes.array,
-    status: PropTypes.string,
 };

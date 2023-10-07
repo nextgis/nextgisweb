@@ -1,14 +1,14 @@
-import { useEffect, useState, useRef, useMemo } from "react";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Input, AutoComplete } from "@nextgisweb/gui/antd";
+import { AutoComplete, Input } from "@nextgisweb/gui/antd";
+import { AutoCompleteHoneypot } from "@nextgisweb/gui/component";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
-import { AutoCompleteHoneypot } from "@nextgisweb/gui/component";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ParamsOf } from "@nextgisweb/gui/type";
-import type { ResourceItem, ResourceClass } from "../type/Resource";
+import type { ResourceClass, ResourceItem } from "../type/Resource";
 
 import "./ResourcesFilter.less";
 
@@ -121,12 +121,12 @@ export function ResourcesFilter({
                 onSelect={onSelect}
                 options={options}
                 status={acStatus}
-                notFoundContent={i18n.gettext("Resources not found")}
+                notFoundContent={gettext("Resources not found")}
                 {...rest}
             >
                 <Input.Search
                     size="middle"
-                    placeholder={i18n.gettext("Search resources")}
+                    placeholder={gettext("Search resources")}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     loading={loading}
