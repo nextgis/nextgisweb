@@ -1,6 +1,6 @@
-import { route } from "./route";
-
 import type { Blueprint } from "@nextgisweb/resource/type";
+
+import { route } from "./route";
 
 /** This testentry for test typings only */
 async function routeTest() {

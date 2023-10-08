@@ -1,3 +1,1 @@
-import { SingleSettingForm } from "./SingleSettingForm";
-
-export { SingleSettingForm };
+export { SingleSettingForm } from "./SingleSettingForm";

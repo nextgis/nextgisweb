@@ -1,9 +1,8 @@
 import { observer } from "mobx-react-lite";
 
 import { Checkbox, Select } from "@nextgisweb/gui/antd";
-
-import { editing, annotation } from "@nextgisweb/pyramid/settings!webmap";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { annotation, editing } from "@nextgisweb/pyramid/settings!webmap";
 
 import "./SettingsWidget.less";
 

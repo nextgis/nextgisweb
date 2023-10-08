@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 
 import { Modal } from "@nextgisweb/gui/antd";
 
-import { Body, Footer, TechInfo } from "./shared";
-
 import type { ParamsOf } from "../type";
+
+import { Body, Footer, TechInfo } from "./shared";
 import type { ApiError } from "./type";
 
 type ModalProps = ParamsOf<typeof Modal>;

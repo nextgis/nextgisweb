@@ -1,5 +1,3 @@
-import { formatSize } from "./formatSize";
-import { sleep } from "./sleep";
-import { sorterFactory } from "./sorterFactory";
-
-export { formatSize, sleep, sorterFactory };
+export { formatSize } from "./formatSize";
+export { sleep } from "./sleep";
+export { sorterFactory } from "./sorterFactory";

@@ -1,15 +1,15 @@
-import { makeAutoObservable, runInAction, toJS } from "mobx";
 import isEqual from "lodash-es/isEqual";
-
-import { parseNgwAttribute, formatNgwAttribute } from "../util/ngwAttributes";
+import { makeAutoObservable, runInAction, toJS } from "mobx";
 
 import type {
+    EditorStore,
     EditorStoreConstructorOptions,
     FeatureLayerField,
-    EditorStore,
 } from "@nextgisweb/feature-layer/type";
 
 import type { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
+import { formatNgwAttribute, parseNgwAttribute } from "../util/ngwAttributes";
+
 import type { AppAttributes, NgwAttributeValue } from "./type";
 
 class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {

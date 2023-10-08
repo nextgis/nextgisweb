@@ -1,6 +1,5 @@
 import { makeAutoObservable, runInAction } from "mobx";
-
-import type { ReactElement, ComponentType } from "react";
+import type { ComponentType, ReactElement } from "react";
 
 interface WebMapTabsStoreProps {
     onTabs?: () => void;

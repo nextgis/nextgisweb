@@ -13,10 +13,10 @@ import { parse } from "@nextgisweb/webmap/coordinates/parser";
 import { CloseButton } from "../header/CloseButton";
 
 import { LoadingOutlined } from "@ant-design/icons";
+import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import LayersIcon from "@nextgisweb/icon/material/layers";
 import LocationOnIcon from "@nextgisweb/icon/material/location_on";
 import PublicIcon from "@nextgisweb/icon/material/public";
-import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 
 import "./SearchPanel.less";
 

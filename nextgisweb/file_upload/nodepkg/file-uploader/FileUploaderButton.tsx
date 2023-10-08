@@ -1,10 +1,10 @@
-import { InboxOutlined } from "@ant-design/icons";
 import { Button, Upload } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { useFileUploader } from "./hook/useFileUploader";
-
 import type { FileUploaderProps } from "./type";
+
+import { InboxOutlined } from "@ant-design/icons";
 
 const msgUploadButton = gettext("Upload");
 

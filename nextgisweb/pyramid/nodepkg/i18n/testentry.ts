@@ -1,7 +1,7 @@
 /** @testentry mocha */
 import { assert } from "chai";
 
-import { pgettext, npgettext } from "@nextgisweb/pyramid/i18n";
+import { npgettext, pgettext } from "@nextgisweb/pyramid/i18n";
 
 describe("Gettext implementation", () => {
     it("pgettext returns something", () => {

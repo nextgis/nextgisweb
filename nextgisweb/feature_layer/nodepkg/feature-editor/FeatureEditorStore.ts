@@ -1,17 +1,18 @@
 import { makeAutoObservable, runInAction, toJS } from "mobx";
 
-import { message } from "@nextgisweb/gui/antd";
-import { route } from "@nextgisweb/pyramid/api";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
-
 import type {
     FeatureItemExtensions,
     FeatureLayerField,
 } from "@nextgisweb/feature-layer/type";
+import { message } from "@nextgisweb/gui/antd";
+import { route } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
+
 import type { NgwAttributeValue } from "../attribute-editor/type";
 import type { EditorStore, FeatureItem as FeatureItem_ } from "../type";
+
 import type { FeatureEditorStoreOptions } from "./type";
 
 type FeatureItem = FeatureItem_<NgwAttributeValue>;

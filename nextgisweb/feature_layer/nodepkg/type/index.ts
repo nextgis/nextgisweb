@@ -1,5 +1,7 @@
 import type { ComponentType, ReactNode } from "react";
+
 import type { EditorWidgetProps } from "../feature-editor/type";
+
 import type { EditorStore, EditorStoreConstructorOptions } from "./EditorStore";
 
 export * from "./FeatureItem";

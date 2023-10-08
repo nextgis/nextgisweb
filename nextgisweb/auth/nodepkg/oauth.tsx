@@ -1,8 +1,7 @@
 import { Button } from "@nextgisweb/gui/antd";
+import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!auth";
-
-import type { ButtonProps } from "@nextgisweb/gui/antd";
 
 const {
     enabled,

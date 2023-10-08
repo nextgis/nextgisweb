@@ -1,5 +1,6 @@
 import type { Select } from "@nextgisweb/gui/antd";
-import type { User, Group } from "../../type";
+
+import type { Group, User } from "../../type";
 
 export type SelectProps = Parameters<typeof Select>[0];
 export type Model = "principal" | "user" | "group";

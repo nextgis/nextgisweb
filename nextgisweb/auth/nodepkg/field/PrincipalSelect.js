@@ -1,4 +1,5 @@
 import { Form } from "@nextgisweb/gui/antd";
+
 import { PrincipalSelect as Component } from "../component";
 
 export function PrincipalSelect(props) {

@@ -1,5 +1,5 @@
+import type { EditorView, ViewUpdate } from "@codemirror/view";
 import type { MutableRefObject } from "react";
-import type { ViewUpdate, EditorView } from "@codemirror/view";
 
 export interface Editor {
     source: EditorView;

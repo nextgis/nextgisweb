@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
-
-import { TextEditor } from "@nextgisweb/gui/component/text-editor";
-import DescriptionEditorStore from "./DescriptionEditorStore";
+import { useMemo, useState } from "react";
 
 import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
+import { TextEditor } from "@nextgisweb/gui/component/text-editor";
+
+import DescriptionEditorStore from "./DescriptionEditorStore";
 
 const DescriptionEditor = observer(
     ({ store }: EditorWidgetProps<string | null>) => {

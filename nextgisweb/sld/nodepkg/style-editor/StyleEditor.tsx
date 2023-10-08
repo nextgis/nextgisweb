@@ -1,13 +1,13 @@
+import type { Symbolizer as GSSymbolizer } from "geostyler-style";
 import { useCallback, useEffect } from "react";
+
 import { useObjectState } from "@nextgisweb/gui/hook";
 
 import { KindEditor } from "./component/KindEditor";
+import type { Symbolizer, SymbolizerType } from "./type/Style";
 import { convertFromGeostyler } from "./util/convertFromGeostyler";
 import { convertToGeostyler } from "./util/convertToGeostyler";
 import { generateSymbolizer } from "./util/generateSymbolizer";
-
-import type { Symbolizer as GSSymbolizer } from "geostyler-style";
-import type { Symbolizer, SymbolizerType } from "./type/Style";
 
 export interface StyleEditorProps {
     value?: Symbolizer;

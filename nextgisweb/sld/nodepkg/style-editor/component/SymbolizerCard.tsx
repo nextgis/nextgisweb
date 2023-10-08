@@ -28,12 +28,12 @@
  */
 
 import { Card } from "antd";
-
-import { convertToGeostyler } from "../util/convertToGeostyler";
-import { OlRenderer } from "./OlRenderer";
-
 import type { Symbolizer as GSSymbolizer } from "geostyler-style";
+
 import type { Symbolizer } from "../type/Style";
+import { convertToGeostyler } from "../util/convertToGeostyler";
+
+import { OlRenderer } from "./OlRenderer";
 
 import "./SymbolizerCard.less";
 

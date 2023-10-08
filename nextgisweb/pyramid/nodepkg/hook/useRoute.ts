@@ -3,10 +3,10 @@ import { useEffect, useMemo, useReducer, useRef } from "react";
 import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 
 import { route as apiRoute } from "../api";
-import { useAbortController } from "./useAbortController";
-
-import type { GetRouteParam, RequestMethod, RouteResults } from "../api/type";
 import type { RouteParameters } from "../api/route.inc";
+import type { GetRouteParam, RequestMethod, RouteResults } from "../api/type";
+
+import { useAbortController } from "./useAbortController";
 
 type LoadingCounterState = "increment" | "decrement" | "reset";
 

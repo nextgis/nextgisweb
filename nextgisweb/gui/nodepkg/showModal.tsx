@@ -1,8 +1,7 @@
+import type { ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 
 import { ConfigProvider } from "@nextgisweb/gui/antd";
-
-import type { ReactElement } from "react";
 import type { Modal } from "@nextgisweb/gui/antd";
 import type { ParamsOf } from "@nextgisweb/gui/type";
 

@@ -1,4 +1,2 @@
-import { ProgressModal } from "./ProgressModal";
-import { showProgressModal } from "./showProgressModal";
-
-export { ProgressModal, showProgressModal };
+export { ProgressModal } from "./ProgressModal";
+export { showProgressModal } from "./showProgressModal";

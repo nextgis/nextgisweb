@@ -1,11 +1,10 @@
 import { Button, Dropdown, Space, Tooltip } from "@nextgisweb/gui/antd";
+import type { SizeType } from "@nextgisweb/gui/antd";
+import type { ParamsOf } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 
 import { useExportFeatureLayer } from "../../hook/useExportFeatureLayer";
-
-import type { SizeType } from "@nextgisweb/gui/antd";
-import type { ParamsOf } from "@nextgisweb/gui/type";
 import type { ExportFeatureLayerOptions } from "../../hook/useExportFeatureLayer";
 
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";

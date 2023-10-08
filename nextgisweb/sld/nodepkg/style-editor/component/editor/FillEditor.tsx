@@ -1,16 +1,15 @@
+import type { FillSymbolizer } from "geostyler-style";
 import _cloneDeep from "lodash-es/cloneDeep";
 import { useMemo } from "react";
 
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
+import type { FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ColorField } from "../../field/ColorField";
+import type { EditorProps } from "../../type";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
 import { hexWithOpacity } from "../../util/hexWithOpacity";
-
-import type { FormField } from "@nextgisweb/gui/fields-form";
-import type { FillSymbolizer } from "geostyler-style";
-import type { EditorProps } from "../../type";
 
 const msgFillColor = gettext("Fill color");
 const msgOutlineColor = gettext("Stroke color");

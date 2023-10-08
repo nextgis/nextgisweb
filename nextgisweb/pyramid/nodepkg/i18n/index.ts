@@ -1,5 +1,6 @@
 /** @entrypoint */
 import { callingComponent } from "../util/loader";
+
 import { domain } from "./gettext";
 import { factory } from "./handlebars";
 

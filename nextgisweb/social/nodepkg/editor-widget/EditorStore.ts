@@ -1,12 +1,11 @@
-import { toJS, makeAutoObservable } from "mobx";
+import { makeAutoObservable, toJS } from "mobx";
 
-import { routeURL } from "@nextgisweb/pyramid/api";
-
-import type {
-    EditorStore as IEditorStore,
-    EditorStoreOptions,
-} from "@nextgisweb/resource/type/EditorStore";
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader";
+import { routeURL } from "@nextgisweb/pyramid/api";
+import type {
+    EditorStoreOptions,
+    EditorStore as IEditorStore,
+} from "@nextgisweb/resource/type/EditorStore";
 
 interface Value {
     preview_image_exists?: boolean;

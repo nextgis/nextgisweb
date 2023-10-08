@@ -1,10 +1,9 @@
 /** @entrypoint */
 import { createRoot } from "react-dom/client";
+import type { Root } from "react-dom/client";
 import { Provider as BalancedProvider } from "react-wrap-balancer";
 
 import { ConfigProvider } from "./antd";
-
-import type { Root } from "react-dom/client";
 
 type PropsType = Record<string, unknown>;
 

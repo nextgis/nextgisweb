@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 
-import { Button } from "@nextgisweb/gui/antd";
-import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
-
 import type {
     FeatureExtent,
     NgwExtent,
 } from "@nextgisweb/feature-layer/type/FeatureExtent";
+import { Button } from "@nextgisweb/gui/antd";
 import type { SizeType } from "@nextgisweb/gui/antd";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 
 interface ZoomToFilteredBtnProps {
     id: number;

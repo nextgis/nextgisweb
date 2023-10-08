@@ -1,4 +1,5 @@
 import { makeAutoObservable, toJS } from "mobx";
+
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 let idSeq = 0;

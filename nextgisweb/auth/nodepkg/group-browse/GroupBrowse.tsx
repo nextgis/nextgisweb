@@ -1,9 +1,8 @@
+import type { TableProps } from "@nextgisweb/gui/antd";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { default as oauth } from "../oauth";
-
-import type { TableProps } from "@nextgisweb/gui/antd";
 
 const messages = {
     deleteConfirm: gettext("Delete group?"),

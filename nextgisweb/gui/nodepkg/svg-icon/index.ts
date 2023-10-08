@@ -1,4 +1,2 @@
-import { SvgIcon } from "./SvgIcon";
-import { SvgIconLink } from "./SvgIconLink";
-
-export { SvgIcon, SvgIconLink };
+export { SvgIcon } from "./SvgIcon";
+export { SvgIconLink } from "./SvgIconLink";

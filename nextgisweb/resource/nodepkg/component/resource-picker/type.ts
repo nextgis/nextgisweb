@@ -1,5 +1,6 @@
-import type { ParamsOf } from "@nextgisweb/gui/type";
 import type { Card, Modal, Table } from "@nextgisweb/gui/antd";
+import type { ParamsOf } from "@nextgisweb/gui/type";
+
 import type {
     Resource,
     ResourceClass,
@@ -7,6 +8,7 @@ import type {
     ResourceItem,
     ResourcePermission,
 } from "../../type/Resource";
+
 import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 
 export type SelectValue = number | number[];

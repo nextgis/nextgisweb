@@ -1,5 +1,6 @@
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
+import { cache } from "./cache";
 import {
     InvalidResponseError,
     LunkwillError,
@@ -8,8 +9,6 @@ import {
     NetworksResponseError,
     ServerResponseError,
 } from "./error";
-import { cache } from "./cache";
-
 import type { ServerResponseErrorData } from "./error";
 import type { LunkwillData, RequestOptions, ToReturn } from "./type";
 

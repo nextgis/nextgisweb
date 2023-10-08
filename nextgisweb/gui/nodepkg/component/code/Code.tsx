@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { useCodeMirror } from "./hook/useCodeMirror";
 
+import { useCodeMirror } from "./hook/useCodeMirror";
 import type { CodeOptions, Editor } from "./type";
 
 export interface CodeProps extends CodeOptions {

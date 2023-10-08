@@ -1,8 +1,8 @@
+import type { ReactNode } from "react";
+
 import { Badge, Space } from "@nextgisweb/gui/antd";
 
 import { DirtyMark } from "./DirtyMark";
-
-import type { ReactNode } from "react";
 
 interface TabLabelProps {
     dirty: boolean;

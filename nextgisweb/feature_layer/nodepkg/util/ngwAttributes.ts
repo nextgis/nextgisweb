@@ -1,12 +1,12 @@
 import dayjs from "dayjs";
 
-import type { FeatureLayerDataType } from "../type/FeatureLayer";
 import type {
     NgwAttributeType,
     NgwDate,
     NgwDateTime,
     NgwTime,
 } from "../type/FeatureItem";
+import type { FeatureLayerDataType } from "../type/FeatureLayer";
 
 export function isDateType(datatype: FeatureLayerDataType) {
     return ["DATE", "TIME", "DATETIME"].includes(datatype);

@@ -1,3 +1,1 @@
-import { ModelForm } from "./ModelForm";
-
-export { ModelForm };
+export { ModelForm } from "./ModelForm";

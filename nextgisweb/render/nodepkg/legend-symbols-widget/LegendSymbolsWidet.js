@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { route } from "@nextgisweb/pyramid/api";
 import "./LegendSymbolsWidet.less";

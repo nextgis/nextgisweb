@@ -1,4 +1,4 @@
-import type { UsePickerModalProps, CardProps, ModalProps } from "../type";
+import type { CardProps, ModalProps, UsePickerModalProps } from "../type";
 
 const usePickerModal = ({
     cardOptions = {},

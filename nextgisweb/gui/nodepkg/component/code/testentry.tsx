@@ -1,14 +1,15 @@
 /** @testentry react */
 import { useState } from "react";
-import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+
 import { Space } from "@nextgisweb/gui/antd";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import type { Blueprint } from "@nextgisweb/resource/type";
+
 import { FieldsForm } from "../../fields-form";
+import type { FormField } from "../../fields-form";
 
 import { Code } from "./Code";
-
 import type { CodeProps } from "./Code";
-import type { FormField } from "../../fields-form";
-import type { Blueprint } from "@nextgisweb/resource/type";
 
 function CodeTest() {
     const { data: blueprint } = useRouteGet<Blueprint>("resource.blueprint");

@@ -1,5 +1,6 @@
 /** @entrypoint */
 import showModal from "@nextgisweb/gui/showModal";
+
 import { FeatureEditorModal } from "./FeatureEditorModal";
 import type { FeatureEditorModalProps } from "./FeatureEditorModal";
 

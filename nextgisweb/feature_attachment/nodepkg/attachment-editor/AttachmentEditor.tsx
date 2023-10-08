@@ -1,8 +1,10 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
+import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
 import { useFileUploader } from "@nextgisweb/file-upload";
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
+import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { Button, Image, Input, Table, Upload } from "@nextgisweb/gui/antd";
 import { formatSize } from "@nextgisweb/gui/util";
@@ -11,12 +13,9 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import AttachmentEditorStore from "./AttachmentEditorStore";
 import { FileReaderImage } from "./component/FileReaderImage";
+import type { DataSource } from "./type";
 
 import DeleteIcon from "@nextgisweb/icon/material/clear";
-
-import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
-import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
-import type { DataSource } from "./type";
 
 import "./AttachmentEditor.less";
 

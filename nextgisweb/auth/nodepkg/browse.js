@@ -1,8 +1,9 @@
 /** @entrypoint */
+import { default as ConfirmDialog } from "dijit/ConfirmDialog";
+
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import resourceSchema from "@nextgisweb/pyramid/api/load!resource/schema";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { default as ConfirmDialog } from "dijit/ConfirmDialog";
 import { default as ErrorDialog } from "ngw-pyramid/ErrorDialog";
 
 window.principal_delete = function (cls, id) {

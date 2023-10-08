@@ -1,4 +1,5 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import { Button, Tooltip } from "../antd";
 
 import DeleteIcon from "@nextgisweb/icon/material/clear";

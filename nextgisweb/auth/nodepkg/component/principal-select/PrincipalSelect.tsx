@@ -1,16 +1,17 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { Select, Space, Tag } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
-import { Select, Tag, Space } from "@nextgisweb/gui/antd";
 
-import AdministratorIcon from "@nextgisweb/icon/material/local_police";
-import RegularUserIcon from "@nextgisweb/icon/material/person";
+import type { Group, User } from "../../type";
+
+import type { Member, PrincipalSelectProps, SelectProps } from "./type";
+
 import SystemUserIcon from "@nextgisweb/icon/material/attribution";
 import GroupIcon from "@nextgisweb/icon/material/groups";
-
-import type { PrincipalSelectProps, Member, SelectProps } from "./type";
-import type { Group, User } from "../../type";
+import AdministratorIcon from "@nextgisweb/icon/material/local_police";
+import RegularUserIcon from "@nextgisweb/icon/material/person";
 
 type TagProps = Parameters<NonNullable<SelectProps["tagRender"]>>[0];
 

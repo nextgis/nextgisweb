@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
 import isEqual from "lodash-es/isEqual";
+import { useMemo, useState } from "react";
+import { useEffect } from "react";
 
 import { Form, Space } from "@nextgisweb/gui/antd";
 
 import type { FormItemProps, InputProps } from "../type";
-import { useEffect } from "react";
 
 export function FormItem<P extends InputProps = InputProps>({
     placeholder,

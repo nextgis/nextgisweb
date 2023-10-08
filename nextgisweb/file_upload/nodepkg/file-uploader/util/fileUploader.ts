@@ -1,4 +1,5 @@
 import { Upload, isSupported } from "tus-js-client";
+
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { chunkSize } from "@nextgisweb/pyramid/settings!file_upload";
 

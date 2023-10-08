@@ -1,7 +1,7 @@
 import { Form } from "@nextgisweb/gui/antd";
-import { ResourceSelectMultiple as SelectInput } from "../component/resource-select";
-
 import type { FormItemProps } from "@nextgisweb/gui/fields-form";
+
+import { ResourceSelectMultiple as SelectInput } from "../component/resource-select";
 import type { ResourceSelectProps } from "../component/resource-select/type";
 
 type ResourceSelectMultipleProps = FormItemProps<ResourceSelectProps<number[]>>;

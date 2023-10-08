@@ -1,8 +1,9 @@
 import type { ActionToolbarProps } from "@nextgisweb/gui/action-toolbar";
+import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 import type { EditorStore } from "../type/EditorStore";
+
 import type { FeatureEditorStore } from "./FeatureEditorStore";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 export interface AttributesFormProps {
     store: FeatureEditorStore;

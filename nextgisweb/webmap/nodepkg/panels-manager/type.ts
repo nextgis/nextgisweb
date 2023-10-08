@@ -1,4 +1,5 @@
 import type Feature from "ol/Feature";
+
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 export interface TopicSubscription {

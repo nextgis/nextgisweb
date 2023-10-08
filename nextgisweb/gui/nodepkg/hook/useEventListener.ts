@@ -1,6 +1,5 @@
 // based on https://github.com/juliencrn/usehooks-ts/blob/master/packages/usehooks-ts/src/useEventListener/useEventListener.ts
-import { useRef, useEffect, useLayoutEffect } from "react";
-
+import { useEffect, useLayoutEffect, useRef } from "react";
 import type { RefObject } from "react";
 
 type Handler<

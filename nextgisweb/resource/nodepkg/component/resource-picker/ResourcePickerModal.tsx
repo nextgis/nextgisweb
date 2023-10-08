@@ -1,9 +1,9 @@
-import { Modal } from "@nextgisweb/gui/antd";
 import { useEffect, useState } from "react";
+
+import { Modal } from "@nextgisweb/gui/antd";
 
 import { ResourcePickerCard } from "./ResourcePickerCard";
 import usePickerModal from "./hook/usePickerModal";
-
 import type { ResourcePickerModalProps, SelectValue } from "./type";
 
 import "./ResourcePickerModal.less";

@@ -1,17 +1,16 @@
+import type { MarkSymbolizer } from "geostyler-style";
 import _cloneDeep from "lodash-es/cloneDeep";
 import { useMemo } from "react";
 
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
+import type { FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ColorField } from "../../field/ColorField";
-import { wellKnownNames } from "../../util/constant";
-import { hexWithOpacity } from "../../util/hexWithOpacity";
-import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
-
-import type { FormField } from "@nextgisweb/gui/fields-form";
-import type { MarkSymbolizer } from "geostyler-style";
 import type { EditorProps } from "../../type";
+import { wellKnownNames } from "../../util/constant";
+import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
+import { hexWithOpacity } from "../../util/hexWithOpacity";
 
 const msgShape = gettext("Shape");
 const msgRadius = gettext("Size");

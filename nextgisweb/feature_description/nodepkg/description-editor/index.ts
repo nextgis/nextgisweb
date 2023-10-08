@@ -1,9 +1,8 @@
 /** @entrypoint */
+import type { EditorWidgetRegister } from "@nextgisweb/feature-layer/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import DescriptionEditorStore from "./DescriptionEditorStore";
-
-import type { EditorWidgetRegister } from "@nextgisweb/feature-layer/type";
 
 const msgTitle = gettext("Description");
 

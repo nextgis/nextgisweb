@@ -1,5 +1,2 @@
-import { ActionToolbar } from "./ActionToolbar";
-
+export { ActionToolbar } from "./ActionToolbar";
 export * from "./type";
-
-export { ActionToolbar };

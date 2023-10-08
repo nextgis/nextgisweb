@@ -1,4 +1,4 @@
-import { toJS, makeAutoObservable } from "mobx";
+import { makeAutoObservable, toJS } from "mobx";
 
 export class DescriptionEditorStore {
     identity = "resource.description";

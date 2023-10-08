@@ -1,20 +1,19 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-
-import WKT from "ol/format/WKT";
 import Feature from "ol/Feature";
+import WKT from "ol/format/WKT";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import { route } from "@nextgisweb/pyramid/api/route";
 import FeatureGrid from "@nextgisweb/feature-layer/feature-grid";
+import type { FeatureGridProps } from "@nextgisweb/feature-layer/feature-grid";
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
+import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
+import { route } from "@nextgisweb/pyramid/api/route";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 
-import type { FeatureGridProps } from "@nextgisweb/feature-layer/feature-grid";
-import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
-import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import type {
-    DojoTopic,
-    DojoDisplay,
     DisplayItemConfig,
+    DojoDisplay,
+    DojoTopic,
     FeatureLayerWebMapPluginConfig,
     TopicSubscription,
 } from "../panels-manager/type";

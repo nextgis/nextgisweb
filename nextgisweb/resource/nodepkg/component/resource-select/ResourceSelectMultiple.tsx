@@ -2,14 +2,14 @@ import uniq from "lodash-es/uniq";
 import { useCallback, useEffect, useState } from "react";
 
 import { Button, Space, Table } from "@nextgisweb/gui/antd";
+import type { ParamsOf } from "@nextgisweb/gui/type";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
-import { ResourcePickerStore, showResourcePicker } from "../resource-picker";
-
-import type { ParamsOf } from "@nextgisweb/gui/type";
 import type { Resource, ResourceItem } from "../../type";
+import { ResourcePickerStore, showResourcePicker } from "../resource-picker";
 import type { SelectValue } from "../resource-picker/type";
+
 import type { ResourceSelectProps } from "./type";
 
 import DeleteIcon from "@nextgisweb/icon/material/delete";

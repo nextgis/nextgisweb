@@ -1,9 +1,10 @@
-import type { ReactNode, ComponentType } from "react";
-import type { Form } from "@nextgisweb/gui/antd";
 import type {
-    FormInstance,
     FormItemProps as AntdFormItemProps,
+    FormInstance,
 } from "antd/lib/form";
+import type { ComponentType, ReactNode } from "react";
+
+import type { Form } from "@nextgisweb/gui/antd";
 
 import type {
     Checkbox,

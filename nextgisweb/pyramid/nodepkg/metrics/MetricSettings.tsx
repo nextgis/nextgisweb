@@ -4,13 +4,13 @@ import { Balancer } from "react-wrap-balancer";
 import { Button, Card, Dropdown, Tabs, message } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 
 import { route } from "../api";
 import { gettext } from "../i18n";
 import { PageTitle } from "../layout";
-import { registry } from "./tab";
 
-import type { ApiError } from "@nextgisweb/gui/error/type";
+import { registry } from "./tab";
 import type {
     MetricSettingsTab,
     PyramidMetrics,

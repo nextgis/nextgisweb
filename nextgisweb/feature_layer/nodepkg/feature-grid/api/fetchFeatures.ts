@@ -1,8 +1,7 @@
 import { route } from "@nextgisweb/pyramid/api";
 
-import { KEY_FIELD_KEYNAME } from "../constant";
-
 import type { FeatureItem } from "../../type";
+import { KEY_FIELD_KEYNAME } from "../constant";
 import type { OrderBy } from "../type";
 
 interface FeatureLayerQuery {

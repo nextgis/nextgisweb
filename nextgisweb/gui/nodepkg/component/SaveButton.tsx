@@ -1,7 +1,8 @@
+import type { ReactNode } from "react";
+
 import { Button } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ReactNode } from "react";
 import type { ParamsOf } from "../type";
 
 import SaveOutlineIcon from "@nextgisweb/icon/material/save/outline";

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { Input, message, Space } from "@nextgisweb/gui/antd";
+import { Input, Space, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
+import type { RouteName } from "@nextgisweb/pyramid/api/type";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { RouteName } from "@nextgisweb/pyramid/api/type";
 import type { ApiError } from "../error/type";
 import type { ParamsOf } from "../type";
 

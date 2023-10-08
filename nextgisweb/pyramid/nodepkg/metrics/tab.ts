@@ -1,11 +1,12 @@
 /** @registry pyramid/metrics/tab */
+import type { FC } from "react";
+
 import { PluginRegistry } from "@nextgisweb/jsrealm/plugin";
 
 import { gettext } from "../i18n";
 
-import type { FC } from "react";
-import type { TV as YandexMetric } from "./YandexMetricaTab";
 import type { TV as GoogleAnalytics } from "./GoogleAnalyticsTab";
+import type { TV as YandexMetric } from "./YandexMetricaTab";
 import type { PyramidMetricsKey } from "./type";
 
 export interface TabProps<TV> {

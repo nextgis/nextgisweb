@@ -1,3 +1,4 @@
+import type { UploadFile } from "antd/lib/upload/interface";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
@@ -12,8 +13,6 @@ import type {
     UseFileUploaderProps,
 } from "../type";
 import { fileUploader } from "../util/fileUploader";
-
-import type { UploadFile } from "antd/lib/upload/interface";
 
 const msgProgress = gettext("{} uploaded...");
 

@@ -1,11 +1,10 @@
 import { useState } from "react";
 
 import { Badge, Button } from "@nextgisweb/gui/antd";
-
+import type { ControlProps } from "@nextgisweb/gui/model-browse/ModelBrowse";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ControlProps } from "@nextgisweb/gui/model-browse/ModelBrowse";
 import type { UserBrowseData } from "../type";
 
 export const ToggleSelectedUsers = ({

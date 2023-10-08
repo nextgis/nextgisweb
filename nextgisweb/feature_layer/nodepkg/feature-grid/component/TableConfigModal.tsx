@@ -1,6 +1,7 @@
+import type { Dispatch, SetStateAction } from "react";
+
 import { Checkbox, Modal } from "@nextgisweb/gui/antd";
 
-import type { Dispatch, SetStateAction } from "react";
 import type { FeatureLayerField } from "../../type/FeatureLayer";
 
 interface TableConfigModal {

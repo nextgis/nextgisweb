@@ -1,6 +1,7 @@
 import "./NavigationMenu.less";
 
 import type { ReactElement } from "react";
+
 import type { PanelDojoItem } from "../panels-manager/type";
 
 export interface NavigationMenuProps {

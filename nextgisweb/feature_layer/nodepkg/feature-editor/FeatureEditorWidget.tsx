@@ -2,23 +2,23 @@ import { observer } from "mobx-react-lite";
 import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
+import type {
+    ActionToolbarAction,
+    ActionToolbarProps,
+} from "@nextgisweb/gui/action-toolbar";
 import { Button, Tabs } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component/SaveButton";
 import { useUnsavedChanges } from "@nextgisweb/gui/hook";
+import type { ParamOf } from "@nextgisweb/gui/type";
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 
 import editorWidgetRegister from "../attribute-editor";
+import type { EditorWidgetRegister } from "../type";
+
 import { FeatureEditorStore } from "./FeatureEditorStore";
 import { TabLabel } from "./component/TabLabel";
-
-import type {
-    ActionToolbarAction,
-    ActionToolbarProps,
-} from "@nextgisweb/gui/action-toolbar";
-import type { ParamOf } from "@nextgisweb/gui/type";
-import type { EditorWidgetRegister } from "../type";
 import type { FeatureEditorWidgetProps } from "./type";
 
 import ResetIcon from "@nextgisweb/icon/material/restart_alt";

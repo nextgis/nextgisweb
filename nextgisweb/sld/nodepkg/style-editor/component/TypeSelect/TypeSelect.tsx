@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { Form } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { TypeField } from "./TypeField";
-
 import type { SymbolizerType } from "../../type/Style";
+
+import { TypeField } from "./TypeField";
 
 export interface KindSelectProps {
     value?: SymbolizerType;

@@ -1,3 +1,4 @@
+import type { ColumnProps } from "antd/lib/table/Column";
 import debounce from "lodash-es/debounce";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
@@ -6,7 +7,7 @@ import { Button, Table } from "@nextgisweb/gui/antd";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ColumnProps } from "antd/lib/table/Column";
+import usePickerCard from "./hook/usePickerCard";
 import type {
     PickerResource,
     ResourcePickerChildrenProps,
@@ -14,8 +15,6 @@ import type {
     RowSelectionType,
     SelectValue,
 } from "./type";
-
-import usePickerCard from "./hook/usePickerCard";
 import { renderResourceCls } from "./util/renderResourceCls";
 
 import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";

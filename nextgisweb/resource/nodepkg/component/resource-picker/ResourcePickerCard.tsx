@@ -1,11 +1,11 @@
-import { Card } from "@nextgisweb/gui/antd";
 import { useEffect, useState } from "react";
 
+import { Card } from "@nextgisweb/gui/antd";
+
 import { ResourcePickerChildren } from "./ResourcePickerChildren";
-import { ResourcePickerStore } from "./store/ResourcePickerStore";
 import { ResourcePickerFooter } from "./ResourcePickerFooter";
 import { ResourcePickerTitle } from "./ResourcePickerTitle";
-
+import { ResourcePickerStore } from "./store/ResourcePickerStore";
 import type { ResourcePickerCardProps, SelectValue } from "./type";
 
 import "./ResourcePickerCard.less";

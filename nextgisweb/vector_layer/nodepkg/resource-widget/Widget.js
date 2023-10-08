@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
-import { Checkbox, Input, Radio, Select, Collapse } from "@nextgisweb/gui/antd";
+import { Checkbox, Collapse, Input, Radio, Select } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";

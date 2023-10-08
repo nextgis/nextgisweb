@@ -7,8 +7,9 @@ import { EdiTable } from "@nextgisweb/gui/edi-table";
 import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import AddIcon from "@nextgisweb/icon/material/add_circle_outline";
 import { AllowIcon, DenyIcon, ResourceIcon } from "../icon";
+
+import AddIcon from "@nextgisweb/icon/material/add_circle_outline";
 
 const { Option, OptGroup } = Select;
 

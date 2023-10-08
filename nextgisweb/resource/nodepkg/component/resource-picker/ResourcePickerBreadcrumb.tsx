@@ -1,13 +1,15 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
+import type { ReactElement } from "react";
+
+import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
+import type { ParamsOf } from "@nextgisweb/gui/type";
+
+import type { ResourceItem } from "../../type";
+
+import type { ResourcePickerBreadcrumbProps } from "./type";
 
 import HomeFilledIcon from "@nextgisweb/icon/material/home";
-import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
-
-import type { ReactElement } from "react";
-import type { ResourcePickerBreadcrumbProps } from "./type";
-import type { ResourceItem } from "../../type";
-import type { ParamsOf } from "@nextgisweb/gui/type";
 
 type BreadcrumbItems = NonNullable<ParamsOf<typeof Breadcrumb>["items"]>;
 

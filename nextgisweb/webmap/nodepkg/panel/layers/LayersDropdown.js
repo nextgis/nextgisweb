@@ -1,4 +1,4 @@
-import { Dropdown, Button } from "@nextgisweb/gui/antd";
+import { Button, Dropdown } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";

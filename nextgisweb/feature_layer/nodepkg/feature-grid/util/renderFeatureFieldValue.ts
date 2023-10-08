@@ -1,7 +1,7 @@
 import { utc } from "@nextgisweb/gui/dayjs";
 
-import type { FeatureLayerDataType } from "../../type/FeatureLayer";
 import type { NgwAttributeType } from "../../type";
+import type { FeatureLayerDataType } from "../../type/FeatureLayer";
 
 export function renderFeatureFieldValue(
     { datatype }: { datatype: FeatureLayerDataType },

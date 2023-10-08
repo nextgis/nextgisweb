@@ -1,6 +1,5 @@
 /** @testentry react */
 import { LanguageSelect } from "./LanguageSelect";
-
 import type { LanguageSelectProps } from "./LanguageSelect";
 
 const presets: [title: string, props: LanguageSelectProps][] = [

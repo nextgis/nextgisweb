@@ -1,8 +1,8 @@
 import type { FC } from "react";
-import type { TabProps } from "./tab";
 
-import type { TV as YandexMetric } from "./YandexMetricaTab";
 import type { TV as GoogleAnalytics } from "./GoogleAnalyticsTab";
+import type { TV as YandexMetric } from "./YandexMetricaTab";
+import type { TabProps } from "./tab";
 
 export interface PyramidMetrics {
     yandex_metrica?: YandexMetric;

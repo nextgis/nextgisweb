@@ -7,7 +7,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { maxSize } from "@nextgisweb/pyramid/settings!file_upload";
 
 import { useFileUploader } from "./hook/useFileUploader";
-
 import type { FileUploaderProps } from "./type";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";

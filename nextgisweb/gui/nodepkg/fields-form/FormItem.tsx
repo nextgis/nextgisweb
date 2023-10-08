@@ -1,5 +1,6 @@
-import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useMemo } from "react";
+
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import {
     Checkbox,
@@ -12,7 +13,6 @@ import {
     TextArea,
     TimeInput,
 } from "./fields";
-
 import type { FormField, FormWidgetComponent, WidgetName } from "./type";
 
 export const widgetsByName: Record<WidgetName, FormWidgetComponent> = {

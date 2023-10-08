@@ -1,14 +1,13 @@
+import type { LanguageSupport } from "@codemirror/language";
+import { Annotation, EditorState, StateEffect } from "@codemirror/state";
+import type { Extension } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Annotation, EditorState, StateEffect } from "@codemirror/state";
-import { EditorView } from "@codemirror/view";
+import type { CodeOptions, Editor, Lang, LangShortcut } from "../type";
 
 import { customSetup } from "./customSetup";
 import { themeSetup } from "./themeSetup";
-
-import type { Extension } from "@codemirror/state";
-import type { LanguageSupport } from "@codemirror/language";
-import type { CodeOptions, Editor, Lang, LangShortcut } from "../type";
 
 type FullLang = Exclude<Lang, LangShortcut>;
 

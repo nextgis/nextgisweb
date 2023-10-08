@@ -1,6 +1,6 @@
 import { route } from "@nextgisweb/pyramid/api";
 
-import type { ResourceItem, Resource } from "../type/Resource";
+import type { Resource, ResourceItem } from "../type/Resource";
 
 interface LoadParentsOptions {
     signal?: AbortSignal;

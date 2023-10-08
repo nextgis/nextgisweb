@@ -1,15 +1,14 @@
-import { makeAutoObservable, toJS } from "mobx";
 import isEqual from "lodash-es/isEqual";
-
-import { findAttachmentIndex } from "./util/findAttachmentIndex";
+import { makeAutoObservable, toJS } from "mobx";
 
 import type {
     EditorStoreConstructorOptions,
     EditorStore as IEditorStore,
 } from "@nextgisweb/feature-layer/type";
-
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
+
 import type { DataSource, FileMetaToUpload } from "./type";
+import { findAttachmentIndex } from "./util/findAttachmentIndex";
 
 class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
     value: DataSource[] | null = null;

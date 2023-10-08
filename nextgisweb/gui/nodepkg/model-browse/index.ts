@@ -1,3 +1,1 @@
-import { ModelBrowse } from "./ModelBrowse";
-
-export { ModelBrowse };
+export { ModelBrowse } from "./ModelBrowse";

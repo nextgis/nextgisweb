@@ -1,7 +1,7 @@
+import type { ModalFuncProps } from "antd/lib/modal/interface";
+
 import { Modal, message } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import type { ModalFuncProps } from "antd/lib/modal/interface";
 
 interface ConfirmOptions extends ModalFuncProps {
     errorMessage?: string;

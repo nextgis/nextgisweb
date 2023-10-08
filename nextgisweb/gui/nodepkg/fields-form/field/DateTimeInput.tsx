@@ -1,10 +1,9 @@
 import { DatePicker } from "antd";
-
-import { FormItem } from "./_FormItem";
-
 import type { DatePickerProps } from "antd/lib/date-picker";
 
 import type { FormItemProps } from "../type";
+
+import { FormItem } from "./_FormItem";
 
 type InputProps = DatePickerProps;
 

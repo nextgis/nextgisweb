@@ -4,9 +4,9 @@ import {
     Col,
     Form,
     Input,
-    message,
     Row,
     Typography,
+    message,
 } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";

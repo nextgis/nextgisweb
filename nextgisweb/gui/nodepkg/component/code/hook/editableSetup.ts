@@ -13,7 +13,6 @@ import {
 import { indentOnInput } from "@codemirror/language";
 import { lintKeymap } from "@codemirror/lint";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-
 import { keymap } from "@codemirror/view";
 
 export function editableSetup() {

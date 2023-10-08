@@ -1,15 +1,15 @@
+import { useEffect, useState } from "react";
+
 import { ImageUploader } from "@nextgisweb/file-upload";
-import { message, Space } from "@nextgisweb/gui/antd";
+import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader";
+import type { ImageUploaderProps } from "@nextgisweb/file-upload/image-uploader";
+import { Space, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { routeURL } from "@nextgisweb/pyramid/api";
+import type { RouteName } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { useEffect, useState } from "react";
-
-import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader";
-import type { ImageUploaderProps } from "@nextgisweb/file-upload/image-uploader";
-import type { RouteName } from "@nextgisweb/pyramid/api/type";
 import type { ApiError } from "../error/type";
 
 interface ModelLogoFormProps extends ImageUploaderProps {

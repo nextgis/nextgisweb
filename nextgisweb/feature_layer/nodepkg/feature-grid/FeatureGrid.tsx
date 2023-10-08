@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import isEqual from "lodash-es/isEqual";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
+import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import { Button, Empty, Input, Space, Tooltip } from "@nextgisweb/gui/antd";
+import type { SizeType } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
 import showModal from "@nextgisweb/gui/showModal";
@@ -10,19 +12,15 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
+import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 import { FeatureEditorModal } from "../feature-editor-modal";
+import type { FeatureLayerCount } from "../type/FeatureLayer";
 
 import FeatureTable from "./FeatureTable";
 import { deleteFeatures } from "./api/deleteFeatures";
 import { ExportAction } from "./component/ExportAction";
 import { KEY_FIELD_KEYNAME } from "./constant";
-
-import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
-import type { SizeType } from "@nextgisweb/gui/antd";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
-
-import type { FeatureLayerCount } from "../type/FeatureLayer";
 import type { FeatureAttrs } from "./type";
 
 import DeleteIcon from "@nextgisweb/icon/material/delete";

@@ -1,20 +1,19 @@
-import { useMemo, useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { Alert, Tooltip } from "@nextgisweb/gui/antd";
+import type { TableProps } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
-
+import type { ControlProps } from "@nextgisweb/gui/model-browse/ModelBrowse";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import { makeTeamManageButton, default as oauth } from "../oauth";
+
+import { ToggleSelectedUsers } from "./component/ToggleSelectedUsers";
+import type { UserBrowseData } from "./type";
 
 import AdministratorIcon from "@nextgisweb/icon/material/local_police";
 import RegularUserIcon from "@nextgisweb/icon/material/person";
-
-import { makeTeamManageButton, default as oauth } from "../oauth";
-import { ToggleSelectedUsers } from "./component/ToggleSelectedUsers";
-
-import type { ControlProps } from "@nextgisweb/gui/model-browse/ModelBrowse";
-import type { TableProps } from "@nextgisweb/gui/antd";
-import type { UserBrowseData } from "./type";
 
 type Col = NonNullable<TableProps["columns"]>[0];
 

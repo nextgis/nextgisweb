@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-
 import settings from "@nextgisweb/pyramid/settings!resource";
 
 import type { Permission } from "../type/Permission";

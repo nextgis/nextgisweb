@@ -1,3 +1,1 @@
-import { PrincipalSelect } from "./PrincipalSelect";
-
-export { PrincipalSelect };
+export { PrincipalSelect } from "./PrincipalSelect";

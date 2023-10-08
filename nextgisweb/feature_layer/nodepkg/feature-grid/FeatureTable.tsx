@@ -1,24 +1,24 @@
 import debounce from "lodash-es/debounce";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 import Draggable from "react-draggable";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
+
+import type { FeatureLayerField } from "../type/FeatureLayer";
 
 import SortIcon from "./component/SortIcon";
 import TableConfigModal from "./component/TableConfigModal";
 import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
-import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
-import { scrollbarWidth } from "./util/scrollbarWidth";
-
-import type { Dispatch, ReactNode, SetStateAction } from "react";
-import type { FeatureLayerField } from "../type/FeatureLayer";
 import type {
-    OrderBy,
     ColOrder,
     FeatureAttrs,
     FeatureLayerFieldCol,
+    OrderBy,
 } from "./type";
+import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
+import { scrollbarWidth } from "./util/scrollbarWidth";
 
 import "./FeatureTable.less";
 

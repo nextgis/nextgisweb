@@ -1,6 +1,6 @@
 import orderBy from "lodash-es/orderBy";
-import reactApp from "@nextgisweb/gui/react-app";
 
+import reactApp from "@nextgisweb/gui/react-app";
 import NavigationMenu from "@nextgisweb/webmap/navigation-menu";
 
 import type { DojoDisplay, DojoItem, PanelDojoItem } from "./type";

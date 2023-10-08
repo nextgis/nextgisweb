@@ -10,9 +10,9 @@ import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Button } from "@nextgisweb/gui/antd";
 import DatePicker from "@nextgisweb/gui/antd/date-picker";
 import dayjs, { utc } from "@nextgisweb/gui/dayjs";
+import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext, ngettext } from "@nextgisweb/pyramid/i18n";
-import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
 
 import "./Journal.less";

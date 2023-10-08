@@ -1,9 +1,8 @@
-import { useEffect, useState, useRef } from "react";
 import isEqual from "lodash-es/isEqual";
+import { useEffect, useRef, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 import { isEqualJSON } from "../util/isEqualJSON";
-
-import type { Dispatch, SetStateAction } from "react";
 
 interface UseObjectStateOptions {
     ignoreUndefined?: boolean;

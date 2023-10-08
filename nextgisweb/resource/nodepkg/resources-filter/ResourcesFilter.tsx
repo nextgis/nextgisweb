@@ -3,11 +3,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { AutoComplete, Input } from "@nextgisweb/gui/antd";
 import { AutoCompleteHoneypot } from "@nextgisweb/gui/component";
+import type { ParamsOf } from "@nextgisweb/gui/type";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ParamsOf } from "@nextgisweb/gui/type";
 import type { ResourceClass, ResourceItem } from "../type/Resource";
 
 import "./ResourcesFilter.less";

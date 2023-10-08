@@ -3,10 +3,10 @@ import { NetworksResponseError } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import showModal from "../showModal";
-import { ErrorModal } from "./ErrorModal";
-import { ErrorPage } from "./ErrorPage";
 
+import { ErrorModal } from "./ErrorModal";
 import type { ErrorModalProps } from "./ErrorModal";
+import { ErrorPage } from "./ErrorPage";
 import type { ApiError } from "./type";
 
 function extractError(error: ApiError): ApiError {
@@ -54,4 +54,3 @@ function errorModal(error: ApiError, props?: Partial<ErrorModalProps>) {
 }
 
 export { ErrorPage, errorModal, extractError };
-

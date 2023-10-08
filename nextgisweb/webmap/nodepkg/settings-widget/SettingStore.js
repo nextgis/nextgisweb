@@ -1,6 +1,6 @@
-import { toJS, makeAutoObservable } from "mobx";
+import { makeAutoObservable, toJS } from "mobx";
 
-import { editing, annotation } from "@nextgisweb/pyramid/settings!webmap";
+import { annotation, editing } from "@nextgisweb/pyramid/settings!webmap";
 
 export class SettingStore {
     identity = "webmap";

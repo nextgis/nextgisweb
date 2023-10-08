@@ -1,7 +1,6 @@
 import { InputNumber } from "@nextgisweb/gui/antd";
-import { FormItem } from "@nextgisweb/gui/fields-form/field/_FormItem";
-
 import type { FormItemProps } from "@nextgisweb/gui/fields-form";
+import { FormItem } from "@nextgisweb/gui/fields-form/field/_FormItem";
 
 type InputNumberProps = Parameters<typeof InputNumber>[0];
 type OpacitySliderProps = FormItemProps<InputNumberProps>;

@@ -1,7 +1,8 @@
 import { InputNumber } from "@nextgisweb/gui/antd";
 
-import { FormItem } from "./_FormItem";
 import type { FormItemProps } from "../type";
+
+import { FormItem } from "./_FormItem";
 
 type InputNumberProps = Parameters<typeof InputNumber>[0];
 

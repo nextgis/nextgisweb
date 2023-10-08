@@ -1,5 +1,4 @@
 import { Number } from "./Number";
-
 import type { NumberProps } from "./Number";
 
 export function Integer(props: NumberProps) {

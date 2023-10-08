@@ -1,7 +1,6 @@
 import { theme } from "antd";
-
-import type { CSSProperties } from "react";
 import type { AliasToken } from "antd/es/theme/interface";
+import type { CSSProperties } from "react";
 
 const { useToken } = theme;
 

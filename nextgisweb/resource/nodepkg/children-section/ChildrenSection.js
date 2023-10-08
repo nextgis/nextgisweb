@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Badge, Dropdown, message, Table, Tooltip } from "@nextgisweb/gui/antd";
+import { Badge, Dropdown, Table, Tooltip, message } from "@nextgisweb/gui/antd";
+import { confirmDelete } from "@nextgisweb/gui/confirm";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { errorModal } from "@nextgisweb/gui/error";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
-import { formatSize } from "@nextgisweb/gui/util/formatSize";
-import { confirmDelete } from "@nextgisweb/gui/confirm";
 import { sorterFactory } from "@nextgisweb/gui/util";
+import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext, ngettext } from "@nextgisweb/pyramid/i18n";
 
 import { showResourcePicker } from "../component/resource-picker";
+
 import { createResourceTableItemOptions } from "./util/createResourceTableItemOptions";
 import { forEachSelected } from "./util/forEachSelected";
 

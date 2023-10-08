@@ -2,7 +2,6 @@
 import { assert } from "chai";
 
 import { meta } from "..";
-
 import type { PluginRegistry } from "..";
 
 Array.from(meta.query()).map((registry) => {

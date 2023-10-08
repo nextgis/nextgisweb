@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import StyleEditor from "./StyleEditor";
 import { SymbolizerCard } from "./component/SymbolizerCard";
 import { TypeSelect } from "./component/TypeSelect";
+import type { Symbolizer, SymbolizerType } from "./type/Style";
 import { convertFromGeostyler } from "./util/convertFromGeostyler";
 import { generateSymbolizer } from "./util/generateSymbolizer";
-
-import type { Symbolizer, SymbolizerType } from "./type/Style";
 
 function StyleEditorTest() {
     const [symbolizer, setSymbolizer] = useState<Symbolizer>();

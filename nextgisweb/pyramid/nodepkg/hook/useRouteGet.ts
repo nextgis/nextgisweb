@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 
-import { useRoute } from "./useRoute";
-
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import type { GetRouteParam, RequestOptions, RouteName } from "../api/type";
+
 import type { UseRouteGetParams } from "./type";
+import { useRoute } from "./useRoute";
 
 export function useRouteGet<D = unknown>(
     nameOrProps: UseRouteGetParams | RouteName,

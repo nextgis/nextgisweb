@@ -1,8 +1,8 @@
 import { Checkbox as Checkbox_ } from "@nextgisweb/gui/antd";
 
-import { FormItem } from "./_FormItem";
-
 import type { FormItemProps } from "../type";
+
+import { FormItem } from "./_FormItem";
 
 type CheckboxInputProps = Parameters<typeof Checkbox_>[0];
 

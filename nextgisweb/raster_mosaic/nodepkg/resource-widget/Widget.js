@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
-import { EdiTable } from "@nextgisweb/gui/edi-table";
-import { message } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
+import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
+import { message } from "@nextgisweb/gui/antd";
+import { EdiTable } from "@nextgisweb/gui/edi-table";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./Widget.less";
 

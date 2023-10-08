@@ -1,5 +1,4 @@
 import { SvgIcon } from "./SvgIcon";
-
 import type { SvgIconLink } from "./type";
 
 export function SvgIconLink({

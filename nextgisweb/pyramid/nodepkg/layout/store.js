@@ -3,6 +3,7 @@ import { makeAutoObservable } from "mobx";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
+
 import { url } from "../nextgis";
 
 const NOTIFICATION_ORDER = ["success", "danger"];

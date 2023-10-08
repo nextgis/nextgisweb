@@ -1,6 +1,7 @@
 /** @entrypoint */
-import { request } from "./request";
 import { LoaderCache } from "../util/loader";
+
+import { request } from "./request";
 
 const cache = new LoaderCache();
 

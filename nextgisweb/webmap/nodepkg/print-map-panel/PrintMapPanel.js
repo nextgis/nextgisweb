@@ -9,7 +9,6 @@ import {
     Space,
     Switch,
 } from "@nextgisweb/gui/antd";
-
 import { FloatingLabel } from "@nextgisweb/gui/floating-label";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";

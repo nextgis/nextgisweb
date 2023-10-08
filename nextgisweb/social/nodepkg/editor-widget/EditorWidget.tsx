@@ -3,11 +3,11 @@ import { observer } from "mobx-react-lite";
 import { ImageUploader } from "@nextgisweb/file-upload/image-uploader";
 import { Input } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
 } from "@nextgisweb/resource/type";
+
 import type { EditorStore } from "./EditorStore";
 
 import "./EditorWidget.less";

@@ -1,8 +1,7 @@
 import { useCallback } from "react";
 
 import type { ResourcePickerStore } from "../store/ResourcePickerStore";
-
-import type { RowSelection, PickerResource } from "../type";
+import type { PickerResource, RowSelection } from "../type";
 
 type GetCheckboxProps = NonNullable<RowSelection["getCheckboxProps"]>;
 

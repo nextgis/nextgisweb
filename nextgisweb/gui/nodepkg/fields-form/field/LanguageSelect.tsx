@@ -1,10 +1,10 @@
 import type { Select } from "@nextgisweb/gui/antd";
 
 import { LanguageSelect as LanguageSelectInput } from "../../component/language-select";
-import { FormItem } from "./_FormItem";
-
 import type { LanguageSelectProps } from "../../component/language-select";
 import type { FormItemProps } from "../type";
+
+import { FormItem } from "./_FormItem";
 
 type InputProps = Parameters<typeof Select>[0];
 

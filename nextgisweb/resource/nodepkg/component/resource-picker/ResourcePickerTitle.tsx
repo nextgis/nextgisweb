@@ -5,8 +5,8 @@ import { Button, Col, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import ResourcesFilter from "../../resources-filter";
-import { ResourcePickerBreadcrumb } from "./ResourcePickerBreadcrumb";
 
+import { ResourcePickerBreadcrumb } from "./ResourcePickerBreadcrumb";
 import type { ResourcePickerTitleProps } from "./type";
 
 import ArrowBack from "@nextgisweb/icon/material/arrow_back";

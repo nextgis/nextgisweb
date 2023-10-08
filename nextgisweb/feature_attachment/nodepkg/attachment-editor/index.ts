@@ -1,9 +1,8 @@
 /** @entrypoint */
+import type { EditorWidgetRegister } from "@nextgisweb/feature-layer/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import AttachmentEditorStore from "./AttachmentEditorStore";
-
-import type { EditorWidgetRegister } from "@nextgisweb/feature-layer/type";
 import type { DataSource } from "./type";
 
 const msgTitle = gettext("Attachments");

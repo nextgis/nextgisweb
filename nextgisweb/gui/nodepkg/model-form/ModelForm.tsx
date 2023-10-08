@@ -1,20 +1,19 @@
-import { useEffect, useState } from "react";
-
-import { Button, Form, message, Popconfirm, Space } from "@nextgisweb/gui/antd";
-import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
-import { FieldsForm } from "@nextgisweb/gui/fields-form";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import { errorModal } from "@nextgisweb/gui/error";
-import { useAbortController } from "@nextgisweb/pyramid/hook";
-
-import { useKeydownListener } from "../hook/useKeydownListener";
-
-import type { ReactNode } from "react";
 import type { FormInstance } from "antd/lib/form";
-import type { RouteName } from "@nextgisweb/pyramid/api/type";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+
+import { Button, Form, Popconfirm, Space, message } from "@nextgisweb/gui/antd";
+import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
+import { errorModal } from "@nextgisweb/gui/error";
+import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
+import type { RouteName } from "@nextgisweb/pyramid/api/type";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import type { ApiError } from "../error/type";
+import { useKeydownListener } from "../hook/useKeydownListener";
 
 interface Messages {
     deleteConfirm?: TimeRanges;

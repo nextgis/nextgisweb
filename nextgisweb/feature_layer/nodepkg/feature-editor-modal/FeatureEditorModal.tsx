@@ -5,7 +5,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 import { FeatureEditorWidget } from "../feature-editor/FeatureEditorWidget";
-
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
 
 import "./FeatureEditorModal.less";

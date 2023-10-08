@@ -1,9 +1,9 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
 import { Button, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
-
 import {
     BigInteger,
     DateInput,
@@ -15,18 +15,16 @@ import {
     Number,
     TimeInput,
 } from "@nextgisweb/gui/fields-form";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import AttributeEditorStore from "./AttributeEditorStore";
-
-import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
 import type {
     FormField,
     FormWidget,
     SizeType,
 } from "@nextgisweb/gui/fields-form";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FeatureLayerDataType, FeatureLayerField } from "../type";
+
+import AttributeEditorStore from "./AttributeEditorStore";
 import type { NgwAttributeValue } from "./type";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";

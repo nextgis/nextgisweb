@@ -1,14 +1,13 @@
 import {
     Fragment,
     forwardRef,
+    isValidElement,
     useCallback,
     useMemo,
-    isValidElement,
 } from "react";
+import type { ReactElement, Ref } from "react";
 
 import { useActionToolbar } from "./hook/useActionToolbar";
-
-import type { Ref, ReactElement } from "react";
 import type {
     ActionToolbarAction,
     ActionToolbarProps,

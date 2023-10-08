@@ -1,9 +1,9 @@
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
+
 import { Editor } from "@nextgisweb/ckeditor";
 
 import { useSourceEditingWorkAround } from "./hook/useSourceEditingWorkAround";
-
-import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import type { TextEditorProps } from "./type";
 
 import "./TextEditor.less";

@@ -1,4 +1,4 @@
-import type { FunctionComponent, ForwardRefRenderFunction } from "react";
+import type { ForwardRefRenderFunction, FunctionComponent } from "react";
 
 import type { EditorStore } from "./EditorStore";
 

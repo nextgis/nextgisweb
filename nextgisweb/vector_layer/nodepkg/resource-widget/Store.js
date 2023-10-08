@@ -1,7 +1,6 @@
 import { makeAutoObservable, toJS } from "mobx";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
 import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 
 export class Store {

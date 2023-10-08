@@ -4,14 +4,14 @@ import { Select } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
+import type { ResourceClass, ResourceItem } from "../../type";
 import { showResourcePicker } from "../resource-picker";
-import { renderResourceCls } from "../resource-picker/util/renderResourceCls";
-
-import type { ResourceItem, ResourceClass } from "../../type";
 import type {
     ResourcePickerStoreOptions,
     SelectValue,
 } from "../resource-picker/type";
+import { renderResourceCls } from "../resource-picker/util/renderResourceCls";
+
 import type { ResourceSelectProps } from "./type";
 
 import "./ResourceSelect.less";

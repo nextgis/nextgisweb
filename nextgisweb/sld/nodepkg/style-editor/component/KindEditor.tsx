@@ -1,12 +1,12 @@
+import type { Symbolizer, SymbolizerKind } from "geostyler-style";
+
 import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import type { EditorProps } from "../type";
 
 import { FillEditor } from "./editor/FillEditor";
 import { LineEditor } from "./editor/LineEditor";
 import { MarkEditor } from "./editor/MarkEditor";
-
-import type { Symbolizer, SymbolizerKind } from "geostyler-style";
-
-import type { EditorProps } from "../type";
 
 interface SymbolizerKindProps {
     symbolizer: Symbolizer;

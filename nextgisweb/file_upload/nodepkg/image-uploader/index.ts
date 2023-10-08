@@ -1,5 +1,2 @@
-import { ImageUploader } from "./ImageUploader";
-
-export { ImageUploader };
-
+export { ImageUploader } from "./ImageUploader";
 export * from "./type";

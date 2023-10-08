@@ -2,7 +2,6 @@
  * @license Copyright (c) 2014-2023, CKSource Holding sp. z o.o. All rights reserved.
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
-import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor.js";
 
 import UploadAdapter from "@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter.js";
 import Autoformat from "@ckeditor/ckeditor5-autoformat/src/autoformat.js";
@@ -12,6 +11,7 @@ import Strikethrough from "@ckeditor/ckeditor5-basic-styles/src/strikethrough.js
 import Underline from "@ckeditor/ckeditor5-basic-styles/src/underline.js";
 import BlockQuote from "@ckeditor/ckeditor5-block-quote/src/blockquote.js";
 import CKFinder from "@ckeditor/ckeditor5-ckfinder/src/ckfinder.js";
+import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor.js";
 import Essentials from "@ckeditor/ckeditor5-essentials/src/essentials.js";
 import Heading from "@ckeditor/ckeditor5-heading/src/heading.js";
 import Image from "@ckeditor/ckeditor5-image/src/image.js";

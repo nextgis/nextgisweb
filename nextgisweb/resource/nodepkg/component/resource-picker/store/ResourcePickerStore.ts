@@ -1,12 +1,10 @@
 import { makeAutoObservable, runInAction } from "mobx";
 
 import { extractError } from "@nextgisweb/gui/error";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { loadParents } from "../../../util/loadParents";
-
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import type { Blueprint } from "../../../type/Blueprint";
 import type {
     Resource,
@@ -15,6 +13,7 @@ import type {
     ResourceItem,
     ResourcePermission,
 } from "../../../type/Resource";
+import { loadParents } from "../../../util/loadParents";
 import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
 
 const msgPickThis = gettext("Pick this group");

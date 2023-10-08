@@ -1,8 +1,8 @@
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import type { DocumentChangeEvent } from "@ckeditor/ckeditor5-engine";
+import type { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
 import { useEffect, useState } from "react";
 
-import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import type { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
-import type { DocumentChangeEvent } from "@ckeditor/ckeditor5-engine";
 import type { TextEditorProps } from "../type";
 
 export function useSourceEditingWorkAround({

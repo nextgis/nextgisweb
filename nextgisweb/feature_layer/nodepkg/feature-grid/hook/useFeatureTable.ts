@@ -1,15 +1,14 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import debounce from "lodash-es/debounce";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { RefObject } from "react";
 
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import { fetchFeatures } from "../api/fetchFeatures";
+import type { FeatureAttrs, FeatureLayerFieldCol, OrderBy } from "../type";
 import { createCacheKey } from "../util/createCacheKey";
-
-import type { RefObject } from "react";
-import type { FeatureLayerFieldCol, FeatureAttrs, OrderBy } from "../type";
 
 const debouncedFn = debounce((fn) => {
     fn();

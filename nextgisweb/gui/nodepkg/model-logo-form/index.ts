@@ -1,3 +1,1 @@
-import { ModelLogoForm } from "./ModelLogoForm";
-
-export { ModelLogoForm };
+export { ModelLogoForm } from "./ModelLogoForm";

@@ -1,6 +1,5 @@
 /** @testentry react */
 import { PrincipalSelect } from "./PrincipalSelect";
-
 import type { PrincipalSelectProps } from "./type";
 
 const presets: [string, PrincipalSelectProps][] = [

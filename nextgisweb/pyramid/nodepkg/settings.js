@@ -1,6 +1,6 @@
 /** @entrypoint */
 import { route } from "./api";
-import { callingComponent, LoaderCache } from "./util/loader";
+import { LoaderCache, callingComponent } from "./util/loader";
 
 const cache = new LoaderCache();
 

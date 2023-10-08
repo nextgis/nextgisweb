@@ -1,22 +1,20 @@
 /** @testentry react */
-import { useState } from "react";
-import { FieldsForm } from "./FieldsForm";
-
 import dayjs from "dayjs";
+import { useState } from "react";
 
+import { FieldsForm } from "./FieldsForm";
 import {
-    Input,
     Checkbox,
     DateInput,
     DateTimeInput,
+    Input,
     Number,
     Password,
     Select,
     TextArea,
     TimeInput,
 } from "./fields";
-
-import type { FormField, FieldsFormProps } from "./type";
+import type { FieldsFormProps, FormField } from "./type";
 
 const InputField: FormField = {
     name: "InputField",

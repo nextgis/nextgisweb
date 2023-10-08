@@ -1,5 +1,3 @@
 /** @entrypoint */
-import { WebMapTabs } from "./WebMapTabs";
-import { WebMapTabsStore } from "./WebMapTabsStore";
-
-export { WebMapTabs, WebMapTabsStore };
+export { WebMapTabs } from "./WebMapTabs";
+export { WebMapTabsStore } from "./WebMapTabsStore";

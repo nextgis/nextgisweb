@@ -1,32 +1,32 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
+import type { FC } from "react";
 
 import {
     Badge,
     Button,
     Col,
     Input,
-    message,
     Modal,
     Popconfirm,
     Row,
     Space,
     Table,
     Tooltip,
+    message,
 } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import type { RequestOptions, RouteName } from "@nextgisweb/pyramid/api/type";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import type { ApiError } from "../error/type";
+import type { ParamsOf } from "../type";
 
 import AddCircleIcon from "@nextgisweb/icon/material/add_circle";
 import DeleteForeverIcon from "@nextgisweb/icon/material/delete_forever";
 import EditIcon from "@nextgisweb/icon/material/edit";
 import SearchIcon from "@nextgisweb/icon/material/search";
-
-import type { RequestOptions, RouteName } from "@nextgisweb/pyramid/api/type";
-import type { FC } from "react";
-import type { ApiError } from "../error/type";
-import type { ParamsOf } from "../type";
 
 type TableProps = ParamsOf<typeof Table>;
 
