@@ -1,4 +1,4 @@
 /** @entrypoint */
-import { AnnotationsPanel } from "./AnnotationsPanel.js";
+import { AnnotationsPanel } from "./AnnotationsPanel";
 
 export default AnnotationsPanel;

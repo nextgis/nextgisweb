@@ -1,8 +1,8 @@
 /** @entrypoint */
-import { routeURL } from "./api";
-
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
+
+import { routeURL } from "./api";
 
 const css = [
     ".map-logo { display: block; position: absolute; right: 10px; bottom: 28px; text-decoration: none; line-height: 1; z-index: 1000;  }",
@@ -29,7 +29,7 @@ export function appendTo(parent) {
         aElem.href = url;
         aElem.target = "_blank";
         if (/[^\w]nextgis\.com/.test(url)) {
-            imgElem.alt = i18n.gettext("Get your own Web GIS at nextgis.com");
+            imgElem.alt = gettext("Get your own Web GIS at nextgis.com");
         }
     }
 

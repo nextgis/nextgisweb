@@ -1,3 +1,3 @@
 /** @entrypoint */
-import { MapViewerInfo } from "./MapViewerInfo.js";
+import { MapViewerInfo } from "./MapViewerInfo";
 export default MapViewerInfo;

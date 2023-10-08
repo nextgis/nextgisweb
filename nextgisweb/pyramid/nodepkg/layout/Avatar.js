@@ -3,12 +3,12 @@ import { observer } from "mobx-react-lite";
 import { authStore } from "@nextgisweb/auth/store";
 import { Popover } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import oauth from "@nextgisweb/auth/oauth";
 
 import "./Avatar.less";
 
-const signInText = i18n.gettext("Sign in");
+const msgSignIn = gettext("Sign in");
 
 export const Avatar = observer(() => {
     const { authenticated, invitationSession, userDisplayName } = authStore;
@@ -16,13 +16,11 @@ export const Avatar = observer(() => {
     const content = (
         <>
             {invitationSession && (
-                <div className="warning">
-                    {i18n.gettext("Invitation session")}
-                </div>
+                <div className="warning">{gettext("Invitation session")}</div>
             )}
-            <a href={routeURL("auth.settings")}>{i18n.gettext("Settings")}</a>
+            <a href={routeURL("auth.settings")}>{gettext("Settings")}</a>
             <a href="#" onClick={() => authStore.logout()}>
-                {i18n.gettext("Sign out")}
+                {gettext("Sign out")}
             </a>
         </>
     );
@@ -60,9 +58,9 @@ export const Avatar = observer(() => {
                     </div>
                 </Popover>
             ) : authStore.showLoginModal ? (
-                <a onClick={showLoginModal}>{signInText}</a>
+                <a onClick={showLoginModal}>{msgSignIn}</a>
             ) : (
-                <a href={ngwConfig.logoutUrl}>{signInText}</a>
+                <a href={ngwConfig.logoutUrl}>{msgSignIn}</a>
             )}
         </div>
     );

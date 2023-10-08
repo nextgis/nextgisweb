@@ -5,16 +5,16 @@ import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ColorField } from "../../field/ColorField";
-import { hexWithOpacity } from "../../util/hexWithOpacity";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
+import { hexWithOpacity } from "../../util/hexWithOpacity";
 
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import type { FillSymbolizer } from "geostyler-style";
 import type { EditorProps } from "../../type";
 
-const fillColorLabel = gettext("Fill color");
-const outlineColorLabel = gettext("Stroke color");
-const outlineWidthLabel = gettext("Stroke width");
+const msgFillColor = gettext("Fill color");
+const msgOutlineColor = gettext("Stroke color");
+const msgOutlineWidth = gettext("Stroke width");
 
 export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
     const onSymbolizer = (v: FillSymbolizer) => {
@@ -45,17 +45,17 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
     const fields = useMemo<FormField<keyof FillSymbolizer>[]>(
         () => [
             {
-                label: fillColorLabel,
+                label: msgFillColor,
                 name: "color",
                 widget: ColorField,
             },
             {
-                label: outlineColorLabel,
+                label: msgOutlineColor,
                 name: "outlineColor",
                 widget: ColorField,
             },
             {
-                label: outlineWidthLabel,
+                label: msgOutlineWidth,
                 name: "outlineWidth",
                 widget: "number",
                 inputProps: {

@@ -1,5 +1,4 @@
 import { Button, Dropdown, Space, Tooltip } from "@nextgisweb/gui/antd";
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 
@@ -27,10 +26,10 @@ const formatItems = exportFormats.map((format) => ({
     label: format.display_name,
 }));
 
-const exportTitleMsg = gettext("Save as");
-const gotToSettingsTitleMsg = gettext("Advanced Export");
-const quickExportTitleMsg = gettext("Quick Export");
-const filtersApplyiedTitleMsg = gettext("Filters are applied");
+const msgExport = gettext("Save as");
+const msgExportAdvanced = gettext("Advanced Export");
+const msgExportQuick = gettext("Quick Export");
+const msgFiltersApplied = gettext("Filters are applied");
 
 const settingsKey = "go-to-settings";
 const quickExportKey = "quick-export";
@@ -49,7 +48,7 @@ export const ExportAction = ({
         items: [
             {
                 key: settingsKey,
-                label: gotToSettingsTitleMsg,
+                label: msgExportAdvanced,
             },
             {
                 type: "divider",
@@ -58,9 +57,9 @@ export const ExportAction = ({
                 key: quickExportKey,
                 label: (
                     <Space>
-                        {quickExportTitleMsg}
+                        {msgExportQuick}
                         {isFilterSet && (
-                            <Tooltip title={filtersApplyiedTitleMsg}>
+                            <Tooltip title={msgFiltersApplied}>
                                 <FilterIcon />
                             </Tooltip>
                         )}
@@ -83,7 +82,7 @@ export const ExportAction = ({
     return (
         <Dropdown menu={menuProps}>
             <Button icon={<ExportIcon />} size={size} loading={exportLoading}>
-                {exportTitleMsg}
+                {msgExport}
             </Button>
         </Dropdown>
     );

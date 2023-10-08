@@ -9,12 +9,12 @@ const m2_to_ha = 1e-4;
 const m2_to_ac = 1 / 4046.86;
 const ac_to_mi2 = 1 / 640;
 
-const SI_m = gettext("m");
-const SI_km = gettext("km");
-const SI_ft = gettext("ft");
-const SI_mi = gettext("mi");
-const SI_ha = gettext("ha");
-const SI_ac = gettext("ac");
+const msgSiM = gettext("m");
+const msgSiKm = gettext("km");
+const msgSiFt = gettext("ft");
+const msgSiMi = gettext("mi");
+const msgSiHa = gettext("ha");
+const msgSiAc = gettext("ac");
 
 const defaultConfig = {
     format: "html-string",
@@ -69,39 +69,39 @@ const metersLengthToUnit = (meters, unit) => {
     switch (unit) {
         case "km":
             resultValue = meters * m_to_km;
-            postfix = SI_km;
+            postfix = msgSiKm;
             break;
         case "metric":
             if (meters > 1000) {
                 resultValue = meters * m_to_km;
-                postfix = SI_km;
+                postfix = msgSiKm;
             } else {
                 resultValue = meters;
-                postfix = SI_m;
+                postfix = msgSiM;
             }
             break;
         case "ft":
             resultValue = meters * m_to_ft;
-            postfix = SI_ft;
+            postfix = msgSiFt;
             break;
         case "mi":
             resultValue = meters * m_to_ft * ft_to_mi;
-            postfix = SI_mi;
+            postfix = msgSiMi;
             break;
         case "imperial":
             resultValue = meters * m_to_ft;
             if (resultValue > 5280) {
                 resultValue = resultValue * ft_to_mi;
-                postfix = SI_mi;
+                postfix = msgSiMi;
             } else {
                 resultValue = meters;
-                postfix = SI_ft;
+                postfix = msgSiFt;
             }
             break;
         case "m":
         default:
             resultValue = meters;
-            postfix = SI_m;
+            postfix = msgSiM;
     }
 
     return {
@@ -119,7 +119,7 @@ const metersAreaToUnit = (meters, unit) => {
             resultValue = meters * m_to_km * m_to_km;
             postfix = (
                 <>
-                    {SI_km}
+                    {msgSiKm}
                     <sup>2</sup>
                 </>
             );
@@ -129,7 +129,7 @@ const metersAreaToUnit = (meters, unit) => {
                 resultValue = meters * m_to_km * m_to_km;
                 postfix = (
                     <>
-                        {SI_km}
+                        {msgSiKm}
                         <sup>2</sup>
                     </>
                 );
@@ -137,7 +137,7 @@ const metersAreaToUnit = (meters, unit) => {
                 resultValue = meters;
                 postfix = (
                     <>
-                        {SI_m}
+                        {msgSiM}
                         <sup>2</sup>
                     </>
                 );
@@ -145,17 +145,17 @@ const metersAreaToUnit = (meters, unit) => {
             break;
         case "ha":
             resultValue = meters * m2_to_ha;
-            postfix = SI_ha;
+            postfix = msgSiHa;
             break;
         case "ac":
             resultValue = meters * m2_to_ac;
-            postfix = SI_ac;
+            postfix = msgSiAc;
             break;
         case "sq_mi":
             resultValue = meters * m2_to_ac * ac_to_mi2;
             postfix = (
                 <>
-                    {SI_mi}
+                    {msgSiMi}
                     <sup>2</sup>
                 </>
             );
@@ -166,20 +166,20 @@ const metersAreaToUnit = (meters, unit) => {
                 resultValue = resultValue * ac_to_mi2;
                 postfix = (
                     <>
-                        {SI_mi}
+                        {msgSiMi}
                         <sup>2</sup>
                     </>
                 );
             } else {
                 resultValue = meters;
-                postfix = SI_ac;
+                postfix = msgSiAc;
             }
             break;
         case "sq_ft":
             resultValue = meters * m_to_ft * m_to_ft;
             postfix = (
                 <>
-                    {SI_ft}
+                    {msgSiFt}
                     <sup>2</sup>
                 </>
             );
@@ -189,7 +189,7 @@ const metersAreaToUnit = (meters, unit) => {
             resultValue = meters;
             postfix = (
                 <>
-                    {SI_m}
+                    {msgSiM}
                     <sup>2</sup>
                 </>
             );

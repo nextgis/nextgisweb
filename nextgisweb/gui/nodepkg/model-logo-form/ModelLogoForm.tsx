@@ -3,7 +3,7 @@ import { message, Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { useEffect, useState } from "react";
 
@@ -23,9 +23,7 @@ interface ModelLogoFormProps extends ImageUploaderProps {
 }
 
 const defaultMessages = {
-    saveSuccess: i18n.gettext(
-        "Logo saved. Reload the page to get them applied."
-    ),
+    saveSuccess: gettext("Logo saved. Reload the page to get them applied."),
 };
 
 export function ModelLogoForm({

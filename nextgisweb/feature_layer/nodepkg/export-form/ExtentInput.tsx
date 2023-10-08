@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { Form, InputNumber, Space } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-const unit = gettext("deg.");
+const msgUnit = gettext("deg.");
+
 const parts = [
     { key: "minx", label: gettext("Left"), min: -180, max: 180 },
     { key: "miny", label: gettext("Bottom"), min: -90, max: 90 },
@@ -33,7 +34,7 @@ const Widget = ({ value, onChange }: ExtentInputProps) => {
                     {...part}
                     key={idx}
                     addonBefore={label}
-                    addonAfter={unit}
+                    addonAfter={msgUnit}
                     onChange={(value) =>
                         setValues((prev) => {
                             prev[idx] = value;

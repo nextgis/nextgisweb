@@ -1,14 +1,14 @@
 import { SingleSettingForm } from "@nextgisweb/gui/single-setting-form";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-const saveSuccesText = i18n.gettext("The home path setting is saved.");
+const msgSuccess = gettext("The home path setting is saved.");
 
 export function HomePath() {
     return (
         <SingleSettingForm
             model="pyramid.home_path"
             settingName="home_path"
-            saveSuccesText={saveSuccesText}
+            saveSuccesText={msgSuccess}
             inputProps={{ placeholder: "/resource/0" }}
         />
     );

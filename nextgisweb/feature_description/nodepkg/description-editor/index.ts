@@ -1,11 +1,11 @@
 /** @entrypoint */
-import DescriptionEditorStore from "./DescriptionEditorStore";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import i18n from "@nextgisweb/pyramid/i18n";
+import DescriptionEditorStore from "./DescriptionEditorStore";
 
 import type { EditorWidgetRegister } from "@nextgisweb/feature-layer/type";
 
-const titleText = i18n.gettext("Description");
+const msgTitle = gettext("Description");
 
 const editorWidgetRegister: EditorWidgetRegister<
     string | null,
@@ -13,7 +13,7 @@ const editorWidgetRegister: EditorWidgetRegister<
 > = {
     component: () => import("./DescriptionEditor"),
     store: DescriptionEditorStore,
-    label: titleText,
+    label: msgTitle,
 };
 
 export default editorWidgetRegister;

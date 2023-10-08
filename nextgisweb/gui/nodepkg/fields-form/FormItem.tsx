@@ -1,4 +1,4 @@
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useMemo } from "react";
 
 import {
@@ -40,7 +40,7 @@ export function FormItem({
     if (required) {
         formProps.rules.push({
             required: true,
-            message: requiredMessage ?? i18n.gettext("This value is required"),
+            message: requiredMessage ?? gettext("This value is required"),
         });
     }
 

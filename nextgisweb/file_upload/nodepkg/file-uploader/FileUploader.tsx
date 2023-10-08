@@ -17,10 +17,10 @@ import "./FileUploader.less";
 
 const { Dragger } = Upload;
 
-const mUpload = gettext("Select a file");
-const mDragAndDrop = gettext("or drag and drop here");
-const mMaxSize = formatSize(maxSize) + " " + gettext("max");
-const mStop = gettext("Stop");
+const msgUpload = gettext("Select a file");
+const msgDragAndDrop = gettext("or drag and drop here");
+const msgMaxSize = formatSize(maxSize) + " " + gettext("max");
+const msgStop = gettext("Stop");
 
 export function FileUploader({
     accept,
@@ -29,11 +29,11 @@ export function FileUploader({
     helpText,
     onChange,
     inputProps = {},
-    uploadText = mUpload,
+    uploadText = msgUpload,
     onUploading,
     setFileMeta,
     showMaxSize = false,
-    dragAndDropText = mDragAndDrop,
+    dragAndDropText = msgDragAndDrop,
     showProgressInDocTitle = true,
 }: FileUploaderProps) {
     const { abort, progressText, props, meta, setMeta, uploading } =
@@ -75,7 +75,7 @@ export function FileUploader({
                     {dragAndDropText}
                 </p>
                 {helpText ? <p className="ant-upload-hint">{helpText}</p> : ""}
-                {showMaxSize && <p className="ant-upload-hint">{mMaxSize}</p>}
+                {showMaxSize && <p className="ant-upload-hint">{msgMaxSize}</p>}
             </Balancer>
         );
     };
@@ -87,7 +87,7 @@ export function FileUploader({
             </span>
             <span>
                 <Button shape="round" icon={<CancelIcon />} onClick={abort}>
-                    {mStop}
+                    {msgStop}
                 </Button>
             </span>
         </div>

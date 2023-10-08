@@ -1,17 +1,16 @@
 import { observer } from "mobx-react-lite";
 
-import { Input } from "@nextgisweb/gui/antd";
-import { ResourceSelect } from "@nextgisweb/resource/component";
 import { PrincipalSelect } from "@nextgisweb/auth/component";
-
-import i18n from "@nextgisweb/pyramid/i18n";
+import { Input } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { ResourceSelect } from "@nextgisweb/resource/component";
 
 import "./EditorWidget.less";
 
 export const EditorWidget = observer(({ store }) => {
     return (
         <div className="ngw-resource-editor-widget">
-            <label>{i18n.gettext("Display name")}</label>
+            <label>{gettext("Display name")}</label>
             <Input
                 value={store.displayName}
                 placeholder={store.sdnDynamic || store.sdnBase}
@@ -21,7 +20,7 @@ export const EditorWidget = observer(({ store }) => {
                 status={store.displayNameIsValid ? undefined : "error"}
             />
 
-            <label>{i18n.gettext("Parent")}</label>
+            <label>{gettext("Parent")}</label>
             <ResourceSelect
                 value={store.parent}
                 onChange={(v) => {
@@ -31,7 +30,7 @@ export const EditorWidget = observer(({ store }) => {
                 disabled={store.operation === "create"}
             />
 
-            <label>{i18n.gettext("Owner")}</label>
+            <label>{gettext("Owner")}</label>
             <PrincipalSelect
                 model={"user"}
                 systemUsers={["guest"]}
@@ -43,11 +42,11 @@ export const EditorWidget = observer(({ store }) => {
                 disabled={!ngwConfig.isAdministrator}
             />
 
-            <label>{i18n.gettext("Keyname")}</label>
+            <label>{gettext("Keyname")}</label>
             <Input
                 value={store.keyname}
                 status={store.keynameIsValid ? undefined : "error"}
-                placeholder={i18n.gettext(
+                placeholder={gettext(
                     "Identifier for API integration (optional)"
                 )}
                 onChange={(e) => {
@@ -59,5 +58,5 @@ export const EditorWidget = observer(({ store }) => {
     );
 });
 
-EditorWidget.title = i18n.gettext("Resource");
+EditorWidget.title = gettext("Resource");
 EditorWidget.order = -100;

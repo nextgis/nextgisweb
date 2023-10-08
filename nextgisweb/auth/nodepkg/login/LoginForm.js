@@ -14,10 +14,9 @@ import LoginIcon from "@nextgisweb/icon/material/login";
 
 import "./LoginForm.less";
 
-const oauthText = gettext("Sign in with {}").replace("{}", oauth.name);
-
-const titleText = gettext("Sign in to Web GIS");
-const loginText = gettext("Sign in");
+const msgOauth = gettext("Sign in with {}").replace("{}", oauth.name);
+const msgTitle = gettext("Sign in to Web GIS");
+const msgSignIn = gettext("Sign in");
 
 export const LoginForm = observer((props = {}) => {
     const [creds, setCreds] = useState();
@@ -82,13 +81,13 @@ export const LoginForm = observer((props = {}) => {
 
     return (
         <div className="ngw-auth-login-form">
-            <h1>{titleText}</h1>
+            <h1>{msgTitle}</h1>
 
             {oauth.enabled && (
                 <>
                     <div className="oauth">
                         <Button type="primary" size="large" href={oauthUrl}>
-                            {oauthText}
+                            {msgOauth}
                         </Button>
                     </div>
                     <div className="separator">
@@ -110,7 +109,7 @@ export const LoginForm = observer((props = {}) => {
                     onClick={login}
                     icon={<LoginIcon />}
                 >
-                    {loginText}
+                    {msgSignIn}
                 </Button>
             </div>
         </div>

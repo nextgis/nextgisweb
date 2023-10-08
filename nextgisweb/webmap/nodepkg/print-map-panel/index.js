@@ -1,3 +1,3 @@
 /** @entrypoint */
-import { PrintMapPanel } from "./PrintMapPanel.js";
+import { PrintMapPanel } from "./PrintMapPanel";
 export default PrintMapPanel;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -16,8 +16,8 @@ import "./ImageUploader.less";
 
 type OriginFileObj = UploadFile["originFileObj"];
 
-const mUpload = gettext("Select a file");
-const mDelete = gettext("Delete");
+const msgUpload = gettext("Select a file");
+const msgDelete = gettext("Delete");
 
 export function ImageUploader({
     inputProps,
@@ -36,7 +36,7 @@ export function ImageUploader({
         file,
         height,
         fileMeta,
-        uploadText: mUpload,
+        uploadText: msgUpload,
         setFileMeta,
         inputProps: {
             name: "image",
@@ -106,7 +106,7 @@ export function ImageUploader({
                         }}
                         onClick={() => clean()}
                     >
-                        {mDelete}
+                        {msgDelete}
                     </Button>
                 </div>
             </div>

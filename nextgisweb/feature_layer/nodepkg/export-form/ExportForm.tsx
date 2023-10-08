@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 
@@ -9,19 +9,19 @@ import {
     Form,
     Select,
 } from "@nextgisweb/gui/fields-form";
-import type { FormField } from "@nextgisweb/gui/fields-form";
 import { ResourceSelectMultiple } from "@nextgisweb/resource/field/ResourceSelectMultiple";
 
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 
-import { ExtentInput } from "./ExtentInput";
 import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
+import { ExtentInput } from "./ExtentInput";
 
 import type { ApiError } from "@nextgisweb/gui/error/type";
+import type { FormField } from "@nextgisweb/gui/fields-form";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 import type { SpatialReferenceSystem } from "@nextgisweb/spatial-ref-sys/type";
 import type { FeatureLayerField } from "../type";
@@ -162,7 +162,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             multipleFields = [
                 {
                     name: "resources",
-                    label: i18n.gettext("Resources"),
+                    label: gettext("Resources"),
                     widget: ResourceSelectMultiple,
                     inputProps: {
                         pickerOptions: {
@@ -183,7 +183,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             ...multipleFields,
             {
                 name: "format",
-                label: i18n.gettext("Format"),
+                label: gettext("Format"),
                 widget: Select,
                 choices: exportFormats.map((format) => ({
                     value: format.name,
@@ -193,13 +193,13 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             ...dscoFields,
             {
                 name: "srs",
-                label: i18n.gettext("SRS"),
+                label: gettext("SRS"),
                 widget: Select,
                 choices: srsOptions,
             },
             {
                 name: "encoding",
-                label: i18n.gettext("Encoding"),
+                label: gettext("Encoding"),
                 widget: Select,
                 choices: [
                     { value: "UTF-8", label: "UTF-8" },
@@ -209,18 +209,16 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             },
             {
                 name: "fid",
-                label: i18n.gettext("FID field"),
+                label: gettext("FID field"),
             },
             {
                 name: "display_name",
-                label: i18n.gettext(
-                    "Use field display names instead of keynames"
-                ),
+                label: gettext("Use field display names instead of keynames"),
                 widget: Checkbox,
             },
             {
                 name: "fields",
-                label: i18n.gettext("Fields"),
+                label: gettext("Fields"),
                 widget: Select,
                 mode: "multiple",
                 included: !multiple,
@@ -228,16 +226,16 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             },
             {
                 name: "extent",
-                label: i18n.gettext("Limit by extent"),
+                label: gettext("Limit by extent"),
                 widget: ExtentInput,
             },
             {
                 name: "ilike",
-                label: i18n.gettext("Filter text"),
+                label: gettext("Filter text"),
             },
             {
                 name: "zipped",
-                label: i18n.gettext("Zip archive"),
+                label: gettext("Zip archive"),
                 widget: Checkbox,
                 included: !multiple,
                 disabled:
@@ -274,7 +272,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                     }}
                     icon={null}
                 >
-                    {i18n.gettext("Save")}
+                    {gettext("Save")}
                 </SaveButton>
             </Form.Item>
         </FieldsForm>

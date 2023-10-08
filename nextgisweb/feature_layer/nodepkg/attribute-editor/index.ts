@@ -5,7 +5,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidgetRegister } from "@nextgisweb/feature-layer/type";
 import type { NgwAttributeValue } from "./type";
 
-const titleText = gettext("Attributes");
+const msgTitle = gettext("Attributes");
 
 const editorWidgetRegister: EditorWidgetRegister<
     NgwAttributeValue | null,
@@ -13,7 +13,7 @@ const editorWidgetRegister: EditorWidgetRegister<
 > = {
     component: () => import("./AttributeEditor"),
     store: AttributeEditorStore,
-    label: titleText,
+    label: msgTitle,
 };
 
 export default editorWidgetRegister;

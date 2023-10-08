@@ -5,7 +5,7 @@ import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { RouteName } from "@nextgisweb/pyramid/api/type";
 import type { ApiError } from "../error/type";
@@ -21,16 +21,14 @@ interface SingleSettingFormParams {
     inputProps?: InputParams;
 }
 
-const saveSuccesText_ = i18n.gettext("The setting is saved.");
-const saveSuccesReloadText_ = i18n.gettext(
-    "Reload the page to get them applied."
-);
+const msgSaved = gettext("The setting is saved.");
+const msgReload = gettext("Reload the page to get them applied.");
 
 export function SingleSettingForm({
     model,
     settingName,
-    saveSuccessText: saveSuccesText = saveSuccesText_,
-    saveSuccessReloadText: saveSuccesReloadText = saveSuccesReloadText_,
+    saveSuccessText: saveSuccesText = msgSaved,
+    saveSuccessReloadText: saveSuccesReloadText = msgReload,
     inputProps = {},
 }: SingleSettingFormParams) {
     const [status, setStatus] = useState<"loading" | "saving" | null>(

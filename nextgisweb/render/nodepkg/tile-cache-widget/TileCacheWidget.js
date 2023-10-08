@@ -1,8 +1,7 @@
 import { observer } from "mobx-react-lite";
 
 import { Checkbox, InputNumber } from "@nextgisweb/gui/antd";
-
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./TileCacheWidget.less";
 
@@ -27,7 +26,7 @@ export const TileCacheWidget = observer(({ store }) => {
                     store.update(data);
                 }}
             >
-                {i18n.gettext("Enabled")}
+                {gettext("Enabled")}
             </Checkbox>
 
             <Checkbox
@@ -36,7 +35,7 @@ export const TileCacheWidget = observer(({ store }) => {
                     store.update({ imageCompose: e.target.checked })
                 }
             >
-                {i18n.gettext("Allow using tiles in non-tile requests")}
+                {gettext("Allow using tiles in non-tile requests")}
             </Checkbox>
 
             {store.featureTrackChanges && (
@@ -46,11 +45,11 @@ export const TileCacheWidget = observer(({ store }) => {
                         store.update({ trackChanges: e.target.checked });
                     }}
                 >
-                    {i18n.gettext("Track changes")}
+                    {gettext("Track changes")}
                 </Checkbox>
             )}
 
-            <label>{i18n.gettext("Max zoom level")}</label>
+            <label>{gettext("Max zoom level")}</label>
             <InputNumber
                 value={store.maxZ}
                 onChange={(v) => store.update({ maxZ: v })}
@@ -60,7 +59,7 @@ export const TileCacheWidget = observer(({ store }) => {
 
             {store.featureSeed && (
                 <>
-                    <label>{i18n.gettext("Seed zoom level")}</label>
+                    <label>{gettext("Seed zoom level")}</label>
                     <InputNumber
                         value={store.seedZ}
                         onChange={(v) => store.update({ seedZ: v })}
@@ -70,7 +69,7 @@ export const TileCacheWidget = observer(({ store }) => {
                 </>
             )}
 
-            <label>{i18n.gettext("TTL, sec.")}</label>
+            <label>{gettext("TTL, sec.")}</label>
             <InputNumber
                 value={store.ttl}
                 onChange={(v) => store.update({ ttl: v })}
@@ -79,10 +78,10 @@ export const TileCacheWidget = observer(({ store }) => {
                 step={86400}
             />
 
-            <Checkbox>{i18n.gettext("Flush")}</Checkbox>
+            <Checkbox>{gettext("Flush")}</Checkbox>
         </div>
     );
 });
 
-TileCacheWidget.title = i18n.gettext("Tile cache");
+TileCacheWidget.title = gettext("Tile cache");
 TileCacheWidget.order = 40;

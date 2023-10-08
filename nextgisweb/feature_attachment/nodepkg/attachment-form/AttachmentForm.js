@@ -1,16 +1,17 @@
 import { useState } from "react";
+
 import { fileUploader } from "@nextgisweb/file-upload";
-import { Button, Tabs, Modal, Upload, Checkbox } from "@nextgisweb/gui/antd";
-import showModal from "@nextgisweb/gui/showModal";
+import { Button, Checkbox, Modal, Tabs, Upload } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
+import showModal from "@nextgisweb/gui/showModal";
 import {
-    routeURL,
-    route,
-    request,
     LunkwillParam,
+    request,
+    route,
+    routeURL,
 } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
-import i18n from "@nextgisweb/pyramid/i18n";
 
 import "./AttachmentForm.less";
 
@@ -45,7 +46,7 @@ export function AttachmentForm({ id }) {
     const exportTab = () => (
         <>
             <p>
-                {i18n.gettext(
+                {gettext(
                     "Use export to copy feature attachments between different layers or to create a backup. The resulting ZIP archive will contain all of the attachments put in directories named after feature IDs. Attachment metadata are put into a separate JSON file."
                 )}
             </p>
@@ -55,7 +56,7 @@ export function AttachmentForm({ id }) {
                 loading={loading === "export"}
                 onClick={doExport}
             >
-                {i18n.gettext("Export attachments to ZIP archive")}
+                {gettext("Export attachments to ZIP archive")}
             </Button>
         </>
     );
@@ -70,15 +71,14 @@ export function AttachmentForm({ id }) {
 
     const ImportSuccessModal = ({ result, ...props }) => (
         <Modal
-            okText={i18n.gettext("Back to resource")}
+            okText={gettext("Back to resource")}
             onOk={backToResource}
-            cancelText={i18n.gettext("Close")}
+            cancelText={gettext("Close")}
             {...props}
         >
-            {i18n.gettext("The archive has been successfully imported.")}
+            {gettext("The archive has been successfully imported.")}
             <br />
-            {i18n
-                .gettext("Attachments imported - {i}, skipped - {s}.")
+            {gettext("Attachments imported - {i}, skipped - {s}.")
                 .replace("{i}", result.imported)
                 .replace("{s}", result.skipped)}
         </Modal>
@@ -112,7 +112,7 @@ export function AttachmentForm({ id }) {
     const importTab = () => (
         <>
             <p>
-                {i18n.gettext(
+                {gettext(
                     "Upload a ZIP archive to batch append attachments to existing features. An archive must contain directories named after feature IDs. Each folder can contain one or many attachments. Duplicates will be ignored."
                 )}
             </p>
@@ -121,7 +121,7 @@ export function AttachmentForm({ id }) {
                     disabled={loading}
                     onChange={(e) => setImportReplace(e.target.checked)}
                 >
-                    {i18n.gettext("Delete existing attachments")}
+                    {gettext("Delete existing attachments")}
                 </Checkbox>
             </p>
 
@@ -142,7 +142,7 @@ export function AttachmentForm({ id }) {
                     disabled={loading && loading !== "import"}
                     loading={loading === "import"}
                 >
-                    {i18n.gettext("Import attachments from ZIP archive")}
+                    {gettext("Import attachments from ZIP archive")}
                 </Button>
             </Upload>
         </>
@@ -154,12 +154,12 @@ export function AttachmentForm({ id }) {
             items={[
                 {
                     key: "export",
-                    label: i18n.gettext("Export"),
+                    label: gettext("Export"),
                     children: exportTab(),
                 },
                 {
                     key: "import",
-                    label: i18n.gettext("Import"),
+                    label: gettext("Import"),
                     children: importTab(),
                 },
             ]}

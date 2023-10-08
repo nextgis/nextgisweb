@@ -3,8 +3,8 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ParamsOf } from "@nextgisweb/gui/type";
 
-const defTitleMsg = gettext("Operation in progress");
-const defCancelMsg = gettext("Cancel");
+const msgInProgress = gettext("Operation in progress");
+const msgCancel = gettext("Cancel");
 
 type ProgressModal = ParamsOf<typeof Progress>;
 
@@ -26,8 +26,8 @@ export const ProgressModal = ({
     closable = false,
     okText = null,
     onCancel,
-    title = defTitleMsg,
-    cancelText = defCancelMsg,
+    title = msgInProgress,
+    cancelText = msgCancel,
     ...restProps
 }: ProgressModalProps) => {
     const modalOptions: ModalParams & Pick<ModalParams, "footer"> = {

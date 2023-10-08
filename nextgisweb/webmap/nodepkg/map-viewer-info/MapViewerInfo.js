@@ -7,7 +7,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { getDecPlacesRoundCoordByProj } from "@nextgisweb/webmap/utils/format-units";
 
-import { roundValue } from "../utils/format-units.js";
+import { roundValue } from "../utils/format-units";
 
 import CropFreeIcon from "@nextgisweb/icon/material/crop_free";
 import MouseIcon from "@nextgisweb/icon/material/mouse";

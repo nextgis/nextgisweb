@@ -1,6 +1,7 @@
 /** @entrypoint */
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import { routeURL } from "../api";
 
 const callbacks = [];
@@ -52,10 +53,10 @@ function addMenuItem(isCritical) {
             title: (
                 <>
                     {isCritical
-                        ? i18n.gettext("Critical updates are available")
-                        : i18n.gettext("Updates are available")}
+                        ? gettext("Critical updates are available")
+                        : gettext("Updates are available")}
                     <div className="text-muted small-text">
-                        {i18n.gettext("Click to see what's new")}
+                        {gettext("Click to see what's new")}
                     </div>
                 </>
             ),

@@ -25,7 +25,7 @@ const componentMap: Partial<
     "Fill": FillEditor,
 };
 
-const unknownSymbolizerText = gettext("Symbolizer unknown!");
+const msgUnknownSymbolizer = gettext("Symbolizer unknown!");
 
 export function KindEditor({ symbolizer, setSymbolizer }: SymbolizerKindProps) {
     const kind = symbolizer.kind;
@@ -36,5 +36,5 @@ export function KindEditor({ symbolizer, setSymbolizer }: SymbolizerKindProps) {
             <Component key={kind} value={symbolizer} onChange={setSymbolizer} />
         );
     }
-    return <>{unknownSymbolizerText}</>;
+    return <>{msgUnknownSymbolizer}</>;
 }

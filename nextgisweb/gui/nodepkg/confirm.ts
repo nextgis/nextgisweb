@@ -1,6 +1,5 @@
 import { Modal, message } from "@nextgisweb/gui/antd";
-
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ModalFuncProps } from "antd/lib/modal/interface";
 
@@ -11,10 +10,10 @@ interface ConfirmOptions extends ModalFuncProps {
 export function confirm({
     onOk,
     errorMessage,
-    title = i18n.gettext("Confirmation required"),
-    content = i18n.gettext("Please confirm this action."),
+    title = gettext("Confirmation required"),
+    content = gettext("Please confirm this action."),
     okButtonProps = { danger: true, type: "primary" },
-    okText = i18n.gettext("OK"),
+    okText = gettext("OK"),
     autoFocusButton = "cancel",
 }: ConfirmOptions) {
     Modal.confirm({
@@ -41,9 +40,9 @@ export function confirm({
 }
 
 export function confirmDelete({
-    content = i18n.gettext("Please confirm the deletion."),
-    okText = i18n.gettext("Delete"),
-    errorMessage = i18n.gettext("Failed to delete."),
+    content = gettext("Please confirm the deletion."),
+    okText = gettext("Delete"),
+    errorMessage = gettext("Failed to delete."),
     ...rest
 }) {
     confirm({ content, okText, errorMessage, ...rest });

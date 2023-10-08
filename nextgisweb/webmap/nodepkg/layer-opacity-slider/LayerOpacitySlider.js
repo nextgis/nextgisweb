@@ -5,12 +5,12 @@ import Icon from "@nextgisweb/icon/mdi/circle-opacity";
 
 import "./LayerOpacitySlider.less";
 
-const mTooltip = gettext("Opacity");
+const msgTooltip = gettext("Opacity");
 
 export function LayerOpacitySlider({ onChange, defaultValue }) {
     return (
         <div className="ngw-webmap-layer-opacity-slider">
-            <Tooltip title={mTooltip}>
+            <Tooltip title={msgTooltip}>
                 <Icon />
             </Tooltip>
             <Slider

@@ -4,7 +4,7 @@ import { Input, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-const mTypeToAdd = gettext("Type here to add a new key...");
+const msgTypeToAdd = gettext("Type here to add a new key...");
 
 const { Option } = Select;
 
@@ -18,7 +18,7 @@ const InputKey = observer(({ row, placeholder }) => {
                 row.update(props);
             }}
             bordered={false}
-            placeholder={placeholder ? mTypeToAdd : undefined}
+            placeholder={placeholder ? msgTypeToAdd : undefined}
         />
     );
 });

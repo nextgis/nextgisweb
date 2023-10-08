@@ -1,7 +1,7 @@
 import { makeAutoObservable } from "mobx";
-import { routeURL } from "@nextgisweb/pyramid/api";
 
-import i18n from "@nextgisweb/pyramid/i18n";
+import { routeURL } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 import { url } from "../nextgis";
 
@@ -35,19 +35,19 @@ export const layoutStore = new LayoutStore();
 
 layoutStore.addMenuItem({
     href: routeURL("resource.show", 0),
-    title: i18n.gettext("Resources"),
+    title: gettext("Resources"),
 });
 
 if (ngwConfig.isAdministrator) {
     layoutStore.addMenuItem({
         href: routeURL("pyramid.control_panel"),
-        title: i18n.gettext("Control panel"),
+        title: gettext("Control panel"),
     });
 }
 
 if (settings["help_page_url"]) {
     layoutStore.addMenuItem({
         href: url(settings["help_page_url"]),
-        title: i18n.gettext("Help"),
+        title: gettext("Help"),
     });
 }

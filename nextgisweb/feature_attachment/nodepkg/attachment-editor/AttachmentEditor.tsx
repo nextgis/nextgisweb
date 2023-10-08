@@ -7,10 +7,10 @@ import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { Button, Image, Input, Table, Upload } from "@nextgisweb/gui/antd";
 import { formatSize } from "@nextgisweb/gui/util";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { FileReaderImage } from "./component/FileReaderImage";
 import AttachmentEditorStore from "./AttachmentEditorStore";
+import { FileReaderImage } from "./component/FileReaderImage";
 
 import DeleteIcon from "@nextgisweb/icon/material/clear";
 
@@ -149,19 +149,19 @@ const AttachmentEditor = observer(
                             {
                                 dataIndex: "name",
                                 className: "name",
-                                title: i18n.gettext("File name"),
+                                title: gettext("File name"),
                                 render: editableField("name"),
                             },
                             {
                                 dataIndex: "size",
                                 className: "size",
-                                title: i18n.gettext("Size"),
+                                title: gettext("Size"),
                                 render: (text: number) => formatSize(text),
                             },
                             {
                                 dataIndex: "description",
                                 className: "description",
-                                title: i18n.gettext("Description"),
+                                title: gettext("Description"),
                                 render: editableField("description"),
                             },
                             {

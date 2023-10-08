@@ -1,25 +1,23 @@
 import { makeAutoObservable, runInAction, toJS } from "mobx";
 
+import { message } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 
-import { message } from "@nextgisweb/gui/antd";
-
-import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 import type {
-    FeatureLayerField,
     FeatureItemExtensions,
+    FeatureLayerField,
 } from "@nextgisweb/feature-layer/type";
-import type { FeatureEditorStoreOptions } from "./type";
-import type { FeatureItem as FeatureItem_, EditorStore } from "../type";
+import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 import type { NgwAttributeValue } from "../attribute-editor/type";
+import type { EditorStore, FeatureItem as FeatureItem_ } from "../type";
+import type { FeatureEditorStoreOptions } from "./type";
 
 type FeatureItem = FeatureItem_<NgwAttributeValue>;
 
-const saveSuccessMsg = gettext("Feature saved");
-const noChangesMsg = gettext("No changes to save");
+const msgSaved = gettext("Feature saved");
+const msgNoChanges = gettext("No changes to save");
 
 export class FeatureEditorStore {
     resourceId: number;
@@ -105,7 +103,7 @@ export class FeatureEditorStore {
 
     save = async () => {
         if (!this.dirty) {
-            message.success(noChangesMsg);
+            message.success(msgNoChanges);
             return;
         }
 
@@ -130,7 +128,7 @@ export class FeatureEditorStore {
             });
             // To update initial feature value
             const resp = await this._initialize();
-            message.success(saveSuccessMsg);
+            message.success(msgSaved);
             return resp;
         } finally {
             runInAction(() => {

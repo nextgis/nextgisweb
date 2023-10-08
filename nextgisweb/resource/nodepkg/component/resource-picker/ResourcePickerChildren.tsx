@@ -22,7 +22,7 @@ import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
 
 const { Column } = Table;
 
-const mDisplayName = gettext("Display name");
+const msgDislpayName = gettext("Display name");
 
 function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     resourceStore,
@@ -155,7 +155,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             }}
         >
             <Column
-                title={mDisplayName}
+                title={msgDislpayName}
                 className="displayName"
                 dataIndex="display_name"
                 sorter={sorterFactory("display_name")}

@@ -5,8 +5,8 @@ import ViewListIcon from "@nextgisweb/icon/material/view_list/outline";
 
 import "./Legend.less";
 
-const showLegendMessage = gettext("Show legend");
-const hideLegendMessage = gettext("Hide legend");
+const msgShowLegend = gettext("Show legend");
+const msgHideLegend = gettext("Hide legend");
 
 export function LegendAction({ nodeData, onClick }) {
     if (
@@ -31,7 +31,7 @@ export function LegendAction({ nodeData, onClick }) {
         <span
             className="legend"
             onClick={click}
-            title={open ? hideLegendMessage : showLegendMessage}
+            title={open ? msgHideLegend : msgShowLegend}
         >
             {icon}
         </span>

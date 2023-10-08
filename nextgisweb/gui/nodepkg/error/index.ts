@@ -1,6 +1,7 @@
 /** @entrypoint */
 import { NetworksResponseError } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import showModal from "../showModal";
 import { ErrorModal } from "./ErrorModal";
 import { ErrorPage } from "./ErrorPage";
@@ -40,11 +41,11 @@ function extractError(error: ApiError): ApiError {
         title:
             typeof error.title === "string"
                 ? error.title
-                : i18n.gettext("Unexpected error"),
+                : gettext("Unexpected error"),
         message:
             typeof error.message === "string"
                 ? error.message
-                : i18n.gettext("Something went wrong."),
+                : gettext("Something went wrong."),
     };
 }
 
@@ -52,4 +53,5 @@ function errorModal(error: ApiError, props?: Partial<ErrorModalProps>) {
     return showModal(ErrorModal, { error: extractError(error), ...props });
 }
 
-export { errorModal, ErrorPage, extractError };
+export { ErrorPage, errorModal, extractError };
+

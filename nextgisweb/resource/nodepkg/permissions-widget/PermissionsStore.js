@@ -1,10 +1,10 @@
 import { makeAutoObservable, toJS } from "mobx";
 
 import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-const errRequired = i18n.gettext("All fields are required");
-const errConflict = i18n.gettext("Row conflicts with another");
+const msgAllRequired = gettext("All fields are required");
+const msgConflict = gettext("Row conflicts with another");
 
 const resourceScopes = (i) => blueprint.resources[i].scopes;
 const resourceBaseClasses = (i) => blueprint.resources[i].base_classes;
@@ -80,7 +80,7 @@ class Item {
             this.identity === null ||
             this.propagate === null
         ) {
-            return errRequired;
+            return msgAllRequired;
         }
 
         for (const other of this.store.items) {
@@ -96,7 +96,7 @@ class Item {
                 other.identity === this.identity &&
                 other.propagate === this.propagate
             ) {
-                return errConflict;
+                return msgConflict;
             }
         }
 

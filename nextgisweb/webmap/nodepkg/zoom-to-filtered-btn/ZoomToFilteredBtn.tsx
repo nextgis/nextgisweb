@@ -6,11 +6,11 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 
-import type { SizeType } from "@nextgisweb/gui/antd";
 import type {
     FeatureExtent,
     NgwExtent,
 } from "@nextgisweb/feature-layer/type/FeatureExtent";
+import type { SizeType } from "@nextgisweb/gui/antd";
 
 interface ZoomToFilteredBtnProps {
     id: number;
@@ -19,7 +19,7 @@ interface ZoomToFilteredBtnProps {
     onZoomToFiltered?: (val: NgwExtent) => void;
 }
 
-const zoomToFilteredMsg = gettext("Zoom to filtered features");
+const msgZoomToFiltered = gettext("Zoom to filtered features");
 
 export const ZoomToFilteredBtn = ({
     id,
@@ -66,7 +66,7 @@ export const ZoomToFilteredBtn = ({
     return (
         <Button
             type="text"
-            title={zoomToFilteredMsg}
+            title={msgZoomToFiltered}
             icon={<ZoomInMap />}
             onClick={click}
             size={size}

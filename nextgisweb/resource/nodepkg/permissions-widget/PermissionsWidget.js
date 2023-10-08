@@ -4,27 +4,27 @@ import { useMemo } from "react";
 import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Select, Space } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
+import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { AllowIcon, DenyIcon, ResourceIcon } from "../icon";
 import AddIcon from "@nextgisweb/icon/material/add_circle_outline";
-import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
+import { AllowIcon, DenyIcon, ResourceIcon } from "../icon";
 
 const { Option, OptGroup } = Select;
 
-const colAction = gettext("Action");
-const colPrincipal = gettext("Principal");
-const colApply = gettext("Apply to");
-const colPermission = gettext("Permission");
+const msgColAction = gettext("Action");
+const msgColPrincipal = gettext("Principal");
+const msgColApply = gettext("Apply to");
+const msgColPermission = gettext("Permission");
 
-const actionAdd = gettext("Add");
-const actionAllow = gettext("Allow");
-const actionDeny = gettext("Deny");
+const msgActionAdd = gettext("Add");
+const msgActionAllow = gettext("Allow");
+const msgActionDeny = gettext("Deny");
 
-const applyPropagate = gettext("This and subresources");
-const applyThis = gettext("This resource only");
+const msgApplyPropagate = gettext("This and subresources");
+const msgApplyThis = gettext("This resource only");
 
-const allPermissions = gettext("All permissions");
+const msgAllPermissions = gettext("All permissions");
 
 const selectDefaults = { allowClear: false, bordered: false };
 
@@ -47,10 +47,10 @@ const Action = observer(({ row }) => {
         return (
             <>
                 <Option value="allow">
-                    <IconText icon={<AllowIcon />} text={actionAllow} />
+                    <IconText icon={<AllowIcon />} text={msgActionAllow} />
                 </Option>
                 <Option value="deny">
-                    <IconText icon={<DenyIcon />} text={actionDeny} />
+                    <IconText icon={<DenyIcon />} text={msgActionDeny} />
                 </Option>
             </>
         );
@@ -60,7 +60,7 @@ const Action = observer(({ row }) => {
         <Select
             {...bindProp(row, "action")}
             {...selectDefaults}
-            placeholder={<IconText icon={<AddIcon />} text={actionAdd} />}
+            placeholder={<IconText icon={<AddIcon />} text={msgActionAdd} />}
             popupMatchSelectWidth={false}
         >
             {options}
@@ -74,7 +74,7 @@ const Principal = observer(({ row }) => {
             systemUsers
             {...bindProp(row, "principal")}
             {...selectDefaults}
-            placeholder={colPrincipal}
+            placeholder={msgColPrincipal}
         />
     );
 });
@@ -83,10 +83,10 @@ const Apply = observer(({ row }) => {
     const options = useMemo(() => {
         const result = [
             <Option key="false" value={false}>
-                {applyThis}
+                {msgApplyThis}
             </Option>,
             <Option key="true" value={true}>
-                {applyPropagate}
+                {msgApplyPropagate}
             </Option>,
         ];
 
@@ -118,7 +118,7 @@ const Apply = observer(({ row }) => {
         <Select
             {...{ value, onChange }}
             {...selectDefaults}
-            placeholder={colApply}
+            placeholder={msgColApply}
         >
             {options}
         </Select>
@@ -128,8 +128,8 @@ const Apply = observer(({ row }) => {
 const Permission = observer(({ row }) => {
     const options = useMemo(() => {
         const result = [
-            <Option key="" value="" label={allPermissions}>
-                {allPermissions}
+            <Option key="" value="" label={msgAllPermissions}>
+                {msgAllPermissions}
             </Option>,
         ];
 
@@ -139,10 +139,10 @@ const Permission = observer(({ row }) => {
             if (!scopes.includes(sid)) continue;
             const scopeOptions = [];
 
-            const label = scope.label + ": " + allPermissions;
+            const label = scope.label + ": " + msgAllPermissions;
             scopeOptions.push(
                 <Option key={sid} value={sid} label={label}>
-                    {allPermissions}
+                    {msgAllPermissions}
                 </Option>
             );
 
@@ -177,7 +177,7 @@ const Permission = observer(({ row }) => {
             {...{ value, onChange }}
             optionLabelProp="label"
             {...selectDefaults}
-            placeholder={colPermission}
+            placeholder={msgColPermission}
         >
             {options}
         </Select>
@@ -186,10 +186,10 @@ const Permission = observer(({ row }) => {
 
 // prettier-ignore
 const columns = [
-    { key: "action", title: colAction, shrink: true, component: Action },
-    { key: "principal", title: colPrincipal, width: "50%", component: Principal },
-    { key: "apply", title: colApply, shrink: applyPropagate.length + "ch", component: Apply },
-    { key: "permission", title: colPermission, width: "50%", component: Permission },
+    { key: "action", title: msgColAction, shrink: true, component: Action },
+    { key: "principal", title: msgColPrincipal, width: "50%", component: Principal },
+    { key: "apply", title: msgColApply, shrink: msgApplyPropagate.length + "ch", component: Apply },
+    { key: "permission", title: msgColPermission, width: "50%", component: Permission },
 ];
 
 export const PermissionsWidget = observer(({ store }) => {

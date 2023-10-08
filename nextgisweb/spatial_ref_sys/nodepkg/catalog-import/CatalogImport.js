@@ -1,10 +1,11 @@
-import { Button, Form } from "@nextgisweb/gui/antd";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { FieldsForm } from "@nextgisweb/gui/fields-form";
-import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
-import i18n from "@nextgisweb/pyramid/i18n";
-import { errorModal } from "@nextgisweb/gui/error";
 import { useEffect, useState } from "react";
+
+import { Button, Form } from "@nextgisweb/gui/antd";
+import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
+import { errorModal } from "@nextgisweb/gui/error";
+import { FieldsForm } from "@nextgisweb/gui/fields-form";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export function CatalogImport({ url, id }) {
     const [status, setStatus] = useState("loading");
@@ -13,12 +14,12 @@ export function CatalogImport({ url, id }) {
     const [fields] = useState([
         {
             name: "display_name",
-            label: i18n.gettext("Display name"),
+            label: gettext("Display name"),
             readOnly: true,
         },
         {
             name: "wkt",
-            label: i18n.gettext("OGC WKT definition"),
+            label: gettext("OGC WKT definition"),
             readOnly: true,
             widget: "textarea",
             rows: 4,
@@ -70,7 +71,7 @@ export function CatalogImport({ url, id }) {
                     size="small"
                     style={{ padding: 0 }}
                 >
-                    {i18n.gettext("View details")}
+                    {gettext("View details")}
                 </Button>
             </Form.Item>
             <Form.Item>
@@ -79,7 +80,7 @@ export function CatalogImport({ url, id }) {
                     icon={null}
                     loading={status === "importing"}
                 >
-                    {i18n.gettext("Import")}
+                    {gettext("Import")}
                 </SaveButton>
             </Form.Item>
         </FieldsForm>

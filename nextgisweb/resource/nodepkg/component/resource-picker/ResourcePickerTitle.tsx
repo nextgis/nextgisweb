@@ -15,8 +15,8 @@ import StartIcon from "@nextgisweb/icon/material/first_page";
 import SearchIcon from "@nextgisweb/icon/material/search";
 import SyncIcon from "@nextgisweb/icon/material/sync";
 
-const mGotoInitialGroup = gettext("Go to initial group");
-const mRefresh = gettext("Refresh");
+const msgGotoInitialGroup = gettext("Go to initial group");
+const msgRefresh = gettext("Refresh");
 
 export const ResourcePickerTitle = observer(
     ({ resourceStore, onClose, showClose }: ResourcePickerTitleProps) => {
@@ -70,7 +70,7 @@ export const ResourcePickerTitle = observer(
 
                     {parentId !== initialParentId && allowMoveInside && (
                         <Col style={{ width: "30px" }}>
-                            <Tooltip title={mGotoInitialGroup}>
+                            <Tooltip title={msgGotoInitialGroup}>
                                 <a
                                     onClick={() =>
                                         resourceStore.returnToInitial()
@@ -83,7 +83,7 @@ export const ResourcePickerTitle = observer(
                     )}
 
                     <Col style={{ width: "30px" }}>
-                        <Tooltip title={mRefresh}>
+                        <Tooltip title={msgRefresh}>
                             <a onClick={() => resourceStore.refresh()}>
                                 <SyncIcon />
                             </a>

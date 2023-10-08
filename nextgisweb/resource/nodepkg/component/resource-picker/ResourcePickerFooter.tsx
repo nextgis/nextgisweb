@@ -29,8 +29,8 @@ interface MoveControlProps<V extends SelectValue = SelectValue> {
     onOk?: (val: V) => void;
 }
 
-const mCreateGroup = gettext("Create group");
-const mClearSelection = gettext("Clear selection");
+const msgCreateGroup = gettext("Create group");
+const msgClearSelection = gettext("Clear selection");
 
 const CreateControl = observer(
     ({ setCreateMode, resourceStore }: CreateControlProps) => {
@@ -166,7 +166,7 @@ const MoveControlInner = <V extends SelectValue = SelectValue>({
                 {allowCreateResource &&
                     possibleToCreate &&
                     !createNewGroupLoading && (
-                        <Tooltip title={mCreateGroup}>
+                        <Tooltip title={msgCreateGroup}>
                             <a
                                 style={{ fontSize: "1.5rem" }}
                                 onClick={onCreateClick}
@@ -179,7 +179,7 @@ const MoveControlInner = <V extends SelectValue = SelectValue>({
             <Col>
                 {selected.length ? (
                     <Space>
-                        <Tooltip title={mClearSelection}>
+                        <Tooltip title={msgClearSelection}>
                             <Button
                                 icon={<HighlightOff />}
                                 onClick={() => {

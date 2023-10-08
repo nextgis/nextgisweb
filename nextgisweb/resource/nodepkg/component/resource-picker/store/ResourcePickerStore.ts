@@ -17,8 +17,8 @@ import type {
 } from "../../../type/Resource";
 import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
 
-const mPickThis = gettext("Pick this group");
-const mPickSelected = gettext("Pick selected");
+const msgPickThis = gettext("Pick this group");
+const msgPickSelected = gettext("Pick selected");
 
 let ID = 0;
 
@@ -73,8 +73,8 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     createNewGroupAbortController?: AbortController;
     getSelectedParentAbortController?: AbortController;
 
-    getThisMsg = mPickThis;
-    getSelectedMsg = mPickSelected;
+    getThisMsg = msgPickThis;
+    getSelectedMsg = msgPickSelected;
 
     readonly initialParentId: number = 0;
 

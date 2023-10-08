@@ -15,7 +15,7 @@ import { fileUploader } from "../util/fileUploader";
 
 import type { UploadFile } from "antd/lib/upload/interface";
 
-const mProgress = gettext("{} uploaded...");
+const msgProgress = gettext("{} uploaded...");
 
 export function useFileUploader({
     accept,
@@ -54,7 +54,7 @@ export function useFileUploader({
     const onProgress = useCallback(
         (evt: Progress) => {
             if (evt.type === "progress") {
-                setProgressText(mProgress.replace("{}", evt.percent));
+                setProgressText(msgProgress.replace("{}", evt.percent));
                 if (showProgressInDocTitle) {
                     document.title = evt.percent + " | " + docTitle;
                 }

@@ -14,7 +14,7 @@ import { FloatingLabel } from "@nextgisweb/gui/floating-label";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { exportFormats, pageFormats, scalesList } from "./options.js";
+import { exportFormats, pageFormats, scalesList } from "./options";
 
 import { DownOutlined } from "@ant-design/icons";
 

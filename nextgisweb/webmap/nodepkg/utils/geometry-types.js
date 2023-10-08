@@ -1,30 +1,30 @@
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export const getGeometryTypeTitle = (geometryType) => {
     switch (geometryType) {
         case "point": {
-            return i18n.gettext("Point");
+            return gettext("Point");
         }
         case "linestring": {
-            return i18n.gettext("LineString");
+            return gettext("LineString");
         }
         case "linearring": {
-            return i18n.gettext("LinearRing");
+            return gettext("LinearRing");
         }
         case "polygon": {
-            return i18n.gettext("Polygon");
+            return gettext("Polygon");
         }
         case "multipoint": {
-            return i18n.gettext("MultiPoint");
+            return gettext("MultiPoint");
         }
         case "multilinestring": {
-            return i18n.gettext("MultiLineString");
+            return gettext("MultiLineString");
         }
         case "multipolygon": {
-            return i18n.gettext("MultiPolygon");
+            return gettext("MultiPolygon");
         }
         case "geometrycollection": {
-            return i18n.gettext("GeometryCollection");
+            return gettext("GeometryCollection");
         }
     }
 };

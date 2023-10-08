@@ -15,8 +15,8 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 // prettier-ignore
-const mHelp = gettext("Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."),
-    mInfo = gettext("Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are allowed for third-level domains and higher.");
+const msgHelp = gettext("Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."),
+    msgInfo = gettext("Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are allowed for third-level domains and higher.");
 
 export function CORSSettings() {
     const [form] = Form.useForm();
@@ -92,8 +92,8 @@ export function CORSSettings() {
                     </Form>
                 </Col>
                 <Col flex="none" span={10}>
-                    <Typography.Paragraph>{mHelp}</Typography.Paragraph>
-                    <Typography.Paragraph>{mInfo}</Typography.Paragraph>
+                    <Typography.Paragraph>{msgHelp}</Typography.Paragraph>
+                    <Typography.Paragraph>{msgInfo}</Typography.Paragraph>
                 </Col>
             </Row>
             <Row>

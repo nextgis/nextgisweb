@@ -46,8 +46,8 @@ const ngwTypeAliases: Record<
     TIME: [TimeInput, { style, allowClear: false }],
 };
 
-const setNullTitle = gettext("Set field value to NULL (No data)");
-const noFieldsTitle = gettext("There are no attributes in the vector layer");
+const msgSetNull = gettext("Set field value to NULL (No data)");
+const msgNoAttrs = gettext("There are no attributes in the vector layer");
 
 interface AttributeEditorStoreProps
     extends EditorWidgetProps<NgwAttributeValue | null, AttributeEditorStore> {
@@ -106,7 +106,7 @@ const AttributeEditor = observer(
                         ...inputProps,
                     },
                     append: (
-                        <Tooltip title={setNullTitle} placement="right">
+                        <Tooltip title={msgSetNull} placement="right">
                             <Button
                                 onClick={() => {
                                     setNullForField(field.keyname);
@@ -145,7 +145,7 @@ const AttributeEditor = observer(
                         }
                     }}
                 >
-                    {!formFields.length && <p>{noFieldsTitle}</p>}
+                    {!formFields.length && <p>{msgNoAttrs}</p>}
                 </FieldsForm>
             </div>
         );

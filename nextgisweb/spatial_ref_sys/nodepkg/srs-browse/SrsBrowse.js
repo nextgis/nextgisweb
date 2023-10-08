@@ -1,15 +1,16 @@
 import { Button } from "@nextgisweb/gui/antd";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import { routeURL } from "@nextgisweb/pyramid/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
-import i18n from "@nextgisweb/pyramid/i18n";
+
 import getMessages from "../srsMessages";
 import { modelObj } from "../srsModel";
 
 export function SrsBrowse() {
     const columns = [
         {
-            title: i18n.gettext("Display name"),
+            title: gettext("Display name"),
             dataIndex: "display_name",
             key: "display_name",
             sorter: (a, b) => (a.display_name > b.display_name ? 1 : -1),
@@ -26,7 +27,7 @@ export function SrsBrowse() {
             };
             return (
                 <Button onClick={importFromCatalog}>
-                    {i18n.gettext("Import from catalog")}
+                    {gettext("Import from catalog")}
                 </Button>
             );
         });

@@ -1,96 +1,96 @@
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export const UnitsLengthOptions = [
     {
-        label: i18n.gettext("Meters"),
+        label: gettext("Meters"),
         value: "m",
     },
     {
-        label: i18n.gettext("Kilometers"),
+        label: gettext("Kilometers"),
         value: "km",
     },
     {
-        label: i18n.gettext("Meters/kilometers (auto)"),
+        label: gettext("Meters/kilometers (auto)"),
         value: "metric",
     },
     {
-        label: i18n.gettext("Feet"),
+        label: gettext("Feet"),
         value: "ft",
     },
     {
-        label: i18n.gettext("Miles"),
+        label: gettext("Miles"),
         value: "mi",
     },
     {
-        label: i18n.gettext("Feet/miles (auto)"),
+        label: gettext("Feet/miles (auto)"),
         value: "imperial",
     },
 ];
 
 export const UnitsAreaOptions = [
     {
-        label: i18n.gettext("Sq. meters"),
+        label: gettext("Sq. meters"),
         value: "sq_m",
     },
     {
-        label: i18n.gettext("Sq. kilometers"),
+        label: gettext("Sq. kilometers"),
         value: "sq_km",
     },
     {
-        label: i18n.gettext("Sq. meters/kilometers (auto)"),
+        label: gettext("Sq. meters/kilometers (auto)"),
         value: "metric",
     },
     {
-        label: i18n.gettext("Hectares"),
+        label: gettext("Hectares"),
         value: "ha",
     },
     {
-        label: i18n.gettext("Acres"),
+        label: gettext("Acres"),
         value: "ac",
     },
     {
-        label: i18n.gettext("Sq. miles"),
+        label: gettext("Sq. miles"),
         value: "sq_mi",
     },
     {
-        label: i18n.gettext("Acres/sq. miles (auto)"),
+        label: gettext("Acres/sq. miles (auto)"),
         value: "imperial",
     },
     {
-        label: i18n.gettext("Sq. feet"),
+        label: gettext("Sq. feet"),
         value: "sq_ft",
     },
 ];
 
 export const DegreeFormatOptions = [
     {
-        label: i18n.gettext("Decimal degrees"),
+        label: gettext("Decimal degrees"),
         value: "dd",
     },
     {
-        label: i18n.gettext("Degrees, decimal minutes"),
+        label: gettext("Degrees, decimal minutes"),
         value: "ddm",
     },
     {
-        label: i18n.gettext("Degrees, minutes, seconds"),
+        label: gettext("Degrees, minutes, seconds"),
         value: "dms",
     },
 ];
 
 export const AddressGeocoderOptions = [
     {
-        label: i18n.gettext("Nominatim (OSM)"),
+        label: gettext("Nominatim (OSM)"),
         value: "nominatim",
     },
     {
-        label: i18n.gettext("Yandex.Maps API Geocoder"),
+        label: gettext("Yandex.Maps API Geocoder"),
         value: "yandex",
     },
 ];
 
 export const LegendEnabledOptions = [
-    { value: "default", label: i18n.gettext("Default") },
-    { value: "expand", label: i18n.gettext("Expand") },
-    { value: "collapse", label: i18n.gettext("Collapse") },
-    { value: "disable", label: i18n.gettext("Disable") },
+    { value: "default", label: gettext("Default") },
+    { value: "expand", label: gettext("Expand") },
+    { value: "collapse", label: gettext("Collapse") },
+    { value: "disable", label: gettext("Disable") },
 ];

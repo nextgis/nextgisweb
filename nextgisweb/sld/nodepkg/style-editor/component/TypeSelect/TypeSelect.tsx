@@ -15,7 +15,7 @@ export interface KindSelectProps {
     markEditor?: boolean;
 }
 
-const kindFieldLabel = gettext("Type");
+const msgKind = gettext("Type");
 
 export function TypeSelect({
     value = "point",
@@ -49,7 +49,7 @@ export function TypeSelect({
 
     return (
         <Form>
-            <Form.Item label={kindFieldLabel}>
+            <Form.Item label={msgKind}>
                 <TypeField
                     kind={kind}
                     onChange={onKindChange}

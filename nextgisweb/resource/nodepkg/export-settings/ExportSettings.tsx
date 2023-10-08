@@ -12,7 +12,7 @@ import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ApiError } from "@nextgisweb/gui/error/type";
 
@@ -30,7 +30,7 @@ export function ExportSettings() {
             await route("resource.resource_export").put({
                 json: { resource_export: value },
             });
-            message.success(i18n.gettext("The setting is saved."));
+            message.success(gettext("The setting is saved."));
         } catch (err) {
             errorModal(err as ApiError);
         } finally {
@@ -51,7 +51,7 @@ export function ExportSettings() {
     return (
         <Space direction="vertical">
             <Typography.Text>
-                {i18n.gettext(
+                {gettext(
                     'Select the category of users who can use the "Save as" link to download resource data.'
                 )}
             </Typography.Text>
@@ -61,20 +61,20 @@ export function ExportSettings() {
             >
                 <Space direction="vertical">
                     <Radio value="data_read">
-                        {i18n.gettext('Users with "Data: Read" permission')}
+                        {gettext('Users with "Data: Read" permission')}
                     </Radio>
                     <Radio value="data_write">
-                        {i18n.gettext('Users with "Data: Write" permission')}
+                        {gettext('Users with "Data: Write" permission')}
                     </Radio>
                     <Radio value="administrators">
-                        {i18n.gettext("Administrators")}
+                        {gettext("Administrators")}
                     </Radio>
                 </Space>
             </Radio.Group>
             <Row align="middle" style={{ marginTop: "1em" }}>
                 <Col flex="none">
                     <SaveButton onClick={save} loading={saving}>
-                        {i18n.gettext("Save")}
+                        {gettext("Save")}
                     </SaveButton>
                 </Col>
                 <Col flex="auto" style={{ marginLeft: "4em" }}>
@@ -82,7 +82,7 @@ export function ExportSettings() {
                         type="secondary"
                         style={{ marginTop: "8em" }}
                     >
-                        {i18n.gettext(
+                        {gettext(
                             "* This will not affect REST API use which will continue to be governed by permissions."
                         )}
                     </Typography.Text>

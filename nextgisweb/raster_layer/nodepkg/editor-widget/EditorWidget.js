@@ -2,15 +2,14 @@ import { observer } from "mobx-react-lite";
 
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
 import { Checkbox } from "@nextgisweb/gui/antd";
-
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./EditorWidget.less";
 
 // prettier-ignore
 const uploaderMessages = {
-    uploadText: i18n.gettext("Select a dataset"),
-    helpText: i18n.gettext("Dataset should be in GeoTIFF format."),
+    uploadText: gettext("Select a dataset"),
+    helpText: gettext("Dataset should be in GeoTIFF format."),
 }
 
 export const EditorWidget = observer(({ store }) => {
@@ -35,13 +34,13 @@ export const EditorWidget = observer(({ store }) => {
                         store.cog = e.target.checked;
                     }}
                 >
-                    {i18n.gettext("Cloud Optimized GeoTIFF (COG)")}
+                    {gettext("Cloud Optimized GeoTIFF (COG)")}
                 </Checkbox>
             </div>
         </div>
     );
 });
 
-EditorWidget.title = i18n.gettext("Raster layer");
+EditorWidget.title = gettext("Raster layer");
 EditorWidget.activateOn = { create: true };
 EditorWidget.order = -50;

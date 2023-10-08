@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 
 import { DropdownActions } from "./DropdownActions";
-import { Legend, LegendAction } from "./Legend.js";
+import { Legend, LegendAction } from "./Legend";
 
 import EditIcon from "@nextgisweb/icon/material/edit/outline";
 

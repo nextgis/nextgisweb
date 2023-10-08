@@ -1,17 +1,17 @@
 import { InboxOutlined } from "@ant-design/icons";
 import { Button, Upload } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { useFileUploader } from "./hook/useFileUploader";
+
 import type { FileUploaderProps } from "./type";
 
-import i18n from "@nextgisweb/pyramid/i18n";
-
-const mUploadButton = i18n.gettext("Upload");
+const msgUploadButton = gettext("Upload");
 
 export function FileUploaderButton({
     showProgressInDocTitle,
     setFileMeta,
-    uploadText = mUploadButton,
+    uploadText = msgUploadButton,
     inputProps,
     onChange,
     fileMeta,

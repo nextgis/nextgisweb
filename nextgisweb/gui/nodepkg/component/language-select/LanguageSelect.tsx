@@ -1,5 +1,5 @@
-import { Button, Space, Select } from "@nextgisweb/gui/antd";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { Button, Select, Space } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 
 type InputProps = Parameters<typeof Select>[0];
@@ -12,7 +12,7 @@ export interface LanguageSelectProps extends InputProps {
 }
 
 const languageContributeUrl = settings.language_contribute_url;
-const translateProposalMsg = i18n.gettext("Improve or add new translation");
+const msgImprove = gettext("Improve or add new translation");
 
 export const LanguageSelect = ({
     value,
@@ -28,7 +28,7 @@ export const LanguageSelect = ({
     const languages = [
         {
             value: defValue,
-            display_name: i18n.gettext("Browser default"),
+            display_name: gettext("Browser default"),
         },
         ...settings.languages,
     ];
@@ -66,7 +66,7 @@ export const LanguageSelect = ({
                     href={languageContributeUrl}
                     target="_blank"
                 >
-                    {translateProposalMsg}
+                    {msgImprove}
                 </Button>
             )}
         </Space.Compact>

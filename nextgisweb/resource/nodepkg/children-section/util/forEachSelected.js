@@ -1,8 +1,8 @@
 import { errorModal } from "@nextgisweb/gui/error";
 import { showProgressModal } from "@nextgisweb/gui/progress-modal";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-const titleMsg = i18n.gettext("Operation in progress");
+const msgInProgress = gettext("Operation in progress");
 
 export async function forEachSelected({
     executer,
@@ -11,7 +11,7 @@ export async function forEachSelected({
     onComplate,
     setSelected,
     setInProgress,
-    title = titleMsg,
+    title = msgInProgress,
 }) {
     if (setInProgress) {
         setInProgress(true);

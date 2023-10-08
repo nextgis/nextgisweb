@@ -1,12 +1,12 @@
 /** @entrypoint */
-import AttachmentEditorStore from "./AttachmentEditorStore";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import i18n from "@nextgisweb/pyramid/i18n";
+import AttachmentEditorStore from "./AttachmentEditorStore";
 
 import type { EditorWidgetRegister } from "@nextgisweb/feature-layer/type";
 import type { DataSource } from "./type";
 
-const titleText = i18n.gettext("Attachments");
+const msgTitle = gettext("Attachments");
 
 const editorWidgetRegister: EditorWidgetRegister<
     DataSource[] | null,
@@ -14,7 +14,7 @@ const editorWidgetRegister: EditorWidgetRegister<
 > = {
     component: () => import("./AttachmentEditor"),
     store: AttachmentEditorStore,
-    label: titleText,
+    label: msgTitle,
 };
 
 export default editorWidgetRegister;
