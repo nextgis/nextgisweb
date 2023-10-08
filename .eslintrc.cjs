@@ -125,6 +125,7 @@ const config = {
             ],
             rules: {
                 "prettier/prettier": "warn",
+                "@typescript-eslint/no-explicit-any": "warn",
             },
             parserOptions: {
                 sourceType: "module",
