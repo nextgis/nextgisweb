@@ -1,14 +1,8 @@
 define([
-    "dojo/_base/array",
     "dojo/Deferred",
     "dojo/promise/all",
     "@nextgisweb/pyramid/settings!",
-], function (
-    array,
-    Deferred,
-    all,
-    settings
-) {
+], function (Deferred, all, settings) {
     return {
         load: function (name, preq, load) {
             var defs = {};
@@ -20,7 +14,8 @@ define([
             };
 
             for (var k in settings.editor_widget) {
-                var d = new Deferred(), key = k,
+                var d = new Deferred(),
+                    key = k,
                     mid = settings.editor_widget[key];
                 defs[key] = d;
                 require([mid], f(d));
@@ -29,6 +24,6 @@ define([
             all(defs).then(function (data) {
                 load(data);
             });
-        }
+        },
     };
 });

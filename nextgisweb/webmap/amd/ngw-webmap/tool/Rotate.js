@@ -5,7 +5,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
 ], function (declare, Base, ol, i18n) {
     return declare(Base, {
-        constructor: function (options) {
+        constructor: function () {
             this.label = i18n.gettext("Rotate");
             this.iconClass = "iconRotate";
 

@@ -176,10 +176,9 @@ define([
             this.display.watch("item", lang.hitch(this, this._onClickTreeItem));
         },
 
-        _onClickTreeItem: function (attr, oldVal, newVal) {
+        _onClickTreeItem: function () {
             var itemConfig = this.display.get("itemConfig"),
-                isPreviousEditing = this.editingItem !== undefined,
-                editingItem;
+                isPreviousEditing = this.editingItem !== undefined;
 
             this._selectedResourceId = itemConfig.layerId;
             if (isPreviousEditing) this.mapStates.activateDefaultState();

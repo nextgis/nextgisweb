@@ -20,7 +20,6 @@ define(["dojo/_base/declare"], function (declare) {
             if (options.before !== undefined || !object.order) {
                 // if options.before is provided or this item doesn't have any
                 // order, calculate a new one
-                var before = object[this.ordinal];
                 object[this.ordinal] = this.calculateOrder(
                     object,
                     options.before,

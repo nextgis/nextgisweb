@@ -31,7 +31,7 @@ define([
     var GEOM_AREA_URL = route.spatial_ref_sys.geom_area;
 
     return declare(Base, {
-        constructor: function (options) {
+        constructor: function () {
             var tool = this;
 
             if (this.type == "LineString") {
@@ -197,7 +197,7 @@ define([
                 })
             );
 
-            this.interaction.on("drawend", function (evt) {
+            this.interaction.on("drawend", function () {
                 ol.Observable.unByKey(listener);
             });
 

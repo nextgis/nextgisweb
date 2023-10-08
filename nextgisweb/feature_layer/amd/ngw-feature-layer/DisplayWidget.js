@@ -1,18 +1,18 @@
-define([
-    "dojo/_base/declare",
-    "dojo/dom-class",
-    "dijit/_WidgetBase"
-], function (
+define(["dojo/_base/declare", "dojo/dom-class", "dijit/_WidgetBase"], function (
     declare,
     domClass,
     _WidgetBase
 ) {
     return declare([_WidgetBase], {
-        buildRendering: function () { 
+        buildRendering: function () {
             this.inherited(arguments);
-            if (this.compact) { domClass.add(this.domNode, "compact"); }
+            if (this.compact) {
+                domClass.add(this.domNode, "compact");
+            }
         },
 
-        renderValue: function () { /* abstract */ }
+        renderValue: function () {
+            /* abstract */
+        },
     });
 });

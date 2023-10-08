@@ -22,7 +22,7 @@ define(["dojo/Deferred", "dojo/request/xhr", "ngw-pyramid/route"], function (
                     cache[resourceId] = data;
                     return data;
                 },
-                function (err) {
+                function () {
                     console.error(
                         "Failed to load lookup table resource from " + url
                     );

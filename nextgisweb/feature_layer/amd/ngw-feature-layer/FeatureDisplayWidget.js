@@ -5,7 +5,7 @@ define([
     "dojo/dom-construct",
     "dijit/_WidgetBase",
     "ngw-pyramid/route",
-    "./FieldsDisplayWidget"
+    "./FieldsDisplayWidget",
 ], function (
     declare,
     lang,
@@ -16,7 +16,10 @@ define([
     FieldsDisplayWidget
 ) {
     function h(text, node) {
-        domConstruct.place(domConstruct.create("h2", {innerHTML: text}), node);
+        domConstruct.place(
+            domConstruct.create("h2", { innerHTML: text }),
+            node
+        );
     }
 
     return declare([_WidgetBase], {
@@ -26,22 +29,26 @@ define([
             this._wfields = new FieldsDisplayWidget({
                 resourceId: this.resourceId,
                 featureId: this.featureId,
-                fields: this.fields
+                fields: this.fields,
             });
             h(this._wfields.title, this.domNode);
-            
-            var contentBox = domConstruct.create("div", {class:"content-box"},this.domNode);
+
+            var contentBox = domConstruct.create(
+                "div",
+                { class: "content-box" },
+                this.domNode
+            );
             this._wfields.placeAt(contentBox);
 
             this._ext = {};
             for (var k in this.extmid) {
                 var widget = new this.extmid[k]({
                     resourceId: this.resourceId,
-                    featureId: this.featureId
+                    featureId: this.featureId,
                 });
 
                 h(widget.title, this.domNode);
-            
+
                 widget.placeAt(this);
 
                 this._ext[k] = widget;
@@ -51,17 +58,19 @@ define([
         url: function () {
             return route.feature_layer.feature.item({
                 id: this.resourceId,
-                fid: this.featureId
+                fid: this.featureId,
             });
         },
 
         load: function () {
             xhr(this.url(), {
                 method: "GET",
-                handleAs: "json"
-            }).then(lang.hitch(this, function (value) {
-                this.renderValue(value);
-            }));
+                handleAs: "json",
+            }).then(
+                lang.hitch(this, function (value) {
+                    this.renderValue(value);
+                })
+            );
         },
 
         renderValue: function (value) {
@@ -69,7 +78,6 @@ define([
             for (var k in this._ext) {
                 this._ext[k].renderValue(value.extensions[k]);
             }
-        }
-
+        },
     });
 });

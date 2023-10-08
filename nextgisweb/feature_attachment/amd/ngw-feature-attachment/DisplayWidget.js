@@ -10,7 +10,7 @@ define([
     "ngw-feature-layer/DisplayWidget",
     // css
     "xstyle/css!dojox/image/resources/Lightbox.css",
-    "xstyle/css!./resource/DisplayWidget.css"
+    "xstyle/css!./resource/DisplayWidget.css",
 ], function (
     declare,
     array,
@@ -49,60 +49,102 @@ define([
         },
 
         renderValue: function (value) {
-            if (!value) { return false }
+            if (!value) {
+                return false;
+            }
 
-            var images = [], others = [];
+            var images = [],
+                others = [];
             array.forEach(value, function (i) {
-                if (i.is_image) { images.push(i); }
-                else { others.push(i); }
+                if (i.is_image) {
+                    images.push(i);
+                } else {
+                    others.push(i);
+                }
             });
 
             if (images.length > 0) {
-                array.forEach(images, function (image) {
-                    var href = route.feature_attachment.download({
-                        id: this.resourceId,
-                        fid: this.featureId,
-                        aid: image.id
-                    });
+                array.forEach(
+                    images,
+                    function (image) {
+                        var href = route.feature_attachment.download({
+                            id: this.resourceId,
+                            fid: this.featureId,
+                            aid: image.id,
+                        });
 
-                    var src = route.feature_attachment.image({
-                        id: this.resourceId,
-                        fid: this.featureId,
-                        aid: image.id
-                    });
+                        var src = route.feature_attachment.image({
+                            id: this.resourceId,
+                            fid: this.featureId,
+                            aid: image.id,
+                        });
 
-                    var preview = src + (this.compact ? "?size=64x64" : "?size=128x128");
+                        var preview =
+                            src +
+                            (this.compact ? "?size=64x64" : "?size=128x128");
 
-                    var contentClass = !this.compact ? ".content-box" : "";
-                    var a = put(this.domNode, "a.image" + contentClass + "[href=$] img[src=$] <", href, preview);
+                        var contentClass = !this.compact ? ".content-box" : "";
+                        var a = put(
+                            this.domNode,
+                            "a.image" + contentClass + "[href=$] img[src=$] <",
+                            href,
+                            preview
+                        );
 
-                    var lbox = this.lbox;
-                    lbox.addImage({href: src, title: image.description || image.name}, "main");
+                        var lbox = this.lbox;
+                        lbox.addImage(
+                            {
+                                href: src,
+                                title: image.description || image.name,
+                            },
+                            "main"
+                        );
 
-                    on(a, "click", function (evt) {
-                        lbox.show({group: "main", href: src, title: image.description || image.name});
-                        evt.preventDefault();
-                    });
-                }, this);
+                        on(a, "click", function (evt) {
+                            lbox.show({
+                                group: "main",
+                                href: src,
+                                title: image.description || image.name,
+                            });
+                            evt.preventDefault();
+                        });
+                    },
+                    this
+                );
             }
 
             if (others.length > 0) {
-                var tbody = put(this.domNode, "table.pure-table thead tr th.name $ < th.size $ < th.mime_type $ < th.description $ < < < tbody",
-                    i18n.gettext("File name"), i18n.gettext("Size"), i18n.gettext("MIME type"), i18n.gettext("Description"));
+                var tbody = put(
+                    this.domNode,
+                    "table.pure-table thead tr th.name $ < th.size $ < th.mime_type $ < th.description $ < < < tbody",
+                    i18n.gettext("File name"),
+                    i18n.gettext("Size"),
+                    i18n.gettext("MIME type"),
+                    i18n.gettext("Description")
+                );
 
-                array.forEach(others, function (a) {
-                    var href = route.feature_attachment.download({
-                        id: this.resourceId,
-                        fid: this.featureId,
-                        aid: a.id
-                    });
+                array.forEach(
+                    others,
+                    function (a) {
+                        var href = route.feature_attachment.download({
+                            id: this.resourceId,
+                            fid: this.featureId,
+                            aid: a.id,
+                        });
 
-                    put(tbody, "tr td.name a[href=$][target=_blank] $ < < td.size $ < td.mime_type $ < td.description $",
-                        href, a.name, fileSizeToString(a.size), a.mime_type,
-                        a.description === null ? "" : a.description);
-
-                }, this);
+                        put(
+                            tbody,
+                            "tr td.name a[href=$][target=_blank] $ < < td.size $ < td.mime_type $ < td.description $",
+                            href,
+                            a.name,
+                            fileSizeToString(a.size),
+                            a.mime_type,
+                            a.description === null ? "" : a.description
+                        );
+                    },
+                    this
+                );
             }
-        }
+        },
     });
 });
