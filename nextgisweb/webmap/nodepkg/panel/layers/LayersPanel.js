@@ -7,15 +7,21 @@ import { LayersDropdown } from "./LayersDropdown";
 import "./LayersPanel.less";
 
 export function LayersPanel({ title, close, display, ...props }) {
+    const zoomToAllLayers = () => {
+        const plugin = display._plugins["ngw-webmap/plugin/ZoomToWebmap"];
+        if (!plugin) {
+            return;
+        }
+        plugin.zoomToAllLayers();
+    };
+
     return (
         <div className="ngw-webmap-layers-panel">
             <PanelHeader {...{ title, close }}>
                 <LayersDropdown
                     onClick={(key) => {
                         if (key === "zoomToAllLayers") {
-                            display._plugins[
-                                "ngw-webmap/plugin/ZoomToWebmap"
-                            ].zoomToAllLayers();
+                            zoomToAllLayers();
                         }
                     }}
                 />
