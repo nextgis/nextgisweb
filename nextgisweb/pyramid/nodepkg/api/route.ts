@@ -3,17 +3,16 @@ import set from "lodash-es/set";
 import routeData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/route";
 
 import { request } from "./request";
-
-// ReExport for backward compatibility
-export * from "./LunkwillParam";
-
+import type { RouteParameters } from "./route.inc";
 import type {
     RequestMethod,
     RequestOptions,
     RouteResults,
     ToReturn,
 } from "./type";
-import type { RouteParameters } from "./route.inc";
+
+// ReExport for backward compatibility
+export * from "./LunkwillParam";
 
 export function routeURL<RouteName extends keyof RouteParameters>(
     name: RouteName,

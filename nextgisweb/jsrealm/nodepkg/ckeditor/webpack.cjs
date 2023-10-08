@@ -1,8 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const { bundler, styles } = require("@ckeditor/ckeditor5-dev-utils");
-const moduleDevTranslations = require("@ckeditor/ckeditor5-dev-translations");
-const { CKEditorTranslationsPlugin } = moduleDevTranslations;
+const { CKEditorTranslationsPlugin } = require("@ckeditor/ckeditor5-dev-translations");
 const TerserPlugin = require("terser-webpack-plugin");
 
 const defaults = require("../jsrealm/webpack/defaults.cjs");

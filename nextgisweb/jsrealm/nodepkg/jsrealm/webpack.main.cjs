@@ -23,6 +23,7 @@ const iconUtil = require("./icon/util.cjs");
 const withChunks = (ep) => `import "@nextgisweb/jsrealm/with-chunks!${ep}"`;
 
 const babelOptions = require("./babelrc.cjs");
+
 const presetEnvOptIndex = babelOptions.presets.findIndex(
     (item) => typeof item[0] === "string" && item[0] === "@babel/preset-env"
 );

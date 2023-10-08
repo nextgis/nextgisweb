@@ -3,9 +3,9 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FormItemProps } from "../type";
 
-type InputProps = Parameters<typeof Input>[0];
-
 import { FormItem } from "./_FormItem";
+
+type InputProps = Parameters<typeof Input>[0];
 
 export function KeynameTextBox({ ...props }: FormItemProps<InputProps>) {
     const rules = props.rules ? props.rules : [];

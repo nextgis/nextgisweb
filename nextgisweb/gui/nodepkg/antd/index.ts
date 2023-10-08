@@ -57,6 +57,7 @@ import {
     Typography,
     Upload,
 } from "antd";
+import type { ParamsOf } from "../type";
 
 export { default as Calendar } from "./calendar";
 export { default as ConfigProvider } from "./config-provider";
@@ -66,12 +67,10 @@ export { default as RangePicker } from "./range-date-time-picker";
 export { default as Table } from "./table";
 export { default as Tabs } from "./tabs";
 
-import type { SizeType } from "antd/lib/config-provider/SizeContext";
-import type { ParamsOf } from "../type";
+export type { SizeType } from "antd/lib/config-provider/SizeContext";
 export type { TableProps } from "./table";
 export type { TabsProps } from "./tabs";
 
-export { SizeType };
 export {
     Affix,
     Anchor,
