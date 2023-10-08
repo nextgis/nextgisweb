@@ -1,8 +1,9 @@
 const path = require("path");
-const webpack = require("webpack");
+
+const ckeTranslations = require("@ckeditor/ckeditor5-dev-translations");
 const { bundler, styles } = require("@ckeditor/ckeditor5-dev-utils");
-const { CKEditorTranslationsPlugin } = require("@ckeditor/ckeditor5-dev-translations");
 const TerserPlugin = require("terser-webpack-plugin");
+const webpack = require("webpack");
 
 const defaults = require("../jsrealm/webpack/defaults.cjs");
 
@@ -72,7 +73,7 @@ module.exports = defaults(
             ],
         },
         plugins: [
-            new CKEditorTranslationsPlugin({
+            new ckeTranslations.CKEditorTranslationsPlugin({
                 language: "en",
                 additionalLanguages: "all",
             }),

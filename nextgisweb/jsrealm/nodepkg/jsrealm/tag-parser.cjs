@@ -1,4 +1,5 @@
 const fs = require("fs");
+
 const doctrine = require("doctrine");
 
 const extractRegexp = /\/\*\*.*(?:\*\/$|$(?:\s*\*\s?.*$)*\s*\*\/)/m;

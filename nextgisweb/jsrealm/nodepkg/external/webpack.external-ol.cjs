@@ -2,8 +2,8 @@ const path = require("path");
 
 const CopyPlugin = require("copy-webpack-plugin");
 
-const defaults = require("../jsrealm/webpack/defaults.cjs");
 const { jsrealm } = require("../jsrealm/config.cjs");
+const defaults = require("../jsrealm/webpack/defaults.cjs");
 
 const entry = path.resolve(path.join(__dirname, "contrib/ol/entry.js"));
 const index = path.resolve(path.join(__dirname, "contrib/ol/index.js"));

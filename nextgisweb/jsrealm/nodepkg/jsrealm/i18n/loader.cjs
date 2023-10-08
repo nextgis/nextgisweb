@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+
 const { po } = require("gettext-parser");
 
 const { env } = require("../config.cjs");

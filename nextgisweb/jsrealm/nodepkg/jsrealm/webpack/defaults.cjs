@@ -1,7 +1,10 @@
 const fs = require("fs");
 const path = require("path");
+
 const chalk = require("chalk");
+
 const { debug, distPath } = require("../config.cjs");
+
 const plugins = require("./plugins.cjs");
 
 const defaults = {

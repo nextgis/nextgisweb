@@ -2,16 +2,17 @@ const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
-const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
-const ESLintPlugin = require("eslint-webpack-plugin");
-const WebpackAssetsManifest = require("webpack-assets-manifest");
 const CopyPlugin = require("copy-webpack-plugin");
+const ESLintPlugin = require("eslint-webpack-plugin");
+const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
+const WebpackAssetsManifest = require("webpack-assets-manifest");
 
+const babelOptions = require("./babelrc.cjs");
 const config = require("./config.cjs");
+const iconUtil = require("./icon/util.cjs");
 const tagParser = require("./tag-parser.cjs");
 const defaults = require("./webpack/defaults.cjs");
 const { injectCode, stripIndex, virtualImport } = require("./webpack/util.cjs");
-const iconUtil = require("./icon/util.cjs");
 
 // Inject the following construction into each entrypoint module
 // at compilation time:
@@ -21,8 +22,6 @@ const iconUtil = require("./icon/util.cjs");
 // This import is handled by AMD loader and loads all chunks
 // required by the entrypoint.
 const withChunks = (ep) => `import "@nextgisweb/jsrealm/with-chunks!${ep}"`;
-
-const babelOptions = require("./babelrc.cjs");
 
 const presetEnvOptIndex = babelOptions.presets.findIndex(
     (item) => typeof item[0] === "string" && item[0] === "@babel/preset-env"

@@ -4,8 +4,8 @@ const CopyPlugin = require("copy-webpack-plugin");
 const UglifyJS = require("uglify-js");
 const UglifyCSS = require("uglifycss");
 
-const defaults = require("../jsrealm/webpack/defaults.cjs");
 const { debug } = require("../jsrealm/config.cjs");
+const defaults = require("../jsrealm/webpack/defaults.cjs");
 
 function minify(content, path) {
     if (debug) return content;

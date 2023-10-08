@@ -1,7 +1,7 @@
 const path = require("path");
 
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const defaults = require("../jsrealm/webpack/defaults.cjs");
 

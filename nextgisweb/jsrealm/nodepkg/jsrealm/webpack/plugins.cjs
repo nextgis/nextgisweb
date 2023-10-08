@@ -1,8 +1,9 @@
-const { StatsWriterPlugin } = require("webpack-stats-plugin");
+const { constants: zlibConst } = require("zlib");
+
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const CompressionPlugin = require("compression-webpack-plugin");
-const { BROTLI_PARAM_QUALITY } = require("zlib").constants;
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+const { StatsWriterPlugin } = require("webpack-stats-plugin");
 
 const { debug, pyramid } = require("../config.cjs");
 
@@ -40,7 +41,9 @@ module.exports = ({ once, clean, compress, bundleAnalyzer } = {}) => {
                     minRatio: 0.9,
                     // Use minimum for development mode and maximum otherwise
                     compressionOptions: {
-                        params: { [BROTLI_PARAM_QUALITY]: debug ? 1 : 11 },
+                        params: {
+                            [zlibConst.BROTLI_PARAM_QUALITY]: debug ? 1 : 11,
+                        },
                     },
                 })
             );
