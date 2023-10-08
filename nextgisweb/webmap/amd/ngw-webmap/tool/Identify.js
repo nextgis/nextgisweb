@@ -465,19 +465,6 @@ define([
             );
         },
 
-        _getLayersLabels: function () {
-            const layerLabels = {};
-            array.forEach(
-                items,
-                (i) => {
-                    layerLabels[this.display.itemStore.getValue(i, "layerId")] =
-                        this.display.itemStore.getValue(i, "label");
-                },
-                this
-            );
-            return layerLabels;
-        },
-
         // Build WKT geometry for identification at given pixel
         _requestGeomString: function (pixel) {
             var olMap = this.map.olMap,
