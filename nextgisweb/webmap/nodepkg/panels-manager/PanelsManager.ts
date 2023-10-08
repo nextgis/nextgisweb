@@ -1,7 +1,11 @@
 import orderBy from "lodash-es/orderBy";
+import { reaction } from "mobx";
 
 import reactApp from "@nextgisweb/gui/react-app";
 import NavigationMenu from "@nextgisweb/webmap/navigation-menu";
+import { navigationMenuStore } from "@nextgisweb/webmap/navigation-menu/NavigationMenuStore";
+
+import type { NavigationPanelInfo } from "../navigation-menu/NavigationMenuStore";
 
 import type { DojoDisplay, DojoItem, PanelDojoItem } from "./type";
 
@@ -50,14 +54,32 @@ export class PanelsManager {
         this._display = display;
         this._activePanelKey = activePanelKey;
         this._onChangePanel = onChangePanel;
+
+        reaction(
+            () => navigationMenuStore.active,
+            (activeInfo: NavigationPanelInfo) => {
+                const { active, source } = activeInfo;
+                if (!active || source !== "menu") {
+                    return;
+                }
+                this._changeNavigationMenu(active);
+            }
+        );
     }
 
-    private _clickNavigationMenu(newPanel: PanelDojoItem): void {
-        const { name } = newPanel;
+    private _changeNavigationMenu(panelName: string): void {
+        const panel = this.getPanel(panelName);
 
-        if (this._activePanelKey === name) {
-            this._deactivatePanel(newPanel);
-            this._activePanelKey = undefined;
+        if (!panel) {
+            throw new Error(
+                `Navigation menu was changed with missing panel: ${panelName}`
+            );
+        }
+
+        const isCurrentMenuClick = this._activePanelKey === panelName;
+
+        if (isCurrentMenuClick) {
+            this._deactivatePanel(panel);
         } else {
             if (this._activePanelKey) {
                 const activePanel = this._panels.get(this._activePanelKey);
@@ -65,11 +87,8 @@ export class PanelsManager {
                     this._deactivatePanel(activePanel);
                 }
             }
-            this._activatePanel(newPanel);
-            this._activePanelKey = name;
+            this._activatePanel(panel);
         }
-
-        this._buildNavigationMenu();
     }
 
     private _buildNavigationMenu(): void {
@@ -78,46 +97,62 @@ export class PanelsManager {
             NavigationMenu,
             {
                 panels: this._panels,
-                active: this._activePanelKey,
-                onClick: (p: PanelDojoItem) => this._clickNavigationMenu(p),
             },
             this._domElements.navigation
         );
     }
 
-    private _activatePanel(panel: PanelDojoItem): void {
-        if (panel.isFullWidth) {
+    private _activatePanel(panel: string | PanelDojoItem): void {
+        const panelToActivate: PanelDojoItem | undefined =
+            typeof panel === "string" ? this._panels.get(panel) : panel;
+        if (!panelToActivate) {
+            return;
+        }
+
+        if (panelToActivate.isFullWidth) {
             this._domElements.leftPanel.domNode.classList.add(
                 "leftPanelPane--fullwidth"
             );
             this._domElements.leftPanel.set("splitter", false);
         }
 
-        this._domElements.leftPanel.addChild(panel);
+        this._domElements.leftPanel.addChild(panelToActivate);
         this._domElements.main.addChild(this._domElements.leftPanel);
 
-        panel.show();
-        this._onChangePanel(panel);
+        panelToActivate.show();
+        this._onChangePanel(panelToActivate);
+
+        const { name } = panelToActivate;
+        this._activePanelKey = name;
+        navigationMenuStore.setActive(this._activePanelKey, "manager");
     }
 
-    private _deactivatePanel(panel: PanelDojoItem): void {
-        this._domElements.main.removeChild(this._domElements.leftPanel);
-        this._domElements.leftPanel.removeChild(panel);
+    private _deactivatePanel(panel: string | PanelDojoItem): void {
+        const panelToDeactivate: PanelDojoItem | undefined =
+            typeof panel === "string" ? this._panels.get(panel) : panel;
+        if (!panelToDeactivate) {
+            return;
+        }
 
-        if (panel.isFullWidth) {
+        this._domElements.main.removeChild(this._domElements.leftPanel);
+        this._domElements.leftPanel.removeChild(panelToDeactivate);
+
+        if (panelToDeactivate.isFullWidth) {
             this._domElements.leftPanel.domNode.classList.remove(
                 "leftPanelPane--fullwidth"
             );
             this._domElements.leftPanel.set("splitter", true);
         }
 
-        panel.hide();
+        panelToDeactivate.hide();
         this._onChangePanel(undefined);
+
+        this._activePanelKey = undefined;
+        navigationMenuStore.setActive(this._activePanelKey, "manager");
     }
 
     private _closePanel(panel: PanelDojoItem): void {
         this._deactivatePanel(panel);
-        this._activePanelKey = undefined;
     }
 
     private _handleInitActive(): void {
@@ -132,19 +167,15 @@ export class PanelsManager {
         }
 
         if (this._activePanelKey && this._panels.has(this._activePanelKey)) {
-            const activePanel = this._panels.get(this._activePanelKey);
-            if (activePanel) {
-                this._activatePanel(activePanel);
-                this._initialized = true;
-                this._panelsReady.resolve();
-            }
+            this._activatePanel(this._activePanelKey);
+            this._initialized = true;
+            this._panelsReady.resolve();
         }
     }
 
     private _activateFirstPanel(): void {
-        const [name, firstPanel] = this._panels.entries().next().value;
-        this._activePanelKey = name;
-        this._activatePanel(firstPanel);
+        const firstPanelKey = this._panels.keys().next().value;
+        this._activatePanel(firstPanelKey);
     }
 
     private _makePanel(panel: PanelDojoItem): void {

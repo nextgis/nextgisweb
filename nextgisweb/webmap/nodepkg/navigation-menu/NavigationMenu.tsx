@@ -1,30 +1,26 @@
-import "./NavigationMenu.less";
-
+import { observer } from "mobx-react-lite";
 import type { ReactElement } from "react";
 
 import type { PanelDojoItem } from "../panels-manager/type";
 
+import { navigationMenuStore } from "./NavigationMenuStore";
+
+import "./NavigationMenu.less";
+
 export interface NavigationMenuProps {
     panels: Map<string, PanelDojoItem>;
-    onClick?: (panel: PanelDojoItem) => void;
-    active?: string;
 }
 
-export function NavigationMenu({
-    panels,
-    onClick,
-    active,
-}: NavigationMenuProps) {
+export const NavigationMenu = observer(({ panels }: NavigationMenuProps) => {
     const onClickItem = (item: PanelDojoItem) => {
-        if (onClick) {
-            onClick(item);
-        }
+        navigationMenuStore.setActive(item.name, "menu");
     };
 
     const menuItems: ReactElement[] = [];
     if (panels) {
+        const activePanel = navigationMenuStore.activePanel;
         panels.forEach((p) => {
-            const activeClass = p.name === active ? "active" : "";
+            const activeClass = p.name === activePanel ? "active" : "";
             menuItems.push(
                 <div
                     key={p.name}
@@ -39,5 +35,6 @@ export function NavigationMenu({
             );
         });
     }
+
     return <div className="navigation-menu">{menuItems}</div>;
-}
+});
