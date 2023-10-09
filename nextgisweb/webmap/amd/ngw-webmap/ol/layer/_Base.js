@@ -28,6 +28,7 @@ define([
                 // Create a printable clone of the layer
                 const layer = this.olLayer;
                 const opts = Object.assign({}, loptions, {
+                    visible: layer.getVisible(),
                     opacity: layer.getOpacity(),
                     source: new scls(soptions),
                 });
