@@ -47,7 +47,7 @@ corresponding table. You can do this as follows:
 
 .. code-block:: none
 
-  $ nextgisweb migration.create foo "Add other column"
+  $ nextgisweb migration create foo "Add other column"
   Migration [foo:2c12ca17] created:
   * migration/2c12ca17-add-other-column.fw.sql
   * migration/2c12ca17-add-other-column.rw.sql
@@ -84,32 +84,32 @@ Now you can apply it using:
 
 .. code-block:: none
 
-  $ nextgisweb migration.forward --no-dry-run foo:2c12ca17
+  $ nextgisweb migration forward --no-dry-run foo:2c12ca17
 
 Or undo it with:
 
 .. code-block:: none
 
-  $ nextgisweb migration.rewind --no-dry-run foo:2c12ca17
+  $ nextgisweb migration rewind --no-dry-run foo:2c12ca17
 
 .. note::
 
-  Each ``nextgisweb migration.*`` command which changes a database state doesn't
+  Each ``nextgisweb migration *`` command which changes a database state doesn't
   change without ``--no-dry-run`` option. You can use commands without this
   option to review what command will do.
 
-To review the current database state you can use ``nextgisweb migration.status``
+To review the current database state you can use ``nextgisweb migration status``
 command. It will show this migration:
 
 .. code-block:: none
 
-  $ nextgisweb migration.status
+  $ nextgisweb migration status
   A |    | Migration                      | Message
   + |    | foo:00000000                   | Initial migration
   + | FR | foo:2c12ca17                   | Add other column
 
 After that, you have to commit these files to git repository. The command
-``nextgisweb migration.upgrade`` will apply them during the standard upgrade
+``nextgisweb migration upgrade`` will apply them during the standard upgrade
 process.
 
 
@@ -134,20 +134,20 @@ Now you can ask NextGIS Web to create tables for this component:
 .. note::
 
   Previously, you could use ``nextgisweb initialize_db``, but now you should use
-  ``nextgisweb migration.install``.
+  ``nextgisweb migration install``.
 
 .. code-block:: none
 
-  $ nextgisweb migration.install --no-dry-run bar
+  $ nextgisweb migration install --no-dry-run bar
 
 Moreover, you can ask to drop tables for this (or any other component) with the
 following command:
 
 .. code-block:: none
 
-  $ nextgisweb migration.uninstall --no-dry-run bar
+  $ nextgisweb migration uninstall --no-dry-run bar
 
-Thus ``nextgisweb migration.install`` and ``nextgisweb migration.uninstall``
+Thus ``nextgisweb migration install`` and ``nextgisweb migration uninstall``
 commands provide the way to install and uninstall components.
 
 Python migrations
@@ -159,7 +159,7 @@ module can be created this way:
 
 .. code-block:: bash
 
-  $ nextgisweb migration.create --format python foo "Add another column"
+  $ nextgisweb migration create --format python foo "Add another column"
   Migration [foo:2e89a6fc] created:
   * migration/2e89a6fc-add-another-column.py
 

@@ -111,7 +111,7 @@ Let's include this package into Yarn workspace root configuration:
 .. code-block:: bash
 
   $ cd ~ngw
-  $ nextgisweb jsrealm.install
+  $ nextgisweb jsrealm install
 
 And now you can add some external dependency for this package, for example:
 
