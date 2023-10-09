@@ -14,3 +14,4 @@ NextGIS Web internals
    versioning
    migration
    url_route
+   code_formatting
