@@ -1,11 +1,11 @@
 import type { ResourceItem as ResourceItemBase } from "@nextgisweb/resource/type/Resource";
 
 declare module "@nextgisweb/resource/type/Resource" {
-    export interface ResourceItem
-        extends import("@nextgisweb/resource/type/Resource").ResourceItem {
+    import type { GeometryType } from "@nextgisweb/feature-layer/type";
+
+    export interface ResourceItem extends ResourceItemBase {
         vector_layer?: {
-            // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-            geometry_type: import("@nextgisweb/feature-layer/type/GeometryType").GeometryType;
+            geometry_type: GeometryType;
             srs: { id: number };
         };
     }

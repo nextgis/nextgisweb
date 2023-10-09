@@ -48,7 +48,6 @@ define([
         class: "coordinate-switcher",
 
         constructor: function (options) {
-            console.log(this.selectedFormat);
             declare.safeMixin(this, options);
 
             this._transform().then((transformedCoord) => {

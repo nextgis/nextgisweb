@@ -1,6 +1,6 @@
 declare module "@nextgisweb/ckeditor" {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    type Editor = import("@ckeditor/ckeditor5-editor-classic");
+    import type { Editor } from "@ckeditor/ckeditor5-editor-classic";
+
     const value: { Editor: Editor };
     export = value;
 }

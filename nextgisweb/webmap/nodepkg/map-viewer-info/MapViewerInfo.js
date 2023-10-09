@@ -65,8 +65,6 @@ const clearViewChangedCallback = () => {
 };
 
 export function MapViewerInfo({ show, map }) {
-    if (!map) return <></>;
-
     const [type, setType] = useState("mouse");
     const [coord, setCoord] = useState(
         transformCoords(map, map.getView().getCenter())

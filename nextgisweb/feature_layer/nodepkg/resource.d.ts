@@ -1,8 +1,9 @@
 import type { ResourceItem as ResourceItemBase } from "@nextgisweb/resource/type/Resource";
 
 declare module "@nextgisweb/resource/type/Resource" {
+    import type { FeatureLayer } from "./type/FeatureLayer";
+
     export interface ResourceItem extends ResourceItemBase {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-        feature_layer?: import("./type/FeatureLayer").FeatureLayer;
+        feature_layer?: FeatureLayer;
     }
 }
