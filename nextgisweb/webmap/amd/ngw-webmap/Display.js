@@ -18,6 +18,7 @@ define([
     "@nextgisweb/pyramid/company-logo",
     "@nextgisweb/webmap/store",
     "@nextgisweb/webmap/panels-manager",
+    "@nextgisweb/webmap/store/annotations",
     "./ol/Map",
     "./MapToolbar",
     "./controls/InitialExtent",
@@ -67,6 +68,7 @@ define([
     companyLogo,
     WebmapStore,
     PanelsManager,
+    AnnotationsStore,
     Map,
     MapToolbar,
     InitialExtent,
@@ -1020,27 +1022,7 @@ define([
             panels.push(makeInfoPanel);
 
             const makeAnnotationsPanel = new Promise((resolve) => {
-                if (
-                    !this.config.annotations ||
-                    !this.config.annotations.enabled ||
-                    !this.config.annotations.scope.read
-                ) {
-                    resolve(undefined);
-                } else {
-                    require([
-                        "ngw-webmap/ui/AnnotationsPanel/AnnotationsPanel",
-                    ], (AnnotationsPanel) => {
-                        resolve({
-                            cls: AnnotationsPanel,
-                            params: {
-                                title: gettext("Annotations"),
-                                name: "annotation",
-                                order: 30,
-                                menuIcon: "material-message",
-                            },
-                        });
-                    });
-                }
+                this._buildAnnotationPanel(resolve);
             });
             panels.push(makeAnnotationsPanel);
 
@@ -1056,6 +1038,58 @@ define([
 
             this.panelsManager.addPanels(panels);
             this.panelsManager.initFinalize();
+        },
+
+        _buildAnnotationPanel: function (resolve) {
+            const shouldMakePanel =
+                this.config.annotations &&
+                this.config.annotations.enabled &&
+                this.config.annotations.scope.read;
+
+            if (!shouldMakePanel) {
+                resolve(undefined);
+                return;
+            }
+
+            const annotUrlParam = this._urlParams.annot;
+            const allowedUrlValues = ["no", "yes", "messages"];
+            let initialAnnotVisible;
+            if (annotUrlParam && allowedUrlValues.includes(annotUrlParam)) {
+                initialAnnotVisible = annotUrlParam;
+            }
+            initialAnnotVisible =
+                initialAnnotVisible || this.config.annotations.default;
+            AnnotationsStore.default.setVisibleMode(initialAnnotVisible);
+
+            require(["ngw-webmap/ui/AnnotationsManager/AnnotationsManager"], (
+                AnnotationsManager
+            ) => {
+                AnnotationsManager.getInstance({
+                    display: this,
+                    initialAnnotVisible,
+                });
+            });
+
+            const panel = {
+                cls: reactPanel("@nextgisweb/webmap/panel/annotations", {
+                    props: {
+                        onTopicPublish: (args) => {
+                            topic.publish.apply(this, args);
+                        },
+                        mapStates: MapStatesObserver.getInstance(),
+                        initialAnnotVisible,
+                    },
+                }),
+                params: {
+                    title: gettext("Annotations"),
+                    name: "annotation",
+                    order: 30,
+                    menuIcon: "material-message",
+                    class: "info-panel dynamic-panel--fullwidth",
+                    withTitle: false,
+                },
+            };
+            resolve(panel);
         },
 
         highlightGeometry: function (geometry) {

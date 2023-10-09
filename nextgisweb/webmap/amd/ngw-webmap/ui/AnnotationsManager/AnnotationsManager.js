@@ -37,19 +37,18 @@ define([
             _annotationsLayer: null,
             _editableLayer: null,
             _annotationsDialog: null,
-            _annotationPanel: null,
 
             _annotationsVisibleState: null,
             _editable: null,
 
             constructor: function (options) {
-                if (!options.display || !options.panel) {
+                if (!options.display) {
                     throw Error(
-                        'AnnotationsManager: "display" and "panel" are required parameter for first call!'
+                        'AnnotationsManager: "display"  required parameter for first call!'
                     );
                 }
                 this._display = options.display;
-                this._annotationPanel = options.panel;
+                this._annotationsVisibleState = options.initialAnnotVisible;
 
                 this._annotationsDialog = new AnnotationsDialog({
                     annotationsManager: this,
@@ -62,8 +61,6 @@ define([
             },
 
             _init: function () {
-                this._annotationsVisibleState =
-                    this._annotationPanel.getAnnotVisibleState();
                 this._buildAnnotationsLayers();
                 this._loadAnnotations();
                 this._buildStandby();

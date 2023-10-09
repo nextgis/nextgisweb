@@ -1,5 +1,7 @@
 import { toLonLat } from "ol/proj";
 
+import AnnotationsStore from "@nextgisweb/webmap/store/annotations/";
+
 export const getPermalink = (display, visibleItems, options) => {
     options = options ? options : {};
 
@@ -14,7 +16,7 @@ export const getPermalink = (display, visibleItems, options) => {
     let annot;
     const annotationPanel = display.panelsManager.getPanel("annotation");
     if (display && annotationPanel) {
-        annot = annotationPanel.getAnnotVisibleState();
+        annot = AnnotationsStore.visibleMode;
     }
 
     let params = {
