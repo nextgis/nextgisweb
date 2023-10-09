@@ -4,6 +4,7 @@ const config = {
     tabWidth: 4,
     quoteProps: "preserve",
     semi: true,
+    proseWrap: "always",
     plugins: ["prettier-plugin-css-order"],
     cssDeclarationSorterKeepOverrides: false,
 };
