@@ -1,196 +1,68 @@
 Internationalization and localization
 =====================================
 
-Internationalization and localization of NextGIS Web is powered by `gettext`_
-and `babel`_ libraries. The procedure for working with strings is standard for
-projects based on gettext:
+Internationalization and localization of NextGIS Web is built on top of
+`gettext`_ and `babel`_ libraries. The workflow for working with messages is
+standard for projects based on gettext:
 
 .. _gettext: http://www.gnu.org/software/gettext
 .. _babel: http://babel.pocoo.org/
 
-1. Extract strings to translate from sources to ``.pot`` file (``extract``)
+1. Extract messages to translate from sources to ``.pot`` file (``extract``)
 2. Create or update ``.po`` files from ``.pot`` files (``update``)
 3. Compile ``.po`` files into ``.mo`` files (``compile``)
 
-All lines that are shown to the user must be written in sources in English and
-only then translated into other languages.
+Each NextGIS Web component becomes an independent domain in terms of the gettext
+library. As a result, there is no way to internationalize messages that do not
+belong to any component.
 
-Translation is performed for each component of NextGIS Web separately. As a
-result, there is no way to internationalize strings that do not belong to any
-component.
+To be able to extract messages for translation, they must be marked up
+appropriately. Below is described how to do this, as well as how to ensure the
+display of already translated messages.
 
-Translations of each component exist within its own ``domain`` in terms of the
-gettext library. For a component a certain line can be translated in one way,
-and in another - in another, even without the use of contexts.
+All on messages are performed using ``nextgisweb-i18n`` command line
+utility. To update translation in ``nextgisweb_foo`` you can do the following:
 
-All actions on translations are performed using ``nextgisweb-i18n`` command line
-utility from the ``nextgisweb`` package. This utility is an add-on to the
-``pybabel`` utility from ``babel`` package with default settings preset.
+.. code-block:: bash
 
-Let's consider localization to Russian on the example of ``bar`` component from
-``nextgisweb_foo`` package. In this case, the directory structure will look like
-this:
-
-::
-
-  🗁 nextgisweb_foo
-  ├── 🗁 nextgisweb_foo
-  │   └── 🗁 bar
-  │       └── 🗀 locale
-  └── 🗎 setup.py     
-
-Extract strings from source code files with default settings:
-
-::
-
-  (env) $ nextgisweb-i18n --package nextgisweb_foo extract bar
-
-This will create a ``.pot`` file ``nextgisweb_foo/bar/locale/.pot``. Since this
-file can be generated at any time, there is no need to put it inside the source
-control system.
-
-Create a ``.po`` file for the Russian language based on the ``.pot`` file:
-
-::
-
-  (env) $ nextgisweb-i18n --package nextgisweb_foo update bar --locale ru
-
-As a result, the ``.po`` file ``nextgisweb_foo/bar/locale/ru.po`` will be
-created. This file must be filled in accordance with the translation of the
-strings in it using a text editor or a specialized ``.po`` file editor.
-
-After this, we compile ``.po`` files into ``.mo`` files, which also do not need
-to be placed in the version control system:
-
-::
-
-  (env) $ nextgisweb-i18n --package nextgisweb_foo compile bar
-
-The resulting directory structure is given bellow. The files `bar.jed` are
-analogous to the mo file for the javascript library `jed`_, which is used for
-client-side internationalization. These files are also created at the
-compilation stage.
-
-.. _jed: http://slexaxton.github.io/Jed/
-
-::
-
-  🗁 nextgisweb_foo
-  ├── 🗁 nextgisweb_foo
-  │   └── 🗁 bar
-  │       └── 🗁 locale
-  │           ├── 🗎 .pot
-  │           ├── 🗎 ru.mo
-  │           └── 🗎 ru.po
-  └── 🗎 setup.py
-
-This completes the initial internationalization, after some time new lines may
-have be added to the package, in this case you need to re-extract the lines,
-automatically update the ``.po`` file, edit it and compile again:
-
-::
-
-  (env) $ nextgisweb-i18n --package nextgisweb_foo extract bar
-  (env) $ nextgisweb-i18n --package nextgisweb_foo update bar
-  (env) $ nano nextgisweb_foo/bar/locale/ru.po
-  (env) $ nextgisweb-i18n --package nextgisweb_foo compile bar
-
+  $ nextgisweb-i18n --package nextgisweb_foo update --extract --locale ru
+  $ nano package/nextgisweb_foo/nextgisweb_foo/locale/ru.po
+  $ nextgisweb-i18n --package nextgisweb_foo compile
 
 Server side
 -----------
 
-Python code
-^^^^^^^^^^^
-
-To be able to extract strings for translation, they must be marked up
-appropriately. Below is described how to do this, as well as how to ensure the
-display of already translated strings to the user.
+Python
+^^^^^^
 
 Since python code is executed on a server, the same application instance must be
 able to serve users with different locales, it is necessary to use a two-step
-work with strings: first, the string is marked as requiring translation, then
+work with messages: first, a message is marked as requiring translation, then
 before displaying it to the user, it's translated according to the user's
-preferences. 
-
-The class :py:class:`nextgisweb.lib.i18n.trstr.TrStr` solves this problem, which
-is similar to the class :py:class:`translationstring.TranslationString`, but
-with some additional convenience in terms of string interpolation. Let's look at
-the example of the ``bar`` component from the ``nextgisweb_foo`` package.
-
-.. code-block:: text
-  :caption: Sample directory structure
-  :name: tree-server
-
-  🗁 bar
-  ├── 🗁 template
-  │   └── 🗎 section.mako
-  ├── 🗎 __init__.py
-  └── 🗎 util.py
-    
-.. code-block:: python
-  :caption: File util.py
-
-  from nextgisweb.lib.i18n import trstr_factory
-  _ = trstr_factory('bar')
-
-Function :py:func:`nextgisweb.lib.i18n.trstr.trstr_factory` allows you to
-simplify creation of strings :py:class:`~nextgisweb.lib.i18n.trstr.TrStr` with a
-predefined domain, which is specified in the function parameters. For
-convenience, both the function and the class are also available for import from
-the module :py:mod:`nextgisweb.i18n`, as shown in the examples.
+preferences.
 
 .. code-block:: python
-  :caption: File __init__.py #1
 
-  from .util import _
-  def something():
-      return _('Some message for translation')
+  from nextgisweb.env import gettext
 
-Usage of the underscore character is necessary for extraction of translation
-strings, so you can't import it with a different name ``from .util import _ as
-blah``, it will break extraction process.
-
-For string output in accordance with the user's preferences (one user may want
-English, the other Russian), you need to translate the string using the
-``request.localizer.translate(trstring)`` method:
-
-.. code-block:: python
-  :caption: File __init__.py #2
-
-  @view_config(renderer='string')
+  @view_config(renderer='json')
   def view(request):
-      return request.localizer.translate(something())
+      tr = request.localizer.translate
+      return tr(gettext("Some message for translation"))
 
-.. note::
+Mako
+^^^^
 
-  Since ``request`` only makes sense in the web application, this means that
-  currently it isn't possible to use localization in the nextgisweb command line
-  utilities.
-
-Mako templates
-^^^^^^^^^^^^^^
-
-Some of the strings that require translation are also contained in the
-mako-templates. In fact, the work of mako templates is not much different from
-the python code: first, we mark the string for translation with a special
-function, then we need to translate through ``request``, taking into account the
-user's preferences.
+Some of the strings that require translation are also contained in Mako
+templates. In fact, the work of mako templates is not much different from
+Python. You don't need import anything as it's imported behind the scene.
+Consider the following example:
 
 .. code-block:: mako
-  :caption: File template/section.mako #1
 
-  <% from nextgisweb_foo.bar.util import _ %>
-  <div>${request.localizer.translate(_("Another message for translation"))}</div>
-
-To shorten this long notation a bit, a ``tr()`` function has been added to the
-mako-template's context, which does the same. The example below is completely
-equivalent to the previous one:
-
-.. code-block:: mako
-  :caption: File template/section.mako #2
-
-  <% from nextgisweb_foo.bar.util import _ %>
-  <div>${tr(_("Another message for translation"))}</div>
+  <div>
+      ${tr(gettext("Another message for translation"))}
+  </div>
 
 .. note:: 
 
@@ -209,93 +81,45 @@ Client side
 
 When executing client-side code, user preferences are already known and there is
 no need for two-step processing. Translation and marking strings for translation
-can be combined into one function. The `jed`_ library is used as `gettext`_
-library implementation with ``.jed`` files precompiled from ``.po`` files on the
-server side.
+are combined into one function.
 
-Modern JavaScript
+Modern JavaScript and TypeScript
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Here is the minimal example:
+
+.. code-block:: javascript
+
+  import { gettext } from "@nextgisweb/pyramid/i18n";
+  
+  const msgTranslated = gettext("Some message for translation");
+  console.log("Localized message: " + msgTranslated);
+
+
+Legacy JavaScript
 ^^^^^^^^^^^^^^^^^
 
-Consider the following directory structure of ``bar`` component:
-
-.. code-block:: text
-  :caption: Directory structure
-
-  🗁 bar
-  └── 🗁 nodepkg
-      └── 🗁 bar
-          ├── 🗎 some-module.js
-          └── 🗎 package.json
-
-And here is the simple example, where string extraction and translation work:
-
 .. code-block:: javascript
-  :caption: File bar/nodepkg/bar/some-module.js
 
-  import i18n from "@nextgisweb/pyramid/i18n!";
-  
-  const translated = i18n.gettext("Some message for translation");
-  console.log("Localized message: " + translated);
-
-
-Old-style JavaScript
-^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: text
-  :caption: Directory structure
-
-  🗁 bar
-  └── 🗁 amd
-      └── 🗁 ngw-bar
-          ├── 🗎 mod-a.js
-          ├── 🗎 mod-b.js
-          └── 🗁 template
-              └── 🗎 html.hbs
-
-.. code-block:: javascript
-  :caption: File amd/ngw-bar/mod-a.js
-
-  define([
-      "@nextgisweb/pyramid/i18n!"
-  ], function (i18n) {
-      var translated = i18n.gettext("Some message for translation");
-      alert(translated);
+  define(["@nextgisweb/pyramid/i18n!"], function ({ gettext }) {
+      const msgTranslated = gettext("Some message for translation");
+      console.log("Localized message: " + msgTranslated);
   });
 
 As a result of loading this module, a message will be displayed, translated in
-exactly the same way as on the server. In this case client and server use the
-same set of strings.
+exactly the same way as on the server.
 
 Handlebars
 ^^^^^^^^^^
 
-Dijit-widgets often use template-based construction, which may also require
+Dijit-widgets use template-based construction, which may also require
 internationalization. To do this, it is possible to first pass the template
 through the template engine `handlebars`_.
 
 .. _handlebars: http://handlebarsjs.com/
 
-.. code-block:: javascript
-  :caption: File amd/ngw-bar/mod-b.js
-
-  define([
-      "@nextgisweb/pyramid/i18n!",
-      "dojo/text!.template/html.hbs"
-  ], function (i18n, template) {
-      var translated = i18n.renderTemplate(template);
-      alert(translated);
-  });
-
 .. code-block:: html
-  :caption: amd/ngw-bar/html.hbs
-
-  <strong>{{gettext "Another message for translation"}}</strong>
-
-In case of a template-based widget, using handlebars for internationalization
-would look like the original example in the dijit documentation:
-
-.. code-block:: html
-  :caption: File amd/ngw-bar/template/SomeWidget.hbs
+  :caption: SomeWidget.hbs
 
   <div data-dojo-type="${baseClass}">
       <input data-dojo-type="dijit/form/TextBox"
@@ -303,16 +127,15 @@ would look like the original example in the dijit documentation:
       <button data-dojo-type="dijit/form/Button">{{gettext 'Button'}}</button>
   </div>
 
-
 .. code-block:: javascript
-  :caption: File amd/ngw-bar/template/SomeWidget.js
+  :caption: SomeWidget.js
 
   define([
       "dojo/_base/declare",
       "dijit/_WidgetBase",
       "dijit/_TemplatedMixin",
       "@nextgisweb/pyramid/i18n!",
-      "dojo/text!./template/SomeWidget.hbs"
+      "dojo/text!./SomeWidget.hbs"
   ], function(declare, _WidgetBase, _TemplatedMixin, i18n, template) {
       return declare([_WidgetBase, _TemplatedMixin], {
           templateString: i18n.renderTemplate(template)
@@ -324,21 +147,3 @@ would look like the original example in the dijit documentation:
   Pay attention to quotes escaping inside attribute values such as
   ``data-dojo-props`` and use ``gettextString`` there instead of ``gettext``.
   It'll escape quotes keeping javascript code valid.
-
-.. note::
-
-  According to the settings, specified in the babel.cfg file, widget templates
-  should have the ``.hbs`` extension and be located inside ``template``
-  directory.
-
-Configuration options
----------------------
-
-The default language is determined by the ``locale.default`` setting of the
-``core`` component. English is used by default. Thus, in order for all messages
-to be displayed in Russian in the ``config.ini``, you need to specify:
-
-.. code-block:: ini
-
-  [core]
-  locale.default = ru
