@@ -67,6 +67,7 @@ extras_require = dict(
         "flake8-future-import",
         "flake8",
         "freezegun",
+        "pre-commit",
         "pyramid-debugtoolbar==4.10",
         "pytest-flake8",
         "pytest-watch",

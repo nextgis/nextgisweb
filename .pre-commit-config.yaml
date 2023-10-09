@@ -1,0 +1,8 @@
+repos:
+- repo: https://github.com/nextgis/nextgisweb_githook.git
+  rev: "c15a6fb4e2b306a84e630d8dd9847b4594cf78ad"
+  hooks:
+  - id: ruff
+  - id: black
+  - id: eslint
+  - id: prettier
