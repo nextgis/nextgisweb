@@ -1,3 +1,5 @@
+import re
+import os
 import json
 from itertools import chain
 from pathlib import Path
@@ -16,6 +18,21 @@ from nextgisweb.pyramid.uacompat import FAMILIES
 from .component import JSRealmComponent
 from .util import scan_for_nodepkgs
 
+
+def create_workspace_folders(npkgs: List[str], root="."):
+    folders = []
+    def create_folder_config(path, name):
+        return dict(
+            path=os.path.join(root,path),
+            name=name
+        )
+    folders.append(create_folder_config('', 'root'))
+    pattern = re.compile(r'/([^/]+)/([^/]+)/nodepkg$')
+    for pkg in npkgs:
+        match = pattern.search(pkg)
+        if match:
+            folders.append(create_folder_config(pkg, '@{}/{}'.format(match.group(1), match.group(2))))
+    print(json.dumps(folders))
 
 def create_tsconfig(npkgs: List[str]):
     compiler_options = dict(
@@ -128,6 +145,7 @@ def install(
         fd.write(json.dumps(package_json, indent=4))
 
     create_tsconfig(npkgs)
+    create_workspace_folders(npkgs)
 
     for comp in env.chain("client_codegen"):
         comp.client_codegen()
