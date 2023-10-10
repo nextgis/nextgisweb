@@ -39,7 +39,7 @@ function convertMarkSymbolizer(gsMark: GSMarkSymbolizer): PointSymbolizer {
                     : undefined,
             },
             opacity: setOpacity(gsMark.opacity),
-            size: gsMark.radius as number,
+            size: (gsMark.radius as number) * 2,
         },
     };
 }

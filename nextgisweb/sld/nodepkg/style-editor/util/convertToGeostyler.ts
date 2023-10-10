@@ -26,7 +26,7 @@ function reverseConvertMarkSymbolizer(
         kind: "Mark",
         wellKnownName,
         opacity,
-        radius: size,
+        radius: size ? size / 2 : undefined,
     };
 
     if (mark) {
