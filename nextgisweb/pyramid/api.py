@@ -136,11 +136,15 @@ def cors_tween_factory(handler, registry):
     return cors_tween
 
 
+# fmt: off
 ORIGIN_RE = (
-    r"^SCHEME(\*\.)?(HOST\.)+(HOST)\.?(\:PORT)?\/?$".replace("SCHEME", r"https?\:\/\/")
-    .replace("HOST", r"[a-z_\-][a-z_\-0-9]+")
-    .replace("PORT", r"[1-9][0-9]{1,4}")
+    r"^SCHEME(?:(\*\.)?(HOST\.)*(HOST)\.?|(IPv4))(:PORT)?\/?$"
+    .replace("SCHEME", r"https?:\/\/")
+    .replace("HOST", r"[_a-z-][_a-z0-9-]*")
+    .replace("IPv4", r"((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}")
+    .replace("PORT", r"([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])")
 )
+# fmt: on
 
 Origin = Annotated[
     str,
