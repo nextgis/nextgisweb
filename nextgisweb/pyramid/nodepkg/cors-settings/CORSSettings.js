@@ -15,8 +15,13 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 // prettier-ignore
-const msgHelp = gettext("Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."),
-    msgInfo = gettext("Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are allowed for third-level domains and higher.");
+const [msgHelp, msgInfo] = [
+    gettext("Enter allowed origins for cross domain requests to use HTTP API of this Web GIS on other websites. One origin per line."),
+    gettext("Please note that different protocols (HTTP and HTTPS) and subdomains (example.com and www.example.com) are different origins. Wildcards are allowed for third-level domains and higher."),
+];
+
+// prettier-ignore
+const ORIGIN_RE  = /^https?:\/\/(?:(\*\.)?([_a-z-][_a-z0-9-]*\.)*([_a-z-][_a-z0-9-]*)\.?|(((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}))(:([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?\/?$/g;
 
 export function CORSSettings() {
     const [form] = Form.useForm();
@@ -53,9 +58,8 @@ export function CORSSettings() {
     }
 
     const validCORSRule = (val) => {
-        const regex = /^(https?):\/\/(\*\.)?([\w\-.]{3,})(:\d{2,5})?\/?$/gi;
         const origins = val.split(/\r?\n/).map((x) => x.trim());
-        return origins.filter(Boolean).every((x) => x.match(regex));
+        return origins.filter(Boolean).every((x) => x.match(ORIGIN_RE));
     };
 
     const rules = [
