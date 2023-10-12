@@ -107,13 +107,14 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
         });
     };
 
-    const makePdf = () => {
+    const exportToFormat = (format) => {
         getImage().then((dataUrl) => {
             const body = {
                 width: parseInt(width),
                 height: parseInt(height),
                 margin: parseInt(margin),
                 map_image: dataUrl.substring("data:image/png;base64,".length),
+                format: format,
             };
 
             route("webmap.print")
@@ -129,11 +130,7 @@ export const PrintMapPanel = ({ display, onAction, getImage, scaleMap }) => {
     const exportFormatsProps = {
         items: exportFormats,
         onClick: (item) => {
-            if (item.key === "pdf") {
-                makePdf();
-            } else {
-                onAction("export", item.key);
-            }
+            exportToFormat(item.key);
         },
     };
 

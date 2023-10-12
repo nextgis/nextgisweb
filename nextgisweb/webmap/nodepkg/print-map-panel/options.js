@@ -44,5 +44,6 @@ export const scalesList = [
 export const exportFormats = [
     { label: gettext("JPEG"), key: "jpeg", icon: <FileJpgOutlined /> },
     { label: gettext("PNG"), key: "png", icon: <FileImageOutlined /> },
+    { label: gettext("TIFF"), key: "tiff", icon: <FileImageOutlined /> },
     { label: gettext("PDF"), key: "pdf", icon: <FilePdfOutlined /> },
 ];

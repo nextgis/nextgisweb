@@ -86,6 +86,18 @@ async function lunkwillFetch(lwRespUrl: string) {
     }
 }
 
+const mediaContentTypes = [
+    "application/pdf",
+    "image/png",
+    "image/jpeg",
+    "image/tiff",
+];
+const mediaContentTypesRegex = new RegExp(mediaContentTypes.join("|"));
+
+function isMediaContentType(contentType: string): boolean {
+    return mediaContentTypesRegex.test(contentType);
+}
+
 export async function request<T = unknown, ReturnUrl extends boolean = false>(
     path: string,
     options: RequestOptions<ReturnUrl>
@@ -163,9 +175,9 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
                     "application/vnd.lunkwill.request-summary+json"
                 ));
 
-        const respPdf = respCType && respCType.includes("application/pdf");
+        const respMedia = respCType && isMediaContentType(respCType);
 
-        if (!(respJSON || respPdf)) {
+        if (!(respJSON || respMedia)) {
             throw new InvalidResponseError();
         }
 

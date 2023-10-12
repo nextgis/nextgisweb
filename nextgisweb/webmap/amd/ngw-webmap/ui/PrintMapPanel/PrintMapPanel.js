@@ -107,7 +107,7 @@ define([
                         },
                         scaleMap,
                         getImage: () => {
-                            return this._buildPrintCanvas("png", true);
+                            return this._buildPrintCanvas();
                         },
                     },
                     contentNode.querySelector(".print-panel-content")
@@ -151,18 +151,6 @@ define([
                 if (action === "change-scale-controls") {
                     this._changeScaleControls(payload.value, payload.type);
                 }
-
-                if (action === "export") {
-                    this._buildPrintCanvas(payload).then(
-                        lang.hitch(this, function (dataUrl) {
-                            var hrefCanvasEl = this._buildHrefCanvasElement(
-                                dataUrl,
-                                payload
-                            );
-                            hrefCanvasEl.click();
-                        })
-                    );
-                }
             },
 
             _setMapScale: function (scale) {
@@ -189,40 +177,20 @@ define([
             },
 
             /**
-             * Build canvas for printing image.
-             *
-             * @param {string} imageType - "png" or "jpeg"
-             * @return {Deferred} A good string
+             * Build printing image canvas.
              */
-            _buildPrintCanvas: function (imageType, onlyMap) {
+            _buildPrintCanvas: function () {
                 var deferred = new Deferred(),
-                    domToImagePromise,
-                    elementToRender;
+                    domToPngPromise,
+                    mapElementToRender;
 
                 this._resizeMapContainer();
                 this._updateMapSize();
 
-                if (onlyMap) {
-                    elementToRender =
-                        this.contentWidget.mapContainer.firstChild;
-                } else {
-                    elementToRender = this.contentWidget.mapPageContainer;
-                }
+                mapElementToRender = this.contentWidget.mapContainer.firstChild;
+                domToPngPromise = toPng(mapElementToRender);
 
-                switch (imageType) {
-                    case "png":
-                        domToImagePromise = toPng(elementToRender);
-                        break;
-                    case "jpeg":
-                        domToImagePromise = toJpeg(elementToRender);
-                        break;
-                    default:
-                        console.error(
-                            'Image type "' + imageType + '" is unknown.'
-                        );
-                }
-
-                domToImagePromise
+                domToPngPromise
                     .then(
                         lang.hitch(this, function (dataUrl) {
                             deferred.resolve(dataUrl);

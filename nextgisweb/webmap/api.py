@@ -1,6 +1,8 @@
 from pathlib import Path
+from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
+from typing import Literal
 
 from geoalchemy2.shape import to_shape
 from msgspec import Meta, Struct
@@ -180,11 +182,15 @@ def settings_put(request) -> JSONType:
             raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
 
 
+ExportFormat = Literal["png", "jpeg", "tiff", "pdf"]
+
+
 class PrintBody(Struct):
     width: Annotated[float, Meta(gt=0, le=500)]
     height: Annotated[float, Meta(gt=0, le=500)]
     margin: Annotated[float, Meta(ge=0, le=100)]
     map_image: bytes
+    format: ExportFormat
 
 
 def print(request, *, body: PrintBody) -> Response:
@@ -223,11 +229,61 @@ def print(request, *, body: PrintBody) -> Response:
             ]
         )
 
+        output_file = None
+        content_type = None
+        if body.format == "pdf":
+            output_file = output_pdf
+            content_type = "application/pdf"
+        else:
+            content_type, output_file = pdf_to_image(body.format, output_pdf, temp_dir)
+
         return Response(
-            app_iter=output_pdf.open("rb"),
-            content_type="application/pdf",
+            app_iter=output_file.open("rb"),
+            content_type=content_type,
             request=request,
         )
+
+
+def pdf_to_image(format: ExportFormat, pdf_file: str, temp_dir: TemporaryDirectory):
+    gs = which("gs")
+    if not gs:
+        raise RuntimeError("Ghostscript not found")
+
+    output_file = None
+    content_type = None
+    device = None
+
+    if format == "jpeg":
+        content_type = "image/jpeg"
+        output_file = temp_dir / "output.jpeg"
+        device = "jpeg"
+    elif format == "png":
+        content_type = "image/png"
+        output_file = temp_dir / "output.png"
+        device = "png16m"
+    elif format == "tiff":
+        content_type = "image/tiff"
+        output_file = temp_dir / "output.tiff"
+        device = "tiff24nc"
+    else:
+        raise ValueError(f"Wrong image fromat to export: {format}")
+
+    check_call(
+        [
+            gs,
+            "-q",
+            "-dBATCH",
+            "-dSAFER",
+            "-dNOPAUSE",
+            "-r96",
+            "-dDownScaleFactor=1",
+            f"-sDEVICE={device}",
+            f"-sOutputFile={output_file}",
+            pdf_file,
+        ]
+    )
+
+    return (content_type, output_file)
 
 
 def setup_pyramid(comp, config):

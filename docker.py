@@ -20,10 +20,10 @@ def on_apt(event):
     if event.image.context.is_development():
         event.image.environment["SQLALCHEMY_WARN_20"] = "1"
 
-    # Chromium for printing
+    # Chromium and ghostscript for printing
     event.add_repository("ppa:savoury1/ffmpeg4")
     event.add_repository("ppa:savoury1/chromium")
-    event.package("chromium-browser")
+    event.package("chromium-browser", "ghostscript")
 
 
 @AppImage.on_user_dir.handler
