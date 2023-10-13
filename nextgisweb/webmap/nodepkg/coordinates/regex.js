@@ -19,11 +19,11 @@ const degrees = (groupName) => {
 };
 
 const minutes = (groupName) => {
-    return String.raw`((?<${groupName}>\d{1,2}(\.\d+)?)\s*[\u2032\u0027]?)`;
+    return String.raw`((?<${groupName}>\d{1,2}(\.\d+)?)\s*[\u2032\u0027\u02B9]?)`;
 };
 
 const seconds = (groupName) => {
-    return String.raw`((?<${groupName}>\d{1,2}(\.\d+)?)\s*[\u0022\u00A8\u02DD]?)`;
+    return String.raw`((?<${groupName}>\d{1,2}(\.\d+)?)\s*[\u0022\u00A8\u02DD\u2033]?)`;
 };
 
 export const makeRegexDecimalDegrees = () => {

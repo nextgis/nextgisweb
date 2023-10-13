@@ -8,7 +8,7 @@ import {
 
 const RegexDecimalComma = /(\d+),(\d+)/gi;
 const RegexCoordinatesTest =
-    /^[nwse\d+.,\s+-/|\\\u00B0\u02DA\u00BA\u007E\u002A\u2032\u0027\u0022\u00A8\u02DD]+$/i;
+    /^[nwse\d+.,\s+-/|\\\u00B0\u02DA\u00BA\u007E\u002A\u2032\u0027\u0022\u00A8\u02DD\u02B9\u2033]+$/i;
 const RegexDecimalDegrees = makeRegexDecimalDegrees();
 const RegexDegreesMinSec = makeRegexDegreesMinSec();
 const RegexNonSpaceSeparator = makeRegexNonSpaceSeparator();
