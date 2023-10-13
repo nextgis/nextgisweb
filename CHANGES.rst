@@ -1,6 +1,12 @@
 Changes
 =======
 
+4.6.0
+-----
+
+- Print to TIFF format in addition to PDF, JPEG and PNG.
+
+
 4.5.0
 -----
 
