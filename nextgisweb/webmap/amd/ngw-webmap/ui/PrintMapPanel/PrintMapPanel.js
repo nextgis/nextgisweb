@@ -47,7 +47,7 @@ define([
     handlebars,
     DynamicPanel,
     BorderContainer,
-    { toPng, toJpeg },
+    { toPng },
     i18n,
     Map,
     ol,
