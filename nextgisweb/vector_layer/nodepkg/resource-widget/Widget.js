@@ -102,9 +102,9 @@ const SourceOptions = observer(({ store }) => {
                 <RadioGroup options={optsFidSource} {...brg("fid_source")} />
                 <Input
                     value={so.fid_field}
-                    onChange={(value) => {
+                    onChange={(e) => {
                         runInAction(() => {
-                            so.fid_field = value;
+                            so.fid_field = e.target.value;
                         });
                     }}
                 />
