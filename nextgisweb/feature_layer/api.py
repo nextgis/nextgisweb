@@ -1,4 +1,3 @@
-import json
 import os
 import re
 import tempfile
@@ -6,7 +5,6 @@ import uuid
 import zipfile
 from datetime import date, datetime, time
 from typing import List, Optional
-from urllib.parse import unquote
 
 from msgspec import Meta
 from osgeo import gdal, ogr
@@ -927,61 +925,6 @@ def feature_extent(resource, request) -> JSONType:
     return dict(extent=extent)
 
 
-def store_collection(resource, request) -> JSONType:
-    request.resource_permission(PERM_READ)
-
-    query = resource.feature_query()
-
-    http_range = request.headers.get("range")
-    if http_range and http_range.startswith("items="):
-        first, last = map(int, http_range[len("items=") :].split("-", 1))
-        query.limit(last - first + 1, first)
-
-    field_prefix = json.loads(unquote(request.headers.get("x-field-prefix", '""')))
-
-    def pref(f):
-        return field_prefix + f
-
-    field_list = json.loads(unquote(request.headers.get("x-field-list", "[]")))
-    if len(field_list) > 0:
-        query.fields(*field_list)
-
-    box = request.headers.get("x-feature-box")
-    if box:
-        query.box()
-
-    like = request.params.get("like", "")
-    if like != "":
-        query.like(like)
-
-    sort_re = re.compile(r"sort\(([+-])%s(\w+)\)" % (field_prefix,))
-    sort = sort_re.search(unquote(request.query_string))
-    if sort:
-        sort_order = {"+": "asc", "-": "desc"}[sort.group(1)]
-        sort_colname = sort.group(2)
-        query.order_by(
-            (sort_order, sort_colname),
-        )
-
-    features = query()
-
-    result = []
-    for fobj in features:
-        fdata = dict([(pref(k), v) for k, v in fobj.fields.items()], id=fobj.id, label=fobj.label)
-        if box:
-            fdata["box"] = fobj.box.bounds
-
-        result.append(fdata)
-
-    if http_range:
-        total = features.total_count
-        last = min(total - 1, last)
-        content_range = "items %d-%d/%d" % (first, last, total)
-        request.response.headers["Content-Range"] = content_range
-
-    return result
-
-
 def setup_pyramid(comp, config):
     geojson_route = config.add_route(
         "feature_layer.geojson",
@@ -1049,13 +992,6 @@ def setup_pyramid(comp, config):
         "/api/resource/{id:uint}/feature_extent",
         factory=resource_factory,
     ).get(feature_extent, context=IFeatureLayer)
-
-    config.add_route(
-        "feature_layer.store",
-        "/api/resource/{id:uint}/store/",
-        factory=resource_factory,
-        deprecated=True,
-    ).get(store_collection, context=IFeatureLayer)
 
     from .identify import identify
 
