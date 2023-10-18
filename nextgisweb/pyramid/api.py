@@ -138,7 +138,7 @@ def cors_tween_factory(handler, registry):
 
 # fmt: off
 ORIGIN_RE = (
-    r"^SCHEME(?:(\*\.)?(HOST\.)*(HOST)\.?|(IPv4))(:PORT)?\/?$"
+    r"^SCHEME(?:(\*\.)?(HOST\.)+(HOST)\.?|(HOST)|(IPv4))(:PORT)?\/?$"
     .replace("SCHEME", r"https?:\/\/")
     .replace("HOST", r"[_a-z-][_a-z0-9-]*")
     .replace("IPv4", r"((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}")
