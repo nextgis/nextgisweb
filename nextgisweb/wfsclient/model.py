@@ -426,7 +426,6 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         WFSConnection,
         foreign_keys=connection_id,
         cascade="save-update, merge",
-        cascade_backrefs=False,
     )
 
     @classmethod

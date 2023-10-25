@@ -38,7 +38,7 @@ class Collection(Base):
     resource = db.relationship(
         Resource,
         foreign_keys=resource_id,
-        backref=db.backref("_ogcfserver_collections", cascade="all", cascade_backrefs=False),
+        backref=db.backref("_ogcfserver_collections", cascade="all"),
     )
 
     def to_dict(self):

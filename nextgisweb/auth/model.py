@@ -137,7 +137,7 @@ class Group(Principal):
     oauth_mapping = sa.Column(sa.Boolean, nullable=False, default=False)
 
     members = orm.relationship(
-        User, secondary=tab_group_user, cascade_backrefs=False, backref=orm.backref("member_of")
+        User, secondary=tab_group_user, backref=orm.backref("member_of")
     )
 
     __mapper_args__ = dict(polymorphic_identity="G")

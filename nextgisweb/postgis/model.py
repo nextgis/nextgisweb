@@ -255,8 +255,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     __field_class__ = PostgisLayerField
 
     connection = db.relationship(
-        Resource, foreign_keys=connection_id, cascade="save-update, merge", cascade_backrefs=False
-    )
+        Resource, foreign_keys=connection_id, cascade="save-update, merge")
 
     @classmethod
     def check_parent(cls, parent):

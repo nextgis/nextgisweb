@@ -195,8 +195,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
     vendor_params = db.Column(db.JSONB, nullable=False, default=dict)
 
     connection = db.relationship(
-        Resource, foreign_keys=connection_id, cascade="save-update, merge", cascade_backrefs=False
-    )
+        Resource, foreign_keys=connection_id, cascade="save-update, merge")
 
     @db.validates("vendor_params")
     def _validate_vendor_params(self, key, value):

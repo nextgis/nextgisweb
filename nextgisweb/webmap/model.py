@@ -85,7 +85,6 @@ class WebMap(Base, Resource):
         "WebMapAnnotation",
         back_populates="webmap",
         cascade="all,delete-orphan",
-        cascade_backrefs=False,
     )
 
     def __init__(self, *args, **kwagrs):

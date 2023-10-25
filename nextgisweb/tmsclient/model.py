@@ -152,7 +152,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
         Connection,
         foreign_keys=connection_id,
         cascade="save-update, merge",
-        cascade_backrefs=False,
     )
 
     @classmethod

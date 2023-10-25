@@ -309,7 +309,6 @@ class ResourceTileCache(Base):
             "tile_cache",
             cascade="all, delete-orphan",
             uselist=False,
-            cascade_backrefs=False,
         ),
     )
 
