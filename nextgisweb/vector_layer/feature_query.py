@@ -186,10 +186,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             columns.append(geomexpr.label("geom"))
 
         selected_fields = []
-        for f in tableinfo.fields:
-            if self._fields is None or f.keyname in self._fields:
-                columns.append(table.columns[f.key].label(f.keyname))
-                selected_fields.append(f)
+        for idx, fld in enumerate(tableinfo.fields):
+            if self._fields is None or fld.keyname in self._fields:
+                label = f"fld_{idx}"
+                columns.append(table.columns[fld.key].label(label))
+                selected_fields.append((fld.keyname, label))
 
         if self._filter_by:
             for k, v in self._filter_by.items():
@@ -318,7 +319,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         order_criterion.append(db.asc(idcol))
 
         class QueryFeatureSet(FeatureSet):
-            fields = selected_fields
             layer = self.layer
 
             _geom = self._geom
@@ -341,7 +341,10 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
                 result = DBSession.connection().execute(query)
                 for row in result.mappings():
-                    fdict = dict((f.keyname, row[f.keyname]) for f in selected_fields)
+                    fdict = dict(
+                        (keyname, row[label])
+                        for keyname, label in selected_fields)
+
                     if self._geom:
                         if self._geom_format == "WKB":
                             geom_data = row["geom"].tobytes()

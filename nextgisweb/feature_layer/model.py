@@ -16,7 +16,7 @@ from .interface import FIELD_TYPE, FIELD_TYPE_OGR
 
 Base.depends_on("resource", "lookup_table")
 
-FIELD_FORBIDDEN_NAME = ("id", "geom")
+FIELD_FORBIDDEN_NAME = ("fid", "geom")
 
 _FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
 

@@ -280,9 +280,6 @@ def test_id_field(data):
     ds = ogr.Open(str(src))
     layer = ds.GetLayer(0)
 
-    with pytest.raises(ValidationError):
-        res.setup_from_ogr(layer)
-
     fid_params = dict(fid_source=FID_SOURCE.FIELD, fid_field=["id"])
     with pytest.raises(ValidationError):
         res.setup_from_ogr(layer, fid_params=fid_params)
@@ -294,4 +291,4 @@ def test_id_field(data):
     query = res.feature_query()
     feature = query().one()
     assert feature.id == 1
-    assert list(feature.fields.keys()) == ["id_1"]
+    assert list(feature.fields.keys()) == ["id"]
