@@ -26,20 +26,25 @@ addPageFormat("A4", 210, 297);
 addPageFormat("A3", 297, 420);
 pageFormats.push({ value: "custom", label: gettext("Custom size") });
 
-export const scalesList = [
-    { value: 5000, label: "1 : 5 000" },
-    { value: 10000, label: "1 : 10 000" },
-    { value: 20000, label: "1 : 20 000" },
-    { value: 25000, label: "1 : 25 000" },
-    { value: 50000, label: "1 : 50 000" },
-    { value: 100000, label: "1 : 100 000" },
-    { value: 200000, label: "1 : 200 000" },
-    { value: 500000, label: "1 : 500 000" },
-    { value: 1000000, label: "1 : 1 000 000" },
-    { value: 2000000, label: "1 : 2 000 000" },
-    { value: 5000000, label: "1 : 5 000 000" },
-    { value: 10000000, label: "1 : 10 000 000" },
+const scalesValues = [
+    5000, 10000, 20000, 25000, 50000, 100000, 200000, 500000, 1000000, 2000000,
+    5000000, 10000000,
 ];
+
+const numberFormat = new Intl.NumberFormat("ru-RU");
+
+export const scaleToLabel = (scale) => {
+    return `1 : ${numberFormat.format(scale)}`;
+};
+
+export const scalesList = [];
+scalesValues.forEach((value) => {
+    const label = scaleToLabel(value);
+    scalesList.push({
+        value,
+        label,
+    });
+});
 
 export const exportFormats = [
     { label: gettext("JPEG"), key: "jpeg", icon: <FileJpgOutlined /> },

@@ -7,7 +7,9 @@ export const FloatingLabel = (props) => {
     const { children, label, value } = props;
 
     const classLabel =
-        focus || (value && value.length !== 0) ? "label float" : "label";
+        focus || (value !== undefined && value.length !== 0)
+            ? "label float"
+            : "label";
 
     return (
         <div
