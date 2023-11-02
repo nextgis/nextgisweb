@@ -89,7 +89,7 @@ const buildMap = (
         });
 
     const mapLogoEl = document.getElementsByClassName("map-logo");
-    if (mapLogoEl) {
+    if (mapLogoEl.length > 0) {
         const olViewportEl = container.getElementsByClassName("ol-viewport")[0];
         const newLogoEl = mapLogoEl[0].cloneNode(true);
         olViewportEl.appendChild(newLogoEl);
