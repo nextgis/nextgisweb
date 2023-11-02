@@ -52,21 +52,21 @@ msgstr "Поиск"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:993
+#: amd/ngw-webmap/Display.js:992
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1010 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: amd/ngw-webmap/Display.js:1009 amd/ngw-webmap/plugin/LayerInfo.js:28
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1036
-msgid "Annotations"
-msgstr "Аннотации"
-
-#: amd/ngw-webmap/Display.js:1050
+#: amd/ngw-webmap/Display.js:1029
 msgid "Share"
 msgstr "Поделиться"
+
+#: amd/ngw-webmap/Display.js:1081
+msgid "Annotations"
+msgstr "Аннотации"
 
 #: amd/ngw-webmap/ExtentWidget.js:37
 msgid "Extent and bookmarks"
@@ -83,7 +83,7 @@ msgstr "Учитывать на карте"
 #: amd/ngw-webmap/ItemWidget.js:179
 #: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:109
 #: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:47
-#: nodepkg/settings/SettingsForm.js:296
+#: nodepkg/settings/SettingsForm.js:292
 msgid "Save"
 msgstr "Сохранить"
 
@@ -96,31 +96,31 @@ msgid "Your location could not be determined"
 msgstr "Определить местоположение не удалось"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:7
-#: nodepkg/settings-widget/SettingsWidget.js:56
-#: nodepkg/settings/SettingsForm.js:260
+#: nodepkg/settings-widget/SettingsWidget.js:55
+#: nodepkg/settings/SettingsForm.js:256
 msgid "Legend"
 msgstr "Легенда"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:9
-#: nodepkg/settings-widget/SettingsWidget.js:62
+#: nodepkg/settings-widget/SettingsWidget.js:61
 #: nodepkg/settings/select-options.js:92
 msgid "Default"
 msgstr "По умолчанию"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:10
-#: nodepkg/settings-widget/SettingsWidget.js:66
+#: nodepkg/settings-widget/SettingsWidget.js:65
 #: nodepkg/settings/select-options.js:93
 msgid "Expand"
 msgstr "Развернуть"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:11
-#: nodepkg/settings-widget/SettingsWidget.js:67
+#: nodepkg/settings-widget/SettingsWidget.js:66
 #: nodepkg/settings/select-options.js:94
 msgid "Collapse"
 msgstr "Свернуть"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:12
-#: nodepkg/settings-widget/SettingsWidget.js:68
+#: nodepkg/settings-widget/SettingsWidget.js:67
 #: nodepkg/settings/select-options.js:95
 msgid "Disable"
 msgstr "Отключить"
@@ -155,7 +155,7 @@ msgid "Stop editing"
 msgstr "Завершить редактирование"
 
 #: amd/ngw-webmap/plugin/LayerEditor.js:143
-#: nodepkg/annotations-panel/AnnotationsPanel.js:90
+#: nodepkg/panel/annotations/AnnotationsPanel.js:84
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -227,7 +227,7 @@ msgstr "Удалить"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:71
 #: amd/ngw-webmap/template/ItemWidget.hbs:128
-#: nodepkg/clone-webmap/CloneWebmap.js:48
+#: nodepkg/clone-webmap/CloneWebmap.js:45
 msgid "Display name"
 msgstr "Наименование"
 
@@ -275,19 +275,19 @@ msgstr "Геометрия"
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:537
+#: amd/ngw-webmap/tool/Identify.js:524
 msgid "Features"
 msgstr "Объектов"
 
-#: amd/ngw-webmap/tool/Measure.js:38
+#: amd/ngw-webmap/tool/Measure.js:36
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
-#: amd/ngw-webmap/tool/Measure.js:44
+#: amd/ngw-webmap/tool/Measure.js:42
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: amd/ngw-webmap/tool/Measure.js:220
+#: amd/ngw-webmap/tool/Measure.js:218
 msgid "Double click to finish."
 msgstr "Щёлкните дважды, чтобы завершить."
 
@@ -391,15 +391,6 @@ msgstr "Вы хотите сохранить изменения?"
 msgid "Don't save"
 msgstr "Не сохранять"
 
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:10
-#: nodepkg/print-map-panel/PrintMapPanel.js:225
-msgid "Print"
-msgstr "Печать"
-
-#: amd/ngw-webmap/ui/PrintMapPanel/PrintMapPanel.hbs:16
-msgid "Close"
-msgstr "Закрыть"
-
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:536
 msgid "Open full map"
 msgstr "Открыть карту целиком"
@@ -432,73 +423,11 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/annotations-panel/AnnotationsPanel.js:95
-msgid "Edit annotations"
-msgstr "Редактировать аннотации"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:100
-msgid "Geometry type"
-msgstr "Тип геометрии"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:109
-#: nodepkg/utils/geometry-types.js:6
-msgid "Point"
-msgstr "Точка"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:112
-msgid "Line"
-msgstr "Линия"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:116
-#: nodepkg/utils/geometry-types.js:15
-msgid "Polygon"
-msgstr "Полигон"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:135
-msgid "Annotations layer"
-msgstr "Слой аннотаций"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:138
-#: nodepkg/settings-widget/SettingsWidget.js:41
-msgid "Show annotations"
-msgstr "Показывать аннотации"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:147
-#: nodepkg/settings-widget/SettingsWidget.js:51
-msgid "No"
-msgstr "Нет"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:148
-#: nodepkg/settings-widget/SettingsWidget.js:52
-msgid "Yes"
-msgstr "Да"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:151
-#: nodepkg/settings-widget/SettingsWidget.js:53
-msgid "With messages"
-msgstr "С сообщениями"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:159
-msgid "Private annotations"
-msgstr "Приватные аннотации"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:167
-msgid "Public annotations"
-msgstr "Публичные аннотации"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:177
-msgid "My private annotations"
-msgstr "Мои приватные аннотации"
-
-#: nodepkg/annotations-panel/AnnotationsPanel.js:188
-msgid "Other private annotations"
-msgstr "Другие приватные аннотации"
-
-#: nodepkg/clone-webmap/CloneWebmap.js:35
+#: nodepkg/clone-webmap/CloneWebmap.js:32
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/clone-webmap/CloneWebmap.js:183 view.py:323
+#: nodepkg/clone-webmap/CloneWebmap.js:180 view.py:323
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -514,17 +443,143 @@ msgstr "Показывать легенду"
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.js:123
+#: nodepkg/map-viewer-info/MapViewerInfo.js:121
 msgid "Show extent"
 msgstr "Показывать охват"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.js:124
+#: nodepkg/map-viewer-info/MapViewerInfo.js:122
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:92
+msgid "Edit annotations"
+msgstr "Редактировать аннотации"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:97
+msgid "Geometry type"
+msgstr "Тип геометрии"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:106
+#: nodepkg/utils/geometry-types.js:6
+msgid "Point"
+msgstr "Точка"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:109
+msgid "Line"
+msgstr "Линия"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:113
+#: nodepkg/utils/geometry-types.js:15
+msgid "Polygon"
+msgstr "Полигон"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:132
+msgid "Annotations layer"
+msgstr "Слой аннотаций"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:135
+#: nodepkg/settings-widget/SettingsWidget.js:40
+msgid "Show annotations"
+msgstr "Показывать аннотации"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:144
+#: nodepkg/settings-widget/SettingsWidget.js:50
+msgid "No"
+msgstr "Нет"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:145
+#: nodepkg/settings-widget/SettingsWidget.js:51
+msgid "Yes"
+msgstr "Да"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:148
+#: nodepkg/settings-widget/SettingsWidget.js:52
+msgid "With messages"
+msgstr "С сообщениями"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:156
+msgid "Private annotations"
+msgstr "Приватные аннотации"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:164
+msgid "Public annotations"
+msgstr "Публичные аннотации"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:174
+msgid "My private annotations"
+msgstr "Мои приватные аннотации"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.js:187
+msgid "Other private annotations"
+msgstr "Другие приватные аннотации"
 
 #: nodepkg/panel/layers/LayersDropdown.js:12
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
+
+#: nodepkg/panel/print/PrintPanel.js:217
+msgid "Paper format"
+msgstr "Формат бумаги"
+
+#: nodepkg/panel/print/PrintPanel.js:229
+msgid "Height, mm"
+msgstr "Высота, мм"
+
+#: nodepkg/panel/print/PrintPanel.js:246
+msgid "Width, mm"
+msgstr "Ширина, мм"
+
+#: nodepkg/panel/print/PrintPanel.js:263
+msgid "Margin, mm"
+msgstr "Отступ, мм"
+
+#: nodepkg/panel/print/PrintPanel.js:280 nodepkg/panel/print/PrintPanel.js:301
+msgid "Scale"
+msgstr "Масштаб"
+
+#: nodepkg/panel/print/PrintPanel.js:287
+msgid "Scale value"
+msgstr "Значение масштаба"
+
+#: nodepkg/panel/print/PrintPanel.js:296
+msgid "Scale bar"
+msgstr "Масштабная линейка"
+
+#: nodepkg/panel/print/PrintPanel.js:319
+msgid "Print"
+msgstr "Печать"
+
+#: nodepkg/panel/print/PrintPanel.js:324
+msgid "Save as"
+msgstr "Сохранить как"
+
+#: nodepkg/panel/print/options.js:9
+msgid "Portrait"
+msgstr "Портретный"
+
+#: nodepkg/panel/print/options.js:10
+msgid "Landscape"
+msgstr "Ландшафтный"
+
+#: nodepkg/panel/print/options.js:27
+msgid "Custom size"
+msgstr "Настраиваемый"
+
+#: nodepkg/panel/print/options.js:50
+msgid "JPEG"
+msgstr "JPEG"
+
+#: nodepkg/panel/print/options.js:51
+msgid "PNG"
+msgstr "PNG"
+
+#: nodepkg/panel/print/options.js:52
+msgid "TIFF"
+msgstr "TIFF"
+
+#: nodepkg/panel/print/options.js:53
+msgid "PDF"
+msgstr "PDF"
 
 #: nodepkg/panel/search/SearchPanel.js:323
 msgid "Not found"
@@ -564,11 +619,11 @@ msgstr "Вставить карту на сайт"
 msgid "Map size:"
 msgstr "Размер карты:"
 
-#: nodepkg/panel/share/SharePanel.js:148 nodepkg/settings/SettingsForm.js:59
+#: nodepkg/panel/share/SharePanel.js:148 nodepkg/settings/SettingsForm.js:60
 msgid "Width, px"
 msgstr "Ширина, пикс."
 
-#: nodepkg/panel/share/SharePanel.js:154 nodepkg/settings/SettingsForm.js:72
+#: nodepkg/panel/share/SharePanel.js:154 nodepkg/settings/SettingsForm.js:73
 msgid "Height, px"
 msgstr "Высота, пикс."
 
@@ -596,148 +651,87 @@ msgstr "Копировать код"
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: nodepkg/print-map-panel/PrintMapPanel.js:143
-msgid "Page"
-msgstr "Страница"
-
-#: nodepkg/print-map-panel/PrintMapPanel.js:145
-msgid "Paper format"
-msgstr "Формат бумаги"
-
-#: nodepkg/print-map-panel/PrintMapPanel.js:154
-msgid "Height, mm"
-msgstr "Высота, мм"
-
-#: nodepkg/print-map-panel/PrintMapPanel.js:166
-msgid "Width, mm"
-msgstr "Ширина, мм"
-
-#: nodepkg/print-map-panel/PrintMapPanel.js:178
-msgid "Margin, mm"
-msgstr "Отступ, мм"
-
-#: nodepkg/print-map-panel/PrintMapPanel.js:189
-#: nodepkg/print-map-panel/PrintMapPanel.js:209
-msgid "Scale"
-msgstr "Масштаб"
-
-#: nodepkg/print-map-panel/PrintMapPanel.js:197
-msgid "Scale value"
-msgstr "Значение масштаба"
-
-#: nodepkg/print-map-panel/PrintMapPanel.js:206
-msgid "Scale bar"
-msgstr "Масштабная линейка"
-
-#: nodepkg/print-map-panel/PrintMapPanel.js:230
-msgid "Save as"
-msgstr "Сохранить как"
-
-#: nodepkg/print-map-panel/options.js:9
-msgid "Portrait"
-msgstr "Портретный"
-
-#: nodepkg/print-map-panel/options.js:10
-msgid "Landscape"
-msgstr "Ландшафтный"
-
-#: nodepkg/print-map-panel/options.js:27
-msgid "Custom size"
-msgstr "Настраиваемый"
-
-#: nodepkg/print-map-panel/options.js:45
-msgid "JPEG"
-msgstr "JPEG"
-
-#: nodepkg/print-map-panel/options.js:46
-msgid "PNG"
-msgstr "PNG"
-
-#: nodepkg/print-map-panel/options.js:47
-msgid "PDF"
-msgstr "PDF"
-
-#: nodepkg/settings-widget/SettingsWidget.js:27
+#: nodepkg/settings-widget/SettingsWidget.js:26
 msgid "Enable layers editing"
 msgstr "Разрешить редактирование слоев"
 
-#: nodepkg/settings-widget/SettingsWidget.js:37
+#: nodepkg/settings-widget/SettingsWidget.js:36
 msgid "Enable annotations"
 msgstr "Разрешить аннотирование"
 
-#: nodepkg/settings-widget/SettingsWidget.js:74
+#: nodepkg/settings-widget/SettingsWidget.js:73
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/settings/Settings.js:56
+#: nodepkg/settings/Settings.js:58
 msgid "Settings saved"
 msgstr "Настройки сохранены"
 
-#: nodepkg/settings/SettingsForm.js:53
+#: nodepkg/settings/SettingsForm.js:54
 msgid "Identify popup"
 msgstr "Окно идентификации"
 
-#: nodepkg/settings/SettingsForm.js:85
+#: nodepkg/settings/SettingsForm.js:86
 msgid "Radius, px"
 msgstr "Радиус, пикс."
 
-#: nodepkg/settings/SettingsForm.js:108
+#: nodepkg/settings/SettingsForm.js:109
 msgid "Show feature attributes"
 msgstr "Показывать атрибуты объектов"
 
-#: nodepkg/settings/SettingsForm.js:122
+#: nodepkg/settings/SettingsForm.js:123
 msgid "Show geometry info"
 msgstr "Показывать информацию о геометрии"
 
-#: nodepkg/settings/SettingsForm.js:128
+#: nodepkg/settings/SettingsForm.js:129
 msgid "Measurement"
 msgstr "Измерения"
 
-#: nodepkg/settings/SettingsForm.js:134
+#: nodepkg/settings/SettingsForm.js:135
 msgid "Length units"
 msgstr "Единицы длины"
 
-#: nodepkg/settings/SettingsForm.js:145
+#: nodepkg/settings/SettingsForm.js:144
 msgid "Area units"
 msgstr "Единицы площади"
 
-#: nodepkg/settings/SettingsForm.js:156
+#: nodepkg/settings/SettingsForm.js:154
 msgid "Degree format"
 msgstr "Формат градусов"
 
-#: nodepkg/settings/SettingsForm.js:170
+#: nodepkg/settings/SettingsForm.js:168
 msgid "Measurement SRID"
 msgstr "Система координат для расчётов"
 
-#: nodepkg/settings/SettingsForm.js:180
+#: nodepkg/settings/SettingsForm.js:178
 msgid "Address search"
 msgstr "Адресный поиск"
 
-#: nodepkg/settings/SettingsForm.js:193
+#: nodepkg/settings/SettingsForm.js:191
 msgid "Enable"
 msgstr "Включить"
 
-#: nodepkg/settings/SettingsForm.js:207
+#: nodepkg/settings/SettingsForm.js:205
 msgid "Limit by web map initial extent"
 msgstr "Ограничить начальным охватом карты"
 
-#: nodepkg/settings/SettingsForm.js:217
+#: nodepkg/settings/SettingsForm.js:215
 msgid "Provider"
 msgstr "Провайдер"
 
-#: nodepkg/settings/SettingsForm.js:229
+#: nodepkg/settings/SettingsForm.js:227
 msgid "Limit search results to countries"
 msgstr "Ограничить поиск странами"
 
-#: nodepkg/settings/SettingsForm.js:239
+#: nodepkg/settings/SettingsForm.js:235
 msgid "Invalid countries. For example ru or gb,de"
 msgstr "Неверные значения. Например, ru или gb,de"
 
-#: nodepkg/settings/SettingsForm.js:252
+#: nodepkg/settings/SettingsForm.js:248
 msgid "Yandex.Maps API Geocoder Key"
 msgstr "Ключ геокодера API Яндекс.Карт"
 
-#: nodepkg/settings/SettingsForm.js:271
+#: nodepkg/settings/SettingsForm.js:267
 msgid "Visibility"
 msgstr "Видимость"
 
@@ -817,27 +811,27 @@ msgstr "Nominatim (OSM)"
 msgid "Yandex.Maps API Geocoder"
 msgstr "Геокодер API Яндекс.Карт"
 
-#: nodepkg/utils/format-units.js:11
+#: nodepkg/utils/format-units.js:12
 msgid "m"
 msgstr "м"
 
-#: nodepkg/utils/format-units.js:12
+#: nodepkg/utils/format-units.js:13
 msgid "km"
 msgstr "км"
 
-#: nodepkg/utils/format-units.js:13
+#: nodepkg/utils/format-units.js:14
 msgid "ft"
 msgstr "фут"
 
-#: nodepkg/utils/format-units.js:14
+#: nodepkg/utils/format-units.js:15
 msgid "mi"
 msgstr "миля"
 
-#: nodepkg/utils/format-units.js:15
+#: nodepkg/utils/format-units.js:16
 msgid "ha"
 msgstr "га"
 
-#: nodepkg/utils/format-units.js:16
+#: nodepkg/utils/format-units.js:17
 msgid "ac"
 msgstr "акр"
 
@@ -865,15 +859,15 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:22
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:21
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-tabs/WebMapTabs.tsx:17
+#: nodepkg/webmap-tabs/WebMapTabs.tsx:16
 msgid "Loading"
 msgstr "Загрузка"
 
-#: nodepkg/zoom-to-filtered-btn/ZoomToFilteredBtn.tsx:22
+#: nodepkg/zoom-to-filtered-btn/ZoomToFilteredBtn.tsx:21
 msgid "Zoom to filtered features"
 msgstr "Приблизить к найденным объектам"
 
