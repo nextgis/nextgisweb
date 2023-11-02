@@ -277,4 +277,8 @@ export class PanelsManager {
     get panelsReady(): Deferred<void> {
         return this._panelsReady;
     }
+
+    activatePanel(name: string): void {
+        this._changeNavigationMenu(name);
+    }
 }
