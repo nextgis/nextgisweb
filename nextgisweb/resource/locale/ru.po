@@ -501,9 +501,11 @@ msgctxt "permission"
 msgid "Access"
 msgstr "Доступ"
 
-#: serialize.py:93
-msgid "Attribute '%s' forbidden."
-msgstr "Недостаточно прав, атрибут '%s'."
+#: serialize.py:91
+msgid ""
+"Modification of the '{attribute}' attribute requires the '{scope}: "
+"{permission}' permission."
+msgstr "Для изменения атрибута '{attribute}' необходимо право '{scope}: {permission}'."
 
 #: template/resource_section_description.mako:5
 msgid "Resource description is empty."

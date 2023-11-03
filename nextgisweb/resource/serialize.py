@@ -87,7 +87,20 @@ class SerializedProperty:
         if self.writeperm(srlzr):
             self.setter(srlzr, srlzr.data[self.attrname])
         else:
-            raise ForbiddenError(message=_("Attribute '%s' forbidden.") % self.attrname)
+            raise ForbiddenError(
+                message=_(
+                    "Modification of the '{attribute}' attribute requires "
+                    "the '{scope}: {permission}' permission."
+                ).format(
+                    attribute=self.attrname,
+                    scope=self.write.scope.label,
+                    permission=self.write.label,
+                ),
+                data=dict(
+                    scope=self.write.scope.identity,
+                    permission=self.write.name,
+                ),
+            )
 
 
 class SerializedRelationship(SerializedProperty):
