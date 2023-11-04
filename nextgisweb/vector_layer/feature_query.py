@@ -341,9 +341,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
                 result = DBSession.connection().execute(query)
                 for row in result.mappings():
-                    fdict = dict(
-                        (keyname, row[label])
-                        for keyname, label in selected_fields)
+                    fdict = dict((keyname, row[label]) for keyname, label in selected_fields)
 
                     if self._geom:
                         if self._geom_format == "WKB":

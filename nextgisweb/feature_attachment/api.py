@@ -23,11 +23,12 @@ from .util import attachments_import
 
 
 def attachment_or_not_found(resource_id, feature_id, attachment_id):
-    """ Return attachment filtered by id or raise AttachmentNotFound exception. """
+    """Return attachment filtered by id or raise AttachmentNotFound exception."""
 
     obj = FeatureAttachment.filter_by(
-        id=attachment_id, resource_id=resource_id,
-        feature_id=feature_id
+        id=attachment_id,
+        resource_id=resource_id,
+        feature_id=feature_id,
     ).one_or_none()
 
     if obj is None:
@@ -40,13 +41,14 @@ def download(resource, request):
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(
-        resource_id=resource.id, feature_id=int(request.matchdict['fid']),
-        attachment_id=int(request.matchdict['aid'])
+        resource_id=resource.id,
+        feature_id=int(request.matchdict["fid"]),
+        attachment_id=int(request.matchdict["aid"]),
     )
 
     fn = env.file_storage.filename(obj.fileobj)
     response = UnsafeFileResponse(fn, content_type=obj.mime_type, request=request)
-    response.content_disposition = f'filename*=utf-8\'\'{quote_plus(obj.name)}'
+    response.content_disposition = f"filename*=utf-8''{quote_plus(obj.name)}"
     return response
 
 
@@ -54,8 +56,9 @@ def image(resource, request):
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(
-        resource_id=resource.id, feature_id=int(request.matchdict['fid']),
-        attachment_id=int(request.matchdict['aid'])
+        resource_id=resource.id,
+        feature_id=int(request.matchdict["fid"]),
+        attachment_id=int(request.matchdict["aid"]),
     )
 
     image = Image.open(env.file_storage.filename(obj.fileobj))
@@ -73,10 +76,8 @@ def image(resource, request):
             orientation = ORIENTATIONS.get(otag)
             image = image.transpose(orientation.degrees)
 
-    if 'size' in request.GET:
-        image.thumbnail(
-            list(map(int, request.GET['size'].split('x'))),
-            Image.LANCZOS)
+    if "size" in request.GET:
+        image.thumbnail(list(map(int, request.GET["size"].split("x"))), Image.LANCZOS)
 
     buf = BytesIO()
     image.save(buf, ext)
@@ -89,8 +90,9 @@ def iget(resource, request) -> JSONType:
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(
-        resource_id=resource.id, feature_id=int(request.matchdict['fid']),
-        attachment_id=int(request.matchdict['aid'])
+        resource_id=resource.id,
+        feature_id=int(request.matchdict["fid"]),
+        attachment_id=int(request.matchdict["aid"]),
     )
 
     return obj.serialize()
@@ -100,8 +102,9 @@ def idelete(resource, request) -> JSONType:
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(
-        resource_id=resource.id, feature_id=int(request.matchdict['fid']),
-        attachment_id=int(request.matchdict['aid'])
+        resource_id=resource.id,
+        feature_id=int(request.matchdict["fid"]),
+        attachment_id=int(request.matchdict["aid"]),
     )
 
     DBSession.delete(obj)
@@ -111,8 +114,9 @@ def iput(resource, request) -> JSONType:
     request.resource_permission(DataScope.write)
 
     obj = attachment_or_not_found(
-        resource_id=resource.id, feature_id=int(request.matchdict['fid']),
-        attachment_id=int(request.matchdict['aid'])
+        resource_id=resource.id,
+        feature_id=int(request.matchdict["fid"]),
+        attachment_id=int(request.matchdict["aid"]),
     )
 
     obj.deserialize(request.json_body)
@@ -126,8 +130,8 @@ def cget(resource, request) -> JSONType:
     request.resource_permission(DataScope.read)
 
     query = FeatureAttachment.filter_by(
-        feature_id=request.matchdict['fid'],
-        resource_id=resource.id)
+        feature_id=request.matchdict["fid"], resource_id=resource.id
+    )
 
     result = [itm.serialize() for itm in query]
 
@@ -137,7 +141,7 @@ def cget(resource, request) -> JSONType:
 def cpost(resource, request) -> JSONType:
     request.resource_permission(DataScope.write)
 
-    feature_id = int(request.matchdict['fid'])
+    feature_id = int(request.matchdict["fid"])
     query = resource.feature_query()
     query.filter_by(id=feature_id)
     query.limit(1)
@@ -161,11 +165,12 @@ def cpost(resource, request) -> JSONType:
 def export(resource, request):
     request.resource_permission(DataScope.read)
 
-    query = FeatureAttachment.filter_by(resource_id=resource.id) \
-        .order_by(FeatureAttachment.feature_id, FeatureAttachment.id)
+    query = FeatureAttachment.filter_by(resource_id=resource.id).order_by(
+        FeatureAttachment.feature_id, FeatureAttachment.id
+    )
 
     metadata = dict()
-    metadata_items = metadata['items'] = dict()
+    metadata_items = metadata["items"] = dict()
 
     with NamedTemporaryFile(suffix=".zip") as tmp_file:
         with ZipFile(tmp_file, "w", ZIP_DEFLATED, allowZip64=True) as zipf:
@@ -181,29 +186,29 @@ def export(resource, request):
                 if name in feature_anames:
                     # Make attachment's name unique
                     (base, suffix) = re.match(
-                        r'(.*?)((?:\.[a-z0-9_]+)+)$',
-                        name, re.IGNORECASE).groups()
+                        r"(.*?)((?:\.[a-z0-9_]+)+)$", name, re.IGNORECASE
+                    ).groups()
                     for idx in count(1):
-                        candidate = f'{base}.{idx}{suffix}'
+                        candidate = f"{base}.{idx}{suffix}"
                         if candidate not in feature_anames:
                             name = candidate
                             break
 
                 feature_anames.add(name)
-                arcname = f'{obj.feature_id:010d}/{name}'
+                arcname = f"{obj.feature_id:010d}/{name}"
 
                 metadata_item = metadata_items[arcname] = dict(
-                    id=obj.id, feature_id=obj.feature_id,
-                    name=obj.name, mime_type=obj.mime_type)
+                    id=obj.id, feature_id=obj.feature_id, name=obj.name, mime_type=obj.mime_type
+                )
                 if obj.description is not None:
-                    metadata_item['description'] = obj.description
+                    metadata_item["description"] = obj.description
 
                 fn = env.file_storage.filename(obj.fileobj)
                 zipf.write(fn, arcname=arcname)
 
-            zipf.writestr('metadata.json', dumpb(metadata))
+            zipf.writestr("metadata.json", dumpb(metadata))
 
-        response = FileResponse(tmp_file.name, content_type='application/zip')
+        response = FileResponse(tmp_file.name, content_type="application/zip")
         response.content_disposition = 'attachment; filename="%d.attachments.zip"' % resource.id
         return response
 
@@ -212,51 +217,58 @@ def import_attachment(resource, request) -> JSONType:
     request.resource_permission(DataScope.write)
 
     data = request.json_body
-    replace = data.get('replace', False) is True
-    upload_meta = data['source']
-    data, meta = request.env.file_upload.get_filename(upload_meta['id'])
+    replace = data.get("replace", False) is True
+    upload_meta = data["source"]
+    data, meta = request.env.file_upload.get_filename(upload_meta["id"])
 
     return attachments_import(resource, data, replace=replace)
 
 
 def setup_pyramid(comp, config):
-    colurl = '/api/resource/{id:uint}/feature/{fid:int}/attachment/'
-    itmurl = '/api/resource/{id:uint}/feature/{fid:int}/attachment/{aid:uint}'
+    colurl = "/api/resource/{id:uint}/feature/{fid:int}/attachment/"
+    itmurl = "/api/resource/{id:uint}/feature/{fid:int}/attachment/{aid:uint}"
 
     config.add_route(
-        'feature_attachment.download',
-        itmurl + '/download',
+        "feature_attachment.download",
+        itmurl + "/download",
         factory=resource_factory,
-        get=download)
+        get=download,
+    )
 
     config.add_route(
-        'feature_attachment.image',
-        itmurl + '/image',
+        "feature_attachment.image",
+        itmurl + "/image",
         factory=resource_factory,
-        get=image)
+        get=image,
+    )
 
     config.add_route(
-        'feature_attachment.item', itmurl,
+        "feature_attachment.item",
+        itmurl,
         factory=resource_factory,
         get=iget,
         put=iput,
-        delete=idelete)
+        delete=idelete,
+    )
 
     config.add_route(
-        'feature_attachment.collection',
+        "feature_attachment.collection",
         colurl,
         factory=resource_factory,
         get=cget,
-        post=cpost)
+        post=cpost,
+    )
 
     config.add_route(
-        'feature_attachment.export',
-        '/api/resource/{id:uint}/feature_attachment/export',
+        "feature_attachment.export",
+        "/api/resource/{id:uint}/feature_attachment/export",
         factory=resource_factory,
-        get=export)
+        get=export,
+    )
 
     config.add_route(
-        'feature_attachment.import',
-        '/api/resource/{id:uint}/feature_attachment/import',
+        "feature_attachment.import",
+        "/api/resource/{id:uint}/feature_attachment/import",
         factory=resource_factory,
-        put=import_attachment)
+        put=import_attachment,
+    )

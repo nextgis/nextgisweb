@@ -20,20 +20,20 @@ def attachments_import(resource, filename, *, replace):
     @contextmanager
     def open_zip_file():
         try:
-            with ZipFile(filename, mode='r') as zf:
+            with ZipFile(filename, mode="r") as zf:
                 yield zf
         except BadZipFile:
             raise ValidationError(message=_("Invalid ZIP archive."))
 
     with open_zip_file() as z:
         try:
-            metadata_info = z.getinfo('metadata.json')
+            metadata_info = z.getinfo("metadata.json")
         except KeyError:
             metadata_info = None
 
         if metadata_info is not None:
             metadata = loadb(z.read(metadata_info))
-            metadata_items = metadata.get('items')
+            metadata_items = metadata.get("items")
         else:
             metadata = None
             metadata_items = None
@@ -51,60 +51,64 @@ def attachments_import(resource, filename, *, replace):
                 try:
                     file_md = metadata_items.pop(info_fn)
                 except KeyError:
-                    raise ValidationError(message=_(
-                        "File '{}' isn't found in metadata.").format(info_fn))
+                    raise ValidationError(
+                        message=_("File '{}' isn't found in metadata.").format(info_fn)
+                    )
 
-                file_name = file_md.get('name')
+                file_name = file_md.get("name")
                 if not isinstance(file_name, str):
-                    raise ValidationError(message=_(
-                        "Invalid name for file '{}'.").format(info_fn))
-                src['name'] = file_name
+                    raise ValidationError(message=_("Invalid name for file '{}'.").format(info_fn))
+                src["name"] = file_name
 
-                file_fid = file_md.get('feature_id')
+                file_fid = file_md.get("feature_id")
                 if not isinstance(file_fid, int):
-                    raise ValidationError(message=_(
-                        "Invalid feature ID for file '{}'.").format(info_fn))
-                src['feature_id'] = file_fid
+                    raise ValidationError(
+                        message=_("Invalid feature ID for file '{}'.").format(info_fn)
+                    )
+                src["feature_id"] = file_fid
 
-                file_mime = file_md.get('mime_type')
+                file_mime = file_md.get("mime_type")
                 if file_mime is not None and not isinstance(file_mime, str):
-                    raise ValidationError(message=_(
-                        "Invalid MIME type for file '{}'.").format(info_fn))
-                src['mime_type'] = file_mime
+                    raise ValidationError(
+                        message=_("Invalid MIME type for file '{}'.").format(info_fn)
+                    )
+                src["mime_type"] = file_mime
 
-                file_desc = file_md.get('description')
+                file_desc = file_md.get("description")
                 if file_desc is not None and not isinstance(file_desc, str):
-                    raise ValidationError(message=_(
-                        "Invalid description for file '{}'.").format(info_fn))
-                src['description'] = file_desc
+                    raise ValidationError(
+                        message=_("Invalid description for file '{}'.").format(info_fn)
+                    )
+                src["description"] = file_desc
 
             else:
                 try:
-                    file_fid, file_name = info.filename.split('/', 2)
+                    file_fid, file_name = info.filename.split("/", 2)
                     if file_fid.isdigit():
                         file_fid = int(file_fid)
                     else:
                         raise ValueError
                 except ValueError:
-                    raise ValidationError(message=_(
-                        "Could not determine feature ID for file '{}'."
-                    ).format(info_fn))
+                    raise ValidationError(
+                        message=_("Could not determine feature ID for file '{}'.").format(info_fn)
+                    )
 
-                src['feature_id'] = file_fid
-                src['name'] = file_name
-                src['mime_type'] = None
-                src['description'] = None
+                src["feature_id"] = file_fid
+                src["name"] = file_name
+                src["mime_type"] = None
+                src["description"] = None
 
-            if src['mime_type'] is None:
+            if src["mime_type"] is None:
                 with z.open(info) as f:
-                    src['mime_type'] = magic_from_buffer(f.read(1024), mime=True)
+                    src["mime_type"] = magic_from_buffer(f.read(1024), mime=True)
 
             sources.append(src)
 
         if metadata_items is not None:
             for missing in metadata_items.keys():
-                raise ValidationError(message=_(
-                    "File '{}' isn't found in the archive.").format(missing))
+                raise ValidationError(
+                    message=_("File '{}' isn't found in the archive.").format(missing)
+                )
 
         if replace:
             rows_deleted = FeatureAttachment.filter_by(resource_id=resource.id).delete()
@@ -115,18 +119,17 @@ def attachments_import(resource, filename, *, replace):
             for src in sources:
                 fileobj = env.file_storage.fileobj(component=COMP_ID)
                 dstfile = env.file_storage.filename(fileobj, makedirs=True)
-                with z.open(src['info'], 'r') as sf, open(dstfile, 'wb') as df:
+                with z.open(src["info"], "r") as sf, open(dstfile, "wb") as df:
                     copyfileobj(sf, df)
 
                 skip = False
                 if not replace:
                     for att_cmp in FeatureAttachment.filter_by(
                         resource_id=resource.id,
-                        feature_id=src['feature_id'],
-                        size=src['info'].file_size
+                        feature_id=src["feature_id"],
+                        size=src["info"].file_size,
                     ):
-                        cmpfile = env.file_storage.filename(
-                            att_cmp.fileobj, makedirs=False)
+                        cmpfile = env.file_storage.filename(att_cmp.fileobj, makedirs=False)
                         if filecmp.cmp(dstfile, cmpfile, False):
                             skip = True
                             break
@@ -134,11 +137,11 @@ def attachments_import(resource, filename, *, replace):
                 if not skip:
                     obj = FeatureAttachment(
                         resource=resource,
-                        feature_id=src['feature_id'],
-                        name=src['name'],
-                        mime_type=src['mime_type'],
-                        description=src['description'],
-                        size=src['info'].file_size,
+                        feature_id=src["feature_id"],
+                        name=src["name"],
+                        mime_type=src["mime_type"],
+                        description=src["description"],
+                        size=src["info"].file_size,
                     ).persist()
                     obj.fileobj = fileobj.persist()
                     obj.extract_meta()

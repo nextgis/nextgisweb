@@ -3,7 +3,7 @@ from nextgisweb.env import _
 from nextgisweb.core.exception import UserException
 
 __all__ = [
-    'AttachmentNotFound',
+    "AttachmentNotFound",
 ]
 
 
@@ -16,4 +16,9 @@ class AttachmentNotFound(UserException):
     def __init__(self, resource_id, feature_id, attachment_id):
         super().__init__(
             message=self.__class__.message % (attachment_id, feature_id),
-            data=dict(resource_id=resource_id, feature_id=feature_id, attachment_id=attachment_id))
+            data=dict(
+                resource_id=resource_id,
+                feature_id=feature_id,
+                attachment_id=attachment_id,
+            ),
+        )
