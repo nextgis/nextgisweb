@@ -21,6 +21,7 @@ requires = [
     "attrs==23.1.0",
     "babel==2.12.1",
     "cachetools==5.3.1",
+    "defusedxml==0.7.1",
     "docstring-parser==0.15",
     "geoalchemy2==0.14.1",
     "httpx[http2]==0.24.1",

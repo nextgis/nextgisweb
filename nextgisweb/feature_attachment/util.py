@@ -141,6 +141,7 @@ def attachments_import(resource, filename, *, replace):
                         size=src['info'].file_size,
                     ).persist()
                     obj.fileobj = fileobj.persist()
+                    obj.extract_meta()
                     imported += 1
                 else:
                     skipped += 1

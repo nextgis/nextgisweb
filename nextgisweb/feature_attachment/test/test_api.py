@@ -1,9 +1,12 @@
+import shutil
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
 import pytest
 import transaction
 import webtest
+from PIL import Image
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
@@ -15,6 +18,8 @@ from nextgisweb.vector_layer import VectorLayer
 from .. import FeatureAttachment
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
+
+DATA_PATH = Path(__file__).parent / "data" 
 
 att_ids = dict()
 
@@ -163,3 +168,24 @@ def test_import_multiple(layer_id, ngw_webtest_app):
     resp = ngw_webtest_app.put_json(f'/api/resource/{layer_id}/feature_attachment/import', dict(
         source=upload_meta), status=200)
     assert resp.json == dict(imported=1, skipped=1)
+
+# name = '{feature_id}/{file_name}'
+# TODO: Update whenever the structure of file_meta changes; add images without xmp meta
+def test_import_image(layer_id, clear, ngw_webtest_app):
+    file_path = DATA_PATH / 'panorama-image.jpg'
+    with open(file_path, mode='rb') as f:
+        files = [dict(name='00003/image', content=f.read())] # fails to work as a tuple for whatever reason
+        upload_meta = generate_archive(files, ngw_webtest_app)
+        resp = ngw_webtest_app.put_json(
+            f'/api/resource/{layer_id}/feature_attachment/import',
+            dict(source=upload_meta),
+            status=200,
+        )
+        assert resp.json == dict(imported=1, skipped=0)
+
+        with transaction.manager:
+            file_meta = FeatureAttachment.filter_by(resource_id=layer_id, feature_id=3).one().file_meta
+            assert file_meta == {
+                "timestamp": "2023-09-18T15:56:09",
+                "panorama": {"ProjectionType": "equirectangular"},
+            }
