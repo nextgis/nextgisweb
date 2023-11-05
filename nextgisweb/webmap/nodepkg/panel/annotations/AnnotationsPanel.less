@@ -1,7 +1,19 @@
-.annotations-panel {
-    position: relative !important;
-    padding: 0 16px 24px !important;
-    width: auto !important;
+.ngw-webmap-annotations-panel {
+    display: flex;
+    flex-direction: column;
+
+    > section {
+        border-bottom: 1px solid var(--divider-color);
+        padding: 12px 8px;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        > h5 {
+            margin: 0;
+        }
+    }
 
     .input-group {
         display: flex;

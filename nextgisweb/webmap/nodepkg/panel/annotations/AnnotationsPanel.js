@@ -6,12 +6,14 @@ import { FloatingLabel } from "@nextgisweb/gui/floating-label";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations/";
 
+import { PanelHeader } from "../header";
+
 import "./AnnotationsPanel.less";
 
 const ADD_ANNOTATION_STATE_KEY = "addAnnotation";
 
 export const AnnotationsPanel = observer(
-    ({ display, mapStates, onTopicPublish }) => {
+    ({ display, title, close, mapStates, onTopicPublish }) => {
         const [visible, setVisible] = useState(undefined);
         const [editable, setEditable] = useState(false);
         const [edit, setEdit] = useState(false);
@@ -80,7 +82,7 @@ export const AnnotationsPanel = observer(
         let editSection;
         if (editable) {
             editSection = (
-                <>
+                <section>
                     <h5 className="heading">{gettext("Edit")}</h5>
 
                     <div className="input-group">
@@ -115,7 +117,7 @@ export const AnnotationsPanel = observer(
                             ]}
                         ></Select>
                     </FloatingLabel>
-                </>
+                </section>
             );
         }
 
@@ -128,66 +130,76 @@ export const AnnotationsPanel = observer(
         };
 
         return (
-            <div className="annotations-panel">
-                <h5 className="heading">{gettext("Annotations layer")}</h5>
+            <div className="ngw-webmap-annotations-panel">
+                <PanelHeader {...{ title, close }} />
 
-                <FloatingLabel
-                    label={gettext("Show annotations")}
-                    name="name"
-                    value={visible}
-                >
-                    <Select
-                        style={{ width: "100%" }}
-                        onChange={(value) => changeVisible(value)}
+                <section>
+                    <h5 className="heading">{gettext("Annotations layer")}</h5>
+
+                    <FloatingLabel
+                        label={gettext("Show annotations")}
+                        name="name"
                         value={visible}
-                        options={[
-                            { value: "no", label: gettext("No") },
-                            { value: "yes", label: gettext("Yes") },
-                            {
-                                value: "messages",
-                                label: gettext("With messages"),
-                            },
-                        ]}
-                    ></Select>
-                </FloatingLabel>
+                    >
+                        <Select
+                            style={{ width: "100%" }}
+                            onChange={(value) => changeVisible(value)}
+                            value={visible}
+                            options={[
+                                { value: "no", label: gettext("No") },
+                                { value: "yes", label: gettext("Yes") },
+                                {
+                                    value: "messages",
+                                    label: gettext("With messages"),
+                                },
+                            ]}
+                        ></Select>
+                    </FloatingLabel>
+                </section>
 
                 {editSection}
 
-                <h5 className="heading">{gettext("Private annotations")}</h5>
+                <section>
+                    <h5 className="heading">
+                        {gettext("Private annotations")}
+                    </h5>
 
-                <div className="input-group">
-                    <Switch
-                        checked={annFilter.public}
-                        onChange={(v) => changeAccessTypeFilters(v, "public")}
-                    />
-                    <span className="label public">
-                        {gettext("Public annotations")}
-                    </span>
-                </div>
-
-                <div className="input-group">
-                    <Switch
-                        checked={annFilter.own}
-                        onChange={(v) => changeAccessTypeFilters(v, "own")}
-                    />
-                    <span className="label own">
-                        {gettext("My private annotations")}
-                    </span>
-                </div>
-
-                {annScope.manage && (
                     <div className="input-group">
                         <Switch
-                            checked={annFilter.private}
+                            checked={annFilter.public}
                             onChange={(v) =>
-                                changeAccessTypeFilters(v, "private")
+                                changeAccessTypeFilters(v, "public")
                             }
                         />
-                        <span className="label private">
-                            {gettext("Other private annotations")}
+                        <span className="label public">
+                            {gettext("Public annotations")}
                         </span>
                     </div>
-                )}
+
+                    <div className="input-group">
+                        <Switch
+                            checked={annFilter.own}
+                            onChange={(v) => changeAccessTypeFilters(v, "own")}
+                        />
+                        <span className="label own">
+                            {gettext("My private annotations")}
+                        </span>
+                    </div>
+
+                    {annScope.manage && (
+                        <div className="input-group">
+                            <Switch
+                                checked={annFilter.private}
+                                onChange={(v) =>
+                                    changeAccessTypeFilters(v, "private")
+                                }
+                            />
+                            <span className="label private">
+                                {gettext("Other private annotations")}
+                            </span>
+                        </div>
+                    )}
+                </section>
             </div>
         );
     }
