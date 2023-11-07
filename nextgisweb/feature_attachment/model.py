@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 from shutil import copyfileobj
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 from nextgisweb.env import Base, env
 from nextgisweb.lib import db
@@ -53,17 +53,25 @@ class FeatureAttachment(Base):
     def extract_meta(self):
         _file_meta = {}
         if self.is_image:
-            image = Image.open(env.file_storage.filename(self.fileobj))
-            if exif := image.getexif():
-                if tstamp := exif.get(306):  # Timestamp EXIF tag
-                    tstamp = datetime.strptime(tstamp, r"%Y:%m:%d %H:%M:%S").isoformat()
-                    _file_meta["timestamp"] = tstamp
-            if xmp := image.getxmp():
-                if rdf_desc := xmp.get("xmpmeta", {}).get("RDF", {}).get("Description", {}):
-                    if isinstance(rdf_desc, list):
-                        rdf_desc = rdf_desc[0] if len(rdf_desc) > 0 else {}
-                    if projection := rdf_desc.get("ProjectionType"):
-                        _file_meta["panorama"] = {"ProjectionType": projection}
+            try:
+                image = Image.open(env.file_storage.filename(self.fileobj))
+            except UnidentifiedImageError:
+                pass
+            else:
+                if exif := image.getexif():
+                    if tstamp := exif.get(306):  # Timestamp EXIF tag
+                        try:
+                            tstamp = datetime.strptime(tstamp, r"%Y:%m:%d %H:%M:%S").isoformat()
+                        except ValueError:
+                            pass
+                        else:
+                            _file_meta["timestamp"] = tstamp
+                if xmp := image.getxmp():
+                    if rdf_desc := xmp.get("xmpmeta", {}).get("RDF", {}).get("Description", {}):
+                        if isinstance(rdf_desc, list):
+                            rdf_desc = rdf_desc[0] if len(rdf_desc) > 0 else {}
+                        if projection := rdf_desc.get("ProjectionType"):
+                            _file_meta["panorama"] = {"ProjectionType": projection}
         self.file_meta = _file_meta
 
     @property
