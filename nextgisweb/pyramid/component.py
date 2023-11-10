@@ -125,8 +125,8 @@ class PyramidComponent(Component):
 
         result["storage_enabled"] = self.env.core.options["storage.enabled"]
         result["storage_limit"] = self.env.core.options["storage.limit"]
-
         result["lunkwill_enabled"] = self.options["lunkwill.enabled"]
+        result["instance_id"] = self.env.core.instance_id
 
         return result
 
