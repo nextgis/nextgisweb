@@ -16,7 +16,7 @@ export class Store {
         "cast_is_multi": "NONE",
         "cast_has_z": "NONE",
         "fid_source": "AUTO",
-        "fid_field": "ngw_fid, id",
+        "fid_field": "ngw_id, id",
         "skip_other_geometry_types": false,
     };
     geometryType = null;
