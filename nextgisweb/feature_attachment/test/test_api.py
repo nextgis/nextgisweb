@@ -19,12 +19,9 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administ
 
 DATA_PATH = Path(__file__).parent / "data"
 
-att_ids = dict()
-
 
 @pytest.fixture(scope="module")
 def layer_id():
-    att_ids.clear()
     with transaction.manager:
         res = VectorLayer(geometry_type="POINT").persist()
 
@@ -143,27 +140,30 @@ def test_import(files, result, layer_id, clear, ngw_webtest_app):
         status=status,
     )
 
-    if resp.status != 200:
+    if status != 200:
         return
 
     import_result = resp.json
 
     imported = 0
-
-    for i, fid in enumerate(result["features"]):
+    fid_last = att_idx = attachments = None
+    for file_idx, fid in enumerate(result["features"]):
         imported += 1
-        if fid not in att_ids:
-            att_ids[fid] = 1
-        else:
-            att_ids[fid] += 1
 
-        f = files[i]
+        if fid != fid_last:
+            resp = ngw_webtest_app.get(
+                f"/api/resource/{layer_id}/feature/{fid}/attachment/",
+                status=200,
+            )
+            attachments = resp.json
+            att_idx = 0
+        else:
+            att_idx += 1
+
+        f = files[file_idx]
         size = f["size"] if "size" in f else len(f["content"])
-        resp = ngw_webtest_app.get(
-            f"/api/resource/{layer_id}/feature/{fid}/attachment/{att_ids[fid]}",
-            status=200,
-        )
-        assert resp.json[size] == size
+        attachment = attachments[att_idx]
+        assert attachment["size"] == size
 
     assert import_result["imported"] == imported
 
