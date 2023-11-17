@@ -9,6 +9,7 @@ import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 import { fetchFeatures } from "../api/fetchFeatures";
 import type { FeatureAttrs, FeatureLayerFieldCol, OrderBy } from "../type";
 import { createCacheKey } from "../util/createCacheKey";
+import { updateFeaturesValue } from "../util/updateFeaturesValue";
 
 const debouncedFn = debounce((fn) => {
     fn();
@@ -25,6 +26,21 @@ interface UseFeatureTableProps {
     resourceId: number;
     rowMinHeight: number;
     visibleFields: number[];
+}
+
+export interface FetchFeatures {
+    // fields: columns
+    //                         // ids that are less than one are created for
+    //                         // internal purposes and not used in NGW
+    //                         .filter((f) => f.id > 0)
+    //                         .map((f) => f.keyname),
+    //                     limit: pageSize,
+    //                     cache: false,
+    //                     offset: page,
+    //                     ilike: query,
+    //                     resourceId,
+    //                     orderBy,
+    //                     signal,
 }
 
 /**
@@ -115,7 +131,7 @@ export function useFeatureTable({
             }
             return attributes;
         });
-    };
+    }; // тут
 
     const queryMode = useMemo<boolean>(() => !!query, [query]);
 
@@ -167,6 +183,11 @@ export function useFeatureTable({
                         resourceId,
                         orderBy,
                         signal,
+                    }).then((data_) => {
+                        return updateFeaturesValue({
+                            resourceId: resourceId,
+                            data: data_,
+                        });
                     });
                 })
                 .catch((er) => {

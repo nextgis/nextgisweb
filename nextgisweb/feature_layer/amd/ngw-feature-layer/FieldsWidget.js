@@ -22,6 +22,7 @@ define([
     "@nextgisweb/pyramid/settings!",
     "ngw-resource/serialize",
     "@nextgisweb/pyramid/i18n!",
+    "ngw-resource/ResourceBox",
     //
     "xstyle/css!./resource/FieldsWidget.css",
 ], function (
@@ -47,7 +48,8 @@ define([
     DijitRegistry,
     settings,
     serialize,
-    i18n
+    i18n,
+    ResourceBox
 ) {
     var GridClass = declare([Grid, Selection, DijitRegistry], {
         selectionMode: "single",
@@ -87,6 +89,26 @@ define([
                     value: "value",
                     required: true,
                     style: "width: 100%; border: none;",
+                },
+            }),
+
+            editor({
+                field: "lookup_table",
+                label: i18n.gettext("Lookup table link"),
+                sortable: false,
+                autoSave: true,
+                autoSelect: true,
+                editor: ResourceBox,
+                canEdit: function (object, value) {
+                    return ["STRING", "FLOAT", "INTEGER"].includes(
+                        object.datatype
+                    );
+                },
+                editorArgs: {
+                    value: "value",
+                    required: true,
+                    style: "width: 100%; border: none;",
+                    cls: "lookup_table",
                 },
             }),
 
@@ -137,6 +159,7 @@ define([
 
             this.addChild(this.grid);
 
+
             this.grid.on(
                 "dgrid-datachange",
                 function (evt) {
@@ -177,6 +200,7 @@ define([
                         datatype: this.value,
                         // FIXME: set default
                         grid_visibility: true,
+                        lookup_table: null,
                         display_name: "value",
                         idx: store.data.length + 1,
                     });

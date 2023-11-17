@@ -5,10 +5,13 @@ define([
     "./ResourcePicker",
 ], function (declare, lang, PickerBox, ResourcePicker) {
     return declare([PickerBox], {
-        buildRendering: function () {
+        buildRendering: function (cls) {
+            if (!cls) {
+                cls = this.cls;
+            }
             this.inherited(arguments);
             this.picker = new ResourcePicker({
-                cls: this.cls,
+                cls: cls,
                 interface: this.interface,
                 dialogTitle: this.dialogTitle,
             });
@@ -27,6 +30,7 @@ define([
         },
 
         _setValueAttr: function (value) {
+            console.log(value);
             if (value === undefined) {
                 return;
             }
@@ -44,6 +48,10 @@ define([
                     this.emit("picked", {
                         resource: itm,
                     });
+                    // Use a timeout here to get the value in dgrid editor
+                    setTimeout(() => {
+                        this.onChange();
+                    }, 100);
                 })
             );
         },

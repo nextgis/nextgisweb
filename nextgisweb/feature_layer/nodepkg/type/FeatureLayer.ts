@@ -7,6 +7,9 @@ export type FeatureLayerDataType =
     | "DATE"
     | "TIME";
 
+export interface LookupTable {
+    id: number;
+}
 export interface FeatureLayerField {
     id: number;
     keyname: string;
@@ -15,7 +18,7 @@ export interface FeatureLayerField {
     display_name: string;
     label_field?: boolean;
     grid_visibility?: boolean;
-    lookup_table?: unknown;
+    lookup_table?: LookupTable;
 }
 
 export interface FeatureLayer {
