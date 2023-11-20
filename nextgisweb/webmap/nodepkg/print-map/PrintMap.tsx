@@ -80,11 +80,11 @@ const buildMap = (container: HTMLElement, display: DojoDisplay): OlMap => {
     return printMap;
 };
 
-interface PrintMapSettings {
+export interface PrintMapSettings {
     width: number;
     height: number;
     margin: number;
-    scale: number;
+    scale?: number;
     scaleLine: boolean;
     scaleValue: boolean;
 }
@@ -110,7 +110,7 @@ class PrintMapStyle {
 
     update(settings: Pick<PrintMapSettings, "width" | "height" | "margin">) {
         const widthPage = Math.round(this.mmToPx(settings.width));
-        const heightPage = Math.round(this.mmToPx(settings.height));
+        const heightPage = Math.round(this.mmToPx(Number(settings.height)));
         const margin = Math.round(this.mmToPx(settings.margin));
         const widthMap = widthPage - margin * 2;
         const heightMap = heightPage - margin * 2;
