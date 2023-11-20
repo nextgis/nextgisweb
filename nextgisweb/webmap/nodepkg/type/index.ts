@@ -1,3 +1,5 @@
+/// <reference types="dojo/dijit" />
+
 import type Feature from "ol/Feature";
 import type Map from "ol/Map";
 
@@ -41,10 +43,11 @@ export interface DojoMap {
     olMap: Map;
 }
 
-export interface DojoDisplay extends DojoItem {
+export interface DojoDisplay extends dijit._WidgetBase {
     identify: DojoDisplayIdentify;
     featureHighlighter: FeatureHighlighter;
     map: DojoMap;
+    mapContainer: dijit.layout.BorderContainer;
     displayProjection: string;
     _layers: Record<number, BaseLayer>;
 }
