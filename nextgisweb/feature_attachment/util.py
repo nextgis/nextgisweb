@@ -56,7 +56,7 @@ def attachments_import(resource, filename, *, replace):
                     )
 
                 file_name = file_md.get("name")
-                if not isinstance(file_name, str):
+                if file_name is not None and not isinstance(file_name, str):
                     raise ValidationError(message=_("Invalid name for file '{}'.").format(info_fn))
                 src["name"] = file_name
 

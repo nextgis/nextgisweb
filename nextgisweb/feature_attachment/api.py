@@ -176,13 +176,20 @@ def export(resource, request):
         with ZipFile(tmp_file, "w", ZIP_DEFLATED, allowZip64=True) as zipf:
             current_feature_id = None
             feature_anames = set()
+            att_idx = 1
 
             for obj in query:
                 if obj.feature_id != current_feature_id:
-                    feature_anames = set()
+                    feature_anames.clear()
+                    att_idx = 1
                     current_feature_id = obj.feature_id
+                else:
+                    att_idx += 1
 
                 name = obj.name
+                if name is None or name.strip() == "":
+                    name = f"{att_idx:010d}"
+
                 if name in feature_anames:
                     # Make attachment's name unique
                     (base, suffix) = re.match(

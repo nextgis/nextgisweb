@@ -82,6 +82,7 @@ def clear(layer_id):
             [
                 dict(name="00001/test_A", size=1),
                 dict(name="00002/test_B", size=2),
+                dict(name="00002/test_C", size=3),
                 dict(
                     name="metadata.json",
                     content=dumpb(
@@ -99,12 +100,18 @@ def clear(layer_id):
                                     mime_type="text/plain",
                                     description=None,
                                 ),
+                                "00002/test_C": dict(
+                                    name=None,
+                                    feature_id=2,
+                                    mime_type="text/plain",
+                                    description="No name",
+                                ),
                             }
                         )
                     ),
                 ),
             ],
-            dict(features=[3, 1]),
+            dict(features=[3, 1, 2]),
         ),
         (
             [
