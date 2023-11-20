@@ -26,11 +26,7 @@ const setMapScale = (scale: number, olMap: OlMap): void => {
     olMap.getView().setResolution(resolution);
 };
 
-const buildMap = (
-    container: HTMLElement,
-    display: DojoDisplay,
-    onScaleChange: (scale: number) => void
-): [OlMap, MapScaleControl] => {
+const buildMap = (container: HTMLElement, display: DojoDisplay): OlMap => {
     const interactions = defaultInteractions({
         doubleClickZoom: true,
         keyboard: true,
@@ -49,18 +45,6 @@ const buildMap = (
         interactions,
         view,
     });
-
-    const onChangeScale = debounce((scale) => {
-        onScaleChange(scale);
-    }, 100);
-
-    const mapScale = new MapScaleControl({
-        formatNumber: (scale) => {
-            return String(Math.round(scale / 1000) * 1000);
-        },
-        onChangeScale,
-    });
-    printMap.addControl(mapScale);
 
     display.map.olMap
         .getLayers()
@@ -93,7 +77,7 @@ const buildMap = (
         olViewportEl.appendChild(newLogoEl);
     }
 
-    return [printMap, mapScale];
+    return printMap;
 };
 
 interface PrintMapSettings {
@@ -173,11 +157,18 @@ export const PrintMap = ({
 
     useEffect(() => {
         if (printMapRef.current) {
-            const [map, mapScale] = buildMap(
-                printMapRef.current,
-                display,
-                onScaleChange
-            );
+            const map = buildMap(printMapRef.current, display);
+            const onChangeScale = debounce((scale) => {
+                onScaleChange(scale);
+            }, 100);
+
+            const mapScale = new MapScaleControl({
+                formatNumber: (scale) => {
+                    return String(Math.round(scale / 1000) * 1000);
+                },
+                onChangeScale,
+            });
+            map.addControl(mapScale);
             printMap.current = map;
             setMapScaleControl(mapScale);
         }
