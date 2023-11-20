@@ -9,12 +9,15 @@ import {
     Space,
     Switch,
 } from "@nextgisweb/gui/antd";
+import type { MenuProps } from "@nextgisweb/gui/antd";
 import { FloatingLabel } from "@nextgisweb/gui/floating-label";
 import reactApp from "@nextgisweb/gui/react-app";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import PrintMap from "@nextgisweb/webmap/print-map";
 
+import type { PrintMapSettings } from "../../print-map/PrintMap";
+import type { DojoDisplay } from "../../type";
 import { PanelHeader } from "../header";
 
 import {
@@ -28,7 +31,25 @@ import { DownOutlined } from "@ant-design/icons";
 
 import "./PrintPanel.less";
 
-const makePrintMapComp = (settings, display, onScaleChange) => {
+interface PrintMapCompProps {
+    settings: PrintMapSettings;
+    display: DojoDisplay;
+    onScaleChange: (scale: number) => void;
+}
+
+type Comp = ReturnType<typeof reactApp<PrintMapCompProps>>;
+
+interface PrintMapCompElements {
+    comp: Comp;
+    element: HTMLDivElement;
+    resizeObserver: ResizeObserver;
+}
+
+const makePrintMapComp = ({
+    settings,
+    display,
+    onScaleChange,
+}: PrintMapCompProps): PrintMapCompElements => {
     const div = document.createElement("div");
     div.classList.add("print-map-pane");
     document.body.appendChild(div);
@@ -42,22 +63,32 @@ const makePrintMapComp = (settings, display, onScaleChange) => {
 
     resizeObserver.observe(display.mapContainer.domNode);
 
-    const comp = reactApp.default(
-        PrintMap.default,
+    const comp: ReturnType<typeof reactApp<PrintMapCompProps>> = reactApp(
+        PrintMap,
         { settings, display, onScaleChange },
         div
     );
-    return [comp, div, resizeObserver];
+    return { comp, element: div, resizeObserver };
 };
 
-const updatePrintMapComp = (comp, settings) => {
+const updatePrintMapComp = (comp: Comp, settings: PrintMapSettings) => {
     if (!comp) {
         return;
     }
     comp.update({ settings });
 };
 
-const runExport = (format, element, mapSettings, setLoadingFile) => {
+const runExport = ({
+    format,
+    element,
+    settings,
+    setLoadingFile,
+}: {
+    format: string;
+    element: HTMLElement;
+    settings: PrintMapSettings;
+    setLoadingFile: (loading: boolean) => void;
+}) => {
     setLoadingFile(true);
 
     let toPngPromise;
@@ -70,7 +101,7 @@ const runExport = (format, element, mapSettings, setLoadingFile) => {
 
     toPngPromise
         .then((dataUrl) => {
-            const { width, height, margin } = mapSettings;
+            const { width, height, margin } = settings;
             const body = {
                 width,
                 height,
@@ -82,10 +113,12 @@ const runExport = (format, element, mapSettings, setLoadingFile) => {
             route("webmap.print")
                 .post({ json: body })
                 .then((blob) => {
-                    const file = window.URL.createObjectURL(blob);
-                    let tab = window.open();
-                    tab.location.href = file;
-                    setLoadingFile(false);
+                    const file = window.URL.createObjectURL(blob as Blob);
+                    const tab = window.open();
+                    if (tab) {
+                        tab.location.href = file;
+                        setLoadingFile(false);
+                    }
                 })
                 .finally(() => {
                     setLoadingFile(false);
@@ -96,7 +129,7 @@ const runExport = (format, element, mapSettings, setLoadingFile) => {
         });
 };
 
-const defaultPanelMapSettings = {
+const defaultPanelMapSettings: PrintMapSettings = {
     height: 297,
     width: 210,
     margin: 10,
@@ -105,31 +138,49 @@ const defaultPanelMapSettings = {
     scaleValue: false,
 };
 
-export const PrintPanel = ({ display, title, close, visible }) => {
-    const [mapSettings, setMapSettings] = useState(defaultPanelMapSettings);
+interface PrintPanelProps {
+    display: DojoDisplay;
+    title: string;
+    close: () => void;
+    visible: boolean;
+}
+
+export const PrintPanel = ({
+    display,
+    title,
+    close,
+    visible,
+}: PrintPanelProps) => {
+    const [mapSettings, setMapSettings] = useState<PrintMapSettings>(
+        defaultPanelMapSettings
+    );
     const [paperFormat, setPaperFormat] = useState("210_297");
     const [disableChangeSize, setDisableChangeSize] = useState(true);
     const [scales, setScales] = useState(scalesList);
-    const [printMapScale, setPrintMapScale] = useState(undefined);
-    const [printMapComp, setPrintMapComp] = useState(undefined);
-    const [printMapEl, setPrintMapEl] = useState(undefined);
+    const [printMapScale, setPrintMapScale] = useState<number>();
+    const [printMapComp, setPrintMapComp] = useState<Comp>();
+    const [printMapEl, setPrintMapEl] = useState<HTMLElement>();
     const [loadingFile, setLoadingFile] = useState(false);
 
-    const resizeObserver = useRef(undefined);
+    const resizeObserver = useRef<ResizeObserver>();
 
-    const updateMapSettings = (updateSettings) => {
+    const updateMapSettings = (updateSettings: Partial<PrintMapSettings>) => {
         const newMapSettings = { ...mapSettings, ...updateSettings };
         setMapSettings(newMapSettings);
     };
 
     const show = () => {
-        const [comp, element, resize] = makePrintMapComp(
-            mapSettings,
+        const {
+            comp,
+            element,
+            resizeObserver: resize,
+        } = makePrintMapComp({
+            settings: mapSettings,
             display,
-            (scale) => {
+            onScaleChange: (scale: number) => {
                 setPrintMapScale(scale);
-            }
-        );
+            },
+        });
         setPrintMapComp(comp);
         setPrintMapEl(element);
         resizeObserver.current = resize;
@@ -137,11 +188,17 @@ export const PrintPanel = ({ display, title, close, visible }) => {
 
     const hide = () => {
         setTimeout(() => {
-            resizeObserver.current.disconnect();
-            printMapComp.unmount();
+            if (resizeObserver.current) {
+                resizeObserver.current.disconnect();
+            }
+            if (printMapComp) {
+                printMapComp.unmount();
+            }
             setPrintMapComp(undefined);
             setPrintMapEl(undefined);
-            printMapEl.remove();
+            if (printMapEl) {
+                printMapEl.remove();
+            }
         });
     };
 
@@ -150,7 +207,9 @@ export const PrintPanel = ({ display, title, close, visible }) => {
     }, [visible]);
 
     useEffect(() => {
-        updatePrintMapComp(printMapComp, mapSettings);
+        if (printMapComp) {
+            updatePrintMapComp(printMapComp, mapSettings);
+        }
     }, [mapSettings]);
 
     useEffect(() => {
@@ -175,7 +234,7 @@ export const PrintPanel = ({ display, title, close, visible }) => {
         updateMapSettings({ scale: printMapScale });
     }, [printMapScale]);
 
-    const changePaperFormat = (newPaperFormat) => {
+    const changePaperFormat = (newPaperFormat: string) => {
         setPaperFormat(newPaperFormat);
         setDisableChangeSize(newPaperFormat !== "custom");
         if (newPaperFormat !== "custom") {
@@ -189,22 +248,27 @@ export const PrintPanel = ({ display, title, close, visible }) => {
         }
     };
 
-    const exportToFormat = (format) => {
+    const exportToFormat = (format: string) => {
         if (!printMapEl) {
             return;
         }
         const [viewport] = printMapEl.getElementsByClassName("ol-viewport");
-        runExport(format, viewport, mapSettings, setLoadingFile);
+        runExport({
+            format,
+            element: viewport as HTMLElement,
+            settings: mapSettings,
+            setLoadingFile,
+        });
     };
 
-    const exportFormatsProps = {
+    const exportFormatsProps: MenuProps = {
         items: exportFormats,
         onClick: (item) => {
             exportToFormat(item.key);
         },
     };
 
-    const validate = (value) => {
+    const validate = (value: unknown) => {
         return typeof value === "number";
     };
 
@@ -227,12 +291,13 @@ export const PrintPanel = ({ display, title, close, visible }) => {
 
                 <FloatingLabel
                     label={gettext("Height, mm")}
-                    value={mapSettings.height}
+                    value={String(mapSettings.height)}
                 >
                     <InputNumber
                         style={{ width: "100%" }}
                         onChange={(v) =>
-                            validate(v) && updateMapSettings({ height: v })
+                            validate(v) &&
+                            updateMapSettings({ height: v || undefined })
                         }
                         value={mapSettings.height}
                         min={5}
@@ -244,12 +309,13 @@ export const PrintPanel = ({ display, title, close, visible }) => {
 
                 <FloatingLabel
                     label={gettext("Width, mm")}
-                    value={mapSettings.width}
+                    value={String(mapSettings.width)}
                 >
                     <InputNumber
                         style={{ width: "100%" }}
                         onChange={(v) =>
-                            validate(v) && updateMapSettings({ width: v })
+                            validate(v) &&
+                            updateMapSettings({ width: v || undefined })
                         }
                         value={mapSettings.width}
                         min={5}
@@ -261,12 +327,13 @@ export const PrintPanel = ({ display, title, close, visible }) => {
 
                 <FloatingLabel
                     label={gettext("Margin, mm")}
-                    value={mapSettings.margin}
+                    value={String(mapSettings.margin)}
                 >
                     <InputNumber
                         style={{ width: "100%" }}
                         onChange={(v) =>
-                            validate(v) && updateMapSettings({ margin: v })
+                            validate(v) &&
+                            updateMapSettings({ margin: v || undefined })
                         }
                         value={mapSettings.margin}
                         min={0}
@@ -299,7 +366,7 @@ export const PrintPanel = ({ display, title, close, visible }) => {
 
                 <FloatingLabel
                     label={gettext("Scale")}
-                    value={mapSettings.scale}
+                    value={String(mapSettings.scale)}
                 >
                     <Select
                         style={{ width: "100%" }}
