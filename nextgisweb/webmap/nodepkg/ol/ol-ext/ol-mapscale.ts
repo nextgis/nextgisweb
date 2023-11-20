@@ -99,7 +99,7 @@ class MapScaleControl extends Control {
 
     setMap(map: Map) {
         super.setMap(map);
-        if (this.scaleLine_) this.scaleLine_.setMap(map);
+        this.setScaleLineVisibility(true);
         if (map) {
             map.on("postrender", () => {
                 this.updateElement_();
@@ -109,9 +109,14 @@ class MapScaleControl extends Control {
 
     setScaleLineVisibility(visible: boolean) {
         if (this.scaleLine_) {
-            (this.scaleLine_ as any).element.style.display = visible
-                ? ""
-                : "none";
+            if (visible) {
+                const map = this.getMap();
+                if (map) {
+                    this.scaleLine_.setMap(map);
+                }
+            } else {
+                this.scaleLine_.setMap(null);
+            }
         }
     }
 
