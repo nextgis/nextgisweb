@@ -47,7 +47,7 @@ interface MapScaleControlOptions {
     scaleValueClassName?: string;
     units?: string[];
     formatNumber?: FormatNumberFunction;
-    onChangeScale?: (scale: number) => void;
+    onChangeScale?: (scale: string) => void;
     digits?: number;
     scaleLine?: boolean;
     target?: HTMLElement;
@@ -56,9 +56,9 @@ interface MapScaleControlOptions {
 class MapScaleControl extends Control {
     private units_?: string[];
     private formatNumber_: FormatNumberFunction;
-    private onScaleChange_?: (scale: number) => void;
+    private onScaleChange_?: (scale: string) => void;
     private digits_: number;
-    private scaleValueElement_: Element;
+    private scaleValueElement_: HTMLElement;
     private previousScaleValue_: string | null;
     private scaleLine_?: ScaleLine;
 
@@ -76,7 +76,10 @@ class MapScaleControl extends Control {
         this.formatNumber_ = options.formatNumber || formatNumber;
         this.onScaleChange_ = options.onChangeScale;
         this.digits_ = options.digits || 0;
-        this.scaleValueElement_ = createElement("div", scaleValueClassName);
+        this.scaleValueElement_ = createElement(
+            "div",
+            scaleValueClassName
+        ) as HTMLDivElement;
         element.appendChild(this.scaleValueElement_);
         this.previousScaleValue_ = null;
 
@@ -104,6 +107,18 @@ class MapScaleControl extends Control {
         }
     }
 
+    setScaleLineVisibility(visible: boolean) {
+        if (this.scaleLine_) {
+            (this.scaleLine_ as any).element.style.display = visible
+                ? ""
+                : "none";
+        }
+    }
+
+    setScaleValueVisibility(visible: boolean) {
+        this.scaleValueElement_.style.display = visible ? "" : "none";
+    }
+
     private updateElement_() {
         const map = this.getMap();
         if (!map) {
@@ -120,10 +135,10 @@ class MapScaleControl extends Control {
                 center,
                 Units.METERS
             );
-
             const scale = Math.round(
                 pointResolution * INCHES_PER_METER * DOTS_PER_INCH
             );
+            // TODO: Review the rounding method to ensure the scale value is accurate and does not diverge from the actual scale on the map.
             const scaleValue = this.formatNumber_(
                 scale,
                 this.digits_,
@@ -133,7 +148,7 @@ class MapScaleControl extends Control {
             if (this.previousScaleValue_ !== scaleValue) {
                 this.previousScaleValue_ = scaleValue;
                 if (this.onScaleChange_) {
-                    this.onScaleChange_(scale);
+                    this.onScaleChange_(scaleValue);
                 }
             }
             this.scaleValueElement_.innerHTML = `1 : ${scaleValue}`;

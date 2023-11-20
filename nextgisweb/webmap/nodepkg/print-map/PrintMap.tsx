@@ -58,7 +58,7 @@ const buildMap = (
         formatNumber: (scale) => {
             return String(Math.round(scale / 1000) * 1000);
         },
-        onChangeScale: onChangeScale,
+        onChangeScale,
     });
     printMap.addControl(mapScale);
 
@@ -66,10 +66,10 @@ const buildMap = (
         .getLayers()
         .getArray()
         .forEach((layer) => {
-            if (layer.getVisible() && layer.printingCopy) {
+            if (layer.getVisible() && (layer as any).printingCopy) {
                 // Adding the same layer to different maps causes
                 // infinite loading, thus we need a copy.
-                printMap.addLayer(layer.printingCopy());
+                printMap.addLayer((layer as any).printingCopy());
             }
         });
 
@@ -79,8 +79,8 @@ const buildMap = (
         .forEach((overlay) => {
             if ("annPopup" in overlay && overlay.annPopup) {
                 const annPopup = overlay.annPopup;
-                const clonedPopup = annPopup.cloneOlPopup(
-                    annPopup.getAnnFeature()
+                const clonedPopup = (annPopup as any).cloneOlPopup(
+                    (annPopup as any).getAnnFeature()
                 );
                 printMap.addOverlay(clonedPopup);
             }
@@ -107,7 +107,7 @@ interface PrintMapSettings {
 
 interface PrintMapProps {
     settings: PrintMapSettings;
-    display: any;
+    display: DojoDisplay;
     onScaleChange: (scale: number) => void;
 }
 
@@ -158,7 +158,7 @@ export const PrintMap = ({
     const { width, height, margin, scale, scaleLine, scaleValue } = settings;
     const printMapRef = useRef<HTMLDivElement>(null);
     const printMap = useRef<OlMap>();
-    const mapScaleControl = useRef<MapScaleControl>();
+    const [mapScaleControl, setMapScaleControl] = useState<MapScaleControl>();
 
     const [style, setStyle] = useState<PrintMapStyle>();
 
@@ -179,7 +179,7 @@ export const PrintMap = ({
                 onScaleChange
             );
             printMap.current = map;
-            mapScaleControl.current = mapScale;
+            setMapScaleControl(mapScale);
         }
     }, [style, display]);
 
@@ -194,13 +194,12 @@ export const PrintMap = ({
     }, [width, height, margin, scale, style]);
 
     useEffect(() => {
-        if (mapScaleControl.current) {
-            const element: HTMLElement = mapScaleControl.current.element;
-            const classes = element.classList;
-            scaleLine ? classes.add("line") : classes.remove("line");
-            scaleValue ? classes.add("value") : classes.remove("value");
+        const control = mapScaleControl;
+        if (control) {
+            control.setScaleLineVisibility(scaleLine);
+            control.setScaleValueVisibility(scaleValue);
         }
-    }, [scaleLine, scaleValue]);
+    }, [scaleLine, scaleValue, mapScaleControl]);
 
     return (
         <div className="print-map-page-wrapper">
