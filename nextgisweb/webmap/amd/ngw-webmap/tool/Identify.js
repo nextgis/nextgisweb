@@ -310,18 +310,32 @@ define([
                             }
                         }
                     );
-
-                    widget.editButton = new Button({
-                        iconClass: "dijitIconEdit",
-                        showLabel: true,
-                        onClick: () =>
-                            openFeatureEditorTab({
-                                resourceId: lid,
-                                featureId: fid,
-                                widget: widget,
-                            }),
-                    }).placeAt(widget.extController, "last");
-                    domClass.add(widget.editButton.domNode, "no-label");
+                    var itemConfigsById = Object.values(
+                        widget.tool.display._itemConfigById
+                    );
+                    for (var config of itemConfigsById) {
+                        if (config.layerId === lid) {
+                            if (
+                                !config.plugin["ngw-webmap/plugin/FeatureLayer"]
+                                    .readonly
+                            ) {
+                                widget.editButton = new Button({
+                                    iconClass: "dijitIconEdit",
+                                    showLabel: true,
+                                    onClick: () =>
+                                        openFeatureEditorTab({
+                                            resourceId: lid,
+                                            featureId: fid,
+                                            widget: widget,
+                                        }),
+                                }).placeAt(widget.extController, "last");
+                                domClass.add(
+                                    widget.editButton.domNode,
+                                    "no-label"
+                                );
+                            }
+                        }
+                    }
 
                     widget.resize();
                 });
