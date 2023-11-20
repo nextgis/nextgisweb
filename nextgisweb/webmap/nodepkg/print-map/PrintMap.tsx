@@ -172,7 +172,7 @@ export const PrintMap = ({
     }, [width, height, margin]);
 
     useEffect(() => {
-        if (printMapRef.current && style) {
+        if (printMapRef.current) {
             const [map, mapScale] = buildMap(
                 printMapRef.current,
                 display,
@@ -181,7 +181,7 @@ export const PrintMap = ({
             printMap.current = map;
             setMapScaleControl(mapScale);
         }
-    }, [style, display]);
+    }, [display]);
 
     useEffect(() => {
         if (printMap.current && style) {
