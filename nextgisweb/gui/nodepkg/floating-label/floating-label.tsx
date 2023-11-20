@@ -1,10 +1,16 @@
 import { useState } from "react";
+import type { ReactElement } from "react";
 
 import "./floating-label.less";
 
-export const FloatingLabel = (props) => {
+type FloatingLabelProps = {
+    children: ReactElement;
+    label: string;
+    value?: string;
+};
+
+export function FloatingLabel({ children, label, value }: FloatingLabelProps) {
     const [focus, setFocus] = useState(false);
-    const { children, label, value } = props;
 
     const classLabel =
         focus || (value !== undefined && value.length !== 0)
@@ -21,4 +27,4 @@ export const FloatingLabel = (props) => {
             <label className={classLabel}>{label}</label>
         </div>
     );
-};
+}
