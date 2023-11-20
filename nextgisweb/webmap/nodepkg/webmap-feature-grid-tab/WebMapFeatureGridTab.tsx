@@ -12,11 +12,11 @@ import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 
 import type {
     DisplayItemConfig,
-    DojoDisplay,
     DojoTopic,
     FeatureLayerWebMapPluginConfig,
     TopicSubscription,
 } from "../panels-manager/type";
+import type { DojoDisplay } from "../type";
 
 const msgGoto = gettext("Go to");
 

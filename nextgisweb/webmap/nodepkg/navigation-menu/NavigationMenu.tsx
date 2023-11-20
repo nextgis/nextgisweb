@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import type { ReactElement } from "react";
 
-import type { PanelDojoItem } from "../panels-manager/type";
+import type { PanelDojoItem } from "../type";
 
 import { navigationMenuStore } from "./NavigationMenuStore";
 

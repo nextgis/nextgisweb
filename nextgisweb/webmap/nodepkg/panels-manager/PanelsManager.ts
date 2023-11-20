@@ -6,8 +6,7 @@ import NavigationMenu from "@nextgisweb/webmap/navigation-menu";
 import { navigationMenuStore } from "@nextgisweb/webmap/navigation-menu/NavigationMenuStore";
 
 import type { NavigationPanelInfo } from "../navigation-menu/NavigationMenuStore";
-
-import type { DojoDisplay, DojoItem, PanelDojoItem } from "./type";
+import type { DojoDisplay, DojoItem, PanelDojoItem } from "../type";
 
 interface PanelElements {
     main: DojoItem;
