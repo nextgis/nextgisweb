@@ -98,7 +98,7 @@ export const ResourceSelect = <V extends SelectValue = SelectValue>({
             pickerModal.current = showResourcePicker({
                 pickerOptions: pickerOptions_,
                 onSelect: (v) => {
-                    if (v) {
+                    if (v !== undefined) {
                         onPick(v);
                     }
                 },
