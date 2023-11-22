@@ -28,21 +28,6 @@ interface UseFeatureTableProps {
     visibleFields: number[];
 }
 
-export interface FetchFeatures {
-    // fields: columns
-    //                         // ids that are less than one are created for
-    //                         // internal purposes and not used in NGW
-    //                         .filter((f) => f.id > 0)
-    //                         .map((f) => f.keyname),
-    //                     limit: pageSize,
-    //                     cache: false,
-    //                     offset: page,
-    //                     ilike: query,
-    //                     resourceId,
-    //                     orderBy,
-    //                     signal,
-}
-
 /**
  * This table component works in two modes:
  * 1. Static size = total layer size - full data in the table, without any filters.
@@ -131,7 +116,7 @@ export function useFeatureTable({
             }
             return attributes;
         });
-    }; // тут
+    };
 
     const queryMode = useMemo<boolean>(() => !!query, [query]);
 
@@ -183,10 +168,11 @@ export function useFeatureTable({
                         resourceId,
                         orderBy,
                         signal,
-                    }).then((data_) => {
+                    }).then((features) => {
                         return updateFeaturesValue({
                             resourceId: resourceId,
-                            data: data_,
+                            data: features,
+                            signal,
                         });
                     });
                 })

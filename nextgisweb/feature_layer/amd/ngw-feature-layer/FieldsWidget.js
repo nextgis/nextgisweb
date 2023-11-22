@@ -94,12 +94,12 @@ define([
 
             editor({
                 field: "lookup_table",
-                label: i18n.gettext("Lookup table link"),
+                label: i18n.gettext("Lookup table"),
                 sortable: false,
                 autoSave: true,
                 autoSelect: true,
                 editor: ResourceBox,
-                canEdit: function (object, value) {
+                canEdit: function (object) {
                     return ["STRING", "FLOAT", "INTEGER"].includes(
                         object.datatype
                     );
@@ -158,7 +158,6 @@ define([
             domStyle.set(this.grid.domNode, "border", "none");
 
             this.addChild(this.grid);
-
 
             this.grid.on(
                 "dgrid-datachange",
