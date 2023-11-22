@@ -20,6 +20,7 @@ import type {
     FormWidget,
     SizeType,
 } from "@nextgisweb/gui/fields-form";
+import { LookupSelectField } from "@nextgisweb/lookup-table/field/LookupSelectField";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FeatureLayerDataType, FeatureLayerField } from "../type";
@@ -91,39 +92,52 @@ const AttributeEditor = observer(
         }, [store.value, onChange]);
 
         const formFields = useMemo(() => {
-            return fields.map((field) => {
-                const widgetAlias = ngwTypeAliases[field.datatype];
-                const [widget, inputProps] = widgetAlias;
+            const fieldFormWidgets: FormField<string, FormWidget>[] = [];
+            for (const field of fields) {
+                let widget: FormWidget | undefined = undefined;
+                let inputProps: Record<string, unknown> = {};
 
-                const props: FormField = {
-                    name: field.keyname,
-                    label: field.display_name,
-                    widget,
-                    inputProps: {
-                        readOnly: saving,
-                        ...inputProps,
-                    },
-                    append: (
-                        <Tooltip title={msgSetNull} placement="right">
-                            <Button
-                                onClick={() => {
-                                    setNullForField(field.keyname);
-                                }}
-                            >
-                                <BackspaceIcon
-                                    style={{ verticalAlign: "middle" }}
-                                />
-                            </Button>
-                        </Tooltip>
-                    ),
-                };
-                const val = attributes[field.keyname];
-                if (val === null) {
-                    props.placeholder = "NULL";
+                if (field.lookup_table && field.lookup_table.id) {
+                    widget = LookupSelectField;
+                    inputProps.lookupId = field.lookup_table.id;
+                } else {
+                    const widgetAlias = ngwTypeAliases[field.datatype];
+                    widget = widgetAlias[0];
+                    inputProps = widgetAlias[1] || inputProps;
                 }
+                if (widget) {
+                    const props: FormField = {
+                        name: field.keyname,
+                        label: field.display_name,
+                        widget,
+                        inputProps: {
+                            readOnly: saving,
+                            ...inputProps,
+                        },
+                        append: (
+                            <Tooltip title={msgSetNull} placement="right">
+                                <Button
+                                    onClick={() => {
+                                        setNullForField(field.keyname);
+                                    }}
+                                >
+                                    <BackspaceIcon
+                                        style={{ verticalAlign: "middle" }}
+                                    />
+                                </Button>
+                            </Tooltip>
+                        ),
+                    };
 
-                return props;
-            });
+                    const val = attributes[field.keyname];
+                    if (val === null) {
+                        props.placeholder = "NULL";
+                    }
+
+                    fieldFormWidgets.push(props);
+                }
+            }
+            return fieldFormWidgets;
         }, [fields, attributes, setNullForField, saving]);
 
         if (!isReady) {
