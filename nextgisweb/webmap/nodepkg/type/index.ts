@@ -5,9 +5,13 @@ import type Map from "ol/Map";
 
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
-interface BaseLayer {
-    reload: () => void;
-}
+import type WebmapStore from "../store";
+
+import type { DisplayConfig } from "./DisplayConfig";
+import type { WebmapLayer } from "./WebmapLayer";
+
+export * from "./DisplayConfig";
+export * from "./WebmapLayer";
 
 interface DojoDisplayIdentifyPopup {
     widget?: DojoDisplayIdentify;
@@ -43,13 +47,37 @@ export interface DojoMap {
     olMap: Map;
 }
 
+export type StoreItem = dojo.data.api.Item;
+
+export interface WebmapItem {
+    checked: boolean;
+    id: number;
+    identifiable: boolean;
+    label: string;
+    layerId: number;
+    position: unknown;
+    styleId: number;
+    type: string;
+    visibility: boolean;
+}
+
+export interface CustomItemFileWriteStore extends dojo.data.ItemFileWriteStore {
+    dumpItem: (item: StoreItem) => WebmapItem;
+}
+
 export interface DojoDisplay extends dijit._WidgetBase {
     identify: DojoDisplayIdentify;
     featureHighlighter: FeatureHighlighter;
     map: DojoMap;
     mapContainer: dijit.layout.BorderContainer;
     displayProjection: string;
-    _layers: Record<number, BaseLayer>;
+    config: DisplayConfig;
+    itemStore: CustomItemFileWriteStore;
+    webmapStore: WebmapStore;
+    /**
+     * @deprecated use webmapStore.getlayers() instead
+     */
+    _layers: Record<number, WebmapLayer>;
 }
 
 export interface PanelClsParams {
