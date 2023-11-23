@@ -37,10 +37,17 @@ define([
 
             var layer = this;
 
+            this._opacity = this.olLayer.getOpacity();
+
             this._visibility = this.olLayer.getVisible();
             this.olLayer.on("change:visible", function () {
                 if (layer.get("visibility") !== layer.olLayer.getVisible()) {
                     layer.set("visibility", layer.olLayer.getVisible());
+                }
+            });
+            this.olLayer.on("change:opacity", function () {
+                if (layer.get("opacity") !== layer.olLayer.getOpacity()) {
+                    layer.set("opacity", layer.olLayer.getOpacity());
                 }
             });
         },
@@ -61,6 +68,17 @@ define([
             if (this._visibility !== value) {
                 this.olLayer.setVisible(value);
                 this._visibility = value;
+            }
+        },
+
+        _opacityGetter: function () {
+            return this._opacity;
+        },
+
+        _opacitySetter: function (value) {
+            if (this._opacity !== value) {
+                this.olLayer.setOpacity(value);
+                this._opacity = value;
             }
         },
     });
