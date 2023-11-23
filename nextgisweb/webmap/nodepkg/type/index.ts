@@ -1,13 +1,11 @@
 /// <reference types="dojo/dijit" />
 
 import type Feature from "ol/Feature";
-import type Map from "ol/Map";
-
-import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 
 import type WebmapStore from "../store";
 
 import type { DisplayConfig } from "./DisplayConfig";
+import type { DisplayMap } from "./DisplayMap";
 import type { WebmapLayer } from "./WebmapLayer";
 
 export * from "./DisplayConfig";
@@ -41,12 +39,6 @@ export interface DojoItem extends HTMLElement {
     get: (val: string) => unknown;
 }
 
-export interface DojoMap {
-    zoomToFeature: (feature: Feature) => void;
-    zoomToNgwExtent: (ngwExtent: NgwExtent, projection?: string) => void;
-    olMap: Map;
-}
-
 export type StoreItem = dojo.data.api.Item;
 
 export interface WebmapItem {
@@ -68,7 +60,7 @@ export interface CustomItemFileWriteStore extends dojo.data.ItemFileWriteStore {
 export interface DojoDisplay extends dijit._WidgetBase {
     identify: DojoDisplayIdentify;
     featureHighlighter: FeatureHighlighter;
-    map: DojoMap;
+    map: DisplayMap;
     mapContainer: dijit.layout.BorderContainer;
     displayProjection: string;
     config: DisplayConfig;
