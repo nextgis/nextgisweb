@@ -3,26 +3,43 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
-import type { FormField } from "@nextgisweb/gui/fields-form";
+import type { FieldsFormProps, FormField } from "@nextgisweb/gui/fields-form";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/field/ResourceSelect";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
+import type {
+    ResourceItem,
+    ResourceItemCreationResponse,
+} from "@nextgisweb/resource/type/Resource";
 
 import { cloneResource } from "./util/cloneResource";
 import { getUniqueName } from "./util/getUniqName";
 
-export function CloneWebmap({
-    id,
-    beforeClone,
-}: {
+const msgSaveButtonTitle = gettext("Clone");
+
+export interface AfterCloneOptions {
+    item: ResourceItemCreationResponse;
+}
+interface CloneWebmapProps {
     id: number;
+    fieldsFormProps?: Omit<FieldsFormProps, "fields" | "form">;
+    saveButtonTitle?: string;
+    afterClone?: (opt: AfterCloneOptions) => void;
     beforeClone?: (
         resourceItem: ResourceItem,
         options?: { signal?: AbortSignal }
     ) => Promise<ResourceItem>;
-}) {
+}
+
+export function CloneWebmap({
+    id,
+    afterClone,
+    beforeClone,
+    saveButtonTitle = msgSaveButtonTitle,
+    fieldsFormProps,
+}: CloneWebmapProps) {
     const form = Form.useForm()[0];
 
     const { data, isLoading } = useRouteGet<ResourceItem>(
@@ -97,30 +114,43 @@ export function CloneWebmap({
                     : data;
 
                 const { name, parent } = form.getFieldsValue();
-                await cloneResource({
+                const cloneItem = await cloneResource({
                     displayName: name,
                     parentId: parent,
                     resourceItem,
                     signal: makeSignal(),
                 });
+                if (cloneItem) {
+                    if (afterClone) {
+                        afterClone({ item: cloneItem });
+                    } else {
+                        const newItemDetailUrl = routeURL(
+                            "resource.update",
+                            cloneItem.id
+                        );
+                        window.open(newItemDetailUrl, "_self");
+                    }
+                }
             }
         } finally {
             setSaving(false);
         }
-    }, [data, form, makeSignal, beforeClone]);
+    }, [data, beforeClone, form, makeSignal, afterClone]);
 
     if (isLoading) {
         return <LoadingWrapper></LoadingWrapper>;
     }
 
     return (
-        <>
-            <Space direction="vertical" style={{ width: "100%" }}>
-                <FieldsForm form={form} fields={fields}></FieldsForm>
-                <SaveButton loading={saving} onClick={clone}>
-                    {gettext("Clone")}
-                </SaveButton>
-            </Space>
-        </>
+        <Space direction="vertical" style={{ width: "100%" }}>
+            <FieldsForm
+                {...fieldsFormProps}
+                form={form}
+                fields={fields}
+            ></FieldsForm>
+            <SaveButton loading={saving} onClick={clone}>
+                {saveButtonTitle}
+            </SaveButton>
+        </Space>
     );
 }

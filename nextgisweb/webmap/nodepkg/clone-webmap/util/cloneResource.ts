@@ -1,20 +1,25 @@
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { route } from "@nextgisweb/pyramid/api";
 import type { ServerResponseError } from "@nextgisweb/pyramid/api";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
+import type {
+    ResourceItem,
+    ResourceItemCreationResponse,
+} from "@nextgisweb/resource/type/Resource";
+
+interface CloneResourceOptions {
+    resourceItem: ResourceItem;
+    displayName: string;
+    parentId: number;
+    signal: AbortSignal;
+}
 
 export async function cloneResource({
     resourceItem,
     displayName,
     parentId,
     signal,
-}: {
-    resourceItem: ResourceItem;
-    displayName: string;
-    parentId: number;
-    signal: AbortSignal;
-}) {
+}: CloneResourceOptions) {
     const { resource, resmeta, webmap, ...rest } = JSON.parse(
         JSON.stringify(resourceItem)
     );
@@ -28,17 +33,18 @@ export async function cloneResource({
     resource.display_name = displayName;
     resource.parent = { id: parentId };
 
-    const clone_ = async () => {
+    const clone = async (): Promise<
+        ResourceItemCreationResponse | undefined
+    > => {
         try {
             const newResPayload = { resource, resmeta, webmap, ...rest };
-            const cloneItem = await route("resource.collection").post<{
-                id: number;
-            }>({
+            const cloneItem = await route(
+                "resource.collection"
+            ).post<ResourceItemCreationResponse>({
                 json: newResPayload,
                 signal,
             });
-            const newItemDetailUrl = routeURL("resource.update", cloneItem.id);
-            window.open(newItemDetailUrl, "_self");
+            return cloneItem;
         } catch (err) {
             const er = err as ServerResponseError;
             const cantChangePermissions =
@@ -50,11 +56,11 @@ export async function cloneResource({
                 // Workaround to make a copy without permission to change permissions
                 delete resource.permissions;
                 delete resource.owner_user;
-                await clone_();
+                return await clone();
             } else {
                 errorModal(err as ApiError);
             }
         }
     };
-    clone_();
+    return clone();
 }
