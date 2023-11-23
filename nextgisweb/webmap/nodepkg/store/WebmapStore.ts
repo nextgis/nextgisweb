@@ -160,11 +160,28 @@ export class WebmapStore {
     setChecked = (checked: number[]) => {
         this._checked = checked;
     };
+
     getChecked = () => {
         return this._checked;
     };
 
     setExpanded = (expanded: number[]) => {
         this._expanded = expanded;
+    };
+
+    getLayerVisibility = (layerId: number) => {
+        return this._checked.includes(layerId);
+    };
+
+    getLayerOpacity = (layerId: number) => {
+        const layer = this._layers[layerId];
+        return layer ? layer.get("opacity") : 1;
+    };
+
+    setLayerOpacity = (layerId: number, opacity: number) => {
+        const layer = this._layers[layerId];
+        if (layer) {
+            layer.set("opacity", opacity);
+        }
     };
 }
