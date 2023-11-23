@@ -13,7 +13,16 @@ import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 import { cloneResource } from "./util/cloneResource";
 import { getUniqueName } from "./util/getUniqName";
 
-export function CloneWebmap({ id }: { id: number }) {
+export function CloneWebmap({
+    id,
+    beforeClone,
+}: {
+    id: number;
+    beforeClone?: (
+        resourceItem: ResourceItem,
+        options?: { signal?: AbortSignal }
+    ) => Promise<ResourceItem>;
+}) {
     const form = Form.useForm()[0];
 
     const { data, isLoading } = useRouteGet<ResourceItem>(
@@ -70,8 +79,11 @@ export function CloneWebmap({ id }: { id: number }) {
 
     useEffect(() => {
         if (data && data.resource) {
-            form.setFieldsValue({ parent: data.resource.parent.id });
-            setUniqName(data.resource.display_name, data.resource.parent.id);
+            const parent = data.resource.parent;
+            if (parent) {
+                form.setFieldsValue({ parent: parent.id });
+                setUniqName(data.resource.display_name, parent.id);
+            }
         }
     }, [data, form, setUniqName]);
 
@@ -79,18 +91,23 @@ export function CloneWebmap({ id }: { id: number }) {
         try {
             if (data) {
                 setSaving(true);
+
+                const resourceItem = beforeClone
+                    ? await beforeClone(data)
+                    : data;
+
                 const { name, parent } = form.getFieldsValue();
                 await cloneResource({
                     displayName: name,
                     parentId: parent,
-                    resourceItem: data,
+                    resourceItem,
                     signal: makeSignal(),
                 });
             }
         } finally {
             setSaving(false);
         }
-    }, [data, form, makeSignal]);
+    }, [data, form, makeSignal, beforeClone]);
 
     if (isLoading) {
         return <LoadingWrapper></LoadingWrapper>;
