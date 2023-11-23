@@ -40,3 +40,7 @@ export interface Resource {
 export interface ResourceItem {
     resource: Resource;
 }
+
+export interface ResourceItemCreationResponse {
+    id: number;
+}
