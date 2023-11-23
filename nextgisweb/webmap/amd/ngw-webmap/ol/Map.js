@@ -70,7 +70,7 @@ define(["dojo/_base/declare", "dojo/Stateful", "openlayers/ol"], function (
             var extent = view.calculateExtent();
             var mapCrs = view.getProjection().getCode();
             if (crs && crs !== mapCrs) {
-                extent = ol.proj.transform(extent, mapCrs, crs);
+                extent = ol.proj.transformExtent(extent, mapCrs, crs);
             }
             return extent;
         },
