@@ -35,6 +35,7 @@ export interface ServerResponseErrorData {
     message: string;
     title?: string;
     detail?: string;
+    exception?: string;
 }
 
 export class ServerResponseError extends BaseAPIError {
