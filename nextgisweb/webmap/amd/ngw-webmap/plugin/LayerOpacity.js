@@ -14,17 +14,14 @@ define([
         },
 
         render: function (state) {
-            var map = state.map;
+            const store = this.display.webmapStore;
             var id = state.nodeData.id;
             var defaultValue = state.nodeData.transparency;
             return LayerOpacitySlider.default({
                 defaultValue: 100 - defaultValue,
                 onChange: function (val) {
-                    var layer = map.layers[id];
-                    if (layer && layer.olLayer && layer.olLayer.setOpacity) {
-                        state.nodeData.transparency = 100 - val;
-                        layer.olLayer.setOpacity(val / 100);
-                    }
+                    state.nodeData.transparency = 100 - val;
+                    store.setLayerOpacity(id, val / 100);
                 },
             });
         },
