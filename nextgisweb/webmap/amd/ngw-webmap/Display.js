@@ -642,10 +642,9 @@ define([
 
                     // Turn on layers from permalink
                     var cond,
-                        layer =
-                            widget.webmapStore._layers[
-                                store.getValue(item, "id")
-                            ];
+                        layer = widget.webmapStore.getLayer(
+                            store.getValue(item, "id")
+                        );
                     if (visibleStyles) {
                         cond =
                             array.indexOf(
@@ -687,7 +686,7 @@ define([
             layer.itemId = data.id;
             layer.itemConfig = data;
 
-            this.webmapStore._layers[data.id] = layer;
+            this.webmapStore.addLayer(data.id, layer);
         },
 
         _toolsSetup: function () {

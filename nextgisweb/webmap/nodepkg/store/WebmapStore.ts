@@ -1,36 +1,58 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, runInAction, toJS } from "mobx";
+
+import type {
+    CustomItemFileWriteStore,
+    StoreItem,
+    WebmapItem,
+    WebmapLayer,
+} from "../type";
+import type { TreeItem } from "../type/TreeItems";
 
 export class WebmapStore {
-    _webmapItems = [];
-    _checked = [];
-    _expanded = [];
+    _webmapItems: StoreItem[] = [];
+    _checked: number[] = [];
+    _expanded: number[] = [];
 
-    _itemStore = null;
-    _layers = {};
+    _itemStore: CustomItemFileWriteStore;
+    _layers: Record<number, WebmapLayer> = {};
 
-    constructor({ itemStore, checked }) {
+    constructor({
+        itemStore,
+        checked,
+    }: {
+        itemStore: CustomItemFileWriteStore;
+        checked?: number[];
+    }) {
         this._itemStore = itemStore;
         if (Array.isArray(checked)) {
             this._checked = checked;
         }
         makeAutoObservable(this, { _itemStore: false, _layers: false });
 
-        itemStore.on("Set", (item, attr, oldVal, newVal) => {
-            if (attr === "checked" || attr === "visibility") {
-                const id = itemStore.getValue(item, "id");
-                if (
-                    attr === "checked" &&
-                    itemStore.getValue(item, "type") === "layer"
-                ) {
-                    this._itemStoreVisibility(item);
-                } else if (attr === "visibility") {
-                    const layer = this._layers[id];
-                    if (layer) {
-                        layer.set("visibility", newVal);
+        itemStore.on(
+            "Set",
+            (
+                item: StoreItem,
+                attr: keyof WebmapItem,
+                oldVal: unknown,
+                newVal: unknown
+            ) => {
+                if (attr === "checked" || attr === "visibility") {
+                    const id = itemStore.getValue(item, "id");
+                    if (
+                        attr === "checked" &&
+                        itemStore.getValue(item, "type") === "layer"
+                    ) {
+                        this._itemStoreVisibility(item);
+                    } else if (attr === "visibility") {
+                        const layer = this._layers[id];
+                        if (layer) {
+                            layer.set("visibility", newVal as any);
+                        }
                     }
                 }
             }
-        });
+        );
     }
 
     get webmapItems() {
@@ -45,7 +67,11 @@ export class WebmapStore {
         return [...this._expanded];
     }
 
-    _setChecked = (id, newVal, oldVal) => {
+    getWebmapItems(): TreeItem[] {
+        return toJS(this._webmapItems as TreeItem[]);
+    }
+
+    _setChecked = (id: number, newVal: boolean, oldVal?: boolean) => {
         const checked_ = [...this._checked];
         if (newVal) {
             if (!checked_.includes(id)) {
@@ -62,11 +88,11 @@ export class WebmapStore {
         });
     };
 
-    _itemStoreVisibility = (item) => {
+    _itemStoreVisibility = (item: StoreItem) => {
         const store = this._itemStore;
 
         if (store.getValue(item, "type") === "layer") {
-            var newVal = store.getValue(item, "checked");
+            const newVal = store.getValue(item, "checked");
             if (store.getValue(item, "visibility") !== newVal) {
                 const id = store.getValue(item, "id");
                 console.log(
@@ -80,12 +106,12 @@ export class WebmapStore {
         }
     };
 
-    handleCheckChanged = (checkedKeysValue) => {
+    handleCheckChanged = (checkedKeysValue: number[]) => {
         const itemStore = this._itemStore;
         itemStore.fetch({
             query: { type: "layer" },
             queryOptions: { deep: true },
-            onItem: (item) => {
+            onItem: (item: StoreItem) => {
                 const id = itemStore.getValue(item, "id");
                 const newValue = checkedKeysValue.includes(id);
                 const oldValue = itemStore.getValue(item, "checked");
@@ -96,13 +122,13 @@ export class WebmapStore {
         });
     };
 
-    getIds = ({ query } = {}) => {
+    getIds = ({ query }: { query?: Record<string, unknown> } = {}) => {
         const itemStore = this._itemStore;
         return new Promise((resolve) => {
             itemStore.fetch({
                 query,
                 queryOptions: { deep: true },
-                onComplete: function (items) {
+                onComplete: function (items: StoreItem[]) {
                     resolve(
                         items.map((item) => itemStore.getValue(item, "id"))
                     );
@@ -111,7 +137,19 @@ export class WebmapStore {
         });
     };
 
-    addItem = (item) => {
+    getLayers() {
+        return this._layers;
+    }
+
+    getLayer(id: number) {
+        return this._layers[id];
+    }
+
+    addLayer(id: number, layer: WebmapLayer) {
+        this._layers[id] = layer;
+    }
+
+    addItem = (item: WebmapItem) => {
         const items = [item, ...this._webmapItems];
         if (item.visibility) {
             this._checked = [...this._checked, item.id];
@@ -119,15 +157,15 @@ export class WebmapStore {
         this._webmapItems = items;
     };
 
-    setWebmapItems = (items) => {
+    setWebmapItems = (items: StoreItem[]) => {
         this._webmapItems = items;
     };
 
-    setChecked = (checked) => {
+    setChecked = (checked: number[]) => {
         this._checked = checked;
     };
 
-    setExpanded = (expanded) => {
+    setExpanded = (expanded: number[]) => {
         this._expanded = expanded;
     };
 }
