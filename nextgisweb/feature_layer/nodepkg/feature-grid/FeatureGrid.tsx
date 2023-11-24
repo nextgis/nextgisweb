@@ -42,6 +42,7 @@ export interface FeatureGridProps {
     selectedIds?: number[];
     size?: SizeType;
     query?: string;
+    queryIntersects?: string;
     version?: number;
     readonly?: boolean;
     editOnNewPage?: boolean;
@@ -65,6 +66,7 @@ const loadingCol = () => "...";
 export const FeatureGrid = ({
     id,
     query: propQuery,
+    queryIntersects,
     onSave,
     version: propVersion,
     onDelete,
@@ -288,6 +290,7 @@ export const FeatureGrid = ({
                 empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
                 {...{
                     query,
+                    queryIntersects,
                     fields,
                     selected,
                     loadingCol,

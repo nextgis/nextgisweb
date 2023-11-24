@@ -6,65 +6,65 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:476 amd/ngw-webmap/tool/Zoom.js:14
+#: amd/ngw-webmap/Display.js:477 amd/ngw-webmap/tool/Zoom.js:14
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:503
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:477 amd/ngw-webmap/tool/Zoom.js:20
+#: amd/ngw-webmap/Display.js:478 amd/ngw-webmap/tool/Zoom.js:20
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:504
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:481 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:508
+#: amd/ngw-webmap/Display.js:482 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:508
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:497 amd/ngw-webmap/template/ExtentWidget.hbs:12
+#: amd/ngw-webmap/Display.js:498 amd/ngw-webmap/template/ExtentWidget.hbs:12
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:502
+#: amd/ngw-webmap/Display.js:503
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:505 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:517
+#: amd/ngw-webmap/Display.js:506 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:517
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:929 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:732
+#: amd/ngw-webmap/Display.js:930 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:732
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:930 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:733
+#: amd/ngw-webmap/Display.js:931 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:733
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:958 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:959 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:968
+#: amd/ngw-webmap/Display.js:969
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:978
+#: amd/ngw-webmap/Display.js:979
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:992
+#: amd/ngw-webmap/Display.js:993
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1009 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: amd/ngw-webmap/Display.js:1010 amd/ngw-webmap/plugin/LayerInfo.js:28
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1029
+#: amd/ngw-webmap/Display.js:1028
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1081
+#: amd/ngw-webmap/Display.js:1080
 msgid "Annotations"
 msgstr "Аннотации"
 
@@ -155,7 +155,7 @@ msgid "Stop editing"
 msgstr "Завершить редактирование"
 
 #: amd/ngw-webmap/plugin/LayerEditor.js:143
-#: nodepkg/panel/annotations/AnnotationsPanel.js:84
+#: nodepkg/panel/annotations/AnnotationsPanel.js:86
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -271,11 +271,11 @@ msgstr "Атрибуты"
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: amd/ngw-webmap/tool/Identify.js:364 amd/ngw-webmap/tool/Identify.js:380
+#: amd/ngw-webmap/tool/Identify.js:378 amd/ngw-webmap/tool/Identify.js:394
 msgid "Identify"
 msgstr "Идентификация"
 
-#: amd/ngw-webmap/tool/Identify.js:524
+#: amd/ngw-webmap/tool/Identify.js:538
 msgid "Features"
 msgstr "Объектов"
 
@@ -431,6 +431,49 @@ msgstr "Группа ресурсов"
 msgid "Clone"
 msgstr "Клонировать"
 
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:52
+#: nodepkg/panel/annotations/AnnotationsPanel.js:111
+msgid "Line"
+msgstr "Линия"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:58
+msgid "Rectangle"
+msgstr "Прямоугольник"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:65
+#: nodepkg/panel/annotations/AnnotationsPanel.js:115
+#: nodepkg/utils/geometry-types.js:15
+msgid "Polygon"
+msgstr "Полигон"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:83
+msgid "Hide"
+msgstr "Скрыть"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:83
+msgid "Show"
+msgstr "Показать"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:88
+msgid "Zoom to filtering geometry"
+msgstr "Увеличить"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:93
+msgid "Clear filtering geometry"
+msgstr "Очистить"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:99
+msgid "Draw filtering geometry"
+msgstr "Нарисовать геометрию для фильтра"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:100
+msgid "Change filtering geometry"
+msgstr "Изменить геометрию для фильтра"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:101
+msgid "Stop drawing..."
+msgstr "Остановить рисование"
+
 #: nodepkg/layer-opacity-slider/LayerOpacitySlider.js:8
 msgid "Opacity"
 msgstr "Непрозрачность"
@@ -451,65 +494,56 @@ msgstr "Показывать охват"
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:92
+#: nodepkg/panel/annotations/AnnotationsPanel.js:94
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:97
+#: nodepkg/panel/annotations/AnnotationsPanel.js:99
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:106
+#: nodepkg/panel/annotations/AnnotationsPanel.js:108
 #: nodepkg/utils/geometry-types.js:6
 msgid "Point"
 msgstr "Точка"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:109
-msgid "Line"
-msgstr "Линия"
-
-#: nodepkg/panel/annotations/AnnotationsPanel.js:113
-#: nodepkg/utils/geometry-types.js:15
-msgid "Polygon"
-msgstr "Полигон"
-
-#: nodepkg/panel/annotations/AnnotationsPanel.js:132
+#: nodepkg/panel/annotations/AnnotationsPanel.js:137
 msgid "Annotations layer"
 msgstr "Слой аннотаций"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:135
+#: nodepkg/panel/annotations/AnnotationsPanel.js:140
 #: nodepkg/settings-widget/SettingsWidget.js:40
 msgid "Show annotations"
 msgstr "Показывать аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:144
+#: nodepkg/panel/annotations/AnnotationsPanel.js:149
 #: nodepkg/settings-widget/SettingsWidget.js:50
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:145
+#: nodepkg/panel/annotations/AnnotationsPanel.js:150
 #: nodepkg/settings-widget/SettingsWidget.js:51
 msgid "Yes"
 msgstr "Да"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:148
+#: nodepkg/panel/annotations/AnnotationsPanel.js:153
 #: nodepkg/settings-widget/SettingsWidget.js:52
 msgid "With messages"
 msgstr "С сообщениями"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:156
+#: nodepkg/panel/annotations/AnnotationsPanel.js:164
 msgid "Private annotations"
 msgstr "Приватные аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:164
+#: nodepkg/panel/annotations/AnnotationsPanel.js:175
 msgid "Public annotations"
 msgstr "Публичные аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:174
+#: nodepkg/panel/annotations/AnnotationsPanel.js:185
 msgid "My private annotations"
 msgstr "Мои приватные аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:187
+#: nodepkg/panel/annotations/AnnotationsPanel.js:198
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
@@ -517,39 +551,39 @@ msgstr "Другие приватные аннотации"
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/panel/print/PrintPanel.js:217
+#: nodepkg/panel/print/PrintPanel.tsx:281
 msgid "Paper format"
 msgstr "Формат бумаги"
 
-#: nodepkg/panel/print/PrintPanel.js:229
+#: nodepkg/panel/print/PrintPanel.tsx:293
 msgid "Height, mm"
 msgstr "Высота, мм"
 
-#: nodepkg/panel/print/PrintPanel.js:246
+#: nodepkg/panel/print/PrintPanel.tsx:311
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
-#: nodepkg/panel/print/PrintPanel.js:263
+#: nodepkg/panel/print/PrintPanel.tsx:329
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
-#: nodepkg/panel/print/PrintPanel.js:280 nodepkg/panel/print/PrintPanel.js:301
+#: nodepkg/panel/print/PrintPanel.tsx:347 nodepkg/panel/print/PrintPanel.tsx:368
 msgid "Scale"
 msgstr "Масштаб"
 
-#: nodepkg/panel/print/PrintPanel.js:287
+#: nodepkg/panel/print/PrintPanel.tsx:354
 msgid "Scale value"
 msgstr "Значение масштаба"
 
-#: nodepkg/panel/print/PrintPanel.js:296
+#: nodepkg/panel/print/PrintPanel.tsx:363
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/PrintPanel.js:319
+#: nodepkg/panel/print/PrintPanel.tsx:386
 msgid "Print"
 msgstr "Печать"
 
-#: nodepkg/panel/print/PrintPanel.js:324
+#: nodepkg/panel/print/PrintPanel.tsx:391
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -859,7 +893,7 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:21
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:22
 msgid "Go to"
 msgstr "Перейти"
 

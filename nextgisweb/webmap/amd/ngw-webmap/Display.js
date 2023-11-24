@@ -190,6 +190,7 @@ define([
             this._startupDeferred = new LoggedDeferred("_startupDeferred");
 
             var widget = this;
+            this.mapStates = MapStatesObserver.getInstance();
 
             // AMD module loading
             this._midDeferred = {};
@@ -719,9 +720,9 @@ define([
             );
 
             this.identify = new Identify({ display: this });
-            var mapStates = MapStatesObserver.getInstance();
-            mapStates.addState("identifying", this.identify);
-            mapStates.setDefaultState("identifying", true);
+
+            this.mapStates.addState("identifying", this.identify);
+            this.mapStates.setDefaultState("identifying", true);
 
             topic.publish("/webmap/tools/initialized");
         },

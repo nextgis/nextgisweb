@@ -8,6 +8,7 @@ import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 import { route } from "@nextgisweb/pyramid/api/route";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 
 import type {
@@ -33,6 +34,7 @@ export function WebMapFeatureGridTab({
 }: WebMapFeatureGridTabProps) {
     const [version, setVersion] = useState(0);
     const [query, setQuery] = useState("");
+    const [queryIntersects, setQueryIntersects] = useState<string>(undefined);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const topicHandlers = useRef<TopicSubscription[]>([]);
 
@@ -127,10 +129,23 @@ export function WebMapFeatureGridTab({
         return unsubscribe;
     }, [subscribe, layerId]);
 
+    const filterExtentBtn = useCallback((props) => {
+        return (
+            <FilterExtentBtn
+                {...props}
+                display={display.current}
+                onGeomChange={(geom, geomWKT) => {
+                    setQueryIntersects(geomWKT);
+                }}
+            />
+        );
+    }, []);
+
     const featureGridProps = useMemo<FeatureGridProps>(() => {
         return {
             id: layerId,
             query,
+            queryIntersects,
             readonly: data.current?.readonly ?? true,
             size: "small",
             cleanSelectedOnFilter: false,
@@ -179,9 +194,10 @@ export function WebMapFeatureGridTab({
                         }}
                     />
                 ),
+                filterExtentBtn,
             ],
         };
-    }, [layerId, query, reloadLayer, zoomToFeature]);
+    }, [layerId, query, queryIntersects, reloadLayer, zoomToFeature]);
 
     return (
         <FeatureGrid

@@ -18,6 +18,7 @@ const debouncedFn = debounce((fn) => {
 interface UseFeatureTableProps {
     total: number;
     query: string;
+    queryIntersects?: string;
     columns: FeatureLayerFieldCol[];
     version?: number;
     orderBy?: OrderBy;
@@ -87,6 +88,7 @@ interface UseFeatureTableProps {
 export function useFeatureTable({
     total,
     query,
+    queryIntersects,
     columns,
     version,
     orderBy,
@@ -118,7 +120,10 @@ export function useFeatureTable({
         });
     };
 
-    const queryMode = useMemo<boolean>(() => !!query, [query]);
+    const queryMode = useMemo<boolean>(
+        () => !!query || !!queryIntersects,
+        [query, queryIntersects]
+    );
 
     const handleFeatures = useCallback(
         (attributes: FeatureAttrs[]) => {
@@ -165,6 +170,7 @@ export function useFeatureTable({
                         cache: false,
                         offset: page,
                         ilike: query,
+                        intersects: queryIntersects,
                         resourceId,
                         orderBy,
                         signal,
@@ -184,7 +190,7 @@ export function useFeatureTable({
                     }
                 });
         },
-        [columns, orderBy, pageSize, query, resourceId]
+        [columns, orderBy, pageSize, query, queryIntersects, resourceId]
     );
 
     const queryFn = useCallback(async () => {
@@ -204,6 +210,7 @@ export function useFeatureTable({
                     version,
                     orderBy,
                     query,
+                    queryIntersects,
                     page,
                 }),
             }));
@@ -254,6 +261,7 @@ export function useFeatureTable({
         version,
         pages,
         query,
+        queryIntersects,
         abort,
     ]);
 
@@ -284,7 +292,7 @@ export function useFeatureTable({
     useEffect(() => {
         setFetchEnabled(false);
         debouncedFn(() => setFetchEnabled(true));
-    }, [pages, pageSize, query, orderBy]);
+    }, [pages, pageSize, query, queryIntersects, orderBy]);
 
     const prevTotal = useRef(total);
     const prevVersion = useRef(version);
@@ -320,6 +328,7 @@ export function useFeatureTable({
         queryFn,
         version,
         query,
+        queryIntersects,
         total,
         pages,
         data,
@@ -332,7 +341,7 @@ export function useFeatureTable({
 
     useEffect(() => {
         setData([]);
-    }, [orderBy, query, visibleFields]);
+    }, [orderBy, query, queryIntersects, visibleFields]);
 
     useEffect(() => {
         if (getTotalSize()) {
@@ -340,7 +349,7 @@ export function useFeatureTable({
         }
         // to init first loading
         setQueryTotal(pageSize);
-    }, [query, pageSize, scrollToIndex, getTotalSize, total]);
+    }, [query, queryIntersects, pageSize, scrollToIndex, getTotalSize, total]);
 
     useEffect(() => {
         const items = [...virtualItems];

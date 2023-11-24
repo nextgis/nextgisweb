@@ -6,6 +6,7 @@ interface CreateCacheKeyOptions {
     orderBy?: OrderBy;
     version?: number;
     query: string;
+    queryIntersects?: string;
     page: number;
 }
 
@@ -15,6 +16,7 @@ export function createCacheKey({
     orderBy,
     version,
     query,
+    queryIntersects,
     page,
 }: CreateCacheKeyOptions): string {
     return [
@@ -22,6 +24,8 @@ export function createCacheKey({
         pageSize,
         "query",
         query,
+        "queryIntersects",
+        queryIntersects || "",
         "page",
         page,
         "version",

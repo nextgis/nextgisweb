@@ -28,6 +28,7 @@ interface FeatureTableProps {
     empty: () => ReactNode;
     total: number;
     query: string;
+    queryIntersects?: string;
     fields: FeatureLayerField[];
     version?: number;
     selected: FeatureAttrs[];
@@ -46,6 +47,7 @@ const FeatureTable = ({
     empty,
     total,
     query,
+    queryIntersects,
     fields,
     version,
     selected,
@@ -128,6 +130,7 @@ const FeatureTable = ({
         orderBy,
         version,
         query,
+        queryIntersects,
         total,
     });
 
@@ -135,7 +138,7 @@ const FeatureTable = ({
         if (cleanSelectedOnFilter) {
             setSelected([]);
         }
-    }, [query, cleanSelectedOnFilter, setSelected]);
+    }, [query, queryIntersects, cleanSelectedOnFilter, setSelected]);
 
     const scrollBarSize = useMemo<number>(() => scrollbarWidth(), []);
 
