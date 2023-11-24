@@ -124,7 +124,69 @@ class PolygonSymbolizer(Struct, tag="polygon"):
         return _polygon_symbolizer
 
 
-Symbolizer = Union[PointSymbolizer, LineSymbolizer, PolygonSymbolizer]
+class Algorithm(Enum):
+    StretchToMinimumMaximum = "stretch"
+    ClipToMinimumMaximum = "clip"
+    ClipToZero = "clip_to_zero"
+
+
+class NormalizeEnhancement(Struct):
+    algorithm: Algorithm
+    min_value: float
+    max_value: float
+
+    def xml(self):
+        return E.NormalizeEnhancement(
+            E.VendorOption(dict(name="algorithm"), self.algorithm.name),
+            E.VendorOption(dict(name="minValue"), str(self.min_value)),
+            E.VendorOption(dict(name="maxValue"), str(self.max_value)),
+        )
+
+
+class ContrastEnhancement(Struct):
+    normalize: NormalizeEnhancement
+
+    def xml(self):
+        return E.ContrastEnhancement(self.normalize.xml())
+
+
+class Channel(Struct):
+    source_channel: int
+    contrast_enhancement: Union[ContrastEnhancement, UnsetType] = UNSET
+
+
+class Channels(Struct):
+    red: Union[Channel, UnsetType] = UNSET
+    green: Union[Channel, UnsetType] = UNSET
+    blue: Union[Channel, UnsetType] = UNSET
+
+    def xml(self):
+        _channel_selection = E.ChannelSelection()
+        for color in ('red', 'green', 'blue'):
+            channel = getattr(self, color)
+            if channel is not UNSET:
+                _channel = getattr(E, color.capitalize() + "Channel")(
+                    E.SourceChannelName(str(channel.source_channel))
+                )
+                if channel.contrast_enhancement is not UNSET:
+                    _channel.append(channel.contrast_enhancement.xml())
+                _channel_selection.append(_channel)
+        return _channel_selection
+
+
+class RasterSymbolizer(Struct, tag="raster"):
+    channels: Channels
+    opacity: Opacity = UNSET
+
+    def xml(self):
+        _raster_symbolizer = E.RasterSymbolizer()
+        if self.opacity is not UNSET:
+            _raster_symbolizer.append(E.Opacity(str(self.opacity)))
+        _raster_symbolizer.append(self.channels.xml())
+        return _raster_symbolizer
+
+
+Symbolizer = Union[PointSymbolizer, LineSymbolizer, PolygonSymbolizer, RasterSymbolizer]
 
 
 class Rule(Struct):
