@@ -30,7 +30,6 @@ define([
         },
 
         _setValueAttr: function (value) {
-            console.log(value);
             if (value === undefined) {
                 return;
             }
