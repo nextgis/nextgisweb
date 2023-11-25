@@ -1,9 +1,21 @@
 import { Divider, Dropdown } from "@nextgisweb/gui/antd";
+import type { MenuProps } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
-import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
+import type { WebmapPlugin } from "../type";
+import type { TreeItem } from "../type/TreeItems";
 
+import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 import "./DropdownActions.less";
+
+interface DropdownActionsProps {
+    nodeData: TreeItem;
+    getWebmapPlugins: () => Record<string, WebmapPlugin>;
+    moreClickId?: number;
+    setMoreClickId: (id: number | undefined) => void;
+    update: boolean;
+    setUpdate: (update: boolean) => void;
+}
 
 export function DropdownActions({
     nodeData,
@@ -12,7 +24,7 @@ export function DropdownActions({
     setMoreClickId,
     update,
     setUpdate,
-}) {
+}: DropdownActionsProps) {
     const { id, type } = nodeData;
     if (type === "root" || type === "group") {
         return <></>;
@@ -30,14 +42,15 @@ export function DropdownActions({
         );
     }
 
-    const menuItems = [];
-    const customMenuItems = [];
+    const menuItems: MenuProps["items"] = [];
+    const customMenuItems: JSX.Element[] = [];
     const plugins = getWebmapPlugins();
     for (const keyPlugin in plugins) {
         const plugin = plugins[keyPlugin];
         if (!plugin || !plugin.getPluginState) {
             continue;
         }
+        const { render } = plugin;
         const pluginInfo = plugin.getPluginState(nodeData);
         if (pluginInfo.enabled) {
             if (plugin.getMenuItem) {
@@ -68,24 +81,19 @@ export function DropdownActions({
                         ),
                     label: title,
                 });
-            } else if (plugin.render) {
-                customMenuItems.push(plugin.render.bind(plugin, pluginInfo));
+            } else if (render) {
+                const RenderedPlugin = () => render(pluginInfo);
+                customMenuItems.push(<RenderedPlugin key={keyPlugin} />);
             }
         }
     }
 
-    const menuProps = {
-        items: menuItems,
-    };
-
-    const onOpenChange = () => {
-        setMoreClickId(undefined);
-    };
-
     return (
         <Dropdown
-            menu={menuProps}
-            onOpenChange={onOpenChange}
+            menu={{ items: menuItems }}
+            onOpenChange={() => {
+                setMoreClickId(undefined);
+            }}
             trigger={["click"]}
             destroyPopupOnHide
             open
@@ -93,19 +101,13 @@ export function DropdownActions({
             dropdownRender={(menu) => (
                 <div className="dropdown-content">
                     {menu}
-                    {customMenuItems.length ? (
+                    {customMenuItems.length && (
                         <>
                             <Divider style={{ margin: 0 }} />
                             <div className="ant-dropdown-menu">
-                                {customMenuItems.map((Item, i) => (
-                                    <div key={i}>
-                                        <Item />
-                                    </div>
-                                ))}
+                                {customMenuItems}
                             </div>
                         </>
-                    ) : (
-                        ""
                     )}
                 </div>
             )}
