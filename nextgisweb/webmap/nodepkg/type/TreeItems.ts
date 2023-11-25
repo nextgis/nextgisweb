@@ -1,9 +1,13 @@
 interface BaseItem {
     id: number;
     key: number;
-    type: "layer" | "group";
+    type: "layer" | "group" | "root";
     label: string;
     title: string;
+}
+export interface RootItem extends BaseItem {
+    type: "root";
+    children: TreeItem[];
 }
 
 export interface GroupItem extends BaseItem {
@@ -26,6 +30,8 @@ interface LegendInfo {
     has_legend: boolean;
     symbols: SymbolInfo[];
     single: boolean;
+
+    open?: boolean;
 }
 
 export interface LayerItem extends BaseItem {
@@ -43,6 +49,8 @@ export interface LayerItem extends BaseItem {
     plugin: Record<string, unknown>;
     minResolution: unknown;
     maxResolution: unknown;
+
+    editable?: boolean;
 }
 
-export type TreeItem = GroupItem | LayerItem;
+export type TreeItem = GroupItem | LayerItem | RootItem;
