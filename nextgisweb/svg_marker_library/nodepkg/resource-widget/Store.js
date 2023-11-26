@@ -42,7 +42,7 @@ export class Store {
             result.archive = this.archive;
         } else {
             result.files = this.files.map(({ name, file }) => ({
-                name: name + ".svg",
+                name: name,
                 ...(file ? { id: file.id } : {}),
             }));
         }

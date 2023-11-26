@@ -127,12 +127,7 @@ class _files_attr(SP):
         for f in value:
             filename = f["name"]
             validate_filename(filename)
-            if "id" in f:
-                name, ext = os.path.splitext(filename)
-                validate_ext(filename, ext)
-            else:
-                name = filename
-            files_info[name] = f
+            files_info[filename] = f
 
         def copy_file_validate(srcfile, dstfile, filename):
             with open(srcfile, "rb") as sf:
