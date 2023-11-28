@@ -32,39 +32,39 @@ msgstr "Определить мое местоположение"
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:930 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:732
+#: amd/ngw-webmap/Display.js:929 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:732
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:931 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:733
+#: amd/ngw-webmap/Display.js:930 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:733
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:959 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:958 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:969
+#: amd/ngw-webmap/Display.js:968
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:979
+#: amd/ngw-webmap/Display.js:978
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:993
+#: amd/ngw-webmap/Display.js:992
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1010 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: amd/ngw-webmap/Display.js:1009 amd/ngw-webmap/plugin/LayerInfo.js:28
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1028
+#: amd/ngw-webmap/Display.js:1027
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1080
+#: amd/ngw-webmap/Display.js:1079
 msgid "Annotations"
 msgstr "Аннотации"
 
@@ -227,7 +227,7 @@ msgstr "Удалить"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:71
 #: amd/ngw-webmap/template/ItemWidget.hbs:128
-#: nodepkg/clone-webmap/CloneWebmap.js:45
+#: nodepkg/clone-webmap/CloneWebmap.tsx:73
 msgid "Display name"
 msgstr "Наименование"
 
@@ -423,54 +423,58 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.js:32
-msgid "Resource group"
-msgstr "Группа ресурсов"
-
-#: nodepkg/clone-webmap/CloneWebmap.js:180 view.py:323
+#: nodepkg/clone-webmap/CloneWebmap.tsx:20 view.py:323
 msgid "Clone"
 msgstr "Клонировать"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:52
+#: nodepkg/clone-webmap/CloneWebmap.tsx:60
+msgid "Resource group"
+msgstr "Группа ресурсов"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:47
+msgid "Circle"
+msgstr "Окружность"
+
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:53
 #: nodepkg/panel/annotations/AnnotationsPanel.js:111
 msgid "Line"
 msgstr "Линия"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:58
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:59
 msgid "Rectangle"
 msgstr "Прямоугольник"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:65
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:66
 #: nodepkg/panel/annotations/AnnotationsPanel.js:115
 #: nodepkg/utils/geometry-types.js:15
 msgid "Polygon"
 msgstr "Полигон"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:83
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:84
 msgid "Hide"
 msgstr "Скрыть"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:83
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:84
 msgid "Show"
 msgstr "Показать"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:88
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:89
 msgid "Zoom to filtering geometry"
 msgstr "Увеличить"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:93
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:94
 msgid "Clear filtering geometry"
 msgstr "Очистить"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:99
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:100
 msgid "Draw filtering geometry"
 msgstr "Нарисовать геометрию для фильтра"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:100
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:101
 msgid "Change filtering geometry"
 msgstr "Изменить геометрию для фильтра"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:101
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:102
 msgid "Stop drawing..."
 msgstr "Остановить рисование"
 

@@ -1,6 +1,5 @@
 import { WKT } from "ol/format";
-import { Polygon } from "ol/geom";
-import type { Circle, Geometry, Polygon as OlPolygon } from "ol/geom";
+import type { Circle, Geometry } from "ol/geom";
 import { fromCircle } from "ol/geom/Polygon";
 import Draw, { createBox } from "ol/interaction/Draw";
 import type { DrawEvent } from "ol/interaction/Draw";
