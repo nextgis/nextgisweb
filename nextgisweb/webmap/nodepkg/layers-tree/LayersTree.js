@@ -74,7 +74,15 @@ const prepareWebMapItems = (webMapItems) => {
 };
 
 export const LayersTree = observer(
-    ({ store, onSelect, setLayerZIndex, getWebmapPlugins, onReady }) => {
+    ({
+        store,
+        onSelect,
+        setLayerZIndex,
+        getWebmapPlugins,
+        onReady,
+        showLegend = true,
+        showDropdown = true,
+    }) => {
         const [draggable] = useState(true);
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
@@ -117,31 +125,58 @@ export const LayersTree = observer(
 
         const titleRender = (nodeData) => {
             const { title } = nodeData;
+
+            const shouldActions = showLegend || showDropdown;
+
+            let actions;
+            if (shouldActions) {
+                let legendAction;
+                if (showLegend) {
+                    legendAction = (
+                        <LegendAction
+                            nodeData={nodeData}
+                            onClick={() => setUpdate(!update)}
+                        />
+                    );
+                }
+                let dropdownAction;
+                if (showDropdown) {
+                    dropdownAction = (
+                        <DropdownActions
+                            nodeData={nodeData}
+                            getWebmapPlugins={getWebmapPlugins}
+                            setMoreClickId={setMoreClickId}
+                            moreClickId={moreClickId}
+                            update={update}
+                            setUpdate={setUpdate}
+                        />
+                    );
+                }
+                actions = (
+                    <Col
+                        className="tree-item-action"
+                        style={{ alignItems: "center" }}
+                    >
+                        {legendAction}
+                        {dropdownAction}
+                    </Col>
+                );
+            }
+
+            let legend;
+            if (showLegend) {
+                legend = <Legend nodeData={nodeData} />;
+            }
+
             return (
                 <>
                     <Row wrap={false}>
                         <Col flex="auto" className="tree-item-title">
                             {title}
                         </Col>
-                        <Col
-                            className="tree-item-action"
-                            style={{ alignItems: "center" }}
-                        >
-                            <LegendAction
-                                nodeData={nodeData}
-                                onClick={() => setUpdate(!update)}
-                            />
-                            <DropdownActions
-                                nodeData={nodeData}
-                                getWebmapPlugins={getWebmapPlugins}
-                                setMoreClickId={setMoreClickId}
-                                moreClickId={moreClickId}
-                                update={update}
-                                setUpdate={setUpdate}
-                            />
-                        </Col>
+                        {actions}
                     </Row>
-                    <Legend nodeData={nodeData} />
+                    {legend}
                 </>
             );
         };
