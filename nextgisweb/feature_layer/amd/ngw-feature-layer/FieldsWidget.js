@@ -72,6 +72,7 @@ define([
                 autoSave: true,
                 editor: ValidationTextBox,
                 editorArgs: {
+                    value: "keyname",
                     required: true,
                     style: "width: 100%; border: none",
                 },
@@ -106,7 +107,7 @@ define([
                 },
                 editorArgs: {
                     value: "value",
-                    required: true,
+                    required: false,
                     style: "width: 100%; border: none;",
                     cls: "lookup_table",
                 },
