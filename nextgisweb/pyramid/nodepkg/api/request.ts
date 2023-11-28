@@ -107,7 +107,11 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
         credentials: "same-origin",
         headers: {},
     };
-    const { cache: useCache, ...opt } = { ...defaults, ...options };
+    const {
+        cache: useCache,
+        responseType,
+        ...opt
+    } = { ...defaults, ...options };
 
     let urlParams = "";
     if (opt.query !== undefined) {
@@ -175,24 +179,26 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
                     "application/vnd.lunkwill.request-summary+json"
                 ));
 
-        const respMedia = respCType && isMediaContentType(respCType);
-
-        if (!(respJSON || respMedia)) {
-            throw new InvalidResponseError();
-        }
-
         let body: T | ServerResponseErrorData;
+        if (responseType === "blob") {
+            body = (await response.blob()) as T;
+        } else {
+            const respMedia = respCType && isMediaContentType(respCType);
 
-        try {
-            body = await (respJSON ? response.json() : response.blob());
-        } catch (e) {
-            throw new InvalidResponseError();
+            if (!(respJSON || respMedia)) {
+                throw new InvalidResponseError();
+            }
+
+            try {
+                body = await (respJSON ? response.json() : response.blob());
+            } catch (e) {
+                throw new InvalidResponseError();
+            }
         }
 
         if (400 <= response.status && response.status <= 599) {
             throw new ServerResponseError(body as ServerResponseErrorData);
         }
-
         return body as ToReturn<T, ReturnUrl>;
     };
     if (opt.method && opt.method.toUpperCase() === "GET" && useCache) {

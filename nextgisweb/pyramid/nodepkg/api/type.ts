@@ -26,6 +26,8 @@ export interface RequestOptions<ReturnUrl extends boolean = false> {
 
     signal?: AbortSignal;
 
+    responseType?: "blob" | "json";
+
     lunkwill?: LunkwillParam;
     lunkwillReturnUrl?: ReturnUrl;
 }
