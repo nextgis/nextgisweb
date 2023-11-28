@@ -50,7 +50,7 @@ define([
                     // Use a timeout here to get the value in dgrid editor
                     setTimeout(() => {
                         this.onChange();
-                    }, 100);
+                    }, 1000);
                 })
             );
         },
