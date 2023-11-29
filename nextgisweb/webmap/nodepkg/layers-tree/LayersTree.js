@@ -82,8 +82,8 @@ export const LayersTree = observer(
         onReady,
         showLegend = true,
         showDropdown = true,
+        draggable = true,
     }) => {
-        const [draggable] = useState(true);
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState(undefined);
