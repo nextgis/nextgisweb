@@ -921,7 +921,8 @@ define([
                 .identifyFeatureByAttrValue(
                     urlParams.hl_lid,
                     urlParams.hl_attr,
-                    urlParams.hl_val
+                    urlParams.hl_val,
+                    urlParams.zoom
                 )
                 .then((result) => {
                     if (result) return;

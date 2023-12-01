@@ -551,7 +551,12 @@ define([
             );
         },
 
-        identifyFeatureByAttrValue: function (layerId, attrName, attrValue) {
+        identifyFeatureByAttrValue: function (
+            layerId,
+            attrName,
+            attrValue,
+            zoom
+        ) {
             const identifyDeferred = new Deferred();
             const urlGetLayerInfo = api.routeURL("resource.item", {
                 id: layerId,
@@ -611,7 +616,13 @@ define([
                     center,
                     layerLabel,
                     () => {
-                        this.map.zoomToExtent(extent);
+                        if (zoom) {
+                            const view = this.map.olMap.getView();
+                            view.setCenter(center);
+                            view.setZoom(zoom);
+                        } else {
+                            this.map.zoomToExtent(extent);
+                        }
                     }
                 );
                 identifyDeferred.resolve(true);
