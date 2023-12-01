@@ -153,6 +153,8 @@ class TileFetcher:
             params=connection.query_params,
             timeout=Timeout(timeout=self._request_timeout),
         )
+        if connection.username is not None:
+            data["req_kw"]["auth"] = (connection.username, connection.password)
         data["insecure"] = connection.insecure
         answer = data["answer"] = Queue()
 
