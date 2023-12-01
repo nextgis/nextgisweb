@@ -600,8 +600,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         elif not self._geom:
             params["propertyname"] = [f.keyname for f in self.layer.fields]
         elif self._fields is not None:
-            params["propertyname"] = self._fields
-            params["propertyname"].append(self.layer.column_geom)
+            params["propertyname"] = [*self._fields, self.layer.column_geom]
 
         features, count = self.layer.connection.get_feature(self.layer, **params)
 
