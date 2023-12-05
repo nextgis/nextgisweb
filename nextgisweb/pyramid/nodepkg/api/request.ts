@@ -180,20 +180,19 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
                 ));
 
         let body: T | ServerResponseErrorData;
-        if (responseType === "blob") {
-            body = (await response.blob()) as T;
-        } else {
+
+        try {
             const respMedia = respCType && isMediaContentType(respCType);
 
-            if (!(respJSON || respMedia)) {
+            if (responseType === "blob" || respMedia) {
+                body = (await response.blob()) as T;
+            } else if (respJSON) {
+                body = await response.json();
+            } else {
                 throw new InvalidResponseError();
             }
-
-            try {
-                body = await (respJSON ? response.json() : response.blob());
-            } catch (e) {
-                throw new InvalidResponseError();
-            }
+        } catch (e) {
+            throw new InvalidResponseError();
         }
 
         if (400 <= response.status && response.status <= 599) {
