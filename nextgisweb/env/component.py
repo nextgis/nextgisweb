@@ -148,6 +148,9 @@ class Component(metaclass=ComponentMeta):
     def client_codegen(self):
         pass
 
+    def stylesheets(self):
+        return ()
+
     @property
     def env(self):
         """Environment this component belongs too. Set

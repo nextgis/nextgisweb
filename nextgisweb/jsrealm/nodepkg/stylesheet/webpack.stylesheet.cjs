@@ -1,12 +1,23 @@
+const fs = require("fs");
 const path = require("path");
 
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
+const { jsrealm } = require("../jsrealm/config.cjs");
 const defaults = require("../jsrealm/webpack/defaults.cjs");
 
 const stylesheetRoot = path.resolve(__dirname, "../../../static");
 const filename = stylesheetRoot + "/css/layout.less";
+
+const include = jsrealm["stylesheets"].map((fn) => {
+    return `@import "${fn}";`;
+});
+
+fs.writeFileSync(
+    path.join(stylesheetRoot, "css/include.less"),
+    include.join("\n")
+);
 
 module.exports = defaults("stylesheet", {
     entry: { layout: filename },

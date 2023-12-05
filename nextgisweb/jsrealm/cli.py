@@ -108,6 +108,11 @@ def install(
     s_jsrealm = nextgisweb["jsrealm"] = dict()
     s_jsrealm["tscheck"] = jsrealm.options["tscheck"]
     s_jsrealm["eslint"] = jsrealm.options["eslint"]
+
+    stylesheets = s_jsrealm["stylesheets"] = list()
+    for comp in env.chain("stylesheets"):
+        stylesheets.extend(str(s) for s in comp.stylesheets())
+
     targets = s_jsrealm["targets"] = dict()
     for k in FAMILIES.keys():
         r = o_pyramid[f"uacompat.{k}"]
