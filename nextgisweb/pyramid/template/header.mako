@@ -1,7 +1,7 @@
 <%!
     from pathlib import Path
     import nextgisweb.pyramid as m
-    svglogo = Markup((Path(m.__file__).parent / "asset/nextgis_logo_s.svg").read_text())
+    svglogo = None
 %>
 
 <%page args="title, hide_resource_filter=False"/>
@@ -15,6 +15,12 @@
             <% ckey = request.env.core.settings_get('pyramid', 'logo.ckey') %>
             <img src="${request.route_url('pyramid.logo', _query=dict(ckey=ckey))}"/>
         %else:
+            <%
+                global svglogo
+                if svglogo is None:
+                    logo_path = Path(request.env.pyramid.options["logo"])
+                    svglogo = Markup(logo_path.read_text())
+            %>
             ${svglogo}
         %endif
     </a>
