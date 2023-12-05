@@ -1,21 +1,27 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button, Form, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import { FieldsForm, LanguageSelect } from "@nextgisweb/gui/fields-form";
+import type {
+    FormField,
+    FormOnChangeOptions,
+} from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import oauth from "../oauth";
 
 interface AuthProfile {
-    oauth_subject?: string | null;
-    language?: string | null;
+    oauth_subject: string | null;
+    language: string | null;
 }
 
 interface OauthStatusProps {
-    oauthSubject: string;
+    oauthSubject: string | null;
 }
 
 function OAuthStatus({ oauthSubject }: OauthStatusProps) {
@@ -40,19 +46,22 @@ function OAuthStatus({ oauthSubject }: OauthStatusProps) {
 }
 
 export function SettingsForm() {
-    const [status, setStatus] = useState("loading");
-    const [profile, setProfile] = useState<AuthProfile>(null);
-    const fields = useMemo(() => {
+    const [isSaving, setSaving] = useState(false);
+    const { data: profile, isLoading } = useRouteGet<AuthProfile>({
+        name: "auth.profile",
+    });
+
+    const fields = useMemo<FormField[]>(() => {
         const result = [];
 
         result.push({
             name: "language",
             widget: LanguageSelect,
-            loading: status === "saved",
+            loading: isSaving,
             label: gettext("Language"),
         });
 
-        if (oauth.enabled) {
+        if (oauth.enabled && profile) {
             result.push({
                 name: "oauth_subject",
                 label: oauth.name,
@@ -65,37 +74,24 @@ export function SettingsForm() {
         }
 
         return result;
-    }, [status, profile]);
-
-    useEffect(() => {
-        (async () => {
-            try {
-                const resp = await route("auth.profile").get<AuthProfile>();
-                setProfile(resp);
-            } catch {
-                // ignore error
-            } finally {
-                setStatus(null);
-            }
-        })();
-    }, []);
-
-    const onChange = async ({ value: json }) => {
-        setStatus("saving");
+    }, [profile, isSaving]);
+    const onChange = async ({ value: json }: FormOnChangeOptions) => {
+        setSaving(true);
         try {
             await route("auth.profile").put<AuthProfile>({ json });
             message.success(gettext("Saved"));
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
-            setStatus(null);
+            setSaving(false);
         }
     };
-    if (status === "loading") {
-        return <LoadingWrapper />;
-    }
     const initialValues = {
-        language: profile.language,
+        language: profile ? profile.language : null,
     };
-    return <FieldsForm {...{ fields, onChange, initialValues }} />;
+    return (
+        <LoadingWrapper loading={isLoading} rows={fields.length} title={false}>
+            <FieldsForm {...{ fields, onChange, initialValues }} />
+        </LoadingWrapper>
+    );
 }
