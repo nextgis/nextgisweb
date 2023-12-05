@@ -1,3 +1,4 @@
+import type { Projection } from "ol/proj";
 import ReactDOMServer from "react-dom/server";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -16,19 +17,24 @@ const msgSiMi = gettext("mi");
 const msgSiHa = gettext("ha");
 const msgSiAc = gettext("ac");
 
-const defaultConfig = {
+interface DefaultConfig {
+    format: "html-string" | "jsx";
+    locale: string;
+}
+
+const defaultConfig: DefaultConfig = {
     format: "html-string",
     locale: "en",
 };
 
-export const roundValue = (num, places) => {
+export const roundValue = (num: number, places: number) => {
     return (
         Math.round((num + Number.EPSILON) * Math.pow(10, places)) /
         Math.pow(10, places)
     );
 };
 
-const formatPlacesValue = (value) => {
+const formatPlacesValue = (value: number): number => {
     let places;
     if (value > 0 && value < 1) {
         places = Math.floor(-Math.log10(value)) + 4;
@@ -43,11 +49,15 @@ const formatPlacesValue = (value) => {
  * @param {number} value - number
  * @param {string} locale - e.g. 'en'
  */
-const formatLocaleNumber = (value, locale) => {
+const formatLocaleNumber = (value: number, locale: string): string => {
     return value.toLocaleString(locale);
 };
 
-const makeDomResult = (value, postfix, format) => {
+const makeDomResult = (
+    value: string,
+    postfix: JSX.Element | string,
+    format: "html-string" | "jsx"
+): string | JSX.Element => {
     const domResult = (
         <>
             {value} {postfix}
@@ -62,7 +72,12 @@ const makeDomResult = (value, postfix, format) => {
     }
 };
 
-const metersLengthToUnit = (meters, unit) => {
+interface MetersResult {
+    value: number;
+    postfix: JSX.Element | string;
+}
+
+const metersLengthToUnit = (meters: number, unit: string): MetersResult => {
     let resultValue;
     let postfix;
 
@@ -110,7 +125,7 @@ const metersLengthToUnit = (meters, unit) => {
     };
 };
 
-const metersAreaToUnit = (meters, unit) => {
+const metersAreaToUnit = (meters: number, unit: string): MetersResult => {
     let resultValue;
     let postfix;
 
@@ -206,7 +221,10 @@ const metersAreaToUnit = (meters, unit) => {
  * @param {number} value - Coordinate value, e.g. 38.55555559
  * @param {string} locale - Locale, e.g. 'en'
  */
-export const formatCoordinatesValue = (value, locale) => {
+export const formatCoordinatesValue = (
+    value: number,
+    locale: string
+): string => {
     const numberRound = roundValue(value, 2);
     return numberRound.toLocaleString(locale);
 };
@@ -216,7 +234,7 @@ export const formatCoordinatesValue = (value, locale) => {
  * @param {Object} proj - ol/proj/Projection
  * @return {number} Decimal places to rounding
  */
-export const getDecPlacesRoundCoordByProj = (proj) => {
+export const getDecPlacesRoundCoordByProj = (proj: Projection): number => {
     const extent = proj.getExtent();
     const max = Math.max.apply(
         null,
@@ -230,7 +248,10 @@ export const getDecPlacesRoundCoordByProj = (proj) => {
  * @param {(number|number[])} coords - single value, array of coordinates
  * @param {number} places - decimal places to rounding
  */
-export const roundCoords = (coords, places) => {
+export const roundCoords = (
+    coords: number | number[],
+    places: number
+): number | number[] => {
     if (coords instanceof Array) {
         return coords.map((c) => roundValue(c, places));
     }
@@ -245,13 +266,17 @@ export const roundCoords = (coords, places) => {
  * @param {string} config.format - 'html-string', 'jsx'
  * @param {string} config.locale - locale
  */
-export const formatMetersLength = (meters, unit, config) => {
-    let _config = config || defaultConfig;
+export const formatMetersLength = (
+    meters: number,
+    unit: string,
+    config?: DefaultConfig
+) => {
+    const _config = config || defaultConfig;
 
-    let { value, postfix } = metersLengthToUnit(meters, unit);
-    value = formatPlacesValue(value);
-    value = formatLocaleNumber(value, _config.locale);
-    return makeDomResult(value, postfix, _config.format);
+    const { value, postfix } = metersLengthToUnit(meters, unit);
+    const placeValue = formatPlacesValue(value);
+    const localNumber = formatLocaleNumber(placeValue, _config.locale);
+    return makeDomResult(localNumber, postfix, _config.format);
 };
 
 /**
@@ -262,11 +287,15 @@ export const formatMetersLength = (meters, unit, config) => {
  * @param {string} config.format - 'html-string', 'jsx'
  * @param {string} config.locale - locale
  */
-export const formatMetersArea = (meters, unit, config) => {
-    let _config = config || defaultConfig;
+export const formatMetersArea = (
+    meters: number,
+    unit: string,
+    config?: DefaultConfig
+) => {
+    const _config = config || defaultConfig;
 
-    let { value, postfix } = metersAreaToUnit(meters, unit);
-    value = formatPlacesValue(value);
-    value = formatLocaleNumber(value, _config.locale);
-    return makeDomResult(value, postfix, _config.format);
+    const { value, postfix } = metersAreaToUnit(meters, unit);
+    const placeValue = formatPlacesValue(value);
+    const localNumber = formatLocaleNumber(placeValue, _config.locale);
+    return makeDomResult(localNumber, postfix, _config.format);
 };
