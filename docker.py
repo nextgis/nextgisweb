@@ -19,6 +19,8 @@ def on_apt(event):
 
     if event.image.context.is_development():
         event.image.environment["SQLALCHEMY_WARN_20"] = "1"
+    else:
+        event.image.environment["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"
 
     # Chromium and ghostscript for printing
     event.add_repository("ppa:savoury1/ffmpeg4")
