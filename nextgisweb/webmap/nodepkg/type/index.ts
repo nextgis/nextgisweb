@@ -1,35 +1,12 @@
 /// <reference types="dojo/dijit" />
 
-import type Feature from "ol/Feature";
-
-import type WebmapStore from "../store";
-
-import type { DisplayConfig } from "./DisplayConfig";
-import type { DisplayMap } from "./DisplayMap";
-import type { WebmapLayer } from "./WebmapLayer";
+import type { DojoDisplay } from "./DojoDisplay";
 
 export * from "./DisplayConfig";
+export * from "./DojoDisplay";
+export * from "./WebmapItem";
 export * from "./WebmapLayer";
-
-interface DojoDisplayIdentifyPopup {
-    widget?: DojoDisplayIdentify;
-}
-interface DojoDisplayIdentify {
-    _popup: DojoDisplayIdentifyPopup;
-    reset: () => void;
-}
-
-export interface HighlightFeatureData {
-    geom: string;
-    featureId: number;
-    layerId: number;
-}
-
-export interface FeatureHighlighter {
-    highlightFeature: (data: HighlightFeatureData) => void;
-    getHighlighted: () => Feature[];
-    unhighlightFeature: (filter: (feature: Feature) => boolean) => void;
-}
+export * from "./WebmapPlugin";
 
 export interface DojoItem extends HTMLElement {
     set: (key: string, value: unknown) => void;
