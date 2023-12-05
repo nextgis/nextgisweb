@@ -9,7 +9,16 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import oauth from "../oauth";
 
-function OAuthStatus({ oauthSubject }) {
+interface AuthProfile {
+    oauth_subject?: string | null;
+    language?: string | null;
+}
+
+interface OauthStatusProps {
+    oauthSubject: string;
+}
+
+function OAuthStatus({ oauthSubject }: OauthStatusProps) {
     if (oauthSubject) {
         return (
             <>
@@ -22,7 +31,7 @@ function OAuthStatus({ oauthSubject }) {
             "?" +
             new URLSearchParams([
                 ["bind", "1"],
-                ["next", window.location],
+                ["next", window.location.toString()],
             ]);
         return <Button href={bindUrl}>{gettext("Bind account")}</Button>;
     } else {
@@ -32,7 +41,7 @@ function OAuthStatus({ oauthSubject }) {
 
 export function SettingsForm() {
     const [status, setStatus] = useState("loading");
-    const [profile, setProfile] = useState(null);
+    const [profile, setProfile] = useState<AuthProfile>(null);
     const fields = useMemo(() => {
         const result = [];
 
@@ -61,7 +70,7 @@ export function SettingsForm() {
     useEffect(() => {
         (async () => {
             try {
-                const resp = await route("auth.profile").get();
+                const resp = await route("auth.profile").get<AuthProfile>();
                 setProfile(resp);
             } catch {
                 // ignore error
@@ -74,7 +83,7 @@ export function SettingsForm() {
     const onChange = async ({ value: json }) => {
         setStatus("saving");
         try {
-            await route("auth.profile").put({ json });
+            await route("auth.profile").put<AuthProfile>({ json });
             message.success(gettext("Saved"));
         } catch (err) {
             errorModal(err);
