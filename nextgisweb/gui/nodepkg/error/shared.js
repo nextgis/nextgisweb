@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 
 import { Button, Space, Spin } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { url } from "@nextgisweb/pyramid/nextgis";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 
 const CodeLazy = lazy(() => import("./CodeLazy"));
@@ -54,13 +55,15 @@ export function Footer({ tinfo, setTinfo, onOk }) {
                 </Button>
             )}
             <Space style={{ marginLeft: "auto" }} direction="horizontal">
-                <Button
-                    type="link"
-                    href={settings["support_url"]}
-                    target="_blank"
-                >
-                    {gettext("Contact support")}
-                </Button>
+                {settings.support_url && (
+                    <Button
+                        type="link"
+                        href={url(settings.support_url)}
+                        target="_blank"
+                    >
+                        {gettext("Contact support")}
+                    </Button>
+                )}
                 {onOk ? (
                     <Button type="primary" onClick={onOk}>
                         {gettext("OK")}

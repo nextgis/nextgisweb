@@ -5,6 +5,6 @@
  * "https://nextgis.com/redirect/docs/{lang}/path".*/
 export function url(source: string): string {
     const [proto, rest] = source.split(":", 2);
-    if (proto === "https") return source.replace("{lang}", ngwConfig.locale);
+    if (/^https?$|^\//.test(proto)) return source.replace("{lang}", ngwConfig.locale);
     return `https://nextgis.com/redirect/${proto}/${ngwConfig.locale}/${rest}`;
 }

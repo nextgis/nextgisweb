@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button, Modal } from "@nextgisweb/gui/antd";
 import { TemplateLink } from "@nextgisweb/gui/component";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { url } from "@nextgisweb/pyramid/nextgis";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 
 import { notesUrl, registerCallback } from ".";
@@ -61,11 +62,11 @@ export default function UpdateSysInfo() {
         >
             <div className="msg">
                 <div>{res}</div>
-                {hasUpdate && (
+                {hasUpdate && settings.support_url && (
                     <div>
                         <TemplateLink
                             template={msgContactSupport}
-                            link={settings.support_url}
+                            link={url(settings.support_url)}
                             target="_blank"
                         />
                     </div>

@@ -506,7 +506,7 @@ class CoreComponent(StorageComponentMixin, Component):
         Option("locale.poeditor.api_token", str, default=None),
         Option("locale.contribute_url", default=None),
         # Other deployment settings
-        Option("support_url", default="https://nextgis.com/contact/"),
+        Option("support_url", default="https://nextgis.com/redirect/{lang}/contact/"),
         Option("provision.instance_id", default=None),
         Option("provision.system.title", default=None),
         # Debug settings
