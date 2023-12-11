@@ -34,7 +34,10 @@ class StaticMap:
         n = self.data
         u = list(subpath)
         while True:
-            h = u.pop(0)
+            try:
+                h = u.pop(0)
+            except IndexError:
+                raise KeyError
             if h in n:
                 n = n[h]
             else:
