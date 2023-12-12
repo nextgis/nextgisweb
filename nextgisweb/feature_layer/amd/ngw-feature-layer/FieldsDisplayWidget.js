@@ -98,15 +98,16 @@ define([
 
                 if (val === null) {
                     // pass
-                } else if (field.datatype == "DATE") {
+                } else if (field.datatype === "DATE") {
                     val = locale.format(
                         new Date(val.year, val.month - 1, val.day),
                         {
                             selector: "date",
-                            formatLength: "medium",
+                            formatLength: "short",
+                            fullYear: true,
                         }
                     );
-                } else if (field.datatype == "TIME") {
+                } else if (field.datatype === "TIME") {
                     val = locale.format(
                         new Date(0, 0, 0, val.hour, val.minute, val.second),
                         {
@@ -114,7 +115,7 @@ define([
                             formatLength: "medium",
                         }
                     );
-                } else if (field.datatype == "DATETIME") {
+                } else if (field.datatype === "DATETIME") {
                     val = locale.format(
                         new Date(
                             val.year,
@@ -125,7 +126,8 @@ define([
                             val.second
                         ),
                         {
-                            formatLength: "medium",
+                            formatLength: "short",
+                            fullYear: true,
                         }
                     );
                 }
