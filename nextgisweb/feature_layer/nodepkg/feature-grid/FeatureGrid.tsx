@@ -1,31 +1,21 @@
 import isEqual from "lodash-es/isEqual";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
-import { Button, Empty, Input, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Empty } from "@nextgisweb/gui/antd";
 import type { SizeType } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
-import { confirmDelete } from "@nextgisweb/gui/confirm";
-import showModal from "@nextgisweb/gui/showModal";
-import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import { useResource } from "@nextgisweb/resource/hook/useResource";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
-import { FeatureEditorModal } from "../feature-editor-modal";
 import type { FeatureLayerCount } from "../type/FeatureLayer";
 
+import { FeatureGridActions } from "./FeatureGridActions";
 import FeatureTable from "./FeatureTable";
-import { deleteFeatures } from "./api/deleteFeatures";
-import { ExportAction } from "./component/ExportAction";
-import { KEY_FIELD_KEYNAME } from "./constant";
+import TableConfigModal from "./component/TableConfigModal";
+import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
 import type { FeatureAttrs } from "./type";
 
-import DeleteIcon from "@nextgisweb/icon/material/delete";
-import EditInNewpageIcon from "@nextgisweb/icon/material/launch";
-import OpenIcon from "@nextgisweb/icon/material/open_in_new";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import "./FeatureGrid.less";
@@ -39,46 +29,40 @@ export interface ActionProps {
 
 export interface FeatureGridProps {
     id: number;
-    selectedIds?: number[];
     size?: SizeType;
     query?: string;
-    queryIntersects?: string;
+    actions?: ActionToolbarAction<ActionProps>[];
     version?: number;
     readonly?: boolean;
+    selectedIds?: number[];
     editOnNewPage?: boolean;
+    queryIntersects?: string;
     cleanSelectedOnFilter?: boolean;
-    actions?: ActionToolbarAction<ActionProps>[];
     beforeDelete?: (featureIds: number[]) => void;
     deleteError?: (featureIds: number[]) => void;
+    onSelect?: (selected: number[]) => void;
     onDelete?: (featureIds: number[]) => void;
     onSave?: (value: ResourceItem | undefined) => void;
-    onSelect?: (selected: number[]) => void;
 }
-
-const msgSearchPlaceholder = gettext("Search...");
-const msgOpenTitle = gettext("Open");
-const msgDeleteTitle = gettext("Delete");
-const msgEditTitle = gettext("Edit");
-const msgEditOnNewPage = gettext("Edit on a new page");
 
 const loadingCol = () => "...";
 
 export const FeatureGrid = ({
     id,
+    size = "middle",
     query: propQuery,
-    queryIntersects,
-    onSave,
+    actions: propActions = [],
     version: propVersion,
+    readonly = true,
+    selectedIds,
+    editOnNewPage,
+    queryIntersects,
+    cleanSelectedOnFilter = true,
+    beforeDelete,
+    deleteError,
     onDelete,
     onSelect,
-    deleteError,
-    actions = [],
-    selectedIds,
-    beforeDelete,
-    editOnNewPage,
-    size = "middle",
-    readonly = true,
-    cleanSelectedOnFilter = true,
+    onSave,
 }: FeatureGridProps) => {
     const { data: totalData, refresh: refreshTotal } =
         useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
@@ -87,12 +71,22 @@ export const FeatureGrid = ({
     const { data: resourceData } = useRouteGet<ResourceItem>("resource.item", {
         id,
     });
-    const { isExportAllowed } = useResource({ id });
 
     const [query, setQuery] = useState("");
     const [version, setVersion] = useState(propVersion || 0);
     const [selected, setSelected] = useState<FeatureAttrs[]>(() => []);
     const [settingsOpen, setSettingsOpen] = useState(false);
+
+    const fields = useMemo(() => {
+        if (resourceData) {
+            return resourceData.feature_layer?.fields;
+        }
+        return undefined;
+    }, [resourceData]);
+
+    const [visibleFields, setVisibleFields] = useState<number[]>(() => [
+        KEY_FIELD_ID,
+    ]);
 
     useEffect(() => {
         if (propVersion !== undefined) {
@@ -125,180 +119,71 @@ export const FeatureGrid = ({
         }
     }, [propQuery]);
 
-    const fields = useMemo(() => {
-        if (resourceData) {
-            return resourceData.feature_layer?.fields;
+    useEffect(() => {
+        if (fields) {
+            setVisibleFields([
+                KEY_FIELD_ID,
+                ...fields.filter((f) => f.grid_visibility).map((f) => f.id),
+            ]);
         }
-        return undefined;
-    }, [resourceData]);
-
-    const goTo = useCallback(
-        (
-            path: "feature_layer.feature.update" | "feature_layer.feature.show"
-        ) => {
-            const first = selected[0];
-            if (first) {
-                const featureId = first[KEY_FIELD_KEYNAME] as number;
-                window.open(routeURL(path, { id, feature_id: featureId }));
-            }
-        },
-        [id, selected]
-    );
-
-    const handleDelete = useCallback(async () => {
-        const featureIds = selected.map(
-            (s) => s[KEY_FIELD_KEYNAME]
-        ) as number[];
-        if (beforeDelete) {
-            beforeDelete(featureIds);
-        }
-        try {
-            await deleteFeatures({
-                resourceId: id,
-                featureIds,
-            });
-            if (onDelete) {
-                onDelete(featureIds);
-            }
-        } catch (er) {
-            if (deleteError) {
-                deleteError(featureIds);
-            }
-        }
-        await refreshTotal();
-        setSelected([]);
-    }, [
-        beforeDelete,
-        refreshTotal,
-        setSelected,
-        deleteError,
-        onDelete,
-        selected,
-        id,
-    ]);
+    }, [fields]);
 
     if (!totalData || !fields) {
         return <LoadingWrapper />;
     }
 
-    const defActions: ActionToolbarAction<ActionProps>[] = [
-        {
-            onClick: () => {
-                goTo("feature_layer.feature.show");
-            },
-            icon: <OpenIcon />,
-            title: msgOpenTitle,
-            disabled: !selected.length,
-            size,
-        },
-    ];
-
-    if (!readonly) {
-        defActions.push(
-            ...[
-                <Space.Compact key="feature-item-edit">
-                    <Button
-                        disabled={!selected.length}
-                        size={size}
-                        onClick={() => {
-                            const first = selected[0];
-                            if (first) {
-                                const featureId = first[
-                                    KEY_FIELD_KEYNAME
-                                ] as number;
-                                showModal(FeatureEditorModal, {
-                                    editorOptions: {
-                                        featureId,
-                                        resourceId: id,
-                                        onSave: (e) => {
-                                            if (onSave) {
-                                                onSave(e);
-                                            }
-                                            setVersion((old) => old + 1);
-                                        },
-                                    },
-                                });
-                            }
-                        }}
-                    >
-                        {msgEditTitle}
-                    </Button>
-                    {editOnNewPage && (
-                        <Tooltip title={msgEditOnNewPage} key="leftButton">
-                            <Button
-                                disabled={!selected.length}
-                                size={size}
-                                onClick={() => {
-                                    goTo("feature_layer.feature.update");
-                                }}
-                                icon={<EditInNewpageIcon />}
-                            ></Button>
-                        </Tooltip>
-                    )}
-                </Space.Compact>,
-                {
-                    onClick: () => {
-                        confirmDelete({ onOk: handleDelete });
-                    },
-                    icon: <DeleteIcon />,
-                    title: msgDeleteTitle,
-                    danger: true,
-                    disabled: !selected.length,
-                    size,
-                },
-            ]
-        );
-    }
-
-    const rightActions: ActionToolbarAction<ActionProps>[] = [];
-    if (isExportAllowed) {
-        rightActions.push((props) => <ExportAction {...props} />);
-    }
-
-    const actionProps: ActionProps = { selected, query, id };
-
     return (
         <div className="ngw-feature-layer-feature-grid">
-            <ActionToolbar
+            <FeatureGridActions
+                id={id}
                 size={size}
-                actions={[...defActions, ...actions]}
-                rightActions={rightActions}
-                actionProps={actionProps}
+                query={query}
+                actions={propActions}
+                readonly={readonly}
+                selected={selected}
+                editOnNewPage={editOnNewPage}
+                beforeDelete={beforeDelete}
+                refreshTotal={refreshTotal}
+                deleteError={deleteError}
+                setSelected={setSelected}
+                setVersion={setVersion}
+                onDelete={onDelete}
+                setQuery={setQuery}
+                onSave={onSave}
             >
-                <div>
-                    <Input
-                        placeholder={msgSearchPlaceholder}
-                        onChange={(e) => setQuery(e.target.value)}
-                        allowClear
-                        size={size}
-                    />
-                </div>
                 <div>
                     <Button
                         type="text"
                         icon={<TuneIcon />}
-                        onClick={() => setSettingsOpen(!settingsOpen)}
+                        onClick={() => {
+                            setSettingsOpen(!settingsOpen);
+                        }}
                         size={size}
                     />
                 </div>
-            </ActionToolbar>
+            </FeatureGridActions>
 
             <FeatureTable
-                resourceId={id}
-                total={totalData.total_count}
-                version={version}
                 empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
-                {...{
-                    query,
-                    queryIntersects,
-                    fields,
-                    selected,
-                    loadingCol,
-                    setSelected,
-                    settingsOpen,
-                    setSettingsOpen,
-                    cleanSelectedOnFilter,
-                }}
+                total={totalData.total_count}
+                query={query}
+                fields={fields}
+                version={version}
+                selected={selected}
+                resourceId={id}
+                visibleFields={visibleFields}
+                queryIntersects={queryIntersects}
+                cleanSelectedOnFilter={cleanSelectedOnFilter}
+                setSelected={setSelected}
+                loadingCol={loadingCol}
+            />
+
+            <TableConfigModal
+                fields={fields}
+                isOpen={settingsOpen}
+                setIsOpen={setSettingsOpen}
+                visibleFields={visibleFields}
+                setVisibleFields={setVisibleFields}
             />
         </div>
     );

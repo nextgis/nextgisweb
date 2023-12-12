@@ -8,7 +8,6 @@ import { useThemeVariables } from "@nextgisweb/gui/hook";
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
 import SortIcon from "./component/SortIcon";
-import TableConfigModal from "./component/TableConfigModal";
 import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type {
@@ -25,38 +24,36 @@ import "./FeatureTable.less";
 type EffectiveWidths = Record<string, number>;
 
 interface FeatureTableProps {
-    empty: () => ReactNode;
     total: number;
     query: string;
-    queryIntersects?: string;
     fields: FeatureLayerField[];
     version?: number;
     selected: FeatureAttrs[];
     resourceId: number;
-    loadingCol: () => string;
-    setSelected: Dispatch<SetStateAction<FeatureAttrs[]>>;
-    settingsOpen: boolean;
-    setSettingsOpen: Dispatch<SetStateAction<boolean>>;
+    visibleFields?: number[];
+    queryIntersects?: string;
     deletedFeatureIds?: number[];
     cleanSelectedOnFilter: boolean;
+    setSelected: Dispatch<SetStateAction<FeatureAttrs[]>>;
+    loadingCol: () => string;
+    empty: () => ReactNode;
 }
 
 const RESIZE_HANDLE_WIDTH = 6;
 
 const FeatureTable = ({
-    empty,
     total,
     query,
-    queryIntersects,
     fields,
     version,
     selected,
     resourceId,
-    loadingCol,
-    setSelected,
-    settingsOpen,
-    setSettingsOpen,
+    visibleFields = [],
+    queryIntersects,
     cleanSelectedOnFilter = true,
+    setSelected,
+    loadingCol,
+    empty,
 }: FeatureTableProps) => {
     const tbodyRef = useRef<HTMLDivElement>(null);
     const theadRef = useRef<HTMLDivElement>(null);
@@ -73,11 +70,6 @@ const FeatureTable = ({
     const [userDefinedWidths, setUserDefinedWidths] = useState<
         Record<string, number>
     >({});
-
-    const [visibleFields, setVisibleFields] = useState<number[]>(() => [
-        KEY_FIELD_ID,
-        ...fields.filter((f) => f.grid_visibility).map((f) => f.id),
-    ]);
 
     const columns = useMemo<FeatureLayerFieldCol[]>(() => {
         const cols = [];
@@ -401,13 +393,6 @@ const FeatureTable = ({
                     </div>
                 )}
             </div>
-            <TableConfigModal
-                isOpen={settingsOpen}
-                setIsOpen={setSettingsOpen}
-                visibleFields={visibleFields}
-                setVisibleFields={setVisibleFields}
-                fields={fields}
-            />
         </div>
     );
 };
