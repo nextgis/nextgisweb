@@ -13,7 +13,7 @@ import { updateFeaturesValue } from "../util/updateFeaturesValue";
 
 const debouncedFn = debounce((fn) => {
     fn();
-}, 200);
+}, 100);
 
 interface UseFeatureTableProps {
     total: number;

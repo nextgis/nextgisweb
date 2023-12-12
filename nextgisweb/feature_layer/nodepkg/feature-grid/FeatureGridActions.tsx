@@ -41,7 +41,6 @@ export interface FeatureGridActionsProps {
     refreshTotal: () => Promise<void>;
     deleteError?: (featureIds: number[]) => void;
     setSelected: React.Dispatch<React.SetStateAction<FeatureAttrs[]>>;
-    setVersion: React.Dispatch<React.SetStateAction<number>>;
     onDelete?: (featureIds: number[]) => void;
     setQuery: React.Dispatch<React.SetStateAction<string>>;
     onSave?: (value: ResourceItem | undefined) => void;
@@ -62,7 +61,6 @@ export const FeatureGridActions = ({
     refreshTotal,
     deleteError,
     setSelected,
-    setVersion,
     onDelete,
     setQuery,
     onSave,
@@ -147,7 +145,7 @@ export const FeatureGridActions = ({
                                             if (onSave) {
                                                 onSave(e);
                                             }
-                                            setVersion((old) => old + 1);
+
                                         },
                                     },
                                 });

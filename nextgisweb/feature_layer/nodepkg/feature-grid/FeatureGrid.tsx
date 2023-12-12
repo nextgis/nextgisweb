@@ -1,11 +1,12 @@
 import isEqual from "lodash-es/isEqual";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
-import { Button, Empty } from "@nextgisweb/gui/antd";
+import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import type { SizeType } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 import type { FeatureLayerCount } from "../type/FeatureLayer";
@@ -16,6 +17,7 @@ import TableConfigModal from "./component/TableConfigModal";
 import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
 import type { FeatureAttrs } from "./type";
 
+import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import "./FeatureGrid.less";
@@ -45,6 +47,9 @@ export interface FeatureGridProps {
     onSave?: (value: ResourceItem | undefined) => void;
 }
 
+const msgSettingsTitle = gettext("Open table settings");
+const msgRefreshTitle = gettext("Refresh table");
+
 const loadingCol = () => "...";
 
 export const FeatureGrid = ({
@@ -73,7 +78,10 @@ export const FeatureGrid = ({
     });
 
     const [query, setQuery] = useState("");
-    const [version, setVersion] = useState(propVersion || 0);
+    const [version, bumpVersion] = useReducer(
+        (state) => state + 1,
+        propVersion || 0
+    );
     const [selected, setSelected] = useState<FeatureAttrs[]>(() => []);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -90,7 +98,7 @@ export const FeatureGrid = ({
 
     useEffect(() => {
         if (propVersion !== undefined) {
-            setVersion((old) => old + propVersion);
+            bumpVersion();
         }
     }, [propVersion]);
 
@@ -146,20 +154,32 @@ export const FeatureGrid = ({
                 refreshTotal={refreshTotal}
                 deleteError={deleteError}
                 setSelected={setSelected}
-                setVersion={setVersion}
                 onDelete={onDelete}
                 setQuery={setQuery}
-                onSave={onSave}
+                onSave={(val) => {
+                    onSave && onSave(val);
+                    bumpVersion();
+                }}
             >
                 <div>
-                    <Button
-                        type="text"
-                        icon={<TuneIcon />}
-                        onClick={() => {
-                            setSettingsOpen(!settingsOpen);
-                        }}
-                        size={size}
-                    />
+                    <Tooltip title={msgRefreshTitle}>
+                        <Button
+                            type="text"
+                            icon={<RefreshIcon />}
+                            onClick={bumpVersion}
+                            size={size}
+                        />
+                    </Tooltip>
+                    <Tooltip title={msgSettingsTitle}>
+                        <Button
+                            type="text"
+                            icon={<TuneIcon />}
+                            onClick={() => {
+                                setSettingsOpen(!settingsOpen);
+                            }}
+                            size={size}
+                        />
+                    </Tooltip>
                 </div>
             </FeatureGridActions>
 
