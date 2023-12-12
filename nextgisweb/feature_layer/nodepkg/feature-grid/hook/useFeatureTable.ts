@@ -102,9 +102,6 @@ export function useFeatureTable({
     const [hasNextPage, setHasNextPage] = useState(false);
     const [queryTotal, setQueryTotal] = useState(0);
 
-    /** For limit the number of API requests */
-    const [fetchEnabled, setFetchEnabled] = useState(false);
-
     const { makeSignal, abort } = useAbortController();
 
     const loaderCache = useRef<LoaderCache<FeatureAttrs[]>>();
@@ -227,7 +224,7 @@ export function useFeatureTable({
                     )
                 ).flat();
                 handleFeatures(attrs);
-            } else if (fetchEnabled) {
+            } else {
                 const signal = makeSignal();
                 const promises = [];
                 for (const { key, page } of cacheKeys) {
@@ -253,7 +250,6 @@ export function useFeatureTable({
     }, [
         handleFeatures,
         visibleFields,
-        fetchEnabled,
         fetchWrapper,
         makeSignal,
         pageSize,
@@ -289,11 +285,6 @@ export function useFeatureTable({
         }
     }, [total]);
 
-    useEffect(() => {
-        setFetchEnabled(false);
-        debouncedFn(() => setFetchEnabled(true));
-    }, [pages, pageSize, query, queryIntersects, orderBy]);
-
     const prevTotal = useRef(total);
     const prevVersion = useRef(version);
     useEffect(() => {
@@ -318,10 +309,9 @@ export function useFeatureTable({
             }
         }
         prevVersion.current = version;
-        queryFn();
+        debouncedFn(queryFn);
     }, [
         visibleFields,
-        fetchEnabled,
         hasNextPage,
         pageSize,
         orderBy,
