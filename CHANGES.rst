@@ -5,6 +5,12 @@ Changes
 -----
 
 - Print to TIFF format in addition to PDF, JPEG and PNG.
+- Improved handling of ``id`` and ``fid`` attributes of vector layers.
+- Support for lookup tables for attributes.
+- Geometry based filtering of feature tables on webmaps.
+- Passing a zoom level to webmaps via ``zoom`` attribute.
+- Ability to refresh feature tables from UI.
+
 
 
 4.5.0
