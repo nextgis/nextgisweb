@@ -366,6 +366,12 @@ define([
 
         startup: function () {
             this.inherited(arguments);
+
+            if (settings.hide_nav_menu && ngwConfig.isGuest) {
+                const navMenu = document.querySelector("#header #menu");
+                navMenu.style.display = "none";
+            }
+
             this._startupDeferred.resolve();
         },
 

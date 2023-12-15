@@ -706,6 +706,14 @@ msgid "Settings saved"
 msgstr "Настройки сохранены"
 
 #: nodepkg/settings/SettingsForm.js:54
+msgid "General"
+msgstr "Общие"
+
+#: nodepkg/settings/SettingsForm.js:67
+msgid "Hide navigation menu for guest"
+msgstr "Скрывать меню навигации для гостя"
+
+#: nodepkg/settings/SettingsForm.js:75
 msgid "Identify popup"
 msgstr "Окно идентификации"
 

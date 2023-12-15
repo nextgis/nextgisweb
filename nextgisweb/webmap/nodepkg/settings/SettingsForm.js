@@ -51,6 +51,27 @@ export const SettingsForm = ({
             onValuesChange={onValuesChange}
             layout="vertical"
         >
+            <Title level={4}>{gettext("General")}</Title>
+
+            <Row gutter={[16, 16]}>
+                <Col span={8}>
+                    <Form.Item>
+                        <Space direction="horizontal">
+                            <Form.Item
+                                noStyle
+                                name="hide_nav_menu"
+                                valuePropName="checked"
+                            >
+                                <Switch />
+                            </Form.Item>
+                            {gettext("Hide navigation menu for guest")}
+                        </Space>
+                    </Form.Item>
+                </Col>
+                <Col span={8}></Col>
+                <Col span={8}></Col>
+            </Row>
+
             <Title level={4}>{gettext("Identify popup")}</Title>
 
             <Row gutter={[16, 16]}>

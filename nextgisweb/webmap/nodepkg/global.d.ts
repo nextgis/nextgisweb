@@ -41,6 +41,7 @@ declare module "@nextgisweb/pyramid/settings!webmap" {
         degree_format: string;
         measurement_srid: number;
         legend_symbols: unknown;
+        hide_nav_menu: boolean;
     }
 
     const value: Config;

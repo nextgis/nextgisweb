@@ -48,7 +48,9 @@ export function Settings() {
         }
     }
 
-    useEffect(() => load(), []);
+    useEffect(() => {
+        load();
+    }, []);
 
     const onFinish = async (values) => {
         setStatus("saving");
