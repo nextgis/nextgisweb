@@ -1,3 +1,4 @@
+import type Feature from "ol/Feature";
 import { WKT } from "ol/format";
 import type { Circle, Geometry } from "ol/geom";
 import { fromCircle } from "ol/geom/Polygon";
@@ -7,11 +8,12 @@ import { Vector as VectorLayer } from "ol/layer";
 import type { Vector as OlVectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import type { Vector as OlVectorSource } from "ol/source";
+import { Text } from "ol/style";
+import type { Style } from "ol/style";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button, Dropdown, Space } from "@nextgisweb/gui/antd";
-import type { MenuProps } from "@nextgisweb/gui/antd";
-import type { SizeType } from "@nextgisweb/gui/antd";
+import type { MenuProps, SizeType } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { DojoDisplay, MapStateControl } from "../type";
@@ -42,11 +44,39 @@ enum FilterExtentBtnMode {
 
 const formatWKT = new WKT();
 
+const defaultStyleFunction = new VectorLayer().getStyleFunction();
+const circleStyleFunc = (feature: Feature, resolution: number) => {
+    const geometry = feature.getGeometry();
+    const style: Style = defaultStyleFunction(feature, resolution)[0];
+
+    if (geometry.getType() === "Circle") {
+        const radius = (geometry as Circle).getRadius();
+        const radiusStr = radius.toLocaleString("ru-RU", {
+            maximumFractionDigits: 0,
+        });
+        const radiusText = gettext("Radius:");
+        const unitText = gettext("m");
+        const text = `${radiusText}\n${radiusStr} ${unitText}`;
+        style.setText(
+            new Text({
+                textAlign: "left",
+                textBaseline: "middle",
+                text,
+            })
+        );
+    } else {
+        style.setText(new Text());
+    }
+
+    return style;
+};
+
 const geomTypesInfo = [
     {
         label: gettext("Circle"),
         key: "circle",
         geomType: "Circle",
+        styleFunc: circleStyleFunc,
         icon: <CircleIcon />,
     },
     {
@@ -123,9 +153,14 @@ const buildInteraction = (
     if (!geomTypeInfo) return;
 
     const source = new VectorSource();
+
     const vectorLayer = new VectorLayer({
         source,
     });
+
+    if (geomTypeInfo.styleFunc) {
+        vectorLayer.setStyle(geomTypeInfo.styleFunc);
+    }
 
     const olMap = display.map.olMap;
     olMap.addLayer(vectorLayer);
@@ -140,6 +175,10 @@ const buildInteraction = (
     if (geomTypeInfo.geomFunc) {
         drawOptions.geometryFunction = geomTypeInfo.geomFunc;
     }
+    if (geomTypeInfo.styleFunc) {
+        drawOptions.style = geomTypeInfo.styleFunc;
+    }
+
     const drawInteraction = new Draw(drawOptions);
     olMap.addInteraction(drawInteraction);
     drawInteraction.on("drawend", (e) => {
