@@ -34,41 +34,6 @@ export interface CustomItemFileWriteStore extends dojo.data.ItemFileWriteStore {
     dumpItem: (item: StoreItem) => WebmapItem;
 }
 
-export interface MapStateControl {
-    activate: () => void;
-    deactivate: () => void;
-}
-
-export interface MapStatesObserver {
-    addState: (
-        state: string,
-        control?: MapStateControl,
-        activate?: boolean
-    ) => void;
-    removeState: (state: string) => void;
-    activateState: (state: string) => boolean;
-    deactivateState: (state: string) => boolean;
-    setDefaultState: (state: string, activate?: boolean) => void;
-    activateDefaultState: () => void;
-    getActiveState: () => string;
-}
-
-export interface DojoDisplay extends dijit._WidgetBase {
-    identify: DojoDisplayIdentify;
-    featureHighlighter: FeatureHighlighter;
-    map: DisplayMap;
-    mapStates: MapStatesObserver;
-    mapContainer: dijit.layout.BorderContainer;
-    displayProjection: string;
-    config: DisplayConfig;
-    itemStore: CustomItemFileWriteStore;
-    webmapStore: WebmapStore;
-    /**
-     * @deprecated use webmapStore.getlayers() instead
-     */
-    _layers: Record<number, WebmapLayer>;
-}
-
 export interface PanelClsParams {
     display: DojoDisplay;
     menuIcon: string;

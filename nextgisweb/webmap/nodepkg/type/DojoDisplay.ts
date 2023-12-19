@@ -6,6 +6,7 @@ import type WebmapStore from "../store";
 
 import type { DisplayConfig } from "./DisplayConfig";
 import type { DisplayMap } from "./DisplayMap";
+import type { MapStatesObserver } from "./MapState";
 import type { WebmapItem } from "./WebmapItem";
 import type { WebmapLayer } from "./WebmapLayer";
 import type { WebmapPlugin } from "./WebmapPlugin";
@@ -45,6 +46,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     config: DisplayConfig;
     itemStore: CustomItemFileWriteStore;
     webmapStore: WebmapStore;
+    mapStates: MapStatesObserver;
     _plugins: WebmapPlugin[];
     /**
      * @deprecated use webmapStore.getlayers() instead
