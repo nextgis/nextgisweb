@@ -11,7 +11,7 @@ import { Vector as VectorSource } from "ol/source";
 import type { Vector as OlVectorSource } from "ol/source";
 import { Text } from "ol/style";
 import type { Style } from "ol/style";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, Dropdown, Space } from "@nextgisweb/gui/antd";
 import type { MenuProps, SizeType } from "@nextgisweb/gui/antd";
@@ -240,10 +240,16 @@ export const FilterExtentBtn = ({
     onGeomChange,
 }: FilterExtentBtnProps) => {
     const interactionInfo = useRef<InteractionInfo>();
-    const [mode, setMode] = useState<FilterExtentBtnMode>("default");
     const [geomType, setGeomType] = useState<string>();
     const [visibleGeom, setVisibleGeom] = useState<boolean>(true);
     const [drawEnd, setDrawEnd] = useState<DrawEvent>();
+
+    const mode = useMemo<FilterExtentBtnMode>(() => {
+        if (drawEnd) {
+            return "geometry";
+        }
+        return geomType ? "draw" : "default";
+    }, [drawEnd, geomType]);
 
     const clearInteraction = useCallback(() => {
         const info = interactionInfo.current;
@@ -260,7 +266,6 @@ export const FilterExtentBtn = ({
         clearInteraction();
         setDrawEnd(undefined);
         setGeomType(undefined);
-        setMode("default");
         if (onGeomChange) {
             onGeomChange(undefined, undefined);
         }
@@ -287,21 +292,17 @@ export const FilterExtentBtn = ({
             }
         }
         if (interactionInfo.current) {
-            const newInteractionInfo = clearDrawInteraction(
+            interactionInfo.current = clearDrawInteraction(
                 display,
                 interactionInfo.current
             );
-            interactionInfo.current = newInteractionInfo;
         }
-        setMode("geometry");
-        setDrawEnd(undefined);
     }, [display, drawEnd, onGeomChange]);
 
     const geomTypesMenuItems: MenuProps = {
         items: geomTypesOptions,
         onClick: (item) => {
             setGeomType(item.key);
-            setMode("draw");
             const info = buildInteraction(display, id, item.key, setDrawEnd);
             interactionInfo.current = info;
         },
