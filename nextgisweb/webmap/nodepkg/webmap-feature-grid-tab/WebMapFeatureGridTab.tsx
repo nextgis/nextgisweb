@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import FeatureGrid from "@nextgisweb/feature-layer/feature-grid";
 import type { FeatureGridProps } from "@nextgisweb/feature-layer/feature-grid";
+import type { ActionProps } from "@nextgisweb/feature-layer/feature-grid/FeatureGrid";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 import { route } from "@nextgisweb/pyramid/api/route";
@@ -34,7 +35,7 @@ export function WebMapFeatureGridTab({
 }: WebMapFeatureGridTabProps) {
     const [version, setVersion] = useState(0);
     const [query, setQuery] = useState("");
-    const [queryIntersects, setQueryIntersects] = useState<string>(undefined);
+    const [queryIntersects, setQueryIntersects] = useState<string>();
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const topicHandlers = useRef<TopicSubscription[]>([]);
 
@@ -129,7 +130,7 @@ export function WebMapFeatureGridTab({
         return unsubscribe;
     }, [subscribe, layerId]);
 
-    const filterExtentBtn = useCallback((props) => {
+    const filterExtentBtn = useCallback((props: ActionProps) => {
         return (
             <FilterExtentBtn
                 {...props}
@@ -197,7 +198,14 @@ export function WebMapFeatureGridTab({
                 filterExtentBtn,
             ],
         };
-    }, [layerId, query, queryIntersects, reloadLayer, zoomToFeature]);
+    }, [
+        filterExtentBtn,
+        layerId,
+        query,
+        queryIntersects,
+        reloadLayer,
+        zoomToFeature,
+    ]);
 
     return (
         <FeatureGrid
