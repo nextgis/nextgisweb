@@ -254,7 +254,7 @@ class SecurityPolicy:
                     logger.debug("OAuthAToken(%s): expired bearer token", lf(atoken.id))
                     raise OAuthAccessTokenExpiredException()
 
-                user = self.oauth.access_token_to_user(atoken)
+                user = self.oauth.access_token_to_user(atoken, access_token=value)
                 if user.id is None:
                     DBSession.flush()
 
@@ -308,6 +308,7 @@ class SecurityPolicy:
                     atoken=_get_atoken,
                     from_existing=ptoken.user,
                     min_oauth_tstamp=datetime.fromtimestamp(ptoken.tstamp),
+                    access_token=ptoken.access_token,
                 )
 
                 if ptoken.user is None:

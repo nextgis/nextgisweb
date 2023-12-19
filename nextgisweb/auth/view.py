@@ -154,7 +154,11 @@ def oauth(request):
         bind_user = (
             request.user if data["bind"] == "1" and request.user.keyname != "guest" else None
         )
-        user = oaserver.access_token_to_user(atoken, bind_user=bind_user)
+        user = oaserver.access_token_to_user(
+            atoken,
+            bind_user=bind_user,
+            access_token=tpair.access_token,
+        )
 
         DBSession.flush()
         headers = remember(request, (user.id, tpair))

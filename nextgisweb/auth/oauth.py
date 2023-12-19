@@ -76,6 +76,17 @@ class OAuthHelper:
             _set("profile.display_name.attr", "name")
             _set("profile.member_of.attr", "resource_access.{client_id}.roles")
 
+        elif stype == "blitz":
+            tbase_url = f"{base_url}/blitz/oauth"
+            _set("server.token_endpoint", f"{tbase_url}/te")
+            _set("server.auth_endpoint", f"{tbase_url}/ae")
+            _set("server.introspection_endpoint", f"{tbase_url}/introspect")
+            _set("server.userinfo_endpoint", f"{tbase_url}/me")
+            _set("profile.subject.attr", "sub")
+            _set("profile.keyname.attr", "sub")
+            _set("profile.display_name.attr", "given_name, family_name")
+            _set("profile.member_of.attr", "groups.id")
+
         else:
             raise ValueError(f"Invalid value: {stype}")
 
@@ -278,6 +289,7 @@ class OAuthHelper:
         bind_user=None,
         from_existing=None,
         min_oauth_tstamp=None,
+        access_token=None,
     ):
         def _atoken():
             nonlocal atoken
@@ -330,7 +342,7 @@ class OAuthHelper:
                     logger.debug(
                         "User(id=%d, keyname=%s): updating from token", user.id, user.keyname
                     )
-                self._update_user(user, _atoken().data)
+                self._update_user(user, _atoken().data, access_token=access_token)
 
             user.oauth_tstamp = datetime.utcnow()
 
@@ -339,24 +351,37 @@ class OAuthHelper:
 
         return user
 
-    def _server_request(self, endpoint, params):
+    def _server_request(self, endpoint, params, *, default_method="POST", access_token=None):
         url = self.options["server.{}_endpoint".format(endpoint)]
-        method = self.options.get("server.{}_method".format(endpoint), "POST").lower()
+        method = self.options.get("server.{}_method".format(endpoint), default_method).lower()
         timeout = self.options["timeout"].total_seconds()
 
         params = dict(params)
-
-        if client_id := self.options.get("client.id"):
-            params["client_id"] = client_id
-        if client_secret := self.options.get("client.secret"):
-            params["client_secret"] = client_secret
+        headers = dict(self.server_headers)
+        authorization = None
+        verify = not self.options["server.insecure"]
 
         log_reqid = token_hex(4)
         logger.debug("Request(%s): > %s %s", log_reqid, method.upper(), url)
-        logger.debug("Request(%s): > %s", log_reqid, lf(params))
 
+        if access_token is None:
+            if client_id := self.options.get("client.id"):
+                params["client_id"] = client_id
+            if client_secret := self.options.get("client.secret"):
+                params["client_secret"] = client_secret
+            authorization = (client_id, client_secret)
+        else:
+            headers["Authorization"] = f"Bearer {access_token}"
+            logger.debug("Request(%s): Bearer %s", log_reqid, lf(access_token))
+
+        logger.debug("Request(%s): > %s", log_reqid, lf(params))
         response = getattr(requests, method.lower())(
-            url, params, headers=self.server_headers, timeout=timeout
+            url,
+            params,
+            headers=headers,
+            timeout=timeout,
+            auth=authorization,
+            verify=verify,
         )
 
         logger.debug(
@@ -398,7 +423,15 @@ class OAuthHelper:
             ),
         )
 
-    def _update_user(self, user, tdata):
+    def _update_user(self, user, tdata, *, access_token=None):
+        if self.options["server.userinfo_endpoint"]:
+            tdata = self._server_request(
+                "userinfo",
+                dict(),
+                default_method="GET",
+                access_token=access_token,
+            )
+
         opts = self.options.with_prefix("profile")
 
         if user.keyname is None or not opts["keyname.no_update"]:
@@ -499,7 +532,7 @@ class OAuthHelper:
         Option("client.id", default=None, doc="OAuth client ID"),
         Option("client.secret", default=None, secure=True, doc="OAuth client secret"),
 
-        Option("server.type", default=None, doc="OAuth server: nextgisid or keycloak (requires base URL)."),
+        Option("server.type", default=None, doc="OAuth server: nextgisid, keycloak or blitz (requires base URL)."),
         Option("server.base_url", doc=(
                 "OAuth server base URL. For NextGIS ID - https://nextgisid, "
                 "for Keycloak - https://keycloak/auth/realms/master.")),
@@ -511,10 +544,12 @@ class OAuthHelper:
         Option("server.introspection_endpoint", default=None, doc="OAuth token introspection endpoint URL."),
         Option("server.introspection_method", default="POST", doc="Workaround for NGID OAuth implementation."),
         Option("server.auth_endpoint", default=None, doc="OAuth authorization code endpoint URL."),
+        Option("server.userinfo_endpoint", default=None, doc="OAuth user info endpoint URL."),
         Option("server.authorization_header", default=None, doc="Add Authorization HTTP header to requests to OAuth server."),
         Option("server.refresh_expires_in", timedelta, default=timedelta(days=7), doc=(
             "Default refresh token expiration (if not set by OAuth server).")),
         Option("server.logout_endpoint", default=None, doc="OAuth logout endpoint URL."),
+        Option("server.insecure", bool, default=False, doc="Skip SSL certificates validaion."),
         Option("profile.endpoint", default=None, doc="OpenID Connect endpoint URL"),
 
         Option("profile.subject.attr", default="sub", doc="OAuth profile subject identifier"),
@@ -623,18 +658,28 @@ def _fallback_value(*args):
     raise ValueError("No suitable value found")
 
 
-def _member_of_from_token(tdata, key):
-    value = tdata
-    for k in key.split("."):
-        if isinstance(value, dict) and k in value:
-            value = value[k]
-        else:
+def _member_of_traverse(data, path):
+    if len(path) == 0:
+        if data is None:
+            pass  # Skip nulls
+        elif not isinstance(data, (int, str)):
             raise ValueError
+        else:
+            yield str(data)
+    else:
+        path = list(path)
+        key = path.pop(0)
+        value = data.get(key, None)
 
-    if not isinstance(value, list):
-        raise ValueError
+        if isinstance(value, list):
+            for itm in value:
+                yield from _member_of_traverse(itm, path)
+        else:
+            yield from _member_of_traverse(value, path)
 
-    return set(v.lower() for v in value)
+
+def _member_of_from_token(tdata, key):
+    return set(v.lower() for v in _member_of_traverse(tdata, key.split(".")))
 
 
 @lazy_str
