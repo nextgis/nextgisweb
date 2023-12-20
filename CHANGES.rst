@@ -11,6 +11,7 @@ Changes
 - Passing a zoom level to webmaps via ``zoom`` attribute.
 - Ability to refresh feature tables from UI.
 - Support for OpenID Connect UserInfo endpoint.
+- Improved handling of date and time inputs.
 
 
 
