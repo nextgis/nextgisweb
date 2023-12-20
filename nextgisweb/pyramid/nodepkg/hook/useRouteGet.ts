@@ -32,7 +32,7 @@ export function useRouteGet<D = unknown>(
         loadOnInit_ = nameOrProps.loadOnInit ?? loadOnInit;
     }
 
-    const { route, abort } = useRoute(endpointName_, params_, loadOnInit_);
+    const { route, abort } = useRoute(endpointName_, params_);
     const [isLoading, setIsLoading] = useState(!!loadOnInit_);
     const [data, setData] = useState<D>();
     const [error, setError] = useState<ApiError | null>(null);

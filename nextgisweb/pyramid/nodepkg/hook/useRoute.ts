@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useRef } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 
 import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 
@@ -40,14 +40,12 @@ function apiRouteOverloaded<RouteName extends keyof RouteParameters>(
 
 export function useRoute<RouteName extends keyof RouteParameters>(
     name: RouteName,
-    params?: GetRouteParam<RouteName>,
-    loadOnInit = false
+    params?: GetRouteParam<RouteName>
 ) {
-    const loadOnInit_ = useRef(loadOnInit);
     const { abort, makeSignal } = useAbortController();
     const [loadingCounter, dispatchLoadingCounter] = useReducer(
         loadingCounterReducer,
-        { count: Number(!!loadOnInit_) }
+        { count: 0 }
     );
 
     const [routerParams] = useObjectState(params);
@@ -59,10 +57,6 @@ export function useRoute<RouteName extends keyof RouteParameters>(
         for (const method of methods) {
             const requestForMethodCb = result[method];
             result[method] = async (options) => {
-                if (loadOnInit_.current) {
-                    dispatchLoadingCounter("decrement");
-                    loadOnInit_.current = false;
-                }
                 dispatchLoadingCounter("increment");
                 try {
                     return await requestForMethodCb({
