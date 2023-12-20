@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import type { QueryParams } from "package/nextgisweb/nextgisweb/feature_layer/nodepkg/feature-grid/hook/useFeatureTable";
 
 import type {
     FeatureExtent,
@@ -6,14 +6,14 @@ import type {
 } from "@nextgisweb/feature-layer/type/FeatureExtent";
 import { Button } from "@nextgisweb/gui/antd";
 import type { SizeType } from "@nextgisweb/gui/antd";
-import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import { useRoute } from "@nextgisweb/pyramid/hook/useRoute";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 
 interface ZoomToFilteredBtnProps {
     id: number;
-    query: string;
+    queryParams: QueryParams | null;
     size?: SizeType;
     onZoomToFiltered?: (val: NgwExtent) => void;
 }
@@ -22,45 +22,24 @@ const msgZoomToFiltered = gettext("Zoom to filtered features");
 
 export const ZoomToFilteredBtn = ({
     id,
-    query,
+    queryParams,
     size = "middle",
     onZoomToFiltered,
 }: ZoomToFilteredBtnProps) => {
-    const {
-        data: extentData,
-        refresh: refreshExtent,
-        isLoading: loading,
-    } = useRouteGet<FeatureExtent>(
-        "feature_layer.feature.extent",
-        { id },
-        { query: { ilike: query } }
-    );
+    const { route, isLoading } = useRoute("feature_layer.feature.extent", {
+        id,
+    });
 
-    const [extentCache, setExtentCache] = useState<Record<string, NgwExtent>>();
-
-    const click = () => {
+    const click = async () => {
         if (!onZoomToFiltered) {
             return;
         }
-
-        if (extentCache && extentCache[query]) {
-            onZoomToFiltered(extentCache[query]);
-            return;
-        }
-
-        setExtentCache({});
-        refreshExtent();
+        const resp = await route.get<FeatureExtent>({
+            query: queryParams || undefined,
+            cache: true,
+        });
+        onZoomToFiltered(resp.extent);
     };
-
-    useEffect(() => {
-        if (!onZoomToFiltered || !extentData || !extentCache) {
-            return;
-        }
-
-        const { extent } = extentData;
-        extentCache[query] = extent;
-        onZoomToFiltered(extent);
-    }, [extentData]);
 
     return (
         <Button
@@ -69,7 +48,7 @@ export const ZoomToFilteredBtn = ({
             icon={<ZoomInMap />}
             onClick={click}
             size={size}
-            loading={loading}
+            loading={isLoading}
         />
     );
 };

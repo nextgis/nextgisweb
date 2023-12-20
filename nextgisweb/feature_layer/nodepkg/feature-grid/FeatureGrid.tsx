@@ -1,9 +1,8 @@
 import isEqual from "lodash-es/isEqual";
-import { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { observer } from "mobx-react-lite";
+import { useEffect, useRef, useState } from "react";
 
-import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
-import type { SizeType } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -12,199 +11,133 @@ import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 import type { FeatureLayerCount } from "../type/FeatureLayer";
 
 import { FeatureGridActions } from "./FeatureGridActions";
+import { FeatureGridStore } from "./FeatureGridStore";
 import FeatureTable from "./FeatureTable";
 import TableConfigModal from "./component/TableConfigModal";
-import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
-import type { FeatureAttrs } from "./type";
+import { KEY_FIELD_ID } from "./constant";
+import type { FeatureGridProps } from "./type";
 
 import RefreshIcon from "@nextgisweb/icon/material/refresh";
 import TuneIcon from "@nextgisweb/icon/material/tune";
 
 import "./FeatureGrid.less";
 
-export interface ActionProps {
-    id: number;
-    query: string;
-    size?: SizeType;
-    selected?: FeatureAttrs[];
-}
-
-export interface FeatureGridProps {
-    id: number;
-    size?: SizeType;
-    query?: string;
-    actions?: ActionToolbarAction<ActionProps>[];
-    version?: number;
-    readonly?: boolean;
-    selectedIds?: number[];
-    editOnNewPage?: boolean;
-    queryIntersects?: string;
-    cleanSelectedOnFilter?: boolean;
-    beforeDelete?: (featureIds: number[]) => void;
-    deleteError?: (featureIds: number[]) => void;
-    onSelect?: (selected: number[]) => void;
-    onDelete?: (featureIds: number[]) => void;
-    onSave?: (value: ResourceItem | undefined) => void;
-}
-
 const msgSettingsTitle = gettext("Open table settings");
 const msgRefreshTitle = gettext("Refresh table");
 
 const loadingCol = () => "...";
 
-export const FeatureGrid = ({
-    id,
-    size = "middle",
-    query: propQuery,
-    actions: propActions = [],
-    version: propVersion,
-    readonly = true,
-    selectedIds,
-    editOnNewPage,
-    queryIntersects,
-    cleanSelectedOnFilter = true,
-    beforeDelete,
-    deleteError,
-    onDelete,
-    onSelect,
-    onSave,
-}: FeatureGridProps) => {
-    const { data: totalData, refresh: refreshTotal } =
-        useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
+export const FeatureGrid = observer(
+    ({
+        store: storeProp,
+        ...restProps
+    }: {
+        store?: FeatureGridStore;
+    } & FeatureGridProps) => {
+        const [store] = useState(
+            () => storeProp || new FeatureGridStore(restProps)
+        );
+
+        const {
             id,
-        });
-    const { data: resourceData } = useRouteGet<ResourceItem>("resource.item", {
-        id,
-    });
+            size,
+            fields,
+            version,
+            queryParams,
+            selectedIds,
+            visibleFields,
+            cleanSelectedOnFilter,
+            bumpVersion,
+            onSelect,
+        } = store;
 
-    const [query, setQuery] = useState("");
-    const [version, bumpVersion] = useReducer(
-        (state) => state + 1,
-        propVersion || 0
-    );
-    const [selected, setSelected] = useState<FeatureAttrs[]>(() => []);
-    const [settingsOpen, setSettingsOpen] = useState(false);
-
-    const fields = useMemo(() => {
-        if (resourceData) {
-            return resourceData.feature_layer?.fields;
-        }
-        return undefined;
-    }, [resourceData]);
-
-    const [visibleFields, setVisibleFields] = useState<number[]>(() => [
-        KEY_FIELD_ID,
-    ]);
-
-    useEffect(() => {
-        if (propVersion !== undefined) {
-            bumpVersion();
-        }
-    }, [propVersion]);
-
-    useEffect(() => {
-        if (selectedIds) {
-            setSelected(selectedIds.map((s) => ({ [KEY_FIELD_KEYNAME]: s })));
-        }
-    }, [selectedIds, setSelected]);
-
-    const prevSelectedIds = useRef(selectedIds);
-    useEffect(() => {
-        if (onSelect) {
-            const selectedIds_ = selected.map((s) =>
-                Number(s[KEY_FIELD_KEYNAME])
-            );
-            if (!isEqual(selectedIds_, prevSelectedIds.current)) {
-                prevSelectedIds.current = selectedIds_;
-                onSelect(selectedIds_ || []);
+        const { data: totalData, refresh: refreshTotal } =
+            useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
+                id,
+            });
+        const { data: resourceData, isLoading } = useRouteGet<ResourceItem>(
+            "resource.item",
+            {
+                id,
             }
-        }
-    }, [onSelect, selected]);
+        );
 
-    useEffect(() => {
-        if (propQuery !== undefined) {
-            setQuery(propQuery);
-        }
-    }, [propQuery]);
+        useEffect(() => {
+            // Do not refresh on init version
+            if (version) {
+                refreshTotal();
+            }
+        }, [refreshTotal, version]);
 
-    useEffect(() => {
-        if (fields) {
-            setVisibleFields([
-                KEY_FIELD_ID,
-                ...fields.filter((f) => f.grid_visibility).map((f) => f.id),
-            ]);
-        }
-    }, [fields]);
+        useEffect(() => {
+            if (resourceData) {
+                const fields = resourceData.feature_layer?.fields;
+                if (fields) {
+                    store.setFields(fields);
+                    store.setVisibleFields([
+                        KEY_FIELD_ID,
+                        ...fields
+                            .filter((f) => f.grid_visibility)
+                            .map((f) => f.id),
+                    ]);
+                }
+            }
+        }, [resourceData, store]);
 
-    if (!totalData || !fields) {
-        return <LoadingWrapper />;
+        const prevSelectedIds = useRef(selectedIds);
+        useEffect(() => {
+            if (onSelect) {
+                if (!isEqual(selectedIds, prevSelectedIds.current)) {
+                    prevSelectedIds.current = [...selectedIds];
+                    onSelect(selectedIds || []);
+                }
+            }
+        }, [onSelect, selectedIds]);
+
+        if (!totalData || isLoading) {
+            return <LoadingWrapper />;
+        }
+
+        return (
+            <div className="ngw-feature-layer-feature-grid">
+                <FeatureGridActions store={store}>
+                    <div>
+                        <Tooltip title={msgRefreshTitle}>
+                            <Button
+                                type="text"
+                                icon={<RefreshIcon />}
+                                onClick={bumpVersion}
+                                size={size}
+                            />
+                        </Tooltip>
+                        <Tooltip title={msgSettingsTitle}>
+                            <Button
+                                type="text"
+                                icon={<TuneIcon />}
+                                onClick={() => {
+                                    store.setSettingsOpen(!store.settingsOpen);
+                                }}
+                                size={size}
+                            />
+                        </Tooltip>
+                    </div>
+                </FeatureGridActions>
+
+                <FeatureTable
+                    empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+                    total={totalData.total_count}
+                    fields={fields}
+                    version={version}
+                    selectedIds={selectedIds}
+                    loadingCol={loadingCol}
+                    resourceId={id}
+                    setSelectedIds={store.setSelectedIds}
+                    queryParams={queryParams || undefined}
+                    visibleFields={visibleFields}
+                    cleanSelectedOnFilter={cleanSelectedOnFilter}
+                />
+                <TableConfigModal store={store} />
+            </div>
+        );
     }
-
-    return (
-        <div className="ngw-feature-layer-feature-grid">
-            <FeatureGridActions
-                id={id}
-                size={size}
-                query={query}
-                actions={propActions}
-                readonly={readonly}
-                selected={selected}
-                editOnNewPage={editOnNewPage}
-                beforeDelete={beforeDelete}
-                refreshTotal={refreshTotal}
-                deleteError={deleteError}
-                setSelected={setSelected}
-                onDelete={onDelete}
-                setQuery={setQuery}
-                onSave={(val) => {
-                    onSave && onSave(val);
-                    bumpVersion();
-                }}
-            >
-                <div>
-                    <Tooltip title={msgRefreshTitle}>
-                        <Button
-                            type="text"
-                            icon={<RefreshIcon />}
-                            onClick={bumpVersion}
-                            size={size}
-                        />
-                    </Tooltip>
-                    <Tooltip title={msgSettingsTitle}>
-                        <Button
-                            type="text"
-                            icon={<TuneIcon />}
-                            onClick={() => {
-                                setSettingsOpen(!settingsOpen);
-                            }}
-                            size={size}
-                        />
-                    </Tooltip>
-                </div>
-            </FeatureGridActions>
-
-            <FeatureTable
-                empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
-                total={totalData.total_count}
-                query={query}
-                fields={fields}
-                version={version}
-                selected={selected}
-                resourceId={id}
-                visibleFields={visibleFields}
-                queryIntersects={queryIntersects}
-                cleanSelectedOnFilter={cleanSelectedOnFilter}
-                setSelected={setSelected}
-                loadingCol={loadingCol}
-            />
-
-            <TableConfigModal
-                fields={fields}
-                isOpen={settingsOpen}
-                setIsOpen={setSettingsOpen}
-                visibleFields={visibleFields}
-                setVisibleFields={setVisibleFields}
-            />
-        </div>
-    );
-};
+);

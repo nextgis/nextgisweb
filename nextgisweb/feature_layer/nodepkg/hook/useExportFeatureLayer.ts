@@ -14,6 +14,7 @@ interface UseExportFeatureLayerProps {
 export type ExportFeatureLayerOptions = {
     extent?: number[];
     resources?: string[];
+    intersects?: string;
     ilike?: string;
     format?: string;
 };

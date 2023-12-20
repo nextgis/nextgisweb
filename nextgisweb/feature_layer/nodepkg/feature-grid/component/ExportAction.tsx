@@ -6,6 +6,7 @@ import settings from "@nextgisweb/pyramid/settings!feature_layer";
 
 import { useExportFeatureLayer } from "../../hook/useExportFeatureLayer";
 import type { ExportFeatureLayerOptions } from "../../hook/useExportFeatureLayer";
+import type { QueryParams } from "../hook/useFeatureTable";
 
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 import ExportIcon from "@nextgisweb/icon/material/save_alt";
@@ -14,7 +15,7 @@ type MenuItems = ParamsOf<typeof Dropdown>["menu"];
 
 interface ExportActionProps {
     id: number;
-    query: string;
+    queryParams: QueryParams | null;
     size?: SizeType;
 }
 
@@ -35,13 +36,14 @@ const quickExportKey = "quick-export";
 
 export const ExportAction = ({
     id,
-    query,
+    queryParams,
     size = "middle",
 }: ExportActionProps) => {
     const { exportFeatureLayer, openExportPage, exportLoading } =
         useExportFeatureLayer({ id });
 
-    const isFilterSet = query;
+    const isFilterSet =
+        !!queryParams && Object.values(queryParams).some(Boolean);
 
     const menuProps: MenuItems = {
         items: [
@@ -68,7 +70,7 @@ export const ExportAction = ({
             },
         ],
         onClick: (e) => {
-            const params: ExportFeatureLayerOptions = { ilike: query };
+            const params: ExportFeatureLayerOptions = queryParams || {};
             if (e.key === settingsKey) {
                 openExportPage(params);
             } else {

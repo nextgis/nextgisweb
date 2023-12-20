@@ -1,10 +1,10 @@
 import Feature from "ol/Feature";
 import WKT from "ol/format/WKT";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import FeatureGrid from "@nextgisweb/feature-layer/feature-grid";
-import type { FeatureGridProps } from "@nextgisweb/feature-layer/feature-grid";
-import type { ActionProps } from "@nextgisweb/feature-layer/feature-grid/FeatureGrid";
+import { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/FeatureGridStore";
+import type { ActionProps } from "@nextgisweb/feature-layer/feature-grid/type";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
 import { route } from "@nextgisweb/pyramid/api/route";
@@ -33,10 +33,6 @@ export function WebMapFeatureGridTab({
     plugin,
     layerId,
 }: WebMapFeatureGridTabProps) {
-    const [version, setVersion] = useState(0);
-    const [query, setQuery] = useState("");
-    const [queryIntersects, setQueryIntersects] = useState<string>();
-    const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const topicHandlers = useRef<TopicSubscription[]>([]);
 
     const display = useRef<DojoDisplay>(plugin.display as DojoDisplay);
@@ -50,9 +46,102 @@ export function WebMapFeatureGridTab({
     );
 
     const reloadLayer = useCallback(() => {
-        const layer = display.current?._layers[layerId];
+        const layer = display.current?.webmapStore.getLayer(layerId);
         layer?.reload();
     }, [layerId]);
+
+    const [store] = useState(
+        () =>
+            new FeatureGridStore({
+                id: layerId,
+                readonly: data.current?.readonly ?? true,
+                size: "small",
+                cleanSelectedOnFilter: false,
+                onDelete: reloadLayer,
+                onSave: () => {
+                    display.current.identify._popup.widget?.reset();
+                    reloadLayer();
+                },
+
+                onSelect: (newVal) => {
+                    store.setSelectedIds(newVal);
+                    const fid = newVal[0];
+                    if (fid !== undefined) {
+                        route("feature_layer.feature.item", {
+                            id: layerId,
+                            fid,
+                        })
+                            .get<FeatureItem>()
+                            .then((feature) => {
+                                display.current.featureHighlighter.highlightFeature(
+                                    {
+                                        geom: feature.geom,
+                                        featureId: feature.id,
+                                        layerId,
+                                    }
+                                );
+                            });
+                    } else {
+                        display.current.featureHighlighter.unhighlightFeature(
+                            (f) => f?.getProperties?.()?.layerId === layerId
+                        );
+                    }
+                },
+                actions: [
+                    {
+                        title: msgGoto,
+                        icon: "material-center_focus_weak",
+                        disabled: (params) => !params?.selectedIds?.length,
+                        action: () => {
+                            const wkt = new WKT();
+                            const fid = store.selectedIds[0];
+                            if (fid !== undefined) {
+                                route("feature_layer.feature.item", {
+                                    id: layerId,
+                                    fid,
+                                })
+                                    .get<FeatureItem>()
+                                    .then((feature) => {
+                                        const geometry = wkt.readGeometry(
+                                            feature.geom
+                                        );
+                                        display.current.map.zoomToFeature(
+                                            new Feature({ geometry })
+                                        );
+                                    });
+                            }
+                        },
+                    },
+                    "separator",
+                    (props) => (
+                        <ZoomToFilteredBtn
+                            {...props}
+                            queryParams={store.queryParams}
+                            onZoomToFiltered={(ngwExtent: NgwExtent) => {
+                                display.current.map.zoomToNgwExtent(
+                                    ngwExtent,
+                                    display.current.displayProjection
+                                );
+                            }}
+                        />
+                    ),
+                    (props: ActionProps) => {
+                        return (
+                            <FilterExtentBtn
+                                {...props}
+                                display={display.current}
+                                onGeomChange={(_, geomWKT) => {
+                                    store.setQueryParams((prev) => ({
+                                        ...prev,
+                                        intersects: geomWKT,
+                                    }));
+                                }}
+                            />
+                        );
+                    },
+                ],
+            })
+    );
 
     const featureHighlightedEvent = useCallback(
         ({
@@ -63,22 +152,22 @@ export function WebMapFeatureGridTab({
             layerId: number;
         }) => {
             if (featureId !== undefined && eventLayerId === layerId) {
-                setSelectedIds([featureId]);
+                store.setSelectedIds([featureId]);
             } else {
-                setSelectedIds([]);
+                store.setSelectedIds([]);
             }
         },
-        [layerId]
+        [layerId, store]
     );
 
     const featureUpdatedEvent = useCallback(
         ({ resourceId }: { resourceId: number }) => {
             if (layerId === resourceId) {
-                setVersion((old) => old + 1);
+                store.bumpVersion();
                 reloadLayer();
             }
         },
-        [layerId, reloadLayer]
+        [layerId, reloadLayer, store]
     );
 
     const subscribe = useCallback(() => {
@@ -86,35 +175,20 @@ export function WebMapFeatureGridTab({
             topic.subscribe("feature.highlight", featureHighlightedEvent),
             topic.subscribe(
                 "feature.unhighlight",
-                setSelectedIds.bind(null, [])
+                store.setSelectedIds.bind(null, [])
             ),
             topic.subscribe("feature.updated", featureUpdatedEvent),
-            topic.subscribe(
-                "/webmap/feature-table/refresh",
-                setQuery.bind(null, "")
-            )
+            topic.subscribe("/webmap/feature-table/refresh", () => {
+                store.setQueryParams(null);
+                store.bumpVersion();
+            })
         );
-    }, [featureHighlightedEvent, featureUpdatedEvent, topic]);
+    }, [featureHighlightedEvent, featureUpdatedEvent, topic, store]);
 
     const unsubscribe = () => {
         topicHandlers.current.forEach((handler) => handler.remove());
         topicHandlers.current = [];
     };
-
-    const zoomToFeature = useCallback(() => {
-        const wkt = new WKT();
-        const fid = selectedIds[0];
-        if (fid !== undefined) {
-            route("feature_layer.feature.item", { id: layerId, fid })
-                .get<FeatureItem>()
-                .then((feature) => {
-                    const geometry = wkt.readGeometry(feature.geom);
-                    display.current.map.zoomToFeature(
-                        new Feature({ geometry })
-                    );
-                });
-        }
-    }, [layerId, selectedIds]);
 
     useEffect(() => {
         subscribe();
@@ -125,93 +199,10 @@ export function WebMapFeatureGridTab({
             .filter((f) => f.getProperties?.()?.layerId === layerId)
             .map((f) => f.getProperties().featureId);
 
-        setSelectedIds(selected);
+        store.setSelectedIds(selected);
 
         return unsubscribe;
-    }, [subscribe, layerId]);
+    }, [subscribe, layerId, store]);
 
-    const filterExtentBtn = useCallback((props: ActionProps) => {
-        return (
-            <FilterExtentBtn
-                {...props}
-                display={display.current}
-                onGeomChange={(geom, geomWKT) => {
-                    setQueryIntersects(geomWKT);
-                }}
-            />
-        );
-    }, []);
-
-    const featureGridProps = useMemo<FeatureGridProps>(() => {
-        return {
-            id: layerId,
-            query,
-            queryIntersects,
-            readonly: data.current?.readonly ?? true,
-            size: "small",
-            cleanSelectedOnFilter: false,
-            onDelete: reloadLayer,
-            onSave: () => {
-                display.current.identify._popup.widget?.reset();
-                reloadLayer();
-            },
-            onSelect: function (newVal) {
-                setSelectedIds(newVal);
-                const fid = newVal[0];
-                if (fid !== undefined) {
-                    route("feature_layer.feature.item", { id: layerId, fid })
-                        .get<FeatureItem>()
-                        .then((feature) => {
-                            display.current.featureHighlighter.highlightFeature(
-                                {
-                                    geom: feature.geom,
-                                    featureId: feature.id,
-                                    layerId,
-                                }
-                            );
-                        });
-                } else {
-                    display.current.featureHighlighter.unhighlightFeature(
-                        (f) => f?.getProperties?.()?.layerId === layerId
-                    );
-                }
-            },
-            actions: [
-                {
-                    title: msgGoto,
-                    icon: "material-center_focus_weak",
-                    disabled: (params) => !params?.selected?.length,
-                    action: zoomToFeature,
-                },
-                "separator",
-                (props) => (
-                    <ZoomToFilteredBtn
-                        {...props}
-                        onZoomToFiltered={(ngwExtent: NgwExtent) => {
-                            display.current.map.zoomToNgwExtent(
-                                ngwExtent,
-                                display.current.displayProjection
-                            );
-                        }}
-                    />
-                ),
-                filterExtentBtn,
-            ],
-        };
-    }, [
-        filterExtentBtn,
-        layerId,
-        query,
-        queryIntersects,
-        reloadLayer,
-        zoomToFeature,
-    ]);
-
-    return (
-        <FeatureGrid
-            selectedIds={selectedIds}
-            version={version}
-            {...featureGridProps}
-        />
-    );
+    return <FeatureGrid id={layerId} store={store} />;
 }

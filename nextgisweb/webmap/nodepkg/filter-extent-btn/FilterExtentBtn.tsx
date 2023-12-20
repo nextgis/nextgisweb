@@ -10,7 +10,6 @@ import type { Vector as OlVectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import type { Vector as OlVectorSource } from "ol/source";
 import { Text } from "ol/style";
-import type { Style } from "ol/style";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, Dropdown, Space } from "@nextgisweb/gui/antd";
@@ -45,28 +44,31 @@ const formatWKT = new WKT();
 const defaultStyleFunction = new VectorLayer().getStyleFunction();
 const circleStyleFunc = (feature: Feature, resolution: number) => {
     const geometry = feature.getGeometry();
-    const style: Style = defaultStyleFunction(feature, resolution)[0];
-
-    if (geometry.getType() === "Circle") {
-        const radius = (geometry as Circle).getRadius();
-        const radiusStr = radius.toLocaleString("ru-RU", {
-            maximumFractionDigits: 0,
-        });
-        const radiusText = gettext("Radius:");
-        const unitText = gettext("m");
-        const text = `${radiusText}\n${radiusStr} ${unitText}`;
-        style.setText(
-            new Text({
-                textAlign: "left",
-                textBaseline: "middle",
-                text,
-            })
-        );
-    } else {
-        style.setText(new Text());
+    if (defaultStyleFunction) {
+        const styles = defaultStyleFunction(feature, resolution);
+        const style = (Array.isArray(styles) ? styles : [styles])[0];
+        if (style) {
+            if (geometry && geometry.getType() === "Circle") {
+                const radius = (geometry as Circle).getRadius();
+                const radiusStr = radius.toLocaleString("ru-RU", {
+                    maximumFractionDigits: 0,
+                });
+                const radiusText = gettext("Radius:");
+                const unitText = gettext("m");
+                const text = `${radiusText}\n${radiusStr} ${unitText}`;
+                style.setText(
+                    new Text({
+                        textAlign: "left",
+                        textBaseline: "middle",
+                        text,
+                    })
+                );
+            } else {
+                style.setText(new Text());
+            }
+            return style;
+        }
     }
-
-    return style;
 };
 
 const geomTypesInfo = [
@@ -277,6 +279,7 @@ export const FilterExtentBtn = ({
         };
     }, [clearInteraction]);
 
+    const prevGeometryWKT = useRef<string>();
     useEffect(() => {
         if (!drawEnd) return;
 
@@ -287,7 +290,8 @@ export const FilterExtentBtn = ({
                 geometry = fromCircle(geometry as Circle);
             }
             const geometryWKT = formatWKT.writeGeometry(geometry);
-            if (onGeomChange) {
+            if (onGeomChange && prevGeometryWKT.current !== geometryWKT) {
+                prevGeometryWKT.current = geometryWKT;
                 onGeomChange(geometry, geometryWKT);
             }
         }

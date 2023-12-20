@@ -6,19 +6,22 @@ import type { RefObject } from "react";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
-import { fetchFeatures } from "../api/fetchFeatures";
+import type { FetchFeaturesOptions } from "../api/fetchFeatures";
 import type { FeatureAttrs, FeatureLayerFieldCol, OrderBy } from "../type";
 import { createCacheKey } from "../util/createCacheKey";
-import { updateFeaturesValue } from "../util/updateFeaturesValue";
+import { fetchWrapper } from "../util/fetchWrapper";
 
 const debouncedFn = debounce((fn) => {
     fn();
 }, 100);
 
-interface UseFeatureTableProps {
+export type QueryParams = Partial<
+    Pick<FetchFeaturesOptions, "ilike" | "like" | "intersects">
+>;
+
+export interface UseFeatureTableProps {
     total: number;
-    query: string;
-    queryIntersects?: string;
+    queryParams?: QueryParams;
     columns: FeatureLayerFieldCol[];
     version?: number;
     orderBy?: OrderBy;
@@ -87,14 +90,13 @@ interface UseFeatureTableProps {
  */
 export function useFeatureTable({
     total,
-    query,
-    queryIntersects,
     columns,
     version,
     orderBy,
     pageSize,
     tbodyRef,
     resourceId,
+    queryParams,
     rowMinHeight,
     visibleFields,
 }: UseFeatureTableProps) {
@@ -118,8 +120,8 @@ export function useFeatureTable({
     };
 
     const queryMode = useMemo<boolean>(
-        () => !!query || !!queryIntersects,
-        [query, queryIntersects]
+        () => !!queryParams && Object.values(queryParams).some(Boolean),
+        [queryParams]
     );
 
     const handleFeatures = useCallback(
@@ -142,54 +144,6 @@ export function useFeatureTable({
         [pageSize, pages, queryMode]
     );
 
-    const fetchWrapper = useCallback(
-        ({
-            page,
-            signal,
-            key,
-        }: {
-            page: number;
-            signal: AbortSignal;
-            key: string;
-        }) => {
-            if (!loaderCache.current) {
-                return [];
-            }
-            return loaderCache.current
-                .promiseFor(key, () => {
-                    return fetchFeatures({
-                        fields: columns
-                            // ids that are less than one are created for
-                            // internal purposes and not used in NGW
-                            .filter((f) => f.id > 0)
-                            .map((f) => f.keyname),
-                        limit: pageSize,
-                        cache: false,
-                        offset: page,
-                        ilike: query,
-                        intersects: queryIntersects,
-                        resourceId,
-                        orderBy,
-                        signal,
-                    }).then((features) => {
-                        return updateFeaturesValue({
-                            resourceId: resourceId,
-                            data: features,
-                            signal,
-                        });
-                    });
-                })
-                .catch((er) => {
-                    if (er && er.name === "AbortError") {
-                        // ignore abort error
-                    } else {
-                        throw er;
-                    }
-                });
-        },
-        [columns, orderBy, pageSize, query, queryIntersects, resourceId]
-    );
-
     const queryFn = useCallback(async () => {
         abort();
         if (pages.length) {
@@ -206,9 +160,8 @@ export function useFeatureTable({
                     pageSize,
                     version,
                     orderBy,
-                    query,
-                    queryIntersects,
                     page,
+                    ...queryParams,
                 }),
             }));
             const allPageLoaded = cacheKeys.every((c) => {
@@ -229,7 +182,19 @@ export function useFeatureTable({
                 const promises = [];
                 for (const { key, page } of cacheKeys) {
                     if (pages.includes(page)) {
-                        promises.push(fetchWrapper({ page, signal, key }));
+                        promises.push(
+                            fetchWrapper({
+                                key,
+                                page,
+                                cache,
+                                signal,
+                                columns,
+                                orderBy,
+                                pageSize,
+                                resourceId,
+                                queryParams,
+                            })
+                        );
                     }
                 }
                 const parts = await Promise.all(promises);
@@ -248,16 +213,16 @@ export function useFeatureTable({
             }
         }
     }, [
-        handleFeatures,
-        visibleFields,
-        fetchWrapper,
-        makeSignal,
-        pageSize,
+        pages,
+        columns,
         orderBy,
         version,
-        pages,
-        query,
-        queryIntersects,
+        pageSize,
+        resourceId,
+        queryParams,
+        visibleFields,
+        handleFeatures,
+        makeSignal,
         abort,
     ]);
 
@@ -310,19 +275,7 @@ export function useFeatureTable({
         }
         prevVersion.current = version;
         debouncedFn(queryFn);
-    }, [
-        visibleFields,
-        hasNextPage,
-        pageSize,
-        orderBy,
-        queryFn,
-        version,
-        query,
-        queryIntersects,
-        total,
-        pages,
-        data,
-    ]);
+    }, [hasNextPage, pageSize, queryFn, version, total, pages, data]);
 
     // Update prevTotal only after useEffect with queryFn call!
     useEffect(() => {
@@ -331,7 +284,7 @@ export function useFeatureTable({
 
     useEffect(() => {
         setData([]);
-    }, [orderBy, query, queryIntersects, visibleFields]);
+    }, [orderBy, queryParams, visibleFields]);
 
     useEffect(() => {
         if (getTotalSize()) {
@@ -339,7 +292,7 @@ export function useFeatureTable({
         }
         // to init first loading
         setQueryTotal(pageSize);
-    }, [query, queryIntersects, pageSize, scrollToIndex, getTotalSize, total]);
+    }, [queryParams, pageSize, scrollToIndex, getTotalSize, total]);
 
     useEffect(() => {
         const items = [...virtualItems];
