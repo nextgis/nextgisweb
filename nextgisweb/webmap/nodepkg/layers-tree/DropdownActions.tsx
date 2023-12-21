@@ -82,7 +82,7 @@ export function DropdownActions({
                     label: title,
                 });
             } else if (render) {
-                const RenderedPlugin = () => render(pluginInfo);
+                const RenderedPlugin = () => render.call(plugin, pluginInfo);
                 customMenuItems.push(<RenderedPlugin key={keyPlugin} />);
             }
         }
