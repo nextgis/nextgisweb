@@ -39,4 +39,5 @@ def server(
     app = config.make_wsgi_app()
     logger.debug("WSGI application created")
 
-    serve(app, host=host, port=port, threads=1, clear_untrusted_proxy_headers=True)
+    # NOTE: Don't need to clear untrusted headers for a development-only server
+    serve(app, host=host, port=port, threads=1, clear_untrusted_proxy_headers=False)

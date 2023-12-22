@@ -66,7 +66,7 @@ def factory(handler, registry, *, comp: AuditComponent):
             body_request = body["request"] = dict(
                 method=request.method,
                 path=request.path,
-                remote_addr=request.remote_addr,
+                remote_addr=request.client_addr,
             )
 
             qstring = request.query_string
