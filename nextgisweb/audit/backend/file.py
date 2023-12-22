@@ -12,7 +12,8 @@ class FileBackend(BackendBase):
 
     def __init__(self, comp: AuditComponent) -> None:
         super().__init__(comp)
-        self.fd = io.open(self.options["path"], "a")
+        # NOTE: Buffering = 1 for line buffering
+        self.fd = io.open(self.options["path"], "a", buffering=1)
 
     def _write(self, tstamp, body):
         print('{"@timestamp":' + dumps(tstamp) + "," + dumps(body)[1:], file=self.fd)
