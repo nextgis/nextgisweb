@@ -66,12 +66,16 @@ class FeatureAttachment(Base):
                             pass
                         else:
                             _file_meta["timestamp"] = tstamp
-                if xmp := image.getxmp():
-                    if rdf_desc := xmp.get("xmpmeta", {}).get("RDF", {}).get("Description", {}):
-                        if isinstance(rdf_desc, list):
-                            rdf_desc = rdf_desc[0] if len(rdf_desc) > 0 else {}
-                        if projection := rdf_desc.get("ProjectionType"):
-                            _file_meta["panorama"] = {"ProjectionType": projection}
+                if (
+                    (xmp_root := image.getxmp())
+                    and (xmp_meta := xmp_root.get("xmpmeta"))
+                    and (xmp_rdf := xmp_meta.get("RDF"))
+                    and (xmp_desc := xmp_rdf.get("Description"))
+                ):
+                    if isinstance(xmp_desc, list):
+                        xmp_desc = xmp_desc[0] if len(xmp_desc) > 0 else {}
+                    if projection := xmp_desc.get("ProjectionType"):
+                        _file_meta["panorama"] = {"ProjectionType": projection}
         self.file_meta = _file_meta
 
     @property

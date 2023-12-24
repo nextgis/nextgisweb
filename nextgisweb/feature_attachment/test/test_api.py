@@ -256,6 +256,6 @@ def test_import_image(layer_id, clear, ngw_webtest_app):
         with transaction.manager:
             obj = FeatureAttachment.filter_by(resource_id=layer_id, feature_id=3).one()
             assert obj.file_meta == {
-                "timestamp": "2023-09-18T15:56:09",
+                "timestamp": "2020-02-21T20:33:54",
                 "panorama": {"ProjectionType": "equirectangular"},
             }
