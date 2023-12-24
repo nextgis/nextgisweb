@@ -291,6 +291,9 @@ class WebMapItem(Base):
 
             self.children.append(item)
 
+    def scale_range(self):
+        return (self.layer_min_scale_denom, self.layer_max_scale_denom)
+
 
 @event.listens_for(WebMapItem, "load")
 def load_webmap_item_children(target, context):

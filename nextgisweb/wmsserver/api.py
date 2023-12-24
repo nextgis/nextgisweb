@@ -24,7 +24,9 @@ from nextgisweb.render import (
     FORMAT_JPEG,
     FORMAT_PNG,
     ILegendableStyle,
+    IRenderableScaleRange,
     image_encoder_factory,
+    scale_range_intersection,
 )
 from nextgisweb.resource import DataScope, ServiceScope, resource_factory
 from nextgisweb.spatial_ref_sys import SRS
@@ -283,8 +285,12 @@ def _get_map(obj, params, request):
         res = lobj.resource
         request.resource_permission(DataScope.read, res)
 
-        if (lobj.min_scale_denom is None or lobj.min_scale_denom >= w_scale) and (
-            lobj.max_scale_denom is None or w_scale >= lobj.max_scale_denom
+        scale_range = lobj.scale_range()
+        if IRenderableScaleRange.providedBy(res):
+            scale_range = scale_range_intersection(scale_range, res.scale_range())
+
+        if (scale_range[0] is None or scale_range[0] >= w_scale) and (
+            scale_range[1] is None or w_scale >= scale_range[1]
         ):
             req = res.render_request(res.srs)
 

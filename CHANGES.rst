@@ -12,7 +12,7 @@ Changes
 - Ability to refresh feature tables from UI.
 - Support for OpenID Connect UserInfo endpoint.
 - Improved handling of date and time inputs.
-
+- Autodetection of scale ranges of layers for webmaps and WMS services.
 
 
 4.5.0

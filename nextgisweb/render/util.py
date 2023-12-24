@@ -91,3 +91,24 @@ def zxy_from_request(request):
             )
 
     return result
+
+
+def scale_range_intersection(a, b):
+    min_a, max_a = a
+    min_b, max_b = b
+
+    if min_a is None:
+        min_i = min_b
+    elif min_b is None:
+        min_i = min_a
+    else:
+        min_i = min(min_a, min_b)
+
+    if max_a is None:
+        max_i = max_b
+    elif max_b is None:
+        max_i = max_a
+    else:
+        max_i = max(max_a, max_b)
+
+    return (min_i, max_i)

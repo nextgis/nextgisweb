@@ -31,6 +31,11 @@ class IRenderableNonCached(IRenderableStyle):
     pass
 
 
+class IRenderableScaleRange(IRenderableStyle):
+    def scale_range(self):
+        pass
+
+
 @adapter_hooks.append
 def style_adapter_hook(iface, param):
     if (

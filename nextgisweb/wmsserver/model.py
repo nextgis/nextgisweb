@@ -69,6 +69,9 @@ class Layer(Base):
 
         return value
 
+    def scale_range(self):
+        return (self.min_scale_denom, self.max_scale_denom)
+
 
 class _layers_attr(SP):
     def getter(self, srlzr):

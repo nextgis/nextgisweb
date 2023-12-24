@@ -12,8 +12,10 @@ from .interface import (
     IExtentRenderRequest,
     ILegendableStyle,
     IRenderableNonCached,
+    IRenderableScaleRange,
     IRenderableStyle,
     ITileRenderRequest,
 )
 from .legend import ILegendSymbols, LegendSymbol
 from .model import ResourceTileCache
+from .util import scale_range_intersection
