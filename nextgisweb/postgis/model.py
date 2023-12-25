@@ -628,7 +628,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         idcol = tab.columns[self.layer.column_id]
         columns = [idcol.label("id")]
-        where = []
+        where = [idcol.isnot(None)]
 
         geomcol = tab.columns[self.layer.column_geom]
 
