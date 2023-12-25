@@ -30,7 +30,10 @@ def setup_pyramid(comp, config):
 
     class PostgisMenu(DynItem):
         def build(self, args):
-            if isinstance(args.obj, (PostgisConnection, PostgisLayer)):
+            if (
+                isinstance(args.obj, (PostgisConnection, PostgisLayer))
+                and args.request.user.keyname != "guest"
+            ):
                 yield Link(
                     "extra/postgis-diagnostics",
                     _("Diagnostics"),
