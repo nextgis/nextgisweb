@@ -4,15 +4,15 @@ Changes
 4.6.0
 -----
 
+- Support for lookup tables for feature layer attributes.
 - Print to TIFF format in addition to PDF, JPEG and PNG.
+- Geometry-based filtering of feature tables on webmaps.
+- Autodetection of minimum and maximum scales for webmap and WMS layers.
+- Refresh feature tables after saving layer changes on webmaps.
 - Improved handling of ``id`` and ``fid`` attributes of vector layers.
-- Support for lookup tables for attributes.
-- Geometry based filtering of feature tables on webmaps.
-- Passing a zoom level to webmaps via ``zoom`` attribute.
-- Ability to refresh feature tables from UI.
-- Support for OpenID Connect UserInfo endpoint.
 - Improved handling of date and time inputs.
-- Autodetection of scale ranges of layers for webmaps and WMS services.
+- Passing a zoom level to webmaps via ``zoom`` attribute.
+- Support for OpenID Connect UserInfo endpoint.
 
 
 4.5.0
