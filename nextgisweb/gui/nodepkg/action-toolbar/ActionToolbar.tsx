@@ -4,8 +4,11 @@ import {
     isValidElement,
     useCallback,
     useMemo,
+    useRef,
 } from "react";
-import type { ReactElement, Ref } from "react";
+import type { ForwardedRef, ReactElement, Ref } from "react";
+
+import { useFit } from "../hook/useFit";
 
 import { useActionToolbar } from "./hook/useActionToolbar";
 import type {
@@ -27,11 +30,18 @@ function ActionToolbarInput<
         actionProps,
         children,
     }: ActionToolbarProps<P>,
-    ref: Ref<HTMLDivElement>
+    ref: ForwardedRef<HTMLDivElement>
 ) {
+    const toolbarRef = useRef<HTMLDivElement | null>(null);
+    const isFit = useFit({
+        ref: toolbarRef,
+        deps: [actions, rightActions, children],
+    });
+
     const { createButtonAction } = useActionToolbar({
         size,
         props: actionProps,
+        isFit,
     });
 
     const getAction = useCallback(
@@ -44,7 +54,13 @@ function ActionToolbarInput<
                 const ActionComponent = action as React.ComponentType<
                     Record<string, unknown>
                 >;
-                return <ActionComponent {...{ size, ...actionProps }} />;
+                return (
+                    <ActionComponent
+                        size={size}
+                        isFit={isFit}
+                        {...actionProps}
+                    />
+                );
             }
 
             if (action && typeof action === "object") {
@@ -53,7 +69,7 @@ function ActionToolbarInput<
 
             return null;
         },
-        [actionProps, createButtonAction, size]
+        [actionProps, createButtonAction, isFit, size]
     );
 
     const [leftActions_, rightActions_] = useMemo(() => {
@@ -84,7 +100,18 @@ function ActionToolbarInput<
     }, [actions, getAction, rightActions]);
 
     return (
-        <div ref={ref} className="action-toolbar" style={style}>
+        <div
+            ref={(node) => {
+                toolbarRef.current = node;
+                if (typeof ref === "function") {
+                    ref(node);
+                } else if (ref) {
+                    ref.current = node;
+                }
+            }}
+            className="action-toolbar"
+            style={style}
+        >
             {leftActions_.map((action, index) => (
                 <Fragment key={index}>{action}</Fragment>
             ))}

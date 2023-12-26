@@ -2,7 +2,10 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useMemo } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
+import type {
+    ActionToolbarAction,
+    CreateButtonActionProps,
+} from "@nextgisweb/gui/action-toolbar";
 import { Button, Input, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
 import showModal from "@nextgisweb/gui/showModal";
@@ -18,6 +21,7 @@ import { ExportAction } from "./component/ExportAction";
 import type { ActionProps } from "./type";
 
 import DeleteIcon from "@nextgisweb/icon/material/delete";
+import EditIcon from "@nextgisweb/icon/material/edit";
 import EditInNewpageIcon from "@nextgisweb/icon/material/launch";
 import OpenIcon from "@nextgisweb/icon/material/open_in_new";
 
@@ -104,42 +108,52 @@ export const FeatureGridActions = observer(
         if (!readonly) {
             defActions.push(
                 ...[
-                    <Space.Compact key="feature-item-edit">
-                        <Button
-                            disabled={!selectedIds.length}
-                            size={size}
-                            onClick={() => {
-                                if (selectedIds.length) {
-                                    const featureId = selectedIds[0];
-                                    showModal(FeatureEditorModal, {
-                                        editorOptions: {
-                                            featureId,
-                                            resourceId: id,
-                                            onSave: (e) => {
-                                                if (onSave) {
-                                                    onSave(e);
-                                                }
-                                            },
-                                        },
-                                    });
-                                }
-                            }}
-                        >
-                            {msgEditTitle}
-                        </Button>
-                        {editOnNewPage && (
-                            <Tooltip title={msgEditOnNewPage} key="leftButton">
+                    (props: CreateButtonActionProps) => (
+                        <Space.Compact key="feature-item-edit">
+                            <Tooltip title={!props.isFit && msgEditTitle}>
                                 <Button
                                     disabled={!selectedIds.length}
                                     size={size}
+                                    icon={<EditIcon />}
                                     onClick={() => {
-                                        goTo("feature_layer.feature.update");
+                                        if (selectedIds.length) {
+                                            const featureId = selectedIds[0];
+                                            showModal(FeatureEditorModal, {
+                                                editorOptions: {
+                                                    featureId,
+                                                    resourceId: id,
+                                                    onSave: (e) => {
+                                                        if (onSave) {
+                                                            onSave(e);
+                                                        }
+                                                    },
+                                                },
+                                            });
+                                        }
                                     }}
-                                    icon={<EditInNewpageIcon />}
-                                ></Button>
+                                >
+                                    {props.isFit && msgEditTitle}
+                                </Button>
                             </Tooltip>
-                        )}
-                    </Space.Compact>,
+                            {editOnNewPage && (
+                                <Tooltip
+                                    title={msgEditOnNewPage}
+                                    key="leftButton"
+                                >
+                                    <Button
+                                        disabled={!selectedIds.length}
+                                        size={size}
+                                        onClick={() => {
+                                            goTo(
+                                                "feature_layer.feature.update"
+                                            );
+                                        }}
+                                        icon={<EditInNewpageIcon />}
+                                    ></Button>
+                                </Tooltip>
+                            )}
+                        </Space.Compact>
+                    ),
                     {
                         onClick: () => {
                             confirmDelete({ onOk: handleDelete });

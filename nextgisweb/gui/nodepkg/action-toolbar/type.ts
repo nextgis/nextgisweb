@@ -9,6 +9,7 @@ export type CreateButtonActionProps = Record<string, any>;
 export interface UseActionToolbarProps {
     size?: SizeType;
     props?: CreateButtonActionProps;
+    isFit?: boolean;
 }
 
 export interface CreateButtonActionOptions<

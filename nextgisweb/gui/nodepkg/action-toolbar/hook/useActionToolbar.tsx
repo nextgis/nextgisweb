@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { Button } from "@nextgisweb/gui/antd";
+import { Button, Tooltip } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
 import type {
@@ -9,13 +9,17 @@ import type {
     UseActionToolbarProps,
 } from "../type";
 
-export function useActionToolbar({ size, props }: UseActionToolbarProps) {
+export function useActionToolbar({
+    size,
+    isFit,
+    props,
+}: UseActionToolbarProps) {
     const createButtonAction = useCallback(
         ({
-            action,
             icon,
-            disabled,
             title,
+            disabled,
+            action,
             ...rest
         }: CreateButtonActionOptions) => {
             const btnAction: ButtonProps = { size, ...rest };
@@ -30,12 +34,23 @@ export function useActionToolbar({ size, props }: UseActionToolbarProps) {
                     typeof disabled === "function" ? disabled(props) : disabled;
             }
 
-            if (typeof icon === "string") {
-                btnAction.icon = <SvgIcon icon={icon} fill="currentColor" />;
+            btnAction.icon =
+                typeof icon === "string" ? (
+                    <SvgIcon icon={icon} fill="currentColor" />
+                ) : (
+                    icon
+                );
+            if (!isFit && icon) {
+                return (
+                    <Tooltip title={title}>
+                        <Button {...btnAction} />
+                    </Tooltip>
+                );
             }
+
             return <Button {...btnAction}>{title}</Button>;
         },
-        [props, size]
+        [props, size, isFit]
     );
 
     return { createButtonAction };

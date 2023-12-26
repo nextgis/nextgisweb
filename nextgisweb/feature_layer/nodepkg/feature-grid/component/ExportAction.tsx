@@ -17,6 +17,7 @@ interface ExportActionProps {
     id: number;
     queryParams: QueryParams | null;
     size?: SizeType;
+    isFit?: boolean;
 }
 
 const exportFormats = settings.export_formats;
@@ -37,6 +38,7 @@ const quickExportKey = "quick-export";
 export const ExportAction = ({
     id,
     queryParams,
+    isFit,
     size = "middle",
 }: ExportActionProps) => {
     const { exportFeatureLayer, openExportPage, exportLoading } =
@@ -83,7 +85,7 @@ export const ExportAction = ({
     return (
         <Dropdown menu={menuProps}>
             <Button icon={<ExportIcon />} size={size} loading={exportLoading}>
-                {msgExport}
+                {isFit && msgExport}
             </Button>
         </Dropdown>
     );
