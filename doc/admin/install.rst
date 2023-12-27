@@ -23,7 +23,7 @@ System requirements
 
 - GDAL >= 3.
 
-- Node.js 16.x or higher and Yarn 1.x package manager. We recommend using
+- Node.js 20.x or higher and Yarn 1.x package manager. We recommend using
   NodeSource and Yarn package repositories.
 
 - PostgreSQL database with PostGIS and hstore extensions enabled:
@@ -71,8 +71,8 @@ First you need to install required packages:
 .. code-block:: none
 
   # apt install curl git
-  # curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - 
-  # add-apt-repository --yes --no-update "deb https://deb.nodesource.com/node_14.x $(lsb_release -sc) main"
+  # curl --silent https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | apt-key add - 
+  # add-apt-repository --yes --no-update "deb https://deb.nodesource.com/node_20.x nodistro main"
   # curl --silent https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
   # add-apt-repository --yes --no-update "deb https://dl.yarnpkg.com/debian/ stable main"
   # apt update

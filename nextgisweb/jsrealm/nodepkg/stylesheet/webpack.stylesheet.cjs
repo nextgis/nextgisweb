@@ -52,22 +52,8 @@ module.exports = defaults("stylesheet", {
                 use: ["css-loader"],
             },
             {
-                test: /\.(woff2?|ttf|eot)?$/,
-                use: [
-                    {
-                        loader: "file-loader",
-                        options: { outputPath: "font", name: "[name].[ext]" },
-                    },
-                ],
-            },
-            {
-                test: /\.(png|gif|svg)?$/,
-                use: [
-                    {
-                        loader: "file-loader",
-                        options: { outputPath: "image", name: "[name].[ext]" },
-                    },
-                ],
+                test: /\.(woff2?|ttf|eot|png|gif|svg)$/,
+                type: "asset/resource",
             },
         ],
     },

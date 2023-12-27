@@ -79,6 +79,7 @@ def install(
     ]
 
     package_json = dict(private=True)
+    package_json["engines"] = dict(node=">=20.0.0")
     package_json["nextgisweb"] = nextgisweb = dict()
 
     s_env = nextgisweb["env"] = dict()

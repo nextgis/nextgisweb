@@ -1,6 +1,12 @@
 Changes
 =======
 
+4.7.0
+-----
+
+- Update minimum required NodeJS version to 20.0.
+
+
 4.6.0
 -----
 

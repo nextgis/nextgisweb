@@ -1,6 +1,6 @@
 import ngwdocker
 
-ngwdocker.require_version(">=2.0.0.dev16")
+ngwdocker.require_version(">=2.0.0.dev19")
 
 from pathlib import Path
 
