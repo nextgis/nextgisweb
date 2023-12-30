@@ -1,4 +1,4 @@
-from nextgisweb.env.cli import EnvCommand, arg, cli
+from nextgisweb.env.cli import InTransactionCommand, arg, cli
 
 from .component import AuthComponent
 from .model import User
@@ -6,7 +6,7 @@ from .model import User
 
 @cli.command()
 def change_password(
-    self: EnvCommand.customize(use_transaction=True),
+    self: InTransactionCommand,
     keyname: str = arg(metavar="user"),
     password: str = arg(),
 ):
@@ -18,7 +18,7 @@ def change_password(
 
 @cli.command()
 def authenticate(
-    self: EnvCommand.customize(use_transaction=True),
+    self: InTransactionCommand,
     keyname: str = arg(metavar="user|group"),
     base_url: str = arg(),
     *,

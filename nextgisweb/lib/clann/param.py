@@ -4,6 +4,8 @@ from enum import Enum
 from functools import partial
 from typing import Any, List, Optional, Tuple, Union, get_args, get_origin
 
+from typing_extensions import Protocol
+
 from .argparse import ArgumentParser
 
 
@@ -139,5 +141,18 @@ class Param:
         return (["-" + self.short] if self.short else []) + ["--" + self.name.replace("_", "-")]
 
 
-opt = partial(Param, OPTION)
-arg = partial(Param, ARGUMENT)
+class OptArgFactory(Protocol):
+    def __call__(
+        self,
+        default: Any = NO_DEFAULT,
+        *,
+        short: Optional[str] = None,
+        flag: bool = False,
+        doc: Optional[str] = None,
+        **extra,
+    ) -> Any:
+        pass
+
+
+opt: OptArgFactory = partial(Param, OPTION)
+arg: OptArgFactory = partial(Param, ARGUMENT)

@@ -6,7 +6,7 @@ import transaction
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import DBSession
-from nextgisweb.env.cli import DryRunOptions, EnvCommand, arg, cli, opt
+from nextgisweb.env.cli import DryRunOptions, EnvCommand, UninitializedEnvCommand, arg, cli, opt
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.migration import (
     REVID_ZERO,
@@ -179,7 +179,7 @@ class status(RegistryMixin, EnvCommand):
 
 
 @migration.command()
-class create(RegistryMixin, EnvCommand.customize(env_initialize=False)):
+class create(RegistryMixin, UninitializedEnvCommand):
     """Create a new migration boilerplate"""
 
     format: str = opt(

@@ -61,10 +61,10 @@ class Group(Command):
         super().__init__(*args, **kwargs)
         self.members = list()
 
-    def command(self, *args, **kwargs):
+    def command(self, *args, **kwargs) -> Callable[..., Command]:
         return self._decorator_factory(Command, *args, **kwargs)
 
-    def group(self, *args, **kwargs):
+    def group(self, *args, **kwargs) -> Callable[..., Group]:
         return self._decorator_factory(Group, *args, **kwargs)
 
     def setup_parser(self, parser: ArgumentParser):

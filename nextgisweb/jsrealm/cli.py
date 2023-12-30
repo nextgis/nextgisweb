@@ -5,7 +5,7 @@ from subprocess import check_call
 from typing import List
 
 from nextgisweb.env import Env
-from nextgisweb.env.cli import EnvCommand, comp_cli
+from nextgisweb.env.cli import UninitializedEnvCommand, comp_cli
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.logging import logger
 
@@ -54,7 +54,7 @@ def create_tsconfig(npkgs: List[str]):
 
 @comp_cli.command()
 def install(
-    self: EnvCommand.customize(env_initialize=False),
+    self: UninitializedEnvCommand,
     *,
     env: Env,
     core: CoreComponent,

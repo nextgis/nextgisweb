@@ -1,7 +1,22 @@
+from typing import TYPE_CHECKING
+
 from nextgisweb.lib.clann import arg, opt
 
 from . import dump_config
-from .base import DryRunOptions, EnvCommand, EnvOptions, bootstrap, cli
+from .base import (
+    DryRunOptions,
+    EnvCommand,
+    EnvOptions,
+    InTransactionCommand,
+    UninitializedEnvCommand,
+    bootstrap,
+    cli,
+)
+
+if TYPE_CHECKING:
+    from nextgisweb.lib.clann import Group
+
+    comp_cli: Group
 
 
 def __getattr__(name):

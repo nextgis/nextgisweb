@@ -5,7 +5,7 @@ from time import sleep
 from typing import List
 
 from nextgisweb.env import DBSession
-from nextgisweb.env.cli import EnvCommand, arg, cli, opt
+from nextgisweb.env.cli import EnvCommand, UninitializedEnvCommand, arg, cli, opt
 from nextgisweb.lib.logging import logger
 
 from ..backup import pg_connection_options
@@ -72,7 +72,7 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 
 @cli.command()
 def psql(
-    self: EnvCommand.customize(env_initialize=False),
+    self: UninitializedEnvCommand,
     arg: List[str] = arg(nargs="..."),
 ):
     """Launch psql connected to database

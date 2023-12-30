@@ -1,6 +1,6 @@
 from typing import Optional
 
-from nextgisweb.env.cli import EnvCommand, cli, opt
+from nextgisweb.env.cli import UninitializedEnvCommand, cli, opt
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent
@@ -10,7 +10,7 @@ from .component import PyramidComponent
 
 @cli.command()
 def server(
-    self: EnvCommand.customize(env_initialize=False),
+    self: UninitializedEnvCommand,
     host: str = opt("0.0.0.0"),
     port: int = opt(8080),
     reload: Optional[bool] = opt(flag=True),
