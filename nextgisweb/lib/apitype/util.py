@@ -7,15 +7,14 @@ NoneType = type(None)
 
 
 def deannotated(tdef):
-    origin = get_origin(tdef)
-    if origin is not None and type(tdef) is _AnnotatedAlias:
-        return origin
+    if type(tdef) is _AnnotatedAlias and get_origin(tdef) is not None:
+        return get_args(tdef)[0]
     return tdef
 
 
 def expannotated(tdef):
     if type(tdef) is _AnnotatedAlias:
-        return get_origin(tdef), getattr(tdef, "__metadata__")
+        return get_args(tdef)[0], getattr(tdef, "__metadata__")
     return tdef, ()
 
 

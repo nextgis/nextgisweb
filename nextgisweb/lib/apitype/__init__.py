@@ -1,6 +1,6 @@
 from .http import ContentType, StatusCode
 from .param import param_decoder
-from .schema import AnyOf, AsJSON, JSONType, iter_anyof
+from .schema import AnyOf, AsJSON, JSONType, is_anyof, iter_anyof
 from .struct import OP, Default, Derived, ReadOnly, Required, flag, omit, struct_items
 from .struct import Default as DEF
 from .struct import ReadOnly as RO

@@ -9,7 +9,14 @@ from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
 
 from nextgisweb.env.package import pkginfo
-from nextgisweb.lib.apitype import ContentType, JSONType, is_optional, iter_anyof, param_decoder
+from nextgisweb.lib.apitype import (
+    ContentType,
+    JSONType,
+    is_anyof,
+    is_optional,
+    iter_anyof,
+    param_decoder,
+)
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 
@@ -298,7 +305,7 @@ class Configurator(PyramidConfigurator):
                     return_type = None
                 elif return_type is JSONType:
                     kwargs["renderer"] = "json"
-                elif is_json_type(return_type) or getattr(return_type, "_oneof", False):
+                elif is_json_type(return_type) or is_anyof(return_type):
                     kwargs["renderer"] = "msgspec"
 
             kwargs["meta"] = ViewMeta(
