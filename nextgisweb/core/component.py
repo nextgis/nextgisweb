@@ -12,9 +12,9 @@ from pathlib import Path
 from subprocess import check_output
 
 import requests
+import sqlalchemy.dialects.postgresql as postgresql
 from requests.exceptions import JSONDecodeError, RequestException
-from sqlalchemy import create_engine, inspect, text, types
-from sqlalchemy.dialects.postgresql import dialect as pg_dialect
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine.url import URL as EngineURL
 from sqlalchemy.engine.url import make_url as make_engine_url
 from sqlalchemy.exc import OperationalError
@@ -436,40 +436,39 @@ class CoreComponent(StorageComponentMixin, Component):
         metadata.bind = self.engine
         inspector = inspect(self.engine)
 
-        def type_repr(ctype):
-            return ctype.compile(pg_dialect()).replace(",", ", ").upper()
+        def ct_compile(coltype, _dialect=postgresql.dialect()):
+            return coltype.compile(_dialect)
 
-        def type_compare(t1: types.TypeEngine, t2: types.TypeEngine):
-            c1, c2 = type(t1), type(t2)
-            if c1 is types.NUMERIC:
-                c1 = types.Numeric
-            elif c1 is types.VARCHAR:
-                c1 = types.String
-            return issubclass(c2, c1) or issubclass(c1, c2)
+        for tab in metadata.tables.values():
+            tab_name, tab_schema = tab.name, tab.schema
+            tab_repr = (f"{tab_schema}." if tab_schema else "") + tab_name
+            tab_msg = f"Table '{tab_repr}'"
 
-        for table in metadata.tables.values():
-            table_repr = (
-                (table.schema + "." + table.name) if (table.schema is not None) else table.name
-            )
-
-            if not table.exists():
-                yield f"Table '{table_repr}' not found."
+            if not inspector.has_table(tab_name, tab_schema):
+                yield f"Table '{tab_repr}' not found."
                 continue
 
-            db_columns = {c["name"]: c for c in inspector.get_columns(table.name, table.schema)}
+            cols_act = {c["name"]: c for c in inspector.get_columns(tab_name, tab_schema)}
+            type_remap = {"FLOAT": "DOUBLE PRECISION", "DECIMAL": "NUMERIC"}
 
-            for column in table.columns:
-                if column.name not in db_columns:
-                    yield f"Column '{column.name}' of table '{table_repr}' not found."
-                    continue
+            for col_exp in tab.columns:
+                col_msg = f"{tab_msg}, column '{col_exp.name}'"
 
-                db_column = db_columns[column.name]
-                t1, t2 = db_column["type"], column.type
-                if not type_compare(t1, t2):
-                    yield (
-                        f"Column '{column.name}' type of table '{table_repr}' doesn't match. "
-                        f"{type_repr(t2)} expected, but got {type_repr(t1)}."
-                    )
+                if col_act := cols_act.pop(col_exp.name, None):
+                    type_exp = col_exp.type
+                    type_act = col_act["type"]
+
+                    sql_exp = ct_compile(type_exp)
+                    sql_exp = type_remap.get(sql_exp, sql_exp)
+                    sql_act = ct_compile(type_act)
+
+                    if sql_act != sql_exp:
+                        yield f"{col_msg}: type mismatch ({sql_exp} <> {sql_act})."
+                else:
+                    yield f"{col_msg}: not found."
+
+            if len(cols_act) > 0:
+                yield f"{tab_msg}: extra columns found ({', '.join(cols_act.keys())})."
 
     # fmt: off
     option_annotations = (
