@@ -23,6 +23,7 @@ from ..component import CoreComponent
 def backup(
     self: EnvCommand,
     no_zip: bool = opt(False),
+    one_shot: bool = opt(False),
     target: Optional[str] = arg(metavar="path"),
     *,
     core: CoreComponent,
@@ -30,6 +31,7 @@ def backup(
     """Backup data into an archive
 
     :param no_zip: Don't compress a backup with ZIP
+    :param one_shot: Don't record metadata about this backup
     :param target: Output file or directory"""
 
     opts = core.options.with_prefix("backup")
@@ -88,11 +90,16 @@ def backup(
     with tgt_context() as tgt:
         mod.backup(self.env, tgt)
 
+    if not one_shot:
+        with transaction.manager:
+            core.settings_set(
+                core.identity,
+                "last_backup",
+                datetime.utcnow().isoformat(),
+            )
+
     if not to_stdout:
         print(target)
-
-    with transaction.manager:
-        core.settings_set(core.identity, "last_backup", datetime.utcnow().isoformat())
 
 
 @cli.command()

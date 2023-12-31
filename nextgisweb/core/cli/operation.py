@@ -111,22 +111,29 @@ def psql(
 def maintenance(
     self: EnvCommand,
     estimate_storage: bool = opt(False),
+    one_shot: bool = opt(False),
     *,
     core: CoreComponent,
 ):
     """Perform housekeeping tasks
 
-    :param estimate_storage: Execute storage estimation after maintenance"""
+    :param estimate_storage: Execute storage estimation after maintenance
+    :param one_shot: Don't record metadata about this maintenance"""
 
     for comp in self.env.chain("maintenance"):
         logger.debug("Maintenance for component: %s...", comp.identity)
         comp.maintenance()
 
+    if not one_shot:
+        with transaction.manager:
+            core.settings_set(
+                core.identity,
+                "last_maintenance",
+                datetime.utcnow().isoformat(),
+            )
+
     if estimate_storage:
         core.estimate_storage_all()
-
-    with transaction.manager:
-        core.settings_set(core.identity, "last_maintenance", datetime.utcnow().isoformat())
 
 
 @cli.command()
