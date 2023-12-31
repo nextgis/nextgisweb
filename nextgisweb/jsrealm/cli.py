@@ -1,11 +1,13 @@
 import json
+import os
+import shutil
 from itertools import chain
 from pathlib import Path
 from subprocess import check_call
 from typing import List
 
 from nextgisweb.env import Env
-from nextgisweb.env.cli import UninitializedEnvCommand, comp_cli
+from nextgisweb.env.cli import UninitializedEnvCommand, comp_cli, opt
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.logging import logger
 
@@ -45,7 +47,9 @@ def create_tsconfig(npkgs: List[str]):
         include.append("{}/**/*.tsx".format(pkg))
 
     tsconfig_json = dict(
-        compilerOptions=compiler_options, include=include, exclude=["node_modules"]
+        compilerOptions=compiler_options,
+        include=include,
+        exclude=["node_modules"],
     )
 
     with open("tsconfig.json", "w") as fd:
@@ -55,13 +59,23 @@ def create_tsconfig(npkgs: List[str]):
 @comp_cli.command()
 def install(
     self: UninitializedEnvCommand,
+    watch: bool = opt(False),
+    build: bool = opt(False),
     *,
     env: Env,
     core: CoreComponent,
     pyramid: PyramidComponent,
     jsrealm: JSRealmComponent,
 ):
+    """Setup JavaScript environment
+
+    :param watch: Start `yarn run watch` after installation
+    :param build: Start `yarn run build` after installation"""
+
     from babel.messages.plurals import PLURALS
+
+    if watch and build:
+        raise RuntimeError("Flags --watch and --build are mutually exclusive.")
 
     debug = core.options["debug"]
     cwd = Path().resolve()
@@ -117,7 +131,7 @@ def install(
     targets = s_jsrealm["targets"] = dict()
     for k in FAMILIES.keys():
         r = o_pyramid[f"uacompat.{k}"]
-        if type(r) == bool:
+        if isinstance(r, bool):
             continue
         targets[k] = r
 
@@ -149,3 +163,12 @@ def install(
             tf.symlink_to((ngw_root / lc).relative_to(pkg_root))
 
     check_call(["yarn", "install"])
+
+    if watch or build:
+        yarn_path = shutil.which("yarn")
+        assert yarn_path is not None
+        os.execve(
+            yarn_path,
+            ["run"] + ["watch" if watch else "build"],
+            env=os.environ,
+        )
