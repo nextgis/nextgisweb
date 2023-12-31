@@ -272,23 +272,13 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             if len(_where_filter_sql) > 0:
                 where.append(db.and_(_where_filter_sql))
 
-        if self._like:
-            _where_like = []
-            for f in tableinfo.fields:
-                _where_like.append(cast(table.columns[f.key], db.Unicode).like(f"%{self._like}%"))
-
-            if len(_where_like) > 0:
-                where.append(db.or_(*_where_like))
-
-        elif self._ilike:
-            _where_ilike = []
-            for f in tableinfo.fields:
-                _where_ilike.append(
-                    cast(table.columns[f.key], db.Unicode).ilike(f"%{self._ilike}%")
-                )
-
-            if len(_where_ilike) > 0:
-                where.append(db.or_(*_where_ilike))
+        if self._like or self._ilike:
+            operands = [cast(table.columns[f.key], db.Unicode) for f in tableinfo.fields]
+            if len(operands) == 0:
+                where.append(False)
+            else:
+                method, value = ("like", self._like) if self._like else ("ilike", self._ilike)
+                where.append(db.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
 
         if self._intersects:
             reproject = (
