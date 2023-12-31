@@ -133,7 +133,8 @@ class CoreComponent(StorageComponentMixin, Component):
 
         if (
             (free_inodes := self.options["healthcheck.free_inodes"]) > 0
-            and stat.f_ffree >= 0 and stat.f_files >= 0  # Not available in some FS
+            and stat.f_ffree >= 0
+            and stat.f_files >= 0  # Not available in some FS
         ):
             if (free_inodes_current := stat.f_ffree / stat.f_files * 100) < free_inodes:
                 return dict(
@@ -166,6 +167,20 @@ class CoreComponent(StorageComponentMixin, Component):
             return dict(success=False, message="Database connection failed: " + msg)
 
         sa_engine.dispose()
+
+        if (
+            (delta := self.options["backup.interval"]) is not None
+            and (last := self.settings_get(self.identity, "last_backup", None)) is not None
+            and (datetime.utcnow() - datetime.fromisoformat(last)) > delta
+        ):
+            return dict(success=False, message="Backup has not been performed on time.")
+
+        if (
+            (delta := self.options["maintenance.interval"]) is not None
+            and (last := self.settings_get(self.identity, "last_maintenance", None)) is not None
+            and (datetime.utcnow() - datetime.fromisoformat(last)) > delta
+        ):
+            return dict(success=False, message="Maintenance has not been performed on time.")
 
         return dict(success=True)
 
@@ -490,6 +505,8 @@ class CoreComponent(StorageComponentMixin, Component):
         Option("backup.tmpdir", default=None, doc=(
             "Temporary directory used for backup integrity and archive "
             "packing/unpacking.")),
+        Option("backup.interval", timedelta, default=None, doc=(
+            "Planned backup interval, if exceeded, heathcheck will fail.")),
         # Estimate storage
         Option("storage.enabled", bool, default=False),
         Option("storage.limit", SizeInBytes, default=None, doc=("Storage limit.")),
@@ -509,6 +526,8 @@ class CoreComponent(StorageComponentMixin, Component):
         Option("support_url", default="https://nextgis.com/redirect/{lang}/contact/"),
         Option("provision.instance_id", default=None),
         Option("provision.system.title", default=None),
+        Option("maintenance.interval", timedelta, default=None, doc=(
+            "Planned maintenance interval, if exceeded, heathcheck will fail.")),
         # Debug settings
         Option("debug", bool, default=False, doc=("Enable additional debug tools.")),
     )

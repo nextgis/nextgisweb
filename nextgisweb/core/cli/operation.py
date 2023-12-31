@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from time import sleep
 from typing import List
 
+import transaction
+
 from nextgisweb.env import DBSession
 from nextgisweb.env.cli import EnvCommand, UninitializedEnvCommand, arg, cli, opt
 from nextgisweb.lib.logging import logger
@@ -122,6 +124,9 @@ def maintenance(
 
     if estimate_storage:
         core.estimate_storage_all()
+
+    with transaction.manager:
+        core.settings_set(core.identity, "last_maintenance", datetime.utcnow().isoformat())
 
 
 @cli.command()

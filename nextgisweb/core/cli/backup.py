@@ -10,6 +10,8 @@ from tempfile import TemporaryDirectory, mkdtemp, mkstemp
 from typing import Optional
 from zipfile import ZipFile, is_zipfile
 
+import transaction
+
 from nextgisweb.env.cli import EnvCommand, arg, cli, opt
 from nextgisweb.lib.logging import logger
 
@@ -88,6 +90,9 @@ def backup(
 
     if not to_stdout:
         print(target)
+
+    with transaction.manager:
+        core.settings_set(core.identity, "last_backup", datetime.utcnow().isoformat())
 
 
 @cli.command()
