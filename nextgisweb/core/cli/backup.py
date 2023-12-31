@@ -45,6 +45,7 @@ def backup(
 
     to_stdout = target == "-"
 
+    started_at = datetime.utcnow()
     tmp_root = opts.get("tmpdir", None if to_stdout else path_split(target)[0])
 
     if not to_stdout and path_exists(target):
@@ -95,7 +96,7 @@ def backup(
             core.settings_set(
                 core.identity,
                 "last_backup",
-                datetime.utcnow().isoformat(),
+                started_at.isoformat(),
             )
 
     if not to_stdout:
