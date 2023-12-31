@@ -131,3 +131,17 @@ Now you can start services back. It may look as follows:
 .. code-block:: none
 
   # systemctl start ngw.service ngw-maintenance.timer
+
+
+Upgrading PostgreSQL and PostGIS
+--------------------------------
+
+PostgreSQL and PostGIS can be upgraded as described in corresponding docs,
+including dump and restore major upgrades. But keep in mind the following:
+
+- After dump and restore during PostgreSQL upgrade, ownership of PostGIS tables
+  (``spatial_ref_sys``, etc.) can be lost. You will have to set it up again.
+
+- NextGIS Web manages the ``spatial_ref_sys`` table, but it will be overwritten
+  while restoring from a dump or upgrading PostGIS. So that, you will need to
+  execute ``nextgisweb spatial_ref_sys sync_postgis`` command after restoration.

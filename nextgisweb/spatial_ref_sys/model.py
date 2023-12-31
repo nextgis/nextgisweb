@@ -1,7 +1,8 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import declared_attr, relationship
+from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import Base
+from nextgisweb.env import Base, DBSession
 from nextgisweb.lib import db
 from nextgisweb.lib.osrhelper import sr_from_wkt
 
@@ -186,3 +187,17 @@ class SRSMixin:
     @declared_attr
     def srs(cls):
         return relationship("SRS", lazy="joined")
+
+
+def synchronize_postgis_spatial_ref_sys():
+    """Force PostGIS spatial_ref_sys table synchronization"""
+
+    # Delete all existing records and do update to run the synchronizaion
+    # trigger function. It will add missing rows.
+    query = f"""
+        TRUNCATE spatial_ref_sys;
+        UPDATE {SRS.__tablename__} SET id = id;
+    """
+
+    DBSession.connection().execute(sa.text(query))
+    mark_changed(DBSession())
