@@ -264,6 +264,11 @@ class TableCheck(LayerCheck):
             return
         self.success(_("Table found, table type is {}.").format(tins.table_type))
 
+        sql_has_privilege = """
+            SELECT has_table_privilege(
+                quote_ident(:schema) || '.' || quote_ident(:table), :privilege)
+        """
+
         for priv, req in (
             ("SELECT", True),
             ("INSERT", False),
@@ -271,12 +276,7 @@ class TableCheck(LayerCheck):
             ("DELETE", False),
         ):
             has_privilege = conn.execute(
-                sql.text(
-                    """
-                SELECT has_table_privilege(
-                    quote_ident(:schema) || '.' || quote_ident(:table), :privilege)
-            """
-                ),
+                sql.text(sql_has_privilege),
                 dict(schema=self.schema, table=self.table, privilege=priv),
             ).scalar()
             if has_privilege:

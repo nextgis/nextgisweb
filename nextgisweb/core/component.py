@@ -296,24 +296,18 @@ class CoreComponent(StorageComponentMixin, Component):
 
         postgres_version = DBSession.scalar(text("SHOW server_version"))
         postgres_version = re.sub(r"\s\(.*\)$", "", postgres_version)
-        postgres_extra = list(
-            DBSession.execute(
-                text(
-                    """
+
+        sql_extra = """
             SELECT datcollate, datctype FROM pg_database
-            WHERE datname = current_database()"""
-                )
-            ).first()
-        )
-        if DBSession.scalar(
-            text(
-                """
-            SELECT EXISTS(SELECT * FROM pg_proc WHERE proname = 'pgpro_edition')
+            WHERE datname = current_database()
         """
-            )
-        ):
+        postgres_extra = list(DBSession.execute(text(sql_extra)).first())
+
+        sql_postgrespro = "SELECT EXISTS(SELECT * FROM pg_proc WHERE proname = 'pgpro_edition')"
+        if DBSession.scalar(text(sql_postgrespro)):
             postgrespro_edition = DBSession.scalar(text("SELECT pgpro_edition()"))
             postgres_extra.append(f"Postgres Pro {postgrespro_edition.capitalize()}")
+
         result.append(("PostgreSQL", f"{postgres_version} ({', '.join(postgres_extra)})"))
 
         postgis_version = DBSession.scalar(text("SELECT PostGIS_Lib_Version()"))

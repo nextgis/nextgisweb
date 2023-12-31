@@ -69,17 +69,14 @@ class RenderComponent(Component):
 
         # Drop tables and collect tile cache UUIDs that should remain
         with transaction.manager:
-            for tablename, exists in DBSession.execute(
-                sa.text(
-                    """
+            sql_tables = """
                 SELECT t.tablename, r.resource_id IS NOT NULL
                 FROM pg_catalog.pg_tables t
                 LEFT JOIN resource_tile_cache r
                     ON replace(r.uuid::character varying, '-', '') = t.tablename::character varying
                 WHERE t.schemaname = 'tile_cache'
             """
-                )
-            ):
+            for tablename, exists in DBSession.execute(sa.text(sql_tables)):
                 if not exists:
                     DBSession.execute(sa.text('DROP TABLE "tile_cache"."%s"' % tablename))
                     deleted_tables += 1
@@ -171,9 +168,9 @@ class RenderComponent(Component):
     def estimate_storage(self):
         for tc in RTC.filter_by(enabled=True).all():
             tilestor, lock = tc.get_tilestor()
-            query_tile = (
-                "SELECT coalesce(sum(length(data) + 16), 0) FROM tile"  # with 4x int columns
-            )
+
+            # 16 bytes stand for 4 int columns (z, x, y)
+            query_tile = "SELECT coalesce(sum(length(data) + 16), 0) FROM tile"
             size_img = tilestor.execute(query_tile).fetchone()[0]
 
             query = sa.text('SELECT count(1) FROM tile_cache."{}"'.format(tc.uuid.hex))
