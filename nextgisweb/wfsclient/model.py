@@ -172,7 +172,7 @@ class WFSConnection(Base, Resource):
         for el in find_tags(root, "FeatureType"):
             srid = get_srid(find_tags(el, "DefaultCRS")[0].text)
 
-            is_supported = type(srid) == int
+            is_supported = isinstance(srid, int)
             if not is_supported:
                 continue
 

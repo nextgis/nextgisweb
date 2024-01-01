@@ -100,7 +100,7 @@ def deserialize_principal(src, obj, *, create: bool, auth: AuthComponent):
                 continue
             elif k == "member_of" and set(m.id for m in obj.member_of) == set(v):
                 continue
-            elif k == "password" and type(v) == bool:
+            elif k == "password" and isinstance(v, bool):
                 phash = obj.password_hash
                 if v and phash is None:
                     raise ValidationError(message=gettext("Password is not set."))

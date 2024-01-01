@@ -177,7 +177,7 @@ def test_serialization(key, value, ngw_webtest_app, webapp_handler):
                 obj = list(obj)
                 for i in range(len(obj)):
                     obj[i] = _tuple2list(obj[i])
-            elif type(obj) is dict:
+            elif isinstance(obj, dict):
                 for k, v in obj.items():
                     obj[k] = _tuple2list(v)
             return obj

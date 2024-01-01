@@ -35,7 +35,7 @@ _re_thin = re.compile(r"(?:^|.+_)(?:token(?!_type$)|code)(?:_.+|$)")
 
 @lazy_str
 def log_lazy_data(value):
-    if type(value) == str:
+    if isinstance(value, str):
         result = []
         for p in value.split("."):
             c = max(min(len(p) // 4, 6), 2)
@@ -44,7 +44,7 @@ def log_lazy_data(value):
             else:
                 result.append(p[0:c] + "*" + p[-c:])
         return ".".join(result)
-    elif type(value) == dict:
+    elif isinstance(value, dict):
         result = dict()
         for k, v in value.items():
             if type(v) in (str, dict):

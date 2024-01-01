@@ -101,7 +101,7 @@ def subscriber(event):
         fam_id, cur = fam_ver
         req = options[fam_id]
 
-        supported = req is True or (type(req) == int and req <= cur)
+        supported = req is True or (req and req <= cur)
 
         if not supported:
             hash = hash_header(ua_str)
@@ -142,10 +142,12 @@ def page(request):
         fam = FAMILIES[fam_id]
         req = request.env.pyramid.options[f"uacompat.{fam_id}"]
         ctx["fargs"] = dict(
-            name=fam.alias, current=str(cur), required=str(req) if type(req) == int else None
+            name=fam.alias,
+            current=str(cur),
+            required=str(req) if type(req) is int else None,  # noqa: E721
         )
 
-        supported = req is True or (type(req) == int and req <= cur)
+        supported = req is True or (req and req <= cur)
         ctx["mode"] = (
             "supported"
             if supported

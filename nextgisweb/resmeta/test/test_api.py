@@ -57,7 +57,7 @@ def test_item_type(value, ngw_webtest_app, resource_id):
 
     if value is None:
         assert value_saved is None
-    elif type(value) == float:
+    elif isinstance(value, float):
         assert value_saved == pytest.approx(value)
     else:
         assert value_saved == value

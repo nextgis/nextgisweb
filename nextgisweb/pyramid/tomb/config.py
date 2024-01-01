@@ -336,7 +336,7 @@ class Configurator(PyramidConfigurator):
             is_api = route.template.startswith("/api/")
             methods = set()
             for view in route.views:
-                if is_api and type(view.method) != str:
+                if is_api and not isinstance(view.method, str):
                     _warn_from_info(
                         f"View for route '{route.name}' has invalid or missing "
                         f"request method ({view.method}), which is required "

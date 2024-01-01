@@ -92,7 +92,7 @@ def openapi(introspector, prefix="/api/"):
 
         # Operations
         for view in route.views:
-            if type(view.method) != str or not view.openapi:
+            if not isinstance(view.method, str) or not view.openapi:
                 continue
 
             o_params, o_param = _pfact("query", style="form", explode=False)
@@ -100,7 +100,7 @@ def openapi(introspector, prefix="/api/"):
             # Handle operation overloading
             oper_pattern = route.wotypes
             oper_context = _context_str(view.context)
-            assert type(route.overloaded) == bool
+            assert isinstance(route.overloaded, bool)
             if route.overloaded:
                 oper_pattern += f"?context={oper_context}"
                 o_param("context", **_context_param(oper_context))
