@@ -91,6 +91,7 @@ const mediaContentTypes = [
     "image/png",
     "image/jpeg",
     "image/tiff",
+    "text/csv",
 ];
 const mediaContentTypesRegex = new RegExp(mediaContentTypes.join("|"));
 
