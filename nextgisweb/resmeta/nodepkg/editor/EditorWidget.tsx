@@ -1,33 +1,54 @@
 import { observer } from "mobx-react-lite";
 
 import { Input, InputNumber, Select } from "@nextgisweb/gui/antd";
+import type { InputNumberProps, InputProps } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
+import type {
+    RecordItem,
+    RecordOption,
+} from "@nextgisweb/gui/edi-table/store/RecordItem";
+import type {
+    ComponentProps,
+    EdiTableColumn,
+} from "@nextgisweb/gui/edi-table/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type {
+    EditorWidgetComponent,
+    EditorWidgetProps,
+} from "@nextgisweb/resource/type";
+
+import type { EditorStore } from "./EditorStore";
 
 const msgTypeToAdd = gettext("Type here to add a new key...");
 
 const { Option } = Select;
 
-const InputKey = observer(({ row, placeholder }) => {
-    return (
-        <Input
-            value={row.key}
-            onChange={(e) => {
-                const props = { key: e.target.value };
-                if (row.value === undefined) props.value = "";
-                row.update(props);
-            }}
-            bordered={false}
-            placeholder={placeholder ? msgTypeToAdd : undefined}
-        />
-    );
-});
+const InputKey = observer(
+    ({ row, placeholder }: ComponentProps<RecordItem>) => {
+        return (
+            <Input
+                value={row.key}
+                onChange={(e) => {
+                    const props: Partial<RecordOption> = {
+                        key: e.target.value,
+                    };
+                    if (row.value === undefined) {
+                        props.value = "";
+                    }
+                    row.update(props);
+                }}
+                bordered={false}
+                placeholder={placeholder ? msgTypeToAdd : undefined}
+            />
+        );
+    }
+);
 
-const InputValue = observer(({ row }) => {
+const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
     if (row.type === "string") {
         return (
             <Input
-                value={row.value}
+                value={row.value as InputProps["value"]}
                 onChange={(e) => {
                     row.update({ value: e.target.value });
                 }}
@@ -37,7 +58,7 @@ const InputValue = observer(({ row }) => {
     } else if (row.type === "number") {
         return (
             <InputNumber
-                value={row.value}
+                value={row.value as InputNumberProps["value"]}
                 controls={false}
                 onChange={(newValue) => {
                     row.update({ value: newValue });
@@ -64,7 +85,7 @@ const InputValue = observer(({ row }) => {
     return <></>;
 });
 
-const SelectType = observer(({ row }) => {
+const SelectType = observer(({ row }: ComponentProps<RecordItem>) => {
     return (
         <Select
             value={row.type}
@@ -82,7 +103,7 @@ const SelectType = observer(({ row }) => {
     );
 });
 
-const columns = [
+const columns: EdiTableColumn<RecordItem>[] = [
     {
         key: "key",
         title: gettext("Key"),
@@ -103,8 +124,12 @@ const columns = [
     },
 ];
 
-export const EditorWidget = observer(({ store }) => {
-    return <EdiTable {...{ store, columns }} rowKey="id" parentHeight />;
+export const EditorWidget: EditorWidgetComponent<
+    EditorWidgetProps<EditorStore>
+> = observer(({ store }) => {
+    return (
+        <EdiTable store={store} columns={columns} rowKey="id" parentHeight />
+    );
 });
 
 EditorWidget.title = gettext("Metadata");
