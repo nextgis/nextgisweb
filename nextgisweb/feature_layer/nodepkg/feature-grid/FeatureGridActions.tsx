@@ -126,6 +126,7 @@ export const FeatureGridActions = observer(
                                                         if (onSave) {
                                                             onSave(e);
                                                         }
+                                                        store.bumpVersion();
                                                     },
                                                 },
                                             });
