@@ -18,12 +18,14 @@
         "@types/dojo": "^1.9.47",
         "@types/react": "18.2.20",
         "@types/react-dom": "18.2.7",
+        "@types/papaparse": "^5.3.14",
         "antd": "^5.8.3",
         "dayjs": "^1.11.9",
         "mobx": "^6.10.0",
         "mobx-react-lite": "^4.0.5",
         "react": "18.2.0",
         "react-dom": "18.2.0",
-        "react-wrap-balancer": "^1.1.0"
+        "react-wrap-balancer": "^1.1.0",
+        "papaparse": "^5.4.1"
     }
 }
