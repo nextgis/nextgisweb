@@ -21,6 +21,8 @@ export interface FeatureLayerFieldCol extends FeatureLayerField {
     flex?: string;
 }
 
+export type EffectiveWidths = Record<string, number>;
+
 export interface ActionProps {
     id: number;
     size?: SizeType;

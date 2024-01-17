@@ -8,23 +8,21 @@ import { useThemeVariables } from "@nextgisweb/gui/hook";
 
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
+import { FeatureTableRows } from "./FeatureTableRows";
 import SortIcon from "./component/SortIcon";
 import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type { QueryParams } from "./hook/useFeatureTable";
 import type {
     ColOrder,
-    FeatureAttrs,
+    EffectiveWidths,
     FeatureLayerFieldCol,
     OrderBy,
     SetValue,
 } from "./type";
-import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 import { scrollbarWidth } from "./util/scrollbarWidth";
 
 import "./FeatureTable.less";
-
-type EffectiveWidths = Record<string, number>;
 
 interface FeatureTableProps {
     total: number;
@@ -200,89 +198,6 @@ const FeatureTable = observer(
             "font-weight-strong": "fontWeightStrong",
         });
 
-        const Rows = () => {
-            const firstVirtual = virtualItems[0];
-            if (!firstVirtual) {
-                return null;
-            }
-
-            const prepareCols = (row?: FeatureAttrs) => {
-                return (
-                    <>
-                        {columns.map((f) => {
-                            const val = row && row[f.keyname];
-                            const renderValue =
-                                val !== undefined
-                                    ? renderFeatureFieldValue(f, val)
-                                    : loadingCol();
-                            return (
-                                <div
-                                    key={f.id}
-                                    className="td"
-                                    style={{
-                                        width: `${effectiveWidths[f.id]}px`,
-                                    }}
-                                >
-                                    {renderValue}
-                                </div>
-                            );
-                        })}
-                    </>
-                );
-            };
-
-            return (
-                <>
-                    {virtualItems.map((virtualRow) => {
-                        let selectedKey: number | undefined = undefined;
-                        let className = "tr";
-
-                        const row = data.find(
-                            (d) => d.__rowIndex === virtualRow.index
-                        );
-                        if (row) {
-                            selectedKey = selectedIds.find(
-                                (s) => s === row[KEY_FIELD_KEYNAME]
-                            );
-                        }
-
-                        if (selectedKey) {
-                            className += " selected";
-                        }
-                        return (
-                            <div
-                                key={virtualRow.key}
-                                className={className}
-                                data-index={virtualRow.index}
-                                ref={measureElement}
-                                style={{
-                                    minHeight: `${rowMinHeight}px`,
-                                    transform: `translateY(${virtualRow.start}px)`,
-                                }}
-                                onClick={() => {
-                                    setSelectedIds((old) => {
-                                        if (selectedKey) {
-                                            return old.filter(
-                                                (o) => o !== selectedKey
-                                            );
-                                        } else if (row) {
-                                            const newId = row[
-                                                KEY_FIELD_KEYNAME
-                                            ] as number;
-                                            return [newId];
-                                        }
-                                        return old;
-                                    });
-                                }}
-                            >
-                                {prepareCols(row)}
-                            </div>
-                        );
-                    })}
-                </>
-            );
-        };
-
         let isEmpty = total === 0;
         if (queryMode && !isEmpty) {
             isEmpty = !hasNextPage && queryTotal === 0;
@@ -405,7 +320,21 @@ const FeatureTable = observer(
                             className="tbody"
                             style={{ height: getTotalSize() }}
                         >
-                            {effectiveWidths && <Rows />}
+                            {effectiveWidths && (
+                                <FeatureTableRows
+                                    {...{
+                                        effectiveWidths,
+                                        virtualItems,
+                                        rowMinHeight,
+                                        selectedIds,
+                                        columns,
+                                        data,
+                                        loadingCol,
+                                        measureElement,
+                                        setSelectedIds,
+                                    }}
+                                />
+                            )}
                         </div>
                     )}
                 </div>
