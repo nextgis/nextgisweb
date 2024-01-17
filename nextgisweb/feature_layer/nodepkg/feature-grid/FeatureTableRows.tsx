@@ -89,7 +89,15 @@ export function FeatureTableRows({
                             minHeight: `${rowMinHeight}px`,
                             transform: `translateY(${virtualRow.start}px)`,
                         }}
-                        onClick={() => {
+                        onClick={(e) => {
+                            // When you finish selecting text in a single row, it triggers a click event.
+                            // However, when selecting text across multiple rows, no click event is triggered.
+                            // The following technique is used to prevent the click event from firing during text selection within a single row.
+                            const selection = window.getSelection();
+                            if (selection && selection.toString().length > 0) {
+                                e.preventDefault();
+                                return;
+                            }
                             setSelectedIds((old) => {
                                 if (selectedKey) {
                                     return old.filter((o) => o !== selectedKey);
