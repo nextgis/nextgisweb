@@ -1,8 +1,5 @@
-#: amd/ngw-lookup-table/Widget.js:87 model.py:21 view.py:16
-msgid "Lookup table"
-msgstr "Справочник"
-
-#: amd/ngw-lookup-table/Widget.js:50 template/resource_section.mako:8
+#: amd/ngw-lookup-table/Widget.js:50 nodepkg/editor/EditorWidget.tsx:80
+#: template/resource_section.mako:8
 msgid "Key"
 msgstr "Ключ"
 
@@ -10,17 +7,35 @@ msgstr "Ключ"
 msgid "Type"
 msgstr "Тип"
 
-#: amd/ngw-lookup-table/Widget.js:66 template/resource_section.mako:9
+#: amd/ngw-lookup-table/Widget.js:68 nodepkg/editor/EditorWidget.tsx:86
+#: template/resource_section.mako:9
 msgid "Value"
 msgstr "Значение"
 
-#: amd/ngw-lookup-table/Widget.js:124
+#: amd/ngw-lookup-table/Widget.js:91 model.py:21
+#: nodepkg/editor/EditorWidget.tsx:145 view.py:16
+msgid "Lookup table"
+msgstr "Справочник"
+
+#: amd/ngw-lookup-table/Widget.js:132
 msgid "Add"
 msgstr "Добавить"
 
-#: amd/ngw-lookup-table/Widget.js:130
+#: amd/ngw-lookup-table/Widget.js:140
 msgid "Delete"
 msgstr "Удалить"
+
+#: nodepkg/editor/EditorWidget.tsx:36
+msgid "Type here to add a new item..."
+msgstr "Введите новый ключ здесь..."
+
+#: nodepkg/editor/EditorWidget.tsx:37
+msgid "Export"
+msgstr "Экспорт"
+
+#: nodepkg/editor/EditorWidget.tsx:38
+msgid "Import"
+msgstr "Импорт"
 
 #: template/resource_section.mako:3
 msgid "Items"

@@ -9,7 +9,7 @@ from .model import LookupTable
 class Widget(Widget):
     resource = LookupTable
     operation = ("create", "update")
-    amdmod = "ngw-lookup-table/Widget"
+    amdmod = "@nextgisweb/lookup-table/editor"
 
 
 def setup_pyramid(comp, config):

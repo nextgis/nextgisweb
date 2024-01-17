@@ -5,6 +5,7 @@ Changes
 -----
 
 - Update minimum required NodeJS version to 20.0.
+- Add export to CSV and import from CSV for lookup tables.
 
 
 4.6.0
