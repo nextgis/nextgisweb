@@ -1,13 +1,13 @@
 import type { VirtualItem } from "@tanstack/react-virtual";
 
-import { KEY_FIELD_KEYNAME } from "./constant";
+import { KEY_FIELD_KEYNAME } from "../constant";
 import type {
     EffectiveWidths,
     FeatureAttrs,
     FeatureLayerFieldCol,
     SetValue,
-} from "./type";
-import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
+} from "../type";
+import { renderFeatureFieldValue } from "../util/renderFeatureFieldValue";
 
 interface RowsProps {
     effectiveWidths: EffectiveWidths;

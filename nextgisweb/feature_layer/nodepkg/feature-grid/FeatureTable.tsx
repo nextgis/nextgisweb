@@ -1,30 +1,28 @@
 import debounce from "lodash-es/debounce";
 import { observer } from "mobx-react-lite";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import type { ReactNode } from "react";
-import Draggable from "react-draggable";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
-import { FeatureTableRows } from "./FeatureTableRows";
-import SortIcon from "./component/SortIcon";
+import { FeatureTableRows } from "./component/FeatureTableRows";
+import { HeaderCols } from "./component/HeaderCols";
+import { HeaderHandles } from "./component/HeaderHandles";
 import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type { QueryParams } from "./hook/useFeatureTable";
 import type {
-    ColOrder,
     EffectiveWidths,
     FeatureLayerFieldCol,
     OrderBy,
     SetValue,
 } from "./type";
-import { scrollbarWidth } from "./util/scrollbarWidth";
 
 import "./FeatureTable.less";
 
 interface FeatureTableProps {
+    empty: React.ReactElement;
     total: number;
     fields: FeatureLayerField[];
     version?: number;
@@ -37,13 +35,11 @@ interface FeatureTableProps {
     cleanSelectedOnFilter?: boolean;
     setSelectedIds: (ids: SetValue<number[]>) => void;
     loadingCol: () => string;
-    empty: () => ReactNode;
 }
-
-const RESIZE_HANDLE_WIDTH = 6;
 
 const FeatureTable = observer(
     ({
+        empty,
         total,
         fields,
         version,
@@ -55,7 +51,6 @@ const FeatureTable = observer(
         cleanSelectedOnFilter = true,
         setSelectedIds,
         loadingCol,
-        empty,
     }: FeatureTableProps) => {
         const tbodyRef = useRef<HTMLDivElement>(null);
         const theadRef = useRef<HTMLDivElement>(null);
@@ -140,29 +135,6 @@ const FeatureTable = observer(
             setSelectedIds,
         ]);
 
-        const scrollBarSize = useMemo<number>(() => scrollbarWidth(), []);
-
-        const toggleSorting = (keyname: string, curOrder: ColOrder = null) => {
-            if (keyname === KEY_FIELD_KEYNAME) {
-                setOrderBy(undefined);
-                return;
-            }
-            const sortOrderSeq: ColOrder[] = ["asc", "desc", null];
-            setOrderBy((old) => {
-                if (old) {
-                    const [oldSortKey, oldSortOrder] = old;
-                    if (oldSortKey === keyname) {
-                        curOrder = oldSortOrder;
-                    }
-                }
-                const curOrderIndex = sortOrderSeq.indexOf(curOrder);
-                const nextOrderIndex =
-                    (curOrderIndex + 1) % sortOrderSeq.length;
-                const nextOrder = sortOrderSeq[nextOrderIndex];
-                return [keyname, nextOrder];
-            });
-        };
-
         useLayoutEffect(() => {
             const tbodyRefElement = tbodyRef.current;
             if (!tbodyRefElement) {
@@ -203,95 +175,7 @@ const FeatureTable = observer(
             isEmpty = !hasNextPage && queryTotal === 0;
         }
 
-        const HeaderCols = () => {
-            return (
-                <>
-                    {columns
-                        .map((column) => {
-                            const {
-                                keyname,
-                                id,
-                                display_name: label,
-                                flex,
-                            } = column;
-                            const colSort =
-                                orderBy && orderBy[0] === keyname && orderBy[1];
-
-                            const style = userDefinedWidths[id]
-                                ? { flex: `0 0 ${userDefinedWidths[id]}px` }
-                                : { flex };
-
-                            return (
-                                <div
-                                    key={id}
-                                    ref={(element) => {
-                                        if (element) {
-                                            columnRef.current[id] = element;
-                                        }
-                                    }}
-                                    className="th"
-                                    style={style}
-                                    onClick={() => toggleSorting(keyname)}
-                                >
-                                    <div className="label">{label}</div>
-                                    {colSort && (
-                                        <div className="suffix">
-                                            <SortIcon dir={colSort} />
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })
-                        .concat([
-                            <div
-                                key="scrollbar"
-                                style={{ flex: `0 0 ${scrollBarSize}px` }}
-                            />,
-                        ])}
-                </>
-            );
-        };
-
-        const HeaderHandles = () => {
-            let cumWidth = 0;
-            return (
-                <>
-                    {columns.map(({ id }) => {
-                        const width = effectiveWidths[id];
-                        if (isNaN(width)) {
-                            return null;
-                        }
-                        cumWidth += width;
-                        return (
-                            <Draggable
-                                key={id}
-                                axis="x"
-                                defaultClassName="handle"
-                                defaultClassNameDragging="handle-dragging"
-                                defaultClassNameDragged="handle-dragged"
-                                onStop={(_, { lastX }) => {
-                                    setTimeout(() => {
-                                        setUserDefinedWidths((prev) => ({
-                                            ...prev,
-                                            [id]: width + lastX,
-                                        }));
-                                    });
-                                }}
-                            >
-                                <div
-                                    style={{
-                                        left:
-                                            cumWidth - RESIZE_HANDLE_WIDTH / 2,
-                                        width: RESIZE_HANDLE_WIDTH,
-                                    }}
-                                ></div>
-                            </Draggable>
-                        );
-                    })}
-                </>
-            );
-        };
-
+        const EmptyComponent = empty;
         return (
             <div
                 className="ngw-feature-layer-feature-table"
@@ -299,9 +183,21 @@ const FeatureTable = observer(
             >
                 <div ref={theadRef} className="thead">
                     <div className="tr">
-                        <HeaderCols />
+                        <HeaderCols
+                            userDefinedWidths={userDefinedWidths}
+                            columns={columns}
+                            orderBy={orderBy}
+                            columnRef={columnRef}
+                            setOrderBy={setOrderBy}
+                        />
                     </div>
-                    {effectiveWidths && <HeaderHandles />}
+                    {effectiveWidths && (
+                        <HeaderHandles
+                            columns={columns}
+                            effectiveWidths={effectiveWidths}
+                            setUserDefinedWidths={setUserDefinedWidths}
+                        />
+                    )}
                 </div>
                 <div
                     ref={tbodyRef}
@@ -313,8 +209,8 @@ const FeatureTable = observer(
                         }
                     }}
                 >
-                    {isEmpty && empty ? (
-                        empty()
+                    {isEmpty && EmptyComponent ? (
+                        EmptyComponent
                     ) : (
                         <div
                             className="tbody"

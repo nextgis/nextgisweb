@@ -1,6 +1,6 @@
 import isEqual from "lodash-es/isEqual";
 import { observer } from "mobx-react-lite";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
@@ -94,6 +94,11 @@ export const FeatureGrid = observer(
             }
         }, [onSelect, selectedIds]);
 
+        const empty = useMemo(
+            () => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />,
+            []
+        );
+
         if (!totalData || isLoading) {
             return <LoadingWrapper />;
         }
@@ -124,7 +129,7 @@ export const FeatureGrid = observer(
                 </FeatureGridActions>
 
                 <FeatureTable
-                    empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+                    empty={empty}
                     total={totalData.total_count}
                     fields={fields}
                     version={version}
