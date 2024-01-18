@@ -61,6 +61,10 @@ define([
             }
             this.inherited(arguments);
             this.set("value", null);
+            // Use a timeout here to get the value in dgrid editor
+            setTimeout(() => {
+                this.onChange();
+            }, 1000);
         },
     });
 });
