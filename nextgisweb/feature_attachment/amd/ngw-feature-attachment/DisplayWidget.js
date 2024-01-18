@@ -5,7 +5,7 @@ define([
     "dojo/on",
     "dojox/image/Lightbox",
     "put-selector/put",
-    "ngw-pyramid/route",
+    "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/DisplayWidget",
     // css
@@ -18,7 +18,7 @@ define([
     on,
     Lightbox,
     put,
-    route,
+    api,
     i18n,
     DisplayWidget
 ) {
@@ -67,13 +67,13 @@ define([
                 array.forEach(
                     images,
                     function (image) {
-                        var href = route.feature_attachment.download({
+                        var href = api.routeURL("feature_attachment.download", {
                             id: this.resourceId,
                             fid: this.featureId,
                             aid: image.id,
                         });
 
-                        var src = route.feature_attachment.image({
+                        var src = api.routeURL("feature_attachment.image", {
                             id: this.resourceId,
                             fid: this.featureId,
                             aid: image.id,
@@ -126,7 +126,7 @@ define([
                 array.forEach(
                     others,
                     function (a) {
-                        var href = route.feature_attachment.download({
+                        var href = api.routeURL("feature_attachment.download", {
                             id: this.resourceId,
                             fid: this.featureId,
                             aid: a.id,

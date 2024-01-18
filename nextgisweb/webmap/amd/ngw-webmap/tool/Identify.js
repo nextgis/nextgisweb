@@ -20,7 +20,6 @@ define([
     "dijit/form/Select",
     "dijit/form/Button",
     "put-selector/put",
-    "ngw-pyramid/route",
     "openlayers/ol",
     "ngw-webmap/ol/Popup",
     "@nextgisweb/pyramid/api",
@@ -58,7 +57,6 @@ define([
     Select,
     Button,
     put,
-    route,
     ol,
     Popup,
     api,
@@ -240,7 +238,10 @@ define([
             var widget = this,
                 lid = featureInfo.layerId,
                 fid = featureInfo.id,
-                iurl = route.feature_layer.feature.item({ id: lid, fid: fid });
+                iurl = api.routeURL("feature_layer.feature.item", {
+                    id: lid,
+                    fid: fid,
+                });
 
             domConstruct.empty(widget.featureContainer.domNode);
 
@@ -466,15 +467,13 @@ define([
                         this
                     );
 
-                    xhr.post(route.feature_layer.identify(), {
-                        handleAs: "json",
-                        data: json.stringify(request),
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }).then(function (response) {
-                        tool._responsePopup(response, point, layerLabels);
-                    });
+                    api.route("feature_layer.identify")
+                        .post({
+                            body: json.stringify(request),
+                        })
+                        .then(function (response) {
+                            tool._responsePopup(response, point, layerLabels);
+                        });
                 })
             );
         },
@@ -558,12 +557,12 @@ define([
             zoom
         ) {
             const identifyDeferred = new Deferred();
-            const urlGetLayerInfo = api.routeURL("resource.item", {
-                id: layerId,
-            });
-            const getLayerInfo = xhr.get(urlGetLayerInfo, {
-                handleAs: "json",
-            });
+
+            const getLayerInfo = api
+                .route("resource.item", {
+                    id: layerId,
+                })
+                .get();
 
             const query = {
                 limit: 1,
