@@ -21,6 +21,7 @@ _OPTIONS_LOGGING_LEVELS = ("critical", "error", "warning", "info", "debug")
 
 class Env(Container):
     components: Mapping[str, Component]
+    running_tests: bool = False
 
     def __init__(
         self,

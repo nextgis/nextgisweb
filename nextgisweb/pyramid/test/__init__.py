@@ -35,7 +35,7 @@ def ngw_httptest_factory(ngw_wsgi_test_helper):
 
 @pytest.fixture()
 def ngw_webtest_app(ngw_webtest_factory):
-    return ngw_webtest_factory()
+    yield ngw_webtest_factory()
 
 
 @pytest.fixture()

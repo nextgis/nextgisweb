@@ -35,6 +35,7 @@ def _env_initialize():
     if result:
         return result
     result = Env(initialize=True, set_global=True)
+    result.running_tests = True
     return result
 
 
