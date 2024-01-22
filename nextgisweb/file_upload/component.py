@@ -30,7 +30,9 @@ class FileUploadComponent(Component):
         mod = SourceFileLoader(
             "",
             os.path.join(
-                os.path.split(__file__)[0], "migration", "3803b726-cleanup-prev-format.py"
+                os.path.split(__file__)[0],
+                "migration",
+                "3803b726-cleanup-prev-format.py",
             ),
         ).load_module()
         mod.forward(SimpleNamespace(env=self.env))

@@ -18,6 +18,7 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode, struct_items
 from nextgisweb.core.exception import UserException
 
 from .component import FileUploadComponent
+from .model import FileId
 
 BUF_SIZE = 1024 * 1024
 
@@ -30,9 +31,6 @@ class UploadedFileTooLarge(UserException):
 class UploadNotCompleted(UserException):
     title = gettext("Upload is not completed")
     http_status_code = 405
-
-
-FileId = Annotated[str, Meta(min_length=32, max_length=32, pattern="^[0-9a-f]{32}$")]
 
 
 class FileUploadObject(Struct, kw_only=True):
