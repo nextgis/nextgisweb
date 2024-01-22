@@ -2,6 +2,7 @@ from sqlalchemy import exists, sql, text
 
 from nextgisweb.env import DBSession, env
 
+from .geometry import Geometry
 from .msgspec import Msgspec
 
 
