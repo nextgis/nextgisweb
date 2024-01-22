@@ -162,7 +162,7 @@ class Channels(Struct):
 
     def xml(self):
         _channel_selection = E.ChannelSelection()
-        for color in ('red', 'green', 'blue'):
+        for color in ("red", "green", "blue"):
             channel = getattr(self, color)
             if channel is not UNSET:
                 _channel = getattr(E, color.capitalize() + "Channel")(
