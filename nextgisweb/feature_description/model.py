@@ -15,5 +15,9 @@ class FeatureDescription(Base):
 
     resource = db.relationship(
         Resource,
-        backref=db.backref("__feature_description", cascade="all"),
+        backref=db.backref(
+            "_backref_feature_description",
+            cascade="all",
+            cascade_backrefs=False,
+        ),
     )

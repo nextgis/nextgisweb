@@ -52,7 +52,13 @@ class BasemapWebMap(Base):
     )
 
     resource = db.relationship(
-        Resource, foreign_keys=resource_id, backref=db.backref("_basemaps", cascade="all")
+        Resource,
+        foreign_keys=resource_id,
+        backref=db.backref(
+            "_backref_basemap_webmap",
+            cascade="all",
+            cascade_backrefs=False,
+        ),
     )
 
     def to_dict(self):
