@@ -16,4 +16,4 @@ def setup_pyramid(comp, config):
     @resource_sections(title=_("Lookup table"), priority=10)
     def resource_section(obj):
         if isinstance(obj, LookupTable):
-            return dict(items=obj.val.items())
+            return dict(lookup_value=obj.val)
