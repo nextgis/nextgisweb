@@ -91,6 +91,8 @@ def test_attributes(create_resource, ngw_resource_group_sub, ngw_httptest_app):
     with create_resource(
         ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
     ) as layer:
+        layer.persist()
+
         # IFeatureQuery
 
         query = layer.feature_query()
@@ -202,6 +204,8 @@ def test_geometry(create_resource, geom_type, ngw_resource_group_sub, ngw_httpte
     with create_resource(
         ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
     ) as layer:
+        layer.persist()
+
         # IFeatureQuery
 
         # - geom
@@ -245,6 +249,8 @@ def test_filtered_extent(
     with create_resource(
         ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
     ) as layer:
+        layer.persist()
+
         # Filtered extent
         query = layer.feature_query()
         if filter_ is not None:

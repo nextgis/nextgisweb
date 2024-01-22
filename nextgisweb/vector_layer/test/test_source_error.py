@@ -205,7 +205,6 @@ def test_create(filename, options, checks, ngw_txn):
         DBSession.expunge(obj)
     else:
         obj.from_source(src, **options)
-        DBSession.flush()
 
         if "geometry_type" in checks:
             exp_geometry_type = checks["geometry_type"]

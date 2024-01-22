@@ -2,8 +2,6 @@ from pathlib import Path
 
 import pytest
 
-from nextgisweb.env import DBSession
-
 from .. import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
@@ -53,8 +51,6 @@ for key, operator, should_be_true, should_be_false in check_list:
 @pytest.fixture
 def resource(ngw_txn):
     resource = VectorLayer().persist().from_ogr(DATA_PATH / "layer.geojson")
-
-    DBSession.flush()
     return resource
 
 

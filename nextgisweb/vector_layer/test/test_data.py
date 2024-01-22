@@ -5,8 +5,6 @@ import pytest
 import webtest
 from osgeo import ogr, osr
 
-from nextgisweb.env import DBSession
-
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import FIELD_TYPE
 
@@ -35,7 +33,6 @@ def test_from_fields(ngw_txn):
     res.persist()
 
     assert res.feature_label_field.keyname == "string"
-    DBSession.flush()
 
 
 @pytest.mark.parametrize(
@@ -48,9 +45,6 @@ def test_from_fields(ngw_txn):
 )
 def test_from_ogr(filename, ngw_txn):
     res = VectorLayer().persist().from_ogr(DATA_PATH / filename)
-
-    DBSession.flush()
-
     features = list(res.feature_query()())
     assert len(features) == 1
 
@@ -292,7 +286,6 @@ def test_error_limit():
 
     res.from_source(layer, **opts, skip_errors=True)
 
-    DBSession.flush()
     assert res.feature_query()().total_count == some
 
 
@@ -304,7 +297,6 @@ def test_geom_field():
         res.from_source(src)
 
     res.from_source(src, fix_errors=FIX_ERRORS.SAFE)
-    DBSession.flush()
 
     query = res.feature_query()
     feature = query().one()
@@ -329,7 +321,6 @@ def test_id_field(data):
         res.from_source(src, **fid_params)
 
     res.from_source(src, fix_errors=FIX_ERRORS.SAFE, **fid_params)
-    DBSession.flush()
 
     query = res.feature_query()
     feature = query().one()

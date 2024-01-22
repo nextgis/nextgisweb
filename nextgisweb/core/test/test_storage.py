@@ -72,7 +72,6 @@ def test_storage(ngw_env, ngw_webtest_app):
 
 def vector_layer():
     res = VectorLayer(geometry_type="POINT").persist()
-    res.setup_from_fields([])
     return res
 
 

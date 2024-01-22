@@ -6,7 +6,6 @@ import pytest
 import transaction
 import webtest
 
-from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.json import dumpb
 
@@ -24,11 +23,6 @@ DATA_PATH = Path(__file__).parent / "data"
 def layer_id():
     with transaction.manager:
         res = VectorLayer(geometry_type="POINT").persist()
-
-        res.setup_from_fields([])
-
-        DBSession.flush()
-
         for _ in range(3):
             f = Feature()
             f.geom = Geometry.from_wkt("POINT (0 0)")

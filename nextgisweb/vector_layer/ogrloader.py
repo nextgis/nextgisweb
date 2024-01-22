@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 import sqlalchemy as sa
 from osgeo import ogr, osr
 
-from nextgisweb.env import DBSession, _
+from nextgisweb.env import _
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
 from nextgisweb.lib.registry import DictRegistry
@@ -418,7 +418,16 @@ class OGRLoader:
         self.fields = fields
         return self
 
-    def write(self, *, schema: str, table: str, sequence: str, srs: SRS, columns: Dict[int, str]):
+    def write(
+        self,
+        *,
+        srs: SRS,
+        schema: str,
+        table: str,
+        sequence: str,
+        columns: Dict[int, str],
+        connection: sa.engine.Connection,
+    ):
         ogrlayer = self.ogrlayer
         params = self.params
 
@@ -478,7 +487,7 @@ class OGRLoader:
             if data is not None:
                 chunk.append(data)
             if len(chunk) >= 1000 or (flush and len(chunk) > 0):
-                DBSession.execute(query_insert, chunk)
+                connection.execute(query_insert, chunk)
                 feature_count += len(chunk)
                 chunk.clear()
 
@@ -549,9 +558,9 @@ class OGRLoader:
 
         # Set sequence next value
         if fid_fget:
-            max_fid = DBSession.scalar(sa.text(f"SELECT MAX(id) FROM {tab_sn}"))
+            max_fid = connection.scalar(sa.text(f"SELECT MAX(id) FROM {tab_sn}"))
             sql_alter_seq = f"ALTER SEQUENCE {seq_sn} RESTART WITH {max_fid + 1}"
-            DBSession.execute(sa.text(sql_alter_seq))
+            connection.execute(sa.text(sql_alter_seq))
 
         return size
 

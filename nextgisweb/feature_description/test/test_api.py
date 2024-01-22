@@ -10,7 +10,6 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administ
 def layer_id():
     with transaction.manager:
         res = VectorLayer(geometry_type="POINT").persist()
-        res.setup_from_fields([])
 
     yield res.id
 

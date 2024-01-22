@@ -1,4 +1,4 @@
-import geoalchemy2 as ga
+import sqlalchemy as sa
 from shapely.geometry import box
 from sqlalchemy import cast, func, sql
 from sqlalchemy.sql import null
@@ -23,8 +23,6 @@ from nextgisweb.feature_layer import (
     IFeatureQuerySimplify,
 )
 from nextgisweb.spatial_ref_sys import SRS
-
-from .table_info import TableInfo
 
 
 @implementer(
@@ -101,18 +99,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._ilike = value
 
     def __call__(self):
-        tableinfo = TableInfo.from_layer(self.layer)
-        tableinfo.setup_metadata(self.layer._tablename)
-        table = tableinfo.table
+        table = self.layer.vlschema().ctab
 
         idcol = table.columns.id
+        geomcol = table.columns.geom
         columns = [idcol]
         where = []
 
-        geomcol = table.columns.geom
-
         srs = self.layer.srs if self._srs is None else self._srs
-
         if srs.id != self.layer.srs_id:
             geomexpr = func.st_transform(geomcol, srs.id)
         else:
@@ -147,19 +141,15 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             columns.append(geomexpr.label("geom"))
 
         selected_fields = []
-        for idx, fld in enumerate(tableinfo.fields):
-            if self._fields is None or fld.keyname in self._fields:
-                label = f"fld_{idx}"
-                columns.append(table.columns[fld.key].label(label))
-                selected_fields.append((fld.keyname, label))
+        for idx, (fld_k, fld_c) in enumerate(table.fields.items()):
+            if self._fields is None or fld_k in self._fields:
+                label = str(idx)
+                columns.append(fld_c.label(label))
+                selected_fields.append((fld_k, label))
 
         if self._filter_by:
             for k, v in self._filter_by.items():
-                if k == "id":
-                    where.append(idcol == v)
-                else:
-                    field = tableinfo.find_field(keyname=k)
-                    where.append(table.columns[field.key] == v)
+                where.append((idcol if k == "id" else table.fields[k]) == v)
 
         if self._filter:
             _where_filter = []
@@ -204,19 +194,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     v = null()
 
                 op = getattr(db.sql.operators, o)
-                if k == "id":
-                    column = idcol
-                else:
-                    field = tableinfo.find_field(keyname=k)
-                    column = table.columns[field.key]
-
+                column = idcol if k == "id" else table.fields[k]
                 _where_filter.append(op(column, v))
 
             if len(_where_filter) > 0:
                 where.append(db.and_(*_where_filter))
 
         if self._like or self._ilike:
-            operands = [cast(table.columns[f.key], db.Unicode) for f in tableinfo.fields]
+            operands = [cast(fld_c, db.Unicode) for fld_c in table.fields.values()]
             if len(operands) == 0:
                 where.append(False)
             else:
@@ -244,11 +229,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         order_criterion = []
         if self._order_by:
-            for order, colname in self._order_by:
-                field = tableinfo.find_field(keyname=colname)
-                order_criterion.append(
-                    dict(asc=db.asc, desc=db.desc)[order](table.columns[field.key])
-                )
+            for order, fld_k in self._order_by:
+                order_criterion.append(dict(asc=db.asc, desc=db.desc)[order](table.fields[fld_k]))
         order_criterion.append(db.asc(idcol))
 
         class QueryFeatureSet(FeatureSet):
@@ -304,47 +286,18 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             @property
             def extent(self):
-                return calculate_extent(self.layer, where, geomcol)
+                geom_clause = sa.select(geomcol).where(*where).subquery().c[0]
+                return calculate_extent(geom_clause)
 
         return QueryFeatureSet()
 
 
-def calculate_extent(layer, where=None, geomcol=None):
-    tableinfo = TableInfo.from_layer(layer)
-    tableinfo.setup_metadata(layer._tablename)
-
-    if not (where is None and geomcol is None) and len(where) > 0:
-        bbox = (
-            sql.select(
-                func.st_extent(
-                    func.st_transform(
-                        func.st_setsrid(cast(func.st_force2d(geomcol), ga.Geometry), layer.srs_id),
-                        4326,
-                    )
-                )
-            )
-            .where(db.and_(True, *where))
-            .label("bbox")
-        )
-    else:
-        bbox = func.st_extent(
-            func.st_transform(
-                func.st_setsrid(
-                    cast(func.st_force2d(tableinfo.geom_column), ga.Geometry), layer.srs_id
-                ),
-                4326,
-            )
-        ).label("bbox")
-    sq = DBSession.query(bbox).subquery()
-
-    fields = (
-        func.st_xmax(sq.c.bbox),
-        func.st_xmin(sq.c.bbox),
-        func.st_ymax(sq.c.bbox),
-        func.st_ymin(sq.c.bbox),
-    )
-    maxLon, minLon, maxLat, minLat = DBSession.query(*fields).one()
-
-    extent = dict(minLon=minLon, maxLon=maxLon, minLat=minLat, maxLat=maxLat)
-
-    return extent
+def calculate_extent(geom_clause):
+    bbox = func.st_extent(func.st_transform(geom_clause, sa.text("4326")))
+    row = DBSession.query(
+        func.st_xmin(bbox).label("minLon"),
+        func.st_ymin(bbox).label("minLat"),
+        func.st_xmax(bbox).label("maxLon"),
+        func.st_ymax(bbox).label("maxLat"),
+    ).one()
+    return dict(row._mapping)

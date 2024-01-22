@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from nextgisweb.env import COMP_ID
 from nextgisweb.lib import db
 from nextgisweb.lib.ogrhelper import read_dataset
@@ -74,3 +76,7 @@ def fix_encoding(s):
 
 def utf8len(s):
     return len(s.encode("utf-8"))
+
+
+def uuid_hex():
+    return uuid4().hex
