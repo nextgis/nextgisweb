@@ -84,6 +84,9 @@ def unhandled_exception_tween_factory(handler, registry):
             if request.path_info.startswith("/test/request/"):
                 raise
 
+            if (env := getattr(request, "env", None)) and env.running_tests:
+                raise
+
             try:
                 logger.exception("Uncaught exception %s at %s" % (exc_name(exc), request.url))
                 iexc = InternalServerError(sys.exc_info())
