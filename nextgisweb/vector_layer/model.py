@@ -2,10 +2,14 @@ import re
 import uuid
 
 import geoalchemy2 as ga
+from msgspec import UNSET
 from osgeo import gdal, ogr
 from shapely.geometry import box
-from sqlalchemy import event, func, inspect, sql
+from sqlalchemy import event, func, inspect, text
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.sql import column, delete, insert, select, table, update
 from zope.interface import implementer
+from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import COMP_ID, Base, DBSession, _, env
 from nextgisweb.lib import db
@@ -21,8 +25,8 @@ from nextgisweb.feature_layer import (
     LayerField,
     LayerFieldsMixin,
     on_data_change,
-    query_feature_or_not_found,
 )
+from nextgisweb.feature_layer.exception import FeatureNotFound
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceGroup, Serializer
 from nextgisweb.resource import SerializedProperty as SP
@@ -82,6 +86,10 @@ class VectorLayerField(Base, LayerField):
     id = db.Column(db.ForeignKey(LayerField.id), primary_key=True)
     fld_uuid = db.Column(db.Unicode(32), nullable=False)
 
+    @property
+    def _column_name(self):
+        return f"fld_{self.fld_uuid}"
+
 
 @implementer(
     IFeatureLayer,
@@ -114,10 +122,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def _tablename(self):
         return "layer_%s" % self.tbl_uuid
 
-    def _drop_table(self, connection):
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
-        tableinfo.metadata.drop_all(bind=connection)
+    def _drop_table(self, *, connection):
+        connection.execute(text(f"DROP TABLE {SCHEMA}.{self._tablename}"))
 
     def from_ogr(self, filename, *, layername=None):
         ds = read_dataset_vector(filename)
@@ -284,133 +290,105 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IWritableFeatureLayer
 
     def feature_put(self, feature):
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
+        columns = [column("id")]
+        values = dict()
 
-        obj = tableinfo.model(id=feature.id)
-        for f in tableinfo.fields:
-            if f.keyname in feature.fields:
-                setattr(obj, f.key, feature.fields[f.keyname])
+        if (geom := feature.geom) is not None:
+            columns.append(column("geom"))
+            values["geom"] = func.ST_GeomFromWKB(geom.wkb, text(str(self.srs_id)))
 
-        # FIXME: Don't try to write geometry if it exists.
-        # This will not let to write empty geometry, but it is not needed yet.
+        for f in self.fields:
+            if (v := feature.fields.get(f.keyname, UNSET)) is not UNSET:
+                columns.append(column(f._column_name))
+                values[f._column_name] = v
 
-        if feature.geom is not None:
-            obj.geom = ga.elements.WKBElement(bytearray(feature.geom.wkb), srid=self.srs_id)
+        tab = table(self._tablename, *columns, schema=SCHEMA)
+        query = update(tab).where(tab.c.id == feature.id).values(**values)
 
-        DBSession.merge(obj)
+        DBSession.execute(query)
+        mark_changed(DBSession())
 
-        on_data_change.fire(self, feature.geom)
         # TODO: Old geom version
+        on_data_change.fire(self, feature.geom)
 
     def feature_create(self, feature):
-        """Insert new object to DB which is described in feature
+        columns = [column("id")]
+        values = [text(f"nextval('{SCHEMA}.{self._tablename}_id_seq')")]
 
-        :param feature: object description
-        :type feature:  Feature
+        if (geom := feature.geom) is not None:
+            columns.append(column("geom"))
+            values.append(func.ST_GeomFromWKB(geom.wkb, text(str(self.srs_id))))
 
-        :return:    inserted object ID
-        """
+        for f in self.fields:
+            if (v := feature.fields.get(f.keyname, UNSET)) is not UNSET:
+                columns.append(column(f._column_name))
+                values.append(v)
 
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
+        tab = table(self._tablename, *columns, schema=SCHEMA)
+        query = insert(tab).values(values).returning(tab.c.id)
 
-        obj = tableinfo.model()
-        for f in tableinfo.fields:
-            if f.keyname in feature.fields.keys():
-                setattr(obj, f.key, feature.fields[f.keyname])
-
-        obj.geom = ga.elements.WKBElement(bytearray(feature.geom.wkb), srid=self.srs_id)
-
-        shape = feature.geom.shape
-        geom_type = shape.geom_type.upper()
-        if shape.has_z:
-            geom_type += "Z"
-        if geom_type != self.geometry_type:
-            raise VE(
-                _("Geometry type (%s) does not match geometry column type (%s).")
-                % (geom_type, self.geometry_type)
-            )
-
-        DBSession.add(obj)
-        DBSession.flush()
-        DBSession.refresh(obj)
+        feature_id = DBSession.scalar(query)
+        mark_changed(DBSession())
 
         on_data_change.fire(self, feature.geom)
 
-        return obj.id
+        return feature_id
 
     def feature_delete(self, feature_id):
-        """Remove record with id
+        tab = table(self._tablename, column("id"), column("geom"), schema=SCHEMA)
+        query = delete(tab).where(tab.c.id == feature_id).returning(tab.c.geom)
 
-        :param feature_id: record id
-        :type feature_id:  int or bigint
-        """
+        try:
+            geom = DBSession.execute(query).one()[0]
+        except NoResultFound:
+            raise FeatureNotFound(self.id, feature_id)
+        mark_changed(DBSession())
 
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
-
-        query = self.feature_query()
-        query.geom()
-        feature = query_feature_or_not_found(query, self.id, feature_id)
-        obj = DBSession.query(tableinfo.model).filter_by(id=feature.id).one()
-        DBSession.delete(obj)
-
-        on_data_change.fire(self, feature.geom)
+        on_data_change.fire(self, geom)
 
     def feature_delete_all(self):
-        """Remove all records from a layer"""
+        tab = table(self._tablename, schema=SCHEMA)
+        query = delete(tab)
 
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
-
-        DBSession.query(tableinfo.model).delete()
+        DBSession.execute(query)
+        mark_changed(DBSession())
 
         geom = box(self.srs.minx, self.srs.miny, self.srs.maxx, self.srs.maxy)
         on_data_change.fire(self, geom)
 
     # IBboxLayer implementation:
+
     @property
     def extent(self):
         return calculate_extent(self)
 
 
 def estimate_vector_layer_data(resource):
-    tableinfo = TableInfo.from_layer(resource)
-    tableinfo.setup_metadata(resource._tablename)
-    table = tableinfo.table
+    def fnull(expr):
+        return func.coalesce(expr, text("0"))
 
-    static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]  # ID field size
-    string_columns = []
-    for f in tableinfo.fields:
+    fixed = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]  # ID field size
+    dynamic = fnull(func.length(func.ST_AsBinary(text("geom"))))
+
+    for f in resource.fields:
         if f.datatype == FIELD_TYPE.STRING:
-            string_columns.append(f.key)
+            dynamic += fnull(func.octet_length(text(f._column_name)))
         else:
-            static_size += FIELD_TYPE_SIZE[f.datatype]
+            fixed += FIELD_TYPE_SIZE[f.datatype]
 
-    size_columns = [
-        func.length(func.ST_AsBinary(table.columns.geom)),
-    ]
-    for key in string_columns:
-        size_columns.append(func.coalesce(func.octet_length(table.columns[key]), 0))
+    tab = table(resource._tablename, schema=SCHEMA)
+    total = func.sum(dynamic + fixed).label("total")
+    query = select(total).select_from(tab)
 
-    columns = [
-        func.count(1),
-    ] + [func.coalesce(func.sum(c), 0) for c in size_columns]
-
-    query = sql.select(*columns)
-    row = DBSession.connection().execute(query).fetchone()
-
-    num_features = row[0]
-    dynamic_size = sum(row[1:])
-    size = static_size * num_features + dynamic_size
-
-    return size
+    return DBSession.scalar(query)
 
 
 # Create vector_layer schema on table creation
 event.listen(
-    VectorLayer.__table__, "after_create", db.DDL("CREATE SCHEMA %s" % SCHEMA), propagate=True
+    VectorLayer.__table__,
+    "after_create",
+    db.DDL("CREATE SCHEMA %s" % SCHEMA),
+    propagate=True,
 )
 
 # Drop vector_layer schema on table creation
@@ -425,7 +403,7 @@ event.listen(
 # Drop data table on vector layer deletion
 @event.listens_for(VectorLayer, "before_delete")
 def drop_verctor_layer_table(mapper, connection, target):
-    target._drop_table(connection)
+    target._drop_table(connection=connection)
 
 
 class _source_attr(SP):
@@ -492,7 +470,7 @@ class _source_attr(SP):
 
     def setter(self, srlzr, value):
         if srlzr.obj.id is not None:
-            srlzr.obj._drop_table(DBSession.connection())
+            srlzr.obj._drop_table(connection=DBSession.connection())
             srlzr.obj.tbl_uuid = uuid.uuid4().hex
 
         datafile, metafile = env.file_upload.get_filename(value["id"])
