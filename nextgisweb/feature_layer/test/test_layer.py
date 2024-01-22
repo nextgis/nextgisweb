@@ -1,6 +1,5 @@
 import json
 from datetime import date, datetime, time
-from pathlib import Path
 
 import pytest
 from osgeo import ogr
@@ -22,7 +21,6 @@ from .data import generate_filter_extents
 
 pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
 
-data_points = Path(__file__).parent / "data" / "points.geojson"
 filter_cases = (
     ((("null", "isnull", "yes"),), [1, 2]),
     ((("null", "isnull", "no"),), [3]),
@@ -81,11 +79,16 @@ def cmp_geom(gj_geom, geom2, srs):
         pytest.param(create_postgis_layer, id="postgis_layer"),
     ),
 )
-def test_attributes(create_resource, ngw_resource_group_sub, ngw_httptest_app):
-    geojson = json.loads(data_points.read_text())
+def test_attributes(
+    create_resource,
+    ngw_resource_group_sub,
+    ngw_httptest_app,
+    ngw_data_path,
+):
+    geojson = json.loads((ngw_data_path / "points.geojson").read_text())
     gj_fs = geojson["features"]
 
-    ds = ogr.Open(str(data_points))
+    ds = ogr.Open(str(ngw_data_path / "points.geojson"))
     ogrlayer = ds.GetLayer(0)
 
     with create_resource(
@@ -192,8 +195,14 @@ def geom_type_product():
 
 
 @pytest.mark.parametrize("create_resource, geom_type", geom_type_product())
-def test_geometry(create_resource, geom_type, ngw_resource_group_sub, ngw_httptest_app):
-    data = Path(__file__).parent / "data" / "geometry" / f"{geom_type}.geojson"
+def test_geometry(
+    create_resource,
+    geom_type,
+    ngw_resource_group_sub,
+    ngw_httptest_app,
+    ngw_data_path,
+):
+    data = ngw_data_path / "geometry" / f"{geom_type}.geojson"
 
     geojson = json.loads(data.read_text())
     gj_fs = geojson["features"]
@@ -239,9 +248,14 @@ filter_extents_data = generate_filter_extents()
 )
 @pytest.mark.parametrize("filter_, expected_extent", filter_extents_data)
 def test_filtered_extent(
-    create_resource, filter_, expected_extent, ngw_resource_group_sub, ngw_httptest_app
+    create_resource,
+    filter_,
+    expected_extent,
+    ngw_resource_group_sub,
+    ngw_httptest_app,
+    ngw_data_path,
 ):
-    data = Path(__file__).parent / "data" / "filter-extent-layer.geojson"
+    data = ngw_data_path / "filter-extent-layer.geojson"
 
     ds = ogr.Open(str(data))
     ogrlayer = ds.GetLayer(0)

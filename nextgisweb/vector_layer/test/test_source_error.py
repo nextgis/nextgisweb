@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from nextgisweb.env import DBSession
@@ -10,8 +8,6 @@ from .. import VectorLayer
 from ..util import DRIVERS
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
-
-path = Path(__file__).parent / "data" / "errors"
 
 
 # List of creation test cases: file name, creation options, and final checks.
@@ -194,9 +190,9 @@ CREATE_TEST_PARAMS = (
 
 
 @pytest.mark.parametrize("filename, options, checks", CREATE_TEST_PARAMS)
-def test_create(filename, options, checks, ngw_txn):
+def test_create(filename, options, checks, ngw_txn, ngw_data_path):
     obj = VectorLayer().persist()
-    src = path.absolute() / filename
+    src = ngw_data_path / "errors" / filename
     options["allowed_drivers"] = DRIVERS.enum + ("OGR_VRT",)
 
     if "exception" in checks:

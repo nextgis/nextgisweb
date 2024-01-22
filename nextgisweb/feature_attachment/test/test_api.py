@@ -1,10 +1,8 @@
-from pathlib import Path
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
 import pytest
 import transaction
-import webtest
 
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.json import dumpb
@@ -15,8 +13,6 @@ from nextgisweb.vector_layer import VectorLayer
 from .. import FeatureAttachment
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
-
-DATA_PATH = Path(__file__).parent / "data"
 
 
 @pytest.fixture(scope="module")
@@ -31,7 +27,7 @@ def layer_id():
     yield res.id
 
 
-def generate_archive(files, webapp):
+def generate_archive(files, uploader):
     with NamedTemporaryFile() as f:
         with ZipFile(f, "w") as z:
             for i in files:
@@ -41,10 +37,8 @@ def generate_archive(files, webapp):
                 else:
                     content = b"0" * i["size"]
                 z.writestr(i["name"], content)
-        upload_meta = webapp.post(
-            "/api/component/file_upload/", dict(file=webtest.Upload(f.name))
-        ).json["upload_meta"][0]
-    return upload_meta
+
+        return uploader(f.name)
 
 
 @pytest.fixture
@@ -131,8 +125,8 @@ def clear(layer_id):
         ),
     ),
 )
-def test_import(files, result, layer_id, clear, ngw_webtest_app):
-    upload_meta = generate_archive(files, ngw_webtest_app)
+def test_import(files, result, layer_id, clear, ngw_file_upload, ngw_webtest_app):
+    upload_meta = generate_archive(files, ngw_file_upload)
 
     status = 422 if result.get("error") else 200
     resp = ngw_webtest_app.put_json(
@@ -169,13 +163,13 @@ def test_import(files, result, layer_id, clear, ngw_webtest_app):
     assert import_result["imported"] == imported
 
 
-def test_import_multiple(layer_id, ngw_webtest_app):
+def test_import_multiple(layer_id, ngw_file_upload, ngw_webtest_app):
     files = (
         dict(name="00001/test_A", content="AAA"),
         dict(name="00001/test_B", content="BBB"),
         dict(name="00002/test_C", content="AAA"),
     )
-    upload_meta = generate_archive(files, ngw_webtest_app)
+    upload_meta = generate_archive(files, ngw_file_upload)
     resp = ngw_webtest_app.put_json(
         f"/api/resource/{layer_id}/feature_attachment/import",
         dict(source=upload_meta),
@@ -222,7 +216,7 @@ def test_import_multiple(layer_id, ngw_webtest_app):
             ),
         ),
     )
-    upload_meta = generate_archive(files, ngw_webtest_app)
+    upload_meta = generate_archive(files, ngw_file_upload)
     resp = ngw_webtest_app.put_json(
         f"/api/resource/{layer_id}/feature_attachment/import",
         dict(source=upload_meta),
@@ -233,13 +227,13 @@ def test_import_multiple(layer_id, ngw_webtest_app):
 
 # name = '{feature_id}/{file_name}'
 # TODO: Update whenever the structure of file_meta changes; add images without xmp meta
-def test_import_image(layer_id, clear, ngw_webtest_app):
-    file_path = DATA_PATH / "panorama-image.jpg"
+def test_import_image(layer_id, clear, ngw_file_upload, ngw_webtest_app, ngw_data_path):
+    file_path = ngw_data_path / "panorama-image.jpg"
     with open(file_path, mode="rb") as f:
         files = [
             dict(name="00003/image", content=f.read())
         ]  # fails to work as a tuple for whatever reason
-        upload_meta = generate_archive(files, ngw_webtest_app)
+        upload_meta = generate_archive(files, ngw_file_upload)
         resp = ngw_webtest_app.put_json(
             f"/api/resource/{layer_id}/feature_attachment/import",
             dict(source=upload_meta),

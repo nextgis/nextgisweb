@@ -1,12 +1,8 @@
-from pathlib import Path
-
 import pytest
 
 from .. import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
-
-DATA_PATH = Path(__file__).parent / "data"
 
 
 # key, operator, should_be_true, should_be_false
@@ -49,8 +45,8 @@ for key, operator, should_be_true, should_be_false in check_list:
 
 
 @pytest.fixture
-def resource(ngw_txn):
-    resource = VectorLayer().persist().from_ogr(DATA_PATH / "layer.geojson")
+def resource(ngw_txn, ngw_data_path):
+    resource = VectorLayer().persist().from_ogr(ngw_data_path / "layer.geojson")
     return resource
 
 

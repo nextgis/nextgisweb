@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 import transaction
 from osgeo import gdal, gdalconst
@@ -12,13 +10,12 @@ from ..model import Collection, Service
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 
-DATA_PATH = Path(__file__).parent / "data"
-
 
 @pytest.fixture(scope="module")
-def vlayer_id(ngw_resource_group):
+def vlayer_id(ngw_resource_group, ngw_data_path):
     with transaction.manager:
-        res_vl = VectorLayer().persist().from_ogr(DATA_PATH / "ne_110m_populated_places.geojson")
+        res_vl = VectorLayer().persist()
+        res_vl.from_ogr(ngw_data_path / "ne_110m_populated_places.geojson")
 
         DBSession.flush()
 
