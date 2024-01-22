@@ -14,6 +14,10 @@ filterwarnings(
     category=ImportWarning,
 )
 
+# Ignore osgeo imp module deprecation warning
+filterwarnings("ignore", module="osgeo", category=DeprecationWarning)
+import osgeo  # noqa: E402, F401
+
 
 def module_path(module_name: str) -> Path:
     """Extract module's path from sys.modules and sys.meta_path
