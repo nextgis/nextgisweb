@@ -1,5 +1,5 @@
 import enum
-from typing import List, TypeVar
+from typing import List, Literal, TypeVar, Union
 
 import pytest
 from msgspec import Meta, ValidationError
@@ -21,6 +21,8 @@ class Enum(enum.Enum):
 
 FOO = Enum.FOO
 BAR = Enum.BAR
+
+Literals = Union[Literal["foo"], Literal["bar"]]
 
 
 @pytest.mark.parametrize(
@@ -45,6 +47,8 @@ BAR = Enum.BAR
         [Enum, "bar", BAR],
         [ExactlyTwo[Enum], "foo,bar", [FOO, BAR]],
         [TwoOrThree[Enum], "foo,bar", [FOO, BAR]],
+        [Literals, "foo", "foo"],
+        [List[Literals], "foo,bar", ["foo", "bar"]],
     ],
 )
 def test_valid(tdef, val, expected):
@@ -72,6 +76,7 @@ def test_valid(tdef, val, expected):
         [List[Enum], "foo,zoo"],
         [ExactlyTwo[Enum], "foo,bar,foo,bar"],
         [TwoOrThree[Enum], "foo,bar,foo,bar"],
+        [Literals, "qux"],
     ],
 )
 def test_invalid(tdef, val):

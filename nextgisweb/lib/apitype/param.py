@@ -1,5 +1,5 @@
 from enum import EnumMeta
-from typing import get_args, get_origin
+from typing import Union, get_args, get_origin
 
 from msgspec import Meta, convert
 from typing_extensions import Annotated
@@ -16,7 +16,7 @@ def _decode_bool(val):
 
 
 def item_decoder(tdef, bdef):
-    if bdef == str or type(bdef) is EnumMeta:
+    if bdef == str or type(bdef) is EnumMeta or get_origin(bdef) is Union:
 
         def _decode(val):
             return convert(val, tdef)
