@@ -157,24 +157,29 @@ def test_fid(fid_source, fid_field, id_expect, ngw_txn):
     assert query().total_count == 1
 
 
-def test_multi_layers(ngw_webtest_app):
-    src = DATA_PATH / "two-layers.zip"
-    resp = ngw_webtest_app.post("/api/component/file_upload/", dict(file=webtest.Upload(str(src))))
-    upload_meta = resp.json["upload_meta"][0]
+def test_source_layer(ngw_webtest_app, ngw_resource_group_sub):
+    upload_meta = ngw_webtest_app.post(
+        "/api/component/file_upload/",
+        dict(file=webtest.Upload(str(DATA_PATH / "two-layers.zip"))),
+    ).json["upload_meta"][0]
 
     resp = ngw_webtest_app.post_json(
-        "/api/component/vector_layer/dataset", dict(source=upload_meta), status=200
+        "/api/component/vector_layer/dataset",
+        dict(source=upload_meta),
+        status=200,
     )
 
     layers = resp.json["layers"]
-    assert len(layers) == 2
-    assert "layer1" in layers
-    assert "layer2" in layers
+    assert layers == ["layer1", "layer2"]
 
     resp = ngw_webtest_app.post_json(
         "/api/resource/",
         dict(
-            resource=dict(cls="vector_layer", display_name="test two layers", parent=dict(id=0)),
+            resource=dict(
+                cls="vector_layer",
+                display_name="test two layers",
+                parent=dict(id=ngw_resource_group_sub),
+            ),
             vector_layer=dict(
                 source=upload_meta,
                 source_layer="layer1",
@@ -186,13 +191,77 @@ def test_multi_layers(ngw_webtest_app):
         status=201,
     )
 
-    layer_id = resp.json["id"]
+    layer_url = f"/api/resource/{resp.json['id']}"
+    second = ngw_webtest_app.get(f"{layer_url}/feature/2", status=200).json
+    assert second["fields"] == dict(name_point="Point two")
 
-    resp = ngw_webtest_app.get("/api/resource/%d/feature/2" % layer_id, status=200)
-    feature = resp.json
-    assert feature["fields"] == dict(name_point="Point two")
+    resp = ngw_webtest_app.put_json(
+        layer_url,
+        dict(vector_layer=dict(delete_all_features=True)),
+        status=200,
+    )
 
-    ngw_webtest_app.delete("/api/resource/%d" % layer_id)
+    ngw_webtest_app.get(f"{layer_url}/feature/2", status=404)
+
+
+def test_geometry_type_change(ngw_webtest_app, ngw_resource_group_sub):
+    upload_meta = ngw_webtest_app.post(
+        "/api/component/file_upload/",
+        dict(file=webtest.Upload(str(DATA_PATH / "pointz.geojson"))),
+    ).json["upload_meta"][0]
+
+    resp = ngw_webtest_app.post_json(
+        "/api/resource/",
+        dict(
+            resource=dict(
+                cls="vector_layer",
+                display_name="test_geometry_type_change",
+                parent=dict(id=ngw_resource_group_sub),
+            ),
+            vector_layer=dict(
+                source=upload_meta,
+                srs=dict(id=3857),
+            ),
+        ),
+        status=201,
+    )
+
+    url = f"/api/resource/{resp.json['id']}"
+    assert ngw_webtest_app.get(url).json["vector_layer"]["geometry_type"] == "POINTZ"
+    ngw_webtest_app.put_json(url, dict(vector_layer=dict(geometry_type="LINESTRINGZ")), status=422)
+    ngw_webtest_app.put_json(url, dict(vector_layer=dict(geometry_type="MULTIPOINT")), status=200)
+
+
+def test_replace_file(ngw_webtest_app, ngw_resource_group_sub):
+    pointz_geojson = ngw_webtest_app.post(
+        "/api/component/file_upload/",
+        dict(file=webtest.Upload(str(DATA_PATH / "pointz.geojson"))),
+    ).json["upload_meta"][0]
+
+    type_geojson = ngw_webtest_app.post(
+        "/api/component/file_upload/",
+        dict(file=webtest.Upload(str(DATA_PATH / "type.geojson"))),
+    ).json["upload_meta"][0]
+
+    resp = ngw_webtest_app.post_json(
+        "/api/resource/",
+        dict(
+            resource=dict(
+                cls="vector_layer",
+                display_name="test_replace_file",
+                parent=dict(id=ngw_resource_group_sub),
+            ),
+            vector_layer=dict(
+                source=pointz_geojson,
+                srs=dict(id=3857),
+            ),
+        ),
+        status=201,
+    )
+
+    url = f"/api/resource/{resp.json['id']}"
+    ngw_webtest_app.put_json(url, dict(vector_layer=dict(source=type_geojson)))
+    assert ngw_webtest_app.get(url).json["vector_layer"]["geometry_type"] == "POINT"
 
 
 def test_error_limit():
