@@ -6,11 +6,12 @@ from textwrap import wrap
 
 # Workaround for https://bugs.python.org/issue47082
 import numpy  # noqa: F401
+from msgspec import UNSET
 
 from nextgisweb.env import Env
 from nextgisweb.env.cli import bootstrap, cli
 from nextgisweb.lib.clann import ArgumentParser
-from nextgisweb.lib.config import NO_DEFAULT, Option, key_to_environ
+from nextgisweb.lib.config import Option, key_to_environ
 
 
 def config(argv=sys.argv):
@@ -98,7 +99,7 @@ def config(argv=sys.argv):
 
     def _section_option(oa):
         result = []
-        default = oa.otype.dumps(oa.default) if oa.default != NO_DEFAULT else ""
+        default = oa.otype.dumps(oa.default) if oa.default is not UNSET else ""
         result.append(
             "## Option: {key} ({otype})".format(key=oa.key, otype=oa.otype)
             + (" (required)" if oa.required else "")
@@ -111,7 +112,7 @@ def config(argv=sys.argv):
     def _print_option_value(comp_or_env, oa_or_key, value=None, required=False):
         if value is None:
             value = (
-                oa_or_key.otype.dumps(oa_or_key.default) if oa_or_key.default != NO_DEFAULT else ""
+                oa_or_key.otype.dumps(oa_or_key.default) if oa_or_key.default is not UNSET else ""
             )
 
         key = oa_or_key.key if isinstance(oa_or_key, Option) else oa_or_key

@@ -7,4 +7,4 @@ from .annotation import (
     OptionAnnotations,
 )
 from .otype import Choice, OptionType, SizeInBytes
-from .util import NO_DEFAULT, environ_to_key, key_to_environ, load_config
+from .util import environ_to_key, key_to_environ, load_config

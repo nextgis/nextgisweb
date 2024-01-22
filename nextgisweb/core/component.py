@@ -13,6 +13,7 @@ from subprocess import check_output
 
 import requests
 import sqlalchemy.dialects.postgresql as postgresql
+from msgspec import UNSET
 from requests.exceptions import JSONDecodeError, RequestException
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine.url import URL as EngineURL
@@ -32,13 +33,6 @@ from nextgisweb.i18n import Localizer, Translations
 from .backup import BackupMetadata
 from .model import Setting
 from .storage import StorageComponentMixin
-
-
-class _NO_DEFAULT:
-    pass
-
-
-NO_DEFAULT = _NO_DEFAULT()
 
 
 class CoreComponent(StorageComponentMixin, Component):
@@ -233,12 +227,12 @@ class CoreComponent(StorageComponentMixin, Component):
             db.exists().where(db.and_(Setting.component == component, Setting.name == name))
         ).scalar()
 
-    def settings_get(self, component, name, default=NO_DEFAULT):
+    def settings_get(self, component, name, default=UNSET):
         try:
             obj = Setting.filter_by(component=component, name=name).one()
             return obj.value
         except NoResultFound:
-            if default is NO_DEFAULT:
+            if default is UNSET:
                 raise KeyError("Setting %s.%s not found!" % (component, name))
             else:
                 return default

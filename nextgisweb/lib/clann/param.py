@@ -4,6 +4,7 @@ from enum import Enum
 from functools import partial
 from typing import Any, List, Optional, Tuple, Union, get_args, get_origin
 
+from msgspec import UNSET
 from typing_extensions import Protocol
 
 from .argparse import ArgumentParser
@@ -18,18 +19,11 @@ OPTION = ParamType.OPTION
 ARGUMENT = ParamType.ARGUMENT
 
 
-class NoDefaultType(Enum):
-    NO_DEFAULT = "NO_DEFAULT"
-
-
-NO_DEFAULT = NoDefaultType.NO_DEFAULT
-
-
 class Param:
     def __init__(
         self,
         ptype: ParamType,
-        default: Any = NO_DEFAULT,
+        default: Any = UNSET,
         *,
         short: Optional[str] = None,
         flag: bool = False,
@@ -85,7 +79,7 @@ class Param:
         if iarg and is_list and is_optional:
             raise NotImplementedError("optional lists aren't supported for args")
 
-        if default is NO_DEFAULT:
+        if default is UNSET:
             if is_optional:
                 default = None
             elif is_list:
@@ -127,7 +121,7 @@ class Param:
         else:
             raise NotImplementedError(f"Unsupported type: {annnotation}")
 
-        if default is not NO_DEFAULT:
+        if default is not UNSET:
             kwargs["default"] = default
 
         if self.doc is not None:
@@ -144,7 +138,7 @@ class Param:
 class OptArgFactory(Protocol):
     def __call__(
         self,
-        default: Any = NO_DEFAULT,
+        default: Any = UNSET,
         *,
         short: Optional[str] = None,
         flag: bool = False,
