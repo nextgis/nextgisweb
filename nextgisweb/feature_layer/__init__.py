@@ -7,6 +7,7 @@ from .interface import (
     FIELD_TYPE,
     FIELD_TYPE_OGR,
     GEOM_TYPE,
+    GEOM_TYPE_2_WKB_TYPE,
     GEOM_TYPE_OGR,
     GEOM_TYPE_OGR_2_GEOM_TYPE,
     IFeatureLayer,

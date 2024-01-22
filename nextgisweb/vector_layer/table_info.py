@@ -2,10 +2,11 @@ import re
 import uuid
 from functools import partial
 from html import escape as html_escape
+from itertools import product
 
 import geoalchemy2 as ga
+import sqlalchemy as sa
 from osgeo import ogr, osr
-from sqlalchemy import insert, text
 from sqlalchemy.orm import registry
 
 from nextgisweb.env import DBSession, _, env
@@ -19,6 +20,7 @@ from nextgisweb.feature_layer import (
     FIELD_FORBIDDEN_NAME,
     FIELD_TYPE,
     GEOM_TYPE,
+    GEOM_TYPE_2_WKB_TYPE,
     GEOM_TYPE_OGR,
     GEOM_TYPE_OGR_2_GEOM_TYPE,
 )
@@ -502,7 +504,7 @@ class TableInfo:
                     geometry_type=geom_fldtype,
                 ),
             ),
-            *map(lambda fld: db.Column(fld.key, FIELD_TYPE_2_DB[fld.datatype]), self.fields)
+            *map(lambda fld: db.Column(fld.key, FIELD_TYPE_2_DB[fld.datatype]), self.fields),
         )
 
         mapper_registry = registry()
@@ -525,16 +527,12 @@ class TableInfo:
     ):
         source_osr = ogrlayer.GetSpatialRef()
         target_osr = self.srs.to_osr()
-
         transform = (
             osr.CoordinateTransformation(source_osr, target_osr)
             if not source_osr.IsSame(target_osr)
             else None
         )
 
-        errors = []
-
-        num_features = 0
         static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]
         dynamic_size = 0
         string_fields = []
@@ -544,316 +542,272 @@ class TableInfo:
             else:
                 static_size += FIELD_TYPE_SIZE[f.datatype]
 
-        defn = ogrlayer.GetLayerDefn()
+        tab_sn = f"{SCHEMA}.{self.table.name}"
+        seq_sn = f"{tab_sn}_id_seq"
+        nextval = sa.text(f"nextval('{seq_sn}')")
 
-        fieldmap = list()
+        fields = []
+        params = dict(
+            id=sa.bindparam("id") if self.fid_field_index else nextval,
+            geom=sa.func.ST_GeomFromWKB(sa.bindparam("geom"), sa.text(str(self.srs.id))),
+        )
+
+        fid_fget = None
+        defn = ogrlayer.GetLayerDefn()
         for fidx in range(defn.GetFieldCount()):
             fdefn = defn.GetFieldDefn(fidx)
             fname = fdefn.GetName()
             ftype = fdefn.GetType()
             fget = partial(FIELD_GETTER[ftype], fidx=fidx)
             field = self.find_field(ogrindex=fidx)
-            fieldmap.append((fname, fget, ftype, field))
+            if fidx == self.fid_field_index:
+                fid_fget = partial(_fid_fget, fget=fget, fidx=fidx, fname=fname)
+            else:
+                fields.append((fidx, fname, fget, ftype))
+                params[field.key] = sa.bindparam(str(fidx))
 
-        if self.fid_field_index is not None:
-            fid_field_name, fid_fget = fieldmap[self.fid_field_index][:2]
-
-        max_fid = None
+        query_insert = sa.insert(self.table).values(**params)
+        feature_count = 0
         chunk = []
 
-        def add_record(record):
-            if record is not None:
-                chunk.append(record)
-            if len(chunk) >= 1000 or (record is None and len(chunk) > 0):
-                DBSession.execute(insert(self.table), chunk)
+        def insert_feature(data=None, *, flush=False):
+            nonlocal feature_count
+            if data is not None:
+                chunk.append(data)
+            if len(chunk) >= 1000 or (flush and len(chunk) > 0):
+                DBSession.execute(query_insert, chunk)
+                feature_count += len(chunk)
                 chunk.clear()
 
-        for i, feature in enumerate(ogrlayer, start=1):
-            if len(errors) >= ERROR_LIMIT and not skip_errors:
-                break
+        errors = []
+        wkb_type = GEOM_TYPE_2_WKB_TYPE[self.geometry_type]
+        for ogr_fid, feature in enumerate(ogrlayer, start=1):
+            ctx = dict(fix_errors=fix_errors, fid=ogr_fid)
+            try:
+                row = dict()
+                if fid_fget:
+                    row["id"] = fid_fget(feature, ogr_fid)
 
-            if self.fid_field_index is None:
-                fid = i
-            else:
-                if not feature.IsFieldSet(self.fid_field_index):
-                    errors.append(
-                        _("Feature (seq. #%d) doesn't have a FID field '%s'.")
-                        % (i, fid_field_name)
-                    )
-                    continue
-                if feature.IsFieldNull(self.fid_field_index):
-                    errors.append(
-                        _("Feature (seq. #%d) FID field '%s' is null.") % (i, fid_field_name)
-                    )
-                    continue
-                fid = fid_fget(feature)
+                geom = feature.GetGeometryRef()
+                if validate:
+                    geom = _validate_geom(geom, wkb_type, **ctx)
 
-            max_fid = max(max_fid, fid) if max_fid is not None else fid
-
-            geom = feature.GetGeometryRef()
-            if validate:
-                if geom is None:
-                    if not skip_other_geometry_types:
-                        errors.append(_("Feature #%d doesn't have geometry.") % fid)
-                    continue
-
-                if geom.IsMeasured() and fix_errors == ERROR_FIX.LOSSY:
-                    geom.SetMeasured(False)
-
-                # Extract GeometryCollection
-                if (
-                    geom.GetGeometryType()
-                    in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D)
-                    and fix_errors != ERROR_FIX.NONE
-                ):
-                    geom_candidate = None
-                    for j in range(geom.GetGeometryCount()):
-                        col_geom = geom.GetGeometryRef(j)
-                        col_gtype = col_geom.GetGeometryType()
-                        if col_gtype not in GEOM_TYPE_OGR:
-                            continue
-                        if (
-                            (
-                                self.geometry_type in GEOM_TYPE.points
-                                and col_gtype
-                                in (
-                                    ogr.wkbPoint,
-                                    ogr.wkbPoint25D,
-                                    ogr.wkbMultiPoint,
-                                    ogr.wkbMultiPoint25D,
-                                )
-                            )
-                            or (
-                                self.geometry_type in GEOM_TYPE.linestrings
-                                and col_gtype
-                                in (
-                                    ogr.wkbLineString,
-                                    ogr.wkbLineString25D,
-                                    ogr.wkbMultiLineString,
-                                    ogr.wkbMultiLineString25D,
-                                )
-                            )
-                            or (
-                                self.geometry_type in GEOM_TYPE.polygons
-                                and col_gtype
-                                in (
-                                    ogr.wkbPolygon,
-                                    ogr.wkbPolygon25D,
-                                    ogr.wkbMultiPolygon,
-                                    ogr.wkbMultiPolygon25D,
-                                )
-                            )
-                        ):
-                            if geom_candidate is None:
-                                geom_candidate = col_geom
-                                if fix_errors == ERROR_FIX.LOSSY:
-                                    break
-                            else:
-                                errors.append(
-                                    _(
-                                        "Feature #%d has multiple geometries satisfying the conditions."
-                                    )
-                                    % fid
-                                )
-                                continue
-                    if geom_candidate is not None:
-                        geom = geom_candidate
-
-                gtype = geom.GetGeometryType()
-
-                # Check geometry type
-                if gtype not in GEOM_TYPE_OGR:
-                    if not skip_other_geometry_types:
-                        errors.append(
-                            _("Feature #%d has unknown geometry type: %d (%s).")
-                            % (fid, gtype, ogr.GeometryTypeToName(gtype))
-                        )
-                    continue
-                elif not any(
-                    (
-                        (
-                            self.geometry_type in GEOM_TYPE.points
-                            and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.points
-                        ),
-                        (
-                            self.geometry_type in GEOM_TYPE.linestrings
-                            and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.linestrings
-                        ),
-                        (
-                            self.geometry_type in GEOM_TYPE.polygons
-                            and GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.polygons
-                        ),
-                    )
-                ):
-                    if not skip_other_geometry_types:
-                        errors.append(
-                            _("Feature #%d has unsuitable geometry type: %d (%s).")
-                            % (fid, gtype, ogr.GeometryTypeToName(gtype))
-                        )
-                    continue
-
-                # Force single geometries to multi
-                if self.geometry_type in GEOM_TYPE.is_multi:
-                    if gtype in (ogr.wkbPoint, ogr.wkbPoint25D):
-                        geom = ogr.ForceToMultiPoint(geom)
-                    elif gtype in (ogr.wkbLineString, ogr.wkbLineString25D):
-                        geom = ogr.ForceToMultiLineString(geom)
-                    elif gtype in (ogr.wkbPolygon, ogr.wkbPolygon25D):
-                        geom = ogr.ForceToMultiPolygon(geom)
-                elif gtype in (
-                    ogr.wkbMultiPoint,
-                    ogr.wkbMultiPoint25D,
-                    ogr.wkbMultiLineString,
-                    ogr.wkbMultiLineString25D,
-                    ogr.wkbMultiPolygon,
-                    ogr.wkbMultiPolygon25D,
-                ):
-                    if geom.GetGeometryCount() == 1 or fix_errors == ERROR_FIX.LOSSY:
-                        geom = geom.GetGeometryRef(0)
-                    else:
-                        errors.append(
-                            _("Feature #%d has multiple geometries satisfying the conditions.")
-                            % fid
-                        )
-                        continue
-
-            if transform is not None:
-                if geom.Transform(transform) != 0:
-                    errors.append(
+                if transform and geom.Transform(transform) != 0:
+                    raise FeatureError(
                         _(
-                            "Feature #%d has a geometry that can't be reprojected to "
-                            "target coordinate system"
+                            "Feature #%d has a geometry that can't be "
+                            "reprojected to target coordinate system"
                         )
-                        % fid
+                        % ogr_fid
                     )
-                    continue
 
-            if validate:
-                # Force Z
-                has_z = self.geometry_type in GEOM_TYPE.has_z
-                if has_z and not geom.Is3D():
-                    geom.Set3D(True)
-                elif not has_z and geom.Is3D():
-                    geom.Set3D(False)
+                geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
+                dynamic_size += len(geom_bytes)
+                row["geom"] = geom_bytes
 
-                # Points can't have validity errors.
-                is_single = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] not in GEOM_TYPE.is_multi
-                is_point = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.points
-                is_polygon = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.polygons
+                for fidx, fname, fget, ftype in fields:
+                    if not feature.IsFieldSetAndNotNull(fidx):
+                        fld_value = None
+                    else:
+                        fld_value = fget(feature)
+                        if ftype in STRING_CAST_TYPES:
+                            fld_value = dumps(fld_value)
+                        elif validate and ftype == ogr.OFTString:
+                            fld_value = _validate_string(fld_value, fname, **ctx)
 
-                if not is_point and not geom.IsValid():
-                    # Close rings for polygons: GDAL doesn't provide a method for
-                    # checking if a geometry has unclosed rings, but we can achieve
-                    # this via comparison.
-                    if is_polygon:
-                        geom_closed = geom.Clone()
-                        geom_closed.CloseRings()
-                        if not geom_closed.Equals(geom):
-                            if fix_errors == ERROR_FIX.NONE:
-                                errors.append(_("Feature #%d has unclosed rings.") % fid)
-                                continue
-                            else:
-                                geom = geom_closed
+                    row[str(fidx)] = fld_value
+                    if fname in string_fields and fld_value is not None:
+                        dynamic_size += utf8len(fld_value)
 
-                    # Check for polygon rings with fewer than 3 points and
-                    # linestrings with fewer than 2 points.
-                    if not geom.IsValid():
-                        error_found = False
-                        for part in (geom,) if is_single else geom:
-                            if is_polygon:
-                                for ring in part:
-                                    if ring.GetPointCount() < 4:
-                                        # TODO: Invalid parts can be removed from multipart geometries in LOSSY mode.
-                                        errors.append(
-                                            _(
-                                                "Feature #%d has less than 3 points in a polygon ring."
-                                            )
-                                            % fid
-                                        )
-                                        error_found = True
-                            elif part.GetPointCount() < 2:
-                                # TODO: Invalid parts can be removed from multipart geometries in LOSSY mode.
-                                errors.append(
-                                    _("Feature #%d has less than 2 points in a linestring.") % fid
-                                )
-                                error_found = True
-                            if error_found:
-                                break
-                        if error_found:
-                            continue
+                insert_feature(row)
 
-                    # NOTE: Disabled for better times.
-                    # Check for topology errors and fix them as possible.
-                    # invalid = True
-                    # if fix_errors != ERROR_FIX.NONE:
-                    #     if fix_errors == ERROR_FIX.LOSSY and not geom.IsValid():
-                    #         geom = geom.MakeValid()
-                    #         if geom is not None and not geom.IsValid():
-                    #             geom = geom.Buffer(0)
-                    #     invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype
-                    # if invalid:
-                    #     errors.append(_("Feature #%d has invalid geometry.") % fid)
-                    #     continue
-
-            fld_values = dict()
-            for k, (fname, fget, ftype, field) in enumerate(fieldmap):
-                if k == self.fid_field_index:
-                    continue
-
-                ftype = feature.GetFieldDefnRef(k).GetType()
-
-                if not feature.IsFieldSetAndNotNull(k):
-                    fld_value = None
+            except FeatureError as exc:
+                if skip_errors:
+                    continue  # Processs next feature
+                elif skip_other_geometry_types and isinstance(exc, FeatureGeometryTypeInvalid):
+                    continue  # Processs next feature
+                elif len(errors) < ERROR_LIMIT:
+                    errors.append(exc.args[0])
                 else:
-                    fld_value = FIELD_GETTER[ftype](feature, k)
+                    break
 
-                    if ftype in STRING_CAST_TYPES:
-                        fld_value = dumps(fld_value)
-                    elif validate and ftype == ogr.OFTString:
-                        fixed_fld_value = fix_encoding(fld_value)
-                        if fld_value != fixed_fld_value:
-                            if fix_errors == ERROR_FIX.LOSSY:
-                                fld_value = fixed_fld_value
-                            else:
-                                errors.append(
-                                    _("Feature #%d contains a broken encoding of field '%s'.")
-                                    % (fid, field.keyname)
-                                )
-                                continue
-
-                fld_values[field.key] = fld_value
-
-                if field.keyname in string_fields and fld_value is not None:
-                    dynamic_size += utf8len(fld_value)
-
-            if len(errors) > 0 and not skip_errors:
-                continue
-
-            geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
-            dynamic_size += len(geom_bytes)
-
-            record = dict(
-                id=fid, geom=ga.elements.WKBElement(geom_bytes, srid=self.srs.id), **fld_values
-            )
-            add_record(record)
-
-            num_features += 1
-        add_record(None)
-
-        if len(errors) > 0 and not skip_errors:
+        if len(errors) > 0:
             detail = "<br>".join(html_escape(translate(error), quote=False) for error in errors)
             raise VE(message=_("Vector layer cannot be written due to errors."), detail=detail)
 
-        size = static_size * num_features + dynamic_size
+        insert_feature(flush=True)
+        size = static_size * feature_count + dynamic_size
 
         # Set sequence next value
-        if max_fid is not None:
-            connection = DBSession.connection()
-            connection.execute(
-                text(
-                    'ALTER SEQUENCE "%s"."%s" RESTART WITH %d'
-                    % (self.sequence.schema, self.sequence.name, max_fid + 1)
-                )
-            )
+        if fid_fget:
+            max_fid = DBSession.scalar(sa.text(f"SELECT MAX(id) FROM {tab_sn}"))
+            sql_alter_seq = f"ALTER SEQUENCE {seq_sn} RESTART WITH {max_fid + 1}"
+            DBSession.execute(sa.text(sql_alter_seq))
 
         return size
+
+
+class FeatureError(Exception):
+    pass
+
+
+class FeatureGeometryTypeInvalid(FeatureError):
+    pass
+
+
+def _fid_fget(feature, ogr_fid, *, fget, fidx, fname):
+    if not feature.IsFieldSet(fidx):
+        raise FeatureError(
+            _("Feature (seq. #%d) doesn't have a FID field '%s'.") % (ogr_fid, fname)
+        )
+    if feature.IsFieldNull(fidx):
+        raise FeatureError(_("Feature (seq. #%d) FID field '%s' is null.") % (ogr_fid, fname))
+    return fget(feature)
+
+
+def _wkb_product(*args):
+    args = [((arg,) if isinstance(arg, str) else arg) for arg in args]
+    return tuple(getattr(ogr, "wkb" + "".join(ai)) for ai in product(*args))
+
+
+_wkb_points = _wkb_product(("", "Multi"), "Point", ("", "25D"))
+_wkb_linestrings = _wkb_product(("", "Multi"), "LineString", ("", "25D"))
+_wkb_polygons = _wkb_product(("", "Multi"), "Polygon", ("", "25D"))
+_wkb_collections = _wkb_product("GeometryCollection", ("", "25D"))
+_wkb_single = _wkb_product(("Point", "LineString", "Polygon"), ("", "25D"))
+_wkb_multi = _wkb_product("Multi", ("Point", "LineString", "Polygon"), ("", "25D"))
+_wkb_has_z = _wkb_product(("", "Multi"), ("Point", "LineString", "Polygon"), "25D")
+_wkb_supported = _wkb_points + _wkb_linestrings + _wkb_polygons
+
+
+def _validate_geom(geom, target, *, fix_errors, fid):
+    if geom is None:
+        raise FeatureGeometryTypeInvalid(_("Feature #%d doesn't have geometry.") % fid)
+
+    if geom.IsMeasured() and fix_errors == ERROR_FIX.LOSSY:
+        geom.SetMeasured(False)
+
+    wkb_type = geom.GetGeometryType()
+    if (wkb_type in _wkb_has_z) != (target in _wkb_has_z):
+        geom.Set3D(target in _wkb_has_z)
+
+    # Extract GeometryCollection
+    if wkb_type in _wkb_collections and fix_errors != ERROR_FIX.NONE:
+        geom_candidate = None
+        for j in range(geom.GetGeometryCount()):
+            member_geom = geom.GetGeometryRef(j)
+            member_type = member_geom.GetGeometryType()
+            if member_type not in _wkb_supported:
+                continue
+            if (
+                (target in _wkb_points and member_type in _wkb_points)
+                or (target in _wkb_linestrings and member_type in _wkb_linestrings)
+                or (target in _wkb_polygons and member_type in _wkb_polygons)
+            ):
+                if geom_candidate is None:
+                    geom_candidate = member_geom
+                    if fix_errors == ERROR_FIX.LOSSY:
+                        break
+                else:
+                    raise FeatureError(
+                        _("Feature #%d has multiple geometries satisfying the conditions.") % fid
+                    )
+        if geom_candidate is not None:
+            geom = geom_candidate
+            wkb_type = geom.GetGeometryType()
+
+    # Check geometry type
+    if wkb_type not in _wkb_supported:
+        raise FeatureGeometryTypeInvalid(
+            _("Feature #%d has unknown geometry type: %d (%s).")
+            % (fid, wkb_type, ogr.GeometryTypeToName(wkb_type))
+        )
+    elif not (
+        (target in _wkb_points and wkb_type in _wkb_points)
+        or (target in _wkb_linestrings and wkb_type in _wkb_linestrings)
+        or (target in _wkb_polygons and wkb_type in _wkb_polygons)
+    ):
+        raise FeatureGeometryTypeInvalid(
+            _("Feature #%d has unsuitable geometry type: %d (%s).")
+            % (fid, wkb_type, ogr.GeometryTypeToName(wkb_type))
+        )
+
+    if (target in _wkb_multi) == (wkb_type in _wkb_multi):
+        pass
+    elif wkb_type in _wkb_single:
+        # Promote single geometries to multi
+        if wkb_type in (ogr.wkbPoint, ogr.wkbPoint25D):
+            geom = ogr.ForceToMultiPoint(geom)
+        elif wkb_type in (ogr.wkbLineString, ogr.wkbLineString25D):
+            geom = ogr.ForceToMultiLineString(geom)
+        elif wkb_type in (ogr.wkbPolygon, ogr.wkbPolygon25D):
+            geom = ogr.ForceToMultiPolygon(geom)
+    elif wkb_type in _wkb_multi:
+        # Extract member from multi geometry
+        if geom.GetGeometryCount() == 1 or fix_errors == ERROR_FIX.LOSSY:
+            geom = geom.GetGeometryRef(0)
+        else:
+            raise FeatureError(
+                _("Feature #%d has multiple geometries satisfying the conditions.") % fid
+            )
+
+    if wkb_type in _wkb_points:
+        pass  # Points are always valid.
+    elif not geom.IsValid():
+        # Close rings for polygons: GDAL doesn't provide a method for checking
+        # if a geometry has unclosed rings, but we can achieve this via
+        # comparison.
+        if wkb_type in _wkb_polygons:
+            geom_closed = geom.Clone()
+            geom_closed.CloseRings()
+            if not geom_closed.Equals(geom):
+                if fix_errors == ERROR_FIX.NONE:
+                    raise FeatureError(_("Feature #%d has unclosed rings.") % fid)
+                else:
+                    geom = geom_closed
+
+        # Check for polygon rings with fewer than 3 points and linestrings with
+        # fewer than 2 points.
+        if not geom.IsValid():
+            for part in (geom,) if (wkb_type in _wkb_single) else geom:
+                if wkb_type in _wkb_polygons:
+                    for ring in part:
+                        if ring.GetPointCount() < 4:
+                            # TODO: Invalid parts can be removed from multipart
+                            # geometries in LOSSY mode.
+                            raise FeatureError(
+                                _("Feature #%d has less than 3 points in a polygon ring.") % fid
+                            )
+                elif part.GetPointCount() < 2:
+                    # TODO: Invalid parts can be removed from multipart
+                    # geometries in LOSSY mode.
+                    raise FeatureError(
+                        _("Feature #%d has less than 2 points in a linestring.") % fid
+                    )
+
+        # NOTE: Disabled for better times.
+        # Check for topology errors and fix them as possible.
+        # invalid = True
+        # if fix_errors != ERROR_FIX.NONE:
+        #     if fix_errors == ERROR_FIX.LOSSY and not geom.IsValid():
+        #         geom = geom.MakeValid()
+        #         if geom is not None and not geom.IsValid():
+        #             geom = geom.Buffer(0)
+        #     invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype
+        # if invalid:
+        #     errors.append(_("Feature #%d has invalid geometry.") % fid)
+        #     continue
+
+    return geom
+
+
+def _validate_string(value, fname, *, fix_errors, fid):
+    fixed = fix_encoding(value)
+    if value != fixed:
+        if fix_errors == ERROR_FIX.LOSSY:
+            value = fixed
+        else:
+            raise FeatureError(
+                _("Feature #%d contains a broken encoding of field '%s'.") % (fid, fname)
+            )
+    return value
