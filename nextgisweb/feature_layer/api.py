@@ -617,6 +617,39 @@ def iget(resource, request) -> JSONType:
     return result
 
 
+def iput(resource, request) -> JSONType:
+    request.resource_permission(PERM_WRITE)
+
+    query = resource.feature_query()
+    query.geom()
+
+    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
+
+    dsrlz_params = dict(
+        geom_format=request.GET.get("geom_format", "wkt").lower(),
+        dt_format=request.GET.get("dt_format", "obj"),
+    )
+
+    srs = request.GET.get("srs")
+
+    if srs is not None:
+        srs_from = SRS.filter_by(id=int(srs)).one()
+        dsrlz_params["transformer"] = Transformer(srs_from.wkt, resource.srs.wkt)
+
+    deserialize(feature, request.json_body, **dsrlz_params)
+    if IWritableFeatureLayer.providedBy(resource):
+        resource.feature_put(feature)
+
+    return dict(id=feature.id)
+
+
+def idelete(resource, request) -> JSONType:
+    request.resource_permission(PERM_WRITE)
+
+    fid = int(request.matchdict["fid"])
+    resource.feature_delete(fid)
+
+
 def item_extent(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
     feature_id = int(request.matchdict["fid"])
@@ -675,39 +708,6 @@ def geometry_info(resource, request) -> JSONType:
         area = None
 
     return dict(type=geom_type, area=area, length=length, extent=extent)
-
-
-def iput(resource, request) -> JSONType:
-    request.resource_permission(PERM_WRITE)
-
-    query = resource.feature_query()
-    query.geom()
-
-    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
-
-    dsrlz_params = dict(
-        geom_format=request.GET.get("geom_format", "wkt").lower(),
-        dt_format=request.GET.get("dt_format", "obj"),
-    )
-
-    srs = request.GET.get("srs")
-
-    if srs is not None:
-        srs_from = SRS.filter_by(id=int(srs)).one()
-        dsrlz_params["transformer"] = Transformer(srs_from.wkt, resource.srs.wkt)
-
-    deserialize(feature, request.json_body, **dsrlz_params)
-    if IWritableFeatureLayer.providedBy(resource):
-        resource.feature_put(feature)
-
-    return dict(id=feature.id)
-
-
-def idelete(resource, request) -> JSONType:
-    request.resource_permission(PERM_WRITE)
-
-    fid = int(request.matchdict["fid"])
-    resource.feature_delete(fid)
 
 
 def apply_attr_filter(query, request, keynames):
@@ -951,13 +951,15 @@ def setup_pyramid(comp, config):
 
     config.add_route("feature_layer.mvt", "/api/component/feature_layer/mvt", get=mvt)
 
-    config.add_route(
+    fitm = config.add_route(
         "feature_layer.feature.item",
         "/api/resource/{id:uint}/feature/{fid:int}",
         factory=resource_factory,
-    ).get(iget, context=IFeatureLayer).put(iput, context=IFeatureLayer).delete(
-        idelete, context=IWritableFeatureLayer
     )
+
+    fitm.get(iget, context=IFeatureLayer)
+    fitm.put(iput, context=IFeatureLayer)
+    fitm.delete(idelete, context=IWritableFeatureLayer)
 
     config.add_route(
         "feature_layer.feature.item_extent",
@@ -971,15 +973,16 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
     ).get(geometry_info, context=IFeatureLayer)
 
-    config.add_route(
+    fcol = config.add_route(
         "feature_layer.feature.collection",
         "/api/resource/{id:uint}/feature/",
         factory=resource_factory,
-    ).get(cget, context=IFeatureLayer).post(cpost, context=IWritableFeatureLayer).patch(
-        cpatch, context=IWritableFeatureLayer
-    ).delete(
-        cdelete, context=IWritableFeatureLayer
     )
+
+    fcol.get(cget, context=IFeatureLayer)
+    fcol.post(cpost, context=IWritableFeatureLayer)
+    fcol.patch(cpatch, context=IWritableFeatureLayer)
+    fcol.delete(cdelete, context=IWritableFeatureLayer)
 
     config.add_route(
         "feature_layer.feature.count",
