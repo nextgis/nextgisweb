@@ -2,8 +2,9 @@ import warnings
 from collections import defaultdict
 from contextlib import contextmanager
 
+from msgspec import UNSET
+
 from .otype import OptionType
-from .util import NO_DEFAULT
 
 
 class Option:
@@ -11,7 +12,7 @@ class Option:
         self,
         key,
         otype=str,
-        default=NO_DEFAULT,
+        default=UNSET,
         required=False,
         secure=False,
         doc=None,
@@ -122,7 +123,7 @@ class ConfigOptions:
             optvalue = self._options[key]
         except KeyError as exc:
             if use_default:
-                if annotation.default != NO_DEFAULT:
+                if annotation.default is not UNSET:
                     self._values[key] = annotation.default
                     return annotation.default
                 else:
@@ -141,7 +142,7 @@ class ConfigOptions:
     def __setitem__(self, key, value):
         self._values[key] = value
 
-    def get(self, key, default=NO_DEFAULT):
+    def get(self, key, default=UNSET):
         """Get option by key with given default value."""
 
         annotation = self._akey_warn(key)
@@ -151,10 +152,10 @@ class ConfigOptions:
         except KeyError:
             default = (
                 default
-                if default != NO_DEFAULT
-                else (annotation.default if annotation.default != NO_DEFAULT else NO_DEFAULT)
+                if default is not UNSET
+                else (annotation.default if annotation.default is not UNSET else UNSET)
             )
-            if default == NO_DEFAULT:
+            if default is UNSET:
                 raise MissingDefaultError(key)
             value = default
 
@@ -206,7 +207,7 @@ class ConfigOptionsPrefixProxy:
     def __contains__(self, key):
         return self._pkey(key) in self._parent
 
-    def get(self, key, default=NO_DEFAULT):
+    def get(self, key, default=UNSET):
         return self._parent.get(self._pkey(key), default=default)
 
     def with_prefix(self, prefix):

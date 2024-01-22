@@ -4,14 +4,6 @@ import re
 from configparser import RawConfigParser
 
 
-class _NO_DEFAULT:
-    def __repr__(self):
-        return "NO_DEFAULT"
-
-
-NO_DEFAULT = _NO_DEFAULT()
-
-
 def environ_to_key(name, prefix="NEXTGISWEB"):
     """Convert environment variable name to setting name and return None
     in case of mismatch.
