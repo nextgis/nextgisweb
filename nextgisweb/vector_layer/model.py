@@ -1,5 +1,6 @@
 import re
 import uuid
+from pathlib import Path
 
 import geoalchemy2 as ga
 from msgspec import UNSET
@@ -35,17 +36,9 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from .feature_query import FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
+from .ogrloader import FID_SOURCE, FIX_ERRORS, TOGGLE, LoaderParams, OGRLoader
 from .table_info import TableInfo
-from .util import (
-    DRIVERS,
-    ERROR_FIX,
-    FID_SOURCE,
-    FIELD_TYPE_2_DB,
-    FIELD_TYPE_SIZE,
-    SCHEMA,
-    TOGGLE,
-    read_dataset_vector,
-)
+from .util import DRIVERS, FIELD_TYPE_2_DB, FIELD_TYPE_SIZE, SCHEMA, read_dataset_vector
 
 Base.depends_on("resource", "feature_layer")
 
@@ -63,18 +56,6 @@ GEOM_TYPE_DISPLAY = (
     _("Multiline Z"),
     _("Multipolygon Z"),
 )
-
-
-skip_errors_default = False
-
-geom_cast_params_default = dict(
-    geometry_type=TOGGLE.AUTO,
-    is_multi=TOGGLE.AUTO,
-    has_z=TOGGLE.AUTO,
-)
-
-
-fid_params_default = dict(fid_source=FID_SOURCE.SEQUENCE, fid_field=[])
 
 
 class VectorLayerField(Base, LayerField):
@@ -125,31 +106,70 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def _drop_table(self, *, connection):
         connection.execute(text(f"DROP TABLE {SCHEMA}.{self._tablename}"))
 
-    def from_ogr(self, filename, *, layername=None):
-        ds = read_dataset_vector(filename)
-        layer = ds.GetLayerByName(layername) if layername is not None else ds.GetLayer(0)
+    def from_source(self, source, *, layer=UNSET, **kw):
+        lparams = LoaderParams()
+        for k in list(kw.keys()):
+            if hasattr(lparams, k):
+                setattr(lparams, k, kw.pop(k))
+
+        if isinstance(source, Path):
+            source = str(source)
+
+        if isinstance(source, str):
+            source = read_dataset_vector(source, **kw)
+        else:
+            assert len(kw) == 0, f"Unconsumed arguments: {kw}"
+
+        if isinstance(source, gdal.Dataset):
+            # Keep reference against GC
+            dataset_ref = source
+            source = (
+                source.GetLayerByName(layer)
+                if isinstance(layer, str)
+                else source.GetLayer(0 if layer is UNSET else layer)
+            )
+        else:
+            dataset_ref = None
+            assert layer is UNSET
+
         with DBSession.no_autoflush:
-            self.setup_from_ogr(layer)
-            self.load_from_ogr(layer, validate=False)
+            loader = OGRLoader(source, params=lparams).scan()
+            self.geometry_type = loader.geometry_type
+            self.setup_from_fields(
+                [
+                    dict(keyname=lfld.name, datatype=lfld.datatype)
+                    for lfld in loader.fields.values()
+                ]
+            )
+
+            size = loader.write(
+                table=self._tablename,
+                schema=SCHEMA,
+                sequence=f"{self._tablename}_id_seq",
+                srs=self.srs,
+                columns=dict(
+                    zip(
+                        loader.fields.keys(),
+                        [f._column_name for f in self.fields],
+                    )
+                ),
+            )
+
+            env.core.reserve_storage(
+                COMP_ID,
+                VectorLayerData,
+                value_data_volume=size,
+                resource=self,
+            )
+
+        # Keep reference against GC
+        if dataset_ref:
+            pass
+
         return self
 
-    def setup_from_ogr(
-        self,
-        ogrlayer,
-        skip_other_geometry_types=False,
-        fid_params=fid_params_default,
-        geom_cast_params=geom_cast_params_default,
-        fix_errors=ERROR_FIX.default,
-    ):
-        tableinfo = TableInfo.from_ogrlayer(
-            ogrlayer, self.srs, skip_other_geometry_types, fid_params, geom_cast_params, fix_errors
-        )
-        tableinfo.setup_layer(self)
-
-        tableinfo.setup_metadata(self._tablename)
-        tableinfo.metadata.create_all(bind=DBSession.connection())
-
-        self.tableinfo = tableinfo
+    def from_ogr(self, *args, **kw):
+        return self.from_source(*args, validate=False, **kw)
 
     def setup_from_fields(self, fields):
         tableinfo = TableInfo.from_fields(fields, self.srs, self.geometry_type)
@@ -159,20 +179,6 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         tableinfo.metadata.create_all(bind=DBSession.connection())
 
         self.tableinfo = tableinfo
-
-    def load_from_ogr(
-        self,
-        ogrlayer,
-        skip_other_geometry_types=False,
-        fix_errors=ERROR_FIX.default,
-        skip_errors=skip_errors_default,
-        validate=True,
-    ):
-        size = self.tableinfo.load_from_ogr(
-            ogrlayer, skip_other_geometry_types, fix_errors, skip_errors, validate
-        )
-
-        env.core.reserve_storage(COMP_ID, VectorLayerData, value_data_volume=size, resource=self)
 
     def get_info(self):
         return super().get_info() + (
@@ -444,16 +450,7 @@ class _source_attr(SP):
 
         return ogrlayer
 
-    def _setup_layer(
-        self,
-        obj,
-        ogrlayer,
-        skip_other_geometry_types,
-        fix_errors,
-        skip_errors,
-        geom_cast_params,
-        fid_params,
-    ):
+    def _setup_layer(self, obj, ogrlayer, **kw):
         try:
             # Apparently OGR_XLSX_HEADERS is taken into account during the GetSpatialRef call
             gdal.SetConfigOption("OGR_XLSX_HEADERS", "FORCE")
@@ -463,10 +460,7 @@ class _source_attr(SP):
             gdal.SetConfigOption("OGR_XLSX_HEADERS", None)
 
         with DBSession.no_autoflush:
-            obj.setup_from_ogr(
-                ogrlayer, skip_other_geometry_types, fid_params, geom_cast_params, fix_errors
-            )
-            obj.load_from_ogr(ogrlayer, skip_other_geometry_types, fix_errors, skip_errors)
+            obj.from_source(ogrlayer, **kw)
 
     def setter(self, srlzr, value):
         if srlzr.obj.id is not None:
@@ -479,49 +473,48 @@ class _source_attr(SP):
 
         layer_name = srlzr.data.get("source_layer")
         ogrlayer = self._ogrlayer(ogrds, layer_name=layer_name)
+        kwargs = dict()
 
-        skip_other_geometry_types = srlzr.data.get("skip_other_geometry_types")
+        if (val := srlzr.data.get("skip_other_geometry_types", UNSET)) is not UNSET:
+            kwargs["skip_other_geometry_types"] = bool(val)
 
-        fix_errors = srlzr.data.get("fix_errors", ERROR_FIX.default)
-        if fix_errors not in ERROR_FIX.enum:
-            raise VE(message=_("Unknown 'fix_errors' value."))
+        if (val := srlzr.data.get("fix_errors", UNSET)) is not UNSET:
+            if val not in FIX_ERRORS.enum:
+                raise VE(message=_("Unknown 'fix_errors' value."))
+            kwargs["fix_errors"] = val
 
-        skip_errors = srlzr.data.get("skip_errors", skip_errors_default)
+        if (val := srlzr.data.get("skip_errors", UNSET)) is not UNSET:
+            kwargs["skip_errors"] = bool(val)
 
-        geometry_type = srlzr.data.get(
-            "cast_geometry_type", geom_cast_params_default["geometry_type"]
-        )
-        if geometry_type not in (None, "POINT", "LINESTRING", "POLYGON"):
-            raise VE(message=_("Unknown 'cast_geometry_type' value."))
+        if (val := srlzr.data.get("cast_geometry_type", UNSET)) is not UNSET:
+            if val not in (None, "POINT", "LINESTRING", "POLYGON"):
+                raise VE(message=_("Unknown 'cast_geometry_type' value."))
+            kwargs["cast_geometry_type"] = val
 
-        is_multi = srlzr.data.get("cast_is_multi", geom_cast_params_default["is_multi"])
-        if is_multi not in TOGGLE.enum:
-            raise VE(message=_("Unknown 'cast_is_multi' value."))
+        if (val := srlzr.data.get("cast_is_multi", UNSET)) is not UNSET:
+            if val not in TOGGLE.enum:
+                raise VE(message=_("Unknown 'cast_is_multi' value."))
+            kwargs["cast_is_multi"] = val
 
-        has_z = srlzr.data.get("cast_has_z", geom_cast_params_default["has_z"])
-        if has_z not in TOGGLE.enum:
-            raise VE(message=_("Unknown 'cast_has_z' value."))
+        if (val := srlzr.data.get("cast_has_z", UNSET)) is not UNSET:
+            if val not in TOGGLE.enum:
+                raise VE(message=_("Unknown 'cast_has_z' value."))
+            kwargs["cast_has_z"] = val
 
-        geom_cast_params = dict(geometry_type=geometry_type, is_multi=is_multi, has_z=has_z)
+        if (val := srlzr.data.get("fid_source", UNSET)) is not UNSET:
+            if val not in FID_SOURCE.enum:
+                raise VE(message=_("Unknown 'fid_source' value."))
+            kwargs["fid_source"] = val
 
-        fid_source = srlzr.data.get("fid_source", fid_params_default["fid_source"])
-        fid_field_param = srlzr.data.get("fid_field")
-        fid_field = (
-            fid_params_default["fid_field"]
-            if fid_field_param is None
-            else re.split(r"\s*,\s*", fid_field_param)
-        )
-
-        fid_params = dict(fid_source=fid_source, fid_field=fid_field)
+        if (val := srlzr.data.get("fid_field", UNSET)) is not UNSET:
+            if isinstance(val, str):
+                val = re.split(r"\s*,\s*", val)
+            kwargs["fid_field"] = val
 
         self._setup_layer(
             srlzr.obj,
             ogrlayer,
-            skip_other_geometry_types,
-            fix_errors,
-            skip_errors,
-            geom_cast_params,
-            fid_params,
+            **kwargs,
         )
 
 

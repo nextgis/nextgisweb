@@ -6,14 +6,12 @@ import webtest
 from osgeo import ogr, osr
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib.ogrhelper import read_dataset
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import FIELD_TYPE
 
 from .. import VectorLayer
-from ..table_info import ERROR_LIMIT
-from ..util import ERROR_FIX, FID_SOURCE
+from ..ogrloader import ERROR_LIMIT, FID_SOURCE, FIX_ERRORS
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -22,7 +20,6 @@ DATA_PATH = Path(__file__).parent / "data"
 
 def test_from_fields(ngw_txn):
     res = VectorLayer(geometry_type="POINT")
-
     res.setup_from_fields(
         [
             dict(keyname="integer", datatype=FIELD_TYPE.INTEGER),
@@ -38,7 +35,6 @@ def test_from_fields(ngw_txn):
     res.persist()
 
     assert res.feature_label_field.keyname == "string"
-
     DBSession.flush()
 
 
@@ -82,15 +78,8 @@ def test_from_ogr(filename, ngw_txn):
     ),
 )
 def test_from_csv_xlsx(filename, ngw_txn):
-    dsource = read_dataset(DATA_PATH / filename, source_filename=filename)
-    layer = dsource.GetLayer(0)
-
     res = VectorLayer().persist()
-
-    res.setup_from_ogr(layer)
-    res.load_from_ogr(layer)
-
-    DBSession.flush()
+    res.from_source(DATA_PATH / filename, source_filename=filename)
 
     features = list(res.feature_query()())
     assert len(features) == 1
@@ -112,10 +101,7 @@ def test_from_csv_xlsx(filename, ngw_txn):
 
 def test_type_geojson(ngw_txn):
     src = DATA_PATH / "type.geojson"
-
     res = VectorLayer().persist().from_ogr(src)
-
-    DBSession.flush()
 
     def field_as(f, n, t):
         fidx = f.GetFieldIndex(n)
@@ -156,17 +142,15 @@ def test_type_geojson(ngw_txn):
     ),
 )
 def test_fid(fid_source, fid_field, id_expect, ngw_txn):
-    src = DATA_PATH / "type.geojson"
-
-    dataset = ogr.Open(str(src))
-    layer = dataset.GetLayer(0)
-
-    res = VectorLayer().persist()
-
-    res.setup_from_ogr(layer, fid_params=dict(fid_source=fid_source, fid_field=fid_field))
-    res.load_from_ogr(layer)
-
-    DBSession.flush()
+    res = (
+        VectorLayer()
+        .persist()
+        .from_source(
+            DATA_PATH / "type.geojson",
+            fid_source=fid_source,
+            fid_field=fid_field,
+        )
+    )
 
     query = res.feature_query()
     query.filter_by(id=id_expect)
@@ -232,14 +216,12 @@ def test_error_limit():
             feature.SetGeometry(ogr.CreateGeometryFromWkt("POINT (0 0)"))
         layer.CreateFeature(feature)
 
-    res.setup_from_ogr(layer)
-
-    opts = dict(fix_errors=ERROR_FIX.NONE, skip_other_geometry_types=False)
+    opts = dict(fix_errors=FIX_ERRORS.NONE, skip_other_geometry_types=False)
     with pytest.raises(ValidationError) as excinfo:
-        res.load_from_ogr(layer, **opts, skip_errors=False)
+        res.from_source(layer, **opts, skip_errors=False)
     assert excinfo.value.detail is not None
 
-    res.load_from_ogr(layer, **opts, skip_errors=True)
+    res.from_source(layer, **opts, skip_errors=True)
 
     DBSession.flush()
     assert res.feature_query()().total_count == some
@@ -247,16 +229,12 @@ def test_error_limit():
 
 def test_geom_field():
     res = VectorLayer().persist()
-
     src = DATA_PATH / "geom-fld.geojson"
-    ds = ogr.Open(str(src))
-    layer = ds.GetLayer(0)
 
     with pytest.raises(ValidationError):
-        res.setup_from_ogr(layer)
-    res.setup_from_ogr(layer, fix_errors=ERROR_FIX.SAFE)
-    res.load_from_ogr(layer)
+        res.from_source(src)
 
+    res.from_source(src, fix_errors=FIX_ERRORS.SAFE)
     DBSession.flush()
 
     query = res.feature_query()
@@ -275,17 +253,13 @@ def test_geom_field():
 )
 def test_id_field(data):
     res = VectorLayer().persist()
-
     src = DATA_PATH / f"{data}.geojson"
-    ds = ogr.Open(str(src))
-    layer = ds.GetLayer(0)
 
     fid_params = dict(fid_source=FID_SOURCE.FIELD, fid_field=["id"])
     with pytest.raises(ValidationError):
-        res.setup_from_ogr(layer, fid_params=fid_params)
-    res.setup_from_ogr(layer, fix_errors=ERROR_FIX.SAFE, fid_params=fid_params)
-    res.load_from_ogr(layer)
+        res.from_source(src, **fid_params)
 
+    res.from_source(src, fix_errors=FIX_ERRORS.SAFE, **fid_params)
     DBSession.flush()
 
     query = res.feature_query()
