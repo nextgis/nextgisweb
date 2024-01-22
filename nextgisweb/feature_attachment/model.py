@@ -110,12 +110,7 @@ class FeatureAttachment(Base):
 
             with io.open(srcfile, "rb") as fs, io.open(dstfile, "wb") as fd:
                 copyfileobj(fs, fd)
-            with io.open(srcfile, "rb") as fs, io.open(dstfile, "wb") as fd:
-                copyfileobj(fs, fd)
 
-            for k in ("name", "mime_type"):
-                if k in file_upload:
-                    setattr(self, k, file_upload[k])
             for k in ("name", "mime_type"):
                 if k in file_upload:
                     setattr(self, k, file_upload[k])
