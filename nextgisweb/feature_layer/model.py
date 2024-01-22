@@ -46,7 +46,9 @@ class LayerField(Base):
     layer = db.relationship(Resource, primaryjoin="Resource.id == LayerField.layer_id")
 
     lookup_table = db.relationship(
-        LookupTable, primaryjoin="LayerField.lookup_table_id == LookupTable.id"
+        LookupTable,
+        primaryjoin="LayerField.lookup_table_id == LookupTable.id",
+        backref=db.backref("layer_fields"),
     )
 
     def __str__(self):
