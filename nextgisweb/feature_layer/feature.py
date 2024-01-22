@@ -4,17 +4,12 @@ from .interface import FIELD_TYPE
 
 
 class Feature:
-    def __init__(self, layer=None, id=None, fields=None, geom=None, box=None, calculations=None):
+    def __init__(self, layer=None, id=None, fields=None, geom=None, box=None):
         self._layer = layer
-
         self._id = int(id) if id is not None else None
-
         self._geom = geom
         self._box = box
-
         self._fields = dict(fields) if fields is not None else dict()
-
-        self._calculations = dict(calculations) if calculations else dict()
 
     @property
     def layer(self):
@@ -52,10 +47,6 @@ class Feature:
     @property
     def fields(self):
         return self._fields
-
-    @property
-    def calculations(self):
-        return self._calculations
 
     @property
     def geom(self):
