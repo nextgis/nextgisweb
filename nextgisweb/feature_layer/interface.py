@@ -153,6 +153,10 @@ class IWritableFeatureLayer(IFeatureLayer):
         """Save feature in a layer"""
 
 
+class IVersionableFeatureLayer(IWritableFeatureLayer):
+    pass
+
+
 class IFeatureQuery(Interface):
     layer = Attribute(""" IFeatureLayer """)
 

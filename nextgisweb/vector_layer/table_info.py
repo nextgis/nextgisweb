@@ -12,7 +12,7 @@ class TableInfo:
     def __init__(self, res):
         vls = res.vlschema()
         self.table = vls.ctab
-        self.id_column = self.table.columns.id
+        self.id_column = self.table.columns.fid
         self.geom_column = self.table.columns.geom
         self.fields = [FieldDef(f"fld_{f.fld_uuid}", f.keyname) for f in res.fields]
 

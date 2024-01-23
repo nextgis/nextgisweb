@@ -2,6 +2,7 @@ import warnings
 from dataclasses import dataclass
 
 import zope.event
+from msgspec import Meta
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
 from pyramid.threadlocal import get_current_request
 from sqlalchemy.orm import joinedload, with_polymorphic
@@ -59,6 +60,11 @@ def resource_factory(request):
     request.audit_context(res_cls, res_id)
 
     return obj
+
+
+resource_factory.annotations = dict(
+    id=[Meta(extra=dict(description="Resource ID"))],
+)
 
 
 @breadcrumb_adapter

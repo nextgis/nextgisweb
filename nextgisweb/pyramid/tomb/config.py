@@ -1,3 +1,4 @@
+from collections import defaultdict
 from inspect import signature
 from pathlib import Path
 from sys import _getframe
@@ -190,6 +191,16 @@ class Configurator(PyramidConfigurator):
 
             pattern = ROUTE_RE.sub(_sub, pattern)
 
+            mdannos = defaultdict(list)
+            if factory := kwargs.get("factory"):
+                if factory_annotations := getattr(factory, "annotations", None):
+                    for k, v in factory_annotations.items():
+                        mdannos[k].extend(v)
+
+            if route_annotations := kwargs.pop("annotations", None):
+                for k, v in route_annotations.items():
+                    mdannos[k].extend(v)
+
             if tmissing:
                 warn(
                     f"Some matchdict type specifiers are missing for route "
@@ -207,6 +218,7 @@ class Configurator(PyramidConfigurator):
                 client=client,
                 wotypes=wotypes,
                 mdtypes=mdtypes,
+                mdannos=dict(mdannos),
             )
 
         helper = RouteHelper(name, self, deprecated=deprecated, openapi=openapi)

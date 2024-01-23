@@ -1,14 +1,12 @@
 import re
+from functools import partial
 from itertools import chain
 from pathlib import Path
 
 from msgspec import UNSET
 from osgeo import gdal, ogr
-from shapely.geometry import box
 from sqlalchemy import event, func, inspect, text
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import validates
-from sqlalchemy.sql import delete, insert, update
 from zope.interface import implementer
 from zope.sqlalchemy import mark_changed
 
@@ -25,9 +23,16 @@ from nextgisweb.feature_layer import (
     IWritableFeatureLayer,
     LayerField,
     LayerFieldsMixin,
-    on_data_change,
 )
-from nextgisweb.feature_layer.exception import FeatureNotFound
+from nextgisweb.feature_layer.exception import FeatureNotFound, RestoreNotDeleted
+from nextgisweb.feature_layer.versioning import (
+    FeatureCreate,
+    FeatureDelete,
+    FeatureUpdate,
+    FVersioningMixin,
+    OperationFieldValue,
+    fversioning_guard,
+)
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceGroup, Serializer
 from nextgisweb.resource import SerializedProperty as SP
@@ -90,7 +95,7 @@ def _vlschema_autoflush(res):
 
     assert session, f"{res} not in a session"
     assert res not in session.deleted, f"{res} is deleted"
-    if insp.pending or res in session.dirty:
+    if insp.pending or session.is_modified(res):
         assert session.autoflush
         session.flush()
 
@@ -102,7 +107,7 @@ def _vlschema_autoflush(res):
     IWritableFeatureLayer,
     IBboxLayer,
 )
-class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
+class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixin):
     identity = "vector_layer"
     cls_display_name = _("Vector layer")
 
@@ -184,6 +189,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             connection=session,
         )
 
+        if self.fversioning:
+            session.execute(vls.dml_initfill())
+
         env.core.reserve_storage(
             COMP_ID,
             VectorLayerData,
@@ -226,10 +234,20 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
             self.fields.append(field)
 
-    @vlschema_autoflush
-    def vlschema(self, *, tbl_uuid=None, geometry_type=None, fields=None) -> VLSchema:
-        tbl_uuid = tbl_uuid if tbl_uuid else self.tbl_uuid
-        geometry_type = geometry_type if geometry_type else self.geometry_type
+    def vlschema(
+        self,
+        *,
+        tbl_uuid=None,
+        fversioning_enabled=None,
+        geometry_type=None,
+        fields=None,
+    ) -> VLSchema:
+        if tbl_uuid is None:
+            tbl_uuid = self.tbl_uuid
+        if fversioning_enabled is None:
+            fversioning_enabled = bool(self.fversioning)
+        if geometry_type is None:
+            geometry_type = self.geometry_type
         if fields is None:
             fields = {
                 fld.keyname: (
@@ -241,6 +259,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         return VLSchema(
             tbl_uuid=tbl_uuid,
+            versioning=fversioning_enabled,
             geom_column_type=self._geom_column_type(geometry_type),
             fields=fields,
         )
@@ -277,6 +296,9 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     @vlschema_autoflush
     def geometry_type_change(self, geometry_type):
+        if self.fversioning:
+            raise NotImplementedError
+
         if self.geometry_type == geometry_type:
             return
 
@@ -294,67 +316,119 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IWritableFeatureLayer
 
     @vlschema_autoflush
-    def feature_put(self, feature):
-        ctab = self.vlschema().ctab
-
-        values = dict()
-        if (geom := feature.geom) is not None:
-            values["geom"] = func.ST_GeomFromWKB(geom.wkb, text(str(self.srs_id)))
-        for f in self.fields:
-            if (v := feature.fields.get(f.keyname, UNSET)) is not UNSET:
-                values[ctab.fields[f.keyname].name] = v
-
-        query = update(ctab).where(ctab.c.id == feature.id).values(**values).returning(ctab.c.id)
-        session = inspect(self).session
-        if session.scalar(query) is None:
-            raise FeatureNotFound(self.id, feature.id)
-        mark_changed(session)
-
-        on_data_change.fire(self, feature.geom)
-
-    @vlschema_autoflush
+    @fversioning_guard
     def feature_create(self, feature):
         vls = self.vlschema()
-        ctab = vls.ctab
+        session = inspect(self).session
 
-        values = dict(id=vls.cnextval)
-        if (geom := feature.geom) is not None:
-            values["geom"] = func.ST_GeomFromWKB(geom.wkb, text(str(self.srs_id)))
+        data = dict()
+        query, bmap = vls.dml_insert(fields=feature.fields.keys())
+
+        geom = feature.geom
+        data["geom"] = geom.wkb if geom not in (None, UNSET) else None
+
         for f in self.fields:
             if (v := feature.fields.get(f.keyname, UNSET)) is not UNSET:
-                values[ctab.fields[f.keyname].name] = v
+                data[bmap[f.keyname]] = v
 
-        query = insert(ctab).values(values).returning(ctab.c.id)
-        session = inspect(self).session
-        feature_id = session.scalar(query)
+        if vobj := self.fversioning_vobj:
+            data["vid"] = vobj.version_id
+
+        fid = session.scalar(query, data)
+        assert fid is not None
+
+        if vobj:
+            vobj.mark_changed()
         mark_changed(session)
-
-        on_data_change.fire(self, feature.geom)
-        return feature_id
+        return fid
 
     @vlschema_autoflush
-    def feature_delete(self, feature_id):
-        ctab = self.vlschema(fields={}).ctab
-        query = delete(ctab).where(ctab.c.id == feature_id).returning(ctab.c.geom)
+    @fversioning_guard
+    def feature_put(self, feature):
+        vls = self.vlschema()
         session = inspect(self).session
-        try:
-            geom = session.execute(query).one()[0]
-        except NoResultFound:
+
+        data = dict()
+        with_geom = False
+        if (geom := feature.geom) is not UNSET:
+            data["geom"] = geom.wkb if geom else None
+            with_geom = True
+
+        query, bmap = vls.dml_update(
+            id=feature.id,
+            with_geom=with_geom,
+            fields=feature.fields.keys(),
+        )
+
+        for f in self.fields:
+            if (v := feature.fields.get(f.keyname, UNSET)) is not UNSET:
+                data[bmap[f.keyname]] = v
+
+        if vobj := self.fversioning_vobj:
+            data["vid"] = vobj.version_id
+
+        result = session.execute(query, data)
+        if result.rowcount:
+            if vobj:
+                vobj.mark_changed()
+            mark_changed(session)
+            return True
+
+        return False
+
+    @vlschema_autoflush
+    @fversioning_guard
+    def feature_delete(self, feature_id):
+        vls = self.vlschema()
+        session = inspect(self).session
+        query = vls.dml_delete(filter_by=dict(fid=feature_id))
+
+        if vobj := self.fversioning_vobj:
+            result = session.execute(query, dict(vid=vobj.version_id))
+            row_count = result.rowcount
+            if row_count > 0:
+                vobj.mark_features_deleted(feature_id)
+        else:
+            row_count = session.execute(query).rowcount
+
+        if row_count == 0:
             raise FeatureNotFound(self.id, feature_id)
         mark_changed(session)
 
-        on_data_change.fire(self, geom)
-
     @vlschema_autoflush
-    def feature_delete_all(self):
-        ctab = self.vlschema(fields={}).ctab
-        query = delete(ctab)
+    @fversioning_guard
+    def feature_restore(self, feature_id):
+        vls = self.vlschema()
         session = inspect(self).session
-        session.execute(query)
+        query = vls.dml_restore()
+
+        vobj = self.fversioning_vobj
+        assert vobj is not None
+
+        qres = session.execute(query, dict(p_fid=feature_id, p_vid=vobj.version_id))
+        if qres.rowcount > 0:
+            vobj.mark_features_restored(feature_id)
+        else:
+            raise RestoreNotDeleted(self.id, feature_id)
+
         mark_changed(session)
 
-        geom = box(self.srs.minx, self.srs.miny, self.srs.maxx, self.srs.maxy)
-        on_data_change.fire(self, geom)
+    @vlschema_autoflush
+    @fversioning_guard
+    def feature_delete_all(self):
+        vls = self.vlschema()
+        session = inspect(self).session
+        query = vls.dml_delete(filter_by={})
+
+        if vobj := self.fversioning_vobj:
+            result = session.execute(query, dict(vid=vobj.version_id))
+            if result.rowcount > 0:
+                vobj.mark_features_deleted(all=True)
+        else:
+            result = session.execute(query)
+
+        if result.rowcount > 0:
+            mark_changed(session)
 
     # IBboxLayer implementation:
 
@@ -364,27 +438,78 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         ctab = self.vlschema(fields={}).ctab
         return calculate_extent(ctab.columns.geom)
 
+    # Versioning
+
+    def fversioning_changed_fids(self):
+        yield from self.vlschema().query_changed_fids()
+
+    def fversioning_changes(self, *, initial, target, fid_min, fid_max):
+        initial = initial or 0
+
+        fields = {fld.id: (fld.fld_uuid, FIELD_TYPE_2_DB[fld.datatype]) for fld in self.fields}
+
+        query, fmap = self.vlschema(fields=fields).query_changes()
+        result = DBSession.execute(
+            query,
+            dict(
+                p_initial=initial,
+                p_target=target,
+                p_fid_min=fid_min,
+                p_fid_max=fid_max,
+            ),
+        )
+
+        geom_col_offset = 4
+        for row in result:
+            fid, vid, op, bits, geom = row[: geom_col_offset + 1]
+            if op == "D":
+                yield FeatureDelete(fid=fid, vid=vid)
+            elif op == "C":
+                yield FeatureCreate(
+                    fid=fid,
+                    vid=vid,
+                    geom=geom if geom is not None else UNSET,
+                    fields=[
+                        OperationFieldValue(id, row[geom_col_offset + idx])
+                        for id, idx in fmap.items()
+                        if row[geom_col_offset + idx] is not None
+                    ],
+                )
+            elif op == "U":
+                yield FeatureUpdate(
+                    fid=fid,
+                    vid=vid,
+                    geom=geom if geom is not None else UNSET,
+                    fields=[
+                        OperationFieldValue(id, row[geom_col_offset + idx])
+                        for id, idx in fmap.items()
+                        if bits[idx] == "1"
+                    ],
+                )
+            else:
+                raise NotImplementedError
+
     # Internals
 
     def _vlschema_wipe(self):
         self.fields[:] = []
         self.tbl_uuid = uuid_hex()
 
-    def _geom_column_type(self, geometry_type=None):
-        geometry_type = geometry_type if geometry_type else self.geometry_type
-        return saext.Geometry(geometry_type, self.srs.id)
-
     @validates("tbl_uuid")
     def _tbl_uuid_validate(self, key, value):
         assert self.tbl_uuid is None or self.fields == []
         return value
+
+    def _geom_column_type(self, geometry_type=None):
+        geometry_type = geometry_type if geometry_type else self.geometry_type
+        return saext.Geometry(geometry_type, self.srs.id)
 
 
 # Create vector_layer schema on table creation
 event.listen(
     VectorLayer.__table__,
     "after_create",
-    db.DDL("CREATE SCHEMA %s" % SCHEMA),
+    db.DDL(f"CREATE SCHEMA {SCHEMA}"),
     propagate=True,
 )
 
@@ -392,7 +517,7 @@ event.listen(
 event.listen(
     VectorLayer.__table__,
     "after_drop",
-    db.DDL("DROP SCHEMA IF EXISTS %s CASCADE" % SCHEMA),
+    db.DDL(f"DROP SCHEMA IF EXISTS {SCHEMA} CASCADE"),
     propagate=True,
 )
 
@@ -401,41 +526,29 @@ class VectorLayerSession:
     @classmethod
     def listen(cls, session):
         event.listen(session, "before_flush", cls.before_flush)
-        event.listen(session, "after_flush", cls.after_flush)
 
     @classmethod
     def before_flush(cls, session, flush_context, instances):
-        instance = cls()
-        session.info[cls] = instance
-        instance.handle_session(session)
+        exec = partial(_execute_multiple, session=session)
 
-    @classmethod
-    def after_flush(cls, session, flush_context):
-        session.info[cls].execute_queries(session)
-        del session.info[cls]
-
-    def __init__(self):
-        self.execute = list()
-
-    def push(self, args):
-        self.execute.extend(args)
-
-    def handle_session(self, session):
+        deleted = set()
         for obj in session.deleted:
             if isinstance(obj, VectorLayer):
                 # TODO: Consider changing of tbl_uuid
-                self.push(obj.vlschema(fields={}).sql_drop())
+                exec(obj.vlschema(fields={}).sql_drop())
+                deleted.add(obj)
 
         for obj in session:
-            if isinstance(obj, VectorLayer):
+            if isinstance(obj, VectorLayer) and obj not in deleted:
                 insp = inspect(obj)
                 if insp.pending:
-                    self.push(obj.vlschema().sql_create())
+                    exec(obj.vlschema().sql_create())
                 else:
-                    self.handle_changed(obj, insp)
+                    cls.handle_changed(obj, insp, exec, session)
 
-    def handle_changed(self, obj, insp):
-        attrs = {"tbl_uuid", "geometry_type", "fields"}
+    @classmethod
+    def handle_changed(cls, obj, insp, exec, session):
+        attrs = {"tbl_uuid", "fversioning", "geometry_type", "fields"}
         if insp.unloaded.issuperset(attrs):
             return
 
@@ -445,11 +558,13 @@ class VectorLayerSession:
             a, u, d = getattr(iattrs, attr).history
             if not a and not d:
                 continue
-            if attr != "fields":
+            if attr == "fields":
+                fadd, fdel = a, d
+            elif attr == "fversioning":
+                achanges[attr] = (bool(d) and (bool(d[0])), bool(a) and bool(a[0]))
+            else:
                 assert a and d
                 achanges[attr] = (d[0], a[0])
-            else:
-                fadd, fdel = a, d
         if not achanges and not fadd and not fdel:
             return
 
@@ -458,13 +573,25 @@ class VectorLayerSession:
 
         wiped = False
         if tu := achanges.pop("tbl_uuid", None):
+            if obj.fversioning:
+                raise NotImplementedError
             vls = obj.vlschema(tbl_uuid=tu[0])
-            self.push(vls.sql_drop())
-            self.push(obj.vlschema().sql_create())
+            exec(vls.sql_drop())
+            exec(obj.vlschema().sql_create())
             wiped = True
 
+        elif vm := achanges.pop("fversioning", None):
+            fversioning_enabled = vm[1]
+            vls = obj.vlschema()
+            if fversioning_enabled:
+                exec(vls.sql_versioning_enable())
+            else:
+                exec(vls.sql_versioning_disable())
+
         elif gt := achanges.pop("geometry_type", None):
-            self.push(
+            if obj.fversioning:
+                raise NotImplementedError
+            exec(
                 obj.vlschema(
                     geometry_type=gt[0],
                     fields={},
@@ -493,11 +620,12 @@ class VectorLayerSession:
                 vls = obj.vlschema(fields=fields)
                 for oper, fidxs in operations.items():
                     if len(fidxs) > 0:
-                        self.push(getattr(vls, f"sql_{oper}_fields")(fidxs))
+                        exec(getattr(vls, f"sql_{oper}_fields")(fidxs))
 
-    def execute_queries(self, session):
-        for query in self.execute:
-            session.execute(query)
+
+def _execute_multiple(queries, *, session):
+    for q in queries:
+        session.execute(q)
 
 
 VectorLayerSession.listen(DBSession)

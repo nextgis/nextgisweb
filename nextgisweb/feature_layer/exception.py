@@ -18,3 +18,16 @@ class FeatureNotFound(UserException):
             message=self.__class__.message % (feature_id, resource_id),
             data=dict(resource_id=resource_id, feature_id=feature_id),
         )
+
+
+class RestoreNotDeleted(UserException):
+    title = _("Feature not deleted")
+    message = _("Unable to restore the #{} feature as it is not deleted.")
+    detail = _("The feature may exist or have never existed.")
+    http_status_code = 422
+
+    def __init__(self, resource_id, feature_id):
+        super().__init__(
+            message=self.message.format(feature_id),
+            data=dict(resource_id=resource_id, feature_id=feature_id),
+        )

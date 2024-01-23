@@ -1,5 +1,5 @@
 from enum import EnumMeta
-from typing import Union, get_args, get_origin
+from typing import Optional, Union, get_args, get_origin
 
 from msgspec import Meta, convert
 from typing_extensions import Annotated
@@ -54,3 +54,10 @@ def param_decoder(tdef):
         return convert(vals, tdef)
 
     return _decode
+
+
+def ParamMeta(*, description: Optional[str] = None):
+    extra = dict()
+    if description is not None:
+        extra["description"] = description
+    return Meta(extra=extra)

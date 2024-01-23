@@ -1,7 +1,8 @@
 import sqlalchemy as sa
+from msgspec import UNSET
 from shapely.geometry import box
-from sqlalchemy import cast, func, sql
-from sqlalchemy.sql import null
+from sqlalchemy import cast, func
+from sqlalchemy.sql import alias, literal_column, null, select
 from zope.interface import implementer
 
 from nextgisweb.env import DBSession
@@ -40,6 +41,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def __init__(self):
         super().__init__()
 
+        self._pit_version = None
+
         self._srs = None
         self._geom = None
         self._geom_format = "WKB"
@@ -57,6 +60,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._ilike = None
 
         self._order_by = None
+
+    def pit(self, version):
+        self._pit_version = version
 
     def srs(self, srs):
         self._srs = srs
@@ -99,11 +105,16 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._ilike = value
 
     def __call__(self):
-        table = self.layer.vlschema().ctab
+        vls = self.layer.vlschema()
+        if not self._pit_version:
+            table = alias(vls.ctab, "tab")
+        else:
+            table = vls.query_pit(self._pit_version)
 
-        idcol = table.columns.id
+        idcol = table.columns.fid
         geomcol = table.columns.geom
-        columns = [idcol]
+        fields = table.fields
+        columns = []
         where = []
 
         srs = self.layer.srs if self._srs is None else self._srs
@@ -141,15 +152,15 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             columns.append(geomexpr.label("geom"))
 
         selected_fields = []
-        for idx, (fld_k, fld_c) in enumerate(table.fields.items()):
+        for idx, (fld_k, fld_c) in enumerate(fields.items(), start=1):
             if self._fields is None or fld_k in self._fields:
-                label = str(idx)
+                label = f"fld_{idx}"
                 columns.append(fld_c.label(label))
                 selected_fields.append((fld_k, label))
 
         if self._filter_by:
             for k, v in self._filter_by.items():
-                where.append((idcol if k == "id" else table.fields[k]) == v)
+                where.append((idcol if k == "id" else fields[k]) == v)
 
         if self._filter:
             _where_filter = []
@@ -194,14 +205,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     v = null()
 
                 op = getattr(db.sql.operators, o)
-                column = idcol if k == "id" else table.fields[k]
+                column = idcol if k == "id" else fields[k]
                 _where_filter.append(op(column, v))
 
             if len(_where_filter) > 0:
                 where.append(db.and_(*_where_filter))
 
         if self._like or self._ilike:
-            operands = [cast(fld_c, db.Unicode) for fld_c in table.fields.values()]
+            operands = [cast(fld_c, db.Unicode) for fld_c in fields.values()]
             if len(operands) == 0:
                 where.append(False)
             else:
@@ -227,11 +238,22 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             where.append(func.st_intersects(geomcol, int_geom))
 
-        order_criterion = []
+        order_by = []
         if self._order_by:
             for order, fld_k in self._order_by:
-                order_criterion.append(dict(asc=db.asc, desc=db.desc)[order](table.fields[fld_k]))
-        order_criterion.append(db.asc(idcol))
+                order_by.append(getattr(fields[fld_k], order)())
+        order_by.append(idcol.asc())
+
+        qbase = select(idcol)
+        if (vid_col := table.c.get("vid")) is not None:
+            qbase = qbase.add_columns(vid_col)
+        elif self.layer.fversioning:
+            vc = alias(vls.etab, "tab_e")
+            qbase = qbase.add_columns(vc.c.vid)
+            qbase = qbase.join(vc, vc.c.fid == idcol)
+        else:
+            qbase = qbase.add_columns(literal_column("NULL").label("vid"))
+        qbase = qbase.add_columns(*columns)
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer
@@ -243,32 +265,31 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             _offset = self._offset
 
             def __iter__(self):
-                query = (
-                    sql.select(*columns)
-                    .limit(self._limit)
-                    .offset(self._offset)
-                    .order_by(*order_criterion)
-                )
+                query = qbase.where(*where).order_by(*order_by)
+                query = query.limit(self._limit).offset(self._offset)
 
-                if len(where) > 0:
-                    query = query.where(db.and_(*where))
-
-                result = DBSession.connection().execute(query)
+                result = DBSession.execute(query)
                 for row in result.mappings():
-                    fdict = dict((keyname, row[label]) for keyname, label in selected_fields)
+                    fdict = {keyname: row[label] for keyname, label in selected_fields}
 
                     if self._geom:
-                        if self._geom_format == "WKB":
+                        geom_row = row["geom"]
+                        if geom_row is None:
+                            geom = None
+                        elif self._geom_format == "WKB":
                             geom_data = row["geom"].tobytes()
                             geom = Geometry.from_wkb(geom_data, validate=False)
-                        else:
+                        elif self._geom_format == "WKT":
                             geom = Geometry.from_wkt(row["geom"], validate=False)
+                        else:
+                            raise NotImplementedError
                     else:
-                        geom = None
+                        geom = UNSET
 
                     yield Feature(
                         layer=self.layer,
-                        id=row.id,
+                        id=row.fid,
+                        version=row.vid,
                         fields=fdict,
                         geom=geom,
                         box=box(row.box_left, row.box_bottom, row.box_right, row.box_top)
@@ -278,15 +299,12 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             @property
             def total_count(self):
-                query = sql.select(func.count(idcol))
-                if len(where) > 0:
-                    query = query.where(db.and_(*where))
-                result = DBSession.connection().execute(query)
-                return result.scalar()
+                query = select(func.count(idcol)).where(*where)
+                return DBSession.scalar(query)
 
             @property
             def extent(self):
-                geom_clause = sa.select(geomcol).where(*where).subquery().c[0]
+                geom_clause = select(geomcol).where(*where).subquery().c[0]
                 return calculate_extent(geom_clause)
 
         return QueryFeatureSet()

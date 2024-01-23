@@ -1,7 +1,9 @@
+import base64
 from collections import defaultdict
 from typing import Any, Dict
 
 from msgspec import UNSET, Meta
+from msgspec.inspect import Metadata, type_info
 from msgspec.json import schema_components
 from typing_extensions import Annotated
 
@@ -90,7 +92,15 @@ def openapi(introspector, prefix="/api/"):
         # Path parameters
         p_params, p_param = _pfact("path", required=True)
         for pname, ptype in route.mdtypes.items():
-            p_param(pname, schema=schema_ref(_PATH_TYPE[ptype]))
+            tdef = _PATH_TYPE[ptype]
+            pkwargs = dict()
+            if annos := route.mdannos.get(pname):
+                tdef = Annotated[(tdef, *annos)]
+                tinfo = type_info(tdef)
+                if isinstance(tinfo, Metadata) and (extra := tinfo.extra):
+                    if description := extra.get("description"):
+                        pkwargs["description"] = description
+            p_param(pname, schema=schema_ref(tdef), **pkwargs)
 
         # Operations
         for view in route.views:

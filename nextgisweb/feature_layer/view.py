@@ -1,6 +1,6 @@
 from pyramid.httpexceptions import HTTPNotFound
 
-from nextgisweb.env import _
+from nextgisweb.env import _, env
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.pyramid import JSONType, viewargs
@@ -16,7 +16,7 @@ from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
 from .extension import FeatureExtension
-from .interface import IFeatureLayer
+from .interface import IFeatureLayer, IVersionableFeatureLayer
 from .ogrdriver import MVT_DRIVER_EXIST
 
 
@@ -24,6 +24,19 @@ class FeatureLayerFieldsWidget(Widget):
     interface = IFeatureLayer
     operation = ("update",)
     amdmod = "ngw-feature-layer/FieldsWidget"
+
+
+class SettingsWidget(Widget):
+    interface = IFeatureLayer
+    operation = ("create", "update")
+    amdmod = "@nextgisweb/feature-layer/settings-widget"
+
+    def is_applicable(self) -> bool:
+        return (
+            env.feature_layer.options["versioning.enabled"]
+            and IVersionableFeatureLayer.providedBy(self.obj)
+            and super().is_applicable()
+        )
 
 
 PD_READ = DataScope.read

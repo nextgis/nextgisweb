@@ -50,6 +50,7 @@ class RouteMeta(MetaPredicateBase):
     client: bool
     wotypes: str
     mdtypes: Dict[str, str]
+    mdannos: Dict[str, list]
 
 
 class ErrorRendererPredicate:

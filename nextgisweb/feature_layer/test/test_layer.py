@@ -2,6 +2,7 @@ import json
 from datetime import date, datetime, time
 
 import pytest
+from msgspec import UNSET
 from osgeo import ogr
 
 from nextgisweb.lib.geometry import Geometry, Transformer
@@ -103,7 +104,8 @@ def test_attributes(
         assert result.total_count == len(gj_fs)
         for i, f in enumerate(result):
             cmp_fields(gj_fs[i]["properties"], f.fields)
-            assert f.geom is None
+            # TODO: Migrate everything to UNSET
+            assert f.geom in (None, UNSET)
 
         # - fields
         fields = ("int", "string")
