@@ -13,6 +13,8 @@ ROUTE_PATTERN = dict(
     any=r".*",
     int=r"-?[0-9]+",
     uint=r"[0-9]+",
+    pint=r"0*[1-9][0-9]*",
+    urlsafe=r"[A-Za-z0-9\-\._~]*",
 )
 
 ROUTE_RE = re.compile(

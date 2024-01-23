@@ -136,7 +136,9 @@ class PyramidComponent(Component):
         typemap = {
             "int": "number",
             "uint": "number",
+            "pint": "number",
             "str": "string",
+            "urlsafe": "string",
             "any": "string",
         }
 

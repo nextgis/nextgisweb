@@ -18,6 +18,8 @@ _PATH_TYPE = dict(
     any=str,
     int=int,
     uint=Annotated[int, Meta(ge=0)],
+    pint=Annotated[int, Meta(ge=1)],
+    urlsafe=Annotated[str, Meta(pattern=r"^[A-Za-z0-9\-\._~]*$")],
 )
 
 
