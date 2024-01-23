@@ -7,4 +7,76 @@
     > .wrapper {
         padding: 0;
     }
+
+    .opblock > .opblock-summary {
+        padding: 4px 6px;
+
+        > .opblock-summary-control {
+            flex-flow: row wrap;
+
+            > .opblock-summary-method {
+                order: 1;
+                margin-right: 1ex;
+                background: unset;
+                padding: unset;
+                min-width: unset;
+                text-shadow: unset;
+            }
+            > .opblock-summary-path,
+            > .opblock-summary-path__deprecated {
+                flex-grow: 1;
+                order: 2;
+                padding: unset;
+                max-width: unset;
+                font-weight: unset;
+                font-size: 14px;
+            }
+            > .opblock-summary-description {
+                order: 4;
+                width: 100%;
+                font-size: 16px;
+            }
+            > svg.arrow {
+                order: 3;
+            }
+        }
+
+        &.opblock-summary-get
+            > .opblock-summary-control
+            > .opblock-summary-method {
+            color: #61affe;
+        }
+
+        &.opblock-summary-post
+            > .opblock-summary-control
+            > .opblock-summary-method {
+            color: #49cc90;
+        }
+
+        &.opblock-summary-put
+            > .opblock-summary-control
+            > .opblock-summary-method {
+            color: #fca130;
+        }
+        &.opblock-summary-delete
+            > .opblock-summary-control
+            > .opblock-summary-method {
+            color: #f93e3e;
+        }
+        &.opblock-summary-head
+            > .opblock-summary-control
+            > .opblock-summary-method {
+            color: #9012fe;
+        }
+        &.opblock-summary-options
+            > .opblock-summary-control
+            > .opblock-summary-method {
+            color: #0d5aa7;
+        }
+        &.opblock-summary-patch
+            > .opblock-summary-control
+            > .opblock-summary-method {
+            color: #50e3c2;
+        }
+    }
 }
