@@ -5,6 +5,7 @@ from os import environ
 import transaction
 from babel import Locale
 from babel.core import UnknownLocaleError
+from msgspec.inspect import IntType, Metadata, StrType, type_info
 
 from nextgisweb.env import Component, _, require
 from nextgisweb.lib.config import Option, OptionAnnotations
@@ -133,19 +134,20 @@ class PyramidComponent(Component):
     def client_codegen(self):
         self.make_app(settings=dict())
 
-        typemap = {
-            "int": "number",
-            "uint": "number",
-            "str": "string",
-            "any": "string",
-        }
+        def tstype(tdef):
+            tinfo = type_info(tdef)
+            titype = tinfo.type if isinstance(tinfo, Metadata) else tinfo
+            if isinstance(titype, IntType):
+                return "number"
+            elif isinstance(titype, StrType):
+                return "string"
 
         code = ["export interface RouteParameters /* prettier-ignore */ {"]
         for k, v in self.route_mdtypes.items():
             if len(v) == 0:
                 cv = "[]"
             else:
-                cv = ", ".join(p + ": " + typemap[t] for p, t in v.items())
+                cv = ", ".join(p + ": " + tstype(t) for p, t in v.items())
                 cv = f"[{cv}] | [{{ {cv} }}]" if len(v) == 1 else f"[{{ {cv} }}]"
             code.append(f'    "{k}": {cv};')
         code.append("}")

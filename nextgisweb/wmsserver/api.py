@@ -28,7 +28,7 @@ from nextgisweb.render import (
     image_encoder_factory,
     scale_range_intersection,
 )
-from nextgisweb.resource import DataScope, ServiceScope, resource_factory
+from nextgisweb.resource import DataScope, ResourceFactory, ServiceScope
 from nextgisweb.spatial_ref_sys import SRS
 
 from .model import Service
@@ -527,12 +527,13 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
 
 
 def setup_pyramid(comp, config):
-    route = config.add_route(
-        "wmsserver.wms",
-        "/api/resource/{id:uint}/wms",
-        factory=resource_factory,
-        error_renderer=error_renderer,
-    )
+    service_factory = ResourceFactory(context=Service)
 
-    route.get(handler, context=Service)
-    route.post(handler, context=Service)
+    config.add_route(
+        "wmsserver.wms",
+        "/api/resource/{id}/wms",
+        factory=service_factory,
+        error_renderer=error_renderer,
+        get=handler,
+        post=handler,
+    )

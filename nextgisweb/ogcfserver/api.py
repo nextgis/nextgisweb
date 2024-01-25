@@ -10,7 +10,7 @@ from nextgisweb.feature_layer.api import deserialize, query_feature_or_not_found
 from nextgisweb.feature_layer.feature import Feature
 from nextgisweb.feature_layer.interface import IWritableFeatureLayer
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, ServiceScope, resource_factory
+from nextgisweb.resource import DataScope, ResourceFactory, ServiceScope
 from nextgisweb.spatial_ref_sys import SRS
 
 from .model import Service
@@ -529,54 +529,64 @@ def openapi(resource, request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
+    service_factory = ResourceFactory(context=Service)
+
     config.add_route(
         "ogcfserver.landing_page",
-        "/api/resource/{id:uint}/ogcf",
-        factory=resource_factory,
-    ).get(landing_page, context=Service)
+        "/api/resource/{id}/ogcf",
+        factory=service_factory,
+        get=landing_page,
+    )
 
     config.add_route(
         "ogcfserver.openapi",
-        "/api/resource/{id:uint}/ogcf/openapi",
-        factory=resource_factory,
+        "/api/resource/{id}/ogcf/openapi",
+        factory=service_factory,
         openapi=False,
-    ).get(openapi, context=Service)
+        get=openapi,
+    )
 
     config.add_route(
         "ogcfserver.conformance",
-        "/api/resource/{id:uint}/ogcf/conformance",
-        factory=resource_factory,
+        "/api/resource/{id}/ogcf/conformance",
+        factory=service_factory,
         openapi=False,
-    ).get(conformance, context=Service)
+        get=conformance,
+    )
 
     config.add_route(
         "ogcfserver.collections",
-        "/api/resource/{id:uint}/ogcf/collections",
-        factory=resource_factory,
+        "/api/resource/{id}/ogcf/collections",
+        factory=service_factory,
         openapi=False,
-    ).get(collections, context=Service)
+        get=collections,
+    )
 
     config.add_route(
         "ogcfserver.collection",
-        "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}",
-        factory=resource_factory,
+        "/api/resource/{id}/ogcf/collections/{collection_id:str}",
+        factory=service_factory,
         openapi=False,
-    ).get(collection, context=Service)
+        get=collection,
+    )
 
     config.add_route(
         "ogcfserver.items",
-        "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}/items",
-        factory=resource_factory,
+        "/api/resource/{id}/ogcf/collections/{collection_id:str}/items",
+        factory=service_factory,
         openapi=False,
-    ).get(items, context=Service).post(create, context=Service).options(options, context=Service)
+        get=items,
+        post=create,
+        options=options,
+    )
 
     config.add_route(
         "ogcfserver.item",
-        "/api/resource/{id:uint}/ogcf/collections/{collection_id:str}/items/{item_id:int}",
-        factory=resource_factory,
+        "/api/resource/{id}/ogcf/collections/{collection_id:str}/items/{item_id:int}",
+        factory=service_factory,
         openapi=False,
-    ).get(iget, context=Service).put(iput, context=Service).delete(
-        idelete, context=Service
-    ).options(
-        options, context=Service
+        get=iget,
+        put=iput,
+        delete=idelete,
+        options=options,
     )

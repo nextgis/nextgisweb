@@ -5,7 +5,7 @@ from nextgisweb.env import _
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import ConnectionScope, DataStructureScope, resource_factory
+from nextgisweb.resource import ConnectionScope, DataStructureScope, ResourceFactory
 
 from .diagnostics import Checker
 from .exception import ExternalDatabaseError
@@ -127,17 +127,21 @@ def diagnostics(request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
+    postgis_connection_factory = ResourceFactory(context=PostgisConnection)
+
     config.add_route(
         "postgis.connection.inspect",
-        "/api/resource/{id:uint}/inspect/",
-        factory=resource_factory,
-    ).get(inspect_connection, context=PostgisConnection)
+        "/api/resource/{id}/inspect/",
+        factory=postgis_connection_factory,
+        get=inspect_connection,
+    )
 
     config.add_route(
         "postgis.connection.inspect.table",
-        "/api/resource/{id:uint}/inspect/{table_name:str}/",
-        factory=resource_factory,
-    ).get(inspect_table, context=PostgisConnection)
+        "/api/resource/{id}/inspect/{table_name:str}/",
+        factory=postgis_connection_factory,
+        get=inspect_table,
+    )
 
     config.add_route(
         "postgis.diagnostics",

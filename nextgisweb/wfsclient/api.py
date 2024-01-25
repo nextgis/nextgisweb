@@ -1,5 +1,5 @@
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import ConnectionScope, resource_factory
+from nextgisweb.resource import ConnectionScope, ResourceFactory
 
 from .model import WFSConnection
 
@@ -22,14 +22,18 @@ def inspect_layer(resource, request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
+    wfsconnection_factory = ResourceFactory(context=WFSConnection)
+
     config.add_route(
         "wfsclient.connection.inspect",
-        "/api/resource/{id:uint}/wfs_connection/inspect/",
-        factory=resource_factory,
-    ).get(inspect_connection, context=WFSConnection)
+        "/api/resource/{id}/wfs_connection/inspect/",
+        factory=wfsconnection_factory,
+        get=inspect_connection,
+    )
 
     config.add_route(
         "wfsclient.connection.inspect.layer",
-        "/api/resource/{id:uint}/wfs_connection/inspect/{layer:str}/",
-        factory=resource_factory,
-    ).add_view(inspect_layer, context=WFSConnection, request_method="GET")
+        "/api/resource/{id}/wfs_connection/inspect/{layer:str}/",
+        factory=wfsconnection_factory,
+        get=inspect_layer,
+    )

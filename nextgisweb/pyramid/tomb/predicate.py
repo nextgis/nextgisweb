@@ -49,7 +49,7 @@ class RouteMeta(MetaPredicateBase):
     overloaded: bool
     client: bool
     wotypes: str
-    mdtypes: Dict[str, str]
+    mdtypes: Dict[str, Type]
 
 
 class ErrorRendererPredicate:

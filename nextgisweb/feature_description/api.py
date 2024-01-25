@@ -5,7 +5,8 @@ from pyramid.response import FileResponse
 
 from nextgisweb.lib.json import dumpb
 
-from nextgisweb.resource import DataScope, resource_factory
+from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.resource import DataScope, ResourceFactory
 
 from .model import FeatureDescription
 
@@ -35,7 +36,7 @@ def export(resource, request):
 def setup_pyramid(comp, config):
     config.add_route(
         "feature_description.export",
-        "/api/resource/{id:uint}/feature_description/export",
-        factory=resource_factory,
+        "/api/resource/{id}/feature_description/export",
+        factory=ResourceFactory(context=IFeatureLayer),
         get=export,
     )

@@ -15,7 +15,7 @@ from nextgisweb.env import DBSession, env
 
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, resource_factory
+from nextgisweb.resource import DataScope, ResourceFactory
 
 from .model import (
     WM_SETTINGS,
@@ -23,6 +23,8 @@ from .model import (
     WebMapAnnotation,
     WebMapScope,
 )
+
+AnnotationID = Annotated[int, Meta(gt=1, description="Annotation ID")]
 
 
 def annotation_to_dict(obj, request, with_user_info=False):
@@ -287,37 +289,43 @@ def pdf_to_image(format: ExportFormat, pdf_file: str, temp_dir: TemporaryDirecto
 
 
 def setup_pyramid(comp, config):
-    setup_annotations(config)
-    setup_print(config)
-
+    webmap_factory = ResourceFactory(context=WebMap)
     comp.settings_view = settings_get
 
     config.add_route(
-        "webmap.settings", "/api/component/webmap/settings", get=settings_get, put=settings_put
+        "webmap.annotation.collection",
+        "/api/resource/{id}/annotation/",
+        factory=webmap_factory,
+        get=annotation_cget,
+        post=annotation_cpost,
+    )
+
+    config.add_route(
+        "webmap.annotation.item",
+        "/api/resource/{id}/annotation/{annotation_id}",
+        factory=webmap_factory,
+        types=dict(annotation_id=AnnotationID),
+        get=annotation_iget,
+        put=annotation_iput,
+        delete=annotation_idelete,
     )
 
     config.add_route(
         "webmap.extent",
-        "/api/resource/{id:uint}/webmap/extent",
-        factory=resource_factory,
-    ).get(get_webmap_extent, context=WebMap)
-
-
-def setup_print(config):
-    config.add_route("webmap.print", "/api/component/webmap/print", post=print)
-
-
-def setup_annotations(config):
-    config.add_route(
-        "webmap.annotation.collection",
-        "/api/resource/{id:uint}/annotation/",
-        factory=resource_factory,
-    ).get(annotation_cget, context=WebMap).post(annotation_cpost, context=WebMap)
+        "/api/resource/{id}/webmap/extent",
+        factory=webmap_factory,
+        get=get_webmap_extent,
+    )
 
     config.add_route(
-        "webmap.annotation.item",
-        "/api/resource/{id:uint}/annotation/{annotation_id:uint}",
-        factory=resource_factory,
-    ).get(annotation_iget, context=WebMap).put(annotation_iput, context=WebMap).delete(
-        annotation_idelete, context=WebMap
+        "webmap.settings",
+        "/api/component/webmap/settings",
+        get=settings_get,
+        put=settings_put,
+    )
+
+    config.add_route(
+        "webmap.print",
+        "/api/component/webmap/print",
+        post=print,
     )

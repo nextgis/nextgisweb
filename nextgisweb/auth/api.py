@@ -24,6 +24,8 @@ BRIEF = flag("Brief")
 DEF_NB = DEF[Annotated[T, omit(BRIEF)]]
 RO_NB = RO[Annotated[T, omit(BRIEF)]]
 
+UserID = Annotated[int, Meta(ge=1, description="User ID")]
+GroupID = Annotated[int, Meta(ge=1, description="Group ID")]
 Language = Annotated[str, Meta(pattern=r"^[a-z]{2,3}(\-[a-z]{2,3})?$")]
 Keyname = Annotated[str, Meta(min_length=1, pattern=r"^[A-Za-z][A-Za-z0-9_\-]*$")]
 DisplayName = Annotated[str, Meta(min_length=1)]
@@ -450,40 +452,67 @@ def logout(request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        "auth.user.collection", "/api/component/auth/user/", get=user_cget, post=user_cpost
+        "auth.user.collection",
+        "/api/component/auth/user/",
+        get=user_cget,
+        post=user_cpost,
     )
 
     config.add_route(
         "auth.user.item",
-        "/api/component/auth/user/{id:uint}",
+        "/api/component/auth/user/{id}",
+        types=dict(id=UserID),
         get=user_iget,
         put=user_iput,
         delete=user_idelete,
     )
 
     config.add_route(
-        "auth.profile", "/api/component/auth/profile", get=profile_get, put=profile_put
+        "auth.profile",
+        "/api/component/auth/profile",
+        get=profile_get,
+        put=profile_put,
     )
 
     config.add_route(
-        "auth.group.collection", "/api/component/auth/group/", get=group_cget, post=group_cpost
+        "auth.group.collection",
+        "/api/component/auth/group/",
+        get=group_cget,
+        post=group_cpost,
     )
 
     config.add_route(
         "auth.group.item",
-        "/api/component/auth/group/{id:uint}",
+        "/api/component/auth/group/{id}",
+        types=dict(id=GroupID),
         get=group_iget,
         put=group_iput,
         delete=group_idelete,
     )
 
-    config.add_route("auth.current_user", "/api/component/auth/current_user", get=current_user)
+    config.add_route(
+        "auth.current_user",
+        "/api/component/auth/current_user",
+        get=current_user,
+    )
 
-    config.add_route("auth.register", "/api/component/auth/register", post=register)
+    config.add_route(
+        "auth.register",
+        "/api/component/auth/register",
+        post=register,
+    )
 
-    config.add_route("auth.login_cookies", "/api/component/auth/login", post=login)
+    config.add_route(
+        "auth.login_cookies",
+        "/api/component/auth/login",
+        post=login,
+    )
 
-    config.add_route("auth.logout_cookies", "/api/component/auth/logout", post=logout)
+    config.add_route(
+        "auth.logout_cookies",
+        "/api/component/auth/logout",
+        post=logout,
+    )
 
 
 def validate_members(obj, members):

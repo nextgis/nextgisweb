@@ -20,7 +20,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geo
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, resource_factory
+from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -40,6 +40,8 @@ from .ogrdriver import EXPORT_FORMAT_OGR, MVT_DRIVER_EXIST
 
 PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write
+
+FeatureID = Annotated[int, Meta(description="Feature ID")]
 
 
 def _ogr_memory_ds():
@@ -926,14 +928,17 @@ def feature_extent(resource, request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
+    feature_layer_factory = ResourceFactory(context=IFeatureLayer)
+
     geojson_route = config.add_route(
         "feature_layer.geojson",
-        "/api/resource/{id:uint}/geojson",
-        factory=resource_factory,
-    ).get(view_geojson, context=IFeatureLayer)
+        "/api/resource/{id}/geojson",
+        factory=feature_layer_factory,
+        get=view_geojson,
+    )
 
     # HEAD method is required for GDAL /vsicurl/ and QGIS connect
-    geojson_route.head(view_geojson_head, context=IFeatureLayer, deprecated=True)
+    geojson_route.head(view_geojson_head, deprecated=True)
 
     config.add_view(
         export_single,
@@ -949,33 +954,43 @@ def setup_pyramid(comp, config):
         post=export_multi,
     )
 
-    config.add_route("feature_layer.mvt", "/api/component/feature_layer/mvt", get=mvt)
-
     config.add_route(
-        "feature_layer.feature.item",
-        "/api/resource/{id:uint}/feature/{fid:int}",
-        factory=resource_factory,
-    ).get(iget, context=IFeatureLayer).put(iput, context=IFeatureLayer).delete(
-        idelete, context=IWritableFeatureLayer
+        "feature_layer.mvt",
+        "/api/component/feature_layer/mvt",
+        get=mvt,
     )
 
     config.add_route(
+        "feature_layer.feature.item",
+        "/api/resource/{id}/feature/{fid}",
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
+        get=iget,
+        put=iput,
+    ).delete(idelete, context=IWritableFeatureLayer)
+
+    config.add_route(
         "feature_layer.feature.item_extent",
-        "/api/resource/{id:uint}/feature/{fid:int}/extent",
-        factory=resource_factory,
-    ).get(item_extent, context=IFeatureLayer)
+        "/api/resource/{id}/feature/{fid}/extent",
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
+        get=item_extent,
+    )
 
     config.add_route(
         "feature_layer.feature.geometry_info",
-        "/api/resource/{id:uint}/feature/{fid:int}/geometry_info",
-        factory=resource_factory,
-    ).get(geometry_info, context=IFeatureLayer)
+        "/api/resource/{id}/feature/{fid}/geometry_info",
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
+        get=geometry_info,
+    )
 
     config.add_route(
         "feature_layer.feature.collection",
-        "/api/resource/{id:uint}/feature/",
-        factory=resource_factory,
-    ).get(cget, context=IFeatureLayer).post(cpost, context=IWritableFeatureLayer).patch(
+        "/api/resource/{id}/feature/",
+        factory=feature_layer_factory,
+        get=cget,
+    ).post(cpost, context=IWritableFeatureLayer).patch(
         cpatch, context=IWritableFeatureLayer
     ).delete(
         cdelete, context=IWritableFeatureLayer
@@ -983,16 +998,22 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "feature_layer.feature.count",
-        "/api/resource/{id:uint}/feature_count",
-        factory=resource_factory,
-    ).get(count, context=IFeatureLayer)
+        "/api/resource/{id}/feature_count",
+        factory=feature_layer_factory,
+        get=count,
+    )
 
     config.add_route(
         "feature_layer.feature.extent",
-        "/api/resource/{id:uint}/feature_extent",
-        factory=resource_factory,
-    ).get(feature_extent, context=IFeatureLayer)
+        "/api/resource/{id}/feature_extent",
+        factory=feature_layer_factory,
+        get=feature_extent,
+    )
 
     from .identify import identify
 
-    config.add_route("feature_layer.identify", "/api/feature_layer/identify", post=identify)
+    config.add_route(
+        "feature_layer.identify",
+        "/api/feature_layer/identify",
+        post=identify,
+    )

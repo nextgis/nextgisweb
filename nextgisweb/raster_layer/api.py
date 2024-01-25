@@ -9,7 +9,7 @@ from nextgisweb.env import _, env
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid.util import set_output_buffering
-from nextgisweb.resource import DataScope, resource_factory
+from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
 from .gdaldriver import EXPORT_FORMAT_GDAL
@@ -145,16 +145,19 @@ def setup_pyramid(comp, config):
         request_method="GET",
     )
 
-    route_cog = config.add_route(
+    raster_layer_factory = ResourceFactory(context=RasterLayer)
+
+    config.add_route(
         "raster_layer.cog",
-        "/api/resource/{id:uint}/cog",
-        factory=resource_factory,
+        "/api/resource/{id}/cog",
+        factory=raster_layer_factory,
+        head=cog,
+        get=cog,
     )
-    route_cog.head(cog, context=RasterLayer)
-    route_cog.get(cog, context=RasterLayer)
 
     config.add_route(
         "raster_layer.download",
-        "/api/resource/{id:uint}/download",
-        factory=resource_factory,
-    ).get(download, context=RasterLayer)
+        "/api/resource/{id}/download",
+        factory=raster_layer_factory,
+        get=download,
+    )

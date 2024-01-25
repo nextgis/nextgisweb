@@ -12,7 +12,7 @@ from nextgisweb.env import _
 
 from nextgisweb.core.exception import UserException, ValidationError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import DataScope, Resource, ResourceNotFound, resource_factory
+from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNotFound
 
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
@@ -383,6 +383,8 @@ def legend_symbols(request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
+    renderable_style_factory = ResourceFactory(context=IRenderableStyle)
+
     config.add_route(
         "render.tile",
         "/api/component/render/tile",
@@ -396,18 +398,21 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "render.tile_cache.seed_status",
-        "/api/resource/{id:uint}/tile_cache/seed_status",
-        factory=resource_factory,
-    ).get(tile_cache_seed_status, context=IRenderableStyle)
+        "/api/resource/{id}/tile_cache/seed_status",
+        factory=renderable_style_factory,
+        get=tile_cache_seed_status,
+    )
 
     config.add_route(
         "render.legend",
-        "/api/resource/{id:uint}/legend",
-        factory=resource_factory,
-    ).get(legend, context=ILegendableStyle)
+        "/api/resource/{id}/legend",
+        factory=ResourceFactory(context=ILegendableStyle),
+        get=legend,
+    )
 
     config.add_route(
         "render.legend_symbols",
-        "/api/resource/{id:uint}/legend_symbols",
-        factory=resource_factory,
-    ).get(legend_symbols, context=ILegendSymbols)
+        "/api/resource/{id}/legend_symbols",
+        factory=ResourceFactory(context=ILegendSymbols),
+        get=legend_symbols,
+    )

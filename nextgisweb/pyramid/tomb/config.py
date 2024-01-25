@@ -1,12 +1,15 @@
+import re
 from inspect import signature
 from pathlib import Path
 from sys import _getframe
 from warnings import warn, warn_explicit
 
-from msgspec import UNSET
+from msgspec import UNSET, Meta
 from msgspec import ValidationError as MsgSpecValidationError
+from msgspec.inspect import IntType, Metadata, type_info
 from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
+from typing_extensions import Annotated
 
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import (
@@ -25,7 +28,7 @@ from nextgisweb.core.exception import ValidationError
 from .helper import RouteHelper
 from .inspect import iter_routes
 from .predicate import ErrorRendererPredicate, RequestMethodPredicate, RouteMeta, ViewMeta
-from .util import ROUTE_PATTERN, ROUTE_RE, is_json_type, push_stacklevel
+from .util import is_json_type, push_stacklevel
 
 
 def _json_generic(request):
@@ -109,6 +112,22 @@ def find_template(name, func=None, stack_level=1):
     raise ValueError(f"Template '{name}' not found")
 
 
+PATH_TYPE_UNKNOWN = Annotated[str, Meta(description="Undocumented")]
+PATH_TYPES = dict(
+    # Basic types
+    str=Annotated[str, Meta(extra=dict(route_pattern=r"[^/]+"))],
+    any=Annotated[str, Meta(extra=dict(route_pattern=r"^.+$"))],
+    int=Annotated[int, Meta(extra=dict(route_pattern=r"-?[0-9]+"))],
+    # Some useful types
+    uint=Annotated[int, Meta(ge=0, extra=dict(route_pattern=r"[0-9]+"))],
+    pint=Annotated[int, Meta(ge=1, extra=dict(route_pattern=r"0*[1-9][0-9]*"))],
+    urlsafe=Annotated[str, Meta(extra=dict(route_pattern=r"[A-Za-z0-9\-\._~]+"))],
+)
+
+
+PATH_PARAM_RE = re.compile(r"\{(?P<k>\w+)(?:\:(?P<r>.+?))?\}")
+
+
 class Configurator(PyramidConfigurator):
     def add_default_view_predicates(self):
         import pyramid.predicates as pp
@@ -139,6 +158,7 @@ class Configurator(PyramidConfigurator):
         self,
         name,
         pattern=None,
+        types=None,
         deprecated=False,
         openapi=True,
         **kwargs,
@@ -162,6 +182,15 @@ class Configurator(PyramidConfigurator):
             del kwargs["client"]
 
         if pattern is not None:
+            mdtypes = dict()
+
+            if factory := kwargs.get("factory"):
+                if factory_annotations := getattr(factory, "annotations", None):
+                    mdtypes.update(factory_annotations)
+
+            if types:
+                mdtypes.update(types)
+
             pidx = 0
 
             def _pnum(m):
@@ -170,34 +199,47 @@ class Configurator(PyramidConfigurator):
                 pidx += 1
                 return res
 
-            template = ROUTE_RE.sub(_pnum, pattern)
-            wotypes = ROUTE_RE.sub(lambda m: f"{{{m.group('k')}}}", pattern)
-
-            mdtypes = dict()
-            tmissing = False
+            template = PATH_PARAM_RE.sub(_pnum, pattern)
+            wotypes = PATH_PARAM_RE.sub(lambda m: "{%s}" % m.group(1), pattern)
 
             def _sub(m):
-                k, t, r = m.groups()
-                if t is not None:
-                    mdtypes[k] = t
-                    regexp = ROUTE_PATTERN[t]
-                    return f"{{{k}:{regexp}}}" if regexp else f"{{{k}}}"
-                elif r is None:
-                    nonlocal tmissing
-                    tmissing = True
+                key, type_or_regexp = m.groups()
 
-                return m.group(0)
+                if (tdef := mdtypes.get(key)) is None:
+                    tdef = PATH_TYPES.get(type_or_regexp, PATH_TYPE_UNKNOWN)
+                    mdtypes[key] = tdef
 
-            pattern = ROUTE_RE.sub(_sub, pattern)
+                if type_or_regexp:
+                    if pdef := PATH_TYPES.get(type_or_regexp):
+                        pattern = type_info(pdef).extra["route_pattern"]
+                    else:
+                        pattern = type_or_regexp
+                else:
+                    tinfo = type_info(tdef)
+                    titype = tinfo.type if isinstance(tinfo, Metadata) else tinfo
+                    if (
+                        isinstance(tinfo, Metadata)
+                        and tinfo.extra
+                        and (extra_pattern := tinfo.extra["route_pattern"])
+                    ):
+                        pattern = extra_pattern
+                    elif isinstance(titype, IntType):
+                        if (titype.ge is not None and titype.ge >= 1) or (
+                            titype.gt is not None and titype.gt >= 0
+                        ):
+                            pattern = r"0*[1-9][0-9]*"
+                        elif (titype.ge is not None and titype.ge >= 0) or (
+                            titype.gt is not None and titype.gt >= -1
+                        ):
+                            pattern = r"0*[1-9][0-9]*|0+"
+                        else:
+                            pattern = r"-?0*[1-9][0-9]*|0+"
+                    else:
+                        raise ValueError(f"Type or pattern required: {key}")
 
-            if tmissing:
-                warn(
-                    f"Some matchdict type specifiers are missing for route "
-                    f"{name} ({pattern}). Available since 4.5.0.dev13 and "
-                    f"will be required in 4.6.0.dev0.",
-                    DeprecationWarning,
-                    stacklevel + 1,
-                )
+                return "{%s:%s}" % (key, pattern)
+
+            pattern = PATH_PARAM_RE.sub(_sub, pattern)
 
             overloaded = kwargs.pop("overloaded", False)
             kwargs["meta"] = RouteMeta(

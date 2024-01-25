@@ -5,21 +5,27 @@ from tempfile import NamedTemporaryFile
 from urllib.parse import quote_plus
 from zipfile import ZIP_DEFLATED, ZipFile
 
+from msgspec import Meta
 from PIL import Image
 from pyramid.response import FileResponse, Response
+from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, env
 from nextgisweb.lib.json import dumpb
 
+from nextgisweb.feature_layer import IFeatureLayer
+from nextgisweb.feature_layer.api import FeatureID
 from nextgisweb.feature_layer.exception import FeatureNotFound
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.tomb import UnsafeFileResponse
-from nextgisweb.resource import DataScope, resource_factory
+from nextgisweb.resource import DataScope, ResourceFactory
 
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from .model import FeatureAttachment
 from .util import attachments_import
+
+AttachmentID = Annotated[int, Meta(ge=1, description="Attachment ID")]
 
 
 def attachment_or_not_found(resource_id, feature_id, attachment_id):
@@ -232,27 +238,32 @@ def import_attachment(resource, request) -> JSONType:
 
 
 def setup_pyramid(comp, config):
-    colurl = "/api/resource/{id:uint}/feature/{fid:int}/attachment/"
-    itmurl = "/api/resource/{id:uint}/feature/{fid:int}/attachment/{aid:uint}"
+    feature_layer_factory = ResourceFactory(context=IFeatureLayer)
+
+    itmurl = "/api/resource/{id}/feature/{fid}/attachment/{aid}"
+    colurl = "/api/resource/{id}/feature/{fid}/attachment/"
 
     config.add_route(
         "feature_attachment.download",
         itmurl + "/download",
-        factory=resource_factory,
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID, aid=AttachmentID),
         get=download,
     )
 
     config.add_route(
         "feature_attachment.image",
         itmurl + "/image",
-        factory=resource_factory,
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID, aid=AttachmentID),
         get=image,
     )
 
     config.add_route(
         "feature_attachment.item",
         itmurl,
-        factory=resource_factory,
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID, aid=AttachmentID),
         get=iget,
         put=iput,
         delete=idelete,
@@ -261,21 +272,24 @@ def setup_pyramid(comp, config):
     config.add_route(
         "feature_attachment.collection",
         colurl,
-        factory=resource_factory,
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
         get=cget,
         post=cpost,
     )
 
     config.add_route(
         "feature_attachment.export",
-        "/api/resource/{id:uint}/feature_attachment/export",
-        factory=resource_factory,
+        "/api/resource/{id}/feature_attachment/export",
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
         get=export,
     )
 
     config.add_route(
         "feature_attachment.import",
-        "/api/resource/{id:uint}/feature_attachment/import",
-        factory=resource_factory,
+        "/api/resource/{id}/feature_attachment/import",
+        factory=feature_layer_factory,
+        types=dict(fid=FeatureID),
         put=import_attachment,
     )

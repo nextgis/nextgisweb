@@ -1,7 +1,9 @@
+import base64
 from collections import defaultdict
 from typing import Any, Dict
 
 from msgspec import UNSET, Meta
+from msgspec.inspect import Metadata, type_info
 from msgspec.json import schema_components
 from typing_extensions import Annotated
 
@@ -12,13 +14,6 @@ from nextgisweb.lib.apitype import StatusCode as SCode
 
 from ..tomb import is_json_type, iter_routes
 from .docstring import Doctring
-
-_PATH_TYPE = dict(
-    str=str,
-    any=str,
-    int=int,
-    uint=Annotated[int, Meta(ge=0)],
-)
 
 
 def _apply_json_content_type(ct, tdef):
@@ -87,8 +82,13 @@ def openapi(introspector, prefix="/api/"):
 
         # Path parameters
         p_params, p_param = _pfact("path", required=True)
-        for pname, ptype in route.mdtypes.items():
-            p_param(pname, schema=schema_ref(_PATH_TYPE[ptype]))
+        for pname, tdef in route.mdtypes.items():
+            p_kwargs = dict()
+            tinfo = type_info(tdef)
+            if ejs := tinfo.extra_json_schema:
+                if desc := ejs.get("description"):
+                    p_kwargs.update(description=desc)
+            p_param(pname, schema=schema_ref(tdef), **p_kwargs)
 
         # Operations
         for view in route.views:

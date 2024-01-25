@@ -2,10 +2,12 @@ import warnings
 from dataclasses import dataclass
 
 import zope.event
+from msgspec import Meta
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
 from pyramid.threadlocal import get_current_request
 from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
+from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib.dynmenu import DynItem, DynMenu, Label, Link
@@ -17,6 +19,7 @@ from nextgisweb.pyramid.psection import PageSections
 
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
+from .interface import IResourceBase
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
@@ -30,35 +33,66 @@ PERM_CPERMISSIONS = ResourceScope.change_permissions
 PERM_MCHILDREN = ResourceScope.manage_children
 
 
-def resource_factory(request):
-    # TODO: We'd like to use first key, but can't
-    # as matchdiсt doesn't save keys order.
+ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 
-    if request.matchdict["id"] == "-":
-        return None
 
-    # First, load base class resource
-    res_id = int(request.matchdict["id"])
+class ResourceFactory:
+    def __init__(self, *, key="id", context=None):
+        self.key = key
+        self.context = context
 
-    try:
-        (res_cls,) = DBSession.query(Resource.cls).where(Resource.id == res_id).one()
-    except NoResultFound:
-        raise ResourceNotFound(res_id)
+    def __call__(self, request) -> Resource:
+        if request.matchdict[self.key] == "-":
+            return None
 
-    polymorphic = with_polymorphic(Resource, [Resource.registry[res_cls]])
-    obj = (
-        DBSession.query(polymorphic)
-        .options(
-            joinedload(polymorphic.owner_user),
-            joinedload(polymorphic.parent),
+        # First, load base class resource
+        res_id = int(request.matchdict[self.key])
+        try:
+            (res_cls,) = DBSession.query(Resource.cls).where(Resource.id == res_id).one()
+        except NoResultFound:
+            raise ResourceNotFound(res_id)
+
+        polymorphic = with_polymorphic(Resource, [Resource.registry[res_cls]])
+        obj = (
+            DBSession.query(polymorphic)
+            .options(
+                joinedload(polymorphic.owner_user),
+                joinedload(polymorphic.parent),
+            )
+            .where(polymorphic.id == res_id)
+            .one()
         )
-        .where(polymorphic.id == res_id)
-        .one()
-    )
 
-    request.audit_context(res_cls, res_id)
+        if context := self.context:
+            if issubclass(context, Resource):
+                if not isinstance(obj, context):
+                    raise ResourceNotFound(res_id)
+            elif issubclass(context, IResourceBase):
+                if not context.providedBy(obj):
+                    raise ResourceNotFound(res_id)
+            else:
+                raise NotImplementedError
 
-    return obj
+        request.audit_context(res_cls, res_id)
+
+        return obj
+
+    @property
+    def annotations(self):
+        if context := self.context:
+            if issubclass(context, Resource):
+                description = f"{context.cls_display_name} resource ID"
+            elif issubclass(context, IResourceBase):
+                description = f"ID of resource providing {context.__name__} interface"
+            else:
+                raise NotImplementedError
+            tdef = Annotated[ResourceID, Meta(description=description)]
+        else:
+            tdef = ResourceID
+        return {self.key: tdef}
+
+
+resource_factory = ResourceFactory()
 
 
 @breadcrumb_adapter

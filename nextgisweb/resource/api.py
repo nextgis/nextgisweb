@@ -476,7 +476,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "resource.item",
-        "/api/resource/{id:uint}",
+        "/api/resource/{id}",
         factory=resource_factory,
         get=item_get,
         put=item_put,
@@ -492,21 +492,21 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "resource.permission",
-        "/api/resource/{id:uint}/permission",
+        "/api/resource/{id}/permission",
         factory=resource_factory,
         get=permission,
     )
 
     config.add_route(
         "resource.permission.explain",
-        "/api/resource/{id:uint}/permission/explain",
+        "/api/resource/{id}/permission/explain",
         factory=resource_factory,
         get=permission_explain,
     )
 
     config.add_route(
         "resource.volume",
-        "/api/resource/{id:uint}/volume",
+        "/api/resource/{id}/volume",
         factory=resource_factory,
         get=resource_volume,
     )
@@ -540,14 +540,14 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "resource.export",
-        "/api/resource/{id:uint}/export",
+        "/api/resource/{id}/export",
         factory=resource_factory,
         overloaded=True,
     )
 
     config.add_route(
         "resource.file_download",
-        "/api/resource/{id:uint}/file/{name:any}",
+        "/api/resource/{id}/file/{name:any}",
         factory=resource_factory,
         overloaded=True,
     )

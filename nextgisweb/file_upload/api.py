@@ -32,11 +32,18 @@ class UploadNotCompleted(UserException):
     http_status_code = 405
 
 
-FileId = Annotated[str, Meta(min_length=32, max_length=32, pattern="^[0-9a-f]{32}$")]
+FileID = Annotated[
+    str,
+    Meta(
+        pattern="^([0-9a-f][0-9a-f]){16}$",
+        description="File upload ID",
+        extra=dict(route_pattern=r"([0-9a-f][0-9a-f]){16}"),
+    ),
+]
 
 
 class FileUploadObject(Struct, kw_only=True):
-    id: FileId
+    id: FileID
     size: Annotated[int, Meta(ge=0)]
     name: Union[str, UnsetType] = UNSET
     mime_type: Union[str, UnsetType] = UNSET
@@ -378,7 +385,8 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "file_upload.item",
-        "/api/component/file_upload/{id:str}",
+        "/api/component/file_upload/{id}",
+        types=dict(id=FileID),
         head=item_head_tus,
         get=item_get,
         patch=item_patch_tus,

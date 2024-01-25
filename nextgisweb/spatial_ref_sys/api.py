@@ -1,9 +1,10 @@
 import json
 
 import requests
-from msgspec import Struct
+from msgspec import Meta, Struct
 from requests.exceptions import RequestException
 from sqlalchemy import sql
+from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, _, env
 from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_length
@@ -13,6 +14,9 @@ from nextgisweb.pyramid import JSONType
 
 from .model import SRS
 from .util import convert_to_wkt
+
+SRSID = Annotated[int, Meta(ge=1, description="Spatial reference system ID")]
+SRSCatalogID = Annotated[int, Meta(gt=1, description="ID of spatial reference system in catalog")]
 
 
 def serialize(obj: SRS):
@@ -273,11 +277,16 @@ def catalog_import(request) -> JSONType:
 
 def setup_pyramid(comp, config):
     config.add_route(
-        "spatial_ref_sys.collection", "/api/component/spatial_ref_sys/", get=cget, post=cpost
+        "spatial_ref_sys.collection",
+        "/api/component/spatial_ref_sys/",
+        get=cget,
+        post=cpost,
     )
 
     config.add_route(
-        "spatial_ref_sys.convert", "/api/component/spatial_ref_sys/convert", post=srs_convert
+        "spatial_ref_sys.convert",
+        "/api/component/spatial_ref_sys/convert",
+        post=srs_convert,
     )
 
     config.add_route(
@@ -288,25 +297,29 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "spatial_ref_sys.geom_transform",
-        "/api/component/spatial_ref_sys/{id:uint}/geom_transform",
+        "/api/component/spatial_ref_sys/{id}/geom_transform",
+        types=dict(id=SRSID),
         post=geom_transform,
     )
 
     config.add_route(
         "spatial_ref_sys.geom_length",
-        "/api/component/spatial_ref_sys/{id:uint}/geom_length",
+        "/api/component/spatial_ref_sys/{id}/geom_length",
+        types=dict(id=SRSID),
         post=geom_length_post,
     )
 
     config.add_route(
         "spatial_ref_sys.geom_area",
-        "/api/component/spatial_ref_sys/{id:uint}/geom_area",
+        "/api/component/spatial_ref_sys/{id}/geom_area",
+        types=dict(id=SRSID),
         post=geom_area_post,
     )
 
     config.add_route(
         "spatial_ref_sys.item",
-        "/api/component/spatial_ref_sys/{id:uint}",
+        "/api/component/spatial_ref_sys/{id}",
+        types=dict(id=SRSID),
         get=iget,
         put=iput,
         delete=idelete,
@@ -321,7 +334,8 @@ def setup_pyramid(comp, config):
 
         config.add_route(
             "spatial_ref_sys.catalog.item",
-            "/api/component/spatial_ref_sys/catalog/{id:uint}",
+            "/api/component/spatial_ref_sys/catalog/{id}",
+            types=dict(id=SRSCatalogID),
             get=catalog_item,
         )
 

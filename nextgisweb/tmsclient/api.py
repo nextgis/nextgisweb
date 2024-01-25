@@ -3,7 +3,7 @@ from requests.exceptions import RequestException
 
 from nextgisweb.core.exception import ExternalServiceError
 from nextgisweb.pyramid import JSONType
-from nextgisweb.resource import ConnectionScope, resource_factory
+from nextgisweb.resource import ConnectionScope, ResourceFactory
 
 from .model import NEXTGIS_GEOSERVICES, Connection
 
@@ -44,6 +44,7 @@ def inspect_connection(request) -> JSONType:
 def setup_pyramid(comp, config):
     config.add_route(
         "tmsclient.connection.layers",
-        "/api/component/tmsclient/{id:uint}/layers/",
-        factory=resource_factory,
-    ).get(inspect_connection, context=Connection)
+        "/api/component/tmsclient/{id}/layers/",
+        factory=ResourceFactory(context=Connection),
+        get=inspect_connection,
+    )

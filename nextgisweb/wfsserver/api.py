@@ -2,7 +2,7 @@ from pyramid.response import Response
 
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid.exception import json_error
-from nextgisweb.resource import ServiceScope, resource_factory
+from nextgisweb.resource import ResourceFactory, ServiceScope
 
 from .model import Service
 from .wfs_handler import WFSHandler
@@ -52,12 +52,13 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
 
 
 def setup_pyramid(comp, config):
-    route = config.add_route(
-        "wfsserver.wfs",
-        "/api/resource/{id:uint}/wfs",
-        factory=resource_factory,
-        error_renderer=error_renderer,
-    )
+    service_factory = ResourceFactory(context=Service)
 
-    route.get(wfs, context=Service)
-    route.post(wfs, context=Service)
+    config.add_route(
+        "wfsserver.wfs",
+        "/api/resource/{id}/wfs",
+        factory=service_factory,
+        error_renderer=error_renderer,
+        get=wfs,
+        post=wfs,
+    )
