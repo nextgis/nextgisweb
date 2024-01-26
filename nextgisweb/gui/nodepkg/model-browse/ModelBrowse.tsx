@@ -1,3 +1,4 @@
+import type { TableProps as AntTAbleProps } from "antd/es/table/InternalTable";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import type { FC } from "react";
 
@@ -21,20 +22,19 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ApiError } from "../error/type";
-import type { ParamsOf } from "../type";
 
 import AddCircleIcon from "@nextgisweb/icon/material/add_circle";
 import DeleteForeverIcon from "@nextgisweb/icon/material/delete_forever";
 import EditIcon from "@nextgisweb/icon/material/edit";
 import SearchIcon from "@nextgisweb/icon/material/search";
 
-type TableProps = ParamsOf<typeof Table>;
+type TableProps<D> = AntTAbleProps<D>;
 
 export interface ModalBrowseData {
     id: number;
 }
 
-interface Model {
+export interface Model {
     item: RouteName;
     collection: RouteName;
     edit: RouteName;
@@ -50,7 +50,7 @@ export interface ControlProps<Data extends ModalBrowseData = ModalBrowseData> {
 }
 
 interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
-    extends TableProps {
+    extends TableProps<Data> {
     model: string | Model;
     messages?: {
         deleteConfirm?: string;
@@ -64,6 +64,7 @@ interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
     itemProps?: {
         canDelete?: (args: { item: Data }) => boolean;
     };
+
     createProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
     headerControls?: FC<ControlProps<Data>>[];
     selectedControls?: FC<ControlProps<Data>>[];
@@ -216,7 +217,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
         return true;
     };
 
-    const rowSelection: TableProps["rowSelection"] = {
+    const rowSelection: TableProps<Data>["rowSelection"] = {
         onChange: (selectedRowKeys) => {
             setSelected(selectedRowKeys.map(Number));
         },
@@ -225,7 +226,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
         }),
     };
 
-    const tableColumns: TableProps["columns"] = [
+    const tableColumns: TableProps<Data>["columns"] = [
         ...(columns ? columns : []),
         {
             title: "",

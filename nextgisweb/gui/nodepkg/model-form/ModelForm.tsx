@@ -6,7 +6,7 @@ import { Button, Form, Popconfirm, Space, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
-import type { FormField } from "@nextgisweb/gui/fields-form";
+import type { FormField, FormProps } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import type { RouteName } from "@nextgisweb/pyramid/api/type";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
@@ -16,7 +16,7 @@ import type { ApiError } from "../error/type";
 import { useKeydownListener } from "../hook/useKeydownListener";
 
 interface Messages {
-    deleteConfirm?: TimeRanges;
+    deleteConfirm?: string;
 }
 
 interface Model {
@@ -26,14 +26,14 @@ interface Model {
     browse: RouteName;
 }
 
-interface ModelFormProps {
+interface ModelFormProps extends FormProps {
     id: number;
     children?: ReactNode;
     model: RouteName | Model;
-    value: unknown;
+    value?: unknown;
     fields: FormField[];
     form?: FormInstance;
-    onChange?: (val: unknown) => void;
+    onChange?: (val: { value: unknown }) => void;
     allowDelete?: boolean;
     messages?: Messages;
 }

@@ -18,7 +18,7 @@ import type {
     TimeInput,
 } from "./fields";
 
-export type FormProps = Omit<Parameters<typeof Form>[0], "onChange">;
+export type FormProps = Omit<Parameters<typeof Form>[0], "onChange" | "id">;
 
 export type SizeType = FormProps["size"];
 

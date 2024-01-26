@@ -1,26 +1,27 @@
 import { Table as TableBase } from "antd";
-
-import type { ParamsOf } from "../../type";
+import type { AnyObject } from "antd/es/_util/type";
+import type { TableProps as AntTAbleProps } from "antd/es/table/InternalTable";
 
 import "./index.less";
 
-export interface TableProps extends ParamsOf<typeof TableBase> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface TableProps<D = any> extends AntTAbleProps<D> {
     parentHeight?: boolean;
 }
 
-export default function Table({
+export default function Table<D extends AnyObject = AnyObject>({
     className,
     parentHeight = false,
     pagination = false,
     ...props
-}: TableProps) {
+}: TableProps<D>) {
     if (parentHeight) {
         className = (className ? className.split(" ") : [])
             .concat("ant-table-parent-height")
             .join(" ");
     }
 
-    const tableProps: TableProps = { ...props, pagination, className };
+    const tableProps: AntTAbleProps<D> = { ...props, pagination, className };
 
     return <TableBase {...tableProps} />;
 }
