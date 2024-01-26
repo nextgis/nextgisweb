@@ -1,17 +1,20 @@
 import { makeAutoObservable, toJS } from "mobx";
 
 export class DescriptionEditorStore {
-    identity = "resource.description";
+    readonly identity = "resource.description";
 
-    value = null;
-    loaded = null;
+    value: string | null = null;
+    loaded: string | null = null;
 
     constructor() {
         makeAutoObservable(this, { identity: false });
-        this.loader = null;
     }
 
-    load(value) {
+    setValue(value: string | null) {
+        this.value = value;
+    }
+
+    load(value: string) {
         this.value = this.loaded = value;
     }
 
