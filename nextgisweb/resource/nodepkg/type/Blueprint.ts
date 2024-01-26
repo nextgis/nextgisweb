@@ -23,7 +23,7 @@ interface Permissions {
 export interface BlueprintScope {
     identity: string;
     label: string;
-    permissions: Permissions;
+    permissions: Record<string, Permissions>;
 }
 
 interface Resources {
