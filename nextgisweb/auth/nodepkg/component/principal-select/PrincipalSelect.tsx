@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Select, Space, Tag } from "@nextgisweb/gui/antd";
+import type { SelectProps } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
 import type { Group, User } from "../../type";
 
-import type { Member, PrincipalSelectProps, SelectProps } from "./type";
+import type { Member, PrincipalSelectProps } from "./type";
 
 import SystemUserIcon from "@nextgisweb/icon/material/attribution";
 import GroupIcon from "@nextgisweb/icon/material/groups";
