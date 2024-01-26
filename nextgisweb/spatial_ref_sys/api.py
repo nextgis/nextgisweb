@@ -13,6 +13,7 @@ from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.pyramid import JSONType
 
 from .model import SRS
+from .pyramid import require_catalog_configured
 from .util import convert_to_wkt
 
 SRSID = Annotated[int, Meta(ge=1, description="Spatial reference system ID")]
@@ -170,6 +171,7 @@ def geom_area_post(request) -> GeometryPropertyResponse:
 
 def catalog_collection(request) -> JSONType:
     request.require_administrator()
+    require_catalog_configured()
 
     query = dict()
 
@@ -208,21 +210,9 @@ def catalog_collection(request) -> JSONType:
     return items
 
 
-def get_srs_from_catalog(catalog_id):
-    catalog_url = env.spatial_ref_sys.options["catalog.url"]
-    url = catalog_url + "/api/v1/spatial_ref_sys/" + str(catalog_id)
-    timeout = env.spatial_ref_sys.options["catalog.timeout"].total_seconds()
-    try:
-        res = requests.get(url, timeout=timeout)
-        res.raise_for_status()
-    except RequestException:
-        raise ExternalServiceError()
-
-    return res.json()
-
-
 def catalog_item(request) -> JSONType:
     request.require_administrator()
+    require_catalog_configured()
 
     catalog_id = int(request.matchdict["id"])
     srs = get_srs_from_catalog(catalog_id)
@@ -232,6 +222,7 @@ def catalog_item(request) -> JSONType:
 
 def catalog_import(request) -> JSONType:
     request.require_administrator()
+    require_catalog_configured()
 
     catalog_id = int(request.json_body["catalog_id"])
     srs = get_srs_from_catalog(catalog_id)
@@ -273,6 +264,19 @@ def catalog_import(request) -> JSONType:
     DBSession.flush()
 
     return dict(id=obj.id)
+
+
+def get_srs_from_catalog(catalog_id):
+    catalog_url = env.spatial_ref_sys.options["catalog.url"]
+    url = catalog_url + "/api/v1/spatial_ref_sys/" + str(catalog_id)
+    timeout = env.spatial_ref_sys.options["catalog.timeout"].total_seconds()
+    try:
+        res = requests.get(url, timeout=timeout)
+        res.raise_for_status()
+    except RequestException:
+        raise ExternalServiceError()
+
+    return res.json()
 
 
 def setup_pyramid(comp, config):
@@ -325,22 +329,21 @@ def setup_pyramid(comp, config):
         delete=idelete,
     )
 
-    if comp.options["catalog.enabled"]:
-        config.add_route(
-            "spatial_ref_sys.catalog.collection",
-            "/api/component/spatial_ref_sys/catalog/",
-            get=catalog_collection,
-        )
+    config.add_route(
+        "spatial_ref_sys.catalog.collection",
+        "/api/component/spatial_ref_sys/catalog/",
+        get=catalog_collection,
+    )
 
-        config.add_route(
-            "spatial_ref_sys.catalog.item",
-            "/api/component/spatial_ref_sys/catalog/{id}",
-            types=dict(id=SRSCatalogID),
-            get=catalog_item,
-        )
+    config.add_route(
+        "spatial_ref_sys.catalog.item",
+        "/api/component/spatial_ref_sys/catalog/{id}",
+        types=dict(id=SRSCatalogID),
+        get=catalog_item,
+    )
 
-        config.add_route(
-            "spatial_ref_sys.catalog.import",
-            "/api/component/spatial_ref_sys/catalog/import",
-            post=catalog_import,
-        )
+    config.add_route(
+        "spatial_ref_sys.catalog.import",
+        "/api/component/spatial_ref_sys/catalog/import",
+        post=catalog_import,
+    )

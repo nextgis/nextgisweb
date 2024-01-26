@@ -7,6 +7,7 @@ from nextgisweb.lib import dynmenu as dm
 from nextgisweb.pyramid import viewargs
 
 from .model import SRS
+from .pyramid import require_catalog_configured
 
 
 def check_permission(request):
@@ -15,31 +16,6 @@ def check_permission(request):
     are limited by administrators group membership criterion"""
 
     request.require_administrator()
-
-
-@viewargs(renderer="react")
-def catalog_browse(request):
-    check_permission(request)
-
-    return dict(
-        title=_("Spatial reference system catalog"),
-        entrypoint="@nextgisweb/spatial-ref-sys/catalog-browse",
-        dynmenu=request.env.pyramid.control_panel,
-    )
-
-
-@viewargs(renderer="react")
-def catalog_import(request):
-    check_permission(request)
-    catalog_id = int(request.matchdict["id"])
-    catalog_url = request.env.spatial_ref_sys.options["catalog.url"]
-    item_url = catalog_url + "/srs/" + str(catalog_id)
-    return dict(
-        title=_("Spatial reference system") + " #%d" % catalog_id,
-        entrypoint="@nextgisweb/spatial-ref-sys/catalog-import",
-        props=dict(url=item_url, id=catalog_id),
-        dynmenu=request.env.pyramid.control_panel,
-    )
 
 
 @viewargs(renderer="react")
@@ -75,10 +51,41 @@ def srs_create_or_edit(request):
     return result
 
 
+@viewargs(renderer="react")
+def catalog_browse(request):
+    check_permission(request)
+    require_catalog_configured()
+
+    return dict(
+        title=_("Spatial reference system catalog"),
+        entrypoint="@nextgisweb/spatial-ref-sys/catalog-browse",
+        dynmenu=request.env.pyramid.control_panel,
+    )
+
+
+@viewargs(renderer="react")
+def catalog_import(request):
+    check_permission(request)
+    require_catalog_configured()
+
+    catalog_id = int(request.matchdict["id"])
+    catalog_url = request.env.spatial_ref_sys.options["catalog.url"]
+    item_url = catalog_url + "/srs/" + str(catalog_id)
+    return dict(
+        title=_("Spatial reference system") + " #%d" % catalog_id,
+        entrypoint="@nextgisweb/spatial-ref-sys/catalog-import",
+        props=dict(url=item_url, id=catalog_id),
+        dynmenu=request.env.pyramid.control_panel,
+    )
+
+
 def setup_pyramid(comp, config):
-    config.add_route("srs.browse", "/srs/").add_view(srs_browse)
-    config.add_route("srs.create", "/srs/create").add_view(srs_create_or_edit)
-    config.add_route("srs.edit", "/srs/{id:uint}").add_view(srs_create_or_edit)
+    config.add_route("srs.browse", "/srs/", get=srs_browse)
+    config.add_route("srs.create", "/srs/create", get=srs_create_or_edit)
+    config.add_route("srs.edit", "/srs/{id:pint}", get=srs_create_or_edit)
+
+    config.add_route("srs.catalog", "/srs/catalog", get=catalog_browse)
+    config.add_route("srs.catalog.import", "/srs/catalog/{id:pint}", get=catalog_import)
 
     class SRSMenu(dm.DynItem):
         def build(self, kwargs):
@@ -120,11 +127,3 @@ def setup_pyramid(comp, config):
         dm.Label("spatial_ref_sys", _("Spatial reference systems")),
         SRSMenu("spatial_ref_sys"),
     )
-
-    if comp.options["catalog.enabled"]:
-        config.add_route(
-            "srs.catalog",
-            "/srs/catalog",
-        ).add_view(catalog_browse)
-
-        config.add_route("srs.catalog.import", r"/srs/catalog/{id:uint}").add_view(catalog_import)
