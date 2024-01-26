@@ -8,6 +8,10 @@ import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blue
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { AllowIcon, DenyIcon, ResourceIcon } from "../icon";
+import type { EditorWidgetComponent, EditorWidgetProps } from "../type";
+
+import type { PermissionStoreItem as Item } from "./PermissionStoreItem";
+import type { PermissionsStore } from "./PermissionsStore";
 
 import AddIcon from "@nextgisweb/icon/material/add_circle_outline";
 
@@ -29,21 +33,29 @@ const msgAllPermissions = gettext("All permissions");
 
 const selectDefaults = { allowClear: false, bordered: false };
 
-const IconText = ({ icon, text }) => (
+const IconText = ({
+    icon,
+    text,
+}: {
+    icon: React.ReactNode;
+    text: React.ReactNode;
+}) => (
     <Space>
         {icon}
         {text}
     </Space>
 );
 
-const bindProp = (item, prop) => ({
-    value: item[prop],
-    onChange: (value) => {
-        item.update({ [prop]: value });
-    },
-});
+function bindProp<T extends Item>(item: T, prop: keyof T) {
+    return {
+        value: item[prop],
+        onChange: (value: unknown) => {
+            item.update({ [prop]: value });
+        },
+    };
+}
 
-const Action = observer(({ row }) => {
+const Action = observer(({ row }: { row: Item }) => {
     const options = useMemo(() => {
         return (
             <>
@@ -69,18 +81,21 @@ const Action = observer(({ row }) => {
     );
 });
 
-const Principal = observer(({ row }) => {
+const Principal = observer(({ row }: { row: Item }) => {
+    const { value, onChange } = bindProp(row, "principal");
+
     return (
         <PrincipalSelect
             systemUsers
-            {...bindProp(row, "principal")}
+            value={value ? Number(value) : undefined}
+            onChange={onChange}
             {...selectDefaults}
             placeholder={msgColPrincipal}
         />
     );
 });
 
-const Apply = observer(({ row }) => {
+const Apply = observer(({ row }: { row: Item }) => {
     const options = useMemo(() => {
         const result = [
             <Option key="false" value={false}>
@@ -107,7 +122,7 @@ const Apply = observer(({ row }) => {
     }, []);
 
     const value = row.identity ? row.identity : row.propagate;
-    const onChange = (v) => {
+    const onChange = (v: boolean | string) => {
         if (typeof v === "boolean") {
             row.update({ identity: "", propagate: v });
         } else {
@@ -126,7 +141,7 @@ const Apply = observer(({ row }) => {
     );
 });
 
-const Permission = observer(({ row }) => {
+const Permission = observer(({ row }: { row: Item }) => {
     const options = useMemo(() => {
         const result = [
             <Option key="" value="" label={msgAllPermissions}>
@@ -164,11 +179,11 @@ const Permission = observer(({ row }) => {
             );
         }
         return result;
-    }, [row.propagate, row.identity]);
+    }, [row.scopes]);
 
     const { scope: scp, permission: perm } = row;
     const value = scp !== null ? scp + (perm ? ":" + perm : "") : null;
-    const onChange = (v) => {
+    const onChange = (v: string) => {
         const [scope, permission] = v.split(":", 2);
         row.update({ scope: scope || "", permission: permission || "" });
     };
@@ -193,8 +208,10 @@ const columns = [
     { key: "permission", title: msgColPermission, width: "50%", component: Permission },
 ];
 
-export const PermissionsWidget = observer(({ store }) => {
-    return <EdiTable {...{ store, columns }} parentHeight />;
+export const PermissionsWidget: EditorWidgetComponent<
+    EditorWidgetProps<PermissionsStore>
+> = observer(({ store }) => {
+    return <EdiTable store={store} columns={columns} parentHeight />;
 });
 
 PermissionsWidget.title = gettext("Permissions");

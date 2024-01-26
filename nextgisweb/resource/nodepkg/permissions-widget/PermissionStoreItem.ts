@@ -3,26 +3,33 @@ import { makeAutoObservable, toJS } from "mobx";
 import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { ResourcePermission } from "../type";
+
+import type { PermissionsStore } from "./PermissionsStore";
+
 const msgAllRequired = gettext("All fields are required");
 const msgConflict = gettext("Row conflicts with another");
 
-const resourceScopes = (i) => blueprint.resources[i].scopes;
-const resourceBaseClasses = (i) => blueprint.resources[i].base_classes;
+const resourceScopes = (i: string) => blueprint.resources[i].scopes;
+const resourceBaseClasses = (i: string) => blueprint.resources[i].base_classes;
 
-const isSameOrSubclass = (child, parent) =>
+const isSameOrSubclass = (child: string, parent: string) =>
     child === parent || resourceBaseClasses(child).includes(parent);
 
 let keySeq = 0;
 
-class Item {
-    action = null;
-    principal = null;
-    scope = null;
-    permission = null;
-    identity = null;
-    propagate = null;
+export class PermissionStoreItem {
+    action: string | null = null;
+    principal: number | null = null;
+    scope: string | null = null;
+    permission: string | null = null;
+    identity: string | null = null;
+    propagate: boolean | null = null;
 
-    constructor(store, data) {
+    readonly store: PermissionsStore;
+    readonly key: number;
+
+    constructor(store: PermissionsStore, data?: ResourcePermission) {
         makeAutoObservable(this, {});
         this.store = store;
         this.key = ++keySeq;
@@ -49,8 +56,8 @@ class Item {
         }
     }
 
-    dump() {
-        return toJS({
+    dump(): ResourcePermission {
+        return toJS<ResourcePermission>({
             action: this.action,
             principal: this.principal ? { id: this.principal } : null,
             scope: this.scope,
@@ -103,8 +110,10 @@ class Item {
         return null;
     }
 
-    update(data) {
-        for (const [k, v] of Object.entries(data)) this[k] = v;
+    update(data: Partial<ResourcePermission>) {
+        for (const [k, v] of Object.entries(data)) {
+            Object.assign(this, { [k]: v });
+        }
 
         // Reset a permission if it doesn't match with available scopes
         if (data.identity !== undefined || data.propagate !== undefined) {
@@ -117,65 +126,5 @@ class Item {
         this.store.dirty = true;
 
         this.store.rotatePlaceholder();
-    }
-}
-
-export class PermissionsStore {
-    identity = "resource.permissions";
-
-    items = null;
-    dirty = false;
-
-    constructor({ composite }) {
-        makeAutoObservable(this, { identity: false });
-        this.resourceClass = composite.cls;
-        this.items = [];
-
-        this.rotatePlaceholder();
-    }
-
-    load(value) {
-        // Existing data transformation
-        const isUseful = (item) => item.propagate || item.identity === "";
-
-        this.items = value.map((data) => new Item(this, data)).filter(isUseful);
-        this.dirty = false;
-    }
-
-    dump() {
-        if (!this.dirty) return undefined;
-        return this.items.map((item) => item.dump());
-    }
-
-    get isValid() {
-        if (!this.dirty) return true;
-        this.validate = true;
-        return this.items.every((item) => item.error === null);
-    }
-
-    // EdiTable
-
-    validate = false;
-    placeholder = null;
-
-    get rows() {
-        return this.items;
-    }
-
-    rotatePlaceholder() {
-        if (this.placeholder && this.placeholder.action === null) return;
-        this.placeholder && this.items.push(this.placeholder);
-        this.placeholder = new Item(this);
-    }
-
-    deleteRow(row) {
-        this.items.splice(this.items.indexOf(row), 1);
-        this.dirty = true;
-    }
-
-    cloneRow(row) {
-        const idx = this.items.indexOf(row);
-        this.items.splice(idx + 1, 0, new Item(this, row.dump()));
-        this.dirty = true;
     }
 }
