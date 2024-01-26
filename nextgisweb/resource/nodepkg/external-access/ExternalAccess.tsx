@@ -11,13 +11,22 @@ import "./ExternalAccess.less";
 const msgUsage = gettext("Use these links to plug data into external applications.");
 const msgReadMore = gettext("Read more");
 
-const Help = ({ help, docsUrl }) => (
+interface HelpProps {
+    help: string;
+    docsUrl?: string;
+}
+
+const Help = ({ help, docsUrl }: HelpProps) => (
     <>
         {help}
         {docsUrl && (
             <>
                 {" "}
-                <a target="_blank" href={url("docs:" + docsUrl)}>
+                <a
+                    target="_blank"
+                    href={url("docs:" + docsUrl)}
+                    rel="noopener noreferrer"
+                >
                     {msgReadMore}
                 </a>
             </>
@@ -25,7 +34,14 @@ const Help = ({ help, docsUrl }) => (
     </>
 );
 
-const Link = ({ title, help, docsUrl, url }) => (
+interface LinkProps {
+    title: string;
+    help: string;
+    docsUrl?: string;
+    url: string;
+}
+
+const Link = ({ title, help, docsUrl, url }: LinkProps) => (
     <>
         <div className="label">
             {title}{" "}
@@ -48,7 +64,11 @@ const Link = ({ title, help, docsUrl, url }) => (
     </>
 );
 
-export function ExternalAccess({ links }) {
+interface ExternalAccessProps {
+    links: LinkProps[];
+}
+
+export function ExternalAccess({ links }: ExternalAccessProps) {
     return (
         <div className="ngw-resource-external-access">
             <div className="text">{msgUsage}</div>
