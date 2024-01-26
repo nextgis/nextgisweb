@@ -30,6 +30,8 @@ Language = Annotated[str, Meta(pattern=r"^[a-z]{2,3}(\-[a-z]{2,3})?$")]
 Keyname = Annotated[str, Meta(min_length=1, pattern=r"^[A-Za-z][A-Za-z0-9_\-]*$")]
 DisplayName = Annotated[str, Meta(min_length=1)]
 
+Brief = Annotated[bool, Meta(description="Return limited set of attributes")]
+
 
 def serialize_principal(src, cls):
     attrs = dict()
@@ -172,10 +174,9 @@ UserUpdate = Derived[_User, OP.UPDATE]
 UserReadBrief = Derived[_User, OP.READ, BRIEF]
 
 
-def user_cget(request, *, brief: bool = False) -> AsJSON[List[UserRead]]:
+def user_cget(request, *, brief: Brief = False) -> AsJSON[List[UserRead]]:
     """Read users
 
-    :param brief: Return limited set of attributes
     :returns: Array of user objects"""
     brief or request.require_administrator()  # pyright: ignore[reportUnusedExpression]
 
@@ -263,10 +264,9 @@ GroupUpdate = Derived[_Group, OP.UPDATE]
 GroupReadBrief = Derived[_Group, OP.READ, BRIEF]
 
 
-def group_cget(request, *, brief: bool = False) -> AsJSON[List[_Group]]:
+def group_cget(request, *, brief: Brief = False) -> AsJSON[List[_Group]]:
     """Read groups
 
-    :param brief: Return limited set of attributes
     :returns: Array of group objects"""
     brief or request.require_administrator()  # pyright: ignore[reportUnusedExpression]
 

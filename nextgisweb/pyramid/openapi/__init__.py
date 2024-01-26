@@ -127,11 +127,16 @@ def openapi(introspector, prefix="/api/"):
 
             # Operation parameters
             for pname, (ptype, pdefault) in view.param_types.items():
+                if (pdesc := dstr.params.get(pname)) is None:
+                    tinfo = type_info(ptype)
+                    if isinstance(tinfo, Metadata) and (ejs := tinfo.extra_json_schema):
+                        pdesc = ejs.get("description")
+
                 o_param(
                     pname,
                     required=not is_optional(ptype)[0] and pdefault is UNSET,
                     schema=schema_ref(ptype, pdefault),
-                    description=dstr.params.get(pname),
+                    description=pdesc,
                 )
 
             # Merge path and operation parameters
