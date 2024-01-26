@@ -31,10 +31,12 @@ const usePickerModal = ({
 
     const modalProps: ModalProps = {
         ...modalDefaultProps,
-        bodyStyle: {
-            height,
-            overflowY: "auto",
-            padding: "0",
+        styles: {
+            body: {
+                height,
+                overflowY: "auto",
+                padding: "0",
+            },
         },
     };
 
