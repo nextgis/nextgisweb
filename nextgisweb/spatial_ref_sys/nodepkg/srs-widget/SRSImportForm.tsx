@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { FieldsForm, Select } from "@nextgisweb/gui/fields-form";
+import type { FieldsFormProps, FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 const PLACEHOLDERS = {
@@ -10,10 +11,31 @@ const PLACEHOLDERS = {
     esri: 'GEOGCS["GCS_WGS_1972", DATUM["D_WGS_1972", SPHEROID["WGS_1972", 6378135.0, 298.26]], PRIMEM["Greenwich", 0.0], UNIT["Degree", 0.0174532925199433]]',
 };
 
-export function SRSImportFrom({ format: f, projStr, onChange, form }) {
-    const [format, setFormat] = useState(f);
+type Format = keyof typeof PLACEHOLDERS;
 
-    const fields = useMemo(
+interface SrsFormValue {
+    format: Format;
+    projStr: string;
+}
+
+interface SRSImportFromProps
+    extends Omit<FieldsFormProps, "fields" | "onChange"> {
+    format: string;
+    projStr: string;
+    form: NonNullable<FieldsFormProps["form"]>;
+    onChange?: (arg: (val: SrsFormValue) => SrsFormValue) => void;
+}
+
+export function SRSImportFrom({
+    format: f,
+    projStr,
+    onChange,
+    form,
+    ...restProps
+}: SRSImportFromProps) {
+    const [format, setFormat] = useState<Format>(f as Format);
+
+    const fields = useMemo<FormField[]>(
         () => [
             {
                 name: "format",
@@ -29,7 +51,7 @@ export function SRSImportFrom({ format: f, projStr, onChange, form }) {
             {
                 name: "projStr",
                 label: gettext("Definition"),
-                widget: "textarea",
+                widget: "text",
                 placeholder: PLACEHOLDERS[format],
                 required: true,
                 rows: 4,
@@ -45,7 +67,7 @@ export function SRSImportFrom({ format: f, projStr, onChange, form }) {
                 errors: [],
             },
         ]);
-    }, [format]);
+    }, [form, format]);
 
     return (
         <FieldsForm
@@ -53,14 +75,16 @@ export function SRSImportFrom({ format: f, projStr, onChange, form }) {
             fields={fields}
             initialValues={{ format: format, projStr }}
             onChange={({ value }) => {
-                if (value.format) {
+                const val = value as SrsFormValue;
+                if (val.format) {
                     setFormat(value.format);
                 }
                 if (onChange) {
-                    onChange((old) => ({ ...old, ...value }));
+                    onChange((old: SrsFormValue) => ({ ...old, ...val }));
                 }
             }}
             labelCol={{ span: 6 }}
+            {...restProps}
         ></FieldsForm>
     );
 }

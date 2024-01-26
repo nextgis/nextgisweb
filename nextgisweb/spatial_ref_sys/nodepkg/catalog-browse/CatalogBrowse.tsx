@@ -1,5 +1,4 @@
-import debounce from "lodash-es/debounce";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
     Button,
@@ -11,21 +10,34 @@ import {
     Table,
     Tooltip,
 } from "@nextgisweb/gui/antd";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import type { TableProps } from "@nextgisweb/gui/antd";
+import { routeURL } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
+
+import type { SRSItem } from "../type";
 
 import InputOutlineIcon from "@nextgisweb/icon/material/input";
 import OpenInNewIcon from "@nextgisweb/icon/material/open_in_new";
 import SearchIcon from "@nextgisweb/icon/material/search";
 
-export function CatalogBrowse() {
-    const [status, setStatus] = useState(null);
-    const [search, setSearch] = useState("");
-    const [lon, setLon] = useState(null);
-    const [lat, setLat] = useState(null);
+interface Query {
+    q?: string;
+    lat?: number;
+    lon?: number;
+}
 
-    const [rows, setRows] = useState([]);
+interface SRSRow extends SRSItem {
+    auth_name_srid: string | null;
+}
+
+export function CatalogBrowse() {
+    const [search, setSearch] = useState("");
+    const [lon, setLon] = useState<number | null>(null);
+    const [lat, setLat] = useState<number | null>(null);
+
+    const [rows, setRows] = useState<SRSRow[]>([]);
 
     const latLon = useMemo(
         () => (lon !== null && lat !== null ? [lat, lon] : null),
@@ -33,8 +45,8 @@ export function CatalogBrowse() {
     );
 
     const query = useMemo(() => {
+        const q: Query = {};
         if ((search && search.length > 1) || latLon) {
-            const q = {};
             if (search) {
                 q.q = search;
             }
@@ -44,63 +56,35 @@ export function CatalogBrowse() {
             }
             return q;
         }
-        return null;
+        return q;
     }, [search, latLon]);
 
-    const makeRequest = useCallback(
-        debounce(async ({ query: q, signal }) => {
-            setStatus("loading");
-            try {
-                const srs = await route(
-                    "spatial_ref_sys.catalog.collection"
-                ).get({
-                    query: q,
-                    signal,
-                });
-                setRows(
-                    // Add auth_name_srid column
-                    srs.map((row) => ({
-                        auth_name_srid:
-                            (row.auth_name &&
-                                row.auth_srid &&
-                                `${row.auth_name}:${row.auth_srid}`) ||
-                            null,
-                        ...row,
-                    }))
-                );
-            } catch (er) {
-                // ignore error
-            } finally {
-                setStatus(null);
-            }
-        }, 1000)
-    );
+    const { data: srs, isLoading } = useRouteGet<SRSItem[]>({
+        name: "spatial_ref_sys.catalog.collection",
+        options: { query },
+    });
 
     useEffect(() => {
-        let signal;
-        let controller;
-        if (query) {
-            if (window.AbortController) {
-                controller = new AbortController();
-                signal = controller.signal;
-            }
-            makeRequest({ signal, query });
-        } else {
-            setRows([]);
-        }
-        return () => {
-            if (controller) {
-                controller.abort();
-            }
-        };
-    }, [query]);
+        const newRows = srs
+            ? srs.map((row) => ({
+                  auth_name_srid:
+                      (row.auth_name &&
+                          row.auth_srid &&
+                          `${row.auth_name}:${row.auth_srid}`) ||
+                      null,
+                  ...row,
+              }))
+            : [];
 
-    const onImportClick = (id) => {
+        setRows(newRows);
+    }, [srs]);
+
+    const onImportClick = (id: number) => {
         const url = routeURL("srs.catalog.import", id);
         window.open(url, "_self");
     };
 
-    const columns = [
+    const columns: TableProps["columns"] = [
         {
             title: gettext("Display name"),
             dataIndex: "display_name",
@@ -113,6 +97,7 @@ export function CatalogBrowse() {
                         <a
                             href={settings.catalog.url + "/srs/" + record.id}
                             target="_blank"
+                            rel="noreferrer"
                         >
                             <OpenInNewIcon />
                         </a>
@@ -174,7 +159,6 @@ export function CatalogBrowse() {
                                 setLat(e);
                             }}
                             addonAfter="°"
-                            allowClear
                         />
                     </Form.Item>
                     <Form.Item>
@@ -187,7 +171,6 @@ export function CatalogBrowse() {
                                 setLon(e);
                             }}
                             addonAfter="°"
-                            allowClear
                         />
                     </Form.Item>
                 </>
@@ -201,7 +184,7 @@ export function CatalogBrowse() {
             <Table
                 rowKey="id"
                 showSorterTooltip={false}
-                loading={status === "loading"}
+                loading={isLoading}
                 columns={columns}
                 dataSource={rows}
             />

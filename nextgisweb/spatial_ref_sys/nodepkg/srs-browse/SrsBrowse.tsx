@@ -6,17 +6,9 @@ import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 
 import getMessages from "../srsMessages";
 import { modelObj } from "../srsModel";
+import type { SRSItem } from "../type";
 
 export function SrsBrowse() {
-    const columns = [
-        {
-            title: gettext("Display name"),
-            dataIndex: "display_name",
-            key: "display_name",
-            sorter: (a, b) => (a.display_name > b.display_name ? 1 : -1),
-        },
-    ];
-
     const headerControls = [];
 
     if (settings.catalog.enabled) {
@@ -34,9 +26,17 @@ export function SrsBrowse() {
     }
 
     return (
-        <ModelBrowse
+        <ModelBrowse<SRSItem>
             model={modelObj}
-            columns={columns}
+            columns={[
+                {
+                    title: gettext("Display name"),
+                    dataIndex: "display_name",
+                    key: "display_name",
+                    sorter: (a, b) =>
+                        a.display_name > b.display_name ? 1 : -1,
+                },
+            ]}
             messages={getMessages()}
             itemProps={{ canDelete: ({ item }) => !item.system }}
             headerControls={headerControls}

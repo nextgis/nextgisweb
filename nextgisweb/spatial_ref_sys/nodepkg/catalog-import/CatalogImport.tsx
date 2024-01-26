@@ -1,46 +1,54 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button, Form } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
+import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-export function CatalogImport({ url, id }) {
-    const [status, setStatus] = useState("loading");
-    const [data, setData] = useState(null);
+import type { SRSItem } from "../type";
 
-    const [fields] = useState([
-        {
-            name: "display_name",
-            label: gettext("Display name"),
-            readOnly: true,
-        },
-        {
-            name: "wkt",
-            label: gettext("OGC WKT definition"),
-            readOnly: true,
-            widget: "textarea",
-            rows: 4,
-            style: { margin: "0" },
-        },
-    ]);
+interface CatalogImportProps {
+    url: string;
+    id: number;
+}
 
-    useEffect(async () => {
-        try {
-            const srs = await route("spatial_ref_sys.catalog.item", id).get();
-            setData(srs);
-            setStatus(null);
-        } catch (err) {
-            errorModal(err);
-            setStatus("error");
-        }
-    }, []);
+export function CatalogImport({ url, id }: CatalogImportProps) {
+    const [status, setStatus] = useState<string | null>(null);
 
-    if (status === "loading") {
+    const { data, isLoading, error } = useRouteGet<SRSItem>({
+        name: "spatial_ref_sys.catalog.item",
+        params: { id },
+    });
+
+    const fields = useMemo<FormField[]>(
+        () => [
+            {
+                name: "display_name",
+                label: gettext("Display name"),
+                inputProps: {
+                    readOnly: true,
+                },
+            },
+            {
+                name: "wkt",
+                label: gettext("OGC WKT definition"),
+                readOnly: true,
+                widget: "text",
+                rows: 4,
+                style: { margin: "0" },
+            },
+        ],
+        []
+    );
+
+    if (isLoading) {
         return <LoadingWrapper />;
-    } else if (status === "error") {
+    } else if (error) {
         return null;
     }
 
@@ -51,12 +59,14 @@ export function CatalogImport({ url, id }) {
     const importSrs = async () => {
         setStatus("importing");
         try {
-            const resp = await route("spatial_ref_sys.catalog.import").post({
+            const resp = await route("spatial_ref_sys.catalog.import").post<{
+                id: number;
+            }>({
                 json: { catalog_id: id },
             });
             window.open(routeURL("srs.edit", resp.id), "_self");
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
             setStatus(null);
         }
