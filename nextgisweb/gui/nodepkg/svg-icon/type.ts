@@ -4,8 +4,14 @@ export interface SvgIconProps extends SVGProps<SVGSVGElement> {
     icon?: string;
 }
 
-export interface SvgIconLink extends Pick<SvgIconProps, "fill" | "icon"> {
+export interface SvgIconLink
+    extends React.DetailedHTMLProps<
+        React.AnchorHTMLAttributes<HTMLAnchorElement>,
+        HTMLAnchorElement
+    > {
     iconProps?: SvgIconProps;
     children?: ReactNode;
     onClick?: () => void;
+    icon?: string;
+    fill?: SvgIconProps["fill"];
 }

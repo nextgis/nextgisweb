@@ -33,7 +33,6 @@ export const ProgressModal = ({
         open: open ?? visible,
         title,
         okText,
-        visible,
         closable,
         onCancel,
     };
