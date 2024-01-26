@@ -44,3 +44,7 @@ export interface ResourceItem {
 export interface ResourceItemCreationResponse {
     id: number;
 }
+
+export interface ResourceVolume {
+    volume: number;
+}

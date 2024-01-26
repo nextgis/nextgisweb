@@ -1,10 +1,15 @@
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { Resource } from "../../type";
+import type { ChildrenResource } from "../type";
+
 const msgChange = gettext("Change");
 const msgDelete = gettext("Delete");
 
-export function createResourceTableItemOptions(resource) {
+export function createResourceTableItemOptions(
+    resource: Resource
+): ChildrenResource {
     return {
         actions: [
             {
