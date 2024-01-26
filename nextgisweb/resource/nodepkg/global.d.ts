@@ -5,3 +5,10 @@ declare module "@nextgisweb/pyramid/settings!resource" {
 
     export = value;
 }
+
+declare module "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint" {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    const value: import("./type/Blueprint").Blueprint;
+
+    export = value;
+}

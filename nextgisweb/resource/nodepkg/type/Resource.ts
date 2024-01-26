@@ -6,12 +6,12 @@ interface Owneruser {
 }
 
 export interface ResourcePermission {
-    action: string;
-    principal: Owneruser;
-    identity: string;
-    scope: string;
-    permission: string;
-    propagate: boolean;
+    action: string | null;
+    principal: Owneruser | null;
+    identity: string | null;
+    scope: string | null;
+    permission: string | null;
+    propagate: boolean | null;
 }
 
 interface ResourceParentDeep {
