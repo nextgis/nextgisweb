@@ -4,10 +4,14 @@ import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { Code } from "@nextgisweb/gui/component/code";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 
-export function JsonView(props) {
+interface JsonViewProps {
+    id: number;
+}
+
+export function JsonView({ id }: JsonViewProps) {
     const { data, isLoading } = useRouteGet(
         "resource.item",
-        { id: props.id },
+        { id },
         { cache: true }
     );
 
