@@ -14,6 +14,15 @@ from nextgisweb.auth import User
 from ..model import Resource, ResourceGroup
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--ngw-keep-resource-group",
+        action="store_true",
+        default=False,
+        help="Do not delete a test resource group on teardown",
+    )
+
+
 def _delete_recursive(resource_id):
     res = Resource.filter_by(id=resource_id).one()
 
@@ -45,7 +54,7 @@ def _delete_recursive(resource_id):
 
 
 @pytest.fixture(scope="session")
-def ngw_resource_group(ngw_env):
+def ngw_resource_group(request, ngw_env):
     with transaction.manager:
         res = ResourceGroup(
             parent_id=0,
@@ -55,8 +64,11 @@ def ngw_resource_group(ngw_env):
 
     yield res.id
 
+    keep = request.config.getoption("--ngw-keep-resource-group")
     with transaction.manager:
-        _delete_recursive(res.id)
+        if res := Resource.filter_by(id=res.id).first():
+            if not keep or len(res.children) == 0:
+                _delete_recursive(res.id)
 
 
 @pytest.fixture(scope="function")
