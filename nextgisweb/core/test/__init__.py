@@ -19,6 +19,17 @@ def ngw_txn(ngw_env):
 
 
 @pytest.fixture()
+def ngw_commit(ngw_env):
+    try:
+        with manager as txn:
+            yield txn
+            DBSession.flush()
+    finally:
+        DBSession.expunge_all()
+        DBSession.expire_all()
+
+
+@pytest.fixture()
 def ngw_core_settings_override(ngw_env):
     def set_or_delete(comp, name, value):
         if value is None:
