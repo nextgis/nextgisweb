@@ -47,7 +47,10 @@ const circleStyleFunc = (feature: Feature, resolution: number) => {
     if (defaultStyleFunction) {
         const styles = defaultStyleFunction(feature, resolution);
         const style = (Array.isArray(styles) ? styles : [styles])[0];
+
         if (style) {
+            const newStyle = style.clone();
+
             if (geometry && geometry.getType() === "Circle") {
                 const radius = (geometry as Circle).getRadius();
                 const radiusStr = radius.toLocaleString("ru-RU", {
@@ -56,7 +59,7 @@ const circleStyleFunc = (feature: Feature, resolution: number) => {
                 const radiusText = gettext("Radius:");
                 const unitText = gettext("m");
                 const text = `${radiusText}\n${radiusStr} ${unitText}`;
-                style.setText(
+                newStyle.setText(
                     new Text({
                         textAlign: "left",
                         textBaseline: "middle",
@@ -64,9 +67,10 @@ const circleStyleFunc = (feature: Feature, resolution: number) => {
                     })
                 );
             } else {
-                style.setText(new Text());
+                newStyle.setText(new Text());
             }
-            return style;
+
+            return newStyle;
         }
     }
 };
