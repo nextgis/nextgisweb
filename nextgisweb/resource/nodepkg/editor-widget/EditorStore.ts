@@ -84,7 +84,7 @@ export class EditorStore {
             result.cls = this.cls;
         }
 
-        if (this.displayName !== c.displayName) {
+        if (this.operation === "create" || this.displayName !== c.displayName) {
             result.display_name = this.displayName
                 ? this.displayName
                 : this.sdnDynamic || this.sdnBase;
