@@ -34,7 +34,7 @@ requires = [
     "orjson==3.9.9",
     "OWSLib==0.29.2",
     "passlib==1.7.4",
-    "pillow==10.1.0",
+    "pillow==10.2.0",
     "poeditor",
     "psutil==5.9.5",
     "psycopg2==2.9.9",
