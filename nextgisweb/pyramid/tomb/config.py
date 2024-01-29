@@ -116,7 +116,7 @@ PATH_TYPE_UNKNOWN = Annotated[str, Meta(description="Undocumented")]
 PATH_TYPES = dict(
     # Basic types
     str=Annotated[str, Meta(extra=dict(route_pattern=r"[^/]+"))],
-    any=Annotated[str, Meta(extra=dict(route_pattern=r"^.+$"))],
+    any=Annotated[str, Meta(extra=dict(route_pattern=r".+"))],
     int=Annotated[int, Meta(extra=dict(route_pattern=r"-?[0-9]+"))],
     # Some useful types
     uint=Annotated[int, Meta(ge=0, extra=dict(route_pattern=r"[0-9]+"))],
