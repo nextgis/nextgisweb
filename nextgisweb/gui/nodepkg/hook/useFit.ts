@@ -31,7 +31,6 @@ export function useFit({
                         contentWidth += isNaN(gap) ? 0 : gap;
                     }
                 });
-
                 if (contentWidth > elementWidth) {
                     isFitStopRef.current = contentWidth;
                     setIsFit(false);
@@ -46,6 +45,7 @@ export function useFit({
 
     useEffect(() => {
         const element = ref.current;
+        isFitStopRef.current = undefined;
         if (element) {
             const resizeObserver = new ResizeObserver(checkFit);
             resizeObserver.observe(element);
@@ -53,7 +53,8 @@ export function useFit({
                 resizeObserver.unobserve(element);
             };
         }
-    }, [checkFit, ref, deps]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [checkFit, ref, ...deps]);
 
     return isFit;
 }

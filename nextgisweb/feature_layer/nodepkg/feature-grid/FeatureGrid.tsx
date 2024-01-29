@@ -101,26 +101,24 @@ export const FeatureGrid = observer(
         return (
             <div className="ngw-feature-layer-feature-grid">
                 <FeatureGridActions store={store}>
-                    <div>
-                        <Tooltip title={msgRefreshTitle}>
-                            <Button
-                                type="text"
-                                icon={<RefreshIcon />}
-                                onClick={bumpVersion}
-                                size={size}
-                            />
-                        </Tooltip>
-                        <Tooltip title={msgSettingsTitle}>
-                            <Button
-                                type="text"
-                                icon={<TuneIcon />}
-                                onClick={() => {
-                                    store.setSettingsOpen(!store.settingsOpen);
-                                }}
-                                size={size}
-                            />
-                        </Tooltip>
-                    </div>
+                    <Tooltip title={msgRefreshTitle}>
+                        <Button
+                            type="text"
+                            icon={<RefreshIcon />}
+                            onClick={bumpVersion}
+                            size={size}
+                        />
+                    </Tooltip>
+                    <Tooltip title={msgSettingsTitle}>
+                        <Button
+                            type="text"
+                            icon={<TuneIcon />}
+                            onClick={() => {
+                                store.setSettingsOpen(!store.settingsOpen);
+                            }}
+                            size={size}
+                        />
+                    </Tooltip>
                 </FeatureGridActions>
 
                 <FeatureTable
