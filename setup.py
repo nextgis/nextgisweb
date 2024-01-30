@@ -86,10 +86,11 @@ entry_points = {
     ],
     "pytest11": [
         "nextgisweb = nextgisweb.pytest",
+        "nextgisweb.auth = nextgisweb.auth.test",
         "nextgisweb.core = nextgisweb.core.test",
+        "nextgisweb.file_upload = nextgisweb.file_upload.test",
         "nextgisweb.pyramid = nextgisweb.pyramid.test",
-        "nextgiswev.auth = nextgisweb.auth.test",
-        "nextgiswev.resource = nextgisweb.resource.test",
+        "nextgisweb.resource = nextgisweb.resource.test",
     ],
     "nextgisweb.packages": [
         "nextgisweb = nextgisweb:pkginfo",

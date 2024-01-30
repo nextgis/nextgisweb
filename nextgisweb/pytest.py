@@ -44,6 +44,15 @@ def ngw_env():
     return _env_initialize()
 
 
+@pytest.fixture(scope="module")
+def ngw_data_path(request):
+    parent = request.path.parent
+    assert parent.name == "test"
+    result = parent / "data"
+    assert result.is_dir()
+    yield result
+
+
 @pytest.fixture()
 def webapp_handler(ngw_env):
     pyramid = ngw_env.pyramid

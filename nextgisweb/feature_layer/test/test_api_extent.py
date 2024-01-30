@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 import pytest
 import transaction
@@ -107,8 +106,9 @@ def test_filtered_extent(
     ngw_resource_group_sub,
     ngw_httptest_app,
     ngw_webtest_app,
+    ngw_data_path,
 ):
-    data = Path(__file__).parent / "data" / "filter-extent-layer.geojson"
+    data = ngw_data_path / "filter-extent-layer.geojson"
 
     ds = ogr.Open(str(data))
     ogrlayer = ds.GetLayer(0)
