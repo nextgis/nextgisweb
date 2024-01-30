@@ -2,10 +2,6 @@ from nextgisweb.env import _
 
 from nextgisweb.core.exception import UserException
 
-__all__ = [
-    "FeatureNotFound",
-]
-
 
 class FeatureNotFound(UserException):
     title = _("Feature not found")

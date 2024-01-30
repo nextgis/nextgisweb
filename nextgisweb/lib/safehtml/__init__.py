@@ -2,8 +2,6 @@ from lxml.etree import tounicode
 from lxml.html import document_fromstring
 from lxml.html.clean import Cleaner
 
-__all__ = ["sanitize"]
-
 _cleaner = Cleaner(style=True)
 
 

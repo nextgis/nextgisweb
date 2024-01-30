@@ -5,9 +5,6 @@ import orjson
 from msgspec import Struct
 from msgspec import to_builtins as msgspec_to_builtins
 
-__all__ = ["dumpb", "loadb", "dumps", "loads"]
-
-
 if "pytest" in sys.modules:
     from freezegun.api import FakeDate, FakeDatetime
 

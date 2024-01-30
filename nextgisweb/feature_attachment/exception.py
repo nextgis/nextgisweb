@@ -2,10 +2,6 @@ from nextgisweb.env import _
 
 from nextgisweb.core.exception import UserException
 
-__all__ = [
-    "AttachmentNotFound",
-]
-
 
 class AttachmentNotFound(UserException):
     title = _("Attachment not found")

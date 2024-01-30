@@ -3,14 +3,6 @@ from io import BytesIO
 
 from lxml import etree
 
-__all__ = [
-    "parse_request",
-    "SRSParseError",
-    "parse_srs",
-    "get_exception_template",
-    "FIELD_TYPE_WFS",
-]
-
 
 class FIELD_TYPE_WFS:
     INT = "int"

@@ -10,8 +10,6 @@ from nextgisweb.env import DBSession
 from .model import Session, SessionStore
 from .util import datetime_to_unix, gensecret
 
-__all__ = ["WebSession"]
-
 
 @implementer(ISession)
 class WebSession(dict):
