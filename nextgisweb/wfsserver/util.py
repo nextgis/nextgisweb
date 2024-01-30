@@ -1,10 +1,19 @@
-from lxml.etree import Element
+from xml.parsers.expat import ExpatError, ParserCreate
+
+from lxml.etree import Element, tostring
 
 
 def validate_tag(tag):
     try:
-        Element(tag)
+        el_validate = Element(tag)
     except ValueError:
         return False
-    else:
-        return True
+
+    string_validate = tostring(el_validate, encoding="unicode")
+
+    try:
+        ParserCreate().Parse(string_validate)
+    except ExpatError:
+        return False
+
+    return True
