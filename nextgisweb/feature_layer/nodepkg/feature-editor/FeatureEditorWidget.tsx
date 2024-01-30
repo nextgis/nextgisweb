@@ -8,7 +8,9 @@ import type {
 } from "@nextgisweb/gui/action-toolbar";
 import { Button, Tabs } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component/SaveButton";
+import { ErrorModal } from "@nextgisweb/gui/error/ErrorModal";
 import { useUnsavedChanges } from "@nextgisweb/gui/hook";
+import showModal from "@nextgisweb/gui/showModal";
 import type { ParamOf } from "@nextgisweb/gui/type";
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -22,7 +24,6 @@ import { TabLabel } from "./component/TabLabel";
 import type { FeatureEditorWidgetProps } from "./type";
 
 import ResetIcon from "@nextgisweb/icon/material/restart_alt";
-
 import "./FeatureEditorWidget.less";
 
 type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
@@ -131,8 +132,8 @@ export const FeatureEditorWidget = observer(
                         if (onSave) {
                             onSave(res);
                         }
-                    } catch {
-                        // ignore
+                    } catch (error) {
+                        showModal(ErrorModal, { error: error });
                     }
                 }}
             >
