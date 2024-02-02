@@ -31,7 +31,7 @@ from nextgisweb.feature_layer import (
     LayerField,
     LayerFieldsMixin,
 )
-from nextgisweb.layer import SpatialLayerMixin
+from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import (
     ConnectionScope,
     DataScope,
@@ -176,10 +176,14 @@ class WFSConnection(Base, Resource):
             if not is_supported:
                 continue
 
+            el_bbox = find_tags(el, "WGS84BoundingBox")[0]
+            min_lon, min_lat = map(float, find_tags(el_bbox, "LowerCorner")[0].text.split(" "))
+            max_lon, max_lat = map(float, find_tags(el_bbox, "UpperCorner")[0].text.split(" "))
             layers.append(
                 dict(
                     name=find_tags(el, "Name")[0].text,
                     srid=srid,
+                    bbox=(min_lon, min_lat, max_lon, max_lat),
                 )
             )
 
@@ -407,7 +411,7 @@ class WFSLayerField(Base, LayerField):
     column_name = db.Column(db.Unicode, nullable=False)
 
 
-@implementer(IFeatureLayer)
+@implementer(IFeatureLayer, IBboxLayer)
 class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = layer_identity
     cls_display_name = _("WFS layer")
@@ -486,6 +490,21 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 return f
 
         raise KeyError("Field '%s' not found!" % keyname)
+
+    # IBboxLayer
+
+    @property
+    def extent(self):
+        capabilities = self.connection.get_capabilities()
+        for layer in capabilities["layers"]:
+            if layer["name"] == self.layer_name:
+                bbox = layer["bbox"]
+                return dict(
+                    minLon=bbox[0],
+                    maxLon=bbox[2],
+                    minLat=bbox[1],
+                    maxLat=bbox[3])
+        raise ValueError(f"Layer {self.layer_name} not found in Capabilities.")
 
 
 class _fields_action(SP):
