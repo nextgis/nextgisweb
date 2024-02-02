@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Form, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
@@ -49,7 +49,7 @@ export function RasterStyleEditor({
     const [bands, setBands] = useState<BandOptions[]>([]);
     const [bandRange, setBandRange] = useState<BandRange>(null);
     const [initialValues, setInitialValues] = useState<SymbolizerValues>(null);
-    useLayoutEffect(() => {
+    useEffect(() => {
         async function getBands() {
             const rasterRes = await route("resource.item", {
                 id: resourceId,
@@ -76,46 +76,46 @@ export function RasterStyleEditor({
             }
         }
         getBands();
-    }, [initSymbolizer]);
+    }, []);
 
     const onChange = useCallback(
-        (valueChange, allValues) => {
+        (valueChanged, values) => {
             const symbolizer = {
                 type: "raster",
                 channels: {
                     red: {
-                        source_channel: allValues.redChannel
-                            ? allValues.redChannel + 1
+                        source_channel: values.redChannel
+                            ? values.redChannel + 1
                             : 1,
                         contrast_enhancement: {
                             normalize: {
                                 algorithm: "stretch",
-                                min_value: allValues.redChannelMin,
-                                max_value: allValues.redChannelMax,
+                                min_value: values.redChannelMin,
+                                max_value: values.redChannelMax,
                             },
                         },
                     },
                     green: {
-                        source_channel: allValues.greenChannel
-                            ? allValues.greenChannel + 1
+                        source_channel: values.greenChannel
+                            ? values.greenChannel + 1
                             : 1,
                         contrast_enhancement: {
                             normalize: {
                                 algorithm: "stretch",
-                                min_value: allValues.greenChannelMin,
-                                max_value: allValues.greenChannelMax,
+                                min_value: values.greenChannelMin,
+                                max_value: values.greenChannelMax,
                             },
                         },
                     },
                     blue: {
-                        source_channel: allValues.blueChannel
-                            ? allValues.blueChannel + 1
+                        source_channel: values.blueChannel
+                            ? values.blueChannel + 1
                             : 1,
                         contrast_enhancement: {
                             normalize: {
                                 algorithm: "stretch",
-                                min_value: allValues.blueChannelMin,
-                                max_value: allValues.blueChannelMax,
+                                min_value: values.blueChannelMin,
+                                max_value: values.blueChannelMax,
                             },
                         },
                     },
@@ -125,13 +125,21 @@ export function RasterStyleEditor({
         },
         [onSymbolizerChange]
     );
+
+    // form doesn't trigger onChange without manually setting values;
+    useEffect(() => {
+        if (initialValues && form) {
+            form.setFieldsValue(initialValues);
+            onChange(null, initialValues);
+        }
+    }, [initialValues]);
+
     if (!(initialValues && bandRange)) {
         return null;
     } else {
         return (
             <Form
                 form={form}
-                initialValues={initialValues}
                 onValuesChange={onChange}
                 className="ngw-qgis-raster-editor-widget-sld"
             >
