@@ -1,0 +1,24 @@
+.ngw-qgis-raster-editor-widget-sld {
+    display: grid;
+    grid-template-columns: max-content max-content max-content auto max-content max-content;
+    gap: 1em;
+
+    & > label {
+        align-self: center;
+        &::after {
+            content: ":";
+        }
+
+        &.min {
+            grid-column: 2;
+        }
+
+        &.max {
+            grid-column: 5;
+        }
+    }
+
+    & > div.ant-select {
+        grid-column: span 5;
+    }
+}
