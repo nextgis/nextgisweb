@@ -10,5 +10,6 @@ export interface RasterlayerResource {
     band_count: number;
     color_interpretation: string[];
     cog: boolean;
+    dtype: string;
 }
 

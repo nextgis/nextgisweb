@@ -398,6 +398,7 @@ class RasterLayerSerializer(Serializer):
     xsize = SP(read=P_DSS_READ)
     ysize = SP(read=P_DSS_READ)
     band_count = SP(read=P_DSS_READ)
+    dtype = SP(read=P_DSS_READ)
     color_interpretation = _color_interpretation(read=P_DSS_READ)
 
     source = _source_attr(write=P_DS_WRITE)
