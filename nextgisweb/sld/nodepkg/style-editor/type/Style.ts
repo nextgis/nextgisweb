@@ -27,6 +27,26 @@ interface Graphic {
     size?: Size;
 }
 
+interface NormalizeEnhancement {
+    algorithm: string;
+    min_value: number;
+    max_value: number;
+}
+
+interface ContrastEnhancement {
+    normalize: NormalizeEnhancement;
+}
+interface Channel {
+    source_channel: number;
+    contrast_enhancement: ContrastEnhancement;
+}
+
+interface Channels {
+    red: Channel;
+    green: Channel;
+    blue: Channel;
+}
+
 export interface PointSymbolizer {
     type: "point";
     graphic: Graphic;
@@ -43,9 +63,18 @@ export interface PolygonSymbolizer {
     fill?: Fill;
 }
 
-export type Symbolizer = PointSymbolizer | LineSymbolizer | PolygonSymbolizer;
+export interface RasterSymbolizer {
+    type: "raster";
+    channels: Channels;
+}
 
-export type SymbolizerType = Symbolizer["type"];
+export type Symbolizer =
+    | PointSymbolizer
+    | LineSymbolizer
+    | PolygonSymbolizer
+    | RasterSymbolizer;
+
+export type SymbolizerType = Exclude<Symbolizer["type"], "raster">;
 
 export interface Rule {
     symbolizers: Symbolizer[];
