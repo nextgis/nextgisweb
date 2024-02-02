@@ -43,4 +43,5 @@ def style_adapter_hook(iface, param):
         and param[0] is IBboxLayer
         and param[1].identity.endswith("_style")
     ):
+        # FIXME: IBboxLayer may not be provided by parent
         return lambda res: res.parent
