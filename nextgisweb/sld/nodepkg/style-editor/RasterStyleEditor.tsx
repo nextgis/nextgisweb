@@ -1,13 +1,13 @@
 import { useCallback, useLayoutEffect, useState } from "react";
 
 import { Form, InputNumber, Select } from "@nextgisweb/gui/antd";
-import type { InputNumberProps } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { ResourceItem } from "@nextgisweb/resource/type";
-import { getRasterSymbolizerValues } from "@nextgisweb/sld/style-editor/util/getRasterSymbolizerValues";
 
 import type { RasterSymbolizer, Symbolizer } from "./type/Style";
+import { getRasterBandRange } from "./util/getRasterBandRange";
+import { getRasterSymbolizerValues } from "./util/getRasterSymbolizerValues";
 
 import "./RasterStyleEditor.less";
 
@@ -17,11 +17,27 @@ interface RasterStyleEditorProps {
     resourceId?: number;
 }
 
+export interface SymbolizerValues {
+    redChannelMin: number;
+    redChannelMax: number;
+    greenChannelMin: number;
+    greenChannelMax: number;
+    blueChannelMin: number;
+    blueChannelMax: number;
+    redChannel: number;
+    greenChannel: number;
+    blueChannel: number;
+}
+
 interface BandOptions {
     label: string;
     value: number;
 }
-const defInputProps: InputNumberProps = { min: 0, max: 255 };
+
+export interface BandRange {
+    min: number;
+    max: number;
+}
 
 export function RasterStyleEditor({
     initSymbolizer,
@@ -31,6 +47,8 @@ export function RasterStyleEditor({
     const [form] = Form.useForm();
 
     const [bands, setBands] = useState<BandOptions[]>([]);
+    const [bandRange, setBandRange] = useState<BandRange>(null);
+    const [initialValues, setInitialValues] = useState<SymbolizerValues>(null);
     useLayoutEffect(() => {
         async function getBands() {
             const rasterRes = await route("resource.item", {
@@ -38,10 +56,8 @@ export function RasterStyleEditor({
             }).get<ResourceItem>({
                 cache: true,
             });
-            console.log(rasterRes);
             if (rasterRes.raster_layer) {
                 const bands_ = rasterRes.raster_layer.color_interpretation;
-                console.log(bands_);
                 setBands(
                     bands_.map((value, index) => ({
                         key: index,
@@ -51,12 +67,16 @@ export function RasterStyleEditor({
                             (value ? ` (${value})` : ""),
                     }))
                 );
+                const dtype = rasterRes.raster_layer.dtype;
+                const bandRange_ = getRasterBandRange(dtype);
+                setBandRange(bandRange_);
+                setInitialValues(
+                    getRasterSymbolizerValues(initSymbolizer, bandRange_)
+                );
             }
         }
         getBands();
-    }, [resourceId]);
-
-    const initialValues = getRasterSymbolizerValues(initSymbolizer);
+    }, [initSymbolizer]);
 
     const onChange = useCallback(
         (valueChange, allValues) => {
@@ -101,57 +121,59 @@ export function RasterStyleEditor({
                     },
                 },
             } as Symbolizer;
-            console.log(symbolizer);
             onSymbolizerChange(symbolizer);
         },
         [onSymbolizerChange]
     );
+    if (!(initialValues && bandRange)) {
+        return null;
+    } else {
+        return (
+            <Form
+                form={form}
+                initialValues={initialValues}
+                onValuesChange={onChange}
+                className="ngw-qgis-raster-editor-widget-sld"
+            >
+                <label>{gettext("Red channel")}</label>
+                <Form.Item noStyle name="redChannel">
+                    <Select options={bands} />
+                </Form.Item>
+                <label className="min">{gettext("Min")}</label>
+                <Form.Item noStyle name="redChannelMin">
+                    <InputNumber {...bandRange} />
+                </Form.Item>
+                <label className="max">{gettext("Max")}</label>
+                <Form.Item noStyle name="redChannelMax">
+                    <InputNumber {...bandRange} />
+                </Form.Item>
 
-    return (
-        <Form
-            form={form}
-            initialValues={initialValues}
-            onValuesChange={onChange}
-            className="ngw-qgis-raster-editor-widget-sld"
-        >
-            <label>{gettext("Red channel")}</label>
-            <Form.Item noStyle name="redChannel">
-                <Select options={bands} />
-            </Form.Item>
-            <label className="min">{gettext("Min")}</label>
-            <Form.Item noStyle name="redChannelMin">
-                <InputNumber {...defInputProps} />
-            </Form.Item>
-            <label className="max">{gettext("Max")}</label>
-            <Form.Item noStyle name="redChannelMax">
-                <InputNumber {...defInputProps} />
-            </Form.Item>
+                <label>{gettext("Green channel")}</label>
+                <Form.Item noStyle name="greenChannel">
+                    <Select options={bands} />
+                </Form.Item>
+                <label className="min">{gettext("Min")}</label>
+                <Form.Item noStyle name="greenChannelMin">
+                    <InputNumber {...bandRange} />
+                </Form.Item>
+                <label className="max">{gettext("Max")}</label>
+                <Form.Item noStyle name="greenChannelMax">
+                    <InputNumber {...bandRange} />
+                </Form.Item>
 
-            <label>{gettext("Green channel")}</label>
-            <Form.Item noStyle name="greenChannel">
-                <Select options={bands} />
-            </Form.Item>
-            <label className="min">{gettext("Min")}</label>
-            <Form.Item noStyle name="greenChannelMin">
-                <InputNumber {...defInputProps} />
-            </Form.Item>
-            <label className="max">{gettext("Max")}</label>
-            <Form.Item noStyle name="greenChannelMax">
-                <InputNumber {...defInputProps} />
-            </Form.Item>
-
-            <label>{gettext("Blue channel")}</label>
-            <Form.Item noStyle name="blueChannel">
-                <Select options={bands} />
-            </Form.Item>
-            <label className="min">{gettext("Min")}</label>
-            <Form.Item noStyle name="blueChannelMin">
-                <InputNumber {...defInputProps} />
-            </Form.Item>
-            <label className="max">{gettext("Max")}</label>
-            <Form.Item noStyle name="blueChannelMax">
-                <InputNumber {...defInputProps} />
-            </Form.Item>
-        </Form>
-    );
+                <label>{gettext("Blue channel")}</label>
+                <Form.Item noStyle name="blueChannel">
+                    <Select options={bands} />
+                </Form.Item>
+                <label className="min">{gettext("Min")}</label>
+                <Form.Item noStyle name="blueChannelMin">
+                    <InputNumber {...bandRange} />
+                </Form.Item>
+                <label className="max">{gettext("Max")}</label>
+                <Form.Item noStyle name="blueChannelMax">
+                    <InputNumber {...bandRange} />
+                </Form.Item>
+            </Form>
+        );
+    }
 }

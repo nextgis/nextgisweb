@@ -1,20 +1,23 @@
+import type { BandRange, SymbolizerValues } from "../RasterStyleEditor";
 import type { RasterSymbolizer } from "../type/Style";
 
-export function getRasterSymbolizerValues(symbolizer: RasterSymbolizer) {
+export function getRasterSymbolizerValues(
+    symbolizer: RasterSymbolizer,
+    bandRange: BandRange
+) {
     if (!symbolizer) {
         return {
-            redChannelMin: 0,
-            redChannelMax: 255,
-            greenChannelMin: 0,
-            greenChannelMax: 255,
-            blueChannelMin: 0,
-            blueChannelMax: 255,
+            redChannelMin: bandRange.min,
+            redChannelMax: bandRange.max,
+            greenChannelMin: bandRange.min,
+            greenChannelMax: bandRange.max,
+            blueChannelMin: bandRange.min,
+            blueChannelMax: bandRange.max,
             redChannel: 0,
             greenChannel: 0,
             blueChannel: 0,
         };
     } else {
-        console.log(symbolizer);
         const values = {};
         values["redChannelMin"] =
             symbolizer.channels.red.contrast_enhancement.normalize.min_value;
@@ -31,6 +34,6 @@ export function getRasterSymbolizerValues(symbolizer: RasterSymbolizer) {
         values["redChannel"] = symbolizer.channels.red.source_channel - 1;
         values["greenChannel"] = symbolizer.channels.green.source_channel - 1;
         values["blueChannel"] = symbolizer.channels.blue.source_channel - 1;
-        return values;
+        return values as SymbolizerValues;
     }
 }
