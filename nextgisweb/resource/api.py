@@ -189,10 +189,10 @@ def collection_post(request) -> JSONType:
     serializer = CompositeSerializer(resource, request.user, data)
     serializer.members["resource"].mark("cls")
 
+    resource.persist()
     with DBSession.no_autoflush:
         serializer.deserialize()
 
-    resource.persist()
     DBSession.flush()
 
     result = dict(id=resource.id)
