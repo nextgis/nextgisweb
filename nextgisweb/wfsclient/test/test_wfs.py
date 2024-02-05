@@ -77,7 +77,7 @@ def layer_id(connection_id):
 
 def test_connection(connection_id, ngw_webtest_app):
     res = ngw_webtest_app.get("/api/resource/%d/wfs_connection/inspect/" % connection_id)
-    assert res.json == [dict(name="type", srid=3857)]
+    assert res.json == [dict(name="type", srid=3857, bbox=[0.0, 0.0, 131.89371, 43.11047])]
 
     ngw_webtest_app.get(
         "/api/resource/%d/wfs_connection/inspect/%s/" % (connection_id, "type"), status=200
