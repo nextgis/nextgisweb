@@ -307,8 +307,9 @@ class ResourceTileCache(Base):
         Resource,
         backref=db.backref(
             "tile_cache",
-            cascade="all, delete-orphan",
             uselist=False,
+            cascade="all, delete-orphan",
+            cascade_backrefs=False,
         ),
     )
 

@@ -85,6 +85,7 @@ class WebMap(Base, Resource):
         "WebMapAnnotation",
         back_populates="webmap",
         cascade="all,delete-orphan",
+        cascade_backrefs=False,
     )
 
     def __init__(self, *args, **kwagrs):
@@ -179,6 +180,7 @@ class WebMapItem(Base):
     parent = db.relationship(
         "WebMapItem",
         remote_side=id,
+        cascade_backrefs=False,
         backref=db.backref(
             "children",
             order_by=position,
@@ -191,7 +193,11 @@ class WebMapItem(Base):
         "Resource",
         # Temporary solution that allows to automatically
         # remove web-map elements when style is removed
-        backref=db.backref("webmap_items", cascade="all"),
+        backref=db.backref(
+            "webmap_items",
+            cascade="all",
+            cascade_backrefs=False,
+        ),
     )
 
     def to_dict(self):

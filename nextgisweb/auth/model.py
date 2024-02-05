@@ -139,6 +139,7 @@ class Group(Principal):
     members = orm.relationship(
         User,
         secondary=tab_group_user,
+        cascade_backrefs=False,
         backref=orm.backref("member_of"),
     )
 

@@ -36,7 +36,14 @@ class FeatureAttachment(Base):
 
     fileobj = db.relationship(FileObj, lazy="joined")
 
-    resource = db.relationship(Resource, backref=db.backref("__feature_attachment", cascade="all"))
+    resource = db.relationship(
+        Resource,
+        backref=db.backref(
+            "__feature_attachment",
+            cascade="all",
+            cascade_backrefs=False,
+        ),
+    )
 
     __table_args__ = (
         db.Index("feature_attachment_resource_id_feature_id_idx", resource_id, feature_id),
