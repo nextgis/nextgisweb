@@ -108,6 +108,10 @@ class FeatureAttachment(Base):
         }
 
     def deserialize(self, data):
+        for k in ("name", "keyname", "mime_type", "description"):
+            if k in data:
+                setattr(self, k, data[k])
+
         if (file_upload := data.get("file_upload")) is not None:
             file_upload_obj = FileUpload(file_upload)
             self.fileobj = file_upload_obj.to_fileobj()
@@ -118,7 +122,3 @@ class FeatureAttachment(Base):
 
             self.size = file_upload_obj.data_path.stat().st_size
             self.extract_meta()
-
-        for k in ("name", "keyname", "mime_type", "description"):
-            if k in data:
-                setattr(self, k, data[k])

@@ -1,3 +1,10 @@
+interface Panorama {
+    ProjectionType: string;
+}
+
+interface FeatureAttachmentFileMeta {
+    panorama: Panorama;
+}
 export interface FeatureAttachment {
     id: number;
     name: string;
@@ -6,4 +13,5 @@ export interface FeatureAttachment {
     mime_type: string;
     description?: string;
     is_image: boolean;
+    file_meta: FeatureAttachmentFileMeta;
 }

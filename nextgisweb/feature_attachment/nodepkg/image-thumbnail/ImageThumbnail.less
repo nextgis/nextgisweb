@@ -1,0 +1,21 @@
+.ngw-feature-attachment-image-thumbnail {
+    display: flex;
+    position: relative;
+    margin: 8px;
+    height: max-content;
+
+    > .overlay {
+        display: none;
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.25);
+        color: white;
+    }
+
+    &:hover > .overlay {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}

@@ -1,25 +1,27 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
 import { useFileUploader } from "@nextgisweb/file-upload";
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Button, Image, Input, Table, Upload } from "@nextgisweb/gui/antd";
+import { Button, Input, Table, Upload } from "@nextgisweb/gui/antd";
+import showModal from "@nextgisweb/gui/showModal";
 import { formatSize } from "@nextgisweb/gui/util";
-import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { ImageThumbnail } from "../image-thumbnail/ImageThumbnail";
+import { CarouselModal } from "../image-thumbnail/component/CarouselModal";
+
 import AttachmentEditorStore from "./AttachmentEditorStore";
-import { FileReaderImage } from "./component/FileReaderImage";
 import type { DataSource } from "./type";
 
 import DeleteIcon from "@nextgisweb/icon/material/clear";
 
 import "./AttachmentEditor.less";
 
-function isFileImage(file: File) {
+export function isFileImage(file: File) {
     return file && file["type"].split("/")[0] === "image";
 }
 
@@ -28,6 +30,9 @@ const AttachmentEditor = observer(
         store,
     }: EditorWidgetProps<DataSource[] | null, AttachmentEditorStore>) => {
         const multiple = true;
+
+        const [width] = useState(80);
+        const previewRef = useRef<HTMLDivElement>(null);
 
         const [store_] = useState<AttachmentEditorStore>(() => {
             if (store) {
@@ -117,31 +122,42 @@ const AttachmentEditor = observer(
                                 className: "preview",
                                 render: (_, row) => {
                                     const r = row as DataSource;
-                                    if ("is_image" in r && r.is_image) {
-                                        const url = routeURL(
-                                            "feature_attachment.image",
-                                            {
-                                                id: store_.resourceId,
-                                                fid: store_.featureId,
-                                                aid: r.id,
-                                            }
-                                        );
-                                        return (
-                                            <Image
-                                                width={80}
-                                                src={`${url}?size=80x80`}
-                                                preview={{ src: url }}
-                                            />
-                                        );
-                                    } else if (
-                                        "_file" in r &&
-                                        r._file instanceof File &&
-                                        isFileImage(r._file)
+                                    if (
+                                        ("is_image" in r && r.is_image) ||
+                                        ("_file" in r &&
+                                            r._file instanceof File &&
+                                            isFileImage(r._file))
                                     ) {
                                         return (
-                                            <FileReaderImage file={r._file} />
+                                            <ImageThumbnail
+                                                attachment={r}
+                                                resourceId={store_.resourceId}
+                                                featureId={store_.featureId}
+                                                width={width}
+                                                height={width}
+                                                onClick={() => {
+                                                    const container =
+                                                        previewRef.current;
+                                                    if (container) {
+                                                        showModal(
+                                                            CarouselModal,
+                                                            {
+                                                                dataSource,
+                                                                attachment: r,
+                                                                featureId:
+                                                                    store_.featureId,
+                                                                resourceId:
+                                                                    store_.resourceId,
+                                                                getContainer:
+                                                                    container,
+                                                            }
+                                                        );
+                                                    }
+                                                }}
+                                            />
                                         );
                                     }
+
                                     return "";
                                 },
                             },
@@ -180,6 +196,7 @@ const AttachmentEditor = observer(
                         size="small"
                     />
                 </Upload>
+                <div ref={previewRef}></div>
             </div>
         );
     }

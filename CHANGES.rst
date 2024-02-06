@@ -6,6 +6,7 @@ Changes
 
 - Update minimum required NodeJS version to 20.0.
 - Add export to CSV and import from CSV for lookup tables.
+- Enhanced feature attachment viewer now includes panoramic images support.
 
 
 4.6.0

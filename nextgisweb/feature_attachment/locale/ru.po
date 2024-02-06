@@ -1,44 +1,40 @@
-#: amd/ngw-feature-attachment/DisplayWidget.js:36
-#: nodepkg/attachment-editor/index.ts:9
+#: amd/ngw-feature-attachment/DisplayWidget.js:9
+#: nodepkg/attachment-editor/index.ts:8
 msgid "Attachments"
 msgstr "Вложения"
 
-#: amd/ngw-feature-attachment/DisplayWidget.js:91
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:152
-msgid "File name"
-msgstr "Имя файла"
-
-#: amd/ngw-feature-attachment/DisplayWidget.js:91
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:158
-msgid "Size"
-msgstr "Размер"
-
-#: amd/ngw-feature-attachment/DisplayWidget.js:91
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:164
-msgid "Description"
-msgstr "Описание"
-
-#: amd/ngw-feature-attachment/DisplayWidget.js:91
-msgid "MIME type"
-msgstr "Тип MIME"
-
-#: component.py:10
+#: component.py:12
 msgid "Feature attachments"
 msgstr "Прикрепленные к объектам файлы"
 
-#: exception.py:11
+#: exception.py:7
 msgid "Attachment not found"
 msgstr "Вложение не найдено"
 
-#: exception.py:12
+#: exception.py:8
 msgid "Attachment with id = %d was not found in feature with id = %d."
 msgstr "Вложение с id = %d не найдено в объекте с id = %d."
 
-#: exception.py:13
+#: exception.py:9
 msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 
-#: nodepkg/attachment-form/AttachmentForm.js:48
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:167
+#: nodepkg/attachment-table/AttachmentTable.tsx:54
+msgid "File name"
+msgstr "Имя файла"
+
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:173
+#: nodepkg/attachment-table/AttachmentTable.tsx:72
+msgid "Size"
+msgstr "Размер"
+
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:179
+#: nodepkg/attachment-table/AttachmentTable.tsx:87
+msgid "Description"
+msgstr "Описание"
+
+#: nodepkg/attachment-form/AttachmentForm.js:49
 msgid ""
 "Use export to copy feature attachments between different layers or to create "
 "a backup. The resulting ZIP archive will contain all of the attachments put "
@@ -50,19 +46,19 @@ msgstr ""
 " директориях с именами объектов. Метаданные вложений сохраняются в отдельном "
 "JSON-файле."
 
-#: nodepkg/attachment-form/AttachmentForm.js:58
+#: nodepkg/attachment-form/AttachmentForm.js:59
 msgid "Export attachments to ZIP archive"
 msgstr "Экспортировать вложения в ZIP-архив"
 
-#: nodepkg/attachment-form/AttachmentForm.js:73
+#: nodepkg/attachment-form/AttachmentForm.js:74
 msgid "Back to resource"
 msgstr "Назад к ресурсу"
 
-#: nodepkg/attachment-form/AttachmentForm.js:75
+#: nodepkg/attachment-form/AttachmentForm.js:76
 msgid "Close"
 msgstr "Закрыть"
 
-#: nodepkg/attachment-form/AttachmentForm.js:78
+#: nodepkg/attachment-form/AttachmentForm.js:79
 msgid "The archive has been successfully imported."
 msgstr "Импорт архива выполнен успешно."
 
@@ -97,38 +93,47 @@ msgstr "Экспорт"
 msgid "Import"
 msgstr "Импорт"
 
+#: nodepkg/attachment-table/AttachmentTable.tsx:81
+msgid "MIME type"
+msgstr "Тип MIME"
+
+#: nodepkg/image-thumbnail/component/CarouselRender.tsx:23
+msgid "Toggle panorama viewer"
+msgstr "Переключить просмотр панорам"
+
 #: util.py:26
 msgid "Invalid ZIP archive."
 msgstr "Некорректный ZIP-архив."
 
-#: util.py:54
+#: util.py:55
 msgid "File '{}' isn't found in metadata."
 msgstr "Файл '{}' не найден в метаданных."
 
-#: util.py:59
+#: util.py:60
 msgid "Invalid name for file '{}'."
 msgstr "Некорректное имя для файла '{}'."
 
-#: util.py:65
+#: util.py:66
 msgid "Invalid feature ID for file '{}'."
 msgstr "Некорректный идентификатор объекта для файла '{}'."
 
-#: util.py:71
+#: util.py:73
 msgid "Invalid MIME type for file '{}'."
 msgstr "Некорректный MIME-тип для файла '{}'."
 
-#: util.py:77
+#: util.py:80
 msgid "Invalid description for file '{}'."
 msgstr "Некорректное описание для файла '{}'."
 
-#: util.py:89
+#: util.py:93
 msgid "Could not determine feature ID for file '{}'."
 msgstr "Не удалось определить идентификатор объекта для файла '{}'."
 
-#: util.py:106
+#: util.py:110
 msgid "File '{}' isn't found in the archive."
 msgstr "Файл '{}' не найден в архиве."
 
 #: view.py:20 view.py:41
 msgid "Manage attachments"
 msgstr "Управление вложениями"
+

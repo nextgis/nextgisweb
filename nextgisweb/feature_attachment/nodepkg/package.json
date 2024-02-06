@@ -1,5 +1,8 @@
 {
     "name": "@nextgisweb/feature_attachment",
     "version": "0.0.0",
-    "type": "module"
+    "type": "module",
+    "dependencies": {
+        "@photo-sphere-viewer/core": "^5.7.0"
+    }
 }

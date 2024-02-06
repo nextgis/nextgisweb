@@ -1,0 +1,55 @@
+.ngw-feature-attachment-carousel-modal {
+    > .ant-modal-mask {
+        backdrop-filter: blur(4px);
+        background-color: rgba(0, 0, 0, 0.95);
+    }
+
+    > .ant-modal-wrap > .ant-modal {
+        margin: 0;
+        inset: 0;
+        padding: 0;
+        max-width: unset;
+        height: 100%;
+
+        > .ant-modal-content {
+            box-shadow: none;
+            background-color: transparent;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+
+            > .ant-modal-close {
+                top: 8px;
+                right: 8px;
+                border-radius: 100%;
+                background: none;
+                width: 32px;
+                height: 32px;
+                pointer-events: auto;
+
+                > .ant-modal-close-x {
+                    color: rgba(255, 255, 255, 0.25);
+                    font-size: 32px;
+
+                    &:hover {
+                        color: white;
+                    }
+                }
+            }
+
+            > .ant-modal-body {
+                height: 100%;
+                pointer-events: none;
+
+                > .ant-float-btn {
+                    top: 8px;
+                    right: 48px;
+                    width: 32px;
+                    height: 32px;
+                    pointer-events: auto;
+                }
+            }
+        }
+    }
+}

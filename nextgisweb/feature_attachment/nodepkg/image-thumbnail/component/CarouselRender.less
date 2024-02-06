@@ -1,0 +1,82 @@
+.ngw-feature-attachment-carousel-render {
+    height: 100%;
+    pointer-events: none;
+
+    > .slick-slider {
+        height: 100%;
+
+        > .slick-arrow {
+            z-index: 100;
+            width: 32px;
+            height: 32px;
+            pointer-events: auto;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 32px;
+
+            > .icon {
+                position: absolute;
+            }
+
+            &:hover {
+                color: white;
+            }
+
+            &::before {
+                content: unset;
+            }
+
+            &.slick-prev {
+                left: 8px;
+            }
+
+            &.slick-next {
+                right: 8px;
+            }
+        }
+
+        > .slick-list {
+            height: 100%;
+
+            > .slick-track {
+                height: 100%;
+
+                > .slick-slide {
+                    height: 100%;
+                    pointer-events: none;
+
+                    > div {
+                        box-sizing: border-box;
+                        padding: 48px;
+                        height: 100%;
+
+                        > .ant-image {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100%;
+
+                            > img {
+                                display: block;
+                                width: unset;
+                                max-width: 100%;
+                                height: unset;
+                                max-height: 100%;
+                                pointer-events: auto;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        > .slick-dots-bottom {
+            position: absolute;
+            bottom: 20px;
+            pointer-events: auto;
+        }
+    }
+
+    > .ant-float-btn {
+        pointer-events: auto;
+    }
+}
