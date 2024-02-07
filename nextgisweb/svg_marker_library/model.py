@@ -1,15 +1,16 @@
 import os.path
 import zipfile
 from datetime import datetime
-from shutil import copyfileobj
 
 import magic
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 
-from nextgisweb.env import COMP_ID, Base, DBSession, _, env
-from nextgisweb.lib import db
+from nextgisweb.env import Base, _
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 
@@ -22,11 +23,11 @@ class SVGMarkerLibrary(Base, Resource):
     identity = "svg_marker_library"
     cls_display_name = _("SVG marker library")
 
-    stuuid = db.Column(db.Unicode(32))
-    tstamp = db.Column(db.DateTime())
+    stuuid = sa.Column(sa.Unicode(32))
+    tstamp = sa.Column(sa.DateTime())
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
     def from_archive(self, filename):
@@ -41,16 +42,12 @@ class SVGMarkerLibrary(Base, Resource):
                 name, ext = os.path.splitext(filename)
                 validate_ext(filename, ext)
 
-                fileobj = env.file_storage.fileobj(component=COMP_ID)
-
-                dstfile = env.file_storage.filename(fileobj, makedirs=True)
                 with archive.open(filename, "r") as sf:
                     validate_mime(filename, sf.read(1024))
                     sf.seek(0)
-                    with open(dstfile, "wb") as df:
-                        copyfileobj(sf, df)
 
-                self.files.append(SVGMarker(name=name, fileobj=fileobj))
+                    fileobj = FileObj().copy_from(sf)
+                    self.files.append(SVGMarker(name=name, fileobj=fileobj))
 
         return self
 
@@ -63,24 +60,24 @@ class SVGMarkerLibrary(Base, Resource):
 class SVGMarker(Base):
     __tablename__ = "svg_marker"
 
-    id = db.Column(db.Integer, primary_key=True)
-    svg_marker_library_id = db.Column(db.ForeignKey(SVGMarkerLibrary.id), nullable=False)
-    fileobj_id = db.Column(db.ForeignKey(FileObj.id), nullable=False)
-    name = db.Column(db.Unicode(255), nullable=False)
+    id = sa.Column(sa.Integer, primary_key=True)
+    svg_marker_library_id = sa.Column(sa.ForeignKey(SVGMarkerLibrary.id), nullable=False)
+    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
+    name = sa.Column(sa.Unicode(255), nullable=False)
 
-    __table_args__ = (db.UniqueConstraint(svg_marker_library_id, name),)
+    __table_args__ = (sa.UniqueConstraint(svg_marker_library_id, name),)
 
-    fileobj = db.relationship(FileObj, lazy="joined")
+    fileobj = orm.relationship(FileObj, lazy="joined")
 
-    svg_marker_library = db.relationship(
+    svg_marker_library = orm.relationship(
         SVGMarkerLibrary,
         foreign_keys=svg_marker_library_id,
-        backref=db.backref("files", cascade="all,delete-orphan"),
+        backref=orm.backref("files", cascade="all,delete-orphan"),
     )
 
     @property
     def path(self):
-        return env.file_storage.filename(self.fileobj)
+        return str(self.fileobj.filename())
 
 
 def validate_filename(filename):
@@ -103,17 +100,12 @@ class _archive_attr(SP):
     def setter(self, srlzr, value):
         srlzr.obj.tstamp = datetime.utcnow()
 
-        archive_name, metafile = env.file_upload.get_filename(value["id"])
+        # Delete all existing files, do flush due to delete before insert
+        srlzr.obj.files[:] = []
+        sa.inspect(srlzr.obj).session.flush()
 
-        old_files = list(srlzr.obj.files)
-
-        with DBSession.no_autoflush:
-            for f in old_files:
-                srlzr.obj.files.remove(f)
-
-        DBSession.flush()
-
-        srlzr.obj.from_archive(archive_name)
+        fupload = FileUpload(id=value["id"])
+        srlzr.obj.from_archive(fupload.data_path)
 
 
 class _files_attr(SP):
@@ -129,12 +121,10 @@ class _files_attr(SP):
             validate_filename(filename)
             files_info[filename] = f
 
-        def copy_file_validate(srcfile, dstfile, filename):
-            with open(srcfile, "rb") as sf:
-                validate_mime(filename, sf.read(1024))
-                sf.seek(0)
-                with open(dstfile, "wb") as df:
-                    copyfileobj(sf, df)
+        def to_fileobj(fu: FileUpload):
+            with fu.data_path.open("rb") as fd:
+                validate_mime(fu.name, fd.read(1024))
+            return fu.to_fileobj()
 
         removed_files = list()
         for svg_marker in srlzr.obj.files:
@@ -143,9 +133,8 @@ class _files_attr(SP):
             else:
                 file_info = files_info.pop(svg_marker.name)
                 if "id" in file_info:  # Updated file
-                    srcfile, metafile = env.file_upload.get_filename(file_info["id"])
-                    dstfile = env.file_storage.filename(svg_marker.fileobj, makedirs=False)
-                    copy_file_validate(srcfile, dstfile, file_info["name"])
+                    fupload = FileUpload(id=file_info["id"], name=file_info["name"])
+                    svg_marker.fileobj = to_fileobj(fupload)
                 else:  # Untouched file
                     pass
 
@@ -153,14 +142,8 @@ class _files_attr(SP):
             srlzr.obj.files.remove(f)
 
         for name, file_info in files_info.items():  # New file
-            fileobj = env.file_storage.fileobj(component=COMP_ID)
-
-            srcfile, metafile = env.file_upload.get_filename(file_info["id"])
-            dstfile = env.file_storage.filename(fileobj, makedirs=True)
-            copy_file_validate(srcfile, dstfile, file_info["name"])
-
-            svg_marker = SVGMarker(name=name, fileobj=fileobj)
-
+            fupload = FileUpload(id=file_info["id"], name=file_info["name"])
+            svg_marker = SVGMarker(name=name, fileobj=to_fileobj(fupload))
             srlzr.obj.files.append(svg_marker)
 
 

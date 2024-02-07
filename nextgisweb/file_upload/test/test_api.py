@@ -2,6 +2,8 @@ from subprocess import check_call, check_output
 
 import webtest
 
+from ..model import FileUpload
+
 TEST_FILENAME = "file.ext"
 TEST_CONTENT = "content".encode("utf-8")
 
@@ -105,17 +107,17 @@ def test_tus_client(ngw_httptest_app, tmp_path):
     assert data["size"] == 16 * 1024 * 1024
 
 
-def test_post_single(ngw_env, ngw_webtest_app):
+def test_post_single(ngw_webtest_app):
     resp = ngw_webtest_app.post(
-        "/api/component/file_upload/", dict(file=webtest.Upload(TEST_FILENAME, TEST_CONTENT))
+        "/api/component/file_upload/",
+        dict(file=webtest.Upload(TEST_FILENAME, TEST_CONTENT)),
     )
 
-    datafn, metafn = ngw_env.file_upload.get_filename(resp.json["upload_meta"][0]["id"])
-    with open(datafn, "rb") as fp:
-        assert fp.read() == TEST_CONTENT
+    fupload = FileUpload(id=resp.json["upload_meta"][0]["id"])
+    assert fupload.data_path.read_bytes() == TEST_CONTENT
 
 
-def test_post_multi(ngw_env, ngw_webtest_app):
+def test_post_multi(ngw_webtest_app):
     resp = ngw_webtest_app.post(
         "/api/component/file_upload/",
         [
@@ -124,17 +126,14 @@ def test_post_multi(ngw_env, ngw_webtest_app):
         ],
     )
 
-    datafn, metafn = ngw_env.file_upload.get_filename(resp.json["upload_meta"][0]["id"])
-    with open(datafn, "rb") as fp:
-        assert fp.read() == TEST_CONTENT
+    fupload = FileUpload(id=resp.json["upload_meta"][0]["id"])
+    assert fupload.data_path.read_bytes() == TEST_CONTENT
 
-    datafn, metafn = ngw_env.file_upload.get_filename(resp.json["upload_meta"][1]["id"])
-    with open(datafn, "rb") as fp:
-        assert fp.read() == TEST_CONTENT2
+    fupload = FileUpload(id=resp.json["upload_meta"][1]["id"])
+    assert fupload.data_path.read_bytes() == TEST_CONTENT2
 
 
-def test_put(ngw_env, ngw_webtest_app):
+def test_put(ngw_webtest_app):
     resp = ngw_webtest_app.put("/api/component/file_upload/", TEST_CONTENT)
-    datafn, metafn = ngw_env.file_upload.get_filename(resp.json["id"])
-    with open(datafn, "rb") as fp:
-        assert fp.read() == TEST_CONTENT
+    fupload = FileUpload(id=resp.json["id"])
+    assert fupload.data_path.read_bytes() == TEST_CONTENT

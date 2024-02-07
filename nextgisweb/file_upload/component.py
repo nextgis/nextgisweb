@@ -1,8 +1,7 @@
 import os
 from datetime import datetime, timedelta
 from shutil import rmtree
-
-from ulid import ULID
+from warnings import warn
 
 from nextgisweb.env import Component
 from nextgisweb.lib.config import Option, SizeInBytes
@@ -30,7 +29,9 @@ class FileUploadComponent(Component):
         mod = SourceFileLoader(
             "",
             os.path.join(
-                os.path.split(__file__)[0], "migration", "3803b726-cleanup-prev-format.py"
+                os.path.split(__file__)[0],
+                "migration",
+                "3803b726-cleanup-prev-format.py",
             ),
         ).load_module()
         mod.forward(SimpleNamespace(env=self.env))
@@ -41,20 +42,17 @@ class FileUploadComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
-    def fileid(self):
-        return ULID().hex
-
     def get_filename(self, fileid, makedirs=False):
-        ulid = ULID.from_hex(fileid)
-        levels = (ulid.datetime.strftime(date_format), fileid[-2:], fileid[-4:-2])
-        level_path = os.path.join(self.path, *levels)
+        from .model import _filenames
 
-        # Create folders if needed
-        if makedirs and not os.path.isdir(level_path):
-            os.makedirs(level_path)
+        warn(
+            "FileUploadComponent.get_filename is deprecated since 4.7.0.dev5. "
+            "Use FileUpoad.data_path and FileUpload.meta_path instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
-        base_filename = os.path.join(level_path, fileid)
-        return (base_filename + ".data", base_filename + ".meta")
+        return tuple(str(p) for p in _filenames(fileid, makedirs=makedirs))
 
     def maintenance(self):
         super().maintenance()

@@ -1,14 +1,14 @@
 import filecmp
 from contextlib import contextmanager
-from shutil import copyfileobj
 from zipfile import BadZipFile, ZipFile
 
 from magic import from_buffer as magic_from_buffer
 
-from nextgisweb.env import COMP_ID, DBSession, _, env
+from nextgisweb.env import DBSession, _
 from nextgisweb.lib.json import loadb
 
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.file_storage import FileObj
 
 from .model import FeatureAttachment
 
@@ -117,10 +117,8 @@ def attachments_import(resource, filename, *, replace):
 
         with DBSession.no_autoflush:
             for src in sources:
-                fileobj = env.file_storage.fileobj(component=COMP_ID)
-                dstfile = env.file_storage.filename(fileobj, makedirs=True)
-                with z.open(src["info"], "r") as sf, open(dstfile, "wb") as df:
-                    copyfileobj(sf, df)
+                with z.open(src["info"], "r") as sf:
+                    fileobj = FileObj().copy_from(sf)
 
                 skip = False
                 if not replace:
@@ -129,8 +127,9 @@ def attachments_import(resource, filename, *, replace):
                         feature_id=src["feature_id"],
                         size=src["info"].file_size,
                     ):
-                        cmpfile = env.file_storage.filename(att_cmp.fileobj, makedirs=False)
-                        if filecmp.cmp(dstfile, cmpfile, False):
+                        fn_new = fileobj.filename()
+                        fn_existing = att_cmp.fileobj.filename()
+                        if filecmp.cmp(fn_new, fn_existing, False):
                             skip = True
                             break
 

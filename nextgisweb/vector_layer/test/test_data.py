@@ -179,7 +179,9 @@ def test_multi_layers(ngw_webtest_app):
     upload_meta = resp.json["upload_meta"][0]
 
     resp = ngw_webtest_app.post_json(
-        "/api/component/vector_layer/dataset", dict(source=upload_meta), status=200
+        "/api/component/vector_layer/inspect",
+        dict(id=upload_meta["id"]),
+        status=200,
     )
 
     layers = resp.json["layers"]

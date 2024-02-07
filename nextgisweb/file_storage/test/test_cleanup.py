@@ -1,5 +1,3 @@
-import io
-import os
 from datetime import timedelta
 
 import pytest
@@ -18,21 +16,12 @@ def off_keep_interfal(ngw_env):
 
 
 def test_keep_delete(ngw_env, ngw_txn):
-    fo_keep = FileObj(component="test").persist()
-    fn_keep = ngw_env.file_storage.filename(fo_keep, makedirs=True)
-
-    fo_delete = FileObj(component="test")
-    fn_delete = ngw_env.file_storage.filename(fo_delete, makedirs=True)
+    fobj_keep = FileObj(component="test").from_content(b"").persist()
+    fobj_delete = FileObj(component="test").from_content(b"")
 
     DBSession.flush()
 
-    for fn in (fn_keep, fn_delete):
-        with io.open(fn, "w") as fd:
-            fd.write(fn)
-
     ngw_env.file_storage.cleanup(dry_run=False)
 
-    assert os.path.isfile(fn_keep)
-    assert not os.path.isfile(fn_delete)
-
-    os.unlink(fn_keep)
+    assert fobj_keep.filename().is_file()
+    assert not fobj_delete.filename().is_file()

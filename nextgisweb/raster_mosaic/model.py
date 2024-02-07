@@ -13,6 +13,7 @@ from nextgisweb.lib.osrhelper import sr_from_wkt
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.raster_layer.util import calc_overviews_levels
 from nextgisweb.resource import (
@@ -237,8 +238,7 @@ class _items_attr(SP):
             file_upload = item.get("file_upload")
             if file_upload is not None:
                 mitem = RasterMosaicItem(resource=srlzr.obj, display_name=item["display_name"])
-                srcfile, _ = env.file_upload.get_filename(file_upload["id"])
-                mitem.load_file(srcfile, env)
+                mitem.load_file(str(FileUpload(id=file_upload["id"]).data_path), env)
             else:
                 mitem = RasterMosaicItem.filter_by(id=item["id"]).one()
                 if mitem.resource_id == srlzr.obj.id:

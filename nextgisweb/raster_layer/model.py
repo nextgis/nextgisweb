@@ -15,6 +15,7 @@ from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_fro
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.core.util import format_size
 from nextgisweb.file_storage import FileObj
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceGroup, Serializer
 from nextgisweb.resource import SerializedProperty as SP
@@ -335,12 +336,10 @@ def estimate_raster_layer_data(resource):
 
 class _source_attr(SP):
     def setter(self, srlzr, value):
-        cog = srlzr.data.get("cog", env.raster_layer.cog_enabled)
-
         cur_size = 0 if srlzr.obj.id is None else estimate_raster_layer_data(srlzr.obj)
 
-        filedata, filemeta = env.file_upload.get_filename(value["id"])
-        srlzr.obj.load_file(filedata, env, cog)
+        cog = srlzr.data.get("cog", env.raster_layer.cog_enabled)
+        srlzr.obj.load_file(str(FileUpload(id=value["id"]).data_path), env, cog)
 
         new_size = estimate_raster_layer_data(srlzr.obj)
         size = new_size - cur_size

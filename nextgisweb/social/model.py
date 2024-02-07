@@ -1,16 +1,13 @@
-from shutil import copyfile
+from io import BytesIO
 
 from PIL import Image
 
-from nextgisweb.env import COMP_ID, Base, DBSession, env
+from nextgisweb.env import COMP_ID, Base
 from nextgisweb.lib import db
 
 from nextgisweb.file_storage import FileObj
-from nextgisweb.resource import (
-    Resource,
-    ResourceScope,
-    Serializer,
-)
+from nextgisweb.file_upload import FileUpload
+from nextgisweb.resource import Resource, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 
 Base.depends_on("resource")
@@ -43,27 +40,21 @@ class _preview_file_upload_attr(SP):
 
         social = srlzr.obj.social
         if value is not None:
-            srcfile, _ = env.file_upload.get_filename(value["id"])
-
-            fileobj = env.file_storage.fileobj(component=COMP_ID)
-            dstfile = env.file_storage.filename(fileobj, makedirs=True)
-
-            with Image.open(srcfile) as image:
+            fupload = FileUpload(id=value["id"])
+            with Image.open(fupload.data_path) as image:
                 width, height = image.size
                 resize = width > MAX_SIZE[0] or height > MAX_SIZE[1]
-
                 if image.format != "PNG" or resize:
                     if resize:
                         image.thumbnail(MAX_SIZE)
-                    image.save(dstfile, "png", optimize=True)
+                    buf = BytesIO()
+                    image.save(buf, "png", optimize=True)
+                    social.preview_fileobj = FileObj().from_content(buf.getvalue())
                 else:
-                    copyfile(srcfile, dstfile)
+                    social.preview_fileobj = fupload.to_fileobj()
 
-            social.preview_fileobj = fileobj
         elif social.preview_fileobj is not None:
-            fileobj = social.preview_fileobj
             social.preview_fileobj = None
-            DBSession.delete(fileobj)
 
 
 class _preview_image_exists(SP):

@@ -47,13 +47,15 @@ def module_path(module_name: str) -> Path:
 def module_from_stack(depth=0, skip=None):
     """Extract module name from stack"""
 
+    if skip is not None:
+        skip = tuple(m if m.endswith(".") else (m + ".") for m in skip)
+
     cur_depth = 2 + depth
     while True:
         fr = sys._getframe(cur_depth)
         mod = fr.f_globals["__name__"]
-        if mod.startswith(
-            ("importlib.") or (skip and (mod.startswith(skip) or (mod + ".").startswith(skip)))
-        ):
+        mod_dot = mod + "."
+        if mod_dot.startswith("importlib.") or (skip and mod_dot.startswith(skip)):
             cur_depth += 1
         else:
             return mod

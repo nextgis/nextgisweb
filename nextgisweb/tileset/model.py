@@ -23,6 +23,7 @@ from nextgisweb.lib.registry import list_registry
 from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.render import (
     IExtentRenderRequest,
@@ -151,8 +152,8 @@ class Tileset(Base, Resource, SpatialLayerMixin):
 
         image = None
 
-        db_path = env.file_storage.filename(self.fileobj)
-        connection = get_tile_db(db_path)
+        db_path = self.fileobj.filename()
+        connection = get_tile_db(str(db_path))
 
         # fmt: off
         for x, y, data in connection.execute("""
@@ -323,7 +324,7 @@ class _source_attr(SerializedProperty):
                 COMP_ID, TilesetData, value_data_volume=-size, resource=srlzr.obj
             )
 
-        fn, fn_meta = env.file_upload.get_filename(value["id"])
+        fupload = FileUpload(id=value["id"])
         stat = dict()
         with NamedTemporaryFile() as tf:
             with sqlite3.connect(tf.name) as connection:
@@ -341,7 +342,7 @@ class _source_attr(SerializedProperty):
                 """)
                 # fmt: on
 
-                for z, x, y, img_data in read_file(fn):
+                for z, x, y, img_data in read_file(fupload):
                     img = Image.open(BytesIO(img_data))
                     if img.size != (256, 256):
                         raise ValidationError(message=_("Only 256x256 px tiles are supported."))

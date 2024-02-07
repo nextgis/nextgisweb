@@ -10,12 +10,13 @@ from PIL import Image
 from pyramid.response import FileResponse, Response
 from typing_extensions import Annotated
 
-from nextgisweb.env import DBSession, env
+from nextgisweb.env import DBSession
 from nextgisweb.lib.json import dumpb
 
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.feature_layer.api import FeatureID
 from nextgisweb.feature_layer.exception import FeatureNotFound
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.tomb import UnsafeFileResponse
 from nextgisweb.resource import DataScope, ResourceFactory
@@ -52,8 +53,8 @@ def download(resource, request):
         attachment_id=int(request.matchdict["aid"]),
     )
 
-    fn = env.file_storage.filename(obj.fileobj)
-    response = UnsafeFileResponse(fn, content_type=obj.mime_type, request=request)
+    fn = obj.fileobj.filename()
+    response = UnsafeFileResponse(str(fn), content_type=obj.mime_type, request=request)
     response.content_disposition = f"filename*=utf-8''{quote_plus(obj.name)}"
     return response
 
@@ -67,7 +68,7 @@ def image(resource, request):
         attachment_id=int(request.matchdict["aid"]),
     )
 
-    image = Image.open(env.file_storage.filename(obj.fileobj))
+    image = Image.open(obj.fileobj.filename())
     ext = image.format
 
     exif = None
@@ -216,8 +217,7 @@ def export(resource, request):
                 if obj.description is not None:
                     metadata_item["description"] = obj.description
 
-                fn = env.file_storage.filename(obj.fileobj)
-                zipf.write(fn, arcname=arcname)
+                zipf.write(obj.fileobj.filename(), arcname=arcname)
 
             zipf.writestr("metadata.json", dumpb(metadata))
 
@@ -231,10 +231,8 @@ def import_attachment(resource, request) -> JSONType:
 
     data = request.json_body
     replace = data.get("replace", False) is True
-    upload_meta = data["source"]
-    data, meta = request.env.file_upload.get_filename(upload_meta["id"])
-
-    return attachments_import(resource, data, replace=replace)
+    fupload = FileUpload(id=data["source"]["id"])
+    return attachments_import(resource, fupload.data_path, replace=replace)
 
 
 def setup_pyramid(comp, config):

@@ -1,7 +1,5 @@
 from pyramid.response import FileResponse
 
-from nextgisweb.env import env
-
 from nextgisweb.resource import DataScope
 
 from .model import Tileset
@@ -10,7 +8,7 @@ from .model import Tileset
 def export(resource, request):
     request.resource_permission(DataScope.read)
 
-    fn = env.file_storage.filename(resource.fileobj)
+    fn = resource.fileobj.filename()
     response = FileResponse(fn, content_type="application/vnd.sqlite3")
     response.content_disposition = f"attachment; filename={resource.id}.ngwtiles"
     return response

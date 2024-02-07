@@ -1,15 +1,15 @@
-import io
-import os
+from __future__ import annotations
+
 import re
 from datetime import datetime
-from shutil import copyfileobj
 
 from PIL import Image, UnidentifiedImageError
 
-from nextgisweb.env import Base, env
+from nextgisweb.env import Base
 from nextgisweb.lib import db
 
 from nextgisweb.file_storage import FileObj
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.resource import Resource
 
 Base.depends_on("resource", "feature_layer")
@@ -61,7 +61,7 @@ class FeatureAttachment(Base):
         _file_meta = {}
         if self.is_image:
             try:
-                image = Image.open(env.file_storage.filename(self.fileobj))
+                image = Image.open(self.fileobj.filename())
             except UnidentifiedImageError:
                 pass
             else:
@@ -108,21 +108,15 @@ class FeatureAttachment(Base):
         }
 
     def deserialize(self, data):
-        file_upload = data.get("file_upload")
-        if file_upload is not None:
-            self.fileobj = env.file_storage.fileobj(component="feature_attachment")
-
-            srcfile, _ = env.file_upload.get_filename(file_upload["id"])
-            dstfile = env.file_storage.filename(self.fileobj, makedirs=True)
-
-            with io.open(srcfile, "rb") as fs, io.open(dstfile, "wb") as fd:
-                copyfileobj(fs, fd)
+        if (file_upload := data.get("file_upload")) is not None:
+            file_upload_obj = FileUpload(file_upload)
+            self.fileobj = file_upload_obj.to_fileobj()
 
             for k in ("name", "mime_type"):
                 if k in file_upload:
                     setattr(self, k, file_upload[k])
 
-            self.size = os.stat(dstfile).st_size
+            self.size = file_upload_obj.data_path.stat().st_size
             self.extract_meta()
 
         for k in ("name", "keyname", "mime_type", "description"):

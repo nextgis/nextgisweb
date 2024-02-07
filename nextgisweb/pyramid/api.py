@@ -13,6 +13,7 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
 
 from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import Resource, ResourceScope
 
@@ -418,16 +419,12 @@ def logo_get(request):
 def logo_put(request):
     request.require_administrator()
 
-    value = request.json_body
-
-    if value is None:
-        request.env.core.settings_delete("pyramid", "logo")
-
+    if value := request.json_body:
+        fupload = FileUpload(id=value["id"])
+        data = base64.b64encode(fupload.data_path.read_bytes())
+        request.env.core.settings_set("pyramid", "logo", data.decode("utf-8"))
     else:
-        fn, fnmeta = request.env.file_upload.get_filename(value["id"])
-        with open(fn, "rb") as fd:
-            data = base64.b64encode(fd.read())
-            request.env.core.settings_set("pyramid", "logo", data.decode("utf-8"))
+        request.env.core.settings_delete("pyramid", "logo")
 
     request.env.core.settings_set("pyramid", "logo.ckey", gensecret(8))
 

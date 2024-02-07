@@ -23,6 +23,7 @@ from nextgisweb.feature_layer import (
     on_data_change,
     query_feature_or_not_found,
 )
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceGroup, Serializer
 from nextgisweb.resource import SerializedProperty as SP
@@ -495,9 +496,8 @@ class _source_attr(SP):
             srlzr.obj._drop_table(DBSession.connection())
             srlzr.obj.tbl_uuid = uuid.uuid4().hex
 
-        datafile, metafile = env.file_upload.get_filename(value["id"])
-
-        ogrds = self._ogrds(datafile, source_filename=value.get("name"))
+        fupload = FileUpload(id=value["id"])
+        ogrds = self._ogrds(str(fupload.data_path), source_filename=fupload.name)
 
         layer_name = srlzr.data.get("source_layer")
         ogrlayer = self._ogrlayer(ogrds, layer_name=layer_name)

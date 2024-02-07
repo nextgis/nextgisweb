@@ -1,25 +1,29 @@
-#: api.py:21
+#: api.py:25
 msgid "Uploaded file too large"
 msgstr "Загруженный файл слишком большой"
 
-#: api.py:26
+#: model.py:112
+msgid "Uploaded file not found"
+msgstr "Загруженный файл не найден"
+
+#: model.py:116
 msgid "Upload is not completed"
 msgstr "Загрузка не завершена"
 
-#: nodepkg/file-uploader/FileUploader.tsx:18
-#: nodepkg/image-uploader/ImageUploader.tsx:17
+#: nodepkg/file-uploader/FileUploader.tsx:19
+#: nodepkg/image-uploader/ImageUploader.tsx:18
 msgid "Select a file"
 msgstr "Выберите файл"
 
-#: nodepkg/file-uploader/FileUploader.tsx:19
+#: nodepkg/file-uploader/FileUploader.tsx:20
 msgid "or drag and drop here"
 msgstr "или перетащите в эту область"
 
-#: nodepkg/file-uploader/FileUploader.tsx:20
+#: nodepkg/file-uploader/FileUploader.tsx:21
 msgid "max"
 msgstr "максимум"
 
-#: nodepkg/file-uploader/FileUploader.tsx:21
+#: nodepkg/file-uploader/FileUploader.tsx:22
 msgid "Stop"
 msgstr "Стоп"
 
@@ -27,11 +31,11 @@ msgstr "Стоп"
 msgid "Upload"
 msgstr "Загрузить"
 
-#: nodepkg/file-uploader/hook/useFileUploader.ts:18
+#: nodepkg/file-uploader/hook/useFileUploader.ts:17
 msgid "{} uploaded..."
 msgstr "{} загружено..."
 
-#: nodepkg/image-uploader/ImageUploader.tsx:18
+#: nodepkg/image-uploader/ImageUploader.tsx:19
 msgid "Delete"
 msgstr "Удалить"
 

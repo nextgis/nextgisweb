@@ -169,10 +169,10 @@ export const Widget = observer(({ store }) => {
         update({ sourceLayer: null });
         if (!source) return;
         (async () => {
-            const post = route("vector_layer.dataset").post;
+            const post = route("vector_layer.inspect").post;
             let dset;
             try {
-                dset = await post({ json: { source: source } });
+                dset = await post({ json: { id: source.id } });
             } catch (err) {
                 errorModal(err);
                 update({ source: null });

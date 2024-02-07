@@ -1,5 +1,3 @@
-import os
-
 from nextgisweb.env import Component
 
 from .model import Tileset, TilesetData
@@ -14,6 +12,5 @@ class TilesetComponent(Component):
 
     def estimate_storage(self):
         for resource in Tileset.query():
-            fn = self.env.file_storage.filename(resource.fileobj)
-            size = os.stat(fn).st_size
+            size = resource.fileobj.filename().stat().st_size
             yield TilesetData, resource.id, size
