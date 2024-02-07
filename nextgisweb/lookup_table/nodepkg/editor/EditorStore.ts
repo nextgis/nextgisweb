@@ -19,7 +19,7 @@ export class EditorStore extends KeyValueEditorStore<LookupTableResource> {
         if (!this.dirty) return undefined;
 
         const items = Object.fromEntries(
-            this.items.map((i) => [i.key, i.value])
+            this.items.map((i) => [i.key, String(i.value)])
         );
         return { items };
     }

@@ -21,6 +21,7 @@ export class EditorStore extends KeyValueEditorStore<{
         const items = Object.fromEntries(
             this.items.map((i) => [i.key, i.value])
         );
-        return { items };
+        // FIXME: Type of items should be Record<string, string | number | boolean | null>
+        return { items: items as unknown as RecordOption[] };
     }
 }
