@@ -37,7 +37,7 @@ def _pfact(pin, **defaults):
 
 
 def _ctag(cid):
-    return Component.registry[cid].__name__[: -len("Component")]
+    return Component.registry[cid].basename
 
 
 def _context_str(context):

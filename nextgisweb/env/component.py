@@ -1,6 +1,7 @@
 import sys
 from importlib.util import find_spec
 from pathlib import Path
+from typing import ClassVar
 from warnings import warn
 
 from nextgisweb.lib.config import ConfigOptions
@@ -56,6 +57,7 @@ class ComponentMeta(type):
             assert (
                 name.lower() == identity.replace("_", "").lower() + "component"
             ), f"Class name '{name}' doesn't match the '{identity}' identity."
+            nmspc["basename"] = name[: -len("Component")]
 
         return super().__new__(mcls, name, bases, nmspc)
 
@@ -103,6 +105,9 @@ class Component(metaclass=ComponentMeta):
 
     root_path: Path
     """Path to a directory containing {module}"""
+
+    basename: ClassVar[str]
+    """Class name with the 'Component' suffix removed"""
 
     def __init__(self, env, settings):
         self._env = env
