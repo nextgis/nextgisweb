@@ -62,10 +62,12 @@ export function MetricsSettings() {
     const [activeTab, setActiveTab] = useState<string>();
 
     useEffect(() => {
-        route("pyramid.metrics")
-            .get<PyramidMetrics>()
+        route("pyramid.csettings")
+            .get<Record<"pyramid", Record<"metrics", PyramidMetrics>>>({
+                query: { pyramid: "metrics" },
+            })
             .then((data) => {
-                setValue(data);
+                setValue(data.pyramid.metrics);
                 setStatus(null);
             });
     }, []);
@@ -119,14 +121,14 @@ export function MetricsSettings() {
     const save = async () => {
         setStatus("saving");
         try {
-            await route("pyramid.metrics").put({
-                json:
-                    value !== undefined
-                        ? Object.fromEntries(
-                              Object.entries(value).filter(([, v]) => v)
-                          )
-                        : null,
+            const payload = Object.fromEntries(
+                Object.entries(value).filter(([, v]) => v)
+            );
+
+            await route("pyramid.csettings").put({
+                json: { pyramid: { metrics: payload } },
             });
+
             messageApi.open({
                 type: "success",
                 content: msgSuccess + " " + msgSuccessReload,

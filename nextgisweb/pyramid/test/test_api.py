@@ -52,13 +52,6 @@ def override(ngw_core_settings_override):
 @pytest.mark.parametrize(
     "api_key, comp, setting_key, key, value",
     (
-        (
-            "cors",
-            "pyramid",
-            "cors_allow_origin",
-            "allow_origin",
-            ["https://d1.ru", "https://d2.ru"],
-        ),
         ("system_name", "core", "system.full_name", "full_name", "test_sysname"),
         ("home_path", "pyramid", "home_path", "home_path", "/resource/-1"),
     ),

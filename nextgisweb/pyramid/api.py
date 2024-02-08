@@ -1,17 +1,33 @@
 import base64
 import re
 from datetime import timedelta
-from typing import Any, Dict, List, Optional, TypedDict, Union
+from enum import Enum
+from inspect import Parameter, signature
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    ClassVar,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypedDict,
+    Union,
+)
 
-from msgspec import UNSET, Meta, Struct, UnsetType, convert, to_builtins
+from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_builtins
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse, Response
 from typing_extensions import Annotated
 
-from nextgisweb.env import DBSession, _, env
+from nextgisweb.env import COMP_ID, Component, DBSession, _, env, inject
+from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
+from nextgisweb.lib.imptool import module_from_stack
 
-from nextgisweb.core import KindOfData
+from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.pyramid import JSONType
@@ -137,52 +153,6 @@ def cors_tween_factory(handler, registry):
     return cors_tween
 
 
-# fmt: off
-ORIGIN_RE = (
-    r"^SCHEME(?:(\*\.)?(HOST\.)+(HOST)\.?|(HOST)|(IPv4))(:PORT)?\/?$"
-    .replace("SCHEME", r"https?:\/\/")
-    .replace("HOST", r"[_a-z-][_a-z0-9-]*")
-    .replace("IPv4", r"((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}")
-    .replace("PORT", r"([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])")
-)
-# fmt: on
-
-Origin = Annotated[
-    str,
-    Meta(
-        pattern=ORIGIN_RE,
-        description=(
-            "An origin including scheme, domain and optional port if differs "
-            "from the default (80 for HTTP and 443 for HTTPS). Wildcards are "
-            "allowed on the third level and below."
-        ),
-        examples=["https://example.com", "https://*.example.com"],
-    ),
-]
-
-
-class CORSSettings(TypedDict):
-    allow_origin: Annotated[List[Origin], Meta(description="The list of allowed origins")]
-
-
-def cors_get(request) -> CORSSettings:
-    """Read CORS settings"""
-    request.require_administrator()
-    return CORSSettings(allow_origin=_get_cors_olist())
-
-
-def cors_put(request, body: CORSSettings) -> JSONType:
-    """Update CORS settings"""
-    request.require_administrator()
-
-    v = [o.lower().rstrip("/") for o in body["allow_origin"]]
-    for origin in v:
-        if v.count(origin) > 1:
-            raise ValidationError("Duplicate origin '%s'" % origin)
-
-    env.core.settings_set("pyramid", "cors_allow_origin", v)
-
-
 class SystemNameSettings(TypedDict):
     full_name: Optional[str]
 
@@ -227,41 +197,6 @@ def home_path_put(request, body: HomePathSettings) -> JSONType:
         env.core.settings_set("pyramid", "home_path", value)
     else:
         env.core.settings_delete("pyramid", "home_path")
-
-
-class GoogleAnalytics(Struct):
-    id: str
-
-
-class YandexMetrica(Struct):
-    id: str
-    webvisor: bool
-
-
-class MetricsSettings(Struct):
-    google_analytics: Union[GoogleAnalytics, UnsetType] = UNSET
-    yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
-
-
-def metrics_get(request) -> MetricsSettings:
-    request.require_administrator()
-
-    try:
-        value = env.core.settings_get("pyramid", "metrics")
-    except KeyError:
-        value = {}
-
-    return convert(value, MetricsSettings)
-
-
-def metrics_put(request, *, body: MetricsSettings) -> JSONType:
-    request.require_administrator()
-
-    value = to_builtins(body)
-    if len(value) == 0:
-        env.core.settings_delete("pyramid", "metrics")
-    else:
-        env.core.settings_set("pyramid", "metrics", value)
 
 
 def settings(request, *, component: str) -> JSONType:
@@ -453,19 +388,274 @@ def company_logo(request):
     return response
 
 
+# Component settings machinery
+
+SKey = Tuple[str, str]
+SType = Type
+SValue = Any
+Normalize = Callable[[SValue], SValue]
+
+
+class CSetting:
+    component: str
+    name: str
+
+    gtype: SType
+    stype: SType
+    default: SValue
+
+    skey: SKey
+
+    registry: ClassVar[Dict[str, Dict[str, "CSetting"]]] = dict()
+
+    def __init__(
+        self,
+        name: str,
+        type: Union[Type, Tuple[Type, Type]],
+        *,
+        default: Any = None,
+        normalize: Normalize = lambda val: val,
+        skey: Optional[Tuple[str, str]] = None,
+        register: bool = True,
+        stacklevel: int = 0,
+    ):
+        caller_module = module_from_stack(stacklevel)
+        self.component = pkginfo.component_by_module(caller_module)
+
+        self.name = name
+        self.gtype, self.stype = type if isinstance(type, tuple) else (type, type)
+        self.default = default
+        self.normalize = normalize
+
+        self.skey = skey if skey else (self.component, self.name)
+
+        if register:
+            if (comp_items := self.registry.get(self.component)) is None:
+                self.registry[self.component] = comp_items = dict()
+
+            assert self.name not in comp_items
+            comp_items[self.name] = self
+
+    @inject()
+    def dump(self, *, core: CoreComponent) -> SValue:
+        try:
+            value = core.settings_get(*self.skey)
+        except KeyError:
+            return self.default
+        return convert(value, self.gtype)
+
+    @inject()
+    def load(self, value: SValue, *, core: CoreComponent):
+        if value is not None:
+            value = self.normalize(value)
+
+        if value is None:
+            core.settings_delete(*self.skey)
+        else:
+            core.settings_set(*self.skey, to_builtins(value))
+
+
+def csetting(
+    name: str,
+    type: SType,
+    *,
+    default: SValue = None,
+    normalize: Normalize = lambda val: val,
+    skey: Optional[SKey] = None,
+):
+    CSetting(
+        name,
+        type,
+        default=default,
+        normalize=normalize,
+        skey=skey,
+        stacklevel=1,
+    )
+
+
+def setup_pyramid_csettings(comp, config):
+    NoneDefault = Annotated[None, Meta(description="Resets the setting to its default value.")]
+    fld_unset = lambda n, t: (n, Union[t, UnsetType], UNSET)
+    fld_reset = lambda n, t: (n, Union[t, NoneDefault, UnsetType], UNSET)
+
+    rfields, ufields = list(), list()
+    dumpers, loaders = dict(), dict()
+    get_parameters = list()
+
+    for component, stngs in CSetting.registry.items():
+        sitems = list(stngs.items())
+        basename = Component.registry[component].basename
+
+        rfields.append(
+            fld_unset(
+                component,
+                defstruct(
+                    f"{basename}SettingsRead",
+                    [fld_unset(name, stng.gtype) for name, stng in sitems],
+                ),
+            )
+        )
+
+        ufields.append(
+            fld_unset(
+                component,
+                defstruct(
+                    f"{basename}SettingsUpdate",
+                    [fld_reset(name, stng.stype) for name, stng in sitems],
+                ),
+            )
+        )
+
+        dumpers[component] = {k: v.dump for k, v in sitems}
+        loaders[component] = {k: v.load for k, v in sitems}
+
+        cstype = Annotated[
+            List[Enum(f"{basename}SettingsEnum", dict(all="all", **{k: k for k in stngs}))],
+            Meta(description=f"{basename} component settings to read"),
+        ]
+        get_parameters.append(
+            Parameter(
+                component,
+                Parameter.KEYWORD_ONLY,
+                default=[],
+                annotation=cstype,
+            )
+        )
+
+    if TYPE_CHECKING:
+        CSettingsRead = Struct
+        CSettingsUpadate = Struct
+    else:
+        CSettingsRead = defstruct("ComponentSettingsRead", rfields)
+        CSettingsUpadate = defstruct("ComponentSettingUpdate", ufields)
+
+    def get(request, **kwargs) -> CSettingsRead:
+        """Read component settings"""
+
+        request.require_administrator()
+
+        sf = dict()
+        for cid, attrs in kwargs.items():
+            if not attrs:
+                continue
+
+            cgetters = dumpers[cid]
+
+            attrs = [a.value for a in attrs]
+            if "all" in attrs and len(attrs) > 1:
+                raise ValidationError(
+                    message=_(
+                        "The '{}' query parameter should not contain "
+                        "additional values if 'all' is specified."
+                    ).format(cid)
+                )
+            else:
+                attrs = list(cgetters)
+
+            sf[cid] = {a: cgetters[a]() for a in attrs}
+
+        return CSettingsRead(**sf)
+
+    # Patch signature to get parameter extraction working
+    get_sig = signature(get)
+    get.__signature__ = get_sig.replace(
+        parameters=[get_sig.parameters["request"]] + get_parameters
+    )
+
+    def put(request, *, body: CSettingsUpadate) -> JSONType:
+        """Update component settings"""
+
+        request.require_administrator()
+
+        for cid, cloaders in loaders.items():
+            if (cvalue := getattr(body, cid)) is not UNSET:
+                for sid, loader in cloaders.items():
+                    if (abody := getattr(cvalue, sid)) is not UNSET:
+                        loader(abody)
+
+    config.add_route(
+        "pyramid.csettings",
+        "/api/component/pyramid/csettings",
+        get=get,
+        put=put,
+    )
+
+
+# Pyramid component setting
+
+ORIGIN_RE = (
+    r"^%(scheme)s(?:(\*\.)?(%(host)s\.)+(%(host)s)\.?|(%(host)s)|(%(ipv4)s))(:%(port)s)?\/?$"
+    % dict(
+        scheme=r"https?:\/\/",
+        host=r"[_a-z-][_a-z0-9-]*",
+        ipv4=r"((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}",
+        port=r"([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])",
+    )
+)
+
+AllowOrigin = Annotated[
+    List[Annotated[str, Meta(pattern=ORIGIN_RE)]],
+    Meta(
+        description="Origins are composed of a scheme, domain, and an optional "
+        "port if it differs from the default (80 for HTTP and 443 for HTTPS). "
+        "Wildcards can be used on the third level and below in the domain.",
+        examples=[
+            [
+                "https://example.com",
+                "https://*.example.com",
+                "http://localhost:8080",
+                "http://127.0.0.1:8080",
+            ]
+        ],
+    ),
+]
+
+
+def _allow_origin_normalize(value: AllowOrigin) -> AllowOrigin:
+    value = [itm.rstrip("/").lower() for itm in value]
+    result = list()
+    for itm in value:
+        norm = itm.rstrip("/").lower()
+        norm = re.sub(r"^(http:\/\/.*):80$", lambda m: m.group(1), norm)
+        norm = re.sub(r"^(https:\/\/.*):443$", lambda m: m.group(1), norm)
+        if norm in result:
+            raise ValidationError("Duplicate origin '%s'" % itm)
+        result.append(norm)
+    return result
+
+
+csetting(
+    "allow_origin",
+    AllowOrigin,
+    default=[],
+    normalize=_allow_origin_normalize,
+    skey=(COMP_ID, "cors_allow_origin"),
+)
+
+
+class GoogleAnalytics(Struct):
+    id: str
+
+
+class YandexMetrica(Struct):
+    id: str
+    webvisor: bool
+
+
+class MetricsSettings(Struct):
+    google_analytics: Union[GoogleAnalytics, UnsetType] = UNSET
+    yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
+
+
+csetting("metrics", MetricsSettings, default={})
+
+
 def setup_pyramid(comp, config):
     config.add_request_method(check_origin)
 
     config.add_tween(
         "nextgisweb.pyramid.api.cors_tween_factory",
         under=("nextgisweb.pyramid.exception.handled_exception_tween_factory", "INGRESS"),
-    )
-
-    config.add_route(
-        "pyramid.cors",
-        "/api/component/pyramid/cors",
-        get=cors_get,
-        put=cors_put,
     )
 
     config.add_route(
@@ -604,11 +794,4 @@ def setup_pyramid(comp, config):
         "/api/component/pyramid/home_path",
         get=home_path_get,
         put=home_path_put,
-    )
-
-    config.add_route(
-        "pyramid.metrics",
-        "/api/component/pyramid/metrics",
-        get=metrics_get,
-        put=metrics_put,
     )

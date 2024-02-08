@@ -1,8 +1,7 @@
-from typing import Dict, List
+from typing import Dict, List, Literal, Union
 
 import zope.event
 from msgspec import Struct
-from pyramid.httpexceptions import HTTPBadRequest
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 
@@ -12,6 +11,7 @@ from nextgisweb.lib import db
 from nextgisweb.auth import User
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid.api import csetting
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import QuotaExceeded, ResourceError, ValidationError
@@ -444,27 +444,13 @@ def quota_check(request) -> JSONType:
     return dict(success=True)
 
 
-def resource_export_get(request) -> JSONType:
-    request.require_administrator()
-    try:
-        value = request.env.core.settings_get("resource", "resource_export")
-    except KeyError:
-        value = "data_read"
-    return dict(resource_export=value)
+# Component settings
 
-
-def resource_export_put(request) -> JSONType:
-    request.require_administrator()
-
-    body = request.json_body
-    for k, v in body.items():
-        if k == "resource_export":
-            if v in ("data_read", "data_write", "administrators"):
-                request.env.core.settings_set("resource", "resource_export", v)
-            else:
-                raise HTTPBadRequest(explanation="Invalid value '%s'" % v)
-        else:
-            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
+csetting(
+    "resource_export",
+    Union[Literal["data_read"], Literal["data_write"], Literal["administrators"]],
+    default="data_read",
+)
 
 
 def setup_pyramid(comp, config):
@@ -527,13 +513,6 @@ def setup_pyramid(comp, config):
         "resource.quota_check",
         "/api/component/resource/check_quota",
         post=quota_check,
-    )
-
-    config.add_route(
-        "resource.resource_export",
-        "/api/component/resource/resource_export",
-        get=resource_export_get,
-        put=resource_export_put,
     )
 
     # Overloaded routes

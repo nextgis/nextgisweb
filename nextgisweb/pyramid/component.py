@@ -29,6 +29,10 @@ class PyramidComponent(Component):
         for comp in chain:
             comp.setup_pyramid(config)
 
+        from .api import setup_pyramid_csettings
+
+        setup_pyramid_csettings(self, config)
+
         config.commit()
 
         self.route_meta = route_meta = dict()

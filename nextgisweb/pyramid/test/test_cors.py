@@ -36,9 +36,10 @@ def override(ngw_core_settings_override):
     ),
 )
 def test_validation(domain, ok, ngw_webtest_app, override):
-    API_URL = "/api/component/pyramid/cors"
+    API_URL = "/api/component/pyramid/csettings"
     with override():
-        ngw_webtest_app.put_json(API_URL, dict(allow_origin=[domain]), status=200 if ok else 422)
+        body = dict(pyramid=dict(allow_origin=[domain]))
+        ngw_webtest_app.put_json(API_URL, body, status=200 if ok else 422)
 
 
 @pytest.mark.parametrize(

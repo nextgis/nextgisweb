@@ -18,16 +18,21 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 export function ExportSettings() {
     const [saving, setSaving] = useState(false);
 
-    const { data, isLoading } = useRouteGet<{ resource_export: string }>(
-        "resource.resource_export"
-    );
+    const { data, isLoading } = useRouteGet<
+        Record<"resource", Record<"resource_export", string>>
+    >({
+        name: "pyramid.csettings",
+        options: {
+            query: { resource: "resource_export" },
+        },
+    });
     const [value, setValue] = useState<string>();
 
     async function save() {
         setSaving(true);
         try {
-            await route("resource.resource_export").put({
-                json: { resource_export: value },
+            await route("pyramid.csettings").put({
+                json: { resource: { resource_export: value } },
             });
             message.success(gettext("The setting is saved."));
         } catch (err) {
@@ -39,7 +44,7 @@ export function ExportSettings() {
 
     useEffect(() => {
         if (data) {
-            setValue(data.resource_export);
+            setValue(data.resource.resource_export);
         }
     }, [data]);
 

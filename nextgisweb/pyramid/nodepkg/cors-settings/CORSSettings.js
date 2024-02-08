@@ -27,10 +27,14 @@ export function CORSSettings() {
     const [form] = Form.useForm();
     const [status, setStatus] = useState(null);
 
-    const corsRoute = useRouteGet({ name: "pyramid.cors" });
+    const corsRoute = useRouteGet({
+        name: "pyramid.csettings",
+        options: { "query": { pyramid: "allow_origin" } },
+    });
 
     const allowOriginInitial = useMemo(() => {
-        const allowOrigin = corsRoute.data && corsRoute.data.allow_origin;
+        const allowOrigin =
+            corsRoute.data && corsRoute.data.pyramid.allow_origin;
         return allowOrigin ? allowOrigin.join("\n") : "";
     }, [corsRoute.data]);
 
@@ -43,8 +47,8 @@ export function CORSSettings() {
                     .split(/\n/)
                     .filter((s) => !s.match(/^\s*$/))
                     .map((c) => c.trim());
-                await route("pyramid.cors").put({
-                    json: { allow_origin: list || null },
+                await route("pyramid.csettings").put({
+                    json: { pyramid: { allow_origin: list || null } },
                 });
                 message.success(gettext("CORS settings updated"));
             } catch (err) {

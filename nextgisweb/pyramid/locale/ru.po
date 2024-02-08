@@ -15,31 +15,39 @@ msgstr "Не удалось скопировать"
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
 
-#: api.py:265
+#: api.py:205
 msgid "Invalid component identity."
 msgstr "Некорректный идентификатор компонента."
 
-#: api.py:588
+#: api.py:547
+msgid ""
+"The '{}' query parameter should not contain additional values if 'all' is "
+"specified."
+msgstr ""
+"Параметр запроса '{}' не должен содержать дополнительных значений, если "
+"указано 'all'."
+
+#: api.py:779
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:181
+#: component.py:187
 msgid "Request timeout"
 msgstr "Таймаут запроса"
 
-#: component.py:184
+#: component.py:190
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:184
+#: component.py:190
 msgid "Disabled"
 msgstr "Отключено"
 
-#: exception.py:200 exception.py:261
+#: exception.py:203 exception.py:262
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:201
+#: exception.py:204
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -47,37 +55,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:230
+#: exception.py:231
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:231
+#: exception.py:232
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:238
+#: exception.py:239
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:239
+#: exception.py:240
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:243
+#: exception.py:244
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:244
+#: exception.py:245
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:248
+#: exception.py:249
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:249
+#: exception.py:250
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -86,15 +94,15 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:256
+#: exception.py:257
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:257
+#: exception.py:258
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:262
+#: exception.py:263
 msgid ""
 "The server has either erred or is incapable of performing the requested "
 "operation."
@@ -102,21 +110,21 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:266 exception.py:267
+#: exception.py:267 exception.py:268
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:271
+#: exception.py:272
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:272
+#: exception.py:273
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: nodepkg/api/error.ts:11 nodepkg/api/error.ts:30
+#: nodepkg/api/error.ts:11 nodepkg/api/error.ts:29
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
 
@@ -138,7 +146,7 @@ msgstr "Сетевая ошибка"
 msgid "Check network connectivity and try again later."
 msgstr "Проверьте сетевое соединение и попробуйте повторить позже."
 
-#: nodepkg/api/error.ts:31
+#: nodepkg/api/error.ts:30
 msgid "Unexpected server response"
 msgstr "Неожидаемый ответ сервера"
 
@@ -158,7 +166,7 @@ msgstr "Длительный запрос был отменен."
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Создайте свою Веб ГИС на nextgis.com"
 
-#: nodepkg/cors-settings/CORSSettings.js:18
+#: nodepkg/cors-settings/CORSSettings.js:19
 msgid ""
 "Enter allowed origins for cross domain requests to use HTTP API of this Web "
 "GIS on other websites. One origin per line."
@@ -167,7 +175,7 @@ msgstr ""
 "использования HTTP API этой Веб ГИС на других веб-сайтах. По одному источнику"
 " в строке."
 
-#: nodepkg/cors-settings/CORSSettings.js:19
+#: nodepkg/cors-settings/CORSSettings.js:20
 msgid ""
 "Please note that different protocols (HTTP and HTTPS) and subdomains "
 "(example.com and www.example.com) are different origins. Wildcards are "
@@ -177,15 +185,15 @@ msgstr ""
 " www.example.com) считаются разными источниками. Символ подстановки (*) "
 "допустим для доменов третьего уровней и выше."
 
-#: nodepkg/cors-settings/CORSSettings.js:44
+#: nodepkg/cors-settings/CORSSettings.js:53
 msgid "CORS settings updated"
 msgstr "Настройки CORS обновлены"
 
-#: nodepkg/cors-settings/CORSSettings.js:49
+#: nodepkg/cors-settings/CORSSettings.js:58
 msgid "Fix the form errors first"
 msgstr "Вначале исправьте ошибку в форме"
 
-#: nodepkg/cors-settings/CORSSettings.js:66
+#: nodepkg/cors-settings/CORSSettings.js:74
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
@@ -217,27 +225,27 @@ msgstr[2] "штук"
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/layout/Avatar.js:20
+#: nodepkg/layout/Avatar.js:19
 msgid "Invitation session"
 msgstr "Пригласительная сессия"
 
-#: nodepkg/layout/Avatar.js:23 view.py:488
+#: nodepkg/layout/Avatar.js:21 view.py:488
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/layout/Avatar.js:25
+#: nodepkg/layout/Avatar.js:23
 msgid "Sign out"
 msgstr "Выйти"
 
-#: nodepkg/layout/store.js:38
+#: nodepkg/layout/store.js:39
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.js:44 view.py:103
+#: nodepkg/layout/store.js:45 view.py:103
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: nodepkg/layout/store.js:51
+#: nodepkg/layout/store.js:52
 msgid "Help"
 msgstr "Справка"
 
@@ -249,23 +257,23 @@ msgstr "Рекомендуемая высота 45 px и ширина до 200 p
 msgid "Measurement ID"
 msgstr "Идентификатор потока данных"
 
-#: nodepkg/metrics/MetricSettings.tsx:15
+#: nodepkg/metrics/MetricSettings.tsx:23
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/metrics/MetricSettings.tsx:16
+#: nodepkg/metrics/MetricSettings.tsx:24
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/metrics/MetricSettings.tsx:17
+#: nodepkg/metrics/MetricSettings.tsx:25
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
 
-#: nodepkg/metrics/MetricSettings.tsx:21
+#: nodepkg/metrics/MetricSettings.tsx:29
 msgid "Add one or more counters to your Web GIS."
 msgstr "Добавьте один или несколько счетчиков в вашу Веб ГИС."
 
-#: nodepkg/metrics/MetricSettings.tsx:22
+#: nodepkg/metrics/MetricSettings.tsx:30
 msgid ""
 "HTML code of these counters will be embeded into each page and will allow you"
 " to track user activity."
@@ -281,53 +289,53 @@ msgstr "Номер счетчика"
 msgid "Webvisor"
 msgstr "Вебвизор"
 
-#: nodepkg/metrics/tab.ts:27
+#: nodepkg/metrics/tab.ts:34
 msgid "Google Analytics"
 msgstr "Google Аналитика"
 
-#: nodepkg/metrics/tab.ts:34
+#: nodepkg/metrics/tab.ts:41
 msgid "Yandex.Metrica"
 msgstr "Яндекс.Метрика"
 
-#: nodepkg/storage-summary/StorageSummary.js:97
+#: nodepkg/storage-summary/StorageSummary.js:96
 msgid "Kind of data"
 msgstr "Вид данных"
 
-#: nodepkg/storage-summary/StorageSummary.js:103
+#: nodepkg/storage-summary/StorageSummary.js:102
 msgid "Volume"
 msgstr "Размер"
 
-#: nodepkg/storage-summary/StorageSummary.js:119
+#: nodepkg/storage-summary/StorageSummary.js:118
 msgid "Total"
 msgstr "Итого"
 
-#: nodepkg/storage-summary/StorageSummary.js:124
+#: nodepkg/storage-summary/StorageSummary.js:123
 msgid "of"
 msgstr "из"
 
-#: nodepkg/storage-summary/StorageSummary.js:141
+#: nodepkg/storage-summary/StorageSummary.js:140
 msgid "Storage usage was fully estimated at %s and updated at %s."
 msgstr "Использование хранилища было полностью оценено в %s и обновлено в %s."
 
-#: nodepkg/storage-summary/StorageSummary.js:147
+#: nodepkg/storage-summary/StorageSummary.js:146
 msgid "Storage usage was fully estimated at %s."
 msgstr "Использование хранилища было полностью оценено в %s."
 
-#: nodepkg/storage-summary/StorageSummary.js:152
+#: nodepkg/storage-summary/StorageSummary.js:151
 msgid "Storage usage hasn't been estimated yet but was updated at %s."
 msgstr "Использование хранилища еще не было полностью оценено, но было обновлено в %s."
 
-#: nodepkg/storage-summary/StorageSummary.js:156
+#: nodepkg/storage-summary/StorageSummary.js:155
 msgid "Storage usage hasn't been estimated yet."
 msgstr "Использование хранилища еще не было полностью оценено."
 
-#: nodepkg/storage-summary/StorageSummary.js:161
+#: nodepkg/storage-summary/StorageSummary.js:160
 msgid "Some changes may be reflected only after full estimation."
 msgstr ""
 "Некоторые изменения могут быть отражены только после полной оценки "
 "использования хранилища."
 
-#: nodepkg/storage-summary/StorageSummary.js:185
+#: nodepkg/storage-summary/StorageSummary.js:184
 msgid "Estimate storage"
 msgstr "Оценка хранилища"
 
@@ -335,31 +343,31 @@ msgstr "Оценка хранилища"
 msgid "The system name setting is saved."
 msgstr "Настройка названия Веб ГИС сохранена."
 
-#: nodepkg/update/index.js:55
+#: nodepkg/update/index.js:56
 msgid "Critical updates are available"
 msgstr "Доступны критические обновления"
 
-#: nodepkg/update/index.js:56
+#: nodepkg/update/index.js:57
 msgid "Updates are available"
 msgstr "Доступны обновления"
 
-#: nodepkg/update/index.js:58
+#: nodepkg/update/index.js:59
 msgid "Click to see what's new"
 msgstr "Нажмите и узнайте, что нового"
 
-#: nodepkg/update/sysinfo.js:13
+#: nodepkg/update/sysinfo.js:14
 msgid "Checking for updates..."
 msgstr "Проверяем наличие обновлений..."
 
-#: nodepkg/update/sysinfo.js:14
+#: nodepkg/update/sysinfo.js:15
 msgid "<a>Contact support</a> for update."
 msgstr "<a>Обратитесь в поддержку</a> для установки обновлений."
 
-#: nodepkg/update/sysinfo.js:15
+#: nodepkg/update/sysinfo.js:16
 msgid "Show details"
 msgstr "Подробнее"
 
-#: nodepkg/update/sysinfo.js:19
+#: nodepkg/update/sysinfo.js:20
 msgid ""
 "Critical updates are available: {version}. Please consider updating an soon "
 "as possible."
@@ -367,11 +375,11 @@ msgstr ""
 "Доступны критические обновления: {version}. Рекомендуем установить их как "
 "можно быстрее."
 
-#: nodepkg/update/sysinfo.js:20
+#: nodepkg/update/sysinfo.js:21
 msgid "New version of {distribution} is available: {version}."
 msgstr "Доступна новая версия {distribution}: {version}."
 
-#: nodepkg/update/sysinfo.js:21
+#: nodepkg/update/sysinfo.js:22
 msgid "Your {distribution} is up-to-date."
 msgstr "У вас последняя версия {distribution}."
 
