@@ -1,11 +1,13 @@
 from datetime import datetime
 from threading import Thread
+from typing import ClassVar, Mapping, Type
 
 import sqlalchemy as sa
 import transaction
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import DBSession, _
+from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import dict_registry
 
@@ -21,8 +23,10 @@ from .util import format_size
 
 @dict_registry
 class KindOfData:
-    identity: str = None
-    display_name: str = None
+    registry: ClassVar[Mapping[str, Type["KindOfData"]]]
+
+    identity: ClassVar[str]
+    display_name: ClassVar[TrStr]
 
 
 class StorageComponentMixin:

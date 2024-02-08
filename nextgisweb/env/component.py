@@ -1,7 +1,7 @@
 import sys
 from importlib.util import find_spec
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, Mapping, Type
 from warnings import warn
 
 from nextgisweb.lib.config import ConfigOptions
@@ -61,7 +61,7 @@ class ComponentMeta(type):
 
         return super().__new__(mcls, name, bases, nmspc)
 
-    def __init__(cls, name, bases, nmspc):
+    def __init__(cls: Type["Component"], name, bases, nmspc):
         super().__init__(name, bases, nmspc)
 
         # Skip Component base class from processing
@@ -93,30 +93,30 @@ class ComponentMeta(type):
 
 @dict_registry
 class Component(metaclass=ComponentMeta):
-    identity = None
+    registry: ClassVar[Mapping[str, Type["Component"]]]
+    """Component classes registry"""
+
+    identity: ClassVar[str]
     """Identifier redefined in successors"""
 
-    package: str
+    package: ClassVar[str]
     """Top-level package name, usually 'nextgisweb' or 'nextgisweb_*'"""
 
-    module: str
-    """Root module name, usually {package}.{identity} or {package} for
-    single-component packages"""
+    module: ClassVar[str]
+    """Root module name: {package}.{identity} for multi-component and {package}
+    for single-component packages"""
 
-    root_path: Path
+    root_path: ClassVar[Path]
     """Path to a directory containing {module}"""
 
     basename: ClassVar[str]
-    """Class name with the 'Component' suffix removed"""
+    """Class name with 'Component' suffix removed (CoreComponent -> Core)"""
 
     def __init__(self, env, settings):
         self._env = env
 
         self._settings = settings
-        self._options = ConfigOptions(
-            settings,
-            self.option_annotations if hasattr(self, "option_annotations") else (),
-        )
+        self._options = ConfigOptions(settings, getattr(self, "option_annotations", ()))
 
     @classmethod
     def resource_path(cls, path: str = ""):
