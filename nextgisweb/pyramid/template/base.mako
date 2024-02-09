@@ -30,11 +30,11 @@
 
     <%include file="nextgisweb:social/template/meta.mako" args="title=head_title"/>
 
-    <link href="${request.route_url('pyramid.favicon')}" rel="shortcut icon" type="image/x-icon" />
+    <link href="${request.route_url('pyramid.asset.favicon')}" rel="shortcut icon" type="image/x-icon" />
     <link href="${request.static_url('stylesheet/layout.css')}" rel="stylesheet" type="text/css" />
 
     <%
-        custom_css_url = request.route_url('pyramid.custom_css', _query=dict(
+        custom_css_url = request.route_url('pyramid.asset.css', _query=dict(
             ckey=request.env.core.settings_get('pyramid', 'custom_css.ckey')))
     %>
     <link href="${custom_css_url}" rel="stylesheet" type="text/css"/>

@@ -13,7 +13,7 @@
             <img src="${request.static_url('asset/pyramid/return-button.svg')}"/>
         %elif request.env.core.settings_exists('pyramid', 'logo'):
             <% ckey = request.env.core.settings_get('pyramid', 'logo.ckey') %>
-            <img src="${request.route_url('pyramid.logo', _query=dict(ckey=ckey))}"/>
+            <img src="${request.route_url('pyramid.asset.hlogo', _query=dict(ckey=ckey))}"/>
         %else:
             <%
                 global svglogo

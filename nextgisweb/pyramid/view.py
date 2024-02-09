@@ -1,10 +1,12 @@
 import os
 import os.path
+from base64 import b64decode
 from datetime import datetime, timedelta
 from hashlib import md5
 from itertools import chain
 from pathlib import Path
 from time import sleep
+from typing import Optional
 
 from markupsafe import Markup
 from psutil import Process
@@ -13,7 +15,7 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.response import FileResponse, Response
 from sqlalchemy import text
 
-from nextgisweb.env import DBSession, _, env
+from nextgisweb.env import DBSession, _, env, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.apitype import JSONType
@@ -22,9 +24,11 @@ from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import UserException
 
 from . import exception, renderer
+from .component import PyramidComponent
 from .openapi import openapi
 from .session import WebSession
 from .tomb.predicate import ErrorRendererPredicate
@@ -57,6 +61,71 @@ def static_view(request):
     static_path = request.environ["static_path"]
     cache = request.matchdict["skey"] == request.env.pyramid.static_key[1:]
     return StaticFileResponse(str(static_path), cache=cache, request=request)
+
+
+@inject()
+def asset_favicon(request, *, pyramid: PyramidComponent):
+    fn_favicon = pyramid.options["favicon"]
+    if os.path.isfile(fn_favicon):
+        return FileResponse(fn_favicon, request=request, content_type="image/x-icon")
+    else:
+        raise HTTPNotFound()
+
+
+@inject()
+def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
+    response = Response(
+        core.settings_get("pyramid", "custom_css", ""),
+        content_type="text/css",
+        charset="utf-8",
+    )
+
+    if ckey == core.settings_get("pyramid", "custom_css.ckey"):
+        response.cache_control.public = True
+        response.cache_control.max_age = 86400
+
+    return response
+
+
+@inject()
+def asset_hlogo(request, *, ckey: Optional[str] = None, core: CoreComponent):
+    if (data := core.settings_get("pyramid", "logo", None)) is None:
+        raise HTTPNotFound()
+
+    response = Response(b64decode(data), content_type="image/png")
+
+    if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
+        response.cache_control.public = True
+        response.cache_control.max_age = 86400
+
+    return response
+
+
+@inject()
+def asset_blogo(
+    request,
+    *,
+    ckey: Optional[str] = None,
+    core: CoreComponent,
+    pyramid: PyramidComponent,
+):
+    if (view := pyramid.company_logo_view) is not None:
+        try:
+            response = view(request)
+        except HTTPNotFound:
+            response = None
+    else:
+        response = None
+
+    if response is None:
+        default = pyramid.resource_path("asset/logo_outline.png")
+        response = FileResponse(default)
+
+    if ckey and ckey == core.settings_get("pyramid", "company_logo.ckey"):
+        response.cache_control.public = True
+        response.cache_control.max_age = 86400
+
+    return response
 
 
 def home(request):
@@ -101,14 +170,6 @@ def control_panel(request):
     request.require_administrator()
 
     return dict(title=_("Control panel"), control_panel=request.env.pyramid.control_panel)
-
-
-def favicon(request):
-    fn_favicon = request.env.pyramid.options["favicon"]
-    if os.path.isfile(fn_favicon):
-        return FileResponse(fn_favicon, request=request, content_type="image/x-icon")
-    else:
-        raise HTTPNotFound()
 
 
 def locale(request):
@@ -401,6 +462,11 @@ def setup_pyramid(comp, config):
 
     # OTHERS
 
+    config.add_route("pyramid.asset.favicon", "/favicon.ico", get=asset_favicon)
+    config.add_route("pyramid.asset.css", "/pyramid/css", get=asset_css)
+    config.add_route("pyramid.asset.hlogo", "/pyramid/mlogo", get=asset_hlogo)
+    config.add_route("pyramid.asset.blogo", "/pyramid/blogo", get=asset_blogo)
+
     config.add_route("home", "/", client=False).add_view(home)
 
     config.add_route("pyramid.openapi_json", "/openapi.json", get=openapi_json)
@@ -413,12 +479,6 @@ def setup_pyramid(comp, config):
         "pyramid.control_panel",
         "/control-panel",
     ).add_view(control_panel)
-
-    config.add_route(
-        "pyramid.favicon",
-        "/favicon.ico",
-        client=False,
-    ).add_view(favicon)
 
     config.add_route(
         "pyramid.control_panel.sysinfo",

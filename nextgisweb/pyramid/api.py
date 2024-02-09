@@ -19,12 +19,12 @@ from typing import (
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_builtins
 from pyramid.httpexceptions import HTTPNotFound
-from pyramid.response import FileResponse, Response
+from pyramid.response import Response
 from typing_extensions import Annotated
 
 from nextgisweb.env import COMP_ID, Component, DBSession, _, env, inject
 from nextgisweb.env.package import pkginfo
-from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
+from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
 from nextgisweb.lib.imptool import module_from_stack
 
 from nextgisweb.core import CoreComponent, KindOfData
@@ -288,41 +288,18 @@ def kind_of_data(request) -> JSONType:
     return result
 
 
-CSSGetPutContent = AnyOf[
-    Annotated[str, ContentType("application/json")],
-    Annotated[str, ContentType("text/css")],
-]
+def custom_css_get(request) -> AsJSON[str]:
+    """Read custom CSS styles"""
+
+    return request.env.core.settings_get("pyramid", "custom_css", "")
 
 
-def custom_css_get(request, *, ckey: Optional[CKey]) -> CSSGetPutContent:
-    """Read custom CSS styles as plain CSS or as JSON string
+def custom_css_put(request) -> AsJSON[None]:
+    """Update custom CSS styles"""
 
-    :param ckey: Caching key
-    :returns: Current custom CSS rules"""
-    try:
-        body = request.env.core.settings_get("pyramid", "custom_css")
-    except KeyError:
-        body = ""
-
-    m = request.accept.best_match(("application/json", "text/css"))
-    if m == "application/json":
-        return body
-    elif m == "text/css":
-        response = Response(body, content_type="text/css", charset="utf-8")
-
-    if ckey == request.env.core.settings_get("pyramid", "custom_css.ckey"):
-        request.response.cache_control.public = True
-        request.response.cache_control.max_age = 86400
-
-    return response
-
-
-def custom_css_put(request, body: CSSGetPutContent) -> AsJSON[CKey]:
-    """Update custom CSS styles from plain CSS or JSON string
-
-    :returns: New caching key"""
     request.require_administrator()
 
+    body = request.json_body
     if body is None or re.match(r"^\s*$", body, re.MULTILINE):
         request.env.core.settings_delete("pyramid", "custom_css")
     else:
@@ -330,7 +307,6 @@ def custom_css_put(request, body: CSSGetPutContent) -> AsJSON[CKey]:
 
     ckey = gensecret(8)
     request.env.core.settings_set("pyramid", "custom_css.ckey", ckey)
-    return ckey
 
 
 def logo_get(request):
@@ -364,28 +340,6 @@ def logo_put(request):
     request.env.core.settings_set("pyramid", "logo.ckey", gensecret(8))
 
     return Response()
-
-
-def company_logo(request):
-    response = None
-    company_logo_view = request.env.pyramid.company_logo_view
-    if company_logo_view is not None:
-        try:
-            response = company_logo_view(request)
-        except HTTPNotFound:
-            pass
-
-    if response is None:
-        default = request.env.pyramid.resource_path("asset/logo_outline.png")
-        response = FileResponse(default)
-
-    if "ckey" in request.GET and request.GET["ckey"] == request.env.core.settings_get(
-        "pyramid", "company_logo.ckey"
-    ):
-        response.cache_control.public = True
-        response.cache_control.max_age = int(timedelta(days=1).total_seconds())
-
-    return response
 
 
 # Component settings machinery
@@ -780,12 +734,6 @@ def setup_pyramid(comp, config):
     )
 
     comp.preview_link_view = preview_link_view
-
-    config.add_route(
-        "pyramid.company_logo",
-        "/api/component/pyramid/company_logo",
-        get=company_logo,
-    )
 
     # TODO: Add PUT method for changing custom_css setting and GUI
 

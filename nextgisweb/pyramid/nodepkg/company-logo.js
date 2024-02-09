@@ -22,7 +22,7 @@ export function appendTo(parent) {
     aElem.className = "map-logo company-logo";
 
     const imgElem = document.createElement("img");
-    imgElem.src = routeURL("pyramid.company_logo") + `?ckey=${settings.ckey}`;
+    imgElem.src = routeURL("pyramid.asset.blogo") + `?ckey=${settings.ckey}`;
 
     const url = settings.link;
     if (url && url.trim()) {
