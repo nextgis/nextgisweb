@@ -7,7 +7,7 @@ import type { ParamsOf } from "@nextgisweb/gui/type";
 
 type ModalParams = ParamsOf<typeof Modal>;
 
-interface ShowModalOptions extends ModalParams {
+export interface ShowModalOptions extends ModalParams {
     open?: boolean;
     /** @deprecated use {@link ShowModalOptions.open} instead */
     visible?: boolean;
