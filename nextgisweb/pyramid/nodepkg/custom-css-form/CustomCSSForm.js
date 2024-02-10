@@ -10,19 +10,29 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export function CustomCSSForm() {
     const [saving, setSaving] = useState(false);
+    const [initial, setInitial] = useState(null);
     const [data, setData] = useState(null);
 
-    const { data: initialData, isLoading } = useRouteGet("pyramid.custom_css");
+    const { data: initialData, isLoading } = useRouteGet({
+        name: "pyramid.csettings",
+        options: { query: { pyramid: "custom_css" } },
+    });
 
     useEffect(() => {
-        setData(initialData);
+        const value = initialData?.pyramid?.custom_css;
+        if (value !== undefined) {
+            setInitial(value);
+            setData(value);
+        }
     }, [initialData]);
 
     const save = async () => {
         setSaving(true);
 
         try {
-            await route("pyramid.custom_css").put({ json: data });
+            await route("pyramid.csettings").put({
+                json: { pyramid: { custom_css: data } },
+            });
         } catch (err) {
             errorModal(err);
         } finally {
@@ -41,7 +51,7 @@ export function CustomCSSForm() {
             <Row gutter={[16, 16]}>
                 <Col span={14} style={{ height: "300px" }}>
                     <Code
-                        value={initialData}
+                        value={initial}
                         onChange={setData}
                         lang="css"
                         lineNumbers

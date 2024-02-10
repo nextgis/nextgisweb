@@ -16,7 +16,7 @@ from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import UserException
 
 from .component import FileUploadComponent
-from .model import FileUpload, FileUploadNotCompleted, FileUploadNotFound
+from .model import FileUpload, FileUploadID, FileUploadNotCompleted, FileUploadNotFound
 
 BUF_SIZE = 1024 * 1024
 
@@ -26,18 +26,8 @@ class UploadedFileTooLarge(UserException):
     http_status_code = 413
 
 
-FileID = Annotated[
-    str,
-    Meta(
-        pattern="^([0-9a-f][0-9a-f]){16}$",
-        description="File upload ID",
-        extra=dict(route_pattern=r"([0-9a-f][0-9a-f]){16}"),
-    ),
-]
-
-
 class FileUploadObject(Struct, kw_only=True):
-    id: FileID
+    id: FileUploadID
     size: Annotated[int, Meta(ge=0)]
     name: Union[str, UnsetType] = UNSET
     mime_type: Union[str, UnsetType] = UNSET
@@ -210,7 +200,7 @@ class FileUploadFactory:
 
     @property
     def annotations(self):
-        return {self.key: FileID}
+        return {self.key: FileUploadID}
 
 
 def item_head_tus(fupload: FileUpload, request) -> Annotated[None, StatusCode(200)]:

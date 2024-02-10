@@ -15,11 +15,11 @@ msgstr "Не удалось скопировать"
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
 
-#: api.py:205
+#: api.py:204
 msgid "Invalid component identity."
 msgstr "Некорректный идентификатор компонента."
 
-#: api.py:547
+#: api.py:481
 msgid ""
 "The '{}' query parameter should not contain additional values if 'all' is "
 "specified."
@@ -27,7 +27,11 @@ msgstr ""
 "Параметр запроса '{}' не должен содержать дополнительных значений, если "
 "указано 'all'."
 
-#: api.py:779
+#: api.py:585
+msgid "64K should be enough for a logo."
+msgstr "64K должно быть достаточно для логотипа."
+
+#: api.py:725
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
@@ -197,11 +201,11 @@ msgstr "Вначале исправьте ошибку в форме"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/custom-css-form/CustomCSSForm.js:30
+#: nodepkg/custom-css-form/CustomCSSForm.js:40
 msgid "Custom styles saved. Reload the page to get them applied."
 msgstr "Изменения в стилях сохранены. Обновите страницу, чтобы увидеть изменения."
 
-#: nodepkg/custom-css-form/CustomCSSForm.js:52
+#: nodepkg/custom-css-form/CustomCSSForm.js:62
 msgid ""
 "Enter custom CSS rules here. They will be used to redefine styles, design for"
 " all pages of your Web GIS."
@@ -229,7 +233,7 @@ msgstr "Войти"
 msgid "Invitation session"
 msgstr "Пригласительная сессия"
 
-#: nodepkg/layout/Avatar.js:21 view.py:488
+#: nodepkg/layout/Avatar.js:21 view.py:548
 msgid "Settings"
 msgstr "Настройки"
 
@@ -241,7 +245,7 @@ msgstr "Выйти"
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.js:45 view.py:103
+#: nodepkg/layout/store.js:45 view.py:172
 msgid "Control panel"
 msgstr "Панель управления"
 
@@ -492,47 +496,47 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
-#: view.py:93
+#: view.py:162
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:122 view.py:485
+#: view.py:183 view.py:545
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:130 view.py:525
+#: view.py:191 view.py:585
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:141 view.py:534
+#: view.py:202 view.py:594
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:157 view.py:496
+#: view.py:218 view.py:556
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:167 view.py:501
+#: view.py:228 view.py:561
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:177 view.py:506
+#: view.py:238 view.py:566
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:187 view.py:491
+#: view.py:248 view.py:551
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:197 view.py:511
+#: view.py:258 view.py:571
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:207 view.py:516
+#: view.py:268 view.py:576
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:482
+#: view.py:542
 msgid "Info"
 msgstr "Информация"
 

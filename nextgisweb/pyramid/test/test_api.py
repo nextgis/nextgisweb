@@ -62,12 +62,3 @@ def test_misc_settings(api_key, comp, setting_key, key, value, override, webtest
         webtest.put_json(api_url, {key: value}, status=200)
         resp = webtest.get(api_url, status=200)
         assert resp.json[key] == value
-
-
-def test_custom_css(override, webtest):
-    api_url = "/api/component/pyramid/custom_css"
-    value = "any text"
-    with override("pyramid", "custom_css"):
-        webtest.put_json(api_url, value, status=200)
-        resp = webtest.get(api_url, status=200)
-        assert resp.json == value

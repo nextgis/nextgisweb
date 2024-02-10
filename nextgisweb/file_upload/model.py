@@ -2,7 +2,8 @@ import pickle
 from pathlib import Path
 from typing import Optional, Tuple, Union, overload
 
-from msgspec import UNSET, UnsetType
+from msgspec import UNSET, Meta, Struct, UnsetType
+from typing_extensions import Annotated
 from ulid import ULID
 
 from nextgisweb.env import env, gettext
@@ -10,9 +11,25 @@ from nextgisweb.env import env, gettext
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
 
+FileUploadID = Annotated[
+    str,
+    Meta(
+        pattern="^([0-9a-f][0-9a-f]){16}$",
+        description="File upload ID",
+        extra=dict(route_pattern=r"([0-9a-f][0-9a-f]){16}"),
+    ),
+]
+
+
+class FileUploadRef(Struct, kw_only=True):
+    id: FileUploadID
+
+    def __call__(self) -> "FileUpload":
+        return FileUpload(id=self.id)
+
 
 class FileUpload:
-    id: str
+    id: FileUploadID
     size: int
     name: Optional[str]
     mime_type: Optional[str]
@@ -37,14 +54,14 @@ class FileUpload:
         """Create new FileUpload"""
 
     @overload
-    def __init__(self, *, id: str, incomplete_ok=False):
+    def __init__(self, *, id: FileUploadID, incomplete_ok=False):
         """Read exitsing FileUpload"""
 
     def __init__(
         self,
         src: Union[dict, UnsetType] = UNSET,
         *,
-        id: Union[str, UnsetType] = UNSET,
+        id: Union[FileUploadID, UnsetType] = UNSET,
         incomplete_ok: bool = False,
         **kwargs,
     ):
@@ -103,7 +120,7 @@ class FileUpload:
         return FileObj(component=component).copy_from(self.data_path)
 
 
-def _filenames(id: str, makedirs=False) -> Tuple[Path, Path]:
+def _filenames(id: FileUploadID, makedirs=False) -> Tuple[Path, Path]:
     ulid = ULID.from_hex(id)
     levels = (ulid.datetime.strftime(r"%Y-%m-%d"), id[-2:], id[-4:-2])
     level_path = Path(env.file_upload.path, *levels)

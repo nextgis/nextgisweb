@@ -6,7 +6,6 @@ from inspect import Parameter, signature
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
     ClassVar,
     Dict,
     List,
@@ -29,7 +28,7 @@ from nextgisweb.lib.imptool import module_from_stack
 
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.file_upload import FileUpload
+from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import Resource, ResourceScope
 
@@ -288,27 +287,6 @@ def kind_of_data(request) -> JSONType:
     return result
 
 
-def custom_css_get(request) -> AsJSON[str]:
-    """Read custom CSS styles"""
-
-    return request.env.core.settings_get("pyramid", "custom_css", "")
-
-
-def custom_css_put(request) -> AsJSON[None]:
-    """Update custom CSS styles"""
-
-    request.require_administrator()
-
-    body = request.json_body
-    if body is None or re.match(r"^\s*$", body, re.MULTILINE):
-        request.env.core.settings_delete("pyramid", "custom_css")
-    else:
-        request.env.core.settings_set("pyramid", "custom_css", body)
-
-    ckey = gensecret(8)
-    request.env.core.settings_set("pyramid", "custom_css.ckey", ckey)
-
-
 def logo_get(request):
     try:
         logodata = request.env.core.settings_get("pyramid", "logo")
@@ -344,23 +322,21 @@ def logo_put(request):
 
 # Component settings machinery
 
-SKey = Tuple[str, str]
 SType = Type
 SValue = Any
-Normalize = Callable[[SValue], SValue]
 
 
-class CSetting:
+class csetting:
     component: str
     name: str
 
     gtype: SType
     stype: SType
     default: SValue
+    skey: Tuple[str, str]
+    ckey: bool
 
-    skey: SKey
-
-    registry: ClassVar[Dict[str, Dict[str, "CSetting"]]] = dict()
+    registry: ClassVar[Dict[str, Dict[str, "csetting"]]] = dict()
 
     def __init__(
         self,
@@ -368,8 +344,8 @@ class CSetting:
         type: Union[Type, Tuple[Type, Type]],
         *,
         default: Any = None,
-        normalize: Normalize = lambda val: val,
         skey: Optional[Tuple[str, str]] = None,
+        ckey: Optional[bool] = None,
         register: bool = True,
         stacklevel: int = 0,
     ):
@@ -379,9 +355,16 @@ class CSetting:
         self.name = name
         self.gtype, self.stype = type if isinstance(type, tuple) else (type, type)
         self.default = default
-        self.normalize = normalize
 
-        self.skey = skey if skey else (self.component, self.name)
+        if not getattr(self, "skey", None):
+            self.skey = skey if skey else (self.component, self.name)
+        elif skey is not None:
+            raise ValueError("skey already defined")
+
+        if not getattr(self, "ckey", None):
+            self.ckey = bool(ckey)
+        elif ckey is not None:
+            raise ValueError("ckey already defined")
 
         if register:
             if (comp_items := self.registry.get(self.component)) is None:
@@ -390,8 +373,21 @@ class CSetting:
             assert self.name not in comp_items
             comp_items[self.name] = self
 
+    def __init_subclass__(cls) -> None:
+        name = cls.__name__
+        if not re.match(r"^[a-z][a-z0-9_]*[a-z0-9]$", name):
+            raise TypeError("snake_case class name required, got: " + name)
+
+        type = getattr(cls, "vtype")
+        default = getattr(cls, "default", None)
+
+        cls(name, type, default=default, stacklevel=1)
+
+    def normalize(self, value: SValue) -> Optional[SValue]:
+        return value
+
     @inject()
-    def dump(self, *, core: CoreComponent) -> SValue:
+    def getter(self, *, core: CoreComponent) -> SValue:
         try:
             value = core.settings_get(*self.skey)
         except KeyError:
@@ -399,7 +395,7 @@ class CSetting:
         return convert(value, self.gtype)
 
     @inject()
-    def load(self, value: SValue, *, core: CoreComponent):
+    def setter(self, value: Optional[SValue], *, core: CoreComponent):
         if value is not None:
             value = self.normalize(value)
 
@@ -408,23 +404,9 @@ class CSetting:
         else:
             core.settings_set(*self.skey, to_builtins(value))
 
-
-def csetting(
-    name: str,
-    type: SType,
-    *,
-    default: SValue = None,
-    normalize: Normalize = lambda val: val,
-    skey: Optional[SKey] = None,
-):
-    CSetting(
-        name,
-        type,
-        default=default,
-        normalize=normalize,
-        skey=skey,
-        stacklevel=1,
-    )
+        if self.ckey:
+            skey = (self.skey[0], self.skey[1] + ".ckey")
+            core.settings_set(*skey, gensecret(8))
 
 
 def setup_pyramid_csettings(comp, config):
@@ -433,10 +415,10 @@ def setup_pyramid_csettings(comp, config):
     fld_reset = lambda n, t: (n, Union[t, NoneDefault, UnsetType], UNSET)
 
     rfields, ufields = list(), list()
-    dumpers, loaders = dict(), dict()
+    getters, setters = dict(), dict()
     get_parameters = list()
 
-    for component, stngs in CSetting.registry.items():
+    for component, stngs in csetting.registry.items():
         sitems = list(stngs.items())
         basename = Component.registry[component].basename
 
@@ -460,8 +442,8 @@ def setup_pyramid_csettings(comp, config):
             )
         )
 
-        dumpers[component] = {k: v.dump for k, v in sitems}
-        loaders[component] = {k: v.load for k, v in sitems}
+        getters[component] = {k: v.getter for k, v in sitems}
+        setters[component] = {k: v.setter for k, v in sitems}
 
         cstype = Annotated[
             List[Enum(f"{basename}SettingsEnum", dict(all="all", **{k: k for k in stngs}))],
@@ -490,21 +472,19 @@ def setup_pyramid_csettings(comp, config):
 
         sf = dict()
         for cid, attrs in kwargs.items():
-            if not attrs:
-                continue
-
-            cgetters = dumpers[cid]
+            cgetters = getters[cid]
 
             attrs = [a.value for a in attrs]
-            if "all" in attrs and len(attrs) > 1:
-                raise ValidationError(
-                    message=_(
-                        "The '{}' query parameter should not contain "
-                        "additional values if 'all' is specified."
-                    ).format(cid)
-                )
-            else:
-                attrs = list(cgetters)
+            if "all" in attrs:
+                if len(attrs) > 1:
+                    raise ValidationError(
+                        message=_(
+                            "The '{}' query parameter should not contain "
+                            "additional values if 'all' is specified."
+                        ).format(cid)
+                    )
+                else:
+                    attrs = list(cgetters)
 
             sf[cid] = {a: cgetters[a]() for a in attrs}
 
@@ -521,9 +501,9 @@ def setup_pyramid_csettings(comp, config):
 
         request.require_administrator()
 
-        for cid, cloaders in loaders.items():
+        for cid, csetters in setters.items():
             if (cvalue := getattr(body, cid)) is not UNSET:
-                for sid, loader in cloaders.items():
+                for sid, loader in csetters.items():
                     if (abody := getattr(cvalue, sid)) is not UNSET:
                         loader(abody)
 
@@ -565,26 +545,45 @@ AllowOrigin = Annotated[
 ]
 
 
-def _allow_origin_normalize(value: AllowOrigin) -> AllowOrigin:
-    value = [itm.rstrip("/").lower() for itm in value]
-    result = list()
-    for itm in value:
-        norm = itm.rstrip("/").lower()
-        norm = re.sub(r"^(http:\/\/.*):80$", lambda m: m.group(1), norm)
-        norm = re.sub(r"^(https:\/\/.*):443$", lambda m: m.group(1), norm)
-        if norm in result:
-            raise ValidationError("Duplicate origin '%s'" % itm)
-        result.append(norm)
-    return result
+class allow_origin(csetting):
+    vtype = AllowOrigin
+    default = list()
+    skey = (COMP_ID, "cors_allow_origin")
+
+    def normalize(self, value: AllowOrigin) -> Optional[AllowOrigin]:
+        value = [itm.rstrip("/").lower() for itm in value]
+        result = list()
+        for itm in value:
+            norm = itm.rstrip("/").lower()
+            norm = re.sub(r"^(http:\/\/.*):80$", lambda m: m.group(1), norm)
+            norm = re.sub(r"^(https:\/\/.*):443$", lambda m: m.group(1), norm)
+            if norm in result:
+                raise ValidationError("Duplicate origin '%s'" % itm)
+            result.append(norm)
+        return result if result else None
 
 
-csetting(
-    "allow_origin",
-    AllowOrigin,
-    default=[],
-    normalize=_allow_origin_normalize,
-    skey=(COMP_ID, "cors_allow_origin"),
-)
+class custom_css(csetting):
+    vtype = str
+    default = ""
+    ckey = True
+
+    def normalize(self, value: str) -> Optional[str]:
+        if re.match(r"^\s*$", value, re.MULTILINE):
+            return None
+        return value
+
+
+class header_logo(csetting):
+    vtype = (bytes, FileUploadRef)
+    skey = (COMP_ID, "logo")
+    ckey = True
+
+    def normalize(self, value: FileUploadRef) -> Optional[bytes]:
+        fupload = value()
+        if fupload.size > 64 * 1024:
+            raise ValidationError(message=_("64K should be enough for a logo."))
+        return value().data_path.read_bytes()
 
 
 class GoogleAnalytics(Struct):
@@ -671,13 +670,6 @@ def setup_pyramid(comp, config):
         "pyramid.kind_of_data",
         "/api/component/pyramid/kind_of_data",
         get=kind_of_data,
-    )
-
-    config.add_route(
-        "pyramid.custom_css",
-        "/api/component/pyramid/custom_css",
-        get=custom_css_get,
-        put=custom_css_put,
     )
 
     config.add_route(
