@@ -20,6 +20,7 @@ import {
     Drawer,
     Dropdown,
     Empty,
+    FloatButton,
     Form,
     Grid,
     Image,
@@ -94,6 +95,7 @@ export {
     Dropdown,
     Drawer,
     Empty,
+    FloatButton,
     Form,
     Grid,
     Input,
@@ -153,6 +155,7 @@ type DividerProps = ParamsOf<typeof Divider>;
 type DropdownProps = ParamsOf<typeof Dropdown>;
 type DrawerProps = ParamsOf<typeof Drawer>;
 type EmptyProps = ParamsOf<typeof Empty>;
+type FloatButtonProps = ParamsOf<typeof FloatButton>;
 type FormProps = ParamsOf<typeof Form>;
 type InputProps = ParamsOf<typeof Input>;
 type ImageProps = ParamsOf<typeof Image>;
@@ -207,6 +210,7 @@ export type {
     DropdownProps,
     DrawerProps,
     EmptyProps,
+    FloatButtonProps,
     FormProps,
     InputProps,
     ImageProps,
