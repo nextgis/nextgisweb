@@ -1,10 +1,8 @@
-import os.path
+from pathlib import Path
 
 import pytest
 import transaction
 from osgeo import gdal
-
-from nextgisweb.env import DBSession
 
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -14,40 +12,41 @@ from .validate_cloud_optimized_geotiff import validate
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
-def test_cog(ngw_webtest_app, ngw_env):
-    source = "sochi-aster-dem.tif"
-    source_srs_id = 4326
-    src = os.path.join(os.path.split(__file__)[0], "data", source)
-
+@pytest.mark.parametrize("srs_id", [3857, 4326])
+def test_cog(srs_id, ngw_data_path, ngw_webtest_app, ngw_env):
     with transaction.manager:
-        res = RasterLayer(
-            srs=SRS.filter_by(id=source_srs_id).one(),
-        ).persist()
+        res = RasterLayer(srs=SRS.filter_by(id=srs_id).one()).persist()
+        res.load_file(ngw_data_path / "sochi-aster-dem.tif", ngw_env, cog=False)
 
-        res.load_file(src, ngw_env, cog=False)
+    fdata = res.fileobj.filename()
+    assert fdata.exists() and not fdata.is_symlink()
 
-        DBSession.flush()
-        DBSession.expunge(res)
-
-    ds = gdal.Open(ngw_env.raster_layer.workdir_filename(res.fileobj))
+    fwork = Path(ngw_env.raster_layer.workdir_filename(res.fileobj))
+    ds = gdal.Open(str(fwork))
     cs = ds.GetRasterBand(1).Checksum()
 
     ngw_webtest_app.put_json(
         f"/api/resource/{res.id}",
         dict(raster_layer=dict(cog=True)),
     )
+
     res = RasterLayer.filter_by(id=res.id).one()
-    fn = ngw_env.raster_layer.workdir_filename(res.fileobj)
-    warnings, errors, _ = validate(fn, full_check=True)
-    assert len(errors) == 0
+    cog_wd = Path(ngw_env.raster_layer.workdir_filename(res.fileobj))
+    assert cog_wd != fwork and cog_wd.is_symlink()
+    assert not cog_wd.with_suffix(".ovr").is_file()
+
+    warnings, errors, _ = validate(str(cog_wd), full_check=True)
+    assert len(errors) == 0 and len(warnings) == 0
 
     ngw_webtest_app.put_json(
         f"/api/resource/{res.id}",
         dict(raster_layer=dict(cog=False)),
     )
+
     res = RasterLayer.filter_by(id=res.id).one()
-    fn = ngw_env.raster_layer.workdir_filename(res.fileobj)
-    ds = gdal.Open(fn)
-    warnings, errors, _ = validate(fn, full_check=True)
-    assert len(errors) == 1
+    ovr_wd = Path(ngw_env.raster_layer.workdir_filename(res.fileobj))
+    assert ovr_wd != cog_wd and ovr_wd.is_symlink()
+    assert ovr_wd.with_suffix(".ovr").is_file()
+
+    ds = gdal.Open(str(ovr_wd))
     assert cs == ds.GetRasterBand(1).Checksum()

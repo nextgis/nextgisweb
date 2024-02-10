@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import sqlalchemy as sa
@@ -73,6 +74,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         return isinstance(parent, ResourceGroup)
 
     def load_file(self, filename, env, cog=False):
+        if isinstance(filename, Path):
+            filename = str(filename)
+
         ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
         if not ds:
             raise ValidationError(_("GDAL library was unable to open the file."))
@@ -339,7 +343,7 @@ class _source_attr(SP):
         cur_size = 0 if srlzr.obj.id is None else estimate_raster_layer_data(srlzr.obj)
 
         cog = srlzr.data.get("cog", env.raster_layer.cog_enabled)
-        srlzr.obj.load_file(str(FileUpload(id=value["id"]).data_path), env, cog)
+        srlzr.obj.load_file(FileUpload(id=value["id"]).data_path, env, cog)
 
         new_size = estimate_raster_layer_data(srlzr.obj)
         size = new_size - cur_size

@@ -1,10 +1,10 @@
 import os.path
+from operator import xor
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import pytest
 from osgeo import gdal
-
-from nextgisweb.env import DBSession
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.spatial_ref_sys import SRS
@@ -27,30 +27,24 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
     ],
 )
 @pytest.mark.parametrize("cog", [False, True])
-def test_load_file(source, band_count, srs_id, ngw_env, ngw_txn, cog):
-    res = RasterLayer(
-        srs=SRS.filter_by(id=srs_id).one(),
-    ).persist()
+def test_load_file(source, band_count, srs_id, cog, ngw_data_path, ngw_env, ngw_commit):
+    res = RasterLayer(srs=SRS.filter_by(id=srs_id).one()).persist()
 
-    res.load_file(
-        os.path.join(os.path.split(__file__)[0], "data", source),
-        ngw_env,
-        cog,
-    )
+    res.load_file(ngw_data_path / source, ngw_env, cog)
     assert res.band_count == band_count
 
-    fn_data = ngw_env.file_storage.filename(res.fileobj)
-    assert not os.path.islink(fn_data)
+    fd = res.fileobj.filename()
+    assert fd.exists() and not fd.is_symlink()
 
-    fn_work = ngw_env.raster_layer.workdir_filename(res.fileobj)
-    assert os.path.islink(fn_work) and os.path.realpath(fn_work) == fn_data
+    fw = Path(ngw_env.raster_layer.workdir_filename(res.fileobj))
+    assert fw.exists() and fw.is_symlink()
+    assert fw.resolve() == fd.resolve()
+    assert os.readlink(fw) == ("../" * 3) + "/".join(["file_storage", *fd.parts[-4:]])
+    assert xor(cog, fw.with_suffix(".ovr").is_file())
 
-    warnings, errors, _ = validate(fn_work, full_check=True)
     if cog:
-        assert len(errors) == 0
-
-    if not cog:
-        assert len(errors) == 1
+        warnings, errors, _ = validate(str(fw), full_check=True)
+        assert len(errors) == 0 and len(warnings) == 0
 
 
 @pytest.mark.parametrize(
@@ -64,16 +58,12 @@ def test_load_file(source, band_count, srs_id, ngw_env, ngw_txn, cog):
     ),
 )
 def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env):
-    res = RasterLayer().persist()
-
+    res = RasterLayer()
     driver = gdal.GetDriverByName("GTiff")
-    proj = res.srs.to_osr()
-    proj_wkt = proj.ExportToWkt()
-
     with ngw_env.raster_layer.options.override(dict(size_limit=size_limit)):
         with NamedTemporaryFile("w") as f:
             ds = driver.Create(f.name, width, height, band_count, datatype)
-            ds.SetProjection(proj_wkt)
+            ds.SetProjection(res.srs.to_osr().ExportToWkt())
             ds.FlushCache()
             ds = None
             f.flush()
@@ -84,22 +74,21 @@ def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env
                 with pytest.raises(ValidationError):
                     res.load_file(f.name, ngw_env)
 
-    DBSession.expunge(res)
-
 
 @pytest.mark.parametrize(
-    "source, size_expect", (("sochi-aster-colorized.tif", 13800), ("sochi-aster-dem.tif", 608224))
+    "source, expected_size",
+    [
+        ("sochi-aster-colorized.tif", 13800),
+        ("sochi-aster-dem.tif", 608224),
+    ],
 )
-def test_size_limit_reproj(source, size_expect, ngw_env):
+def test_size_limit_reproj(source, expected_size, ngw_commit, ngw_data_path, ngw_env):
     res = RasterLayer().persist()
+    filename = ngw_data_path / source
 
-    filename = os.path.join(os.path.split(__file__)[0], "data", source)
-
-    with ngw_env.raster_layer.options.override(dict(size_limit=size_expect - 100)):
+    with ngw_env.raster_layer.options.override(dict(size_limit=expected_size - 100)):
         with pytest.raises(ValidationError):
             res.load_file(filename, ngw_env)
 
-    with ngw_env.raster_layer.options.override(dict(size_limit=size_expect)):
+    with ngw_env.raster_layer.options.override(dict(size_limit=expected_size)):
         res.load_file(filename, ngw_env)
-
-    DBSession.expunge(res)
