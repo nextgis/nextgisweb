@@ -1,14 +1,14 @@
 import os
 import os.path
-from collections import defaultdict
 from datetime import datetime as dt
 from datetime import timedelta
 from operator import itemgetter
 from shutil import copyfileobj
 
+import sqlalchemy as sa
 import transaction
 
-from nextgisweb.env import Component
+from nextgisweb.env import Component, DBSession
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import query_unreferenced
@@ -76,24 +76,25 @@ class FileStorageComponent(Component):
         return os.path.join(path, uuid)
 
     def query_stat(self):
-        # Traverse all objects in file storage and calculate total
-        # and per component size in filesystem
+        total_count = 0
+        total_size = 0
+        total_max = 0
+        component = dict()
+        for cid, count, csize, cmax in DBSession.query(
+            FileObj.component,
+            sa.func.count(FileObj.id),
+            sa.func.sum(FileObj.size),
+            sa.func.max(FileObj.size),
+        ).group_by(FileObj.component):
+            total_count += count
+            total_size += csize
+            total_max = max(total_max, cmax)
+            component[cid] = dict(count=count, size=csize, max=cmax)
 
-        def itm():
-            return dict(size=0, count=0)
-
-        result = dict(total=itm(), component=defaultdict(itm))
-
-        def add_item(itm, size):
-            itm["size"] += size
-            itm["count"] += 1
-
-        for fileobj in FileObj.query():
-            statres = os.stat(self.filename(fileobj))
-            add_item(result["total"], statres.st_size)
-            add_item(result["component"][fileobj.component], statres.st_size)
-
-        return result
+        return dict(
+            dict(count=total_count, size=total_size, max=total_max),
+            component=component,
+        )
 
     def maintenance(self):
         super().maintenance()

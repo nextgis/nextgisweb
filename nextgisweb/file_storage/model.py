@@ -14,12 +14,20 @@ from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.imptool import module_from_stack
 
 
+def _size_default(context):
+    params = context.get_current_parameters()
+    if params.get("size") is None:
+        fn = Path(env.file_storage.filename((params["component"], params["uuid"])))
+        return fn.stat().st_size
+
+
 class FileObj(Base):
     __tablename__ = "fileobj"
 
     id = sa.Column(sa.Integer, primary_key=True)
     component = sa.Column(sa.Unicode, nullable=False)
     uuid = sa.Column(sa.Unicode(32), nullable=False)
+    size = sa.Column(sa.BigInteger, nullable=False, default=_size_default)
 
     __table_args__ = (sa.Index("fileobj_uuid_component_idx", uuid, component, unique=True),)
 
