@@ -83,8 +83,8 @@ class FileStorageComponent(Component):
         for cid, count, csize, cmax in DBSession.query(
             FileObj.component,
             sa.func.count(FileObj.id),
-            sa.func.sum(FileObj.size),
-            sa.func.max(FileObj.size),
+            sa.func.sum(FileObj.size).cast(sa.BigInteger),
+            sa.func.max(FileObj.size).cast(sa.BigInteger),
         ).group_by(FileObj.component):
             total_count += count
             total_size += csize
