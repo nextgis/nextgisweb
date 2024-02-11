@@ -3,6 +3,7 @@ import shutil
 import subprocess
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from warnings import warn
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -73,9 +74,17 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    def load_file(self, filename, env, cog=False):
+    def load_file(self, filename, env_arg=None, *, cog=False):
         if isinstance(filename, Path):
             filename = str(filename)
+
+        if env_arg is not None:
+            warn(
+                "RasterLayer.load_file's env_arg is deprecated since 4.7.0.dev7.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        comp = env.raster_layer
 
         ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
         if not ds:
@@ -178,7 +187,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         )  # https://github.com/OSGeo/gdal/issues/4469
         ds_measure = None
 
-        size_limit = env.raster_layer.options["size_limit"]
+        size_limit = comp.options["size_limit"]
         if size_limit is not None and size_expected > size_limit:
             raise ValidationError(
                 message=_(
@@ -195,7 +204,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "TILED=YES", "-co", "BIGTIFF=YES", filename))
 
         fobj = FileObj(component="raster_layer")
-        dst_file = env.raster_layer.workdir_filename(fobj, makedirs=True)
+        dst_file = str(comp.workdir_path(fobj, makedirs=True))
         self.fileobj = fobj
 
         self.cog = cog
@@ -237,23 +246,23 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         self.band_count = ds.RasterCount
 
     def gdal_dataset(self):
-        fn = env.raster_layer.workdir_filename(self.fileobj)
-        return gdal.Open(fn, gdalconst.GA_ReadOnly)
+        fn = env.raster_layer.workdir_path(self.fileobj)
+        return gdal.Open(str(fn), gdalconst.GA_ReadOnly)
 
     def build_overview(self, missing_only=False, fn=None):
         if fn is None and self.cog:
             return
 
         if fn is None:
-            fn = env.raster_layer.workdir_filename(self.fileobj)
+            fn = env.raster_layer.workdir_path(self.fileobj)
 
-        if missing_only and os.path.isfile(fn + ".ovr"):
+        if missing_only and fn.with_suffix(".ovr").exists():
             return
 
-        ds = gdal.Open(fn, gdalconst.GA_ReadOnly)
+        ds = gdal.Open(str(fn), gdalconst.GA_ReadOnly)
         levels = list(map(str, calc_overviews_levels(ds)))
 
-        cmd = ["gdaladdo", "-q", "-clean", fn]
+        cmd = ["gdaladdo", "-q", "-clean", str(fn)]
 
         logger.debug("Removing existing overviews with command: " + " ".join(cmd))
         subprocess.check_call(cmd)
@@ -277,7 +286,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             "--config",
             "BIGTIFF_OVERVIEW",
             "YES",
-            fn,
+            str(fn),
         ] + levels
 
         logger.debug("Building raster overview with command: " + " ".join(cmd))
@@ -325,17 +334,8 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
 
 def estimate_raster_layer_data(resource):
-    def file_size(fn):
-        stat = os.stat(fn)
-        return stat.st_size
-
-    fn = env.raster_layer.workdir_filename(resource.fileobj)
-
-    # Size of source file with overviews
-    size = file_size(fn)
-    if not resource.cog:
-        size += file_size(fn + ".ovr")
-    return size
+    fn = env.raster_layer.workdir_path(resource.fileobj)
+    return fn.stat().st_size + (0 if resource.cog else fn.with_suffix(".ovr").stat().st_size)
 
 
 class _source_attr(SP):
@@ -343,7 +343,7 @@ class _source_attr(SP):
         cur_size = 0 if srlzr.obj.id is None else estimate_raster_layer_data(srlzr.obj)
 
         cog = srlzr.data.get("cog", env.raster_layer.cog_enabled)
-        srlzr.obj.load_file(FileUpload(id=value["id"]).data_path, env, cog)
+        srlzr.obj.load_file(FileUpload(id=value["id"]).data_path, cog=cog)
 
         new_size = estimate_raster_layer_data(srlzr.obj)
         size = new_size - cur_size
@@ -363,8 +363,8 @@ class _cog_attr(SP):
         ):
             cur_size = estimate_raster_layer_data(srlzr.obj)
 
-            fn = env.raster_layer.workdir_filename(srlzr.obj.fileobj)
-            srlzr.obj.load_file(fn, env, value)
+            fn = env.raster_layer.workdir_path(srlzr.obj.fileobj)
+            srlzr.obj.load_file(fn, cog=value)
 
             new_size = estimate_raster_layer_data(srlzr.obj)
             size = new_size - cur_size
@@ -379,7 +379,8 @@ class _cog_attr(SP):
 
 class _color_interpretation(SP):
     def getter(self, srlzr):
-        ds = gdal.OpenEx(env.raster_layer.workdir_filename(srlzr.obj.fileobj))
+        fdata = env.raster_layer.workdir_path(srlzr.obj.fileobj)
+        ds = gdal.OpenEx(str(fdata))
         return [
             COLOR_INTERPRETATION[ds.GetRasterBand(bidx).GetRasterColorInterpretation()]
             for bidx in range(1, srlzr.obj.band_count + 1)

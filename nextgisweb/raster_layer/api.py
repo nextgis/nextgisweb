@@ -76,19 +76,19 @@ def export(resource, request):
             response.content_disposition = content_disposition
             return response
 
-    source_filename = env.raster_layer.workdir_filename(resource.fileobj)
+    source_filename = env.raster_layer.workdir_path(resource.fileobj)
     if bands is not None and len(bands) != resource.band_count:
         with tempfile.NamedTemporaryFile(suffix=".tif") as tmp_file:
-            gdal.Translate(tmp_file.name, source_filename, bandList=bands)
+            gdal.Translate(tmp_file.name, str(source_filename), bandList=bands)
             return _warp(tmp_file.name)
     else:
-        return _warp(source_filename)
+        return _warp(str(source_filename))
 
 
 def cog(resource, request):
     request.resource_permission(PERM_READ)
 
-    fn = env.raster_layer.workdir_filename(resource.fileobj)
+    fn = env.raster_layer.workdir_path(resource.fileobj)
     filesize = os.path.getsize(fn)
 
     if request.method == "HEAD":
@@ -126,7 +126,7 @@ def cog(resource, request):
 def download(request):
     request.resource_permission(PERM_READ)
 
-    filename = env.raster_layer.workdir_filename(request.context.fileobj)
+    filename = env.raster_layer.workdir_path(request.context.fileobj)
     response = FileResponse(
         filename,
         content_type="image/tiff; application=geotiff",

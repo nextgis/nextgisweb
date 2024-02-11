@@ -13,7 +13,7 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administ
 def raster_layer_id(ngw_data_path, ngw_env):
     with transaction.manager:
         obj = RasterLayer().persist()
-        obj.load_file(ngw_data_path / "sochi-aster-colorized.tif", ngw_env)
+        obj.load_file(ngw_data_path / "sochi-aster-colorized.tif")
 
     yield obj.id
 

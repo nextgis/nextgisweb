@@ -30,13 +30,13 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 def test_load_file(source, band_count, srs_id, cog, ngw_data_path, ngw_env, ngw_commit):
     res = RasterLayer(srs=SRS.filter_by(id=srs_id).one()).persist()
 
-    res.load_file(ngw_data_path / source, ngw_env, cog)
+    res.load_file(ngw_data_path / source, cog=cog)
     assert res.band_count == band_count
 
     fd = res.fileobj.filename()
     assert fd.exists() and not fd.is_symlink()
 
-    fw = Path(ngw_env.raster_layer.workdir_filename(res.fileobj))
+    fw = Path(ngw_env.raster_layer.workdir_path(res.fileobj))
     assert fw.exists() and fw.is_symlink()
     assert fw.resolve() == fd.resolve()
     assert os.readlink(fw) == ("../" * 3) + "/".join(["file_storage", *fd.parts[-4:]])
@@ -69,10 +69,10 @@ def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env
             f.flush()
 
             if ok:
-                res.load_file(f.name, ngw_env)
+                res.load_file(f.name)
             else:
                 with pytest.raises(ValidationError):
-                    res.load_file(f.name, ngw_env)
+                    res.load_file(f.name)
 
 
 @pytest.mark.parametrize(
@@ -88,7 +88,7 @@ def test_size_limit_reproj(source, expected_size, ngw_commit, ngw_data_path, ngw
 
     with ngw_env.raster_layer.options.override(dict(size_limit=expected_size - 100)):
         with pytest.raises(ValidationError):
-            res.load_file(filename, ngw_env)
+            res.load_file(filename)
 
     with ngw_env.raster_layer.options.override(dict(size_limit=expected_size)):
-        res.load_file(filename, ngw_env)
+        res.load_file(filename)

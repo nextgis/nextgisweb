@@ -25,7 +25,7 @@ def rlayer_id(ngw_env):
 
         path = Path(raster_layer_test.__file__).parent / "data/rounds.tif"
 
-        obj.load_file(str(path), ngw_env)
+        obj.load_file(path)
 
         DBSession.flush()
         DBSession.expunge(obj)

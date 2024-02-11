@@ -1,4 +1,4 @@
-import os.path
+from pathlib import Path
 
 import geoalchemy2 as ga
 from osgeo import gdal
@@ -59,15 +59,11 @@ class RasterMosaic(Base, Resource, SpatialLayerMixin):
                 .all()
             )
 
-            fnames = []
-            for item in items:
-                fname = env.raster_mosaic.workdir_filename(item.fileobj)
-                fnames.append(fname)
-
-            if len(fnames) > 0:
+            if len(items) > 0:
+                workdir_path = env.raster_mosaic.workdir_path
                 ds = gdal.BuildVRT(
                     "",
-                    fnames,
+                    [str(workdir_path(item.fileobj)) for item in items],
                     options=gdal.BuildVRTOptions(
                         xRes=(xmax - xmin) / width,
                         yRes=(ymax - ymin) / height,
@@ -116,7 +112,10 @@ class RasterMosaicItem(Base):
         ),
     )
 
-    def load_file(self, filename, env):
+    def load_file(self, filename):
+        if isinstance(filename, Path):
+            filename = str(filename)
+
         ds = gdal.Open(filename, gdal.GA_ReadOnly)
         if not ds:
             raise ValidationError(_("GDAL library was unable to open the file."))
@@ -175,11 +174,11 @@ class RasterMosaicItem(Base):
         self.footprint = ga.elements.WKBElement(bytearray(geom.wkb), srid=4326)
         self.fileobj = env.file_storage.fileobj(component="raster_mosaic")
 
-        dst_file = env.raster_mosaic.workdir_filename(self.fileobj, makedirs=True)
+        dst_file = env.raster_mosaic.workdir_path(self.fileobj, makedirs=True)
         co = ["COMPRESS=DEFLATE", "TILED=YES", "BIGTIFF=YES"]
         if reproject:
             gdal.Warp(
-                dst_file,
+                str(dst_file),
                 filename,
                 options=gdal.WarpOptions(
                     format="GTiff",
@@ -190,7 +189,7 @@ class RasterMosaicItem(Base):
             )
         else:
             gdal.Translate(
-                dst_file,
+                str(dst_file),
                 filename,
                 options=gdal.TranslateOptions(format="GTiff", creationOptions=co),
             )
@@ -198,12 +197,12 @@ class RasterMosaicItem(Base):
         self.build_overview()
 
     def build_overview(self, missing_only=False):
-        fn = env.raster_mosaic.workdir_filename(self.fileobj)
-        if missing_only and os.path.isfile(fn + ".ovr"):
+        fn = env.raster_mosaic.workdir_path(self.fileobj)
+        if missing_only and fn.with_suffix(".ovr").exists():
             return
 
         # cleaning overviews
-        ds = gdal.Open(fn, gdal.GA_Update)
+        ds = gdal.Open(str(fn), gdal.GA_Update)
         ds.BuildOverviews(overviewlist=[])
         ds = None
 
@@ -216,7 +215,7 @@ class RasterMosaicItem(Base):
         for key, val in options.items():
             gdal.SetConfigOption(key, val)
         try:
-            ds = gdal.Open(fn, gdal.GA_ReadOnly)
+            ds = gdal.Open(str(fn), gdal.GA_ReadOnly)
             ds.BuildOverviews("GAUSS", overviewlist=calc_overviews_levels(ds))
 
             ds = None
@@ -238,7 +237,7 @@ class _items_attr(SP):
             file_upload = item.get("file_upload")
             if file_upload is not None:
                 mitem = RasterMosaicItem(resource=srlzr.obj, display_name=item["display_name"])
-                mitem.load_file(str(FileUpload(id=file_upload["id"]).data_path), env)
+                mitem.load_file(FileUpload(id=file_upload["id"]).data_path)
             else:
                 mitem = RasterMosaicItem.filter_by(id=item["id"]).one()
                 if mitem.resource_id == srlzr.obj.id:
