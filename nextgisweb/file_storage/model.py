@@ -64,11 +64,13 @@ class FileObj(Base):
         else:
             with io.open(dest, "wb") as fd:
                 copyfileobj(source, fd)
+        self.size = dest.stat().st_size
         return self
 
     def from_content(self, content: bytes) -> FileObj:
         with io.open(self.filename(makedirs=True, not_exists=True), "wb") as fd:
             fd.write(content)
+        self.size = len(content)
         return self
 
 
