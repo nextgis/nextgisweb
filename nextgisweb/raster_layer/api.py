@@ -85,50 +85,54 @@ def export(resource, request):
         return _warp(str(source_filename))
 
 
-def cog(resource, request):
+def cog(resource: RasterLayer, request):
+    """Cloud optimized GeoTIFF endpoint"""
+
     request.resource_permission(PERM_READ)
 
-    fn = env.raster_layer.workdir_path(resource.fileobj)
-    filesize = os.path.getsize(fn)
+    if not resource.cog:
+        raise ValidationError(_("Requested raster is not COG."))
 
     if request.method == "HEAD":
         return Response(
             accept_ranges="bytes",
-            content_length=filesize,
+            content_length=resource.fileobj.size,
             content_type="image/geo+tiff",
         )
 
     if request.method == "GET":
-        if not resource.cog:
-            raise ValidationError(_("Requested raster is not COG."))
-
         range = request.range
         if range is None:
             raise ValidationError(_("Range header is missed or invalid."))
 
-        content_range = range.content_range(filesize)
+        content_range = range.content_range(resource.fileobj.size)
         if content_range is None:
             raise ValidationError(_("Range %s can not be read." % range))
 
         content_length = content_range.stop - content_range.start
         response = Response(
-            status_code=206, content_range=content_range, content_type="image/geo+tiff"
+            status_code=206,
+            content_range=content_range,
+            content_type="image/geo+tiff",
         )
 
         response.app_iter = RangeFileWrapper(
-            open(fn, "rb"), offset=content_range.start, length=content_length
+            open(resource.fileobj.filename(), "rb"),
+            offset=content_range.start,
+            length=content_length,
         )
         response.content_length = content_length
 
         return response
 
 
-def download(request):
+def download(resource: RasterLayer, request):
+    """Download raster in internal representation format"""
+
     request.resource_permission(PERM_READ)
 
-    filename = env.raster_layer.workdir_path(request.context.fileobj)
     response = FileResponse(
-        filename,
+        resource.fileobj.filename(),
         content_type="image/tiff; application=geotiff",
         request=request,
     )
