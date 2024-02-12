@@ -8,7 +8,7 @@ from .model import FeatureAttachment
 class FeatureAttachmentExtension(FeatureExtension):
     identity = "attachment"
 
-    editor_widget = "@nextgisweb/feature_attachment/attachment-editor"
+    editor_widget = "@nextgisweb/feature-attachment/attachment-editor"
     display_widget = "ngw-feature-attachment/DisplayWidget"
 
     def serialize(self, feature):

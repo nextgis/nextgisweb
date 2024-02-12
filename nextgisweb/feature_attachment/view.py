@@ -19,7 +19,7 @@ def attachment(request):
         obj=request.context,
         title=_("Manage attachments"),
         props=dict(id=request.context.id),
-        entrypoint="@nextgisweb/feature_attachment/attachment-form",
+        entrypoint="@nextgisweb/feature-attachment/attachment-form",
         maxheight=True,
     )
 

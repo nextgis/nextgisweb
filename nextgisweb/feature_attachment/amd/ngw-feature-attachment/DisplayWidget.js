@@ -3,7 +3,7 @@ define([
     "@nextgisweb/pyramid/i18n!",
     "ngw-feature-layer/DisplayWidget",
     "@nextgisweb/gui/react-app",
-    "@nextgisweb/feature_attachment/attachment-table",
+    "@nextgisweb/feature-attachment/attachment-table",
 ], function (declare, { gettext }, DisplayWidget, reactApp, AttachmentTable) {
     return declare([DisplayWidget], {
         title: gettext("Attachments"),

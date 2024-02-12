@@ -1,8 +1,8 @@
 import { Fragment, Suspense, lazy, useEffect, useState } from "react";
 
-import { isFileImage } from "@nextgisweb/feature_attachment/attachment-editor/AttachmentEditor";
-import { isFeatureAttachment } from "@nextgisweb/feature_attachment/image-thumbnail/ImageThumbnail";
-import { getFileImage } from "@nextgisweb/feature_attachment/image-thumbnail/util/getFileImage";
+import { isFileImage } from "@nextgisweb/feature-attachment/attachment-editor/AttachmentEditor";
+import { isFeatureAttachment } from "@nextgisweb/feature-attachment/image-thumbnail/ImageThumbnail";
+import { getFileImage } from "@nextgisweb/feature-attachment/image-thumbnail/util/getFileImage";
 import { Carousel, FloatButton, Image, Spin } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 

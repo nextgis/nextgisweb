@@ -1,5 +1,5 @@
 {
-    "name": "@nextgisweb/feature_attachment",
+    "name": "@nextgisweb/feature-attachment",
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
