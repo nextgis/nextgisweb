@@ -15,6 +15,9 @@ import reactApp from "@nextgisweb/gui/react-app";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import PrintMap from "@nextgisweb/webmap/print-map";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Import URL parser module
+import URL from "ngw-webmap/utils/URL";
 
 import type { PrintMapSettings } from "../../print-map/PrintMap";
 import type { DojoDisplay } from "../../type";
@@ -25,6 +28,7 @@ import {
     pageFormats,
     scaleToLabel,
     scalesList,
+    urlPrintParams,
 } from "./options";
 
 import { DownOutlined } from "@ant-design/icons";
@@ -138,6 +142,23 @@ const defaultPanelMapSettings: PrintMapSettings = {
     scaleValue: false,
 };
 
+const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
+    const parsed = URL.getURLParams();
+
+    const settingsUrl = {};
+    for (const [k, v] of Object.entries(parsed)) {
+        if (!(k in urlPrintParams) || v === null) {
+            continue;
+        }
+        const [value, settingKey] = urlPrintParams[k](v);
+        if (value === undefined) {
+            continue;
+        }
+        settingsUrl[settingKey] = value;
+    }
+    return settingsUrl;
+};
+
 interface PrintPanelProps {
     display: DojoDisplay;
     title: string;
@@ -202,6 +223,33 @@ export const PrintPanel = ({
         });
     };
 
+    const changePaperFormat = (newPaperFormat: string) => {
+        setPaperFormat(newPaperFormat);
+        setDisableChangeSize(newPaperFormat !== "custom");
+        if (newPaperFormat !== "custom") {
+            const widthHeight = newPaperFormat.split("_");
+            const width = parseInt(widthHeight[0], 10);
+            const height = parseInt(widthHeight[1], 10);
+            updateMapSettings({
+                width,
+                height,
+            });
+        }
+    };
+
+    useEffect(() => {
+        const urlSettings = getPrintUrlSettings();
+
+        const keysPaperSize = ["height", "width"];
+        if (keysPaperSize.every((k) => k in urlSettings)) {
+            changePaperFormat("custom");
+        } else {
+            keysPaperSize.forEach((k) => delete urlSettings[k]);
+        }
+
+        updateMapSettings(urlSettings);
+    }, []);
+
     useEffect(() => {
         visible ? show() : hide();
     }, [visible]);
@@ -233,20 +281,6 @@ export const PrintPanel = ({
         setScales(newScales);
         updateMapSettings({ scale: printMapScale });
     }, [printMapScale]);
-
-    const changePaperFormat = (newPaperFormat: string) => {
-        setPaperFormat(newPaperFormat);
-        setDisableChangeSize(newPaperFormat !== "custom");
-        if (newPaperFormat !== "custom") {
-            const widthHeight = newPaperFormat.split("_");
-            const width = parseInt(widthHeight[0], 10);
-            const height = parseInt(widthHeight[1], 10);
-            updateMapSettings({
-                width,
-                height,
-            });
-        }
-    };
 
     const exportToFormat = (format: string) => {
         if (!printMapEl) {

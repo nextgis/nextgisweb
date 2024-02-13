@@ -52,3 +52,17 @@ export const exportFormats = [
     { label: gettext("TIFF"), key: "tiff", icon: <FileImageOutlined /> },
     { label: gettext("PDF"), key: "pdf", icon: <FilePdfOutlined /> },
 ];
+
+const parseNumber = (v) => {
+    const parsed = parseInt(v, 10);
+    return isNaN(parsed) ? undefined : parsed;
+};
+
+export const urlPrintParams = {
+    print_height: (v) => [parseNumber(v), "height"],
+    print_width: (v) => [parseNumber(v), "width"],
+    print_margin: (v) => [parseNumber(v), "margin"],
+    print_scale: (v) => [parseNumber(v), "scale"],
+    print_scaleLine: (v) => [v === "true", "scaleLine"],
+    print_scaleValue: (v) => [v === "true", "scaleValue"],
+};
