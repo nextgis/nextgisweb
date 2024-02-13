@@ -6,65 +6,65 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:483 amd/ngw-webmap/tool/Zoom.js:14
+#: amd/ngw-webmap/Display.js:489 amd/ngw-webmap/tool/Zoom.js:14
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:503
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/Display.js:484 amd/ngw-webmap/tool/Zoom.js:20
+#: amd/ngw-webmap/Display.js:490 amd/ngw-webmap/tool/Zoom.js:20
 #: amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:504
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: amd/ngw-webmap/Display.js:488 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:508
+#: amd/ngw-webmap/Display.js:494 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:508
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: amd/ngw-webmap/Display.js:504 amd/ngw-webmap/template/ExtentWidget.hbs:12
+#: amd/ngw-webmap/Display.js:510 amd/ngw-webmap/template/ExtentWidget.hbs:12
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: amd/ngw-webmap/Display.js:509
+#: amd/ngw-webmap/Display.js:515
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: amd/ngw-webmap/Display.js:512 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:517
+#: amd/ngw-webmap/Display.js:518 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:517
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: amd/ngw-webmap/Display.js:936 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:732
+#: amd/ngw-webmap/Display.js:942 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:732
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:937 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:733
+#: amd/ngw-webmap/Display.js:943 amd/ngw-webmap/ui/TinyDisplay/TinyDisplay.js:733
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:965 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:971 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:975
+#: amd/ngw-webmap/Display.js:981
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:985
+#: amd/ngw-webmap/Display.js:991
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:999
+#: amd/ngw-webmap/Display.js:1005
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1016 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: amd/ngw-webmap/Display.js:1022 amd/ngw-webmap/plugin/LayerInfo.js:28
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1034
+#: amd/ngw-webmap/Display.js:1040
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1086
+#: amd/ngw-webmap/Display.js:1092
 msgid "Annotations"
 msgstr "Аннотации"
 
@@ -399,7 +399,7 @@ msgstr "Открыть карту целиком"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:34 model.py:53 view.py:307 view.py:345
+#: model.py:34 model.py:53 view.py:313 view.py:351
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -423,7 +423,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:20 view.py:323
+#: nodepkg/clone-webmap/CloneWebmap.tsx:20 view.py:329
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -431,11 +431,11 @@ msgstr "Клонировать"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:57
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:56
 msgid "Radius:"
 msgstr "Радиус"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:58
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:57
 #: nodepkg/utils/format-units.tsx:13
 msgid "m"
 msgstr "м"
@@ -487,7 +487,7 @@ msgstr "Изменить геометрию для фильтра"
 msgid "Stop drawing..."
 msgstr "Остановить рисование"
 
-#: nodepkg/layer-opacity-slider/LayerOpacitySlider.js:8
+#: nodepkg/layer-opacity-slider/LayerOpacitySlider.tsx:8
 msgid "Opacity"
 msgstr "Непрозрачность"
 
@@ -564,41 +564,45 @@ msgstr "Другие приватные аннотации"
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/panel/print/PrintPanel.tsx:281
+#: nodepkg/panel/print/PrintPanel.tsx:332
 msgid "Paper format"
 msgstr "Формат бумаги"
 
-#: nodepkg/panel/print/PrintPanel.tsx:293
+#: nodepkg/panel/print/PrintPanel.tsx:344
 msgid "Height, mm"
 msgstr "Высота, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:311
+#: nodepkg/panel/print/PrintPanel.tsx:362
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:329
+#: nodepkg/panel/print/PrintPanel.tsx:380
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:347 nodepkg/panel/print/PrintPanel.tsx:368
+#: nodepkg/panel/print/PrintPanel.tsx:398 nodepkg/panel/print/PrintPanel.tsx:419
 msgid "Scale"
 msgstr "Масштаб"
 
-#: nodepkg/panel/print/PrintPanel.tsx:354
+#: nodepkg/panel/print/PrintPanel.tsx:405
 msgid "Scale value"
 msgstr "Значение масштаба"
 
-#: nodepkg/panel/print/PrintPanel.tsx:363
+#: nodepkg/panel/print/PrintPanel.tsx:414
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/PrintPanel.tsx:386
+#: nodepkg/panel/print/PrintPanel.tsx:438
 msgid "Print"
 msgstr "Печать"
 
-#: nodepkg/panel/print/PrintPanel.tsx:391
+#: nodepkg/panel/print/PrintPanel.tsx:446
 msgid "Save as"
 msgstr "Сохранить как"
+
+#: nodepkg/panel/print/PrintPanel.tsx:458
+msgid "Copy link to the print map"
+msgstr "Скопировать ссылку на карту для печати"
 
 #: nodepkg/panel/print/options.js:9
 msgid "Portrait"
@@ -910,7 +914,7 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:22
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:23
 msgid "Go to"
 msgstr "Перейти"
 
@@ -950,19 +954,19 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: view.py:45
+#: view.py:47
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:257
+#: view.py:263
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:270
+#: view.py:276
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:313
+#: view.py:319
 msgid "Display"
 msgstr "Открыть"
 

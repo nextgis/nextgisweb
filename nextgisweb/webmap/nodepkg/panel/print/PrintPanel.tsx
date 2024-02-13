@@ -10,6 +10,7 @@ import {
     Switch,
 } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
+import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { FloatingLabel } from "@nextgisweb/gui/floating-label";
 import reactApp from "@nextgisweb/gui/react-app";
 import { route } from "@nextgisweb/pyramid/api";
@@ -31,7 +32,7 @@ import {
     urlPrintParams,
 } from "./options";
 
-import { DownOutlined } from "@ant-design/icons";
+import { DownOutlined, ShareAltOutlined } from "@ant-design/icons";
 
 import "./PrintPanel.less";
 
@@ -146,17 +147,33 @@ const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
     const parsed = URL.getURLParams();
 
     const settingsUrl = {};
-    for (const [k, v] of Object.entries(parsed)) {
-        if (!(k in urlPrintParams) || v === null) {
+    for (const [urlParam, urlValue] of Object.entries(parsed)) {
+        if (!(urlParam in urlPrintParams) || urlValue === null) {
             continue;
         }
-        const [value, settingKey] = urlPrintParams[k](v);
+        const { fromParam, setting } = urlPrintParams[urlParam];
+        const value = fromParam(urlValue);
         if (value === undefined) {
             continue;
         }
-        settingsUrl[settingKey] = value;
+        settingsUrl[setting] = value;
     }
     return settingsUrl;
+};
+
+const getPrintMapLink = (mapSettings: PrintMapSettings): string => {
+    const parsed = URL.getURLParams();
+
+    for (const [urlParam, { setting }] of Object.entries(urlPrintParams)) {
+        parsed[urlParam] = mapSettings[setting];
+    }
+
+    const origin = window.location.origin;
+    const pathname = window.location.pathname;
+    const urlWithoutParams = `${origin}${pathname}`;
+    const queryString = new URLSearchParams(parsed).toString();
+
+    return `${urlWithoutParams}?${queryString}`;
 };
 
 interface PrintPanelProps {
@@ -410,24 +427,39 @@ export const PrintPanel = ({
                     ></Select>
                 </FloatingLabel>
 
-                <Space.Compact>
-                    <Button
-                        type="primary"
-                        onClick={() => {
-                            window.print();
-                        }}
-                    >
-                        {gettext("Print")}
-                    </Button>
-                    <Dropdown menu={exportFormatsProps} disabled={loadingFile}>
-                        <Button loading={loadingFile}>
-                            <Space>
-                                {gettext("Save as")}
-                                <DownOutlined />
-                            </Space>
+                <div className="actions">
+                    <Space.Compact>
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                window.print();
+                            }}
+                        >
+                            {gettext("Print")}
                         </Button>
-                    </Dropdown>
-                </Space.Compact>
+                        <Dropdown
+                            menu={exportFormatsProps}
+                            disabled={loadingFile}
+                        >
+                            <Button loading={loadingFile}>
+                                <Space>
+                                    {gettext("Save as")}
+                                    <DownOutlined />
+                                </Space>
+                            </Button>
+                        </Dropdown>
+                    </Space.Compact>
+
+                    <Space.Compact>
+                        <CopyToClipboardButton
+                            type="link"
+                            getTextToCopy={() => getPrintMapLink(mapSettings)}
+                            icon={<ShareAltOutlined />}
+                            title={gettext("Copy link to the print map")}
+                            iconOnly
+                        ></CopyToClipboardButton>
+                    </Space.Compact>
+                </div>
             </section>
         </div>
     );

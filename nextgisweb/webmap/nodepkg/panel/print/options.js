@@ -59,10 +59,10 @@ const parseNumber = (v) => {
 };
 
 export const urlPrintParams = {
-    print_height: (v) => [parseNumber(v), "height"],
-    print_width: (v) => [parseNumber(v), "width"],
-    print_margin: (v) => [parseNumber(v), "margin"],
-    print_scale: (v) => [parseNumber(v), "scale"],
-    print_scaleLine: (v) => [v === "true", "scaleLine"],
-    print_scaleValue: (v) => [v === "true", "scaleValue"],
+    print_height: { fromParam: (v) => parseNumber(v), setting: "height" },
+    print_width: { fromParam: (v) => parseNumber(v), setting: "width" },
+    print_margin: { fromParam: (v) => parseNumber(v), setting: "margin" },
+    print_scale: { fromParam: (v) => parseNumber(v), setting: "scale" },
+    print_scaleLine: { fromParam: (v) => v === "true", setting: "scaleLine" },
+    print_scaleValue: { fromParam: (v) => v === "true", setting: "scaleValue" },
 };
