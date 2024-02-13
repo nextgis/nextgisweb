@@ -1,4 +1,5 @@
 import { toPng } from "html-to-image";
+import type { Coordinate } from "ol/coordinate";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -39,7 +40,9 @@ import "./PrintPanel.less";
 interface PrintMapCompProps {
     settings: PrintMapSettings;
     display: DojoDisplay;
+    initCenter: Coordinate;
     onScaleChange: (scale: number) => void;
+    onCenterChange: (center: Coordinate) => void;
 }
 
 type Comp = ReturnType<typeof reactApp<PrintMapCompProps>>;
@@ -53,7 +56,9 @@ interface PrintMapCompElements {
 const makePrintMapComp = ({
     settings,
     display,
+    initCenter,
     onScaleChange,
+    onCenterChange,
 }: PrintMapCompProps): PrintMapCompElements => {
     const div = document.createElement("div");
     div.classList.add("print-map-pane");
@@ -70,9 +75,10 @@ const makePrintMapComp = ({
 
     const comp: ReturnType<typeof reactApp<PrintMapCompProps>> = reactApp(
         PrintMap,
-        { settings, display, onScaleChange },
+        { settings, display, initCenter, onScaleChange, onCenterChange },
         div
     );
+
     return { comp, element: div, resizeObserver };
 };
 
@@ -164,8 +170,12 @@ const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
 const getPrintMapLink = (mapSettings: PrintMapSettings): string => {
     const parsed = URL.getURLParams();
 
-    for (const [urlParam, { setting }] of Object.entries(urlPrintParams)) {
-        parsed[urlParam] = mapSettings[setting];
+    for (const [urlParam, settingInfo] of Object.entries(urlPrintParams)) {
+        const { setting } = settingInfo;
+        const mapSettingValue = mapSettings[setting];
+        parsed[urlParam] = settingInfo.toParam
+            ? settingInfo.toParam(mapSettingValue)
+            : mapSettingValue;
     }
 
     const origin = window.location.origin;
@@ -192,9 +202,12 @@ export const PrintPanel = ({
     const [mapSettings, setMapSettings] = useState<PrintMapSettings>(
         defaultPanelMapSettings
     );
+    const [urlParsed, setUrlParsed] = useState(false);
+    const [mapInit, setMapInit] = useState(false);
     const [paperFormat, setPaperFormat] = useState("210_297");
     const [disableChangeSize, setDisableChangeSize] = useState(true);
     const [scales, setScales] = useState(scalesList);
+    const [center, setCenter] = useState<Coordinate>();
     const [printMapScale, setPrintMapScale] = useState<number>();
     const [printMapComp, setPrintMapComp] = useState<Comp>();
     const [printMapEl, setPrintMapEl] = useState<HTMLElement>();
@@ -205,39 +218,6 @@ export const PrintPanel = ({
     const updateMapSettings = (updateSettings: Partial<PrintMapSettings>) => {
         const newMapSettings = { ...mapSettings, ...updateSettings };
         setMapSettings(newMapSettings);
-    };
-
-    const show = () => {
-        const {
-            comp,
-            element,
-            resizeObserver: resize,
-        } = makePrintMapComp({
-            settings: mapSettings,
-            display,
-            onScaleChange: (scale: number) => {
-                setPrintMapScale(scale);
-            },
-        });
-        setPrintMapComp(comp);
-        setPrintMapEl(element);
-        resizeObserver.current = resize;
-    };
-
-    const hide = () => {
-        setTimeout(() => {
-            if (resizeObserver.current) {
-                resizeObserver.current.disconnect();
-            }
-            if (printMapComp) {
-                printMapComp.unmount();
-            }
-            setPrintMapComp(undefined);
-            setPrintMapEl(undefined);
-            if (printMapEl) {
-                printMapEl.remove();
-            }
-        });
     };
 
     const changePaperFormat = (newPaperFormat: string) => {
@@ -254,7 +234,7 @@ export const PrintPanel = ({
         }
     };
 
-    useEffect(() => {
+    if (!urlParsed) {
         const urlSettings = getPrintUrlSettings();
 
         const keysPaperSize = ["height", "width"];
@@ -265,11 +245,67 @@ export const PrintPanel = ({
         }
 
         updateMapSettings(urlSettings);
-    }, []);
+        setUrlParsed(true);
+    }
+
+    const getCenterFromUrl = (): Coordinate => {
+        if (mapInit) {
+            return undefined;
+        }
+
+        const urlSettings = getPrintUrlSettings();
+        return urlSettings.center;
+    };
+
+    const show = () => {
+        const {
+            comp,
+            element,
+            resizeObserver: resize,
+        } = makePrintMapComp({
+            settings: mapSettings,
+            display,
+            initCenter: getCenterFromUrl(),
+            onScaleChange: (scale: number) => {
+                setPrintMapScale(scale);
+            },
+            onCenterChange: (center: Coordinate) => {
+                setCenter(center);
+            },
+        });
+        setPrintMapComp(comp);
+        setPrintMapEl(element);
+        resizeObserver.current = resize;
+        setMapInit(true);
+    };
+
+    const hide = () => {
+        setTimeout(() => {
+            updateMapSettings({ scale: undefined });
+            if (resizeObserver.current) {
+                resizeObserver.current.disconnect();
+            }
+            if (printMapComp) {
+                printMapComp.unmount();
+            }
+            setPrintMapComp(undefined);
+            setPrintMapEl(undefined);
+            if (printMapEl) {
+                printMapEl.remove();
+            }
+        });
+    };
 
     useEffect(() => {
         visible ? show() : hide();
     }, [visible]);
+
+    useEffect(() => {
+        if (!center) {
+            return;
+        }
+        updateMapSettings({ center: center });
+    }, [center]);
 
     useEffect(() => {
         if (printMapComp) {

@@ -65,4 +65,15 @@ export const urlPrintParams = {
     print_scale: { fromParam: (v) => parseNumber(v), setting: "scale" },
     print_scaleLine: { fromParam: (v) => v === "true", setting: "scaleLine" },
     print_scaleValue: { fromParam: (v) => v === "true", setting: "scaleValue" },
+    print_center: {
+        fromParam: (centerParam) => {
+            if (!centerParam) return null;
+            const coordStr = decodeURIComponent(centerParam).split(",");
+            return coordStr.map((i) => parseFloat(i));
+        },
+        toParam: (center) => {
+            return center.map((i) => i.toFixed(4)).join(",");
+        },
+        setting: "center",
+    },
 };

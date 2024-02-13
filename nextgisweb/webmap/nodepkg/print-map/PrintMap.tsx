@@ -2,6 +2,7 @@ import debounce from "lodash-es/debounce";
 import Map from "ol/Map";
 import type OlMap from "ol/Map";
 import View from "ol/View";
+import type { Coordinate } from "ol/coordinate";
 import { defaults as defaultInteractions } from "ol/interaction";
 import { useEffect, useRef, useState } from "react";
 
@@ -87,12 +88,15 @@ export interface PrintMapSettings {
     scale?: number;
     scaleLine: boolean;
     scaleValue: boolean;
+    center?: Coordinate;
 }
 
 interface PrintMapProps {
     settings: PrintMapSettings;
+    initCenter: Coordinate;
     display: DojoDisplay;
     onScaleChange: (scale: number) => void;
+    onCenterChange: (center: Coordinate) => void;
 }
 
 class PrintMapStyle {
@@ -137,7 +141,9 @@ class PrintMapStyle {
 export const PrintMap = ({
     settings,
     display,
+    initCenter,
     onScaleChange,
+    onCenterChange,
 }: PrintMapProps) => {
     const { width, height, margin, scale, scaleLine, scaleValue } = settings;
     const printMapRef = useRef<HTMLDivElement>(null);
@@ -158,8 +164,28 @@ export const PrintMap = ({
     useEffect(() => {
         if (printMapRef.current) {
             const map = buildMap(printMapRef.current, display);
-            const onChangeScale = debounce((scale) => {
-                onScaleChange(scale);
+
+            if (initCenter) {
+                const view = map.getView();
+                view.setCenter(initCenter);
+            }
+
+            const fireChangeCenter = () => {
+                if (!onCenterChange) {
+                    return;
+                }
+                const centerPrintMap = map.getView().getCenter();
+                onCenterChange(centerPrintMap);
+            };
+
+            const viewCenterChange = debounce(() => {
+                fireChangeCenter();
+            }, 100);
+            map.getView().on("change:center", viewCenterChange);
+            fireChangeCenter();
+
+            const onChangeScale = debounce((scale: string) => {
+                onScaleChange(parseInt(scale, 10));
             }, 100);
 
             const mapScale = new MapScaleControl({
