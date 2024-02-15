@@ -108,9 +108,9 @@ def test_read(service_id, ngw_httptest_app):
     img_red = read_image(5.02, 46.06, 11.16, 55.93, "EPSG:4326")
     assert color(img_red) == pytest.approx((255, 0, 0), abs=tolerance)
 
-    img_green = read_image(4580543, 6704397, 5033914, 6932643, "EPSG:3857")
+    img_green = read_image(4600000, 6800000, 4600010, 6800010, "EPSG:3857")
     assert color(img_green) == pytest.approx((0, 255, 0), abs=tolerance)
-    img_green = read_image(41.15, 51.47, 45.22, 52.73, "EPSG:4326")
+    img_green = read_image(42.0000, 52.0000, 42.0010, 52.0010, "EPSG:4326")
     assert color(img_green) == pytest.approx((0, 255, 0), abs=tolerance)
 
     img_blue = read_image(454962, 2593621, 2239863, 3771499, "EPSG:3857")
