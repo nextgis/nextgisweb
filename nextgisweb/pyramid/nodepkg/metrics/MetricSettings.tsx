@@ -122,7 +122,7 @@ export function MetricsSettings() {
         setStatus("saving");
         try {
             const payload = Object.fromEntries(
-                Object.entries(value).filter(([, v]) => v)
+                Object.entries(value || {}).filter(([, v]) => v)
             );
 
             await route("pyramid.csettings").put({

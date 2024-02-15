@@ -31,7 +31,7 @@ export const ImageThumbnail = ({
     resourceId,
     attachment,
 }: ImageThumbnailProps) => {
-    const [url, setUrl] = useState<string>(null);
+    const [url, setUrl] = useState<string>();
     useEffect(() => {
         async function fetchImage() {
             if (!isFeatureAttachment(attachment)) {

@@ -47,10 +47,13 @@ export function RasterStyleEditor({
     const [form] = Form.useForm();
 
     const [bands, setBands] = useState<BandOptions[]>([]);
-    const [bandRange, setBandRange] = useState<BandRange>(null);
-    const [initialValues, setInitialValues] = useState<SymbolizerValues>(null);
+    const [bandRange, setBandRange] = useState<BandRange>();
+    const [initialValues, setInitialValues] = useState<SymbolizerValues>();
     useEffect(() => {
         async function getBands() {
+            if (resourceId === undefined) {
+                return;
+            }
             const rasterRes = await route("resource.item", {
                 id: resourceId,
             }).get<ResourceItem>({
@@ -71,15 +74,18 @@ export function RasterStyleEditor({
                 const bandRange_ = getRasterBandRange(dtype);
                 setBandRange(bandRange_);
                 setInitialValues(
-                    getRasterSymbolizerValues(initSymbolizer, bandRange_)
+                    getRasterSymbolizerValues({
+                        symbolizer: initSymbolizer,
+                        bandRange: bandRange_,
+                    })
                 );
             }
         }
         getBands();
-    }, []);
+    }, [initSymbolizer, resourceId]);
 
     const onChange = useCallback(
-        (valueChanged, values) => {
+        (_: unknown, values: SymbolizerValues) => {
             const symbolizer = {
                 type: "raster",
                 channels: {
@@ -121,7 +127,9 @@ export function RasterStyleEditor({
                     },
                 },
             } as Symbolizer;
-            onSymbolizerChange(symbolizer);
+            if (onSymbolizerChange) {
+                onSymbolizerChange(symbolizer);
+            }
         },
         [onSymbolizerChange]
     );

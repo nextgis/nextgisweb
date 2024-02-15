@@ -9,6 +9,7 @@ import type {
 import { Button, Tabs } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component/SaveButton";
 import { ErrorModal } from "@nextgisweb/gui/error/ErrorModal";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import showModal from "@nextgisweb/gui/showModal";
 import type { ParamOf } from "@nextgisweb/gui/type";
@@ -133,7 +134,7 @@ export const FeatureEditorWidget = observer(
                             onSave(res);
                         }
                     } catch (error) {
-                        showModal(ErrorModal, { error: error });
+                        showModal(ErrorModal, { error: error as ApiError });
                     }
                 }}
             >

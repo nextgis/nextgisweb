@@ -19,7 +19,7 @@ interface AttachmentTableProps {
     isSmall: boolean | undefined;
 }
 
-function fileSizeToString(size) {
+function fileSizeToString(size: number) {
     const units = ["B", "KB", "MB", "GB"];
     let i = 0;
     while (size >= 1024) {
