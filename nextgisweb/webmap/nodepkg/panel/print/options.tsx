@@ -1,5 +1,7 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { PrintMapSettings } from "../../print-map/PrintMap";
+
 import {
     FileImageOutlined,
     FileJpgOutlined,
@@ -9,9 +11,18 @@ import {
 const msgPortrait = gettext("Portrait");
 const msgLandscape = gettext("Landscape");
 
-export const pageFormats = [];
+interface PageFormat {
+    label: string;
+    value: string;
+}
+interface Scale {
+    label: string;
+    value: number;
+}
 
-function addPageFormat(label, width, height) {
+export const pageFormats: PageFormat[] = [];
+
+function addPageFormat(label: string, width: number, height: number) {
     pageFormats.push({
         value: `${width}_${height}`,
         label: `${label} - ${msgPortrait}`,
@@ -33,11 +44,11 @@ const scalesValues = [
 
 const numberFormat = new Intl.NumberFormat("ru-RU");
 
-export const scaleToLabel = (scale) => {
+export const scaleToLabel = (scale: number) => {
     return `1 : ${numberFormat.format(scale)}`;
 };
 
-export const scalesList = [];
+export const scalesList: Scale[] = [];
 scalesValues.forEach((value) => {
     const label = scaleToLabel(value);
     scalesList.push({
@@ -53,16 +64,33 @@ export const exportFormats = [
     { label: gettext("PDF"), key: "pdf", icon: <FilePdfOutlined /> },
 ];
 
-const parseNumber = (v) => {
+const parseNumber = (v: string) => {
     const parsed = parseInt(v, 10);
     return isNaN(parsed) ? undefined : parsed;
 };
 
-export const urlPrintParams = {
-    print_height: { fromParam: (v) => parseNumber(v), setting: "height" },
-    print_width: { fromParam: (v) => parseNumber(v), setting: "width" },
-    print_margin: { fromParam: (v) => parseNumber(v), setting: "margin" },
-    print_scale: { fromParam: (v) => parseNumber(v), setting: "scale" },
+type SettingKey = keyof PrintMapSettings;
+
+interface PrintParam<T> {
+    fromParam: (val: string) => T | undefined;
+    setting: SettingKey;
+    toParam?: (val: T) => string | undefined;
+}
+
+type StringKeyOf<T> = Extract<keyof T, string>;
+
+export type UrlPrintParams<T> = {
+    [K in StringKeyOf<T> as `print_${K}`]: PrintParam<T[K]>;
+};
+
+export const urlPrintParams: UrlPrintParams<PrintMapSettings> = {
+    print_height: {
+        fromParam: parseNumber,
+        setting: "height",
+    },
+    print_width: { fromParam: parseNumber, setting: "width" },
+    print_margin: { fromParam: parseNumber, setting: "margin" },
+    print_scale: { fromParam: parseNumber, setting: "scale" },
     print_scaleLine: { fromParam: (v) => v === "true", setting: "scaleLine" },
     print_scaleValue: { fromParam: (v) => v === "true", setting: "scaleValue" },
     print_center: {
@@ -72,6 +100,9 @@ export const urlPrintParams = {
             return coordStr.map((i) => parseFloat(i));
         },
         toParam: (center) => {
+            if (!center) {
+                return;
+            }
             return center.map((i) => i.toFixed(4)).join(",");
         },
         setting: "center",

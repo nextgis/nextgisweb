@@ -32,6 +32,7 @@ import {
     scalesList,
     urlPrintParams,
 } from "./options";
+import type { UrlPrintParams } from "./options";
 
 import { DownOutlined, ShareAltOutlined } from "@ant-design/icons";
 
@@ -40,7 +41,7 @@ import "./PrintPanel.less";
 interface PrintMapCompProps {
     settings: PrintMapSettings;
     display: DojoDisplay;
-    initCenter: Coordinate;
+    initCenter: Coordinate | null;
     onScaleChange: (scale: number) => void;
     onCenterChange: (center: Coordinate) => void;
 }
@@ -150,10 +151,16 @@ const defaultPanelMapSettings: PrintMapSettings = {
 };
 
 const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
-    const parsed = URL.getURLParams();
+    const parsed = URL.getURLParams() as Record<
+        keyof UrlPrintParams<PrintMapSettings>,
+        string
+    >;
 
-    const settingsUrl = {};
-    for (const [urlParam, urlValue] of Object.entries(parsed)) {
+    const settingsUrl: Record<string, unknown> = {};
+    for (const [urlParam, urlValue] of Object.entries(parsed) as [
+        keyof UrlPrintParams<PrintMapSettings>,
+        string,
+    ][]) {
         if (!(urlParam in urlPrintParams) || urlValue === null) {
             continue;
         }
@@ -162,9 +169,9 @@ const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
         if (value === undefined) {
             continue;
         }
-        settingsUrl[setting] = value;
+        settingsUrl[setting] = value as PrintMapSettings[typeof setting];
     }
-    return settingsUrl;
+    return settingsUrl as Partial<PrintMapSettings>;
 };
 
 const getPrintMapLink = (mapSettings: PrintMapSettings): string => {
@@ -174,7 +181,7 @@ const getPrintMapLink = (mapSettings: PrintMapSettings): string => {
         const { setting } = settingInfo;
         const mapSettingValue = mapSettings[setting];
         parsed[urlParam] = settingInfo.toParam
-            ? settingInfo.toParam(mapSettingValue)
+            ? settingInfo.toParam(mapSettingValue as never)
             : mapSettingValue;
     }
 
@@ -237,24 +244,26 @@ export const PrintPanel = ({
     if (!urlParsed) {
         const urlSettings = getPrintUrlSettings();
 
-        const keysPaperSize = ["height", "width"];
+        const keysPaperSize: (keyof PrintMapSettings)[] = ["height", "width"];
         if (keysPaperSize.every((k) => k in urlSettings)) {
             changePaperFormat("custom");
         } else {
-            keysPaperSize.forEach((k) => delete urlSettings[k]);
+            keysPaperSize.forEach((k) => {
+                delete urlSettings[k];
+            });
         }
 
         updateMapSettings(urlSettings);
         setUrlParsed(true);
     }
 
-    const getCenterFromUrl = (): Coordinate => {
+    const getCenterFromUrl = (): Coordinate | null => {
         if (mapInit) {
-            return undefined;
+            return null;
         }
 
         const urlSettings = getPrintUrlSettings();
-        return urlSettings.center;
+        return urlSettings.center || null;
     };
 
     const show = () => {

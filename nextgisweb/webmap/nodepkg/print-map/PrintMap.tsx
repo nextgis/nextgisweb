@@ -88,12 +88,12 @@ export interface PrintMapSettings {
     scale?: number;
     scaleLine: boolean;
     scaleValue: boolean;
-    center?: Coordinate;
+    center?: Coordinate | null;
 }
 
 interface PrintMapProps {
     settings: PrintMapSettings;
-    initCenter: Coordinate;
+    initCenter: Coordinate | null;
     display: DojoDisplay;
     onScaleChange: (scale: number) => void;
     onCenterChange: (center: Coordinate) => void;
@@ -175,7 +175,9 @@ export const PrintMap = ({
                     return;
                 }
                 const centerPrintMap = map.getView().getCenter();
-                onCenterChange(centerPrintMap);
+                if (centerPrintMap) {
+                    onCenterChange(centerPrintMap);
+                }
             };
 
             const viewCenterChange = debounce(() => {
