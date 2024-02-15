@@ -2,6 +2,7 @@
     "name": "@nextgisweb/gui",
     "version": "0.0.0",
     "type": "module",
+    "sideEffects": ["*.css", "*.less"],
     "dependencies": {
         "@ckeditor/ckeditor5-react": "6.0.0",
         "@codemirror/commands": "^6.2.1",

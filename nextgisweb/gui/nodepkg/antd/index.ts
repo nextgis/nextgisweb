@@ -67,4 +67,4 @@ export { default as RangePicker } from "./range-date-time-picker";
 export { default as Table } from "./table";
 export { default as Tabs } from "./tabs";
 
-export * from "./type";
+export type * from "./type";
