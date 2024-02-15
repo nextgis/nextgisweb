@@ -1,6 +1,6 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-export const getGeometryTypeTitle = (geometryType) => {
+export const getGeometryTypeTitle = (geometryType: string) => {
     switch (geometryType) {
         case "point": {
             return gettext("Point");

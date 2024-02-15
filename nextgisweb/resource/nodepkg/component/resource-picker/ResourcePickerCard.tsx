@@ -28,7 +28,7 @@ export function ResourcePickerCard<V extends SelectValue = SelectValue>({
     store,
 }: ResourcePickerCardProps<V>) {
     const style = cardOptions.style || defaultStyle;
-    const bodyStyle = cardOptions.styles.body || defaultBodyStyle;
+    const bodyStyle = cardOptions.styles?.body || defaultBodyStyle;
 
     const [resourceStore] = useState(
         () => store || new ResourcePickerStore(pickerOptions)

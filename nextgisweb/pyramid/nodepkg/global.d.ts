@@ -15,6 +15,12 @@ declare const ngwConfig: {
     plurals: [number, { (n: number): number }];
 };
 
+declare const dojoConfig: {
+    baseUrl: string;
+    isDebug: boolean;
+    locale: string;
+};
+
 declare module "@nextgisweb/pyramid/settings!pyramid" {
     interface Language {
         display_name: string;

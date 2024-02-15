@@ -17,7 +17,7 @@ const msgSiMi = gettext("mi");
 const msgSiHa = gettext("ha");
 const msgSiAc = gettext("ac");
 
-interface DefaultConfig {
+export interface DefaultConfig {
     format: "html-string" | "jsx";
     locale: string;
 }
@@ -223,7 +223,7 @@ const metersAreaToUnit = (meters: number, unit: string): MetersResult => {
  */
 export const formatCoordinatesValue = (
     value: number,
-    locale: string
+    locale?: string
 ): string => {
     const numberRound = roundValue(value, 2);
     return numberRound.toLocaleString(locale);
