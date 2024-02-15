@@ -3,6 +3,7 @@ import { useMemo } from "react";
 
 import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Select, Space } from "@nextgisweb/gui/antd";
+import type { SelectProps } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
 import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -31,7 +32,10 @@ const msgApplyThis = gettext("This resource only");
 
 const msgAllPermissions = gettext("All permissions");
 
-const selectDefaults = { allowClear: false, bordered: false };
+const selectDefaults: Pick<SelectProps, "allowClear" | "variant"> = {
+    allowClear: false,
+    variant: "borderless",
+};
 
 const IconText = ({
     icon,
@@ -87,9 +91,9 @@ const Principal = observer(({ row }: { row: Item }) => {
     return (
         <PrincipalSelect
             systemUsers
-            value={value ? Number(value) : undefined}
             onChange={onChange}
             {...selectDefaults}
+            value={value ? Number(value) : undefined}
             placeholder={msgColPrincipal}
         />
     );

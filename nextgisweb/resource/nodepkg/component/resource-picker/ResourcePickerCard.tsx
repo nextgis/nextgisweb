@@ -28,7 +28,7 @@ export function ResourcePickerCard<V extends SelectValue = SelectValue>({
     store,
 }: ResourcePickerCardProps<V>) {
     const style = cardOptions.style || defaultStyle;
-    const bodyStyle = cardOptions.bodyStyle || defaultBodyStyle;
+    const bodyStyle = cardOptions.styles.body || defaultBodyStyle;
 
     const [resourceStore] = useState(
         () => store || new ResourcePickerStore(pickerOptions)
@@ -48,7 +48,7 @@ export function ResourcePickerCard<V extends SelectValue = SelectValue>({
     return (
         <Card
             style={style}
-            bodyStyle={bodyStyle}
+            styles={{ body: bodyStyle }}
             className="ngw-resource-resource-picker-card"
             {...cardOptions}
             title={

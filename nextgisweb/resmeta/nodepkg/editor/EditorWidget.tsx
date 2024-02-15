@@ -37,7 +37,7 @@ const InputKey = observer(
                     }
                     row.update(props);
                 }}
-                bordered={false}
+                variant="borderless"
                 placeholder={placeholder ? msgTypeToAdd : undefined}
             />
         );
@@ -52,7 +52,7 @@ const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
                 onChange={(e) => {
                     row.update({ value: e.target.value });
                 }}
-                bordered={false}
+                variant="borderless"
             />
         );
     } else if (row.type === "number") {
@@ -63,7 +63,7 @@ const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
                 onChange={(newValue) => {
                     row.update({ value: newValue });
                 }}
-                bordered={false}
+                variant="borderless"
             />
         );
     } else if (row.type === "boolean") {
@@ -73,7 +73,7 @@ const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
                 onChange={(value) => {
                     row.update({ value: value });
                 }}
-                bordered={false}
+                variant="borderless"
                 popupMatchSelectWidth={false}
             >
                 <Option value={false}>{gettext("False")}</Option>
@@ -92,7 +92,7 @@ const SelectType = observer(({ row }: ComponentProps<RecordItem>) => {
             onChange={(value) => {
                 row.update({ type: value });
             }}
-            bordered={false}
+            variant="borderless"
             popupMatchSelectWidth={false}
         >
             <Option value="string">{gettext("String")}</Option>

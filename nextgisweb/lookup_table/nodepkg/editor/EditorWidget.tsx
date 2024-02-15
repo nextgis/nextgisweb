@@ -51,7 +51,7 @@ const InputKey = observer(
                     }
                     row.update(props);
                 }}
-                bordered={false}
+                variant="borderless"
                 placeholder={placeholder ? msgTypeToAdd : undefined}
             />
         );
@@ -66,7 +66,7 @@ const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
                 onChange={(e) => {
                     row.update({ value: e.target.value });
                 }}
-                bordered={false}
+                variant="borderless"
             />
         );
     }

@@ -23,7 +23,7 @@ export function BasemapSelector({ map, basemapDefault, onChange }) {
             options={options}
             onChange={(key) => onChange(key)}
             style={{ width: "100%" }}
-            bordered={false}
+            variant="borderless"
             suffixIcon={<UpOutlined style={{ pointerEvents: "none" }} />}
         />
     );

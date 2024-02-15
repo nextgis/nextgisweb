@@ -357,7 +357,7 @@ export const SearchPanel = ({ display, close }) => {
             <div className="control">
                 <Input
                     onChange={searchChange}
-                    bordered={false}
+                    variant="borderless"
                     placeholder={gettext("Enter at least 2 characters")}
                     value={searchText}
                 />
