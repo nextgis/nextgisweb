@@ -1,5 +1,4 @@
 import type { Projection } from "ol/proj";
-import ReactDOMServer from "react-dom/server";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -64,7 +63,7 @@ const makeDomResult = (
         </>
     );
     if (format === "html-string") {
-        return ReactDOMServer.renderToStaticMarkup(domResult);
+        return `${value} ${postfix}`;
     } else if (format === "jsx") {
         return domResult;
     } else {
