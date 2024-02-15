@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-
 import { Spin } from "@nextgisweb/gui/antd";
-import { route } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import {
@@ -9,49 +7,49 @@ import {
     formatMetersArea,
     formatMetersLength,
 } from "@nextgisweb/webmap/utils/format-units";
+import type { DefaultConfig } from "@nextgisweb/webmap/utils/format-units";
 import { getGeometryTypeTitle } from "@nextgisweb/webmap/utils/geometry-types";
+
+import type { GeometryInfo } from "../type/GeometryInfo";
 
 import "./GeometryInfo.less";
 
-const loadGeometryInfo = async (layerId, featureId) => {
-    const geoInfoRoute = route("feature_layer.feature.geometry_info", {
-        id: layerId,
-        fid: featureId,
-    });
-    const query = {
-        srs: webmapSettings.measurement_srid,
-    };
-    return await geoInfoRoute.get({ query });
-};
-
-const locale = window.dojoConfig.locale;
-const formatConfig = {
+const locale = dojoConfig.locale;
+const formatConfig: DefaultConfig = {
     format: "jsx",
     locale,
 };
 
-const formatLength = (length) =>
+const formatLength = (length: number) =>
     formatMetersLength(length, webmapSettings.units_length, formatConfig);
-const formatArea = (area) =>
+const formatArea = (area: number) =>
     formatMetersArea(area, webmapSettings.units_area, formatConfig);
 
-export function GeometryInfo({ layerId, featureId }) {
-    const [status, setStatus] = useState("loading");
-    const [geometryInfo, setGeometryInfo] = useState(undefined);
+export function GeometryInfo({
+    layerId,
+    featureId,
+}: {
+    layerId: number;
+    featureId: number;
+}) {
+    const {
+        data: geometryInfo,
+        isLoading,
+        error,
+    } = useRouteGet<GeometryInfo>({
+        name: "feature_layer.feature.geometry_info",
+        params: {
+            id: layerId,
+            fid: featureId,
+        },
+        options: {
+            query: {
+                srs: webmapSettings.measurement_srid,
+            },
+        },
+    });
 
-    async function load() {
-        try {
-            const geometryInfo = await loadGeometryInfo(layerId, featureId);
-            setGeometryInfo(geometryInfo);
-            setStatus("loaded");
-        } catch (err) {
-            setStatus("error");
-        }
-    }
-
-    useEffect(() => load(), []);
-
-    if (status === "loading") {
+    if (isLoading) {
         return (
             <div className="loading">
                 <Spin />
@@ -60,7 +58,7 @@ export function GeometryInfo({ layerId, featureId }) {
         );
     }
 
-    if (status === "error") {
+    if (error || !geometryInfo) {
         return (
             <div className="error">
                 <div>
