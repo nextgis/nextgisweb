@@ -3,8 +3,9 @@ import sys
 import traceback
 import warnings
 from hashlib import md5
+from typing import cast
 
-from pyramid import httpexceptions
+import pyramid.httpexceptions as httpexceptions
 from pyramid.renderers import render_to_response
 from pyramid.request import RequestLocalCache
 from pyramid.response import Response
@@ -273,5 +274,5 @@ for exc, title, explanation in (
         _("The server is currently unavailable. " "Please try again at a later time."),
     ),
 ):
-    exc.title = title
-    exc.explanation = explanation
+    exc.title = cast(str, title)
+    exc.explanation = cast(str, explanation)
