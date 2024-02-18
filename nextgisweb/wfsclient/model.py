@@ -501,9 +501,10 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 bbox = layer["bbox"]
                 return dict(
                     minLon=bbox[0],
-                    maxLon=bbox[2],
                     minLat=bbox[1],
-                    maxLat=bbox[3])
+                    maxLon=bbox[2],
+                    maxLat=bbox[3],
+                )
         raise ValueError(f"Layer {self.layer_name} not found in Capabilities.")
 
 

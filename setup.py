@@ -62,7 +62,7 @@ requires = [
 
 extras_require = dict(
     development=[
-        "black",
+        "black<24",
         "bump2version",
         "coverage",
         "flake8-future-import",
