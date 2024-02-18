@@ -8,7 +8,7 @@ from msgspec.inspect import type_info
 from msgspec.structs import asdict
 from typing_extensions import Annotated
 
-from .util import expannotated, mkannotated
+from .util import annotate, disannotate
 
 
 def flag(value: str):
@@ -59,7 +59,7 @@ def derive(struct: ST, *spec) -> ST:
     ti = type_info(struct)
     nsfields = list()
     for f in ti.fields:
-        ftype, fmeta = expannotated(ann[f.name])
+        ftype, fmeta = disannotate(ann[f.name])
         fdefault = f.default
         fnmeta = list()
         control = None
@@ -85,10 +85,10 @@ def derive(struct: ST, *spec) -> ST:
             continue  # Skip this field
 
         if control is Control.MAY:
-            utype = Union[mkannotated(ftype, fnmeta), UnsetType]
+            utype = Union[annotate(ftype, fnmeta), UnsetType]
             nsfields.append((f.name, utype, UNSET))
         else:
-            nsfields.append((f.name, mkannotated(ftype, fnmeta), fdefault))
+            nsfields.append((f.name, annotate(ftype, fnmeta), fdefault))
 
     name = struct.__name__.lstrip("_")  # type: ignore
     name += "".join(s.value for s in spec if s.value)

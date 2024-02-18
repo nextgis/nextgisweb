@@ -9,7 +9,7 @@ from typing_extensions import Annotated
 
 from nextgisweb.env import Component
 from nextgisweb.lib.apitype import ContentType as CType
-from nextgisweb.lib.apitype import JSONType, deannotated, is_optional, iter_anyof
+from nextgisweb.lib.apitype import JSONType, is_optional, iter_anyof, unannotate
 from nextgisweb.lib.apitype import StatusCode as SCode
 
 from ..tomb import is_json_type, iter_routes
@@ -17,7 +17,7 @@ from .docstring import Doctring
 
 
 def _apply_json_content_type(ct, tdef):
-    if ct == CType.EMPTY and is_json_type(deannotated(tdef)):
+    if ct == CType.EMPTY and is_json_type(unannotate(tdef)):
         return CType.JSON
     return ct
 

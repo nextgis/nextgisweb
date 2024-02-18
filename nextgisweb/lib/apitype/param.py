@@ -4,7 +4,7 @@ from typing import Union, get_args, get_origin
 from msgspec import Meta, convert
 from typing_extensions import Annotated
 
-from .util import deannotated
+from .util import unannotate
 
 _INT_STR = Annotated[str, Meta(pattern=r"^-?[0-9]+$")]
 _FLOAT_STR = Annotated[str, Meta(pattern=r"^-?[0-9]+(\.[0-9]+)?$")]
@@ -41,12 +41,12 @@ def item_decoder(tdef, bdef):
 
 
 def param_decoder(tdef):
-    bdef = deannotated(tdef)
+    bdef = unannotate(tdef)
     if get_origin(bdef) is not list:
         return item_decoder(tdef, bdef)
 
     itdef = get_args(bdef)[0]
-    ibdef = deannotated(itdef)
+    ibdef = unannotate(itdef)
     idecode = item_decoder(itdef, ibdef)
 
     def _decode(val):

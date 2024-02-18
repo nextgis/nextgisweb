@@ -5,4 +5,4 @@ from .struct import OP, Default, Derived, ReadOnly, Required, flag, omit, struct
 from .struct import Default as DEF
 from .struct import ReadOnly as RO
 from .struct import Required as REQ
-from .util import deannotated, is_optional, msgspec_metadata
+from .util import is_optional, msgspec_metadata, unannotate
