@@ -105,7 +105,8 @@ const dynamicEntries = () => {
                         `import entrypoint from "@nextgisweb/jsrealm/entrypoint";`,
                         `import { registry } from "${fullname}";`,
                         ...(plScopeFiles[registry] || []).map(
-                            (fn) => `import "${fn}";`
+                            // Import + side-effect to avoid shaking out
+                            (fn, i) => `import * as m${i} from "${fn}"; m${i};`
                         ),
                     ];
 
