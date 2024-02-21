@@ -280,7 +280,6 @@ def setup_pyramid(comp, config):
         "feature_attachment.export",
         "/api/resource/{id}/feature_attachment/export",
         factory=feature_layer_factory,
-        types=dict(fid=FeatureID),
         get=export,
     )
 
@@ -288,6 +287,5 @@ def setup_pyramid(comp, config):
         "feature_attachment.import",
         "/api/resource/{id}/feature_attachment/import",
         factory=feature_layer_factory,
-        types=dict(fid=FeatureID),
         put=import_attachment,
     )
