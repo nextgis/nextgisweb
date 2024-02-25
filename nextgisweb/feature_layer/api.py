@@ -3,10 +3,13 @@ import re
 import tempfile
 import uuid
 import zipfile
-from datetime import date, datetime, time
-from typing import List, Optional
+from contextlib import contextmanager
+from dataclasses import dataclass
+from enum import Enum
+from functools import cached_property, partial
+from typing import Any, List, Optional
 
-from msgspec import Meta
+from msgspec import UNSET, Meta
 from osgeo import gdal, ogr
 from pyramid.httpexceptions import HTTPNoContent, HTTPNotFound
 from pyramid.response import FileResponse, Response
@@ -24,19 +27,21 @@ from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
 
+from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
 from .feature import Feature
 from .interface import (
-    FIELD_TYPE,
     IFeatureLayer,
     IFeatureQueryClipByBox,
     IFeatureQueryIlike,
     IFeatureQueryLike,
     IFeatureQuerySimplify,
+    IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
 from .ogrdriver import EXPORT_FORMAT_OGR, MVT_DRIVER_EXIST
+from .versioning import FVersioningNotEnabled, FVersioningOutOfRange
 
 PERM_READ = DataScope.read
 PERM_WRITE = DataScope.write
@@ -55,7 +60,14 @@ def _ogr_ds(driver, options):
 
 
 def _ogr_layer_from_features(
-    layer, features, *, ds, name="", fields=None, use_display_name=False, fid=None
+    layer,
+    features,
+    *,
+    ds,
+    name="",
+    fields=None,
+    use_display_name=False,
+    fid=None,
 ):
     layer_fields = (
         layer.fields
@@ -80,18 +92,6 @@ def _ogr_layer_from_features(
         ogr_layer.CreateFeature(f.to_ogr(layer_defn, **f_kw))
 
     return ogr_layer
-
-
-def _extensions(extensions, layer):
-    result = []
-
-    ext_filter = None if extensions is None else extensions.split(",")
-
-    for identity, cls in FeatureExtension.registry.items():
-        if ext_filter is None or identity in ext_filter:
-            result.append((identity, cls(layer)))
-
-    return result
 
 
 class ExportOptions:
@@ -447,137 +447,190 @@ def mvt(
         gdal.Unlink(vsibuf)
 
 
-def deserialize(feat, data, geom_format="wkt", dt_format="obj", transformer=None, create=False):
-    if "geom" in data:
-        try:
-            if geom_format == "wkt":
-                feat.geom = Geometry.from_wkt(data["geom"])
-            elif geom_format == "geojson":
-                feat.geom = Geometry.from_geojson(data["geom"])
+ParamLabel = bool
+ParamGeom = bool
+ParamGeomNull = bool
+ParamGeomFormat = Enum("ParamGeomFormat", (("WKT", "wkt"), ("GEOJSON", "geojson")))
+ParamDtFormat = Enum("ParamDtFormat", (("ISO", "iso"), ("OBJ", "obj")))
+ParamFields = Optional[str]
+ParamExtensions = Optional[Annotated[str, Meta(pattern=r"^(\w+(,\w+)*)?$")]]
+ParamSrs = Optional[Annotated[int, Meta(gt=0)]]
+ParamVersion = Optional[Annotated[int, Meta(gt=0)]]
+ParamEpoch = Optional[Annotated[int, Meta(gt=0)]]
+ParamOrderBy = Optional[str]
+ParamLimit = Optional[Annotated[int, Meta(ge=0)]]
+ParamOffset = Annotated[int, Meta(ge=0)]
+
+
+@dataclass
+class Loader:
+    resource: Resource
+    geom_null: ParamGeomNull
+    geom_format: ParamGeomFormat
+    dt_format: ParamDtFormat
+    srs: ParamSrs
+
+    @cached_property
+    def geom_loader(self):
+        loader = getattr(Geometry, f"from_{self.geom_format.value}")
+        if self.srs is not None:
+            srs_from = SRS.filter_by(id=self.srs).one()
+            transformer = Transformer(srs_from.wkt, self.resource.srs.wkt)
+            transform = transformer.transform
+            return lambda val: transform(loader(val))
+        return loader
+
+    @cached_property
+    def field_loaders(self):
+        result = dict()
+        for fld in self.resource.fields:
+            fld_datatype = fld.datatype
+            if fld_datatype in DT_DATATYPES:
+                fld_load = DT_LOADERS[self.dt_format.value][fld_datatype]
             else:
-                raise ValidationError(_("Geometry format '%s' is not supported.") % geom_format)
-        except GeometryNotValid:
-            raise ValidationError(_("Geometry is not valid."))
+                fld_load = lambda val: val
+            result[fld.keyname] = fld_load
+        return result
 
-        if transformer is not None:
-            feat.geom = transformer.transform(feat.geom)
+    @cached_property
+    def extension_loaders(self):
+        return dict()
 
-    if dt_format not in ("obj", "iso"):
-        raise ValidationError(_("Date format '%s' is not supported.") % dt_format)
+    def __call__(self, feature: Feature, data: Any):
+        feature.geom = UNSET
+        if (geom := data.get("geom", UNSET)) is not UNSET:
+            if geom is not None or self.geom_null:
+                try:
+                    feature.geom = self.geom_loader(geom)
+                except GeometryNotValid:
+                    raise ValidationError(_("Geometry is not valid."))
 
-    if "fields" in data:
-        fdata = data["fields"]
+        ftarget = feature.fields
+        ftarget.clear()
+        if fsource := data.get("fields"):
+            loaders = self.field_loaders
+            for fkey, fval in fsource.items():
+                if loader := loaders.get(fkey):
+                    if fval is not None:
+                        fval = loader(fval)
+                    ftarget[fkey] = fval
 
-        for fld in feat.layer.fields:
-            if fld.keyname in fdata:
-                val = fdata.get(fld.keyname)
-
-                if val is None:
-                    fval = None
-
-                elif fld.datatype == FIELD_TYPE.DATE:
-                    if dt_format == "iso":
-                        fval = date.fromisoformat(val)
+    def extensions(self, feature, data):
+        updated = False
+        if (source := data.get("extensions")) is not None:
+            loaders = self.extension_loaders
+            for k, v in source.items():
+                if (loader := loaders.get(k)) is None:
+                    if cls := FeatureExtension.registry.get(k):
+                        loaders[k] = loader = cls(feature.layer).deserialize
                     else:
-                        fval = date(int(val["year"]), int(val["month"]), int(val["day"]))
+                        continue
+                updated = loader(feature, v) or updated
+        return updated
 
-                elif fld.datatype == FIELD_TYPE.TIME:
-                    if dt_format == "iso":
-                        fval = time.fromisoformat(val)
-                    else:
-                        fval = time(int(val["hour"]), int(val["minute"]), int(val["second"]))
 
-                elif fld.datatype == FIELD_TYPE.DATETIME:
-                    if dt_format == "iso":
-                        fval = datetime.fromisoformat(val)
-                    else:
-                        fval = datetime(
-                            int(val["year"]),
-                            int(val["month"]),
-                            int(val["day"]),
-                            int(val["hour"]),
-                            int(val["minute"]),
-                            int(val["second"]),
-                        )
+@dataclass
+class Dumper:
+    resource: Resource
+    label: ParamLabel
+    geom: ParamGeom
+    geom_format: ParamGeomFormat
+    fields: ParamFields
+    dt_format: ParamDtFormat
+    extensions: ParamExtensions
+    srs: ParamSrs
+    version: ParamVersion
+    epoch: ParamEpoch
 
-                else:
-                    fval = val
+    @cached_property
+    def geom_dumper(self):
+        if self.geom_format.value == ParamGeomFormat.WKT.value:
+            return lambda val: val.wkt
+        elif self.geom_format.value == ParamGeomFormat.GEOJSON.value:
+            return lambda val: val.to_geojson()
+        else:
+            raise NotImplementedError
 
-                feat.fields[fld.keyname] = fval
+    @cached_property
+    def field_dumpers(self):
+        result = dict()
+        if (fields := self.fields) is not None:
+            if fields == "":
+                return None
+            else:
+                fields_set = set(fields.split(","))
+        else:
+            fields_set = None
 
-    if create:
-        feat.id = feat.layer.feature_create(feat)
+        for fld in self.resource.fields:
+            fld_keyname = fld.keyname
+            if fields_set is not None and fld_keyname not in fields_set:
+                continue
 
-    if "extensions" in data:
+            fld_datatype = fld.datatype
+            if fld_datatype in DT_DATATYPES:
+                fld_dump = DT_DUMPERS[self.dt_format.value][fld_datatype]
+            else:
+                fld_dump = lambda val: val
+            result[fld_keyname] = fld_dump
+        return result
+
+    @cached_property
+    def extension_dumpers(self):
+        result = dict()
+        extensions = self.extensions
+        if extensions is not None:
+            if extensions == "":
+                return None
+            else:
+                extensions_set = set(extensions.split(","))
+        else:
+            extensions_set = None
+
         for identity, cls in FeatureExtension.registry.items():
-            if identity in data["extensions"]:
-                ext = cls(feat.layer)
-                ext.deserialize(feat, data["extensions"][identity])
+            if extensions_set is not None and identity not in extensions_set:
+                continue
+            result[identity] = partial(
+                cls(self.resource).serialize,
+                version=self.version,
+            )
 
+        return result
 
-def serialize(feat, keys=None, geom_format="wkt", dt_format="obj", label=False, extensions=[]):
-    result = dict(id=feat.id)
+    def feature_query(self):
+        query = self.resource.feature_query()
+        feature_query_pit(self.resource, query, self.version, self.epoch)
+        query.fields(*(self.field_dumpers.keys() if self.field_dumpers is not None else ()))
 
-    if label:
-        result["label"] = feat.label
+        if self.geom:
+            query.geom()
+            if self.geom_format == ParamGeomFormat.WKT:
+                query.geom_format("WKT")
+            if self.srs:
+                query.srs(SRS.filter_by(id=self.srs).one())
 
-    if feat.geom is not None:
-        if geom_format == "wkt":
-            geom = feat.geom.wkt
-        elif geom_format == "geojson":
-            geom = feat.geom.to_geojson()
-        else:
-            raise ValidationError(_("Geometry format '%s' is not supported.") % geom_format)
+        return query
 
-        result["geom"] = geom
+    def __call__(self, feature: Feature) -> Any:
+        result = dict(id=feature.id)
+        if self.label:
+            result["label"] = feature.label
 
-    if dt_format not in ("obj", "iso"):
-        raise ValidationError(_("Date format '%s' is not supported.") % dt_format)
+        if self.geom:
+            geom = feature.geom
+            result["geom"] = self.geom_dumper(geom) if geom is not None else None
 
-    result["fields"] = dict()
-    for fld in feat.layer.fields:
-        if keys is not None and fld.keyname not in keys:
-            continue
+        if (fdumpers := self.field_dumpers) is not None:
+            fsource = feature.fields
+            ftarget = result["fields"] = dict()
+            for fkey, fdump in fdumpers.items():
+                fval = fsource[fkey]
+                ftarget[fkey] = fdump(fval) if fval is not None else None
 
-        val = feat.fields.get(fld.keyname)
+        if (edumpers := self.extension_dumpers) is not None:
+            result["extensions"] = {ident: ext(feature) for ident, ext in edumpers.items()}
 
-        if val is None:
-            fval = None
-
-        elif fld.datatype in (FIELD_TYPE.DATE, FIELD_TYPE.TIME, FIELD_TYPE.DATETIME):
-            if dt_format == "iso":
-                fval = val.isoformat()
-            else:
-                if fld.datatype == FIELD_TYPE.DATE:
-                    fval = dict((("year", val.year), ("month", val.month), ("day", val.day)))
-
-                elif fld.datatype == FIELD_TYPE.TIME:
-                    fval = dict(
-                        (("hour", val.hour), ("minute", val.minute), ("second", val.second))
-                    )
-
-                elif fld.datatype == FIELD_TYPE.DATETIME:
-                    fval = dict(
-                        (
-                            ("year", val.year),
-                            ("month", val.month),
-                            ("day", val.day),
-                            ("hour", val.hour),
-                            ("minute", val.minute),
-                            ("second", val.second),
-                        )
-                    )
-
-        else:
-            fval = val
-
-        result["fields"][fld.keyname] = fval
-
-    result["extensions"] = dict()
-    for identity, ext in extensions:
-        result["extensions"][identity] = ext.serialize(feat)
-
-    return result
+        return result
 
 
 def query_feature_or_not_found(query, resource_id, feature_id):
@@ -592,31 +645,103 @@ def query_feature_or_not_found(query, resource_id, feature_id):
     raise FeatureNotFound(resource_id, feature_id)
 
 
-def iget(resource, request) -> JSONType:
+@contextmanager
+def versioning(resource, request):
+    if IVersionableFeatureLayer.providedBy(resource) and resource.fversioning:
+        with resource.fversioning_context(request) as vobj:
+            yield vobj
+    else:
+        yield None
+
+
+def feature_query_pit(resource, feature_query, version, epoch):
+    if version is None:
+        return
+    FVersioningNotEnabled.disprove(resource)
+    FVersioningOutOfRange.disprove(resource, version)
+    feature_query.pit(version)
+
+
+def iget(
+    resource,
+    request,
+    *,
+    label: ParamLabel = False,
+    geom: ParamGeom = True,
+    geom_format: ParamGeomFormat = ParamGeomFormat.WKT,
+    dt_format: ParamDtFormat = ParamDtFormat.OBJ,
+    fields: ParamFields = None,
+    extensions: ParamExtensions = None,
+    srs: ParamSrs = None,
+    version: ParamVersion = None,
+    epoch: ParamEpoch = None,
+) -> JSONType:
+    """Read feature"""
     request.resource_permission(PERM_READ)
 
-    geom_skip = request.GET.get("geom", "yes").lower() == "no"
-    srs = request.GET.get("srs")
-
-    srlz_params = dict(
-        geom_format=request.GET.get("geom_format", "wkt").lower(),
-        dt_format=request.GET.get("dt_format", "obj"),
-        extensions=_extensions(request.GET.get("extensions"), resource),
+    dumper = Dumper(
+        resource,
+        label=label,
+        geom=geom,
+        geom_format=geom_format,
+        fields=fields,
+        dt_format=dt_format,
+        extensions=extensions,
+        srs=srs,
+        version=version,
+        epoch=epoch,
     )
 
-    query = resource.feature_query()
-    if not geom_skip:
-        if srs is not None:
-            query.srs(SRS.filter_by(id=int(srs)).one())
-        query.geom()
-        if srlz_params["geom_format"] == "wkt":
-            query.geom_format("WKT")
-
+    query = dumper.feature_query()
     feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
+    return dumper(feature)
 
-    result = serialize(feature, **srlz_params)
 
-    return result
+def iput(
+    resource,
+    request,
+    *,
+    geom_null: ParamGeomNull = False,
+    geom_format: ParamGeomFormat = ParamGeomFormat.WKT,
+    dt_format: ParamDtFormat = ParamDtFormat.OBJ,
+    srs: ParamSrs = None,
+) -> JSONType:
+    """Update feature"""
+    request.resource_permission(PERM_WRITE)
+
+    query = resource.feature_query()
+    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
+    loader = Loader(
+        resource,
+        geom_null=geom_null,
+        geom_format=geom_format,
+        dt_format=dt_format,
+        srs=srs,
+    )
+
+    vinfo = dict()
+    with versioning(resource, request) as vobj:
+        updated = loader.extensions(feature, request.json_body)
+        loader(feature, request.json_body)
+        if (feature.geom or feature.fields) and IWritableFeatureLayer.providedBy(resource):
+            updated = resource.feature_put(feature) or updated
+        if updated is True and vobj:
+            vinfo["version"] = vobj.version_id
+
+    return dict(id=feature.id, **vinfo)
+
+
+def idelete(resource, request) -> JSONType:
+    """Delete feature"""
+    request.resource_permission(PERM_WRITE)
+
+    with versioning(resource, request) as vobj:
+        fid = int(request.matchdict["fid"])
+        resource.feature_delete(fid)
+        result = dict(id=fid)
+        if vobj:
+            result["version"] = vobj.version_id
+        return result
 
 
 def item_extent(resource, request) -> JSONType:
@@ -679,41 +804,7 @@ def geometry_info(resource, request) -> JSONType:
     return dict(type=geom_type, area=area, length=length, extent=extent)
 
 
-def iput(resource, request) -> JSONType:
-    request.resource_permission(PERM_WRITE)
-
-    query = resource.feature_query()
-    query.geom()
-
-    feature = query_feature_or_not_found(query, resource.id, int(request.matchdict["fid"]))
-
-    dsrlz_params = dict(
-        geom_format=request.GET.get("geom_format", "wkt").lower(),
-        dt_format=request.GET.get("dt_format", "obj"),
-    )
-
-    srs = request.GET.get("srs")
-
-    if srs is not None:
-        srs_from = SRS.filter_by(id=int(srs)).one()
-        dsrlz_params["transformer"] = Transformer(srs_from.wkt, resource.srs.wkt)
-
-    deserialize(feature, request.json_body, **dsrlz_params)
-    if IWritableFeatureLayer.providedBy(resource):
-        resource.feature_put(feature)
-
-    return dict(id=feature.id)
-
-
-def idelete(resource, request) -> JSONType:
-    request.resource_permission(PERM_WRITE)
-
-    fid = int(request.matchdict["fid"])
-    resource.feature_delete(fid)
-
-
-def apply_attr_filter(query, request, keynames):
-    # Fields filters
+def apply_fields_filter(query, request):
     filter_ = []
     for param in request.GET.keys():
         if param.startswith("fld_"):
@@ -728,8 +819,11 @@ def apply_attr_filter(query, request, keynames):
         except ValueError:
             key, operator = (fld_expr, "eq")
 
-        if key != "id" and key not in keynames:
-            raise ValidationError(message="Unknown field '%s'." % key)
+        if key != "id":
+            try:
+                query.layer.field_by_keyname(key)
+            except KeyError:
+                raise ValidationError(message="Unknown field '%s'." % key)
 
         filter_.append((key, operator, request.GET[param]))
 
@@ -762,32 +856,49 @@ def apply_intersect_filter(query, request, resource):
         query.intersects(geom)
 
 
-def cget(resource, request) -> JSONType:
+def cget(
+    resource,
+    request,
+    *,
+    label: ParamLabel = False,
+    geom: ParamGeom = True,
+    geom_format: ParamGeomFormat = ParamGeomFormat.WKT,
+    dt_format: ParamDtFormat = ParamDtFormat.OBJ,
+    fields: ParamFields = None,
+    extensions: ParamExtensions = None,
+    srs: ParamSrs = None,
+    order_by: ParamOrderBy = None,
+    limit: ParamLimit = None,
+    offset: ParamOffset = 0,
+    version: ParamVersion = None,
+    epoch: ParamEpoch = None,
+) -> JSONType:
+    """Read features"""
     request.resource_permission(PERM_READ)
 
-    geom_skip = request.GET.get("geom", "yes") == "no"
-    srs = request.GET.get("srs")
-
-    srlz_params = dict(
-        geom_format=request.GET.get("geom_format", "wkt").lower(),
-        dt_format=request.GET.get("dt_format", "obj"),
-        label=request.GET.get("label", False),
-        extensions=_extensions(request.GET.get("extensions"), resource),
+    dumper = Dumper(
+        resource,
+        label=label,
+        geom=geom,
+        geom_format=geom_format,
+        fields=fields,
+        dt_format=dt_format,
+        extensions=extensions,
+        srs=srs,
+        version=version,
+        epoch=epoch,
     )
 
-    keys = [fld.keyname for fld in resource.fields]
-    query = resource.feature_query()
+    query = dumper.feature_query()
 
     # Paging
-    limit = request.GET.get("limit")
-    offset = request.GET.get("offset", 0)
     if limit is not None:
-        query.limit(int(limit), int(offset))
+        query.limit(limit, offset)
 
-    apply_attr_filter(query, request, keys)
+    apply_fields_filter(query, request)
+    apply_intersect_filter(query, request, resource)
 
     # Ordering
-    order_by = request.GET.get("order_by")
     order_by_ = []
     if order_by is not None:
         for order_def in list(order_by.split(",")):
@@ -799,102 +910,102 @@ def cget(resource, request) -> JSONType:
     if order_by_:
         query.order_by(*order_by_)
 
-    apply_intersect_filter(query, request, resource)
-
-    # Selected fields
-    fields = request.GET.get("fields")
-    if fields is not None:
-        field_list = fields.split(",")
-        fields = [key for key in keys if key in field_list]
-
-    if fields:
-        srlz_params["keys"] = fields
-        query.fields(*fields)
-
-    if not geom_skip:
-        if srs is not None:
-            query.srs(SRS.filter_by(id=int(srs)).one())
-        query.geom()
-        if srlz_params["geom_format"] == "wkt":
-            query.geom_format("WKT")
-
-    result = [serialize(feature, **srlz_params) for feature in query()]
-
-    return result
+    return [dumper(feature) for feature in query()]
 
 
-def cpost(resource, request) -> JSONType:
+def cpost(
+    resource,
+    request,
+    *,
+    geom_null: ParamGeomNull = False,
+    geom_format: ParamGeomFormat = ParamGeomFormat.WKT,
+    dt_format: ParamDtFormat = ParamDtFormat.OBJ,
+    srs: ParamSrs = None,
+) -> JSONType:
+    """Create feature"""
     request.resource_permission(PERM_WRITE)
 
-    dsrlz_params = dict(
-        geom_format=request.GET.get("geom_format", "wkt").lower(),
-        dt_format=request.GET.get("dt_format", "obj"),
+    loader = Loader(
+        resource,
+        geom_null=geom_null,
+        geom_format=geom_format,
+        dt_format=dt_format,
+        srs=srs,
     )
 
-    srs = request.GET.get("srs")
+    with versioning(resource, request) as vobj:
+        feature = Feature(layer=resource)
+        loader(feature, request.json_body)
+        feature.id = resource.feature_create(feature)
+        loader.extensions(feature, request.json_body)
+        vinfo = dict(version=vobj.version_id) if vobj else dict()
 
-    if srs is not None:
-        srs_from = SRS.filter_by(id=int(srs)).one()
-        dsrlz_params["transformer"] = Transformer(srs_from.wkt, resource.srs.wkt)
-
-    feature = Feature(layer=resource)
-    deserialize(feature, request.json_body, create=True, **dsrlz_params)
-
-    return dict(id=feature.id)
+    return dict(id=feature.id, **vinfo)
 
 
-def cpatch(resource, request) -> JSONType:
+def cpatch(
+    resource,
+    request,
+    *,
+    geom_null: ParamGeomNull = False,
+    geom_format: ParamGeomFormat = ParamGeomFormat.WKT,
+    dt_format: ParamDtFormat = ParamDtFormat.OBJ,
+    srs: ParamSrs = None,
+) -> JSONType:
+    """Update features"""
     request.resource_permission(PERM_WRITE)
+
+    loader = Loader(
+        resource,
+        geom_null=geom_null,
+        geom_format=geom_format,
+        dt_format=dt_format,
+        srs=srs,
+    )
+
     result = list()
+    with versioning(resource, request) as vobj:
+        vinfo = dict(version=vobj.version_id) if vobj else dict()
+        for fdata in request.json_body:
+            if "id" not in fdata:
+                # Create new feature
+                feature = Feature(layer=resource)
+                loader(feature, fdata)
+                feature.id = resource.feature_create(feature)
+                loader.extensions(feature, fdata)
+            else:
+                # Update existing feature
+                query = resource.feature_query()
+                feature = query_feature_or_not_found(query, resource.id, fdata["id"])
 
-    dsrlz_params = dict(
-        geom_format=request.GET.get("geom_format", "wkt").lower(),
-        dt_format=request.GET.get("dt_format", "obj"),
-    )
+                have_changes = loader.extensions(feature, fdata)
+                if have_changes and vobj:
+                    vobj.mark_changed()
 
-    srs = request.GET.get("srs")
+                loader(feature, fdata)
+                if (feature.geom or feature.fields) and IWritableFeatureLayer.providedBy(resource):
+                    resource.feature_put(feature)
 
-    if srs is not None:
-        srs_from = SRS.filter_by(id=int(srs)).one()
-        dsrlz_params["transformer"] = Transformer(srs_from.wkt, resource.srs.wkt)
-
-    for fdata in request.json_body:
-        if "id" not in fdata:
-            # Create new feature
-            feature = Feature(layer=resource)
-            deserialize(feature, fdata, create=True, **dsrlz_params)
-        else:
-            # Update existing feature
-            query = resource.feature_query()
-            query.geom()
-            query.filter_by(id=fdata["id"])
-            query.limit(1)
-
-            feature = None
-            for f in query():
-                feature = f
-
-            deserialize(feature, fdata, **dsrlz_params)
-            resource.feature_put(feature)
-
-        result.append(dict(id=feature.id))
+            result.append(dict(id=feature.id, **vinfo))
 
     return result
 
 
 def cdelete(resource, request) -> JSONType:
+    """Delete features"""
     request.resource_permission(PERM_WRITE)
 
-    if len(request.body) > 0:
-        result = []
-        for fdata in request.json_body:
-            if "id" in fdata:
-                fid = fdata["id"]
-                resource.feature_delete(fid)
-                result.append(fid)
-    else:
-        resource.feature_delete_all()
-        result = True
+    with versioning(resource, request):
+        if len(request.body) > 0:
+            result = []
+            for fdata in request.json_body:
+                if "id" in fdata:
+                    fid = fdata["id"]
+                    resource.feature_delete(fid)
+                    result.append(fid)
+        else:
+            resource.feature_delete_all()
+            result = True
 
     return result
 
@@ -911,16 +1022,9 @@ def count(resource, request) -> JSONType:
 def feature_extent(resource, request) -> JSONType:
     request.resource_permission(PERM_READ)
 
-    supported_ident = ["vector_layer", "postgis_layer"]
-    if resource.identity not in supported_ident:
-        raise ValidationError(
-            "feature_layer.feature.extent can only be applied to vector and postgis layers"
-        )
-
-    keys = [fld.keyname for fld in resource.fields]
     query = resource.feature_query()
 
-    apply_attr_filter(query, request, keys)
+    apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)
 
     extent = query().extent
@@ -1017,3 +1121,9 @@ def setup_pyramid(comp, config):
         "/api/feature_layer/identify",
         post=identify,
     )
+
+    from .transaction import api as transaction_api
+    from .versioning import api as versioning_api
+
+    transaction_api.setup_pyramid(comp, config)
+    versioning_api.setup_pyramid(comp, config)

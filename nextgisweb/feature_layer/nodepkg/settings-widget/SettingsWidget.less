@@ -1,0 +1,20 @@
+.ngw-feature-layer-settings-widget {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1em;
+    padding: 1em;
+
+    & > .ant-checkbox-wrapper {
+        grid-column: 1 / span 2;
+        & + .ant-checkbox-wrapper {
+            margin-left: 0;
+        }
+    }
+
+    & > label {
+        align-self: center;
+        &::after {
+            content: ":";
+        }
+    }
+}

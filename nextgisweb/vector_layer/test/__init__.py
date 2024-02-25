@@ -20,10 +20,6 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
             owner_user=User.by_keyname("administrator"),
             srs=SRS.filter_by(id=3857).one(),
         ).persist()
-
-        layer.setup_from_ogr(ogrlayer)
-        layer.load_from_ogr(ogrlayer)
-
-        DBSession.flush()
+        layer.from_source(ogrlayer)
 
     yield layer

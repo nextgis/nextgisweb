@@ -2,7 +2,7 @@ from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
 
-from nextgisweb.env import Base, _
+from nextgisweb.env import Base, _, env
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Transformer
 
@@ -12,7 +12,7 @@ from nextgisweb.resource import DataStructureScope, Resource, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.spatial_ref_sys import SRS
 
-from .interface import FIELD_TYPE, FIELD_TYPE_OGR
+from .interface import FIELD_TYPE, FIELD_TYPE_OGR, IVersionableFeatureLayer
 
 Base.depends_on("resource", "lookup_table")
 
@@ -210,6 +210,37 @@ class _fields_attr(SP):
         obj.fields.reorder()
 
 
+class _fversioning_attr(SP):
+    def getter(self, srlzr):
+        obj = srlzr.obj
+        if not IVersionableFeatureLayer.providedBy(obj):
+            return None
+
+        if not env.feature_layer.options["versioning.enabled"]:
+            return None
+
+        enabled = bool(obj.fversioning)
+        result = dict(enabled=enabled)
+        if enabled:
+            result["epoch"] = obj.fversioning.epoch
+            result["latest"] = obj.fversioning.latest
+
+        return result
+
+    def setter(self, srlzr, value):
+        obj = srlzr.obj
+
+        if (
+            not IVersionableFeatureLayer.providedBy(obj)
+            or not env.feature_layer.options["versioning.enabled"]
+        ) and value is not None:
+            raise ValidationError(message=_("Versioning not supported"))
+
+        if (enabled := value.get("enabled", None)) is not None:
+            if enabled != bool(obj.fversioning):
+                obj.fversioning_configure(enabled=enabled)
+
+
 P_DSS_READ = DataStructureScope.read
 P_DSS_WRITE = DataStructureScope.write
 
@@ -219,6 +250,7 @@ class FeatureLayerSerializer(Serializer):
     resclass = LayerFieldsMixin
 
     fields = _fields_attr(read=P_DSS_READ, write=P_DSS_WRITE)
+    versioning = _fversioning_attr(read=P_DSS_READ, write=P_DSS_WRITE)
 
 
 class FeatureQueryIntersectsMixin:

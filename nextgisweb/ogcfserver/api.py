@@ -1,17 +1,23 @@
 from datetime import datetime
 
+from msgspec import UNSET
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import Response
 from shapely.geometry import box
 
-from nextgisweb.lib.geometry import Geometry, Transformer
+from nextgisweb.lib.geometry import Geometry
 
-from nextgisweb.feature_layer.api import deserialize, query_feature_or_not_found, serialize
-from nextgisweb.feature_layer.feature import Feature
-from nextgisweb.feature_layer.interface import IWritableFeatureLayer
+from nextgisweb.feature_layer import Feature, IWritableFeatureLayer
+from nextgisweb.feature_layer.api import (
+    Dumper,
+    Loader,
+    ParamDtFormat,
+    ParamGeomFormat,
+    query_feature_or_not_found,
+    versioning,
+)
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, ResourceFactory, ServiceScope
-from nextgisweb.spatial_ref_sys import SRS
 
 from .model import Service
 
@@ -70,14 +76,48 @@ def collection_to_ogc(collection, request):
     )
 
 
-def feature_to_ogc(feature):
-    result = serialize(feature, geom_format="geojson", dt_format="iso")
+def dumper_factory(resource):
+    return Dumper(
+        resource,
+        label=False,
+        geom=True,
+        geom_format=ParamGeomFormat.GEOJSON,
+        dt_format=ParamDtFormat.ISO,
+        fields=None,
+        extensions="",
+        srs=4326,
+        version=None,
+        epoch=None,
+    )
+
+
+def feature_to_ogc(dumper: Dumper, feature: Feature):
+    data = dumper(feature)
     return dict(
         type="Feature",
-        geometry=result["geom"],
-        properties=result["fields"],
         id=feature.id,
+        geometry=data["geom"],
+        properties=data["fields"],
     )
+
+
+def loader_factory(resource):
+    return Loader(
+        resource,
+        geom_null=False,
+        geom_format=ParamGeomFormat.GEOJSON,
+        dt_format=ParamDtFormat.ISO,
+        srs=4326,
+    )
+
+
+def feature_from_ogc(loader: Loader, feature: Feature, data):
+    data = data.copy()
+    if (geometry := data.pop("geometry", UNSET)) is not UNSET:
+        data["geom"] = geometry
+    if (properties := data.pop("properties", UNSET)) is not UNSET:
+        data["fields"] = properties
+    loader(feature, data)
 
 
 def landing_page(resource, request) -> JSONType:
@@ -155,19 +195,12 @@ def create(resource, request) -> JSONType:
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.write, c.resource)
-            feature = Feature(layer=c.resource)
-            new_feature = request.json_body.copy()
-            new_feature["fields"] = new_feature.pop("properties")
-            new_feature["geom"] = new_feature.pop("geometry")
-            srs_from = SRS.filter_by(id=int(4326)).one()
-            deserialize(
-                feature,
-                new_feature,
-                geom_format="geojson",
-                transformer=Transformer(srs_from.wkt, c.resource.srs.wkt),
-            )
-            if IWritableFeatureLayer.providedBy(c.resource):
-                fid = c.resource.feature_create(feature)
+            with versioning(c.resource, request):
+                feature = Feature(layer=c.resource)
+                loader = loader_factory(c.resource)
+                feature_from_ogc(loader, feature, request.json_body.copy())
+                if IWritableFeatureLayer.providedBy(c.resource):
+                    fid = c.resource.feature_create(feature)
     request.response.status_code = 201
     request.response.headers["Location"] = request.route_url(
         "ogcfserver.item",
@@ -190,9 +223,9 @@ def items(resource, request) -> JSONType:
                 else 10
             )
             offset = int(request.GET.get("offset", 0))
-            query = c.resource.feature_query()
-            query.srs(SRS.filter_by(id=4326).one())
-            query.geom()
+
+            dumper = dumper_factory(c.resource)
+            query = dumper.feature_query()
             query.limit(limit, offset)
 
             bbox = request.GET.get("bbox")
@@ -201,7 +234,7 @@ def items(resource, request) -> JSONType:
                 box_geom = Geometry.from_shape(box(*box_coords), srid=4326, validate=False)
                 query.intersects(box_geom)
 
-            features = [feature_to_ogc(feature) for feature in query()]
+            features = [feature_to_ogc(dumper, feature) for feature in query()]
 
             items = dict(
                 type="FeatureCollection",
@@ -253,11 +286,10 @@ def iget(resource, request) -> JSONType:
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.read, c.resource)
-            query = c.resource.feature_query()
-            query.srs(SRS.filter_by(id=4326).one())
-            query.geom()
+            dumper = dumper_factory(c.resource)
+            query = dumper.feature_query()
             feature = query_feature_or_not_found(query, c.resource.id, item_id)
-            item = feature_to_ogc(feature)
+            item = feature_to_ogc(dumper, feature)
             item["links"] = [
                 {
                     "rel": "self",
@@ -292,21 +324,13 @@ def iput(resource, request) -> JSONType:
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.write, c.resource)
-            query = c.resource.feature_query()
-            query.geom()
-            feature = query_feature_or_not_found(query, c.resource.id, item_id)
-            new_feature = request.json_body.copy()
-            new_feature["fields"] = new_feature.pop("properties")
-            new_feature["geom"] = new_feature.pop("geometry")
-            srs_from = SRS.filter_by(id=int(4326)).one()
-            deserialize(
-                feature,
-                new_feature,
-                geom_format="geojson",
-                transformer=Transformer(srs_from.wkt, c.resource.srs.wkt),
-            )
-            if IWritableFeatureLayer.providedBy(c.resource):
-                c.resource.feature_put(feature)
+            with versioning(c.resource, request):
+                query = c.resource.feature_query()
+                feature = query_feature_or_not_found(query, c.resource.id, item_id)
+                loader = loader_factory(c.resource)
+                feature_from_ogc(loader, feature, request.json_body.copy())
+                if IWritableFeatureLayer.providedBy(c.resource):
+                    c.resource.feature_put(feature)
     return dict(id=feature.id)
 
 
@@ -317,7 +341,8 @@ def idelete(resource, request) -> JSONType:
     for c in resource.collections:
         if c.keyname == collection_id:
             request.resource_permission(DataScope.write, c.resource)
-            c.resource.feature_delete(item_id)
+            with versioning(c.resource, request):
+                c.resource.feature_delete(item_id)
 
 
 def options(resource, request):

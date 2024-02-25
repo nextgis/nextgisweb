@@ -72,7 +72,7 @@ class QuotaExceeded(UserException):
 class ResourceError(Exception):
     """Base class for resource exceptions"""
 
-    def __init__(self, message, data=None):
+    def __init__(self, message=None, data=None):
         warnings.warn(
             "{} is deprecated!".format(self.__class__.__name__), DeprecationWarning, stacklevel=2
         )
@@ -83,6 +83,11 @@ class ResourceError(Exception):
 class ForbiddenError(ResourceError):
     title = _("Forbidden")
     http_status_code = 403
+
+
+class ResourceInterfaceNotSupported(ResourceError):
+    title = _("Interface not supported")
+    http_status_code = 422
 
 
 class OperationalError(ResourceError):
