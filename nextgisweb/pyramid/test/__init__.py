@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 import pytest
 from requests import Session as RequestsSession
 from webtest import TestApp as BaseTestApp
@@ -94,3 +96,20 @@ class HTTPTestApp(RequestsSession):
             url = self.application_url.strip("/") + url
 
         return super().request(method, url, *args, **kwargs)
+
+
+@pytest.fixture()
+def webapp_handler(ngw_env):
+    pyramid = ngw_env.pyramid
+
+    @contextmanager
+    def _decorator(handler):
+        assert pyramid.test_request_handler is None
+        try:
+            pyramid.test_request_handler = handler
+            yield
+        finally:
+            pyramid.test_request_handler = None
+
+    yield _decorator
+    pyramid.test_request_handler = None

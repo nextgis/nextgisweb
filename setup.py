@@ -85,7 +85,7 @@ entry_points = {
         "hbs = nextgisweb.i18n.hbs:extract",
     ],
     "pytest11": [
-        "nextgisweb = nextgisweb.pytest",
+        "nextgisweb.env = nextgisweb.env.test",
         "nextgisweb.auth = nextgisweb.auth.test",
         "nextgisweb.core = nextgisweb.core.test",
         "nextgisweb.file_upload = nextgisweb.file_upload.test",
