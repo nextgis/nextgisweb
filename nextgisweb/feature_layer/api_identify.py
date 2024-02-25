@@ -6,8 +6,6 @@ from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
 
-PR_R = ResourceScope.read
-
 
 def identify(request) -> JSONType:
     data = request.json_body
@@ -50,7 +48,7 @@ def identify(request) -> JSONType:
 
             # Add name of parent resource to identification results,
             # if there is no way to get layer name by id on the client
-            allow = layer.parent.has_permission(PR_R, request.user)
+            allow = layer.parent.has_permission(ResourceScope.read, request.user)
 
             if allow:
                 for feature in features:
@@ -63,3 +61,11 @@ def identify(request) -> JSONType:
     result["featureCount"] = feature_count
 
     return result
+
+
+def setup_pyramid(comp, config):
+    config.add_route(
+        "feature_layer.identify",
+        "/api/feature_layer/identify",
+        post=identify,
+    )

@@ -267,9 +267,9 @@ def test_mvt_should_return_not_found_if_mvt_driver_not_available(
     old_MVT_DRIVER_EXIST = ogrdriver.MVT_DRIVER_EXIST
     ogrdriver.MVT_DRIVER_EXIST = mvt_driver_exist
 
-    from .. import api
+    from .. import api_mvt
 
-    importlib.reload(api)
+    importlib.reload(api_mvt)
 
     params = dict(
         ZXY0,
@@ -286,7 +286,7 @@ def test_mvt_should_return_not_found_if_mvt_driver_not_available(
     )
 
     ogrdriver.MVT_DRIVER_EXIST = old_MVT_DRIVER_EXIST
-    importlib.reload(api)
+    importlib.reload(api_mvt)
 
 
 def test_filter(ngw_webtest_app, vector_layer_id):
