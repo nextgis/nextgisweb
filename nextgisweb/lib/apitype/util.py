@@ -1,8 +1,25 @@
-from typing import Any, Iterable, Tuple, Type, TypeVar, Union, get_args, get_origin
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Iterable,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    get_args,
+    get_origin,
+)
 
+from msgspec import Struct
+from msgspec import _utils as ms_utils
 from msgspec.inspect import Metadata, type_info
+from msgspec.inspect import _is_enum as is_enum  # noqa: F401
+from msgspec.inspect import _is_struct as is_struct  # noqa: F401
+from msgspec.inspect import _is_typeddict as is_typeddict  # noqa: F401
 from typing_extensions import Annotated, _AnnotatedAlias
 
+get_class_annotations = ms_utils.get_class_annotations
 NoneType = type(None)
 
 T = TypeVar("T", bound=Type)
@@ -33,6 +50,16 @@ def disannotate(tdef: T) -> Tuple[T, Tuple[Any, ...]]:
     return tdef, ()
 
 
+def decompose_union(tdef: Type, *, annotated: bool = True) -> Tuple[Type, ...]:
+    if annotated:
+        tdef = unannotate(tdef)
+
+    if get_origin(tdef) == Union:
+        return get_args(tdef)
+    else:
+        return (tdef,)
+
+
 def is_optional(tdef: Type) -> Tuple[bool, Type]:
     """Determine if type definition is an optional type"""
 
@@ -57,3 +84,14 @@ def msgspec_metadata(tdef):
     if isinstance(tinfo, Metadata):
         return tinfo.type, tinfo
     return tdef, Metadata(tdef)
+
+
+class EmptyObjectStruct(Struct, kw_only=True):
+    pass
+
+
+if TYPE_CHECKING:
+    EmptyObject = Optional[EmptyObjectStruct]
+else:
+    EmptyObjectStruct.__name__ = "EmptyObject"
+    EmptyObject = EmptyObjectStruct

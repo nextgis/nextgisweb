@@ -2,28 +2,26 @@ import re
 from inspect import signature
 from pathlib import Path
 from sys import _getframe
+from typing import Any, Dict, Mapping, Optional, Tuple
 from warnings import warn, warn_explicit
 
-from msgspec import UNSET, Meta
+from msgspec import NODEFAULT, Meta
 from msgspec import ValidationError as MsgSpecValidationError
 from msgspec.inspect import IntType, Metadata, type_info
 from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
 from typing_extensions import Annotated
 
+from nextgisweb.env import gettext
 from nextgisweb.env.package import pkginfo
-from nextgisweb.lib.apitype import (
-    ContentType,
-    JSONType,
-    is_anyof,
-    is_optional,
-    iter_anyof,
-    param_decoder,
-)
+from nextgisweb.lib.apitype import ContentType, EmptyObject, JSONType, PathParam, QueryParam
+from nextgisweb.lib.apitype.query_string import QueryParamError, QueryParamRequired
+from nextgisweb.lib.apitype.schema import _AnyOfRuntime, iter_anyof
+from nextgisweb.lib.apitype.util import disannotate, is_struct, is_typeddict
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 
-from nextgisweb.core.exception import ValidationError
+from nextgisweb.core.exception import ValidationError, user_exception
 
 from .helper import RouteHelper
 from .inspect import iter_routes
@@ -47,36 +45,63 @@ def _json_msgspec_factory(typedef):
     return _json_msgspec
 
 
-def _param_factory(name, tdef, default):
-    optional, tdef = is_optional(tdef)
-    if optional and default is UNSET:
-        default = None
+def _view_driver_factory(
+    view,
+    pass_context,
+    *,
+    path_params: Mapping[str, PathParam],
+    query_params: Mapping[str, QueryParam],
+    body: Optional[Tuple[str, Any]],
+    result: Any,
+):
+    extract = list()
 
-    decoder = param_decoder(tdef)
+    extract.extend(
+        # NOTE: Decoded twice (the first one in request.path_param)
+        (arg, lambda req, name=param.name, dec=param.decoder: dec(req.matchdict[name]))
+        for arg, param in path_params.items()
+    )
 
-    def _param(request):
-        s = request.GET.get(name, UNSET)
-        if s is UNSET:
-            if default is UNSET:
-                raise ValueError
-            return default
+    extract.extend(
+        (arg, lambda req, dec=param.decoder: dec(req.qs_parser))
+        for arg, param in query_params.items()
+    )
 
-        try:
-            res = decoder(s)
-        except MsgSpecValidationError as exc:
-            raise ValidationError(message=str(exc.args[0])) from exc
-        return res
+    if body is not None:
+        extract.append(body)
 
-    return _param
+    convert = None
+    if result is EmptyObject:
+        convert = lambda v, empty=EmptyObject(): empty if v is None else v
 
+    if len(extract) == 0 and convert is None:
+        return view
 
-def _view_driver_factory(view, pextractor, pass_context):
+    if convert is None:
+        convert = lambda x: x
+
     def _view(context, request):
-        kw = {k: f(request) for k, f in pextractor.items()}
-        return view(context, request, **kw) if pass_context else view(request, **kw)
+        try:
+            kw = {k: f(request) for k, f in extract}
+        except QueryParamError as exc:
+            _describe_query_param_error(exc)
+            raise
+        return convert(view(context, request, **kw) if pass_context else view(request, **kw))
 
     _view.__doc__ = view.__doc__
     return _view
+
+
+def _describe_query_param_error(exc):
+    name = exc.name
+    data = dict(location=["query", exc.name])
+    if isinstance(exc, QueryParamRequired):
+        title = gettext("Parameter required")
+        message = gettext("The '{}' query parameter is required.").format(exc.name)
+    else:
+        title = gettext("Invalid parameter")
+        message = gettext("The '{}' query parameter has an invalid value.").format(name)
+    user_exception(exc, title=title, message=message, data=data, http_status_code=422)
 
 
 def find_template(name, func=None, stack_level=1):
@@ -113,7 +138,7 @@ def find_template(name, func=None, stack_level=1):
 
 
 PATH_TYPE_UNKNOWN = Annotated[str, Meta(description="Undocumented")]
-PATH_TYPES = dict(
+PATH_TYPES: Dict[str, Any] = dict(
     # Basic types
     str=Annotated[str, Meta(extra=dict(route_pattern=r"[^/]+"))],
     any=Annotated[str, Meta(extra=dict(route_pattern=r".+"))],
@@ -129,6 +154,17 @@ PATH_PARAM_RE = re.compile(r"\{(?P<k>\w+)(?:\:(?P<r>.+?))?\}")
 
 
 class Configurator(PyramidConfigurator):
+    def setup_registry(self, *args, **kwargs):
+        super().setup_registry(*args, **kwargs)
+
+        def path_param(request):
+            for p in request.matched_route.predicates:
+                if isinstance(p, RouteMeta):
+                    md = request.matchdict
+                    return {k: v(md[k]) for k, v in p.path_decoders}
+
+        self.add_request_method(path_param, property=True)
+
     def add_default_view_predicates(self):
         import pyramid.predicates as pp
 
@@ -182,73 +218,59 @@ class Configurator(PyramidConfigurator):
             del kwargs["client"]
 
         if pattern is not None:
-            mdtypes = dict()
+            opattern = pattern
+            rtypes = dict()
 
             if factory := kwargs.get("factory"):
-                if factory_annotations := getattr(factory, "annotations", None):
-                    mdtypes.update(factory_annotations)
+                rtypes.update(getattr(factory, "annotations", {}))
 
             if types:
-                mdtypes.update(types)
+                rtypes.update(types)
 
-            pidx = 0
+            # Rewrite route pattern in the following formats:
+            #   pattern:    /param/{name:regexp}  for Pyramid framework
+            #   itemplate:  /param/{0}            with numeric placeholders
+            #   ktemplate:  /param/{name}         with string placeholders
+            lastpos, pattern, itemplate, ktemplate = 0, "", "", ""
+            for idx, m in enumerate(PATH_PARAM_RE.finditer(opattern)):
+                leader = opattern[lastpos : m.start()]
+                lastpos = m.end()
 
-            def _pnum(m):
-                nonlocal pidx
-                res = f"{{{pidx}}}"
-                pidx += 1
-                return res
-
-            template = PATH_PARAM_RE.sub(_pnum, pattern)
-            wotypes = PATH_PARAM_RE.sub(lambda m: "{%s}" % m.group(1), pattern)
-
-            def _sub(m):
                 key, type_or_regexp = m.groups()
 
-                if (tdef := mdtypes.get(key)) is None:
+                if (tdef := rtypes.get(key)) is None:
                     tdef = PATH_TYPES.get(type_or_regexp, PATH_TYPE_UNKNOWN)
-                    mdtypes[key] = tdef
+                    rtypes[key] = tdef
 
                 if type_or_regexp:
                     if pdef := PATH_TYPES.get(type_or_regexp):
-                        pattern = type_info(pdef).extra["route_pattern"]
+                        mpattern = type_info(pdef).extra["route_pattern"]
                     else:
-                        pattern = type_or_regexp
+                        mpattern = type_or_regexp
                 else:
-                    tinfo = type_info(tdef)
-                    titype = tinfo.type if isinstance(tinfo, Metadata) else tinfo
-                    if (
-                        isinstance(tinfo, Metadata)
-                        and tinfo.extra
-                        and (extra_pattern := tinfo.extra["route_pattern"])
-                    ):
-                        pattern = extra_pattern
-                    elif isinstance(titype, IntType):
-                        if (titype.ge is not None and titype.ge >= 1) or (
-                            titype.gt is not None and titype.gt >= 0
-                        ):
-                            pattern = r"0*[1-9][0-9]*"
-                        elif (titype.ge is not None and titype.ge >= 0) or (
-                            titype.gt is not None and titype.gt >= -1
-                        ):
-                            pattern = r"0*[1-9][0-9]*|0+"
-                        else:
-                            pattern = r"-?0*[1-9][0-9]*|0+"
-                    else:
-                        raise ValueError(f"Type or pattern required: {key}")
+                    mpattern = self._pattern_from_type(tdef)
 
-                return "{%s:%s}" % (key, pattern)
+                pattern += "%s{%s:%s}" % (leader, key, mpattern)
+                itemplate += "%s{%s}" % (leader, str(idx))
+                ktemplate += "%s{%s}" % (leader, key)
 
-            pattern = PATH_PARAM_RE.sub(_sub, pattern)
+            trailer = opattern[lastpos:]
+            itemplate += trailer
+            ktemplate += trailer
+            pattern += trailer
+
+            path_params = {k: PathParam(k, v) for k, v in rtypes.items()}
+            path_decoders = [(k, v.decoder) for k, v in path_params.items()]
 
             overloaded = kwargs.pop("overloaded", False)
             kwargs["meta"] = RouteMeta(
                 component=component,
-                template=template,
+                itemplate=itemplate,
                 overloaded=overloaded,
                 client=client,
-                wotypes=wotypes,
-                mdtypes=mdtypes,
+                ktemplate=ktemplate,
+                path_params=path_params,
+                path_decoders=path_decoders,
             )
 
         helper = RouteHelper(name, self, deprecated=deprecated, openapi=openapi)
@@ -266,7 +288,7 @@ class Configurator(PyramidConfigurator):
 
         if view is not None:
             # Extract attrs missing in kwargs from view.__pyramid_{attr}__
-            attrs = {"renderer"}.difference(set(kwargs.keys()))
+            attrs = {"renderer", "query_params"}.difference(set(kwargs.keys()))
 
             fn = view
             while fn and len(attrs) > 0:
@@ -281,19 +303,21 @@ class Configurator(PyramidConfigurator):
             body_type = None
             return_type = None
 
-            pass_context = False
-            param_types = dict()
-            pextractor = dict()
+            has_request, has_context = False, False
+            path_params: Dict[str, PathParam] = dict()
+            query_params: Dict[str, QueryParam] = dict()
+            body: Optional[Tuple[str, Any]] = None
             for idx, (name, p) in enumerate(sig.parameters.items()):
                 if name == "request":
+                    has_request = True
                     continue
-
-                if idx == 0 and name != "request":
-                    pass_context = True
+                elif idx == 0:
+                    has_context = True
                     if p.annotation is not p.empty and "context" not in kwargs:
                         kwargs["context"] = p.annotation
+                    continue
 
-                assert idx < 2 or p.kind != p.POSITIONAL_ONLY
+                assert has_request or idx in (0, 1)
 
                 if name in ("body", "json_body"):
                     assert body_type is None and p.annotation is not p.empty
@@ -327,36 +351,61 @@ class Configurator(PyramidConfigurator):
                                 raise ValueError
 
                     assert bextract is not None
+                    body = (name, bextract)
 
-                    pextractor[name] = bextract
+                elif p.kind == p.POSITIONAL_OR_KEYWORD:
+                    assert p.default is p.empty
+                    assert p.annotation is not p.empty
+                    path_params[name] = PathParam(name, p.annotation)
 
                 elif p.kind == p.KEYWORD_ONLY:
-                    ptype = p.annotation
-                    pdefault = p.default if p.default is not p.empty else UNSET
+                    pdefault = p.default if p.default is not p.empty else NODEFAULT
+                    query_params[name] = QueryParam(name, p.annotation, pdefault)
 
-                    param_types[name] = (ptype, pdefault)
-                    pextractor[name] = _param_factory(name, ptype, pdefault)
+            return_type = sig.return_annotation
+            return_renderer = None
+            if return_type is sig.empty:
+                return_type = None
+            elif return_type is JSONType:
+                return_renderer = "json"
+            else:
+                return_concrete, return_extras = disannotate(return_type)
+                if (
+                    return_concrete is EmptyObject
+                    or is_struct(return_concrete)
+                    or is_typeddict(return_concrete)
+                    or ContentType.JSON in return_extras
+                    or _AnyOfRuntime in return_extras
+                ):
+                    return_renderer = "msgspec"
 
-            if len(pextractor) > 0:
-                view = _view_driver_factory(view, pextractor, pass_context)
+            if kwargs.get("renderer") is None and return_renderer is not None:
+                kwargs["renderer"] = return_renderer
 
-            if kwargs.get("renderer") is None:
-                assert return_type is None
-                return_type = sig.return_annotation
-                if return_type is sig.empty:
-                    return_type = None
-                elif return_type is JSONType:
-                    kwargs["renderer"] = "json"
-                elif is_json_type(return_type) or is_anyof(return_type):
-                    kwargs["renderer"] = "msgspec"
+            view = _view_driver_factory(
+                view,
+                has_context,
+                path_params=path_params,
+                query_params=query_params,
+                body=body,
+                result=return_type,
+            )
+
+            if extra_query_params := kwargs.pop("query_params", None):
+                query_params = query_params.copy()
+                for eqp in extra_query_params:
+                    if len(eqp) == 2:
+                        eqp = eqp + (NODEFAULT,)
+                    query_params[eqp[0]] = QueryParam(*eqp)
 
             kwargs["meta"] = ViewMeta(
                 func=view,
                 context=kwargs.get("context"),
                 deprecated=deprecated,
                 openapi=openapi,
+                path_params=path_params,
+                query_params=query_params,
                 component=component,
-                param_types=param_types,
                 body_type=body_type,
                 return_type=return_type,
             )
@@ -375,7 +424,7 @@ class Configurator(PyramidConfigurator):
         super().commit()
 
         for route in iter_routes(self.introspector):
-            is_api = route.template.startswith("/api/")
+            is_api = route.itemplate.startswith("/api/")
             methods = set()
             for view in route.views:
                 if is_api and not isinstance(view.method, str):
@@ -393,7 +442,36 @@ class Configurator(PyramidConfigurator):
                         f"since 4.5.0.dev17.",
                         view.info,
                     )
+
                 methods.add(view.method)
+
+    def _pattern_from_type(self, tdef):
+        tinfo = type_info(tdef)
+        titype = tinfo.type if isinstance(tinfo, Metadata) else tinfo
+        if (
+            isinstance(tinfo, Metadata)
+            and tinfo.extra
+            and (extra_pattern := tinfo.extra["route_pattern"])
+        ):
+            return extra_pattern
+        elif isinstance(titype, IntType):
+            if (titype.ge is not None and titype.ge >= 1) or (
+                titype.gt is not None and titype.gt >= 0
+            ):
+                return r"0*[1-9][0-9]*"
+            elif (titype.ge is not None and titype.ge >= 0) or (
+                titype.gt is not None and titype.gt >= -1
+            ):
+                return r"0*[1-9][0-9]*|0+"
+            else:
+                return r"-?0*[1-9][0-9]*|0+"
+        else:
+            raise ValueError("Type or pattern required")
+
+
+def _request_path_param(request):
+    matchdict = request.matchdict
+    return {k: v(matchdict[k]) for k, v in request.path_param_decoders}
 
 
 def _warn_from_info(message, info):

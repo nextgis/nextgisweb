@@ -4,12 +4,19 @@ import string
 from calendar import timegm
 from collections import defaultdict
 from pathlib import Path
+from typing import Any, Optional, Sequence, Tuple, Union
 
 
-def viewargs(*, renderer=None):
+def viewargs(
+    *,
+    renderer: Optional[str] = None,
+    query_params: Optional[Sequence[Union[Tuple[str, Any], Tuple[str, Any, Any]]]] = None,
+):
     def wrap(func):
         if renderer is not None:
             func.__pyramid_renderer__ = renderer
+        if query_params is not None:
+            func.__pyramid_query_params__ = query_params
         return func
 
     return wrap

@@ -53,7 +53,7 @@ def test_validation(domain, ok, ngw_webtest_app, override):
 )
 def test_headers(domain, resource_exists, expected_ok, ngw_webtest_app, override):
     with override(good_domains):
-        url = "/api/resource/%d" % (0 if resource_exists else -1)
+        url = "/api/resource/%d" % (0 if resource_exists else 2**31)
         response = ngw_webtest_app.get(url, headers=dict(Origin=domain), status="*")
 
         exp_creds = "true" if expected_ok else None
@@ -73,7 +73,7 @@ def test_headers(domain, resource_exists, expected_ok, ngw_webtest_app, override
 )
 def test_options(domain, resource_exists, expected_ok, ngw_webtest_app, override):
     with override(good_domains):
-        url = "/api/resource/%d" % (0 if resource_exists else -1)
+        url = "/api/resource/%d" % (0 if resource_exists else 2**31)
         response = ngw_webtest_app.options(
             url, headers={"Origin": domain, "Access-Control-Request-Method": "OPTIONS"}, status="*"
         )

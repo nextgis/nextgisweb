@@ -234,7 +234,7 @@ def test_user_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_us
     )
 
     with ngw_env.auth.options.override(dict(user_limit=2)):
-        res = ngw_webtest_app.post_json(user_url(), vasya, status=200)
+        res = ngw_webtest_app.post_json(user_url(), vasya, status=201)
         vasya_id = res.json["id"]
 
         petya = dict(
@@ -248,7 +248,7 @@ def test_user_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_us
         vasya["disabled"] = True
         ngw_webtest_app.put_json(user_url(vasya_id), vasya, status=200)
 
-        res = ngw_webtest_app.post_json(user_url(), petya, status=200)
+        res = ngw_webtest_app.post_json(user_url(), petya, status=201)
         petya_id = res.json["id"]
 
         masha = dict(
@@ -303,7 +303,7 @@ def test_user_over_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disab
 
 def test_unique(ngw_webtest_app, ngw_auth_administrator):
     petya = dict(keyname="test-petya", display_name="Test Petya", password="qwerty")
-    res = ngw_webtest_app.post_json(user_url(), petya)
+    res = ngw_webtest_app.post_json(user_url(), petya, status=201)
     petya["id"] = res.json["id"]
 
     vasya = dict(keyname="TEST-petya", display_name="test petya", password="qwerty")
@@ -311,18 +311,18 @@ def test_unique(ngw_webtest_app, ngw_auth_administrator):
     vasya["display_name"] = "Test Vasya"
     ngw_webtest_app.post_json(user_url(), vasya, status=422)
     vasya["keyname"] = "test-vasya"
-    res = ngw_webtest_app.post_json(user_url(), vasya)
+    res = ngw_webtest_app.post_json(user_url(), vasya, status=201)
     vasya["id"] = res.json["id"]
 
     drones = dict(keyname="drones-club", display_name="Drones Club")
-    res = ngw_webtest_app.post_json(group_url(), drones)
+    res = ngw_webtest_app.post_json(group_url(), drones, status=201)
     drones["id"] = res.json["id"]
     petya_grp = dict(keyname="Drones-Club", display_name="Drones club")
     ngw_webtest_app.post_json(group_url(), petya_grp, status=422)
     petya_grp["display_name"] = "Test Petya"
     res = ngw_webtest_app.post_json(group_url(), petya_grp, status=422)
     petya_grp["keyname"] = "test-petya-group"
-    res = ngw_webtest_app.post_json(group_url(), petya_grp, status=200)
+    res = ngw_webtest_app.post_json(group_url(), petya_grp, status=201)
     petya_grp["id"] = res.json["id"]
 
     ngw_webtest_app.delete(user_url(petya["id"]))

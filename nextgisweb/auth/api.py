@@ -10,7 +10,20 @@ from sqlalchemy.orm import aliased, undefer
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, gettext, inject
-from nextgisweb.lib.apitype import DEF, OP, REQ, RO, AsJSON, Derived, flag, omit, struct_items
+from nextgisweb.lib.apitype import (
+    OP,
+    AnyOf,
+    AsJSON,
+    Default,
+    Derived,
+    EmptyObject,
+    ReadOnly,
+    Required,
+    StatusCode,
+    flag,
+    omit,
+    struct_items,
+)
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
@@ -18,19 +31,28 @@ from nextgisweb.pyramid.util import gensecret
 
 from .component import AuthComponent
 from .model import Group, Principal, User
+from .policy import AuthMedium, AuthProvider
 
 T = TypeVar("T")
-BRIEF = flag("Brief")
-DEF_NB = DEF[Annotated[T, omit(BRIEF)]]
-RO_NB = RO[Annotated[T, omit(BRIEF)]]
 
-UserID = Annotated[int, Meta(ge=1, description="User ID")]
-GroupID = Annotated[int, Meta(ge=1, description="Group ID")]
-Language = Annotated[str, Meta(pattern=r"^[a-z]{2,3}(\-[a-z]{2,3})?$")]
-Keyname = Annotated[str, Meta(min_length=1, pattern=r"^[A-Za-z][A-Za-z0-9_\-]*$")]
+BRIEF = flag("Brief")
+DefaultNonBrief = Default[Annotated[T, omit(BRIEF)]]
+ReadOnlyNonBrief = ReadOnly[Annotated[T, omit(BRIEF)]]
+
+UserID = Annotated[int, Meta(ge=1, description="User ID", examples=[4])]
+GroupID = Annotated[int, Meta(ge=1, description="Group ID", examples=[5])]
+Keyname = Annotated[str, Meta(pattern=r"^[A-Za-z][A-Za-z0-9_\-]*$")]
 DisplayName = Annotated[str, Meta(min_length=1)]
+Description = Annotated[str, Meta(examples=[None])]
+Language = Annotated[str, Meta(pattern=r"^[a-z]{2,3}(\-[a-z]{2,3})?$", examples=["en", "zh-cn"])]
+OAuthSubject = Annotated[str, Meta(examples=["a223836c-2678-4096-8608-0bd7a12bd25f"])]
 
 Brief = Annotated[bool, Meta(description="Return limited set of attributes")]
+
+
+def brief_or_administrator(request, brief: Brief):
+    if not brief:
+        request.require_administrator()
 
 
 def serialize_principal(src, cls):
@@ -147,25 +169,25 @@ def deserialize_principal(src, obj, *, create: bool, auth: AuthComponent):
 
 
 class UserRef(Struct, kw_only=True):
-    id: int
+    id: UserID
 
 
 class _User(Struct, kw_only=True):
-    id: RO[int]
-    system: RO[bool]
-    keyname: REQ[Keyname]
-    display_name: REQ[DisplayName]
-    description: DEF_NB[Optional[str]]
-    superuser: RO_NB[bool]
-    disabled: DEF[bool]
-    password: DEF[Union[bool, str]]
-    last_activity: RO[Optional[datetime]]
-    language: DEF_NB[Optional[Language]]
-    oauth_subject: RO[str]
-    oauth_tstamp: RO_NB[Optional[datetime]]
-    alink: DEF_NB[Union[bool, str]]
-    member_of: DEF_NB[List[int]]
-    is_administrator: RO[bool]
+    id: ReadOnly[UserID]
+    system: ReadOnly[Annotated[bool, Meta(examples=[False, True])]]
+    keyname: Required[Annotated[Keyname, Meta(examples=["administrator", "guest"])]]
+    display_name: Required[Annotated[DisplayName, Meta(examples=["Administrator", "Guest"])]]
+    description: DefaultNonBrief[Optional[Description]]
+    superuser: ReadOnlyNonBrief[bool]
+    disabled: Default[bool]
+    password: Default[Union[bool, str]]
+    last_activity: ReadOnly[Optional[datetime]]
+    language: DefaultNonBrief[Optional[Language]]
+    oauth_subject: ReadOnly[Optional[OAuthSubject]]
+    oauth_tstamp: ReadOnlyNonBrief[Optional[datetime]]
+    alink: DefaultNonBrief[Union[bool, str]]
+    member_of: DefaultNonBrief[List[GroupID]]
+    is_administrator: ReadOnly[bool]
 
 
 UserCreate = Derived[_User, OP.CREATE]
@@ -173,12 +195,15 @@ UserRead = Derived[_User, OP.READ]
 UserUpdate = Derived[_User, OP.UPDATE]
 UserReadBrief = Derived[_User, OP.READ, BRIEF]
 
+UserCGetResponse = AnyOf[AsJSON[List[UserRead]], AsJSON[List[UserReadBrief]]]
+UserIGetResponse = AnyOf[UserRead, UserReadBrief]
 
-def user_cget(request, *, brief: Brief = False) -> AsJSON[List[UserRead]]:
+
+def user_cget(request, *, brief: Brief = False) -> UserCGetResponse:
     """Read users
 
     :returns: Array of user objects"""
-    brief or request.require_administrator()  # pyright: ignore[reportUnusedExpression]
+    brief_or_administrator(request, brief)
 
     q = User.query().options(undefer(User.is_administrator))
     if request.authenticated_userid is None:
@@ -188,7 +213,7 @@ def user_cget(request, *, brief: Brief = False) -> AsJSON[List[UserRead]]:
     return [serialize_principal(o, cls) for o in q]
 
 
-def user_cpost(request, *, body: UserCreate) -> UserRef:
+def user_cpost(request, *, body: UserCreate) -> Annotated[UserRef, StatusCode(201)]:
     """Create user
 
     :returns: User reference"""
@@ -196,28 +221,29 @@ def user_cpost(request, *, body: UserCreate) -> UserRef:
 
     obj = User(system=False)
     deserialize_principal(body, obj, create=True)
+
+    request.response.status_code = 201
     return UserRef(id=obj.id)
 
 
-def user_iget(request) -> UserRead:
+def user_iget(request, id: UserID, *, brief: Brief = False) -> UserIGetResponse:
     """Read user
 
     :returns: User object"""
-    request.require_administrator()
+    brief_or_administrator(request, brief)
 
-    q = User.filter_by(id=int(request.matchdict["id"]))
-    q = q.options(undefer(User.is_administrator))
+    q = User.filter_by(id=id).options(undefer(User.is_administrator))
+    cls = UserReadBrief if brief else UserRead
+    return serialize_principal(q.one(), cls)
 
-    return serialize_principal(q.one(), UserRead)
 
-
-def user_iput(request, *, body: UserUpdate) -> UserRef:
+def user_iput(request, id: UserID, *, body: UserUpdate) -> UserRef:
     """Update user
 
     :returns: User reference"""
     request.require_administrator()
 
-    obj = User.filter_by(id=int(request.matchdict["id"])).one()
+    obj = User.filter_by(id=id).one()
     updated = deserialize_principal(body, obj, create=False)
 
     if obj.id != request.authenticated_userid and ({"keyname", "password", "alink"} & updated):
@@ -230,32 +256,30 @@ def user_iput(request, *, body: UserUpdate) -> UserRef:
     return UserRef(id=obj.id)
 
 
-def user_idelete(request) -> JSONType:
+def user_idelete(request, id: UserID) -> EmptyObject:
     """Delete user"""
     request.require_administrator()
 
-    obj = User.filter_by(id=int(request.matchdict["id"])).one()
+    obj = User.filter_by(id=id).one()
     check_principal_delete(obj)
     DBSession.delete(obj)
 
     check_last_administrator()
 
-    return None
-
 
 class GroupRef(Struct, kw_only=True):
-    id: int
+    id: GroupID
 
 
 class _Group(Struct, kw_only=True):
-    id: RO[int]
-    system: RO[bool]
-    keyname: REQ[Keyname]
-    display_name: REQ[DisplayName]
-    description: DEF_NB[Optional[str]]
-    register: DEF_NB[bool]
-    oauth_mapping: DEF_NB[bool]
-    members: DEF_NB[List[int]]
+    id: ReadOnly[GroupID]
+    system: ReadOnly[Annotated[bool, Meta(examples=[True])]]
+    keyname: Required[Annotated[Keyname, Meta(examples=["administrators"])]]
+    display_name: Required[Annotated[DisplayName, Meta(examples=["Administrators"])]]
+    description: DefaultNonBrief[Optional[Description]]
+    register: DefaultNonBrief[bool]
+    oauth_mapping: DefaultNonBrief[bool]
+    members: DefaultNonBrief[List[UserID]]
 
 
 GroupCreate = Derived[_Group, OP.CREATE]
@@ -263,24 +287,25 @@ GroupRead = Derived[_Group, OP.READ]
 GroupUpdate = Derived[_Group, OP.UPDATE]
 GroupReadBrief = Derived[_Group, OP.READ, BRIEF]
 
+GroupCGetResponse = AnyOf[AsJSON[List[GroupRead]], AsJSON[List[GroupReadBrief]]]
+GroupIGetResponse = AnyOf[GroupRead, GroupReadBrief]
 
-def group_cget(request, *, brief: Brief = False) -> AsJSON[List[_Group]]:
+
+def group_cget(request, *, brief: Brief = False) -> GroupCGetResponse:
     """Read groups
 
     :returns: Array of group objects"""
-    brief or request.require_administrator()  # pyright: ignore[reportUnusedExpression]
+    brief_or_administrator(request, brief)
 
     q = Group.query()
     if request.authenticated_userid is None:
         q = q.filter_by(system=True)
 
     cls = GroupReadBrief if brief else GroupRead
-    result = [serialize_principal(o, cls) for o in q]
-
-    return result
+    return [serialize_principal(o, cls) for o in q]
 
 
-def group_cpost(request, *, body: GroupCreate) -> GroupRef:
+def group_cpost(request, *, body: GroupCreate) -> Annotated[GroupRef, StatusCode(201)]:
     """Create group
 
     :returns: Group reference"""
@@ -289,46 +314,46 @@ def group_cpost(request, *, body: GroupCreate) -> GroupRef:
     obj = Group(system=False)
     deserialize_principal(body, obj, create=True)
 
+    request.response.status_code = 201
     return GroupRef(id=obj.id)
 
 
-def group_iget(request) -> GroupRead:
+def group_iget(request, id: GroupID, *, brief: Brief = False) -> GroupIGetResponse:
     """Read group
 
     :returns: Group object"""
-    request.require_administrator()
-    obj = Group.filter_by(id=int(request.matchdict["id"])).one()
-    return serialize_principal(obj, GroupRead)
+    brief_or_administrator(request, brief)
+
+    obj = Group.filter_by(id=id).one()
+    cls = GroupReadBrief if brief else GroupRead
+    return serialize_principal(obj, cls)
 
 
-def group_iput(request, *, body: GroupUpdate) -> GroupRef:
+def group_iput(request, id: GroupID, *, body: GroupUpdate) -> GroupRef:
     """Update group
 
     :returns: Group reference"""
     request.require_administrator()
 
-    obj = Group.filter_by(id=int(request.matchdict["id"])).one()
+    obj = Group.filter_by(id=id).one()
     updated = deserialize_principal(body, obj, create=False)
     if {"members"} & updated:
         check_last_administrator()
-
     return GroupRef(id=obj.id)
 
 
-def group_idelete(request) -> JSONType:
+def group_idelete(request, id: GroupID) -> EmptyObject:
     """Delete group"""
     request.require_administrator()
 
-    obj = Group.filter_by(id=int(request.matchdict["id"])).one()
+    obj = Group.filter_by(id=id).one()
     check_principal_delete(obj)
     DBSession.delete(obj)
 
-    return None
-
 
 class Profile(Struct, kw_only=True):
-    oauth_subject: RO[Optional[str]]
-    language: DEF[Optional[Language]]
+    oauth_subject: ReadOnly[Optional[str]]
+    language: Default[Optional[Language]]
 
 
 ProfileRead = Derived[Profile, OP.READ]
@@ -341,27 +366,24 @@ def profile_get(request) -> AsJSON[ProfileRead]:
     :returns: User profile"""
     if request.user.keyname == "guest":
         return HTTPUnauthorized()
-
     return serialize_principal(request.user, ProfileRead)
 
 
-def profile_put(request, body: ProfileUpdate) -> JSONType:
+def profile_put(request, body: ProfileUpdate) -> EmptyObject:
     """Update profile of the current user"""
     if request.user.keyname == "guest":
-        return HTTPUnauthorized()
+        raise HTTPUnauthorized()
 
     deserialize_principal(body, request.user, create=False)
 
-    return None
 
-
-class CurrentUser(Struct):
-    id: int
-    keyname: Keyname
-    display_name: DisplayName
+class CurrentUser(Struct, kw_only=True):
+    id: UserID
+    keyname: Annotated[Keyname, Meta(examples=["administrator"])]
+    display_name: Annotated[DisplayName, Meta(examples=["Administrator"])]
     language: Language
-    auth_medium: Optional[str]
-    auth_provider: Optional[str]
+    auth_medium: Optional[AuthMedium]
+    auth_provider: Optional[AuthProvider]
 
 
 def current_user(request) -> CurrentUser:
@@ -387,9 +409,9 @@ def current_user(request) -> CurrentUser:
 
 
 class RegisterBody(Struct, kw_only=True):
-    keyname: REQ[Keyname]
-    display_name: REQ[str]
-    password: REQ[str]
+    keyname: Required[Keyname]
+    display_name: Required[str]
+    password: Required[str]
 
 
 def register(request, *, body: RegisterBody) -> UserRef:
@@ -407,7 +429,7 @@ def register(request, *, body: RegisterBody) -> UserRef:
 
 
 class LoginResponse(Struct, kw_only=True):
-    id: int
+    id: UserID
     keyname: Keyname
     display_name: DisplayName
     home_url: Union[str, UnsetType] = UNSET
@@ -461,7 +483,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         "auth.user.item",
         "/api/component/auth/user/{id}",
-        types=dict(id=UserID),
+        types=dict(id=int),
         get=user_iget,
         put=user_iput,
         delete=user_idelete,
@@ -484,7 +506,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         "auth.group.item",
         "/api/component/auth/group/{id}",
-        types=dict(id=GroupID),
+        types=dict(id=int),
         get=group_iget,
         put=group_iput,
         delete=group_idelete,

@@ -496,6 +496,22 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
+#: tomb/config.py:99
+msgid "Parameter required"
+msgstr "Требуется параметр"
+
+#: tomb/config.py:100
+msgid "The '{}' query parameter is required."
+msgstr "Необходимо указать значение параметра '{}'."
+
+#: tomb/config.py:102
+msgid "Invalid parameter"
+msgstr "Некорректный параметр"
+
+#: tomb/config.py:103
+msgid "The '{}' query parameter has an invalid value."
+msgstr "Параметр запроса '{}' имеет недопустимое значение."
+
 #: view.py:162
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"

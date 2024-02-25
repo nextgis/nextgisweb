@@ -19,7 +19,7 @@ from .util import StaticMap, gensecret
 
 
 class PyramidComponent(Component):
-    def make_app(self, settings=None):
+    def make_app(self, settings={}):
         settings = dict(self._settings, **settings)
         settings["pyramid.static_map"] = StaticMap()
         config = Configurator(settings=settings)
@@ -40,11 +40,8 @@ class PyramidComponent(Component):
         for route in iter_routes(config.registry.introspector):
             if not route.client or route.name.startswith("_"):
                 continue
-            template = route.template
-            route_meta[route.name] = [
-                template,
-            ] + list(route.mdtypes.keys())
-            route_mdtypes[route.name] = route.mdtypes
+            route_meta[route.name] = [route.itemplate, *route.path_params.keys()]
+            route_mdtypes[route.name] = {k: v.type for k, v in route.path_params.items()}
 
         return config
 

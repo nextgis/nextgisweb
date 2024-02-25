@@ -7,6 +7,7 @@ from sqlalchemy.sql.operators import ilike_op
 
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib import db
+from nextgisweb.lib.apitype import EmptyObject
 
 from nextgisweb.auth import User
 from nextgisweb.core.exception import InsufficientPermissions
@@ -51,8 +52,7 @@ class BlueprintResponse(Struct):
 
 
 def blueprint(request) -> BlueprintResponse:
-    tr = request.localizer.translate
-
+    tr = request.translate
     SResource = BlueprintResponse.Resource
 
     resources = {
@@ -112,7 +112,7 @@ def item_put(context, request) -> JSONType:
     return result
 
 
-def item_delete(context, request) -> JSONType:
+def item_delete(context, request) -> EmptyObject:
     def delete(obj):
         request.resource_permission(PERM_DELETE, obj)
         request.resource_permission(PERM_MCHILDREN, obj)
@@ -439,8 +439,7 @@ def quota_check(request) -> JSONType:
         request.env.resource.quota_check(request.json_body)
     except QuotaExceeded as exc:
         request.response.status_code = exc.http_status_code
-        tr = request.localizer.translate
-        return dict(exc.data, message=tr(exc.message))
+        return dict(exc.data, message=request.translate(exc.message))
     return dict(success=True)
 
 

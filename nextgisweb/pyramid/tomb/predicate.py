@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Optional, Tuple, Type
+from typing import Any, Callable, Mapping, Optional, Sequence, Tuple
 
 from pyramid.predicates import RequestMethodPredicate as PyramidRequestMethodPredicate
 from pyramid.predicates import as_sorted_tuple  # type: ignore
+
+from nextgisweb.lib.apitype import PathParam, QueryParam
 
 
 class MetaPredicateBase:
@@ -34,10 +36,11 @@ class MetaPredicateBase:
 class ViewMeta(MetaPredicateBase):
     component: str
     func: Callable
-    context: Type
+    context: Any
     deprecated: bool
     openapi: bool
-    param_types: Dict[str, Tuple[type, Any]]
+    path_params: Mapping[str, PathParam]
+    query_params: Mapping[str, QueryParam]
     body_type: Optional[type]
     return_type: Optional[type]
 
@@ -45,11 +48,12 @@ class ViewMeta(MetaPredicateBase):
 @dataclass
 class RouteMeta(MetaPredicateBase):
     component: str
-    template: str
     overloaded: bool
     client: bool
-    wotypes: str
-    mdtypes: Dict[str, Type]
+    itemplate: str
+    ktemplate: str
+    path_params: Mapping[str, PathParam]
+    path_decoders: Sequence[Tuple[str, Callable[[str], Any]]]
 
 
 class ErrorRendererPredicate:

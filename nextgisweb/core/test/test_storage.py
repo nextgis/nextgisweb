@@ -114,7 +114,7 @@ def test_resource(ngw_env, ngw_webtest_app):
 
 
 def estimage(app):
-    app.post("/api/component/pyramid/estimate_storage", status=200)
+    app.post("/api/component/pyramid/storage/estimate", status=200)
     sleep(0.05)  # Give a chance to start a thread and acquire the lock
     with transaction.manager:
         # Wait estimation end

@@ -42,11 +42,8 @@ class ResourceFactory:
         self.context = context
 
     def __call__(self, request) -> Resource:
-        if request.matchdict[self.key] == "-":
-            return None
-
         # First, load base class resource
-        res_id = int(request.matchdict[self.key])
+        res_id = request.path_param[self.key]
         try:
             (res_cls,) = DBSession.query(Resource.cls).where(Resource.id == res_id).one()
         except NoResultFound:
@@ -141,23 +138,26 @@ def effective_permisssions(request):
 
 # TODO: Move to API
 def schema(request) -> JSONType:
+    tr = request.translate
     resources = dict()
     scopes = dict()
 
     for identity, cls in Resource.registry.items():
         resources[identity] = dict(
             identity=identity,
-            label=request.localizer.translate(cls.cls_display_name),
+            label=tr(cls.cls_display_name),
             scopes=list(cls.scope.keys()),
         )
 
     for k, scp in Scope.registry.items():
         spermissions = dict()
         for p in scp.values():
-            spermissions[p.name] = dict(label=request.localizer.translate(p.label))
+            spermissions[p.name] = dict(label=tr(p.label))
 
         scopes[k] = dict(
-            identity=k, permissions=spermissions, label=request.localizer.translate(scp.label)
+            identity=k,
+            permissions=spermissions,
+            label=tr(scp.label),
         )
 
     return dict(resources=resources, scopes=scopes)

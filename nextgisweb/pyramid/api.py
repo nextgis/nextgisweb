@@ -1,6 +1,6 @@
 import base64
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 from enum import Enum
 from inspect import Parameter, signature
 from typing import (
@@ -9,6 +9,7 @@ from typing import (
     ClassVar,
     Dict,
     List,
+    Literal,
     Optional,
     Tuple,
     Type,
@@ -23,7 +24,7 @@ from typing_extensions import Annotated
 
 from nextgisweb.env import COMP_ID, Component, DBSession, _, env, inject
 from nextgisweb.env.package import pkginfo
-from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
+from nextgisweb.lib.apitype import AnyOf, AsJSON, EmptyObject, Gap, StatusCode, fillgap
 from nextgisweb.lib.imptool import module_from_stack
 
 from nextgisweb.core import CoreComponent, KindOfData
@@ -33,17 +34,6 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import Resource, ResourceScope
 
 from .util import gensecret, parse_origin
-
-CKey = Annotated[
-    str,
-    Meta(
-        title="CKey",
-        description=(
-            "An unique hash key for content. If the requested content key mathes "
-            "the current, the server will set caching headers."
-        ),
-    ),
-]
 
 
 def _get_cors_olist():
@@ -198,11 +188,16 @@ def home_path_put(request, body: HomePathSettings) -> JSONType:
         env.core.settings_delete("pyramid", "home_path")
 
 
-def settings(request, *, component: str) -> JSONType:
-    comp = request.env.components.get(component)
-    if comp is None:
-        raise ValidationError(message=_("Invalid component identity."))
+SettingsComponentGap = Gap[
+    Annotated[
+        Literal["pyramid", "unknown"],
+        Meta(description="Component identity"),
+    ]
+]
 
+
+def settings(request, *, component: SettingsComponentGap) -> AsJSON[Dict[str, Any]]:
+    comp = request.env.components[component]
     return comp.client_settings(request)
 
 
@@ -216,7 +211,7 @@ def pkg_version(request) -> AsJSON[Dict[str, str]]:
     return {pn: p.version for pn, p in request.env.packages.items()}
 
 
-class HealthcheckResponse(TypedDict):
+class HealthcheckResponse(Struct, kw_only=True):
     success: bool
     component: Dict[str, Any]
 
@@ -228,22 +223,20 @@ def healthcheck(
     Annotated[HealthcheckResponse, StatusCode(503)],
 ]:
     """Run healtchecks and return the result"""
+    result = HealthcheckResponse(success=True, component=dict())
     components = [comp for comp in env.components.values() if hasattr(comp, "healthcheck")]
-
-    result = dict(success=True)
-    result["component"] = dict()
-
     for comp in components:
         cresult = comp.healthcheck()
-        result["success"] = result["success"] and cresult["success"]
-        result["component"][comp.identity] = cresult
+        result.success = result.success and cresult["success"]
+        result.component[comp.identity] = cresult
 
-    if not result["success"]:
+    if not result.success:
         request.response.status_code = 503
+
     return result
 
 
-def statistics(request) -> JSONType:
+def statistics(request) -> AsJSON[Dict[str, Dict[str, Any]]]:
     request.require_administrator()
 
     result = dict()
@@ -258,33 +251,39 @@ def require_storage_enabled(request):
         raise HTTPNotFound()
 
 
-def estimate_storage(request) -> JSONType:
-    require_storage_enabled(request)
+def storage_estimate(request) -> EmptyObject:
     request.require_administrator()
-
+    require_storage_enabled(request)
     request.env.core.start_estimation()
 
 
-def storage_status(request) -> JSONType:
+class StorageStatusResponse(Struct, kw_only=True):
+    estimation_running: bool
+
+
+@inject()
+def storage_status(request, *, core: CoreComponent) -> StorageStatusResponse:
+    request.require_administrator()
     require_storage_enabled(request)
+    return StorageStatusResponse(estimation_running=core.estimation_running())
+
+
+class StorageResponseValue(Struct, kw_only=True):
+    estimated: Optional[Annotated[datetime, Meta(tz=False)]]
+    updated: Optional[Annotated[datetime, Meta(tz=False)]]
+    data_volume: Annotated[int, Meta(gt=0)]
+
+
+@inject()
+def storage(request, *, core: CoreComponent) -> AsJSON[Dict[str, StorageResponseValue]]:
     request.require_administrator()
-
-    return dict(estimation_running=request.env.core.estimation_running())
-
-
-def storage(request) -> JSONType:
     require_storage_enabled(request)
+    return {kod: StorageResponseValue(**data) for kod, data in core.query_storage().items()}
+
+
+def kind_of_data(request) -> AsJSON[Dict[str, str]]:
     request.require_administrator()
-    return dict((k, v) for k, v in request.env.core.query_storage().items())
-
-
-def kind_of_data(request) -> JSONType:
-    request.require_administrator()
-
-    result = dict()
-    for item in KindOfData.registry.values():
-        result[item.identity] = request.localizer.translate(item.display_name)
-    return result
+    return {k: request.translate(v.display_name) for k, v in KindOfData.registry.items()}
 
 
 def logo_get(request):
@@ -496,7 +495,7 @@ def setup_pyramid_csettings(comp, config):
         parameters=[get_sig.parameters["request"]] + get_parameters
     )
 
-    def put(request, *, body: CSettingsUpadate) -> JSONType:
+    def put(request, *, body: CSettingsUpadate) -> EmptyObject:
         """Update component settings"""
 
         request.require_administrator()
@@ -618,6 +617,10 @@ def setup_pyramid(comp, config):
         put=system_name_put,
     )
 
+    comps = comp.env.components.values()
+    comp_ids = [comp.identity for comp in comps if hasattr(comp, "client_settings")]
+    fillgap(SettingsComponentGap, Literal[tuple(comp_ids)])  # type: ignore
+
     config.add_route(
         "pyramid.settings",
         "/api/component/pyramid/settings",
@@ -650,13 +653,13 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "pyramid.estimate_storage",
-        "/api/component/pyramid/estimate_storage",
-        post=estimate_storage,
+        "/api/component/pyramid/storage/estimate",
+        post=storage_estimate,
     )
 
     config.add_route(
         "pyramid.storage_status",
-        "/api/component/pyramid/storage_status",
+        "/api/component/pyramid/storage/status",
         get=storage_status,
     )
 
@@ -684,10 +687,8 @@ def setup_pyramid(comp, config):
     comp.company_logo_view = None
     comp.company_url_view = lambda request: comp.options["company_url"]
 
-    comp.help_page_url_view = (
-        lambda request: comp.options["help_page.url"]
-        if comp.options["help_page.enabled"]
-        else None
+    comp.help_page_url_view = lambda request: (
+        comp.options["help_page.url"] if comp.options["help_page.enabled"] else None
     )
 
     def preview_link_view(request):

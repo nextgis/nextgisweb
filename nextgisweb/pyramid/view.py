@@ -18,7 +18,7 @@ from sqlalchemy import text
 from nextgisweb.env import DBSession, _, env, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib import dynmenu as dm
-from nextgisweb.lib.apitype import JSONType
+from nextgisweb.lib.apitype import JSONType, QueryString
 from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
@@ -353,10 +353,12 @@ def setup_pyramid(comp, config):
 
     # COMMON REQUEST'S ATTRIBUTES
 
+    qs_parser = lambda req: QueryString(req.environ["QUERY_STRING"])
+    is_api = lambda req: req.path_info.lower().startswith("/api/")
+
+    config.add_request_method(qs_parser, "qs_parser", property=True)
     config.add_request_method(lambda req: env, "env", property=True)
-    config.add_request_method(
-        lambda req: req.path_info.lower().startswith("/api/"), "is_api", property=True
-    )
+    config.add_request_method(is_api, "is_api", property=True)
 
     # ERROR HANGLING
 
@@ -400,10 +402,14 @@ def setup_pyramid(comp, config):
     # Substitute localizer from pyramid with our own, original is
     # too tied to translationstring, that works strangely with string
     # interpolation via % operator.
-    def localizer(request):
-        return request.env.core.localizer(request.locale_name)
+    def localizer(request, localizer=comp.env.core.localizer):
+        return localizer(request.locale_name)
+
+    def translate(request):
+        return request.localizer.translate
 
     config.add_request_method(localizer, "localizer", property=True)
+    config.add_request_method(translate, "translate", property=True)
 
     locale_default = comp.env.core.locale_default
     locale_sorted = [locale_default] + [

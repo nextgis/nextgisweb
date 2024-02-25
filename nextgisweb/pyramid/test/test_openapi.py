@@ -1,13 +1,63 @@
 from enum import Enum
-from typing import List, Optional, TypedDict, Union
+from typing import Dict, List, TypedDict, Union
 
+from msgspec import Meta
 from typing_extensions import Annotated
 
-from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, JSONType, StatusCode
+from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, JSONType, Query, StatusCode
+from nextgisweb.lib.apitype.test.test_param import EnumA, LiteralA, StructA
 
 from ..tomb import Configurator
 
 config = Configurator(settings={})
+
+
+def path(
+    request,
+    foo: Annotated[int, Meta(description="Foo")],
+    bar: Annotated[int, Meta(gt=0, description="Bar")],
+):
+    pass
+
+
+config.add_route("path", "/path/{foo}/{bar}", types=dict(foo=int, bar=int), get=path)
+
+
+def query_primitive(
+    request,
+    *,
+    str: Annotated[str, Meta(description="String")],
+    int: Annotated[int, Meta(description="Integer")],
+    bool: Annotated[bool, Meta(description="Boolean")],
+    float: Annotated[float, Meta(description="Float")],
+    enum: Annotated[EnumA, Meta(description="Enum")],
+    literal: Annotated[LiteralA, Meta(description="Literal")],
+):
+    "Primitive query params"
+
+
+def query_array(
+    request,
+    *,
+    str: Annotated[List[str], Meta(description="List with default")] = [],
+    int: Annotated[List[int], Meta(min_length=2, description="Two or more list")],
+):
+    "Array query params"
+
+
+def query_object(
+    request,
+    *,
+    sto: Annotated[StructA, Meta(description="Struct")],
+    sts: Annotated[StructA, Query(spread=True), Meta(description="Spreaded struct")],
+    dsi: Annotated[Dict[str, int], Meta(description="String to integer mapping")],
+):
+    "Object query params"
+
+
+config.add_route("query_primitive", "/query/primitive", get=query_primitive)
+config.add_route("query_array", "/query/array", get=query_array)
+config.add_route("query_object", "/query/object", get=query_object)
 
 
 # JSON without type specification, orjson parses and renders them. JSONType is
@@ -32,28 +82,6 @@ def json(request, body: JSONType) -> JSONType:
 class EnumParam(Enum):
     FOO = "foo"
     BAR = "bar"
-
-
-# Query parameters can be declared as keyword-only parameters of view.
-# Parameters descriptions from docstrings are mapped to OpenAPI descriptions.
-def param(
-    request,
-    *,
-    rstr: str,
-    rint: int,
-    enum: EnumParam = EnumParam.FOO,
-    ostr: Optional[str],
-    lstr: List[str],
-) -> JSONType:
-    """Handle basic types of query parameters
-
-    :param rstr: Required string
-    :param rint: Required integer
-    :param enum: Enum with default value
-    :param ostr: Optional string, None is default
-    :param lstr: List of strings
-    """
-    return "OK"
 
 
 def anyof(
@@ -94,7 +122,6 @@ def tdict(
 
 
 config.add_route("json", "/json", post=json)
-config.add_route("param", "/param", get=param)
 config.add_route("anyof", "/anyof", get=anyof)
 config.add_route("body", "/body", post=body)
 config.add_route("tdict", "/tdict", get=tdict)

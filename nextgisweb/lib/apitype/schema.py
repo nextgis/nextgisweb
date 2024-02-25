@@ -1,8 +1,10 @@
 from typing import TYPE_CHECKING, Any, TypeVar, Union, get_args
 
+from msgspec import NODEFAULT
 from typing_extensions import Annotated, _AnnotatedAlias
 
 from .http import ContentType
+from .util import disannotate
 
 T = TypeVar("T")
 
@@ -12,11 +14,38 @@ AsJSON = Annotated[T, ContentType.JSON]
 
 class _AnyOfRuntime:
     def __class_getitem__(cls, args):
-        res = Annotated[Union[args], _AnyOfRuntime]  # type: ignore
-        return res
+        result = Annotated[Union[args], _AnyOfRuntime]  # type: ignore
+        return result
 
 
-AnyOf = Union if TYPE_CHECKING else _AnyOfRuntime
+class _GapRuntime:
+    def __class_getitem__(cls, arg):
+        _, extras = disannotate(arg)
+        if len(extras) == 0:
+            extras = (None,)
+        result = Annotated[(Any,) + extras]  # type: ignore
+
+        # NODEFAULT will break everything if it's not filled by actual type
+        result.__dict__.update(
+            __origin__=NODEFAULT,
+            __args__=(NODEFAULT,),
+            _is_gap=True,
+        )
+
+        return result
+
+
+if TYPE_CHECKING:
+    AnyOf = Union
+    Gap = Annotated[T, None]
+else:
+    AnyOf = _AnyOfRuntime
+    Gap = _GapRuntime
+
+
+def fillgap(placeholder: Any, type: Any):
+    assert placeholder._is_gap
+    placeholder.__dict__.update(__origin__=type, __args__=(type,))
 
 
 def _anyof_explode(tdef):
@@ -48,7 +77,3 @@ def iter_anyof(tdef, *args, classes=None):
     for t in anyof_members:
         ta = _update_from(args, getattr(t, "__metadata__", ()), classes)
         yield (t, *ta)
-
-
-def is_anyof(tdef):
-    return _anyof_explode(tdef)[1]
