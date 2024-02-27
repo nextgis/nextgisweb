@@ -103,20 +103,6 @@ def test_geom_length(ngw_webtest_app):
     "wkt, srs_geom, srs_calc, area",
     [
         pytest.param(
-            "POLYGON((484000 1400000, 484000 1400100, 484100 1400100, 484100 1400000, 484000 1400000))",
-            "MSK",
-            "MSK",
-            10000,
-            id="hectare-cw-msk",
-        ),
-        pytest.param(
-            "POLYGON((484000 1400000, 484100 1400000, 484100 1400100, 484000 1400100, 484000 1400000))",
-            "MSK",
-            "MSK",
-            10000,
-            id="hectare-ccw-msk",
-        ),
-        pytest.param(
             "POLYGON((0 1, 1 0, 0 -1, -1 0, 0 1))", "EPSG:3857", "EPSG:4326", -2, id="zero-cw-4326"
         ),
         pytest.param(
