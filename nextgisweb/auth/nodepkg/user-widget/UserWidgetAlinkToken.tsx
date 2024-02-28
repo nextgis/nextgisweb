@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { Form, Input, Select, Space } from "@nextgisweb/gui/antd";
+import { Input, InputProps, Select, Space } from "@nextgisweb/gui/antd";
+import type { FormItemProps } from "@nextgisweb/gui/fields-form";
+import { FormItem } from "@nextgisweb/gui/fields-form/field/_FormItem";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 const modes = [
@@ -20,7 +22,12 @@ const modes = [
 
 let alink_token = "";
 
-const AlinkInput = ({ value, onChange }) => {
+type AlinkInputProps = Omit<InputProps, "value" | "onChange"> & {
+    value: boolean | string | null;
+    onChange: (val: string | boolean | null) => void;
+};
+
+const AlinkInput = ({ value, onChange }: AlinkInputProps) => {
     if (typeof value === "string") {
         alink_token = value;
     }
@@ -34,14 +41,14 @@ const AlinkInput = ({ value, onChange }) => {
         } else if (mode === "turn_off") {
             onChange(false);
         }
-    }, [mode]);
+    }, [mode, onChange]);
 
     const availableModes = useMemo(() => {
         return modes.filter((m) => value !== null || m.value !== "keep");
-    }, []);
+    }, [value]);
 
     return (
-        <Space.Compact compact style={{ display: "flex" }}>
+        <Space.Compact style={{ display: "flex", width: "100%" }}>
             <Select
                 onChange={setMode}
                 popupMatchSelectWidth={false}
@@ -73,10 +80,8 @@ const AlinkInput = ({ value, onChange }) => {
     );
 };
 
-export function UserWidgetAlinkToken({ ...props }) {
-    return (
-        <Form.Item {...props}>
-            <AlinkInput></AlinkInput>
-        </Form.Item>
-    );
+export function UserWidgetAlinkToken({
+    ...props
+}: FormItemProps<AlinkInputProps>) {
+    return <FormItem {...props} input={AlinkInput} />;
 }

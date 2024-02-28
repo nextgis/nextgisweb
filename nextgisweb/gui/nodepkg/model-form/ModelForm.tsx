@@ -19,7 +19,7 @@ interface Messages {
     deleteConfirm?: string;
 }
 
-interface Model {
+export interface Model {
     item: RouteName;
     collection: RouteName;
     edit?: RouteName;

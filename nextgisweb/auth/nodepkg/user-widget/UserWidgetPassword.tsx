@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { Form, Input, Select, Space } from "@nextgisweb/gui/antd";
+import { Input, Select, Space } from "@nextgisweb/gui/antd";
+import type { FormItemProps } from "@nextgisweb/gui/fields-form";
+import { FormItem } from "@nextgisweb/gui/fields-form/field/_FormItem";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import oauth from "../oauth";
@@ -22,9 +24,18 @@ const modes = [
     },
 ];
 
-const PasswordInput = ({ value, onChange, ...inputProps }) => {
+type PasswordInputProps = Parameters<typeof Input.Password>[0];
+
+type InputProps = Omit<PasswordInputProps, "value" | "onChange"> & {
+    value: boolean | string;
+    onChange: (val: string | boolean) => void;
+};
+
+const PasswordInput = ({ value, onChange, ...inputProps }: InputProps) => {
     const [mode, setMode] = useState(value === false ? "turn_off" : "keep");
-    const [password, setPassword] = useState(mode === "assign" ? value : "");
+    const [password, setPassword] = useState<boolean | string>(
+        mode === "assign" ? value : ""
+    );
 
     useEffect(() => {
         if (mode === "assign") {
@@ -34,15 +45,15 @@ const PasswordInput = ({ value, onChange, ...inputProps }) => {
         } else if (mode === "turn_off") {
             onChange(false);
         }
-    }, [mode, password]);
+    }, [mode, onChange, password]);
 
     // Hide "keep" item if password wasn't assigned.
     const availableModes = useMemo(() => {
         return modes.filter((m) => value !== false || m.value !== "keep");
-    }, []);
+    }, [value]);
 
     return (
-        <Space.Compact style={{ display: "flex" }}>
+        <Space.Compact style={{ display: "flex", width: "100%" }}>
             <Select
                 onChange={setMode}
                 popupMatchSelectWidth={false}
@@ -57,7 +68,7 @@ const PasswordInput = ({ value, onChange, ...inputProps }) => {
             {mode === "assign" && (
                 <Input.Password
                     style={{ flexGrow: "1" }}
-                    value={mode === "assign" ? password : ""}
+                    value={mode === "assign" ? String(password) : ""}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={mode !== "assign"}
                     {...inputProps}
@@ -67,12 +78,11 @@ const PasswordInput = ({ value, onChange, ...inputProps }) => {
     );
 };
 
-export function UserWidgetPassword({ autoComplete, placeholder, ...props }) {
-    const inputProps = { autoComplete, placeholder };
-
+export function UserWidgetPassword({
+    inputProps,
+    ...props
+}: FormItemProps<InputProps>) {
     return (
-        <Form.Item {...props}>
-            <PasswordInput {...inputProps}></PasswordInput>
-        </Form.Item>
+        <FormItem {...props} inputProps={inputProps} input={PasswordInput} />
     );
 }

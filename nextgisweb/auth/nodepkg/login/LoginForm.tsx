@@ -3,12 +3,15 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Alert, Button, Form } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
+import type { FormField } from "@nextgisweb/gui/fields-form";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import oauth from "../oauth";
 import { authStore } from "../store";
+
+import type { Credentials, CredsOnChangeOptions, LoginFormProps } from "./type";
 
 import LoginIcon from "@nextgisweb/icon/material/login";
 
@@ -18,14 +21,14 @@ const msgOauth = gettext("Sign in with {}").replace("{}", oauth.name);
 const msgTitle = gettext("Sign in to Web GIS");
 const msgSignIn = gettext("Sign in");
 
-export const LoginForm = observer((props = {}) => {
-    const [creds, setCreds] = useState();
+export const LoginForm = observer((props: LoginFormProps) => {
+    const [creds, setCreds] = useState<Credentials>({});
 
     const form = Form.useForm()[0];
     const queryParams = new URLSearchParams(location.search);
     const nextQueryParam = queryParams.get("next");
 
-    const fields = useMemo(
+    const fields = useMemo<FormField[]>(
         () => [
             {
                 name: "login",
@@ -42,15 +45,13 @@ export const LoginForm = observer((props = {}) => {
         []
     );
 
-    const p = { fields, size: "large", form };
-
     useEffect(() => {
         if (props && props.onChange) {
             props.onChange(creds);
         }
-    }, [creds]);
+    }, [creds, props]);
 
-    const onChange = (e) => {
+    const onChange = (e: CredsOnChangeOptions) => {
         setCreds((oldVal) => ({ ...oldVal, ...e.value }));
     };
 
@@ -100,7 +101,12 @@ export const LoginForm = observer((props = {}) => {
                 {authStore.loginError && (
                     <Alert type="error" message={authStore.loginError} />
                 )}
-                <FieldsForm {...p} onChange={onChange}></FieldsForm>
+                <FieldsForm
+                    form={form}
+                    size="large"
+                    fields={fields}
+                    onChange={onChange}
+                ></FieldsForm>
 
                 <Button
                     type="primary"

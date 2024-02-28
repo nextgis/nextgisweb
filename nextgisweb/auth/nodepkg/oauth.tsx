@@ -15,7 +15,7 @@ const {
 
 const isNGID = type === "nextgisid";
 
-export function makeTeamManageButton(props: ButtonProps) {
+export function makeTeamManageButton(props?: ButtonProps) {
     if (isNGID && baseUrl) {
         const url =
             baseUrl.replace(/\/$/, "") +

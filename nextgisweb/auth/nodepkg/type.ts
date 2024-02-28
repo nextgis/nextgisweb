@@ -13,6 +13,10 @@ export interface User {
 export interface Group {
     id: number;
     system: boolean;
-    display_name: string;
     keyname: string;
+    display_name: string;
+    description?: string;
+    register: boolean;
+    oauth_mapping: boolean;
+    members: number[];
 }

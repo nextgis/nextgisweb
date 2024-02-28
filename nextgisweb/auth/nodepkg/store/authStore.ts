@@ -1,38 +1,48 @@
 import { makeAutoObservable } from "mobx";
 
 import { extractError } from "@nextgisweb/gui/error";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import { route } from "@nextgisweb/pyramid/api";
+
+import type { Credentials, LoginFormProps } from "../login/type";
+
+interface LoginResponse {
+    id: number;
+    display_name: string;
+    keyname: string;
+    home_url?: string;
+}
 
 class AuthStore {
     loginError = "";
     isLogining = false;
-
-    authenticated = !window.ngwConfig.isGuest;
-    invitationSession = window.ngwConfig.invitationSession;
-    userDisplayName = window.ngwConfig.userDisplayName;
-    isAdministrator = window.ngwConfig.isAdministrator;
+    authenticated = !ngwConfig.isGuest;
+    invitationSession = ngwConfig.invitationSession;
+    userDisplayName = ngwConfig.userDisplayName;
+    isAdministrator = ngwConfig.isAdministrator;
     showLoginModal = true;
 
     constructor() {
         makeAutoObservable(this);
     }
 
-    async login(creds) {
+    async login(creds: Credentials) {
         this._logout();
         this._cleanErrors();
         try {
             this.isLogining = true;
-            const resp = await route("auth.login_cookies").post({
+            const resp = await route("auth.login_cookies").post<LoginResponse>({
                 json: creds,
             });
             this.authenticated = true;
             this.userDisplayName = resp.display_name;
             return resp;
         } catch (er) {
-            const { title } = extractError(er);
+            const er_ = er as ApiError;
+            const { title } = extractError(er_);
             this.loginError = title;
-            throw new Error(er);
+            throw new Error(er_.title);
         } finally {
             this.isLogining = false;
         }
@@ -40,7 +50,7 @@ class AuthStore {
 
     logout() {
         this._logout();
-        window.open(window.ngwConfig.logoutUrl, "_self");
+        window.open(ngwConfig.logoutUrl, "_self");
     }
 
     async showModal() {
@@ -48,10 +58,12 @@ class AuthStore {
         loginModal();
     }
 
-    async runApp(props, el) {
+    async runApp(props: LoginFormProps, el: HTMLDivElement) {
         this.showLoginModal = false; // Do not show new modal on "Sign in" click
         const [{ default: reactApp }, { LoginBox }] = await Promise.all([
-            entrypoint("@nextgisweb/gui/react-app"),
+            entrypoint<{
+                default: typeof import("@nextgisweb/gui/react-app").default;
+            }>("@nextgisweb/gui/react-app"),
             import("../login"),
         ]);
         reactApp(LoginBox, props, el);

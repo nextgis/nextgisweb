@@ -11,6 +11,7 @@ declare const ngwConfig: {
     userDisplayName: string;
     invitationSession: boolean;
     locale: string;
+    logoutUrl: string;
     // Defined in @nextgisweb/jsrealm/locale-loader
     plurals: [number, { (n: number): number }];
 };
