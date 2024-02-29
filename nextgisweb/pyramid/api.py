@@ -121,10 +121,14 @@ def cors_tween_factory(handler, registry):
                 hadd(response, "Access-Control-Allow-Methods", method)
                 hadd(response, "Access-Control-Allow-Credentials", "true")
 
-                # Add allowed Authorization header for HTTP authentication
-                # from JavaScript. It is a good idea?
+                # Authorization + CORS-safeist headers are allowed
 
-                hadd(response, "Access-Control-Allow-Headers", "Authorization, Range")
+                hadd(
+                    response,
+                    "Access-Control-Allow-Headers",
+                    "Authorization, Accept, Accept-Language, "
+                    "Content-Language, Content-Type, Range",
+                )
 
                 return response
 
