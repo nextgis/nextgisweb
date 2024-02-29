@@ -15,7 +15,8 @@ type InputParams = ParamsOf<typeof Input>;
 
 interface SingleSettingFormParams {
     model: RouteName;
-    settingName?: string;
+    component: string;
+    settingName: string;
     saveSuccessText?: string;
     saveSuccessReloadText?: string;
     inputProps?: InputParams;
@@ -26,6 +27,7 @@ const msgReload = gettext("Reload the page to get them applied.");
 
 export function SingleSettingForm({
     model,
+    component,
     settingName,
     saveSuccessText: saveSuccesText = msgSaved,
     saveSuccessReloadText: saveSuccesReloadText = msgReload,
@@ -40,15 +42,22 @@ export function SingleSettingForm({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data } = useRouteGet<any>({
         name: model,
+        options: {
+            query: {
+                [component]: settingName,
+            },
+        },
     });
 
     useEffect(() => {
         if (data !== undefined) {
-            const val = settingName ? data[settingName] : data;
+            const val = settingName
+                ? data[component][settingName]
+                : data[component];
             setValue(val);
             setStatus(null);
         }
-    }, [data, settingName]);
+    }, [data, component, settingName]);
 
     const save = async () => {
         setStatus("saving");
@@ -57,7 +66,7 @@ export function SingleSettingForm({
                 ? { [settingName]: value || null }
                 : value || null;
             await route(model).put({
-                json,
+                json: { [component]: json },
             });
             if (saveSuccesText) {
                 message.success(

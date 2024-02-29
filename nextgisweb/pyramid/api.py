@@ -3,19 +3,7 @@ import re
 from datetime import datetime, timedelta
 from enum import Enum
 from inspect import Parameter, signature
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    ClassVar,
-    Dict,
-    List,
-    Literal,
-    Optional,
-    Tuple,
-    Type,
-    TypedDict,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_builtins
 from pyramid.httpexceptions import HTTPNotFound
@@ -30,7 +18,6 @@ from nextgisweb.lib.imptool import module_from_stack
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_upload import FileUpload, FileUploadRef
-from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import Resource, ResourceScope
 
 from .util import gensecret, parse_origin
@@ -144,52 +131,6 @@ def cors_tween_factory(handler, registry):
         return handler(request)
 
     return cors_tween
-
-
-class SystemNameSettings(TypedDict):
-    full_name: Optional[str]
-
-
-def system_name_get(request) -> AsJSON[SystemNameSettings]:
-    """Read system name settings"""
-    try:
-        value = env.core.settings_get("core", "system.full_name")
-    except KeyError:
-        value = None
-    return SystemNameSettings(full_name=value)
-
-
-def system_name_put(request, body: SystemNameSettings) -> JSONType:
-    """Update system name settings"""
-    request.require_administrator()
-
-    if value := body["full_name"]:
-        env.core.settings_set("core", "system.full_name", value)
-    else:
-        env.core.settings_delete("core", "system.full_name")
-
-
-class HomePathSettings(TypedDict):
-    home_path: Optional[str]
-
-
-def home_path_get(request) -> AsJSON[HomePathSettings]:
-    """Read home path settings"""
-    try:
-        value = env.core.settings_get("pyramid", "home_path")
-    except KeyError:
-        value = None
-    return HomePathSettings(home_path=value)
-
-
-def home_path_put(request, body: HomePathSettings) -> JSONType:
-    """Update home path settings"""
-    request.require_administrator()
-
-    if value := body["home_path"]:
-        env.core.settings_set("pyramid", "home_path", value)
-    else:
-        env.core.settings_delete("pyramid", "home_path")
 
 
 SettingsComponentGap = Gap[
@@ -604,6 +545,8 @@ class MetricsSettings(Struct):
     yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
 
 
+csetting("full_name", Optional[str], skey=("core", "system.full_name"))
+csetting("home_path", Optional[str])
 csetting("metrics", MetricsSettings, default={})
 
 
@@ -613,13 +556,6 @@ def setup_pyramid(comp, config):
     config.add_tween(
         "nextgisweb.pyramid.api.cors_tween_factory",
         under=("nextgisweb.pyramid.exception.handled_exception_tween_factory", "INGRESS"),
-    )
-
-    config.add_route(
-        "pyramid.system_name",
-        "/api/component/pyramid/system_name",
-        get=system_name_get,
-        put=system_name_put,
     )
 
     comps = comp.env.components.values()
@@ -734,10 +670,3 @@ def setup_pyramid(comp, config):
     comp.preview_link_view = preview_link_view
 
     # TODO: Add PUT method for changing custom_css setting and GUI
-
-    config.add_route(
-        "pyramid.home_path",
-        "/api/component/pyramid/home_path",
-        get=home_path_get,
-        put=home_path_put,
-    )

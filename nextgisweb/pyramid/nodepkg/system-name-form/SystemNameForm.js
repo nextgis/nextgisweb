@@ -6,7 +6,8 @@ const msgSaved = gettext("The system name setting is saved.");
 export function SystemNameForm() {
     return (
         <SingleSettingForm
-            model="pyramid.system_name"
+            component="pyramid"
+            model="pyramid.csettings"
             saveSuccesText={msgSaved}
             settingName="full_name"
         />
