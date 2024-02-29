@@ -6,6 +6,12 @@ const msgHelp = gettext("We recommend height of 45 px and width of up to 200 px.
 
 export function LogoForm() {
     return (
-        <ModelLogoForm model="pyramid.logo" messages={{ helpText: msgHelp }} />
+        <ModelLogoForm
+            component="pyramid"
+            model="pyramid.csettings"
+            settingName="header_logo"
+            messages={{ helpText: msgHelp }}
+            accept=".png"
+        />
     );
 }

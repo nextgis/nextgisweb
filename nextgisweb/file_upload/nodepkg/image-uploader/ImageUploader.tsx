@@ -64,14 +64,14 @@ export function ImageUploader({
         const f = Array.isArray(image_) ? image_[0] : image_;
         const reader = new FileReader();
         reader.onloadend = () => {
-            setBackgroundImage(`url(${reader.result})`);
+            setBackgroundImage(`url(${reader.result}`);
         };
         reader.readAsDataURL(f);
     };
 
     useEffect(() => {
         if (image) {
-            readImage(image);
+            setBackgroundImage(`url(${image})`);
         }
     }, [image]);
 

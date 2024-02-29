@@ -6,14 +6,17 @@ import type { ImageUploaderProps } from "@nextgisweb/file-upload/image-uploader"
 import { Space, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import { routeURL } from "@nextgisweb/pyramid/api";
+import { route } from "@nextgisweb/pyramid/api";
 import type { RouteName } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ApiError } from "../error/type";
 
 interface ModelLogoFormProps extends ImageUploaderProps {
+    component: string;
     model: RouteName;
+    settingName: string;
+
     messages?: {
         saveSuccess?: string;
         helpText?: string;
@@ -27,14 +30,16 @@ const defaultMessages = {
 };
 
 export function ModelLogoForm({
+    component,
     model,
+    settingName,
     messages = {},
     accept,
 }: ModelLogoFormProps) {
     const [status, setStatus] = useState<"loading" | "saving" | null>(
         "loading"
     );
-    const [logo, setLogo] = useState<Blob>();
+    const [logo, setLogo] = useState<string>();
     const [fileMeta, setFileMeta] = useState<UploaderMeta | null>(null);
 
     const msg = { ...defaultMessages, ...messages };
@@ -42,10 +47,15 @@ export function ModelLogoForm({
     useEffect(() => {
         const initLogo = async () => {
             try {
-                const resp = await fetch(routeURL(model));
-                if (resp.ok) {
-                    const existLogo = await resp.blob();
-                    setLogo(existLogo);
+                const resp = await route(model).get({
+                    query: {
+                        [component]: settingName,
+                    },
+                });
+                if (resp[component][settingName]) {
+                    setLogo(
+                        "data:image/png;base64," + resp[component][settingName]
+                    );
                 } else {
                     throw new Error("The logo is not set");
                 }
@@ -56,13 +66,16 @@ export function ModelLogoForm({
             }
         };
         initLogo();
-    }, [model]);
+    }, [component, model, settingName]);
 
     const save = async () => {
         try {
-            await fetch(routeURL(model), {
-                method: "PUT",
-                body: JSON.stringify(fileMeta),
+            await route(model).put({
+                json: {
+                    [component]: {
+                        [settingName]: fileMeta,
+                    },
+                },
             });
             message.success(msg.saveSuccess);
         } catch (err) {

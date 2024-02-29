@@ -1,6 +1,5 @@
-import base64
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
@@ -17,7 +16,7 @@ from nextgisweb.lib.imptool import module_from_stack
 
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.file_upload import FileUpload, FileUploadRef
+from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.resource import Resource, ResourceScope
 
 from .util import gensecret, parse_origin
@@ -229,39 +228,6 @@ def storage(request, *, core: CoreComponent) -> AsJSON[Dict[str, StorageResponse
 def kind_of_data(request) -> AsJSON[Dict[str, str]]:
     request.require_administrator()
     return {k: request.translate(v.display_name) for k, v in KindOfData.registry.items()}
-
-
-def logo_get(request):
-    try:
-        logodata = request.env.core.settings_get("pyramid", "logo")
-    except KeyError:
-        raise HTTPNotFound()
-
-    bindata = base64.b64decode(logodata)
-    response = Response(bindata, content_type="image/png")
-
-    if "ckey" in request.GET and request.GET["ckey"] == request.env.core.settings_get(
-        "pyramid", "logo.ckey"
-    ):
-        response.cache_control.public = True
-        response.cache_control.max_age = int(timedelta(days=1).total_seconds())
-
-    return response
-
-
-def logo_put(request):
-    request.require_administrator()
-
-    if value := request.json_body:
-        fupload = FileUpload(id=value["id"])
-        data = base64.b64encode(fupload.data_path.read_bytes())
-        request.env.core.settings_set("pyramid", "logo", data.decode("utf-8"))
-    else:
-        request.env.core.settings_delete("pyramid", "logo")
-
-    request.env.core.settings_set("pyramid", "logo.ckey", gensecret(8))
-
-    return Response()
 
 
 # Component settings machinery
@@ -614,13 +580,6 @@ def setup_pyramid(comp, config):
         "pyramid.kind_of_data",
         "/api/component/pyramid/kind_of_data",
         get=kind_of_data,
-    )
-
-    config.add_route(
-        "pyramid.logo",
-        "/api/component/pyramid/logo",
-        get=logo_get,
-        put=logo_put,
     )
 
     # Methods for customization in components
