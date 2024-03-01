@@ -337,7 +337,7 @@ class csetting:
     stype: SType
     default: SValue
     skey: Tuple[str, str]
-    ckey: bool
+    ckey: Union[bool, Tuple[str, str]]
 
     registry: ClassVar[Dict[str, Dict[str, "csetting"]]] = dict()
 
@@ -348,7 +348,7 @@ class csetting:
         *,
         default: Any = None,
         skey: Optional[Tuple[str, str]] = None,
-        ckey: Optional[bool] = None,
+        ckey: Optional[Union[bool, Tuple[str, str]]] = None,
         register: bool = True,
         stacklevel: int = 0,
     ):
@@ -365,7 +365,7 @@ class csetting:
             raise ValueError("skey already defined")
 
         if not getattr(self, "ckey", None):
-            self.ckey = bool(ckey)
+            self.ckey = ckey if ckey is not None else False
         elif ckey is not None:
             raise ValueError("ckey already defined")
 
@@ -407,9 +407,10 @@ class csetting:
         else:
             core.settings_set(*self.skey, to_builtins(value))
 
-        if self.ckey:
-            skey = (self.skey[0], self.skey[1] + ".ckey")
-            core.settings_set(*skey, gensecret(8))
+        if cskey := self.ckey:
+            if cskey is True:
+                cskey = (self.skey[0], self.skey[1] + ".ckey")
+            core.settings_set(*cskey, gensecret(8))
 
 
 def setup_pyramid_csettings(comp, config):
