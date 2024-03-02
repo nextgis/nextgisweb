@@ -2,27 +2,23 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import Literal
+from typing import Literal, Optional
 
 from geoalchemy2.shape import to_shape
 from msgspec import Meta, Struct
-from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.renderers import render
 from pyramid.response import Response
 from typing_extensions import Annotated
 
-from nextgisweb.env import DBSession, env
+from nextgisweb.env import DBSession
 
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid.api import csetting
 from nextgisweb.resource import DataScope, ResourceFactory
 
-from .model import (
-    WM_SETTINGS,
-    WebMap,
-    WebMapAnnotation,
-    WebMapScope,
-)
+from .model import WebMap, WebMapAnnotation, WebMapScope
 
 AnnotationID = Annotated[int, Meta(gt=1, description="Annotation ID")]
 
@@ -160,30 +156,6 @@ def get_webmap_extent(resource, request) -> JSONType:
     return traverse(resource.root_item, None)
 
 
-def settings_get(request) -> JSONType:
-    result = dict()
-    for k, default in WM_SETTINGS.items():
-        try:
-            v = env.core.settings_get("webmap", k)
-            if v is not None:
-                result[k] = v
-        except KeyError:
-            result[k] = default
-
-    return result
-
-
-def settings_put(request) -> JSONType:
-    request.require_administrator()
-
-    body = request.json_body
-    for k, v in body.items():
-        if k in WM_SETTINGS.keys():
-            env.core.settings_set("webmap", k, v)
-        else:
-            raise HTTPBadRequest(explanation="Invalid key '%s'" % k)
-
-
 ExportFormat = Literal["png", "jpeg", "tiff", "pdf"]
 
 
@@ -288,9 +260,33 @@ def pdf_to_image(format: ExportFormat, pdf_file: str, temp_dir: TemporaryDirecto
     return (content_type, output_file)
 
 
+# Component settings
+
+LengthUnits = Literal["m", "km", "metric", "ft", "mi", "imperial"]
+AreaUnits = Literal["sq_m", "sq_km", "metric", "ha", "ac", "sq_mi", "imperial", "sq_ft"]
+DegreeFormat = Literal["dd", "ddm", "dms"]
+AddressGeocoder = Literal["nominatim", "yandex"]
+
+csetting("identify_radius", float, default=3)
+csetting("identify_attributes", bool, default=True)
+csetting("show_geometry_info", bool, default=False)
+csetting("popup_width", int, default=300)
+csetting("popup_height", int, default=200)
+csetting("address_search_enabled", bool, default=True)
+csetting("address_search_extent", bool, default=False)
+csetting("address_geocoder", AddressGeocoder, default="nominatim")
+csetting("yandex_api_geocoder_key", Optional[str], default=None)
+csetting("nominatim_countrycodes", Optional[str], default=None)
+csetting("units_length", LengthUnits, default="m")
+csetting("units_area", AreaUnits, default="sq_m")
+csetting("degree_format", DegreeFormat, default="dd")
+csetting("measurement_srid", int, default=4326)
+csetting("legend_symbols", Optional[str], default=None)
+csetting("hide_nav_menu", bool, default=False)
+
+
 def setup_pyramid(comp, config):
     webmap_factory = ResourceFactory(context=WebMap)
-    comp.settings_view = settings_get
 
     config.add_route(
         "webmap.annotation.collection",
@@ -315,13 +311,6 @@ def setup_pyramid(comp, config):
         "/api/resource/{id}/webmap/extent",
         factory=webmap_factory,
         get=get_webmap_extent,
-    )
-
-    config.add_route(
-        "webmap.settings",
-        "/api/component/webmap/settings",
-        get=settings_get,
-        put=settings_put,
     )
 
     config.add_route(

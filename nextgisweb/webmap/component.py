@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from nextgisweb.env import Component, DBSession, _, require
+from nextgisweb.env import COMP_ID, Component, DBSession, _, require
 from nextgisweb.lib import db
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.imptool import module_path
@@ -38,7 +38,10 @@ class WebMapComponent(Component):
         view.setup_pyramid(self, config)
 
     def client_settings(self, request):
+        from nextgisweb.pyramid.api import csetting
+
         result = dict(
+            {k: v.getter() for k, v in csetting.registry[COMP_ID].items()},
             basemaps=self.basemaps,
             editing=self.options["editing"],
             annotation=self.options["annotation"],
@@ -48,9 +51,6 @@ class WebMapComponent(Component):
             ),
             check_origin=self.options["check_origin"],
         )
-
-        settings_view = self.settings_view(request)
-        result.update(settings_view)
 
         return result
 

@@ -6,18 +6,12 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
 from sqlalchemy.orm.attributes import set_committed_value
 
-from nextgisweb.env import Base, DBSession, _, env, pgettext
+from nextgisweb.env import COMP_ID, Base, DBSession, _, pgettext
 from nextgisweb.lib import db
 
 from nextgisweb.auth import User
 from nextgisweb.resource import Permission as P
-from nextgisweb.resource import (
-    Resource,
-    ResourceGroup,
-    ResourceScope,
-    Scope,
-    Serializer,
-)
+from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, Scope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedResourceRelationship as SRR
 from nextgisweb.spatial_ref_sys import SRS
@@ -381,38 +375,7 @@ class WebMapSerializer(Serializer):
     root_item = _root_item_attr(**_mdargs)
 
 
-WM_SETTINGS = dict(
-    identify_radius=3,
-    identify_attributes=True,
-    show_geometry_info=False,
-    popup_width=300,
-    popup_height=200,
-    address_search_enabled=True,
-    address_search_extent=False,
-    address_geocoder="nominatim",
-    yandex_api_geocoder_key="",
-    nominatim_countrycodes="",
-    units_length="m",
-    units_area="sq.m",
-    degree_format="dd",
-    measurement_srid=4326,
-    legend_symbols=None,
-    hide_nav_menu=False,
-)
-
-
 @event.listens_for(SRS, "after_delete")
 def check_measurement_srid(mapper, connection, target):
-    try:
-        measurement_srid = env.core.settings_get("webmap", "measurement_srid")
-    except KeyError:
-        return
-
-    if measurement_srid == target.id:
-        srid_default = WM_SETTINGS["measurement_srid"]
-        # fmt: off
-        connection.execute(text("""
-            UPDATE setting SET value = :srid
-            WHERE component = 'webmap' AND name = 'measurement_srid'
-        """), dict(srid=srid_default))
-        # fmt: on
+    sql = "DELETE FROM setting WHERE component = :c AND name = :n AND value::text::int = :v"
+    connection.execute(text(sql), dict(c=COMP_ID, n="measurement_srid", v=target.id))
