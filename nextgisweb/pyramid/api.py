@@ -5,7 +5,6 @@ from inspect import Parameter, signature
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_builtins
-from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import Response
 from typing_extensions import Annotated
 
@@ -15,7 +14,7 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, EmptyObject, Gap, StatusCode, 
 from nextgisweb.lib.imptool import module_from_stack
 
 from nextgisweb.core import CoreComponent, KindOfData
-from nextgisweb.core.exception import ValidationError
+from nextgisweb.core.exception import NotConfigured, ValidationError
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.resource import Resource, ResourceScope
 
@@ -190,14 +189,19 @@ def statistics(request) -> AsJSON[Dict[str, Dict[str, Any]]]:
     return result
 
 
-def require_storage_enabled(request):
-    if not request.env.core.options["storage.enabled"]:
-        raise HTTPNotFound()
+class StorageNotConfigured(NotConfigured):
+    message = _("Storage management is not enabled on this server.")
+
+
+@inject()
+def require_storage_enabled(*, core: CoreComponent):
+    if not core.options["storage.enabled"]:
+        raise StorageNotConfigured
 
 
 def storage_estimate(request) -> EmptyObject:
     request.require_administrator()
-    require_storage_enabled(request)
+    require_storage_enabled()
     request.env.core.start_estimation()
 
 
@@ -208,7 +212,7 @@ class StorageStatusResponse(Struct, kw_only=True):
 @inject()
 def storage_status(request, *, core: CoreComponent) -> StorageStatusResponse:
     request.require_administrator()
-    require_storage_enabled(request)
+    require_storage_enabled()
     return StorageStatusResponse(estimation_running=core.estimation_running())
 
 
@@ -221,7 +225,7 @@ class StorageResponseValue(Struct, kw_only=True):
 @inject()
 def storage(request, *, core: CoreComponent) -> AsJSON[Dict[str, StorageResponseValue]]:
     request.require_administrator()
-    require_storage_enabled(request)
+    require_storage_enabled()
     return {kod: StorageResponseValue(**data) for kod, data in core.query_storage().items()}
 
 

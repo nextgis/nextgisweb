@@ -1,9 +1,10 @@
 from typing import Dict, List, Literal, Union
 
 import zope.event
-from msgspec import Struct
+from msgspec import Meta, Struct
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
+from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib import db
@@ -12,7 +13,7 @@ from nextgisweb.lib.apitype import EmptyObject
 from nextgisweb.auth import User
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid import JSONType
-from nextgisweb.pyramid.api import csetting
+from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import QuotaExceeded, ResourceError, ValidationError
@@ -413,17 +414,28 @@ def search(request) -> JSONType:
     return result
 
 
-def resource_volume(resource, request) -> JSONType:
-    ids = []
+class ResourceVolumeResponse(Struct, kw_only=True):
+    volume: Annotated[int, Meta(ge=0, description="Resource volume in bytes")]
 
-    def _collect_ids(res):
+
+def resource_volume(
+    resource,
+    request,
+    *,
+    recursive: Annotated[bool, Meta(description="Include children resources")] = True,
+) -> ResourceVolumeResponse:
+    """Get resource data volume"""
+    require_storage_enabled()
+
+    def _traverse(res):
         request.resource_permission(ResourceScope.read, res)
-        ids.append(res.id)
-        for child in res.children:
-            _collect_ids(child)
+        yield res.id
+        if recursive:
+            for child in res.children:
+                yield from _traverse(child)
 
     try:
-        _collect_ids(resource)
+        ids = list(_traverse(resource))
     except InsufficientPermissions:
         volume = 0
     else:
@@ -431,7 +443,7 @@ def resource_volume(resource, request) -> JSONType:
         volume = res.get("", dict()).get("data_volume", 0)
         volume = volume if volume is not None else 0
 
-    return dict(volume=volume)
+    return ResourceVolumeResponse(volume=volume)
 
 
 def quota_check(request) -> JSONType:

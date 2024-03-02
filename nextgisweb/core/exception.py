@@ -105,3 +105,13 @@ class OperationalError(UserException):
 
 class ExternalServiceError(OperationalError):
     title = _("External service error")
+
+
+class NotConfigured(UserException):
+    """Not configured exception base class
+
+    Should be used as a base class for exceptions that are raised when a
+    specific server configuration is required but not present."""
+
+    title = _("Not configured")
+    http_status_code = 501

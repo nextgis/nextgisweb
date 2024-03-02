@@ -15,11 +15,11 @@ msgstr "Не удалось скопировать"
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
 
-#: api.py:204
-msgid "Invalid component identity."
-msgstr "Некорректный идентификатор компонента."
+#: api.py:193
+msgid "Storage management is not enabled on this server."
+msgstr "Управление хранилищем не включено на этом сервере."
 
-#: api.py:481
+#: api.py:396
 msgid ""
 "The '{}' query parameter should not contain additional values if 'all' is "
 "specified."
@@ -27,31 +27,31 @@ msgstr ""
 "Параметр запроса '{}' не должен содержать дополнительных значений, если "
 "указано 'all'."
 
-#: api.py:585
+#: api.py:500
 msgid "64K should be enough for a logo."
 msgstr "64K должно быть достаточно для логотипа."
 
-#: api.py:725
+#: api.py:630
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:187
+#: component.py:184
 msgid "Request timeout"
 msgstr "Таймаут запроса"
 
-#: component.py:190
+#: component.py:187
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:190
+#: component.py:187
 msgid "Disabled"
 msgstr "Отключено"
 
-#: exception.py:203 exception.py:262
+#: exception.py:205 exception.py:264
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:204
+#: exception.py:206
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -59,37 +59,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:231
+#: exception.py:233
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:232
+#: exception.py:234
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:239
+#: exception.py:241
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:240
+#: exception.py:242
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:244
+#: exception.py:246
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:245
+#: exception.py:247
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:249
+#: exception.py:251
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:250
+#: exception.py:252
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -98,15 +98,15 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:257
+#: exception.py:259
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:258
+#: exception.py:260
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:263
+#: exception.py:265
 msgid ""
 "The server has either erred or is incapable of performing the requested "
 "operation."
@@ -114,15 +114,15 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:267 exception.py:268
+#: exception.py:269 exception.py:270
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:272
+#: exception.py:274
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:273
+#: exception.py:275
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
@@ -217,7 +217,7 @@ msgstr ""
 msgid "The home path setting is saved."
 msgstr "Настройка стартовой страницы сохранена."
 
-#: nodepkg/i18n/testentry.ts:8 nodepkg/i18n/testentry.ts:12 test/test_i18n.py:8
+#: nodepkg/i18n/testentry.ts:8 nodepkg/i18n/testentry.ts:12 test/test_i18n.py:15
 msgctxt "test"
 msgid "unit"
 msgid_plural "units"
@@ -233,7 +233,7 @@ msgstr "Войти"
 msgid "Invitation session"
 msgstr "Пригласительная сессия"
 
-#: nodepkg/layout/Avatar.js:21 view.py:548
+#: nodepkg/layout/Avatar.js:21 view.py:554
 msgid "Settings"
 msgstr "Настройки"
 
@@ -516,43 +516,42 @@ msgstr "Параметр запроса '{}' имеет недопустимое
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:183 view.py:545
+#: view.py:183 view.py:551
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:191 view.py:585
+#: view.py:191 view.py:591
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:202 view.py:594
+#: view.py:202 view.py:600
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:218 view.py:556
+#: view.py:218 view.py:562
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
-#: view.py:228 view.py:561
+#: view.py:228 view.py:567
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:238 view.py:566
+#: view.py:238 view.py:572
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:248 view.py:551
+#: view.py:248 view.py:557
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:258 view.py:571
+#: view.py:258 view.py:577
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:268 view.py:576
+#: view.py:268 view.py:582
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:542
+#: view.py:548
 msgid "Info"
 msgstr "Информация"
-

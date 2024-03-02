@@ -3,7 +3,7 @@ from typing import List, Optional, TypeVar, Union
 
 import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, UnsetType
-from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
+from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.interfaces import ISecurityPolicy
 from pyramid.security import forget
 from sqlalchemy.orm import aliased, undefer
@@ -25,7 +25,7 @@ from nextgisweb.lib.apitype import (
     struct_items,
 )
 
-from nextgisweb.core.exception import ValidationError
+from nextgisweb.core.exception import NotConfigured, ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.util import gensecret
 
@@ -414,12 +414,16 @@ class RegisterBody(Struct, kw_only=True):
     password: Required[str]
 
 
+class RegistrationNotConfigured(NotConfigured):
+    message = gettext("User self-registration is not allowed on this server.")
+
+
 def register(request, *, body: RegisterBody) -> UserRef:
     """Self-register user
 
     :returns: User reference"""
     if not request.env.auth.options["register"]:
-        raise HTTPForbidden(explanation="Anonymous registration is not allowed!")
+        raise RegistrationNotConfigured
 
     obj = User(system=False)
     obj.member_of = list(Group.filter_by(register=True))

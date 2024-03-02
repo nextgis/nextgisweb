@@ -30,10 +30,6 @@ msgstr "Аттрибуты организации СК должны быть у�
 msgid "SRS #{} already exists."
 msgstr "СК #{} уже существует."
 
-#: exception.py:7
-msgid "SRS catalog not cofigured"
-msgstr "Каталог СК не настроен"
-
 #: nodepkg/catalog-browse/CatalogBrowse.tsx:89
 #: nodepkg/catalog-import/CatalogImport.tsx:32 nodepkg/srs-browse/SrsBrowse.tsx:33
 #: nodepkg/srs-widget/SRSWidget.tsx:28
@@ -97,6 +93,14 @@ msgstr "Удалить СК?"
 msgid "SRS deleted"
 msgstr "СК удалена"
 
+#: pyramid.py:9
+msgid "Catalog not cofigured"
+msgstr "Каталог не настроен"
+
+#: pyramid.py:10
+msgid "The spatial reference system catalog is not configured on this server."
+msgstr "Каталог систем координат не настроен на этом сервере."
+
 #: util.py:40
 msgid "Invalid MapInfo spatial reference system: %s"
 msgstr "Неверная система координат MapInfo: %s"
@@ -144,4 +148,3 @@ msgstr "Редактировать"
 #: view.py:120
 msgid "Delete"
 msgstr "Удалить"
-

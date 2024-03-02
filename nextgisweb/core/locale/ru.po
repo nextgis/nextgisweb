@@ -1,49 +1,52 @@
-#: component.py:99
+#: component.py:90
 msgid "NextGIS geoinformation system"
 msgstr "Геоинформационная система NextGIS"
 
-#: component.py:255
+#: component.py:269
 msgid "Linux kernel"
 msgstr "Ядро Linux"
 
-#: component.py:258
+#: component.py:272
 msgid "OS distribution"
 msgstr "Дистрибутив ОС"
 
-#: component.py:270
+#: component.py:284
 msgid "CPU"
 msgstr "Процессор"
 
-#: component.py:274
+#: component.py:287
 msgid "RAM"
 msgstr "ОЗУ"
 
-#: exception.py:84
+#: exception.py:87
 msgid "Validation error"
 msgstr "Ошибка валидации"
 
-#: exception.py:89
+#: exception.py:92
 msgid "Forbidden"
 msgstr "Запрещено"
 
-#: exception.py:94
+#: exception.py:97
 msgid "Insufficient permissions"
 msgstr "Недостаточно прав"
 
-#: exception.py:99
+#: exception.py:102
 msgid "Operational error"
 msgstr "Операционная ошибка"
 
-#: exception.py:104
+#: exception.py:107
 msgid "External service error"
 msgstr "Ошибка внешнего сервиса"
 
-#: storage.py:249
+#: exception.py:111
+msgid "Not configured"
+msgstr "Не сконфигурировано"
+
+#: storage.py:289
 msgid "Storage full"
 msgstr "Хранилище переполнено"
 
-#: storage.py:250
-#, python-format
+#: storage.py:290
 msgid ""
 "This operation can't be performed because the storage limit (%s) has been "
 "already exceeded by %s."
@@ -51,12 +54,11 @@ msgstr ""
 "Операция не может быть выполнена, так как лимит использования хранилища (%s) "
 "уже превышен на %s."
 
-#: storage.py:258
+#: storage.py:300
 msgid "Not enough storage"
 msgstr "Недостаточно места в хранилище"
 
-#: storage.py:259
-#, python-format
+#: storage.py:301
 msgid ""
 "This operation requires %s of storage and can't be performed because only %s "
 "available."
@@ -64,12 +66,11 @@ msgstr ""
 "Операция не может быть выполнена, так как для ее выполнения требуется %s в "
 "хранилище, однако доступно только %s."
 
-#: storage.py:267
+#: storage.py:311
 msgid "Estimation is already running"
 msgstr "Процесс оценки хранилища уже запущен"
 
-#: test/test_exception.py:72
-#, python-format
+#: test/test_exception.py:76
 msgid "The answer is %d"
 msgstr "Ответ %d"
 

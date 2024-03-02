@@ -1,61 +1,64 @@
-#: backend/base.py:41
-msgid "Audit backend not configured"
-msgstr "Серверная часть аудита не настроена"
+#: backend/base.py:36
+msgid "Audit backend not enabled"
+msgstr "Механизм аудита не включен"
 
-#: nodepkg/journal/Journal.js:45
+#: backend/base.py:37
+msgid "The '{}' audit backend is not configured on this server."
+msgstr "Механизм аудита '{}' не настроен на этом сервере."
+
+#: nodepkg/journal/Journal.js:47
 msgid "Request"
 msgstr "Запрос"
 
-#: nodepkg/journal/Journal.js:62
+#: nodepkg/journal/Journal.js:64
 msgid "IP address"
 msgstr "IP адрес"
 
-#: nodepkg/journal/Journal.js:66
+#: nodepkg/journal/Journal.js:68
 msgid "User"
 msgstr "Пользователь"
 
-#: nodepkg/journal/Journal.js:70
+#: nodepkg/journal/Journal.js:72
 msgid "Route name"
 msgstr "Имя маршрута"
 
-#: nodepkg/journal/Journal.js:74
+#: nodepkg/journal/Journal.js:76
 msgid "Context"
 msgstr "Контекст"
 
-#: nodepkg/journal/Journal.js:156
+#: nodepkg/journal/Journal.js:158
 msgid "Last {} minute"
 msgid_plural "Last {} minutes"
 msgstr[0] "За {} минуту"
 msgstr[1] "За {} минуты"
 msgstr[2] "За {} минут"
 
-#: nodepkg/journal/Journal.js:158
+#: nodepkg/journal/Journal.js:160
 msgid "Last {} hour"
 msgid_plural "Last {} hours"
 msgstr[0] "За {} час"
 msgstr[1] "За {} часа"
 msgstr[2] "За {} часов"
 
-#: nodepkg/journal/Journal.js:160
+#: nodepkg/journal/Journal.js:162
 msgid "Last {} day"
 msgid_plural "Last {} days"
 msgstr[0] "За {} день"
 msgstr[1] "За {} дня"
 msgstr[2] "За {} дней"
 
-#: nodepkg/journal/Journal.js:281
+#: nodepkg/journal/Journal.js:292
 msgid "Filter by user"
 msgstr "Фильтр по пользователю"
 
-#: nodepkg/journal/Journal.js:285
+#: nodepkg/journal/Journal.js:301
 msgid "Export CSV"
 msgstr "Экспорт в CSV"
 
-#: nodepkg/journal/Journal.js:294
+#: nodepkg/journal/Journal.js:312
 msgid "Timestamp"
 msgstr "Время"
 
 #: view.py:15 view.py:41
 msgid "Journal"
 msgstr "Журнал"
-
