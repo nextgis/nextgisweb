@@ -9,7 +9,11 @@ const messages = {
     deleteSuccess: gettext("Group deleted"),
 };
 
-export function GroupBrowse() {
+interface GroupBrowseProps {
+    readonly: boolean;
+}
+
+export function GroupBrowse({readonly}: GroupBrowseProps) {
     const columns: TableProps["columns"] = [
         {
             title: gettext("Full name"),
@@ -40,5 +44,11 @@ export function GroupBrowse() {
         });
     }
 
-    return <ModelBrowse model="auth.group" {...{ columns, messages }} />;
+    return (
+        <ModelBrowse
+            readonly={readonly}
+            model="auth.group"
+            {...{ columns, messages }}
+        />
+    );
 }

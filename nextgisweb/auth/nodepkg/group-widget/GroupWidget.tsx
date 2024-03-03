@@ -11,6 +11,7 @@ import { default as oauth } from "../oauth";
 
 interface GroupWidgetProps {
     id: number;
+    readonly: boolean;
 }
 
 const messages = {
@@ -18,7 +19,7 @@ const messages = {
     deleteSuccess: gettext("Group deleted"),
 };
 
-export function GroupWidget({ id }: GroupWidgetProps) {
+export function GroupWidget({ id, readonly }: GroupWidgetProps) {
     const [fields] = useState<FormField[]>(() => {
         const fields_: FormField[] = [
             {
@@ -73,6 +74,12 @@ export function GroupWidget({ id }: GroupWidgetProps) {
         item: "auth.group.item",
     };
     return (
-        <ModelForm model={model} fields={fields} id={id} messages={messages} />
+        <ModelForm
+            model={model}
+            readonly={readonly}
+            fields={fields}
+            id={id}
+            messages={messages}
+        />
     );
 }

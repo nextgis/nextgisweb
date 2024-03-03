@@ -28,9 +28,10 @@ const messages = {
 
 interface UserWidgetProps {
     id: number;
+    readonly: boolean;
 }
 
-export function UserWidget({ id }: UserWidgetProps) {
+export function UserWidget({ id, readonly }: UserWidgetProps) {
     const { data: group, isLoading } = useRouteGet<Group[]>(
         "auth.group.collection"
     );
@@ -136,6 +137,7 @@ export function UserWidget({ id }: UserWidgetProps) {
             {infoNGID}
             <ModelForm
                 fields={fields}
+                readonly={readonly}
                 model={model}
                 id={id}
                 messages={messages}

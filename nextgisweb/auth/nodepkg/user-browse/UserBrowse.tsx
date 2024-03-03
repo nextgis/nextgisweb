@@ -17,6 +17,10 @@ import RegularUserIcon from "@nextgisweb/icon/material/person";
 
 type Col = NonNullable<TableProps["columns"]>[0];
 
+interface UserBrowseProps {
+    readonly: boolean;
+}
+
 const msgDisabled = gettext("Disabled");
 const msgEnabled = gettext("Enabled");
 const msgFullName = gettext("Full name");
@@ -106,7 +110,7 @@ const columns: TableProps["columns"] = [
     createStatusColumn(),
 ];
 
-export function UserBrowse() {
+export function UserBrowse({readonly}: UserBrowseProps) {
     const DisableSelectedUsers = (props: ControlProps<UserBrowseData>) => {
         return ToggleSelectedUsers({ disable: true, ...props });
     };
@@ -131,6 +135,7 @@ export function UserBrowse() {
         <div className="ngw-auth-user-browse">
             <ModelBrowse
                 model="auth.user"
+                readonly={readonly}
                 columns={columns}
                 messages={messages}
                 collectionOptions={{ query: { brief: true } }}
