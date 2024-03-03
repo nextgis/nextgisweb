@@ -287,12 +287,12 @@ export function useFeatureTable({
     }, [orderBy, queryParams, visibleFields]);
 
     useEffect(() => {
-        if (getTotalSize()) {
+        if (getTotalSize() && !total) {
             scrollToIndex(0);
         }
         // to init first loading
         setQueryTotal(pageSize);
-    }, [queryParams, pageSize, scrollToIndex, getTotalSize, total]);
+    }, [queryParams, pageSize, total, scrollToIndex, getTotalSize]);
 
     useEffect(() => {
         const items = [...virtualItems];
