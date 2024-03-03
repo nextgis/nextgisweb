@@ -21,9 +21,9 @@ const [msgHelp, msgInfo] = [
 ];
 
 // prettier-ignore
-const ORIGIN_RE  = /^https?:\/\/(?:(\*\.)?([_a-z-][_a-z0-9-]*\.)+([_a-z-][_a-z0-9-]*)\.?|([_a-z-][_a-z0-9-]*)|(((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}))(:([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?\/?$/g;
+const ORIGIN_RE = /^https?:\/\/(?:(\*\.)?([_a-z-][_a-z0-9-]*\.)+([_a-z-][_a-z0-9-]*)\.?|([_a-z-][_a-z0-9-]*)|(((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}))(:([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?\/?$/g;
 
-export function CORSSettings() {
+export function CORSSettings(props) {
     const [form] = Form.useForm();
     const [status, setStatus] = useState(null);
 
@@ -90,6 +90,7 @@ export function CORSSettings() {
                     <Form
                         initialValues={{ cors: allowOriginInitial }}
                         form={form}
+                        disabled={props.readonly}
                     >
                         <Form.Item rules={rules} name="cors">
                             <Input.TextArea
@@ -104,9 +105,11 @@ export function CORSSettings() {
                     <Typography.Paragraph>{msgInfo}</Typography.Paragraph>
                 </Col>
             </Row>
-            <Row>
-                <SaveButton onClick={save} loading={status === "saving"} />
-            </Row>
+            {!props.readonly ? (
+                <Row>
+                    <SaveButton onClick={save} loading={status === "saving"} />
+                </Row>
+            ) : null}
         </>
     );
 }
