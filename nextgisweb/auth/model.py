@@ -1,5 +1,6 @@
 from collections import namedtuple
 from functools import lru_cache
+from typing import ClassVar, Mapping, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -8,7 +9,8 @@ from sqlalchemy.dialects.postgresql import JSONB
 from zope.event import notify
 from zope.event.classhandler import handler
 
-from nextgisweb.env import Base
+from nextgisweb.env import Base, gettext
+from nextgisweb.lib.i18n import TrStr
 
 tab_group_user = sa.Table(
     "auth_group_user",
@@ -29,6 +31,8 @@ class Principal(Base):
     system = sa.Column(sa.Boolean, nullable=False, default=False)
     display_name = sa.Column(sa.Unicode, nullable=False)
     description = sa.Column(sa.Unicode)
+
+    system_display_name: ClassVar[Mapping[str, TrStr]]
 
     __table_args__ = (
         sa.Index(
@@ -55,6 +59,12 @@ class Principal(Base):
 
     __mapper_args__ = dict(polymorphic_on=cls, with_polymorphic="*")
 
+    @property
+    def display_name_i18n(self) -> Union[TrStr, str]:
+        if self.system and (value := self.system_display_name.get(self.keyname)):
+            return value
+        return self.display_name
+
 
 class User(Principal):
     __tablename__ = "auth_user"
@@ -71,6 +81,13 @@ class User(Principal):
     alink_token = sa.Column(sa.Unicode, unique=True)
     last_activity = sa.Column(sa.DateTime)
     language = sa.Column(sa.Unicode)
+
+    system_display_name = {
+        "guest": gettext("Guest"),
+        "everyone": gettext("Everyone"),
+        "authenticated": gettext("Authenticated"),
+        "owner": gettext("Owner"),
+    }
 
     __mapper_args__ = dict(polymorphic_identity="U")
 
@@ -135,6 +152,10 @@ class Group(Principal):
     keyname = sa.Column(sa.Unicode, unique=True)
     register = sa.Column(sa.Boolean, nullable=False, default=False)
     oauth_mapping = sa.Column(sa.Boolean, nullable=False, default=False)
+
+    system_display_name = {
+        "administrators": gettext("Administrators"),
+    }
 
     members = orm.relationship(
         User,

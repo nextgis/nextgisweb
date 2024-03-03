@@ -18,5 +18,5 @@
     %endif
 
     <dt>${tr(_("Owner"))}</dt>
-    <dd>${obj.owner_user}</dd>
+    <dd>${tr(obj.owner_user.display_name_i18n)}</dd>
 </dl>     

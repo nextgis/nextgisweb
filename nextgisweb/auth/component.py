@@ -6,11 +6,12 @@ from pyramid.httpexceptions import HTTPForbidden
 from sqlalchemy.orm import defer, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import Component, DBSession, _
+from nextgisweb.env import Component, DBSession, gettext, inject
 from nextgisweb.lib import db
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.logging import logger
 
+from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import Session, SessionStore
 from nextgisweb.pyramid.util import gensecret
@@ -31,32 +32,27 @@ class AuthComponent(Component):
             else None
         )
 
-    def initialize_db(self):
-        self.initialize_user(keyname="guest", system=True, display_name=_("Guest"))
-
-        self.initialize_user(keyname="everyone", system=True, display_name=_("Everyone")).persist()
-
-        self.initialize_user(
-            keyname="authenticated", system=True, display_name=_("Authenticated")
-        ).persist()
+    @inject()
+    def initialize_db(self, *, core: CoreComponent):
+        tr = core.localizer().translate
+        for keyname, display_name in User.system_display_name.items():
+            self.initialize_user(keyname, tr(display_name), system=True).persist()
 
         adm_opts = self.options.with_prefix("provision.administrator")
-
         self.initialize_group(
-            keyname="administrators",
+            "administrators",
+            tr(Group.system_display_name["administrators"]),
             system=True,
-            display_name=_("Administrators"),
             members=[
                 self.initialize_user(
-                    keyname="administrator",
-                    display_name=_("Administrator"),
+                    "administrator",
+                    tr(gettext("Administrator")),
+                    system=False,
                     password=adm_opts["password"],
                     oauth_subject=adm_opts["oauth_subject"],
                 ),
             ],
         ).persist()
-
-        self.initialize_user(system=True, keyname="owner", display_name=_("Owner")).persist()
 
     def setup_pyramid(self, config):
         def user(request):
@@ -180,29 +176,36 @@ class AuthComponent(Component):
             ),
         )
 
-    def initialize_user(self, keyname, display_name, **kwargs):
+    def initialize_user(self, keyname, display_name, *, system, **kwargs):
         """Checks is user with keyname exists in DB and
         if not, creates it with kwargs parameters"""
 
         try:
             obj = User.filter_by(keyname=keyname).one()
+            if system:
+                obj.display_name = display_name
         except NoResultFound:
             obj = User(
-                keyname=keyname, display_name=translate(self, display_name), **kwargs
+                keyname=keyname,
+                display_name=display_name,
+                system=system,
+                **kwargs,
             ).persist()
 
         return obj
 
-    def initialize_group(self, keyname, display_name, **kwargs):
+    def initialize_group(self, keyname, display_name, *, system, **kwargs):
         """Checks is usergroup with keyname exists in DB and
         if not, creates it with kwargs parameters"""
 
         try:
             obj = Group.filter_by(keyname=keyname).one()
+            if system:
+                obj.display_name = display_name
         except NoResultFound:
             obj = Group(
                 keyname=keyname,
-                display_name=translate(self, display_name),
+                display_name=display_name,
                 **kwargs,
             ).persist()
 
@@ -252,7 +255,7 @@ class AuthComponent(Component):
 
             if active_user_count >= user_limit:
                 raise ValidationError(
-                    message=_(
+                    message=gettext(
                         "Maximum number of users is reached. Your current plan user number limit is %d."
                     )
                     % user_limit
@@ -295,7 +298,3 @@ class AuthComponent(Component):
 
     option_annotations += OAuthHelper.option_annotations.with_prefix("oauth")
     option_annotations += SecurityPolicy.option_annotations.with_prefix("policy")
-
-
-def translate(self, trstring):
-    return self.env.core.localizer().translate(trstring)

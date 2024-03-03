@@ -17,7 +17,7 @@
         idata = dict(
             id=item.id, displayName=item.display_name, link=request.route_url('resource.show', id=item.id),
             cls=item.cls, clsDisplayName=tr(item.cls_display_name), creationDate=item.creation_date,
-            ownerUserDisplayName=item.owner_user.display_name)
+            ownerUserDisplayName=tr(item.owner_user.display_name_i18n))
         
         iacts = idata["actions"] = list()
         args = SimpleNamespace(obj=item, request=request)

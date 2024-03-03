@@ -55,10 +55,12 @@ def brief_or_administrator(request, brief: Brief):
         request.require_administrator()
 
 
-def serialize_principal(src, cls):
+def serialize_principal(src, cls, *, tr):
     attrs = dict()
     for k in cls.__struct_fields__:
-        if k in ("members", "member_of"):
+        if k == "display_name":
+            attrs[k] = tr(src.display_name_i18n)
+        elif k in ("members", "member_of"):
             attrs[k] = [m.id for m in getattr(src, k)]
         elif k == "password":
             attrs[k] = src.password_hash is not None
@@ -110,7 +112,7 @@ def validate_display_name(obj, display_name):
 
 
 @inject()
-def deserialize_principal(src, obj, *, create: bool, auth: AuthComponent):
+def deserialize_principal(src, obj, *, create: bool, tr, auth: AuthComponent):
     updated = set()
 
     is_group = isinstance(obj, Group)
@@ -122,7 +124,9 @@ def deserialize_principal(src, obj, *, create: bool, auth: AuthComponent):
             if k == "alink":
                 attr = "alink_token"
 
-            if k == "members" and set(m.id for m in obj.members) == set(v):
+            if k == "display_name" and not create and tr(obj.display_name_i18n) == v:
+                continue
+            elif k == "members" and set(m.id for m in obj.members) == set(v):
                 continue
             elif k == "member_of" and set(m.id for m in obj.member_of) == set(v):
                 continue
@@ -210,7 +214,8 @@ def user_cget(request, *, brief: Brief = False) -> UserCGetResponse:
         q = q.filter_by(system=True)
 
     cls = UserReadBrief if brief else UserRead
-    return [serialize_principal(o, cls) for o in q]
+    tr = request.translate
+    return [serialize_principal(o, cls, tr=tr) for o in q]
 
 
 def user_cpost(request, *, body: UserCreate) -> Annotated[UserRef, StatusCode(201)]:
@@ -220,7 +225,7 @@ def user_cpost(request, *, body: UserCreate) -> Annotated[UserRef, StatusCode(20
     request.require_administrator()
 
     obj = User(system=False)
-    deserialize_principal(body, obj, create=True)
+    deserialize_principal(body, obj, create=True, tr=request.translate)
 
     request.response.status_code = 201
     return UserRef(id=obj.id)
@@ -234,7 +239,7 @@ def user_iget(request, id: UserID, *, brief: Brief = False) -> UserIGetResponse:
 
     q = User.filter_by(id=id).options(undefer(User.is_administrator))
     cls = UserReadBrief if brief else UserRead
-    return serialize_principal(q.one(), cls)
+    return serialize_principal(q.one(), cls, tr=request.translate)
 
 
 def user_iput(request, id: UserID, *, body: UserUpdate) -> UserRef:
@@ -244,7 +249,7 @@ def user_iput(request, id: UserID, *, body: UserUpdate) -> UserRef:
     request.require_administrator()
 
     obj = User.filter_by(id=id).one()
-    updated = deserialize_principal(body, obj, create=False)
+    updated = deserialize_principal(body, obj, create=False, tr=request.translate)
 
     if obj.id != request.authenticated_userid and ({"keyname", "password", "alink"} & updated):
         auth_policy = request.registry.getUtility(ISecurityPolicy)
@@ -302,7 +307,8 @@ def group_cget(request, *, brief: Brief = False) -> GroupCGetResponse:
         q = q.filter_by(system=True)
 
     cls = GroupReadBrief if brief else GroupRead
-    return [serialize_principal(o, cls) for o in q]
+    tr = request.translate
+    return [serialize_principal(o, cls, tr=tr) for o in q]
 
 
 def group_cpost(request, *, body: GroupCreate) -> Annotated[GroupRef, StatusCode(201)]:
@@ -312,7 +318,7 @@ def group_cpost(request, *, body: GroupCreate) -> Annotated[GroupRef, StatusCode
     request.require_administrator()
 
     obj = Group(system=False)
-    deserialize_principal(body, obj, create=True)
+    deserialize_principal(body, obj, create=True, tr=request.translate)
 
     request.response.status_code = 201
     return GroupRef(id=obj.id)
@@ -326,7 +332,7 @@ def group_iget(request, id: GroupID, *, brief: Brief = False) -> GroupIGetRespon
 
     obj = Group.filter_by(id=id).one()
     cls = GroupReadBrief if brief else GroupRead
-    return serialize_principal(obj, cls)
+    return serialize_principal(obj, cls, tr=request.translate)
 
 
 def group_iput(request, id: GroupID, *, body: GroupUpdate) -> GroupRef:
@@ -336,7 +342,7 @@ def group_iput(request, id: GroupID, *, body: GroupUpdate) -> GroupRef:
     request.require_administrator()
 
     obj = Group.filter_by(id=id).one()
-    updated = deserialize_principal(body, obj, create=False)
+    updated = deserialize_principal(body, obj, create=False, tr=request.translate)
     if {"members"} & updated:
         check_last_administrator()
     return GroupRef(id=obj.id)
@@ -366,7 +372,7 @@ def profile_get(request) -> AsJSON[ProfileRead]:
     :returns: User profile"""
     if request.user.keyname == "guest":
         return HTTPUnauthorized()
-    return serialize_principal(request.user, ProfileRead)
+    return serialize_principal(request.user, ProfileRead, tr=request.translate)
 
 
 def profile_put(request, body: ProfileUpdate) -> EmptyObject:
@@ -374,7 +380,7 @@ def profile_put(request, body: ProfileUpdate) -> EmptyObject:
     if request.user.keyname == "guest":
         raise HTTPUnauthorized()
 
-    deserialize_principal(body, request.user, create=False)
+    deserialize_principal(body, request.user, create=False, tr=request.translate)
 
 
 class CurrentUser(Struct, kw_only=True):
@@ -427,7 +433,7 @@ def register(request, *, body: RegisterBody) -> UserRef:
 
     obj = User(system=False)
     obj.member_of = list(Group.filter_by(register=True))
-    deserialize_principal(body, obj, create=True)
+    deserialize_principal(body, obj, create=True, tr=request.translate)
 
     return UserRef(id=obj.id)
 
