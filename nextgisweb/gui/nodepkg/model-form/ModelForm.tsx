@@ -36,6 +36,7 @@ interface ModelFormProps extends FormProps {
     onChange?: (val: { value: unknown }) => void;
     allowDelete?: boolean;
     messages?: Messages;
+    readonly?: boolean;
 }
 
 const btnTitleAliases = {
@@ -52,6 +53,7 @@ export function ModelForm(props: ModelFormProps) {
         children,
         messages: msg,
         allowDelete: allowDelete_,
+        readonly: readonly,
         ...formProps
     } = props;
 
@@ -163,31 +165,34 @@ export function ModelForm(props: ModelFormProps) {
                 initialValues={value}
                 fields={fields}
                 form={form}
+                disabled={readonly}
                 {...formProps}
             >
                 {children}
-                <Form.Item>
-                    <Space>
-                        <SaveButton
-                            onClick={submit}
-                            loading={status === "saving"}
-                        >
-                            {btnTitleAliases[operation]}
-                        </SaveButton>
-                        {operation === "edit" && allowDelete ? (
-                            <Popconfirm
-                                title={deleteConfirm}
-                                onConfirm={deleteModelItem}
+                {!readonly ? (
+                    <Form.Item>
+                        <Space>
+                            <SaveButton
+                                onClick={submit}
+                                loading={status === "saving"}
                             >
-                                <Button danger>
-                                    {btnTitleAliases["delete"]}
-                                </Button>
-                            </Popconfirm>
-                        ) : (
-                            ""
-                        )}
-                    </Space>
-                </Form.Item>
+                                {btnTitleAliases[operation]}
+                            </SaveButton>
+                            {operation === "edit" && allowDelete ? (
+                                <Popconfirm
+                                    title={deleteConfirm}
+                                    onConfirm={deleteModelItem}
+                                >
+                                    <Button danger>
+                                        {btnTitleAliases["delete"]}
+                                    </Button>
+                                </Popconfirm>
+                            ) : (
+                                ""
+                            )}
+                        </Space>
+                    </Form.Item>
+                ) : null}
             </FieldsForm>
         </Space>
     );

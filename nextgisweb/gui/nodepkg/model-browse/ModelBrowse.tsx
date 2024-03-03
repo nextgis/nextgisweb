@@ -27,6 +27,7 @@ import AddCircleIcon from "@nextgisweb/icon/material/add_circle";
 import DeleteForeverIcon from "@nextgisweb/icon/material/delete_forever";
 import EditIcon from "@nextgisweb/icon/material/edit";
 import SearchIcon from "@nextgisweb/icon/material/search";
+import VisibilityIcon from "@nextgisweb/icon/material/visibility";
 
 type TableProps<D> = AntTAbleProps<D>;
 
@@ -64,6 +65,7 @@ interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
     itemProps?: {
         canDelete?: (args: { item: Data }) => boolean;
     };
+    readonly?: boolean;
 
     createProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
     headerControls?: FC<ControlProps<Data>>[];
@@ -111,6 +113,8 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     const [isDeleting, setIsDeleting] = useState(false);
     const [search, setSearch] = useState("");
     const [selected, setSelected] = useState<number[]>([]);
+
+    const readonly = tableProps.readonly;
 
     useEffect(() => {
         if (data) {
@@ -211,7 +215,9 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     };
 
     const canDelete = (item: Data) => {
-        if (itemProps.canDelete) {
+        if (readonly) {
+            return false;
+        } else if (itemProps.canDelete) {
             return itemProps.canDelete({ item });
         }
         return true;
@@ -235,11 +241,13 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
             align: "center",
             render: (_, record) => (
                 <div style={{ whiteSpace: "nowrap" }}>
-                    <Tooltip title={gettext("Edit")}>
+                    <Tooltip
+                        title={!readonly ? gettext("Edit") : gettext("View")}
+                    >
                         <Button
                             type="text"
                             shape="circle"
-                            icon={<EditIcon />}
+                            icon={!readonly ? <EditIcon /> : <VisibilityIcon />}
                             onClick={() => onEditClick(record.id)}
                         />
                     </Tooltip>
@@ -323,16 +331,24 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
             style={{ width: "100%" }}
             className="ngw-gui-model-browse"
         >
-            {selected.length ? SelectedControl() : TableControl()}
+            {!readonly
+                ? selected.length
+                    ? SelectedControl()
+                    : TableControl()
+                : null}
             <Table
                 className="ngw-card"
                 rowKey="id"
                 showSorterTooltip={false}
-                rowSelection={{
-                    type: "checkbox",
-                    selectedRowKeys: selected,
-                    ...rowSelection,
-                }}
+                rowSelection={
+                    !readonly
+                        ? {
+                              type: "checkbox",
+                              selectedRowKeys: selected,
+                              ...rowSelection,
+                          }
+                        : null
+                }
                 loading={isLoading}
                 columns={tableColumns}
                 dataSource={filteredRows}
