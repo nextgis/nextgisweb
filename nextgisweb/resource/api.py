@@ -1,16 +1,17 @@
-from typing import Dict, List, Literal, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Optional, Union
 
 import zope.event
-from msgspec import Meta, Struct
+from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib import db
-from nextgisweb.lib.apitype import EmptyObject
+from nextgisweb.lib.apitype import EmptyObject, annotate
 
 from nextgisweb.auth import User
+from nextgisweb.auth.api import UserID
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
@@ -208,36 +209,60 @@ def collection_post(request) -> JSONType:
     return result
 
 
-def permission(resource, request) -> JSONType:
+if TYPE_CHECKING:
+    scope_permissions_struct: Mapping[str, Any] = dict()
+
+    class PermissionResponse(Struct, kw_only=True):
+        pass
+
+else:
+    scope_permissions_struct = dict()
+    for sid, scope in Scope.registry.items():
+        struct = defstruct(
+            f"{scope.__name__}Permissions",
+            [
+                (
+                    perm.name,
+                    annotate(bool, [Meta(description=f"{scope.label}: {perm.label}")]),
+                )
+                for perm in scope.values(ordered=True)
+            ],
+            module=scope.__module__,
+        )
+        struct = annotate(struct, [Meta(description=str(scope.label))])
+        scope_permissions_struct[sid] = struct
+
+    PermissionResponse = defstruct(
+        "PermissionResponse",
+        [
+            ((sid, struct) if sid == "resource" else (sid, Union[(struct, UnsetType)], UNSET))
+            for sid, struct in scope_permissions_struct.items()
+        ],
+    )
+
+
+def permission(
+    resource,
+    request,
+    *,
+    user: Optional[UserID] = None,
+) -> PermissionResponse:
+    """Get resource effective permissions"""
     request.resource_permission(PERM_READ)
 
-    # In some cases it is convenient to pass empty string instead of
-    # user's identifier, that's why it so tangled.
-
-    user = request.params.get("user", "")
-    user = None if user == "" else user
-
-    if user is not None:
-        # To see permissions for arbitrary user additional permissions are needed
+    user_obj = User.filter_by(id=user).one() if (user is not None) else request.user
+    if user_obj.id != request.user.id:
         request.resource_permission(PERM_CPERM)
-        user = User.filter_by(id=user).one()
 
-    else:
-        # If it is not set otherwise, use current user
-        user = request.user
-
-    effective = resource.permissions(user)
-
-    result = dict()
-    for k, scope in resource.scope.items():
-        sres = dict()
-
-        for perm in scope.values(ordered=True):
-            sres[perm.name] = perm in effective
-
-        result[k] = sres
-
-    return result
+    effective = resource.permissions(user_obj)
+    return PermissionResponse(
+        **{
+            sid: scope_permissions_struct[sid](
+                **{p.name: (p in effective) for p in scope.values()},
+            )
+            for sid, scope in resource.scope.items()
+        }
+    )
 
 
 def permission_explain(request) -> JSONType:
