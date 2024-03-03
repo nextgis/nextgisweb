@@ -541,14 +541,10 @@ define([
             if (afterPopupInit && afterPopupInit instanceof Function)
                 afterPopupInit();
 
-            on(
-                this._popup._closeSpan,
-                "click",
-                lang.hitch(this, function () {
-                    this._popup.setPosition(undefined);
-                    topic.publish("feature.unhighlight");
-                })
-            );
+            this._popup._closeSpan.onclick = () => {
+                this._popup.setPosition(undefined);
+                topic.publish("feature.unhighlight");
+            };
         },
 
         identifyFeatureByAttrValue: function (
