@@ -47,7 +47,9 @@ export function ModelLogoForm({
     useEffect(() => {
         const initLogo = async () => {
             try {
-                const resp = await route(model).get({
+                const resp = await route(model).get<
+                    Record<string, Record<string, string>>
+                >({
                     query: {
                         [component]: settingName,
                     },
