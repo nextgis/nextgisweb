@@ -128,33 +128,20 @@ const metersAreaToUnit = (meters: number, unit: string): MetersResult => {
     let resultValue;
     let postfix;
 
+    const addSupSquare = (val: string) => `${val}²`;
+
     switch (unit) {
         case "sq_km":
             resultValue = meters * m_to_km * m_to_km;
-            postfix = (
-                <>
-                    {msgSiKm}
-                    <sup>2</sup>
-                </>
-            );
+            postfix = addSupSquare(msgSiKm);
             break;
         case "metric":
             if (meters > 1e5) {
                 resultValue = meters * m_to_km * m_to_km;
-                postfix = (
-                    <>
-                        {msgSiKm}
-                        <sup>2</sup>
-                    </>
-                );
+                postfix = addSupSquare(msgSiKm);
             } else {
                 resultValue = meters;
-                postfix = (
-                    <>
-                        {msgSiM}
-                        <sup>2</sup>
-                    </>
-                );
+                postfix = addSupSquare(msgSiM);
             }
             break;
         case "ha":
@@ -167,23 +154,13 @@ const metersAreaToUnit = (meters: number, unit: string): MetersResult => {
             break;
         case "sq_mi":
             resultValue = meters * m2_to_ac * ac_to_mi2;
-            postfix = (
-                <>
-                    {msgSiMi}
-                    <sup>2</sup>
-                </>
-            );
+            postfix = addSupSquare(msgSiMi);
             break;
         case "imperial":
             resultValue = meters * m2_to_ac;
             if (resultValue > 640 * 100) {
                 resultValue = resultValue * ac_to_mi2;
-                postfix = (
-                    <>
-                        {msgSiMi}
-                        <sup>2</sup>
-                    </>
-                );
+                postfix = addSupSquare(msgSiMi);
             } else {
                 resultValue = meters;
                 postfix = msgSiAc;
@@ -191,22 +168,12 @@ const metersAreaToUnit = (meters: number, unit: string): MetersResult => {
             break;
         case "sq_ft":
             resultValue = meters * m_to_ft * m_to_ft;
-            postfix = (
-                <>
-                    {msgSiFt}
-                    <sup>2</sup>
-                </>
-            );
+            postfix = addSupSquare(msgSiFt);
             break;
         case "sq_m":
         default:
             resultValue = meters;
-            postfix = (
-                <>
-                    {msgSiM}
-                    <sup>2</sup>
-                </>
-            );
+            postfix = addSupSquare(msgSiM);
     }
 
     return {
