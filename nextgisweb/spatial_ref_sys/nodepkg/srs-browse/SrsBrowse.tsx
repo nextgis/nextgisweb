@@ -8,7 +8,11 @@ import getMessages from "../srsMessages";
 import { modelObj } from "../srsModel";
 import type { SRSItem } from "../type";
 
-export function SrsBrowse() {
+interface SrsBrowseProps {
+    readonly: boolean;
+}
+
+export function SrsBrowse({ readonly }: SrsBrowseProps) {
     const headerControls = [];
 
     if (settings.catalog.enabled) {
@@ -28,6 +32,7 @@ export function SrsBrowse() {
     return (
         <ModelBrowse<SRSItem>
             model={modelObj}
+            readonly={readonly}
             columns={[
                 {
                     title: gettext("Display name"),

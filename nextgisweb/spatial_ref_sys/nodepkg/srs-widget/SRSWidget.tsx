@@ -15,7 +15,7 @@ import { SRSImportFrom } from "./SRSImportForm";
 
 const DEFAULT_DATA = { projStr: "", format: "proj4" };
 
-export function SRSWidget({ id }: { id: number }) {
+export function SRSWidget({ id, readonly }: { id: number, readonly: boolean }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isProtected, setIsProtected] = useState(false);
     const [isSystem, setIsSystem] = useState(false);
@@ -92,6 +92,7 @@ export function SRSWidget({ id }: { id: number }) {
             <ModelForm
                 id={id}
                 fields={fields}
+                readonly={readonly}
                 allowDelete={!isSystem}
                 form={form}
                 model={modelObj}
