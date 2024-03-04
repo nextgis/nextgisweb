@@ -625,21 +625,33 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         elif self._fields is not None:
             params["propertyname"] = [*self._fields, self.layer.column_geom]
 
-        features, count = self.layer.connection.get_feature(self.layer, **params)
-
         class QueryFeatureSet(FeatureSet):
             layer = self.layer
 
+            def __init__(self):
+                super().__init__()
+                self._features = None
+                self._count = None
+
             def __iter__(self):
-                for feature in features:
+                if self._features is None:
+                    self._features, self._count = self.layer.connection.get_feature(
+                        self.layer, **params
+                    )
+                for feature in self._features:
                     yield feature
 
             @property
             def total_count(self):
-                if count is None:
+                if self._count is None:
+                    _none_features, self._count = self.layer.connection.get_feature(
+                        self.layer, get_count=True, **params
+                    )
+
+                if self._count is None:
                     raise ExternalServiceError(
                         message="Couldn't determine feature count in the current request."
                     )
-                return count
+                return self._count
 
         return QueryFeatureSet()
