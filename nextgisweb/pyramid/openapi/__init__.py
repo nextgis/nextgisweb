@@ -6,11 +6,12 @@ from msgspec import NODEFAULT, UNSET
 from msgspec.inspect import Metadata, type_info
 from msgspec.json import schema_components
 
-from nextgisweb.env import Component
+from nextgisweb.env import Component, inject
 from nextgisweb.lib.apitype import ContentType as CType
 from nextgisweb.lib.apitype import JSONType, annotate, iter_anyof, unannotate
 from nextgisweb.lib.apitype import StatusCode as SCode
 
+from ..component import PyramidComponent
 from ..tomb import is_json_type, iter_routes
 from .docstring import Doctring
 
@@ -19,6 +20,18 @@ def _apply_json_content_type(ct, tdef):
     if ct == CType.EMPTY and is_json_type(unannotate(tdef)):
         return CType.JSON
     return ct
+
+
+def _del_if_none(obj, *keys):
+    for key in keys:
+        if obj.get(key, NODEFAULT) is None:
+            del obj[key]
+
+
+def _del_if_false(obj, *keys):
+    for key in keys:
+        if obj.get(key, NODEFAULT) is False:
+            del obj[key]
 
 
 def _pfact(pin, **defaults):
@@ -30,6 +43,7 @@ def _pfact(pin, **defaults):
         obj["name"] = name
         obj.update(defaults)
         obj.update(kwargs)
+        _del_if_none(obj, "description")
         res.append(obj)
 
     return res, _append
@@ -52,8 +66,17 @@ def _context_param(value):
     return dict(schema=dict(type="string", enum=[value]), description=desc)
 
 
-def openapi(introspector, prefix="/api/"):
+@inject()
+def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
     doc: Dict[str, Any] = dict(openapi="3.1.0")
+
+    info = doc["info"] = dict()
+    distr = comp.env.options.with_prefix("distribution")
+    if distr_description := distr.get("description"):
+        info["title"] = distr_description
+    if distr_version := distr.get("version"):
+        info["version"] = distr_version
+
     paths = doc["paths"] = defaultdict(dict)
     components = doc["components"] = dict()
 
@@ -130,6 +153,9 @@ def openapi(introspector, prefix="/api/"):
             oper["x-nextgisweb-component"] = view.component
             oper["x-nextgisweb-context"] = oper_context
 
+            _del_if_none(oper, "summary", "description", "x-nextgisweb-context")
+            _del_if_false(oper, "deprecated", "x-nextgisweb-overloaded")
+
             # Operation parameters
             for param in chain(*(p.spreaded for p in view.query_params.values())):
                 if (pdesc := dstr.params.get(param.name)) is None:
@@ -164,6 +190,7 @@ def openapi(introspector, prefix="/api/"):
                     ct = _apply_json_content_type(ct, t)
                     response = responses[str(sc)]
                     response["description"] = dstr.returns
+                    _del_if_none(response, "description")
                     if ct != CType.EMPTY:
                         response["content"][str(ct)].append(schema_for_json(ct, t))
 
