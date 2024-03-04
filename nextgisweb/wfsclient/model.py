@@ -219,6 +219,7 @@ class WFSConnection(Base, Resource):
     def get_feature(
         self,
         layer,
+        *,
         fid=None,
         filter_=None,
         intersects=None,
@@ -301,87 +302,86 @@ class WFSConnection(Base, Resource):
             __query.append(__filter)
         # } Filter
 
+        if limit is not None:
+            req_root.attrib["count"] = str(limit)
+            if offset is not None:
+                req_root.attrib["startIndex"] = str(offset)
+
+        if get_count:
+            req_root.attrib["resultType"] = "hits"
+            root = self.request_wfs("POST", xml_root=req_root)
+            n_returned = root.attrib["numberReturned"]
+            count = None if n_returned == "unknown" else int(n_returned)
+            return None, count
+
         if propertyname is not None:
             for p in propertyname:
                 __p = etree.Element(etree.QName(NS_WFS, "PropertyName"))
                 __p.text = p
                 __query.append(__p)
 
-        if get_count:
-            req_root.attrib["resultType"] = "hits"
-
-        if limit is not None:
-            req_root.attrib["count"] = str(limit)
-            if offset is not None:
-                req_root.attrib["startIndex"] = str(offset)
-
         if srs is not None:
             req_root.attrib["srsName"] = "EPSG:%d" % srs
 
         root = self.request_wfs("POST", xml_root=req_root)
 
+        _members = find_tags(root, "member")
+
+        fld_map = dict()
+        for field in layer.fields:
+            fld_map[field.keyname] = field.datatype
+
         features = []
-        n_matched = root.attrib["numberMatched"]
-        count = None if n_matched == "unknown" else int(n_matched)
+        for _member in _members:
+            _feature = _member[0]
 
-        if not get_count:
-            _members = find_tags(root, "member")
+            fields = dict()
+            geom = None
+            for _property in _feature:
+                key = ns_trim(_property.tag)
+                if key == layer.column_geom:
+                    geom = geom_from_gml(_property[0])
+                    continue
 
-            fld_map = dict()
-            for field in layer.fields:
-                fld_map[field.keyname] = field.datatype
-
-            features = []
-            for _member in _members:
-                _feature = _member[0]
-
-                fields = dict()
-                geom = None
-                for _property in _feature:
-                    key = ns_trim(_property.tag)
-                    if key == layer.column_geom:
-                        geom = geom_from_gml(_property[0])
-                        continue
-
-                    datatype = fld_map[key]
-                    nil_attr = r"{http://www.w3.org/2001/XMLSchema-instance}nil"
-                    if _property.attrib.get(nil_attr, "false") == "true":
-                        value = None
-                    elif datatype in (FIELD_TYPE.INTEGER, FIELD_TYPE.BIGINT):
-                        value = int(_property.text)
-                    elif datatype == FIELD_TYPE.REAL:
-                        value = float(_property.text)
-                    elif datatype == FIELD_TYPE.STRING:
-                        if _property.text is None:
-                            value = ""
-                        else:
-                            value = _property.text
-                    elif datatype == FIELD_TYPE.DATE:
-                        value = date.fromisoformat(_property.text)
-                    elif datatype == FIELD_TYPE.TIME:
-                        value = time.fromisoformat(_property.text)
-                    elif datatype == FIELD_TYPE.DATETIME:
-                        value = datetime.fromisoformat(_property.text)
+                datatype = fld_map[key]
+                nil_attr = r"{http://www.w3.org/2001/XMLSchema-instance}nil"
+                if _property.attrib.get(nil_attr, "false") == "true":
+                    value = None
+                elif datatype in (FIELD_TYPE.INTEGER, FIELD_TYPE.BIGINT):
+                    value = int(_property.text)
+                elif datatype == FIELD_TYPE.REAL:
+                    value = float(_property.text)
+                elif datatype == FIELD_TYPE.STRING:
+                    if _property.text is None:
+                        value = ""
                     else:
-                        raise ValidationError("Unknown data type: %s" % datatype)
-                    fields[key] = value
-
-                fid = _feature.attrib["{http://www.opengis.net/gml/3.2}id"]
-                if add_box:
-                    _box = box(*geom.bounds)
+                        value = _property.text
+                elif datatype == FIELD_TYPE.DATE:
+                    value = date.fromisoformat(_property.text)
+                elif datatype == FIELD_TYPE.TIME:
+                    value = time.fromisoformat(_property.text)
+                elif datatype == FIELD_TYPE.DATETIME:
+                    value = datetime.fromisoformat(_property.text)
                 else:
-                    _box = None
-                features.append(
-                    Feature(
-                        layer=layer,
-                        id=fid_int(fid, layer.layer_name),
-                        fields=fields,
-                        geom=geom,
-                        box=_box,
-                    )
-                )
+                    raise ValidationError("Unknown data type: %s" % datatype)
+                fields[key] = value
 
-        return features, count
+            fid = _feature.attrib["{http://www.opengis.net/gml/3.2}id"]
+            if add_box:
+                _box = box(*geom.bounds)
+            else:
+                _box = None
+            features.append(
+                Feature(
+                    layer=layer,
+                    id=fid_int(fid, layer.layer_name),
+                    fields=fields,
+                    geom=geom,
+                    box=_box,
+                )
+            )
+
+        return features, len(features)
 
 
 class _path_attr(SP):

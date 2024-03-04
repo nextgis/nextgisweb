@@ -1000,11 +1000,11 @@ class WFSHandler:
             offset = 0 if self.p_startindex is None else int(self.p_startindex)
             query.limit(limit, offset)
 
-        count = 0
-
         if self.p_resulttype == "hits":
-            matched = query().total_count
+            count = query().total_count
         else:
+            count = 0
+
             if self.p_propertyname is None or geom_column in self.p_propertyname:
                 query.geom()
 
@@ -1122,12 +1122,10 @@ class WFSHandler:
                     text="%f %f %f %f" % (minX, minY, maxX, maxY),
                 )
 
-            matched = count
-
         if self.p_version == v110:
             root.set("numberOfFeatures", str(count))
         elif self.p_version >= v200:
-            root.set("numberMatched", str(matched))
+            root.set("numberMatched", str(count) if limit is None else "unknown")
             root.set("numberReturned", str(count))
 
         if self.p_version >= v110:
