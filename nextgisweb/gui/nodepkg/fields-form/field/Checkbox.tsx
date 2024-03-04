@@ -7,7 +7,7 @@ import { FormItem } from "./_FormItem";
 type CheckboxInputProps = Parameters<typeof Checkbox_>[0];
 
 export function Checkbox({
-    disabled = false,
+    disabled,
     inputProps,
     ...props
 }: FormItemProps<CheckboxInputProps>) {
