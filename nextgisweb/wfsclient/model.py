@@ -170,6 +170,9 @@ class WFSConnection(Base, Resource):
 
         layers = []
         for el in find_tags(root, "FeatureType"):
+            if find_tags(el, "NoCRS"):
+                continue
+
             srid = get_srid(find_tags(el, "DefaultCRS")[0].text)
 
             is_supported = isinstance(srid, int)
