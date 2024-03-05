@@ -250,6 +250,7 @@ class PyramidComponent(Component):
         Option("lunkwill.enabled", bool, default=None),
         Option("lunkwill.host", str, default=None),
         Option("lunkwill.port", int, default=None),
+        Option("lunkwill.secret", str, secure=True, default=None),
 
         Option("compression.algorithms", list, default=['br', 'gzip']),
     )) + uacompat.option_annotations

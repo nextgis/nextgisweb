@@ -8,6 +8,7 @@ Changes
 - Add export to CSV and import from CSV for lookup tables.
 - Enhanced feature attachment viewer now includes panoramic images support.
 - Ability to copy printing parameters as a URL for sharing.
+- Support for multiple replicas and long-runnning requests.
 
 
 4.6.0
