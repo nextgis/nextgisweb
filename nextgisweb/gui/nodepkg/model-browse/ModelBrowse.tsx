@@ -347,7 +347,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                               selectedRowKeys: selected,
                               ...rowSelection,
                           }
-                        : null
+                        : undefined
                 }
                 loading={isLoading}
                 columns={tableColumns}
