@@ -52,6 +52,7 @@ export interface ResourcePickerTitleProps {
 export interface ResourcePickerStoreOptions {
     multiple?: boolean;
     parentId?: number;
+    saveLastParentIdGlobal?: boolean;
     selected?: number[];
     requireClass?: ResourceClass | null;
     getThisMsg?: string;

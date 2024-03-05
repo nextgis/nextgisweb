@@ -21,8 +21,10 @@ const msgPickSelected = gettext("Pick selected");
 
 let ID = 0;
 
+let GLOBAL_PARENT_ID = 0;
+
 export class ResourcePickerStore implements ResourcePickerStoreOptions {
-    readonly _id = ID++;
+    private readonly _id = ID++;
 
     resourcesLoadError: string | boolean = false;
     resourcesLoading = false;
@@ -75,6 +77,8 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     getThisMsg = msgPickThis;
     getSelectedMsg = msgPickSelected;
 
+    private _saveLastParentIdGlobal = false;
+
     readonly initialParentId: number = 0;
 
     constructor({
@@ -90,7 +94,13 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         requireInterface,
         traverseClasses,
         disableResourceIds,
+        saveLastParentIdGlobal,
     }: ResourcePickerStoreOptions) {
+        if (saveLastParentIdGlobal) {
+            this._saveLastParentIdGlobal = saveLastParentIdGlobal;
+            parentId = GLOBAL_PARENT_ID;
+        }
+
         this.parentId = parentId ?? this.parentId;
         this.initialParentId = this.parentId;
 
@@ -124,8 +134,12 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         if (traverseClasses) {
             this.traverseClasses = traverseClasses;
         }
-        makeAutoObservable(this, {
+        makeAutoObservable<
+            ResourcePickerStore,
+            "_id" | "_saveLastParentIdGlobal"
+        >(this, {
             _id: false,
+            _saveLastParentIdGlobal: false,
             setResourcesAbortController: false,
             getSelectedParentAbortController: false,
             setBreadcrumbItemsAbortController: false,
@@ -139,6 +153,9 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         this.setBreadcrumbItems(parent);
         runInAction(() => {
             this.parentId = parent;
+            if (this._saveLastParentIdGlobal) {
+                GLOBAL_PARENT_ID = parent;
+            }
             if (this.onTraverse) {
                 this.onTraverse(parent);
             }
