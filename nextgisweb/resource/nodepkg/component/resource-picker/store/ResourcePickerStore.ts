@@ -21,9 +21,12 @@ const msgPickSelected = gettext("Pick selected");
 
 let ID = 0;
 
-let GLOBAL_PARENT_ID = 0;
-
 export class ResourcePickerStore implements ResourcePickerStoreOptions {
+    static GLOBAL_PARENT_ID?: number = undefined;
+    static resetGlobalParentId = () => {
+        ResourcePickerStore.GLOBAL_PARENT_ID = undefined;
+    };
+
     private readonly _id = ID++;
 
     resourcesLoadError: string | boolean = false;
@@ -96,9 +99,9 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         disableResourceIds,
         saveLastParentIdGlobal,
     }: ResourcePickerStoreOptions) {
-        if (saveLastParentIdGlobal) {
+        if (saveLastParentIdGlobal && ResourcePickerStore.GLOBAL_PARENT_ID) {
             this._saveLastParentIdGlobal = saveLastParentIdGlobal;
-            parentId = GLOBAL_PARENT_ID;
+            parentId = ResourcePickerStore.GLOBAL_PARENT_ID;
         }
 
         this.parentId = parentId ?? this.parentId;
@@ -154,7 +157,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         runInAction(() => {
             this.parentId = parent;
             if (this._saveLastParentIdGlobal) {
-                GLOBAL_PARENT_ID = parent;
+                ResourcePickerStore.GLOBAL_PARENT_ID = parent;
             }
             if (this.onTraverse) {
                 this.onTraverse(parent);
