@@ -7,6 +7,8 @@ import { Button, Table } from "@nextgisweb/gui/antd";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { renderResourceCls } from "../../util/renderResourceCls";
+
 import usePickerCard from "./hook/usePickerCard";
 import type {
     PickerResource,
@@ -15,7 +17,6 @@ import type {
     RowSelectionType,
     SelectValue,
 } from "./type";
-import { renderResourceCls } from "./util/renderResourceCls";
 
 import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
 

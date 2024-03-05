@@ -10,7 +10,7 @@ import type {
     ResourcePickerStoreOptions,
     SelectValue,
 } from "../resource-picker/type";
-import { renderResourceCls } from "../resource-picker/util/renderResourceCls";
+import { renderResourceCls } from "../../util/renderResourceCls";
 
 import type { ResourceSelectProps } from "./type";
 
