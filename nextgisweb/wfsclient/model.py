@@ -114,7 +114,7 @@ def fid_int(fid, layer_name):
 
 
 def fid_str(fid, layer_name):
-    return "%s.%d" % (layer_name, fid)
+    return "%s.%d" % (ns_trim(layer_name), fid)
 
 
 class WFSConnection(Base, Resource):
