@@ -34,12 +34,15 @@ export function useActionToolbar({
                     typeof disabled === "function" ? disabled(props) : disabled;
             }
 
-            btnAction.icon =
-                typeof icon === "string" ? (
-                    <SvgIcon icon={icon} fill="currentColor" />
-                ) : (
-                    icon
-                );
+            let iconElement;
+            if (typeof icon === "string") {
+                iconElement = <SvgIcon icon={icon} fill="currentColor" />;
+            } else {
+                iconElement = icon;
+            }
+
+            btnAction.icon = iconElement;
+
             if (!isFit && icon) {
                 return (
                     <Tooltip title={title}>
