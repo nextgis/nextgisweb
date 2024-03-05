@@ -89,6 +89,7 @@ export interface ResourcePickerModalProps<V extends SelectValue = SelectValue>
     visible?: boolean;
     store?: ResourcePickerStore;
     onSelect?: (val: V) => void;
+    onPick?: (val: ResourceItem | ResourceItem[]) => void;
     closeOnSelect?: boolean;
     pickerOptions?: ResourcePickerStoreOptions;
 }
