@@ -19,14 +19,14 @@ from .component import JSRealmComponent
 from .util import scan_for_nodepkgs
 
 
-def create_tsconfig(npkgs: List[str]):
+def create_tsconfig(npkgs: List[str], *, debug):
     compiler_options = dict(
         target="es2015",
         lib=["dom", "dom.iterable", "esnext"],
         allowJs=True,
         skipLibCheck=True,
         esModuleInterop=True,
-        strict=False,
+        strict=debug,
         moduleResolution="node",
         resolveJsonModule=True,
         isolatedModules=True,
@@ -147,7 +147,7 @@ def install(
     with open("package.json", "w") as fd:
         fd.write(json.dumps(package_json, indent=4))
 
-    create_tsconfig(npkgs)
+    create_tsconfig(npkgs, debug=debug)
 
     for comp in env.chain("client_codegen"):
         comp.client_codegen()
