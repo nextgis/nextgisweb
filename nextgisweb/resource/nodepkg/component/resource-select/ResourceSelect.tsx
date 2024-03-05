@@ -1,23 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
-import { route } from "@nextgisweb/pyramid/api";
-import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
+import { routeURL } from "@nextgisweb/pyramid/api";
 
-import type { ResourceClass, ResourceItem } from "../../type";
+import type { ResourceClass } from "../../type";
+import { renderResourceCls } from "../../util/renderResourceCls";
 import { showResourcePicker } from "../resource-picker";
 import type {
     ResourcePickerStoreOptions,
     SelectValue,
 } from "../resource-picker/type";
-import { renderResourceCls } from "../../util/renderResourceCls";
 
+import { useResourceSelect } from "./hook/useResourceSelect";
 import type { ResourceSelectProps } from "./type";
 
 import "./ResourceSelect.less";
 
 interface Option {
-    label: string;
+    label: React.ReactNode;
     value: number;
     cls: ResourceClass;
 }
@@ -25,46 +25,26 @@ interface Option {
 export const ResourceSelect = <V extends SelectValue = SelectValue>({
     value,
     onChange,
+    readOnly,
     pickerOptions,
     ...selectOptions
 }: ResourceSelectProps<V>) => {
     const pickerModal = useRef<ReturnType<typeof showResourcePicker<V>>>();
 
-    const { makeSignal, abort } = useAbortController();
     const [value_, setValue_] = useState<V | undefined>(value);
     const [open, setOpen] = useState(false);
     const pickerParentIdMem = useRef<number | undefined>(
         pickerOptions ? pickerOptions.parentId : undefined
     );
-    const [resource, setResource] = useState<ResourceItem | null>(null);
-    const [resourceLoading, setResourceLoading] = useState(
-        value_ !== undefined
-    );
+    const { resource, isLoading: resourceLoading } = useResourceSelect({
+        value: value_,
+    });
 
     const closePicker = () => {
         if (pickerModal.current) {
             pickerModal.current;
         }
     };
-
-    const loadResource = useCallback(async () => {
-        abort();
-        if (typeof value_ === "number") {
-            try {
-                setResourceLoading(true);
-                const res = await route(
-                    "resource.item",
-                    value_
-                ).get<ResourceItem>({
-                    cache: true,
-                    signal: makeSignal(),
-                });
-                setResource(res);
-            } finally {
-                setResourceLoading(false);
-            }
-        }
-    }, [value_, abort, makeSignal]);
 
     const onPick = useCallback(
         (val: V | undefined) => {
@@ -107,10 +87,6 @@ export const ResourceSelect = <V extends SelectValue = SelectValue>({
         return closePicker;
     }, [onPick, open, pickerOptions, value_]);
 
-    useEffect(() => {
-        loadResource();
-    }, [loadResource]);
-
     const options = useMemo<Option[]>(() => {
         return resource
             ? [
@@ -128,25 +104,50 @@ export const ResourceSelect = <V extends SelectValue = SelectValue>({
     };
 
     return (
-        <Select
-            open={open}
-            value={value_}
-            loading={resourceLoading}
-            onDropdownVisibleChange={(visible) => setOpen(visible)}
-            popupClassName="ngw-resource-resource-select-hidden-dropdown"
-            dropdownRender={() => <></>}
-            onClear={() => {
-                onPick(undefined);
-            }}
-            {...selectOptions}
-        >
-            {options.map(({ label, value, cls }) => {
-                return (
-                    <Select.Option key={value} value={value} label={label}>
-                        {optionRender({ label, cls })}
-                    </Select.Option>
-                );
-            })}
-        </Select>
+        <>
+            {readOnly ? (
+                options.map(({ label, value, cls }) => {
+                    const Label = (
+                        <a
+                            href={routeURL("resource.show", { id: value })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {label}
+                        </a>
+                    );
+                    return (
+                        <div key={value}>
+                            {optionRender({ label: Label, cls })}
+                        </div>
+                    );
+                })
+            ) : (
+                <Select
+                    open={open}
+                    value={value_}
+                    loading={resourceLoading}
+                    onDropdownVisibleChange={(visible) => setOpen(visible)}
+                    popupClassName="ngw-resource-resource-select-hidden-dropdown"
+                    dropdownRender={() => <></>}
+                    onClear={() => {
+                        onPick(undefined);
+                    }}
+                    {...selectOptions}
+                >
+                    {options.map(({ label, value, cls }) => {
+                        return (
+                            <Select.Option
+                                key={value}
+                                value={value}
+                                label={label}
+                            >
+                                {optionRender({ label, cls })}
+                            </Select.Option>
+                        );
+                    })}
+                </Select>
+            )}
+        </>
     );
 };
