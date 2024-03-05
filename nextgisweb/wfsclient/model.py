@@ -146,7 +146,7 @@ class WFSConnection(Base, Resource):
         else:
             raise NotImplementedError()
 
-        if self.username is not None:
+        if self.username is not None and self.username.strip() != "":
             kwargs["auth"] = requests.auth.HTTPBasicAuth(self.username, self.password)
 
         try:
