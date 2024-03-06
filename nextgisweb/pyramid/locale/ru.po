@@ -35,15 +35,15 @@ msgstr "64K должно быть достаточно для логотипа."
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:184
+#: component.py:183
 msgid "Request timeout"
 msgstr "Таймаут запроса"
 
-#: component.py:187
+#: component.py:186
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:187
+#: component.py:186
 msgid "Disabled"
 msgstr "Отключено"
 
@@ -127,6 +127,14 @@ msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
+
+#: lunkwill.py:26
+msgid "Lunkwill not enabled"
+msgstr "Lunkwill не включен"
+
+#: lunkwill.py:27
+msgid "The Lunkwill extension is not configured on this server."
+msgstr "Расширение Lunkwill не настроено на этом сервере."
 
 #: nodepkg/api/error.ts:11 nodepkg/api/error.ts:29
 msgid "Something went wrong."
@@ -555,3 +563,4 @@ msgstr "Метрики и аналитика"
 #: view.py:548
 msgid "Info"
 msgstr "Информация"
+
