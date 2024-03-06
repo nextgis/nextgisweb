@@ -27,7 +27,7 @@ requires = [
     "geoalchemy2==0.14.1",
     "httpx[http2]==0.24.1",
     "humanize==4.6.0",
-    'importlib_metadata; python_version<"3.10"',
+    'importlib-metadata==4.6; python_version<"3.10"',
     "lxml==4.9.3",
     "msgspec==0.16.0",
     "numpy",
