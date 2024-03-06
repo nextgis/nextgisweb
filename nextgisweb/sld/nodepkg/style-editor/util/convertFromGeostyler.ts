@@ -56,12 +56,15 @@ function convertLineSymbolizer(gsLine: GSLineSymbolizer): LineSymbolizer {
 }
 
 function convertFillSymbolizer(gsFill: GSFillSymbolizer): PolygonSymbolizer {
+    const fillOpacity = setOpacity(gsFill.fillOpacity || gsFill.opacity);
     return {
         type: "polygon",
-        fill: {
-            color: gsFill.color as string,
-            opacity: setOpacity(gsFill.fillOpacity || gsFill.opacity),
-        },
+        fill: gsFill.color
+            ? {
+                  color: gsFill.color as string,
+                  opacity: fillOpacity,
+              }
+            : undefined,
         stroke: gsFill.outlineColor
             ? {
                   color: gsFill.outlineColor as string,
