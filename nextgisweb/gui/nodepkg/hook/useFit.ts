@@ -14,13 +14,17 @@ export function useFit({
     const checkFit = useCallback(() => {
         const element = ref.current;
         if (element) {
-            const elementWidth = element.offsetWidth;
+            const elementStyles = window.getComputedStyle(element);
+            const elementWidth = Math.floor(parseFloat(elementStyles.width));
+
             if (!isFitStopRef.current) {
                 const children = Array.from(element.children) as HTMLElement[];
 
                 let contentWidth = 0;
                 children.forEach((child, index) => {
-                    contentWidth += child.offsetWidth;
+                    const childStyles = window.getComputedStyle(child);
+                    contentWidth += Math.floor(parseFloat(childStyles.width));
+
                     if (index < children.length - 1) {
                         const gap = parseInt(
                             window
@@ -31,14 +35,18 @@ export function useFit({
                         contentWidth += isNaN(gap) ? 0 : gap;
                     }
                 });
-                if (contentWidth > elementWidth) {
+                const increasedElementWidth =
+                    elementWidth + elementWidth * 0.05;
+                if (contentWidth > increasedElementWidth) {
                     isFitStopRef.current = contentWidth;
                     setIsFit(false);
                 } else {
                     setIsFit(true);
                 }
             } else {
-                setIsFit(elementWidth >= isFitStopRef.current);
+                const decreasedElementWidth =
+                    elementWidth - elementWidth * 0.05;
+                setIsFit(decreasedElementWidth >= isFitStopRef.current);
             }
         }
     }, [ref]);
