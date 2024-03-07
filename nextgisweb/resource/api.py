@@ -12,12 +12,12 @@ from nextgisweb.lib.apitype import EmptyObject, annotate
 
 from nextgisweb.auth import User
 from nextgisweb.auth.api import UserID
-from nextgisweb.core.exception import InsufficientPermissions
+from nextgisweb.core.exception import InsufficientPermissions, ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
-from .exception import QuotaExceeded, ResourceError, ValidationError
+from .exception import HierarchyError, QuotaExceeded
 from .model import Resource, ResourceSerializer
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .scope import ResourceScope, Scope
@@ -125,7 +125,7 @@ def item_delete(context, request) -> EmptyObject:
         DBSession.delete(obj)
 
     if context.id == 0:
-        raise ResourceError(_("Root resource could not be deleted."))
+        raise HierarchyError(message=_("Root resource could not be deleted."))
 
     with DBSession.no_autoflush:
         delete(context)
