@@ -3,7 +3,7 @@ from logging import ERROR
 
 import pytest
 
-from ..trstr import trstr_factory
+from ..trstr import Translator, trstr_factory
 
 f = trstr_factory("test")
 n = f.ngettext
@@ -11,7 +11,7 @@ p = f.pgettext
 np = f.npgettext
 
 
-class UpperCaseTranslator:
+class UpperCaseTranslator(Translator):
     def translate(
         self,
         msg,
@@ -19,7 +19,7 @@ class UpperCaseTranslator:
         plural=None,
         number=None,
         context=None,
-        domain=None,
+        domain,
     ):
         assert domain == "test"
         result = msg
@@ -62,7 +62,7 @@ def test_concat(uc_tr):
     value = f("foo")
     value += " " + f("bar")
     assert uc_tr(value) == "FOO BAR"
-    assert len(value._items) == 3
+    assert len(value.items) == 3
 
 
 def test_format(uc_tr):
@@ -71,7 +71,7 @@ def test_format(uc_tr):
     assert uc_tr(f("foo %s") % f("bar") + " " + f("foo")) == "FOO BAR FOO"
 
 
-class DictTranslator:
+class DictTranslator(Translator):
     def __init__(self):
         self._dict = dict()
 
@@ -85,7 +85,7 @@ class DictTranslator:
         plural=None,
         number=None,
         context=None,
-        domain=None,
+        domain,
     ):
         assert domain == "test"
         return self._dict[msg]
@@ -103,7 +103,7 @@ def test_guard(caplog):
         caplog.clear()
         with caplog.at_level(ERROR):
             yield
-            assert "exception during translation" in caplog.text
+            assert "Unable to format" in caplog.text
 
     dt.add("A", "B")
     assert tr(f("A").format() + " " + f("A")) == "B B"

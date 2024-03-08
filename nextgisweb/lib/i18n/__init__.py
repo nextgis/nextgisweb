@@ -1,1 +1,1 @@
-from .trstr import TrStr, trstr_factory
+from .trstr import Translatable, TranslatableOrStr, TrStr, trstr_factory

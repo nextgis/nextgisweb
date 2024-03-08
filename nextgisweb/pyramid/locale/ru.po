@@ -47,11 +47,11 @@ msgstr "Включено"
 msgid "Disabled"
 msgstr "Отключено"
 
-#: exception.py:205 exception.py:264
+#: exception.py:206
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:206
+#: exception.py:207
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -59,37 +59,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:233
+#: exception.py:240
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:234
+#: exception.py:241
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:241
+#: exception.py:249
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:242
+#: exception.py:250
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:246
+#: exception.py:255
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:247
+#: exception.py:256
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:251
+#: exception.py:261
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:252
+#: exception.py:262
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -98,41 +98,33 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:259
+#: exception.py:270
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:260
+#: exception.py:271
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:265
-msgid ""
-"The server has either erred or is incapable of performing the requested "
-"operation."
-msgstr ""
-"При обработке запроса возникла внутренняя ошибка или сервер настроен "
-"некорректно и не может обработать запрос."
-
-#: exception.py:269 exception.py:270
+#: exception.py:276 exception.py:277
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:274
+#: exception.py:282
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:275
+#: exception.py:283
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: lunkwill.py:26
+#: lunkwill.py:25
 msgid "Lunkwill not enabled"
 msgstr "Lunkwill не включен"
 
-#: lunkwill.py:27
+#: lunkwill.py:26
 msgid "The Lunkwill extension is not configured on this server."
 msgstr "Расширение Lunkwill не настроено на этом сервере."
 

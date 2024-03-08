@@ -10,10 +10,10 @@ if typing.TYPE_CHECKING:
     COMP_ID: str
 
     # fmt: off
-    def gettext(message: str) -> TrStr: pass
-    def pgettext(context: str, messsage: str) -> TrStr: pass
-    def ngettext(singual: str, plural: str, number: int) -> TrStr: pass
-    def npgettext(context: str, singual: str, plural: str, number: int) -> TrStr: pass
+    def gettext(message: str) -> TrStr: ...
+    def pgettext(context: str, messsage: str) -> TrStr: ...
+    def ngettext(singual: str, plural: str, number: int) -> TrStr: ...
+    def npgettext(context: str, singual: str, plural: str, number: int) -> TrStr: ...
     # fmt: on
 
     _ = gettext

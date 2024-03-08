@@ -3,7 +3,6 @@ import sys
 import traceback
 import warnings
 from hashlib import md5
-from typing import cast
 
 import pyramid.httpexceptions as httpexceptions
 from pyramid.renderers import render_to_response
@@ -12,7 +11,7 @@ from pyramid.response import Response
 from zope.interface import implementer
 from zope.interface.interface import adapter_hooks
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib import json
 from nextgisweb.lib.logging import logger
 
@@ -202,13 +201,12 @@ def html_error_response(request, err_info, exc, exc_info, debug=True):
 
 @implementer(IUserException)
 class InternalServerError(Exception):
-    title = _("Internal server error")
-    message = _(
+    title = gettext("Internal server error")
+    message = gettext(
         "The server encountered an internal error or misconfiguration "
         "and was unable to complete your request."
     )
     detail = None
-
     http_status_code = 500
 
     def __init__(self, exc_info):
@@ -219,61 +217,66 @@ class InternalServerError(Exception):
 @adapter_hooks.append
 def adapt_httpexception(iface, obj):
     if issubclass(iface, IUserException) and isinstance(obj, httpexceptions.HTTPError):
-        user_exception(
-            obj, title=obj.title, message=obj.explanation, detail=None, http_status_code=obj.code
-        )
-
+        user_exception(obj, title=obj.title, message=obj.explanation, http_status_code=obj.code)
         return IUserException(obj)
 
 
 # Patch useful pyramid HTTP exceptions with translatable strings
-for exc, title, explanation in (
-    (
-        httpexceptions.HTTPBadRequest,
-        _("Bad request"),
-        _(
-            "The server could not comply with the request since "
-            "it is either malformed or otherwise incorrect."
-        ),
+def _patch_http_error(cls, title, explanation):
+    setattr(cls, "title", title)
+    setattr(cls, "explanation", explanation)
+
+
+_patch_http_error(
+    httpexceptions.HTTPInternalServerError,
+    InternalServerError.title,
+    InternalServerError.message,
+)
+
+_patch_http_error(
+    httpexceptions.HTTPBadRequest,
+    gettext("Bad request"),
+    gettext(
+        "The server could not comply with the request since it is either "
+        "malformed or otherwise incorrect."
     ),
-    (
-        httpexceptions.HTTPPaymentRequired,
-        _("Payment required"),
-        _("Access was denied for financial reasons."),
+)
+
+_patch_http_error(
+    httpexceptions.HTTPPaymentRequired,
+    gettext("Payment required"),
+    gettext("Access was denied for financial reasons."),
+)
+
+_patch_http_error(
+    httpexceptions.HTTPForbidden,
+    gettext("Forbidden"),
+    gettext("Access was denied to this resource."),
+)
+
+_patch_http_error(
+    httpexceptions.HTTPNotFound,
+    gettext("Page not found"),
+    gettext(
+        "The page may have been deleted or an error in the address. Correct "
+        "the address or go to the home page and try to find the desired page."
     ),
-    (
-        httpexceptions.HTTPForbidden,
-        _("Forbidden"),
-        _("Access was denied to this resource."),
-    ),
-    (
-        httpexceptions.HTTPNotFound,
-        _("Page not found"),
-        _(
-            "The page may have been deleted or an error in the address. "
-            "Correct the address or go to the home page and try to find the desired page."
-        ),
-    ),
-    (
-        httpexceptions.HTTPUnprocessableEntity,
-        _("Unprocessable entity"),
-        _("Unable to process the contained instructions."),
-    ),
-    (
-        httpexceptions.HTTPInternalServerError,
-        _("Internal server error"),
-        _("The server has either erred or is incapable of performing " "the requested operation."),
-    ),
-    (
-        httpexceptions.HTTPNotImplemented,
-        _("Not implemented"),
-        _("Not implemented"),
-    ),
-    (
-        httpexceptions.HTTPServiceUnavailable,
-        _("Service unavailable"),
-        _("The server is currently unavailable. " "Please try again at a later time."),
-    ),
-):
-    exc.title = cast(str, title)
-    exc.explanation = cast(str, explanation)
+)
+
+_patch_http_error(
+    httpexceptions.HTTPUnprocessableEntity,
+    gettext("Unprocessable entity"),
+    gettext("Unable to process the contained instructions."),
+)
+
+_patch_http_error(
+    httpexceptions.HTTPNotImplemented,
+    gettext("Not implemented"),
+    gettext("Not implemented"),
+)
+
+_patch_http_error(
+    httpexceptions.HTTPServiceUnavailable,
+    gettext("Service unavailable"),
+    gettext("The server is currently unavailable. Please try again at a later time."),
+)

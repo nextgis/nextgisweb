@@ -1,12 +1,46 @@
-from inspect import signature
+from __future__ import annotations
+
+from functools import partial
+from typing import Any, Mapping, Protocol, Sequence, Tuple, Union
 
 from ..logging import logger
 
 
-class TrStr:
+class Translatable(Protocol):
+    def __translate__(self, translator: Translator) -> str:
+        ...
+
+
+class Translator(Protocol):
+    def translate(
+        self,
+        msg: str,
+        *,
+        plural: Union[str, None] = None,
+        number: Union[int, None] = None,
+        context: Union[str, None] = None,
+        domain: str,
+    ) -> str:
+        ...
+
+
+TranslatableOrStr = Union[Translatable, str]
+ModScalar = Union[int, float, TranslatableOrStr]
+ModArgument = Union[ModScalar, Tuple[ModScalar], Mapping[str, ModScalar]]
+
+
+class TrStr(Translatable):
     __slots__ = ["msg", "plural", "number", "context", "domain"]
 
-    def __init__(self, msg, *, plural=None, number=None, context=None, domain):
+    def __init__(
+        self,
+        msg: str,
+        *,
+        plural: Union[str, None] = None,
+        number: Union[int, None] = None,
+        context: Union[str, None] = None,
+        domain: str,
+    ):
         self.msg = msg
         self.plural = plural
         self.number = number
@@ -14,16 +48,16 @@ class TrStr:
         self.context = context
         self.domain = domain
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.msg
 
-    def __mod__(self, arg):
+    def __mod__(self, arg: ModArgument):
         return TrStrModFormat(self, arg)
 
-    def __add__(self, other):
+    def __add__(self, other: TranslatableOrStr):
         return TrStrConcat(self, other)
 
-    def __radd__(self, other):
+    def __radd__(self, other: TranslatableOrStr):
         return TrStrConcat(other, self)
 
     def format(self, *args, **kwargs):
@@ -39,111 +73,100 @@ class TrStr:
         )
 
 
-class TrStrConcat:
-    def __init__(self, a, b):
-        self._items = (a._items if isinstance(a, TrStrConcat) else [a]) + (
-            b._items if isinstance(b, TrStrConcat) else [b]
-        )
+class TrStrConcat(Translatable):
+    def __init__(self, a: TranslatableOrStr, b: TranslatableOrStr):
+        aitems = a.items if isinstance(a, TrStrConcat) else (a,)
+        bitems = b.items if isinstance(b, TrStrConcat) else (b,)
+        self.items: Tuple[TranslatableOrStr, ...] = (aitems) + (bitems)
 
-    def __str__(self):
-        return "".join(map(str, deep_cast_to_str(self._items)))
+    def __str__(self) -> str:
+        return "".join(str(i) for i in deep_cast_to_str(self.items))
 
-    def __add__(self, other):
+    def __add__(self, other: TranslatableOrStr):
         return TrStrConcat(self, other)
 
-    def __radd__(self, other):
+    def __radd__(self, other: TranslatableOrStr):
         return TrStrConcat(other, self)
 
     def __translate__(self, translator):
-        return "".join(map(str, deep_translate(self._items, translator)))
+        return "".join(str(i) for i in deep_translate(self.items, translator))
 
 
-def translate_guard(errors):
-    def actual_decorator(func):
-        translate_args = "translate_args" in signature(func).parameters
-
-        def wrapper(trstr, original_translator):
-            kwargs = (
-                dict()
-                if not translate_args
-                else dict(translate_args=trstr.__translate_args__(original_translator))
-            )
-
-            try:
-                return func(trstr, original_translator, **kwargs)
-            except errors as exc:
-                try:
-                    result = func(trstr, dummy_translator, **kwargs)
-                except errors:
-                    raise exc from None
-                else:
-                    logger.exception(
-                        'Got an exception during translation into "%s". '
-                        'Falling back to untranslated message "%s".',
-                        getattr(original_translator, "locale", "unknown"),
-                        str(trstr),
-                        exc_info=exc,
-                    )
-                    return result
-
-        return wrapper
-
-    return actual_decorator
-
-
-class TrStrModFormat:
-    def __init__(self, trstr, arg):
+class TrStrModFormat(Translatable):
+    def __init__(self, trstr: TrStr, arg: ModArgument):
         self.trstr = trstr
         self.arg = arg
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.trstr) % deep_cast_to_str(self.arg)
 
-    def __add__(self, other):
+    def __add__(self, other: TranslatableOrStr):
         return TrStrConcat(self, other)
 
-    def __radd__(self, other):
+    def __radd__(self, other: TranslatableOrStr):
         return TrStrConcat(other, self)
 
-    def __translate_args__(self, translator):
-        return deep_translate(self.arg, translator)
+    def __translate__(self, translator):
+        translated = self.trstr.__translate__(translator)
+        targ = deep_translate(self.arg, translator)
+        try:
+            result = translated % targ
+        except TypeError as exc:
+            logger.exception(
+                "Unable to format translated message into '%s': %s",
+                getattr(translator, "locale", "unknown"),
+                str(self.trstr),
+                exc_info=exc,
+            )
+            translated = self.trstr.__translate__(dummy_translator)
+            try:
+                result = translated % targ
+            except TypeError:
+                raise exc from None
+        return result
 
-    @translate_guard(TypeError)
-    def __translate__(self, translator, translate_args):
-        return self.trstr.__translate__(translator) % translate_args
 
-
-class TrStrFormat:
-    def __init__(self, trstr, args, kwargs):
+class TrStrFormat(Translatable):
+    def __init__(self, trstr: TrStr, args: Sequence, kwargs: Mapping):
         self.trstr = trstr
         self.args = args
         self.kwargs = kwargs
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.trstr).format(
-            *deep_cast_to_str(self.args), **deep_cast_to_str(self.kwargs)
+            *deep_cast_to_str(self.args),
+            **deep_cast_to_str(self.kwargs),
         )
 
-    def __add__(self, other):
+    def __add__(self, other: TranslatableOrStr):
         return TrStrConcat(self, other)
 
-    def __radd__(self, other):
+    def __radd__(self, other: TranslatableOrStr):
         return TrStrConcat(other, self)
 
-    def __translate_args__(self, translator):
-        return (deep_translate(self.args, translator), deep_translate(self.kwargs, translator))
+    def __translate__(self, translator):
+        translated = self.trstr.__translate__(translator)
+        targs = deep_translate(self.args, translator)
+        tkwargs = deep_translate(self.kwargs, translator)
+        try:
+            result = translated.format(*targs, **tkwargs)
+        except (KeyError, IndexError) as exc:
+            logger.exception(
+                "Unable to format translated message into '%s': %s",
+                getattr(translator, "locale", "unknown"),
+                str(self.trstr),
+                exc_info=exc,
+            )
+            translated = self.trstr.__translate__(dummy_translator)
+            try:
+                result = translated.format(*targs, **tkwargs)
+            except (KeyError, IndexError):
+                raise exc from None
+        return result
 
-    def __translate_message__(self, translator):
-        return self.trstr.__translate__(translator)
 
-    @translate_guard((KeyError, IndexError))
-    def __translate__(self, translator, translate_args):
-        args, kwargs = translate_args
-        return self.trstr.__translate__(translator).format(*args, **kwargs)
-
-
-def deep_translate(value, translator):
-    if value is None or isinstance(value, (str, int, float, bool)):
+def deep_translate(value, translator: Translator) -> Any:
+    if value is None or isinstance(value, (str, int, float)):
         return value
     if trmeth := getattr(value, "__translate__", None):
         return trmeth(translator)
@@ -153,20 +176,6 @@ def deep_translate(value, translator):
         return [deep_translate(i, translator) for i in value]
     if isinstance(value, dict):
         return {k: deep_translate(v, translator) for k, v in value.items()}
-    return value
-
-
-def deep_cast_to_str(value):
-    if value is None or isinstance(value, (str, int, float, bool)):
-        return value
-    if hasattr(value, "__translate__"):
-        return str(value)
-    if isinstance(value, tuple):
-        return tuple(deep_cast_to_str(i) for i in value)
-    if isinstance(value, list):
-        return [deep_cast_to_str(i) for i in value]
-    if isinstance(value, dict):
-        return {k: deep_cast_to_str(v) for k, v in value.items()}
     return value
 
 
@@ -191,7 +200,7 @@ class trstr_factory:
         return TrStr(message, domain=self.domain)
 
 
-class DummyTranslator:
+class DummyTranslator(Translator):
     def translate(
         self,
         msg,
@@ -199,7 +208,7 @@ class DummyTranslator:
         plural=None,
         number=None,
         context=None,
-        domain=None,
+        domain,
     ):
         if plural is not None:
             assert number is not None
@@ -209,3 +218,4 @@ class DummyTranslator:
 
 
 dummy_translator = DummyTranslator()
+deep_cast_to_str = partial(deep_translate, translator=dummy_translator)
