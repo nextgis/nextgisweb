@@ -255,7 +255,7 @@ class csetting:
     def __init__(
         self,
         name: str,
-        type: Union[Type, Tuple[Type, Type]],
+        type: Union[Any, Tuple[Any, Any]],
         *,
         default: Any = None,
         skey: Optional[Tuple[str, str]] = None,

@@ -484,7 +484,7 @@ def quota_check(request) -> JSONType:
 
 csetting(
     "resource_export",
-    Union[Literal["data_read"], Literal["data_write"], Literal["administrators"]],
+    Literal["data_read", "data_write", "administrators"],
     default="data_read",
 )
 
