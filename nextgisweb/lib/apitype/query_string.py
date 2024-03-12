@@ -50,7 +50,7 @@ def primitive(qs: QueryString, *, name: str, default: Any, loads: StringDecoder)
         raise QueryParamInvalidValue(name) from exc
 
 
-def form_list(
+def form_list_list(
     qs: QueryString,
     *,
     name: str,
@@ -69,6 +69,30 @@ def form_list(
 
     try:
         return convert([loads(unquote_strict(i)) for i in value.split(",")], type)
+    except ValidationError as exc:
+        raise QueryParamInvalidValue(name) from exc
+
+
+def form_list_tuple(
+    qs: QueryString,
+    *,
+    name: str,
+    type: Any,
+    default: Any,
+    loads: Tuple[StringDecoder, ...],
+) -> Tuple[Any, ...]:
+    value = qs.last(name)
+    if value is None:
+        if default is NODEFAULT:
+            raise QueryParamRequired(name)
+        return default
+
+    try:
+        parts = [unquote_strict(i) for i in value.split(",")] if value != "" else []
+        if (pad := len(parts) - len(loads)) > 0:
+            loads = loads + tuple(str for i in range(pad))
+        parsed = [ls(pt) for ls, pt in zip(loads, parts)]
+        return convert(parsed, type)
     except ValidationError as exc:
         raise QueryParamInvalidValue(name) from exc
 

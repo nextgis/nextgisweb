@@ -192,11 +192,21 @@ class QueryParam:
             self.style = Style.FORM
             self.shape = Shape.LIST
             self.decoder_factory = lambda: partial(
-                qs.form_list,
+                qs.form_list_list,
                 name=self.name,
                 type=self.type,
                 default=self.default,
                 loads=string_decoder(args[0]),
+            )
+        elif origin is tuple:
+            self.style = Style.FORM
+            self.shape = Shape.LIST
+            self.decoder_factory = lambda: partial(
+                qs.form_list_tuple,
+                name=self.name,
+                type=self.type,
+                default=self.default,
+                loads=tuple(string_decoder(a) for a in args),
             )
         else:
             self.style = Style.FORM
