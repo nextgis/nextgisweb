@@ -1,7 +1,8 @@
+import type { RouteParameters } from "@nextgisweb/pyramid/type/route";
+
 import type { LoaderCache } from "../util/loader";
 
 import type { LunkwillParam } from "./LunkwillParam";
-import type { RouteParameters } from "./route.inc";
 
 export type RequestMethod = "get" | "post" | "put" | "delete";
 

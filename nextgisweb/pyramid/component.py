@@ -5,7 +5,6 @@ from os import environ
 import transaction
 from babel import Locale
 from babel.core import UnknownLocaleError
-from msgspec.inspect import IntType, Metadata, StrType, type_info
 
 from nextgisweb.env import Component, _, require
 from nextgisweb.lib.config import Option, OptionAnnotations
@@ -36,12 +35,11 @@ class PyramidComponent(Component):
         config.commit()
 
         self.route_meta = route_meta = dict()
-        self.route_mdtypes = route_mdtypes = dict()
+
         for route in iter_routes(config.registry.introspector):
             if not route.client or route.name.startswith("_"):
                 continue
             route_meta[route.name] = [route.itemplate, *route.path_params.keys()]
-            route_mdtypes[route.name] = {k: v.type for k, v in route.path_params.items()}
 
         return config
 
@@ -132,27 +130,9 @@ class PyramidComponent(Component):
         return result
 
     def client_codegen(self):
-        self.make_app(settings=dict())
+        from . import codegen as m
 
-        def tstype(tdef):
-            tinfo = type_info(tdef)
-            titype = tinfo.type if isinstance(tinfo, Metadata) else tinfo
-            if isinstance(titype, IntType):
-                return "number"
-            elif isinstance(titype, StrType):
-                return "string"
-
-        code = ["export interface RouteParameters /* prettier-ignore */ {"]
-        for k, v in self.route_mdtypes.items():
-            if len(v) == 0:
-                cv = "[]"
-            else:
-                cv = ", ".join(p + ": " + tstype(t) for p, t in v.items())
-                cv = f"[{cv}] | [{{ {cv} }}]" if len(v) == 1 else f"[{{ {cv} }}]"
-            code.append(f'    "{k}": {cv};')
-        code.append("}")
-        nodepkg = self.root_path / "nodepkg"
-        (nodepkg / "api/route.inc.ts").write_text("\n".join(code))
+        m.client_codegen(self)
 
     @property
     def template_include(self):

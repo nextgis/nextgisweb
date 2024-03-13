@@ -1,9 +1,9 @@
 import set from "lodash-es/set";
 
 import routeData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/route";
+import type { RouteParameters } from "@nextgisweb/pyramid/type/route";
 
 import { request } from "./request";
-import type { RouteParameters } from "./route.inc";
 import type {
     RequestMethod,
     RequestOptions,

@@ -93,7 +93,7 @@ def derive(struct: ST, *spec) -> ST:
     name = struct.__name__.lstrip("_")  # type: ignore
     name += "".join(s.value for s in spec if s.value)
 
-    return defstruct(name, nsfields, kw_only=True)  # type: ignore
+    return defstruct(name, nsfields, kw_only=True, module=struct.__module__)  # type: ignore
 
 
 def struct_items(struct) -> List[Tuple[str, Any]]:

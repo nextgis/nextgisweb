@@ -29,7 +29,7 @@ requires = [
     "humanize==4.6.0",
     'importlib-metadata==4.6; python_version<"3.10"',
     "lxml==4.9.3",
-    "msgspec==0.16.0",
+    "msgspec==0.17.0",
     "numpy",
     "networkx",
     "orjson==3.9.9",

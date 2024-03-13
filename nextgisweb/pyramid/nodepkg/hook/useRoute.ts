@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useReducer } from "react";
 
 import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
+import type { RouteParameters } from "@nextgisweb/pyramid/type/route";
 
 import { route as apiRoute } from "../api";
-import type { RouteParameters } from "../api/route.inc";
 import type { GetRouteParam, RequestMethod, RouteResults } from "../api/type";
 
 import { useAbortController } from "./useAbortController";
