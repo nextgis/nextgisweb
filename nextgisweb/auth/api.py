@@ -26,7 +26,6 @@ from nextgisweb.lib.apitype import (
 )
 
 from nextgisweb.core.exception import NotConfigured, ValidationError
-from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.util import gensecret
 
 from .component import AuthComponent
@@ -57,6 +56,7 @@ def brief_or_administrator(request, brief: Brief):
 
 def serialize_principal(src, cls, *, tr):
     attrs = dict()
+    cls = getattr(cls, "__origin__", cls)
     for k in cls.__struct_fields__:
         if k == "display_name":
             attrs[k] = tr(src.display_name_i18n)
@@ -198,6 +198,7 @@ UserCreate = Derived[_User, OP.CREATE]
 UserRead = Derived[_User, OP.READ]
 UserUpdate = Derived[_User, OP.UPDATE]
 UserReadBrief = Derived[_User, OP.READ, BRIEF]
+
 
 UserCGetResponse = AnyOf[AsJSON[List[UserRead]], AsJSON[List[UserReadBrief]]]
 UserIGetResponse = AnyOf[UserRead, UserReadBrief]
@@ -366,7 +367,7 @@ ProfileRead = Derived[Profile, OP.READ]
 ProfileUpdate = Derived[Profile, OP.UPDATE]
 
 
-def profile_get(request) -> AsJSON[ProfileRead]:
+def profile_get(request) -> ProfileRead:
     """Read profile of the current user
 
     :returns: User profile"""
@@ -475,11 +476,10 @@ def login(request) -> LoginResponse:
     return result
 
 
-def logout(request) -> JSONType:
+def logout(request) -> EmptyObject:
     """Log out and close session"""
     headers = forget(request)
     request.response.headerlist.extend(headers)
-    return dict()
 
 
 def setup_pyramid(comp, config):

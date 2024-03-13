@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import type { GroupRead } from "@nextgisweb/auth/type/api";
 import { Alert } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import {
@@ -16,7 +17,6 @@ import settings from "@nextgisweb/pyramid/settings!auth";
 
 import { PrincipalSelect } from "../field";
 import { makeTeamManageButton, default as oauth } from "../oauth";
-import type { Group } from "../type";
 
 import { UserWidgetAlinkToken } from "./UserWidgetAlinkToken";
 import { UserWidgetPassword } from "./UserWidgetPassword";
@@ -32,7 +32,7 @@ interface UserWidgetProps {
 }
 
 export function UserWidget({ id, readonly }: UserWidgetProps) {
-    const { data: group, isLoading } = useRouteGet<Group[]>(
+    const { data: group, isLoading } = useRouteGet<GroupRead[]>(
         "auth.group.collection"
     );
 

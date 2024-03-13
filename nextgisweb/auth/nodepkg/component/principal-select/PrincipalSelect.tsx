@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 
+import type { GroupReadBrief, UserReadBrief } from "@nextgisweb/auth/type/api";
 import { Select, Space, Tag } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
-
-import type { Group, User } from "../../type";
 
 import type { Member, PrincipalSelectProps } from "./type";
 
@@ -106,7 +105,7 @@ export function PrincipalSelect({
             if (loadUsers) {
                 promises.push(
                     route("auth.user.collection")
-                        .get<User[]>({
+                        .get<UserReadBrief[]>({
                             query: { brief: true },
                             signal: makeSignal(),
                             cache: true,
@@ -131,7 +130,7 @@ export function PrincipalSelect({
             if (loadGroups) {
                 promises.push(
                     route("auth.group.collection")
-                        .get<Group[]>({
+                        .get<GroupReadBrief[]>({
                             query: { brief: true },
                             signal: makeSignal(),
                             cache: true,

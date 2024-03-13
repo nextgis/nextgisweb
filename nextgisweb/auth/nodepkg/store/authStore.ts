@@ -1,18 +1,12 @@
 import { makeAutoObservable } from "mobx";
 
+import type { LoginResponse } from "@nextgisweb/auth/type/api";
 import { extractError } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import { route } from "@nextgisweb/pyramid/api";
 
 import type { Credentials, LoginFormProps } from "../login/type";
-
-interface LoginResponse {
-    id: number;
-    display_name: string;
-    keyname: string;
-    home_url?: string;
-}
 
 class AuthStore {
     loginError = "";
