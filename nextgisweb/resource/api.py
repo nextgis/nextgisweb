@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Optional, Union, cast
 
 import zope.event
 from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
@@ -8,12 +8,13 @@ from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib import db
-from nextgisweb.lib.apitype import EmptyObject, annotate
+from nextgisweb.lib.apitype import AnyOf, EmptyObject, StatusCode, annotate
 
 from nextgisweb.auth import User
 from nextgisweb.auth.api import UserID
 from nextgisweb.core.exception import InsufficientPermissions, ValidationError
-from nextgisweb.pyramid import JSONType
+from nextgisweb.jsrealm import TSExport
+from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
 from .events import AfterResourceCollectionPost, AfterResourcePut
@@ -30,67 +31,66 @@ PERM_MCHILDREN = ResourceScope.manage_children
 PERM_CPERM = ResourceScope.change_permissions
 
 
-class BlueprintResponse(Struct):
-    class Resource(Struct):
-        identity: str
-        label: str
-        base_classes: List[str]
-        interfaces: List[str]
-        scopes: List[str]
-
-    resources: Dict[str, Resource]
-
-    class Scope(Struct):
-        identity: str
-        label: str
-
-        class Permission(Struct):
-            identity: str
-            label: str
-
-        permissions: Dict[str, Permission]
-
-    scopes: Dict[str, Scope]
+class BlueprintResource(Struct):
+    identity: str
+    label: str
+    base_classes: List[str]
+    interfaces: List[str]
+    scopes: List[str]
 
 
-def blueprint(request) -> BlueprintResponse:
+class BlueprintPermission(Struct):
+    identity: str
+    label: str
+
+
+class BlueprintScope(Struct):
+    identity: str
+    label: str
+    permissions: Dict[str, BlueprintPermission]
+
+
+class Blueprint(Struct):
+    resources: Dict[str, BlueprintResource]
+    scopes: Dict[str, BlueprintScope]
+
+
+def blueprint(request) -> Blueprint:
     tr = request.translate
-    SResource = BlueprintResponse.Resource
-
-    resources = {
-        identity: SResource(
-            identity=identity,
-            label=tr(cls.cls_display_name),
-            base_classes=list(
-                reversed(
-                    [bc.identity for bc in cls.__mro__ if (bc != cls and issubclass(bc, Resource))]
-                )
-            ),
-            interfaces=[i.__name__ for i in cls.implemented_interfaces()],
-            scopes=list(cls.scope.keys()),
-        )
-        for identity, cls in Resource.registry.items()
-    }
-
-    SScope = BlueprintResponse.Scope
-    SPermission = BlueprintResponse.Scope.Permission
-
-    scopes = {
-        sid: SScope(
-            identity=sid,
-            label=tr(scope.label),
-            permissions={
-                perm.name: SPermission(
-                    identity=perm.name,
-                    label=tr(perm.label),
-                )
-                for perm in scope.values()
-            },
-        )
-        for sid, scope in Scope.registry.items()
-    }
-
-    return BlueprintResponse(resources=resources, scopes=scopes)
+    return Blueprint(
+        resources={
+            identity: BlueprintResource(
+                identity=identity,
+                label=tr(cls.cls_display_name),
+                base_classes=list(
+                    reversed(
+                        [
+                            bc.identity
+                            for bc in cls.__mro__
+                            if (bc != cls and issubclass(bc, Resource))
+                        ]
+                    )
+                ),
+                interfaces=[i.__name__ for i in cls.implemented_interfaces()],
+                scopes=list(cls.scope.keys()),
+            )
+            for identity, cls in Resource.registry.items()
+        },
+        scopes={
+            sid: BlueprintScope(
+                identity=sid,
+                label=tr(scope.label),
+                permissions={
+                    perm.name: BlueprintPermission(
+                        identity=perm.name,
+                        label=tr(perm.label),
+                    )
+                    for perm in scope.values()
+                },
+            )
+            for sid, scope in Scope.registry.items()
+        },
+    )
 
 
 def item_get(context, request) -> JSONType:
@@ -212,7 +212,7 @@ def collection_post(request) -> JSONType:
 if TYPE_CHECKING:
     scope_permissions_struct: Mapping[str, Any] = dict()
 
-    class PermissionResponse(Struct, kw_only=True):
+    class EffectivePermissions(Struct, kw_only=True):
         pass
 
 else:
@@ -232,8 +232,8 @@ else:
         struct = annotate(struct, [Meta(description=str(scope.label))])
         scope_permissions_struct[sid] = struct
 
-    PermissionResponse = defstruct(
-        "PermissionResponse",
+    EffectivePermissions = defstruct(
+        "EffectivePermissions",
         [
             ((sid, struct) if sid == "resource" else (sid, Union[(struct, UnsetType)], UNSET))
             for sid, struct in scope_permissions_struct.items()
@@ -246,7 +246,7 @@ def permission(
     request,
     *,
     user: Optional[UserID] = None,
-) -> PermissionResponse:
+) -> EffectivePermissions:
     """Get resource effective permissions"""
     request.resource_permission(PERM_READ)
 
@@ -255,7 +255,7 @@ def permission(
         request.resource_permission(PERM_CPERM)
 
     effective = resource.permissions(user_obj)
-    return PermissionResponse(
+    return EffectivePermissions(
         **{
             sid: scope_permissions_struct[sid](
                 **{p.name: (p in effective) for p in scope.values()},
@@ -439,7 +439,7 @@ def search(request) -> JSONType:
     return result
 
 
-class ResourceVolumeResponse(Struct, kw_only=True):
+class ResourceVolume(Struct, kw_only=True):
     volume: Annotated[int, Meta(ge=0, description="Resource volume in bytes")]
 
 
@@ -448,7 +448,7 @@ def resource_volume(
     request,
     *,
     recursive: Annotated[bool, Meta(description="Include children resources")] = True,
-) -> ResourceVolumeResponse:
+) -> ResourceVolume:
     """Get resource data volume"""
     require_storage_enabled()
 
@@ -468,25 +468,52 @@ def resource_volume(
         volume = res.get("", dict()).get("data_volume", 0)
         volume = volume if volume is not None else 0
 
-    return ResourceVolumeResponse(volume=volume)
+    return ResourceVolume(volume=volume)
 
 
-def quota_check(request) -> JSONType:
+QuotaCheckBody = Annotated[
+    Dict[
+        Annotated[str, Meta(examples=["webmap"])],
+        Annotated[int, Meta(ge=0, examples=[1])],
+    ],
+    TSExport("QuotaCheckBody"),
+]
+
+
+class QuotaCheckSuccess(Struct, kw_only=True):
+    success: Annotated[bool, Meta(examples=[True])]
+
+
+class QuotaCheckFailure(Struct, kw_only=True):
+    cls: Union[str, None]
+    required: int
+    available: int
+    message: str
+
+
+def quota_check(
+    request,
+    body: AsJSON[QuotaCheckBody],
+) -> AnyOf[
+    Annotated[QuotaCheckSuccess, StatusCode.OK],
+    Annotated[QuotaCheckFailure, StatusCode(cast(int, QuotaExceeded.http_status_code))],
+]:
+    """Check for resource quota"""
     try:
-        request.env.resource.quota_check(request.json_body)
+        request.env.resource.quota_check(body)
     except QuotaExceeded as exc:
         request.response.status_code = exc.http_status_code
-        return dict(exc.data, message=request.translate(exc.message))
-    return dict(success=True)
+        return QuotaCheckFailure(**exc.data, message=request.translate(exc.message))
+    return QuotaCheckSuccess(success=True)
 
 
 # Component settings
 
-csetting(
-    "resource_export",
+ResourceExport = Annotated[
     Literal["data_read", "data_write", "administrators"],
-    default="data_read",
-)
+    TSExport("ResourceExport"),
+]
+csetting("resource_export", ResourceExport, default="data_read")
 
 
 def setup_pyramid(comp, config):

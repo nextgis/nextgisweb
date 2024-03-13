@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { Space } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import type { Blueprint } from "@nextgisweb/resource/type";
+import type { Blueprint } from "@nextgisweb/resource/type/api";
 
 import { FieldsForm } from "../../fields-form";
 import type { FormField } from "../../fields-form";

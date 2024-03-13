@@ -1,6 +1,6 @@
 import { route } from "@nextgisweb/pyramid/api";
+import type { ResourceVolume } from "@nextgisweb/resource/type/api";
 
-import type { ResourceVolume } from "../../type";
 import type { ChildrenResource } from "../type";
 
 interface LoadVoluemsParams {

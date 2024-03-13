@@ -4,8 +4,8 @@ import { extractError } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { Blueprint } from "@nextgisweb/resource/type/api";
 
-import type { Blueprint } from "../../../type/Blueprint";
 import type {
     Resource,
     ResourceClass,

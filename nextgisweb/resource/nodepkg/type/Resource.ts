@@ -1,13 +1,11 @@
+import type { GroupRef, UserRef } from "@nextgisweb/auth/type/api";
+
 export type ResourceClass = string;
 export type ResourceInterface = string;
 
-interface Owneruser {
-    id: number;
-}
-
 export interface ResourcePermission {
     action: string | null;
-    principal: Owneruser | null;
+    principal: GroupRef | UserRef | null;
     identity: string | null;
     scope: string | null;
     permission: string | null;
@@ -27,7 +25,7 @@ export interface Resource {
     cls: ResourceClass;
     creation_date: string;
     parent: ResourceParent;
-    owner_user: Owneruser;
+    owner_user: UserRef;
     permissions: ResourcePermission[];
     keyname?: string;
     display_name: string;
@@ -43,8 +41,4 @@ export interface ResourceItem {
 
 export interface ResourceItemCreationResponse {
     id: number;
-}
-
-export interface ResourceVolume {
-    volume: number;
 }

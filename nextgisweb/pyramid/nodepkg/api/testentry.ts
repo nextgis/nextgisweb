@@ -1,4 +1,4 @@
-import type { Blueprint } from "@nextgisweb/resource/type";
+import type { Blueprint } from "@nextgisweb/resource/type/api";
 
 import { route } from "./route";
 

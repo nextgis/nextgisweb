@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import type {
+    Blueprint,
+    EffectivePermissions,
+} from "@nextgisweb/resource/type/api";
 
-import type { Blueprint } from "../../type";
-import type { Permission } from "../../type/Permission";
 import type { PermissionData, PermissionDataItem } from "../type";
 
 interface UseLoadDataProps {
@@ -19,7 +21,7 @@ export function useLoadData({
 }: UseLoadDataProps): [PermissionData[] | null, boolean] {
     const { data: schema } = useRouteGet<Blueprint>("resource.blueprint");
 
-    const { data: effective } = useRouteGet<Permission>({
+    const { data: effective } = useRouteGet<EffectivePermissions>({
         name: "resource.permission",
         params: { id: resourceId },
         options: { query: !isCurrent(userId) ? { user: userId } : undefined },
@@ -38,7 +40,7 @@ export function useLoadData({
     const result: PermissionData[] = [];
 
     for (const [sid, scope] of Object.entries(schema.scopes)) {
-        const pd = effective[sid as keyof Permission];
+        const pd = effective[sid as keyof EffectivePermissions];
         if (pd === undefined) continue;
 
         const sub: PermissionDataItem[] = [];

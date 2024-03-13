@@ -2,13 +2,15 @@ import { useMemo } from "react";
 
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import settings from "@nextgisweb/pyramid/settings!resource";
-
-import type { Permission } from "../type/Permission";
+import type { DataScopePermissions } from "@nextgisweb/resource/type/api";
 
 const resourceExportSetting = settings.resource_export;
 
 export function useResource({ id }: { id: number }) {
-    const { data } = useRouteGet<Permission>("resource.permission", { id });
+    const { data } = useRouteGet<{ data: DataScopePermissions }>(
+        "resource.permission",
+        { id }
+    );
 
     const isUserAdministrator = ngwConfig.isAdministrator;
 
