@@ -21,7 +21,7 @@ from nextgisweb.resource import DataScope, ResourceFactory
 
 from .model import WebMap, WebMapAnnotation, WebMapScope
 
-AnnotationID = Annotated[int, Meta(gt=1, description="Annotation ID")]
+AnnotationID = Annotated[int, Meta(ge=1, description="Annotation ID")]
 
 
 def annotation_to_dict(obj, request, with_user_info=False):

@@ -17,7 +17,7 @@ from .pyramid import require_catalog_configured
 from .util import convert_to_wkt
 
 SRSID = Annotated[int, Meta(ge=1, description="Spatial reference system ID")]
-SRSCatalogID = Annotated[int, Meta(gt=1, description="ID of spatial reference system in catalog")]
+SRSCatalogID = Annotated[int, Meta(ge=1, description="ID of spatial reference system in catalog")]
 
 
 def serialize(obj: SRS):
