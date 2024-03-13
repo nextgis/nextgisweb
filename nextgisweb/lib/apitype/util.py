@@ -16,7 +16,6 @@ from msgspec import _utils as ms_utils
 from msgspec.inspect import Metadata, type_info
 from msgspec.inspect import _is_enum as is_enum  # noqa: F401
 from msgspec.inspect import _is_struct as is_struct  # noqa: F401
-from msgspec.inspect import _is_typeddict as is_typeddict  # noqa: F401
 from typing_extensions import Annotated, _AnnotatedAlias
 
 get_class_annotations = ms_utils.get_class_annotations

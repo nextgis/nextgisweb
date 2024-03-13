@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, TypedDict, Union
+from typing import Dict, List, Union
 
 from msgspec import Meta
 from typing_extensions import Annotated
@@ -94,37 +94,8 @@ def anyof(
     return "OK"
 
 
-def body(
-    request,
-    *,
-    body: AnyOf[
-        Annotated[str, ContentType("application/json")],
-        Annotated[str, ContentType("text/plain")],
-    ],
-) -> JSONType:
-    """Decode request body depending on its content type"""
-    return "OK"
-
-
-class FooResponse(TypedDict):
-    foo: str
-
-
-class BarResponse(TypedDict):
-    bar: str
-
-
-def tdict(
-    request,
-) -> AnyOf[Annotated[FooResponse, StatusCode(200)], Annotated[BarResponse, StatusCode(201)],]:
-    """Generate response from TypedDict"""
-    return FooResponse(foo="foo")
-
-
 config.add_route("json", "/json", post=json)
 config.add_route("anyof", "/anyof", get=anyof)
-config.add_route("body", "/body", post=body)
-config.add_route("tdict", "/tdict", get=tdict)
 
 
 config.commit()

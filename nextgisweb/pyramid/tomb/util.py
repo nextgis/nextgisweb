@@ -4,7 +4,6 @@ from sys import _getframe
 from typing import Type
 
 from msgspec import Struct
-from msgspec.inspect import _is_typeddict
 
 from nextgisweb.lib.apitype import ContentType
 
@@ -31,7 +30,7 @@ def push_stacklevel(kwargs, push, ainfo=False):
 
 
 def is_json_type(t: Type) -> bool:
-    if isclass(t) and (issubclass(t, Struct) or _is_typeddict(t)):
+    if isclass(t) and issubclass(t, Struct):
         return True
 
     if ContentType.JSON in getattr(t, "__metadata__", ()):

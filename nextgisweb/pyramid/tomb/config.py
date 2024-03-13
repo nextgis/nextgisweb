@@ -16,8 +16,8 @@ from nextgisweb.env import gettext
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import ContentType, EmptyObject, JSONType, PathParam, QueryParam
 from nextgisweb.lib.apitype.query_string import QueryParamError, QueryParamRequired
-from nextgisweb.lib.apitype.schema import _AnyOfRuntime, iter_anyof
-from nextgisweb.lib.apitype.util import disannotate, is_struct, is_typeddict
+from nextgisweb.lib.apitype.schema import _AnyOfRuntime
+from nextgisweb.lib.apitype.util import disannotate, is_struct
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 
@@ -26,11 +26,7 @@ from nextgisweb.core.exception import ValidationError, user_exception
 from .helper import RouteHelper
 from .inspect import iter_routes
 from .predicate import ErrorRendererPredicate, RequestMethodPredicate, RouteMeta, ViewMeta
-from .util import is_json_type, push_stacklevel
-
-
-def _json_generic(request):
-    return request.json_body
+from .util import push_stacklevel
 
 
 def _json_msgspec_factory(typedef):
@@ -320,37 +316,15 @@ class Configurator(PyramidConfigurator):
                 assert has_request or idx in (0, 1)
 
                 if name in ("body", "json_body"):
-                    assert body_type is None and p.annotation is not p.empty
-
+                    assert body is None, "Got both of body and json_body arguments"
+                    assert p.annotation is not p.empty, f"Type hint required for {name}"
                     body_type = p.annotation
-                    bextract = None
-
-                    if body_type is JSONType:
-                        bextract = _json_generic
-                    elif is_json_type(body_type):
+                    body_base, body_extras = disannotate(body_type)
+                    if is_struct(body_base) or (ContentType.JSON in body_extras):
                         bextract = _json_msgspec_factory(body_type)
                     else:
-                        ctmap = dict()
-                        for bt, ct in iter_anyof(body_type, ContentType()):
-                            assert ct is not None
-                            ctmap[ct] = bt
-                        if len(ctmap) > 0:
-
-                            def bextract(request):
-                                rct = request.content_type
-                                for ct, bt in ctmap.items():
-                                    if ct != rct:
-                                        continue
-                                    if ct == "application/json":
-                                        d = Decoder(bt)
-                                        res = d.decode(request.body)
-                                        return res
-                                    elif ct.startswith("text/"):
-                                        return request.body.decode(request.charset)
-
-                                raise ValueError
-
-                    assert bextract is not None
+                        err = f"Body type not supported: {body_base}"
+                        raise NotImplementedError(err)
                     body = (name, bextract)
 
                 elif p.kind == p.POSITIONAL_OR_KEYWORD:
@@ -373,7 +347,6 @@ class Configurator(PyramidConfigurator):
                 if (
                     return_concrete is EmptyObject
                     or is_struct(return_concrete)
-                    or is_typeddict(return_concrete)
                     or ContentType.JSON in return_extras
                     or _AnyOfRuntime in return_extras
                 ):
