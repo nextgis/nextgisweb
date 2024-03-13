@@ -1,22 +1,20 @@
 import { useState } from "react";
 
 import { Checkbox, Input } from "@nextgisweb/gui/antd";
+import type { Metrics } from "@nextgisweb/pyramid/type/api";
 
 import { gettext } from "../i18n";
 
 import type { TabProps } from "./tab";
 
-export interface TV {
-    id: string;
-    webvisor: boolean;
-}
+type TabValue = NonNullable<Metrics["yandex_metrica"]>;
 
 export default function YandexMetricaTab({
     value,
     onChange,
     readonly,
-}: TabProps<TV>) {
-    const [ivalue, setIvalue] = useState<TV>(() => ({
+}: TabProps<TabValue>) {
+    const [ivalue, setIvalue] = useState<TabValue>(() => ({
         id: value?.id || "",
         webvisor: value?.webvisor || false,
     }));

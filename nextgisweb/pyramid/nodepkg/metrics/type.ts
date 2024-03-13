@@ -1,22 +1,13 @@
 import type { FC } from "react";
 
-import type { TV as GoogleAnalytics } from "./GoogleAnalyticsTab";
-import type { TV as YandexMetric } from "./YandexMetricaTab";
+import type { Metrics } from "@nextgisweb/pyramid/type/api";
+
 import type { TabProps } from "./tab";
 
-export interface PyramidMetrics {
-    yandex_metrica?: YandexMetric;
-    google_analytics?: GoogleAnalytics;
-}
-
-export type PyramidMetricsKey = keyof PyramidMetrics;
-
-export type PyramidMetricsComponent = FC<
-    TabProps<PyramidMetrics[keyof PyramidMetrics]>
->;
+export type PyramidMetricsComponent = FC<TabProps<Metrics[keyof Metrics]>>;
 
 export interface MetricSettingsTab {
-    key: PyramidMetricsKey;
+    key: keyof Metrics;
     label: string;
     component: PyramidMetricsComponent;
 }

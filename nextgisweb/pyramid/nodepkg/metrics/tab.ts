@@ -2,12 +2,9 @@
 import type { FC } from "react";
 
 import { PluginRegistry } from "@nextgisweb/jsrealm/plugin";
+import type { Metrics } from "@nextgisweb/pyramid/type/api";
 
 import { gettext } from "../i18n";
-
-import type { TV as GoogleAnalytics } from "./GoogleAnalyticsTab";
-import type { TV as YandexMetric } from "./YandexMetricaTab";
-import type { PyramidMetricsKey } from "./type";
 
 export interface TabProps<TV> {
     value: TV | null;
@@ -16,15 +13,15 @@ export interface TabProps<TV> {
 }
 
 export interface MetadataType {
-    readonly key: PyramidMetricsKey;
+    readonly key: keyof Metrics;
     readonly label: string;
 }
 
-type PluginRegistryValue =
-    | FC<TabProps<YandexMetric>>
-    | FC<TabProps<GoogleAnalytics>>;
+type PluginDistribute<TV> = TV extends unknown ? FC<TabProps<TV>> : never;
+type PluginValue = NonNullable<Metrics[keyof Metrics]>;
+export type Plugin = PluginDistribute<PluginValue>;
 
-export const registry = new PluginRegistry<PluginRegistryValue, MetadataType>(
+export const registry = new PluginRegistry<Plugin, MetadataType>(
     "pyramid/metrics/tab"
 );
 

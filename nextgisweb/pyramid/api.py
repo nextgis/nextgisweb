@@ -1,6 +1,5 @@
 import re
 from datetime import datetime
-from enum import Enum
 from inspect import Parameter, signature
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
 
@@ -16,6 +15,7 @@ from nextgisweb.lib.imptool import module_from_stack
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import NotConfigured, ValidationError
 from nextgisweb.file_upload import FileUploadRef
+from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import Resource, ResourceScope
 
 from .util import gensecret, parse_origin
@@ -333,40 +333,36 @@ def setup_pyramid_csettings(comp, config):
     getters, setters = dict(), dict()
     get_parameters = list()
 
-    for component, stngs in csetting.registry.items():
+    for cid, stngs in csetting.registry.items():
         sitems = list(stngs.items())
-        basename = Component.registry[component].basename
+        component = Component.registry[cid]
+        basename = component.basename
 
-        rfields.append(
-            fld_unset(
-                component,
-                defstruct(
-                    f"{basename}SettingsRead",
-                    [fld_unset(name, stng.gtype) for name, stng in sitems],
-                ),
-            )
+        rstruct = defstruct(
+            f"{basename}CSettingsRead",
+            [fld_unset(name, stng.gtype) for name, stng in sitems],
+            module=f"{component.module}.api",
         )
 
-        ufields.append(
-            fld_unset(
-                component,
-                defstruct(
-                    f"{basename}SettingsUpdate",
-                    [fld_reset(name, stng.stype) for name, stng in sitems],
-                ),
-            )
+        ustruct = defstruct(
+            f"{basename}CSettingsUpdate",
+            [fld_reset(name, stng.stype) for name, stng in sitems],
+            module=f"{component.module}.api",
         )
 
-        getters[component] = {k: v.getter for k, v in sitems}
-        setters[component] = {k: v.setter for k, v in sitems}
+        rfields.append(fld_unset(cid, rstruct))
+        ufields.append(fld_unset(cid, ustruct))
+        getters[cid] = {k: v.getter for k, v in sitems}
+        setters[cid] = {k: v.setter for k, v in sitems}
 
+        cslit = Literal[("all",) + tuple(stngs)]  # type: ignore
         cstype = Annotated[
-            List[Enum(f"{basename}SettingsEnum", dict(all="all", **{k: k for k in stngs}))],
+            List[Annotated[cslit, TSExport(f"{basename}CSetting", component=cid)]],
             Meta(description=f"{basename} component settings to read"),
         ]
         get_parameters.append(
             Parameter(
-                component,
+                cid,
                 Parameter.KEYWORD_ONLY,
                 default=[],
                 annotation=cstype,
@@ -375,10 +371,10 @@ def setup_pyramid_csettings(comp, config):
 
     if TYPE_CHECKING:
         CSettingsRead = Struct
-        CSettingsUpadate = Struct
+        CSettingsUpdate = Struct
     else:
-        CSettingsRead = defstruct("ComponentSettingsRead", rfields)
-        CSettingsUpadate = defstruct("ComponentSettingUpdate", ufields)
+        CSettingsRead = defstruct("CSettingsRead", rfields)
+        CSettingsUpdate = defstruct("CSettingsUpdate", ufields)
 
     def get(request, **kwargs) -> CSettingsRead:
         """Read component settings"""
@@ -388,8 +384,6 @@ def setup_pyramid_csettings(comp, config):
         sf = dict()
         for cid, attrs in kwargs.items():
             cgetters = getters[cid]
-
-            attrs = [a.value for a in attrs]
             if "all" in attrs:
                 if len(attrs) > 1:
                     raise ValidationError(
@@ -411,7 +405,7 @@ def setup_pyramid_csettings(comp, config):
         parameters=[get_sig.parameters["request"]] + get_parameters
     )
 
-    def put(request, *, body: CSettingsUpadate) -> EmptyObject:
+    def put(request, *, body: CSettingsUpdate) -> EmptyObject:
         """Update component settings"""
 
         request.require_administrator()
@@ -510,14 +504,14 @@ class YandexMetrica(Struct):
     webvisor: bool
 
 
-class MetricsSettings(Struct):
+class Metrics(Struct):
     google_analytics: Union[GoogleAnalytics, UnsetType] = UNSET
     yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
 
 
 csetting("full_name", Optional[str], skey=("core", "system.full_name"))
 csetting("home_path", Optional[str])
-csetting("metrics", MetricsSettings, default={})
+csetting("metrics", Metrics, default={})
 
 
 def setup_pyramid(comp, config):

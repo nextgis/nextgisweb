@@ -1,21 +1,20 @@
 import { useState } from "react";
 
 import { Input } from "@nextgisweb/gui/antd";
+import type { Metrics } from "@nextgisweb/pyramid/type/api";
 
 import { gettext } from "../i18n";
 
 import type { TabProps } from "./tab";
 
-export interface TV {
-    id: string;
-}
+type TabValue = NonNullable<Metrics["google_analytics"]>;
 
 export default function GoogleAnalyticsTab({
     value,
     onChange,
     readonly,
-}: TabProps<TV>) {
-    const [ivalue, setIvalue] = useState<TV>(() => ({
+}: TabProps<TabValue>) {
+    const [ivalue, setIvalue] = useState<TabValue>(() => ({
         id: value?.id || "",
     }));
 
