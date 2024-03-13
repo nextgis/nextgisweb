@@ -1,6 +1,7 @@
 import type { Projection } from "ol/proj";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { AreaUnits, LengthUnits } from "@nextgisweb/webmap/type/api";
 
 const m_to_km = 1e-3;
 const m_to_ft = 1 / 0.3048;
@@ -76,7 +77,10 @@ interface MetersResult {
     postfix: JSX.Element | string;
 }
 
-const metersLengthToUnit = (meters: number, unit: string): MetersResult => {
+const metersLengthToUnit = (
+    meters: number,
+    unit: LengthUnits
+): MetersResult => {
     let resultValue;
     let postfix;
 
@@ -113,9 +117,9 @@ const metersLengthToUnit = (meters: number, unit: string): MetersResult => {
             }
             break;
         case "m":
-        default:
             resultValue = meters;
             postfix = msgSiM;
+            break;
     }
 
     return {
@@ -124,7 +128,7 @@ const metersLengthToUnit = (meters: number, unit: string): MetersResult => {
     };
 };
 
-const metersAreaToUnit = (meters: number, unit: string): MetersResult => {
+const metersAreaToUnit = (meters: number, unit: AreaUnits): MetersResult => {
     let resultValue;
     let postfix;
 
@@ -171,9 +175,9 @@ const metersAreaToUnit = (meters: number, unit: string): MetersResult => {
             postfix = addSupSquare(msgSiFt);
             break;
         case "sq_m":
-        default:
             resultValue = meters;
             postfix = addSupSquare(msgSiM);
+            break;
     }
 
     return {
@@ -234,7 +238,7 @@ export const roundCoords = (
  */
 export const formatMetersLength = (
     meters: number,
-    unit: string,
+    unit: LengthUnits,
     config?: DefaultConfig
 ) => {
     const _config = config || defaultConfig;
@@ -255,7 +259,7 @@ export const formatMetersLength = (
  */
 export const formatMetersArea = (
     meters: number,
-    unit: string,
+    unit: AreaUnits,
     config?: DefaultConfig
 ) => {
     const _config = config || defaultConfig;

@@ -13,6 +13,7 @@ from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession
 
+from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
@@ -156,7 +157,7 @@ def get_webmap_extent(resource, request) -> JSONType:
     return traverse(resource.root_item, None)
 
 
-ExportFormat = Literal["png", "jpeg", "tiff", "pdf"]
+PrintFormat = Annotated[Literal["png", "jpeg", "tiff", "pdf"], TSExport("PrintFormat")]
 
 
 class PrintBody(Struct):
@@ -164,7 +165,7 @@ class PrintBody(Struct):
     height: Annotated[float, Meta(gt=0, le=500)]
     margin: Annotated[float, Meta(ge=0, le=100)]
     map_image: bytes
-    format: ExportFormat
+    format: PrintFormat
 
 
 def print(request, *, body: PrintBody) -> Response:
@@ -218,7 +219,7 @@ def print(request, *, body: PrintBody) -> Response:
         )
 
 
-def pdf_to_image(format: ExportFormat, pdf_file: str, temp_dir: TemporaryDirectory):
+def pdf_to_image(format: PrintFormat, pdf_file: str, temp_dir: TemporaryDirectory):
     gs = which("gs")
     if not gs:
         raise RuntimeError("Ghostscript not found")
@@ -262,10 +263,15 @@ def pdf_to_image(format: ExportFormat, pdf_file: str, temp_dir: TemporaryDirecto
 
 # Component settings
 
-LengthUnits = Literal["m", "km", "metric", "ft", "mi", "imperial"]
-AreaUnits = Literal["sq_m", "sq_km", "metric", "ha", "ac", "sq_mi", "imperial", "sq_ft"]
-DegreeFormat = Literal["dd", "ddm", "dms"]
-AddressGeocoder = Literal["nominatim", "yandex"]
+LengthUnits = Annotated[
+    Literal["m", "km", "metric", "ft", "mi", "imperial"], TSExport("LengthUnits")
+]
+AreaUnits = Annotated[
+    Literal["sq_m", "sq_km", "metric", "ha", "ac", "sq_mi", "imperial", "sq_ft"],
+    TSExport("AreaUnits"),
+]
+DegreeFormat = Annotated[Literal["dd", "ddm", "dms"], TSExport("DegreeFormat")]
+AddressGeocoder = Annotated[Literal["nominatim", "yandex"], TSExport("DegreeFormat")]
 
 csetting("identify_radius", float, default=3)
 csetting("identify_attributes", bool, default=True)

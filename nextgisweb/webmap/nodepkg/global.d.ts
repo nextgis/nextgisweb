@@ -1,4 +1,11 @@
 declare module "@nextgisweb/pyramid/settings!webmap" {
+    import type {
+        AddressGeocoder,
+        AreaUnits,
+        DegreeFormat,
+        LengthUnits,
+    } from "@nextgisweb/webmap/type/api";
+
     interface BaseMap {
         base: {
             keyname: string;
@@ -33,12 +40,12 @@ declare module "@nextgisweb/pyramid/settings!webmap" {
         popup_height: number;
         address_search_enabled: boolean;
         address_search_extent: boolean;
-        address_geocoder: string;
+        address_geocoder: AddressGeocoder;
         yandex_api_geocoder_key: string;
         nominatim_countrycodes: string;
-        units_length: string;
-        units_area: string;
-        degree_format: string;
+        units_length: LengthUnits;
+        units_area: AreaUnits;
+        degree_format: DegreeFormat;
         measurement_srid: number;
         legend_symbols: unknown;
         hide_nav_menu: boolean;
