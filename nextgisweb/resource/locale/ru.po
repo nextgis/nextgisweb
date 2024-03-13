@@ -345,8 +345,8 @@ msgid "Users with \"Data: Read\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Чтение\""
 
 #: nodepkg/export-settings/ExportSettings.tsx:71
-msgid "Users with \"Data: Write\" permission"
-msgstr "Пользователи с правом доступа \"Данные: Запись\""
+msgid "Users with \"Data: Modify\" permission"
+msgstr "Пользователи с правом доступа \"Данные: Изменение\""
 
 #: nodepkg/export-settings/ExportSettings.tsx:74
 msgid "Administrators"

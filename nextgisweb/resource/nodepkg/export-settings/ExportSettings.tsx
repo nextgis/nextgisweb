@@ -68,7 +68,7 @@ export function ExportSettings() {
                         {gettext('Users with "Data: Read" permission')}
                     </Radio>
                     <Radio value="data_write">
-                        {gettext('Users with "Data: Write" permission')}
+                        {gettext('Users with "Data: Modify" permission')}
                     </Radio>
                     <Radio value="administrators">
                         {gettext("Administrators")}
