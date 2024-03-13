@@ -55,7 +55,11 @@ def module_from_stack(depth=0, skip=None):
         fr = sys._getframe(cur_depth)
         mod = fr.f_globals["__name__"]
         mod_dot = mod + "."
-        if mod_dot.startswith("importlib.") or (skip and mod_dot.startswith(skip)):
+        if (
+            mod.startswith("_")
+            or mod_dot.startswith("importlib.")
+            or (skip and mod_dot.startswith(skip))
+        ):
             cur_depth += 1
         else:
             return mod
