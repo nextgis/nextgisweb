@@ -309,7 +309,7 @@ class TSStructObject(TSType, kw_only=True):
         self.fields = tuple(fields)
 
     def inline(self, module: TSModule) -> str:
-        q = lambda v: v if re.match(r"\w+$", v) else f"[{dumps(v)}]"
+        q = lambda v: v if re.match(r"\w+$", v) else f"{dumps(v)}"
         parts = [f"{q(k)}{'?' if ue else ''}: {ts.render(module)}" for k, ue, ts in self.fields]
         indented_sc = partial(indented, sep=";\n")
         return f"{{\n{indented_sc(parts)};\n}}" if len(self.fields) > 1 else f"{{ {parts[0]} }}"

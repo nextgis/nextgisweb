@@ -56,18 +56,17 @@ class Route(Struct, kw_only=True):
 
     basename: str = field(default_factory=lambda: f"_Route{counter()}")
 
-    def struct(self) -> Type[Struct]:
+    def field(self, name: str) -> Tuple[str, Type[Struct], Any]:
         fields = list()
-        if path := self.type_path_obj():
-            fields.append(("path", path))
+        fields.append(("path_obj", self.type_path_obj(), field(name="pathObj")))
+        fields.append(("path_arr", self.type_path_arr(), field(name="pathArr")))
         for a in self.__struct_fields__:
             if a not in ("path", "basename") and len(val := getattr(self, a)) > 0:
                 fields.append((a, union([t.struct() for t in val])))
-        return defstruct(self.basename, fields)
+        return (f"f{id(name)}", defstruct(self.basename, fields), field(name=name))
 
-    def type_path_obj(self) -> Union[Type[Struct], None]:
-        if len(self.path) > 0:
-            return defstruct(f"{self.basename}PathObj", list(self.path.items()))
+    def type_path_obj(self) -> Type[Struct]:
+        return defstruct(f"{self.basename}PathObj", list(self.path.items()))
 
     def type_path_arr(self) -> Type[Struct]:
         return defstruct(f"{self.basename}PathArr", list(self.path.items()), array_like=True)
@@ -112,14 +111,7 @@ def client_codegen(self: PyramidComponent):
                 if (meth := getattr(routes[route.name], method_attr, None)) is not None:
                     cast(List[Operation], meth).append(op)
 
-    routes_struct = defstruct(
-        "Routes",
-        [
-            (f"f{counter()}", v.struct(), field(name=k))
-            for k, v in routes.items()
-            if not v.is_empty()
-        ],
-    )
+    routes_struct = defstruct("Routes", [v.field(k) for k, v in routes.items()])
 
     params_fields = list()
     for k, v in routes.items():
