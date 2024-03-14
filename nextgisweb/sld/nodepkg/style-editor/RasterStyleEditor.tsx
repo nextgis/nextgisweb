@@ -134,14 +134,6 @@ export function RasterStyleEditor({
         [onSymbolizerChange]
     );
 
-    // form doesn't trigger onChange without manually setting values;
-    useEffect(() => {
-        if (initialValues && form) {
-            form.setFieldsValue(initialValues);
-            onChange(null, initialValues);
-        }
-    }, [initialValues]);
-
     if (!(initialValues && bandRange)) {
         return null;
     } else {
@@ -149,6 +141,7 @@ export function RasterStyleEditor({
             <Form
                 form={form}
                 onValuesChange={onChange}
+                initialValues={initialValues}
                 className="ngw-qgis-raster-editor-widget-sld"
             >
                 <label>{gettext("Red channel")}</label>
