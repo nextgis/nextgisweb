@@ -1,21 +1,39 @@
+from typing import List, Tuple
+
 import requests
+from msgspec import Meta, Struct
 from requests.exceptions import RequestException
+from typing_extensions import Annotated
 
 from nextgisweb.core.exception import ExternalServiceError
-from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import ConnectionScope, ResourceFactory
 
 from .model import NEXTGIS_GEOSERVICES, Connection
 
+Zoom = Annotated[int, Meta(ge=0, le=30)]
+Lat = Annotated[float, Meta(ge=-90, le=90)]
+Lon = Annotated[float, Meta(ge=-180, le=180)]
 
-def inspect_connection(request) -> JSONType:
+
+class LayerObject(Struct, kw_only=True):
+    layer: str
+    description: str
+    tilesize: Annotated[int, Meta(ge=1)]
+    minzoom: Zoom
+    maxzoom: Zoom
+    bounds: Tuple[Lon, Lat, Lon, Lat]
+
+
+class InspectResponse(Struct, kw_only=True):
+    layers: List[LayerObject]
+
+
+def inspect_connection(resource, request) -> InspectResponse:
     request.resource_permission(ConnectionScope.connect)
-
-    connection = request.context
 
     layers = []
 
-    if connection.capmode == NEXTGIS_GEOSERVICES:
+    if resource.capmode == NEXTGIS_GEOSERVICES:
         try:
             result = requests.get(
                 request.env.tmsclient.options["nextgis_geoservices.layers"],
@@ -28,7 +46,7 @@ def inspect_connection(request) -> JSONType:
 
         for layer in result.json():
             layers.append(
-                dict(
+                LayerObject(
                     layer=layer["layer"],
                     description=layer["description"],
                     tilesize=layer["tile_size"],
@@ -38,13 +56,13 @@ def inspect_connection(request) -> JSONType:
                 )
             )
 
-    return layers
+    return InspectResponse(layers=layers)
 
 
 def setup_pyramid(comp, config):
     config.add_route(
-        "tmsclient.connection.layers",
-        "/api/component/tmsclient/{id}/layers/",
+        "tmsclient.connection.inspect",
+        "/api/resource/{id}/tmsclient/inspect",
         factory=ResourceFactory(context=Connection),
         get=inspect_connection,
     )

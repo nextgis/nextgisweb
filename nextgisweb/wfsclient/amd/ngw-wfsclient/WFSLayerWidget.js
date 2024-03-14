@@ -113,7 +113,7 @@ define([
                     handleAs: "json",
                 }).then(
                     lang.hitch(this, function (response) {
-                        var data = array.map(response, function (layer) {
+                        var data = array.map(response.layers, function (layer) {
                             return { id: layer.name, srid: layer.srid };
                         });
                         this.wLayer.set("store", new Memory({ data: data }));
@@ -139,7 +139,7 @@ define([
                     lang.hitch(this, function (response) {
                         var geomcols = [];
                         array.forEach(
-                            response,
+                            response.fields,
                             function (item) {
                                 if (item.type.startsWith("gml:")) {
                                     geomcols.push({
