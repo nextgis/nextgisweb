@@ -227,7 +227,7 @@ class SLD(Base):
         return to_builtins(self.value)
 
     def deserialize(self, value):
-        convert(value, Style)
+        self.value = convert(value, Style)
 
     def to_xml(self):
         _root = self.value.xml()
