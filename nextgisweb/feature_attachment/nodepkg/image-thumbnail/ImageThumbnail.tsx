@@ -58,8 +58,16 @@ export const ImageThumbnail = ({
         <div
             className="ngw-feature-attachment-image-thumbnail"
             style={{ width: width }}
-            onClick={() => {
-                if (onClick) onClick(attachment);
+            onClick={(event) => {
+                if (event.ctrlKey && url) {
+                    window.open(
+                        url.split("?")[0],
+                        "_feature_attachment",
+                        `location=${window.location.href}`
+                    );
+                } else {
+                    if (onClick) onClick(attachment);
+                }
             }}
         >
             <div className="overlay">
