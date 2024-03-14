@@ -2,6 +2,7 @@
 
 <%!
     from types import SimpleNamespace
+    from msgspec import NODEFAULT
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
 %>
 
@@ -86,21 +87,18 @@
                 args="title=system_name, hide_resource_filter=hasattr(self, 'hide_resource_filter')"
             />
 
-            %if obj and hasattr(obj,'__dynmenu__'):
-                <%
-                    has_dynmenu = True
-                    dynmenu = obj.__dynmenu__
+            <%
+                if (dynmenu := context.get("dynmenu", NODEFAULT)) is not NODEFAULT:
+                    if dynmenu:
+                        dynmenu_kwargs = context.get('dynmenu_kwargs', SimpleNamespace(request=request))
+                    else:
+                        dynmenu_kwargs = None
+                elif obj and (dynmenu := getattr(obj,'__dynmenu__', None)):
                     dynmenu_kwargs = SimpleNamespace(obj=obj, request=request)
-                %>
-            %elif 'dynmenu' in context.keys():
-                <%
-                    has_dynmenu = True
-                    dynmenu = context['dynmenu']
-                    dynmenu_kwargs = context.get('dynmenu_kwargs', SimpleNamespace(request=request))
-                %>
-            %else:
-                <% has_dynmenu = False %>
-            %endif
+                else:
+                    dynmenu_kwargs = None
+                has_dynmenu = dynmenu_kwargs is not None
+            %>
 
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">

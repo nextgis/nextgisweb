@@ -69,6 +69,7 @@ def feature_show(request):
         title=_("Feature #%d") % feature_id,
         feature_id=feature_id,
         ext_mid=ext_mid,
+        dynmenu=False,
     )
 
 
@@ -84,6 +85,7 @@ def feature_update(request):
         props=dict(resourceId=request.context.id, featureId=feature_id),
         title=_("Feature #%d") % feature_id,
         maxheight=True,
+        dynmenu=False,
     )
 
 
