@@ -84,6 +84,7 @@ class GEOM_TYPE:
 
 
 GEOM_TYPE_OGR_2_GEOM_TYPE = dict(zip(GEOM_TYPE_OGR, GEOM_TYPE.enum))
+GEOM_TYPE_2_WKB_TYPE = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_OGR))
 
 
 class FIELD_TYPE:
@@ -150,6 +151,10 @@ class IWritableFeatureLayer(IFeatureLayer):
 
     def feature_put(self, feature):
         """Save feature in a layer"""
+
+
+class IVersionableFeatureLayer(IWritableFeatureLayer):
+    pass
 
 
 class IFeatureQuery(Interface):

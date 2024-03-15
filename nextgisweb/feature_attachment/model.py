@@ -2,12 +2,22 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
+from typing import Any, Dict, Union
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
+from msgspec import UNSET, Struct, UnsetType
 from PIL import Image, UnidentifiedImageError
+from sqlalchemy.dialects import postgresql as pg
 
 from nextgisweb.env import Base
-from nextgisweb.lib import db
 
+from nextgisweb.feature_layer.versioning import (
+    ActColValue,
+    FVersioningExtensionMixin,
+    auto_description,
+    register_change,
+)
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.resource import Resource
@@ -18,42 +28,52 @@ Base.depends_on("resource", "feature_layer")
 KEYNAME_RE = re.compile(r"[a-z_][a-z0-9_]*", re.IGNORECASE)
 
 
-class FeatureAttachment(Base):
+class FeatureAttachment(Base, FVersioningExtensionMixin):
     __tablename__ = "feature_attachment"
 
-    id = db.Column(db.Integer, primary_key=True)
-    resource_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
-    feature_id = db.Column(db.Integer, nullable=False)
-    keyname = db.Column(db.Unicode, nullable=True)
-    fileobj_id = db.Column(db.ForeignKey(FileObj.id), nullable=False)
+    id = sa.Column(sa.Integer, primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
+    feature_id = sa.Column(sa.Integer, nullable=False)
 
-    name = db.Column(db.Unicode, nullable=True)
-    size = db.Column(db.BigInteger, nullable=False)
-    mime_type = db.Column(db.Unicode, nullable=False)
-    file_meta = db.Column(db.JSONB, nullable=True)
+    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
+    keyname = sa.Column(sa.Unicode, nullable=True)
+    name = sa.Column(sa.Unicode, nullable=True)
+    mime_type = sa.Column(sa.Unicode, nullable=False)
+    description = sa.Column(sa.Unicode, nullable=True)
 
-    description = db.Column(db.Unicode, nullable=True)
-
-    fileobj = db.relationship(FileObj, lazy="joined")
-
-    resource = db.relationship(
-        Resource,
-        backref=db.backref(
-            "__feature_attachment",
-            cascade="all",
-            cascade_backrefs=False,
-        ),
-    )
+    size = sa.Column(sa.BigInteger, nullable=False)
+    file_meta = sa.Column(pg.JSONB, nullable=True)
 
     __table_args__ = (
-        db.Index("feature_attachment_resource_id_feature_id_idx", resource_id, feature_id),
-        db.UniqueConstraint(
+        sa.Index("feature_attachment_resource_id_feature_id_idx", resource_id, feature_id),
+        sa.UniqueConstraint(
             resource_id,
             feature_id,
             keyname,
             deferrable=True,
             initially="DEFERRED",
             name="feature_attachment_keyname_unique",
+        ),
+    )
+
+    fversioning_metadata_version = 1
+    fversioning_extension = "attachment"
+    fversioning_columns = ["fileobj_id", "keyname", "name", "mime_type", "description"]
+    fversioning_htab_args = [
+        sa.ForeignKeyConstraint(
+            ["fileobj_id"],
+            [FileObj.id],
+            name="feature_attachment_ht_fileobj_id_fkey",
+        )
+    ]
+
+    fileobj = orm.relationship(FileObj, lazy="joined")
+    resource = orm.relationship(
+        Resource,
+        backref=orm.backref(
+            "_backref_feature_attachment",
+            cascade="all",
+            cascade_backrefs=False,
         ),
     )
 
@@ -89,12 +109,6 @@ class FeatureAttachment(Base):
     def is_image(self):
         return self.mime_type in ("image/jpeg", "image/png")
 
-    @db.validates("keyname")
-    def _validate_keyname(self, key, value):
-        if value is None or KEYNAME_RE.match(value):
-            return value
-        raise ValueError
-
     def serialize(self):
         return {
             "id": self.id,
@@ -108,9 +122,13 @@ class FeatureAttachment(Base):
         }
 
     def deserialize(self, data):
+        updated = False
         for k in ("name", "keyname", "mime_type", "description"):
             if k in data:
-                setattr(self, k, data[k])
+                v = data[k]
+                if v != getattr(self, k):
+                    setattr(self, k, v)
+                    updated = True
 
         if (file_upload := data.get("file_upload")) is not None:
             file_upload_obj = FileUpload(file_upload)
@@ -122,3 +140,64 @@ class FeatureAttachment(Base):
 
             self.size = file_upload_obj.data_path.stat().st_size
             self.extract_meta()
+            updated = True
+
+        return updated
+
+    @classmethod
+    def fversioning_change_from_query(
+        cls,
+        action: ActColValue,
+        fid: int,
+        aid: int,
+        vid: int,
+        values: Dict[str, Any],
+    ) -> Union[AttachmentCreate, AttachmentUpdate, AttachmentDelete]:
+        if action in ("C", "U"):
+            if action == "C":
+                cid = AttachmentCreate
+                values = {k: v for k, v in values.items() if v is not None}
+            else:
+                cid = AttachmentUpdate
+                values = dict(values)
+            if fileobj := values.pop("fileobj_id", None):
+                values["fileobj"] = fileobj
+            return cid(fid=fid, aid=aid, vid=vid, **values)
+        elif action == "D":
+            return AttachmentDelete(fid=fid, aid=aid, vid=vid)
+        else:
+            raise NotImplementedError(f"{action=}")
+
+
+@register_change
+@auto_description
+class AttachmentCreate(Struct, kw_only=True, tag="attachment.create", tag_field="action"):
+    fid: int
+    aid: int
+    vid: int
+    fileobj: int
+    keyname: Union[str, UnsetType] = UNSET
+    name: Union[str, UnsetType] = UNSET
+    mime_type: str
+    description: Union[str, UnsetType] = UNSET
+
+
+@register_change
+@auto_description
+class AttachmentUpdate(Struct, kw_only=True, tag="attachment.update", tag_field="action"):
+    fid: int
+    aid: int
+    vid: int
+    fileobj: Union[int, UnsetType] = UNSET
+    keyname: Union[str, None, UnsetType] = UNSET
+    name: Union[str, None, UnsetType] = UNSET
+    mime_type: Union[str, UnsetType] = UNSET
+    description: Union[str, None, UnsetType] = UNSET
+
+
+@register_change
+@auto_description
+class AttachmentDelete(Struct, kw_only=True, tag="attachment.delete", tag_field="action"):
+    fid: int
+    vid: int
+    aid: int
