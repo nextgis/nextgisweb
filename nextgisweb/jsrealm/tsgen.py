@@ -2,17 +2,17 @@ from __future__ import annotations
 
 import re
 from datetime import datetime, time
-from functools import partial
 from itertools import count
+from textwrap import indent
 from typing import (
     Any,
     Dict,
     List,
     Literal,
-    Mapping,
     Sequence,
     Set,
     Tuple,
+    Type,
     TypeVar,
     Union,
     cast,
@@ -97,13 +97,7 @@ class TSGenerator:
         elif is_enum(otype):
             result = TSEnum(args=[m.value for m in otype], **defaults)
         elif is_struct(otype):
-            args = struct_fields_encoded(otype)
-            if otype.__struct_config__.array_like:
-                result = TSStructArray(args=args, **defaults)
-            elif len(args) == 0:
-                result = TSPrimitive(keyword="Record<string, never>", **defaults)
-            else:
-                result = TSStructObject(args=args, **defaults)
+            result = TSStruct(cls=otype, **defaults)
         elif (origin := get_origin(otype)) is Union:
             result = TSUnion(args=get_args(otype), **defaults)
         elif origin is list:
@@ -293,40 +287,67 @@ class TSTuple(TSType, kw_only=True):
         return f"[{', '.join(parts)}]"
 
 
-class TSStructObject(TSType, kw_only=True):
-    args: Mapping[str, Any]
-    fields: Tuple[Tuple[str, bool, TSType], ...] = POST_INIT
+class TSStructField(Struct):
+    name: str
+    tstype: TSType
+    undefined: bool
+
+
+IDENT_RE = re.compile(r"[_a-z][_a-z0-9]*", re.IGNORECASE)
+KEYWORDS = frozenset(
+    # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#reserved_words
+    "await,break,case,catch,class,const,continue,debugger,default,delete,do,"
+    "else,enum,export,extends,false,finally,for,function,if,implements,import,"
+    "in,instanceof,interface,let,new,null,package,private,protected,public,"
+    "return,static,super,switch,this,throw,true,try,typeof,var,void,while,"
+    "with,yield".split(",")
+)
+
+
+class TSStruct(TSType, kw_only=True):
+    cls: Type[Struct]
+    fields: Tuple[TSStructField, ...] = POST_INIT
+    tag: Union[Tuple[str, Union[str, int]], None] = POST_INIT
+    array_like: bool = POST_INIT
     auto_export = True
 
     def __tstype_init__(self):
         super().__tstype_init__()
-        fields = list()
-        for k, v in self.args.items():
-            ts, cu = self.generator.add(v), False
-            if isinstance(ts, TSUnion) and (ts_ue := ts.undefided_excluded) is not None:
-                ts, cu = ts_ue, True
-            fields.append((k, cu, ts))
+        fields: List[TSStructField] = list()
+        for k, v in struct_fields_encoded(self.cls):
+            ts, undefined = self.generator.add(v), False
+            if isinstance(ts, TSUnion) and (ts_undefined := ts.undefided_excluded) is not None:
+                ts, undefined = ts_undefined, True
+            fields.append(TSStructField(k, ts, undefined))
         self.fields = tuple(fields)
 
-    def inline(self, module: TSModule) -> str:
-        q = lambda v: v if re.match(r"\w+$", v) else f"{dumps(v)}"
-        parts = [f"{q(k)}{'?' if ue else ''}: {ts.render(module)}" for k, ue, ts in self.fields]
-        indented_sc = partial(indented, sep=";\n")
-        return f"{{\n{indented_sc(parts)};\n}}" if len(self.fields) > 1 else f"{{ {parts[0]} }}"
-
-
-class TSStructArray(TSType, kw_only=True):
-    args: Mapping[str, Any]
-    fields: Tuple[Tuple[str, TSType], ...] = POST_INIT
-    auto_export = True
-
-    def __tstype_init__(self):
-        super().__tstype_init__()
-        self.fields = tuple((k, self.generator.add(v)) for k, v in self.args.items())
+        cfg = self.cls.__struct_config__
+        self.array_like = cfg.array_like
+        if cfg.tag is not None:
+            assert cfg.tag_field is not None
+            self.tag = (cfg.tag_field, cfg.tag)
+        else:
+            self.tag = None
 
     def inline(self, module: TSModule) -> str:
-        parts = [f"{k}: {v.render(module)}" for k, v in self.fields]
-        return f"[{', '.join(parts)}]"
+        if len(self.fields) == 0:
+            return "[]" if self.array_like else "Record<str, never>"
+        quote = any((not IDENT_RE.fullmatch(f.name) or f.name in KEYWORDS) for f in self.fields)
+        quote = (lambda v: dumps(v)) if quote else (lambda v: v)
+        parts = [f"{quote(self.tag[0])}: {dumps(self.tag[1])}"] if self.tag else []
+        for fld in self.fields:
+            name = quote(fld.name) + ("?" if fld.undefined else "")
+            parts.append(f"{name}: {fld.tstype.render(module)}")
+        multiline = len(parts) > 1
+        sep = ("," if self.array_like else ";") + ("\n" if multiline else " ")
+        tail = sep[0] if multiline else ""
+        code = sep.join(parts) + tail
+        if multiline:
+            code = indent(code, "    ")
+        brackets = "[]" if self.array_like else "{}"
+        code = ("\n" if multiline else "") + code + ("\n" if multiline else "")
+        code = brackets[0] + code + brackets[1]
+        return code
 
 
 class TSMapping(TSType, kw_only=True):
@@ -383,12 +404,12 @@ def component_tsmodule(component: str, module: str = "type/api") -> str:
     return "/".join(parts)
 
 
-def struct_fields_encoded(otype) -> Dict[str, Any]:
+def struct_fields_encoded(otype) -> Tuple[Tuple[str, Any], ...]:
     hints = get_class_annotations(otype)
-    return {
-        en: hints[fn]
+    return tuple(
+        (en, hints[fn])
         for fn, en in zip(
             otype.__struct_fields__,
             otype.__struct_encode_fields__,
         )
-    }
+    )
