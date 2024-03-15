@@ -13,6 +13,7 @@ from typing_extensions import Annotated
 from nextgisweb.lib.apitype import AnyOf, ContentType, StatusCode
 from nextgisweb.lib.geometry import Geometry
 
+from nextgisweb.render.api import TileX, TileY, TileZ
 from nextgisweb.resource import DataScope, Resource
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
@@ -33,9 +34,9 @@ def mvt(
     request,
     *,
     resource: Annotated[List[int], Meta(min_length=1)],
-    z: Annotated[int, Meta(ge=0, le=22, description="Tile zoom level")],
-    x: Annotated[int, Meta(ge=0, description="Tile X coordinate")],
-    y: Annotated[int, Meta(ge=0, description="Tile Y coordinate")],
+    z: TileZ,
+    x: TileX,
+    y: TileY,
     extent: int = 4096,
     simplification: Optional[float],
     padding: Annotated[float, Meta(ge=0, le=0.5)] = 0.05,
