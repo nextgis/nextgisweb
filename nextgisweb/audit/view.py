@@ -1,5 +1,5 @@
 from nextgisweb.env import gettext
-from nextgisweb.lib import dynmenu as dm
+from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.pyramid import viewargs
 
@@ -33,13 +33,11 @@ def setup_pyramid(comp, config):
         get=journal,
     )
 
-    class CPItems(dm.DynItem):
-        def build(self, kwargs):
-            if is_backend_configured("dbase"):
-                yield dm.Link(
-                    "info/journal",
-                    gettext("Journal"),
-                    lambda args: (args.request.route_url("audit.control_panel.journal.browse")),
-                )
-
-    comp.env.pyramid.control_panel.add(CPItems())
+    @comp.env.pyramid.control_panel.add
+    def _control_panel(args):
+        if args.request.user.is_administrator and is_backend_configured("dbase"):
+            yield Link(
+                "info/journal",
+                gettext("Journal"),
+                lambda args: (args.request.route_url("audit.control_panel.journal.browse")),
+            )

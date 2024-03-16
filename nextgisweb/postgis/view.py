@@ -1,5 +1,5 @@
 from nextgisweb.env import _
-from nextgisweb.lib.dynmenu import DynItem, Link
+from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.pyramid import viewargs
 from nextgisweb.resource import ConnectionScope, DataScope, Resource, Widget, resource_factory
@@ -28,22 +28,18 @@ def setup_pyramid(comp, config):
         diagnostics_page, context=PostgisLayer
     )
 
-    class PostgisMenu(DynItem):
-        def build(self, args):
-            if (
-                isinstance(args.obj, (PostgisConnection, PostgisLayer))
-                and args.request.user.keyname != "guest"
-            ):
-                yield Link(
-                    "extra/postgis-diagnostics",
-                    _("Diagnostics"),
-                    lambda args: args.request.route_url(
-                        "postgis.diagnostics_page", id=args.obj.id
-                    ),
-                    icon="material-flaky",
-                )
-
-    Resource.__dynmenu__.add(PostgisMenu())
+    @Resource.__dynmenu__.add
+    def _resource_dynmenu(args):
+        if (
+            isinstance(args.obj, (PostgisConnection, PostgisLayer))
+            and args.request.user.keyname != "guest"
+        ):
+            yield Link(
+                "extra/postgis-diagnostics",
+                _("Diagnostics"),
+                lambda args: args.request.route_url("postgis.diagnostics_page", id=args.obj.id),
+                icon="material-flaky",
+            )
 
 
 @viewargs(renderer="react")

@@ -10,7 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, _
-from nextgisweb.lib.dynmenu import DynItem, DynMenu, Label, Link
+from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid import JSONType, viewargs
@@ -315,6 +315,12 @@ def setup_pyramid(comp, config):
     _resource_route("effective_permissions", r"{id:uint}/permissions", get=effective_permisssions)
     _resource_route("export.page", r"{id:uint}/export", request_method="GET")
 
+    config.add_route(
+        "resource.control_panel.resource_export",
+        "/control-panel/resource-export",
+        get=resource_export,
+    )
+
     # CRUD
     _resource_route("create", r"{id:uint}/create", get=create)
     _resource_route("update", r"{id:uint}/update", get=update)
@@ -347,99 +353,92 @@ def setup_pyramid(comp, config):
         return dict(links=items) if len(items) > 0 else None
 
     # Actions
-
-    class ResourceMenu(DynItem):
-        def build(self, args):
-            permissions = args.obj.permissions(args.request.user)
-            for ident, cls in Resource.registry._dict.items():
-                if ident in comp.options["disabled_cls"] or comp.options["disable." + ident]:
-                    continue
-
-                if not cls.check_parent(args.obj):
-                    continue
-
-                # Is current user has permission to manage resource children?
-                if PERM_MCHILDREN not in permissions:
-                    continue
-
-                # Is current user has permission to create child resource?
-                child = cls(parent=args.obj, owner_user=args.request.user)
-                if not child.has_permission(PERM_CREATE, args.request.user):
-                    continue
-
-                # Workaround SAWarning: Object of type ... not in session,
-                # add operation along 'Resource.children' will not proceed
-                child.parent = None
-
-                yield Link(
-                    "create/%s" % ident,
-                    cls.cls_display_name,
-                    self._url(ident),
-                    icon=f"rescls-{cls.identity}",
-                )
-
-            if PERM_UPDATE in permissions:
-                yield Link(
-                    "operation/10-update",
-                    _("Update"),
-                    lambda args: args.request.route_url("resource.update", id=args.obj.id),
-                    important=True,
-                    icon="material-edit",
-                )
-
-            if (
-                PERM_DELETE in permissions
-                and args.obj.id != 0
-                and args.obj.parent.has_permission(PERM_MCHILDREN, args.request.user)
-            ):
-                yield Link(
-                    "operation/20-delete",
-                    _("Delete"),
-                    lambda args: args.request.route_url("resource.delete", id=args.obj.id),
-                    important=True,
-                    icon="material-delete_forever",
-                )
-
-            if PERM_READ in permissions:
-                yield Link(
-                    "extra/json",
-                    _("JSON view"),
-                    lambda args: args.request.route_url("resource.json", id=args.obj.id),
-                    icon="material-data_object",
-                )
-
-                yield Link(
-                    "extra/effective-permissions",
-                    _("User permissions"),
-                    lambda args: args.request.route_url(
-                        "resource.effective_permissions",
-                        id=args.obj.id,
-                    ),
-                    icon="material-key",
-                )
-
-        def _url(self, cls):
-            return lambda args: args.request.route_url(
-                "resource.create", id=args.obj.id, _query=dict(cls=cls)
-            )
-
     Resource.__dynmenu__ = DynMenu(
         Label("create", _("Create resource")),
         Label("operation", _("Action")),
         Label("extra", _("Extra")),
-        ResourceMenu(),
     )
 
-    comp.env.pyramid.control_panel.add(
-        Link(
-            "settings/resource_export",
-            _("Resource export"),
-            lambda args: (args.request.route_url("resource.control_panel.resource_export")),
-        )
-    )
+    @Resource.__dynmenu__.add
+    def _resource_dynmenu(args):
+        permissions = args.obj.permissions(args.request.user)
 
-    config.add_route(
-        "resource.control_panel.resource_export",
-        "/control-panel/resource-export",
-        get=resource_export,
-    )
+        for ident, cls in Resource.registry._dict.items():
+            if ident in comp.options["disabled_cls"] or comp.options["disable." + ident]:
+                continue
+
+            if not cls.check_parent(args.obj):
+                continue
+
+            # Is current user has permission to manage resource children?
+            if PERM_MCHILDREN not in permissions:
+                continue
+
+            # Is current user has permission to create child resource?
+            child = cls(parent=args.obj, owner_user=args.request.user)
+            if not child.has_permission(PERM_CREATE, args.request.user):
+                continue
+
+            # Workaround SAWarning: Object of type ... not in session,
+            # add operation along 'Resource.children' will not proceed
+            child.parent = None
+
+            yield Link(
+                "create/%s" % ident,
+                cls.cls_display_name,
+                lambda args, ident=ident: args.request.route_url(
+                    "resource.create",
+                    id=args.obj.id,
+                    _query=dict(cls=ident),
+                ),
+                icon=f"rescls-{cls.identity}",
+            )
+
+        if PERM_UPDATE in permissions:
+            yield Link(
+                "operation/10-update",
+                _("Update"),
+                lambda args: args.request.route_url("resource.update", id=args.obj.id),
+                important=True,
+                icon="material-edit",
+            )
+
+        if (
+            PERM_DELETE in permissions
+            and args.obj.id != 0
+            and args.obj.parent.has_permission(PERM_MCHILDREN, args.request.user)
+        ):
+            yield Link(
+                "operation/20-delete",
+                _("Delete"),
+                lambda args: args.request.route_url("resource.delete", id=args.obj.id),
+                important=True,
+                icon="material-delete_forever",
+            )
+
+        if PERM_READ in permissions:
+            yield Link(
+                "extra/json",
+                _("JSON view"),
+                lambda args: args.request.route_url("resource.json", id=args.obj.id),
+                icon="material-data_object",
+            )
+
+            yield Link(
+                "extra/effective-permissions",
+                _("User permissions"),
+                lambda args: args.request.route_url(
+                    "resource.effective_permissions",
+                    id=args.obj.id,
+                ),
+                icon="material-key",
+            )
+
+    @comp.env.pyramid.control_panel.add
+    def _control_panel(args):
+        if args.request.user.is_administrator:
+            yield Link(
+                "settings/resource_export",
+                _("Resource export"),
+                lambda args: (args.request.route_url("resource.control_panel.resource_export")),
+            )

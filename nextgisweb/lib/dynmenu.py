@@ -15,6 +15,8 @@ class DynMenu:
         for item in self._items:
             if isinstance(item, DynItem):
                 result.extend(item.build(args))
+            elif callable(item):
+                result.extend(item(args))
             else:
                 result.append(item.copy())
 

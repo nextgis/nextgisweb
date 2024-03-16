@@ -1,5 +1,5 @@
 from nextgisweb.env import _
-from nextgisweb.lib.dynmenu import DynItem, Link
+from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.layer.interface import IBboxLayer
@@ -50,19 +50,17 @@ def setup_pyramid(comp, config):
         preview_map, context=RasterLayer
     )
 
-    class LayerMenuExt(DynItem):
-        def build(self, args):
-            if (
-                IFeatureLayer.providedBy(args.obj)
-                or IRenderableStyle.providedBy(args.obj)
-                or (isinstance(args.obj, RasterLayer) and args.obj.cog)
-            ) and (args.obj.has_permission(DataScope.read, args.request.user)):
-                yield Link(
-                    "extra/preview",
-                    _("Preview"),
-                    lambda args: args.request.route_url("layer_preview.map", id=args.obj.id),
-                    important=True,
-                    icon="material-preview",
-                )
-
-    Resource.__dynmenu__.add(LayerMenuExt())
+    @Resource.__dynmenu__.add
+    def _resource_dynmenu(args):
+        if (
+            IFeatureLayer.providedBy(args.obj)
+            or IRenderableStyle.providedBy(args.obj)
+            or (isinstance(args.obj, RasterLayer) and args.obj.cog)
+        ) and (args.obj.has_permission(DataScope.read, args.request.user)):
+            yield Link(
+                "extra/preview",
+                _("Preview"),
+                lambda args: args.request.route_url("layer_preview.map", id=args.obj.id),
+                important=True,
+                icon="material-preview",
+            )
