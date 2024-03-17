@@ -99,6 +99,42 @@ function isMediaContentType(contentType: string): boolean {
     return mediaContentTypesRegex.test(contentType);
 }
 
+type QueryScalar = string | number | boolean;
+type QueryList = QueryScalar[];
+type QueryRecord = Record<string, QueryScalar | QueryList>;
+
+function encodeQuery(
+    value: Record<string, QueryScalar | QueryList | QueryRecord>
+): string {
+    const result = [];
+    for (const [k, v] of Object.entries(value)) {
+        if (
+            typeof v === "string" ||
+            typeof v === "number" ||
+            typeof v === "boolean"
+        ) {
+            result.push(`${k}=${encodeURIComponent(v)}`);
+        } else if (Array.isArray(v)) {
+            result.push(`${k}=${v.map(encodeURIComponent).join(",")}`);
+        } else {
+            for (const [sk, sv] of Object.entries(v)) {
+                const ske = `${k}[${encodeURIComponent(sk)}]`;
+                if (
+                    typeof sv === "string" ||
+                    typeof sv === "number" ||
+                    typeof sv === "boolean"
+                ) {
+                    result.push(`${ske}=${encodeURIComponent(sv)}`);
+                } else if (Array.isArray(sv)) {
+                    const sve = sv.map(encodeURIComponent);
+                    result.push(`${ske}=${sve.join(",")}`);
+                }
+            }
+        }
+    }
+    return result.join("&");
+}
+
 export async function request<T = unknown, ReturnUrl extends boolean = false>(
     path: string,
     options: RequestOptions<ReturnUrl>
@@ -116,11 +152,7 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
 
     let urlParams = "";
     if (opt.query !== undefined) {
-        const queryEntries = Object.entries(opt.query).map(([key, value]) => [
-            key,
-            String(value),
-        ]);
-        urlParams = "?" + new URLSearchParams(queryEntries).toString();
+        urlParams = "?" + encodeQuery(opt.query);
         delete opt.query;
     }
 
