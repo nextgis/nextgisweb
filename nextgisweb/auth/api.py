@@ -25,7 +25,7 @@ from nextgisweb.lib.apitype import (
     struct_items,
 )
 
-from nextgisweb.core.exception import NotConfigured, ValidationError
+from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid.util import gensecret
 
 from .component import AuthComponent
@@ -415,30 +415,6 @@ def current_user(request) -> CurrentUser:
     return result
 
 
-class RegisterBody(Struct, kw_only=True):
-    keyname: Required[Keyname]
-    display_name: Required[str]
-    password: Required[str]
-
-
-class RegistrationNotConfigured(NotConfigured):
-    message = gettext("User self-registration is not allowed on this server.")
-
-
-def register(request, *, body: RegisterBody) -> UserRef:
-    """Self-register user
-
-    :returns: User reference"""
-    if not request.env.auth.options["register"]:
-        raise RegistrationNotConfigured
-
-    obj = User(system=False)
-    obj.member_of = list(Group.filter_by(register=True))
-    deserialize_principal(body, obj, create=True, tr=request.translate)
-
-    return UserRef(id=obj.id)
-
-
 class LoginResponse(Struct, kw_only=True):
     id: UserID
     keyname: Keyname
@@ -526,12 +502,6 @@ def setup_pyramid(comp, config):
         "auth.current_user",
         "/api/component/auth/current_user",
         get=current_user,
-    )
-
-    config.add_route(
-        "auth.register",
-        "/api/component/auth/register",
-        post=register,
     )
 
     config.add_route(

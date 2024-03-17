@@ -25,7 +25,6 @@ from .policy import AuthProvider, AuthState, SecurityPolicy
 class AuthComponent(Component):
     def initialize(self):
         super().initialize()
-        self.settings_register = self.options["register"]
         self.oauth = (
             OAuthHelper(self.options.with_prefix("oauth"))
             if self.options["oauth.enabled"]
@@ -281,7 +280,6 @@ class AuthComponent(Component):
 
     # fmt: off
     option_annotations = OptionAnnotations((
-        Option("register", bool, default=False, doc="Allow user registration."),
         Option("alink", bool, default=False, doc="Allow authentication via link."),
 
         Option("login_route_name", default="auth.login"),
