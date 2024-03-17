@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import type {
-    Blueprint,
-    EffectivePermissions,
-} from "@nextgisweb/resource/type/api";
+import type { EffectivePermissions } from "@nextgisweb/resource/type/api";
 
 import type { PermissionData, PermissionDataItem } from "../type";
 
@@ -19,9 +16,9 @@ export function useLoadData({
     resourceId,
     userId,
 }: UseLoadDataProps): [PermissionData[] | null, boolean] {
-    const { data: schema } = useRouteGet<Blueprint>("resource.blueprint");
+    const { data: schema } = useRouteGet("resource.blueprint");
 
-    const { data: effective } = useRouteGet<EffectivePermissions>({
+    const { data: effective } = useRouteGet({
         name: "resource.permission",
         params: { id: resourceId },
         options: { query: !isCurrent(userId) ? { user: userId } : undefined },

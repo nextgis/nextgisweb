@@ -4,7 +4,7 @@ import { Input, Space, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
-import type { RouteName } from "@nextgisweb/pyramid/api/type";
+import type { KeysWithMethods } from "@nextgisweb/pyramid/api/type";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -14,7 +14,7 @@ import type { ParamsOf } from "../type";
 type InputParams = ParamsOf<typeof Input>;
 
 interface SingleSettingFormParams {
-    model: RouteName;
+    model: KeysWithMethods<["get", "put"]>;
     component: string;
     settingName: string;
     saveSuccessText?: string;
@@ -39,8 +39,7 @@ export function SingleSettingForm({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [value, setValue] = useState<any>();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = useRouteGet<any>({
+    const { data } = useRouteGet<Record<string, Record<string, unknown>>>({
         name: model,
         options: {
             query: {

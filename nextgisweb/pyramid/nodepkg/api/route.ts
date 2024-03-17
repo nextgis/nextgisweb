@@ -1,12 +1,16 @@
 import set from "lodash-es/set";
 
 import routeData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/route";
-import type { RouteParameters } from "@nextgisweb/pyramid/type/route";
 
 import { request } from "./request";
 import type {
     RequestMethod,
     RequestOptions,
+    ResponseType,
+    RouteName,
+    RouteParameters,
+    RouteQuery,
+    RouteResp,
     RouteResults,
     ToReturn,
 } from "./type";
@@ -14,9 +18,9 @@ import type {
 // ReExport for backward compatibility
 export * from "./LunkwillParam";
 
-export function routeURL<RouteName extends keyof RouteParameters>(
-    name: RouteName,
-    ...rest: RouteParameters[RouteName]
+export function routeURL<N extends RouteName>(
+    name: N,
+    ...rest: RouteParameters[N]
 ): string {
     const [template, ...params] = routeData[name];
     const first = rest[0];
@@ -47,21 +51,40 @@ export function routeURL<RouteName extends keyof RouteParameters>(
     });
 }
 
-export function route<RouteName extends keyof RouteParameters>(
-    name: RouteName,
-    ...rest: RouteParameters[RouteName]
-): RouteResults {
+/* Ideas for future improvements:
+
+- Implement getBlob, postBlob, and maybe getLunkwillUrl
+- Use Extract in generics instead of replacement
+- Response properties: route().get().then((data, {statusCode, ...etc}) => ...)
+- Strict validation of query parameters
+
+*/
+
+export function route<N extends RouteName>(
+    name: N,
+    ...rest: RouteParameters[N]
+): RouteResults<N> {
     const template = routeURL(name, ...rest);
-    const result = {} as RouteResults;
-    const methods: RequestMethod[] = ["get", "post", "put", "delete"];
+    const result = {} as RouteResults<N>;
+    const methods: RequestMethod[] = ["get", "post", "put", "delete", "patch"];
     for (const method of methods) {
-        result[method] = <T = unknown, B extends boolean = false>(
-            requestOptions?: RequestOptions<B>
-        ): Promise<ToReturn<T, B>> =>
-            request<T, B>(template, {
+        const methodResp = <
+            T = RouteResp<N, typeof method>,
+            RT extends ResponseType = "json",
+            RU extends boolean = false,
+        >(
+            requestOptions?: RequestOptions<
+                RT,
+                RU,
+                RouteQuery<N, typeof method>
+            >
+        ): Promise<ToReturn<T, RT, RU>> =>
+            request<T, RT, RU>(template, {
                 ...requestOptions,
-                method: method.toUpperCase() as Uppercase<RequestMethod>,
+                method,
             });
+        // Using 'unknown' for type assertion because all methods are actually written to 'result'
+        (result[method] as unknown) = methodResp;
     }
     return result;
 }

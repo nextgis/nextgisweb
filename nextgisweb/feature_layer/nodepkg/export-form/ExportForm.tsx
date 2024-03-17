@@ -89,14 +89,17 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const load = useCallback(async () => {
         try {
             const signal = makeSignal();
-            const promises = [route("spatial_ref_sys.collection")];
-            if (id !== undefined) {
-                promises.push(route("resource.item", id));
-            }
-            const [srsInfo, itemInfo] = (await Promise.all(
-                promises.map((r) => r.get({ signal }))
-            )) as [SpatialReferenceSystem[], ResourceItem];
+            const srsInfo = await route("spatial_ref_sys.collection").get<
+                SpatialReferenceSystem[]
+            >({ signal });
             setSrsOptions(srsListToOptions(srsInfo));
+            let itemInfo = null;
+            if (id !== undefined) {
+                itemInfo = await route("resource.item", id).get<ResourceItem>({
+                    signal,
+                });
+            }
+
             if (itemInfo && itemInfo.feature_layer) {
                 const cls = itemInfo.resource.cls as "vector_layer";
                 const vectorLayer = itemInfo[cls];

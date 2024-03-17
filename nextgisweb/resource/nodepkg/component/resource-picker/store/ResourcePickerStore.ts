@@ -287,7 +287,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
             runInAction(() => {
                 this.resourcesLoading = true;
             });
-            const blueprint = await route("resource.blueprint").get<Blueprint>({
+            const blueprint = await route("resource.blueprint").get({
                 signal: this.setResourcesAbortController.signal,
                 cache: true,
             });

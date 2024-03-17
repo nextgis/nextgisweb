@@ -3,7 +3,6 @@ import { useState } from "react";
 
 import { Space } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import type { Blueprint } from "@nextgisweb/resource/type/api";
 
 import { FieldsForm } from "../../fields-form";
 import type { FormField } from "../../fields-form";
@@ -12,7 +11,7 @@ import { Code } from "./Code";
 import type { CodeProps } from "./Code";
 
 function CodeTest() {
-    const { data: blueprint } = useRouteGet<Blueprint>("resource.blueprint");
+    const { data: blueprint } = useRouteGet("resource.blueprint");
     const [props, setProps] = useState<CodeProps>({
         lang: "json",
         readOnly: true,

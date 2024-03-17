@@ -17,6 +17,7 @@ import reactApp from "@nextgisweb/gui/react-app";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import PrintMap from "@nextgisweb/webmap/print-map";
+import type { PrintBody, PrintFormat } from "@nextgisweb/webmap/type/api";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Import URL parser module
 import URL from "ngw-webmap/utils/URL";
@@ -96,7 +97,7 @@ const runExport = ({
     settings,
     setLoadingFile,
 }: {
-    format: string;
+    format: PrintFormat;
     element: HTMLElement;
     settings: PrintMapSettings;
     setLoadingFile: (loading: boolean) => void;
@@ -114,7 +115,7 @@ const runExport = ({
     toPngPromise
         .then((dataUrl) => {
             const { width, height, margin } = settings;
-            const body = {
+            const body: PrintBody = {
                 width,
                 height,
                 margin,
@@ -344,7 +345,7 @@ export const PrintPanel = ({
         updateMapSettings({ scale: printMapScale });
     }, [printMapScale]);
 
-    const exportToFormat = (format: string) => {
+    const exportToFormat = (format: PrintFormat) => {
         if (!printMapEl) {
             return;
         }
@@ -360,7 +361,7 @@ export const PrintPanel = ({
     const exportFormatsProps: MenuProps = {
         items: exportFormats,
         onClick: (item) => {
-            exportToFormat(item.key);
+            exportToFormat(item.key as PrintFormat);
         },
     };
 

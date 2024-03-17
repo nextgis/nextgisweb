@@ -124,19 +124,10 @@ def client_codegen(self: PyramidComponent):
 
     routes_struct = defstruct("Routes", [v.field(k) for k, v in routes.items()])
 
-    params_fields = list()
-    for k, v in routes.items():
-        type = v.type_path_arr()
-        if obj := v.type_path_obj():
-            type = Union[(type, Tuple[(obj,)])]  # type: ignore
-        params_fields.append((f"f{counter()}", type, field(name=k)))
-    params_struct = defstruct("RouteParameters", params_fields)
-
     tsgen = TSGenerator()
     route_tsmodule = "@nextgisweb/pyramid/type/route"
     tsgen.add(routes_struct, export=(route_tsmodule, "Routes"))
     tsgen.add(routes_struct, export=(route_tsmodule, "default"))
-    tsgen.add(params_struct, export=(route_tsmodule, "RouteParameters"))
 
     no_eslint = [
         f"/* eslint-disable {r} */"

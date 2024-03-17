@@ -1,12 +1,12 @@
 import { getLookupValue } from "@nextgisweb/lookup-table/util/getLookupValue";
-import type { RequestOptions } from "@nextgisweb/pyramid/api/type";
+import type { RequestOptionsByMethod } from "@nextgisweb/pyramid/api/type";
 
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
 export async function getFeatureFieldValue(
     fieldValue: unknown,
     field: FeatureLayerField,
-    requestOptions?: RequestOptions
+    requestOptions?: RequestOptionsByMethod<"get">
 ) {
     if (field.lookup_table) {
         return getLookupValue(

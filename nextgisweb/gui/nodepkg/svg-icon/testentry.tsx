@@ -3,15 +3,12 @@ import { useMemo } from "react";
 
 import { List, Space } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import type {
-    Blueprint,
-    BlueprintResource,
-} from "@nextgisweb/resource/type/api";
+import type { BlueprintResource } from "@nextgisweb/resource/type/api";
 
 import { SvgIcon } from "./SvgIcon";
 
 const SvgIconTest = () => {
-    const { data: blueprint } = useRouteGet<Blueprint>("resource.blueprint");
+    const { data: blueprint } = useRouteGet("resource.blueprint");
 
     const allResourceClasses = useMemo<
         (BlueprintResource & { cls: string })[]

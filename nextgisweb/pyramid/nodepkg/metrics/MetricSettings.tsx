@@ -59,12 +59,14 @@ export function MetricsSettings() {
 
     useEffect(() => {
         route("pyramid.csettings")
-            .get<Record<"pyramid", Record<"metrics", Metrics>>>({
-                query: { pyramid: "metrics" },
+            .get({
+                query: { pyramid: ["metrics"] },
             })
             .then((data) => {
-                setValue(data.pyramid.metrics);
-                setStatus(null);
+                if (data.pyramid) {
+                    setValue(data.pyramid.metrics);
+                    setStatus(null);
+                }
             });
     }, []);
 

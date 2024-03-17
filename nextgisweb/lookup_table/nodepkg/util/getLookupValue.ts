@@ -1,11 +1,11 @@
-import type { RequestOptions } from "@nextgisweb/pyramid/api/type";
+import type { RequestOptionsByMethod } from "@nextgisweb/pyramid/api/type";
 
 import { getLookupTableItems } from "./getLookupTableItems";
 
 export async function getLookupValue(
     value: unknown,
     lookupId: number,
-    requestOptions?: RequestOptions
+    requestOptions?: RequestOptionsByMethod<"get">
 ) {
     try {
         const items = await getLookupTableItems(lookupId, requestOptions);

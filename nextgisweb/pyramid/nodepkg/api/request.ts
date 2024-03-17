@@ -10,7 +10,12 @@ import {
     ServerResponseError,
 } from "./error";
 import type { ServerResponseErrorData } from "./error";
-import type { LunkwillData, RequestOptions, ToReturn } from "./type";
+import type {
+    LunkwillData,
+    RequestOptions,
+    ResponseType,
+    ToReturn,
+} from "./type";
 
 function lunkwillCheckResponse(lwResp: Response) {
     const ct = lwResp.headers.get("content-type");
@@ -135,11 +140,15 @@ function encodeQuery(
     return result.join("&");
 }
 
-export async function request<T = unknown, ReturnUrl extends boolean = false>(
+export async function request<
+    T = unknown,
+    RT extends ResponseType = "json",
+    ReturnUrl extends boolean = false,
+>(
     path: string,
-    options: RequestOptions<ReturnUrl>
-): Promise<ToReturn<T, ReturnUrl>> {
-    const defaults: RequestOptions = {
+    options: RequestOptions<RT, ReturnUrl>
+): Promise<ToReturn<T, RT, ReturnUrl>> {
+    const defaults: RequestOptions<RT, ReturnUrl> = {
         method: "GET",
         credentials: "same-origin",
         headers: {},
@@ -185,7 +194,7 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
             urlParams;
     }
 
-    const makeRequest = async (): Promise<ToReturn<T, ReturnUrl>> => {
+    const makeRequest = async (): Promise<ToReturn<T, RT, ReturnUrl>> => {
         let response: Response;
         try {
             response = await fetch(url, opt);
@@ -199,7 +208,7 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
         if (useLunkwill && lunkwillCheckResponse(response)) {
             const lwRespUrl = await lunkwillResponseUrl(response);
             if (lunkwillReturnUrl) {
-                return lwRespUrl as ToReturn<T, ReturnUrl>;
+                return lwRespUrl as ToReturn<T, RT, ReturnUrl>;
             }
             response = await lunkwillFetch(lwRespUrl);
         }
@@ -231,12 +240,13 @@ export async function request<T = unknown, ReturnUrl extends boolean = false>(
         if (400 <= response.status && response.status <= 599) {
             throw new ServerResponseError(body as ServerResponseErrorData);
         }
-        return body as ToReturn<T, ReturnUrl>;
+        return body as ToReturn<T, RT, ReturnUrl>;
     };
     if (opt.method && opt.method.toUpperCase() === "GET" && useCache) {
         const cacheToUse = useCache instanceof LoaderCache ? useCache : cache;
         return cacheToUse.promiseFor(url, makeRequest) as ToReturn<
             T,
+            RT,
             ReturnUrl
         >;
     }

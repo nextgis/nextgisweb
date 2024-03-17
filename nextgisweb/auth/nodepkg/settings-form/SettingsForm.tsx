@@ -15,11 +15,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import oauth from "../oauth";
 
-interface AuthProfile {
-    oauth_subject: string | null;
-    language: string | null;
-}
-
 interface OauthStatusProps {
     oauthSubject: string | null;
 }
@@ -47,9 +42,7 @@ function OAuthStatus({ oauthSubject }: OauthStatusProps) {
 
 export function SettingsForm() {
     const [isSaving, setSaving] = useState(false);
-    const { data: profile, isLoading } = useRouteGet<AuthProfile>({
-        name: "auth.profile",
-    });
+    const { data: profile, isLoading } = useRouteGet("auth.profile");
 
     const fields = useMemo<FormField[]>(() => {
         const result = [];
@@ -78,7 +71,7 @@ export function SettingsForm() {
     const onChange = async ({ value: json }: FormOnChangeOptions) => {
         setSaving(true);
         try {
-            await route("auth.profile").put<AuthProfile>({ json });
+            await route("auth.profile").put({ json });
             message.success(gettext("Saved"));
         } catch (err) {
             errorModal(err as ApiError);

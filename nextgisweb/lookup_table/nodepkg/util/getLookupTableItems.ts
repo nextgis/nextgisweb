@@ -1,12 +1,12 @@
 import { route } from "@nextgisweb/pyramid/api";
-import type { RequestOptions } from "@nextgisweb/pyramid/api/type";
+import type { RequestOptionsByMethod } from "@nextgisweb/pyramid/api/type";
 import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 const EXCLUDED_IDS: number[] = [];
 
 export async function getLookupTableItems(
     lookupId: number,
-    requestOptions?: RequestOptions
+    requestOptions?: RequestOptionsByMethod<"get">
 ): Promise<Record<string, string>> {
     if (!EXCLUDED_IDS.includes(lookupId)) {
         try {

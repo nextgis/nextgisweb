@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useReducer } from "react";
 
 import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
-import type { RouteParameters } from "@nextgisweb/pyramid/type/route";
 
 import { route as apiRoute } from "../api";
-import type { GetRouteParam, RequestMethod, RouteResults } from "../api/type";
+import type {
+    GetRouteParam,
+    RouteName,
+    RouteParameters,
+    RouteResults,
+} from "../api/type";
 
 import { useAbortController } from "./useAbortController";
 
@@ -26,21 +30,21 @@ const loadingCounterReducer = (
     }
 };
 
-function apiRouteOverloaded<RouteName extends keyof RouteParameters>(
-    name: RouteName,
-    obj?: GetRouteParam<RouteName>
-): RouteResults;
+function apiRouteOverloaded<N extends RouteName>(
+    name: N,
+    obj?: GetRouteParam<N>
+): RouteResults<N>;
 
-function apiRouteOverloaded<RouteName extends keyof RouteParameters>(
-    name: RouteName,
-    ...rest: RouteParameters[RouteName]
-): RouteResults {
+function apiRouteOverloaded<N extends RouteName>(
+    name: N,
+    ...rest: RouteParameters[N]
+): RouteResults<N> {
     return apiRoute(name, ...rest);
 }
 
-export function useRoute<RouteName extends keyof RouteParameters>(
-    name: RouteName,
-    params?: GetRouteParam<RouteName>
+export function useRoute<N extends RouteName>(
+    name: N,
+    params?: GetRouteParam<N>
 ) {
     const { abort, makeSignal } = useAbortController();
     const [loadingCounter, dispatchLoadingCounter] = useReducer(
@@ -51,24 +55,34 @@ export function useRoute<RouteName extends keyof RouteParameters>(
     const [routerParams] = useObjectState(params);
 
     const route = useMemo(() => {
-        const result = apiRouteOverloaded(name, routerParams);
+        const apiResults = apiRouteOverloaded(name, routerParams);
         abort();
-        const methods: RequestMethod[] = ["get", "post", "put", "delete"];
-        for (const method of methods) {
-            const requestForMethodCb = result[method];
-            result[method] = async (options) => {
+        const overloadedResults = {} as RouteResults<N>;
+
+        Object.keys(apiResults).forEach((m) => {
+            const method = m as keyof RouteResults<N>;
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const originalMethod: (...args: any[]) => unknown =
+                apiResults[method];
+            const overloadedMethod = async (
+                requestOptions: Record<string, unknown>
+            ) => {
                 dispatchLoadingCounter("increment");
                 try {
-                    return await requestForMethodCb({
+                    return originalMethod({
                         signal: makeSignal(),
-                        ...options,
+                        ...requestOptions,
                     });
                 } finally {
                     dispatchLoadingCounter("decrement");
                 }
             };
-        }
-        return result;
+            // Using 'unknown' for type assertion because all methods are actually written to 'result'
+            (overloadedResults[method] as unknown) = overloadedMethod;
+        });
+
+        return overloadedResults;
     }, [abort, makeSignal, name, routerParams]);
 
     const isLoading = useMemo(() => {
@@ -76,9 +90,7 @@ export function useRoute<RouteName extends keyof RouteParameters>(
     }, [loadingCounter]);
 
     useEffect(() => {
-        return () => {
-            abort();
-        };
+        return abort;
     }, [abort]);
 
     return { route, isLoading, abort };

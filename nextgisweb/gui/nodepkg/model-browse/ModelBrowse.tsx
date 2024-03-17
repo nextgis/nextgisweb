@@ -17,7 +17,12 @@ import {
 } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import type { RequestOptions, RouteName } from "@nextgisweb/pyramid/api/type";
+import type {
+    KeysWithMethodAndPath,
+    KeysWithMethods,
+    KeysWithPaths,
+    RequestOptionsByMethod,
+} from "@nextgisweb/pyramid/api/type";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -36,11 +41,11 @@ export interface ModalBrowseData {
 }
 
 export interface Model {
-    item: RouteName;
-    collection: RouteName;
-    edit: RouteName;
-    browse: RouteName;
-    create: RouteName;
+    item: KeysWithMethodAndPath<["get", "delete", "put"], ["id"]>;
+    collection: KeysWithMethods<["get", "post"]>;
+    edit: KeysWithPaths<[]>;
+    browse: KeysWithMethods<[]>;
+    create: KeysWithPaths<[]>;
 }
 
 export interface ControlProps<Data extends ModalBrowseData = ModalBrowseData> {
@@ -70,7 +75,7 @@ interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
     createProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
     headerControls?: FC<ControlProps<Data>>[];
     selectedControls?: FC<ControlProps<Data>>[];
-    collectionOptions?: RequestOptions;
+    collectionOptions?: RequestOptionsByMethod<"get">;
     collectionFilter?: (item: Data) => boolean;
 }
 

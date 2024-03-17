@@ -14,19 +14,18 @@ import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { ResourceExport } from "@nextgisweb/resource/type/api";
 
 export function ExportSettings() {
     const [saving, setSaving] = useState(false);
 
-    const { data, isLoading } = useRouteGet<
-        Record<"resource", Record<"resource_export", string>>
-    >({
+    const { data, isLoading } = useRouteGet({
         name: "pyramid.csettings",
         options: {
-            query: { resource: "resource_export" },
+            query: { resource: ["resource_export"] },
         },
     });
-    const [value, setValue] = useState<string>();
+    const [value, setValue] = useState<ResourceExport>();
 
     async function save() {
         setSaving(true);
@@ -43,7 +42,7 @@ export function ExportSettings() {
     }
 
     useEffect(() => {
-        if (data) {
+        if (data?.resource) {
             setValue(data.resource.resource_export);
         }
     }, [data]);

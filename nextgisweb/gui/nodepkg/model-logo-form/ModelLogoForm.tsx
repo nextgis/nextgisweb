@@ -7,14 +7,14 @@ import { Space, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
-import type { RouteName } from "@nextgisweb/pyramid/api/type";
+import type { KeysWithMethods } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ApiError } from "../error/type";
 
 interface ModelLogoFormProps extends ImageUploaderProps {
     component: string;
-    model: RouteName;
+    model: KeysWithMethods<["get", "put"]>;
     settingName: string;
 
     messages?: {

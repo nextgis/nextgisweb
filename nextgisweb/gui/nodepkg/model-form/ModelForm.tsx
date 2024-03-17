@@ -8,7 +8,10 @@ import { errorModal } from "@nextgisweb/gui/error";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField, FormProps } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import type { RouteName } from "@nextgisweb/pyramid/api/type";
+import type {
+    KeysWithMethodAndPath,
+    RouteName,
+} from "@nextgisweb/pyramid/api/type";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -20,7 +23,7 @@ interface Messages {
 }
 
 export interface Model {
-    item: RouteName;
+    item: KeysWithMethodAndPath<["get", "delete", "put"], ["id"]>;
     collection: RouteName;
     edit?: RouteName;
     browse: RouteName;
@@ -29,7 +32,7 @@ export interface Model {
 interface ModelFormProps extends FormProps {
     id: number;
     children?: ReactNode;
-    model: RouteName | Model;
+    model: Model;
     value?: unknown;
     fields: FormField[];
     form?: FormInstance;
@@ -62,7 +65,7 @@ export function ModelForm(props: ModelFormProps) {
 
     const messages = msg ?? {};
     const deleteConfirm = (
-        <>{messages.deleteConfirm || gettext("Confirmation")})</>
+        <>{messages.deleteConfirm || gettext("Confirmation")}</>
     );
 
     const model: Model =
