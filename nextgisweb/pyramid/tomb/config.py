@@ -259,11 +259,13 @@ class Configurator(PyramidConfigurator):
             path_decoders = [(k, v.decoder) for k, v in path_params.items()]
 
             overloaded = kwargs.pop("overloaded", False)
+            load_types = kwargs.pop("load_types", False)
             kwargs["meta"] = RouteMeta(
                 component=component,
                 itemplate=itemplate,
                 overloaded=overloaded,
                 client=client,
+                load_types=load_types,
                 ktemplate=ktemplate,
                 path_params=path_params,
                 path_decoders=path_decoders,

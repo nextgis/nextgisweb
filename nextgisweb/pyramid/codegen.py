@@ -7,7 +7,7 @@ from pyramid.response import Response
 
 from nextgisweb.lib.apitype import unannotate
 
-from nextgisweb.jsrealm.tsgen import TSGenerator
+from nextgisweb.jsrealm.tsgen import TSGenerator, indented
 
 from .component import PyramidComponent
 from .tomb import iter_routes
@@ -85,31 +85,42 @@ def client_codegen(self: PyramidComponent):
     config = self.make_app(settings=dict())
 
     routes: Dict[str, Route] = defaultdict(Route)
-    for route in iter_routes(config.registry.introspector):
-        is_api = route.itemplate.startswith("/api/")
-        if not is_api and not route.client:
+    loaders: Dict[str, Any] = dict()
+    for iroute in iter_routes(config.registry.introspector):
+        is_api = iroute.itemplate.startswith("/api/")
+        if not is_api and not iroute.client:
             continue
 
-        routes[route.name].path = {p.name: p.type for p in route.path_params.values()}
+        route = routes[iroute.name]
+        route.path = {p.name: p.type for p in iroute.path_params.values()}
         if not is_api:
             continue
 
-        for view in route.views:
-            if view.method is None:
+        for iview in iroute.views:
+            if iview.method is None:
                 continue
 
             op = Operation(
                 query={
                     p.name: p.type if (p.default is NODEFAULT) else Union[(p.type, UnsetType)]
-                    for p in view.query_params.values()
+                    for p in iview.query_params.values()
                 }
             )
-            op.set_if_supported("body", view.body_type)
-            op.set_if_supported("response", view.return_type)
+            op.set_if_supported("body", iview.body_type)
+            op.set_if_supported("response", iview.return_type)
             if not op.is_empty():
-                method_attr = view.method.lower()
-                if (meth := getattr(routes[route.name], method_attr, None)) is not None:
+                method_attr = iview.method.lower()
+                if (meth := getattr(route, method_attr, None)) is not None:
                     cast(List[Operation], meth).append(op)
+
+        if iroute.load_types:
+            assert (
+                len(route.path) == 0
+                and len(route_get := route.get) == 1
+                and len(route_get[0].query) == 0
+                and route_get[0].response is not UnsetType
+            ), f"Types cannot be loaded for {iroute.name}"
+            loaders[iroute.itemplate] = iroute.name
 
     routes_struct = defstruct("Routes", [v.field(k) for k, v in routes.items()])
 
@@ -126,9 +137,32 @@ def client_codegen(self: PyramidComponent):
     tsgen.add(routes_struct, export=(route_tsmodule, "Routes"))
     tsgen.add(routes_struct, export=(route_tsmodule, "default"))
     tsgen.add(params_struct, export=(route_tsmodule, "RouteParameters"))
-    (nodepkg / "api/type.inc.d.ts").write_text(
-        "\n".join(
-            [f"/* eslint-disable {r} */" for r in ("prettier/prettier", "import/order")]
-            + [m.code for m in tsgen.compile()]
+
+    no_eslint = [
+        f"/* eslint-disable {r} */"
+        for r in (
+            "prettier/prettier",
+            "import/newline-after-import",
+            "import/order",
         )
-    )
+    ] + [""]
+
+    code = no_eslint + [m.code for m in tsgen.compile()]
+    (nodepkg / "api/type.inc.d.ts").write_text("\n".join(code))
+
+    code = no_eslint
+    for k, v in loaders.items():
+        mod = [
+            f'import type route from "{route_tsmodule}";',
+            f'const value: route["{v}"]["get"]["response"];',
+            "export = value;",
+        ]
+        code.extend(
+            (
+                f'declare module "@nextgisweb/pyramid/api/load!{k}" ' + "{",
+                indented(mod),
+                "}\n",
+            )
+        )
+
+    (nodepkg / "api/load.inc.d.ts").write_text("\n".join(code))
