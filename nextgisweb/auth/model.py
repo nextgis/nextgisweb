@@ -1,16 +1,21 @@
 from collections import namedtuple
-from functools import lru_cache
-from typing import ClassVar, Mapping, Union
+from functools import cached_property, lru_cache
+from itertools import chain
+from typing import Callable, ClassVar, FrozenSet, Iterable, Mapping, Union, overload
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from passlib.hash import sha256_crypt
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from zope.event import notify
 from zope.event.classhandler import handler
 
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib.i18n import TrStr
+
+from nextgisweb.core.exception import ForbiddenError
+
+from .permission import Permission
 
 tab_group_user = sa.Table(
     "auth_group_user",
@@ -31,6 +36,7 @@ class Principal(Base):
     system = sa.Column(sa.Boolean, nullable=False, default=False)
     display_name = sa.Column(sa.Unicode, nullable=False)
     description = sa.Column(sa.Unicode)
+    permissions = sa.Column(ARRAY(sa.Unicode, as_tuple=True), nullable=False, default=tuple())
 
     system_display_name: ClassVar[Mapping[str, TrStr]]
 
@@ -137,6 +143,45 @@ class User(Principal):
     @classmethod
     def by_keyname(cls, keyname):
         return cls.filter(sa.func.lower(User.keyname) == keyname.lower()).one()
+
+    @cached_property
+    def effective_permissions(self) -> FrozenSet[Permission]:
+        registry = Permission.registry
+        return frozenset(
+            registry[identity]
+            for identity in chain(
+                self.permissions,
+                *(group.permissions for group in self.member_of),
+            )
+        )
+
+    @overload
+    def has_permission(self, perm: Permission) -> bool:
+        ...
+
+    @overload
+    def has_permission(self, fn: Callable[[Iterable[bool]], bool], *perms: Permission) -> bool:
+        ...
+
+    def has_permission(self, *args) -> bool:
+        if self.superuser or self.is_administrator:
+            return True
+        if len(effective_permissions := self.effective_permissions) == 0:
+            return False
+        fn, *perms = (all, *args) if len(args) == 1 else args
+        return fn(p in effective_permissions for p in perms)
+
+    @overload
+    def require_permission(self, perm: Permission):
+        ...
+
+    @overload
+    def require_permission(self, fn: Callable[[Iterable[bool]], bool], *perms: Permission):
+        ...
+
+    def require_permission(self, *args):
+        if not self.has_permission(*args):
+            raise ForbiddenError
 
     __table_args__ = (
         sa.Index("auth_user_lower_keyname_idx", sa.func.lower(keyname), unique=True),

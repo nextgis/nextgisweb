@@ -6,7 +6,7 @@ import { ModelForm } from "@nextgisweb/gui/model-form";
 import type { Model } from "@nextgisweb/gui/model-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { PrincipalSelect } from "../field";
+import { PermissionSelect, PrincipalSelect } from "../field";
 import { default as oauth } from "../oauth";
 
 interface GroupWidgetProps {
@@ -43,6 +43,13 @@ export function GroupWidget({ id, readonly }: GroupWidgetProps) {
                     systemUsers: ["guest"],
                     editOnClick: true,
                 },
+            },
+            {
+                name: "permissions",
+                label: gettext("Permissions"),
+                widget: PermissionSelect,
+                inputProps: { multiple: true },
+                value: [],
             },
             {
                 name: "register",

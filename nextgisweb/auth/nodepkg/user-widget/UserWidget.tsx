@@ -15,7 +15,7 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!auth";
 
-import { PrincipalSelect } from "../field";
+import { PermissionSelect, PrincipalSelect } from "../field";
 import { makeTeamManageButton, default as oauth } from "../oauth";
 
 import { UserWidgetAlinkToken } from "./UserWidgetAlinkToken";
@@ -98,6 +98,13 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
                     group && isNewUser
                         ? group.filter((g) => g.register).map((g) => g.id)
                         : [],
+            },
+            {
+                name: "permissions",
+                label: gettext("Permissions"),
+                widget: PermissionSelect,
+                inputProps: { multiple: true },
+                value: [],
             },
             {
                 name: "language",

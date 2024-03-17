@@ -12,6 +12,7 @@
         user = request.user
         is_administrator = user.is_administrator
         is_guest = user.keyname == 'guest'
+        contol_panel = is_administrator or len(user.effective_permissions) > 0
         user_id = user.id
         user_display_name = user.display_name
 
@@ -24,6 +25,7 @@
         # Something like InvalidCredentials
         is_administrator = False
         is_guest = True
+        contol_panel = False
         user_id = None
         user_display_name = None
         invitation_session = False
@@ -40,6 +42,7 @@
         "instanceId": request.env.core.instance_id,
         "isAdministrator": is_administrator,
         "isGuest": is_guest,
+        "controlPanel": contol_panel,
         "userId": user_id,
         "userDisplayName": user_display_name,
         "invitationSession": invitation_session,

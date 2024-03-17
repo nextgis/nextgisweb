@@ -12,12 +12,14 @@ from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import AnyOf, AsJSON, EmptyObject, Gap, StatusCode, fillgap
 from nextgisweb.lib.imptool import module_from_stack
 
+from nextgisweb.auth import Permission
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import NotConfigured, ValidationError
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import Resource, ResourceScope
 
+from .permission import cors_manage, cors_view
 from .util import gensecret, parse_origin
 
 
@@ -247,6 +249,8 @@ class csetting:
     gtype: SType
     stype: SType
     default: SValue
+    read: Optional[Permission]
+    write: Optional[Permission]
     skey: Tuple[str, str]
     ckey: Union[bool, Tuple[str, str]]
 
@@ -258,6 +262,8 @@ class csetting:
         type: Union[Any, Tuple[Any, Any]],
         *,
         default: Any = None,
+        read: Optional[Permission] = None,
+        write: Optional[Permission] = None,
         skey: Optional[Tuple[str, str]] = None,
         ckey: Optional[Union[bool, Tuple[str, str]]] = None,
         register: bool = True,
@@ -269,6 +275,10 @@ class csetting:
         self.name = name
         self.gtype, self.stype = type if isinstance(type, tuple) else (type, type)
         self.default = default
+        if getattr(self, "read", None) is None or read is not None:
+            self.read = read
+        if getattr(self, "write", None) is None or write is not None:
+            self.write = write
 
         if not getattr(self, "skey", None):
             self.skey = skey if skey else (self.component, self.name)
@@ -331,6 +341,7 @@ def setup_pyramid_csettings(comp, config):
 
     rfields, ufields = list(), list()
     getters, setters = dict(), dict()
+    read, write = dict(), dict()
     get_parameters = list()
 
     for cid, stngs in csetting.registry.items():
@@ -354,6 +365,8 @@ def setup_pyramid_csettings(comp, config):
         ufields.append(fld_unset(cid, ustruct))
         getters[cid] = {k: v.getter for k, v in sitems}
         setters[cid] = {k: v.setter for k, v in sitems}
+        read[cid] = {k: v.read for k, v in sitems}
+        write[cid] = {k: v.write for k, v in sitems}
 
         cslit = Literal[("all",) + tuple(stngs)]  # type: ignore
         cstype = Annotated[
@@ -379,11 +392,13 @@ def setup_pyramid_csettings(comp, config):
     def get(request, **kwargs) -> CSettingsRead:
         """Read component settings"""
 
-        request.require_administrator()
+        is_administrator = request.user.is_administrator
+        require_permission = request.user.require_permission
 
         sf = dict()
         for cid, attrs in kwargs.items():
             cgetters = getters[cid]
+            cread = read[cid]
             if "all" in attrs:
                 if len(attrs) > 1:
                     raise ValidationError(
@@ -395,7 +410,16 @@ def setup_pyramid_csettings(comp, config):
                 else:
                     attrs = list(cgetters)
 
-            sf[cid] = {a: cgetters[a]() for a in attrs}
+            av = dict()
+            for a in attrs:
+                if (ap := cread[a]) is None:
+                    if not is_administrator:
+                        request.require_administrator()
+                else:
+                    require_permission(ap)
+                av[a] = cgetters[a]()
+            if len(av) > 0:
+                sf[cid] = av
 
         return CSettingsRead(**sf)
 
@@ -408,12 +432,18 @@ def setup_pyramid_csettings(comp, config):
     def put(request, *, body: CSettingsUpdate) -> EmptyObject:
         """Update component settings"""
 
-        request.require_administrator()
+        is_administrator = request.user.is_administrator
+        require_permission = request.user.require_permission
 
         for cid, csetters in setters.items():
             if (cvalue := getattr(body, cid)) is not UNSET:
                 for sid, loader in csetters.items():
                     if (abody := getattr(cvalue, sid)) is not UNSET:
+                        if (ap := write[cid][sid]) is None:
+                            if not is_administrator:
+                                request.require_administrator()
+                            else:
+                                require_permission(ap)
                         loader(abody)
 
     config.add_route(
@@ -457,6 +487,8 @@ AllowOrigin = Annotated[
 class allow_origin(csetting):
     vtype = AllowOrigin
     default = list()
+    read = cors_view
+    write = cors_manage
     skey = (COMP_ID, "cors_allow_origin")
 
     def normalize(self, value: AllowOrigin) -> Optional[AllowOrigin]:

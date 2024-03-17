@@ -66,7 +66,7 @@ def cget(request) -> JSONType:
 
 
 def cpost(request) -> JSONType:
-    request.require_administrator()
+    request.user.require_permission(SRS.permissions.manage)
 
     obj = SRS().persist()
     deserialize(obj, request.json_body, create=True)
@@ -81,7 +81,7 @@ def iget(request) -> JSONType:
 
 
 def iput(request) -> JSONType:
-    request.require_administrator()
+    request.user.require_permission(SRS.permissions.manage)
 
     obj = SRS.filter_by(id=int(request.matchdict["id"])).one()
     deserialize(obj, request.json_body, create=False)
@@ -89,7 +89,7 @@ def iput(request) -> JSONType:
 
 
 def idelete(request) -> JSONType:
-    request.require_administrator()
+    request.user.require_permission(SRS.permissions.manage)
 
     obj = SRS.filter_by(id=int(request.matchdict["id"])).one()
     if obj.system:

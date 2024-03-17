@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import List, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, List, Literal, Optional, TypeVar, Union
 
 import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, UnsetType
 from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.interfaces import ISecurityPolicy
+from pyramid.request import Request
 from pyramid.security import forget
 from sqlalchemy.orm import aliased, undefer
 from typing_extensions import Annotated
@@ -26,10 +27,14 @@ from nextgisweb.lib.apitype import (
 )
 
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.jsrealm import TSExport
 from nextgisweb.pyramid.util import gensecret
 
 from .component import AuthComponent
 from .model import Group, Principal, User
+from .permission import Permission
+from .permission import auth as permission_auth
+from .permission import manage as permission_manage
 from .policy import AuthMedium, AuthProvider
 
 T = TypeVar("T")
@@ -49,9 +54,9 @@ OAuthSubject = Annotated[str, Meta(examples=["a223836c-2678-4096-8608-0bd7a12bd2
 Brief = Annotated[bool, Meta(description="Return limited set of attributes")]
 
 
-def brief_or_administrator(request, brief: Brief):
+def brief_or_permission(request, brief: Brief):
     if not brief:
-        request.require_administrator()
+        request.user.require_permission(any, *permission_auth)
 
 
 def serialize_principal(src, cls, *, tr):
@@ -112,11 +117,26 @@ def validate_display_name(obj, display_name):
 
 
 @inject()
-def deserialize_principal(src, obj, *, create: bool, tr, auth: AuthComponent):
+def deserialize_principal(
+    src,
+    obj,
+    *,
+    create: bool,
+    request: Request,
+    auth: AuthComponent,
+):
     updated = set()
 
     is_group = isinstance(obj, Group)
     is_user = isinstance(obj, User)
+
+    administrator_check = False
+
+    def require_administrator():
+        nonlocal administrator_check
+        if not administrator_check:
+            request.require_administrator()
+            administrator_check = True
 
     with DBSession.no_autoflush:
         for k, v in struct_items(src):
@@ -124,11 +144,15 @@ def deserialize_principal(src, obj, *, create: bool, tr, auth: AuthComponent):
             if k == "alink":
                 attr = "alink_token"
 
-            if k == "display_name" and not create and tr(obj.display_name_i18n) == v:
+            if (
+                k == "display_name"
+                and not create
+                and request.translate(obj.display_name_i18n) == v
+            ):
                 continue
-            elif k == "members" and set(m.id for m in obj.members) == set(v):
+            elif k in ("members", "member_of") and set(m.id for m in getattr(obj, k)) == set(v):
                 continue
-            elif k == "member_of" and set(m.id for m in obj.member_of) == set(v):
+            elif k == "permissions" and (set() if create else set(obj.permissions)) == set(v):
                 continue
             elif k == "password" and isinstance(v, bool):
                 phash = obj.password_hash
@@ -145,6 +169,13 @@ def deserialize_principal(src, obj, *, create: bool, tr, auth: AuthComponent):
             ):
                 raise SystemPrincipalAttributeReadOnly(k)
 
+            if (
+                (obj.system is True)
+                or (k in ("register", "oauth_mapping", "permissions", "alink"))
+                or (not create and is_user and obj.is_administrator)
+            ):
+                require_administrator()
+
             if k == "keyname":
                 validate_keyname(obj, v)
             elif k == "display_name":
@@ -154,6 +185,10 @@ def deserialize_principal(src, obj, *, create: bool, tr, auth: AuthComponent):
                 v = [User.filter_by(id=id).one() for id in v]
             elif k == "member_of":
                 v = [Group.filter_by(id=id).one() for id in v]
+                adm_before = any(g.keyname == "administrators" for g in obj.member_of)
+                adm_after = any(g.keyname == "administrators" for g in v)
+                if adm_before != adm_after:
+                    require_administrator()
             elif k == "password" and v is False:
                 v = None
             elif k == "alink":
@@ -170,6 +205,13 @@ def deserialize_principal(src, obj, *, create: bool, tr, auth: AuthComponent):
         auth.check_user_limit(obj.id)
 
     return updated
+
+
+if TYPE_CHECKING:
+    PermissionItem = str
+else:
+    identities = Permission.registry.keys()
+    PermissionItem = Annotated[Literal[tuple(identities)], TSExport("Permission")]
 
 
 class UserRef(Struct, kw_only=True):
@@ -189,8 +231,9 @@ class _User(Struct, kw_only=True):
     language: DefaultNonBrief[Optional[Language]]
     oauth_subject: ReadOnly[Optional[OAuthSubject]]
     oauth_tstamp: ReadOnlyNonBrief[Optional[datetime]]
-    alink: DefaultNonBrief[Union[bool, str]]
     member_of: DefaultNonBrief[List[GroupID]]
+    permissions: DefaultNonBrief[List[PermissionItem]]
+    alink: DefaultNonBrief[Union[bool, str]]
     is_administrator: ReadOnly[bool]
 
 
@@ -208,7 +251,7 @@ def user_cget(request, *, brief: Brief = False) -> UserCGetResponse:
     """Read users
 
     :returns: Array of user objects"""
-    brief_or_administrator(request, brief)
+    brief_or_permission(request, brief)
 
     q = User.query().options(undefer(User.is_administrator))
     if request.authenticated_userid is None:
@@ -223,10 +266,10 @@ def user_cpost(request, *, body: UserCreate) -> Annotated[UserRef, StatusCode(20
     """Create user
 
     :returns: User reference"""
-    request.require_administrator()
+    request.user.require_permission(permission_manage)
 
     obj = User(system=False)
-    deserialize_principal(body, obj, create=True, tr=request.translate)
+    deserialize_principal(body, obj, create=True, request=request)
 
     request.response.status_code = 201
     return UserRef(id=obj.id)
@@ -236,7 +279,7 @@ def user_iget(request, id: UserID, *, brief: Brief = False) -> UserIGetResponse:
     """Read user
 
     :returns: User object"""
-    brief_or_administrator(request, brief)
+    brief_or_permission(request, brief)
 
     q = User.filter_by(id=id).options(undefer(User.is_administrator))
     cls = UserReadBrief if brief else UserRead
@@ -247,10 +290,10 @@ def user_iput(request, id: UserID, *, body: UserUpdate) -> UserRef:
     """Update user
 
     :returns: User reference"""
-    request.require_administrator()
+    request.user.require_permission(permission_manage)
 
     obj = User.filter_by(id=id).one()
-    updated = deserialize_principal(body, obj, create=False, tr=request.translate)
+    updated = deserialize_principal(body, obj, create=False, request=request)
 
     if obj.id != request.authenticated_userid and ({"keyname", "password", "alink"} & updated):
         auth_policy = request.registry.getUtility(ISecurityPolicy)
@@ -264,9 +307,12 @@ def user_iput(request, id: UserID, *, body: UserUpdate) -> UserRef:
 
 def user_idelete(request, id: UserID) -> EmptyObject:
     """Delete user"""
-    request.require_administrator()
-
     obj = User.filter_by(id=id).one()
+    if obj.is_administrator:
+        request.require_administrator()
+    else:
+        request.user.require_permission(permission_manage)
+
     check_principal_delete(obj)
     DBSession.delete(obj)
 
@@ -286,6 +332,7 @@ class _Group(Struct, kw_only=True):
     register: DefaultNonBrief[bool]
     oauth_mapping: DefaultNonBrief[bool]
     members: DefaultNonBrief[List[UserID]]
+    permissions: DefaultNonBrief[List[PermissionItem]]
 
 
 GroupCreate = Derived[_Group, OP.CREATE]
@@ -301,7 +348,7 @@ def group_cget(request, *, brief: Brief = False) -> GroupCGetResponse:
     """Read groups
 
     :returns: Array of group objects"""
-    brief_or_administrator(request, brief)
+    brief_or_permission(request, brief)
 
     q = Group.query()
     if request.authenticated_userid is None:
@@ -316,10 +363,10 @@ def group_cpost(request, *, body: GroupCreate) -> Annotated[GroupRef, StatusCode
     """Create group
 
     :returns: Group reference"""
-    request.require_administrator()
+    request.user.require_permission(permission_manage)
 
     obj = Group(system=False)
-    deserialize_principal(body, obj, create=True, tr=request.translate)
+    deserialize_principal(body, obj, create=True, request=request)
 
     request.response.status_code = 201
     return GroupRef(id=obj.id)
@@ -329,7 +376,7 @@ def group_iget(request, id: GroupID, *, brief: Brief = False) -> GroupIGetRespon
     """Read group
 
     :returns: Group object"""
-    brief_or_administrator(request, brief)
+    brief_or_permission(request, brief)
 
     obj = Group.filter_by(id=id).one()
     cls = GroupReadBrief if brief else GroupRead
@@ -340,10 +387,10 @@ def group_iput(request, id: GroupID, *, body: GroupUpdate) -> GroupRef:
     """Update group
 
     :returns: Group reference"""
-    request.require_administrator()
+    request.user.require_permission(permission_manage)
 
     obj = Group.filter_by(id=id).one()
-    updated = deserialize_principal(body, obj, create=False, tr=request.translate)
+    updated = deserialize_principal(body, obj, create=False, request=request)
     if {"members"} & updated:
         check_last_administrator()
     return GroupRef(id=obj.id)
@@ -351,7 +398,7 @@ def group_iput(request, id: GroupID, *, body: GroupUpdate) -> GroupRef:
 
 def group_idelete(request, id: GroupID) -> EmptyObject:
     """Delete group"""
-    request.require_administrator()
+    request.user.require_permission(permission_manage)
 
     obj = Group.filter_by(id=id).one()
     check_principal_delete(obj)
@@ -381,7 +428,7 @@ def profile_put(request, body: ProfileUpdate) -> EmptyObject:
     if request.user.keyname == "guest":
         raise HTTPUnauthorized()
 
-    deserialize_principal(body, request.user, create=False, tr=request.translate)
+    deserialize_principal(body, request.user, create=False, request=request)
 
 
 class CurrentUser(Struct, kw_only=True):
@@ -458,6 +505,11 @@ def logout(request) -> EmptyObject:
     request.response.headerlist.extend(headers)
 
 
+def permission(request) -> AsJSON[Dict[PermissionItem, str]]:
+    tr = request.translate
+    return {k: tr(v.label) for k, v in Permission.registry.items()}
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         "auth.user.collection",
@@ -514,6 +566,13 @@ def setup_pyramid(comp, config):
         "auth.logout_cookies",
         "/api/component/auth/logout",
         post=logout,
+    )
+
+    config.add_route(
+        "auth.permission",
+        "/api/component/auth/permission",
+        load_types=True,
+        get=permission,
     )
 
 

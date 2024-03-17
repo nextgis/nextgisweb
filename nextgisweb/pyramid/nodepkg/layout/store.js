@@ -39,7 +39,7 @@ layoutStore.addMenuItem({
     title: gettext("Resources"),
 });
 
-if (ngwConfig.isAdministrator) {
+if (ngwConfig.controlPanel) {
     layoutStore.addMenuItem({
         href: routeURL("pyramid.control_panel"),
         title: gettext("Control panel"),

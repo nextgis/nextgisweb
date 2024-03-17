@@ -7,6 +7,7 @@ declare const ngwConfig: {
     staticKey: string;
     isAdministrator: boolean;
     isGuest: boolean;
+    controlPanel: boolean;
     userId: number;
     userDisplayName: string;
     invitationSession: boolean;

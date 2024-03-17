@@ -15,6 +15,7 @@ from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.pyramid import SessionStore, WebSession, viewargs
 
+from . import permission
 from .exception import ALinkException, InvalidCredentialsException, UserDisabledException
 from .model import Group, User
 from .oauth import AuthorizationException, InvalidTokenException
@@ -279,30 +280,33 @@ def settings(request):
 
 @viewargs(renderer="react")
 def user_browse(request):
-    request.require_administrator()
+    request.user.require_permission(any, *permission.auth)
     return dict(
         title=_("Users"),
         entrypoint="@nextgisweb/auth/user-browse",
+        props=dict(readonly=not request.user.has_permission(permission.manage)),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
 @viewargs(renderer="react")
 def user_create_or_edit(request):
-    request.require_administrator()
-
     result = dict(
-        entrypoint="@nextgisweb/auth/user-widget", dynmenu=request.env.pyramid.control_panel
+        entrypoint="@nextgisweb/auth/user-widget",
+        dynmenu=request.env.pyramid.control_panel,
     )
 
     if "id" not in request.matchdict:
+        request.user.require_permission(permission.manage)
         result["title"] = _("Create new user")
     else:
+        request.user.require_permission(any, *permission.auth)
         try:
             obj = User.filter_by(**request.matchdict).one()
         except NoResultFound:
             raise HTTPNotFound()
-        result["props"] = dict(id=obj.id)
+        readonly = not request.user.has_permission(permission.manage)
+        result["props"] = dict(id=obj.id, readonly=readonly)
         result["title"] = obj.display_name
 
     return result
@@ -310,30 +314,33 @@ def user_create_or_edit(request):
 
 @viewargs(renderer="react")
 def group_browse(request):
-    request.require_administrator()
+    request.user.require_permission(any, *permission.auth)
     return dict(
         title=_("Groups"),
         entrypoint="@nextgisweb/auth/group-browse",
+        props=dict(readonly=not request.user.has_permission(permission.manage)),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
 @viewargs(renderer="react")
 def group_create_or_edit(request):
-    request.require_administrator()
-
     result = dict(
-        entrypoint="@nextgisweb/auth/group-widget", dynmenu=request.env.pyramid.control_panel
+        entrypoint="@nextgisweb/auth/group-widget",
+        dynmenu=request.env.pyramid.control_panel,
     )
 
     if "id" not in request.matchdict:
+        request.user.require_permission(permission.manage)
         result["title"] = _("Create new group")
     else:
+        request.user.require_permission(any, *permission.auth)
         try:
             obj = Group.filter_by(**request.matchdict).one()
         except NoResultFound:
             raise HTTPNotFound()
-        result["props"] = dict(id=obj.id)
+        readonly = not request.user.has_permission(permission.manage)
+        result["props"] = dict(id=obj.id, readonly=readonly)
         result["title"] = obj.display_name
 
     return result
@@ -360,24 +367,23 @@ def setup_pyramid(comp, config):
     config.add_route("auth.group.create", "/auth/group/create").add_view(group_create_or_edit)
     config.add_route("auth.group.edit", "/auth/group/{id:uint}").add_view(group_create_or_edit)
 
-    class AuthComponentMenu(dm.DynItem):
-        def build(self, kwargs):
+    @comp.env.pyramid.control_panel.add
+    def _control_panel(args):
+        user = args.request.user
+        if user.has_permission(any, *permission.auth):
+            yield dm.Label("auth", _("Groups and users"))
+
             yield dm.Link(
-                self.sub("user"),
+                "auth/user",
                 _("Users"),
                 lambda kwargs: kwargs.request.route_url("auth.user.browse"),
             )
 
             yield dm.Link(
-                self.sub("group"),
+                "auth/group",
                 _("Groups"),
                 lambda kwargs: kwargs.request.route_url("auth.group.browse"),
             )
-
-    comp.env.pyramid.control_panel.add(
-        dm.Label("auth", _("Groups and users")),
-        AuthComponentMenu("auth"),
-    )
 
     # Login and logout routes names
     def add_globals(event):

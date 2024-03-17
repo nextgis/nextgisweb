@@ -10,6 +10,7 @@ Changes
 - Ability to copy printing parameters as a URL for sharing.
 - Support for multiple replicas and long-runnning requests.
 - Ctrl+Click opens feature attachment in a fixed tab.
+- Configurable permissions for groups, users, SRS and CORS management.
 
 
 4.6.0

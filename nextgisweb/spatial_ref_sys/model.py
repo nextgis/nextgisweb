@@ -2,9 +2,11 @@ import sqlalchemy as sa
 from sqlalchemy.orm import declared_attr, relationship
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import Base, DBSession
+from nextgisweb.env import Base, DBSession, gettext
 from nextgisweb.lib import db
 from nextgisweb.lib.osrhelper import sr_from_wkt
+
+from nextgisweb.auth import Permission
 
 from .util import convert_to_proj
 
@@ -46,6 +48,11 @@ class SRS(Base):
     maxx = sa.Column(sa.Float)
     maxy = sa.Column(sa.Float)
     catalog_id = sa.Column(sa.Integer, unique=True)
+
+    class permissions:
+        view = Permission("view", gettext("Spatial reference systems"), "view")
+        manage = Permission("manage", gettext("Spatial reference systems"), "manage")
+        all = (view, manage)
 
     __table_args__ = (
         db.CheckConstraint("id > 0 AND id <= %d" % SRID_MAX, name="srs_id_check"),
