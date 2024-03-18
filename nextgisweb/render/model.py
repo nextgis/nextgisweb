@@ -553,7 +553,7 @@ class TileCacheFlushProperty(SerializedProperty):
             srlzr.obj.tile_cache.clear()
 
 
-class ResourceTileCacheSerializer(Serializer):
+class TileCacheSerializer(Serializer):
     identity = "tile_cache"
     resclass = Resource
 

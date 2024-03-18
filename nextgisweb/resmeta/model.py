@@ -91,7 +91,7 @@ class _items_attr(SerializedProperty):
             itm.value = val
 
 
-class ResourceMetadataSerializer(Serializer):
+class ResmetaSerializer(Serializer):
     identity = COMP_ID
     resclass = Resource
 
