@@ -1,26 +1,26 @@
-from base64 import b64encode
+from datetime import datetime
 from io import BytesIO
 from itertools import product
 from math import ceil, floor, log
 from pathlib import Path
 from typing import List, Literal
 
-from msgspec import Meta
+from msgspec import Meta, Struct
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
 from typing_extensions import Annotated
 
 from nextgisweb.env import _
-from nextgisweb.lib.apitype import AnyOf, ContentType, StatusCode
+from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, EmptyObject, StatusCode
 
 from nextgisweb.core.exception import UserException, ValidationError
-from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNotFound
 
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
+from .model import SEED_STATUS_ENUM
 from .util import af_transform
 
 RenderResource = Annotated[
@@ -60,6 +60,23 @@ RenderResponse = AnyOf[
     Annotated[Response, StatusCode(204)],
     Annotated[Response, StatusCode(404), ContentType("application/octet-stream")],
 ]
+
+
+class TileCacheSeedStatusResponse(Struct, kw_only=True):
+    tstamp: datetime
+    status: Literal[SEED_STATUS_ENUM]  # type: ignore
+    progress: int
+    total: int
+
+
+class LegendIcon(Struct, kw_only=True):
+    format: Literal["png"]
+    data: bytes
+
+
+class LegendSymbol(Struct, kw_only=True):
+    display_name: str
+    icon: LegendIcon
 
 
 class InvalidOriginError(UserException):
@@ -383,13 +400,13 @@ def image(
     return image_response(aimg, nd, size)
 
 
-def tile_cache_seed_status(request) -> JSONType:
+def tile_cache_seed_status(request) -> AnyOf[TileCacheSeedStatusResponse, EmptyObject]:
     request.resource_permission(PD_READ)
     tc = request.context.tile_cache
     if tc is None:
-        return dict()
+        return
 
-    return dict(
+    return TileCacheSeedStatusResponse(
         tstamp=tc.seed_tstamp,
         status=tc.seed_status,
         progress=tc.seed_progress,
@@ -412,11 +429,11 @@ def legend_symbols_by_resource(resource, icon_size: int):
         s.icon.save(buf, "png", compress_level=3)
 
         result.append(
-            dict(
+            LegendSymbol(
                 display_name=s.display_name,
-                icon=dict(
+                icon=LegendIcon(
                     format="png",
-                    data=b64encode(buf.getvalue()).decode("ascii"),
+                    data=buf.getvalue(),
                 ),
             )
         )
@@ -424,7 +441,8 @@ def legend_symbols_by_resource(resource, icon_size: int):
     return result
 
 
-def legend_symbols(request, *, icon_size: int = 24) -> JSONType:
+def legend_symbols(request, *, icon_size: int = 24) -> AsJSON[List[LegendSymbol]]:
+    """Get resource legend symbols"""
     request.resource_permission(PD_READ)
     return legend_symbols_by_resource(request.context, icon_size)
 
