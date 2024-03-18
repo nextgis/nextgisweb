@@ -578,6 +578,14 @@ P_DS_READ = DataScope.read
 P_DS_WRITE = DataScope.write
 
 
+class _source_option(SP):
+    def __init__(self):
+        super().__init__(write=P_DS_WRITE)
+
+    def setter(self, srlzr, value):
+        pass
+
+
 class VectorLayerSerializer(Serializer):
     identity = VectorLayer.identity
     resclass = VectorLayer
@@ -585,6 +593,15 @@ class VectorLayerSerializer(Serializer):
     srs = SR(read=P_DSS_READ, write=P_DSS_WRITE)
 
     source = _source_attr(write=P_DS_WRITE)
+    source_layer = _source_option()
+    fix_errors = _source_option()
+    skip_errors = _source_option()
+    cast_geometry_type = _source_option()
+    cast_is_multi = _source_option()
+    cast_has_z = _source_option()
+    fid_source = _source_option()
+    fid_field = _source_option()
+    skip_other_geometry_types = _source_option()
 
     geometry_type = _geometry_type_attr(read=P_DSS_READ, write=P_DSS_WRITE)
     fields = _fields_attr(write=P_DS_WRITE)
