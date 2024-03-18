@@ -11,14 +11,14 @@ msgid "Create and edit"
 msgstr "Создать и изменить"
 
 #: amd/ngw-resource/CompositeWidget.js:103
-#: nodepkg/export-settings/ExportSettings.tsx:81
+#: nodepkg/export-settings/ExportSettings.tsx:80
 msgid "Save"
 msgstr "Сохранить"
 
 #: amd/ngw-resource/CompositeWidget.js:110
 #: nodepkg/children-section/component/MenuDropdown.tsx:206
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/delete-page/DeletePage.tsx:58 view.py:397
+#: nodepkg/delete-page/DeletePage.tsx:58 view.py:413
 msgid "Delete"
 msgstr "Удалить"
 
@@ -104,15 +104,25 @@ msgstr ""
 "вернитесь на главную страницу и попробуйте найти нужный ресурс с помощью "
 "навигации."
 
-#: exception.py:22
+#: exception.py:27
+msgid ""
+"Modification of the '{attribute}' attribute requires the '{scope}: "
+"{permission}' permission."
+msgstr "Для изменения атрибута '{attribute}' необходимо право '{scope}: {permission}'."
+
+#: exception.py:33
+msgid "The '{attribute}' attribute is read-only and cannot be updated."
+msgstr "Атрибут `{attribute}` - только для чтения и не может быть изменен."
+
+#: exception.py:40
 msgid "Resource display name is not unique"
 msgstr "Наименование ресурса не уникально"
 
-#: exception.py:23
+#: exception.py:41
 msgid "Resource with same display name already exists (id = %d)."
 msgstr "Ресурс с таким наименованием уже существует (id = %d)."
 
-#: exception.py:24
+#: exception.py:42
 msgid ""
 "Within a single parent resource, each resource must have unique display name."
 " Give the resource a different display name or rename existing."
@@ -121,23 +131,23 @@ msgstr ""
 "наименование. Присвойте ресурсу другое наименование или переименуйте "
 "существующий."
 
-#: exception.py:36
+#: exception.py:54
 msgid "Hierarchy error"
 msgstr "Ошибка иерархии"
 
-#: exception.py:40
+#: exception.py:58
 msgid "Quota exceeded"
 msgstr "Превышена квота"
 
-#: exception.py:46
+#: exception.py:64
 msgid "Maximum number of resources exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов. Лимит %s."
 
-#: exception.py:48
+#: exception.py:66
 msgid "Not enough resource quota: {0} required, but only {1} available."
 msgstr "Превышена квота на количество ресурсов: {0} запрошено, доступно {1}."
 
-#: exception.py:52
+#: exception.py:70
 msgid "Resource type - {}."
 msgstr "Тип ресурса - {}."
 
@@ -328,11 +338,11 @@ msgstr "Нет"
 msgid "Yes"
 msgstr "Да"
 
-#: nodepkg/export-settings/ExportSettings.tsx:37
+#: nodepkg/export-settings/ExportSettings.tsx:36
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/export-settings/ExportSettings.tsx:58
+#: nodepkg/export-settings/ExportSettings.tsx:57
 msgid ""
 "Select the category of users who can use the \"Save as\" link to download "
 "resource data."
@@ -340,19 +350,19 @@ msgstr ""
 "Выберите категорию пользователей, которые могут видеть ссылку \"Сохранить "
 "как\" для скачивания данных ресурса."
 
-#: nodepkg/export-settings/ExportSettings.tsx:68
+#: nodepkg/export-settings/ExportSettings.tsx:67
 msgid "Users with \"Data: Read\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Чтение\""
 
-#: nodepkg/export-settings/ExportSettings.tsx:71
+#: nodepkg/export-settings/ExportSettings.tsx:70
 msgid "Users with \"Data: Modify\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Изменение\""
 
-#: nodepkg/export-settings/ExportSettings.tsx:74
+#: nodepkg/export-settings/ExportSettings.tsx:73
 msgid "Administrators"
 msgstr "Администраторы"
 
-#: nodepkg/export-settings/ExportSettings.tsx:89
+#: nodepkg/export-settings/ExportSettings.tsx:88
 msgid ""
 "* This will not affect REST API use which will continue to be governed by "
 "permissions."
@@ -376,7 +386,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:428
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:358
 msgid "Action"
 msgstr "Действие"
 
@@ -493,12 +503,6 @@ msgctxt "permission"
 msgid "Access"
 msgstr "Доступ"
 
-#: serialize.py:91
-msgid ""
-"Modification of the '{attribute}' attribute requires the '{scope}: "
-"{permission}' permission."
-msgstr "Для изменения атрибута '{attribute}' необходимо право '{scope}: {permission}'."
-
 #: template/resource_section_description.mako:5
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
@@ -507,15 +511,15 @@ msgstr "У этого ресурса нет описания."
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:122 view.py:406
+#: view.py:122 view.py:422
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:134 view.py:413
+#: view.py:134 view.py:429
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:179 view.py:427
+#: view.py:179 view.py:357
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -527,7 +531,7 @@ msgstr "Обновить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:259 view.py:436
+#: view.py:259 view.py:442
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
@@ -535,10 +539,11 @@ msgstr "Экспорт ресурсов"
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:384
+#: view.py:359
+msgid "Extra"
+msgstr "Дополнительно"
+
+#: view.py:400
 msgid "Update"
 msgstr "Изменить"
 
-#: view.py:429
-msgid "Extra"
-msgstr "Дополнительно"

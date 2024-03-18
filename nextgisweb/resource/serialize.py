@@ -2,11 +2,12 @@ import sys
 
 from zope.interface import Interface, implementer
 
-from nextgisweb.env import _
 from nextgisweb.env.model import BaseClass
 from nextgisweb.lib.registry import dict_registry
 
-from nextgisweb.core.exception import ForbiddenError, IUserException
+from nextgisweb.core.exception import IUserException
+
+from .exception import AttributeUpdateForbidden
 
 
 class SerializerBase:
@@ -87,20 +88,7 @@ class SerializedProperty:
         if self.writeperm(srlzr):
             self.setter(srlzr, srlzr.data[self.attrname])
         else:
-            raise ForbiddenError(
-                message=_(
-                    "Modification of the '{attribute}' attribute requires "
-                    "the '{scope}: {permission}' permission."
-                ).format(
-                    attribute=self.attrname,
-                    scope=self.write.scope.label,
-                    permission=self.write.label,
-                ),
-                data=dict(
-                    scope=self.write.scope.identity,
-                    permission=self.write.name,
-                ),
-            )
+            raise AttributeUpdateForbidden(self)
 
 
 class SerializedRelationship(SerializedProperty):

@@ -1,6 +1,6 @@
 from nextgisweb.env import gettext
 
-from nextgisweb.core.exception import UserException, ValidationError
+from nextgisweb.core.exception import InsufficientPermissions, UserException, ValidationError
 
 
 class ResourceNotFound(UserException):
@@ -16,6 +16,24 @@ class ResourceNotFound(UserException):
         super().__init__(
             message=self.__class__.message % resource_id, data=dict(resource_id=resource_id)
         )
+
+
+class AttributeUpdateForbidden(InsufficientPermissions):
+    def __init__(self, attr):
+        super().__init__()
+        write = attr.write
+        attribute = f"{attr.srlzrcls.identity}.{attr.attrname}"
+        if attr.write is not None:
+            self.message = gettext(
+                "Modification of the '{attribute}' attribute requires "
+                "the '{scope}: {permission}' permission."
+            ).format(attribute=attribute, scope=write.scope.label, permission=write.label)
+            self.data.update(scope=write.scope.identity, permission=write.name)
+        else:
+            self.message = gettext(
+                "The '{attribute}' attribute is read-only and cannot be updated."
+            ).format(attribute=attribute)
+            self.data.update(scope=None, permission=None)
 
 
 class DisplayNameNotUnique(ValidationError):
