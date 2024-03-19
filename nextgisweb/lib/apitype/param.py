@@ -191,22 +191,24 @@ class QueryParam:
         elif origin is list:
             self.style = Style.FORM
             self.shape = Shape.LIST
-            self.decoder_factory = lambda: partial(
+            self.decoder_factory = lambda loads=string_decoder(args[0]): partial(
                 qs.form_list_list,
                 name=self.name,
                 type=self.type,
                 default=self.default,
-                loads=string_decoder(args[0]),
+                loads=loads,
+                urlsafe=getattr(loads, "urlsafe"),
             )
         elif origin is tuple:
             self.style = Style.FORM
             self.shape = Shape.LIST
-            self.decoder_factory = lambda: partial(
+            self.decoder_factory = lambda loads=tuple(string_decoder(a) for a in args): partial(
                 qs.form_list_tuple,
                 name=self.name,
                 type=self.type,
                 default=self.default,
-                loads=tuple(string_decoder(a) for a in args),
+                loads=loads,
+                urlsafe=all(getattr(li, "urlsafe") for li in loads),
             )
         else:
             self.style = Style.FORM
