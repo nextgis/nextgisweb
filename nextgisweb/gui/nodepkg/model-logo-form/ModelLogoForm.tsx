@@ -34,7 +34,7 @@ export function ModelLogoForm({
     model,
     settingName,
     messages = {},
-    accept,
+    accept = ".png, .svg",
 }: ModelLogoFormProps) {
     const [status, setStatus] = useState<"loading" | "saving" | null>(
         "loading"
@@ -48,16 +48,15 @@ export function ModelLogoForm({
         const initLogo = async () => {
             try {
                 const resp = await route(model).get<
-                    Record<string, Record<string, string>>
+                    Record<string, Record<string, [string, string]>>
                 >({
                     query: {
                         [component]: settingName,
                     },
                 });
                 if (resp[component][settingName]) {
-                    setLogo(
-                        "data:image/png;base64," + resp[component][settingName]
-                    );
+                    const [mimeType, file] = resp[component][settingName];
+                    setLogo(`data:${mimeType};base64,` + file);
                 } else {
                     throw new Error("The logo is not set");
                 }

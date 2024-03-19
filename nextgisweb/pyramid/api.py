@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from enum import Enum
 from inspect import Parameter, signature
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
 
@@ -515,16 +516,26 @@ class custom_css(csetting):
         return value
 
 
+class LogoMimeType(Enum):
+    PNG = "image/png"
+    SVG = "image/svg+xml"
+
+
 class header_logo(csetting):
-    vtype = (bytes, FileUploadRef)
+    vtype = (Tuple[LogoMimeType, bytes], FileUploadRef)
     skey = (COMP_ID, "logo")
     ckey = True
 
-    def normalize(self, value: FileUploadRef) -> Optional[bytes]:
+    def normalize(self, value: FileUploadRef) -> Optional[Tuple[LogoMimeType, bytes]]:
         fupload = value()
+        try:
+            mime_type = LogoMimeType(fupload.mime_type)
+        except ValueError:
+            msg = _("Got an unsupported MIME type: '{}'.").format(fupload.mime_type)
+            raise ValidationError(msg)
         if fupload.size > 64 * 1024:
             raise ValidationError(message=_("64K should be enough for a logo."))
-        return value().data_path.read_bytes()
+        return mime_type, value().data_path.read_bytes()
 
 
 class GoogleAnalytics(Struct):

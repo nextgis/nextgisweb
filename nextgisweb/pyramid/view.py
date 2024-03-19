@@ -86,8 +86,8 @@ def asset_css(request, *, ckey: Optional[str] = None, core: CoreComponent):
 def asset_hlogo(request, *, ckey: Optional[str] = None, core: CoreComponent):
     if (data := core.settings_get("pyramid", "logo", None)) is None:
         raise HTTPNotFound()
-
-    response = Response(b64decode(data), content_type="image/png")
+    mime_type, file = data
+    response = Response(b64decode(file), content_type=mime_type)
 
     if ckey and ckey == core.settings_get("pyramid", "logo.ckey"):
         response.cache_control.public = True

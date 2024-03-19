@@ -15,11 +15,11 @@ msgstr "Не удалось скопировать"
 msgid "Enter the correct scale value, e.g. 1:"
 msgstr "Введите корректное значение масштаба, например 1:"
 
-#: api.py:193
+#: api.py:196
 msgid "Storage management is not enabled on this server."
 msgstr "Управление хранилищем не включено на этом сервере."
 
-#: api.py:396
+#: api.py:406
 msgid ""
 "The '{}' query parameter should not contain additional values if 'all' is "
 "specified."
@@ -27,31 +27,35 @@ msgstr ""
 "Параметр запроса '{}' не должен содержать дополнительных значений, если "
 "указано 'all'."
 
-#: api.py:500
+#: api.py:534
+msgid "Got an unsupported MIME type: '{}'."
+msgstr "Получен неподдерживаемый тип MIME: '{}'."
+
+#: api.py:537
 msgid "64K should be enough for a logo."
 msgstr "64K должно быть достаточно для логотипа."
 
-#: api.py:630
+#: api.py:669
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:183
+#: component.py:163
 msgid "Request timeout"
 msgstr "Таймаут запроса"
 
-#: component.py:186
+#: component.py:166
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:186
+#: component.py:166
 msgid "Disabled"
 msgstr "Отключено"
 
-#: exception.py:206
+#: exception.py:204
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:207
+#: exception.py:205
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -59,37 +63,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:240
+#: exception.py:238
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:241
+#: exception.py:239
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:249
+#: exception.py:247
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:250
+#: exception.py:248
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:255
+#: exception.py:253
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:256
+#: exception.py:254
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:261
+#: exception.py:259
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:262
+#: exception.py:260
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -98,23 +102,23 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:270
+#: exception.py:268
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:271
+#: exception.py:269
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:276 exception.py:277
+#: exception.py:274 exception.py:275
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:282
+#: exception.py:280
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:283
+#: exception.py:281
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
@@ -233,7 +237,7 @@ msgstr "Войти"
 msgid "Invitation session"
 msgstr "Пригласительная сессия"
 
-#: nodepkg/layout/Avatar.js:21 view.py:554
+#: nodepkg/layout/Avatar.js:21 view.py:549
 msgid "Settings"
 msgstr "Настройки"
 
@@ -245,7 +249,7 @@ msgstr "Выйти"
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.js:45 view.py:172
+#: nodepkg/layout/store.js:45 view.py:169
 msgid "Control panel"
 msgstr "Панель управления"
 
@@ -257,27 +261,31 @@ msgstr "Справка"
 msgid "We recommend height of 45 px and width of up to 200 px."
 msgstr "Рекомендуемая высота 45 px и ширина до 200 px."
 
-#: nodepkg/metrics/GoogleAnalyticsTab.tsx:30
+#: nodepkg/logo-form/LogoForm.tsx:6
+msgid "Only PNG and SVG images are supported."
+msgstr "Поддерживаются только изображения PNG и SVG."
+
+#: nodepkg/metrics/GoogleAnalyticsTab.tsx:29
 msgid "Measurement ID"
 msgstr "Идентификатор потока данных"
 
-#: nodepkg/metrics/MetricSettings.tsx:23
+#: nodepkg/metrics/MetricSettings.tsx:19
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/metrics/MetricSettings.tsx:24
+#: nodepkg/metrics/MetricSettings.tsx:20
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/metrics/MetricSettings.tsx:25
+#: nodepkg/metrics/MetricSettings.tsx:21
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
 
-#: nodepkg/metrics/MetricSettings.tsx:29
+#: nodepkg/metrics/MetricSettings.tsx:25
 msgid "Add one or more counters to your Web GIS."
 msgstr "Добавьте один или несколько счетчиков в вашу Веб ГИС."
 
-#: nodepkg/metrics/MetricSettings.tsx:30
+#: nodepkg/metrics/MetricSettings.tsx:26
 msgid ""
 "HTML code of these counters will be embeded into each page and will allow you"
 " to track user activity."
@@ -285,19 +293,19 @@ msgstr ""
 "HTML-код этих счетчиков будет встроен в каждую страницу и позволит "
 "отслеживать активность пользователей."
 
-#: nodepkg/metrics/YandexMetricaTab.tsx:32
+#: nodepkg/metrics/YandexMetricaTab.tsx:30
 msgid "Tag number"
 msgstr "Номер счетчика"
 
-#: nodepkg/metrics/YandexMetricaTab.tsx:50
+#: nodepkg/metrics/YandexMetricaTab.tsx:48
 msgid "Webvisor"
 msgstr "Вебвизор"
 
-#: nodepkg/metrics/tab.ts:34
+#: nodepkg/metrics/tab.ts:31
 msgid "Google Analytics"
 msgstr "Google Аналитика"
 
-#: nodepkg/metrics/tab.ts:41
+#: nodepkg/metrics/tab.ts:38
 msgid "Yandex.Metrica"
 msgstr "Яндекс.Метрика"
 
@@ -386,6 +394,10 @@ msgstr "Доступна новая версия {distribution}: {version}."
 #: nodepkg/update/sysinfo.js:22
 msgid "Your {distribution} is up-to-date."
 msgstr "У вас последняя версия {distribution}."
+
+#: permission.py:5 view.py:216 view.py:559
+msgid "Cross-origin resource sharing (CORS)"
+msgstr "Cross-origin resource sharing (CORS)"
 
 #: template/backup.mako:5
 msgid "Filename"
@@ -496,59 +508,55 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
-#: tomb/config.py:99
+#: tomb/config.py:95
 msgid "Parameter required"
 msgstr "Требуется параметр"
 
-#: tomb/config.py:100
+#: tomb/config.py:96
 msgid "The '{}' query parameter is required."
 msgstr "Необходимо указать значение параметра '{}'."
 
-#: tomb/config.py:102
+#: tomb/config.py:98
 msgid "Invalid parameter"
 msgstr "Некорректный параметр"
 
-#: tomb/config.py:103
+#: tomb/config.py:99
 msgid "The '{}' query parameter has an invalid value."
 msgstr "Параметр запроса '{}' имеет недопустимое значение."
 
-#: view.py:162
+#: view.py:157
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:183 view.py:551
+#: view.py:182 view.py:568
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:191 view.py:591
+#: view.py:190 view.py:605
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:202 view.py:600
+#: view.py:201 view.py:612
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:218 view.py:562
-msgid "Cross-origin resource sharing (CORS)"
-msgstr "Cross-origin resource sharing (CORS)"
-
-#: view.py:228 view.py:567
+#: view.py:228 view.py:580
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:238 view.py:572
+#: view.py:238 view.py:586
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:248 view.py:557
+#: view.py:248 view.py:574
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:258 view.py:577
+#: view.py:258 view.py:592
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:268 view.py:582
+#: view.py:268 view.py:598
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
