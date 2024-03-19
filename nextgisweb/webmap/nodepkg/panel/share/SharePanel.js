@@ -291,6 +291,20 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     />
                     <span>{gettext("px")}</span>
                 </div>
+                <div className="input-group column">
+                    <label>{gettext("Map tools")}</label>
+                    <ToolsSelect value={controls} onChange={setControls} />
+                </div>
+                <div className="input-group column">
+                    <label>{gettext("Panels")}</label>
+                    <PanelsSelect
+                        value={panels}
+                        options={panelsOptions}
+                        onChange={setPanels}
+                        className="panels-select"
+                    />
+                </div>
+                {activePanelSelect}
                 <div className="input-group">
                     <Switch
                         checked={addLinkToMap}
@@ -309,20 +323,6 @@ export const SharePanel = ({ display, title, close, visible }) => {
                         {gettext("Generate events")}
                     </span>
                 </div>
-                <div className="input-group column">
-                    <label>{gettext("Map tools")}</label>
-                    <ToolsSelect value={controls} onChange={setControls} />
-                </div>
-                <div className="input-group column">
-                    <label>{gettext("Panels")}</label>
-                    <PanelsSelect
-                        value={panels}
-                        options={panelsOptions}
-                        onChange={setPanels}
-                        className="panels-select"
-                    />
-                </div>
-                {activePanelSelect}
                 <div className="input-group  column">
                     <label>{gettext("Embed code")}</label>
                     <CodeArea value={embedCode} rows={4} />
