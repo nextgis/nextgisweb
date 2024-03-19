@@ -2,7 +2,7 @@ import type { DojoDisplay, MapControl, MapTool } from "../type";
 
 export interface ControlBase<T> {
     ctor: (display: DojoDisplay) => T;
-    key?: string;
+    key: string;
     label?: string;
     embeddedShowMode?: "always" | "customize";
     mapStateKey?: string;

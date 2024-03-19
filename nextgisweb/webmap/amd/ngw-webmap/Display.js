@@ -880,92 +880,6 @@ define([
             this.panelsManager.activatePanel(activePanel);
         },
 
-        _addLinkToMainMap: function () {
-            if (this._urlParams.linkMainMap !== "true") {
-                return;
-            }
-            this.map.olMap.addControl(
-                new LinkToMainMap({
-                    url: this.tinyConfig.mainDisplayUrl,
-                    target: this.rightTopControlPane,
-                    tipLabel: gettext("Open full map"),
-                })
-            );
-        },
-
-        /**
-         * Generate window `message` events to listen from iframe
-         * @example
-         * window.addEventListener('message', function(evt) {
-         *    var data = evt.data;
-         *    if (data.event === 'ngMapExtentChanged') {
-         *        if (data.detail === 'zoom') {
-         *        } else if (data.detail === 'move') {
-         *        }
-         *        // OR
-         *        if (data.detail === 'position') {}
-         *    }
-         * }, false);
-         */
-        _handlePostMessage: function () {
-            var widget = this;
-            var parent = window.parent;
-            if (
-                this._urlParams.events === "true" &&
-                parent &&
-                parent.postMessage
-            ) {
-                var commonOptions = {
-                    event: "ngMapExtentChanged",
-                };
-                var parsePosition = function (pos) {
-                    return {
-                        zoom: pos.zoom,
-                        lat: pos.center[1],
-                        lon: pos.center[0],
-                    };
-                };
-                widget.map.watch(
-                    "position",
-                    function (name, oldPosition, newPosition) {
-                        oldPosition = oldPosition
-                            ? parsePosition(oldPosition)
-                            : {};
-                        newPosition = parsePosition(newPosition);
-                        // set array of position part to compare between old and new state
-                        var events = [
-                            { params: ["lat", "lon"], name: "move" },
-                            { params: ["zoom"], name: "zoom" },
-                        ];
-                        var transformPosition = widget.map.getPosition(
-                            widget.lonlatProjection
-                        );
-                        // prepare to send transform position
-                        commonOptions.data = parsePosition(transformPosition);
-                        array.forEach(events, function (event) {
-                            var isChange = array.some(
-                                event.params,
-                                function (p) {
-                                    return oldPosition[p] !== newPosition[p];
-                                }
-                            );
-                            if (isChange) {
-                                commonOptions.detail = event.name;
-                                // message should be a string to work correctly with all browsers and systems
-                                parent.postMessage(
-                                    JSON.stringify(commonOptions),
-                                    "*"
-                                );
-                            }
-                        });
-                        // on any position change
-                        commonOptions.detail = name;
-                        parent.postMessage(JSON.stringify(commonOptions), "*");
-                    }
-                );
-            }
-        },
-
         _buildPanelsManager: function () {
             const activePanelKey = this._urlParams[this.modeURLParam];
             const onChangePanel = (panel) => {
@@ -1170,6 +1084,92 @@ define([
                 "ngw-webmap/plugin/FeatureLayer",
             ];
             return !disabledPlugins.includes(pluginKey);
+        },
+
+        _addLinkToMainMap: function () {
+            if (this._urlParams.linkMainMap !== "true") {
+                return;
+            }
+            this.map.olMap.addControl(
+                new LinkToMainMap({
+                    url: this.tinyConfig.mainDisplayUrl,
+                    target: this.rightTopControlPane,
+                    tipLabel: gettext("Open full map"),
+                })
+            );
+        },
+
+        /**
+         * Generate window `message` events to listen from iframe
+         * @example
+         * window.addEventListener('message', function(evt) {
+         *    var data = evt.data;
+         *    if (data.event === 'ngMapExtentChanged') {
+         *        if (data.detail === 'zoom') {
+         *        } else if (data.detail === 'move') {
+         *        }
+         *        // OR
+         *        if (data.detail === 'position') {}
+         *    }
+         * }, false);
+         */
+        _handlePostMessage: function () {
+            var widget = this;
+            var parent = window.parent;
+            if (
+                this._urlParams.events === "true" &&
+                parent &&
+                parent.postMessage
+            ) {
+                var commonOptions = {
+                    event: "ngMapExtentChanged",
+                };
+                var parsePosition = function (pos) {
+                    return {
+                        zoom: pos.zoom,
+                        lat: pos.center[1],
+                        lon: pos.center[0],
+                    };
+                };
+                widget.map.watch(
+                    "position",
+                    function (name, oldPosition, newPosition) {
+                        oldPosition = oldPosition
+                            ? parsePosition(oldPosition)
+                            : {};
+                        newPosition = parsePosition(newPosition);
+                        // set array of position part to compare between old and new state
+                        var events = [
+                            { params: ["lat", "lon"], name: "move" },
+                            { params: ["zoom"], name: "zoom" },
+                        ];
+                        var transformPosition = widget.map.getPosition(
+                            widget.lonlatProjection
+                        );
+                        // prepare to send transform position
+                        commonOptions.data = parsePosition(transformPosition);
+                        array.forEach(events, function (event) {
+                            var isChange = array.some(
+                                event.params,
+                                function (p) {
+                                    return oldPosition[p] !== newPosition[p];
+                                }
+                            );
+                            if (isChange) {
+                                commonOptions.detail = event.name;
+                                // message should be a string to work correctly with all browsers and systems
+                                parent.postMessage(
+                                    JSON.stringify(commonOptions),
+                                    "*"
+                                );
+                            }
+                        });
+                        // on any position change
+                        commonOptions.detail = name;
+                        parent.postMessage(JSON.stringify(commonOptions), "*");
+                    }
+                );
+            }
         },
     });
 });

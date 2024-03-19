@@ -7,6 +7,8 @@ import ScaleLine from "ol/control/ScaleLine";
 import Zoom from "ol/control/Zoom";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Import URL parser module
 import { html } from "@nextgisweb/pyramid/icon";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Import URL parser module
@@ -21,7 +23,7 @@ import MyLocation from "ngw-webmap/controls/MyLocation";
 // @ts-ignore Import URL parser module
 import Identify from "ngw-webmap/tool/Identify";
 
-import type { DojoDisplay } from "../type";
+import type { DojoDisplay, MapControl } from "../type";
 
 import { ToolsInfo, buildTools, getToolsInfo } from "./map-tools";
 import type { ControlInfo, ControlReady } from "./type";
@@ -36,6 +38,7 @@ const getLabel = (glyph: string): HTMLElement => {
 
 export const ControlsInfo: ControlInfo[] = [
     {
+        key: "z",
         ctor: (display) => {
             return new Zoom({
                 zoomInLabel: getLabel("add"),
@@ -49,6 +52,7 @@ export const ControlsInfo: ControlInfo[] = [
         olMapControl: true,
     },
     {
+        key: "attr",
         ctor: (display) => {
             return new Attribution({
                 tipLabel: gettext("Attributions"),
@@ -60,6 +64,7 @@ export const ControlsInfo: ControlInfo[] = [
         olMapControl: true,
     },
     {
+        key: "rot",
         ctor: (display) => {
             return new Rotate({
                 tipLabel: gettext("Reset rotation"),
@@ -137,7 +142,7 @@ export const buildControls = (
     const controlsMap = new Map<string, ControlReady>();
 
     const controlsInfo = getControlsInfo<ControlInfo>(display, ControlsInfo);
-    const controlsToMap = [];
+    const controlsToMap: MapControl[] = [];
     controlsInfo.forEach((c: ControlInfo) => {
         const control = c.ctor(display);
         if (c.postCreate) {

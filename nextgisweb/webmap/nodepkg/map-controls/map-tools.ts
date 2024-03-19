@@ -30,7 +30,7 @@ export const ToolsInfo: ToolInfo[] = [
         embeddedShowMode: "customize",
     },
     {
-        label: gettext("Zoom Out"),
+        label: gettext("Zoom out"),
         ctor: (display) => {
             return new ToolZoom({ display, out: true });
         },
@@ -87,7 +87,9 @@ export const buildTools = (
     const mapToolbar = display.mapToolbar;
     tools.forEach((t: ToolInfo) => {
         const tool = t.ctor(display);
-        mapToolbar.items.addTool(tool, t.mapStateKey);
+        if (t.mapStateKey) {
+            mapToolbar.items.addTool(tool, t.mapStateKey);
+        }
         controlsReady.set(t.key, { control: tool, info: t });
     });
     return mapToolbar;

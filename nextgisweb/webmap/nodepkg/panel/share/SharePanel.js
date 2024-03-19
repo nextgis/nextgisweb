@@ -79,7 +79,7 @@ const ToolsSelect = (props) => {
             style={{
                 width: "100%",
             }}
-            placeholder={gettext("Please select tools")}
+            placeholder={gettext("Select tools")}
             options={toolsOptions}
             {...props}
         />
@@ -95,7 +95,7 @@ const PanelsSelect = (props) => {
                 width: "100%",
             }}
             {...props}
-            placeholder={gettext("Panels list")}
+            placeholder={gettext("Select panels")}
         />
     );
 };
@@ -103,7 +103,7 @@ const PanelsSelect = (props) => {
 const DEFAULT_ACTIVE_PANEL = "none";
 const ActivePanelSelect = ({ panelsOptions, onChange, activePanel }) => {
     const NoneOption = {
-        label: gettext("No active panel"),
+        label: gettext("None"),
         value: "none",
     };
     const options = [NoneOption, ...panelsOptions];
@@ -113,7 +113,6 @@ const ActivePanelSelect = ({ panelsOptions, onChange, activePanel }) => {
             style={{
                 width: "100%",
             }}
-            placeholder={gettext("Set active panel")}
             options={options}
             onChange={onChange}
             value={activePanel}
@@ -138,8 +137,8 @@ export const SharePanel = ({ display, title, close, visible }) => {
     const webmapId = display.config.webmapId;
 
     const [mapLink, setMapLink] = useState("");
-    const [widthMap, setWidthMap] = useState(600);
-    const [heightMap, setHeightMap] = useState(400);
+    const [widthMap, setWidthMap] = useState(800);
+    const [heightMap, setHeightMap] = useState(600);
     const [addLinkToMap, setAddLinkToMap] = useState(true);
     const [generateEvents, setGenerateEvents] = useState(false);
     const [embedCode, setEmbedCode] = useState("");
@@ -247,7 +246,7 @@ export const SharePanel = ({ display, title, close, visible }) => {
         );
         activePanelSelect = (
             <div className="input-group column">
-                <label>{gettext("Select active panel")}</label>
+                <label>{gettext("Active panel")}</label>
                 <ActivePanelSelect
                     panelsOptions={activePanelsOptions}
                     onChange={setActivePanel}
@@ -311,11 +310,11 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     </span>
                 </div>
                 <div className="input-group column">
-                    <label>{gettext("Select tools")}</label>
+                    <label>{gettext("Map tools")}</label>
                     <ToolsSelect value={controls} onChange={setControls} />
                 </div>
                 <div className="input-group column">
-                    <label>{gettext("Please select panels")}</label>
+                    <label>{gettext("Panels")}</label>
                     <PanelsSelect
                         value={panels}
                         options={panelsOptions}
@@ -324,7 +323,8 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     />
                 </div>
                 {activePanelSelect}
-                <div className="input-group">
+                <div className="input-group  column">
+                    <label>{gettext("Embed code")}</label>
                     <CodeArea value={embedCode} rows={4} />
                 </div>
 
