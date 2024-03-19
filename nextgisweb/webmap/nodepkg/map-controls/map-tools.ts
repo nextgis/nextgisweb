@@ -16,77 +16,79 @@ import ToolZoom from "ngw-webmap/tool/Zoom";
 
 import type { DojoDisplay, MapToolbar } from "../type/DojoDisplay";
 
-import type { ToolInfo } from "./type";
+import type { ControlReady, ToolInfo } from "./type";
 import { getControlsInfo } from "./utils";
 
 export const ToolsInfo: ToolInfo[] = [
     {
         label: gettext("Zoom in"),
-        constructor: (display) => {
+        ctor: (display) => {
             return new ToolZoom({ display, out: false });
         },
-        urlKey: "zi",
+        key: "zi",
         mapStateKey: "zoomingIn",
         embeddedShowMode: "customize",
     },
     {
         label: gettext("Zoom Out"),
-        constructor: (display) => {
+        ctor: (display) => {
             return new ToolZoom({ display, out: true });
         },
-        urlKey: "zo",
+        key: "zo",
         mapStateKey: "zoomingOut",
         embeddedShowMode: "customize",
     },
     {
         label: gettext("Measure distance"),
-        constructor: (display) => {
+        ctor: (display) => {
             return new ToolMeasure({ display, type: "LineString" });
         },
-        urlKey: "md",
+        key: "md",
         mapStateKey: "measuringLength",
         embeddedShowMode: "customize",
     },
     {
         label: gettext("Measure area"),
-        constructor: (display) => {
+        ctor: (display) => {
             return new ToolMeasure({ display, type: "Polygon" });
         },
-        urlKey: "ma",
+        key: "ma",
         mapStateKey: "measuringArea",
         embeddedShowMode: "customize",
     },
     {
         label: gettext("Vertical swipe"),
-        constructor: (display) => {
+        ctor: (display) => {
             return new ToolSwipe({ display, orientation: "vertical" });
         },
-        urlKey: "sv",
+        key: "sv",
         mapStateKey: "swipeVertical",
     },
     {
         label: gettext("Cursor coordinates / extent"),
-        constructor: (display) => {
+        ctor: (display) => {
             return new ToolViewerInfo({ display });
         },
-        urlKey: "tv",
+        key: "tv",
         mapStateKey: "~viewerInfo",
         embeddedShowMode: "customize",
     },
 ];
 
-export const getToolsInfo = (urlKeys?: string[]): ToolInfo[] => {
-    if (!urlKeys) {
-        return [...ToolsInfo];
-    }
-    return ToolsInfo.filter((t) => urlKeys.includes(t.urlKey));
+export const getToolsInfo = (display: DojoDisplay): ToolInfo[] => {
+    return getControlsInfo<ToolInfo>(display, ToolsInfo);
 };
 
-export const buildTools = (display: DojoDisplay): MapToolbar => {
-    const tools = getControlsInfo(display, ToolsInfo);
+export const buildTools = (
+    display: DojoDisplay,
+    tools: ToolInfo[],
+    controlsReady: Map<string, ControlReady>
+): MapToolbar => {
     const mapToolbar = display.mapToolbar;
     tools.forEach((t: ToolInfo) => {
-        mapToolbar.items.addTool(t.constructor(display), t.mapStateKey);
+        const tool = t.ctor(display);
+        mapToolbar.items.addTool(tool, t.mapStateKey);
+        controlsReady.set(t.key, { control: tool, info: t });
     });
     return mapToolbar;
 };

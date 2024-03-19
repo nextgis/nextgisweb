@@ -1,7 +1,7 @@
 /// <reference types="dojo/dijit" />
 
-import type { Control as OlControl } from "ol/control";
 import type Feature from "ol/Feature";
+import type { Control as OlControl } from "ol/control";
 
 import type WebmapStore from "../store";
 
@@ -11,15 +11,8 @@ import type { MapStatesObserver } from "./MapState";
 import type { WebmapItem } from "./WebmapItem";
 import type { WebmapLayer } from "./WebmapLayer";
 import type { WebmapPlugin } from "./WebmapPlugin";
-import { DojoItem } from ".";
 
-interface DojoDisplayIdentifyPopup {
-    widget?: DojoDisplayIdentify;
-}
-interface DojoDisplayIdentify {
-    _popup: DojoDisplayIdentifyPopup;
-    reset: () => void;
-}
+import type { DojoItem } from ".";
 
 export interface HighlightFeatureData {
     geom: string;
@@ -54,7 +47,16 @@ export interface MapToolbar extends OlControl {
     items: MapToolbarItems;
 }
 
-export type MapControl = OlControl | dijit._WidgetBase;
+interface DojoDisplayIdentifyPopup {
+    widget?: DojoDisplayIdentify;
+}
+
+export interface DojoDisplayIdentify {
+    _popup: DojoDisplayIdentifyPopup;
+    reset: () => void;
+}
+
+export type MapControl = OlControl | dijit._WidgetBase | DojoDisplayIdentify;
 
 export interface DojoDisplay extends dijit._WidgetBase {
     config: DisplayConfig;

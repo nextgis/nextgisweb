@@ -6,43 +6,43 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:855
+#: amd/ngw-webmap/Display.js:854
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:856
+#: amd/ngw-webmap/Display.js:855
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:908
+#: amd/ngw-webmap/Display.js:907
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: amd/ngw-webmap/Display.js:1034 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:1033 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:1045
+#: amd/ngw-webmap/Display.js:1044
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:1056
+#: amd/ngw-webmap/Display.js:1055
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:1070
+#: amd/ngw-webmap/Display.js:1069
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:1088 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: amd/ngw-webmap/Display.js:1087 amd/ngw-webmap/plugin/LayerInfo.js:28
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1107
+#: amd/ngw-webmap/Display.js:1106
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1159
+#: amd/ngw-webmap/Display.js:1158
 msgid "Annotations"
 msgstr "Аннотации"
 
@@ -154,7 +154,8 @@ msgid "Web map will start at this extent"
 msgstr "Веб-карта будет открываться с этим охватом"
 
 #: amd/ngw-webmap/template/ExtentWidget.hbs:12
-#: nodepkg/map-controls/map-controls.ts:95 nodepkg/map-controls/map-controls.ts:98
+#: nodepkg/map-controls/map-controls.ts:102
+#: nodepkg/map-controls/map-controls.ts:105
 msgid "Initial extent"
 msgstr "Начальный охват"
 
@@ -290,12 +291,12 @@ msgstr "Горизонтальная шторка"
 msgid "Show cursor coordinates / extent"
 msgstr "Показать координаты курсора / охват"
 
-#: amd/ngw-webmap/tool/Zoom.js:14 nodepkg/map-controls/map-controls.ts:41
+#: amd/ngw-webmap/tool/Zoom.js:14 nodepkg/map-controls/map-controls.ts:43
 #: nodepkg/map-controls/map-tools.ts:24
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: amd/ngw-webmap/tool/Zoom.js:20 nodepkg/map-controls/map-controls.ts:42
+#: amd/ngw-webmap/tool/Zoom.js:20 nodepkg/map-controls/map-controls.ts:44
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
@@ -487,26 +488,30 @@ msgstr "Показывать легенду"
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
-#: nodepkg/map-controls/map-controls.ts:51
+#: nodepkg/map-controls/map-controls.ts:54
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: nodepkg/map-controls/map-controls.ts:61
+#: nodepkg/map-controls/map-controls.ts:65
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: nodepkg/map-controls/map-controls.ts:75
+#: nodepkg/map-controls/map-controls.ts:80
 msgid "Scale line"
 msgstr "Линейка масштаба"
 
-#: nodepkg/map-controls/map-controls.ts:86
+#: nodepkg/map-controls/map-controls.ts:92
 msgid "Info scale"
 msgstr "Числовой масштаб"
 
-#: nodepkg/map-controls/map-controls.ts:107
-#: nodepkg/map-controls/map-controls.ts:110
+#: nodepkg/map-controls/map-controls.ts:115
+#: nodepkg/map-controls/map-controls.ts:118
 msgid "Locate me"
 msgstr "Определить мое местоположение"
+
+#: nodepkg/map-controls/map-controls.ts:123
+msgid "Identification"
+msgstr "Идентификация"
 
 #: nodepkg/map-controls/map-tools.ts:33
 msgid "Zoom Out"

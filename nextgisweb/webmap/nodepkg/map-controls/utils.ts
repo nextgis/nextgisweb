@@ -1,13 +1,11 @@
 import type { DojoDisplay } from "../type";
 
-import type { ControlInfo, ToolInfo } from "./type";
+import type { ControlsInfo } from "./type";
 
-type ControlsInfo = ControlInfo | ToolInfo;
-
-export const getControlsInfo = (
+export const getControlsInfo = <T extends ControlsInfo>(
     display: DojoDisplay,
-    controlsInfo: ControlsInfo[]
-): ControlsInfo[] => {
+    controlsInfo: T[]
+): T[] => {
     let controls;
 
     if (display.isTinyMode()) {
@@ -15,9 +13,7 @@ export const getControlsInfo = (
         if ("controls" in urlParams && urlParams.controls) {
             const urlKeys = urlParams.controls.split(",");
             controls = controlsInfo.filter((c: ControlsInfo) => {
-                const matchToUrlKey = c.urlKey
-                    ? urlKeys.includes(c.urlKey)
-                    : false;
+                const matchToUrlKey = c.key ? urlKeys.includes(c.key) : false;
                 const alwaysEmbeddedShow = c.embeddedShowMode === "always";
                 return matchToUrlKey || alwaysEmbeddedShow;
             });

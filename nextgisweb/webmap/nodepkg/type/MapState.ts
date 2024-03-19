@@ -1,3 +1,5 @@
+import type { DojoDisplayIdentify } from "./DojoDisplay";
+
 export interface MapStateControl {
     activate: () => void;
     deactivate: () => void;
@@ -6,7 +8,7 @@ export interface MapStateControl {
 export interface MapStatesObserver {
     addState: (
         state: string,
-        control?: MapStateControl,
+        control?: MapStateControl | DojoDisplayIdentify,
         activate?: boolean
     ) => void;
     removeState: (state: string) => void;

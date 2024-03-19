@@ -67,7 +67,7 @@ const toolsOptions = getControls()
     .map((c) => {
         return {
             label: c.label,
-            value: c.urlKey,
+            value: c.key,
         };
     });
 

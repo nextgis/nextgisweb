@@ -325,10 +325,8 @@ define([
             // Tools and plugins
             all([this._midDeferred.plugin, this._layersDeferred])
                 .then(function () {
-                    widget._toolsSetup();
                     widget._pluginsSetup();
                     widget._buildLayersTree();
-                    widget._identifyFeatureByAttrValue();
                 })
                 .then(undefined, function (err) {
                     console.error(err);
@@ -464,7 +462,17 @@ define([
                 }),
             });
 
-            MapControls.buildControls(this);
+            const controlsReady = MapControls.buildControls(this);
+
+            if (controlsReady.has("id")) {
+                const { control } = controlsReady.get("id");
+                this.identify = control;
+                this.mapStates.addState("identifying", this.identify);
+                this.mapStates.setDefaultState("identifying", true);
+                widget._identifyFeatureByAttrValue();
+            }
+
+            topic.publish("/webmap/tools/initialized");
 
             // Resize OpenLayers Map on container resize
             aspect.after(this.mapPane, "resize", function () {
@@ -641,15 +649,6 @@ define([
             layer.itemConfig = data;
 
             this.webmapStore.addLayer(data.id, layer);
-        },
-
-        _toolsSetup: function () {
-            this.identify = new Identify({ display: this });
-
-            this.mapStates.addState("identifying", this.identify);
-            this.mapStates.setDefaultState("identifying", true);
-
-            topic.publish("/webmap/tools/initialized");
         },
 
         _pluginsPanels: [],

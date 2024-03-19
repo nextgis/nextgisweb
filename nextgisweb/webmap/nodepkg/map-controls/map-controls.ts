@@ -1,7 +1,6 @@
 /// <reference types="dojo/dijit" />
 
 import orderBy from "lodash-es/orderBy";
-
 import Attribution from "ol/control/Attribution";
 import Rotate from "ol/control/Rotate";
 import ScaleLine from "ol/control/ScaleLine";
@@ -18,11 +17,14 @@ import InitialExtent from "ngw-webmap/controls/InitialExtent";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Import URL parser module
 import MyLocation from "ngw-webmap/controls/MyLocation";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Import URL parser module
+import Identify from "ngw-webmap/tool/Identify";
 
 import type { DojoDisplay } from "../type";
 
-import { ToolsInfo, buildTools } from "./map-tools";
-import type { ControlInfo } from "./type";
+import { ToolsInfo, buildTools, getToolsInfo } from "./map-tools";
+import type { ControlInfo, ControlReady } from "./type";
 import { getControlsInfo } from "./utils";
 
 const getLabel = (glyph: string): HTMLElement => {
@@ -34,7 +36,7 @@ const getLabel = (glyph: string): HTMLElement => {
 
 export const ControlsInfo: ControlInfo[] = [
     {
-        constructor: (display) => {
+        ctor: (display) => {
             return new Zoom({
                 zoomInLabel: getLabel("add"),
                 zoomOutLabel: getLabel("remove"),
@@ -44,9 +46,10 @@ export const ControlsInfo: ControlInfo[] = [
             });
         },
         embeddedShowMode: "always",
+        olMapControl: true,
     },
     {
-        constructor: (display) => {
+        ctor: (display) => {
             return new Attribution({
                 tipLabel: gettext("Attributions"),
                 target: display.rightBottomControlPane,
@@ -54,19 +57,21 @@ export const ControlsInfo: ControlInfo[] = [
             });
         },
         embeddedShowMode: "always",
+        olMapControl: true,
     },
     {
-        constructor: (display) => {
+        ctor: (display) => {
             return new Rotate({
                 tipLabel: gettext("Reset rotation"),
                 target: display.leftTopControlPane,
                 label: getLabel("arrow_upward"),
             });
         },
+        olMapControl: true,
     },
     {
-        urlKey: "sl",
-        constructor: (display) => {
+        key: "sl",
+        ctor: (display) => {
             return new ScaleLine({
                 target: display.rightBottomControlPane,
                 minWidth: 48,
@@ -74,10 +79,11 @@ export const ControlsInfo: ControlInfo[] = [
         },
         label: gettext("Scale line"),
         embeddedShowMode: "customize",
+        olMapControl: true,
     },
     {
-        urlKey: "is",
-        constructor: (display) => {
+        key: "is",
+        ctor: (display) => {
             return new InfoScale({
                 display: display,
                 target: display.rightBottomControlPane,
@@ -85,10 +91,11 @@ export const ControlsInfo: ControlInfo[] = [
         },
         label: gettext("Info scale"),
         embeddedShowMode: "customize",
+        olMapControl: true,
     },
     {
-        urlKey: "ie",
-        constructor: (display) => {
+        key: "ie",
+        ctor: (display) => {
             return new InitialExtent({
                 display: display,
                 target: display.leftTopControlPane,
@@ -97,10 +104,11 @@ export const ControlsInfo: ControlInfo[] = [
         },
         label: gettext("Initial extent"),
         embeddedShowMode: "customize",
+        olMapControl: true,
     },
     {
-        urlKey: "ml",
-        constructor: (display) => {
+        key: "ml",
+        ctor: (display) => {
             return new MyLocation({
                 display: display,
                 target: display.leftTopControlPane,
@@ -109,43 +117,44 @@ export const ControlsInfo: ControlInfo[] = [
         },
         label: gettext("Locate me"),
         embeddedShowMode: "customize",
+        olMapControl: true,
+    },
+    {
+        label: gettext("Identification"),
+        ctor: (display) => {
+            return new Identify({ display });
+        },
+        key: "id",
+        mapStateKey: "identifying",
+        embeddedShowMode: "customize",
+        olMapControl: false,
     },
 ];
 
-// export const getControlsInfo = (display: DojoDisplay): ControlInfo[] => {
-//     let controls;
+export const buildControls = (
+    display: DojoDisplay
+): Map<string, ControlReady> => {
+    const controlsMap = new Map<string, ControlReady>();
 
-//     if (display.isTinyMode()) {
-//         const urlParams = display.getUrlParams();
-//         if ("controls" in urlParams && urlParams.controls) {
-//             const urlKeys = urlParams.controls.split(",");
-//             controls = ControlsInfo.filter((c: ControlInfo) => {
-//                 const matchToUrlKey = c.urlKey
-//                     ? urlKeys.includes(c.urlKey)
-//                     : false;
-//                 const alwaysEmbeddedShow = c.embeddedShowMode === "always";
-//                 return matchToUrlKey || alwaysEmbeddedShow;
-//             });
-//         } else {
-//             controls = ControlsInfo.filter(
-//                 (c) => c.embeddedShowMode === "always"
-//             );
-//         }
-//     } else {
-//         controls = [...ControlsInfo];
-//     }
-
-//     return controls;
-// };
-
-export const buildControls = (display: DojoDisplay) => {
-    const controls = getControlsInfo(display, ControlsInfo).map((c) => {
-        return c.constructor(display);
+    const controlsInfo = getControlsInfo<ControlInfo>(display, ControlsInfo);
+    const controlsToMap = [];
+    controlsInfo.forEach((c: ControlInfo) => {
+        const control = c.ctor(display);
+        if (c.postCreate) {
+            c.postCreate(display, control);
+        }
+        controlsMap.set(c.key, { info: c, control });
+        if (c.olMapControl) {
+            controlsToMap.push(control);
+        }
     });
-    display._mapAddControls(controls);
+    display._mapAddControls(controlsToMap);
 
-    const mapToolbar = buildTools(display);
+    const toolsInfo = getToolsInfo(display);
+    const mapToolbar = buildTools(display, toolsInfo, controlsMap);
     display._mapAddControls([mapToolbar]);
+
+    return controlsMap;
 };
 
 export const getControls = () => {
