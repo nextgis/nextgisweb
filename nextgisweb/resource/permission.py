@@ -1,37 +1,53 @@
 from collections import UserList
 from functools import reduce
+from typing import ClassVar, Type, Union
 
+from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
 
 
 class RequirementList(UserList):
     def toposort(self):
+        # Split on internal (attr is None) and external requirements
+        internal, external = list(), list()
+        for req in self:
+            (internal, external)[req.attr is not None].append(req)
+
+        # Build graph of internal requirements
         g = dict()
-        for a in self:
+        for a in internal:
             g[a] = set()
-            for b in self:
+            for b in internal:
                 if a.src == b.dst and a != b:
                     g[a].add(b)
 
-        self[:] = []
+        # Put external requirements first
+        self[:] = list(external)
 
+        # Sort internal
         extra = reduce(set.union, g.values(), set()) - set(g.keys())
         g.update({item: set() for item in extra})
-
         while True:
             ordered = set(item for item, dep in g.items() if not dep)
             if not ordered:
                 break
 
+            # Add sorted internal requirements after externals
             self.extend(ordered)
-
             g = {item: (dep - ordered) for item, dep in g.items() if item not in ordered}
 
         assert not g, "A cyclic dependency exists amongst %r" % g
 
 
 class Requirement:
-    def __init__(self, dst, src, attr=None, cls=None, attr_empty=False):
+    def __init__(
+        self,
+        dst: "Permission",
+        src: "Permission",
+        attr: Union[str, None] = None,
+        cls: Union[Type, None] = None,
+        attr_empty: bool = False,
+    ):
         self.dst = dst
         self.src = src
         self.attr = attr
@@ -39,39 +55,36 @@ class Requirement:
         self.attr_empty = attr_empty
 
     def __repr__(self):
-        return "<Requirement: %s requires %s on attr=%s>" % (
-            repr(self.dst),
-            repr(self.src),
-            self.attr,
-        )
+        crepr = f" FOR {self.cls.identity}" if self.cls else ""
+        arepr = f" ON {self.attr}{' IF SET' if self.attr_empty else ''}" if self.attr else ""
+        return f"<Requirement{crepr}: {self.dst} REQUIRES {self.src}{arepr}>"
 
 
 class Permission:
-    # Counter to number objects. Needed to get elements in a way they were
-    # created inside class.
-    __create_order = 0
+    def __init__(self, label: TrStr):
+        self.scope = None
+        self.name = None
 
-    def __init__(self, label=None, name=None, scope=None):
         self.label = label
-        self.name = name
-        self.scope = scope
-
-        if not self.is_bound():
-            self._requirements = list()
-
-        Permission.__create_order += 1
-        self._create_order = Permission.__create_order
+        self._requirements = list()
 
     def __repr__(self):
-        return "<Permission %s:%s>" % (self.scope.identity if self.scope else "*", self.name)
+        if self.scope is None:
+            assert self.name is None
+            return "<Permission: unbound>"
+        else:
+            assert self.name is not None
+            return f"<Permission: {self.scope.identity}.{self.name}>"
 
     def __str__(self):
-        return str(self.label)
+        return "unbound" if self.scope is None else f"{self.scope.identity}:{self.name}"
 
     def is_bound(self):
         return self.name is not None and self.scope is not None
 
-    def bind(self, name=None, scope=None):
+    def bind(self, name: str, scope: Type["Scope"]):
+        assert isinstance(name, str) and issubclass(scope, Scope)
+        assert self.name is None and self.scope is None
         self.name = name
         self.scope = scope
 
@@ -79,13 +92,14 @@ class Permission:
         self.scope.requirements.toposort()
         del self._requirements
 
-    def require(self, *args, **kwargs):
-        tgt = self.scope.requirements if self.is_bound() else self._requirements
+    def require(self, other: "Permission", attr=None, cls=None, attr_empty=False):
+        req = Requirement(self, other, attr=attr, attr_empty=attr_empty, cls=cls)
 
-        tgt.append(Requirement(self, *args, **kwargs))
-
-        if self.is_bound():
-            tgt.toposort()
+        if self.scope is None:
+            self._requirements.append(req)
+        else:
+            self.scope.requirements.append(req)
+            self.scope.requirements.toposort()
 
         return self
 
@@ -106,17 +120,17 @@ class ScopeMeta(type):
 
         for name, perm in cls.__dict__.items():
             if isinstance(perm, Permission):
-                perm.bind(name, cls)
+                perm.bind(name, scope=cls)
 
         super().__init__(classname, bases, nmspc)
 
-    def values(cls, ordered=False):
-        def _ordered(a):
-            return sorted(a, key=lambda i: i._create_order) if ordered else a
-
-        for v in _ordered(filter(lambda v: isinstance(v, Permission), cls.__dict__.values())):
-            yield v
+    def values(cls, **kwargs):
+        assert len(kwargs) == 0
+        yield from (p for p in cls.__dict__.values() if isinstance(p, Permission))
 
 
 class Scope(metaclass=ScopeMeta, abstract=True):
-    registry = scope_registry
+    registry: ClassVar[DictRegistry] = scope_registry
+    identity: ClassVar[str]
+    label: ClassVar[TrStr]
+    requirements: ClassVar[RequirementList]

@@ -225,7 +225,7 @@ else:
                     perm.name,
                     annotate(bool, [Meta(description=f"{scope.label}: {perm.label}")]),
                 )
-                for perm in scope.values(ordered=True)
+                for perm in scope.values()
             ],
             module=scope.__module__,
         )
@@ -306,7 +306,7 @@ def permission_explain(request) -> JSONType:
         result = dict()
         for scope_identity, scope in value.resource.scope.items():
             n_scope = result.get(scope_identity)
-            for perm in scope.values(ordered=True):
+            for perm in scope.values():
                 if perm in value._result:
                     if n_scope is None:
                         n_scope = result[scope_identity] = dict()
