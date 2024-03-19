@@ -310,32 +310,28 @@ define([
                             }
                         }
                     );
-                    var itemConfigsById = Object.values(
-                        widget.tool.display._itemConfigById
-                    );
-                    for (var config of itemConfigsById) {
-                        if (config.layerId === lid) {
-                            if (
-                                !config.plugin["ngw-webmap/plugin/FeatureLayer"]
-                                    .readonly
-                            ) {
-                                widget.editButton = new Button({
-                                    iconClass: "dijitIconEdit",
-                                    showLabel: true,
-                                    onClick: () =>
-                                        openFeatureEditorTab({
-                                            resourceId: lid,
-                                            featureId: fid,
-                                            widget: widget,
-                                        }),
-                                }).placeAt(widget.extController, "last");
-                                domClass.add(
-                                    widget.editButton.domNode,
-                                    "no-label"
-                                );
-                            }
+
+                    const display = widget.tool.display;
+                    Object.values(display._itemConfigById).forEach((config) => {
+                        if (
+                            config.layerId !== lid ||
+                            !widget._isEditEnabled(display, config)
+                        ) {
+                            return;
                         }
-                    }
+
+                        widget.editButton = new Button({
+                            iconClass: "dijitIconEdit",
+                            showLabel: true,
+                            onClick: () =>
+                                openFeatureEditorTab({
+                                    resourceId: lid,
+                                    featureId: fid,
+                                    widget: widget,
+                                }),
+                        }).placeAt(widget.extController, "last");
+                        domClass.add(widget.editButton.domNode, "no-label");
+                    });
 
                     widget.resize();
                 });
@@ -348,6 +344,19 @@ define([
                 });
             });
         },
+
+        _isEditEnabled: function (display, config) {
+            const pluginName = "ngw-webmap/plugin/FeatureLayer";
+
+            if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
+                return false;
+            }
+
+            const configLayerPlugin = config.plugin[pluginName];
+            const readOnly = configLayerPlugin.readonly;
+            return !readOnly;
+        },
+
         _displayCoordinates: function () {
             this.coordinatePane = new ContentPane({
                 region: "bottom",

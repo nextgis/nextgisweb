@@ -5,7 +5,6 @@ define([
     "dojo/Deferred",
     "dojo/promise/all",
     "dojo/aspect",
-    "dojo/dom-construct",
     "dojo/topic",
     "dojo/data/ItemFileWriteStore",
     "dijit/_WidgetBase",
@@ -14,27 +13,18 @@ define([
     "dijit/layout/ContentPane",
     "openlayers/ol",
     "@nextgisweb/gui/error",
-    "@nextgisweb/pyramid/icon",
     "@nextgisweb/pyramid/company-logo",
     "@nextgisweb/webmap/store",
     "@nextgisweb/webmap/panels-manager",
     "@nextgisweb/webmap/store/annotations",
     "./ol/Map",
     "./MapToolbar",
-    "./controls/InitialExtent",
-    "./controls/InfoScale",
-    "./controls/MyLocation",
     "./FeatureHighlighter",
     "./MapStatesObserver",
     "./ui/react-panel",
     "./ui/react-webmap-tabs",
     // tools
     "@nextgisweb/webmap/map-controls",
-    "./tool/Zoom",
-    "./tool/Measure",
-    "./tool/Identify",
-    "./tool/ViewerInfo",
-    "./tool/Swipe",
     // Tiny display
     "ngw-webmap/controls/LinkToMainMap",
     // panels
@@ -57,7 +47,6 @@ define([
     Deferred,
     all,
     aspect,
-    domConstruct,
     topic,
     ItemFileWriteStore,
     _WidgetBase,
@@ -66,26 +55,17 @@ define([
     ContentPane,
     ol,
     errorModule,
-    icon,
     companyLogo,
     WebmapStore,
     PanelsManager,
     AnnotationsStore,
     Map,
     MapToolbar,
-    InitialExtent,
-    InfoScale,
-    MyLocation,
     FeatureHighlighter,
     MapStatesObserver,
     reactPanel,
     ReactWebMapTabs,
     MapControls,
-    ToolZoom,
-    ToolMeasure,
-    Identify,
-    ToolViewerInfo,
-    ToolSwipe,
     LinkToMainMap,
     LayersPanelModule,
     URL,
@@ -669,6 +649,10 @@ define([
                 function (key) {
                     console.log("Plugin [%s]::constructor...", key);
 
+                    if (this.isTinyMode() && !this.isTinyModePlugin(key)) {
+                        return;
+                    }
+
                     var plugin = new plugins[key]({
                         identity: key,
                         display: this,
@@ -1178,6 +1162,14 @@ define([
 
         isTinyMode: function () {
             return this.tinyConfig !== undefined;
+        },
+
+        isTinyModePlugin: function (pluginKey) {
+            const disabledPlugins = [
+                "ngw-webmap/plugin/LayerEditor",
+                "ngw-webmap/plugin/FeatureLayer",
+            ];
+            return !disabledPlugins.includes(pluginKey);
         },
     });
 });
