@@ -184,7 +184,6 @@ export class PanelsManager {
         if (!panel) {
             return;
         }
-        console.log(this._allowPanels);
         let newPanel: PanelDojoItem;
         let name: string;
         if (panel.cls) {

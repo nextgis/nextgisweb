@@ -79,7 +79,7 @@ const ToolsSelect = (props) => {
             style={{
                 width: "100%",
             }}
-            placeholder={gettext("Please select controls")}
+            placeholder={gettext("Please select tools")}
             options={toolsOptions}
             {...props}
         />
@@ -94,8 +94,29 @@ const PanelsSelect = (props) => {
             style={{
                 width: "100%",
             }}
-            placeholder={gettext("Please select panels")}
             {...props}
+            placeholder={gettext("Panels list")}
+        />
+    );
+};
+
+const DEFAULT_ACTIVE_PANEL = "none";
+const ActivePanelSelect = ({ panelsOptions, onChange, activePanel }) => {
+    const NoneOption = {
+        label: gettext("No active panel"),
+        value: "none",
+    };
+    const options = [NoneOption, ...panelsOptions];
+
+    return (
+        <Select
+            style={{
+                width: "100%",
+            }}
+            placeholder={gettext("Set active panel")}
+            options={options}
+            onChange={onChange}
+            value={activePanel}
         />
     );
 };
@@ -125,6 +146,7 @@ export const SharePanel = ({ display, title, close, visible }) => {
     const [controls, setControls] = useState([]);
     const [panelsOptions, setPanelsOptions] = useState([]);
     const [panels, setPanels] = useState([]);
+    const [activePanel, setActivePanel] = useState(DEFAULT_ACTIVE_PANEL);
 
     const updatePermalinkUrl = () => {
         display.getVisibleItems().then((visibleItems) => {
@@ -135,8 +157,6 @@ export const SharePanel = ({ display, title, close, visible }) => {
 
     const updateEmbedCode = () => {
         display.getVisibleItems().then((visibleItems) => {
-            console.log(controls);
-            console.log(panels);
             const permalinkOptions = {
                 urlWithoutParams:
                     ngwConfig.applicationUrl +
@@ -144,6 +164,7 @@ export const SharePanel = ({ display, title, close, visible }) => {
                 additionalParams: {
                     linkMainMap: addLinkToMap,
                     events: generateEvents,
+                    panel: activePanel,
                     controls,
                     panels,
                 },
@@ -179,7 +200,28 @@ export const SharePanel = ({ display, title, close, visible }) => {
         display._mapExtentDeferred.then(() => {
             updateEmbedCode();
         });
-    }, [widthMap, heightMap, addLinkToMap, generateEvents, controls, panels]);
+    }, [
+        widthMap,
+        heightMap,
+        addLinkToMap,
+        generateEvents,
+        controls,
+        panels,
+        activePanel,
+    ]);
+
+    useEffect(() => {
+        if (panels.length) {
+            if (activePanel !== DEFAULT_ACTIVE_PANEL) {
+                const found = panels.find((p) => p === activePanel);
+                if (!found) {
+                    setActivePanel(DEFAULT_ACTIVE_PANEL);
+                }
+            }
+        } else {
+            setActivePanel(DEFAULT_ACTIVE_PANEL);
+        }
+    }, [panels, activePanel]);
 
     useEffect(() => {
         display.panelsManager.panelsReady.promise.then(() => {
@@ -197,6 +239,23 @@ export const SharePanel = ({ display, title, close, visible }) => {
     }, [display]);
 
     const previewUrl = routeURL("webmap.preview_embedded", webmapId);
+
+    let activePanelSelect;
+    if (panels.length) {
+        const activePanelsOptions = panelsOptions.filter((o) =>
+            panels.includes(o.value)
+        );
+        activePanelSelect = (
+            <div className="input-group column">
+                <label>{gettext("Select active panel")}</label>
+                <ActivePanelSelect
+                    panelsOptions={activePanelsOptions}
+                    onChange={setActivePanel}
+                    activePanel={activePanel}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="ngw-webmap-share-panel">
@@ -251,10 +310,12 @@ export const SharePanel = ({ display, title, close, visible }) => {
                         {gettext("Generate events")}
                     </span>
                 </div>
-                <div className="input-group">
+                <div className="input-group column">
+                    <label>{gettext("Select tools")}</label>
                     <ToolsSelect value={controls} onChange={setControls} />
                 </div>
-                <div className="input-group">
+                <div className="input-group column">
+                    <label>{gettext("Please select panels")}</label>
                     <PanelsSelect
                         value={panels}
                         options={panelsOptions}
@@ -262,6 +323,7 @@ export const SharePanel = ({ display, title, close, visible }) => {
                         className="panels-select"
                     />
                 </div>
+                {activePanelSelect}
                 <div className="input-group">
                     <CodeArea value={embedCode} rows={4} />
                 </div>

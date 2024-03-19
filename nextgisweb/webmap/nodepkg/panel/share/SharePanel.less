@@ -25,6 +25,18 @@
         align-items: center;
         gap: 4px;
 
+        &.column {
+            flex-direction: column;
+            align-items: baseline;
+            gap: 0px;
+            margin-top: 10px;
+
+            label {
+                color: var(--text-secondary);
+                font-size: 12px;
+            }
+        }
+
         span.grow {
             flex-grow: 1;
         }
@@ -36,7 +48,8 @@
 }
 
 .ant-select-item-option-content,
-.ant-select-selection-item-content {
+.ant-select-selection-item-content,
+.ant-select-selection-item {
     .panel-title {
         display: grid;
         grid-template-columns: 20px auto;
