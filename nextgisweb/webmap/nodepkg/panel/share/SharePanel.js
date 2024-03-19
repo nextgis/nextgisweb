@@ -1,3 +1,4 @@
+import orderBy from "lodash-es/orderBy";
 import { useCallback, useEffect, useState } from "react";
 
 import {
@@ -5,6 +6,7 @@ import {
     Button,
     Input,
     InputNumber,
+    Select,
     Space,
     Switch,
 } from "@nextgisweb/gui/antd";
@@ -13,6 +15,7 @@ import { TemplateLink } from "@nextgisweb/gui/component";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!";
+import { getControls } from "@nextgisweb/webmap/map-controls";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 import { PanelHeader } from "../header";
@@ -33,7 +36,7 @@ const makeIframeTag = (iframeSrc, height, width) => {
     );
 };
 
-function CORSWarning() {
+const CORSWarning = () => {
     if (!settings["check_origin"]) return <></>;
     return (
         <Alert
@@ -47,9 +50,9 @@ function CORSWarning() {
             }
         />
     );
-}
+};
 
-function CodeArea(props) {
+const CodeArea = (props) => {
     return (
         <Input.TextArea
             style={{ wordBreak: "break-all", overflow: "hidden" }}
@@ -57,7 +60,58 @@ function CodeArea(props) {
             {...props}
         />
     );
-}
+};
+
+const toolsOptions = getControls()
+    .filter((c) => c.embeddedShowMode === "customize")
+    .map((c) => {
+        return {
+            label: c.label,
+            value: c.urlKey,
+        };
+    });
+
+const ToolsSelect = (props) => {
+    return (
+        <Select
+            mode="multiple"
+            allowClear
+            style={{
+                width: "100%",
+            }}
+            placeholder={gettext("Please select controls")}
+            options={toolsOptions}
+            {...props}
+        />
+    );
+};
+
+const PanelsSelect = (props) => {
+    return (
+        <Select
+            mode="multiple"
+            allowClear
+            style={{
+                width: "100%",
+            }}
+            placeholder={gettext("Please select panels")}
+            {...props}
+        />
+    );
+};
+
+const PanelTitle = ({ panelInfo }) => {
+    return (
+        <div className="panel-title">
+            <div>
+                <svg className="icon" fill="currentColor">
+                    <use xlinkHref={`#icon-${panelInfo.menuIcon}`} />
+                </svg>
+            </div>
+            <div className="title">{panelInfo.title}</div>
+        </div>
+    );
+};
 
 export const SharePanel = ({ display, title, close, visible }) => {
     const webmapId = display.config.webmapId;
@@ -68,6 +122,9 @@ export const SharePanel = ({ display, title, close, visible }) => {
     const [addLinkToMap, setAddLinkToMap] = useState(true);
     const [generateEvents, setGenerateEvents] = useState(false);
     const [embedCode, setEmbedCode] = useState("");
+    const [controls, setControls] = useState([]);
+    const [panelsOptions, setPanelsOptions] = useState([]);
+    const [panels, setPanels] = useState([]);
 
     const updatePermalinkUrl = () => {
         display.getVisibleItems().then((visibleItems) => {
@@ -78,6 +135,8 @@ export const SharePanel = ({ display, title, close, visible }) => {
 
     const updateEmbedCode = () => {
         display.getVisibleItems().then((visibleItems) => {
+            console.log(controls);
+            console.log(panels);
             const permalinkOptions = {
                 urlWithoutParams:
                     ngwConfig.applicationUrl +
@@ -85,6 +144,8 @@ export const SharePanel = ({ display, title, close, visible }) => {
                 additionalParams: {
                     linkMainMap: addLinkToMap,
                     events: generateEvents,
+                    controls,
+                    panels,
                 },
             };
             const iframeSrc = getPermalink(
@@ -118,7 +179,22 @@ export const SharePanel = ({ display, title, close, visible }) => {
         display._mapExtentDeferred.then(() => {
             updateEmbedCode();
         });
-    }, [widthMap, heightMap, addLinkToMap, generateEvents]);
+    }, [widthMap, heightMap, addLinkToMap, generateEvents, controls, panels]);
+
+    useEffect(() => {
+        display.panelsManager.panelsReady.promise.then(() => {
+            const panelsForTinyMap = display.panelsManager
+                .getPanels()
+                .filter((p) => p.applyToTinyMap === true)
+                .map((p) => {
+                    return {
+                        label: <PanelTitle panelInfo={p} />,
+                        value: p.name,
+                    };
+                });
+            setPanelsOptions(orderBy(panelsForTinyMap, "label", "asc"));
+        });
+    }, [display]);
 
     const previewUrl = routeURL("webmap.preview_embedded", webmapId);
 
@@ -174,6 +250,17 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     <span className="checkbox__label">
                         {gettext("Generate events")}
                     </span>
+                </div>
+                <div className="input-group">
+                    <ToolsSelect value={controls} onChange={setControls} />
+                </div>
+                <div className="input-group">
+                    <PanelsSelect
+                        value={panels}
+                        options={panelsOptions}
+                        onChange={setPanels}
+                        className="panels-select"
+                    />
                 </div>
                 <div className="input-group">
                     <CodeArea value={embedCode} rows={4} />

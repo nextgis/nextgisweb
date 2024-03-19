@@ -14,10 +14,12 @@
 <div id="display" style="width: 100%; height: 100%"></div>
 
 <script type="text/javascript">
-    require(["ngw-webmap/ui/TinyDisplay/TinyDisplay"], function (TinyDisplay) {
+    require(["ngw-webmap/Display"], function (Display) {
         const displayConfig = ${json_js(display_config)};
         const mainDisplayUrl = ${json_js(request.route_url('webmap.display', id=obj.id) + "?" + request.query_string)};
-        new TinyDisplay({ config: displayConfig, mainDisplayUrl: mainDisplayUrl })
+        const tinyConfig = {mainDisplayUrl};
+
+        new Display({ config: displayConfig, tinyConfig })
             .placeAt(document.getElementById("display"))
             .startup();
     });

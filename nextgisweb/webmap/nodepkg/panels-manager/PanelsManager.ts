@@ -38,6 +38,7 @@ export class PanelsManager {
     private _display: DojoDisplay;
     private _domElements!: PanelElements;
     private _activePanelKey?: string;
+    private _allowPanels?: string[];
     private _panels = new Map<string, PanelDojoItem>();
     private _initialized = false;
     private _initPromises: Promise<PanelDojoItem>[] = [];
@@ -48,10 +49,12 @@ export class PanelsManager {
     constructor(
         display: DojoDisplay,
         activePanelKey: string | undefined,
-        onChangePanel: (panel?: PanelDojoItem) => void
+        allowPanels: string[] | undefined,
+        onChangePanel: (panel?: PanelDojoItem) => void,
     ) {
         this._display = display;
         this._activePanelKey = activePanelKey;
+        this._allowPanels = allowPanels;
         this._onChangePanel = onChangePanel;
 
         reaction(
@@ -181,12 +184,15 @@ export class PanelsManager {
         if (!panel) {
             return;
         }
-
+        console.log(this._allowPanels);
         let newPanel: PanelDojoItem;
         let name: string;
         if (panel.cls) {
             const { cls, params } = panel;
             name = params.name;
+            if (this._allowPanels && !this._allowPanels.includes(name)) {
+                return;
+            }
 
             if (isFuncReactComponent(cls)) {
                 throw new Error("Panel React rendering is not implemented");
@@ -202,6 +208,10 @@ export class PanelsManager {
             }
         } else {
             name = panel.name;
+            if (this._allowPanels && !this._allowPanels.includes(name)) {
+                return;
+            }
+
             if (panel.on) {
                 panel.on("closed", (panel: PanelDojoItem) => {
                     // can't reach this event
@@ -269,8 +279,24 @@ export class PanelsManager {
         });
     }
 
+    getActivePanelName(): string | undefined {
+        return this._activePanelKey;
+    }
+
     getPanel(name: string): PanelDojoItem | undefined {
         return this._panels.get(name);
+    }
+
+    getPanelsNames(): string[] {
+        return [...this._panels.keys()];
+    }
+
+    getPanels(): PanelDojoItem[] {
+        return [...this._panels.values()];
+    }
+
+    getPanelsCount(): number {
+        return this._panels.size;
     }
 
     get panelsReady(): Deferred<void> {
@@ -279,5 +305,12 @@ export class PanelsManager {
 
     activatePanel(name: string): void {
         this._changeNavigationMenu(name);
+    }
+
+    deactivatePanel(): void {
+        if (!this._activePanelKey) {
+            return;
+        }
+        this._changeNavigationMenu(this._activePanelKey);
     }
 }

@@ -11,6 +11,7 @@ Changes
 - Support for multiple replicas and long-runnning requests.
 - Ctrl+Click opens feature attachment in a fixed tab.
 - Configurable permissions for groups, users, SRS and CORS management.
+- Lots of customization options for embedded webmaps: map tools and panels.
 
 
 4.6.0

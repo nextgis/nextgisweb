@@ -10,27 +10,31 @@ define([
             app: undefined,
             props: props,
 
+            _updateVisible: function (visible) {
+                if (this.app) {
+                    this.app.update({ visible });
+                } else if (typeof fcomp === "string") {
+                    // Lazy panel module loading
+                    require([fcomp], (fcompMod) => {
+                        fcomp = fcompMod.default;
+                        this.runReactApp({ visible });
+                    });
+                } else {
+                    this.runReactApp({ visible });
+                }
+            },
+
             buildRendering: function () {
                 this.inherited(arguments);
                 domStyle.set(this.domNode, "height", "100%");
             },
 
             show: function () {
-                if (this.app) {
-                    this.app.update({ visible: true });
-                } else if (typeof fcomp === "string") {
-                    // Lazy panel module loading
-                    require([fcomp], (fcompMod) => {
-                        fcomp = fcompMod.default;
-                        this.runReactApp({ visible: true });
-                    });
-                } else {
-                    this.runReactApp({ visible: true });
-                }
+                this._updateVisible(true);
             },
 
             hide: function () {
-                this.app.update({ visible: false });
+                this._updateVisible(false);
             },
 
             runReactApp: function ({ visible }) {

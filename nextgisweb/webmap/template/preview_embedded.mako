@@ -1,6 +1,12 @@
-<%inherit file='nextgisweb:pyramid/template/plain.mako' />
+<%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<h2>${tr(title)}</h2>
+<%def name="head()">
+    <style type="text/css">
+        #content {
+            overflow: auto;
+        }
+    </style>
+</%def>
 
 % if iframe:
     ${iframe | n}

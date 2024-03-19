@@ -55,4 +55,6 @@ export interface PanelDojoItem extends DojoItem {
     isFullWidth?: boolean;
     show: () => void;
     hide: () => void;
+
+    applyToTinyMap?: boolean;
 }

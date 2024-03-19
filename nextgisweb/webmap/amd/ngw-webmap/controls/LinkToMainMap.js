@@ -1,9 +1,10 @@
 define([
     "dojo/_base/declare",
+    "dojo/on",
     "dojo/dom-construct",
     "openlayers/ol",
     "@nextgisweb/pyramid/icon",
-], function (declare, domConstruct, ol, icon) {
+], function (declare, on, domConstruct, ol, icon) {
     return declare(ol.control.Control, {
         element: undefined,
         target: undefined,
@@ -15,19 +16,16 @@ define([
 
             this.element = domConstruct.create("div", {
                 class: "ol-control ol-unselectable",
+                innerHTML:
+                    '<button><span class="ol-control__icon">' +
+                    icon.html({ glyph: "open_in_new" }) +
+                    "</span></button>",
                 title: this.tipLabel,
             });
 
-            domConstruct.create(
-                "a",
-                {
-                    href: this.url,
-                    target: "_blank",
-                    class: "ol-control__btn",
-                    innerHTML: icon.html({ glyph: "open_in_new" }),
-                },
-                this.element
-            );
+            on(this.element, "click", () => {
+                window.open(this.url, "_blank");
+            });
 
             ol.control.Control.call(this, {
                 element: this.element,
