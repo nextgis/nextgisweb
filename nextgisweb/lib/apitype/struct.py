@@ -110,5 +110,6 @@ Derived = Annotated if TYPE_CHECKING else _Derived
 
 T = TypeVar("T")
 ReadOnly = Annotated[T, Conditional([OP.CREATE, OP.UPDATE], Control.OMIT)]
+CreateOnly = Annotated[T, Conditional([OP.UPDATE], Control.OMIT)]
 Required = Annotated[T, Conditional([OP.UPDATE], Control.MAY)]
 Default = Annotated[T, Conditional([OP.CREATE, OP.UPDATE], Control.MAY)]
