@@ -1,7 +1,9 @@
 from collections import namedtuple
 from datetime import datetime
 from types import MappingProxyType
+from typing import List, Literal, Union
 
+from msgspec import Struct
 from sqlalchemy import event, func, text
 
 from nextgisweb.env import Base, DBSession, _, env
@@ -16,10 +18,11 @@ from .exception import DisplayNameNotUnique, HierarchyError
 from .interface import IResourceAdapter, interface_registry
 from .permission import RequirementList
 from .scope import DataScope, MetadataScope, ResourceScope
+from .serialize import CRUTypes, Serializer
+from .serialize import SerializedColumn as SC
 from .serialize import SerializedProperty as SP
 from .serialize import SerializedRelationship as SR
 from .serialize import SerializedResourceRelationship as SRR
-from .serialize import Serializer
 
 Base.depends_on("auth")
 
@@ -346,7 +349,21 @@ ResourceScope.read.require(
 )
 
 
+class Parent(Struct, kw_only=True):
+    id: int
+
+
+class ParentOptional(Struct, kw_only=True):
+    id: Union[int, None]
+
+
+class ParentDeep(Parent, kw_only=True):
+    parent: ParentOptional
+
+
 class _parent_attr(SRR):
+    types = CRUTypes(Parent, Union[ParentDeep, None], Parent)
+
     def writeperm(self, srlzr):
         return True
 
@@ -375,7 +392,13 @@ class _parent_attr(SRR):
             )
 
 
+class PrincipalRef(Struct, kw_only=True):
+    id: int
+
+
 class _owner_user_attr(SR):
+    types = CRUTypes.single(PrincipalRef)
+
     def setter(self, srlzr, value):
         if not srlzr.user.is_administrator:
             raise ForbiddenError("Membership in group 'administrators' required!")
@@ -389,7 +412,18 @@ REQUIRED_PERMISSIONS_FOR_ADMINISTATORS = [
 ]
 
 
+class Permission(Struct, kw_only=True):
+    action: Literal["allow", "deny"]
+    principal: PrincipalRef
+    identity: str
+    scope: str
+    permission: str
+    propagate: bool
+
+
 class _perms_attr(SP):
+    types = CRUTypes.single(List[Permission])
+
     def setter(self, srlzr, value):
         for r in list(srlzr.obj.acl):
             srlzr.obj.acl.remove(r)
@@ -445,7 +479,7 @@ class _perms_attr(SP):
         return result
 
 
-class _description_attr(SP):
+class _description_attr(SC):
     def setter(self, srlzr, value):
         if value is not None:
             value = sanitize(value)
@@ -453,16 +487,22 @@ class _description_attr(SP):
 
 
 class _children_attr(SP):
+    types = CRUTypes.single(bool)
+
     def getter(self, srlzr):
         return len(srlzr.obj.children) > 0
 
 
 class _interfaces_attr(SP):
+    types = CRUTypes.single(List[str])
+
     def getter(self, srlzr):
         return [i.getName() for i in srlzr.obj.provided_interfaces()]
 
 
 class _scopes_attr(SP):
+    types = CRUTypes.single(List[str])
+
     def getter(self, srlzr):
         return list(srlzr.obj.scope.keys())
 
@@ -471,28 +511,28 @@ _scp = ResourceScope
 
 
 def _ro(c):
-    return c(read=_scp.read, write=None, depth=2)
+    return c(read=_scp.read, write=None)
 
 
 def _rw(c):
-    return c(read=_scp.read, write=_scp.update, depth=2)
+    return c(read=_scp.read, write=_scp.update)
 
 
 class ResourceSerializer(Serializer):
     identity = Resource.identity
     resclass = Resource
 
-    id = _ro(SP)
-    cls = _ro(SP)
-    creation_date = _ro(SP)
+    id = SC(read=ResourceScope.read, write=None)
+    cls = SC(read=ResourceScope.read, write=None)
+    creation_date = SC(read=ResourceScope.read, write=None)
 
     parent = _rw(_parent_attr)
     owner_user = _rw(_owner_user_attr)
 
     permissions = _perms_attr(read=_scp.read, write=_scp.change_permissions)
 
-    keyname = _rw(SP)
-    display_name = _rw(SP)
+    keyname = SC(read=ResourceScope.read, write=ResourceScope.update)
+    display_name = SC(read=ResourceScope.read, write=ResourceScope.update)
 
     description = _description_attr(read=ResourceScope.read, write=ResourceScope.update)
 

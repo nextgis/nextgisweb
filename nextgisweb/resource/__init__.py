@@ -13,6 +13,8 @@ from .scope import (
     ServiceScope,
 )
 from .serialize import (
+    CRUTypes,
+    SerializedColumn,
     SerializedProperty,
     SerializedRelationship,
     SerializedResourceRelationship,

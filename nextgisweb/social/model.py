@@ -1,4 +1,5 @@
 from io import BytesIO
+from typing import Union
 
 from PIL import Image
 
@@ -6,8 +7,8 @@ from nextgisweb.env import COMP_ID, Base
 from nextgisweb.lib import db
 
 from nextgisweb.file_storage import FileObj
-from nextgisweb.file_upload import FileUpload
-from nextgisweb.resource import Resource, ResourceScope, Serializer
+from nextgisweb.file_upload import FileUpload, FileUploadRef
+from nextgisweb.resource import CRUTypes, Resource, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 
 Base.depends_on("resource")
@@ -34,6 +35,8 @@ class ResourceSocial(Base):
 
 
 class _preview_file_upload_attr(SP):
+    types = CRUTypes.single(FileUploadRef)
+
     def setter(self, srlzr, value):
         if srlzr.obj.social is None:
             srlzr.obj.social = ResourceSocial()
@@ -58,12 +61,16 @@ class _preview_file_upload_attr(SP):
 
 
 class _preview_image_exists(SP):
+    types = CRUTypes.single(bool)
+
     def getter(self, srlzr):
         social = srlzr.obj.social
         return social is not None and social.preview_fileobj_id is not None
 
 
 class _preview_description_attr(SP):
+    types = CRUTypes.single(Union[str, None])
+
     def getter(self, srlzr):
         social = srlzr.obj.social
         return social.preview_description if social is not None else None

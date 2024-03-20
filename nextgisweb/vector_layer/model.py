@@ -1,5 +1,6 @@
 import re
 import uuid
+from typing import Any, Literal, Union
 
 import geoalchemy2 as ga
 from osgeo import gdal, ogr
@@ -23,9 +24,16 @@ from nextgisweb.feature_layer import (
     on_data_change,
     query_feature_or_not_found,
 )
-from nextgisweb.file_upload import FileUpload
+from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
-from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceGroup, Serializer
+from nextgisweb.resource import (
+    CRUTypes,
+    DataScope,
+    DataStructureScope,
+    Resource,
+    ResourceGroup,
+    Serializer,
+)
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedRelationship as SR
 from nextgisweb.spatial_ref_sys import SRS
@@ -430,6 +438,8 @@ def drop_verctor_layer_table(mapper, connection, target):
 
 
 class _source_attr(SP):
+    types = CRUTypes.single(FileUploadRef)
+
     def _ogrds(self, filename, source_filename=None):
         ogrds = read_dataset_vector(
             filename,
@@ -567,6 +577,8 @@ class _geometry_type_attr(SP):
 
 
 class _delete_all_features_attr(SP):
+    types = CRUTypes.single(bool)
+
     def setter(self, srlzr, value):
         if value:
             srlzr.obj.feature_delete_all()
@@ -579,11 +591,18 @@ P_DS_WRITE = DataScope.write
 
 
 class _source_option(SP):
-    def __init__(self):
+    def __init__(self, type: Any = Any):
         super().__init__(write=P_DS_WRITE)
+        self.types = CRUTypes.single(type)
 
     def setter(self, srlzr, value):
         pass
+
+
+FixErrors = Literal["NONE", "SAFE", "LOSSY"]
+CastToggle = Union[bool, None]
+CastGeometryType = Union[Literal["POINT", "LINESTRING", "POLYGON"], None]
+FidSource = Literal["AUTO", "SEQUENCE", "FIELD"]
 
 
 class VectorLayerSerializer(Serializer):
@@ -593,15 +612,15 @@ class VectorLayerSerializer(Serializer):
     srs = SR(read=P_DSS_READ, write=P_DSS_WRITE)
 
     source = _source_attr(write=P_DS_WRITE)
-    source_layer = _source_option()
-    fix_errors = _source_option()
-    skip_errors = _source_option()
-    cast_geometry_type = _source_option()
-    cast_is_multi = _source_option()
-    cast_has_z = _source_option()
-    fid_source = _source_option()
-    fid_field = _source_option()
-    skip_other_geometry_types = _source_option()
+    source_layer = _source_option(str)
+    fix_errors = _source_option(FixErrors)
+    skip_errors = _source_option(bool)
+    cast_geometry_type = _source_option(CastGeometryType)
+    cast_is_multi = _source_option(CastToggle)
+    cast_has_z = _source_option(CastToggle)
+    fid_source = _source_option(FidSource)
+    fid_field = _source_option(str)
+    skip_other_geometry_types = _source_option(bool)
 
     geometry_type = _geometry_type_attr(read=P_DSS_READ, write=P_DSS_WRITE)
     fields = _fields_attr(write=P_DS_WRITE)

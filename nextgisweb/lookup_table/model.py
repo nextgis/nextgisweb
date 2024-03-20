@@ -1,3 +1,5 @@
+from typing import Dict
+
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 
@@ -5,6 +7,7 @@ from nextgisweb.env import Base, _
 from nextgisweb.lib import db
 
 from nextgisweb.resource import (
+    CRUTypes,
     DataScope,
     Resource,
     ResourceGroup,
@@ -30,6 +33,8 @@ class LookupTable(Base, Resource):
 
 
 class _items_attr(SerializedProperty):
+    types = CRUTypes.single(Dict[str, str])
+
     def getter(self, srlzr):
         return srlzr.obj.val
 

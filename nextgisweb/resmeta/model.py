@@ -1,7 +1,9 @@
+from typing import Dict, Union
+
 from nextgisweb.env import COMP_ID, Base, _
 from nextgisweb.lib import db
 
-from nextgisweb.resource import Resource, ResourceScope, SerializedProperty, Serializer
+from nextgisweb.resource import CRUTypes, Resource, ResourceScope, SerializedProperty, Serializer
 
 Base.depends_on("resource")
 
@@ -56,6 +58,8 @@ VTYPE_DISPLAY_NAME = {
 
 
 class _items_attr(SerializedProperty):
+    types = CRUTypes.single(Dict[str, Union[str, int, bool, float, None]])
+
     def getter(self, srlzr):
         result = dict()
 

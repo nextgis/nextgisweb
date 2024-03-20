@@ -1,7 +1,18 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Optional, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Union,
+    cast,
+    get_args,
+)
 
 import zope.event
-from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
+from msgspec import UNSET, Meta, Struct, UnsetType, defstruct, to_builtins
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 from typing_extensions import Annotated
@@ -93,7 +104,20 @@ def blueprint(request) -> Blueprint:
     )
 
 
-def item_get(context, request) -> JSONType:
+if TYPE_CHECKING:
+    ResourceCreate = JSONType
+    ResourceRead = JSONType
+    ResourceUpdate = JSONType
+else:
+    composite_types = CompositeSerializer.types()
+
+    ResourceCreate = composite_types.create
+    ResourceRead = composite_types.read
+    ResourceUpdate = composite_types.update
+
+
+def item_get(context, request) -> ResourceRead:
+    """Read resource"""
     request.resource_permission(PERM_READ)
 
     serializer = CompositeSerializer(context, request.user)
@@ -102,10 +126,11 @@ def item_get(context, request) -> JSONType:
     return serializer.data
 
 
-def item_put(context, request) -> JSONType:
+def item_put(context, request, body: ResourceUpdate) -> JSONType:
+    """Update resource"""
     request.resource_permission(PERM_READ)
 
-    serializer = CompositeSerializer(context, request.user, request.json_body)
+    serializer = CompositeSerializer(context, request.user, to_builtins(body))
     with DBSession.no_autoflush:
         result = serializer.deserialize()
 
@@ -115,6 +140,8 @@ def item_put(context, request) -> JSONType:
 
 
 def item_delete(context, request) -> EmptyObject:
+    """Delete resource"""
+
     def delete(obj):
         request.resource_permission(PERM_DELETE, obj)
         request.resource_permission(PERM_MCHILDREN, obj)
@@ -133,10 +160,12 @@ def item_delete(context, request) -> EmptyObject:
     DBSession.flush()
 
 
-def collection_get(request) -> JSONType:
-    parent = request.params.get("parent")
-    parent = int(parent) if parent else None
-
+def collection_get(
+    request,
+    *,
+    parent: Union[int, None] = None,
+) -> AsJSON[List[ResourceRead]]:
+    """Read children resources"""
     query = (
         Resource.query()
         .filter_by(parent_id=parent)
@@ -154,41 +183,45 @@ def collection_get(request) -> JSONType:
     return result
 
 
-def collection_post(request) -> JSONType:
+def collection_post(
+    request,
+    body: ResourceCreate,
+    *,
+    cls: Union[str, UnsetType] = UNSET,
+    parent: Union[int, UnsetType] = UNSET,
+) -> JSONType:
+    """Create resource"""
     request.env.core.check_storage_limit()
 
-    data = dict(request.json_body)
+    if body.resource is UNSET:
+        resource_type = ResourceCreate.__annotations__["resource"]
+        resource_struct = get_args(resource_type)[0]
+        body.resource = resource_struct()
 
-    if "resource" not in data:
-        data["resource"] = dict()
+    resource = body.resource
 
-    qparent = request.params.get("parent")
-    if qparent is not None:
-        data["resource"]["parent"] = dict(id=int(qparent))
+    if cls is not UNSET:
+        resource.cls = cls
 
-    cls = request.params.get("cls")
-    if cls is not None:
-        data["resource"]["cls"] = cls
-
-    if "parent" not in data["resource"]:
+    if parent is not UNSET:
+        resource.parent = dict(id=parent)
+    elif resource.parent is UNSET:
         raise ValidationError(_("Resource parent required."))
 
-    if "cls" not in data["resource"]:
+    resource_cls = resource.cls
+
+    if resource_cls is UNSET:
         raise ValidationError(message=_("Resource class required."))
-
-    if data["resource"]["cls"] not in Resource.registry:
-        raise ValidationError(_("Unknown resource class '%s'.") % data["resource"]["cls"])
-
+    elif resource_cls not in Resource.registry:
+        raise ValidationError(_("Unknown resource class '%s'.") % resource_cls)
     elif (
-        data["resource"]["cls"] in request.env.resource.options["disabled_cls"]
-        or request.env.resource.options["disable." + data["resource"]["cls"]]
+        resource_cls in request.env.resource.options["disabled_cls"]
+        or request.env.resource.options["disable." + resource_cls]
     ):
-        raise ValidationError(message=_("Resource class '%s' disabled.") % data["resource"]["cls"])
+        raise ValidationError(_("Resource class '%s' disabled.") % resource_cls)
 
-    cls = Resource.registry[data["resource"]["cls"]]
-    resource = cls(owner_user=request.user)
-
-    serializer = CompositeSerializer(resource, request.user, data)
+    resource = Resource.registry[resource_cls](owner_user=request.user)
+    serializer = CompositeSerializer(resource, request.user, to_builtins(body))
     serializer.members["resource"].mark("cls")
 
     resource.persist()

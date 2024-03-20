@@ -1,17 +1,19 @@
 import os.path
 import zipfile
 from datetime import datetime
+from typing import List, Union
 
 import magic
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from msgspec import UNSET, Struct, UnsetType
 
 from nextgisweb.env import Base, _
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
-from nextgisweb.file_upload import FileUpload
-from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, Serializer
+from nextgisweb.file_upload import FileUpload, FileUploadID, FileUploadRef
+from nextgisweb.resource import CRUTypes, Resource, ResourceGroup, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 
 Base.depends_on("resource")
@@ -97,6 +99,8 @@ def validate_mime(filename, buf):
 
 
 class _archive_attr(SP):
+    types = CRUTypes.single(FileUploadRef)
+
     def setter(self, srlzr, value):
         srlzr.obj.tstamp = datetime.utcnow()
 
@@ -108,7 +112,17 @@ class _archive_attr(SP):
         srlzr.obj.from_archive(fupload.data_path)
 
 
+class FileRead(Struct, kw_only=True):
+    name: str
+
+
+class FileUpdate(FileRead, kw_only=True):
+    id: Union[FileUploadID, UnsetType] = UNSET
+
+
 class _files_attr(SP):
+    types = CRUTypes(List[FileUpdate], List[FileRead], List[FileUpdate])
+
     def getter(self, srlzr):
         return [dict(name=f.name) for f in srlzr.obj.files]
 

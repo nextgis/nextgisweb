@@ -1,6 +1,8 @@
-import sys
+import re
+from typing import Any, NamedTuple, Union
+from warnings import warn
 
-from zope.interface import Interface, implementer
+from msgspec import UNSET, Struct, UnsetType, defstruct
 
 from nextgisweb.env.model import BaseClass
 from nextgisweb.lib.registry import dict_registry
@@ -8,6 +10,7 @@ from nextgisweb.lib.registry import dict_registry
 from nextgisweb.core.exception import IUserException
 
 from .exception import AttributeUpdateForbidden
+from .scope import ResourceScope
 
 
 class SerializerBase:
@@ -38,28 +41,26 @@ class SerializerBase:
         return self.obj.has_permission(permission, self.user)
 
 
-class ISerializedAttribute(Interface):
-    def bind(self, srlzrcls, attrname):
-        pass
+class CRUTypes(NamedTuple):
+    create: Any
+    read: Any
+    update: Any
 
-    def serialize(self, srlzr):
-        pass
-
-    def deserialize(self, srlzr):
-        pass
+    @classmethod
+    def single(cls, type) -> "CRUTypes":
+        return cls(type, type, type)
 
 
-@implementer(ISerializedAttribute)
 class SerializedProperty:
-    def __init__(self, read=None, write=None, scope=None, depth=1):
+    types: CRUTypes = CRUTypes(Any, Any, Any)
+
+    def __init__(self, read=None, write=None, scope=None):
         self.read = read
         self.write = write
         self.scope = scope
 
         self.srlzrcls = None
         self.attrname = None
-
-        self.__order__ = len(sys._getframe(depth).f_locals)
 
     def bind(self, srlzrcls, attrname):
         self.srlzrcls = srlzrcls
@@ -91,62 +92,91 @@ class SerializedProperty:
             raise AttributeUpdateForbidden(self)
 
 
-class SerializedRelationship(SerializedProperty):
-    def __init__(self, depth=1, **kwargs):
-        super().__init__(depth=depth + 1, **kwargs)
-
+class SerializedColumn(SerializedProperty):
     def bind(self, srlzrcls, prop):
         super().bind(srlzrcls, prop)
-        self.relationship = srlzrcls.resclass.__mapper__.relationships[self.attrname]
+        mapper = srlzrcls.resclass.__mapper__
+        column = mapper.columns[self.attrname]
+
+        btype = column.type.python_type
+        type = btype
+        if column.nullable:
+            type = Union[type, None]
+        self.types = CRUTypes(type, type, type)
+
+
+class RelationshipRef(Struct, kw_only=True):
+    id: int
+
+
+class SerializedRelationship(SerializedProperty):
+    def bind(self, srlzrcls, prop):
+        super().bind(srlzrcls, prop)
+        mapper = srlzrcls.resclass.__mapper__
+        relationship = mapper.relationships[self.attrname]
+        if len(pk := mapper.primary_key) != 1 or pk[0].name != "id":
+            raise TypeError("Single column 'id' primary key required")
+        self.relcls = relationship.mapper.class_
+        self.nullable = tuple(relationship.local_columns)[0].nullable
+
+        # Don't overwrite 'types' class attribute
+        if "types" not in self.__class__.__dict__:
+            btype = RelationshipRef
+            if self.nullable:
+                btype = Union[btype, None]
+            self.types = CRUTypes.single(btype)
 
     def getter(self, srlzr):
-        value = super().getter(srlzr)
-        return (
-            dict(
-                map(
-                    lambda k: (k.name, serval(getattr(value, k.name))),
-                    value.__mapper__.primary_key,
-                )
-            )
-            if value
-            else None
-        )
+        if (value := super().getter(srlzr)) is None:
+            return None
+        return dict(id=serval(value.id))
 
     def setter(self, srlzr, value):
-        mapper = self.relationship.mapper
-        cls = mapper.class_
-
         if value is not None:
-            obj = cls.filter_by(
-                **dict(map(lambda k: (k.name, value[k.name]), mapper.primary_key))
-            ).one()
+            obj = self.relcls.filter_by(id=value["id"]).one()
         else:
             obj = None
-
         setattr(srlzr.obj, self.attrname, obj)
 
 
 class SerializedResourceRelationship(SerializedRelationship):
     def getter(self, srlzr):
-        value = SerializedProperty.getter(self, srlzr)
-        return dict(id=value.id, parent=dict(id=value.parent_id)) if value else None
+        if (value := SerializedProperty.getter(self, srlzr)) is None:
+            return None
+        return dict(id=value.id, parent=dict(id=value.parent_id))
 
 
 class SerializerMeta(type):
     def __init__(cls, name, bases, nmspc):
         super().__init__(name, bases, nmspc)
+        cls._warn_cls_name_conventions(nmspc, depth=1)
 
         proptab = []
         for prop, sp in nmspc.items():
-            if ISerializedAttribute.providedBy(sp):
+            if isinstance(sp, SerializedProperty):
                 sp.bind(cls, prop)
                 proptab.append((prop, sp))
+        cls.proptab = proptab
 
-        cls.proptab = sorted(proptab, key=lambda x: getattr(x[1], "__order__", 65535))
+    def _warn_cls_name_conventions(cls, nmspc, *, depth):
+        expected = set()
+        if (identity := nmspc.get("identity")) is not None:
+            camel = re.sub(r"(?:^|_)(\w)", lambda m: m.group(1).upper(), identity)
+            expected.add(f"{camel}Serializer")
+        if (resclass := nmspc.get("resclass")) is not None:
+            camel = resclass.__name__
+            expected.add(f"{camel}Serializer")
+        cls_name = cls.__name__
+        if expected and cls_name.lower() not in (e.lower() for e in expected):
+            warn(
+                f"{cls_name} should have one of the following names: {', '.join(expected)}",
+                stacklevel=2 + depth,
+            )
 
 
 @dict_registry
 class Serializer(SerializerBase, metaclass=SerializerMeta):
+    identity = None
     resclass = None
 
     def is_applicable(self):
@@ -174,6 +204,36 @@ class Serializer(SerializerBase, metaclass=SerializerMeta):
         except TypeError:
             pass
 
+    @classmethod
+    def types(cls) -> CRUTypes:
+        base = cls.__name__
+        if base.endswith("Serializer"):
+            base = base[: -len("Serializer")]
+
+        create, read, update = list(), list(), list()
+        for pn, prop in cls.proptab:
+            fcreate = prop.write is not None or (pn == "cls" and cls.identity == "resource")
+            fread = prop.read is not None
+            fupdate = prop.write is not None
+
+            pt = prop.types
+            if fcreate:
+                create.append((pn, Union[pt.create, UnsetType], UNSET))
+            if fread:
+                rfield = (pt.read,)
+                if prop.read is not ResourceScope.read:
+                    rfield = (Union[rfield[0], UnsetType], UNSET)  # type: ignore
+                read.append((pn, *rfield))
+            if fupdate:
+                update.append((pn, Union[pt.update, UnsetType], UNSET))
+
+        skwa: Any = dict(kw_only=True, module=cls.__module__)
+        return CRUTypes(
+            defstruct(f"{base}Create", create, **skwa),
+            defstruct(f"{base}Read", read, **skwa),
+            defstruct(f"{base}Update", update, **skwa),
+        )
+
 
 class CompositeSerializer(SerializerBase):
     registry = Serializer.registry
@@ -182,7 +242,7 @@ class CompositeSerializer(SerializerBase):
         super().__init__(obj, user, data)
 
         self.members = dict()
-        for ident, mcls in self.registry._dict.items():
+        for ident, mcls in self.registry.items():
             if data is None or ident in data:
                 mdata = data[ident] if data else None
                 mobj = mcls(obj, user, mdata)
@@ -218,6 +278,20 @@ class CompositeSerializer(SerializerBase):
         except TypeError:
             pass
 
+    @classmethod
+    def types(cls) -> CRUTypes:
+        create, read, update = list(), list(), list()
+        for k, v in cls.registry.items():
+            t = v.types()
+            create.append((k, Union[t.create, UnsetType], UNSET))
+            read.append((k, Union[t.read, UnsetType], UNSET))
+            update.append((k, Union[t.update, UnsetType], UNSET))
+        return CRUTypes(
+            defstruct("CompositeCreate", create),
+            defstruct("CompositeRead", read),
+            defstruct("CompositeUpdate", update),
+        )
+
 
 def serval(value):
     if (
@@ -227,20 +301,14 @@ def serval(value):
         or isinstance(value, str)
     ):
         return value
-
     elif isinstance(value, dict):
-        return dict(map(lambda k, v: (serval(k), serval(v)), value.items()))
-
+        return {serval(k): serval(v) for k, v in value.items()}
     elif isinstance(value, BaseClass):
-        return dict(
-            map(
-                lambda k: (k.name, serval(getattr(value, k.name))),
-                value.__mapper__.primary_key,
-            )
-        )
-
+        return {
+            column.name: serval(getattr(value, column.name))
+            for column in value.__mapper__.primary_key
+        }
     elif hasattr(value, "__iter__"):
         return map(serval, value)
-
     else:
         raise NotImplementedError()

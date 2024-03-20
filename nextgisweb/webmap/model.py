@@ -12,6 +12,7 @@ from nextgisweb.lib import db
 from nextgisweb.auth import User
 from nextgisweb.resource import Permission as P
 from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, Scope, Serializer
+from nextgisweb.resource import SerializedColumn as SC
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedResourceRelationship as SRR
 from nextgisweb.spatial_ref_sys import SRS
@@ -352,23 +353,23 @@ class WebMapSerializer(Serializer):
     identity = WebMap.identity
     resclass = WebMap
 
-    extent_left = SP(**_mdargs)
-    extent_right = SP(**_mdargs)
-    extent_bottom = SP(**_mdargs)
-    extent_top = SP(**_mdargs)
+    extent_left = SC(**_mdargs)
+    extent_right = SC(**_mdargs)
+    extent_bottom = SC(**_mdargs)
+    extent_top = SC(**_mdargs)
 
-    extent_const_left = SP(**_mdargs)
-    extent_const_right = SP(**_mdargs)
-    extent_const_bottom = SP(**_mdargs)
-    extent_const_top = SP(**_mdargs)
+    extent_const_left = SC(**_mdargs)
+    extent_const_right = SC(**_mdargs)
+    extent_const_bottom = SC(**_mdargs)
+    extent_const_top = SC(**_mdargs)
 
-    draw_order_enabled = SP(**_mdargs)
-    editable = SP(**_mdargs)
+    draw_order_enabled = SC(**_mdargs)
+    editable = SC(**_mdargs)
 
-    annotation_enabled = SP(**_mdargs)
-    annotation_default = SP(**_mdargs)
+    annotation_enabled = SC(**_mdargs)
+    annotation_default = SC(**_mdargs)
 
-    legend_symbols = SP(**_mdargs)
+    legend_symbols = SC(**_mdargs)
 
     bookmark_resource = SRR(**_mdargs)
 
