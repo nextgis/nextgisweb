@@ -20,7 +20,7 @@ import type {
 import "./ActionToolbar.less";
 
 function ActionToolbarInput<
-    P extends Record<string, any> = Record<string, any>,
+    P extends Record<string, unknown> = Record<string, unknown>,
 >(
     {
         size,
@@ -127,8 +127,12 @@ function ActionToolbarInput<
     );
 }
 
-export const ActionToolbar = forwardRef(ActionToolbarInput) as <
-    P extends Record<string, any> = Record<string, any>,
+type ActionToolbarType = <
+    P extends Record<string, unknown> = Record<string, unknown>,
 >(
-    p: ActionToolbarProps<P> & { ref?: Ref<HTMLDivElement> }
+    p: P & { ref?: Ref<HTMLDivElement> }
 ) => ReactElement;
+
+export const ActionToolbar = forwardRef(
+    ActionToolbarInput
+) as ActionToolbarType;
