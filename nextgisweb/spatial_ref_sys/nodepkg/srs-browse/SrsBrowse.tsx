@@ -3,10 +3,10 @@ import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
+import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import getMessages from "../srsMessages";
 import { modelObj } from "../srsModel";
-import type { SRSItem } from "../type";
 
 interface SrsBrowseProps {
     readonly: boolean;
@@ -30,7 +30,7 @@ export function SrsBrowse({ readonly }: SrsBrowseProps) {
     }
 
     return (
-        <ModelBrowse<SRSItem>
+        <ModelBrowse<SRSRead>
             model={modelObj}
             readonly={readonly}
             columns={[

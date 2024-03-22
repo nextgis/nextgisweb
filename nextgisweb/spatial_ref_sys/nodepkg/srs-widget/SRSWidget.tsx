@@ -6,21 +6,24 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type {
+    ConvertBody,
+    SRSRead,
+} from "@nextgisweb/spatial-ref-sys/type/api";
 
 import getMessages from "../srsMessages";
 import { modelObj } from "../srsModel";
-import type { RefSysConvertPostResp, SRSItem } from "../type";
 
 import { SRSImportFrom } from "./SRSImportForm";
 
-const DEFAULT_DATA = { projStr: "", format: "proj4" };
+const DEFAULT_DATA: ConvertBody = { projStr: "", format: "proj4" };
 
-export function SRSWidget({ id, readonly }: { id: number, readonly: boolean }) {
+export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isProtected, setIsProtected] = useState(false);
     const [isSystem, setIsSystem] = useState(false);
     const [form] = Form.useForm();
-    const [modalForm] = Form.useForm();
+    const [modalForm] = Form.useForm<ConvertBody>();
     const fields = useMemo<FormField[]>(() => {
         return [
             {
@@ -31,7 +34,7 @@ export function SRSWidget({ id, readonly }: { id: number, readonly: boolean }) {
             {
                 name: "auth_name_srid",
                 label: gettext("Authority and code"),
-                value: (record: SRSItem) =>
+                value: (record: SRSRead) =>
                     `${record.auth_name}:${record.auth_srid}`,
                 disabled: true,
                 included: id !== undefined && isProtected,
@@ -54,18 +57,12 @@ export function SRSWidget({ id, readonly }: { id: number, readonly: boolean }) {
     const handleOk = async () => {
         try {
             const json = await modalForm.validateFields();
-            const resp = await route(
-                "spatial_ref_sys.convert"
-            ).post<RefSysConvertPostResp>({
+            const resp = await route("spatial_ref_sys.convert").post({
                 json,
             });
-            if (resp.wkt) {
-                const fields = form.getFieldsValue();
-                form.setFieldsValue({ ...fields, wkt: resp.wkt });
-                setIsModalVisible(false);
-            } else if (resp.error) {
-                console.log(resp.error);
-            }
+            const fields = form.getFieldsValue();
+            form.setFieldsValue({ ...fields, wkt: resp.wkt });
+            setIsModalVisible(false);
         } catch (error) {
             const err = error as ApiError;
             if ("message" in err) {
@@ -99,7 +96,7 @@ export function SRSWidget({ id, readonly }: { id: number, readonly: boolean }) {
                 labelCol={{ span: 5 }}
                 messages={getMessages()}
                 onChange={(obj) => {
-                    const v = obj.value as SRSItem;
+                    const v = obj.value as SRSRead;
                     if (v) {
                         if (v.system !== undefined) {
                             setIsSystem(v.system);

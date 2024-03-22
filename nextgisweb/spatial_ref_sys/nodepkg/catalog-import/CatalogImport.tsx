@@ -10,8 +10,6 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { SRSItem } from "../type";
-
 interface CatalogImportProps {
     url: string;
     id: number;
@@ -20,7 +18,7 @@ interface CatalogImportProps {
 export function CatalogImport({ url, id }: CatalogImportProps) {
     const [status, setStatus] = useState<string | null>(null);
 
-    const { data, isLoading, error } = useRouteGet<SRSItem>({
+    const { data, isLoading, error } = useRouteGet({
         name: "spatial_ref_sys.catalog.item",
         params: { id },
     });

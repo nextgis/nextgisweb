@@ -3,6 +3,10 @@ import { useEffect, useMemo, useState } from "react";
 import { FieldsForm, Select } from "@nextgisweb/gui/fields-form";
 import type { FieldsFormProps, FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type {
+    ConvertBody,
+    SRSFormat,
+} from "@nextgisweb/spatial-ref-sys/type/api";
 
 const PLACEHOLDERS = {
     epsg: "4326",
@@ -26,6 +30,18 @@ interface SRSImportFromProps
     onChange?: (arg: (val: SrsFormValue) => SrsFormValue) => void;
 }
 
+interface FormFieldChoice {
+    label?: string;
+    value: SRSFormat;
+}
+
+const choices: FormFieldChoice[] = [
+    { value: "proj4", label: "PROJ" },
+    { value: "mapinfo", label: "MapInfo" },
+    { value: "epsg", label: "EPSG" },
+    { value: "esri", label: "ESRI WKT" },
+];
+
 export function SRSImportFrom({
     format: f,
     projStr,
@@ -35,18 +51,13 @@ export function SRSImportFrom({
 }: SRSImportFromProps) {
     const [format, setFormat] = useState<Format>(f as Format);
 
-    const fields = useMemo<FormField[]>(
+    const fields = useMemo<FormField<keyof ConvertBody>[]>(
         () => [
             {
                 name: "format",
                 label: gettext("Format"),
                 widget: Select,
-                choices: [
-                    { value: "proj4", label: "PROJ" },
-                    { value: "mapinfo", label: "MapInfo" },
-                    { value: "epsg", label: "EPSG" },
-                    { value: "esri", label: "ESRI WKT" },
-                ],
+                choices,
             },
             {
                 name: "projStr",

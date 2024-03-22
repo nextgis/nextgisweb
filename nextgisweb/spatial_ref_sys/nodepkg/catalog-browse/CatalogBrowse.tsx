@@ -15,8 +15,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
-
-import type { SRSItem } from "../type";
+import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import InputOutlineIcon from "@nextgisweb/icon/material/input";
 import OpenInNewIcon from "@nextgisweb/icon/material/open_in_new";
@@ -28,7 +27,7 @@ interface Query {
     lon?: number;
 }
 
-interface SRSRow extends SRSItem {
+interface SRSRow extends SRSRead {
     auth_name_srid: string | null;
 }
 
@@ -59,7 +58,7 @@ export function CatalogBrowse() {
         return q;
     }, [search, latLon]);
 
-    const { data: srs, isLoading } = useRouteGet<SRSItem[]>({
+    const { data: srs, isLoading } = useRouteGet<SRSRead[]>({
         name: "spatial_ref_sys.catalog.collection",
         options: { query },
     });
