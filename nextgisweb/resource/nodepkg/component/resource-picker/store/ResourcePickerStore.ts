@@ -302,7 +302,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
             this.parentItem = parentItem;
             const resp = await route("resource.collection").get<ResourceItem[]>(
                 {
-                    query: { parent: String(parent) },
+                    query: { parent: parent },
                     signal: this.setResourcesAbortController.signal,
                 }
             );
