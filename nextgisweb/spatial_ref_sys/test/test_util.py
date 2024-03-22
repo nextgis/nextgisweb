@@ -86,5 +86,5 @@ def test_normalize_mapinfo_cs(expected, variants):
     ],
 )
 def test_convert_to_wkt(format, source, expected):
-    result = convert_to_wkt(source, format=format)
+    result = convert_to_wkt(source, format)
     assert result in expected

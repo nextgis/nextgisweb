@@ -1,12 +1,11 @@
+from typing import Literal
+
 from osgeo import osr
 
-from nextgisweb.lib.i18n import trstr_factory
+from nextgisweb.env import gettext
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_wkt
 
 from nextgisweb.core.exception import ValidationError
-
-COMP_ID = "spatial_ref_sys"
-_ = trstr_factory(COMP_ID)
 
 MI_UNIT_ALIASES = {
     0: "mi",
@@ -36,15 +35,16 @@ def normalize_mapinfo_cs(source):
         if unit:
             items[unit_index] = '"%s"' % unit
         else:
-            raise ValidationError(
-                message=_("Invalid MapInfo spatial reference system: %s") % source
-            )
+            raise ValidationError(gettext("Invalid MapInfo spatial reference system: %s") % source)
     if len(items) == 8:
         items.append("0")
     return "Earth Projection " + ", ".join(items)
 
 
-def convert_to_wkt(source, format=None, pretty=False):
+SRSFormat = Literal["proj4", "epsg", "esri", "mapinfo", "wkt"]
+
+
+def convert_to_wkt(source: str, format: SRSFormat, pretty=False) -> str:
     sr = osr.SpatialReference()
 
     if format == "proj4":
@@ -58,7 +58,7 @@ def convert_to_wkt(source, format=None, pretty=False):
     elif format == "wkt":
         sr.ImportFromWkt(source)
     else:
-        raise ValidationError(message=_("Unknown spatial reference system format: %s!") % format)
+        raise ValidationError(gettext("Unknown spatial reference system format: %s!") % format)
 
     wkt = sr.ExportToPrettyWkt() if pretty else sr.ExportToWkt()
     return wkt
@@ -68,5 +68,5 @@ def convert_to_proj(source):
     try:
         sr = sr_from_wkt(source)
     except SpatialReferenceError:
-        raise ValidationError(message=_("Invalid OGC WKT definition!"))
+        raise ValidationError(message=gettext("Invalid OGC WKT definition!"))
     return sr.ExportToProj4()

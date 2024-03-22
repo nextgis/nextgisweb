@@ -1,3 +1,6 @@
+from ..model import SRID_MAX
+
+
 def transform_batch_input(srs_ids):
     return {
         "geom": "LineString (3.14325808 48.40736379, 3.96493966 47.88959904, 4.85183405 47.98571393, 5.37353664 48.57591553, 5.99957974 48.83842479)",
@@ -14,7 +17,7 @@ def transform_batch_input_wrong_srs_to(srs_ids):
     return {
         "geom": "LineString (3.14325808 48.40736379, 3.96493966 47.88959904, 4.85183405 47.98571393, 5.37353664 48.57591553, 5.99957974 48.83842479)",
         "srs_from": srs_ids["EPSG:4326"],
-        "srs_to": [-1],
+        "srs_to": [SRID_MAX - 1],
     }
 
 
