@@ -119,9 +119,9 @@ def _registry(cls, regcls):
 
     original_init_subclass = cls.__init_subclass__
 
-    def _patched_init_subclass(subcls):
+    def _patched_init_subclass(subcls, **kwargs):
         if func := getattr(original_init_subclass, "__func__", None):
-            func(subcls)
+            func(subcls, **kwargs)
         cls.registry.register(subcls)
 
     cls.__init_subclass__ = classmethod(_patched_init_subclass)
