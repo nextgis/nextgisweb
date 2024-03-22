@@ -1,3 +1,4 @@
+import sortBy from "lodash-es/sortBy";
 import { useEffect, useState } from "react";
 
 import { Spin } from "@nextgisweb/gui/antd";
@@ -26,13 +27,12 @@ export function BookmarksPanel({ display, title, close }) {
         const features = await route(
             "feature_layer.feature.collection",
             bookmarkLayerId
-        ).get({
-            query,
-        });
+        ).get({ query });
 
-        const bookmarks = features.map((f) => {
-            return { key: f.id, label: f.label };
-        });
+        const bookmarks = sortBy(
+            features.map((f) => ({ key: f.id, label: f.label })),
+            ["label", "key"]
+        );
 
         setBookmarks(bookmarks);
         setLoading(false);
