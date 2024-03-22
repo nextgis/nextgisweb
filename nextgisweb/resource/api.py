@@ -356,26 +356,6 @@ def permission_explain(request) -> JSONType:
     return _explain_jsonify(resolver)
 
 
-def quota(request) -> JSONType:
-    quota_limit = request.env.resource.quota_limit
-    quota_resource_cls = request.env.resource.quota_resource_cls
-
-    count = None
-    if quota_limit is not None:
-        query = DBSession.query(db.func.count(Resource.id))
-        if quota_resource_cls is not None:
-            query = query.filter(Resource.cls.in_(quota_resource_cls))
-
-        with DBSession.no_autoflush:
-            count = query.scalar()
-
-    return dict(
-        limit=quota_limit,
-        resource_cls=quota_resource_cls,
-        count=count,
-    )
-
-
 def search(request) -> JSONType:
     smap = dict(resource=ResourceSerializer, full=CompositeSerializer)
 
@@ -558,12 +538,6 @@ def setup_pyramid(comp, config):
         "/api/resource/{id}/volume",
         factory=resource_factory,
         get=resource_volume,
-    )
-
-    config.add_route(
-        "resource.quota",
-        "/api/resource/quota",
-        get=quota,
     )
 
     config.add_route(
