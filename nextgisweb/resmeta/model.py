@@ -1,23 +1,32 @@
-from nextgisweb.env import COMP_ID, Base, _
-from nextgisweb.lib import db
+from typing import Dict, Union
 
-from nextgisweb.resource import Resource, ResourceScope, SerializedProperty, Serializer
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
+from msgspec import Meta
+from typing_extensions import Annotated
+
+from nextgisweb.env import Base, gettext
+
+from nextgisweb.resource import Resource, ResourceScope, SAttribute, Serializer
 
 Base.depends_on("resource")
 
 
 class ResourceMetadataItem(Base):
-    __tablename__ = "%s_item" % COMP_ID
+    __tablename__ = "resmeta_item"
 
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    key = db.Column(db.Unicode(255), primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    key = sa.Column(sa.Unicode(255), primary_key=True)
 
-    vinteger = db.Column(db.Integer)
-    vfloat = db.Column(db.Float)
-    vtext = db.Column(db.Unicode)
-    vboolean = db.Column(db.Boolean)
+    vinteger = sa.Column(sa.Integer)
+    vfloat = sa.Column(sa.Float)
+    vtext = sa.Column(sa.Unicode)
+    vboolean = sa.Column(sa.Boolean)
 
-    resource = db.relationship(Resource, backref=db.backref(COMP_ID, cascade="all, delete-orphan"))
+    resource = orm.relationship(
+        Resource,
+        backref=orm.backref("resmeta", cascade="all, delete-orphan"),
+    )
 
     def tval(self):
         if self.vinteger is not None:
@@ -48,24 +57,22 @@ class ResourceMetadataItem(Base):
 
 
 VTYPE_DISPLAY_NAME = {
-    "string": _("String"),
-    "number": _("Number"),
-    "boolean": _("Boolean"),
-    "null": _("Empty"),
+    "string": gettext("String"),
+    "number": gettext("Number"),
+    "boolean": gettext("Boolean"),
+    "null": gettext("Empty"),
 }
 
+ItemKey = Annotated[str, Meta(max_length=255)]
+ItemsType = Dict[ItemKey, Union[str, int, bool, float, None]]
 
-class _items_attr(SerializedProperty):
-    def getter(self, srlzr):
-        result = dict()
 
-        for itm in getattr(srlzr.obj, COMP_ID):
-            result[itm.key] = itm.value
+class ItemsAttr(SAttribute, apitype=True):
+    def get(self, srlzr) -> ItemsType:
+        return {itm.key: itm.value for itm in srlzr.obj.resmeta}
 
-        return result
-
-    def setter(self, srlzr, value):
-        odata = getattr(srlzr.obj, COMP_ID)
+    def set(self, srlzr, value: ItemsType, *, create: bool):
+        odata = srlzr.obj.resmeta
 
         rml = []  # Records to be removed
         imap = dict()  # Records to be rewritten
@@ -91,12 +98,12 @@ class _items_attr(SerializedProperty):
             itm.value = val
 
 
-class ResmetaSerializer(Serializer):
-    identity = COMP_ID
+class ResmetaSerializer(Serializer, apitype=True):
+    identity = "resmeta"
     resclass = Resource
 
     # TODO: It would be possible nice to implement serialization
     # without intermediate items key, but this is impossible right now
     # as serialization as a whole and serialization of attributes are mixed in one class.
 
-    items = _items_attr(read=ResourceScope.read, write=ResourceScope.update)
+    items = ItemsAttr(read=ResourceScope.read, write=ResourceScope.update)
