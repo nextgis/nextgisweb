@@ -1,12 +1,12 @@
 from enum import Enum
 from functools import cached_property, partial
-from typing import Any, Callable, Optional, Sequence, Tuple, Type, cast, get_args, get_origin
+from typing import Any, Optional, Sequence, Tuple, cast, get_args, get_origin
 
-from msgspec import NODEFAULT, UNSET, UnsetType, convert
+from msgspec import NODEFAULT, UNSET, UnsetType
 from msgspec.inspect import StructType, type_info
 
 from . import query_string as qs
-from .primitive import StringDecoder, string_decoder
+from .primitive import StringDecoder, sequence_decoder, string_decoder
 from .query_string import QueryStringDecoder
 from .util import (
     NoneType,
@@ -17,22 +17,6 @@ from .util import (
     is_struct,
     unannotate,
 )
-
-
-def param_decoder(tdef):
-    bdef = unannotate(tdef)
-    if get_origin(bdef) is not list:
-        return string_decoder(tdef, bdef)
-
-    itdef = get_args(bdef)[0]
-    ibdef = unannotate(itdef)
-    idecode = string_decoder(itdef, ibdef)
-
-    def _decode(val):
-        vals = [idecode(i) for i in val.split(",")]
-        return convert(vals, tdef)
-
-    return _decode
 
 
 class Shape(Enum):
@@ -86,13 +70,13 @@ Query = partial(Param, Location.QUERY)
 class PathParam:
     param: Param
     name: str
-    type: Type
+    type: Any
 
-    otype: Type
+    otype: Any
     extras: Tuple[Any, ...]
-    decoder_factory: Callable[[], StringDecoder]
+    decoder: StringDecoder
 
-    def __init__(self, name: str, type: Type, *, param: Param = Path()):
+    def __init__(self, name: str, type: Any, *, param: Param = Path()):
         self.otype, self.extras = disannotate(type)
         param = param.replace(*self.extras)
         if (rename := param.name) is not None:
@@ -103,26 +87,22 @@ class PathParam:
         if len(decompose_union(self.otype, annotated=False)) != 1:
             raise TypeError(f"Union in PathParam: {type}")
 
-        self.decoder_factory = lambda: string_decoder(type, self.otype)
-
-    @cached_property
-    def decoder(self) -> StringDecoder:
-        return self.decoder_factory()
+        self.decoder = string_decoder(type)
 
 
 class QueryParam:
     param: Param
     name: str
-    type: Type
+    type: Any
     default: Any
 
-    otype: Type
+    otype: Any
     extras: Tuple[Any, ...]
     shape: Shape
     style: Style
-    decoder_factory: Callable[[], QueryStringDecoder]
+    decoder: QueryStringDecoder
 
-    def __init__(self, name: str, type: Type, default: Any = NODEFAULT, *, param: Param = Query()):
+    def __init__(self, name: str, type: Any, default: Any = NODEFAULT, *, param: Param = Query()):
         rest = []
         type, extras = disannotate(type)
         param = param.replace(*extras)
@@ -173,59 +153,46 @@ class QueryParam:
         if is_struct(otype):
             self.style = Style.FORM
             self.shape = Shape.OBJECT
-            self.decoder_factory = lambda: partial(
+            self.decoder = partial(
                 qs.form_object,
                 cls=otype,
                 fields=self._struct_decoders,
+            )
+        elif origin in (list, tuple):
+            self.style = Style.FORM
+            self.shape = Shape.LIST
+            self.decoder = partial(
+                qs.form_list,
+                name=self.name,
+                default=self.default,
+                loads=sequence_decoder(self.type),
             )
         elif origin is dict:
             # TODO: Support for lists
             self.style = Style.DEEP_OBJECT
             self.shape = Shape.OBJECT
-            self.decoder_factory = lambda: partial(
+            typek, typev = args
+            loadk = string_decoder(typek)
+            seq = get_origin(unannotate(typev)) in (list, tuple)
+            loadv = sequence_decoder(typev) if seq else string_decoder(typev)
+            self.decoder = partial(
                 qs.deep_dict,
                 name=self.name,
-                loadk=string_decoder(args[0]),
-                loadv=string_decoder(args[1]),
-            )
-        elif origin is list:
-            self.style = Style.FORM
-            self.shape = Shape.LIST
-            self.decoder_factory = lambda loads=string_decoder(args[0]): partial(
-                qs.form_list_list,
-                name=self.name,
-                type=self.type,
-                default=self.default,
-                loads=loads,
-                urlsafe=getattr(loads, "urlsafe"),
-            )
-        elif origin is tuple:
-            self.style = Style.FORM
-            self.shape = Shape.LIST
-            self.decoder_factory = lambda loads=tuple(string_decoder(a) for a in args): partial(
-                qs.form_list_tuple,
-                name=self.name,
-                type=self.type,
-                default=self.default,
-                loads=loads,
-                urlsafe=all(getattr(li, "urlsafe") for li in loads),
+                loadk=loadk,
+                loadv=loadv,
             )
         else:
             self.style = Style.FORM
             self.shape = Shape.PRIMITIVE
-            self.decoder_factory = lambda: partial(
+            self.decoder = partial(
                 qs.primitive,
                 name=self.name,
                 default=self.default,
-                loads=string_decoder(self.type, otype),
+                loads=string_decoder(self.type),
             )
 
         if self.shape == Shape.OBJECT and (self.default is not NODEFAULT):
             raise DefaultsNotSupported
-
-    @cached_property
-    def decoder(self) -> QueryStringDecoder:
-        return self.decoder_factory()
 
     @cached_property
     def spreaded(self) -> Sequence["QueryParam"]:

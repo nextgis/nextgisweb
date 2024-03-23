@@ -1,11 +1,10 @@
-from functools import cached_property, partial
+from functools import cached_property
 from itertools import groupby
-from typing import Any, Callable, List, Mapping, Optional, Sequence, Tuple
-from urllib.parse import unquote
+from typing import Any, Callable, Mapping, Optional, Sequence, Tuple
 
-from msgspec import NODEFAULT, ValidationError, convert
+from msgspec import NODEFAULT, ValidationError
 
-from .primitive import StringDecoder
+from .primitive import SequenceDecoder, StringDecoder, unquote_strict
 
 
 class QueryString:
@@ -50,45 +49,7 @@ def primitive(qs: QueryString, *, name: str, default: Any, loads: StringDecoder)
         raise QueryParamInvalidValue(name) from exc
 
 
-def form_list_list(
-    qs: QueryString,
-    *,
-    name: str,
-    type: Any,
-    default: Any,
-    loads: StringDecoder,
-    urlsafe: bool = False,
-) -> List[Any]:
-    value = qs.last(name)
-    if value is None:
-        if default is NODEFAULT:
-            raise QueryParamRequired(name)
-        return default
-
-    if value == "":
-        return convert([], type)
-
-    try:
-        if urlsafe:
-            # If members are marked as urlsafe, unquote the value first. It
-            # allows to use values like 1%2C2%2C3 which becomes 1,2,3.
-            parts = [loads(i) for i in unquote_strict(value).split(",")]
-        else:
-            parts = [loads(unquote_strict(i)) for i in value.split(",")]
-        return convert(parts, type)
-    except ValidationError as exc:
-        raise QueryParamInvalidValue(name) from exc
-
-
-def form_list_tuple(
-    qs: QueryString,
-    *,
-    name: str,
-    type: Any,
-    default: Any,
-    loads: Tuple[StringDecoder, ...],
-    urlsafe: bool = False,
-) -> Tuple[Any, ...]:
+def form_list(qs: QueryString, *, name: str, default: Any, loads: SequenceDecoder) -> Any:
     value = qs.last(name)
     if value is None:
         if default is NODEFAULT:
@@ -96,20 +57,7 @@ def form_list_tuple(
         return default
 
     try:
-        if value == "":
-            parts = []
-        elif urlsafe:
-            # If members are marked as urlsafe, unquote the value first. It
-            # allows to use values like 1%2C2%2C3 which becomes 1,2,3.
-            parts = unquote_strict(value).split(",")
-        else:
-            parts = [unquote_strict(i) for i in value.split(",")]
-
-        if (pad := len(parts) - len(loads)) > 0:
-            loads = loads + tuple(str for i in range(pad))
-
-        parsed = [ls(pt) for ls, pt in zip(loads, parts)]
-        return convert(parsed, type)
+        return loads(value)
     except ValidationError as exc:
         raise QueryParamInvalidValue(name) from exc
 
@@ -129,9 +77,6 @@ def deep_dict(qs: QueryString, *, name: str, loadk: StringDecoder, loadv: String
         }
     except ValidationError as exc:
         raise QueryParamInvalidValue(name) from exc
-
-
-unquote_strict = partial(unquote, errors="strict")
 
 
 class QueryParamError(ValueError):

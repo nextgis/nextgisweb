@@ -1,5 +1,5 @@
 from .http import ContentType, StatusCode
-from .param import PathParam, Query, QueryParam, param_decoder
+from .param import PathParam, Query, QueryParam
 from .primitive import StringDecoder
 from .query_string import QueryString
 from .schema import AnyOf, AsJSON, Gap, JSONType, fillgap, iter_anyof

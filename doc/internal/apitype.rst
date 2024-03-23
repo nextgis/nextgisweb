@@ -61,12 +61,12 @@ Supported types:
       - Basic types: ``str``, ``int``, ``bool``, ``float``
       - ``enum.Enum`` with string values only
       - ``typing.Literal`` with string and integer values
-- Arrays and lists of primitive types:
-      - ``typing.List`` for variable-length uniform arrays
-      - ``typing.Tuple`` for fixed-length and non-uniform lists
+- Sequences of primitive types:
+      - ``typing.List`` for variable-length uniform lists
+      - ``typing.Tuple`` for fixed-length non-uniform and uniform tuples
 - Objects:
-      - ``msgspec.Struct`` with primitive values
-      - ``typing.Dict`` with primitive keys and values
+      - ``msgspec.Struct``
+      - ``typing.Dict``
 
 .. code-block:: python
 
@@ -85,10 +85,13 @@ Supported types:
         txt: str,
         num: int = 0,
         flag: bool = False,
-        arr_str: List[str],
-        arr_int: List[int] = [1, 2, 3],
-        obj_struct: SomeStruct,
-        obj_dict: Dict[str, int],
+        list_str: List[str],
+        list_int: List[int] = [1, 2, 3],
+        tuple_mixed: Tuple[str, int],
+        tuple_uniform: Tuple[float, ...],
+        struct: SomeStruct,
+        dict_str_int: Dict[str, int],
+        dict_list: Dict[str, List[int]],
     ):
         ...
 
@@ -139,10 +142,9 @@ annotation in the following cases:
 
 - Declared as ``msgspec.Struct``
 - Wrapped into the ``AsJSON`` helper
-- Decorated with ``@viewargs(renderer="msgspec")``
 
-The first two options support OpenAPI schema generation and static type
-checking, here is the examples:
+These options support OpenAPI schema generation and static type checking, here
+is the examples:
 
 .. code-block:: python
 
@@ -162,11 +164,6 @@ checking, here is the examples:
 
     def helper(request) -> AsJSON[int]:
         return 1
-
-
-    @viewargs(renderer="msgspec")
-    def decorator(request):
-        return 2
 
 The ``StatusCode`` annotation can be used to declare non-200 status codes. It's
 important to note that this annotation only modifies the OpenAPI schema. To set
