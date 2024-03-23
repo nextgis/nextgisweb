@@ -1,11 +1,14 @@
 from collections import namedtuple
 from datetime import datetime
 from types import MappingProxyType
+from typing import ClassVar, List, Literal, Tuple, Type, Union
 
+from msgspec import Struct
 from sqlalchemy import event, func, text
 
-from nextgisweb.env import Base, DBSession, _, env
+from nextgisweb.env import Base, DBSession, env, gettext
 from nextgisweb.lib import db
+from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
 from nextgisweb.lib.safehtml import sanitize
 
@@ -15,11 +18,9 @@ from nextgisweb.core.exception import ForbiddenError, ValidationError
 from .exception import DisplayNameNotUnique, HierarchyError
 from .interface import IResourceAdapter, interface_registry
 from .permission import RequirementList
-from .scope import DataScope, MetadataScope, ResourceScope
-from .serialize import SerializedProperty as SP
-from .serialize import SerializedRelationship as SR
-from .serialize import SerializedResourceRelationship as SRR
-from .serialize import Serializer
+from .sattribute import ResourceRef, SColumn, SRelationship, SResource
+from .scope import DataScope, MetadataScope, ResourceScope, Scope
+from .serialize import CRUTypes, SAttribute, Serializer
 
 Base.depends_on("auth")
 
@@ -71,14 +72,15 @@ class ResourceMeta(db.DeclarativeMeta):
         resource_registry.register(cls)
 
 
+ResourceScopeType = Union[Tuple[Type[Scope], ...], Type[Scope]]
+
+
 class Resource(Base, metaclass=ResourceMeta):
     registry = resource_registry
 
-    identity = "resource"
-    cls_display_name = _("Resource")
-    primary_display_name = None
-
-    __scope__ = (ResourceScope, MetadataScope)
+    identity: ClassVar[str] = "resource"
+    cls_display_name: ClassVar[TrStr] = gettext("Resource")
+    __scope__: ClassVar[ResourceScopeType] = (ResourceScope, MetadataScope)
 
     id = db.Column(db.Integer, primary_key=True)
     cls = db.Column(db.Unicode, nullable=False)
@@ -119,7 +121,7 @@ class Resource(Base, metaclass=ResourceMeta):
         return col
 
     @classmethod
-    def check_parent(cls, parent):
+    def check_parent(cls, parent) -> bool:
         """Can this resource be child for parent?"""
         return False
 
@@ -257,7 +259,7 @@ class Resource(Base, metaclass=ResourceMeta):
         with DBSession.no_autoflush:
             if value is not None:
                 if self == value or self in value.parents:
-                    raise HierarchyError(_("Resource can not be a parent himself."))
+                    raise HierarchyError(gettext("Resource can not be a parent himself."))
 
         return value
 
@@ -270,7 +272,7 @@ class Resource(Base, metaclass=ResourceMeta):
                 value is not None
                 and Resource.filter(Resource.keyname == value, Resource.id != self.id).first()
             ):
-                raise ValidationError(_("Resource keyname is not unique."))
+                raise ValidationError(gettext("Resource keyname is not unique."))
 
         return value
 
@@ -302,7 +304,7 @@ class Resource(Base, metaclass=ResourceMeta):
             if self.identity.endswith("_style"):
                 q = _query(func.count(Resource.id))
                 if q.scalar() == 0:
-                    yield tr(_("Default style"))
+                    yield tr(gettext("Default style"))
 
             yield tr(self.cls_display_name)
 
@@ -346,11 +348,59 @@ ResourceScope.read.require(
 )
 
 
-class _parent_attr(SRR):
+class ResourceACLRule(Base):
+    __tablename__ = "resource_acl_rule"
+
+    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
+    principal_id = db.Column(db.ForeignKey(Principal.id), primary_key=True)
+
+    identity = db.Column(db.Unicode, primary_key=True, default="")
+    scope = db.Column(db.Unicode, primary_key=True, default="")
+    permission = db.Column(db.Unicode, primary_key=True, default="")
+    propagate = db.Column(db.Boolean, primary_key=True, default=True)
+    action = db.Column(db.Unicode, nullable=False, default=True)
+
+    resource = db.relationship(Resource, backref=db.backref("acl", cascade="all, delete-orphan"))
+    principal = db.relationship(Principal)
+
+    def cmp_user(self, user):
+        principal = self.principal
+        return (isinstance(principal, User) and principal.compare(user)) or (
+            isinstance(principal, Group) and principal.is_member(user)
+        )
+
+    def cmp_identity(self, identity):
+        return (self.identity == "") or (self.identity == identity)
+
+    def cmp_permission(self, permission):
+        pname = permission.name
+        pscope = permission.scope.identity
+
+        return (
+            (self.scope == "" and self.permission == "")
+            or (self.scope == pscope and self.permission == "")
+            or (self.scope == pscope and self.permission == pname)
+        )
+
+
+class ClsAttr(SColumn, apitype=True):
     def writeperm(self, srlzr):
         return True
 
     def setter(self, srlzr, value):
+        assert srlzr.obj.cls == value
+
+
+class ParentAttr(SResource, apitype=True):
+    def setup_types(self):
+        # Only the root has an empty parent, thus it cannot be set empty
+        super().setup_types()
+        self.types = CRUTypes(ResourceRef, self.types.read, ResourceRef)
+
+    def writeperm(self, srlzr):
+        return True
+
+    def setter(self, srlzr: Serializer, value):
         old_parent = srlzr.obj.parent
         super().setter(srlzr, value)
 
@@ -358,28 +408,35 @@ class _parent_attr(SRR):
             return
 
         if srlzr.obj.parent is None:
-            raise ForbiddenError(_("Resource can not be without a parent."))
+            raise ForbiddenError(gettext("Resource can not be without a parent."))
 
         for parent in (old_parent, srlzr.obj.parent):
             if parent is not None and not parent.has_permission(
                 ResourceScope.manage_children, srlzr.user
             ):
                 raise ForbiddenError(
-                    _("You are not allowed to manage children of resource with id = %d.")
+                    gettext("You are not allowed to manage children of resource with id = %d.")
                     % parent.id
                 )
 
         if not srlzr.obj.check_parent(srlzr.obj.parent):
             raise HierarchyError(
-                _("Resource can not be a child of resource id = %d.") % srlzr.obj.parent.id
+                gettext("Resource can not be a child of resource id = %d.") % srlzr.obj.parent.id
             )
 
 
-class _owner_user_attr(SR):
-    def setter(self, srlzr, value):
+class PrincipalRef(Struct, kw_only=True):
+    id: int
+
+
+class OwnerUserAttr(SRelationship, apitype=True):
+    def get(self, srlzr) -> PrincipalRef:
+        return PrincipalRef(id=srlzr.obj.owner_user_id)
+
+    def set(self, srlzr, value: PrincipalRef, *, create: bool):
         if not srlzr.user.is_administrator:
             raise ForbiddenError("Membership in group 'administrators' required!")
-        return super().setter(srlzr, value)
+        super().set(srlzr, value, create=create)
 
 
 REQUIRED_PERMISSIONS_FOR_ADMINISTATORS = [
@@ -389,21 +446,44 @@ REQUIRED_PERMISSIONS_FOR_ADMINISTATORS = [
 ]
 
 
-class _perms_attr(SP):
-    def setter(self, srlzr, value):
+class ACLRule(Struct, kw_only=True):
+    action: Literal["allow", "deny"]
+    principal: PrincipalRef
+    identity: str
+    scope: str
+    permission: str
+    propagate: bool
+
+    @classmethod
+    def from_model(cls, obj: ResourceACLRule):
+        return cls(
+            action=obj.action,
+            principal=PrincipalRef(id=obj.principal_id),
+            identity=obj.identity,
+            scope=obj.scope,
+            permission=obj.permission,
+            propagate=obj.propagate,
+        )
+
+
+class ACLAttr(SAttribute, apitype=True):
+    def get(self, srlzr) -> List[ACLRule]:
+        return [ACLRule.from_model(itm) for itm in srlzr.obj.acl]
+
+    def set(self, srlzr, value: List[ACLRule], *, create: bool):
         for r in list(srlzr.obj.acl):
             srlzr.obj.acl.remove(r)
 
         for itm in value:
             rule = ResourceACLRule(
-                identity=itm["identity"],
-                scope=itm["scope"],
-                permission=itm["permission"],
-                propagate=itm["propagate"],
-                action=itm["action"],
+                identity=itm.identity,
+                scope=itm.scope,
+                permission=itm.permission,
+                propagate=itm.propagate,
+                action=itm.action,
             )
 
-            rule.principal = Principal.filter_by(id=itm["principal"]["id"]).one()
+            rule.principal = Principal.filter_by(id=itm.principal.id).one()
 
             srlzr.obj.acl.append(rule)
 
@@ -417,7 +497,7 @@ class _perms_attr(SP):
                         if p in perms:
                             continue
                         raise ValidationError(
-                            message=_(
+                            message=gettext(
                                 "Unable to revoke '{s}: {p}' permission for '{u}' "
                                 "as the user belongs to the administrators group. "
                                 "Administrators must always have ability to "
@@ -427,78 +507,50 @@ class _perms_attr(SP):
                     else:
                         assert False
 
-    def getter(self, srlzr):
-        result = []
 
-        for o in srlzr.obj.acl:
-            result.append(
-                {
-                    "action": o.action,
-                    "principal": dict(id=o.principal_id),
-                    "identity": o.identity,
-                    "scope": o.scope,
-                    "permission": o.permission,
-                    "propagate": o.propagate,
-                }
-            )
-
-        return result
-
-
-class _description_attr(SP):
+class DescriptionAttr(SColumn, apitype=True):
     def setter(self, srlzr, value):
         if value is not None:
             value = sanitize(value)
         super().setter(srlzr, value)
 
 
-class _children_attr(SP):
-    def getter(self, srlzr):
+class ChildrenAttr(SAttribute, apitype=True):
+    def get(self, srlzr) -> bool:
         return len(srlzr.obj.children) > 0
 
 
-class _interfaces_attr(SP):
-    def getter(self, srlzr):
+class InterfacesAttr(SAttribute, apitype=True):
+    def get(self, srlzr) -> List[str]:
         return [i.getName() for i in srlzr.obj.provided_interfaces()]
 
 
-class _scopes_attr(SP):
-    def getter(self, srlzr):
+class ScopesAttr(SAttribute, apitype=True):
+    def get(self, srlzr) -> List[str]:
         return list(srlzr.obj.scope.keys())
 
 
-_scp = ResourceScope
-
-
-def _ro(c):
-    return c(read=_scp.read, write=None, depth=2)
-
-
-def _rw(c):
-    return c(read=_scp.read, write=_scp.update, depth=2)
-
-
-class ResourceSerializer(Serializer):
+class ResourceSerializer(Serializer, apitype=True):
     identity = Resource.identity
     resclass = Resource
 
-    id = _ro(SP)
-    cls = _ro(SP)
-    creation_date = _ro(SP)
+    id = SColumn(read=ResourceScope.read, write=None)
+    cls = ClsAttr(read=ResourceScope.read, write=None, required=False)
+    creation_date = SColumn(read=ResourceScope.read, write=None)
 
-    parent = _rw(_parent_attr)
-    owner_user = _rw(_owner_user_attr)
+    parent = ParentAttr(read=ResourceScope.read, write=ResourceScope.update)
+    owner_user = OwnerUserAttr(read=ResourceScope.read, write=ResourceScope.update, required=False)
 
-    permissions = _perms_attr(read=_scp.read, write=_scp.change_permissions)
+    permissions = ACLAttr(read=ResourceScope.read, write=ResourceScope.change_permissions)
 
-    keyname = _rw(SP)
-    display_name = _rw(SP)
+    keyname = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    display_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
-    description = _description_attr(read=ResourceScope.read, write=ResourceScope.update)
+    description = DescriptionAttr(read=ResourceScope.read, write=ResourceScope.update)
 
-    children = _ro(_children_attr)
-    interfaces = _ro(_interfaces_attr)
-    scopes = _ro(_scopes_attr)
+    children = ChildrenAttr(read=ResourceScope.read, write=None)
+    interfaces = InterfacesAttr(read=ResourceScope.read, write=None)
+    scopes = ScopesAttr(read=ResourceScope.read, write=None)
 
     def deserialize(self, *args, **kwargs):
         # As the test for uniqueness within group is dependent on two attributes
@@ -525,56 +577,6 @@ class ResourceSerializer(Serializer):
 
         if self.obj.id is None:
             env.resource.quota_check({self.obj.cls: 1})
-
-
-class ResourceACLRule(Base):
-    __tablename__ = "resource_acl_rule"
-
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    principal_id = db.Column(db.ForeignKey(Principal.id), primary_key=True)
-
-    identity = db.Column(db.Unicode, primary_key=True, default="")
-    identity.__doc__ = """
-        Тип ресурса для которого действует это правило. Пустая строка
-        означает, что оно действует для всех типов ресурсов."""
-
-    # Permission for which this rule is applicable. Empty line means
-    # full set of permissions for all types of resources.
-    scope = db.Column(db.Unicode, primary_key=True, default="")
-    permission = db.Column(db.Unicode, primary_key=True, default="")
-
-    propagate = db.Column(db.Boolean, primary_key=True, default=True)
-    propagate.__doc__ = """
-        Следует ли распространять действие этого правила на дочерние ресурсы
-        или оно действует только на ресурс в котором указано."""
-
-    action = db.Column(db.Unicode, nullable=False, default=True)
-    action.__doc__ = """
-        Действие над правом: allow (разрешение) или deny (запрет). При этом
-        правила запрета имеют приоритет над разрешениями."""
-
-    resource = db.relationship(Resource, backref=db.backref("acl", cascade="all, delete-orphan"))
-
-    principal = db.relationship(Principal)
-
-    def cmp_user(self, user):
-        principal = self.principal
-        return (isinstance(principal, User) and principal.compare(user)) or (
-            isinstance(principal, Group) and principal.is_member(user)
-        )
-
-    def cmp_identity(self, identity):
-        return (self.identity == "") or (self.identity == identity)
-
-    def cmp_permission(self, permission):
-        pname = permission.name
-        pscope = permission.scope.identity
-
-        return (
-            (self.scope == "" and self.permission == "")
-            or (self.scope == pscope and self.permission == "")
-            or (self.scope == pscope and self.permission == pname)
-        )
 
 
 @Principal.on_find_references.handler
@@ -605,7 +607,7 @@ def _on_find_references(event):
 
 class ResourceGroup(Resource):
     identity = "resource_group"
-    cls_display_name = _("Resource group")
+    cls_display_name = gettext("Resource group")
 
     @classmethod
     def check_parent(cls, parent):

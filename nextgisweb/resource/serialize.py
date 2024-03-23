@@ -1,169 +1,71 @@
-import sys
+from __future__ import annotations
 
-from zope.interface import Interface, implementer
+import re
+from typing import Any, ClassVar, Literal, Mapping, Tuple, Type, Union, get_type_hints
+from warnings import warn
 
-from nextgisweb.env.model import BaseClass
+from msgspec import UNSET, Struct, UnsetType, defstruct
+
 from nextgisweb.lib.registry import dict_registry
 
+from nextgisweb.auth import User
 from nextgisweb.core.exception import IUserException
 
+from . import model
 from .exception import AttributeUpdateForbidden
+from .permission import Permission
+from .scope import ResourceScope
 
 
-class SerializerBase:
-    def __init__(self, obj, user, data=None):
-        self.obj = obj
-        self.user = user
-
-        if data is None:
-            self.data = dict()
-            self.keys = None
-        else:
-            self.data = data
-            self.keys = set()
-
-    def is_applicable(self):
-        pass
-
-    def serialize(self):
-        pass
-
-    def deserialize(self):
-        pass
-
-    def mark(self, *keys):
-        self.keys.update(keys)
-
-    def has_permission(self, permission):
-        return self.obj.has_permission(permission, self.user)
-
-
-class ISerializedAttribute(Interface):
-    def bind(self, srlzrcls, attrname):
-        pass
-
-    def serialize(self, srlzr):
-        pass
-
-    def deserialize(self, srlzr):
-        pass
-
-
-@implementer(ISerializedAttribute)
-class SerializedProperty:
-    def __init__(self, read=None, write=None, scope=None, depth=1):
-        self.read = read
-        self.write = write
-        self.scope = scope
-
-        self.srlzrcls = None
-        self.attrname = None
-
-        self.__order__ = len(sys._getframe(depth).f_locals)
-
-    def bind(self, srlzrcls, attrname):
-        self.srlzrcls = srlzrcls
-        self.attrname = attrname
-
-        if not self.scope:
-            self.scope = self.srlzrcls.resclass
-
-    def readperm(self, srlzr):
-        return self.read and srlzr.has_permission(self.read)
-
-    def writeperm(self, srlzr):
-        return self.write and srlzr.has_permission(self.write)
-
-    def getter(self, srlzr):
-        return getattr(srlzr.obj, self.attrname)
-
-    def setter(self, srlzr, value):
-        setattr(srlzr.obj, self.attrname, value)
-
-    def serialize(self, srlzr):
-        if self.readperm(srlzr):
-            srlzr.data[self.attrname] = self.getter(srlzr)
-
-    def deserialize(self, srlzr):
-        if self.writeperm(srlzr):
-            self.setter(srlzr, srlzr.data[self.attrname])
-        else:
-            raise AttributeUpdateForbidden(self)
-
-
-class SerializedRelationship(SerializedProperty):
-    def __init__(self, depth=1, **kwargs):
-        super().__init__(depth=depth + 1, **kwargs)
-
-    def bind(self, srlzrcls, prop):
-        super().bind(srlzrcls, prop)
-        self.relationship = srlzrcls.resclass.__mapper__.relationships[self.attrname]
-
-    def getter(self, srlzr):
-        value = super().getter(srlzr)
-        return (
-            dict(
-                map(
-                    lambda k: (k.name, serval(getattr(value, k.name))),
-                    value.__mapper__.primary_key,
-                )
-            )
-            if value
-            else None
-        )
-
-    def setter(self, srlzr, value):
-        mapper = self.relationship.mapper
-        cls = mapper.class_
-
-        if value is not None:
-            obj = cls.filter_by(
-                **dict(map(lambda k: (k.name, value[k.name]), mapper.primary_key))
-            ).one()
-        else:
-            obj = None
-
-        setattr(srlzr.obj, self.attrname, obj)
-
-
-class SerializedResourceRelationship(SerializedRelationship):
-    def getter(self, srlzr):
-        value = SerializedProperty.getter(self, srlzr)
-        return dict(id=value.id, parent=dict(id=value.parent_id)) if value else None
-
-
-class SerializerMeta(type):
-    def __init__(cls, name, bases, nmspc):
-        super().__init__(name, bases, nmspc)
-
-        proptab = []
-        for prop, sp in nmspc.items():
-            if ISerializedAttribute.providedBy(sp):
-                sp.bind(cls, prop)
-                proptab.append((prop, sp))
-
-        cls.proptab = sorted(proptab, key=lambda x: getattr(x[1], "__order__", 65535))
+class CRUTypes(Struct, frozen=True):
+    create: Any
+    read: Any
+    update: Any
 
 
 @dict_registry
-class Serializer(SerializerBase, metaclass=SerializerMeta):
-    resclass = None
+class Serializer:
+    registry: ClassVar[Mapping[str, Type[Serializer]]]
+    identity: ClassVar[str]
+    resclass: ClassVar[model.Resource]
+    proptab: ClassVar[Tuple[Tuple[str, SAttribute], ...]]
+    apitype: ClassVar[bool]
 
-    def is_applicable(self):
-        return self.resclass and isinstance(self.obj, self.resclass)
+    def __init_subclass__(cls, apitype: bool = False):
+        super().__init_subclass__()
+        cls.check_class_name()
+        cls.apitype = apitype
 
-    def serialize(self):
-        for prop, sp in self.proptab:
-            sp.serialize(self)
+        proptab = []
+        for pn, pv in cls.__dict__.items():
+            if isinstance(pv, SAttribute):
+                pv.bind(cls, pn)
+                proptab.append((pn, pv))
+        cls.proptab = tuple(proptab)
 
-    def deserialize(self):
-        for prop, sp in self.proptab:
-            if prop in self.data and prop not in self.keys:
-                try:
-                    sp.deserialize(self)
-                except Exception as exc:
-                    self.annotate_exception(exc, sp)
-                    raise
+    def __init__(self, obj: model.Resource, user: User, data=None):
+        self.obj = obj
+        self.user = user
+        self.data = dict() if data is None else data
+
+    def is_applicable(self) -> bool:
+        return isinstance(self.obj, self.resclass)
+
+    def serialize(self) -> None:
+        for _, pv in self.proptab:
+            pv.serialize(self)
+
+    def deserialize(self) -> None:
+        for pn, pv in self.proptab:
+            if self.apitype and getattr(self.data, pn, UNSET) is UNSET:
+                continue
+            elif not self.apitype and pn not in self.data:
+                continue
+            try:
+                pv.deserialize(self)
+            except Exception as exc:
+                self.annotate_exception(exc, pv)
+                raise
 
     def annotate_exception(self, exc, sp):
         exc.__srlzr_prprt__ = sp.attrname
@@ -174,73 +76,137 @@ class Serializer(SerializerBase, metaclass=SerializerMeta):
         except TypeError:
             pass
 
+    def has_permission(self, perm: Permission) -> bool:
+        """Test for permission on attached resource"""
+        return self.obj.has_permission(perm, self.user)
 
-class CompositeSerializer(SerializerBase):
-    registry = Serializer.registry
+    @classmethod
+    def types(cls) -> CRUTypes:
+        # Strip the "Serializer" suffix and use as basename
+        base = cls.__name__
+        if base.endswith("Serializer"):
+            base = base[: -len("Serializer")]
 
-    def __init__(self, obj, user, data=None):
-        super().__init__(obj, user, data)
+        fcreate, fread, fupdate = list(), list(), list()
+        for pn, pv in cls.proptab:
+            pt = pv.types
+            if pv.write is not None or (pn == "cls" and cls.identity == "resource"):
+                # FIXME: ResourceSerializer.cls create-only attribute workaround
+                if not getattr(pv, "required", False):
+                    fcreate.append((pn, Union[pt.create, UnsetType], UNSET))
+                else:
+                    fcreate.append((pn, pt.create))
+            if pv.read is not None:
+                if pv.read is ResourceScope.read:
+                    # ResourceScope.read is the minimum required permission,
+                    # without this permission a resource cannot be serialized.
+                    fread.append((pn, pt.read))
+                else:
+                    fread.append((pn, Union[pt.read, UnsetType], UNSET))
+            if pv.write is not None:
+                # Any attribute can be ommited during update
+                fupdate.append((pn, Union[pt.update, UnsetType], UNSET))
 
-        self.members = dict()
-        for ident, mcls in self.registry._dict.items():
-            if data is None or ident in data:
-                mdata = data[ident] if data else None
-                mobj = mcls(obj, user, mdata)
-                if mobj.is_applicable():
-                    self.members[ident] = mobj
-
-    def serialize(self):
-        for ident, mobj in self.members.items():
-            try:
-                mobj.serialize()
-                self.data[ident] = mobj.data
-            except Exception as exc:
-                self.annotate_exception(exc, mobj)
-                raise
-
-    def deserialize(self):
-        for ident, mobj in self.members.items():
-            try:
-                if ident in self.data:
-                    mobj.deserialize()
-            except Exception as exc:
-                self.annotate_exception(exc, mobj)
-                raise
-
-    def annotate_exception(self, exc, mobj):
-        """Adds information about serializer that called the exception to the exception"""
-
-        exc.__srlzr_cls__ = mobj.__class__
-
-        try:
-            error_info = IUserException(exc)
-            error_info.data["serializer"] = mobj.__class__.identity
-        except TypeError:
-            pass
-
-
-def serval(value):
-    if (
-        value is None
-        or isinstance(value, int)
-        or isinstance(value, float)
-        or isinstance(value, str)
-    ):
-        return value
-
-    elif isinstance(value, dict):
-        return dict(map(lambda k, v: (serval(k), serval(v)), value.items()))
-
-    elif isinstance(value, BaseClass):
-        return dict(
-            map(
-                lambda k: (k.name, serval(getattr(value, k.name))),
-                value.__mapper__.primary_key,
-            )
+        skwa: Any = dict(kw_only=True, module=cls.__module__)
+        return CRUTypes(
+            defstruct(f"{base}Create", fcreate, **skwa),
+            defstruct(f"{base}Read", fread, **skwa),
+            defstruct(f"{base}Update", fupdate, **skwa),
         )
 
-    elif hasattr(value, "__iter__"):
-        return map(serval, value)
+    @classmethod
+    def check_class_name(cls):
+        id_camel = re.sub(r"(?:^|_)(\w)", lambda m: m.group(1).upper(), cls.identity)
+        expected = {f"{cls.resclass.__name__}Serializer", f"{id_camel}Serializer"}
 
-    else:
-        raise NotImplementedError()
+        cls_name = cls.__name__
+        if expected and cls_name.lower() not in (e.lower() for e in expected):
+            warn(f"{cls_name} should have one of the following names: {', '.join(expected)}")
+
+
+class SAttribute:
+    apitype: ClassVar[bool] = True
+    ctypes: ClassVar[Union[CRUTypes, None]] = None
+
+    srlzrcls: Type[Serializer]
+    attrname: str
+    types: CRUTypes
+
+    def __init_subclass__(cls, apitype=False) -> None:
+        super().__init_subclass__()
+        cls.apitype = apitype
+        mget, mset = [cls.__dict__.get(m) for m in ("get", "set")]
+        no_setup_types = "setup_types" not in cls.__dict__
+        if apitype and no_setup_types and (mget is not None or mset is not None):
+            tget = _type_from_signature(mget, "return") if mget else None
+            tset = _type_from_signature(mset, "value") if mset else None
+            cls.ctypes = CRUTypes(tset, tget, tset)
+
+    def __init__(
+        self,
+        read: Union[Permission, None] = None,
+        write: Union[Permission, None] = None,
+        required: Union[bool, None] = None,
+    ):
+        self.read = read
+        self.write = write
+        self.required = required
+        if ct := self.ctypes:
+            assert read is None or ct.read is not None
+            assert write is None or ct.update is not None
+
+    def bind(self, srlzrcls: Type[Serializer], attrname: str):
+        self.srlzrcls = srlzrcls
+        self.attrname = attrname
+        self.setup_types()
+
+    def setup_types(self):
+        if self.ctypes:
+            self.types = self.ctypes
+        else:
+            self.types = CRUTypes(Any, Any, Any)
+
+    def readperm(self, srlzr: Serializer) -> bool:
+        return False if ((perm := self.read) is None) else srlzr.has_permission(perm)
+
+    def writeperm(self, srlzr: Serializer) -> bool:
+        return False if ((perm := self.write) is None) else srlzr.has_permission(perm)
+
+    def serialize(self, srlzr: Serializer) -> None:
+        if self.readperm(srlzr):
+            apitype = srlzr.apitype and self.apitype
+            srlzr.data[self.attrname] = self.get(srlzr) if apitype else self.getter(srlzr)
+
+    def deserialize(self, srlzr: Serializer) -> None:
+        if self.writeperm(srlzr):
+            if srlzr.apitype and self.apitype:
+                value = getattr(srlzr.data, self.attrname)
+                assert value is not UNSET
+                self.set(srlzr, value, create=srlzr.obj.id is None)
+            else:
+                self.setter(srlzr, srlzr.data[self.attrname])
+        else:
+            raise AttributeUpdateForbidden(self)
+
+    # Modern (apitype == True)
+
+    def get(self, srlzr: Serializer) -> Any:
+        return getattr(srlzr.obj, self.attrname)
+
+    def set(self, srlzr: Serializer, value: Any, *, create: bool):
+        setattr(srlzr.obj, self.attrname, value)
+
+    # Legacy (apitype == False)
+
+    def getter(self, srlzr: Serializer) -> Any:
+        return getattr(srlzr.obj, self.attrname)
+
+    def setter(self, srlzr: Serializer, value: Any) -> None:
+        setattr(srlzr.obj, self.attrname, value)
+
+
+def _type_from_signature(fn, param: Literal["value", "return"]) -> Any:
+    hints = get_type_hints(fn)
+    type = hints.get(param)
+    assert type is not None, f"type annotation missing: {param}"
+    return type

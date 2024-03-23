@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Union, cast, get_args
 
 import zope.event
 from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
@@ -17,12 +17,13 @@ from nextgisweb.jsrealm import TSExport
 from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
+from .composite import CompositeSerializer
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import HierarchyError, QuotaExceeded
-from .model import Resource, ResourceSerializer
+from .model import Resource
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
+from .sattribute import ResourceRefOptional, ResourceRefWithParent
 from .scope import ResourceScope, Scope
-from .serialize import CompositeSerializer
 from .view import resource_factory
 
 PERM_READ = ResourceScope.read
@@ -93,28 +94,39 @@ def blueprint(request) -> Blueprint:
     )
 
 
-def item_get(context, request) -> JSONType:
+if TYPE_CHECKING:
+    CompositCreate = Struct
+    CompositeRead = Struct
+    CompositeUpdate = Struct
+else:
+    composite = CompositeSerializer.types()
+    CompositCreate = composite.create
+    CompositeRead = composite.read
+    CompositeUpdate = composite.update
+
+
+def item_get(context, request) -> CompositeRead:
+    """Read resource"""
     request.resource_permission(PERM_READ)
 
-    serializer = CompositeSerializer(context, request.user)
-    serializer.serialize()
-
-    return serializer.data
+    serializer = CompositeSerializer(user=request.user)
+    return serializer.serialize(context, CompositeRead)
 
 
-def item_put(context, request) -> JSONType:
+def item_put(context, request, body: CompositeUpdate) -> EmptyObject:
+    """Update resource"""
     request.resource_permission(PERM_READ)
 
-    serializer = CompositeSerializer(context, request.user, request.json_body)
+    serializer = CompositeSerializer(user=request.user)
     with DBSession.no_autoflush:
-        result = serializer.deserialize()
+        serializer.deserialize(context, body)
 
     zope.event.notify(AfterResourcePut(context, request))
 
-    return result
-
 
 def item_delete(context, request) -> EmptyObject:
+    """Delete resource"""
+
     def delete(obj):
         request.resource_permission(PERM_DELETE, obj)
         request.resource_permission(PERM_MCHILDREN, obj)
@@ -133,10 +145,12 @@ def item_delete(context, request) -> EmptyObject:
     DBSession.flush()
 
 
-def collection_get(request) -> JSONType:
-    parent = request.params.get("parent")
-    parent = int(parent) if parent else None
-
+def collection_get(
+    request,
+    *,
+    parent: Union[int, None] = None,
+) -> AsJSON[List[CompositeRead]]:
+    """Read children resources"""
     query = (
         Resource.query()
         .filter_by(parent_id=parent)
@@ -144,69 +158,69 @@ def collection_get(request) -> JSONType:
         .options(db.subqueryload(Resource.acl))
     )
 
+    serializer = CompositeSerializer(user=request.user)
     result = list()
     for resource in query:
         if resource.has_permission(PERM_READ, request.user):
-            serializer = CompositeSerializer(resource, request.user)
-            serializer.serialize()
-            result.append(serializer.data)
+            result.append(serializer.serialize(resource, CompositeRead))
 
-    return result
+    serializer = CompositeSerializer(user=request.user)
+    check_perm = lambda res, u=request.user: res.has_permission(PERM_READ, u)
+    return [serializer.serialize(res, CompositeRead) for res in query if check_perm(res)]
 
 
-def collection_post(request) -> JSONType:
+def collection_post(
+    request,
+    body: CompositCreate,
+    *,
+    cls: Union[str, UnsetType] = UNSET,
+    parent: Union[int, UnsetType] = UNSET,
+) -> Annotated[ResourceRefWithParent, StatusCode(201)]:
+    """Create resource"""
     request.env.core.check_storage_limit()
 
-    data = dict(request.json_body)
+    if body.resource is UNSET:
+        resource_type = CompositCreate.__annotations__["resource"]
+        resource_struct = get_args(resource_type)[0]
+        body.resource = resource_struct()
 
-    if "resource" not in data:
-        data["resource"] = dict()
+    resource = body.resource
 
-    qparent = request.params.get("parent")
-    if qparent is not None:
-        data["resource"]["parent"] = dict(id=int(qparent))
+    if cls is not UNSET:
+        resource.cls = cls
 
-    cls = request.params.get("cls")
-    if cls is not None:
-        data["resource"]["cls"] = cls
-
-    if "parent" not in data["resource"]:
+    if parent is not UNSET:
+        resource.parent = dict(id=parent)
+    elif resource.parent is UNSET:
         raise ValidationError(_("Resource parent required."))
 
-    if "cls" not in data["resource"]:
+    resource_cls = resource.cls
+
+    if resource_cls is UNSET:
         raise ValidationError(message=_("Resource class required."))
-
-    if data["resource"]["cls"] not in Resource.registry:
-        raise ValidationError(_("Unknown resource class '%s'.") % data["resource"]["cls"])
-
+    elif resource_cls not in Resource.registry:
+        raise ValidationError(_("Unknown resource class '%s'.") % resource_cls)
     elif (
-        data["resource"]["cls"] in request.env.resource.options["disabled_cls"]
-        or request.env.resource.options["disable." + data["resource"]["cls"]]
+        resource_cls in request.env.resource.options["disabled_cls"]
+        or request.env.resource.options["disable." + resource_cls]
     ):
-        raise ValidationError(message=_("Resource class '%s' disabled.") % data["resource"]["cls"])
+        raise ValidationError(_("Resource class '%s' disabled.") % resource_cls)
 
-    cls = Resource.registry[data["resource"]["cls"]]
-    resource = cls(owner_user=request.user)
-
-    serializer = CompositeSerializer(resource, request.user, data)
-    serializer.members["resource"].mark("cls")
+    resource = Resource.registry[resource_cls](owner_user=request.user)
+    serializer = CompositeSerializer(user=request.user)
 
     resource.persist()
     with DBSession.no_autoflush:
-        serializer.deserialize()
+        serializer.deserialize(resource, body)
 
     DBSession.flush()
 
-    result = dict(id=resource.id)
     request.audit_context("resource", resource.id)
-
-    # TODO: Parent is returned only for compatibility
-    result["parent"] = dict(id=resource.parent.id)
-
     zope.event.notify(AfterResourceCollectionPost(resource, request))
 
     request.response.status_code = 201
-    return result
+    parent_ref = ResourceRefOptional(id=resource.parent.id)
+    return ResourceRefWithParent(id=resource.id, parent=parent_ref)
 
 
 if TYPE_CHECKING:
@@ -245,7 +259,7 @@ def permission(
     resource,
     request,
     *,
-    user: Optional[UserID] = None,
+    user: Union[UserID, None] = None,
 ) -> EffectivePermissions:
     """Get resource effective permissions"""
     request.resource_permission(PERM_READ)
@@ -356,14 +370,12 @@ def permission_explain(request) -> JSONType:
     return _explain_jsonify(resolver)
 
 
-def search(request) -> JSONType:
-    smap = dict(resource=ResourceSerializer, full=CompositeSerializer)
-
-    smode = request.GET.pop("serialization", None)
-    smode = smode if smode in smap else "resource"
+def search(
+    request,
+    *,
+    serialization: Literal["resource", "full"] = "resource",
+) -> AsJSON[List[CompositeRead]]:
     principal_id = request.GET.pop("owner_user__id", None)
-
-    scls = smap.get(smode)
 
     query = DBSession.query(Resource)
     if "parent_id__recursive" in request.GET:
@@ -378,12 +390,6 @@ def search(request) -> JSONType:
                 DBSession.query(Resource.id).filter(Resource.parent_id == rquery.c.id)
             )
             query = query.filter(exists().where(Resource.id == rquery.c.id))
-
-    def serialize(resource, user):
-        serializer = scls(resource, user)
-        serializer.serialize()
-        data = serializer.data
-        return {Resource.identity: data} if smode == "resource" else data
 
     filter_ = []
     for k, v in request.GET.items():
@@ -411,12 +417,10 @@ def search(request) -> JSONType:
         owner = User.filter_by(principal_id=int(principal_id)).one()
         query = query.filter_by(owner_user=owner)
 
-    result = list()
-    for resource in query:
-        if resource.has_permission(PERM_READ, request.user):
-            result.append(serialize(resource, request.user))
-
-    return result
+    cs_keys = None if serialization == "full" else ("resource",)
+    serializer = CompositeSerializer(keys=cs_keys, user=request.user)
+    check_perm = lambda res, u=request.user: res.has_permission(PERM_READ, u)
+    return [serializer.serialize(res, CompositeRead) for res in query if check_perm(res)]
 
 
 class ResourceVolume(Struct, kw_only=True):
