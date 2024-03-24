@@ -5,6 +5,7 @@ from typing import ClassVar, List, Literal, Tuple, Type, Union
 
 from msgspec import Struct
 from sqlalchemy import event, func, text
+from typing_extensions import Annotated
 
 from nextgisweb.env import Base, DBSession, env, gettext
 from nextgisweb.lib import db
@@ -14,6 +15,7 @@ from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.auth import Group, OnFindReferencesData, Principal, User
 from nextgisweb.core.exception import ForbiddenError, ValidationError
+from nextgisweb.jsrealm import TSExport
 
 from .exception import DisplayNameNotUnique, HierarchyError
 from .interface import IResourceAdapter, interface_registry
@@ -383,11 +385,17 @@ class ResourceACLRule(Base):
         )
 
 
+ResourceCls = Annotated[str, TSExport("ResourceCls")]
+
+
 class ClsAttr(SColumn, apitype=True):
     def writeperm(self, srlzr):
         return True
 
-    def setter(self, srlzr, value):
+    def get(self, srlzr) -> ResourceCls:
+        return super().get(srlzr)
+
+    def set(self, srlzr, value: ResourceCls, *, create: bool):
         assert srlzr.obj.cls == value
 
 
@@ -400,9 +408,9 @@ class ParentAttr(SResource, apitype=True):
     def writeperm(self, srlzr):
         return True
 
-    def setter(self, srlzr: Serializer, value):
+    def set(self, srlzr: Serializer, value, *, create: bool):
         old_parent = srlzr.obj.parent
-        super().setter(srlzr, value)
+        super().set(srlzr, value, create=create)
 
         if old_parent == srlzr.obj.parent:
             return
@@ -447,7 +455,7 @@ REQUIRED_PERMISSIONS_FOR_ADMINISTATORS = [
 
 
 class ACLRule(Struct, kw_only=True):
-    action: Literal["allow", "deny"]
+    action: Annotated[Literal["allow", "deny"], TSExport("ACLRuleAction")]
     principal: PrincipalRef
     identity: str
     scope: str

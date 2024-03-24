@@ -19,14 +19,17 @@ class SColumn(SAttribute, apitype=True):
         super().bind(srlzrcls, attrname)
 
     def setup_types(self):
-        type = self.column.type.python_type
-        if type not in (str, int, float, bool, date, datetime):
-            raise NotImplementedError(f"{self.column} has unsupported type: {type}")
+        if self.ctypes is not None:
+            self.types = self.ctypes
+        else:
+            type = self.column.type.python_type
+            if type not in (str, int, float, bool, date, datetime):
+                raise NotImplementedError(f"{self.column} has unsupported type: {type}")
 
-        if self.column.nullable:
-            type = Union[type, None]
+            if self.column.nullable:
+                type = Union[type, None]
 
-        self.types = CRUTypes(type, type, type)
+            self.types = CRUTypes(type, type, type)
 
 
 class RelationshipRef(Struct, kw_only=True):
