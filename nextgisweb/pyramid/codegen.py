@@ -135,6 +135,7 @@ def client_codegen(self: PyramidComponent):
             "prettier/prettier",
             "import/newline-after-import",
             "import/order",
+            "@typescript-eslint/no-explicit-any",
         )
     ] + [""]
 

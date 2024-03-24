@@ -85,7 +85,7 @@ class TSGenerator:
         elif otype is NoneType:
             result = TSPrimitive(keyword="null", **defaults)
         elif otype is Any:
-            result = TSPrimitive(keyword="unknown", **defaults)
+            result = TSPrimitive(keyword="any", **defaults)
         elif otype in (int, float):
             result = TSPrimitive(keyword="number", comment=otype.__name__, **defaults)
         elif otype is bool:
