@@ -22,27 +22,27 @@ msgstr "Вложение с id = %d не найдено в объекте с id 
 msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:29
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:33
 msgid "Draw the geometry on the map to visualize the attachments to the objects"
 msgstr "Нарисуйте геометрию на карте, чтобы отобразить вложения к объектам."
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:118
-msgid "Download"
-msgstr "Скачать"
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:130
+msgid "Object: "
+msgstr "Объект: "
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:129
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:139
 msgid "Identify object"
 msgstr "Идентифицировать объект"
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:150
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:160
 msgid "Attachments: "
 msgstr "Вложений: "
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:177
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:187
 msgid "No attachments"
 msgstr "Нет вложений"
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:243
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:253
 msgid "Download all attachments"
 msgstr "Скачать все вложения"
 

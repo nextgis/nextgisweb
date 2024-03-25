@@ -15,6 +15,7 @@ interface FeatureLayerQuery {
     like?: string;
     ilike?: string;
     intersects?: string;
+    label?: boolean;
 }
 
 export interface FetchFeaturesOptions {
@@ -29,6 +30,7 @@ export interface FetchFeaturesOptions {
     cache?: boolean;
     ilike?: string;
     like?: string;
+    label?: boolean;
 }
 
 export function fetchFeaturesItems({
@@ -43,6 +45,7 @@ export function fetchFeaturesItems({
     cache,
     like,
     ilike,
+    label,
 }: FetchFeaturesOptions) {
     const query: FeatureLayerQuery = {
         geom: "no",
@@ -66,6 +69,10 @@ export function fetchFeaturesItems({
 
     if (intersects) {
         query.intersects = intersects;
+    }
+
+    if (label) {
+        query.label = true;
     }
 
     return route("feature_layer.feature.collection", resourceId).get<

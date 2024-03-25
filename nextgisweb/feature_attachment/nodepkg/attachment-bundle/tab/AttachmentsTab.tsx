@@ -22,7 +22,11 @@ import type { DojoDisplay, WebmapItemConfig } from "@nextgisweb/webmap/type";
 import type { FeatureAttachment } from "../../type";
 import { fileSizeToString } from "../../utils";
 
-import { DownloadOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import {
+    DownloadOutlined,
+    ExpandOutlined,
+    InfoCircleOutlined,
+} from "@ant-design/icons";
 
 import "./AttachmentsTab.less";
 
@@ -38,6 +42,7 @@ interface AttachmentsTabProps {
 interface FeatureAttachmentView {
     featureId: number;
     attachment: FeatureAttachment;
+    label?: string;
 }
 
 interface LayerItemView {
@@ -74,6 +79,7 @@ interface AttachmentsListDataItem {
     description: string | undefined;
     featureId: number;
     layerId: number;
+    label?: string;
 }
 
 const attachmentsToDataList = (
@@ -87,6 +93,7 @@ const attachmentsToDataList = (
         description: l.attachment.description,
         featureId: l.featureId,
         layerId,
+        label: l.label,
     }));
 };
 
@@ -101,34 +108,37 @@ const makeListItem = (
         aid: item.id,
     });
 
+    const label = item.label || `#${item.featureId}`;
+
     return (
         <List.Item key={item.id}>
             <div className="attachment">
-                <div className="name" title={item.name}>
-                    {item.name}
-                </div>
-                <div className="extra">
+                <div className="row" title={item.name}>
+                    <div className="name">{item.name}</div>
                     <div>
-                        {item.size}{" "}
                         <Button
                             shape="circle"
                             type="text"
                             target="_blank"
                             href={href}
-                            title={gettext("Download")}
+                            title={`${gettext("Download")} ${item.size}`}
                         >
                             <DownloadOutlined />
                         </Button>
                     </div>
+                </div>
+                <div className="row" title={gettext("Object: ") + label}>
+                    <div className="name">{label}</div>
                     <div>
                         <Button
+                            shape="circle"
                             type="text"
                             onClick={() =>
                                 identifyFeature(item.featureId, item.layerId)
                             }
                             title={gettext("Identify object")}
                         >
-                            #{item.featureId}
+                            <ExpandOutlined />
                         </Button>
                     </div>
                 </div>
@@ -267,6 +277,7 @@ const fetchFeaturesAttachments = async (
                 intersects: geomWKT,
                 fields: [],
                 extensions: "attachment",
+                label: true,
             })
         );
     });
@@ -278,14 +289,16 @@ const fetchFeaturesAttachments = async (
     parts.forEach((featuresInfo: FeatureItem[], index) => {
         const layerInfo = layersInfo[index];
         const attachments: FeatureAttachmentView[] = [];
-        featuresInfo.forEach((f) => {
+        featuresInfo.forEach((f: FeatureItem) => {
             if (f.extensions && f.extensions.attachment) {
                 const attachmentsInfo = f.extensions
                     .attachment as FeatureAttachment[];
-                const attachmentsView = attachmentsInfo.map((a) => ({
-                    featureId: f.id,
-                    attachment: a,
-                }));
+                const attachmentsView: FeatureAttachmentView[] =
+                    attachmentsInfo.map((a: FeatureAttachment) => ({
+                        featureId: f.id,
+                        attachment: a,
+                        label: f.label,
+                    }));
                 attachments.push(...attachmentsView);
             }
         });
