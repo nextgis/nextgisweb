@@ -1,20 +1,23 @@
 import re
+from typing import List, Union
 
-from nextgisweb.env import Base, _
+from msgspec import Meta, Struct
+from typing_extensions import Annotated
+
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib import db
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.resource import Resource, ResourceGroup, Serializer, ServiceScope
-from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import Resource, ResourceGroup, SAttribute, Serializer, ServiceScope
 
 Base.depends_on("resource", "feature_layer")
 
-keyname_pattern = re.compile(r"^[A-Za-z][\w]*$")
+KEYNAME_RE = re.compile(r"^[A-Za-z][\w]*$")
 
 
 class Service(Base, Resource):
     identity = "wfsserver_service"
-    cls_display_name = _("WFS service")
+    cls_display_name = gettext("WFS service")
 
     __scope__ = ServiceScope
 
@@ -50,47 +53,54 @@ class Layer(Base):
         ),
     )
 
-    def to_dict(self):
-        return dict(
-            keyname=self.keyname,
-            display_name=self.display_name,
-            maxfeatures=self.maxfeatures,
-            resource_id=self.resource_id,
-        )
-
     @db.validates("keyname")
     def _validate_keyname(self, key, value):
-        if not keyname_pattern.match(value):
+        if not KEYNAME_RE.match(value):
             raise ValidationError("Invalid keyname: %s" % value)
 
         return value
 
 
-class _layers_attr(SP):
-    def getter(self, srlzr):
-        return [layer.to_dict() for layer in srlzr.obj.layers]
+class WFSServerLayer(Struct, kw_only=True):
+    resource_id: int
+    keyname: Annotated[str, Meta(pattern=KEYNAME_RE.pattern)]
+    display_name: Annotated[str, Meta(min_length=1)]
+    maxfeatures: Union[Annotated[int, Meta(ge=1)], None]
 
-    def setter(self, srlzr, value):
+
+class LayersAttr(SAttribute, apitype=True):
+    def get(self, srlzr) -> List[WFSServerLayer]:
+        return [
+            WFSServerLayer(
+                resource_id=layer.resource_id,
+                keyname=layer.keyname,
+                display_name=layer.display_name,
+                maxfeatures=layer.maxfeatures,
+            )
+            for layer in srlzr.obj.layers
+        ]
+
+    def set(self, srlzr, value: List[WFSServerLayer], *, create: bool):
         m = dict((layer.resource_id, layer) for layer in srlzr.obj.layers)
         keep = set()
         for lv in value:
-            if lv["resource_id"] in m:
-                lo = m[lv["resource_id"]]
-                keep.add(lv["resource_id"])
+            if lv.resource_id in m:
+                lo = m[lv.resource_id]
+                keep.add(lv.resource_id)
             else:
-                lo = Layer(resource_id=lv["resource_id"])
+                lo = Layer(resource_id=lv.resource_id)
                 srlzr.obj.layers.append(lo)
 
             for a in ("keyname", "display_name", "maxfeatures"):
-                setattr(lo, a, lv[a])
+                setattr(lo, a, getattr(lv, a))
 
         for lrid, lo in m.items():
             if lrid not in keep:
                 srlzr.obj.layers.remove(lo)
 
 
-class ServiceSerializer(Serializer):
+class ServiceSerializer(Serializer, apitype=True):
     identity = Service.identity
     resclass = Service
 
-    layers = _layers_attr(read=ServiceScope.connect, write=ServiceScope.configure)
+    layers = LayersAttr(read=ServiceScope.connect, write=ServiceScope.configure)
