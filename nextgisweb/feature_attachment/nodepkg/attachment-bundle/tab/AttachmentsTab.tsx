@@ -46,6 +46,8 @@ interface LayerItemView {
     attachments: FeatureAttachmentView[];
 }
 
+type IdentifyFeatureFunc = (featureId: number, layerId: number) => void;
+
 const getLayersInfo = (display: DojoDisplay) => {
     const checked = display.webmapStore.checked;
     const itemConfig = display.getItemConfig();
@@ -71,26 +73,34 @@ interface AttachmentsListDataItem {
     name: string;
     description: string | undefined;
     featureId: number;
+    layerId: number;
 }
 
 const attachmentsToDataList = (
     layerItemView: LayerItemView
 ): AttachmentsListDataItem[] => {
+    const layerId = layerItemView.layerId;
     return layerItemView.attachments.map((l: FeatureAttachmentView) => ({
         id: l.attachment.id,
         size: fileSizeToString(l.attachment.size),
         name: l.attachment.name,
         description: l.attachment.description,
         featureId: l.featureId,
+        layerId,
     }));
 };
 
-const makeListItem = (item: AttachmentsListDataItem, layerId: number) => {
+const makeListItem = (
+    item: AttachmentsListDataItem,
+    layerId: number,
+    identifyFeature: IdentifyFeatureFunc
+) => {
     const href = routeURL("feature_attachment.download", {
         id: layerId,
         fid: item.featureId,
         aid: item.id,
     });
+
     return (
         <List.Item key={item.id}>
             <div className="attachment">
@@ -98,10 +108,27 @@ const makeListItem = (item: AttachmentsListDataItem, layerId: number) => {
                     {item.name}
                 </div>
                 <div className="extra">
-                    <div>{item.size}</div>
                     <div>
-                        <Button type="text" target="_blank" href={href}>
+                        {item.size}{" "}
+                        <Button
+                            shape="circle"
+                            type="text"
+                            target="_blank"
+                            href={href}
+                            title={gettext("Download")}
+                        >
                             <DownloadOutlined />
+                        </Button>
+                    </div>
+                    <div>
+                        <Button
+                            type="text"
+                            onClick={() =>
+                                identifyFeature(item.featureId, item.layerId)
+                            }
+                            title={gettext("Identify object")}
+                        >
+                            #{item.featureId}
                         </Button>
                     </div>
                 </div>
@@ -110,7 +137,10 @@ const makeListItem = (item: AttachmentsListDataItem, layerId: number) => {
     );
 };
 
-const makeAttachmentsList = (layerItemView: LayerItemView): ReactElement => {
+const makeAttachmentsList = (
+    layerItemView: LayerItemView,
+    identifyFeature: IdentifyFeatureFunc
+): ReactElement => {
     const data = attachmentsToDataList(layerItemView);
     let header;
     if (data.length) {
@@ -141,20 +171,29 @@ const makeAttachmentsList = (layerItemView: LayerItemView): ReactElement => {
                     xl: 4,
                     xxl: 4,
                 }}
-                renderItem={(item) => makeListItem(item, layerItemView.layerId)}
+                renderItem={(item) =>
+                    makeListItem(item, layerItemView.layerId, identifyFeature)
+                }
                 locale={{ emptyText: gettext("No attachments") }}
             />
         </div>
     );
 };
 
-const layerItems = (layerAttachments: LayerItemView[] | undefined) => {
+const layerItems = (
+    layerAttachments: LayerItemView[] | undefined,
+    display: DojoDisplay
+) => {
     if (!layerAttachments) {
         return undefined;
     }
 
+    const identifyFeature = (featureId: number, layerId: number) => {
+        display.identify.identifyFeatureByAttrValue(layerId, "id", featureId);
+    };
+
     return layerAttachments?.map((l) => {
-        return makeAttachmentsList(l);
+        return makeAttachmentsList(l, identifyFeature);
     });
 };
 
@@ -215,6 +254,7 @@ const fetchFeaturesAttachments = async (
         return [];
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promises: Promise<any[]>[] = [];
     const layersInfoById = getLayersInfo(display);
 
@@ -290,8 +330,8 @@ function AttachmentsTab({ display }: AttachmentsTabProps) {
     }, [geomWKT]);
 
     const listAttachments = useMemo(
-        () => layerItems(layerAttachments),
-        [layerAttachments]
+        () => layerItems(layerAttachments, display),
+        [layerAttachments, display]
     );
 
     let content, buttonBulkLoad;

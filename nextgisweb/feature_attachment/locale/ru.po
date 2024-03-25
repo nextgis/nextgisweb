@@ -1,7 +1,7 @@
 #: amd/ngw-feature-attachment/DisplayWidget.js:9
 #: nodepkg/attachment-bundle/ol-control/control.js:14
 #: nodepkg/attachment-bundle/ol-control/control.js:30
-#: nodepkg/attachment-bundle/plugin/plugin.ts:16
+#: nodepkg/attachment-bundle/plugin/plugin.ts:14
 #: nodepkg/attachment-editor/index.ts:8
 msgid "Attachments"
 msgstr "Вложения"
@@ -26,15 +26,23 @@ msgstr "Вложение могло быть удалено, либо допущ
 msgid "Draw the geometry on the map to visualize the attachments to the objects"
 msgstr "Нарисуйте геометрию на карте, чтобы отобразить вложения к объектам."
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:120
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:118
+msgid "Download"
+msgstr "Скачать"
+
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:129
+msgid "Identify object"
+msgstr "Идентифицировать объект"
+
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:150
 msgid "Attachments: "
 msgstr "Вложений: "
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:145
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:177
 msgid "No attachments"
 msgstr "Нет вложений"
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:204
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:243
 msgid "Download all attachments"
 msgstr "Скачать все вложения"
 
@@ -152,7 +160,7 @@ msgstr "Не удалось определить идентификатор об
 msgid "File '{}' isn't found in the archive."
 msgstr "Файл '{}' не найден в архиве."
 
-#: view.py:20 view.py:41
+#: view.py:20 view.py:43
 msgid "Manage attachments"
 msgstr "Управление вложениями"
 

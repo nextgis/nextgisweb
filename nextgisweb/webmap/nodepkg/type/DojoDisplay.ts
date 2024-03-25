@@ -63,6 +63,12 @@ interface DojoDisplayIdentifyPopup {
 
 export interface DojoDisplayIdentify {
     _popup: DojoDisplayIdentifyPopup;
+    identifyFeatureByAttrValue: (
+        layerId: number,
+        attribute: string,
+        value: string | number | boolean,
+        zoom?: number
+    ) => PromiseLike<boolean>;
     reset: () => void;
 }
 
