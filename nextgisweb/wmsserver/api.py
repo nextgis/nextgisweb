@@ -237,21 +237,19 @@ def _get_map(obj, params, request):
         raise ValidationError("Style not found.", data=dict(code="StyleNotDefined"))
     if p_srs is None:
         raise ValidationError(message="CRS/SRS parameter required.")
+
+    img_params = dict()
     if p_bgcolor:
         r, g, b = _validate_bgcolor(p_bgcolor)
         bgcolor = (r, g, b)
     else:
         bgcolor = (255, 255, 255)
-
-    if p_transparent.upper() == "TRUE":
-        img_mode = "RGBA"
-        bgcolor = bgcolor + (0,)
-    else:
-        img_mode = "RGB"
+    if p_transparent.upper() == "FALSE":
+        img_params["color"] = bgcolor + (255, )
 
     p_size = (p_width, p_height)
 
-    img = Image.new(img_mode, p_size, bgcolor)
+    img = Image.new("RGBA", p_size, **img_params)
 
     try:
         epsg, axis_sy = parse_srs(p_srs)
