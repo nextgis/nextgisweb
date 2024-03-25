@@ -124,6 +124,16 @@ define([
             }),
 
             editor({
+                field: "text_search",
+                id: "text_search",
+                label: i18n.gettext("TS"),
+                sortable: false,
+                autoSave: true,
+                editor: CheckBox,
+                editorArgs: { value: true },
+            }),
+
+            editor({
                 field: "label_field",
                 id: "label_field",
                 label: i18n.gettext("LA"),
@@ -187,6 +197,11 @@ define([
                 label: i18n.gettext("Feature table"),
             });
 
+            new Tooltip({
+                connectId: [this.grid.column("text_search").headerNode],
+                label: i18n.gettext("Text search"),
+            });
+
             this.toolbar = new Toolbar({});
 
             this.addMenu = new DropDownMenu({ style: "display: none;" });
@@ -200,6 +215,7 @@ define([
                         datatype: this.value,
                         // FIXME: set default
                         grid_visibility: true,
+                        text_search: true,
                         lookup_table: null,
                         display_name: "value",
                         idx: store.data.length + 1,

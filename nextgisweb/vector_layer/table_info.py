@@ -63,6 +63,7 @@ class FieldDef:
         display_name=None,
         label_field=None,
         grid_visibility=None,
+        text_search=None,
         ogrindex=None,
     ):
         self.key = key
@@ -72,6 +73,7 @@ class FieldDef:
         self.display_name = display_name
         self.label_field = label_field
         self.grid_visibility = grid_visibility
+        self.text_search = text_search
         self.ogrindex = ogrindex
 
 
@@ -422,6 +424,7 @@ class TableInfo:
                     fld.get("display_name"),
                     fld.get("label_field"),
                     fld.get("grid_visibility"),
+                    fld.get("text_search"),
                 )
             )
 
@@ -434,7 +437,15 @@ class TableInfo:
         self.geometry_type = layer.geometry_type
 
         for f in layer.fields:
-            self.fields.append(FieldDef("fld_%s" % f.fld_uuid, f.keyname, f.datatype, f.fld_uuid))
+            self.fields.append(
+                FieldDef(
+                    "fld_%s" % f.fld_uuid,
+                    f.keyname,
+                    f.datatype,
+                    f.fld_uuid,
+                    text_search=f.text_search,
+                )
+            )
 
         return self
 
@@ -471,6 +482,8 @@ class TableInfo:
             )
             if f.grid_visibility is not None:
                 field.grid_visibility = f.grid_visibility
+            if f.text_search is not None:
+                field.text_search = f.text_search
 
             layer.fields.append(field)
 

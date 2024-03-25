@@ -33,6 +33,7 @@ class LayerField(Base):
     datatype = db.Column(db.Enum(*FIELD_TYPE.enum), nullable=False)
     display_name = db.Column(db.Unicode, nullable=False)
     grid_visibility = db.Column(db.Boolean, nullable=False, default=True)
+    text_search = db.Column(db.Boolean, nullable=False, default=True)
     lookup_table_id = db.Column(db.ForeignKey(LookupTable.id))
 
     identity = __tablename__
@@ -66,6 +67,7 @@ class LayerField(Base):
                 "datatype",
                 "display_name",
                 "grid_visibility",
+                "text_search",
             )
         )
         if self.lookup_table is not None:
@@ -134,6 +136,7 @@ class _fields_attr(SP):
                 "display_name": f.display_name,
                 "label_field": f == srlzr.obj.feature_label_field,
                 "grid_visibility": f.grid_visibility,
+                "text_search": f.text_search,
                 "lookup_table": (dict(id=f.lookup_table.id) if f.lookup_table else None),
             }
             for f in srlzr.obj.fields
@@ -177,6 +180,8 @@ class _fields_attr(SP):
                 mfld.display_name = fld["display_name"]
             if "grid_visibility" in fld:
                 mfld.grid_visibility = fld["grid_visibility"]
+            if "text_search" in fld:
+                mfld.text_search = fld["text_search"]
             if "lookup_table" in fld:
                 # TODO: Handle errors: wrong schema, missing lookup table
                 ltval = fld["lookup_table"]

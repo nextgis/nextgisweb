@@ -707,7 +707,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 where.append(db.and_(*_where_filter))
 
         if self._like or self._ilike:
-            operands = [cast(tab.columns[f.column_name], db.Unicode) for f in self.layer.fields]
+            operands = [
+                cast(tab.columns[fld.column_name], db.Unicode)
+                for fld in self.layer.fields
+                if fld.text_search
+            ]
             if len(operands) == 0:
                 where.append(False)
             else:

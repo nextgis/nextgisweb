@@ -18,6 +18,7 @@ export interface FeatureLayerField {
     display_name: string;
     label_field?: boolean;
     grid_visibility?: boolean;
+    text_search?: boolean;
     lookup_table?: LookupTable;
 }
 

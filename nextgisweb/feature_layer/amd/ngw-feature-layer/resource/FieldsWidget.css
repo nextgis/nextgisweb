@@ -9,6 +9,7 @@
 }
 
 .ngw-feature-layer-fields-widget .field-grid_visibility,
+.ngw-feature-layer-fields-widget .field-text_search,
 .ngw-feature-layer-fields-widget .field-label_field {
     width: 3em;
     text-align: center;

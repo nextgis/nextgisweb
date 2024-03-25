@@ -69,6 +69,7 @@ def test_fields_edit(ngw_webtest_app, vector_layer_id):
             display_name="new_field",
             label_field=False,
             grid_visibility=True,
+            text_search=True,
         )
     )
     ngw_webtest_app.put_json(
