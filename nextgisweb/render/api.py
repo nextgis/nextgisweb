@@ -3,7 +3,7 @@ from io import BytesIO
 from itertools import product
 from math import ceil, floor, log
 from pathlib import Path
-from typing import List, Literal
+from typing import Dict, List, Literal, Union
 
 from msgspec import Meta, Struct
 from PIL import Image, ImageDraw, ImageFont
@@ -48,6 +48,12 @@ ImageSize = Annotated[
     Meta(description="Image size in pixels"),
 ]
 
+SymbolRange = Annotated[str, Meta(pattern=r"^[0-9]{1,3}(-[0-9]{1,3})?$")]
+Symbols = Annotated[
+    Dict[int, Annotated[List[SymbolRange], Meta(min_length=1)]],
+    Meta(examples=[dict()]),  # Just to stop Swagger UI make crazy defaults
+]
+
 NoDataStatusCode = Annotated[
     Literal[200, 204, 404],
     Meta(description="HTTP status code for empty images"),
@@ -75,6 +81,8 @@ class LegendIcon(Struct, kw_only=True):
 
 
 class LegendSymbol(Struct, kw_only=True):
+    index: int
+    render: Union[bool, None]
     display_name: str
     icon: LegendIcon
 
@@ -147,6 +155,21 @@ def check_origin(request):
             raise InvalidOriginError()
 
 
+def process_symbols(value: Symbols) -> Dict[int, List[int]]:
+    result = dict()
+    for k, s in value.items():
+        result[k] = seq = list()
+        tail = -1
+        for v in s:
+            p = tuple(int(i) for i in v.split("-", maxsplit=1))
+            f, t = p if len(p) == 2 else (p[0], p[0])
+            if f <= tail:
+                raise ValidationError(_("Invalid symbols sequence"))
+            seq.extend(range(f, t + 1))
+            tail = t
+    return result
+
+
 def tile(
     request,
     *,
@@ -154,12 +177,14 @@ def tile(
     z: TileZ,
     x: TileX,
     y: TileY,
+    symbols: Symbols,
     nd: NoDataStatusCode = 200,
     cache: TileCache = True,
 ) -> RenderResponse:
     """Render tile from one or more resources"""
     check_origin(request)
 
+    p_symbols = process_symbols(symbols) if symbols else dict()
     p_cache = cache and request.env.render.tile_cache_enabled
 
     aimg = None
@@ -176,11 +201,13 @@ def tile(
 
         rimg = None  # Resulting resource image
 
+        rsymbols = p_symbols.get(resid)
         tcache = obj.tile_cache
 
         # Is requested tile may be cached?
         cache_enabled = (
             p_cache
+            and rsymbols is None
             and tcache is not None
             and tcache.enabled
             and (tcache.max_z is None or z <= tcache.max_z)
@@ -191,7 +218,10 @@ def tile(
             cache_exists, rimg = tcache.get_tile((z, x, y))
 
         if not cache_exists:
-            req = obj.render_request(obj.srs)
+            cond = dict()
+            if rsymbols is not None:
+                cond["symbols"] = rsymbols
+            req = obj.render_request(obj.srs, cond=cond)
             rimg = req.render_tile((z, x, y), 256)
 
             if cache_enabled:
@@ -220,6 +250,7 @@ def image(
     resource: RenderResource,
     extent: RenderExtent,
     size: ImageSize,
+    symbols: Symbols,
     nd: NoDataStatusCode = 200,
     cache: TileCache = True,
     tdi: TileDebugInfo = False,
@@ -227,6 +258,7 @@ def image(
     """Render image from one or more resources"""
     check_origin(request)
 
+    p_symbols = process_symbols(symbols) if symbols else dict()
     p_cache = cache and request.env.render.tile_cache_enabled
 
     resolution = (
@@ -258,11 +290,13 @@ def image(
             else:
                 zexact = False
 
+        rsymbols = p_symbols.get(resid)
         tcache = obj.tile_cache
 
         # Is requested image may be cached via tiles?
         cache_enabled = (
             p_cache
+            and rsymbols is None
             and zexact
             and tcache is not None
             and tcache.enabled
@@ -336,7 +370,10 @@ def image(
                     rimg.paste(timg, toffset)
 
         if rimg is None:
-            req = obj.render_request(obj.srs)
+            cond = dict()
+            if rsymbols is not None:
+                cond["symbols"] = rsymbols
+            req = obj.render_request(obj.srs, cond=cond)
             rimg = req.render_extent(ext_extent, ext_size)
 
             empty_image = rimg is None
@@ -430,6 +467,8 @@ def legend_symbols_by_resource(resource, icon_size: int):
 
         result.append(
             LegendSymbol(
+                index=s.index,
+                render=s.render,
                 display_name=s.display_name,
                 icon=LegendIcon(
                     format="png",
