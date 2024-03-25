@@ -2,9 +2,7 @@ define([
     "dojo/_base/declare",
     "dojo/_base/array",
     "dojo/dom-class",
-    "dojo/request/xhr",
     "dojo/Deferred",
-    "dojo/json",
     "dijit/form/Select",
     "put-selector/put",
     "openlayers/ol",
@@ -17,9 +15,7 @@ define([
     declare,
     array,
     domClass,
-    xhr,
     Deferred,
-    json,
     Select,
     put,
     ol,
@@ -74,34 +70,22 @@ define([
 
         _transform: function () {
             const deferred = new Deferred();
-            const point = new ol.geom.Point(this.point);
-            const wktPoint = wkt.writeGeometry(point);
-            const srsTo = Object.keys(srsCoordinates);
-            const urlBatchTransformSrs = api.routeURL(
-                "spatial_ref_sys.geom_transform.batch"
-            );
-
-            const batchTransformData = {
-                geom: wktPoint,
-                srs_from: 3857,
-                srs_to: srsTo,
-            };
-
-            const getTransformPoints = xhr.post(urlBatchTransformSrs, {
-                handleAs: "json",
-                data: json.stringify(batchTransformData),
-                headers: { "Content-Type": "application/json" },
-            });
-
-            getTransformPoints.then((transformed) => {
-                const transformedCoord = {};
-                transformed.forEach((t) => {
-                    const wktPoint = wkt.readGeometry(t.geom);
-                    transformedCoord[t.srs_id] = wktPoint.getCoordinates();
+            api.route("spatial_ref_sys.geom_transform.batch")
+                .post({
+                    json: {
+                        srs_from: 3857,
+                        srs_to: Object.keys(srsCoordinates).map(Number),
+                        geom: wkt.writeGeometry(new ol.geom.Point(this.point)),
+                    },
+                })
+                .then((transformed) => {
+                    const transformedCoord = {};
+                    transformed.forEach((t) => {
+                        const wktPoint = wkt.readGeometry(t.geom);
+                        transformedCoord[t.srs_id] = wktPoint.getCoordinates();
+                    });
+                    deferred.resolve(transformedCoord);
                 });
-                deferred.resolve(transformedCoord);
-            });
-
             return deferred.promise;
         },
 
