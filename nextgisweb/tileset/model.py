@@ -21,7 +21,7 @@ from nextgisweb.lib.registry import list_registry
 from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
-from nextgisweb.file_upload import FileUpload
+from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.render import (
     IExtentRenderRequest,
@@ -34,9 +34,9 @@ from nextgisweb.resource import (
     DataStructureScope,
     Resource,
     ResourceGroup,
-    SerializedProperty,
-    SerializedRelationship,
+    SAttribute,
     Serializer,
+    SRelationship,
 )
 from nextgisweb.tmsclient.util import crop_box, render_zoom, toggle_tms_xyz_y
 
@@ -310,8 +310,8 @@ def read_file(fn):
     raise ValidationError(message=_("Unsupported data format."))
 
 
-class _source_attr(SerializedProperty):
-    def setter(self, srlzr, value):
+class SourceAttr(SAttribute, apitype=True):
+    def set(self, srlzr, value: FileUploadRef, *, create: bool):
         if srlzr.obj.id is not None:
             env.core.reserve_storage(
                 COMP_ID,
@@ -337,7 +337,7 @@ class _source_attr(SerializedProperty):
                 """)
                 # fmt: on
 
-                for z, x, y, img_data in read_file(FileUpload(id=value["id"]).data_path):
+                for z, x, y, img_data in read_file(value().data_path):
                     img = Image.open(BytesIO(img_data))
                     if img.size != (256, 256):
                         raise ValidationError(message=_("Only 256x256 px tiles are supported."))
@@ -398,9 +398,9 @@ class _source_attr(SerializedProperty):
         srlzr.obj.maxy = _maxy
 
 
-class TilesetSerializer(Serializer):
+class TilesetSerializer(Serializer, apitype=True):
     identity = Tileset.identity
     resclass = Tileset
 
-    srs = SerializedRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
-    source = _source_attr(write=DataScope.write)
+    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
+    source = SourceAttr(write=DataScope.write)
