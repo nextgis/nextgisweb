@@ -1,15 +1,19 @@
-from nextgisweb.env import Base, _
+from typing import List, Union
+
+from msgspec import Meta, Struct
+from typing_extensions import Annotated
+
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib import db
 
-from nextgisweb.resource import Resource, ResourceGroup, Serializer, ServiceScope
-from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import Resource, ResourceGroup, SAttribute, Serializer, ServiceScope
 
 Base.depends_on("resource", "feature_layer")
 
 
 class Service(Base, Resource):
     identity = "ogcfserver_service"
-    cls_display_name = _("OGC API Features service")
+    cls_display_name = gettext("OGC API Features service")
 
     __scope__ = ServiceScope
 
@@ -41,40 +45,47 @@ class Collection(Base):
         backref=db.backref("_ogcfserver_collections", cascade="all"),
     )
 
-    def to_dict(self):
-        return dict(
-            keyname=self.keyname,
-            display_name=self.display_name,
-            maxfeatures=self.maxfeatures,
-            resource_id=self.resource_id,
-        )
+
+class OGCFServerCollection(Struct, kw_only=True):
+    resource_id: int
+    keyname: Annotated[str, Meta(min_length=1)]
+    display_name: Annotated[str, Meta(min_length=1)]
+    maxfeatures: Union[Annotated[int, Meta(ge=1)], None]
 
 
-class _collections_attr(SP):
-    def getter(self, srlzr):
-        return [collection.to_dict() for collection in srlzr.obj.collections]
+class CollectionsAttr(SAttribute, apitype=True):
+    def get(self, srlzr) -> List[OGCFServerCollection]:
+        return [
+            OGCFServerCollection(
+                resource_id=layer.resource_id,
+                keyname=layer.keyname,
+                display_name=layer.display_name,
+                maxfeatures=layer.maxfeatures,
+            )
+            for layer in srlzr.obj.layers
+        ]
 
-    def setter(self, srlzr, value):
-        m = dict((collection.resource_id, collection) for collection in srlzr.obj.collections)
+    def set(self, srlzr, value: List[OGCFServerCollection], *, create: bool):
+        m = dict((layer.resource_id, layer) for layer in srlzr.obj.layers)
         keep = set()
-        for lv in value:
-            if lv["resource_id"] in m:
-                lo = m[lv["resource_id"]]
-                keep.add(lv["resource_id"])
+        for cv in value:
+            if cv.resource_id in m:
+                co = m[cv.resource_id]
+                keep.add(cv.resource_id)
             else:
-                lo = Collection(resource_id=lv["resource_id"])
-                srlzr.obj.collections.append(lo)
+                co = Collection(resource_id=cv.resource_id)
+                srlzr.obj.layers.append(co)
 
             for a in ("keyname", "display_name", "maxfeatures"):
-                setattr(lo, a, lv[a])
+                setattr(co, a, getattr(cv, a))
 
-        for lrid, lo in m.items():
+        for lrid, co in m.items():
             if lrid not in keep:
-                srlzr.obj.collections.remove(lo)
+                srlzr.obj.layers.remove(co)
 
 
-class ServiceSerializer(Serializer):
+class ServiceSerializer(Serializer, apitype=True):
     identity = Service.identity
     resclass = Service
 
-    collections = _collections_attr(read=ServiceScope.connect, write=ServiceScope.configure)
+    collections = CollectionsAttr(read=ServiceScope.connect, write=ServiceScope.configure)
