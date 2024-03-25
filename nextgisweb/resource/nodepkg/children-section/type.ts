@@ -1,3 +1,5 @@
+import type { ResourceCls } from "@nextgisweb/resource/type/api";
+
 export type ChildrenResourceAction = {
     href: string;
     target?: "_self" | "_blank";
@@ -10,7 +12,7 @@ export type ChildrenResource = {
     id: number;
     displayName: string;
     link: string;
-    cls: string;
+    cls: ResourceCls;
     clsDisplayName?: string;
     creationDate?: string;
     ownerUserDisplayName?: string;

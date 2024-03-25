@@ -7,8 +7,7 @@ import type { ParamsOf } from "@nextgisweb/gui/type";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import type { ResourceClass, ResourceItem } from "../type/Resource";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import "./ResourcesFilter.less";
 
@@ -16,12 +15,15 @@ type AutoProps = ParamsOf<typeof AutoComplete>;
 
 interface ResourcesFilterProps extends AutoProps {
     onChange?: AutoProps["onSelect"];
-    cls?: ResourceClass;
+    cls?: string;
 }
 
-const resourcesToOptions = (resourcesInfo: ResourceItem[]) => {
+const resourcesToOptions = (resourcesInfo: CompositeRead[]) => {
     return resourcesInfo.map((resInfo) => {
         const { resource } = resInfo;
+        if (!resource) {
+            throw new Error("No `resource` item in response");
+        }
         const resourceUrl = routeURL("resource.show", {
             id: resource.id,
         });
@@ -83,9 +85,10 @@ export function ResourcesFilter({
             setLoading(true);
             try {
                 abort();
-                const resources = await route("resource.search").get<
-                    ResourceItem[]
-                >({ query: q, signal: makeSignal() });
+                const resources = await route("resource.search").get({
+                    query: q,
+                    signal: makeSignal(),
+                });
                 const options = resourcesToOptions(resources);
                 setOptions(options);
                 setAcSatus("");

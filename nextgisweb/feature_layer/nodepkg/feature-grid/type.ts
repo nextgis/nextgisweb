@@ -1,6 +1,6 @@
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import type { SizeType } from "@nextgisweb/gui/antd";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { NgwAttributeType } from "../type";
 import type { FeatureLayerField } from "../type/FeatureLayer";
@@ -43,5 +43,5 @@ export interface FeatureGridProps {
     deleteError?: (featureIds: number[]) => void;
     onSelect?: (selected: number[]) => void;
     onDelete?: (featureIds: number[]) => void;
-    onSave?: (value: ResourceItem | undefined) => void;
+    onSave?: (value: CompositeRead | undefined) => void;
 }

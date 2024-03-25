@@ -1,13 +1,15 @@
 import { makeAutoObservable, toJS } from "mobx";
 
-import type { EditorStoreOptions, Operation, Resource } from "../type";
+import type { ResourceCls, ResourceRead } from "@nextgisweb/resource/type/api";
+
+import type { EditorStoreOptions, Operation } from "../type";
 import type { Composite } from "../type/Composite";
 
 type NullableProperties<T> = {
     [P in keyof T]?: T[P] | null;
 };
 
-type Value = NullableProperties<Omit<Resource, "parent" | "owner_user">> & {
+type Value = NullableProperties<Omit<ResourceRead, "parent" | "owner_user">> & {
     parent?: { id: number | null };
     owner_user?: { id: number | null };
 };
@@ -22,7 +24,7 @@ interface Loaded {
 export class EditorStore {
     identity = "resource";
 
-    cls: string | null = null;
+    cls: ResourceCls | null = null;
     displayName: string | null = null;
     keyname: string | null = null;
     parent: number | null = null;

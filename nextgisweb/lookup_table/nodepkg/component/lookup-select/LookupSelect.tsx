@@ -3,7 +3,6 @@ import { useMemo } from "react";
 import { Select } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 export interface LookupSelectProps<V extends number = number>
     extends SelectProps {
@@ -17,7 +16,7 @@ export function LookupSelect({
     value,
     ...restSelectProps
 }: LookupSelectProps) {
-    const { data, isLoading } = useRouteGet<ResourceItem>({
+    const { data, isLoading } = useRouteGet({
         name: "resource.item",
         params: { id: lookupId },
         options: { cache: true },

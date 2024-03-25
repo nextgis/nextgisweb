@@ -11,3 +11,5 @@ declare module "@nextgisweb/jsrealm/locale-loader!" {
     };
     export = value;
 }
+
+declare type Nullable<T> = { [K in keyof T]: T[K] | null };

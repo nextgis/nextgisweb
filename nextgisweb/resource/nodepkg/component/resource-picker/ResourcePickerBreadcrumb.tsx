@@ -4,8 +4,7 @@ import type { ReactElement } from "react";
 
 import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
 import type { ParamsOf } from "@nextgisweb/gui/type";
-
-import type { ResourceItem } from "../../type";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { ResourcePickerBreadcrumbProps } from "./type";
 
@@ -29,7 +28,7 @@ export const ResourcePickerBreadcrumb = observer(
             };
 
             const createLabel = (
-                resItem: ResourceItem,
+                resItem: CompositeRead,
                 name?: string | ReactElement,
                 link = true
             ) => {

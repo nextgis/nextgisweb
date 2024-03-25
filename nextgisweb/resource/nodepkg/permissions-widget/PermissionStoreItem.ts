@@ -2,24 +2,27 @@ import { makeAutoObservable, toJS } from "mobx";
 
 import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import type { ResourcePermission } from "../type";
+import type {
+    ACLRule,
+    ACLRuleAction,
+    ResourceCls,
+} from "@nextgisweb/resource/type/api";
 
 import type { PermissionsStore } from "./PermissionsStore";
 
 const msgAllRequired = gettext("All fields are required");
 const msgConflict = gettext("Row conflicts with another");
 
-const resourceScopes = (i: string) => blueprint.resources[i].scopes;
-const resourceBaseClasses = (i: string) => blueprint.resources[i].base_classes;
+const resourceScopes = (i: ResourceCls) => blueprint.resources[i].scopes;
+const baseClasses = (i: ResourceCls) => blueprint.resources[i].base_classes;
 
-const isSameOrSubclass = (child: string, parent: string) =>
-    child === parent || resourceBaseClasses(child).includes(parent);
+const isSameOrSubclass = (child: ResourceCls, parent: ResourceCls) =>
+    child === parent || baseClasses(child).includes(parent);
 
 let keySeq = 0;
 
 export class PermissionStoreItem {
-    action: string | null = null;
+    action: ACLRuleAction | null = null;
     principal: number | null = null;
     scope: string | null = null;
     permission: string | null = null;
@@ -29,7 +32,7 @@ export class PermissionStoreItem {
     readonly store: PermissionsStore;
     readonly key: number;
 
-    constructor(store: PermissionsStore, data?: ResourcePermission) {
+    constructor(store: PermissionsStore, data?: Nullable<ACLRule>) {
         makeAutoObservable(this, {});
         this.store = store;
         this.key = ++keySeq;
@@ -56,15 +59,15 @@ export class PermissionStoreItem {
         }
     }
 
-    dump(): ResourcePermission {
-        return toJS<ResourcePermission>({
+    dump(): ACLRule {
+        return toJS({
             action: this.action,
-            principal: this.principal ? { id: this.principal } : null,
+            principal: { id: this.principal },
             scope: this.scope,
             permission: this.permission,
             identity: this.identity,
             propagate: this.propagate,
-        });
+        }) as ACLRule;
     }
 
     get scopes() {
@@ -110,7 +113,7 @@ export class PermissionStoreItem {
         return null;
     }
 
-    update(data: Partial<ResourcePermission>) {
+    update(data: Partial<ACLRule>) {
         for (const [k, v] of Object.entries(data)) {
             Object.assign(this, { [k]: v });
         }

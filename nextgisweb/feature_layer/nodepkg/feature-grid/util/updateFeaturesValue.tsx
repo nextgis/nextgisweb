@@ -1,5 +1,4 @@
 import { route } from "@nextgisweb/pyramid/api";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 import type { FeatureLayer, NgwAttributeType } from "../../type";
 import { getFeatureFieldValue } from "../../util/getFeatureFieldValue";
@@ -17,7 +16,7 @@ export async function updateFeaturesValue({
     signal,
     data,
 }: UpdateFeaturesValue) {
-    const res = await route("resource.item", resourceId).get<ResourceItem>({
+    const res = await route("resource.item", resourceId).get({
         cache: true,
     });
     const featureLayer = res.feature_layer as FeatureLayer;

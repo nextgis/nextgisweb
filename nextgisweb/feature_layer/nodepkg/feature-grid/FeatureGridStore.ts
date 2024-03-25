@@ -2,7 +2,7 @@ import { makeAutoObservable } from "mobx";
 
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import type { SizeType } from "@nextgisweb/gui/antd";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { FeatureLayerField } from "../type";
 
@@ -29,7 +29,7 @@ export class FeatureGridStore {
     deleteError?: (featureIds: number[]) => void;
     onSelect?: (selected: number[]) => void;
     onDelete?: (featureIds: number[]) => void;
-    onSave?: (value: ResourceItem | undefined) => void;
+    onSave?: (value: CompositeRead | undefined) => void;
 
     constructor({ id, ...props }: FeatureGridProps) {
         this.id = id;
@@ -117,7 +117,7 @@ export class FeatureGridStore {
     };
 
     setOnSave = (
-        onSave: ((value: ResourceItem | undefined) => void) | undefined
+        onSave: ((value: CompositeRead | undefined) => void) | undefined
     ) => {
         this.onSave = onSave;
     };

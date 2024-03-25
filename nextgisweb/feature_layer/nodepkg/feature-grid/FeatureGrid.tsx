@@ -6,9 +6,8 @@ import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
-import type { FeatureLayerCount } from "../type/FeatureLayer";
+import type { FeatureLayer, FeatureLayerCount } from "../type/FeatureLayer";
 
 import { FeatureGridActions } from "./FeatureGridActions";
 import { FeatureGridStore } from "./FeatureGridStore";
@@ -55,12 +54,9 @@ export const FeatureGrid = observer(
             useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
                 id,
             });
-        const { data: resourceData, isLoading } = useRouteGet<ResourceItem>(
-            "resource.item",
-            {
-                id,
-            }
-        );
+        const { data: resourceData, isLoading } = useRouteGet("resource.item", {
+            id,
+        });
 
         useEffect(() => {
             // Do not refresh on init version
@@ -71,7 +67,7 @@ export const FeatureGrid = observer(
 
         useEffect(() => {
             if (resourceData) {
-                const fields = resourceData.feature_layer?.fields;
+                const fields = (resourceData.feature_layer as FeatureLayer)?.fields;
                 if (fields) {
                     store.setFields(fields);
                     store.setVisibleFields([

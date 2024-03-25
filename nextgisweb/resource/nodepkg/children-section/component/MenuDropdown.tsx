@@ -4,9 +4,9 @@ import { Badge, Dropdown, Tooltip } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import { showResourcePicker } from "../../component/resource-picker";
-import type { ResourceItem } from "../../type";
 import type { ChildrenResource } from "../type";
 import { createResourceTableItemOptions } from "../util/createResourceTableItemOptions";
 import { forEachSelected } from "../util/forEachSelected";
@@ -77,9 +77,12 @@ export function MenuDropdown({
     }, [selected, items]);
 
     const onNewGroup = useCallback(
-        (newGroup: ResourceItem) => {
+        (newGroup: CompositeRead) => {
             if (newGroup) {
-                if (newGroup.resource.parent.id === resourceId)
+                if (
+                    newGroup.resource.parent &&
+                    newGroup.resource.parent.id === resourceId
+                )
                     setItems((old) => {
                         const newItem = createResourceTableItemOptions(
                             newGroup.resource

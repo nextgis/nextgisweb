@@ -4,15 +4,14 @@ import { extractError } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { Blueprint } from "@nextgisweb/resource/type/api";
-
 import type {
-    Resource,
-    ResourceClass,
-    ResourceInterface,
-    ResourceItem,
-    ResourcePermission,
-} from "../../../type/Resource";
+    Blueprint,
+    CompositeRead,
+    ResourceCls,
+    ResourceRead,
+} from "@nextgisweb/resource/type/api";
+
+import type { ResourceInterface } from "../../../type/Resource";
 import { loadParents } from "../../../util/loadParents";
 import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
 
@@ -31,22 +30,22 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     resourcesLoadError: string | boolean = false;
     resourcesLoading = false;
-    resources: ResourceItem[] = [];
+    resources: CompositeRead[] = [];
 
-    parentId = 0;
+    parentId: number = 0;
 
-    get parentItem(): ResourceItem | null {
+    get parentItem(): CompositeRead | null {
         return this._parentItem;
     }
-    set parentItem(v: ResourceItem | null) {
+    set parentItem(v: CompositeRead | null) {
         this._parentItem = v;
     }
-    private _parentItem: ResourceItem | null = null;
+    private _parentItem: CompositeRead | null = null;
     blueprint: Blueprint | null = null;
 
     setBreadcrumbItemsError: string | boolean = false;
     breadcrumbItemsLoading = false;
-    breadcrumbItems: ResourceItem[] = [];
+    breadcrumbItems: CompositeRead[] = [];
 
     createNewGroupLoading = false;
     createNewGroupError: string | boolean = false;
@@ -55,13 +54,12 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     disableResourceIds: number[] = [];
 
-    requireClass?: ResourceClass;
+    requireClass?: ResourceCls;
     requireInterface?: ResourceInterface;
-    requirePermission?: ResourcePermission;
 
     allowSelection = true;
     allowMoveInside = true;
-    traverseClasses?: ResourceClass[];
+    traverseClasses?: ResourceCls[];
 
     allowCreateResource = true;
 
@@ -169,8 +167,8 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         this.abort();
     };
 
-    getResourceClasses = (classes: ResourceClass[]): ResourceClass[] => {
-        const resourceClasses: ResourceClass[] = [...classes];
+    getResourceClasses = (classes: ResourceCls[]): ResourceCls[] => {
+        const resourceClasses: ResourceCls[] = [...classes];
         if (this.blueprint) {
             for (const cls of classes) {
                 const blueprintResourceClasses = this.blueprint.resources[cls];
@@ -184,7 +182,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         return resourceClasses;
     };
 
-    checkEnabled = (resource: Resource): boolean => {
+    checkEnabled = (resource: ResourceRead): boolean => {
         const checks: (() => boolean)[] = [];
         const requireClass = this.requireClass;
         const requireInterface = this.requireInterface;
@@ -282,6 +280,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     async setChildrenFor(parent: number): Promise<void> {
         this._abortChildLoading();
+
         try {
             this.setResourcesAbortController = new AbortController();
             runInAction(() => {
@@ -292,23 +291,18 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
                 cache: true,
             });
             this.blueprint = blueprint;
-            const parentItem = await route(
-                "resource.item",
-                parent
-            ).get<ResourceItem>({
+            const parentItem = await route("resource.item", parent).get({
                 signal: this.setResourcesAbortController.signal,
                 cache: true,
             });
             this.parentItem = parentItem;
-            const resp = await route("resource.collection").get<ResourceItem[]>(
-                {
-                    query: { parent: parent },
-                    signal: this.setResourcesAbortController.signal,
-                }
-            );
-            const resources: ResourceItem[] = [];
+            const resp = await route("resource.collection").get({
+                query: { parent: parent },
+                signal: this.setResourcesAbortController.signal,
+            });
+            const resources: CompositeRead[] = [];
             for (const x of resp) {
-                const res = x.resource as Resource;
+                const res = x.resource;
                 const resourceVisible = this._resourceVisible(res);
                 if (resourceVisible) {
                     resources.push(x);
@@ -330,7 +324,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         }
     }
 
-    async createNewGroup(name: string): Promise<ResourceItem | undefined> {
+    async createNewGroup(name: string): Promise<CompositeRead | undefined> {
         this._abortNewGroupCreation();
         try {
             this.createNewGroupAbortController = new AbortController();
@@ -389,14 +383,16 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
                 const lastSelected: number = Array.isArray(selected)
                     ? selected[selected.length - 1]
                     : selected;
-                const selectedItem = (await route(
+                const selectedItem = await route(
                     "resource.item",
                     lastSelected
                 ).get({
                     signal: this.getSelectedParentAbortController.signal,
                     cache: true,
-                })) as ResourceItem;
-                this.parentId = selectedItem.resource.parent.id;
+                });
+                if (selectedItem.resource.parent) {
+                    this.parentId = selectedItem.resource.parent.id;
+                }
             } catch {
                 // ignore
             }
@@ -404,14 +400,14 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         this.changeParentTo(this.parentId);
     }
 
-    private _resourceVisible(resource: Resource): boolean {
+    private _resourceVisible(resource: ResourceRead): boolean {
         if (this.hideUnavailable) {
             return this._resourceAvailable(resource);
         }
         return true;
     }
 
-    private _resourceAvailable(resource: Resource): boolean {
+    private _resourceAvailable(resource: ResourceRead): boolean {
         const { cls, interfaces } = resource;
         const traverseClasses = this.traverseClasses;
         const requireClass = this.requireClass;

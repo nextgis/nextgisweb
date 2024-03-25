@@ -1,13 +1,10 @@
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
-import type {
-    ResourceItem,
-    ResourceItemCreationResponse,
-} from "@nextgisweb/resource/type/Resource";
+import type { CompositeCreate } from "@nextgisweb/resource/type/api";
 
 interface CloneResourceOptions {
-    resourceItem: ResourceItem;
+    resourceItem: CompositeCreate;
     displayName: string;
     parentId: number;
     signal: AbortSignal;
@@ -44,9 +41,7 @@ export async function cloneResource({
 
     try {
         const newResPayload = { resource, resmeta, webmap, ...rest };
-        const cloneItem = await route(
-            "resource.collection"
-        ).post<ResourceItemCreationResponse>({
+        const cloneItem = await route("resource.collection").post({
             json: newResPayload,
             signal,
         });

@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
-import type { ResourceItem } from "../../../type";
 import type { SelectValue } from "../../resource-picker/type";
 import type { ResourceSelectProps } from "../type";
 
@@ -13,7 +13,7 @@ export function useResourceSelect<V extends SelectValue = SelectValue>({
 }: ResourceSelectProps<V>) {
     const { makeSignal, abort } = useAbortController();
 
-    const [resource, setResource] = useState<ResourceItem | null>(null);
+    const [resource, setResource] = useState<CompositeRead | null>(null);
     const [isLoading, setIsLoading] = useState(value !== undefined);
     const [error, setError] = useState<ApiError>();
 
@@ -23,10 +23,7 @@ export function useResourceSelect<V extends SelectValue = SelectValue>({
             if (typeof value === "number") {
                 try {
                     setIsLoading(true);
-                    const res = await route(
-                        "resource.item",
-                        value
-                    ).get<ResourceItem>({
+                    const res = await route("resource.item", value).get({
                         cache: true,
                         signal: makeSignal(),
                     });

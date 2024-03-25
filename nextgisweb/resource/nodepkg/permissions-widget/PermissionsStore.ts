@@ -1,13 +1,12 @@
 import { makeAutoObservable } from "mobx";
 
 import type { EdiTableStore } from "@nextgisweb/gui/edi-table";
-
-import type { ResourcePermission } from "../type";
+import type { ACLRule, ResourceCls } from "@nextgisweb/resource/type/api";
 
 import { PermissionStoreItem as Item } from "./PermissionStoreItem";
 
 interface Composite {
-    cls: string;
+    cls: ResourceCls;
 }
 
 export class PermissionsStore implements EdiTableStore<Item> {
@@ -26,7 +25,7 @@ export class PermissionsStore implements EdiTableStore<Item> {
         this.rotatePlaceholder();
     }
 
-    load(value: ResourcePermission[]) {
+    load(value: ACLRule[]) {
         // Existing data transformation
         const isUseful = (item: Item) => item.propagate || item.identity === "";
 

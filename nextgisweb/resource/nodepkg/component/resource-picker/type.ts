@@ -1,13 +1,12 @@
 import type { Card, Modal, Table } from "@nextgisweb/gui/antd";
 import type { ParamsOf } from "@nextgisweb/gui/type";
-
 import type {
-    Resource,
-    ResourceClass,
-    ResourceInterface,
-    ResourceItem,
-    ResourcePermission,
-} from "../../type/Resource";
+    CompositeRead,
+    ResourceCls,
+    ResourceRead,
+} from "@nextgisweb/resource/type/api";
+
+import type { ResourceInterface } from "../../type/Resource";
 
 import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 
@@ -20,7 +19,7 @@ export type TableProps = ParamsOf<typeof Table>;
 export type RowSelection = Exclude<TableProps["rowSelection"], undefined>;
 export type RowSelectionType = RowSelection["type"];
 
-export type PickerResource = Resource;
+export type PickerResource = ResourceRead;
 
 export interface ResourcePickerBreadcrumbProps {
     resourceStore: ResourcePickerStore;
@@ -41,7 +40,7 @@ export interface ResourcePickerFooterProps<
     onOk?: (val: V) => void;
 }
 
-export type OnNewGroupType = (resource: ResourceItem) => void;
+export type OnNewGroupType = (resource: CompositeRead) => void;
 
 export interface ResourcePickerTitleProps {
     resourceStore: ResourcePickerStore;
@@ -54,14 +53,13 @@ export interface ResourcePickerStoreOptions {
     parentId?: number;
     saveLastParentIdGlobal?: boolean;
     selected?: number[];
-    requireClass?: ResourceClass | null;
+    requireClass?: ResourceCls | null;
     getThisMsg?: string;
     onNewGroup?: null | OnNewGroupType;
     disableResourceIds?: number[];
     getSelectedMsg?: string;
     requireInterface?: ResourceInterface | null;
-    traverseClasses?: ResourceClass[] | null;
-    requirePermission?: ResourcePermission | null;
+    traverseClasses?: ResourceCls[] | null;
     hideUnavailable?: boolean;
     onTraverse?: (parentId: number) => void;
 }
@@ -89,7 +87,7 @@ export interface ResourcePickerModalProps<V extends SelectValue = SelectValue>
     visible?: boolean;
     store?: ResourcePickerStore;
     onSelect?: (val: V) => void;
-    onPick?: (val: ResourceItem | ResourceItem[]) => void;
+    onPick?: (val: CompositeRead | CompositeRead[]) => void;
     closeOnSelect?: boolean;
     pickerOptions?: ResourcePickerStoreOptions;
 }

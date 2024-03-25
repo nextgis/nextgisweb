@@ -1,4 +1,3 @@
-
 interface Srs {
     id: number;
 }
@@ -12,4 +11,3 @@ export interface RasterlayerResource {
     cog: boolean;
     dtype: string;
 }
-

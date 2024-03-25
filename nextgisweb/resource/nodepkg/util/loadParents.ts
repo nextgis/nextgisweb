@@ -1,6 +1,8 @@
 import { route } from "@nextgisweb/pyramid/api";
-
-import type { Resource, ResourceItem } from "../type/Resource";
+import type {
+    CompositeRead,
+    ResourceRefWithParent,
+} from "@nextgisweb/resource/type/api";
 
 interface LoadParentsOptions {
     signal?: AbortSignal;
@@ -10,18 +12,19 @@ interface LoadParentsOptions {
 export async function loadParents(
     resourceId: number,
     { signal, cache = true }: LoadParentsOptions
-): Promise<ResourceItem[]> {
-    const parents: ResourceItem[] = [];
-    let parentIdOrNull: number | null | Resource["parent"] = resourceId;
+): Promise<CompositeRead[]> {
+    const parents: CompositeRead[] = [];
+    let parentIdOrNull: number | null | ResourceRefWithParent = resourceId;
     while (typeof parentIdOrNull === "number") {
-        const resourceItem: ResourceItem = await route("resource.item", {
-            id: parentIdOrNull,
-        }).get<ResourceItem>({
+        const id = Number(parentIdOrNull) as number;
+        const resourceItem = await route("resource.item", {
+            id,
+        }).get({
             signal,
             cache,
         });
         parents.push(resourceItem);
-        parentIdOrNull = resourceItem.resource.parent;
+        parentIdOrNull = resourceItem.resource?.parent;
         if (parentIdOrNull && typeof parentIdOrNull !== "number") {
             parentIdOrNull = parentIdOrNull.id;
         }

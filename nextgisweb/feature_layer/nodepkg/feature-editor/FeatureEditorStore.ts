@@ -8,7 +8,6 @@ import { message } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 import type { NgwAttributeValue } from "../attribute-editor/type";
 import type { EditorStore, FeatureItem as FeatureItem_ } from "../type";
@@ -74,10 +73,7 @@ export class FeatureEditorStore {
             runInAction(() => {
                 this.initLoading = true;
             });
-            const resp = await route(
-                "resource.item",
-                this.resourceId
-            ).get<ResourceItem>({
+            const resp = await route("resource.item", this.resourceId).get({
                 signal,
             });
             runInAction(() => {

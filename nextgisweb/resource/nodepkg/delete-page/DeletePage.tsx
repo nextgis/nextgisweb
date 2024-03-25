@@ -6,8 +6,6 @@ import { errorModal } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ResourceItem } from "../type";
-
 import DeleteOutlineIcon from "@nextgisweb/icon/material/delete/outline";
 
 interface DeletePageProps {
@@ -21,7 +19,12 @@ export function DeletePage({ id }: DeletePageProps) {
     const onDeleteClick = async () => {
         setDeletingInProgress(true);
         try {
-            const item = await route("resource.item", id).get<ResourceItem>();
+            const item = await route("resource.item", id).get();
+            if (!item.resource.parent) {
+                throw new Error(
+                    `Parent for resource ${item.resource.id} does not exist`
+                );
+            }
             const parentId = item.resource.parent.id;
             const parentResourceUrl = routeURL("resource.show", {
                 id: parentId,

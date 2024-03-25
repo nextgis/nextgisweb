@@ -1,5 +1,7 @@
 /// <reference types="dojo/dijit" />
 
+import type { ResourceCls } from "@nextgisweb/resource/type/api";
+
 export interface Composite extends dijit.layout.BorderContainer {
     // from package/nextgisweb/nextgisweb/resource/amd/ngw-resource/CompositeWidget.js
     style: string;
@@ -12,7 +14,7 @@ export interface Composite extends dijit.layout.BorderContainer {
     operation: string;
     id: string;
     parent: number;
-    cls: string;
+    cls: ResourceCls;
 
     // from console
     srcNodeRef: any;

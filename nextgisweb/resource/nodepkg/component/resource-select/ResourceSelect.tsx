@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Select } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 
-import type { ResourceClass } from "../../type";
 import { renderResourceCls } from "../../util/renderResourceCls";
 import { showResourcePicker } from "../resource-picker";
 import type {
@@ -19,7 +18,7 @@ import "./ResourceSelect.less";
 interface Option {
     label: React.ReactNode;
     value: number;
-    cls: ResourceClass;
+    cls: string;
 }
 
 export const ResourceSelect = <V extends SelectValue = SelectValue>({

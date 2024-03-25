@@ -1,5 +1,4 @@
 import { route } from "@nextgisweb/pyramid/api";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 
 const parseName = (name: string): [string, number] => {
     const match = name.match(/^(.*)\((\d+)\)$/);
@@ -19,7 +18,7 @@ export async function getUniqueName({
     parentId: number;
     defaultName: string;
 }): Promise<string> {
-    const siblings = await route("resource.collection").get<ResourceItem[]>({
+    const siblings = await route("resource.collection").get({
         signal,
         query: { parent: parentId },
     });

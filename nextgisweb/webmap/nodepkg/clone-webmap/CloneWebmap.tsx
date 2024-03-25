@@ -10,9 +10,10 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/field/ResourceSelect";
 import type {
-    ResourceItem,
-    ResourceItemCreationResponse,
-} from "@nextgisweb/resource/type/Resource";
+    CompositeCreate,
+    CompositeRead,
+    ResourceRefWithParent,
+} from "@nextgisweb/resource/type/api";
 
 import { cloneResource } from "./util/cloneResource";
 import { getUniqueName } from "./util/getUniqName";
@@ -20,7 +21,7 @@ import { getUniqueName } from "./util/getUniqName";
 const msgSaveButtonTitle = gettext("Clone");
 
 export interface AfterCloneOptions {
-    item: ResourceItemCreationResponse;
+    item: ResourceRefWithParent;
 }
 interface CloneWebmapProps {
     id: number;
@@ -28,9 +29,9 @@ interface CloneWebmapProps {
     saveButtonTitle?: string;
     afterClone?: (opt: AfterCloneOptions) => void;
     beforeClone?: (
-        resourceItem: ResourceItem,
+        resourceItem: CompositeRead,
         options?: { signal?: AbortSignal }
-    ) => Promise<ResourceItem>;
+    ) => Promise<CompositeCreate>;
 }
 
 export function CloneWebmap({
@@ -42,7 +43,7 @@ export function CloneWebmap({
 }: CloneWebmapProps) {
     const form = Form.useForm()[0];
 
-    const { data, isLoading } = useRouteGet<ResourceItem>(
+    const { data, isLoading } = useRouteGet(
         "resource.item",
         { id },
         { cache: true }
@@ -111,7 +112,7 @@ export function CloneWebmap({
 
                 const resourceItem = beforeClone
                     ? await beforeClone(data)
-                    : data;
+                    : (data as CompositeCreate);
 
                 const { name, parent } = form.getFieldsValue();
                 const cloneItem = await cloneResource({

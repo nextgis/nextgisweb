@@ -15,7 +15,6 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 import { ResourceSelectMultiple } from "@nextgisweb/resource/field/ResourceSelectMultiple";
-import type { ResourceItem } from "@nextgisweb/resource/type/Resource";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
@@ -95,7 +94,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             setSrsOptions(srsListToOptions(srsInfo));
             let itemInfo = null;
             if (id !== undefined) {
-                itemInfo = await route("resource.item", id).get<ResourceItem>({
+                itemInfo = await route("resource.item", id).get({
                     signal,
                 });
             }
