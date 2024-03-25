@@ -245,7 +245,7 @@ def _get_map(obj, params, request):
     else:
         bgcolor = (255, 255, 255)
     if p_transparent.upper() == "FALSE":
-        img_params["color"] = bgcolor + (255, )
+        img_params["color"] = bgcolor + (255,)
 
     p_size = (p_width, p_height)
 

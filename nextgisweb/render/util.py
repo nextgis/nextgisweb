@@ -3,10 +3,6 @@ import struct
 import PIL.ImageStat
 from affine import Affine
 
-from nextgisweb.env import _
-
-from nextgisweb.core.exception import ValidationError
-
 
 def imgcolor(img):
     """Check image color and return color tuple if all pixels have same color"""
