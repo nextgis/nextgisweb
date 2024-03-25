@@ -23,6 +23,7 @@ export interface FetchFeaturesOptions {
     orderBy?: OrderBy;
     signal?: AbortSignal;
     fields?: string[];
+    extensions?: string;
     offset?: number;
     limit?: number;
     cache?: boolean;
@@ -30,9 +31,10 @@ export interface FetchFeaturesOptions {
     like?: string;
 }
 
-export function fetchFeatures({
+export function fetchFeaturesItems({
     resourceId,
     intersects,
+    extensions,
     orderBy,
     signal,
     fields,
@@ -43,10 +45,8 @@ export function fetchFeatures({
     ilike,
 }: FetchFeaturesOptions) {
     const query: FeatureLayerQuery = {
-        offset,
-        limit,
         geom: "no",
-        extensions: "",
+        extensions: extensions ? extensions : "",
         dt_format: "iso",
         fields,
     };
@@ -59,20 +59,29 @@ export function fetchFeatures({
         query.ilike = ilike;
     }
 
+    if (offset !== undefined && limit !== undefined) {
+        query.offset = offset;
+        query.limit = limit;
+    }
+
     if (intersects) {
         query.intersects = intersects;
     }
 
-    return route("feature_layer.feature.collection", resourceId)
-        .get<FeatureItem[]>({
-            query,
-            signal,
-            cache,
-        })
-        .then((items) => {
-            return items.map((item) => ({
-                ...item.fields,
-                [KEY_FIELD_KEYNAME]: item.id,
-            }));
-        });
+    return route("feature_layer.feature.collection", resourceId).get<
+        FeatureItem[]
+    >({
+        query,
+        signal,
+        cache,
+    });
+}
+
+export function fetchFeatures(options: FetchFeaturesOptions) {
+    return fetchFeaturesItems(options).then((items) => {
+        return items.map((item) => ({
+            ...item.fields,
+            [KEY_FIELD_KEYNAME]: item.id,
+        }));
+    });
 }

@@ -9,6 +9,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import ImageThumbnail from "../image-thumbnail";
 import { CarouselModal } from "../image-thumbnail/component/CarouselModal";
 import type { FeatureAttachment } from "../type";
+import { fileSizeToString } from "../utils";
 
 import "./AttachmentTable.less";
 
@@ -17,16 +18,6 @@ interface AttachmentTableProps {
     featureId: number;
     resourceId: number;
     isSmall: boolean | undefined;
-}
-
-function fileSizeToString(size: number) {
-    const units = ["B", "KB", "MB", "GB"];
-    let i = 0;
-    while (size >= 1024) {
-        size /= 1024;
-        ++i;
-    }
-    return size.toFixed(0) + " " + units[i];
 }
 
 export function AttachmentTable({
