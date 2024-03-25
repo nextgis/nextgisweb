@@ -9,7 +9,8 @@ import type { LayerItem, TreeItem } from "../type/TreeItems";
 import type { WebmapPlugin } from "../type/WebmapPlugin";
 
 import { DropdownActions } from "./DropdownActions";
-import { Legend, LegendAction } from "./Legend";
+import { Legend } from "./Legend";
+import { LegendAction } from "./LegendAction";
 import { useDrag } from "./hook/useDrag";
 
 import EditIcon from "@nextgisweb/icon/material/edit/outline";
@@ -177,7 +178,9 @@ export const LayersTree = observer(
                         </Col>
                         {actions}
                     </Row>
-                    {showLegend && <Legend nodeData={nodeData.treeItem} />}
+                    {showLegend && (
+                        <Legend nodeData={nodeData.treeItem} store={store} />
+                    )}
                 </>
             );
         };

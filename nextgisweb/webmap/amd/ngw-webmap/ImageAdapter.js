@@ -32,10 +32,17 @@ define([
                         var url = src.split("?")[0];
                         var query = src.split("?")[1];
                         var queryObject = ioQuery.queryToObject(query);
+
+                        var resource = queryObject["resource"];
+                        var symbolsParam = queryObject["symbols"];
+                        var symbols = symbolsParam
+                            ? `&symbols[${resource}]=${symbolsParam === "-1" ? "" : symbolsParam}`
+                            : "";
+
                         image.getImage().src =
                             url +
                             "?resource=" +
-                            queryObject["resource"] +
+                            resource +
                             "&extent=" +
                             queryObject["BBOX"] +
                             "&size=" +
@@ -43,6 +50,7 @@ define([
                             "," +
                             queryObject["HEIGHT"] +
                             "&nd=204" +
+                            symbols +
                             "#" +
                             Date.now(); // in-memory cache busting
                     },

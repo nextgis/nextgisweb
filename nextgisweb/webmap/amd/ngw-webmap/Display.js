@@ -163,7 +163,6 @@ define([
 
         constructor: function (options) {
             declare.safeMixin(this, options);
-
             this._urlParams = URL.getURLParams();
 
             this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
@@ -488,9 +487,9 @@ define([
                     } catch (err) {
                         console.warn(
                             "Can't initialize layer [" +
-                            baseOptions.keyname +
-                            "]: " +
-                            err
+                                baseOptions.keyname +
+                                "]: " +
+                                err
                         );
                     }
 
@@ -574,10 +573,10 @@ define([
                 queryOptions: { deep: true },
                 sort: widget.config.drawOrderEnabled
                     ? [
-                        {
-                            attribute: "position",
-                        },
-                    ]
+                          {
+                              attribute: "position",
+                          },
+                      ]
                     : null,
                 onItem: function (item) {
                     widget._onNewStoreItem(item, visibleStyles);

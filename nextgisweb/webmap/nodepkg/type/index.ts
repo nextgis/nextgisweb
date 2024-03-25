@@ -28,6 +28,7 @@ export interface WebmapItem {
     styleId: number;
     type: string;
     visibility: boolean;
+    symbols: string[];
 }
 
 export interface CustomItemFileWriteStore extends dojo.data.ItemFileWriteStore {

@@ -14,6 +14,7 @@ Changes
 - Lots of customization options for embedded webmaps: map tools and panels.
 - Support for custom SVG logos in addition to PNG.
 - Ability to exclude feature layer fields from text search.
+- Directly toggle legend symbols for a better experience on webmaps.
 
 
 4.6.0

@@ -6,5 +6,12 @@ define(["dojo/_base/declare", "./_Base"], function (declare, _Base) {
         constructor: function () {
             this.inherited(arguments);
         },
+
+        _symbolsSetter: function (value) {
+            this.inherited(arguments);
+            this.olSource.updateParams({
+                symbols: value,
+            });
+        },
     });
 });

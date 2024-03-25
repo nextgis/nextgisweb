@@ -37,6 +37,7 @@ define([
 
             var layer = this;
 
+            this._symbols = [];
             this._opacity = this.olLayer.getOpacity();
 
             this._visibility = this.olLayer.getVisible();
@@ -80,6 +81,19 @@ define([
                 this.olLayer.setOpacity(value);
                 this._opacity = value;
             }
+        },
+
+        _symbolsGetter: function () {
+            return this._symbols;
+        },
+
+        _symbolsSetter: function (value) {
+            if (value === "-1") {
+                this.olLayer.setSource();
+            } else if (this._symbols === "-1") {
+                this.olLayer.setSource(this.olSource);
+            }
+            this._symbols = value;
         },
     });
 });

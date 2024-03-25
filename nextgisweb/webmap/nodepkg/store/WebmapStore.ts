@@ -8,6 +8,8 @@ import type {
 } from "../type";
 import type { TreeItem } from "../type/TreeItems";
 
+type LegendSymbols = { [layerId: number]: { [symbolIndex: number]: boolean } };
+
 export class WebmapStore {
     _webmapItems: StoreItem[] = [];
     _checked: number[] = [];
@@ -15,6 +17,7 @@ export class WebmapStore {
 
     _itemStore: CustomItemFileWriteStore;
     _layers: Record<number, WebmapLayer> = {};
+    _legendSymbols: LegendSymbols = {};
 
     constructor({
         itemStore,
@@ -37,7 +40,11 @@ export class WebmapStore {
                 oldVal: unknown,
                 newVal: unknown
             ) => {
-                if (attr === "checked" || attr === "visibility") {
+                if (
+                    attr === "checked" ||
+                    attr === "visibility" ||
+                    attr === "symbols"
+                ) {
                     const id = itemStore.getValue(item, "id");
                     if (
                         attr === "checked" &&
@@ -47,7 +54,12 @@ export class WebmapStore {
                     } else if (attr === "visibility") {
                         const layer = this._layers[id];
                         if (layer) {
-                            layer.set("visibility", newVal as any);
+                            layer.set("visibility", newVal as boolean);
+                        }
+                    } else if (attr === "symbols") {
+                        const layer = this._layers[id];
+                        if (layer) {
+                            layer.set("symbols", newVal as string);
                         }
                     }
                 }
@@ -116,6 +128,69 @@ export class WebmapStore {
                 }
             },
         });
+    };
+
+    setLayerLegendSymbol = (
+        identity: number,
+        symbolIndex: number,
+        status: boolean
+    ) => {
+        const symbols = { ...(this._legendSymbols[identity] || {}) };
+        symbols[symbolIndex] = status;
+        runInAction(() => {
+            this._legendSymbols[identity] = symbols;
+        });
+
+        const layer = this.getLayer(identity);
+        const layerSymbols = layer.itemConfig.legendInfo.symbols;
+
+        const needSymbolRender = Object.entries(symbols).some(
+            ([index, renderStatus]) => {
+                const layerSymbol = layerSymbols.find(
+                    (l) => l.index === Number(index)
+                );
+                return layerSymbol && layerSymbol.render !== renderStatus;
+            }
+        );
+
+        // -1 - do not show nothing, null - use default render without symbols
+        let intervals: string[] | "-1" | null = null;
+        if (needSymbolRender) {
+            const renderIndexes: number[] = [];
+            for (const s of layerSymbols) {
+                const render = symbols[s.index] ?? s.render;
+                if (render) {
+                    renderIndexes.push(s.index);
+                }
+            }
+            intervals = this._consolidateIntervals(renderIndexes);
+            intervals = intervals.length ? intervals : "-1";
+        }
+        this._itemStore.fetchItemByIdentity({
+            identity,
+            onItem: (item: StoreItem) => {
+                this._itemStore.setValue(item, "symbols", intervals);
+            },
+        });
+    };
+
+    _consolidateIntervals = (symbols: number[]) => {
+        const sortedSymbols = symbols.slice().sort((a, b) => a - b);
+        const intervals = [];
+        let start = sortedSymbols[0];
+        let end = start;
+
+        for (let i = 1; i <= sortedSymbols.length; i++) {
+            if (sortedSymbols[i] === end + 1) {
+                end = sortedSymbols[i];
+            } else {
+                intervals.push(start === end ? `${start}` : `${start}-${end}`);
+                start = sortedSymbols[i];
+                end = start;
+            }
+        }
+
+        return intervals;
     };
 
     getIds = ({ query }: { query?: Record<string, unknown> } = {}) => {

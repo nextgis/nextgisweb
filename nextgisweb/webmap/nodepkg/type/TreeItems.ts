@@ -21,6 +21,8 @@ interface Icon {
     data: string;
 }
 interface SymbolInfo {
+    index: number;
+    render: boolean;
     display_name: string;
     icon: Icon;
 }
@@ -49,7 +51,6 @@ export interface LayerItem extends BaseItem {
     plugin: Record<string, unknown>;
     minResolution: unknown;
     maxResolution: unknown;
-
     editable?: boolean;
 }
 
