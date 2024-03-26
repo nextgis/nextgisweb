@@ -62,11 +62,11 @@ class CollectionsAttr(SAttribute, apitype=True):
                 display_name=layer.display_name,
                 maxfeatures=layer.maxfeatures,
             )
-            for layer in srlzr.obj.layers
+            for layer in srlzr.obj.collections
         ]
 
     def set(self, srlzr, value: List[OGCFServerCollection], *, create: bool):
-        m = dict((layer.resource_id, layer) for layer in srlzr.obj.layers)
+        m = dict((layer.resource_id, layer) for layer in srlzr.obj.collections)
         keep = set()
         for cv in value:
             if cv.resource_id in m:
@@ -74,14 +74,14 @@ class CollectionsAttr(SAttribute, apitype=True):
                 keep.add(cv.resource_id)
             else:
                 co = Collection(resource_id=cv.resource_id)
-                srlzr.obj.layers.append(co)
+                srlzr.obj.collections.append(co)
 
             for a in ("keyname", "display_name", "maxfeatures"):
                 setattr(co, a, getattr(cv, a))
 
         for lrid, co in m.items():
             if lrid not in keep:
-                srlzr.obj.layers.remove(co)
+                srlzr.obj.collections.remove(co)
 
 
 class ServiceSerializer(Serializer, apitype=True):
