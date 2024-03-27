@@ -3,6 +3,8 @@ import type {
     TreeItemIndex,
 } from "react-complex-tree";
 
+import type { FormField } from "@nextgisweb/gui/fields-form";
+
 export type DataObject = Record<string, any>;
 
 export type TreeItemData<R extends DataObject = DataObject> = R & {
@@ -17,3 +19,7 @@ export type TreeItems<R extends DataObject = DataObject> = Record<
     TreeItemIndex,
     TreeItem<R>
 >;
+
+export type TreeDetailFormField = FormField & {
+    tableView?: boolean;
+};

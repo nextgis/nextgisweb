@@ -4,27 +4,37 @@ import type { DraggingPosition, TreeItemIndex } from "react-complex-tree";
 
 import { Space } from "@nextgisweb/gui/antd";
 
-import type { DataObject, TreeItem, TreeItems } from "../type";
+import type {
+    DataObject,
+    TreeDetailFormField,
+    TreeItem,
+    TreeItems,
+} from "../type";
 
 import FolderIcon from "@nextgisweb/icon/mdi/folder";
 import FolderOpenIcon from "@nextgisweb/icon/mdi/folder-open";
 
 import "react-complex-tree/lib/style-modern.css";
+import "./ResourceTree.less";
 
 interface ResourceTreeProps<V extends DataObject = DataObject> {
-    items: TreeItems<V>;
-    setItems: React.Dispatch<React.SetStateAction<TreeItems<V>>>;
-    selected: TreeItemIndex[];
-    setSelected: (selected: TreeItemIndex[]) => void;
     titleField?: string;
+    items: TreeItems<V>;
+    selected: TreeItemIndex[];
+    style?: React.CSSProperties;
+    setItems: React.Dispatch<React.SetStateAction<TreeItems<V>>>;
+    setSelected: (selected: TreeItemIndex[]) => void;
+    getItemFields?: (options: { item: TreeItem }) => TreeDetailFormField[];
 }
 
 export function ResourceTree<V extends DataObject = DataObject>({
+    style,
     items: treeItems,
-    setItems,
     selected,
-    setSelected,
     titleField = "display_name",
+    getItemFields,
+    setSelected,
+    setItems,
 }: ResourceTreeProps<V>) {
     const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
 
@@ -69,53 +79,104 @@ export function ResourceTree<V extends DataObject = DataObject>({
     };
 
     return (
-        <>
-            <ControlledTreeEnvironment
-                items={treeItems}
-                getItemTitle={(item) => item.data[titleField]}
-                renderItemTitle={({ title, item }) => {
-                    if (item.data.children) {
-                        return (
-                            <Space>
-                                {expandedItems.includes(item.index) ? (
-                                    <FolderOpenIcon />
-                                ) : (
-                                    <FolderIcon />
-                                )}
-                                {title}
-                            </Space>
-                        );
-                    } else {
-                        return title;
-                    }
-                }}
-                canDragAndDrop
-                canDropOnFolder
-                canReorderItems
-                viewState={{
-                    ["tree-1"]: {
-                        selected,
-                        expandedItems,
-                    },
-                }}
-                onDrop={onDrop}
-                onExpandItem={(item) => {
-                    setExpandedItems([...expandedItems, item.index]);
-                }}
-                onCollapseItem={(item) => {
-                    setExpandedItems(
-                        expandedItems.filter(
-                            (expandedItemIndex) =>
-                                expandedItemIndex !== item.index
-                        )
+        <ControlledTreeEnvironment
+            items={treeItems}
+            getItemTitle={(item) => item.data[titleField]}
+            renderItemTitle={({ title, item }) => {
+                if (item.data.children) {
+                    return (
+                        <Space>
+                            {expandedItems.includes(item.index) ? (
+                                <FolderOpenIcon />
+                            ) : (
+                                <FolderIcon />
+                            )}
+                            {title}
+                        </Space>
                     );
-                }}
-                onSelectItems={(items) => {
-                    setSelected(items);
-                }}
-            >
-                <Tree treeId="tree-1" rootItem="root" />
-            </ControlledTreeEnvironment>
-        </>
+                } else {
+                    return title;
+                }
+            }}
+            renderItemsContainer={({ containerProps, children }) => (
+                <table
+                    style={style}
+                    className="rct-tree-items-container"
+                    {...containerProps}
+                >
+                    <tbody>{children}</tbody>
+                </table>
+            )}
+            renderItem={({ title, context, item, arrow, children }) => {
+                const isSelected = selected.includes(item.index);
+                const fields =
+                    !selected.length && getItemFields
+                        ? getItemFields({ item })
+                        : [];
+                return (
+                    <>
+                        <tr
+                            role="treeitem"
+                            key="display-name"
+                            className={`rct-tree-item-li ${isSelected ? "is-active" : ""}`}
+                            {...context.itemContainerWithChildrenProps}
+                        >
+                            <td
+                                className="rct-tree-item-title-container"
+                                style={{ paddingLeft: "10px" }}
+                            >
+                                <div className="rct-tree-item-arrow"></div>
+                                <button
+                                    {...context.itemContainerWithoutChildrenProps}
+                                    {...context.interactiveElementProps}
+                                    type="button"
+                                    className="rct-tree-item-button"
+                                >
+                                    {arrow}
+                                    {title}
+                                </button>
+                            </td>
+
+                            {fields
+                                .filter((field) => field.tableView ?? true)
+                                .map((field) => {
+                                    return (
+                                        <td key={field.name}>
+                                            {item.data[field.name]}
+                                        </td>
+                                    );
+                                })}
+                        </tr>
+                        {children}
+                    </>
+                );
+            }}
+            canDragAndDrop
+            canDropOnFolder
+            canReorderItems
+            autoFocus={false}
+            viewState={{
+                ["tree-1"]: {
+                    selected,
+                    expandedItems,
+                },
+            }}
+            onDrop={onDrop}
+            onExpandItem={(item) => {
+                setExpandedItems([...expandedItems, item.index]);
+            }}
+            onCollapseItem={(item) => {
+                setExpandedItems(
+                    expandedItems.filter(
+                        (expandedItemIndex) => expandedItemIndex !== item.index
+                    )
+                );
+            }}
+            onSelectItems={(items) => {
+                setSelected(items);
+            }}
+        >
+            <Tree treeId="tree-1" rootItem="root" />
+        </ControlledTreeEnvironment>
     );
 }

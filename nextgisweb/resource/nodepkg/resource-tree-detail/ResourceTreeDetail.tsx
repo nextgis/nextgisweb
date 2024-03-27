@@ -2,12 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { TreeItemIndex } from "react-complex-tree";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Col, Row } from "@nextgisweb/gui/antd";
+import { Button, Col, Row } from "@nextgisweb/gui/antd";
 import type { SizeType } from "@nextgisweb/gui/antd";
-import type {
-    FormField,
-    FormOnChangeOptions,
-} from "@nextgisweb/gui/fields-form";
+import type { FormOnChangeOptions } from "@nextgisweb/gui/fields-form";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -19,12 +16,20 @@ import type { ResourceItem } from "../type";
 import { ResourceDetail } from "./component/ResourceDetail";
 import { ResourceTree } from "./component/ResourceTree";
 import { ROOT_INDEX } from "./constant";
-import type { TreeItem, TreeItemData, TreeItems } from "./type";
+import type {
+    TreeDetailFormField,
+    TreeItem,
+    TreeItemData,
+    TreeItems,
+} from "./type";
 import { convertToTree, findNearestParent, flattenTree } from "./util/tree";
 
+import CloseIcon from "@nextgisweb/icon/material/close";
 import DeleteIcon from "@nextgisweb/icon/material/delete";
 import AddLayerIcon from "@nextgisweb/icon/mdi/file-document-plus-outline";
 import AddGroupIcon from "@nextgisweb/icon/mdi/folder-plus-outline";
+
+import "./ResourceTreeDetail.less";
 
 const msgAddLayerTitle = gettext("Add layer");
 const msgAddGroupTitle = gettext("Add group");
@@ -37,7 +42,7 @@ interface ResourceTreeDetailProps<V extends TreeItemData = TreeItemData> {
     pickerOptions?: Partial<ResourcePickerStoreOptions>;
     disableGroups?: boolean;
     titleField?: keyof V;
-    getItemFields?: (options: { item: TreeItem }) => FormField[];
+    getItemFields?: (options: { item: TreeItem }) => TreeDetailFormField[];
     onAddTreeItem?: (item: ResourceItem) => V;
     size?: SizeType;
 }
@@ -157,18 +162,21 @@ export function ResourceTreeDetail<V extends TreeItemData = TreeItemData>({
     }, [addTreeItems, titleField]);
 
     const addResourceItem = useCallback(
-        async (resourceId: number | number[]) => {
-            const resourceIds = Array.isArray(resourceId)
-                ? resourceId
-                : [resourceId];
+        async (resource: number | number[] | ResourceItem | ResourceItem[]) => {
+            const resources = Array.isArray(resource) ? resource : [resource];
             const treeItems: Omit<TreeItem, "index">[] = [];
-            for (const id of resourceIds) {
-                const res = await route("resource.item", {
-                    id,
-                }).get<ResourceItem>({
-                    cache: true,
-                    signal: makeSignal(),
-                });
+            for (const item of resources) {
+                let res: ResourceItem | undefined = undefined;
+                if (typeof item === "number") {
+                    res = await route("resource.item", {
+                        id: item,
+                    }).get<ResourceItem>({
+                        cache: true,
+                        signal: makeSignal(),
+                    });
+                } else {
+                    res = item;
+                }
                 if (res) {
                     const data: TreeItemData = {
                         [titleField]: res.resource.display_name,
@@ -228,7 +236,7 @@ export function ResourceTreeDetail<V extends TreeItemData = TreeItemData>({
                                     ...pickerOptions,
                                     saveLastParentIdGlobal: true,
                                 },
-                                onSelect: (v) => {
+                                onPick: (v) => {
                                     if (v) {
                                         addResourceItem(v);
                                     }
@@ -259,11 +267,13 @@ export function ResourceTreeDetail<V extends TreeItemData = TreeItemData>({
                 ]}
             ></ActionToolbar>
             <Row>
-                <Col span={8}>
+                <Col span={focused ? 8 : 24}>
                     <ResourceTree
+                        style={{ width: "100%" }}
                         items={items}
                         setItems={setItems}
                         selected={focused ? [focused] : []}
+                        getItemFields={getItemForm}
                         setSelected={(selectedItems) => {
                             const firstSelectedItem = selectedItems[0];
                             setFocused(firstSelectedItem);
@@ -272,11 +282,19 @@ export function ResourceTreeDetail<V extends TreeItemData = TreeItemData>({
                 </Col>
                 {focused && items[focused] && (
                     <Col span={16}>
+                        <Button
+                            type="text"
+                            size="small"
+                            icon={<CloseIcon />}
+                            onClick={() => {
+                                setFocused(undefined);
+                            }}
+                        />
                         <ResourceDetail
                             style={{ width: "100%" }}
                             key={focused}
                             item={items[focused]}
-                            getItemForm={getItemForm}
+                            getItemFields={getItemForm}
                             onChange={onChange}
                             initialValues={items[focused].data}
                         />

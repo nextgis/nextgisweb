@@ -1,15 +1,11 @@
-import { Space } from "@nextgisweb/gui/antd";
 import { FieldsForm, useForm } from "@nextgisweb/gui/fields-form";
-import type {
-    FormField,
-    FormOnChangeOptions,
-} from "@nextgisweb/gui/fields-form";
+import type { FormOnChangeOptions } from "@nextgisweb/gui/fields-form";
 
-import type { TreeItem } from "../type";
+import type { TreeDetailFormField, TreeItem } from "../type";
 
 interface ResourceDetailProps {
     item: TreeItem;
-    getItemForm?: (options: { item: TreeItem }) => FormField[];
+    getItemFields?: (options: { item: TreeItem }) => TreeDetailFormField[];
     onChange?: (item: TreeItem, options: FormOnChangeOptions) => void;
     initialValues?: Record<string, unknown>;
     style?: React.CSSProperties;
@@ -19,24 +15,23 @@ export const ResourceDetail = ({
     item,
     style,
     initialValues,
-    getItemForm,
+    getItemFields,
     onChange,
 }: ResourceDetailProps) => {
     const form = useForm()[0];
 
     return (
-        <Space direction="vertical" style={style}>
-            <h4>{item.data.title}</h4>
-            {getItemForm && (
+        <div style={style}>
+            {getItemFields && (
                 <FieldsForm
                     form={form}
-                    fields={getItemForm({ item })}
+                    fields={getItemFields({ item })}
                     onChange={(options) => {
                         onChange ? onChange(item, options) : undefined;
                     }}
                     initialValues={initialValues}
                 />
             )}
-        </Space>
+        </div>
     );
 };
