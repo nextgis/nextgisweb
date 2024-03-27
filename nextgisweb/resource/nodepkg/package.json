@@ -3,6 +3,6 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "react-complex-tree": "^2.2.3"
+        "react-complex-tree": "^2.3.2"
     }
 }

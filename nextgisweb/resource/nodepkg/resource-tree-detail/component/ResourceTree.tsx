@@ -17,9 +17,7 @@ interface ResourceTreeProps {
     items: TreeItems;
     setItems: React.Dispatch<React.SetStateAction<TreeItems>>;
     selected: TreeItemIndex[];
-    setSelected: React.Dispatch<React.SetStateAction<TreeItemIndex[]>>;
-    focused: TreeItemIndex | undefined;
-    setFocused: React.Dispatch<React.SetStateAction<TreeItemIndex | undefined>>;
+    setSelected: (selected: TreeItemIndex[]) => void;
 }
 
 export const ResourceTree = observer(
@@ -28,8 +26,6 @@ export const ResourceTree = observer(
         setItems,
         selected,
         setSelected,
-        focused,
-        setFocused,
     }: ResourceTreeProps) => {
         const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
 
@@ -107,15 +103,11 @@ export const ResourceTree = observer(
                     canReorderItems
                     viewState={{
                         ["tree-1"]: {
-                            focused,
                             selected,
                             expandedItems,
                         },
                     }}
                     onDrop={onDrop}
-                    onFocusItem={(item) => {
-                        setFocused(item.index);
-                    }}
                     onExpandItem={(item) => {
                         setExpandedItems([...expandedItems, item.index]);
                     }}

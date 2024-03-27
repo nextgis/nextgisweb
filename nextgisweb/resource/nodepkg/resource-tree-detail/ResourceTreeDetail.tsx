@@ -57,7 +57,6 @@ export const ResourceTreeDetail = observer(
     }: ResourceTreeDetailProps) => {
         const { makeSignal } = useAbortController();
 
-        const [selected, setSelected] = useState<TreeItemIndex[]>([]);
         const [focused, setFocused] = useState<TreeItemIndex>();
         const [items, setItems] = useState<TreeItems>(() => {
             return {
@@ -196,13 +195,12 @@ export const ResourceTreeDetail = observer(
                 <Row>
                     <Col span={8}>
                         <ResourceTree
-                            {...{
-                                items,
-                                setItems,
-                                selected,
-                                setSelected,
-                                focused,
-                                setFocused,
+                            items={items}
+                            setItems={setItems}
+                            selected={focused ? [focused] : []}
+                            setSelected={(selectedItems) => {
+                                const firstSelectedItem = selectedItems[0];
+                                setFocused(firstSelectedItem);
                             }}
                         ></ResourceTree>
                     </Col>
