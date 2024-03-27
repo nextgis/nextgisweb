@@ -1,8 +1,8 @@
-import type { Resource } from "../type";
+import type { ResourceRead } from "@nextgisweb/resource/type/api";
 
 const keyname_pattern = "^[A-Za-z][\\w]*$";
 
-export function generateResourceKeyname(item: Resource) {
+export function generateResourceKeyname(item: ResourceRead) {
     const re = new RegExp(keyname_pattern);
     let value = item.keyname || item.display_name;
     if (re.test(value)) {

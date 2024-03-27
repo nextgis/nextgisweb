@@ -8,10 +8,10 @@ import type { FormOnChangeOptions } from "@nextgisweb/gui/fields-form";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import { showResourcePicker } from "../component/resource-picker";
 import type { ResourcePickerStoreOptions } from "../component/resource-picker/type";
-import type { ResourceItem } from "../type";
 
 import { ResourceDetail } from "./component/ResourceDetail";
 import { ResourceTree } from "./component/ResourceTree";
@@ -43,7 +43,7 @@ interface ResourceTreeDetailProps<V extends TreeItemData = TreeItemData> {
     disableGroups?: boolean;
     titleField?: keyof V;
     getItemFields?: (options: { item: TreeItem }) => TreeDetailFormField[];
-    onAddTreeItem?: (item: ResourceItem) => V;
+    onAddTreeItem?: (item: CompositeRead) => V;
     size?: SizeType;
 }
 
@@ -162,15 +162,17 @@ export function ResourceTreeDetail<V extends TreeItemData = TreeItemData>({
     }, [addTreeItems, titleField]);
 
     const addResourceItem = useCallback(
-        async (resource: number | number[] | ResourceItem | ResourceItem[]) => {
+        async (
+            resource: number | number[] | CompositeRead | CompositeRead[]
+        ) => {
             const resources = Array.isArray(resource) ? resource : [resource];
             const treeItems: Omit<TreeItem, "index">[] = [];
             for (const item of resources) {
-                let res: ResourceItem | undefined = undefined;
+                let res: CompositeRead | undefined = undefined;
                 if (typeof item === "number") {
                     res = await route("resource.item", {
                         id: item,
-                    }).get<ResourceItem>({
+                    }).get({
                         cache: true,
                         signal: makeSignal(),
                     });
