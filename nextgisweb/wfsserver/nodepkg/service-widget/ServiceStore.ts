@@ -26,6 +26,7 @@ export class ServiceStore implements IEditorStore<Value> {
         makeAutoObservable<ServiceStore>(this, {});
         this.operation = operation;
         this.parentId = composite.parent;
+        this.isLoaded = operation === "create";
     }
 
     get isValid() {
