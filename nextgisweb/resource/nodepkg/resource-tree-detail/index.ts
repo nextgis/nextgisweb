@@ -1,0 +1,1 @@
+export { ResourceTreeDetail } from "./ResourceTreeDetail";
