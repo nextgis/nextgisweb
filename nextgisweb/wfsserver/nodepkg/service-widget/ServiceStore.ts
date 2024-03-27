@@ -3,23 +3,29 @@ import { makeAutoObservable, toJS } from "mobx";
 import type {
     EditorStoreOptions,
     EditorStore as IEditorStore,
-    Operations,
+    Operation,
 } from "@nextgisweb/resource/type/EditorStore";
 
-interface Value {
-    //
+import type { WfsServiceLayer } from "./type";
+
+export interface Value {
+    layers: WfsServiceLayer[];
 }
 
 export class ServiceStore implements IEditorStore<Value> {
-    readonly identity = "ngw-wfsserver";
+    readonly identity = "wfsserver_service";
+    readonly parentId: number;
+    readonly operation?: Operation;
 
+    isLoaded = false;
     uploading = false;
+    value?: Value | null = null;
+    initValue?: Value | null = null;
 
-    operation?: Operations;
-
-    constructor({ operation }: EditorStoreOptions) {
+    constructor({ operation, composite }: EditorStoreOptions) {
         makeAutoObservable<ServiceStore>(this, {});
         this.operation = operation;
+        this.parentId = composite.parent;
     }
 
     get isValid() {
@@ -27,12 +33,18 @@ export class ServiceStore implements IEditorStore<Value> {
     }
 
     load(value: Value) {
-        console.log(value);
+        this.setValue(value);
+        this.initValue = { ...value };
+        this.isLoaded = true;
     }
 
     dump() {
-        const result: Value = {};
+        const result: Value = this.value || { layers: [] };
 
         return toJS(result);
+    }
+
+    setValue(value: Value) {
+        this.value = value;
     }
 }
