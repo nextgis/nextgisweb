@@ -15,7 +15,7 @@ interface PageFormat {
     label: string;
     value: string;
 }
-interface Scale {
+export interface Scale {
     label: string;
     value: number;
 }
