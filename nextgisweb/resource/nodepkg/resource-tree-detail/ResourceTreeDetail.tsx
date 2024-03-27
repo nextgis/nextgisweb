@@ -1,5 +1,4 @@
-import { observer } from "mobx-react-lite";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { TreeItemIndex } from "react-complex-tree";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
@@ -19,208 +18,271 @@ import type { ResourceItem } from "../type";
 
 import { ResourceDetail } from "./component/ResourceDetail";
 import { ResourceTree } from "./component/ResourceTree";
-import type { TreeItem, TreeItems } from "./type";
+import { ROOT_INDEX } from "./constant";
+import type { TreeItem, TreeItemData, TreeItems } from "./type";
+import { convertToTree, findNearestParent, flattenTree } from "./util/tree";
 
+import DeleteIcon from "@nextgisweb/icon/material/delete";
 import AddLayerIcon from "@nextgisweb/icon/mdi/file-document-plus-outline";
 import AddGroupIcon from "@nextgisweb/icon/mdi/folder-plus-outline";
 
 const msgAddLayerTitle = gettext("Add layer");
 const msgAddGroupTitle = gettext("Add group");
-
+const msgDeleteTitle = gettext("Delete");
 const msgNewFolder = gettext("New group");
 
-const ROOT_INDEX = "root";
-
-interface ResourceTreeDetailProps {
+interface ResourceTreeDetailProps<V extends TreeItemData = TreeItemData> {
+    initValue: V[];
+    onChange?: (val: V[]) => void;
     pickerOptions?: Partial<ResourcePickerStoreOptions>;
     disableGroups?: boolean;
-    getItemForm?: (options: { item: TreeItem }) => FormField[];
+    titleField?: keyof V;
+    getItemFields?: (options: { item: TreeItem }) => FormField[];
+    onAddTreeItem?: (item: ResourceItem) => V;
     size?: SizeType;
 }
 
-const findNearestParent = (index: string, items: TreeItems) => {
-    for (const key in items) {
-        const item = items[key];
-        if (item.children && item.children.includes(index)) {
-            return item;
-        }
-    }
-    return items[ROOT_INDEX];
-};
+export function ResourceTreeDetail<V extends TreeItemData = TreeItemData>({
+    initValue,
+    onChange: onChangeProp,
+    pickerOptions,
+    disableGroups,
+    onAddTreeItem,
+    titleField = "display_name",
+    getItemFields: getItemForm,
+    size,
+}: ResourceTreeDetailProps<V>) {
+    const { makeSignal } = useAbortController();
 
-export const ResourceTreeDetail = observer(
-    ({
-        pickerOptions,
-        disableGroups,
-        getItemForm,
-        size,
-    }: ResourceTreeDetailProps) => {
-        const { makeSignal } = useAbortController();
+    const [focused, setFocused] = useState<TreeItemIndex>();
+    const [items, setItems] = useState<TreeItems<V>>(() => {
+        const flatTree = initValue ? flattenTree(initValue) : {};
+        return {
+            [ROOT_INDEX]: {
+                index: ROOT_INDEX,
+                isFolder: true,
+                children: Object.keys(flatTree),
+                data: {},
+            } as TreeItem<V>,
+            ...flatTree,
+        };
+    });
 
-        const [focused, setFocused] = useState<TreeItemIndex>();
-        const [items, setItems] = useState<TreeItems>(() => {
-            return {
-                [ROOT_INDEX]: {
-                    index: ROOT_INDEX,
-                    isFolder: true,
-                    children: [],
-                    data: { title: "Root" },
-                },
-            };
-        });
+    // Ref for unique ID generation.
+    const ID = useRef(1);
 
-        const ID = useRef(1);
+    const addTreeItems = useCallback(
+        (newItems: Omit<TreeItem, "index">[]) => {
+            setItems((prevItems) => {
+                const updatedItems = { ...prevItems };
+                let parentIndex: TreeItemIndex = ROOT_INDEX;
 
-        const addTreeItem = useCallback(
-            (item: Omit<TreeItem, "index">) => {
-                const newId = String(ID.current++);
-                const index = `tree-item-${newId}`;
-                setItems((prev) => {
-                    const newItems = JSON.parse(JSON.stringify(prev));
-                    let parentItem: TreeItem = newItems[ROOT_INDEX];
-                    if (focused) {
-                        const parent = newItems[focused];
-                        if (parent) {
-                            if (!parent.isFolder) {
-                                parentItem = findNearestParent(index, items);
-                            } else {
-                                parentItem = parent;
-                            }
-                        }
+                if (focused) {
+                    const parent = updatedItems[focused];
+                    if (parent && !parent.isFolder) {
+                        const nearestParent = findNearestParent(
+                            focused,
+                            updatedItems
+                        ) as TreeItem<V>;
+                        parentIndex = nearestParent
+                            ? nearestParent.index
+                            : ROOT_INDEX;
+                    } else {
+                        parentIndex = focused;
                     }
-                    if (parentItem) {
-                        parentItem.children = parentItem.children || [];
-                        parentItem.children.push(index);
-                    }
-                    return {
-                        ...newItems,
-                        [index]: { index, ...item },
-                    };
+                }
+
+                const parentItem = (updatedItems[parentIndex] = updatedItems[
+                    parentIndex
+                ] || { children: [], isFolder: true });
+                parentItem.children = parentItem.children || [];
+
+                newItems.forEach((item) => {
+                    const newId = `added-tree-item-${String(ID.current++)}`;
+                    updatedItems[newId] = {
+                        index: newId,
+                        ...item,
+                    } as TreeItem<V>;
+                    parentItem.children!.push(newId);
                 });
-                // setFocused(index);
-            },
-            [focused, items]
-        );
 
-        const addGroupItem = useCallback(() => {
-            addTreeItem({
+                return updatedItems;
+            });
+        },
+        [focused]
+    );
+
+    const deleteFocused = useCallback(() => {
+        if (focused) {
+            setItems((prevItems) => {
+                const updatedItems = { ...prevItems };
+
+                const deleteItemAndChildren = (itemId: TreeItemIndex) => {
+                    const item = updatedItems[itemId];
+                    if (item && item.children) {
+                        item.children.forEach((childId) =>
+                            deleteItemAndChildren(childId)
+                        );
+                    }
+                    delete updatedItems[itemId];
+                };
+
+                deleteItemAndChildren(focused);
+
+                const parent = findNearestParent(focused, updatedItems);
+                if (parent && parent.children) {
+                    parent.children = parent.children.filter(
+                        (childId) => childId !== focused
+                    );
+                }
+
+                return updatedItems;
+            });
+
+            setFocused(undefined);
+        }
+    }, [focused, setItems]);
+
+    const addGroupItem = useCallback(() => {
+        addTreeItems([
+            {
                 isFolder: true,
                 children: [],
                 canMove: true,
                 data: {
-                    title: `${msgNewFolder} ${ID.current}`,
+                    [titleField]: `${msgNewFolder} ${ID.current}`,
                 },
-            });
-        }, [addTreeItem]);
-
-        const addResourceItem = useCallback(
-            async (resourceId: number | number[]) => {
-                const resourceIds = Array.isArray(resourceId)
-                    ? resourceId
-                    : [resourceId];
-                for (const id of resourceIds) {
-                    const res = await route("resource.item", {
-                        id,
-                    }).get<ResourceItem>({
-                        cache: true,
-                        signal: makeSignal(),
-                    });
-                    if (res) {
-                        addTreeItem({
-                            isFolder: false,
-                            canMove: true,
-                            data: {
-                                title: res.resource.display_name,
-                                resourceItem: res,
-                            },
-                        });
-                    }
-                }
             },
-            [addTreeItem, makeSignal]
-        );
+        ]);
+    }, [addTreeItems, titleField]);
 
-        const onChange = useCallback(
-            (item: TreeItem, options: FormOnChangeOptions) => {
-                const index = item.index;
-                const treeItems = JSON.parse(
-                    JSON.stringify(items)
-                ) as TreeItems;
-                const treeItem = treeItems[index];
-                if (treeItem) {
-                    treeItems[index].data = {
-                        ...treeItem.data,
-                        ...options.value,
+    const addResourceItem = useCallback(
+        async (resourceId: number | number[]) => {
+            const resourceIds = Array.isArray(resourceId)
+                ? resourceId
+                : [resourceId];
+            const treeItems: Omit<TreeItem, "index">[] = [];
+            for (const id of resourceIds) {
+                const res = await route("resource.item", {
+                    id,
+                }).get<ResourceItem>({
+                    cache: true,
+                    signal: makeSignal(),
+                });
+                if (res) {
+                    const data: TreeItemData = {
+                        [titleField]: res.resource.display_name,
                     };
+                    if (onAddTreeItem) {
+                        Object.assign(data, onAddTreeItem(res));
+                    }
+                    treeItems.push({
+                        isFolder: false,
+                        canMove: true,
+                        data,
+                    });
                 }
-                setItems(treeItems);
-            },
-            [items]
-        );
+            }
 
-        return (
-            <>
-                <ActionToolbar
-                    size={size}
-                    actions={[
-                        {
-                            onClick: () => {
-                                showResourcePicker({
-                                    pickerOptions: {
-                                        ...pickerOptions,
-                                        saveLastParentIdGlobal: true,
-                                    },
-                                    onSelect: (v) => {
-                                        if (v) {
-                                            addResourceItem(v);
-                                        }
-                                    },
-                                });
-                            },
-                            icon: <AddLayerIcon />,
-                            title: msgAddLayerTitle,
+            addTreeItems(treeItems);
+        },
+        [addTreeItems, makeSignal, onAddTreeItem, titleField]
+    );
+
+    const onChange = useCallback(
+        (item: TreeItem, options: FormOnChangeOptions) => {
+            const index = item.index;
+            const treeItems = { ...items };
+            const treeItem = treeItems[index];
+            if (treeItem) {
+                treeItems[index].data = {
+                    ...treeItem.data,
+                    ...options.value,
+                };
+            }
+            setItems(treeItems);
+        },
+        [items]
+    );
+
+    useEffect(() => {
+        if (onChangeProp) {
+            const tree = convertToTree<V>(items);
+            const rootChildren = tree[0] && tree[0].children;
+            if (rootChildren) {
+                onChangeProp(rootChildren);
+            }
+        }
+    }, [items, onChangeProp]);
+
+    return (
+        <>
+            <ActionToolbar
+                size={size}
+                actions={[
+                    {
+                        onClick: () => {
+                            showResourcePicker({
+                                pickerOptions: {
+                                    multiple: true,
+                                    ...pickerOptions,
+                                    saveLastParentIdGlobal: true,
+                                },
+                                onSelect: (v) => {
+                                    if (v) {
+                                        addResourceItem(v);
+                                    }
+                                },
+                            });
                         },
+                        icon: <AddLayerIcon />,
+                        title: msgAddLayerTitle,
+                    },
 
-                        ...[
-                            disableGroups
-                                ? undefined
-                                : {
-                                      onClick: addGroupItem,
-                                      icon: <AddGroupIcon />,
-                                      title: msgAddGroupTitle,
-                                  },
-                        ],
-                    ]}
-                ></ActionToolbar>
-                <Row>
-                    <Col span={8}>
-                        <ResourceTree
-                            items={items}
-                            setItems={setItems}
-                            selected={focused ? [focused] : []}
-                            setSelected={(selectedItems) => {
-                                const firstSelectedItem = selectedItems[0];
-                                setFocused(firstSelectedItem);
-                            }}
-                        ></ResourceTree>
+                    ...[
+                        disableGroups
+                            ? undefined
+                            : {
+                                  onClick: addGroupItem,
+                                  icon: <AddGroupIcon />,
+                                  title: msgAddGroupTitle,
+                              },
+                    ],
+                    {
+                        onClick: deleteFocused,
+                        icon: <DeleteIcon />,
+                        title: msgDeleteTitle,
+                        danger: true,
+                        disabled: !focused,
+                        size,
+                    },
+                ]}
+            ></ActionToolbar>
+            <Row>
+                <Col span={8}>
+                    <ResourceTree
+                        items={items}
+                        setItems={setItems}
+                        selected={focused ? [focused] : []}
+                        setSelected={(selectedItems) => {
+                            const firstSelectedItem = selectedItems[0];
+                            setFocused(firstSelectedItem);
+                        }}
+                    ></ResourceTree>
+                </Col>
+                {focused && items[focused] && (
+                    <Col span={16}>
+                        <ResourceDetail
+                            style={{ width: "100%" }}
+                            key={focused}
+                            item={items[focused]}
+                            getItemForm={getItemForm}
+                            onChange={onChange}
+                            initialValues={items[focused].data}
+                        />
                     </Col>
-                    {focused && items[focused] && (
-                        <Col span={16}>
-                            <ResourceDetail
-                                key={focused}
-                                {...{
-                                    item: items[focused],
-                                    getItemForm,
-                                    onChange,
-                                    initialValues: {
-                                        title: items[focused].data.title,
-                                    },
-                                }}
-                            />
-                        </Col>
-                    )}
-                </Row>
-            </>
-        );
-    }
-);
+                )}
+            </Row>
+        </>
+    );
+}

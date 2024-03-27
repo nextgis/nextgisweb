@@ -3,13 +3,17 @@ import type {
     TreeItemIndex,
 } from "react-complex-tree";
 
-import type { ResourceItem } from "../type";
+export type DataObject = Record<string, any>;
 
-export interface TreeItemData {
-    title: string;
-    resourceItem?: ResourceItem;
-}
+export type TreeItemData<R extends DataObject = DataObject> = R & {
+    children?: R[];
+};
 
-export type TreeItem = ReactComplexTreeItem<TreeItemData>;
+export type TreeItem<R extends DataObject = DataObject> = ReactComplexTreeItem<
+    TreeItemData<R>
+>;
 
-export type TreeItems = Record<TreeItemIndex, TreeItem>;
+export type TreeItems<R extends DataObject = DataObject> = Record<
+    TreeItemIndex,
+    TreeItem<R>
+>;
