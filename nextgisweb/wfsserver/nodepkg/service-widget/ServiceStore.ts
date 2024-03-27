@@ -1,9 +1,9 @@
 import { makeAutoObservable, toJS } from "mobx";
 
 import type {
+    EditorStoreOptions,
     EditorStore as IEditorStore,
     Operations,
-    EditorStoreOptions,
 } from "@nextgisweb/resource/type/EditorStore";
 
 interface Value {
@@ -27,7 +27,7 @@ export class ServiceStore implements IEditorStore<Value> {
     }
 
     load(value: Value) {
-        //
+        console.log(value);
     }
 
     dump() {
