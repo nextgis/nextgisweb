@@ -1,0 +1,1 @@
+export { ResourceFocusTable } from "./ResourceFocusTable";

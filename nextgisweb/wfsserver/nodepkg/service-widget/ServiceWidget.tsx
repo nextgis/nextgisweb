@@ -2,10 +2,10 @@ import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
 import { LoadingWrapper } from "@nextgisweb/gui/component";
+import type { GetItemFieldsFunction } from "@nextgisweb/gui/focus-table";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/field/ResourceSelect";
-import { ResourceTreeDetail } from "@nextgisweb/resource/resource-tree-detail";
-import type { TreeDetailFormField } from "@nextgisweb/resource/resource-tree-detail";
+import { ResourceFocusTable } from "@nextgisweb/resource/resource-focus-table";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
@@ -14,12 +14,13 @@ import { generateResourceKeyname } from "@nextgisweb/resource/util/generateResou
 
 import type { ServiceStore } from "./ServiceStore";
 import type { WfsServiceLayer } from "./type";
-import "./ServiceWidget.less";
 
 export const ServiceWidget: EditorWidgetComponent<
     EditorWidgetProps<ServiceStore>
 > = observer(({ store }: EditorWidgetProps<ServiceStore>) => {
-    const getItemFields = useCallback((): TreeDetailFormField[] => {
+    const getItemFields = useCallback<
+        GetItemFieldsFunction<WfsServiceLayer>
+    >(() => {
         return [
             {
                 name: "display_name",
@@ -49,14 +50,14 @@ export const ServiceWidget: EditorWidgetComponent<
 
     return (
         <div className="ngw-wfsserver-widget">
-            <ResourceTreeDetail<WfsServiceLayer>
+            <ResourceFocusTable<WfsServiceLayer>
                 pickerOptions={{
                     requireInterface: "IFeatureLayer",
                     parentId: store.parentId,
                 }}
                 titleField="display_name"
                 getItemFields={getItemFields}
-                onAddTreeItem={(item) => {
+                onResourceAdd={(item) => {
                     const keyname = generateResourceKeyname(item.resource);
 
                     return {
@@ -71,7 +72,7 @@ export const ServiceWidget: EditorWidgetComponent<
                     store.setValue({ layers });
                 }}
                 disableGroups
-            ></ResourceTreeDetail>
+            ></ResourceFocusTable>
         </div>
     );
 });
