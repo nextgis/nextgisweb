@@ -52,15 +52,17 @@ export const FocusTable = observer(
         const onChange = useCallback(
             (item: TreeItem, options: FormOnChangeOptions) => {
                 const index = item.index;
-                const treeItems = { ...items };
-                const treeItem = treeItems[index];
-                if (treeItem) {
-                    treeItems[index].data = {
-                        ...treeItem.data,
-                        ...options.value,
-                    };
-                }
-                setItems(treeItems);
+                const updatedTreeItems = {
+                    ...items,
+                    [index]: {
+                        ...items[index],
+                        data: {
+                            ...items[index].data,
+                            ...options.value,
+                        },
+                    },
+                };
+                setItems(updatedTreeItems);
             },
             [items, setItems]
         );
