@@ -53,11 +53,13 @@ export interface InputProps<V = unknown> {
     onChange?: (...args: any[]) => void;
 }
 
+export type NameType<N extends string = string> = N | `#${string}`;
+
 export interface FormItemProps<
     P extends InputProps = InputProps,
     N extends string = string,
 > extends AntdFormItemProps {
-    name: N;
+    name: NameType<N>;
     placeholder?: string;
     inputProps?: P;
     disabled?: boolean;
@@ -86,14 +88,15 @@ type GetWidgetInputPropsFromComponent<W extends FormWidgetComponent> = Exclude<
 type GetWidgetInputProps<W extends FormWidget> = W extends WidgetName
     ? GetWidgetInputPropsFromName<W>
     : W extends FormWidgetComponent
-    ? GetWidgetInputPropsFromComponent<W>
-    : GetWidgetInputPropsFromName<"input">;
+      ? GetWidgetInputPropsFromComponent<W>
+      : GetWidgetInputPropsFromName<"input">;
 
 export interface FormField<
     N extends string = string,
     W extends FormWidget = FormWidget,
 > extends FormItemProps<GetWidgetInputProps<W>, N> {
     widget?: W;
+    render?: React.ReactElement;
     inputProps?: GetWidgetInputProps<W>;
     choices?: FormFieldChoice[];
     included?: boolean;
@@ -102,13 +105,14 @@ export interface FormField<
     value?: unknown;
 }
 
-export interface FieldsFormProps extends FormProps {
+export interface FieldsFormProps<N extends string = string>
+    extends Omit<FormProps, "fields"> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialValues?: Record<string, any>;
     whenReady?: () => void;
     onChange?: (options: FormOnChangeOptions) => void;
     children?: ReactNode;
-    fields: FormField[];
+    fields: FormField<N>[];
     form?: FormInstance;
 }
 

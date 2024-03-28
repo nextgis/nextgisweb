@@ -27,12 +27,12 @@ export const widgetsByName: Record<WidgetName, FormWidgetComponent> = {
     time: TimeInput,
 };
 
-export function FormItem({
+export function FormItem<N extends string = string>({
     required,
     requiredMessage,
     widget,
     ...formProps
-}: FormField) {
+}: FormField<N>) {
     delete formProps.included;
     delete formProps.value;
     formProps.rules = formProps.rules ? [...formProps.rules] : [];

@@ -5,7 +5,7 @@ import { Form } from "@nextgisweb/gui/antd";
 import { FormItem } from "./FormItem";
 import type { FieldsFormProps, FormProps } from "./type";
 
-export function FieldsForm({
+export function FieldsForm<N extends string = string>({
     form,
     fields = [],
     children,
@@ -13,7 +13,7 @@ export function FieldsForm({
     whenReady,
     initialValues,
     ...formProps
-}: FieldsFormProps) {
+}: FieldsFormProps<N>) {
     const localForm = Form.useForm(form)[0];
     const readyRef = useRef(whenReady);
 
@@ -38,7 +38,6 @@ export function FieldsForm({
             onChange({ isValid, value });
         }
     };
-
     const modifiedFormProps: Partial<FormProps> = {
         form: localForm,
         initialValues,
