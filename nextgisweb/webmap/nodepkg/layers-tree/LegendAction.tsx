@@ -1,3 +1,5 @@
+import type { MouseEvent } from "react";
+
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { TreeItem } from "../type/TreeItems";
@@ -23,11 +25,10 @@ export function LegendAction({
     const { open } = nodeData.legendInfo;
     const icon = open ? <ExpandLessIcon /> : <ViewListIcon />;
 
-    const click = () => {
-        const { id } = nodeData;
-        const { open } = nodeData.legendInfo;
-        nodeData.legendInfo.open = !open;
-        onClick(id);
+    const click = (evt: MouseEvent) => {
+        evt.stopPropagation();
+        nodeData.legendInfo.open = !nodeData.legendInfo.open;
+        onClick(nodeData.id);
     };
 
     return (

@@ -54,6 +54,7 @@ export function Legend({ nodeData, store }: LegendProps) {
                                         e.target.checked
                                     );
                                 }}
+                                onClick={(evt) => evt.stopPropagation()}
                             />
                             <img
                                 width={20}
