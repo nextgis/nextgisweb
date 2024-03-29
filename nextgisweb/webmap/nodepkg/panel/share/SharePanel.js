@@ -24,6 +24,7 @@ import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
 
 import "./SharePanel.less";
+import "../styles/panels.less";
 
 // prettier-ignore
 const msgCORS = gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain.");
@@ -257,7 +258,7 @@ export const SharePanel = ({ display, title, close, visible }) => {
     }
 
     return (
-        <div className="ngw-webmap-share-panel">
+        <div className="ngw-panel ngw-webmap-share-panel">
             <PanelHeader {...{ title, close }} />
             <section>
                 <h5 className="heading">{gettext("Map link")}</h5>

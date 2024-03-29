@@ -1,5 +1,5 @@
-import debounce from "lodash-es/debounce";
 import { toPng } from "html-to-image";
+import debounce from "lodash-es/debounce";
 import type { Coordinate } from "ol/coordinate";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -13,9 +13,8 @@ import {
     Space,
     Switch,
 } from "@nextgisweb/gui/antd";
-import type { InputRef, MenuProps } from "@nextgisweb/gui/antd";
+import type { MenuProps } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
-import { FloatingLabel } from "@nextgisweb/gui/floating-label";
 import reactApp from "@nextgisweb/gui/react-app";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -38,11 +37,7 @@ import {
 } from "./options";
 import type { Scale, UrlPrintParams } from "./options";
 
-import {
-    CheckOutlined,
-    DownOutlined,
-    ShareAltOutlined,
-} from "@ant-design/icons";
+import { DownOutlined, ShareAltOutlined } from "@ant-design/icons";
 
 import "./PrintPanel.less";
 
@@ -260,6 +255,8 @@ const ScalesSelect = ({
 
     const dropdownRender = (menu: ReactNode) => (
         <>
+            {menu}
+            <Divider style={{ margin: "5px 0" }} />
             <div className="custom-scale">
                 <div className="prefix">1 : </div>
                 <div className="input">
@@ -279,8 +276,6 @@ const ScalesSelect = ({
                     />
                 </div>
             </div>
-            <Divider style={{ margin: "5px 0" }} />
-            {menu}
         </>
     );
 
@@ -465,26 +460,22 @@ export const PrintPanel = ({
     };
 
     return (
-        <div className="print-panel">
+        <div className="ngw-panel print-panel">
             <PanelHeader {...{ title, close }} />
 
             <section>
-                <FloatingLabel
-                    label={gettext("Paper format")}
-                    value={paperFormat}
-                >
+                <div className="input-group column">
+                    <label>{gettext("Paper format")}</label>
                     <Select
                         style={{ width: "100%" }}
                         onChange={(v) => changePaperFormat(v)}
                         value={paperFormat}
                         options={pageFormats}
                     ></Select>
-                </FloatingLabel>
+                </div>
 
-                <FloatingLabel
-                    label={gettext("Height, mm")}
-                    value={String(mapSettings.height)}
-                >
+                <div className="input-group column">
+                    <label>{gettext("Height, mm")}</label>
                     <InputNumber
                         style={{ width: "100%" }}
                         onChange={(v) =>
@@ -497,12 +488,10 @@ export const PrintPanel = ({
                         step={1}
                         disabled={disableChangeSize}
                     ></InputNumber>
-                </FloatingLabel>
+                </div>
 
-                <FloatingLabel
-                    label={gettext("Width, mm")}
-                    value={String(mapSettings.width)}
-                >
+                <div className="input-group column">
+                    <label>{gettext("Width, mm")}</label>
                     <InputNumber
                         style={{ width: "100%" }}
                         onChange={(v) =>
@@ -515,12 +504,10 @@ export const PrintPanel = ({
                         step={1}
                         disabled={disableChangeSize}
                     ></InputNumber>
-                </FloatingLabel>
+                </div>
 
-                <FloatingLabel
-                    label={gettext("Margin, mm")}
-                    value={String(mapSettings.margin)}
-                >
+                <div className="input-group column">
+                    <label>{gettext("Margin, mm")}</label>
                     <InputNumber
                         style={{ width: "100%" }}
                         onChange={(v) =>
@@ -532,7 +519,7 @@ export const PrintPanel = ({
                         max={1000}
                         step={1}
                     ></InputNumber>
-                </FloatingLabel>
+                </div>
             </section>
 
             <section>
@@ -556,16 +543,14 @@ export const PrintPanel = ({
                     </span>
                 </div>
 
-                <FloatingLabel
-                    label={gettext("Scale")}
-                    value={String(mapSettings.scale)}
-                >
+                <div className="input-group column">
+                    <label>{gettext("Scale")}</label>
                     <ScalesSelect
                         selectedValue={mapSettings.scale}
                         scales={scales}
                         onChange={(v) => updateMapSettings({ scale: v })}
                     />
-                </FloatingLabel>
+                </div>
 
                 <div className="actions">
                     <Space.Compact>

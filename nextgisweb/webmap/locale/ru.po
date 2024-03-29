@@ -6,43 +6,43 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:838
+#: amd/ngw-webmap/Display.js:837
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: amd/ngw-webmap/Display.js:839
+#: amd/ngw-webmap/Display.js:838
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:931 amd/ngw-webmap/ItemWidget.js:309
+#: amd/ngw-webmap/Display.js:930 amd/ngw-webmap/ItemWidget.js:309
 msgid "Layers"
 msgstr "Слои"
 
-#: amd/ngw-webmap/Display.js:942
+#: amd/ngw-webmap/Display.js:941
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-webmap/Display.js:953
+#: amd/ngw-webmap/Display.js:952
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:967
+#: amd/ngw-webmap/Display.js:966
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: amd/ngw-webmap/Display.js:985 amd/ngw-webmap/plugin/LayerInfo.js:28
+#: amd/ngw-webmap/Display.js:984 amd/ngw-webmap/plugin/LayerInfo.js:28
 msgid "Description"
 msgstr "Описание"
 
-#: amd/ngw-webmap/Display.js:1004
+#: amd/ngw-webmap/Display.js:1003
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1056
+#: amd/ngw-webmap/Display.js:1055
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: amd/ngw-webmap/Display.js:1097
+#: amd/ngw-webmap/Display.js:1096
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
@@ -211,7 +211,7 @@ msgstr "Удалить"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:71
 #: amd/ngw-webmap/template/ItemWidget.hbs:128
-#: nodepkg/clone-webmap/CloneWebmap.tsx:73
+#: nodepkg/clone-webmap/CloneWebmap.tsx:74
 msgid "Display name"
 msgstr "Наименование"
 
@@ -413,11 +413,11 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:20 view.py:337
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:337
 msgid "Clone"
 msgstr "Клонировать"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:60
+#: nodepkg/clone-webmap/CloneWebmap.tsx:61
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -481,11 +481,11 @@ msgstr "Остановить рисование"
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: nodepkg/layers-tree/Legend.tsx:10
+#: nodepkg/layers-tree/LegendAction.tsx:8
 msgid "Show legend"
 msgstr "Показывать легенду"
 
-#: nodepkg/layers-tree/Legend.tsx:11
+#: nodepkg/layers-tree/LegendAction.tsx:9
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
@@ -583,43 +583,47 @@ msgstr "Другие приватные аннотации"
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/panel/print/PrintPanel.tsx:378
+#: nodepkg/panel/print/PrintPanel.tsx:272
+msgid "Custom scale"
+msgstr "Произвольный масштаб"
+
+#: nodepkg/panel/print/PrintPanel.tsx:473
 msgid "Paper format"
 msgstr "Формат бумаги"
 
-#: nodepkg/panel/print/PrintPanel.tsx:390
+#: nodepkg/panel/print/PrintPanel.tsx:485
 msgid "Height, mm"
 msgstr "Высота, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:408
+#: nodepkg/panel/print/PrintPanel.tsx:503
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:426
+#: nodepkg/panel/print/PrintPanel.tsx:521
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:444 nodepkg/panel/print/PrintPanel.tsx:465
+#: nodepkg/panel/print/PrintPanel.tsx:539 nodepkg/panel/print/PrintPanel.tsx:560
 msgid "Scale"
 msgstr "Масштаб"
 
-#: nodepkg/panel/print/PrintPanel.tsx:451
+#: nodepkg/panel/print/PrintPanel.tsx:546
 msgid "Scale value"
 msgstr "Значение масштаба"
 
-#: nodepkg/panel/print/PrintPanel.tsx:460
+#: nodepkg/panel/print/PrintPanel.tsx:555
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/PrintPanel.tsx:484
+#: nodepkg/panel/print/PrintPanel.tsx:578
 msgid "Print"
 msgstr "Печать"
 
-#: nodepkg/panel/print/PrintPanel.tsx:492
+#: nodepkg/panel/print/PrintPanel.tsx:586
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: nodepkg/panel/print/PrintPanel.tsx:504
+#: nodepkg/panel/print/PrintPanel.tsx:598
 msgid "Copy link to the print map"
 msgstr "Скопировать ссылку на карту для печати"
 
@@ -717,21 +721,21 @@ msgstr "Высота, пикс."
 msgid "px"
 msgstr "px"
 
-#: nodepkg/panel/share/SharePanel.js:300
-msgid "Link to main map"
-msgstr "Ссылка на основную карту"
-
-#: nodepkg/panel/share/SharePanel.js:309
-msgid "Generate events"
-msgstr "Генерация событий"
-
-#: nodepkg/panel/share/SharePanel.js:313
+#: nodepkg/panel/share/SharePanel.js:295
 msgid "Map tools"
 msgstr "Инструменты карты"
 
-#: nodepkg/panel/share/SharePanel.js:317
+#: nodepkg/panel/share/SharePanel.js:299
 msgid "Panels"
 msgstr "Панели"
+
+#: nodepkg/panel/share/SharePanel.js:314
+msgid "Link to main map"
+msgstr "Ссылка на основную карту"
+
+#: nodepkg/panel/share/SharePanel.js:323
+msgid "Generate events"
+msgstr "Генерация событий"
 
 #: nodepkg/panel/share/SharePanel.js:327
 msgid "Embed code"
@@ -1016,3 +1020,4 @@ msgstr "Просмотр встроенной веб-карты"
 #: view.py:327
 msgid "Display"
 msgstr "Открыть"
+

@@ -2,13 +2,13 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
 import { Select, Switch } from "@nextgisweb/gui/antd";
-import { FloatingLabel } from "@nextgisweb/gui/floating-label";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations/";
 
 import { PanelHeader } from "../header";
 
 import "./AnnotationsPanel.less";
+import "../styles/panels.less";
 
 const ADD_ANNOTATION_STATE_KEY = "addAnnotation";
 
@@ -95,10 +95,8 @@ export const AnnotationsPanel = observer(
                         </span>
                     </div>
 
-                    <FloatingLabel
-                        label={gettext("Geometry type")}
-                        value={geomType}
-                    >
+                    <div className="input-group column">
+                        <label>{gettext("Geometry type")}</label>
                         <Select
                             style={{ width: "100%" }}
                             onChange={(v) => changeGeomType(v)}
@@ -116,7 +114,7 @@ export const AnnotationsPanel = observer(
                                 },
                             ]}
                         ></Select>
-                    </FloatingLabel>
+                    </div>
                 </section>
             );
         }
@@ -130,17 +128,14 @@ export const AnnotationsPanel = observer(
         };
 
         return (
-            <div className="ngw-webmap-annotations-panel">
+            <div className="ngw-panel ngw-webmap-annotations-panel">
                 <PanelHeader {...{ title, close }} />
 
                 <section>
                     <h5 className="heading">{gettext("Annotations layer")}</h5>
 
-                    <FloatingLabel
-                        label={gettext("Show annotations")}
-                        name="name"
-                        value={visible}
-                    >
+                    <div className="input-group column">
+                        <label>{gettext("Show annotations")}</label>
                         <Select
                             style={{ width: "100%" }}
                             onChange={(value) => changeVisible(value)}
@@ -154,7 +149,7 @@ export const AnnotationsPanel = observer(
                                 },
                             ]}
                         ></Select>
-                    </FloatingLabel>
+                    </div>
                 </section>
 
                 {editSection}
