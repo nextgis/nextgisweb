@@ -124,5 +124,19 @@ define(["dojo/_base/declare", "dojo/Stateful", "openlayers/ol"], function (
             );
             this.zoomToExtent(extent);
         },
+
+        getMaxZIndex: function () {
+            var layers = this.olMap.getLayers().getArray();
+            var maxZIndex = 0;
+
+            layers.forEach((layer) => {
+                var zIndex = layer.getZIndex();
+                if (zIndex !== undefined && zIndex > maxZIndex) {
+                    maxZIndex = zIndex;
+                }
+            });
+
+            return maxZIndex;
+        },
     });
 });

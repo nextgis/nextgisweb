@@ -56,15 +56,15 @@ define([
 
                 const formattedMeasure = is_area
                     ? utils.formatMetersArea(
-                          value,
-                          settings.units_area,
-                          formatConfig
-                      )
+                        value,
+                        settings.units_area,
+                        formatConfig
+                    )
                     : utils.formatMetersLength(
-                          value,
-                          settings.units_length,
-                          formatConfig
-                      );
+                        value,
+                        settings.units_length,
+                        formatConfig
+                    );
 
                 return `${label} = ${formattedMeasure}`;
             }
@@ -97,6 +97,9 @@ define([
             });
             this.display.map.olMap.addInteraction(this.interaction);
             this.interaction.setActive(false);
+
+            const maxZIndex = this.display.map.getMaxZIndex();
+            this.vector.setZIndex(maxZIndex + 1);
 
             function isValid(geom) {
                 if (geom instanceof ol.geom.Polygon) {
@@ -195,9 +198,12 @@ define([
                 })
             );
 
-            this.interaction.on("drawend", function () {
-                ol.Observable.unByKey(listener);
-            });
+            this.interaction.on(
+                "drawend",
+                lang.hitch(this, function () {
+                    ol.Observable.unByKey(listener);
+                })
+            );
 
             // Tooltip for results
             this.tooltip = new TooltipDialog();
