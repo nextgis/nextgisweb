@@ -2,30 +2,34 @@ import re
 from io import BytesIO
 from itertools import count
 from tempfile import NamedTemporaryFile
+from typing import List
 from urllib.parse import quote_plus
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from msgspec import Meta
+from msgspec import Meta, Struct
 from PIL import Image
 from pyramid.response import FileResponse, Response
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.apitype import ContentType
 from nextgisweb.lib.json import dumpb
 
+from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.feature_layer.api import FeatureID
 from nextgisweb.feature_layer.exception import FeatureNotFound
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.tomb import UnsafeFileResponse
-from nextgisweb.resource import DataScope, ResourceFactory
+from nextgisweb.resource import DataScope, Resource, ResourceFactory
 
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from .model import FeatureAttachment
 from .util import attachments_import
 
+ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 AttachmentID = Annotated[int, Meta(ge=1, description="Attachment ID")]
 
 
@@ -235,6 +239,58 @@ def import_attachment(resource, request) -> JSONType:
     return attachments_import(resource, fupload.data_path, replace=replace)
 
 
+class BundleItem(Struct, kw_only=True):
+    resource: ResourceID
+    attachment: AttachmentID
+
+
+class BundleBody(Struct, kw_only=True):
+    items: List[BundleItem]
+
+
+def bundle(request, body: BundleBody) -> Annotated[Response, ContentType("application/zip")]:
+    """Download specific attachments as ZIP archive"""
+    valid_rid = set()
+    arc_names = set()
+    re_idx = re.compile(r"^(.*?)((?:\.[a-z0-9]+)*)$", re.IGNORECASE)
+    afiles = list()
+
+    for itm in body.items:
+        rid = itm.resource
+        if rid not in valid_rid:
+            if (resource := Resource.filter_by(id=rid).first()) is None:
+                raise ValidationError
+            if not IFeatureLayer.providedBy(resource):
+                raise ValidationError
+            request.resource_permission(DataScope.read, resource)
+            valid_rid.add(rid)
+        fa = FeatureAttachment.filter_by(id=itm.attachment, resource_id=rid).first()
+        if fa is None:
+            raise ValidationError
+
+        arc_name = None
+        for idx in count():
+            if idx == 0:
+                arc_name = fa.name
+            else:
+                arc_name = re_idx.sub(lambda m: f"{m.group(1)}-{idx}{m.group(2)}", fa.name)
+            if arc_name not in arc_names:
+                arc_names.add(arc_name)
+                break
+
+        assert arc_name is not None
+        afiles.append((fa.fileobj.filename(), arc_name))
+
+    with NamedTemporaryFile(suffix=".zip") as tmp_file:
+        with ZipFile(tmp_file, "w", ZIP_DEFLATED, allowZip64=True) as zipf:
+            for afile in afiles:
+                zipf.write(*afile)
+
+        response = FileResponse(tmp_file.name, content_type="application/zip")
+        response.content_disposition = 'attachment; filename="bundle.zip"'
+        return response
+
+
 def setup_pyramid(comp, config):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
@@ -288,4 +344,10 @@ def setup_pyramid(comp, config):
         "/api/resource/{id}/feature_attachment/import",
         factory=feature_layer_factory,
         put=import_attachment,
+    )
+
+    config.add_route(
+        "feature_attachment.bundle",
+        "/api/component/feature_attachment/bundle",
+        post=bundle,
     )
