@@ -31,10 +31,13 @@ import VisibilityOffIcon from "@nextgisweb/icon/material/visibility_off/outline"
 import ZoomInIcon from "@nextgisweb/icon/material/zoom_in/outline";
 
 export interface FilterExtentBtnProps {
-    id: number;
+    id: number | string;
     display: DojoDisplay;
     size?: SizeType;
-    onGeomChange?: (geom?: Geometry, geomWKT?: string) => void;
+    onGeomChange?: (
+        geom: Geometry | undefined,
+        geomWKT: string | undefined
+    ) => void;
 }
 
 type FilterExtentBtnMode = "default" | "draw" | "geometry";
@@ -145,7 +148,7 @@ interface InteractionInfo {
 
 const buildInteraction = (
     display: DojoDisplay,
-    layerId: number,
+    uniqueLayerId: number | string,
     geomType: string,
     onDrawEnd?: (event: DrawEvent) => void,
     onTerminate?: () => void
@@ -189,7 +192,7 @@ const buildInteraction = (
         }
     });
 
-    const mapStateKey = `filterExtent-${layerId}`;
+    const mapStateKey = `filterExtent-${uniqueLayerId}`;
     const control: MapStateControl = {
         activate: () => {},
         deactivate: () => {

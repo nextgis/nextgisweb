@@ -28,4 +28,5 @@ export interface FeatureItem<F extends Attrs = Attrs> {
     geom: string;
     fields: F;
     extensions: FeatureItemExtensions;
+    label?: string;
 }

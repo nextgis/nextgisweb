@@ -1,6 +1,7 @@
 /// <reference types="dojo/dijit" />
 
 import type Feature from "ol/Feature";
+import type { Options } from "ol/control/Control";
 import type { Control as OlControl } from "ol/control";
 
 import type WebmapStore from "../store";
@@ -32,6 +33,15 @@ export interface FeatureHighlighter {
     unhighlightFeature: (filter: (feature: Feature) => boolean) => void;
 }
 
+export interface WebmapItemConfig extends WebmapItem {
+    plugin?: Record<string, unknown>;
+    label: string;
+}
+
+export interface ItemConfigById {
+    [key: number]: WebmapItemConfig;
+}
+
 export interface MapTool extends dijit._WidgetBase {
     activate: () => void;
     deactivate: () => void;
@@ -53,6 +63,12 @@ interface DojoDisplayIdentifyPopup {
 
 export interface DojoDisplayIdentify {
     _popup: DojoDisplayIdentifyPopup;
+    identifyFeatureByAttrValue: (
+        layerId: number,
+        attribute: string,
+        value: string | number | boolean,
+        zoom?: number
+    ) => PromiseLike<boolean>;
     reset: () => void;
 }
 
@@ -66,6 +82,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     isTinyMode: () => boolean;
 
     itemStore: CustomItemFileWriteStore;
+    getItemConfig: () => ItemConfigById;
     webmapStore: WebmapStore;
     mapStates: MapStatesObserver;
 
@@ -86,4 +103,20 @@ export interface DojoDisplay extends dijit._WidgetBase {
      * @deprecated use webmapStore.getlayers() instead
      */
     _layers: Record<number, WebmapLayer>;
+}
+
+export interface PluginParams {
+    identity: string;
+    display: DojoDisplay;
+    itemStore: CustomItemFileWriteStore | boolean;
+}
+
+export interface Plugin {
+    postCreate: () => void;
+    startup: () => void;
+}
+
+export interface ControlOption extends Options {
+    display: DojoDisplay;
+    tipLabel: string;
 }

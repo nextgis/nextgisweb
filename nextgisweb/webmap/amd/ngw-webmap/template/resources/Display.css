@@ -74,6 +74,11 @@ body > .webmap-wrapper {
     line-height: 1;
 }
 
+.control-pane--bottom.control-pane--left {
+    display: flex;
+    align-items: center;
+}
+
 .control-pane .ol-control,
 .control-pane .ol-scale-line {
     position: static;

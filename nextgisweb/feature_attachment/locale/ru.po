@@ -1,9 +1,12 @@
 #: amd/ngw-feature-attachment/DisplayWidget.js:9
+#: nodepkg/attachment-bundle/ol-control/control.js:14
+#: nodepkg/attachment-bundle/ol-control/control.js:30
+#: nodepkg/attachment-bundle/plugin/plugin.ts:14
 #: nodepkg/attachment-editor/index.ts:8
 msgid "Attachments"
 msgstr "Вложения"
 
-#: component.py:12
+#: component.py:13
 msgid "Feature attachments"
 msgstr "Прикрепленные к объектам файлы"
 
@@ -19,18 +22,42 @@ msgstr "Вложение с id = %d не найдено в объекте с id 
 msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:33
+msgid "Draw the geometry on the map to visualize the attachments to the objects"
+msgstr "Нарисуйте геометрию на карте, чтобы отобразить вложения к объектам."
+
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:130
+msgid "Object: "
+msgstr "Объект: "
+
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:139
+msgid "Identify object"
+msgstr "Идентифицировать объект"
+
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:160
+msgid "Attachments: "
+msgstr "Вложений: "
+
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:187
+msgid "No attachments"
+msgstr "Нет вложений"
+
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:253
+msgid "Download all attachments"
+msgstr "Скачать все вложения"
+
 #: nodepkg/attachment-editor/AttachmentEditor.tsx:167
-#: nodepkg/attachment-table/AttachmentTable.tsx:54
+#: nodepkg/attachment-table/AttachmentTable.tsx:45
 msgid "File name"
 msgstr "Имя файла"
 
 #: nodepkg/attachment-editor/AttachmentEditor.tsx:173
-#: nodepkg/attachment-table/AttachmentTable.tsx:72
+#: nodepkg/attachment-table/AttachmentTable.tsx:63
 msgid "Size"
 msgstr "Размер"
 
 #: nodepkg/attachment-editor/AttachmentEditor.tsx:179
-#: nodepkg/attachment-table/AttachmentTable.tsx:87
+#: nodepkg/attachment-table/AttachmentTable.tsx:78
 msgid "Description"
 msgstr "Описание"
 
@@ -93,7 +120,7 @@ msgstr "Экспорт"
 msgid "Import"
 msgstr "Импорт"
 
-#: nodepkg/attachment-table/AttachmentTable.tsx:81
+#: nodepkg/attachment-table/AttachmentTable.tsx:72
 msgid "MIME type"
 msgstr "Тип MIME"
 
@@ -133,7 +160,7 @@ msgstr "Не удалось определить идентификатор об
 msgid "File '{}' isn't found in the archive."
 msgstr "Файл '{}' не найден в архиве."
 
-#: view.py:20 view.py:41
+#: view.py:20 view.py:43
 msgid "Manage attachments"
 msgstr "Управление вложениями"
 
