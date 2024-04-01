@@ -4,17 +4,17 @@ Changes
 4.7.0
 -----
 
-- Update minimum required NodeJS version to 20.0.
-- Add export to CSV and import from CSV for lookup tables.
-- Enhanced feature attachment viewer now includes panoramic images support.
-- Ability to copy printing parameters as a URL for sharing.
-- Support for multiple replicas and long-runnning requests.
-- Ctrl+Click opens feature attachment in a fixed tab.
-- Configurable permissions for groups, users, SRS and CORS management.
+- Turn legend categories on/off for a better experience on webmaps.
 - Lots of customization options for embedded webmaps: map tools and panels.
-- Support for custom SVG logos in addition to PNG.
 - Ability to exclude feature layer fields from text search.
-- Directly toggle legend symbols for a better experience on webmaps.
+- Configurable permissions for groups, users, SRS and CORS management.
+- Enhanced feature attachment viewer now includes panoramic images support.
+- Ctrl+click opens feature attachment in a fixed tab.
+- Ability to copy printing parameters as a URL for sharing.
+- Support for custom SVG logos in addition to PNG.
+- Add export to CSV and import from CSV for lookup tables.
+- Support for multiple replicas and long-runnning requests.
+- Update minimum required NodeJS version to 20.0.
 
 
 4.6.0
