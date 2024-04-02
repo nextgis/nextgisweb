@@ -6,6 +6,7 @@ import type {
 } from "@nextgisweb/feature-layer/type";
 import { message } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
+import type { RouteBody } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 
@@ -109,19 +110,22 @@ export class FeatureEditorStore {
             const storeExtension = this._extensionStores[key];
             extensions[key] = toJS(storeExtension.value);
         }
-        const fields = this._attributeStore
-            ? toJS(this._attributeStore.value)
-            : {};
         runInAction(() => {
             this.saving = true;
         });
+
+        const json: RouteBody<"feature_layer.feature.item", "put"> = {
+            extensions,
+        };
+
+        if (this._attributeStore && this._attributeStore.dirty) {
+            json.fields = toJS(this._attributeStore.value);
+        }
+
         try {
             await this.route.put({
                 query: { dt_format: "iso" },
-                json: {
-                    fields,
-                    extensions,
-                },
+                json,
             });
             // To update initial feature value
             const resp = await this._initialize();
