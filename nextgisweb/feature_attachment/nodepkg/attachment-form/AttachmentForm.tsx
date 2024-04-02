@@ -1,8 +1,11 @@
+import type { RcFile } from "antd/es/upload/interface";
 import { useState } from "react";
 
 import { fileUploader } from "@nextgisweb/file-upload";
 import { Button, Checkbox, Modal, Tabs, Upload } from "@nextgisweb/gui/antd";
+import type { ModalProps } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import showModal from "@nextgisweb/gui/showModal";
 import {
     LunkwillParam,
@@ -10,13 +13,17 @@ import {
     route,
     routeURL,
 } from "@nextgisweb/pyramid/api";
+import type { RouteResp } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 
 import "./AttachmentForm.less";
 
-export function AttachmentForm({ id }) {
-    const [loading, setLoading] = useState(false);
+type ImportSuccessModalProps = ModalProps &
+    RouteResp<"feature_attachment.import", "put">;
+
+export function AttachmentForm({ id }: { id: number }) {
+    const [loading, setLoading] = useState<"export" | "import">();
 
     // Export
 
@@ -33,10 +40,10 @@ export function AttachmentForm({ id }) {
                 });
                 window.open(respUrl);
             } catch (err) {
-                errorModal(err);
+                errorModal(err as ApiError);
                 return;
             } finally {
-                setLoading(false);
+                setLoading(undefined);
             }
         } else {
             window.open(apiUrl);
@@ -69,7 +76,10 @@ export function AttachmentForm({ id }) {
         window.open(routeURL("resource.show", { id: id }), "_self");
     };
 
-    const ImportSuccessModal = ({ result, ...props }) => (
+    const ImportSuccessModal = ({
+        result,
+        ...props
+    }: ImportSuccessModalProps) => (
         <Modal
             okText={gettext("Back to resource")}
             onOk={backToResource}
@@ -84,7 +94,7 @@ export function AttachmentForm({ id }) {
         </Modal>
     );
 
-    const doImport = async (fileObj) => {
+    const doImport = async (fileObj: RcFile) => {
         try {
             setLoading("import");
             const uploadedFiles = await fileUploader({ files: [fileObj] });
@@ -97,15 +107,15 @@ export function AttachmentForm({ id }) {
                 },
                 lunkwill: lunkwillParam,
             });
-            const modal = showModal(ImportSuccessModal, {
+            const { destroy } = showModal(ImportSuccessModal, {
                 result,
-                onCancel: () => modal.destroy(),
+                onCancel: () => destroy(),
             });
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
             return;
         } finally {
-            setLoading(false);
+            setLoading(undefined);
         }
     };
 
@@ -118,7 +128,7 @@ export function AttachmentForm({ id }) {
             </p>
             <p>
                 <Checkbox
-                    disabled={loading}
+                    disabled={!!loading}
                     onChange={(e) => setImportReplace(e.target.checked)}
                 >
                     {gettext("Delete existing attachments")}
@@ -128,10 +138,14 @@ export function AttachmentForm({ id }) {
             <Upload
                 multiple={false}
                 showUploadList={false}
-                customRequest={({ file, onSuccess }) => onSuccess(file)}
+                customRequest={({ file, onSuccess }) => {
+                    if (onSuccess) {
+                        onSuccess(file);
+                    }
+                }}
                 onChange={({ file }) => {
                     const { status, originFileObj } = file;
-                    if (status === "done") {
+                    if (status === "done" && originFileObj) {
                         doImport(originFileObj);
                     }
                 }}
