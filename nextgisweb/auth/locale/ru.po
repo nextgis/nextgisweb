@@ -347,7 +347,7 @@ msgid ""
 "link and contact the administrator."
 msgstr ""
 "Не удалось выполнить авторизацию с использованием указанной авторизационной "
-"ссылки. Пожалуйста проверьте ссылку и свяжитесь с администратором."
+"ссылки. Пожалуйста, проверьте ссылку и свяжитесь с администратором."
 
 #: view.py:94
 msgid "Usage of authorization link is forbidden for administrators."

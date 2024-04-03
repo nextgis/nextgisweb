@@ -1,6 +1,6 @@
 #: amd/ngw-resource/CompositeWidget.js:52
 msgid "Please wait. Processing request..."
-msgstr "Пожалуйста подождите, идет обработка запроса..."
+msgstr "Подождите, пожалуйста, идет обработка запроса..."
 
 #: amd/ngw-resource/CompositeWidget.js:85
 msgid "Create"
@@ -268,7 +268,7 @@ msgstr "Выполняется операция"
 
 #: nodepkg/children-section/util/notify.ts:8
 msgid "Please confirm resource deletion. This action cannot be undone."
-msgstr "Пожалуйста подтвердите удаление. Это действие не может быть отменено."
+msgstr "Пожалуйста, подтвердите удаление. Это действие не может быть отменено."
 
 #: nodepkg/children-section/util/notify.ts:16
 msgid "The resource has been deleted"

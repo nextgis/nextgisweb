@@ -122,7 +122,7 @@ msgstr "Поле не найдено (ID=%d)."
 
 #: model.py:174
 msgid "Field name is forbidden: '{}'. Please remove or rename it."
-msgstr "Недопустимое имя поля: '{}'. Пожалуйста удалите или переименуйте его."
+msgstr "Недопустимое имя поля: '{}'. Пожалуйста, удалите или переименуйте его."
 
 #: nodepkg/attribute-editor/AttributeEditor.tsx:48
 msgid "Set field value to NULL (No data)"
