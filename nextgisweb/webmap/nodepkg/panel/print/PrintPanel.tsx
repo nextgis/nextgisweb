@@ -39,6 +39,7 @@ import type { Scale, UrlPrintParams } from "./options";
 
 import { DownOutlined, ShareAltOutlined } from "@ant-design/icons";
 
+import "../styles/panels.less";
 import "./PrintPanel.less";
 
 interface PrintMapCompProps {
