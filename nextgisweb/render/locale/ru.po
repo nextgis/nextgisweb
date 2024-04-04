@@ -1,14 +1,18 @@
-#: api.py:83
+#: api.py:91
 msgid "Invalid origin"
 msgstr "Недопустимый источник"
 
-#: api.py:84
+#: api.py:92
 msgid ""
 "Origin validation is enabled for rendering requests, but the given origin "
 "doesn't match with the CORS origins list."
 msgstr ""
 "Для запросов рендеринга включена проверка источника, однако указанный "
 "источник не совпадает со списком допустимых источников CORS."
+
+#: api.py:167
+msgid "Invalid symbols sequence"
+msgstr "Некорректная последовательность символов"
 
 #: component.py:24 nodepkg/tile-cache-widget/TileCacheWidget.js:86
 msgid "Tile cache"
@@ -63,3 +67,4 @@ msgstr ""
 #: view.py:49
 msgid "Legend symbols"
 msgstr "Символы легенды"
+
