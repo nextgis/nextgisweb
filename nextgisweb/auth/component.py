@@ -205,6 +205,7 @@ class AuthComponent(Component):
             obj = Group(
                 keyname=keyname,
                 display_name=display_name,
+                system=system,
                 **kwargs,
             ).persist()
 
