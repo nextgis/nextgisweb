@@ -2,13 +2,13 @@ import json
 import re
 from datetime import datetime
 from io import BytesIO
+from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import PIL
 import requests
 from lxml import etree
 from owslib.map.common import WMSCapabilitiesReader
 from owslib.wms import WebMapService
-from pyramid.url import urlencode
 from requests.exceptions import RequestException
 from zope.interface import implementer
 
@@ -215,7 +215,10 @@ class Layer(Base, Resource, SpatialLayerMixin):
         return RenderRequest(self, srs, cond)
 
     def render_image(self, extent, size):
-        query = dict(
+        up = urlparse(self.connection.url, allow_fragments=False)
+
+        query = dict(parse_qsl(up.query))
+        query.update(dict(
             service="WMS",
             request="GetMap",
             version=self.connection.version,
@@ -226,27 +229,22 @@ class Layer(Base, Resource, SpatialLayerMixin):
             width=size[0],
             height=size[1],
             transparent="true",
-        )
-
-        # Vendor-specific parameters
+        ))
         query.update(self.vendor_params)
 
-        # In the GetMap operation the srs parameter is called crs in 1.3.0.
-        srs = "crs" if self.connection.version == "1.3.0" else "srs"
-        query[srs] = "EPSG:%d" % self.srs.id
+        srs_param = "crs" if self.connection.version == "1.3.0" else "srs"
+        query[srs_param] = "EPSG:%d" % self.srs.id
+
+        # ArcGIS server requires that space is url-encoded as "%20"
+        query_encoded = urlencode(query, quote_via=quote)
+
+        url = urlunparse((up.scheme, up.netloc, up.path, None, query_encoded, None))
 
         auth = None
         username = self.connection.username
         password = self.connection.password
         if username and password:
             auth = (username, password)
-
-        sep = "&" if "?" in self.connection.url else "?"
-
-        # ArcGIS server requires that space is url-encoded as "%20"
-        # but it does not accept space encoded as "+".
-        # It is always safe to replace spaces with "%20".
-        url = self.connection.url + sep + urlencode(query).replace("+", "%20")
 
         try:
             response = requests.get(
