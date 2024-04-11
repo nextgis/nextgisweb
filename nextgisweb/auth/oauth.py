@@ -659,10 +659,10 @@ def _fallback_value(*args):
 
 
 def _member_of_traverse(data, path):
-    if len(path) == 0:
-        if data is None:
-            pass  # Skip nulls
-        elif not isinstance(data, (int, str)):
+    if data is None:
+        pass  # Skip nulls
+    elif len(path) == 0:
+        if not isinstance(data, (int, str)):
             raise ValueError
         else:
             yield str(data)
