@@ -2,7 +2,7 @@ interface Srs {
     id: number;
 }
 
-export interface RasterlayerResource {
+export interface RasterLayerResource {
     srs: Srs;
     xsize: number;
     ysize: number;
