@@ -338,12 +338,19 @@ define([
         startup: function () {
             this.inherited(arguments);
 
-            if (settings.hide_nav_menu && ngwConfig.isGuest) {
-                const navMenu = document.querySelector("#header #menu");
-                navMenu.style.display = "none";
-            }
+            this._hideNavMenuForGuest();
 
             this._startupDeferred.resolve();
+        },
+
+        _hideNavMenuForGuest: function () {
+            if (!settings.hide_nav_menu || !ngwConfig.isGuest) {
+                return;
+            }
+
+            const navMenu = document.querySelector("#header #menu");
+            if (!navMenu) return;
+            navMenu.style.display = "none";
         },
 
         prepareItem: function (item) {
