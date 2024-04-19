@@ -1,11 +1,11 @@
 import type { UploadFile } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FileUploader } from "../file-uploader";
-import type { FileUploaderProps, UploaderMeta } from "../file-uploader/type";
+import type { UploadProps, UploaderMeta } from "../file-uploader/type";
 
 import type { ImageUploaderProps } from "./type";
 
@@ -18,26 +18,22 @@ type OriginFileObj = UploadFile["originFileObj"];
 const msgUpload = gettext("Select a file");
 const msgDelete = gettext("Delete");
 
-export function ImageUploader({
-    inputProps,
+export function ImageUploader<M extends boolean = boolean>({
+    inputProps: inputPropsParam,
     file,
     image,
     ...rest
-}: ImageUploaderProps) {
+}: ImageUploaderProps<M>) {
     const [backgroundImage, setBackgroundImage] = useState<string>();
     const [chosenFile, setChosenFile] = useState<OriginFileObj[]>();
-    const [fileMeta, setFileMeta] = useState<UploaderMeta>();
+    const [fileMeta, setFileMeta] = useState<UploaderMeta<M>>();
 
-    const inputPropsOnChange = inputProps?.onChange;
+    const inputPropsOnChange = inputPropsParam?.onChange;
 
     const height = 220;
-    const props: FileUploaderProps = {
-        file,
-        height,
-        fileMeta,
-        uploadText: msgUpload,
-        setFileMeta,
-        inputProps: {
+
+    const inputProps = useMemo<UploadProps>(() => {
+        return {
             name: "image",
             onChange: (info) => {
                 if (info) {
@@ -50,10 +46,9 @@ export function ImageUploader({
                     }
                 }
             },
-            ...inputProps,
-        },
-        ...rest,
-    };
+            ...inputPropsParam,
+        };
+    }, [inputPropsOnChange, inputPropsParam]);
 
     const clean = () => {
         setFileMeta(undefined);
@@ -112,5 +107,21 @@ export function ImageUploader({
         );
     };
 
-    return <>{backgroundImage ? <Preview /> : <FileUploader {...props} />}</>;
+    return (
+        <>
+            {backgroundImage ? (
+                <Preview />
+            ) : (
+                <FileUploader
+                    file={file}
+                    height={height}
+                    fileMeta={fileMeta}
+                    uploadText={msgUpload}
+                    setFileMeta={setFileMeta}
+                    inputProps={inputProps}
+                    {...rest}
+                />
+            )}
+        </>
+    );
 }

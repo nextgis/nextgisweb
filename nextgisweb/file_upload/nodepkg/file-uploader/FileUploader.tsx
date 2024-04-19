@@ -7,7 +7,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { maxSize } from "@nextgisweb/pyramid/settings!file_upload";
 
 import { useFileUploader } from "./hook/useFileUploader";
-import type { FileUploaderProps } from "./type";
+import type { FileMeta, FileUploaderProps } from "./type";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import CancelIcon from "@nextgisweb/icon/material/cancel";
@@ -21,12 +21,13 @@ const msgDragAndDrop = gettext("or drag and drop here");
 const msgMaxSize = formatSize(maxSize) + " " + gettext("max");
 const msgStop = gettext("Stop");
 
-export function FileUploader({
+export function FileUploader<M extends boolean = false>({
     style,
     accept,
     height = 220,
     fileMeta,
     helpText,
+    multiple,
     onChange,
     inputProps = {},
     uploadText = msgUpload,
@@ -35,13 +36,14 @@ export function FileUploader({
     showMaxSize = false,
     dragAndDropText = msgDragAndDrop,
     showProgressInDocTitle = true,
-}: FileUploaderProps) {
+}: FileUploaderProps<M>) {
     const { abort, progressText, props, meta, setMeta, uploading } =
-        useFileUploader({
+        useFileUploader<M>({
             showProgressInDocTitle,
             setFileMeta,
             inputProps,
             fileMeta,
+            multiple,
             onChange,
             accept,
         });
@@ -51,8 +53,7 @@ export function FileUploader({
     }, [uploading, onUploading]);
 
     const InputText = () => {
-        const firstMeta = Array.isArray(meta) ? meta[0] : meta;
-
+        const firstMeta = (Array.isArray(meta) ? meta[0] : meta) as FileMeta;
         return firstMeta ? (
             <>
                 <p className="ant-upload-text">

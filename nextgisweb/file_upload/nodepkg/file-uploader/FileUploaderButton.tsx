@@ -8,16 +8,16 @@ import { InboxOutlined } from "@ant-design/icons";
 
 const msgUploadButton = gettext("Upload");
 
-export function FileUploaderButton({
+export function FileUploaderButton<M extends boolean = false>({
     showProgressInDocTitle,
     setFileMeta,
     uploadText = msgUploadButton,
     inputProps,
     onChange,
     fileMeta,
-    multiple,
+    multiple = false as M,
     accept,
-}: FileUploaderProps) {
+}: FileUploaderProps<M>) {
     const { uploading, props } = useFileUploader({
         showProgressInDocTitle,
         setFileMeta,

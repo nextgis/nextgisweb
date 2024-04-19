@@ -10,22 +10,28 @@ export interface FileMeta {
     _file?: File;
 }
 
-export type UploaderMeta = FileMeta | FileMeta[];
+export type UploaderMeta<M extends boolean = boolean> = M extends true
+    ? FileMeta[]
+    : FileMeta;
 
-export interface UseFileUploaderProps {
+export interface UseFileUploaderProps<
+    M extends boolean = boolean,
+    F extends UploaderMeta<M> = UploaderMeta<M>,
+> {
     /** File types that can be accepted. See input accept {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept Attribute}  */
     accept?: string;
-    fileMeta?: UploaderMeta;
-    multiple?: boolean;
-    onChange?: (meta?: UploaderMeta) => void;
+    fileMeta?: F;
+    multiple?: M;
+    onChange?: (meta?: F) => void;
     inputProps?: UploadProps;
-    setFileMeta?: (meta?: UploaderMeta) => void;
+    setFileMeta?: (meta?: F) => void;
     showUploadList?: boolean;
     openFileDialogOnClick?: boolean;
     showProgressInDocTitle?: boolean;
 }
 
-export interface FileUploaderProps extends UseFileUploaderProps {
+export interface FileUploaderProps<M extends boolean = boolean>
+    extends UseFileUploaderProps<M> {
     helpText?: string;
     uploadText?: string;
     dragAndDropText?: string;

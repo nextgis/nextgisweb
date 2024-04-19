@@ -16,17 +16,17 @@ import { fileUploader } from "../util/fileUploader";
 
 const msgProgress = gettext("{} uploaded...");
 
-export function useFileUploader({
+export function useFileUploader<M extends boolean = false>({
     accept,
     fileMeta: initMeta,
-    multiple = false,
+    multiple = false as M,
     onChange,
     inputProps = {},
     setFileMeta: setInitMeta,
     showUploadList = false,
     openFileDialogOnClick = true,
     showProgressInDocTitle = false,
-}: UseFileUploaderProps) {
+}: UseFileUploaderProps<M>) {
     const { makeSignal, abort } = useAbortController();
 
     const docTitle = useRef(document.title);
@@ -36,7 +36,7 @@ export function useFileUploader({
     const [progress, setProgress] = useState<string>();
     const [progressText, setProgressText] = useState<string | null>(null);
     const [uploading, setUploading] = useState<boolean>(false);
-    const [meta, setMeta] = useState<UploaderMeta | undefined>(initMeta);
+    const [meta, setMeta] = useState<UploaderMeta<M> | undefined>(initMeta);
 
     useEffect(() => {
         if (setInitMeta) {
@@ -86,11 +86,11 @@ export function useFileUploader({
                     f._file = files[i];
                 });
                 if (multiple) {
-                    setMeta(uploadedFiles.filter(Boolean));
+                    setMeta(uploadedFiles.filter(Boolean) as UploaderMeta<M>);
                 } else {
                     const uploadedFile = uploadedFiles && uploadedFiles[0];
                     if (uploadedFile) {
-                        setMeta(uploadedFile);
+                        setMeta(uploadedFile as UploaderMeta<M>);
                     }
                 }
             } catch (er) {

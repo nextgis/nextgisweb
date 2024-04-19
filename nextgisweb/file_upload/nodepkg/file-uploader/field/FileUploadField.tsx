@@ -15,14 +15,7 @@ function FileUploader_({
     ...inputProps
 }: FileUploaderFieldProps) {
     return (
-        <FileUploader
-            style={{ width: "100%", color: "red" }}
-            fileMeta={value}
-            onChange={(e) => {
-                onChange(e);
-            }}
-            {...inputProps}
-        />
+        <FileUploader fileMeta={value} onChange={onChange} {...inputProps} />
     );
 }
 
