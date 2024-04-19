@@ -34,6 +34,7 @@ export function FileUploader({
     showMaxSize = false,
     dragAndDropText = msgDragAndDrop,
     showProgressInDocTitle = true,
+    reset,
 }: FileUploaderProps) {
     const { abort, progressText, props, meta, setMeta, uploading } =
         useFileUploader({
@@ -48,6 +49,12 @@ export function FileUploader({
     useEffect(() => {
         onUploading && onUploading(uploading);
     }, [uploading, onUploading]);
+
+    useEffect(() => {
+        if (reset) {
+            setMeta(undefined);
+        }
+    }, [reset, setMeta]);
 
     const InputText = () => {
         const firstMeta = Array.isArray(meta) ? meta[0] : meta;

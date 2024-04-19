@@ -33,6 +33,7 @@ export interface FileUploaderProps extends UseFileUploaderProps {
     onUploading?: (status: boolean) => void;
     showMaxSize?: boolean;
     file?: File;
+    reset?: boolean;
 }
 
 export interface Progress {
