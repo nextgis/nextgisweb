@@ -41,7 +41,7 @@ export function FileUploader({
             showProgressInDocTitle,
             setFileMeta,
             inputProps,
-            fileMeta: fileMeta,
+            fileMeta,
             onChange,
             accept,
         });

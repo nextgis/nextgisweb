@@ -1,5 +1,5 @@
 import type { UploadFile } from "antd/lib/upload/interface";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
@@ -29,10 +29,11 @@ export function useFileUploader({
 }: UseFileUploaderProps) {
     const { makeSignal, abort } = useAbortController();
 
-    const [docTitle] = useState(document.title);
+    const docTitle = useRef(document.title);
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
+    const [progress, setProgress] = useState<string>();
     const [progressText, setProgressText] = useState<string | null>(null);
     const [uploading, setUploading] = useState<boolean>(false);
     const [meta, setMeta] = useState<UploaderMeta | undefined>(initMeta);
@@ -44,23 +45,26 @@ export function useFileUploader({
         if (onChange) {
             onChange(meta);
         }
-    }, [meta]);
+    }, [meta, onChange, setInitMeta]);
+
+    useEffect(() => {
+        setProgressText(progress ? msgProgress.replace("{}", progress) : null);
+        if (showProgressInDocTitle && progress !== undefined) {
+            document.title = progress + " | " + docTitle.current;
+        } else if (document.title !== docTitle.current) {
+            document.title = docTitle.current;
+        }
+    }, [progress, showProgressInDocTitle]);
 
     useEffect(() => {
         setMeta(initMeta);
     }, [initMeta]);
 
-    const onProgress = useCallback(
-        (evt: Progress) => {
-            if (evt.type === "progress") {
-                setProgressText(msgProgress.replace("{}", evt.percent));
-                if (showProgressInDocTitle) {
-                    document.title = evt.percent + " | " + docTitle;
-                }
-            }
-        },
-        [docTitle, showProgressInDocTitle]
-    );
+    const onProgress = useCallback((evt: Progress) => {
+        if (evt.type === "progress") {
+            setProgress(evt.percent);
+        }
+    }, []);
 
     const fileUploaderWrapper = useCallback(
         (options: FileUploaderOptions) => {
@@ -92,7 +96,7 @@ export function useFileUploader({
             } catch (er) {
                 console.log(er);
             } finally {
-                setProgressText(null);
+                setProgress(undefined);
                 setUploading(false);
             }
         },
