@@ -86,7 +86,7 @@ export function SRSImportFrom({
             fields={fields}
             initialValues={{ format: format, projStr }}
             onChange={({ value }) => {
-                const val = value as SrsFormValue;
+                const val = value;
                 if (val.format) {
                     setFormat(value.format);
                 }

@@ -16,7 +16,7 @@ function CodeTest() {
         lang: "json",
         readOnly: true,
     });
-    const propFields: FormField[] = [
+    const propFields: FormField<keyof CodeProps>[] = [
         {
             name: "fold",
             label: "fold",

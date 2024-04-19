@@ -37,6 +37,21 @@ interface FieldOption {
     value: string;
 }
 
+interface FormProps {
+    [key: string]: unknown;
+    format: string;
+    fields: string[];
+    srs: number | undefined;
+    fid: string;
+    encoding: string;
+    display_name: boolean;
+    zipped: boolean;
+    extent: (null | number)[];
+    ilike: string;
+}
+
+type FormPropsKey = Extract<keyof FormProps, string>;
+
 const exportFormats = settings.export_formats;
 
 const srsListToOptions = (srsList: SRSRead[]): SrsOption[] =>
@@ -65,14 +80,14 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const [fieldOptions, setFieldOptions] = useState<FieldOption[]>([]);
     const [defaultSrs, setDefaultSrs] = useState<number>();
     const [format, setFormat] = useState(exportFormats[0].name);
-    const [fields, setFields] = useState<FormField[]>([]);
+    const [fields, setFields] = useState<FormField<FormPropsKey>[]>([]);
     const [isReady, setIsReady] = useState(false);
     const form = Form.useForm()[0];
 
     const loading = staffLoading || exportLoading;
 
     const initialValues = useMemo(() => {
-        const initialVals = {
+        const initialVals: Partial<FormProps> = {
             format,
             fields: fieldOptions.map((field) => field.value),
             srs: defaultSrs,
@@ -178,7 +193,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             form.setFieldsValue(dscoFieldsValues);
         }
 
-        const fieldsToSet = [
+        const fieldsToSet: FormField<FormPropsKey>[] = [
             ...multipleFields,
             {
                 name: "format",
@@ -219,7 +234,9 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                 name: "fields",
                 label: gettext("Fields"),
                 widget: Select,
-                mode: "multiple",
+                inputProps: {
+                    mode: "multiple",
+                },
                 included: !multiple,
                 choices: fieldOptions,
             },

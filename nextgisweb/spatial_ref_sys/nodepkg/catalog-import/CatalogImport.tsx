@@ -9,6 +9,7 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { SRSCatalogItem } from "@nextgisweb/spatial-ref-sys/type/api";
 
 interface CatalogImportProps {
     url: string;
@@ -23,7 +24,7 @@ export function CatalogImport({ url, id }: CatalogImportProps) {
         params: { id },
     });
 
-    const fields = useMemo<FormField[]>(
+    const fields = useMemo<FormField<keyof SRSCatalogItem>[]>(
         () => [
             {
                 name: "display_name",

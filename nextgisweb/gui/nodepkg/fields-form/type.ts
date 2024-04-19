@@ -39,10 +39,12 @@ export interface WidgetFieldMap {
     time: typeof TimeInput;
 }
 
-export interface FormOnChangeOptions {
-    isValid: () => Promise<boolean>;
+export interface FormOnChangeOptions<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    value: Record<string, any>;
+    P extends Record<string, any> = Record<string, unknown>,
+> {
+    isValid: () => Promise<boolean>;
+    value: P;
 }
 
 export interface InputProps<V = unknown> {
@@ -86,8 +88,8 @@ type GetWidgetInputPropsFromComponent<W extends FormWidgetComponent> = Exclude<
 type GetWidgetInputProps<W extends FormWidget> = W extends WidgetName
     ? GetWidgetInputPropsFromName<W>
     : W extends FormWidgetComponent
-    ? GetWidgetInputPropsFromComponent<W>
-    : GetWidgetInputPropsFromName<"input">;
+      ? GetWidgetInputPropsFromComponent<W>
+      : GetWidgetInputPropsFromName<"input">;
 
 export interface FormField<
     N extends string = string,
@@ -102,13 +104,15 @@ export interface FormField<
     value?: unknown;
 }
 
-export interface FieldsFormProps extends FormProps {
+export interface FieldsFormProps<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    initialValues?: Record<string, any>;
+    P extends Record<string, any> = Record<string, any>,
+> extends FormProps {
+    initialValues?: Partial<P>;
     whenReady?: () => void;
-    onChange?: (options: FormOnChangeOptions) => void;
+    onChange?: (options: FormOnChangeOptions<P>) => void;
     children?: ReactNode;
-    fields: FormField[];
+    fields: FormField<Extract<keyof P, string>>[];
     form?: FormInstance;
 }
 

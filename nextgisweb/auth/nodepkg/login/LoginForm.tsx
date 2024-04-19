@@ -28,7 +28,7 @@ export const LoginForm = observer((props: LoginFormProps) => {
     const queryParams = new URLSearchParams(location.search);
     const nextQueryParam = queryParams.get("next");
 
-    const fields = useMemo<FormField[]>(
+    const fields = useMemo<FormField<keyof Credentials>[]>(
         () => [
             {
                 name: "login",
