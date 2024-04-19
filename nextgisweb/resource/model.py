@@ -495,25 +495,24 @@ class ACLAttr(SAttribute, apitype=True):
 
             srlzr.obj.acl.append(rule)
 
-        if srlzr.obj.id == 0:
-            for user in User.filter(
-                User.disabled.is_(False), User.member_of.any(keyname="administrators")
-            ):
-                perms = srlzr.obj.permissions(user)
-                if not perms.issuperset(REQUIRED_PERMISSIONS_FOR_ADMINISTATORS):
-                    for p in REQUIRED_PERMISSIONS_FOR_ADMINISTATORS:
-                        if p in perms:
-                            continue
-                        raise ValidationError(
-                            message=gettext(
-                                "Unable to revoke '{s}: {p}' permission for '{u}' "
-                                "as the user belongs to the administrators group. "
-                                "Administrators must always have ability to "
-                                "configure permissions of the main resource group."
-                            ).format(s=p.scope.label, p=p.label, u=user.display_name)
-                        )
-                    else:
-                        assert False
+        for user in User.filter(
+            User.disabled.is_(False), User.member_of.any(keyname="administrators")
+        ):
+            perms = srlzr.obj.permissions(user)
+            if not perms.issuperset(REQUIRED_PERMISSIONS_FOR_ADMINISTATORS):
+                for p in REQUIRED_PERMISSIONS_FOR_ADMINISTATORS:
+                    if p in perms:
+                        continue
+                    raise ValidationError(
+                        message=gettext(
+                            "Unable to revoke '{s}: {p}' permission for '{u}' "
+                            "as the user belongs to the administrators group. "
+                            "Administrators must always have ability to "
+                            "configure permissions of resources."
+                        ).format(s=p.scope.label, p=p.label, u=user.display_name)
+                    )
+                else:
+                    assert False
 
 
 class DescriptionAttr(SColumn, apitype=True):
