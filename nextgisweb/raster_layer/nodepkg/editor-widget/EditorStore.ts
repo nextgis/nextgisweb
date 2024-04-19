@@ -1,28 +1,42 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable, runInAction, toJS } from "mobx";
 
+import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import settings from "@nextgisweb/pyramid/settings!raster_layer";
 import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
+import type { Composite } from "@nextgisweb/resource/type/Composite";
+import type {
+    DumpParams,
+    EditorStoreOptions,
+    EditorStore as IEditorStore,
+    Operation,
+} from "@nextgisweb/resource/type/EditorStore";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
-export class EditorStore {
+type Value = CompositeRead["raster_layer"];
+
+export class EditorStore implements IEditorStore<Value> {
     identity = "raster_layer";
 
-    source = null;
+    source: FileMeta | null = null;
     uploading = false;
     cog = settings.cog_enabled;
-    cogInitial = null;
+    cogInitial: boolean | null = null;
 
-    constructor({ composite, operation }) {
+    operation?: Operation;
+    composite: Composite;
+
+    constructor({ composite, operation }: EditorStoreOptions) {
         makeAutoObservable(this, { identity: false });
         this.operation = operation;
         this.composite = composite;
     }
 
-    load(value) {
+    load(value: Value) {
         this.cog = this.cogInitial = !!value.cog;
     }
 
-    dump({ lunkwill }) {
-        const result = {
+    dump({ lunkwill }: DumpParams) {
+        const result: Value = {
             cog:
                 !!this.source || this.cog !== this.cogInitial
                     ? this.cog
@@ -43,6 +57,12 @@ export class EditorStore {
         return toJS(result);
     }
 
+    update = (props: Partial<this>) => {
+        runInAction(() => {
+            Object.assign(this, props);
+        });
+    };
+
     get isValid() {
         return (
             !this.uploading && (this.operation === "update" || !!this.source)
@@ -51,6 +71,6 @@ export class EditorStore {
 
     get suggestedDisplayName() {
         const base = this.source?.name;
-        return base ? base.replace(/\.tiff?$/i, "") : null;
+        return base ? base.replace(/\.tiff?$/i, "") : undefined;
     }
 }

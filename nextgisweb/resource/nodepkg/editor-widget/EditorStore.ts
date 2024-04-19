@@ -1,4 +1,4 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable, runInAction, toJS } from "mobx";
 
 import type { ResourceCls, ResourceRead } from "@nextgisweb/resource/type/api";
 
@@ -106,6 +106,12 @@ export class EditorStore {
 
         return toJS(result);
     }
+
+    update = (props: Partial<this>) => {
+        runInAction(() => {
+            Object.assign(this, props);
+        });
+    };
 
     get isValid() {
         const c = this._loaded;

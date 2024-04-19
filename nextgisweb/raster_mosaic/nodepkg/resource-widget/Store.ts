@@ -1,19 +1,29 @@
 import { makeAutoObservable, toJS } from "mobx";
 
+import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
+import type { EditorStoreOptions, Operation } from "@nextgisweb/resource/type";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
+
+type Value = CompositeRead["raster_mosaic"];
+type Data = CompositeRead["raster_mosaic"]["data"];
 
 let keySeq = 0;
 
-class File {
+export class File {
     id = undefined;
     display_name = undefined;
     file_upload = undefined;
 
-    constructor(store, data) {
+    store: Store;
+    key: number;
+
+    constructor(store: Store, data: Data) {
         makeAutoObservable(this);
         this.store = store;
         this.key = ++keySeq;
+
         Object.assign(this, data);
     }
 }
@@ -21,26 +31,33 @@ class File {
 export class Store {
     identity = "raster_mosaic";
 
-    items = null;
+    items: File[] = [];
     dirty = false;
 
-    constructor({ operation }) {
+    operation?: Operation;
+
+    constructor({ operation }: EditorStoreOptions) {
         makeAutoObservable(this, { identity: false });
         this.items = [];
         this.operation = operation;
     }
 
-    load(value) {
-        this.items = value.items.map((data) => new File(this, data));
+    load(value: Value) {
+        this.items = value.items.map((data: Data) => new File(this, data));
         this.dirty = false;
     }
 
     dump() {
         if (!this.dirty) return undefined;
-        const result = {};
-        if (this.operation === "create") result.srs = srsSettings.default;
-        // eslint-disable-next-line no-unused-vars
-        result.items = this.items.map(({ store, key, ...rest }) => rest);
+        const result: Value = {};
+        if (this.operation === "create") {
+            result.srs = srsSettings.default;
+        }
+
+        result.items = (this.items || []).map(
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            ({ store, key, ...rest }) => rest
+        );
         return toJS(result);
     }
 
@@ -48,8 +65,8 @@ export class Store {
         return true;
     }
 
-    appendFiles(files) {
-        const updated = [...this.items];
+    appendFiles(files: FileMeta[]): [boolean, string | null] {
+        const updated = this.items ? [...this.items] : [];
         for (const file_upload of files) {
             let { name } = file_upload;
             if (!/\.tiff?$/i.test(name)) {
@@ -69,10 +86,10 @@ export class Store {
     validate = false;
 
     get rows() {
-        return this.items;
+        return this.items || [];
     }
 
-    deleteRow(row) {
+    deleteRow(row: File) {
         this.rows.splice(this.rows.indexOf(row), 1);
         this.dirty = true;
     }

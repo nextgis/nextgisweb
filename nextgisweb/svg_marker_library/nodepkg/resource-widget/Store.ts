@@ -1,27 +1,41 @@
 import { makeAutoObservable, toJS } from "mobx";
 
+import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type {
+    CompositeRead,
+    CompositeUpdate,
+} from "@nextgisweb/resource/type/api";
 
 let idSeq = 0;
 
-class File {
-    name = undefined;
-    file = undefined;
+type Value = NonNullable<CompositeRead["svg_marker_library"]>;
+type ValueUpdate = NonNullable<CompositeUpdate["svg_marker_library"]>;
 
-    constructor(store, { name, file }) {
+export class File {
+    name: string = "";
+    file: FileMeta | null = null;
+    id: number;
+
+    store: Store;
+
+    constructor(
+        store: Store,
+        { name, file }: { name: string; file?: FileMeta | null }
+    ) {
         makeAutoObservable(this);
         this.store = store;
         this.id = ++idSeq;
         this.name = name;
-        this.file = file;
+        this.file = file || null;
     }
 }
 
 export class Store {
     identity = "svg_marker_library";
 
-    files = null;
-    archive = null;
+    files: File[] = [];
+    archive: FileMeta | null = null;
     dirty = false;
 
     constructor() {
@@ -29,7 +43,7 @@ export class Store {
         this.files = [];
     }
 
-    load(value) {
+    load(value: Value) {
         this.files = value.files.map(({ name }) => new File(this, { name }));
         this.archive = null;
         this.dirty = false;
@@ -37,7 +51,7 @@ export class Store {
 
     dump() {
         if (!this.dirty) return undefined;
-        const result = {};
+        const result: ValueUpdate = {};
         if (this.archive) {
             result.archive = this.archive;
         } else {
@@ -53,7 +67,7 @@ export class Store {
         return true;
     }
 
-    appendFiles(files) {
+    appendFiles(files: FileMeta[]): [boolean, string | null] {
         const updated = [...this.files];
         for (const file of files) {
             let { name } = file;
@@ -72,7 +86,7 @@ export class Store {
         return [true, null];
     }
 
-    fromArchive(archive) {
+    fromArchive(archive: FileMeta | null): [boolean, string | null] {
         const { name } = archive || {};
         if (name && !name.toLowerCase().endsWith(".zip")) {
             return [false, gettext("ZIP archive required")];
@@ -91,7 +105,7 @@ export class Store {
         return this.files;
     }
 
-    deleteRow(row) {
+    deleteRow(row: File) {
         this.rows.splice(this.rows.indexOf(row), 1);
         this.dirty = true;
     }

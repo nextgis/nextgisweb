@@ -10,9 +10,14 @@ import type {
     EditorStoreOptions,
     Operation,
 } from "@nextgisweb/resource/type/EditorStore";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
+import type {
+    CompositeRead,
+    CompositeUpdate,
+} from "@nextgisweb/resource/type/api";
 
 type Value = CompositeRead["feature_layer"];
+type ValueUpdate = CompositeUpdate["feature_layer"];
+
 export type Mode = "empty" | "gtype" | "file" | "keep" | "delete";
 
 interface SourceOptions {
@@ -67,7 +72,7 @@ export class Store implements EditorStore<Value> {
     dump({ lunkwill }: DumpParams) {
         if (!this.dirty) return;
 
-        const result: Value = {};
+        const result: ValueUpdate = {};
 
         if (this.mode === "file") {
             lunkwill.suggest(true);

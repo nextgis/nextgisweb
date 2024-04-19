@@ -21,7 +21,7 @@ export const EditorWidget: EditorWidgetComponent<
                 value={store.displayName || undefined}
                 placeholder={store.sdnDynamic || store.sdnBase || undefined}
                 onChange={(e) => {
-                    store.displayName = e.target.value;
+                    store.update({ displayName: e.target.value });
                 }}
                 status={store.displayNameIsValid ? undefined : "error"}
             />

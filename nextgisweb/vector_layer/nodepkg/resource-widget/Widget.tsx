@@ -2,10 +2,8 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { GeometryType } from "@nextgisweb/feature-layer/type";
-import {
-    FileUploader,
-    UploaderMeta,
-} from "@nextgisweb/file-upload/file-uploader";
+import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
+import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader";
 import { Checkbox, Collapse, Input, Radio, Select } from "@nextgisweb/gui/antd";
 import type {
     CheckboxProps,
