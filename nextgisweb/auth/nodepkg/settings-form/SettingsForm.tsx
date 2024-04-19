@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 
-import { Button, Form, message } from "@nextgisweb/gui/antd";
+import { Button, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { LanguageSelect } from "@nextgisweb/gui/component/language-select";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
-import { FieldsForm, LanguageSelect } from "@nextgisweb/gui/fields-form";
+import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type {
     FormField,
     FormOnChangeOptions,
@@ -49,7 +50,7 @@ export function SettingsForm() {
 
         result.push({
             name: "language",
-            widget: LanguageSelect,
+            formItem: <LanguageSelect />,
             loading: isSaving,
             label: gettext("Language"),
         });
@@ -58,14 +59,9 @@ export function SettingsForm() {
             result.push({
                 name: "oauth_subject",
                 label: oauth.name,
-                widget: ({ ...props }) => (
-                    <Form.Item {...props}>
-                        <OAuthStatus oauthSubject={profile.oauth_subject} />
-                    </Form.Item>
-                ),
+                formItem: <OAuthStatus oauthSubject={profile.oauth_subject} />,
             });
         }
-
         return result;
     }, [profile, isSaving]);
     const onChange = async ({ value: json }: FormOnChangeOptions) => {
@@ -84,7 +80,11 @@ export function SettingsForm() {
     };
     return (
         <LoadingWrapper loading={isLoading} rows={fields.length} title={false}>
-            <FieldsForm {...{ fields, onChange, initialValues }} />
+            <FieldsForm
+                fields={fields}
+                onChange={onChange}
+                initialValues={initialValues}
+            />
         </LoadingWrapper>
     );
 }

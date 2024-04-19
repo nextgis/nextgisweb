@@ -1,14 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { Select } from "@nextgisweb/gui/antd";
+import type { OptionType } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import { FieldsForm, Form, Select } from "@nextgisweb/gui/fields-form";
+import type { ApiError } from "@nextgisweb/gui/error/type";
+import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
+import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!raster_layer";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
+import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
-const srsListToOptions = (srsList) => {
+type RasterLayerRead = CompositeRead["raster_layer"];
+
+interface ExporFormValues {
+    format: string;
+    srs: string;
+    bands: string[];
+}
+
+const srsListToOptions = (srsList: SRSRead[]): OptionType[] => {
     return srsList.map((srs) => {
         return {
             label: srs.display_name,
@@ -17,8 +31,10 @@ const srsListToOptions = (srsList) => {
     });
 };
 
-const bandListToOptions = (bandList) => {
-    return bandList.map((band, idx) => {
+const bandListToOptions = (
+    bandList: RasterLayerRead["color_interpretation"]
+) => {
+    return bandList.map((band: string, idx: number) => {
         return {
             label:
                 gettext("Band") +
@@ -30,60 +46,62 @@ const bandListToOptions = (bandList) => {
     });
 };
 
-export function ExportForm({ id }) {
+export function ExportForm({ id }: { id: number }) {
     const [status, setStatus] = useState("loading");
-    const { makeSignal } = useAbortController();
-    const [srsOptions, setSrsOptions] = useState([]);
-    const [bandOptions, setBandOptions] = useState([]);
+    const { makeSignal, abort } = useAbortController();
+    const [srsOptions, setSrsOptions] = useState<OptionType[]>([]);
+    const [bandOptions, setBandOptions] = useState<OptionType[]>([]);
     const [defaultSrs, setDefaultSrs] = useState();
-    const form = Form.useForm()[0];
+    const form = Form.useForm<ExporFormValues>()[0];
 
-    async function load() {
+    const load = useCallback(async () => {
+        abort();
         try {
             const signal = makeSignal();
-            const [srsInfo, itemInfo] = await Promise.all(
-                [
-                    route("spatial_ref_sys.collection"),
-                    route("resource.item", id),
-                ].map((r) => r.get({ signal }))
-            );
+            const srsInfo = await route("spatial_ref_sys.collection").get({
+                signal,
+            });
+            const itemInfo = await route("resource.item", id).get({ signal });
+
             setSrsOptions(srsListToOptions(srsInfo));
             setBandOptions(
                 bandListToOptions(itemInfo.raster_layer.color_interpretation)
             );
             setDefaultSrs(itemInfo.raster_layer.srs.id);
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
             setStatus("loaded");
         }
-    }
+    }, [id, makeSignal, abort]);
 
-    useEffect(() => load(), []);
+    useEffect(() => {
+        load();
+    }, [load]);
 
-    const fields = useMemo(
+    const fields = useMemo<FormField<keyof ExporFormValues>[]>(
         () => [
             {
                 name: "format",
                 label: gettext("Format"),
-                widget: Select,
-                choices: settings.export_formats.map((format) => ({
-                    value: format.name,
-                    label: format.display_name,
-                })),
+                formItem: (
+                    <Select
+                        options={settings.export_formats.map((format) => ({
+                            value: format.name,
+                            label: format.display_name,
+                        }))}
+                    />
+                ),
             },
             {
                 name: "srs",
                 label: gettext("SRS"),
-                widget: Select,
-                choices: srsOptions,
+                formItem: <Select options={srsOptions} />,
             },
             {
                 name: "bands",
                 label: gettext("Bands"),
-                widget: Select,
-                mode: "multiple",
-                choices: bandOptions,
+                formItem: <Select mode="multiple" options={bandOptions} />,
             },
         ],
         [srsOptions, bandOptions]
@@ -94,7 +112,7 @@ export function ExportForm({ id }) {
         window.open(
             routeURL("resource.export", id) +
                 "?" +
-                new URLSearchParams(fields).toString()
+                new URLSearchParams(Object.entries(fields)).toString()
         );
     };
 

@@ -1,21 +1,18 @@
 import { useMemo } from "react";
 
 import type { GroupRead } from "@nextgisweb/auth/type/api";
-import { Alert } from "@nextgisweb/gui/antd";
+import { Alert, Checkbox, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
-import {
-    KeynameTextBox,
-    LanguageSelect,
-    Password,
-} from "@nextgisweb/gui/fields-form";
+import { LanguageSelect } from "@nextgisweb/gui/component/language-select";
 import type { FormField } from "@nextgisweb/gui/fields-form";
+import { KeynameRule } from "@nextgisweb/gui/fields-form/rules/KeynameRule";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import type { Model } from "@nextgisweb/gui/model-form";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!auth";
 
-import { PermissionSelect, PrincipalSelect } from "../field";
+import { PermissionSelect, PrincipalSelect } from "../component";
 import { makeTeamManageButton, default as oauth } from "../oauth";
 
 import { UserWidgetAlinkToken } from "./UserWidgetAlinkToken";
@@ -39,61 +36,60 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
     const isNewUser = useMemo(() => id === undefined, [id]);
 
     const fields = useMemo<FormField[]>(() => {
-        const fields_: FormField[] = [
+        return [
             {
                 name: "display_name",
                 label: gettext("Full name"),
+                formItem: <Input />,
                 required: true,
             },
             {
                 name: "keyname",
                 label: gettext("Login"),
                 required: true,
-                widget: KeynameTextBox,
+                rules: [KeynameRule],
+                formItem: <Input />,
             },
             {
                 name: "password",
                 label: gettext("Password"),
-                widget: isNewUser ? Password : UserWidgetPassword,
+                formItem: isNewUser ? (
+                    <Input.Password
+                        autoComplete="new-password"
+                        placeholder={gettext("Enter new password here")}
+                    />
+                ) : (
+                    <UserWidgetPassword
+                        autoComplete="new-password"
+                        placeholder={gettext("Enter new password here")}
+                    />
+                ),
                 required: true,
-                inputProps: {
-                    autoComplete: "new-password",
-                    placeholder: gettext("Enter new password here"),
-                },
             },
-        ];
-
-        if (oauth.enabled && !isNewUser) {
-            fields_.push({
+            {
                 name: "oauth_subject",
                 label: oauth.name,
-                disabled: true,
-            });
-        }
-
-        if (settings.alink) {
-            fields_.push({
+                formItem: <Input disabled />,
+                included: oauth.enabled && !isNewUser,
+            },
+            {
                 name: "alink_token",
                 label: gettext("Authorization link"),
-                widget: UserWidgetAlinkToken,
-            });
-        }
-
-        fields_.push(
+                formItem: <UserWidgetAlinkToken />,
+                included: settings.alink,
+            },
             {
                 name: "disabled",
                 label: gettext("Disabled"),
-                widget: "checkbox",
+                valuePropName: "checked",
+                formItem: <Checkbox />,
             },
             {
                 name: "member_of",
                 label: gettext("Groups"),
-                widget: PrincipalSelect,
-                inputProps: {
-                    model: "group",
-                    multiple: true,
-                    editOnClick: true,
-                },
+                formItem: (
+                    <PrincipalSelect model="group" multiple editOnClick />
+                ),
                 value:
                     group && isNewUser
                         ? group.filter((g) => g.register).map((g) => g.id)
@@ -102,32 +98,37 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
             {
                 name: "permissions",
                 label: gettext("Permissions"),
-                widget: PermissionSelect,
-                inputProps: { multiple: true },
+                formItem: <PermissionSelect multiple />,
                 value: [],
             },
             {
                 name: "language",
                 label: gettext("Language"),
-                widget: LanguageSelect,
+                formItem: <LanguageSelect />,
                 value: null,
             },
             {
                 name: "description",
                 label: gettext("Description"),
-                widget: "text",
-            }
-        );
-
-        return fields_;
+                formItem: <Input.TextArea />,
+            },
+        ];
     }, [group, isNewUser]);
 
-    // prettier-ignore
-    const infoNGID = useMemo(() => oauth.isNGID && isNewUser && <Alert
-        type="info" style={{marginBottom: "1ex"}}
-        message={gettext("Consider adding {name} user to your team instead of creating a new user with a password.").replace("{name}", oauth.name)}
-        action={makeTeamManageButton()}
-    />, []);
+    const infoNGID = useMemo(
+        () =>
+            oauth.isNGID &&
+            isNewUser && (
+                <Alert
+                    type="info"
+                    style={{ marginBottom: "1ex" }}
+                    // prettier-ignore
+                    message={gettext("Consider adding {name} user to your team instead of creating a new user with a password.").replace("{name}", oauth.name)}
+                    action={makeTeamManageButton()}
+                />
+            ),
+        [isNewUser]
+    );
     if (isLoading) {
         return <LoadingWrapper></LoadingWrapper>;
     }

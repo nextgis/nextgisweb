@@ -42,7 +42,7 @@ export function PrincipalSelect({
 
     const getIcon = (member?: Member) => {
         if (member && member._user) {
-            if (member.is_administrator) {
+            if ("is_administrator" in member && member.is_administrator) {
                 return <AdministratorIcon />;
             } else if (member.system) {
                 return <SystemUserIcon />;

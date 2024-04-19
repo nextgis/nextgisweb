@@ -1,23 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { Checkbox, Input, Select } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
-import {
-    Checkbox,
-    FieldsForm,
-    Form,
-    Select,
-} from "@nextgisweb/gui/fields-form";
+import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
-import { ResourceSelectMultiple } from "@nextgisweb/resource/field/ResourceSelectMultiple";
+import { ResourceSelectMultiple } from "@nextgisweb/resource/component";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
+import type { ExportFeatureLayerOptions } from "../hook/useExportFeatureLayer";
 import type { FeatureLayerField } from "../type";
 
 import { ExtentInput } from "./ExtentInput";
@@ -37,7 +34,7 @@ interface FieldOption {
     value: string;
 }
 
-interface FormProps {
+interface FormProps extends ExportFeatureLayerOptions {
     [key: string]: unknown;
     format: string;
     fields: string[];
@@ -82,7 +79,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const [format, setFormat] = useState(exportFormats[0].name);
     const [fields, setFields] = useState<FormField<FormPropsKey>[]>([]);
     const [isReady, setIsReady] = useState(false);
-    const form = Form.useForm()[0];
+    const form = Form.useForm<FormProps>()[0];
 
     const loading = staffLoading || exportLoading;
 
@@ -159,13 +156,14 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     useEffect(() => {
         const exportFormat = exportFormats.find((f) => f.name === format);
         const dscoCfg = (exportFormat && exportFormat.dsco_configurable) ?? [];
-        let multipleFields: FormField[] = [];
-        const dscoFields: FormField[] = [];
+        let multipleFields: FormField<FormPropsKey>[] = [];
+        const dscoFields: FormField<FormPropsKey>[] = [];
         const dscoFieldsValues: Record<string, string> = {};
         for (const d of dscoCfg) {
             const [name, value] = d.split(":");
             dscoFields.push({
                 name,
+                formItem: <Input />,
                 label: name,
             });
             if (isReady) {
@@ -177,15 +175,16 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                 {
                     name: "resources",
                     label: gettext("Resources"),
-                    widget: ResourceSelectMultiple,
-                    inputProps: {
-                        pickerOptions: {
-                            traverseClasses: ["resource_group"],
-                            requireClass: "vector_layer",
-                            requireInterface: "IFeatureLayer",
-                            hideUnavailable: true,
-                        },
-                    },
+                    formItem: (
+                        <ResourceSelectMultiple
+                            pickerOptions={{
+                                traverseClasses: ["resource_group"],
+                                requireClass: "vector_layer",
+                                requireInterface: "IFeatureLayer",
+                                hideUnavailable: true,
+                            }}
+                        />
+                    ),
                 },
             ];
         }
@@ -198,64 +197,74 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             {
                 name: "format",
                 label: gettext("Format"),
-                widget: Select,
-                choices: exportFormats.map((format) => ({
-                    value: format.name,
-                    label: format.display_name,
-                })),
+                formItem: (
+                    <Select
+                        options={exportFormats.map((format) => ({
+                            value: format.name,
+                            label: format.display_name,
+                        }))}
+                    />
+                ),
             },
             ...dscoFields,
             {
                 name: "srs",
                 label: gettext("SRS"),
-                widget: Select,
-                choices: srsOptions,
+                formItem: <Select options={srsOptions} />,
             },
             {
                 name: "encoding",
                 label: gettext("Encoding"),
-                widget: Select,
-                choices: [
-                    { value: "UTF-8", label: "UTF-8" },
-                    { value: "CP1251", label: "Windows-1251" },
-                    { value: "CP1252", label: "Windows-1252" },
-                ],
+                formItem: (
+                    <Select
+                        options={[
+                            { value: "UTF-8", label: "UTF-8" },
+                            { value: "CP1251", label: "Windows-1251" },
+                            { value: "CP1252", label: "Windows-1252" },
+                        ]}
+                    />
+                ),
             },
             {
                 name: "fid",
+                formItem: <Input />,
                 label: gettext("FID field"),
             },
             {
                 name: "display_name",
                 label: gettext("Use field display names instead of keynames"),
-                widget: Checkbox,
+                valuePropName: "checked",
+                formItem: <Checkbox />,
             },
             {
                 name: "fields",
                 label: gettext("Fields"),
-                widget: Select,
-                inputProps: {
-                    mode: "multiple",
-                },
+                formItem: <Select mode="multiple" options={fieldOptions} />,
                 included: !multiple,
-                choices: fieldOptions,
             },
             {
                 name: "extent",
                 label: gettext("Limit by extent"),
-                widget: ExtentInput,
+                formItem: <ExtentInput />,
             },
             {
                 name: "ilike",
+                formItem: <Input />,
                 label: gettext("Filter text"),
             },
             {
                 name: "zipped",
                 label: gettext("Zip archive"),
-                widget: Checkbox,
+                formItem: (
+                    <Checkbox
+                        disabled={
+                            (exportFormat && !exportFormat.single_file) ||
+                            multiple
+                        }
+                    />
+                ),
+                valuePropName: "checked",
                 included: !multiple,
-                disabled:
-                    (exportFormat && !exportFormat.single_file) || multiple,
             },
         ];
 

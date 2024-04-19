@@ -2,11 +2,12 @@ import type { FillSymbolizer } from "geostyler-style";
 import _cloneDeep from "lodash-es/cloneDeep";
 import { useMemo } from "react";
 
+import { InputNumber } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { ColorField } from "../../field/ColorField";
+import { ColorInput } from "../../field/ColorInput";
 import type { EditorProps } from "../../type";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
 import { hexWithOpacity } from "../../util/hexWithOpacity";
@@ -46,20 +47,17 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
             {
                 label: msgFillColor,
                 name: "color",
-                widget: ColorField,
+                formItem: <ColorInput />,
             },
             {
                 label: msgOutlineColor,
                 name: "outlineColor",
-                widget: ColorField,
+                formItem: <ColorInput />,
             },
             {
                 label: msgOutlineWidth,
                 name: "outlineWidth",
-                widget: "number",
-                inputProps: {
-                    min: 0,
-                },
+                formItem: <InputNumber min={0} />,
             },
         ],
         []

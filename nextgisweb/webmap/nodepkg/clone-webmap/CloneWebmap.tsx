@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Space } from "@nextgisweb/gui/antd";
+import { Input, Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import type { FieldsFormProps, FormField } from "@nextgisweb/gui/fields-form";
@@ -8,7 +8,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { ResourceSelect } from "@nextgisweb/resource/field/ResourceSelect";
+import { ResourceSelect } from "@nextgisweb/resource/component";
 import type {
     CompositeCreate,
     CompositeRead,
@@ -59,19 +59,21 @@ export function CloneWebmap({
             {
                 name: "parent",
                 label: gettext("Resource group"),
-                widget: ResourceSelect,
-                inputProps: {
-                    pickerOptions: {
-                        traverseClasses: ["resource_group"],
-                        hideUnavailable: true,
-                    },
-                },
+                formItem: (
+                    <ResourceSelect
+                        pickerOptions={{
+                            traverseClasses: ["resource_group"],
+                            hideUnavailable: true,
+                        }}
+                    />
+                ),
                 required: true,
             },
             {
                 name: "name",
                 disabled: nameLoading,
                 label: gettext("Display name"),
+                formItem: <Input />,
                 required: true,
             },
         ],

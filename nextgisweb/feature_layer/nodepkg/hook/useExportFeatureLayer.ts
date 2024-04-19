@@ -12,7 +12,7 @@ interface UseExportFeatureLayerProps {
 }
 
 export type ExportFeatureLayerOptions = {
-    extent?: number[];
+    extent?: (null | number)[];
     resources?: string[];
     intersects?: string;
     ilike?: string;
@@ -37,8 +37,10 @@ export function useExportFeatureLayer({ id }: UseExportFeatureLayerProps) {
         async (values: ExportFeatureLayerOptions) => {
             const { extent, resources, ...fields } = values;
             const json: Record<string, string> = {};
-            if (extent && !(extent as (number | null)[]).includes(null)) {
-                const wkt = new WKT().writeGeometry(fromExtent(extent));
+            if (extent && !extent.includes(null)) {
+                const wkt = new WKT().writeGeometry(
+                    fromExtent(extent as number[])
+                );
 
                 json.intersects = wkt;
                 json.intersects_srs = String(4326);

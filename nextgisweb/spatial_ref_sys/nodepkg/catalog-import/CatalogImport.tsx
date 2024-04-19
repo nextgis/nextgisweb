@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { Button, Form } from "@nextgisweb/gui/antd";
+import { Button, Form, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
@@ -29,16 +29,12 @@ export function CatalogImport({ url, id }: CatalogImportProps) {
             {
                 name: "display_name",
                 label: gettext("Display name"),
-                inputProps: {
-                    readOnly: true,
-                },
+                formItem: <Input readOnly />,
             },
             {
                 name: "wkt",
                 label: gettext("OGC WKT definition"),
-                readOnly: true,
-                widget: "text",
-                rows: 4,
+                formItem: <Input.TextArea readOnly rows={4} />,
                 style: { margin: "0" },
             },
         ],

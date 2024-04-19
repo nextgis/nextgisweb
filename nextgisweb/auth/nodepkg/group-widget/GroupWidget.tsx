@@ -1,12 +1,13 @@
 import { useState } from "react";
 
-import { KeynameTextBox } from "@nextgisweb/gui/fields-form";
+import { Checkbox, Input } from "@nextgisweb/gui/antd";
 import type { FormField } from "@nextgisweb/gui/fields-form";
+import { KeynameRule } from "@nextgisweb/gui/fields-form/rules/KeynameRule";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import type { Model } from "@nextgisweb/gui/model-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { PermissionSelect, PrincipalSelect } from "../field";
+import { PermissionSelect, PrincipalSelect } from "../component";
 import { default as oauth } from "../oauth";
 
 interface GroupWidgetProps {
@@ -21,57 +22,57 @@ const messages = {
 
 export function GroupWidget({ id, readonly }: GroupWidgetProps) {
     const [fields] = useState<FormField[]>(() => {
-        const fields_: FormField[] = [
+        return [
             {
                 name: "display_name",
                 label: gettext("Full name"),
+                formItem: <Input />,
                 required: true,
             },
             {
                 name: "keyname",
                 label: gettext("Group name"),
                 required: true,
-                widget: KeynameTextBox,
+                rules: [KeynameRule],
+                formItem: <Input />,
             },
             {
                 name: "members",
                 label: gettext("Users"),
-                widget: PrincipalSelect,
-                inputProps: {
-                    model: "user",
-                    multiple: true,
-                    systemUsers: ["guest"],
-                    editOnClick: true,
-                },
+                formItem: (
+                    <PrincipalSelect
+                        model={"user"}
+                        multiple
+                        systemUsers={["guest"]}
+                        editOnClick
+                    />
+                ),
             },
             {
                 name: "permissions",
                 label: gettext("Permissions"),
-                widget: PermissionSelect,
-                inputProps: { multiple: true },
+                formItem: <PermissionSelect multiple />,
                 value: [],
             },
             {
                 name: "register",
                 label: gettext("New users"),
-                widget: "checkbox",
+                valuePropName: "checked",
+                formItem: <Checkbox />,
             },
-        ];
-
-        if (oauth.group_mapping) {
-            fields_.push({
+            {
                 name: "oauth_mapping",
                 label: gettext("{dn} mapping").replace("{dn}", oauth.name),
-                widget: "checkbox",
-            });
-        }
-
-        fields_.push({
-            name: "description",
-            label: gettext("Description"),
-            widget: "text",
-        });
-        return fields_;
+                valuePropName: "checked",
+                formItem: <Checkbox />,
+                included: oauth.group_mapping,
+            },
+            {
+                name: "description",
+                label: gettext("Description"),
+                formItem: <Input.TextArea />,
+            },
+        ];
     });
 
     const model: Model = {

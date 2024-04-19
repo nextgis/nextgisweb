@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { Button, Form, Modal } from "@nextgisweb/gui/antd";
+import { Button, Form, Input, Modal } from "@nextgisweb/gui/antd";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
@@ -29,11 +29,13 @@ export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
             {
                 name: "display_name",
                 label: gettext("Display name"),
+                formItem: <Input />,
                 required: true,
             },
             {
                 name: "auth_name_srid",
                 label: gettext("Authority and code"),
+                formItem: <Input />,
                 value: (record: SRSRead) =>
                     `${record.auth_name}:${record.auth_srid}`,
                 disabled: true,
@@ -42,8 +44,7 @@ export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
             {
                 name: "wkt",
                 label: gettext("OGC WKT definition"),
-                widget: "text",
-                rows: 4,
+                formItem: <Input.TextArea rows={4} />,
                 required: true,
                 disabled: isProtected,
             },
@@ -68,7 +69,7 @@ export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
             if ("message" in err) {
                 modalForm.setFields([
                     {
-                        name: "projStr",
+                        name: "projstring",
                         errors: [err.message],
                     },
                 ]);

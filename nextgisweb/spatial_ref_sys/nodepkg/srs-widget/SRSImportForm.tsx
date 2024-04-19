@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { FieldsForm, Select } from "@nextgisweb/gui/fields-form";
+import { Input, Select } from "@nextgisweb/gui/antd";
+import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FieldsFormProps, FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
@@ -56,16 +57,18 @@ export function SRSImportFrom({
             {
                 name: "format",
                 label: gettext("Format"),
-                widget: Select,
-                choices,
+                formItem: <Select options={choices} />,
             },
             {
                 name: "projStr",
                 label: gettext("Definition"),
-                widget: "text",
-                placeholder: PLACEHOLDERS[format],
+                formItem: (
+                    <Input.TextArea
+                        placeholder={PLACEHOLDERS[format]}
+                        rows={4}
+                    />
+                ),
                 required: true,
-                rows: 4,
             },
         ],
         [format]

@@ -2,25 +2,22 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
-import { Button, Tooltip } from "@nextgisweb/gui/antd";
-import { LoadingWrapper } from "@nextgisweb/gui/component";
 import {
-    BigInteger,
-    DateInput,
-    DateTimeInput,
-    FieldsForm,
-    Form,
+    Button,
+    DatePicker,
+    DateTimePicker,
     Input,
-    Integer,
-    Number,
-    TimeInput,
-} from "@nextgisweb/gui/fields-form";
-import type {
-    FormField,
-    FormWidget,
-    SizeType,
-} from "@nextgisweb/gui/fields-form";
-import { LookupSelectField } from "@nextgisweb/lookup-table/field/LookupSelectField";
+    InputBigInteger,
+    InputInteger,
+    InputNumber,
+    TimePicker,
+    Tooltip,
+} from "@nextgisweb/gui/antd";
+import type { DatePickerProps } from "@nextgisweb/gui/antd";
+import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
+import type { FormField, SizeType } from "@nextgisweb/gui/fields-form";
+import { LookupSelect } from "@nextgisweb/lookup-table/component/lookup-select";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FeatureLayerDataType, FeatureLayerField } from "../type";
@@ -32,25 +29,13 @@ import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 
 const style = { width: "100%" };
 
-const ngwTypeAliases: Record<
-    FeatureLayerDataType,
-    [widget: FormWidget, props?: Record<string, unknown>]
-> = {
-    STRING: [Input],
-    REAL: [Number, { style }],
-    INTEGER: [Integer, { style }],
-    BIGINT: [BigInteger, { style }],
-    DATETIME: [DateTimeInput, { style, allowClear: false }],
-    DATE: [DateInput, { style, allowClear: false }],
-    TIME: [TimeInput, { style, allowClear: false }],
-};
-
 const msgSetNull = gettext("Set field value to NULL (No data)");
 const msgNoAttrs = gettext("There are no attributes in the vector layer");
 
 interface AttributeEditorStoreProps
     extends EditorWidgetProps<NgwAttributeValue | null, AttributeEditorStore> {
     fields?: FeatureLayerField[];
+    size?: SizeType;
     onChange?: (value: NgwAttributeValue | null) => void;
 }
 
@@ -58,6 +43,7 @@ const AttributeEditor = observer(
     ({
         store: store_,
         fields: fields_,
+        size = "middle",
         onChange,
     }: AttributeEditorStoreProps) => {
         const [store] = useState(() => {
@@ -68,7 +54,7 @@ const AttributeEditor = observer(
         });
 
         const { fields, attributes, isReady, setValues, saving } = store;
-        const [size] = useState<SizeType>();
+
         const form = Form.useForm()[0];
 
         const setNullForField = useCallback(
@@ -91,29 +77,66 @@ const AttributeEditor = observer(
             }
         }, [store.value, onChange]);
 
-        const formFields = useMemo(() => {
-            const fieldFormWidgets: FormField<string, FormWidget>[] = [];
-            for (const field of fields) {
-                let widget: FormWidget | undefined = undefined;
-                let inputProps: Record<string, unknown> = {};
+        const getNgwTypeAliases = useCallback(
+            ({
+                placeholder,
+            }: {
+                placeholder?: string;
+            }): Record<FeatureLayerDataType, React.ReactElement> => {
+                const dpProps: DatePickerProps = {
+                    style,
+                    placeholder,
+                    allowClear: false,
+                    disabled: saving,
+                };
+                const inputProps = {
+                    placeholder,
+                    disabled: saving,
+                    style,
+                };
+                return {
+                    STRING: <Input {...inputProps} />,
+                    REAL: <InputNumber {...inputProps} />,
+                    INTEGER: <InputInteger {...inputProps} />,
+                    BIGINT: <InputBigInteger {...inputProps} />,
+                    DATETIME: <DateTimePicker {...dpProps} />,
+                    DATE: <DatePicker {...dpProps} />,
+                    TIME: <TimePicker {...dpProps} />,
+                };
+            },
+            [saving]
+        );
 
-                if (field.lookup_table && field.lookup_table.id) {
-                    widget = LookupSelectField;
-                    inputProps.lookupId = field.lookup_table.id;
-                } else {
-                    const widgetAlias = ngwTypeAliases[field.datatype];
-                    widget = widgetAlias[0];
-                    inputProps = widgetAlias[1] || inputProps;
+        const formFields = useMemo(() => {
+            const fieldFormWidgets: FormField<string>[] = [];
+            for (const field of fields) {
+                let formItem: FormField["formItem"] | undefined = undefined;
+
+                const val = attributes[field.keyname];
+                let placeholder: string | undefined = undefined;
+                if (val === null) {
+                    placeholder = "NULL";
                 }
-                if (widget) {
+
+                if (field.lookup_table && field.lookup_table.id !== undefined) {
+                    formItem = (
+                        <LookupSelect
+                            lookupId={field.lookup_table.id}
+                            placeholder={placeholder}
+                            disabled={saving}
+                        />
+                    );
+                } else {
+                    formItem = getNgwTypeAliases({ placeholder })[
+                        field.datatype
+                    ];
+                }
+                if (formItem) {
                     const props: FormField = {
                         name: field.keyname,
                         label: field.display_name,
-                        widget,
-                        inputProps: {
-                            readOnly: saving,
-                            ...inputProps,
-                        },
+                        formItem,
+
                         append: (
                             <Tooltip title={msgSetNull} placement="right">
                                 <Button
@@ -129,16 +152,11 @@ const AttributeEditor = observer(
                         ),
                     };
 
-                    const val = attributes[field.keyname];
-                    if (val === null) {
-                        props.placeholder = "NULL";
-                    }
-
                     fieldFormWidgets.push(props);
                 }
             }
             return fieldFormWidgets;
-        }, [fields, attributes, setNullForField, saving]);
+        }, [fields, attributes, saving, getNgwTypeAliases, setNullForField]);
 
         if (!isReady) {
             return <LoadingWrapper />;

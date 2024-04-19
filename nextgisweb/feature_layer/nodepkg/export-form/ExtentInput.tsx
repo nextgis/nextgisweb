@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Form, InputNumber, Space } from "@nextgisweb/gui/antd";
+import { InputNumber, Space } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 const msgUnit = gettext("deg.");
@@ -19,7 +19,7 @@ interface ExtentInputProps {
     onChange?: (val: Extent) => void;
 }
 
-const Widget = ({ value, onChange }: ExtentInputProps) => {
+export const ExtentInput = ({ value, onChange }: ExtentInputProps) => {
     const [values, setValues] = useState(value ? value : parts.map(() => null));
     useEffect(() => {
         if (onChange) {
@@ -46,11 +46,3 @@ const Widget = ({ value, onChange }: ExtentInputProps) => {
         </Space.Compact>
     );
 };
-
-export function ExtentInput({ ...props }) {
-    return (
-        <Form.Item {...props}>
-            <Widget />
-        </Form.Item>
-    );
-}

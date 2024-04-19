@@ -2,11 +2,12 @@ import type { LineSymbolizer } from "geostyler-style";
 import _cloneDeep from "lodash-es/cloneDeep";
 import { useMemo } from "react";
 
+import { InputNumber } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { ColorField } from "../../field/ColorField";
+import { ColorInput } from "../../field/ColorInput";
 import type { EditorProps } from "../../type";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
 import { hexWithOpacity } from "../../util/hexWithOpacity";
@@ -37,15 +38,12 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
             {
                 label: msgFillColor,
                 name: "color",
-                widget: ColorField,
+                formItem: <ColorInput />,
             },
             {
                 label: msgWidth,
                 name: "width",
-                widget: "number",
-                inputProps: {
-                    min: 0,
-                },
+                formItem: <InputNumber min={0} />,
             },
         ],
         []

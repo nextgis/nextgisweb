@@ -2,11 +2,12 @@ import type { MarkSymbolizer as GSMarkSymbolizer } from "geostyler-style";
 import _cloneDeep from "lodash-es/cloneDeep";
 import { useMemo } from "react";
 
+import { InputNumber, Select } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { ColorField } from "../../field/ColorField";
+import { ColorInput } from "../../field/ColorInput";
 import type { EditorProps } from "../../type";
 import { wellKnownNames } from "../../util/constant";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
@@ -54,34 +55,27 @@ export function MarkEditor({ value, onChange }: EditorProps<MarkSymbolizer>) {
             {
                 label: msgShape,
                 name: "wellKnownName",
-                widget: "select",
-                choices: wellKnownNames,
+                formItem: <Select options={wellKnownNames} />,
             },
             {
                 label: msgSize,
                 name: "size",
-                widget: "number",
-                inputProps: {
-                    min: 0,
-                },
+                formItem: <InputNumber min={0} />,
             },
             {
                 label: msgFillColor,
                 name: "color",
-                widget: ColorField,
+                formItem: <ColorInput />,
             },
             {
                 label: msgStrokeColor,
                 name: "strokeColor",
-                widget: ColorField,
+                formItem: <ColorInput />,
             },
             {
                 label: msgStrokeWidth,
                 name: "strokeWidth",
-                widget: "number",
-                inputProps: {
-                    min: 0,
-                },
+                formItem: <InputNumber min={0} />,
             },
         ],
         []
