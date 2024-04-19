@@ -80,6 +80,10 @@ export interface DojoDisplay extends dijit._WidgetBase {
     featureHighlighter: FeatureHighlighter;
     getUrlParams: () => Record<string, string>;
     isTinyMode: () => boolean;
+    prepareItem: (item: WebmapItem) => WebmapItem;
+    _installPlugins: (plugins: WebmapPlugin[]) => void;
+    _onNewStoreItem: (item: WebmapItem | any) => void;
+    _mapAddLayer: (id: number) => void;
 
     itemStore: CustomItemFileWriteStore;
     getItemConfig: () => ItemConfigById;
