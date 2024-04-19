@@ -232,6 +232,7 @@ def display(obj, request):
         webmapEditable=obj.editable,
         webmapLegendVisible=obj.legend_symbols,
         drawOrderEnabled=obj.draw_order_enabled,
+        measureSrsId=obj.measure_srs_id,
     )
 
     if request.env.webmap.options["annotation"]:

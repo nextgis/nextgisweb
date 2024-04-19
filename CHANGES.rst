@@ -1,6 +1,11 @@
 Changes
 =======
 
+4.8.0
+-----
+
+- Per-webmap measurement SRS configuration.
+
 4.7.0
 -----
 

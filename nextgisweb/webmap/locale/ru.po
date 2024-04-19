@@ -810,8 +810,8 @@ msgid "Degree format"
 msgstr "Формат градусов"
 
 #: nodepkg/settings/SettingsForm.js:189
-msgid "Measurement SRID"
-msgstr "Система координат для расчётов"
+msgid "Measurement SRS"
+msgstr "Система координат для измерений"
 
 #: nodepkg/settings/SettingsForm.js:199
 msgid "Address search"

@@ -13,6 +13,7 @@ from nextgisweb.auth import User
 from nextgisweb.resource import Permission as P
 from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, Scope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import SerializedRelationship as SR
 from nextgisweb.resource import SerializedResourceRelationship as SRR
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -73,6 +74,11 @@ class WebMap(Base, Resource):
 
     bookmark_resource = db.relationship(
         Resource, foreign_keys=bookmark_resource_id, backref=db.backref("bookmarked_webmaps")
+    )
+
+    measure_srs_id = db.Column(db.ForeignKey(SRS.id, ondelete='SET NULL'), nullable=True)
+    measure_srs = db.relationship(
+        SRS, foreign_keys=measure_srs_id, back_populates="measure_webmaps"
     )
 
     annotations = db.relationship(
@@ -369,6 +375,8 @@ class WebMapSerializer(Serializer):
     annotation_default = SP(**_mdargs)
 
     legend_symbols = SP(**_mdargs)
+
+    measure_srs = SR(**_mdargs)
 
     bookmark_resource = SRR(**_mdargs)
 

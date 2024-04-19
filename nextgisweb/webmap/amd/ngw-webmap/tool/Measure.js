@@ -143,11 +143,13 @@ define([
                                 ? GEOM_AREA_URL
                                 : GEOM_LENGTH_URL;
 
+                            const measureSrsId = tool.getMeasureSrsId();
+
                             function requestMeasure() {
                                 id_request = id_actuality;
                                 xhr(
                                     measure_url({
-                                        id: settings.measurement_srid,
+                                        id: measureSrsId,
                                     }),
                                     {
                                         method: "POST",
@@ -209,6 +211,15 @@ define([
             this.tooltip = new TooltipDialog();
 
             this.active = false;
+        },
+
+        getMeasureSrsId: function () {
+            const displayConfig = this.display.config;
+            if (displayConfig.measureSrsId) {
+                return displayConfig.measureSrsId;
+            } else {
+                return settings.measurement_srid;
+            }
         },
 
         activate: function () {

@@ -186,7 +186,7 @@ export const SettingsForm = ({
                 <Col span={24}>
                     <Form.Item
                         name="measurement_srid"
-                        label={gettext("Measurement SRID")}
+                        label={gettext("Measurement SRS")}
                     >
                         <Select
                             options={srsOptions}

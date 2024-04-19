@@ -9,6 +9,7 @@ export class SettingStore {
     annotationEnabled = false;
     annotationDefault = "no";
     legendSymbols = null;
+    measureSrs = null;
 
     dirty = false;
 
@@ -21,6 +22,7 @@ export class SettingStore {
         this.annotationEnabled = !!value.annotation_enabled;
         this.annotationDefault = value.annotation_default;
         this.legendSymbols = value.legend_symbols;
+        this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
 
         this.dirty = false;
     }
@@ -29,6 +31,7 @@ export class SettingStore {
         if (!this.dirty) return;
         const result = {
             legend_symbols: this.legendSymbols ? this.legendSymbols : null,
+            measure_srs: this.measureSrs ? { id: this.measureSrs } : null,
         };
         if (editing) result.editable = this.editable;
         if (annotation) {
