@@ -34,6 +34,7 @@ export interface FileUploaderProps extends UseFileUploaderProps {
     showMaxSize?: boolean;
     file?: File;
     reset?: boolean;
+    style?: React.CSSProperties;
 }
 
 export interface Progress {

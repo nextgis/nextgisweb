@@ -22,6 +22,7 @@ const msgMaxSize = formatSize(maxSize) + " " + gettext("max");
 const msgStop = gettext("Stop");
 
 export function FileUploader({
+    style,
     accept,
     height = 220,
     fileMeta,
@@ -34,7 +35,6 @@ export function FileUploader({
     showMaxSize = false,
     dragAndDropText = msgDragAndDrop,
     showProgressInDocTitle = true,
-    reset,
 }: FileUploaderProps) {
     const { abort, progressText, props, meta, setMeta, uploading } =
         useFileUploader({
@@ -49,12 +49,6 @@ export function FileUploader({
     useEffect(() => {
         onUploading && onUploading(uploading);
     }, [uploading, onUploading]);
-
-    useEffect(() => {
-        if (reset) {
-            setMeta(undefined);
-        }
-    }, [reset, setMeta]);
 
     const InputText = () => {
         const firstMeta = Array.isArray(meta) ? meta[0] : meta;
@@ -98,12 +92,12 @@ export function FileUploader({
             </span>
         </div>
     );
-
     return (
         <Dragger
             {...props}
             className="ngw-file-upload-file-uploader"
             height={height}
+            style={style}
             disabled={progressText !== null}
             accept={accept}
         >
