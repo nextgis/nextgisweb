@@ -128,7 +128,7 @@ class CoreComponent(StorageComponentMixin, Component):
         if (
             (free_inodes := self.options["healthcheck.free_inodes"]) > 0
             and stat.f_ffree >= 0
-            and stat.f_files >= 0  # Not available in some FS
+            and stat.f_files > 0  # Not available in some FS
         ):
             if (free_inodes_current := stat.f_ffree / stat.f_files * 100) < free_inodes:
                 return dict(
