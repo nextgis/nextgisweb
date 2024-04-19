@@ -1,4 +1,4 @@
-import type { PanelDojoItem } from "../type";
+import type { DojoDisplay, PanelDojoItem } from "../type";
 
 export interface TopicSubscription {
     remove: () => void;
@@ -17,6 +17,12 @@ export interface FeatureLayerWebMapPluginConfig {
 
 export interface DisplayItemConfig {
     plugin: Record<string, unknown>;
+}
+
+export interface PanelProps {
+    display: DojoDisplay;
+    close: () => void;
+    title?: string;
 }
 
 export type DojoPanel = PanelDojoItem;

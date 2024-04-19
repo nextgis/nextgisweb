@@ -20,7 +20,7 @@ interface Icon {
     format: string;
     data: string;
 }
-interface SymbolInfo {
+export interface SymbolInfo {
     index: number;
     render: boolean;
     display_name: string;
