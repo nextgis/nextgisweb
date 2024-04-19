@@ -74,6 +74,8 @@ export interface DojoDisplayIdentify {
 
 export type MapControl = OlControl | dijit._WidgetBase | DojoDisplayIdentify;
 
+export type WebmapAdapter = any;
+
 export interface DojoDisplay extends dijit._WidgetBase {
     config: DisplayConfig;
     identify: DojoDisplayIdentify;
@@ -81,7 +83,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     getUrlParams: () => Record<string, string>;
     isTinyMode: () => boolean;
     prepareItem: (item: WebmapItem) => WebmapItem;
-    _installPlugins: (plugins: WebmapPlugin[]) => void;
+    _installPlugins: (plugins: Record<string, WebmapPlugin>) => void;
     _onNewStoreItem: (item: WebmapItem | any) => void;
     _mapAddLayer: (id: number) => void;
 
@@ -107,6 +109,8 @@ export interface DojoDisplay extends dijit._WidgetBase {
      * @deprecated use webmapStore.getlayers() instead
      */
     _layers: Record<number, WebmapLayer>;
+
+    _adapters: Record<string, WebmapAdapter>;
 }
 
 export interface PluginParams {
