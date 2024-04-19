@@ -2,90 +2,88 @@
 import dayjs from "dayjs";
 import { useState } from "react";
 
-import { FieldsForm } from "./FieldsForm";
 import {
     Checkbox,
-    DateInput,
-    DateTimeInput,
+    DatePicker,
+    DateTimePicker,
     Input,
-    Number,
-    Password,
+    InputNumber,
     Select,
-    TextArea,
-    TimeInput,
-} from "./fields";
+    TimePicker,
+} from "@nextgisweb/gui/antd";
+
+import { FieldsForm } from "./FieldsForm";
 import type { FieldsFormProps, FormField } from "./type";
 
 const InputField: FormField = {
     name: "InputField",
     label: "InputField",
-    widget: "input",
-    inputProps: { allowClear: true },
+    formItem: <Input allowClear />,
 };
 const CheckboxField: FormField = {
     name: "CheckboxField",
     label: "CheckboxField",
-    widget: Checkbox,
-    inputProps: { indeterminate: true },
+    formItem: <Checkbox indeterminate />,
+    valuePropName: "checked",
 };
 
 const usageFields: FormField[] = [
     {
         name: "field1",
         label: "Field 1 - default input",
-        placeholder: "Fill Fields 1",
+        formItem: <Input placeholder="Fill Fields 1" />,
     },
-    { name: "field2", label: "Field 2 - input widget", widget: Input },
-    { name: "field3", label: "Field 3 - disabled", disabled: true },
+    { name: "field2", label: "Field 2 - input widget", formItem: <Input /> },
+    {
+        name: "field3",
+        label: "Field 3 - disabled",
+        formItem: <Input disabled />,
+    },
     {
         name: "field4",
         label: "Field 4 - use min max inputProps",
-        widget: "number",
-        inputProps: { min: 10, max: 20 },
+        formItem: <InputNumber min={10} max={20} />,
     },
     {
         name: "field5",
         label: "Field 5",
-        widget: Checkbox,
+        formItem: <Checkbox />,
+        valuePropName: "checked",
         help: "Need help?",
-        inputProps: {},
     },
     CheckboxField,
     InputField,
 ];
 
 const fields: FormField[] = [
-    { name: "Input", widget: Input },
-    { name: "Input2", widget: "input" },
-    { name: "Number", widget: Number },
-    { name: "Number2", widget: "number" },
-    { name: "Password", widget: Password },
-    { name: "Password2", widget: "password" },
-    { name: "Checkbox", widget: Checkbox },
-    { name: "Checkbox2", widget: "checkbox" },
-    { name: "DateInput", widget: DateInput },
-    { name: "DateInput2", widget: "date" },
-    { name: "DateTimeInput", widget: DateTimeInput },
-    { name: "DateTimeInput2", widget: "datetime" },
-    { name: "TimeInput", widget: TimeInput },
-    { name: "TimeInput2", widget: "time" },
-    { name: "TextArea", widget: TextArea },
-    { name: "TextArea2", widget: TextArea },
+    {
+        name: "Input",
+        label: "formItem",
+        formItem: <Input allowClear />,
+    },
+    { name: "Input2", formItem: <Input allowClear /> },
+    { name: "Number", formItem: <InputNumber /> },
+    { name: "Password", formItem: <Input.Password /> },
+    { name: "Checkbox", formItem: <Checkbox />, valuePropName: "checked" },
+
+    { name: "DateInput", formItem: <DatePicker /> },
+
+    { name: "DateTimeInput", formItem: <DateTimePicker /> },
+
+    { name: "TimeInput", formItem: <TimePicker /> },
+
+    { name: "TextArea", formItem: <Input.TextArea /> },
+
     {
         name: "Select",
-        widget: Select,
-        choices: [
-            { value: "js", label: "Javascript" },
-            { value: "ts", label: "Typescript" },
-        ],
-    },
-    {
-        name: "Select2",
-        widget: "select",
-        choices: [
-            { value: "yes", label: "Yes" },
-            { value: "No", label: "No" },
-        ],
+        formItem: (
+            <Select
+                options={[
+                    { value: "js", label: "Javascript" },
+                    { value: "ts", label: "Typescript" },
+                ]}
+            />
+        ),
     },
 ];
 
@@ -123,6 +121,8 @@ function FormValues(props: FieldsFormProps) {
             <FieldsForm
                 style={{ width: "40em" }}
                 {...props}
+                labelCol={{ flex: "auto" }}
+                layout="vertical"
                 onChange={async ({ isValid, value }) => {
                     const valid = await isValid();
                     if (valid) {
@@ -140,15 +140,10 @@ function FieldsFormTest() {
     return (
         <>
             {presets.map(([title, props]) => {
-                const propsCode = Object.entries(props)
-                    .map(([k, v]) =>
-                        v === true ? k : k + "={" + JSON.stringify(v) + "}"
-                    )
-                    .join(" ");
                 return (
                     <div key={title} style={{ marginBottom: "1em" }}>
                         <h4>{title}</h4>
-                        <code>{`<FieldsForm ${propsCode}/>`}</code>
+
                         <div style={{ marginTop: "1ex" }}></div>
                         <FormValues {...props}></FormValues>
                     </div>

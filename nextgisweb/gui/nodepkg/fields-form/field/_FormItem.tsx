@@ -1,68 +1,49 @@
-import isEqual from "lodash-es/isEqual";
-import { useMemo, useState } from "react";
-import { useEffect } from "react";
+import { isValidElement, useCallback, useMemo } from "react";
+import type { ComponentType, ReactElement } from "react";
 
 import { Form, Space } from "@nextgisweb/gui/antd";
 
-import type { FormItemProps, InputProps } from "../type";
+import type { ChildProps, FormItemProps } from "../type";
 
-export function FormItem<P extends InputProps = InputProps>({
-    placeholder,
-    inputProps: inputPropsFromProps,
-    disabled,
+export function FormItem({
     prepend,
     append,
     label,
     input: Input,
+    noStyle = true,
     ...props
-}: FormItemProps<P>) {
-    const [inputProps, setInputProps] = useState<P>(
-        () => inputPropsFromProps || ({} as P)
+}: FormItemProps) {
+    const memoizedInputComponent: ReactElement | null = useMemo(() => {
+        if (isValidElement(Input)) {
+            return Input;
+        }
+        if (typeof Input === "function" || typeof Input === "object") {
+            const Component: ComponentType<ChildProps> =
+                Input as ComponentType<ChildProps>;
+            return <Component />;
+        }
+        return null;
+    }, [Input]);
+
+    const wrapWithSpaceIfNeeded = useCallback(
+        (children: React.ReactNode) => {
+            return prepend || append ? (
+                <Space.Compact block>
+                    {prepend}
+                    {children}
+                    {append}
+                </Space.Compact>
+            ) : (
+                children
+            );
+        },
+        [append, prepend]
     );
-
-    const memoizedInputComponent = useMemo(() => {
-        const combinedProps: P = {
-            placeholder,
-            disabled,
-            ...inputProps,
-        };
-
-        const propsForInput = {} as P;
-
-        for (const p in combinedProps) {
-            const prop = combinedProps[p];
-
-            if (prop !== undefined) {
-                propsForInput[p] = prop;
-            }
-        }
-
-        return Input && <Input {...propsForInput} />;
-    }, [disabled, inputProps, Input, placeholder]);
-
-    useEffect(() => {
-        if (inputPropsFromProps) {
-            setInputProps((old) => {
-                if (!isEqual(old, inputPropsFromProps)) {
-                    return inputPropsFromProps;
-                }
-                return old;
-            });
-        }
-    }, [inputPropsFromProps]);
 
     return (
         <Form.Item label={label}>
-            {prepend || append ? (
-                <Space.Compact block>
-                    {prepend && prepend}
-                    <Form.Item {...props} noStyle>
-                        {memoizedInputComponent}
-                    </Form.Item>
-                    {append && append}
-                </Space.Compact>
-            ) : (
-                <Form.Item {...props} noStyle>
+            {wrapWithSpaceIfNeeded(
+                <Form.Item {...props} noStyle={noStyle}>
                     {memoizedInputComponent}
                 </Form.Item>
             )}

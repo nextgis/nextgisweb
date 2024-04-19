@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { Form } from "@nextgisweb/gui/antd";
 
@@ -52,7 +52,12 @@ export function FieldsForm<
         ...(onChange && { onFieldsChange }),
     };
 
-    const includedFormItems = fields.filter((f) => f.included ?? true);
+    const formItems = useMemo(() => {
+        const includedFormItems = fields.filter((f) => f.included ?? true);
+        return includedFormItems.map((f) => {
+            return <FormItem key={f.name} {...f} />;
+        });
+    }, [fields]);
 
     return (
         <Form
@@ -61,9 +66,7 @@ export function FieldsForm<
             {...modifiedFormProps}
             className="fields-form"
         >
-            {includedFormItems.map((f) => (
-                <FormItem key={f.name} {...f} />
-            ))}
+            {formItems}
             {children}
         </Form>
     );
