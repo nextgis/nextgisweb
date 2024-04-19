@@ -53,13 +53,19 @@ export function FormItem<P extends InputProps = InputProps>({
 
     return (
         <Form.Item label={label}>
-            <Space.Compact block>
-                {prepend && prepend}
+            {prepend || append ? (
+                <Space.Compact block>
+                    {prepend && prepend}
+                    <Form.Item {...props} noStyle>
+                        {memoizedInputComponent}
+                    </Form.Item>
+                    {append && append}
+                </Space.Compact>
+            ) : (
                 <Form.Item {...props} noStyle>
                     {memoizedInputComponent}
                 </Form.Item>
-                {append && append}
-            </Space.Compact>
+            )}
         </Form.Item>
     );
 }
