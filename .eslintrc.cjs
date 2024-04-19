@@ -25,7 +25,12 @@ const config = {
         "eqeqeq": "error",
         "no-unused-vars": [
             "error",
-            { args: "after-used", destructuredArrayIgnorePattern: "^_" },
+            {
+                args: "after-used",
+                vars: "all",
+                ignoreRestSiblings: true,
+                varsIgnorePattern: "^_+$",
+            },
         ],
         "no-use-before-define": "warn",
         "no-useless-escape": "warn",
@@ -127,6 +132,16 @@ const config = {
             rules: {
                 "prettier/prettier": "warn",
                 "@typescript-eslint/no-explicit-any": "warn",
+                "@typescript-eslint/no-unused-vars": [
+                    "error",
+                    {
+                        args: "after-used",
+                        destructuredArrayIgnorePattern: "^_",
+                        vars: "all",
+                        ignoreRestSiblings: true,
+                        varsIgnorePattern: "^_+$",
+                    },
+                ],
             },
             parserOptions: {
                 sourceType: "module",
