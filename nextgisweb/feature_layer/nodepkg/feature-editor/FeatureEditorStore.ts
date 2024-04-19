@@ -47,7 +47,12 @@ export class FeatureEditorStore {
 
         makeAutoObservable(this, { _abortController: false, route: false });
 
-        this._initialize();
+        this.initLoading = true;
+        this._initialize().finally(() => {
+            runInAction(() => {
+                this.initLoading = false;
+            });
+        });
     }
 
     get route() {
@@ -69,34 +74,27 @@ export class FeatureEditorStore {
 
     private _initialize = async () => {
         this._abort();
-        try {
-            const signal = this._abortController.makeSignal();
-            runInAction(() => {
-                this.initLoading = true;
-            });
-            const resp = await route("resource.item", this.resourceId).get({
-                signal,
-            });
-            runInAction(() => {
-                const fields =
-                    resp && resp.feature_layer && resp.feature_layer.fields;
-                if (fields) {
-                    this.fields = fields;
-                }
-            });
-            if (this.featureId !== undefined) {
-                const featureItem = await this.route.get<FeatureItem>({
-                    signal,
-                    query: { dt_format: "iso" },
-                });
-                this._setFeatureItem(featureItem);
+
+        const signal = this._abortController.makeSignal();
+
+        const resp = await route("resource.item", this.resourceId).get({
+            signal,
+        });
+        runInAction(() => {
+            const fields =
+                resp && resp.feature_layer && resp.feature_layer.fields;
+            if (fields) {
+                this.fields = fields;
             }
-            return resp;
-        } finally {
-            runInAction(() => {
-                this.initLoading = false;
+        });
+        if (this.featureId !== undefined) {
+            const featureItem = await this.route.get<FeatureItem>({
+                signal,
+                query: { dt_format: "iso" },
             });
+            this._setFeatureItem(featureItem);
         }
+        return resp;
     };
 
     save = async () => {
