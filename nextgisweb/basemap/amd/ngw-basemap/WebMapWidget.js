@@ -19,6 +19,7 @@ define([
     "dijit/Toolbar",
     "dijit/form/Button",
     "dijit/form/Form",
+    "dijit/form/Select",
     "ngw-resource/ResourcePicker",
     "ngw-resource/form/ResourceLink",
     "ngw-pyramid/form/DisplayNameTextBox",
@@ -97,12 +98,17 @@ define([
                 // Add new layer
                 this.btnAddLayer.on("click", function () {
                     widget.layerPicker.pick().then(function (itm) {
+                        if (widget._hasBasemapResourceId(itm.id)) {
+                            alert(i18n.gettext("Basemap already added"));
+                            return;
+                        }
+
                         widget.itemStore.newItem(
                             {
                                 "keyname": null,
                                 "display_name": itm.display_name,
                                 "resource_id": itm.id,
-                                "enabled": true,
+                                "enabled": false,
                                 "opacity": null,
                             },
                             {
@@ -115,6 +121,8 @@ define([
                             widget.widgetTreeRootNodeId,
                             widget.itemIdx,
                         ]);
+
+                        widget._buildBasemapsDefault();
                     });
                 });
 
@@ -139,6 +147,7 @@ define([
                     }
 
                     widget.itemStore.deleteItem(item);
+                    widget._buildBasemapsDefault();
                 });
 
                 this.widgetTree.watch(
@@ -151,10 +160,6 @@ define([
                             widget.wDisplayName.set(
                                 "value",
                                 widget.getItemValue("display_name")
-                            );
-                            widget.wEnabled.set(
-                                "checked",
-                                widget.getItemValue("enabled")
                             );
                             widget.wOpacity.set(
                                 "value",
@@ -186,18 +191,16 @@ define([
                     "value",
                     function (attr, oldValue, newValue) {
                         widget.setItemValue("display_name", newValue);
-                    }
-                );
-
-                this.wEnabled.watch(
-                    "checked",
-                    function (attr, oldValue, newValue) {
-                        widget.setItemValue("enabled", newValue);
+                        widget._buildBasemapsDefault();
                     }
                 );
 
                 this.wOpacity.watch("value", function (attr, oldVal, newVal) {
                     widget.setItemValue("opacity", newVal);
+                });
+
+                this.slBasemapDefault.on("change", (basemapId) => {
+                    this._setDefaultBasemap(basemapId);
                 });
             },
 
@@ -263,6 +266,11 @@ define([
                 if (this.itemIdx > 0) {
                     this.widgetTree.set("path", [this.widgetTreeRootNodeId, 1]);
                 }
+
+                this._buildBasemapsDefault();
+                const defaultBasemapId = this._getDefaultBasemapId();
+                this.slBasemapDefault.set("value", defaultBasemapId);
+                this._setDefaultBasemap(defaultBasemapId);
             },
 
             validateDataInMixin: function () {
@@ -283,6 +291,74 @@ define([
                 );
 
                 return success;
+            },
+
+            _hasBasemapResourceId: function (resourceId) {
+                if (!this.itemStore) return;
+                const basemapsItems = this.itemStore.getValues(
+                    this.itemModel.root,
+                    "children"
+                );
+
+                for (const item of basemapsItems) {
+                    const resId = this.itemStore.getValue(item, "resource_id");
+                    if (resId === resourceId) return true;
+                }
+
+                return false;
+            },
+
+            _buildBasemapsDefault: function () {
+                if (!this.itemStore) return;
+
+                const options = [{ value: -1, label: i18n.gettext("None") }];
+                const basemapsItems = this.itemStore.getValues(
+                    this.itemModel.root,
+                    "children"
+                );
+                basemapsItems.forEach((item) => {
+                    const value = this.itemStore.getValue(item, "resource_id");
+                    const label = this.itemStore.getValue(item, "display_name");
+                    options.push({ value, label });
+                });
+
+                this.slBasemapDefault.set("options", options);
+                this.slBasemapDefault.set("value", this._getDefaultBasemapId());
+            },
+
+            _getDefaultBasemapId: function () {
+                const basemapsItems = this.itemStore.getValues(
+                    this.itemModel.root,
+                    "children"
+                );
+
+                for (const item of basemapsItems) {
+                    const enabled = this.itemStore.getValue(item, "enabled");
+                    if (enabled) {
+                        const resId = this.itemStore.getValue(
+                            item,
+                            "resource_id"
+                        );
+                        return resId;
+                    }
+                }
+
+                return -1;
+            },
+
+            _setDefaultBasemap: function (resourceId) {
+                const basemapsItems = this.itemStore.getValues(
+                    this.itemModel.root,
+                    "children"
+                );
+                for (const item of basemapsItems) {
+                    const resId = this.itemStore.getValue(item, "resource_id");
+                    this.itemStore.setValue(
+                        item,
+                        "enabled",
+                        resId === resourceId
+                    );
+                }
             },
         }
     );

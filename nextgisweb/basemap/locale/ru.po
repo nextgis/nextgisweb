@@ -1,18 +1,26 @@
-#: amd/ngw-basemap/LayerWidget.js:33 model.py:19
+#: amd/ngw-basemap/LayerWidget.js:39 model.py:19
 msgid "Basemap"
 msgstr "Подложка веб-карты"
 
-#: amd/ngw-basemap/LayerWidget.js:54
+#: amd/ngw-basemap/LayerWidget.js:60
 msgid "Search"
 msgstr "Поиск"
 
-#: amd/ngw-basemap/LayerWidget.js:61
+#: amd/ngw-basemap/LayerWidget.js:67
 msgid "Use options from QMS"
 msgstr "Использовать настройки из QMS"
 
-#: amd/ngw-basemap/WebMapWidget.js:43
+#: amd/ngw-basemap/WebMapWidget.js:50
 msgid "Basemaps"
 msgstr "Подложки"
+
+#: amd/ngw-basemap/WebMapWidget.js:102
+msgid "Basemap already added"
+msgstr "Эта подложка уже добавлена"
+
+#: amd/ngw-basemap/WebMapWidget.js:314
+msgid "None"
+msgstr "Нет"
 
 #: amd/ngw-basemap/template/LayerWidget.hbs:11
 msgid "URL"
@@ -38,19 +46,19 @@ msgstr "Выберите подложку"
 msgid "Remove"
 msgstr "Удалить"
 
-#: amd/ngw-basemap/template/WebMapWidget.hbs:61
+#: amd/ngw-basemap/template/WebMapWidget.hbs:34
+msgid "Set default basemap"
+msgstr "Установить подложку по умолчанию"
+
+#: amd/ngw-basemap/template/WebMapWidget.hbs:68
 msgid "Display name"
 msgstr "Название"
 
-#: amd/ngw-basemap/template/WebMapWidget.hbs:65
-msgid "Enabled"
-msgstr "Включён"
-
-#: amd/ngw-basemap/template/WebMapWidget.hbs:72
+#: amd/ngw-basemap/template/WebMapWidget.hbs:74
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: amd/ngw-basemap/template/WebMapWidget.hbs:78
+#: amd/ngw-basemap/template/WebMapWidget.hbs:80
 msgid "Resource"
 msgstr "Ресурс"
 

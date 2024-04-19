@@ -731,7 +731,7 @@ define([
 
         _getActiveBasemapKey: function () {
             if (!this._baseLayer || !this._baseLayer.name) {
-                return undefined;
+                return "blank";
             }
             return this._baseLayer.name;
         },

@@ -26,6 +26,13 @@
                 disabled="disabled">
                 {{gettext 'Remove'}}
             </div>
+
+            <div data-dojo-type="dijit/form/Select"
+                data-dojo-attach-point="slBasemapDefault"
+                class="dojo-select-ellipsis"
+                style="float: right;"
+                title="{{gettext 'Set default basemap'}}">
+            </div>
         </div>
 
         <div data-dojo-attach-point="containerTree"
@@ -59,11 +66,6 @@
                             <div data-dojo-attach-point="wDisplayName"
                                 data-dojo-type="ngw-pyramid/form/DisplayNameTextBox"
                                 title="{{gettext 'Display name'}}" style="width: 100%"></div>
-
-                            <div data-dojo-attach-point="wEnabled"
-                                data-dojo-type="dijit/form/CheckBox"
-                                title="{{gettext 'Enabled'}}">
-                            </div>
 
                             <div data-dojo-attach-point="wOpacity"
                                 data-dojo-type="dijit/form/NumberTextBox"
