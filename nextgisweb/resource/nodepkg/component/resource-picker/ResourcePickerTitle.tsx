@@ -40,7 +40,7 @@ export const ResourcePickerTitle = observer(
                         </Col>
                         <Col flex="auto">
                             <ResourcesFilter
-                                cls={resourceStore.requireClass}
+                                cls={resourceStore.requireClass || undefined}
                                 onChange={(v, opt) => {
                                     resourceStore.changeParentTo(
                                         Number(opt.key)

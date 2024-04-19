@@ -54,7 +54,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     disableResourceIds: number[] = [];
 
-    requireClass?: ResourceCls;
+    requireClass: ResourceCls | null = null;
     requireInterface?: ResourceInterface;
 
     allowSelection = true;
