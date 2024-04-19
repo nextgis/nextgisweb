@@ -4,7 +4,7 @@ import type { Composite } from "./Composite";
 
 export type Operation = "create" | "update" | "delete";
 
-interface DumpParams {
+export interface DumpParams {
     lunkwill: LunkwillParam;
 }
 
