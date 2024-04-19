@@ -1,9 +1,13 @@
 import type { AnyObject } from "antd/es/_util/type";
 import type { ColumnType } from "antd/lib/table";
 
-export type FunctionKeys<T, R extends AnyObject = AnyObject> = {
-    [K in keyof T]: T[K] extends (row: R) => void ? K : never;
-}[keyof T];
+export type FunctionKeys<
+    T,
+    R extends AnyObject = AnyObject,
+    RT = Required<T>,
+> = {
+    [K in keyof RT]: RT[K] extends (row: R) => void ? K : never;
+}[keyof RT];
 
 export type AntTableCollumn = ColumnType<AnyObject>;
 

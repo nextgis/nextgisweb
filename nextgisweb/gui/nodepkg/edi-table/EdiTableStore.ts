@@ -5,6 +5,6 @@ export interface EdiTableStore<Row extends AnyObject = AnyObject> {
     placeholder?: Row | null;
     validate?: boolean;
 
-    cloneRow: (row: Row) => void;
+    cloneRow?: (row: Row) => void;
     deleteRow: (row: Row) => void;
 }
