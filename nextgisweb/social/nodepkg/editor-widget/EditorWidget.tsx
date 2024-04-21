@@ -1,4 +1,5 @@
 import { observer } from "mobx-react-lite";
+import { useState } from "react";
 
 import { ImageUploader } from "@nextgisweb/file-upload/image-uploader";
 import { Input } from "@nextgisweb/gui/antd";
@@ -23,10 +24,19 @@ const msgImageUploader = {
 export const EditorWidget: EditorWidgetComponent<
     EditorWidgetProps<EditorStore>
 > = observer(({ store }) => {
+    const [image, setImage] = useState<string>();
+    if (store.imageExisting) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImage(reader.result as string);
+        };
+        reader.readAsDataURL(store.imageExisting);
+    }
+
     return (
         <div className="ngw-social-editor-widget">
             <ImageUploader
-                image={store.imageExisting}
+                image={image}
                 onChange={(value) => {
                     store.update({
                         imageUpdated: value === undefined ? null : value,
