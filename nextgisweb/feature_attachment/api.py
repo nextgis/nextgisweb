@@ -204,8 +204,10 @@ def export(resource, request):
                 if name in feature_anames:
                     # Make attachment's name unique
                     (base, suffix) = re.match(
-                        r"(.*?)((?:\.[a-z0-9_]+)+)$", name, re.IGNORECASE
+                        r"(.*?)((?:\.[a-z0-9_]+)+)?$", name, re.IGNORECASE
                     ).groups()
+                    if suffix is None:
+                        suffix = ""
                     for idx in count(1):
                         candidate = f"{base}.{idx}{suffix}"
                         if candidate not in feature_anames:
