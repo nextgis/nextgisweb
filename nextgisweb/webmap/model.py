@@ -69,17 +69,17 @@ class WebMap(Base, Resource):
         db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default="no"
     )
     legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
+    measure_srs_id = db.Column(db.ForeignKey(SRS.id, ondelete="SET NULL"), nullable=True)
 
     root_item = db.relationship("WebMapItem", cascade="all")
 
     bookmark_resource = db.relationship(
-        Resource, foreign_keys=bookmark_resource_id, backref=db.backref("bookmarked_webmaps")
+        Resource,
+        foreign_keys=bookmark_resource_id,
+        backref=db.backref("bookmarked_webmaps"),
     )
 
-    measure_srs_id = db.Column(db.ForeignKey(SRS.id, ondelete='SET NULL'), nullable=True)
-    measure_srs = db.relationship(
-        SRS, foreign_keys=measure_srs_id, back_populates="measure_webmaps"
-    )
+    measure_srs = db.relationship(SRS, foreign_keys=measure_srs_id)
 
     annotations = db.relationship(
         "WebMapAnnotation",

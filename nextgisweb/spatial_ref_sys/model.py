@@ -48,7 +48,6 @@ class SRS(Base):
     maxx = sa.Column(sa.Float)
     maxy = sa.Column(sa.Float)
     catalog_id = sa.Column(sa.Integer, unique=True)
-    measure_webmaps = relationship("WebMap", back_populates="measure_srs")
 
     class permissions:
         view = Permission("view", gettext("Spatial reference systems"), "view")
