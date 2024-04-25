@@ -32,14 +32,12 @@ export const LoginForm = observer((props: LoginFormProps) => {
         () => [
             {
                 name: "login",
-                placeholder: gettext("Login"),
-                formItem: <Input />,
+                formItem: <Input placeholder={gettext("Login")} />,
                 required: true,
             },
             {
                 name: "password",
-                placeholder: gettext("Password"),
-                formItem: <Input.Password />,
+                formItem: <Input.Password placeholder={gettext("Password")} />,
                 required: true,
             },
         ],
@@ -72,7 +70,7 @@ export const LoginForm = observer((props: LoginFormProps) => {
         }
     };
 
-    useKeydownListener("enter", () => login());
+    useKeydownListener("enter", login);
 
     const oauthUrl =
         routeURL("auth.oauth") +
