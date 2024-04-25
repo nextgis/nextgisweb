@@ -164,6 +164,7 @@ def create(resource, request) -> JSONType:
                 feature,
                 new_feature,
                 geom_format="geojson",
+                dt_format="iso",
                 transformer=Transformer(srs_from.wkt, c.resource.srs.wkt),
             )
             if IWritableFeatureLayer.providedBy(c.resource):
