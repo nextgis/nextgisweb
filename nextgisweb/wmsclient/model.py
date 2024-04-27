@@ -76,7 +76,7 @@ class Connection(Base, Resource):
             headers=env.wmsclient.headers,
         )
         try:
-            xml = reader.read(self.url)
+            xml = reader.read(self.url, timeout=env.wmsclient.options["timeout"].total_seconds())
         except RequestException:
             raise ExternalServiceError("Could not read WMS capabilities.")
         self.capcache_xml = etree.tostring(xml)
@@ -87,6 +87,7 @@ class Connection(Base, Resource):
             username=self.username,
             password=self.password,
             xml=self.capcache_xml,
+            timeout=env.wmsclient.options["timeout"].total_seconds(),
         )
 
         layers = []
