@@ -206,7 +206,7 @@ Delete previously created user:
     
 To get current user details execute following request:
 
-.. http:post:: /api/component/auth/current_user
+.. http:get:: /api/component/auth/current_user
 
    Request to get current user details
 
