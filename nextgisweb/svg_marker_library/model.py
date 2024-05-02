@@ -166,6 +166,6 @@ class SVGMarkerLibrarySerializer(Serializer, apitype=True):
 
     def deserialize(self):
         assert not isinstance(self.data, dict)
-        if self.data.archive is not UNSET and self.data.items is not UNSET:
+        if self.data.archive is not UNSET and self.data.files is not UNSET:
             raise ValidationError('"files" and "archive" attributes should not pass together.')
         super().deserialize()
