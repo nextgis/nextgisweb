@@ -1,3 +1,5 @@
+import { runInAction } from "mobx";
+
 import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table/store/EditorStore";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
 
@@ -14,6 +16,12 @@ export class EditorStore extends KeyValueEditorStore<LookupTableResource> {
             this.dirty = false;
         }
     }
+
+    clear = () => {
+        runInAction(() => {
+            this.items = [];
+        });
+    };
 
     dump(): LookupTableResource | undefined {
         if (!this.dirty) return undefined;

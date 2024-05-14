@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Button, Input, Upload } from "@nextgisweb/gui/antd";
+import { Button, Input, Modal, Upload } from "@nextgisweb/gui/antd";
 import type { InputProps } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
 import type {
@@ -28,6 +28,7 @@ import {
     updateItems,
 } from "./util";
 
+import DeleteIcon from "@nextgisweb/icon/material/delete";
 import ImportIcon from "@nextgisweb/icon/material/file_download";
 import ExportIcon from "@nextgisweb/icon/material/file_upload";
 
@@ -36,6 +37,10 @@ import "./EditorWidget.less";
 const msgTypeToAdd = gettext("Type here to add a new item...");
 const msgExport = gettext("Export");
 const msgImport = gettext("Import");
+const msgClear = gettext("Clear");
+
+// prettier-ignore
+const msgConfirm = gettext("All existing records will be deleted after import. Are you sure you want to proceed?");
 
 const InputKey = observer(
     ({ row, placeholder }: ComponentProps<RecordItem>) => {
@@ -96,6 +101,8 @@ export const EditorWidget: EditorWidgetComponent<
         exportToCsv([{ key: "Key", value: "Value" }, ...store.items]);
     }, [store.items]);
 
+    const [modal, contextHolder] = Modal.useModal();
+
     const handleFileChange = async (file: File) => {
         if (file) {
             const json = await parseCsv<[key: string, value: string]>(file);
@@ -107,28 +114,39 @@ export const EditorWidget: EditorWidgetComponent<
 
     return (
         <div className="ngw-lookup-table-editor">
+            {contextHolder}
             <ActionToolbar
                 actions={[
-                    () => {
-                        return (
-                            <Upload
-                                beforeUpload={(e) => {
+                    () => (
+                        <Upload
+                            beforeUpload={async (e) => {
+                                const confirmed = await modal.confirm({
+                                    content: msgConfirm,
+                                });
+                                if (confirmed) {
+                                    store.clear();
                                     handleFileChange(e);
-                                    // Prevent antd uploader request
-                                    return false;
-                                }}
-                                showUploadList={false}
-                            >
-                                <Button icon={<ImportIcon />}>
-                                    {msgImport}
-                                </Button>
-                            </Upload>
-                        );
-                    },
+                                }
+                                // Prevent antd uploader request
+                                return false;
+                            }}
+                            showUploadList={false}
+                        >
+                            <Button icon={<ImportIcon />}>{msgImport}</Button>
+                        </Upload>
+                    ),
                     {
                         icon: <ExportIcon />,
                         title: msgExport,
                         onClick: exportLookup,
+                    },
+                ]}
+                rightActions={[
+                    {
+                        title: msgClear,
+                        icon: <DeleteIcon />,
+                        danger: true,
+                        onClick: store.clear,
                     },
                 ]}
             />
