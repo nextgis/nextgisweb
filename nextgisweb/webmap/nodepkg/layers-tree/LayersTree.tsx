@@ -5,15 +5,19 @@ import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
 
 import type WebmapStore from "../store";
-import type { LayerItem, TreeItem } from "../type/TreeItems";
+import type { TreeItem } from "../type/TreeItems";
 import type { WebmapPlugin } from "../type/WebmapPlugin";
 
 import { DropdownActions } from "./DropdownActions";
 import { Legend } from "./Legend";
 import { LegendAction } from "./LegendAction";
 import { useDrag } from "./hook/useDrag";
-
-import EditIcon from "@nextgisweb/icon/material/edit/outline";
+import {
+    keyInMutuallyExclusiveGroupDeep,
+    prepareWebMapItems,
+    updateKeysForGroup,
+    updateKeysForMutualExclusivity,
+} from "./util/treeItems";
 
 import "./LayersTree.less";
 
@@ -36,50 +40,6 @@ interface LayersTreeProps {
     showDropdown?: boolean;
 }
 
-const handleWebMapItem = (webMapItem: TreeItem): TreeWebmapItem => {
-    const { key, title } = webMapItem;
-    const item: TreeWebmapItem = { key, title, treeItem: webMapItem };
-    if (item.treeItem.type === "layer") {
-        item.isLeaf = true;
-
-        if ("legendInfo" in item.treeItem) {
-            const { legendInfo } = item.treeItem;
-            if (legendInfo && legendInfo.visible && legendInfo.single) {
-                item.legendIcon = (
-                    <img
-                        width={20}
-                        height={20}
-                        src={
-                            "data:image/png;base64," +
-                            legendInfo.symbols[0].icon.data
-                        }
-                    />
-                );
-            }
-        }
-
-        item.icon = (item_) => {
-            const item = item_ as TreeWebmapItem;
-            if ((item.treeItem as LayerItem).editable === true) {
-                return <EditIcon />;
-            } else {
-                if (item.legendIcon) {
-                    return item.legendIcon;
-                }
-            }
-        };
-    }
-
-    if ("children" in webMapItem) {
-        item.children = webMapItem.children.map(handleWebMapItem);
-    }
-    return item;
-};
-
-const prepareWebMapItems = (webMapItems: TreeItem[]) => {
-    return webMapItems.map(handleWebMapItem);
-};
-
 export const LayersTree = observer(
     ({
         store,
@@ -95,7 +55,7 @@ export const LayersTree = observer(
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
-        const webmapItems = store.webmapItems as TreeItem[];
+        const webmapItems = store.webmapItems;
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 
@@ -124,9 +84,39 @@ export const LayersTree = observer(
             setAutoExpandParent(false);
         };
 
-        const onCheck: TreeProps["onCheck"] = (val) => {
-            const checkedKeysValue = Array.isArray(val) ? val : val.checked;
-            store.handleCheckChanged(checkedKeysValue.map(Number));
+        const onCheck: TreeProps<TreeWebmapItem>["onCheck"] = (
+            checkedKeysValue,
+            event
+        ) => {
+            const checkedItem = event.node;
+            const checkedKeys = (
+                Array.isArray(checkedKeysValue)
+                    ? checkedKeysValue
+                    : checkedKeysValue.checked
+            ).map(Number);
+
+            const mutuallyExclusiveParents = keyInMutuallyExclusiveGroupDeep(
+                checkedItem.treeItem.key,
+                treeItems.map((t) => t.treeItem)
+            );
+
+            let updatedCheckedKeys = checkedKeys;
+
+            if (mutuallyExclusiveParents) {
+                updatedCheckedKeys = updateKeysForMutualExclusivity(
+                    checkedItem,
+                    mutuallyExclusiveParents,
+                    checkedKeys
+                );
+            } else if (checkedItem.treeItem.type === "group") {
+                updatedCheckedKeys = updateKeysForGroup(
+                    checkedItem,
+                    checkedKeys,
+                    store.checked
+                );
+            }
+
+            store.handleCheckChanged(updatedCheckedKeys);
         };
 
         const _onSelect = (selectedKeysValue: React.Key[]) => {

@@ -1,5 +1,8 @@
 import { makeAutoObservable, runInAction, toJS } from "mobx";
 
+import { getChildrenDeep } from "@nextgisweb/gui/util/tree";
+
+import { keyInMutuallyExclusiveGroupDeep } from "../layers-tree/util/treeItems";
 import type {
     CustomItemFileWriteStore,
     StoreItem,
@@ -95,9 +98,7 @@ export class WebmapStore {
                 checked_.splice(index, 1);
             }
         }
-        runInAction(() => {
-            this._checked = checked_;
-        });
+        this._checked = checked_;
     };
 
     _itemStoreVisibility = (item: StoreItem) => {
@@ -115,16 +116,57 @@ export class WebmapStore {
     };
 
     handleCheckChanged = (checkedKeysValue: number[]) => {
-        const itemStore = this._itemStore;
-        itemStore.fetch({
+        this.setChecked(checkedKeysValue);
+        this._updateLayersVisibility(this._checked);
+    };
+
+    _prepareChecked = (checkedKeysValue: number[]) => {
+        const updatedCheckedKeys = [];
+        const skip: number[] = [];
+
+        for (const key of checkedKeysValue) {
+            if (skip.includes(key)) {
+                continue;
+            }
+            const parents = keyInMutuallyExclusiveGroupDeep(
+                key,
+                this._webmapItems
+            );
+
+            if (parents) {
+                const firstParent = parents[0];
+                const mutualGroup = parents[parents.length - 1];
+                const mutualItems = getChildrenDeep(mutualGroup);
+                const mutualKeys = mutualItems.map((m) => m.key);
+                skip.push(...mutualKeys);
+
+                if (firstParent.type === "group" && !firstParent.exclusive) {
+                    updatedCheckedKeys.push(
+                        ...firstParent.children
+                            .map((c) => c.key)
+                            .filter((k) => checkedKeysValue.includes(k))
+                    );
+                } else {
+                    updatedCheckedKeys.push(key);
+                }
+            } else {
+                updatedCheckedKeys.push(key);
+            }
+        }
+
+        return updatedCheckedKeys;
+    };
+
+    _updateLayersVisibility = (checkedKeys: number[]) => {
+        this._itemStore.fetch({
             query: { type: "layer" },
             queryOptions: { deep: true },
             onItem: (item: StoreItem) => {
-                const id = itemStore.getValue(item, "id");
-                const newValue = checkedKeysValue.includes(id);
-                const oldValue = itemStore.getValue(item, "checked");
+                const id = this._itemStore.getValue(item, "id");
+                const newValue = checkedKeys.includes(id);
+                const oldValue = this._itemStore.getValue(item, "checked");
                 if (newValue !== oldValue) {
-                    itemStore.setValue(item, "checked", newValue);
+                    this._itemStore.setValue(item, "checked", newValue);
                 }
             },
         });
@@ -220,20 +262,22 @@ export class WebmapStore {
         this._layers[id] = layer;
     }
 
-    addItem = (item: WebmapItem) => {
+    addItem = (item: StoreItem) => {
         const items = [item, ...this._webmapItems];
-        if (item.visibility) {
-            this._checked = [...this._checked, item.id];
+        if ("visibility" in item && item.visibility) {
+            this.setChecked([...this._checked, item.id]);
         }
         this._webmapItems = items;
     };
 
     setWebmapItems = (items: StoreItem[]) => {
         this._webmapItems = items;
+        this.setChecked(this._checked);
     };
 
     setChecked = (checked: number[]) => {
-        this._checked = checked;
+        const updatedCheckedKeys = this._prepareChecked(checked);
+        this._checked = updatedCheckedKeys;
     };
 
     getChecked = () => {

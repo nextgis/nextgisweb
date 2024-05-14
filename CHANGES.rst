@@ -5,6 +5,8 @@ Changes
 -----
 
 - Per-webmap measurement SRS configuration.
+- Exclusive layers groups on webmaps.
+
 
 4.7.0
 -----

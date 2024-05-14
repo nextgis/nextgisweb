@@ -1,6 +1,7 @@
 /// <reference types="dojo/dijit" />
 
 import type { DojoDisplay } from "./DojoDisplay";
+import type { TreeItem } from "./TreeItems";
 
 export * from "./DisplayConfig";
 export * from "./DojoDisplay";
@@ -16,7 +17,7 @@ export interface DojoItem extends HTMLElement {
     get: (val: string) => unknown;
 }
 
-export type StoreItem = dojo.data.api.Item;
+export type StoreItem = dojo.data.api.Item & TreeItem;
 
 export interface WebmapItem {
     checked: boolean;
