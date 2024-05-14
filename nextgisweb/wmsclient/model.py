@@ -6,8 +6,6 @@ from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import PIL
 import requests
-from lxml import etree
-from owslib.map.common import WMSCapabilitiesReader
 from owslib.wms import WebMapService
 from requests.exceptions import RequestException
 from zope.interface import implementer
@@ -66,20 +64,41 @@ class Connection(Base, Resource):
             and self.capcache_tstamp is not None
         )
 
+    def request_wms(self, request, query=None):
+        up = urlparse(self.url, allow_fragments=False)
+
+        query_main = dict(parse_qsl(up.query))
+        query_main["service"] = "WMS"
+        query_main["request"] = request
+        query_main["version"] = self.version
+        if query is not None:
+            query_main.update(query)
+
+        # ArcGIS server requires that space is url-encoded as "%20"
+        query_encoded = urlencode(query_main, quote_via=quote)
+
+        url = urlunparse((up.scheme, up.netloc, up.path, None, query_encoded, None))
+
+        if self.username and self.password:
+            auth = (self.username, self.password)
+        else:
+            auth = None
+
+        try:
+            return requests.get(
+                url,
+                auth=auth,
+                headers=env.wmsclient.headers,
+                timeout=env.wmsclient.options["timeout"].total_seconds(),
+            )
+        except RequestException:
+            raise ExternalServiceError
+
     def capcache_query(self):
         self.capcache_tstamp = datetime.utcnow()
-        reader = WMSCapabilitiesReader(
-            self.version,
-            url=self.url,
-            un=self.username,
-            pw=self.password,
-            headers=env.wmsclient.headers,
-        )
-        try:
-            xml = reader.read(self.url, timeout=env.wmsclient.options["timeout"].total_seconds())
-        except RequestException:
-            raise ExternalServiceError("Could not read WMS capabilities.")
-        self.capcache_xml = etree.tostring(xml)
+
+        response = self.request_wms("GetCapabilities")
+        self.capcache_xml = response.content
 
         service = WebMapService(
             url=self.url,
@@ -216,13 +235,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
         return RenderRequest(self, srs, cond)
 
     def render_image(self, extent, size):
-        up = urlparse(self.connection.url, allow_fragments=False)
-
-        query = dict(parse_qsl(up.query))
-        query.update(dict(
-            service="WMS",
-            request="GetMap",
-            version=self.connection.version,
+        query = dict(
             layers=self.wmslayers,
             styles="",
             format=self.imgformat,
@@ -230,32 +243,12 @@ class Layer(Base, Resource, SpatialLayerMixin):
             width=size[0],
             height=size[1],
             transparent="true",
-        ))
+        )
         query.update(self.vendor_params)
 
         srs_param = "crs" if self.connection.version == "1.3.0" else "srs"
         query[srs_param] = "EPSG:%d" % self.srs.id
-
-        # ArcGIS server requires that space is url-encoded as "%20"
-        query_encoded = urlencode(query, quote_via=quote)
-
-        url = urlunparse((up.scheme, up.netloc, up.path, None, query_encoded, None))
-
-        auth = None
-        username = self.connection.username
-        password = self.connection.password
-        if username and password:
-            auth = (username, password)
-
-        try:
-            response = requests.get(
-                url,
-                auth=auth,
-                headers=env.wmsclient.headers,
-                timeout=env.wmsclient.options["timeout"].total_seconds(),
-            )
-        except RequestException:
-            raise ExternalServiceError()
+        response = self.connection.request_wms("GetMap", query)
 
         if response.status_code == 200:
             data = BytesIO(response.content)
@@ -266,7 +259,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
         elif response.status_code in (204, 404):
             return None
         else:
-            raise ExternalServiceError()
+            raise ExternalServiceError
 
     # IBboxLayer implementation:
     @property
