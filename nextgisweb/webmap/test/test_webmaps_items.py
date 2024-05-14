@@ -43,7 +43,7 @@ def make_webmap_items(layers_styles):
         ],
     }
 
-    return {"root_item": dict_items}
+    return dict_items
 
 
 def make_layer_style(num):
@@ -71,8 +71,8 @@ def fixt_layers_styles(ngw_env, ngw_resource_group):
 @pytest.fixture(scope="module")
 def webmap_with_items(fixt_layers_styles):
     with transaction.manager:
-        webmap = WebMap(root_item=WebMapItem(item_type="root"))
-        webmap.from_dict(make_webmap_items(fixt_layers_styles))
+        webmap = WebMap()
+        webmap.root_item.from_dict(make_webmap_items(fixt_layers_styles))
         webmap.persist()
 
     yield webmap, fixt_layers_styles

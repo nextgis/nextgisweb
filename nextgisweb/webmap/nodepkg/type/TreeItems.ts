@@ -13,6 +13,7 @@ export interface RootItem extends BaseItem {
 export interface GroupItem extends BaseItem {
     type: "group";
     expanded: boolean;
+    exclusive: boolean;
     children: TreeItem[];
 }
 

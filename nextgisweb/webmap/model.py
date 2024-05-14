@@ -122,40 +122,13 @@ class WebMap(Base, Resource):
             ),
         )
 
-    def from_dict(self, data):
-        for k in (
-            "display_name",
-            "bookmark_resource_id",
-            "editable",
-        ):
-            if k in data:
-                setattr(self, k, data[k])
 
-        if "root_item" in data:
-            self.root_item.from_dict(data["root_item"])
+def _item_default(item_type, default):
+    def _default(context):
+        if context.get_current_parameters()["item_type"] == item_type:
+            return default
 
-        if "extent" in data:
-            self.extent_left, self.extent_bottom, self.extent_right, self.extent_top = data[
-                "extent"
-            ]
-
-        if "extent_const" in data:
-            (
-                self.extent_const_left,
-                self.extent_const_bottom,
-                self.extent_const_right,
-                self.extent_const_top,
-            ) = data["extent_const"]
-
-
-def _layer_enabled_default(context):
-    if context.get_current_parameters()["item_type"] == "layer":
-        return False
-
-
-def _layer_identifiable_default(context):
-    if context.get_current_parameters()["item_type"] == "layer":
-        return True
+    return _default
 
 
 class WebMapItem(Base):
@@ -166,10 +139,11 @@ class WebMapItem(Base):
     item_type = db.Column(db.Enum("root", "group", "layer"), nullable=False)
     position = db.Column(db.Integer, nullable=True)
     display_name = db.Column(db.Unicode, nullable=True)
-    group_expanded = db.Column(db.Boolean, nullable=True)
+    group_expanded = db.Column(db.Boolean, nullable=True, default=_item_default("group", False))
+    group_exclusive = db.Column(db.Boolean, nullable=True, default=_item_default("group", False))
     layer_style_id = db.Column(db.ForeignKey(Resource.id), nullable=True)
-    layer_enabled = db.Column(db.Boolean, nullable=True, default=_layer_enabled_default)
-    layer_identifiable = db.Column(db.Boolean, nullable=True, default=_layer_identifiable_default)
+    layer_enabled = db.Column(db.Boolean, nullable=True, default=_item_default("layer", False))
+    layer_identifiable = db.Column(db.Boolean, nullable=True, default=_item_default("layer", True))
     layer_transparency = db.Column(db.Float, nullable=True)
     layer_min_scale_denom = db.Column(db.Float, nullable=True)
     layer_max_scale_denom = db.Column(db.Float, nullable=True)
@@ -208,6 +182,7 @@ class WebMapItem(Base):
 
         if self.item_type == "group":
             data["group_expanded"] = self.group_expanded
+            data["group_exclusive"] = self.group_exclusive
 
         if self.item_type in ("root", "group"):
             data["children"] = [i.to_dict() for i in self.children]
@@ -235,16 +210,11 @@ class WebMapItem(Base):
 
     def from_dict(self, data):
         assert data["item_type"] == self.item_type
-        if data["item_type"] in ("root", "group") and "children" in data:
-            self.children = []
-            for i in data["children"]:
-                child = WebMapItem(parent=self, item_type=i["item_type"])
-                child.from_dict(i)
-                self.children.append(child)
 
         for a in (
             "display_name",
             "group_expanded",
+            "group_exclusive",
             "layer_enabled",
             "layer_identifiable",
             "layer_adapter",
@@ -257,6 +227,21 @@ class WebMapItem(Base):
         ):
             if a in data:
                 setattr(self, a, data[a])
+
+        if self.item_type in ("root", "group") and "children" in data:
+            self.children.clear()
+            for i in data["children"]:
+                child = WebMapItem(parent=self, item_type=i["item_type"])
+                child.from_dict(i)
+
+            if self.item_type == "group" and self.group_exclusive:
+                found_enabled = False
+                for child in reversed(self.children):
+                    if child.item_type == "layer" and child.layer_enabled:
+                        if not found_enabled:
+                            found_enabled = True
+                        else:
+                            child.layer_enabled = False
 
     def from_children(self, children, *, defaults=dict()):
         assert self.item_type in ("root", "group")
@@ -274,6 +259,7 @@ class WebMapItem(Base):
             if "children" in child:
                 item = WebMapItem(item_type="group")
                 _set(item, "group_expanded", True)
+                _set(item, "group_exclusive", True)
 
                 defaults_next = defaults.copy()
                 if "defaults" in child:

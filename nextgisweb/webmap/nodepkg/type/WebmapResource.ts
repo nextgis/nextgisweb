@@ -18,6 +18,7 @@ export type TreeItem = GroupItem | LayerItem;
 export interface GroupItem {
     display_name: string;
     group_expanded: boolean;
+    group_exclusive: boolean;
     item_type: "group";
     children?: TreeItem[];
 }

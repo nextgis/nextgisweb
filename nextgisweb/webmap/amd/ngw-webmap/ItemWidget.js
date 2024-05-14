@@ -395,6 +395,7 @@ define([
                             display_name: i18n.gettext("Add group"),
                             item_type: "group",
                             group_expanded: null,
+                            group_exclusive: null,
                         },
                         {
                             parent: widget.getAddParent(),
@@ -479,6 +480,10 @@ define([
                                     "checked",
                                     widget.getItemValue("group_expanded")
                                 );
+                                widget.widgetItemGroupExclusive.set(
+                                    "checked",
+                                    widget.getItemValue("group_exclusive")
+                                );
                             } else if (itemType === "layer") {
                                 widget.widgetItemDisplayNameLayer.set(
                                     "value",
@@ -560,6 +565,13 @@ define([
                     "checked",
                     function (attr, oldValue, newValue) {
                         widget.setItemValue("group_expanded", newValue);
+                    }
+                );
+
+                this.widgetItemGroupExclusive.watch(
+                    "checked",
+                    function (attr, oldValue, newValue) {
+                        widget.setItemValue("group_exclusive", newValue);
                     }
                 );
 
@@ -663,6 +675,7 @@ define([
                         item_type: store.getValue(itm, "item_type"),
                         display_name: store.getValue(itm, "display_name"),
                         group_expanded: store.getValue(itm, "group_expanded"),
+                        group_exclusive: store.getValue(itm, "group_exclusive"),
                         layer_style_id: store.getValue(itm, "layer_style_id"),
                         layer_enabled: store.getValue(itm, "layer_enabled"),
                         layer_identifiable: store.getValue(
