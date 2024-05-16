@@ -13,6 +13,8 @@ from typing_extensions import Annotated
 from nextgisweb.lib.apitype import AnyOf, ContentType, StatusCode
 from nextgisweb.lib.geometry import Geometry
 
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.render.api import TileX, TileY, TileZ
 from nextgisweb.resource import DataScope, Resource
 from nextgisweb.resource.exception import ResourceNotFound
@@ -80,6 +82,9 @@ def mvt(
             obj = Resource.filter_by(id=resid).one()
         except NoResultFound:
             raise ResourceNotFound(resid)
+
+        if not IFeatureLayer.providedBy(obj):
+            raise ValidationError("Resource (ID=%d) is not a feature layer." % resid)
 
         request.resource_permission(DataScope.read, obj)
 
