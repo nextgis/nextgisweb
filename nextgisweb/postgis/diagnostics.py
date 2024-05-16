@@ -6,7 +6,7 @@ from sqlalchemy import func, inspect, select, sql
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.engine import URL as EngineURL
 from sqlalchemy.engine import Connection, create_engine
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.pool import NullPool
 from sqlalchemy.types import (
     BigInteger,
@@ -391,6 +391,25 @@ class GeomColumnCheck(LayerCheck):
 
         if ctype.srid != self.geometry_srid:
             self.error(_("Geometry SRID mismatch."))
+
+        for srid in (ctype.srid, *(s for s in (3857, 4326) if s != ctype.srid)):
+            expr = sql.column(self.column_geom)
+            if ctype.srid != srid:
+                expr = func.st_transform(func.st_setsrid(expr, ctype.srid), srid)
+            expr = select(func.st_extent(expr)).select_from(self.sa_table).scalar_subquery()
+            expr = select(
+                func.st_xmin(expr), func.st_ymin(expr), func.st_xmax(expr), func.st_ymax(expr)
+            )
+            try:
+                extent = conn.execute(expr).one()
+            except SQLAlchemyError:
+                if ctype.srid == srid:
+                    raise
+                self.error(_("Failed to reproject extent to SRID {}.").format(srid))
+                continue
+
+            extent_str = ", ".join("{:.4f}".format(c) for c in extent)
+            self.say(_("Extent (SRID {}): {}.").format(srid, extent_str))
 
 
 class ColumnsCheck(LayerCheck):
