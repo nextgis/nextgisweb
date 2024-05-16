@@ -98,7 +98,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
 
     mapToolbar: MapToolbar;
     _mapAddControls: (controls: MapControl[]) => void;
-    _plugins: WebmapPlugin[];
+    _plugins: Record<string, WebmapPlugin>;
 
     leftTopControlPane: HTMLDivElement;
     leftBottomControlPane: HTMLDivElement;
