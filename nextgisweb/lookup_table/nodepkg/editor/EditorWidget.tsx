@@ -120,9 +120,12 @@ export const EditorWidget: EditorWidgetComponent<
                     () => (
                         <Upload
                             beforeUpload={async (e) => {
-                                const confirmed = await modal.confirm({
-                                    content: msgConfirm,
-                                });
+                                let confirmed = true;
+                                if (store.items.length) {
+                                    confirmed = await modal.confirm({
+                                        content: msgConfirm,
+                                    });
+                                }
                                 if (confirmed) {
                                     store.clear();
                                     handleFileChange(e);
@@ -146,6 +149,7 @@ export const EditorWidget: EditorWidgetComponent<
                         title: msgClear,
                         icon: <DeleteIcon />,
                         danger: true,
+                        disabled: !store.items.length,
                         onClick: store.clear,
                     },
                 ]}
