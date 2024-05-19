@@ -63,3 +63,5 @@ export class RequestQueue {
         }
     }
 }
+
+export const imageQueue = new RequestQueue({ debounce: 100, limit: 4 });

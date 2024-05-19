@@ -2,8 +2,8 @@ define([
     "dojo/_base/declare",
     "dojo/Stateful",
     "openlayers/ol",
-    "@nextgisweb/pyramid/util",
-], function (declare, Stateful, ol, util) {
+    "@nextgisweb/webmap/utils",
+], function (declare, Stateful, ol, { imageQueue }) {
     return declare([Stateful], {
         DPI: 1000 / 39.37 / 0.28,
 
@@ -36,7 +36,7 @@ define([
             // Workaround to scip first map move event on start
             olMap.once("movestart", function () {
                 olMap.on("movestart", function () {
-                    util.imageQueue.abort();
+                    imageQueue.abort();
                 });
             });
         },

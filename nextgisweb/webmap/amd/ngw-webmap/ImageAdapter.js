@@ -3,9 +3,9 @@ define([
     "dojo/io-query",
     "./Adapter",
     "@nextgisweb/pyramid/api",
-    "@nextgisweb/pyramid/util",
+    "@nextgisweb/webmap/utils",
     "ngw-webmap/ol/layer/Image",
-], function (declare, ioQuery, Adapter, api, util, Image) {
+], function (declare, ioQuery, Adapter, api, { imageQueue }, Image) {
     function tileLoadFunction({ src, signal }) {
         return fetch(src, {
             method: "GET",
@@ -24,7 +24,7 @@ define([
 
     return declare(Adapter, {
         createLayer: function (item) {
-            const queue = util.imageQueue;
+            const queue = imageQueue;
 
             const layer = new Image(
                 item.id,
