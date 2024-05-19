@@ -15,7 +15,7 @@ document.head.appendChild(style);
 
 const settings = pyramidSettings.company_logo;
 
-export function appendTo(parent) {
+export function appendTo(parent: HTMLElement) {
     if (!settings.enabled) return;
 
     const aElem = document.createElement("a");

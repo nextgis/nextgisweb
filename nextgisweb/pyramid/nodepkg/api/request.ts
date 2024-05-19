@@ -146,7 +146,7 @@ export async function request<
     ReturnUrl extends boolean = false,
 >(
     path: string,
-    options: RequestOptions<RT, ReturnUrl>
+    options?: RequestOptions<RT, ReturnUrl>
 ): Promise<ToReturn<T, RT, ReturnUrl>> {
     const defaults: RequestOptions<RT, ReturnUrl> = {
         method: "GET",

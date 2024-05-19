@@ -1,13 +1,21 @@
 /** @entrypoint */
 import { route } from "./api";
+import type { RouteQuery, RouteResp } from "./api/type";
 import { LoaderCache, callingComponent } from "./util/loader";
 
-const cache = new LoaderCache();
+type Component = RouteQuery<"pyramid.settings", "get">["component"];
+type Data = RouteResp<"pyramid.settings", "get">;
+
+const cache = new LoaderCache<Data>();
 
 export const normalize = callingComponent;
 
-export function load(component, require, ready) {
-    const readyEsm = (data) => ready({ _esModule: true, ...data });
+export function load(
+    component: Component,
+    _require: unknown,
+    ready: (data: Data) => void
+) {
+    const readyEsm = (data: Data) => ready({ _esModule: true, ...data });
 
     if (!component) {
         const msg = "No identifier was given while importing settings!";
