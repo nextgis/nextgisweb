@@ -1,8 +1,9 @@
-define(["dojo/_base/declare", "dojo/Stateful", "openlayers/ol"], function (
-    declare,
-    Stateful,
-    ol
-) {
+define([
+    "dojo/_base/declare",
+    "dojo/Stateful",
+    "openlayers/ol",
+    "@nextgisweb/pyramid/util",
+], function (declare, Stateful, ol, util) {
     return declare([Stateful], {
         DPI: 1000 / 39.37 / 0.28,
 
@@ -31,6 +32,12 @@ define(["dojo/_base/declare", "dojo/Stateful", "openlayers/ol"], function (
 
             olMap.on("moveend", function () {
                 widget.set("position", widget.getPosition(), this);
+            });
+            // Workaround to scip first map move event on start
+            olMap.once("movestart", function () {
+                olMap.on("movestart", function () {
+                    util.imageQueue.abort();
+                });
             });
         },
 
