@@ -710,10 +710,12 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 where.append(db.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
 
         if self._intersects:
-            reproject = (
-                self._intersects.srid is not None
-                and self._intersects.srid != self.layer.geometry_srid
-            )
+            if self._intersects.srid is None:
+                self._intersects = Geometry.from_shape(
+                    self._intersects.shape, srid=self.layer.srs_id
+                )
+
+            reproject = self._intersects.srid != self.layer.geometry_srid
             int_srs = (
                 SRS.filter_by(id=self._intersects.srid).one() if reproject else self.layer.srs
             )
