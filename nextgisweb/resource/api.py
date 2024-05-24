@@ -19,7 +19,7 @@ from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
 from .composite import CompositeSerializer
 from .events import AfterResourceCollectionPost, AfterResourcePut
-from .exception import HierarchyError, QuotaExceeded
+from .exception import HierarchyError, QuotaExceeded, ResourceDisabled
 from .model import Resource
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
@@ -204,7 +204,7 @@ def collection_post(
         resource_cls in request.env.resource.options["disabled_cls"]
         or request.env.resource.options["disable." + resource_cls]
     ):
-        raise ValidationError(_("Resource class '%s' disabled.") % resource_cls)
+        raise ResourceDisabled(resource_cls)
 
     resource = Resource.registry[resource_cls](owner_user=request.user)
     serializer = CompositeSerializer(user=request.user)

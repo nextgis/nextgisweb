@@ -54,6 +54,15 @@ class HierarchyError(ValidationError):
     title = gettext("Hierarchy error")
 
 
+class ResourceDisabled(ValidationError):
+    message = gettext("Resource class '%s' disabled.")
+
+    def __init__(self, resource_cls):
+        super().__init__(
+            message=self.__class__.message % resource_cls, data=dict(resource_cls=resource_cls)
+        )
+
+
 class QuotaExceeded(UserException):
     title = gettext("Quota exceeded")
     http_status_code = 402
