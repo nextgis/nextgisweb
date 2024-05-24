@@ -710,15 +710,12 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 where.append(db.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
 
         if self._intersects:
-            if self._intersects.srid is None:
-                self._intersects = Geometry.from_shape(
-                    self._intersects.shape, srid=self.layer.srs_id
-                )
+            int_srid = self._intersects.srid
+            if int_srid is None:
+                int_srid = self.layer.srs_id
 
-            reproject = self._intersects.srid != self.layer.geometry_srid
-            int_srs = (
-                SRS.filter_by(id=self._intersects.srid).one() if reproject else self.layer.srs
-            )
+            reproject = int_srid != self.layer.geometry_srid
+            int_srs = SRS.filter_by(id=int_srid).one() if reproject else self.layer.srs
 
             int_geom = func.st_geomfromtext(self._intersects.wkt)
             if int_srs.is_geographic:
