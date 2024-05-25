@@ -363,7 +363,13 @@ class ResourceACLRule(Base):
     action = db.Column(db.Unicode, nullable=False, default=True)
 
     resource = db.relationship(Resource, backref=db.backref("acl", cascade="all, delete-orphan"))
-    principal = db.relationship(Principal)
+    principal = db.relationship(
+        Principal,
+        backref=db.backref(
+            "__resource_acl_rule",
+            cascade="all, delete-orphan",
+        ),
+    )
 
     def cmp_user(self, user):
         principal = self.principal
@@ -590,16 +596,6 @@ class ResourceSerializer(Serializer, apitype=True):
 def _on_find_references(event):
     principal = event.principal
     data = event.data
-
-    for acl in ResourceACLRule.filter_by(principal_id=principal.id).all():
-        resource = acl.resource
-        data.append(
-            OnFindReferencesData(
-                cls=resource.cls,
-                id=resource.id,
-                autoremove=False,
-            )
-        )
 
     if isinstance(principal, User):
         for resource in Resource.filter_by(owner_user_id=principal.id).all():
