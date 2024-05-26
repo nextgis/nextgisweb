@@ -1,6 +1,6 @@
 import type { AnyObject } from "antd/es/_util/type";
 import { observer } from "mobx-react-lite";
-import { useMemo } from "react";
+import { createElement, useCallback, useMemo } from "react";
 
 import { Table } from "../antd";
 import type { TableProps } from "../antd";
@@ -22,13 +22,6 @@ export interface EdiTableProps<
     columns: EdiTableColumn<R>[];
 }
 
-interface RowActionTemp {
-    key: string;
-    callback: FunctionKeys<EdiTableStore> | ((row: AnyObject) => void);
-    title: string;
-    icon: React.ReactNode;
-}
-
 const DEFAULT_ROW_ACTIONS = Object.keys(
     WELLKNOWN_ROW_ACTIONS
 ) as FunctionKeys<EdiTableStore>[];
@@ -36,130 +29,111 @@ const DEFAULT_ROW_ACTIONS = Object.keys(
 function EdiTableComponent<R extends AnyObject = AnyObject>({
     store,
     columns,
-    className,
     rowActions = DEFAULT_ROW_ACTIONS,
+    className,
     size = "small",
     ...tableProps
 }: EdiTableProps<EdiTableStore<R>, R>) {
     className = (className ? className + " " : "") + "ngw-gui-edi-table";
 
-    const rows = [...store.rows];
-    const placeholder = store.placeholder;
-    placeholder && rows.push(placeholder);
+    const renderActs = useCallback(
+        (row: R) => {
+            const actions: RowAction[] = [];
+            for (const actOrKey of rowActions) {
+                const actConfig =
+                    typeof actOrKey === "string"
+                        ? {
+                              key: actOrKey,
+                              ...WELLKNOWN_ROW_ACTIONS[actOrKey],
+                          }
+                        : (actOrKey as RowAction);
 
-    const rowActionsObj = useMemo(() => {
-        const result: RowAction[] = [];
-        for (const actOrKey of rowActions) {
-            const actConfig: RowActionTemp =
-                typeof actOrKey === "string"
-                    ? {
-                          key: actOrKey,
-                          ...WELLKNOWN_ROW_ACTIONS[actOrKey],
-                      }
-                    : (actOrKey as RowAction);
+                let act: RowAction;
 
-            let act: RowAction;
+                if (typeof actConfig.callback === "string") {
+                    const storeCbKey = actConfig.callback;
+                    const catCallback = store[storeCbKey];
 
-            if (typeof actConfig.callback === "string") {
-                const storeCbKey = actConfig.callback;
-                const catCallback = store[storeCbKey];
+                    if (typeof catCallback !== "function") continue;
+                    act = { ...actConfig, callback: catCallback };
+                    act.callback = act.callback.bind(store);
+                } else {
+                    act = actConfig;
+                }
 
-                if (typeof catCallback !== "function") continue;
-                act = { ...actConfig, callback: catCallback };
-                act.callback = act.callback.bind(store);
-            } else {
-                act = actConfig as RowAction;
+                actions.push(act);
             }
+            return <RowActions {...{ row, actions, store }} />;
+        },
+        [store, rowActions]
+    );
 
-            result.push(act);
-        }
-        return result;
-    }, [store, rowActions]);
+    const tableDataSource = [...store.rows];
+
+    // There is no way to append a placeholder row by overriding components
+    // property. It works in general, but looses focus on inputs. So we add
+    // placeholders to rows and customize rendering via hooks.
+    store.placeholder && tableDataSource.push(store.placeholder);
 
     const tableColumns = useMemo(() => {
-        const isPlaceholder = (row: unknown) => row === placeholder;
-        const results: NonNullable<TableProps["columns"]> = columns.map(
-            ({ key, className, component, shrink, ...columnProps }, idx) => {
-                className = className ? className : String(key);
-                if (shrink) className += " shrink";
-                const minWidth = shrink !== true ? shrink : undefined;
+        const isPlaceholder = (row: unknown) => row === store.placeholder;
+        const actsCell = { className: "row-actions" };
+        const hideCell = { colSpan: 0 };
+        const placeholderCell = {
+            colSpan: columns.length + 1,
+            className: "placeholder",
+        };
 
+        return columns
+            .map(({ key, component, shrink, ...columnProps }, idx) => {
                 const result: AntTableCollumn = {
                     key,
                     dataIndex: String(key),
                     ...columnProps,
                 };
 
-                if (component) {
-                    const Component = component;
-                    result.render = (value, row) => (
-                        <Component
-                            value={value}
-                            row={row}
-                            placeholder={isPlaceholder(row)}
-                        />
-                    );
+                let className = columnProps.className || String(key);
+                const style: React.CSSProperties = {};
+                if (shrink) {
+                    className += " shrink";
+                    if (shrink !== true) style.minWidth = shrink;
                 }
 
-                const style = minWidth ? { style: { minWidth } } : {};
-
+                result.onHeaderCell = () => ({ className, ...{ style } });
                 result.onCell = (row) => {
                     if (isPlaceholder(row)) {
-                        if (idx === 0) {
-                            return {
-                                colSpan: columns.length + 1,
-                                className: "placeholder",
-                            };
-                        } else {
-                            return { colSpan: 0 };
-                        }
+                        return idx === 0 ? placeholderCell : hideCell;
                     }
-                    return {
-                        className,
-                        ...style,
-                    };
+                    return { className, ...{ style } };
                 };
 
-                result.onHeaderCell = () => ({
-                    className,
-                    ...style,
-                });
+                if (component) {
+                    result.render = (value, row) =>
+                        createElement(component, {
+                            ...{ value, row },
+                            placeholder: idx === 0 && isPlaceholder(row),
+                        });
+                }
 
                 return result;
-            }
-        );
-
-        results.push({
-            key: "rowActions",
-            fixed: "right",
-            render(_, row) {
-                if (isPlaceholder(row)) return <></>;
-                return (
-                    <RowActions
-                        row={row}
-                        store={store}
-                        actions={rowActionsObj}
-                    />
-                );
-            },
-            onCell(row) {
-                if (isPlaceholder(row)) return { colSpan: 0 };
-                return { className: "row-actions shrink" };
-            },
-            onHeaderCell() {
-                return { className: "row-actions shrink" };
-            },
-        });
-
-        return results;
-    }, [columns, placeholder, rowActionsObj, store]);
+            })
+            .concat([
+                {
+                    key: "rowActions",
+                    fixed: "right",
+                    onHeaderCell: () => actsCell,
+                    onCell: (row) => (isPlaceholder(row) ? hideCell : actsCell),
+                    render: (_, row) => renderActs(row),
+                },
+            ]);
+    }, [store, columns, renderActs]);
 
     return (
         <Table
-            dataSource={rows}
+            dataSource={tableDataSource}
             columns={tableColumns}
-            size={size}
             className={className}
+            size={size}
             {...tableProps}
         />
     );
