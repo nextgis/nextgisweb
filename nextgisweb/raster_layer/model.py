@@ -267,8 +267,15 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         logger.debug("Removing existing overviews with command: " + " ".join(cmd))
         subprocess.check_call(cmd)
 
-        data_type = ds.GetRasterBand(1).DataType
-        resampling = "nearest" if gdal.DataTypeIsComplex(data_type) else "gauss"
+        # IMPORTANT: "nearest" method does not create new values by averaging.
+        # It is the best choice to preserve initial pixel values for thematic
+        # data. However, this method is not well-suited for the continuous
+        # nature of satellite imagery, providing less visually pleasing and
+        # analytically accurate results. We need to develop a heuristic to
+        # distinguish different types of raster data and select the appropriate
+        # resampling method. For now, using "nearest" is the safest option to
+        # avoid altering pixel values.
+        resampling = "nearest"
         ds = None
 
         cmd = [
