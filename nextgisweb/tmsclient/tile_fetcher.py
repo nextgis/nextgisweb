@@ -64,7 +64,6 @@ class TileFetcher:
         req_kw,
         scheme,
         url_template,
-        layer_name,
         zoom,
         xmin,
         xmax,
@@ -75,9 +74,7 @@ class TileFetcher:
             if scheme == SCHEME.TMS:
                 ytile = toggle_tms_xyz_y(zoom, ytile)
 
-            url = url_template.format(
-                x=xtile, y=ytile, z=zoom, q=quad_key(xtile, ytile, zoom), layer=layer_name
-            )
+            url = url_template.format(x=xtile, y=ytile, z=zoom, q=quad_key(xtile, ytile, zoom))
 
             try:
                 response = await client.get(url, **req_kw)
@@ -139,10 +136,12 @@ class TileFetcher:
         self._loop.run_until_complete(self._ajob())
 
     def get_tiles(self, connection, layer_name, zoom, xmin, xmax, ymin, ymax):
+        url_template = connection.url_template.format(
+            layer=layer_name, **dict((c.upper(), f"{{{c}}}") for c in "xyzq")
+        )
         data = dict(
             scheme=connection.scheme,
-            url_template=connection.url_template,
-            layer_name=layer_name,
+            url_template=url_template,
             zoom=zoom,
             xmin=xmin,
             xmax=xmax,

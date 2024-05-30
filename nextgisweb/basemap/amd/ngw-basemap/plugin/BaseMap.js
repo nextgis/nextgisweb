@@ -109,14 +109,14 @@ define([
                         "maxZoom": qms.z_max ? qms.z_max : undefined,
                         "projection": "EPSG:" + qms.epsg,
                     };
+                }
 
-                    if (!qms.y_origin_top) {
-                        opts.source.url = lang.replace(opts.source.url, {
-                            "x": "{x}",
-                            "y": "{-y}",
-                            "z": "{z}",
-                        });
-                    }
+                opts.source.url = opts.source.url.replace(/\{[XYZQ]\}/g, (c) =>
+                    c.toLowerCase()
+                );
+
+                if (qms && !qms.y_origin_top) {
+                    opts.source.url = opts.source.url.replace("{y}", "{-y}");
                 }
 
                 if (opts.source.url.includes("{q}")) {
