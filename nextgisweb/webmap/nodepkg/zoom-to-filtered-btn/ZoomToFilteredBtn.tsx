@@ -1,5 +1,4 @@
-import type { QueryParams } from "package/nextgisweb/nextgisweb/feature_layer/nodepkg/feature-grid/hook/useFeatureTable";
-
+import type { QueryParams } from "@nextgisweb/feature-layer/feature-grid/hook/useFeatureTable";
 import type {
     FeatureExtent,
     NgwExtent,

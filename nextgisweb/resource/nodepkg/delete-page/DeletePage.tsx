@@ -1,8 +1,8 @@
-import type { ApiError } from "package/nextgisweb/nextgisweb/gui/nodepkg/error/type";
 import { useState } from "react";
 
 import { Button, Checkbox, Col, Row } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 

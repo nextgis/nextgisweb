@@ -53,6 +53,13 @@ const config = {
                         "message":
                             "Use 'lodash-es/[util]' instead 'lodash/[util]'.",
                     },
+                    {
+                        "group": [
+                            "**/nextgisweb*/*/nodepkg/*",
+                            "**/nextgisweb*/nodepkg/*",
+                        ],
+                        "message": "Use '@nextgisweb/*' namespace instead.",
+                    },
                 ],
             },
         ],
