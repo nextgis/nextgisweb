@@ -1,5 +1,6 @@
 .ngw-feature-attachment-carousel-render {
-    height: 100%;
+    flex: 1;
+    min-height: 0;
     pointer-events: none;
 
     > .slick-slider {
@@ -47,6 +48,7 @@
                     > div {
                         box-sizing: border-box;
                         padding: 48px;
+                        padding-top: 0;
                         height: 100%;
 
                         > .ant-image {
@@ -76,7 +78,49 @@
         }
     }
 
-    > .ant-float-btn {
+    > .ant-tooltip-btn {
         pointer-events: auto;
+    }
+}
+
+.ngw-feature-attachment-carousel-render-toolbar {
+    display: flex;
+    justify-content: end;
+    align-items: start;
+    gap: 8px;
+    z-index: 1100;
+    margin-right: 48px;
+    margin-left: 48px;
+    min-height: 48px;
+    pointer-events: auto;
+    color: white;
+
+    > div.title {
+        flex: 1;
+        align-self: center;
+        margin: 4px 0;
+
+        > .filename {
+            color: rgba(255, 255, 255, 0.25);
+        }
+    }
+
+    > .ant-btn {
+        margin-top: 8px;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        pointer-events: auto;
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 24px;
+        line-height: 0;
+
+        &.toggle-on {
+            color: white;
+        }
+
+        .ant-btn-icon:hover {
+            color: white;
+        }
     }
 }

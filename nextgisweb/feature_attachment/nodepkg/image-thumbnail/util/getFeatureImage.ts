@@ -37,5 +37,8 @@ export function getFeatureImage({
 
     const isPanorama = projection === "equirectangular";
 
-    return { url, isPanorama };
+    const fileName = attachment.name;
+    const description = attachment.description;
+
+    return { url, isPanorama, fileName, description };
 }

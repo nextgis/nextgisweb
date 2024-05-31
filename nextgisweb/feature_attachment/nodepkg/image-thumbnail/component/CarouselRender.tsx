@@ -1,17 +1,17 @@
 import { Fragment, Suspense, lazy, useEffect, useState } from "react";
 
-import { isFileImage } from "@nextgisweb/feature-attachment/attachment-editor/AttachmentEditor";
-import { isFeatureAttachment } from "@nextgisweb/feature-attachment/image-thumbnail/ImageThumbnail";
-import { getFileImage } from "@nextgisweb/feature-attachment/image-thumbnail/util/getFileImage";
-import { Carousel, FloatButton, Image, Spin } from "@nextgisweb/gui/antd";
+import { Button, Carousel, Image, Spin, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { isFileImage } from "../../attachment-editor/AttachmentEditor";
 import type {
     DataSource,
     FileMetaToUpload,
 } from "../../attachment-editor/type";
 import type { FeatureAttachment } from "../../type";
+import { isFeatureAttachment } from "../ImageThumbnail";
 import { getFeatureImage } from "../util/getFeatureImage";
+import { getFileImage } from "../util/getFileImage";
 
 import { LoadingOutlined } from "@ant-design/icons";
 import ArrowBack from "@nextgisweb/icon/material/arrow_back_ios_new";
@@ -48,6 +48,22 @@ interface CarouselRenderProps {
 interface urlPanorama {
     url: string;
     isPanorama: boolean;
+    fileName: string;
+    description?: string;
+}
+
+function TogglePanoramaButton(props: { value: boolean; onClick: () => void }) {
+    return (
+        <Tooltip title={msgTogglePanorama}>
+            <Button
+                shape="circle"
+                type="text"
+                className={props.value ? "toggle-on" : undefined}
+                icon={<PhotosphereIcon />}
+                onClick={props.onClick}
+            />
+        </Tooltip>
+    );
 }
 
 export function CarouselRender({
@@ -57,6 +73,8 @@ export function CarouselRender({
     featureId,
 }: CarouselRenderProps) {
     const [togglePanorama, setTogglePanorama] = useState(true);
+    const [fileName, setFileName] = useState<string>();
+    const [description, setDescription] = useState<string>();
     const [imageUrlIsPanorama, setImageUrlIsPanorama] =
         useState<urlPanorama[]>();
 
@@ -98,28 +116,42 @@ export function CarouselRender({
                         const url_ = await getFileImage(
                             fileImage._file as File
                         );
-                        return { url: url_, isPanorama: false };
+                        return {
+                            url: url_,
+                            isPanorama: false,
+                            fileName: fileImage.name,
+                            description: fileImage.description,
+                        };
                     }
                 })
             );
             setImageUrlIsPanorama(imageUrlIsPanorama_);
             setVisibility(imageUrlIsPanorama_[start].isPanorama);
+            setDescription(imageUrlIsPanorama_[start].description);
+            setFileName(imageUrlIsPanorama_[start].fileName);
         }
         getUrl();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <Fragment>
-            {visibility ? (
-                <FloatButton
-                    type={togglePanorama ? "primary" : "default"}
-                    tooltip={msgTogglePanorama}
-                    icon={<PhotosphereIcon />}
-                    onClick={() => {
-                        setTogglePanorama(!togglePanorama);
-                    }}
-                />
-            ) : null}
+            <div className="ngw-feature-attachment-carousel-render-toolbar">
+                {(description || fileName) && (
+                    <div className="title">
+                        {description || (
+                            <span className="filename">{fileName}</span>
+                        )}
+                    </div>
+                )}
+                {visibility && (
+                    <TogglePanoramaButton
+                        value={togglePanorama}
+                        onClick={() => {
+                            setTogglePanorama(!togglePanorama);
+                        }}
+                    />
+                )}
+            </div>
 
             <Carousel
                 rootClassName="ngw-feature-attachment-carousel-render"
@@ -129,6 +161,17 @@ export function CarouselRender({
                         imageUrlIsPanorama
                             ? imageUrlIsPanorama[currentSlide].isPanorama
                             : false
+                    );
+                    setDescription(
+                        imageUrlIsPanorama
+                            ? imageUrlIsPanorama[currentSlide].description
+                            : ""
+                    );
+                    1;
+                    setFileName(
+                        imageUrlIsPanorama
+                            ? imageUrlIsPanorama[currentSlide].fileName
+                            : ""
                     );
                 }}
                 arrows={true}

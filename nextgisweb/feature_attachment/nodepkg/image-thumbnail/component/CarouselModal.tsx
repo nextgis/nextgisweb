@@ -1,6 +1,5 @@
-import type { ShowModalOptions } from "package/nextgisweb/nextgisweb/gui/nodepkg/showModal";
-
 import { Modal } from "@nextgisweb/gui/antd";
+import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
 
 import type { DataSource } from "../../attachment-editor/type";
 
