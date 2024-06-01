@@ -45,17 +45,22 @@ export function Legend({ nodeData, store }: LegendProps) {
                             className="legend-symbol"
                             title={s.display_name}
                         >
-                            <Checkbox
-                                defaultChecked={render}
-                                onChange={(e) => {
-                                    store.setLayerLegendSymbol(
-                                        id,
-                                        s.index,
-                                        e.target.checked
-                                    );
-                                }}
-                                onClick={(evt) => evt.stopPropagation()}
-                            />
+                            {s.render !== null ? (
+                                <Checkbox
+                                    style={{ width: "16px" }}
+                                    defaultChecked={render}
+                                    onChange={(e) => {
+                                        store.setLayerLegendSymbol(
+                                            id,
+                                            s.index,
+                                            e.target.checked
+                                        );
+                                    }}
+                                    onClick={(evt) => evt.stopPropagation()}
+                                />
+                            ) : (
+                                <div style={{ width: "16px" }} />
+                            )}
                             <img
                                 width={20}
                                 height={20}
