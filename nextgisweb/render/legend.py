@@ -3,13 +3,15 @@ from typing import List, Union
 from msgspec import Struct
 from PIL.Image import Image
 
+from nextgisweb.lib.i18n import TrStr
+
 from nextgisweb.resource import IResourceBase
 
 
 class LegendSymbol(Struct, kw_only=True):
     index: int
     render: Union[bool, None]
-    display_name: str
+    display_name: Union[str, TrStr]
     icon: Image
 
 

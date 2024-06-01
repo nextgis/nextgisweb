@@ -458,7 +458,7 @@ def legend(request) -> Annotated[Response, ContentType("image/png")]:
     return Response(body_file=result, content_type="image/png")
 
 
-def legend_symbols_by_resource(resource, icon_size: int):
+def legend_symbols_by_resource(resource, icon_size: int, tr):
     result = list()
 
     for s in resource.legend_symbols(icon_size):
@@ -469,7 +469,7 @@ def legend_symbols_by_resource(resource, icon_size: int):
             LegendSymbol(
                 index=s.index,
                 render=s.render,
-                display_name=s.display_name,
+                display_name=tr(s.display_name),
                 icon=LegendIcon(
                     format="png",
                     data=buf.getvalue(),
@@ -483,7 +483,7 @@ def legend_symbols_by_resource(resource, icon_size: int):
 def legend_symbols(request, *, icon_size: int = 24) -> AsJSON[List[LegendSymbol]]:
     """Get resource legend symbols"""
     request.resource_permission(PD_READ)
-    return legend_symbols_by_resource(request.context, icon_size)
+    return legend_symbols_by_resource(request.context, icon_size, request.translate)
 
 
 def setup_pyramid(comp, config):
