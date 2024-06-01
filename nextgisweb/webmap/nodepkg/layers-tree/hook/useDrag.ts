@@ -1,23 +1,10 @@
 import type { TreeProps } from "@nextgisweb/gui/antd";
+import { countNodes, traverseTree } from "@nextgisweb/gui/util/tree";
 
 import type WebmapStore from "../../store";
 import type { TreeItem } from "../../type/TreeItems";
 
 type TreeNodeData = NonNullable<TreeProps["treeData"]>[0];
-
-const traverseTree = (
-    items: TreeItem[],
-    callback: (item: TreeItem, index: number, arr: TreeItem[]) => boolean | void
-): boolean => {
-    return items.some((item, index, arr) => {
-        if (callback(item, index, arr) === true) {
-            return true;
-        }
-        if ("children" in item) {
-            return traverseTree(item.children, callback);
-        }
-    });
-};
 
 interface UseDragProps {
     store: WebmapStore;
@@ -81,7 +68,8 @@ export function useDrag({ store, setLayerZIndex }: UseDragProps) {
             store.setWebmapItems(data);
 
             // Update zIndex for all items
-            let zIndex = data.length + 1;
+            const totalNodes = countNodes(data);
+            let zIndex = totalNodes;
             traverseTree(data, (item) => {
                 setLayerZIndex(item.id, zIndex--);
             });
