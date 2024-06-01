@@ -14,20 +14,17 @@ export function getChildren<F extends D = D>(
     item: F,
     relation: TreeRelation<F> = "children"
 ): F[] | undefined {
-    let children: F[] = [];
     const relationFunction: RelationFunction<F> =
         typeof relation === "function"
             ? relation
             : (item): F[] => item[relation] as F[];
+
     const relChild = relationFunction(item);
-    if (relChild) {
-        if (Array.isArray(relChild)) {
-            children = relChild;
-        } else {
-            children.push(relChild);
-        }
+    if (!relChild) {
+        return undefined;
     }
-    return relChild ? children : undefined;
+
+    return Array.isArray(relChild) ? relChild : [relChild];
 }
 
 export function getParent<F extends D = D>(
@@ -66,4 +63,35 @@ export function getChildrenDeep<F extends D = D>(
     const allChildren: F[] = [];
     collectChildren(item, allChildren);
     return allChildren;
+}
+
+export function traverseTree<F extends D = D>(
+    items: F[],
+    callback: (item: F, index: number, arr: F[]) => boolean | void,
+    relation: TreeRelation<F> = "children"
+): boolean {
+    return items.some((item, index, arr) => {
+        if (callback(item, index, arr) === true) {
+            return true;
+        }
+        const children = getChildren(item, relation);
+        if (children) {
+            return traverseTree(children, callback, relation);
+        }
+    });
+}
+
+export function countNodes<F extends D = D>(
+    items: F[],
+    relation: TreeRelation<F> = "children"
+): number {
+    let count = 0;
+    traverseTree(
+        items,
+        () => {
+            count++;
+        },
+        relation
+    );
+    return count;
 }
