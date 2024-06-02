@@ -35,8 +35,8 @@ msgid "Display name"
 msgstr "Наименование"
 
 #: amd/ngw-ogcfserver/template/ServiceWidget.hbs:70
-msgid "Default count of returned features"
-msgstr "Число возвращаемых объектов по умолчанию"
+msgid "Features per request"
+msgstr "Объектов на запрос"
 
 #: amd/ngw-ogcfserver/template/ServiceWidget.hbs:74
 msgid "Resource"
