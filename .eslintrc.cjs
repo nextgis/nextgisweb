@@ -138,6 +138,8 @@ const config = {
             ],
             rules: {
                 "prettier/prettier": "warn",
+                "react/prop-types": "off", // Use TypeScript instead
+                "react/jsx-no-target-blank": "off", // Unsupported browsers
                 "@typescript-eslint/no-explicit-any": "warn",
                 "@typescript-eslint/no-unused-vars": [
                     "error",
