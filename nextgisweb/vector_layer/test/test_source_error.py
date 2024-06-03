@@ -1,17 +1,13 @@
-from pathlib import Path
-
 import pytest
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib.ogrhelper import read_dataset
 
 from nextgisweb.core.exception import ValidationError
 
 from .. import VectorLayer
+from ..util import DRIVERS
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
-
-path = Path(__file__).parent / "data" / "errors"
 
 
 # List of creation test cases: file name, creation options, and final checks.
@@ -39,7 +35,7 @@ CREATE_TEST_PARAMS = (
     ),
     (
         "mixed-feature-geom.geojson",
-        dict(geometry_type="POINT", skip_other_geometry_types=True),
+        dict(cast_geometry_type="POINT", skip_other_geometry_types=True),
         dict(geometry_type="MULTIPOINT", feature_count=2),
     ),
     (
@@ -47,17 +43,17 @@ CREATE_TEST_PARAMS = (
         # The first POINT should be taken in LOSSY mode.
         "mixed-feature-geom.geojson",
         dict(
-            geometry_type="POINT",
+            cast_geometry_type="POINT",
             skip_other_geometry_types=True,
             fix_errors="LOSSY",
-            is_multi=False,
+            cast_is_multi=False,
         ),
         dict(geometry_type="POINT", feature_count=2),
     ),
     (
         # The layer has only one LINESTRING geometry and it's valid.
         "mixed-feature-geom.geojson",
-        dict(geometry_type="LINESTRING", skip_other_geometry_types=True),
+        dict(cast_geometry_type="LINESTRING", skip_other_geometry_types=True),
         dict(geometry_type="LINESTRING", feature_count=1),
     ),
     (
@@ -83,27 +79,27 @@ CREATE_TEST_PARAMS = (
     # ),
     (
         "single-geom-collection.geojson",
-        dict(geometry_type="POINT", fix_errors="SAFE"),
+        dict(cast_geometry_type="POINT", fix_errors="SAFE"),
         dict(geometry_type="POINT", feature_count=1),
     ),
     (
         "single-geom-collection.geojson",
-        dict(geometry_type="POINT", skip_other_geometry_types=True),
+        dict(cast_geometry_type="POINT", skip_other_geometry_types=True),
         dict(geometry_type="POINT", feature_count=0),
     ),
     (
         "single-geom-collection.geojson",
-        dict(geometry_type="POINT", fix_errors="LOSSSY"),
+        dict(cast_geometry_type="POINT", fix_errors="LOSSSY"),
         dict(geometry_type="POINT", feature_count=1),
     ),
     (
         "single-geom-collection.geojson",
-        dict(geometry_type="LINESTRING", fix_errors="SAFE"),
+        dict(cast_geometry_type="LINESTRING", fix_errors="SAFE"),
         dict(exception=ValidationError),
     ),
     (
         "single-geom-collection.geojson",
-        dict(geometry_type="LINESTRING", fix_errors="LOSSY"),
+        dict(cast_geometry_type="LINESTRING", fix_errors="LOSSY"),
         dict(geometry_type="LINESTRING", feature_count=1),
     ),
     (
@@ -115,7 +111,7 @@ CREATE_TEST_PARAMS = (
     (
         # An empty layer with MULTIPOINTZ must be created.
         "empty.geojson",
-        dict(geometry_type="POINT", is_multi=True, has_z=True),
+        dict(cast_geometry_type="POINT", cast_is_multi=True, cast_has_z=True),
         dict(geometry_type="MULTIPOINTZ", feature_count=0),
     ),
     (
@@ -133,19 +129,19 @@ CREATE_TEST_PARAMS = (
     (
         # Just check loading of POINTZ layers.
         "pointz.geojson",
-        dict(geometry_type="POINT"),
+        dict(cast_geometry_type="POINT"),
         dict(geometry_type="POINTZ", feature_count=1),
     ),
     (
         # Explicit setting of geometry type.
         "pointz.geojson",
-        dict(geometry_type="POINT", is_multi=False, has_z=True),
+        dict(cast_geometry_type="POINT", cast_is_multi=False, cast_has_z=True),
         dict(geometry_type="POINTZ", feature_count=1),
     ),
     (
         # Z coordinate should be stripped here.
         "pointz.geojson",
-        dict(geometry_type="POINT", has_z=False, fix_errors="LOSSY"),
+        dict(cast_geometry_type="POINT", cast_has_z=False, fix_errors="LOSSY"),
         dict(geometry_type="POINT", feature_count=1),
     ),
     (
@@ -194,45 +190,17 @@ CREATE_TEST_PARAMS = (
 
 
 @pytest.mark.parametrize("filename, options, checks", CREATE_TEST_PARAMS)
-def test_create(filename, options, checks, ngw_txn):
+def test_create(filename, options, checks, ngw_txn, ngw_data_path):
     obj = VectorLayer().persist()
-
-    src = str(path / filename)
-    ds = read_dataset(src)
-    layer = ds.GetLayer(0)
-
-    geom_cast_params = dict(
-        geometry_type=options.get("geometry_type"),
-        is_multi=options.get("is_multi"),
-        has_z=options.get("has_z"),
-    )
-
-    def setup_and_load():
-        setup_kwargs = dict()
-        load_kwargs = dict()
-
-        if "skip_other_geometry_types" in options:
-            setup_kwargs["skip_other_geometry_types"] = options["skip_other_geometry_types"]
-            load_kwargs["skip_other_geometry_types"] = options["skip_other_geometry_types"]
-
-        if "fix_errors" in options:
-            setup_kwargs["fix_errors"] = options["fix_errors"]
-            load_kwargs["fix_errors"] = options["fix_errors"]
-
-        if "skip_errors" in options:
-            load_kwargs["skip_errors"] = options["skip_errors"]
-
-        obj.setup_from_ogr(layer, geom_cast_params=geom_cast_params, **setup_kwargs)
-        obj.load_from_ogr(layer, **load_kwargs)
+    src = ngw_data_path / "errors" / filename
+    options["allowed_drivers"] = DRIVERS.enum + ("OGR_VRT",)
 
     if "exception" in checks:
         with pytest.raises(checks["exception"]):
-            setup_and_load()
+            obj.from_source(src, **options)
         DBSession.expunge(obj)
     else:
-        setup_and_load()
-
-        DBSession.flush()
+        obj.from_source(src, **options)
 
         if "geometry_type" in checks:
             exp_geometry_type = checks["geometry_type"]

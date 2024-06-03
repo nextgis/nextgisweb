@@ -67,7 +67,7 @@ def test_cget_extensions(ngw_webtest_app, vector_layer_id):
     assert len(resp.json[0]["extensions"].keys()) > 0
 
     resp = ngw_webtest_app.get(f"{url_feature}?extensions=")
-    assert len(resp.json[0]["extensions"].keys()) == 0
+    assert "extensions" not in resp.json
 
     resp = ngw_webtest_app.get(f"{url_feature}?extensions=description,attachment")
     assert resp.json[0]["extensions"] == dict(description=None, attachment=None)

@@ -36,6 +36,11 @@ class AttributeUpdateForbidden(InsufficientPermissions):
             self.data.update(scope=None, permission=None)
 
 
+class ResourceInterfaceNotSupported(UserException):
+    title = gettext("Interface not supported")
+    http_status_code = 422
+
+
 class DisplayNameNotUnique(ValidationError):
     title = gettext("Resource display name is not unique")
     message = gettext("Resource with same display name already exists (id = %d).")
