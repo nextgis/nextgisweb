@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from nextgisweb.env import COMP_ID
 from nextgisweb.lib import db
 from nextgisweb.lib.ogrhelper import read_dataset
@@ -17,29 +19,6 @@ class DRIVERS:
     MAPINFO_FILE = "MapInfo File"
 
     enum = (ESRI_SHAPEFILE, GPKG, GEOJSON, KML, LIBKML, GML, MAPINFO_FILE)
-
-
-class ERROR_FIX:
-    NONE = "NONE"
-    SAFE = "SAFE"
-    LOSSY = "LOSSY"
-
-    default = NONE
-    enum = (NONE, SAFE, LOSSY)
-
-
-class FID_SOURCE:
-    AUTO = "AUTO"
-    SEQUENCE = "SEQUENCE"
-    FIELD = "FIELD"
-
-
-class TOGGLE:
-    AUTO = None
-    YES = True
-    NO = False
-
-    enum = (AUTO, YES, NO)
 
 
 FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
@@ -71,10 +50,10 @@ GEOM_TYPE_DB = (
 GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
 
 
-def read_dataset_vector(filename, **kw):
+def read_dataset_vector(filename, allowed_drivers=DRIVERS.enum, **kw):
     return read_dataset(
         filename,
-        allowed_drivers=DRIVERS.enum,
+        allowed_drivers=allowed_drivers,
         open_options=("EXPOSE_FID=NO",),
         **kw,
     )
@@ -97,3 +76,7 @@ def fix_encoding(s):
 
 def utf8len(s):
     return len(s.encode("utf-8"))
+
+
+def uuid_hex():
+    return uuid4().hex

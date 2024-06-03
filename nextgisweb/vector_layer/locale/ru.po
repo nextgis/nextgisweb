@@ -1,4 +1,4 @@
-#: api.py:13 model.py:413
+#: api.py:23 model.py:690
 msgid "GDAL library failed to open file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
@@ -6,127 +6,127 @@ msgstr "Библиотеке GDAL не удалось открыть файл."
 msgid "Vector layer features"
 msgstr "Объекты векторного слоя"
 
-#: model.py:48 nodepkg/resource-widget/Widget.js:36
-#: nodepkg/resource-widget/Widget.js:151
+#: model.py:55 nodepkg/resource-widget/Widget.tsx:54
+#: nodepkg/resource-widget/Widget.tsx:177
 msgid "Point"
 msgstr "Точка"
 
-#: model.py:48 nodepkg/resource-widget/Widget.js:37
-#: nodepkg/resource-widget/Widget.js:152
+#: model.py:56 nodepkg/resource-widget/Widget.tsx:55
+#: nodepkg/resource-widget/Widget.tsx:178
 msgid "Line"
 msgstr "Линия"
 
-#: model.py:48 nodepkg/resource-widget/Widget.js:38
-#: nodepkg/resource-widget/Widget.js:153
+#: model.py:57 nodepkg/resource-widget/Widget.tsx:56
+#: nodepkg/resource-widget/Widget.tsx:179
 msgid "Polygon"
 msgstr "Полигон"
 
-#: model.py:49 nodepkg/resource-widget/Widget.js:154
+#: model.py:58 nodepkg/resource-widget/Widget.tsx:180
 msgid "Multipoint"
 msgstr "Мультиточка"
 
-#: model.py:49 nodepkg/resource-widget/Widget.js:155
+#: model.py:59 nodepkg/resource-widget/Widget.tsx:181
 msgid "Multiline"
 msgstr "Мультилиния"
 
-#: model.py:49 nodepkg/resource-widget/Widget.js:156
+#: model.py:60 nodepkg/resource-widget/Widget.tsx:182
 msgid "Multipolygon"
 msgstr "Мультиполигон"
 
-#: model.py:50 nodepkg/resource-widget/Widget.js:157
+#: model.py:61 nodepkg/resource-widget/Widget.tsx:183
 msgid "Point Z"
 msgstr "Точка Z"
 
-#: model.py:50 nodepkg/resource-widget/Widget.js:158
+#: model.py:62 nodepkg/resource-widget/Widget.tsx:184
 msgid "Line Z"
 msgstr "Линия Z"
 
-#: model.py:50 nodepkg/resource-widget/Widget.js:159
+#: model.py:63 nodepkg/resource-widget/Widget.tsx:185
 msgid "Polygon Z"
 msgstr "Полигон Z"
 
-#: model.py:51 nodepkg/resource-widget/Widget.js:160
+#: model.py:64 nodepkg/resource-widget/Widget.tsx:186
 msgid "Multipoint Z"
 msgstr "Мультиточка Z"
 
-#: model.py:51 nodepkg/resource-widget/Widget.js:161
+#: model.py:65 nodepkg/resource-widget/Widget.tsx:187
 msgid "Multiline Z"
 msgstr "Мультилиния Z"
 
-#: model.py:51 nodepkg/resource-widget/Widget.js:162
+#: model.py:66 nodepkg/resource-widget/Widget.tsx:188
 msgid "Multipolygon Z"
 msgstr "Мультиполигон Z"
 
-#: model.py:99 nodepkg/resource-widget/Widget.js:251
+#: model.py:115 nodepkg/resource-widget/Widget.tsx:298
 msgid "Vector layer"
 msgstr "Векторный слой"
 
-#: model.py:167 nodepkg/resource-widget/Widget.js:82
-#: nodepkg/resource-widget/Widget.js:222
+#: model.py:135 nodepkg/resource-widget/Widget.tsx:106
+#: nodepkg/resource-widget/Widget.tsx:263
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: model.py:169
+#: model.py:136
 msgid "Feature count"
 msgstr "Количество объектов"
 
-#: model.py:305
-msgid "Geometry type (%s) does not match geometry column type (%s)."
-msgstr "Тип геометрии (%s) не соответствует типу поля геометрии (%s)."
-
-#: model.py:416
+#: model.py:693
 msgid "Unsupport OGR driver: %s."
 msgstr "Драйвер OGR '%s' не поддерживается."
 
-#: model.py:425
+#: model.py:702
 msgid "Dataset doesn't contain layers."
 msgstr "Набор данных не содержит ни одного слоя."
 
-#: model.py:428
+#: model.py:705
 msgid "Dataset contains more than one layer."
 msgstr "Набор данных содержит более одного слоя."
 
-#: model.py:433
+#: model.py:710
 msgid "Unable to open layer."
 msgstr "Не удалось открыть слой."
 
-#: model.py:448
+#: model.py:723
 msgid "Layer doesn't contain coordinate system information."
 msgstr "Слой не содержит информации о системе координат."
 
-#: model.py:473
+#: model.py:746
 msgid "Unknown 'fix_errors' value."
 msgstr "Неизвестное значение параметра 'fix_errors'."
 
-#: model.py:480
+#: model.py:754
 msgid "Unknown 'cast_geometry_type' value."
 msgstr "Неизвестное значение параметра 'cast_geometry_type'."
 
-#: model.py:484
+#: model.py:759
 msgid "Unknown 'cast_is_multi' value."
 msgstr "Неизвестное значение параметра 'cast_is_multi'."
 
-#: model.py:488
+#: model.py:764
 msgid "Unknown 'cast_has_z' value."
 msgstr "Неизвестное значение параметра 'cast_has_z'."
 
-#: model.py:520
+#: model.py:769
+msgid "Unknown 'fid_source' value."
+msgstr "Неизвестное знаяние 'fid_source'."
+
+#: model.py:792
 msgid "Unsupported geometry type."
 msgstr "Тип геометрии не поддерживается."
 
-#: nodepkg/resource-widget/Store.js:108
+#: nodepkg/resource-widget/Store.tsx:168
 msgid "Confirm deletion of existing features"
 msgstr "Подтвердить удаление существующих объектов"
 
-#: nodepkg/resource-widget/Store.js:115
+#: nodepkg/resource-widget/Store.tsx:175
 msgid "Confirm change of geometry type"
 msgstr "Подтвердить изменение типа геометрии"
 
-#: nodepkg/resource-widget/Widget.js:15
+#: nodepkg/resource-widget/Widget.tsx:33
 msgid "Select a dataset"
 msgstr "Выберите набор данных"
 
-#: nodepkg/resource-widget/Widget.js:16
+#: nodepkg/resource-widget/Widget.tsx:34
 msgid ""
 "ESRI Shapefile (zip), GeoPackage, GeoJSON, GML, KML, CSV or XLSX formats are "
 "supported. For CSV and XLSX only points are supported, coordinates must be "
@@ -136,164 +136,140 @@ msgstr ""
 "GeoJSON, GML, KML, CSV или XLSX. Для CSV и XLSX поддерживаются только точки, "
 "координаты должны быть в колонках lat и lon."
 
-#: nodepkg/resource-widget/Widget.js:27
+#: nodepkg/resource-widget/Widget.tsx:45
 msgid "Whenever possible"
 msgstr "Если возможно"
 
-#: nodepkg/resource-widget/Widget.js:28
+#: nodepkg/resource-widget/Widget.tsx:46
 msgid "Without losing data"
 msgstr "Без потери данных"
 
-#: nodepkg/resource-widget/Widget.js:29
+#: nodepkg/resource-widget/Widget.tsx:47
 msgid "None"
 msgstr "Нет"
 
-#: nodepkg/resource-widget/Widget.js:35 nodepkg/resource-widget/Widget.js:44
-#: nodepkg/resource-widget/Widget.js:52
+#: nodepkg/resource-widget/Widget.tsx:53 nodepkg/resource-widget/Widget.tsx:62
+#: nodepkg/resource-widget/Widget.tsx:70
 msgid "Auto"
 msgstr "Авто"
 
-#: nodepkg/resource-widget/Widget.js:45
+#: nodepkg/resource-widget/Widget.tsx:63
 msgid "Yes"
 msgstr "Да"
 
-#: nodepkg/resource-widget/Widget.js:46
+#: nodepkg/resource-widget/Widget.tsx:64
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/resource-widget/Widget.js:53
+#: nodepkg/resource-widget/Widget.tsx:71
 msgid "Sequence"
 msgstr "Нумерация"
 
-#: nodepkg/resource-widget/Widget.js:54
+#: nodepkg/resource-widget/Widget.tsx:72
 msgid "Field"
 msgstr "Из поля"
 
-#: nodepkg/resource-widget/Widget.js:74
+#: nodepkg/resource-widget/Widget.tsx:98
 msgid "Fix errors"
 msgstr "Исправлять ошибки"
 
-#: nodepkg/resource-widget/Widget.js:78
+#: nodepkg/resource-widget/Widget.tsx:102
 msgid "Skip features with unfixable errors"
 msgstr "Пропускать объекты с неустранимыми ошибками"
 
-#: nodepkg/resource-widget/Widget.js:90
+#: nodepkg/resource-widget/Widget.tsx:114
 msgid "Only load features of the selected geometry type"
 msgstr "Загружать объекты только с выбранным типом геометрии"
 
-#: nodepkg/resource-widget/Widget.js:94
+#: nodepkg/resource-widget/Widget.tsx:118
 msgid "Multi-geometry"
 msgstr "Мульти-геометрия"
 
-#: nodepkg/resource-widget/Widget.js:97
+#: nodepkg/resource-widget/Widget.tsx:121
 msgid "Z-coordinate"
 msgstr "Координата Z"
 
-#: nodepkg/resource-widget/Widget.js:100
+#: nodepkg/resource-widget/Widget.tsx:124
 msgid "FID source"
 msgstr "Источник FID"
 
-#: nodepkg/resource-widget/Widget.js:125
+#: nodepkg/resource-widget/Widget.tsx:151
 msgid "Load features from file"
 msgstr "Загрузить объекты из файла"
 
-#: nodepkg/resource-widget/Widget.js:126
+#: nodepkg/resource-widget/Widget.tsx:152
 msgid "Create empty layer"
 msgstr "Создать пустой слой"
 
-#: nodepkg/resource-widget/Widget.js:128
+#: nodepkg/resource-widget/Widget.tsx:154
 msgid "Keep existing layer features"
 msgstr "Оставить существующие объекты"
 
-#: nodepkg/resource-widget/Widget.js:129
+#: nodepkg/resource-widget/Widget.tsx:155
 msgid "Change geometry type"
 msgstr "Изменить тип геометрии"
 
-#: nodepkg/resource-widget/Widget.js:130
+#: nodepkg/resource-widget/Widget.tsx:156
 msgid "Replace layer features from file"
 msgstr "Заменить объекты слоя из файла"
 
-#: nodepkg/resource-widget/Widget.js:131
+#: nodepkg/resource-widget/Widget.tsx:157
 msgid "Delete all features from layer"
 msgstr "Удалить все объекты из слоя"
 
-#: nodepkg/resource-widget/Widget.js:147
+#: nodepkg/resource-widget/Widget.tsx:173
 msgid "current"
 msgstr "текущий"
 
-#: nodepkg/resource-widget/Widget.js:210
+#: nodepkg/resource-widget/Widget.tsx:251
 msgid "Source layer"
 msgstr "Исходный слой"
 
-#: nodepkg/resource-widget/Widget.js:242
+#: nodepkg/resource-widget/Widget.tsx:287
 msgid "Advanced options"
 msgstr "Дополнительные параметры"
 
-#: table_info.py:299
+#: ogrloader.py:311
 msgid "Could not determine a geometry type."
 msgstr "Не удалось определить тип геометрии."
 
-#: table_info.py:301
+#: ogrloader.py:313
 msgid "Source layer contains no features satisfying the conditions."
 msgstr "Слой не содержит объектов, удовлетворяющих условиям."
 
-#: table_info.py:316
+#: ogrloader.py:329
 msgid "Field '%s' is out of int32 range."
 msgstr "Значение поля '%s' находится за пределами диапазона int32."
 
-#: table_info.py:323
+#: ogrloader.py:337
 msgid "Field '%s' contains non-unique or empty values."
 msgstr "Значение поля '%s' содержит неуникальное или пустое значение."
 
-#: table_info.py:335
+#: ogrloader.py:354
 msgid "Parameter 'fid_field' is missing."
 msgstr "Отсутствует параметр 'fid_field'"
 
-#: table_info.py:338
+#: ogrloader.py:357
 msgid "Fields %s not found."
 msgstr "Поле %s не найдено"
 
-#: table_info.py:340
+#: ogrloader.py:359
 msgid "None of fields %s are integer."
 msgstr "Ни одно из полей %d не является целочисленным."
 
-#: table_info.py:356
+#: ogrloader.py:374
 msgid "Field '%s(?)' encoding is broken."
 msgstr "Кодировка поля '%s(?)' повреждена."
 
-#: table_info.py:360
+#: ogrloader.py:379
 msgid "Field name is forbidden: '%s'. Please remove or rename it."
 msgstr "Недопустимое имя поля: '%s'. Удалите или переименуйте его."
 
-#: table_info.py:396
+#: ogrloader.py:412
 msgid "Unsupported field type: %r."
 msgstr "Тип поля %r не поддерживается."
 
-#: table_info.py:561
-msgid "Feature (seq. #%d) doesn't have a FID field '%s'."
-msgstr "Объект (ном. #%d) не содержит поле FID '%s'."
-
-#: table_info.py:565
-msgid "Feature (seq. #%d) FID field '%s' is null."
-msgstr "Объект (ном. #%d) содержит пустое поле FID '%s'."
-
-#: table_info.py:578
-msgid "Feature #%d doesn't have geometry."
-msgstr "Объект #%d не содержит геометрии."
-
-#: table_info.py:611 table_info.py:655
-msgid "Feature #%d has multiple geometries satisfying the conditions."
-msgstr "Объект #%d содержит несколько геометрий, удовлетворяющих условиям."
-
-#: table_info.py:623
-msgid "Feature #%d has unknown geometry type: %d (%s)."
-msgstr "Объект #%d содержит неизвестный тип геометрии: %d (%s)."
-
-#: table_info.py:636
-msgid "Feature #%d has unsuitable geometry type: %d (%s)."
-msgstr "Объект #%d содержит неподходящий тип геометрии: %d (%s)."
-
-#: table_info.py:661
+#: ogrloader.py:509
 msgid ""
 "Feature #%d has a geometry that can't be reprojected to target coordinate "
 "system"
@@ -301,23 +277,47 @@ msgstr ""
 "Геометрия объект #%d не может быть перепроецирована в целевую систему "
 "координат."
 
-#: table_info.py:686
+#: ogrloader.py:554
+msgid "Vector layer cannot be written due to errors."
+msgstr "Векторный слой не может быть записан из-за ошибок."
+
+#: ogrloader.py:579
+msgid "Feature (seq. #%d) doesn't have a FID field '%s'."
+msgstr "Объект (ном. #%d) не содержит поле FID '%s'."
+
+#: ogrloader.py:582
+msgid "Feature (seq. #%d) FID field '%s' is null."
+msgstr "Объект (ном. #%d) содержит пустое поле FID '%s'."
+
+#: ogrloader.py:603
+msgid "Feature #%d doesn't have geometry."
+msgstr "Объект #%d не содержит геометрии."
+
+#: ogrloader.py:631 ogrloader.py:669
+msgid "Feature #%d has multiple geometries satisfying the conditions."
+msgstr "Объект #%d содержит несколько геометрий, удовлетворяющих условиям."
+
+#: ogrloader.py:640
+msgid "Feature #%d has unknown geometry type: %d (%s)."
+msgstr "Объект #%d содержит неизвестный тип геометрии: %d (%s)."
+
+#: ogrloader.py:649
+msgid "Feature #%d has unsuitable geometry type: %d (%s)."
+msgstr "Объект #%d содержит неподходящий тип геометрии: %d (%s)."
+
+#: ogrloader.py:683
 msgid "Feature #%d has unclosed rings."
 msgstr "Объект #%d содержит незамкнутые кольца."
 
-#: table_info.py:700
+#: ogrloader.py:697
 msgid "Feature #%d has less than 3 points in a polygon ring."
 msgstr "Объект #%d содержит меньше 3-х точек в кольце полигона."
 
-#: table_info.py:706
+#: ogrloader.py:703
 msgid "Feature #%d has less than 2 points in a linestring."
 msgstr "Объект #%d содержит меньше 2-х точек в линии."
 
-#: table_info.py:748
+#: ogrloader.py:729
 msgid "Feature #%d contains a broken encoding of field '%s'."
 msgstr "Объект #%d содержит поврежденную кодировку поля '%s'."
-
-#: table_info.py:772
-msgid "Vector layer cannot be written due to errors."
-msgstr "Векторный слой не может быть записан из-за ошибок."
 

@@ -1,5 +1,5 @@
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: nodepkg/attribute-editor/index.ts:7 view.py:213
+#: nodepkg/attribute-editor/index.ts:7 view.py:222
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -11,23 +11,15 @@ msgstr "Н/Д"
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: api.py:53 api.py:125
-msgid "Geometry format '%s' is not supported."
-msgstr "Формат геометрии '%s' не поддерживается."
-
-#: api.py:55
+#: api.py:88
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:61 api.py:130
-msgid "Date format '%s' is not supported."
-msgstr "Формат даты '%s' не поддерживается."
-
-#: api.py:251
+#: api.py:326
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:356 api_export.py:121
+#: api.py:399 api_export.py:121
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -63,6 +55,14 @@ msgstr "Объект с id = %d не найден в ресурсе с id = %d."
 msgid "The feature may have been deleted or an error in the address."
 msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
 
+#: exception.py:20
+msgid "Feature not deleted"
+msgstr "Объект не удален"
+
+#: exception.py:21
+msgid "Unable to restore the #{} feature as it is not deleted."
+msgstr "Невозможно восстановить объект #{} поскольку он не удален."
+
 #: model.py:163
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
@@ -70,6 +70,10 @@ msgstr "Поле не найдено (ID=%d)."
 #: model.py:174
 msgid "Field name is forbidden: '{}'. Please remove or rename it."
 msgstr "Недопустимое имя поля: '{}'. Пожалуйста, удалите или переименуйте его."
+
+#: model.py:236
+msgid "Versioning not supported"
+msgstr "Версионирование не поддерживается"
 
 #: nodepkg/attribute-editor/AttributeEditor.tsx:32
 msgid "Set field value to NULL (No data)"
@@ -181,28 +185,28 @@ msgstr "Открыть настройки таблицы"
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:28
+#: nodepkg/feature-grid/FeatureGridActions.tsx:24
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:29
+#: nodepkg/feature-grid/FeatureGridActions.tsx:25
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:30
+#: nodepkg/feature-grid/FeatureGridActions.tsx:26
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:31
+#: nodepkg/feature-grid/FeatureGridActions.tsx:27
 msgid "Edit on a new page"
 msgstr "Редактировать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:33
+#: nodepkg/feature-grid/FeatureGridActions.tsx:29
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:108 view.py:119
-#: view.py:208
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:117 view.py:128
+#: view.py:217
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -238,7 +242,7 @@ msgstr "Тип"
 msgid "Lookup table"
 msgstr "Справочник"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:27 view.py:47
+#: nodepkg/fields-widget/FieldsWidget.tsx:27 view.py:56
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -248,7 +252,7 @@ msgstr "Текстовый поиск"
 
 #: nodepkg/fields-widget/FieldsWidget.tsx:29
 msgid "Label attribute"
-msgstr "Атрибут наименования"
+msgstr "Атрибут наименование"
 
 #: nodepkg/fields-widget/FieldsWidget.tsx:31
 msgid "Please select"
@@ -302,7 +306,35 @@ msgstr "Охват (xMax)"
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
-#: template/resource_section_fields.mako:21 view.py:197
+#: nodepkg/settings-widget/SettingsWidget.tsx:18
+msgid "Feature versioning"
+msgstr "Версионирование объектов"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:19
+msgid ""
+"Experimental feature. Some operations may not work if feature versioning is "
+"enabled."
+msgstr ""
+"Экспериментальная функция. Некоторые операции могут не работать если включено"
+" версионирование объектов."
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:40
+msgid "Disable feature versioning?"
+msgstr "Отключить версионирование объектов?"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:41
+msgid ""
+"Turning off feature versioning will truncate the history and keep only the "
+"latest state."
+msgstr ""
+"Отключение версионирования приведет к усечению истории и сохранению только "
+"последнего состояния."
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:64
+msgid "Settings"
+msgstr "Настройки"
+
+#: template/resource_section_fields.mako:21 view.py:206
 msgid "Table"
 msgstr "Таблица"
 
@@ -316,15 +348,68 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-#: view.py:69 view.py:86
+#: transaction/exception.py:7
+msgid "Transaction not found"
+msgstr "Транзакция не найдена"
+
+#: transaction/exception.py:12
+msgid "Operation conflict in transaction"
+msgstr "Конфликт операций в транзакции"
+
+#: transaction/exception.py:20
+msgid "Transaction not committed"
+msgstr "Транзакция не зафиксирована"
+
+#: versioning/exception.py:17
+msgid "Not implemented for feature versioning"
+msgstr "Не реализовано для версионирования объектов"
+
+#: versioning/exception.py:18
+msgid ""
+"This operation cannot be performed on a resource with feature versioning "
+"enabled. Disable feature versioning for the resource first, and then try "
+"again."
+msgstr ""
+"Операция не может быть выполнена для ресурса с включенным версионированием "
+"объектов. Отключите версионирование и повторите попытку."
+
+#: versioning/exception.py:27
+msgid "Feature versioning required"
+msgstr "Требуется версионирование объектов"
+
+#: versioning/exception.py:32
+msgid "Feature versioning is not supported for this resource."
+msgstr "Версионирование объектов не поддерживается для этого ресурса."
+
+#: versioning/exception.py:34
+msgid "Feature versioning is not enabled for this resource."
+msgstr "Версионирование объектов не включено для этого ресурса."
+
+#: versioning/exception.py:41
+msgid "Epoch required"
+msgstr "Требуется эпоха"
+
+#: versioning/exception.py:45
+msgid "Epoch mismatch"
+msgstr "Несооответствие эпох"
+
+#: versioning/exception.py:55
+msgid "Version out of range"
+msgstr "Версия за пределами диапазона"
+
+#: versioning/exception.py:65
+msgid "Invalid range"
+msgstr "Некорректный диапазон"
+
+#: view.py:78 view.py:95
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:127
+#: view.py:136
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:128
+#: view.py:137
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
@@ -332,7 +417,7 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: view.py:191
+#: view.py:200
 msgid "Features"
 msgstr "Объекты"
 

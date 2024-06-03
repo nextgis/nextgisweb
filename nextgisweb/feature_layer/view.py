@@ -1,6 +1,6 @@
 from pyramid.httpexceptions import HTTPNotFound
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.pyramid import JSONType, viewargs
@@ -16,7 +16,7 @@ from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
 from .extension import FeatureExtension
-from .interface import IFeatureLayer
+from .interface import IFeatureLayer, IVersionableFeatureLayer
 from .ogrdriver import MVT_DRIVER_EXIST
 
 
@@ -24,6 +24,15 @@ class FeatureLayerFieldsWidget(Widget):
     interface = IFeatureLayer
     operation = ("update",)
     amdmod = "@nextgisweb/feature-layer/fields-widget"
+
+
+class SettingsWidget(Widget):
+    interface = IFeatureLayer
+    operation = ("create", "update")
+    amdmod = "@nextgisweb/feature-layer/settings-widget"
+
+    def is_applicable(self) -> bool:
+        return IVersionableFeatureLayer.providedBy(self.obj) and super().is_applicable()
 
 
 PD_READ = DataScope.read
@@ -44,7 +53,7 @@ def feature_browse(request):
 
     return dict(
         obj=request.context,
-        title=_("Feature table"),
+        title=gettext("Feature table"),
         entrypoint="@nextgisweb/feature-layer/feature-grid",
         props=dict(id=request.context.id, readonly=readonly, editOnNewPage=True),
         maxwidth=True,
@@ -66,7 +75,7 @@ def feature_show(request):
 
     return dict(
         obj=request.context,
-        title=_("Feature #%d") % feature_id,
+        title=gettext("Feature #%d") % feature_id,
         feature_id=feature_id,
         ext_mid=ext_mid,
         dynmenu=False,
@@ -83,7 +92,7 @@ def feature_update(request):
         obj=request.context,
         entrypoint="@nextgisweb/feature-layer/feature-editor",
         props=dict(resourceId=request.context.id, featureId=feature_id),
-        title=_("Feature #%d") % feature_id,
+        title=gettext("Feature #%d") % feature_id,
         maxheight=True,
         dynmenu=False,
     )
@@ -105,7 +114,7 @@ def export(request):
         raise HTTPNotFound()
     return dict(
         obj=request.context,
-        title=_("Save as"),
+        title=gettext("Save as"),
         props=dict(id=request.context.id),
         entrypoint="@nextgisweb/feature-layer/export-form",
         maxheight=True,
@@ -116,7 +125,7 @@ def export(request):
 def export_multiple(request):
     return dict(
         obj=request.context,
-        title=_("Save as"),
+        title=gettext("Save as"),
         props=dict(multiple=True, pick=True),
         entrypoint="@nextgisweb/feature-layer/export-form",
         maxheight=True,
@@ -124,8 +133,8 @@ def export_multiple(request):
 
 
 class MVTLink(ExternalAccessLink):
-    title = _("MVT Vector Tiles")
-    help = _(
+    title = gettext("MVT Vector Tiles")
+    help = gettext(
         "The Mapbox Vector Tile is an efficient encoding for map data into vector tiles that can be rendered dynamically."
     )
     docs_url = "docs_ngweb_dev/doc/developer/misc.html#mvt-vector-tiles"
@@ -188,13 +197,13 @@ def setup_pyramid(comp, config):
         if not IFeatureLayer.providedBy(args.obj):
             return
 
-        yield Label("feature_layer", _("Features"))
+        yield Label("feature_layer", gettext("Features"))
 
         if args.obj.has_permission(PD_READ, args.request.user):
             if args.obj.has_permission(PDS_R, args.request.user):
                 yield Link(
                     "feature_layer/feature-browse",
-                    _("Table"),
+                    gettext("Table"),
                     lambda args: args.request.route_url(
                         "feature_layer.feature.browse", id=args.obj.id
                     ),
@@ -205,11 +214,11 @@ def setup_pyramid(comp, config):
         if args.obj.has_export_permission(args.request.user):
             yield Link(
                 "feature_layer/export",
-                _("Save as"),
+                gettext("Save as"),
                 lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
                 icon="material-download",
             )
 
-    @resource_sections(title=_("Attributes"))
+    @resource_sections(title=gettext("Attributes"))
     def resource_section_fields(obj):
         return IFeatureLayer.providedBy(obj)

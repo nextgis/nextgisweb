@@ -11,6 +11,7 @@ Changes
 - Show feature attachment descriptions in the viewer.
 - Support for upper-case placeholders in TMS connections.
 - Customizable print layout including legend.
+- Experimental support for feature versioning.
 
 
 4.7.0

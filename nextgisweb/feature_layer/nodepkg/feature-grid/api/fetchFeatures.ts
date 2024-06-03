@@ -7,8 +7,8 @@ import type { OrderBy } from "../type";
 interface FeatureLayerQuery {
     offset?: number;
     limit?: number;
-    geom?: "yes" | "no";
-    extensions?: string;
+    geom?: boolean;
+    extensions?: string[];
     dt_format?: "iso";
     fields?: string[];
     order_by?: string;
@@ -24,7 +24,7 @@ export interface FetchFeaturesOptions {
     orderBy?: OrderBy;
     signal?: AbortSignal;
     fields?: string[];
-    extensions?: string;
+    extensions?: string[];
     offset?: number;
     limit?: number;
     cache?: boolean;
@@ -36,7 +36,7 @@ export interface FetchFeaturesOptions {
 export function fetchFeaturesItems({
     resourceId,
     intersects,
-    extensions,
+    extensions = [],
     orderBy,
     signal,
     fields,
@@ -48,8 +48,8 @@ export function fetchFeaturesItems({
     label,
 }: FetchFeaturesOptions) {
     const query: FeatureLayerQuery = {
-        geom: "no",
-        extensions: extensions ? extensions : "",
+        geom: false,
+        extensions: extensions,
         dt_format: "iso",
         fields,
     };

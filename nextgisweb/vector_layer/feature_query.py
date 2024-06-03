@@ -1,10 +1,8 @@
-from functools import lru_cache
-
-import geoalchemy2 as ga
+import sqlalchemy as sa
+from msgspec import UNSET
 from shapely.geometry import box
-from sqlalchemy import cast, func, sql
-from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.sql import ColumnElement, null, text
+from sqlalchemy import cast, func
+from sqlalchemy.sql import alias, literal_column, null, select
 from zope.interface import implementer
 
 from nextgisweb.env import DBSession
@@ -27,8 +25,6 @@ from nextgisweb.feature_layer import (
 )
 from nextgisweb.spatial_ref_sys import SRS
 
-from .table_info import TableInfo
-
 
 @implementer(
     IFeatureQuery,
@@ -45,15 +41,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def __init__(self):
         super().__init__()
 
+        self._pit_version = None
+
         self._srs = None
         self._geom = None
-        self._single_part = None
         self._geom_format = "WKB"
         self._clip_by_box = None
         self._simplify = None
         self._box = None
-
-        self._geom_len = None
 
         self._fields = None
         self._limit = None
@@ -61,18 +56,19 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         self._filter = None
         self._filter_by = None
-        self._filter_sql = None
         self._like = None
         self._ilike = None
 
         self._order_by = None
 
+    def pit(self, version):
+        self._pit_version = version
+
     def srs(self, srs):
         self._srs = srs
 
-    def geom(self, single_part=False):
+    def geom(self):
         self._geom = True
-        self._single_part = single_part
 
     def geom_format(self, geom_format):
         self._geom_format = geom_format
@@ -82,9 +78,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def simplify(self, tolerance):
         self._simplify = tolerance
-
-    def geom_length(self):
-        self._geom_len = True
 
     def box(self):
         self._box = True
@@ -102,12 +95,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
 
-    def filter_sql(self, *args):
-        if len(args) > 0 and isinstance(args[0], list):
-            self._filter_sql = args[0]
-        else:
-            self._filter_sql = args
-
     def order_by(self, *args):
         self._order_by = args
 
@@ -118,42 +105,33 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._ilike = value
 
     def __call__(self):
-        tableinfo = TableInfo.from_layer(self.layer)
-        tableinfo.setup_metadata(self.layer._tablename)
-        table = tableinfo.table
+        vls = self.layer.vlschema()
+        if not self._pit_version:
+            table = alias(vls.ctab, "tab")
+        else:
+            table = vls.query_pit(self._pit_version)
 
-        idcol = table.columns.id
-        columns = [idcol]
+        idcol = table.columns.fid
+        geomcol = table.columns.geom
+        fields = table.fields
+        columns = []
         where = []
 
-        geomcol = table.columns.geom
-
         srs = self.layer.srs if self._srs is None else self._srs
-
         if srs.id != self.layer.srs_id:
             geomexpr = func.st_transform(geomcol, srs.id)
         else:
             geomexpr = geomcol
 
         if self._clip_by_box is not None:
-            if _clipbybox2d_exists():
-                clip = func.st_setsrid(
-                    func.st_makeenvelope(*self._clip_by_box.bounds), self._clip_by_box.srid
-                )
-                geomexpr = func.st_clipbybox2d(geomexpr, clip)
-            else:
-                clip = func.st_setsrid(
-                    func.st_geomfromtext(self._clip_by_box.wkt), self._clip_by_box.srid
-                )
-                geomexpr = func.st_intersection(geomexpr, clip)
+            clip = func.st_setsrid(
+                func.st_makeenvelope(*self._clip_by_box.bounds),
+                self._clip_by_box.srid,
+            )
+            geomexpr = func.st_clipbybox2d(geomexpr, clip)
 
         if self._simplify is not None:
             geomexpr = func.st_simplifypreservetopology(geomexpr, self._simplify)
-
-        if self._geom_len:
-            columns.append(
-                func.st_length(func.geography(func.st_transform(geomexpr, 4326))).label("geom_len")
-            )
 
         if self._box:
             columns.extend(
@@ -166,39 +144,23 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             )
 
         if self._geom:
-            if self._single_part:
-
-                class geom(ColumnElement):
-                    def __init__(self, base):
-                        self.base = base
-
-                @compiles(geom)
-                def compile(expr, compiler, **kw):
-                    return "(%s).geom" % str(compiler.process(expr.base))
-
-                geomexpr = geom(func.st_dump(geomexpr))
-
-            if self._geom_format == "WKB":
-                geomexpr = func.st_asbinary(geomexpr, "NDR")
-            else:
-                geomexpr = func.st_astext(geomexpr)
-
+            geomexpr = (
+                func.st_asbinary(geomexpr, "NDR")
+                if self._geom_format == "WKB"
+                else func.st_astext(geomexpr)
+            )
             columns.append(geomexpr.label("geom"))
 
         selected_fields = []
-        for idx, fld in enumerate(tableinfo.fields):
-            if self._fields is None or fld.keyname in self._fields:
+        for idx, (fld_k, fld_c) in enumerate(fields.items(), start=1):
+            if self._fields is None or fld_k in self._fields:
                 label = f"fld_{idx}"
-                columns.append(table.columns[fld.key].label(label))
-                selected_fields.append((fld.keyname, label))
+                columns.append(fld_c.label(label))
+                selected_fields.append((fld_k, label))
 
         if self._filter_by:
             for k, v in self._filter_by.items():
-                if k == "id":
-                    where.append(idcol == v)
-                else:
-                    field = tableinfo.find_field(keyname=k)
-                    where.append(table.columns[field.key] == v)
+                where.append((idcol if k == "id" else fields[k]) == v)
 
         if self._filter:
             _where_filter = []
@@ -243,41 +205,18 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     v = null()
 
                 op = getattr(db.sql.operators, o)
-                if k == "id":
-                    column = idcol
-                else:
-                    field = tableinfo.find_field(keyname=k)
-                    column = table.columns[field.key]
-
+                column = idcol if k == "id" else fields[k]
                 _where_filter.append(op(column, v))
 
             if len(_where_filter) > 0:
                 where.append(db.and_(*_where_filter))
 
-        if self._filter_sql:
-            _where_filter_sql = []
-            for _filter_sql_item in self._filter_sql:
-                if len(_filter_sql_item) == 3:
-                    table_column, op, val = _filter_sql_item
-                    if table_column == "id":
-                        _where_filter_sql.append(op(idcol, val))
-                    else:
-                        field = tableinfo.find_field(keyname=table_column)
-                        _where_filter_sql.append(op(table.columns[field.key], val))
-                elif len(_filter_sql_item) == 4:
-                    table_column, op, val1, val2 = _filter_sql_item
-                    field = tableinfo.find_field(keyname=table_column)
-                    _where_filter_sql.append(op(table.columns[field.key], val1, val2))
-
-            if len(_where_filter_sql) > 0:
-                where.append(db.and_(_where_filter_sql))
-
         if self._like or self._ilike:
-            operands = [
-                cast(table.columns[fld.key], db.Unicode)
-                for fld in tableinfo.fields
-                if fld.text_search
-            ]
+            operands = []
+            text_seach_fields = set(f.keyname for f in self.layer.fields if f.text_search)
+            for fld_k, fld_c in fields.items():
+                if fld_k in text_seach_fields:
+                    operands.append(cast(fld_c, db.Unicode))
             if len(operands) == 0:
                 where.append(False)
             else:
@@ -303,59 +242,60 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             where.append(func.st_intersects(geomcol, int_geom))
 
-        order_criterion = []
+        order_by = []
         if self._order_by:
-            for order, colname in self._order_by:
-                field = tableinfo.find_field(keyname=colname)
-                order_criterion.append(
-                    dict(asc=db.asc, desc=db.desc)[order](table.columns[field.key])
-                )
-        order_criterion.append(db.asc(idcol))
+            for order, fld_k in self._order_by:
+                order_by.append(getattr(fields[fld_k], order)())
+        order_by.append(idcol.asc())
+
+        qbase = select(idcol)
+        if (vid_col := table.c.get("vid")) is not None:
+            qbase = qbase.add_columns(vid_col)
+        elif self.layer.fversioning:
+            vc = alias(vls.etab, "tab_e")
+            qbase = qbase.add_columns(vc.c.vid)
+            qbase = qbase.join(vc, vc.c.fid == idcol)
+        else:
+            qbase = qbase.add_columns(literal_column("NULL").label("vid"))
+        qbase = qbase.add_columns(*columns)
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer
 
             _geom = self._geom
             _geom_format = self._geom_format
-            _geom_len = self._geom_len
             _box = self._box
             _limit = self._limit
             _offset = self._offset
 
             def __iter__(self):
-                query = (
-                    sql.select(*columns)
-                    .limit(self._limit)
-                    .offset(self._offset)
-                    .order_by(*order_criterion)
-                )
+                query = qbase.where(*where).order_by(*order_by)
+                query = query.limit(self._limit).offset(self._offset)
 
-                if len(where) > 0:
-                    query = query.where(db.and_(*where))
-
-                result = DBSession.connection().execute(query)
+                result = DBSession.execute(query)
                 for row in result.mappings():
-                    fdict = dict((keyname, row[label]) for keyname, label in selected_fields)
+                    fdict = {keyname: row[label] for keyname, label in selected_fields}
 
                     if self._geom:
-                        if self._geom_format == "WKB":
+                        geom_row = row["geom"]
+                        if geom_row is None:
+                            geom = None
+                        elif self._geom_format == "WKB":
                             geom_data = row["geom"].tobytes()
                             geom = Geometry.from_wkb(geom_data, validate=False)
-                        else:
+                        elif self._geom_format == "WKT":
                             geom = Geometry.from_wkt(row["geom"], validate=False)
+                        else:
+                            raise NotImplementedError
                     else:
-                        geom = None
-
-                    calculated = dict()
-                    if self._geom_len:
-                        calculated["geom_len"] = row["geom_len"]
+                        geom = UNSET
 
                     yield Feature(
                         layer=self.layer,
-                        id=row.id,
+                        id=row.fid,
+                        version=row.vid,
                         fields=fdict,
                         geom=geom,
-                        calculations=calculated,
                         box=box(row.box_left, row.box_bottom, row.box_right, row.box_top)
                         if self._box
                         else None,
@@ -363,64 +303,23 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             @property
             def total_count(self):
-                query = sql.select(func.count(idcol))
-                if len(where) > 0:
-                    query = query.where(db.and_(*where))
-                result = DBSession.connection().execute(query)
-                return result.scalar()
+                query = select(func.count(idcol)).where(*where)
+                return DBSession.scalar(query)
 
             @property
             def extent(self):
-                return calculate_extent(self.layer, where, geomcol)
+                geom_clause = select(geomcol).where(*where).subquery().c[0]
+                return calculate_extent(geom_clause)
 
         return QueryFeatureSet()
 
 
-def calculate_extent(layer, where=None, geomcol=None):
-    tableinfo = TableInfo.from_layer(layer)
-    tableinfo.setup_metadata(layer._tablename)
-
-    if not (where is None and geomcol is None) and len(where) > 0:
-        bbox = (
-            sql.select(
-                func.st_extent(
-                    func.st_transform(
-                        func.st_setsrid(cast(func.st_force2d(geomcol), ga.Geometry), layer.srs_id),
-                        4326,
-                    )
-                )
-            )
-            .where(db.and_(True, *where))
-            .label("bbox")
-        )
-    else:
-        bbox = func.st_extent(
-            func.st_transform(
-                func.st_setsrid(
-                    cast(func.st_force2d(tableinfo.geom_column), ga.Geometry), layer.srs_id
-                ),
-                4326,
-            )
-        ).label("bbox")
-    sq = DBSession.query(bbox).subquery()
-
-    fields = (
-        func.st_xmax(sq.c.bbox),
-        func.st_xmin(sq.c.bbox),
-        func.st_ymax(sq.c.bbox),
-        func.st_ymin(sq.c.bbox),
-    )
-    maxLon, minLon, maxLat, minLat = DBSession.query(*fields).one()
-
-    extent = dict(minLon=minLon, maxLon=maxLon, minLat=minLat, maxLat=maxLat)
-
-    return extent
-
-
-@lru_cache()
-def _clipbybox2d_exists():
-    return (
-        DBSession.connection()
-        .execute(text("SELECT 1 FROM pg_proc WHERE proname='st_clipbybox2d'"))
-        .fetchone()
-    )
+def calculate_extent(geom_clause):
+    bbox = func.st_extent(func.st_transform(geom_clause, sa.text("4326")))
+    row = DBSession.query(
+        func.st_xmin(bbox).label("minLon"),
+        func.st_ymin(bbox).label("minLat"),
+        func.st_xmax(bbox).label("maxLon"),
+        func.st_ymax(bbox).label("maxLat"),
+    ).one()
+    return dict(row._mapping)

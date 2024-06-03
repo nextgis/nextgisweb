@@ -71,7 +71,7 @@ export function WebMapFeatureGridTab({
                             id: layerId,
                             fid,
                         })
-                            .get<FeatureItem>()
+                            .get<FeatureItem>({})
                             .then((feature) => {
                                 display.current.featureHighlighter.highlightFeature(
                                     {
@@ -100,7 +100,7 @@ export function WebMapFeatureGridTab({
                                     id: layerId,
                                     fid,
                                 })
-                                    .get<FeatureItem>()
+                                    .get<FeatureItem>({})
                                     .then((feature) => {
                                         const geometry = wkt.readGeometry(
                                             feature.geom

@@ -1,37 +1,43 @@
+from datetime import date, datetime, time
+from typing import Dict, Optional, Union
+
+from msgspec import UNSET, UnsetType
 from osgeo import ogr
+
+from nextgisweb.lib.geometry import Geometry
 
 from .interface import FIELD_TYPE
 
 
 class Feature:
-    def __init__(self, layer=None, id=None, fields=None, geom=None, box=None, calculations=None):
+    def __init__(self, layer=None, id=None, version=None, fields=None, geom=UNSET, box=None):
         self._layer = layer
-
         self._id = int(id) if id is not None else None
-
+        self._version = version
         self._geom = geom
         self._box = box
-
         self._fields = dict(fields) if fields is not None else dict()
-
-        self._calculations = dict(calculations) if calculations else dict()
 
     @property
     def layer(self):
         return self._layer
 
     @property
-    def id(self):
+    def id(self) -> Optional[int]:
         return self._id
 
     @id.setter
-    def id(self, value):
-        if self._id is not None:
+    def id(self, value: Optional[int]):
+        if self._id is not None and self._id != int(value):
             raise ValueError("Existing feature ID can't be changed.")
         self._id = value
 
     @property
-    def label(self):
+    def version(self) -> Optional[int]:
+        return self._version
+
+    @property
+    def label(self) -> Optional[str]:
         if self._layer and self._layer.feature_label_field:
             # If object is linked to a layer and naming field is set for a layer
             # use it for naming.
@@ -50,19 +56,15 @@ class Feature:
         return self.label
 
     @property
-    def fields(self):
+    def fields(self) -> Dict[str, Union[None, int, bool, float, str, date, time, datetime]]:
         return self._fields
 
     @property
-    def calculations(self):
-        return self._calculations
-
-    @property
-    def geom(self):
+    def geom(self) -> Union[Geometry, None, UnsetType]:
         return self._geom
 
     @geom.setter
-    def geom(self, value):
+    def geom(self, value: Union[Geometry, None, UnsetType]):
         self._geom = value
 
     @property

@@ -2,7 +2,7 @@ from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
 
-from nextgisweb.env import Base, _
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Transformer
 
@@ -12,7 +12,7 @@ from nextgisweb.resource import DataStructureScope, Resource, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.spatial_ref_sys import SRS
 
-from .interface import FIELD_TYPE, FIELD_TYPE_OGR
+from .interface import FIELD_TYPE, FIELD_TYPE_OGR, IVersionableFeatureLayer
 
 Base.depends_on("resource", "lookup_table")
 
@@ -160,7 +160,7 @@ class _fields_attr(SP):
                 try:
                     mfld = fldmap.pop(fldid)  # update
                 except KeyError:
-                    raise ValidationError(_("Field not found (ID=%d)." % fldid))
+                    raise ValidationError(gettext("Field not found (ID=%d)." % fldid))
 
                 if fld.get("delete", False):
                     obj.field_delete(mfld)  # delete
@@ -171,7 +171,7 @@ class _fields_attr(SP):
             if "keyname" in fld:
                 if fld["keyname"] in FIELD_FORBIDDEN_NAME:
                     raise ValidationError(
-                        message=_(
+                        message=gettext(
                             "Field name is forbidden: '{}'. Please remove or " "rename it."
                         ).format(fld["keyname"])
                     )
@@ -215,6 +215,31 @@ class _fields_attr(SP):
         obj.fields.reorder()
 
 
+class _fversioning_attr(SP):
+    def getter(self, srlzr):
+        obj = srlzr.obj
+        if not IVersionableFeatureLayer.providedBy(obj):
+            return None
+
+        enabled = bool(obj.fversioning)
+        result = dict(enabled=enabled)
+        if enabled:
+            result["epoch"] = obj.fversioning.epoch
+            result["latest"] = obj.fversioning.latest
+
+        return result
+
+    def setter(self, srlzr, value):
+        obj = srlzr.obj
+
+        if (not IVersionableFeatureLayer.providedBy(obj)) and value is not None:
+            raise ValidationError(message=gettext("Versioning not supported"))
+
+        if (enabled := value.get("enabled", None)) is not None:
+            if enabled != bool(obj.fversioning):
+                obj.fversioning_configure(enabled=enabled)
+
+
 P_DSS_READ = DataStructureScope.read
 P_DSS_WRITE = DataStructureScope.write
 
@@ -224,6 +249,7 @@ class FeatureLayerSerializer(Serializer):
     resclass = LayerFieldsMixin
 
     fields = _fields_attr(read=P_DSS_READ, write=P_DSS_WRITE)
+    versioning = _fversioning_attr(read=P_DSS_READ, write=P_DSS_WRITE)
 
 
 class FeatureQueryIntersectsMixin:

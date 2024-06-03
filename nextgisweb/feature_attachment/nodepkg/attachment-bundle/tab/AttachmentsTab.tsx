@@ -276,7 +276,7 @@ const fetchFeaturesAttachments = async (
                 signal,
                 intersects: geomWKT,
                 fields: [],
-                extensions: "attachment",
+                extensions: ["attachment"],
                 label: true,
             })
         );
