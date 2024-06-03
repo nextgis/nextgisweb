@@ -7,6 +7,8 @@ Changes
 - Per-webmap measurement SRS configuration.
 - Exclusive layers groups on webmaps.
 - Extent information in PostGIS layer diagnostics.
+- Switch to nearest neighbor resampling for raster pyramids.
+- Show feature attachment descriptions in the viewer.
 
 
 4.7.0
