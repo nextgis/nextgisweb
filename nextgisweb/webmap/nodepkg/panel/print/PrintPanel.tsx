@@ -152,6 +152,9 @@ const defaultPanelMapSettings: PrintMapSettings = {
     scale: undefined,
     scaleLine: false,
     scaleValue: false,
+    legend: false,
+    arrow: false,
+    title: undefined,
 };
 
 const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
@@ -440,7 +443,7 @@ export const PrintPanel = ({
         if (!printMapEl) {
             return;
         }
-        const [viewport] = printMapEl.getElementsByClassName("ol-viewport");
+        const [viewport] = printMapEl.getElementsByClassName("print-olmap");
         runExport({
             format,
             element: viewport as HTMLElement,
@@ -524,6 +527,33 @@ export const PrintPanel = ({
             </section>
 
             <section>
+                <h5 className="heading">{gettext("Elements")}</h5>
+                <div className="input-group">
+                    <Switch
+                        checked={mapSettings.legend}
+                        onChange={(v) => updateMapSettings({ legend: v })}
+                    />
+                    <span className="checkbox__label">{gettext("Legend")}</span>
+                </div>
+                <div className="input-group">
+                    <Switch
+                        checked={mapSettings.title}
+                        onChange={(v) => updateMapSettings({ title: v })}
+                    />
+                    <span className="checkbox__label">{gettext("Title")}</span>
+                </div>
+                <div className="input-group">
+                    <Switch
+                        checked={mapSettings.arrow}
+                        onChange={(v) => updateMapSettings({ arrow: v })}
+                    />
+                    <span className="checkbox__label">
+                        {gettext("North Arrow")}
+                    </span>
+                </div>
+            </section>
+
+            <section>
                 <h5 className="heading">{gettext("Scale")}</h5>
                 <div className="input-group">
                     <Switch
@@ -552,7 +582,9 @@ export const PrintPanel = ({
                         onChange={(v) => updateMapSettings({ scale: v })}
                     />
                 </div>
+            </section>
 
+            <section>
                 <div className="actions">
                     <Space.Compact>
                         <Button

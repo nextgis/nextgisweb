@@ -1,8 +1,8 @@
 /// <reference types="dojo/dijit" />
 
 import type Feature from "ol/Feature";
-import type { Options } from "ol/control/Control";
 import type { Control as OlControl } from "ol/control";
+import type { Options } from "ol/control/Control";
 
 import type WebmapStore from "../store";
 

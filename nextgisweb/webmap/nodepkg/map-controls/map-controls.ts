@@ -29,7 +29,7 @@ import { ToolsInfo, buildTools, getToolsInfo } from "./map-tools";
 import type { ControlInfo, ControlReady } from "./type";
 import { getControlsInfo } from "./utils";
 
-const getLabel = (glyph: string): HTMLElement => {
+export const getLabel = (glyph: string): HTMLElement => {
     const labelEl = document.createElement("span");
     labelEl.innerHTML = html({ glyph });
     labelEl.classList.add("ol-control__icon");

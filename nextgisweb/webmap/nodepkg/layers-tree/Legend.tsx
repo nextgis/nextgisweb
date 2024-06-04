@@ -10,11 +10,12 @@ import "./Legend.less";
 interface LegendProps {
     nodeData: TreeItem;
     store: WebmapStore;
+    checkable: boolean;
 }
 
 const { useToken } = theme;
 
-export function Legend({ nodeData, store }: LegendProps) {
+export function Legend({ nodeData, store, checkable }: LegendProps) {
     const { token } = useToken();
 
     const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;
@@ -22,8 +23,9 @@ export function Legend({ nodeData, store }: LegendProps) {
         return <></>;
     }
 
+    const blockClassName = checkable ? "checkable" : "uncheckable";
     return (
-        <div className="legend-block">
+        <div className={`legend-block ${blockClassName}`}>
             <ConfigProvider
                 theme={{
                     components: {
@@ -39,28 +41,31 @@ export function Legend({ nodeData, store }: LegendProps) {
                     const id = nodeData.id;
                     const symbols = store._legendSymbols[id];
                     const render = (symbols && symbols[s.index]) ?? s.render;
+
+                    let checkbox;
+                    if (checkable) {
+                        checkbox = (
+                            <Checkbox
+                                defaultChecked={render}
+                                onChange={(e) => {
+                                    store.setLayerLegendSymbol(
+                                        id,
+                                        s.index,
+                                        e.target.checked
+                                    );
+                                }}
+                                onClick={(evt) => evt.stopPropagation()}
+                            />
+                        );
+                    }
+
                     return (
                         <div
                             key={idx}
                             className="legend-symbol"
                             title={s.display_name}
                         >
-                            {s.render !== null ? (
-                                <Checkbox
-                                    style={{ width: "16px" }}
-                                    defaultChecked={render}
-                                    onChange={(e) => {
-                                        store.setLayerLegendSymbol(
-                                            id,
-                                            s.index,
-                                            e.target.checked
-                                        );
-                                    }}
-                                    onClick={(evt) => evt.stopPropagation()}
-                                />
-                            ) : (
-                                <div style={{ width: "16px" }} />
-                            )}
+                            {checkbox}
                             <img
                                 width={20}
                                 height={20}

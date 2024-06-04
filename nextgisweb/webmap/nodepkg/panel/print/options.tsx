@@ -107,4 +107,7 @@ export const urlPrintParams: UrlPrintParams<PrintMapSettings> = {
         },
         setting: "center",
     },
+    print_arrow: { fromParam: (v) => v === "true", setting: "arrow" },
+    print_title: { fromParam: (v) => v === "true", setting: "title" },
+    print_legend: { fromParam: (v) => v === "true", setting: "legend" },
 };
