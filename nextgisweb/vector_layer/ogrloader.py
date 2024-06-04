@@ -558,7 +558,7 @@ class OGRLoader:
 
         # Set sequence next value
         if fid_fget:
-            max_fid = connection.scalar(sa.text(f"SELECT MAX(id) FROM {tab_sn}"))
+            max_fid = connection.scalar(sa.text(f"SELECT COALESCE(MAX(id), 0) FROM {tab_sn}"))
             sql_alter_seq = f"ALTER SEQUENCE {seq_sn} RESTART WITH {max_fid + 1}"
             connection.execute(sa.text(sql_alter_seq))
 
