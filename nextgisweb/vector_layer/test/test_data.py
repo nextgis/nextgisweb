@@ -1,28 +1,19 @@
 from datetime import date, datetime, time
-from pathlib import Path
 
 import pytest
-import webtest
 from osgeo import ogr, osr
-
-from nextgisweb.env import DBSession
-from nextgisweb.lib.ogrhelper import read_dataset
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import FIELD_TYPE
 
 from .. import VectorLayer
-from ..table_info import ERROR_LIMIT
-from ..util import ERROR_FIX, FID_SOURCE
+from ..ogrloader import ERROR_LIMIT, FID_SOURCE, FIX_ERRORS
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
-
-DATA_PATH = Path(__file__).parent / "data"
 
 
 def test_from_fields(ngw_txn):
     res = VectorLayer(geometry_type="POINT")
-
     res.setup_from_fields(
         [
             dict(keyname="integer", datatype=FIELD_TYPE.INTEGER),
@@ -39,8 +30,6 @@ def test_from_fields(ngw_txn):
 
     assert res.feature_label_field.keyname == "string"
 
-    DBSession.flush()
-
 
 @pytest.mark.parametrize(
     "filename",
@@ -50,11 +39,8 @@ def test_from_fields(ngw_txn):
         "layer.geojson",
     ),
 )
-def test_from_ogr(filename, ngw_txn):
-    res = VectorLayer().persist().from_ogr(DATA_PATH / filename)
-
-    DBSession.flush()
-
+def test_from_ogr(filename, ngw_txn, ngw_data_path):
+    res = VectorLayer().persist().from_ogr(ngw_data_path / filename)
     features = list(res.feature_query()())
     assert len(features) == 1
 
@@ -81,16 +67,9 @@ def test_from_ogr(filename, ngw_txn):
         "layer-lon-lat.xlsx",
     ),
 )
-def test_from_csv_xlsx(filename, ngw_txn):
-    dsource = read_dataset(DATA_PATH / filename, source_filename=filename)
-    layer = dsource.GetLayer(0)
-
+def test_from_csv_xlsx(filename, ngw_txn, ngw_data_path):
     res = VectorLayer().persist()
-
-    res.setup_from_ogr(layer)
-    res.load_from_ogr(layer)
-
-    DBSession.flush()
+    res.from_source(ngw_data_path / filename, source_filename=filename)
 
     features = list(res.feature_query()())
     assert len(features) == 1
@@ -110,12 +89,9 @@ def test_from_csv_xlsx(filename, ngw_txn):
     )
 
 
-def test_type_geojson(ngw_txn):
-    src = DATA_PATH / "type.geojson"
-
+def test_type_geojson(ngw_txn, ngw_data_path):
+    src = ngw_data_path / "type.geojson"
     res = VectorLayer().persist().from_ogr(src)
-
-    DBSession.flush()
 
     def field_as(f, n, t):
         fidx = f.GetFieldIndex(n)
@@ -155,28 +131,24 @@ def test_type_geojson(ngw_txn):
         ("AUTO", ["not_exists"], 1),
     ),
 )
-def test_fid(fid_source, fid_field, id_expect, ngw_txn):
-    src = DATA_PATH / "type.geojson"
-
-    dataset = ogr.Open(str(src))
-    layer = dataset.GetLayer(0)
-
-    res = VectorLayer().persist()
-
-    res.setup_from_ogr(layer, fid_params=dict(fid_source=fid_source, fid_field=fid_field))
-    res.load_from_ogr(layer)
-
-    DBSession.flush()
+def test_fid(fid_source, fid_field, id_expect, ngw_txn, ngw_data_path):
+    res = (
+        VectorLayer()
+        .persist()
+        .from_source(
+            ngw_data_path / "type.geojson",
+            fid_source=fid_source,
+            fid_field=fid_field,
+        )
+    )
 
     query = res.feature_query()
     query.filter_by(id=id_expect)
     assert query().total_count == 1
 
 
-def test_multi_layers(ngw_webtest_app):
-    src = DATA_PATH / "two-layers.zip"
-    resp = ngw_webtest_app.post("/api/component/file_upload/", dict(file=webtest.Upload(str(src))))
-    upload_meta = resp.json["upload_meta"][0]
+def test_source_layer(ngw_webtest_app, ngw_resource_group_sub, ngw_file_upload, ngw_data_path):
+    upload_meta = ngw_file_upload(ngw_data_path / "two-layers.zip")
 
     resp = ngw_webtest_app.post_json(
         "/api/component/vector_layer/inspect",
@@ -185,14 +157,16 @@ def test_multi_layers(ngw_webtest_app):
     )
 
     layers = resp.json["layers"]
-    assert len(layers) == 2
-    assert "layer1" in layers
-    assert "layer2" in layers
+    assert layers == ["layer1", "layer2"]
 
     resp = ngw_webtest_app.post_json(
         "/api/resource/",
         dict(
-            resource=dict(cls="vector_layer", display_name="test two layers", parent=dict(id=0)),
+            resource=dict(
+                cls="vector_layer",
+                display_name="test two layers",
+                parent=dict(id=ngw_resource_group_sub),
+            ),
             vector_layer=dict(
                 source=upload_meta,
                 source_layer="layer1",
@@ -204,13 +178,72 @@ def test_multi_layers(ngw_webtest_app):
         status=201,
     )
 
-    layer_id = resp.json["id"]
+    layer_url = f"/api/resource/{resp.json['id']}"
+    second = ngw_webtest_app.get(f"{layer_url}/feature/2", status=200).json
+    assert second["fields"] == dict(name_point="Point two")
 
-    resp = ngw_webtest_app.get("/api/resource/%d/feature/2" % layer_id, status=200)
-    feature = resp.json
-    assert feature["fields"] == dict(name_point="Point two")
+    resp = ngw_webtest_app.put_json(
+        layer_url,
+        dict(vector_layer=dict(delete_all_features=True)),
+        status=200,
+    )
 
-    ngw_webtest_app.delete("/api/resource/%d" % layer_id)
+    ngw_webtest_app.get(f"{layer_url}/feature/2", status=404)
+
+
+def test_geometry_type_change(
+    ngw_webtest_app,
+    ngw_resource_group_sub,
+    ngw_file_upload,
+    ngw_data_path,
+):
+    upload_meta = ngw_file_upload(ngw_data_path / "pointz.geojson")
+
+    resp = ngw_webtest_app.post_json(
+        "/api/resource/",
+        dict(
+            resource=dict(
+                cls="vector_layer",
+                display_name="test_geometry_type_change",
+                parent=dict(id=ngw_resource_group_sub),
+            ),
+            vector_layer=dict(
+                source=upload_meta,
+                srs=dict(id=3857),
+            ),
+        ),
+        status=201,
+    )
+
+    url = f"/api/resource/{resp.json['id']}"
+    assert ngw_webtest_app.get(url).json["vector_layer"]["geometry_type"] == "POINTZ"
+    ngw_webtest_app.put_json(url, dict(vector_layer=dict(geometry_type="LINESTRINGZ")), status=422)
+    ngw_webtest_app.put_json(url, dict(vector_layer=dict(geometry_type="MULTIPOINT")), status=200)
+
+
+def test_replace_file(ngw_webtest_app, ngw_resource_group_sub, ngw_file_upload, ngw_data_path):
+    pointz_geojson = ngw_file_upload(ngw_data_path / "pointz.geojson")
+    type_geojson = ngw_file_upload(ngw_data_path / "type.geojson")
+
+    resp = ngw_webtest_app.post_json(
+        "/api/resource/",
+        dict(
+            resource=dict(
+                cls="vector_layer",
+                display_name="test_replace_file",
+                parent=dict(id=ngw_resource_group_sub),
+            ),
+            vector_layer=dict(
+                source=pointz_geojson,
+                srs=dict(id=3857),
+            ),
+        ),
+        status=201,
+    )
+
+    url = f"/api/resource/{resp.json['id']}"
+    ngw_webtest_app.put_json(url, dict(vector_layer=dict(source=type_geojson)))
+    assert ngw_webtest_app.get(url).json["vector_layer"]["geometry_type"] == "POINT"
 
 
 def test_error_limit():
@@ -234,32 +267,24 @@ def test_error_limit():
             feature.SetGeometry(ogr.CreateGeometryFromWkt("POINT (0 0)"))
         layer.CreateFeature(feature)
 
-    res.setup_from_ogr(layer)
-
-    opts = dict(fix_errors=ERROR_FIX.NONE, skip_other_geometry_types=False)
+    opts = dict(fix_errors=FIX_ERRORS.NONE, skip_other_geometry_types=False)
     with pytest.raises(ValidationError) as excinfo:
-        res.load_from_ogr(layer, **opts, skip_errors=False)
+        res.from_source(layer, **opts, skip_errors=False)
     assert excinfo.value.detail is not None
 
-    res.load_from_ogr(layer, **opts, skip_errors=True)
+    res.from_source(layer, **opts, skip_errors=True)
 
-    DBSession.flush()
     assert res.feature_query()().total_count == some
 
 
-def test_geom_field():
+def test_geom_field(ngw_data_path):
     res = VectorLayer().persist()
-
-    src = DATA_PATH / "geom-fld.geojson"
-    ds = ogr.Open(str(src))
-    layer = ds.GetLayer(0)
+    src = ngw_data_path / "geom-fld.geojson"
 
     with pytest.raises(ValidationError):
-        res.setup_from_ogr(layer)
-    res.setup_from_ogr(layer, fix_errors=ERROR_FIX.SAFE)
-    res.load_from_ogr(layer)
+        res.from_source(src)
 
-    DBSession.flush()
+    res.from_source(src, fix_errors=FIX_ERRORS.SAFE)
 
     query = res.feature_query()
     feature = query().one()
@@ -275,20 +300,15 @@ def test_geom_field():
         "id-empty",
     ),
 )
-def test_id_field(data):
+def test_id_field(data, ngw_data_path):
     res = VectorLayer().persist()
-
-    src = DATA_PATH / f"{data}.geojson"
-    ds = ogr.Open(str(src))
-    layer = ds.GetLayer(0)
+    src = ngw_data_path / f"{data}.geojson"
 
     fid_params = dict(fid_source=FID_SOURCE.FIELD, fid_field=["id"])
     with pytest.raises(ValidationError):
-        res.setup_from_ogr(layer, fid_params=fid_params)
-    res.setup_from_ogr(layer, fix_errors=ERROR_FIX.SAFE, fid_params=fid_params)
-    res.load_from_ogr(layer)
+        res.from_source(src, **fid_params)
 
-    DBSession.flush()
+    res.from_source(src, fix_errors=FIX_ERRORS.SAFE, **fid_params)
 
     query = res.feature_query()
     feature = query().one()

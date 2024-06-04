@@ -1,12 +1,10 @@
-from pathlib import Path
+import itertools
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
 import pytest
 import transaction
-import webtest
 
-from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.json import dumpb
 
@@ -17,18 +15,11 @@ from .. import FeatureAttachment
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
-DATA_PATH = Path(__file__).parent / "data"
-
 
 @pytest.fixture(scope="module")
 def layer_id():
     with transaction.manager:
         res = VectorLayer(geometry_type="POINT").persist()
-
-        res.setup_from_fields([])
-
-        DBSession.flush()
-
         for _ in range(3):
             f = Feature()
             f.geom = Geometry.from_wkt("POINT (0 0)")
@@ -37,7 +28,7 @@ def layer_id():
     yield res.id
 
 
-def generate_archive(files, webapp):
+def generate_archive(files, uploader):
     with NamedTemporaryFile() as f:
         with ZipFile(f, "w") as z:
             for i in files:
@@ -47,10 +38,8 @@ def generate_archive(files, webapp):
                 else:
                     content = b"0" * i["size"]
                 z.writestr(i["name"], content)
-        upload_meta = webapp.post(
-            "/api/component/file_upload/", dict(file=webtest.Upload(f.name))
-        ).json["upload_meta"][0]
-    return upload_meta
+
+        return uploader(f.name)
 
 
 @pytest.fixture
@@ -137,8 +126,8 @@ def clear(layer_id):
         ),
     ),
 )
-def test_import(files, result, layer_id, clear, ngw_webtest_app):
-    upload_meta = generate_archive(files, ngw_webtest_app)
+def test_import(files, result, layer_id, clear, ngw_file_upload, ngw_webtest_app):
+    upload_meta = generate_archive(files, ngw_file_upload)
 
     status = 422 if result.get("error") else 200
     resp = ngw_webtest_app.put_json(
@@ -175,13 +164,13 @@ def test_import(files, result, layer_id, clear, ngw_webtest_app):
     assert import_result["imported"] == imported
 
 
-def test_import_multiple(layer_id, ngw_webtest_app):
+def test_import_multiple(layer_id, ngw_file_upload, ngw_webtest_app):
     files = (
         dict(name="00001/test_A", content="AAA"),
         dict(name="00001/test_B", content="BBB"),
         dict(name="00002/test_C", content="AAA"),
     )
-    upload_meta = generate_archive(files, ngw_webtest_app)
+    upload_meta = generate_archive(files, ngw_file_upload)
     resp = ngw_webtest_app.put_json(
         f"/api/resource/{layer_id}/feature_attachment/import",
         dict(source=upload_meta),
@@ -228,7 +217,7 @@ def test_import_multiple(layer_id, ngw_webtest_app):
             ),
         ),
     )
-    upload_meta = generate_archive(files, ngw_webtest_app)
+    upload_meta = generate_archive(files, ngw_file_upload)
     resp = ngw_webtest_app.put_json(
         f"/api/resource/{layer_id}/feature_attachment/import",
         dict(source=upload_meta),
@@ -239,13 +228,13 @@ def test_import_multiple(layer_id, ngw_webtest_app):
 
 # name = '{feature_id}/{file_name}'
 # TODO: Update whenever the structure of file_meta changes; add images without xmp meta
-def test_import_image(layer_id, clear, ngw_webtest_app):
-    file_path = DATA_PATH / "panorama-image.jpg"
+def test_import_image(layer_id, clear, ngw_file_upload, ngw_webtest_app, ngw_data_path):
+    file_path = ngw_data_path / "panorama-image.jpg"
     with open(file_path, mode="rb") as f:
         files = [
             dict(name="00003/image", content=f.read())
         ]  # fails to work as a tuple for whatever reason
-        upload_meta = generate_archive(files, ngw_webtest_app)
+        upload_meta = generate_archive(files, ngw_file_upload)
         resp = ngw_webtest_app.put_json(
             f"/api/resource/{layer_id}/feature_attachment/import",
             dict(source=upload_meta),
@@ -259,3 +248,150 @@ def test_import_image(layer_id, clear, ngw_webtest_app):
                 "timestamp": "2020-02-21T20:33:54",
                 "panorama": {"ProjectionType": "equirectangular"},
             }
+
+
+@pytest.fixture(scope="module")
+def foo_jpg(ngw_file_upload, ngw_data_path):
+    yield dict(ngw_file_upload(ngw_data_path / "panorama-image.jpg"), name="foo.jpg")
+
+
+@pytest.mark.parametrize(
+    "versioning",
+    [
+        pytest.param(False, id="fversioning_disabled"),
+        pytest.param(True, id="fversioning_enabled"),
+    ],
+)
+def test_feature_layer_and_feature_attachment_api(versioning, foo_jpg, ngw_webtest_app):
+    web = ngw_webtest_app
+    vcur = itertools.count(start=1)
+
+    with transaction.manager:
+        res = VectorLayer(geometry_type="POINTZ").persist()
+        res.fversioning_configure(enabled=versioning)
+
+        vup = next(vcur)
+        for i in (1, 2, 3):
+            feat = Feature()
+            feat.geom = Geometry.from_wkt(f"POINT Z ({i} {i} {vup})")
+            res.feature_create(feat)
+        res.fversioning_close(raise_if_not_enabled=False)
+
+    burl = f"/api/resource/{res.id}/feature"
+    curl = f"/api/resource/{res.id}/feature/"
+
+    vup = next(vcur)
+    exts = [dict(file_upload=foo_jpg)]
+    payload = dict(geom=f"POINT Z (1 1 {vup})", extensions=dict(attachment=exts))
+    resp = web.put_json(f"{burl}/1", payload).json
+    assert not versioning or resp["version"] == vup
+
+    resp_fa = web.get(f"{burl}/1?extensions=attachment").json["extensions"]["attachment"]
+    assert len(resp_fa) == 1
+    fa_data = resp_fa[0]
+    assert fa_data["size"] == foo_jpg["size"]
+    assert fa_data["name"] == foo_jpg["name"]
+    assert fa_data["mime_type"] == foo_jpg["mime_type"]
+    assert fa_data["is_image"] is True
+    assert isinstance(fa_data["file_meta"], dict)
+    fa_id = fa_data["id"]
+
+    # Compare to feature attachment API
+    resp_ext_api = web.get(f"{burl}/1/attachment/").json
+    assert resp_ext_api == resp_ext_api
+
+    if versioning:
+        # Shouldn't update anything
+        exts = [dict(id=fa_id)]
+        payload = dict(extensions=dict(attachment=exts))
+        resp = web.put_json(f"{burl}/1", payload).json
+        assert "version" not in resp
+
+        # Should not exist in a previous version.
+        resp_fa = web.get(f"{burl}/1?version={vup - 1}&extensions=attachment")
+        resp_fa = resp_fa.json["extensions"]["attachment"]
+        assert resp_fa is None
+
+        # Request the current version and compare.
+        resp_fa = web.get(f"{burl}/1?version={vup}&extensions=attachment")
+        resp_fa = resp_fa.json["extensions"]["attachment"]
+        assert len(resp_fa) == 1
+        fa_data = resp_fa[0]
+        assert fa_data["version"] == vup
+        assert fa_data["name"] == foo_jpg["name"]
+        assert fa_data["mime_type"] == foo_jpg["mime_type"]
+
+    # Rename, should update version
+    vup = next(vcur)
+    exts = [dict(id=fa_id, name="bar.jpg")]
+    payload = dict(extensions=dict(attachment=exts))
+    resp = web.put_json(f"{burl}/1", payload).json
+    assert not versioning or resp["version"] == vup
+
+    # Check renaming result
+    resp_fa = web.get(f"{burl}/1?extensions=attachment").json["extensions"]["attachment"]
+    assert len(resp_fa) == 1
+    fa_data = resp_fa[0]
+    assert fa_data["name"] == "bar.jpg"
+
+    if versioning:
+        # Check name in the previous version
+        resp_fa = web.get(f"{burl}/1?version={vup - 1}&extensions=attachment")
+        resp_fa = resp_fa.json["extensions"]["attachment"]
+        assert len(resp_fa) == 1
+        fa_data = resp_fa[0]
+        assert fa_data["name"] == "foo.jpg"
+
+    # Delete all attachments the first feature
+    payload = dict(extensions=dict(attachment=[]))
+    resp = web.put_json(f"{burl}/1", payload).json
+    assert not versioning or resp["version"] == next(vcur)
+
+    # Check for deletion
+    resp_fa = web.get(f"{burl}/1?extensions=attachment").json["extensions"]["attachment"]
+    assert resp_fa is None
+
+    # Compare to FA API
+    resp_ext_api = web.post_json(f"{burl}/2/attachment/", dict(file_upload=foo_jpg)).json
+    assert not versioning or resp_ext_api["version"] == next(vcur)
+    assert versioning or "version" not in resp_ext_api
+
+    vup = next(vcur)
+    exts = dict(extensions=dict(attachment=[dict(file_upload=foo_jpg)]))
+    payload = [dict(id=2, **exts), dict(id=3, **exts), dict(geom=f"POINT Z (4 4 {vup})", **exts)]
+    resp = web.patch_json(curl, payload).json
+    for id, feat in zip((2, 3, 4), resp):
+        assert feat["id"] == id
+        assert not versioning or feat["version"] == vup
+
+    # Insert a new feature with an attachment
+    vup = next(vcur)
+    payload = dict(geom=f"POINT Z (5 5 {vup})", **exts)
+    resp = web.post_json(curl, payload).json
+    resp = web.get(f"{curl}?extensions=attachment").json
+    assert len(resp) == 5
+
+    for i, data in enumerate(resp, start=1):
+        assert data["id"] == i
+        assert data["geom"].startswith(f"POINT Z ({i} {i}")
+        fa_ext = data["extensions"]["attachment"]
+        if i == 1:
+            assert fa_ext is None
+            continue
+
+        assert len(fa_ext) == 1
+        fa_data = fa_ext[0]
+        assert fa_data["size"] == foo_jpg["size"]
+        assert fa_data["name"] == foo_jpg["name"]
+        assert fa_data["mime_type"] == foo_jpg["mime_type"]
+        assert fa_data["is_image"] is True
+        assert isinstance(fa_data["file_meta"], dict)
+
+        if i == 2:
+            # Compare to FA API
+            aid = fa_data["id"]
+            resp_ext_api = web.get(f"{burl}/2/attachment/{aid}").json
+            assert resp_ext_api == fa_data
+
+            # Delete via FA API
+            web.delete(f"{burl}/2/attachment/{aid}")

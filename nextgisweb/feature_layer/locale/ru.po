@@ -1,6 +1,6 @@
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
 #: amd/ngw-feature-layer/FieldsWidget.js:149 nodepkg/attribute-editor/index.ts:7
-#: view.py:213
+#: view.py:226
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -44,7 +44,7 @@ msgstr "АН"
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
-#: amd/ngw-feature-layer/FieldsWidget.js:197 view.py:47
+#: amd/ngw-feature-layer/FieldsWidget.js:197 view.py:60
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -64,23 +64,15 @@ msgstr "Удалить"
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: api.py:53 api.py:125
-msgid "Geometry format '%s' is not supported."
-msgstr "Формат геометрии '%s' не поддерживается."
-
-#: api.py:55
+#: api.py:89
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:61 api.py:130
-msgid "Date format '%s' is not supported."
-msgstr "Формат даты '%s' не поддерживается."
-
-#: api.py:251
+#: api.py:338
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:356 api_export.py:121
+#: api.py:411 api_export.py:121
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -116,6 +108,14 @@ msgstr "Объект с id = %d не найден в ресурсе с id = %d."
 msgid "The feature may have been deleted or an error in the address."
 msgstr "Объект мог быть удалён, либо допущена ошибка в адресе."
 
+#: exception.py:20
+msgid "Feature not deleted"
+msgstr "Объект не удален"
+
+#: exception.py:21
+msgid "Unable to restore the #{} feature as it is not deleted."
+msgstr "Невозможно восстановить объект #{} поскольку он не удален."
+
 #: model.py:163
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
@@ -124,55 +124,59 @@ msgstr "Поле не найдено (ID=%d)."
 msgid "Field name is forbidden: '{}'. Please remove or rename it."
 msgstr "Недопустимое имя поля: '{}'. Пожалуйста, удалите или переименуйте его."
 
-#: nodepkg/attribute-editor/AttributeEditor.tsx:48
+#: model.py:242
+msgid "Versioning not supported"
+msgstr "Версионирование не поддерживается"
+
+#: nodepkg/attribute-editor/AttributeEditor.tsx:32
 msgid "Set field value to NULL (No data)"
 msgstr "Установить для атрибута значение NULL (Нет данных)"
 
-#: nodepkg/attribute-editor/AttributeEditor.tsx:49
+#: nodepkg/attribute-editor/AttributeEditor.tsx:33
 msgid "There are no attributes in the vector layer"
 msgstr "В векторном слое нет атрибутов"
 
-#: nodepkg/export-form/ExportForm.tsx:165
+#: nodepkg/export-form/ExportForm.tsx:177
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/export-form/ExportForm.tsx:186
+#: nodepkg/export-form/ExportForm.tsx:199
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.tsx:196
+#: nodepkg/export-form/ExportForm.tsx:212
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.tsx:202
+#: nodepkg/export-form/ExportForm.tsx:217
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: nodepkg/export-form/ExportForm.tsx:212
+#: nodepkg/export-form/ExportForm.tsx:231
 msgid "FID field"
 msgstr "Поле FID"
 
-#: nodepkg/export-form/ExportForm.tsx:216
+#: nodepkg/export-form/ExportForm.tsx:235
 msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
-#: nodepkg/export-form/ExportForm.tsx:221
+#: nodepkg/export-form/ExportForm.tsx:241
 msgid "Fields"
 msgstr "Поля"
 
-#: nodepkg/export-form/ExportForm.tsx:229
+#: nodepkg/export-form/ExportForm.tsx:247
 msgid "Limit by extent"
 msgstr "Ограничить охватом"
 
-#: nodepkg/export-form/ExportForm.tsx:234
+#: nodepkg/export-form/ExportForm.tsx:253
 msgid "Filter text"
 msgstr "Текстовый фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:238
+#: nodepkg/export-form/ExportForm.tsx:257
 msgid "Zip archive"
 msgstr "Zip архив"
 
-#: nodepkg/export-form/ExportForm.tsx:275
+#: nodepkg/export-form/ExportForm.tsx:300
 #: nodepkg/feature-editor/FeatureEditorWidget.tsx:34
 msgid "Save"
 msgstr "Сохранить"
@@ -225,11 +229,11 @@ msgstr "Загрузка..."
 msgid "Reset"
 msgstr "Сбросить"
 
-#: nodepkg/feature-grid/FeatureGrid.tsx:25
+#: nodepkg/feature-grid/FeatureGrid.tsx:24
 msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
 
-#: nodepkg/feature-grid/FeatureGrid.tsx:26
+#: nodepkg/feature-grid/FeatureGrid.tsx:25
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
@@ -253,8 +257,8 @@ msgstr "Редактировать на новой странице"
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:108 view.py:119
-#: view.py:208
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:121 view.py:132
+#: view.py:221
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -310,7 +314,15 @@ msgstr "Охват (xMax)"
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
-#: template/resource_section_fields.mako:21 view.py:197
+#: nodepkg/settings-widget/SettingsWidget.js:17
+msgid "Enable feature versioning"
+msgstr "Включить версионирование объектов"
+
+#: nodepkg/settings-widget/SettingsWidget.js:23
+msgid "Settings"
+msgstr "Настройки"
+
+#: template/resource_section_fields.mako:21 view.py:210
 msgid "Table"
 msgstr "Таблица"
 
@@ -324,15 +336,55 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-#: view.py:69 view.py:86
+#: transaction/exception.py:7
+msgid "Transaction not found"
+msgstr "Транзакция не найдена"
+
+#: transaction/exception.py:12
+msgid "Operation conflict in transaction"
+msgstr "Конфликт операций в транзакции"
+
+#: transaction/exception.py:20
+msgid "Transaction not committed"
+msgstr "Транзакция не зафиксирована"
+
+#: versioning/exception.py:17
+msgid "Feature versioning required"
+msgstr "Требуется версионирование объектов"
+
+#: versioning/exception.py:22
+msgid "Feature versioning is not supported for this resource."
+msgstr "Версионирование объектов не поддерживается для этого ресурса."
+
+#: versioning/exception.py:24
+msgid "Feature versioning is not enabled for this resource."
+msgstr "Версионирование объектов не включено для этого ресурса."
+
+#: versioning/exception.py:31
+msgid "Epoch required"
+msgstr "Требуется эпоха"
+
+#: versioning/exception.py:35
+msgid "Epoch mismatch"
+msgstr "Несооответствие эпох"
+
+#: versioning/exception.py:45
+msgid "Version out of range"
+msgstr "Версия за пределами диапазона"
+
+#: versioning/exception.py:55
+msgid "Invalid range"
+msgstr "Некорректный диапазон"
+
+#: view.py:82 view.py:99
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:127
+#: view.py:140
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:128
+#: view.py:141
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
@@ -340,7 +392,7 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: view.py:191
+#: view.py:204
 msgid "Features"
 msgstr "Объекты"
 

@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
+from msgspec import UNSET
 from osgeo import ogr
 from pyramid.request import Request
 from shapely.geometry import box
@@ -22,6 +23,7 @@ from nextgisweb.lib.ows import (
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import FIELD_TYPE, GEOM_TYPE, Feature
+from nextgisweb.feature_layer.api import versioning
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.resource import DataScope
 from nextgisweb.spatial_ref_sys import SRS
@@ -1044,7 +1046,8 @@ class WFSHandler:
                 id_attr = ns_attr("gml", "id", self.p_version) if self.p_version >= v110 else "fid"
                 __feature = El(layer.keyname, {id_attr: feature_id}, parent=__member)
 
-                if feature.geom is not None:
+                # TODO: Can we handle NULL geometries here?
+                if (geom := feature.geom) and geom is not None and geom is not UNSET:
                     geom = feature.geom.ogr
                     geom.AssignSpatialReference(osr_out)
 
@@ -1206,8 +1209,10 @@ class WFSHandler:
                     else:
                         feature.fields[fld_keyname] = _property.text
 
-                fid = feature_layer.feature_create(feature)
-                fid_str = fid_encode(fid, keyname)
+                # TODO: Aggregate transcactions
+                with versioning(feature_layer, self.request):
+                    fid = feature_layer.feature_create(feature)
+                    fid_str = fid_encode(fid, keyname)
 
                 _insert = El(
                     "InsertResult" if self.p_version == v100 else "InsertResults",
@@ -1275,15 +1280,19 @@ class WFSHandler:
                                 value = _value.text
                             feature.fields[fld_keyname] = value
 
-                    feature_layer.feature_put(feature)
+                    # TODO: Aggregate transcactions
+                    with versioning(feature_layer, self.request):
+                        feature_layer.feature_put(feature)
 
                     if show_summary:
                         summary["totalUpdated"] += 1
                 elif operation_tag == "Delete":
-                    for fid in fids:
-                        feature_layer.feature_delete(fid)
-                    if show_summary:
-                        summary["totalDeleted"] += 1
+                    # TODO: Aggregate transcactions
+                    with versioning(feature_layer, self.request):
+                        for fid in fids:
+                            feature_layer.feature_delete(fid)
+                        if show_summary:
+                            summary["totalDeleted"] += 1
                 else:
                     raise ValidationError("Unknown operation: %s" % operation_tag)
 

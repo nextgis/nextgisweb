@@ -1,14 +1,17 @@
 import re
-import uuid
+from functools import partial
+from itertools import chain
+from pathlib import Path
 
-import geoalchemy2 as ga
+from msgspec import UNSET
 from osgeo import gdal, ogr
-from shapely.geometry import box
-from sqlalchemy import event, func, inspect, sql
+from sqlalchemy import event, func, inspect, text
+from sqlalchemy.orm import validates
 from zope.interface import implementer
+from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import COMP_ID, Base, DBSession, _, env
-from nextgisweb.lib import db
+from nextgisweb.lib import db, saext
 
 from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import (
@@ -20,8 +23,15 @@ from nextgisweb.feature_layer import (
     IWritableFeatureLayer,
     LayerField,
     LayerFieldsMixin,
-    on_data_change,
-    query_feature_or_not_found,
+)
+from nextgisweb.feature_layer.exception import FeatureNotFound, RestoreNotDeleted
+from nextgisweb.feature_layer.versioning import (
+    FeatureCreate,
+    FeatureDelete,
+    FeatureUpdate,
+    FVersioningMixin,
+    OperationFieldValue,
+    fversioning_guard,
 )
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
@@ -32,17 +42,10 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from .feature_query import FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
-from .table_info import TableInfo
-from .util import (
-    DRIVERS,
-    ERROR_FIX,
-    FID_SOURCE,
-    FIELD_TYPE_2_DB,
-    FIELD_TYPE_SIZE,
-    SCHEMA,
-    TOGGLE,
-    read_dataset_vector,
-)
+from .ogrloader import FID_SOURCE, FIX_ERRORS, TOGGLE, LoaderParams, OGRLoader
+from .table_info import TableInfo  # noqa: F401
+from .util import DRIVERS, FIELD_TYPE_2_DB, FIELD_TYPE_SIZE, SCHEMA, read_dataset_vector, uuid_hex
+from .vlschema import VLSchema
 
 Base.depends_on("resource", "feature_layer")
 
@@ -62,18 +65,6 @@ GEOM_TYPE_DISPLAY = (
 )
 
 
-skip_errors_default = False
-
-geom_cast_params_default = dict(
-    geometry_type=TOGGLE.AUTO,
-    is_multi=TOGGLE.AUTO,
-    has_z=TOGGLE.AUTO,
-)
-
-
-fid_params_default = dict(fid_source=FID_SOURCE.SEQUENCE, fid_field=[])
-
-
 class VectorLayerField(Base, LayerField):
     identity = "vector_layer"
 
@@ -83,6 +74,32 @@ class VectorLayerField(Base, LayerField):
     id = db.Column(db.ForeignKey(LayerField.id), primary_key=True)
     fld_uuid = db.Column(db.Unicode(32), nullable=False)
 
+    def __init__(self, *args, **kwagrs):
+        if "fld_uuid" not in kwagrs:
+            kwagrs["fld_uuid"] = uuid_hex()
+        super().__init__(*args, **kwagrs)
+
+
+def vlschema_autoflush(func):
+    def wrapped(*args, **kwargs):
+        _vlschema_autoflush(args[0])
+        return func(*args, **kwargs)
+
+    return wrapped
+
+
+def _vlschema_autoflush(res):
+    insp = inspect(res)
+    session = insp.session
+    if session._flushing:
+        return
+
+    assert session, f"{res} not in a session"
+    assert res not in session.deleted, f"{res} is deleted"
+    if insp.pending or session.is_modified(res):
+        assert session.autoflush
+        session.flush()
+
 
 @implementer(
     IFeatureLayer,
@@ -91,7 +108,7 @@ class VectorLayerField(Base, LayerField):
     IWritableFeatureLayer,
     IBboxLayer,
 )
-class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
+class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixin):
     identity = "vector_layer"
     cls_display_name = _("Vector layer")
 
@@ -104,70 +121,12 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     def __init__(self, *args, **kwagrs):
         if "tbl_uuid" not in kwagrs:
-            kwagrs["tbl_uuid"] = uuid.uuid4().hex
+            kwagrs["tbl_uuid"] = uuid_hex()
         super().__init__(*args, **kwagrs)
 
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
-
-    @property
-    def _tablename(self):
-        return "layer_%s" % self.tbl_uuid
-
-    def _drop_table(self, connection):
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
-        tableinfo.metadata.drop_all(bind=connection)
-
-    def from_ogr(self, filename, *, layername=None):
-        ds = read_dataset_vector(filename)
-        layer = ds.GetLayerByName(layername) if layername is not None else ds.GetLayer(0)
-        with DBSession.no_autoflush:
-            self.setup_from_ogr(layer)
-            self.load_from_ogr(layer, validate=False)
-        return self
-
-    def setup_from_ogr(
-        self,
-        ogrlayer,
-        skip_other_geometry_types=False,
-        fid_params=fid_params_default,
-        geom_cast_params=geom_cast_params_default,
-        fix_errors=ERROR_FIX.default,
-    ):
-        tableinfo = TableInfo.from_ogrlayer(
-            ogrlayer, self.srs, skip_other_geometry_types, fid_params, geom_cast_params, fix_errors
-        )
-        tableinfo.setup_layer(self)
-
-        tableinfo.setup_metadata(self._tablename)
-        tableinfo.metadata.create_all(bind=DBSession.connection())
-
-        self.tableinfo = tableinfo
-
-    def setup_from_fields(self, fields):
-        tableinfo = TableInfo.from_fields(fields, self.srs, self.geometry_type)
-        tableinfo.setup_layer(self)
-
-        tableinfo.setup_metadata(self._tablename)
-        tableinfo.metadata.create_all(bind=DBSession.connection())
-
-        self.tableinfo = tableinfo
-
-    def load_from_ogr(
-        self,
-        ogrlayer,
-        skip_other_geometry_types=False,
-        fix_errors=ERROR_FIX.default,
-        skip_errors=skip_errors_default,
-        validate=True,
-    ):
-        size = self.tableinfo.load_from_ogr(
-            ogrlayer, skip_other_geometry_types, fix_errors, skip_errors, validate
-        )
-
-        env.core.reserve_storage(COMP_ID, VectorLayerData, value_data_volume=size, resource=self)
 
     def get_info(self):
         return super().get_info() + (
@@ -175,9 +134,141 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             (_("Feature count"), self.feature_query()().total_count),
         )
 
+    @property
+    def _tablename(self):
+        return "layer_%s" % self.tbl_uuid
+
+    def from_source(self, source, *, layer=UNSET, **kw):
+        lparams = LoaderParams()
+        for k in list(kw.keys()):
+            if hasattr(lparams, k):
+                setattr(lparams, k, kw.pop(k))
+
+        if isinstance(source, Path):
+            source = str(source)
+
+        if isinstance(source, str):
+            source = read_dataset_vector(source, **kw)
+        else:
+            assert len(kw) == 0, f"Unconsumed arguments: {kw}"
+
+        if isinstance(source, gdal.Dataset):
+            # Keep reference against GC
+            dataset_ref = source
+            source = (
+                source.GetLayerByName(layer)
+                if isinstance(layer, str)
+                else source.GetLayer(0 if layer is UNSET else layer)
+            )
+        else:
+            dataset_ref = None
+            assert layer is UNSET
+
+        loader = OGRLoader(source, params=lparams).scan()
+        self.geometry_type = loader.geometry_type
+        self.fields[:] = [
+            VectorLayerField(
+                keyname=lf.name,
+                datatype=lf.datatype,
+                display_name=lf.name,
+            )
+            for lf in loader.fields.values()
+        ]
+
+        session = inspect(self).session
+        session.flush()
+
+        vls = self.vlschema()
+        columns = {lf.idx: vls.ctab.fields[lf.name].name for lf in loader.fields.values()}
+
+        size = loader.write(
+            srs=self.srs,
+            schema=vls.ctab.schema,
+            table=vls.ctab.name,
+            sequence=vls.cseq.name,
+            columns=columns,
+            connection=session,
+        )
+
+        if self.fversioning:
+            session.execute(vls.dml_initfill())
+
+        env.core.reserve_storage(
+            COMP_ID,
+            VectorLayerData,
+            value_data_volume=size,
+            resource=self,
+        )
+
+        # Keep reference against GC
+        if dataset_ref:
+            pass
+
+        return self
+
+    def from_ogr(self, *args, **kw):
+        return self.from_source(*args, validate=False, **kw)
+
+    def setup_from_fields(self, fields):
+        assert len(self.fields) == 0
+        keynames = set()
+        display_names = set()
+        for fdata in fields:
+            keyname = fdata.get("keyname")
+            display_name = fdata.get("display_name", keyname)
+            field = VectorLayerField(
+                keyname=keyname,
+                datatype=fdata.get("datatype"),
+                display_name=display_name,
+                grid_visibility=fdata.get("grid_visibility", True),
+            )
+
+            if keyname in keynames:
+                raise VE(message="Field keyname (%s) is not unique." % keyname)
+            if display_name in display_names:
+                raise VE(message="Field display_name (%s) is not unique." % display_name)
+            keynames.add(keyname)
+            display_names.add(display_name)
+
+            if fdata.get("label_field"):
+                self.feature_label_field = field
+
+            self.fields.append(field)
+
+    def vlschema(
+        self,
+        *,
+        tbl_uuid=None,
+        fversioning_enabled=None,
+        geometry_type=None,
+        fields=None,
+    ) -> VLSchema:
+        if tbl_uuid is None:
+            tbl_uuid = self.tbl_uuid
+        if fversioning_enabled is None:
+            fversioning_enabled = bool(self.fversioning)
+        if geometry_type is None:
+            geometry_type = self.geometry_type
+        if fields is None:
+            fields = {
+                fld.keyname: (
+                    fld.fld_uuid,
+                    FIELD_TYPE_2_DB[fld.datatype],
+                )
+                for fld in self.fields
+            }
+
+        return VLSchema(
+            tbl_uuid=tbl_uuid,
+            versioning=fversioning_enabled,
+            geom_column_type=self._geom_column_type(geometry_type),
+            fields=fields,
+        )
+
     # IFeatureLayer
 
     @property
+    @vlschema_autoflush
     def feature_query(self):
         srs_supported_ = [row[0] for row in DBSession.query(SRS.id).all()]
 
@@ -197,236 +288,365 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     # IFieldEditableFeatureLayer
 
     def field_create(self, datatype):
-        uid = uuid.uuid4().hex
-        column = db.Column("fld_" + uid, FIELD_TYPE_2_DB[datatype])
-
-        connection = inspect(self).session.connection()
-        dialect = connection.engine.dialect
-        connection.execute(
-            db.text(
-                "ALTER TABLE {}.{} ADD COLUMN {} {}".format(
-                    SCHEMA,
-                    self._tablename,
-                    column.name,
-                    column.type.compile(dialect),
-                )
-            )
-        )
-
-        return VectorLayerField(datatype=datatype, fld_uuid=uid)
+        return VectorLayerField(datatype=datatype)
 
     def field_delete(self, field):
-        column_name = "fld_" + field.fld_uuid
         DBSession.delete(field)
-
-        connection = inspect(self).session.connection()
-        connection.execute(
-            db.text(
-                "ALTER TABLE {}.{} DROP COLUMN {}".format(
-                    SCHEMA,
-                    self._tablename,
-                    column_name,
-                )
-            )
-        )
 
     # IGeometryEditableFeatureLayer
 
+    @vlschema_autoflush
     def geometry_type_change(self, geometry_type):
+        if self.fversioning:
+            raise NotImplementedError
+
         if self.geometry_type == geometry_type:
             return
 
-        for cls in (GEOM_TYPE.points, GEOM_TYPE.linestrings, GEOM_TYPE.polygons):
-            if self.geometry_type in cls:
-                geom_cls = cls
-                break
-
-        if geometry_type not in geom_cls:
+        regexp = re.compile(r"(?:MULTI)?(POINT|LINESTRING|POLYGON)(?:Z)?")
+        base_type = lambda v: regexp.sub(r"\g<1>", v)
+        if base_type(geometry_type) != base_type(self.geometry_type):
             raise VE(
                 message="Can't convert {0} geometry type to {1}.".format(
                     self.geometry_type, geometry_type
                 )
             )
 
-        is_multi_1 = self.geometry_type in GEOM_TYPE.is_multi
-        is_multi_2 = geometry_type in GEOM_TYPE.is_multi
-        has_z_1 = self.geometry_type in GEOM_TYPE.has_z
-        has_z_2 = geometry_type in GEOM_TYPE.has_z
-
-        column_geom = db.Column("geom")
-        column_type_new = ga.types.Geometry(geometry_type=geometry_type, srid=self.srs_id)
-
-        expr = column_geom
-
-        if is_multi_1 and not is_multi_2:  # Multi -> single
-            expr = func.ST_GeometryN(expr, 1)
-        elif not is_multi_1 and is_multi_2:  # Single -> multi
-            expr = func.ST_Multi(expr)
-
-        if has_z_1 and not has_z_2:  # Z -> not Z
-            expr = func.ST_Force2D(expr)
-        elif not has_z_1 and has_z_2:  # not Z -> Z
-            expr = func.ST_Force3D(expr)
-
-        text = db.text(
-            "ALTER TABLE {}.{} ALTER COLUMN {} TYPE {} USING {}".format(
-                SCHEMA,
-                self._tablename,
-                column_geom,
-                column_type_new,
-                expr.compile(compile_kwargs=dict(literal_binds=True)),
-            )
-        )
-        connection = inspect(self).session.connection()
-        connection.execute(text)
-
         self.geometry_type = geometry_type
 
     # IWritableFeatureLayer
 
-    def feature_put(self, feature):
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
-
-        obj = tableinfo.model(id=feature.id)
-        for f in tableinfo.fields:
-            if f.keyname in feature.fields:
-                setattr(obj, f.key, feature.fields[f.keyname])
-
-        # FIXME: Don't try to write geometry if it exists.
-        # This will not let to write empty geometry, but it is not needed yet.
-
-        if feature.geom is not None:
-            obj.geom = ga.elements.WKBElement(bytearray(feature.geom.wkb), srid=self.srs_id)
-
-        DBSession.merge(obj)
-
-        on_data_change.fire(self, feature.geom)
-        # TODO: Old geom version
-
+    @vlschema_autoflush
+    @fversioning_guard
     def feature_create(self, feature):
-        """Insert new object to DB which is described in feature
+        vls = self.vlschema()
+        session = inspect(self).session
 
-        :param feature: object description
-        :type feature:  Feature
+        data = dict()
+        query, bmap = vls.dml_insert(fields=feature.fields.keys())
 
-        :return:    inserted object ID
-        """
+        geom = feature.geom
+        data["geom"] = geom.wkb if geom not in (None, UNSET) else None
 
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
+        for f in self.fields:
+            if (v := feature.fields.get(f.keyname, UNSET)) is not UNSET:
+                data[bmap[f.keyname]] = v
 
-        obj = tableinfo.model()
-        for f in tableinfo.fields:
-            if f.keyname in feature.fields.keys():
-                setattr(obj, f.key, feature.fields[f.keyname])
+        if vobj := self.fversioning_vobj:
+            data["vid"] = vobj.version_id
 
-        obj.geom = ga.elements.WKBElement(bytearray(feature.geom.wkb), srid=self.srs_id)
+        fid = session.scalar(query, data)
+        assert fid is not None
 
-        shape = feature.geom.shape
-        geom_type = shape.geom_type.upper()
-        if shape.has_z:
-            geom_type += "Z"
-        if geom_type != self.geometry_type:
-            raise VE(
-                _("Geometry type (%s) does not match geometry column type (%s).")
-                % (geom_type, self.geometry_type)
-            )
+        if vobj:
+            vobj.mark_changed()
+        mark_changed(session)
+        return fid
 
-        DBSession.add(obj)
-        DBSession.flush()
-        DBSession.refresh(obj)
+    @vlschema_autoflush
+    @fversioning_guard
+    def feature_put(self, feature):
+        vls = self.vlschema()
+        session = inspect(self).session
 
-        on_data_change.fire(self, feature.geom)
+        data = dict()
+        with_geom = False
+        if (geom := feature.geom) is not UNSET:
+            data["geom"] = geom.wkb if geom else None
+            with_geom = True
 
-        return obj.id
+        query, bmap = vls.dml_update(
+            id=feature.id,
+            with_geom=with_geom,
+            fields=feature.fields.keys(),
+        )
 
+        for f in self.fields:
+            if (v := feature.fields.get(f.keyname, UNSET)) is not UNSET:
+                data[bmap[f.keyname]] = v
+
+        if vobj := self.fversioning_vobj:
+            data["vid"] = vobj.version_id
+
+        result = session.execute(query, data)
+        if result.rowcount:
+            if vobj:
+                vobj.mark_changed()
+            mark_changed(session)
+            return True
+
+        return False
+
+    @vlschema_autoflush
+    @fversioning_guard
     def feature_delete(self, feature_id):
-        """Remove record with id
+        vls = self.vlschema()
+        session = inspect(self).session
+        query = vls.dml_delete(filter_by=dict(fid=feature_id))
 
-        :param feature_id: record id
-        :type feature_id:  int or bigint
-        """
+        if vobj := self.fversioning_vobj:
+            result = session.execute(query, dict(vid=vobj.version_id))
+            row_count = result.rowcount
+            if row_count > 0:
+                vobj.mark_features_deleted(feature_id)
+        else:
+            row_count = session.execute(query).rowcount
 
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
+        if row_count == 0:
+            raise FeatureNotFound(self.id, feature_id)
+        mark_changed(session)
 
-        query = self.feature_query()
-        query.geom()
-        feature = query_feature_or_not_found(query, self.id, feature_id)
-        obj = DBSession.query(tableinfo.model).filter_by(id=feature.id).one()
-        DBSession.delete(obj)
+    @vlschema_autoflush
+    @fversioning_guard
+    def feature_restore(self, feature_id):
+        vls = self.vlschema()
+        session = inspect(self).session
+        query = vls.dml_restore()
 
-        on_data_change.fire(self, feature.geom)
+        vobj = self.fversioning_vobj
+        assert vobj is not None
 
+        qres = session.execute(query, dict(p_fid=feature_id, p_vid=vobj.version_id))
+        if qres.rowcount > 0:
+            vobj.mark_features_restored(feature_id)
+        else:
+            raise RestoreNotDeleted(self.id, feature_id)
+
+        mark_changed(session)
+
+    @vlschema_autoflush
+    @fversioning_guard
     def feature_delete_all(self):
-        """Remove all records from a layer"""
+        vls = self.vlschema()
+        session = inspect(self).session
+        query = vls.dml_delete(filter_by={})
 
-        tableinfo = TableInfo.from_layer(self)
-        tableinfo.setup_metadata(self._tablename)
+        if vobj := self.fversioning_vobj:
+            result = session.execute(query, dict(vid=vobj.version_id))
+            if result.rowcount > 0:
+                vobj.mark_features_deleted(all=True)
+        else:
+            result = session.execute(query)
 
-        DBSession.query(tableinfo.model).delete()
-
-        geom = box(self.srs.minx, self.srs.miny, self.srs.maxx, self.srs.maxy)
-        on_data_change.fire(self, geom)
+        if result.rowcount > 0:
+            mark_changed(session)
 
     # IBboxLayer implementation:
+
     @property
+    @vlschema_autoflush
     def extent(self):
-        return calculate_extent(self)
+        ctab = self.vlschema(fields={}).ctab
+        return calculate_extent(ctab.columns.geom)
 
+    # Versioning
 
-def estimate_vector_layer_data(resource):
-    tableinfo = TableInfo.from_layer(resource)
-    tableinfo.setup_metadata(resource._tablename)
-    table = tableinfo.table
+    def fversioning_changed_fids(self):
+        yield from self.vlschema().query_changed_fids()
 
-    static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]  # ID field size
-    string_columns = []
-    for f in tableinfo.fields:
-        if f.datatype == FIELD_TYPE.STRING:
-            string_columns.append(f.key)
-        else:
-            static_size += FIELD_TYPE_SIZE[f.datatype]
+    def fversioning_changes(self, *, initial, target, fid_min, fid_max):
+        initial = initial or 0
 
-    size_columns = [
-        func.length(func.ST_AsBinary(table.columns.geom)),
-    ]
-    for key in string_columns:
-        size_columns.append(func.coalesce(func.octet_length(table.columns[key]), 0))
+        fields = {fld.id: (fld.fld_uuid, FIELD_TYPE_2_DB[fld.datatype]) for fld in self.fields}
 
-    columns = [
-        func.count(1),
-    ] + [func.coalesce(func.sum(c), 0) for c in size_columns]
+        query, fmap = self.vlschema(fields=fields).query_changes()
+        result = DBSession.execute(
+            query,
+            dict(
+                p_initial=initial,
+                p_target=target,
+                p_fid_min=fid_min,
+                p_fid_max=fid_max,
+            ),
+        )
 
-    query = sql.select(*columns)
-    row = DBSession.connection().execute(query).fetchone()
+        geom_col_offset = 4
+        for row in result:
+            fid, vid, op, bits, geom = row[: geom_col_offset + 1]
+            if op == "D":
+                yield FeatureDelete(fid=fid, vid=vid)
+            elif op == "C":
+                yield FeatureCreate(
+                    fid=fid,
+                    vid=vid,
+                    geom=geom if geom is not None else UNSET,
+                    fields=[
+                        OperationFieldValue(id, row[geom_col_offset + idx])
+                        for id, idx in fmap.items()
+                        if row[geom_col_offset + idx] is not None
+                    ],
+                )
+            elif op == "U":
+                yield FeatureUpdate(
+                    fid=fid,
+                    vid=vid,
+                    geom=geom if geom is not None else UNSET,
+                    fields=[
+                        OperationFieldValue(id, row[geom_col_offset + idx])
+                        for id, idx in fmap.items()
+                        if bits[idx] == "1"
+                    ],
+                )
+            else:
+                raise NotImplementedError
 
-    num_features = row[0]
-    dynamic_size = sum(row[1:])
-    size = static_size * num_features + dynamic_size
+    # Internals
 
-    return size
+    def _vlschema_wipe(self):
+        self.fields[:] = []
+        self.tbl_uuid = uuid_hex()
+
+    @validates("tbl_uuid")
+    def _tbl_uuid_validate(self, key, value):
+        assert self.tbl_uuid is None or self.fields == []
+        return value
+
+    def _geom_column_type(self, geometry_type=None):
+        geometry_type = geometry_type if geometry_type else self.geometry_type
+        return saext.Geometry(geometry_type, self.srs.id)
 
 
 # Create vector_layer schema on table creation
 event.listen(
-    VectorLayer.__table__, "after_create", db.DDL("CREATE SCHEMA %s" % SCHEMA), propagate=True
+    VectorLayer.__table__,
+    "after_create",
+    db.DDL(f"CREATE SCHEMA {SCHEMA}"),
+    propagate=True,
 )
 
 # Drop vector_layer schema on table creation
 event.listen(
     VectorLayer.__table__,
     "after_drop",
-    db.DDL("DROP SCHEMA IF EXISTS %s CASCADE" % SCHEMA),
+    db.DDL(f"DROP SCHEMA IF EXISTS {SCHEMA} CASCADE"),
     propagate=True,
 )
 
 
-# Drop data table on vector layer deletion
-@event.listens_for(VectorLayer, "before_delete")
-def drop_verctor_layer_table(mapper, connection, target):
-    target._drop_table(connection)
+class VectorLayerSession:
+    @classmethod
+    def listen(cls, session):
+        event.listen(session, "before_flush", cls.before_flush)
+
+    @classmethod
+    def before_flush(cls, session, flush_context, instances):
+        exec = partial(_execute_multiple, session=session)
+
+        deleted = set()
+        for obj in session.deleted:
+            if isinstance(obj, VectorLayer):
+                # TODO: Consider changing of tbl_uuid
+                exec(obj.vlschema(fields={}).sql_drop())
+                deleted.add(obj)
+
+        for obj in session:
+            if isinstance(obj, VectorLayer) and obj not in deleted:
+                insp = inspect(obj)
+                if insp.pending:
+                    exec(obj.vlschema().sql_create())
+                else:
+                    cls.handle_changed(obj, insp, exec, session)
+
+    @classmethod
+    def handle_changed(cls, obj, insp, exec, session):
+        attrs = {"tbl_uuid", "fversioning", "geometry_type", "fields"}
+        if insp.unloaded.issuperset(attrs):
+            return
+
+        achanges, fadd, fdel = dict(), None, None
+        iattrs = insp.attrs
+        for attr in attrs:
+            a, u, d = getattr(iattrs, attr).history
+            if not a and not d:
+                continue
+            if attr == "fields":
+                fadd, fdel = a, d
+            elif attr == "fversioning":
+                achanges[attr] = (bool(d) and (bool(d[0])), bool(a) and bool(a[0]))
+            else:
+                assert a and d
+                achanges[attr] = (d[0], a[0])
+        if not achanges and not fadd and not fdel:
+            return
+
+        if len(achanges) > 1:
+            raise NotImplementedError(f"Too many operations: {achanges}")
+
+        wiped = False
+        if tu := achanges.pop("tbl_uuid", None):
+            if obj.fversioning:
+                raise NotImplementedError
+            vls = obj.vlschema(tbl_uuid=tu[0])
+            exec(vls.sql_drop())
+            exec(obj.vlschema().sql_create())
+            wiped = True
+
+        elif vm := achanges.pop("fversioning", None):
+            fversioning_enabled = vm[1]
+            vls = obj.vlschema()
+            if fversioning_enabled:
+                exec(vls.sql_versioning_enable())
+            else:
+                exec(vls.sql_versioning_disable())
+
+        elif gt := achanges.pop("geometry_type", None):
+            if obj.fversioning:
+                raise NotImplementedError
+            exec(
+                obj.vlschema(
+                    geometry_type=gt[0],
+                    fields={},
+                ).sql_convert_geom_column_type(
+                    obj._geom_column_type(gt[1]),
+                )
+            )
+
+        assert len(achanges) == 0, f"Unconsumed: {achanges}"
+
+        if (fadd or fdel) and not wiped:
+            # Collect deleted and added fields to construct VLSchema instance.
+            # The 'delete' key goes first as it's better to delete then add new
+            # columns.
+            fields, operations = dict(), dict(delete=[], add=[])
+            for fidx, (fld, oper) in enumerate(
+                chain(
+                    [(i, "add") for i in (fadd if fadd else [])],
+                    [(i, "delete") for i in (fdel if fdel else [])],
+                )
+            ):
+                fields[fidx] = (fld.fld_uuid, FIELD_TYPE_2_DB[fld.datatype])
+                operations[oper].append(fidx)
+
+            if fields:
+                vls = obj.vlschema(fields=fields)
+                for oper, fidxs in operations.items():
+                    if len(fidxs) > 0:
+                        exec(getattr(vls, f"sql_{oper}_fields")(fidxs))
+
+
+def _execute_multiple(queries, *, session):
+    for q in queries:
+        session.execute(q)
+
+
+VectorLayerSession.listen(DBSession)
+
+
+def estimate_vector_layer_data(resource):
+    ctab = resource.vlschema().ctab
+
+    def fnull(expr):
+        return func.coalesce(expr, text("0"))
+
+    fixed = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]  # ID field size
+    dynamic = fnull(func.length(func.ST_AsBinary(ctab.c.geom)))
+    for f in resource.fields:
+        if f.datatype == FIELD_TYPE.STRING:
+            dynamic += fnull(func.octet_length(ctab.fields[f.keyname]))
+        else:
+            fixed += FIELD_TYPE_SIZE[f.datatype]
+
+    return inspect(resource).session.scalar(func.sum(dynamic + fixed))
 
 
 class _source_attr(SP):
@@ -467,16 +687,7 @@ class _source_attr(SP):
 
         return ogrlayer
 
-    def _setup_layer(
-        self,
-        obj,
-        ogrlayer,
-        skip_other_geometry_types,
-        fix_errors,
-        skip_errors,
-        geom_cast_params,
-        fid_params,
-    ):
+    def _setup_layer(self, obj, ogrlayer, **kw):
         try:
             # Apparently OGR_XLSX_HEADERS is taken into account during the GetSpatialRef call
             gdal.SetConfigOption("OGR_XLSX_HEADERS", "FORCE")
@@ -485,72 +696,66 @@ class _source_attr(SP):
         finally:
             gdal.SetConfigOption("OGR_XLSX_HEADERS", None)
 
-        with DBSession.no_autoflush:
-            obj.setup_from_ogr(
-                ogrlayer, skip_other_geometry_types, fid_params, geom_cast_params, fix_errors
-            )
-            obj.load_from_ogr(ogrlayer, skip_other_geometry_types, fix_errors, skip_errors)
+        obj.from_source(ogrlayer, **kw)
 
     def setter(self, srlzr, value):
         if srlzr.obj.id is not None:
-            srlzr.obj._drop_table(DBSession.connection())
-            srlzr.obj.tbl_uuid = uuid.uuid4().hex
+            srlzr.obj._vlschema_wipe()
+            inspect(srlzr.obj).session.flush()
 
         fupload = FileUpload(id=value["id"])
         ogrds = self._ogrds(str(fupload.data_path), source_filename=fupload.name)
 
         layer_name = srlzr.data.get("source_layer")
         ogrlayer = self._ogrlayer(ogrds, layer_name=layer_name)
+        kwargs = dict()
 
-        skip_other_geometry_types = srlzr.data.get("skip_other_geometry_types")
+        if (val := srlzr.data.get("skip_other_geometry_types", UNSET)) is not UNSET:
+            kwargs["skip_other_geometry_types"] = bool(val)
 
-        fix_errors = srlzr.data.get("fix_errors", ERROR_FIX.default)
-        if fix_errors not in ERROR_FIX.enum:
-            raise VE(message=_("Unknown 'fix_errors' value."))
+        if (val := srlzr.data.get("fix_errors", UNSET)) is not UNSET:
+            if val not in FIX_ERRORS.enum:
+                raise VE(message=_("Unknown 'fix_errors' value."))
+            kwargs["fix_errors"] = val
 
-        skip_errors = srlzr.data.get("skip_errors", skip_errors_default)
+        if (val := srlzr.data.get("skip_errors", UNSET)) is not UNSET:
+            kwargs["skip_errors"] = bool(val)
 
-        geometry_type = srlzr.data.get(
-            "cast_geometry_type", geom_cast_params_default["geometry_type"]
-        )
-        if geometry_type not in (None, "POINT", "LINESTRING", "POLYGON"):
-            raise VE(message=_("Unknown 'cast_geometry_type' value."))
+        if (val := srlzr.data.get("cast_geometry_type", UNSET)) is not UNSET:
+            if val not in (None, "POINT", "LINESTRING", "POLYGON"):
+                raise VE(message=_("Unknown 'cast_geometry_type' value."))
+            kwargs["cast_geometry_type"] = val
 
-        is_multi = srlzr.data.get("cast_is_multi", geom_cast_params_default["is_multi"])
-        if is_multi not in TOGGLE.enum:
-            raise VE(message=_("Unknown 'cast_is_multi' value."))
+        if (val := srlzr.data.get("cast_is_multi", UNSET)) is not UNSET:
+            if val not in TOGGLE.enum:
+                raise VE(message=_("Unknown 'cast_is_multi' value."))
+            kwargs["cast_is_multi"] = val
 
-        has_z = srlzr.data.get("cast_has_z", geom_cast_params_default["has_z"])
-        if has_z not in TOGGLE.enum:
-            raise VE(message=_("Unknown 'cast_has_z' value."))
+        if (val := srlzr.data.get("cast_has_z", UNSET)) is not UNSET:
+            if val not in TOGGLE.enum:
+                raise VE(message=_("Unknown 'cast_has_z' value."))
+            kwargs["cast_has_z"] = val
 
-        geom_cast_params = dict(geometry_type=geometry_type, is_multi=is_multi, has_z=has_z)
+        if (val := srlzr.data.get("fid_source", UNSET)) is not UNSET:
+            if val not in FID_SOURCE.enum:
+                raise VE(message=_("Unknown 'fid_source' value."))
+            kwargs["fid_source"] = val
 
-        fid_source = srlzr.data.get("fid_source", fid_params_default["fid_source"])
-        fid_field_param = srlzr.data.get("fid_field")
-        fid_field = (
-            fid_params_default["fid_field"]
-            if fid_field_param is None
-            else re.split(r"\s*,\s*", fid_field_param)
-        )
-
-        fid_params = dict(fid_source=fid_source, fid_field=fid_field)
+        if (val := srlzr.data.get("fid_field", UNSET)) is not UNSET:
+            if isinstance(val, str):
+                val = re.split(r"\s*,\s*", val)
+            kwargs["fid_field"] = val
 
         self._setup_layer(
             srlzr.obj,
             ogrlayer,
-            skip_other_geometry_types,
-            fix_errors,
-            skip_errors,
-            geom_cast_params,
-            fid_params,
+            **kwargs,
         )
 
 
 class _fields_attr(SP):
     def setter(self, srlzr, value):
-        with DBSession.no_autoflush:
-            srlzr.obj.setup_from_fields(value)
+        srlzr.obj.setup_from_fields(value)
 
 
 class _geometry_type_attr(SP):
