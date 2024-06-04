@@ -9,6 +9,7 @@ Changes
 - Extent information in PostGIS layer diagnostics.
 - Switch to nearest neighbor resampling for raster pyramids.
 - Show feature attachment descriptions in the viewer.
+- Support for upper-case placeholders in TMS connections.
 
 
 4.7.0
