@@ -11,6 +11,7 @@ declare const ngwConfig: {
     userId: number;
     userDisplayName: string;
     invitationSession: boolean;
+    resourceHome: { id: number } | null;
     locale: string;
     logoutUrl: string;
     // Defined in @nextgisweb/jsrealm/locale-loader

@@ -18,7 +18,7 @@ msgstr "Сохранить"
 #: amd/ngw-resource/CompositeWidget.js:110
 #: nodepkg/children-section/component/MenuDropdown.tsx:209
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/delete-page/DeletePage.tsx:61 view.py:413
+#: nodepkg/delete-page/DeletePage.tsx:61 view.py:415
 msgid "Delete"
 msgstr "Удалить"
 
@@ -74,10 +74,6 @@ msgstr "Необходимо указать класс ресурса."
 #: api.py:202
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
-
-#: api.py:207
-msgid "Resource class '%s' disabled."
-msgstr "Класс ресурса '%s' отключен."
 
 #: api.py:303
 msgid "Permission not found"
@@ -136,20 +132,28 @@ msgid "Hierarchy error"
 msgstr "Ошибка иерархии"
 
 #: exception.py:58
+msgid "Resource class '%s' disabled."
+msgstr "Класс ресурса '%s' отключен."
+
+#: exception.py:67
 msgid "Quota exceeded"
 msgstr "Превышена квота"
 
-#: exception.py:64
+#: exception.py:73
 msgid "Maximum number of resources exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов. Лимит %s."
 
-#: exception.py:66
+#: exception.py:75
 msgid "Not enough resource quota: {0} required, but only {1} available."
 msgstr "Превышена квота на количество ресурсов: {0} запрошено, доступно {1}."
 
-#: exception.py:70
+#: exception.py:79
 msgid "Resource type - {}."
 msgstr "Тип ресурса - {}."
+
+#: home.py:23
+msgid "User resources"
+msgstr "Пользовательские ресурсы"
 
 #: model.py:264
 msgid "Resource can not be a parent himself."
@@ -163,19 +167,19 @@ msgstr "Ключ ресурса не уникален."
 msgid "Default style"
 msgstr "Стиль по умолчанию"
 
-#: model.py:419
+#: model.py:425
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:426
+#: model.py:432
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:432
+#: model.py:438
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:507
+#: model.py:513
 msgid ""
 "Unable to revoke '{s}: {p}' permission for '{u}' as the user belongs to the "
 "administrators group. Administrators must always have ability to configure "
@@ -185,7 +189,7 @@ msgstr ""
 "относится к группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для ресурсов."
 
-#: model.py:617
+#: model.py:613
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -386,7 +390,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:358
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:360
 msgid "Action"
 msgstr "Действие"
 
@@ -511,39 +515,39 @@ msgstr "У этого ресурса нет описания."
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:122 view.py:422
+#: view.py:124 view.py:424
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:134 view.py:429
+#: view.py:136 view.py:431
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:179 view.py:357
+#: view.py:181 view.py:359
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:190
+#: view.py:192
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
-#: view.py:202
+#: view.py:204
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:259 view.py:442
+#: view.py:261 view.py:444
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:283
+#: view.py:285
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:359
+#: view.py:361
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:400
+#: view.py:402
 msgid "Update"
 msgstr "Изменить"
 

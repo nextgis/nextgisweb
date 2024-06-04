@@ -98,6 +98,11 @@ class ResourceComponent(Component):
 
             obj.persist()
 
+        if self.options["home.enabled"]:
+            from . import home
+
+            home.parent_group(True)
+
     @require("auth")
     def setup_pyramid(self, config):
         from . import api, view
@@ -136,5 +141,8 @@ class ResourceComponent(Component):
         Option("quota.limit", int, default=None),
         Option("quota.resource_cls", list, default=None),
         Option("quota.resource_by_cls"),
+        Option("home.enabled", bool, default=False),
+        Option("home.keyname", str, default="resource_home"),
+        Option("home.groups", list, default=[]),
     )
     # fmt: on

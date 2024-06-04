@@ -1,4 +1,7 @@
-<%! from nextgisweb.auth.policy import AuthProvider %>
+<%!
+    from nextgisweb.auth.policy import AuthProvider
+    from nextgisweb.resource.home import user_group
+%>
 
 <%
     distr_opts = request.env.options.with_prefix('distribution')
@@ -21,6 +24,11 @@
         else:
             invitation_session = False
 
+        if request.env.resource.options["home.enabled"]:
+            resource_home = user_group(user, create=False)
+        else:
+            resource_home = None
+
     except Exception:
         # Something like InvalidCredentials
         is_administrator = False
@@ -29,6 +37,7 @@
         user_id = None
         user_display_name = None
         invitation_session = False
+        resource_home = None
 
     ngwConfig = {
         "components": list(request.env.components.keys()),
@@ -46,6 +55,7 @@
         "userId": user_id,
         "userDisplayName": user_display_name,
         "invitationSession": invitation_session,
+        "resourceHome": dict(id=resource_home.id) if resource_home else None,
         "locale": request.locale_name,
     }
 

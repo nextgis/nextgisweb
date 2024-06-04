@@ -2,6 +2,7 @@ import warnings
 from dataclasses import dataclass
 
 import zope.event
+import zope.event.classhandler
 from msgspec import Meta
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
 from pyramid.threadlocal import get_current_request
@@ -12,6 +13,7 @@ from typing_extensions import Annotated
 from nextgisweb.env import DBSession, _
 from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
+from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.pyramid import JSONType, viewargs
 from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
@@ -442,3 +444,8 @@ def setup_pyramid(comp, config):
                 _("Resource export"),
                 lambda args: (args.request.route_url("resource.control_panel.resource_export")),
             )
+
+    if comp.options["home.enabled"]:
+        from .home import on_user_login
+
+        zope.event.classhandler.handler(OnUserLogin)(on_user_login)
