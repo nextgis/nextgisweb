@@ -136,9 +136,9 @@ class TileFetcher:
         self._loop.run_until_complete(self._ajob())
 
     def get_tiles(self, connection, layer_name, zoom, xmin, xmax, ymin, ymax):
-        url_template = connection.url_template.format(
-            layer=layer_name, **dict((c.upper(), f"{{{c}}}") for c in "xyzq")
-        )
+        url_template = connection.url_template
+        if r"{layer}" in url_template:
+            url_template = url_template.replace(r"{layer}", layer_name)
         data = dict(
             scheme=connection.scheme,
             url_template=url_template,
