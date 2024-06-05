@@ -1,3 +1,4 @@
+import type { ApiError } from "package/nextgisweb/nextgisweb/gui/nodepkg/error/type";
 import { useMemo, useState } from "react";
 
 import {
@@ -23,18 +24,18 @@ const [msgHelp, msgInfo] = [
 // prettier-ignore
 const ORIGIN_RE = /^https?:\/\/(?:(\*\.)?([_a-z-][_a-z0-9-]*\.)+([_a-z-][_a-z0-9-]*)\.?|([_a-z-][_a-z0-9-]*)|(((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}))(:([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?\/?$/g;
 
-export function CORSSettings(props) {
+export function CORSSettings(props: { readonly: boolean }) {
     const [form] = Form.useForm();
-    const [status, setStatus] = useState(null);
+    const [status, setStatus] = useState<string | null>(null);
 
     const corsRoute = useRouteGet({
         name: "pyramid.csettings",
-        options: { "query": { pyramid: "allow_origin" } },
+        options: { "query": { pyramid: ["allow_origin"] } },
     });
 
     const allowOriginInitial = useMemo(() => {
         const allowOrigin =
-            corsRoute.data && corsRoute.data.pyramid.allow_origin;
+            corsRoute.data && corsRoute?.data?.pyramid?.allow_origin;
         return allowOrigin ? allowOrigin.join("\n") : "";
     }, [corsRoute.data]);
 
@@ -45,14 +46,14 @@ export function CORSSettings(props) {
             try {
                 const list = cors
                     .split(/\n/)
-                    .filter((s) => !s.match(/^\s*$/))
-                    .map((c) => c.trim());
+                    .filter((s: string) => !s.match(/^\s*$/))
+                    .map((c: string) => c.trim());
                 await route("pyramid.csettings").put({
                     json: { pyramid: { allow_origin: list || null } },
                 });
                 message.success(gettext("CORS settings updated"));
             } catch (err) {
-                errorModal(err);
+                errorModal(err as ApiError);
             }
         } catch {
             message.error(gettext("Fix the form errors first"));
@@ -61,14 +62,14 @@ export function CORSSettings(props) {
         }
     }
 
-    const validCORSRule = (val) => {
+    const validCORSRule = (val: string) => {
         const origins = val.split(/\r?\n/).map((x) => x.trim());
         return origins.filter(Boolean).every((x) => x.match(ORIGIN_RE));
     };
 
     const rules = [
         () => ({
-            validator(_, value) {
+            validator(_: unknown, value: string) {
                 if (value && !validCORSRule(value)) {
                     return Promise.reject(
                         new Error(gettext("The value entered is not valid"))
