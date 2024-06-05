@@ -1,19 +1,16 @@
-import { useEffect, useState } from "react";
-
 import { LoadingWrapper } from "@nextgisweb/gui/component";
-import { route } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import "./LegendSymbolsWidet.less";
 
-export function LegendSymbolsWidget({ resourceId }) {
-    const [data, setData] = useState(null);
-
-    useEffect(async () => {
-        setData(await route("render.legend_symbols", resourceId).get());
-    }, []);
+export function LegendSymbolsWidget({ resourceId }: { resourceId: number }) {
+    const { data } = useRouteGet({
+        name: "render.legend_symbols",
+        params: { id: resourceId },
+    });
 
     return (
         <div className="ngw-render-legend-symbols-widget">
-            {data === null ? (
+            {data === undefined ? (
                 <LoadingWrapper />
             ) : (
                 data.map((s, idx) => (
