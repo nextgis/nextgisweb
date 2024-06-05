@@ -1,3 +1,4 @@
+import type { ApiError } from "package/nextgisweb/nextgisweb/gui/nodepkg/error/type";
 import { useEffect, useState } from "react";
 
 import { Col, Row, Space, Typography, message } from "@nextgisweb/gui/antd";
@@ -10,12 +11,12 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export function CustomCSSForm() {
     const [saving, setSaving] = useState(false);
-    const [initial, setInitial] = useState(null);
-    const [data, setData] = useState(null);
+    const [initial, setInitial] = useState<string | null>(null);
+    const [data, setData] = useState<string | null>(null);
 
     const { data: initialData, isLoading } = useRouteGet({
         name: "pyramid.csettings",
-        options: { query: { pyramid: "custom_css" } },
+        options: { query: { pyramid: ["custom_css"] } },
     });
 
     useEffect(() => {
@@ -34,7 +35,7 @@ export function CustomCSSForm() {
                 json: { pyramid: { custom_css: data } },
             });
         } catch (err) {
-            errorModal(err);
+            errorModal(err as ApiError);
         } finally {
             // prettier-ignore
             message.success(gettext("Custom styles saved. Reload the page to get them applied."));
@@ -51,7 +52,7 @@ export function CustomCSSForm() {
             <Row gutter={[16, 16]}>
                 <Col span={14} style={{ height: "300px" }}>
                     <Code
-                        value={initial}
+                        value={initial || undefined}
                         onChange={setData}
                         lang="css"
                         lineNumbers
