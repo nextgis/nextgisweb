@@ -1,18 +1,18 @@
-import type { ApiError } from "package/nextgisweb/nextgisweb/gui/nodepkg/error/type";
 import { useEffect, useState } from "react";
 
 import { Col, Row, Space, Typography, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { Code } from "@nextgisweb/gui/component/code";
 import { errorModal } from "@nextgisweb/gui/error";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export function CustomCSSForm() {
     const [saving, setSaving] = useState(false);
-    const [initial, setInitial] = useState<string | null>(null);
-    const [data, setData] = useState<string | null>(null);
+    const [initial, setInitial] = useState<string>();
+    const [data, setData] = useState<string>();
 
     const { data: initialData, isLoading } = useRouteGet({
         name: "pyramid.csettings",
@@ -52,7 +52,7 @@ export function CustomCSSForm() {
             <Row gutter={[16, 16]}>
                 <Col span={14} style={{ height: "300px" }}>
                     <Code
-                        value={initial || undefined}
+                        value={initial}
                         onChange={setData}
                         lang="css"
                         lineNumbers

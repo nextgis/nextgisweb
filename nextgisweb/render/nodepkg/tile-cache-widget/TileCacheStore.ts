@@ -1,6 +1,9 @@
 import { makeAutoObservable, toJS } from "mobx";
 
-import type { TileCacheStoreOptions } from "../type";
+interface TileCacheStoreOptions {
+    featureTrackChanges: boolean;
+    featureSeed: number;
+}
 
 interface Value {
     enabled?: boolean | null;
@@ -73,11 +76,10 @@ export class TileCacheStore {
         return true;
     }
 
-    update(source: Value) {
+    update(source: Partial<TileCacheStore>) {
         Object.entries(source).forEach(([key, value]) => {
             if (key in this && key !== "isValid") {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (this as any)[key] = value;
+                (this as unknown as Record<string, unknown>)[key] = value;
             }
         });
         this.dirty = true;

@@ -1,4 +1,3 @@
-import type { ApiError } from "package/nextgisweb/nextgisweb/gui/nodepkg/error/type";
 import { useMemo, useState } from "react";
 
 import {
@@ -11,9 +10,14 @@ import {
 } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
+import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+
+interface CORSSettingsForm {
+    cors: string;
+}
 
 // prettier-ignore
 const [msgHelp, msgInfo] = [
@@ -25,8 +29,8 @@ const [msgHelp, msgInfo] = [
 const ORIGIN_RE = /^https?:\/\/(?:(\*\.)?([_a-z-][_a-z0-9-]*\.)+([_a-z-][_a-z0-9-]*)\.?|([_a-z-][_a-z0-9-]*)|(((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}))(:([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?\/?$/g;
 
 export function CORSSettings(props: { readonly: boolean }) {
-    const [form] = Form.useForm();
-    const [status, setStatus] = useState<string | null>(null);
+    const [form] = Form.useForm<CORSSettingsForm>();
+    const [status, setStatus] = useState<string>();
 
     const corsRoute = useRouteGet({
         name: "pyramid.csettings",
@@ -46,8 +50,8 @@ export function CORSSettings(props: { readonly: boolean }) {
             try {
                 const list = cors
                     .split(/\n/)
-                    .filter((s: string) => !s.match(/^\s*$/))
-                    .map((c: string) => c.trim());
+                    .filter((s) => !s.match(/^\s*$/))
+                    .map((c) => c.trim());
                 await route("pyramid.csettings").put({
                     json: { pyramid: { allow_origin: list || null } },
                 });
@@ -58,7 +62,7 @@ export function CORSSettings(props: { readonly: boolean }) {
         } catch {
             message.error(gettext("Fix the form errors first"));
         } finally {
-            setStatus(null);
+            setStatus(undefined);
         }
     }
 

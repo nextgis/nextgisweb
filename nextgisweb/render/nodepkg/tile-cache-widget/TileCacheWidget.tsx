@@ -2,15 +2,17 @@ import { observer } from "mobx-react-lite";
 
 import { Checkbox, InputNumber } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type {
+    EditorWidgetComponent,
+    EditorWidgetProps,
+} from "@nextgisweb/resource/type";
 
 import "./TileCacheWidget.less";
 
-import type { TileCacheWidgetComponent, TileCacheWidgetProps } from "../type";
-
 import type { TileCacheStore } from "./TileCacheStore";
 
-export const TileCacheWidget: TileCacheWidgetComponent<
-    TileCacheWidgetProps<TileCacheStore>
+export const TileCacheWidget: EditorWidgetComponent<
+    EditorWidgetProps<TileCacheStore>
 > = observer(({ store }) => {
     return (
         <div className="ngw-render-tile-cache-widget">
@@ -36,9 +38,9 @@ export const TileCacheWidget: TileCacheWidgetComponent<
             </Checkbox>
 
             <Checkbox
-                checked={store.imageCompose || undefined}
+                checked={!!store.imageCompose}
                 onChange={(e) =>
-                    store.update({ image_compose: e.target.checked })
+                    store.update({ imageCompose: e.target.checked })
                 }
             >
                 {gettext("Allow using tiles in non-tile requests")}
@@ -46,9 +48,9 @@ export const TileCacheWidget: TileCacheWidgetComponent<
 
             {store.featureTrackChanges && (
                 <Checkbox
-                    checked={store.trackChanges || undefined}
+                    checked={!!store.trackChanges}
                     onChange={(e) => {
-                        store.update({ track_changes: e.target.checked });
+                        store.update({ trackChanges: e.target.checked });
                     }}
                 >
                     {gettext("Track changes")}
@@ -58,7 +60,7 @@ export const TileCacheWidget: TileCacheWidgetComponent<
             <label>{gettext("Max zoom level")}</label>
             <InputNumber
                 value={store.maxZ}
-                onChange={(v) => store.update({ max_z: v })}
+                onChange={(v) => store.update({ maxZ: v })}
                 min={0}
                 max={18}
             />
@@ -68,7 +70,7 @@ export const TileCacheWidget: TileCacheWidgetComponent<
                     <label>{gettext("Seed zoom level")}</label>
                     <InputNumber
                         value={store.seedZ}
-                        onChange={(v) => store.update({ seed_z: v })}
+                        onChange={(v) => store.update({ seedZ: v })}
                         min={0}
                         max={18}
                     />
@@ -83,7 +85,6 @@ export const TileCacheWidget: TileCacheWidgetComponent<
                 max={315360000}
                 step={86400}
             />
-
             <Checkbox>{gettext("Flush")}</Checkbox>
         </div>
     );
