@@ -8,18 +8,27 @@ import { url } from "../nextgis";
 
 const NOTIFICATION_ORDER = ["success", "danger"];
 
+export interface MenuItem {
+    key?: number;
+    className?: string;
+    href?: string;
+    title?: string;
+    notification?: string;
+}
+
 class LayoutStore {
-    menuNotification = null;
-    menuItems = [];
+    menuNotification: string | null = null;
+    menuItems: MenuItem[] = [];
+    _counter: number;
 
     constructor() {
         makeAutoObservable(this);
         this._counter = 0;
     }
 
-    addMenuItem(item) {
+    addMenuItem(item: MenuItem) {
         const { notification, ...rest } = item;
-        if (notification) {
+        if (notification && this.menuNotification) {
             rest.className = rest.className || `notification-${notification}`;
             if (
                 NOTIFICATION_ORDER.indexOf(notification) >

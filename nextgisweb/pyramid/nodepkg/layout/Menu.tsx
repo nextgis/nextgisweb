@@ -4,13 +4,16 @@ import { useState } from "react";
 import { Drawer } from "@nextgisweb/gui/antd";
 
 import { layoutStore } from "./store";
+import type { MenuItem as MenuItemProps } from "./store";
 
 import CircleIcon from "@nextgisweb/icon/material/circle";
 import MenuIcon from "@nextgisweb/icon/material/menu";
 
 import "./Menu.less";
 
-const MenuItem = observer(({ title, ...rest }) => <a {...rest}>{title}</a>);
+const MenuItem = observer(({ title, ...rest }: MenuItemProps) => (
+    <a {...rest}>{title}</a>
+));
 
 export const Menu = observer(() => {
     const [visible, setVisible] = useState(false);
