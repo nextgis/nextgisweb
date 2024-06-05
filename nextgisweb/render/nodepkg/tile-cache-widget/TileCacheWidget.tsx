@@ -5,14 +5,20 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import "./TileCacheWidget.less";
 
-export const TileCacheWidget = observer(({ store }) => {
+import type { TileCacheWidgetComponent, TileCacheWidgetProps } from "../type";
+
+import type { TileCacheStore } from "./TileCacheStore";
+
+export const TileCacheWidget: TileCacheWidgetComponent<
+    TileCacheWidgetProps<TileCacheStore>
+> = observer(({ store }) => {
     return (
         <div className="ngw-render-tile-cache-widget">
             <Checkbox
-                checked={store.enabled}
+                checked={store.enabled || undefined}
                 onChange={(e) => {
                     const enabled = e.target.checked;
-                    const data = { enabled };
+                    const data: Partial<TileCacheStore> = { enabled };
                     if (
                         enabled &&
                         !store.imageCompose &&
@@ -30,9 +36,9 @@ export const TileCacheWidget = observer(({ store }) => {
             </Checkbox>
 
             <Checkbox
-                checked={store.imageCompose}
+                checked={store.imageCompose || undefined}
                 onChange={(e) =>
-                    store.update({ imageCompose: e.target.checked })
+                    store.update({ image_compose: e.target.checked })
                 }
             >
                 {gettext("Allow using tiles in non-tile requests")}
@@ -40,9 +46,9 @@ export const TileCacheWidget = observer(({ store }) => {
 
             {store.featureTrackChanges && (
                 <Checkbox
-                    checked={store.trackChanges}
+                    checked={store.trackChanges || undefined}
                     onChange={(e) => {
-                        store.update({ trackChanges: e.target.checked });
+                        store.update({ track_changes: e.target.checked });
                     }}
                 >
                     {gettext("Track changes")}
@@ -52,7 +58,7 @@ export const TileCacheWidget = observer(({ store }) => {
             <label>{gettext("Max zoom level")}</label>
             <InputNumber
                 value={store.maxZ}
-                onChange={(v) => store.update({ maxZ: v })}
+                onChange={(v) => store.update({ max_z: v })}
                 min={0}
                 max={18}
             />
@@ -62,7 +68,7 @@ export const TileCacheWidget = observer(({ store }) => {
                     <label>{gettext("Seed zoom level")}</label>
                     <InputNumber
                         value={store.seedZ}
-                        onChange={(v) => store.update({ seedZ: v })}
+                        onChange={(v) => store.update({ seed_z: v })}
                         min={0}
                         max={18}
                     />
