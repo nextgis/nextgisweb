@@ -8,7 +8,7 @@ export function SystemNameForm() {
         <SingleSettingForm
             component="pyramid"
             model="pyramid.csettings"
-            saveSuccesText={msgSaved}
+            saveSuccessText={msgSaved}
             settingName="full_name"
         />
     );
