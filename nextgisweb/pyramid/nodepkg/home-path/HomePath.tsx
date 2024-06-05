@@ -9,7 +9,7 @@ export function HomePath() {
             component="pyramid"
             model="pyramid.csettings"
             settingName="home_path"
-            saveSuccesText={msgSuccess}
+            saveSuccessText={msgSuccess}
             inputProps={{ placeholder: "/resource/0" }}
         />
     );
