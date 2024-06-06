@@ -61,7 +61,7 @@ export interface ResourcePickerStoreOptions {
     requireInterface?: ResourceInterface | null;
     traverseClasses?: ResourceCls[] | null;
     hideUnavailable?: boolean;
-    onTraverse?: (parentId: number) => void;
+    onTraverse?: ((parentId: number) => void) | null;
 }
 
 export interface ResourcePickerCardProps<V extends SelectValue = SelectValue> {

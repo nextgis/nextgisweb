@@ -55,11 +55,11 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     disableResourceIds: number[] = [];
 
     requireClass: ResourceCls | null = null;
-    requireInterface?: ResourceInterface;
+    requireInterface: ResourceInterface | null = null;
 
     allowSelection = true;
     allowMoveInside = true;
-    traverseClasses?: ResourceCls[];
+    traverseClasses: ResourceCls[] | null = null;
 
     allowCreateResource = true;
 
@@ -67,13 +67,13 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     multiple = false;
 
-    readonly onNewGroup?: OnNewGroupType;
-    readonly onTraverse?: (parentId: number) => void;
+    readonly onNewGroup: OnNewGroupType | null = null;
+    readonly onTraverse: ((parentId: number) => void) | null = null;
 
-    setResourcesAbortController?: AbortController;
-    setBreadcrumbItemsAbortController?: AbortController;
-    createNewGroupAbortController?: AbortController;
-    getSelectedParentAbortController?: AbortController;
+    setResourcesAbortController: AbortController | null = null;
+    setBreadcrumbItemsAbortController: AbortController | null = null;
+    createNewGroupAbortController: AbortController | null = null;
+    getSelectedParentAbortController: AbortController | null = null;
 
     getThisMsg = msgPickThis;
     getSelectedMsg = msgPickSelected;
@@ -435,27 +435,27 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         if (this.setResourcesAbortController) {
             this.setResourcesAbortController.abort();
         }
-        this.setResourcesAbortController = undefined;
+        this.setResourcesAbortController = null;
     }
 
     private _abortBreadcrumbsLoading(): void {
         if (this.setBreadcrumbItemsAbortController) {
             this.setBreadcrumbItemsAbortController.abort();
         }
-        this.setBreadcrumbItemsAbortController = undefined;
+        this.setBreadcrumbItemsAbortController = null;
     }
 
     private _abortSelectedParentLoading(): void {
         if (this.getSelectedParentAbortController) {
             this.getSelectedParentAbortController.abort();
         }
-        this.getSelectedParentAbortController = undefined;
+        this.getSelectedParentAbortController = null;
     }
 
     private _abortNewGroupCreation(): void {
         if (this.createNewGroupAbortController) {
             this.createNewGroupAbortController.abort();
         }
-        this.createNewGroupAbortController = undefined;
+        this.createNewGroupAbortController = null;
     }
 }
