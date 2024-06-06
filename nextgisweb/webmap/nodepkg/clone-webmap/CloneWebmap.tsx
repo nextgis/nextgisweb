@@ -108,10 +108,13 @@ export function CloneWebmap({
 
     useEffect(() => {
         if (data && data.resource) {
-            const parent = data.resource.parent;
-            if (parent) {
-                form.setFieldsValue({ parent: parent.id });
-                setUniqName(data.resource.display_name, parent.id);
+            const parentId =
+                ngwConfig.resourceHome && "id" in ngwConfig.resourceHome
+                    ? ngwConfig.resourceHome.id
+                    : data.resource.parent?.id;
+            if (typeof parentId === "number") {
+                form.setFieldsValue({ parent: parentId });
+                setUniqName(data.resource.display_name, parentId);
             }
         }
     }, [data, form, setUniqName]);
