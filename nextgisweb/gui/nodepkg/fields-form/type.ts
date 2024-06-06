@@ -28,9 +28,11 @@ export interface ChildProps {
     [key: string]: unknown;
 }
 
+export type NameType<N extends string = string> = N | `#${string}`;
+
 export interface FormItemProps<N extends string = string>
     extends AntdFormItemProps {
-    name: N;
+    name: NameType<N>;
     prepend?: ReactNode;
     append?: ReactNode;
     input?: ComponentType<ChildProps> | React.ReactNode;
@@ -54,5 +56,5 @@ export interface FieldsFormProps<
     onChange?: (options: FormOnChangeOptions<P>) => void;
     children?: ReactNode;
     fields: FormField<Extract<keyof P, string>>[];
-    form?: FormInstance;
+    form?: FormInstance<P>;
 }
