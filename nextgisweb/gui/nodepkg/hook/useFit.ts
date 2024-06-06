@@ -8,7 +8,7 @@ export function useFit({
     ref: MutableRefObject<HTMLDivElement | null>;
     deps?: DependencyList;
 }) {
-    const [isFit, setIsFit] = useState(false);
+    const [isFit, setIsFit] = useState(true);
     const isFitStopRef = useRef<number>();
 
     const checkFit = useCallback(() => {
