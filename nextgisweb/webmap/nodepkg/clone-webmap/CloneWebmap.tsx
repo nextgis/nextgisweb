@@ -20,6 +20,11 @@ import { getUniqueName } from "./util/getUniqName";
 
 const msgSaveButtonTitle = gettext("Clone");
 
+interface CloneProps {
+    name: string;
+    parent: number;
+}
+
 export interface AfterCloneOptions {
     item: ResourceRefWithParent;
 }
@@ -41,7 +46,7 @@ export function CloneWebmap({
     saveButtonTitle = msgSaveButtonTitle,
     fieldsFormProps,
 }: CloneWebmapProps) {
-    const form = Form.useForm()[0];
+    const form = Form.useForm<CloneProps>()[0];
 
     const { data, isLoading } = useRouteGet(
         "resource.item",
@@ -54,19 +59,23 @@ export function CloneWebmap({
     const [nameLoading, setNameLoading] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    const fields = useMemo<FormField[]>(
+    const ResourceSelectFormItem = useMemo(() => {
+        return (
+            <ResourceSelect
+                pickerOptions={{
+                    traverseClasses: ["resource_group"],
+                    hideUnavailable: true,
+                }}
+            />
+        );
+    }, []);
+
+    const fields = useMemo<FormField<keyof CloneProps>[]>(
         () => [
             {
                 name: "parent",
                 label: gettext("Resource group"),
-                formItem: (
-                    <ResourceSelect
-                        pickerOptions={{
-                            traverseClasses: ["resource_group"],
-                            hideUnavailable: true,
-                        }}
-                    />
-                ),
+                formItem: ResourceSelectFormItem,
                 required: true,
             },
             {
@@ -77,7 +86,7 @@ export function CloneWebmap({
                 required: true,
             },
         ],
-        [nameLoading]
+        [nameLoading, ResourceSelectFormItem]
     );
 
     const setUniqName = useCallback(
@@ -146,7 +155,7 @@ export function CloneWebmap({
 
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
-            <FieldsForm
+            <FieldsForm<CloneProps>
                 {...fieldsFormProps}
                 form={form}
                 fields={fields}
