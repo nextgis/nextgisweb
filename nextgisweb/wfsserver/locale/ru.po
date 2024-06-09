@@ -1,6 +1,26 @@
-#: amd/ngw-wfsserver/ServiceWidget.js:56 model.py:17
+#: model.py:20 nodepkg/service-widget/ServiceWidget.tsx:102
 msgid "WFS service"
 msgstr "Сервис WFS"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:27
+msgid "Display name"
+msgstr "Наименование"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:32
+msgid "Keyname"
+msgstr "Ключ"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:37
+msgid "Features per request"
+msgstr "Объектов на запрос"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:42
+msgid "Not set"
+msgstr "Не заполнено"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:47
+msgid "Resource"
+msgstr "Ресурс"
 
 #: view.py:16
 msgid "Web Feature Service (WFS)"
@@ -14,32 +34,3 @@ msgstr ""
 "Web Feature Service (WFS) предоставляет интерфейс, позволяющий запрашивать "
 "географические сущности, используя независимые от используемой платформы "
 "вызовы."
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:14
-msgid "Add"
-msgstr "Добавить"
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:18
-msgid "Select vector layer"
-msgstr "Выберите векторный слой"
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:27
-msgid "Remove"
-msgstr "Удалить"
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:62
-msgid "Keyname"
-msgstr "Ключ"
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:66
-msgid "Display name"
-msgstr "Наименование"
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:70
-msgid "Features per request"
-msgstr "Объектов на запрос"
-
-#: amd/ngw-wfsserver/template/ServiceWidget.hbs:74
-msgid "Resource"
-msgstr "Ресурс"
-
